@@ -15,10 +15,13 @@ import {RestError} from 'models/misc';
 import {useUserSession} from './useUserSession';
 import {useCompanyXeroInfo} from './useCompanies';
 
-export const download = (blob: Blob, filename: string) => {
+export const download = (blob: Blob, filename: string, ext?: string) => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.setAttribute('download', `${filename}_${toRestDateTime(new Date())}`);
+  a.setAttribute(
+    'download',
+    `${filename}_${toRestDateTime(new Date())}${ext ?? ''}`,
+  );
   a.click();
 };
 
@@ -276,7 +279,7 @@ export const fetchInvoicesDf2 = async (
     `/api/reports/${serviceCompanyId}/invoice.df2`,
     {
       headers: {
-        accept: 'text/csv',
+        accept: 'application/octet-stream',
       },
       responseType: 'blob',
       params,
@@ -297,7 +300,7 @@ export const useInvoicesDf2 = (
     () => fetchInvoicesDf2(serviceCompanyId, params),
     {
       onSuccess: (data) => {
-        download(data, ReportType.FINANCIALS);
+        download(data, ReportType.FINANCIALS, '.df2');
         enqueueSnackbar('Report downloaded successfully!', {
           variant: 'success',
         });
