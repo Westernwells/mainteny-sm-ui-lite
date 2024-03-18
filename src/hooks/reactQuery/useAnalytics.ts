@@ -15,10 +15,13 @@ import {RestError} from 'models/misc';
 import {useUserSession} from './useUserSession';
 import {useCompanyXeroInfo} from './useCompanies';
 
-export const download = (blob: Blob, filename: string) => {
+export const download = (blob: Blob, filename: string, ext?: string) => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.setAttribute('download', `${filename}_${toRestDateTime(new Date())}`);
+  a.setAttribute(
+    'download',
+    `${filename}_${toRestDateTime(new Date())}${ext ?? ''}`,
+  );
   a.click();
 };
 
@@ -255,6 +258,49 @@ export const useInvoicesSage50 = (
     {
       onSuccess: (data) => {
         download(data, ReportType.FINANCIALS);
+        enqueueSnackbar('Report downloaded successfully!', {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+      enabled: false,
+    },
+  );
+};
+
+export const fetchInvoicesDf2 = async (
+  serviceCompanyId: string,
+  params: QueryFinancials,
+) => {
+  const response = await axiosClient.get(
+    `/api/reports/${serviceCompanyId}/invoice.df2`,
+    {
+      headers: {
+        accept: 'application/octet-stream',
+      },
+      responseType: 'blob',
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export const useInvoicesDf2 = (
+  serviceCompanyId: string,
+  params: QueryFinancials,
+) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useQuery(
+    [FormatType.DF2, serviceCompanyId, params],
+    () => fetchInvoicesDf2(serviceCompanyId, params),
+    {
+      onSuccess: (data) => {
+        download(data, ReportType.FINANCIALS, '.df2');
         enqueueSnackbar('Report downloaded successfully!', {
           variant: 'success',
         });

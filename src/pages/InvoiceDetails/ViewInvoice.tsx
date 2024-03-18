@@ -59,7 +59,7 @@ import {ChecklistStatus} from 'models/service-order';
 import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
 import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
 import {InvoiceActivities} from './InvoiceActivities';
-import {Notes} from './Notes';
+import {Notes} from './Notes/EditNotes';
 
 interface Props {
   downloadUrl: string;
