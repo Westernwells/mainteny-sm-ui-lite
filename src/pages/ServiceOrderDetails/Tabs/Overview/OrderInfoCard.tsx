@@ -77,6 +77,12 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {t} = useTranslation();
   const {mutate: cancelServiceOrder} = useCancelServiceOrders();
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
+  const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(
+    'Service job rescheduled successfully',
+  );
+  const {mutate: scheduleServiceOrder} = useUpdateServiceOrderSchedule(
+    'Service job scheduled successfully',
+  );
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);

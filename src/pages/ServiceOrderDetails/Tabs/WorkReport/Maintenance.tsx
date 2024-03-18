@@ -215,7 +215,7 @@ export const Maintenance = ({serviceOrder, formik}: Props) => {
               py={1}
               px={2}>
               <Typography color="white" fontWeight={700} flexShrink={0}>
-                {t('Billable hours')}:
+                {t('Billable hours:')}
               </Typography>
               <Box display="flex" flexDirection="column">
                 <Typography color="white" fontWeight={700} flexShrink={0}>
