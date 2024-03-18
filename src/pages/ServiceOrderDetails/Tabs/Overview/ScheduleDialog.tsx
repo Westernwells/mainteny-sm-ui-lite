@@ -1,5 +1,4 @@
 import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
-import {t} from 'i18next';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -27,6 +26,7 @@ import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
 import {formatDate, setDateTime, toRestDateTime} from 'utils/datetime';
 import {JobScheduleType} from 'models/service-order';
+import {useTranslation} from 'react-i18next';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -71,12 +71,14 @@ export const ScheduleDialog = ({
   serviceOrderId,
   open,
   onClose,
-  title = t('Assign Engineer'),
+  title = 'Assign Engineer',
   defaultTechnicians,
   defaultStartDate,
   defaultEndDate,
   onSaveCB,
 }: Props) => {
+  const {t} = useTranslation();
+
   const [query, setQuery] = useState<string>('');
   const {mutate: scheduleServiceOrder} = useUpdateServiceOrderSchedule(
     t('Service job scheduled successfully'),
