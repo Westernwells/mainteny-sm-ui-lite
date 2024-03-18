@@ -56,6 +56,7 @@ export const ContractParties = ({
             {customerNumber ? (
               <Typography
                 variant="subtitle1"
+                fontWeight={600}
                 onClick={() =>
                   navigate(`/customers/details/${customerId}?tab=0`)
                 }
@@ -68,7 +69,8 @@ export const ContractParties = ({
             ) : (
               <Typography
                 variant="subtitle1"
-                sx={{display: 'block', fontWeight: '600'}}>
+                fontWeight={600}
+                sx={{display: 'block'}}>
                 {name || ''}
               </Typography>
             )}
