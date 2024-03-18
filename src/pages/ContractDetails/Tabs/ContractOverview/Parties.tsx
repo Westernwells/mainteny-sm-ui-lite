@@ -19,7 +19,6 @@ interface Props {
 export const Parties: FC<Props> = ({contractDetails, user}) => {
   const {t} = useTranslation();
   const theme = useTheme();
-
   return (
     <Grid item xs={12} md={8}>
       <ContractCard
@@ -53,19 +52,25 @@ export const Parties: FC<Props> = ({contractDetails, user}) => {
           }}>
           <Grid
             item
-            xs={5}
+            xs={3}
             sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
             {t('CONTRACT PARTY')}
           </Grid>
           <Grid
             item
-            xs={5}
+            xs={3}
+            sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
+            {t('CUSTOMER NUMBER')}
+          </Grid>
+          <Grid
+            item
+            xs={3}
             sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
             {t('ADDRESS')}
           </Grid>
           <Grid
             item
-            xs={2}
+            xs={3}
             display="flex"
             justifyContent="center"
             sx={{color: theme.palette.text.secondary, fontWeight: 600}}>
@@ -92,6 +97,8 @@ export const Parties: FC<Props> = ({contractDetails, user}) => {
             contractDetails?.propertyOwner.billingAddress?.fullName ?? ''
           }
           phoneNumber={contractDetails?.propertyOwner.contact.phone}
+          customerNumber={contractDetails?.propertyOwner.externalId}
+          customerId={contractDetails?.propertyOwner.id}
           partyType="CUSTOMER"
           chipStyles={{
             chipColor: 'primary',
