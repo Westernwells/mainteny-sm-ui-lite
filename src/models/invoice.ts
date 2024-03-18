@@ -337,6 +337,7 @@ export interface InvoiceFormData {
   deliveryStartDate?: Date;
   deliveryEndDate?: Date;
   showArticleSection?: boolean;
+  notes?: CreateInvoiceComment[];
 }
 
 export interface CreateInvoice {
@@ -376,6 +377,7 @@ export interface CreateInvoice {
   deliveryEndDate?: string;
   showArticleSection?: boolean;
   refInvoiceId?: string;
+  notes?: CreateInvoiceComment[];
 }
 
 export interface UpdateInvoice {
@@ -420,6 +422,7 @@ export interface QueryInvoiceCommentsParams {
 export interface CreateInvoiceComment {
   content: string;
   subject: string;
+  id?: string;
 }
 
 export interface InvoicePaymentRecord {

@@ -66,7 +66,6 @@ import {
 import {
   AddressComponent,
   AddressRecord,
-  Amount,
   PdfGenerationStatus,
 } from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -93,7 +92,6 @@ import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pi
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
-import {ContractPaymentTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
 import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
@@ -104,6 +102,9 @@ import {PartialPaymentsSection} from './PartialPaymentsSection';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
 import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 import {T} from 'utils/i18n-utils';
+import {Notes} from './Notes/EditNotes';
+import {CreateNotes} from './Notes/CreateNotes';
+import {ContractPaymentTermView} from 'models/contract';
 
 interface Props {
   invoice?: InvoiceView;
@@ -288,7 +289,7 @@ export const InvoiceForm = ({
       typeof invoiceType === 'string' &&
       invoiceType &&
       invoiceType in InvoiceType
-        ? InvoiceType[invoiceType as InvoiceType]
+        ? InvoiceType[invoiceType]
         : InvoiceType.FULL,
     items: [],
     paymentTerms: '',
@@ -305,6 +306,7 @@ export const InvoiceForm = ({
     moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
     unitNumber: '-',
     showArticleSection: true,
+    notes: [],
   };
 
   const validationSchema = Yup.object().shape({
@@ -340,6 +342,18 @@ export const InvoiceForm = ({
         ? addYears(new Date(), 1)
         : values.dueDate;
 
+    const createData = {
+      notes:
+        values.notes?.map((note) => ({
+          content: note.content,
+          subject: note.subject,
+        })) || [],
+      refInvoiceId:
+        formType === 'new' && invoiceType === InvoiceType.CREDIT_NOTE
+          ? invoice?.id
+          : undefined,
+    };
+
     if (formType === 'edit' && invoice) {
       return updateInvoiceAsync({
         data: formatInvoiceRecord({
@@ -356,10 +370,7 @@ export const InvoiceForm = ({
           ...values,
           dueDate,
         }) as CreateInvoice),
-        refInvoiceId:
-          formType === 'new' && invoiceType === InvoiceType.CREDIT_NOTE
-            ? invoice?.id
-            : undefined,
+        ...createData,
       },
     });
   }
@@ -927,12 +938,19 @@ export const InvoiceForm = ({
             p={3}
             rowGap={2}
             flexWrap="wrap">
-            <Grid item xs={12}>
+            <Grid item xs={12} display="flex" justifyContent="space-between">
               <Box pb={0.5}>
                 <SectionTitle
                   Icon={MapPinIllustration}
                   title="Address information"
                 />
+              </Box>
+              <Box pb={0.5}>
+                {formType === 'edit' ? (
+                  <Notes invoice={invoice!} />
+                ) : (
+                  <CreateNotes formik={formik} customer={customer} />
+                )}
               </Box>
             </Grid>
 

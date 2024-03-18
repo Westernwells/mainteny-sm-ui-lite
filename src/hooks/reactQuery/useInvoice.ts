@@ -249,6 +249,7 @@ export const useCreateInvoice = () => {
       queryClient.invalidateQueries([qk.fetchInvoices]);
       queryClient.invalidateQueries([qk.invoiceById]);
       queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+      queryClient.invalidateQueries([qk.fetchInvoiceComments]);
       enqueueSnackbar(`Invoice created successfully`, {
         variant: 'success',
       });
