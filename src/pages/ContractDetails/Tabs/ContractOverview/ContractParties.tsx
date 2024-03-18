@@ -4,6 +4,8 @@ import Grid from '@mui/material/Grid';
 import {ServiceCompanyView} from 'models/service-company';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useTranslation} from 'react-i18next';
+import React from 'react';
+import {useNavigate} from 'react-router-dom';
 import PartiesChipStatus from './PartiesChipStatus';
 
 interface Props {
@@ -13,6 +15,8 @@ interface Props {
   partyType?: string;
   occupation?: string;
   containerStyle?: {[key: string]: string | number};
+  customerNumber?: string;
+  customerId?: string;
   chipStyles?: {
     chipMaxChars?: number;
     chipLength?: 'short' | 'medium' | 'long' | 'auto';
@@ -39,18 +43,35 @@ export const ContractParties = ({
   partyType,
   containerStyle,
   chipStyles,
+  customerNumber,
+  customerId,
 }: Props) => {
   const {t} = useTranslation();
+  const navigate = useNavigate();
   return (
     <Grid container sx={{...containerStyle, marginBottom: 2}}>
-      <Grid item xs={5}>
+      <Grid item xs={3}>
         <Box display="flex" alignItems="center">
           <Box display="flex" flexDirection="column">
-            <Typography
-              variant="subtitle1"
-              sx={{display: 'block', fontWeight: '600'}}>
-              {name || ''}
-            </Typography>
+            {customerNumber ? (
+              <Typography
+                variant="subtitle1"
+                onClick={() =>
+                  navigate(`/customers/details/${customerId}?tab=0`)
+                }
+                sx={{
+                  color: 'primary.light',
+                  cursor: 'pointer',
+                }}>
+                {name || ''}
+              </Typography>
+            ) : (
+              <Typography
+                variant="subtitle1"
+                sx={{display: 'block', fontWeight: '600'}}>
+                {name || ''}
+              </Typography>
+            )}
             <Typography variant="body2" sx={{display: 'block'}}>
               {typeof occupation === 'string' ? t(occupation) : ''}
             </Typography>
@@ -58,7 +79,14 @@ export const ContractParties = ({
         </Box>
       </Grid>
 
-      <Grid item xs={5} alignSelf="center">
+      <Grid item xs={3} alignSelf="center">
+        <Box>
+          <Typography variant="body2" fontWeight={600}>
+            {customerNumber || '-'}
+          </Typography>
+        </Box>
+      </Grid>
+      <Grid item xs={3} alignSelf="center">
         <Box>
           <Typography variant="body2" fontWeight={600}>
             {address || ''}
@@ -70,7 +98,7 @@ export const ContractParties = ({
       </Grid>
       <Grid
         item
-        xs={2}
+        xs={3}
         alignSelf="center"
         display="flex"
         justifyContent="center">
