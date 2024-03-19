@@ -8,20 +8,19 @@ import {countriesOptions, getStatesByCountry} from 'utils/countries';
 import {FormSelect} from 'components/form/FormSelect';
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 import {useTranslation} from 'react-i18next';
-import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import {PropertyOwnerView} from 'models/propertyManager';
 
 interface Props {
   formik: FormikProps<LocationFormModel>;
+  initialCustomer?: PropertyOwnerView;
 }
 
-export const EditLocationForm = ({formik}: Props) => {
+export const EditLocationForm = ({formik, initialCustomer}: Props) => {
   const {t} = useTranslation();
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
     [formik.values.address?.component?.country],
   );
-
-  const {data: initialCustomer} = useGetCustomer(formik.values.propertyOwnerId);
 
   return (
     <Grid container component="form" spacing={2}>
@@ -36,7 +35,7 @@ export const EditLocationForm = ({formik}: Props) => {
               formik.setFieldValue('propertyOwnerId', value.id);
             }
           }}
-          initialValue={initialCustomer || null}
+          initialValue={initialCustomer!}
           textFieldProps={{
             required: true,
             error: !!(

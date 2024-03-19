@@ -15,6 +15,7 @@ import {LocationFormModel} from 'models/unitForm';
 import {formatAddressFullname} from 'utils/utils';
 import {AddressRecord} from 'models/misc';
 import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {LocationSchema} from './LocationSchema';
 import {EditLocationForm} from './EditLocationForm';
 
@@ -66,7 +67,6 @@ export const Location = ({
       keyLocation: elevator.additionalInfo.keyLocation,
       parking: elevator.additionalInfo.parking,
       propertyOwnerId,
-      // TODO: check functionality after backend implementation
       distance: elevator.additionalInfo?.distance,
       travelTime: elevator.additionalInfo?.travelTime,
       travelFee: elevator.additionalInfo?.travelFee,
@@ -76,6 +76,7 @@ export const Location = ({
   });
   const labels = useRef([
     'customer',
+    'customerNumber',
     'address',
     'building',
     'propertySegment',
@@ -99,7 +100,6 @@ export const Location = ({
         propertySegment: formik.values.propertySegment!,
         keyLocation: formik.values.keyLocation!,
         parking: formik.values.parking!,
-        // TODO: check functionality after backend implementation
         distance: formik.values.distance!,
         travelTime: formik.values.travelTime!,
         travelFee: formik.values.travelFee!,
@@ -107,6 +107,8 @@ export const Location = ({
       elevatorId: elevator.id,
     });
   };
+
+  const {data: initialCustomer} = useGetCustomer(propertyOwnerId);
 
   return (
     <InfoCard
@@ -133,14 +135,14 @@ export const Location = ({
         onCancel={() => {
           setOpenDialog(false);
         }}
-        disableSaveBtn={!!Object.keys(formik.errors).length || !formik.dirty}
+        disableSaveBtn={!!Object.keys(formik.errors).length}
         onSave={() => onSave()}
         dialogProps={{
           maxWidth: 'sm',
           open: openDialog || false,
           sx: {height: '100%'},
         }}>
-        <EditLocationForm formik={formik} />
+        <EditLocationForm formik={formik} initialCustomer={initialCustomer} />
       </Dialog>
     </InfoCard>
   );

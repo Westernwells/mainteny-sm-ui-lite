@@ -38,7 +38,7 @@ export const FormInput = forwardRef(
       <FormControl sx={{...containerStyles}} fullWidth={fullWidth}>
         {inputType === 'currency' ? (
           <NumericFormat
-            value={Number(props!.value)}
+            value={Number(props!.inputProps!.defaultValue || props!.value)}
             onValueChange={(values) => {
               if (onValueChange) {
                 onValueChange({

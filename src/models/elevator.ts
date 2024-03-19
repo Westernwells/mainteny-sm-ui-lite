@@ -2,6 +2,7 @@ import {
   Address,
   AddressRecord,
   Fee,
+  InspectionCycle,
   Meta,
   Order,
   Priority,
@@ -28,7 +29,9 @@ export enum ElevatorCommentType {
 export enum ElevatorStatus {
   RUNNING = 'RUNNING',
   BROKEN = 'BROKEN',
-  STOPPED = 'STOPPED',
+  JOB_ONGOING = 'JOB_ONGOING',
+  UNKNOWN = 'UNKNOWN',
+  OUT_OF_SERVICE = 'OUT_OF_SERVICE',
 }
 
 export enum ElevatorCategory {
@@ -121,10 +124,12 @@ export interface ElevatorAdditionalInfo {
   counterWeight: string;
   hoistingHeight: string;
   shaftHeight: string;
-  spendingLimit: string;
+  spendingLimit: number;
   distance: string;
   travelTime: string;
   travelFee: string;
+  inspectionCycle: InspectionCycle;
+  numberOfPeople: number;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -349,6 +354,7 @@ export interface ElevatorTimeRuleRecord {
 export interface CustomerAppointment {
   shouldNotifyCustomer: boolean;
   appointmentNotificationDue: number;
+  requiresAppointment: boolean;
 }
 
 export interface ElevatorRequestBody {
@@ -395,10 +401,12 @@ export interface ElevatorRequestBody {
   counterWeight: string;
   hoistingHeight: string;
   shaftHeight: string;
-  // TODO: check functionality after backend implementation
+  spendingLimit: number;
+  inspectionCycle: InspectionCycle;
   distance: string;
   travelTime: string;
   travelFee: string;
+  numberOfPeople: number;
 }
 
 export interface ElevatorComment {

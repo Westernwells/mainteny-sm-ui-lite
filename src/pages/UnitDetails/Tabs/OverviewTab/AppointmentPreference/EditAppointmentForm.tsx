@@ -1,12 +1,15 @@
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {TimePicker} from 'components/TimePicker';
-import {FormCheckbox} from 'components/form/FormCheckbox';
 import {AppointmentFormModel} from 'models/unitForm';
 import {setDateTime} from 'utils/datetime';
 import Grid from '@mui/material/Grid';
 import {useTranslation} from 'react-i18next';
 import {useFormatDate} from 'hooks/useFormatDate';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
 import {UseFormRegister, UseFormSetValue, UseFormWatch} from 'react-hook-form';
 
 interface Props {
@@ -54,7 +57,7 @@ export const EditAppointmentForm = ({
 
   return (
     <Grid container spacing={2} component="form">
-      <Grid item sm={12} md={12}>
+      <Grid item sm={12} md={12} xs={12}>
         <FormSelect
           labelId="daysOfWeek-label"
           label="Days of the week"
@@ -66,6 +69,8 @@ export const EditAppointmentForm = ({
             })) || []
           }
           selectProps={{
+            disabled:
+              watch('openingHour') === '' || watch('closingHour') === '',
             id: 'daysofWeekSelect',
             value: watch('appointmentDaysOfWeek'),
             multiple: true,
@@ -74,7 +79,7 @@ export const EditAppointmentForm = ({
         />
       </Grid>
 
-      <Grid item sm={12} md={6}>
+      <Grid item sm={6} md={6} xs={12}>
         <TimePicker
           defaultTime={
             defaultValues.openingHour
@@ -96,7 +101,7 @@ export const EditAppointmentForm = ({
         />
       </Grid>
 
-      <Grid item sm={12} md={6}>
+      <Grid item sm={6} md={6} xs={12}>
         <TimePicker
           minTime={
             watch('openingHour')
@@ -123,7 +128,7 @@ export const EditAppointmentForm = ({
         />
       </Grid>
 
-      <Grid item sm={12}>
+      <Grid item sm={12} xs={12}>
         <FormInput
           props={{
             label: t('Notification Due'),
@@ -135,15 +140,48 @@ export const EditAppointmentForm = ({
         />
       </Grid>
 
-      <Grid item sm={12}>
-        <FormCheckbox
-          label={t('Requires Notification')}
-          {...register('shouldNotifyCustomer')}
-          checked={watch('shouldNotifyCustomer')}
-          checkboxProps={{
-            ...register('shouldNotifyCustomer'),
-          }}
-        />
+      <Grid item md={6} sm={6} xs={12}>
+        <FormControl fullWidth>
+          <InputLabel
+            size="small"
+            shrink
+            variant="outlined"
+            id="demo-simple-select-label">
+            {t('Requires appointment')}
+          </InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            label={t('Requires appointment')}
+            size="small"
+            defaultValue={watch('requiresAppointment') ? 'true' : 'false'}
+            notched
+            {...register('requiresAppointment')}>
+            <MenuItem value="true">{t('Yes')}</MenuItem>
+            <MenuItem value="false">{t('No')}</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item md={6} sm={6} xs={12}>
+        <FormControl fullWidth>
+          <InputLabel
+            size="small"
+            shrink
+            variant="outlined"
+            id="demo-simple-select-label">
+            {t('Requires notification')}
+          </InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            label={t('Requires notification')}
+            size="small"
+            defaultValue={watch('shouldNotifyCustomer') ? 'true' : 'false'}
+            notched
+            {...register('shouldNotifyCustomer')}>
+            <MenuItem value="true">{t('Yes')}</MenuItem>
+            <MenuItem value="false">{t('No')}</MenuItem>
+          </Select>
+        </FormControl>
       </Grid>
     </Grid>
   );

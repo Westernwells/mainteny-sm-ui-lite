@@ -1,4 +1,4 @@
-import {AddressRecord} from 'models/misc';
+import {AddressRecord, InspectionCycle} from 'models/misc';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {ElevatorStatus} from './elevator';
 
@@ -13,7 +13,6 @@ export interface LocationFormModel {
   keyLocation?: string;
   parking?: string;
   propertyOwnerId?: string;
-  // TODO: check functionality after backend implementation
   distance?: string;
   travelTime?: string;
   travelFee?: string;
@@ -61,6 +60,7 @@ export interface TechnicalDataFormModel {
   counterWeight?: string;
   hoistingHeight?: string;
   shaftHeight?: string;
+  numberOfPeople?: number;
 }
 
 export interface AutoDialerFormModel {
@@ -81,6 +81,7 @@ export interface ServiceFormModel {
   serviceTime?: number;
   technicianNumber?: number;
   priority?: string;
+  inspectionCycle?: InspectionCycle;
 }
 
 export interface AppointmentFormModel {
@@ -88,6 +89,7 @@ export interface AppointmentFormModel {
   openingHour?: string;
   closingHour?: string;
   shouldNotifyCustomer: boolean;
+  requiresAppointment: boolean;
   appointmentNotificationDue: number;
 }
 

@@ -62,6 +62,7 @@ export const Service = ({
       serviceTime: elevator.serviceTime,
       technicianNumber: elevator.technicianNumber,
       priority: elevator.additionalInfo.priority,
+      inspectionCycle: elevator.additionalInfo.inspectionCycle,
     },
     onSubmit: () => {},
     validationSchema,
@@ -88,6 +89,7 @@ export const Service = ({
         serviceTime: formik.values.serviceTime,
         technicianNumber: formik.values.technicianNumber,
         priority: formik.values.priority as Priority,
+        inspectionCycle: formik.values.inspectionCycle,
       },
       elevatorId: elevator.id,
     });
@@ -107,11 +109,7 @@ export const Service = ({
       <Grid container spacing={2}>
         {labels.map((label) => (
           <Grid key={label} item xs={12} sm={4} md={4}>
-            <ServiceSchema
-              label={label}
-              elevator={elevator}
-              visitNumber={validContract?.visitsNumber}
-            />
+            <ServiceSchema label={label} elevator={elevator} />
           </Grid>
         ))}
       </Grid>

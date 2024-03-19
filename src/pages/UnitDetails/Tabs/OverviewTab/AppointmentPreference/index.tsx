@@ -71,10 +71,13 @@ export const AppointmentPreference = ({
     closingHour: parsedTimeRulesData?.timeRange.end ?? '',
     shouldNotifyCustomer:
       elevatorData.additionalInfo?.customerAppointment?.shouldNotifyCustomer ??
-      true,
+      false,
     appointmentNotificationDue:
       elevatorData.additionalInfo?.customerAppointment
         ?.appointmentNotificationDue ?? 0,
+    requiresAppointment:
+      elevatorData.additionalInfo?.customerAppointment?.requiresAppointment ??
+      false,
   });
 
   const {
@@ -119,6 +122,7 @@ export const AppointmentPreference = ({
         customerAppointment: {
           shouldNotifyCustomer: data.shouldNotifyCustomer,
           appointmentNotificationDue: data.appointmentNotificationDue,
+          requiresAppointment: data.requiresAppointment,
         },
       },
       elevatorId: elevator.id,

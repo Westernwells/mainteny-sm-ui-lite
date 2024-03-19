@@ -56,9 +56,8 @@ export const AppointmentShema = ({
               />
             }
             label="Requires appointment"
-            // TODO: Change to the correct value when the API is ready
             bodyText={
-              elevator.additionalInfo.customerAppointment.shouldNotifyCustomer
+              elevator.additionalInfo?.customerAppointment?.requiresAppointment
                 ? t('Yes')
                 : t('No')
             }

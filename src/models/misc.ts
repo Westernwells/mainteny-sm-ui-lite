@@ -381,3 +381,12 @@ export interface IdState {
   id: string;
   state: State;
 }
+
+export enum InspectionCycle {
+  MONTHLY = 'MONTHLY',
+  BIMONTHLY = 'BIMONTHLY',
+  QUARTERLY = 'QUARTERLY',
+  HALF_YEARLY = 'HALF_YEARLY',
+  YEARLY = 'YEARLY',
+  BIENNIALLY = 'BIENNIALLY',
+}

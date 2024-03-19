@@ -45,9 +45,10 @@ export const OverviewTab = ({getUnitName}: Props) => {
 
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{display: 'flex', alignItems: 'stretch'}}>
         <Grid item md={6} sm={12}>
           <General
+            containerStyles={{height: '100%'}}
             elevator={elevator!}
             propertyOwnerId={elevator?.propertyOwner.id}
           />
@@ -60,9 +61,14 @@ export const OverviewTab = ({getUnitName}: Props) => {
         </Grid>
       </Grid>
 
-      <Grid container spacing={2} mt="0.3em">
+      <Grid
+        container
+        spacing={2}
+        mt="0.3em"
+        sx={{display: 'flex', alignItems: 'stretch'}}>
         <Grid item xs={12} md={6}>
           <Service
+            containerStyles={{height: '100%'}}
             elevator={elevator!}
             validContract={validContract}
             propertyOwnerId={elevator?.propertyOwner.id}
