@@ -8,9 +8,9 @@ import {Location} from './Location';
 import General from './General';
 import {Service} from './Service';
 import {AppointmentPreference} from './AppointmentPreference';
-import {UnitContracts} from './UnitContracts';
 import {PriorityTechnician} from './PriorityTechnician';
 import {Pictures} from './Pictures';
+import ContractServices from './ContractServices';
 
 interface Props {
   getUnitName?: (value: string) => void;
@@ -82,10 +82,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
         </Grid>
       </Grid>
 
-      <UnitContracts
-        contracts={elevatorId ? elevator!.contracts : []}
-        containerStyles={{mt: '1.2em'}}
-      />
+      <ContractServices elevator={elevator!} containerStyles={{mt: '1.2em'}} />
 
       <PriorityTechnician
         containerStyles={{mt: '1.2em'}}

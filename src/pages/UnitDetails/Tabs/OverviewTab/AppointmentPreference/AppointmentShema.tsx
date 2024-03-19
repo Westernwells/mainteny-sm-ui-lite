@@ -73,7 +73,7 @@ export const AppointmentShema = ({
             }
             label="Requires notification"
             bodyText={
-              elevator.additionalInfo.customerAppointment.shouldNotifyCustomer
+              elevator.additionalInfo.customerAppointment?.shouldNotifyCustomer
                 ? t('Yes')
                 : t('No')
             }
