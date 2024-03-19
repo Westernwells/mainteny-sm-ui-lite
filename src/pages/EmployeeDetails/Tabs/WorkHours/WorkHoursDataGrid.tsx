@@ -166,7 +166,7 @@ export const makeRows = (
         billableHours: convertToHourAndMinutes(
           item.additionalInfo.billableTime,
         ),
-        duration: convertToHourAndMinutes(item.duration),
+        duration: convertToHourAndMinutes(item.additionalInfo.baseTime),
         startTime: `${formatDate(item.startTime, 'HH:mm')}`,
         address: getAddress(item.data) || '-',
         orderNumber: (
