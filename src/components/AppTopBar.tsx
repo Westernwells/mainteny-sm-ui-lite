@@ -9,7 +9,7 @@ import {useAuth} from 'hooks/useAuth';
 import {useContext, useEffect} from 'react';
 import {axiosClient} from 'utils/axios-utils';
 import {Role} from 'models/user';
-import {convertToText, languageMap} from 'utils/utils';
+import {convertLanguageIfNeeded, convertToText, languageMap} from 'utils/utils';
 import {useQueryClient} from 'react-query';
 import {Notifications} from 'pages/Notifications';
 import {LanguageContext} from 'context/LanguageProvider';
@@ -118,7 +118,7 @@ export const AppTopBar = ({
               }
               menuListProps={{id: 'selectLanguageMenuList'}}
               id="selectLanguageButton"
-              label={selectedLng}
+              label={convertLanguageIfNeeded(selectedLng)}
               menu={[
                 {
                   label: 'English',
@@ -143,6 +143,10 @@ export const AppTopBar = ({
                 {
                   label: 'Danish',
                   action: () => changeLanguage('da-DK'),
+                },
+                {
+                  label: 'Georgian',
+                  action: () => changeLanguage('ka-GE'),
                 },
               ]}
             />
