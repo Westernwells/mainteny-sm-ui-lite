@@ -67,7 +67,6 @@ export const CardProps = ({
           justifyContent: 'center',
           mr: '0.8em',
           maxHeight: iconMaxHeight || 'default',
-          marginRight: 0,
           ...iconContainerStyles,
         }}>
         {icon}
@@ -106,7 +105,7 @@ export const CardProps = ({
                   sx={{
                     ...bodyStyle,
                     fontSize: '0.9rem',
-                    fontWeight: '400',
+                    fontWeight: '600',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'wrap',
