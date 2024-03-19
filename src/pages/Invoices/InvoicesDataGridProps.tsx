@@ -102,7 +102,7 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: InvoiceOrderField.TYPE,
     sortable: true,
-    headerName: 'invoice type',
+    headerName: 'Invoice type',
   }),
   getColumnProps({
     field: InvoiceOrderField.SERVICE_ORDER_TYPE,

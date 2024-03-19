@@ -42,7 +42,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: ContractOrderField.START_TIME,
-    headerName: 'start',
+    headerName: 'START',
     align: 'left',
     headerAlign: 'left',
     flex: 0.5,
@@ -50,7 +50,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: ContractOrderField.EXPIRY_TIME,
-    headerName: 'expiry',
+    headerName: 'EXPIRY',
     align: 'left',
     headerAlign: 'left',
     flex: 0.5,
@@ -76,7 +76,7 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: ContractOrderField.NET_PRICE,
     sortable: true,
-    headerName: 'PRICE (excl. VAT)',
+    headerName: 'PRICE (EXCL. VAT)',
     align: 'right',
     headerAlign: 'right',
     flex: 1,
