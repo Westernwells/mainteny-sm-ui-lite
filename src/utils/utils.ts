@@ -101,6 +101,7 @@ export const languageMap: {[key: string]: string} = {
   'it-IT': 'it-it',
   'ru-RU': 'ru-ru',
   'da-DK': 'da-dk',
+  'ka-GE': 'ka-ge',
 };
 
 export const mapLanguageToLocale: {[key: string]: string} = {
@@ -110,6 +111,11 @@ export const mapLanguageToLocale: {[key: string]: string} = {
   'it-it': 'it',
   'ru-ru': 'ru',
   'da-DK': 'da',
+  'ka-GE': 'ka',
+};
+
+export const languagesToPars: {[key: string]: string} = {
+  KA: 'GE',
 };
 
 export const getDataGridHeight = (
@@ -189,6 +195,7 @@ export const languageContextMap: {[key: string]: Language} = {
   RU: Language.RU_RU,
   IT: Language.IT_IT,
   DA: Language.DA_DK,
+  KA: Language.KA_GE,
 };
 
 export const companyLanguageContextMap: {[key: string]: string} = {
@@ -198,6 +205,7 @@ export const companyLanguageContextMap: {[key: string]: string} = {
   'it-it': 'it',
   'ru-ru': 'ru',
   'da-dk': 'da',
+  'ka-ge': 'ka',
 };
 
 export const companyLanguageToUppercaseMap: {[key: string]: string} = {
@@ -206,7 +214,7 @@ export const companyLanguageToUppercaseMap: {[key: string]: string} = {
   'sr-rs': Language.SR_RS,
   'it-it': Language.IT_IT,
   'ru-ru': Language.RU_RU,
-  'da-dk': Language.DA_DK,
+  'ka-ge': Language.KA_GE,
 };
 
 export const titleCase = (str: string) =>
@@ -369,3 +377,6 @@ export const convertToHourAndMinutes = (timeInMinutes?: number) => {
 
   return `${formattedHours}:${formattedMinutes}h`;
 };
+
+export const convertLanguageIfNeeded = (key: string) =>
+  languagesToPars[key] || key;

@@ -137,6 +137,8 @@ export const AuthLayout = ({children}: Props) => {
                 ? 'Serbian'
                 : selectedLng === 'IT'
                 ? 'Italian'
+                : selectedLng === 'KA'
+                ? 'Georgian'
                 : selectedLng === 'RU'
                 ? 'Russian'
                 : selectedLng === 'DA'
@@ -167,6 +169,10 @@ export const AuthLayout = ({children}: Props) => {
               {
                 label: 'Danish',
                 action: () => changeLanguage('da-dk', 'DA'),
+              },
+              {
+                label: 'Georgian',
+                action: () => changeLanguage('ka-ge', 'GE'),
               },
             ]}
           />

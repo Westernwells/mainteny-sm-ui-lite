@@ -34,6 +34,10 @@ export const languages = [
     label: 'Danish',
     value: 'da-dk',
   },
+  {
+    label: 'Georgian',
+    value: 'ka-ge',
+  },
 ];
 
 export const timeFormats = [
