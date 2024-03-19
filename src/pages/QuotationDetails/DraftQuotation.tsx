@@ -910,6 +910,8 @@ export const DraftQuotation = ({
                 size: 'small',
                 label: 'Payment terms',
                 name: 'paymentTerms',
+                minRows: 2,
+                multiline: true,
                 value: formik.values.paymentTerms,
                 onChange: formik.handleChange,
                 InputProps: {
