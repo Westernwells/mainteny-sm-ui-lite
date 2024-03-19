@@ -9,6 +9,8 @@ import {FormSelect} from 'components/form/FormSelect';
 import {CustomerAutoComplete} from 'components/CustomerAutocomplete';
 import {useTranslation} from 'react-i18next';
 import {PropertyOwnerView} from 'models/propertyManager';
+import InputAdornment from '@mui/material/InputAdornment';
+import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
 
 interface Props {
   formik: FormikProps<LocationFormModel>;
@@ -17,6 +19,7 @@ interface Props {
 
 export const EditLocationForm = ({formik, initialCustomer}: Props) => {
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
     [formik.values.address?.component?.country],
@@ -217,14 +220,27 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
       </Grid>
       <Grid item xs={12} md={4}>
         <FormInput
+          inputType="currency"
           props={{
-            type: 'number',
             size: 'small',
-            placeholder: 'e.g. 10€',
+            placeholder: 'e.g. 150',
             label: 'Travel fee',
-            name: 'travelFee',
-            value: formik.values.travelFee,
-            onChange: formik.handleChange,
+            type: 'number',
+            inputProps: {
+              min: 0,
+              defaultValue: formik.values.travelFee,
+              name: 'travelFee',
+              value: formik.values.travelFee,
+              onChange: formik.handleChange,
+            },
+            InputProps: {
+              sx: {alignItems: 'center'},
+              startAdornment: (
+                <InputAdornment position="end" sx={{marginRight: '0.3rem'}}>
+                  {getCurrencySymbol[currentCurrency.code]}
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Grid>
