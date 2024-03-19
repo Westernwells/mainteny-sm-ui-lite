@@ -80,7 +80,6 @@ export const GeneralSchema = ({label, elevator, currency}: Props) => {
             icon={<AttachMoneyIcon sx={{color: theme.palette.primary.light}} />}
             label="Spending limit"
             unitText={currency}
-            // TODO: confirm after backend changes
             bodyText={elevator.additionalInfo.spendingLimit || '-'}
             iconMaxHeight="3em"
             containerStyles={{alignItems: 'center'}}

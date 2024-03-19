@@ -189,7 +189,11 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
             placeholder: 'e.g. 150',
             label: 'Spending Limit',
             type: 'number',
-            inputProps: {min: 0},
+            inputProps: {
+              min: 0,
+              defaultValue: watch('spendingLimit'),
+              ...register('spendingLimit'),
+            },
             InputProps: {
               sx: {alignItems: 'center'},
               startAdornment: (
@@ -198,7 +202,6 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
                 </InputAdornment>
               ),
             },
-            ...register('spendingLimit'),
           }}
         />
       </Grid>
@@ -232,9 +235,15 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
             defaultValue={watch('status')}
             notched
             {...register('status')}>
-            <MenuItem value={ElevatorStatus.BROKEN}>{t('Broken')}</MenuItem>
-            <MenuItem value={ElevatorStatus.STOPPED}>{t('Stopped')}</MenuItem>
             <MenuItem value={ElevatorStatus.RUNNING}>{t('Running')}</MenuItem>
+            <MenuItem value={ElevatorStatus.BROKEN}>{t('Broken')}</MenuItem>
+            <MenuItem value={ElevatorStatus.JOB_ONGOING}>
+              {t('Job ongoing')}
+            </MenuItem>
+            <MenuItem value={ElevatorStatus.UNKNOWN}>{t('Unknown')}</MenuItem>
+            <MenuItem value={ElevatorStatus.OUT_OF_SERVICE}>
+              {t('Out of service')}
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>

@@ -35,9 +35,11 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
   );
 
   const statusColors = useRef({
-    [ElevatorStatus.BROKEN]: theme.palette.error.main,
-    [ElevatorStatus.STOPPED]: theme.palette.grey[400],
     [ElevatorStatus.RUNNING]: theme.palette.success.darkSuccess,
+    [ElevatorStatus.JOB_ONGOING]: theme.palette.primary.light,
+    [ElevatorStatus.BROKEN]: theme.palette.error.main,
+    [ElevatorStatus.OUT_OF_SERVICE]: theme.palette.warning.main,
+    [ElevatorStatus.UNKNOWN]: theme.palette.grey[200],
   }).current;
 
   const getDefaultValues = (elevatorData: ElevatorView) => ({
@@ -50,6 +52,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
     serialNumber: elevatorData.serialNumber,
     yearBuilt: elevatorData.additionalInfo.builtYear,
     status: elevatorData.status,
+    spendingLimit: elevatorData.additionalInfo.spendingLimit,
   });
 
   const {
@@ -80,6 +83,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
         serialNumber: data.serialNumber,
         builtYear: data.yearBuilt,
         status: data.status,
+        spendingLimit: Number(data.spendingLimit),
       },
       elevatorId: elevator.id,
     });
@@ -103,10 +107,15 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
         <Typography variant="h5">
           {t('General')}{' '}
           <Chip
-            label={elevator.status && capitalize(elevator.status)}
+            label={
+              elevator.status && capitalize(elevator.status).replace(/_/g, ' ')
+            }
             size="small"
             sx={{
-              color: theme.palette.primary.contrastText,
+              color:
+                elevator.status === ElevatorStatus.UNKNOWN
+                  ? theme.palette.primary.dark
+                  : theme.palette.primary.contrastText,
               bgcolor: statusColors[elevator.status],
               marginLeft: '0.5rem',
               padding: '0 0.5rem',

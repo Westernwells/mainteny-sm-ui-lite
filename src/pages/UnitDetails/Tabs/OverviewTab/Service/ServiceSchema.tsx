@@ -7,16 +7,16 @@ import PeopleIcon from '@mui/icons-material/People';
 import FlagIcon from '@mui/icons-material/Flag';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
+import capitalize from 'lodash/capitalize';
 import {convertMinsToHM} from 'utils/datetime';
 import {useFormatDate} from 'hooks/useFormatDate';
 
 interface Props {
   label: string;
   elevator: ElevatorView;
-  visitNumber?: number;
 }
 
-export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
+export const ServiceSchema = ({label, elevator}: Props) => {
   const formatDate = useFormatDate();
   const {t} = useTranslation();
   const theme = useTheme();
@@ -101,8 +101,12 @@ export const ServiceSchema = ({label, elevator, visitNumber}: Props) => {
               />
             }
             label="Inspection cycle"
-            // TODO: Update after backend implementation
-            bodyText={visitNumber || '-'}
+            bodyText={
+              capitalize(elevator.additionalInfo.inspectionCycle).replace(
+                /_/g,
+                ' ',
+              ) || '-'
+            }
             containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />

@@ -1,8 +1,4 @@
-import {
-  ElevatorStatus,
-  UnitAppointment,
-  UnitAppointmentView,
-} from 'models/elevator';
+import {UnitAppointment, UnitAppointmentView} from 'models/elevator';
 import {PriorityTechnicianFormModel} from 'models/unitForm';
 import {
   ContractComponentElevator,
@@ -28,19 +24,6 @@ export const monthNames = [
 ];
 
 export const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-export const getElevatorStatusChipColor = (status: ElevatorStatus) => {
-  switch (status) {
-    case ElevatorStatus.RUNNING:
-      return 'success';
-    case ElevatorStatus.BROKEN:
-      return 'error';
-    case ElevatorStatus.STOPPED:
-      return 'warning';
-    default:
-      return 'default';
-  }
-};
 
 export const convertTechnicianArrayToWeights = (
   inputArray: PriorityTechnicianFormModel[],

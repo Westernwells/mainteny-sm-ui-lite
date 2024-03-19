@@ -41,6 +41,7 @@ export const AppointmentPreferenceForm = ({
       openingHour: initialValues?.openingHour || '',
       closingHour: initialValues?.closingHour || '',
       shouldNotifyCustomer: initialValues?.shouldNotifyCustomer || false,
+      requiresAppointment: initialValues?.requiresAppointment || false,
       appointmentNotificationDue:
         initialValues?.appointmentNotificationDue || 1,
     },

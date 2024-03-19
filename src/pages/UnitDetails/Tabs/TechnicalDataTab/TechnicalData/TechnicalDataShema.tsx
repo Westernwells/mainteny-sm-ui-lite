@@ -153,6 +153,16 @@ const TechnicalDataSchema = ({label, elevator}: Props) => {
             containerStyles={{alignItems: 'center'}}
           />
         );
+      case 'numberOfPeople':
+        return (
+          <CardProps
+            icon={<PeopleIcon sx={{color: theme.palette.primary.light}} />}
+            label="Number of people"
+            bodyText={elevator.additionalInfo.numberOfPeople || '-'}
+            iconMaxHeight="3em"
+            containerStyles={{alignItems: 'center'}}
+          />
+        );
       default:
         return null;
     }

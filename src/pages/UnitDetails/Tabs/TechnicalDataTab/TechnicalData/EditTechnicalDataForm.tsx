@@ -99,7 +99,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
         }}
       />
     </Grid>
-    <Grid item md={6}>
+    <Grid item md={4}>
       <FormInput
         props={{
           placeholder: '240',
@@ -109,13 +109,23 @@ const EditTechnicalDataForm = ({register}: Props) => (
         }}
       />
     </Grid>
-    <Grid item md={6}>
+    <Grid item md={4}>
       <FormInput
         props={{
           placeholder: '150',
           label: 'Shaft height (m)',
           type: 'number',
           ...register('shaftHeight'),
+        }}
+      />
+    </Grid>
+    <Grid item md={4}>
+      <FormInput
+        props={{
+          placeholder: '3',
+          label: 'Number of people',
+          type: 'number',
+          ...register('numberOfPeople'),
         }}
       />
     </Grid>

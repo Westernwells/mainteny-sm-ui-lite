@@ -8,9 +8,12 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import SocialDistanceIcon from '@mui/icons-material/SocialDistance';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import TagIcon from '@mui/icons-material/Tag';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
+import Typography from '@mui/material/Typography';
+import {useNavigate} from 'react-router';
 
 interface Props {
   label: string;
@@ -22,6 +25,7 @@ export const LocationSchema = ({label, elevator, currency}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const renderSection = () => {
+    const navigate = useNavigate();
     switch (label) {
       case 'customer':
         return (
@@ -30,7 +34,32 @@ export const LocationSchema = ({label, elevator, currency}: Props) => {
               <BusinessCenterIcon sx={{color: theme.palette.primary.light}} />
             }
             label="Customer"
-            bodyText={elevator.propertyOwner.name || '-'}
+            bodyText={
+              <Typography
+                variant="subtitle1"
+                onClick={() =>
+                  navigate(
+                    `/customers/details/${elevator.propertyOwner.id}?tab=0`,
+                  )
+                }
+                sx={{
+                  color: 'primary.light',
+                  cursor: 'pointer',
+                  whiteSpace: 'wrap',
+                }}>
+                {elevator.propertyOwner.name || '-'}
+              </Typography>
+            }
+            containerStyles={{alignItems: 'center'}}
+            iconMaxHeight="3em"
+          />
+        );
+      case 'customerNumber':
+        return (
+          <CardProps
+            icon={<TagIcon sx={{color: theme.palette.primary.light}} />}
+            label="Customer number"
+            bodyText={elevator.propertyOwner.externalId || '-'}
             containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
@@ -95,7 +124,6 @@ export const LocationSchema = ({label, elevator, currency}: Props) => {
             }
             label="Distance"
             unitText={t('km')}
-            // TODO: confirm after backend changes
             bodyText={elevator.additionalInfo.distance || '-'}
             containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
@@ -109,7 +137,6 @@ export const LocationSchema = ({label, elevator, currency}: Props) => {
             }
             label="Travel time"
             unitText={t('min')}
-            // TODO: confirm after backend changes
             bodyText={elevator.additionalInfo.travelTime || '-'}
             containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
@@ -121,7 +148,6 @@ export const LocationSchema = ({label, elevator, currency}: Props) => {
             icon={<AttachMoneyIcon sx={{color: theme.palette.primary.light}} />}
             label="Travel fee"
             unitText={currency}
-            // TODO: confirm after backend changes
             bodyText={elevator.additionalInfo.travelFee || '-'}
             containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"

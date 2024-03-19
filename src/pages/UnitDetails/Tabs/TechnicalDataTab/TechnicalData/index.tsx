@@ -40,6 +40,7 @@ const TechnicalData = ({elevator}: Props) => {
     counterWeight: elevator.additionalInfo.counterWeight,
     hoistingHeight: elevator.additionalInfo.hoistingHeight,
     shaftHeight: elevator.additionalInfo.shaftHeight,
+    numberOfPeople: elevator.additionalInfo.numberOfPeople,
   });
 
   const {
@@ -66,6 +67,7 @@ const TechnicalData = ({elevator}: Props) => {
     'counterWeight',
     'hoistingHeight',
     'shaftHeight',
+    'numberOfPeople',
   ]).current;
 
   const onSubmit = async (data: TechnicalDataFormModel) => {
@@ -84,6 +86,7 @@ const TechnicalData = ({elevator}: Props) => {
         shaftHeight: data.shaftHeight,
         controller: data.controller,
         iotDevice: data.iotDevice,
+        numberOfPeople: data.numberOfPeople,
       },
       elevatorId: elevator.id,
     });
