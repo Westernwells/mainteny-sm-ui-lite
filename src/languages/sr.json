@@ -2216,5 +2216,13 @@
   "Required Appointment": "Obavezno zakazivanje",
   "Contract renews in {{unUsedContractDays}} days!": "Ugovor se obnavlja za {{unUsedContractDais}} dana!",
   "Start time": "Početno vreme",
-  "Georgian": "Gruzijski"
+  "Georgian": "Gruzijski",
+  "Hours traveled": "Pređeni sati",
+  "Hours worked": "odrađenih sati",
+  "Technician(s)": "tehničar(i)",
+  "START": "POČETAK",
+  "EXPIRY": "ISTEK",
+  "PRICE (EXCL. VAT)": "CENA (BEZ PDV-a)",
+  "INVOICE TYPE": "VRSTA FAKTURA",
+  "TOTAL AMOUNT (EXCL. VAT)": "UKUPAN IZNOS (BEZ PDV-a)"
 }
