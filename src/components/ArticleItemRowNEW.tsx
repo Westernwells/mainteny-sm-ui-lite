@@ -488,7 +488,10 @@ export const ArticleItemRowNEW = ({
                 placement="bottom-start"
                 anchorEl={
                   popperOpen ? document.getElementById(`name-${index}`) : null
-                }>
+                }
+                sx={{
+                  zIndex: 1,
+                }}>
                 <Paper
                   sx={{
                     maxHeight: '380px',

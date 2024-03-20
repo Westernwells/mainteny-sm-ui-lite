@@ -62,10 +62,14 @@ export const columns: GridColDef[] = [
   },
   {
     field: QuotationOrderField.CUSTOMER_NAME,
-    headerName: 'CUSTOMER',
     cellClassName: 'truncateText',
     flex: 1.5,
     sortable: true,
+    renderHeader: () => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {T('CUSTOMER')}
+      </Typography>
+    ),
   },
   {
     field: QuotationOrderField.ELEVATOR_ADDRESS,
@@ -81,17 +85,25 @@ export const columns: GridColDef[] = [
   },
   {
     field: QuotationOrderField.CREATED_DATE,
-    headerName: 'CREATED DATE',
     align: 'right',
     headerAlign: 'right',
     flex: 0.75,
+    renderHeader: () => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {T('CREATED DATE')}
+      </Typography>
+    ),
   },
   {
     field: QuotationOrderField.TOTAL_NET_AMOUNT,
-    headerName: 'Total amount (excl. VAT)',
     flex: 1,
     align: 'right',
     headerAlign: 'right',
+    renderHeader: () => (
+      <Typography variant="subtitle2" color="textSecondary">
+        {T('TOTAL AMOUNT (EXCL. VAT)')}
+      </Typography>
+    ),
   },
   {
     field: QuotationOrderField.COMMENT_COUNT,
