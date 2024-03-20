@@ -6,6 +6,7 @@ import sr from './languages/sr.json';
 import it from './languages/it.json';
 import ru from './languages/ru.json';
 import da from './languages/dk.json';
+import ka from './languages/ka.json';
 
 export const resources = {
   de: {
@@ -25,6 +26,9 @@ export const resources = {
   },
   da: {
     translation: da,
+  },
+  ka: {
+    translation: ka,
   },
 };
 
