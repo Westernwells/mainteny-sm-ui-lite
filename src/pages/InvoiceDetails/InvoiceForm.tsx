@@ -106,9 +106,6 @@ import {T} from 'utils/i18n-utils';
 import {ServiceCompanyType} from 'models/service-company';
 import {Notes} from './Notes/EditNotes';
 import {CreateNotes} from './Notes/CreateNotes';
-import {Notes} from './Notes/EditNotes';
-import {CreateNotes} from './Notes/CreateNotes';
-import {ContractPaymentTermView} from 'models/contract';
 
 interface Props {
   invoice?: InvoiceView;
