@@ -2192,5 +2192,13 @@
   "Required Appointment": "Erforderlicher Termin",
   "Contract renews in {{unUsedContractDays}} days!": "Vertrag verlängert sich in {{unUsedContractDays}} Tagen!",
   "Start time": "Startzeit",
-  "Georgian": "Georgisch"
+  "Georgian": "Georgisch",
+  "Hours traveled": "Gefahrene Stunden",
+  "Hours worked": "Gearbeitete Stunden",
+  "Technician(s)": "Techniker",
+  "START": "START",
+  "EXPIRY": "ABLAUFDATUM",
+  "PRICE (EXCL. VAT)": "PREIS (EXKL. MWST.)",
+  "INVOICE TYPE": "RECHNUNGSTYP",
+  "TOTAL AMOUNT (EXCL. VAT)": "GESAMTBETRAG (EXKL. MWST.)"
 }
