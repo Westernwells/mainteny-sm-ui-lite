@@ -1,18 +1,17 @@
-import {grey} from '@mui/material/colors';
 import {useFormik} from 'formik';
+import {Box} from '@mui/material';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 import {FormInput} from 'components/form/FormInput';
-import {PageCard} from 'components/PageCard';
 import {ElevatorView} from 'models/elevator';
 import {EmployeesView} from 'models/employee';
 import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {FormLabel} from 'components/form/FormLabel';
 import {AssignmentDescriptionOrderModel} from 'models/service-order';
 import {TimePicker} from 'components/TimePicker';
 import {setDateTime, toRestDateTime} from 'utils/datetime';
-import {RadioOptions} from './models';
+import {ReactComponent as LiftIcon} from 'assets/icons/Lift-1.svg';
+import {ReactComponent as FieldServiceIcon} from 'assets/icons/FieldService.svg';
+import {ReactComponent as CalendarInformationIcon} from 'assets/icons/CalendarInformation.svg';
 import {Summary, SummaryItem} from './Summary';
 
 interface Props {
@@ -20,11 +19,9 @@ interface Props {
   initialValues: AssignmentDescriptionOrderModel;
   getDescription?: (val: string) => void;
   initialDescription?: string;
-  selectedUnit?: ElevatorView;
+  selectedUnit: ElevatorView;
   selectedTechnicians?: EmployeesView[];
-  selectedDateString?: string;
-  selectedTimeString?: string;
-  selectedRadioOption?: string;
+  selectedDateTimeString?: string;
 }
 
 export const AddDescription = ({
@@ -34,9 +31,7 @@ export const AddDescription = ({
   initialDescription = '',
   selectedUnit,
   selectedTechnicians = [],
-  selectedDateString,
-  selectedTimeString,
-  selectedRadioOption,
+  selectedDateTimeString,
 }: Props) => {
   const {t} = useTranslation();
   const [description, setDescription] = useState(initialDescription);
@@ -63,52 +58,47 @@ export const AddDescription = ({
   }, [formik]);
 
   return (
-    <>
-      <Typography variant="h6" pb={2}>
-        {t('Description')}
-      </Typography>
-
-      {selectedUnit ? (
-        <Summary label="Selected Unit">
+    <Box maxWidth="42rem">
+      <Box display="flex" gap={5} pt={3}>
+        <Summary
+          label="Selected Unit"
+          icon={<LiftIcon fontSize="4rem" height="2rem" />}>
           <SummaryItem value={selectedUnit.model || ''} />
           <SummaryItem value={selectedUnit.propertyOwner.name || ''} />
           <SummaryItem value={selectedUnit.address.fullName || ''} />
         </Summary>
-      ) : null}
 
-      {selectedTechnicians.length ? (
-        <Summary label="Selected Technician" containerStyle={{mt: '1em'}}>
-          {selectedTechnicians.map((item) => (
-            <SummaryItem
-              key={item.id}
-              value={`${item.userAccount.firstName} ${item.userAccount.lastName}`}
-            />
-          ))}
-        </Summary>
-      ) : null}
+        {selectedTechnicians.length ? (
+          <Summary
+            label="Selected Engineer"
+            icon={<FieldServiceIcon fontSize="2rem" />}>
+            {selectedTechnicians.map((item) => (
+              <SummaryItem
+                key={item.id}
+                value={`${item.userAccount.firstName} ${item.userAccount.lastName}`}
+              />
+            ))}
+          </Summary>
+        ) : null}
 
-      {(selectedDateString || selectedTimeString) &&
-      selectedRadioOption !== RadioOptions.IMMEDIATE ? (
-        <Summary label="Selected Date & Time" containerStyle={{mt: '1em'}}>
-          {selectedDateString ? (
+        {selectedDateTimeString ? (
+          <Summary
+            label="Selected Date & Time"
+            icon={<CalendarInformationIcon fontSize="2rem" />}>
             <SummaryItem
-              value={`${selectedDateString} ${
-                selectedTimeString ? ` at ${selectedTimeString}` : ''
-              }`}
+              value={selectedDateTimeString}
               containerStyle={{display: 'inline-block'}}
             />
-          ) : null}
-        </Summary>
-      ) : null}
-
-      <PageCard containerStyles={{mt: '2em'}}>
-        <Grid container spacing={2} mb={3} sx={{alignItems: 'center'}}>
-          <Grid item md={3}>
-            <FormLabel text="Purchase order number" />
+          </Summary>
+        ) : null}
+      </Box>
+      <Box pt={5}>
+        <Grid container alignItems="center" spacing={2} mb={3}>
+          <Grid item md={4.5}>
             <FormInput
               props={{
+                label: 'Purchase order number',
                 value: formik.values.purchaseOrderNumber,
-                placeholder: t('123456789'),
                 size: 'small',
                 type: 'text',
                 onChange: (e) => {
@@ -118,12 +108,11 @@ export const AddDescription = ({
             />
           </Grid>
 
-          <Grid item md={3}>
-            <FormLabel text="Caller" />
+          <Grid item md={4.5}>
             <FormInput
               props={{
+                label: 'Caller',
                 value: formik.values.callerName,
-                placeholder: t('Name Surname'),
                 size: 'small',
                 type: 'text',
                 onChange: (e) => {
@@ -133,14 +122,13 @@ export const AddDescription = ({
             />
           </Grid>
 
-          <Grid item md={1.5} mb={-3}>
+          <Grid item md={3}>
             <TimePicker
               defaultTime={
                 formik.values.callTime
                   ? setDateTime(new Date(), formik.values.callTime)
                   : undefined
               }
-              containerStyles={{mr: '1em'}}
               getSelectedTime={(time) => {
                 if (time && !Number.isNaN(time.getTime())) {
                   const today = new Date();
@@ -168,23 +156,17 @@ export const AddDescription = ({
           </Grid>
         </Grid>
 
-        <Grid container mb={1}>
-          <FormLabel text="Description" />
-          <FormInput
-            props={{
-              sx: {background: grey[50], border: 'none'},
-              value: description,
-              multiline: true,
-              maxRows: 8,
-              placeholder: t('Please describe what happened'),
-              size: 'medium',
-              fullWidth: true,
-              type: 'text',
-              onChange: (e) => setDescription(e.target.value),
-            }}
-          />
-        </Grid>
-      </PageCard>
-    </>
+        <FormInput
+          props={{
+            label: 'Description to the engineer',
+            value: description,
+            multiline: true,
+            minRows: 4,
+            type: 'text',
+            onChange: (e) => setDescription(e.target.value),
+          }}
+        />
+      </Box>
+    </Box>
   );
 };

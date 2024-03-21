@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ButtonProps, IconButton} from '@mui/material';
+import {ButtonProps, IconButton, SxProps, Theme} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import {Button} from './Button';
 
@@ -26,6 +26,7 @@ interface Props {
   saveButtonVariant?: ButtonProps['variant'];
   saveButtonProps?: ButtonProps;
   saveButtonContainerProps?: ButtonProps;
+  dialogContentStyles?: SxProps<Theme>;
 }
 
 export const Dialog = ({
@@ -43,6 +44,7 @@ export const Dialog = ({
   saveButtonText = 'Save',
   saveButtonVariant = 'contained',
   saveButtonProps,
+  dialogContentStyles = {},
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -68,7 +70,7 @@ export const Dialog = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{margin: '1em 0em 0em 1em'}}>
+      <DialogContent sx={{margin: '1em 0em 0em 1em', ...dialogContentStyles}}>
         <DialogContentText
           id="alert-dialog-description"
           component="div"

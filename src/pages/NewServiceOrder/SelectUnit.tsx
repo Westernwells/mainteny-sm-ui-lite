@@ -1,4 +1,4 @@
-import {useTranslation} from 'react-i18next';
+import {useNavigate} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
@@ -23,7 +23,7 @@ interface Props {
 const pageInfo = makePage(0, 10);
 
 export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
-  const {t} = useTranslation();
+  const navigate = useNavigate();
   const formatDate = useFormatDate();
   const theme = useTheme();
   const [search, setSearch] = useState('');
@@ -61,6 +61,10 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
       getSelectedUnit(selectedUnit);
     }
   }, [selectedUnit]);
+
+  const addNewUnit = () => {
+    navigate(`/units/new`);
+  };
 
   if (isIdle || isLoading) {
     return <Progress />;
@@ -116,10 +120,7 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
 
   return (
     <>
-      <Box display="flex" justifyContent="space-between">
-        <Typography variant="h6" component="div">
-          {t('Unit')}
-        </Typography>
+      <Box display="flex" justifyContent="flex-end">
         <SearchInput
           variant="outlined"
           label="Search"
@@ -142,6 +143,24 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
         }}
         pageCount={pageCount}
         totalRows={elevatorResponse.total}
+        isEvenRowDifferentColor
+        noRowsEmptySection={
+          <EmptySection
+            illustration="lift"
+            showActionBtn
+            btnLabel="Add Unit"
+            labelVariant="h6"
+            btnAction={addNewUnit}
+            size="tiny"
+            containerStyle={{
+              height: '100%',
+              m: 'auto',
+              maxWidth: '17.5rem',
+            }}
+            label="No units found"
+            subLabel="If you like to add a new unit, please click the button below."
+          />
+        }
       />
     </>
   );

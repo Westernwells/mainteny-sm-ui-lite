@@ -204,7 +204,7 @@ export const theme = createTheme({
         {
           props: {variant: 'outlined'},
           style: {
-            background: 'rgba(15, 76, 100, 0.08)',
+            background: 'white',
             border: '1px solid rgba(15, 76, 100, 0.5)',
             boxSizing: 'border-box',
             borderRadius: '4px',
