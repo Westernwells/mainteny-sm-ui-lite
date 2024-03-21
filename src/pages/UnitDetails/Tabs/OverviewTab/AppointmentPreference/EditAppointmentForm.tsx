@@ -69,8 +69,6 @@ export const EditAppointmentForm = ({
             })) || []
           }
           selectProps={{
-            disabled:
-              watch('openingHour') === '' || watch('closingHour') === '',
             id: 'daysofWeekSelect',
             value: watch('appointmentDaysOfWeek'),
             multiple: true,
