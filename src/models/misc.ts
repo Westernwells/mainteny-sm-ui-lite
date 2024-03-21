@@ -384,6 +384,7 @@ export interface IdState {
 }
 
 export enum InspectionCycle {
+  NONE = 'NONE',
   MONTHLY = 'MONTHLY',
   BIMONTHLY = 'BIMONTHLY',
   QUARTERLY = 'QUARTERLY',

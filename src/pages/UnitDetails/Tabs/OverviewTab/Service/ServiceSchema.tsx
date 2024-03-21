@@ -7,9 +7,9 @@ import PeopleIcon from '@mui/icons-material/People';
 import FlagIcon from '@mui/icons-material/Flag';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
-import capitalize from 'lodash/capitalize';
 import {convertMinsToHM} from 'utils/datetime';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {inspectionCycleLabels} from 'utils/elevator-utils';
 
 interface Props {
   label: string;
@@ -100,12 +100,10 @@ export const ServiceSchema = ({label, elevator}: Props) => {
                 sx={{color: theme.palette.primary.light}}
               />
             }
-            label="Inspection cycle"
+            label="Inspection Cycle"
             bodyText={
-              capitalize(elevator.additionalInfo.inspectionCycle).replace(
-                /_/g,
-                ' ',
-              ) || '-'
+              inspectionCycleLabels[elevator.additionalInfo.inspectionCycle] ??
+              '-'
             }
             containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"

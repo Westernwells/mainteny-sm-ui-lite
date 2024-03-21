@@ -7,6 +7,7 @@ import {
   ContractTimeUnit,
   TimeUnitYearView,
 } from 'models/contract';
+import {InspectionCycle} from 'models/misc';
 
 export const monthNames = [
   'Jan',
@@ -149,4 +150,14 @@ export const getViewFrequency = (job: JobTimeUnit): string => {
     .forEach((unit) => frequencySet.add(monthNames[unit - 1]));
 
   return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
+};
+
+export const inspectionCycleLabels = {
+  [InspectionCycle.NONE]: 'No inspection',
+  [InspectionCycle.MONTHLY]: 'Every month',
+  [InspectionCycle.BIMONTHLY]: 'Every 2 months',
+  [InspectionCycle.QUARTERLY]: 'Every 3 months',
+  [InspectionCycle.HALF_YEARLY]: 'Every 6 months',
+  [InspectionCycle.YEARLY]: 'Every year',
+  [InspectionCycle.BIENNIALLY]: 'Every 2 years',
 };
