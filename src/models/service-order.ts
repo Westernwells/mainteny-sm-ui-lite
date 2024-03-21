@@ -220,6 +220,7 @@ export interface ServiceOrderView {
   search: string;
   meta: Meta;
   report?: ServiceOrderReportView;
+  reports?: ServiceOrderReportView[];
   additionalInfo: ServiceOrderAdditionalInfo;
 }
 
@@ -325,6 +326,7 @@ export interface ServiceOrderReportTimeRecord {
 }
 
 export interface CompleteServiceOrder {
+  technicianId?: string;
   externalId?: string;
   description?: string;
   serviceTime?: number;
@@ -366,6 +368,20 @@ export interface ServiceOrderReportAdditionalInfo {
   pdfPath: string;
   pdfGenerationStatus: PdfGenerationStatus;
   onlyShowTotalTime: boolean;
+  workTimeInfo?: {
+    timeSlots: ServiceOrderTimeSlot[];
+    percentageSurcharge?: number;
+    billableMinutes?: number;
+    startTime: string;
+    endTime: string;
+  };
+  travelTimeInfo?: {
+    timeSlots: ServiceOrderTimeSlot[];
+    percentageSurcharge?: number;
+    billableMinutes?: number;
+    startTime: string;
+    endTime: string;
+  };
 }
 
 export interface ServiceOrderReportArticleView {
@@ -411,6 +427,7 @@ export interface ServiceOrderReportView {
   elevator: ElevatorView;
   externalId: string;
   id: string;
+  technicianId: string;
   meta: Meta;
   serviceOrder: ServiceOrderView;
   totalAmount: Amount;

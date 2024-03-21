@@ -51,7 +51,7 @@ export const PageCard = ({
             minHeight: '2rem',
             mt: '0.5em',
             mx: '0.5em',
-            p: '0.75em 0em 0em 1.1em',
+            p: '0.7em 0em 0em 1.1em',
             ...headerStyles,
           }}
           action={

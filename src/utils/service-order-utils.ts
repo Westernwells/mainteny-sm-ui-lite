@@ -25,7 +25,7 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
     case ServiceOrderStatus.OVERDUE:
       return 'error';
     case ServiceOrderStatus.COMPLETED:
-      return 'success';
+      return 'darkSuccess';
     default:
       return 'default';
   }

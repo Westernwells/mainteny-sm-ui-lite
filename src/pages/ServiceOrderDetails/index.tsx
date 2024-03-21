@@ -172,6 +172,7 @@ export const ServiceOrderDetails = () => {
       showActionBtn={tabValue === 1 || tabValue === 0}
       btnLabel={ACTION_BUTTON_LABEL[tabValue] || undefined}
       actionBtnVariant="outlined"
+      hideDivider
       actionButtonIcon={<FileDownloadIcon />}
       btnOnClick={() => {
         if (tabValue === 0) {
@@ -191,10 +192,13 @@ export const ServiceOrderDetails = () => {
         );
         setTabValue(index);
       }}>
-      <TabsBody value={tabValue} index={0} containerStyle={{height: 2}}>
+      <TabsBody
+        value={tabValue}
+        index={0}
+        containerStyle={{height: 2, marginTop: 3}}>
         <Overview serviceOrder={serviceOrder!} />
       </TabsBody>
-      <TabsBody value={tabValue} index={1}>
+      <TabsBody value={tabValue} index={1} containerStyle={{marginTop: 3}}>
         <WorkReport
           serviceOrder={serviceOrder!}
           downloadWorkReport={
@@ -205,7 +209,7 @@ export const ServiceOrderDetails = () => {
       <TabsBody
         value={tabValue}
         index={2}
-        containerStyle={{height: '1px', overflow: 'auto'}}>
+        containerStyle={{height: '1px', overflow: 'auto', marginTop: 3}}>
         <CheckList serviceOrder={serviceOrder!} />
       </TabsBody>
     </Tabs>
