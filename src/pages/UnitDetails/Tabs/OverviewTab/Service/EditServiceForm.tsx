@@ -12,6 +12,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import {inspectionCycleLabels} from 'utils/elevator-utils';
 
 interface Props {
   formik: FormikProps<ServiceFormModel>;
@@ -94,7 +95,7 @@ export const EditServiceForm = ({formik}: Props) => {
       <Grid item sm={12} md={6}>
         <FormInput
           props={{
-            label: 'No. of Engineers',
+            label: 'No. of technicians',
             name: 'technicianNumber',
             value: formik.values.technicianNumber,
             helperText:
@@ -129,7 +130,7 @@ export const EditServiceForm = ({formik}: Props) => {
         />
       </Grid>
 
-      <Grid item md={6}>
+      <Grid item md={6} sm={12}>
         <FormControl fullWidth>
           <InputLabel
             size="small"
@@ -145,24 +146,32 @@ export const EditServiceForm = ({formik}: Props) => {
             notched
             inputProps={{
               value: formik.values.inspectionCycle ?? '',
+              defaultValue: formik.values.inspectionCycle ?? '',
               onChange: formik.handleChange,
               onBlur: formik.handleBlur,
               name: 'inspectionCycle',
               sx: {width: '100%'},
             }}>
-            <MenuItem value={InspectionCycle.MONTHLY}>{t('Monthly')}</MenuItem>
+            <MenuItem value={InspectionCycle.NONE}>
+              {t(inspectionCycleLabels[InspectionCycle.NONE])}
+            </MenuItem>
+            <MenuItem value={InspectionCycle.MONTHLY}>
+              {t(inspectionCycleLabels[InspectionCycle.MONTHLY])}
+            </MenuItem>
             <MenuItem value={InspectionCycle.BIMONTHLY}>
-              {t('Bimonthly')}
+              {t(inspectionCycleLabels[InspectionCycle.BIMONTHLY])}
             </MenuItem>
             <MenuItem value={InspectionCycle.QUARTERLY}>
-              {t('Quarterly')}
+              {t(inspectionCycleLabels[InspectionCycle.QUARTERLY])}
             </MenuItem>
             <MenuItem value={InspectionCycle.HALF_YEARLY}>
-              {t('Half yearly')}
+              {t(inspectionCycleLabels[InspectionCycle.HALF_YEARLY])}
             </MenuItem>
-            <MenuItem value={InspectionCycle.YEARLY}>{t('Yearly')}</MenuItem>
+            <MenuItem value={InspectionCycle.YEARLY}>
+              {t(inspectionCycleLabels[InspectionCycle.YEARLY])}
+            </MenuItem>
             <MenuItem value={InspectionCycle.BIENNIALLY}>
-              {t('Biennially')}
+              {t(inspectionCycleLabels[InspectionCycle.BIENNIALLY])}
             </MenuItem>
           </Select>
         </FormControl>

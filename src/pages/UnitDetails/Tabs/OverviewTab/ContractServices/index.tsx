@@ -11,6 +11,7 @@ import {
   ContractComponentView,
   ContractServiceForm,
   ContractSimpleView,
+  ContractStatus,
   calculateContractInvoicePriceTotal,
 } from 'models/contract';
 import {EmptySection} from 'components/EmptySection';
@@ -62,13 +63,13 @@ const serviceListingColumns: {
   align?: TableCellProps['align'];
   width?: TableCellProps['width'];
 }[] = [
-  {name: 'SERVICE NAME', align: 'left', width: '10%'},
-  {name: 'CONTRACT NUMBER', align: 'left', width: '10%'},
-  {name: 'DATE', align: 'right', width: '5%'},
-  {name: 'AUTO JOB', align: 'center', width: '15%'},
-  {name: 'JOB FREQUENCY', align: 'left', width: '20%'},
-  {name: 'INVOICE FREQUENCY', align: 'left', width: '20%'},
-  {name: 'PRICE', align: 'center', width: '15%'},
+  {name: 'SERVICE NAME', align: 'left', width: '15%'},
+  {name: 'CONTRACT NUMBER', align: 'left', width: '17%'},
+  {name: 'DATE', align: 'left', width: '9%'},
+  {name: 'AUTO JOB', align: 'left', width: '9%'},
+  {name: 'JOB FREQUENCY', align: 'left', width: '15%'},
+  {name: 'INVOICE FREQUENCY', align: 'left', width: '21%'},
+  {name: 'PRICE', align: 'left', width: '5%'},
   {name: '', align: 'right', width: '5%'},
 ];
 
@@ -138,18 +139,20 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
 
   const services = useMemo(
     () =>
-      elevator?.contracts.reduce(
-        (prev: Service[], contract: ContractSimpleView) => [
-          ...prev,
-          ...(contract.components || []).map((component) => ({
-            ...component,
-            contractNumber: contract.externalId,
-            contractId: contract.id,
-          })),
-        ],
-        [],
-      ),
-    [elevator?.contracts],
+      elevator?.contracts
+        .filter((item) => item.status === ContractStatus.VALID)
+        .reduce(
+          (prev: Service[], contract: ContractSimpleView) => [
+            ...prev,
+            ...(contract.components || []).map((component) => ({
+              ...component,
+              contractNumber: contract.externalId,
+              contractId: contract.id,
+            })),
+          ],
+          [],
+        ),
+    [elevator?.contracts, isUpdateLoading],
   );
 
   const deleteComponent = async () => {
@@ -256,7 +259,7 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
                   <TableCell
                     onClick={() => openViewDialog(row)}
                     sx={{
-                      width: '10%',
+                      width: '15%',
                       display: 'inline-block',
                       padding: '0.5em',
                       borderBottom: 'none',
@@ -270,9 +273,9 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
                   <TableCell
                     onClick={() => openViewDialog(row)}
                     sx={{
-                      width: '5%',
+                      width: '17%',
                       borderBottom: 'none',
-                      textAlign: 'right',
+                      textAlign: 'left',
                       display: 'inline-block',
                       padding: '0.5em 0em',
                     }}>
@@ -285,11 +288,11 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
                   <TableCell
                     onClick={() => openViewDialog(row)}
                     sx={{
-                      width: '10%',
+                      width: '5%',
                       display: 'inline-block',
                       borderBottom: 'none',
                       padding: '0.5em 0em',
-                      textAlign: 'right',
+                      textAlign: 'left',
                     }}>
                     <Typography
                       color={theme.palette.text.primary}
@@ -302,7 +305,7 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
                   <TableCell
                     onClick={() => openViewDialog(row)}
                     sx={{
-                      width: '15%',
+                      width: '13%',
                       display: 'inline-block',
                       borderBottom: 'none',
                       padding: '0.5em 0em',
@@ -326,7 +329,7 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
                   <TableCell
                     onClick={() => openViewDialog(row)}
                     sx={{
-                      width: '20%',
+                      width: '15%',
                       display: 'inline-block',
                       textAlign: 'left',
                       borderBottom: 'none',
@@ -362,9 +365,9 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
                   <TableCell
                     onClick={() => openViewDialog(row)}
                     sx={{
-                      width: '10%',
+                      width: '6%',
                       display: 'inline-block',
-                      textAlign: 'right',
+                      textAlign: 'left',
                       borderBottom: 'none',
                     }}>
                     <Typography
