@@ -2,6 +2,7 @@ import {AxiosResponse} from 'axios';
 import {NewServiceCompanyBody} from 'pages/NewCompany/model';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
+  Language,
   Page,
   Resource,
   RestError,
@@ -116,7 +117,13 @@ export const useUpdateCompany = (successMsg?: string) => {
           ...user!,
           userAccount: {
             ...user!.userAccount,
-            serviceCompany: {...user!.userAccount.serviceCompany, ...company},
+            serviceCompany: {
+              ...user!.userAccount.serviceCompany,
+              ...company,
+              language:
+                (localStorage.getItem('i18nextLng') as Language) ||
+                company.language,
+            },
           },
         });
         queryClient.invalidateQueries(queryKeys.fetchCompany);
