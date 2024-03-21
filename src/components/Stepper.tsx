@@ -1,4 +1,5 @@
 import {ReactNode, useEffect, useState} from 'react';
+import {SxProps, Theme} from '@mui/system';
 import Box from '@mui/material/Box';
 import MuiStepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -13,7 +14,7 @@ interface Props {
   stepperWidth?: string;
   children: ReactNode;
   containerStyles?: {[key: string]: any};
-  stepperStyles?: {[key: string]: any};
+  stepperStyles?: SxProps<Theme>;
   stepperNavigationStyles?: {[key: string]: any};
   handleCancel?: () => void;
   handleSubmit?: () => void;

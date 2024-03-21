@@ -502,34 +502,49 @@ export interface AssignmentDescriptionOrderModel {
   purchaseOrderNumber: string;
 }
 
+export enum ContactChannel {
+  PUSH_NOTIFICATION = 'PUSH_NOTIFICATION',
+  PHONE_CALL = 'PHONE_CALL',
+  SMS = 'SMS',
+}
+
 export interface CreateScheduledServiceOrderBody {
   description: string;
   elevatorId: string;
-  endTime: string;
-  externalId: string;
+  dueDate: string;
+  endTime?: string;
+  externalId?: string;
   labels?: string[];
   moreInformation?: string;
-  priority: Priority;
-  requireReschedule: boolean;
-  requireTechnicianNotification: boolean;
+  priority?: Priority;
+  requireReschedule?: boolean;
+  requireTechnicianNotification?: boolean;
   serviceCompanyId: string;
   startTime: string;
   technicianIds: string[];
   type: ServiceOrderType;
-  purchaseOrderNumber: string;
-  callerInfo: CallerInfo;
+  purchaseOrderNumber?: string;
+  callerInfo?: CallerInfo;
+  quotationId?: string;
+  checkListId?: string;
+  notificationChannels?: ContactChannel[];
 }
 
 export interface CreateNonScheduledServiceOrderBody {
   description: string;
   dueDate: string;
   elevatorId: string;
-  externalId: string;
+  externalId?: string;
   labels?: string[];
   moreInformation?: string;
-  priority: Priority;
+  priority?: Priority;
   serviceCompanyId: string;
   type: ServiceOrderType;
+  purchaseOrderNumber?: string;
+  callerInfo?: CallerInfo;
+  quotationId?: string;
+  checkListId?: string;
+  notificationChannels?: ContactChannel[];
 }
 
 export interface ServiceOrderArticleView {

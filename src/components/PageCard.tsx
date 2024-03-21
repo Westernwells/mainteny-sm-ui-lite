@@ -11,8 +11,8 @@ import {Box} from '@mui/material';
 
 export interface Props {
   children: ReactNode;
-  headerStyles?: {[key: string]: string | number};
-  headerTextOverrideStyles?: {[key: string]: string | number};
+  headerStyles?: SxProps<Theme>;
+  headerTextOverrideStyles?: SxProps<Theme>;
   headerActionIcon?: JSX.Element;
   minHeight?: number | string;
   headerIcon?: JSX.Element;

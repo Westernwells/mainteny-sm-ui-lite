@@ -1,5 +1,6 @@
 import {ChangeEvent, useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {theme} from 'theme';
 import {grey} from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import {ServiceOrderView} from 'models/service-order';
@@ -66,6 +67,15 @@ export const ScheduleLabel = ({
       value={checkboxValue}
       handleChange={handleChange}
       label={item}
+      typographyProps={{variant: 'subtitle2'}}
+      checkboxProps={{
+        sx: {
+          color: theme.palette.text.secondary,
+          '&.Mui-checked': {
+            color: theme.palette.primary.light,
+          },
+        },
+      }}
     />
   );
 

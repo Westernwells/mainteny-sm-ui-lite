@@ -1,183 +1,143 @@
-import Box from '@mui/material/Box';
-import {useTranslation} from 'react-i18next';
-import {DatePicker} from 'components/DatePicker';
-import {TimePicker} from 'components/TimePicker';
+import {useEffect} from 'react';
 import {useFormik} from 'formik';
-import {useEffect, useState} from 'react';
-import * as Yup from 'yup';
-import {EmployeesView} from 'models/employee';
-import {RadioOptions, ScheduleTechnicianForm} from './models';
-import {TechnicianAutoComplete} from '../../components/TechnicianAutoComplete';
+import {useTranslation} from 'react-i18next';
+import {Box, Typography} from '@mui/material';
+import {DateRange} from '@mui/x-date-pickers-pro';
+import {TimePicker} from 'components/TimePicker';
+import DatePickerRange from 'components/DatePickerRange';
+import {ScheduleTechnicianForm} from './models';
 
 interface Props {
-  defaultStartDate: Date | null;
-  defaultEndDate: Date | null;
-  defaultTechnician: EmployeesView | null;
-  getScheduleFormValues?: (value: ScheduleTechnicianForm) => void;
-  getTechnician?: (val: EmployeesView | null) => void;
-  getQuery?: (val: string) => void;
-  containerStyles?: {[key: string]: any};
-  scheduleFormIsErrored?: (value: boolean) => void;
-  currentRadioOption: RadioOptions;
+  getScheduleFormValues: (value: ScheduleTechnicianForm) => void;
 }
 
-const validationSchema = Yup.object().shape({
-  date: Yup.string().nullable().required('Date is required'),
-  startTime: Yup.string().nullable().required('Start time is required'),
-  endTime: Yup.string().nullable().required('End time is required'),
-  technicianId: Yup.string().nullable().required('Technician is required'),
-});
-
-export const ScheduleForm = ({
-  defaultStartDate,
-  defaultEndDate,
-  defaultTechnician,
-  getScheduleFormValues,
-  containerStyles,
-  getTechnician,
-  getQuery,
-  scheduleFormIsErrored,
-  currentRadioOption,
-}: Props) => {
+export const ScheduleForm = ({getScheduleFormValues}: Props) => {
   const {t} = useTranslation();
-  const formik = useFormik<ScheduleTechnicianForm>({
+  const formik = useFormik<
+    ScheduleTechnicianForm & {startDate?: Date; endDate?: Date}
+  >({
     initialValues: {
-      date: defaultStartDate || null,
-      startTime: defaultStartDate || undefined,
-      endTime: defaultEndDate || undefined,
-      technicianId: defaultTechnician?.id || null,
+      startDate: undefined,
+      startTime: undefined,
+      endDate: undefined,
+      endTime: undefined,
     },
     onSubmit: () => {},
-    validationSchema,
   });
 
-  const [minTimeError, setMinTimeError] = useState(false);
+  const {startDate, startTime, endDate, endTime} = formik.values;
 
   useEffect(() => {
-    if (getScheduleFormValues) {
-      getScheduleFormValues({...formik.values});
+    if (!startDate) {
+      return;
     }
+
+    const startDateTime = new Date(
+      startDate?.getFullYear() || new Date().getFullYear(),
+      startDate?.getMonth() || new Date().getMonth(),
+      startDate?.getDate() || new Date().getDate(),
+      startTime?.getHours() || new Date().getHours(),
+      startTime?.getMinutes() || new Date().getMinutes(),
+    );
+    const endDateTime = new Date(
+      endDate?.getFullYear() || new Date().getFullYear(),
+      endDate?.getMonth() || new Date().getMonth(),
+      endDate?.getDate() || new Date().getDate(),
+      endTime?.getHours() || new Date().getHours(),
+      endTime?.getMinutes() || new Date().getMinutes(),
+    );
+
+    getScheduleFormValues({
+      startTime: startDateTime,
+      endTime: endDateTime,
+    });
   }, [formik.values]);
 
-  useEffect(() => {
-    if (scheduleFormIsErrored) {
-      scheduleFormIsErrored(
-        !!Object.keys(formik.errors).length || minTimeError,
-      );
-    }
-  }, [formik.errors, minTimeError]);
-  return (
-    <Box sx={{...containerStyles}}>
-      <DatePicker
-        defaultDate={defaultStartDate}
-        containerStyles={{mr: '1em', width: '100%'}}
-        getSelectedDate={(date) => {
-          formik.setValues({
-            ...formik.values,
-            date,
-          });
-        }}
-        textFieldProps={{
-          label: t('Due Date'),
-          name: 'date',
-          required: true,
-          helperText:
-            formik.errors.date && formik.touched.date ? formik.errors.date : '',
-          error: !!(formik.touched.date && formik.errors.date),
-          sx: {width: '100%'},
-          onBlur: formik.handleBlur,
-        }}
-      />
-      {currentRadioOption === RadioOptions.SCHEDULE_TECHNICIAN ? (
-        <>
-          <Box sx={{display: 'flex', mt: '1.4em'}}>
-            <TimePicker
-              defaultTime={defaultStartDate}
-              containerStyles={{mr: '1em'}}
-              getSelectedTime={(time) => {
-                if (time && !Number.isNaN(time.getTime())) {
-                  const newStartTime = time;
-                  const newEndTime = new Date(
-                    newStartTime.getTime() + 60 * 60000,
-                  );
-                  formik.setValues({
-                    ...formik.values,
-                    startTime: newStartTime,
-                    endTime: newEndTime,
-                  });
-                }
-              }}
-              textFieldProps={{
-                label: t('Start Time'),
-                name: 'startTime',
-                helperText:
-                  formik.errors.startTime && formik.touched.startTime
-                    ? formik.errors.startTime
-                    : '',
-                required: true,
-                error: !!(formik.errors.startTime && formik.touched.startTime),
-                onBlur: formik.handleBlur,
-              }}
-            />
+  const clearDateSelection = () => {
+    formik.setValues({
+      ...formik.values,
+      startDate: undefined,
+      endDate: undefined,
+    });
+  };
 
-            <TimePicker
-              defaultTime={formik.values.endTime || defaultEndDate}
-              minTime={formik.values.startTime}
-              getSelectedTime={(time) => {
-                if (time && !Number.isNaN(time.getTime())) {
-                  formik.setFieldValue('endTime', time);
-                }
-              }}
-              textFieldProps={{
-                label: t('End Time'),
-                name: 'endTime',
-                helperText:
-                  formik.errors.endTime && formik.touched.endTime
-                    ? formik.errors.endTime
-                    : '',
-                required: true,
-                error:
-                  !!(formik.errors.endTime && formik.touched.endTime) ||
-                  minTimeError,
-                onBlur: formik.handleBlur,
-              }}
-              onError={(newError) => {
-                setMinTimeError(newError === 'minTime');
-              }}
-            />
-          </Box>
-          <Box sx={{mt: '1.4em'}}>
-            <TechnicianAutoComplete
-              getTechnician={(value) => {
-                formik.setValues({
-                  ...formik.values,
-                  technicianId: value ? value.id : null,
-                });
-                if (getTechnician) {
-                  getTechnician(value);
-                }
-              }}
-              getQuery={(val) => {
-                if (getQuery) {
-                  getQuery(val);
-                }
-              }}
-              textFieldProps={{
-                error: !!(
-                  formik.errors.technicianId && formik.touched.technicianId
-                ),
-                helperText:
-                  formik.errors.technicianId && formik.touched.technicianId
-                    ? formik.errors.technicianId
-                    : '',
-                label: t('Assign To'),
-                placeholder: t('e.g. Paul Schneider'),
-                onBlur: formik.handleBlur,
-              }}
-            />
-          </Box>
-        </>
-      ) : null}
+  const setDate = (date: DateRange<Date>) => {
+    formik.setValues({
+      ...formik.values,
+      startDate: date?.[0] || undefined,
+      endDate: date?.[1] || undefined,
+    });
+  };
+
+  const setStartTime = (time: Date) => {
+    formik.setValues({
+      ...formik.values,
+      startTime: time,
+      endTime: new Date(time.getTime() + 60 * 60000),
+    });
+  };
+
+  const setEndTime = (time: Date) => {
+    formik.setValues({
+      ...formik.values,
+      endTime: time,
+    });
+  };
+
+  return (
+    <Box display="flex" alignItems="center" gap={0.5} maxWidth="40rem">
+      <Box>
+        <Typography variant="subtitle2">{t('Schedule the job for')}</Typography>
+        <DatePickerRange
+          defaultDate={[
+            formik.values.startDate || null,
+            formik.values.endDate || null,
+          ]}
+          getSelectedDate={setDate}
+          textFieldProps={{
+            label: '',
+            sx: {
+              width: '100%',
+            },
+          }}
+          onClear={clearDateSelection}
+        />
+      </Box>
+
+      <Box>
+        <Typography variant="subtitle2">{t('From')}</Typography>
+        <TimePicker
+          defaultTime={formik.values.startTime}
+          containerStyles={{pt: 1}}
+          getSelectedTime={(time) => {
+            if (time && !Number.isNaN(time.getTime())) {
+              setStartTime(time);
+            }
+          }}
+          textFieldProps={{
+            label: '',
+            name: 'startTime',
+          }}
+        />
+      </Box>
+
+      <Box>
+        <Typography variant="subtitle2">{t('To')}</Typography>
+        <TimePicker
+          defaultTime={formik.values.endTime}
+          containerStyles={{pt: 1}}
+          minTime={formik.values.startTime}
+          getSelectedTime={(time) => {
+            if (time && !Number.isNaN(time.getTime())) {
+              setEndTime(time);
+            }
+          }}
+          textFieldProps={{
+            label: '',
+            name: 'endTime',
+          }}
+        />
+      </Box>
     </Box>
   );
 };
