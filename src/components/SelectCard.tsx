@@ -12,7 +12,7 @@ interface Props {
 export const SelectCard = ({header, body, onClose}: Props) => (
   <Box
     display="flex"
-    bgcolor="inputBackground.main"
+    bgcolor="#eeeeee"
     alignItems="start"
     justifyContent="space-between"
     px={1.5}
