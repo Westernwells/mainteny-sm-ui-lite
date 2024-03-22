@@ -45,6 +45,7 @@ import {useUuid} from 'hooks/reactQuery/useUuid';
 import {ElevatorView} from 'models/elevator';
 import {SxProps} from '@mui/system';
 import {InfoCard} from 'components/InfoCard';
+import {State} from 'models/misc';
 import ServiceInformationReview from './ServiceInfo';
 import {MutationService} from './MutationService';
 
@@ -140,7 +141,12 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
   const services = useMemo(
     () =>
       elevator?.contracts
-        .filter((item) => item.status === ContractStatus.VALID)
+        .filter(
+          (item) =>
+            item.meta.state === State.ACTIVE &&
+            (item.status === ContractStatus.VALID ||
+              item.status === ContractStatus.EXPIRING),
+        )
         .reduce(
           (prev: Service[], contract: ContractSimpleView) => [
             ...prev,
