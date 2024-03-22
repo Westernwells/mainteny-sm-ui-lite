@@ -60,7 +60,7 @@ const ServiceListing = ({
     {name: 'Units', align: 'right', width: '5%'},
     {name: 'Start Date', align: 'right', width: '10%'},
     {name: 'Auto Job Creation', align: 'center', width: '15%'},
-    {name: 'Job frequency', align: 'left', width: '20%'},
+    {name: 'Job Frequency', align: 'left', width: '20%'},
     {name: 'Invoice frequency', align: 'left', width: '20%'},
     {name: 'Service Price', align: 'right', width: '10%'},
     {name: '', align: 'right', width: '5%'},
