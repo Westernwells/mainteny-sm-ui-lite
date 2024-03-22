@@ -7,6 +7,7 @@ import {
   InvoiceStatus,
   InvoiceStatusView,
   InvoiceView,
+  MyInvoiceActivityView,
 } from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
 import {Currencies} from './currency';
@@ -60,7 +61,10 @@ export const mapInvoiceStatus = (invoiceStatus: InvoiceStatusView) => {
   }
 };
 
-export const getInvoiceActivityTitle = (type: InvoiceActivityType): string => {
+export const getInvoiceActivityTitle = (
+  type: InvoiceActivityType,
+  activity?: MyInvoiceActivityView,
+): string => {
   switch (type) {
     case InvoiceActivityType.CREATED:
       return 'Invoice created';
@@ -79,7 +83,7 @@ export const getInvoiceActivityTitle = (type: InvoiceActivityType): string => {
     case InvoiceActivityType.EXPIRED:
       return 'Invoice overdue';
     case InvoiceActivityType.PAYMENT_RECEIVED:
-      return 'Payment received';
+      return `Payment of ${activity?.amount} received`;
     case InvoiceActivityType.PAYMENT_UPDATED:
       return 'Payment updated';
     case InvoiceActivityType.PAYMENT_DELETED:
