@@ -7,6 +7,8 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
+import {ButtonProps, IconButton, SxProps, Theme} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import {Button} from './Button';
 
 interface Props {
@@ -14,12 +16,17 @@ interface Props {
   children: ReactNode;
   onSave?: () => void;
   onCancel: () => void;
+  showCancelButton?: boolean;
   disableSaveBtn?: boolean;
   dialogProps: DialogProps;
   isSaving?: boolean;
   saveBtnType?: 'button' | 'submit' | 'reset';
   leftButton?: React.ReactNode;
   saveButtonText?: string;
+  saveButtonVariant?: ButtonProps['variant'];
+  saveButtonProps?: ButtonProps;
+  saveButtonContainerProps?: ButtonProps;
+  dialogContentStyles?: SxProps<Theme>;
 }
 
 export const Dialog = ({
@@ -27,12 +34,17 @@ export const Dialog = ({
   children,
   onSave = () => {},
   onCancel = () => {},
+  showCancelButton = true,
   disableSaveBtn,
   dialogProps,
   saveBtnType,
+  saveButtonContainerProps,
   isSaving = false,
   leftButton,
   saveButtonText = 'Save',
+  saveButtonVariant = 'contained',
+  saveButtonProps,
+  dialogContentStyles = {},
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -48,11 +60,17 @@ export const Dialog = ({
         sx={{
           background: 'white',
           padding: '1em 1.5em',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}>
         {typeof title === 'string' ? t(title) : title}
+        <IconButton onClick={onCancel}>
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{margin: '1em 0em 0em 0em'}}>
+      <DialogContent sx={{margin: '1em 0em 0em 1em', ...dialogContentStyles}}>
         <DialogContentText
           id="alert-dialog-description"
           component="div"
@@ -62,24 +80,32 @@ export const Dialog = ({
       </DialogContent>
       <DialogActions
         sx={{
-          padding: '1.5em 24px 1.5em 0px',
+          padding: '1.5em 24px 1.5em 1.5em',
           display: 'flex',
           justifyContent: 'space-between',
           background: 'white',
+          marginLeft: '1em',
         }}>
         {leftButton}
-        <Box sx={{marginLeft: 'auto'}}>
-          <Button buttonProps={{onClick: onCancel, size: 'large'}}>
-            <Typography variant="subtitle2">{t('Cancel')}</Typography>
-          </Button>
+        <Box sx={{marginLeft: 'auto', ...saveButtonContainerProps}}>
+          {showCancelButton && (
+            <Button
+              buttonProps={{
+                size: 'large',
+                onClick: onCancel,
+              }}>
+              <Typography variant="subtitle2">{t('Cancel')}</Typography>
+            </Button>
+          )}
           <Button
             buttonProps={{
               size: 'large',
-              variant: 'contained',
+              variant: saveButtonVariant,
               onClick: onSave,
               autoFocus: true,
               disabled: disableSaveBtn || isSaving,
               type: saveBtnType,
+              ...saveButtonProps,
             }}>
             <Typography variant="subtitle2">
               {isSaving ? `${t('Saving')}...` : t(saveButtonText)}

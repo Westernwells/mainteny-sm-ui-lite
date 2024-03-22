@@ -25,9 +25,9 @@ import {
   useNotifications,
 } from 'hooks/reactQuery/useNotifications';
 import {useFormatDate} from 'hooks/useFormatDate';
+import AlarmBell from 'assets/icons/alarm-bell.svg';
 import {NotificationCard} from './NotificationCard';
 import {NotificationCardSkeleton} from './NotificationCardSkeleton';
-import AlarmBell from '../../assets/icons/alarm-bell.svg';
 
 export const Notifications = () => {
   const theme = useTheme();

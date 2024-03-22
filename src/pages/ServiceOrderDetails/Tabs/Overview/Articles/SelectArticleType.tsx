@@ -33,6 +33,12 @@ export const articleTypes = [
     title: 'Mix of Labor and Material',
     isPackage: true,
   },
+  {
+    value: ArticleType.OTHER,
+    label: 'Other',
+    title: 'Anything else that doesn’t fit the previous types description',
+    subTitle: '',
+  },
 ];
 
 export const SelectArticleType = ({

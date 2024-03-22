@@ -1,4 +1,6 @@
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -9,12 +11,16 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   ContractRequestBody,
   ContractView,
+  CreateContractComment,
   CustomerContractParams,
   ElevatorContractParams,
+  QueryContractCommentsParams,
   QueryContractParams,
+  UpdateContractComment,
 } from 'models/contract';
 import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
 import {useSnackbar} from 'hooks/useSnackbar';
+import {Comment} from 'models/comment';
 import {useUserSession} from './useUserSession';
 
 export const queryContracts = async (params: QueryContractParams) => {
@@ -49,6 +55,54 @@ export const useQueryContract = (
       ...options,
     },
   );
+};
+
+export const fetchContractComments = async (
+  contractId: string,
+  params: QueryContractCommentsParams,
+): Promise<Resource<Comment>> => {
+  const response = await axiosClient.get<Resource<Comment>>(
+    `/api/contracts/${contractId}/comments`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export const postContractComment = async (
+  contractId: string,
+  body: CreateContractComment,
+) => {
+  const {data} = await axiosClient.post<{value: string}>(
+    `/api/contracts/${contractId}/comments`,
+    body,
+  );
+  return data;
+};
+
+export const deleteContractComment = async (
+  contractId: string,
+  noteId: string,
+) => {
+  const {data} = await axiosClient.delete<{value: string}>(
+    `/api/contracts/${contractId}/comments/${noteId}`,
+  );
+  return data;
+};
+
+export const updateContractComment = async (
+  contractId: string,
+  noteId: string,
+  body: UpdateContractComment,
+) => {
+  const {data} = await axiosClient.put<{value: string}>(
+    `/api/contracts/${contractId}/comments/${noteId}`,
+    body,
+  );
+  return data;
 };
 
 const fetchContractDetails = async (contractId: string) => {
@@ -232,6 +286,90 @@ export const useAttachElevatorsToContract = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.contractDetails);
       },
       onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export function useInfiniteContractComments(
+  contractId: string,
+  params: QueryContractCommentsParams,
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) {
+  return useInfiniteQuery<Resource<Comment>, RestError, Resource<Comment>>(
+    [qk.fetchContractComments, params, contractId, {infinite: true}],
+    ({pageParam = 0}) =>
+      fetchContractComments(contractId, {...params, pageIndex: pageParam}),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
+      ...options,
+    },
+  );
+}
+
+export const useCreateContractComment = () => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({contractId, body}: {contractId: string; body: CreateContractComment}) =>
+      postContractComment(contractId, body),
+    {
+      onSuccess: () =>
+        queryClient.invalidateQueries([qk.fetchContractComments]),
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const useDeleteContractComment = () => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({contractId, noteId}: {contractId: string; noteId: string}) =>
+      deleteContractComment(contractId, noteId),
+    {
+      onSuccess: () =>
+        queryClient.invalidateQueries([qk.fetchContractComments]),
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const useUpdateContractComment = () => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      contractId,
+      noteId,
+      body,
+    }: {
+      contractId: string;
+      noteId: string;
+      body: UpdateContractComment;
+    }) => updateContractComment(contractId, noteId, body),
+    {
+      onSuccess: () =>
+        queryClient.invalidateQueries([qk.fetchContractComments]),
+      onError: (err) => {
         console.log(err);
         showError(err);
       },

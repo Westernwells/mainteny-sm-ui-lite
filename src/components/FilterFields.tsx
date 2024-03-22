@@ -8,6 +8,7 @@ interface Props {
   children: ReactNode;
   containerStyle?: {[key: string]: string | number};
   wrapperStyle?: {[key: string]: string | number};
+  textStyles?: {[key: string]: string | number};
   showFilter?: boolean;
   hideClear?: boolean;
   clearText?: string;
@@ -18,6 +19,7 @@ export const FilterFields = ({
   children,
   containerStyle,
   wrapperStyle,
+  textStyles,
   hideClear,
   showFilter = true,
   clearText,
@@ -39,6 +41,7 @@ export const FilterFields = ({
             cursor: 'pointer',
             color: theme.palette.text.primary,
             fontWeight: '600',
+            ...textStyles,
           }}>
           {clearText ? t(clearText) : t('Clear filter')}
         </Typography>

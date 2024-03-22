@@ -32,6 +32,11 @@ export const articleTypes = [
     title: 'Mix of Labor and Material',
     isPackage: true,
   },
+  {
+    value: ArticleType.OTHER,
+    label: 'Other',
+    title: 'Anything else that does’t fit the previous types description',
+  },
 ];
 
 export const SelectArticleType = ({
@@ -78,7 +83,7 @@ export const SelectArticleType = ({
             key={articleType.label}
             component="label"
             sx={{
-              width: '32.3%',
+              width: '23%',
               px: '1.5rem',
               py: '1rem',
               cursor: 'pointer',

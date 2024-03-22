@@ -5,10 +5,12 @@ import useTheme from '@mui/material/styles/useTheme';
 import {getColumnProps} from 'components/DataGridLayout';
 import {DataGridElevatorView} from 'pages/Units/Models';
 import {FormatDate} from 'models/misc';
+import {ElevatorOrderField} from 'models/elevator';
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: 'number',
+    field: ElevatorOrderField.EXTERNAL_ID,
+    sortable: true,
     headerName: 'unit number',
     align: 'left',
     flex: 1.25,
@@ -25,30 +27,34 @@ export const columns: GridColDef[] = [
     },
   }),
   getColumnProps({
-    field: 'model',
+    field: ElevatorOrderField.MODEL,
+    sortable: true,
     headerName: 'model',
     align: 'left',
     flex: 2,
   }),
   getColumnProps({
-    field: 'customer',
+    field: ElevatorOrderField.PROPERTY_OWNER_NAME,
+    sortable: true,
     headerName: 'customer',
     cellClassName: 'truncateText',
     align: 'left',
-    flex: 1,
+    flex: 2,
   }),
   getColumnProps({
-    field: 'address',
+    field: ElevatorOrderField.ADDRESS,
+    sortable: true,
     headerName: 'address',
     cellClassName: 'truncateText',
     align: 'left',
-    flex: 2,
+    flex: 4,
   }),
   getColumnProps({
-    field: 'lastVisit',
+    field: ElevatorOrderField.LAST_VISIT_DATE,
     headerName: 'last visit',
     align: 'left',
     flex: 2,
+    sortable: true,
   }),
 ];
 
@@ -64,11 +70,12 @@ export const makeRows = (
     elevators.length &&
     elevators.map((elevator: DataGridElevatorView) => ({
       id: elevator.id,
-      number: elevator.externalId || '-',
-      address: elevator?.address?.fullName || '-',
-      model: elevator.model || '-',
-      customer: elevator.propertyOwner.name || '-',
-      lastVisit: formatDate(elevator.lastVisitDate),
+      [ElevatorOrderField.EXTERNAL_ID]: elevator.externalId || '-',
+      [ElevatorOrderField.ADDRESS]: elevator?.address?.fullName || '-',
+      [ElevatorOrderField.MODEL]: elevator.model || '-',
+      [ElevatorOrderField.PROPERTY_OWNER_NAME]:
+        elevator.propertyOwner.name || '-',
+      [ElevatorOrderField.LAST_VISIT_DATE]: formatDate(elevator.lastVisitDate),
     }));
   return result || [];
 };

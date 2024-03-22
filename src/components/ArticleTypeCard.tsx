@@ -28,6 +28,10 @@ const articleTypes = [
     label: 'Package',
     isPackage: true,
   },
+  {
+    value: ArticleType.OTHER,
+    label: 'Other',
+  },
 ];
 
 type Props = {

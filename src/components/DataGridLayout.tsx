@@ -311,16 +311,17 @@ export const DataGridLayout = ({
           borderLeft: 'none',
           borderRight: 'none',
           borderTop: 'none',
-          borderBottom: '2px solid',
-          borderColor: 'background.default',
           '& > div:nth-of-type(3)': {
             display: 'flex',
             flexDirection: 'column',
+            position: 'sticky',
           },
           '& .MuiDataGrid-virtualScroller': {
             msOverflowStyle: 'none',
             scrollbarWidth: 'none',
-
+            '& .Mui-selected': {
+              background: '#ebfcff',
+            },
             '&::-webkit-scrollbar': {
               display: 'none',
             },
@@ -341,9 +342,8 @@ export const DataGridLayout = ({
             borderBottom: '2px solid',
             borderColor: 'background.default',
             ...(isWidget && {
-              border: `1px solid ${theme.palette.text.disabled}`,
-              borderRadius: '4px',
-              padding: '0.5em 0em',
+              borderBottom: `1px solid`,
+              borderColor: `${theme.palette.text.disabled}`,
             }),
           },
           '& .MuiDataGrid-columnHeaderTitleContainer': {

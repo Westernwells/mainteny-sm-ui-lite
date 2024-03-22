@@ -271,6 +271,7 @@ export type StoreSlice<T extends object, E extends object = T> = (
 export interface MenuBtnProps {
   label: string;
   action: (event: MouseEvent<HTMLLIElement>) => void;
+  icon?: JSX.Element;
 }
 
 export enum CacheTypes {
@@ -380,4 +381,14 @@ export interface IdStateParams {
 export interface IdState {
   id: string;
   state: State;
+}
+
+export enum InspectionCycle {
+  NONE = 'NONE',
+  MONTHLY = 'MONTHLY',
+  BIMONTHLY = 'BIMONTHLY',
+  QUARTERLY = 'QUARTERLY',
+  HALF_YEARLY = 'HALF_YEARLY',
+  YEARLY = 'YEARLY',
+  BIENNIALLY = 'BIENNIALLY',
 }

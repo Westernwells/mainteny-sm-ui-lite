@@ -4,6 +4,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import {ContractView} from 'models/contract';
 import {useTranslation} from 'react-i18next';
 import {useFormatDate} from 'hooks/useFormatDate';
+import React from 'react';
 
 interface Props {
   contractDetails?: ContractView;
@@ -30,15 +31,25 @@ export const ContractTimeline = ({
             width: '.75rem',
             height: '.75rem',
             borderRadius: '50%',
-            backgroundColor: unUsedContractDays
-              ? theme.palette.text.secondary
-              : theme.palette.success.dark,
+            border: `2px solid ${
+              unUsedContractDays
+                ? theme.palette.success.main
+                : theme.palette.text.secondary
+            }`,
           }}
         />
         <Box>
-          <Typography variant="subtitle1">{t('Contract ends')}</Typography>
-          <Typography variant="body1">
-            {formatDate(contractDetails?.end)}
+          <Typography variant="subtitle1">
+            <span style={{fontWeight: 'bold'}}>{t('Contract')}</span>{' '}
+            {t('ends')}
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: theme.palette.text.secondary,
+            }}>
+            {formatDate(contractDetails?.end)} {' | '}
+            {formatDate(contractDetails?.endTime, 'HH:mm')}
           </Typography>
         </Box>
       </Box>
@@ -57,9 +68,11 @@ export const ContractTimeline = ({
       <Box display="flex" alignItems="center">
         <Box
           sx={{
-            backgroundColor: unUsedContractDays
-              ? theme.palette.success.main
-              : theme.palette.text.secondary,
+            border: `2px solid ${
+              unUsedContractDays
+                ? theme.palette.success.main
+                : theme.palette.text.secondary
+            }`,
             mr: '1em',
             display: 'flex',
             justifyContent: 'center',
@@ -70,9 +83,17 @@ export const ContractTimeline = ({
           }}
         />
         <Box>
-          <Typography variant="subtitle1">{t('Contract signed')}</Typography>
-          <Typography variant="body1">
-            {formatDate(contractDetails?.start)}
+          <Typography variant="subtitle1">
+            <span style={{fontWeight: 'bold'}}>{t('Contract')}</span>{' '}
+            {t('signed')}
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: theme.palette.text.secondary,
+            }}>
+            {formatDate(contractDetails?.start)} {' | '}
+            {formatDate(contractDetails?.startTime, 'HH:mm')}
           </Typography>
         </Box>
       </Box>

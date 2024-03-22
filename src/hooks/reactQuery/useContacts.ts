@@ -9,7 +9,26 @@ import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {Page, Resource, RestError, StringValue} from '../../models/misc';
+import {
+  ContractElevatorQueryParams,
+  ContractElevatorUpdate,
+  ContractElevatorView,
+} from 'models/contract';
+import {Page, Resource, RestError, StringValue} from 'models/misc';
+
+const fetchContractElevators = async (
+  contractId: string,
+  params: Partial<ContractElevatorQueryParams>,
+): Promise<Resource<ContractElevatorView>> => {
+  const response = await axiosClient.get<Resource<ContractElevatorView>>(
+    `/api/contracts/${contractId}/elevators`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
 
 export const getContacts = async (page: Page, customerId: string) => {
   const response = await axiosClient.get<Resource<ContactsView>>(
@@ -146,6 +165,58 @@ export const useInviteContact = (successMsg?: string) => {
           });
         }
         queryClient.invalidateQueries(queryKeys.queryContacts);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const useContractElevators = (
+  contractId: string,
+  params: Partial<ContractElevatorQueryParams>,
+  options?: UseQueryOptions<any, any, any>,
+) =>
+  useQuery<Resource<ContractElevatorView>, RestError>(
+    [queryKeys.fetchContractElevators, contractId, params],
+    () => fetchContractElevators(contractId, params),
+    {...options},
+  );
+
+const updateContractElevator = async (
+  body: ContractElevatorUpdate,
+  contractId: string,
+  elevatorId: string,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/contracts/${contractId}/elevators/${elevatorId}`,
+    {
+      ...body,
+    },
+  );
+};
+
+export const useUpdateContractElevator = (successMsg: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      elevatorId,
+      contractId,
+    }: {
+      body: ContractElevatorUpdate;
+      elevatorId: string;
+      contractId: string;
+    }) => updateContractElevator(body, contractId, elevatorId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries(queryKeys.fetchContractElevators);
       },
       onError: (err: any) => {
         console.log(err);
