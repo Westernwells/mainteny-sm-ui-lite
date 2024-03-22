@@ -1,4 +1,3 @@
-import useTheme from '@mui/material/styles/useTheme';
 import Grid from '@mui/material/Grid';
 import {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
@@ -6,14 +5,12 @@ import {ContractStatus, ContractSimpleView} from 'models/contract';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {Progress} from 'components/Progress';
 import {Location} from './Location';
-import {UnitDetails} from './UnitDetails';
+import General from './General';
 import {Service} from './Service';
 import {AppointmentPreference} from './AppointmentPreference';
-import {EmergencyPhone} from './EmergencyPhone';
-import {UnitContracts} from './UnitContracts';
 import {PriorityTechnician} from './PriorityTechnician';
-import {Notes} from './Notes';
 import {Pictures} from './Pictures';
+import ContractServices from './ContractServices';
 
 interface Props {
   getUnitName?: (value: string) => void;
@@ -21,7 +18,6 @@ interface Props {
 
 export const OverviewTab = ({getUnitName}: Props) => {
   const {id: elevatorId} = useParams();
-  const theme = useTheme();
 
   const [validContract, setValidContract] = useState<ContractSimpleView>();
 
@@ -49,29 +45,18 @@ export const OverviewTab = ({getUnitName}: Props) => {
 
   return (
     <>
-      <Grid container spacing={2}>
-        <Grid item md={5} sm={12}>
-          <Location
-            propertyOwnerId={elevator?.propertyOwner.id}
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                minHeight: '35rem',
-                height: '100%',
-              },
-            }}
+      <Grid container spacing={2} sx={{display: 'flex', alignItems: 'stretch'}}>
+        <Grid item md={6} sm={12}>
+          <General
+            containerStyles={{height: '100%'}}
             elevator={elevator!}
+            propertyOwnerId={elevator?.propertyOwner.id}
           />
         </Grid>
-        <Grid item md={7} sm={12}>
-          <UnitDetails
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                minHeight: '35rem',
-                height: '100%',
-              },
-            }}
-            elevator={elevator!}
+        <Grid item md={6} sm={12}>
+          <Location
             propertyOwnerId={elevator?.propertyOwner.id}
+            elevator={elevator!}
           />
         </Grid>
       </Grid>
@@ -79,82 +64,25 @@ export const OverviewTab = ({getUnitName}: Props) => {
       <Grid
         container
         spacing={2}
-        sx={{
-          mt: '0.3em',
-          [theme.breakpoints.up('md')]: {
-            maxHeight: '27.5rem',
-          },
-        }}>
-        <Grid
-          item
-          xs={12}
-          md={4}
-          sx={{
-            [theme.breakpoints.up('md')]: {
-              height: '100%',
-            },
-          }}>
+        mt="0.3em"
+        sx={{display: 'flex', alignItems: 'stretch'}}>
+        <Grid item xs={12} md={6}>
           <Service
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-              },
-            }}
+            containerStyles={{height: '100%'}}
             elevator={elevator!}
             validContract={validContract}
             propertyOwnerId={elevator?.propertyOwner.id}
           />
         </Grid>
-        <Grid
-          item
-          xs={12}
-          md={4}
-          sx={{
-            [theme.breakpoints.up('md')]: {
-              height: '100%',
-            },
-          }}>
+        <Grid item md={6} sm={12}>
           <AppointmentPreference
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-              },
-            }}
-            elevator={elevator!}
-            propertyOwnerId={elevator?.propertyOwner.id}
-          />
-        </Grid>
-        <Grid
-          item
-          xs={12}
-          md={4}
-          sx={{
-            [theme.breakpoints.up('md')]: {
-              height: '100%',
-            },
-          }}>
-          <EmergencyPhone
-            containerStyles={{
-              [theme.breakpoints.up('md')]: {
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-              },
-            }}
             elevator={elevator!}
             propertyOwnerId={elevator?.propertyOwner.id}
           />
         </Grid>
       </Grid>
 
-      <UnitContracts
-        contracts={elevatorId ? elevator!.contracts : []}
-        containerStyles={{mt: '1.2em'}}
-      />
+      <ContractServices elevator={elevator!} containerStyles={{mt: '1.2em'}} />
 
       <PriorityTechnician
         containerStyles={{mt: '1.2em'}}
@@ -162,36 +90,8 @@ export const OverviewTab = ({getUnitName}: Props) => {
         maintainers={elevator?.assignments}
       />
 
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          mt: '0.3em',
-          [theme.breakpoints.up('md')]: {
-            maxHeight: 500,
-          },
-        }}>
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            [theme.breakpoints.up('md')]: {
-              height: '100%',
-            },
-          }}>
-          <Notes elevatorId={elevator?.id} />
-        </Grid>
-
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            [theme.breakpoints.up('md')]: {
-              height: '100%',
-            },
-          }}>
+      <Grid container spacing={2} mt="0.3em">
+        <Grid item xs={12} md={12}>
           <Pictures
             elevator={elevator!}
             propertyOwnerId={elevator?.propertyOwner.id}

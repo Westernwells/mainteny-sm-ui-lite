@@ -110,6 +110,7 @@ export const NewUnit = () => {
       openingHour: '',
       closingHour: '',
       shouldNotifyCustomer: true,
+      requiresAppointment: true,
       appointmentNotificationDue: 0,
     });
 
@@ -209,6 +210,8 @@ export const NewUnit = () => {
           appointmentPreferenceFormValues.shouldNotifyCustomer,
         appointmentNotificationDue:
           appointmentPreferenceFormValues.appointmentNotificationDue,
+        requiresAppointment:
+          appointmentPreferenceFormValues.requiresAppointment,
       },
     };
 

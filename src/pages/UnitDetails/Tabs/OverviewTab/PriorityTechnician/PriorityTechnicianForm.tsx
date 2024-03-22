@@ -1,4 +1,4 @@
-import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import {FormInput} from 'components/form/FormInput';
 import {TechnicianAutoComplete} from 'components/TechnicianAutoComplete';
 import {FormikProps} from 'formik';
@@ -20,45 +20,47 @@ export const PriorityTechnicianForm = ({
 }: Props) => {
   const {t} = useTranslation();
   return (
-    <Box sx={{mt: '0.5em'}}>
-      <TechnicianAutoComplete
-        disabled={disableAutoComplete}
-        getTechnician={(value) => {
-          formik.setValues({
-            ...formik.values,
-            technicianId: value ? value.id! : null,
-          });
-        }}
-        initialValue={activeTechnician?.technician}
-        textFieldProps={{
-          error: !!(formik.errors.technicianId && formik.touched.technicianId),
-          helperText:
-            formik.errors.technicianId && formik.touched.technicianId
-              ? formik.errors.technicianId
-              : '',
-          label: t('Technicians Name'),
-          onBlur: formik.handleBlur,
-        }}
-      />
-      <FormInput
-        props={{
-          size: 'small',
-          placeholder: 'Enter priority number',
-          label: 'Priority',
-          name: 'priority',
-          value: formik.values.priority,
-          onChange: formik.handleChange,
-          helperText: formik.errors.priority,
-          error: !!formik.errors.priority,
-          onBlur: formik.handleBlur,
-          required: true,
-          sx: {
-            mt: '0.5em',
-          },
-          type: 'number',
-          inputProps: {min: 0},
-        }}
-      />
-    </Box>
+    <Grid container spacing={2} alignItems="end">
+      <Grid item xs={12} md={6} sm={6}>
+        <TechnicianAutoComplete
+          disabled={disableAutoComplete}
+          getTechnician={(value) => {
+            formik.setValues({
+              ...formik.values,
+              technicianId: value ? value.id! : null,
+            });
+          }}
+          initialValue={activeTechnician?.technician}
+          textFieldProps={{
+            InputLabelProps: {shrink: true},
+            error: !!(
+              formik.errors.technicianId && formik.touched.technicianId
+            ),
+            label: t('Engineers Name'),
+            onBlur: formik.handleBlur,
+          }}
+        />
+      </Grid>
+      <Grid item xs={12} md={6} sm={6}>
+        <FormInput
+          props={{
+            size: 'small',
+            placeholder: 'Enter priority number',
+            label: 'Priority',
+            name: 'priority',
+            value: formik.values.priority,
+            onChange: formik.handleChange,
+            error: !!formik.errors.priority,
+            onBlur: formik.handleBlur,
+            required: true,
+            sx: {
+              mt: '0.5em',
+            },
+            type: 'number',
+            inputProps: {min: 0},
+          }}
+        />
+      </Grid>
+    </Grid>
   );
 };

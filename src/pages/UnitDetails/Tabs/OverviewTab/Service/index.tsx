@@ -1,12 +1,14 @@
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
-import EditIcon from '@mui/icons-material/Edit';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import {ReactComponent as ToolsWrenchScrewdriverIcon} from 'assets/icons/ToolsWrenchScrewdriverIcon.svg';
 import {ElevatorView} from 'models/elevator';
 import Grid from '@mui/material/Grid';
 import {useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
 import * as Yup from 'yup';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
+import useTheme from '@mui/material/styles/useTheme';
 import {InfoCard} from 'components/InfoCard';
 import {useFormik} from 'formik';
 import {ContractSimpleView} from 'models/contract';
@@ -37,6 +39,7 @@ export const Service = ({
   propertyOwnerId,
   validContract,
 }: Props) => {
+  const theme = useTheme();
   const {t} = useTranslation();
   const formatDate = useFormatDate();
   const [openDialog, setOpenDialog] = useState(false);
@@ -59,16 +62,18 @@ export const Service = ({
       serviceTime: elevator.serviceTime,
       technicianNumber: elevator.technicianNumber,
       priority: elevator.additionalInfo.priority,
+      inspectionCycle: elevator.additionalInfo.inspectionCycle,
     },
     onSubmit: () => {},
     validationSchema,
   });
   const labels = useRef([
     'lastVisit',
-    'lastInspection',
     'requiredTime',
+    'lastInspection',
     'numOfTechnicians',
     'unitPriority',
+    'visitsPerYear',
   ]).current;
 
   const onSave = async () => {
@@ -84,6 +89,7 @@ export const Service = ({
         serviceTime: formik.values.serviceTime,
         technicianNumber: formik.values.technicianNumber,
         priority: formik.values.priority as Priority,
+        inspectionCycle: formik.values.inspectionCycle,
       },
       elevatorId: elevator.id,
     });
@@ -93,20 +99,17 @@ export const Service = ({
     <InfoCard
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
-      header={<Typography variant="subtitle1">{t('Service')}</Typography>}
-      headerActionIcon={<EditIcon />}
-      showHeaderBackground
-      bodyContainerStyle={{
-        overflowY: 'hidden',
-      }}>
+      header={<Typography variant="h5">{t('Service')}</Typography>}
+      headerIcon={
+        <ToolsWrenchScrewdriverIcon style={{width: '2rem', height: '2rem'}} />
+      }
+      headerActionIcon={
+        <EditOutlinedIcon style={{color: theme.palette.secondary.mainLight}} />
+      }>
       <Grid container spacing={2}>
         {labels.map((label) => (
-          <Grid key={label} item xs={12}>
-            <ServiceSchema
-              label={label}
-              elevator={elevator}
-              visitNumber={validContract?.visitsNumber}
-            />
+          <Grid key={label} item xs={12} sm={4} md={4}>
+            <ServiceSchema label={label} elevator={elevator} />
           </Grid>
         ))}
       </Grid>

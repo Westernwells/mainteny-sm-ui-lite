@@ -1,6 +1,6 @@
-import {AddressRecord} from 'models/misc';
+import {AddressRecord, InspectionCycle} from 'models/misc';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
-import {FileResourceRecord} from './media';
+import {ElevatorStatus} from './elevator';
 
 export interface AttachmentFormModel {
   documents?: FileWithPreview[];
@@ -12,6 +12,10 @@ export interface LocationFormModel {
   propertySegment?: string;
   keyLocation?: string;
   parking?: string;
+  propertyOwnerId?: string;
+  distance?: string;
+  travelTime?: string;
+  travelFee?: string;
 }
 
 export interface UnitDetailsFormModel {
@@ -32,6 +36,44 @@ export interface UnitDetailsFormModel {
   spendingLimit?: number;
 }
 
+export interface GeneralFormModel {
+  category?: string;
+  manufacturer?: string;
+  externalId?: string;
+  yearBuilt?: number;
+  model?: string;
+  serialNumber?: string;
+  spendingLimit?: number;
+  number?: string;
+  status?: ElevatorStatus;
+}
+
+export interface TechnicalDataFormModel {
+  numberOfStops?: number;
+  drive?: string;
+  capacity?: string;
+  speed?: string;
+  controller?: string;
+  iotDevice?: string;
+  cabinType?: string;
+  cageWeight?: string;
+  counterWeight?: string;
+  hoistingHeight?: string;
+  shaftHeight?: string;
+  numberOfPeople?: number;
+}
+
+export interface AutoDialerFormModel {
+  emergencyPhoneProvider?: string;
+  systemId?: string;
+  phoneConnection?: string;
+  phoneNumber?: string;
+  simCardNumber?: string;
+  simPin?: string;
+  callCenter?: string;
+  placeOfInstallation?: string;
+}
+
 export interface ServiceFormModel {
   lastVisitDate?: Date;
   lastInspectionDate?: Date;
@@ -39,6 +81,7 @@ export interface ServiceFormModel {
   serviceTime?: number;
   technicianNumber?: number;
   priority?: string;
+  inspectionCycle?: InspectionCycle;
 }
 
 export interface AppointmentFormModel {
@@ -46,6 +89,7 @@ export interface AppointmentFormModel {
   openingHour?: string;
   closingHour?: string;
   shouldNotifyCustomer: boolean;
+  requiresAppointment: boolean;
   appointmentNotificationDue: number;
 }
 
