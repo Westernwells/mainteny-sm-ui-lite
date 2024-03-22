@@ -185,7 +185,7 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
             InputLabelProps={{
               shrink: true,
             }}
-            label={t('Notice Period')}
+            label={t('Notice period')}
             onValueChange={(values) => {
               formik.setFieldValue('noticePeriodInMonth', Number(values.value));
             }}

@@ -17,6 +17,7 @@ import {
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {ComboBox} from 'components/ComboBox';
 import ContractName from 'components/ContractName';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   formik: FormikProps<ContractBasicInfoFormModel>;
@@ -24,6 +25,7 @@ interface Props {
 
 const NewContractBasicInfo: FC<Props> = ({formik}) => {
   const {user} = useUserSession();
+  const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const {data: companyAutoNumberConfig} = useCompanyAutoNumberConfig(
     user?.userAccount.serviceCompany.id,
@@ -116,7 +118,9 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
             id: 'startDate',
             label: 'Contract Start Date',
             required: true,
-            helperText: formik.errors.startDate ? formik.errors.startDate : '',
+            helperText: formik.errors.startDate
+              ? t(`${formik.errors.startDate}`)
+              : '',
             error: !!formik.errors.startDate,
           }}
           defaultDate={formik.values.startDate}
@@ -133,7 +137,9 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
             id: 'endDate',
             label: 'Contract End Date',
             required: true,
-            helperText: formik.errors.endDate ? formik.errors.endDate : '',
+            helperText: formik.errors.endDate
+              ? t(`${formik.errors.endDate}`)
+              : '',
             error: !!formik.errors.endDate,
           }}
           defaultDate={formik.values.endDate}
