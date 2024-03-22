@@ -5,6 +5,8 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
+import {ReactComponent as UnionIcon} from 'assets/icons/union.svg';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import {useFormik} from 'formik';
 import {Confirm} from 'components/Confirm';
 import * as Yup from 'yup';
@@ -25,8 +27,8 @@ interface Props {
 }
 
 enum DialogTitle {
-  ADD_TECHNICIAN = 'Add Technician',
-  EDIT_TECHNICIAN = 'Edit Technician',
+  ADD_TECHNICIAN = 'Add Priority Engineer',
+  EDIT_TECHNICIAN = 'Edit Priority Engineer',
 }
 
 const validationSchema = Yup.object().shape({
@@ -152,13 +154,11 @@ export const PriorityTechnician = ({
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
-      showHeaderBackground
-      header={
-        <Typography variant="subtitle1">{t('Priority Technicians')}</Typography>
-      }
+      header={<Typography variant="h5">{t('Priority Engineers')}</Typography>}
+      headerIcon={<UnionIcon style={{width: '2rem', height: '2rem'}} />}
       handleAction={() => onAddButtonClicked()}
       headerActionIcon={
-        <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
+        <AddOutlinedIcon style={{color: theme.palette.primary.dark}} />
       }>
       {!totalTechnicianRef ? (
         renderNoRowsSection()
@@ -206,7 +206,7 @@ export const PriorityTechnician = ({
         onConfirm={() => onDelete()}
         onClose={() => setOpenCancelConfirm(false)}
         title="Confirm"
-        content="Do you want to delete this technician?"
+        content="Do you want to delete this engineer?"
       />
     </InfoCard>
   );

@@ -38,7 +38,8 @@ export const FormInput = forwardRef(
       <FormControl sx={{...containerStyles}} fullWidth={fullWidth}>
         {inputType === 'currency' ? (
           <NumericFormat
-            value={Number(props!.value)}
+            // eslint-disable-next-line react/prop-types
+            value={Number(props?.inputProps?.defaultValue || props!.value)}
             onValueChange={(values) => {
               if (onValueChange) {
                 onValueChange({

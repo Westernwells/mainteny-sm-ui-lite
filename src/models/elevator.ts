@@ -29,7 +29,9 @@ export enum ElevatorCommentType {
 export enum ElevatorStatus {
   RUNNING = 'RUNNING',
   BROKEN = 'BROKEN',
-  STOPPED = 'STOPPED',
+  JOB_ONGOING = 'JOB_ONGOING',
+  UNKNOWN = 'UNKNOWN',
+  OUT_OF_SERVICE = 'OUT_OF_SERVICE',
 }
 
 export enum ElevatorCategory {
@@ -352,6 +354,7 @@ export interface ElevatorTimeRuleRecord {
 export interface CustomerAppointment {
   shouldNotifyCustomer: boolean;
   appointmentNotificationDue: number;
+  requiresAppointment: boolean;
 }
 
 export interface ElevatorRequestBody {
@@ -390,6 +393,20 @@ export interface ElevatorRequestBody {
   timeRule: Partial<ElevatorTimeRuleRecord>;
   customerAppointment: CustomerAppointment;
   technicianWeights: {[key: string]: string | number};
+  drive: string;
+  speed: string;
+  controller: string;
+  iotDevice: string;
+  cageWeight: string;
+  counterWeight: string;
+  hoistingHeight: string;
+  shaftHeight: string;
+  spendingLimit: number;
+  inspectionCycle: InspectionCycle;
+  distance: string;
+  travelTime: string;
+  travelFee: string;
+  numberOfPeople: number;
 }
 
 export interface ElevatorComment {

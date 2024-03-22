@@ -1,73 +1,155 @@
 import {CardProps} from 'components/CardProps';
-import LocationCityIcon from '@mui/icons-material/LocationCity';
-import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
-import HomeIcon from '@mui/icons-material/Home';
+import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import BusinessIcon from '@mui/icons-material/Business';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import SocialDistanceIcon from '@mui/icons-material/SocialDistance';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import TagIcon from '@mui/icons-material/Tag';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
+import {useTranslation} from 'react-i18next';
+import Typography from '@mui/material/Typography';
+import {useNavigate} from 'react-router';
 
 interface Props {
   label: string;
   elevator: ElevatorView;
+  currency: string;
 }
 
-export const LocationSchema = ({label, elevator}: Props) => {
+export const LocationSchema = ({label, elevator, currency}: Props) => {
   const theme = useTheme();
+  const {t} = useTranslation();
   const renderSection = () => {
+    const navigate = useNavigate();
     switch (label) {
+      case 'customer':
+        return (
+          <CardProps
+            icon={
+              <BusinessCenterIcon sx={{color: theme.palette.primary.light}} />
+            }
+            label="Customer"
+            bodyText={
+              <Typography
+                variant="subtitle1"
+                onClick={() =>
+                  navigate(
+                    `/customers/details/${elevator.propertyOwner.id}?tab=0`,
+                  )
+                }
+                sx={{
+                  color: 'primary.light',
+                  cursor: 'pointer',
+                  whiteSpace: 'wrap',
+                }}>
+                {elevator.propertyOwner.name || '-'}
+              </Typography>
+            }
+            containerStyles={{alignItems: 'center'}}
+            iconMaxHeight="3em"
+          />
+        );
+      case 'customerNumber':
+        return (
+          <CardProps
+            icon={<TagIcon sx={{color: theme.palette.primary.light}} />}
+            label="Customer number"
+            bodyText={elevator.propertyOwner.externalId || '-'}
+            containerStyles={{alignItems: 'center'}}
+            iconMaxHeight="3em"
+          />
+        );
       case 'address':
         return (
           <CardProps
-            icon={<HomeIcon sx={{color: theme.palette.info.dark}} />}
-            label="ADDRESS"
+            icon={<LocationOnIcon sx={{color: theme.palette.primary.light}} />}
+            label="Address"
             bodyText={elevator.address.fullName || '-'}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
+            containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
         );
       case 'building':
         return (
           <CardProps
-            icon={<LocationCityIcon sx={{color: theme.palette.info.dark}} />}
-            label="BUILDING"
+            icon={<BusinessIcon sx={{color: theme.palette.primary.light}} />}
+            label="Building"
             bodyText={elevator.additionalInfo.buildingLocation || '-'}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
+            containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
         );
       case 'propertySegment':
         return (
           <CardProps
-            icon={<MapsHomeWorkIcon sx={{color: theme.palette.info.dark}} />}
-            label="PROPERTY SEGMENT"
+            icon={<ApartmentIcon sx={{color: theme.palette.primary.light}} />}
+            label="Property segment"
             bodyText={elevator.additionalInfo.propertySegment || '-'}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
+            containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
         );
       case 'keyLocation':
         return (
           <CardProps
-            icon={<LocationOnIcon sx={{color: theme.palette.info.dark}} />}
-            label="KEY LOCATION"
+            icon={<VpnKeyIcon sx={{color: theme.palette.primary.light}} />}
+            label="Key location"
             bodyText={elevator.additionalInfo.keyLocation || '-'}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
+            containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
         );
       case 'parking':
         return (
           <CardProps
-            icon={<LocalParkingIcon sx={{color: theme.palette.info.dark}} />}
-            label="PARKING"
+            icon={
+              <LocalParkingIcon sx={{color: theme.palette.primary.light}} />
+            }
+            label="Parking"
             bodyText={elevator.additionalInfo.parking || '-'}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
+            containerStyles={{alignItems: 'center'}}
+            iconMaxHeight="3em"
+          />
+        );
+      case 'distance':
+        return (
+          <CardProps
+            icon={
+              <SocialDistanceIcon sx={{color: theme.palette.primary.light}} />
+            }
+            label="Distance"
+            unitText={t('km')}
+            bodyText={elevator.additionalInfo.distance || '-'}
+            containerStyles={{alignItems: 'center'}}
+            iconMaxHeight="3em"
+          />
+        );
+      case 'travelTime':
+        return (
+          <CardProps
+            icon={
+              <TimerOutlinedIcon sx={{color: theme.palette.primary.light}} />
+            }
+            label="Travel time"
+            unitText={t('min')}
+            bodyText={elevator.additionalInfo.travelTime || '-'}
+            containerStyles={{alignItems: 'center'}}
+            iconMaxHeight="3em"
+          />
+        );
+      case 'travelFee':
+        return (
+          <CardProps
+            icon={<AttachMoneyIcon sx={{color: theme.palette.primary.light}} />}
+            label="Travel fee"
+            unitText={currency}
+            bodyText={elevator.additionalInfo.travelFee || '-'}
+            containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
         );

@@ -18,9 +18,9 @@ interface Props {
   bodyText?: string | JSX.Element | ReactNode;
   unitText?: string;
   iconMaxHeight?: string | number;
-  containerStyles?: {[key: string]: any};
-  bodyStyle?: {[key: string]: any};
-  labelStyle?: {[key: string]: any};
+  containerStyles?: SxProps;
+  bodyStyle?: SxProps;
+  labelStyle?: SxProps;
   iconContainerStyles?: SxProps;
   enabled?: boolean;
   shouldTranslate?: boolean;
@@ -67,18 +67,19 @@ export const CardProps = ({
           justifyContent: 'center',
           mr: '0.8em',
           maxHeight: iconMaxHeight || 'default',
+          marginRight: 0,
           ...iconContainerStyles,
         }}>
         {icon}
       </Box>
-      <Box>
+      <Box sx={{textWrap: 'nowrap'}}>
         <Typography
           component="div"
           variant={titleTextVariant || 'caption'}
           color={
             enabled ? theme.palette.text.primary : theme.palette.text.secondary
           }
-          sx={{textTransform: 'capitalize', ...labelStyle}}>
+          sx={{...labelStyle}}>
           {t(label)}
         </Typography>
 
@@ -87,7 +88,7 @@ export const CardProps = ({
             display: 'flex',
             flexWrap: 'nowrap',
             alignItems: 'baseline',
-            fontWeight: '600',
+            fontWeight: '400',
           }}>
           {navigateTo ? (
             <Link
@@ -96,7 +97,7 @@ export const CardProps = ({
               to={`${navigateTo}`}
               underline="hover"
               variant="body2"
-              style={{paddingTop: '0.2em', display: 'flex', fontWeight: '600'}}
+              style={{paddingTop: '0.2em', display: 'flex', fontWeight: '400'}}
               color={theme.palette.info.main}>
               {typeof bodyText === 'string' ? (
                 <Typography
@@ -105,7 +106,7 @@ export const CardProps = ({
                   sx={{
                     ...bodyStyle,
                     fontSize: '0.9rem',
-                    fontWeight: '600',
+                    fontWeight: '400',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'wrap',
@@ -133,6 +134,7 @@ export const CardProps = ({
                 whiteSpace: 'wrap',
                 display: '-webkit-box',
                 wordBreak: 'break-all',
+                overflow: 'hidden',
                 ...bodyStyle,
               }}>
               {hasProtocol(bodyText) || !shouldTranslate
