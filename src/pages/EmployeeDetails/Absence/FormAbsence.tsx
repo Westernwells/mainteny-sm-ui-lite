@@ -189,7 +189,6 @@ const FormAbsence = ({formik, roles, name}: Props) => {
                     ? formik.errors.dateStart
                     : '',
                 error: !!(formik.touched.dateStart && formik.errors.dateStart),
-                onBlur: formik.handleBlur,
               }}
               maxDate={
                 formik.values.dateEnd
@@ -211,7 +210,6 @@ const FormAbsence = ({formik, roles, name}: Props) => {
                     ? formik.errors.dateEnd
                     : '',
                 error: !!(formik.touched.dateEnd && formik.errors.dateEnd),
-                onBlur: formik.handleBlur,
               }}
               minDate={
                 formik.values.dateStart

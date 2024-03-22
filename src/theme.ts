@@ -18,6 +18,7 @@ export const theme = createTheme({
       outlinedHoverBg: 'rgba(0, 209, 255, 0.08)',
       containedHoverBackground:
         'linear-gradient(0deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), #00D1FF',
+      mainLight: '#8F9BB380',
     },
     text: {
       primary: '#222B45',
@@ -59,6 +60,7 @@ export const theme = createTheme({
       light: '#61FFC0',
       main: '#00D68F',
       dark: '#00A361',
+      darkSuccess: '#4CAF50',
       contrastText: '#FFFFFF',
       outlinedHoverBg: 'rgba(97, 255, 192, 0.08)',
     },
@@ -202,7 +204,7 @@ export const theme = createTheme({
         {
           props: {variant: 'outlined'},
           style: {
-            background: 'rgba(15, 76, 100, 0.08)',
+            background: 'white',
             border: '1px solid rgba(15, 76, 100, 0.5)',
             boxSizing: 'border-box',
             borderRadius: '4px',
@@ -409,6 +411,22 @@ export const theme = createTheme({
         root: {
           '&.Mui-selected': {
             color: '#222B45',
+          },
+        },
+      },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        tag: {
+          backgroundColor: '#0F4C64',
+          color: '#F5FDFE',
+          '& .MuiChip-deleteIcon': {
+            color: 'white',
+          },
+        },
+        option: {
+          '&[aria-selected="true"]': {
+            backgroundColor: '#000034',
           },
         },
       },

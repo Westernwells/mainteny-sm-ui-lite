@@ -118,6 +118,7 @@ export const ComboBox = ({
   const renderCustomPopper = (popperProps: PopperProps) => (
     <CustomPopper
       {...popperProps}
+      sx={{width: 'max-content !important'}}
       isEnabled={autoIdProps.isEnabled!}
       handleAction={handleClick}
       query={query}

@@ -11,8 +11,8 @@ import {Box} from '@mui/material';
 
 export interface Props {
   children: ReactNode;
-  headerStyles?: {[key: string]: string | number};
-  headerTextOverrideStyles?: {[key: string]: string | number};
+  headerStyles?: SxProps<Theme>;
+  headerTextOverrideStyles?: SxProps<Theme>;
   headerActionIcon?: JSX.Element;
   minHeight?: number | string;
   headerIcon?: JSX.Element;
@@ -49,8 +49,9 @@ export const PageCard = ({
         <CardHeader
           sx={{
             minHeight: '2rem',
-            mt: '1em',
+            mt: '0.5em',
             mx: '0.5em',
+            p: '0.7em 0em 0em 1.1em',
             ...headerStyles,
           }}
           action={

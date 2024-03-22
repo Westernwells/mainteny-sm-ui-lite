@@ -2,22 +2,21 @@ import {
   Address,
   AddressRecord,
   Fee,
+  InspectionCycle,
   Meta,
   Order,
   Priority,
   StringMap,
-  StringValue,
 } from './misc';
 import {Client} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
-import {ServiceOrderOrderField, ServiceOrderView} from './service-order';
+import {ServiceOrderView} from './service-order';
 import {ContractSimpleView} from './contract';
 import {EmployeesSimpleView} from './employee';
 import {
   PropertyContactPersonSimpleView,
-  PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from './propertyManager';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
@@ -115,6 +114,20 @@ export interface ElevatorAdditionalInfo {
   qrCode: FileResourceRecord;
   elevatorPhone: ElevatorPhone;
   customerAppointment: CustomerAppointment;
+  drive: string;
+  speed: string;
+  controller: string;
+  iotDevice: string;
+  cageWeight: string;
+  counterWeight: string;
+  hoistingHeight: string;
+  shaftHeight: string;
+  spendingLimit: number;
+  distance: string;
+  travelTime: string;
+  travelFee: string;
+  inspectionCycle: InspectionCycle;
+  numberOfPeople: number;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -297,6 +310,8 @@ export interface CustomerElevatorParams {
   pageIndex: number;
   pageSize: number;
   query: string;
+  orderBy?: ElevatorOrderField;
+  order?: Order;
 }
 
 export interface ElevatorDataGrid {
@@ -394,4 +409,14 @@ export interface ElevatorCommentRecord {
 export interface QueryTodoParams {
   pageIndex: number;
   pageSize: number;
+}
+
+export enum UnitAppointmentView {
+  YES = 'Yes',
+  NO = 'No',
+}
+
+export enum UnitAppointment {
+  YES = 'YES',
+  NO = 'NO',
 }

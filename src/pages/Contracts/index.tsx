@@ -127,7 +127,14 @@ export const Contracts = () => {
         ? companyCurrencies[0]?.code
         : 'EUR';
 
-      setRows(makeRows(contractResource.data, companyCurrencyCode, formatDate));
+      setRows(
+        makeRows(
+          contractResource.data,
+          companyCurrencyCode,
+          currentCurrency.fractionDigits ?? 0,
+          formatDate,
+        ),
+      );
       setContractorFilterItems([...contractorFilterItems, ...options]);
     }
   }, [contractResource, isLoading, isFetching, isIdle]);

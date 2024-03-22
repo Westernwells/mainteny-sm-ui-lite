@@ -37,6 +37,7 @@ import {ArticleType, ArticleView} from 'models/article';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
 import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
 import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
+import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
 import * as Yup from 'yup';
 import {
   useArticles,
@@ -549,8 +550,10 @@ export const ArticleItemRowNEW = ({
                 <PackageIcon fontSize="2rem" />
               ) : formik.values.article?.type === ArticleType.MATERIAL ? (
                 <MaterialIcon fontSize="2rem" />
-              ) : (
+              ) : formik.values.article?.type === ArticleType.LABOR ? (
                 <LaborIcon fontSize="2rem" />
+              ) : (
+                <OtherIcon fontSize="2rem" />
               )}
             </Box>
           </Tooltip>

@@ -27,6 +27,13 @@ export const columns: GridColDef[] = [
     flex: 1.5,
   }),
   getColumnProps({
+    field: ContractOrderField.NAME,
+    sortable: true,
+    headerName: 'contract name',
+    align: 'left',
+    headerAlign: 'left',
+  }),
+  getColumnProps({
     field: ContractOrderField.NUMBER_OF_ELEVATOR,
     sortable: true,
     headerName: 'no. of units',
@@ -50,16 +57,9 @@ export const columns: GridColDef[] = [
     sortable: true,
   }),
   getColumnProps({
-    field: ContractOrderField.NAME,
-    sortable: true,
-    headerName: 'contract name',
-    align: 'left',
-    headerAlign: 'left',
-  }),
-  getColumnProps({
     field: ContractOrderField.STATUS,
     sortable: true,
-    headerName: 'contract status',
+    headerName: 'status',
     align: 'center',
     headerAlign: 'center',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
@@ -100,6 +100,7 @@ export const columns: GridColDef[] = [
 export const makeRows = (
   contracts: ContractView[],
   currencyCode: string,
+  fractionDigits: number,
   formatDate: FormatDate = () => '',
 ) =>
   contracts
@@ -117,8 +118,10 @@ export const makeRows = (
         [ContractOrderField.NAME]: item.name,
         [ContractOrderField.NET_PRICE]:
           `${formatCurrency(
-            (item.additionalInfo?.price?.netAmount ?? 0) /
-              10 ** (item.additionalInfo?.price?.fractionDigits ?? 0),
+            (item.additionalInfo?.price?.netAmount ??
+              item.additionalInfo?.totalYearlyPrice ??
+              0) /
+              10 ** fractionDigits,
             {currency: item.additionalInfo.price?.currency || currencyCode},
           )}` || '-',
         [ContractOrderField.STATUS]: item.status,

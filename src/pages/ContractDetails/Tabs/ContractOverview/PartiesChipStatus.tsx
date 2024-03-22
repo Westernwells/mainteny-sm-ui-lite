@@ -22,7 +22,7 @@ const statusColor: Record<string, {[key: string]: string}> = {
     bg: 'rgba(33, 150, 243, 0.08)',
   },
   warning: {
-    color: '#C77700',
+    color: '#ED6C02',
     bg: 'rgba(237, 108, 2, 0.08)',
   },
 };
@@ -38,7 +38,12 @@ const PartiesChipStatus: FC<Props> = ({
     <Chip
       label={t(partyType)}
       sx={{
-        backgroundColor: statusColor[color].bg,
+        border: `1px solid ${statusColor[color].color}`,
+        textTransform: 'lowercase',
+        '& :first-letter': {
+          textTransform: 'uppercase',
+        },
+        backgroundColor: 'primary.contrastText',
         color: statusColor[color].color,
         maxWidth: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
         width: maxChars ? '100%' : 'auto',

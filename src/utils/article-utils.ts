@@ -56,6 +56,8 @@ export const getArticleTypeText = (type: ArticleType): string => {
       return 'Material';
     case ArticleType.PACKAGE:
       return 'Package';
+    case ArticleType.OTHER:
+      return 'Other';
     default:
       return '';
   }

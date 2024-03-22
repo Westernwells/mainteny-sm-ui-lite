@@ -1,4 +1,5 @@
 import {ReactNode, useEffect, useState} from 'react';
+import {SxProps, Theme} from '@mui/system';
 import Box from '@mui/material/Box';
 import MuiStepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -13,7 +14,8 @@ interface Props {
   stepperWidth?: string;
   children: ReactNode;
   containerStyles?: {[key: string]: any};
-  stepperStyles?: {[key: string]: any};
+  stepperStyles?: SxProps<Theme>;
+  stepperNavigationStyles?: {[key: string]: any};
   handleCancel?: () => void;
   handleSubmit?: () => void;
   initialActiveStep?: number;
@@ -34,6 +36,7 @@ export const Stepper = ({
   getActiveStep,
   disableNextBtn,
   stepperStyles,
+  stepperNavigationStyles,
   stepperWidth,
   submitting,
   disableNavigateBack = false,
@@ -99,44 +102,56 @@ export const Stepper = ({
       </Box>
       <>
         {children}
-        <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-          <Box sx={{display: 'flex', flexDirection: 'row', pt: 2}}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexDirection: 'row',
+            py: 2,
+            background: 'white',
+            mt: 2,
+            ...stepperNavigationStyles,
+          }}>
+          <Button
+            onClick={() => {
+              setActiveStep(0);
+              if (activeStep === 0 && !disableNavigateBack) {
+                navigate(-1);
+              } else {
+                handleCancel();
+              }
+            }}
+            sx={{color: theme.palette.text.primary, ml: '1em'}}
+            size="large"
+            variant="text">
+            {t('Cancel')}
+          </Button>
+
+          <Box sx={{flex: '1 1 auto'}} />
+
+          {activeStep > 0 && (
             <Button
-              onClick={() => {
-                setActiveStep(0);
-                if (activeStep === 0 && !disableNavigateBack) {
-                  navigate(-1);
-                } else {
-                  handleCancel();
-                }
-              }}
-              sx={{mr: '1.5em', color: theme.palette.text.secondary}}
+              color="inherit"
               size="large"
-              variant="text">
-              {t('Cancel')}
+              variant="outlined"
+              disabled={activeStep === 0}
+              onClick={handleBack}
+              sx={{mr: '1em'}}>
+              {t('Back')}
             </Button>
-            {activeStep > 0 ? (
-              <Button
-                color="inherit"
-                size="large"
-                variant="outlined"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{mr: '1.5em'}}>
-                {t('Back')}
-              </Button>
-            ) : null}
-            <Box sx={{flex: '1 1 auto'}} />
-            <Button
-              size="large"
-              variant="contained"
-              disabled={disableNextBtn}
-              onClick={
-                activeStep === steps.length - 1 ? handleSubmit : handleNext
-              }>
-              {getButtonLabel()}
-            </Button>
-          </Box>
+          )}
+
+          <Button
+            size="large"
+            variant="contained"
+            disabled={disableNextBtn}
+            onClick={
+              activeStep === steps.length - 1 ? handleSubmit : handleNext
+            }
+            sx={{mr: '1em'}}>
+            {getButtonLabel()}
+          </Button>
         </Box>
       </>
     </Box>

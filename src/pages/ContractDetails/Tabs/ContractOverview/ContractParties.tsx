@@ -1,10 +1,11 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import Avatar from '@mui/material/Avatar';
 import {ServiceCompanyView} from 'models/service-company';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useTranslation} from 'react-i18next';
+import React from 'react';
+import {useNavigate} from 'react-router-dom';
 import PartiesChipStatus from './PartiesChipStatus';
 
 interface Props {
@@ -14,6 +15,8 @@ interface Props {
   partyType?: string;
   occupation?: string;
   containerStyle?: {[key: string]: string | number};
+  customerNumber?: string;
+  customerId?: string;
   chipStyles?: {
     chipMaxChars?: number;
     chipLength?: 'short' | 'medium' | 'long' | 'auto';
@@ -40,18 +43,37 @@ export const ContractParties = ({
   partyType,
   containerStyle,
   chipStyles,
+  customerNumber,
+  customerId,
 }: Props) => {
   const {t} = useTranslation();
+  const navigate = useNavigate();
   return (
     <Grid container sx={{...containerStyle, marginBottom: 2}}>
-      <Grid item xs={5}>
+      <Grid item xs={3}>
         <Box display="flex" alignItems="center">
-          <Avatar sx={{width: '3rem', height: '3rem', mr: '1em'}}>H</Avatar>
-
           <Box display="flex" flexDirection="column">
-            <Typography variant="subtitle1" sx={{display: 'block'}}>
-              {name || ''}
-            </Typography>
+            {customerNumber ? (
+              <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                onClick={() =>
+                  navigate(`/customers/details/${customerId}?tab=0`)
+                }
+                sx={{
+                  color: 'primary.light',
+                  cursor: 'pointer',
+                }}>
+                {name || ''}
+              </Typography>
+            ) : (
+              <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                sx={{display: 'block'}}>
+                {name || ''}
+              </Typography>
+            )}
             <Typography variant="body2" sx={{display: 'block'}}>
               {typeof occupation === 'string' ? t(occupation) : ''}
             </Typography>
@@ -59,9 +81,16 @@ export const ContractParties = ({
         </Box>
       </Grid>
 
-      <Grid item xs={5} alignSelf="center">
+      <Grid item xs={3} alignSelf="center">
         <Box>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2" fontWeight={600}>
+            {customerNumber || '-'}
+          </Typography>
+        </Box>
+      </Grid>
+      <Grid item xs={3} alignSelf="center">
+        <Box>
+          <Typography variant="body2" fontWeight={600}>
             {address || ''}
           </Typography>
           <Typography variant="body2" color="textSecondary">
@@ -69,7 +98,12 @@ export const ContractParties = ({
           </Typography>
         </Box>
       </Grid>
-      <Grid item xs={2} alignSelf="center">
+      <Grid
+        item
+        xs={3}
+        alignSelf="center"
+        display="flex"
+        justifyContent="center">
         <PartiesChipStatus
           color={chipStyles?.chipColor! || 'primary'}
           length={chipStyles?.chipLength || 'auto'}

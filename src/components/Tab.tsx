@@ -218,6 +218,9 @@ export const Tabs = ({
                   },
                   '& .item-icon': {
                     color: theme.palette.secondary.main,
+                    '& path': {
+                      fill: theme.palette.primary.light,
+                    },
                   },
                 },
               },
