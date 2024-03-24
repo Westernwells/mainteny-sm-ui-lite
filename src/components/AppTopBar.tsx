@@ -14,10 +14,10 @@ import {useQueryClient} from 'react-query';
 import {Notifications} from 'pages/Notifications';
 import {LanguageContext} from 'context/LanguageProvider';
 import {Language} from 'models/misc';
-import {useUserSession} from '../hooks/reactQuery/useUserSession';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import EcologyGlobeMessage from 'assets/icons/EcologyGlobeMessage.svg';
 import {MenuBtn} from './MenuBtn';
 import {BackAction} from './BackAction';
-import EcologyGlobeMessage from '../assets/icons/EcologyGlobeMessage.svg';
 
 interface Props {
   pageTitle?: string;
@@ -35,6 +35,7 @@ export const AppTopBar = ({
   const {signout} = useAuth();
   const {user, updateUser} = useUserSession();
   const queryClient = useQueryClient();
+
   const {language: selectedLng, setLanguage} = useContext(LanguageContext);
   const fullName = `${user?.userAccount.firstName} ${user?.userAccount.lastName}`;
 
