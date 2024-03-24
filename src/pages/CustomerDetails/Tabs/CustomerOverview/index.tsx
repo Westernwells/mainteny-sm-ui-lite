@@ -68,14 +68,13 @@ export const formatAddress = (address: Address | undefined) => {
     : '';
 
   return (
-    <>
-      <Typography variant="body2">{name}</Typography>
-      <Typography variant="body2">{address1}</Typography>
-      <Typography variant="body2">{address2}</Typography>
-      <Typography variant="body2">
-        {zip} {city} {country}
-      </Typography>
-    </>
+    <Typography
+      variant="body2"
+      sx={{
+        textWrap: 'wrap',
+      }}>
+      {name} {address1} {address2} {zip} {city} {country}
+    </Typography>
   );
 };
 
