@@ -123,8 +123,8 @@ const ServicesForm = ({
         ? '22%'
         : '37%',
     },
-    {name: 'Job frequency', align: 'left', width: '15%'},
-    {name: 'Invoice frequency', align: 'left', width: '15%'},
+    {name: 'Job Frequency', align: 'left', width: '15%'},
+    {name: 'Invoice Frequency', align: 'left', width: '15%'},
     {name: 'Invoice Price (Excl. VAT)', align: 'right', width: '18%'},
   ];
 
@@ -224,8 +224,10 @@ const ServicesForm = ({
                   <OtherIcon fontSize="2rem" />
                 )}
                 <Typography variant="body1" fontSize="1.2rem" pl={2}>
-                  {getArticleTypeText(
-                    formikContractServiceComponent.values.costType!,
+                  {t(
+                    getArticleTypeText(
+                      formikContractServiceComponent.values.costType!,
+                    ),
                   )}
                 </Typography>
               </Box>
@@ -602,7 +604,7 @@ const ServicesForm = ({
             <TableRow sx={{display: 'block'}}>
               {columns.map(
                 (column) =>
-                  (column.name !== 'Job frequency' ||
+                  (column.name !== 'Job Frequency' ||
                     formikContractServiceComponent.values
                       .isAutomaticJobCycle) && (
                     <TableCell
@@ -781,7 +783,7 @@ const ServicesForm = ({
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      label={t('Invoice Price(Excl. VAT)')}
+                      label={t('Invoice Price (Excl. VAT)')}
                       onValueChange={(values) => {
                         const {floatValue} = values;
                         if (floatValue) {
