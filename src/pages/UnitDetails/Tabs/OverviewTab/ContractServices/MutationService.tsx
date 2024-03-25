@@ -257,7 +257,7 @@ export const MutationService = ({
         ? '22%'
         : '37%',
     },
-    {name: 'Job frequency', align: 'left', width: '15%'},
+    {name: 'Job Frequency', align: 'left', width: '15%'},
     {name: 'Invoice frequency', align: 'left', width: '15%'},
     {name: 'Invoice Price (Excl. VAT)', align: 'right', width: '18%'},
   ];
@@ -803,7 +803,7 @@ export const MutationService = ({
           <TableRow sx={{display: 'block'}}>
             {columns.map(
               (column) =>
-                (column.name !== 'Job frequency' ||
+                (column.name !== 'Job Frequency' ||
                   formikContractServiceComponent.values
                     .isAutomaticJobCycle) && (
                   <TableCell
@@ -979,7 +979,7 @@ export const MutationService = ({
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    label={t('Invoice Price(Excl. VAT)')}
+                    label={t('Invoice Price (Excl. VAT)')}
                     onValueChange={(values) => {
                       const {floatValue} = values;
 

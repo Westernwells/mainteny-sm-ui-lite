@@ -54,7 +54,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
     {name: 'Serial Number', align: 'left', width: '15%'},
     {name: 'Building', width: '12%'},
     {name: 'Unit Address', width: '25%'},
-    {name: 'Job frequency', align: 'left', width: '15%'},
+    {name: 'Job Frequency', align: 'left', width: '15%'},
     {name: 'Invoice frequency', align: 'left', width: '15%'},
     {name: 'Invoice Price (Excl. VAT)', align: 'right', width: '18%'},
   ];
