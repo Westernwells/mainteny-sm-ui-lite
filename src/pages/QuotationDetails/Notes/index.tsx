@@ -31,10 +31,12 @@ export const Notes = ({quotation}: Props) => {
     useInfiniteQuotationComments,
     quotation.id,
   );
-  const totalCustomerNotes = useTotalNotesData(
-    useInfiniteCustomerNotes,
-    quotation?.elevator?.propertyOwner.id,
-  );
+  const totalCustomerNotes = quotation?.elevator?.propertyOwner.id
+    ? useTotalNotesData(
+        useInfiniteCustomerNotes,
+        quotation.elevator.propertyOwner.id,
+      )
+    : null;
 
   const handleOpenSideDrawer = () => {
     setShowSideDrawer(true);
