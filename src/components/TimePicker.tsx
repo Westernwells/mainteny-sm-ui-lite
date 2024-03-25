@@ -16,9 +16,12 @@ import CustomToolbar from './CustomToolbar';
 interface Props extends Partial<TimePickerProps<Date>> {
   defaultTime?: Date | null;
   getSelectedTime?: (state: Date | null) => void;
+  confirm?: () => void;
+  cancel?: () => void;
   containerStyles?: {[key: string]: any};
   textFieldProps?: TextFieldProps;
   required?: boolean;
+  resetValue?: Date;
 }
 
 export const TimePicker = ({
@@ -28,6 +31,9 @@ export const TimePicker = ({
   textFieldProps,
   minTime,
   maxTime,
+  confirm,
+  cancel,
+  resetValue,
   required = false,
   ...props
 }: Props) => {
@@ -40,6 +46,14 @@ export const TimePicker = ({
   };
 
   const handleClose = () => {
+    if (cancel) {
+      setValue(resetValue || null);
+    }
+    setOpen(false);
+  };
+
+  const handleConfirm = () => {
+    if (confirm) confirm();
     setOpen(false);
   };
 
@@ -184,7 +198,7 @@ export const TimePicker = ({
 
   const renderActionBar = () => (
     <CustomActionBar
-      onAccept={handleClose}
+      onAccept={handleConfirm}
       onClear={handleClose}
       isDatePicker={false}
     />
