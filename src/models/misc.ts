@@ -5,6 +5,7 @@ import {number} from 'yup';
 import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
 import {ContractTypes, ContractNameTypes} from './contract';
+import {MinToStep} from './service-company';
 
 export interface RestError {
   errorCode: number;
@@ -57,6 +58,10 @@ export interface Settings {
   currencies: Currency[];
   contractTypes: ContractTypes;
   contractNameTypes: ContractNameTypes[];
+  serviceOrderGenerationEnabled?: boolean;
+  contractInvoiceGenerationEnabled?: boolean;
+  serviceOrderGenerationDaysInAdvance?: number;
+  minToHourStep?: MinToStep | number;
 }
 
 export interface Page {

@@ -12,6 +12,15 @@ import {
 import {ServiceOrderSummary} from './service-order';
 import {TechnicianEventView} from './technician';
 
+export enum MinToStep {
+  STEP_0 = 0,
+  STEP_5 = 5,
+  STEP_15 = 15,
+  STEP_20 = 20,
+  STEP_30 = 30,
+  STEP_60 = 60,
+}
+
 export enum ServiceCompanyTimeUnit {
   DAILY = 'DAILY',
   QUARTERLY = 'QUARTERLY',
@@ -196,6 +205,10 @@ export interface ServiceCompanyUpdateBody {
   };
   contractTypes?: string[];
   contractNameTypes?: ContractNameTypes[];
+  serviceOrderGenerationEnabled?: boolean;
+  contractInvoiceGenerationEnabled?: boolean;
+  serviceOrderGenerationDaysInAdvance?: number;
+  minToHourStep?: MinToStep | number;
 }
 
 export interface SystemSettingsUpdateBody {
