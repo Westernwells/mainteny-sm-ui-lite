@@ -305,8 +305,8 @@ export const Actions = ({quotation}: Props) => {
         submitHook={usePublishQuotation}
         confirmBtnDisabled={!isPDFGenerated}
         email={
-          quotation.elevator.propertyOwner?.additionalInfo.billingEmail ||
-          quotation.elevator.propertyOwner?.contact.email
+          quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
+          quotation?.elevator?.propertyOwner?.contact.email
         }
         subject={quotation.subject}
         content={quotation.description}

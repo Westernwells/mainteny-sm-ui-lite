@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
 import printJS from 'print-js';
 import useTheme from '@mui/material/styles/useTheme';
@@ -16,7 +16,6 @@ import Close from '@mui/icons-material/Close';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
-import {Dialog} from 'components/Dialog';
 import {FormLabel} from 'components/form/FormLabel';
 import {PDFContainer} from 'components/PDFContainer';
 import {BottomDrawer} from 'components/BottomDrawer';
@@ -43,10 +42,19 @@ import PathImage from 'assets/images/Path.svg';
 import {convertToMacro} from 'utils/utils';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
+import {ElevatorView} from 'models/elevator';
+import {useElevatorById} from 'hooks/reactQuery/useElevator';
+import queryString from 'query-string';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import LocationOn from '@mui/icons-material/LocationOn';
+import {Business, Tag} from '@mui/icons-material';
+import {IconButton} from '@mui/material';
+import {Dialog} from 'components/Dialog';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
 import {QuotationActivities} from './QuotationActivities';
+import {QuotationUnitsDataGrid} from './QuotationUnitsDataGrid';
 
 interface Props {
   downloadUrl: string;
@@ -66,16 +74,27 @@ export const ViewQuotation = ({
   const theme = useTheme();
   const {user} = useUserSession();
   const navigate = useNavigate();
+  const {search} = useLocation();
   const {downloadFile} = useDownloadFileWithCustomName(
     quotation.number,
     downloadUrl,
   );
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isRejectedDialogOpen, setIsRejectedDialogOpen] = useState(false);
-  const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
     useState(false);
+  const [isCreateForm, setIsCreateForm] = useState(false);
+  const {elevatorId = ''} = queryString.parse(search);
+
+  const {data: elevator} =
+    typeof elevatorId === 'string'
+      ? useElevatorById(elevatorId)
+      : {data: undefined};
+
+  const [unit, setUnit] = useState<ElevatorView | null>(elevator || null);
 
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutateAsync: publishQuotation} = usePublishQuotation();
@@ -84,15 +103,12 @@ export const ViewQuotation = ({
     initialValues: {
       createServiceOrder: '',
     },
-    onSubmit: (values) => {
-      if (values.createServiceOrder && quotation)
-        navigate(
-          `/orders/new?type=${convertToMacro(
-            values.createServiceOrder,
-          ).toLowerCase()}&quotationId=${quotation.id}`,
-        );
-    },
+    onSubmit: () => {},
   });
+
+  const handleSelectUnit = (row: ElevatorView) => {
+    setUnit(row);
+  };
 
   const isPDFGenerated =
     quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
@@ -291,15 +307,13 @@ export const ViewQuotation = ({
         </Grid>
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
           <PageCard
-            headerLabel="Service Job"
+            headerLabel="Job"
             headerIcon={<ManageSearchOutlinedIcon sx={{color: '#8F9BB380'}} />}
             contentContainerStyles={{
-              display: 'flex',
               gap: '1em',
-              alignItems: 'center',
-              flexDirection: 'column',
               mx: 0,
-              pt: '0.5rem',
+              pt: '1em',
+              pb: '1.5em !important',
             }}
             headerStyles={{
               mx: 0,
@@ -321,6 +335,201 @@ export const ViewQuotation = ({
                 }`,
               )
             }>
+            {isCreateForm && (
+              <Box mt=".5em" mb="0em">
+                <Box>
+                  {unit !== null && (
+                    <Box
+                      sx={{
+                        borderRadius: '4px',
+                        mb: '2em',
+                        padding: '0.75em 0.5em 1.5em 1em',
+                        background:
+                          'linear-gradient(0deg, rgba(33, 150, 243, 0.1), rgba(33, 150, 243, 0.1)),linear-gradient(0deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9))',
+                      }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          paddingLeft: '0.3em',
+                        }}>
+                        <Typography
+                          variant="h6"
+                          color="linear-gradient(0deg, #2196F3, #2196F3), linear-gradient(0deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6))">
+                          {unit?.model || quotation?.elevator?.model || '-'}
+                        </Typography>
+                        <IconButton onClick={() => setIsModalOpen(true)}>
+                          <EditOutlinedIcon
+                            sx={{
+                              fontSize: '1em',
+                              color: theme.palette.text.secondary,
+                            }}
+                          />
+                        </IconButton>
+                      </Box>
+
+                      <Box
+                        sx={{display: 'flex', alignItems: 'center', mt: 1.5}}>
+                        <LocationOn
+                          sx={{
+                            fontSize: '1.2em',
+                            mr: '0.594em',
+                            color: '#0092B2',
+                          }}
+                        />
+                        <Typography
+                          variant="body2"
+                          fontSize="0.8rem"
+                          color="#000034">
+                          {unit?.address.fullName ||
+                            quotation?.elevator?.address?.fullName ||
+                            '-'}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{display: 'flex', alignItems: 'center', mt: 2.5}}>
+                        <Business
+                          sx={{
+                            fontSize: '1.2em',
+                            mr: '0.594em',
+                            color: '#0092B2',
+                          }}
+                        />
+
+                        <Typography
+                          variant="body2"
+                          fontSize="0.8rem"
+                          color="#000034">
+                          {unit?.additionalInfo.buildingLocation ||
+                            quotation?.elevator?.additionalInfo
+                              .buildingLocation ||
+                            '-'}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{display: 'flex', alignItems: 'center', mt: 2.5}}>
+                        <Tag
+                          sx={{
+                            fontSize: '1.2em',
+                            mr: '0.594em',
+                            color: '#0092B2',
+                          }}
+                        />
+
+                        <Typography
+                          variant="body2"
+                          fontSize="0.8rem"
+                          color="#000034">
+                          {unit?.externalId ||
+                            quotation?.elevator?.externalId ||
+                            '-'}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  )}
+
+                  {!unit?.id && (
+                    <Box sx={{mb: 3}}>
+                      <Box
+                        sx={{
+                          backgroundColor: '#F7F9FC',
+                          border: '1px dashed #8F9BB380',
+                          padding: '3em 1em',
+                          textAlign: 'center',
+                          borderRadius: '4px',
+                        }}>
+                        <Button
+                          label="Select Unit"
+                          buttonProps={{
+                            variant: 'outlined',
+                            size: 'small',
+                            onClick: () => {
+                              setIsModalOpen(true);
+                            },
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  )}
+
+                  <Dialog
+                    title={t('Select unit')}
+                    onCancel={() => setIsModalOpen(false)}
+                    saveButtonText="Select"
+                    showCancelButton
+                    onSave={() => {
+                      formik.setFieldValue('elevatorId', unit?.id);
+                      setIsModalOpen(false);
+                    }}
+                    dialogContentStyles={{padding: '0.5em 0em 0.5em 0.5em'}}
+                    disableSaveBtn={!unit}
+                    dialogProps={{
+                      maxWidth: 'lg',
+                      open: isModalOpen || false,
+                    }}>
+                    <QuotationUnitsDataGrid
+                      setRowItem={handleSelectUnit}
+                      searchCustomer={quotation?.elevator?.propertyOwner?.name}
+                      propertyOwnerId={quotation?.elevator?.propertyOwner?.id}
+                    />
+                  </Dialog>
+
+                  <CreateServiceOrder
+                    value={formik.values.createServiceOrder}
+                    onChange={formik.handleChange}
+                  />
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                      padding: '1em 0em',
+                    }}>
+                    <Button
+                      label="Cancel"
+                      buttonProps={{
+                        variant: 'text',
+                        size: 'small',
+                        sx: {
+                          color: theme.palette.text.disabled,
+                        },
+                        onClick: () => {
+                          setUnit(null);
+                          setIsCreateForm(false);
+                          formik.setFieldValue('createServiceOrder', '');
+                        },
+                      }}
+                    />
+                    <Button
+                      label="Create"
+                      buttonProps={{
+                        variant: 'contained',
+                        size: 'small',
+                        disabled: !(formik.values.createServiceOrder && unit),
+                        sx: {
+                          background: theme.palette.text.primary,
+                          color: 'white',
+                        },
+                        onClick: () => {
+                          navigate(
+                            `/orders/new?type=${convertToMacro(
+                              formik.values.createServiceOrder,
+                            ).toLowerCase()}&quotationId=${
+                              quotation.id
+                            }&elevatorId=${unit?.id || quotation.elevator.id}`,
+                          );
+                        },
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            )}
+
             {quotation.additionalInfo &&
             'serviceOrderIds' in quotation.additionalInfo ? (
               <ServiceOrderDetails
@@ -329,22 +538,26 @@ export const ViewQuotation = ({
                 }
               />
             ) : (
-              <>
-                <Typography variant="subtitle2" textAlign="center">
-                  {t('No service job has been created for this quotation yet!')}
-                </Typography>
-                <Button
-                  label="Create Service Job"
-                  buttonProps={{
-                    variant: 'outlined',
-                    size: 'small',
-                    sx: {
-                      background: 'transparent',
-                    },
-                    onClick: () => setIsOrderDialogOpen(true),
-                  }}
-                />
-              </>
+              !isCreateForm && (
+                <Box sx={{textAlign: 'center'}}>
+                  <Typography variant="subtitle2" textAlign="center" py={2}>
+                    {t('No job has been created for this quotation yet!')}
+                  </Typography>
+                  <Button
+                    label="Create Job"
+                    buttonProps={{
+                      variant: 'contained',
+                      size: 'small',
+
+                      sx: {
+                        background: theme.palette.text.primary,
+                        color: 'white',
+                      },
+                      onClick: () => setIsCreateForm(true),
+                    }}
+                  />
+                </Box>
+              )
             )}
           </PageCard>
           {quotationActivities?.length ? (
@@ -381,8 +594,8 @@ export const ViewQuotation = ({
         submitHook={usePublishQuotation}
         confirmBtnDisabled={!isPDFGenerated}
         email={
-          quotation.elevator.propertyOwner?.additionalInfo.billingEmail ||
-          quotation.elevator.propertyOwner?.contact.email
+          quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
+          quotation?.elevator?.propertyOwner?.contact.email
         }
         subject={quotation.subject}
         content={quotation.description}
@@ -427,22 +640,7 @@ export const ViewQuotation = ({
         content="Do you want to mark this quotation as rejected?"
         helperText="This action is irreversible."
       />
-      <Dialog
-        title="Create Service Job"
-        onCancel={() => setIsOrderDialogOpen(false)}
-        disableSaveBtn={!formik.values.createServiceOrder}
-        onSave={() => formik.handleSubmit()}
-        dialogProps={{
-          maxWidth: 'xs',
-          open: isOrderDialogOpen || false,
-        }}>
-        <Box mt=".5em" mb="5em">
-          <CreateServiceOrder
-            value={formik.values.createServiceOrder}
-            onChange={formik.handleChange}
-          />
-        </Box>
-      </Dialog>
+
       <ConfirmPrintQuotation
         open={isConfirmPrintDialogOpen}
         onConfirm={onPrintQuotation}

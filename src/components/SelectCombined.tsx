@@ -7,7 +7,7 @@ import {SelectButton} from './SelectButton';
 import {SelectModal} from './SelectModal';
 
 interface Props {
-  label: string | ReactNode;
+  label?: string | ReactNode;
   labelRequired?: boolean;
   selected: boolean;
   buttonText: string;
