@@ -191,9 +191,7 @@ const ReportTimeEntries = ({
               }}
             />
           ) : (
-            <Typography textAlign="end">
-              {formatDate(date, 'HH:mm')}h
-            </Typography>
+            <Typography textAlign="end">{formatDate(date, 'HH:mm')}</Typography>
           )}
         </Box>
         <Box width={!isEdit ? TIME_SECTION_WIDTH : DURATION_SECTION_WIDTH}>
