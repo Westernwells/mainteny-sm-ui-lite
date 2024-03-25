@@ -55,11 +55,13 @@ const ReportTimeEntries = ({
   const DATE_SECTION_WIDTH = isSmallerThan1180 ? 125 : 150;
   const TIME_SECTION_WIDTH = isSmallerThan1180 ? 95 : 120;
   const DURATION_SECTION_WIDTH = isSmallerThan1180 ? 65 : 80;
+  const [tempTime, setTempTime] = useState<string>('');
+  const [slotDate, setSlotDate] = useState<string>('');
 
   useEffect(() => {
     setTimeRawValues(
       timeInfo.timeSlots.map((slot) =>
-        convertMinutesToHoursAndMinutes(slot.minutes ?? 0, {hourUnit: ''}),
+        convertMinutesToHoursAndMinutes(slot.minutes ?? 0, {hourUnit: ''}, 1),
       ),
     );
   }, [timeInfo]);
@@ -94,34 +96,39 @@ const ReportTimeEntries = ({
   const renderEntry = (slot: ServiceOrderTimeSlot, index: number) => {
     const date = new Date(slot.startTime);
     return (
-      <Box key={slot.startTime} display="flex" my={2} columnGap={1}>
+      <Box key={slot.startTime} display="flex" my={1} columnGap={2.5}>
         <Box width={DATE_SECTION_WIDTH}>
           {isEdit ? (
             <DatePicker
+              defaultDate={date}
               getSelectedDate={(newDate) => {
                 if (newDate) {
                   const newDateTime = addDateToTime(
                     timeInfo.timeSlots[index].startTime,
                     newDate,
                   );
-                  formik.setFieldValue(
-                    `${timeRecordKey}.timeSlots[${index}].startTime`,
-                    newDateTime,
-                  );
+                  setSlotDate(newDateTime);
                 }
               }}
+              confirm={() => {
+                formik.setFieldValue(
+                  `${timeRecordKey}.timeSlots[${index}].startTime`,
+                  slotDate,
+                );
+              }}
+              resetValue={new Date(slot.startTime)}
+              cancel={() => setSlotDate(slot.startTime)}
               shouldDisableDate={(tDate) =>
                 timeInfo.timeSlots.some((d) => {
-                  const slotDate = new Date(d.startTime);
+                  const slotDateToCompare = new Date(d.startTime);
 
-                  if (isSameDay(date, slotDate)) {
+                  if (isSameDay(date, slotDateToCompare)) {
                     return false;
                   }
 
-                  return isSameDay(slotDate, tDate);
+                  return isSameDay(slotDateToCompare, tDate);
                 })
               }
-              defaultDate={date}
               textFieldProps={{
                 name: 'date',
                 label: '',
@@ -155,12 +162,17 @@ const ReportTimeEntries = ({
                     timeInfo.timeSlots[index].startTime,
                     newTime,
                   );
-                  formik.setFieldValue(
-                    `${timeRecordKey}.timeSlots[${index}].startTime`,
-                    newDateTime,
-                  );
+                  setTempTime(newDateTime);
                 }
               }}
+              confirm={() => {
+                formik.setFieldValue(
+                  `${timeRecordKey}.timeSlots[${index}].startTime`,
+                  tempTime,
+                );
+              }}
+              resetValue={new Date(slot.startTime)}
+              cancel={() => setTempTime(slot.startTime)}
               textFieldProps={{
                 name: 'startTime',
                 label: '',
@@ -179,39 +191,42 @@ const ReportTimeEntries = ({
               }}
             />
           ) : (
-            <Typography textAlign="end">{formatDate(date, 'HH:mm')}</Typography>
+            <Typography textAlign="end">
+              {formatDate(date, 'HH:mm')}h
+            </Typography>
           )}
         </Box>
         <Box width={!isEdit ? TIME_SECTION_WIDTH : DURATION_SECTION_WIDTH}>
           {isEdit ? (
             <PatternFormat
-              value={timeRawValues[index] ?? '00:00'}
+              value={timeRawValues[index] ?? '0:00'}
               size="small"
               allowEmptyFormatting
               onBlur={formik.handleBlur}
               sx={{
                 width: '100%',
                 input: {
-                  fontWeight: 700,
+                  textAlign: 'end',
                   fontSize: isSmallerThan1180 ? '12px' : undefined,
                 },
               }}
               onChange={(e) => {
                 const valuesClone = [...timeRawValues];
-                valuesClone[index] = e.target.value;
+                const value = e.target.value.replace('h', '');
+                valuesClone[index] = value;
 
                 setTimeRawValues(valuesClone);
 
                 formik.setFieldValue(
                   `${timeRecordKey}.timeSlots[${index}].minutes`,
-                  convertHoursAndMinutesToMinutes(e.target.value),
+                  convertHoursAndMinutesToMinutes(value),
                 );
               }}
               customInput={TextField}
-              format="##:##"
+              format="#:##h"
             />
           ) : (
-            <Typography textAlign="end">{timeRawValues[index]}</Typography>
+            <Typography textAlign="end">{timeRawValues[index]}h</Typography>
           )}
         </Box>
         {isEdit && (
@@ -225,18 +240,20 @@ const ReportTimeEntries = ({
 
   return (
     <Box flex={1} maxWidth={500}>
-      <Box mb={3} display="flex" columnGap={1}>
+      <Box mb={2} display="flex" columnGap={2.5}>
         <Box width={DATE_SECTION_WIDTH}>
-          <Typography variant="caption">{t('Date')}</Typography>
+          <Typography variant="caption" color="#616161">
+            {t('Date')}
+          </Typography>
         </Box>
         <Box
           width={TIME_SECTION_WIDTH}
-          sx={{textAlign: !isEdit ? 'end' : 'start'}}>
+          sx={{textAlign: !isEdit ? 'end' : 'start', color: '#616161'}}>
           <Typography variant="caption">{t('Start time')}</Typography>
         </Box>
         <Box
           width={TIME_SECTION_WIDTH}
-          sx={{textAlign: !isEdit ? 'end' : 'start'}}>
+          sx={{textAlign: !isEdit ? 'end' : 'start', color: '#616161'}}>
           <Typography variant="caption">
             {type === 'work' ? t('Hours worked') : t('Hours traveled')}
           </Typography>
@@ -251,87 +268,77 @@ const ReportTimeEntries = ({
           <Box
             justifyContent="space-between"
             mt={2}
-            columnGap={2}
+            columnGap={1}
             display="flex"
             flexWrap="wrap">
             {type === 'work' ? (
-              <Box maxWidth={465} flex={1}>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  flexDirection="column"
-                  gap={1}>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    sx={{width: '100%'}}
-                    justifyContent="space-between">
-                    <Box width={150}>
-                      <Typography variant="caption">
-                        {t('Work time')}:
-                      </Typography>
-                    </Box>
-                    <Box width={100}>
-                      <Typography>{totalWorkFormatted}</Typography>
-                    </Box>
+              <>
+                <Box mb={1} display="flex" columnGap={2.5}>
+                  <Box width={DATE_SECTION_WIDTH}>
+                    <Typography variant="caption">{t('Work time')}:</Typography>
                   </Box>
+                  <Box width={TIME_SECTION_WIDTH} />
                   <Box
-                    display="flex"
-                    alignItems="center"
-                    sx={{width: '100%'}}
-                    justifyContent="space-between">
-                    <Box width={150}>
-                      <Typography variant="caption">
-                        {t('Surcharge')}:
-                      </Typography>
-                    </Box>
-                    <Box width={100}>
-                      <Typography>
-                        {formik.values.workTimeRecord?.percentageSurcharge}%
-                      </Typography>
-                    </Box>
+                    width={TIME_SECTION_WIDTH}
+                    sx={{
+                      textAlign: !isEdit ? 'end' : 'start',
+                      color: '#616161',
+                    }}>
+                    <Typography>{totalWorkFormatted}</Typography>
                   </Box>
                 </Box>
-              </Box>
+                <Box mb={2} display="flex" columnGap={2.5}>
+                  <Box width={DATE_SECTION_WIDTH}>
+                    <Typography variant="caption">{t('Surcharge')}:</Typography>
+                  </Box>
+                  <Box width={TIME_SECTION_WIDTH} />
+                  <Box
+                    width={TIME_SECTION_WIDTH}
+                    sx={{
+                      textAlign: !isEdit ? 'end' : 'start',
+                      color: '#616161',
+                    }}>
+                    <Typography>
+                      {formik.values.workTimeRecord?.percentageSurcharge}%
+                    </Typography>
+                  </Box>
+                </Box>
+              </>
             ) : (
-              <Box maxWidth={465} flex={1}>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  flexDirection="column"
-                  gap={1}>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    sx={{width: '100%'}}
-                    justifyContent="space-between">
-                    <Box width={150}>
-                      <Typography variant="caption">
-                        {t('Travel time')}
-                      </Typography>
-                    </Box>
-                    <Box width={100}>
-                      <Typography>{totalTravelFormatted}</Typography>
-                    </Box>
+              <>
+                <Box mb={1} display="flex" columnGap={2.5}>
+                  <Box width={DATE_SECTION_WIDTH}>
+                    <Typography variant="caption">
+                      {t('Travel time')}:
+                    </Typography>
                   </Box>
+                  <Box width={TIME_SECTION_WIDTH} />
                   <Box
-                    display="flex"
-                    alignItems="center"
-                    sx={{width: '100%'}}
-                    justifyContent="space-between">
-                    <Box width={150}>
-                      <Typography variant="caption">
-                        {t('Surcharge')}
-                      </Typography>
-                    </Box>
-                    <Box width={100}>
-                      <Typography>
-                        {formik.values.travelTimeRecord?.percentageSurcharge}%
-                      </Typography>
-                    </Box>
+                    width={TIME_SECTION_WIDTH}
+                    sx={{
+                      textAlign: !isEdit ? 'end' : 'start',
+                      color: '#616161',
+                    }}>
+                    <Typography>{totalTravelFormatted}</Typography>
                   </Box>
                 </Box>
-              </Box>
+                <Box mb={2} display="flex" columnGap={2.5}>
+                  <Box width={DATE_SECTION_WIDTH}>
+                    <Typography variant="caption">{t('Surcharge')}:</Typography>
+                  </Box>
+                  <Box width={TIME_SECTION_WIDTH} />
+                  <Box
+                    width={TIME_SECTION_WIDTH}
+                    sx={{
+                      textAlign: !isEdit ? 'end' : 'start',
+                      color: '#616161',
+                    }}>
+                    <Typography>
+                      {formik.values.travelTimeRecord?.percentageSurcharge}%
+                    </Typography>
+                  </Box>
+                </Box>
+              </>
             )}
           </Box>
         </>

@@ -176,7 +176,7 @@ export const ReportCard = ({
               <HandymanOutlined sx={{color: theme.palette.text.secondary}} />
 
               <Typography sx={{fontWeight: '600'}}>
-                {t('Technician(s)')}
+                {t('Engineer(s)')}
               </Typography>
               <Chip
                 label={reports?.length}
@@ -184,6 +184,10 @@ export const ReportCard = ({
                 sx={{
                   marginLeft: '0.5rem',
                   color: theme.palette.primary.main,
+                  width: '23px',
+                  '& .MuiChip-label': {
+                    overflow: 'visible',
+                  },
                 }}
               />
             </Box>

@@ -31,6 +31,7 @@ import {
   calculateTotalBillableHours,
   convertTimeSlotDatesToRestDateTime,
   serviceOrderStatusToString,
+  getSignatureKeys,
 } from 'utils/service-order-utils';
 import {convertDigitalMinsToHM} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -77,10 +78,12 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
   const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
     usePublishWorkReport();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
-  const signatureKeys = {
-    CUSTOMER: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/CUSTOMER.png`,
-    TECHNICIAN: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/TECHNICIAN.png`,
-  };
+
+  const signatureKeys = getSignatureKeys(
+    serviceOrder,
+    report,
+    serviceCompanyId,
+  );
 
   const {data: downloadUrls = {}} = useDownloadUrl(
     report?.signatures?.map((item) => item.fileResource.uri) ?? [],

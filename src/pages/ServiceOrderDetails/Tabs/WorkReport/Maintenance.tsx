@@ -39,24 +39,33 @@ export const Maintenance = ({schedule, formik, isEdit}: Props) => {
   const totalBillableHoursFormatted = convertMinutesToHoursAndMinutes(
     totalBillableHours,
     {hourUnit: t('h')},
+    1,
   );
 
   const totalTravelFormatted = useMemo(() => {
     const totalTravelWithoutSurcharge = calculateSlotTotalWithoutSurcharge(
       formik.values.travelTimeRecord,
     );
-    return convertMinutesToHoursAndMinutes(totalTravelWithoutSurcharge, {
-      hourUnit: t('h'),
-    });
+    return convertMinutesToHoursAndMinutes(
+      totalTravelWithoutSurcharge,
+      {
+        hourUnit: t('h'),
+      },
+      1,
+    );
   }, [formik.values.travelTimeRecord]);
 
   const totalWorkFormatted = useMemo(() => {
     const totalWorkWithoutSurcharge = calculateSlotTotalWithoutSurcharge(
       formik.values.workTimeRecord,
     );
-    return convertMinutesToHoursAndMinutes(totalWorkWithoutSurcharge, {
-      hourUnit: t('h'),
-    });
+    return convertMinutesToHoursAndMinutes(
+      totalWorkWithoutSurcharge,
+      {
+        hourUnit: t('h'),
+      },
+      1,
+    );
   }, [formik.values.workTimeRecord]);
 
   const renderHeader = () => (

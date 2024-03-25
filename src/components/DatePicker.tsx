@@ -28,11 +28,14 @@ interface Props extends Partial<DatePickerProps<Date>> {
   inputLabelProps?: InputLabelProps;
   reset?: boolean;
   getReset?: (reset: boolean) => void;
+  cancel?: () => void;
+  confirm?: () => void;
   required?: boolean;
   dateFormat?: string;
   disableMask?: boolean;
   errorMessage?: string;
   shouldDisableDate?: (tDate: Date) => boolean;
+  resetValue?: Date;
 }
 
 export const DatePicker = ({
@@ -44,7 +47,10 @@ export const DatePicker = ({
   inputLabelProps,
   textFieldProps,
   reset = false,
+  confirm,
   getReset = () => {},
+  cancel,
+  resetValue,
   required,
   dateFormat,
   errorMessage,
@@ -70,6 +76,14 @@ export const DatePicker = ({
   };
 
   const handleClose = () => {
+    if (cancel) {
+      setValue(resetValue || null);
+    }
+    setOpen(false);
+  };
+
+  const handleConfirm = () => {
+    if (confirm) confirm();
     setOpen(false);
   };
 
@@ -236,7 +250,7 @@ export const DatePicker = ({
 
   const renderActionBar = () => (
     <CustomActionBar
-      onAccept={handleClose}
+      onAccept={handleConfirm}
       onClear={handleClose}
       isDatePicker
     />
