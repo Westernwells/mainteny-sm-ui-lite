@@ -7,7 +7,7 @@ import {
   useCreateScheduledServiceOrder,
 } from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {
   AssignmentDescriptionOrderModel,
   ContactChannel,
@@ -19,7 +19,7 @@ import {EmployeesView} from 'models/employee';
 import {QuotationView} from 'models/quotation';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {toRestDateTime} from 'utils/datetime';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
 import {SelectUnit} from '../SelectUnit';
@@ -37,6 +37,8 @@ interface Props {
 }
 
 export const ScheduleServiceOrder = ({type, quotation}: Props) => {
+  const [queryParams] = useSearchParams();
+  const currentParams = useRef(Object.fromEntries([...queryParams])).current;
   const formatDate = useFormatDate();
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
@@ -113,7 +115,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
     const body = {
       dueDate,
       description,
-      elevatorId: selectedUnit!.id,
+      elevatorId: currentParams.elevatorId || selectedUnit!.id,
       externalId: '',
       priority: Priority.A,
       serviceCompanyId,
@@ -141,7 +143,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
     const dueDate = formatDate(dueDateFormValue?.date!, 'yyy-MM-dd')!;
     const body = {
       description,
-      elevatorId: selectedUnit!.id,
+      elevatorId: currentParams.elevatorId || selectedUnit!.id,
       externalId: '',
       priority: Priority.A,
       serviceCompanyId,

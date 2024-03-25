@@ -1,4 +1,4 @@
-import {FC, useEffect, useMemo, useRef, useState} from 'react';
+import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {useInView} from 'react-intersection-observer';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';

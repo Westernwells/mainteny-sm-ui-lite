@@ -228,7 +228,7 @@ export const DraftQuotation = ({
   const initialValues: QuotationFormData = {
     subject: quotation?.subject || t('Quotation'),
     description: quotation?.description || '',
-    elevatorId: quotation?.elevator.id || '',
+    elevatorId: quotation?.elevator?.id || '',
     notes: quotation?.additionalInfo.notes || '',
     items: quotation?.items || [],
     serviceCompanyId: quotation?.serviceCompany.id || '',
@@ -277,7 +277,7 @@ export const DraftQuotation = ({
     if (formType === 'new' && row.paymentTerm) {
       formik.setFieldValue('paymentTerms', row.paymentTerm?.term || '');
     }
-    const quotationCustomer = quotation?.elevator.propertyOwner;
+    const quotationCustomer = quotation?.elevator?.propertyOwner;
     if (row.id !== quotationCustomer?.id) {
       const emptyAddressState = {fullName: null};
       formik.setFieldValue('propertyOwnerId', row.id);
@@ -414,7 +414,6 @@ export const DraftQuotation = ({
   const isValid = () => {
     const valid =
       formik.values.subject &&
-      formik.values.elevatorId &&
       formik.values.items.length &&
       !!customer &&
       Object.keys(formik.errors).length === 0;
@@ -434,7 +433,7 @@ export const DraftQuotation = ({
 
   useEffect(() => {
     if (elevator) {
-      const quotationCustomer = elevator.propertyOwner;
+      const quotationCustomer = elevator?.propertyOwner;
       setUnit(elevator);
       setCustomer(quotationCustomer);
 
@@ -481,7 +480,7 @@ export const DraftQuotation = ({
 
   useEffect(() => {
     if (quotation) {
-      const quotationCustomer = quotation.elevator.propertyOwner;
+      const quotationCustomer = quotation.elevator?.propertyOwner;
       setCustomer(quotationCustomer);
 
       formik.setFieldValue(
@@ -781,10 +780,10 @@ export const DraftQuotation = ({
 
             <Grid item xs={12}>
               <SelectCombined
-                selected={unit !== null}
+                selected={unit !== null && unit !== undefined}
                 label={
                   <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                    <FormLabel text={t('Unit Details')} required />
+                    <FormLabel text={t('Unit Details')} />
                     <Button
                       label="Add New Unit"
                       style={{color: theme.palette.primary.dark}}

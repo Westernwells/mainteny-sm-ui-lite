@@ -429,7 +429,7 @@ const AttachmentsCard = ({
             minWidth: '50%',
             minHeight: '50%',
             // removes scrolling of preview image
-            '& > div:nth-child(2)': {
+            '& > div:nth-of-type(2)': {
               overflowY: 'hidden',
             },
           },
