@@ -164,7 +164,7 @@ export const ScheduleDialog = ({
     formik.setValues({
       ...formik.values,
       startDate: dateValues[0],
-      endDate: dateValues[1],
+      endDate: dateValues[1] || dateValues[0],
     });
   };
 

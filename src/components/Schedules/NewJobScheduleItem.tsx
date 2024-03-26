@@ -39,7 +39,7 @@ export const NewJobScheduleItem = ({
       transform: `translateX(${position?.x})`,
       border: `1px solid ${theme.palette.secondary.mainLight}`,
       borderRadius: 1,
-      minWidth: '13px',
+      minWidth: '1.5rem',
       minHeight: '40px',
       cursor: 'pointer',
       overflowY: 'hidden',
@@ -66,7 +66,7 @@ export const NewJobScheduleItem = ({
       }}>
       {children || (
         <Box
-          width={width}
+          width="100%"
           display="flex"
           alignItems="center"
           justifyContent="center"
