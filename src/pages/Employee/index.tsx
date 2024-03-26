@@ -127,7 +127,7 @@ export const Employees = () => {
       <MultipleSelectCheckmarks
         label="Role"
         initialSelectedItems={role ? [role] : []}
-        options={['Technician', 'Service Manager']}
+        options={['Technician', 'Service Manager', 'Contractor']}
         containerStyles={{
           minWidth: '21.875em',
           marginRight: '0.438em',

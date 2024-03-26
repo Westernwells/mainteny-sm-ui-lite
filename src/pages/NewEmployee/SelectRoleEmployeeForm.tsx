@@ -49,6 +49,7 @@ export const SelectRoleEmployeeForm = ({
                   options={[
                     'Technician',
                     'Service Manager',
+                    'Contractor',
                     'Both Technician & Service Manager',
                   ]}
                   containerStyles={{
