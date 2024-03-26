@@ -480,7 +480,7 @@ export const DraftQuotation = ({
 
   useEffect(() => {
     if (quotation) {
-      const quotationCustomer = quotation.elevator?.propertyOwner;
+      const quotationCustomer = quotation?.elevator?.propertyOwner;
       setCustomer(quotationCustomer);
 
       formik.setFieldValue(

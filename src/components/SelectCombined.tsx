@@ -7,15 +7,15 @@ import {SelectButton} from './SelectButton';
 import {SelectModal} from './SelectModal';
 
 interface Props {
-  label?: string | ReactNode;
-  labelRequired?: boolean;
+  modalHeader: string;
+  modalBody: ReactNode;
   selected: boolean;
   buttonText: string;
   cardHeader: ReactNode;
+  label?: string | ReactNode;
+  labelRequired?: boolean;
   cardBody?: ReactNode;
   cardOnClose?: () => void;
-  modalHeader: string;
-  modalBody: ReactNode;
 }
 
 export const SelectCombined = ({

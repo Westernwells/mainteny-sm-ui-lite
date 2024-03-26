@@ -473,6 +473,7 @@ export interface MyInvoiceActivityView {
   meta: Meta;
   overdueNoticeId: string;
   count: number;
+  amount: number;
 }
 
 export interface InvoiceActivityOverdueNoticeSentData {

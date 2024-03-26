@@ -243,7 +243,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
                         onChange={() => handleToggle(item.number - 1)}
                       />
                     }
-                    label={item.month}
+                    label={t(item.month)}
                   />
                 </ListItem>
               ))}
@@ -261,7 +261,7 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
                         onChange={() => handleToggle(item.number - 1)}
                       />
                     }
-                    label={item.month}
+                    label={t(item.month)}
                   />
                 </ListItem>
               ))}

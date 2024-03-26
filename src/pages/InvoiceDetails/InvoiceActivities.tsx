@@ -18,6 +18,7 @@ import {
   InvoiceActivityView,
   InvoiceView,
   MyInvoiceActivityView,
+  Payment,
 } from 'models/invoice';
 import {
   getInvoiceActivityDescription,
@@ -49,6 +50,13 @@ export const InvoiceActivities = ({
           ...item,
           overdueNoticeId: data.overdueNoticeId,
           count: overdueNoticeCount,
+        };
+      }
+      if (item.type === InvoiceActivityType.PAYMENT_RECEIVED) {
+        const data = JSON.parse(item.data) as Payment;
+        return {
+          ...item,
+          amount: data?.amount,
         };
       }
       return item;
@@ -108,7 +116,12 @@ export const InvoiceActivities = ({
                 </Link>
               ) : (
                 <Typography variant="subtitle1">
-                  {t(getInvoiceActivityTitle(activity.type))}
+                  {t(
+                    getInvoiceActivityTitle(
+                      activity.type,
+                      activity as MyInvoiceActivityView,
+                    ),
+                  )}
                 </Typography>
               )}
 
