@@ -63,6 +63,7 @@ export const AddDescription = ({
         <Summary
           label="Selected Unit"
           icon={<LiftIcon fontSize="4rem" height="2rem" />}>
+          <SummaryItem value={selectedUnit?.externalId || ''} />
           <SummaryItem value={selectedUnit?.model || ''} />
           <SummaryItem value={selectedUnit?.propertyOwner?.name || ''} />
           <SummaryItem value={selectedUnit?.address?.fullName || ''} />
