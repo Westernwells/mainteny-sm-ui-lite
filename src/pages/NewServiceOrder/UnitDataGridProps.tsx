@@ -76,6 +76,14 @@ export const columns = (activeId: string): GridColDef[] => [
     ...defaultProps,
   },
   {
+    field: 'address',
+    headerName: 'ADDRESS',
+    type: 'number',
+    ...defaultAlignment,
+    ...defaultProps,
+    flex: 2,
+  },
+  {
     field: 'building',
     headerName: 'BUILDING',
     type: 'string',
@@ -86,13 +94,6 @@ export const columns = (activeId: string): GridColDef[] => [
     field: 'customer',
     headerName: 'CUSTOMER',
     type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'address',
-    headerName: 'ADDRESS',
-    type: 'number',
     ...defaultAlignment,
     ...defaultProps,
   },

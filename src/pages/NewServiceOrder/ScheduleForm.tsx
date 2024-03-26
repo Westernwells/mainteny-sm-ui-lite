@@ -65,7 +65,7 @@ export const ScheduleForm = ({getScheduleFormValues}: Props) => {
     formik.setValues({
       ...formik.values,
       startDate: date?.[0] || undefined,
-      endDate: date?.[1] || undefined,
+      endDate: date?.[1] || date?.[0] || undefined,
     });
   };
 

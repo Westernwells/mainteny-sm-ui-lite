@@ -15,6 +15,7 @@ interface WidthOptions {
   startDateTime: string;
   endDateTime: string;
   gridWidth: number;
+  horizontalPosition: number;
 }
 
 export const getItemPosition = ({
@@ -43,14 +44,20 @@ export const getItemWidth = ({
   startDateTime,
   endDateTime,
   gridWidth,
+  horizontalPosition,
 }: WidthOptions) => {
-  const width =
+  const hoursInDay = 24;
+  const width = Math.min(
     (differenceInMinutes(
       getDateObject(endDateTime),
       getDateObject(startDateTime),
     ) /
       60) *
-    gridWidth;
+      gridWidth,
+    gridWidth * hoursInDay - horizontalPosition,
+  );
 
   return `${width}px`;
 };
+
+export const getPxFromString = (str: string) => Number(str.split('px')[0]);

@@ -45,7 +45,7 @@ import {styles as sx} from './styles';
 import {ScheduleControls} from './ScheduleControls';
 import {ScheduleLabel} from './ScheduleLabel';
 import {ScheduledItemGroup} from './model';
-import {getItemPosition, getItemWidth} from './utils';
+import {getItemPosition, getItemWidth, getPxFromString} from './utils';
 import {SystemCssProperties} from '@mui/system';
 
 interface Props {
@@ -375,8 +375,18 @@ export const Schedule = ({
                                     <ScheduleItemContainer>
                                       {
                                         scheduleItems[xKey].map(
-                                          (scheduleItem) =>
-                                            renderCellItem(
+                                          (scheduleItem) => {
+                                            const itemPosition =
+                                              getItemPosition({
+                                                scheduleItemGroup,
+                                                startDateTime:
+                                                  scheduleItem.schedules[0]
+                                                    .startTime,
+                                                rowKey: xKey,
+                                                orderId: scheduleItem.id,
+                                                gridWidth,
+                                              });
+                                            return renderCellItem(
                                               scheduleItem,
                                               getItemWidth({
                                                 startDateTime:
@@ -386,17 +396,14 @@ export const Schedule = ({
                                                   scheduleItem.schedules[0]
                                                     .endTime,
                                                 gridWidth,
+                                                horizontalPosition:
+                                                  getPxFromString(
+                                                    itemPosition.x,
+                                                  ),
                                               }),
-                                              getItemPosition({
-                                                scheduleItemGroup,
-                                                startDateTime:
-                                                  scheduleItem.schedules[0]
-                                                    .startTime,
-                                                rowKey: xKey,
-                                                orderId: scheduleItem.id,
-                                                gridWidth,
-                                              }),
-                                            ),
+                                              itemPosition,
+                                            );
+                                          },
                                         ) as ReactNode
                                       }
                                     </ScheduleItemContainer>
@@ -470,8 +477,18 @@ export const Schedule = ({
                                       <ScheduleItemContainer>
                                         {
                                           scheduleItems[xKey].map(
-                                            (scheduleItem) =>
-                                              renderCellItem(
+                                            (scheduleItem) => {
+                                              const itemPosition =
+                                                getItemPosition({
+                                                  scheduleItemGroup,
+                                                  startDateTime:
+                                                    scheduleItem.schedules[0]
+                                                      .startTime,
+                                                  rowKey: xKey,
+                                                  orderId: scheduleItem.id,
+                                                  gridWidth,
+                                                });
+                                              return renderCellItem(
                                                 scheduleItem,
                                                 getItemWidth({
                                                   startDateTime:
@@ -481,17 +498,14 @@ export const Schedule = ({
                                                     scheduleItem.schedules[0]
                                                       .endTime,
                                                   gridWidth,
+                                                  horizontalPosition:
+                                                    getPxFromString(
+                                                      itemPosition.x,
+                                                    ),
                                                 }),
-                                                getItemPosition({
-                                                  scheduleItemGroup,
-                                                  startDateTime:
-                                                    scheduleItem.schedules[0]
-                                                      .startTime,
-                                                  rowKey: xKey,
-                                                  orderId: scheduleItem.id,
-                                                  gridWidth,
-                                                }),
-                                              ),
+                                                itemPosition,
+                                              );
+                                            },
                                           ) as ReactNode
                                         }
                                       </ScheduleItemContainer>

@@ -16,7 +16,11 @@ import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer'
 import {ServiceOrderView} from 'models/service-order';
 import {ScheduleLabel} from 'components/Schedules/ScheduleLabel';
 import {ScheduledItemGroup} from 'components/Schedules/model';
-import {getItemPosition, getItemWidth} from 'components/Schedules/utils';
+import {
+  getItemPosition,
+  getItemWidth,
+  getPxFromString,
+} from 'components/Schedules/utils';
 import {isBefore} from 'date-fns';
 import {EmployeesView} from 'models/employee';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -296,8 +300,16 @@ export const TechnicianSchedule = ({
                               cellWidth={gridWidth}>
                               <ScheduleItemContainer>
                                 {
-                                  scheduleItems[xKey].map((scheduleItem) =>
-                                    renderCellItem(
+                                  scheduleItems[xKey].map((scheduleItem) => {
+                                    const itemPosition = getItemPosition({
+                                      scheduleItemGroup,
+                                      startDateTime:
+                                        scheduleItem.schedules[0].startTime,
+                                      rowKey: xKey,
+                                      orderId: scheduleItem.id,
+                                      gridWidth,
+                                    });
+                                    return renderCellItem(
                                       scheduleItem,
                                       getItemWidth({
                                         startDateTime:
@@ -305,17 +317,13 @@ export const TechnicianSchedule = ({
                                         endDateTime:
                                           scheduleItem.schedules[0].endTime,
                                         gridWidth,
+                                        horizontalPosition: getPxFromString(
+                                          itemPosition.x,
+                                        ),
                                       }),
-                                      getItemPosition({
-                                        scheduleItemGroup,
-                                        startDateTime:
-                                          scheduleItem.schedules[0].startTime,
-                                        rowKey: xKey,
-                                        orderId: scheduleItem.id,
-                                        gridWidth,
-                                      }),
-                                    ),
-                                  ) as ReactNode
+                                      itemPosition,
+                                    );
+                                  }) as ReactNode
                                 }
                               </ScheduleItemContainer>
                             </ScheduleBodyCell>
