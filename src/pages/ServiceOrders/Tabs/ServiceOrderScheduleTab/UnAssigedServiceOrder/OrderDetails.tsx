@@ -75,7 +75,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
       <Box display="flex" alignItems="center" py={0.25} pb={1.5} gap={0.5}>
         <Tag fontSize="small" sx={{color: 'text.disabled'}} />
         <Typography variant="caption" color="textSecondary" pt={0.5}>
-          {serviceOrder.elevator.serialNumber || '-'}
+          {serviceOrder.elevator.externalId || '-'}
         </Typography>
       </Box>
 
