@@ -1,31 +1,8 @@
 export const countries = [
   {
-    name: 'Deutschland',
-    states: [
-      'Baden-Württemberg',
-      'Bayern',
-      'Bavaria',
-      'Berlin',
-      'Brandenburg',
-      'Bremen',
-      'Hamburg',
-      'Hesse',
-      'Lower Saxony',
-      'Mecklenburg-Vorpommern',
-      'North Rhine-Westphalia',
-      'Rhineland-Palatinate',
-      'Saarland',
-      'Saxony',
-      'Saxony-Anhalt',
-      'Schleswig-Holstein',
-      'Thuringia',
-    ],
-  },
-  {
     name: 'Germany',
     states: [
       'Baden-Württemberg',
-      'Bayern',
       'Bavaria',
       'Berlin',
       'Brandenburg',
