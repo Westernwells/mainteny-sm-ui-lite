@@ -348,7 +348,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
                         onChange={() => handleToggle(item.number - 1)}
                       />
                     }
-                    label={item.month}
+                    label={t(item.month)}
                   />
                 </ListItem>
               ))}
@@ -366,7 +366,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
                         onChange={() => handleToggle(item.number - 1)}
                       />
                     }
-                    label={item.month}
+                    label={t(item.month)}
                   />
                 </ListItem>
               ))}
