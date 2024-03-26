@@ -56,9 +56,9 @@ export const useAuth = (): UseAuth => {
           )
         ) {
           enqueueSnackbar(
-            `${t('Uh oh! As a Property Manager, please login at')} ${
-              import.meta.env.REACT_APP_PMUI_URL
-            }`,
+            `${t(
+              'You don’t have access to Mainteny web portal. Please contact your system administrator.',
+            )}`,
             {
               variant: 'warning',
             },
