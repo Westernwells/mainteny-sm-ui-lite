@@ -33,7 +33,7 @@ import {
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceOrder} from 'models/service-order';
-import {ContractTermView} from 'models/contract';
+import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './useUserSession';
 
@@ -423,6 +423,49 @@ export const useContractTerms = ({
         page,
         query,
         type,
+      ),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+};
+
+export const queryContractPaymentTerms = async (
+  serviceCompanyId: string,
+  page: Page,
+  query: string,
+) => {
+  const response = await axiosClient.get<Resource<ContractPaymentTermView>>(
+    `/api/serviceCompanies/${serviceCompanyId}/contractPaymentTerms`,
+    {
+      params: {
+        query,
+        ...page,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQueryContractPaymentTerms = ({
+  page,
+  query,
+  options,
+}: {
+  page: Page;
+  query: string;
+  options?: UseQueryOptions<any, any, any>;
+}) => {
+  const {user} = useUserSession();
+  return useQuery<Resource<ContractPaymentTermView>, RestError>(
+    [queryKeys.queryContractPaymentTerms, page, query],
+    () =>
+      queryContractPaymentTerms(
+        user!.userAccount.serviceCompany.id,
+        page,
+        query,
       ),
     {
       enabled: !!user,

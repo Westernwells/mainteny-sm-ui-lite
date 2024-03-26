@@ -436,7 +436,7 @@ export interface ContractTermView {
 export interface NewContractPaymentTermBody {
   serviceCompanyId: string;
   term: string;
-  type: ServiceCompanyType;
+  type?: ServiceCompanyType;
 }
 
 export interface UpdateContractTermRecord {
@@ -838,3 +838,15 @@ export const getSingleItemViewFrequency = (
 
   return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
 };
+
+export interface UpdateContractPaymentTermRecord {
+  term: string;
+}
+
+export interface ContractPaymentTermView {
+  id: string;
+  serviceCompanyId: string;
+  term: string;
+  additionalInfo: string;
+  meta: Meta;
+}
