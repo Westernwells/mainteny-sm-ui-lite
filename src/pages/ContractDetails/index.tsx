@@ -12,6 +12,7 @@ import {ContractOverview} from './Tabs/ContractOverview';
 import {AddUnitsDataGrid} from './AddUnitsDataGrid';
 import InvoicesTab from './Tabs/Invoices/InvoicesTab';
 import {Notes} from './Notes';
+import {OldContractData} from './Tabs/ContractOverview/OldContractData';
 
 const tabItems = [
   {
@@ -25,6 +26,10 @@ const tabItems = [
   {
     label: 'Invoices',
     icon: <Invoices />,
+  },
+  {
+    label: 'Old Contract Data',
+    icon: <ManageSearchIcon />,
   },
 ];
 
@@ -65,6 +70,12 @@ export const ContractDetails = () => {
         </TabsBody>
         <TabsBody value={tabValue} index={2}>
           <InvoicesTab contractId={contractDetails?.id} />
+        </TabsBody>
+        <TabsBody value={tabValue} index={3}>
+          <OldContractData
+            contractDetails={contractDetails!}
+            isLoading={isLoading}
+          />
         </TabsBody>
       </Tabs>
       <SelectModal

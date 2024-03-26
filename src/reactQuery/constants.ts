@@ -81,6 +81,7 @@ export const queryKeys = {
   fetchXeroAuthUrl: 'fetchXeroAuthUrl',
   fetchServiceJobArticles: 'fetchServiceJobArticles',
   fetchEntitiesStates: 'fetchEntitiesStates',
+  queryContractPaymentTerms: 'queryContractPaymentTerms',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',
