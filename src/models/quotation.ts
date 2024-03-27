@@ -2,6 +2,7 @@ import {ArticleType, ArticleView, CostPackage} from './article';
 import {ElevatorView} from './elevator';
 import {AlternativeServiceCompanyInfo, Discount} from './invoice';
 import {AddressRecord, Amount, AmountRecord, Meta, Order} from './misc';
+import {PropertyOwnerView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
 
 export enum QuotationStatus {
@@ -73,6 +74,7 @@ export interface QuotationView {
   number: string;
   externalId: string;
   description: string;
+  propertyOwner: PropertyOwnerView;
   subject: string;
   moreInfo: string;
   status: QuotationStatus;
@@ -101,7 +103,7 @@ export interface QuotationFilters {}
 
 export interface QuotationFormData {
   serviceCompanyId: string;
-  elevatorId: string;
+  elevatorId?: string;
   externalId?: string;
   subject: string;
   description: string;
@@ -143,13 +145,14 @@ export interface CreateQuotation {
   expiryDate?: string;
   referenceNumber?: string;
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+  propertyOwnerId?: string;
 }
 
 export interface UpdateQuotation {
   subject: string;
   description: string;
   moreInfo?: string;
-  elevatorId: string;
+  elevatorId?: string;
   items: QuotationItemRecord[];
   externalId?: string;
   integration?: {
