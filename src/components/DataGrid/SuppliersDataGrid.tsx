@@ -75,11 +75,11 @@ export const SuppliersDataGrid = ({setRowItem}: Props) => {
 
   useEffect(() => {
     setPageCount(Math.ceil(articleSupplierResource.total / page.pageSize));
-  }, [articleSupplierResource, page.pageSize]);
+  }, [articleSupplierResource.total, page.pageSize]);
 
   useEffect(() => {
     setRows(makeRows(articleSupplierResource.data));
-  }, [articleSupplierResource]);
+  }, [articleSupplierResource.total]);
 
   if (isIdle || isLoading) {
     return (

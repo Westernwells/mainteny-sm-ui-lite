@@ -55,3 +55,13 @@ html::-webkit-scrollbar {
 .MuiDataGrid-main {
   min-height: 100%;
 }
+
+.iframe-parent {
+  height: 100vh;
+}
+
+iframe {
+  width: 100%;
+  z-index: 0;
+  position: relative;
+}

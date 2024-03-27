@@ -9,7 +9,6 @@ import {SelectCombined} from 'components/SelectCombined';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
-import PathImage from 'assets/images/Path.svg';
 import {SuppliersDataGrid} from 'components/DataGrid/SuppliersDataGrid';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -18,19 +17,25 @@ import {
   useCreateArticleOrder,
 } from 'hooks/reactQuery/useArticle';
 import {
-  useDownloadFileWithCustomName,
-  useDownloadUrl,
-} from 'hooks/reactQuery/useDownloadUrl';
-import {
   ArticleOrderItemRecord,
   ArticleSupplierView,
   ArticleView,
   CreateArticleOrderRecord,
 } from 'models/article';
-import {PdfGenerationStatus} from 'models/misc';
-import {waitForSeconds} from 'utils/utils';
+import {getBase64FromUrl, waitForSeconds} from 'utils/utils';
 import {useSnackbar} from 'notistack';
+import {PDFDownloadLink, pdf} from '@react-pdf/renderer';
+import printJS from 'print-js';
+import PathImage from 'assets/images/Path.svg';
+import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
+import Edit from '@mui/icons-material/Edit';
+import {Button} from 'components/Button';
+import useTheme from '@mui/material/styles/useTheme';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useCurrentCurrency} from 'utils/currency';
 import {ArticleItemsTable} from './ArticleItemsTable';
+import OrderArticlePDF from './OrderArticlePDF';
+import OrderArticlePDFPreview from './OrderArticlePDFPreview';
 
 const validationSchema = Yup.object().shape({
   serviceCompanyId: Yup.string().required('Service company ID is required'),
@@ -54,14 +59,22 @@ const validationSchema = Yup.object().shape({
     .required('Articles are required'),
 });
 
+const enum DocumentMode {
+  EDIT = 'EDIT',
+  PREVIEW = 'PREVIEW',
+  PRINT = 'PRINT',
+}
+
 export const OrderArticle = () => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const location = useLocation();
-  const {closeSnackbar} = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
   const articleFromLocation = (location.state as {article: ArticleView})
     ?.article;
   const formatDate = useFormatDate();
   const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
   const [orderId, setOrderId] = useState('');
   const {data: articleOrder, refetch} = useArticleOrder(orderId);
   const {mutate: createArticleOrder} = useCreateArticleOrder(
@@ -76,19 +89,19 @@ export const OrderArticle = () => {
     undefined,
   );
   const [items, setItems] = useState<ArticleOrderItemRecord[]>([]);
-  const {data: downloadUrl} = useDownloadUrl([
-    articleOrder?.additionalInfo?.pdfGenerationStatus ===
-    PdfGenerationStatus.DONE
-      ? articleOrder?.additionalInfo?.pdfPath
-      : '',
-  ]);
-  const isPDFGenerated =
-    articleOrder?.additionalInfo?.pdfGenerationStatus ===
-      PdfGenerationStatus.DONE && downloadUrl;
 
-  const {downloadFile} = useDownloadFileWithCustomName(
-    articleOrder?.number,
-    downloadUrl ? Object.values(downloadUrl)[0] : '',
+  const [mode, setMode] = useState(DocumentMode.EDIT);
+  const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
+  const [printPdfBlobUrl, setPrintPdfBlobUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+
+  const logoCompany =
+    user?.userAccount?.serviceCompany?.settings?.whiteLabel?.logoPath;
+
+  const {data: logoUrl = {}} = useDownloadUrl(
+    logoCompany ? [logoCompany] : [],
+    undefined,
+    user?.userAccount.serviceCompany.id,
   );
 
   const initialValues: CreateArticleOrderRecord = {
@@ -102,16 +115,7 @@ export const OrderArticle = () => {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
-      formik.setSubmitting(true);
-      createArticleOrder(values, {
-        onSuccess: async ({value}) => {
-          setOrderId(value);
-          await waitForSeconds(10);
-          refetch();
-        },
-      });
-    },
+    onSubmit: () => {},
   });
 
   const handleSelectSupplier = (row: ArticleSupplierView) => {
@@ -119,19 +123,52 @@ export const OrderArticle = () => {
     formik.setFieldValue('articleSupplierId', row.id);
   };
 
+  const printDocument = async () => {
+    if (articleOrder) {
+      setMode(DocumentMode.PRINT);
+      const blob = await pdf(
+        <OrderArticlePDF
+          articleOrder={articleOrder!}
+          userInfo={user?.userAccount}
+          currencyCode={currentCurrency.code}
+          logoSrc={imageUrl}
+        />,
+      ).toBlob();
+      const blobURL = URL.createObjectURL(blob);
+      setPrintPdfBlobUrl(blobURL);
+    }
+  };
+
+  const handlePrint = () => {
+    createArticleOrder(formik.values, {
+      onSuccess: async ({value}) => {
+        setOrderId(value);
+        await waitForSeconds(10);
+        refetch();
+
+        await printDocument();
+      },
+    });
+  };
+
+  const handlePreview = async () => {
+    setMode(DocumentMode.PREVIEW);
+    const blob = await pdf(
+      <OrderArticlePDFPreview
+        supplier={supplier!}
+        formik={formik}
+        userInfo={user?.userAccount}
+        logoSrc={imageUrl}
+        currencyCode={currentCurrency.code}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    setPreviewPdfBlobUrl(blobURL);
+  };
+
   useEffect(() => {
     formik.setFieldValue('items', items);
   }, [items]);
-
-  useEffect(() => {
-    (async () => {
-      if (isPDFGenerated && downloadUrl && formik.isSubmitting) {
-        await downloadFile();
-        formik.setSubmitting(false);
-        waitForSeconds(0.1);
-      }
-    })();
-  }, [downloadUrl, isPDFGenerated, !formik.isSubmitting, orderId]);
 
   useEffect(() => {
     if (articleFromLocation) {
@@ -157,6 +194,7 @@ export const OrderArticle = () => {
             quantity: 1,
             unit: articleFromLocation.unit,
             description: articleFromLocation.description,
+            unitSellingAmount: articleFromLocation.unitSellingAmount,
           },
         ]);
       }
@@ -164,13 +202,28 @@ export const OrderArticle = () => {
   }, [articleFromLocation]);
 
   useEffect(() => {
-    if (
-      articleOrder?.additionalInfo?.pdfGenerationStatus !==
-      PdfGenerationStatus.RUNNING
-    ) {
-      closeSnackbar();
+    const fetchImage = async () => {
+      if (!imageUrl && logoCompany !== undefined) {
+        const fetchedImageUrl = await getBase64FromUrl(logoUrl[logoCompany!]);
+
+        if (fetchedImageUrl) {
+          setImageUrl(fetchedImageUrl);
+        }
+      }
+    };
+
+    fetchImage();
+  }, [logoUrl[logoCompany!]]);
+
+  useEffect(() => {
+    if (printPdfBlobUrl) {
+      printJS({
+        printable: printPdfBlobUrl,
+        type: 'pdf',
+        showModal: true,
+      });
     }
-  }, [articleOrder]);
+  }, [printPdfBlobUrl]);
   return (
     <Box>
       <Box
@@ -178,129 +231,364 @@ export const OrderArticle = () => {
         mx="auto"
         mb="8em"
         mt="1.5em">
-        <Box bgcolor="white" p="1.5rem">
-          <Typography variant="h6">{t('Order Article')}</Typography>
-          <Box display="flex" mt="1rem" gap="2rem">
-            <Box flexGrow={1} display="flex" flexDirection="column" gap="1rem">
-              <Box>
-                <FormLabel text={t('From')} />
-                <Box
-                  display="flex"
-                  bgcolor="grey.200"
-                  alignItems="start"
-                  justifyContent="space-between"
-                  px="0.75rem"
-                  py=".5rem"
-                  border="1px solid"
-                  borderColor="inputBackground.main"
-                  borderRadius="4px">
-                  <Box>
-                    <Typography variant="body2">
-                      {user?.userAccount.serviceCompany.name || ''}
-                    </Typography>
-                    <Box color="text.secondary">
-                      {user &&
-                      'businessAddress' in user.userAccount.serviceCompany &&
-                      user.userAccount.serviceCompany.postalAddress
-                        ?.fullName ? (
-                        <Typography variant="caption">
-                          {
-                            user.userAccount.serviceCompany.postalAddress
-                              ?.fullName
-                          }
-                        </Typography>
-                      ) : (
-                        ''
-                      )}
+        {mode === DocumentMode.EDIT ? (
+          <Box bgcolor="white" p="1.5rem">
+            <Typography variant="h6">{t('Order Article')}</Typography>
+            <Box display="flex" mt="1rem" gap="2rem">
+              <Box
+                flexGrow={1}
+                display="flex"
+                flexDirection="column"
+                gap="1rem">
+                <Box>
+                  <FormLabel text={t('From')} />
+                  <Box
+                    display="flex"
+                    bgcolor="grey.200"
+                    alignItems="start"
+                    justifyContent="space-between"
+                    px="0.75rem"
+                    py=".5rem"
+                    border="1px solid"
+                    borderColor="inputBackground.main"
+                    borderRadius="4px">
+                    <Box>
+                      <Typography variant="body2">
+                        {user?.userAccount.serviceCompany.name || ''}
+                      </Typography>
+                      <Box color="text.secondary">
+                        {user &&
+                        'businessAddress' in user.userAccount.serviceCompany &&
+                        user.userAccount.serviceCompany.postalAddress
+                          ?.fullName ? (
+                          <Typography variant="caption">
+                            {
+                              user.userAccount.serviceCompany.postalAddress
+                                ?.fullName
+                            }
+                          </Typography>
+                        ) : (
+                          ''
+                        )}
+                      </Box>
                     </Box>
                   </Box>
                 </Box>
+                <SelectCombined
+                  selected={supplier !== undefined}
+                  label="Supplier"
+                  buttonText="Select Supplier"
+                  cardHeader={
+                    supplier && (
+                      <Typography variant="body2">
+                        {supplier.name || '-'}
+                      </Typography>
+                    )
+                  }
+                  cardBody={
+                    supplier && (
+                      <>
+                        <Typography variant="caption">
+                          {supplier.address?.fullName || '-'}
+                        </Typography>
+                        <Typography variant="caption" component="p">
+                          {supplier.externalId || '-'}
+                        </Typography>
+                      </>
+                    )
+                  }
+                  cardOnClose={() => setSupplier(undefined)}
+                  modalHeader="Select Supplier"
+                  modalBody={
+                    <SuppliersDataGrid setRowItem={handleSelectSupplier} />
+                  }
+                  labelRequired
+                />
               </Box>
-              <SelectCombined
-                selected={supplier !== undefined}
-                label="Supplier"
-                buttonText="Select Supplier"
-                cardHeader={
-                  supplier && (
-                    <Typography variant="body2">
-                      {supplier.name || '-'}
-                    </Typography>
-                  )
-                }
-                cardBody={
-                  supplier && (
-                    <>
-                      <Typography variant="caption">
-                        {supplier.address?.fullName || '-'}
-                      </Typography>
-                      <Typography variant="caption" component="p">
-                        {supplier.externalId || '-'}
-                      </Typography>
-                    </>
-                  )
-                }
-                cardOnClose={() => setSupplier(undefined)}
-                modalHeader="Select Supplier"
-                modalBody={
-                  <SuppliersDataGrid setRowItem={handleSelectSupplier} />
-                }
-                labelRequired
+              <Box
+                width="40%"
+                display="flex"
+                flexDirection="column"
+                gap="2em"
+                mt="1.5em">
+                <Box>
+                  <FormLabel text="Date" />
+                  <Typography>{formatDate(new Date())}</Typography>
+                </Box>
+              </Box>
+            </Box>
+
+            <Box display="flex" flexDirection="column" gap={3} pt="2rem">
+              <FormInput
+                props={{
+                  name: 'externalId',
+                  label: 'Purchase order number',
+                  value: formik.values.externalId,
+                  onChange: formik.handleChange,
+                  onBlur: formik.handleBlur,
+                  error:
+                    !!formik.errors.externalId && formik.touched.externalId,
+                  helperText:
+                    formik.touched.externalId && formik.errors.externalId,
+                }}
+              />
+              <FormInput
+                props={{
+                  name: 'description',
+                  label: 'Description',
+                  value: formik.values.description,
+                  onChange: formik.handleChange,
+                  onBlur: formik.handleBlur,
+                  error:
+                    !!formik.errors.description && formik.touched.description,
+                  helperText:
+                    formik.touched.description && formik.errors.description,
+                  required: true,
+                  multiline: true,
+                  rows: 4,
+                }}
               />
             </Box>
+
+            <ArticleItemsTable items={items} setItems={setItems} />
+          </Box>
+        ) : mode === DocumentMode.PREVIEW ? (
+          <Box
+            width="min(calc(1240px + 1.25em), 100%)"
+            textAlign="center"
+            sx={{
+              margin: '2em auto',
+            }}>
             <Box
-              width="40%"
-              display="flex"
-              flexDirection="column"
-              gap="2em"
-              mt="1.5em">
-              <Box>
-                <FormLabel text="Date" />
-                <Typography>{formatDate(new Date())}</Typography>
-              </Box>
+              sx={{
+                position: 'relative',
+                maxWidth: '807px',
+                margin: '0 auto',
+              }}>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  borderWidth: '3px',
+                  borderStyle: 'solid',
+                  zIndex: 1,
+                  borderColor: '#f2f6f8',
+                  width: '100%',
+                }}
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  left: 0,
+                  borderWidth: '13px',
+                  borderStyle: 'solid',
+                  zIndex: 1,
+                  borderColor: '#f2f6f8',
+                  height: '846px',
+                }}
+              />
+
+              <Box
+                sx={{
+                  position: 'absolute',
+                  right: '-1px',
+                  borderWidth: '22px',
+                  borderStyle: 'solid',
+                  zIndex: 1,
+                  borderColor: '#f2f6f8',
+                  height: '829px',
+                  marginTop: '0.4em',
+                }}
+              />
+
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: 0,
+                  borderWidth: '15px',
+                  borderStyle: 'solid',
+                  zIndex: 1,
+                  borderColor: '#f2f6f8',
+                  width: '100%',
+                }}
+              />
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  color: 'white',
+                  position: 'absolute',
+                  textAlign: 'center',
+                  top: '2%',
+                  left: '44%',
+                  zIndex: '100',
+                  fontWeight: '300',
+                }}>
+                {t('Loading Preview...')}
+              </Typography>
+              {previewPdfBlobUrl && (
+                <iframe
+                  title="pdf-loader"
+                  src={`${previewPdfBlobUrl}#toolbar=0`}
+                  loading="eager"
+                  height="842"
+                  style={{maxWidth: '807px', margin: '0 auto'}}
+                  id="pdf-loader"
+                />
+              )}
             </Box>
           </Box>
+        ) : (
+          mode === DocumentMode.PRINT &&
+          articleOrder && (
+            <Box
+              width="min(calc(1240px + 1.25em), 100%)"
+              textAlign="center"
+              sx={{
+                margin: '2em auto',
+              }}>
+              <Box
+                sx={{
+                  position: 'relative',
+                  maxWidth: '807px',
+                  margin: '0 auto',
+                }}>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    borderWidth: '3px',
+                    borderStyle: 'solid',
+                    zIndex: 1,
+                    borderColor: '#f2f6f8',
+                    width: '100%',
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    left: 0,
+                    borderWidth: '13px',
+                    borderStyle: 'solid',
+                    zIndex: 1,
+                    borderColor: '#f2f6f8',
+                    height: '846px',
+                  }}
+                />
 
-          <Box display="flex" flexDirection="column" gap={3} pt="2rem">
-            <FormInput
-              props={{
-                name: 'externalId',
-                label: 'Purchase order number',
-                value: formik.values.externalId,
-                onChange: formik.handleChange,
-                onBlur: formik.handleBlur,
-                error: !!formik.errors.externalId && formik.touched.externalId,
-                helperText:
-                  formik.touched.externalId && formik.errors.externalId,
-              }}
-            />
-            <FormInput
-              props={{
-                name: 'description',
-                label: 'Description',
-                value: formik.values.description,
-                onChange: formik.handleChange,
-                onBlur: formik.handleBlur,
-                error:
-                  !!formik.errors.description && formik.touched.description,
-                helperText:
-                  formik.touched.description && formik.errors.description,
-                required: true,
-                multiline: true,
-                rows: 4,
-              }}
-            />
-          </Box>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    right: '-1px',
+                    borderWidth: '22px',
+                    borderStyle: 'solid',
+                    zIndex: 1,
+                    borderColor: '#f2f6f8',
+                    height: '829px',
+                    marginTop: '0.4em',
+                  }}
+                />
 
-          <ArticleItemsTable items={items} setItems={setItems} />
-        </Box>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    borderWidth: '15px',
+                    borderStyle: 'solid',
+                    zIndex: 1,
+                    borderColor: '#f2f6f8',
+                    width: '100%',
+                  }}
+                />
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: 'white',
+                    position: 'absolute',
+                    textAlign: 'center',
+                    top: '2%',
+                    left: '44%',
+                    zIndex: '100',
+                    fontWeight: '300',
+                  }}>
+                  {t('Loading Article Order...')}
+                </Typography>
+                {printPdfBlobUrl && (
+                  <iframe
+                    title="pdf-loader"
+                    src={`${printPdfBlobUrl}#toolbar=0`}
+                    loading="eager"
+                    height="842"
+                    style={{maxWidth: '807px', margin: '0 auto'}}
+                    id="pdf-loader"
+                  />
+                )}
+              </Box>
+            </Box>
+          )
+        )}
       </Box>
 
       <BottomDrawer
         isOpen
-        primaryButtonLabel={t('Print order')}
-        primaryButtonAction={formik.handleSubmit}
+        primaryButtonLabel={
+          mode === DocumentMode.PREVIEW || mode === DocumentMode.PRINT ? (
+            t('Print order')
+          ) : (
+            <PDFDownloadLink
+              onClick={() =>
+                enqueueSnackbar(t('Saving PDF'), {
+                  variant: 'info',
+                })
+              }
+              style={{color: 'white', textDecoration: 'none'}}
+              document={
+                <OrderArticlePDFPreview
+                  supplier={supplier!}
+                  formik={formik}
+                  userInfo={user?.userAccount}
+                  logoSrc={imageUrl}
+                  currencyCode={currentCurrency.code}
+                />
+              }
+              fileName={t('preview.pdf')}>
+              {t('Save')}
+            </PDFDownloadLink>
+          )
+        }
+        primaryButtonAction={
+          mode === DocumentMode.PREVIEW ? handlePrint : handlePreview
+        }
         listItems={[]}
-        isValid={formik.isValid && !formik.isSubmitting}
+        isValid={formik.isValid}
+        secondaryButton={
+          <Button
+            label={
+              mode === DocumentMode.EDIT
+                ? 'Preview'
+                : mode === DocumentMode.PREVIEW
+                ? 'Continue editing'
+                : 'Back'
+            }
+            buttonProps={{
+              variant: 'outlined',
+              sx: {bgcolor: theme.palette.inputBackground.main},
+              startIcon:
+                mode === DocumentMode.EDIT ? (
+                  <RemoveRedEye />
+                ) : (
+                  mode === DocumentMode.PREVIEW && <Edit />
+                ),
+              size: 'medium',
+              disabled: !formik.isValid,
+              onClick:
+                mode === DocumentMode.EDIT
+                  ? handlePreview
+                  : () => {
+                      setMode(DocumentMode.EDIT);
+                    },
+            }}
+          />
+        }
       />
     </Box>
   );
