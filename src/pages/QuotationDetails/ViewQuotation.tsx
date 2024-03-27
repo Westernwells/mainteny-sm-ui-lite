@@ -343,7 +343,7 @@ export const ViewQuotation = ({
             {isCreateForm && (
               <Box mt=".5em" mb="0em">
                 <Box>
-                  {unit !== null && (
+                  {!!unit && (
                     <Box
                       sx={{
                         borderRadius: '4px',
