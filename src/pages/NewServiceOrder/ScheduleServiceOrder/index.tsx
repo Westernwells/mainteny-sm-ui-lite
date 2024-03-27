@@ -16,7 +16,6 @@ import {
 } from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
-import {QuotationView} from 'models/quotation';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {toRestDateTime} from 'utils/datetime';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -33,10 +32,10 @@ const steps = [
 
 interface Props {
   type: ServiceOrderType;
-  quotation?: QuotationView;
+  elevator?: ElevatorView;
 }
 
-export const ScheduleServiceOrder = ({type, quotation}: Props) => {
+export const ScheduleServiceOrder = ({type, elevator}: Props) => {
   const [queryParams] = useSearchParams();
   const currentParams = useRef(Object.fromEntries([...queryParams])).current;
   const formatDate = useFormatDate();
@@ -93,11 +92,11 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
   }, [activeStep, selectedUnit, dueDateFormErrored]);
 
   useEffect(() => {
-    if (quotation) {
-      setSelectedUnit(quotation.elevator);
+    if (elevator) {
+      setSelectedUnit(elevator);
       setActiveStep(1);
     }
-  }, [quotation]);
+  }, [elevator]);
 
   const handleCancel = () => {
     setActiveStep(0);
@@ -125,7 +124,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       requireTechnicianNotification,
       startTime,
       endTime,
-      quotationId: quotation ? quotation.id : '',
+      quotationId: currentParams.quotationId || '',
       callerInfo: {
         calledAt: descriptionValues.callTime ?? null,
         name: descriptionValues.callerName ?? '',
@@ -149,7 +148,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       serviceCompanyId,
       type,
       dueDate,
-      quotationId: quotation ? quotation.id : '',
+      quotationId: currentParams.quotationId || '',
       callerInfo: {
         calledAt: descriptionValues.callTime ?? null,
         name: descriptionValues.callerName ?? '',
@@ -190,7 +189,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       disableNextBtn={
         disableNextBtn || isCreatingNonScheduledOrder || isSchedulingOrder
       }
-      initialActiveStep={quotation ? 1 : 0}
+      initialActiveStep={elevator ? 1 : 0}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
       containerStyles={{
