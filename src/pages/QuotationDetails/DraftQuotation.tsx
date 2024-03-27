@@ -257,8 +257,8 @@ export const DraftQuotation = ({
   });
 
   async function save(values: QuotationFormData) {
-    if (!values.description.length) values.description = ' ';
-    if (!values.notes?.length) values.notes = ' ';
+    if (!values.description.trim().length) values.description = '';
+    if (!values.notes?.trim().length) values.notes = '';
 
     if (formType === 'edit' && quotation) {
       return updateQuotationAsync({

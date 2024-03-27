@@ -21,7 +21,7 @@ import ImageIcon from '@mui/icons-material/Image';
 import {ReactComponent as DriveFileIcon} from 'assets/icons/DriveFileIcon.svg';
 import {FormInput} from 'components/form/FormInput';
 import {InfoCard} from 'components/InfoCard';
-import {Tooltip} from '@mui/material';
+import {SxProps, Tooltip} from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import {useFormatDate} from 'hooks/useFormatDate';
 
@@ -37,6 +37,7 @@ interface Props {
   documents?: FileWithPreview[];
   updateContract: (obj: any) => void;
   contractId?: string;
+  containerStyles?: SxProps;
 }
 
 export const AttachDocument: FC<Props> = ({
@@ -51,6 +52,7 @@ export const AttachDocument: FC<Props> = ({
   setDocuments,
   updateContract,
   contractId,
+  containerStyles,
 }) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -113,6 +115,7 @@ export const AttachDocument: FC<Props> = ({
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
+            ...containerStyles,
           },
           pt: 'unset',
         }}
