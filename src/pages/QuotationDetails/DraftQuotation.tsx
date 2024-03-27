@@ -228,7 +228,6 @@ export const DraftQuotation = ({
   const initialValues: QuotationFormData = {
     subject: quotation?.subject || t('Quotation'),
     description: quotation?.description || '',
-    elevatorId: quotation?.elevator?.id || '',
     notes: quotation?.additionalInfo.notes || '',
     items: quotation?.items || [],
     serviceCompanyId: quotation?.serviceCompany.id || '',
@@ -323,6 +322,7 @@ export const DraftQuotation = ({
       handleSelectCustomer(value);
     } else {
       setCustomer(null);
+      setUnit(null);
     }
   };
 
@@ -480,7 +480,7 @@ export const DraftQuotation = ({
 
   useEffect(() => {
     if (quotation) {
-      const quotationCustomer = quotation?.elevator?.propertyOwner;
+      const quotationCustomer = quotation.propertyOwner;
       setCustomer(quotationCustomer);
 
       formik.setFieldValue(
@@ -808,6 +808,7 @@ export const DraftQuotation = ({
                 }
                 cardOnClose={() => {
                   setUnit(null);
+                  formik.setFieldValue('elevatorId', null);
                 }}
                 modalHeader="Select unit"
                 modalBody={

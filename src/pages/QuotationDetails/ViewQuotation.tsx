@@ -198,6 +198,11 @@ export const ViewQuotation = ({
   }, [downloadUrl]);
 
   useEffect(() => {
+    if (quotation) {
+      const quotationElevator = quotation.elevator;
+      setUnit(quotationElevator);
+    }
+
     if (
       quotation?.additionalInfo.pdfGenerationStatus ===
       PdfGenerationStatus.RUNNING
