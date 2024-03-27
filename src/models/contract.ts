@@ -436,7 +436,7 @@ export interface ContractTermView {
 export interface NewContractPaymentTermBody {
   serviceCompanyId: string;
   term: string;
-  type: ServiceCompanyType;
+  type?: ServiceCompanyType;
 }
 
 export interface UpdateContractTermRecord {
