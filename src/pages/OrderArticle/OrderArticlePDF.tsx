@@ -17,10 +17,12 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Currencies, formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
+import font from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 
 Font.register({
   family: 'Montserrat',
-  src: '../../src/assets/fonts/Montserrat/Montserrat-Regular.ttf',
+  format: 'truetype',
+  src: font,
 });
 
 const styles = StyleSheet.create({
