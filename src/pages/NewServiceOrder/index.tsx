@@ -3,9 +3,9 @@ import {Progress} from 'components/Progress';
 import {useLayoutEffect, useRef} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {ServiceOrderType} from 'models/service-order';
-import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {convertToMacro} from 'utils/utils';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {NewEmergency} from './NewEmergency';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
@@ -17,11 +17,11 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   const [queryParams] = useSearchParams();
   const currentParams = useRef(Object.fromEntries([...queryParams])).current;
   const {
-    data: quotation,
+    data: elevator,
     isLoading,
     isFetched,
-  } = currentParams.quotationId
-    ? useQuotationDetails(currentParams.quotationId)
+  } = currentParams.elevatorId
+    ? useElevatorById(currentParams.elevatorId)
     : {data: undefined, isLoading: false, isFetched: true};
 
   useLayoutEffect(() => {
@@ -39,41 +39,41 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   return (
     <FlexContainer>
       {currentParams.type === 'emergency' ? (
-        <NewEmergency quotation={quotation} />
+        <NewEmergency elevator={elevator} />
       ) : currentParams.type === 'callout' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.CALLOUT}
-          quotation={quotation}
+          elevator={elevator}
         />
       ) : currentParams.type === 'repair' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.REPAIR}
-          quotation={quotation}
+          elevator={elevator}
         />
       ) : currentParams.type === 'regular' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.REGULAR}
-          quotation={quotation}
+          elevator={elevator}
         />
       ) : currentParams.type === 'inspection' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.INSPECTION}
-          quotation={quotation}
+          elevator={elevator}
         />
       ) : currentParams.type === 'new_installation' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.NEW_INSTALLATION}
-          quotation={quotation}
+          elevator={elevator}
         />
       ) : currentParams.type === 'modernization' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.MODERNIZATION}
-          quotation={quotation}
+          elevator={elevator}
         />
       ) : currentParams.type === 'general' ? (
         <ScheduleServiceOrder
           type={ServiceOrderType.GENERAL}
-          quotation={quotation}
+          elevator={elevator}
         />
       ) : null}
     </FlexContainer>

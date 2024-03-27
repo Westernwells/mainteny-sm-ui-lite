@@ -14,7 +14,6 @@ import {
 } from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
-import {QuotationView} from 'models/quotation';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {setDateTime, toRestDateTime} from 'utils/datetime';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -35,10 +34,10 @@ const steps = [
 
 interface Props {
   type: Exclude<ServiceOrderType, ServiceOrderType.EMERGENCY>;
-  quotation?: QuotationView;
+  elevator?: ElevatorView;
 }
 
-export const ScheduleServiceOrder = ({type, quotation}: Props) => {
+export const ScheduleServiceOrder = ({type, elevator}: Props) => {
   const [queryParams] = useSearchParams();
   const currentParams = useRef(Object.fromEntries([...queryParams])).current;
   const formatDate = useFormatDate();
@@ -131,11 +130,11 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
   ]);
 
   useEffect(() => {
-    if (quotation) {
-      setSelectedUnit(quotation.elevator);
+    if (elevator) {
+      setSelectedUnit(elevator);
       setActiveStep(1);
     }
-  }, [quotation]);
+  }, [elevator]);
 
   useEffect(() => {
     let dateString;
@@ -173,7 +172,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       technicianIds: selectedTechnicians.map((item) => item.id),
       time: toRestDateTime(new Date()),
       type,
-      quotationId: quotation ? quotation.id : '',
+      quotationId: currentParams.quotationId || '',
       callerInfo: {
         calledAt: descriptionValues.callTime ?? null,
         name: descriptionValues.callerName ?? '',
@@ -210,7 +209,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       requireTechnicianNotification: true,
       startTime,
       endTime,
-      quotationId: quotation ? quotation.id : '',
+      quotationId: currentParams.quotationId || '',
       callerInfo: {
         calledAt: descriptionValues.callTime ?? null,
         name: descriptionValues.callerName ?? '',
@@ -233,7 +232,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
       serviceCompanyId,
       type,
       dueDate,
-      quotationId: quotation ? quotation.id : '',
+      quotationId: currentParams.quotationId || '',
       callerInfo: {
         calledAt: descriptionValues.callTime ?? null,
         name: descriptionValues.callerName ?? '',
@@ -274,7 +273,7 @@ export const ScheduleServiceOrder = ({type, quotation}: Props) => {
         isCreatingNonScheduledOrder ||
         isSchedulingOrder
       }
-      initialActiveStep={quotation ? 1 : 0}
+      initialActiveStep={elevator ? 1 : 0}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
       containerStyles={{

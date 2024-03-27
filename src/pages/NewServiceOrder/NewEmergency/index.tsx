@@ -2,7 +2,7 @@ import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {useAssignmentBasedOrder} from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {
   AssignmentDescriptionOrderModel,
   Priority,
@@ -11,8 +11,7 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
 import {toRestDateTime} from 'utils/datetime';
-import {useNavigate} from 'react-router-dom';
-import {QuotationView} from 'models/quotation';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
@@ -20,16 +19,18 @@ import {SelectUnit} from '../SelectUnit';
 import {RadioOptions} from '../models';
 
 interface Props {
-  quotation?: QuotationView;
+  elevator?: ElevatorView;
 }
 
 const steps = ['Select unit', 'Select technicians', 'Add description'];
 
-export const NewEmergency = ({quotation}: Props) => {
+export const NewEmergency = ({elevator}: Props) => {
   const {t} = useTranslation();
+  const [queryParams] = useSearchParams();
   const [activeStep, setActiveStep] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState<ElevatorView>();
   const [disableNextBtn, setDisableNextBtn] = useState(false);
+  const currentParams = useRef(Object.fromEntries([...queryParams])).current;
   const {user} = useUserSession();
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
@@ -62,11 +63,11 @@ export const NewEmergency = ({quotation}: Props) => {
   }, [activeStep, selectedUnit, selectedTechnicians]);
 
   useEffect(() => {
-    if (quotation) {
-      setSelectedUnit(quotation.elevator);
+    if (elevator) {
+      setSelectedUnit(elevator);
       setActiveStep(1);
     }
-  }, [quotation]);
+  }, [elevator]);
 
   const handleCancel = () => {
     setActiveStep(0);
@@ -87,7 +88,7 @@ export const NewEmergency = ({quotation}: Props) => {
       technicianIds: selectedTechnicians.map((item) => item.id),
       time: toRestDateTime(new Date()),
       type: ServiceOrderType.EMERGENCY,
-      quotationId: quotation ? quotation.id : '',
+      quotationId: currentParams.quotationId || '',
       callerInfo: {
         calledAt: descriptionValues.callTime ?? null,
         name: descriptionValues.callerName ?? '',
@@ -105,7 +106,7 @@ export const NewEmergency = ({quotation}: Props) => {
         await createNewEmergencyOrder();
       }}
       disableNextBtn={disableNextBtn}
-      initialActiveStep={quotation ? 1 : 0}
+      initialActiveStep={elevator ? 1 : 0}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
       containerStyles={{
