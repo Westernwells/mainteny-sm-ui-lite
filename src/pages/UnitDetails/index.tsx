@@ -17,6 +17,18 @@ import {useDeleteElevator} from 'hooks/reactQuery/useElevator';
 import {theme} from 'theme';
 import Box from '@mui/material/Box';
 import {Button} from '@mui/material';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import BuildCircleIcon from '@mui/icons-material/BuildCircle';
+import UploadIcon from '@mui/icons-material/Upload';
+import HandymanIcon from '@mui/icons-material/Handyman';
+import {ServiceOrderType} from 'models/service-order';
+import {
+  serviceOrderTypeColor,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 import {TodosTab} from './Tabs/TodosTab';
@@ -80,18 +92,122 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
     }
   }, [unitName, language]);
 
+  const track = (cb: () => void) => {
+    cb();
+  };
+
+  const menu = [
+    {
+      label: serviceOrderTypeToString(ServiceOrderType.EMERGENCY),
+      action: () =>
+        track(() =>
+          navigate(`/orders/new?type=emergency&elevatorId=${elevatorId}`),
+        ),
+      icon: (
+        <ReportProblemIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.EMERGENCY)}}
+        />
+      ),
+    },
+    {
+      label: serviceOrderTypeToString(ServiceOrderType.CALLOUT),
+      action: () =>
+        track(() =>
+          navigate(`/orders/new?type=callout&elevatorId=${elevatorId}`),
+        ),
+      icon: (
+        <PhoneInTalkIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.CALLOUT)}}
+        />
+      ),
+    },
+    {
+      label: serviceOrderTypeToString(ServiceOrderType.REPAIR),
+      action: () =>
+        track(() =>
+          navigate(`/orders/new?type=repair&elevatorId=${elevatorId}`),
+        ),
+      icon: (
+        <SettingsIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.REPAIR)}}
+        />
+      ),
+    },
+    {
+      label: serviceOrderTypeToString(ServiceOrderType.REGULAR),
+      action: () =>
+        track(() =>
+          navigate(`/orders/new?type=regular&elevatorId=${elevatorId}`),
+        ),
+      icon: (
+        <RefreshIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.REGULAR)}}
+        />
+      ),
+    },
+    {
+      label: serviceOrderTypeToString(ServiceOrderType.INSPECTION),
+      action: () =>
+        track(() =>
+          navigate(`/orders/new?type=inspection&elevatorId=${elevatorId}`),
+        ),
+      icon: (
+        <YoutubeSearchedForIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.INSPECTION)}}
+        />
+      ),
+    },
+    {
+      label: serviceOrderTypeToString(ServiceOrderType.NEW_INSTALLATION),
+      action: () =>
+        track(() =>
+          navigate(
+            `/orders/new?type=new_installation&elevatorId=${elevatorId}`,
+          ),
+        ),
+      icon: (
+        <BuildCircleIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.NEW_INSTALLATION)}}
+        />
+      ),
+    },
+    {
+      label: serviceOrderTypeToString(ServiceOrderType.MODERNIZATION),
+      action: () =>
+        track(() =>
+          navigate(`/orders/new?type=modernization&elevatorId=${elevatorId}`),
+        ),
+      icon: (
+        <UploadIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.MODERNIZATION)}}
+        />
+      ),
+    },
+    {
+      label: serviceOrderTypeToString(ServiceOrderType.GENERAL),
+      action: () =>
+        track(() =>
+          navigate(`/orders/new?type=general&elevatorId=${elevatorId}`),
+        ),
+      icon: (
+        <HandymanIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.GENERAL)}}
+        />
+      ),
+    },
+  ];
+
   return (
     <>
       <Tabs
+        hideBackIcon
         tabItems={tabItems}
-        currentIndex={value}
-        showActionBtn
         hideDivider
+        showMenuActionBtn
+        menu={menu}
         btnLabel="Create Job"
+        currentIndex={value}
         onChange={(index) => setValue(index)}
-        disableBtnAction={isDeleting}
-        // TODO: Add onClick event to the button
-        btnOnClick={() => console.log('Create Job')}
         containerStyles={{
           marginBottom: theme.spacing(8),
           '& > div:first-child': {marginBottom: theme.spacing(2)},

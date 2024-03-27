@@ -3,9 +3,9 @@ import {Progress} from 'components/Progress';
 import {useLayoutEffect} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {ServiceOrderType} from 'models/service-order';
-import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {convertToMacro} from 'utils/utils';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
 interface Props {
@@ -22,11 +22,11 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   ) as ServiceOrderType;
 
   const {
-    data: quotation,
+    data: elevator,
     isLoading,
     isFetched,
-  } = currentParams.quotationId
-    ? useQuotationDetails(currentParams.quotationId)
+  } = currentParams.elevatorId
+    ? useElevatorById(currentParams.elevatorId)
     : {data: undefined, isLoading: false, isFetched: true};
 
   useLayoutEffect(() => {
@@ -41,7 +41,7 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
 
   return (
     <FlexContainer>
-      <ScheduleServiceOrder type={type} quotation={quotation} />
+      <ScheduleServiceOrder type={type} elevator={elevator} />
     </FlexContainer>
   );
 };
