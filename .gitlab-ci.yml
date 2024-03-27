@@ -72,6 +72,8 @@ variables:
     - pulumi config set --path "mainteny:imageName" ${DOCKER_REGISTRY}/sm-lite:${IMAGE_SUFFIX}-${IMAGE_ENV}
     - pulumi config set mainteny:version ${CI_COMMIT_SHORT_SHA}_$(date '+%Y%m%d')
     - pulumi config set mainteny:deploymentTimeStamp "$(date)"
+    - pulumi cancel
+    - pulumi stack ls
     - pulumi up -y
     - aws cloudfront create-invalidation --distribution-id $(pulumi stack output cdnDistributionId) --paths "$CACHE_PATH"
     - >-
