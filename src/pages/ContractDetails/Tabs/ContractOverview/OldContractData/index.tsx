@@ -17,6 +17,7 @@ import {
   ContractOrderField,
   ContractRequestBody,
   ContractStatus,
+  ContractTermView,
   ContractUpdateRequest,
   ContractView,
 } from 'models/contract';
@@ -48,8 +49,8 @@ import {StatusChip} from 'components/StatusChip';
 import {capitalize} from 'lodash';
 import {Order} from 'models/misc';
 import {createEmptyResource} from 'utils/paging-utils';
-import {ContractPaymentTermsDialog} from 'components/ContactPaymentTermsDialog';
-import {ContractPaymentTermSelectDialog} from 'components/ContractPaymentTermSelectDialog';
+import {ContractTerm} from 'components/ContractTerm';
+import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractBasic} from './ContractBasic';
 import EditContractForm from './EditContractForm';
 import {ContractCard} from './ContractCard';
@@ -95,6 +96,9 @@ export const OldContractData: FC<Props> = ({contractDetails, isLoading}) => {
     openContractPaymentTermSelectDialog,
     setOpenContractPaymentTermSelectDialog,
   ] = useState(false);
+  const [paymentTermToEdit, setPaymentTermToEdit] = useState<
+    ContractTermView | undefined
+  >(undefined);
 
   const [documents, setDocuments] = useState<FileWithPreview[]>([]);
 
@@ -638,7 +642,7 @@ export const OldContractData: FC<Props> = ({contractDetails, isLoading}) => {
               </Box>
             }
             headerActionIcon={<EditIcon />}
-            headerAction={() => setOpenContractPaymentTermSelectDialog(true)}>
+            headerAction={() => setOpenContractPaymentTermsDialog(true)}>
             {contractDetails?.paymentTerm?.term ? (
               <Typography variant="body2">
                 {contractDetails.paymentTerm.term}
@@ -654,22 +658,27 @@ export const OldContractData: FC<Props> = ({contractDetails, isLoading}) => {
               />
             )}
 
-            <ContractPaymentTermSelectDialog
-              title={t('Payment Terms')}
-              alertText={t('Choose a payment term to be used on your invoice')}
-              open={openContractPaymentTermSelectDialog}
-              onSave={handleContractPaymentTermsModal}
-              onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
-              onClickPaymentTerms={() =>
-                setOpenContractPaymentTermsDialog(true)
-              }
-            />
+            {openContractPaymentTermSelectDialog && (
+              <ContractTermInput
+                title={t('New payment term')}
+                open={openContractPaymentTermSelectDialog}
+                onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
+                defaultTerm={paymentTermToEdit}
+                setEdit={setPaymentTermToEdit}
+              />
+            )}
 
-            <ContractPaymentTermsDialog
-              title={t('Manage Payment Terms')}
-              open={openContractPaymentTermsDialog}
-              onCancel={() => setOpenContractPaymentTermsDialog(false)}
-            />
+            {openContractPaymentTermsDialog && (
+              <ContractTerm
+                title={t('Payment Terms')}
+                open={openContractPaymentTermsDialog}
+                onCancel={() => setOpenContractPaymentTermsDialog(false)}
+                onSave={handleContractPaymentTermsModal}
+                defaultValue={formik.values.paymentTermId}
+                onClick={() => setOpenContractPaymentTermSelectDialog(true)}
+                setEdit={setPaymentTermToEdit}
+              />
+            )}
           </ContractCard>
         </Grid>
       </Grid>
