@@ -11,6 +11,7 @@ import {
   Money,
   Order,
 } from './misc';
+import {ServiceCompany} from './service-company';
 
 export enum ArticleType {
   LABOR = 'LABOR',
@@ -198,6 +199,7 @@ export interface ArticleOrderItemRecord {
   quantity: number;
   unit: string;
   description: string;
+  unitSellingAmount: Amount;
 }
 
 export interface CreateArticleOrderRecord {
@@ -252,7 +254,7 @@ export interface ArticleSimpleView {
 
 export interface ArticleOrderItemView {
   id: string;
-  article: ArticleSimpleView;
+  article: ArticleView;
   articleName: string;
   supplierArticleNumber: string;
   quantity: number;
@@ -272,11 +274,12 @@ export interface ArticleOrderView {
   externalId: string;
   articleSupplier: ArticleSupplierSimpleView;
   description: string;
-  status: ArticleOrderStatus;
-  items: ArticleOrderItemView;
+  items: ArticleOrderItemView[];
   additionalInfo: ArticleOrderAdditionalInfo;
+  status: ArticleOrderStatus;
   search: string;
   meta: Meta;
+  serviceCompany: ServiceCompany;
 }
 
 export interface CreateArticleSupplierRecord {

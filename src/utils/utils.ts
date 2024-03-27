@@ -380,3 +380,21 @@ export const convertToHourAndMinutes = (timeInMinutes?: number) => {
 
 export const convertLanguageIfNeeded = (key: string) =>
   languagesToPars[key] || key;
+
+export const getBase64FromUrl = async (url: string) => {
+  const data = await fetch(url);
+  const contentType = data.headers.get('content-type');
+
+  if (contentType && contentType.startsWith('image')) {
+    const blob = await data.blob();
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    return new Promise<string>((resolve) => {
+      reader.onloadend = () => {
+        const base64data = reader.result as string;
+        resolve(base64data);
+      };
+    });
+  }
+  return null;
+};
