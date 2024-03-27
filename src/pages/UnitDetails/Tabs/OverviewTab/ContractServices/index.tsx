@@ -43,6 +43,7 @@ import {Dialog} from 'components/Dialog';
 import {ArticleType, CostPackage} from 'models/article';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {ElevatorView} from 'models/elevator';
+import {Link} from 'react-router-dom';
 import {SxProps} from '@mui/system';
 import {InfoCard} from 'components/InfoCard';
 import {State} from 'models/misc';
@@ -285,11 +286,19 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
                       display: 'inline-block',
                       padding: '0.5em 0em',
                     }}>
-                    <Typography
-                      sx={{color: '#0092B2', fontWeight: '600'}}
-                      variant="body2">
-                      {row?.contractNumber || '-'}
-                    </Typography>
+                    <Link
+                      to={`/contracts/details/${row.contractId}`}
+                      style={{
+                        textDecoration: 'none',
+                        width: 'fit-content',
+                        display: 'inline-block',
+                      }}>
+                      <Typography
+                        sx={{color: '#0092B2', fontWeight: '600'}}
+                        variant="body2">
+                        {row?.contractNumber || '-'}
+                      </Typography>
+                    </Link>
                   </TableCell>
                   <TableCell
                     onClick={() => openViewDialog(row)}
