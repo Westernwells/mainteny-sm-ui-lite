@@ -58,7 +58,7 @@ export const NewJobOrderDetails = ({order}: Props) => (
         icon={Business}
         title={order.elevator.additionalInfo.buildingLocation}
       />
-      <Detail icon={Tag} title={order.elevator.serialNumber} />
+      <Detail icon={Tag} title={order.elevator.externalId} />
     </Box>
   </Box>
 );
