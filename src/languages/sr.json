@@ -2328,7 +2328,7 @@
   "{{numberOfUnits}} Units selected": "Izabrane jedinice: {{numberOfUnits}}",
   "1 Unit selected": "1 Izabrana jedinica",
   "Engineer(s)": "inženjer(i)",
-  "{{numberOfSelectedEngineers}} Engineer(s) Selected": "Izabran inženjer",
+  "{{numberOfSelectedEngineers}} Engineer(s) Selected": "{{numberOfSelectedEngineers}} Inženjer je izabran",
   "Baden-Württemberg": "Baden-Virtemberg",
   "Bayern": "Bajern",
   "Bavaria": "Bavaria",
