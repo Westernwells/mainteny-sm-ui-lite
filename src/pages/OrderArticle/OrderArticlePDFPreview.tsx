@@ -33,8 +33,9 @@ const styles = StyleSheet.create({
   page: {
     fontFamily: 'Montserrat',
     fontSize: 8,
-    paddingVertical: 25,
-    paddingHorizontal: 35,
+    paddingTop: 25,
+    paddingLeft: 68,
+    paddingRight: 45,
     backgroundColor: 'white',
     height: '100%',
     minHeight: '100vh',
@@ -42,11 +43,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     position: 'relative',
     justifyContent: 'space-between',
+    paddingBottom: 80,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   topSection: {
     flexDirection: 'row',
@@ -56,7 +58,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   leftAddress: {
-    flex: '0 0 65%',
+    flex: '0 0 70%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -103,12 +105,12 @@ const styles = StyleSheet.create({
   },
   dataBody: {
     borderBottom: '1px solid #212121',
-    paddingBottom: 6,
+    paddingBottom: 1,
   },
   contentHeader: {
     fontSize: 14,
     color: '#212121',
-    marginTop: 15,
+    marginTop: 10,
     marginBottom: 10,
     fontWeight: 'heavy',
   },
@@ -117,6 +119,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
     marginBottom: 20,
     lineHeight: 1.7,
+    paddingBottom: 5,
   },
   numberColumn: {
     width: '7%',
@@ -175,12 +178,12 @@ const styles = StyleSheet.create({
     paddingVertical: 1.5,
   },
   footerSectionBody: {
-    fontSize: 6,
+    fontSize: 4.5,
     fontWeight: 'light',
     color: '#616161',
     display: 'flex',
     flexDirection: 'column',
-    paddingVertical: 1.5,
+    paddingVertical: 0.5,
   },
   footerWrapper: {
     display: 'flex',
@@ -202,10 +205,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    flex: '0 0 80%',
+    flex: '0 0 70%%',
   },
   emailText: {
-    fontSize: 6,
+    fontSize: 4,
     color: '#616161',
     fontWeight: 'light',
   },
@@ -215,6 +218,7 @@ const styles = StyleSheet.create({
   table: {
     width: '100%',
     display: 'flex',
+    marginTop: 10,
   },
   tableHead: {
     display: 'flex',
@@ -225,18 +229,24 @@ const styles = StyleSheet.create({
     color: '#8f9bb3',
     display: 'flex',
     fontWeight: 'extrabold',
+    fontSize: 8,
   },
   tableRow: {
     display: 'flex',
     flexDirection: 'row',
-    marginTop: 8,
-    fontSize: 10,
+    fontSize: 9,
+    marginVertical: 2.5,
   },
   footerContainer: {
-    display: 'flex',
     flexDirection: 'column',
     width: '100%',
-    paddingTop: 7,
+    paddingTop: 10,
+    marginTop: 35,
+    height: 55,
+    position: 'absolute',
+    bottom: 30,
+    left: 68,
+    right: 45,
   },
   descriptionText: {
     width: '25%',
@@ -528,27 +538,30 @@ const OrderArticlePDFPreview = React.memo(
                           )}
                         </Text>
                       </View>
-                      <Text style={styles.descriptionText}>
-                        {articleOrderItem?.description}
-                      </Text>
+                      {articleOrderItem?.description.trim() !== '' && (
+                        <Text style={styles.descriptionText}>
+                          {articleOrderItem?.description}
+                        </Text>
+                      )}
                     </View>
                   ))}
                 </View>
 
                 <View>
                   <View style={styles.tableRow}>
-                    <Text style={{width: '54%'}} />
+                    <Text style={{width: '44%'}} />
                     <Text
                       style={{
-                        width: '26%',
+                        width: '32%',
                         color: '#616161',
                         fontSize: '9px',
+                        textAlign: 'right',
                       }}>
                       {t('Subtotal (excl. VAT)')}
                     </Text>
                     <Text
                       style={{
-                        width: '20%',
+                        width: '24%',
                         textAlign: 'right',
                         fontSize: '9px',
                       }}>
@@ -559,18 +572,19 @@ const OrderArticlePDFPreview = React.memo(
                   <View>
                     {uniqueVATPercentages.map((vatPercentage) => (
                       <View style={styles.tableRow} key={vatPercentage}>
-                        <Text style={{width: '54%'}} />
+                        <Text style={{width: '44%'}} />
                         <Text
                           style={{
-                            width: '26%',
+                            width: '32%',
                             color: '#616161',
                             fontSize: '9px',
+                            textAlign: 'right',
                           }}>
                           {t('VAT {{vatPercentage}}%', {vatPercentage})}
                         </Text>
                         <Text
                           style={{
-                            width: '20%',
+                            width: '24%',
                             textAlign: 'right',
                             fontSize: '8px',
                           }}>
@@ -583,19 +597,20 @@ const OrderArticlePDFPreview = React.memo(
                   </View>
 
                   <View style={styles.tableRow}>
-                    <Text style={{width: '54%'}} />
+                    <Text style={{width: '44%'}} />
                     <Text
                       style={{
-                        width: '26%',
+                        width: '32%',
                         color: '#212121',
                         fontWeight: 'bold',
                         fontSize: '8px',
+                        textAlign: 'right',
                       }}>
                       {t('Total (incl. VAT)')}
                     </Text>
                     <Text
                       style={{
-                        width: '20%',
+                        width: '24%',
                         textAlign: 'right',
                         color: '#212121',
                         fontWeight: 'bold',
@@ -653,7 +668,7 @@ const OrderArticlePDFPreview = React.memo(
             <View style={styles.footerWrapper}>
               <View style={styles.leftFooter}>
                 <View style={{flex: '0 0 38%'}}>
-                  <Text style={{paddingVertical: 3, fontSize: 6.5}}>
+                  <Text style={{paddingVertical: 0.5, fontSize: 5}}>
                     {userInfo?.serviceCompany.name}
                   </Text>
                   <Text style={styles.footerSectionBody}>
@@ -670,7 +685,7 @@ const OrderArticlePDFPreview = React.memo(
                   </Text>
                 </View>
                 <View style={{flex: '0 0 27%', marginRight: 4}}>
-                  <Text style={{paddingVertical: 3, fontSize: 6.5}}>
+                  <Text style={{paddingVertical: 0.5, fontSize: 5}}>
                     {t('Bank')}:
                   </Text>
                   <Text style={styles.footerSectionBody}>
@@ -690,9 +705,9 @@ const OrderArticlePDFPreview = React.memo(
                   </Text>
                 </View>
 
-                <View style={{flex: '0 0 31%', marginLeft: 4}}>
+                <View style={{flex: '0 0 35%', marginLeft: 4}}>
                   {userInfo?.serviceCompany.settings.managingDirector && (
-                    <Text style={{paddingVertical: 3, fontSize: 6.5}}>
+                    <Text style={{paddingVertical: 0.5, fontSize: 5}}>
                       {t('Managing Director')}:{' '}
                       {userInfo?.serviceCompany.settings.managingDirector}
                     </Text>
@@ -735,7 +750,7 @@ const OrderArticlePDFPreview = React.memo(
                   {userInfo?.serviceCompany.contact.email}
                 </Text>
                 <Text
-                  style={{...styles.emailText, flex: '0 0 31%', marginLeft: 4}}
+                  style={{...styles.emailText, flex: '0 0 35%', marginLeft: 4}}
                 />
               </View>
               <Text
