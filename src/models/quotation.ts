@@ -2,6 +2,7 @@ import {ArticleType, ArticleView, CostPackage} from './article';
 import {ElevatorView} from './elevator';
 import {AlternativeServiceCompanyInfo, Discount} from './invoice';
 import {AddressRecord, Amount, AmountRecord, Meta, Order} from './misc';
+import {PropertyOwnerView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
 
 export enum QuotationStatus {
@@ -82,6 +83,7 @@ export interface QuotationView {
   meta: Meta;
   items: QuotationItem[];
   commentCount?: number;
+  propertyOwner?: PropertyOwnerView;
 }
 
 export interface QueryQuotationParams {
