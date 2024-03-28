@@ -11,6 +11,7 @@ import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {
   CheckList,
   CreateCheckListRecord,
+  ServiceOrderCheckListView,
   UpdateCheckListRecord,
 } from 'models/checklist';
 import {useUserSession} from './useUserSession';
@@ -145,3 +146,34 @@ export const useDeleteChecklist = (successMsg?: string) => {
     },
   });
 };
+
+export const queryServiceOrderChecklists = async (
+  serviceOrderId: string,
+  params?: {technicianId?: string},
+) => {
+  const response = await axiosClient.get<ServiceOrderCheckListView[]>(
+    `/api/serviceOrders/${serviceOrderId}/checkLists`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQueryServiceOrderChecklists = ({
+  serviceOrderId,
+  params,
+  options,
+}: {
+  serviceOrderId: string;
+  params?: {technicianId?: string};
+  options?: UseQueryOptions<any, any, any>;
+}) =>
+  useQuery<ServiceOrderCheckListView[], RestError>(
+    [queryKeys.queryServiceOrderChecklists, serviceOrderId],
+    () => queryServiceOrderChecklists(serviceOrderId, params),
+    {
+      ...options,
+    },
+  );

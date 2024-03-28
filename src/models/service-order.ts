@@ -113,11 +113,11 @@ export enum ChecklistStatus {
 
 export interface ServiceOrderCheckListInfo {
   checkListId: string;
-  technicianSignature: string;
-  pdfPath: string;
-  pdfGenerationStatus: PdfGenerationStatus;
-  status: ChecklistStatus;
+  technicianId: string;
+  pdfGenerationStatus?: PdfGenerationStatus;
+  status?: ChecklistStatus;
 }
+
 export interface ServiceOrder {
   id: string;
   number: string;
@@ -152,7 +152,14 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
   priority: Priority;
-  checkListInfo?: ServiceOrderCheckListInfo;
+  checkListInfo?: {
+    checkListId?: string;
+    technicianSignature?: string;
+    pdfPath?: string;
+    pdfGenerationStatus?: PdfGenerationStatus;
+    completedAt?: string;
+    status?: ChecklistStatus;
+  };
   moreInformation: string;
   quotationId: string;
   workReportGenerated: boolean;
@@ -222,6 +229,7 @@ export interface ServiceOrderView {
   report?: ServiceOrderReportView;
   reports?: ServiceOrderReportView[];
   additionalInfo: ServiceOrderAdditionalInfo;
+  checkLists?: ServiceOrderCheckListInfo[];
 }
 
 export interface ServiceOrderSimpleView {

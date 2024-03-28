@@ -53,7 +53,7 @@ import {LinearProgress, linearProgressClasses} from '@mui/material';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import GradingOutlinedIcon from '@mui/icons-material/GradingOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
-import {useServiceOrderCheckList} from 'hooks/reactQuery/useServiceOrder';
+import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
 import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
@@ -99,35 +99,45 @@ export const ViewInvoice = ({
     getInvoicePDFStatuses(invoice);
   const serviceOrder = invoice?.serviceOrder;
 
-  const {data: serviceOrderCheckList} = useServiceOrderCheckList(
-    serviceOrder?.additionalInfo.checkListInfo?.checkListId && serviceOrder.id,
-  );
+  const {data: serviceOrderCheckLists} = useQueryServiceOrderChecklists({
+    serviceOrderId: serviceOrder?.id || '',
+    options: {
+      enabled: !!serviceOrder?.id,
+    },
+  });
 
-  const checklistSummary = useMemo(() => {
-    const componentsWithoutHead =
-      serviceOrderCheckList?.components.filter(
-        (c) => c.type !== CheckListComponentType.HEAD,
-      ) ?? [];
-    const doneList = componentsWithoutHead.filter((item) => {
-      if (item.type === CheckListComponentType.TEXT) {
-        return !!item.additionalInfo.note;
-      }
+  const checklistSummaries = useMemo(() => {
+    const data = serviceOrderCheckLists?.map((checklist) => {
+      const componentsWithoutHead =
+        checklist?.checkList.components.filter(
+          (c) => c.type !== CheckListComponentType.HEAD,
+        ) ?? [];
+      const doneList = componentsWithoutHead.filter((item) => {
+        if (item.type === CheckListComponentType.TEXT) {
+          return !!item.additionalInfo.note;
+        }
 
-      if (item.additionalInfo.moreInfoInNote && !!item.additionalInfo.note) {
-        return true;
-      }
+        if (item.additionalInfo.moreInfoInNote && !!item.additionalInfo.note) {
+          return true;
+        }
 
-      return (item.additionalInfo.answer?.length || 0) > 0;
+        return (item.additionalInfo.answer?.length || 0) > 0;
+      });
+
+      return {
+        name: checklist?.checkList.name,
+        all: componentsWithoutHead.length,
+        done: doneList.length,
+        percentComplete:
+          componentsWithoutHead.length === 0
+            ? 0
+            : Math.round(
+                (doneList.length / componentsWithoutHead.length) * 100,
+              ),
+      };
     });
-
-    return {all: componentsWithoutHead.length, done: doneList.length};
-  }, [serviceOrderCheckList?.components]);
-
-  const percentComplete = Math.round(
-    checklistSummary.all === 0
-      ? 0
-      : (checklistSummary.done! / checklistSummary.all!) * 100,
-  );
+    return data;
+  }, [serviceOrderCheckLists]);
 
   const actions = useMemo(() => {
     const items = [];
@@ -458,48 +468,59 @@ export const ViewInvoice = ({
           )}
 
           {/* CHECKLIST CARD */}
-          {serviceOrder?.additionalInfo.checkListInfo?.status ===
-            ChecklistStatus.COMPLETED && (
-            <PageCard
-              headerLabel={t('Checklist')}
-              headerIcon={<FactCheckOutlinedIcon sx={{color: '#8F9BB380'}} />}
-              headerStyles={{
-                pt: '11px',
-                mx: 0,
-                px: '1rem',
-              }}
-              headerActionIcon={
-                <OpenInNewIcon
-                  fontSize="small"
-                  sx={{color: theme.palette.secondary.dark}}
-                />
-              }
-              handleAction={() =>
-                navigate(`/orders/details/${serviceOrder?.id}?tab=2`)
-              }>
-              <Typography variant="body1" sx={{m: '0em 0em 0.8em 0em'}}>
-                {serviceOrderCheckList?.name}
-              </Typography>
-              <Box display="flex" justifyContent="space-between">
-                <Typography variant="caption" sx={{fontWeight: '600'}}>
-                  {checklistSummary.done}/{checklistSummary.all} {t('options')}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {percentComplete}% {t('complete')}
-                </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={percentComplete}
-                sx={{
-                  backgroundColor: `${theme.palette.text.secondary}`,
-                  [`& .${linearProgressClasses.bar}`]: {
-                    backgroundColor: '#4CAF50',
-                  },
+          {serviceOrder?.checkLists?.length &&
+            serviceOrder.checkLists.every(
+              (c) => c.status === ChecklistStatus.COMPLETED,
+            ) && (
+              <PageCard
+                headerLabel={t('Checklist')}
+                headerIcon={<FactCheckOutlinedIcon sx={{color: '#8F9BB380'}} />}
+                headerStyles={{
+                  pt: '11px',
+                  mx: 0,
+                  px: '1rem',
                 }}
-              />
-            </PageCard>
-          )}
+                headerActionIcon={
+                  <OpenInNewIcon
+                    fontSize="small"
+                    sx={{color: theme.palette.secondary.dark}}
+                  />
+                }
+                handleAction={() =>
+                  navigate(`/orders/details/${serviceOrder?.id}?tab=2`)
+                }
+                contentContainerStyles={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 3,
+                }}>
+                {checklistSummaries?.map((c, idx) => (
+                  <Box key={`${c.name}-${idx}`}>
+                    <Typography variant="body1" sx={{m: '0em 0em 0.8em 0em'}}>
+                      {c.name}
+                    </Typography>
+                    <Box display="flex" justifyContent="space-between">
+                      <Typography variant="caption" sx={{fontWeight: '600'}}>
+                        {c.done}/{c.all} {t('options')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {c.percentComplete}% {t('complete')}
+                      </Typography>
+                    </Box>
+                    <LinearProgress
+                      variant="determinate"
+                      value={c.percentComplete}
+                      sx={{
+                        backgroundColor: `${theme.palette.text.secondary}`,
+                        [`& .${linearProgressClasses.bar}`]: {
+                          backgroundColor: '#4CAF50',
+                        },
+                      }}
+                    />
+                  </Box>
+                ))}
+              </PageCard>
+            )}
 
           {/* INVOICE ACTIVITY CARD */}
 
