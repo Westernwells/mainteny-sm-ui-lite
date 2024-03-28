@@ -71,11 +71,13 @@ export const formatServiceName = (
 };
 
 export const getRoles = (selectedRole: string) => {
-  let roles: Role[] = [Role.SERVICE_MANAGER, Role.TECHNICIAN];
+  let roles: Role[] = [Role.SERVICE_MANAGER, Role.TECHNICIAN, Role.CONTRACTOR];
   if (selectedRole === 'Service Manager') {
     roles = [Role.SERVICE_MANAGER];
   } else if (selectedRole === 'Technician') {
     roles = [Role.TECHNICIAN];
+  } else if (selectedRole === 'Contractor') {
+    roles = [Role.CONTRACTOR];
   }
 
   return roles;

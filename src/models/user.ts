@@ -12,6 +12,7 @@ export enum Role {
   ADMIN = 'ADMIN',
   SERVICE_MANAGER = 'SERVICE_MANAGER',
   TECHNICIAN = 'TECHNICIAN',
+  CONTRACTOR = 'CONTRACTOR',
 }
 
 export interface UserAccount {
