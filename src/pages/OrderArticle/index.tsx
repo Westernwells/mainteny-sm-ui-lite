@@ -18,6 +18,7 @@ import {
 } from 'hooks/reactQuery/useArticle';
 import {
   ArticleOrderItemRecord,
+  ArticleOrderView,
   ArticleSupplierView,
   ArticleView,
   CreateArticleOrderRecord,
@@ -36,6 +37,7 @@ import {useCurrentCurrency} from 'utils/currency';
 import {ArticleItemsTable} from './ArticleItemsTable';
 import OrderArticlePDF from './OrderArticlePDF';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
+import PdfPreview from './PDFPreview';
 
 const validationSchema = Yup.object().shape({
   serviceCompanyId: Yup.string().required('Service company ID is required'),
@@ -77,18 +79,22 @@ export const OrderArticle = () => {
   const currentCurrency = useCurrentCurrency();
   const [orderId, setOrderId] = useState('');
   const {data: articleOrder, refetch} = useArticleOrder(orderId);
-  const {mutate: createArticleOrder} = useCreateArticleOrder(
-    <Box display="flex" padding="0em" margin="0em" alignItems="center">
-      <img alt={t('Path Image')} src={PathImage} />{' '}
-      <Typography margin="0em" paddingLeft="0.5em" variant="body2">
-        {t('PDF generation is in progress. Please wait...')}
-      </Typography>
-    </Box>,
-  );
+  const {mutate: createArticleOrder, isLoading: isCreating} =
+    useCreateArticleOrder(
+      <Box display="flex" padding="0em" margin="0em" alignItems="center">
+        <img alt={t('Path Image')} src={PathImage} />{' '}
+        <Typography margin="0em" paddingLeft="0.5em" variant="body2">
+          {t('PDF generation is in progress. Please wait...')}
+        </Typography>
+      </Box>,
+    );
   const [supplier, setSupplier] = useState<ArticleSupplierView | undefined>(
     undefined,
   );
   const [items, setItems] = useState<ArticleOrderItemRecord[]>([]);
+  const [newArticleOrder, setNewArticleOrder] = useState<
+    ArticleOrderView | null | undefined
+  >(null);
 
   const [mode, setMode] = useState(DocumentMode.EDIT);
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
@@ -123,12 +129,12 @@ export const OrderArticle = () => {
     formik.setFieldValue('articleSupplierId', row.id);
   };
 
-  const printDocument = async () => {
-    if (articleOrder) {
+  const generatePrintBlobUrl = async () => {
+    if (newArticleOrder) {
       setMode(DocumentMode.PRINT);
       const blob = await pdf(
         <OrderArticlePDF
-          articleOrder={articleOrder!}
+          articleOrder={newArticleOrder!}
           userInfo={user?.userAccount}
           currencyCode={currentCurrency.code}
           logoSrc={imageUrl}
@@ -139,20 +145,30 @@ export const OrderArticle = () => {
     }
   };
 
-  const handlePrint = () => {
+  const handleCreateOrder = () => {
     createArticleOrder(formik.values, {
       onSuccess: async ({value}) => {
         setOrderId(value);
         await waitForSeconds(10);
         refetch();
-
-        await printDocument();
+        setMode(DocumentMode.PRINT);
       },
     });
   };
 
+  const handlePrint = async () => {
+    if (printPdfBlobUrl) {
+      printJS({
+        printable: printPdfBlobUrl,
+        type: 'pdf',
+        showModal: true,
+      });
+    }
+  };
+
   const handlePreview = async () => {
     setMode(DocumentMode.PREVIEW);
+    setNewArticleOrder(null);
     const blob = await pdf(
       <OrderArticlePDFPreview
         supplier={supplier!}
@@ -164,6 +180,11 @@ export const OrderArticle = () => {
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
     setPreviewPdfBlobUrl(blobURL);
+  };
+
+  const handleEdit = () => {
+    setMode(DocumentMode.EDIT);
+    setNewArticleOrder(null);
   };
 
   useEffect(() => {
@@ -216,14 +237,10 @@ export const OrderArticle = () => {
   }, [logoUrl[logoCompany!]]);
 
   useEffect(() => {
-    if (printPdfBlobUrl) {
-      printJS({
-        printable: printPdfBlobUrl,
-        type: 'pdf',
-        showModal: true,
-      });
-    }
-  }, [printPdfBlobUrl]);
+    setNewArticleOrder(articleOrder);
+    generatePrintBlobUrl();
+  }, [articleOrder]);
+
   return (
     <Box>
       <Box
@@ -354,175 +371,19 @@ export const OrderArticle = () => {
           </Box>
         ) : mode === DocumentMode.PREVIEW ? (
           <Box
-            width="min(calc(1240px + 1.25em), 100%)"
-            textAlign="center"
-            sx={{
-              margin: '2em auto',
-            }}>
-            <Box
-              sx={{
-                position: 'relative',
-                maxWidth: '807px',
-                margin: '0 auto',
-              }}>
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  borderWidth: '3px',
-                  borderStyle: 'solid',
-                  zIndex: 1,
-                  borderColor: '#f2f6f8',
-                  width: '100%',
-                }}
-              />
-              <Box
-                sx={{
-                  position: 'absolute',
-                  left: 0,
-                  borderWidth: '13px',
-                  borderStyle: 'solid',
-                  zIndex: 1,
-                  borderColor: '#f2f6f8',
-                  height: '846px',
-                }}
-              />
-
-              <Box
-                sx={{
-                  position: 'absolute',
-                  right: '-1px',
-                  borderWidth: '22px',
-                  borderStyle: 'solid',
-                  zIndex: 1,
-                  borderColor: '#f2f6f8',
-                  height: '829px',
-                  marginTop: '0.4em',
-                }}
-              />
-
-              <Box
-                sx={{
-                  position: 'absolute',
-                  bottom: 0,
-                  borderWidth: '15px',
-                  borderStyle: 'solid',
-                  zIndex: 1,
-                  borderColor: '#f2f6f8',
-                  width: '100%',
-                }}
-              />
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  color: 'white',
-                  position: 'absolute',
-                  textAlign: 'center',
-                  top: '2%',
-                  left: '44%',
-                  zIndex: '100',
-                  fontWeight: '300',
-                }}>
-                {t('Loading Preview...')}
-              </Typography>
-              {previewPdfBlobUrl && (
-                <iframe
-                  title="pdf-loader"
-                  src={`${previewPdfBlobUrl}#toolbar=0`}
-                  loading="eager"
-                  height="842"
-                  style={{maxWidth: '807px', margin: '0 auto'}}
-                  id="pdf-loader"
-                />
-              )}
-            </Box>
+            sx={{margin: '0 auto', display: 'flex', justifyContent: 'center'}}>
+            {previewPdfBlobUrl && <PdfPreview blobUrl={previewPdfBlobUrl} />}
           </Box>
         ) : (
           mode === DocumentMode.PRINT &&
-          articleOrder && (
+          newArticleOrder && (
             <Box
-              width="min(calc(1240px + 1.25em), 100%)"
-              textAlign="center"
               sx={{
-                margin: '2em auto',
+                margin: '0 auto',
+                display: 'flex',
+                justifyContent: 'center',
               }}>
-              <Box
-                sx={{
-                  position: 'relative',
-                  maxWidth: '807px',
-                  margin: '0 auto',
-                }}>
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    borderWidth: '3px',
-                    borderStyle: 'solid',
-                    zIndex: 1,
-                    borderColor: '#f2f6f8',
-                    width: '100%',
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    left: 0,
-                    borderWidth: '13px',
-                    borderStyle: 'solid',
-                    zIndex: 1,
-                    borderColor: '#f2f6f8',
-                    height: '846px',
-                  }}
-                />
-
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    right: '-1px',
-                    borderWidth: '22px',
-                    borderStyle: 'solid',
-                    zIndex: 1,
-                    borderColor: '#f2f6f8',
-                    height: '829px',
-                    marginTop: '0.4em',
-                  }}
-                />
-
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    bottom: 0,
-                    borderWidth: '15px',
-                    borderStyle: 'solid',
-                    zIndex: 1,
-                    borderColor: '#f2f6f8',
-                    width: '100%',
-                  }}
-                />
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: 'white',
-                    position: 'absolute',
-                    textAlign: 'center',
-                    top: '2%',
-                    left: '44%',
-                    zIndex: '100',
-                    fontWeight: '300',
-                  }}>
-                  {t('Loading Article Order...')}
-                </Typography>
-                {printPdfBlobUrl && (
-                  <iframe
-                    title="pdf-loader"
-                    src={`${printPdfBlobUrl}#toolbar=0`}
-                    loading="eager"
-                    height="842"
-                    style={{maxWidth: '807px', margin: '0 auto'}}
-                    id="pdf-loader"
-                  />
-                )}
-              </Box>
+              {printPdfBlobUrl && <PdfPreview blobUrl={printPdfBlobUrl} />}
             </Box>
           )
         )}
@@ -531,7 +392,9 @@ export const OrderArticle = () => {
       <BottomDrawer
         isOpen
         primaryButtonLabel={
-          mode === DocumentMode.PREVIEW || mode === DocumentMode.PRINT ? (
+          mode === DocumentMode.PREVIEW ? (
+            t('Create order')
+          ) : mode === DocumentMode.PRINT ? (
             t('Print order')
           ) : (
             <PDFDownloadLink
@@ -556,7 +419,11 @@ export const OrderArticle = () => {
           )
         }
         primaryButtonAction={
-          mode === DocumentMode.PREVIEW ? handlePrint : handlePreview
+          mode === DocumentMode.PREVIEW
+            ? handleCreateOrder
+            : mode === DocumentMode.PRINT
+            ? handlePrint
+            : handlePreview
         }
         listItems={[]}
         isValid={formik.isValid}
@@ -579,13 +446,8 @@ export const OrderArticle = () => {
                   mode === DocumentMode.PREVIEW && <Edit />
                 ),
               size: 'medium',
-              disabled: !formik.isValid,
-              onClick:
-                mode === DocumentMode.EDIT
-                  ? handlePreview
-                  : () => {
-                      setMode(DocumentMode.EDIT);
-                    },
+              disabled: !formik.isValid || isCreating,
+              onClick: mode === DocumentMode.EDIT ? handlePreview : handleEdit,
             }}
           />
         }
