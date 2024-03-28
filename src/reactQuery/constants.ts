@@ -81,6 +81,7 @@ export const queryKeys = {
   fetchXeroAuthUrl: 'fetchXeroAuthUrl',
   fetchServiceJobArticles: 'fetchServiceJobArticles',
   fetchEntitiesStates: 'fetchEntitiesStates',
+  queryServiceOrderChecklists: 'queryServiceOrderChecklists',
   queryContractPaymentTerms: 'queryContractPaymentTerms',
 
   // GOOGLE GEOCODE API

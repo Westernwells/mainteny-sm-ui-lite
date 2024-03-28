@@ -1,4 +1,5 @@
-import {Meta} from './misc';
+import {Meta, PdfGenerationStatus} from './misc';
+import {ChecklistStatus} from './service-order';
 
 export enum CheckListComponentType {
   HEAD = 'HEAD',
@@ -100,4 +101,19 @@ export interface ExtendedUpdateCheckListRecord {
   name?: string;
   externalId?: string;
   components: ExtendedCheckListComponentRecord[];
+}
+
+export interface ServiceOrderCheckListAdditionalInfo {
+  technicianSignature?: string;
+  pdfPath?: string;
+  pdfGenerationStatus?: PdfGenerationStatus;
+  status?: ChecklistStatus;
+  completedAt?: string;
+}
+
+export interface ServiceOrderCheckListView {
+  technicianId: string;
+  checkListId: string;
+  checkList: CheckList;
+  additionalInfo: ServiceOrderCheckListAdditionalInfo;
 }

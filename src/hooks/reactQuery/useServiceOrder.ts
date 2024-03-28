@@ -783,11 +783,16 @@ export const useConfirmAppointment = () => {
 
 export const postPublishChecklist = async (
   id: string,
+  params: {checkListId?: string; technicianId?: string},
   body: SimpleEmailRecord,
 ) => {
   await axiosClient.post<{value: string}>(
     `api/serviceOrders/${id}/checkList/publish`,
     body,
+    {
+      params,
+      paramsSerializer,
+    },
   );
 };
 
@@ -795,8 +800,15 @@ export const usePublishChecklist = () => {
   const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
-    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
-      postPublishChecklist(id, body),
+    ({
+      id,
+      params,
+      body,
+    }: {
+      id: string;
+      params: {checkListId?: string; technicianId?: string};
+      body: SimpleEmailRecord;
+    }) => postPublishChecklist(id, params, body),
     {
       onSuccess: () => {
         enqueueSnackbar(`CheckList sent successfully`, {
