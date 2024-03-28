@@ -430,7 +430,8 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                         },
                       },
                     }}
-                    key={text}>
+                    key={text}
+                    data-testid={`${text}-nav-item`}>
                     <ListItemIcon
                       sx={{
                         minWidth: 0,
