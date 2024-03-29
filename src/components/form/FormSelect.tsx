@@ -6,14 +6,18 @@ import Checkbox from '@mui/material/Checkbox';
 import Select, {SelectProps} from '@mui/material/Select';
 import useTheme from '@mui/material/styles/useTheme';
 import {SxProps} from '@mui/system';
-import {capitalize} from 'utils/utils';
+import {capitalize, companyLanguageContextMap} from 'utils/utils';
 import {useTranslation} from 'react-i18next';
 import SettingsIcon from '@mui/icons-material/Settings';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useMemo} from 'react';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 
 interface Props<T> {
   labelId: string;
   label: string;
   required?: boolean;
+  isCompanyTranslation?: boolean;
   options: {
     label: string;
     value: string;
@@ -46,17 +50,35 @@ export const FormSelect = ({
   labelId,
   label,
   options,
-  required = false,
   labelStyles,
   selectStyles,
   selectProps,
-  errorText = '',
   containerStyles,
   resetOption,
   onClickPaymentTerms,
+  errorText = '',
+  required = false,
+  isCompanyTranslation = false,
 }: Props<string | string[]>) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const {user} = useUserSession();
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  });
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (isCompanyTranslation && company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
   return (
     <FormControl sx={{...containerStyles}} fullWidth required={required}>
       <InputLabel
@@ -94,7 +116,7 @@ export const FormSelect = ({
               ({value}) => value === selectProps?.value,
             )?.label;
           }
-          return typeof selectValue === 'string' ? t(selectValue) : '';
+          return typeof selectValue === 'string' ? translate(selectValue) : '';
         }}
         value={selectProps?.value}
         sx={selectStyles}
@@ -102,7 +124,7 @@ export const FormSelect = ({
         {...selectProps}>
         {resetOption && (
           <MenuItem value="" sx={{color: theme.palette.grey[500]}}>
-            {t(resetOption.label)}
+            {translate(resetOption.label)}
           </MenuItem>
         )}
         {[
@@ -121,7 +143,7 @@ export const FormSelect = ({
                   }
                 />
               ) : null}
-              {t(option.label)}
+              {translate(option.label)}
             </MenuItem>
           )),
           selectProps?.name === 'paymentTermId' && [
@@ -134,7 +156,7 @@ export const FormSelect = ({
                 }}
                 key="none"
                 value="none">
-                {t('None')}
+                {translate('None')}
               </MenuItem>
             ),
 

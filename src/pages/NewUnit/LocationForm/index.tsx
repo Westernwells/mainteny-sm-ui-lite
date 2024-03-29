@@ -171,6 +171,7 @@ export const LocationForm = ({
                 onChange: formik.handleChange,
               }}
               required
+              isCompanyTranslation
             />
           </Grid>
 
@@ -189,6 +190,7 @@ export const LocationForm = ({
                 onChange: formik.handleChange,
               }}
               required
+              isCompanyTranslation
             />
           </Grid>
         </Grid>
