@@ -418,6 +418,7 @@ export const EditCustomerForm = ({
               multiple: false,
               ...defaultProps,
             }}
+            isCompanyTranslation
           />
         </Grid>
         <Grid item md={2.5}>
@@ -434,6 +435,7 @@ export const EditCustomerForm = ({
               multiple: false,
               onChange: handleChange,
             }}
+            isCompanyTranslation
           />
         </Grid>
       </Grid>
@@ -524,6 +526,7 @@ export const EditCustomerForm = ({
                 ...defaultProps,
                 onChange: handleChange,
               }}
+              isCompanyTranslation
             />
           </Grid>
           <Grid item md={2.5}>
@@ -541,6 +544,7 @@ export const EditCustomerForm = ({
                 ...defaultProps,
                 onChange: handleChange,
               }}
+              isCompanyTranslation
             />
           </Grid>
         </Grid>
@@ -642,6 +646,7 @@ export const EditCustomerForm = ({
                 multiple: false,
                 onChange: handleChange,
               }}
+              isCompanyTranslation
             />
           </Grid>
           <Grid item md={2.5}>
@@ -658,6 +663,7 @@ export const EditCustomerForm = ({
                 multiple: false,
                 ...defaultProps,
               }}
+              isCompanyTranslation
             />
           </Grid>
         </Grid>

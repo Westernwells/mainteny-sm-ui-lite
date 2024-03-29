@@ -124,6 +124,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
               multiple: false,
               onChange: formik.handleChange,
             }}
+            isCompanyTranslation
           />
         </Grid>
         <Grid item md={2.5}>
@@ -140,6 +141,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
               multiple: false,
               onChange: formik.handleChange,
             }}
+            isCompanyTranslation
           />
         </Grid>
       </Grid>
@@ -230,6 +232,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
                 multiple: false,
                 onChange: formik.handleChange,
               }}
+              isCompanyTranslation
             />
           </Grid>
           <Grid item md={2.5}>
@@ -246,6 +249,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
                 multiple: false,
                 onChange: formik.handleChange,
               }}
+              isCompanyTranslation
             />
           </Grid>
         </Grid>
@@ -347,6 +351,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
                 multiple: false,
                 onChange: formik.handleChange,
               }}
+              isCompanyTranslation
             />
           </Grid>
           <Grid item md={2.5}>
@@ -363,6 +368,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
                 multiple: false,
                 onChange: formik.handleChange,
               }}
+              isCompanyTranslation
             />
           </Grid>
         </Grid>

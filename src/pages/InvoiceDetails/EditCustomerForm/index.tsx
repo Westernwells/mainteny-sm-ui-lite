@@ -105,6 +105,7 @@ export const EditCustomerForm = ({
             multiple: false,
             onChange: handleChange,
           }}
+          isCompanyTranslation
         />
       </Grid>
       <Grid item md={3}>
@@ -119,6 +120,7 @@ export const EditCustomerForm = ({
             multiple: false,
             onChange: handleChange,
           }}
+          isCompanyTranslation
         />
       </Grid>
     </Grid>
