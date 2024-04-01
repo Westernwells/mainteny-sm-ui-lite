@@ -23,16 +23,18 @@ import {
   ArticleView,
   CreateArticleOrderRecord,
 } from 'models/article';
-import {getBase64FromUrl, waitForSeconds} from 'utils/utils';
-import {useSnackbar} from 'notistack';
-import {PDFDownloadLink, pdf} from '@react-pdf/renderer';
+import {getBase64FromUrl} from 'utils/utils';
+import {pdf} from '@react-pdf/renderer';
 import printJS from 'print-js';
 import PathImage from 'assets/images/Path.svg';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import Edit from '@mui/icons-material/Edit';
 import {Button} from 'components/Button';
 import useTheme from '@mui/material/styles/useTheme';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {useCurrentCurrency} from 'utils/currency';
 import {ArticleItemsTable} from './ArticleItemsTable';
 import OrderArticlePDF from './OrderArticlePDF';
@@ -71,14 +73,13 @@ export const OrderArticle = () => {
   const {t} = useTranslation();
   const theme = useTheme();
   const location = useLocation();
-  const {enqueueSnackbar} = useSnackbar();
   const articleFromLocation = (location.state as {article: ArticleView})
     ?.article;
   const formatDate = useFormatDate();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const [orderId, setOrderId] = useState('');
-  const {data: articleOrder, refetch} = useArticleOrder(orderId);
+  const {data: articleOrder} = useArticleOrder(orderId);
   const {mutate: createArticleOrder, isLoading: isCreating} =
     useCreateArticleOrder(
       <Box display="flex" padding="0em" margin="0em" alignItems="center">
@@ -100,6 +101,11 @@ export const OrderArticle = () => {
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
   const [printPdfBlobUrl, setPrintPdfBlobUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    `AO_${newArticleOrder?.externalId}`,
+    printPdfBlobUrl,
+  );
 
   const logoCompany =
     user?.userAccount?.serviceCompany?.settings?.whiteLabel?.logoPath;
@@ -131,7 +137,6 @@ export const OrderArticle = () => {
 
   const generatePrintBlobUrl = async () => {
     if (newArticleOrder) {
-      setMode(DocumentMode.PRINT);
       const blob = await pdf(
         <OrderArticlePDF
           articleOrder={newArticleOrder!}
@@ -145,18 +150,23 @@ export const OrderArticle = () => {
     }
   };
 
+  const handleSave = async () => {
+    if (newArticleOrder && printPdfBlobUrl && mode !== DocumentMode.PRINT) {
+      setMode(DocumentMode.PRINT);
+      downloadFile();
+    }
+  };
+
   const handleCreateOrder = () => {
     createArticleOrder(formik.values, {
       onSuccess: async ({value}) => {
         setOrderId(value);
-        await waitForSeconds(10);
-        refetch();
-        setMode(DocumentMode.PRINT);
       },
     });
   };
 
   const handlePrint = async () => {
+    generatePrintBlobUrl();
     if (printPdfBlobUrl) {
       printJS({
         printable: printPdfBlobUrl,
@@ -167,6 +177,7 @@ export const OrderArticle = () => {
   };
 
   const handlePreview = async () => {
+    setPrintPdfBlobUrl('');
     setMode(DocumentMode.PREVIEW);
     setNewArticleOrder(null);
     const blob = await pdf(
@@ -185,6 +196,7 @@ export const OrderArticle = () => {
   const handleEdit = () => {
     setMode(DocumentMode.EDIT);
     setNewArticleOrder(null);
+    setPrintPdfBlobUrl('');
   };
 
   useEffect(() => {
@@ -238,8 +250,19 @@ export const OrderArticle = () => {
 
   useEffect(() => {
     setNewArticleOrder(articleOrder);
-    generatePrintBlobUrl();
   }, [articleOrder]);
+
+  useEffect(() => {
+    if (newArticleOrder && !printPdfBlobUrl) {
+      generatePrintBlobUrl();
+    }
+  }, [newArticleOrder]);
+
+  useEffect(() => {
+    if (printPdfBlobUrl) {
+      handleSave();
+    }
+  }, [printPdfBlobUrl]);
 
   return (
     <Box>
@@ -392,59 +415,25 @@ export const OrderArticle = () => {
       <BottomDrawer
         isOpen
         primaryButtonLabel={
-          mode === DocumentMode.PREVIEW ? (
-            t('Create order')
-          ) : mode === DocumentMode.PRINT ? (
-            t('Print order')
-          ) : (
-            <PDFDownloadLink
-              onClick={() =>
-                enqueueSnackbar(t('Saving PDF'), {
-                  variant: 'info',
-                })
-              }
-              style={{color: 'white', textDecoration: 'none'}}
-              document={
-                <OrderArticlePDFPreview
-                  supplier={supplier!}
-                  formik={formik}
-                  userInfo={user?.userAccount}
-                  logoSrc={imageUrl}
-                  currencyCode={currentCurrency.code}
-                />
-              }
-              fileName={t('preview.pdf')}>
-              {t('Save')}
-            </PDFDownloadLink>
-          )
+          mode === DocumentMode.EDIT || mode === DocumentMode.PREVIEW
+            ? t('Save')
+            : mode === DocumentMode.PRINT && t('Print order')
         }
         primaryButtonAction={
-          mode === DocumentMode.PREVIEW
+          mode === DocumentMode.EDIT || mode === DocumentMode.PREVIEW
             ? handleCreateOrder
-            : mode === DocumentMode.PRINT
-            ? handlePrint
-            : handlePreview
+            : handlePrint
         }
         listItems={[]}
         isValid={formik.isValid}
         secondaryButton={
           <Button
-            label={
-              mode === DocumentMode.EDIT
-                ? 'Preview'
-                : mode === DocumentMode.PREVIEW
-                ? 'Continue editing'
-                : 'Back'
-            }
+            label={mode === DocumentMode.EDIT ? 'Preview' : 'Continue editing'}
             buttonProps={{
               variant: 'outlined',
               sx: {bgcolor: theme.palette.inputBackground.main},
               startIcon:
-                mode === DocumentMode.EDIT ? (
-                  <RemoveRedEye />
-                ) : (
-                  mode === DocumentMode.PREVIEW && <Edit />
-                ),
+                mode === DocumentMode.EDIT ? <RemoveRedEye /> : <Edit />,
               size: 'medium',
               disabled: !formik.isValid || isCreating,
               onClick: mode === DocumentMode.EDIT ? handlePreview : handleEdit,
