@@ -527,42 +527,25 @@ export enum ContactChannel {
   SMS = 'SMS',
 }
 
-export interface CreateScheduledServiceOrderBody {
-  description: string;
-  elevatorId: string;
-  dueDate: string;
-  endTime?: string;
+export interface CreateServiceOrderRecord {
+  type: ServiceOrderType;
   externalId?: string;
-  labels?: string[];
-  moreInformation?: string;
-  priority?: Priority;
-  requireReschedule?: boolean;
-  requireTechnicianNotification?: boolean;
   serviceCompanyId: string;
-  startTime: string;
+  elevatorId: string;
+  description: string;
   technicianIds: string[];
-  type: ServiceOrderType;
-  purchaseOrderNumber?: string;
-  callerInfo?: CallerInfo;
-  quotationId?: string;
-  checkListId?: string;
-  notificationChannels?: ContactChannel[];
-}
-
-export interface CreateNonScheduledServiceOrderBody {
-  description: string;
   dueDate: string;
-  elevatorId: string;
-  externalId?: string;
-  labels?: string[];
-  moreInformation?: string;
+  timeRange?: {
+    start: string;
+    end: string;
+  };
   priority?: Priority;
-  serviceCompanyId: string;
-  type: ServiceOrderType;
+  moreInformation?: string;
+  labels?: string[];
+  quotationId?: string;
   purchaseOrderNumber?: string;
   callerInfo?: CallerInfo;
-  quotationId?: string;
-  checkListId?: string;
+  confirmationChannels?: ContactChannel[];
   notificationChannels?: ContactChannel[];
 }
 

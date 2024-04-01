@@ -9,47 +9,26 @@ import {ScheduleTechnicianForm} from './models';
 
 interface Props {
   getScheduleFormValues: (value: ScheduleTechnicianForm) => void;
+  defaultValues?: ScheduleTechnicianForm;
 }
 
-export const ScheduleForm = ({getScheduleFormValues}: Props) => {
+export const ScheduleForm = ({getScheduleFormValues, defaultValues}: Props) => {
   const {t} = useTranslation();
   const formik = useFormik<
     ScheduleTechnicianForm & {startDate?: Date; endDate?: Date}
   >({
     initialValues: {
-      startDate: undefined,
-      startTime: undefined,
-      endDate: undefined,
-      endTime: undefined,
+      startDate: defaultValues?.startDate || undefined,
+      startTime: defaultValues?.startTime || undefined,
+      endDate: defaultValues?.endDate || undefined,
+      endTime: defaultValues?.endTime || undefined,
     },
     onSubmit: () => {},
   });
 
-  const {startDate, startTime, endDate, endTime} = formik.values;
-
   useEffect(() => {
-    if (!startDate) {
-      return;
-    }
-
-    const startDateTime = new Date(
-      startDate?.getFullYear() || new Date().getFullYear(),
-      startDate?.getMonth() || new Date().getMonth(),
-      startDate?.getDate() || new Date().getDate(),
-      startTime?.getHours() || new Date().getHours(),
-      startTime?.getMinutes() || new Date().getMinutes(),
-    );
-    const endDateTime = new Date(
-      endDate?.getFullYear() || new Date().getFullYear(),
-      endDate?.getMonth() || new Date().getMonth(),
-      endDate?.getDate() || new Date().getDate(),
-      endTime?.getHours() || new Date().getHours(),
-      endTime?.getMinutes() || new Date().getMinutes(),
-    );
-
     getScheduleFormValues({
-      startTime: startDateTime,
-      endTime: endDateTime,
+      ...formik.values,
     });
   }, [formik.values]);
 

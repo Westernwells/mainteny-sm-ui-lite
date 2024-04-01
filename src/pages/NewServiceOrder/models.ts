@@ -1,4 +1,6 @@
 export interface ScheduleTechnicianForm {
+  startDate?: Date;
+  endDate?: Date;
   startTime?: Date;
   endTime?: Date;
 }

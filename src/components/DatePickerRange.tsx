@@ -60,14 +60,8 @@ const DatePickerRange = ({
       }
     }, 100);
   };
-  const [dateSelectionFinalized, setDateSelectionFinalized] =
-    useState<boolean>(false);
 
   const handleSelect = () => {
-    if (dateSelectionFinalized) {
-      getSelectedDate(value);
-    }
-    setDateSelectionFinalized(false);
     setOpen(false);
   };
 
@@ -163,7 +157,7 @@ const DatePickerRange = ({
             maxDate={maxDate}
             onChange={(newDateRange: DateRange<Date>) => {
               setValue(newDateRange);
-              setDateSelectionFinalized(true);
+              getSelectedDate(newDateRange);
             }}
             slotProps={
               {

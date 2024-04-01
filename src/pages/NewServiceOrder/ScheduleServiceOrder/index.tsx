@@ -2,15 +2,13 @@ import {Typography} from '@mui/material';
 import {t} from 'i18next';
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
-import {
-  useCreateNonScheduledServiceOrder,
-  useCreateScheduledServiceOrder,
-} from 'hooks/reactQuery/useServiceOrder';
+import {useCreateServiceOrder} from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
 import {useEffect, useRef, useState} from 'react';
 import {
   AssignmentDescriptionOrderModel,
   ContactChannel,
+  CreateServiceOrderRecord,
   Priority,
   ServiceOrderType,
 } from 'models/service-order';
@@ -63,14 +61,8 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
       purchaseOrderNumber: '',
     });
 
-  const {
-    mutateAsync: createScheduledServiceOrder,
-    isLoading: isSchedulingOrder,
-  } = useCreateScheduledServiceOrder('Order scheduled successfully');
-  const {
-    mutateAsync: createNonScheduledServiceOrder,
-    isLoading: isCreatingNonScheduledOrder,
-  } = useCreateNonScheduledServiceOrder('Order created successfully');
+  const {mutateAsync: createServiceOrder, isLoading: isCreatingOrder} =
+    useCreateServiceOrder('Order scheduled successfully');
 
   const [recommendedTechnicians, setRecommendedTechnicians] = useState<
     EmployeesView[]
@@ -106,12 +98,29 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
     setDescription('');
   };
 
-  const createScheduledOrder = async () => {
+  const startDateTime = scheduleFormValue?.startDate
+    ? new Date(
+        scheduleFormValue.startDate.getFullYear(),
+        scheduleFormValue.startDate.getMonth(),
+        scheduleFormValue.startDate.getDate(),
+        scheduleFormValue?.startTime?.getHours() || new Date().getHours(),
+        scheduleFormValue?.startTime?.getMinutes() || new Date().getMinutes(),
+      )
+    : null;
+  const endDateTime = scheduleFormValue?.endDate
+    ? new Date(
+        scheduleFormValue.endDate.getFullYear(),
+        scheduleFormValue.endDate.getMonth(),
+        scheduleFormValue.endDate.getDate(),
+        scheduleFormValue?.endTime?.getHours() || new Date().getHours(),
+        scheduleFormValue?.endTime?.getMinutes() || new Date().getMinutes(),
+      )
+    : null;
+
+  const createOrder = async () => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id!;
     const dueDate = formatDate(dueDateFormValue?.date!, 'yyy-MM-dd')!;
-    const startTime = toRestDateTime(scheduleFormValue!.startTime!);
-    const endTime = toRestDateTime(scheduleFormValue!.endTime!);
-    const body = {
+    const body: CreateServiceOrderRecord = {
       dueDate,
       description,
       elevatorId: currentParams.elevatorId || selectedUnit!.id,
@@ -120,75 +129,43 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
       serviceCompanyId,
       technicianIds: selectedTechnicians.map((item) => item.id),
       type,
-      requireReschedule: true,
-      requireTechnicianNotification,
-      startTime,
-      endTime,
+      ...(startDateTime && endDateTime
+        ? {
+            timeRange: {
+              start: toRestDateTime(startDateTime),
+              end: toRestDateTime(endDateTime),
+            },
+          }
+        : {}),
       quotationId: currentParams.quotationId || '',
       callerInfo: {
         calledAt: descriptionValues.callTime ?? null,
         name: descriptionValues.callerName ?? '',
       },
       purchaseOrderNumber: descriptionValues.purchaseOrderNumber ?? '',
-      notificationChannels,
+      ...(requireTechnicianNotification
+        ? {confirmationChannels: notificationChannels}
+        : {notificationChannels}),
     };
 
-    await createScheduledServiceOrder(body);
+    await createServiceOrder(body);
     navigate('/orders?tab=1');
-  };
-
-  const createNonScheduledOrder = async () => {
-    const serviceCompanyId = user?.userAccount.serviceCompany.id!;
-    const dueDate = formatDate(dueDateFormValue?.date!, 'yyy-MM-dd')!;
-    const body = {
-      description,
-      elevatorId: currentParams.elevatorId || selectedUnit!.id,
-      externalId: '',
-      priority: Priority.A,
-      serviceCompanyId,
-      type,
-      dueDate,
-      quotationId: currentParams.quotationId || '',
-      callerInfo: {
-        calledAt: descriptionValues.callTime ?? null,
-        name: descriptionValues.callerName ?? '',
-      },
-      purchaseOrderNumber: descriptionValues.purchaseOrderNumber ?? '',
-      notificationChannels,
-    };
-
-    await createNonScheduledServiceOrder(body);
-    navigate('/orders?tab=1');
-  };
-
-  const handleSubmit = async () => {
-    if (
-      selectedTechnicians.length > 0 &&
-      dueDateFormValue?.date &&
-      scheduleFormValue?.startTime &&
-      scheduleFormValue?.endTime
-    ) {
-      return createScheduledOrder();
-    }
-    return createNonScheduledOrder();
   };
 
   const selectedDateTimeString =
-    scheduleFormValue?.startTime && scheduleFormValue.endTime
-      ? `${formatDate(
-          scheduleFormValue.startTime,
-          'dd.MM.yyyy',
-        )} at ${formatDate(scheduleFormValue.startTime, 'HH:mm')}`
+    startDateTime && endDateTime
+      ? `${formatDate(startDateTime, 'dd.MM.yyyy')} at ${formatDate(
+          endDateTime,
+          'HH:mm',
+        )}`
       : '';
 
   return (
     <Stepper
       handleCancel={handleCancel}
-      handleSubmit={() => handleSubmit()}
-      submitting={isCreatingNonScheduledOrder || isSchedulingOrder}
-      disableNextBtn={
-        disableNextBtn || isCreatingNonScheduledOrder || isSchedulingOrder
-      }
+      handleSubmit={createOrder}
+      submitting={isCreatingOrder}
+      disableNextBtn={disableNextBtn || isCreatingOrder}
       initialActiveStep={elevator ? 1 : 0}
       getActiveStep={(val) => setActiveStep(val)}
       steps={steps}
