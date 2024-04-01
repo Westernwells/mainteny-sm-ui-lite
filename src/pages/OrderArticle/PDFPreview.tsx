@@ -60,6 +60,7 @@ const PdfPreview = ({blobUrl}: Props) => {
                     pageIndex={index}
                     renderAnnotationLayer={false}
                     inputRef={pageRef}
+                    scale={1.428}
                   />
                 </div>
               ))}

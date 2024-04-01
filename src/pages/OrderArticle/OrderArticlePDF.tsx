@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   },
   page: {
     fontFamily: 'Montserrat',
-    fontSize: 8,
+    fontSize: 10,
     paddingTop: 25,
     paddingLeft: 68,
     paddingRight: 45,
@@ -42,7 +42,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     position: 'relative',
     justifyContent: 'space-between',
-    paddingBottom: 80,
+    paddingBottom: 95,
+    fontWeight: 'heavy',
   },
   header: {
     flexDirection: 'row',
@@ -53,33 +54,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     marginTop: 20,
   },
   leftAddress: {
-    flex: '0 0 70%',
+    flex: '0 0 50%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
   },
   addressText: {
-    fontSize: 6,
+    fontSize: 8,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   partialAddressText: {
-    fontSize: 8,
+    fontSize: 10,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   partAddress: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   rightAddress: {
     minWidth: 200,
-    flex: '0 0 30%',
+    flex: '0 0 45%',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -92,14 +93,14 @@ const styles = StyleSheet.create({
   },
   tag: {
     fontWeight: 'bold',
-    fontSize: 8,
+    fontSize: 10,
     color: '#212121',
-    flex: '0 0 40%',
+    flex: '0 0 45%',
   },
   tagContent: {
-    fontSize: 8,
+    fontSize: 10,
     color: '#616161',
-    flex: '0 0 50%',
+    flex: '0 0 55%',
     textAlign: 'right',
   },
   dataBody: {
@@ -107,16 +108,17 @@ const styles = StyleSheet.create({
     paddingBottom: 1,
   },
   contentHeader: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#212121',
     marginTop: 10,
     marginBottom: 10,
-    fontWeight: 'heavy',
+    fontWeight: 900,
   },
   contentBody: {
     color: '#616161',
-    fontSize: 9,
-    marginBottom: 5,
+    fontSize: 10,
+    marginBottom: 10,
+    lineHeight: 1.3,
   },
   numberColumn: {
     width: '7%',
@@ -127,7 +129,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   supplierColumn: {
-    width: '15%',
+    width: '20%',
     textAlign: 'left',
   },
   quantityColumn: {
@@ -135,7 +137,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   unitColumn: {
-    width: '10%',
+    width: '5%',
     textAlign: 'center',
   },
   priceColumn: {
@@ -167,7 +169,7 @@ const styles = StyleSheet.create({
     fontWeight: 'extrabold',
   },
   sectionBody: {
-    fontSize: 7,
+    fontSize: 10,
     fontWeight: 'light',
     color: '#616161',
     display: 'flex',
@@ -175,7 +177,7 @@ const styles = StyleSheet.create({
     paddingVertical: 1.5,
   },
   footerSectionBody: {
-    fontSize: 4.5,
+    fontSize: 5,
     fontWeight: 'light',
     color: '#616161',
     display: 'flex',
@@ -200,14 +202,18 @@ const styles = StyleSheet.create({
   },
   leftFooter: {
     display: 'flex',
-    justifyContent: 'space-between',
     flexDirection: 'row',
     flex: '0 0 70%',
+    justifyContent: 'space-between',
   },
   emailText: {
     fontSize: 5,
     color: '#616161',
     fontWeight: 'light',
+  },
+  pageNumberText: {
+    fontSize: 7,
+    color: '#000000',
   },
   numberText: {
     color: '#212121',
@@ -231,35 +237,37 @@ const styles = StyleSheet.create({
   tableRow: {
     display: 'flex',
     flexDirection: 'row',
-    marginTop: 2,
-    fontSize: 9,
+    fontSize: 10,
     marginVertical: 2.5,
   },
   footerContainer: {
-    display: 'flex',
     flexDirection: 'column',
     width: '100%',
     paddingTop: 10,
     marginTop: 35,
-    height: 45,
+    height: 75,
     position: 'absolute',
     bottom: 30,
     left: 68,
     right: 45,
   },
   descriptionText: {
-    width: '25%',
+    width: '45%',
     display: 'flex',
     fontSize: 7,
     color: '#212121',
-    paddingLeft: 25,
+    paddingLeft: 10,
     letterSpacing: -0.15,
     marginTop: 4,
-    lineHeight: 1.5,
+    lineHeight: 1.3,
   },
   qrCode: {
     width: 60,
     height: 60,
+  },
+  footerContent: {
+    marginRight: 10,
+    maxWidth: 130,
   },
 });
 
@@ -339,38 +347,41 @@ const OrderArticlePDF = React.memo(
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
                 <Text style={styles.addressText}>
-                  {userInfo?.serviceCompany.businessAddress?.fullName}
+                  {userInfo?.serviceCompany?.businessAddress?.fullName}
                 </Text>
 
                 <View style={styles.partAddress}>
                   <Text style={styles.partialAddressText}>
-                    {articleOrder?.articleSupplier.name}
+                    {articleOrder?.articleSupplier?.name}
                   </Text>
                   <Text style={styles.partialAddressText}>
-                    {articleOrder?.articleSupplier.address.component?.street}
+                    {articleOrder?.articleSupplier?.address?.component?.street}
                   </Text>
                   <Text style={styles.partialAddressText}>
-                    {articleOrder?.articleSupplier.address.component?.street2}
+                    {articleOrder?.articleSupplier?.address?.component?.street2}
                   </Text>
                   <Text style={styles.partialAddressText}>
-                    {articleOrder?.articleSupplier.address.component
+                    {articleOrder?.articleSupplier?.address?.component
                       ?.postalCode &&
-                      `${articleOrder?.articleSupplier.address.component?.postalCode},`}
-                    {articleOrder?.articleSupplier.address.component?.state &&
-                      `${articleOrder?.articleSupplier.address.component?.state},`}
-                    {articleOrder?.articleSupplier.address.component?.country &&
-                      `${articleOrder?.articleSupplier.address.component?.country}`}
+                      `${articleOrder?.articleSupplier?.address?.component?.postalCode},`}
+                    {articleOrder?.articleSupplier?.address?.component?.state &&
+                      `${articleOrder?.articleSupplier?.address?.component?.state},`}
+                    {articleOrder?.articleSupplier?.address?.component
+                      ?.country &&
+                      `${articleOrder?.articleSupplier?.address?.component?.country}`}
                   </Text>
                 </View>
               </View>
 
               <View style={styles.rightAddress}>
-                <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}> {t('Order number')}</Text>
-                  <Text style={styles.tagContent}>
-                    {articleOrder?.externalId || '-'}
-                  </Text>
-                </View>
+                {articleOrder?.externalId && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}> {t('Order no.')}</Text>
+                    <Text style={styles.tagContent}>
+                      {articleOrder?.externalId || '-'}
+                    </Text>
+                  </View>
+                )}
 
                 <View style={styles.rightAddressContent}>
                   <Text style={styles.tag}> {t('Order date')}</Text>
@@ -379,24 +390,29 @@ const OrderArticlePDF = React.memo(
                   </Text>
                 </View>
 
-                <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}> {t('Generated by')}</Text>
-                  <Text style={styles.tagContent}>
-                    {articleOrder?.meta.creator?.firstName}{' '}
-                    {articleOrder?.meta.creator?.lastName}
-                  </Text>
-                </View>
+                {(articleOrder?.meta.creator?.firstName ||
+                  articleOrder?.meta.creator?.lastName) && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}> {t('Generated by')}</Text>
+                    <Text style={styles.tagContent}>
+                      {articleOrder?.meta.creator?.firstName}{' '}
+                      {articleOrder?.meta.creator?.lastName}
+                    </Text>
+                  </View>
+                )}
 
-                <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}> {t('Supplier number')}</Text>
-                  <Text style={styles.tagContent}>
-                    {articleOrder?.articleSupplier.externalId || '-'}{' '}
-                  </Text>
-                </View>
+                {articleOrder?.articleSupplier?.externalId && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}> {t('Supplier no.')}</Text>
+                    <Text style={styles.tagContent}>
+                      {articleOrder?.articleSupplier?.externalId || '-'}{' '}
+                    </Text>
+                  </View>
+                )}
 
-                <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}> {t('Customer number')}</Text>
-                </View>
+                {/* <View style={styles.rightAddressContent}>
+                  <Text style={styles.tag}> {t('Customer no.')}</Text>
+                </View> */}
               </View>
             </View>
 
@@ -415,7 +431,7 @@ const OrderArticlePDF = React.memo(
                   <View style={styles.tableRow}>
                     <Text
                       style={{
-                        width: '5%',
+                        width: '2%',
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
@@ -423,7 +439,7 @@ const OrderArticlePDF = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '25%',
+                        width: '45%',
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
@@ -431,7 +447,7 @@ const OrderArticlePDF = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '20%',
+                        width: '10%',
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
@@ -447,8 +463,9 @@ const OrderArticlePDF = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '10%',
+                        width: '3%',
                         textAlign: 'center',
+                        marginLeft: 10,
                         ...styles.tableHeading,
                       }}>
                       {t('UNIT')}
@@ -479,7 +496,7 @@ const OrderArticlePDF = React.memo(
                       <View style={styles.tableRow}>
                         <Text
                           style={{
-                            width: '5%',
+                            width: '2%',
                             textAlign: 'left',
                             color: '#212121',
                           }}>
@@ -487,7 +504,7 @@ const OrderArticlePDF = React.memo(
                         </Text>
                         <Text
                           style={{
-                            width: '25%',
+                            width: '45%',
                             textAlign: 'left',
                             color: '#212121',
                           }}>
@@ -495,7 +512,7 @@ const OrderArticlePDF = React.memo(
                         </Text>
                         <Text
                           style={{
-                            width: '20%',
+                            width: '10%',
                             textAlign: 'left',
                             color: '#212121',
                           }}>
@@ -511,8 +528,9 @@ const OrderArticlePDF = React.memo(
                         </Text>
                         <Text
                           style={{
-                            width: '10%',
+                            width: '3%',
                             textAlign: 'center',
+                            marginLeft: 10,
                             color: '#212121',
                           }}>
                           {articleOrderItem.unit || '-'}
@@ -558,6 +576,11 @@ const OrderArticlePDF = React.memo(
                           {articleOrderItem?.description}
                         </Text>
                       )}
+                      {articleOrderItem?.description.trim() !== '' && (
+                        <Text style={styles.descriptionText}>
+                          {articleOrderItem?.description}
+                        </Text>
+                      )}
                     </View>
                   ))}
                 </View>
@@ -565,12 +588,12 @@ const OrderArticlePDF = React.memo(
                 <View>
                   <View style={styles.tableRow}>
                     <Text style={{width: '44%'}} />
+                    <Text style={{width: '44%'}} />
                     <Text
                       style={{
                         width: '32%',
                         color: '#616161',
-                        fontSize: 9,
-                        textAlign: 'right',
+                        fontSize: '9px',
                       }}>
                       {t('Subtotal (excl. VAT)')}
                     </Text>
@@ -578,7 +601,7 @@ const OrderArticlePDF = React.memo(
                       style={{
                         width: '24%',
                         textAlign: 'right',
-                        fontSize: '9px',
+                        fontSize: 10,
                       }}>
                       {formatCurrency(calculateTotal(articleItems))}
                     </Text>
@@ -592,8 +615,7 @@ const OrderArticlePDF = React.memo(
                           style={{
                             width: '32%',
                             color: '#616161',
-                            fontSize: 9,
-                            textAlign: 'right',
+                            fontSize: '9px',
                           }}>
                           {t('VAT {{vatPercentage}}%', {vatPercentage})}
                         </Text>
@@ -601,7 +623,7 @@ const OrderArticlePDF = React.memo(
                           style={{
                             width: '24%',
                             textAlign: 'right',
-                            fontSize: '8px',
+                            fontSize: 10,
                           }}>
                           {formatCurrency(totalVATMap.get(vatPercentage) ?? 0, {
                             currency: currencyCode,
@@ -619,7 +641,6 @@ const OrderArticlePDF = React.memo(
                         color: '#212121',
                         fontWeight: 'bold',
                         fontSize: '8px',
-                        textAlign: 'right',
                       }}>
                       {t('Total (incl. VAT)')}
                     </Text>
@@ -629,7 +650,7 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'right',
                         color: '#212121',
                         fontWeight: 'bold',
-                        fontSize: '8px',
+                        fontSize: 10,
                       }}>
                       {formatCurrency(
                         calculateTotal(articleItems) +
@@ -658,21 +679,21 @@ const OrderArticlePDF = React.memo(
           <View>
             <Text style={styles.sectionBody}>
               {' '}
-              {articleOrder?.articleSupplier.name}{' '}
+              {articleOrder?.articleSupplier?.name}{' '}
             </Text>
             <Text style={styles.sectionBody}>
               {' '}
               {
-              articleOrder?.articleSupplier.address.component?.postalCode
+              articleOrder?.articleSupplier?.address?.component?.postalCode
               }{' '}
-              {articleOrder?.articleSupplier.address.component?.street}
+              {articleOrder?.articleSupplier?.address?.component?.street}
             </Text>
             <Text style={styles.sectionBody}>
               {' '}
               {
-                articleOrder?.articleSupplier.address.component?.postalCode
+                articleOrder?.articleSupplier?.address?.component?.postalCode
               }{' '}
-              {articleOrder?.articleSupplier.address.component?.street}
+              {articleOrder?.articleSupplier?.address?.component?.street}
             </Text>
           </View>
         </View> */}
@@ -682,47 +703,127 @@ const OrderArticlePDF = React.memo(
           <View fixed style={styles.footerContainer}>
             <View style={styles.footerWrapper}>
               <View style={styles.leftFooter}>
-                <View style={{flex: '0 0 38%'}}>
-                  <Text style={{paddingVertical: 0.5, fontSize: 5}}>
-                    {userInfo?.serviceCompany.name}
-                  </Text>
-                  <Text style={styles.footerSectionBody}>
-                    {userInfo?.serviceCompany.postalAddress?.fullName}
-                  </Text>
-                  <Text style={styles.footerSectionBody}>
-                    {userInfo?.serviceCompany.postalAddress?.component?.state}
-                    {userInfo?.serviceCompany.postalAddress?.component?.state &&
-                      '·'}
-                    {userInfo?.serviceCompany.postalAddress?.component?.country}
-                  </Text>
-                  <Text style={styles.footerSectionBody}>
-                    {t('Tel.')}: {userInfo?.serviceCompany.contact.phone}
-                  </Text>
-                </View>
-                <View style={{flex: '0 0 27%', marginRight: 4}}>
-                  <Text style={{paddingVertical: 0.5, fontSize: 5}}>
-                    {t('Bank')}:
-                  </Text>
-                  <Text style={styles.footerSectionBody}>
-                    {t('Acc. nr.')}:{' '}
-                    {
-                      userInfo?.serviceCompany.settings.paymentInfo
-                        .accountNumber
-                    }
-                  </Text>
-                  <Text style={styles.footerSectionBody}>
-                    {t('IBAN')}:{' '}
-                    {userInfo?.serviceCompany.settings.paymentInfo.iban}
-                  </Text>
-                  <Text style={styles.footerSectionBody}>
-                    {t('BIC')}:{' '}
-                    {userInfo?.serviceCompany.settings.paymentInfo.bic}
-                  </Text>
+                <View style={{...styles.footerContent}}>
+                  {userInfo?.serviceCompany.name && (
+                    <Text
+                      style={{
+                        paddingVertical: 0.5,
+                        fontSize: 5,
+                        fontWeight: 'heavy',
+                      }}>
+                      {userInfo?.serviceCompany.name}
+                    </Text>
+                  )}
+
+                  {userInfo?.serviceCompany.postalAddress?.fullName && (
+                    <Text style={styles.footerSectionBody}>
+                      {userInfo?.serviceCompany.postalAddress?.fullName}
+                    </Text>
+                  )}
+
+                  {userInfo?.serviceCompany.postalAddress?.component?.state ||
+                    (userInfo?.serviceCompany.postalAddress?.component
+                      ?.country && (
+                      <Text style={styles.footerSectionBody}>
+                        {
+                          userInfo?.serviceCompany?.postalAddress?.component
+                            ?.state
+                        }
+                        {userInfo?.serviceCompany?.postalAddress?.component
+                          ?.state && '·'}
+                        {
+                          userInfo?.serviceCompany?.postalAddress?.component
+                            ?.country
+                        }
+                      </Text>
+                    ))}
+
+                  {userInfo?.serviceCompany?.contact?.phone && (
+                    <Text style={styles.footerSectionBody}>
+                      {t('Tel.')}: {userInfo?.serviceCompany.contact.phone}
+                    </Text>
+                  )}
                 </View>
 
-                <View style={{flex: '0 0 35%', marginLeft: 4}}>
+                <View style={{...styles.footerContent}}>
+                  <Text
+                    style={{
+                      paddingVertical: 0.5,
+                      fontSize: 5,
+                      fontWeight: 'heavy',
+                    }}>
+                    {t('Bank')}:
+                  </Text>
+
+                  {userInfo?.serviceCompany.settings.paymentInfo
+                    .accountNumber && (
+                    <Text style={styles.footerSectionBody}>
+                      {t('Acc. nr.')}:{' '}
+                      {
+                        userInfo?.serviceCompany.settings.paymentInfo
+                          .accountNumber
+                      }
+                    </Text>
+                  )}
+
+                  {userInfo?.serviceCompany.settings.paymentInfo.iban && (
+                    <Text style={styles.footerSectionBody}>
+                      {t('IBAN')}:{' '}
+                      {userInfo?.serviceCompany.settings.paymentInfo.iban}
+                    </Text>
+                  )}
+
+                  {userInfo?.serviceCompany.settings.paymentInfo.bic && (
+                    <Text style={styles.footerSectionBody}>
+                      {t('BIC')}:{' '}
+                      {userInfo?.serviceCompany.settings.paymentInfo.bic}
+                    </Text>
+                  )}
+                </View>
+
+                {/* TODO: 2nd bank information  */}
+                {/* <View style={{...styles.footerContent}}>
+                  <Text
+                    style={{
+                      paddingVertical: 0.5,
+                      fontSize: 5,
+                      fontWeight: 'heavy',
+                    }}>
+                    {t('Bank')}:
+                  </Text>
+                  {userInfo?.serviceCompany.settings.paymentInfo
+                    .accountNumber && (
+                    <Text style={styles.footerSectionBody}>
+                      {t('Acc. nr.')}:{' '}
+                      {
+                        userInfo?.serviceCompany.settings.paymentInfo
+                          .accountNumber
+                      }
+                    </Text>
+                  )}
+
+                  {userInfo?.serviceCompany.settings.paymentInfo.iban && (
+                    <Text style={styles.footerSectionBody}>
+                      {t('IBAN')}:{' '}
+                      {userInfo?.serviceCompany.settings.paymentInfo.iban}
+                    </Text>
+                  )}
+
+                  {userInfo?.serviceCompany.settings.paymentInfo.bic && (
+                    <Text style={styles.footerSectionBody}>
+                      {t('BIC')}:{' '}
+                      {userInfo?.serviceCompany.settings.paymentInfo.bic}
+                    </Text>
+                  )}
+                </View> */}
+                <View style={{...styles.footerContent}}>
                   {userInfo?.serviceCompany.settings.managingDirector && (
-                    <Text style={{paddingVertical: 0.5, fontSize: 5}}>
+                    <Text
+                      style={{
+                        paddingVertical: 0.5,
+                        fontSize: 5,
+                        fontWeight: 'heavy',
+                      }}>
                       {t('Managing Director')}:{' '}
                       {userInfo?.serviceCompany.settings.managingDirector}
                     </Text>
@@ -753,35 +854,38 @@ const OrderArticlePDF = React.memo(
 
             <View style={styles.footerEmailWrapper}>
               <View style={styles.leftFooter}>
-                <Text style={{...styles.emailText, flex: '0 0 38%'}}>
-                  {userInfo?.serviceCompany.contact.url}
-                </Text>
+                {userInfo?.serviceCompany.contact.url && (
+                  <Text style={{...styles.emailText, ...styles.footerContent}}>
+                    {userInfo?.serviceCompany.contact.url}
+                  </Text>
+                )}
+
+                {userInfo?.serviceCompany.contact.email && (
+                  <Text
+                    style={{
+                      ...styles.emailText,
+                      ...styles.footerContent,
+                    }}>
+                    {userInfo?.serviceCompany.contact.email}
+                  </Text>
+                )}
+
+                <Text style={{...styles.emailText, ...styles.footerContent}} />
+
+                <Text style={{...styles.emailText, ...styles.footerContent}} />
+              </View>
+              <View>
                 <Text
                   style={{
-                    ...styles.emailText,
-                    flex: '0 0 27%',
-                    marginRight: 4,
-                  }}>
-                  {userInfo?.serviceCompany.contact.email}
-                </Text>
-                <Text
-                  style={{
-                    ...styles.emailText,
-                    flex: '0 0 35%',
+                    ...styles.pageNumberText,
                     marginLeft: 4,
+                    textAlign: 'right',
                   }}
+                  render={({pageNumber, totalPages}) =>
+                    `${pageNumber} / ${totalPages}`
+                  }
                 />
               </View>
-              <Text
-                style={{
-                  ...styles.emailText,
-                  marginLeft: 4,
-                  textAlign: 'right',
-                }}
-                render={({pageNumber, totalPages}) =>
-                  `${pageNumber} / ${totalPages}`
-                }
-              />
             </View>
           </View>
         </Page>
