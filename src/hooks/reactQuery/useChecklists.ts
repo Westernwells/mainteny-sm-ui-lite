@@ -177,3 +177,34 @@ export const useQueryServiceOrderChecklists = ({
       ...options,
     },
   );
+
+const deleteServiceOrderChecklist = ({
+  id,
+  params,
+}: {
+  id: string;
+  params: {checkListId: string; technicianId: string};
+}) =>
+  axiosClient.delete(`/api/serviceOrders/${id}/checkLists`, {
+    params,
+    paramsSerializer,
+  });
+
+export const useDeleteServiceOrderChecklist = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(deleteServiceOrderChecklist, {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      }
+      queryClient.invalidateQueries(queryKeys.queryChecklists);
+    },
+    onError: (err: any) => {
+      console.log(err);
+      showError(err);
+    },
+  });
+};
