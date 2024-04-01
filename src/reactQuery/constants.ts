@@ -83,6 +83,7 @@ export const queryKeys = {
   fetchEntitiesStates: 'fetchEntitiesStates',
   queryServiceOrderChecklists: 'queryServiceOrderChecklists',
   queryContractPaymentTerms: 'queryContractPaymentTerms',
+  queryTravelWorks: 'queryTravelWorks',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

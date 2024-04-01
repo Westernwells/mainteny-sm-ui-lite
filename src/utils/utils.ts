@@ -398,3 +398,11 @@ export const getBase64FromUrl = async (url: string) => {
   }
   return null;
 };
+
+export const scrollTableToBottom = () => {
+  const tableElement = document.querySelector('.MuiDataGrid-virtualScroller');
+
+  if (tableElement) {
+    tableElement.scrollTop = tableElement.scrollHeight;
+  }
+};
