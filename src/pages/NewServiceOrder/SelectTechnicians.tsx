@@ -72,8 +72,17 @@ export const SelectTechnicians = ({
 
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [page] = useState(makePage(0, 500));
+  const scheduledStartDateTime = scheduleFormValue?.startDate
+    ? new Date(
+        scheduleFormValue.startDate.getFullYear(),
+        scheduleFormValue.startDate.getMonth(),
+        scheduleFormValue.startDate.getDate(),
+        scheduleFormValue.startTime?.getHours() || new Date().getHours(),
+        scheduleFormValue.startTime?.getMinutes() || new Date().getMinutes(),
+      )
+    : null;
   const queryDate =
-    scheduleFormValue?.startTime || dueDateFormValue?.date || new Date();
+    scheduledStartDateTime || dueDateFormValue?.date || new Date();
   const [recommendedTechniciansView, setRecommendedTechniciansView] = useState<
     EmployeesView[]
   >(initialRecommendedTechnicians || []);
@@ -226,7 +235,10 @@ export const SelectTechnicians = ({
         containerStyles={{maxWidth: '20rem', py: 3}}
       />
 
-      <ScheduleForm getScheduleFormValues={getScheduleFormValue} />
+      <ScheduleForm
+        getScheduleFormValues={getScheduleFormValue}
+        defaultValues={scheduleFormValue || undefined}
+      />
 
       <Box>
         <TechnicianSchedule

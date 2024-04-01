@@ -33,13 +33,12 @@ import {
   ServiceOrderQueryParams,
   ServiceOrderScheduleParams,
   ServiceOrderView,
-  CreateScheduledServiceOrderBody,
-  CreateNonScheduledServiceOrderBody,
   CompleteServiceOrder,
   UpdateServiceOrderBody,
   AppointmentConfirmationRequiredOrdersQueryParams,
   ServiceOrderArticleView,
   ServiceOrderConfirmationPublishBody,
+  CreateServiceOrderRecord,
 } from 'models/service-order';
 import {
   Order,
@@ -636,56 +635,24 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
   );
 };
 
-const createScheduledServiceOrder = async (
-  body: CreateScheduledServiceOrderBody,
-) =>
-  axiosClient.post<StringValue>('/api/serviceOrders/scheduled', {
+const createServiceOrder = async (body: CreateServiceOrderRecord) =>
+  axiosClient.post<StringValue>('/api/serviceOrders', {
     ...body,
   });
 
-export const useCreateScheduledServiceOrder = (successMsg: string) => {
+export const useCreateServiceOrder = (successMsg: string) => {
   const {enqueueSnackbar, showError} = useSnackbar();
-  return useMutation(
-    (body: CreateScheduledServiceOrderBody) =>
-      createScheduledServiceOrder(body),
-    {
-      onSuccess: () => {
-        enqueueSnackbar(successMsg, {
-          variant: 'success',
-        });
-      },
-      onError: (err) => {
-        console.log(err);
-        showError(err);
-      },
+  return useMutation(createServiceOrder, {
+    onSuccess: () => {
+      enqueueSnackbar(successMsg, {
+        variant: 'success',
+      });
     },
-  );
-};
-
-const createNonScheduledServiceOrder = async (
-  body: CreateNonScheduledServiceOrderBody,
-) =>
-  axiosClient.post<StringValue>('/api/serviceOrders/nonscheduled', {
-    ...body,
+    onError: (err) => {
+      console.log(err);
+      showError(err);
+    },
   });
-
-export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
-  const {enqueueSnackbar, showError} = useSnackbar();
-  return useMutation(
-    (body: CreateNonScheduledServiceOrderBody) =>
-      createNonScheduledServiceOrder(body),
-    {
-      onSuccess: () => {
-        enqueueSnackbar(successMsg, {
-          variant: 'success',
-        });
-      },
-      onError: (err) => {
-        console.log(err);
-        showError(err);
-      },
-    },
-  );
 };
 
 export const queryAppointmentConfirmationRequiredOrders = async (
