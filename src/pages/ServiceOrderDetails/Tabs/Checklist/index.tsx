@@ -11,6 +11,7 @@ import {
   SelectChangeEvent,
   MenuItem,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import Send from '@mui/icons-material/Send';
 import {HandymanOutlined, InfoOutlined} from '@mui/icons-material';
@@ -22,7 +23,10 @@ import {PageCard} from 'components/PageCard';
 import {Progress} from 'components/Progress';
 import {Button} from 'components/Button';
 import {usePublishChecklist} from 'hooks/reactQuery/useServiceOrder';
-import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
+import {
+  useDeleteServiceOrderChecklist,
+  useQueryServiceOrderChecklists,
+} from 'hooks/reactQuery/useChecklists';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {StatusChip} from 'components/StatusChip';
@@ -39,6 +43,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {PdfGenerationStatus} from 'models/misc';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {CardProps} from 'components/CardProps';
+import {Confirm} from 'components/Confirm';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistComponent} from './ChecklistComponent';
 
@@ -60,47 +65,46 @@ export const CheckList = ({serviceOrder}: Props) => {
   const formatDate = useFormatDate();
   const {t} = useTranslation();
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
+  const [deleteChecklistConfirm, setDeleteChecklistConfirm] = useState(false);
 
   const {mutateAsync: publishCheckList, isLoading: publishingCheckList} =
     usePublishChecklist();
+  const {mutateAsync: deleteServiceOrderChecklist, isLoading: isDeleting} =
+    useDeleteServiceOrderChecklist();
 
   const {data: serviceOrderCheckLists, isLoading: isLoadingCheckList} =
     useQueryServiceOrderChecklists({serviceOrderId: serviceOrder.id});
 
-  const isPdfGenerated = serviceOrder.checkLists?.every(
-    (c) => c.pdfGenerationStatus === PdfGenerationStatus.DONE,
+  const completedChecklists = serviceOrderCheckLists?.filter(
+    (c) => c.additionalInfo.status === ChecklistStatus.COMPLETED,
+  );
+
+  const isPdfGenerated = completedChecklists?.every(
+    (c) => c.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE,
   );
 
   const {data: pdfDownloadUrl = {}} = useDownloadUrl(
-    isPdfGenerated && serviceOrderCheckLists?.length
-      ? serviceOrderCheckLists.map((c) => c.additionalInfo.pdfPath || '')
+    isPdfGenerated && completedChecklists?.length
+      ? completedChecklists.map((c) => c.additionalInfo.pdfPath || '')
       : [],
   );
 
   const [pdfPathToDownload, setPdfPathToDownload] = useState('');
-  const {downloadFile} = useDownloadFileWithCustomName(
-    serviceOrder?.number,
-    pdfDownloadUrl[pdfPathToDownload],
-  );
 
   const {data: signatureDownloadUrls = {}} = useDownloadUrl(
-    serviceOrderCheckLists?.length
-      ? serviceOrderCheckLists.map(
+    completedChecklists?.length
+      ? completedChecklists.map(
           (c) => c.additionalInfo.technicianSignature || '',
         )
       : [],
   );
 
   const labels =
-    serviceOrder.checkLists?.map((c) => {
+    completedChecklists?.map((c) => {
       const schedule = serviceOrder.schedules.find(
         (s) => s.technician.id === c.technicianId,
       );
-      const checklistNumber =
-        serviceOrderCheckLists?.find(
-          (serviceOrderCheckList) =>
-            serviceOrderCheckList.checkListId === c.checkListId,
-        )?.checkList.number || 'Unassigned';
+      const checklistNumber = c.checkList.number || 'Unassigned';
       return {
         value: {
           checklistId: c.checkListId,
@@ -111,10 +115,21 @@ export const CheckList = ({serviceOrder}: Props) => {
     }) || [];
 
   const [selectedOption, setSelectedOption] = useState(labels[0]?.value || '');
-  const selectedChecklist = serviceOrderCheckLists?.find(
+  const selectedChecklist = completedChecklists?.find(
     (c) =>
       c.checkListId === selectedOption.checklistId &&
       c.technicianId === selectedOption.technicianId,
+  );
+  const sortedChecklistComponents =
+    selectedChecklist?.checkList?.components.sort(
+      (a, b) =>
+        (a.additionalInfo?.orderNumber ?? 0) -
+        (b.additionalInfo?.orderNumber ?? 0),
+    );
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    selectedChecklist?.checkList.number,
+    pdfDownloadUrl[pdfPathToDownload],
   );
 
   const technicianUserAccount = serviceOrder.schedules.find(
@@ -126,6 +141,19 @@ export const CheckList = ({serviceOrder}: Props) => {
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedOption(JSON.parse(event.target.value));
+  };
+
+  const deleteChecklist = async () => {
+    await deleteServiceOrderChecklist(
+      {
+        id: serviceOrder.id,
+        params: {
+          checkListId: selectedOption.checklistId,
+          technicianId: selectedOption.technicianId,
+        },
+      },
+      {onSuccess: () => setDeleteChecklistConfirm(false)},
+    );
   };
 
   const signaturePath =
@@ -154,6 +182,12 @@ export const CheckList = ({serviceOrder}: Props) => {
   }, [selectedChecklist]);
 
   useEffect(() => {
+    if (completedChecklists?.length && !selectedOption) {
+      setSelectedOption(labels[0].value);
+    }
+  }, [completedChecklists]);
+
+  useEffect(() => {
     setPdfPathToDownload(selectedChecklist?.additionalInfo.pdfPath || '');
   }, [selectedChecklist]);
 
@@ -167,12 +201,7 @@ export const CheckList = ({serviceOrder}: Props) => {
     return <Progress />;
   }
 
-  if (
-    !serviceOrder.checkLists?.length ||
-    !serviceOrder.checkLists?.every(
-      (c) => c.status === ChecklistStatus.COMPLETED,
-    )
-  ) {
+  if (!completedChecklists?.length) {
     return (
       <InfoCard
         disabledHeader
@@ -279,7 +308,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                     {t('Engineer(s)')}
                   </Typography>
                   <Chip
-                    label={serviceOrder.checkLists?.length || 0}
+                    label={completedChecklists?.length || 0}
                     size="small"
                     sx={{
                       color: theme.palette.primary.dark,
@@ -385,7 +414,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                 </Typography>
 
                 <Box display="flex" flexDirection="column" rowGap={3}>
-                  {selectedChecklist?.checkList?.components.map((component) => (
+                  {sortedChecklistComponents?.map((component) => (
                     <ChecklistComponent
                       key={component.id}
                       component={component}
@@ -454,8 +483,21 @@ export const CheckList = ({serviceOrder}: Props) => {
                 </Box>
               )}
             </Box>
+          </Box>
 
-            <Box sx={{display: 'flex', justifyContent: 'flex-end', mb: '1em'}}>
+          <Box display="flex" justifyContent="space-between" p={2}>
+            <Button
+              label="Delete"
+              buttonProps={{
+                color: 'error',
+                variant: 'text',
+                size: 'medium',
+                onClick: () => setDeleteChecklistConfirm(true),
+                sx: {background: 'transparent'},
+                startIcon: <DeleteIcon />,
+              }}
+            />
+            <Box>
               <Button
                 label="Download"
                 buttonProps={{
@@ -515,6 +557,14 @@ export const CheckList = ({serviceOrder}: Props) => {
           </Box>
         </Box>
       </Grid>
+      <Confirm
+        open={deleteChecklistConfirm}
+        onConfirm={deleteChecklist}
+        onClose={() => setDeleteChecklistConfirm(false)}
+        title={t('Delete')}
+        content={t('Do you want to delete this checklist?')}
+        disableActions={isDeleting}
+      />
     </Grid>
   );
 };
