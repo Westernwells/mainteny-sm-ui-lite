@@ -4,6 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
+import {addDays} from 'date-fns';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DraftsIcon from '@mui/icons-material/Drafts';
@@ -231,6 +232,9 @@ export const DraftQuotation = ({
     notes: quotation?.additionalInfo.notes || '',
     items: quotation?.items || [],
     serviceCompanyId: quotation?.serviceCompany.id || '',
+    expiryDate: quotation?.additionalInfo.expiryDate
+      ? new Date(quotation?.additionalInfo.expiryDate)
+      : addDays(new Date(), 14),
   };
 
   const validationSchema = Yup.object().shape({
@@ -998,6 +1002,7 @@ export const DraftQuotation = ({
                 }}
                 textFieldProps={{
                   label: 'Offer valid until',
+                  name: 'expiryDate',
                 }}
               />
             </Box>
