@@ -123,6 +123,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
             multiple: false,
             onChange: formik.handleChange,
           }}
+          isCompanyTranslation
         />
       </Grid>
       <Grid item xs={12} md={6}>
@@ -138,6 +139,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
             multiple: false,
             onChange: formik.handleChange,
           }}
+          isCompanyTranslation
         />
       </Grid>
 

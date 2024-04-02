@@ -70,6 +70,7 @@ export const AddDescription = ({
 
       {selectedUnit ? (
         <Summary label="Selected Unit">
+          <SummaryItem value={selectedUnit?.externalId || ''} />
           <SummaryItem value={selectedUnit?.model || ''} />
           <SummaryItem value={selectedUnit?.propertyOwner?.name || ''} />
           <SummaryItem value={selectedUnit?.address?.fullName || ''} />

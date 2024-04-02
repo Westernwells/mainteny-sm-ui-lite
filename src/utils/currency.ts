@@ -99,6 +99,7 @@ export const Currencies: StringMap<number> = {
   DKK: 2,
   NGN: 2,
   GEL: 2,
+  MXN: 2,
 };
 
 export function getCurrencyFractionDigits(currency: string) {
@@ -168,6 +169,7 @@ export const getCurrencySymbol: {[key: string]: string} = {
   DKK: 'kr.',
   NGN: '₦',
   GEL: '₾',
+  MXN: '$',
 };
 
 export const useCurrentCurrency = (): CurrencyModalType => {
