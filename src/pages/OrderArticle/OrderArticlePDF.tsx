@@ -17,12 +17,19 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Currencies, formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
-import font from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
+import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
+import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 
 Font.register({
-  family: 'Montserrat',
+  family: 'Montserrat-Bold',
   format: 'truetype',
-  src: font,
+  src: MontserratBold,
+});
+
+Font.register({
+  family: 'Montserrat-Regular',
+  format: 'truetype',
+  src: MontserratRegular,
 });
 
 const styles = StyleSheet.create({
@@ -30,7 +37,7 @@ const styles = StyleSheet.create({
     height: '30px',
   },
   page: {
-    fontFamily: 'Montserrat',
+    fontFamily: 'Montserrat-Regular',
     fontSize: 10,
     paddingTop: 25,
     paddingLeft: 68,
@@ -43,7 +50,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     justifyContent: 'space-between',
     paddingBottom: 95,
-    fontWeight: 'heavy',
+    color: '#212121',
   },
   header: {
     flexDirection: 'row',
@@ -62,21 +69,19 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
+    fontFamily: 'Montserrat-Bold',
   },
   addressText: {
     fontSize: 8,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   partialAddressText: {
     fontSize: 10,
-    fontWeight: 'bold',
     marginBottom: 4,
   },
   partAddress: {
     fontSize: 10,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 4,
   },
   rightAddress: {
     minWidth: 200,
@@ -92,7 +97,7 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   tag: {
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat-Bold',
     fontSize: 10,
     color: '#212121',
     flex: '0 0 45%',
@@ -108,17 +113,18 @@ const styles = StyleSheet.create({
     paddingBottom: 1,
   },
   contentHeader: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#212121',
     marginTop: 10,
     marginBottom: 10,
-    fontWeight: 900,
+    fontFamily: 'Montserrat-Bold',
   },
   contentBody: {
     color: '#616161',
     fontSize: 10,
     marginBottom: 10,
     lineHeight: 1.3,
+    maxWidth: '100%',
   },
   numberColumn: {
     width: '7%',
@@ -214,6 +220,9 @@ const styles = StyleSheet.create({
   pageNumberText: {
     fontSize: 7,
     color: '#000000',
+    marginLeft: 4,
+    textAlign: 'right',
+    fontFamily: 'Montserrat-Bold',
   },
   numberText: {
     color: '#212121',
@@ -238,7 +247,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     fontSize: 10,
-    marginVertical: 2.5,
+    marginVertical: 4,
   },
   footerContainer: {
     flexDirection: 'column',
@@ -256,9 +265,9 @@ const styles = StyleSheet.create({
     display: 'flex',
     fontSize: 7,
     color: '#212121',
-    paddingLeft: 10,
+    paddingLeft: 20,
     letterSpacing: -0.15,
-    marginTop: 4,
+    marginTop: 2,
     lineHeight: 1.3,
   },
   qrCode: {
@@ -268,6 +277,11 @@ const styles = StyleSheet.create({
   footerContent: {
     marginRight: 10,
     maxWidth: 130,
+  },
+  footerHeading: {
+    paddingVertical: 0.5,
+    fontSize: 5,
+    fontFamily: 'Montserrat-Bold',
   },
 });
 
@@ -433,6 +447,7 @@ const OrderArticlePDF = React.memo(
                       style={{
                         width: '2%',
                         textAlign: 'left',
+                        marginRight: 10,
                         ...styles.tableHeading,
                       }}>
                       #
@@ -498,6 +513,7 @@ const OrderArticlePDF = React.memo(
                           style={{
                             width: '2%',
                             textAlign: 'left',
+                            marginRight: 10,
                             color: '#212121',
                           }}>
                           {index + 1}
@@ -576,11 +592,6 @@ const OrderArticlePDF = React.memo(
                           {articleOrderItem?.description}
                         </Text>
                       )}
-                      {articleOrderItem?.description.trim() !== '' && (
-                        <Text style={styles.descriptionText}>
-                          {articleOrderItem?.description}
-                        </Text>
-                      )}
                     </View>
                   ))}
                 </View>
@@ -588,12 +599,12 @@ const OrderArticlePDF = React.memo(
                 <View>
                   <View style={styles.tableRow}>
                     <Text style={{width: '44%'}} />
-                    <Text style={{width: '44%'}} />
                     <Text
                       style={{
                         width: '32%',
                         color: '#616161',
-                        fontSize: '9px',
+                        fontSize: 10,
+                        textAlign: 'right',
                       }}>
                       {t('Subtotal (excl. VAT)')}
                     </Text>
@@ -615,7 +626,8 @@ const OrderArticlePDF = React.memo(
                           style={{
                             width: '32%',
                             color: '#616161',
-                            fontSize: '9px',
+                            fontSize: 10,
+                            textAlign: 'right',
                           }}>
                           {t('VAT {{vatPercentage}}%', {vatPercentage})}
                         </Text>
@@ -639,8 +651,9 @@ const OrderArticlePDF = React.memo(
                       style={{
                         width: '32%',
                         color: '#212121',
-                        fontWeight: 'bold',
-                        fontSize: '8px',
+                        fontFamily: 'Montserrat-Bold',
+                        textAlign: 'right',
+                        fontSize: 10,
                       }}>
                       {t('Total (incl. VAT)')}
                     </Text>
@@ -649,7 +662,7 @@ const OrderArticlePDF = React.memo(
                         width: '24%',
                         textAlign: 'right',
                         color: '#212121',
-                        fontWeight: 'bold',
+                        fontFamily: 'Montserrat-Bold',
                         fontSize: 10,
                       }}>
                       {formatCurrency(
@@ -705,12 +718,7 @@ const OrderArticlePDF = React.memo(
               <View style={styles.leftFooter}>
                 <View style={{...styles.footerContent}}>
                   {userInfo?.serviceCompany.name && (
-                    <Text
-                      style={{
-                        paddingVertical: 0.5,
-                        fontSize: 5,
-                        fontWeight: 'heavy',
-                      }}>
+                    <Text style={styles.footerHeading}>
                       {userInfo?.serviceCompany.name}
                     </Text>
                   )}
@@ -746,14 +754,7 @@ const OrderArticlePDF = React.memo(
                 </View>
 
                 <View style={{...styles.footerContent}}>
-                  <Text
-                    style={{
-                      paddingVertical: 0.5,
-                      fontSize: 5,
-                      fontWeight: 'heavy',
-                    }}>
-                    {t('Bank')}:
-                  </Text>
+                  <Text style={styles.footerHeading}>{t('Bank')}:</Text>
 
                   {userInfo?.serviceCompany.settings.paymentInfo
                     .accountNumber && (
@@ -784,11 +785,7 @@ const OrderArticlePDF = React.memo(
                 {/* TODO: 2nd bank information  */}
                 {/* <View style={{...styles.footerContent}}>
                   <Text
-                    style={{
-                      paddingVertical: 0.5,
-                      fontSize: 5,
-                      fontWeight: 'heavy',
-                    }}>
+                    style={styles.footerHeading}>
                     {t('Bank')}:
                   </Text>
                   {userInfo?.serviceCompany.settings.paymentInfo
@@ -818,12 +815,7 @@ const OrderArticlePDF = React.memo(
                 </View> */}
                 <View style={{...styles.footerContent}}>
                   {userInfo?.serviceCompany.settings.managingDirector && (
-                    <Text
-                      style={{
-                        paddingVertical: 0.5,
-                        fontSize: 5,
-                        fontWeight: 'heavy',
-                      }}>
+                    <Text style={styles.footerHeading}>
                       {t('Managing Director')}:{' '}
                       {userInfo?.serviceCompany.settings.managingDirector}
                     </Text>
@@ -876,11 +868,7 @@ const OrderArticlePDF = React.memo(
               </View>
               <View>
                 <Text
-                  style={{
-                    ...styles.pageNumberText,
-                    marginLeft: 4,
-                    textAlign: 'right',
-                  }}
+                  style={styles.pageNumberText}
                   render={({pageNumber, totalPages}) =>
                     `${pageNumber} / ${totalPages}`
                   }
