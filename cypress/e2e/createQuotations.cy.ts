@@ -1,3 +1,4 @@
+import {addDays} from 'date-fns';
 import AppTopBarPage from '../pages/appTopBar.page';
 import LoginPage from '../pages/login.page';
 import QuotationPage from '../pages/quotation.page';
@@ -57,5 +58,9 @@ describe('Create Quotation', () => {
 
     cy.contains('Article cannot be empty');
     cy.contains('button', 'Save').should('be.disabled');
+  });
+
+  it('should check expiry date is prefilled with 14 days from today', () => {
+    cy.get('input[name="expiryDate"]').should('have.value', addDays(new Date(), 14).toLocaleDateString());
   });
 });
