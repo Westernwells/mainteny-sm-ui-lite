@@ -152,7 +152,12 @@ export const CheckList = ({serviceOrder}: Props) => {
           technicianId: selectedOption.technicianId,
         },
       },
-      {onSuccess: () => setDeleteChecklistConfirm(false)},
+      {
+        onSuccess: () => {
+          setDeleteChecklistConfirm(false);
+          setSelectedOption(labels[0]?.value || '');
+        },
+      },
     );
   };
 

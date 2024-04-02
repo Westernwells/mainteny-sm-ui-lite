@@ -200,7 +200,7 @@ export const useDeleteServiceOrderChecklist = (successMsg?: string) => {
           variant: 'success',
         });
       }
-      queryClient.invalidateQueries(queryKeys.queryChecklists);
+      queryClient.invalidateQueries(queryKeys.queryServiceOrderChecklists);
     },
     onError: (err: any) => {
       console.log(err);
