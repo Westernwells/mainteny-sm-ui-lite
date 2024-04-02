@@ -168,10 +168,9 @@ export const makeRows = (
     id: index,
     quotationId: item.id,
     [QuotationOrderField.EXTERNAL_ID]: item.number,
-    [QuotationOrderField.CUSTOMER_NAME]:
-      item?.elevator?.propertyOwner?.name ?? '-',
+    [QuotationOrderField.CUSTOMER_NAME]: item?.propertyOwner?.name ?? '-',
     [QuotationOrderField.ELEVATOR_ADDRESS]:
-      item?.elevator?.propertyOwner?.billingAddress?.fullName ?? '-',
+      item?.propertyOwner?.billingAddress?.fullName ?? '-',
     [QuotationOrderField.CREATED_DATE]: formatDate(item.meta.createdAt),
     [QuotationOrderField.TOTAL_NET_AMOUNT]: `${formatCurrency(
       item

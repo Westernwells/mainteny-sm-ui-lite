@@ -134,6 +134,7 @@ export const EditFrom = ({
                   multiple: false,
                   onChange: formik.handleChange,
                 }}
+                isCompanyTranslation
               />
             </Grid>
             <Grid item md={3.5}>
@@ -150,6 +151,7 @@ export const EditFrom = ({
                   multiple: false,
                   onChange: formik.handleChange,
                 }}
+                isCompanyTranslation
               />
             </Grid>
           </Grid>
