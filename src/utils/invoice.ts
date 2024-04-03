@@ -83,7 +83,9 @@ export const getInvoiceActivityTitle = (
     case InvoiceActivityType.EXPIRED:
       return 'Invoice overdue';
     case InvoiceActivityType.PAYMENT_RECEIVED:
-      return `Payment of ${activity?.amount} received`;
+      return t(`Payment of {{amount}} received`, {
+        amount: activity?.amount,
+      });
     case InvoiceActivityType.PAYMENT_UPDATED:
       return 'Payment updated';
     case InvoiceActivityType.PAYMENT_DELETED:
