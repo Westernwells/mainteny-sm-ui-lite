@@ -2386,5 +2386,6 @@
   "Unit Selected": "Odobrana jedinica",
   "Units Selected": "Odabrane jedinice",
   "Every 2 weeks": "Svake 2 nedelje",
-  "Payment of {{amount}} received": "Primljena uplata od {{iznos}}"
+  "Payment of {{amount}} received": "Primljena uplata od {{iznos}}",
+  "Service name cannot be empty": "Naziv usluge ne može biti prazan"
 }
