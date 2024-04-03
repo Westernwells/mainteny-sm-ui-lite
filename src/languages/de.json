@@ -2362,5 +2362,6 @@
   "Unit Selected": "Anlage ausgewählt",
   "Units Selected": "Anlagen ausgewählt",
   "Every 2 weeks": "Alle 2 Wochen",
-  "Payment of {{amount}} received": "Zahlung von {{amount}} erhalten"
+  "Payment of {{amount}} received": "Zahlung von {{amount}} erhalten",
+  "Service name cannot be empty": "Vertragspositionsname kann nicht leer sein"
 }
