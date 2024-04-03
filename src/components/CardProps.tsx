@@ -107,7 +107,7 @@ export const CardProps = ({
                   sx={{
                     ...bodyStyle,
                     fontSize: '0.9rem',
-                    fontWeight: '400',
+                    fontWeight: '600',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'wrap',

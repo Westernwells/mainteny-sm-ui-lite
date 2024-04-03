@@ -68,11 +68,11 @@ export const OpenQuotations = ({
               sx={{p: '0px !important'}}>
               <ListItemAvatar>
                 <Avatar sx={{width: 28, height: 28, fontSize: '1rem'}}>
-                  {nameToInitials(quotation.propertyOwner.name)}
+                  {nameToInitials(quotation?.propertyOwner!.name)}
                 </Avatar>
               </ListItemAvatar>
               <ListItemText sx={{flexBasis: '25%'}}>
-                {quotation.propertyOwner.name}
+                {quotation?.propertyOwner?.name}
               </ListItemText>
               <ListItemText>
                 {formatCurrency(

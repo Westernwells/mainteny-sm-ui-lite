@@ -7,11 +7,15 @@ import Select, {SelectProps} from '@mui/material/Select';
 import useTheme from '@mui/material/styles/useTheme';
 import {SxProps} from '@mui/system';
 import {capitalize, companyLanguageContextMap} from 'utils/utils';
-import {useTranslation} from 'react-i18next';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useMemo} from 'react';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
 
 interface Props<T> {
   labelId: string;
@@ -66,7 +70,7 @@ export const FormSelect = ({
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
     lng: companyLanguageContextMap[company?.language as string],
-  });
+  } as CustomTranslationOptions);
 
   const translate = useMemo(
     () => (key: string) => {
