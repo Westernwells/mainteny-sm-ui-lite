@@ -159,7 +159,11 @@ export const SelectTechnicians = ({
   }, [recommendedTechnicians, isLoadingRecommendedTechnicians]);
 
   useEffect(() => {
-    if (!Object.keys(checkboxState).length) return;
+    if (
+      !Object.keys(checkboxState).length ||
+      selectedTechnicianIds.length >= 10
+    )
+      return;
     if (!selectedTechnicianIds.includes(checkboxState.value)) {
       setSelectedTechnicianIds([...selectedTechnicianIds, checkboxState.value]);
     } else {
