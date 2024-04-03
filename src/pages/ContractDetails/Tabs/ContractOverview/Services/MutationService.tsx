@@ -307,13 +307,11 @@ export const MutationService = ({
             endIcon: <CloseIcon />,
             onClick: () => clearElevators(),
           }}>
-          {T('{{numberOfUnits}} {{unitLabel}}', {
-            numberOfUnits,
-            unitLabel:
-              numberOfUnits && numberOfUnits === 1
-                ? 'Unit Selected'
-                : 'Units Selected',
-          })}
+          {numberOfUnits === 1
+            ? T('1 Unit Selected')
+            : T('{{numberOfUnits}} Units Selected', {
+                numberOfUnits,
+              })}
         </Button>
         <SearchInput
           placeholder={t('Search by number, name, address etc.')}
