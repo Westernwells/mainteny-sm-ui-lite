@@ -2360,5 +2360,7 @@
   "1 Unit Selected": "1 Anlage ausgewählt",
   "{{numberOfUnits}} Units Selected": "{{numberOfUnits}} Anlagen ausgewählt",
   "Unit Selected": "Anlage ausgewählt",
-  "Units Selected": "Anlagen ausgewählt"
+  "Units Selected": "Anlagen ausgewählt",
+  "Every 2 weeks": "Alle 2 Wochen",
+  "Payment of {{amount}} received": "Zahlung von {{amount}} erhalten"
 }

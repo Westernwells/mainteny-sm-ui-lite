@@ -2384,5 +2384,7 @@
   "1 Unit Selected": "Odabrana 1 jedinica",
   "{{numberOfUnits}} Units Selected": "Izabrane jedinice {{numberOfUnits}}",
   "Unit Selected": "Odobrana jedinica",
-  "Units Selected": "Odabrane jedinice"
+  "Units Selected": "Odabrane jedinice",
+  "Every 2 weeks": "Svake 2 nedelje",
+  "Payment of {{amount}} received": "Primljena uplata od {{iznos}}"
 }
