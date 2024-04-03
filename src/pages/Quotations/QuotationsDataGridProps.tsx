@@ -170,7 +170,7 @@ export const makeRows = (
     [QuotationOrderField.EXTERNAL_ID]: item.number,
     [QuotationOrderField.CUSTOMER_NAME]: item?.propertyOwner?.name ?? '-',
     [QuotationOrderField.ELEVATOR_ADDRESS]:
-      item?.propertyOwner?.billingAddress?.fullName ?? '-',
+      item?.additionalInfo?.billingAddress?.fullName ?? '-',
     [QuotationOrderField.CREATED_DATE]: formatDate(item.meta.createdAt),
     [QuotationOrderField.TOTAL_NET_AMOUNT]: `${formatCurrency(
       item
