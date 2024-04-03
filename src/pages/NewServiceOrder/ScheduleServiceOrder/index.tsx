@@ -103,8 +103,8 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
         scheduleFormValue.startDate.getFullYear(),
         scheduleFormValue.startDate.getMonth(),
         scheduleFormValue.startDate.getDate(),
-        scheduleFormValue?.startTime?.getHours() || new Date().getHours(),
-        scheduleFormValue?.startTime?.getMinutes() || new Date().getMinutes(),
+        (scheduleFormValue?.startTime || new Date()).getHours(),
+        (scheduleFormValue?.startTime || new Date()).getMinutes(),
       )
     : null;
   const endDateTime = scheduleFormValue?.endDate
@@ -112,8 +112,8 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
         scheduleFormValue.endDate.getFullYear(),
         scheduleFormValue.endDate.getMonth(),
         scheduleFormValue.endDate.getDate(),
-        scheduleFormValue?.endTime?.getHours() || new Date().getHours(),
-        scheduleFormValue?.endTime?.getMinutes() || new Date().getMinutes(),
+        (scheduleFormValue?.endTime || new Date()).getHours(),
+        (scheduleFormValue?.endTime || new Date()).getMinutes(),
       )
     : null;
 
