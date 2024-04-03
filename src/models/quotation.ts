@@ -122,11 +122,12 @@ export interface QuotationFormData {
   expiryDate?: Date;
   referenceNumber?: string;
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+  propertyOwnerId?: string;
 }
 
 export interface CreateQuotation {
   serviceCompanyId: string;
-  elevatorId: string;
+  elevatorId?: string | null;
   externalId?: string;
   subject: string;
   description: string;
@@ -152,7 +153,7 @@ export interface UpdateQuotation {
   subject: string;
   description: string;
   moreInfo?: string;
-  elevatorId?: string;
+  elevatorId?: string | null;
   items: QuotationItemRecord[];
   externalId?: string;
   integration?: {

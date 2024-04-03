@@ -284,18 +284,34 @@ export const DraftQuotation = ({
     if (row.id !== quotationCustomer?.id) {
       const emptyAddressState = {fullName: null};
       formik.setFieldValue('propertyOwnerId', row.id);
-      formik.setFieldValue(
-        'billingAddress',
-        row.billingAddress || emptyAddressState,
-      );
-      formik.setFieldValue(
-        'beneficiaryAddress',
-        row.beneficiaryAddress || emptyAddressState,
-      );
-      formik.setFieldValue(
-        'alternativeAddress',
-        row.otherAddress || emptyAddressState,
-      );
+
+      if (formType === 'edit' && customer) {
+        formik.setFieldValue(
+          'billingAddress',
+          quotation?.additionalInfo.billingAddress,
+        );
+        formik.setFieldValue(
+          'beneficiaryAddress',
+          quotation?.additionalInfo.beneficiaryAddress,
+        );
+        formik.setFieldValue(
+          'alternativeAddress',
+          quotation?.additionalInfo.alternativeAddress,
+        );
+      } else {
+        formik.setFieldValue(
+          'billingAddress',
+          row.billingAddress || emptyAddressState,
+        );
+        formik.setFieldValue(
+          'beneficiaryAddress',
+          row.beneficiaryAddress || emptyAddressState,
+        );
+        formik.setFieldValue(
+          'alternativeAddress',
+          row.otherAddress || emptyAddressState,
+        );
+      }
     } else {
       formik.setFieldValue(
         'billingAddress',
@@ -489,19 +505,16 @@ export const DraftQuotation = ({
 
       formik.setFieldValue(
         'billingAddress',
-        quotation.additionalInfo?.billingAddress ||
-          quotationCustomer?.billingAddress,
+        quotation.additionalInfo?.billingAddress,
       );
 
       formik.setFieldValue(
         'beneficiaryAddress',
-        quotation.additionalInfo?.beneficiaryAddress ||
-          quotationCustomer?.beneficiaryAddress,
+        quotation.additionalInfo?.beneficiaryAddress,
       );
       formik.setFieldValue(
         'alternativeAddress',
-        quotation.additionalInfo?.alternativeAddress ||
-          quotationCustomer?.otherAddress,
+        quotation.additionalInfo?.alternativeAddress,
       );
 
       formik.setFieldValue('description', quotation?.description ?? '');
