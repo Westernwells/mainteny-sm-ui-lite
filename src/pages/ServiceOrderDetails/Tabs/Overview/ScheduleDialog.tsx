@@ -238,6 +238,10 @@ export const ScheduleDialog = ({
                   }
                 />
               )}
+              getOptionDisabled={(option) =>
+                (formik.values.technicianIds?.length || 0) >= 10 &&
+                !formik.values.technicianIds?.includes(option.id)
+              }
             />
 
             <Box sx={{mt: '1.5em'}}>
