@@ -86,6 +86,7 @@ export const formatQuotationRecord = (
   notes: value.notes,
   sentDate: value.sentDate ? dateToString(value.sentDate) : '',
   expiryDate: value.expiryDate ? dateToString(value.expiryDate) : '',
+  elevatorId: value.elevatorId ?? null,
 });
 
 export const applyQuotationDiscount = ({

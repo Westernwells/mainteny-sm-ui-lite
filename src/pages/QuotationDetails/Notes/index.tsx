@@ -31,12 +31,13 @@ export const Notes = ({quotation}: Props) => {
     useInfiniteQuotationComments,
     quotation.id,
   );
-  const totalCustomerNotes = quotation?.elevator?.propertyOwner.id
-    ? useTotalNotesData(
-        useInfiniteCustomerNotes,
-        quotation.elevator.propertyOwner.id,
-      )
-    : null;
+  const totalCustomerNotes =
+    quotation?.propertyOwner?.id || quotation?.elevator?.propertyOwner.id
+      ? useTotalNotesData(
+          useInfiniteCustomerNotes,
+          quotation?.propertyOwner?.id || quotation.elevator.propertyOwner.id,
+        )
+      : null;
 
   const handleOpenSideDrawer = () => {
     setShowSideDrawer(true);
@@ -177,7 +178,10 @@ export const Notes = ({quotation}: Props) => {
           </TabsBody>
           <TabsBody value={tabValue} index={TabIndex.Customer}>
             <CustomerNotes
-              propertyOwnerId={quotation?.elevator?.propertyOwner.id}
+              propertyOwnerId={
+                quotation?.propertyOwner?.id ||
+                quotation?.elevator?.propertyOwner.id
+              }
             />
           </TabsBody>
         </Tabs>

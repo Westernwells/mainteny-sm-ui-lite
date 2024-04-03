@@ -4,6 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
+import {addDays} from 'date-fns';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DraftsIcon from '@mui/icons-material/Drafts';
@@ -228,10 +229,12 @@ export const DraftQuotation = ({
   const initialValues: QuotationFormData = {
     subject: quotation?.subject || t('Quotation'),
     description: quotation?.description || '',
-    elevatorId: quotation?.elevator?.id || '',
     notes: quotation?.additionalInfo.notes || '',
     items: quotation?.items || [],
     serviceCompanyId: quotation?.serviceCompany.id || '',
+    expiryDate: quotation?.additionalInfo.expiryDate
+      ? new Date(quotation?.additionalInfo.expiryDate)
+      : addDays(new Date(), 14),
   };
 
   const validationSchema = Yup.object().shape({
@@ -281,18 +284,34 @@ export const DraftQuotation = ({
     if (row.id !== quotationCustomer?.id) {
       const emptyAddressState = {fullName: null};
       formik.setFieldValue('propertyOwnerId', row.id);
-      formik.setFieldValue(
-        'billingAddress',
-        row.billingAddress || emptyAddressState,
-      );
-      formik.setFieldValue(
-        'beneficiaryAddress',
-        row.beneficiaryAddress || emptyAddressState,
-      );
-      formik.setFieldValue(
-        'alternativeAddress',
-        row.otherAddress || emptyAddressState,
-      );
+
+      if (formType === 'edit' && customer) {
+        formik.setFieldValue(
+          'billingAddress',
+          quotation?.additionalInfo.billingAddress,
+        );
+        formik.setFieldValue(
+          'beneficiaryAddress',
+          quotation?.additionalInfo.beneficiaryAddress,
+        );
+        formik.setFieldValue(
+          'alternativeAddress',
+          quotation?.additionalInfo.alternativeAddress,
+        );
+      } else {
+        formik.setFieldValue(
+          'billingAddress',
+          row.billingAddress || emptyAddressState,
+        );
+        formik.setFieldValue(
+          'beneficiaryAddress',
+          row.beneficiaryAddress || emptyAddressState,
+        );
+        formik.setFieldValue(
+          'alternativeAddress',
+          row.otherAddress || emptyAddressState,
+        );
+      }
     } else {
       formik.setFieldValue(
         'billingAddress',
@@ -323,6 +342,7 @@ export const DraftQuotation = ({
       handleSelectCustomer(value);
     } else {
       setCustomer(null);
+      setUnit(null);
     }
   };
 
@@ -435,7 +455,7 @@ export const DraftQuotation = ({
     if (elevator) {
       const quotationCustomer = elevator?.propertyOwner;
       setUnit(elevator);
-      setCustomer(quotationCustomer);
+      setCustomer(quotationCustomer!);
 
       formik.setFieldValue('billingAddress', quotationCustomer?.billingAddress);
 
@@ -480,24 +500,21 @@ export const DraftQuotation = ({
 
   useEffect(() => {
     if (quotation) {
-      const quotationCustomer = quotation?.elevator?.propertyOwner;
-      setCustomer(quotationCustomer);
+      const quotationCustomer = quotation.propertyOwner;
+      setCustomer(quotationCustomer!);
 
       formik.setFieldValue(
         'billingAddress',
-        quotation.additionalInfo?.billingAddress ||
-          quotationCustomer?.billingAddress,
+        quotation.additionalInfo?.billingAddress,
       );
 
       formik.setFieldValue(
         'beneficiaryAddress',
-        quotation.additionalInfo?.beneficiaryAddress ||
-          quotationCustomer?.beneficiaryAddress,
+        quotation.additionalInfo?.beneficiaryAddress,
       );
       formik.setFieldValue(
         'alternativeAddress',
-        quotation.additionalInfo?.alternativeAddress ||
-          quotationCustomer?.otherAddress,
+        quotation.additionalInfo?.alternativeAddress,
       );
 
       formik.setFieldValue('description', quotation?.description ?? '');
@@ -808,6 +825,7 @@ export const DraftQuotation = ({
                 }
                 cardOnClose={() => {
                   setUnit(null);
+                  formik.setFieldValue('elevatorId', null);
                 }}
                 modalHeader="Select unit"
                 modalBody={
@@ -997,6 +1015,7 @@ export const DraftQuotation = ({
                 }}
                 textFieldProps={{
                   label: 'Offer valid until',
+                  name: 'expiryDate',
                 }}
               />
             </Box>

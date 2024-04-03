@@ -198,6 +198,11 @@ export const ViewQuotation = ({
   }, [downloadUrl]);
 
   useEffect(() => {
+    if (quotation) {
+      const quotationElevator = quotation.elevator;
+      setUnit(quotationElevator);
+    }
+
     if (
       quotation?.additionalInfo.pdfGenerationStatus ===
       PdfGenerationStatus.RUNNING
@@ -338,7 +343,7 @@ export const ViewQuotation = ({
             {isCreateForm && (
               <Box mt=".5em" mb="0em">
                 <Box>
-                  {unit !== null && (
+                  {!!unit && (
                     <Box
                       sx={{
                         borderRadius: '4px',
