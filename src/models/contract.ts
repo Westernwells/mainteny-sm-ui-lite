@@ -29,6 +29,7 @@ import {FileResource} from './media';
 import {ArticleType, CostPackage} from './article';
 import {toRestDate} from 'utils/datetime';
 import {ServiceCompanyType} from './service-company';
+import {t} from 'i18next';
 
 export interface QueryContractCommentsParams {
   pageIndex: number;
@@ -785,7 +786,7 @@ export const getListViewFrequency = (
         break;
       case ContractTimeUnit.NONE:
         if (key === 'invoiceJob') {
-          frequencySet.add(ContractTimeUnitYearView[timeUnit]);
+          frequencySet.add(t(ContractTimeUnitYearView[timeUnit]));
         }
         break;
       case ContractTimeUnit.WEEKLY:
@@ -794,7 +795,7 @@ export const getListViewFrequency = (
       case ContractTimeUnit.BIENNIALLY:
       case ContractTimeUnit.TRIENNIALLY:
       case ContractTimeUnit.QUADRENNIALLY:
-        frequencySet.add(ContractTimeUnitYearView[timeUnit]);
+        frequencySet.add(t(ContractTimeUnitYearView[timeUnit]));
         break;
       default:
         return '-';

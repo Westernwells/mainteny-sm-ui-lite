@@ -588,7 +588,7 @@
   "5 days": "5 dana",
   "Related Contracts": "Povezani ugovori",
   "Start Date": "Datum početka",
-  "Basic": "Osnovni",
+  "Basic": "Osnovno",
   "Medium": "Srednji",
   "Premium": "Premium",
   "Active": "Aktivan",
@@ -2323,7 +2323,7 @@
   "Deutschland": "Nemačka",
   "Invoice frequency": "Učestalost faktura",
   "Invoice Together": "Fakturišite zajedno",
-  "After Job": "Posle posla",
+  "After job": "Posle posla",
   "New Contract name": "Naziv novog ugovora",
   "{{numberOfUnits}} Units selected": "Izabrane jedinice: {{numberOfUnits}}",
   "1 Unit selected": "1 Izabrana jedinica",
@@ -2379,5 +2379,13 @@
   "Hourly rate (work & travel)": "Satnica (posao i putovanje)",
   "Fixed travel fee (unit)": "Fiksna putna naknada (jedinica)",
   "Fixed travel time (unit)": "Fiksno vreme putovanja (jedinica)",
-  "Fixed travel distance (unit)": "Fiksno rastojanje (jedinica)"
+  "Fixed travel distance (unit)": "Fiksno rastojanje (jedinica)",
+  "Service name can not be empty": "Naziv usluge ne može biti prazan",
+  "1 Unit Selected": "Odabrana 1 jedinica",
+  "{{numberOfUnits}} Units Selected": "Izabrane jedinice {{numberOfUnits}}",
+  "Unit Selected": "Odobrana jedinica",
+  "Units Selected": "Odabrane jedinice",
+  "Every 2 weeks": "Svake 2 nedelje",
+  "Payment of {{amount}} received": "Primljena uplata od {{iznos}}",
+  "Service name cannot be empty": "Naziv usluge ne može biti prazan"
 }
