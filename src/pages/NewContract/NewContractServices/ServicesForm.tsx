@@ -179,7 +179,7 @@ const ServicesForm = ({
               required: true,
               helperText:
                 formikContractServiceComponent.touched.name &&
-                formikContractServiceComponent.errors.name,
+                t(`${formikContractServiceComponent.errors.name}`),
               error:
                 !!formikContractServiceComponent.errors.name &&
                 formikContractServiceComponent.touched.name,

@@ -172,10 +172,11 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
           endIcon: <CloseIcon />,
           onClick: () => clearElevators(),
         }}>
-        {T('{{numberOfUnits}} {{unitLabel}}', {
-          numberOfUnits,
-          unitLabel: numberOfUnits === 1 ? 'Unit Selected' : 'Units Selected',
-        })}
+        {numberOfUnits === 1
+          ? T('1 Unit Selected')
+          : T('{{numberOfUnits}} Units Selected', {
+              numberOfUnits,
+            })}
       </Button>
     );
   };
