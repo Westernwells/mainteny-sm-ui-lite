@@ -84,7 +84,6 @@ export interface QuotationView {
   meta: Meta;
   items: QuotationItem[];
   commentCount?: number;
-  propertyOwner?: PropertyOwnerView;
 }
 
 export interface QueryQuotationParams {

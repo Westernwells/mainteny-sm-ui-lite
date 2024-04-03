@@ -22,15 +22,6 @@ export enum MinToStep {
   STEP_60 = 60,
 }
 
-export enum MinToStep {
-  STEP_0 = 0,
-  STEP_5 = 5,
-  STEP_15 = 15,
-  STEP_20 = 20,
-  STEP_30 = 30,
-  STEP_60 = 60,
-}
-
 export enum ServiceCompanyTimeUnit {
   DAILY = 'DAILY',
   QUARTERLY = 'QUARTERLY',
