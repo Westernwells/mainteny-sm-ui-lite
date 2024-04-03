@@ -35,7 +35,7 @@ Font.register({
 
 const styles = StyleSheet.create({
   logoImage: {
-    height: '30px',
+    height: 60,
   },
   page: {
     fontFamily: 'Montserrat-Regular',
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   descriptionText: {
     width: '45%',
     display: 'flex',
-    fontSize: 7,
+    fontSize: 8.5,
     color: '#212121',
     paddingLeft: 20,
     letterSpacing: -0.15,
