@@ -48,6 +48,7 @@ import {getArticleTypeText} from 'utils/article-utils';
 import {QuotationItemRecord} from 'models/quotation';
 import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
 import {DragIndicator} from '@mui/icons-material';
+import {useDebounce} from 'hooks/useDebounce';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -248,6 +249,7 @@ export const ArticleItemRowQuotation = ({
 
   const [popperOpen, setPopperOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const debouncedText = useDebounce(searchText);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [tabValue, setTabValue] = useState(0);
 
@@ -284,7 +286,7 @@ export const ArticleItemRowQuotation = ({
     {
       pageIndex: 0,
       pageSize: 30,
-      query: searchText,
+      query: debouncedText,
     },
     {keepPreviousData: true, enabled: popperOpen && tabValue === 0},
   );
@@ -297,7 +299,7 @@ export const ArticleItemRowQuotation = ({
     {
       pageIndex: 0,
       pageSize: 100,
-      query: searchText,
+      query: debouncedText,
     },
     {
       keepPreviousData: true,
