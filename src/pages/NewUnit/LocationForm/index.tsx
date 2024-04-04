@@ -123,7 +123,6 @@ export const LocationForm = ({
                 placeholder: '',
                 label: 'Street 2',
                 name: 'address.component.street2',
-                required: false,
                 value: formik.values.address?.component?.street2 ?? '',
                 onChange: formik.handleChange,
               }}

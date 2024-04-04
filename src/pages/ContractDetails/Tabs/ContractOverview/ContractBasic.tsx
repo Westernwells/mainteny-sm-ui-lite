@@ -98,7 +98,7 @@ export const ContractBasic = ({
           icon={<AutorenewIcon fontSize="1.5rem" />}
           containerStyles={{mr: '0.5em'}}
           iconMaxHeight="3rem"
-          bodyText={autoRenewal ? 'Yes' : 'No'}
+          bodyText={autoRenewal ? 'No' : 'Yes'}
           bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
