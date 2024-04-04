@@ -24,6 +24,11 @@ interface Props {
 export const LocationSchema = ({label, elevator, currency}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
+  const customer =
+    elevator.propertyOwner.meta.state === 'ACTIVE'
+      ? elevator.propertyOwner
+      : null;
+
   const renderSection = () => {
     const navigate = useNavigate();
     switch (label) {
@@ -37,17 +42,18 @@ export const LocationSchema = ({label, elevator, currency}: Props) => {
             bodyText={
               <Typography
                 variant="subtitle1"
-                onClick={() =>
-                  navigate(
-                    `/customers/details/${elevator.propertyOwner.id}?tab=0`,
-                  )
-                }
+                onClick={() => {
+                  if (customer) {
+                    navigate(`/customers/details/${customer.id}?tab=0`);
+                  }
+                }}
                 sx={{
-                  color: 'primary.light',
-                  cursor: 'pointer',
+                  color: customer ? 'primary.light' : '',
+                  cursor: customer ? 'pointer' : '',
                   whiteSpace: 'wrap',
+                  wordBreak: 'break-word',
                 }}>
-                {elevator.propertyOwner.name || '-'}
+                {customer ? customer.name : '-'}
               </Typography>
             }
             containerStyles={{alignItems: 'center'}}
