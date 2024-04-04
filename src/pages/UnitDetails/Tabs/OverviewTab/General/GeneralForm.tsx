@@ -24,6 +24,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
+import sortOptions from 'utils/sortOptions';
 
 interface Props {
   register: UseFormRegister<GeneralFormModel>;
@@ -71,10 +72,12 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
     <Grid container spacing={2} component="form">
       <Grid item md={6}>
         <ComboBoxNew
-          options={Object.keys(ElevatorCategory).map((item) => ({
-            label: t(convertToText(item)),
-            value: convertToText(item),
-          }))}
+          options={Object.keys(ElevatorCategory)
+            .map((item) => ({
+              label: t(convertToText(item)),
+              value: convertToText(item),
+            }))
+            .sort(sortOptions)}
           initialValue={
             watch('category')
               ? {
