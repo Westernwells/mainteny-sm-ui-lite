@@ -15,7 +15,6 @@ import {LocationFormModel} from 'models/unitForm';
 import {formatAddressFullname} from 'utils/utils';
 import {AddressRecord} from 'models/misc';
 import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
-import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {LocationSchema} from './LocationSchema';
 import {EditLocationForm} from './EditLocationForm';
 
@@ -108,8 +107,6 @@ export const Location = ({
     });
   };
 
-  const {data: initialCustomer} = useGetCustomer(propertyOwnerId);
-
   return (
     <InfoCard
       containerStyles={{...containerStyles}}
@@ -142,7 +139,10 @@ export const Location = ({
           open: openDialog || false,
           sx: {height: '100%'},
         }}>
-        <EditLocationForm formik={formik} initialCustomer={initialCustomer} />
+        <EditLocationForm
+          formik={formik}
+          initialCustomer={elevator?.propertyOwner}
+        />
       </Dialog>
     </InfoCard>
   );
