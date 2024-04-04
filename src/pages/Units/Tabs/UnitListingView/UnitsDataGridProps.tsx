@@ -154,7 +154,10 @@ export const makeRows = (
     [ElevatorOrderField.BUILDING_LOCATION]:
       elevator.additionalInfo.buildingLocation,
     actions: elevator.id,
-    [ElevatorOrderField.PROPERTY_OWNER_NAME]: elevator.propertyOwner.name,
+    [ElevatorOrderField.PROPERTY_OWNER_NAME]:
+      elevator.propertyOwner.meta.state === 'ACTIVE'
+        ? elevator.propertyOwner.name
+        : '-',
     [ElevatorOrderField.LAST_VISIT_DATE]: elevator.lastVisitDate
       ? formatDate(toDate(elevator.lastVisitDate))
       : '-',

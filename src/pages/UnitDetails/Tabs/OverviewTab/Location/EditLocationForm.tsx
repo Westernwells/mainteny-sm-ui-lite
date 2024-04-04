@@ -25,6 +25,9 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
     [formik.values.address?.component?.country],
   );
 
+  const customer =
+    initialCustomer?.meta.state === 'ACTIVE' ? initialCustomer : null;
+
   return (
     <Grid container component="form" spacing={2}>
       <Grid item xs={12}>
@@ -38,7 +41,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
               formik.setFieldValue('propertyOwnerId', value.id);
             }
           }}
-          initialValue={initialCustomer!}
+          initialValue={customer}
           textFieldProps={{
             required: true,
             error: !!(
