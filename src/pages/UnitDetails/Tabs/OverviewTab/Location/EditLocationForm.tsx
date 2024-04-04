@@ -24,7 +24,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
     (country?: string) => getStatesByCountry(country ?? ''),
     [formik.values.address?.component?.country],
   );
-
+  // console.log("fomik", formik.values)
   return (
     <Grid container component="form" spacing={2}>
       <Grid item xs={12}>
@@ -81,6 +81,18 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
                   }
                 : undefined,
             });
+          }}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <FormInput
+          props={{
+            size: 'small',
+            placeholder: '',
+            label: 'Address line 2',
+            name: 'address.component.street2',
+            value: formik.values.address?.component?.street2 ?? '',
+            onChange: formik.handleChange,
           }}
         />
       </Grid>
