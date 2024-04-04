@@ -33,13 +33,10 @@ Font.register({
 });
 
 const styles = StyleSheet.create({
-  logoImage: {
-    height: 60,
-  },
   page: {
     fontFamily: 'Montserrat-Regular',
     fontSize: 10,
-    paddingTop: 25,
+    paddingTop: 15,
     paddingLeft: 68,
     paddingRight: 45,
     backgroundColor: 'white',
@@ -62,7 +59,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 20,
     alignItems: 'flex-start',
-    marginTop: 20,
   },
   leftAddress: {
     flex: '0 0 50%',
@@ -209,7 +205,7 @@ const styles = StyleSheet.create({
   leftFooter: {
     display: 'flex',
     flexDirection: 'row',
-    flex: '0 0 70%',
+    flex: '0 0 75%',
     justifyContent: 'space-between',
   },
   emailText: {
@@ -277,6 +273,7 @@ const styles = StyleSheet.create({
   footerContent: {
     marginRight: 10,
     maxWidth: 130,
+    flex: '0 0 32%',
   },
   footerHeading: {
     paddingVertical: 0.5,
@@ -290,10 +287,14 @@ type Props = {
   userInfo?: UserAccount | undefined;
   logoSrc?: string;
   currencyCode?: string;
+  logoDimensions?: {
+    width: number;
+    height: number;
+  } | null;
 };
 
 const OrderArticlePDF = React.memo(
-  ({articleOrder, userInfo, logoSrc, currencyCode}: Props) => {
+  ({articleOrder, userInfo, logoSrc, currencyCode, logoDimensions}: Props) => {
     const {t} = useTranslation();
 
     function convertToArticleOrderItemRecord(
@@ -355,7 +356,12 @@ const OrderArticlePDF = React.memo(
         <Page size="A4" style={styles.page}>
           <View>
             <View style={styles.header} fixed>
-              {logoSrc && <Image style={styles.logoImage} source={logoSrc} />}
+              {logoSrc && (
+                <Image
+                  style={{height: logoDimensions?.height || 35}}
+                  source={logoSrc}
+                />
+              )}
             </View>
 
             <View style={styles.topSection}>
@@ -423,10 +429,6 @@ const OrderArticlePDF = React.memo(
                     </Text>
                   </View>
                 )}
-
-                {/* <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}> {t('Customer no.')}</Text>
-                </View> */}
               </View>
             </View>
 
@@ -679,37 +681,6 @@ const OrderArticlePDF = React.memo(
                   </View>
                 </View>
               </View>
-
-              {/* TO DO: Implement logic for display of notes section and delivery section when backend is available */}
-
-              {/* <View style={styles.notesSection}>
-          <Text style={styles.sectionHeading}>{t('Notes')}</Text>
-          <Text style={styles.sectionBody}>-</Text>
-        </View> */}
-
-              {/* <View style={styles.deliverySection}>
-          <Text style={styles.sectionHeading}>{t('Delivery Address')}</Text>
-          <View>
-            <Text style={styles.sectionBody}>
-              {' '}
-              {articleOrder?.articleSupplier?.name}{' '}
-            </Text>
-            <Text style={styles.sectionBody}>
-              {' '}
-              {
-              articleOrder?.articleSupplier?.address?.component?.postalCode
-              }{' '}
-              {articleOrder?.articleSupplier?.address?.component?.street}
-            </Text>
-            <Text style={styles.sectionBody}>
-              {' '}
-              {
-                articleOrder?.articleSupplier?.address?.component?.postalCode
-              }{' '}
-              {articleOrder?.articleSupplier?.address?.component?.street}
-            </Text>
-          </View>
-        </View> */}
             </View>
           </View>
 
@@ -719,18 +690,18 @@ const OrderArticlePDF = React.memo(
                 <View style={{...styles.footerContent}}>
                   {userInfo?.serviceCompany.name && (
                     <Text style={styles.footerHeading}>
-                      {userInfo?.serviceCompany.name}
+                      {userInfo?.serviceCompany?.name}
                     </Text>
                   )}
 
                   {userInfo?.serviceCompany.postalAddress?.fullName && (
                     <Text style={styles.footerSectionBody}>
-                      {userInfo?.serviceCompany.postalAddress?.fullName}
+                      {userInfo?.serviceCompany?.postalAddress?.fullName}
                     </Text>
                   )}
 
-                  {userInfo?.serviceCompany.postalAddress?.component?.state ||
-                    (userInfo?.serviceCompany.postalAddress?.component
+                  {userInfo?.serviceCompany?.postalAddress?.component?.state ||
+                    (userInfo?.serviceCompany?.postalAddress?.component
                       ?.country && (
                       <Text style={styles.footerSectionBody}>
                         {
@@ -748,7 +719,7 @@ const OrderArticlePDF = React.memo(
 
                   {userInfo?.serviceCompany?.contact?.phone && (
                     <Text style={styles.footerSectionBody}>
-                      {t('Tel.')}: {userInfo?.serviceCompany.contact.phone}
+                      {t('Tel.')}: {userInfo?.serviceCompany?.contact?.phone}
                     </Text>
                   )}
                 </View>
@@ -756,88 +727,56 @@ const OrderArticlePDF = React.memo(
                 <View style={{...styles.footerContent}}>
                   <Text style={styles.footerHeading}>{t('Bank')}:</Text>
 
-                  {userInfo?.serviceCompany.settings.paymentInfo
-                    .accountNumber && (
+                  {userInfo?.serviceCompany?.settings?.paymentInfo
+                    ?.accountNumber && (
                     <Text style={styles.footerSectionBody}>
                       {t('Acc. nr.')}:{' '}
                       {
-                        userInfo?.serviceCompany.settings.paymentInfo
-                          .accountNumber
+                        userInfo?.serviceCompany?.settings?.paymentInfo
+                          ?.accountNumber
                       }
                     </Text>
                   )}
 
-                  {userInfo?.serviceCompany.settings.paymentInfo.iban && (
+                  {userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
                     <Text style={styles.footerSectionBody}>
                       {t('IBAN')}:{' '}
-                      {userInfo?.serviceCompany.settings.paymentInfo.iban}
+                      {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
                     </Text>
                   )}
 
-                  {userInfo?.serviceCompany.settings.paymentInfo.bic && (
+                  {userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
                     <Text style={styles.footerSectionBody}>
                       {t('BIC')}:{' '}
-                      {userInfo?.serviceCompany.settings.paymentInfo.bic}
+                      {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
                     </Text>
                   )}
                 </View>
-
-                {/* TODO: 2nd bank information  */}
-                {/* <View style={{...styles.footerContent}}>
-                  <Text
-                    style={styles.footerHeading}>
-                    {t('Bank')}:
-                  </Text>
-                  {userInfo?.serviceCompany.settings.paymentInfo
-                    .accountNumber && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('Acc. nr.')}:{' '}
-                      {
-                        userInfo?.serviceCompany.settings.paymentInfo
-                          .accountNumber
-                      }
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany.settings.paymentInfo.iban && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('IBAN')}:{' '}
-                      {userInfo?.serviceCompany.settings.paymentInfo.iban}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany.settings.paymentInfo.bic && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('BIC')}:{' '}
-                      {userInfo?.serviceCompany.settings.paymentInfo.bic}
-                    </Text>
-                  )}
-                </View> */}
                 <View style={{...styles.footerContent}}>
-                  {userInfo?.serviceCompany.settings.managingDirector && (
+                  {userInfo?.serviceCompany?.settings?.managingDirector && (
                     <Text style={styles.footerHeading}>
                       {t('Managing Director')}:{' '}
-                      {userInfo?.serviceCompany.settings.managingDirector}
+                      {userInfo?.serviceCompany?.settings?.managingDirector}
                     </Text>
                   )}
 
-                  {userInfo?.serviceCompany.settings.arbitrationCourt && (
+                  {userInfo?.serviceCompany?.settings?.arbitrationCourt && (
                     <Text style={styles.footerSectionBody}>
                       {t('Registration court')}:{' '}
-                      {userInfo?.serviceCompany.settings.arbitrationCourt}
+                      {userInfo?.serviceCompany?.settings?.arbitrationCourt}
                     </Text>
                   )}
 
-                  {userInfo?.serviceCompany.settings.vatId && (
+                  {userInfo?.serviceCompany?.settings?.vatId && (
                     <Text style={styles.footerSectionBody}>
-                      {t('VAT ID')}: {userInfo?.serviceCompany.settings.vatId}{' '}
+                      {t('VAT ID')}: {userInfo?.serviceCompany?.settings?.vatId}{' '}
                     </Text>
                   )}
 
-                  {userInfo?.serviceCompany.settings.tradeRegisterNumber && (
+                  {userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
                     <Text style={styles.footerSectionBody}>
                       {t('Certified')}:{' '}
-                      {userInfo?.serviceCompany.settings.tradeRegisterNumber}
+                      {userInfo?.serviceCompany?.settings?.tradeRegisterNumber}
                     </Text>
                   )}
                 </View>
@@ -846,25 +785,23 @@ const OrderArticlePDF = React.memo(
 
             <View style={styles.footerEmailWrapper}>
               <View style={styles.leftFooter}>
-                {userInfo?.serviceCompany.contact.url && (
-                  <Text style={{...styles.emailText, ...styles.footerContent}}>
-                    {userInfo?.serviceCompany.contact.url}
-                  </Text>
+                {userInfo?.serviceCompany?.contact?.url && (
+                  <View style={styles.footerContent}>
+                    <Text style={styles.emailText}>
+                      {userInfo?.serviceCompany?.contact?.url}
+                    </Text>
+                  </View>
                 )}
 
                 {userInfo?.serviceCompany.contact.email && (
-                  <Text
-                    style={{
-                      ...styles.emailText,
-                      ...styles.footerContent,
-                    }}>
-                    {userInfo?.serviceCompany.contact.email}
-                  </Text>
+                  <View style={{...styles.footerContent, marginLeft: 2}}>
+                    <Text style={styles.emailText}>
+                      {userInfo?.serviceCompany?.contact?.email}
+                    </Text>
+                  </View>
                 )}
 
-                <Text style={{...styles.emailText, ...styles.footerContent}} />
-
-                <Text style={{...styles.emailText, ...styles.footerContent}} />
+                <Text style={styles.footerContent} />
               </View>
               <View>
                 <Text

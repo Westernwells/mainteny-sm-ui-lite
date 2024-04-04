@@ -36,6 +36,7 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useCurrentCurrency} from 'utils/currency';
+import useLogoDimensions from 'hooks/useLogoDimensions';
 import {ArticleItemsTable} from './ArticleItemsTable';
 import OrderArticlePDF from './OrderArticlePDF';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
@@ -135,6 +136,8 @@ export const OrderArticle = () => {
     formik.setFieldValue('articleSupplierId', row.id);
   };
 
+  const logoDimensions = useLogoDimensions(imageUrl);
+
   const generatePrintBlobUrl = async () => {
     if (newArticleOrder) {
       const blob = await pdf(
@@ -143,6 +146,7 @@ export const OrderArticle = () => {
           userInfo={user?.userAccount}
           currencyCode={currentCurrency.code}
           logoSrc={imageUrl}
+          logoDimensions={logoDimensions}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -187,6 +191,7 @@ export const OrderArticle = () => {
         userInfo={user?.userAccount}
         logoSrc={imageUrl}
         currencyCode={currentCurrency.code}
+        logoDimensions={logoDimensions}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
