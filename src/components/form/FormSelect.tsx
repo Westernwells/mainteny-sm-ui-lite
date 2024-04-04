@@ -91,7 +91,8 @@ export const FormSelect = ({
         sx={{
           px: '0.2em',
           ...labelStyles,
-        }}>
+        }}
+        shrink={selectProps?.notched}>
         {t(label)}
       </InputLabel>
       <Select

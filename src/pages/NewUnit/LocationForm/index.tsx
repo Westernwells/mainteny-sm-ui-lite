@@ -26,7 +26,6 @@ const validationSchema = Yup.object().shape({
         country: Yup.string().required('Country is required'),
         state: Yup.string().required('State is required'),
         city: Yup.string().required('City is required'),
-        street: Yup.string().required('Street is required'),
       }),
     }),
 });
@@ -73,7 +72,7 @@ export const LocationForm = ({
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={6} md={6}>
             <AddressAutoComplete
               initialValue={formik.values.address?.fullName || ''}
               initialAddress={formik.values.address}
@@ -102,35 +101,20 @@ export const LocationForm = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={6} md={6}>
             <FormInput
               props={{
                 size: 'small',
                 placeholder: '',
-                label: 'Street',
-                name: 'address.component.street',
-                required: true,
-                value: formik.values.address?.component?.street ?? '',
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4} md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                placeholder: '',
-                label: 'Street 2',
+                label: 'Address line 2',
                 name: 'address.component.street2',
-                required: false,
+                // required: true,
                 value: formik.values.address?.component?.street2 ?? '',
                 onChange: formik.handleChange,
               }}
             />
           </Grid>
-
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={3} md={3}>
             <FormInput
               props={{
                 size: 'small',
@@ -144,7 +128,7 @@ export const LocationForm = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={3} md={3}>
             <FormInput
               props={{
                 size: 'small',
@@ -158,7 +142,7 @@ export const LocationForm = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={3} md={3}>
             <FormSelect
               labelId="address.component.country"
               label="Country"
@@ -169,13 +153,14 @@ export const LocationForm = ({
                 value: formik.values.address?.component?.country ?? '',
                 multiple: false,
                 onChange: formik.handleChange,
+                notched: true,
               }}
               required
               isCompanyTranslation
             />
           </Grid>
 
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={3} md={3}>
             <FormSelect
               labelId="address.component.state"
               label="State/Province/Region"
@@ -188,6 +173,8 @@ export const LocationForm = ({
                 value: formik.values.address?.component?.state ?? '',
                 multiple: false,
                 onChange: formik.handleChange,
+                notched: true,
+                placeholder: '',
               }}
               required
               isCompanyTranslation
