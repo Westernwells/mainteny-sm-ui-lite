@@ -23,7 +23,6 @@ import {
   ArticleView,
   CreateArticleOrderRecord,
 } from 'models/article';
-import {getBase64FromUrl} from 'utils/utils';
 import {pdf} from '@react-pdf/renderer';
 import printJS from 'print-js';
 import PathImage from 'assets/images/Path.svg';
@@ -31,12 +30,10 @@ import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import Edit from '@mui/icons-material/Edit';
 import {Button} from 'components/Button';
 import useTheme from '@mui/material/styles/useTheme';
-import {
-  useDownloadFileWithCustomName,
-  useDownloadUrl,
-} from 'hooks/reactQuery/useDownloadUrl';
+import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
 import {useCurrentCurrency} from 'utils/currency';
 import useLogoDimensions from 'hooks/useLogoDimensions';
+import useLogoImage from 'hooks/useLogoImage';
 import {ArticleItemsTable} from './ArticleItemsTable';
 import OrderArticlePDF from './OrderArticlePDF';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
@@ -101,20 +98,11 @@ export const OrderArticle = () => {
   const [mode, setMode] = useState(DocumentMode.EDIT);
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
   const [printPdfBlobUrl, setPrintPdfBlobUrl] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const imageUrl = useLogoImage(user);
 
   const {downloadFile} = useDownloadFileWithCustomName(
     `AO_${newArticleOrder?.externalId}`,
     printPdfBlobUrl,
-  );
-
-  const logoCompany =
-    user?.userAccount?.serviceCompany?.settings?.whiteLabel?.logoPath;
-
-  const {data: logoUrl = {}} = useDownloadUrl(
-    logoCompany ? [logoCompany] : [],
-    undefined,
-    user?.userAccount.serviceCompany.id,
   );
 
   const initialValues: CreateArticleOrderRecord = {
@@ -238,20 +226,6 @@ export const OrderArticle = () => {
       }
     }
   }, [articleFromLocation]);
-
-  useEffect(() => {
-    const fetchImage = async () => {
-      if (!imageUrl && logoCompany !== undefined) {
-        const fetchedImageUrl = await getBase64FromUrl(logoUrl[logoCompany!]);
-
-        if (fetchedImageUrl) {
-          setImageUrl(fetchedImageUrl);
-        }
-      }
-    };
-
-    fetchImage();
-  }, [logoUrl[logoCompany!]]);
 
   useEffect(() => {
     setNewArticleOrder(articleOrder);

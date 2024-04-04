@@ -22,9 +22,15 @@ import {useTranslation} from 'react-i18next';
 import {useSnackbar} from 'hooks/useSnackbar';
 import PathImage from 'assets/images/Path.svg';
 import {SnackbarKey} from 'notistack';
+import {useCurrentCurrency} from 'utils/currency';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {pdf} from '@react-pdf/renderer';
+import useLogoDimensions from 'hooks/useLogoDimensions';
+import useLogoImage from 'hooks/useLogoImage';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
+import JobOverviewPdfTemplate from './Tabs/Overview/JobOverviewPdfTemplate';
 
 const tabItems = [
   {
@@ -55,13 +61,15 @@ export const ServiceOrderDetails = () => {
   const isWorkReportPdfGenerated =
     serviceOrder?.report?.additionalInfo.pdfGenerationStatus ===
     PdfGenerationStatus.DONE;
-  const isJobOverviewPdfGenerated =
-    serviceOrder?.additionalInfo.confirmationInfo?.pdfGenerationStatus ===
-    PdfGenerationStatus.DONE;
   const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
   const {t} = useTranslation();
+  const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
   const [filePathToDownload, setFilePathToDownload] = useState('');
+  const imageUrl = useLogoImage(user);
+
+  const logoDimensions = useLogoDimensions(imageUrl);
 
   const filePaths = useMemo(
     () => (filePathToDownload ? [filePathToDownload] : []),
@@ -71,11 +79,6 @@ export const ServiceOrderDetails = () => {
   const {data: fileDownloadURLs = {}} = useDownloadUrl(filePaths, {
     refetchOnWindowFocus: false,
   });
-
-  const {downloadFile} = useDownloadFileWithCustomName(
-    tabValue === 1 ? serviceOrder?.report?.number : serviceOrder?.number,
-    fileDownloadURLs[filePathToDownload],
-  );
 
   const {mutateAsync: postServiceOrderConfirmationPublish} =
     usePostServiceOrderConfirmationPublish();
@@ -90,13 +93,23 @@ export const ServiceOrderDetails = () => {
     }
   };
 
-  const downloadWorkOverview = () => {
-    const pdfPath = isJobOverviewPdfGenerated
-      ? (serviceOrder?.additionalInfo.confirmationInfo?.pdfPath as string)
-      : '';
-    if (pdfPath) {
-      setFilePathToDownload(pdfPath);
-    }
+  const {downloadFile} = useDownloadFileWithCustomName(
+    tabValue === 1 ? serviceOrder?.report?.externalId : serviceOrder?.number,
+    tabValue === 0 ? filePathToDownload : fileDownloadURLs[filePathToDownload],
+  );
+
+  const generatePreviewPdfBlobUrl = async () => {
+    const blob = await pdf(
+      <JobOverviewPdfTemplate
+        userInfo={user?.userAccount}
+        currencyCode={currentCurrency.code}
+        logoSrc={imageUrl}
+        serviceOrder={serviceOrder}
+        logoDimensions={logoDimensions}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    setFilePathToDownload(blobURL);
   };
 
   const generateWorkOverview = async () => {
@@ -114,6 +127,8 @@ export const ServiceOrderDetails = () => {
         },
       );
 
+      generatePreviewPdfBlobUrl();
+
       await postServiceOrderConfirmationPublish({
         serviceOrder: serviceOrderId as string,
         data: {
@@ -127,16 +142,6 @@ export const ServiceOrderDetails = () => {
       showError(e);
     }
   };
-
-  useEffect(() => {
-    if (
-      serviceOrder?.additionalInfo.confirmationInfo?.pdfGenerationStatus ===
-        PdfGenerationStatus.DONE &&
-      overviewPdfSnackBarRef.current
-    ) {
-      downloadWorkOverview();
-    }
-  }, [serviceOrder]);
 
   useEffect(() => {
     if (!Object.keys(fileDownloadURLs || {}).length) {

@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   rightAddressContent: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingBottom: 4,
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#616161',
     flex: '0 0 55%',
-    textAlign: 'right',
+    textAlign: 'left',
   },
   dataBody: {
     borderBottom: '1px solid #212121',
