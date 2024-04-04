@@ -47,6 +47,7 @@ import {createEmptyResource} from 'utils/paging-utils';
 import useHighlightText from 'hooks/useHighlightText';
 import {getArticleTypeText} from 'utils/article-utils';
 import {DragIndicator} from '@mui/icons-material';
+import {useDebounce} from 'hooks/useDebounce';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -243,6 +244,8 @@ export const ArticleItemRowNEW = ({
 
   const [popperOpen, setPopperOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const debouncedSearchText = useDebounce(searchText);
+
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [tabValue, setTabValue] = useState(0);
 
@@ -279,7 +282,7 @@ export const ArticleItemRowNEW = ({
     {
       pageIndex: 0,
       pageSize: 30,
-      query: searchText,
+      query: debouncedSearchText,
     },
     {keepPreviousData: true, enabled: popperOpen && tabValue === 0},
   );
@@ -292,7 +295,7 @@ export const ArticleItemRowNEW = ({
     {
       pageIndex: 0,
       pageSize: 100,
-      query: searchText,
+      query: debouncedSearchText,
     },
     {
       keepPreviousData: true,
