@@ -74,7 +74,7 @@ export const LocationForm = ({
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6} md={6}>
             <AddressAutoComplete
-              initialValue={formik.values.address?.fullName || ''}
+              initialValue={formik.values.address?.component?.street || ''}
               initialAddress={formik.values.address}
               inputError={
                 getIn(formik.errors, 'address.fullName') &&
@@ -86,6 +86,7 @@ export const LocationForm = ({
               textFieldProps={{
                 placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
                 name: 'address.fullName',
+                label: 'Address line 1',
               }}
               allowMap
               getAddress={(address) => {
@@ -99,6 +100,7 @@ export const LocationForm = ({
                     : undefined,
                 });
               }}
+              shortAddress
             />
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
@@ -180,8 +182,8 @@ export const LocationForm = ({
             />
           </Grid>
         </Grid>
-        <Grid sx={{mt: '3em'}} container spacing={2}>
-          <Grid item xs={12} sm={4} md={4}>
+        <Grid sx={{mt: '50px'}} container spacing={2}>
+          <Grid item xs={12} sm={6} md={6}>
             <FormInput
               props={{
                 size: 'small',
@@ -194,7 +196,7 @@ export const LocationForm = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={6} md={6}>
             <FormInput
               props={{
                 size: 'small',
@@ -207,20 +209,7 @@ export const LocationForm = ({
             />
           </Grid>
 
-          <Grid item xs={12} sm={4} md={4}>
-            <FormInput
-              props={{
-                size: 'small',
-                placeholder: 'e.g. central parking lot',
-                label: 'Parking',
-                name: 'parking',
-                value: formik.values.parking,
-                onChange: formik.handleChange,
-              }}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={6} md={6}>
             <FormInput
               props={{
                 size: 'small',
@@ -229,8 +218,20 @@ export const LocationForm = ({
                 name: 'keyLocation',
                 value: formik.values.keyLocation,
                 onChange: formik.handleChange,
-                multiline: true,
-                rows: 4,
+                // multiline: true,
+                // rows: 4,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={6}>
+            <FormInput
+              props={{
+                size: 'small',
+                placeholder: 'e.g. central parking lot',
+                label: 'Parking',
+                name: 'parking',
+                value: formik.values.parking,
+                onChange: formik.handleChange,
               }}
             />
           </Grid>

@@ -24,6 +24,7 @@ interface Props {
   label?: string;
   noOptionsText?: string;
   allowMap?: boolean;
+  shortAddress?: boolean;
 }
 
 export const AddressAutoComplete = ({
@@ -36,6 +37,7 @@ export const AddressAutoComplete = ({
   noOptionsText = 'Address not found. Please check and try again',
   allowMap = false,
   initialAddress,
+  shortAddress,
 }: Props) => {
   const [address, setAddress] = useState<any>(null);
   const [open, setOpen] = useState(false);
@@ -75,7 +77,26 @@ export const AddressAutoComplete = ({
 
   useEffect(() => {
     if (address !== null) {
-      setQueryView(address.formatted_address);
+      if (
+        address.fullName &&
+        !address.countryCode &&
+        !address.component &&
+        !address.location
+      ) {
+        setQueryView(address.fullName);
+      } else if (
+        shortAddress &&
+        address.components?.route &&
+        address.components?.street_number
+      ) {
+        setQueryView(
+          `${address.components?.route[0]?.long_name || ''} ${
+            address.components?.street_number[0]?.long_name || ''
+          }`,
+        );
+      } else {
+        setQueryView(address.formatted_address);
+      }
     }
   }, [address]);
 
@@ -83,11 +104,41 @@ export const AddressAutoComplete = ({
     if (!queryView && getAddress) {
       getAddress();
     }
-
-    if (queryView.length === 0 || queryView === address?.formatted_address) {
+    if (
+      (queryView && queryView.length === 0) ||
+      (queryView && queryView === address?.formatted_address)
+    ) {
       setOpen(false);
     }
-  }, [queryView]);
+
+    if (
+      queryView &&
+      queryView.length > 0 &&
+      !addressData &&
+      getAddress &&
+      !address
+    ) {
+      const addressDataObject = {
+        countryCode: initialAddress?.countryCode
+          ? initialAddress?.countryCode
+          : null,
+        fullName: queryView,
+        component: {
+          street: queryView,
+          ...(initialAddress && {
+            postalCode: initialAddress?.component?.postalCode,
+            country: initialAddress?.component?.country,
+            city: initialAddress?.component?.city,
+            state: initialAddress?.component?.state,
+            street2: initialAddress?.component?.street2,
+          }),
+        },
+        location: initialAddress?.location ? initialAddress.location : null,
+      } as AddressRecord;
+
+      getAddress(addressDataObject);
+    }
+  }, [queryView, address]);
 
   const onInputChange = (e: any) => {
     setQueryView(e.target.value);
