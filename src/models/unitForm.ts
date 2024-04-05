@@ -13,9 +13,9 @@ export interface LocationFormModel {
   keyLocation?: string;
   parking?: string;
   propertyOwnerId?: string;
-  distance?: string;
-  travelTime?: string;
-  travelFee?: string;
+  distance?: number;
+  travelTime?: number;
+  travelFee?: number;
 }
 
 export interface UnitDetailsFormModel {

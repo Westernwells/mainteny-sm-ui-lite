@@ -14,7 +14,7 @@ import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {LocationFormModel} from 'models/unitForm';
 import {formatAddressFullname} from 'utils/utils';
 import {AddressRecord} from 'models/misc';
-import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
+import {centsToMoney, moneyToCents, useCurrentCurrency} from 'utils/currency';
 import {LocationSchema} from './LocationSchema';
 import {EditLocationForm} from './EditLocationForm';
 
@@ -68,7 +68,10 @@ export const Location = ({
       propertyOwnerId,
       distance: elevator.additionalInfo?.distance,
       travelTime: elevator.additionalInfo?.travelTime,
-      travelFee: elevator.additionalInfo?.travelFee,
+      travelFee: centsToMoney(
+        currentCurrency.code,
+        elevator.additionalInfo?.travelFee,
+      ),
     },
     onSubmit: () => {},
     validationSchema,
@@ -101,7 +104,7 @@ export const Location = ({
         parking: formik.values.parking!,
         distance: formik.values.distance!,
         travelTime: formik.values.travelTime!,
-        travelFee: formik.values.travelFee!,
+        travelFee: moneyToCents(currentCurrency.code, formik.values.travelFee!),
       },
       elevatorId: elevator.id,
     });
@@ -119,11 +122,7 @@ export const Location = ({
       <Grid container spacing={2}>
         {labels.map((label) => (
           <Grid key={label} item xs={12} sm={4} md={4}>
-            <LocationSchema
-              label={label}
-              elevator={elevator}
-              currency={getCurrencySymbol[currentCurrency.code]}
-            />
+            <LocationSchema label={label} elevator={elevator} />
           </Grid>
         ))}
       </Grid>
