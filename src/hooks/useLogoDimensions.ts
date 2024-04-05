@@ -17,10 +17,10 @@ const useLogoDimensions = (imageUrl: string) => {
           let height;
           if (aspectRatio <= 1.3) {
             height = 90;
-          } else if (aspectRatio <= 2.3) {
-            height = img.width > 400 ? 80 : 35;
+          } else if (aspectRatio <= 100) {
+            height = img.width > 400 ? 80 : 40;
           } else {
-            height = 35;
+            height = 40;
           }
           setLogoDimensions({width: img.width, height});
         }

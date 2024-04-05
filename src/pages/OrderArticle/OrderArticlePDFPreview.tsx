@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   page: {
     fontFamily: 'Montserrat-Regular',
     fontSize: 10,
-    paddingTop: 15,
+    paddingTop: 25,
     paddingLeft: 68,
     paddingRight: 45,
     backgroundColor: 'white',
@@ -53,29 +53,32 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginBottom: 20,
     height: 100,
   },
   topSection: {
+    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 40,
     alignItems: 'flex-start',
+    position: 'absolute',
+    top: 110,
   },
   leftAddress: {
-    flex: '0 0 50%',
+    flex: '0 0 55%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
     fontFamily: 'Montserrat-Bold',
   },
   addressText: {
-    fontSize: 8,
-    marginBottom: 15,
+    fontSize: 10,
+    marginBottom: 30,
+    fontFamily: 'Montserrat-Regular',
   },
   partialAddressText: {
     fontSize: 10,
-    marginBottom: 4,
+    marginBottom: 1,
   },
   partAddress: {
     fontSize: 10,
@@ -113,7 +116,7 @@ const styles = StyleSheet.create({
   contentHeader: {
     fontSize: 14,
     color: '#212121',
-    marginTop: 10,
+    marginTop: 150,
     marginBottom: 10,
     fontFamily: 'Montserrat-Bold',
   },

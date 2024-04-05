@@ -50,17 +50,18 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginBottom: 20,
     height: 100,
   },
   topSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 40,
     alignItems: 'flex-start',
+    position: 'absolute',
+    top: 110,
   },
   leftAddress: {
-    flex: '0 0 50%',
+    flex: '0 0 55%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -68,18 +69,18 @@ const styles = StyleSheet.create({
   },
   addressText: {
     fontSize: 8,
-    marginBottom: 15,
+    marginBottom: 30,
+    fontFamily: 'Montserrat-Regular',
   },
   partialAddressText: {
     fontSize: 10,
-    marginBottom: 4,
+    marginBottom: 1,
   },
   partAddress: {
     fontSize: 10,
     marginBottom: 4,
   },
   rightAddress: {
-    minWidth: 200,
     flex: '0 0 45%',
     display: 'flex',
     flexDirection: 'column',
@@ -110,9 +111,9 @@ const styles = StyleSheet.create({
   contentHeader: {
     fontSize: 14,
     color: '#212121',
-    marginTop: 10,
     marginBottom: 10,
     fontFamily: 'Montserrat-Bold',
+    marginTop: 200,
   },
   contentBody: {
     color: '#616161',
@@ -378,10 +379,10 @@ const JobOverviewPdfTemplate = React.memo(
                   <Text style={styles.partialAddressText}>
                     {serviceOrder?.elevator.propertyOwner.billingAddress
                       ?.component?.postalCode &&
-                      `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.postalCode},`}
+                      `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.postalCode}, `}
                     {serviceOrder?.elevator.propertyOwner.billingAddress
                       ?.component?.state &&
-                      `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.state},`}
+                      `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.state}, `}
                     {serviceOrder?.elevator.propertyOwner.billingAddress
                       ?.component?.country &&
                       `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.country}`}
@@ -421,7 +422,7 @@ const JobOverviewPdfTemplate = React.memo(
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}> {t('Customer no.')}</Text>
                     <Text style={styles.tagContent}>
-                      {serviceOrder?.elevator.propertyOwner.externalId}
+                      {serviceOrder?.elevator.propertyOwner.number}
                     </Text>
                   </View>
                 )}
