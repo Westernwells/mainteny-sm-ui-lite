@@ -155,7 +155,7 @@ export const makeRows = (
       elevator.additionalInfo.buildingLocation,
     actions: elevator.id,
     [ElevatorOrderField.PROPERTY_OWNER_NAME]:
-      elevator.propertyOwner.meta.state === 'ACTIVE'
+      elevator.propertyOwner.meta?.state === 'ACTIVE'
         ? elevator.propertyOwner.name
         : '-',
     [ElevatorOrderField.LAST_VISIT_DATE]: elevator.lastVisitDate

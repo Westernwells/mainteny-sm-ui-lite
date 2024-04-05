@@ -49,7 +49,7 @@ export const MarkAsPaidDialog = ({
           (invoice.totalAmount?.grossAmount ?? 0) /
             10 ** invoice.totalAmount.fractionDigits! -
           invoice.payments
-            .filter((item) => item.meta.state === State.ACTIVE)
+            .filter((item) => item.meta?.state === State.ACTIVE)
             .reduce((partialSum, a) => partialSum + a.amount.value!, 0) /
             10 ** invoice.totalAmount.fractionDigits!,
         currency: invoice.totalAmount.currency,
