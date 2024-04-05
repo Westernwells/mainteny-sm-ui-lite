@@ -6,7 +6,6 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {Progress} from 'components/Progress';
-import {PdfGenerationStatus} from 'models/misc';
 import {
   usePostServiceOrderConfirmationPublish,
   useServiceOrderDetails,
@@ -48,20 +47,12 @@ const tabItems = [
   },
 ];
 
-const ACTION_BUTTON_LABEL: {[key: number]: string} = {
-  0: 'Download Job Overview',
-  1: 'Download Work Report',
-};
-
 export const ServiceOrderDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: serviceOrderId} = useParams();
   const [queryParams, setQueryParams] = useSearchParams();
   const {data: serviceOrder, isLoading} =
     useServiceOrderDetails(serviceOrderId);
-  const isWorkReportPdfGenerated =
-    serviceOrder?.report?.additionalInfo.pdfGenerationStatus ===
-    PdfGenerationStatus.DONE;
   const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -87,19 +78,9 @@ export const ServiceOrderDetails = () => {
   const {mutateAsync: postServiceOrderConfirmationPublish} =
     usePostServiceOrderConfirmationPublish();
 
-  const downloadWorkReport = () => {
-    const pdfPath = isWorkReportPdfGenerated
-      ? serviceOrder?.report!.additionalInfo.pdfPath
-      : '';
-
-    if (pdfPath) {
-      setFilePathToDownload(pdfPath);
-    }
-  };
-
   const {downloadFile} = useDownloadFileWithCustomName(
-    tabValue === 1 ? serviceOrder?.report?.externalId : serviceOrder?.number,
-    tabValue === 0 ? filePathToDownload : fileDownloadURLs[filePathToDownload],
+    serviceOrder?.number,
+    filePathToDownload,
   );
 
   const generatePreviewPdfBlobUrl = async () => {
@@ -179,21 +160,13 @@ export const ServiceOrderDetails = () => {
 
   return (
     <Tabs
-      showActionBtn={tabValue === 1 || tabValue === 0}
-      btnLabel={ACTION_BUTTON_LABEL[tabValue] || undefined}
+      showActionBtn={tabValue === 0}
+      btnLabel="Download Job Overview"
       actionBtnVariant="outlined"
       hideDivider
       actionButtonIcon={<FileDownloadIcon />}
-      btnOnClick={() => {
-        if (tabValue === 0) {
-          generateWorkOverview();
-        }
-        if (tabValue === 1) {
-          downloadWorkReport();
-        }
-      }}
+      btnOnClick={generateWorkOverview}
       actionButtonStyles={{background: 'transparent'}}
-      disableBtnAction={tabValue === 1 && !isWorkReportPdfGenerated}
       tabItems={tabItems}
       currentIndex={tabValue}
       onChange={(index) => {
@@ -209,12 +182,7 @@ export const ServiceOrderDetails = () => {
         <Overview serviceOrder={serviceOrder!} />
       </TabsBody>
       <TabsBody value={tabValue} index={1} containerStyle={{marginTop: 3}}>
-        <WorkReport
-          serviceOrder={serviceOrder!}
-          downloadWorkReport={
-            isWorkReportPdfGenerated ? downloadWorkReport : null
-          }
-        />
+        <WorkReport serviceOrder={serviceOrder!} />
       </TabsBody>
       <TabsBody
         value={tabValue}
