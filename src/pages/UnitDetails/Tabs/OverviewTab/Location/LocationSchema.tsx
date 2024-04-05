@@ -25,7 +25,7 @@ export const LocationSchema = ({label, elevator, currency}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const customer =
-    elevator.propertyOwner.meta.state === 'ACTIVE'
+    elevator.propertyOwner.meta?.state === 'ACTIVE'
       ? elevator.propertyOwner
       : null;
 
