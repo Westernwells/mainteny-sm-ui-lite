@@ -20,12 +20,16 @@ import {
   ServiceOrderReportView,
   ServiceOrderView,
 } from 'models/service-order';
+import {PdfGenerationStatus} from 'models/misc';
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {FormInput} from 'components/form/FormInput';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {
   articleViewToArticleRecord,
   calculateTotalBillableHours,
@@ -45,7 +49,6 @@ import {ArticleItemsTable} from './ArticleItemsTable';
 
 interface Props {
   serviceOrder: ServiceOrderView;
-  downloadWorkReport: (() => void) | null;
 }
 
 const validationSchema = Yup.object().shape({
@@ -56,7 +59,7 @@ const validationSchema = Yup.object().shape({
     }),
 });
 
-export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
+export const WorkReport = ({serviceOrder}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const [queryParams, setQueryParams] = useSearchParams();
@@ -73,6 +76,16 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
   const reportToUpdate = serviceOrder?.reports?.find(
     (r) => r.externalId === report?.externalId,
   );
+
+  const {data: pdfDownloadUrl = {}} = useDownloadUrl(
+    serviceOrder.reports?.map((i) => i.additionalInfo.pdfPath) || [],
+  );
+  const {downloadFile} = useDownloadFileWithCustomName(
+    report?.externalId || '',
+    pdfDownloadUrl[report?.additionalInfo.pdfPath || ''],
+  );
+  const isWorkReportPdfGenerated =
+    report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
 
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
@@ -362,12 +375,12 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'outlined',
-              disabled: !downloadWorkReport,
+              disabled: !isWorkReportPdfGenerated,
               sx: {
                 background: 'transparent',
               },
               startIcon: <FileDownloadIcon />,
-              onClick: () => downloadWorkReport?.(),
+              onClick: downloadFile,
             }}>
             <Typography variant="subtitle2">{t('Download')}</Typography>
           </Button>
