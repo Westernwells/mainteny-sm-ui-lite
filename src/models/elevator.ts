@@ -129,9 +129,9 @@ export interface ElevatorAdditionalInfo {
   hoistingHeight: string;
   shaftHeight: string;
   spendingLimit: number;
-  distance: string;
-  travelTime: string;
-  travelFee: string;
+  distance: number;
+  travelTime: number;
+  travelFee: number;
   inspectionCycle: InspectionCycle;
   numberOfPeople: number;
 }
@@ -407,9 +407,9 @@ export interface ElevatorRequestBody {
   shaftHeight: string;
   spendingLimit: number;
   inspectionCycle: InspectionCycle;
-  distance: string;
-  travelTime: string;
-  travelFee: string;
+  distance: number;
+  travelTime: number;
+  travelFee: number;
   numberOfPeople: number;
 }
 

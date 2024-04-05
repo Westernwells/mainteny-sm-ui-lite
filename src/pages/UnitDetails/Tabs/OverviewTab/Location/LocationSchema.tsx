@@ -14,16 +14,22 @@ import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {useNavigate} from 'react-router';
+import {
+  centsToMoney,
+  getCurrencySymbol,
+  useCurrentCurrency,
+} from 'utils/currency';
 
 interface Props {
   label: string;
   elevator: ElevatorView;
-  currency: string;
 }
 
-export const LocationSchema = ({label, elevator, currency}: Props) => {
+export const LocationSchema = ({label, elevator}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
+
   const customer =
     elevator.propertyOwner.meta.state === 'ACTIVE'
       ? elevator.propertyOwner
@@ -153,8 +159,13 @@ export const LocationSchema = ({label, elevator, currency}: Props) => {
           <CardProps
             icon={<AttachMoneyIcon sx={{color: theme.palette.primary.light}} />}
             label="Travel fee"
-            unitText={currency}
-            bodyText={elevator.additionalInfo.travelFee || '-'}
+            unitText={getCurrencySymbol[currentCurrency.code]}
+            bodyText={
+              centsToMoney(
+                currentCurrency.code,
+                elevator.additionalInfo.travelFee,
+              ) || '-'
+            }
             containerStyles={{alignItems: 'center'}}
             iconMaxHeight="3em"
           />
