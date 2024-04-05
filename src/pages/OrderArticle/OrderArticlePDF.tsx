@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginBottom: 20,
+    height: 100,
   },
   topSection: {
     flexDirection: 'row',
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#616161',
     flex: '0 0 55%',
-    textAlign: 'left',
+    textAlign: 'right',
   },
   dataBody: {
     borderBottom: '1px solid #212121',
@@ -359,7 +360,7 @@ const OrderArticlePDF = React.memo(
               {logoSrc && (
                 <Image
                   style={{height: logoDimensions?.height || 35}}
-                  source={logoSrc}
+                  src={logoSrc}
                 />
               )}
             </View>

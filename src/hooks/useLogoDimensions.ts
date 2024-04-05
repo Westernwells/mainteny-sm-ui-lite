@@ -30,7 +30,6 @@ const useLogoDimensions = (imageUrl: string) => {
       isMounted = false;
     };
   }, [imageUrl]);
-
   return logoDimensions;
 };
 

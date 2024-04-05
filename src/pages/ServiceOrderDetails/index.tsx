@@ -27,6 +27,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
+import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -66,6 +67,9 @@ export const ServiceOrderDetails = () => {
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+  const {data: quotation} = useQuotationDetails(
+    serviceOrder?.additionalInfo.quotationId,
+  );
   const [filePathToDownload, setFilePathToDownload] = useState('');
   const imageUrl = useLogoImage(user);
 
@@ -106,6 +110,7 @@ export const ServiceOrderDetails = () => {
         logoSrc={imageUrl}
         serviceOrder={serviceOrder}
         logoDimensions={logoDimensions}
+        quotation={quotation}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

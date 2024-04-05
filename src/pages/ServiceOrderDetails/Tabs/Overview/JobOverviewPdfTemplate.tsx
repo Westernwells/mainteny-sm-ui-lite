@@ -14,6 +14,7 @@ import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
 import {Currencies, formatCurrency} from 'utils/currency';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {QuotationView} from 'models/quotation';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 
@@ -50,6 +51,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginBottom: 20,
+    height: 100,
   },
   topSection: {
     flexDirection: 'row',
@@ -288,12 +290,19 @@ type Props = {
     width: number;
     height: number;
   } | null;
+  quotation?: QuotationView;
 };
 
 const JobOverviewPdfTemplate = React.memo(
-  ({userInfo, logoSrc, currencyCode, serviceOrder, logoDimensions}: Props) => {
+  ({
+    userInfo,
+    logoSrc,
+    currencyCode,
+    serviceOrder,
+    logoDimensions,
+    quotation,
+  }: Props) => {
     const {t} = useTranslation();
-    console.log(serviceOrder, 'serviceOrder');
 
     const articleItems = serviceOrder?.articles!;
     const calculateTotal = (arr: ServiceOrderArticleView[]) => {
@@ -417,20 +426,20 @@ const JobOverviewPdfTemplate = React.memo(
                   </View>
                 )}
 
-                {serviceOrder?.elevator.propertyOwner.externalId && (
+                {serviceOrder?.meta.createdAt && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}> {t('Your order from')}</Text>
                     <Text style={styles.tagContent}>
-                      {serviceOrder?.elevator.propertyOwner.externalId}
+                      {formatDate(serviceOrder?.meta.createdAt)}
                     </Text>
                   </View>
                 )}
 
-                {serviceOrder?.elevator.propertyOwner.externalId && (
+                {quotation?.externalId && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}> {t('Quotation no.')}</Text>
                     <Text style={styles.tagContent}>
-                      {serviceOrder?.elevator.propertyOwner.externalId}
+                      {quotation?.externalId}
                     </Text>
                   </View>
                 )}

@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {getBase64FromUrl} from 'utils/utils';
+import {convertBase64ToPNG, getBase64FromUrl} from 'utils/utils';
 import {UserSession} from 'models/session';
 import {useDownloadUrl} from './reactQuery/useDownloadUrl';
 
@@ -22,7 +22,15 @@ function useLogoImage(user: UserSession | null | undefined) {
         const fetchedImageUrl = await getBase64FromUrl(logoUrl[logoUrlPath!]);
 
         if (isMounted && fetchedImageUrl) {
-          setImageUrl(fetchedImageUrl);
+          let finalImageUrl = fetchedImageUrl;
+          if (fetchedImageUrl.startsWith('data:image/jpeg')) {
+            try {
+              finalImageUrl = await convertBase64ToPNG(fetchedImageUrl);
+            } catch (error) {
+              console.error('Error converting JPEG to PNG:', error);
+            }
+          }
+          setImageUrl(finalImageUrl);
         }
       }
     };
