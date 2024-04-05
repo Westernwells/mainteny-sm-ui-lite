@@ -35,6 +35,7 @@ import Companies from 'pages/Companies';
 import CompanyDetails from 'pages/CompanyDetails';
 import ServiceOrderDetails from 'pages/ServiceOrderDetails';
 import SystemSettings from 'pages/SystemSettings';
+import ImportSettings from 'pages/Imports';
 import NewCompany from 'pages/NewCompany';
 import SettingsPage from 'pages/Settings';
 import Checklist from 'pages/Settings/Checklist';
@@ -754,6 +755,19 @@ export const Router = () => {
                 </Helmet>
                 <PageLayout pageTitle="System Settings">
                   <SystemSettings />
+                </PageLayout>
+              </>
+            }
+          />
+          <Route
+            path="/admin/imports"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Data Import Settings - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout pageTitle="Data Import Settings">
+                  <ImportSettings />
                 </PageLayout>
               </>
             }

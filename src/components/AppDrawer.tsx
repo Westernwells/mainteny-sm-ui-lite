@@ -326,6 +326,22 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         navigate('/admin/system-settings');
       },
     },
+    {
+      text: 'Imports',
+      icon: <DashboardIcon fontSize="1.5rem" />,
+      selectIcon: <DashboardIconColor fontSize="1.5rem" />,
+      path: '/admin/import-settings',
+      access: isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/admin/imports');
+        navigate('/admin/imports');
+      },
+    },
   ];
 
   const drawerHeader = (logo: any, arrowIcon: any) => (
