@@ -255,6 +255,7 @@ export const SelectTechnicians = ({
           checkedValues={selectedTechnicianIds}
           clearSelectedTechnicians={clearSelectedTechnicians}
           setTechnicianSearch={setTechnicianSearch}
+          viewDate={queryDate}
         />
       </Box>
 

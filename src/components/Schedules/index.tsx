@@ -30,7 +30,7 @@ import {ScheduleBody} from 'components/Schedules/ScheduleBody';
 import {ScheduleBodyCell} from 'components/Schedules/ScheduleBodyCell';
 import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer';
 import {WeekPair} from 'models/misc';
-import {ServiceOrderView} from 'models/service-order';
+import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import CardHeader from '@mui/material/CardHeader';
 import {useTheme} from '@mui/material/styles';
 import {
@@ -97,7 +97,7 @@ export const Schedule = ({
   footerContainerStyles,
   technicians,
   checkedValues = [],
-  currentDate,
+  currentDate = new Date(),
 }: Props) => {
   const formatDate = useFormatDate();
   const {t} = useTranslation();
@@ -376,12 +376,17 @@ export const Schedule = ({
                                       {
                                         scheduleItems[xKey].map(
                                           (scheduleItem) => {
+                                            const startDateTime =
+                                              scheduleItem.schedules[0]
+                                                .startTime;
+                                            const endDateTime =
+                                              scheduleItem.schedules[0].endTime;
+
                                             const itemPosition =
                                               getItemPosition({
                                                 scheduleItemGroup,
-                                                startDateTime:
-                                                  scheduleItem.schedules[0]
-                                                    .startTime,
+                                                startDateTime,
+                                                viewDate: currentDate,
                                                 rowKey: xKey,
                                                 orderId: scheduleItem.id,
                                                 gridWidth,
@@ -389,12 +394,9 @@ export const Schedule = ({
                                             return renderCellItem(
                                               scheduleItem,
                                               getItemWidth({
-                                                startDateTime:
-                                                  scheduleItem.schedules[0]
-                                                    .startTime,
-                                                endDateTime:
-                                                  scheduleItem.schedules[0]
-                                                    .endTime,
+                                                startDateTime,
+                                                endDateTime,
+                                                viewDate: currentDate,
                                                 gridWidth,
                                                 horizontalPosition:
                                                   getPxFromString(
@@ -478,12 +480,17 @@ export const Schedule = ({
                                         {
                                           scheduleItems[xKey].map(
                                             (scheduleItem) => {
+                                              const startDateTime =
+                                                scheduleItem.schedules[0]
+                                                  .startTime;
+                                              const endDateTime =
+                                                scheduleItem.schedules[0]
+                                                  .endTime;
                                               const itemPosition =
                                                 getItemPosition({
                                                   scheduleItemGroup,
-                                                  startDateTime:
-                                                    scheduleItem.schedules[0]
-                                                      .startTime,
+                                                  startDateTime,
+                                                  viewDate: currentDate,
                                                   rowKey: xKey,
                                                   orderId: scheduleItem.id,
                                                   gridWidth,
@@ -491,12 +498,9 @@ export const Schedule = ({
                                               return renderCellItem(
                                                 scheduleItem,
                                                 getItemWidth({
-                                                  startDateTime:
-                                                    scheduleItem.schedules[0]
-                                                      .startTime,
-                                                  endDateTime:
-                                                    scheduleItem.schedules[0]
-                                                      .endTime,
+                                                  startDateTime,
+                                                  endDateTime,
+                                                  viewDate: currentDate,
                                                   gridWidth,
                                                   horizontalPosition:
                                                     getPxFromString(

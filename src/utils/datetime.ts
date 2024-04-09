@@ -92,7 +92,8 @@ export function toDate(value: any): Date {
   if (Array.isArray(value)) {
     return new Date(value[0], value[1] - 1, value[2], 0, 0, 0, 0);
   }
-  return parseISO(value?.toString());
+
+  return parseISO(value);
 }
 
 export function toEpochSeconds(date: Date): number {

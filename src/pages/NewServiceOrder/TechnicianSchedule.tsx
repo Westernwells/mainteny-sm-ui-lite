@@ -43,6 +43,7 @@ interface Props {
   clearSelectedTechnicians: () => void;
   setTechnicianSearch: (value: string) => void;
   maxHeight?: string;
+  viewDate: Date;
 }
 
 const gridWidth = 120;
@@ -58,6 +59,7 @@ export const TechnicianSchedule = ({
   clearSelectedTechnicians,
   setTechnicianSearch,
   maxHeight = '20rem',
+  viewDate,
 }: Props) => {
   const formatDate = useFormatDate();
   const [scheduleItemGroup, setScheduleItemGroup] =
@@ -305,6 +307,7 @@ export const TechnicianSchedule = ({
                                       scheduleItemGroup,
                                       startDateTime:
                                         scheduleItem.schedules[0].startTime,
+                                      viewDate,
                                       rowKey: xKey,
                                       orderId: scheduleItem.id,
                                       gridWidth,
@@ -316,6 +319,7 @@ export const TechnicianSchedule = ({
                                           scheduleItem.schedules[0].startTime,
                                         endDateTime:
                                           scheduleItem.schedules[0].endTime,
+                                        viewDate,
                                         gridWidth,
                                         horizontalPosition: getPxFromString(
                                           itemPosition.x,
@@ -386,6 +390,7 @@ export const TechnicianSchedule = ({
           clearSelectedTechnicians={clearSelectedTechnicians}
           setTechnicianSearch={setTechnicianSearch}
           maxHeight="40rem"
+          viewDate={viewDate}
         />
       </Dialog>
     </>
