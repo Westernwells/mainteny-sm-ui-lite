@@ -124,11 +124,11 @@ export enum ChecklistStatus {
 
 export interface ServiceOrderCheckListInfo {
   checkListId: string;
-  technicianSignature: string;
-  pdfPath: string;
-  pdfGenerationStatus: PdfGenerationStatus;
-  status: ChecklistStatus;
+  technicianId: string;
+  pdfGenerationStatus?: PdfGenerationStatus;
+  status?: ChecklistStatus;
 }
+
 export interface ServiceOrder {
   id: string;
   number: string;
@@ -163,7 +163,14 @@ export interface ServiceOrderAdditionalInfo {
   appointmentNotificationRequired: boolean;
   appointmentNotificationSent: boolean;
   priority: Priority;
-  checkListInfo?: ServiceOrderCheckListInfo;
+  checkListInfo?: {
+    checkListId?: string;
+    technicianSignature?: string;
+    pdfPath?: string;
+    pdfGenerationStatus?: PdfGenerationStatus;
+    completedAt?: string;
+    status?: ChecklistStatus;
+  };
   moreInformation: string;
   quotationId: string;
   workReportGenerated: boolean;
@@ -231,7 +238,9 @@ export interface ServiceOrderView {
   search: string;
   meta: Meta;
   report?: ServiceOrderReportView;
+  reports?: ServiceOrderReportView[];
   additionalInfo: ServiceOrderAdditionalInfo;
+  checkLists?: ServiceOrderCheckListInfo[];
 }
 
 export interface ServiceOrderSimpleView {
@@ -336,6 +345,7 @@ export interface ServiceOrderReportTimeRecord {
 }
 
 export interface CompleteServiceOrder {
+  technicianId?: string;
   externalId?: string;
   description?: string;
   serviceTime?: number;
@@ -377,6 +387,20 @@ export interface ServiceOrderReportAdditionalInfo {
   pdfPath: string;
   pdfGenerationStatus: PdfGenerationStatus;
   onlyShowTotalTime: boolean;
+  workTimeInfo?: {
+    timeSlots: ServiceOrderTimeSlot[];
+    percentageSurcharge?: number;
+    billableMinutes?: number;
+    startTime: string;
+    endTime: string;
+  };
+  travelTimeInfo?: {
+    timeSlots: ServiceOrderTimeSlot[];
+    percentageSurcharge?: number;
+    billableMinutes?: number;
+    startTime: string;
+    endTime: string;
+  };
 }
 
 export interface ServiceOrderReportArticleView {
@@ -422,6 +446,7 @@ export interface ServiceOrderReportView {
   elevator: ElevatorView;
   externalId: string;
   id: string;
+  technicianId: string;
   meta: Meta;
   serviceOrder: ServiceOrderView;
   totalAmount: Amount;
@@ -468,11 +493,6 @@ export interface ServiceOrderActivityView {
   creator: UserAccountSimpleView;
 }
 
-export interface RedispatchParams {
-  technicianId: string;
-  serviceOrderId: string;
-}
-
 export interface UpdateServiceOrderScheduleBody {
   endTime?: string;
   startTime?: string;
@@ -501,34 +521,32 @@ export interface AssignmentDescriptionOrderModel {
   purchaseOrderNumber: string;
 }
 
-export interface CreateScheduledServiceOrderBody {
-  description: string;
-  elevatorId: string;
-  endTime: string;
-  externalId: string;
-  labels?: string[];
-  moreInformation?: string;
-  priority: Priority;
-  requireReschedule: boolean;
-  requireTechnicianNotification: boolean;
-  serviceCompanyId: string;
-  startTime: string;
-  technicianIds: string[];
-  type: ServiceOrderType;
-  purchaseOrderNumber: string;
-  callerInfo: CallerInfo;
+export enum ContactChannel {
+  PUSH_NOTIFICATION = 'PUSH_NOTIFICATION',
+  PHONE_CALL = 'PHONE_CALL',
+  SMS = 'SMS',
 }
 
-export interface CreateNonScheduledServiceOrderBody {
-  description: string;
-  dueDate: string;
-  elevatorId: string;
-  externalId: string;
-  labels?: string[];
-  moreInformation?: string;
-  priority: Priority;
-  serviceCompanyId: string;
+export interface CreateServiceOrderRecord {
   type: ServiceOrderType;
+  externalId?: string;
+  serviceCompanyId: string;
+  elevatorId: string;
+  description: string;
+  technicianIds: string[];
+  dueDate: string;
+  timeRange?: {
+    start: string;
+    end: string;
+  };
+  priority?: Priority;
+  moreInformation?: string;
+  labels?: string[];
+  quotationId?: string;
+  purchaseOrderNumber?: string;
+  callerInfo?: CallerInfo;
+  confirmationChannels?: ContactChannel[];
+  notificationChannels?: ContactChannel[];
 }
 
 export interface ServiceOrderArticleView {

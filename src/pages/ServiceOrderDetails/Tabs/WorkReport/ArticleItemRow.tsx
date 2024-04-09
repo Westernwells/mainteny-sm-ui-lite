@@ -15,6 +15,7 @@ interface Props<T> {
   index: number;
   deleteItem: (indexPos: number) => void;
   setItems: React.Dispatch<React.SetStateAction<T[]>>;
+  disableButton: boolean;
 }
 
 export const ArticleItemRow = ({
@@ -22,6 +23,7 @@ export const ArticleItemRow = ({
   index,
   deleteItem,
   setItems,
+  disableButton,
 }: Props<ServiceOrderArticleView>) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
@@ -55,7 +57,7 @@ export const ArticleItemRow = ({
         px=".5em"
         sx={{
           display: 'grid',
-          gridTemplateColumns: '3ch 2fr 2fr 1fr 1fr',
+          gridTemplateColumns: '3ch 2fr 0.4fr 0.6fr 0.6fr',
           placeItems: 'start',
           gap: '1.5rem',
           alignItems: 'baseline',
@@ -79,7 +81,7 @@ export const ArticleItemRow = ({
           )}
         </Box>
 
-        <Typography variant="body2">
+        <Typography variant="body2" sx={{ml: 'auto'}}>
           {articleItem.article.externalId || '-'}
         </Typography>
         <NumericFormat
@@ -117,6 +119,7 @@ export const ArticleItemRow = ({
           <Button
             buttonProps={{
               size: 'small',
+              disabled: disableButton,
               endIcon: <EditIcon />,
               onClick: () => setShowDescription(true),
               sx: {
@@ -132,6 +135,7 @@ export const ArticleItemRow = ({
           buttonProps={{
             size: 'small',
             color: 'error',
+            disabled: disableButton,
             endIcon: <DeleteIcon />,
             onClick: () => deleteItem(index),
             sx: {

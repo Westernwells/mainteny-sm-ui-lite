@@ -41,7 +41,7 @@ const defaultAlignment: {
 export const columns = (activeId: string): GridColDef[] => [
   {
     field: 'number',
-    headerName: 'Number',
+    headerName: 'NUMBER',
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
@@ -59,49 +59,47 @@ export const columns = (activeId: string): GridColDef[] => [
         <FormRadio
           value={params.row.id}
           checked={params.row.id === activeId}
-          label={
-            <Typography
-              variant="body2"
-              component="div"
-              sx={{display: 'flex', alignItems: 'center'}}>
-              {params.value || '-'}
-            </Typography>
-          }
+          label={params.value || '-'}
+          labelProps={{
+            variant: 'body2',
+            sx: {display: 'flex', alignItems: 'center'},
+          }}
         />
       </Box>
     ),
   },
   {
     field: 'model',
-    headerName: 'Model',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'building',
-    headerName: 'Building',
-    type: 'string',
-    ...defaultAlignment,
-    ...defaultProps,
-  },
-  {
-    field: 'customer',
-    headerName: 'Customer',
+    headerName: 'MODEL',
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,
   },
   {
     field: 'address',
-    headerName: 'Address',
+    headerName: 'ADDRESS',
     type: 'number',
+    ...defaultAlignment,
+    ...defaultProps,
+    flex: 2,
+  },
+  {
+    field: 'building',
+    headerName: 'BUILDING',
+    type: 'string',
+    ...defaultAlignment,
+    ...defaultProps,
+  },
+  {
+    field: 'customer',
+    headerName: 'CUSTOMER',
+    type: 'string',
     ...defaultAlignment,
     ...defaultProps,
   },
   {
     field: 'lastVisit',
-    headerName: 'Last Visit',
+    headerName: 'LAST VISIT',
     type: 'string',
     ...defaultAlignment,
     ...defaultProps,

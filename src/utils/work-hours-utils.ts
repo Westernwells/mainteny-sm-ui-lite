@@ -103,13 +103,14 @@ export const getEmployeeStatus = (status: EmployeeStatus) => {
 export const convertMinutesToHoursAndMinutes = (
   minutes: number,
   {hourUnit = 'h'}: {hourUnit?: string} = {},
+  hoursPad = 2,
 ) => {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  const hoursPadded = hours.toString().padStart(2, '0');
+  const hoursPadded = hours.toString().padStart(hoursPad, '0');
   const minsPadded = mins.toString().padStart(2, '0');
 
-  return `${hoursPadded}:${minsPadded} ${hourUnit}`;
+  return `${hoursPadded}:${minsPadded}${hourUnit}`;
 };
 
 export const convertHoursAndMinutesToMinutes = (timeString: string): number => {

@@ -1,4 +1,5 @@
 import {ReactNode} from 'react';
+import {SxProps, Theme} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
 import {grey} from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
@@ -9,6 +10,7 @@ interface Props extends BoxProps {
   children?: ReactNode;
   cellWidth?: string | number;
   labelWidth?: string;
+  containerStyles?: SxProps<Theme>;
 }
 
 export const ScheduleHeaderCell = ({
@@ -16,6 +18,7 @@ export const ScheduleHeaderCell = ({
   children,
   cellWidth = '120px',
   labelWidth,
+  containerStyles = {},
   ...rest
 }: Props) => {
   const theme = useTheme();
@@ -41,6 +44,7 @@ export const ScheduleHeaderCell = ({
           minWidth: labelWidth || '11.5rem',
           color: theme.palette.primary.main,
         },
+        ...containerStyles,
       }}
       {...rest}>
       {children || <Typography variant="tableHeaderText">{label}</Typography> ||

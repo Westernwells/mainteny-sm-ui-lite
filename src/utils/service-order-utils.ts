@@ -5,6 +5,7 @@ import {
   ServiceOrderArticleView,
   ServiceOrderPaymentStatus,
   ServiceOrderReportTimeRecord,
+  ServiceOrderReportView,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
@@ -25,7 +26,7 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
     case ServiceOrderStatus.OVERDUE:
       return 'error';
     case ServiceOrderStatus.COMPLETED:
-      return 'success';
+      return 'darkSuccess';
     default:
       return 'default';
   }
@@ -313,4 +314,32 @@ export const serviceOrderTypeColor = (type?: ServiceOrderType) => {
     default:
       return theme.palette.primary.main;
   }
+};
+
+export const getSignatureKeys = (
+  serviceOrder: ServiceOrderView,
+  report?: ServiceOrderReportView,
+  serviceCompanyId?: string,
+) => {
+  let signatureKeys = {CUSTOMER: '', TECHNICIAN: ''};
+
+  report?.signatures?.forEach((item) => {
+    const url = item.fileResource.uri;
+    if (item.fileResource.uri) {
+      const regex = /\/report\/(?!CUSTOMER\.png|TECHNICIAN\.png)([^/]+)/;
+      const match = url.match(regex);
+      if (match?.[1]) {
+        signatureKeys = {
+          CUSTOMER: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/${report?.technicianId}/CUSTOMER.png`,
+          TECHNICIAN: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/${report?.technicianId}/TECHNICIAN.png`,
+        };
+      } else {
+        signatureKeys = {
+          CUSTOMER: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/CUSTOMER.png`,
+          TECHNICIAN: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/TECHNICIAN.png`,
+        };
+      }
+    }
+  });
+  return signatureKeys;
 };

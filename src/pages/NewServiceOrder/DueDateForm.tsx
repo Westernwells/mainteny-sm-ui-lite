@@ -1,4 +1,6 @@
 import Box from '@mui/material/Box';
+import {IconButton, Typography, Tooltip} from '@mui/material';
+import {InfoOutlined} from '@mui/icons-material';
 import {DatePicker} from 'components/DatePicker';
 import {useFormik} from 'formik';
 import {useEffect} from 'react';
@@ -47,6 +49,30 @@ export const DueDateForm = ({
 
   return (
     <Box sx={{...containerStyles}}>
+      <Box display="flex" alignItems="center" gap={0.5} pb={0.5}>
+        <Typography variant="subtitle2">
+          {t('Select due date')}
+          <span style={{color: '#FC5555'}}>*</span>
+        </Typography>
+        <Tooltip
+          title={t('Latest date this job has to be completed')}
+          placement="top"
+          arrow
+          PopperProps={{
+            modifiers: [
+              {
+                name: 'offset',
+                options: {
+                  offset: [0, -10],
+                },
+              },
+            ],
+          }}>
+          <IconButton sx={{color: 'action.active', p: 0}}>
+            <InfoOutlined fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
       <DatePicker
         defaultDate={defaultStartDate}
         containerStyles={{mr: '1em', width: '100%'}}
@@ -57,7 +83,7 @@ export const DueDateForm = ({
           });
         }}
         textFieldProps={{
-          label: t('Due Date'),
+          label: '',
           name: 'date',
           required: true,
           helperText:

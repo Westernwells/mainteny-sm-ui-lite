@@ -1,8 +1,8 @@
 export interface ScheduleTechnicianForm {
-  date: Date | null;
-  startTime: Date | undefined;
-  endTime: Date | undefined;
-  technicianId: string | null;
+  startDate?: Date;
+  endDate?: Date;
+  startTime?: Date;
+  endTime?: Date;
 }
 
 export interface DueDateFormProps {

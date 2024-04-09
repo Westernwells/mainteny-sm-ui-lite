@@ -13,6 +13,7 @@ import {ReactComponent as MobileUsabilityTesting} from 'assets/illustrations/Mob
 import {ReactComponent as UXAnalytics} from 'assets/illustrations/UXAnalytics.svg';
 import {ReactComponent as NotePadIcon} from 'assets/icons/NotePadIcon.svg';
 import {ReactComponent as AttachmentLargeIcon} from 'assets/icons/AttachmentLargeIcon.svg';
+import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
 import {Button} from './Button';
 
 interface Props extends BoxProps {
@@ -20,7 +21,7 @@ interface Props extends BoxProps {
   size?: 'tiny' | 'small' | 'medium' | 'large';
   containerStyle?: {[key: string]: string | number};
   labelStyle?: {[key: string]: string | number};
-  labelVariant?: any;
+  labelVariant?: TypographyProps['variant'];
   illustration?:
     | 'attachment'
     | 'clipboard'
@@ -31,7 +32,8 @@ interface Props extends BoxProps {
     | 'checklist'
     | 'articles'
     | 'emptyChecklistComponents'
-    | 'file-attachment';
+    | 'file-attachment'
+    | 'lift';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -90,6 +92,8 @@ export const EmptySection = ({
         return <UXAnalytics style={{width: '100%', height: '100%'}} />;
       case 'articles':
         return <NotePadIcon style={{width: '50%', height: '100%'}} />;
+      case 'lift':
+        return <LiftIcon style={{width: '100%', height: '100%'}} />;
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }
@@ -122,11 +126,11 @@ export const EmptySection = ({
           buttonProps={{
             onClick: btnAction,
             variant: 'contained',
-            size: 'large',
+            size: 'small',
             startIcon: actionButtonIcon || <AddIcon />,
             endIcon: actionButtonEndIcon || null,
             style: {
-              backgroundColor: theme.palette.primary.main,
+              backgroundColor: theme.palette.primary.dark,
             },
           }}>
           {t(btnLabel)}

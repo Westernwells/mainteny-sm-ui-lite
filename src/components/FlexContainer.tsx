@@ -1,9 +1,10 @@
+import {SxProps, Theme} from '@mui/system';
 import Box from '@mui/material/Box';
 import {ReactNode} from 'react';
 
 interface Props {
   children: ReactNode;
-  containerStyle?: {[key: string]: any};
+  containerStyle?: SxProps<Theme>;
 }
 
 export const FlexContainer = ({children, containerStyle}: Props) => (

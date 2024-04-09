@@ -6,8 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import {MenuBtnProps} from 'models/misc';
 import IconButton from '@mui/material/IconButton';
 import {MouseEvent, useState} from 'react';
-import {MenuListProps} from '@mui/material';
-import ListItemIcon from '@mui/material/ListItemIcon';
+import {ListItemIcon, MenuListProps} from '@mui/material';
 
 interface Props extends ButtonProps {
   label?: string | JSX.Element;

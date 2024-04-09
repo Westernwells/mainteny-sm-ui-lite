@@ -1,3 +1,4 @@
+import {SxProps, Theme} from '@mui/material';
 import {ReactNode} from 'react';
 import Typography from '@mui/material/Typography';
 import Box, {BoxProps} from '@mui/material/Box';
@@ -7,6 +8,7 @@ interface Props extends BoxProps {
   label?: string;
   cellWidth?: string | number;
   cellHeight?: string;
+  containerStyles?: SxProps<Theme>;
 }
 
 export const ScheduleBodyCell = ({
@@ -14,6 +16,7 @@ export const ScheduleBodyCell = ({
   children,
   cellWidth = '120px',
   cellHeight = '70px',
+  containerStyles = {},
   ...rest
 }: Props) => (
   <Box
@@ -34,6 +37,7 @@ export const ScheduleBodyCell = ({
         minWidth: '11.5rem',
         maxWidth: '15rem',
       },
+      ...containerStyles,
     }}
     {...rest}>
     {children || <Typography variant="subtitle2">{label}</Typography> || null}

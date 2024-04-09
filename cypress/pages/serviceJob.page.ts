@@ -1,8 +1,6 @@
 export default class ServiceJobPage {
   static visit = () => {
-    cy.visit('/orders', {
-      failOnStatusCode: false,
-    });
+    cy.get('ul > div[role="button"][data-testid="Jobs-nav-item"]').click();
   };
 
   static changeTab = (index: number) => {
@@ -10,22 +8,56 @@ export default class ServiceJobPage {
   };
 
   static selectTechnician = () => {
-    cy.get('input[name="technicianId"]').parent().click();
+    cy.get('input[role="combobox"]').parent().click();
     cy.wait(300);
     cy.get('li[role="option"]').first().click();
-  }
+  };
 
-  static submitData = () => {
-    this.selectTechnician();
+  static selectTechnicianWithIndex = (index: number) => {
+    cy.get('input[role="combobox"]').parent().click();
+    cy.get(`li[role="option"][id="combo-box-demo-option-${index}"]`).click();
+  };
 
-    // select start and end time
-    cy.get('input[name="date"]').click();
-    cy.get('[role="gridcell"]').eq(11).click({force: true});
-    cy.get('input[name="startTime"]').click({force: true});
-    cy.get('ul > li:nth-child(1)').eq(0).click({force: true});
-    cy.get('input[name="endTime"]').click({force: true});
-    cy.wait(200);
-    cy.get('ul > li:nth-child(3)').eq(1).click({force: true});
+  static submitData = ({
+    withSchedule = true,
+    assignEngineersCount = 1,
+  }: {withSchedule?: boolean; assignEngineersCount?: number} = {}) => {
+    for (let i = 0; i < assignEngineersCount; i += 1) {
+      this.selectTechnicianWithIndex(i);
+    }
+
+    if (withSchedule) {
+      // enable choose a fixed date and time checkbox
+      cy.get('[type="checkbox"]').check();
+      cy.contains('button', 'Save').should('be.disabled');
+
+      // select start and end date
+      cy.contains('label', 'Start and end date').click();
+      cy.get('button[aria-current="date"]').click();
+      cy.contains('button', 'Confirm').click();
+
+      // select start time
+      cy.contains('label', 'Start Time').click();
+      cy.get('ul[aria-label="Select hours"]')
+        .get('li[aria-label="0 hours"]')
+        .click();
+      cy.get('ul[aria-label="Select minutes"]')
+        .get('li[aria-label="0 minutes"]')
+        .click();
+      cy.contains('button', 'Confirm').click();
+      cy.get('ul[aria-label="Select hours"]').should('not.exist');
+
+      // select end time
+      cy.contains('label', 'End Time').click();
+      cy.get('ul[aria-label="Select hours"]')
+        .get('li[aria-label="1 hours"]')
+        .click();
+      cy.get('ul[aria-label="Select minutes"]')
+        .get('li[aria-label="0 minutes"]')
+        .click();
+      cy.contains('button', 'Confirm').click();
+    }
+
     cy.get('[aria-describedby="alert-dialog-description"]').click({
       force: true,
     });
@@ -36,7 +68,7 @@ export default class ServiceJobPage {
   static goNext = () => {
     cy.contains('button', 'Next').should('not.be.disabled').click();
     cy.wait(200);
-  }
+  };
 
-  static getFirstTableElement = () => cy.get('[role="cell"]').first()
+  static getFirstTableElement = () => cy.get('[role="cell"]').first();
 }

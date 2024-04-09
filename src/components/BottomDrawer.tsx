@@ -13,6 +13,7 @@ import Divider from '@mui/material/Divider';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import {useTheme} from '@mui/material';
 import {useTranslation} from 'react-i18next';
+import {SxProps} from '@mui/system';
 
 interface ListMenu {
   label: string;
@@ -28,6 +29,7 @@ interface Props {
   primaryButtonAction: () => void;
   listItems: ListMenu[];
   secondaryButton?: React.ReactNode;
+  buttonWrapperStyles?: SxProps;
   isSaving?: boolean;
 }
 
@@ -39,6 +41,7 @@ export const BottomDrawer = ({
   listItems,
   secondaryButton,
   isSaving,
+  buttonWrapperStyles,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -68,7 +71,7 @@ export const BottomDrawer = ({
         display="flex"
         justifyContent="flex-end"
         gap={2}
-        sx={{my: 'auto', px: '4em'}}>
+        sx={{my: 'auto', px: '4em', ...buttonWrapperStyles}}>
         {secondaryButton}
         <ButtonGroup variant="contained">
           <MuiButton

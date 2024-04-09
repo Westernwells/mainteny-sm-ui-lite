@@ -164,11 +164,7 @@ export const ServiceOrderScheduleTab = () => {
   );
 
   const renderWidget = () => (
-    <Widget
-      filterItems={renderFilterItems()}
-      btnLabel="New Job"
-      hideSearchInput
-    />
+    <Widget filterItems={renderFilterItems()} hideSearchInput />
   );
 
   const renderControls = () => (
@@ -201,7 +197,7 @@ export const ServiceOrderScheduleTab = () => {
         <Box sx={{display: 'flex', justifyContent: 'flex-end', flexGrow: 1}}>
           <Switch
             getValue={(value) => setSwitchActive(value)}
-            label={t(`Show Unassigned Orders ({{count}})`, {
+            label={t(`Show Unassigned Jobs ({{count}})`, {
               count: unassignedServiceOrders.total,
             })}
           />

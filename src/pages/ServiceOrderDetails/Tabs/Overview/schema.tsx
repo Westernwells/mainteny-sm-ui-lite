@@ -1,3 +1,4 @@
+import {isSameDay} from 'date-fns';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import TimelapseIcon from '@mui/icons-material/Timelapse';
 import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
@@ -15,7 +16,7 @@ import {
   PersonOutline,
   Tag,
 } from '@mui/icons-material';
-import {Typography} from '@mui/material';
+import {Box, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 
 interface OrderInfoProps {
@@ -163,47 +164,39 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             bodyText={
               serviceOrderDetails.schedules &&
               serviceOrderDetails.schedules.length ? (
-                <>
+                <Box>
                   <Typography variant="body2" sx={{paddingTop: '0.2em'}}>
-                    {`${formatDate(
-                      toDate(
-                        serviceOrderDetails.status ===
-                          ServiceOrderStatus.COMPLETED
-                          ? serviceOrderDetails?.actualEndTime
-                          : serviceOrderDetails.schedules[0].endTime,
-                      ),
-                    )}`}
+                    {serviceOrderDetails.status ===
+                      ServiceOrderStatus.COMPLETED ||
+                    isSameDay(
+                      toDate(serviceOrderDetails.schedules[0].startTime),
+                      toDate(serviceOrderDetails.schedules[0].endTime),
+                    )
+                      ? formatDate(
+                          toDate(serviceOrderDetails.schedules[0].endTime),
+                        )
+                      : `${formatDate(
+                          toDate(serviceOrderDetails.schedules[0].startTime),
+                        )} - ${formatDate(
+                          toDate(serviceOrderDetails.schedules[0].endTime),
+                        )}`}
                   </Typography>
 
                   <Typography
                     variant="body2"
                     sx={{paddingTop: '0.2em'}}
                     color={theme.palette.text.secondary}>
-                    {`${
-                      serviceOrderDetails.status ===
-                        ServiceOrderStatus.COMPLETED &&
-                      serviceOrderDetails.actualStartTime
-                        ? `${formatDate(
-                            toDate(serviceOrderDetails.actualStartTime),
-                            'HH:mm',
-                          )} -`
-                        : `${formatDate(
-                            toDate(serviceOrderDetails.schedules[0].startTime),
-                            'HH:mm',
-                          )} -`
-                    }
+                    {`${formatDate(
+                      toDate(serviceOrderDetails.schedules[0].startTime),
+                      'HH:mm',
+                    )} -
                     ${formatDate(
-                      toDate(
-                        serviceOrderDetails.status ===
-                          ServiceOrderStatus.COMPLETED
-                          ? serviceOrderDetails?.actualEndTime
-                          : serviceOrderDetails.schedules[0].endTime,
-                      ),
+                      toDate(serviceOrderDetails.schedules[0].endTime),
                       'HH:mm',
                     )}
-                   `}{' '}
+                   `}
                   </Typography>
-                </>
+                </Box>
               ) : (
                 '-'
               )
