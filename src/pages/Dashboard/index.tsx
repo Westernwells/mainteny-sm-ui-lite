@@ -34,13 +34,6 @@ import {
   ServiceCompanyTimeUnit,
 } from 'models/service-company';
 import {useTranslation} from 'react-i18next';
-import {useQueryContract} from 'hooks/reactQuery/useContract';
-import {
-  ContractView,
-  ContractOrderField,
-  ContractStatus,
-} from 'models/contract';
-import {Order} from 'models/misc';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
 import {TechniciansWorking} from './TechniciansWorking';
@@ -109,39 +102,6 @@ export const Dashboard = () => {
     query: '',
     status: [InvoiceStatus.DRAFT],
   });
-  const {
-    data: activeContract = createEmptyResource<ContractView>(10),
-    isLoading: isContractLoading,
-  } = useQueryContract(
-    {
-      order: Order.DESC,
-      orderBy: ContractOrderField.CREATED_TIME,
-      pageIndex: 0,
-      pageSize: 25,
-      query: '',
-      status: [ContractStatus.VALID],
-      priceStart: -9999999,
-      priceEnd: 9999999,
-    },
-    {keepPreviousData: true},
-  );
-
-  const {
-    data: expiringContract = createEmptyResource<ContractView>(10),
-    isLoading: isContractExpiringLoading,
-  } = useQueryContract(
-    {
-      order: Order.DESC,
-      orderBy: ContractOrderField.CREATED_TIME,
-      pageIndex: 0,
-      pageSize: 25,
-      query: '',
-      status: [ContractStatus.EXPIRING],
-      priceStart: -9999999,
-      priceEnd: 9999999,
-    },
-    {keepPreviousData: true},
-  );
 
   const {
     data: technicians = createEmptyResource<EmployeeStatusView>(5),
@@ -202,8 +162,6 @@ export const Dashboard = () => {
     isLoadingAppointments ||
     isLoadingQuotations ||
     isLoadingInvoices ||
-    isContractLoading ||
-    isContractExpiringLoading ||
     isLoadingTechnicians ||
     isLoadingActivities;
 
@@ -273,14 +231,17 @@ export const Dashboard = () => {
             <Grid item xs={12} sm={6} lg={2.4}>
               <TopCard
                 title="Active contracts"
-                value={`${activeContract.total}`}
+                value={`${fullSummary?.contractSummary.numberOfValidContract}`}
                 icon={ContactsIcon}
                 iconColor={theme.palette.secondary.dark}
                 iconBackgroundColor={theme.palette.info.outlinedHoverBg}
                 subText={`${t('{{totalNumberOfExpiringContracts}} expiring', {
-                  totalNumberOfExpiringContracts: expiringContract.total,
+                  totalNumberOfExpiringContracts:
+                    fullSummary?.contractSummary?.numberOfExpiringContract,
                 })}`}
-                subValue={expiringContract.total}
+                subValue={
+                  fullSummary?.contractSummary?.numberOfExpiringContract
+                }
                 url="contracts"
               />
             </Grid>
