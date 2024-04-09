@@ -46,6 +46,7 @@ import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
 import {ArticleItemsTable} from './ArticleItemsTable';
+import {Pictures} from './Pictures';
 
 interface Props {
   serviceOrder: ServiceOrderView;
@@ -334,6 +335,11 @@ export const WorkReport = ({serviceOrder}: Props) => {
           setItems={setArticles}
           isEdit={isEditMode || false}
         />
+
+        <Box mt="1em">
+          <Pictures attachments={report.attachments} />
+        </Box>
+
         <Box mt="1em">
           <FormInput
             containerStyles={{width: '100%', py: '1rem'}}
