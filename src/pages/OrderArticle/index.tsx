@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useLocation} from 'react-router-dom';
 import * as Yup from 'yup';
@@ -34,6 +34,7 @@ import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
 import {useCurrentCurrency} from 'utils/currency';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
+import {LanguageContext} from 'context/LanguageProvider';
 import {ArticleItemsTable} from './ArticleItemsTable';
 import OrderArticlePDF from './OrderArticlePDF';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
@@ -99,6 +100,7 @@ export const OrderArticle = () => {
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
   const [printPdfBlobUrl, setPrintPdfBlobUrl] = useState('');
   const imageUrl = useLogoImage(user);
+  const {language: selectedLng} = useContext(LanguageContext);
 
   const {downloadFile} = useDownloadFileWithCustomName(
     `AO_${newArticleOrder?.externalId}`,
@@ -135,6 +137,7 @@ export const OrderArticle = () => {
           currencyCode={currentCurrency.code}
           logoSrc={imageUrl}
           logoDimensions={logoDimensions}
+          selectedLng={selectedLng}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -180,6 +183,7 @@ export const OrderArticle = () => {
         logoSrc={imageUrl}
         currencyCode={currentCurrency.code}
         logoDimensions={logoDimensions}
+        selectedLng={selectedLng}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

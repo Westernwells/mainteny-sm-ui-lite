@@ -5,7 +5,6 @@ import {
   View,
   StyleSheet,
   Font,
-  Image,
 } from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
@@ -15,8 +14,12 @@ import {formatDate} from 'utils/datetime';
 import {Currencies, formatCurrency} from 'utils/currency';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {QuotationView} from 'models/quotation';
+import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
+import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
+import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
+import NotoSansGeorgianBold from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -29,258 +32,195 @@ Font.register({
   format: 'truetype',
   src: MontserratRegular,
 });
-
-const styles = StyleSheet.create({
-  page: {
-    fontFamily: 'Montserrat-Regular',
-    fontSize: 10,
-    paddingTop: 25,
-    paddingLeft: 68,
-    paddingRight: 45,
-    backgroundColor: 'white',
-    height: '100%',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    justifyContent: 'space-between',
-    paddingBottom: 95,
-    color: '#212121',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    height: 100,
-  },
-  topSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 40,
-    alignItems: 'flex-start',
-    position: 'absolute',
-    top: 110,
-  },
-  leftAddress: {
-    flex: '0 0 55%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    fontFamily: 'Montserrat-Bold',
-  },
-  addressText: {
-    fontSize: 8,
-    marginBottom: 30,
-    fontFamily: 'Montserrat-Regular',
-  },
-  partialAddressText: {
-    fontSize: 10,
-    marginBottom: 1,
-  },
-  partAddress: {
-    fontSize: 10,
-    marginBottom: 4,
-  },
-  rightAddress: {
-    flex: '0 0 45%',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  rightAddressContent: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingBottom: 4,
-  },
-  tag: {
-    fontFamily: 'Montserrat-Bold',
-    fontSize: 10,
-    color: '#212121',
-    flex: '0 0 45%',
-  },
-  tagContent: {
-    fontSize: 10,
-    color: '#616161',
-    flex: '0 0 55%',
-    textAlign: 'left',
-  },
-  dataBody: {
-    borderBottom: '1px solid #212121',
-    paddingBottom: 1,
-  },
-  contentHeader: {
-    fontSize: 14,
-    color: '#212121',
-    marginBottom: 10,
-    fontFamily: 'Montserrat-Bold',
-    marginTop: 200,
-  },
-  contentBody: {
-    color: '#616161',
-    fontSize: 10,
-    marginBottom: 10,
-    lineHeight: 1.3,
-    maxWidth: '100%',
-  },
-  numberColumn: {
-    width: '7%',
-    textAlign: 'left',
-  },
-  articleColumn: {
-    width: '25%',
-    textAlign: 'left',
-  },
-  supplierColumn: {
-    width: '20%',
-    textAlign: 'left',
-  },
-  quantityColumn: {
-    width: '8%',
-    textAlign: 'right',
-  },
-  unitColumn: {
-    width: '5%',
-    textAlign: 'center',
-  },
-  priceColumn: {
-    width: '20%',
-    textAlign: 'right',
-  },
-  totalColumn: {
-    width: '15%',
-    textAlign: 'right',
-  },
-  notesSection: {
-    paddingBottom: 6,
-    marginTop: 5,
-  },
-  deliverySection: {
-    paddingBottom: 6,
-    marginTop: 10,
-  },
-  footerEmail: {
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  sectionHeading: {
-    fontSize: 10,
-    padding: 0,
-    lineHeight: 0,
-    marginBottom: 6,
-    color: '#212121',
-    fontWeight: 'extrabold',
-  },
-  sectionBody: {
-    fontSize: 10,
-    fontWeight: 'light',
-    color: '#616161',
-    display: 'flex',
-    flexDirection: 'column',
-    paddingVertical: 1.5,
-  },
-  footerSectionBody: {
-    fontSize: 5,
-    fontWeight: 'light',
-    color: '#616161',
-    display: 'flex',
-    flexDirection: 'column',
-    paddingVertical: 0.5,
-  },
-  footerWrapper: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    paddingBottom: 7,
-    borderBottom: '1px solid #616161',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  footerEmailWrapper: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  leftFooter: {
-    display: 'flex',
-    flexDirection: 'row',
-    flex: '0 0 75%',
-    justifyContent: 'space-between',
-  },
-  emailText: {
-    fontSize: 5,
-    color: '#616161',
-    fontWeight: 'light',
-  },
-  pageNumberText: {
-    fontSize: 7,
-    color: '#000000',
-    marginLeft: 4,
-    textAlign: 'right',
-    fontFamily: 'Montserrat-Bold',
-  },
-  numberText: {
-    color: '#212121',
-  },
-  table: {
-    width: '100%',
-    display: 'flex',
-    marginTop: 10,
-  },
-  tableHead: {
-    display: 'flex',
-    flexDirection: 'row',
-    paddingVertical: 4,
-  },
-  tableHeading: {
-    color: '#8f9bb3',
-    display: 'flex',
-    fontWeight: 'extrabold',
-    fontSize: 7,
-  },
-  tableRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    fontSize: 10,
-    marginVertical: 4,
-  },
-  footerContainer: {
-    flexDirection: 'column',
-    width: '100%',
-    paddingTop: 10,
-    marginTop: 105,
-    height: 55,
-    position: 'absolute',
-    bottom: 25,
-    left: 68,
-    right: 45,
-  },
-  descriptionText: {
-    width: '45%',
-    display: 'flex',
-    fontSize: 8.5,
-    color: '#212121',
-    paddingLeft: 20,
-    letterSpacing: -0.15,
-    marginTop: 2,
-    lineHeight: 1.3,
-  },
-  qrCode: {
-    width: 60,
-    height: 60,
-  },
-  footerContent: {
-    marginRight: 10,
-    maxWidth: 130,
-    flex: '0 0 32%',
-  },
-  footerHeading: {
-    paddingVertical: 0.5,
-    fontSize: 5,
-    fontFamily: 'Montserrat-Bold',
-  },
+Font.register({
+  family: 'NotoSans-Regular',
+  format: 'truetype',
+  src: NotoSansGeorgianRegular,
 });
+
+Font.register({
+  family: 'NotoSans-Bold',
+  format: 'truetype',
+  src: NotoSansGeorgianBold,
+});
+
+const getStyles = (
+  selectedLng?: string,
+  boldFontStyle?: {fontFamily: string},
+  regularFontStyle?: {fontFamily: string},
+) =>
+  StyleSheet.create({
+    page: {
+      ...regularFontStyle,
+      fontSize: 10,
+      paddingTop: 25,
+      paddingLeft: 68,
+      paddingRight: 45,
+      backgroundColor: 'white',
+      height: '100%',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative',
+      justifyContent: 'space-between',
+      paddingBottom: 95,
+      color: '#212121',
+    },
+    topSection: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 40,
+      alignItems: 'flex-start',
+      position: 'absolute',
+      top: 110,
+    },
+    leftAddress: {
+      flex: '0 0 55%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      ...boldFontStyle,
+    },
+    addressText: {
+      fontSize: 8,
+      marginBottom: 23,
+      ...regularFontStyle,
+    },
+    partialAddressText: {
+      fontSize: 10,
+      marginBottom: 1,
+    },
+    partAddress: {
+      fontSize: 10,
+      marginBottom: 4,
+    },
+    rightAddress: {
+      flex: '0 0 45%',
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    rightAddressContent: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingBottom: 6,
+    },
+    tag: {
+      ...boldFontStyle,
+      fontSize: 10,
+      color: '#212121',
+      flex: '0 0 43%',
+    },
+    tagContent: {
+      fontSize: 10,
+      color: '#616161',
+      flex: '0 0 55%',
+      textAlign: 'left',
+    },
+    dataBody: {
+      borderBottom: '1px solid #212121',
+      paddingBottom: 1,
+    },
+    contentHeader: {
+      fontSize: 14,
+      color: '#212121',
+      marginBottom: 10,
+      ...boldFontStyle,
+      marginTop: selectedLng === 'KA' ? 270 : 220,
+    },
+    contentBody: {
+      color: '#616161',
+      fontSize: 10,
+      marginBottom: 10,
+      lineHeight: 1.3,
+      maxWidth: '100%',
+    },
+    numberColumn: {
+      width: '7%',
+      textAlign: 'left',
+    },
+    articleColumn: {
+      width: '25%',
+      textAlign: 'left',
+    },
+    supplierColumn: {
+      width: '20%',
+      textAlign: 'left',
+    },
+    quantityColumn: {
+      width: '8%',
+      textAlign: 'right',
+    },
+    unitColumn: {
+      width: '5%',
+      textAlign: 'center',
+    },
+    priceColumn: {
+      width: '20%',
+      textAlign: 'right',
+    },
+    totalColumn: {
+      width: '15%',
+      textAlign: 'right',
+    },
+    notesSection: {
+      paddingBottom: 6,
+      marginTop: 5,
+    },
+    deliverySection: {
+      paddingBottom: 6,
+      marginTop: 10,
+    },
+    sectionHeading: {
+      fontSize: 10,
+      padding: 0,
+      lineHeight: 0,
+      marginBottom: 6,
+      color: '#212121',
+      fontWeight: 'extrabold',
+    },
+    sectionBody: {
+      fontSize: 10,
+      fontWeight: 'light',
+      color: '#616161',
+      display: 'flex',
+      flexDirection: 'column',
+      paddingVertical: 1.5,
+    },
+    table: {
+      width: '100%',
+      display: 'flex',
+      marginTop: 10,
+    },
+    tableHead: {
+      display: 'flex',
+      flexDirection: 'row',
+      paddingVertical: 4,
+    },
+    tableHeading: {
+      color: '#8f9bb3',
+      display: 'flex',
+      fontWeight: 'extrabold',
+      fontSize: 6,
+    },
+    tableRow: {
+      display: 'flex',
+      flexDirection: 'row',
+      fontSize: 10,
+      marginVertical: 4,
+    },
+    descriptionText: {
+      width: '45%',
+      display: 'flex',
+      fontSize: 8.5,
+      color: '#212121',
+      paddingLeft: 20,
+      letterSpacing: -0.15,
+      marginTop: 2,
+      lineHeight: 1.3,
+    },
+  });
 
 type Props = {
   userInfo?: UserAccount | undefined;
@@ -292,6 +232,7 @@ type Props = {
     height: number;
   } | null;
   quotation?: QuotationView;
+  selectedLng?: string;
 };
 
 const JobOverviewPdfTemplate = React.memo(
@@ -302,6 +243,7 @@ const JobOverviewPdfTemplate = React.memo(
     serviceOrder,
     logoDimensions,
     quotation,
+    selectedLng,
   }: Props) => {
     const {t} = useTranslation();
 
@@ -341,18 +283,25 @@ const JobOverviewPdfTemplate = React.memo(
       ...new Set(articleItems?.map((item) => item.unitAmount.percentageVat)),
     ];
 
+    const boldFontStyle = {
+      fontFamily: selectedLng === 'KA' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+    };
+
+    const regularFontStyle = {
+      fontFamily:
+        selectedLng === 'KA' ? 'NotoSans-Regular' : 'Montserrat-Regular',
+    };
+
+    const styles = getStyles(selectedLng, boldFontStyle, regularFontStyle);
+
     return (
       <Document>
         <Page size="A4" style={styles.page}>
           <View>
-            <View style={styles.header} fixed>
-              {logoSrc && (
-                <Image
-                  style={{height: logoDimensions?.height || 35}}
-                  source={logoSrc}
-                />
-              )}
-            </View>
+            <PdfTemplateHeader
+              logoSrc={logoSrc}
+              logoDimensions={logoDimensions}
+            />
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
@@ -683,7 +632,7 @@ const JobOverviewPdfTemplate = React.memo(
                         style={{
                           width: '32%',
                           color: '#212121',
-                          fontFamily: 'Montserrat-Bold',
+                          ...boldFontStyle,
                           textAlign: 'right',
                           fontSize: 10,
                         }}>
@@ -694,7 +643,7 @@ const JobOverviewPdfTemplate = React.memo(
                           width: '24%',
                           textAlign: 'right',
                           color: '#212121',
-                          fontFamily: 'Montserrat-Bold',
+                          ...boldFontStyle,
                           fontSize: 10,
                         }}>
                         {formatCurrency(
@@ -715,135 +664,7 @@ const JobOverviewPdfTemplate = React.memo(
             </View>
           </View>
 
-          <View fixed style={styles.footerContainer}>
-            <View style={styles.footerWrapper}>
-              <View style={styles.leftFooter}>
-                <View style={{...styles.footerContent}}>
-                  {userInfo?.serviceCompany.name && (
-                    <Text style={styles.footerHeading}>
-                      {userInfo?.serviceCompany?.name}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany.postalAddress?.fullName && (
-                    <Text style={styles.footerSectionBody}>
-                      {userInfo?.serviceCompany?.postalAddress?.fullName}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.postalAddress?.component?.state ||
-                    (userInfo?.serviceCompany?.postalAddress?.component
-                      ?.country && (
-                      <Text style={styles.footerSectionBody}>
-                        {
-                          userInfo?.serviceCompany?.postalAddress?.component
-                            ?.state
-                        }
-                        {userInfo?.serviceCompany?.postalAddress?.component
-                          ?.state && '·'}
-                        {
-                          userInfo?.serviceCompany?.postalAddress?.component
-                            ?.country
-                        }
-                      </Text>
-                    ))}
-
-                  {userInfo?.serviceCompany?.contact?.phone && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('Tel.')}: {userInfo?.serviceCompany?.contact?.phone}
-                    </Text>
-                  )}
-                </View>
-
-                <View style={{...styles.footerContent}}>
-                  <Text style={styles.footerHeading}>{t('Bank')}:</Text>
-
-                  {userInfo?.serviceCompany?.settings?.paymentInfo
-                    ?.accountNumber && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('Acc. nr.')}:{' '}
-                      {
-                        userInfo?.serviceCompany?.settings?.paymentInfo
-                          ?.accountNumber
-                      }
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('IBAN')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('BIC')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
-                    </Text>
-                  )}
-                </View>
-                <View style={{...styles.footerContent}}>
-                  {userInfo?.serviceCompany?.settings?.managingDirector && (
-                    <Text style={styles.footerHeading}>
-                      {t('Managing Director')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.managingDirector}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.arbitrationCourt && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('Registration court')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.arbitrationCourt}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.vatId && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('VAT ID')}: {userInfo?.serviceCompany?.settings?.vatId}{' '}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('Certified')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.tradeRegisterNumber}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.footerEmailWrapper}>
-              <View style={styles.leftFooter}>
-                {userInfo?.serviceCompany?.contact?.url && (
-                  <View style={styles.footerContent}>
-                    <Text style={styles.emailText}>
-                      {userInfo?.serviceCompany?.contact?.url}
-                    </Text>
-                  </View>
-                )}
-
-                {userInfo?.serviceCompany.contact.email && (
-                  <View style={{...styles.footerContent, marginLeft: 2}}>
-                    <Text style={styles.emailText}>
-                      {userInfo?.serviceCompany?.contact?.email}
-                    </Text>
-                  </View>
-                )}
-
-                <Text style={styles.footerContent} />
-              </View>
-              <View>
-                <Text
-                  style={styles.pageNumberText}
-                  render={({pageNumber, totalPages}) =>
-                    `${pageNumber} / ${totalPages}`
-                  }
-                />
-              </View>
-            </View>
-          </View>
+          <PdfTemplateFooter userInfo={userInfo} selectedLng={selectedLng} />
         </Page>
       </Document>
     );

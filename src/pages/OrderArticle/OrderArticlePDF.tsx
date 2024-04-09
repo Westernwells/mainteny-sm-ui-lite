@@ -5,20 +5,24 @@ import {
   View,
   StyleSheet,
   Font,
-  Image,
 } from '@react-pdf/renderer';
-import {
-  ArticleOrderItemRecord,
-  ArticleOrderItemView,
-  ArticleOrderView,
-} from 'models/article';
+import {ArticleOrderView} from 'models/article';
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {Currencies, formatCurrency} from 'utils/currency';
+import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
+import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
+import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
+import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
+import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {
+  calculateTotal,
+  calculateTotalVAT,
+  convertToArticleOrderItemRecord,
+} from './utils';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -32,258 +36,198 @@ Font.register({
   src: MontserratRegular,
 });
 
-const styles = StyleSheet.create({
-  page: {
-    fontFamily: 'Montserrat-Regular',
-    fontSize: 10,
-    paddingTop: 25,
-    paddingLeft: 68,
-    paddingRight: 45,
-    backgroundColor: 'white',
-    height: '100%',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    justifyContent: 'space-between',
-    paddingBottom: 95,
-    color: '#212121',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    height: 100,
-  },
-  topSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 40,
-    alignItems: 'flex-start',
-    position: 'absolute',
-    top: 110,
-  },
-  leftAddress: {
-    flex: '0 0 55%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    fontFamily: 'Montserrat-Bold',
-  },
-  addressText: {
-    fontSize: 10,
-    marginBottom: 30,
-    fontFamily: 'Montserrat-Regular',
-  },
-  partialAddressText: {
-    fontSize: 10,
-    marginBottom: 1,
-  },
-  partAddress: {
-    fontSize: 10,
-    marginBottom: 4,
-  },
-  rightAddress: {
-    minWidth: 200,
-    flex: '0 0 45%',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  rightAddressContent: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingBottom: 4,
-  },
-  tag: {
-    fontFamily: 'Montserrat-Bold',
-    fontSize: 10,
-    color: '#212121',
-    flex: '0 0 45%',
-  },
-  tagContent: {
-    fontSize: 10,
-    color: '#616161',
-    flex: '0 0 55%',
-    textAlign: 'right',
-  },
-  dataBody: {
-    borderBottom: '1px solid #212121',
-    paddingBottom: 1,
-  },
-  contentHeader: {
-    fontSize: 14,
-    color: '#212121',
-    marginTop: 150,
-    marginBottom: 10,
-    fontFamily: 'Montserrat-Bold',
-  },
-  contentBody: {
-    color: '#616161',
-    fontSize: 10,
-    marginBottom: 10,
-    lineHeight: 1.3,
-    maxWidth: '100%',
-  },
-  numberColumn: {
-    width: '7%',
-    textAlign: 'left',
-  },
-  articleColumn: {
-    width: '25%',
-    textAlign: 'left',
-  },
-  supplierColumn: {
-    width: '20%',
-    textAlign: 'left',
-  },
-  quantityColumn: {
-    width: '8%',
-    textAlign: 'right',
-  },
-  unitColumn: {
-    width: '5%',
-    textAlign: 'center',
-  },
-  priceColumn: {
-    width: '20%',
-    textAlign: 'right',
-  },
-  totalColumn: {
-    width: '15%',
-    textAlign: 'right',
-  },
-  notesSection: {
-    paddingBottom: 6,
-    marginTop: 5,
-  },
-  deliverySection: {
-    paddingBottom: 6,
-    marginTop: 10,
-  },
-  footerEmail: {
-    display: 'flex',
-    flexDirection: 'row',
-  },
-  sectionHeading: {
-    fontSize: 10,
-    padding: 0,
-    lineHeight: 0,
-    marginBottom: 6,
-    color: '#212121',
-    fontWeight: 'extrabold',
-  },
-  sectionBody: {
-    fontSize: 10,
-    fontWeight: 'light',
-    color: '#616161',
-    display: 'flex',
-    flexDirection: 'column',
-    paddingVertical: 1.5,
-  },
-  footerSectionBody: {
-    fontSize: 5,
-    fontWeight: 'light',
-    color: '#616161',
-    display: 'flex',
-    flexDirection: 'column',
-    paddingVertical: 0.5,
-  },
-  footerWrapper: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    paddingBottom: 7,
-    borderBottom: '1px solid #616161',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  footerEmailWrapper: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  leftFooter: {
-    display: 'flex',
-    flexDirection: 'row',
-    flex: '0 0 75%',
-    justifyContent: 'space-between',
-  },
-  emailText: {
-    fontSize: 5,
-    color: '#616161',
-    fontWeight: 'light',
-  },
-  pageNumberText: {
-    fontSize: 7,
-    color: '#000000',
-    marginLeft: 4,
-    textAlign: 'right',
-    fontFamily: 'Montserrat-Bold',
-  },
-  numberText: {
-    color: '#212121',
-  },
-  table: {
-    width: '100%',
-    display: 'flex',
-    marginTop: 10,
-  },
-  tableHead: {
-    display: 'flex',
-    flexDirection: 'row',
-    paddingVertical: 4,
-  },
-  tableHeading: {
-    color: '#8f9bb3',
-    display: 'flex',
-    fontWeight: 'extrabold',
-    fontSize: 7,
-  },
-  tableRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    fontSize: 10,
-    marginVertical: 4,
-  },
-  footerContainer: {
-    flexDirection: 'column',
-    width: '100%',
-    paddingTop: 10,
-    marginTop: 105,
-    height: 55,
-    position: 'absolute',
-    bottom: 25,
-    left: 68,
-    right: 45,
-  },
-  descriptionText: {
-    width: '45%',
-    display: 'flex',
-    fontSize: 8.5,
-    color: '#212121',
-    paddingLeft: 20,
-    letterSpacing: -0.15,
-    marginTop: 2,
-    lineHeight: 1.3,
-  },
-  qrCode: {
-    width: 60,
-    height: 60,
-  },
-  footerContent: {
-    marginRight: 10,
-    maxWidth: 130,
-    flex: '0 0 32%',
-  },
-  footerHeading: {
-    paddingVertical: 0.5,
-    fontSize: 5,
-    fontFamily: 'Montserrat-Bold',
-  },
+Font.register({
+  family: 'NotoSans-Regular',
+  format: 'truetype',
+  src: NotoSansGeorgianRegular,
 });
+
+Font.register({
+  family: 'NotoSans-Bold',
+  format: 'truetype',
+  src: NotoSansGeorgianBold,
+});
+
+const getStyles = (
+  boldFontStyle?: {fontFamily: string},
+  regularFontStyle?: {fontFamily: string},
+) =>
+  StyleSheet.create({
+    page: {
+      ...regularFontStyle,
+      fontSize: 10,
+      paddingTop: 25,
+      paddingLeft: 68,
+      paddingRight: 45,
+      backgroundColor: 'white',
+      height: '100%',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative',
+      justifyContent: 'space-between',
+      paddingBottom: 95,
+      color: '#212121',
+    },
+    topSection: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 40,
+      alignItems: 'flex-start',
+      position: 'absolute',
+      top: 110,
+    },
+    leftAddress: {
+      flex: '0 0 55%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      ...boldFontStyle,
+    },
+    addressText: {
+      fontSize: 8,
+      marginBottom: 23,
+      ...regularFontStyle,
+    },
+    partialAddressText: {
+      fontSize: 10,
+      marginBottom: 1,
+      ...boldFontStyle,
+    },
+    partAddress: {
+      fontSize: 10,
+      marginBottom: 4,
+    },
+    rightAddress: {
+      minWidth: 200,
+      flex: '0 0 45%',
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    rightAddressContent: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingBottom: 6,
+      ...boldFontStyle,
+    },
+    tag: {
+      ...boldFontStyle,
+      fontSize: 10,
+      color: '#212121',
+      flex: '0 0 43%',
+    },
+    tagContent: {
+      fontSize: 10,
+      color: '#616161',
+      flex: '0 0 55%',
+      textAlign: 'right',
+      ...regularFontStyle,
+    },
+    dataBody: {
+      borderBottom: '1px solid #212121',
+      paddingBottom: 1,
+    },
+    contentHeader: {
+      fontSize: 14,
+      color: '#212121',
+      marginTop: 150,
+      marginBottom: 10,
+      ...boldFontStyle,
+    },
+    contentBody: {
+      color: '#616161',
+      fontSize: 10,
+      marginBottom: 10,
+      lineHeight: 1.3,
+      maxWidth: '100%',
+    },
+    numberColumn: {
+      width: '7%',
+      textAlign: 'left',
+    },
+    articleColumn: {
+      width: '25%',
+      textAlign: 'left',
+    },
+    supplierColumn: {
+      width: '20%',
+      textAlign: 'left',
+    },
+    quantityColumn: {
+      width: '8%',
+      textAlign: 'right',
+    },
+    unitColumn: {
+      width: '5%',
+      textAlign: 'center',
+    },
+    priceColumn: {
+      width: '20%',
+      textAlign: 'right',
+    },
+    totalColumn: {
+      width: '15%',
+      textAlign: 'right',
+    },
+    notesSection: {
+      paddingBottom: 6,
+      marginTop: 5,
+    },
+    deliverySection: {
+      paddingBottom: 6,
+      marginTop: 10,
+    },
+    sectionHeading: {
+      fontSize: 10,
+      padding: 0,
+      lineHeight: 0,
+      marginBottom: 6,
+      color: '#212121',
+      fontWeight: 'extrabold',
+    },
+    sectionBody: {
+      fontSize: 10,
+      fontWeight: 'light',
+      color: '#616161',
+      display: 'flex',
+      flexDirection: 'column',
+      paddingVertical: 1.5,
+    },
+    table: {
+      width: '100%',
+      display: 'flex',
+      marginTop: 10,
+    },
+    tableHead: {
+      display: 'flex',
+      flexDirection: 'row',
+      paddingVertical: 4,
+    },
+    tableHeading: {
+      color: '#8f9bb3',
+      display: 'flex',
+      fontWeight: 'extrabold',
+      fontSize: 6,
+    },
+    tableRow: {
+      display: 'flex',
+      flexDirection: 'row',
+      fontSize: 10,
+      marginVertical: 4,
+    },
+    descriptionText: {
+      width: '45%',
+      display: 'flex',
+      fontSize: 8.5,
+      color: '#212121',
+      paddingLeft: 20,
+      letterSpacing: -0.15,
+      marginTop: 2,
+      lineHeight: 1.3,
+    },
+  });
 
 type Props = {
   articleOrder?: ArticleOrderView | undefined;
@@ -294,57 +238,21 @@ type Props = {
     width: number;
     height: number;
   } | null;
+  selectedLng?: string;
 };
 
 const OrderArticlePDF = React.memo(
-  ({articleOrder, userInfo, logoSrc, currencyCode, logoDimensions}: Props) => {
+  ({
+    articleOrder,
+    userInfo,
+    logoSrc,
+    currencyCode,
+    logoDimensions,
+    selectedLng,
+  }: Props) => {
     const {t} = useTranslation();
 
-    function convertToArticleOrderItemRecord(
-      items: ArticleOrderItemView[],
-    ): ArticleOrderItemRecord[] {
-      return items.map((item) => ({
-        articleId: item.article.id,
-        articleName: item.articleName,
-        supplierArticleNumber: item.supplierArticleNumber,
-        quantity: item.quantity,
-        unit: item.unit,
-        description: item.description,
-        unitSellingAmount: item.article.unitSellingAmount,
-      }));
-    }
-
     const articleItems = convertToArticleOrderItemRecord(articleOrder?.items!);
-    const calculateTotal = (arr: ArticleOrderItemRecord[]) => {
-      const sum = 0;
-
-      return arr
-        .map(
-          (arrayItem) =>
-            arrayItem.quantity *
-            (arrayItem.unitSellingAmount.netAmount /
-              10 ** Currencies[arrayItem.unitSellingAmount.currency] ??
-              currencyCode),
-        )
-        .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
-    };
-
-    const calculateTotalVAT = (items: any[]) => {
-      const vatMap = new Map();
-      items.forEach((item) => {
-        const {percentageVat, netAmount, fractionDigits} =
-          item.unitSellingAmount;
-        const vat =
-          ((percentageVat / 100) * (netAmount * item.quantity)) /
-          10 ** (fractionDigits || 0);
-        if (vatMap.has(percentageVat)) {
-          vatMap.set(percentageVat, vatMap.get(percentageVat) + vat);
-        } else {
-          vatMap.set(percentageVat, vat);
-        }
-      });
-      return vatMap;
-    };
 
     const totalVATMap = calculateTotalVAT(articleItems);
 
@@ -354,18 +262,25 @@ const OrderArticlePDF = React.memo(
       ),
     ];
 
+    const boldFontStyle = {
+      fontFamily: selectedLng === 'KA' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+    };
+
+    const regularFontStyle = {
+      fontFamily:
+        selectedLng === 'KA' ? 'NotoSans-Regular' : 'Montserrat-Regular',
+    };
+
+    const styles = getStyles(boldFontStyle, regularFontStyle);
+
     return (
       <Document>
         <Page size="A4" style={styles.page}>
           <View>
-            <View style={styles.header} fixed>
-              {logoSrc && (
-                <Image
-                  style={{height: logoDimensions?.height || 35}}
-                  src={logoSrc}
-                />
-              )}
-            </View>
+            <PdfTemplateHeader
+              logoSrc={logoSrc}
+              logoDimensions={logoDimensions}
+            />
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
@@ -459,7 +374,7 @@ const OrderArticlePDF = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '45%',
+                        width: '43%',
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
@@ -467,7 +382,7 @@ const OrderArticlePDF = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '10%',
+                        width: '14%',
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
@@ -475,7 +390,7 @@ const OrderArticlePDF = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '10%',
+                        width: '8%',
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
@@ -483,7 +398,7 @@ const OrderArticlePDF = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '3%',
+                        width: '7%',
                         textAlign: 'center',
                         marginLeft: 10,
                         ...styles.tableHeading,
@@ -492,7 +407,7 @@ const OrderArticlePDF = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '15%',
+                        width: '13%',
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
@@ -502,6 +417,7 @@ const OrderArticlePDF = React.memo(
                       style={{
                         width: '15%',
                         textAlign: 'right',
+                        marginRight: 4,
                         ...styles.tableHeading,
                       }}>
                       {' '}
@@ -525,7 +441,7 @@ const OrderArticlePDF = React.memo(
                         </Text>
                         <Text
                           style={{
-                            width: '45%',
+                            width: '43%',
                             textAlign: 'left',
                             color: '#212121',
                           }}>
@@ -533,7 +449,7 @@ const OrderArticlePDF = React.memo(
                         </Text>
                         <Text
                           style={{
-                            width: '10%',
+                            width: '14%',
                             textAlign: 'left',
                             color: '#212121',
                           }}>
@@ -541,7 +457,7 @@ const OrderArticlePDF = React.memo(
                         </Text>
                         <Text
                           style={{
-                            width: '10%',
+                            width: '8%',
                             textAlign: 'right',
                             color: '#212121',
                           }}>
@@ -549,7 +465,7 @@ const OrderArticlePDF = React.memo(
                         </Text>
                         <Text
                           style={{
-                            width: '3%',
+                            width: '7%',
                             textAlign: 'center',
                             marginLeft: 10,
                             color: '#212121',
@@ -558,7 +474,7 @@ const OrderArticlePDF = React.memo(
                         </Text>
                         <Text
                           style={{
-                            width: '15%',
+                            width: '13%',
                             textAlign: 'right',
                             color: '#212121',
                           }}>
@@ -619,12 +535,14 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'right',
                         fontSize: 10,
                       }}>
-                      {formatCurrency(calculateTotal(articleItems))}
+                      {formatCurrency(
+                        calculateTotal(articleItems, currencyCode),
+                      )}
                     </Text>
                   </View>
 
                   <View>
-                    {uniqueVATPercentages.map((vatPercentage) => (
+                    {uniqueVATPercentages?.map((vatPercentage) => (
                       <View style={styles.tableRow} key={vatPercentage}>
                         <Text style={{width: '44%'}} />
                         <Text
@@ -656,7 +574,7 @@ const OrderArticlePDF = React.memo(
                       style={{
                         width: '32%',
                         color: '#212121',
-                        fontFamily: 'Montserrat-Bold',
+                        ...boldFontStyle,
                         textAlign: 'right',
                         fontSize: 10,
                       }}>
@@ -667,7 +585,7 @@ const OrderArticlePDF = React.memo(
                         width: '24%',
                         textAlign: 'right',
                         color: '#212121',
-                        fontFamily: 'Montserrat-Bold',
+                        ...boldFontStyle,
                         fontSize: 10,
                       }}>
                       {formatCurrency(
@@ -687,135 +605,7 @@ const OrderArticlePDF = React.memo(
             </View>
           </View>
 
-          <View fixed style={styles.footerContainer}>
-            <View style={styles.footerWrapper}>
-              <View style={styles.leftFooter}>
-                <View style={{...styles.footerContent}}>
-                  {userInfo?.serviceCompany.name && (
-                    <Text style={styles.footerHeading}>
-                      {userInfo?.serviceCompany?.name}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany.postalAddress?.fullName && (
-                    <Text style={styles.footerSectionBody}>
-                      {userInfo?.serviceCompany?.postalAddress?.fullName}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.postalAddress?.component?.state ||
-                    (userInfo?.serviceCompany?.postalAddress?.component
-                      ?.country && (
-                      <Text style={styles.footerSectionBody}>
-                        {
-                          userInfo?.serviceCompany?.postalAddress?.component
-                            ?.state
-                        }
-                        {userInfo?.serviceCompany?.postalAddress?.component
-                          ?.state && '·'}
-                        {
-                          userInfo?.serviceCompany?.postalAddress?.component
-                            ?.country
-                        }
-                      </Text>
-                    ))}
-
-                  {userInfo?.serviceCompany?.contact?.phone && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('Tel.')}: {userInfo?.serviceCompany?.contact?.phone}
-                    </Text>
-                  )}
-                </View>
-
-                <View style={{...styles.footerContent}}>
-                  <Text style={styles.footerHeading}>{t('Bank')}:</Text>
-
-                  {userInfo?.serviceCompany?.settings?.paymentInfo
-                    ?.accountNumber && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('Acc. nr.')}:{' '}
-                      {
-                        userInfo?.serviceCompany?.settings?.paymentInfo
-                          ?.accountNumber
-                      }
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('IBAN')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('BIC')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
-                    </Text>
-                  )}
-                </View>
-                <View style={{...styles.footerContent}}>
-                  {userInfo?.serviceCompany?.settings?.managingDirector && (
-                    <Text style={styles.footerHeading}>
-                      {t('Managing Director')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.managingDirector}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.arbitrationCourt && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('Registration court')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.arbitrationCourt}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.vatId && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('VAT ID')}: {userInfo?.serviceCompany?.settings?.vatId}{' '}
-                    </Text>
-                  )}
-
-                  {userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
-                    <Text style={styles.footerSectionBody}>
-                      {t('Certified')}:{' '}
-                      {userInfo?.serviceCompany?.settings?.tradeRegisterNumber}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.footerEmailWrapper}>
-              <View style={styles.leftFooter}>
-                {userInfo?.serviceCompany?.contact?.url && (
-                  <View style={styles.footerContent}>
-                    <Text style={styles.emailText}>
-                      {userInfo?.serviceCompany?.contact?.url}
-                    </Text>
-                  </View>
-                )}
-
-                {userInfo?.serviceCompany.contact.email && (
-                  <View style={{...styles.footerContent, marginLeft: 2}}>
-                    <Text style={styles.emailText}>
-                      {userInfo?.serviceCompany?.contact?.email}
-                    </Text>
-                  </View>
-                )}
-
-                <Text style={styles.footerContent} />
-              </View>
-              <View>
-                <Text
-                  style={styles.pageNumberText}
-                  render={({pageNumber, totalPages}) =>
-                    `${pageNumber} / ${totalPages}`
-                  }
-                />
-              </View>
-            </View>
-          </View>
+          <PdfTemplateFooter userInfo={userInfo} selectedLng={selectedLng} />
         </Page>
       </Document>
     );

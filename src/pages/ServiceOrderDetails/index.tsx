@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import GradingIcon from '@mui/icons-material/Grading';
 import FactCheck from '@mui/icons-material/FactCheck';
@@ -27,6 +27,7 @@ import {pdf} from '@react-pdf/renderer';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
+import {LanguageContext} from 'context/LanguageProvider';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -65,6 +66,7 @@ export const ServiceOrderDetails = () => {
   const imageUrl = useLogoImage(user);
 
   const logoDimensions = useLogoDimensions(imageUrl);
+  const {language: selectedLng} = useContext(LanguageContext);
 
   const filePaths = useMemo(
     () => (filePathToDownload ? [filePathToDownload] : []),
@@ -92,6 +94,7 @@ export const ServiceOrderDetails = () => {
         serviceOrder={serviceOrder}
         logoDimensions={logoDimensions}
         quotation={quotation}
+        selectedLng={selectedLng}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
