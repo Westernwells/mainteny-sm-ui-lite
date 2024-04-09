@@ -9,7 +9,7 @@ import {Link as RouterLink} from 'react-router-dom';
 import {hasProtocol} from '../utils/utils';
 
 interface Props {
-  icon: JSX.Element;
+  icon?: JSX.Element;
   label: string;
   navigateTo?: string;
   bodyTextVariant?: any;
@@ -59,18 +59,20 @@ export const CardProps = ({
       alignItems={bodyText ? 'flex-start' : 'center'}
       sx={{...containerStyles}}
       minHeight="60px">
-      <Box
-        sx={{
-          backgroundColor: iconBackground,
-          p: '0.7em',
-          display: 'flex',
-          justifyContent: 'center',
-          mr: '0.8em',
-          maxHeight: iconMaxHeight || 'default',
-          ...iconContainerStyles,
-        }}>
-        {icon}
-      </Box>
+      {icon && (
+        <Box
+          sx={{
+            backgroundColor: iconBackground,
+            p: '0.7em',
+            display: 'flex',
+            justifyContent: 'center',
+            mr: '0.8em',
+            maxHeight: iconMaxHeight || 'default',
+            ...iconContainerStyles,
+          }}>
+          {icon}
+        </Box>
+      )}
       <Box sx={{textWrap: 'nowrap'}}>
         <Typography
           component="div"
@@ -87,7 +89,7 @@ export const CardProps = ({
             display: 'flex',
             flexWrap: 'nowrap',
             alignItems: 'baseline',
-            fontWeight: '400',
+            fontWeight: '600',
           }}>
           {navigateTo ? (
             <Link
@@ -96,7 +98,7 @@ export const CardProps = ({
               to={`${navigateTo}`}
               underline="hover"
               variant="body2"
-              style={{paddingTop: '0.2em', display: 'flex', fontWeight: '400'}}
+              style={{paddingTop: '0.2em', display: 'flex', fontWeight: '600'}}
               color={theme.palette.info.main}>
               {typeof bodyText === 'string' ? (
                 <Typography

@@ -28,19 +28,17 @@ import {ServiceOrderArticleRecord} from 'models/article';
 import {
   AssignmentBasedOrderBody,
   UpdateServiceOrderScheduleBody,
-  RedispatchParams,
   ServiceOrderActivityView,
   ServiceOrderOrderField,
   ServiceOrderQueryParams,
   ServiceOrderScheduleParams,
   ServiceOrderView,
-  CreateScheduledServiceOrderBody,
-  CreateNonScheduledServiceOrderBody,
   CompleteServiceOrder,
   UpdateServiceOrderBody,
   AppointmentConfirmationRequiredOrdersQueryParams,
   ServiceOrderArticleView,
   ServiceOrderConfirmationPublishBody,
+  CreateServiceOrderRecord,
 } from 'models/service-order';
 import {
   Order,
@@ -542,44 +540,6 @@ export const useUnscheduleServiceOrders = () => {
   );
 };
 
-const redispatchServiceOrders = async (
-  technicianId: string,
-  serviceOrderId: string,
-) => {
-  await axiosClient.post<StringValue>(
-    `/api/dispatch/technicians/${technicianId}/serviceOrders/redispatch`,
-    {},
-    {
-      params: {serviceOrderId},
-      paramsSerializer,
-    },
-  );
-};
-
-export const useRedispatchServiceOrders = (successMsg: string) => {
-  const queryClient = useQueryClient();
-  const {enqueueSnackbar, showError} = useSnackbar();
-  return useMutation(
-    ({technicianId, serviceOrderId}: RedispatchParams) =>
-      redispatchServiceOrders(technicianId, serviceOrderId),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
-        queryClient.invalidateQueries([queryKeys.queryDueServiceOrders]);
-        enqueueSnackbar(successMsg, {
-          variant: 'success',
-        });
-      },
-      onError: (err) => {
-        console.log(err);
-        showError(err);
-      },
-    },
-  );
-};
-
 const updateServiceOrderSchedule = async (
   body: UpdateServiceOrderScheduleBody,
   serviceOrderId: string,
@@ -675,56 +635,24 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
   );
 };
 
-const createScheduledServiceOrder = async (
-  body: CreateScheduledServiceOrderBody,
-) =>
-  axiosClient.post<StringValue>('/api/serviceOrders/scheduled', {
+const createServiceOrder = async (body: CreateServiceOrderRecord) =>
+  axiosClient.post<StringValue>('/api/serviceOrders', {
     ...body,
   });
 
-export const useCreateScheduledServiceOrder = (successMsg: string) => {
+export const useCreateServiceOrder = (successMsg: string) => {
   const {enqueueSnackbar, showError} = useSnackbar();
-  return useMutation(
-    (body: CreateScheduledServiceOrderBody) =>
-      createScheduledServiceOrder(body),
-    {
-      onSuccess: () => {
-        enqueueSnackbar(successMsg, {
-          variant: 'success',
-        });
-      },
-      onError: (err) => {
-        console.log(err);
-        showError(err);
-      },
+  return useMutation(createServiceOrder, {
+    onSuccess: () => {
+      enqueueSnackbar(successMsg, {
+        variant: 'success',
+      });
     },
-  );
-};
-
-const createNonScheduledServiceOrder = async (
-  body: CreateNonScheduledServiceOrderBody,
-) =>
-  axiosClient.post<StringValue>('/api/serviceOrders/nonscheduled', {
-    ...body,
+    onError: (err) => {
+      console.log(err);
+      showError(err);
+    },
   });
-
-export const useCreateNonScheduledServiceOrder = (successMsg: string) => {
-  const {enqueueSnackbar, showError} = useSnackbar();
-  return useMutation(
-    (body: CreateNonScheduledServiceOrderBody) =>
-      createNonScheduledServiceOrder(body),
-    {
-      onSuccess: () => {
-        enqueueSnackbar(successMsg, {
-          variant: 'success',
-        });
-      },
-      onError: (err) => {
-        console.log(err);
-        showError(err);
-      },
-    },
-  );
 };
 
 export const queryAppointmentConfirmationRequiredOrders = async (
@@ -822,11 +750,16 @@ export const useConfirmAppointment = () => {
 
 export const postPublishChecklist = async (
   id: string,
+  params: {checkListId?: string; technicianId?: string},
   body: SimpleEmailRecord,
 ) => {
   await axiosClient.post<{value: string}>(
     `api/serviceOrders/${id}/checkList/publish`,
     body,
+    {
+      params,
+      paramsSerializer,
+    },
   );
 };
 
@@ -834,8 +767,15 @@ export const usePublishChecklist = () => {
   const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
-    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
-      postPublishChecklist(id, body),
+    ({
+      id,
+      params,
+      body,
+    }: {
+      id: string;
+      params: {checkListId?: string; technicianId?: string};
+      body: SimpleEmailRecord;
+    }) => postPublishChecklist(id, params, body),
     {
       onSuccess: () => {
         enqueueSnackbar(`CheckList sent successfully`, {

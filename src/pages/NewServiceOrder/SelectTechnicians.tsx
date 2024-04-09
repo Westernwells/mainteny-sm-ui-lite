@@ -1,30 +1,26 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import Typography from '@mui/material/Typography';
+import React, {useCallback, useEffect, useState} from 'react';
+import {t} from 'i18next';
 import * as _ from 'lodash';
-import {ServiceOrderType, ServiceOrderView} from 'models/service-order';
+import {Typography, Box, Tooltip, IconButton} from '@mui/material';
+import {InfoOutlined} from '@mui/icons-material';
+import {ContactChannel, ServiceOrderView} from 'models/service-order';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {useFetchRecommendedTechnician} from 'hooks/reactQuery/useTechnician';
+import {
+  useFetchRecommendedTechnician,
+  useQueryServiceCompanyTechnicians,
+} from 'hooks/reactQuery/useTechnician';
 import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay} from 'date-fns';
 import {toRestDateTime} from 'utils/datetime';
-import {ScheduleItem} from 'components/Schedules/ScheduleItem';
-import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {OrderDetails} from 'components/OrderDetails';
-import {useServiceOrderStatusColor} from 'hooks/useServiceOrderStatusColor';
-import Box from '@mui/material/Box';
-import {FormRadio} from 'components/form/FormRadio';
-import RadioGroup from '@mui/material/RadioGroup';
-import useTheme from '@mui/material/styles/useTheme';
-import Divider from '@mui/material/Divider';
-import {Button} from 'components/Button';
+import {NewJobScheduleItem} from 'components/Schedules/NewJobScheduleItem';
+import {NewJobOrderDetails} from 'components/NewJobOrderDetails';
+import {Switch} from 'components/Switch';
+import {FormCheckbox} from 'components/form/FormCheckbox';
 import {EmployeesView} from 'models/employee';
 import {sortOrderByTime} from 'utils/service-order-utils';
-import {AddTechnicianDialog} from './AddTechnicianDialog';
 import {TechnicianSchedule} from './TechnicianSchedule';
-import {ContainerCard} from './ContainerCard';
 import {ScheduleForm} from './ScheduleForm';
-import {DueDateFormProps, RadioOptions, ScheduleTechnicianForm} from './models';
+import {DueDateFormProps, ScheduleTechnicianForm} from './models';
 import {DueDateForm} from './DueDateForm';
 
 interface Props {
@@ -33,14 +29,15 @@ interface Props {
   getSelectedTechnicians?: (val: EmployeesView[]) => void;
   getRecommendedTechnicianView?: (val: EmployeesView[]) => void;
   initialRecommendedTechnicians?: EmployeesView[];
-  showOptions?: boolean;
-  defaultOption?: RadioOptions;
+  scheduleFormValue: ScheduleTechnicianForm | null;
   getScheduleFormValue?: (form: ScheduleTechnicianForm) => void;
+  dueDateFormValue: DueDateFormProps | null;
   getDueDateFormValues?: (form: DueDateFormProps) => void;
-  scheduleFormIsErrored?: (value: boolean) => void;
   dueDateFormIsErrored?: (value: boolean) => void;
-  getSelectedRadioOption?: (val?: RadioOptions) => void;
-  type?: Exclude<ServiceOrderType, ServiceOrderType.EMERGENCY>;
+  requireTechnicianNotification: boolean;
+  setRequireTechnicianNotification: (value: boolean) => void;
+  notificationChannels: ContactChannel[];
+  setNotificationChannels: (value: ContactChannel[]) => void;
 }
 
 interface CheckBoxState {
@@ -48,86 +45,76 @@ interface CheckBoxState {
   value: string;
 }
 
-const otherOptions = [
-  {
-    value: RadioOptions.DUE_DATE,
-    label: 'Select a due date',
-    subText: `Select a date before which this service job has to be completed`,
-  },
-  {
-    value: RadioOptions.SCHEDULE_TECHNICIAN,
-    label: 'Select a date, time & technician',
-    subText: `Select a specific date, time and technician and update the technicians schedule for that day`,
-  },
-];
-
-const calloutOptions = [
-  {
-    value: RadioOptions.IMMEDIATE,
-    label: 'Immediate',
-    subText: 'Select a technician for attending this service job immediately',
-  },
-  ...otherOptions,
-];
-
 export const SelectTechnicians = ({
   elevatorId,
   getSelectedTechnicians,
   getRecommendedTechnicianView,
   initialRecommendedTechnicians,
   initialSelectedTechnicians,
-  showOptions,
-  defaultOption,
-  type,
+  scheduleFormValue,
   getScheduleFormValue = () => {},
+  dueDateFormValue,
   getDueDateFormValues = () => {},
-  scheduleFormIsErrored,
   dueDateFormIsErrored,
-  getSelectedRadioOption,
+  requireTechnicianNotification,
+  setRequireTechnicianNotification,
+  notificationChannels,
+  setNotificationChannels,
 }: Props) => {
-  const {t} = useTranslation();
-  const theme = useTheme();
-  const options = useRef(
-    type === ServiceOrderType.CALLOUT ? calloutOptions : otherOptions,
-  ).current;
-  const time = useRef(toRestDateTime(new Date())).current;
-  const [selectedOption, setSelectedOption] = useState<
-    RadioOptions | undefined
-  >(defaultOption);
-  const [serviceOrderStatusColor] = useServiceOrderStatusColor();
-  const [openDialog, setOpenDialog] = useState(false);
-
-  const [newTechnician, setNewTechnician] = useState<EmployeesView | null>(
-    null,
-  );
   const [checkboxState, setCheckboxState] = useState<CheckBoxState>(
     {} as CheckBoxState,
   );
   const [selectedTechnicianIds, setSelectedTechnicianIds] = useState<string[]>(
-    [],
+    initialSelectedTechnicians
+      ? initialSelectedTechnicians.map((item) => item.id)
+      : [],
   );
 
   const [orders, setOrders] = useState<{[key: string]: ServiceOrderView[]}>({});
   const [page] = useState(makePage(0, 500));
+  const scheduledStartDateTime = scheduleFormValue?.startDate
+    ? new Date(
+        scheduleFormValue.startDate.getFullYear(),
+        scheduleFormValue.startDate.getMonth(),
+        scheduleFormValue.startDate.getDate(),
+        scheduleFormValue.startTime?.getHours() || new Date().getHours(),
+        scheduleFormValue.startTime?.getMinutes() || new Date().getMinutes(),
+      )
+    : null;
+  const queryDate =
+    scheduledStartDateTime || dueDateFormValue?.date || new Date();
   const [recommendedTechniciansView, setRecommendedTechniciansView] = useState<
     EmployeesView[]
   >(initialRecommendedTechnicians || []);
   const {
-    data: recommendedTechnicians = [],
+    data: recommendedTechniciansData = [],
     isLoading: isLoadingRecommendedTechnicians,
   } = useFetchRecommendedTechnician(
     {
-      time,
-      count: 4,
+      time: toRestDateTime(queryDate),
+      count: 10,
     },
     elevatorId,
   );
+  const [technicianSearch, setTechnicianSearch] = useState<string>('');
+  const {
+    data: technicianResource = createEmptyResource<EmployeesView>(
+      page.pageSize,
+    ),
+  } = useQueryServiceCompanyTechnicians({
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    query: technicianSearch,
+  });
+  const recommendedTechnicians = technicianSearch
+    ? technicianResource.data
+    : recommendedTechniciansData;
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(5),
     isLoading: isLoadingOrderSchedules,
   } = useQueryServiceOrderScheduled({
-    end: toRestDateTime(endOfDay(new Date())),
-    start: toRestDateTime(startOfDay(new Date())),
+    start: toRestDateTime(startOfDay(queryDate)),
+    end: toRestDateTime(endOfDay(queryDate)),
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
     query: '',
@@ -141,22 +128,12 @@ export const SelectTechnicians = ({
   }, [recommendedTechniciansView]);
 
   useEffect(() => {
-    setSelectedTechnicianIds(
-      initialSelectedTechnicians
-        ? initialSelectedTechnicians.map((item) => item.id)
-        : [],
-    );
-  }, []);
-
-  useEffect(() => {
     if (getSelectedTechnicians) {
-      if (selectedOption === RadioOptions.IMMEDIATE) {
-        const result = recommendedTechniciansView.filter((item) =>
-          selectedTechnicianIds.includes(item.id),
-        );
+      const result = recommendedTechniciansView.filter((item) =>
+        selectedTechnicianIds.includes(item.id),
+      );
 
-        getSelectedTechnicians(result);
-      }
+      getSelectedTechnicians(result);
     }
   }, [selectedTechnicianIds]);
 
@@ -182,28 +159,11 @@ export const SelectTechnicians = ({
   }, [recommendedTechnicians, isLoadingRecommendedTechnicians]);
 
   useEffect(() => {
-    if (isLoadingRecommendedTechnicians) return;
-    if (newTechnician) {
-      const technicianExist = recommendedTechniciansView.filter(
-        (item) => item.id === newTechnician.id,
-      );
-      if (!technicianExist.length) {
-        setRecommendedTechniciansView([
-          ...recommendedTechniciansView,
-          newTechnician,
-        ]);
-      }
-    }
-  }, [newTechnician]);
-
-  useEffect(() => {
-    if (getSelectedRadioOption) {
-      getSelectedRadioOption(selectedOption);
-    }
-  }, [selectedOption]);
-
-  useEffect(() => {
-    if (!Object.keys(checkboxState).length) return;
+    if (
+      !Object.keys(checkboxState).length ||
+      selectedTechnicianIds.length >= 10
+    )
+      return;
     if (!selectedTechnicianIds.includes(checkboxState.value)) {
       setSelectedTechnicianIds([...selectedTechnicianIds, checkboxState.value]);
     } else {
@@ -213,100 +173,13 @@ export const SelectTechnicians = ({
     }
   }, [checkboxState]);
 
+  const clearSelectedTechnicians = () => {
+    setSelectedTechnicianIds([]);
+  };
+
   const getCheckedValue = useCallback(
     (checked: boolean, value: string) => setCheckboxState({checked, value}),
     [],
-  );
-
-  const cardHeader = () => (
-    <Box sx={{}}>
-      {showOptions ? (
-        <>
-          <Typography variant="h6" pb={2}>
-            {t('Date, time & technicians')}
-          </Typography>
-
-          <RadioGroup name="radio-buttons-group">
-            <Box sx={{display: 'flex'}}>
-              {options.map((option) => (
-                <Box
-                  key={option.label}
-                  component="label"
-                  sx={{
-                    width: '35%',
-                    mr: '1em',
-                    px: '1.2em',
-                    py: '1.125rem',
-                    cursor: 'pointer',
-                    border:
-                      selectedOption === option.value
-                        ? `2px solid ${theme.palette.primary.mainLight}`
-                        : `1.5px solid ${theme.palette.eden.light}`,
-                    borderRadius: 2,
-                    bgcolor:
-                      selectedOption === option.value
-                        ? '#00D1FF14'
-                        : 'transparent',
-                  }}>
-                  <FormRadio
-                    value={option.value}
-                    checked={selectedOption === option.value}
-                    handleChange={(e) => {
-                      setSelectedOption(e.target.value as RadioOptions);
-                      setSelectedTechnicianIds([]);
-                      if (getSelectedTechnicians) {
-                        getSelectedTechnicians([]);
-                      }
-                    }}
-                    label={
-                      <Typography
-                        variant="h6"
-                        component="span"
-                        fontSize="1.125rem"
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          color:
-                            selectedOption === option.value
-                              ? theme.palette.text.primary
-                              : theme.palette.text.secondary,
-                        }}>
-                        {t(option.label)}
-                      </Typography>
-                    }
-                    radioProps={{
-                      sx: {color: theme.palette.text.secondary},
-                    }}
-                  />
-                  <Typography variant="body1" color="text.secondary">
-                    {t(option.subText)}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          </RadioGroup>
-          <Divider
-            sx={{
-              mt: '1.5em',
-              border: `1px solid ${theme.palette.grey[200]}`,
-            }}
-          />
-        </>
-      ) : null}
-
-      {selectedOption === RadioOptions.IMMEDIATE ? (
-        <>
-          <Typography variant="h6" sx={{mt: showOptions ? '2em' : undefined}}>
-            {t('Technicians')}
-          </Typography>
-          <Typography variant="body1" component="div" color="text.secondary">
-            {t(
-              'Selected technicians below will be contacted by phone automatically',
-            )}
-          </Typography>
-        </>
-      ) : null}
-    </Box>
   );
 
   const getSchedulePeriod = (period: 'start' | 'end' | 'now') => {
@@ -323,17 +196,20 @@ export const SelectTechnicians = ({
     return now;
   };
 
-  const getScheduledPeriodDivisbleByFive = (period: 'start' | 'end') => {
-    const now = getSchedulePeriod(period);
-    const minutes = now.getMinutes();
-    const divisibleByFive = minutes % 5 === 0;
-    if (divisibleByFive) {
-      return now;
+  const handleChangeNotificationChannels = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const {value, checked} = event.target;
+    if (checked) {
+      setNotificationChannels([
+        ...notificationChannels,
+        value as ContactChannel,
+      ]);
+    } else {
+      setNotificationChannels(
+        notificationChannels.filter((item) => item !== value),
+      );
     }
-    const remainder = minutes % 5;
-    const diff = 5 - remainder;
-    now.setMinutes(minutes + diff);
-    return now;
   };
 
   const renderCellItem = (
@@ -341,111 +217,122 @@ export const SelectTechnicians = ({
     width: string,
     position: {x: string; y: string},
   ) => (
-    <ScheduleItem
+    <NewJobScheduleItem
       key={order.id}
-      height="30px"
-      titleLeftAdornment={
-        <ServiceOrderIcons
-          serviceOrderType={order.type}
-          style={{fontSize: '1rem'}}
-        />
-      }
-      title={order.elevator.propertyOwner.name}
       width={width}
-      tooltip={OrderDetails}
+      tooltip={NewJobOrderDetails}
       order={order}
-      cardStatusAccent={serviceOrderStatusColor[order.status]}
       position={position}
     />
   );
 
   return (
-    <>
-      <ContainerCard
-        customCardHeader={cardHeader()}
-        containerStyles={{
-          boxShadow: 'none',
-          border: 'none',
-          flexGrow: 1,
-          height: 0,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-        contentContainerStyle={{flexGrow: 1, height: 0}}
-        footerContainerStyles={{
-          flexGrow: 1,
-        }}
-        cardFooter={
-          selectedOption === RadioOptions.IMMEDIATE ? (
-            <Box sx={{ml: '1.5em'}}>
-              <Button
-                label="Add More"
-                buttonProps={{
-                  variant: 'outlined',
-                  sx: {bgcolor: 'white'},
-                  onClick: () => setOpenDialog(true),
-                }}
-              />
-            </Box>
-          ) : null
-        }>
-        {selectedOption === RadioOptions.IMMEDIATE ? (
-          <TechnicianSchedule
-            scheduleItems={orders}
-            renderCellItem={renderCellItem}
-            defaultTypeLabel="Recommended Technician"
-            labelWidth="15rem"
-            getCheckedValue={getCheckedValue}
-            cellHeight="50px"
-            technicians={recommendedTechniciansView}
-            checkedValues={selectedTechnicianIds}
-          />
-        ) : null}
-
-        {selectedOption === RadioOptions.DUE_DATE ? (
-          <DueDateForm
-            defaultStartDate={getSchedulePeriod('start')}
-            getDueDateFormValues={(form: DueDateFormProps) =>
-              getDueDateFormValues(form)
-            }
-            dueDateFormIsErrored={(val: boolean) =>
-              dueDateFormIsErrored && dueDateFormIsErrored(val)
-            }
-            containerStyles={{pl: '1em', mt: '2em', maxWidth: '30%'}} // containerStyles,
-          />
-        ) : null}
-        {selectedOption === RadioOptions.SCHEDULE_TECHNICIAN ? (
-          <ScheduleForm
-            containerStyles={{pl: '1em', mt: '2em', maxWidth: '30%'}}
-            defaultEndDate={getScheduledPeriodDivisbleByFive('end')}
-            currentRadioOption={selectedOption}
-            defaultStartDate={getScheduledPeriodDivisbleByFive('start')}
-            defaultTechnician={null}
-            scheduleFormIsErrored={(val) =>
-              scheduleFormIsErrored && scheduleFormIsErrored(val)
-            }
-            getTechnician={(val) => {
-              if (getSelectedTechnicians && val) {
-                getSelectedTechnicians([val]);
-              }
-            }}
-            getScheduleFormValues={(form: ScheduleTechnicianForm) => {
-              getScheduleFormValue(form);
-              if (form.technicianId) {
-                setSelectedTechnicianIds([form.technicianId]);
-              } else {
-                setSelectedTechnicianIds([]);
-              }
-            }}
-          />
-        ) : null}
-      </ContainerCard>
-
-      <AddTechnicianDialog
-        open={openDialog}
-        getDialogState={(state) => setOpenDialog(state)}
-        getTechnician={(item) => setNewTechnician(item)}
+    <Box display="flex" flexDirection="column" gap={3}>
+      <DueDateForm
+        defaultStartDate={getSchedulePeriod('start')}
+        getDueDateFormValues={(form: DueDateFormProps) =>
+          getDueDateFormValues(form)
+        }
+        dueDateFormIsErrored={(val: boolean) =>
+          dueDateFormIsErrored && dueDateFormIsErrored(val)
+        }
+        containerStyles={{maxWidth: '20rem', py: 3}}
       />
-    </>
+
+      <ScheduleForm
+        getScheduleFormValues={getScheduleFormValue}
+        defaultValues={scheduleFormValue || undefined}
+      />
+
+      <Box>
+        <TechnicianSchedule
+          scheduleItems={orders}
+          renderCellItem={renderCellItem}
+          labelWidth="15rem"
+          getCheckedValue={getCheckedValue}
+          cellHeight="50px"
+          technicians={recommendedTechniciansView}
+          checkedValues={selectedTechnicianIds}
+          clearSelectedTechnicians={clearSelectedTechnicians}
+          setTechnicianSearch={setTechnicianSearch}
+          viewDate={queryDate}
+        />
+      </Box>
+
+      <Box display="flex" alignItems="center" gap={0.5}>
+        <Typography variant="subtitle2">
+          {t('Engineer confirmation required')}
+        </Typography>
+        <Tooltip
+          title={t(
+            'If this option is selected the engineer has to confirm the job either via mobile app or phone call. If the job is not confirmed it will not be scheduled.',
+          )}
+          placement="top"
+          arrow>
+          <IconButton sx={{color: 'action.active', p: 0}}>
+            <InfoOutlined fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Switch
+          value={requireTechnicianNotification}
+          onChanged={setRequireTechnicianNotification}
+        />
+      </Box>
+
+      <Box>
+        <Box display="flex" alignItems="center" gap={0.5}>
+          <Typography variant="subtitle2">
+            {t('Inform the enginer(s) via:')}
+          </Typography>
+          <Tooltip
+            title={t(
+              'SMS and phone calls are automatically generated by the system. The engineer will always get a notification in the mobile app.',
+            )}
+            placement="top"
+            arrow>
+            <IconButton sx={{color: 'action.active', p: 0}}>
+              <InfoOutlined fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <FormCheckbox
+          value={ContactChannel.PUSH_NOTIFICATION}
+          label="App"
+          checked={notificationChannels.includes(
+            ContactChannel.PUSH_NOTIFICATION,
+          )}
+          disabled
+          typographyProps={{variant: 'body2'}}
+          checkboxProps={{
+            size: 'small',
+            sx: {pt: 1},
+          }}
+        />
+        <FormCheckbox
+          value={ContactChannel.SMS}
+          label="SMS"
+          checked={notificationChannels.includes(ContactChannel.SMS)}
+          handleChange={handleChangeNotificationChannels}
+          typographyProps={{variant: 'body2'}}
+          checkboxProps={{
+            size: 'small',
+            sx: {pt: 1},
+          }}
+        />
+        {requireTechnicianNotification ? (
+          <FormCheckbox
+            value={ContactChannel.PHONE_CALL}
+            label="Phone Call"
+            checked={notificationChannels.includes(ContactChannel.PHONE_CALL)}
+            handleChange={handleChangeNotificationChannels}
+            typographyProps={{variant: 'body2'}}
+            checkboxProps={{
+              size: 'small',
+              sx: {pt: 1},
+            }}
+          />
+        ) : null}
+      </Box>
+    </Box>
   );
 };

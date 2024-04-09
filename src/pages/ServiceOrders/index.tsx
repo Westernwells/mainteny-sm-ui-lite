@@ -1,10 +1,22 @@
-import {useRef} from 'react';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
+import SettingsIcon from '@mui/icons-material/Settings';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
+import BuildCircleIcon from '@mui/icons-material/BuildCircle';
+import UploadIcon from '@mui/icons-material/Upload';
+import HandymanIcon from '@mui/icons-material/Handyman';
 import {useNavigate} from 'react-router-dom';
 import {useQueryState} from 'hooks/useQueryState';
+import {ServiceOrderType} from 'models/service-order';
+import {
+  serviceOrderTypeColor,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
 
@@ -31,40 +43,80 @@ export const ServiceOrders = () => {
     cb();
   };
 
-  const menu = useRef([
+  const menu = [
     {
-      label: 'Emergency',
+      label: serviceOrderTypeToString(ServiceOrderType.EMERGENCY),
       action: () => track(() => navigate('/orders/new?type=emergency')),
+      icon: (
+        <ReportProblemIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.EMERGENCY)}}
+        />
+      ),
     },
     {
-      label: 'Callout',
+      label: serviceOrderTypeToString(ServiceOrderType.CALLOUT),
       action: () => track(() => navigate('/orders/new?type=callout')),
+      icon: (
+        <PhoneInTalkIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.CALLOUT)}}
+        />
+      ),
     },
     {
-      label: 'Repair',
+      label: serviceOrderTypeToString(ServiceOrderType.REPAIR),
       action: () => track(() => navigate('/orders/new?type=repair')),
+      icon: (
+        <SettingsIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.REPAIR)}}
+        />
+      ),
     },
     {
-      label: 'Maintenance',
+      label: serviceOrderTypeToString(ServiceOrderType.REGULAR),
       action: () => track(() => navigate('/orders/new?type=regular')),
+      icon: (
+        <RefreshIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.REGULAR)}}
+        />
+      ),
     },
     {
-      label: 'Inspection',
+      label: serviceOrderTypeToString(ServiceOrderType.INSPECTION),
       action: () => track(() => navigate('/orders/new?type=inspection')),
+      icon: (
+        <YoutubeSearchedForIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.INSPECTION)}}
+        />
+      ),
     },
     {
-      label: 'Installation',
+      label: serviceOrderTypeToString(ServiceOrderType.NEW_INSTALLATION),
       action: () => track(() => navigate('/orders/new?type=new_installation')),
+      icon: (
+        <BuildCircleIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.NEW_INSTALLATION)}}
+        />
+      ),
     },
     {
-      label: 'Modernization',
+      label: serviceOrderTypeToString(ServiceOrderType.MODERNIZATION),
       action: () => track(() => navigate('/orders/new?type=modernization')),
+      icon: (
+        <UploadIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.MODERNIZATION)}}
+        />
+      ),
     },
     {
-      label: 'General',
+      label: serviceOrderTypeToString(ServiceOrderType.GENERAL),
       action: () => track(() => navigate('/orders/new?type=general')),
+      icon: (
+        <HandymanIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.GENERAL)}}
+        />
+      ),
     },
-  ]).current;
+  ];
 
   return (
     <Tabs

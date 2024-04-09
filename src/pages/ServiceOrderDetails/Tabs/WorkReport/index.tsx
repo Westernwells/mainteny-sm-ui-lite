@@ -17,22 +17,31 @@ import {
 import {
   CompleteServiceOrder,
   ServiceOrderArticleView,
+  ServiceOrderReportView,
   ServiceOrderView,
 } from 'models/service-order';
+import {PdfGenerationStatus} from 'models/misc';
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {FormInput} from 'components/form/FormInput';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {
   articleViewToArticleRecord,
   calculateTotalBillableHours,
   convertTimeSlotDatesToRestDateTime,
   serviceOrderStatusToString,
+  getSignatureKeys,
 } from 'utils/service-order-utils';
 import {convertDigitalMinsToHM} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useSearchParams} from 'react-router-dom';
+import {formatSearchParams} from 'utils/utils';
+import {theme} from 'theme';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -41,7 +50,6 @@ import {Pictures} from './Pictures';
 
 interface Props {
   serviceOrder: ServiceOrderView;
-  downloadWorkReport: (() => void) | null;
 }
 
 const validationSchema = Yup.object().shape({
@@ -52,20 +60,44 @@ const validationSchema = Yup.object().shape({
     }),
 });
 
-export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
+export const WorkReport = ({serviceOrder}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
-
+  const [queryParams, setQueryParams] = useSearchParams();
+  const isEditMode = queryParams.get('edit') === '1';
   const [articles, setArticles] = useState<ServiceOrderArticleView[]>([]);
-  const report = serviceOrder?.report;
+  const [report, setReport] = useState<ServiceOrderReportView | undefined>(
+    serviceOrder?.reports?.[0],
+  );
+
+  const schedule = serviceOrder.schedules.find(
+    (s) => s.technician.id === report?.technicianId,
+  );
+
+  const reportToUpdate = serviceOrder?.reports?.find(
+    (r) => r.externalId === report?.externalId,
+  );
+
+  const {data: pdfDownloadUrl = {}} = useDownloadUrl(
+    serviceOrder.reports?.map((i) => i.additionalInfo.pdfPath) || [],
+  );
+  const {downloadFile} = useDownloadFileWithCustomName(
+    report?.externalId || '',
+    pdfDownloadUrl[report?.additionalInfo.pdfPath || ''],
+  );
+  const isWorkReportPdfGenerated =
+    report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
+
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
     usePublishWorkReport();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
-  const signatureKeys = {
-    CUSTOMER: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/CUSTOMER.png`,
-    TECHNICIAN: `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report/TECHNICIAN.png`,
-  };
+
+  const signatureKeys = getSignatureKeys(
+    serviceOrder,
+    report,
+    serviceCompanyId,
+  );
 
   const {data: downloadUrls = {}} = useDownloadUrl(
     report?.signatures?.map((item) => item.fileResource.uri) ?? [],
@@ -97,6 +129,7 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
       completeServiceOrder({
         serviceOrderId: serviceOrder.id ?? '',
         body: {
+          technicianId: report?.technicianId,
           description: values.description,
           articles: articleViewToArticleRecord(articles),
 
@@ -115,7 +148,7 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
     validationSchema,
   });
 
-  useEffect(() => {
+  const resetForm = () => {
     if (report) {
       let temp: ServiceOrderArticleView[] = [];
       if ('articles' in serviceOrder) {
@@ -134,37 +167,43 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
           onlyShowTotalTime: report?.additionalInfo?.onlyShowTotalTime ?? false,
           workTimeRecord: {
             percentageSurcharge:
-              serviceOrder.additionalInfo.workTimeInfo?.percentageSurcharge ??
-              0,
-            timeSlots:
-              serviceOrder.additionalInfo.workTimeInfo?.timeSlots ?? [],
+              report.additionalInfo.workTimeInfo?.percentageSurcharge ?? 0,
+            timeSlots: report.additionalInfo.workTimeInfo?.timeSlots ?? [],
           },
           travelTimeRecord: {
             percentageSurcharge:
-              serviceOrder.additionalInfo.travelTimeInfo?.percentageSurcharge ??
-              0,
-            timeSlots:
-              serviceOrder.additionalInfo.travelTimeInfo?.timeSlots ?? [],
+              report.additionalInfo.travelTimeInfo?.percentageSurcharge ?? 0,
+            timeSlots: report.additionalInfo.travelTimeInfo?.timeSlots ?? [],
           },
         },
       });
     }
+  };
+
+  useEffect(() => {
+    resetForm();
   }, [report]);
+
+  useEffect(() => {
+    if (reportToUpdate) {
+      setReport(reportToUpdate);
+    }
+  }, [reportToUpdate]);
 
   useEffect(() => {
     formik.setFieldValue('workTimeRecord', {
       percentageSurcharge:
-        serviceOrder.additionalInfo.workTimeInfo?.percentageSurcharge ?? 0,
-      timeSlots: serviceOrder.additionalInfo.workTimeInfo?.timeSlots ?? [],
+        report?.additionalInfo.workTimeInfo?.percentageSurcharge ?? 0,
+      timeSlots: report?.additionalInfo.workTimeInfo?.timeSlots ?? [],
     });
     formik.setFieldValue('travelTimeRecord', {
       percentageSurcharge:
-        serviceOrder.additionalInfo.travelTimeInfo?.percentageSurcharge ?? 0,
-      timeSlots: serviceOrder.additionalInfo.travelTimeInfo?.timeSlots ?? [],
+        report?.additionalInfo.travelTimeInfo?.percentageSurcharge ?? 0,
+      timeSlots: report?.additionalInfo.travelTimeInfo?.timeSlots ?? [],
     });
   }, [
-    serviceOrder.additionalInfo.workTimeInfo,
-    serviceOrder.additionalInfo.travelTimeInfo,
+    report?.additionalInfo.workTimeInfo,
+    report?.additionalInfo.travelTimeInfo,
   ]);
 
   useEffect(() => {
@@ -188,9 +227,11 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
         type={serviceOrder.type}
         number={serviceOrder.number}
         status={serviceOrder.status}
+        order={serviceOrder}
+        onReportChange={setReport}
       />
-      <A4Layout>
-        <Box display="flex" mt="1em" gap="2em">
+      <A4Layout hideHeader containerStyle={{border: 'unset', padding: 'unset'}}>
+        <Box display="flex" gap="7em">
           <Box flexGrow={1} display="flex" flexDirection="column" gap="2em">
             <SelectCombined
               selected
@@ -266,11 +307,11 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
                 {
                   label: 'Technician',
                   value:
-                    serviceOrder.schedules.length &&
-                    `${serviceOrder.schedules[0].technician.userAccount.firstName} ${serviceOrder.schedules[0].technician.userAccount.lastName}`,
+                    schedule &&
+                    `${schedule.technician.userAccount.firstName} ${schedule.technician.userAccount.lastName}`,
                 },
                 {
-                  label: 'Status',
+                  label: 'Unit Status',
                   value: `${t(
                     serviceOrderStatusToString(serviceOrder.status),
                   )}`,
@@ -283,13 +324,22 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
               ))}
           </Box>
         </Box>
-        <Maintenance serviceOrder={serviceOrder} formik={formik} />
+        <Maintenance
+          schedule={schedule}
+          formik={formik}
+          isEdit={isEditMode || false}
+        />
 
-        <ArticleItemsTable items={articles} setItems={setArticles} />
+        <ArticleItemsTable
+          items={articles}
+          setItems={setArticles}
+          isEdit={isEditMode || false}
+        />
 
         <Box mt="1em">
           <Pictures attachments={report.attachments} />
         </Box>
+
         <Box mt="1em">
           <FormInput
             containerStyles={{width: '100%', py: '1rem'}}
@@ -316,11 +366,11 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
             />
             <Signature
               name={
-                serviceOrder.schedules.length
-                  ? `${serviceOrder.schedules[0].technician.userAccount.firstName} ${serviceOrder.schedules[0].technician.userAccount.lastName}`
+                schedule
+                  ? `${schedule.technician.userAccount.firstName} ${schedule.technician.userAccount.lastName}`
                   : '-'
               }
-              designation="Technician"
+              designation="Engineer"
               url={downloadUrls[signatureKeys.TECHNICIAN]}
             />
           </Box>
@@ -331,12 +381,12 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'outlined',
-              disabled: !downloadWorkReport,
+              disabled: !isWorkReportPdfGenerated,
               sx: {
                 background: 'transparent',
               },
               startIcon: <FileDownloadIcon />,
-              onClick: () => downloadWorkReport?.(),
+              onClick: downloadFile,
             }}>
             <Typography variant="subtitle2">{t('Download')}</Typography>
           </Button>
@@ -353,11 +403,41 @@ export const WorkReport = ({serviceOrder, downloadWorkReport}: Props) => {
       </A4Layout>
       <BottomDrawer
         isOpen
-        primaryButtonLabel="Save"
-        primaryButtonAction={formik.handleSubmit}
+        primaryButtonLabel={isEditMode ? 'Save' : 'Edit'}
+        primaryButtonAction={() => {
+          if (isEditMode) {
+            formik.handleSubmit();
+            return;
+          }
+          setQueryParams(formatSearchParams({edit: '1'}, queryParams));
+        }}
         listItems={[]}
         isSaving={updatingServiceOrder}
-        isValid={formik.dirty && formik.isValid && !formik.isSubmitting}
+        isValid={!isEditMode ? formik.isValid : true}
+        buttonWrapperStyles={
+          isEditMode
+            ? {
+                justifyContent: 'space-between',
+                paddingLeft: '6em',
+              }
+            : undefined
+        }
+        secondaryButton={
+          isEditMode && (
+            <Button
+              label="Cancel"
+              buttonProps={{
+                variant: 'outlined',
+                sx: {bgcolor: theme.palette.inputBackground.main},
+                size: 'medium',
+                onClick: () => {
+                  setQueryParams(formatSearchParams({edit: '0'}, queryParams));
+                  resetForm();
+                },
+              }}
+            />
+          )
+        }
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}

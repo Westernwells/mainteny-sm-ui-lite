@@ -13,6 +13,7 @@ interface Props {
   number?: string;
   containerStyle?: {[key: string]: any};
   status?: string;
+  hideHeader?: boolean;
 }
 
 interface LabelProps {
@@ -41,6 +42,7 @@ export const A4Layout = ({
   number,
   status,
   containerStyle,
+  hideHeader = false,
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -59,26 +61,28 @@ export const A4Layout = ({
         borderRadius=".5em"
         sx={{...containerStyle}}>
         <Box bgcolor="white" p="1em">
-          <Box display="flex" justifyContent="space-between" mt="1em">
-            <Box>
-              <Typography variant="subtitle1">
-                {user?.userAccount.serviceCompany.name || ''}
-              </Typography>
-              <Typography component="span" variant="caption">
-                {user &&
-                  'businessAddress' in user.userAccount.serviceCompany &&
-                  user.userAccount.serviceCompany.postalAddress?.fullName}
-              </Typography>
-            </Box>
-            {number && (
-              <Box textAlign="end">
-                <Typography component="span" variant="caption">
-                  {t(`${placeholder} Number`)}
+          {!hideHeader && (
+            <Box display="flex" justifyContent="space-between" mt="1em">
+              <Box>
+                <Typography variant="subtitle1">
+                  {user?.userAccount.serviceCompany.name || ''}
                 </Typography>
-                <Typography variant="subtitle1">{number}</Typography>
+                <Typography component="span" variant="caption">
+                  {user &&
+                    'businessAddress' in user.userAccount.serviceCompany &&
+                    user.userAccount.serviceCompany.postalAddress?.fullName}
+                </Typography>
               </Box>
-            )}
-          </Box>
+              {number && (
+                <Box textAlign="end">
+                  <Typography component="span" variant="caption">
+                    {t(`${placeholder} Number`)}
+                  </Typography>
+                  <Typography variant="subtitle1">{number}</Typography>
+                </Box>
+              )}
+            </Box>
+          )}
           {children}
         </Box>
       </Box>

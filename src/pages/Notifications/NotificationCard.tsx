@@ -1,22 +1,13 @@
-import {SetStateAction, useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import Box, {BoxProps} from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import useTheme from '@mui/material/styles/useTheme';
 import {useTranslation} from 'react-i18next';
-import {isEmpty} from 'lodash';
-import {FormikErrors} from 'formik';
-import {JobScheduleType} from 'models/service-order';
 import {Button} from 'components/Button';
-import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
-import {
-  useRedispatchServiceOrders,
-  useUpdateServiceOrderSchedule,
-} from 'hooks/reactQuery/useServiceOrder';
 import {useMarkNotificationAsRead} from 'hooks/reactQuery/useNotifications';
-import {setDateTime, formatDate as formatDateUtil} from 'utils/datetime';
 import {
   MessageType,
   NonTechnicianAssignmentData,
@@ -52,110 +43,22 @@ export const NotificationCard = ({
   const navigate = useNavigate();
   const [openAssignTechnicianDialog, setOpenAssignTechnicianDialog] =
     useState(false);
-  const successMessage = 'Service job scheduled successfully';
-  const {mutate: rescheduleServiceOrder} = useRedispatchServiceOrders(
-    t(successMessage),
-  );
-  const {mutate: scheduleServiceOrder} = useUpdateServiceOrderSchedule(
-    t(successMessage),
-  );
   const {
     mutate: markNotificationAsRead,
     isLoading: isLoadingMarkNotificationAsRead,
   } = useMarkNotificationAsRead();
-  const [switchActive, setSwitchActive] = useState(true);
-  const [form, setForm] = useState<ScheduleForm>({} as ScheduleForm);
-  const [formError, setFormErrors] = useState<FormikErrors<ScheduleForm>>();
-  const [formValid, setFormValid] = useState(false);
+
   const notificationData = useMemo(
     () =>
       notificationJSONDataToObject(notification.messageType, notification.data),
     [notification.id],
   );
 
-  useEffect(() => {
-    if (!form.technicianId) {
-      return setFormValid(false);
-    }
-
-    if (!switchActive && form.technicianId) {
-      return setFormValid(true);
-    }
-
-    if (
-      switchActive &&
-      form?.startTime &&
-      form.endTime &&
-      form.startDate &&
-      form.endDate &&
-      form.technicianId
-    ) {
-      setFormValid(true);
-    } else {
-      setFormValid(false);
-    }
-
-    if (!switchActive) {
-      setFormValid(true);
-    }
-  }, [form, switchActive]);
-
-  const reschedule = () => {
-    if (form.technicianId) {
-      rescheduleServiceOrder(
-        {
-          technicianId: form.technicianId,
-          serviceOrderId: (notificationData as NonTechnicianAssignmentData)
-            ?.serviceOrder?.id,
-        },
-        {
-          onSuccess: () => {
-            if (!read) {
-              markNotificationAsRead(notification.id);
-            }
-          },
-        },
-      );
-      setOpenAssignTechnicianDialog(false);
+  const handleSaveAssignTechnicianCallback = () => {
+    if (!read) {
+      markNotificationAsRead(notification.id);
     }
   };
-
-  const schedule = () => {
-    const orderStartTime = setDateTime(
-      form?.startDate!,
-      formatDateUtil(form.startTime as Date, 'HH:mm')!,
-    ).toISOString();
-    const orderEndTime = setDateTime(
-      form?.endDate!,
-      formatDateUtil(form.endTime as Date, 'HH:mm')!,
-    ).toISOString();
-
-    if (form.technicianId) {
-      scheduleServiceOrder(
-        {
-          body: {
-            endTime: orderEndTime,
-            startTime: orderStartTime,
-            technicianIds: [form.technicianId],
-            type: JobScheduleType.FIXED,
-          },
-          serviceOrderId: (notificationData as NonTechnicianAssignmentData)
-            ?.serviceOrder?.id,
-        },
-        {
-          onSuccess: () => {
-            if (!read) {
-              markNotificationAsRead(notification.id);
-            }
-          },
-        },
-      );
-      setOpenAssignTechnicianDialog(false);
-    }
-  };
-
-  const handleSaveAssignTechnician = () =>
-    switchActive && isEmpty(formError) ? schedule() : reschedule();
 
   const ctaButtonHandler = () => {
     switch (notification.messageType) {
@@ -303,21 +206,13 @@ export const NotificationCard = ({
         {notification.messageType ===
           MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER && (
           <ScheduleDialog
-            disableSaveBtn={!formValid}
-            showSwitch
-            getSwitchState={(value: SetStateAction<boolean>) =>
-              setSwitchActive(value)
+            serviceOrderId={
+              (notificationData as NonTechnicianAssignmentData)?.serviceOrder
+                ?.id
             }
-            title={t('Assign Technician')}
-            getFormValues={(value: SetStateAction<ScheduleForm>) =>
-              setForm(value)
-            }
-            getFormErrors={(
-              errors: SetStateAction<FormikErrors<ScheduleForm> | undefined>,
-            ) => setFormErrors(errors)}
             open={openAssignTechnicianDialog}
-            onSave={handleSaveAssignTechnician}
-            onCancel={() => setOpenAssignTechnicianDialog(false)}
+            onClose={() => setOpenAssignTechnicianDialog(false)}
+            onSaveCB={handleSaveAssignTechnicianCallback}
           />
         )}
       </Box>

@@ -1,7 +1,7 @@
-import React, {ChangeEvent} from 'react';
+import {ChangeEvent} from 'react';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio, {RadioProps} from '@mui/material/Radio';
-import {SxProps, Typography} from '@mui/material';
+import {Typography, TypographyProps} from '@mui/material';
 
 interface Props {
   value?: string;
@@ -11,7 +11,7 @@ interface Props {
   disabled?: boolean;
   name?: string;
   radioProps?: RadioProps;
-  labelProps?: SxProps;
+  labelProps?: TypographyProps;
   formControlLabelStyles?: {[key: string]: any};
 }
 
@@ -39,6 +39,6 @@ export const FormRadio = ({
         {...radioProps}
       />
     }
-    label={<Typography sx={{...labelProps}}>{label}</Typography>}
+    label={<Typography {...labelProps}>{label}</Typography>}
   />
 );

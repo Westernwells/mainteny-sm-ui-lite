@@ -30,7 +30,7 @@ import {ScheduleBody} from 'components/Schedules/ScheduleBody';
 import {ScheduleBodyCell} from 'components/Schedules/ScheduleBodyCell';
 import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer';
 import {WeekPair} from 'models/misc';
-import {ServiceOrderView} from 'models/service-order';
+import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import CardHeader from '@mui/material/CardHeader';
 import {useTheme} from '@mui/material/styles';
 import {
@@ -45,7 +45,7 @@ import {styles as sx} from './styles';
 import {ScheduleControls} from './ScheduleControls';
 import {ScheduleLabel} from './ScheduleLabel';
 import {ScheduledItemGroup} from './model';
-import {getItemPosition, getItemWidth} from './utils';
+import {getItemPosition, getItemWidth, getPxFromString} from './utils';
 import {SystemCssProperties} from '@mui/system';
 
 interface Props {
@@ -97,7 +97,7 @@ export const Schedule = ({
   footerContainerStyles,
   technicians,
   checkedValues = [],
-  currentDate,
+  currentDate = new Date(),
 }: Props) => {
   const formatDate = useFormatDate();
   const {t} = useTranslation();
@@ -135,22 +135,22 @@ export const Schedule = ({
     Object.keys(scheduleItems).forEach((key) => {
       const items = scheduleItems[key];
       result[key] = {};
-      let previousOrder: ServiceOrderView | null = null;
+      const endTimesMap = new Map();
 
-      items.forEach((item) => {
-        if (previousOrder) {
-          const previousEndTime = new Date(previousOrder.schedules[0].endTime);
-          const currentOrderStartTime = new Date(item.schedules[0].startTime);
-          if (isBefore(currentOrderStartTime, previousEndTime)) {
-            const previousOrderNextLevel = result[key][previousOrder.id];
-            result[key][item.id] = previousOrderNextLevel + 1;
-          } else {
-            result[key][item.id] = 1;
+      items.forEach((currentItem) => {
+        const currentStartTime = new Date(currentItem.schedules[0].startTime);
+        const currentEndTime = new Date(currentItem.schedules[0].endTime);
+
+        let level = 1;
+        for (const [endTime] of endTimesMap) {
+          if (isBefore(currentStartTime, endTime)) {
+            level = Math.max(level, endTimesMap.get(endTime) + 1);
           }
-        } else {
-          result[key][item.id] = 1;
         }
-        previousOrder = item;
+
+        endTimesMap.set(currentEndTime, level);
+
+        result[key][currentItem.id] = level;
       });
     });
 
@@ -375,28 +375,37 @@ export const Schedule = ({
                                     <ScheduleItemContainer>
                                       {
                                         scheduleItems[xKey].map(
-                                          (scheduleItem) =>
-                                            renderCellItem(
-                                              scheduleItem,
-                                              getItemWidth({
-                                                startDateTime:
-                                                  scheduleItem.schedules[0]
-                                                    .startTime,
-                                                endDateTime:
-                                                  scheduleItem.schedules[0]
-                                                    .endTime,
-                                                gridWidth,
-                                              }),
+                                          (scheduleItem) => {
+                                            const startDateTime =
+                                              scheduleItem.schedules[0]
+                                                .startTime;
+                                            const endDateTime =
+                                              scheduleItem.schedules[0].endTime;
+
+                                            const itemPosition =
                                               getItemPosition({
                                                 scheduleItemGroup,
-                                                startDateTime:
-                                                  scheduleItem.schedules[0]
-                                                    .startTime,
+                                                startDateTime,
+                                                viewDate: currentDate,
                                                 rowKey: xKey,
                                                 orderId: scheduleItem.id,
                                                 gridWidth,
+                                              });
+                                            return renderCellItem(
+                                              scheduleItem,
+                                              getItemWidth({
+                                                startDateTime,
+                                                endDateTime,
+                                                viewDate: currentDate,
+                                                gridWidth,
+                                                horizontalPosition:
+                                                  getPxFromString(
+                                                    itemPosition.x,
+                                                  ),
                                               }),
-                                            ),
+                                              itemPosition,
+                                            );
+                                          },
                                         ) as ReactNode
                                       }
                                     </ScheduleItemContainer>
@@ -470,28 +479,37 @@ export const Schedule = ({
                                       <ScheduleItemContainer>
                                         {
                                           scheduleItems[xKey].map(
-                                            (scheduleItem) =>
-                                              renderCellItem(
-                                                scheduleItem,
-                                                getItemWidth({
-                                                  startDateTime:
-                                                    scheduleItem.schedules[0]
-                                                      .startTime,
-                                                  endDateTime:
-                                                    scheduleItem.schedules[0]
-                                                      .endTime,
-                                                  gridWidth,
-                                                }),
+                                            (scheduleItem) => {
+                                              const startDateTime =
+                                                scheduleItem.schedules[0]
+                                                  .startTime;
+                                              const endDateTime =
+                                                scheduleItem.schedules[0]
+                                                  .endTime;
+                                              const itemPosition =
                                                 getItemPosition({
                                                   scheduleItemGroup,
-                                                  startDateTime:
-                                                    scheduleItem.schedules[0]
-                                                      .startTime,
+                                                  startDateTime,
+                                                  viewDate: currentDate,
                                                   rowKey: xKey,
                                                   orderId: scheduleItem.id,
                                                   gridWidth,
+                                                });
+                                              return renderCellItem(
+                                                scheduleItem,
+                                                getItemWidth({
+                                                  startDateTime,
+                                                  endDateTime,
+                                                  viewDate: currentDate,
+                                                  gridWidth,
+                                                  horizontalPosition:
+                                                    getPxFromString(
+                                                      itemPosition.x,
+                                                    ),
                                                 }),
-                                              ),
+                                                itemPosition,
+                                              );
+                                            },
                                           ) as ReactNode
                                         }
                                       </ScheduleItemContainer>

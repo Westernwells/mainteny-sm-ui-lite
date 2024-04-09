@@ -11,6 +11,7 @@ import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {
   CheckList,
   CreateCheckListRecord,
+  ServiceOrderCheckListView,
   UpdateCheckListRecord,
 } from 'models/checklist';
 import {useUserSession} from './useUserSession';
@@ -138,6 +139,68 @@ export const useDeleteChecklist = (successMsg?: string) => {
         });
       }
       queryClient.invalidateQueries(queryKeys.queryChecklists);
+    },
+    onError: (err: any) => {
+      console.log(err);
+      showError(err);
+    },
+  });
+};
+
+export const queryServiceOrderChecklists = async (
+  serviceOrderId: string,
+  params?: {technicianId?: string},
+) => {
+  const response = await axiosClient.get<ServiceOrderCheckListView[]>(
+    `/api/serviceOrders/${serviceOrderId}/checkLists`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQueryServiceOrderChecklists = ({
+  serviceOrderId,
+  params,
+  options,
+}: {
+  serviceOrderId: string;
+  params?: {technicianId?: string};
+  options?: UseQueryOptions<any, any, any>;
+}) =>
+  useQuery<ServiceOrderCheckListView[], RestError>(
+    [queryKeys.queryServiceOrderChecklists, serviceOrderId],
+    () => queryServiceOrderChecklists(serviceOrderId, params),
+    {
+      ...options,
+    },
+  );
+
+const deleteServiceOrderChecklist = ({
+  id,
+  params,
+}: {
+  id: string;
+  params: {checkListId: string; technicianId: string};
+}) =>
+  axiosClient.delete(`/api/serviceOrders/${id}/checkLists`, {
+    params,
+    paramsSerializer,
+  });
+
+export const useDeleteServiceOrderChecklist = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(deleteServiceOrderChecklist, {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      }
+      queryClient.invalidateQueries(queryKeys.queryServiceOrderChecklists);
     },
     onError: (err: any) => {
       console.log(err);

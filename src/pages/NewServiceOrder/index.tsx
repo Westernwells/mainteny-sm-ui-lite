@@ -1,12 +1,11 @@
 import {FlexContainer} from 'components/FlexContainer';
 import {Progress} from 'components/Progress';
-import {useLayoutEffect, useRef} from 'react';
+import {useLayoutEffect} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {ServiceOrderType} from 'models/service-order';
 import {convertToMacro} from 'utils/utils';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
-import {NewEmergency} from './NewEmergency';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
 interface Props {
@@ -15,7 +14,13 @@ interface Props {
 
 export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   const [queryParams] = useSearchParams();
-  const currentParams = useRef(Object.fromEntries([...queryParams])).current;
+  const currentParams = Object.fromEntries([...queryParams]);
+  const type = (
+    currentParams.type
+      ? convertToMacro(currentParams.type)
+      : ServiceOrderType.REGULAR
+  ) as ServiceOrderType;
+
   const {
     data: elevator,
     isLoading,
@@ -27,9 +32,7 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   useLayoutEffect(() => {
     if (getCurrentPageTitle && currentParams) {
       getCurrentPageTitle(
-        `New ${serviceOrderTypeToString(
-          convertToMacro(currentParams.type),
-        )} Job`,
+        `New ${serviceOrderTypeToString(convertToMacro(type))} Job`,
       );
     }
   }, []);
@@ -38,44 +41,7 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
 
   return (
     <FlexContainer>
-      {currentParams.type === 'emergency' ? (
-        <NewEmergency elevator={elevator} />
-      ) : currentParams.type === 'callout' ? (
-        <ScheduleServiceOrder
-          type={ServiceOrderType.CALLOUT}
-          elevator={elevator}
-        />
-      ) : currentParams.type === 'repair' ? (
-        <ScheduleServiceOrder
-          type={ServiceOrderType.REPAIR}
-          elevator={elevator}
-        />
-      ) : currentParams.type === 'regular' ? (
-        <ScheduleServiceOrder
-          type={ServiceOrderType.REGULAR}
-          elevator={elevator}
-        />
-      ) : currentParams.type === 'inspection' ? (
-        <ScheduleServiceOrder
-          type={ServiceOrderType.INSPECTION}
-          elevator={elevator}
-        />
-      ) : currentParams.type === 'new_installation' ? (
-        <ScheduleServiceOrder
-          type={ServiceOrderType.NEW_INSTALLATION}
-          elevator={elevator}
-        />
-      ) : currentParams.type === 'modernization' ? (
-        <ScheduleServiceOrder
-          type={ServiceOrderType.MODERNIZATION}
-          elevator={elevator}
-        />
-      ) : currentParams.type === 'general' ? (
-        <ScheduleServiceOrder
-          type={ServiceOrderType.GENERAL}
-          elevator={elevator}
-        />
-      ) : null}
+      <ScheduleServiceOrder type={type} elevator={elevator} />
     </FlexContainer>
   );
 };

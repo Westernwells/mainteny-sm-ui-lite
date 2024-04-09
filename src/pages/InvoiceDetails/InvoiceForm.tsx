@@ -264,8 +264,10 @@ export const InvoiceForm = ({
   const isWorkReportPDFGenerated =
     !!serviceOrder?.additionalInfo.workReportGenerated;
   const isCheckListPDFGenerated =
-    serviceOrder?.additionalInfo.checkListInfo?.pdfGenerationStatus ===
-    PdfGenerationStatus.DONE;
+    serviceOrder?.checkLists?.length &&
+    serviceOrder.checkLists.every(
+      (c) => c.pdfGenerationStatus === PdfGenerationStatus.DONE,
+    );
 
   const [dueDateError, setDueDateError] = useState('');
 

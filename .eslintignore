@@ -15,8 +15,6 @@ src/pages/InvoiceDetails/PartialPaymentsSection.tsx
 src/pages/InvoiceDetails/SectionTitle.tsx
 src/pages/InvoiceDetails/UpfrontPaymentsSection.tsx
 src/pages/NewCustomer/BasicCustomerForm.tsx
-src/pages/NewServiceOrder/SelectTechnicians.tsx
-src/pages/NewServiceOrder/TechnicianSchedule.tsx
 src/pages/QuotationDetails/NewUnit/index.tsx
 src/pages/Quotations/QuotationsDataGridProps.tsx
 src/pages/ResetPassword/PasswordReset.tsx
