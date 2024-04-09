@@ -189,3 +189,24 @@ export const moneyRecordForBackend = (money?: Money) => ({
   currency: money?.currency ?? 'EUR',
   value: (money?.value ?? 0) * 10 ** (money?.fractionDigits ?? 2),
 });
+
+/**
+ * @param currencyCode The currency code as a string (e.g. 'EUR', 'USD')
+ * @param amount The money amount as a number.
+ * @returns The money amount in cents.
+ */
+export const moneyToCents = (currencyCode: string, amount: number = 0) => {
+  const fractionDigits = getCurrencyFractionDigits(currencyCode);
+
+  return Math.round(amount * 10 ** fractionDigits);
+};
+
+/**
+ * @param currencyCode The currency code as a string (e.g. 'EUR', 'USD').
+ * @param amount The money amount as a number.
+ * @returns The money amount.
+ */
+export const centsToMoney = (currencyCode: string, cents: number = 0) => {
+  const fractionDigits = getCurrencyFractionDigits(currencyCode);
+  return cents / 10 ** fractionDigits;
+};
