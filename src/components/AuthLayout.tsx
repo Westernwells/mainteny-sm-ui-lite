@@ -143,6 +143,8 @@ export const AuthLayout = ({children}: Props) => {
                 ? 'Russian'
                 : selectedLng === 'DA'
                 ? 'Danish'
+                : selectedLng === 'ES'
+                ? 'Spanish'
                 : 'English'
             }
             menu={[
@@ -173,6 +175,10 @@ export const AuthLayout = ({children}: Props) => {
               {
                 label: 'Georgian',
                 action: () => changeLanguage('ka-ge', 'GE'),
+              },
+              {
+                label: 'Spanish',
+                action: () => changeLanguage('es-es', 'ES'),
               },
             ]}
           />
