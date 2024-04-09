@@ -33,6 +33,11 @@ export const employeeRoles: EmployeeRolesType[] = [
     value: 'BOTH',
     label: 'Both Technician & Service Manager',
   },
+  {
+    id: '3',
+    value: 'CONTRACTOR',
+    label: 'Contractor',
+  },
 ];
 
 export const getRole = (initialRole: string | string[]) => {
