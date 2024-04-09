@@ -135,22 +135,22 @@ export const Schedule = ({
     Object.keys(scheduleItems).forEach((key) => {
       const items = scheduleItems[key];
       result[key] = {};
-      let previousOrder: ServiceOrderView | null = null;
+      const endTimesMap = new Map();
 
-      items.forEach((item) => {
-        if (previousOrder) {
-          const previousEndTime = new Date(previousOrder.schedules[0].endTime);
-          const currentOrderStartTime = new Date(item.schedules[0].startTime);
-          if (isBefore(currentOrderStartTime, previousEndTime)) {
-            const previousOrderNextLevel = result[key][previousOrder.id];
-            result[key][item.id] = previousOrderNextLevel + 1;
-          } else {
-            result[key][item.id] = 1;
+      items.forEach((currentItem) => {
+        const currentStartTime = new Date(currentItem.schedules[0].startTime);
+        const currentEndTime = new Date(currentItem.schedules[0].endTime);
+
+        let level = 1;
+        for (const [endTime] of endTimesMap) {
+          if (isBefore(currentStartTime, endTime)) {
+            level = Math.max(level, endTimesMap.get(endTime) + 1);
           }
-        } else {
-          result[key][item.id] = 1;
         }
-        previousOrder = item;
+
+        endTimesMap.set(currentEndTime, level);
+
+        result[key][currentItem.id] = level;
       });
     });
 
