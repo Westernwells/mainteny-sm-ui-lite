@@ -9,8 +9,9 @@ import {
   PaymentInfo,
   Settings,
 } from './misc';
-import {ServiceOrderSummary} from './service-order';
+import {ServiceOrderSummary, ServiceOrderType} from './service-order';
 import {TechnicianEventView} from './technician';
+import {ArticleView} from './article';
 
 export enum MinToStep {
   STEP_0 = 0,
@@ -251,4 +252,52 @@ export interface XeroIntegration {
   clientId: string;
   secret: string;
   tenantId: string;
+}
+
+export enum TravelWorkCalculationType {
+  FIXED_FEE = 'FIXED_FEE',
+  HOURLY_RATE_WORK = 'HOURLY_RATE_WORK',
+  HOURLY_RATE_TRAVEL = 'HOURLY_RATE_TRAVEL',
+  HOURLY_RATE_WORK_TRAVEL = 'HOURLY_RATE_WORK_TRAVEL',
+  FIXED_TRAVEL_FEE = 'FIXED_TRAVEL_FEE',
+  FIXED_TRAVEL_TIME = 'FIXED_TRAVEL_TIME',
+  FIXED_TRAVEL_DISTANCE = 'FIXED_TRAVEL_DISTANCE',
+}
+
+export const TravelWorkCalculationTypeLabels = {
+  [TravelWorkCalculationType.FIXED_FEE]: 'Fixed Fee',
+  [TravelWorkCalculationType.HOURLY_RATE_WORK]: 'Hourly rate (work)',
+  [TravelWorkCalculationType.HOURLY_RATE_TRAVEL]: 'Hourly rate (travel)',
+  [TravelWorkCalculationType.HOURLY_RATE_WORK_TRAVEL]:
+    'Hourly rate (work & travel)',
+  [TravelWorkCalculationType.FIXED_TRAVEL_FEE]: 'Fixed travel fee (unit)',
+  [TravelWorkCalculationType.FIXED_TRAVEL_TIME]: 'Fixed travel time (unit)',
+  [TravelWorkCalculationType.FIXED_TRAVEL_DISTANCE]:
+    'Fixed travel distance (unit)',
+} as const;
+
+export interface TravelWorkView {
+  id: string;
+  serviceOrderType: ServiceOrderType;
+  calculationType: TravelWorkCalculationType;
+  article: ArticleView;
+}
+
+export interface TravelWorkParams {
+  serviceOrderType: ServiceOrderType;
+}
+
+export interface CreateTravelWorkRecord {
+  serviceCompanyId: string;
+  propertyOwnerId?: string;
+  serviceOrderType: ServiceOrderType;
+  calculationType: TravelWorkCalculationType;
+  articleId: string;
+}
+
+export interface UpdateTravalWorkRecord {
+  id: string;
+  serviceOrderType: ServiceOrderType;
+  calculationType: TravelWorkCalculationType;
+  articleId: string;
 }

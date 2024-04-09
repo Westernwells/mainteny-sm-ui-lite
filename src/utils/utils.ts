@@ -380,3 +380,11 @@ export const convertToHourAndMinutes = (timeInMinutes?: number) => {
 
 export const convertLanguageIfNeeded = (key: string) =>
   languagesToPars[key] || key;
+
+export const scrollTableToBottom = () => {
+  const tableElement = document.querySelector('.MuiDataGrid-virtualScroller');
+
+  if (tableElement) {
+    tableElement.scrollTop = tableElement.scrollHeight;
+  }
+};
