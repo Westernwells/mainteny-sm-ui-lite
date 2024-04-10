@@ -31,10 +31,11 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Company</Typography>
                 <NuvoImporter
-                  licenseKey="/7wDGRmOBy/e9JEkM0bhGYu9GdtVu/dxMQq+7gkV0Rc="
+                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
                   settings={{
                     developerMode: true,
                     identifier: 'service_company',
+                    multipleFileUpload: true,
                     columns: [
                       {
                         key: 'unternehmensname',
@@ -302,10 +303,11 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Employee</Typography>
                 <NuvoImporter
-                  licenseKey="/7wDGRmOBy/e9JEkM0bhGYu9GdtVu/dxMQq+7gkV0Rc="
+                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
                   settings={{
                     developerMode: true,
                     identifier: 'employee',
+                    multipleFileUpload: true,
                     columns: [
                       {
                         key: 'mitarbeiternummer',
@@ -409,10 +411,11 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Customer</Typography>
                 <NuvoImporter
-                  licenseKey="/7wDGRmOBy/e9JEkM0bhGYu9GdtVu/dxMQq+7gkV0Rc="
+                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
                   settings={{
                     developerMode: true,
                     identifier: 'customer',
+                    multipleFileUpload: true,
                     columns: [
                       {
                         key: 'kundennummer',
@@ -637,10 +640,11 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Contact Person</Typography>
                 <NuvoImporter
-                  licenseKey="/7wDGRmOBy/e9JEkM0bhGYu9GdtVu/dxMQq+7gkV0Rc="
+                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
                   settings={{
                     developerMode: true,
                     identifier: 'contact_person',
+                    multipleFileUpload: true,
                     columns: [
                       {
                         key: 'anrede',
@@ -738,10 +742,11 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Elevator</Typography>
                 <NuvoImporter
-                  licenseKey="/7wDGRmOBy/e9JEkM0bhGYu9GdtVu/dxMQq+7gkV0Rc="
+                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
                   settings={{
                     developerMode: true,
                     identifier: 'customer',
+                    multipleFileUpload: true,
                     columns: [
                       {
                         key: 'kundennummer',
@@ -953,10 +958,11 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Contract</Typography>
                 <NuvoImporter
-                  licenseKey="/7wDGRmOBy/e9JEkM0bhGYu9GdtVu/dxMQq+7gkV0Rc="
+                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
                   settings={{
                     developerMode: true,
                     identifier: 'contract',
+                    multipleFileUpload: true,
                     columns: [
                       {
                         key: 'vertragsname',
@@ -1116,10 +1122,11 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Article</Typography>
                 <NuvoImporter
-                  licenseKey="/7wDGRmOBy/e9JEkM0bhGYu9GdtVu/dxMQq+7gkV0Rc="
+                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
                   settings={{
                     developerMode: true,
                     identifier: 'article',
+                    multipleFileUpload: true,
                     columns: [
                       {
                         key: 'artikelnummer_oder_nummer',
