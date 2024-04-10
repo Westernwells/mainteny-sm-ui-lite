@@ -9,7 +9,6 @@ import {
 import {ArticleOrderView} from 'models/article';
 import {UserAccount} from 'models/user';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
 import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
@@ -75,7 +74,7 @@ const getStyles = (
       marginBottom: 40,
       alignItems: 'flex-start',
       position: 'absolute',
-      top: 110,
+      top: 90,
     },
     leftAddress: {
       flex: '0 0 55%',
@@ -132,7 +131,7 @@ const getStyles = (
     contentHeader: {
       fontSize: 14,
       color: '#212121',
-      marginTop: 150,
+      marginTop: 110,
       marginBottom: 10,
       ...boldFontStyle,
     },
@@ -230,6 +229,7 @@ const getStyles = (
   });
 
 type Props = {
+  translate: (key: string) => string;
   articleOrder?: ArticleOrderView | undefined;
   userInfo?: UserAccount | undefined;
   logoSrc?: string;
@@ -249,9 +249,8 @@ const OrderArticlePDF = React.memo(
     currencyCode,
     logoDimensions,
     selectedLng,
+    translate,
   }: Props) => {
-    const {t} = useTranslation();
-
     const articleItems = convertToArticleOrderItemRecord(articleOrder?.items!);
 
     const totalVATMap = calculateTotalVAT(articleItems);
@@ -263,12 +262,12 @@ const OrderArticlePDF = React.memo(
     ];
 
     const boldFontStyle = {
-      fontFamily: selectedLng === 'KA' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
 
     const regularFontStyle = {
       fontFamily:
-        selectedLng === 'KA' ? 'NotoSans-Regular' : 'Montserrat-Regular',
+        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
     };
 
     const styles = getStyles(boldFontStyle, regularFontStyle);
@@ -284,29 +283,48 @@ const OrderArticlePDF = React.memo(
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
-                <Text style={styles.addressText}>
-                  {userInfo?.serviceCompany?.businessAddress?.fullName}
-                </Text>
+                {userInfo?.serviceCompany?.businessAddress?.fullName && (
+                  <Text style={styles.addressText}>
+                    {userInfo?.serviceCompany?.businessAddress?.fullName}
+                  </Text>
+                )}
 
                 <View style={styles.partAddress}>
-                  <Text style={styles.partialAddressText}>
-                    {articleOrder?.articleSupplier?.name}
-                  </Text>
-                  <Text style={styles.partialAddressText}>
-                    {articleOrder?.articleSupplier?.address?.component?.street}
-                  </Text>
-                  <Text style={styles.partialAddressText}>
-                    {articleOrder?.articleSupplier?.address?.component?.street2}
-                  </Text>
+                  {articleOrder?.articleSupplier?.name && (
+                    <Text style={styles.partialAddressText}>
+                      {articleOrder?.articleSupplier?.name}
+                    </Text>
+                  )}
+
+                  {articleOrder?.articleSupplier?.address?.component
+                    ?.street && (
+                    <Text style={styles.partialAddressText}>
+                      {
+                        articleOrder?.articleSupplier?.address?.component
+                          ?.street
+                      }
+                    </Text>
+                  )}
+
+                  {articleOrder?.articleSupplier?.address?.component
+                    ?.street2 && (
+                    <Text style={styles.partialAddressText}>
+                      {
+                        articleOrder?.articleSupplier?.address?.component
+                          ?.street2
+                      }
+                    </Text>
+                  )}
+
                   <Text style={styles.partialAddressText}>
                     {articleOrder?.articleSupplier?.address?.component
                       ?.postalCode &&
-                      `${articleOrder?.articleSupplier?.address?.component?.postalCode},`}
+                      `${articleOrder?.articleSupplier?.address?.component?.postalCode}`}
                     {articleOrder?.articleSupplier?.address?.component?.state &&
-                      `${articleOrder?.articleSupplier?.address?.component?.state},`}
+                      ` ${articleOrder?.articleSupplier?.address?.component?.state},`}
                     {articleOrder?.articleSupplier?.address?.component
                       ?.country &&
-                      `${articleOrder?.articleSupplier?.address?.component?.country}`}
+                      ` ${articleOrder?.articleSupplier?.address?.component?.country}`}
                   </Text>
                 </View>
               </View>
@@ -314,7 +332,7 @@ const OrderArticlePDF = React.memo(
               <View style={styles.rightAddress}>
                 {articleOrder?.externalId && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Order no.')}</Text>
+                    <Text style={styles.tag}> {translate('Order no.')}</Text>
                     <Text style={styles.tagContent}>
                       {articleOrder?.externalId || '-'}
                     </Text>
@@ -322,7 +340,7 @@ const OrderArticlePDF = React.memo(
                 )}
 
                 <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}> {t('Order date')}</Text>
+                  <Text style={styles.tag}> {translate('Order date')}</Text>
                   <Text style={styles.tagContent}>
                     {formatDate(articleOrder?.meta.createdAt) || '-'}
                   </Text>
@@ -331,7 +349,7 @@ const OrderArticlePDF = React.memo(
                 {(articleOrder?.meta.creator?.firstName ||
                   articleOrder?.meta.creator?.lastName) && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Generated by')}</Text>
+                    <Text style={styles.tag}> {translate('Generated by')}</Text>
                     <Text style={styles.tagContent}>
                       {articleOrder?.meta.creator?.firstName}{' '}
                       {articleOrder?.meta.creator?.lastName}
@@ -341,7 +359,7 @@ const OrderArticlePDF = React.memo(
 
                 {articleOrder?.articleSupplier?.externalId && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Supplier no.')}</Text>
+                    <Text style={styles.tag}> {translate('Supplier no.')}</Text>
                     <Text style={styles.tagContent}>
                       {articleOrder?.articleSupplier?.externalId || '-'}{' '}
                     </Text>
@@ -352,9 +370,7 @@ const OrderArticlePDF = React.memo(
 
             <View>
               <Text style={styles.contentHeader}>
-                {t('Article Order for {{externalId}}', {
-                  externalId: articleOrder?.externalId,
-                })}
+                {translate('Article Order for')} {articleOrder?.externalId}
               </Text>
               <Text style={styles.contentBody}>
                 {articleOrder?.description}
@@ -378,7 +394,7 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
-                      {t('ARTICLE NAME')}
+                      {translate('ARTICLE NAME')}
                     </Text>
                     <Text
                       style={{
@@ -386,7 +402,7 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
-                      {t('SUPPLIER ID')}
+                      {translate('SUPPLIER ID')}
                     </Text>
                     <Text
                       style={{
@@ -394,7 +410,7 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {t('QUANTITY')}
+                      {translate('QUANTITY')}
                     </Text>
                     <Text
                       style={{
@@ -403,7 +419,7 @@ const OrderArticlePDF = React.memo(
                         marginLeft: 10,
                         ...styles.tableHeading,
                       }}>
-                      {t('UNIT')}
+                      {translate('UNIT')}
                     </Text>
                     <Text
                       style={{
@@ -411,7 +427,7 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {t('PRICE')}
+                      {translate('PRICE')}
                     </Text>
                     <Text
                       style={{
@@ -421,7 +437,7 @@ const OrderArticlePDF = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {t('TOTAL')}
+                      {translate('TOTAL')}
                     </Text>
                   </View>
                 </View>
@@ -527,7 +543,7 @@ const OrderArticlePDF = React.memo(
                         fontSize: 10,
                         textAlign: 'right',
                       }}>
-                      {t('Subtotal (excl. VAT)')}
+                      {translate('Subtotal (excl. VAT)')}
                     </Text>
                     <Text
                       style={{
@@ -552,7 +568,7 @@ const OrderArticlePDF = React.memo(
                             fontSize: 10,
                             textAlign: 'right',
                           }}>
-                          {t('VAT {{vatPercentage}}%', {vatPercentage})}
+                          {translate('VAT')} {vatPercentage}%
                         </Text>
                         <Text
                           style={{
@@ -578,7 +594,7 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'right',
                         fontSize: 10,
                       }}>
-                      {t('Total (incl. VAT)')}
+                      {translate('Total (incl. VAT)')}
                     </Text>
                     <Text
                       style={{
@@ -605,7 +621,11 @@ const OrderArticlePDF = React.memo(
             </View>
           </View>
 
-          <PdfTemplateFooter userInfo={userInfo} selectedLng={selectedLng} />
+          <PdfTemplateFooter
+            userInfo={userInfo}
+            selectedLng={selectedLng}
+            translate={translate}
+          />
         </Page>
       </Document>
     );

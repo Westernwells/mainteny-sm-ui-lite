@@ -1,5 +1,5 @@
-import {useContext, useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {useEffect, useMemo, useState} from 'react';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {useLocation} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -34,7 +34,8 @@ import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
 import {useCurrentCurrency} from 'utils/currency';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
-import {LanguageContext} from 'context/LanguageProvider';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {companyLanguageContextMap} from 'utils/utils';
 import {ArticleItemsTable} from './ArticleItemsTable';
 import OrderArticlePDF from './OrderArticlePDF';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
@@ -68,6 +69,10 @@ const enum DocumentMode {
   PRINT = 'PRINT',
 }
 
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
+
 export const OrderArticle = () => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -100,7 +105,6 @@ export const OrderArticle = () => {
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
   const [printPdfBlobUrl, setPrintPdfBlobUrl] = useState('');
   const imageUrl = useLogoImage(user);
-  const {language: selectedLng} = useContext(LanguageContext);
 
   const {downloadFile} = useDownloadFileWithCustomName(
     `AO_${newArticleOrder?.externalId}`,
@@ -128,6 +132,22 @@ export const OrderArticle = () => {
 
   const logoDimensions = useLogoDimensions(imageUrl);
 
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
   const generatePrintBlobUrl = async () => {
     if (newArticleOrder) {
       const blob = await pdf(
@@ -137,7 +157,8 @@ export const OrderArticle = () => {
           currencyCode={currentCurrency.code}
           logoSrc={imageUrl}
           logoDimensions={logoDimensions}
-          selectedLng={selectedLng}
+          selectedLng={company?.language}
+          translate={translate}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -183,7 +204,8 @@ export const OrderArticle = () => {
         logoSrc={imageUrl}
         currencyCode={currentCurrency.code}
         logoDimensions={logoDimensions}
-        selectedLng={selectedLng}
+        selectedLng={company?.language}
+        translate={translate}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
