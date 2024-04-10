@@ -10,7 +10,6 @@ import {FormikProps} from 'formik';
 import {ArticleSupplierView, CreateArticleOrderRecord} from 'models/article';
 import {UserAccount} from 'models/user';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
 import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -73,7 +72,7 @@ const getStyles = (
       marginBottom: 40,
       alignItems: 'flex-start',
       position: 'absolute',
-      top: 110,
+      top: 90,
     },
     leftAddress: {
       flex: '0 0 55%',
@@ -130,7 +129,7 @@ const getStyles = (
     contentHeader: {
       fontSize: 14,
       color: '#212121',
-      marginTop: 150,
+      marginTop: 110,
       marginBottom: 10,
       ...boldFontStyle,
     },
@@ -234,6 +233,7 @@ const getStyles = (
 type Props = {
   supplier: ArticleSupplierView;
   formik: FormikProps<CreateArticleOrderRecord>;
+  translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   logoSrc?: string;
   currencyCode?: string;
@@ -253,8 +253,8 @@ const OrderArticlePDFPreview = React.memo(
     currencyCode,
     logoDimensions,
     selectedLng,
+    translate,
   }: Props) => {
-    const {t} = useTranslation();
     const uniqueVATPercentages = [
       ...new Set(
         formik.values.items.map((item) => item.unitSellingAmount.percentageVat),
@@ -264,12 +264,12 @@ const OrderArticlePDFPreview = React.memo(
     const totalVATMap = calculateTotalVAT(formik.values.items);
 
     const boldFontStyle = {
-      fontFamily: selectedLng === 'KA' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
 
     const regularFontStyle = {
       fontFamily:
-        selectedLng === 'KA' ? 'NotoSans-Regular' : 'Montserrat-Regular',
+        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
     };
 
     const styles = getStyles(boldFontStyle, regularFontStyle);
@@ -285,27 +285,38 @@ const OrderArticlePDFPreview = React.memo(
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
-                <Text style={styles.addressText}>
-                  {userInfo?.serviceCompany?.businessAddress?.fullName}
-                </Text>
+                {userInfo?.serviceCompany?.businessAddress?.fullName && (
+                  <Text style={styles.addressText}>
+                    {userInfo?.serviceCompany?.businessAddress?.fullName}
+                  </Text>
+                )}
 
                 <View style={styles.partAddress}>
-                  <Text style={styles.partialAddressText}>
-                    {supplier?.name}
-                  </Text>
-                  <Text style={styles.partialAddressText}>
-                    {supplier?.address?.component?.street}
-                  </Text>
-                  <Text style={styles.partialAddressText}>
-                    {supplier?.address?.component?.street2}
-                  </Text>
+                  {supplier?.name && (
+                    <Text style={styles.partialAddressText}>
+                      {supplier?.name}
+                    </Text>
+                  )}
+
+                  {supplier?.address?.component?.street && (
+                    <Text style={styles.partialAddressText}>
+                      {supplier?.address?.component?.street}
+                    </Text>
+                  )}
+
+                  {supplier?.address?.component?.street2 && (
+                    <Text style={styles.partialAddressText}>
+                      {supplier?.address?.component?.street2}
+                    </Text>
+                  )}
+
                   <Text style={styles.partialAddressText}>
                     {supplier?.address?.component?.postalCode &&
-                      `${supplier?.address?.component?.postalCode},`}
+                      `${supplier?.address?.component?.postalCode}`}
                     {supplier?.address?.component?.state &&
-                      `${supplier?.address?.component?.state},`}
+                      ` ${supplier?.address?.component?.state},`}
                     {supplier?.address?.component?.country &&
-                      `${supplier?.address?.component?.country}`}
+                      ` ${supplier?.address?.component?.country}`}
                   </Text>
                 </View>
               </View>
@@ -313,7 +324,7 @@ const OrderArticlePDFPreview = React.memo(
               <View style={styles.rightAddress}>
                 {formik?.values.externalId && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Order no.')}</Text>
+                    <Text style={styles.tag}> {translate('Order no.')}</Text>
                     <Text style={styles.tagContent}>
                       {formik?.values.externalId || '-'}
                     </Text>
@@ -321,7 +332,7 @@ const OrderArticlePDFPreview = React.memo(
                 )}
 
                 <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}> {t('Order date')}</Text>
+                  <Text style={styles.tag}> {translate('Order date')}</Text>
                   <Text style={styles.tagContent}>
                     {formatDate(new Date()) || '-'}
                   </Text>
@@ -329,7 +340,7 @@ const OrderArticlePDFPreview = React.memo(
 
                 {(userInfo?.firstName || userInfo?.lastName) && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Generated by')}</Text>
+                    <Text style={styles.tag}> {translate('Generated by')}</Text>
                     <Text style={styles.tagContent}>
                       {userInfo?.firstName} {userInfo?.lastName}
                     </Text>
@@ -338,7 +349,7 @@ const OrderArticlePDFPreview = React.memo(
 
                 {supplier?.externalId && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Supplier no.')}</Text>
+                    <Text style={styles.tag}> {translate('Supplier no.')}</Text>
                     <Text style={styles.tagContent}>
                       {supplier?.externalId || '-'}{' '}
                     </Text>
@@ -349,9 +360,7 @@ const OrderArticlePDFPreview = React.memo(
 
             <View>
               <Text style={styles.contentHeader}>
-                {t('Article Order for {{externalId}}', {
-                  externalId: formik?.values?.externalId,
-                })}
+                {translate('Article Order for')} {formik?.values?.externalId}
               </Text>
               <Text style={styles.contentBody}>
                 {formik?.values?.description}
@@ -375,7 +384,7 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
-                      {t('ARTICLE NAME')}
+                      {translate('ARTICLE NAME')}
                     </Text>
                     <Text
                       style={{
@@ -383,7 +392,7 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
-                      {t('SUPPLIER ID')}
+                      {translate('SUPPLIER ID')}
                     </Text>
                     <Text
                       style={{
@@ -391,7 +400,7 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {t('QUANTITY')}
+                      {translate('QUANTITY')}
                     </Text>
                     <Text
                       style={{
@@ -400,7 +409,7 @@ const OrderArticlePDFPreview = React.memo(
                         marginLeft: 10,
                         ...styles.tableHeading,
                       }}>
-                      {t('UNIT')}
+                      {translate('UNIT')}
                     </Text>
                     <Text
                       style={{
@@ -408,7 +417,7 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {t('PRICE')}
+                      {translate('PRICE')}
                     </Text>
                     <Text
                       style={{
@@ -418,7 +427,7 @@ const OrderArticlePDFPreview = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {t('TOTAL')}
+                      {translate('TOTAL')}
                     </Text>
                   </View>
                 </View>
@@ -524,7 +533,7 @@ const OrderArticlePDFPreview = React.memo(
                         fontSize: 10,
                         textAlign: 'right',
                       }}>
-                      {t('Subtotal (excl. VAT)')}
+                      {translate('Subtotal (excl. VAT)')}
                     </Text>
                     <Text
                       style={{
@@ -547,7 +556,7 @@ const OrderArticlePDFPreview = React.memo(
                             fontSize: 10,
                             textAlign: 'right',
                           }}>
-                          {t('VAT {{vatPercentage}}%', {vatPercentage})}
+                          {translate('VAT')} {vatPercentage}%
                         </Text>
                         <Text
                           style={{
@@ -573,7 +582,7 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'right',
                         ...boldFontStyle,
                       }}>
-                      {t('Total (incl. VAT)')}
+                      {translate('Total (incl. VAT)')}
                     </Text>
                     <Text
                       style={{
@@ -600,7 +609,11 @@ const OrderArticlePDFPreview = React.memo(
             </View>
           </View>
 
-          <PdfTemplateFooter userInfo={userInfo} selectedLng={selectedLng} />
+          <PdfTemplateFooter
+            userInfo={userInfo}
+            selectedLng={selectedLng}
+            translate={translate}
+          />
         </Page>
       </Document>
     );

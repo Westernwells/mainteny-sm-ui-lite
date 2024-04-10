@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import GradingIcon from '@mui/icons-material/Grading';
 import FactCheck from '@mui/icons-material/FactCheck';
@@ -15,9 +15,9 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useParams, useSearchParams} from 'react-router-dom';
-import {formatSearchParams} from 'utils/utils';
+import {companyLanguageContextMap, formatSearchParams} from 'utils/utils';
 import {Box, Typography} from '@mui/material';
-import {useTranslation} from 'react-i18next';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {useSnackbar} from 'hooks/useSnackbar';
 import PathImage from 'assets/images/Path.svg';
 import {SnackbarKey} from 'notistack';
@@ -27,7 +27,7 @@ import {pdf} from '@react-pdf/renderer';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
-import {LanguageContext} from 'context/LanguageProvider';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -48,6 +48,10 @@ const tabItems = [
   },
 ];
 
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
+
 export const ServiceOrderDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: serviceOrderId} = useParams();
@@ -66,7 +70,6 @@ export const ServiceOrderDetails = () => {
   const imageUrl = useLogoImage(user);
 
   const logoDimensions = useLogoDimensions(imageUrl);
-  const {language: selectedLng} = useContext(LanguageContext);
 
   const filePaths = useMemo(
     () => (filePathToDownload ? [filePathToDownload] : []),
@@ -85,6 +88,22 @@ export const ServiceOrderDetails = () => {
     filePathToDownload,
   );
 
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
   const generatePreviewPdfBlobUrl = async () => {
     const blob = await pdf(
       <JobOverviewPdfTemplate
@@ -94,7 +113,8 @@ export const ServiceOrderDetails = () => {
         serviceOrder={serviceOrder}
         logoDimensions={logoDimensions}
         quotation={quotation}
-        selectedLng={selectedLng}
+        selectedLng={company?.language}
+        translate={translate}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

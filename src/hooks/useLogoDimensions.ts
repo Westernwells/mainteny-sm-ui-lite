@@ -13,14 +13,12 @@ const useLogoDimensions = (imageUrl: string) => {
       img.src = imageUrl;
       img.onload = () => {
         if (isMounted) {
-          const aspectRatio = img.width / img.height;
           let height;
+          const aspectRatio = img.width / img.height;
           if (aspectRatio <= 1.3) {
-            height = 90;
-          } else if (aspectRatio <= 100) {
-            height = img.width > 400 ? 80 : 36;
+            height = Math.min(80, 80 * (1 / aspectRatio));
           } else {
-            height = 36;
+            height = Math.min(75, 150 * (1 / aspectRatio));
           }
           setLogoDimensions({width: img.width, height});
         }

@@ -1,11 +1,10 @@
-import React from 'react';
 import {View, StyleSheet, Text, Font} from '@react-pdf/renderer';
-import {t} from 'i18next';
 import {UserAccount} from 'models/user';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 
 type Props = {
+  translate: (key: string) => string;
   userInfo?: UserAccount;
   selectedLng?: string;
 };
@@ -100,9 +99,9 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     },
   });
 
-const PdfTemplateFooter = ({userInfo, selectedLng}: Props) => {
+const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
   const boldFontStyle = {
-    fontFamily: selectedLng === 'KA' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
   };
 
   const styles = getStyles(boldFontStyle);
@@ -118,49 +117,56 @@ const PdfTemplateFooter = ({userInfo, selectedLng}: Props) => {
               </Text>
             )}
 
-            {userInfo?.serviceCompany.postalAddress?.fullName && (
+            {userInfo?.serviceCompany?.businessAddress?.component?.street && (
               <Text style={styles.footerSectionBody}>
-                {userInfo?.serviceCompany?.postalAddress?.fullName}
+                {userInfo?.serviceCompany?.businessAddress?.component?.street}
               </Text>
             )}
 
-            {userInfo?.serviceCompany?.postalAddress?.component?.state ||
-              (userInfo?.serviceCompany?.postalAddress?.component?.country && (
-                <Text style={styles.footerSectionBody}>
-                  {userInfo?.serviceCompany?.postalAddress?.component?.state}
-                  {userInfo?.serviceCompany?.postalAddress?.component?.state &&
-                    '·'}
-                  {userInfo?.serviceCompany?.postalAddress?.component?.country}
-                </Text>
-              ))}
+            {(userInfo?.serviceCompany?.businessAddress?.component
+              ?.postalCode ||
+              userInfo?.serviceCompany?.businessAddress?.component?.state ||
+              userInfo?.serviceCompany?.businessAddress?.component
+                ?.country) && (
+              <Text style={styles.footerSectionBody}>
+                {
+                  userInfo?.serviceCompany?.businessAddress?.component
+                    ?.postalCode
+                }
+                {userInfo?.serviceCompany?.businessAddress?.component?.state}
+                {userInfo?.serviceCompany?.businessAddress?.component?.state &&
+                  '·'}
+                {userInfo?.serviceCompany?.businessAddress?.component?.country}
+              </Text>
+            )}
 
             {userInfo?.serviceCompany?.contact?.phone && (
               <Text style={styles.footerSectionBody}>
-                {t('Tel.')}: {userInfo?.serviceCompany?.contact?.phone}
+                {translate('Tel.')}: {userInfo?.serviceCompany?.contact?.phone}
               </Text>
             )}
           </View>
 
           <View style={styles.footerContent}>
-            <Text style={styles.footerHeading}>{t('Bank')}:</Text>
+            <Text style={styles.footerHeading}>{translate('Bank')}:</Text>
 
             {userInfo?.serviceCompany?.settings?.paymentInfo?.accountNumber && (
               <Text style={styles.footerSectionBody}>
-                {t('Acc. nr.')}:{' '}
+                {translate('Acc. nr.')}:{' '}
                 {userInfo?.serviceCompany?.settings?.paymentInfo?.accountNumber}
               </Text>
             )}
 
             {userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
               <Text style={styles.footerSectionBody}>
-                {t('IBAN')}:{' '}
+                {translate('IBAN')}:{' '}
                 {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
               </Text>
             )}
 
             {userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
               <Text style={styles.footerSectionBody}>
-                {t('BIC')}:{' '}
+                {translate('BIC')}:{' '}
                 {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
               </Text>
             )}
@@ -169,27 +175,28 @@ const PdfTemplateFooter = ({userInfo, selectedLng}: Props) => {
           <View style={styles.footerContent}>
             {userInfo?.serviceCompany?.settings?.managingDirector && (
               <Text style={styles.footerHeading}>
-                {t('Managing Director')}:{' '}
+                {translate('Managing Director')}:{' '}
                 {userInfo?.serviceCompany?.settings?.managingDirector}
               </Text>
             )}
 
             {userInfo?.serviceCompany?.settings?.arbitrationCourt && (
               <Text style={styles.footerSectionBody}>
-                {t('Registration court')}:{' '}
+                {translate('Registration court')}:{' '}
                 {userInfo?.serviceCompany?.settings?.arbitrationCourt}
               </Text>
             )}
 
             {userInfo?.serviceCompany?.settings?.vatId && (
               <Text style={styles.footerSectionBody}>
-                {t('VAT ID')}: {userInfo?.serviceCompany?.settings?.vatId}{' '}
+                {translate('VAT ID')}:{' '}
+                {userInfo?.serviceCompany?.settings?.vatId}{' '}
               </Text>
             )}
 
             {userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
               <Text style={styles.footerSectionBody}>
-                {t('Certified')}:{' '}
+                {translate('Certified')}:{' '}
                 {userInfo?.serviceCompany?.settings?.tradeRegisterNumber}
               </Text>
             )}

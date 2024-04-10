@@ -8,7 +8,6 @@ import {
 } from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
 import {Currencies, formatCurrency} from 'utils/currency';
@@ -72,7 +71,7 @@ const getStyles = (
       marginBottom: 40,
       alignItems: 'flex-start',
       position: 'absolute',
-      top: 110,
+      top: 90,
     },
     leftAddress: {
       flex: '0 0 55%',
@@ -127,7 +126,7 @@ const getStyles = (
       color: '#212121',
       marginBottom: 10,
       ...boldFontStyle,
-      marginTop: selectedLng === 'KA' ? 270 : 220,
+      marginTop: selectedLng === 'KA' ? 250 : 200,
     },
     contentBody: {
       color: '#616161',
@@ -223,6 +222,7 @@ const getStyles = (
   });
 
 type Props = {
+  translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   logoSrc?: string;
   currencyCode?: string;
@@ -237,6 +237,7 @@ type Props = {
 
 const JobOverviewPdfTemplate = React.memo(
   ({
+    translate,
     userInfo,
     logoSrc,
     currencyCode,
@@ -245,8 +246,6 @@ const JobOverviewPdfTemplate = React.memo(
     quotation,
     selectedLng,
   }: Props) => {
-    const {t} = useTranslation();
-
     const articleItems = serviceOrder?.articles!;
     const calculateTotal = (arr: ServiceOrderArticleView[]) => {
       const sum = 0;
@@ -284,12 +283,12 @@ const JobOverviewPdfTemplate = React.memo(
     ];
 
     const boldFontStyle = {
-      fontFamily: selectedLng === 'KA' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
 
     const regularFontStyle = {
       fontFamily:
-        selectedLng === 'KA' ? 'NotoSans-Regular' : 'Montserrat-Regular',
+        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
     };
 
     const styles = getStyles(selectedLng, boldFontStyle, regularFontStyle);
@@ -305,33 +304,46 @@ const JobOverviewPdfTemplate = React.memo(
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
-                <Text style={styles.addressText}>
-                  {userInfo?.serviceCompany?.businessAddress?.fullName}
-                </Text>
+                {userInfo?.serviceCompany?.businessAddress?.fullName && (
+                  <Text style={styles.addressText}>
+                    {userInfo?.serviceCompany?.businessAddress?.fullName}
+                  </Text>
+                )}
 
                 <View style={styles.partAddress}>
-                  <Text style={styles.partialAddressText}>
-                    {serviceOrder?.elevator.propertyOwner.name}
-                  </Text>
-                  <Text style={styles.partialAddressText}>
-                    {
-                      serviceOrder?.elevator.propertyOwner.billingAddress
-                        ?.component?.street
-                    }
-                  </Text>
-                  <Text style={styles.partialAddressText}>
-                    {
-                      serviceOrder?.elevator.propertyOwner.billingAddress
-                        ?.component?.street2
-                    }
-                  </Text>
+                  {serviceOrder?.elevator.propertyOwner.name && (
+                    <Text style={styles.partialAddressText}>
+                      {serviceOrder?.elevator.propertyOwner.name}
+                    </Text>
+                  )}
+
+                  {serviceOrder?.elevator.propertyOwner.billingAddress
+                    ?.component?.street && (
+                    <Text style={styles.partialAddressText}>
+                      {
+                        serviceOrder?.elevator.propertyOwner.billingAddress
+                          ?.component?.street
+                      }
+                    </Text>
+                  )}
+
+                  {serviceOrder?.elevator.propertyOwner.billingAddress
+                    ?.component?.street2 && (
+                    <Text style={styles.partialAddressText}>
+                      {
+                        serviceOrder?.elevator.propertyOwner.billingAddress
+                          ?.component?.street2
+                      }
+                    </Text>
+                  )}
+
                   <Text style={styles.partialAddressText}>
                     {serviceOrder?.elevator.propertyOwner.billingAddress
                       ?.component?.postalCode &&
-                      `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.postalCode}, `}
+                      `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.postalCode} `}
                     {serviceOrder?.elevator.propertyOwner.billingAddress
                       ?.component?.state &&
-                      `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.state}, `}
+                      ` ${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.state}, `}
                     {serviceOrder?.elevator.propertyOwner.billingAddress
                       ?.component?.country &&
                       `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.country}`}
@@ -342,7 +354,7 @@ const JobOverviewPdfTemplate = React.memo(
               <View style={styles.rightAddress}>
                 {serviceOrder?.externalId && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Job no.')}</Text>
+                    <Text style={styles.tag}> {translate('Job no.')}</Text>
                     <Text style={styles.tagContent}>
                       {serviceOrder?.externalId || '-'}
                     </Text>
@@ -350,7 +362,7 @@ const JobOverviewPdfTemplate = React.memo(
                 )}
 
                 <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}> {t('Job date')}</Text>
+                  <Text style={styles.tag}> {translate('Job date')}</Text>
                   <Text style={styles.tagContent}>
                     {formatDate(serviceOrder?.meta.createdAt) || '-'}
                   </Text>
@@ -359,7 +371,7 @@ const JobOverviewPdfTemplate = React.memo(
                 {(serviceOrder?.meta.creator?.firstName ||
                   serviceOrder?.meta.creator?.lastName) && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Generated by')}</Text>
+                    <Text style={styles.tag}> {translate('Generated by')}</Text>
                     <Text style={styles.tagContent}>
                       {serviceOrder?.meta.creator?.firstName}{' '}
                       {serviceOrder?.meta.creator?.lastName}
@@ -369,7 +381,7 @@ const JobOverviewPdfTemplate = React.memo(
 
                 {serviceOrder?.elevator.propertyOwner.externalId && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Customer no.')}</Text>
+                    <Text style={styles.tag}> {translate('Customer no.')}</Text>
                     <Text style={styles.tagContent}>
                       {serviceOrder?.elevator.propertyOwner.number}
                     </Text>
@@ -378,7 +390,10 @@ const JobOverviewPdfTemplate = React.memo(
 
                 {serviceOrder?.meta.createdAt && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Your order from')}</Text>
+                    <Text style={styles.tag}>
+                      {' '}
+                      {translate('Your order from')}
+                    </Text>
                     <Text style={styles.tagContent}>
                       {formatDate(serviceOrder?.meta.createdAt)}
                     </Text>
@@ -387,7 +402,10 @@ const JobOverviewPdfTemplate = React.memo(
 
                 {quotation?.externalId && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}> {t('Quotation no.')}</Text>
+                    <Text style={styles.tag}>
+                      {' '}
+                      {translate('Quotation no.')}
+                    </Text>
                     <Text style={styles.tagContent}>
                       {quotation?.externalId}
                     </Text>
@@ -397,7 +415,7 @@ const JobOverviewPdfTemplate = React.memo(
                 <View style={{marginTop: 20}}>
                   {serviceOrder?.elevator.externalId && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}> {t('Unit no.')}</Text>
+                      <Text style={styles.tag}> {translate('Unit no.')}</Text>
                       <Text style={styles.tagContent}>
                         {serviceOrder?.elevator.externalId}
                       </Text>
@@ -406,7 +424,10 @@ const JobOverviewPdfTemplate = React.memo(
 
                   {serviceOrder?.elevator.address.fullName && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}> {t('Unit address')}</Text>
+                      <Text style={styles.tag}>
+                        {' '}
+                        {translate('Unit address')}
+                      </Text>
                       <Text style={styles.tagContent}>
                         {serviceOrder?.elevator.address.fullName}
                       </Text>
@@ -418,11 +439,8 @@ const JobOverviewPdfTemplate = React.memo(
 
             <View>
               <Text style={styles.contentHeader}>
-                {t('Job Confirmation: {{serviceOrderType}}', {
-                  serviceOrderType: serviceOrderTypeToString(
-                    serviceOrder?.type!,
-                  ),
-                })}
+                {translate('Job Confirmation:')}{' '}
+                {serviceOrderTypeToString(serviceOrder?.type!)}
               </Text>
 
               {serviceOrder?.description.trim() !== '' && (
@@ -449,7 +467,7 @@ const JobOverviewPdfTemplate = React.memo(
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
-                      {t('ARTICLE NAME')}
+                      {translate('ARTICLE NAME')}
                     </Text>
 
                     <Text
@@ -458,7 +476,7 @@ const JobOverviewPdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {t('QUANTITY')}
+                      {translate('QUANTITY')}
                     </Text>
                     <Text
                       style={{
@@ -467,7 +485,7 @@ const JobOverviewPdfTemplate = React.memo(
                         marginLeft: 10,
                         ...styles.tableHeading,
                       }}>
-                      {t('UNIT')}
+                      {translate('UNIT')}
                     </Text>
                     <Text
                       style={{
@@ -475,7 +493,7 @@ const JobOverviewPdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {t('PRICE')}
+                      {translate('PRICE')}
                     </Text>
                     <Text
                       style={{
@@ -484,7 +502,7 @@ const JobOverviewPdfTemplate = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {t('TOTAL')}
+                      {translate('TOTAL')}
                     </Text>
                   </View>
                 </View>
@@ -584,7 +602,7 @@ const JobOverviewPdfTemplate = React.memo(
                           fontSize: 10,
                           textAlign: 'right',
                         }}>
-                        {t('Subtotal (excl. VAT)')}
+                        {translate('Subtotal (excl. VAT)')}
                       </Text>
                       <Text
                         style={{
@@ -607,7 +625,7 @@ const JobOverviewPdfTemplate = React.memo(
                               fontSize: 10,
                               textAlign: 'right',
                             }}>
-                            {t('VAT {{vatPercentage}}%', {vatPercentage})}
+                            {translate('VAT')} {vatPercentage}%
                           </Text>
                           <Text
                             style={{
@@ -636,7 +654,7 @@ const JobOverviewPdfTemplate = React.memo(
                           textAlign: 'right',
                           fontSize: 10,
                         }}>
-                        {t('Total (incl. VAT)')}
+                        {translate('Total (incl. VAT)')}
                       </Text>
                       <Text
                         style={{
@@ -664,7 +682,11 @@ const JobOverviewPdfTemplate = React.memo(
             </View>
           </View>
 
-          <PdfTemplateFooter userInfo={userInfo} selectedLng={selectedLng} />
+          <PdfTemplateFooter
+            userInfo={userInfo}
+            selectedLng={selectedLng}
+            translate={translate}
+          />
         </Page>
       </Document>
     );
