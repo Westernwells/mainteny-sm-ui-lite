@@ -129,6 +129,11 @@ export interface ServiceCompanyTerms {
   type?: ServiceCompanyType[];
 }
 
+export interface ContractSummary {
+  numberOfValidContract?: number;
+  numberOfExpiringContract?: number;
+}
+
 export interface ServiceCompanySummary {
   id: string;
   serviceCompanyId: string;
@@ -136,6 +141,7 @@ export interface ServiceCompanySummary {
   time: string;
   timeUnit: ServiceCompanyTimeUnit;
   elevatorSummary: {numberOfActiveContractElevator: number};
+  contractSummary: ContractSummary;
 }
 
 export interface ServiceCompanySummaryParams {

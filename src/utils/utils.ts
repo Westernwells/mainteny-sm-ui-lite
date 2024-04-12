@@ -102,6 +102,7 @@ export const languageMap: {[key: string]: string} = {
   'ru-RU': 'ru-ru',
   'da-DK': 'da-dk',
   'ka-GE': 'ka-ge',
+  'es-ES': 'es-es',
 };
 
 export const mapLanguageToLocale: {[key: string]: string} = {
@@ -112,6 +113,7 @@ export const mapLanguageToLocale: {[key: string]: string} = {
   'ru-ru': 'ru',
   'da-DK': 'da',
   'ka-GE': 'ka',
+  'es-ES': 'es',
 };
 
 export const languagesToPars: {[key: string]: string} = {
@@ -196,6 +198,7 @@ export const languageContextMap: {[key: string]: Language} = {
   IT: Language.IT_IT,
   DA: Language.DA_DK,
   KA: Language.KA_GE,
+  ES: Language.ES_ES,
 };
 
 export const companyLanguageContextMap: {[key: string]: string} = {
@@ -206,6 +209,7 @@ export const companyLanguageContextMap: {[key: string]: string} = {
   'ru-ru': 'ru',
   'da-dk': 'da',
   'ka-ge': 'ka',
+  'es-es': 'es',
 };
 
 export const companyLanguageToUppercaseMap: {[key: string]: string} = {
@@ -215,6 +219,7 @@ export const companyLanguageToUppercaseMap: {[key: string]: string} = {
   'it-it': Language.IT_IT,
   'ru-ru': Language.RU_RU,
   'ka-ge': Language.KA_GE,
+  'es-es': Language.ES_ES,
 };
 
 export const titleCase = (str: string) =>

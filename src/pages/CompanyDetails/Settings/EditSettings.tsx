@@ -38,6 +38,10 @@ export const languages = [
     label: 'Georgian',
     value: 'ka-ge',
   },
+  {
+    label: 'Spanish',
+    value: 'es-es',
+  },
 ];
 
 export const timeFormats = [
