@@ -29,7 +29,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
     initialCustomer?.meta?.state === 'ACTIVE' ? initialCustomer : null;
 
   return (
-    <Grid container component="form" spacing={2}>
+    <Grid container component="form" rowSpacing={3} columnSpacing={2}>
       <Grid item xs={12}>
         <CustomerAutoComplete
           getCustomer={(value) => {
@@ -59,7 +59,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
       </Grid>
       <Grid item xs={12}>
         <AddressAutoComplete
-          initialValue={formik.values.address?.fullName || ''}
+          initialValue={formik.values.address?.component?.street || ''}
           initialAddress={formik.values.address}
           inputError={
             getIn(formik.errors, 'address.fullName') &&
@@ -72,6 +72,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
             placeholder: 'e.g. 34-36 Exmouth Market, London EC1R 4QE',
             required: true,
             name: 'address.fullName',
+            label: 'Address line 1',
           }}
           allowMap
           getAddress={(address) => {
@@ -80,10 +81,30 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
               address: address
                 ? {
                     ...address,
+                    component: {
+                      ...address.component,
+                      street2:
+                        address.component?.street2 !== ''
+                          ? address.component?.street2
+                          : formik.values.address?.component?.street2,
+                    },
                     fullName: address?.fullName as string,
                   }
                 : undefined,
             });
+          }}
+          shortAddress
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <FormInput
+          props={{
+            size: 'small',
+            placeholder: '',
+            label: 'Address line 2',
+            name: 'address.component.street2',
+            value: formik.values.address?.component?.street2 ?? '',
+            onChange: formik.handleChange,
           }}
         />
       </Grid>
@@ -146,7 +167,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
         />
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid item xs={12} md={6}>
         <FormInput
           props={{
             size: 'small',
@@ -159,7 +180,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
         />
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid item xs={12} md={6}>
         <FormInput
           props={{
             size: 'small',
@@ -172,7 +193,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
         />
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid item xs={12} md={6}>
         <FormInput
           props={{
             size: 'small',
@@ -185,7 +206,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
         />
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid item xs={12} md={6}>
         <FormInput
           props={{
             size: 'small',

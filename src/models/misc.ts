@@ -319,6 +319,7 @@ export enum Language {
   RU_RU = 'RU_RU',
   DA_DK = 'DA_DK',
   KA_GE = 'KA_GE',
+  ES_ES = 'ES_ES',
 }
 
 export interface Coord {
