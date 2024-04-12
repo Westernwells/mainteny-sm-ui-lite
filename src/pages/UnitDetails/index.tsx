@@ -46,7 +46,7 @@ const tabItems = [
     icon: <ManageSearchIcon />,
   },
   {
-    label: 'Technical data',
+    label: 'Technical Data',
     icon: <SettingsIcon />,
   },
   {

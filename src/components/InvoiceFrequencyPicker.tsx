@@ -12,15 +12,12 @@ import {
   IconButton,
   SelectChangeEvent,
 } from '@mui/material';
-import {
-  ContractServiceForm,
-  ContractTimeUnit,
-  getListViewFrequency,
-} from 'models/contract';
+import {ContractServiceForm, ContractTimeUnit} from 'models/contract';
 import {theme} from 'theme';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {FormikProps} from 'formik';
 import {useTranslation} from 'react-i18next';
+import {getListViewFrequency} from 'utils/elevator-utils';
 import {FormSelect} from './form/FormSelect';
 import {Button} from './Button';
 
@@ -263,10 +260,10 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
             paddingTop: '0.2em',
           }}>
           {getListViewFrequency(
+            'invoiceJob',
             formik.values.elevators.filter(
               (elevator) => componentId === elevator.elevatorId,
             ),
-            'invoiceJob',
           )}
         </Typography>
         <IconButton size="small" onClick={handleOpen}>

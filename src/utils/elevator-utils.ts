@@ -8,6 +8,7 @@ import {
   TimeUnitYearView,
 } from 'models/contract';
 import {InspectionCycle} from 'models/misc';
+import {t} from 'i18next';
 
 export const monthNames = [
   'Jan',
@@ -98,29 +99,43 @@ export const getListViewFrequency = (
 ): string => {
   const frequencySet = new Set<string>();
   const monthlyUnits = new Set<number>();
+  let isAutoJobCycle = false;
 
   elevators?.forEach((elevator) => {
-    const {timeUnit} = elevator[key];
-    switch (timeUnit) {
-      case ContractTimeUnit.MONTHLY:
-        elevator[key]?.timeNumbers?.forEach((month) => monthlyUnits.add(month));
-        break;
-      case ContractTimeUnit.WEEKLY:
-      case ContractTimeUnit.BIWEEKLY:
-      case ContractTimeUnit.ANNUALLY:
-      case ContractTimeUnit.BIENNIALLY:
-      case ContractTimeUnit.TRIENNIALLY:
-      case ContractTimeUnit.QUADRENNIALLY:
-        frequencySet.add(TimeUnitYearView[timeUnit]);
-        break;
-      default:
-        return '-';
+    if (elevator[key]) {
+      const {timeUnit} = elevator[key];
+      switch (timeUnit) {
+        case ContractTimeUnit.MONTHLY:
+          elevator[key]?.timeNumbers?.forEach((month) =>
+            monthlyUnits.add(month),
+          );
+          break;
+        case ContractTimeUnit.NONE:
+          if (key === 'invoiceJob') {
+            isAutoJobCycle = true;
+          }
+          break;
+        case ContractTimeUnit.WEEKLY:
+        case ContractTimeUnit.BIWEEKLY:
+        case ContractTimeUnit.ANNUALLY:
+        case ContractTimeUnit.BIENNIALLY:
+        case ContractTimeUnit.TRIENNIALLY:
+        case ContractTimeUnit.QUADRENNIALLY:
+          frequencySet.add(t(TimeUnitYearView[timeUnit]));
+          break;
+        default:
+          return '-';
+      }
     }
   });
 
   Array.from(monthlyUnits)
     .sort((a, b) => a - b)
     .forEach((unit) => frequencySet.add(monthNames[unit - 1]));
+
+  if (isAutoJobCycle) {
+    return key === 'invoiceJob' ? t('After job') : '-';
+  }
 
   return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
 };
@@ -133,6 +148,8 @@ export const getViewFrequency = (job: JobTimeUnit): string => {
     case ContractTimeUnit.MONTHLY:
       job?.timeNumbers?.forEach((month) => monthlyUnits.add(month));
       break;
+    case ContractTimeUnit.NONE:
+      return t('After job');
     case ContractTimeUnit.WEEKLY:
     case ContractTimeUnit.BIWEEKLY:
     case ContractTimeUnit.ANNUALLY:

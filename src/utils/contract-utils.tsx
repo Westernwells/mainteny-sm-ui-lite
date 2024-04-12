@@ -21,6 +21,7 @@ import {
 } from 'models/contract';
 import {toDate, toRestDate} from 'utils/datetime';
 import {ElevatorView} from 'models/elevator';
+import {OptionsObject, SnackbarKey, SnackbarMessage} from 'notistack';
 
 export const costRangeConvertor = (
   selectedItems: string[],
@@ -237,6 +238,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
         : '',
       costType,
       costPackage,
+      id: extendedContractRecord.id,
     };
 
     return contractComponentRecord;
@@ -360,4 +362,85 @@ export const calculateFormContractInvoicePriceTotal = (
     }
   });
   return totalPrice;
+};
+
+/**
+ * Checks if services can be grouped for invoicing based on specific criteria.
+ *
+ * @param services An array of contract component records representing services to be checked.
+ * @param enqueueSnackbar A function to display a snackbar message.
+ * @returns A boolean indicating whether services can be grouped for invoicing.
+ */
+export const canGroupServices = (
+  services: ContractComponentRecord[] | ExtendedContractComponentRecord[],
+  enqueueSnackbar: (
+    message: SnackbarMessage,
+    options?: OptionsObject | undefined,
+  ) => SnackbarKey,
+): boolean => {
+  // Check if there is a leading component
+  const leadingService = services.find((service) =>
+    service.elevators.some(
+      (elevator) => elevator.invoiceJob.timeUnit === ContractTimeUnit.NONE,
+    ),
+  );
+  if (!leadingService) {
+    return true;
+  }
+
+  // Check if there is only one leading service
+  const numLeadingServices = services.filter((service) =>
+    service.elevators.some(
+      (elevator) => elevator.invoiceJob.timeUnit === ContractTimeUnit.NONE,
+    ),
+  ).length;
+  if (numLeadingServices > 1) {
+    enqueueSnackbar(
+      'You cannot create an invoice group for two or more services with the invoice cycle selected “After Job"',
+      {variant: 'error'},
+    );
+    return false;
+  }
+
+  // Check if all elevators in the leading service have invoice cycle "After job"
+  const leadingElevators = leadingService.elevators.filter(
+    (elevator) => elevator.invoiceJob.timeUnit === ContractTimeUnit.NONE,
+  );
+  if (leadingElevators.length !== leadingService.elevators.length) {
+    enqueueSnackbar(
+      'Services can not be grouped since we detected different invoice cycles within one service.',
+      {variant: 'error'},
+    );
+    return false;
+  }
+
+  // Check if the invoice cycles of all services are subsets of the job cycles of the corresponding elevators in the leading service
+  for (let i = 0; i < services.length; i += 1) {
+    const service = services[i];
+    if (service.id !== leadingService.id) {
+      for (let j = 0; j < service.elevators.length; j += 1) {
+        const elevator = service.elevators[j];
+        const correspondingElevator = leadingService.elevators.find(
+          (e) => e.elevatorId === elevator.elevatorId,
+        );
+
+        if (!correspondingElevator) {
+          return true;
+        }
+        const subset = elevator.invoiceJob.timeNumbers.every((time) =>
+          correspondingElevator.orderGenerationJob.timeNumbers.includes(time),
+        );
+
+        if (!subset) {
+          enqueueSnackbar(
+            'Services cannot be grouped since the invoice cycles of the selected services do not match.',
+            {variant: 'error'},
+          );
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
 };

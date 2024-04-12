@@ -34,6 +34,7 @@ import {
   ContractComponentView,
   ContractServiceFormElevator,
   UpdateContractComponents,
+  ContractTimeUnit,
 } from 'models/contract';
 import {
   calculateFormContractInvoicePriceTotal,
@@ -183,7 +184,23 @@ export const MutationService = ({
     );
 
     const {values} = formikContractServiceComponent;
-    const elevatorsToSave = values.elevators.filter((e) => e.isChecked);
+    const elevatorsToSave = values.elevators
+      .filter((e) => e.isChecked)
+      // Nullify invoice and order generation jobs if they have no time numbers set and is monthly time unit
+      .map((elevator) => ({
+        ...elevator,
+        invoiceJob:
+          elevator.invoiceJob.timeUnit === ContractTimeUnit.MONTHLY &&
+          !elevator.invoiceJob.timeNumbers.length
+            ? null
+            : {...elevator.invoiceJob},
+        orderGenerationJob:
+          (elevator.orderGenerationJob.timeUnit === ContractTimeUnit.MONTHLY ||
+            elevator.orderGenerationJob.timeUnit === ContractTimeUnit.NONE) &&
+          !elevator.orderGenerationJob.timeNumbers.length
+            ? null
+            : {...elevator.orderGenerationJob},
+      }));
 
     const existingData = componentsToMutate(updatedComponentsToSave);
 
@@ -803,6 +820,7 @@ export const MutationService = ({
               }}
               textFieldProps={{
                 label: t('First job creation date'),
+                required: true,
               }}
             />
           </Grid>
