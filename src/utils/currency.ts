@@ -17,7 +17,7 @@ export const formatCurrency = (
   },
 ) => {
   const selectedLang = i18n.resolvedLanguage;
-  return amount.toLocaleString(
+  const formattedAmount = amount.toLocaleString(
     selectedLang === 'de' || selectedLang === 'sr' ? 'de-DE' : 'en-US',
     {
       style: 'currency',
@@ -27,6 +27,7 @@ export const formatCurrency = (
       currency: options?.currency ?? 'EUR',
     },
   );
+  return formattedAmount.replace(/\s/g, '');
 };
 
 function formatAmount(amount?: Amount, value?: number): string {

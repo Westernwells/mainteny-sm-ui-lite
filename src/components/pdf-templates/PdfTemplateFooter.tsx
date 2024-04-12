@@ -117,26 +117,9 @@ const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
               </Text>
             )}
 
-            {userInfo?.serviceCompany?.businessAddress?.component?.street && (
+            {userInfo?.serviceCompany?.businessAddress?.fullName && (
               <Text style={styles.footerSectionBody}>
-                {userInfo?.serviceCompany?.businessAddress?.component?.street}
-              </Text>
-            )}
-
-            {(userInfo?.serviceCompany?.businessAddress?.component
-              ?.postalCode ||
-              userInfo?.serviceCompany?.businessAddress?.component?.state ||
-              userInfo?.serviceCompany?.businessAddress?.component
-                ?.country) && (
-              <Text style={styles.footerSectionBody}>
-                {
-                  userInfo?.serviceCompany?.businessAddress?.component
-                    ?.postalCode
-                }
-                {userInfo?.serviceCompany?.businessAddress?.component?.state}
-                {userInfo?.serviceCompany?.businessAddress?.component?.state &&
-                  '·'}
-                {userInfo?.serviceCompany?.businessAddress?.component?.country}
+                {userInfo?.serviceCompany?.businessAddress?.fullName}
               </Text>
             )}
 

@@ -140,34 +140,6 @@ const getStyles = (
       lineHeight: 1.3,
       maxWidth: '100%',
     },
-    numberColumn: {
-      width: '7%',
-      textAlign: 'left',
-    },
-    articleColumn: {
-      width: '25%',
-      textAlign: 'left',
-    },
-    supplierColumn: {
-      width: '20%',
-      textAlign: 'left',
-    },
-    quantityColumn: {
-      width: '8%',
-      textAlign: 'right',
-    },
-    unitColumn: {
-      width: '5%',
-      textAlign: 'center',
-    },
-    priceColumn: {
-      width: '20%',
-      textAlign: 'right',
-    },
-    totalColumn: {
-      width: '15%',
-      textAlign: 'right',
-    },
     notesSection: {
       paddingBottom: 6,
       marginTop: 5,
@@ -285,8 +257,10 @@ const OrderArticlePDFPreview = React.memo(
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
-                {userInfo?.serviceCompany?.businessAddress?.fullName && (
+                {(userInfo?.serviceCompany?.businessAddress?.fullName ||
+                  userInfo?.serviceCompany?.name) && (
                   <Text style={styles.addressText}>
+                    {userInfo?.serviceCompany?.name},{' '}
                     {userInfo?.serviceCompany?.businessAddress?.fullName}
                   </Text>
                 )}
@@ -539,7 +513,7 @@ const OrderArticlePDFPreview = React.memo(
                       style={{
                         width: '24%',
                         textAlign: 'right',
-                        fontSize: 10,
+                        fontSize: 1,
                       }}>
                       {formatCurrency(calculateTotal(formik.values.items ?? 0))}
                     </Text>
