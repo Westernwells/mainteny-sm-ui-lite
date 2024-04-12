@@ -8,12 +8,9 @@ import {Box, Switch, Typography, Divider, IconButton} from '@mui/material';
 import {theme} from 'theme';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {FormikProps} from 'formik';
-import {
-  ContractServiceForm,
-  ContractTimeUnit,
-  getListViewFrequency,
-} from 'models/contract';
+import {ContractServiceForm, ContractTimeUnit} from 'models/contract';
 import {useTranslation} from 'react-i18next';
+import {getListViewFrequency} from 'utils/elevator-utils';
 import {Button} from './Button';
 
 const monthsData = [
@@ -199,10 +196,10 @@ const JobFrequencyPicker = ({componentId, formik}: Props) => {
             paddingTop: '0.2em',
           }}>
           {getListViewFrequency(
+            'orderGenerationJob',
             formik.values.elevators.filter(
               (elevator) => componentId === elevator.elevatorId,
             ),
-            'orderGenerationJob',
           )}
         </Typography>
         <IconButton size="small" onClick={handleOpen}>

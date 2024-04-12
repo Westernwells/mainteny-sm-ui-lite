@@ -21,6 +21,7 @@ import {theme} from 'theme';
 import {useFormik} from 'formik';
 import {
   calculateContractInvoicePriceGrandTotalForm,
+  canGroupServices,
   convertExtendedRecordsToContractComponentRecords,
 } from 'utils/contract-utils';
 import {
@@ -38,6 +39,7 @@ import Grid from '@mui/material/Grid';
 import {olStyles} from 'styles';
 import {EmptySection} from 'components/EmptySection';
 import {isEqual} from 'lodash';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {SectionTitle} from '../../../../InvoiceDetails/SectionTitle';
 import {ContractCard} from '../ContractCard';
 
@@ -56,6 +58,7 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const {enqueueSnackbar} = useSnackbar();
 
   const initialData = useMemo(
     () =>
@@ -141,24 +144,33 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
 
     invoiceGroups[existingGroupIndex].services.push(componentToBeAdded!);
 
-    setCollapsedGroups((prevCollapsed) => [...prevCollapsed]);
-
-    const updatedComponents = formikContractComponents.values.components.map(
-      (item) =>
-        item.id === activeServiceId
-          ? {...item, groupNumber: Number(selectedGroup), isChecked: false}
-          : item,
+    const canBeGrouped = canGroupServices(
+      invoiceGroups[existingGroupIndex].services,
+      enqueueSnackbar,
     );
 
-    formikContractComponents.setFieldValue('components', updatedComponents);
+    if (!canBeGrouped) {
+      invoiceGroups[existingGroupIndex].services.pop();
+    } else {
+      setCollapsedGroups((prevCollapsed) => [...prevCollapsed]);
 
-    updateContract({
-      body: {
-        components:
-          convertExtendedRecordsToContractComponentRecords(updatedComponents),
-      },
-      contractId,
-    });
+      const updatedComponents = formikContractComponents.values.components.map(
+        (item) =>
+          item.id === activeServiceId
+            ? {...item, groupNumber: Number(selectedGroup), isChecked: false}
+            : item,
+      );
+
+      formikContractComponents.setFieldValue('components', updatedComponents);
+
+      updateContract({
+        body: {
+          components:
+            convertExtendedRecordsToContractComponentRecords(updatedComponents),
+        },
+        contractId,
+      });
+    }
   };
 
   const handleDisbandGroup = (groupNumber: number) => {
@@ -283,28 +295,39 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
         ? invoiceGroups[invoiceGroups.length - 1].groupNumber + 1
         : 1;
 
-      setInvoiceGroups((prevGroups) => [
-        ...prevGroups,
-        {groupNumber: newGroupNumber, services: checkedItems},
-      ]);
-
-      setCollapsedGroups((prevCollapsed) => [...prevCollapsed, newGroupNumber]);
-
       const componentsToSave = updatedComponents.map((item) =>
         item.isChecked
           ? {...item, groupNumber: newGroupNumber, isChecked: false}
           : item,
       );
-      formikContractComponents.setFieldValue('components', componentsToSave);
 
-      updateContract({
-        body: {
-          components: convertExtendedRecordsToContractComponentRecords(
-            componentsToSave as ExtendedContractComponentRecord[],
-          ),
-        },
-        contractId,
-      });
+      const canGroup = canGroupServices(
+        convertExtendedRecordsToContractComponentRecords(
+          checkedItems as ExtendedContractComponentRecord[],
+        ),
+        enqueueSnackbar,
+      );
+
+      if (canGroup) {
+        setInvoiceGroups((prevGroups) => [
+          ...prevGroups,
+          {groupNumber: newGroupNumber, services: checkedItems},
+        ]);
+        setCollapsedGroups((prevCollapsed) => [
+          ...prevCollapsed,
+          newGroupNumber,
+        ]);
+        formikContractComponents.setFieldValue('components', componentsToSave);
+
+        updateContract({
+          body: {
+            components: convertExtendedRecordsToContractComponentRecords(
+              componentsToSave as ExtendedContractComponentRecord[],
+            ),
+          },
+          contractId,
+        });
+      }
     }
   };
 

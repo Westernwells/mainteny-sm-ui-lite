@@ -20,7 +20,6 @@ import {
   ExtendedContractComponentRecord,
   calculateContractInvoicePriceGrandTotal,
   calculateContractInvoicePriceTotal,
-  getListViewFrequency,
 } from 'models/contract';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {Button} from 'components/Button';
@@ -30,6 +29,12 @@ import {FormSelect} from 'components/form/FormSelect';
 import {FormikProps} from 'formik';
 import {useTranslation} from 'react-i18next';
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
+import {
+  canGroupServices,
+  convertExtendedRecordsToContractComponentRecords,
+} from 'utils/contract-utils';
+import {useSnackbar} from 'hooks/useSnackbar';
+import {getListViewFrequency} from 'utils/elevator-utils';
 
 type InvoiceGroup = {
   groupNumber: number;
@@ -44,6 +49,7 @@ type Props = {
 
 const InvoiceSetup = ({formikContractComponents}: Props) => {
   const {t} = useTranslation();
+  const {enqueueSnackbar} = useSnackbar();
   const currentCurrency = useCurrentCurrency();
   const [selectedGroup, setSelectedGroup] = useState('');
   const [activeServiceId, setActiveServiceId] = useState('');
@@ -110,21 +116,32 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
         ? invoiceGroups[invoiceGroups.length - 1].groupNumber + 1
         : 1;
 
-      setInvoiceGroups((prevGroups) => [
-        ...prevGroups,
-        {groupNumber: newGroupNumber, services: checkedItems},
-      ]);
-
-      setCollapsedGroups((prevCollapsed) => [...prevCollapsed, newGroupNumber]);
-
-      formikContractComponents.setFieldValue(
-        'components',
-        updatedComponents.map((item) =>
-          item.isChecked
-            ? {...item, groupNumber: newGroupNumber, isChecked: false}
-            : item,
-        ),
+      const componentsToSave = updatedComponents.map((item) =>
+        item.isChecked
+          ? {...item, groupNumber: newGroupNumber, isChecked: false}
+          : item,
       );
+
+      const canGroup = canGroupServices(
+        convertExtendedRecordsToContractComponentRecords(
+          checkedItems as ExtendedContractComponentRecord[],
+        ),
+        enqueueSnackbar,
+      );
+
+      if (canGroup) {
+        setInvoiceGroups((prevGroups) => [
+          ...prevGroups,
+          {groupNumber: newGroupNumber, services: checkedItems},
+        ]);
+
+        setCollapsedGroups((prevCollapsed) => [
+          ...prevCollapsed,
+          newGroupNumber,
+        ]);
+
+        formikContractComponents.setFieldValue('components', componentsToSave);
+      }
     }
   };
 
@@ -141,16 +158,25 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
 
     invoiceGroups[existingGroupIndex].services.push(componentToBeAdded!);
 
-    setCollapsedGroups((prevCollapsed) => [...prevCollapsed]);
-
-    const updatedComponents = formikContractComponents.values.components.map(
-      (item) =>
-        item.id === activeServiceId
-          ? {...item, groupNumber: Number(selectedGroup), isChecked: false}
-          : item,
+    const canBeGrouped = canGroupServices(
+      invoiceGroups[existingGroupIndex].services,
+      enqueueSnackbar,
     );
 
-    formikContractComponents.setFieldValue('components', updatedComponents);
+    if (!canBeGrouped) {
+      invoiceGroups[existingGroupIndex].services.pop();
+    } else {
+      setCollapsedGroups((prevCollapsed) => [...prevCollapsed]);
+
+      const updatedComponents = formikContractComponents.values.components.map(
+        (item) =>
+          item.id === activeServiceId
+            ? {...item, groupNumber: Number(selectedGroup), isChecked: false}
+            : item,
+      );
+
+      formikContractComponents.setFieldValue('components', updatedComponents);
+    }
   };
 
   const handleDisbandGroup = (groupNumber: number) => {
@@ -510,10 +536,10 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                                   color={theme.palette.text.primary}
                                   variant="body2">
                                   {getListViewFrequency(
+                                    'orderGenerationJob',
                                     item.elevators.filter(
                                       (elevator) => elevator.isSelected,
                                     ),
-                                    'orderGenerationJob',
                                   )}
                                 </Typography>
                               </TableCell>
@@ -529,10 +555,10 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                                   color={theme.palette.text.primary}
                                   variant="body2">
                                   {getListViewFrequency(
+                                    'invoiceJob',
                                     item.elevators.filter(
                                       (elevator) => elevator.isSelected,
                                     ),
-                                    'invoiceJob',
                                   )}
                                 </Typography>
                               </TableCell>
@@ -656,10 +682,10 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                             color={theme.palette.text.primary}
                             variant="body2">
                             {getListViewFrequency(
+                              'orderGenerationJob',
                               item.elevators.filter(
                                 (elevator) => elevator.isSelected,
                               ),
-                              'orderGenerationJob',
                             )}
                           </Typography>
                         </TableCell>
@@ -675,10 +701,10 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                             color={theme.palette.text.primary}
                             variant="body2">
                             {getListViewFrequency(
+                              'invoiceJob',
                               item.elevators.filter(
                                 (elevator) => elevator.isSelected,
                               ),
-                              'invoiceJob',
                             )}
                           </Typography>
                         </TableCell>

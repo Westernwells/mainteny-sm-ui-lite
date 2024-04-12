@@ -682,8 +682,8 @@ export const calculateContractInvoicePriceTotal = (
     let timeLength: number = 0;
 
     if (item.invoiceJob) {
-      const invoiceTimeUnit: string = item.invoiceJob.timeUnit;
-      const orderTimeUnit: string = item.orderGenerationJob.timeUnit;
+      const invoiceTimeUnit: string = item.invoiceJob?.timeUnit;
+      const orderTimeUnit: string = item.orderGenerationJob?.timeUnit;
 
       if (invoiceTimeUnit === ContractTimeUnit.MONTHLY) {
         timeLength = item.invoiceJob.timeNumbers
@@ -770,44 +770,6 @@ export enum ContractTimeUnitYearView {
   BIWEEKLY = 'Every 2 weeks',
   NONE = 'After job',
 }
-
-export const getListViewFrequency = (
-  elevators: ContractComponentElevator[] | ContractServiceFormElevator[],
-  key: 'orderGenerationJob' | 'invoiceJob',
-): string => {
-  const frequencySet = new Set<string>();
-  const monthlyUnits = new Set<number>();
-
-  elevators.forEach((elevator) => {
-    const {timeUnit} = elevator[key];
-    switch (timeUnit) {
-      case ContractTimeUnit.MONTHLY:
-        elevator[key].timeNumbers.forEach((month) => monthlyUnits.add(month));
-        break;
-      case ContractTimeUnit.NONE:
-        if (key === 'invoiceJob') {
-          frequencySet.add(t(ContractTimeUnitYearView[timeUnit]));
-        }
-        break;
-      case ContractTimeUnit.WEEKLY:
-      case ContractTimeUnit.BIWEEKLY:
-      case ContractTimeUnit.ANNUALLY:
-      case ContractTimeUnit.BIENNIALLY:
-      case ContractTimeUnit.TRIENNIALLY:
-      case ContractTimeUnit.QUADRENNIALLY:
-        frequencySet.add(t(ContractTimeUnitYearView[timeUnit]));
-        break;
-      default:
-        return '-';
-    }
-  });
-
-  Array.from(monthlyUnits)
-    .sort((a, b) => a - b)
-    .forEach((unit) => frequencySet.add(monthNames[unit - 1]));
-
-  return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
-};
 
 export const getSingleItemViewFrequency = (
   elevator: ContractComponentElevator | ContractServiceFormElevator,
