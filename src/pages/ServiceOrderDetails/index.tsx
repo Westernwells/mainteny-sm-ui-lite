@@ -47,7 +47,7 @@ export const ServiceOrderDetails = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const {data: serviceOrder, isLoading} =
     useServiceOrderDetails(serviceOrderId);
-  const isJobOverviewPdfGenerated =
+  const isPdfGenerated =
     serviceOrder?.additionalInfo.confirmationInfo?.pdfGenerationStatus ===
     PdfGenerationStatus.DONE;
   const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
@@ -64,22 +64,22 @@ export const ServiceOrderDetails = () => {
     refetchOnWindowFocus: false,
   });
 
+  const {downloadFile} = useDownloadFileWithCustomName(
+    serviceOrder?.number,
+    fileDownloadURLs[filePathToDownload],
+  );
+
   const {mutateAsync: postServiceOrderConfirmationPublish} =
     usePostServiceOrderConfirmationPublish();
 
   const downloadWorkOverview = () => {
-    const pdfPath = isJobOverviewPdfGenerated
+    const pdfPath = isPdfGenerated
       ? (serviceOrder?.additionalInfo.confirmationInfo?.pdfPath as string)
       : '';
     if (pdfPath) {
       setFilePathToDownload(pdfPath);
     }
   };
-
-  const {downloadFile} = useDownloadFileWithCustomName(
-    serviceOrder?.number,
-    filePathToDownload,
-  );
 
   const generateWorkOverview = async () => {
     try {
