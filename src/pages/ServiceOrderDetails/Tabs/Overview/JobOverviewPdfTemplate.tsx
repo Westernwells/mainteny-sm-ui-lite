@@ -304,8 +304,10 @@ const JobOverviewPdfTemplate = React.memo(
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
-                {userInfo?.serviceCompany?.businessAddress?.fullName && (
+                {(userInfo?.serviceCompany?.businessAddress?.fullName ||
+                  userInfo?.serviceCompany?.name) && (
                   <Text style={styles.addressText}>
+                    {userInfo?.serviceCompany?.name},{' '}
                     {userInfo?.serviceCompany?.businessAddress?.fullName}
                   </Text>
                 )}
@@ -608,7 +610,7 @@ const JobOverviewPdfTemplate = React.memo(
                         style={{
                           width: '24%',
                           textAlign: 'right',
-                          fontSize: 10,
+                          fontSize: 1,
                         }}>
                         {formatCurrency(calculateTotal(articleItems))}
                       </Text>
@@ -662,7 +664,7 @@ const JobOverviewPdfTemplate = React.memo(
                           textAlign: 'right',
                           color: '#212121',
                           ...boldFontStyle,
-                          fontSize: 10,
+                          fontSize: 1,
                         }}>
                         {formatCurrency(
                           calculateTotal(articleItems) +
