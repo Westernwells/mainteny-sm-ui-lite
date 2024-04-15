@@ -231,7 +231,9 @@ export const Dashboard = () => {
             <Grid item xs={12} sm={6} lg={2.4}>
               <TopCard
                 title="Active contracts"
-                value={`${fullSummary?.contractSummary.numberOfValidContract}`}
+                value={`${
+                  fullSummary?.contractSummary.numberOfValidContract || 0
+                }`}
                 icon={ContactsIcon}
                 iconColor={theme.palette.secondary.dark}
                 iconBackgroundColor={theme.palette.info.outlinedHoverBg}
@@ -240,7 +242,7 @@ export const Dashboard = () => {
                     fullSummary?.contractSummary?.numberOfExpiringContract,
                 })}`}
                 subValue={
-                  fullSummary?.contractSummary?.numberOfExpiringContract
+                  fullSummary?.contractSummary?.numberOfExpiringContract || 0
                 }
                 url="contracts"
               />
