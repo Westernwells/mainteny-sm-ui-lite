@@ -118,8 +118,8 @@ export const makeRows = (
         [ContractOrderField.NAME]: item.name,
         [ContractOrderField.NET_PRICE]:
           `${formatCurrency(
-            (item.additionalInfo?.price?.netAmount ??
-              item.additionalInfo?.totalYearlyPrice ??
+            (item.additionalInfo?.totalYearlyPrice ??
+              item.additionalInfo?.price?.netAmount ??
               0) /
               10 ** fractionDigits,
             {currency: item.additionalInfo.price?.currency || currencyCode},
