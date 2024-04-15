@@ -15,6 +15,7 @@ import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
+import {Currency} from 'models/misc';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -80,10 +81,16 @@ const getStyles = (
       justifyContent: 'space-between',
       ...boldFontStyle,
     },
+    addressTextWrapper: {
+      marginBottom: 40,
+    },
     addressText: {
       fontSize: 8,
-      marginBottom: 23,
       ...regularFontStyle,
+      maxWidth: 250,
+      flexWrap: 'wrap',
+      marginBottom: 2,
+      color: '#212121',
     },
     partialAddressText: {
       fontSize: 10,
@@ -126,7 +133,7 @@ const getStyles = (
       color: '#212121',
       marginBottom: 10,
       ...boldFontStyle,
-      marginTop: selectedLng === 'KA' ? 250 : 200,
+      marginTop: selectedLng === 'KA' ? 270 : 220,
     },
     contentBody: {
       color: '#616161',
@@ -225,7 +232,7 @@ type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   logoSrc?: string;
-  currencyCode?: string;
+  currentCurrency?: Currency;
   serviceOrder?: ServiceOrderView;
   logoDimensions?: {
     width: number;
@@ -240,7 +247,7 @@ const JobOverviewPdfTemplate = React.memo(
     translate,
     userInfo,
     logoSrc,
-    currencyCode,
+    currentCurrency,
     serviceOrder,
     logoDimensions,
     quotation,
@@ -255,7 +262,8 @@ const JobOverviewPdfTemplate = React.memo(
           (arrayItem) =>
             arrayItem.quantity *
             (arrayItem.unitAmount.netAmount /
-              10 ** Currencies[arrayItem.unitAmount.currency] ?? currencyCode),
+              10 ** Currencies[arrayItem.unitAmount.currency] ??
+              (currentCurrency && currentCurrency.code)),
         )
         .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
     };
@@ -304,13 +312,18 @@ const JobOverviewPdfTemplate = React.memo(
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
-                {(userInfo?.serviceCompany?.businessAddress?.fullName ||
-                  userInfo?.serviceCompany?.name) && (
-                  <Text style={styles.addressText}>
-                    {userInfo?.serviceCompany?.name},{' '}
-                    {userInfo?.serviceCompany?.businessAddress?.fullName}
-                  </Text>
-                )}
+                <View style={styles.addressTextWrapper}>
+                  {userInfo?.serviceCompany?.name && (
+                    <Text style={styles.addressText}>
+                      {userInfo?.serviceCompany?.name}
+                    </Text>
+                  )}
+                  {userInfo?.serviceCompany?.businessAddress?.fullName && (
+                    <Text style={styles.addressText}>
+                      {userInfo?.serviceCompany?.businessAddress?.fullName}
+                    </Text>
+                  )}
+                </View>
 
                 <View style={styles.partAddress}>
                   {serviceOrder?.elevator.propertyOwner.name && (
@@ -495,7 +508,7 @@ const JobOverviewPdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {translate('PRICE')}
+                      {translate('PRICE')}({currentCurrency?.symbol})
                     </Text>
                     <Text
                       style={{
@@ -504,7 +517,7 @@ const JobOverviewPdfTemplate = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {translate('TOTAL')}
+                      {translate('TOTAL')}({currentCurrency?.symbol})
                     </Text>
                   </View>
                 </View>
@@ -561,7 +574,9 @@ const JobOverviewPdfTemplate = React.memo(
                                   articleOrderItem.unitAmount.fractionDigits ??
                                 0,
                               {
-                                currency: currencyCode,
+                                currency: currentCurrency?.code,
+                                excludeCurrencySymbol: true,
+                                currencySymbol: currentCurrency?.symbol,
                               },
                             )}
                           </Text>
@@ -578,7 +593,9 @@ const JobOverviewPdfTemplate = React.memo(
                                   articleOrderItem.unitAmount.fractionDigits ??
                                 0,
                               {
-                                currency: currencyCode,
+                                currency: currentCurrency?.code,
+                                excludeCurrencySymbol: true,
+                                currencySymbol: currentCurrency?.symbol,
                               },
                             )}
                           </Text>
@@ -610,9 +627,13 @@ const JobOverviewPdfTemplate = React.memo(
                         style={{
                           width: '24%',
                           textAlign: 'right',
-                          fontSize: 1,
+                          fontSize: 10,
                         }}>
-                        {formatCurrency(calculateTotal(articleItems))}
+                        {formatCurrency(calculateTotal(articleItems), {
+                          currency: currentCurrency?.code,
+                          excludeCurrencySymbol: true,
+                          currencySymbol: currentCurrency?.symbol,
+                        })}
                       </Text>
                     </View>
 
@@ -638,7 +659,9 @@ const JobOverviewPdfTemplate = React.memo(
                             {formatCurrency(
                               totalVATMap.get(vatPercentage) ?? 0,
                               {
-                                currency: currencyCode,
+                                currency: currentCurrency?.code,
+                                excludeCurrencySymbol: true,
+                                currencySymbol: currentCurrency?.symbol,
                               },
                             )}
                           </Text>
@@ -656,7 +679,8 @@ const JobOverviewPdfTemplate = React.memo(
                           textAlign: 'right',
                           fontSize: 10,
                         }}>
-                        {translate('Total (incl. VAT)')}
+                        {translate('Total (incl. VAT)')}(
+                        {currentCurrency?.symbol})
                       </Text>
                       <Text
                         style={{
@@ -664,7 +688,7 @@ const JobOverviewPdfTemplate = React.memo(
                           textAlign: 'right',
                           color: '#212121',
                           ...boldFontStyle,
-                          fontSize: 1,
+                          fontSize: 10,
                         }}>
                         {formatCurrency(
                           calculateTotal(articleItems) +
@@ -673,7 +697,9 @@ const JobOverviewPdfTemplate = React.memo(
                               0,
                             ),
                           {
-                            currency: currencyCode,
+                            currency: currentCurrency?.code,
+                            excludeCurrencySymbol: true,
+                            currencySymbol: currentCurrency?.symbol,
                           },
                         )}
                       </Text>

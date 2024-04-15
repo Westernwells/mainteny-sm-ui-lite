@@ -154,7 +154,7 @@ export const OrderArticle = () => {
         <OrderArticlePDF
           articleOrder={newArticleOrder!}
           userInfo={user?.userAccount}
-          currencyCode={currentCurrency.code}
+          currentCurrency={currentCurrency}
           logoSrc={imageUrl}
           logoDimensions={logoDimensions}
           selectedLng={company?.language}
@@ -202,7 +202,7 @@ export const OrderArticle = () => {
         formik={formik}
         userInfo={user?.userAccount}
         logoSrc={imageUrl}
-        currencyCode={currentCurrency.code}
+        currentCurrency={currentCurrency}
         logoDimensions={logoDimensions}
         selectedLng={company?.language}
         translate={translate}

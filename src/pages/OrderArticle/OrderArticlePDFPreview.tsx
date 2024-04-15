@@ -14,6 +14,7 @@ import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
+import {Currency} from 'models/misc';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -81,10 +82,16 @@ const getStyles = (
       justifyContent: 'space-between',
       ...boldFontStyle,
     },
+    addressTextWrapper: {
+      marginBottom: 40,
+    },
     addressText: {
       fontSize: 8,
-      marginBottom: 23,
       ...regularFontStyle,
+      maxWidth: 250,
+      flexWrap: 'wrap',
+      marginBottom: 2,
+      color: '#212121',
     },
     partialAddressText: {
       fontSize: 10,
@@ -129,7 +136,7 @@ const getStyles = (
     contentHeader: {
       fontSize: 14,
       color: '#212121',
-      marginTop: 110,
+      marginTop: 150,
       marginBottom: 10,
       ...boldFontStyle,
     },
@@ -208,7 +215,7 @@ type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   logoSrc?: string;
-  currencyCode?: string;
+  currentCurrency?: Currency;
   logoDimensions?: {
     width: number;
     height: number;
@@ -222,7 +229,7 @@ const OrderArticlePDFPreview = React.memo(
     formik,
     userInfo,
     logoSrc,
-    currencyCode,
+    currentCurrency,
     logoDimensions,
     selectedLng,
     translate,
@@ -257,13 +264,18 @@ const OrderArticlePDFPreview = React.memo(
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
-                {(userInfo?.serviceCompany?.businessAddress?.fullName ||
-                  userInfo?.serviceCompany?.name) && (
-                  <Text style={styles.addressText}>
-                    {userInfo?.serviceCompany?.name},{' '}
-                    {userInfo?.serviceCompany?.businessAddress?.fullName}
-                  </Text>
-                )}
+                <View style={styles.addressTextWrapper}>
+                  {userInfo?.serviceCompany?.name && (
+                    <Text style={styles.addressText}>
+                      {userInfo?.serviceCompany?.name}
+                    </Text>
+                  )}
+                  {userInfo?.serviceCompany?.businessAddress?.fullName && (
+                    <Text style={styles.addressText}>
+                      {userInfo?.serviceCompany?.businessAddress?.fullName}
+                    </Text>
+                  )}
+                </View>
 
                 <View style={styles.partAddress}>
                   {supplier?.name && (
@@ -336,9 +348,12 @@ const OrderArticlePDFPreview = React.memo(
               <Text style={styles.contentHeader}>
                 {translate('Article Order for')} {formik?.values?.externalId}
               </Text>
-              <Text style={styles.contentBody}>
-                {formik?.values?.description}
-              </Text>
+
+              <View>
+                <Text style={styles.contentBody} wrap={false}>
+                  {formik?.values?.description.split('')}
+                </Text>
+              </View>
 
               <View style={styles.table}>
                 <View style={styles.tableHead}>
@@ -391,7 +406,7 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {translate('PRICE')}
+                      {translate('PRICE')}({currentCurrency?.symbol})
                     </Text>
                     <Text
                       style={{
@@ -401,7 +416,7 @@ const OrderArticlePDFPreview = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {translate('TOTAL')}
+                      {translate('TOTAL')}({currentCurrency?.symbol})
                     </Text>
                   </View>
                 </View>
@@ -465,7 +480,9 @@ const OrderArticlePDFPreview = React.memo(
                                 articleOrderItem.unitSellingAmount
                                   .fractionDigits ?? 0),
                             {
-                              currency: currencyCode,
+                              currency: currentCurrency?.code,
+                              excludeCurrencySymbol: true,
+                              currencySymbol: currentCurrency?.symbol,
                             },
                           )}
                         </Text>
@@ -483,7 +500,9 @@ const OrderArticlePDFPreview = React.memo(
                                 articleOrderItem.unitSellingAmount
                                   .fractionDigits ?? 0,
                             {
-                              currency: currencyCode,
+                              currency: currentCurrency?.code,
+                              excludeCurrencySymbol: true,
+                              currencySymbol: currentCurrency?.symbol,
                             },
                           )}
                         </Text>
@@ -507,15 +526,22 @@ const OrderArticlePDFPreview = React.memo(
                         fontSize: 10,
                         textAlign: 'right',
                       }}>
-                      {translate('Subtotal (excl. VAT)')}
+                      {translate('Subtotal excl. VAT')}
                     </Text>
                     <Text
                       style={{
                         width: '24%',
                         textAlign: 'right',
-                        fontSize: 1,
+                        fontSize: 10,
                       }}>
-                      {formatCurrency(calculateTotal(formik.values.items ?? 0))}
+                      {formatCurrency(
+                        calculateTotal(formik.values.items ?? 0),
+                        {
+                          currency: currentCurrency?.code,
+                          excludeCurrencySymbol: true,
+                          currencySymbol: currentCurrency?.symbol,
+                        },
+                      )}
                     </Text>
                   </View>
 
@@ -539,7 +565,9 @@ const OrderArticlePDFPreview = React.memo(
                             fontSize: 10,
                           }}>
                           {formatCurrency(totalVATMap.get(vatPercentage) ?? 0, {
-                            currency: currencyCode,
+                            currency: currentCurrency?.code,
+                            excludeCurrencySymbol: true,
+                            currencySymbol: currentCurrency?.symbol,
                           })}
                         </Text>
                       </View>
@@ -556,7 +584,7 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'right',
                         ...boldFontStyle,
                       }}>
-                      {translate('Total (incl. VAT)')}
+                      {translate('Total incl. VAT')}({currentCurrency?.symbol})
                     </Text>
                     <Text
                       style={{
@@ -573,7 +601,9 @@ const OrderArticlePDFPreview = React.memo(
                             0,
                           ),
                         {
-                          currency: currencyCode,
+                          currency: currentCurrency?.code,
+                          excludeCurrencySymbol: true,
+                          currencySymbol: currentCurrency?.symbol,
                         },
                       )}
                     </Text>

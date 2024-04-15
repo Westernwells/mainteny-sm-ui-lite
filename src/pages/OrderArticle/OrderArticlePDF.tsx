@@ -13,6 +13,7 @@ import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
+import {Currency} from 'models/misc';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -83,10 +84,16 @@ const getStyles = (
       justifyContent: 'space-between',
       ...boldFontStyle,
     },
+    addressTextWrapper: {
+      marginBottom: 40,
+    },
     addressText: {
       fontSize: 8,
-      marginBottom: 23,
       ...regularFontStyle,
+      maxWidth: 200,
+      flexWrap: 'wrap',
+      marginBottom: 2,
+      color: '#212121',
     },
     partialAddressText: {
       fontSize: 10,
@@ -131,7 +138,7 @@ const getStyles = (
     contentHeader: {
       fontSize: 14,
       color: '#212121',
-      marginTop: 110,
+      marginTop: 150,
       marginBottom: 10,
       ...boldFontStyle,
     },
@@ -205,7 +212,7 @@ type Props = {
   articleOrder?: ArticleOrderView | undefined;
   userInfo?: UserAccount | undefined;
   logoSrc?: string;
-  currencyCode?: string;
+  currentCurrency?: Currency;
   logoDimensions?: {
     width: number;
     height: number;
@@ -218,7 +225,7 @@ const OrderArticlePDF = React.memo(
     articleOrder,
     userInfo,
     logoSrc,
-    currencyCode,
+    currentCurrency,
     logoDimensions,
     selectedLng,
     translate,
@@ -255,13 +262,19 @@ const OrderArticlePDF = React.memo(
 
             <View style={styles.topSection}>
               <View style={styles.leftAddress}>
-                {(userInfo?.serviceCompany?.businessAddress?.fullName ||
-                  userInfo?.serviceCompany?.name) && (
-                  <Text style={styles.addressText}>
-                    {userInfo?.serviceCompany?.name},{' '}
-                    {userInfo?.serviceCompany?.businessAddress?.fullName}
-                  </Text>
-                )}
+                <View style={styles.addressTextWrapper}>
+                  {' '}
+                  {userInfo?.serviceCompany?.name && (
+                    <Text style={styles.addressText}>
+                      {userInfo?.serviceCompany?.name}
+                    </Text>
+                  )}
+                  {userInfo?.serviceCompany?.businessAddress?.fullName && (
+                    <Text style={styles.addressText}>
+                      {userInfo?.serviceCompany?.businessAddress?.fullName}
+                    </Text>
+                  )}
+                </View>
 
                 <View style={styles.partAddress}>
                   {articleOrder?.articleSupplier?.name && (
@@ -347,7 +360,7 @@ const OrderArticlePDF = React.memo(
                 {translate('Article Order for')} {articleOrder?.externalId}
               </Text>
               <Text style={styles.contentBody}>
-                {articleOrder?.description}
+                {articleOrder?.description.split('')}
               </Text>
 
               <View style={styles.table}>
@@ -401,7 +414,7 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {translate('PRICE')}
+                      {translate('PRICE')}({currentCurrency?.symbol})
                     </Text>
                     <Text
                       style={{
@@ -411,7 +424,7 @@ const OrderArticlePDF = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {translate('TOTAL')}
+                      {translate('TOTAL')}({currentCurrency?.symbol})
                     </Text>
                   </View>
                 </View>
@@ -475,7 +488,9 @@ const OrderArticlePDF = React.memo(
                                 articleOrderItem.article.unitSellingAmount
                                   .fractionDigits ?? 0,
                             {
-                              currency: currencyCode,
+                              currency: currentCurrency?.code,
+                              excludeCurrencySymbol: true,
+                              currencySymbol: currentCurrency?.symbol,
                             },
                           )}
                         </Text>
@@ -493,7 +508,9 @@ const OrderArticlePDF = React.memo(
                                 articleOrderItem.article.unitSellingAmount
                                   .fractionDigits ?? 0,
                             {
-                              currency: currencyCode,
+                              currency: currentCurrency?.code,
+                              excludeCurrencySymbol: true,
+                              currencySymbol: currentCurrency?.symbol,
                             },
                           )}
                         </Text>
@@ -517,16 +534,21 @@ const OrderArticlePDF = React.memo(
                         fontSize: 10,
                         textAlign: 'right',
                       }}>
-                      {translate('Subtotal (excl. VAT)')}
+                      {translate('Subtotal excl. VAT')}
                     </Text>
                     <Text
                       style={{
                         width: '24%',
                         textAlign: 'right',
-                        fontSize: 1,
+                        fontSize: 10,
                       }}>
                       {formatCurrency(
-                        calculateTotal(articleItems, currencyCode),
+                        calculateTotal(articleItems, currentCurrency?.code),
+                        {
+                          currency: currentCurrency?.code,
+                          excludeCurrencySymbol: true,
+                          currencySymbol: currentCurrency?.symbol,
+                        },
                       )}
                     </Text>
                   </View>
@@ -551,7 +573,9 @@ const OrderArticlePDF = React.memo(
                             fontSize: 10,
                           }}>
                           {formatCurrency(totalVATMap.get(vatPercentage) ?? 0, {
-                            currency: currencyCode,
+                            currency: currentCurrency?.code,
+                            excludeCurrencySymbol: true,
+                            currencySymbol: currentCurrency?.symbol,
                           })}
                         </Text>
                       </View>
@@ -568,7 +592,7 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'right',
                         fontSize: 10,
                       }}>
-                      {translate('Total (incl. VAT)')}
+                      {translate('Total incl. VAT')}({currentCurrency?.symbol})
                     </Text>
                     <Text
                       style={{
@@ -576,7 +600,7 @@ const OrderArticlePDF = React.memo(
                         textAlign: 'right',
                         color: '#212121',
                         ...boldFontStyle,
-                        fontSize: 1,
+                        fontSize: 10,
                       }}>
                       {formatCurrency(
                         calculateTotal(articleItems) +
@@ -585,7 +609,9 @@ const OrderArticlePDF = React.memo(
                             0,
                           ),
                         {
-                          currency: currencyCode,
+                          currency: currentCurrency?.code,
+                          excludeCurrencySymbol: true,
+                          currencySymbol: currentCurrency?.symbol,
                         },
                       )}
                     </Text>

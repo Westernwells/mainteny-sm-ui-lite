@@ -108,7 +108,7 @@ export const ServiceOrderDetails = () => {
     const blob = await pdf(
       <JobOverviewPdfTemplate
         userInfo={user?.userAccount}
-        currencyCode={currentCurrency.code}
+        currentCurrency={currentCurrency}
         logoSrc={imageUrl}
         serviceOrder={serviceOrder}
         logoDimensions={logoDimensions}

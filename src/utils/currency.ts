@@ -14,6 +14,8 @@ export const formatCurrency = (
   amount: number,
   options?: Intl.NumberFormatOptions & {
     roundingMode?: 'floor' | 'ceil' | 'trunc' | undefined;
+    excludeCurrencySymbol?: boolean;
+    currencySymbol?: string;
   },
 ) => {
   const selectedLang = i18n.resolvedLanguage;
@@ -27,6 +29,11 @@ export const formatCurrency = (
       currency: options?.currency ?? 'EUR',
     },
   );
+
+  if (options?.excludeCurrencySymbol) {
+    return formattedAmount.replace(options?.currencySymbol!, '').trim();
+  }
+
   return formattedAmount.replace(/\s/g, '');
 };
 
