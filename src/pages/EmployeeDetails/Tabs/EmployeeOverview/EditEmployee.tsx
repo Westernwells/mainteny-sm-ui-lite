@@ -66,15 +66,13 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
       employee.userData.additionalInfo
         ? employee.userData.additionalInfo.assignedServiceOrderTypes || []
         : [],
-    shifts:
-      employee.userAccount.roles.includes(Role.TECHNICIAN) &&
-      employee.userData.workingHours
-        ? employee.userData.workingHours.map((item) => ({
-            fromTime: item.fromTime,
-            toTime: item.toTime,
-            type: item.type,
-          }))
-        : [],
+    shifts: employee.userData.workingHours
+      ? employee.userData.workingHours.map((item) => ({
+          fromTime: item.fromTime,
+          toTime: item.toTime,
+          type: item.type,
+        }))
+      : [],
     serviceCompanyId: user?.userAccount.serviceCompany.id,
     employeeId: employee.userData.externalId,
     team: employee.userData.team,

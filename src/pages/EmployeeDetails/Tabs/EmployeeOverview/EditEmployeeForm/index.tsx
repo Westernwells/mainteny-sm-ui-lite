@@ -87,7 +87,9 @@ export const EditEmployeeForm = ({
       title="Edit Basic Information"
       onCancel={handleClose}
       onSave={handleSubmit}
-      disableSaveBtn={!!Object.keys(errors).length || !dirty}
+      disableSaveBtn={
+        !!Object.keys(errors).length || !dirty || !formikValues?.shifts?.length
+      }
       dialogProps={{
         maxWidth: 'md',
         open: openDialog || false,

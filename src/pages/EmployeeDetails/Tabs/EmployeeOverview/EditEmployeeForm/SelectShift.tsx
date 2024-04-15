@@ -100,6 +100,7 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
             containerStyles={{mr: '1em'}}
             maxTime={shift.toTime ?? undefined}
             getSelectedTime={(newValue) => {
+              if (!newValue) return;
               const oldShifts = shifts.filter((item) => item !== shift);
               const newShift = shift;
               newShift.fromTime = newValue;
@@ -117,6 +118,7 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
             defaultTime={shift.toTime}
             containerStyles={{mr: '1em'}}
             getSelectedTime={(newValue) => {
+              if (!newValue) return;
               const oldShifts = shifts.filter((item) => item !== shift);
               const newShift = shift;
               newShift.toTime = newValue;
