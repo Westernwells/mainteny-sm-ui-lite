@@ -17,6 +17,7 @@ import {
   serviceOrderTypeColor,
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
+import {useTranslation} from 'react-i18next';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
 
@@ -38,6 +39,7 @@ export const ServiceOrders = () => {
     parserOptions: {parseNumbers: true},
   });
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const track = (cb: () => void) => {
     cb();
@@ -108,7 +110,9 @@ export const ServiceOrders = () => {
       ),
     },
     {
-      label: serviceOrderTypeToString(ServiceOrderType.GENERAL),
+      label: t(serviceOrderTypeToString(ServiceOrderType.GENERAL), {
+        context: 'other',
+      }),
       action: () => track(() => navigate('/orders/new?type=general')),
       icon: (
         <HandymanIcon

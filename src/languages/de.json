@@ -1491,7 +1491,7 @@
   "MODERNIZATION": "MODERNISIERUNG",
   "GENERAL": "SONSTIGER",
   "Modernization": "Modernisierung",
-  "General": "Sonstiger",
+  "General": "Allgemein",
   "New Modernization Job": "Neuer Modernisierungsauftrag",
   "New General Job": "Neuer Sonstiger Auftrag",
   "Select a date, time & technician": "Wähle: Datum, Uhrzeit und Techniker",
@@ -2375,5 +2375,6 @@
   "Freight Lift": "Lastenaufzug",
   "Passenger Lift": "Personenaufzug",
   "Goods Lift": "Güteraufzug",
-  "Stair Lift": "Treppenlift"
+  "Stair Lift": "Treppenlift",
+  "General_other": "Sonstiger"
 }
