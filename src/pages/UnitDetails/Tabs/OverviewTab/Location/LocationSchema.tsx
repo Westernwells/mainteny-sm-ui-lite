@@ -31,7 +31,7 @@ export const LocationSchema = ({label, elevator}: Props) => {
   const currentCurrency = useCurrentCurrency();
 
   const customer =
-    elevator.propertyOwner.meta.state === 'ACTIVE'
+    elevator.propertyOwner.meta?.state === 'ACTIVE'
       ? elevator.propertyOwner
       : null;
 

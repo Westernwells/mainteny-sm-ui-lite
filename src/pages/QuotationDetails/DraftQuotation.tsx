@@ -455,7 +455,7 @@ export const DraftQuotation = ({
     if (elevator) {
       const quotationCustomer = elevator?.propertyOwner;
       setUnit(elevator);
-      setCustomer(quotationCustomer);
+      setCustomer(quotationCustomer!);
 
       formik.setFieldValue('billingAddress', quotationCustomer?.billingAddress);
 
@@ -501,7 +501,7 @@ export const DraftQuotation = ({
   useEffect(() => {
     if (quotation) {
       const quotationCustomer = quotation.propertyOwner;
-      setCustomer(quotationCustomer);
+      setCustomer(quotationCustomer!);
 
       formik.setFieldValue(
         'billingAddress',

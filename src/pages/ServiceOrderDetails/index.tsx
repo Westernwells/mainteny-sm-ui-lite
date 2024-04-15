@@ -80,13 +80,13 @@ export const ServiceOrderDetails = () => {
     refetchOnWindowFocus: false,
   });
 
-  const {mutateAsync: postServiceOrderConfirmationPublish} =
-    usePostServiceOrderConfirmationPublish();
-
   const {downloadFile} = useDownloadFileWithCustomName(
     serviceOrder?.number,
     filePathToDownload,
   );
+
+  const {mutateAsync: postServiceOrderConfirmationPublish} =
+    usePostServiceOrderConfirmationPublish();
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {

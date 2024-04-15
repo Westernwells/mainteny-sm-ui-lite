@@ -26,7 +26,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
   );
 
   const customer =
-    initialCustomer?.meta.state === 'ACTIVE' ? initialCustomer : null;
+    initialCustomer?.meta?.state === 'ACTIVE' ? initialCustomer : null;
 
   return (
     <Grid container component="form" rowSpacing={3} columnSpacing={2}>

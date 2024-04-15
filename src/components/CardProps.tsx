@@ -89,7 +89,7 @@ export const CardProps = ({
             display: 'flex',
             flexWrap: 'nowrap',
             alignItems: 'baseline',
-            fontWeight: '400',
+            fontWeight: '600',
           }}>
           {navigateTo ? (
             <Link
@@ -98,7 +98,7 @@ export const CardProps = ({
               to={`${navigateTo}`}
               underline="hover"
               variant="body2"
-              style={{paddingTop: '0.2em', display: 'flex', fontWeight: '400'}}
+              style={{paddingTop: '0.2em', display: 'flex', fontWeight: '600'}}
               color={theme.palette.info.main}>
               {typeof bodyText === 'string' ? (
                 <Typography

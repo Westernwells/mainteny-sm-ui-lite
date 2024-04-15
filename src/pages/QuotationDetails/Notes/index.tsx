@@ -32,10 +32,10 @@ export const Notes = ({quotation}: Props) => {
     quotation.id,
   );
   const totalCustomerNotes =
-    quotation?.propertyOwner.id || quotation?.elevator?.propertyOwner.id
+    quotation?.propertyOwner?.id || quotation?.elevator?.propertyOwner.id
       ? useTotalNotesData(
           useInfiniteCustomerNotes,
-          quotation?.propertyOwner.id || quotation.elevator.propertyOwner.id,
+          quotation?.propertyOwner?.id || quotation.elevator.propertyOwner.id,
         )
       : null;
 
@@ -179,7 +179,7 @@ export const Notes = ({quotation}: Props) => {
           <TabsBody value={tabValue} index={TabIndex.Customer}>
             <CustomerNotes
               propertyOwnerId={
-                quotation?.propertyOwner.id ||
+                quotation?.propertyOwner?.id ||
                 quotation?.elevator?.propertyOwner.id
               }
             />

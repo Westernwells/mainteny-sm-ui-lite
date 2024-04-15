@@ -144,7 +144,7 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
       elevator?.contracts
         .filter(
           (item) =>
-            item.meta.state === State.ACTIVE &&
+            item.meta?.state === State.ACTIVE &&
             (item.status === ContractStatus.VALID ||
               item.status === ContractStatus.EXPIRING),
         )
