@@ -406,7 +406,7 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {translate('PRICE')}({currentCurrency?.symbol})
+                      {`${translate('PRICE')} (${currentCurrency?.symbol})`}
                     </Text>
                     <Text
                       style={{
@@ -415,8 +415,7 @@ const OrderArticlePDFPreview = React.memo(
                         marginRight: 4,
                         ...styles.tableHeading,
                       }}>
-                      {' '}
-                      {translate('TOTAL')}({currentCurrency?.symbol})
+                      {`${translate('TOTAL')} (${currentCurrency?.symbol})`}
                     </Text>
                   </View>
                 </View>
@@ -584,7 +583,9 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'right',
                         ...boldFontStyle,
                       }}>
-                      {translate('Total incl. VAT')}({currentCurrency?.symbol})
+                      {`${translate('Total incl. VAT')} (${
+                        currentCurrency?.symbol
+                      })`}
                     </Text>
                     <Text
                       style={{
