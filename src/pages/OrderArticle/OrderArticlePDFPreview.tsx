@@ -15,6 +15,7 @@ import {formatDate} from 'utils/datetime';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import {Currency} from 'models/misc';
+import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -74,33 +75,6 @@ const getStyles = (
       alignItems: 'flex-start',
       position: 'absolute',
       top: 90,
-    },
-    leftAddress: {
-      flex: '0 0 55%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      ...boldFontStyle,
-    },
-    addressTextWrapper: {
-      marginBottom: 40,
-    },
-    addressText: {
-      fontSize: 8,
-      ...regularFontStyle,
-      maxWidth: 250,
-      flexWrap: 'wrap',
-      marginBottom: 2,
-      color: '#212121',
-    },
-    partialAddressText: {
-      fontSize: 10,
-      marginBottom: 1,
-      ...boldFontStyle,
-    },
-    partAddress: {
-      fontSize: 10,
-      marginBottom: 4,
     },
     rightAddress: {
       minWidth: 200,
@@ -263,49 +237,15 @@ const OrderArticlePDFPreview = React.memo(
             />
 
             <View style={styles.topSection}>
-              <View style={styles.leftAddress}>
-                <View style={styles.addressTextWrapper}>
-                  {userInfo?.serviceCompany?.name && (
-                    <Text style={styles.addressText}>
-                      {userInfo?.serviceCompany?.name}
-                    </Text>
-                  )}
-                  {userInfo?.serviceCompany?.businessAddress?.fullName && (
-                    <Text style={styles.addressText}>
-                      {userInfo?.serviceCompany?.businessAddress?.fullName}
-                    </Text>
-                  )}
-                </View>
-
-                <View style={styles.partAddress}>
-                  {supplier?.name && (
-                    <Text style={styles.partialAddressText}>
-                      {supplier?.name}
-                    </Text>
-                  )}
-
-                  {supplier?.address?.component?.street && (
-                    <Text style={styles.partialAddressText}>
-                      {supplier?.address?.component?.street}
-                    </Text>
-                  )}
-
-                  {supplier?.address?.component?.street2 && (
-                    <Text style={styles.partialAddressText}>
-                      {supplier?.address?.component?.street2}
-                    </Text>
-                  )}
-
-                  <Text style={styles.partialAddressText}>
-                    {supplier?.address?.component?.postalCode &&
-                      `${supplier?.address?.component?.postalCode}`}
-                    {supplier?.address?.component?.state &&
-                      ` ${supplier?.address?.component?.state},`}
-                    {supplier?.address?.component?.country &&
-                      ` ${supplier?.address?.component?.country}`}
-                  </Text>
-                </View>
-              </View>
+              <PdfTemplateLeftAddress
+                companyName={userInfo?.serviceCompany?.name}
+                businessAddressName={
+                  userInfo?.serviceCompany?.businessAddress?.fullName
+                }
+                receiverName={supplier?.name}
+                addressComponent={supplier?.address?.component}
+                selectedLng={selectedLng}
+              />
 
               <View style={styles.rightAddress}>
                 {formik?.values.externalId && (

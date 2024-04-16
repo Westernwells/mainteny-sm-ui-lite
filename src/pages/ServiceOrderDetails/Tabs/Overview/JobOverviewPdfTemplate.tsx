@@ -16,6 +16,7 @@ import {QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
+import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -74,32 +75,6 @@ const getStyles = (
       position: 'absolute',
       top: 90,
     },
-    leftAddress: {
-      flex: '0 0 55%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      ...boldFontStyle,
-    },
-    addressTextWrapper: {
-      marginBottom: 40,
-    },
-    addressText: {
-      fontSize: 8,
-      ...regularFontStyle,
-      maxWidth: 250,
-      flexWrap: 'wrap',
-      marginBottom: 2,
-      color: '#212121',
-    },
-    partialAddressText: {
-      fontSize: 10,
-      marginBottom: 1,
-    },
-    partAddress: {
-      fontSize: 10,
-      marginBottom: 4,
-    },
     rightAddress: {
       flex: '0 0 45%',
       display: 'flex',
@@ -141,34 +116,6 @@ const getStyles = (
       marginBottom: 10,
       lineHeight: 1.3,
       maxWidth: '100%',
-    },
-    numberColumn: {
-      width: '7%',
-      textAlign: 'left',
-    },
-    articleColumn: {
-      width: '25%',
-      textAlign: 'left',
-    },
-    supplierColumn: {
-      width: '20%',
-      textAlign: 'left',
-    },
-    quantityColumn: {
-      width: '8%',
-      textAlign: 'right',
-    },
-    unitColumn: {
-      width: '5%',
-      textAlign: 'center',
-    },
-    priceColumn: {
-      width: '20%',
-      textAlign: 'right',
-    },
-    totalColumn: {
-      width: '15%',
-      textAlign: 'right',
     },
     notesSection: {
       paddingBottom: 6,
@@ -311,60 +258,17 @@ const JobOverviewPdfTemplate = React.memo(
             />
 
             <View style={styles.topSection}>
-              <View style={styles.leftAddress}>
-                <View style={styles.addressTextWrapper}>
-                  {userInfo?.serviceCompany?.name && (
-                    <Text style={styles.addressText}>
-                      {userInfo?.serviceCompany?.name}
-                    </Text>
-                  )}
-                  {userInfo?.serviceCompany?.businessAddress?.fullName && (
-                    <Text style={styles.addressText}>
-                      {userInfo?.serviceCompany?.businessAddress?.fullName}
-                    </Text>
-                  )}
-                </View>
-
-                <View style={styles.partAddress}>
-                  {serviceOrder?.elevator.propertyOwner.name && (
-                    <Text style={styles.partialAddressText}>
-                      {serviceOrder?.elevator.propertyOwner.name}
-                    </Text>
-                  )}
-
-                  {serviceOrder?.elevator.propertyOwner.billingAddress
-                    ?.component?.street && (
-                    <Text style={styles.partialAddressText}>
-                      {
-                        serviceOrder?.elevator.propertyOwner.billingAddress
-                          ?.component?.street
-                      }
-                    </Text>
-                  )}
-
-                  {serviceOrder?.elevator.propertyOwner.billingAddress
-                    ?.component?.street2 && (
-                    <Text style={styles.partialAddressText}>
-                      {
-                        serviceOrder?.elevator.propertyOwner.billingAddress
-                          ?.component?.street2
-                      }
-                    </Text>
-                  )}
-
-                  <Text style={styles.partialAddressText}>
-                    {serviceOrder?.elevator.propertyOwner.billingAddress
-                      ?.component?.postalCode &&
-                      `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.postalCode} `}
-                    {serviceOrder?.elevator.propertyOwner.billingAddress
-                      ?.component?.state &&
-                      ` ${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.state}, `}
-                    {serviceOrder?.elevator.propertyOwner.billingAddress
-                      ?.component?.country &&
-                      `${serviceOrder?.elevator.propertyOwner.billingAddress?.component?.country}`}
-                  </Text>
-                </View>
-              </View>
+              <PdfTemplateLeftAddress
+                companyName={userInfo?.serviceCompany?.name}
+                businessAddressName={
+                  userInfo?.serviceCompany?.businessAddress?.fullName
+                }
+                receiverName={serviceOrder?.elevator?.propertyOwner?.name}
+                addressComponent={
+                  serviceOrder?.elevator.propertyOwner.billingAddress?.component
+                }
+                selectedLng={selectedLng}
+              />
 
               <View style={styles.rightAddress}>
                 {serviceOrder?.externalId && (

@@ -14,6 +14,7 @@ import {formatDate} from 'utils/datetime';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
+import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -76,33 +77,6 @@ const getStyles = (
       alignItems: 'flex-start',
       position: 'absolute',
       top: 90,
-    },
-    leftAddress: {
-      flex: '0 0 55%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      ...boldFontStyle,
-    },
-    addressTextWrapper: {
-      marginBottom: 40,
-    },
-    addressText: {
-      fontSize: 8,
-      ...regularFontStyle,
-      maxWidth: 200,
-      flexWrap: 'wrap',
-      marginBottom: 2,
-      color: '#212121',
-    },
-    partialAddressText: {
-      fontSize: 10,
-      marginBottom: 1,
-      ...boldFontStyle,
-    },
-    partAddress: {
-      fontSize: 10,
-      marginBottom: 4,
     },
     rightAddress: {
       minWidth: 200,
@@ -261,60 +235,17 @@ const OrderArticlePDF = React.memo(
             />
 
             <View style={styles.topSection}>
-              <View style={styles.leftAddress}>
-                <View style={styles.addressTextWrapper}>
-                  {' '}
-                  {userInfo?.serviceCompany?.name && (
-                    <Text style={styles.addressText}>
-                      {userInfo?.serviceCompany?.name}
-                    </Text>
-                  )}
-                  {userInfo?.serviceCompany?.businessAddress?.fullName && (
-                    <Text style={styles.addressText}>
-                      {userInfo?.serviceCompany?.businessAddress?.fullName}
-                    </Text>
-                  )}
-                </View>
-
-                <View style={styles.partAddress}>
-                  {articleOrder?.articleSupplier?.name && (
-                    <Text style={styles.partialAddressText}>
-                      {articleOrder?.articleSupplier?.name}
-                    </Text>
-                  )}
-
-                  {articleOrder?.articleSupplier?.address?.component
-                    ?.street && (
-                    <Text style={styles.partialAddressText}>
-                      {
-                        articleOrder?.articleSupplier?.address?.component
-                          ?.street
-                      }
-                    </Text>
-                  )}
-
-                  {articleOrder?.articleSupplier?.address?.component
-                    ?.street2 && (
-                    <Text style={styles.partialAddressText}>
-                      {
-                        articleOrder?.articleSupplier?.address?.component
-                          ?.street2
-                      }
-                    </Text>
-                  )}
-
-                  <Text style={styles.partialAddressText}>
-                    {articleOrder?.articleSupplier?.address?.component
-                      ?.postalCode &&
-                      `${articleOrder?.articleSupplier?.address?.component?.postalCode}`}
-                    {articleOrder?.articleSupplier?.address?.component?.state &&
-                      ` ${articleOrder?.articleSupplier?.address?.component?.state},`}
-                    {articleOrder?.articleSupplier?.address?.component
-                      ?.country &&
-                      ` ${articleOrder?.articleSupplier?.address?.component?.country}`}
-                  </Text>
-                </View>
-              </View>
+              <PdfTemplateLeftAddress
+                companyName={userInfo?.serviceCompany?.name}
+                businessAddressName={
+                  userInfo?.serviceCompany?.businessAddress?.fullName
+                }
+                receiverName={articleOrder?.articleSupplier?.name}
+                addressComponent={
+                  articleOrder?.articleSupplier?.address?.component
+                }
+                selectedLng={selectedLng}
+              />
 
               <View style={styles.rightAddress}>
                 {articleOrder?.externalId && (
