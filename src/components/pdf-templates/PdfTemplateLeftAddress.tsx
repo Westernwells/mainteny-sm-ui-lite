@@ -3,7 +3,7 @@ import {Text, View, StyleSheet} from '@react-pdf/renderer';
 
 type Props = {
   companyName?: string;
-  businessAddressName?: string | null;
+  billingAddressName?: string | null;
   receiverName?: string;
   addressComponent?: AddressComponent | null;
   selectedLng?: string;
@@ -24,12 +24,12 @@ const getStyles = (
       marginBottom: 13,
     },
     addressText: {
-      fontSize: 8,
+      fontSize: 7,
       ...regularFontStyle,
-      maxWidth: 200,
       flexWrap: 'wrap',
       marginBottom: 2,
       color: '#212121',
+      maxWidth: 250,
     },
     partialAddressText: {
       fontSize: 10,
@@ -44,7 +44,7 @@ const getStyles = (
 
 const PdfTemplateLeftAddress = ({
   companyName,
-  businessAddressName,
+  billingAddressName,
   receiverName,
   addressComponent,
   selectedLng,
@@ -60,13 +60,21 @@ const PdfTemplateLeftAddress = ({
 
   const styles = getStyles(boldFontStyle, regularFontStyle);
 
+  const combinedText = companyName
+    ? `${companyName}, ${billingAddressName}`
+    : `${billingAddressName}`;
+  const maxLength = 65;
+
   return (
     <View style={styles.leftAddress}>
       <View style={styles.addressTextWrapper}>
-        {' '}
-        {companyName && <Text style={styles.addressText}>{companyName}</Text>}
-        {businessAddressName && (
-          <Text style={styles.addressText}>{businessAddressName}</Text>
+        {combinedText.length <= maxLength ? (
+          <Text style={styles.addressText}>{combinedText}</Text>
+        ) : (
+          <>
+            <Text style={styles.addressText}>{companyName}</Text>
+            <Text style={styles.addressText}>{billingAddressName}</Text>
+          </>
         )}
       </View>
 

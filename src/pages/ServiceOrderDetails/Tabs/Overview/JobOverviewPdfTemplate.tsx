@@ -152,7 +152,7 @@ const getStyles = (
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#8f9bb3',
+      color: '#616161',
       display: 'flex',
       fontWeight: 'extrabold',
       fontSize: 6,
@@ -260,8 +260,8 @@ const JobOverviewPdfTemplate = React.memo(
             <View style={styles.topSection}>
               <PdfTemplateLeftAddress
                 companyName={userInfo?.serviceCompany?.name}
-                businessAddressName={
-                  userInfo?.serviceCompany?.businessAddress?.fullName
+                billingAddressName={
+                  userInfo?.serviceCompany?.billingAddress?.fullName
                 }
                 receiverName={serviceOrder?.elevator?.propertyOwner?.name}
                 addressComponent={
@@ -359,7 +359,7 @@ const JobOverviewPdfTemplate = React.memo(
             <View>
               <Text style={styles.contentHeader}>
                 {translate('Job Confirmation:')}{' '}
-                {serviceOrderTypeToString(serviceOrder?.type!)}
+                {translate(serviceOrderTypeToString(serviceOrder?.type!))}
               </Text>
 
               {serviceOrder?.description.trim() !== '' && (
