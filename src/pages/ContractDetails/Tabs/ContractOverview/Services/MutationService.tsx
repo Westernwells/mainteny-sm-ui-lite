@@ -195,9 +195,11 @@ export const MutationService = ({
             ? null
             : {...elevator.invoiceJob},
         orderGenerationJob:
-          (elevator.orderGenerationJob.timeUnit === ContractTimeUnit.MONTHLY ||
+          ((elevator.orderGenerationJob.timeUnit === ContractTimeUnit.MONTHLY ||
             elevator.orderGenerationJob.timeUnit === ContractTimeUnit.NONE) &&
-          !elevator.orderGenerationJob.timeNumbers.length
+            !elevator.orderGenerationJob.timeNumbers.length) ||
+          !values.isAutomaticJobCycle ||
+          !values.firstOrderDate
             ? null
             : {...elevator.orderGenerationJob},
       }));
