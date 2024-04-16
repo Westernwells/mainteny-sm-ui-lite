@@ -156,7 +156,7 @@ const getStyles = (
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#8f9bb3',
+      color: '#616161',
       display: 'flex',
       fontWeight: 'extrabold',
       fontSize: 6,
@@ -239,8 +239,8 @@ const OrderArticlePDFPreview = React.memo(
             <View style={styles.topSection}>
               <PdfTemplateLeftAddress
                 companyName={userInfo?.serviceCompany?.name}
-                businessAddressName={
-                  userInfo?.serviceCompany?.businessAddress?.fullName
+                billingAddressName={
+                  userInfo?.serviceCompany?.billingAddress?.fullName
                 }
                 receiverName={supplier?.name}
                 addressComponent={supplier?.address?.component}

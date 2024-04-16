@@ -94,6 +94,7 @@ export interface ServiceCompany {
   id: string;
   name: string;
   contact: CompanyContact;
+  billingAddress?: Address;
   postalAddress?: Address;
   businessAddress?: Address;
   language: Language;

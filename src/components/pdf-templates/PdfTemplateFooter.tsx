@@ -117,9 +117,9 @@ const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
               </Text>
             )}
 
-            {userInfo?.serviceCompany?.businessAddress?.fullName && (
+            {userInfo?.serviceCompany?.billingAddress?.fullName && (
               <Text style={styles.footerSectionBody}>
-                {userInfo?.serviceCompany?.businessAddress?.fullName}
+                {userInfo?.serviceCompany?.billingAddress?.fullName}
               </Text>
             )}
 
