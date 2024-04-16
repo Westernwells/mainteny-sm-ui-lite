@@ -1,8 +1,11 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
   ServiceOrderOrderField,
   ServiceOrderPaymentStatus,
+  ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderView,
 } from 'models/service-order';
 import {
@@ -19,6 +22,7 @@ import {olStyles} from 'styles';
 import {Typography} from '@mui/material';
 import {FormatDate} from 'models/misc';
 import {toDate} from 'utils/datetime';
+import {theme} from 'theme';
 
 export const getServiceOrderPaymentStatusStyles = (
   status: string,
@@ -117,12 +121,34 @@ export const columns: GridColDef[] = [
     sortable: true,
     headerName: 'payment status',
     align: 'center',
-    renderCell: (params: GridRenderCellParams<any, any, any>) => {
+    renderCell: (
+      params: GridRenderCellParams<
+        ServiceOrderPaymentStatus | ServiceOrderPaymentWithIndicationStatus
+      >,
+    ) => {
       const {t} = useTranslation();
+      const {value} = params;
+      const showIndicator =
+        value ===
+          ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID ||
+        value ===
+          ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND;
       return (
-        <Box sx={{display: 'flex'}}>
+        <Box sx={{display: 'flex', alignItems: 'center'}}>
+          {showIndicator ? (
+            <Tooltip
+              title={t(
+                `This job contains articles that haven’t been invoiced yet. Check the job details for more information.`,
+              )}
+              placement="top"
+              arrow>
+              <WarningAmberIcon
+                sx={{mr: '0.2em', color: theme.palette.text.secondary}}
+              />
+            </Tooltip>
+          ) : null}
           <Typography variant="body2">
-            {t(serviceOrderPaymentStatusToString(params.value))}
+            {t(serviceOrderPaymentStatusToString(value))}
           </Typography>
         </Box>
       );
