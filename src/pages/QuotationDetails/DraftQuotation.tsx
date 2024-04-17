@@ -1166,7 +1166,9 @@ export const DraftQuotation = ({
       )}
 
       <ContractTermInput
-        title={t('New payment term')}
+        title={
+          paymentTermToEdit ? t('Edit payment term') : t('New payment term')
+        }
         open={openContractPaymentTermSelectDialog}
         onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
         defaultTerm={paymentTermToEdit}
@@ -1174,12 +1176,16 @@ export const DraftQuotation = ({
       />
 
       <ContractTerm
-        title={t('Payment Terms')}
+        title={t('Payment terms')}
         alertText="Add your payment terms that would be used later in quotation"
         open={openContractPaymentTermsDialog}
         onCancel={() => setOpenContractPaymentTermsDialog(false)}
         onSave={handleContractPaymentTermsModal}
-        defaultValue={formik.values.paymentTerms}
+        defaultValue={
+          contractPaymentTerms?.data.find(
+            (c) => c.term === formik.values.paymentTerms,
+          )?.id || ''
+        }
         onClick={() => setOpenContractPaymentTermSelectDialog(true)}
         setEdit={setPaymentTermToEdit}
       />

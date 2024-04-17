@@ -425,11 +425,29 @@ export interface ContractUpdateRequest {
   numberOfUnits?: number;
 }
 
+export enum PaymentTermArticleType {
+  ALL = 'ALL',
+  MATERIAL = 'MATERIAL',
+  LABOR = 'LABOR',
+}
+
+export interface DiscountOption {
+  discountDays?: number;
+  discountPercent?: number;
+  articleType: PaymentTermArticleType;
+}
+
+export interface PaymentTermData {
+  dueDays?: number;
+  discountOptions: DiscountOption[];
+}
+
 export interface ContractTermView {
   id: string;
   serviceCompanyId: string;
   type?: ServiceCompanyType;
   term: string;
+  data?: PaymentTermData;
   additionalInfo: string;
   meta: Meta;
 }
@@ -448,6 +466,23 @@ export interface UpdateContractTermRecord {
 export interface UpdateContractTermView {
   term: string;
   id: string;
+}
+
+export interface PaymentTermRecord {
+  serviceCompanyId: string;
+  term: string;
+  paymentTermData: PaymentTermData;
+}
+
+export interface UpdateContractPaymentTermRecord {
+  term: string;
+  paymentTermData?: PaymentTermData;
+}
+
+export interface UpdateContractPaymentTermView {
+  term: string;
+  id: string;
+  paymentTermData?: PaymentTermData;
 }
 
 export interface ContractElevatorQueryParams {
@@ -839,10 +874,6 @@ export const getSingleItemViewFrequency = (
 
   return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
 };
-
-export interface UpdateContractPaymentTermRecord {
-  term: string;
-}
 
 export interface ContractPaymentTermView {
   id: string;

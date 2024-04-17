@@ -1,12 +1,21 @@
-import {ContractTermView, UpdateContractTermView} from 'models/contract';
+import {
+  ContractTermView,
+  UpdateContractPaymentTermView,
+  UpdateContractTermView,
+} from 'models/contract';
 
 export const compareArrays = (
   existingContractPaymentTerms: ContractTermView[],
-  newContractPaymentTerms: UpdateContractTermView[],
+  newContractPaymentTerms:
+    | UpdateContractTermView[]
+    | UpdateContractPaymentTermView[],
 ) => {
   const itemsInFirstOnly: ContractTermView[] = [];
-  const modifiedItems: UpdateContractTermView[] = [];
-  const newItems: UpdateContractTermView[] = [];
+  const modifiedItems:
+    | UpdateContractTermView[]
+    | UpdateContractPaymentTermView[] = [];
+  const newItems: UpdateContractTermView[] | UpdateContractPaymentTermView[] =
+    [];
 
   existingContractPaymentTerms.forEach((firstItem) => {
     const matchingItem = newContractPaymentTerms.find(
