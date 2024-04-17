@@ -160,7 +160,6 @@ const getStyles = (
     tableHeading: {
       color: '#616161',
       display: 'flex',
-      fontWeight: 'extrabold',
       fontSize: 6,
     },
     tableRow: {
