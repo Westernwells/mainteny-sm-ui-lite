@@ -158,7 +158,6 @@ const getStyles = (
     tableHeading: {
       color: '#616161',
       display: 'flex',
-      fontWeight: 'extrabold',
       fontSize: 6,
     },
     tableRow: {
@@ -226,7 +225,10 @@ const OrderArticlePDFPreview = React.memo(
     };
 
     const styles = getStyles(boldFontStyle, regularFontStyle);
-
+    console.log(
+      userInfo?.serviceCompany?.billingAddress,
+      'userInfo?.serviceCompany?.billingAddress',
+    );
     return (
       <Document>
         <Page size="A4" style={styles.page}>
