@@ -1699,7 +1699,9 @@ export const InvoiceForm = ({
 
       {openContractPaymentTermSelectDialog && (
         <ContractTermInput
-          title={t('New payment term')}
+          title={
+            paymentTermToEdit ? t('Edit payment term') : t('New payment term')
+          }
           open={openContractPaymentTermSelectDialog}
           onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
           defaultTerm={paymentTermToEdit}
@@ -1709,11 +1711,15 @@ export const InvoiceForm = ({
 
       {openContractPaymentTermsDialog && (
         <ContractTerm
-          title={t('Payment Terms')}
+          title={t('Payment terms')}
           open={openContractPaymentTermsDialog}
           onCancel={() => setOpenContractPaymentTermsDialog(false)}
           onSave={handleContractPaymentTermsModal}
-          defaultValue={formik.values.paymentTerms}
+          defaultValue={
+            contractPaymentTerms?.data.find(
+              (c) => c.term === formik.values.paymentTerms,
+            )?.id || ''
+          }
           onClick={() => setOpenContractPaymentTermSelectDialog(true)}
           setEdit={setPaymentTermToEdit}
         />

@@ -9,7 +9,7 @@ import {ContractTermView} from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
 import {phoneNumberDigitsOnly} from 'utils/customer-utils';
-import {ContractTermInput as NewPaymentTerm} from 'components/ContractTermInput';
+import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
 import {Loading} from 'components/Loading';
 import {CustomerEditForm} from '../EditCustomerForm/model';
@@ -85,12 +85,12 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
             illustration="clipboard"
             size="tiny"
             containerStyle={{m: 'auto', width: '60%'}}
-            label={t('No payment terms applied.')}
+            label={t('No payment terms applied')}
           />
         )}
       </InfoCard>
       <ContractTerm
-        title={t('Payment Terms')}
+        title={t('Payment terms')}
         open={showSideDrawer}
         onCancel={() => setShowSideDrawer(false)}
         onSave={handlePaymentTermSubmit}
@@ -98,8 +98,10 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
         onClick={() => setShowNewPaymentTermDrawer(true)}
         setEdit={setPaymentTermToEdit}
       />
-      <NewPaymentTerm
-        title={t('New payment term')}
+      <ContractTermInput
+        title={
+          paymentTermToEdit ? t('Edit payment term') : t('New payment term')
+        }
         open={showNewPaymentTermDrawer}
         onCancel={() => setShowNewPaymentTermDrawer(false)}
         defaultTerm={paymentTermToEdit}
