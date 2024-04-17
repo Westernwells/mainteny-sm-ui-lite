@@ -61,7 +61,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
 
   return (
     <Grid container spacing={1.8} sx={{mt: '0.1em'}}>
-      {!formik.values.autoRenewalCancelled && (
+      {formik.values.autoRenewalCancelled && (
         <Grid item md={12}>
           <Alert severity="error">
             {t('This contract is ending on {{endDate}}', {
@@ -147,9 +147,9 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
       <Grid item md={3}>
         <Box sx={{display: 'flex', alignItems: 'center'}}>
           <Switch
-            value={formik.values.autoRenewalCancelled}
+            value={!formik.values.autoRenewalCancelled}
             onChanged={(value) =>
-              formik.setFieldValue('autoRenewalCancelled', value)
+              formik.setFieldValue('autoRenewalCancelled', !value)
             }
           />
           <Typography flex="0 0 70%" height="1.5em">
@@ -271,7 +271,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
               min: 0,
               max: 12,
             },
-            disabled: !formik.values.autoRenewalCancelled,
+            disabled: formik.values.autoRenewalCancelled,
           }}
         />
       </Grid>
