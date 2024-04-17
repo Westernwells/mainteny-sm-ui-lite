@@ -93,7 +93,15 @@ export const ContractsTab = ({customerId}: Props) => {
           options.push(item.serviceCompany.name);
         }
       });
-      setRows(makeRows(contractResource.data, formatDate));
+
+      setRows(
+        makeRows(
+          contractResource.data,
+          currentCurrency.code ?? 'EUR',
+          currentCurrency.fractionDigits ?? 0,
+          formatDate,
+        ),
+      );
     }
     setContractorFilterItems([...contractorFilterItems, ...options]);
   }, [contractResource, isLoading]);
