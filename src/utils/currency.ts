@@ -16,19 +16,24 @@ export const formatCurrency = (
     roundingMode?: 'floor' | 'ceil' | 'trunc' | undefined;
     excludeCurrencySymbol?: boolean;
     currencySymbol?: string;
+    companyLang?: string;
   },
 ) => {
   const selectedLang = i18n.resolvedLanguage;
-  const formattedAmount = amount.toLocaleString(
-    selectedLang === 'de' || selectedLang === 'sr' ? 'de-DE' : 'en-US',
-    {
-      style: 'currency',
-      currencyDisplay: 'narrowSymbol',
-      useGrouping: true,
-      ...options,
-      currency: options?.currency ?? 'EUR',
-    },
-  );
+  const lang =
+    options?.companyLang === 'de-de' || options?.companyLang === 'sr-sr'
+      ? 'de-DE'
+      : selectedLang === 'de' || selectedLang === 'sr'
+      ? 'de-DE'
+      : 'en-US';
+
+  const formattedAmount = amount.toLocaleString(lang, {
+    style: 'currency',
+    currencyDisplay: 'narrowSymbol',
+    useGrouping: true,
+    ...options,
+    currency: options?.currency ?? 'EUR',
+  });
 
   if (options?.excludeCurrencySymbol) {
     return formattedAmount.replace(options?.currencySymbol!, '').trim();

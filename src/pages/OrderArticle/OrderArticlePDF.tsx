@@ -79,7 +79,7 @@ const getStyles = (
       top: 90,
     },
     rightAddress: {
-      flex: '0 0 40%',
+      flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
     },
@@ -95,12 +95,12 @@ const getStyles = (
       ...boldFontStyle,
       fontSize: 10,
       color: '#212121',
-      width: '46%',
+      width: '52%',
     },
     tagContent: {
       fontSize: 10,
       color: '#616161',
-      width: '52%',
+      width: '46%',
       textAlign: 'right',
       ...regularFontStyle,
     },
@@ -419,6 +419,7 @@ const OrderArticlePDF = React.memo(
                               currency: currentCurrency?.code,
                               excludeCurrencySymbol: true,
                               currencySymbol: currentCurrency?.symbol,
+                              companyLang: selectedLng,
                             },
                           )}
                         </Text>
@@ -439,6 +440,7 @@ const OrderArticlePDF = React.memo(
                               currency: currentCurrency?.code,
                               excludeCurrencySymbol: true,
                               currencySymbol: currentCurrency?.symbol,
+                              companyLang: selectedLng,
                             },
                           )}
                         </Text>
@@ -476,6 +478,7 @@ const OrderArticlePDF = React.memo(
                           currency: currentCurrency?.code,
                           excludeCurrencySymbol: true,
                           currencySymbol: currentCurrency?.symbol,
+                          companyLang: selectedLng,
                         },
                       )}
                     </Text>
@@ -504,6 +507,7 @@ const OrderArticlePDF = React.memo(
                             currency: currentCurrency?.code,
                             excludeCurrencySymbol: true,
                             currencySymbol: currentCurrency?.symbol,
+                            companyLang: selectedLng,
                           })}
                         </Text>
                       </View>
@@ -542,6 +546,7 @@ const OrderArticlePDF = React.memo(
                           currency: currentCurrency?.code,
                           excludeCurrencySymbol: true,
                           currencySymbol: currentCurrency?.symbol,
+                          companyLang: selectedLng,
                         },
                       )}
                     </Text>
