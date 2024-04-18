@@ -1022,7 +1022,7 @@
   "Invoices": "Facturas",
   "No invoices yet. They will appear here once the invoice is added": "No hay facturas todavía. Aparecerán aquí una vez que se agrega la factura",
   "Add Invoice": "Agregar factura",
-  "Quotations": "Citas",
+  "Quotations": "Cotización",
   "No quotations yet. They will appear here once the quotation is added": "No hay citas todavía. Aparecerán aquí una vez que se agrega la cita",
   "Search by number, customer, address etc.": "Buscar por número, cliente, dirección etc.",
   "Please click the button below to add!I": "¡Haga clic en el botón de abajo para agregar!",
@@ -2298,7 +2298,7 @@
   "Cage weight (kg)": "Peso de la jaula (kg)",
   "Cage weight": "Peso de la jaula",
   "Counter weight (kg)": "Contrapeso (kg)",
-  "Counterwight": "contrapeso",
+  "Counterweight": "contrapeso",
   "Hoisting height (m)": "Altura de elevación (m)",
   "Hoisting height": "Altura de elevación",
   "Shaft height (m)": "Altura del eje (m)",
@@ -2339,8 +2339,7 @@
   "Engineer(s)": "Técnico(s)",
   "{{numberOfSelectedEngineers}} Engineer(s) Selected": "{{numberOfSelectedEngineers}} Técnico(s) seleccionados",
   "Baden-Württemberg": "Baden-Wurtemberg",
-  "Bayern": "Bayern",
-  "Bavaria": "Baviera",
+  "Bavaria": "Bayern",
   "Berlin": "Berlin",
   "Brandenburg": "Brandeburgo",
   "Bremen": "Bremen",
@@ -2410,5 +2409,7 @@
   "Passenger Lift": "Ascensor de pasajeros",
   "Goods Lift": "Ascensor de mercancías",
   "Stair Lift": "Salvaescaleras",
-  "Order no.": "Número de pedido"
+  "Order no.": "Número de pedido",
+  "Article Order for": "Orden de artículos para",
+  "Job Confirmation:": "Confirmación de trabajo:"
 }
