@@ -49,6 +49,7 @@ import {
 } from 'hooks/reactQuery/useInvoice';
 import {
   CreateInvoice,
+  DiscountType,
   InvoiceFormData,
   InvoiceItem,
   InvoiceItemRecord,
@@ -173,6 +174,10 @@ const invoiceItemToInvoiceItemRecord = (
     discount: invoiceItem.additionalInfo?.discount
       ? {
           ...invoiceItem.additionalInfo?.discount,
+          type:
+            invoiceItem.additionalInfo?.discount?.type === DiscountType.NONE
+              ? DiscountType.PERCENTAGE
+              : invoiceItem.additionalInfo?.discount?.type,
           amount: invoiceItem.additionalInfo?.discount?.amount
             ? {
                 ...invoiceItem.additionalInfo?.discount?.amount,

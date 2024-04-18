@@ -539,7 +539,9 @@ export const ViewQuotation = ({
             'serviceOrderIds' in quotation.additionalInfo ? (
               <ServiceOrderDetails
                 serviceOrderId={
-                  quotation.additionalInfo.serviceOrderIds[0] as string
+                  quotation.additionalInfo.serviceOrderIds?.length
+                    ? quotation.additionalInfo.serviceOrderIds[0]
+                    : ''
                 }
               />
             ) : (
