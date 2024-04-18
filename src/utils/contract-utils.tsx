@@ -74,12 +74,20 @@ export const rangeConvertorInverse = (
   return range;
 };
 
-export const getStartEndPrice = (price: number[][]) => {
+export const getStartEndPrice = (
+  price: number[][],
+  setDefaultToUndefined?: boolean,
+) => {
   const numbers =
     price.length &&
     price?.reduce<number[]>((acc, item) => [...acc, ...item], []);
 
-  const newPrice = numbers && numbers.length ? numbers : [-9999999, 9999999];
+  const newPrice =
+    numbers && numbers.length
+      ? numbers
+      : setDefaultToUndefined
+      ? [undefined, undefined]
+      : [-9999999, 9999999];
 
   return [
     Math.min(...(newPrice as number[])),

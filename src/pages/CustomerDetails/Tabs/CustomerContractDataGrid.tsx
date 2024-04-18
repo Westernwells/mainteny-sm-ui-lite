@@ -10,7 +10,7 @@ import {FormatDate} from 'models/misc';
 import {ContractView} from 'models/contract';
 import {Actions} from 'pages/Contracts/Actions';
 import {getColumnProps} from 'components/DataGridLayout';
-import {formatNetAmount} from '../../../utils/currency';
+import {formatCurrency} from '../../../utils/currency';
 
 const defaultProps = {
   editable: false,
@@ -108,6 +108,8 @@ export const columns: GridColDef[] = [
 
 export const makeRows = (
   contracts: ContractView[],
+  currencyCode: string,
+  fractionDigits: number,
   formatDate: FormatDate = () => '',
 ): GridRowsProp =>
   contracts.map((item: ContractView, index: number) => ({
@@ -118,7 +120,14 @@ export const makeRows = (
     startDate: formatDate(item.start),
     expiryDate: formatDate(item.end),
     contractType: item.type[0] + item.type.slice(1).toLowerCase(),
-    cost: formatNetAmount(item.additionalInfo.price) || '-',
+    cost:
+      `${formatCurrency(
+        (item.additionalInfo?.totalYearlyPrice ??
+          item.additionalInfo?.price?.netAmount ??
+          0) /
+          10 ** fractionDigits,
+        {currency: item.additionalInfo.price?.currency || currencyCode},
+      )}` || '-',
     status: item.status,
     actions: {
       url:

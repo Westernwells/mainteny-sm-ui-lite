@@ -46,7 +46,10 @@ export const ContractsTab = ({customerId}: Props) => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const textInput = useRef<HTMLInputElement>(null);
 
-  const [priceStart, priceEnd] = useMemo(() => getStartEndPrice(cost), [cost]);
+  const [priceStart, priceEnd] = useMemo(
+    () => getStartEndPrice(cost, true),
+    [cost],
+  );
 
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
@@ -58,10 +61,10 @@ export const ContractsTab = ({customerId}: Props) => {
       query: searchQuery,
       orderBy: ContractOrderField.EXPIRY_TIME,
       order: Order.ASC,
-      pageIndex: page.pageIndex,
+      pageIndex: page.pageIndex || 0,
       pageSize: page.pageSize,
-      priceStart,
-      priceEnd,
+      ...(priceStart && {priceStart}),
+      ...(priceEnd && {priceEnd}),
       ...(status && {
         status,
       }),
@@ -90,7 +93,15 @@ export const ContractsTab = ({customerId}: Props) => {
           options.push(item.serviceCompany.name);
         }
       });
-      setRows(makeRows(contractResource.data, formatDate));
+
+      setRows(
+        makeRows(
+          contractResource.data,
+          currentCurrency.code ?? 'EUR',
+          currentCurrency.fractionDigits ?? 0,
+          formatDate,
+        ),
+      );
     }
     setContractorFilterItems([...contractorFilterItems, ...options]);
   }, [contractResource, isLoading]);
@@ -103,7 +114,14 @@ export const ContractsTab = ({customerId}: Props) => {
     const range = crConverter(selectedItems, currentCurrency.symbol);
     setCost(range);
   };
-
+  useEffect(() => {
+    if (contractResource.total > 0 && contractResource.data.length === 0) {
+      setPage({
+        ...page,
+        pageIndex: 0,
+      });
+    }
+  }, [searchQuery, cost, status, contractResource]);
   const renderFilterItems = () => (
     <FilterFields
       onClear={() => {
@@ -164,6 +182,7 @@ export const ContractsTab = ({customerId}: Props) => {
           loading={isFetching}
           scrollToTop={searchQuery}
           pageSize={page.pageSize}
+          pageIndex={page.pageIndex + 1}
           handlePageSizeChange={(newPageSize: number) =>
             setPage({...page, pageSize: newPageSize})
           }

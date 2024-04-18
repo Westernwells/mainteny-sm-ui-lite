@@ -325,8 +325,8 @@ export interface CustomerContractParams {
   query: string;
   serviceCompanyId: string;
   status?: string[];
-  priceStart: number;
-  priceEnd: number;
+  priceStart?: number;
+  priceEnd?: number;
 }
 
 export interface ElevatorContractParams {
