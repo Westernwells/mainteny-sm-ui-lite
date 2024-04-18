@@ -78,7 +78,13 @@ export const ServiceOrderScheduleTab = () => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: '',
-      status: selectedOrderStatus,
+      status: selectedOrderStatus.length
+        ? selectedOrderStatus
+        : (Object.keys(ServiceOrderStatus).filter(
+            (key) =>
+              key !== ServiceOrderStatus.CANCELLED &&
+              key !== ServiceOrderStatus.ALL,
+          ) as ServiceOrderStatus[]),
       types: selectedOrderTypes,
     },
     {keepPreviousData: true},
