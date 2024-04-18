@@ -1,7 +1,14 @@
 import {ArticleType, ArticleView, CostPackage} from './article';
 import {ElevatorView} from './elevator';
 import {AlternativeServiceCompanyInfo, Discount} from './invoice';
-import {AddressRecord, Amount, AmountRecord, Meta, Order} from './misc';
+import {
+  AddressRecord,
+  Amount,
+  AmountRecord,
+  Meta,
+  Order,
+  PdfGenerationStatus,
+} from './misc';
 import {PropertyOwnerView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
 
@@ -33,7 +40,23 @@ export enum QuotationOrderField {
 }
 
 export type QuotationAdditionalInfo = {
-  [key: string | number]: any;
+  pdfGenerationStatus?: PdfGenerationStatus;
+  pdfPath?: string;
+  serviceOrderIds?: string[];
+  xero?: {
+    xeroEntityId: string;
+    lastSyncTime: string;
+  };
+  discount?: Discount;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  paymentTerms?: string;
+  notes?: string;
+  sentDate?: string;
+  expiryDate?: string;
+  referenceNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
 };
 
 export interface QuotationItem {

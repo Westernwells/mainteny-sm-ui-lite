@@ -26,6 +26,7 @@ import {
   QuotationItemRecord,
   QuotationView,
 } from 'models/quotation';
+import {Discount, DiscountType} from 'models/invoice';
 import {ElevatorView} from 'models/elevator';
 import {
   PropertyOwnerSimpleView,
@@ -90,6 +91,25 @@ interface Props {
   serviceCompanyType: ServiceCompanyType;
 }
 
+const getDiscoutObj = (discount?: Discount) =>
+  discount
+    ? {
+        ...discount,
+        type:
+          discount?.type === DiscountType.NONE
+            ? DiscountType.PERCENTAGE
+            : discount?.type,
+        amount: discount?.amount
+          ? {
+              ...discount?.amount,
+              value:
+                (discount?.amount?.value ?? 0) /
+                10 ** (discount.amount.fractionDigits ?? 2),
+            }
+          : undefined,
+      }
+    : undefined;
+
 const quotationItemToQuotationItemRecord = (
   quotationItem: QuotationItem,
 ): QuotationItemRecord => {
@@ -99,21 +119,7 @@ const quotationItemToQuotationItemRecord = (
     description: quotationItem.description,
     quantity: quotationItem.quantity,
     unitAmount: quotationItem.unitAmount,
-    discount: quotationItem.additionalInfo?.discount
-      ? {
-          ...quotationItem.additionalInfo?.discount,
-          amount: quotationItem.additionalInfo?.discount?.amount
-            ? {
-                ...quotationItem.additionalInfo?.discount?.amount,
-                value:
-                  (quotationItem.additionalInfo?.discount?.amount?.value ?? 0) /
-                  10 **
-                    (quotationItem.additionalInfo.discount.amount
-                      .fractionDigits ?? 2),
-              }
-            : undefined,
-        }
-      : undefined,
+    discount: getDiscoutObj(quotationItem.additionalInfo?.discount),
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
 };
@@ -488,6 +494,7 @@ export const DraftQuotation = ({
             name: i.name || i.article.name,
             quantity: i.quantity,
             unitAmount: i.unitAmount,
+            discount: getDiscoutObj(i.additionalInfo?.discount),
           }),
         ),
       );
@@ -585,6 +592,7 @@ export const DraftQuotation = ({
           name: item.name,
           quantity: item.quantity,
           unitAmount: item.unitAmount,
+          discount: item?.discount,
         }),
       ),
       true,
