@@ -255,33 +255,22 @@ export const convertExtendedRecordsToContractComponentRecords = (
 export const parsElevatorRecourses = (
   elevatorResource: ContractElevatorView[] | ElevatorView[],
 ) =>
-  elevatorResource?.map((elevator) => {
-    const {contracts, id} = elevator;
-    const foundElevator = contracts
-      ?.flatMap(
-        (contract) =>
-          contract?.components?.flatMap(
-            (component) => component?.additionalInfo?.elevators || [],
-          ) ?? [],
-      )
-      .find((e) => id === e.elevatorId);
-    return {
-      elevatorId: elevator.id,
-      invoiceJob: foundElevator?.invoiceJob || {
-        timeUnit: ContractTimeUnit.MONTHLY,
-        timeNumbers: [],
-      },
-      orderGenerationJob: foundElevator?.orderGenerationJob || {
-        timeUnit: ContractTimeUnit.MONTHLY,
-        timeNumbers: [],
-      },
-      price: foundElevator?.price || 0,
-      externalId: elevator?.externalId || 'Unassigned',
-      address: elevator.address.fullName || '-',
-      buildingLocation: elevator.additionalInfo.buildingLocation || '-',
-      isChecked: false,
-    };
-  });
+  elevatorResource?.map((elevator) => ({
+    elevatorId: elevator.id,
+    invoiceJob: {
+      timeUnit: ContractTimeUnit.MONTHLY,
+      timeNumbers: [],
+    },
+    orderGenerationJob: {
+      timeUnit: ContractTimeUnit.MONTHLY,
+      timeNumbers: [],
+    },
+    price: 0,
+    externalId: elevator?.externalId || 'Unassigned',
+    address: elevator.address.fullName || '-',
+    buildingLocation: elevator.additionalInfo.buildingLocation || '-',
+    isChecked: true,
+  }));
 
 export const mergeElevators = (
   elevatorResource: ContractElevatorView[] | ElevatorView[],
