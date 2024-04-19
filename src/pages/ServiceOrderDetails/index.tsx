@@ -123,6 +123,7 @@ export const ServiceOrderDetails = () => {
 
   const generateWorkOverview = async () => {
     try {
+      downloadFile();
       overviewPdfSnackBarRef.current = enqueueSnackbar(
         <Box display="flex" padding="0em" margin="0em" alignItems="center">
           <img alt={t('Path Image')} src={PathImage} />{' '}
@@ -157,8 +158,6 @@ export const ServiceOrderDetails = () => {
       return;
     }
 
-    downloadFile();
-
     if (overviewPdfSnackBarRef.current) {
       closeSnackbar(overviewPdfSnackBarRef.current);
       overviewPdfSnackBarRef.current = null;
@@ -176,6 +175,10 @@ export const ServiceOrderDetails = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    generatePreviewPdfBlobUrl();
+  }, [imageUrl]);
 
   if (isLoading) {
     return <Progress />;

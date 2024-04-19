@@ -216,7 +216,7 @@ const JobOverviewPdfTemplate = React.memo(
 
     const calculateTotalVAT = (items: any[]) => {
       const vatMap = new Map();
-      items.forEach((item) => {
+      items?.forEach((item) => {
         const {percentageVat, netAmount, fractionDigits} = item.unitAmount;
         const vat =
           ((percentageVat / 100) * (netAmount * item.quantity)) /
@@ -297,11 +297,11 @@ const JobOverviewPdfTemplate = React.memo(
                   </View>
                 )}
 
-                {serviceOrder?.elevator.propertyOwner.externalId && (
+                {serviceOrder?.elevator?.propertyOwner?.externalId && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Customer no.')}</Text>
                     <Text style={styles.tagContent}>
-                      {serviceOrder?.elevator.propertyOwner.number}
+                      {serviceOrder?.elevator?.propertyOwner?.externalId}
                     </Text>
                   </View>
                 )}
