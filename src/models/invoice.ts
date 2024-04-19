@@ -4,6 +4,7 @@ import {
   AddressRecord,
   Amount,
   AmountRecord,
+  EmailRecord,
   Meta,
   Money,
   Order,
@@ -438,6 +439,8 @@ export interface CreateInvoiceOverdueNoticeRecord {
   dueDate: string;
   initialAmount: Money;
   handlingFee: Money;
+  sentDate: string;
+  emailRecord?: EmailRecord;
 }
 
 export enum InvoiceActivityType {
