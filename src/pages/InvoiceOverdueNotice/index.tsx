@@ -1,6 +1,6 @@
-import {useMemo, useState} from 'react';
-import {useLocation, useNavigate, useParams} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
+import {useEffect, useMemo, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import useTheme from '@mui/material/styles/useTheme';
@@ -18,24 +18,37 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
 import {Progress} from 'components/Progress';
 import {SendEmailDialog} from 'components/SendEmailDialog';
-import Delayed from 'components/Delayed';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoiceOverdueNotice,
   useInvoiceDetail,
-  usePublishInvoiceOverdueNotice,
 } from 'hooks/reactQuery/useInvoice';
-import useFakeProgress from 'hooks/useFakeProgress';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+// import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   currencyFactor,
   formatCurrency,
   formatGrossAmount,
   getCurrencySymbol,
+  useCurrentCurrency,
 } from 'utils/currency';
 import {formatDate} from 'utils/datetime';
+import {pdf} from '@react-pdf/renderer';
+import useLogoDimensions from 'hooks/useLogoDimensions';
+import useLogoImage from 'hooks/useLogoImage';
+import PdfPreview from 'pages/OrderArticle/PDFPreview';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  companyLanguageContextMap,
+  createFilesFromBlobArray,
+  dateToString,
+} from 'utils/utils';
+import printJS from 'print-js';
+import {useUuid} from 'hooks/reactQuery/useUuid';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {SimpleEmailRecord} from 'models/misc';
-import {PDFPreview} from './Preview';
+import {CreateInvoiceOverdueNoticeRecord} from 'models/invoice';
+import InvoiceOverduePdfPreview from './InvoiceOverduePdfPreview';
 
 const validationSchema = Yup.object().shape({
   customerAddress: Yup.string().required('Customer Address is required'),
@@ -46,65 +59,72 @@ const validationSchema = Yup.object().shape({
   handlingFee: Yup.number().required('Handling fee is required'),
 });
 
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
+
 export const InvoiceOverdueNotice = () => {
   const {t} = useTranslation();
   const theme = useTheme();
   const {user} = useUserSession();
   const navigate = useNavigate();
   const {id: invoiceId} = useParams();
-  const {search} = useLocation();
-  const overdueNoticeId = new URLSearchParams(search).get('overdueNoticeId');
+  const {data: uuid} = useUuid();
+  const overdueNoticeId = uuid;
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(!overdueNoticeId);
+  const [isEditing, setIsEditing] = useState(true);
   const {data: invoice, isLoading} = useInvoiceDetail(invoiceId);
-  const createInvoiceOverdueNotice = useCreateInvoiceOverdueNotice();
-  const publishInvoiceOverdueNotice = usePublishInvoiceOverdueNotice();
-  const fakeProgress = useFakeProgress(createInvoiceOverdueNotice.status);
-  const overdueNotice = invoice?.overdueNotices.find((i) =>
-    createInvoiceOverdueNotice.data?.value
-      ? i.id === createInvoiceOverdueNotice.data?.value
-      : i.id === overdueNoticeId,
-  );
-  const {data: downloadUrl} = useDownloadUrl(
-    overdueNotice?.additionalInfo.pdfPath
-      ? [overdueNotice?.additionalInfo.pdfPath]
-      : [],
+  const {mutateAsync: createInvoiceOverdueNotice} =
+    useCreateInvoiceOverdueNotice();
+
+  const {mutateAsync: uploadFiles, isLoading: isUploadLoading} = useUploadFiles(
+    'Documents uploaded successfully',
   );
 
-  const initialValues = overdueNotice
-    ? {
-        customerAddress: invoice?.serviceOrder?.elevator.address.fullName ?? '',
-        invoiceNumber: overdueNotice.externalId,
-        subject: overdueNotice.subject,
-        description: overdueNotice.description,
-        initialAmount:
-          (overdueNotice?.totalAmount.value ?? 0) /
-          10 ** (overdueNotice?.totalAmount.fractionDigits ?? 0),
-        handlingFee: overdueNotice.handlingFee?.value ?? 0,
+  const currentCurrency = useCurrentCurrency();
+  const imageUrl = useLogoImage(user);
+  const logoDimensions = useLogoDimensions(imageUrl);
+  const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
+  const [blobFile, setBlobFile] = useState<Blob>();
+
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
       }
-    : {
-        customerAddress: invoice?.serviceOrder?.elevator.address.fullName ?? '',
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
+  const initialValues = {
+    customerAddress: invoice?.serviceOrder?.elevator.address.fullName ?? '',
+    invoiceNumber: invoice?.externalId ?? '',
+    subject: t('Overdue notice for invoice {{invoiceNumber}}', {
+      invoiceNumber: invoice?.externalId ?? '',
+    }),
+    description: t(
+      "Hello {{customerName}},\n\nYour payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.\nAmount Due: {{amountDue}}\n\nIf you've paid, please let us know. If not, please do so soon to avoid extra fees.\n\nQuestions? Contact us at {{contactEmail}}.\nThanks, {{companyName}}",
+      {
+        customerName: invoice?.serviceOrder?.elevator.propertyOwner.name ?? '',
         invoiceNumber: invoice?.externalId ?? '',
-        subject: t('Overdue notice for invoice {{invoiceNumber}}', {
-          invoiceNumber: invoice?.externalId ?? '',
-        }),
-        description: t(
-          "Hello {{customerName}},\n\nYour payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.\nAmount Due: {{amountDue}}\n\nIf you've paid, please let us know. If not, please do so soon to avoid extra fees.\n\nQuestions? Contact us at {{contactEmail}}.\nThanks, {{companyName}}",
-          {
-            customerName:
-              invoice?.serviceOrder?.elevator.propertyOwner.name ?? '',
-            invoiceNumber: invoice?.externalId ?? '',
-            dueDate: formatDate(invoice?.dueDate ?? ''),
-            amountDue: formatGrossAmount(invoice?.totalAmount),
-            contactEmail: user?.userAccount.serviceCompany.contact.email ?? '',
-            companyName: user?.userAccount.serviceCompany.name ?? '',
-          },
-        ),
-        initialAmount:
-          (invoice?.totalAmount.grossAmount ?? 0) /
-          10 ** (invoice?.totalAmount.fractionDigits ?? 0),
-        handlingFee: 0,
-      };
+        dueDate: formatDate(invoice?.dueDate ?? ''),
+        amountDue: formatGrossAmount(invoice?.totalAmount),
+        contactEmail: user?.userAccount.serviceCompany.contact.email ?? '',
+        companyName: user?.userAccount.serviceCompany.name ?? '',
+      },
+    ),
+    initialAmount:
+      (invoice?.totalAmount.grossAmount ?? 0) /
+      10 ** (invoice?.totalAmount.fractionDigits ?? 0),
+    handlingFee: 0,
+  };
 
   const formik = useFormik({
     initialValues,
@@ -128,9 +148,43 @@ export const InvoiceOverdueNotice = () => {
     currency: invoice?.totalAmount.currency ?? '',
   });
 
-  const createInvoiceOverdueNoticeBody = {
-    invoiceId: invoice?.id ?? '',
-    body: {
+  const handlePreview = async () => {
+    const blob = await pdf(
+      <InvoiceOverduePdfPreview
+        userInfo={user?.userAccount}
+        logoSrc={imageUrl}
+        currentCurrency={currentCurrency}
+        logoDimensions={logoDimensions}
+        translate={translate}
+        invoice={invoice}
+        formik={formik}
+      />,
+    ).toBlob();
+    setBlobFile(blob);
+    const blobURL = URL.createObjectURL(blob);
+    setPreviewPdfBlobUrl(blobURL);
+  };
+
+  const handlePreviewInvoiceOverdueNotice = () => {
+    if (isEditing) {
+      setIsEditing(false);
+      handlePreview();
+    } else {
+      setIsEditing(true);
+    }
+  };
+
+  const onSubmitHandler = async (values: SimpleEmailRecord) => {
+    const serviceCompanyId = user?.userAccount.serviceCompany.id;
+    const uploadPath = `${serviceCompanyId}/invoices/${invoice?.id}/overdueNotices/`;
+
+    const fileNames: string[] = [`${overdueNoticeId}.pdf`];
+
+    const files = createFilesFromBlobArray([blobFile!], fileNames);
+
+    await uploadFiles({files, uploadPath});
+
+    const createInvoiceOverdueNoticeBody: CreateInvoiceOverdueNoticeRecord = {
       externalId: formik.values.invoiceNumber,
       subject: formik.values.subject,
       description: formik.values.description,
@@ -143,46 +197,59 @@ export const InvoiceOverdueNotice = () => {
         value: Math.round(formik.values.handlingFee * factor),
         currency: invoice?.totalAmount.currency ?? '',
       },
-    },
-  };
-
-  const handlePreviewInvoiceOverdueNotice = () => {
-    if (isEditing) {
-      createInvoiceOverdueNotice.mutate(createInvoiceOverdueNoticeBody, {
-        onSettled: () => setIsEditing(false),
-      });
-    } else {
-      setIsEditing(true);
-    }
-  };
-
-  const onSubmitHandler = (sendEmailBody: SimpleEmailRecord) => {
-    formik.setSubmitting(true);
-
-    const noticeId = createInvoiceOverdueNotice.data?.value;
-
-    if (noticeId) {
-      return publishInvoiceOverdueNotice.mutate(
-        {
-          invoiceId: invoice?.id ?? '',
-          noticeId,
-          body: sendEmailBody,
-        },
-        {onSettled: () => formik.setSubmitting(false)},
-      );
-    }
-
-    createInvoiceOverdueNotice.mutate(createInvoiceOverdueNoticeBody, {
-      onSuccess: ({value}) => {
-        publishInvoiceOverdueNotice.mutate({
-          invoiceId: invoice?.id ?? '',
-          noticeId: value,
-          body: sendEmailBody,
-        });
+      sentDate: dateToString(new Date()),
+      emailRecord: {
+        email: '',
+        emails: [values.email] || [],
+        subject: values.subject,
+        content: values.content || sendEmailDescription,
+        attachments: files.reduce<FileWithPreview[]>(
+          (newArr: FileWithPreview[], obj) => [
+            ...newArr,
+            {
+              ...obj,
+              type: obj.type,
+              uri: `${uploadPath}/${obj.name}`,
+              description: obj.name.split('.')[0],
+            },
+          ],
+          [],
+        ),
       },
-      onSettled: () => formik.setSubmitting(false),
+    };
+
+    createInvoiceOverdueNotice({
+      invoiceId: invoice?.id ?? '',
+      body: createInvoiceOverdueNoticeBody,
     });
+
+    navigate(`/invoices/details/${invoice?.id}`, {replace: true});
   };
+
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const handlePrint = async () => {
+    setIsPrinting(true);
+  };
+
+  useEffect(() => {
+    handlePreview();
+  }, [logoDimensions, invoice]);
+
+  useEffect(() => {
+    if (isPrinting && previewPdfBlobUrl) {
+      printJS({
+        printable: previewPdfBlobUrl,
+        type: 'pdf',
+        showModal: true,
+        onPrintDialogClose: () => {
+          setIsPrinting(false);
+        },
+      });
+      setIsPrinting(false);
+    }
+    handlePreview();
+  }, [isPrinting]);
 
   const actions = useMemo(() => {
     const items = [
@@ -195,8 +262,9 @@ export const InvoiceOverdueNotice = () => {
     items.unshift({
       label: t('Print'),
       icon: <Print />,
-      // TODO: handle print
-      onClick: () => console.log('print....'),
+      onClick: () => {
+        handlePrint();
+      },
     });
     return items;
   }, []);
@@ -448,11 +516,9 @@ export const InvoiceOverdueNotice = () => {
           </PageCard>
         </>
       ) : (
-        <Delayed waitBeforeShow={8000}>
-          <PDFPreview
-            pdfUrl={downloadUrl ? Object.values(downloadUrl)[0] : ''}
-          />
-        </Delayed>
+        <Box sx={{margin: '0 auto', display: 'flex', justifyContent: 'center'}}>
+          {previewPdfBlobUrl && <PdfPreview blobUrl={previewPdfBlobUrl} />}
+        </Box>
       )}
 
       <BottomDrawer
@@ -483,7 +549,7 @@ export const InvoiceOverdueNotice = () => {
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice?.id ?? ''}
-        confirmBtnDisabled={formik.isSubmitting}
+        confirmBtnDisabled={isUploadLoading}
         email={
           invoice?.propertyOwner?.additionalInfo.billingEmail ||
           invoice?.propertyOwner?.contact.email
@@ -491,7 +557,7 @@ export const InvoiceOverdueNotice = () => {
         subject={formik.values.subject}
         content={formik.values.description || sendEmailDescription}
         callback={(values) => onSubmitHandler(values)}
-        loadingProgress={isEditing ? fakeProgress : 0}
+        loadingProgress={isEditing ? 1 : 0}
       />
     </>
   );

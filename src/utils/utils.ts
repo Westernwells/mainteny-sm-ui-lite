@@ -1,4 +1,5 @@
 import {formatISO} from 'date-fns';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
 
 export const capitalize = (role: any[]) => {
@@ -446,4 +447,19 @@ export const scrollTableToBottom = () => {
   if (tableElement) {
     tableElement.scrollTop = tableElement.scrollHeight;
   }
+};
+
+export const createFilesFromBlobArray = (
+  blobs: Blob[],
+  fileNames: string[],
+): FileWithPreview[] => {
+  const files: FileWithPreview[] = [];
+  blobs.forEach((blob, index) => {
+    const file = new File([blob], fileNames[index], {
+      type: blob.type,
+    }) as FileWithPreview;
+    file.preview = URL.createObjectURL(blob);
+    files.push(file);
+  });
+  return files;
 };

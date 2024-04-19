@@ -1,11 +1,11 @@
 import {AxiosResponse} from 'axios';
 import {MouseEvent, ReactNode} from 'react';
 import {UseMutationResult} from 'react-query';
-import {number} from 'yup';
 import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
 import {ContractTypes, ContractNameTypes} from './contract';
 import {MinToStep} from './service-company';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 
 export interface RestError {
   errorCode: number;
@@ -309,6 +309,15 @@ export interface SimpleEmailRecord {
   email: string;
   subject: string;
   content: string;
+}
+
+export interface EmailRecord {
+  email?: string;
+  emails: string[];
+  subject: string;
+  content: string;
+  attachments: FileWithPreview[];
+  firstEmail?: string;
 }
 
 export enum Language {
