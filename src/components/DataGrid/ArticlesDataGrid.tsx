@@ -114,7 +114,7 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
 
   useEffect(() => {
     setPageCount(Math.ceil(articleResource.total / page.pageSize));
-  }, [articleResource, page.pageSize]);
+  }, [articleResource.total, page.pageSize]);
 
   useEffect(() => {
     if (articleResource.data.length) {
@@ -122,7 +122,7 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
     } else {
       setRows([]);
     }
-  }, [articleResource]);
+  }, [articleResource.total]);
 
   if (isIdle || isLoading) {
     return (

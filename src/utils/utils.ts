@@ -386,6 +386,60 @@ export const convertToHourAndMinutes = (timeInMinutes?: number) => {
 export const convertLanguageIfNeeded = (key: string) =>
   languagesToPars[key] || key;
 
+export const getBase64FromUrl = async (url: string) => {
+  const data = await fetch(url);
+  const contentType = data.headers.get('content-type');
+
+  if (contentType && contentType.startsWith('image')) {
+    const blob = await data.blob();
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    return new Promise<string>((resolve) => {
+      reader.onloadend = () => {
+        const base64data = reader.result as string;
+        resolve(base64data);
+      };
+    });
+  }
+  return null;
+};
+
+export const convertBase64ToPNG = (base64Data: string): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = base64Data;
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Failed to create canvas context.'));
+        return;
+      }
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Failed to convert image to blob.'));
+          return;
+        }
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          if (reader.result) {
+            resolve(reader.result.toString());
+          } else {
+            reject(new Error('Failed to read converted blob.'));
+          }
+        };
+      }, 'image/png');
+    };
+    img.onerror = () => {
+      reject(new Error('Failed to load the image.'));
+    };
+  });
+
 export const scrollTableToBottom = () => {
   const tableElement = document.querySelector('.MuiDataGrid-virtualScroller');
 
