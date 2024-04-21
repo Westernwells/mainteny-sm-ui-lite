@@ -1,0 +1,74 @@
+import Box from '@mui/material/Box';
+import React, {useRef, useState} from 'react';
+import {Document, Page, pdfjs} from 'react-pdf/dist/esm/entry.vite';
+
+// https://github.com/wojtekmaj/react-pdf/issues/321#issuecomment-451291757
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+type Props = {
+  blobUrl: string;
+};
+
+const PdfPreview = ({blobUrl}: Props) => {
+  const [pages, setPages] = useState<number>(0);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  function onDocumentLoadSuccess({numPages}: {numPages: number}) {
+    setPages(numPages);
+  }
+
+  return (
+    <div>
+      {blobUrl && (
+        <Box
+          width="100%"
+          overflow="hidden"
+          sx={{
+            overflowY: pages > 1 ? 'scroll' : 'initial',
+            '& .react-pdf__message': {
+              margin: '1em',
+            },
+            '& .react-pdf__Page__canvas': {
+              margin: '0 auto',
+              width: '100% !important',
+              height: '100% !important',
+              overflowY: 'hidden',
+            },
+            '&::-webkit-scrollbar': {
+              width: '0.25em',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: 'action.disabled',
+              borderRadius: '0.25em',
+            },
+          }}>
+          <Document file={blobUrl} onLoadSuccess={onDocumentLoadSuccess}>
+            {pages &&
+              [...Array(pages).keys()].map((index) => (
+                <div
+                  key={`page_${index + 1}`}
+                  style={{
+                    marginBottom: '2em',
+                  }}>
+                  <Page
+                    pageNumber={index + 1}
+                    renderTextLayer={false}
+                    renderMode="svg"
+                    pageIndex={index}
+                    renderAnnotationLayer={false}
+                    inputRef={pageRef}
+                    scale={1.428}
+                  />
+                </div>
+              ))}
+          </Document>
+        </Box>
+      )}
+    </div>
+  );
+};
+
+export default PdfPreview;

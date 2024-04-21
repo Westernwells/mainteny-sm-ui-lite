@@ -25,8 +25,8 @@ interface ListMenu {
 interface Props {
   isOpen: boolean;
   isValid: boolean;
-  primaryButtonLabel: string;
-  primaryButtonAction: () => void;
+  primaryButtonLabel?: string | React.ReactNode;
+  primaryButtonAction?: () => void;
   listItems: ListMenu[];
   secondaryButton?: React.ReactNode;
   buttonWrapperStyles?: SxProps;
@@ -74,12 +74,16 @@ export const BottomDrawer = ({
         sx={{my: 'auto', px: '4em', ...buttonWrapperStyles}}>
         {secondaryButton}
         <ButtonGroup variant="contained">
-          <MuiButton
-            type="submit"
-            disabled={!isValid || isSaving}
-            onClick={primaryButtonAction}>
-            {t(primaryButtonLabel)}
-          </MuiButton>
+          {primaryButtonLabel && (
+            <MuiButton
+              type="submit"
+              disabled={!isValid || isSaving}
+              onClick={primaryButtonAction}>
+              {typeof primaryButtonLabel === 'string'
+                ? t(primaryButtonLabel)
+                : primaryButtonLabel}
+            </MuiButton>
+          )}
 
           {listItems.length > 0 && (
             <IconButton
