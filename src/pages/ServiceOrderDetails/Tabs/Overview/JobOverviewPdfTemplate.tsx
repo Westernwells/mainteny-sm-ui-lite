@@ -17,6 +17,7 @@ import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
+import {formatAddressFullname} from 'utils/utils';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -247,6 +248,8 @@ const JobOverviewPdfTemplate = React.memo(
 
     const styles = getStyles(selectedLng, boldFontStyle, regularFontStyle);
 
+    const elevatorAddress = serviceOrder?.elevator?.address;
+
     return (
       <Document>
         <Page size="A4" style={styles.page}>
@@ -342,7 +345,7 @@ const JobOverviewPdfTemplate = React.memo(
                         {translate('Unit address')}
                       </Text>
                       <Text style={styles.tagContent}>
-                        {serviceOrder?.elevator.address.fullName}
+                        {formatAddressFullname(elevatorAddress)?.fullCityName}
                       </Text>
                     </View>
                   )}
