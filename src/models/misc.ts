@@ -312,11 +312,11 @@ export interface SimpleEmailRecord {
 }
 
 export interface EmailRecord {
-  email?: string;
-  emails: string[];
+  email: string;
   subject: string;
   content: string;
-  attachments: FileWithPreview[];
+  emails?: string[];
+  attachments?: FileWithPreview[];
   firstEmail?: string;
 }
 
