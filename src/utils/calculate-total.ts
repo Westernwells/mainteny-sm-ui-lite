@@ -179,3 +179,13 @@ export const calculateSameVatTotals = (items: InvoiceItemRecord[]) => {
 
   return {total, totalVAT};
 };
+
+export const getArticlesTotalAmountInclVats = (invoice: InvoiceFormData) => {
+  const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(invoice.items);
+  const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
+    itemsAfterPerItemDiscount,
+    invoice.discount,
+  );
+  const {total} = calculateSameVatTotals(itemsAfterGlobalDiscount);
+  return total;
+};
