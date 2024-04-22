@@ -30,7 +30,9 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
     useQuotationActivities({quotationId: quotationId ?? ''});
 
   const {data: downloadUrl, isLoading: isLoadingDownloadUrl} = useDownloadUrl(
-    isFetched ? [quotation!.additionalInfo.pdfPath] : [],
+    isFetched && quotation?.additionalInfo.pdfPath
+      ? [quotation.additionalInfo.pdfPath]
+      : [],
   );
   const [externalId, setExternalId] = useState('');
 

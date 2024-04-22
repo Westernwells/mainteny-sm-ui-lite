@@ -107,9 +107,12 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
         <Typography variant="h5">
           {t('General')}{' '}
           <Chip
-            label={
-              elevator.status && capitalize(elevator.status).replace(/_/g, ' ')
-            }
+            label={t(
+              `${
+                elevator.status &&
+                capitalize(elevator.status).replace(/_/g, ' ')
+              }`,
+            )}
             size="small"
             sx={{
               color:
