@@ -41,6 +41,7 @@ import {
   CreateServiceOrderRecord,
 } from 'models/service-order';
 import {
+  EmailRecord,
   Order,
   Resource,
   RestError,
@@ -751,7 +752,7 @@ export const useConfirmAppointment = () => {
 export const postPublishChecklist = async (
   id: string,
   params: {checkListId?: string; technicianId?: string},
-  body: SimpleEmailRecord,
+  body: EmailRecord,
 ) => {
   await axiosClient.post<{value: string}>(
     `api/serviceOrders/${id}/checkList/publish`,
@@ -774,7 +775,7 @@ export const usePublishChecklist = () => {
     }: {
       id: string;
       params: {checkListId?: string; technicianId?: string};
-      body: SimpleEmailRecord;
+      body: EmailRecord;
     }) => postPublishChecklist(id, params, body),
     {
       onSuccess: () => {

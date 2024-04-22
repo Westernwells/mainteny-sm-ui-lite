@@ -1,5 +1,5 @@
-import {useEffect, useMemo, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {
   Grid,
   LinearProgress,
@@ -40,12 +40,28 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {PdfGenerationStatus} from 'models/misc';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
 import {CheckListComponentType} from 'models/checklist';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import useLogoDimensions from 'hooks/useLogoDimensions';
+import useLogoImage from 'hooks/useLogoImage';
+import {
+  companyLanguageContextMap,
+  convertBase64ToPNG,
+  createFilesFromBlobArray,
+  getBase64FromUrl,
+} from 'utils/utils';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {pdf} from '@react-pdf/renderer';
+import {useSnackbar} from 'hooks/useSnackbar';
+import PathImage from 'assets/images/Path.svg';
+import {SnackbarKey} from 'notistack';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {ChecklistComponent} from './ChecklistComponent';
+import ChecklistPdf from './ChecklistPdf';
 
 const EmptyCheckList = () => (
   <EmptySection
@@ -60,13 +76,24 @@ interface Props {
   serviceOrder: ServiceOrderView;
 }
 
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
+
 export const CheckList = ({serviceOrder}: Props) => {
   const theme = useTheme();
   const formatDate = useFormatDate();
+  const {user} = useUserSession();
   const {t} = useTranslation();
+  const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
+  const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [deleteChecklistConfirm, setDeleteChecklistConfirm] = useState(false);
+  const [blobFile, setBlobFile] = useState<Blob>();
 
+  const {mutateAsync: uploadFiles} = useUploadFiles(
+    'Documents uploaded successfully',
+  );
   const {mutateAsync: publishCheckList, isLoading: publishingCheckList} =
     usePublishChecklist();
   const {mutateAsync: deleteServiceOrderChecklist, isLoading: isDeleting} =
@@ -79,16 +106,6 @@ export const CheckList = ({serviceOrder}: Props) => {
     (c) => c.additionalInfo.status === ChecklistStatus.COMPLETED,
   );
 
-  const isPdfGenerated = completedChecklists?.every(
-    (c) => c.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE,
-  );
-
-  const {data: pdfDownloadUrl = {}} = useDownloadUrl(
-    isPdfGenerated && completedChecklists?.length
-      ? completedChecklists.map((c) => c.additionalInfo.pdfPath || '')
-      : [],
-  );
-
   const [pdfPathToDownload, setPdfPathToDownload] = useState('');
 
   const {data: signatureDownloadUrls = {}} = useDownloadUrl(
@@ -98,7 +115,6 @@ export const CheckList = ({serviceOrder}: Props) => {
         )
       : [],
   );
-
   const labels =
     completedChecklists?.map((c) => {
       const schedule = serviceOrder.schedules.find(
@@ -129,7 +145,7 @@ export const CheckList = ({serviceOrder}: Props) => {
 
   const {downloadFile} = useDownloadFileWithCustomName(
     selectedChecklist?.checkList.number,
-    pdfDownloadUrl[pdfPathToDownload],
+    pdfPathToDownload,
   );
 
   const technicianUserAccount = serviceOrder.schedules.find(
@@ -192,15 +208,117 @@ export const CheckList = ({serviceOrder}: Props) => {
     }
   }, [completedChecklists]);
 
-  useEffect(() => {
-    setPdfPathToDownload(selectedChecklist?.additionalInfo.pdfPath || '');
-  }, [selectedChecklist]);
-
   const percentComplete = Math.round(
     checklistSummary.all === 0
       ? 0
       : (checklistSummary.done / checklistSummary.all) * 100,
   );
+  const [signatureImage, setSignatureImage] = useState('');
+  const imageUrl = useLogoImage(user);
+  const logoDimensions = useLogoDimensions(imageUrl);
+
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
+  const generatePdfUrl = async () => {
+    const blob = await pdf(
+      <ChecklistPdf
+        userInfo={user?.userAccount}
+        logoSrc={imageUrl}
+        logoDimensions={logoDimensions}
+        selectedLng={company?.language}
+        translate={translate}
+        serviceOrder={serviceOrder}
+        serviceOrderChecklists={serviceOrderCheckLists}
+        sortedChecklistComponents={sortedChecklistComponents}
+        signaturePath={signatureImage}
+        technicianName={technicianName}
+      />,
+    ).toBlob();
+    setBlobFile(blob);
+    const blobURL = URL.createObjectURL(blob);
+    setPdfPathToDownload(blobURL);
+  };
+
+  const handleDownload = () => {
+    try {
+      downloadFile();
+      overviewPdfSnackBarRef.current = enqueueSnackbar(
+        <Box display="flex" padding="0em" margin="0em" alignItems="center">
+          <img alt={t('Path Image')} src={PathImage} />{' '}
+          <Typography margin="0em" paddingLeft="0.5em" variant="body2">
+            {t('PDF generation is in progress. Please wait...')}
+          </Typography>
+        </Box>,
+        {
+          variant: 'info',
+          autoHideDuration: null,
+        },
+      );
+    } catch (e) {
+      showError(e);
+    }
+  };
+
+  useEffect(() => {
+    if (overviewPdfSnackBarRef.current) {
+      closeSnackbar(overviewPdfSnackBarRef.current);
+      overviewPdfSnackBarRef.current = null;
+    }
+  }, [pdfPathToDownload]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchImage = async () => {
+      const technicianSignatureUrl =
+        signatureDownloadUrls[
+          selectedChecklist?.additionalInfo.technicianSignature!
+        ];
+
+      if (!signatureImage.trim() && technicianSignatureUrl) {
+        const fetchedImageUrl = await getBase64FromUrl(technicianSignatureUrl);
+        if (isMounted && fetchedImageUrl) {
+          let finalImageUrl = fetchedImageUrl;
+          if (fetchedImageUrl.startsWith('data:image/jpeg')) {
+            try {
+              finalImageUrl = await convertBase64ToPNG(fetchedImageUrl);
+            } catch (error) {
+              console.error('Error converting JPEG to PNG:', error);
+            }
+          }
+          setSignatureImage(finalImageUrl);
+        }
+      }
+    };
+
+    fetchImage();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    signatureDownloadUrls[
+      selectedChecklist?.additionalInfo.technicianSignature!
+    ],
+  ]);
+
+  useEffect(() => {
+    generatePdfUrl();
+  }, [signatureImage, imageUrl]);
 
   if (isLoadingCheckList) {
     return <Progress />;
@@ -362,6 +480,7 @@ export const CheckList = ({serviceOrder}: Props) => {
           </Grid>
         </Grid>
       </Grid>
+
       <Grid item lg={8} flexBasis="100%" pb="5rem">
         <Box
           bgcolor="white"
@@ -508,8 +627,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                 buttonProps={{
                   variant: 'outlined',
                   size: 'medium',
-                  disabled: !isPdfGenerated,
-                  onClick: downloadFile,
+                  onClick: handleDownload,
                   sx: {
                     background: 'transparent',
                   },
@@ -545,7 +663,18 @@ export const CheckList = ({serviceOrder}: Props) => {
               content={serviceOrder.description}
               callback={async (emailRecord) => {
                 setIsSendEmailDialogOpen(false);
-                await publishCheckList({
+                const serviceCompanyId = user?.userAccount.serviceCompany.id;
+                const checkListInfo = serviceOrder?.checkLists![0];
+                const uploadPath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/checkLists/${checkListInfo.technicianId}`;
+
+                const fileNames: string[] = [
+                  `${checkListInfo.checkListId}.pdf`,
+                ];
+
+                const files = createFilesFromBlobArray([blobFile!], fileNames);
+                await uploadFiles({files, uploadPath});
+
+                publishCheckList({
                   id: serviceOrder!.id,
                   params: {
                     checkListId: selectedChecklist?.checkListId || '',
@@ -555,6 +684,19 @@ export const CheckList = ({serviceOrder}: Props) => {
                     email: emailRecord.email,
                     subject: emailRecord.subject,
                     content: emailRecord.content,
+                    emails: [emailRecord.email],
+                    attachments: files.reduce<FileWithPreview[]>(
+                      (newArr: FileWithPreview[], obj) => [
+                        ...newArr,
+                        {
+                          ...obj,
+                          type: obj.type,
+                          uri: `${uploadPath}/${obj.name}`,
+                          description: obj.name.split('.')[0],
+                        },
+                      ],
+                      [],
+                    ),
                   },
                 });
               }}
