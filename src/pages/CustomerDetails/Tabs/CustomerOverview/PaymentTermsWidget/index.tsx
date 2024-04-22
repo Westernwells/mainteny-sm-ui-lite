@@ -9,6 +9,7 @@ import {ContractTermView} from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
 import {phoneNumberDigitsOnly} from 'utils/customer-utils';
+import {convertToText} from 'utils/utils';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
 import {Loading} from 'components/Loading';
@@ -63,6 +64,15 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
     }
   };
 
+  const discountOptions = customer?.paymentTerm?.data?.discountOptions.map(
+    (o) =>
+      `${o.discountDays} ${t('days')}; ${o.discountPercent}% ${t(
+        'discount',
+      )}; ${t(convertToText(o.articleType))}`,
+  );
+  const formattedDiscountOptions = discountOptions?.join('\n');
+  const paymentTerm = `${customer?.paymentTerm?.term}\n${formattedDiscountOptions}`;
+
   if (isLoading) return <Loading />;
 
   return (
@@ -79,7 +89,7 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
         handleAction={() => setShowSideDrawer(true)}
         showHeaderBackground>
         {customer?.paymentTerm ? (
-          <p>{customer.paymentTerm.term}</p>
+          <p style={{whiteSpace: 'pre-line'}}>{paymentTerm}</p>
         ) : (
           <EmptySection
             illustration="clipboard"

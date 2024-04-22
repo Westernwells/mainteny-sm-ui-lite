@@ -281,10 +281,28 @@ export const DraftQuotation = ({
     });
   }
 
+  const getFormattedPaymentTerms = (paymentTerm: ContractTermView) =>
+    paymentTerm.data?.discountOptions
+      .map((d) => {
+        const discountDays = d.discountDays || 0;
+        const discountPercentage = d.discountPercent || 0;
+        return t(
+          'If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.',
+          {
+            discountDays,
+            discountPercentage,
+          },
+        );
+      })
+      .join('\n') || '';
+
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
     if (formType === 'new' && row.paymentTerm) {
-      formik.setFieldValue('paymentTerms', row.paymentTerm?.term || '');
+      formik.setFieldValue(
+        'paymentTerms',
+        row.paymentTerm ? getFormattedPaymentTerms(row.paymentTerm) : '',
+      );
     }
     const quotationCustomer = quotation?.elevator?.propertyOwner;
     if (row.id !== quotationCustomer?.id) {
@@ -405,7 +423,10 @@ export const DraftQuotation = ({
     const paymentTermObj = contractPaymentTerms?.data.find(
       ({id}) => id === paymentTermId,
     );
-    formik.setFieldValue('paymentTerms', paymentTermObj?.term);
+    formik.setFieldValue(
+      'paymentTerms',
+      paymentTermObj ? getFormattedPaymentTerms(paymentTermObj) : '',
+    );
     setOpenContractPaymentTermsDialog(false);
   };
 

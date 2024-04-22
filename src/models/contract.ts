@@ -878,7 +878,9 @@ export const getSingleItemViewFrequency = (
 export interface ContractPaymentTermView {
   id: string;
   serviceCompanyId: string;
+  type?: ServiceCompanyType;
   term: string;
+  data?: PaymentTermData;
   additionalInfo: string;
   meta: Meta;
 }
