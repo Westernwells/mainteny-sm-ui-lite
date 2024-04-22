@@ -67,6 +67,8 @@ export enum ElevatorOrderField {
   ADDRESS = 'ADDRESS',
   ASSIGNED_TECHNICIAN_NAMES = 'ASSIGNED_TECHNICIAN_NAMES',
   NUMBER_OF_CONTRACTS = 'NUMBER_OF_CONTRACTS',
+  LAST_INSPECTION_DATE = 'LAST_INSPECTION_DATE',
+  NEXT_INSPECTION_DATE = 'NEXT_INSPECTION_DATE',
 }
 
 export interface ElevatorQueryParams {
@@ -111,7 +113,7 @@ export interface ElevatorAdditionalInfo {
   emergencyContactNumber: string;
   emergencyPhoneProvider: string;
   keyLocation: string;
-  lastInspectionDate: string;
+  lastInspectionDate?: string;
   manufacturer: string;
   numberOfStops: 5;
   parking: string;
@@ -134,6 +136,7 @@ export interface ElevatorAdditionalInfo {
   travelFee: number;
   inspectionCycle: InspectionCycle;
   numberOfPeople: number;
+  nextInspectionDate?: string;
 }
 
 export interface ElevatorMaintainerRecord {
