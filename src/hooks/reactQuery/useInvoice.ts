@@ -16,6 +16,7 @@ import {useNavigate} from 'react-router-dom';
 // FIXME: Dummy Import
 
 import {
+  EmailRecord,
   Language,
   Resource,
   RestError,
@@ -153,10 +154,7 @@ export function useInvoiceDetail(invoiceId?: string) {
   });
 }
 
-export const postPublishInvoice = async (
-  id: string,
-  body: SimpleEmailRecord,
-) => {
+export const postPublishInvoice = async (id: string, body: EmailRecord) => {
   await axiosClient.post<{value: string}>(`api/invoices/${id}/publish`, body);
 };
 
@@ -170,7 +168,7 @@ export const usePublishInvoice = ({
   const navigate = useNavigate();
 
   return useMutation(
-    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+    ({id, body}: {id: string; body: EmailRecord}) =>
       postPublishInvoice(id, body),
     {
       onSuccess: (__, {id}) => {

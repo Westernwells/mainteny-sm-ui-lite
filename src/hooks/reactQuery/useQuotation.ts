@@ -11,10 +11,10 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router-dom';
 import {
+  EmailRecord,
   Language,
   Resource,
   RestError,
-  SimpleEmailRecord,
   StringValue,
 } from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -99,10 +99,7 @@ export function useQuotationDetails(
   );
 }
 
-export const postPublishQuotation = async (
-  id: string,
-  body: SimpleEmailRecord,
-) => {
+export const postPublishQuotation = async (id: string, body: EmailRecord) => {
   await axiosClient.post(`api/quotations/${id}/publish`, body);
 };
 
@@ -112,7 +109,7 @@ export const usePublishQuotation = () => {
   const navigate = useNavigate();
 
   return useMutation(
-    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+    ({id, body}: {id: string; body: EmailRecord}) =>
       postPublishQuotation(id, body),
     {
       onSuccess: (_, {id}) => {

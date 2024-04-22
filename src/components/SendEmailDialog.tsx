@@ -10,7 +10,7 @@ import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import CachedIcon from '@mui/icons-material/Cached';
 import CheckCircleRounded from '@mui/icons-material/CheckCircleRounded';
-import {SimpleEmailRecord} from 'models/misc';
+import {EmailRecord} from 'models/misc';
 import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
@@ -28,7 +28,7 @@ interface Props {
   email?: string;
   subject?: string;
   content?: string;
-  callback?: ({email, subject, content}: SimpleEmailRecord) => void;
+  callback?: ({email, subject, content}: EmailRecord) => void;
   loadingProgress?: number;
 }
 
@@ -57,7 +57,7 @@ export const SendEmailDialog = ({
 }: Props) => {
   const {t} = useTranslation();
   const publish = submitHook?.();
-  const formik = useFormik<SimpleEmailRecord>({
+  const formik = useFormik<EmailRecord>({
     validateOnMount: false,
     enableReinitialize: true,
     initialValues: {
