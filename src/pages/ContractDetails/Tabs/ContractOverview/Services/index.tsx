@@ -47,6 +47,7 @@ import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {useContractElevators} from 'hooks/reactQuery/useContacts';
 import {useQueryState} from 'hooks/useQueryState';
 import {Order} from 'models/misc';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {ContractCard} from '../ContractCard';
 import {SectionTitle} from '../../../../InvoiceDetails/SectionTitle';
 import ServiceInformationReview from './ServiceInfo';
@@ -93,6 +94,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
   const formatDate = useFormatDate();
   const currentCurrency = useCurrentCurrency();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const {enqueueSnackbar} = useSnackbar();
 
   const {mutateAsync: updateContract, isLoading: isUpdateLoading} =
     useUpdateContract('Contract updated');
@@ -197,6 +199,22 @@ export const Services: FC<Props> = ({contractDetails}) => {
     setCurrentService(row);
     setEditFormData(row);
     setIsReviewDialogOpen(true);
+  };
+
+  const handleEditButtonClick = (row: ContractComponentView) => {
+    console.log('row', row);
+
+    if (row.group !== '') {
+      enqueueSnackbar(
+        'Services in an invoice group can not be edited. Please disband them in order to edit the services.',
+        {variant: 'error'},
+      );
+    } else {
+      setCurrentService(row);
+      setEditFormData(row);
+      setIsDialogOpen(true);
+      setIsEditForm(true);
+    }
   };
 
   return (
@@ -409,13 +427,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                       padding: '0.5em 0em 0.5em 2em',
                     }}>
                     <Box sx={{display: 'flex'}}>
-                      <IconButton
-                        onClick={() => {
-                          setCurrentService(row);
-                          setEditFormData(row);
-                          setIsDialogOpen(true);
-                          setIsEditForm(true);
-                        }}>
+                      <IconButton onClick={() => handleEditButtonClick(row)}>
                         <EditIcon />
                       </IconButton>
                       <IconButton

@@ -22,11 +22,11 @@ import {
   ExtendedContractComponentRecord,
   calculateContractInvoicePriceGrandTotal,
   calculateContractInvoicePriceTotal,
-  getListViewFrequency,
 } from 'models/contract';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {theme} from 'theme';
 import {StatusChip} from 'components/StatusChip';
+import {getListViewFrequency} from 'utils/elevator-utils';
 
 type Props = {
   formik: FormikProps<{components: ExtendedContractComponentRecord[]}>;
@@ -197,8 +197,8 @@ const ServiceListing = ({
                   }}>
                   <Typography variant="body2">
                     {getListViewFrequency(
-                      item.elevators.filter((elevator) => elevator.isSelected),
                       'orderGenerationJob',
+                      item.elevators.filter((elevator) => elevator.isSelected),
                     )}
                   </Typography>
                 </TableCell>
@@ -213,8 +213,8 @@ const ServiceListing = ({
                   }}>
                   <Typography variant="body2">
                     {getListViewFrequency(
-                      item.elevators.filter((elevator) => elevator.isSelected),
                       'invoiceJob',
+                      item.elevators.filter((elevator) => elevator.isSelected),
                     )}
                   </Typography>
                 </TableCell>
