@@ -20,6 +20,7 @@ import {
 import {MenuBtn} from 'components/MenuBtn';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {useTheme} from '@mui/material';
+import {EmployeesView} from 'models/employee';
 import {ScheduleDialog} from './ScheduleDialog';
 import {MarkCompletedDialog} from './MarkCompletedDialog';
 import {OrderInfo} from './schema';
@@ -82,6 +83,19 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
+
+  // scheduled => perfill technicians from schedules and time
+  // unscheduled => prefill the technicians from candidateTechnicians
+  const defaultTechnicians = serviceOrderDetails.schedules.length
+    ? serviceOrderDetails.schedules.map((s) => s.technician)
+    : serviceOrderDetails.additionalInfo.candidateTechnicians?.length
+    ? (serviceOrderDetails.additionalInfo
+        .candidateTechnicians as unknown as EmployeesView[])
+    : serviceOrderDetails.additionalInfo.candidateTechnician
+    ? ([
+        serviceOrderDetails.additionalInfo.candidateTechnician,
+      ] as unknown as EmployeesView[])
+    : null;
 
   const renderDialogTitle = () =>
     serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED ||
@@ -251,11 +265,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         title={renderDialogTitle()}
         open={openDialog}
         onClose={() => setOpenDialog(false)}
-        defaultTechnicians={
-          serviceOrderDetails.schedules.length
-            ? serviceOrderDetails.schedules.map((s) => s.technician)
-            : null
-        }
+        defaultTechnicians={defaultTechnicians}
         defaultStartDate={
           serviceOrderDetails.schedules.length
             ? new Date(serviceOrderDetails.schedules[0].startTime)

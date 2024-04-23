@@ -200,6 +200,7 @@ export interface ServiceOrderAdditionalInfo {
     endTime: string;
   };
   candidateTechnician?: ServiceOrderCandidateTechnician;
+  candidateTechnicians?: ServiceOrderCandidateTechnician[];
   documents?: FileResource[];
   pictures?: FileResource[];
 }
