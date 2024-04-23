@@ -406,6 +406,7 @@ export interface ServiceOrderReportAdditionalInfo {
 export interface ServiceOrderReportArticleView {
   article: ArticleView;
   id: string;
+  technicianId: string;
   quantity: number;
   serviceOrderReportId: string;
   unitAmount: Amount[];
