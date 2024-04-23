@@ -286,11 +286,10 @@ export const DraftQuotation = ({
     if (formType === 'new' && row.paymentTerm) {
       formik.setFieldValue('paymentTerms', row.paymentTerm?.term || '');
     }
+    formik.setFieldValue('propertyOwnerId', row.id);
     const quotationCustomer = quotation?.elevator?.propertyOwner;
     if (row.id !== quotationCustomer?.id) {
       const emptyAddressState = {fullName: null};
-      formik.setFieldValue('propertyOwnerId', row.id);
-
       if (formType === 'edit' && customer) {
         formik.setFieldValue(
           'billingAddress',
