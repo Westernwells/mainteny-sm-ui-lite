@@ -69,14 +69,14 @@ const InvoiceArticlesTable = ({serviceOrderType}: Props) => {
   };
 
   const {mutate: createTravelWork} = useCreateTravelWork(
-    'Article added successfully',
+    t('Article added successfully'),
     handleSuccessResponse,
   );
   const {mutate: updateTravelWork} = useUpdateTravelWork(
-    'Article updated successfully',
+    t('Article updated successfully'),
   );
   const {mutate: deleteTravelWork} = useDeleteTravelWork(
-    'Article removed successfully',
+    t('Article removed successfully'),
   );
   const {
     data: articles,

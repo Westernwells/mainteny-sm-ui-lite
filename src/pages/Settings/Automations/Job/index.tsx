@@ -18,7 +18,7 @@ type Props = {
 
 const Job = ({company, containerStyles}: Props) => {
   const {mutateAsync: updateCompany} = useUpdateCompany(
-    'Job Automation Settings Updated',
+    t('Job Automation Settings Updated'),
   );
 
   const formik = useFormik({

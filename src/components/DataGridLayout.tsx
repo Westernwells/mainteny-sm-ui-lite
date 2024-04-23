@@ -90,7 +90,7 @@ export const getColumnProps = ({
           variant === 'titleCase' &&
           t(convertToText(params.colDef.headerName))) ||
           (params.colDef.headerName &&
-            t(params.colDef.headerName.toUpperCase()))}
+            t(params.colDef.headerName).toUpperCase())}
       </Typography>
     );
   },
