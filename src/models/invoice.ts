@@ -293,6 +293,7 @@ export enum InvoiceType {
   PARTIAL = 'PARTIAL',
   CREDIT_NOTE = 'CREDIT_NOTE',
   UPFRONT = 'UPFRONT',
+  AGGREGATE = 'AGGREGATE',
 }
 
 export const InvoiceTypeMap = {
@@ -301,6 +302,7 @@ export const InvoiceTypeMap = {
   PARTIAL: 'Partial',
   CREDIT_NOTE: 'Credit Note',
   UPFRONT: 'Upfront',
+  AGGREGATE: 'Contract',
 };
 
 export interface InvoiceFormData {
