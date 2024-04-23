@@ -1431,6 +1431,7 @@ export const InvoiceForm = ({
                 textFieldProps={{
                   label: 'Payment Due Date',
                 }}
+                required
               />
             </Box>
             {/* DELIVERY DATE */}
