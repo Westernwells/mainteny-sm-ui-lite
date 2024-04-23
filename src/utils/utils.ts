@@ -240,21 +240,25 @@ export const formatAddressFullname = (
 
   const name = address?.component?.name ? address?.component?.name : '';
   const address1 = address?.component?.street ? address?.component?.street : '';
-  const address2 = address?.component?.street2
-    ? address?.component?.street2
-    : '';
-  const zip = address?.component?.postalCode
-    ? address?.component?.postalCode
-    : '';
+  const address2 = address?.component?.street2 || '';
+  const zip = address?.component?.postalCode || '';
   const city = address?.component?.city ? address?.component?.city : '';
   const state = address?.component?.state ? address?.component?.state : '';
-  const country = address?.component?.country
-    ? address?.component?.country
-    : '';
+  const country = address?.component?.country || '';
 
   const fullName = [name, address1, address2, zip, city, state, country]
     .filter((x) => x !== '')
     .join(', ');
+
+  const fullCityNameParts = [address1, address2];
+
+  if (zip && city) {
+    fullCityNameParts.push(`${zip} ${city}`);
+  } else {
+    fullCityNameParts.push(zip || city);
+  }
+
+  const fullCityName = fullCityNameParts.filter((x) => x !== '').join(', ');
 
   return {
     ...address,
@@ -268,6 +272,7 @@ export const formatAddressFullname = (
       country,
     },
     fullName,
+    fullCityName,
   };
 };
 
@@ -387,7 +392,9 @@ export const convertLanguageIfNeeded = (key: string) =>
   languagesToPars[key] || key;
 
 export const getBase64FromUrl = async (url: string) => {
-  const data = await fetch(url);
+  const data = await fetch(url, {
+    cache: 'no-store',
+  });
   const contentType = data.headers.get('content-type');
 
   if (contentType && contentType.startsWith('image')) {

@@ -96,9 +96,9 @@ const PdfTemplateLeftAddress = ({
         )}
 
         <Text style={styles.partialAddressText}>
-          {addressComponent?.postalCode && `${addressComponent?.postalCode}`}
-          {addressComponent?.state && ` ${addressComponent?.state},`}
-          {addressComponent?.country && ` ${addressComponent?.country}`}
+          {addressComponent?.postalCode && `${addressComponent.postalCode}`}
+          {addressComponent?.city ? ` ${addressComponent.city},` : ''}
+          {addressComponent?.country && ` ${addressComponent.country}`}
         </Text>
       </View>
     </View>

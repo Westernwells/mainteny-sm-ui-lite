@@ -6,7 +6,6 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {Progress} from 'components/Progress';
-import {PdfGenerationStatus} from 'models/misc';
 import {
   usePostServiceOrderConfirmationPublish,
   useServiceOrderDetails,
@@ -16,15 +15,23 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useParams, useSearchParams} from 'react-router-dom';
-import {formatSearchParams} from 'utils/utils';
+import {companyLanguageContextMap, formatSearchParams} from 'utils/utils';
 import {Box, Typography} from '@mui/material';
-import {useTranslation} from 'react-i18next';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {useSnackbar} from 'hooks/useSnackbar';
 import PathImage from 'assets/images/Path.svg';
 import {SnackbarKey} from 'notistack';
+import {useCurrentCurrency} from 'utils/currency';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {pdf} from '@react-pdf/renderer';
+import useLogoDimensions from 'hooks/useLogoDimensions';
+import useLogoImage from 'hooks/useLogoImage';
+import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
+import JobOverviewPdfTemplate from './Tabs/Overview/JobOverviewPdfTemplate';
 
 const tabItems = [
   {
@@ -41,19 +48,28 @@ const tabItems = [
   },
 ];
 
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
+
 export const ServiceOrderDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const {id: serviceOrderId} = useParams();
   const [queryParams, setQueryParams] = useSearchParams();
   const {data: serviceOrder, isLoading} =
     useServiceOrderDetails(serviceOrderId);
-  const isPdfGenerated =
-    serviceOrder?.additionalInfo.confirmationInfo?.pdfGenerationStatus ===
-    PdfGenerationStatus.DONE;
   const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
   const {t} = useTranslation();
+  const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+  const {data: quotation} = useQuotationDetails(
+    serviceOrder?.additionalInfo.quotationId,
+  );
   const [filePathToDownload, setFilePathToDownload] = useState('');
+  const imageUrl = useLogoImage(user);
+
+  const logoDimensions = useLogoDimensions(imageUrl);
 
   const filePaths = useMemo(
     () => (filePathToDownload ? [filePathToDownload] : []),
@@ -66,23 +82,48 @@ export const ServiceOrderDetails = () => {
 
   const {downloadFile} = useDownloadFileWithCustomName(
     serviceOrder?.number,
-    fileDownloadURLs[filePathToDownload],
+    filePathToDownload,
   );
 
   const {mutateAsync: postServiceOrderConfirmationPublish} =
     usePostServiceOrderConfirmationPublish();
 
-  const downloadWorkOverview = () => {
-    const pdfPath = isPdfGenerated
-      ? (serviceOrder?.additionalInfo.confirmationInfo?.pdfPath as string)
-      : '';
-    if (pdfPath) {
-      setFilePathToDownload(pdfPath);
-    }
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
+  const generatePreviewPdfBlobUrl = async () => {
+    const blob = await pdf(
+      <JobOverviewPdfTemplate
+        userInfo={user?.userAccount}
+        currentCurrency={currentCurrency}
+        logoSrc={imageUrl}
+        serviceOrder={serviceOrder}
+        logoDimensions={logoDimensions}
+        quotation={quotation}
+        selectedLng={company?.language}
+        translate={translate}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    setFilePathToDownload(blobURL);
   };
 
   const generateWorkOverview = async () => {
     try {
+      downloadFile();
       overviewPdfSnackBarRef.current = enqueueSnackbar(
         <Box display="flex" padding="0em" margin="0em" alignItems="center">
           <img alt={t('Path Image')} src={PathImage} />{' '}
@@ -95,6 +136,8 @@ export const ServiceOrderDetails = () => {
           autoHideDuration: null,
         },
       );
+
+      generatePreviewPdfBlobUrl();
 
       await postServiceOrderConfirmationPublish({
         serviceOrder: serviceOrderId as string,
@@ -111,21 +154,9 @@ export const ServiceOrderDetails = () => {
   };
 
   useEffect(() => {
-    if (
-      serviceOrder?.additionalInfo.confirmationInfo?.pdfGenerationStatus ===
-        PdfGenerationStatus.DONE &&
-      overviewPdfSnackBarRef.current
-    ) {
-      downloadWorkOverview();
-    }
-  }, [serviceOrder]);
-
-  useEffect(() => {
     if (!Object.keys(fileDownloadURLs || {}).length) {
       return;
     }
-
-    downloadFile();
 
     if (overviewPdfSnackBarRef.current) {
       closeSnackbar(overviewPdfSnackBarRef.current);
@@ -144,6 +175,10 @@ export const ServiceOrderDetails = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    generatePreviewPdfBlobUrl();
+  }, [imageUrl]);
 
   if (isLoading) {
     return <Progress />;

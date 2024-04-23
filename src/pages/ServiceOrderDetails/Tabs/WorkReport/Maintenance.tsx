@@ -38,7 +38,7 @@ export const Maintenance = ({schedule, formik, isEdit}: Props) => {
 
   const totalBillableHoursFormatted = convertMinutesToHoursAndMinutes(
     totalBillableHours,
-    {hourUnit: t('h')},
+    {hourUnit: 'h'},
     1,
   );
 
@@ -49,7 +49,7 @@ export const Maintenance = ({schedule, formik, isEdit}: Props) => {
     return convertMinutesToHoursAndMinutes(
       totalTravelWithoutSurcharge,
       {
-        hourUnit: t('h'),
+        hourUnit: 'h',
       },
       1,
     );
@@ -62,7 +62,7 @@ export const Maintenance = ({schedule, formik, isEdit}: Props) => {
     return convertMinutesToHoursAndMinutes(
       totalWorkWithoutSurcharge,
       {
-        hourUnit: t('h'),
+        hourUnit: 'h',
       },
       1,
     );

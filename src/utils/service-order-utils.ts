@@ -10,8 +10,8 @@ import {
   ServiceOrderType,
   ServiceOrderView,
 } from '../models/service-order';
-import {toDate, toRestDateTime} from './datetime';
 import {theme} from '../theme';
+import {toDate, toRestDateTime} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
