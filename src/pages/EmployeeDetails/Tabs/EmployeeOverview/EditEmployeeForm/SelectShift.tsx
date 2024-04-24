@@ -23,8 +23,8 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
   );
 
   const defaultTime = {
-    fromTime: new Date(0, 0, 0, 7, 0),
-    toTime: new Date(0, 0, 0, 18, 0),
+    fromTime: new Date(0, 0, 0, 8, 0),
+    toTime: new Date(0, 0, 0, 16, 0),
   };
 
   const convertToLocaleTimeString = (date: Date) =>
@@ -96,35 +96,37 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
           alignItems="flex-end"
           mt="1em">
           <TimePicker
+            required
             defaultTime={shift.fromTime}
             containerStyles={{mr: '1em'}}
             maxTime={shift.toTime ?? undefined}
             getSelectedTime={(newValue) => {
+              if (!newValue || Number.isNaN(newValue.getTime())) return;
               const oldShifts = shifts.filter((item) => item !== shift);
               const newShift = shift;
               newShift.fromTime = newValue;
               setShifts([...oldShifts, newShift]);
             }}
             textFieldProps={{
-              label: t('Start Time'),
-              required: true,
+              label: t('Shift start time'),
               disabled: index < shifts.length - 1,
               onKeyDown: (e) => e.preventDefault(),
             }}
           />
 
           <TimePicker
+            required
             defaultTime={shift.toTime}
             containerStyles={{mr: '1em'}}
             getSelectedTime={(newValue) => {
+              if (!newValue || Number.isNaN(newValue.getTime())) return;
               const oldShifts = shifts.filter((item) => item !== shift);
               const newShift = shift;
               newShift.toTime = newValue;
               setShifts([...oldShifts, newShift]);
             }}
             textFieldProps={{
-              label: t('End Time'),
-              required: true,
+              label: t('Shift end time'),
               onKeyDown: (e) => e.preventDefault(),
               disabled: index < shifts.length - 1,
             }}
