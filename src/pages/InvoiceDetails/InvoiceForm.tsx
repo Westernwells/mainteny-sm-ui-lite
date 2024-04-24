@@ -55,6 +55,7 @@ import {
   InvoiceItemRecord,
   InvoiceStatus,
   InvoiceType,
+  InvoiceTypeMap,
   InvoiceView,
   PaymentType,
   PaymentTypeOptions,
@@ -882,8 +883,8 @@ export const InvoiceForm = ({
 
   const getInvoiceTypeText = () => {
     const invoiceLabel =
-      formik.values.type !== InvoiceType.CREDIT_NOTE ? 'Invoice' : '';
-    const text = `${convertToText(formik.values.type)} ${invoiceLabel}`.trim();
+      formik.values.type !== InvoiceType.CREDIT_NOTE ? 'invoice' : '';
+    const text = `${InvoiceTypeMap[formik.values.type]} ${invoiceLabel}`.trim();
 
     return t(text);
   };
@@ -1384,6 +1385,7 @@ export const InvoiceForm = ({
                 textFieldProps={{
                   label: 'Payment Due Date',
                 }}
+                required
               />
             </Box>
             {/* DELIVERY DATE */}
