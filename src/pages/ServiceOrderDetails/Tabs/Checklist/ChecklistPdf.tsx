@@ -280,7 +280,10 @@ const ChecklistPdf = ({
           </View>
 
           <View>
-            <Text style={styles.contentHeader}>{translate('Checklist')}</Text>
+            <Text style={styles.contentHeader}>
+              {serviceOrderChecklists &&
+                serviceOrderChecklists[0].checkList.name}
+            </Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
                 <Text style={styles.tableHeaderIndex}>#</Text>
@@ -318,7 +321,7 @@ const ChecklistPdf = ({
                 {signaturePath ? (
                   <Image src={signaturePath} style={{width: 120, height: 40}} />
                 ) : (
-                  <Text>No Signature</Text>
+                  <Text>{translate('No Signature')}</Text>
                 )}
               </View>
               {technicianName && (
