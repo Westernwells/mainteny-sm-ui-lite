@@ -158,6 +158,7 @@ export const InvoiceOverdueNotice = () => {
         translate={translate}
         invoice={invoice}
         formik={formik}
+        selectedLng={company?.language}
       />,
     ).toBlob();
     setBlobFile(blob);
