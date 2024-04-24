@@ -1,9 +1,9 @@
 import {CheckListComponentType, CheckListComponentView} from 'models/checklist';
 import {Image, Text, View, StyleSheet} from '@react-pdf/renderer';
-import CheckBox from 'assets/icons/CheckBox.jpg';
-import CheckBoxOutlineBlank from 'assets/icons/CheckBoxOutlineBlank.jpg';
-import RadioButtonChecked from 'assets/icons/RadioButtonChecked.jpg';
-import TextSnippet from 'assets/icons/TextSnippet.jpg';
+import CheckBox from 'assets/icons/CheckBox.png';
+import CheckBoxOutlineBlank from 'assets/icons/CheckBoxOutlineBlank.png';
+import RadioButtonChecked from 'assets/icons/RadioButtonChecked.png';
+import TextSnippet from 'assets/icons/TextSnippet.png';
 
 interface ComponentProps {
   component: CheckListComponentView;
@@ -138,6 +138,7 @@ export const CheckboxComponent = ({
   };
 
   const styles = getStyles(boldFontStyle);
+
   return (
     <View style={styles.checkboxContainer}>
       <View style={styles.checkboxIndex}>

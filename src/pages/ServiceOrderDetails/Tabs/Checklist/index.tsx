@@ -85,14 +85,14 @@ export const CheckList = ({serviceOrder}: Props) => {
   const formatDate = useFormatDate();
   const {user} = useUserSession();
   const {t} = useTranslation();
-  const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [deleteChecklistConfirm, setDeleteChecklistConfirm] = useState(false);
   const [blobFile, setBlobFile] = useState<Blob>();
 
   const {mutateAsync: uploadFiles} = useUploadFiles(
-    'Documents uploaded successfully',
+    'The document was sent successfully.',
   );
   const {mutateAsync: publishCheckList, isLoading: publishingCheckList} =
     usePublishChecklist();
@@ -255,8 +255,7 @@ export const CheckList = ({serviceOrder}: Props) => {
 
   const handleDownload = () => {
     try {
-      downloadFile();
-      overviewPdfSnackBarRef.current = enqueueSnackbar(
+      const snackbarKey = enqueueSnackbar(
         <Box display="flex" padding="0em" margin="0em" alignItems="center">
           <img alt={t('Path Image')} src={PathImage} />{' '}
           <Typography margin="0em" paddingLeft="0.5em" variant="body2">
@@ -265,20 +264,15 @@ export const CheckList = ({serviceOrder}: Props) => {
         </Box>,
         {
           variant: 'info',
-          autoHideDuration: null,
+          autoHideDuration: 3000,
         },
       );
+      overviewPdfSnackBarRef.current = snackbarKey;
+      downloadFile();
     } catch (e) {
       showError(e);
     }
   };
-
-  useEffect(() => {
-    if (overviewPdfSnackBarRef.current) {
-      closeSnackbar(overviewPdfSnackBarRef.current);
-      overviewPdfSnackBarRef.current = null;
-    }
-  }, [pdfPathToDownload]);
 
   useEffect(() => {
     let isMounted = true;
