@@ -32,12 +32,12 @@ const getStyles = (
       maxWidth: 250,
     },
     partialAddressText: {
-      fontSize: 10,
+      fontSize: 9,
       marginBottom: 1,
       ...boldFontStyle,
     },
     partAddress: {
-      fontSize: 10,
+      fontSize: 9,
       marginBottom: 4,
     },
   });

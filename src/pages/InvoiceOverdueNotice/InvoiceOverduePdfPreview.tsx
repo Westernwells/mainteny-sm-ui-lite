@@ -88,12 +88,12 @@ const getStyles = (
     },
     tag: {
       ...boldFontStyle,
-      fontSize: 10,
+      fontSize: 9,
       color: '#212121',
       width: '43%',
     },
     tagContent: {
-      fontSize: 10,
+      fontSize: 9,
       color: '#616161',
       width: '57%',
       textAlign: 'right',
@@ -138,6 +138,11 @@ const getStyles = (
       flexDirection: 'row',
       fontSize: 10,
       marginVertical: 4,
+    },
+    amountText: {
+      ...boldFontStyle,
+      fontSize: 10,
+      color: '#212121',
     },
   });
 
@@ -376,9 +381,8 @@ const InvoiceOverduePdfPreview = ({
                   <Text
                     style={{
                       width: '38%',
-                      color: '#212121',
-                      fontSize: 10,
                       textAlign: 'left',
+                      ...styles.amountText,
                     }}>
                     {`${translate('Outstanding amount incl. VAT')} (${
                       currentCurrency?.symbol
@@ -388,8 +392,7 @@ const InvoiceOverduePdfPreview = ({
                     style={{
                       width: '20%',
                       textAlign: 'right',
-                      fontSize: 10,
-                      color: '#212121',
+                      ...styles.amountText,
                     }}>
                     {overdueTotal(
                       formik.values.initialAmount,

@@ -78,7 +78,7 @@ export const InvoiceOverdueNotice = () => {
     useCreateInvoiceOverdueNotice();
 
   const {mutateAsync: uploadFiles, isLoading: isUploadLoading} = useUploadFiles(
-    'Documents uploaded successfully',
+    'The document was sent successfully.',
   );
 
   const currentCurrency = useCurrentCurrency();
@@ -104,7 +104,7 @@ export const InvoiceOverdueNotice = () => {
   );
 
   const initialValues = {
-    customerAddress: invoice?.serviceOrder?.elevator.address.fullName ?? '',
+    customerAddress: invoice?.propertyOwner?.billingAddress?.fullName ?? '',
     invoiceNumber: invoice?.externalId ?? '',
     subject: t('Overdue notice for invoice {{invoiceNumber}}', {
       invoiceNumber: invoice?.externalId ?? '',
@@ -334,10 +334,10 @@ export const InvoiceOverdueNotice = () => {
                   <Box>
                     {user &&
                     'businessAddress' in user.userAccount.serviceCompany &&
-                    user.userAccount.serviceCompany.postalAddress?.fullName ? (
+                    user.userAccount.serviceCompany.billingAddress?.fullName ? (
                       <Typography variant="caption">
                         {
-                          user.userAccount.serviceCompany.postalAddress
+                          user.userAccount.serviceCompany.billingAddress
                             ?.fullName
                         }
                       </Typography>
@@ -516,7 +516,12 @@ export const InvoiceOverdueNotice = () => {
           </PageCard>
         </>
       ) : (
-        <Box sx={{margin: '0 auto', display: 'flex', justifyContent: 'center'}}>
+        <Box
+          sx={{
+            margin: '1em auto 5em auto',
+            display: 'flex',
+            justifyContent: 'center',
+          }}>
           {previewPdfBlobUrl && <PdfPreview blobUrl={previewPdfBlobUrl} />}
         </Box>
       )}
