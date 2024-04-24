@@ -59,6 +59,13 @@ export enum ServiceOrderPaymentStatus {
   NONE = 'NONE',
 }
 
+export enum ServiceOrderPaymentWithIndicationStatus {
+  AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND = 'AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND',
+  AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID = 'AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID',
+  AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID = 'AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID',
+  AUTO_GENERATED_ADDITIONAL_INVOICE_PAID = 'AUTO_GENERATED_ADDITIONAL_INVOICE_PAID',
+}
+
 export enum ServiceOrderType {
   REGULAR = 'REGULAR',
   EMERGENCY = 'EMERGENCY',
@@ -193,6 +200,7 @@ export interface ServiceOrderAdditionalInfo {
     endTime: string;
   };
   candidateTechnician?: ServiceOrderCandidateTechnician;
+  candidateTechnicians?: ServiceOrderCandidateTechnician[];
   documents?: FileResource[];
   pictures?: FileResource[];
 }

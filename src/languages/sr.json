@@ -1008,7 +1008,7 @@
   "Created 03.09.2022 | 13:15": "Objavljeno 03.09.2022 | 13:15",
   "System": "Sistem",
   "Signature": "Potpis",
-  "No Signature": "Nema potpisa",
+  "No Signature": "Bez potpisa",
   "Send Checklist": "Pošalji popis za provjeru",
   "Checklist sent successfully": "Popis za provjeru uspješno poslan",
   "No description yet. It will appear here once it is added": "Još nema opisa. Pojaviće se ovde kada se doda",
@@ -2436,5 +2436,12 @@
   "LAST MAINTEN.": "POSLEDNJE ODRŽAVA.",
   "NEXT INSPECT.": "SLEDEĆI PREGLED",
   "ENGINEER": "INŽENJER",
-  "ACTIVE CON.": "AKTIVNI UGO."
+  "ACTIVE CON.": "AKTIVNI UGO.",
+  "Outstanding amount incl. VAT": "Neplaćeni iznos uklj. PDV",
+  "Checklist no.": "Kontrolna lista br.",
+  "Checklist date": "Datum kontrolne liste",
+  "Item": "Stavka",
+  "Quotation date": "Datum ponude",
+  "Hereby I confirm the quotation": "Ovim potvrđujem ponudu",
+  "Date, place, signature, stamp": "Datum, mesto, potpis, pečat"
 }

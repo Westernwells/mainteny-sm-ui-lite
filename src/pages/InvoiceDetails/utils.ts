@@ -218,7 +218,7 @@ export const applyGlobalDiscountOnItems = (
   }
 
   const total = arr
-    .map((item) => item.unitAmount.netAmount)
+    .map((item) => item.unitAmount.netAmount * item.quantity)
     .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
 
   const globalDiscountAmount =

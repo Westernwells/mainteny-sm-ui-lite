@@ -4,6 +4,7 @@ import {amber, grey} from '@mui/material/colors';
 import {
   ServiceOrderArticleView,
   ServiceOrderPaymentStatus,
+  ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderReportTimeRecord,
   ServiceOrderReportView,
   ServiceOrderStatus,
@@ -176,7 +177,10 @@ export const serviceOrderTypeToEnum = (type: string) => {
 };
 
 export const serviceOrderPaymentStatusToString = (
-  type: ServiceOrderPaymentStatus | string,
+  type:
+    | ServiceOrderPaymentStatus
+    | ServiceOrderPaymentWithIndicationStatus
+    | string,
 ) => {
   switch (type) {
     case ServiceOrderPaymentStatus.NOT_PAID:
@@ -186,6 +190,10 @@ export const serviceOrderPaymentStatusToString = (
     case ServiceOrderPaymentStatus.PARTIALLY_PAID:
       return 'Partially Paid';
     case ServiceOrderPaymentStatus.AUTO_GENERATED:
+    case ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND:
+    case ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID:
+    case ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID:
+    case ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PAID:
       return 'Auto Generated';
     case ServiceOrderPaymentStatus.NOT_SENT:
       return 'Not Sent';
