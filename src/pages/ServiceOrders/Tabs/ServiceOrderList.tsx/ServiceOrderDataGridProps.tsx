@@ -130,9 +130,8 @@ export const columns: GridColDef[] = [
       const {value} = params;
       const showIndicator =
         value ===
-          ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID ||
-        value ===
-          ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND;
+        ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND;
+
       return (
         <Box sx={{display: 'flex', alignItems: 'center'}}>
           {showIndicator ? (
