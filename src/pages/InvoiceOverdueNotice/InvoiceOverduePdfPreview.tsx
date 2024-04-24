@@ -11,7 +11,7 @@ import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {InvoiceView} from 'models/invoice';
 import {FormikProps} from 'formik';
-import {formatDate} from 'utils/datetime';
+import {formatDate, toDate} from 'utils/datetime';
 import {formatCurrency} from 'utils/currency';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {Currency} from 'models/misc';
@@ -231,7 +231,7 @@ const InvoiceOverduePdfPreview = ({
               <View style={styles.rightAddressContent}>
                 <Text style={styles.tag}>{translate('Invoice date')}</Text>
                 <Text style={styles.tagContent}>
-                  {formatDate(invoice?.meta.createdAt) ||
+                  {formatDate(toDate(invoice?.sentDate)) ||
                     formatDate(new Date())}
                 </Text>
               </View>
