@@ -442,6 +442,7 @@ export const ArticleItemsTableQuotation = ({
                           },
                           '& .MuiOutlinedInput-input': {
                             py: 0.32,
+                            textAlign: 'right',
                           },
                         }}
                         onValueChange={handleDiscountValueChange}
