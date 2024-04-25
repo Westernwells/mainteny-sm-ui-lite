@@ -286,6 +286,11 @@ export const DraftQuotation = ({
       .map((d) => {
         const discountDays = d.discountDays || 0;
         const discountPercentage = d.discountPercent || 0;
+
+        if (discountDays === 0 && discountPercentage === 0) {
+          return paymentTerm.term || '';
+        }
+
         return t(
           'If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.',
           {
