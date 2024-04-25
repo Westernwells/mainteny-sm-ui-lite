@@ -41,7 +41,6 @@ const getStyles = (
       color: '#212121',
     },
     topSection: {
-      display: 'flex',
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginBottom: 40,
@@ -50,7 +49,7 @@ const getStyles = (
       top: 90,
     },
     rightAddress: {
-      flex: '0 0 45%',
+      flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
     },
@@ -72,6 +71,7 @@ const getStyles = (
       color: '#616161',
       width: '57%',
       textAlign: 'right',
+      ...regularFontStyle,
     },
     dataBody: {
       borderBottom: '1px solid #212121',
@@ -155,7 +155,7 @@ type Props = {
     height: number;
   } | null;
   selectedLng?: string;
-  serviceOrderChecklists?: ServiceOrderCheckListView[];
+  selectedChecklist?: ServiceOrderCheckListView;
   serviceOrder?: ServiceOrderView;
   sortedChecklistComponents?: CheckListComponentView[];
   technicianName?: string;
@@ -168,7 +168,7 @@ const ChecklistPdf = ({
   logoDimensions,
   selectedLng,
   translate,
-  serviceOrderChecklists,
+  selectedChecklist,
   serviceOrder,
   sortedChecklistComponents,
   technicianName,
@@ -210,23 +210,20 @@ const ChecklistPdf = ({
             />
 
             <View style={styles.rightAddress}>
-              {serviceOrderChecklists &&
-                serviceOrderChecklists[0].checkList?.externalId && (
-                  <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Checklist no.')}</Text>
-                    <Text style={styles.tagContent}>
-                      {serviceOrderChecklists[0].checkList?.externalId || '-'}
-                    </Text>
-                  </View>
-                )}
+              {selectedChecklist?.checkList?.externalId && (
+                <View style={styles.rightAddressContent}>
+                  <Text style={styles.tag}>{translate('Checklist no.')}</Text>
+                  <Text style={styles.tagContent}>
+                    {selectedChecklist?.checkList?.externalId || '-'}
+                  </Text>
+                </View>
+              )}
 
               <View style={styles.rightAddressContent}>
                 <Text style={styles.tag}>{translate('Checklist date')}</Text>
                 <Text style={styles.tagContent}>
                   {formatDate(
-                    (serviceOrderChecklists &&
-                      serviceOrderChecklists[0]?.checkList?.meta.createdAt) ||
-                      new Date(),
+                    selectedChecklist?.checkList?.meta.createdAt || new Date(),
                   )}
                 </Text>
               </View>
@@ -281,8 +278,7 @@ const ChecklistPdf = ({
 
           <View>
             <Text style={styles.contentHeader}>
-              {serviceOrderChecklists &&
-                serviceOrderChecklists[0].checkList.name}
+              {selectedChecklist?.checkList.name}
             </Text>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
@@ -325,7 +321,13 @@ const ChecklistPdf = ({
                 )}
               </View>
               {technicianName && (
-                <View style={{position: 'absolute', bottom: -5, left: '25%'}}>
+                <View
+                  style={{
+                    position: 'absolute',
+                    bottom: -5,
+                    textAlign: 'center',
+                    width: '100%',
+                  }}>
                   <Text>{technicianName}</Text>
                 </View>
               )}
