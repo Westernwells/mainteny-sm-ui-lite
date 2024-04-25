@@ -63,6 +63,16 @@ export const UserTable = ({companyId}: Props) => {
             .matches(/\d/, t('Must contain 1 digit'))
             .matches(/.*[\W_]/, t('Must contain 1 special character')),
         }),
+    shifts: Yup.array()
+      .of(
+        Yup.object().shape({
+          fromTime: Yup.string().required(),
+          toTime: Yup.string().required(),
+          type: Yup.string().required(),
+        }),
+      )
+      .min(1)
+      .required(),
   });
 
   const [rows, setRows] = useState<GridRowsProp>([]);

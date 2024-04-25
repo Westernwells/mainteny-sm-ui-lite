@@ -2442,6 +2442,19 @@
   "Checklist date": "Datum kontrolne liste",
   "Item": "Stavka",
   "Quotation date": "Datum ponude",
-  "Hereby I confirm the quotation": "Ovim potvrđujem ponudu",
-  "Date, place, signature, stamp": "Datum, mesto, potpis, pečat"
+  "Hereby I confirm the quotation.": "Ovim potvrđujem ponudu",
+  "Date, place, signature, stamp": "Datum, mesto, potpis, pečat",
+  "If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.": "Ako se plaćanje izvrši u roku od {{discountDais}} dana, odobravamo popust od {{discountPercentage}}% iznosa fakture.",
+  "If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}": "Ako platite pre {DUE_DATE}, odobravamo popust od {{discountPercentage}}% ({DISCOUNT_AMOUNT}) na osnovu {INVOICE_AMOUNT}. Iznos uplate: {PAIMENT_AMOUNT}",
+  "The document was sent successfully.": "Dokument je uspešno poslat.",
+  "Article removed successfully": "Stavak je uspešno uklonjen",
+  "Article updated successfully": "Stavak je uspešno ažuriran",
+  "Article added successfully": "Stavka je uspešno dodata",
+  "Job Automation Settings Updated": "Podešavanja automatizacije poslova su ažurirana",
+  "{{number}} day": "{{number}} dan",
+  "{{number}} days": "{{number}} dana",
+  "{{number}} minutes": "{{number}} minuta",
+  "Contract invoice": "Ugovorna faktura",
+  "Shift start time": "Vreme početka smene",
+  "Shift end time": "Vreme završetka smene"
 }

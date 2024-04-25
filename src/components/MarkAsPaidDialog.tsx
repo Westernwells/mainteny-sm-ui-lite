@@ -81,6 +81,8 @@ export const MarkAsPaidDialog = ({
         },
       );
     },
+    enableReinitialize: true,
+
     validationSchema,
   });
   return (
