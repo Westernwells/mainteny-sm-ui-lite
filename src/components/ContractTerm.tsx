@@ -327,19 +327,24 @@ export const ContractTerm = ({
                         {pt.term}
                       </Typography>
                       {pt.data?.discountOptions
-                        ? pt.data?.discountOptions.map((d, idx) => (
-                            <Typography
-                              key={idx}
-                              variant="caption"
-                              component="p"
-                              color="text.secondary">
-                              {`${d.discountDays} ${t('days')}; ${
-                                d.discountPercent
-                              }% ${t('discount')}; ${t(
-                                convertToText(d.articleType),
-                              )}`}
-                            </Typography>
-                          ))
+                        ? pt.data?.discountOptions
+                            .filter(
+                              (d) =>
+                                d.discountDays !== 0 && d.discountPercent !== 0,
+                            )
+                            .map((d, idx) => (
+                              <Typography
+                                key={idx}
+                                variant="caption"
+                                component="p"
+                                color="text.secondary">
+                                {`${d.discountDays} ${t('days')}; ${
+                                  d.discountPercent
+                                }% ${t('discount')}; ${t(
+                                  convertToText(d.articleType),
+                                )}`}
+                              </Typography>
+                            ))
                         : null}
                     </Box>
                   )
