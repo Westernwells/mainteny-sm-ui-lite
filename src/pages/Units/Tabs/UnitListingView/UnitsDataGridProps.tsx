@@ -69,15 +69,17 @@ export const columns: GridColDef[] = [
     flex: 1.5,
   }),
   getColumnProps({
-    field: ElevatorOrderField.LAST_INSPECTION_DATE,
+    field: ElevatorOrderField.LAST_VISIT_DATE,
     headerName: 'last mainten.',
     align: 'center',
     flex: 0.75,
+    sortable: true,
   }),
   getColumnProps({
     field: ElevatorOrderField.NEXT_INSPECTION_DATE,
     headerName: 'next inspect.',
     flex: 0.75,
+    sortable: true,
   }),
   getColumnProps({
     field: ElevatorOrderField.ASSIGNED_TECHNICIAN_NAMES,
@@ -155,9 +157,8 @@ export const makeRows = (
       elevator.propertyOwner.meta?.state === 'ACTIVE'
         ? elevator.propertyOwner.name
         : '-',
-    [ElevatorOrderField.LAST_INSPECTION_DATE]: elevator.additionalInfo
-      .lastInspectionDate
-      ? formatDate(toDate(elevator.additionalInfo.lastInspectionDate))
+    [ElevatorOrderField.LAST_VISIT_DATE]: elevator.lastVisitDate
+      ? formatDate(toDate(elevator.lastVisitDate))
       : '-',
     [ElevatorOrderField.NEXT_INSPECTION_DATE]: elevator.additionalInfo
       .nextInspectionDate
