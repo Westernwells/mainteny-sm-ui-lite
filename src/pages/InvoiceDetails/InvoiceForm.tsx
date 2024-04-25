@@ -445,7 +445,8 @@ export const InvoiceForm = ({
           }
 
           return t(
-            'If you pay before {DUE_DATE} we grant {DISCOUNT_PERCENTAGE}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}.',
+            `If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}`,
+            {discountPercentage},
           );
         })
         .join('\n') || '';
