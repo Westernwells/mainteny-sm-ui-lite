@@ -242,7 +242,7 @@ export const CheckList = ({serviceOrder}: Props) => {
         selectedLng={company?.language}
         translate={translate}
         serviceOrder={serviceOrder}
-        serviceOrderChecklists={serviceOrderCheckLists}
+        selectedChecklist={selectedChecklist}
         sortedChecklistComponents={sortedChecklistComponents}
         signaturePath={signatureImage}
         technicianName={technicianName}
@@ -312,7 +312,7 @@ export const CheckList = ({serviceOrder}: Props) => {
 
   useEffect(() => {
     generatePdfUrl();
-  }, [signatureImage, imageUrl]);
+  }, [signatureImage, imageUrl, selectedChecklist]);
 
   if (isLoadingCheckList) {
     return <Progress />;
