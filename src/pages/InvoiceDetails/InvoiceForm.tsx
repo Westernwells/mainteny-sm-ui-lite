@@ -475,6 +475,11 @@ export const InvoiceForm = ({
     setServiceOrder(selectedServiceOrder);
   };
 
+  const onRemoveServiceOrder = () => {
+    formik.setFieldValue('customerSpecificOrderNumber', '');
+    setServiceOrder(undefined);
+  };
+
   const generateSubject = () => {
     if (invoiceType === InvoiceType.CREDIT_NOTE) {
       if (!serviceOrder) {
@@ -659,6 +664,10 @@ export const InvoiceForm = ({
       if (!formik.values.description && serviceOrder.report?.description) {
         formik.setFieldValue('description', serviceOrder.report.description);
       }
+      formik.setFieldValue(
+        'customerSpecificOrderNumber',
+        serviceOrder.additionalInfo?.purchaseOrderNumber || '',
+      );
       formik.setFieldValue(
         'propertyOwnerId',
         serviceOrder.elevator.propertyOwner.id,
@@ -1179,7 +1188,7 @@ export const InvoiceForm = ({
                     </>
                   )
                 }
-                cardOnClose={() => setServiceOrder(undefined)}
+                cardOnClose={onRemoveServiceOrder}
                 modalHeader="Select Job"
                 modalBody={
                   <ServiceOrdersDataGrid
