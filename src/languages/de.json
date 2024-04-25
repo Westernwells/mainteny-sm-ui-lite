@@ -2422,7 +2422,7 @@
   "Hereby I confirm the quotation.": "Hiermit bestätige ich das Angebot.",
   "Date, place, signature, stamp": "Datum, Ort, Unterschrift, Stempel",
   "If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.": "Bei Zahlung innerhalb von {{discountDays}} Tagen erhalten Sie {{discountPercentage}}% Skonto auf den Rechnungsbetrag.",
-  "If you pay before {DUE_DATE} we grant {DISCOUNT_PERCENTAGE}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}": "Bei Zahlung bis zum {DUE_DATE} erhalten Sie {DISCOUNT_PERCENTAGE}% Skonto ({DISCOUNT_AMOUNT}) basierend auf {INVOICE_AMOUNT} für die inkludierten Artikel. Zu zahlen: {PAYMENT_AMOUNT}",
+  "If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}": "Bei Zahlung bis zum {DUE_DATE} erhalten Sie {{discountPercentage}}% Skonto ({DISCOUNT_AMOUNT}) basierend auf {INVOICE_AMOUNT}. Zu zahlen: {PAYMENT_AMOUNT}",
   "The document was sent successfully.": "Das Dokument wurde erfolgreich gesendet.",
   "Article removed successfully": "Artikel erfolgreich entfernt",
   "Article updated successfully": "Artikel erfolgreich aktualisiert",

@@ -2445,7 +2445,7 @@
   "Hereby I confirm the quotation.": "Ovim potvrđujem ponudu",
   "Date, place, signature, stamp": "Datum, mesto, potpis, pečat",
   "If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.": "Ako se plaćanje izvrši u roku od {{discountDais}} dana, odobravamo popust od {{discountPercentage}}% iznosa fakture.",
-  "If you pay before {DUE_DATE} we grant {DISCOUNT_PERCENTAGE}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}": "Ako platite pre {DUE_DATE}, odobravamo popust od {DISCOUNT_PERCENTAGE}% ({DISCOUNT_AMOUNT}) na osnovu {INVOICE_AMOUNT}. Iznos uplate: {PAIMENT_AMOUNT}",
+  "If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}": "Ako platite pre {DUE_DATE}, odobravamo popust od {{discountPercentage}}% ({DISCOUNT_AMOUNT}) na osnovu {INVOICE_AMOUNT}. Iznos uplate: {PAIMENT_AMOUNT}",
   "The document was sent successfully.": "Dokument je uspešno poslat.",
   "Article removed successfully": "Stavak je uspešno uklonjen",
   "Article updated successfully": "Stavak je uspešno ažuriran",
