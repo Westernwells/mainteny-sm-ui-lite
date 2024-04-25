@@ -307,7 +307,7 @@ export const InvoiceForm = ({
         ? InvoiceType[invoiceType]
         : InvoiceType.FULL,
     items: [],
-    paymentTerms: '',
+    paymentTerm: undefined,
     propertyOwnerId: '',
     serviceCompanyId: '',
     serviceOrderId: '',
@@ -434,42 +434,34 @@ export const InvoiceForm = ({
   }, [invoice]);
 
   const getFormattedPaymentTerms = (paymentTerm: ContractPaymentTermView) => {
-    const invoiceAmount = getArticlesTotalAmountInclVats(formik.values);
-    const formattedInvoiceAmount = formatCurrency(invoiceAmount);
-    return (
+    const term =
       paymentTerm.data?.discountOptions
         .map((d) => {
-          const dueDate = addDays(
-            formik.values.sentDate || new Date(),
-            d.discountDays || 0,
-          );
-          const formattedDueDate = formatDate(dueDate);
+          const discountDays = d.discountDays || 0;
           const discountPercentage = d.discountPercent || 0;
-          const discountAmount = invoiceAmount * (discountPercentage / 100);
-          const formattedDiscountAmount = formatCurrency(discountAmount);
-          const paymentAmount = invoiceAmount - discountAmount;
-          const formattedPaymentAmount = formatCurrency(paymentAmount);
+
+          if (discountDays === 0 && discountPercentage === 0) {
+            return paymentTerm.term || '';
+          }
+
           return t(
-            'If you pay before {{dueDate}} we grant {{discountPercentage}}% discount ({{discountAmount}}) based on {{invoiceAmount}} for the included articles. Payment amount: {{paymentAmount}}',
-            {
-              dueDate: formattedDueDate,
-              discountPercentage,
-              discountAmount: formattedDiscountAmount,
-              invoiceAmount: formattedInvoiceAmount,
-              paymentAmount: formattedPaymentAmount,
-            },
+            'If you pay before {DUE_DATE} we grant {DISCOUNT_PERCENTAGE}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}.',
           );
         })
-        .join('\n') || ''
-    );
+        .join('\n') || '';
+
+    return {
+      id: paymentTerm.id,
+      term,
+    };
   };
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
     if (formType === 'new' && row.paymentTerm) {
       formik.setFieldValue(
-        'paymentTerms',
-        row.paymentTerm ? getFormattedPaymentTerms(row.paymentTerm) : '',
+        'paymentTerm',
+        getFormattedPaymentTerms(row.paymentTerm),
       );
     }
     // If the chosen customer was already set as the property owner of the invoice
@@ -646,7 +638,9 @@ export const InvoiceForm = ({
       if (invoice.sentDate) {
         formik.setFieldValue('sentDate', new Date(invoice.sentDate));
       }
-      formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '');
+      if (invoice?.additionalInfo.paymentTerm) {
+        formik.setFieldValue('paymentTerm', invoice.additionalInfo.paymentTerm);
+      }
       formik.setFieldValue(
         'type',
         formik.values.type === InvoiceType.CREDIT_NOTE
@@ -816,10 +810,12 @@ export const InvoiceForm = ({
     const paymentTermObj = contractPaymentTerms?.data.find(
       ({id}) => id === paymentTermId,
     );
-    formik.setFieldValue(
-      'paymentTerms',
-      paymentTermObj ? getFormattedPaymentTerms(paymentTermObj) : '',
-    );
+    if (paymentTermObj) {
+      formik.setFieldValue(
+        'paymentTerm',
+        getFormattedPaymentTerms(paymentTermObj),
+      );
+    }
     if (!!paymentTermObj?.data?.dueDays) {
       formik.setFieldValue(
         'dueDate',
@@ -1331,13 +1327,13 @@ export const InvoiceForm = ({
             />
             <FormInput
               props={{
-                id: 'paymentTerms',
+                id: 'paymentTerm.term',
                 size: 'small',
                 label: 'Payment terms',
-                name: 'paymentTerms',
+                name: 'paymentTerm.term',
                 minRows: 2,
                 multiline: true,
-                value: formik.values.paymentTerms,
+                value: formik.values.paymentTerm?.term,
                 onChange: formik.handleChange,
                 InputProps: {
                   endAdornment: (
@@ -1771,7 +1767,7 @@ export const InvoiceForm = ({
           onSave={handleContractPaymentTermsModal}
           defaultValue={
             contractPaymentTerms?.data.find(
-              (c) => c.term === formik.values.paymentTerms,
+              (c) => c.id === formik.values.paymentTerm?.id,
             )?.id || ''
           }
           onClick={() => setOpenContractPaymentTermSelectDialog(true)}
