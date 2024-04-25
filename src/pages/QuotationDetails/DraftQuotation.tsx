@@ -26,7 +26,6 @@ import {
   QuotationItemRecord,
   QuotationView,
 } from 'models/quotation';
-import {Discount, DiscountType} from 'models/invoice';
 import {ElevatorView} from 'models/elevator';
 import {
   PropertyOwnerSimpleView,
@@ -83,32 +82,13 @@ import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
 import {ContractTermView} from 'models/contract';
 import NewUnit from './NewUnit';
-import {formatQuotationRecord} from './utils';
+import {formatQuotationRecord, getDiscoutObj} from './utils';
 
 interface Props {
   formType?: string;
   quotation?: QuotationView;
   serviceCompanyType: ServiceCompanyType;
 }
-
-const getDiscoutObj = (discount?: Discount) =>
-  discount
-    ? {
-        ...discount,
-        type:
-          discount?.type === DiscountType.NONE
-            ? DiscountType.PERCENTAGE
-            : discount?.type,
-        amount: discount?.amount
-          ? {
-              ...discount?.amount,
-              value:
-                (discount?.amount?.value ?? 0) /
-                10 ** (discount.amount.fractionDigits ?? 2),
-            }
-          : undefined,
-      }
-    : undefined;
 
 const quotationItemToQuotationItemRecord = (
   quotationItem: QuotationItem,

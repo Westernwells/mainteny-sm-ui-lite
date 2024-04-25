@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -31,26 +31,34 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {PdfGenerationStatus} from 'models/misc';
-import {
-  useDownloadFileWithCustomName,
-  useDownloadUrl,
-} from 'hooks/reactQuery/useDownloadUrl';
+import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import useLogoDimensions from 'hooks/useLogoDimensions';
+import useLogoImage from 'hooks/useLogoImage';
+import {companyLanguageContextMap} from 'utils/utils';
+import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
+import {pdf} from '@react-pdf/renderer';
+import {useCurrentCurrency} from 'utils/currency';
 
 interface Props {
   quotation: QuotationView;
 }
 
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
+
 export const Actions = ({quotation}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isRejectedDialogOpen, setIsRejectedDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const [pathToDownload, setPathToDownload] = useState('');
   const [actionType, setActionType] = useState('');
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
     useState(false);
@@ -58,18 +66,56 @@ export const Actions = ({quotation}: Props) => {
   const {mutate: deleteQuotation} = useDeleteQuotation();
   const {mutateAsync: publishQuotation} = usePublishQuotation();
 
+  const [filePathToDownload, setFilePathToDownload] = useState('');
+  const imageUrl = useLogoImage(user);
+  const logoDimensions = useLogoDimensions(imageUrl);
+
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
+  const generateBlobUrl = async () => {
+    const blob = await pdf(
+      <QuotationPdfTemplate
+        userInfo={user?.userAccount}
+        currentCurrency={currentCurrency}
+        logoSrc={imageUrl}
+        logoDimensions={logoDimensions}
+        quotation={quotation}
+        selectedLng={company?.language}
+        translate={translate}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    setFilePathToDownload(blobURL);
+  };
+
+  useEffect(() => {
+    if (imageUrl) {
+      generateBlobUrl();
+    }
+  }, [actionType]);
+
   const {pdfPath} = quotation.additionalInfo;
   const isPDFGenerated =
     quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
     pdfPath;
 
-  const {data: downloadUrls} = useDownloadUrl(
-    pathToDownload ? [pathToDownload] : [],
-  );
-
   const {downloadFile} = useDownloadFileWithCustomName(
-    quotation?.number,
-    downloadUrls?.[pathToDownload] || '',
+    quotation.number,
+    filePathToDownload,
   );
 
   const handleClick = (event: any) => {
@@ -155,7 +201,6 @@ export const Actions = ({quotation}: Props) => {
                 icon: <FileDownload />,
                 onClick: () => {
                   setActionType('DOWNLOAD');
-                  setPathToDownload(quotation.additionalInfo.pdfPath as string);
                 },
               },
             ]
@@ -195,21 +240,19 @@ export const Actions = ({quotation}: Props) => {
   }, [pdfPath]);
 
   useEffect(() => {
-    const url = downloadUrls?.[pathToDownload];
-
-    if (url) {
+    if (filePathToDownload) {
       if (actionType === 'DOWNLOAD') {
         downloadFile();
       }
 
       if (actionType === 'PRINT') {
-        printQuotation(url);
+        printQuotation(filePathToDownload);
       }
 
-      setPathToDownload('');
+      setFilePathToDownload('');
       setActionType('');
     }
-  }, [downloadUrls]);
+  }, [filePathToDownload]);
 
   return (
     <Box>
@@ -330,7 +373,6 @@ export const Actions = ({quotation}: Props) => {
         open={isConfirmPrintDialogOpen}
         onConfirm={() => {
           setActionType('PRINT');
-          setPathToDownload(quotation.additionalInfo.pdfPath as string);
         }}
         onClose={() => setIsConfirmPrintDialogOpen(false)}
       />

@@ -61,7 +61,7 @@ export const ArticleItemsTableQuotation = ({
   const currentCurrency = useCurrentCurrency();
 
   const subtotalExclVat = calculateQuotationTotalWithPerItemDiscount(
-    formik.values,
+    formik.values.items,
   );
   const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
     currency: currentCurrency.code,

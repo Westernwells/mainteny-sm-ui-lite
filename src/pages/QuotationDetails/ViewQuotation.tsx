@@ -289,7 +289,7 @@ export const ViewQuotation = ({
 
   useEffect(() => {
     generateBlobUrl();
-  }, [imageUrl, quotation]);
+  }, [quotation, imageUrl]);
 
   return (
     <Box>

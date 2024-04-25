@@ -1,9 +1,5 @@
 import {DiscountType} from 'models/invoice';
-import {
-  QuotationActivityType,
-  QuotationFormData,
-  QuotationItemRecord,
-} from 'models/quotation';
+import {QuotationActivityType, QuotationItemRecord} from 'models/quotation';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {Currencies} from './currency';
 
@@ -33,9 +29,9 @@ export const getQuotationActivityTitle = (
 };
 
 export const calculateQuotationTotalWithPerItemDiscount = (
-  invoice: QuotationFormData,
+  quotationItems: QuotationItemRecord[],
 ) => {
-  const sum = invoice.items
+  const sum = quotationItems
     .map((item: QuotationItemRecord) =>
       applyDiscount({
         actualValue:
