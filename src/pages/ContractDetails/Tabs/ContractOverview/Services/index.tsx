@@ -48,6 +48,7 @@ import {useContractElevators} from 'hooks/reactQuery/useContacts';
 import {useQueryState} from 'hooks/useQueryState';
 import {Order} from 'models/misc';
 import {useSnackbar} from 'hooks/useSnackbar';
+import {t as translate} from 'i18next';
 import {ContractCard} from '../ContractCard';
 import {SectionTitle} from '../../../../InvoiceDetails/SectionTitle';
 import ServiceInformationReview from './ServiceInfo';
@@ -63,7 +64,11 @@ const serviceListingColumns: {
   width?: TableCellProps['width'];
 }[] = [
   {name: 'SERVICE NAME', align: 'left', width: '10%'},
-  {name: 'UNITS', align: 'right', width: '5%'},
+  {
+    name: translate('UNITS', {context: 'elevator'}),
+    align: 'right',
+    width: '5%',
+  },
   {name: 'DATE', align: 'right', width: '10%'},
   {name: 'AUTO JOB', align: 'center', width: '15%'},
   {name: 'JOB FREQUENCY', align: 'left', width: '20%'},

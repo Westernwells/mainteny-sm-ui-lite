@@ -105,7 +105,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
       handleAction={() => setOpenDialog(true)}
       header={
         <Typography variant="h5">
-          {t('General')}{' '}
+          {t('General', {context: 'common'})}
           <Chip
             label={t(
               `${
