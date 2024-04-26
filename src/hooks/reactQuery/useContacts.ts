@@ -1,4 +1,10 @@
-import {ContactsView, ContactBody} from 'models/contacts';
+import {
+  ContactsView,
+  ContactBody,
+  ServiceCompanyContactPersonQueryParams,
+  ServiceCompanyContactPersonView,
+  ServiceCompanyContactPeronFormModel,
+} from 'models/contacts';
 import {
   useMutation,
   useQuery,
@@ -15,6 +21,7 @@ import {
   ContractElevatorView,
 } from 'models/contract';
 import {Page, Resource, RestError, StringValue} from 'models/misc';
+import {useUserSession} from './useUserSession';
 
 const fetchContractElevators = async (
   contractId: string,
@@ -217,6 +224,138 @@ export const useUpdateContractElevator = (successMsg: string) => {
           variant: 'success',
         });
         queryClient.invalidateQueries(queryKeys.fetchContractElevators);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const fetchServiceCompanyContactPersons = async (
+  serviceCompanyId: string,
+  params: Partial<ServiceCompanyContactPersonQueryParams>,
+) => {
+  const response = await axiosClient.get<
+    Resource<ServiceCompanyContactPersonView>
+  >(`/api/serviceCompanies/${serviceCompanyId}/contactPersons`, {
+    params,
+    paramsSerializer,
+  });
+  return response.data;
+};
+
+export const useServiceCompanyContactPersons = (
+  params: Partial<ServiceCompanyContactPersonQueryParams>,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+  return useQuery<Resource<ServiceCompanyContactPersonView>, RestError>(
+    [queryKeys.queryServiceCompanyContactPersons, serviceCompanyId, params],
+    () => fetchServiceCompanyContactPersons(serviceCompanyId!, params),
+    {
+      ...options,
+      enabled: !!user,
+    },
+  );
+};
+
+const createServiceCompanyContactPerson = async (
+  body: ServiceCompanyContactPeronFormModel,
+) => {
+  await axiosClient.post<StringValue>(`/api/contactPersons`, {
+    ...body,
+  });
+};
+
+export const useCreateServiceCompanyContactPerson = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    (data: ServiceCompanyContactPeronFormModel) =>
+      createServiceCompanyContactPerson(data),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries([
+          queryKeys.queryServiceCompanyContactPersons,
+        ]);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const updateServiceCompanyContactPerson = async (
+  body: ServiceCompanyContactPeronFormModel,
+  contactPersonId: string,
+) => {
+  await axiosClient.put<StringValue>(`/api/contactPersons/${contactPersonId}`, {
+    ...body,
+  });
+};
+
+export const useUpdateServiceCompanyContactPerson = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      contactPersonId,
+    }: {
+      body: ServiceCompanyContactPeronFormModel;
+      contactPersonId: string;
+    }) => updateServiceCompanyContactPerson(body, contactPersonId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries([
+          queryKeys.queryServiceCompanyContactPersons,
+        ]);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const deleteServiceCompanyContactPerson = async (contactPersonId: string) => {
+  await axiosClient.delete<StringValue>(
+    `/api/contactPersons/${contactPersonId}`,
+  );
+};
+
+export const useDeleteServiceCompanyContactPerson = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    (contactPersonId: string) =>
+      deleteServiceCompanyContactPerson(contactPersonId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries([
+          queryKeys.queryServiceCompanyContactPersons,
+        ]);
       },
       onError: (err: any) => {
         console.log(err);

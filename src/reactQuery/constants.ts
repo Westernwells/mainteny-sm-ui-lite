@@ -84,6 +84,7 @@ export const queryKeys = {
   queryServiceOrderChecklists: 'queryServiceOrderChecklists',
   queryContractPaymentTerms: 'queryContractPaymentTerms',
   queryTravelWorks: 'queryTravelWorks',
+  queryServiceCompanyContactPersons: 'queryServiceCompanyContactPersons',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

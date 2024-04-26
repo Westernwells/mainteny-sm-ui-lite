@@ -41,6 +41,8 @@ import {ReactComponent as AccountingInvoiceMailActive} from 'assets/icons/accoun
 import {ReactComponent as AccountingInvoiceMail} from 'assets/icons/accounting-invoice-mail.svg';
 import {ReactComponent as BusinessContractApproveActive} from 'assets/icons/business-contract-approve-active.svg';
 import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve.svg';
+import {ReactComponent as ContactsIcon} from 'assets/icons/ContactsIcon.svg';
+import {ReactComponent as ContactsIconActive} from 'assets/icons/ContactsIconActive.svg';
 import Fade from '@mui/material/Fade';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Role} from 'models/user';
@@ -196,6 +198,22 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         setSelectedIndex(index);
         setSelectedPath('/contracts');
         navigate('/contracts');
+      },
+    },
+    {
+      text: 'Contacts',
+      icon: <ContactsIcon fontSize="1.5rem" style={{color: 'red'}} />,
+      selectIcon: <ContactsIconActive fontSize="1.5rem" />,
+      path: '/contacts',
+      access: !isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/contacts');
+        navigate('/contacts');
       },
     },
     {

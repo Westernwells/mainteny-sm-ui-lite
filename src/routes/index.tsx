@@ -49,6 +49,7 @@ import NewArticle from 'pages/ArticleDetails/NewArticle';
 import NewSupplier from 'pages/NewSupplier';
 import SupplierDetails from 'pages/SupplierDetails';
 import Analytics from 'pages/Analytics';
+import Contacts from 'pages/Contacts';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -338,6 +339,19 @@ export const Router = () => {
                 </Helmet>
                 <PageLayout pageTitle="Employees">
                   <Employees />
+                </PageLayout>
+              </>
+            }
+          />
+          <Route
+            path="/contacts"
+            element={
+              <>
+                <Helmet>
+                  <title>{`Contacts - ${titleTail}`}</title>
+                </Helmet>
+                <PageLayout pageTitle="Contacts">
+                  <Contacts />
                 </PageLayout>
               </>
             }
