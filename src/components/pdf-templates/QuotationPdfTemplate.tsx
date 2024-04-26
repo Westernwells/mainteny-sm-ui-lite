@@ -122,7 +122,7 @@ const getStyles = (
     contentBody: {
       color: '#616161',
       fontSize: 10,
-      marginBottom: 10,
+      marginVertical: 15,
       lineHeight: 1.3,
       maxWidth: '100%',
     },
@@ -190,7 +190,7 @@ const getStyles = (
     signatureText: {
       position: 'absolute',
       bottom: -5,
-      left: '22%',
+      left: '16%',
       backgroundColor: 'white',
       padding: 1,
       ...boldFontStyle,
@@ -248,12 +248,15 @@ const QuotationPdfTemplate = React.memo(
     const subtotalExclVat =
       calculateQuotationTotalWithPerItemDiscount(articleItems);
 
-    const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
-      currency: currentCurrency?.code,
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    });
+    const subtotalExclVatFormatted = formatCurrency(
+      subtotalExclVat - discountValue,
+      {
+        currency: currentCurrency?.code,
+        excludeCurrencySymbol: true,
+        currencySymbol: currentCurrency?.symbol,
+        companyLang: selectedLng,
+      },
+    );
 
     const subtotalExclVatAfterDiscount = applyQuotationDiscount({
       actualValue: subtotalExclVat,
