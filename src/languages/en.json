@@ -2435,5 +2435,6 @@
   "Total incl. VAT": "Total incl. VAT",
   "days": "days",
   "discount": "discount",
-  "This job contains articles that haven’t been invoiced yet. Check the job details for more information.": "This job contains articles that haven’t been invoiced yet. Check the job details for more information."
+  "This job contains articles that haven’t been invoiced yet. Check the job details for more information.": "This job contains articles that haven’t been invoiced yet. Check the job details for more information.",
+  "Discount_quotation": "Discount"
 }
