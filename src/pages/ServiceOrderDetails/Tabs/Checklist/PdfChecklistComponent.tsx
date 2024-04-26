@@ -11,7 +11,7 @@ interface ComponentProps {
 }
 
 interface ExtendedComponentProps extends ComponentProps {
-  index?: number;
+  index: number;
 }
 
 const getStyles = (boldFontStyle?: {fontFamily: string}) =>
@@ -21,7 +21,6 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       color: '#212121',
       ...boldFontStyle,
       paddingVertical: 8,
-      borderTop: '1px solid rgb(143, 155, 179)',
       borderBottom: '1px solid rgb(143, 155, 179)',
       width: '100%',
       paddingLeft: '5%',
@@ -84,6 +83,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       paddingLeft: '5%',
+      marginTop: 7,
     },
   });
 
@@ -101,7 +101,7 @@ export const MultiChoiceComponent = ({
   return (
     <View style={styles.multiChoiceContainer}>
       <View style={styles.multiChoiceHeader}>
-        <Text style={styles.multiChoiceIndex}>{index}</Text>
+        <Text style={styles.multiChoiceIndex}>{index - 1}</Text>
         <Text style={styles.multiChoiceHeaderContent}>{component.subject}</Text>
       </View>
 
@@ -186,7 +186,7 @@ export const TextComponent = ({
           justifyContent: 'space-between',
           paddingTop: 8,
         }}>
-        <Text style={{flex: '0 0 5%'}}>{index}</Text>
+        <Text style={{flex: '0 0 5%'}}>{index - 1}</Text>
         <Text style={{flex: '0 0 95%', ...boldFontStyle}}>
           {component.subject}
         </Text>
@@ -198,7 +198,9 @@ export const TextComponent = ({
             src={TextSnippet}
             style={{width: 12, height: 12, flex: '0 0 3%'}}
           />
-          <Text style={{flex: '0 0 97%'}}>{component.additionalInfo.note}</Text>
+          <Text style={{flex: '0 0 97%', paddingLeft: 4}}>
+            {component.additionalInfo.note}
+          </Text>
         </View>
       )}
     </View>

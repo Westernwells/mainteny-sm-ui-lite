@@ -123,6 +123,7 @@ const getStyles = (
       justifyContent: 'space-between',
       paddingBottom: 8,
       alignItems: 'center',
+      borderBottom: '1px solid rgb(143, 155, 179)',
     },
     tableHeaderIndex: {
       flex: '0 0 5%',
@@ -312,7 +313,8 @@ const ChecklistPdf = ({
                 textAlign: 'center',
                 justifyContent: 'space-around',
                 position: 'relative',
-              }}>
+              }}
+              wrap={false}>
               <View>
                 {signaturePath ? (
                   <Image src={signaturePath} style={{width: 120, height: 40}} />

@@ -47,12 +47,7 @@ import {CheckListComponentType} from 'models/checklist';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
-import {
-  companyLanguageContextMap,
-  convertBase64ToPNG,
-  createFilesFromBlobArray,
-  getBase64FromUrl,
-} from 'utils/utils';
+import {companyLanguageContextMap, createFilesFromBlobArray} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -60,6 +55,7 @@ import PathImage from 'assets/images/Path.svg';
 import {SnackbarKey} from 'notistack';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {ChecklistComponent} from './ChecklistComponent';
 import ChecklistPdf from './ChecklistPdf';
 
@@ -213,9 +209,10 @@ export const CheckList = ({serviceOrder}: Props) => {
       ? 0
       : (checklistSummary.done / checklistSummary.all) * 100,
   );
-  const [signatureImage, setSignatureImage] = useState('');
+
   const imageUrl = useLogoImage(user);
   const logoDimensions = useLogoDimensions(imageUrl);
+  const signatureImageUrl = useFetchAndConvertImage(signaturePath);
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
@@ -244,7 +241,7 @@ export const CheckList = ({serviceOrder}: Props) => {
         serviceOrder={serviceOrder}
         selectedChecklist={selectedChecklist}
         sortedChecklistComponents={sortedChecklistComponents}
-        signaturePath={signatureImage}
+        signaturePath={signatureImageUrl}
         technicianName={technicianName}
       />,
     ).toBlob();
@@ -275,44 +272,8 @@ export const CheckList = ({serviceOrder}: Props) => {
   };
 
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchImage = async () => {
-      const technicianSignatureUrl =
-        signatureDownloadUrls[
-          selectedChecklist?.additionalInfo.technicianSignature!
-        ];
-
-      if (!signatureImage.trim() && technicianSignatureUrl) {
-        const fetchedImageUrl = await getBase64FromUrl(technicianSignatureUrl);
-        if (isMounted && fetchedImageUrl) {
-          let finalImageUrl = fetchedImageUrl;
-          if (fetchedImageUrl.startsWith('data:image/jpeg')) {
-            try {
-              finalImageUrl = await convertBase64ToPNG(fetchedImageUrl);
-            } catch (error) {
-              console.error('Error converting JPEG to PNG:', error);
-            }
-          }
-          setSignatureImage(finalImageUrl);
-        }
-      }
-    };
-
-    fetchImage();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [
-    signatureDownloadUrls[
-      selectedChecklist?.additionalInfo.technicianSignature!
-    ],
-  ]);
-
-  useEffect(() => {
     generatePdfUrl();
-  }, [signatureImage, imageUrl, selectedChecklist]);
+  }, [signatureImageUrl, imageUrl, selectedChecklist]);
 
   if (isLoadingCheckList) {
     return <Progress />;
