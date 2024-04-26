@@ -45,17 +45,19 @@ import {theme} from 'theme';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import {
+  companyLanguageContextMap,
   formatAddressFullname,
   formatSearchParams,
   getUserFullName,
 } from 'utils/utils';
 import {EditFrom} from 'pages/InvoiceDetails/EditFrom';
-import {AddressComponent, AddressRecord} from 'models/misc';
+import {AddressComponent, AddressRecord, Language} from 'models/misc';
 import NewCustomer from 'pages/InvoiceDetails/NewCustomer';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {SelectCombined} from 'components/SelectCombined';
 import {UnitsDataGrid} from 'components/DataGrid/UnitsDataGrid';
 import {LanguageContext} from 'context/LanguageProvider';
+import {UserCompanyContext} from 'context/UserCompanyProvider';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {
   useCompanyAutoNumberConfig,
@@ -125,6 +127,9 @@ export const DraftQuotation = ({
 
   const {user} = useUserSession();
   const {language: selectedLng} = useContext(LanguageContext);
+  const {company} = useContext(UserCompanyContext);
+  const companyLanguage =
+    companyLanguageContextMap[company?.language || Language.EN_US];
 
   const {data: elevator, isLoading: isLoadingElevator} =
     typeof elevatorId === 'string'
@@ -261,25 +266,30 @@ export const DraftQuotation = ({
     });
   }
 
-  const getFormattedPaymentTerms = (paymentTerm: ContractTermView) =>
-    paymentTerm.data?.discountOptions
-      .map((d) => {
-        const discountDays = d.discountDays || 0;
-        const discountPercentage = d.discountPercent || 0;
+  const getFormattedPaymentTerms = (paymentTerm: ContractTermView) => {
+    const discountOptions =
+      paymentTerm.data?.discountOptions
+        .map((d) => {
+          const discountDays = d.discountDays || 0;
+          const discountPercentage = d.discountPercent || 0;
 
-        if (discountDays === 0 && discountPercentage === 0) {
-          return paymentTerm.term || '';
-        }
+          if (discountDays === 0 && discountPercentage === 0) {
+            return paymentTerm.term || '';
+          }
 
-        return t(
-          'If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.',
-          {
-            discountDays,
-            discountPercentage,
-          },
-        );
-      })
-      .join('\n') || '';
+          return t(
+            'If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.',
+            {
+              discountDays,
+              discountPercentage,
+              lng: companyLanguage,
+            },
+          );
+        })
+        .join('\n') || '';
+
+    return `${paymentTerm.term}\n${discountOptions}`;
+  };
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
