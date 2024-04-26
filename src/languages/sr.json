@@ -1735,7 +1735,6 @@
   "Credit Note invoice": "Kredit faktura",
   "Description updated successfully": "Opis je uspešno ažuriran",
   "Enter discount value (in percentage)": "Unesite vrednost popusta (u procentima)",
-  "Discount": "Popust",
   "Duplicate invoice external id": "Spoljni ID duplikata fakture",
   "Duplicate contract external id": "Duplikat spoljnog ID-a ugovora",
   "Duplicate article external id": "Duplikat spoljnog ID-a članka",
@@ -2456,5 +2455,6 @@
   "{{number}} minutes": "{{number}} minuta",
   "Contract invoice": "Ugovorna faktura",
   "Shift start time": "Vreme početka smene",
-  "Shift end time": "Vreme završetka smene"
+  "Shift end time": "Vreme završetka smene",
+  "Discount": "Popust"
 }
