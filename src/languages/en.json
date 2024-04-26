@@ -1739,7 +1739,6 @@
   "Credit Note invoice": "Credit Note invoice",
   "Description updated successfully": "Description updated successfully",
   "Enter discount value (in percentage)": "Enter discount value (in percentage)",
-  "Discount": "Discount",
   "Duplicate invoice external id": "Duplicate invoice external id",
   "Duplicate contract external id": "Duplicate contract external id",
   "Duplicate article external id": "Duplicate article external id",
@@ -2436,5 +2435,9 @@
   "days": "days",
   "discount": "discount",
   "This job contains articles that haven’t been invoiced yet. Check the job details for more information.": "This job contains articles that haven’t been invoiced yet. Check the job details for more information.",
-  "Discount_quotation": "Discount"
+  "Discount_contract": "Discount",
+  "Unit_elevator": "Unit",
+  "UNITS_elevator": "UNITS",
+  "General_common": "General",
+  "Discount": "Discount"
 }

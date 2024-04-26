@@ -1738,7 +1738,6 @@
   "Credit Note invoice": "Kreditnota faktura",
   "Description updated successfully": "Beskrivelse opdateres med succes",
   "Enter discount value (in percentage)": "Indtast rabatværdi (i procent)",
-  "Discount": "Rabat",
   "Duplicate invoice external id": "Duplikatfaktura eksternt ID",
   "Duplicate contract external id": "Duplikatkontrakt Ekstern ID",
   "Duplicate article external id": "Duplikatreservedel Ekstern ID",
@@ -1972,5 +1971,6 @@
   "Freight Lift": "Godselevator",
   "Passenger Lift": "Personelevator",
   "Goods Lift": "Køkkenhejs",
-  "Stair Lift": "Trappelift"
+  "Stair Lift": "Trappelift",
+  "Discount": "Rabat"
 }

@@ -1719,7 +1719,6 @@
   "Credit Note invoice": "Gutschrift",
   "Description updated successfully": "Beschreibung wurde erfolgreich aktualisiert",
   "Enter discount value (in percentage)": "Skonto eingeben (in Prozent)",
-  "Discount": "Skonto",
   "Duplicate invoice external id": "Doppelte Rechnungsnummer ",
   "Duplicate contract external id": "Doppelte Vertragsnummer",
   "Duplicate article external id": "Doppelte Artikelnummer",
@@ -2433,5 +2432,10 @@
   "{{number}} minutes": "{{number}} Minuten",
   "Contract invoice": "Vertragsrechnung",
   "Shift start time": "Beginn Arbeitszeit",
-  "Shift end time": "Ende Arbeitszeit"
+  "Shift end time": "Ende Arbeitszeit",
+  "Discount_contract": "Skonto",
+  "Unit_elevator": "Anlage",
+  "UNITS_elevator": "ANLAGEN",
+  "General_common": "Allgemein",
+  "Discount": "Rabatt"
 }

@@ -1738,7 +1738,6 @@
   "Credit Note invoice": "Кредитная нота",
   "Description updated successfully": "Описание обновлено успешно",
   "Enter discount value (in percentage)": "Введите скидку (в процентах)",
-  "Discount": "Скидка",
   "Duplicate invoice external id": "Дублировать внешний идентификатор счета ",
   "Duplicate contract external id": "Дублировать внешний идентификатор контракта",
   "Duplicate article external id": "Дублировать внешний идентификатор позиции",
@@ -2462,5 +2461,6 @@
   "{{number}} minutes": "{{number}} минут",
   "Contract invoice": "Счет по контракту",
   "Shift start time": "Начало смены",
-  "Shift end time": "Конец смены"
+  "Shift end time": "Конец смены",
+  "Discount": "Скидка"
 }

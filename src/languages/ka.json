@@ -1739,7 +1739,6 @@
   "Credit Note invoice": "კრედიტ ნოტა",
   "Description updated successfully": "აღწერა წარმატებით განახლდა",
   "Enter discount value (in percentage)": "შეიყვანეთ ფასდაკლების ღირებულება (პროცენტულად)",
-  "Discount": "ფასდაკლება",
   "Duplicate invoice external id": "გარე ინვოისის ID-ს ასლი",
   "Duplicate contract external id": "გარე ხელშეკრულების ID- ს ასლი",
   "Duplicate article external id": "გარე ნაწილის ID- ს ასლი",
@@ -2396,5 +2395,6 @@
   "Invoice no.": "ინვოისის ნომერი",
   "Invoice date": "ინვოისის თარიღი",
   "Due date": "ბოლო ვადა",
-  "Outstanding amount (incl. VAT)": "გადაუხდელი თანხა (დღგ-ს ჩათვლით)"
+  "Outstanding amount (incl. VAT)": "გადაუხდელი თანხა (დღგ-ს ჩათვლით)",
+  "Discount": "ფასდაკლება"
 }
