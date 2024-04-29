@@ -23,7 +23,7 @@ export const getQuotationStatusStyles = (
 ): {
   label: string;
   color:
-    | 'success'
+    | 'darkSuccess'
     | 'warning'
     | 'error'
     | 'info'
@@ -36,9 +36,9 @@ export const getQuotationStatusStyles = (
 } => {
   switch (status) {
     case QuotationStatus.ACCEPTED:
-      return {label: 'Accepted', color: 'success'};
+      return {label: 'Accepted', color: 'darkSuccess'};
     case QuotationStatus.DRAFT:
-      return {label: 'Draft', color: 'eden.light'};
+      return {label: 'Draft', color: 'action.active'};
     case QuotationStatus.REJECTED:
       return {label: 'Rejected', color: 'error'};
     case QuotationStatus.SENT_TO_CLIENT:
