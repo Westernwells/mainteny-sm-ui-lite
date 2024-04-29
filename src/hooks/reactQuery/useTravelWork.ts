@@ -59,6 +59,7 @@ export const useCreateTravelWork = (
       });
       onSuccessResponse?.(response);
       queryClient.invalidateQueries(queryKeys.queryTravelWorks);
+      queryClient.invalidateQueries(queryKeys.queryPropertyOwnerTravelWorks);
     },
     onError: (err: any) => {
       showError(err);
@@ -90,6 +91,7 @@ export const useUpdateTravelWork = (successMsg: string) => {
           variant: 'success',
         });
         queryClient.invalidateQueries(queryKeys.queryTravelWorks);
+        queryClient.invalidateQueries(queryKeys.queryPropertyOwnerTravelWorks);
       },
       onError: (err: any) => {
         showError(err);
@@ -111,9 +113,34 @@ export const useDeleteTravelWork = (successMsg: string) => {
         variant: 'success',
       });
       queryClient.invalidateQueries(queryKeys.queryTravelWorks);
+      queryClient.invalidateQueries(queryKeys.queryPropertyOwnerTravelWorks);
     },
     onError: (err: any) => {
       showError(err);
     },
   });
 };
+
+const fetchPropertyOwnerTravelWorks = async (
+  propertyOwnerId: string,
+  params: TravelWorkParams,
+) => {
+  const response = await axiosClient.get<TravelWorkView[]>(
+    `/api/propertyOwners/${propertyOwnerId}/travelWorks`,
+    {
+      params,
+    },
+  );
+  return response.data;
+};
+
+export const usePropertyOwnerQueryTravelWorks = (
+  propertyOwnerId: string,
+  params: TravelWorkParams,
+  options?: any,
+) =>
+  useQuery<TravelWorkView[], Error>(
+    [queryKeys.queryPropertyOwnerTravelWorks, propertyOwnerId, params],
+    () => fetchPropertyOwnerTravelWorks(propertyOwnerId, params),
+    options,
+  );
