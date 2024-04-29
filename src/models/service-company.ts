@@ -281,7 +281,14 @@ export const TravelWorkCalculationTypeLabels = {
   [TravelWorkCalculationType.FIXED_TRAVEL_TIME]: 'Fixed travel time (unit)',
   [TravelWorkCalculationType.FIXED_TRAVEL_DISTANCE]:
     'Fixed travel distance (unit)',
-} as const;
+};
+
+export const travelWorkCalculationTypeOptions = Object.values(
+  TravelWorkCalculationType,
+).map((value) => ({
+  label: TravelWorkCalculationTypeLabels[value],
+  value,
+}));
 
 export interface TravelWorkView {
   id: string;
@@ -300,6 +307,7 @@ export interface CreateTravelWorkRecord {
   serviceOrderType: ServiceOrderType;
   calculationType: TravelWorkCalculationType;
   articleId: string;
+  articleSellingPrice?: number;
 }
 
 export interface UpdateTravalWorkRecord {
@@ -307,4 +315,12 @@ export interface UpdateTravalWorkRecord {
   serviceOrderType: ServiceOrderType;
   calculationType: TravelWorkCalculationType;
   articleId: string;
+  articleSellingPrice?: number;
+}
+
+export interface TravelWorkFormValues {
+  serviceOrderType: ServiceOrderType;
+  calculationType: TravelWorkCalculationType;
+  articleId: string;
+  articleSellingPrice?: number;
 }
