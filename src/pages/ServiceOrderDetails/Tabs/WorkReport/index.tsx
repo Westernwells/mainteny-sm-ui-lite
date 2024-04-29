@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {useEffect, useMemo, useState} from 'react';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import Box from '@mui/material/Box';
@@ -20,7 +20,6 @@ import {
   ServiceOrderReportView,
   ServiceOrderView,
 } from 'models/service-order';
-import {PdfGenerationStatus} from 'models/misc';
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
@@ -40,8 +39,22 @@ import {
 import {convertDigitalMinsToHM} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSearchParams} from 'react-router-dom';
-import {formatSearchParams} from 'utils/utils';
+import {
+  companyLanguageContextMap,
+  createFilesFromBlobArray,
+  formatSearchParams,
+} from 'utils/utils';
 import {theme} from 'theme';
+import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
+import {pdf} from '@react-pdf/renderer';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import useLogoDimensions from 'hooks/useLogoDimensions';
+import useLogoImage from 'hooks/useLogoImage';
+import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
+import {SimpleEmailRecord} from 'models/misc';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -51,6 +64,10 @@ import {Pictures} from './Pictures';
 interface Props {
   serviceOrder: ServiceOrderView;
 }
+
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
 
 const validationSchema = Yup.object().shape({
   serviceTimeHM: Yup.string()
@@ -78,16 +95,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
     (r) => r.externalId === report?.externalId,
   );
 
-  const {data: pdfDownloadUrl = {}} = useDownloadUrl(
-    serviceOrder.reports?.map((i) => i.additionalInfo.pdfPath) || [],
-  );
-  const {downloadFile} = useDownloadFileWithCustomName(
-    report?.externalId || '',
-    pdfDownloadUrl[report?.additionalInfo.pdfPath || ''],
-  );
-  const isWorkReportPdfGenerated =
-    report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
-
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
     usePublishWorkReport();
@@ -104,8 +111,86 @@ export const WorkReport = ({serviceOrder}: Props) => {
     {enabled: !!report?.signatures?.length},
   );
 
+  const {data: imageDownloadUrls = {}} = useDownloadUrl(
+    report?.attachments?.map((item) => item.fileResource.uri) ?? [],
+    {enabled: true},
+  );
+
+  const technicianSignatureImage = useFetchAndConvertImage(
+    downloadUrls[signatureKeys.TECHNICIAN],
+  );
+
+  const customerSignatureImage = useFetchAndConvertImage(
+    downloadUrls[signatureKeys.CUSTOMER],
+  );
+
+  const imageUrl = useLogoImage(user);
+  const logoDimensions = useLogoDimensions(imageUrl);
+  const {convertedImages, isImageLoading, setShouldFetchImages} =
+    useFetchAndConvertMultipleImages(imageDownloadUrls, report?.attachments);
+
+  const [isPdfGenerated, setIsPdfGenerated] = useState(false);
+  const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
+  const [blobFile, setBlobFile] = useState<Blob>();
+
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
   const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
     useCompleteServiceOrder('Work report updated successfully!');
+
+  const {mutateAsync: uploadFiles} = useUploadFiles(
+    'The document was sent successfully.',
+  );
+
+  const onSubmitHandler = async (values: SimpleEmailRecord) => {
+    const uploadPath = `${serviceCompanyId}/reports/${report?.id}/`;
+
+    const fileNames: string[] = [`${report?.id}.pdf`];
+
+    const files = createFilesFromBlobArray([blobFile!], fileNames);
+
+    await uploadFiles({files, uploadPath});
+
+    publishWorkReport(
+      {
+        id: serviceOrder.id,
+        body: {
+          emails: [values.email] || [],
+          email: values.email,
+          subject: values.subject,
+          content: values.content,
+          attachments: files.reduce<FileWithPreview[]>(
+            (newArr: FileWithPreview[], obj) => [
+              ...newArr,
+              {
+                ...obj,
+                type: obj.type,
+                uri: `${uploadPath}/${obj.name}`,
+                description: obj.name.split('.')[0],
+              },
+            ],
+            [],
+          ),
+        },
+      },
+      {onSuccess: () => setIsSendEmailDialogOpen(false)},
+    );
+  };
+
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
     initialValues: {
       articles: articleViewToArticleRecord(articles),
@@ -132,7 +217,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
           technicianId: report?.technicianId,
           description: values.description,
           articles: articleViewToArticleRecord(articles),
-
           serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
           travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
           onlyShowTotalTime: values.onlyShowTotalTime,
@@ -180,6 +264,41 @@ export const WorkReport = ({serviceOrder}: Props) => {
     }
   };
 
+  const generateWorkReportPdf = async () => {
+    const blob = await pdf(
+      <WorkReportTemplate
+        userInfo={user?.userAccount}
+        selectedLng={company?.language}
+        logoSrc={imageUrl}
+        logoDimensions={logoDimensions}
+        translate={translate}
+        serviceOrder={serviceOrder}
+        report={report}
+        schedule={schedule}
+        technicianSignatureImage={technicianSignatureImage}
+        customerSignatureImage={customerSignatureImage}
+        workReportPictures={convertedImages}
+      />,
+    ).toBlob();
+    setBlobFile(blob);
+    const blobURL = URL.createObjectURL(blob);
+    setPreviewPdfBlobUrl(blobURL);
+  };
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    report?.externalId || '',
+    previewPdfBlobUrl,
+  );
+
+  const downloadPdf = () => {
+    generateWorkReportPdf();
+    setIsPdfGenerated(true);
+  };
+
+  const handleClickDownload = () => {
+    downloadPdf();
+  };
+
   useEffect(() => {
     resetForm();
   }, [report]);
@@ -211,6 +330,24 @@ export const WorkReport = ({serviceOrder}: Props) => {
       formik.setFieldValue('articles', articleViewToArticleRecord(articles));
     }
   }, [articles]);
+
+  useEffect(() => {
+    const hasDownloadUrls = Object.keys(imageDownloadUrls).length > 0;
+    const hasAttachmentUris = report?.attachments?.every(
+      (attachment) => attachment.fileResource?.uri,
+    );
+    if (hasDownloadUrls && hasAttachmentUris) {
+      setShouldFetchImages(true);
+    }
+  }, [imageDownloadUrls, report?.attachments]);
+
+  useEffect(() => {
+    if (isPdfGenerated && previewPdfBlobUrl) {
+      downloadFile();
+      setIsPdfGenerated(false);
+      setPreviewPdfBlobUrl('');
+    }
+  }, [isPdfGenerated, previewPdfBlobUrl]);
 
   if (!report) {
     return (
@@ -381,12 +518,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'outlined',
-              disabled: !isWorkReportPdfGenerated,
+              disabled: isImageLoading,
               sx: {
                 background: 'transparent',
               },
               startIcon: <FileDownloadIcon />,
-              onClick: downloadFile,
+              onClick: () => handleClickDownload(),
             }}>
             <Typography variant="subtitle2">{t('Download')}</Typography>
           </Button>
@@ -395,12 +532,16 @@ export const WorkReport = ({serviceOrder}: Props) => {
               size: 'large',
               variant: 'contained',
               startIcon: <SendIcon />,
-              onClick: () => setIsSendEmailDialogOpen(true),
+              onClick: () => {
+                setIsSendEmailDialogOpen(true);
+                generateWorkReportPdf();
+              },
             }}>
             <Typography variant="subtitle2">{t('Send Work Report')}</Typography>
           </Button>
         </Box>
       </A4Layout>
+
       <BottomDrawer
         isOpen
         primaryButtonLabel={isEditMode ? 'Save' : 'Edit'}
@@ -441,6 +582,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         confirmBtnDisabled={publishingWorkReport}
         title="Send work report"
@@ -451,19 +593,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         }
         subject=""
         content={formik.values.description}
-        callback={(emailRecord) => {
-          publishWorkReport(
-            {
-              id: serviceOrder.id,
-              body: {
-                email: emailRecord.email,
-                subject: emailRecord.subject,
-                content: emailRecord.content,
-              },
-            },
-            {onSuccess: () => setIsSendEmailDialogOpen(false)},
-          );
-        }}
+        callback={(emailRecord) => onSubmitHandler(emailRecord)}
       />
     </Box>
   );

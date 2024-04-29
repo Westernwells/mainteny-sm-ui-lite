@@ -45,7 +45,6 @@ import {
   Order,
   Resource,
   RestError,
-  SimpleEmailRecord,
   StringValue,
 } from 'models/misc';
 import {
@@ -791,10 +790,7 @@ export const usePublishChecklist = () => {
   );
 };
 
-export const publishWorkReport = async (
-  id: string,
-  body: SimpleEmailRecord,
-) => {
+export const publishWorkReport = async (id: string, body: EmailRecord) => {
   await axiosClient.post<{value: string}>(
     `/api/serviceOrders/${id}/report/publish`,
     body,
@@ -805,7 +801,7 @@ export const usePublishWorkReport = () => {
   const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
-    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
+    ({id, body}: {id: string; body: EmailRecord}) =>
       publishWorkReport(id, body),
     {
       onSuccess: () => {
