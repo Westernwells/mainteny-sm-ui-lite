@@ -289,7 +289,7 @@ export const ViewQuotation = ({
 
   useEffect(() => {
     generateBlobUrl();
-  }, [quotation, imageUrl]);
+  }, [quotation, logoDimensions]);
 
   return (
     <Box>
@@ -360,9 +360,9 @@ export const ViewQuotation = ({
             </Box>
           </PageCard>
 
-          <PageCard>
+          <Box sx={{display: 'flex', justifyContent: 'center'}}>
             <PdfPreview blobUrl={filePathToDownload} />
-          </PageCard>
+          </Box>
         </Grid>
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
           <PageCard

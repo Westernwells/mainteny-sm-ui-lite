@@ -99,12 +99,12 @@ const getStyles = (
     },
     tag: {
       ...boldFontStyle,
-      fontSize: 10,
+      fontSize: 9,
       color: '#212121',
       flex: '0 0 43%',
     },
     tagContent: {
-      fontSize: 10,
+      fontSize: 9,
       color: '#616161',
       flex: '0 0 57%',
       textAlign: 'right',
@@ -332,6 +332,10 @@ const QuotationPdfTemplate = React.memo(
                   quotation?.propertyOwner?.billingAddress?.component
                 }
                 selectedLng={selectedLng}
+                translate={translate}
+                beneficiaryInfo={
+                  quotation?.additionalInfo.beneficiaryAddress?.component
+                }
               />
 
               <View style={styles.rightAddress}>
@@ -549,7 +553,12 @@ const QuotationPdfTemplate = React.memo(
                                 textAlign: 'right',
                                 color: '#212121',
                               }}>
-                              -
+                              {articleItem?.additionalInfo?.discount
+                                ?.percentage !== 0 ||
+                              articleItem?.additionalInfo?.discount?.amount
+                                ?.value !== 0
+                                ? '-'
+                                : ''}
                               {articleItem?.additionalInfo?.discount?.type ===
                               DiscountType.PERCENTAGE
                                 ? articleItem?.additionalInfo?.discount
@@ -756,7 +765,7 @@ const QuotationPdfTemplate = React.memo(
                 </View>
               )}
 
-              <View>
+              <View wrap={false}>
                 <Text style={styles.sectionHeading}>
                   {translate('Hereby I confirm the quotation')}{' '}
                 </Text>

@@ -18,7 +18,7 @@ function useLogoImage(user: UserSession | null | undefined) {
     let isMounted = true;
 
     const fetchImage = async () => {
-      if (!imageUrl && logoUrlPath) {
+      if (!imageUrl && logoUrl[logoUrlPath!]) {
         const fetchedImageUrl = await getBase64FromUrl(logoUrl[logoUrlPath!]);
 
         if (isMounted && fetchedImageUrl) {

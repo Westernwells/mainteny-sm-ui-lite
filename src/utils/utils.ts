@@ -396,6 +396,7 @@ export const getBase64FromUrl = async (url: string) => {
   const data = await fetch(url, {
     cache: 'no-store',
   });
+
   const contentType = data.headers.get('content-type');
 
   if (contentType && contentType.startsWith('image')) {

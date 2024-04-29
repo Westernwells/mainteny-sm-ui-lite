@@ -270,6 +270,7 @@ const JobOverviewPdfTemplate = React.memo(
                   serviceOrder?.elevator.propertyOwner.billingAddress?.component
                 }
                 selectedLng={selectedLng}
+                translate={translate}
               />
 
               <View style={styles.rightAddress}>

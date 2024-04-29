@@ -381,6 +381,7 @@ const WorkReportTemplate = React.memo(
                     ?.component
                 }
                 selectedLng={selectedLng}
+                translate={translate}
               />
 
               <View style={styles.rightAddress}>

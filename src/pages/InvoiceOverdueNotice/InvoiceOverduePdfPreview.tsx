@@ -216,6 +216,7 @@ const InvoiceOverduePdfPreview = ({
                 invoice?.propertyOwner.billingAddress?.component
               }
               selectedLng={selectedLng}
+              translate={translate}
             />
 
             <View style={styles.rightAddress}>

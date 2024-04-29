@@ -1,5 +1,6 @@
 import {AddressComponent} from 'models/misc';
 import {Text, View, StyleSheet} from '@react-pdf/renderer';
+import PdfTemplateBeneficiaryAddress from './PdfTemplateBeneficiaryAddress';
 
 type Props = {
   companyName?: string;
@@ -7,6 +8,8 @@ type Props = {
   receiverName?: string;
   addressComponent?: AddressComponent | null;
   selectedLng?: string;
+  translate: (key: string) => string;
+  beneficiaryInfo?: AddressComponent | null;
 };
 
 const getStyles = (
@@ -30,6 +33,7 @@ const getStyles = (
       marginBottom: 2,
       color: '#212121',
       maxWidth: 250,
+      marginTop: 2,
     },
     partialAddressText: {
       fontSize: 9,
@@ -48,6 +52,8 @@ const PdfTemplateLeftAddress = ({
   receiverName,
   addressComponent,
   selectedLng,
+  translate,
+  beneficiaryInfo,
 }: Props) => {
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -97,10 +103,24 @@ const PdfTemplateLeftAddress = ({
 
         <Text style={styles.partialAddressText}>
           {addressComponent?.postalCode && `${addressComponent.postalCode}`}
-          {addressComponent?.city ? ` ${addressComponent.city},` : ''}
-          {addressComponent?.country && ` ${addressComponent.country}`}
+          {addressComponent?.postalCode &&
+            (addressComponent.city || addressComponent.country) &&
+            ' '}
+          {addressComponent?.city && `${addressComponent.city}`}
+          {addressComponent?.city && addressComponent.country && ', '}
+          {addressComponent?.country && `${addressComponent.country}`}
         </Text>
       </View>
+
+      {beneficiaryInfo?.name ||
+        beneficiaryInfo?.city ||
+        (beneficiaryInfo?.street && (
+          <PdfTemplateBeneficiaryAddress
+            selectedLng={selectedLng}
+            translate={translate}
+            beneficiaryInfo={beneficiaryInfo}
+          />
+        ))}
     </View>
   );
 };

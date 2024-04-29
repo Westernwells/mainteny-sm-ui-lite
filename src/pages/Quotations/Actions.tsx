@@ -34,7 +34,6 @@ import {PdfGenerationStatus} from 'models/misc';
 import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import useLogoDimensions from 'hooks/useLogoDimensions';
-import useLogoImage from 'hooks/useLogoImage';
 import {companyLanguageContextMap} from 'utils/utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {pdf} from '@react-pdf/renderer';
@@ -42,13 +41,14 @@ import {useCurrentCurrency} from 'utils/currency';
 
 interface Props {
   quotation: QuotationView;
+  imageUrl?: string;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
 
-export const Actions = ({quotation}: Props) => {
+export const Actions = ({quotation, imageUrl}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {user} = useUserSession();
@@ -67,8 +67,7 @@ export const Actions = ({quotation}: Props) => {
   const {mutateAsync: publishQuotation} = usePublishQuotation();
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
-  const imageUrl = useLogoImage(user);
-  const logoDimensions = useLogoDimensions(imageUrl);
+  const logoDimensions = useLogoDimensions(imageUrl!);
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {

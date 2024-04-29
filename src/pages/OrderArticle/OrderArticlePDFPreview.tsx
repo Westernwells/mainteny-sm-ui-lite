@@ -242,6 +242,7 @@ const OrderArticlePDFPreview = React.memo(
                 receiverName={supplier?.name}
                 addressComponent={supplier?.address?.component}
                 selectedLng={selectedLng}
+                translate={translate}
               />
 
               <View style={styles.rightAddress}>
