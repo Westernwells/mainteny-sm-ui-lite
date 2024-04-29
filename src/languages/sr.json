@@ -2469,5 +2469,6 @@
   "Booked Hours": "Rezervisani sati",
   "This action will set the status of the quotation to sent. You won’t be able to delete it afterwards.": "Ova radnja će postaviti status ponude na poslatu. Nećete moći da ga izbrišete kasnije.",
   "Delivery date": "Datum isporuke",
+  "Credit note for invoice": "Kredit za fakturu",
   "Discount": "Popust"
 }
