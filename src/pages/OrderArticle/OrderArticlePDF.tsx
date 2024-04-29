@@ -243,6 +243,7 @@ const OrderArticlePDF = React.memo(
                   articleOrder?.articleSupplier?.address?.component
                 }
                 selectedLng={selectedLng}
+                translate={translate}
               />
 
               <View style={styles.rightAddress}>
