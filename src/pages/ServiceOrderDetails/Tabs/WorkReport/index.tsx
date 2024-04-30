@@ -151,7 +151,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
   const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
     useCompleteServiceOrder('Work report updated successfully!');
-
   const {mutateAsync: uploadFiles} = useUploadFiles(
     'The document was sent successfully.',
   );
@@ -211,23 +210,30 @@ export const WorkReport = ({serviceOrder}: Props) => {
       },
     },
     onSubmit: (values) => {
-      completeServiceOrder({
-        serviceOrderId: serviceOrder.id ?? '',
-        body: {
-          technicianId: report?.technicianId,
-          description: values.description,
-          articles: articleViewToArticleRecord(articles),
-          serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
-          travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
-          onlyShowTotalTime: values.onlyShowTotalTime,
-          workTimeRecord: convertTimeSlotDatesToRestDateTime(
-            values.workTimeRecord,
-          ),
-          travelTimeRecord: convertTimeSlotDatesToRestDateTime(
-            values.travelTimeRecord,
-          ),
+      completeServiceOrder(
+        {
+          serviceOrderId: serviceOrder.id ?? '',
+          body: {
+            technicianId: report?.technicianId,
+            description: values.description,
+            articles: articleViewToArticleRecord(articles),
+            serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
+            travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
+            onlyShowTotalTime: values.onlyShowTotalTime,
+            workTimeRecord: convertTimeSlotDatesToRestDateTime(
+              values.workTimeRecord,
+            ),
+            travelTimeRecord: convertTimeSlotDatesToRestDateTime(
+              values.travelTimeRecord,
+            ),
+          },
         },
-      });
+        {
+          onSuccess: () => {
+            setQueryParams(formatSearchParams({edit: '0'}, queryParams));
+          },
+        },
+      );
     },
     validationSchema,
   });
