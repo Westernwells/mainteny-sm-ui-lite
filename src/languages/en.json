@@ -2360,7 +2360,7 @@
   "Loading Article Order...": "Loading Article Order...",
   "Article Order for {{externalId}}": "Article Order for {{externalId}}",
   "VAT {{vatPercentage}}%": "VAT {{vatPercentage}}%",
-  "Total (incl. VAT)": "Total (incl. VAT)",
+  "მთლიანი (დღგ-ს ჩათვლით)": "Total (incl. VAT)",
   "5 minutes": "5 minutes",
   "Continue editing": "Continue editing",
   "Order date": "Order date",

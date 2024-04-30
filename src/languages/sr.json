@@ -2350,7 +2350,7 @@
   "Loading Article Order...": "Učitavanje redosleda članaka...",
   "Article Order for {{externalId}}": "Narudžba članka za {{ekternalId}}",
   "VAT {{vatPercentage}}%": "PDV {{vatPercentage}}%",
-  "Total (incl. VAT)": "Ukupno (sa PDV-om)",
+  "მთლიანი (დღგ-ს ჩათვლით)": "Ukupno (sa PDV-om)",
   "5 minutes": "5 minuta",
   "Continue editing": "Nastavite sa uređivanjem",
   "Order date": "Datum porudžbine",
@@ -2470,5 +2470,6 @@
   "This action will set the status of the quotation to sent. You won’t be able to delete it afterwards.": "Ova radnja će postaviti status ponude na poslatu. Nećete moći da ga izbrišete kasnije.",
   "Delivery date": "Datum isporuke",
   "Credit note for invoice": "Kredit za fakturu",
-  "Discount": "Popust"
+  "Discount": "Popust",
+  "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.": "Molimo izaberite odgovarajući tip automatizacije. Ovo će pomoći da se artikal poveže sa ispravnim vrednostima u fakturi. Na primer. ako izaberete Hourli rate (rad) ovaj članak će se koristiti za izračunavanje iznosa za radne sate."
 }

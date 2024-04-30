@@ -489,7 +489,7 @@
   "No notes yet. They will appear here once added.": "Noch keine Notizen. Sie werden hier erscheinen, sobald sie hinzugefügt wurden.",
   "Close": "Schließen",
   "Note message": "Notiz",
-  "Press Enter to submit note": "Drücken Sie die Eingabetaste, um die Notiz zu speichern.",
+  "Press Enter to submit note": "Drücken Sie die Eingabetaste, um die Gutschrift zu übermitteln.",
   "Submit note": "Notiz speichern",
   "Edit Note": "Notiz bearbeiten",
   "Service Information": "Service-Informationen",
@@ -2326,7 +2326,7 @@
   "Loading Article Order...": "Artikelbestellung wird geladen...",
   "Article Order for {{externalId}}": "Artikelbestellung für {{externalId}}",
   "VAT {{vatPercentage}}%": "MwSt. {{vatPercentage}} %",
-  "Total (incl. VAT)": "Gesamt (inkl. MwSt.)",
+  "მთლიანი (დღგ-ს ჩათვლით)": "Gesamt (inkl. MwSt.)",
   "5 minutes": "5 min",
   "Continue editing": "Bearbeiten Sie weiter",
   "Order date": "Bestelldatum",
@@ -2443,6 +2443,10 @@
   "Unit Status: ": "Anlagen Status: ",
   "Images": "Bilder",
   "Hours": "Stunden",
+  "Booked Hours": "Arbeitsstunden",
   "This action will set the status of the quotation to sent. You won’t be able to delete it afterwards.": "Mit dieser Aktion wird der Status des Angebots auf „gesendet“ gesetzt. Sie können es danach nicht mehr löschen.",
-  "Discount": "Rabatt"
+  "Delivery date": "Lieferdatum",
+  "Credit note for invoice": "Gutschrift für Rechnung",
+  "Discount": "Rabatt",
+  "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.": "Bitte wählen Sie den entsprechenden Automatisierungstyp aus. Dies hilft, den Artikel mit den richtigen Werten in der Rechnung zu verbinden. Wenn Sie z.B. Stundensatz (Arbeit) auswählen, wird dieser Artikel verwendet, um den Betrag für die Arbeitsstunden zu berechnen."
 }
