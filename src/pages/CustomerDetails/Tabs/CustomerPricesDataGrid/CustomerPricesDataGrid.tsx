@@ -113,7 +113,7 @@ export const makeRows = (travelWorks: TravelWorkView[]): GridRowsProp =>
   travelWorks?.length
     ? travelWorks.map((travelWork: TravelWorkView) => ({
         id: travelWork.id,
-        number: travelWork?.article?.number,
+        number: travelWork?.article?.externalId || '-',
         name: travelWork?.article.name,
         type: t(convertToText(travelWork?.article.type)),
         category: travelWork?.article.category,
