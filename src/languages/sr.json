@@ -2350,7 +2350,7 @@
   "Loading Article Order...": "Učitavanje redosleda članaka...",
   "Article Order for {{externalId}}": "Narudžba članka za {{ekternalId}}",
   "VAT {{vatPercentage}}%": "PDV {{vatPercentage}}%",
-  "მთლიანი (დღგ-ს ჩათვლით)": "Ukupno (sa PDV-om)",
+  "Total (incl. VAT)": "Ukupno (sa PDV-om)",
   "5 minutes": "5 minuta",
   "Continue editing": "Nastavite sa uređivanjem",
   "Order date": "Datum porudžbine",
