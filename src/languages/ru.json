@@ -2356,7 +2356,7 @@
   "Loading Article Order...": "Загрузка заказа статей...",
   "Article Order for {{externalId}}": "Заказ статьи для {{externalId}}",
   "VAT {{vatPercentage}}%": "НДС {{vatPercentage}} %",
-  "Total (incl. VAT)": "Итого (с НДС)",
+  "მთლიანი (დღგ-ს ჩათვლით)": "Итого (с НДС)",
   "5 minutes": "5 минут",
   "Continue editing": "Продолжить редактирование",
   "Order date": "Дата заказа",
