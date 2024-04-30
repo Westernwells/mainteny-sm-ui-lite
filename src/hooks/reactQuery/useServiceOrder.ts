@@ -400,6 +400,13 @@ export const getServiceOrderChecklist = async (
   return response.data;
 };
 
+export const updateServiceOrderArticles = async (
+  serviceOrderId: string,
+  body: ServiceOrderArticleRecord[],
+) => {
+  await axiosClient.put(`api/serviceOrders/${serviceOrderId}/articles/`, body);
+};
+
 // it is okay to use pass any,information is for react-query & not us.Passing correct types makes simple function gigantic
 export function useServiceOrderCheckList(
   serviceOrderId?: string,
@@ -482,6 +489,10 @@ const completeServiceOrder = async (
     `/api/serviceOrders/${serviceOrderId}/complete`,
     {...body},
   );
+  // this was added due tome flickering and article reurning back before finally delleting
+  setTimeout(() => {
+    updateServiceOrderArticles(serviceOrderId, body.articles ?? []);
+  }, 10);
 };
 
 export const useCompleteServiceOrder = (successMsg?: string) => {
@@ -497,8 +508,10 @@ export const useCompleteServiceOrder = (successMsg?: string) => {
     }) => completeServiceOrder(serviceOrderId, body),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        setTimeout(() => {
+          queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+          queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        }, 10);
         if (successMsg) {
           enqueueSnackbar(successMsg, {
             variant: 'success',
