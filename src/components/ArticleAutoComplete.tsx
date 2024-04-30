@@ -12,6 +12,7 @@ import {
   getCurrencySymbol,
   useCurrentCurrency,
 } from 'utils/currency';
+import {createHighlightedText} from 'utils/utils';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -103,6 +104,7 @@ export const ArticleAutocomplete = ({
       onChange={(event: any, newValue: ArticleView | null) => {
         setSelectedArticle(newValue);
       }}
+      filterOptions={(options) => options}
       getOptionLabel={(option) => option.name}
       onInputChange={onInputChange}
       inputValue={queryView}
@@ -116,10 +118,8 @@ export const ArticleAutocomplete = ({
           }}
         />
       )}
-      renderOption={(props, option, {selected}) => (
-        <li
-          {...(option.name !== 'autocomplete-table-title' ? props : {})}
-          style={{border: selected ? '2px solid red' : ''}}>
+      renderOption={(props, option) => (
+        <li {...(option.name !== 'autocomplete-table-title' ? props : {})}>
           <table style={{width: '100%'}}>
             {option.name === 'autocomplete-table-title' ? (
               <thead>
@@ -166,7 +166,7 @@ export const ArticleAutocomplete = ({
                       wordBreak: 'break-word',
                       textAlign: 'left',
                     }}>
-                    {option.name}
+                    {createHighlightedText(option.name, queryView)}
                   </td>
                   <td
                     style={{
@@ -175,7 +175,7 @@ export const ArticleAutocomplete = ({
                       wordBreak: 'break-word',
                       textAlign: 'left',
                     }}>
-                    {option.externalId}
+                    {createHighlightedText(option.externalId, queryView)}
                   </td>
                   <td
                     style={{
@@ -184,7 +184,7 @@ export const ArticleAutocomplete = ({
                       wordBreak: 'break-word',
                       textAlign: 'left',
                     }}>
-                    {option.category}
+                    {createHighlightedText(option.category, queryView)}
                   </td>
                   <td
                     style={{

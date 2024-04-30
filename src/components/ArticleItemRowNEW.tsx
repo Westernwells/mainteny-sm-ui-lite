@@ -31,7 +31,11 @@ import {MeasurementUnit, createMeasurementOptions} from 'models/articleForm';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
 import {Currencies, formatCurrency, useCurrentCurrency} from 'utils/currency';
-import {fixRounding} from 'utils/utils';
+import {
+  createHighlightedText,
+  filterArrayBySearchText,
+  fixRounding,
+} from 'utils/utils';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {ArticleType, ArticleView} from 'models/article';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
@@ -39,15 +43,13 @@ import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
 import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
 import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
 import * as Yup from 'yup';
-import {
-  useArticles,
-  usePropertyOwnerArticles,
-} from 'hooks/reactQuery/useArticle';
+import {useArticles} from 'hooks/reactQuery/useArticle';
 import {createEmptyResource} from 'utils/paging-utils';
-import useHighlightText from 'hooks/useHighlightText';
 import {getArticleTypeText} from 'utils/article-utils';
 import {DragIndicator} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
+import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
+import {ServiceOrderType} from 'models/service-order';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -72,62 +74,56 @@ interface TableRowProps {
   handleSelectItem: (row: ArticleView, index: number) => void;
 }
 
-const createHighlightedText = (text: string, searchText: string) =>
-  useHighlightText({
-    text: text !== '' ? text : '-',
-    highlight: searchText,
-  });
+enum TabValues {
+  ARTICLES = 0,
+  CUSTOM_ARTICLES = 1,
+}
 
 const TableRowComponent = ({
   index,
   item,
   searchText,
   handleSelectItem,
-}: TableRowProps) => {
-  const highlightedName = createHighlightedText(item.name, searchText);
-
-  const highlightedExternalId = createHighlightedText(
-    item.externalId,
-    searchText,
-  );
-
-  const highlightedCategory = createHighlightedText(item.category, searchText);
-
-  return (
-    <TableRow
-      key={item.id}
-      sx={{width: '100%', cursor: 'pointer'}}
-      onClick={() => {
-        handleSelectItem(item, index);
+}: TableRowProps) => (
+  <TableRow
+    key={item.id}
+    sx={{width: '100%', cursor: 'pointer'}}
+    onClick={() => {
+      handleSelectItem(item, index);
+    }}>
+    <TableCell sx={{padding: '0.8em 0em !important', width: '30%'}}>
+      <Typography variant="subtitle1">
+        {createHighlightedText(item.name, searchText)}
+      </Typography>
+    </TableCell>
+    <TableCell sx={{width: '25%'}}>
+      <Typography variant="subtitle1">
+        {createHighlightedText(item.externalId, searchText)}
+      </Typography>
+    </TableCell>
+    <TableCell sx={{width: '15%'}}>
+      <Typography variant="subtitle1">
+        {createHighlightedText(item.category, searchText)}
+      </Typography>
+    </TableCell>
+    <TableCell
+      sx={{
+        textAlign: 'right',
+        padding: '2em 0em',
+        width: '35%',
       }}>
-      <TableCell sx={{padding: '0.8em 0em !important', width: '30%'}}>
-        <Typography variant="subtitle1">{highlightedName}</Typography>
-      </TableCell>
-      <TableCell sx={{width: '25%'}}>
-        <Typography variant="subtitle1">{highlightedExternalId}</Typography>
-      </TableCell>
-      <TableCell sx={{width: '15%'}}>
-        <Typography variant="subtitle1">{highlightedCategory}</Typography>
-      </TableCell>
-      <TableCell
-        sx={{
-          textAlign: 'right',
-          padding: '2em 0em',
-          width: '35%',
-        }}>
-        <Typography variant="subtitle1">
-          {formatCurrency(
-            (item.unitSellingAmount.netAmount ?? 0) /
-              10 ** (item.unitSellingAmount.fractionDigits ?? 0),
-            {
-              currency: item.unitSellingAmount.currency,
-            },
-          )}
-        </Typography>
-      </TableCell>
-    </TableRow>
-  );
-};
+      <Typography variant="subtitle1">
+        {formatCurrency(
+          (item.unitSellingAmount.netAmount ?? 0) /
+            10 ** (item.unitSellingAmount.fractionDigits ?? 0),
+          {
+            currency: item.unitSellingAmount.currency,
+          },
+        )}
+      </Typography>
+    </TableCell>
+  </TableRow>
+);
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Article cannot be empty'),
@@ -249,7 +245,7 @@ export const ArticleItemRowNEW = ({
   const debouncedSearchText = useDebounce(searchText);
 
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(TabValues.ARTICLES);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -289,20 +285,26 @@ export const ArticleItemRowNEW = ({
     {keepPreviousData: true, enabled: popperOpen && tabValue === 0},
   );
 
-  const {
-    data: customArticleResource = createEmptyResource<ArticleView>(30),
-    isLoading: isCustomPriceLoading,
-  } = usePropertyOwnerArticles(
-    propertyOwnerId,
-    {
-      pageIndex: 0,
-      pageSize: 100,
-      query: debouncedSearchText,
-    },
-    {
-      keepPreviousData: true,
-      enabled: popperOpen && tabValue === 1 && !!propertyOwnerId,
-    },
+  const {data: customArticleResource = [], isLoading: isCustomPriceLoading} =
+    usePropertyOwnerQueryTravelWorks(
+      propertyOwnerId,
+      {
+        serviceOrderType: ServiceOrderType.GENERAL,
+      },
+      {
+        keepPreviousData: true,
+        enabled: popperOpen && tabValue === 1 && !!propertyOwnerId,
+      },
+    );
+
+  const filteredCustomArticles = useMemo(
+    () =>
+      filterArrayBySearchText(customArticleResource, debouncedSearchText, [
+        'article.name',
+        'article.externalId',
+        'article.category',
+      ]),
+    [customArticleResource, debouncedSearchText],
   );
 
   useEffect(() => {
@@ -513,12 +515,14 @@ export const ArticleItemRowNEW = ({
                       currentIndex={tabValue}
                       onChange={(indexValue) => setTabValue(indexValue)}
                       isTextCap>
-                      <TabsBody value={tabValue} index={0}>
+                      <TabsBody value={tabValue} index={TabValues.ARTICLES}>
                         {renderTable(articleResource.data, isArticleLoading)}
                       </TabsBody>
-                      <TabsBody value={tabValue} index={1}>
+                      <TabsBody
+                        value={tabValue}
+                        index={TabValues.CUSTOM_ARTICLES}>
                         {renderTable(
-                          customArticleResource.data,
+                          filteredCustomArticles.map((item) => item.article),
                           isCustomPriceLoading,
                         )}
                       </TabsBody>

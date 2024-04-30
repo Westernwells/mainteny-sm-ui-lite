@@ -1,5 +1,7 @@
 import {formatISO} from 'date-fns';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import lodash from 'lodash';
+import useHighlightText from '../hooks/useHighlightText';
 import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
 
 export const capitalize = (role: any[]) => {
@@ -471,3 +473,33 @@ export const createFilesFromBlobArray = (
   });
   return files;
 };
+
+/**
+ * Filters an array of objects based on a search text within specified property names.
+ *
+ * @param {T[] | undefined} items - The array of objects to filter.
+ * @param {string} searchText - The text to search within the specified property names.
+ * @param {string[]} propNames - The names of the properties to search within.
+ * @return {T[]} The filtered array of objects.
+ */
+export const filterArrayBySearchText = <T>(
+  items: T[] | undefined,
+  searchText: string,
+  propNames: string[],
+): T[] =>
+  items?.length
+    ? items.filter((item) => {
+        const lowerCaseSearchText = searchText.toLowerCase();
+        return propNames.some((propName) =>
+          String(lodash.get(item, propName))
+            .toLowerCase()
+            .includes(lowerCaseSearchText),
+        );
+      })
+    : [];
+
+export const createHighlightedText = (text: string, searchText: string) =>
+  useHighlightText({
+    text: text !== '' ? text : '-',
+    highlight: searchText,
+  });

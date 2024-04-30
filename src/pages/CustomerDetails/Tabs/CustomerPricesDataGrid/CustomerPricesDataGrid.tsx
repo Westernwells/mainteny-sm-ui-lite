@@ -91,13 +91,13 @@ export const columns: GridColDef[] = [
   getColumnProps({
     field: 'purchasePrice',
     headerName: 'Purchase price (excl. VAT)',
-    variant: 'titleCase',
+    variant: 'noFormat',
     align: 'right',
   }),
   getColumnProps({
     field: 'sellingPrice',
     headerName: 'Selling price (excl. VAT)',
-    variant: 'titleCase',
+    variant: 'noFormat',
     align: 'right',
   }),
   getColumnProps({
