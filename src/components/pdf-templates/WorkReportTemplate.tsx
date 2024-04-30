@@ -8,17 +8,14 @@ import {
   Image,
 } from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import React, {useMemo} from 'react';
+import React from 'react';
 import {
   ServiceOrderReportView,
   ServiceOrderScheduleSimpleView,
   ServiceOrderView,
 } from 'models/service-order';
 import {formatDate} from 'utils/datetime';
-import {
-  calculateSlotTotalWithoutSurcharge,
-  serviceOrderTypeToString,
-} from 'utils/service-order-utils';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import capitalize from 'lodash/capitalize';
 import {formatAddressFullname} from 'utils/utils';
 import {format} from 'date-fns';
@@ -140,7 +137,7 @@ const getStyles = (
       marginTop: 10,
     },
     sectionHeading: {
-      fontSize: 12,
+      fontSize: 10,
       padding: 0,
       lineHeight: 0,
       marginTop: 20,
@@ -172,7 +169,6 @@ const getStyles = (
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
-      ...boldFontStyle,
     },
     tableBodyContent: {
       color: '#212121',
@@ -333,32 +329,6 @@ const WorkReportTemplate = React.memo(
     const styles = getStyles(boldFontStyle, regularFontStyle);
 
     const elevatorAddress = serviceOrder?.elevator?.address;
-
-    const totalWorkFormatted = useMemo(() => {
-      const totalWorkWithoutSurcharge = calculateSlotTotalWithoutSurcharge(
-        report?.additionalInfo.workTimeInfo,
-      );
-      return convertMinutesToHoursAndMinutes(
-        totalWorkWithoutSurcharge,
-        {
-          hourUnit: 'h',
-        },
-        1,
-      );
-    }, [report?.additionalInfo.workTimeInfo]);
-
-    const totalTravelFormatted = useMemo(() => {
-      const totalTravelWithoutSurcharge = calculateSlotTotalWithoutSurcharge(
-        report?.additionalInfo.travelTimeInfo,
-      );
-      return convertMinutesToHoursAndMinutes(
-        totalTravelWithoutSurcharge,
-        {
-          hourUnit: 'h',
-        },
-        1,
-      );
-    }, [report?.additionalInfo.travelTimeInfo]);
 
     return (
       <Document>
@@ -551,37 +521,48 @@ const WorkReportTemplate = React.memo(
                       {translate('Engineer')}
                     </Text>
                   </View>
-                  <BookedHoursRow
-                    endTime={report?.additionalInfo.workTimeInfo?.endTime}
-                    startTime={
-                      report?.additionalInfo.workTimeInfo?.timeSlots[0]
-                        ?.startTime
-                    }
-                    totalFormatted={totalWorkFormatted}
-                    percentageSurcharge={
-                      report?.additionalInfo.workTimeInfo?.percentageSurcharge
-                    }
-                    type="Work"
-                    technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
-                    selectedLng={selectedLng}
-                    translate={translate}
-                  />
+                  {report?.additionalInfo.workTimeInfo?.timeSlots.map((s) => (
+                    <BookedHoursRow
+                      endTime={report?.additionalInfo.workTimeInfo?.endTime}
+                      startTime={s?.startTime}
+                      totalFormatted={convertMinutesToHoursAndMinutes(
+                        s?.minutes!,
+                        {
+                          hourUnit: 'h',
+                        },
+                        1,
+                      )}
+                      percentageSurcharge={
+                        report?.additionalInfo.workTimeInfo?.percentageSurcharge
+                      }
+                      type="Work"
+                      technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
+                      selectedLng={selectedLng}
+                      translate={translate}
+                    />
+                  ))}
 
-                  <BookedHoursRow
-                    endTime={report?.additionalInfo.travelTimeInfo?.endTime}
-                    startTime={
-                      report?.additionalInfo.travelTimeInfo?.timeSlots[0]
-                        ?.startTime
-                    }
-                    totalFormatted={totalTravelFormatted}
-                    percentageSurcharge={
-                      report?.additionalInfo.travelTimeInfo?.percentageSurcharge
-                    }
-                    type="Travel"
-                    technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
-                    selectedLng={selectedLng}
-                    translate={translate}
-                  />
+                  {report?.additionalInfo.travelTimeInfo?.timeSlots.map((s) => (
+                    <BookedHoursRow
+                      endTime={report?.additionalInfo.travelTimeInfo?.endTime}
+                      startTime={s?.startTime}
+                      totalFormatted={convertMinutesToHoursAndMinutes(
+                        s?.minutes!,
+                        {
+                          hourUnit: 'h',
+                        },
+                        1,
+                      )}
+                      percentageSurcharge={
+                        report?.additionalInfo.travelTimeInfo
+                          ?.percentageSurcharge
+                      }
+                      type="Travel"
+                      technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
+                      selectedLng={selectedLng}
+                      translate={translate}
+                    />
+                  ))}
                 </View>
               </View>
 
@@ -607,7 +588,7 @@ const WorkReportTemplate = React.memo(
                           textAlign: 'left',
                           ...styles.tableHeading,
                         }}>
-                        {translate('ARTICLE NAME')}
+                        {translate('Article Name')}
                       </Text>
                       <Text
                         style={{
@@ -615,7 +596,7 @@ const WorkReportTemplate = React.memo(
                           textAlign: 'right',
                           ...styles.tableHeading,
                         }}>
-                        {translate('ARTICLE NUMBER')}
+                        {translate('Article Number')}
                       </Text>
                       <Text
                         style={{
@@ -623,7 +604,7 @@ const WorkReportTemplate = React.memo(
                           textAlign: 'right',
                           ...styles.tableHeading,
                         }}>
-                        {translate('QUANTITY')}
+                        {translate('Quantity')}
                       </Text>
                       <Text
                         style={{
@@ -632,7 +613,7 @@ const WorkReportTemplate = React.memo(
                           marginLeft: 10,
                           ...styles.tableHeading,
                         }}>
-                        {translate('UNIT')}
+                        {translate('Unit')}
                       </Text>
                     </View>
                     <View style={styles.tableBody}>
@@ -749,8 +730,11 @@ const WorkReportTemplate = React.memo(
                     style={{
                       position: 'absolute',
                       bottom: -5,
-                      textAlign: 'center',
-                      width: '100%',
+                      left: '30%',
+                      width: '40%',
+                      backgroundColor: 'white',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}>
                     <Text>{translate('Engineer')}</Text>
                   </View>
@@ -783,8 +767,11 @@ const WorkReportTemplate = React.memo(
                     style={{
                       position: 'absolute',
                       bottom: -5,
-                      textAlign: 'center',
-                      width: '100%',
+                      left: '30%',
+                      width: '40%',
+                      backgroundColor: 'white',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}>
                     <Text>{translate('Customer')}</Text>
                   </View>
