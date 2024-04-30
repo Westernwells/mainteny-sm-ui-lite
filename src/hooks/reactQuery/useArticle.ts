@@ -556,3 +556,78 @@ export const useCreateArticlePictures = (
     },
   );
 };
+const updateArticlePicture = async (
+  body: FileResourceRecord,
+  articleId: string,
+  fileResourceId: string,
+): Promise<StringValue> => {
+  const response = await axiosClient.put<StringValue>(
+    `/api/articles/${articleId}/pictures/${fileResourceId}`,
+    {
+      ...body,
+    },
+  );
+  return response.data;
+};
+
+export const useUpdateArticlePicture = (
+  successMsg: string,
+  articleId: string,
+) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      fileResourceId,
+      body,
+    }: {
+      fileResourceId: string;
+      body: FileResourceRecord;
+    }) => updateArticlePicture(body, articleId, fileResourceId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries(queryKeys.fetchArticleDetail);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+const deleteArticlePicture = async (
+  articleId: string,
+  fileResourceId: string,
+): Promise<StringValue> => {
+  const response = await axiosClient.delete<StringValue>(
+    `/api/articles/${articleId}/pictures/${fileResourceId}`,
+  );
+  return response.data;
+};
+
+export const useDeleteArticlePicture = (
+  successMsg: string,
+  articleId: string,
+) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({fileResourceId}: {fileResourceId: string}) =>
+      deleteArticlePicture(articleId, fileResourceId),
+    {
+      onSuccess: () => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries(queryKeys.fetchArticleDetail);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};

@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
@@ -7,22 +7,56 @@ import useTheme from '@mui/material/styles/useTheme';
 import _ from 'lodash';
 import {InfoCard} from 'components/InfoCard';
 import {ArticleView} from 'models/article';
-import {FileResource, FileResourceRecord} from 'models/media';
+import {FileResource} from 'models/media';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useCreateArticlePictures} from 'hooks/reactQuery/useArticle';
+import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
+import {
+  Divider,
+  Grid,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
+import CustomSortLabel, {sortByName} from 'components/CustomSortLabel';
+import {ReactComponent as DriveFileIcon} from 'assets/icons/DriveFileIcon.svg';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
+import ImageIcon from '@mui/icons-material/Image';
+import {useFormatDate} from 'hooks/useFormatDate';
+import {CheckCircleRounded} from '@mui/icons-material';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import {FormInput} from 'components/form/FormInput';
+import {Carousel} from 'components/Carousel';
+import MUIDialog from '@mui/material/Dialog';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
+import {Dialog} from 'components/Dialog';
 import {NoItemSection} from '../NoItemSection';
-import {ArticleImageUploadForm} from './ArticleImageUploadForm';
 
 export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
   const theme = useTheme();
-  const [currentUrl, setCurrentUrl] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const {t} = useTranslation();
+  const formatDate = useFormatDate();
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [openPreview, setOpenPreview] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
+  const [fileName, setFileName] = useState('');
+  const [editingFileId, setEditingFileId] = useState('');
+  const [acceptedFiles, setAcceptedFiles] = useState<FileWithPreview[]>([]);
+  const uploadedPicture = article?.additionalInfo?.pictures || [];
 
-  const {mutateAsync: updateArticlePictures} = useCreateArticlePictures(
-    t('Article updated successfully.'),
-    article.id,
+  const {mutateAsync: uploadFiles, isLoading: isUploadLoading} = useUploadFiles(
+    'Documents uploaded successfully',
   );
+  const {mutateAsync: updateArticle, isLoading: isArticleUpdating} =
+    useUpdateArticle(t('Article updated successfully.'));
 
   const {data: pictureUrls = {}} = useDownloadUrl(
     _.map(
@@ -30,112 +64,493 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
       (item) => item,
     ),
   );
+  const isEmpty =
+    !article.additionalInfo.pictures ||
+    article.additionalInfo.pictures.length === 0;
 
-  useEffect(() => {
-    if (!_.isEmpty(pictureUrls)) {
-      setCurrentUrl(_.values(pictureUrls)[0]);
+  const sortedFiles = useMemo(
+    () =>
+      article.additionalInfo.pictures?.sort((a, b) =>
+        sortByName(sortOrder)(a.type, b.type),
+      ),
+    [article.additionalInfo.pictures, sortOrder],
+  );
+  const images = useMemo(
+    () =>
+      article.additionalInfo.pictures?.filter((file) =>
+        file.type.includes('image'),
+      ),
+    [article.additionalInfo.pictures],
+  );
+  const handleFileNameChange = (fileId?: string) => {
+    if (fileId) {
+      const file = article.additionalInfo.pictures.find((p) => p.id === fileId);
+      setFileName(file?.description ?? '');
+      setEditingFileId(fileId);
+    } else {
+      setEditingFileId('');
+      setFileName('');
     }
-  }, [pictureUrls]);
+  };
+  const onSaveFileName = async (fileId: string, fileTitle: string) => {
+    const updatedPictures = uploadedPicture?.map((d) =>
+      d.id === fileId ? {...d, description: fileTitle} : d,
+    );
+    updateArticle({
+      article: {
+        pictures: updatedPictures,
+      },
+      articleId: article.id,
+    });
+  };
+  const handleSaveFileName = async (fileId: string) => {
+    await onSaveFileName(fileId, fileName);
+    handleFileNameChange();
+  };
 
-  const saveArticle = async (files: FileResourceRecord[]) => {
-    await Promise.all(files.map((file) => updateArticlePictures(file)));
+  const handlePreviewFile = (picture: FileResource) => {
+    if (images.includes(picture)) {
+      const index = images.indexOf(picture);
+      setOpenPreview(true);
+      setActiveStep(index);
+    } else {
+      window.open(pictureUrls[picture.uri], '_blank');
+    }
+  };
+
+  const onSave = async (uploadedFiles: FileWithPreview[]) => {
+    const uploadPath = `${article!.serviceCompanyId}/articles/${
+      article!.id
+    }/images`;
+    await uploadFiles({files: uploadedFiles, uploadPath});
+    const updatedPictures = article?.additionalInfo?.pictures
+      ? [
+          ...article.additionalInfo.pictures,
+          ...uploadedFiles.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ]
+      : [
+          ...uploadedFiles.map((item) => ({
+            description: item.name.split('.')[0],
+            type: item.type,
+            uri: `${uploadPath}/${item.name}`,
+          })),
+        ];
+
+    updateArticle({
+      article: {
+        pictures: updatedPictures,
+      },
+      articleId: article.id,
+    });
+  };
+
+  const onRemovePicture = async (id: string) => {
+    const picturesToSave = uploadedPicture?.length
+      ? uploadedPicture?.filter((d) => d.id !== id)
+      : [];
+
+    updateArticle({
+      article: {
+        pictures: picturesToSave,
+      },
+      articleId: article.id,
+    });
+  };
+
+  const handleSave = async () => {
+    await onSave(acceptedFiles);
     setOpenDialog(false);
+    setAcceptedFiles([]);
   };
 
-  const setCurrentAttachment = (url: string) => {
-    setCurrentUrl(url);
-  };
-
-  const thumbs = _.map(pictureUrls, (url, key) => (
+  const renderEmptySection = () => (
     <Box
-      onClick={() => setCurrentAttachment(url)}
-      key={key}
-      sx={{
-        mx: '0.1rem',
-        border: `2px solid ${
-          url === currentUrl
-            ? theme.palette.text.secondary
-            : theme.palette.text.disabled
-        }`,
-      }}>
-      <img alt="" src={url} width={70} height={70} />
-    </Box>
-  ));
-
-  return (
-    <InfoCard
-      containerStyles={{
-        mb: '1.2rem',
-        display: 'flex',
-        flexDirection: 'column',
-        flex: 1,
-        height: '100%',
-      }}
-      headerActionIcon={<EditIcon />}
-      handleAction={() => setOpenDialog(true)}
-      showHeaderBackground
-      bodyContainerStyle={{
-        display: 'flex',
-        justifyContent: 'center',
-        height: '100%',
-      }}
-      header={<Typography variant="subtitle1">{t('Attachments')}</Typography>}>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center">
-        {currentUrl && (
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            sx={{height: '100%', mx: '0.5rem', my: '0.5rem'}}>
-            <img
-              src={currentUrl}
-              alt=""
-              style={{
-                objectFit: 'cover',
-                objectPosition: 'center',
-                height: '260px',
-                width: '100%',
-              }}
-            />
-          </Box>
-        )}
-        {!_.isEmpty(pictureUrls) && (
-          <Box
-            display="flex"
-            flexWrap="wrap"
-            alignItems="start"
-            justifyContent="flex-start"
-            sx={{width: '100%'}}>
-            {thumbs}
-          </Box>
-        )}
-        {_.isEmpty(pictureUrls) && (
-          <NoItemSection
-            label={t(
-              'No attachments yet. Please click the button below to add!',
-            )}
-            illustration="attachment"
-            buttonLabel={t('Add Attachments')}
-            action={() => setOpenDialog(true)}
-          />
-        )}
-      </Box>
-      {openDialog && (
-        <ArticleImageUploadForm
-          title={t('Edit Attachments')}
-          uploadPath={`${article!.serviceCompanyId}/articles/${
-            article!.id
-          }/images`}
-          onClose={saveArticle}
-          onCancel={() => setOpenDialog(false)}
-          successMessage={t('Image uploaded successfully')}
-          hint="JPEG, PNG, BMP, GIF, WEBP oder SVG"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center">
+      {_.isEmpty(pictureUrls) && (
+        <NoItemSection
+          label={t('No attachments yet. Please click the button below to add!')}
+          illustration="attachment"
+          buttonLabel={t('Add Attachments')}
+          action={() => setOpenDialog(true)}
         />
       )}
-    </InfoCard>
+    </Box>
+  );
+
+  const renderContent = () => {
+    if (isEmpty) {
+      return renderEmptySection();
+    }
+    if (article.additionalInfo?.pictures.length) {
+      return (
+        <Box
+          display="flex"
+          flexDirection="column"
+          padding="16px"
+          width="100%"
+          sx={{
+            paddingTop: '0',
+            '& ::-webkit-scrollbar': {
+              width: '0.25em',
+            },
+            '& ::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '& ::-webkit-scrollbar-thumb': {
+              background: 'transparent',
+              borderRadius: '0.25em',
+            },
+          }}>
+          <TableContainer
+            component={Paper}
+            sx={{overflowX: 'hidden', boxShadow: 'none', padding: 0}}>
+            <Table aria-label="simple table" sx={{padding: 0}}>
+              <TableHead
+                sx={{
+                  position: 'sticky',
+                  top: 0,
+                  backgroundColor: 'white',
+                  zIndex: 5,
+                }}>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      fontWeight: 600,
+                      padding: 0,
+                    }}>
+                    {t('NAME')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      fontWeight: 600,
+                      padding: 0,
+                    }}>
+                    <CustomSortLabel
+                      direction={sortOrder}
+                      onSort={setSortOrder}>
+                      {t('TYPE')}
+                    </CustomSortLabel>
+                    <Divider
+                      sx={{
+                        width: '300%',
+                        marginLeft: '-150%',
+                        borderColor: '#8F9BB380',
+                      }}
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sortedFiles?.map((file) => (
+                  <TableRow
+                    key={file.id}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:hover': {background: theme.palette.grey[100]},
+                    }}
+                    onClick={() => handlePreviewFile(file)}>
+                    <TableCell
+                      align="left"
+                      width="55%"
+                      sx={{paddingLeft: 0, paddingRight: 0, padding: 0.5}}>
+                      {/* Preview */}
+                      <Grid container wrap="nowrap" alignItems="center">
+                        <Grid
+                          border={`1px solid ${theme.palette.text.disabled}`}
+                          borderRadius={1}
+                          sx={{
+                            cursor: 'pointer',
+                            marginRight: '1rem',
+                            overflow: 'hidden',
+                            width: 48,
+                            height: 48,
+                            minWidth: 48,
+                            minHeight: 48,
+                          }}>
+                          {images.includes(file) ? (
+                            <img
+                              loading="lazy"
+                              alt=""
+                              width="48px"
+                              height="48px"
+                              src={pictureUrls[file.uri]}
+                              style={{objectFit: 'cover'}}
+                            />
+                          ) : (
+                            <FileCopyIcon
+                              style={{
+                                color: theme.palette.text.secondary,
+                                width: 48,
+                                height: 48,
+                              }}
+                            />
+                          )}
+                        </Grid>
+
+                        {/* Name */}
+                        {editingFileId === file.id ? (
+                          <FormInput
+                            props={{
+                              value: fileName,
+                              size: 'small',
+                              sx: {ml: '0.1rem', mr: '0.5rem'},
+                              type: 'text',
+                              onClick: (e) => e.stopPropagation(),
+                              onChange: (e) => {
+                                e.stopPropagation();
+                                setFileName(e.target.value);
+                              },
+                            }}
+                          />
+                        ) : (
+                          <Grid container direction="column">
+                            <Typography
+                              variant="body1"
+                              pl={1}
+                              sx={{
+                                wordBreak: 'break-word',
+                                overflowWrap: 'anywhere',
+                              }}>
+                              {file.description}
+                            </Typography>
+                            <Typography
+                              variant="helperText"
+                              pl={1}
+                              sx={{
+                                color: theme.palette.text.secondary,
+                              }}>
+                              {formatDate(
+                                new Date(file.createdAt),
+                                'dd.MM.yyyy',
+                              )}
+                            </Typography>
+                          </Grid>
+                        )}
+                      </Grid>
+                    </TableCell>
+
+                    {/* Type */}
+                    <TableCell
+                      align="right"
+                      width="45%"
+                      sx={{paddingLeft: 0, paddingRight: 0, padding: 0.5}}>
+                      <Grid
+                        container
+                        wrap="nowrap"
+                        justifyContent="space-between">
+                        <Grid container wrap="nowrap" alignItems="center">
+                          {file?.type.startsWith('image/') ? (
+                            <ImageIcon
+                              sx={{
+                                backgroundColor: theme.palette.info.main,
+                                color: theme.palette.primary.contrastText,
+                                borderRadius: 1,
+                                width: 17,
+                                height: 17,
+                              }}
+                            />
+                          ) : (
+                            <DriveFileIcon style={{width: 17, height: 17}} />
+                          )}
+
+                          <Typography
+                            variant="body1"
+                            pl={1}
+                            sx={{
+                              wordBreak: 'break-word',
+                              overflowWrap: 'anywhere',
+                              color: file?.type.startsWith('image/')
+                                ? theme.palette.info.main
+                                : theme.palette.success.darkSuccess,
+                            }}>
+                            {file?.type.startsWith('image/')
+                              ? t('Image')
+                              : t('Document')}
+                          </Typography>
+                        </Grid>
+
+                        {/* Actions */}
+                        {editingFileId === file.id ? (
+                          <Grid
+                            container
+                            wrap="nowrap"
+                            alignItems="center"
+                            width="fit-content"
+                            gap="1rem">
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSaveFileName(file.id);
+                              }}
+                              edge="start"
+                              sx={{ml: '0.1rem', padding: '4px'}}>
+                              <CheckCircleRounded
+                                sx={{
+                                  color: theme.palette.primary.main,
+                                  fontSize: '1.2rem',
+                                }}
+                              />
+                            </IconButton>
+
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFileNameChange();
+                              }}
+                              edge="start"
+                              sx={{padding: '4px'}}>
+                              <CancelIcon
+                                sx={{
+                                  color: theme.palette.primary.main,
+                                  fontSize: '1.2rem',
+                                }}
+                              />
+                            </IconButton>
+                          </Grid>
+                        ) : (
+                          <Grid
+                            container
+                            wrap="nowrap"
+                            alignItems="center"
+                            width="fit-content">
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFileNameChange(file.id);
+                              }}
+                              edge="start">
+                              <EditOutlinedIcon
+                                style={{
+                                  color: '#8F9BB380',
+                                  width: '1.5rem',
+                                  height: '1.5rem',
+                                }}
+                              />
+                            </IconButton>
+
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onRemovePicture(file.id);
+                              }}
+                              sx={{ml: 'auto'}}>
+                              <DeleteOutlineIcon
+                                sx={{
+                                  color: '#8F9BB380',
+                                  width: '1.5rem',
+                                  height: '1.5rem',
+                                }}
+                              />
+                            </IconButton>
+                          </Grid>
+                        )}
+                      </Grid>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      );
+    }
+  };
+
+  return (
+    <>
+      <InfoCard
+        containerStyles={{
+          mb: '1.2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          height: '100%',
+        }}
+        headerActionIcon={<EditIcon />}
+        handleAction={() => setOpenDialog(true)}
+        showHeaderBackground
+        bodyContainerStyle={{
+          display: 'flex',
+          justifyContent: 'center',
+          height: '100%',
+          padding: '0px',
+          width: '100%',
+        }}
+        header={
+          <Typography variant="subtitle1">{t('Attachments')}</Typography>
+        }>
+        {renderContent()}
+        <MUIDialog
+          onClose={() => setOpenPreview(false)}
+          open={openPreview}
+          maxWidth="md"
+          sx={{
+            '& .MuiDialog-container > .MuiPaper-root': {
+              minHeight: '50%',
+              minWidth: '50%',
+              '& > div:nth-of-type(2)': {
+                overflowY: 'hidden',
+              },
+            },
+          }}>
+          <Carousel
+            images={images?.map((p) => ({
+              label: p.description,
+              imgPath: pictureUrls[p.uri],
+            }))}
+            onClose={() => setOpenPreview(false)}
+            activeStep={activeStep}
+            setActiveStep={setActiveStep}
+          />
+        </MUIDialog>
+      </InfoCard>
+      {openDialog && (
+        <Dialog
+          title="Add Attachments"
+          isSaving={isUploadLoading || isArticleUpdating}
+          saveButtonText="Upload attachment"
+          disableSaveBtn={!acceptedFiles.length}
+          onCancel={() => {
+            setOpenDialog(false);
+            setAcceptedFiles([]);
+          }}
+          onSave={handleSave}
+          dialogProps={{
+            maxWidth: 'md',
+            open: openDialog || false,
+          }}>
+          <MyDropZone
+            acceptedFileTypes={[
+              'application/pdf',
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+              'application/vnd.ms-excel',
+              'text/tab-separated-values',
+              'text/csv',
+              'image/png',
+              'image/jpeg',
+              'image/bmp',
+              'image/gif',
+              'image/webp',
+              'image/svg+xml',
+            ]}
+            hint="JPEG, PNG, BMP, GIF, PDF, DOC, DOCX, TXT or SVG"
+            getAcceptedFiles={(filesList) => {
+              setAcceptedFiles(filesList);
+            }}
+          />
+        </Dialog>
+      )}
+    </>
   );
 };

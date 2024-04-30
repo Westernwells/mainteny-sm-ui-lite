@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import {initReactI18next} from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import de from './languages/de.json';
+import en from './languages/en.json';
 import sr from './languages/sr.json';
 import it from './languages/it.json';
 import ru from './languages/ru.json';
@@ -14,7 +15,7 @@ export const resources = {
     translation: de,
   },
   en: {
-    translation: {},
+    translation: en,
   },
   sr: {
     translation: sr,
@@ -41,7 +42,7 @@ i18n
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
     resources,
-    fallbackLng: 'en-US',
+    fallbackLng: 'en',
     // lng: 'en',
 
     keySeparator: false, // we do not use keys in form messages.welcome

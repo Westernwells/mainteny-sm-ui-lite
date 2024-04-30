@@ -1,6 +1,5 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import useTheme from '@mui/material/styles/useTheme';
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import {getColumnProps} from 'components/DataGridLayout';
@@ -71,53 +70,53 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: ElevatorOrderField.LAST_VISIT_DATE,
-    headerName: 'last visit',
+    headerName: 'last mainten.',
     align: 'center',
     flex: 0.75,
     sortable: true,
   }),
   getColumnProps({
-    field: ElevatorOrderField.NEXT_VISIT_DATE,
-    headerName: 'next visit',
+    field: ElevatorOrderField.NEXT_INSPECTION_DATE,
+    headerName: 'next inspect.',
     flex: 0.75,
     sortable: true,
   }),
   getColumnProps({
     field: ElevatorOrderField.ASSIGNED_TECHNICIAN_NAMES,
     sortable: true,
-    headerName: 'priority technician',
+    headerName: 'engineer',
     cellClassName: 'truncateText',
   }),
   getColumnProps({
     field: ElevatorOrderField.NUMBER_OF_CONTRACTS,
     sortable: true,
-    headerName: 'active contracts',
+    headerName: 'active con.',
     align: 'center',
     headerAlign: 'center',
+    flex: 0.5,
     renderCell: (params) => (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        gap={3}
-        width={120}>
-        <StatusChip
-          label={
-            params.row?.[ElevatorOrderField.NUMBER_OF_CONTRACTS] ? 'Yes' : 'No'
-          }
-          color={
-            params.row?.[ElevatorOrderField.NUMBER_OF_CONTRACTS]
-              ? 'success'
-              : 'info'
-          }
-          variant="filled"
-          size="small"
-          maxChars={3}
-          style={{flex: '0 0 50%'}}
-        />
-        <Actions id={params.row.id} />
-      </Box>
+      <StatusChip
+        label={
+          params.row?.[ElevatorOrderField.NUMBER_OF_CONTRACTS] ? 'Yes' : 'No'
+        }
+        color={
+          params.row?.[ElevatorOrderField.NUMBER_OF_CONTRACTS]
+            ? 'darkSuccess'
+            : 'error'
+        }
+        variant="filled"
+        size="small"
+        maxChars={3}
+        style={{flex: '0 0 50%'}}
+      />
     ),
+  }),
+  getColumnProps({
+    field: 'actions',
+    headerName: '',
+    align: 'center',
+    flex: 0.1,
+    renderCell: (params) => <Actions id={params.row.id} />,
   }),
 ];
 
@@ -161,8 +160,9 @@ export const makeRows = (
     [ElevatorOrderField.LAST_VISIT_DATE]: elevator.lastVisitDate
       ? formatDate(toDate(elevator.lastVisitDate))
       : '-',
-    [ElevatorOrderField.NEXT_VISIT_DATE]: elevator.nextVisitDate
-      ? formatDate(toDate(elevator.nextVisitDate))
+    [ElevatorOrderField.NEXT_INSPECTION_DATE]: elevator.additionalInfo
+      .nextInspectionDate
+      ? formatDate(toDate(elevator.additionalInfo.nextInspectionDate))
       : '-',
     [ElevatorOrderField.ADDRESS]: elevator.address.fullName,
     headerText: elevator.address.fullName,

@@ -62,6 +62,7 @@ export const ArticleImageUploadForm = ({
       <MyDropZone
         hint={hint}
         acceptedFileTypes={[
+          'application/pdf',
           'image/png',
           'image/jpeg',
           'image/jpg',

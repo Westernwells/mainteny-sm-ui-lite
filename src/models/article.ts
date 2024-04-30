@@ -146,6 +146,7 @@ export interface UpdateArticleRecord {
   unitPurchaseAmount?: AmountRecord;
   unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
+  pictures?: {description: string; type: string; uri: string}[];
 }
 
 export interface QueryArticleParams {

@@ -198,7 +198,7 @@ export const AddAnything = () => {
       header: 'New',
       items: [
         {
-          label: 'Unit',
+          label: 'Unit_elevator',
           action: () => track(() => navigate('/units/new')),
           icon: <Elevator fontSize="small" />,
         },
