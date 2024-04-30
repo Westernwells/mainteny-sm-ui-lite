@@ -1739,7 +1739,6 @@
   "Credit Note invoice": "Factura de nota de crédito",
   "Description updated successfully": "Descripción actualizada con éxito",
   "Enter discount value (in percentage)": "Ingrese el valor de descuento (en porcentaje)",
-  "Discount": "Descuento",
   "Duplicate invoice external id": "Factura duplicada ID externa",
   "Duplicate contract external id": "ID externo de contrato duplicado",
   "Duplicate article external id": "Artículo duplicado ID externa",
@@ -2411,5 +2410,6 @@
   "Stair Lift": "Salvaescaleras",
   "Order no.": "Número de pedido",
   "Article Order for": "Orden de artículos para",
-  "Job Confirmation:": "Confirmación de trabajo:"
+  "Job Confirmation:": "Confirmación de trabajo:",
+  "Discount": "Descuento"
 }

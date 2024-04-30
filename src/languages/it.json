@@ -1738,7 +1738,6 @@
   "Credit Note invoice": "Fattura della nota di credito",
   "Description updated successfully": "Descrizione aggiornata correttamente",
   "Enter discount value (in percentage)": "Immettere il valore di sconto (in percentuale)",
-  "Discount": "Sconto",
   "Duplicate invoice external id": "ID esterno della fattura duplicata",
   "Duplicate contract external id": "Duplicato ID esterno del contratto",
   "Duplicate article external id": "Duplica Articolo ID esterno",
@@ -1888,5 +1887,6 @@
   "Appointment preferences": "Preferenze di appuntamento",
   "Priority engineers": "Ingegneri prioritari",
   "Select Unit": "Seleziona unità",
-  "Start time": "Ora di inizio"
+  "Start time": "Ora di inizio",
+  "Discount": "Sconto"
 }

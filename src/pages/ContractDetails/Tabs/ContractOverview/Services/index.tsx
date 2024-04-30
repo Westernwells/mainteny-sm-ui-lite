@@ -63,7 +63,11 @@ const serviceListingColumns: {
   width?: TableCellProps['width'];
 }[] = [
   {name: 'SERVICE NAME', align: 'left', width: '10%'},
-  {name: 'UNITS', align: 'right', width: '5%'},
+  {
+    name: 'UNITS_elevator',
+    align: 'right',
+    width: '5%',
+  },
   {name: 'DATE', align: 'right', width: '10%'},
   {name: 'AUTO JOB', align: 'center', width: '15%'},
   {name: 'JOB FREQUENCY', align: 'left', width: '20%'},
@@ -202,8 +206,6 @@ export const Services: FC<Props> = ({contractDetails}) => {
   };
 
   const handleEditButtonClick = (row: ContractComponentView) => {
-    console.log('row', row);
-
     if (row.group !== '') {
       enqueueSnackbar(
         'Services in an invoice group can not be edited. Please disband them in order to edit the services.',
