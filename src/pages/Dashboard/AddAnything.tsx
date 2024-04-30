@@ -27,7 +27,6 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {t as translate} from 'i18next';
 
 interface Props extends ButtonProps {
   label?: string;
@@ -199,7 +198,7 @@ export const AddAnything = () => {
       header: 'New',
       items: [
         {
-          label: translate('Unit', {context: 'elevator'}),
+          label: 'Unit_elevator',
           action: () => track(() => navigate('/units/new')),
           icon: <Elevator fontSize="small" />,
         },
