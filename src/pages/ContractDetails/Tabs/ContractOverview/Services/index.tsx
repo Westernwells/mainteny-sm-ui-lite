@@ -48,7 +48,6 @@ import {useContractElevators} from 'hooks/reactQuery/useContacts';
 import {useQueryState} from 'hooks/useQueryState';
 import {Order} from 'models/misc';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {t as translate} from 'i18next';
 import {ContractCard} from '../ContractCard';
 import {SectionTitle} from '../../../../InvoiceDetails/SectionTitle';
 import ServiceInformationReview from './ServiceInfo';
@@ -65,7 +64,7 @@ const serviceListingColumns: {
 }[] = [
   {name: 'SERVICE NAME', align: 'left', width: '10%'},
   {
-    name: translate('UNITS', {context: 'elevator'}),
+    name: 'UNITS_elevator',
     align: 'right',
     width: '5%',
   },
@@ -207,8 +206,6 @@ export const Services: FC<Props> = ({contractDetails}) => {
   };
 
   const handleEditButtonClick = (row: ContractComponentView) => {
-    console.log('row', row);
-
     if (row.group !== '') {
       enqueueSnackbar(
         'Services in an invoice group can not be edited. Please disband them in order to edit the services.',
