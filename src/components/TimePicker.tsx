@@ -22,6 +22,7 @@ interface Props extends Partial<TimePickerProps<Date>> {
   textFieldProps?: TextFieldProps;
   required?: boolean;
   resetValue?: Date;
+  saveOnClose?: boolean;
 }
 
 export const TimePicker = ({
@@ -34,6 +35,7 @@ export const TimePicker = ({
   confirm,
   cancel,
   resetValue,
+  saveOnClose = false,
   required = false,
   ...props
 }: Props) => {
@@ -210,7 +212,12 @@ export const TimePicker = ({
         <MuiTimePicker
           {...props}
           open={open}
-          onClose={() => setOpen(false)}
+          onClose={() => {
+            if (saveOnClose) {
+              handleConfirm();
+            }
+            setOpen(false);
+          }}
           ampm={false}
           slotProps={
             {
