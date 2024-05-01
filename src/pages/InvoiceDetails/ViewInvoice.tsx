@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import printJS from 'print-js';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
@@ -29,7 +29,7 @@ import {
 } from 'models/invoice';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
-import {formatGrossAmount} from 'utils/currency';
+import {formatGrossAmount, useCurrentCurrency} from 'utils/currency';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
@@ -58,8 +58,18 @@ import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
 import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
 import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
-import {InvoiceActivities} from './InvoiceActivities';
+import {pdf} from '@react-pdf/renderer';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import useLogoDimensions from 'hooks/useLogoDimensions';
+import useLogoImage from 'hooks/useLogoImage';
+import {companyLanguageContextMap, createFilesFromBlobArray} from 'utils/utils';
+import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import {Notes} from './Notes/EditNotes';
+import {InvoiceActivities} from './InvoiceActivities';
 
 interface Props {
   downloadUrl: string;
@@ -67,6 +77,10 @@ interface Props {
   invoiceActivities: InvoiceActivityView[];
   isLoadingDownloadUrl: boolean;
 }
+
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
 
 export const ViewInvoice = ({
   downloadUrl,
@@ -77,8 +91,36 @@ export const ViewInvoice = ({
   const {t} = useTranslation();
   const {enqueueSnackbar, closeSnackbar} = useSnackbar();
   const theme = useTheme();
+  const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
+  const [blobFile, setBlobFile] = useState<Blob>();
+
+  const [filePathToDownload, setFilePathToDownload] = useState('');
+  const imageUrl = useLogoImage(user);
+  const logoDimensions = useLogoDimensions(imageUrl);
+
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
+  const {mutateAsync: uploadFiles} = useUploadFiles(
+    'The document was sent successfully.',
+  );
+
   const {downloadFile} = useDownloadFileWithCustomName(
     invoice.number,
     downloadUrl,
@@ -194,6 +236,27 @@ export const ViewInvoice = ({
     return items;
   }, [downloadUrl, invoice.status]);
 
+  const generateBlobUrl = async () => {
+    const blob = await pdf(
+      <CreditNotePdfTemplate
+        userInfo={user?.userAccount}
+        currentCurrency={currentCurrency}
+        logoSrc={imageUrl}
+        logoDimensions={logoDimensions}
+        invoice={invoice}
+        selectedLng={company?.language}
+        translate={translate}
+      />,
+    ).toBlob();
+    setBlobFile(blob);
+    const blobURL = URL.createObjectURL(blob);
+    setFilePathToDownload(blobURL);
+  };
+
+  useEffect(() => {
+    generateBlobUrl();
+  }, [invoice, logoDimensions]);
+
   const onPrintInvoice = async () => {
     await publishInvoice(
       {
@@ -207,15 +270,13 @@ export const ViewInvoice = ({
       {
         onSuccess: () => {
           setIsConfirmPrintDialogOpen(false);
-          setTimeout(() => {
-            if (downloadUrl) {
-              printJS({
-                printable: downloadUrl,
-                type: 'pdf',
-                showModal: true,
-              });
-            }
-          }, 8000);
+          if (filePathToDownload) {
+            printJS({
+              printable: filePathToDownload || downloadUrl,
+              type: 'pdf',
+              showModal: true,
+            });
+          }
         },
       },
     );
@@ -321,6 +382,7 @@ export const ViewInvoice = ({
             </Grid>
           </Grid>
         </Grid>
+
         <Grid item xs={8}>
           <PageCard
             containerStyles={{mb: '1.5em'}}
@@ -350,17 +412,27 @@ export const ViewInvoice = ({
             </Box>
           </PageCard>
 
-          {invoice!.additionalInfo.pdfGenerationStatus ===
-            PdfGenerationStatus.DONE && !isLoadingDownloadUrl ? (
-            <PDFContainer url={downloadUrl} />
-          ) : (
-            <PageCard>
-              <EmptySection
-                label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
-                size="small"
-              />
-            </PageCard>
+          {invoice.type === InvoiceType.CREDIT_NOTE && (
+            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+              <PdfPreview blobUrl={filePathToDownload} />
+            </Box>
           )}
+
+          {invoice &&
+            invoice.type !== InvoiceType.CREDIT_NOTE &&
+            (invoice.additionalInfo &&
+            invoice.additionalInfo.pdfGenerationStatus ===
+              PdfGenerationStatus.DONE &&
+            !isLoadingDownloadUrl ? (
+              <PDFContainer url={downloadUrl} />
+            ) : (
+              <PageCard>
+                <EmptySection
+                  label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
+                  size="small"
+                />
+              </PageCard>
+            ))}
         </Grid>
 
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
@@ -575,7 +647,6 @@ export const ViewInvoice = ({
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice.id}
-        submitHook={usePublishInvoice}
         confirmBtnDisabled={!isPDFsGenerated}
         email={
           invoice.propertyOwner?.additionalInfo.billingEmail ||
@@ -583,6 +654,39 @@ export const ViewInvoice = ({
         }
         subject={generateEmailSubject()}
         content={invoice.description}
+        callback={async (emailRecord) => {
+          setIsSendEmailDialogOpen(false);
+
+          const serviceCompanyId = user?.userAccount.serviceCompany.id;
+          const uploadPath = `${serviceCompanyId}/invoices`;
+
+          const fileNames: string[] = [`${invoice.id}.pdf`];
+
+          const files = createFilesFromBlobArray([blobFile!], fileNames);
+          await uploadFiles({files, uploadPath});
+
+          publishInvoice({
+            id: invoice!.id,
+            body: {
+              email: emailRecord.email,
+              subject: emailRecord.subject,
+              content: emailRecord.content,
+              emails: [emailRecord.email],
+              attachments: files.reduce<FileWithPreview[]>(
+                (newArr: FileWithPreview[], obj) => [
+                  ...newArr,
+                  {
+                    ...obj,
+                    type: obj.type,
+                    uri: `${uploadPath}/${obj.name}`,
+                    description: obj.name.split('.')[0],
+                  },
+                ],
+                [],
+              ),
+            },
+          });
+        }}
       />
 
       <MarkAsPaidDialog

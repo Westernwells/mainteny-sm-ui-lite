@@ -55,6 +55,7 @@ export interface InvoiceView {
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
   commentCount?: number;
   payments: InvoicePaymentView[];
+  paymentTerms?: string;
 }
 
 export const statusMapping: Record<string, string> = {

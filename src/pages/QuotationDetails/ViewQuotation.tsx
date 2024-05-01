@@ -123,7 +123,7 @@ export const ViewQuotation = ({
   );
 
   const {mutateAsync: uploadFiles} = useUploadFiles(
-    'Documents uploaded successfully',
+    'The document was sent successfully.',
   );
 
   const translate = useMemo(

@@ -144,7 +144,7 @@ export const PartialPaymentsSection = ({
       )
     : allPreviousInvoices;
   const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
-    formik.values,
+    formik.values.items,
   );
   const subtotalExclVat = applyDiscount({
     actualValue: subtotalExclVatAfterPerItemDiscount,

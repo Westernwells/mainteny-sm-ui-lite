@@ -66,7 +66,9 @@ export const ArticleItemsTableNEW = ({
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
 
-  const subtotalExclVat = calculateTotalWithPerItemDiscount(formik.values);
+  const subtotalExclVat = calculateTotalWithPerItemDiscount(
+    formik.values.items,
+  );
   const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
     currency: currentCurrency.code,
   });

@@ -178,7 +178,7 @@ export const ServiceOrderDetails = () => {
 
   useEffect(() => {
     generatePreviewPdfBlobUrl();
-  }, [imageUrl]);
+  }, [logoDimensions]);
 
   if (isLoading) {
     return <Progress />;
