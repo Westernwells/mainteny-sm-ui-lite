@@ -76,7 +76,7 @@ export const ArticleItemsTable = ({
         <Box bgcolor="grey.50" display="flex" flexDirection="column" gap="1em">
           {items.map((item, index) => (
             <ArticleItemRow
-              key={index + item.article.id}
+              key={index + item.article.id + item.id}
               articleItem={item}
               index={index}
               deleteItem={deleteItem}

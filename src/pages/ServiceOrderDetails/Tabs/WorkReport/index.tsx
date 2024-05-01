@@ -537,6 +537,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'contained',
+              disabled: isImageLoading,
               startIcon: <SendIcon />,
               onClick: () => {
                 setIsSendEmailDialogOpen(true);

@@ -18,7 +18,6 @@ import {formatDate} from 'utils/datetime';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import capitalize from 'lodash/capitalize';
 import {formatAddressFullname} from 'utils/utils';
-import {format} from 'date-fns';
 import {convertMinutesToHoursAndMinutes} from 'utils/work-hours-utils';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -106,10 +105,10 @@ const getStyles = (
       ...regularFontStyle,
     },
     statusHeader: {
-      marginTop: 200,
       display: 'flex',
       flexDirection: 'row',
-      marginBottom: 20,
+      marginBottom: 25,
+      marginTop: 5,
     },
     unitStatus: {
       ...boldFontStyle,
@@ -168,6 +167,7 @@ const getStyles = (
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
+      marginRight: -4,
     },
     tableBodyContent: {
       color: '#212121',
@@ -245,18 +245,19 @@ const BookedHoursRow = ({
   };
 
   const styles = getStyles(boldFontStyle, regularFontStyle);
+
   return (
     <View style={styles.tableRow}>
       <Text
-        style={{width: '20%', textAlign: 'left', ...styles.tableBodyContent}}>
+        style={{width: '15%', textAlign: 'left', ...styles.tableBodyContent}}>
         {endTime ? formatDate(endTime) : '-'}
       </Text>
       <Text
-        style={{width: '15%', textAlign: 'right', ...styles.tableBodyContent}}>
+        style={{width: '10%', textAlign: 'right', ...styles.tableBodyContent}}>
         {startTime ? formatDate(startTime, 'HH:mm') : '-'}
       </Text>
       <Text
-        style={{width: '17%', textAlign: 'right', ...styles.tableBodyContent}}>
+        style={{width: '13%', textAlign: 'right', ...styles.tableBodyContent}}>
         {totalFormatted}
       </Text>
       <Text
@@ -265,18 +266,17 @@ const BookedHoursRow = ({
       </Text>
       <Text
         style={{
-          width: '13%',
-          textAlign: 'left',
-          marginLeft: 40,
+          width: '17%',
+          textAlign: 'right',
           ...styles.tableBodyContent,
         }}>
         {translate(type)}
       </Text>
       <Text
         style={{
-          width: '20%',
+          width: '30%',
           textAlign: 'left',
-          marginLeft: 10,
+          marginLeft: 36,
           ...styles.tableBodyContent,
         }}>
         {technicianName}
@@ -374,7 +374,7 @@ const WorkReportTemplate = React.memo(
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Job type')}</Text>
                     <Text style={styles.tagContent}>
-                      {serviceOrderTypeToString(serviceOrder?.type!)}{' '}
+                      {translate(serviceOrderTypeToString(serviceOrder?.type!))}{' '}
                     </Text>
                   </View>
                 )}
@@ -418,7 +418,7 @@ const WorkReportTemplate = React.memo(
                     </View>
                   )}
 
-                  {serviceOrder?.elevator?.address?.fullName && (
+                  {formatAddressFullname(elevatorAddress)?.fullCityName && (
                     <View style={styles.rightAddressContent}>
                       <Text style={styles.tag}>
                         {translate('Unit address')}
@@ -460,25 +460,22 @@ const WorkReportTemplate = React.memo(
                 </Text>
               )}
 
-              <Text style={styles.sectionHeading}>
-                {translate('Booked Hours')}{' '}
-              </Text>
+              <Text style={styles.sectionHeading}>{translate('Hours')} </Text>
 
               <View style={styles.table}>
                 <View style={styles.tableBody}>
                   <View style={styles.tableRow}>
                     <Text
                       style={{
-                        width: '20%',
+                        width: '15%',
                         textAlign: 'left',
-                        marginRight: 10,
                         ...styles.tableHeading,
                       }}>
                       {translate('Date')}
                     </Text>
                     <Text
                       style={{
-                        width: '13%',
+                        width: '10%',
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
@@ -486,7 +483,7 @@ const WorkReportTemplate = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '17%',
+                        width: '13%',
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
@@ -502,9 +499,8 @@ const WorkReportTemplate = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '13%',
-                        textAlign: 'left',
-                        marginLeft: 36,
+                        width: '17%',
+                        textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
                       {translate('Type')}
@@ -512,65 +508,74 @@ const WorkReportTemplate = React.memo(
 
                     <Text
                       style={{
-                        width: '20%',
+                        width: '30%',
                         textAlign: 'left',
-                        marginLeft: 10,
+                        marginLeft: 40,
                         ...styles.tableHeading,
                       }}>
                       {translate('Engineer')}
                     </Text>
                   </View>
-                  {report?.additionalInfo.workTimeInfo?.timeSlots.map((s) => (
-                    <BookedHoursRow
-                      endTime={report?.additionalInfo.workTimeInfo?.endTime}
-                      startTime={s?.startTime}
-                      totalFormatted={convertMinutesToHoursAndMinutes(
-                        s?.minutes!,
-                        {
-                          hourUnit: 'h',
-                        },
-                        1,
-                      )}
-                      percentageSurcharge={
-                        report?.additionalInfo.workTimeInfo?.percentageSurcharge
-                      }
-                      type="Work"
-                      technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
-                      selectedLng={selectedLng}
-                      translate={translate}
-                    />
-                  ))}
+                  {report?.additionalInfo.workTimeInfo?.timeSlots.map(
+                    (s, index) => (
+                      <BookedHoursRow
+                        key={`${index} - ${s.startTime}`}
+                        endTime={report?.additionalInfo.workTimeInfo?.endTime}
+                        startTime={s?.startTime}
+                        totalFormatted={convertMinutesToHoursAndMinutes(
+                          s?.minutes!,
+                          {
+                            hourUnit: 'h',
+                          },
+                          1,
+                        )}
+                        percentageSurcharge={
+                          report?.additionalInfo.workTimeInfo
+                            ?.percentageSurcharge
+                        }
+                        type="Work"
+                        technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
+                        selectedLng={selectedLng}
+                        translate={translate}
+                      />
+                    ),
+                  )}
 
-                  {report?.additionalInfo.travelTimeInfo?.timeSlots.map((s) => (
-                    <BookedHoursRow
-                      endTime={report?.additionalInfo.travelTimeInfo?.endTime}
-                      startTime={s?.startTime}
-                      totalFormatted={convertMinutesToHoursAndMinutes(
-                        s?.minutes!,
-                        {
-                          hourUnit: 'h',
-                        },
-                        1,
-                      )}
-                      percentageSurcharge={
-                        report?.additionalInfo.travelTimeInfo
-                          ?.percentageSurcharge
-                      }
-                      type="Travel"
-                      technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
-                      selectedLng={selectedLng}
-                      translate={translate}
-                    />
-                  ))}
+                  {report?.additionalInfo.travelTimeInfo?.timeSlots.map(
+                    (s, index) => (
+                      <BookedHoursRow
+                        key={`${index} - ${s.startTime}`}
+                        endTime={report?.additionalInfo.travelTimeInfo?.endTime}
+                        startTime={s?.startTime}
+                        totalFormatted={convertMinutesToHoursAndMinutes(
+                          s?.minutes!,
+                          {
+                            hourUnit: 'h',
+                          },
+                          1,
+                        )}
+                        percentageSurcharge={
+                          report?.additionalInfo.travelTimeInfo
+                            ?.percentageSurcharge
+                        }
+                        type="Travel"
+                        technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
+                        selectedLng={selectedLng}
+                        translate={translate}
+                      />
+                    ),
+                  )}
                 </View>
               </View>
 
               {serviceOrder?.articles.length && (
-                <View>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Articles')}{' '}
-                  </Text>
+                <Text style={styles.sectionHeading}>
+                  {translate('Articles')}{' '}
+                </Text>
+              )}
 
+              {serviceOrder?.articles.length && (
+                <View style={styles.tableBody}>
                   <View style={styles.table}>
                     <View style={styles.tableRow}>
                       <Text
@@ -687,14 +692,11 @@ const WorkReportTemplate = React.memo(
                             marginVertical: 2,
                           }}
                         />
-
-                        <Text style={styles.imageDescription}>
-                          {format(
-                            new Date(attachment.fileResource.createdAt),
-                            'dd.MM.yyyy, HH:mm',
-                          )}
-                          h
-                        </Text>
+                        {attachment.fileResource.description && (
+                          <Text style={styles.imageDescription}>
+                            {attachment.fileResource.description}
+                          </Text>
+                        )}
                       </View>
                     ))}
                   </View>
