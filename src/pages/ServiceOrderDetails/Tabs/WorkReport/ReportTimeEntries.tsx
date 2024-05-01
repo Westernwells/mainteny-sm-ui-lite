@@ -189,6 +189,7 @@ const ReportTimeEntries = ({
                     }
                   : {},
               }}
+              saveOnClose
             />
           ) : (
             <Typography textAlign="end">{formatDate(date, 'HH:mm')}</Typography>
