@@ -176,6 +176,8 @@ export interface InvoiceView {
   commentCount?: number;
   payments: InvoicePaymentView[];
   refInvoiceId?: string;
+  paymentTerms?: string;
+  discount: Discount;
 }
 
 export interface InvoicePaymentAdditionalInfo {

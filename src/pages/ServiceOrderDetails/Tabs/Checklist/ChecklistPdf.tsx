@@ -45,8 +45,7 @@ const getStyles = (
       justifyContent: 'space-between',
       marginBottom: 40,
       alignItems: 'flex-start',
-      position: 'absolute',
-      top: 90,
+      marginTop: 5,
     },
     rightAddress: {
       flex: '0 0 42%',
@@ -80,9 +79,8 @@ const getStyles = (
     contentHeader: {
       fontSize: 14,
       color: '#212121',
-      marginTop: 200,
-      marginBottom: 10,
       ...boldFontStyle,
+      marginBottom: 10,
     },
     contentBody: {
       color: '#616161',

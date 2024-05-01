@@ -30,8 +30,10 @@ export const calculateTotal = (arr: InvoiceItemRecord[]) => {
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
 };
 
-export const calculateTotalWithPerItemDiscount = (invoice: InvoiceFormData) => {
-  const sum = invoice.items
+export const calculateTotalWithPerItemDiscount = (
+  invoiceItems: InvoiceItemRecord[],
+) => {
+  const sum = invoiceItems
     .map((item: InvoiceItemRecord) =>
       applyDiscount({
         actualValue:
@@ -104,7 +106,7 @@ export const calculateArticleTotalWithVatFormatted = (
   invoice: InvoiceFormData,
   currentCurrency: Currency,
 ) => {
-  const subtotalExclVat = calculateTotalWithPerItemDiscount(invoice);
+  const subtotalExclVat = calculateTotalWithPerItemDiscount(invoice.items);
   const subtotalExclVatAfterDiscount = applyDiscount({
     actualValue: subtotalExclVat,
     ...(invoice.discount?.type === DiscountType.AMOUNT
@@ -180,7 +182,9 @@ export const calculateSameVatTotals = (items: InvoiceItemRecord[]) => {
   return {total, totalVAT};
 };
 
-export const getArticlesTotalAmountInclVats = (invoice: InvoiceFormData) => {
+export const getArticlesTotalAmountInclVats = (
+  invoice: InvoiceFormData | InvoiceView,
+) => {
   const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(invoice.items);
   const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
     itemsAfterPerItemDiscount,

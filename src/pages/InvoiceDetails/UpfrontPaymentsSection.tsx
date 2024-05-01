@@ -109,7 +109,7 @@ export const UpfrontPaymentsSection = ({
     : allPreviousInvoices;
 
   const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
-    formik.values,
+    formik.values.items,
   );
   const subtotalExclVat = applyDiscount({
     actualValue: subtotalExclVatAfterPerItemDiscount,

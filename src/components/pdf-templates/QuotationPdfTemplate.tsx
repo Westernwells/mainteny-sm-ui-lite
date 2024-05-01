@@ -80,10 +80,9 @@ const getStyles = (
     topSection: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginBottom: 20,
+      marginBottom: 40,
       alignItems: 'flex-start',
-      position: 'absolute',
-      top: 90,
+      marginTop: 5,
     },
     rightAddress: {
       flex: '0 0 42%',
@@ -117,7 +116,7 @@ const getStyles = (
       fontSize: 14,
       color: '#212121',
       ...boldFontStyle,
-      marginTop: selectedLng === 'KA' ? 200 : 160,
+      marginBottom: 10,
     },
     contentBody: {
       color: '#616161',
@@ -174,6 +173,9 @@ const getStyles = (
       letterSpacing: -0.15,
       marginTop: 2,
       lineHeight: 1.3,
+    },
+    signatureBoxWrap: {
+      marginTop: 30,
     },
     signatureBox: {
       display: 'flex',
@@ -765,7 +767,7 @@ const QuotationPdfTemplate = React.memo(
                 </View>
               )}
 
-              <View wrap={false}>
+              <View wrap={false} style={styles.signatureBoxWrap}>
                 <Text style={styles.sectionHeading}>
                   {translate('Hereby I confirm the quotation')}{' '}
                 </Text>

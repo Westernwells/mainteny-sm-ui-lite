@@ -112,15 +112,15 @@ const PdfTemplateLeftAddress = ({
         </Text>
       </View>
 
-      {beneficiaryInfo?.name ||
+      {(beneficiaryInfo?.name ||
         beneficiaryInfo?.city ||
-        (beneficiaryInfo?.street && (
-          <PdfTemplateBeneficiaryAddress
-            selectedLng={selectedLng}
-            translate={translate}
-            beneficiaryInfo={beneficiaryInfo}
-          />
-        ))}
+        beneficiaryInfo?.street) && (
+        <PdfTemplateBeneficiaryAddress
+          selectedLng={selectedLng}
+          translate={translate}
+          beneficiaryInfo={beneficiaryInfo}
+        />
+      )}
     </View>
   );
 };
