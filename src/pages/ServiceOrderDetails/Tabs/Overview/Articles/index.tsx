@@ -18,6 +18,7 @@ import {
 } from 'hooks/reactQuery/useServiceOrder';
 import {calculateOrderArticlesTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
+import {useCurrentCurrency} from 'utils/currency';
 import {columns, makeRows} from './ArticleDataGridProps';
 
 interface Props {
@@ -29,6 +30,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
   const {t} = useTranslation();
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openSelectModal, setOpenSelectModal] = useState(false);
+  const currentCurrency = useCurrentCurrency();
 
   const {mutateAsync: createServiceOrderArticle} =
     useCreateServiceOrderArticle();
@@ -97,6 +99,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
                 serviceOrderArticles &&
                 calculateOrderArticlesTotal(serviceOrderArticles)
               }
+              currency={currentCurrency.code}
             />
           )
         }

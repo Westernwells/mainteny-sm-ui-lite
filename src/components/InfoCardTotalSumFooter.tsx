@@ -5,9 +5,10 @@ import {formatCurrency} from 'utils/currency';
 export interface Props {
   amount: number;
   label: string;
+  currency?: string;
 }
 
-export const InfoCardTotalSumFooter = ({amount, label}: Props) => {
+export const InfoCardTotalSumFooter = ({amount, label, currency}: Props) => {
   const theme = useTheme();
 
   return (
@@ -33,7 +34,7 @@ export const InfoCardTotalSumFooter = ({amount, label}: Props) => {
         variant="subtitle1"
         fontWeight="600"
         sx={{marginRight: '14%'}}>
-        {!!amount && formatCurrency(amount)}
+        {!!amount && formatCurrency(amount, {...(currency && {currency})})}
       </Typography>
     </Box>
   );
