@@ -3,6 +3,8 @@ import {queryKeys} from 'reactQuery/constants';
 import {StringValue} from 'models/misc';
 import {
   NewContractPaymentTermBody,
+  PaymentTermRecord,
+  UpdateContractPaymentTermRecord,
   UpdateContractTermRecord,
 } from 'models/contract';
 import {axiosClient} from 'utils/axios-utils';
@@ -89,6 +91,73 @@ export const useDeleteContractTerm = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryContractTerms);
         queryClient.invalidateQueries(queryKeys.invoiceById);
         queryClient.invalidateQueries(queryKeys.contractDetails);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const createContractPaymentTerm = async (
+  body: PaymentTermRecord,
+): Promise<StringValue> => {
+  const response = await axiosClient.post<StringValue>('/api/terms/payment', {
+    ...body,
+  });
+  return response.data;
+};
+
+export const useCreateContractPaymentTerm = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(createContractPaymentTerm, {
+    onSuccess: () => {
+      if (successMsg) {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+      }
+      queryClient.invalidateQueries([queryKeys.queryContractTerms]);
+    },
+    onError: (err) => {
+      console.log(err);
+      showError(err);
+    },
+  });
+};
+
+const updateContractPaymentTerm = async (
+  body: UpdateContractPaymentTermRecord,
+  paymentTermId: string,
+) => {
+  await axiosClient.put<StringValue>(`/api/terms/payment/${paymentTermId}`, {
+    ...body,
+  });
+};
+
+export const useUpdateContractPaymentTerm = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      paymentTermId,
+    }: {
+      body: UpdateContractPaymentTermRecord;
+      paymentTermId: string;
+    }) => updateContractPaymentTerm(body, paymentTermId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.queryContractTerms);
+        queryClient.invalidateQueries(queryKeys.contractDetails);
+        queryClient.invalidateQueries(queryKeys.invoiceById);
       },
       onError: (err: any) => {
         console.log(err);

@@ -52,7 +52,6 @@ export interface InvoiceView {
   search: string;
   meta: Meta;
   additionalInfo: InvoiceAdditionalInfo;
-  paymentTerms: string;
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
   commentCount?: number;
   payments: InvoicePaymentView[];

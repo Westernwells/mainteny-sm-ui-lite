@@ -37,6 +37,7 @@ import {Tooltip} from 'components/Tooltip';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
 import {LanguageContext} from 'context/LanguageProvider';
+import {UserCompanyContext} from 'context/UserCompanyProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {
@@ -68,12 +69,13 @@ import {
 import {
   AddressComponent,
   AddressRecord,
+  Language,
   PdfGenerationStatus,
 } from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   capitalize,
-  convertToText,
+  companyLanguageContextMap,
   formatAddressFullname,
   formatSearchParams,
   getUserFullName,
@@ -94,7 +96,7 @@ import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pi
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
 import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
-import {ContractTermView} from 'models/contract';
+import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
 import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
 import NewCustomer from './NewCustomer';
@@ -212,6 +214,9 @@ export const InvoiceForm = ({
 }: Props) => {
   const navigate = useNavigate();
   const {language: selectedLng} = useContext(LanguageContext);
+  const {company} = useContext(UserCompanyContext);
+  const companyLanguage =
+    companyLanguageContextMap[company?.language || Language.EN_US];
   const [searchParams, setSearchParams] = useSearchParams();
   const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
   const {user} = useUserSession();
@@ -304,7 +309,7 @@ export const InvoiceForm = ({
         ? InvoiceType[invoiceType]
         : InvoiceType.FULL,
     items: [],
-    paymentTerms: '',
+    paymentTerm: undefined,
     propertyOwnerId: '',
     serviceCompanyId: '',
     serviceOrderId: '',
@@ -430,10 +435,44 @@ export const InvoiceForm = ({
     );
   }, [invoice]);
 
+  const getFormattedPaymentTerms = (paymentTerm: ContractPaymentTermView) => {
+    const discountOptions =
+      paymentTerm.data?.discountOptions
+        .map((d) => {
+          const discountDays = d.discountDays || 0;
+          const discountPercentage = d.discountPercent || 0;
+
+          if (discountDays === 0 && discountPercentage === 0) {
+            return paymentTerm.term || '';
+          }
+
+          return t(
+            `If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}`,
+            {discountPercentage, lng: companyLanguage},
+          );
+        })
+        .join('\n') || '';
+
+    return {
+      id: paymentTerm.id,
+      term: `${paymentTerm.term}\n${discountOptions}`,
+    };
+  };
+
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
     if (formType === 'new' && row.paymentTerm) {
-      formik.setFieldValue('paymentTerms', row.paymentTerm?.term || '');
+      formik.setFieldValue(
+        'paymentTerm',
+        getFormattedPaymentTerms(row.paymentTerm),
+      );
+      if (!!row.paymentTerm?.data?.dueDays) {
+        formik.setFieldValue(
+          'dueDate',
+          addDays(new Date(), row.paymentTerm?.data?.dueDays),
+        );
+        setResetDueDatePicker(true);
+      }
     }
     // If the chosen customer was already set as the property owner of the invoice
     if (row.id !== invoice?.propertyOwner.id) {
@@ -614,7 +653,9 @@ export const InvoiceForm = ({
       if (invoice.sentDate) {
         formik.setFieldValue('sentDate', new Date(invoice.sentDate));
       }
-      formik.setFieldValue('paymentTerms', invoice?.paymentTerms || '');
+      if (invoice?.additionalInfo.paymentTerm) {
+        formik.setFieldValue('paymentTerm', invoice.additionalInfo.paymentTerm);
+      }
       formik.setFieldValue(
         'type',
         formik.values.type === InvoiceType.CREDIT_NOTE
@@ -788,7 +829,19 @@ export const InvoiceForm = ({
     const paymentTermObj = contractPaymentTerms?.data.find(
       ({id}) => id === paymentTermId,
     );
-    formik.setFieldValue('paymentTerms', paymentTermObj?.term || '');
+    if (paymentTermObj) {
+      formik.setFieldValue(
+        'paymentTerm',
+        getFormattedPaymentTerms(paymentTermObj),
+      );
+    }
+    if (!!paymentTermObj?.data?.dueDays) {
+      formik.setFieldValue(
+        'dueDate',
+        addDays(new Date(), paymentTermObj?.data?.dueDays),
+      );
+      setResetDueDatePicker(true);
+    }
     if (paymentTermId) {
       setOpenContractPaymentTermsDialog(false);
     }
@@ -1293,13 +1346,13 @@ export const InvoiceForm = ({
             />
             <FormInput
               props={{
-                id: 'paymentTerms',
+                id: 'paymentTerm.term',
                 size: 'small',
                 label: 'Payment terms',
-                name: 'paymentTerms',
+                name: 'paymentTerm.term',
                 minRows: 2,
                 multiline: true,
-                value: formik.values.paymentTerms,
+                value: formik.values.paymentTerm?.term,
                 onChange: formik.handleChange,
                 InputProps: {
                   endAdornment: (
@@ -1715,7 +1768,9 @@ export const InvoiceForm = ({
 
       {openContractPaymentTermSelectDialog && (
         <ContractTermInput
-          title={t('New payment term')}
+          title={
+            paymentTermToEdit ? t('Edit payment term') : t('New payment term')
+          }
           open={openContractPaymentTermSelectDialog}
           onCancel={() => setOpenContractPaymentTermSelectDialog(false)}
           defaultTerm={paymentTermToEdit}
@@ -1725,11 +1780,15 @@ export const InvoiceForm = ({
 
       {openContractPaymentTermsDialog && (
         <ContractTerm
-          title={t('Payment Terms')}
+          title={t('Payment terms')}
           open={openContractPaymentTermsDialog}
           onCancel={() => setOpenContractPaymentTermsDialog(false)}
           onSave={handleContractPaymentTermsModal}
-          defaultValue={formik.values.paymentTerms}
+          defaultValue={
+            contractPaymentTerms?.data.find(
+              (c) => c.id === formik.values.paymentTerm?.id,
+            )?.id || ''
+          }
           onClick={() => setOpenContractPaymentTermSelectDialog(true)}
           setEdit={setPaymentTermToEdit}
         />
