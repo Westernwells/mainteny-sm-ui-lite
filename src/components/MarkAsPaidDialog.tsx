@@ -40,8 +40,7 @@ export const MarkAsPaidDialog = ({
   invoice,
 }: Props) => {
   const {t} = useTranslation();
-  const {mutate: addInvoicePayment} = useAddInvoicePayment();
-
+  const {mutateAsync: addInvoicePayment} = useAddInvoicePayment();
   const formik = useFormik<InvoicePaymentRecord>({
     initialValues: {
       amount: {
@@ -57,8 +56,8 @@ export const MarkAsPaidDialog = ({
       paidDate: new Date().toString(),
       markAsPaid: false,
     },
-    onSubmit: (values, {setSubmitting}) => {
-      addInvoicePayment(
+    onSubmit: async (values, {setSubmitting}) => {
+      await addInvoicePayment(
         {
           invoiceId: invoice.id,
           body: {
@@ -77,18 +76,21 @@ export const MarkAsPaidDialog = ({
             formik.resetForm();
             onConfirm();
           },
-          onSettled: () => setSubmitting(false),
+          onSettled: () => {
+            setSubmitting(false);
+          },
         },
       );
     },
-    enableReinitialize: true,
-
     validationSchema,
   });
   return (
     <Dialog
       open={open || false}
-      onClose={onClose}
+      onClose={() => {
+        formik.resetForm();
+        onClose();
+      }}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       fullWidth
@@ -188,7 +190,9 @@ export const MarkAsPaidDialog = ({
             variant: 'contained',
             autoFocus: true,
             disabled: formik.isSubmitting,
-            onClick: () => formik.handleSubmit(),
+            onClick: () => {
+              formik.handleSubmit();
+            },
             sx: {
               textTransform: 'capitalize',
             },
