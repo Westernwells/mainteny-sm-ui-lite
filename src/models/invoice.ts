@@ -1,4 +1,5 @@
 import {ArticleType, ArticleView, CostPackage} from './article';
+import {PaymentTermData} from './contract';
 import {
   Address,
   AddressRecord,
@@ -74,6 +75,11 @@ export interface AlternativeServiceCompanyInfo {
   address?: AddressRecord;
 }
 
+export interface InvoicePaymentTermRecord {
+  id?: string;
+  term: string;
+}
+
 export interface InvoiceAdditionalInfo {
   dueDate: string;
   pdfGenerationStatus: PdfGenerationStatus;
@@ -99,6 +105,9 @@ export interface InvoiceAdditionalInfo {
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
+  paymentTerm?: InvoicePaymentTermRecord & {
+    data?: PaymentTermData;
+  };
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -162,7 +171,6 @@ export interface InvoiceView {
   search: string;
   meta: Meta;
   additionalInfo: InvoiceAdditionalInfo;
-  paymentTerms: string;
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
   commentCount?: number;
   payments: InvoicePaymentView[];
@@ -311,7 +319,7 @@ export interface InvoiceFormData {
   sentDate?: Date;
   items: InvoiceItemRecord[];
   paymentInfo: PaymentInfo;
-  paymentTerms: string;
+  paymentTerm?: InvoicePaymentTermRecord;
   propertyOwnerId: string;
   serviceCompanyId: string;
   serviceOrderId?: string;
@@ -353,7 +361,7 @@ export interface CreateInvoice {
   sentDate?: string;
   type?: InvoiceType;
   items: InvoiceItemRecord[];
-  paymentTerms?: string;
+  paymentTerm?: InvoicePaymentTermRecord;
   paymentInfo?: PaymentInfo;
   shouldSendOut?: boolean;
   includeWorkReport?: boolean;
@@ -391,7 +399,7 @@ export interface UpdateInvoice {
   dueDate?: string;
   sentDate?: string;
   items?: InvoiceItemRecord[];
-  paymentTerms?: string;
+  paymentTerm?: InvoicePaymentTermRecord;
   paymentInfo?: PaymentInfo;
   includeWorkReport?: boolean;
   includeCheckList?: boolean;

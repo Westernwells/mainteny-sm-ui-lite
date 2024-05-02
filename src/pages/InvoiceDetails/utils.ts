@@ -79,7 +79,7 @@ export const formatInvoiceRecord = (
         : undefined,
     };
   }),
-  paymentTerms: value.paymentTerms,
+  paymentTerm: value.paymentTerm,
   propertyOwnerId: value.propertyOwnerId,
   serviceCompanyId: value.serviceCompanyId,
   serviceOrderId: value.serviceOrderId,

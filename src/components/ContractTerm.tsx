@@ -15,11 +15,16 @@ import {createEmptyResource} from 'utils/paging-utils';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Order} from 'models/misc';
 import {useQueryContract} from 'hooks/reactQuery/useContract';
-import {ContractOrderField, ContractTermView} from 'models/contract';
+import {
+  ContractOrderField,
+  ContractTermView,
+  PaymentTermData,
+} from 'models/contract';
 import {ServiceCompanyType} from 'models/service-company';
 import EditIcon from '@mui/icons-material/Edit';
 import {compareArrays} from 'utils/contract-terms';
 import {useDeleteContractTerm} from 'hooks/reactQuery/useContractPaymentTerms';
+import {convertToText} from 'utils/utils';
 
 interface Props {
   open?: boolean;
@@ -63,7 +68,12 @@ export const ContractTerm = ({
   const [isShow, setIsShow] = useState(false);
   const [termId, setTermId] = useState('');
   const [toggleItems, setToggleItems] = useState<
-    {id: string; term: string; isShow?: boolean}[]
+    {
+      id: string;
+      term: string;
+      data?: PaymentTermData;
+      isShow?: boolean;
+    }[]
   >([]);
 
   const {data: contractTerms = createEmptyResource(pageSize)} =
@@ -96,7 +106,7 @@ export const ContractTerm = ({
   );
   const formik = useFormik<{
     termId: string;
-    otherTerms: {id: string; term: string}[];
+    otherTerms: {id: string; term: string; paymentTermData?: PaymentTermData}[];
   }>({
     initialValues: {
       termId:
@@ -134,6 +144,7 @@ export const ContractTerm = ({
     const filteredValues = filteredData.map((item) => ({
       id: item.id,
       term: item.term,
+      paymentTermData: item.data,
     }));
 
     const comparisonResult = compareArrays(contractTerms?.data, filteredValues);
@@ -206,7 +217,7 @@ export const ContractTerm = ({
     if (contractTerms?.data) {
       setToggleItems(contractTerms.data);
     }
-  }, [contractTerms.data.length]);
+  }, [contractTerms.data]);
 
   const renderContent = () => {
     if (!isContract && isShow) {
@@ -296,20 +307,56 @@ export const ContractTerm = ({
               xs={12}
               key={pt.id}
               sx={{
-                alignItems: 'flex-start',
+                alignItems: 'center',
                 justifyContent: 'space-between',
+                py: 0.5,
               }}>
               <FormControlLabel
                 key={pt.id}
                 value={pt.term}
                 control={<Radio size="small" />}
-                label={pt.term}
+                label={
+                  isContract ? (
+                    pt.term
+                  ) : (
+                    <Box>
+                      <Typography
+                        variant={
+                          formik.values.termId === pt.id ? 'subtitle2' : 'body2'
+                        }>
+                        {pt.term}
+                      </Typography>
+                      {pt.data?.discountOptions
+                        ? pt.data?.discountOptions
+                            .filter(
+                              (d) =>
+                                d.discountDays !== 0 && d.discountPercent !== 0,
+                            )
+                            .map((d, idx) => (
+                              <Typography
+                                key={idx}
+                                variant="caption"
+                                component="p"
+                                color="text.secondary">
+                                {`${d.discountDays} ${t('days')}; ${
+                                  d.discountPercent
+                                }% ${t('discount')}; ${t(
+                                  convertToText(d.articleType),
+                                )}`}
+                              </Typography>
+                            ))
+                        : null}
+                    </Box>
+                  )
+                }
                 onChange={() => formik.setFieldValue('termId', pt.id)}
                 checked={formik.values.termId === pt.id}
               />
               <Grid container item xs={1} justifyContent="center">
                 {pt.isShow ? (
-                  <IconButton onClick={() => removeTerm(pt.id)}>
+                  <IconButton
+                    onClick={() => removeTerm(pt.id)}
+                    sx={{color: 'text.disabled'}}>
                     <DeleteIcon />
                   </IconButton>
                 ) : (
@@ -321,7 +368,8 @@ export const ContractTerm = ({
                           setEdit(pt as ContractTermView);
                           onClick();
                         }
-                      }}>
+                      }}
+                      sx={{color: 'text.disabled'}}>
                       <EditIcon />
                     </IconButton>
                     <IconButton
@@ -331,7 +379,8 @@ export const ContractTerm = ({
                         if (termId === pt.id) {
                           asyncFetchContractResource();
                         }
-                      }}>
+                      }}
+                      sx={{color: 'text.disabled'}}>
                       <DeleteIcon />
                     </IconButton>
                   </Box>
@@ -354,9 +403,7 @@ export const ContractTerm = ({
             },
           }}>
           <Typography variant="subtitle2">
-            {serviceCompanyType === ServiceCompanyType.CONTRACT_NAME
-              ? t('New Contract name')
-              : t('New Payment Term')}
+            {isContract ? t('New Contract name') : t('New Payment Term')}
           </Typography>
         </Button>
       </DialogContent>

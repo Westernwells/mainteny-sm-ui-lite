@@ -36,6 +36,7 @@ interface Props<T> {
     label: string;
     value?: string | readonly string[] | number | undefined;
   };
+  menuProps?: SelectProps<T>['MenuProps'];
 }
 
 const ITEM_HEIGHT = 48;
@@ -63,6 +64,7 @@ export const FormSelect = ({
   errorText = '',
   required = false,
   isCompanyTranslation = false,
+  menuProps = {},
 }: Props<string | string[]>) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -125,7 +127,7 @@ export const FormSelect = ({
         }}
         value={selectProps?.value}
         sx={selectStyles}
-        MenuProps={MenuProps}
+        MenuProps={{...MenuProps, ...menuProps}}
         {...selectProps}>
         {resetOption && (
           <MenuItem value="" sx={{color: theme.palette.grey[500]}}>
