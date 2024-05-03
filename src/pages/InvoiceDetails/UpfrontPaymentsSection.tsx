@@ -572,31 +572,9 @@ export const UpfrontPaymentsSection = ({
 
               const percentageVats = uniq(
                 i.payments
-                  .map((p) =>
-                    p.additionalInfo.paymentDetails?.vats.map(
-                      (v) => v.percentageVat,
-                    ),
-                  )
+                  .map((p) => p.additionalInfo.paymentDetails?.vats)
                   .flat(),
               );
-
-              const vats = i.payments
-                .map(
-                  (p) =>
-                    (p.additionalInfo.paymentDetails?.vats
-                      .map((v) => v.vat)
-                      .reduce((a, b) => a + b, 0) ?? 0) /
-                    10 **
-                      (p.additionalInfo.paymentDetails?.fractionDigits ?? 2),
-                )
-                .map((v) =>
-                  formatCurrency(Math.abs(v), {
-                    currency: currentCurrency.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                  }),
-                );
 
               const totalPriceInclVat = Math.abs(
                 i.payments
@@ -633,14 +611,19 @@ export const UpfrontPaymentsSection = ({
                   </TableCell>
                   <TableCell align="right">
                     {percentageVats.map((pV) => (
-                      <p key={pV}>{pV}%</p>
+                      <p key={pV?.percentageVat}>{pV?.percentageVat}%</p>
                     ))}
                   </TableCell>
                   <TableCell align="right">
-                    {vats.map((vat, idx) => (
-                      <p key={`${vat}-${idx}`}>
+                    {percentageVats.map((pV, idx) => (
+                      <p key={`${pV?.percentageVat}-${idx}`}>
                         {signBeforeNumber}
-                        {vat}
+                        {formatCurrency(Math.abs((pV?.vat ?? 0) / 10 ** 2), {
+                          currency: currentCurrency.code,
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                          roundingMode: 'floor',
+                        })}
                       </p>
                     ))}
                   </TableCell>
