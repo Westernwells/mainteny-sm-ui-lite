@@ -21,6 +21,8 @@ const useFetchAndConvertMultipleImages = (
               const fetchedImageUrl = await getBase64FromUrl(downloadUrl);
               if (
                 fetchedImageUrl &&
+                fetchedImageUrl &&
+                !fetchedImageUrl.startsWith('data:image/jpeg') &&
                 !fetchedImageUrl.startsWith('data:image/png')
               ) {
                 try {

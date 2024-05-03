@@ -769,7 +769,7 @@ const QuotationPdfTemplate = React.memo(
 
               <View wrap={false} style={styles.signatureBoxWrap}>
                 <Text style={styles.sectionHeading}>
-                  {translate('Hereby I confirm the quotation')}{' '}
+                  {translate('Hereby I confirm the quotation.')}{' '}
                 </Text>
 
                 <View style={styles.signatureBox}>
