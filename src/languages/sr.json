@@ -2441,7 +2441,7 @@
   "Checklist date": "Datum kontrolne liste",
   "Item": "Stavka",
   "Quotation date": "Datum ponude",
-  "Hereby I confirm the quotation.": "Ovim potvrđujem ponudu",
+  "Hereby I confirm the quotation": "Ovim potvrđujem ponudu",
   "Date, place, signature, stamp": "Datum, mesto, potpis, pečat",
   "If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.": "Ako se plaćanje izvrši u roku od {{discountDais}} dana, odobravamo popust od {{discountPercentage}}% iznosa fakture.",
   "If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}": "Ako platite pre {DUE_DATE}, odobravamo popust od {{discountPercentage}}% ({DISCOUNT_AMOUNT}) na osnovu {INVOICE_AMOUNT}. Iznos uplate: {PAIMENT_AMOUNT}",
@@ -2471,5 +2471,9 @@
   "Delivery date": "Datum isporuke",
   "Credit note for invoice": "Kredit za fakturu",
   "Discount": "Popust",
-  "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.": "Molimo izaberite odgovarajući tip automatizacije. Ovo će pomoći da se artikal poveže sa ispravnim vrednostima u fakturi. Na primer. ako izaberete Hourli rate (rad) ovaj članak će se koristiti za izračunavanje iznosa za radne sate."
+  "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.": "Molimo izaberite odgovarajući tip automatizacije. Ovo će pomoći da se artikal poveže sa ispravnim vrednostima u fakturi. Na primer. ako izaberete Hourli rate (rad) ovaj članak će se koristiti za izračunavanje iznosa za radne sate.",
+  "Hereby I confirm the quotation.": "Ovim potvrđujem citat",
+  "Stopped": "Zaustavljeno",
+  "Dumbwaiter": "Samoposlužni lift",
+  "Disabled lift": "Lift za invalide"
 }

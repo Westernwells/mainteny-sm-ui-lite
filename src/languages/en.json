@@ -497,7 +497,7 @@
   "No notes yet. They will appear here once added.": "No notes yet. They will appear here once added.",
   "Close": "Close",
   "Note message": "Note message",
-  "Press Enter to submit note": "Press Enter to submit note",
+  "Press Enter to submit note": "Please Enter to submit note",
   "Submit note": "Submit note",
   "Edit Note": "Edit Note",
   "Service Information": "Service Information",
@@ -2439,5 +2439,9 @@
   "Unit_elevator": "Unit",
   "UNITS_elevator": "UNITS",
   "General_common": "General",
-  "Discount": "Discount"
+  "Discount": "Discount",
+  "Hereby I confirm the quotation.": "Hereby I confirm the quotation.",
+  "Stopped": "Stopped",
+  "Dumbwaiter": "Dumbwaiter",
+  "Disabled lift": "Disabled lift"
 }

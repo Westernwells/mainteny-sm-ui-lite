@@ -2447,7 +2447,7 @@
   "Checklist date": "Дата заполнения контрольного списка",
   "Item": "Позиция",
   "Quotation date": "Дата оферты",
-  "Hereby I confirm the quotation.": "Подтверждаю оферту.",
+  "Hereby I confirm the quotation": "Подтверждаю оферту.",
   "Date, place, signature, stamp": "Дата, место, подпись, печать",
   "If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.": "Если оплата произведена в течение {{discountDays}} дней, мы предоставляем скидку в размере {{discountPercentage}}% от суммы счета.",
   "If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}": "Если вы заплатите до {DUE_DATE}, мы предоставим скидку {{discountPercentage}}% ({DISCOUNT_AMOUNT}) от {INVOICE_AMOUNT} на включенные позиции. Сумма платежа: {PAYMENT_AMOUNT}",
