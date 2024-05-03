@@ -328,7 +328,6 @@ const WorkReportTemplate = React.memo(
     const styles = getStyles(boldFontStyle, regularFontStyle);
 
     const elevatorAddress = serviceOrder?.elevator?.address;
-
     return (
       <Document>
         <Page size="A4" style={styles.page}>
