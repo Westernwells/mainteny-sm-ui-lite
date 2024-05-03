@@ -2451,7 +2451,7 @@
   "Checklist date": "საკონტროლო სიის თარიღი",
   "Item": "ელემენტი",
   "Quotation date": "შეთავაზების თარიღი",
-  "Hereby I confirm the quotation.": "ამით ვადასტურებ შეთავაზებას",
+  "Hereby I confirm the quotation": "ამით ვადასტურებ შეთავაზებას",
   "Date, place, signature, stamp": "თარიღი, ადგილი, ხელმოწერა, ბეჭედი",
   "If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.": "თუ გადახდა განხორციელდება {{discountDays}} დღის განმავლობაში, ჩვენ ვაძლევთ ფასდაკლებას ინვოისის თანხის {{discountPercentage}}%-ის ოდენობით.",
   "If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}": "თუ გადაიხდით {DUE_DATE}-მდე, ჩვენ ვაძლევთ {{discountPercentage}}%-იან ფასდაკლებას ({DISCOUNT_AMOUNT}) {INVOICE_AMOUNT}-ის საფუძველზე. გადასახდელი თანხა: {PAYMENT_AMOUNT}",
@@ -2467,6 +2467,10 @@
   "Shift start time": "ცვლის დაწყების დრო",
   "Shift end time": "ცვლის დასრულების დრო",
   "Work report date": "სამუშაო მოხსენების თარიღი",
+  "Discount_contract": "ფასდაკლება",
+  "Unit_elevator": "ერთეული",
+  "UNITS_elevator": "ერთეულები",
+  "General_common": "ზოგადი",
   "Job type": "სამუშაოს ტიპი",
   "Report no.": "მოხსენების ნომერი",
   "Unit Status: ": "ერთეულის სტატუსი:",
@@ -2478,5 +2482,8 @@
   "Credit note for invoice": "საკრედიტო ნოტა ინვოისისთვის",
   "Discount": "ფასდაკლება",
   "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.": "გთხოვთ, აირჩიოთ შესაბამისი ავტომატიზაციის ტიპი. ეს დაგეხმარებათ დააკავშიროთ ნაწილი ინვოისის სწორ მნიშვნელობებთან. Მაგალითად. თუ აირჩევთ საათობრივი განაკვეთი (სამუშაო), ეს ნაწილი გამოყენებული იქნება სამუშაო საათების თანხის გამოსათვლელად.",
-  "Hereby I confirm the quotation": "ამით ვადასტურებ შეთავაზებას"
+  "Hereby I confirm the quotation.": "ამით ვადასტურებ შეთავაზებას",
+  "Stopped": "შეჩერებული",
+  "Dumbwaiter": "სამზარეულოს ლიფტი",
+  "Disabled lift": "შშმპ ლიფტი"
 }
