@@ -1,5 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikHelpers} from 'formik';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -8,77 +7,70 @@ import {EmptySection} from 'components/EmptySection';
 import {InfoCard} from 'components/InfoCard';
 import {Progress} from 'components/Progress';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {ArticleView, PropertyOwnerArticleRecord} from 'models/article';
+import {TravelWorkFormValues} from 'models/service-company';
 import {
-  useCreatePropertyOwnerArticle,
-  usePropertyOwnerArticles,
-} from 'hooks/reactQuery/useArticle';
+  useCreateTravelWork,
+  usePropertyOwnerQueryTravelWorks,
+} from 'hooks/reactQuery/useTravelWork';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {ServiceOrderType} from 'models/service-order';
+import {CustomerPricesForm} from './CustomerPricesDataGrid/CustomerPricesForm';
 import {
   columns,
   makeRows,
 } from './CustomerPricesDataGrid/CustomerPricesDataGrid';
-import {CustomerPricesForm} from './CustomerPricesDataGrid/CustomerPricesForm';
 
 interface Props {
   propertyOwnerId: string;
 }
 
-const pageSize = 25;
-
 export const CustomPricesTab = ({propertyOwnerId}: Props) => {
   const {t} = useTranslation();
+  const {user} = useUserSession();
 
-  const [page, setPage] = useState(makePage(0, 25));
-  const totalArticlesRef = useRef(0);
   const [openDialog, setOpenDialog] = useState(false);
-  const [pageCount, setPageCount] = useState(0);
   const [rows, setRows] = useState<GridRowsProp>([]);
 
   const {
-    data: articleResource = createEmptyResource<ArticleView>(pageSize),
+    data: travelWorksResource = [],
     isLoading,
     isFetching,
     isFetched,
-  } = usePropertyOwnerArticles(
+  } = usePropertyOwnerQueryTravelWorks(
     propertyOwnerId,
     {
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
+      serviceOrderType: ServiceOrderType.GENERAL,
     },
     {keepPreviousData: true},
   );
 
-  const {mutateAsync: createArticle} = useCreatePropertyOwnerArticle(
-    t('Article created successfully'),
+  const {mutate: createTravelWork} = useCreateTravelWork(
+    'Article created successfully',
   );
 
-  totalArticlesRef.current = totalArticlesRef.current || articleResource.total;
-
   useEffect(() => {
-    setPageCount(Math.ceil(articleResource.total / page.pageSize));
-  }, [articleResource, page.pageSize]);
-
-  useEffect(() => {
-    if (isFetched) setRows(makeRows(articleResource.data));
-  }, [articleResource]);
+    if (isFetched) setRows(makeRows(travelWorksResource));
+  }, [travelWorksResource]);
 
   const onClose = () => {
     setOpenDialog(false);
   };
 
   const onSubmit = async (
-    values: PropertyOwnerArticleRecord,
-    {resetForm}: FormikHelpers<PropertyOwnerArticleRecord>,
+    values: TravelWorkFormValues,
+    {resetForm}: FormikHelpers<TravelWorkFormValues>,
   ) => {
-    createArticle(
-      {propertyOwnerId, body: values},
-      {
-        onSuccess: () => {
-          resetForm();
-          onClose();
-        },
-      },
-    );
+    await createTravelWork({
+      propertyOwnerId,
+      serviceCompanyId: user!.userAccount.serviceCompany.id,
+      serviceOrderType: ServiceOrderType.GENERAL,
+      articleSellingPrice: values.articleSellingPrice,
+      calculationType: values.calculationType,
+      articleId: values.articleId,
+    });
+
+    resetForm();
+    onClose();
   };
 
   return (
@@ -94,14 +86,16 @@ export const CustomPricesTab = ({propertyOwnerId}: Props) => {
         headerStyles={{mt: '0.5rem'}}
         handleAction={() => setOpenDialog(true)}
         headerActionIcon={
-          <Typography color="info.main">
-            {`+ ${t('Add Article & Spare part')}`}
-          </Typography>
+          isFetched && travelWorksResource.length ? (
+            <Typography color="info.main">
+              {`+ ${t('Add Article & Spare part')}`}
+            </Typography>
+          ) : undefined
         }
         showHeaderBackground>
         {isLoading ? (
           <Progress />
-        ) : isFetched && !totalArticlesRef.current ? (
+        ) : isFetched && !travelWorksResource.length ? (
           <EmptySection
             label="No specific prices added, start adding your service prices!"
             showActionBtn
@@ -119,16 +113,6 @@ export const CustomPricesTab = ({propertyOwnerId}: Props) => {
             rows={rows || []}
             columns={columns}
             loading={isFetching}
-            pageSize={page.pageSize}
-            handlePageSizeChange={(newPageSize: number) =>
-              setPage({...page, pageSize: newPageSize})
-            }
-            handlePageChange={(newPage: number) => {
-              setPage({...page, pageIndex: newPage - 1});
-            }}
-            pageCount={pageCount}
-            totalRows={articleResource.total}
-            pageIndex={page.pageIndex + 1}
           />
         )}
       </InfoCard>

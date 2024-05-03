@@ -1,3 +1,4 @@
+import {convertToText} from '../utils/utils';
 import {FileResource, FileResourceRecord} from './media';
 import {
   Amount,
@@ -19,6 +20,11 @@ export enum ArticleType {
   PACKAGE = 'PACKAGE',
   OTHER = 'OTHER',
 }
+
+export const articleTypeOptions = Object.values(ArticleType).map((value) => ({
+  value,
+  label: convertToText(value),
+}));
 
 export enum ArticleOrderField {
   NAME = 'NAME',

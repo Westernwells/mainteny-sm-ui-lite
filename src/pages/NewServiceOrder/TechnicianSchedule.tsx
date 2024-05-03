@@ -1,4 +1,11 @@
-import {ReactNode, useEffect, useRef, useState} from 'react';
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {theme} from 'theme';
 import {Box, IconButton, Typography} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -44,6 +51,7 @@ interface Props {
   setTechnicianSearch: (value: string) => void;
   maxHeight?: string;
   viewDate: Date;
+  isModal?: boolean;
 }
 
 const gridWidth = 120;
@@ -60,6 +68,7 @@ export const TechnicianSchedule = ({
   setTechnicianSearch,
   maxHeight = '20rem',
   viewDate,
+  isModal,
 }: Props) => {
   const formatDate = useFormatDate();
   const [scheduleItemGroup, setScheduleItemGroup] =
@@ -72,7 +81,8 @@ export const TechnicianSchedule = ({
   const [lookupTechnician, setLookupTechnician] = useState<{
     [key: string]: EmployeesView[];
   }>({});
-
+  const [showAll, setShowAll] = useState(false);
+  const [visibleItems, setVisibleItems] = useState(2);
   useEffect(() => {
     const result: ScheduledItemGroup = {};
     Object.keys(scheduleItems).forEach((key) => {
@@ -133,6 +143,25 @@ export const TechnicianSchedule = ({
 
   const numberOfSelectedEngineers = checkedValues.length;
 
+  const handleToggleUnits = useCallback(() => {
+    if (showAll) {
+      setVisibleItems(bodyRow.length || 0);
+      setShowAll(false);
+    } else {
+      setVisibleItems(5);
+      setShowAll(true);
+    }
+  }, [showAll, visibleItems, bodyRow]);
+
+  // Memoize the function using useCallback
+  const toggleModal = () => {
+    setOpenViewInModal((prevIsModal: boolean) => !prevIsModal);
+  };
+
+  const visibleBodyRows = useMemo(
+    () => bodyRow.slice(0, visibleItems) || [],
+    [bodyRow, visibleItems, showAll],
+  );
   return (
     <>
       <Box
@@ -223,9 +252,16 @@ export const TechnicianSchedule = ({
                         <Typography variant="caption" fontWeight={600}>
                           {t(item)}
                         </Typography>
+
                         <IconButton
                           size="small"
-                          onClick={() => setOpenViewInModal(true)}>
+                          onClick={() => {
+                            if (isModal) {
+                              handleToggleUnits();
+                            } else {
+                              toggleModal();
+                            }
+                          }}>
                           <Expand />
                         </IconButton>
                       </Box>
@@ -250,7 +286,7 @@ export const TechnicianSchedule = ({
           </ScheduleHeader>
 
           <ScheduleBody>
-            {bodyRow.map((dayRow, rowIndex) => (
+            {visibleBodyRows.map((dayRow, rowIndex) => (
               <ScheduleRow key={rowIndex}>
                 {Object.keys(dayRow).map((key) =>
                   dayRow[key].map((item, index) => {
@@ -391,6 +427,7 @@ export const TechnicianSchedule = ({
           setTechnicianSearch={setTechnicianSearch}
           maxHeight="40rem"
           viewDate={viewDate}
+          isModal
         />
       </Dialog>
     </>

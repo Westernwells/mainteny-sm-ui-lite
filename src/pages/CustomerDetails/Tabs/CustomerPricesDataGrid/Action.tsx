@@ -1,28 +1,28 @@
 import {useState} from 'react';
-import {useTranslation} from 'react-i18next';
 import {FormikHelpers} from 'formik';
 import Delete from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
-import {
-  useDeletePropertyOwnerArticle,
-  useUpdatePropertyOwnerArticle,
-} from 'hooks/reactQuery/useArticle';
 import {Confirm} from 'components/Confirm';
-import {ArticleView, PropertyOwnerArticleRecord} from 'models/article';
+import {
+  useDeleteTravelWork,
+  useUpdateTravelWork,
+} from 'hooks/reactQuery/useTravelWork';
+import {TravelWorkFormValues, TravelWorkView} from 'models/service-company';
+import {ServiceOrderType} from 'models/service-order';
 import {CustomerPricesForm} from './CustomerPricesForm';
 
 interface Props {
-  article: ArticleView;
+  travelWork: TravelWorkView;
 }
 
-export const Actions = ({article}: Props) => {
-  const {t} = useTranslation();
+export const Actions = ({travelWork}: Props) => {
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
-  const {mutateAsync: deleteElevator, isLoading: isDeleting} =
-    useDeletePropertyOwnerArticle('Article deleted successfully');
-  const {mutateAsync: updateArticle} = useUpdatePropertyOwnerArticle(
-    t('Article updated successfully.'),
+  const {mutate: deleteTravelWork, isLoading: isDeleting} = useDeleteTravelWork(
+    'Article deleted successfully',
+  );
+  const {mutate: updateTravelWork} = useUpdateTravelWork(
+    'Article updated successfully.',
   );
 
   const onClose = () => {
@@ -30,22 +30,19 @@ export const Actions = ({article}: Props) => {
   };
 
   const onSubmit = async (
-    values: PropertyOwnerArticleRecord,
-    {resetForm}: FormikHelpers<PropertyOwnerArticleRecord>,
+    values: TravelWorkFormValues,
+    {resetForm}: FormikHelpers<TravelWorkFormValues>,
   ) => {
-    updateArticle(
-      {
-        propertyOwnerId: article?.propertyOwnerId ?? '',
-        articleId: article.id,
-        article: values,
-      },
-      {
-        onSuccess: () => {
-          resetForm();
-          onClose();
-        },
-      },
-    );
+    await updateTravelWork({
+      id: travelWork.id,
+      articleId: values.articleId,
+      calculationType: values.calculationType,
+      serviceOrderType: ServiceOrderType.GENERAL,
+      articleSellingPrice: values.articleSellingPrice,
+    });
+
+    resetForm();
+    onClose();
   };
 
   return (
@@ -65,13 +62,8 @@ export const Actions = ({article}: Props) => {
         disableActions={isDeleting}
         open={openDeleteConfirm}
         onConfirm={async () => {
-          await deleteElevator(
-            {
-              propertyOwnerId: article?.propertyOwnerId ?? '',
-              articleId: article.id,
-            },
-            {onSuccess: () => setOpenDeleteConfirm(false)},
-          );
+          await deleteTravelWork(travelWork.id);
+          setOpenDeleteConfirm(false);
         }}
         onClose={() => setOpenDeleteConfirm(false)}
         title="Confirm"
@@ -83,7 +75,7 @@ export const Actions = ({article}: Props) => {
         openDialog={openUpdateDialog}
         onClose={onClose}
         onSubmit={onSubmit}
-        article={article}
+        travelWork={travelWork}
       />
     </>
   );

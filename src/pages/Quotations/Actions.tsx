@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import printJS from 'print-js';
@@ -30,7 +30,6 @@ import {
 } from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {QuotationStatus, QuotationView} from 'models/quotation';
-import {PdfGenerationStatus} from 'models/misc';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -57,11 +56,6 @@ export const Actions = ({quotation}: Props) => {
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutate: deleteQuotation} = useDeleteQuotation();
   const {mutateAsync: publishQuotation} = usePublishQuotation();
-
-  const {pdfPath} = quotation.additionalInfo;
-  const isPDFGenerated =
-    quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    pdfPath;
 
   const {data: downloadUrls} = useDownloadUrl(
     pathToDownload ? [pathToDownload] : [],
@@ -113,86 +107,80 @@ export const Actions = ({quotation}: Props) => {
     );
   };
 
-  const actions = useMemo(() => {
-    const items = [];
+  const actions = (() => {
+    const printAction = {
+      label: t('Print'),
+      icon: <Print />,
+      onClick: () =>
+        quotation.status === QuotationStatus.DRAFT
+          ? setIsConfirmPrintDialogOpen(true)
+          : setActionType('PRINT'),
+    };
+    const duplicateAction = {
+      label: t('Duplicate'),
+      icon: <CopyAll />,
+      onClick: () => {
+        navigate(`/quotations/new?id=${quotation.id}`);
+      },
+    };
+    const downloadAction = {
+      label: t('Download'),
+      icon: <FileDownload />,
+      onClick: () => {
+        setActionType('DOWNLOAD');
+        setPathToDownload(quotation.additionalInfo.pdfPath || '');
+      },
+    };
+    const markAcceptedAction = {
+      label: t('Mark Accepted'),
+      icon: <CheckIcon />,
+      onClick: () => setIsDialogOpen(true),
+    };
+    const markRejectedAction = {
+      label: t('Mark Rejected'),
+      icon: <Close />,
+      onClick: () => setIsRejectedDialogOpen(true),
+    };
+
+    const defaultActions = [printAction, duplicateAction, downloadAction];
 
     if (quotation.status === QuotationStatus.DRAFT) {
-      items.push({
-        label: t('Send'),
-        icon: <SendIcon />,
-        onClick: () => setIsSendEmailDialogOpen(true),
-      });
-    } else if (quotation.status === QuotationStatus.SENT_TO_CLIENT) {
-      items.push({
-        label: t('Resend'),
-        icon: <ReplayIcon />,
-        onClick: () => setIsSendEmailDialogOpen(true),
-      });
-    }
-
-    items.push(
-      ...[
-        ...(isPDFGenerated
-          ? [
-              {
-                label: t('Print'),
-                icon: <Print />,
-                onClick: () => setIsConfirmPrintDialogOpen(true),
-              },
-            ]
-          : []),
+      return [
         {
-          label: t('Duplicate'),
-          icon: <CopyAll />,
-          onClick: () => {
-            navigate(`/quotations/new?id=${quotation.id}`);
-          },
+          label: t('Send'),
+          icon: <SendIcon />,
+          onClick: () => setIsSendEmailDialogOpen(true),
         },
-        ...(isPDFGenerated
-          ? [
-              {
-                label: t('Download'),
-                icon: <FileDownload />,
-                onClick: () => {
-                  setActionType('DOWNLOAD');
-                  setPathToDownload(quotation.additionalInfo.pdfPath as string);
-                },
-              },
-            ]
-          : []),
-      ],
-    );
-
-    if (
-      quotation.status === QuotationStatus.DRAFT ||
-      quotation.status === QuotationStatus.SENT_TO_CLIENT
-    ) {
-      items.push(
-        ...[
-          {
-            label: t('Mark Accepted'),
-            icon: <CheckIcon />,
-            onClick: () => setIsDialogOpen(true),
-          },
-          {
-            label: t('Mark Rejected'),
-            icon: <Close />,
-            onClick: () => setIsRejectedDialogOpen(true),
-          },
-        ],
-      );
+        'divider',
+        printAction,
+        duplicateAction,
+        markAcceptedAction,
+        markRejectedAction,
+        'divider',
+        {
+          label: t('Delete'),
+          icon: <DeleteIcon />,
+          onClick: () => setIsDeleteDialogOpen(true),
+        },
+      ];
     }
 
-    if (quotation.status === QuotationStatus.DRAFT) {
-      items.push({
-        label: t('Delete'),
-        icon: <DeleteIcon />,
-        onClick: () => setIsDeleteDialogOpen(true),
-      });
+    if (quotation.status === QuotationStatus.SENT_TO_CLIENT) {
+      return [
+        {
+          label: t('Resend'),
+          icon: <ReplayIcon />,
+          onClick: () => setIsSendEmailDialogOpen(true),
+        },
+        'divider',
+        ...defaultActions,
+        markAcceptedAction,
+        markRejectedAction,
+      ];
     }
 
-    return items;
-  }, [pdfPath]);
+    return defaultActions;
+  })();
 
   useEffect(() => {
     const url = downloadUrls?.[pathToDownload];
@@ -213,12 +201,13 @@ export const Actions = ({quotation}: Props) => {
 
   return (
     <Box>
-      <IconButton
-        onClick={() => navigate(`/quotations/details/${quotation.id}/edit`)}
-        disabled={quotation.status !== QuotationStatus.DRAFT}
-        sx={{color: 'action.active'}}>
-        <Edit fontSize="small" />
-      </IconButton>
+      {quotation.status !== QuotationStatus.ACCEPTED && (
+        <IconButton
+          onClick={() => navigate(`/quotations/details/${quotation.id}/edit`)}
+          sx={{color: 'action.active'}}>
+          <Edit fontSize="small" />
+        </IconButton>
+      )}
 
       <IconButton onClick={handleClick}>
         <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
@@ -239,22 +228,25 @@ export const Actions = ({quotation}: Props) => {
           vertical: 'bottom',
           horizontal: 'right',
         }}>
-        {actions.map((item, index) => (
-          <Box key={`${item.label}-${index}`}>
-            <MenuItem
-              onClick={() => {
-                item.onClick();
-                handleClose();
-              }}
-              sx={{py: '0.5rem'}}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText>
-                <Typography variant="body2">{item.label}</Typography>
-              </ListItemText>
-            </MenuItem>
-            {index === 0 && actions.length > 1 && <Divider />}
-          </Box>
-        ))}
+        {actions.map((item, index) =>
+          typeof item === 'string' ? (
+            <Divider key={`${item}-${index}`} sx={{borderWidth: 1}} />
+          ) : (
+            <Box key={`${item.label}-${index}`}>
+              <MenuItem
+                onClick={() => {
+                  item.onClick();
+                  handleClose();
+                }}
+                sx={{py: '0.5rem'}}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText>
+                  <Typography variant="body2">{item.label}</Typography>
+                </ListItemText>
+              </MenuItem>
+            </Box>
+          ),
+        )}
       </Menu>
 
       <Confirm
@@ -303,7 +295,6 @@ export const Actions = ({quotation}: Props) => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={quotation.id}
         submitHook={usePublishQuotation}
-        confirmBtnDisabled={!isPDFGenerated}
         email={
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
           quotation?.elevator?.propertyOwner?.contact.email

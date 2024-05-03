@@ -1,87 +1,63 @@
 import {FormikHelpers, useFormik} from 'formik';
-import * as Yup from 'yup';
 import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import {FormInput} from 'components/form/FormInput';
 import {Dialog} from 'components/Dialog';
-import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
+import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
+import Tooltip from '@mui/material/Tooltip';
+import {ArticleView, articleTypeOptions} from 'models/article';
 import {
-  ArticleType,
-  ArticleView,
-  PropertyOwnerArticleRecord,
-} from 'models/article';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {
-  amountForView,
-  amountRecordForBackend,
+  centsToMoney,
   getCurrencySymbol,
-  makeAmountRecord,
+  moneyToCents,
   useCurrentCurrency,
 } from 'utils/currency';
-import {convertToText} from 'utils/utils';
-import {MeasurementUnit, createMeasurementOptions} from 'models/articleForm';
 import {FormSelect} from 'components/form/FormSelect';
 import {useTranslation} from 'react-i18next';
-import {useContext} from 'react';
-import {LanguageContext} from 'context/LanguageProvider';
+import {ArticleAutocomplete} from 'components/ArticleAutoComplete';
+import {
+  TravelWorkCalculationType,
+  TravelWorkFormValues,
+  TravelWorkView,
+  travelWorkCalculationTypeOptions,
+} from 'models/service-company';
+import {ServiceOrderType} from 'models/service-order';
+import {useState} from 'react';
 
 interface Props {
   title: string;
   openDialog: boolean;
   onClose: () => void;
   onSubmit: (
-    values: PropertyOwnerArticleRecord,
-    formikHelpers: FormikHelpers<PropertyOwnerArticleRecord>,
+    values: TravelWorkFormValues,
+    formikHelpers: FormikHelpers<TravelWorkFormValues>,
   ) => void;
-  article?: ArticleView;
+  travelWork?: TravelWorkView;
 }
-
-const validationSchema = Yup.object().shape({
-  name: Yup.string().required('Name is required'),
-  externalId: Yup.string(),
-  type: Yup.string().required('Type is required'),
-  category: Yup.string(),
-  unit: Yup.string(),
-  unitPurchaseAmount: Yup.object().shape({
-    currency: Yup.string().required(),
-    netAmount: Yup.number(),
-    percentageVat: Yup.number().required(),
-  }),
-  unitSellingAmount: Yup.object().shape({
-    currency: Yup.string().required(),
-    netAmount: Yup.number().required('Selling price is required'),
-    percentageVat: Yup.number().required(),
-  }),
-});
 
 export const CustomerPricesForm = ({
   title,
   openDialog,
   onClose,
   onSubmit,
-  article,
+  travelWork,
 }: Props) => {
-  const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
-  const {language: selectedLng} = useContext(LanguageContext);
-
   const {t} = useTranslation();
-  const percentageVat =
-    user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0;
 
-  const initialValues: PropertyOwnerArticleRecord = {
-    name: article?.name ?? '',
-    externalId: article?.externalId ?? '',
-    type: article?.type ?? ArticleType.LABOR,
-    category: article?.category ?? '',
-    unit: article?.unit ?? '',
-    unitPurchaseAmount: article?.unitPurchaseAmount
-      ? amountForView(article?.unitPurchaseAmount)
-      : makeAmountRecord(0, currentCurrency.code, percentageVat),
-    unitSellingAmount: article?.unitSellingAmount
-      ? amountForView(article?.unitSellingAmount)
-      : makeAmountRecord(0, currentCurrency.code, percentageVat),
+  const [selectedArticle, setSelectedArticle] = useState<ArticleView | null>(
+    travelWork?.article || null,
+  );
+
+  const initialValues: TravelWorkFormValues = {
+    articleId: selectedArticle?.id ?? '',
+    calculationType:
+      travelWork?.calculationType ?? TravelWorkCalculationType.FIXED_FEE,
+    serviceOrderType: ServiceOrderType.GENERAL,
+    articleSellingPrice: centsToMoney(
+      currentCurrency.code,
+      selectedArticle?.unitSellingAmount.netAmount ?? 0,
+    ),
   };
 
   const {
@@ -92,23 +68,20 @@ export const CustomerPricesForm = ({
     handleBlur,
     submitForm,
     setFieldValue,
-  } = useFormik<PropertyOwnerArticleRecord>({
+  } = useFormik<TravelWorkFormValues>({
     initialValues,
     enableReinitialize: true,
     onSubmit: (formikValues, formikHelpers) => {
-      const valuesWithPenniesAmount = {
+      const valuesWithPenniesAmount: TravelWorkFormValues = {
         ...formikValues,
-        unit: formikValues?.unit ?? '',
-        unitPurchaseAmount: amountRecordForBackend(
-          formikValues.unitPurchaseAmount,
+        articleSellingPrice: moneyToCents(
+          currentCurrency.code,
+          formikValues.articleSellingPrice,
         ),
-        unitSellingAmount: amountRecordForBackend(
-          formikValues.unitSellingAmount,
-        ),
+        articleId: values.articleId,
       };
       onSubmit(valuesWithPenniesAmount, formikHelpers);
     },
-    validationSchema,
   });
 
   const defaultProps = {
@@ -123,151 +96,165 @@ export const CustomerPricesForm = ({
       onSave={submitForm}
       disableSaveBtn={!!Object.keys(errors).length}
       dialogProps={{
-        maxWidth: 'xs',
+        maxWidth: 'md',
         open: openDialog || false,
       }}>
       <Grid container spacing={2} sx={{mt: '0.5rem'}}>
         <Grid item xs={12}>
-          <FormInput
-            props={{
-              size: 'small',
+          <ArticleAutocomplete
+            initialValue={travelWork?.article}
+            textFieldProps={{
+              InputLabelProps: {shrink: true},
               label: 'Name',
-              name: 'name',
-              value: values.name,
-              helperText: touched.name && errors.name,
-              error: !!errors.name && touched.name,
+              name: 'articleId',
+              value: values.articleId,
+              helperText: touched.articleId && errors.articleId,
+              error: !!errors.articleId && touched.articleId,
               required: true,
               ...defaultProps,
+            }}
+            getArticle={(value) => {
+              setSelectedArticle(value);
+              setFieldValue('articleId', value?.id);
             }}
           />
         </Grid>
 
-        <Grid item xs={12}>
-          <Box display="flex" gap="1em">
-            <MultipleSelectCheckmarks
-              label="Type"
-              options={Object.keys(ArticleType).map((i) => convertToText(i))}
-              getSelectedValue={(items: string[]) =>
-                setFieldValue('type', items[0].toUpperCase() as ArticleType)
-              }
-              disableClearBtn
-              initialSelectedItems={
-                values.type
-                  ? [convertToText(values.type)]
-                  : [convertToText(ArticleType.LABOR)]
-              }
-              multiple={false}
-              containerStyles={{marginTop: '0.5em', width: '100%'}}
-              formControlStyles={{width: '100%'}}
-              required
-            />
-          </Box>
+        <Grid item xs={6}>
+          <FormSelect
+            labelId="select-type-label"
+            label="Type"
+            options={articleTypeOptions}
+            selectProps={{
+              id: 'select-type',
+              value: selectedArticle?.type ?? '',
+              name: 'type',
+              label: 'Type',
+              notched: true,
+              disabled: true,
+            }}
+          />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <FormInput
             props={{
               size: 'small',
               label: 'Category',
               name: 'category',
-              value: values.category,
-              helperText: touched.category && errors.category,
-              error: !!errors.category && touched.category,
-              ...defaultProps,
-            }}
-          />
-        </Grid>
-
-        <Grid item xs={12}>
-          <FormInput
-            props={{
-              size: 'small',
-              label: 'Articles & Spare part Number',
-              name: 'externalId',
-              value: values.externalId,
-              helperText: touched.externalId && errors.externalId,
-              error: !!errors.externalId && touched.externalId,
-              ...defaultProps,
+              value: selectedArticle?.category,
+              disabled: true,
             }}
           />
         </Grid>
 
         <Grid item xs={12}>
           <FormSelect
-            labelId="select-unit-label"
-            label="Unit"
-            options={createMeasurementOptions(selectedLng, MeasurementUnit.UE)}
-            resetOption={{label: t('Select Unit')}}
-            selectProps={{
-              id: 'select-unit',
-              value: values.unit,
-              onChange: handleChange,
-              error: !!(touched.unit && errors.unit),
-              placeholder: t('Select Unit'),
-              name: 'unit',
-              label: 'Unit',
-            }}
             required
+            labelId="select-calculation-type-label"
+            label="Automate"
+            beforeLabel={
+              <Tooltip
+                title={t(
+                  'Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.',
+                )}
+                placement="top"
+                arrow>
+                <span style={{lineHeight: '1', marginRight: '0.2rem'}}>
+                  <AlertInfoIcon width="16px" height="16px" />
+                </span>
+              </Tooltip>
+            }
+            options={travelWorkCalculationTypeOptions}
+            selectProps={{
+              id: 'select-calculation-type',
+              name: 'calculationType',
+              sx: {width: '100%'},
+              value: values.calculationType,
+              error: !!(touched.calculationType && errors.calculationType),
+              onChange: handleChange,
+            }}
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <FormInput
-            onValueChange={(vals) => {
-              setFieldValue(vals.name as string, vals.value);
+            props={{
+              size: 'small',
+              label: 'Articles & Spare part Number',
+              name: 'externalId',
+              value: selectedArticle?.externalId ?? '',
+              disabled: true,
             }}
+          />
+        </Grid>
+
+        <Grid item xs={6}>
+          <FormInput
+            props={{
+              size: 'small',
+              label: 'Unit',
+              name: 'unit',
+              value: selectedArticle?.unit ?? '',
+              disabled: true,
+            }}
+          />
+        </Grid>
+
+        <Grid item xs={6}>
+          <FormInput
             inputType="currency"
             props={{
               label: 'Purchase price (excl. VAT)',
-              name: 'unitPurchaseAmount.netAmount',
-              value: values.unitPurchaseAmount?.netAmount ?? 0,
-              helperText:
-                touched.unitPurchaseAmount?.netAmount &&
-                errors.unitPurchaseAmount?.netAmount,
-              error:
-                !!errors.unitPurchaseAmount?.netAmount &&
-                touched.unitPurchaseAmount?.netAmount,
+              value:
+                centsToMoney(
+                  currentCurrency.code,
+                  selectedArticle?.unitPurchaseAmount?.netAmount,
+                ) ?? 0,
               inputProps: {min: 0},
               type: 'number',
               InputProps: {
+                disabled: true,
                 endAdornment: (
                   <InputAdornment position="end">
                     {
                       getCurrencySymbol[
-                        values.unitPurchaseAmount?.currency ?? 0
+                        selectedArticle?.unitPurchaseAmount?.currency ?? 0
                       ]
                     }
                   </InputAdornment>
                 ),
               },
-              ...defaultProps,
             }}
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <FormInput
             onValueChange={(vals) => {
               setFieldValue(vals.name as string, vals.value);
             }}
             inputType="currency"
+            numericFormatProps={{required: true}}
             props={{
               label: 'Selling price (excl. VAT)',
-              name: 'unitSellingAmount.netAmount',
-              value: values.unitSellingAmount?.netAmount ?? 0,
+              name: 'articleSellingPrice',
+              value: values.articleSellingPrice ?? 0,
               helperText:
-                touched.unitSellingAmount?.netAmount &&
-                errors.unitSellingAmount?.netAmount,
+                touched.articleSellingPrice && errors.articleSellingPrice,
               error:
-                !!errors.unitSellingAmount?.netAmount &&
-                touched.unitSellingAmount?.netAmount,
+                !!errors.articleSellingPrice && touched.articleSellingPrice,
               inputProps: {min: 0},
               type: 'number',
               required: true,
               InputProps: {
                 endAdornment: (
                   <InputAdornment position="end">
-                    {getCurrencySymbol[values.unitSellingAmount?.currency ?? 0]}
+                    {
+                      getCurrencySymbol[
+                        selectedArticle?.unitSellingAmount?.currency ?? 0
+                      ]
+                    }
                   </InputAdornment>
                 ),
               },
