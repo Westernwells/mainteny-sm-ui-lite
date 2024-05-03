@@ -4,7 +4,6 @@ import {useTranslation} from 'react-i18next';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import {CustomerPricesForm} from 'pages/CustomerDetails/Tabs/CustomerPricesDataGrid/CustomerPricesForm';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
@@ -16,7 +15,8 @@ import {ArticleView, PropertyOwnerArticleRecord} from 'models/article';
 import {formatNetAmount} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {convertToText} from 'utils/utils';
-import {styles} from './style';
+import {styles} from '../style';
+import {CustomerPricesForm} from './CustomPricesForm';
 
 interface Props {
   setRowItem: (row: ArticleView) => void;

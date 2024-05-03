@@ -26,7 +26,7 @@ export const theme = createTheme({
       disabled: 'rgba(143, 155, 179, 0.5)',
     },
     action: {
-      active: '#0F4C6480',
+      active: '#8F9BB3',
       hover: '#F2F6F8',
       selected: '#40748054',
       disabled: 'rgba(143, 155, 179, 0.5)',

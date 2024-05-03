@@ -3,6 +3,7 @@ import {FormHelperText} from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
+import Grid from '@mui/material/Grid';
 import Select, {SelectProps} from '@mui/material/Select';
 import useTheme from '@mui/material/styles/useTheme';
 import {SxProps} from '@mui/system';
@@ -10,7 +11,7 @@ import {capitalize, companyLanguageContextMap} from 'utils/utils';
 import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useMemo} from 'react';
+import {ReactNode, useMemo} from 'react';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -20,6 +21,7 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
 interface Props<T> {
   labelId: string;
   label: string;
+  beforeLabel?: ReactNode;
   required?: boolean;
   isCompanyTranslation?: boolean;
   options: {
@@ -53,6 +55,7 @@ const MenuProps = {
 
 export const FormSelect = ({
   labelId,
+  beforeLabel,
   label,
   options,
   labelStyles,
@@ -92,15 +95,26 @@ export const FormSelect = ({
         error={!!errorText}
         sx={{
           px: '0.2em',
+          display: 'flex',
+          alignItems: 'center',
           ...labelStyles,
         }}
         shrink={selectProps?.notched}>
+        {beforeLabel || null}
         {t(label)}
       </InputLabel>
       <Select
         size="small"
         labelId={labelId}
-        label={t(label)}
+        label={
+          beforeLabel ? (
+            <Grid display="flex" alignItems="center">
+              {beforeLabel} {t(label)}
+            </Grid>
+          ) : (
+            t(label)
+          )
+        }
         renderValue={() => {
           let selectValue;
           if (

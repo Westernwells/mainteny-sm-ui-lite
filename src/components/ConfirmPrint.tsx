@@ -29,35 +29,38 @@ export const ConfirmPrint = ({
       PaperProps={{
         sx: {
           width: '100%',
-          maxWidth: '23rem',
+          maxWidth: '27rem',
         },
       }}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title">{t(title)}</DialogTitle>
-      <DialogContent color="text.primary">
+      <DialogContent color="text.primary" sx={{px: 3, py: 2}}>
         <Typography variant="body1">
           {t(description)}
+          <br />
           <br />
           {t('Do you want to proceed?')}
         </Typography>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{p: 3, pt: 0}}>
         <Button
           buttonProps={{
+            size: 'medium',
             onClick: onClose,
           }}>
           <Typography variant="subtitle2" color="text.secondary">
-            {t('No')}
+            {t('Cancel')}
           </Typography>
         </Button>
 
         <Button
           buttonProps={{
+            size: 'medium',
+            variant: 'contained',
             onClick: onConfirm,
-            autoFocus: true,
           }}>
-          <Typography variant="subtitle2">{t('Yes')}</Typography>
+          <Typography variant="subtitle2">{t('Print')}</Typography>
         </Button>
       </DialogActions>
     </Dialog>

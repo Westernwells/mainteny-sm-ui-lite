@@ -7,7 +7,6 @@ import {
   DataGrid,
   DataGridProps,
   GridColDef,
-  GridColumnHeaderParams,
   GridEventListener,
   GridEvents,
   GridRenderCellParams,
@@ -58,7 +57,7 @@ interface ColumnProps extends GridColDef {
   headerName: string;
   type?: 'string' | 'number';
   cellClassName?: 'nowrap' | 'truncateText';
-  variant?: 'uppercase' | 'titleCase';
+  variant?: 'uppercase' | 'titleCase' | 'noFormat';
 }
 
 export const getColumnProps = ({
@@ -71,7 +70,7 @@ export const getColumnProps = ({
   align = 'left',
   editable = false,
   sortable = false,
-  renderHeader = (params: GridColumnHeaderParams) => {
+  renderHeader = () => {
     const {t} = useTranslation();
     return (
       <Typography
@@ -86,11 +85,11 @@ export const getColumnProps = ({
               }
             : {}
         }>
-        {(params.colDef.headerName &&
-          variant === 'titleCase' &&
-          t(convertToText(params.colDef.headerName))) ||
-          (params.colDef.headerName &&
-            t(params.colDef.headerName.toUpperCase()))}
+        {variant === 'noFormat'
+          ? t(headerName)
+          : variant === 'titleCase'
+          ? t(convertToText(headerName))
+          : t(headerName).toUpperCase()}
       </Typography>
     );
   },
