@@ -208,7 +208,9 @@ const OrderArticlePDFPreview = React.memo(
   }: Props) => {
     const uniqueVATPercentages = [
       ...new Set(
-        formik.values.items.map((item) => item.unitSellingAmount.percentageVat),
+        formik.values.items.map(
+          (item) => item.unitPurchaseAmount?.percentageVat,
+        ),
       ),
     ];
 
@@ -401,7 +403,7 @@ const OrderArticlePDFPreview = React.memo(
                             marginLeft: 10,
                             color: '#212121',
                           }}>
-                          {articleOrderItem.unit || '-'}
+                          {translate(articleOrderItem.unit) || '-'}
                         </Text>
                         <Text
                           style={{
@@ -410,11 +412,11 @@ const OrderArticlePDFPreview = React.memo(
                             color: '#212121',
                           }}>
                           {formatCurrency(
-                            (articleOrderItem.unitSellingAmount.netAmount ??
+                            (articleOrderItem.unitPurchaseAmount?.netAmount ??
                               0) /
-                              (10 **
-                                articleOrderItem.unitSellingAmount
-                                  .fractionDigits ?? 0),
+                              10 **
+                                (articleOrderItem.unitPurchaseAmount
+                                  ?.fractionDigits ?? 2),
                             {
                               currency: currentCurrency?.code,
                               excludeCurrencySymbol: true,
@@ -430,12 +432,12 @@ const OrderArticlePDFPreview = React.memo(
                             color: '#212121',
                           }}>
                           {formatCurrency(
-                            ((articleOrderItem.unitSellingAmount?.netAmount ??
+                            ((articleOrderItem.unitPurchaseAmount?.netAmount ??
                               0) *
                               articleOrderItem.quantity) /
                               10 **
-                                articleOrderItem.unitSellingAmount
-                                  .fractionDigits ?? 0,
+                                (articleOrderItem.unitPurchaseAmount
+                                  ?.fractionDigits ?? 2),
                             {
                               currency: currentCurrency?.code,
                               excludeCurrencySymbol: true,

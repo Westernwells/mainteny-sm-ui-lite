@@ -247,6 +247,7 @@ export const OrderArticle = () => {
             unit: articleFromLocation.unit,
             description: articleFromLocation.description,
             unitSellingAmount: articleFromLocation.unitSellingAmount,
+            unitPurchaseAmount: articleFromLocation.unitPurchaseAmount,
           },
         ]);
       }

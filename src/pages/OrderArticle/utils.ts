@@ -12,6 +12,7 @@ export const convertToArticleOrderItemRecord = (
     unit: item.unit,
     description: item.description,
     unitSellingAmount: item.article.unitSellingAmount,
+    unitPurchaseAmount: item.article.unitPurchaseAmount,
   }));
 
 export const calculateTotal = (
@@ -24,7 +25,7 @@ export const calculateTotal = (
     .map(
       (arrayItem) =>
         arrayItem.quantity *
-        (arrayItem.unitSellingAmount.netAmount /
+        ((arrayItem.unitPurchaseAmount?.netAmount ?? 0) /
           10 ** Currencies[arrayItem.unitSellingAmount.currency] ??
           currencyCode),
     )
@@ -34,7 +35,7 @@ export const calculateTotal = (
 export const calculateTotalVAT = (items: any[]) => {
   const vatMap = new Map();
   items.forEach((item) => {
-    const {percentageVat, netAmount, fractionDigits} = item.unitSellingAmount;
+    const {percentageVat, netAmount, fractionDigits} = item.unitPurchaseAmount;
     const vat =
       ((percentageVat / 100) * (netAmount * item.quantity)) /
       10 ** (fractionDigits || 0);
