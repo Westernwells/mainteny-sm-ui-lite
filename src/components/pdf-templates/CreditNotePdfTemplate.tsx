@@ -15,7 +15,12 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
-import {fixRounding, formatAddressFullname} from 'utils/utils';
+import {
+  calculateLaborMaterialCost,
+  fixRounding,
+  formatAddressFullname,
+  formatCostText,
+} from 'utils/utils';
 import {
   applyGlobalDiscountOnQuotationItems,
   applyPerItemDiscountOnQuotationItems,
@@ -31,6 +36,7 @@ import {
   getFormattedPaymentValues,
   replacePaymentTermsPlaceholders,
 } from 'utils/invoice';
+import {ArticleType} from 'models/article';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -60,7 +66,6 @@ Font.register({
 });
 
 const getStyles = (
-  selectedLng?: string,
   boldFontStyle?: {fontFamily: string},
   regularFontStyle?: {fontFamily: string},
 ) =>
@@ -304,6 +309,17 @@ const CreditNotePdfTemplate = React.memo(
     const formattedPaymentValues = getFormattedPaymentValues(
       invoice?.additionalInfo.paymentTerm!,
       invoice!,
+      total,
+    );
+
+    const laborCost = calculateLaborMaterialCost(
+      articleItems,
+      ArticleType.LABOR,
+    );
+
+    const materialCost = calculateLaborMaterialCost(
+      articleItems,
+      ArticleType.MATERIAL,
     );
 
     const boldFontStyle = {
@@ -315,7 +331,7 @@ const CreditNotePdfTemplate = React.memo(
         selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
     };
 
-    const styles = getStyles(selectedLng, boldFontStyle, regularFontStyle);
+    const styles = getStyles(boldFontStyle, regularFontStyle);
 
     return (
       <Document>
@@ -461,7 +477,7 @@ const CreditNotePdfTemplate = React.memo(
 
             <View>
               <Text style={styles.contentHeader}>
-                {translate('Credit Note for invoice')} {invoice?.externalId}
+                {translate('Credit Note for Invoice')} {invoice?.externalId}
               </Text>
 
               {invoice?.description.trim() !== '' && (
@@ -486,7 +502,7 @@ const CreditNotePdfTemplate = React.memo(
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
-                      {translate('ARTICLE NAME')}
+                      {translate('Article Name')}
                     </Text>
 
                     <Text
@@ -495,7 +511,7 @@ const CreditNotePdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {translate('QUANTITY')}
+                      {translate('Quantity')}
                     </Text>
                     <Text
                       style={{
@@ -504,7 +520,7 @@ const CreditNotePdfTemplate = React.memo(
                         marginLeft: 10,
                         ...styles.tableHeading,
                       }}>
-                      {translate('UNIT')}
+                      {translate('Unit')}
                     </Text>
                     <Text
                       style={{
@@ -512,7 +528,7 @@ const CreditNotePdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {`${translate('PRICE')} (${currentCurrency?.symbol})`}
+                      {`${translate('Price')} (${currentCurrency?.symbol})`}
                     </Text>
                     {!allItemsHaveZeroDiscount && (
                       <Text
@@ -521,7 +537,7 @@ const CreditNotePdfTemplate = React.memo(
                           textAlign: 'right',
                           ...styles.tableHeading,
                         }}>
-                        {translate('DISCOUNT')}
+                        {translate('Discount')}
                       </Text>
                     )}
 
@@ -532,7 +548,7 @@ const CreditNotePdfTemplate = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {`${translate('TOTAL')} (${currentCurrency?.symbol})`}
+                      {`${translate('Total')} (${currentCurrency?.symbol})`}
                     </Text>
                   </View>
                 </View>
@@ -603,7 +619,12 @@ const CreditNotePdfTemplate = React.memo(
                                 textAlign: 'right',
                                 color: '#212121',
                               }}>
-                              -
+                              {articleItem?.additionalInfo?.discount
+                                ?.percentage !== 0 ||
+                              articleItem?.additionalInfo?.discount?.amount
+                                ?.value !== 0
+                                ? '-'
+                                : ''}
                               {articleItem?.additionalInfo?.discount?.type ===
                               DiscountType.PERCENTAGE
                                 ? articleItem?.additionalInfo?.discount
@@ -811,7 +832,25 @@ const CreditNotePdfTemplate = React.memo(
                   <Text style={styles.sectionHeading}>
                     {translate('Notes')}
                   </Text>
-                  <Text>{invoice?.additionalInfo?.moreInfo}</Text>
+                  <Text>
+                    {formatCostText(
+                      invoice?.additionalInfo?.moreInfo,
+                      laborCost !== 0
+                        ? `${formatCurrency(laborCost, {
+                            currency: currentCurrency?.code,
+                            currencySymbol: currentCurrency?.symbol,
+                            companyLang: selectedLng,
+                          })}`
+                        : '',
+                      materialCost !== 0
+                        ? `${formatCurrency(materialCost, {
+                            currency: currentCurrency?.code,
+                            currencySymbol: currentCurrency?.symbol,
+                            companyLang: selectedLng,
+                          })}`
+                        : '',
+                    )}
+                  </Text>
                 </View>
               )}
             </View>

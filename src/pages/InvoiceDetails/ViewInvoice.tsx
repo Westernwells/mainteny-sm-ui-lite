@@ -237,20 +237,23 @@ export const ViewInvoice = ({
   }, [downloadUrl, invoice.status]);
 
   const generateBlobUrl = async () => {
-    const blob = await pdf(
-      <CreditNotePdfTemplate
-        userInfo={user?.userAccount}
-        currentCurrency={currentCurrency}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
-        invoice={invoice}
-        selectedLng={company?.language}
-        translate={translate}
-      />,
-    ).toBlob();
-    setBlobFile(blob);
-    const blobURL = URL.createObjectURL(blob);
-    setFilePathToDownload(blobURL);
+    if (invoice.type === InvoiceType.CREDIT_NOTE) {
+      // TODO: will remove when all invoice types PDFs are ready
+      const blob = await pdf(
+        <CreditNotePdfTemplate
+          userInfo={user?.userAccount}
+          currentCurrency={currentCurrency}
+          logoSrc={imageUrl}
+          logoDimensions={logoDimensions}
+          invoice={invoice}
+          selectedLng={company?.language}
+          translate={translate}
+        />,
+      ).toBlob();
+      setBlobFile(blob);
+      const blobURL = URL.createObjectURL(blob);
+      setFilePathToDownload(blobURL);
+    }
   };
 
   useEffect(() => {
