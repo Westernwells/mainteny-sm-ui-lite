@@ -157,6 +157,7 @@ const getStyles = (
       color: '#616161',
       display: 'flex',
       fontSize: 6,
+      textTransform: 'uppercase',
     },
     tableRow: {
       display: 'flex',
@@ -438,7 +439,7 @@ const QuotationPdfTemplate = React.memo(
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
-                      {translate('ARTICLE NAME')}
+                      {translate('Article Name')}
                     </Text>
 
                     <Text
@@ -447,7 +448,7 @@ const QuotationPdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {translate('QUANTITY')}
+                      {translate('Quantity')}
                     </Text>
                     <Text
                       style={{
@@ -456,7 +457,7 @@ const QuotationPdfTemplate = React.memo(
                         marginLeft: 10,
                         ...styles.tableHeading,
                       }}>
-                      {translate('UNIT')}
+                      {translate('Unit')}
                     </Text>
                     <Text
                       style={{
@@ -464,7 +465,7 @@ const QuotationPdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {`${translate('PRICE')} (${currentCurrency?.symbol})`}
+                      {`${translate('Price')} (${currentCurrency?.symbol})`}
                     </Text>
                     {!allItemsHaveZeroDiscount && (
                       <Text
@@ -473,7 +474,7 @@ const QuotationPdfTemplate = React.memo(
                           textAlign: 'right',
                           ...styles.tableHeading,
                         }}>
-                        {translate('DISCOUNT')}
+                        {translate('Discount')}
                       </Text>
                     )}
 
@@ -484,7 +485,7 @@ const QuotationPdfTemplate = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {`${translate('TOTAL')} (${currentCurrency?.symbol})`}
+                      {`${translate('Total')} (${currentCurrency?.symbol})`}
                     </Text>
                   </View>
                 </View>

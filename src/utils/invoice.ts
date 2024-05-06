@@ -15,7 +15,6 @@ import {PaymentTermData} from 'models/contract';
 import {InvoicePaymentTermRecord} from '../models/invoice';
 import {Currencies, formatCurrency} from './currency';
 import {getAmountFromPercentage} from './utils';
-import {getArticlesTotalAmountInclVats} from './calculate-total';
 import {formatDate} from './datetime';
 
 export const getTotalFromArticles = (
@@ -202,11 +201,11 @@ export const getFormattedPaymentValues = (
     data?: PaymentTermData;
   },
   invoice: InvoiceView,
+  invoiceAmount: number,
 ) => {
-  const invoiceAmount = getArticlesTotalAmountInclVats(invoice);
   const formattedInvoiceAmount = formatCurrency(invoiceAmount);
 
-  const discountValues = paymentTerm.data?.discountOptions.map((d) => {
+  const discountValues = paymentTerm?.data?.discountOptions?.map((d) => {
     const dueDate = addDays(
       new Date(invoice.sentDate!) || new Date(),
       d.discountDays || 0,

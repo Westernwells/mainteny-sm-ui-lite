@@ -1,6 +1,8 @@
 import {formatISO} from 'date-fns';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import lodash from 'lodash';
+import {ArticleType} from 'models/article';
+import {InvoiceItem} from 'models/invoice';
 import useHighlightText from '../hooks/useHighlightText';
 import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
 
@@ -503,3 +505,32 @@ export const createHighlightedText = (text: string, searchText: string) =>
     text: text !== '' ? text : '-',
     highlight: searchText,
   });
+
+export const formatCostText = (
+  inputString: string,
+  laborCost: string,
+  materialCost: string,
+): string => {
+  if (
+    inputString.includes('{LABOR_COST}') ||
+    inputString.includes('{MATERIAL_COST}')
+  ) {
+    let modifiedString = inputString.replace('{LABOR_COST}', laborCost);
+    modifiedString = modifiedString.replace('{MATERIAL_COST}', materialCost);
+    return modifiedString;
+  }
+  return inputString;
+};
+
+export const calculateLaborMaterialCost = (
+  articleItems: InvoiceItem[],
+  type: ArticleType,
+) =>
+  articleItems
+    ?.filter((item) => item.article?.type === type)
+    ?.reduce((itemTotal, item) => {
+      const netAmount = item?.unitAmount?.netAmount ?? 0;
+      const fractionDigits = item?.unitAmount?.fractionDigits ?? 2;
+      const quantity = item?.quantity ?? 1;
+      return itemTotal + (netAmount * quantity) / 10 ** fractionDigits;
+    }, 0);
