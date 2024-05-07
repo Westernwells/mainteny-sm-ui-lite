@@ -68,6 +68,7 @@ import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplat
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
+import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 
@@ -237,10 +238,25 @@ export const ViewInvoice = ({
   }, [downloadUrl, invoice.status]);
 
   const generateBlobUrl = async () => {
-    if (invoice.type === InvoiceType.CREDIT_NOTE) {
+    let PdfTemplate;
+
+    if (
+      invoice.type === InvoiceType.FULL ||
+      invoice.type === InvoiceType.AGGREGATE
+    ) {
+      PdfTemplate = FullInvoicePdfTemplate;
+    } else {
+      PdfTemplate = CreditNotePdfTemplate;
+    }
+
+    if (
+      invoice.type === InvoiceType.CREDIT_NOTE ||
+      invoice.type === InvoiceType.FULL ||
+      invoice.type === InvoiceType.AGGREGATE
+    ) {
       // TODO: will remove when all invoice types PDFs are ready
       const blob = await pdf(
-        <CreditNotePdfTemplate
+        <PdfTemplate
           userInfo={user?.userAccount}
           currentCurrency={currentCurrency}
           logoSrc={imageUrl}
@@ -415,27 +431,34 @@ export const ViewInvoice = ({
             </Box>
           </PageCard>
 
-          {invoice.type === InvoiceType.CREDIT_NOTE && (
+          {(invoice.type === InvoiceType.CREDIT_NOTE ||
+            invoice.type === InvoiceType.FULL ||
+            invoice.type === InvoiceType.AGGREGATE) && (
             <Box sx={{display: 'flex', justifyContent: 'center'}}>
               <PdfPreview blobUrl={filePathToDownload} />
             </Box>
           )}
 
-          {invoice &&
-            invoice.type !== InvoiceType.CREDIT_NOTE &&
-            (invoice.additionalInfo &&
-            invoice.additionalInfo.pdfGenerationStatus ===
-              PdfGenerationStatus.DONE &&
-            !isLoadingDownloadUrl ? (
-              <PDFContainer url={downloadUrl} />
-            ) : (
-              <PageCard>
-                <EmptySection
-                  label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
-                  size="small"
-                />
-              </PageCard>
-            ))}
+          {invoice.type !== InvoiceType.CREDIT_NOTE &&
+            invoice.type !== InvoiceType.FULL &&
+            invoice.type !== InvoiceType.AGGREGATE && (
+              <Box>
+                {invoice &&
+                invoice.additionalInfo &&
+                invoice.additionalInfo.pdfGenerationStatus ===
+                  PdfGenerationStatus.DONE &&
+                !isLoadingDownloadUrl ? (
+                  <PDFContainer url={downloadUrl} />
+                ) : (
+                  <PageCard>
+                    <EmptySection
+                      label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
+                      size="small"
+                    />
+                  </PageCard>
+                )}
+              </Box>
+            )}
         </Grid>
 
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
