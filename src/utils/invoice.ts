@@ -204,13 +204,13 @@ export const getFormattedPaymentValues = (
   invoiceAmount: number,
 ) => {
   const formattedInvoiceAmount = formatCurrency(invoiceAmount);
-
   const discountValues = paymentTerm?.data?.discountOptions?.map((d) => {
     const dueDate = addDays(
-      new Date(invoice.sentDate!) || new Date(),
+      invoice.sentDate ? new Date(invoice.sentDate) : new Date(),
       d.discountDays || 0,
     );
     const formattedDueDate = formatDate(dueDate);
+
     const discountPercentage = d.discountPercent || 0;
     const discountAmount = invoiceAmount * (discountPercentage / 100);
     const formattedDiscountAmount = formatCurrency(discountAmount);
