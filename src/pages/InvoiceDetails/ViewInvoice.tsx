@@ -63,10 +63,8 @@ import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
-import {companyLanguageContextMap, createFilesFromBlobArray} from 'utils/utils';
+import {companyLanguageContextMap} from 'utils/utils';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
-import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
@@ -95,7 +93,6 @@ export const ViewInvoice = ({
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [blobFile, setBlobFile] = useState<Blob>();
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
   const imageUrl = useLogoImage(user);
@@ -115,10 +112,6 @@ export const ViewInvoice = ({
       return t(key);
     },
     [company?.language],
-  );
-
-  const {mutateAsync: uploadFiles} = useUploadFiles(
-    'The document was sent successfully.',
   );
 
   const {downloadFile} = useDownloadFileWithCustomName(
@@ -250,7 +243,6 @@ export const ViewInvoice = ({
           translate={translate}
         />,
       ).toBlob();
-      setBlobFile(blob);
       const blobURL = URL.createObjectURL(blob);
       setFilePathToDownload(blobURL);
     }
@@ -660,14 +652,6 @@ export const ViewInvoice = ({
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
-          const serviceCompanyId = user?.userAccount.serviceCompany.id;
-          const uploadPath = `${serviceCompanyId}/invoices`;
-
-          const fileNames: string[] = [`${invoice.id}.pdf`];
-
-          const files = createFilesFromBlobArray([blobFile!], fileNames);
-          await uploadFiles({files, uploadPath});
-
           publishInvoice({
             id: invoice!.id,
             body: {
@@ -675,18 +659,6 @@ export const ViewInvoice = ({
               subject: emailRecord.subject,
               content: emailRecord.content,
               emails: [emailRecord.email],
-              attachments: files.reduce<FileWithPreview[]>(
-                (newArr: FileWithPreview[], obj) => [
-                  ...newArr,
-                  {
-                    ...obj,
-                    type: obj.type,
-                    uri: `${uploadPath}/${obj.name}`,
-                    description: obj.name.split('.')[0],
-                  },
-                ],
-                [],
-              ),
             },
           });
         }}
