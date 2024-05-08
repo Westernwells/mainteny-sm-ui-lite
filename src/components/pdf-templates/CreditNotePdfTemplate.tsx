@@ -8,7 +8,7 @@ import {
 } from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
-import {formatCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
@@ -213,10 +213,7 @@ const CreditNotePdfTemplate = React.memo(
       const discountValue =
         articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
 
-      return (
-        (grossTotal - discountValue) /
-          10 ** articleItem.unitAmount.fractionDigits ?? 2
-      );
+      return centsToMoney(currentCurrency?.code!, grossTotal - discountValue);
     };
 
     const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
@@ -326,7 +323,7 @@ const CreditNotePdfTemplate = React.memo(
                 }
                 receiverName={invoice?.propertyOwner?.name}
                 addressComponent={
-                  invoice?.propertyOwner?.billingAddress?.component
+                  invoice?.additionalInfo?.billingAddress?.component
                 }
                 beneficiaryInfo={
                   invoice?.additionalInfo.beneficiaryAddress?.component
@@ -365,7 +362,7 @@ const CreditNotePdfTemplate = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '40%',
+                        width: '36%',
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
@@ -382,7 +379,7 @@ const CreditNotePdfTemplate = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '8%',
+                        width: '7%',
                         textAlign: 'center',
                         marginLeft: 10,
                         ...styles.tableHeading,
@@ -400,7 +397,7 @@ const CreditNotePdfTemplate = React.memo(
                     {!allItemsHaveZeroDiscount && (
                       <Text
                         style={{
-                          width: '10%',
+                          width: '15%',
                           textAlign: 'right',
                           ...styles.tableHeading,
                         }}>
@@ -436,7 +433,7 @@ const CreditNotePdfTemplate = React.memo(
                           </Text>
                           <Text
                             style={{
-                              width: '40%',
+                              width: '37%',
                               textAlign: 'left',
                               color: '#212121',
                             }}>
@@ -453,12 +450,12 @@ const CreditNotePdfTemplate = React.memo(
                           </Text>
                           <Text
                             style={{
-                              width: '8%',
+                              width: '7%',
                               textAlign: 'center',
                               marginLeft: 10,
                               color: '#212121',
                             }}>
-                            {articleItem?.article?.unit || '-'}
+                            {translate(articleItem?.article?.unit!) || '-'}
                           </Text>
                           <Text
                             style={{
@@ -482,7 +479,7 @@ const CreditNotePdfTemplate = React.memo(
                           {!allItemsHaveZeroDiscount && (
                             <Text
                               style={{
-                                width: '10%',
+                                width: '15%',
                                 textAlign: 'right',
                                 color: '#212121',
                               }}>
@@ -496,9 +493,35 @@ const CreditNotePdfTemplate = React.memo(
                               DiscountType.PERCENTAGE
                                 ? articleItem?.additionalInfo?.discount
                                     .percentage
-                                : (articleItem?.additionalInfo?.discount?.amount
-                                    ?.value || 0) /
-                                  10 ** 2}
+                                : formatCurrency(
+                                    centsToMoney(
+                                      currentCurrency?.code!,
+                                      articleItem?.additionalInfo?.discount
+                                        ?.amount?.value,
+                                    ),
+                                    {
+                                      currency: currentCurrency?.code,
+                                      excludeCurrencySymbol: true,
+                                      currencySymbol: currentCurrency?.symbol,
+                                      companyLang: selectedLng,
+                                      minimumFractionDigits:
+                                        centsToMoney(
+                                          currentCurrency?.code!,
+                                          articleItem?.additionalInfo?.discount
+                                            ?.amount?.value,
+                                        ) === 0
+                                          ? 0
+                                          : 2,
+                                      maximumFractionDigits:
+                                        centsToMoney(
+                                          currentCurrency?.code!,
+                                          articleItem?.additionalInfo?.discount
+                                            ?.amount?.value,
+                                        ) === 0
+                                          ? 0
+                                          : 2,
+                                    },
+                                  )}
                               {articleItem?.additionalInfo?.discount?.type ===
                               DiscountType.AMOUNT
                                 ? currentCurrency?.symbol
@@ -551,7 +574,7 @@ const CreditNotePdfTemplate = React.memo(
                           textAlign: 'right',
                           fontSize: 10,
                         }}>
-                        -
+                        {discountValue > 0 ? '-' : ''}
                         {formatCurrency(discountValue, {
                           currency: currentCurrency?.code,
                           excludeCurrencySymbol: true,
