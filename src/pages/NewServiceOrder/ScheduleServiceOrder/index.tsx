@@ -70,7 +70,7 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
   const [selectedTechnicians, setSelectedTechnicians] = useState<
     EmployeesView[]
   >([]);
-
+  const [selectedUnitChange, setSelectedUnitChange] = useState(false);
   useEffect(() => {
     if (activeStep === 0 && !selectedUnit) {
       return setDisableNextBtn(true);
@@ -167,7 +167,12 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
       submitting={isCreatingOrder}
       disableNextBtn={disableNextBtn || isCreatingOrder}
       initialActiveStep={elevator ? 1 : 0}
-      getActiveStep={(val) => setActiveStep(val)}
+      getActiveStep={(val) => {
+        if (val === 2) {
+          setSelectedUnitChange(false);
+        }
+        setActiveStep(val);
+      }}
       steps={steps}
       containerStyles={{
         flexGrow: 1,
@@ -191,7 +196,14 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
         </Typography>
         {activeStep === 0 ? (
           <SelectUnit
-            getSelectedUnit={(val) => setSelectedUnit(val)}
+            getSelectedUnit={(val) => {
+              if (val === selectedUnit) {
+                setSelectedUnitChange(false);
+              } else {
+                setSelectedUnitChange(true);
+              }
+              setSelectedUnit(val);
+            }}
             initialSelectedUnit={selectedUnit}
           />
         ) : activeStep === 1 ? (
@@ -212,6 +224,7 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
             setRequireTechnicianNotification={setRequireTechnicianNotification}
             notificationChannels={notificationChannels}
             setNotificationChannels={setNotificationChannels}
+            selectedUnitChange={selectedUnitChange}
           />
         ) : (
           <AddDescription
