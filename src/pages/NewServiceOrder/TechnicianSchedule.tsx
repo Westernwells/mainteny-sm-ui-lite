@@ -52,6 +52,8 @@ interface Props {
   maxHeight?: string;
   viewDate: Date;
   isModal?: boolean;
+  selectedTechnicianIds?: string[];
+  selectedUnitChange?: boolean;
 }
 
 const gridWidth = 120;
@@ -69,6 +71,8 @@ export const TechnicianSchedule = ({
   maxHeight = '20rem',
   viewDate,
   isModal,
+  selectedTechnicianIds,
+  selectedUnitChange,
 }: Props) => {
   const formatDate = useFormatDate();
   const [scheduleItemGroup, setScheduleItemGroup] =
@@ -81,8 +85,9 @@ export const TechnicianSchedule = ({
   const [lookupTechnician, setLookupTechnician] = useState<{
     [key: string]: EmployeesView[];
   }>({});
+  const defaultVisibleItemsSize = 2;
   const [showAll, setShowAll] = useState(false);
-  const [visibleItems, setVisibleItems] = useState(2);
+  const [visibleItems, setVisibleItems] = useState(defaultVisibleItemsSize);
   useEffect(() => {
     const result: ScheduledItemGroup = {};
     Object.keys(scheduleItems).forEach((key) => {
@@ -152,6 +157,31 @@ export const TechnicianSchedule = ({
       setShowAll(true);
     }
   }, [showAll, visibleItems, bodyRow]);
+
+  useEffect(() => {
+    if (
+      !isModal &&
+      bodyRow &&
+      selectedTechnicianIds &&
+      selectedTechnicianIds.length >= visibleItems
+    ) {
+      setVisibleItems(bodyRow.length || 0);
+    }
+  }, [showAll, bodyRow, selectedTechnicianIds, isModal]);
+  useEffect(() => {
+    if (!isModal && selectedUnitChange) {
+      setVisibleItems(defaultVisibleItemsSize);
+    }
+  }, [selectedUnitChange]);
+  useEffect(() => {
+    if (
+      isModal &&
+      selectedTechnicianIds &&
+      selectedTechnicianIds.length >= visibleItems
+    ) {
+      setVisibleItems(bodyRow.length || 0);
+    }
+  }, [bodyRow, selectedTechnicianIds]);
 
   // Memoize the function using useCallback
   const toggleModal = () => {
@@ -428,6 +458,7 @@ export const TechnicianSchedule = ({
           maxHeight="40rem"
           viewDate={viewDate}
           isModal
+          selectedTechnicianIds={selectedTechnicianIds}
         />
       </Dialog>
     </>

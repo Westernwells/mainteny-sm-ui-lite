@@ -12,12 +12,16 @@ import {EmptySection} from 'components/EmptySection';
 import {Widget} from 'components/Widget';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {formatDate} from 'utils/datetime';
+import {Typography} from '@mui/material';
 import {Actions} from './Actions';
 
 export const columns: GridColDef[] = [
   getColumnProps({
     field: 'name',
     headerName: 'name',
+    renderCell: (params) => (
+      <Typography variant="body2">{params.row.name}</Typography>
+    ),
   }),
   getColumnProps({
     field: 'dateCreated',

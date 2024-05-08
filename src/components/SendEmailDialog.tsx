@@ -15,6 +15,7 @@ import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
 import {usePublishQuotation} from 'hooks/reactQuery/useQuotation';
+import {useState} from 'react';
 
 interface Props {
   open: boolean;
@@ -56,6 +57,7 @@ export const SendEmailDialog = ({
   loadingProgress,
 }: Props) => {
   const {t} = useTranslation();
+  const [isPublishing, setIsPublishing] = useState(false);
   const publish = submitHook?.();
   const formik = useFormik<SimpleEmailRecord>({
     validateOnMount: false,
@@ -68,6 +70,8 @@ export const SendEmailDialog = ({
     onSubmit: async (values, {setSubmitting}) => {
       const contentWithLineBreaks = values.content.replace(/\n/g, '<br/>');
       if (submitHook && publish && id) {
+        setIsPublishing(true);
+
         publish.mutate(
           {
             id,
@@ -84,7 +88,10 @@ export const SendEmailDialog = ({
                 onConfirm();
               }
             },
-            onSettled: () => setSubmitting(false),
+            onSettled: () => {
+              setSubmitting(false);
+              setIsPublishing(false);
+            },
           },
         );
       } else if (callback) {
@@ -215,7 +222,7 @@ export const SendEmailDialog = ({
                 variant: 'contained',
                 autoFocus: true,
                 disabled:
-                  formik.isSubmitting ||
+                  isPublishing ||
                   confirmBtnDisabled ||
                   Object.keys(formik.errors).length > 0,
                 onClick: () => formik.handleSubmit(),

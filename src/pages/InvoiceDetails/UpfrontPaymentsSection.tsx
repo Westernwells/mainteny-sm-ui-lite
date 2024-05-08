@@ -1,7 +1,23 @@
 import {Fragment, useEffect} from 'react';
 import {t} from 'i18next';
+import {uniq} from 'lodash';
 import {theme} from 'theme';
-import {Grid, Typography, Box, InputAdornment, Divider} from '@mui/material';
+import {
+  Grid,
+  Typography,
+  Box,
+  InputAdornment,
+  Divider,
+  TableCellProps,
+  TableContainer,
+  Table as MuiTable,
+  SxProps,
+  tableCellClasses,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+} from '@mui/material';
 import {FormikProps, getIn} from 'formik';
 import {NumberFormatValues} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
@@ -26,6 +42,49 @@ import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceI
 import {applyDiscount, getAggregatedPartialPaymentsVats} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
+import {formatDate, toDate} from 'utils/datetime';
+
+interface TableProps extends React.ComponentProps<typeof MuiTable> {
+  children: React.ReactNode;
+  headStyles?: SxProps;
+  bodyStyles?: SxProps;
+}
+
+const Table = ({children, headStyles, bodyStyles, ...props}: TableProps) => (
+  <MuiTable
+    sx={{
+      minWidth: 700,
+      [`& .${tableCellClasses.root}`]: {
+        borderBottom: 'none',
+        borderSpacing: '0 1rem',
+      },
+      [`& .${tableCellClasses.head}`]: {
+        p: 0,
+        px: 0.5,
+        color: 'text.secondary',
+        typography: 'caption',
+        ...headStyles,
+      },
+      [`& .${tableCellClasses.body}`]: {
+        px: 0.5,
+        pb: 0,
+        color: 'primary.dark',
+        verticalAlign: 'top',
+        '& p': {
+          mt: 0,
+        },
+        ...bodyStyles,
+      },
+      '& .MuiOutlinedInput-root': {
+        fieldset: {
+          borderColor: '#E4E9F2',
+        },
+      },
+    }}
+    {...props}>
+    {children}
+  </MuiTable>
+);
 
 interface Props {
   formik: FormikProps<InvoiceFormData>;
@@ -143,6 +202,13 @@ export const UpfrontPaymentsSection = ({
       ? (subtotalExclVat * (formik.values.payment?.percentage ?? 0)) / 100
       : 0;
 
+  const amountFormatted = formatCurrency(fixRounding(amount, 2), {
+    currency: currentCurrency.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    roundingMode: 'floor',
+  });
+
   const totalAmountExclVat = isEditing
     ? amount +
       previousInvoicesTotalExclVat -
@@ -179,6 +245,17 @@ export const UpfrontPaymentsSection = ({
           formik.values.items,
           totalAmountExclVat,
         )
+    : [];
+  const currentInvoiceAmountPercentageVats = formik.values.items.length
+    ? allItemsHasSameVAT
+      ? [
+          {
+            percentageVat: formik.values.items[0].unitAmount.percentageVat,
+            vat:
+              amount * (formik.values.items[0].unitAmount.percentageVat / 100),
+          },
+        ]
+      : getAggregatedPartialPaymentsVats(formik.values.items, amount)
     : [];
 
   const totalAmountInclVats = calculateTotalAmountInclVats({
@@ -258,6 +335,324 @@ export const UpfrontPaymentsSection = ({
   const paymentDescriptionError =
     getIn(formik.touched, 'payment.description') &&
     getIn(formik.errors, 'payment.description');
+
+  const invoicedSectionColumns: {
+    name: string;
+    align?: TableCellProps['align'];
+  }[] = [
+    {name: '#'},
+    {name: 'Name'},
+    {name: 'Invoice Date'},
+    {name: 'Amount (excl. VAT)', align: 'right'},
+    {name: 'VAT (%)', align: 'right'},
+    {name: 'VAT amount', align: 'right'},
+    {name: 'Total amount (incl. VAT)', align: 'right'},
+  ];
+
+  const renderInvoicedSection = () => (
+    <>
+      <Typography variant="h6" color="primary.dark">
+        {T('Invoiced')}
+      </Typography>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {invoicedSectionColumns.map((column) => (
+                <TableCell key={column.name} align={column.align || 'left'}>
+                  {T(column.name)}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {previousInvoices.map((i, index) => {
+              // don't render anything for the editing invoice
+              if (isEditing && index === previousInvoices.length - 1) {
+                return null;
+              }
+              const invoiceTotalAmount = i.totalAmount;
+              const description =
+                i.type === InvoiceType.CREDIT_NOTE
+                  ? t('Credit Note invoice')
+                  : i.additionalInfo?.payment?.description || '';
+              const fractionDigits = invoiceTotalAmount?.fractionDigits ?? 2;
+              const amountExclVat = Math.abs(
+                (invoiceTotalAmount?.netAmount ?? 0) / 10 ** fractionDigits,
+              );
+              const amountExclVatFormatted = formatCurrency(amountExclVat, {
+                currency: currentCurrency.code,
+                minimumFractionDigits: fractionDigits,
+                maximumFractionDigits: fractionDigits,
+                roundingMode: 'floor',
+              });
+              const totalAmountInclVat = Math.abs(
+                (invoiceTotalAmount?.grossAmount ?? 0) / 10 ** fractionDigits,
+              );
+              const totalAmountInclVatFormatted = formatCurrency(
+                totalAmountInclVat,
+                {
+                  currency: currentCurrency.code,
+                  minimumFractionDigits: fractionDigits,
+                  maximumFractionDigits: fractionDigits,
+                  roundingMode: 'floor',
+                },
+              );
+              const signBeforeNumber =
+                i.type === InvoiceType.CREDIT_NOTE ? '+' : '-';
+
+              return (
+                <TableRow key={i.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell width="25%">{description}</TableCell>
+                  <TableCell>
+                    {i.sentDate ? formatDate(toDate(i.sentDate)) : '-'}
+                  </TableCell>
+                  <TableCell align="right">
+                    {signBeforeNumber}
+                    {amountExclVatFormatted}
+                  </TableCell>
+                  <TableCell align="right">
+                    {invoiceTotalAmount.vats.map((v, idx) => (
+                      <p key={idx}>{v.percentageVat}%</p>
+                    ))}
+                  </TableCell>
+                  <TableCell align="right">
+                    {invoiceTotalAmount.vats.map((v, idx) => {
+                      const vatAmount = Math.abs(
+                        (v?.vat ?? 0) / 10 ** fractionDigits,
+                      );
+                      const vatAmountFormatted = formatCurrency(vatAmount, {
+                        currency: currentCurrency.code,
+                        minimumFractionDigits: fractionDigits,
+                        maximumFractionDigits: fractionDigits,
+                        roundingMode: 'floor',
+                      });
+                      return <p key={idx}>{vatAmountFormatted}</p>;
+                    })}
+                  </TableCell>
+                  <TableCell align="right">
+                    {signBeforeNumber}
+                    {totalAmountInclVatFormatted}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+            <TableRow
+              sx={{
+                '& .MuiTableCell-root': {
+                  fontWeight: 600,
+                },
+              }}>
+              <TableCell />
+              <TableCell width="25%">{T('Invoice amount')}</TableCell>
+              <TableCell />
+              <TableCell align="right">{amountFormatted}</TableCell>
+              <TableCell align="right">
+                {currentInvoiceAmountPercentageVats.map((v, idx) => (
+                  <p key={idx}>{v.percentageVat}%</p>
+                ))}
+              </TableCell>
+              <TableCell align="right">
+                {currentInvoiceAmountPercentageVats.map((v, idx) => {
+                  const vatAmountFormatted = formatCurrency(v.vat, {
+                    currency: currentCurrency.code,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    roundingMode: 'floor',
+                  });
+                  return <p key={idx}>{vatAmountFormatted}</p>;
+                })}
+              </TableCell>
+              <TableCell align="right">
+                {formatCurrency(
+                  amount +
+                    currentInvoiceAmountPercentageVats
+                      .map((v) => v.vat)
+                      .reduce((a, b) => a + b, 0),
+                  {
+                    currency: currentCurrency.code,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    roundingMode: 'floor',
+                  },
+                )}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
+  );
+
+  const paymentHistorySectionColumns: {
+    name: string;
+    align?: TableCellProps['align'];
+  }[] = [
+    {name: '#'},
+    {name: 'Name'},
+    {name: 'Invoice Date'},
+    {name: 'Paid amount (excl. VAT)', align: 'right'},
+    {name: 'VAT (%)', align: 'right'},
+    {name: 'VAT amount', align: 'right'},
+    {name: 'Total amount (incl. VAT)', align: 'right'},
+  ];
+
+  const paidAmountInclVats = previousInvoices
+    .map((i) =>
+      i.payments.reduce(
+        (acc, p) =>
+          acc + (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
+        0,
+      ),
+    )
+    .reduce((acc, a) => acc + a, 0);
+  const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
+  const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
+    currency: currentCurrency.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    roundingMode: 'floor',
+  });
+
+  const renderPaymentHistorySection = () => (
+    <>
+      <Typography variant="h6" color="primary.dark">
+        {T('Payment history')}
+      </Typography>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {paymentHistorySectionColumns.map((column) => (
+                <TableCell key={column.name} align={column.align || 'left'}>
+                  {T(column.name)}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell />
+              <TableCell width="40%">{T('Total amount (incl. VAT)')}</TableCell>
+              <TableCell align="right" colSpan={5}>
+                {totalAmountInclVatsFormatted}
+              </TableCell>
+            </TableRow>
+            {previousInvoices.map((i, index) => {
+              if (!i.payments.length) {
+                return null;
+              }
+
+              const description =
+                i.type === InvoiceType.CREDIT_NOTE
+                  ? t('Credit Note invoice')
+                  : i.additionalInfo?.payment?.description || '';
+
+              const paidAmountExclVat = Math.abs(
+                i.payments
+                  .map(
+                    (p) =>
+                      (p.additionalInfo.paymentDetails?.netAmount ?? 0) /
+                      10 **
+                        (p.additionalInfo.paymentDetails?.fractionDigits ?? 2),
+                  )
+                  .reduce((a, b) => a + b, 0),
+              );
+
+              const paidAmountExclVatFormatted = formatCurrency(
+                paidAmountExclVat,
+                {
+                  currency: currentCurrency.code,
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  roundingMode: 'floor',
+                },
+              );
+
+              const percentageVats = uniq(
+                i.payments
+                  .map((p) => p.additionalInfo.paymentDetails?.vats)
+                  .flat(),
+              );
+
+              const totalPriceInclVat = Math.abs(
+                i.payments
+                  .map(
+                    (p) =>
+                      (p.amount?.value ?? 0) /
+                      10 ** (p.amount?.fractionDigits ?? 2),
+                  )
+                  .reduce((a, b) => a + b, 0),
+              );
+
+              const totalPriceInclVatFormatted = formatCurrency(
+                totalPriceInclVat,
+                {
+                  currency: currentCurrency.code,
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  roundingMode: 'floor',
+                },
+              );
+              const signBeforeNumber =
+                i.type === InvoiceType.CREDIT_NOTE ? '+' : '-';
+
+              return (
+                <TableRow key={i.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell width="40%">{description}</TableCell>
+                  <TableCell>
+                    {i.sentDate ? formatDate(toDate(i.sentDate)) : '-'}
+                  </TableCell>
+                  <TableCell align="right">
+                    {signBeforeNumber}
+                    {paidAmountExclVatFormatted}
+                  </TableCell>
+                  <TableCell align="right">
+                    {percentageVats.map((pV) => (
+                      <p key={pV?.percentageVat}>{pV?.percentageVat}%</p>
+                    ))}
+                  </TableCell>
+                  <TableCell align="right">
+                    {percentageVats.map((pV, idx) => (
+                      <p key={`${pV?.percentageVat}-${idx}`}>
+                        {signBeforeNumber}
+                        {formatCurrency(Math.abs((pV?.vat ?? 0) / 10 ** 2), {
+                          currency: currentCurrency.code,
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                          roundingMode: 'floor',
+                        })}
+                      </p>
+                    ))}
+                  </TableCell>
+                  <TableCell align="right">
+                    {signBeforeNumber}
+                    {totalPriceInclVatFormatted}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+            <TableRow>
+              <TableCell />
+              <TableCell width="40%" sx={{typography: 'h6', fontWeight: 600}}>
+                {T('Outstanding payments')}
+              </TableCell>
+              <TableCell
+                align="right"
+                colSpan={5}
+                sx={{typography: 'h6', fontWeight: 600}}>
+                {outstandingAmountFormatted}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
+  );
+
+  const hasPayments = previousInvoices.map((i) => i.payments).flat().length > 0;
 
   return (
     <Grid item xs={12} bgcolor="white" p={3}>
@@ -518,6 +913,27 @@ export const UpfrontPaymentsSection = ({
             {totalAmountInclVatsFormatted}
           </Typography>
         </Box>
+
+        {hasPreviousInvoices ? (
+          <>
+            {/* INVOICED SECTION */}
+            {/* if editing, show invoiced section if there is more than one previous invoice */}
+            {!isEditing || (isEditing && previousInvoices.length > 1) ? (
+              <>
+                <Divider sx={{borderColor: theme.palette.grey[300]}} />
+                {renderInvoicedSection()}
+              </>
+            ) : null}
+
+            {/* PAYMENT HISTORY SECTION */}
+            {hasPayments ? (
+              <>
+                <Divider sx={{borderColor: theme.palette.grey[300]}} />
+                {renderPaymentHistorySection()}
+              </>
+            ) : null}
+          </>
+        ) : null}
       </Box>
     </Grid>
   );
