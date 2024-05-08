@@ -179,7 +179,7 @@ export const Schedule = ({
     date: toRestDate(currentDate ?? new Date()),
     pageIndex: 0,
     pageSize: 500,
-    roles: [Role.TECHNICIAN],
+    roles: [Role.TECHNICIAN, Role.CONTRACTOR],
   });
 
   useEffect(() => {
