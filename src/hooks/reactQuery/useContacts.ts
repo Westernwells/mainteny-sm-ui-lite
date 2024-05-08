@@ -4,6 +4,9 @@ import {
   ServiceCompanyContactPersonQueryParams,
   ServiceCompanyContactPersonView,
   ServiceCompanyContactPeronFormModel,
+  ContactPersonAssociationView,
+  ContactPersonAssociationQueryParams,
+  CreateContactPersonAssociationRecord,
 } from 'models/contacts';
 import {
   useInfiniteQuery,
@@ -513,6 +516,124 @@ export const useDeleteContactPersonNote = (successMsg?: string) => {
           });
         }
         queryClient.invalidateQueries(queryKeys.queryContactPersonNotes);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const fetchContactPersonAssociations = async (
+  contactPersonId: string,
+  params: Partial<ContactPersonAssociationQueryParams>,
+) => {
+  const response = await axiosClient.get<
+    Resource<ContactPersonAssociationView>
+  >(`/api/contactPersons/${contactPersonId}/associations`, {
+    params,
+    paramsSerializer,
+  });
+  return response.data;
+};
+
+export const useContactPersonAssociations = (
+  contactPersonId: string,
+  params: Partial<ContactPersonAssociationQueryParams>,
+) =>
+  useInfiniteQuery(
+    [
+      queryKeys.fetchContactPersonAssociations,
+      contactPersonId,
+      params,
+      {infinite: true},
+    ],
+    ({pageParam = 0}) =>
+      fetchContactPersonAssociations(contactPersonId, {
+        ...params,
+        pageIndex: pageParam,
+      }),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
+    },
+  );
+
+const disconnectContactPersonAssociation = async (
+  contactPersonId: string,
+  associationId: string,
+) => {
+  await axiosClient.delete<StringValue>(
+    `/api/contactPersons/${contactPersonId}/associations/${associationId}`,
+  );
+};
+
+export const useDisconnectContactPersonAssociation = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      contactPersonId,
+      associationId,
+    }: {
+      contactPersonId: string;
+      associationId: string;
+    }) => disconnectContactPersonAssociation(contactPersonId, associationId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchContactPersonAssociations);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const addContactPersonAssociation = async (
+  body: CreateContactPersonAssociationRecord,
+  contactPersonId: string,
+) => {
+  await axiosClient.post<StringValue>(
+    `/api/contactPersons/${contactPersonId}/associations`,
+    {
+      ...body,
+    },
+  );
+};
+
+export const useAddContactPersonAssociation = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      body,
+      contactPersonId,
+    }: {
+      body: CreateContactPersonAssociationRecord;
+      contactPersonId: string;
+    }) => addContactPersonAssociation(body, contactPersonId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchContactPersonAssociations);
       },
       onError: (err: any) => {
         console.log(err);

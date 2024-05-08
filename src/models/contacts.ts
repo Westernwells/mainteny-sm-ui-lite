@@ -110,6 +110,18 @@ export interface ServiceCompanyContactPersonQueryParams {
   role: ServiceCompanyContactPersonRole[];
 }
 
+export interface ContactPersonAssociationQueryParams {
+  contactPersonId: string;
+  pageIndex?: number;
+  pageSize: number;
+  refType?: ContactPersonAssociationType;
+}
+
+export interface CreateContactPersonAssociationRecord {
+  refType: ContactPersonAssociationType;
+  refId: string;
+}
+
 export interface ContactPersonAdditionalInfo {
   secondaryPhone?: string;
 }
@@ -123,6 +135,34 @@ export interface ServiceCompanyContactPersonView {
   additionalInfo: ContactPersonAdditionalInfo;
   meta: Meta;
 }
+
+export interface ContactPersonAssociationView {
+  id: string;
+  contactPersonId: string;
+  refId: string;
+  refType: ContactPersonAssociationType;
+  additionalInfo: string;
+  meta: Meta;
+  data: unknown;
+}
+
+export enum ContactPersonAssociationType {
+  PROPERTY_OWNER = 'PROPERTY_OWNER',
+  ELEVATOR = 'ELEVATOR',
+  CONTRACT = 'CONTRACT',
+  ARTICLE_SUPPLIER = 'ARTICLE_SUPPLIER',
+  SERVICE_ORDER = 'SERVICE_ORDER',
+}
+
+export const ConnectionTypeLabels: {
+  [key in ContactPersonAssociationType]: string;
+} = {
+  [ContactPersonAssociationType.PROPERTY_OWNER]: 'Customer',
+  [ContactPersonAssociationType.ELEVATOR]: 'Unit_elevator',
+  [ContactPersonAssociationType.CONTRACT]: 'Contract',
+  [ContactPersonAssociationType.ARTICLE_SUPPLIER]: 'Supplier',
+  [ContactPersonAssociationType.SERVICE_ORDER]: 'Job',
+};
 
 export interface ServiceCompanyContactPeronFormModel {
   userAccount: {

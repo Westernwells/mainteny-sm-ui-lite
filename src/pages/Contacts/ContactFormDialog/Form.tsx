@@ -12,7 +12,7 @@ import {
 } from 'models/contacts';
 import {FormInput} from 'components/form/FormInput';
 import {convertToText} from 'utils/utils';
-import ProfilePictureInput from './ProfilePictureInput';
+import ProfilePictureInput from '../ProfilePictureInput';
 
 interface Props {
   form: UseFormReturn<
@@ -23,7 +23,7 @@ interface Props {
   initialValues?: ServiceCompanyContactPeronFormModel;
 }
 const titles = Object.values(ContactTitle);
-const ContactForm = ({form, initialValues}: Props) => {
+const Form = ({form, initialValues}: Props) => {
   const {t} = useTranslation();
   const {register, watch, setValue} = form;
 
@@ -143,4 +143,4 @@ const ContactForm = ({form, initialValues}: Props) => {
   );
 };
 
-export default ContactForm;
+export default Form;

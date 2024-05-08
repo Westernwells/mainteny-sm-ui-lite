@@ -4,92 +4,45 @@ import {Widget} from 'components/Widget';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {
-  ServiceCompanyContactPeronFormModel,
   ServiceCompanyContactPersonOrderField,
   ServiceCompanyContactPersonRole,
   ServiceCompanyContactPersonView,
 } from 'models/contacts';
 import {
-  useCreateServiceCompanyContactPerson,
   useDeleteServiceCompanyContactPerson,
   useServiceCompanyContactPersons,
-  useUpdateServiceCompanyContactPerson,
 } from 'hooks/reactQuery/useContacts';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
-import {Dialog} from 'components/Dialog';
-import {useForm} from 'react-hook-form';
 import {Confirm} from 'components/Confirm';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {useUuid} from 'hooks/reactQuery/useUuid';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {Order, OrderByParams} from 'models/misc';
-import ContactForm from './ContactForm';
 import {getColumns, makeRows} from './ContactsTable/ContactsDataGridProps';
+import ContactDetails from './ContactDetails';
+import ContactFormDialog from './ContactFormDialog';
 
 const PAGE_SIZE = 25;
 
-const getDefaultValues = (
-  contactPerson: ServiceCompanyContactPersonView | undefined,
-  serviceCompanyId: string,
-): ServiceCompanyContactPeronFormModel => ({
-  contactPerson: {
-    roles:
-      (contactPerson?.userAccount
-        .roles as unknown as ServiceCompanyContactPersonRole[]) || [],
-    companyName: contactPerson?.companyName || '',
-    secondaryPhone: contactPerson?.additionalInfo?.secondaryPhone || '',
-    contactPersonId: contactPerson?.id || '',
-  },
-  userAccount: {
-    firstName: contactPerson?.userAccount?.firstName || '',
-    lastName: contactPerson?.userAccount?.lastName || '',
-    photoUrl: contactPerson?.userAccount?.photoUrl || '',
-    contact: {
-      email: contactPerson?.userAccount?.contact.email || '',
-      phone: contactPerson?.userAccount?.contact.phone || '',
-    },
-    serviceCompanyId,
-    title: contactPerson?.userAccount?.title || '',
-  },
-});
-
 const Contacts = () => {
-  const {user} = useUserSession();
-  const {data: uuid} = useUuid();
-  const serviceCompanyId = user?.userAccount.serviceCompany.id || '';
-
-  const {mutateAsync: uploadImages, isLoading: isUploading} = useUploadFiles(
-    'Image uploaded successfully',
-  );
-
   const [search, setSearch] = useState('');
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [formType, setFormType] = useState<'create' | 'edit'>('create');
-  const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const [page, setPage] = useState(makePage(0, PAGE_SIZE));
   const [pageCount, setPageCount] = useState(0);
   const totalContractRef = useRef(0);
+  const [showSideDrawer, setShowSideDrawer] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+
   const [selectedContact, setSelectedContact] =
     useState<ServiceCompanyContactPersonView>();
   const {values} =
     useSearchValues<OrderByParams<ServiceCompanyContactPersonOrderField>>();
   const {sortOrder, orderByField} = values;
 
-  const uploadPath = `${serviceCompanyId}/contactPersons/${
-    formType === 'edit' ? selectedContact?.id : uuid
-  }`;
-
   const {mutate: deleteContact, isLoading: isDeleting} =
     useDeleteServiceCompanyContactPerson('Contact person deleted successfully');
-  const {mutate: createContact, isLoading: isCreating} =
-    useCreateServiceCompanyContactPerson('Contact person created successfully');
-  const {mutate: updateContact, isLoading: isUpdating} =
-    useUpdateServiceCompanyContactPerson('Contact person updated successfully');
 
   const {
     data: contactsResource = createEmptyResource<ServiceCompanyContactPersonView>(
@@ -125,74 +78,8 @@ const Contacts = () => {
     }
   }, [contactsResource, isFetching]);
 
-  const useHookForm = useForm<ServiceCompanyContactPeronFormModel>({
-    defaultValues: getDefaultValues(selectedContact, serviceCompanyId),
-    mode: 'onChange',
-  });
-  const {handleSubmit, formState, reset} = useHookForm;
-
   const resetForm = () => {
     setSelectedContact(undefined);
-    reset(getDefaultValues(undefined, serviceCompanyId));
-  };
-
-  const handleContactFormSubmit = async (
-    data: ServiceCompanyContactPeronFormModel,
-  ) => {
-    const file = data.userAccount.photoUrl?.[0] as unknown as FileWithPreview;
-    const photoUrl = `${uploadPath}/${file?.name}`;
-
-    // If file type is File object, upload it
-    if (!!file && typeof file !== 'string') {
-      await uploadImages({
-        files: [file] || [],
-        uploadPath,
-      });
-    }
-
-    if (formType === 'create') {
-      await createContact({
-        contactPerson: {
-          ...data.contactPerson,
-          roles: [
-            data.contactPerson
-              .roles as unknown as ServiceCompanyContactPersonRole,
-          ],
-          contactPersonId: uuid,
-        },
-        userAccount: {
-          ...data.userAccount,
-          photoUrl,
-          serviceCompanyId,
-        },
-      });
-    } else {
-      await updateContact({
-        body: {
-          contactPerson: {
-            ...data.contactPerson,
-            roles: Array.isArray(data.contactPerson.roles)
-              ? data.contactPerson.roles
-              : [
-                  data.contactPerson
-                    .roles as unknown as ServiceCompanyContactPersonRole,
-                ],
-          },
-          userAccount: {
-            ...data.userAccount,
-            photoUrl:
-              typeof data.userAccount.photoUrl === 'string'
-                ? data.userAccount.photoUrl
-                : photoUrl,
-            serviceCompanyId,
-          },
-        },
-        contactPersonId: selectedContact?.id || '',
-      });
-    }
-
-    setOpenDialog(false);
-    resetForm();
   };
 
   const handleDeleteConfirm = async (id: string) => {
@@ -212,7 +99,6 @@ const Contacts = () => {
       setFormType('edit');
       setOpenDialog(true);
       const contact = contactsResource.data.find((el) => el.id === id);
-      reset(getDefaultValues(contact, serviceCompanyId));
       setSelectedContact(contact);
     },
     [contactsResource],
@@ -234,9 +120,13 @@ const Contacts = () => {
     [contactsResource],
   );
 
-  const handleShowDetails = useCallback((id: string) => {
-    console.log('handleShowDetails', id);
-  }, []);
+  const handleShowDetails = useCallback(
+    (id: string) => {
+      setSelectedContact(contactsResource.data.find((el) => el.id === id));
+      setShowSideDrawer(true);
+    },
+    [contactsResource],
+  );
 
   const columns = useMemo(
     () =>
@@ -246,7 +136,7 @@ const Contacts = () => {
         onSendEmail: handleSendEmail,
         onShowDetails: handleShowDetails,
       }),
-    [handleDeleteContact, handleEditContact],
+    [handleDeleteContact, handleEditContact, handleShowDetails],
   );
 
   if (isIdle || isLoading) {
@@ -255,27 +145,19 @@ const Contacts = () => {
 
   return (
     <>
-      <Dialog
-        title={formType === 'edit' ? 'Edit Contact' : 'Add Contact'}
-        saveButtonText="Confirm"
-        disableSaveBtn={
-          isCreating || isUploading || isUpdating || !formState.isValid
-        }
-        isSaving={isCreating}
-        onCancel={() => {
-          setOpenDialog(false);
-          resetForm();
-        }}
-        onSave={handleSubmit(handleContactFormSubmit)}
-        dialogProps={{
-          maxWidth: 'sm',
-          open: openDialog,
-        }}>
-        <ContactForm
-          form={useHookForm}
-          initialValues={getDefaultValues(selectedContact, serviceCompanyId)}
-        />
-      </Dialog>
+      <ContactDetails
+        showSideDrawer={showSideDrawer}
+        setShowSideDrawer={setShowSideDrawer}
+        contactPerson={contactsResource.data.find(
+          (el) => el.id === selectedContact?.id,
+        )}
+      />
+      <ContactFormDialog
+        contactPerson={selectedContact}
+        formType={formType}
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+      />
       {isFetched && contactsResource.total === 0 && !search ? (
         <EmptySection
           showActionBtn
