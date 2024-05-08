@@ -62,6 +62,12 @@ const PdfTemplateBeneficiaryAddress = ({
         <Text style={styles.partialAddressText}>{beneficiaryInfo?.street}</Text>
       )}
 
+      {beneficiaryInfo?.street2 && (
+        <Text style={styles.partialAddressText}>
+          {beneficiaryInfo?.street2}
+        </Text>
+      )}
+
       <Text style={styles.partialAddressText}>
         {`${beneficiaryInfo?.postalCode} ${beneficiaryInfo?.city}`}
       </Text>

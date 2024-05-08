@@ -35,6 +35,7 @@ import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {
   useDeleteInvoice,
+  useFetchServiceOrderInvoices,
   useInvoicePaymentStatus,
   usePublishInvoice,
 } from 'hooks/reactQuery/useInvoice';
@@ -67,6 +68,7 @@ import {companyLanguageContextMap} from 'utils/utils';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
+import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 
@@ -130,6 +132,29 @@ export const ViewInvoice = ({
   const {mutateAsync: publishInvoice} = usePublishInvoice({
     shouldNavigate: false,
   });
+
+  const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
+    invoice.serviceOrder?.id,
+  );
+  const sortedPreviousInvoices = useMemo(
+    () =>
+      [...previousInvoices]
+        .sort(
+          (a, b) =>
+            new Date(a.meta.createdAt).getTime() -
+            new Date(b.meta.createdAt).getTime(),
+        )
+        .map((i) => ({
+          ...i,
+          totalAmount: {
+            ...i.totalAmount,
+            vats: [...i.totalAmount.vats].sort(
+              (a, b) => b.percentageVat - a.percentageVat,
+            ),
+          },
+        })),
+    [previousInvoices],
+  );
 
   const {isInvoicePDFGenerated, isPDFsGenerated} =
     getInvoicePDFStatuses(invoice);
@@ -238,14 +263,17 @@ export const ViewInvoice = ({
       invoice.type === InvoiceType.AGGREGATE
     ) {
       PdfTemplate = FullInvoicePdfTemplate;
-    } else {
+    } else if (invoice.type === InvoiceType.CREDIT_NOTE) {
       PdfTemplate = CreditNotePdfTemplate;
+    } else {
+      PdfTemplate = FinalInvoicePdfTemplate;
     }
 
     if (
       invoice.type === InvoiceType.CREDIT_NOTE ||
       invoice.type === InvoiceType.FULL ||
-      invoice.type === InvoiceType.AGGREGATE
+      invoice.type === InvoiceType.AGGREGATE ||
+      invoice.type === InvoiceType.FINAL
     ) {
       // TODO: will remove when all invoice types PDFs are ready
       const blob = await pdf(
@@ -257,6 +285,7 @@ export const ViewInvoice = ({
           invoice={invoice}
           selectedLng={company?.language}
           translate={translate}
+          previousInvoices={sortedPreviousInvoices}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -425,7 +454,8 @@ export const ViewInvoice = ({
 
           {(invoice.type === InvoiceType.CREDIT_NOTE ||
             invoice.type === InvoiceType.FULL ||
-            invoice.type === InvoiceType.AGGREGATE) && (
+            invoice.type === InvoiceType.AGGREGATE ||
+            invoice.type === InvoiceType.FINAL) && (
             <Box sx={{display: 'flex', justifyContent: 'center'}}>
               <PdfPreview blobUrl={filePathToDownload} />
             </Box>
@@ -433,7 +463,8 @@ export const ViewInvoice = ({
 
           {invoice.type !== InvoiceType.CREDIT_NOTE &&
             invoice.type !== InvoiceType.FULL &&
-            invoice.type !== InvoiceType.AGGREGATE && (
+            invoice.type !== InvoiceType.AGGREGATE &&
+            invoice.type !== InvoiceType.FINAL && (
               <Box>
                 {invoice &&
                 invoice.additionalInfo &&
