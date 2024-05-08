@@ -97,7 +97,12 @@ export const getColumns = ({
     align: 'center',
     renderCell: (
       params: GridRenderCellParams<ServiceCompanyContactPersonView>,
-    ) => <Notes contactPersonId={params.value.id} />,
+    ) => (
+      <Notes
+        contactPersonId={params.value.id}
+        notesCount={params?.value?.commentCount || 0}
+      />
+    ),
   }),
   getColumnProps({
     field: 'actions',

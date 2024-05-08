@@ -87,6 +87,7 @@ export const queryKeys = {
   queryServiceCompanyContactPersons: 'queryServiceCompanyContactPersons',
   queryPropertyOwnerTravelWorks: 'queryPropertyOwnerTravelWorks',
   queryContactPersonNotes: 'queryContactPersonNotes',
+  fetchContactPersonAssociations: 'fetchContactPersonAssociations',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

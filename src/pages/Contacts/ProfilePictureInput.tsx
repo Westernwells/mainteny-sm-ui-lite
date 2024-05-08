@@ -5,7 +5,7 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import {ReactComponent as AvatarIcon} from 'assets/icons/AvatarIcon.svg';
 import {useEffect, useRef, useState} from 'react';
 import {UseFormRegister, UseFormSetValue} from 'react-hook-form';
-import {Button, IconButton} from '@mui/material';
+import {Button, IconButton, Typography} from '@mui/material';
 import {theme} from 'theme';
 import {useTranslation} from 'react-i18next';
 import {ServiceCompanyContactPeronFormModel} from 'models/contacts';
@@ -124,6 +124,56 @@ const ProfilePictureInput = ({register, setValue, imageUrl}: Props) => {
         </Button>
       )}
     </Grid>
+  );
+};
+
+interface ProfilePicturePreviewProps {
+  imageUrl: string;
+  contactPerson: {
+    name: string;
+    surname: string;
+  };
+}
+export const ProfilePicturePreview = ({
+  imageUrl,
+  contactPerson,
+}: ProfilePicturePreviewProps) => {
+  const {data: downloadUrls = {}, isFetched} = useDownloadUrl(
+    imageUrl !== '' ? [imageUrl] : [],
+  );
+  const [preview, setPreview] = useState('');
+  const [isImageValid, setIsImageValid] = useState(false);
+
+  const checkImageValidness = async (url: string) => {
+    try {
+      const response = await fetch(url, {method: 'GET'});
+      setIsImageValid(response.status !== 403);
+    } catch (error) {
+      console.error('Error: ', error);
+    }
+  };
+
+  useEffect(() => {
+    if (isFetched) {
+      setPreview(downloadUrls[imageUrl]);
+    }
+  }, [imageUrl, isFetched]);
+
+  useEffect(() => {
+    checkImageValidness(preview);
+  }, [preview]);
+
+  const initials =
+    `${contactPerson.name[0]}${contactPerson.surname[0]}`.toUpperCase();
+
+  return (
+    <Avatar
+      src={isImageValid ? preview : ''}
+      sx={{width: 56, height: 56, background: '#0F4C6414'}}>
+      <Typography variant="h5" color="primary" lineHeight={1}>
+        {initials}
+      </Typography>
+    </Avatar>
   );
 };
 
