@@ -9,7 +9,7 @@ import {
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {formatDate} from 'utils/datetime';
-import {formatCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
@@ -597,7 +597,7 @@ const FullInvoicePdfTemplate = React.memo(
                               marginLeft: 10,
                               color: '#212121',
                             }}>
-                            {articleItem?.article?.unit || '-'}
+                            {translate(articleItem?.article?.unit!) || '-'}
                           </Text>
                           <Text
                             style={{
@@ -606,9 +606,10 @@ const FullInvoicePdfTemplate = React.memo(
                               color: '#212121',
                             }}>
                             {formatCurrency(
-                              (articleItem?.unitAmount?.netAmount ?? 0) /
-                                10 ** articleItem.unitAmount.fractionDigits ??
-                                0,
+                              centsToMoney(
+                                currentCurrency?.code!,
+                                articleItem?.unitAmount?.netAmount,
+                              ),
                               {
                                 currency: currentCurrency?.code,
                                 excludeCurrencySymbol: true,
@@ -636,14 +637,30 @@ const FullInvoicePdfTemplate = React.memo(
                                 ? articleItem?.additionalInfo?.discount
                                     .percentage
                                 : formatCurrency(
-                                    (articleItem?.additionalInfo?.discount
-                                      ?.amount?.value || 0) /
-                                      10 ** 2,
+                                    centsToMoney(
+                                      currentCurrency?.code!,
+                                      articleItem?.additionalInfo?.discount
+                                        ?.amount?.value,
+                                    ),
                                     {
                                       currency: currentCurrency?.code,
                                       excludeCurrencySymbol: true,
                                       currencySymbol: currentCurrency?.symbol,
                                       companyLang: selectedLng,
+                                      minimumFractionDigits:
+                                        articleItem?.additionalInfo?.discount
+                                          ?.percentage === 0 ||
+                                        articleItem?.additionalInfo?.discount
+                                          ?.amount?.value === 0
+                                          ? 0
+                                          : 2,
+                                      maximumFractionDigits:
+                                        articleItem?.additionalInfo?.discount
+                                          ?.percentage === 0 ||
+                                        articleItem?.additionalInfo?.discount
+                                          ?.amount?.value === 0
+                                          ? 0
+                                          : 2,
                                     },
                                   )}
                               {articleItem?.additionalInfo?.discount?.type ===
@@ -698,7 +715,7 @@ const FullInvoicePdfTemplate = React.memo(
                           textAlign: 'right',
                           fontSize: 10,
                         }}>
-                        -
+                        {discountValue <= 0 ? '' : '-'}
                         {formatCurrency(discountValue, {
                           currency: currentCurrency?.code,
                           excludeCurrencySymbol: true,
