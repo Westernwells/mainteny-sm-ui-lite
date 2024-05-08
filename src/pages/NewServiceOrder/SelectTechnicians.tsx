@@ -38,6 +38,7 @@ interface Props {
   setRequireTechnicianNotification: (value: boolean) => void;
   notificationChannels: ContactChannel[];
   setNotificationChannels: (value: ContactChannel[]) => void;
+  selectedUnitChange: boolean;
 }
 
 interface CheckBoxState {
@@ -60,6 +61,7 @@ export const SelectTechnicians = ({
   setRequireTechnicianNotification,
   notificationChannels,
   setNotificationChannels,
+  selectedUnitChange,
 }: Props) => {
   const [checkboxState, setCheckboxState] = useState<CheckBoxState>(
     {} as CheckBoxState,
@@ -126,6 +128,12 @@ export const SelectTechnicians = ({
       getRecommendedTechnicianView(recommendedTechniciansView);
     }
   }, [recommendedTechniciansView]);
+
+  useEffect(() => {
+    if (selectedUnitChange) {
+      setSelectedTechnicianIds([]);
+    }
+  }, [selectedUnitChange]);
 
   useEffect(() => {
     if (getSelectedTechnicians) {
@@ -256,6 +264,8 @@ export const SelectTechnicians = ({
           clearSelectedTechnicians={clearSelectedTechnicians}
           setTechnicianSearch={setTechnicianSearch}
           viewDate={queryDate}
+          selectedTechnicianIds={selectedTechnicianIds}
+          selectedUnitChange={selectedUnitChange}
         />
       </Box>
 
