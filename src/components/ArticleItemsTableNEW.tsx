@@ -42,6 +42,7 @@ import {fixRounding, getUniqueId} from 'utils/utils';
 import {useTheme} from '@mui/material/styles';
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {UserCompanyContext} from 'context/UserCompanyProvider';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {ArticleItemRowNEW} from './ArticleItemRowNEW';
@@ -78,7 +79,7 @@ export const ArticleItemsTableNEW = ({
       ? {amount: formik.values.discount?.amount?.value ?? 0}
       : {percentage: formik.values.discount?.percentage ?? 0}),
   });
-
+  const {company} = useContext(UserCompanyContext);
   const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(items);
 
   const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
@@ -174,7 +175,7 @@ export const ArticleItemsTableNEW = ({
           fractionDigits: currentCurrency.fractionDigits,
           currency: currentCurrency.code,
           grossAmount: 0,
-          percentageVat: 0,
+          percentageVat: company?.settings.percentageVat ?? 0,
           vat: 0,
         },
       },
@@ -186,7 +187,7 @@ export const ArticleItemsTableNEW = ({
         fractionDigits: currentCurrency.fractionDigits,
         currency: currentCurrency.code,
         grossAmount: 0,
-        percentageVat: 0,
+        percentageVat: company?.settings.percentageVat ?? 0,
         vat: 0,
       },
       discount: {
