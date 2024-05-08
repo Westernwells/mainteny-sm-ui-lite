@@ -326,7 +326,7 @@ const FullInvoicePdfTemplate = React.memo(
                 }
                 receiverName={invoice?.propertyOwner?.name}
                 addressComponent={
-                  invoice?.propertyOwner?.billingAddress?.component
+                  invoice?.additionalInfo?.billingAddress?.component
                 }
                 beneficiaryInfo={
                   invoice?.additionalInfo.beneficiaryAddress?.component

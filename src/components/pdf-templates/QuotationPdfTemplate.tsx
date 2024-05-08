@@ -332,7 +332,7 @@ const QuotationPdfTemplate = React.memo(
                 }
                 receiverName={quotation?.propertyOwner?.name}
                 addressComponent={
-                  quotation?.propertyOwner?.billingAddress?.component
+                  quotation?.additionalInfo?.billingAddress?.component
                 }
                 selectedLng={selectedLng}
                 translate={translate}
