@@ -34,7 +34,7 @@ export const calculateTotalWithPerItemDiscount = (
   invoiceItems: InvoiceItemRecord[],
 ) => {
   const sum = invoiceItems
-    .map((item: InvoiceItemRecord) =>
+    ?.map((item: InvoiceItemRecord) =>
       applyDiscount({
         actualValue:
           (item.unitAmount.netAmount /

@@ -12,6 +12,7 @@ import {
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
 import {PaymentTermData} from 'models/contract';
+import {Currency} from 'models/misc';
 import {InvoicePaymentTermRecord} from '../models/invoice';
 import {Currencies, formatCurrency} from './currency';
 import {getAmountFromPercentage} from './utils';
@@ -202,8 +203,14 @@ export const getFormattedPaymentValues = (
   },
   invoice: InvoiceView,
   invoiceAmount: number,
+  currentCurrency?: Currency,
+  selectedLng?: string,
 ) => {
-  const formattedInvoiceAmount = formatCurrency(invoiceAmount);
+  const formattedInvoiceAmount = formatCurrency(invoiceAmount, {
+    currency: currentCurrency?.code,
+    currencySymbol: currentCurrency?.symbol,
+    companyLang: selectedLng,
+  });
   const discountValues = paymentTerm?.data?.discountOptions?.map((d) => {
     const dueDate = addDays(
       invoice.sentDate ? new Date(invoice.sentDate) : new Date(),
@@ -213,9 +220,17 @@ export const getFormattedPaymentValues = (
 
     const discountPercentage = d.discountPercent || 0;
     const discountAmount = invoiceAmount * (discountPercentage / 100);
-    const formattedDiscountAmount = formatCurrency(discountAmount);
+    const formattedDiscountAmount = formatCurrency(discountAmount, {
+      currency: currentCurrency?.code,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
+    });
     const paymentAmount = invoiceAmount - discountAmount;
-    const formattedPaymentAmount = formatCurrency(paymentAmount);
+    const formattedPaymentAmount = formatCurrency(paymentAmount, {
+      currency: currentCurrency?.code,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
+    });
     return {
       formattedDueDate,
       formattedInvoiceAmount,
