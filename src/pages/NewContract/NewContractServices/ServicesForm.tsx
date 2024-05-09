@@ -15,6 +15,9 @@ import {
   TextField,
   TableCellProps,
   Table,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import InvoiceFrequencyPicker from 'components/InvoiceFrequencyPicker';
 import JobFrequencyPicker from 'components/JobFrequencyPicker';
@@ -44,6 +47,7 @@ import {theme} from 'theme';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useTranslation} from 'react-i18next';
 import {FormCheckbox} from 'components/form/FormCheckbox';
+import {ServiceOrderLabels, ServiceOrderType} from 'models/service-order';
 
 const articleTypes = [
   {
@@ -577,6 +581,33 @@ const ServicesForm = ({
 
       {formikContractServiceComponent.values.isAutomaticJobCycle && (
         <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <FormControl fullWidth required>
+              <InputLabel
+                size="small"
+                shrink
+                variant="outlined"
+                id="demo-simple-select-label">
+                {t('Job type')}
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                label={t('Job type')}
+                size="small"
+                value={formikContractServiceComponent.values.orderType}
+                required
+                notched
+                name="orderType"
+                onBlur={formikContractServiceComponent.handleBlur}
+                onChange={formikContractServiceComponent.handleChange}>
+                {Object.values(ServiceOrderType).map((type, index) => (
+                  <MenuItem value={type} key={index}>
+                    {t(ServiceOrderLabels[type])}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
           <Grid item xs={3}>
             <DatePicker
               defaultDate={formikContractServiceComponent.values.firstOrderDate}
