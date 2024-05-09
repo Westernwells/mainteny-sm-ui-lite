@@ -2483,5 +2483,8 @@
   "You are about to disconnect Contract from this contact person.": "Sie sind dabei, den Vertrag mit dieser Kontaktperson zu trennen.",
   "CONNECT TO": "VERBINDEN MIT",
   "Connection type": "Art der Verbindung",
-  "Invoice for": "Rechnung für"
+  "Invoice for": "Rechnung für",
+  "Partial Invoices": "Teilrechnung",
+  "Payment History": "Zahlungsverlauf",
+  "No connections": "Keine Verbindungen"
 }
