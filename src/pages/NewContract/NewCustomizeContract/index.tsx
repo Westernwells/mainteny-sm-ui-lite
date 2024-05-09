@@ -57,9 +57,9 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
 
       <Box display="flex" alignItems="center">
         <Switch
-          value={!!formik.values.autoRenewalCancelled}
+          value={!formik.values.autoRenewalCancelled}
           onChanged={(value) =>
-            formik.setFieldValue('autoRenewalCancelled', value)
+            formik.setFieldValue('autoRenewalCancelled', !value)
           }
         />
         <Typography variant="body1" sx={{color: 'text.primary'}}>
