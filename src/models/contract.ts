@@ -30,6 +30,7 @@ import {ArticleType, CostPackage} from './article';
 import {toRestDate} from 'utils/datetime';
 import {ServiceCompanyType} from './service-company';
 import {t} from 'i18next';
+import {ServiceOrderType} from './service-order';
 
 export interface QueryContractCommentsParams {
   pageIndex: number;
@@ -517,6 +518,7 @@ export interface ContractServiceForm {
   elevators: ContractServiceFormElevator[];
   isAutomaticJobCycle?: boolean;
   yearlyPrice?: number;
+  orderType?: ServiceOrderType;
 }
 
 export interface ContractServiceFormElevator {
@@ -544,6 +546,7 @@ export interface ExtendedContractComponentRecord {
   costType: ArticleType;
   costPackage: CostPackage;
   isAutomaticJobCycle: boolean;
+  orderType?: ServiceOrderType;
 }
 
 export interface ContractComponentRecord {
@@ -573,6 +576,7 @@ export interface ContractComponentAdditionalInfo {
   firstOrderDate?: Date | null;
   costPackage?: CostPackage;
   elevators?: ContractComponentElevator[];
+  orderType?: ServiceOrderType;
 }
 
 export interface ContractServiceForm {
@@ -610,6 +614,7 @@ export interface ContractComponentRecord {
   firstOrderDate: string;
   costType: ArticleType;
   costPackage: CostPackage;
+  orderType?: ServiceOrderType;
 }
 
 export interface ContractComponentElevator {
@@ -653,6 +658,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
       costType,
       costPackage,
       groupNumber,
+      orderType,
     } = extendedContractRecord;
 
     const convertedElevators: ContractComponentElevator[] = elevators
@@ -670,6 +676,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
       firstOrderDate: firstOrderDate ? toRestDate(firstOrderDate) : '',
       costType,
       costPackage,
+      orderType,
     };
 
     return contractComponentRecord;

@@ -192,14 +192,14 @@ export const useUpdateContract = (successMsg?: string) => {
       contractId: string;
     }) => UpdateContract(body, contractId),
     {
-      onSuccess: () => {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(queryKeys.elevatorById);
+        await queryClient.invalidateQueries(queryKeys.contractDetails);
         if (successMsg) {
           enqueueSnackbar(successMsg, {
             variant: 'success',
           });
         }
-        queryClient.invalidateQueries(queryKeys.elevatorById);
-        queryClient.invalidateQueries(queryKeys.contractDetails);
       },
       onError: (err: any) => {
         console.log(err);

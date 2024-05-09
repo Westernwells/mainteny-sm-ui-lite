@@ -13,6 +13,7 @@ import {
 import {ReactComponent as ServicePackageIcon} from 'assets/icons/ServicePackageIcon.svg';
 import {ReactComponent as CalendarTodayIcon} from 'assets/icons/CalendarToday.svg';
 import {ReactComponent as UnionIcon} from 'assets/icons/UnionIcon.svg';
+import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import {formatDate} from 'utils/datetime';
 import {theme} from 'theme';
 import {
@@ -31,6 +32,7 @@ import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {getViewFrequency} from 'utils/elevator-utils';
 import {ArticleType} from 'models/article';
 import {ElevatorView} from 'models/elevator';
+import {ServiceOrderLabels} from 'models/service-order';
 
 type Props = {
   service?: ContractComponentView;
@@ -92,6 +94,24 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
         </Grid>
 
         <Grid item xs={2.5} sx={{display: 'flex', alignItems: 'center'}}>
+          <WorkOutlineOutlinedIcon
+            width="1.6rem"
+            height="1.6rem"
+            sx={{color: 'primary.light'}}
+          />
+          <Box sx={{paddingLeft: '1em'}}>
+            <Typography variant="body1" color={theme.palette.text.secondary}>
+              {t('Job type')}
+            </Typography>
+            <Typography variant="h6" color={theme.palette.text.primary}>
+              {service?.additionalInfo?.orderType
+                ? t(ServiceOrderLabels[service?.additionalInfo.orderType])
+                : '-'}
+            </Typography>
+          </Box>
+        </Grid>
+
+        <Grid item xs={2.5} sx={{display: 'flex', alignItems: 'center'}}>
           <CalendarTodayIcon fontSize="1.6rem" />
           <Box sx={{paddingLeft: '1em'}}>
             <Typography variant="body1" color={theme.palette.text.secondary}>
@@ -109,7 +129,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
           <ServicePackageIcon fontSize="1.6rem" />
           <Box sx={{paddingLeft: '1em'}}>
             <Typography variant="body1" color={theme.palette.text.secondary}>
-              Type
+              {t('Type')}
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
               {getArticleTypeText(

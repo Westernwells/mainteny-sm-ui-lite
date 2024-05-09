@@ -13,6 +13,7 @@ import {
 import {ReactComponent as ServicePackageIcon} from 'assets/icons/ServicePackageIcon.svg';
 import {ReactComponent as CalendarTodayIcon} from 'assets/icons/CalendarToday.svg';
 import {ReactComponent as UnionIcon} from 'assets/icons/UnionIcon.svg';
+import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import {formatDate} from 'utils/datetime';
 import {theme} from 'theme';
 import {FormikProps} from 'formik';
@@ -25,6 +26,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {getArticleTypeText} from 'utils/article-utils';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {ServiceOrderLabels} from 'models/service-order';
 
 type Props = {
   formikContractServiceComponent: FormikProps<ContractServiceForm>;
@@ -75,6 +77,28 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
               {formikContractServiceComponent.values.firstOrderDate !== null
                 ? formatDate(
                     formikContractServiceComponent.values.firstOrderDate,
+                  )
+                : '-'}
+            </Typography>
+          </Box>
+        </Grid>
+
+        <Grid item xs={2.5} sx={{display: 'flex', alignItems: 'center'}}>
+          <WorkOutlineOutlinedIcon
+            width="1.6rem"
+            height="1.6rem"
+            sx={{color: 'primary.light'}}
+          />
+          <Box sx={{paddingLeft: '1em'}}>
+            <Typography variant="body1" color={theme.palette.text.secondary}>
+              {t('Job type')}
+            </Typography>
+            <Typography variant="h6" color={theme.palette.text.primary}>
+              {formikContractServiceComponent.values.orderType
+                ? t(
+                    ServiceOrderLabels[
+                      formikContractServiceComponent.values.orderType
+                    ],
                   )
                 : '-'}
             </Typography>
