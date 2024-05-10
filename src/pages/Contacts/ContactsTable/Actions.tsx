@@ -36,12 +36,9 @@ const Actions = ({
   onSendEmail,
 }: Props & IActions) => {
   const {t} = useTranslation();
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -71,7 +68,13 @@ const Actions = ({
 
   return (
     <Box>
-      <IconButton size="small" onClick={handleClick} sx={{ml: '.25em'}}>
+      <IconButton
+        size="small"
+        onClick={(event) => {
+          event.stopPropagation();
+          setAnchorEl(event.currentTarget);
+        }}
+        sx={{ml: '.25em'}}>
         <MoreVertIcon
           sx={{color: open ? 'primary.main' : 'action.active'}}
           fontSize="small"

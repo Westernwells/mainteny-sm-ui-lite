@@ -159,16 +159,15 @@ const Notes = ({
   const {t} = useTranslation();
   const [showSideDrawer, setShowSideDrawer] = useState(false);
 
-  const handleOpenSideDrawer = () => {
-    setShowSideDrawer(true);
-  };
-
   return (
     <>
       {showLabel ? (
         <Button
           buttonProps={{
-            onClick: handleOpenSideDrawer,
+            onClick: (event) => {
+              event.stopPropagation();
+              setShowSideDrawer(true);
+            },
             size: 'small',
             sx: {display: 'flex', gap: '0.5rem'},
           }}>
@@ -176,7 +175,12 @@ const Notes = ({
           <Typography variant="body2">{t('Notes')}</Typography>
         </Button>
       ) : (
-        <IconButton onClick={handleOpenSideDrawer} size="small">
+        <IconButton
+          onClick={(event) => {
+            event.stopPropagation();
+            setShowSideDrawer(true);
+          }}
+          size="small">
           <NoteAlt
             fontSize="small"
             sx={{

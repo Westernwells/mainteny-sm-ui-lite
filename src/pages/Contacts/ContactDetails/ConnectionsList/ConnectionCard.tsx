@@ -19,13 +19,12 @@ import {ElevatorView} from 'models/elevator';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {ContractView} from 'models/contract';
 import {ArticleSupplierView} from 'models/article';
-import {convertToText} from 'utils/utils';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {statusColor} from 'components/StatusChip';
-import {ServiceOrderView} from 'models/service-order';
+import {ServiceOrderLabels, ServiceOrderView} from 'models/service-order';
 import {Confirm} from 'components/Confirm';
 
 interface CardItemProps {
@@ -120,7 +119,7 @@ const getConnectionCardData = (
       return [
         {
           label: t('Job type'),
-          value: t(convertToText(serviceOrder?.contract?.type || '')) || '-',
+          value: t(ServiceOrderLabels[serviceOrder?.type]) || '-',
           icon: (
             <StoreMallDirectoryOutlinedIcon sx={{color: 'primary.light'}} />
           ),
@@ -169,8 +168,8 @@ const ConnectionCard = ({connection, onDisconnect}: Props) => {
         }}
         onClose={() => setOpenConfirmDialog(false)}
         title="Remove connection"
-        content="You are about to disconnect Contract from this contact person."
-        secondContent="Are you sure about it?"
+        content="You are about to remove the connection from this contact person."
+        secondContent="Are you sure?"
         closeBtnLabel="Cancel"
         confirmBtnLabel="Remove"
       />
