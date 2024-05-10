@@ -504,10 +504,6 @@ const completeServiceOrder = async (
     `/api/serviceOrders/${serviceOrderId}/complete`,
     {...body},
   );
-  // this was added due tome flickering and article reurning back before finally delleting
-  setTimeout(() => {
-    updateServiceOrderArticles(serviceOrderId, body.articles ?? []);
-  }, 10);
 };
 
 export const useCompleteServiceOrder = (successMsg?: string) => {
