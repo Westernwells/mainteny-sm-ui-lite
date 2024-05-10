@@ -165,7 +165,7 @@ const AddConnectionCard = ({onAddConnection, onCancel}: Props) => {
           name="refId"
           control={control}
           textFieldProps={{
-            label: t('Unit'),
+            label: t('Unit_elevator'),
             placeholder: t('Select unit'),
             required: true,
             error: !!errors.refId,

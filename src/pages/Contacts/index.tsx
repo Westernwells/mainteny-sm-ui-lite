@@ -197,6 +197,10 @@ const Contacts = () => {
             rows={rows}
             columns={columns}
             isCellClickable={false}
+            onRowClick={({row}, event) => {
+              event.stopPropagation();
+              handleShowDetails(row.id);
+            }}
             scrollToTop={search}
             loading={isFetching}
             pageSize={page.pageSize}
