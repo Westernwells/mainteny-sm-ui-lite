@@ -745,44 +745,33 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                   licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
                   settings={{
                     developerMode: true,
-                    identifier: 'customer',
+                    identifier: 'elevator',
                     multipleFileUpload: true,
                     columns: [
+                      {
+                        key: 'anlagennummer',
+                        label: 'Anlagennummer',
+                        columnType: 'string',
+                        validations: [
+                          {
+                            validate: 'required',
+                          },
+                        ],
+                      },
                       {
                         key: 'kundennummer',
                         label: 'Kundennummer',
                         columnType: 'string',
                         validations: [
                           {
-                            validate: 'unique',
-                          },
-                          {
                             validate: 'required',
                           },
                         ],
                       },
                       {
-                        key: 'kundename',
-                        label: 'Kundename',
+                        key: 'vertragsnummer',
+                        label: 'Vertragsnummer',
                         columnType: 'string',
-                        validations: [
-                          {
-                            validate: 'unique',
-                          },
-                          {
-                            validate: 'required',
-                          },
-                        ],
-                      },
-                      {
-                        key: 'email',
-                        label: 'E-Mail',
-                        columnType: 'email',
-                      },
-                      {
-                        key: 'telefonnummer_des_kunden',
-                        label: 'Telefonnummer des Kunden',
-                        columnType: 'phone',
                       },
                       {
                         key: 'adressenzeile_1',
@@ -798,21 +787,11 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                         key: 'adressenzeile_2',
                         label: 'Adressenzeile 2',
                         columnType: 'string',
-                        validations: [
-                          {
-                            validate: 'required',
-                          },
-                        ],
                       },
                       {
                         key: 'postleitzahl',
                         label: 'Postleitzahl',
                         columnType: 'string',
-                        validations: [
-                          {
-                            validate: 'required',
-                          },
-                        ],
                       },
                       {
                         key: 'stadt',
@@ -835,9 +814,96 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                         ],
                       },
                       {
-                        key: 'emailadresse_fuer_rechnungen',
-                        label: 'Emailadresse für Rechnungen',
-                        columnType: 'email',
+                        key: 'gebaeudestandort',
+                        label: 'Gebäude/Standort',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'segment_der_immobilie',
+                        label: 'Segment der Immobilie',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'schluesselstandort',
+                        label: 'Schlüsselstandort',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'parkplatz',
+                        label: 'Parkplatz',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'entfernung',
+                        label: 'Entfernung',
+                        columnType: 'float',
+                        numberFormat: 'eu',
+                      },
+                      {
+                        key: 'fahrtzeit',
+                        label: 'Fahrtzeit',
+                        columnType: 'float',
+                        numberFormat: 'eu',
+                      },
+                      {
+                        key: 'fahrtkosten',
+                        label: 'Fahrtkosten',
+                        columnType: 'float',
+                        numberFormat: 'eu',
+                      },
+                      {
+                        key: 'kategorie',
+                        label: 'Kategorie',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'hersteller',
+                        label: 'Hersteller',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'modell',
+                        label: 'Modell',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'fabriknummer',
+                        label: 'Fabriknummer',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'ausgabenlimit',
+                        label: 'Ausgabenlimit',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'baujahr',
+                        label: 'Baujahr',
+                        columnType: 'date',
+                        outputFormat: 'YYYY',
+                      },
+                      {
+                        key: 'letzter_besuch',
+                        label: 'Letzter Besuch',
+                        columnType: 'date',
+                        outputFormat: 'YYYY-MM-DD',
+                      },
+                      {
+                        key: 'datum_der_letzten_züs_pruefung',
+                        label: 'Datum der letzten ZÜS Prüfung',
+                        columnType: 'date',
+                        outputFormat: 'YYYY-MM-DD',
+                      },
+                      {
+                        key: 'züs_zyklus',
+                        label: 'ZÜS Zyklus',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'anzahl_der_techniker',
+                        label: 'Anzahl der Techniker',
+                        columnType: 'int',
+                        numberFormat: 'eu',
                       },
                       {
                         key: 'prioritaet',
@@ -845,104 +911,171 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                         columnType: 'string',
                       },
                       {
-                        key: 'kunde_seit_datum',
-                        label: 'Kunde seit (Datum)',
+                        key: 'dauer_der_wartung',
+                        label: 'Dauer der Wartung',
+                        columnType: 'float',
+                        numberFormat: 'eu',
+                      },
+                      {
+                        key: 'prioritaet_techniker',
+                        label: 'Priorität Techniker',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'anzahl_der_haltestellenetagen',
+                        label: 'Anzahl der Haltestellen/Etagen',
+                        columnType: 'int',
+                        numberFormat: 'eu',
+                      },
+                      {
+                        key: 'antrieb',
+                        label: 'Antrieb',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'kapazitaet',
+                        label: 'Kapazität',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'geschwindigkeit',
+                        label: 'Geschwindigkeit',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'steuerungsmodell',
+                        label: 'Steuerungsmodell',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'iotgeraeteids',
+                        label: 'IoT-Geräte-IDs',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'kabinentyp',
+                        label: 'Kabinentyp',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'kabinengewicht',
+                        label: 'Kabinengewicht',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'gegengewicht',
+                        label: 'Gegengewicht',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'hubhoehe',
+                        label: 'Hubhöhe',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'schachthoehe',
+                        label: 'Schachthöhe',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'personenanzahl',
+                        label: 'Personenanzahl',
+                        columnType: 'int',
+                        numberFormat: 'eu',
+                      },
+                      {
+                        key: 'autodialer_hersteller',
+                        label: 'Autodialer Hersteller',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'system_id',
+                        label: 'System ID',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'telefonverbindung',
+                        label: 'Telefonverbindung',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'telefonnnummer_des_aufzuges',
+                        label: 'Telefonnnummer des Aufzuges',
+                        columnType: 'phone',
+                      },
+                      {
+                        key: 'simkartennummer',
+                        label: 'Simkartennummer',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'simkarten_pin',
+                        label: 'Simkarten Pin',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'callcenter',
+                        label: 'Call-Center',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'installationsort',
+                        label: 'Installationsort',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'offene_tage',
+                        label: 'Offene Tage',
+                        columnType: 'string',
+                      },
+                      {
+                        key: 'öffnungszeiten',
+                        label: 'Öffnungszeiten',
                         columnType: 'date',
-                        outputFormat: 'YYYY-MM-DD',
+                        outputFormat: 'HH:mm',
                       },
                       {
-                        key: 'website_des_kunden',
-                        label: 'Website des Kunden',
-                        columnType: 'url',
+                        key: 'termin',
+                        label: 'Termin',
+                        columnType: 'category',
+                        dropdownOptions: [
+                          {
+                            label: 'ja',
+                            value: 'true',
+                            type: 'string',
+                          },
+                          {
+                            label: 'nein',
+                            value: 'false',
+                            type: 'string',
+                          },
+                        ],
+                        allowCustomOptions: false,
+                        isMultiSelect: false,
                       },
                       {
-                        key: 'kontaktperson',
-                        label: 'Kontaktperson',
+                        key: 'benachrichtigung_erforderlich',
+                        label: 'Benachrichtigung erforderlich',
                         columnType: 'string',
                       },
                       {
-                        key: 'telefonnummer_kontaktperson',
-                        label: 'Telefonnummer Kontaktperson',
-                        columnType: 'phone',
-                      },
-                      {
-                        key: 'kostenstelle',
-                        label: 'Kostenstelle',
+                        key: 'benachrichtigung_faellig',
+                        label: 'Benachrichtigung fällig',
                         columnType: 'string',
                       },
                       {
-                        key: 'steuernummer',
-                        label: 'Steuernummer',
+                        key: 'dokumentehandbuecherbilder',
+                        label: 'Dokumente/Handbücher/Bilder',
                         columnType: 'string',
                       },
                       {
-                        key: 'leistungsempfaenger',
-                        label: 'Leistungsempfänger',
+                        key: 'notizen_freier_text',
+                        label: 'Notizen (Freier Text)',
                         columnType: 'string',
                       },
                       {
-                        key: 'ladresszeile_1',
-                        label: 'L-Adresszeile 1',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'ladresszeile_2',
-                        label: 'L-Adresszeile 2',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'lpostleitzahl',
-                        label: 'L-Postleitzahl',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'lstadt',
-                        label: 'L-Stadt',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'lland',
-                        label: 'L-Land',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'rechnung_ueber',
-                        label: 'Rechnung über',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'radresszeile_1',
-                        label: 'R-Adresszeile 1',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'radresszeile_2',
-                        label: 'R-Adresszeile 2',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'rpostleitzahl',
-                        label: 'R-Postleitzahl',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'rstadt',
-                        label: 'R-Stadt',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'rland',
-                        label: 'R-Land',
-                        columnType: 'string',
-                      },
-                      {
-                        key: '2te__telefonnummer_des_kunden',
-                        label: '2te. Telefonnummer des Kunden',
-                        columnType: 'phone',
-                      },
-                      {
-                        key: 'customer_notes',
-                        label: 'Customer Notes',
+                        key: 'offene_todos',
+                        label: 'Offene To-Dos',
                         columnType: 'string',
                       },
                     ],
@@ -952,7 +1085,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                     console.log('Error rows:', errors);
                     complete();
                   }}>
-                  Select Customer File
+                  Select Elevator File
                 </NuvoImporter>
               </Grid>
               <Grid item xs={4} textAlign="center">
