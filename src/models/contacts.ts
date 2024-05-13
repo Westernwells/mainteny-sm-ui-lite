@@ -74,7 +74,7 @@ export interface ContactBody {
 
 export enum ContactTitle {
   'Mr' = 'Mr',
-  'Mrs' = 'Mrs',
+  'Ms' = 'Ms',
   'Diverse' = 'Diverse',
 }
 
