@@ -68,7 +68,7 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
       </Box>
 
       <Grid container spacing={2} sx={{padding: '1em 0em 0em 0em'}}>
-        {formik.values.autoRenewalCancelled && (
+        {!formik.values.autoRenewalCancelled && (
           <Grid item xs={3}>
             <NumericFormat
               value={formik.values.renewalTerms}
