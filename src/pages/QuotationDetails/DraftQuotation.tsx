@@ -82,6 +82,7 @@ import {Progress} from 'components/Progress';
 import {debounce} from 'lodash';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
+import RichTextField from 'components/RichTextField';
 import {ContractTermView} from 'models/contract';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
@@ -884,23 +885,10 @@ export const DraftQuotation = ({
               }}
             />
 
-            <FormInput
-              props={{
-                id: 'description',
-                name: 'description',
-                value: formik.values.description,
-                label: 'Description',
-                onChange: formik.handleChange,
-                onBlur: formik.handleBlur,
-                error: !!(
-                  formik.touched.description && formik.errors.description
-                ),
-                helperText:
-                  formik.touched.description && formik.errors.description,
-                minRows: 2,
-                multiline: true,
-                fullWidth: true,
-              }}
+            <RichTextField
+              label="Description"
+              html={formik.values.description}
+              updateHtml={(h) => formik.setFieldValue('description', h)}
             />
           </Grid>
 
