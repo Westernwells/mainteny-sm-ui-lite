@@ -22,6 +22,9 @@ import {
   RadioGroup,
   TextField,
   Divider,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import InvoiceFrequencyPicker from 'components/InvoiceFrequencyPicker';
 import JobFrequencyPicker from 'components/JobFrequencyPicker';
@@ -63,6 +66,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {SearchInput} from 'components/SearchInput';
 import {EmptySection} from 'components/EmptySection';
+import {ServiceOrderLabels, ServiceOrderType} from 'models/service-order';
 
 const articleTypes = [
   {
@@ -202,6 +206,7 @@ export const MutationService = ({
           !values.firstOrderDate
             ? null
             : {...elevator.orderGenerationJob},
+        orderType: values?.orderType,
       }));
 
     const existingData = componentsToMutate(updatedComponentsToSave);
@@ -219,6 +224,7 @@ export const MutationService = ({
       costPackage: values?.costPackage,
       costType: values?.costType,
       elevators: elevatorsToSave,
+      orderType: values?.orderType,
     } as UpdateContractComponents;
 
     existingData.splice(index, 0, itemToMutate);
@@ -251,6 +257,7 @@ export const MutationService = ({
         costPackage: values?.costPackage,
         costType: values?.costType,
         elevators: elevatorsToSave || [],
+        orderType: values?.orderType,
       },
       ...componentsToMutate(updatedComponentsToSave),
     ];
@@ -360,7 +367,9 @@ export const MutationService = ({
       disableSaveBtn={
         !!Object.keys(formikContractServiceComponent.errors).length ||
         (formikContractServiceComponent.values.isAutomaticJobCycle &&
-          !formikContractServiceComponent.values.firstOrderDate)
+          !formikContractServiceComponent.values.firstOrderDate) ||
+        (formikContractServiceComponent.values.isAutomaticJobCycle &&
+          !formikContractServiceComponent.values.orderType)
       }
       saveButtonText={isEditForm ? t('Save') : t('Add Service')}
       isSaving={loading}
@@ -806,6 +815,33 @@ export const MutationService = ({
 
       {formikContractServiceComponent.values.isAutomaticJobCycle && (
         <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <FormControl fullWidth required>
+              <InputLabel
+                size="small"
+                shrink
+                variant="outlined"
+                id="demo-simple-select-label">
+                {t('Job type')}
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                label={t('Job type')}
+                size="small"
+                value={formikContractServiceComponent.values.orderType}
+                required
+                notched
+                name="orderType"
+                onBlur={formikContractServiceComponent.handleBlur}
+                onChange={formikContractServiceComponent.handleChange}>
+                {Object.values(ServiceOrderType).map((type, index) => (
+                  <MenuItem value={type} key={index}>
+                    {t(ServiceOrderLabels[type])}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
           <Grid item xs={3}>
             <DatePicker
               defaultDate={

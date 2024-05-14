@@ -19,6 +19,7 @@ import {Button} from './Button';
 interface Props extends BoxProps {
   label: string;
   size?: 'tiny' | 'small' | 'medium' | 'large';
+  btnSize?: 'small' | 'medium' | 'large';
   containerStyle?: {[key: string]: string | number};
   labelStyle?: {[key: string]: string | number};
   labelVariant?: TypographyProps['variant'];
@@ -46,6 +47,7 @@ interface Props extends BoxProps {
 export const EmptySection = ({
   label,
   size = 'medium',
+  btnSize,
   containerStyle,
   labelStyle,
   labelVariant,
@@ -109,24 +111,26 @@ export const EmptySection = ({
       mt={3}
       sx={{...containerStyle}}>
       <Box width={Width[size]}>{getIllustration(illustration)}</Box>
-      <Typography
-        variant={labelVariant || 'subtitle2'}
-        textAlign="center"
-        sx={{...labelStyle}}>
-        {t(label)}
-      </Typography>
-      {subLabel && (
-        <Typography variant="body2" textAlign="center" {...subLabelProps}>
-          {t(subLabel)}
+      <Box display="flex" flexDirection="column">
+        <Typography
+          variant={labelVariant || 'subtitle2'}
+          textAlign="center"
+          sx={{...labelStyle}}>
+          {t(label)}
         </Typography>
-      )}
+        {subLabel && (
+          <Typography variant="body2" textAlign="center" {...subLabelProps}>
+            {t(subLabel)}
+          </Typography>
+        )}
+      </Box>
       {showActionBtn ? (
         <Button
           label="Create Service Job"
           buttonProps={{
             onClick: btnAction,
             variant: 'contained',
-            size: 'small',
+            size: btnSize || 'small',
             startIcon: actionButtonIcon || <AddIcon />,
             endIcon: actionButtonEndIcon || null,
             style: {

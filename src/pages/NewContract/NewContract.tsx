@@ -221,7 +221,9 @@ const NewContract = () => {
       startDate: toRestDate(formikBasicInfo.values.startDate!),
       name: formikBasicInfo.values.name,
       externalId: formikBasicInfo.values.externalId,
-      renewalTerms: +formikCustomizeContract.values.renewalTerms,
+      renewalTerms: formikCustomizeContract.values.autoRenewalCancelled
+        ? 0
+        : +formikCustomizeContract.values.renewalTerms,
       spendingLimit: +formikCustomizeContract.values.spendingLimit,
       annualPriceAdjustmentPercentage:
         formikCustomizeContract.values.annualPriceAdjustmentPercentage,

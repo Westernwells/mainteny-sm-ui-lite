@@ -39,6 +39,7 @@ export interface UserAccountView {
   status: UserAccountStatus;
   contact: Contact;
   meta: Meta;
+  title: string;
 }
 
 export interface UserAccountSimpleView {

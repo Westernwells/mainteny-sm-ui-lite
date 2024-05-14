@@ -182,12 +182,22 @@ const Notes: FC<Props> = ({
               name: 'note',
               value: formik.values.note,
               onChange: formik.handleChange,
+              onKeyPress: (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  formik.handleSubmit();
+                }
+              },
               multiline: true,
               minRows: 5,
               maxRows: 5,
               inputRef: formInputRef,
             }}
           />
+          <span
+            style={{color: theme.palette.text.secondary, fontSize: '0.65rem'}}>
+            {t('Press Enter to submit note')}
+          </span>
           <Box display="flex" justifyContent="flex-end" pt="0.625rem">
             <LoadingButton
               buttonProps={{
