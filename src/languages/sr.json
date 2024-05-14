@@ -2519,5 +2519,9 @@
   "Contact person updated successfully": "Kontakt osoba je uspešno ažurirana",
   "Select job": "Izaberite posao",
   "You are about to remove the connection from this contact person.": "Upravo ćete ukloniti vezu sa ove kontakt osobe.",
-  "Are you sure?": "Jeste li sigurni?"
+  "Are you sure?": "Jeste li sigurni?",
+  "Add a connection by clicking the button bellow.": "Dodajte vezu klikom na dugme ispod",
+  "Contact Notes": "Kontakt beleške",
+  "Remove Discount": "Ukloni popust",
+  "Sum": "Iznos"
 }
