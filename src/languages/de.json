@@ -2491,10 +2491,14 @@
   "New connection": "Neue Verknüpfung",
   "Mr": "Herr",
   "Ms": "Frau",
-  "Diverse": "Diverse",
-  "Contact person created successfully": "Kontaktperson erfolgreich erstellt",
-  "Contact person updated successfully": "Kontaktperson erfolgreich aktualisiert",
+  "Diverse": "Divers",
+  "Contact person created successfully": "Kontakt erfolgreich erstellt",
+  "Contact person updated successfully": "Kontakt erfolgreich aktualisiert",
   "Select job": "Auftrag auswählen",
-  "You are about to remove the connection from this contact person.": "Sie sind dabei, die Verbindung dieser Kontaktperson zu entfernen.",
-  "Are you sure?": "Wollen Sie fortfahren?"
+  "You are about to remove the connection from this contact person.": "Sie sind dabei, die Verbindung zu diesem Kontakt zu entfernen.",
+  "Are you sure?": "Wollen Sie fortfahren?",
+  "Add a connection by clicking the button bellow.": "Fügen Sie eine Verbindung hinzu, indem Sie auf die Schaltfläche unten klicken.",
+  "Contact Notes": "Kontakt-Notizen",
+  "Remove Discount": "Rabatt entfernen",
+  "Sum": "Betrag"
 }
