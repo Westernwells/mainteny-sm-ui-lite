@@ -188,6 +188,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
       costPackage: row?.additionalInfo?.costPackage as CostPackage,
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
       elevators: allItems,
+      orderType: row?.additionalInfo?.orderType,
     });
   };
 

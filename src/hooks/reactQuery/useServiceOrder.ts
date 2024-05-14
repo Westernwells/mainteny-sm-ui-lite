@@ -197,6 +197,21 @@ export const useFetchElevatorAvailability = (elevatorIds: string[]) => {
   );
 };
 
+export const queryPropertyOwnerServiceOrders = async (
+  params: ServiceOrderQueryParams,
+  propertyOwnerId: string,
+): Promise<Resource<ServiceOrderView>> => {
+  const response: AxiosResponse<Resource<ServiceOrderView>> =
+    await axiosClient.get(
+      `/api/propertyOwners/${propertyOwnerId}/serviceOrders`,
+      {
+        params,
+        paramsSerializer,
+      },
+    );
+  return response.data;
+};
+
 export const queryServiceOrders = async (
   params: ServiceOrderQueryParams,
 ): Promise<Resource<ServiceOrderView>> => {

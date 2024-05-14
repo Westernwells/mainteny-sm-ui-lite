@@ -98,8 +98,11 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
   const currentCurrency = useCurrentCurrency();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const {mutateAsync: updateContract, isLoading: isUpdateLoading} =
-    useUpdateContract('Contract updated');
+  const {
+    mutateAsync: updateContract,
+    isLoading: isUpdateLoading,
+    isSuccess,
+  } = useUpdateContract('Contract updated');
 
   const [isEditForm, setIsEditForm] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -159,7 +162,7 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
           ],
           [],
         ),
-    [elevator?.contracts, isUpdateLoading],
+    [elevator?.contracts, isSuccess, isUpdateLoading],
   );
 
   const deleteComponent = async () => {
@@ -196,6 +199,7 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
       costPackage: row?.additionalInfo?.costPackage as CostPackage,
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
       elevators: allItems,
+      orderType: row?.additionalInfo?.orderType,
     });
   };
 

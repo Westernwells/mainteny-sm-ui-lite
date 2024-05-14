@@ -9,7 +9,7 @@ const statusWidth = {
   long: '10rem',
 };
 
-const statusColor = {
+export const statusColor = {
   default: 'warning.main',
   primary: 'primary.main',
   'primary.mainLight': 'primary.mainLight',

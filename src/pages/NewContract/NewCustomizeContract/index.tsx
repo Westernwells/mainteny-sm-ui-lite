@@ -57,9 +57,9 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
 
       <Box display="flex" alignItems="center">
         <Switch
-          value={!!formik.values.autoRenewalCancelled}
+          value={!formik.values.autoRenewalCancelled}
           onChanged={(value) =>
-            formik.setFieldValue('autoRenewalCancelled', value)
+            formik.setFieldValue('autoRenewalCancelled', !value)
           }
         />
         <Typography variant="body1" sx={{color: 'text.primary'}}>
@@ -68,7 +68,7 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
       </Box>
 
       <Grid container spacing={2} sx={{padding: '1em 0em 0em 0em'}}>
-        {formik.values.autoRenewalCancelled && (
+        {!formik.values.autoRenewalCancelled && (
           <Grid item xs={3}>
             <NumericFormat
               value={formik.values.renewalTerms}

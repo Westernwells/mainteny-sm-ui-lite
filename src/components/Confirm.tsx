@@ -20,6 +20,7 @@ interface Props {
   closeBtnLabel?: string;
   helperText?: string;
   disableActions?: boolean;
+  maxWidth?: string | number;
 }
 
 export const Confirm = ({
@@ -33,6 +34,7 @@ export const Confirm = ({
   confirmBtnLabel,
   helperText,
   disableActions = false,
+  maxWidth,
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -40,7 +42,8 @@ export const Confirm = ({
       open={open || false}
       onClose={onClose}
       aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description">
+      aria-describedby="alert-dialog-description"
+      sx={{'& .MuiDialog-paper[role="dialog"]': {maxWidth}}}>
       <DialogTitle
         id="alert-dialog-title"
         sx={{
