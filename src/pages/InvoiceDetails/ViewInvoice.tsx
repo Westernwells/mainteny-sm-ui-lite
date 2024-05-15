@@ -266,7 +266,10 @@ export const ViewInvoice = ({
       PdfTemplate = FullInvoicePdfTemplate;
     } else if (invoice.type === InvoiceType.CREDIT_NOTE) {
       PdfTemplate = CreditNotePdfTemplate;
-    } else if (invoice.type === InvoiceType.PARTIAL) {
+    } else if (
+      invoice.type === InvoiceType.PARTIAL ||
+      invoice.type === InvoiceType.UPFRONT
+    ) {
       PdfTemplate = PartialInvoicePdfTemplate;
     } else {
       PdfTemplate = FinalInvoicePdfTemplate;
@@ -290,7 +293,10 @@ export const ViewInvoice = ({
           invoice={invoice}
           selectedLng={company?.language}
           translate={translate}
-          previousInvoices={sortedPreviousInvoices}
+          previousInvoices={sortedPreviousInvoices.slice(
+            0,
+            sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+          )}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
