@@ -273,7 +273,7 @@ export enum InvoiceItemPaymentType {
 
 export interface InvoiceItemPaymentRecord {
   type: InvoiceItemPaymentType;
-  amount?: Money;
+  amount?: Amount;
   percentage?: number;
 }
 
