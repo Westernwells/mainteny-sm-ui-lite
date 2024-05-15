@@ -532,5 +532,9 @@ export const calculateLaborMaterialCost = (
       const netAmount = item?.unitAmount?.netAmount ?? 0;
       const fractionDigits = item?.unitAmount?.fractionDigits ?? 2;
       const quantity = item?.quantity ?? 1;
-      return itemTotal + (netAmount * quantity) / 10 ** fractionDigits;
+      const itemDiscountValue =
+        item?.additionalInfo?.discount?.amount?.value ?? 0;
+      const netTotal = netAmount * quantity;
+
+      return itemTotal + (netTotal - itemDiscountValue) / 10 ** fractionDigits;
     }, 0);

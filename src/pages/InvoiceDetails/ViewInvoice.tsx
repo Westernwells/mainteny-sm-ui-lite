@@ -68,6 +68,7 @@ import {companyLanguageContextMap} from 'utils/utils';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
+import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
 import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
@@ -265,6 +266,8 @@ export const ViewInvoice = ({
       PdfTemplate = FullInvoicePdfTemplate;
     } else if (invoice.type === InvoiceType.CREDIT_NOTE) {
       PdfTemplate = CreditNotePdfTemplate;
+    } else if (invoice.type === InvoiceType.PARTIAL) {
+      PdfTemplate = PartialInvoicePdfTemplate;
     } else {
       PdfTemplate = FinalInvoicePdfTemplate;
     }
@@ -273,6 +276,8 @@ export const ViewInvoice = ({
       invoice.type === InvoiceType.CREDIT_NOTE ||
       invoice.type === InvoiceType.FULL ||
       invoice.type === InvoiceType.AGGREGATE ||
+      invoice.type === InvoiceType.PARTIAL ||
+      invoice.type === InvoiceType.UPFRONT ||
       invoice.type === InvoiceType.FINAL
     ) {
       // TODO: will remove when all invoice types PDFs are ready
@@ -455,6 +460,8 @@ export const ViewInvoice = ({
           {(invoice.type === InvoiceType.CREDIT_NOTE ||
             invoice.type === InvoiceType.FULL ||
             invoice.type === InvoiceType.AGGREGATE ||
+            invoice.type === InvoiceType.PARTIAL ||
+            invoice.type === InvoiceType.UPFRONT ||
             invoice.type === InvoiceType.FINAL) && (
             <Box sx={{display: 'flex', justifyContent: 'center'}}>
               <PdfPreview blobUrl={filePathToDownload} />
@@ -464,6 +471,8 @@ export const ViewInvoice = ({
           {invoice.type !== InvoiceType.CREDIT_NOTE &&
             invoice.type !== InvoiceType.FULL &&
             invoice.type !== InvoiceType.AGGREGATE &&
+            invoice.type !== InvoiceType.PARTIAL &&
+            invoice.type !== InvoiceType.UPFRONT &&
             invoice.type !== InvoiceType.FINAL && (
               <Box>
                 {invoice &&
