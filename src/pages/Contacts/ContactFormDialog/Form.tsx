@@ -36,7 +36,7 @@ const Form = ({form, initialValues}: Props) => {
           imageUrl={initialValues?.userAccount.photoUrl || ''}
         />
       </Grid>
-      <Grid item md={4}>
+      <Grid item md={3}>
         <FormControl fullWidth>
           <InputLabel
             size="small"
@@ -60,7 +60,7 @@ const Form = ({form, initialValues}: Props) => {
           </Select>
         </FormControl>
       </Grid>
-      <Grid item md={4}>
+      <Grid item md={4.5}>
         <FormInput
           props={{
             label: 'First name',
@@ -69,7 +69,7 @@ const Form = ({form, initialValues}: Props) => {
           }}
         />
       </Grid>
-      <Grid item md={4}>
+      <Grid item md={4.5}>
         <FormInput
           props={{
             label: 'Last name',
