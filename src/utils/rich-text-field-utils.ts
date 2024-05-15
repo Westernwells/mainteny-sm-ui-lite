@@ -1,14 +1,19 @@
+import {KeyboardEvent} from 'react';
 import {
   Descendant,
   Editor,
   Element as SlateElement,
   Text,
   Transforms,
+  Path,
+  Range,
 } from 'slate';
 import escapeHtml from 'escape-html';
 import {jsx} from 'slate-hyperscript';
 import {
   ALIGNMENT_TYPES,
+  BaseElement,
+  BaseText,
   CustomEditor,
   DEFAULT_FONT_SIZE,
   ELEMENT_TAGS,
@@ -182,4 +187,69 @@ export const deserialize = (el: HTMLElement) => {
   }
 
   return children;
+};
+
+const handleEnterOnListItem = (
+  editor: CustomEditor,
+  event: KeyboardEvent<HTMLDivElement>,
+  node: BaseElement,
+) => {
+  const {selection} = editor;
+  if (!selection) return false;
+
+  // Get the current list item based on the selection
+  const [listItem, listItemPath] = Editor.node(editor, selection.focus.path, {
+    depth: 2,
+  }) as [BaseElement, Path];
+
+  if (listItem.type !== 'list-item') {
+    return false;
+  }
+
+  const isEmpty = (listItem.children[0] as BaseText).text === '';
+  const isLastItemInList =
+    listItemPath[listItemPath.length - 1] === node.children.length - 1;
+
+  if (isEmpty && isLastItemInList) {
+    // If it's the last item and empty, exit the list
+    event.preventDefault();
+    toggleBlock(editor, node.type as FORMAT);
+
+    // Move cursor to the newly created node
+    // Find the path for the next node (which should now be a paragraph)
+    const nextPath = Path.next(listItemPath.slice(0, -1));
+
+    // Move the selection to the start of the next node
+    Transforms.select(editor, Editor.start(editor, nextPath));
+    return true;
+  }
+
+  return false;
+};
+
+export const handleKeyDown = (
+  event: KeyboardEvent<HTMLDivElement>,
+  editor: CustomEditor,
+) => {
+  if (event.key === 'Enter') {
+    const {selection} = editor;
+
+    if (!selection || Range.isExpanded(selection)) {
+      return;
+    }
+
+    const [node] = Editor.node(editor, selection, {depth: 1}) as [
+      BaseElement,
+      Path,
+    ];
+
+    switch (node.type) {
+      case 'numbered-list':
+      case 'bulleted-list':
+        return handleEnterOnListItem(editor, event, node);
+
+      default:
+        break;
+    }
+  }
 };
