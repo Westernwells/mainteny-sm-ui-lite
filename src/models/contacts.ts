@@ -117,6 +117,13 @@ export interface ContactPersonAssociationQueryParams {
   refType?: ContactPersonAssociationType;
 }
 
+export interface RefContactPersonQueryParams {
+  pageIndex: number;
+  pageSize: number;
+  refId: string;
+  refType: ContactPersonAssociationType;
+}
+
 export interface CreateContactPersonAssociationRecord {
   refType: ContactPersonAssociationType;
   refId: string;
@@ -144,6 +151,10 @@ export interface ContactPersonAssociationView {
   additionalInfo: string;
   meta: Meta;
   data: unknown;
+}
+
+export interface RefContactPersonView extends ServiceCompanyContactPersonView {
+  associationId: string;
 }
 
 export enum ContactPersonAssociationType {

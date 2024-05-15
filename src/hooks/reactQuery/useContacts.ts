@@ -7,6 +7,8 @@ import {
   ContactPersonAssociationView,
   ContactPersonAssociationQueryParams,
   CreateContactPersonAssociationRecord,
+  RefContactPersonView,
+  RefContactPersonQueryParams,
 } from 'models/contacts';
 import {
   useInfiniteQuery,
@@ -239,7 +241,7 @@ export const useUpdateContractElevator = (successMsg: string) => {
   );
 };
 
-const fetchServiceCompanyContactPersons = async (
+export const fetchServiceCompanyContactPersons = async (
   serviceCompanyId: string,
   params: Partial<ServiceCompanyContactPersonQueryParams>,
 ) => {
@@ -271,9 +273,11 @@ export const useServiceCompanyContactPersons = (
 const createServiceCompanyContactPerson = async (
   body: ServiceCompanyContactPeronFormModel,
 ) => {
-  await axiosClient.post<StringValue>(`/api/contactPersons`, {
+  const response = await axiosClient.post<StringValue>(`/api/contactPersons`, {
     ...body,
   });
+
+  return response.data;
 };
 
 export const useCreateServiceCompanyContactPerson = (successMsg?: string) => {
@@ -642,3 +646,19 @@ export const useAddContactPersonAssociation = (successMsg?: string) => {
     },
   );
 };
+
+const queryRefContactPersons = async (params: RefContactPersonQueryParams) => {
+  const response = await axiosClient.get<Resource<RefContactPersonView>>(
+    '/api/contactPersons/references',
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useRefContactPersons = (params: RefContactPersonQueryParams) =>
+  useQuery([queryKeys.queryRefContactPersons, params.refId], () =>
+    queryRefContactPersons(params),
+  );

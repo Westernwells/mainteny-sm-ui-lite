@@ -15,9 +15,15 @@ interface Props {
   register: UseFormRegister<ServiceCompanyContactPeronFormModel>;
   setValue: UseFormSetValue<ServiceCompanyContactPeronFormModel>;
   imageUrl: string;
+  readOnly?: boolean;
 }
 
-const ProfilePictureInput = ({register, setValue, imageUrl}: Props) => {
+const ProfilePictureInput = ({
+  register,
+  setValue,
+  imageUrl,
+  readOnly = false,
+}: Props) => {
   const {t} = useTranslation();
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const {data: downloadUrls = {}, isFetched} = useDownloadUrl(
@@ -37,13 +43,17 @@ const ProfilePictureInput = ({register, setValue, imageUrl}: Props) => {
   };
 
   useEffect(() => {
-    if (isFetched) {
+    if (isFetched && imageUrl) {
       setPreview(downloadUrls[imageUrl]);
+    } else {
+      setPreview('');
     }
   }, [imageUrl, isFetched]);
 
   useEffect(() => {
-    checkImageValidness(preview);
+    if (preview) {
+      checkImageValidness(preview);
+    }
   }, [preview]);
 
   const handleUploadedFile = (event: any) => {
@@ -98,24 +108,26 @@ const ProfilePictureInput = ({register, setValue, imageUrl}: Props) => {
           <AvatarIcon width="75%" height="100%" />
         </Avatar>
 
-        <IconButton
-          onClick={onUpload}
-          sx={{
-            border: `1px solid ${theme.palette.secondary.mainLight}`,
-            width: '32px',
-            height: '32px',
-            position: 'absolute',
-            bottom: '0',
-            right: '0',
-            background: 'white',
-            '&:hover': {
-              background: theme.palette.grey[200],
-            },
-          }}>
-          <CameraAltIcon style={{width: '16px', height: '16px'}} />
-        </IconButton>
+        {!readOnly && (
+          <IconButton
+            onClick={onUpload}
+            sx={{
+              border: `1px solid ${theme.palette.secondary.mainLight}`,
+              width: '32px',
+              height: '32px',
+              position: 'absolute',
+              bottom: '0',
+              right: '0',
+              background: 'white',
+              '&:hover': {
+                background: theme.palette.grey[200],
+              },
+            }}>
+            <CameraAltIcon style={{width: '16px', height: '16px'}} />
+          </IconButton>
+        )}
       </Grid>
-      {preview && isImageValid && (
+      {preview && isImageValid && !readOnly && (
         <Button
           size="small"
           sx={{color: theme.palette.error.main, fontSize: '0.75rem'}}
