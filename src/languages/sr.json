@@ -2526,5 +2526,7 @@
   "Sum": "Iznos",
   "Portion": "Porcija",
   "Amount": "Iznos",
-  "Article name": "Naziv članka"
+  "Article name": "Naziv članka",
+  "You are about to disconnect contact from this {{refType}}.": "Upravo ćete prekinuti vezu između kontakta i ovog {{refTipe}}.",
+  "Assistant": "Asistent"
 }

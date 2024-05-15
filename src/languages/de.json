@@ -2503,5 +2503,7 @@
   "Sum": "Summe",
   "Portion": "Anteil",
   "Amount": "Betrag",
-  "Article name": "Artikelname"
+  "Article name": "Artikelname",
+  "You are about to disconnect contact from this {{refType}}.": "Sie sind dabei, die Verbindung zu diesem {{refType}} zu trennen.",
+  "Assistant": "Assistent"
 }
