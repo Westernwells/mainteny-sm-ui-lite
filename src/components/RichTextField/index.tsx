@@ -25,7 +25,11 @@ import {
   RenderElementProps,
   RenderLeafProps,
 } from 'models/richTextField';
-import {deserialize, serialize} from 'utils/rich-text-field-utils';
+import {
+  deserialize,
+  handleKeyDown,
+  serialize,
+} from 'utils/rich-text-field-utils';
 import {HoveringToolbar} from './HoveringToolbar';
 
 const CustomElements = ({
@@ -219,6 +223,12 @@ const RichTextField = ({
     debouncedUpdateHtml(editor);
   };
 
+  const onKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) =>
+      handleKeyDown(event, editor),
+    [editor],
+  );
+
   return (
     <Slate editor={editor} initialValue={value} onChange={handleChange}>
       <HoveringToolbar />
@@ -238,6 +248,7 @@ const RichTextField = ({
             </span>
           )}
           style={{...styles.editable, marginTop: label ? '-10px' : '0px'}}
+          onKeyDown={onKeyDown}
         />
       </fieldset>
     </Slate>
