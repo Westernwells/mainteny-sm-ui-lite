@@ -121,6 +121,15 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           label: t('Schedule'),
           action: () => setOpenDialog(true),
         },
+        // if the job is overdue, we can also mark it as completed
+        ...(serviceOrderDetails.status === ServiceOrderStatus.OVERDUE
+          ? [
+              {
+                label: t('Mark Completed'),
+                action: () => setOpenMarkCompletedDialog(true),
+              },
+            ]
+          : []),
       ];
     }
 
