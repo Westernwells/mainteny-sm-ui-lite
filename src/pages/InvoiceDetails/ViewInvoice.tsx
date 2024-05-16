@@ -64,12 +64,14 @@ import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
-import {companyLanguageContextMap} from 'utils/utils';
+import {companyLanguageContextMap, createFilesFromBlobArray} from 'utils/utils';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
 import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 
@@ -97,6 +99,7 @@ export const ViewInvoice = ({
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
+  const [blobFile, setBlobFile] = useState<Blob>();
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
   const imageUrl = useLogoImage(user);
@@ -116,6 +119,10 @@ export const ViewInvoice = ({
       return t(key);
     },
     [company?.language],
+  );
+
+  const {mutateAsync: uploadFiles} = useUploadFiles(
+    'The document was sent successfully.',
   );
 
   const {downloadFile} = useDownloadFileWithCustomName(
@@ -300,37 +307,26 @@ export const ViewInvoice = ({
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
+      setBlobFile(blob);
       setFilePathToDownload(blobURL);
     }
   };
 
   useEffect(() => {
-    generateBlobUrl();
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      generateBlobUrl();
+    }
   }, [invoice, logoDimensions]);
 
   const onPrintInvoice = async () => {
-    await publishInvoice(
-      {
-        id: invoice.id,
-        body: {
-          email: '',
-          subject: '',
-          content: '',
-        },
-      },
-      {
-        onSuccess: () => {
-          setIsConfirmPrintDialogOpen(false);
-          if (filePathToDownload) {
-            printJS({
-              printable: filePathToDownload || downloadUrl,
-              type: 'pdf',
-              showModal: true,
-            });
-          }
-        },
-      },
-    );
+    setIsConfirmPrintDialogOpen(false);
+    if (filePathToDownload || downloadUrl) {
+      printJS({
+        printable: filePathToDownload || downloadUrl,
+        type: 'pdf',
+        showModal: true,
+      });
+    }
   };
 
   useEffect(() => {
@@ -463,40 +459,36 @@ export const ViewInvoice = ({
             </Box>
           </PageCard>
 
-          {(invoice.type === InvoiceType.CREDIT_NOTE ||
-            invoice.type === InvoiceType.FULL ||
-            invoice.type === InvoiceType.AGGREGATE ||
-            invoice.type === InvoiceType.PARTIAL ||
-            invoice.type === InvoiceType.UPFRONT ||
-            invoice.type === InvoiceType.FINAL) && (
-            <Box sx={{display: 'flex', justifyContent: 'center'}}>
-              <PdfPreview blobUrl={filePathToDownload} />
-            </Box>
-          )}
-
-          {invoice.type !== InvoiceType.CREDIT_NOTE &&
-            invoice.type !== InvoiceType.FULL &&
-            invoice.type !== InvoiceType.AGGREGATE &&
-            invoice.type !== InvoiceType.PARTIAL &&
-            invoice.type !== InvoiceType.UPFRONT &&
-            invoice.type !== InvoiceType.FINAL && (
-              <Box>
-                {invoice &&
-                invoice.additionalInfo &&
-                invoice.additionalInfo.pdfGenerationStatus ===
-                  PdfGenerationStatus.DONE &&
-                !isLoadingDownloadUrl ? (
-                  <PDFContainer url={downloadUrl} />
-                ) : (
-                  <PageCard>
-                    <EmptySection
-                      label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
-                      size="small"
-                    />
-                  </PageCard>
-                )}
+          {invoice.status === InvoiceStatus.DRAFT &&
+            (invoice.type === InvoiceType.CREDIT_NOTE ||
+              invoice.type === InvoiceType.FULL ||
+              invoice.type === InvoiceType.AGGREGATE ||
+              invoice.type === InvoiceType.PARTIAL ||
+              invoice.type === InvoiceType.UPFRONT ||
+              invoice.type === InvoiceType.FINAL) && (
+              <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                <PdfPreview blobUrl={filePathToDownload} />
               </Box>
             )}
+
+          {invoice.status !== InvoiceStatus.DRAFT && (
+            <Box>
+              {invoice &&
+              invoice.additionalInfo &&
+              invoice.additionalInfo.pdfGenerationStatus ===
+                PdfGenerationStatus.DONE &&
+              !isLoadingDownloadUrl ? (
+                <PDFContainer url={downloadUrl} />
+              ) : (
+                <PageCard>
+                  <EmptySection
+                    label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
+                    size="small"
+                  />
+                </PageCard>
+              )}
+            </Box>
+          )}
         </Grid>
 
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
@@ -711,7 +703,7 @@ export const ViewInvoice = ({
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice.id}
-        confirmBtnDisabled={!isPDFsGenerated}
+        confirmBtnDisabled={!filePathToDownload || !isPDFsGenerated}
         email={
           invoice.propertyOwner?.additionalInfo.billingEmail ||
           invoice.propertyOwner?.contact.email
@@ -721,15 +713,46 @@ export const ViewInvoice = ({
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
-          publishInvoice({
-            id: invoice!.id,
-            body: {
-              email: emailRecord.email,
-              subject: emailRecord.subject,
-              content: emailRecord.content,
-              emails: [emailRecord.email],
-            },
-          });
+          const serviceCompanyId = user?.userAccount.serviceCompany.id;
+          const uploadPath = `${serviceCompanyId}/invoices`;
+
+          if (blobFile) {
+            const fileNames: string[] = [`${invoice.id}.pdf`];
+            const files = createFilesFromBlobArray([blobFile!], fileNames);
+            await uploadFiles({files, uploadPath});
+
+            publishInvoice({
+              id: invoice!.id,
+              body: {
+                email: emailRecord.email,
+                subject: emailRecord.subject,
+                content: emailRecord.content,
+                emails: [emailRecord.email],
+                attachments: files.reduce<FileWithPreview[]>(
+                  (newArr: FileWithPreview[], obj) => [
+                    ...newArr,
+                    {
+                      ...obj,
+                      type: obj.type,
+                      uri: `${uploadPath}/${obj.name}`,
+                      description: obj.name.split('.')[0],
+                    },
+                  ],
+                  [],
+                ),
+              },
+            });
+          } else {
+            publishInvoice({
+              id: invoice!.id,
+              body: {
+                email: emailRecord.email,
+                subject: emailRecord.subject,
+                content: emailRecord.content,
+                emails: [emailRecord.email],
+              },
+            });
+          }
         }}
       />
 
