@@ -5,7 +5,6 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {
   ServiceCompanyContactPersonOrderField,
-  ServiceCompanyContactPersonRole,
   ServiceCompanyContactPersonView,
 } from 'models/contacts';
 import {
@@ -55,9 +54,8 @@ const Contacts = () => {
   } = useServiceCompanyContactPersons(
     {
       pageSize: PAGE_SIZE,
-      pageIndex: page.pageIndex,
+      pageIndex: search.length ? 0 : page.pageIndex,
       query: search,
-      role: [...Object.values(ServiceCompanyContactPersonRole)],
       order: sortOrder || Order.DESC,
       orderBy:
         orderByField || ServiceCompanyContactPersonOrderField.CREATED_DATE,

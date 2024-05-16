@@ -132,7 +132,10 @@ const Form = ({form}: Props) => {
               const lastName = option.userAccount.lastName.toLowerCase();
               const searchText = state.inputValue.toLowerCase();
               return (
-                firstName.includes(searchText) || lastName.includes(searchText)
+                firstName.includes(searchText) ||
+                lastName.includes(searchText) ||
+                searchText.includes(firstName) ||
+                searchText.includes(lastName)
               );
             });
             return filteredOptions;

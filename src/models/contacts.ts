@@ -92,7 +92,7 @@ export enum ServiceCompanyContactPersonOrderField {
 
 export enum ServiceCompanyContactPersonRole {
   GENERAL_MANAGER = 'GENERAL_MANAGER',
-  ASSISTANCE = 'ASSISTANCE',
+  ASSISTANT = 'ASSISTANT',
   FACILITY_MANAGER = 'FACILITY_MANAGER',
   PROPERTY_MANAGER = 'PROPERTY_MANAGER',
   CONTACT_PERSON = 'CONTACT_PERSON',
