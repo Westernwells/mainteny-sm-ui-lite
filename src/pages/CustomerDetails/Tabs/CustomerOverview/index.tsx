@@ -29,9 +29,10 @@ import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {LanguageContext} from 'context/LanguageProvider';
+import ContactsWidget from 'pages/Contacts/ContactsWidget';
+import {ContactPersonAssociationType} from 'models/contacts';
 import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
-import {ContactsWidget} from './ContactsWidget';
 import {EditCustomer} from './EditCustomer';
 import PaymentTermsWidget from './PaymentTermsWidget';
 
@@ -259,8 +260,11 @@ export const CustomerOverviewTab = ({
             openTab={() => getCurrentTabIndex && getCurrentTabIndex(2)}
           />
         </Grid>
-        <Grid item xs={12}>
-          <ContactsWidget customerId={customerId || ''} />
+        <Grid>
+          <ContactsWidget
+            refId={customerId!}
+            refType={ContactPersonAssociationType.PROPERTY_OWNER}
+          />
         </Grid>
         <Grid item xs={12}>
           <PaymentTermsWidget customer={customer} />
