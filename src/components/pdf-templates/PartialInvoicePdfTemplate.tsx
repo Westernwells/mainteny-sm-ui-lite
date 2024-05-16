@@ -273,7 +273,7 @@ type PaymentHistorySectionProps = {
   selectedLng?: string;
 };
 
-const PaymentHistorySection = React.memo(
+export const PaymentHistorySection = React.memo(
   ({
     translate,
     currentCurrency,
@@ -448,7 +448,7 @@ const PaymentHistorySection = React.memo(
   },
 );
 
-const PerItemPaymentSection = React.memo(
+export const PerItemPaymentSection = React.memo(
   ({
     translate,
     currentCurrency,
@@ -601,7 +601,7 @@ const PerItemPaymentSection = React.memo(
   },
 );
 
-const InvoicedSection = React.memo(
+export const InvoicedSection = React.memo(
   ({
     translate,
     currentCurrency,
@@ -834,18 +834,15 @@ const InvoicedSection = React.memo(
                 alignItems: 'flex-end',
               }}>
               {currentInvoiceAmountPercentageVats.map((v, idx) => {
-                const vatAmountFormatted = formatCurrency(
-                  centsToMoney(currentCurrency?.code!, v.vat),
-                  {
-                    currency: currentCurrency?.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                    excludeCurrencySymbol: true,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  },
-                );
+                const vatAmountFormatted = formatCurrency(v.vat, {
+                  currency: currentCurrency?.code,
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  roundingMode: 'floor',
+                  excludeCurrencySymbol: true,
+                  currencySymbol: currentCurrency?.symbol,
+                  companyLang: selectedLng,
+                });
                 return (
                   <Text key={idx} style={{marginBottom: 3, ...boldFontStyle}}>
                     {vatAmountFormatted}

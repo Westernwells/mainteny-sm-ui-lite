@@ -8,8 +8,12 @@ import {
 } from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
-import {formatDate, toDate} from 'utils/datetime';
-import {Currencies, centsToMoney, formatCurrency} from 'utils/currency';
+import {
+  Currencies,
+  aggregatedAmountToMoney,
+  centsToMoney,
+  formatCurrency,
+} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
@@ -17,7 +21,6 @@ import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddr
 import {
   DiscountType,
   InvoiceItem,
-  InvoiceType,
   InvoiceView,
   PaymentType,
 } from 'models/invoice';
@@ -33,15 +36,12 @@ import {
 } from 'utils/calculate-total';
 import {
   applyDiscount,
+  applyGlobalDiscountOnItems,
+  applyPerItemDiscountOnItems,
+  getAggregatedItemsVats,
   getAggregatedPartialPaymentsVats,
 } from 'pages/InvoiceDetails/utils';
-import {
-  applyGlobalDiscountOnQuotationItems,
-  applyPerItemDiscountOnQuotationItems,
-  applyQuotationDiscount,
-  getDiscoutObj,
-  getQuotationAggregatedItemsVats,
-} from 'pages/QuotationDetails/utils';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
   getFormattedPaymentValues,
   replacePaymentTermsPlaceholders,
@@ -52,6 +52,11 @@ import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.tt
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
+import {
+  InvoicedSection,
+  PaymentHistorySection,
+  PerItemPaymentSection,
+} from './PartialInvoicePdfTemplate';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -159,7 +164,7 @@ const getStyles = (
       display: 'flex',
       flexDirection: 'row',
       fontSize: 10,
-      marginBottom: 8,
+      marginVertical: 4,
     },
     descriptionText: {
       width: '45%',
@@ -213,27 +218,7 @@ type PartialProps = {
   invoice: InvoiceView;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
-};
-
-type InvoicedSectionProps = {
-  translate: (key: string) => string;
-  currentCurrency?: Currency;
-  selectedLng?: string;
-  previousInvoices: InvoiceView[];
-  amount: number;
-  currentInvoiceAmountPercentageVats: {
-    percentageVat: number;
-    vat: number;
-  }[];
-};
-
-type PaymentHistorySectionProps = {
-  translate: (key: string) => string;
-  currentCurrency?: Currency;
-  previousInvoices: InvoiceView[];
-  totalAmountInclVatsFormatted: string;
-  outstandingAmountFormatted: string;
-  selectedLng?: string;
+  articleItems?: InvoiceItem[];
 };
 
 type ArticleSectionProps = {
@@ -253,808 +238,6 @@ type ArticleSectionProps = {
   selectedLng?: string;
   netTotal: (articleItem: InvoiceItem) => number;
 };
-
-const PartialPaymentSection = React.memo(
-  ({
-    translate,
-    currentCurrency,
-    invoice,
-    selectedLng,
-    previousInvoices,
-  }: PartialProps) => {
-    const subtotalExclVatAfterPerItemDiscount =
-      calculateTotalWithPerItemDiscount(previousInvoices[0]?.items);
-    const subtotalExclVat = applyDiscount({
-      actualValue: subtotalExclVatAfterPerItemDiscount,
-      ...(invoice?.discount?.type === DiscountType.AMOUNT
-        ? {amount: invoice?.discount?.amount?.value ?? 0}
-        : {percentage: invoice?.discount?.percentage ?? 0}),
-    });
-
-    const previousInvoicesTotalExclVat = previousInvoices
-      ?.map(
-        (i) =>
-          (i.totalAmount?.netAmount ?? 0) /
-          10 ** (i.totalAmount?.fractionDigits ?? 2),
-      )
-      .reduce((a, b) => a + b, 0);
-
-    const amount =
-      invoice?.additionalInfo.payment?.type === PaymentType.LUMP_SUM
-        ? (invoice?.additionalInfo.payment?.amount?.netAmount ?? 0) /
-            10 **
-              (invoice.additionalInfo.payment.amount?.fractionDigits ?? 2) ?? 0
-        : invoice?.additionalInfo.payment?.type === PaymentType.PERCENTAGE
-        ? (subtotalExclVat *
-            (invoice?.additionalInfo.payment?.percentage ?? 0)) /
-          100
-        : invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM
-        ? previousInvoices &&
-          previousInvoices[0]?.items
-            ?.map(
-              (item) =>
-                (item.unitAmount.netAmount /
-                  10 ** Currencies[item.unitAmount.currency] /
-                  100) *
-                (item?.additionalInfo?.payment?.percentage ?? 0),
-            )
-            .reduce((a, b) => a + b, 0)
-        : 0;
-
-    const totalAmountExclVat =
-      amount +
-      previousInvoicesTotalExclVat -
-      (invoice.totalAmount?.netAmount ?? 0) /
-        10 ** (invoice.totalAmount?.fractionDigits ?? 2);
-
-    const totalAmountExclVatFormatted = formatCurrency(
-      fixRounding(totalAmountExclVat, 2),
-      {
-        currency: currentCurrency?.code,
-        excludeCurrencySymbol: true,
-        currencySymbol: currentCurrency?.symbol,
-        companyLang: selectedLng,
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        roundingMode: 'floor',
-      },
-    );
-
-    const allItemsHasSameVAT = previousInvoices[0]?.items.every(
-      (item) =>
-        item.unitAmount.percentageVat ===
-        previousInvoices[0].items[0].unitAmount.percentageVat,
-    );
-
-    const percentageVats = previousInvoices[0]?.items.length
-      ? allItemsHasSameVAT
-        ? [
-            {
-              percentageVat:
-                previousInvoices[0]?.items[0].unitAmount.percentageVat,
-              vat:
-                totalAmountExclVat *
-                (previousInvoices[0].items[0].unitAmount.percentageVat / 100),
-            },
-          ]
-        : getAggregatedPartialPaymentsVats(
-            previousInvoices[0]?.items,
-            totalAmountExclVat,
-          )
-      : [];
-
-    const totalAmountInclVats = calculateTotalAmountInclVats({
-      subtotalExclVatAfterDiscount: totalAmountExclVat,
-      percentageVats,
-    });
-
-    const totalAmountInclVatsFormatted = formatCurrency(
-      fixRounding(totalAmountInclVats, 2),
-      {
-        currency: currentCurrency?.code,
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        roundingMode: 'floor',
-        excludeCurrencySymbol: true,
-        currencySymbol: currentCurrency?.symbol,
-        companyLang: selectedLng,
-      },
-    );
-
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
-
-    return (
-      <View wrap={false}>
-        <View
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexDirection: 'row',
-            width: '100%',
-            marginTop: 20,
-          }}>
-          <Text
-            style={{
-              ...styles.tableHeading,
-              textAlign: 'left',
-              width: '60%',
-            }}>
-            {translate('Partial Invoices')}
-          </Text>
-
-          {invoice.additionalInfo.payment?.type === PaymentType.PERCENTAGE && (
-            <Text
-              style={{
-                ...styles.tableHeading,
-                textAlign: 'right',
-                width: '15%',
-              }}>
-              {translate('Percentage')}
-            </Text>
-          )}
-
-          <Text
-            style={{
-              ...styles.tableHeading,
-              textAlign: 'right',
-              width:
-                invoice.additionalInfo.payment?.type === PaymentType.PERCENTAGE
-                  ? '25%'
-                  : '40%',
-            }}>
-            {translate('Total')}
-            {` (${currentCurrency?.symbol})`}
-          </Text>
-        </View>
-
-        {previousInvoices.map((previousInvoice, index) => (
-          <View
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-              flexDirection: 'row',
-              marginVertical: 4,
-              borderBottomWidth: index === previousInvoices.length - 1 ? 1 : 0,
-              borderBottomColor: '#212121',
-            }}
-            wrap={false}
-            key={previousInvoice.id}>
-            <Text
-              style={{
-                textAlign: 'left',
-                color: '#212121',
-                width: '60%',
-              }}>
-              {previousInvoice.additionalInfo.payment?.description}
-            </Text>
-            {invoice.additionalInfo.payment?.type ===
-              PaymentType.PERCENTAGE && (
-              <Text
-                style={{
-                  textAlign: 'right',
-                  color: '#212121',
-                  width: '15%',
-                }}>
-                {previousInvoice.additionalInfo.payment?.percentage}
-              </Text>
-            )}
-
-            <Text
-              style={{
-                textAlign: 'right',
-                color: '#212121',
-                width:
-                  previousInvoice.additionalInfo.payment?.type ===
-                  PaymentType.PERCENTAGE
-                    ? '25%'
-                    : '40%',
-              }}>
-              {formatCurrency(
-                (previousInvoice?.additionalInfo.payment?.amount?.netAmount ??
-                  0) /
-                  10 **
-                    (previousInvoice?.additionalInfo.payment?.amount
-                      ?.fractionDigits ?? 2),
-                {
-                  currency: currentCurrency?.code,
-                  excludeCurrencySymbol: true,
-                  currencySymbol: currentCurrency?.symbol,
-                  companyLang: selectedLng,
-                },
-              )}
-            </Text>
-          </View>
-        ))}
-
-        <View style={styles.tableRow}>
-          <Text style={{width: '44%'}} />
-          <Text
-            style={{
-              width: '32%',
-              color: '#616161',
-              fontSize: 10,
-              textAlign: 'right',
-            }}>
-            {translate('Subtotal excl. VAT')}
-          </Text>
-          <Text
-            style={{
-              width: '24%',
-              textAlign: 'right',
-              fontSize: 10,
-            }}>
-            {totalAmountExclVatFormatted}
-          </Text>
-        </View>
-
-        <View>
-          {allItemsHasSameVAT ? (
-            <View style={styles.tableRow}>
-              <Text style={{width: '44%'}} />
-              <Text
-                style={{
-                  width: '32%',
-                  color: '#616161',
-                  fontSize: 10,
-                  textAlign: 'right',
-                }}>
-                {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
-              </Text>
-              <Text
-                style={{
-                  width: '24%',
-                  textAlign: 'right',
-                  fontSize: 10,
-                }}>
-                {formatCurrency(fixRounding(percentageVats?.[0]?.vat ?? 0, 2), {
-                  currency: currentCurrency?.code,
-                  excludeCurrencySymbol: true,
-                  currencySymbol: currentCurrency?.symbol,
-                  companyLang: selectedLng,
-                })}
-              </Text>
-            </View>
-          ) : (
-            percentageVats.map((v, index) => (
-              <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
-                <Text style={{width: '44%'}} />
-                <Text
-                  style={{
-                    width: '32%',
-                    color: '#616161',
-                    fontSize: 10,
-                    textAlign: 'right',
-                  }}>
-                  {translate('VAT')} {v.percentageVat}%
-                </Text>
-                <Text
-                  style={{
-                    width: '24%',
-                    textAlign: 'right',
-                    fontSize: 10,
-                  }}>
-                  {formatCurrency(fixRounding(v.vat, 2), {
-                    currency: currentCurrency?.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                    excludeCurrencySymbol: true,
-                    companyLang: selectedLng,
-                    currencySymbol: currentCurrency?.symbol,
-                  })}
-                </Text>
-              </View>
-            ))
-          )}
-        </View>
-
-        <View style={styles.tableRow}>
-          <Text style={{width: '44%'}} />
-          <Text
-            style={{
-              width: '32%',
-              color: '#212121',
-              ...boldFontStyle,
-              textAlign: 'right',
-              fontSize: 10,
-              paddingLeft: 25,
-            }}>
-            {`${translate('Total incl. VAT')} (${currentCurrency?.symbol})`}
-          </Text>
-          <Text
-            style={{
-              width: '24%',
-              textAlign: 'right',
-              color: '#212121',
-              ...boldFontStyle,
-              fontSize: 10,
-            }}>
-            {totalAmountInclVatsFormatted}
-          </Text>
-        </View>
-      </View>
-    );
-  },
-);
-
-const InvoicedSection = React.memo(
-  ({
-    translate,
-    currentCurrency,
-    selectedLng,
-    previousInvoices,
-    amount,
-    currentInvoiceAmountPercentageVats,
-  }: InvoicedSectionProps) => {
-    const amountFormatted = formatCurrency(fixRounding(amount, 2), {
-      currency: currentCurrency?.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    });
-
-    const invoicedSectionColumns: {
-      name: string;
-      align: 'left' | 'right' | 'center' | 'justify' | undefined;
-      width: string;
-    }[] = [
-      {name: `${translate('Invoiced')}`, align: 'left', width: '30%'},
-      {name: `${translate('Date')}`, align: 'right', width: '15%'},
-      {
-        name: `${translate('Total')} (${currentCurrency?.symbol})`,
-        align: 'right',
-        width: '18%',
-      },
-      {name: `${translate('VAT (%)')}`, align: 'right', width: '7%'},
-      {name: `${translate('VAT')}`, align: 'right', width: '12%'},
-      {
-        name: `${translate('Total incl. VAT')} (${currentCurrency?.symbol})`,
-        align: 'right',
-        width: '20%',
-      },
-    ];
-
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
-
-    return (
-      <View>
-        <View
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-            width: '100%',
-            marginTop: 15,
-            marginBottom: 10,
-          }}>
-          {invoicedSectionColumns.map((column) => (
-            <Text
-              style={{
-                ...styles.tableHeading,
-                textAlign: column.align,
-                width: column.width,
-              }}
-              key={column.name}>
-              {column.name}
-            </Text>
-          ))}
-        </View>
-
-        <View>
-          {previousInvoices.map((i, index) => {
-            if (index === previousInvoices.length - 1) {
-              return null;
-            }
-            const invoiceTotalAmount = i.totalAmount;
-            const description = i.additionalInfo?.payment?.description;
-            const fractionDigits = invoiceTotalAmount?.fractionDigits ?? 2;
-            const amountExclVat = Math.abs(
-              (invoiceTotalAmount?.netAmount ?? 0) / 10 ** fractionDigits,
-            );
-            const amountExclVatFormatted = formatCurrency(amountExclVat, {
-              currency: currentCurrency?.code,
-              minimumFractionDigits: fractionDigits,
-              maximumFractionDigits: fractionDigits,
-              roundingMode: 'floor',
-              excludeCurrencySymbol: true,
-              currencySymbol: currentCurrency?.symbol,
-              companyLang: selectedLng,
-            });
-            const totalAmountInclVat = Math.abs(
-              (invoiceTotalAmount?.grossAmount ?? 0) / 10 ** fractionDigits,
-            );
-            const totalAmountInclVatFormatted = formatCurrency(
-              totalAmountInclVat,
-              {
-                currency: currentCurrency?.code,
-                minimumFractionDigits: fractionDigits,
-                maximumFractionDigits: fractionDigits,
-                roundingMode: 'floor',
-                excludeCurrencySymbol: true,
-                currencySymbol: currentCurrency?.symbol,
-                companyLang: selectedLng,
-              },
-            );
-            const signBeforeNumber =
-              i.type === InvoiceType.CREDIT_NOTE ? '+' : '-';
-
-            return (
-              <View
-                key={i.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  flexDirection: 'row',
-                  width: '100%',
-                }}>
-                <Text style={{...styles.tableRow, width: '30%'}}>
-                  {description}
-                </Text>
-                <Text
-                  style={{
-                    ...styles.tableRow,
-                    width: '15%',
-                    textAlign: 'right',
-                  }}>
-                  {i.sentDate ? formatDate(toDate(i.sentDate)) : '-'}
-                </Text>
-                <Text
-                  style={{
-                    ...styles.tableRow,
-                    width: '18%',
-                    textAlign: 'right',
-                  }}>
-                  {signBeforeNumber}
-                  {amountExclVatFormatted}
-                </Text>
-                <View
-                  style={{
-                    ...styles.tableRow,
-                    flexDirection: 'column',
-                    width: '7%',
-                    textAlign: 'right',
-                    display: 'flex',
-                  }}>
-                  {invoiceTotalAmount.vats.map((v, idx) => (
-                    <Text key={idx} style={{marginBottom: 3}}>
-                      {v.percentageVat}%
-                    </Text>
-                  ))}
-                </View>
-                <View
-                  style={{
-                    ...styles.tableRow,
-                    width: '12%',
-                    textAlign: 'right',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}>
-                  {invoiceTotalAmount.vats.map((v, idx) => {
-                    const vatAmount = Math.abs(
-                      (v?.vat ?? 0) / 10 ** fractionDigits,
-                    );
-                    const vatAmountFormatted = formatCurrency(vatAmount, {
-                      currency: currentCurrency?.code,
-                      minimumFractionDigits: fractionDigits,
-                      maximumFractionDigits: fractionDigits,
-                      roundingMode: 'floor',
-                      excludeCurrencySymbol: true,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    });
-                    return (
-                      <Text key={idx} style={{marginBottom: 3}}>
-                        -{vatAmountFormatted}
-                      </Text>
-                    );
-                  })}
-                </View>
-                <Text
-                  style={{
-                    ...styles.tableRow,
-                    width: '20%',
-                    textAlign: 'right',
-                  }}>
-                  {signBeforeNumber}
-                  {totalAmountInclVatFormatted}
-                </Text>
-              </View>
-            );
-          })}
-
-          <View
-            style={{
-              display: 'flex',
-              width: '100%',
-              flexDirection: 'row',
-              borderTopWidth: 1,
-              borderTopColor: '#212121',
-              paddingTop: 3,
-            }}>
-            <Text style={{width: '30%', ...boldFontStyle}}>
-              {translate('Invoice amount')}
-            </Text>
-            <Text style={{width: '15%', textAlign: 'right'}} />
-            <Text style={{width: '18%', textAlign: 'right', ...boldFontStyle}}>
-              {amountFormatted}
-            </Text>
-            <View
-              style={{
-                ...boldFontStyle,
-                width: '7%',
-                textAlign: 'right',
-                alignItems: 'flex-end',
-              }}>
-              {currentInvoiceAmountPercentageVats.map((v, idx) => (
-                <Text key={idx} style={{marginBottom: 3}}>
-                  {v.percentageVat}%
-                </Text>
-              ))}
-            </View>
-            <View
-              style={{
-                width: '12%',
-                textAlign: 'right',
-                alignItems: 'flex-end',
-              }}>
-              {currentInvoiceAmountPercentageVats.map((v, idx) => {
-                const vatAmountFormatted = formatCurrency(
-                  centsToMoney(currentCurrency?.code!, v.vat),
-                  {
-                    currency: currentCurrency?.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                    excludeCurrencySymbol: true,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  },
-                );
-                return (
-                  <Text key={idx} style={{marginBottom: 3, ...boldFontStyle}}>
-                    {vatAmountFormatted}
-                  </Text>
-                );
-              })}
-            </View>
-            <Text style={{width: '20%', textAlign: 'right', ...boldFontStyle}}>
-              {formatCurrency(
-                amount +
-                  currentInvoiceAmountPercentageVats
-                    .map((v) => centsToMoney(currentCurrency?.code!, v.vat))
-                    .reduce((a, b) => a + b, 0),
-                {
-                  currency: currentCurrency?.code,
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                  roundingMode: 'floor',
-                  excludeCurrencySymbol: true,
-                  currencySymbol: currentCurrency?.symbol,
-                  companyLang: selectedLng,
-                },
-              )}
-            </Text>
-          </View>
-        </View>
-        <View
-          style={{
-            display: 'flex',
-            marginTop: 2,
-            justifyContent: 'flex-end',
-            width: '100%',
-            flexDirection: 'row',
-          }}>
-          <View
-            style={{
-              borderBottomWidth: 2,
-              borderBottomColor: '#212121',
-              width: '17%',
-            }}
-          />
-        </View>
-      </View>
-    );
-  },
-);
-
-const PaymentHistorySection = React.memo(
-  ({
-    translate,
-    currentCurrency,
-    previousInvoices,
-    totalAmountInclVatsFormatted,
-    outstandingAmountFormatted,
-    selectedLng,
-  }: PaymentHistorySectionProps) => {
-    const paymentHistorySectionColumns: {
-      name: string;
-      align: 'left' | 'right' | 'center' | 'justify' | undefined;
-      width: string;
-    }[] = [
-      {name: `${translate('Payment History')}`, align: 'left', width: '60%'},
-      {name: `${translate('Date')}`, align: 'right', width: '10%'},
-      {
-        name: `${translate('Total')} (${currentCurrency?.symbol})`,
-        align: 'right',
-        width: '30%',
-      },
-    ];
-
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
-
-    return (
-      <View>
-        <View>
-          <View
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              flexDirection: 'row',
-              width: '100%',
-              marginTop: 15,
-              marginBottom: 10,
-            }}>
-            {paymentHistorySectionColumns.map((column) => (
-              <Text
-                style={{
-                  ...styles.tableHeading,
-                  textAlign: column.align,
-                  width: column.width,
-                }}
-                key={column.name}>
-                {translate(column.name)}
-              </Text>
-            ))}
-          </View>
-
-          <View>
-            <View
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                flexDirection: 'row',
-                width: '100%',
-                marginBottom: 10,
-              }}>
-              <Text style={{width: '60%', textAlign: 'left'}}>
-                {translate('Total amount (incl. VAT)')}
-              </Text>
-              <Text style={{width: '10%', textAlign: 'right'}} />
-
-              <Text style={{width: '30%', textAlign: 'right'}}>
-                {totalAmountInclVatsFormatted}
-              </Text>
-            </View>
-
-            {previousInvoices?.map((i) => {
-              if (!i.payments.length) {
-                return null;
-              }
-
-              const description = i.additionalInfo?.payment?.description || '-';
-
-              const totalPriceInclVat = Math.abs(
-                i.payments
-                  .map(
-                    (p) =>
-                      (p.amount?.value ?? 0) /
-                      10 ** (p.amount?.fractionDigits ?? 2),
-                  )
-                  .reduce((a, b) => a + b, 0),
-              );
-
-              const totalPriceInclVatFormatted = formatCurrency(
-                totalPriceInclVat,
-                {
-                  currency: currentCurrency?.code,
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                  roundingMode: 'floor',
-                  excludeCurrencySymbol: true,
-                  currencySymbol: currentCurrency?.symbol,
-                  companyLang: selectedLng,
-                },
-              );
-
-              const signBeforeNumber =
-                i.type === InvoiceType.CREDIT_NOTE ? '+' : '-';
-
-              return (
-                <View
-                  key={i.id}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                    width: '100%',
-                  }}>
-                  <Text
-                    style={{
-                      ...styles.tableRow,
-                      width: '60%',
-                      textAlign: 'left',
-                    }}>
-                    {description}
-                  </Text>
-                  <Text
-                    style={{
-                      ...styles.tableRow,
-                      width: '10%',
-                      textAlign: 'right',
-                    }}>
-                    {i.sentDate ? formatDate(toDate(i.sentDate)) : '-'}
-                  </Text>
-                  <Text
-                    style={{
-                      ...styles.tableRow,
-                      width: '30%',
-                      textAlign: 'right',
-                    }}>
-                    {signBeforeNumber}
-                    {totalPriceInclVatFormatted}
-                  </Text>
-                </View>
-              );
-            })}
-
-            <View
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                flexDirection: 'row',
-                width: '100%',
-                marginBottom: 10,
-                borderTopWidth: 1,
-                borderTopColor: '#212121',
-              }}>
-              <Text style={{width: '60%', textAlign: 'left', ...boldFontStyle}}>
-                {translate('Outstanding payments')}
-              </Text>
-              <Text style={{width: '10%', textAlign: 'right'}} />
-              <Text
-                style={{width: '40%', textAlign: 'right', ...boldFontStyle}}>
-                {outstandingAmountFormatted}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    );
-  },
-);
 
 const TableHeading = ({
   text,
@@ -1362,71 +545,46 @@ const ArticleSection = React.memo(
   },
 );
 
-const FinalInvoicePdfTemplate = React.memo(
+const PartialPaymentSection = React.memo(
   ({
     translate,
-    userInfo,
-    logoSrc,
     currentCurrency,
-    logoDimensions,
     invoice,
     selectedLng,
     previousInvoices,
-  }: Props) => {
-    const articleItems = invoice?.items.map((item) => ({
-      ...item,
-      discount: getDiscoutObj(item?.additionalInfo?.discount),
-    }));
-
-    const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
-    const discountType = discount?.type;
-    const discountAmount = discount?.amount;
-    const discountPercentage = discount?.percentage;
-    const discountValue = discountAmount?.value ?? 0;
-
-    const netTotal = (articleItem: InvoiceItem) => {
-      const grossTotal =
-        (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
-      const itemDiscountValue =
-        articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
-
-      return (
-        (grossTotal - itemDiscountValue) /
-          10 ** articleItem.unitAmount.fractionDigits ?? 2
-      );
-    };
-
+    articleItems,
+  }: PartialProps) => {
     const subtotalExclVatAfterPerItemDiscount =
-      calculateTotalWithPerItemDiscount(invoice?.items!);
+      calculateTotalWithPerItemDiscount(articleItems!);
 
     const subtotalExclVat = applyDiscount({
       actualValue: subtotalExclVatAfterPerItemDiscount,
-      ...(invoice?.discount?.type === DiscountType.AMOUNT
-        ? {amount: invoice?.discount?.amount?.value ?? 0}
-        : {percentage: invoice?.discount?.percentage ?? 0}),
+      ...(invoice?.additionalInfo.discount?.type === DiscountType.AMOUNT
+        ? {amount: invoice?.additionalInfo.discount?.amount?.value ?? 0}
+        : {percentage: invoice?.additionalInfo.discount?.percentage ?? 0}),
     });
 
-    const previousInvoicesTotalExclVat =
-      previousInvoices
-        ?.map(
-          (i) =>
-            (i.totalAmount?.netAmount ?? 0) /
-            10 ** (i.totalAmount?.fractionDigits ?? 2),
-        )
-        .reduce((a, b) => a + b, 0) ?? 0;
+    const previousInvoicesTotalExclVat = previousInvoices
+      ?.map(
+        (i) =>
+          (i.totalAmount?.netAmount ?? 0) /
+          10 ** (i.totalAmount?.fractionDigits ?? 2),
+      )
+      .reduce((a, b) => a + b, 0);
 
     const amount =
-      invoice?.additionalInfo.payment?.type === PaymentType.LUMP_SUM
+      invoice.additionalInfo.payment?.type === PaymentType.LUMP_SUM
         ? centsToMoney(
             currentCurrency?.code!,
-            invoice.additionalInfo.payment?.amount?.netAmount,
-          )
-        : invoice?.additionalInfo.payment?.type === PaymentType.PERCENTAGE
+            aggregatedAmountToMoney(invoice.additionalInfo.payment?.amount)
+              .value,
+          ) ?? 0
+        : invoice.additionalInfo.payment?.type === PaymentType.PERCENTAGE
         ? (subtotalExclVat *
-            (invoice?.additionalInfo.payment?.percentage ?? 0)) /
+            (invoice.additionalInfo.payment?.percentage ?? 0)) /
           100
-        : invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM
-        ? invoice?.items
+        : invoice.additionalInfo.payment?.type === PaymentType.PER_ITEM
+        ? articleItems!
             .map(
               (item) =>
                 (item.unitAmount.netAmount /
@@ -1437,76 +595,54 @@ const FinalInvoicePdfTemplate = React.memo(
             .reduce((a, b) => a + b, 0)
         : 0;
 
-    const allItemsHaveZeroDiscount = articleItems?.every(
-      (item) =>
-        item?.additionalInfo?.discount?.amount?.value === 0 ||
-        item?.additionalInfo?.discount?.percentage === 0,
-    );
-
     const totalAmountExclVat =
       amount +
       previousInvoicesTotalExclVat -
       (invoice.totalAmount?.netAmount ?? 0) /
         10 ** (invoice.totalAmount?.fractionDigits ?? 2);
 
-    const subtotalExclVatFormatted = formatCurrency(
-      subtotalExclVat - discountValue,
+    const totalAmountExclVatFormatted = formatCurrency(
+      fixRounding(totalAmountExclVat, 2),
       {
         currency: currentCurrency?.code,
         excludeCurrencySymbol: true,
         currencySymbol: currentCurrency?.symbol,
         companyLang: selectedLng,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        roundingMode: 'floor',
       },
     );
 
-    const subtotalExclVatAfterDiscount = applyQuotationDiscount({
-      actualValue: subtotalExclVat,
-      ...(discountType === DiscountType.AMOUNT
-        ? {amount: discountValue ?? 0}
-        : {percentage: discountPercentage ?? 0}),
-    });
-
-    const itemsAfterPerItemDiscount =
-      applyPerItemDiscountOnQuotationItems(articleItems);
-
-    const itemsAfterGlobalDiscount = applyGlobalDiscountOnQuotationItems(
-      itemsAfterPerItemDiscount,
-      discount,
-    );
-
-    const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
+    const allItemsHasSameVAT = articleItems?.every(
       (item) =>
         item.unitAmount.percentageVat ===
         articleItems[0].unitAmount.percentageVat,
     );
 
-    const percentageVats = itemsAfterGlobalDiscount.length
+    const percentageVats = articleItems?.length
       ? allItemsHasSameVAT
         ? [
             {
-              percentageVat:
-                itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
+              percentageVat: articleItems[0].unitAmount.percentageVat,
               vat:
-                subtotalExclVatAfterDiscount *
-                (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
+                totalAmountExclVat *
+                (articleItems[0].unitAmount.percentageVat / 100),
             },
           ]
-        : getQuotationAggregatedItemsVats(itemsAfterGlobalDiscount)
+        : getAggregatedPartialPaymentsVats(articleItems, totalAmountExclVat)
       : [];
 
-    const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
-
-    const currentInvoiceAmountPercentageVats = invoice?.items.length
+    const currentInvoiceAmountPercentageVats = articleItems!.length
       ? allItemsHasSameVAT
         ? [
             {
-              percentageVat: invoice?.items[0].unitAmount.percentageVat,
+              percentageVat: articleItems![0].unitAmount.percentageVat,
               vat:
-                amount *
-                (invoice?.items[0].unitAmount.percentageVat ?? 0 / 100),
+                amount * (articleItems![0].unitAmount.percentageVat ?? 0 / 100),
             },
           ]
-        : getAggregatedPartialPaymentsVats(invoice?.items, amount)
+        : getAggregatedPartialPaymentsVats(articleItems!, amount)
       : [];
 
     const totalAmountInclVats = calculateTotalAmountInclVats({
@@ -1526,6 +662,379 @@ const FinalInvoicePdfTemplate = React.memo(
         companyLang: selectedLng,
       },
     );
+
+    const hasPreviousInvoices = previousInvoices.length > 0;
+
+    const paidAmountInclVats = previousInvoices
+      .map((i) =>
+        i.payments.reduce(
+          (acc, p) =>
+            acc +
+            (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
+          0,
+        ),
+      )
+      .reduce((acc, a) => acc + a, 0);
+    const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
+
+    const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
+      currency: currentCurrency?.code,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      roundingMode: 'floor',
+    });
+
+    const hasPayments =
+      previousInvoices.map((i) => i.payments).flat().length > 0;
+
+    const boldFontStyle = {
+      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+    };
+
+    const regularFontStyle = {
+      fontFamily:
+        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
+    };
+
+    const styles = getStyles(boldFontStyle, regularFontStyle);
+
+    return (
+      <View wrap={false}>
+        {invoice.additionalInfo.payment?.type === PaymentType.PER_ITEM && (
+          <PerItemPaymentSection
+            translate={translate}
+            selectedLng={selectedLng}
+            currentCurrency={currentCurrency}
+            previousInvoices={previousInvoices}
+          />
+        )}
+
+        {invoice.additionalInfo.payment?.type !== PaymentType.PER_ITEM && (
+          <View>
+            <View
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexDirection: 'row',
+                width: '100%',
+                marginTop: 20,
+              }}>
+              <Text
+                style={{
+                  ...styles.tableHeading,
+                  textAlign: 'left',
+                  width: '60%',
+                }}>
+                {translate('Partial Invoices')}
+              </Text>
+
+              {invoice.additionalInfo.payment?.type ===
+                PaymentType.PERCENTAGE && (
+                <Text
+                  style={{
+                    ...styles.tableHeading,
+                    textAlign: 'right',
+                    width: '15%',
+                  }}>
+                  {translate('Percentage')}
+                </Text>
+              )}
+
+              <Text
+                style={{
+                  ...styles.tableHeading,
+                  textAlign: 'right',
+                  width:
+                    invoice.additionalInfo.payment?.type ===
+                    PaymentType.PERCENTAGE
+                      ? '25%'
+                      : '40%',
+                }}>
+                {translate('Total')}
+                {` (${currentCurrency?.symbol})`}
+              </Text>
+            </View>
+
+            {previousInvoices.map((previousInvoice, index) => (
+              <View
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                  flexDirection: 'row',
+                  marginVertical: 4,
+                  borderBottomWidth:
+                    index === previousInvoices.length - 1 ? 1 : 0,
+                  borderBottomColor: '#212121',
+                }}
+                wrap={false}
+                key={previousInvoice.id}>
+                <Text
+                  style={{
+                    textAlign: 'left',
+                    color: '#212121',
+                    width: '60%',
+                  }}>
+                  {previousInvoice.additionalInfo.payment?.description}
+                </Text>
+                {invoice.additionalInfo.payment?.type ===
+                  PaymentType.PERCENTAGE && (
+                  <Text
+                    style={{
+                      textAlign: 'right',
+                      color: '#212121',
+                      width: '15%',
+                    }}>
+                    {previousInvoice.additionalInfo.payment?.percentage}%
+                  </Text>
+                )}
+
+                <Text
+                  style={{
+                    textAlign: 'right',
+                    color: '#212121',
+                    width:
+                      previousInvoice.additionalInfo.payment?.type ===
+                      PaymentType.PERCENTAGE
+                        ? '25%'
+                        : '40%',
+                  }}>
+                  {formatCurrency(
+                    (aggregatedAmountToMoney(
+                      previousInvoice?.additionalInfo.payment?.amount,
+                    ).value ?? 0) /
+                      10 **
+                        (previousInvoice?.additionalInfo.payment?.amount
+                          ?.fractionDigits ?? 2),
+                    {
+                      currency: currentCurrency?.code,
+                      excludeCurrencySymbol: true,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    },
+                  )}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <View style={styles.tableRow}>
+          <Text style={{width: '44%'}} />
+          <Text
+            style={{
+              width: '32%',
+              color: '#616161',
+              fontSize: 10,
+              textAlign: 'right',
+            }}>
+            {translate('Subtotal excl. VAT')}
+          </Text>
+          <Text
+            style={{
+              width: '24%',
+              textAlign: 'right',
+              fontSize: 10,
+            }}>
+            {totalAmountExclVatFormatted}
+          </Text>
+        </View>
+
+        <View>
+          {allItemsHasSameVAT ? (
+            <View style={styles.tableRow}>
+              <Text style={{width: '44%'}} />
+              <Text
+                style={{
+                  width: '32%',
+                  color: '#616161',
+                  fontSize: 10,
+                  textAlign: 'right',
+                }}>
+                {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
+              </Text>
+              <Text
+                style={{
+                  width: '24%',
+                  textAlign: 'right',
+                  fontSize: 10,
+                }}>
+                {formatCurrency(fixRounding(percentageVats?.[0]?.vat ?? 0, 2), {
+                  currency: currentCurrency?.code,
+                  excludeCurrencySymbol: true,
+                  currencySymbol: currentCurrency?.symbol,
+                  companyLang: selectedLng,
+                })}
+              </Text>
+            </View>
+          ) : (
+            percentageVats.map((v, index) => (
+              <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
+                <Text style={{width: '44%'}} />
+                <Text
+                  style={{
+                    width: '32%',
+                    color: '#616161',
+                    fontSize: 10,
+                    textAlign: 'right',
+                  }}>
+                  {translate('VAT')} {v.percentageVat}%
+                </Text>
+                <Text
+                  style={{
+                    width: '24%',
+                    textAlign: 'right',
+                    fontSize: 10,
+                  }}>
+                  {formatCurrency(fixRounding(v.vat, 2), {
+                    currency: currentCurrency?.code,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    roundingMode: 'floor',
+                    excludeCurrencySymbol: true,
+                    companyLang: selectedLng,
+                    currencySymbol: currentCurrency?.symbol,
+                  })}
+                </Text>
+              </View>
+            ))
+          )}
+        </View>
+
+        <View style={styles.tableRow}>
+          <Text style={{width: '44%'}} />
+          <Text
+            style={{
+              width: '32%',
+              color: '#212121',
+              ...boldFontStyle,
+              textAlign: 'right',
+              fontSize: 10,
+              paddingLeft: 25,
+            }}>
+            {`${translate('Total incl. VAT')} (${currentCurrency?.symbol})`}
+          </Text>
+          <Text
+            style={{
+              width: '24%',
+              textAlign: 'right',
+              color: '#212121',
+              ...boldFontStyle,
+              fontSize: 10,
+            }}>
+            {totalAmountInclVatsFormatted}
+          </Text>
+        </View>
+
+        {hasPreviousInvoices && previousInvoices.length > 1 && (
+          <InvoicedSection
+            translate={translate}
+            currentCurrency={currentCurrency}
+            previousInvoices={previousInvoices}
+            amount={amount}
+            currentInvoiceAmountPercentageVats={
+              currentInvoiceAmountPercentageVats
+            }
+          />
+        )}
+
+        {hasPayments && (
+          <PaymentHistorySection
+            translate={translate}
+            currentCurrency={currentCurrency}
+            previousInvoices={previousInvoices}
+            totalAmountInclVatsFormatted={totalAmountInclVatsFormatted}
+            outstandingAmountFormatted={outstandingAmountFormatted}
+            selectedLng={selectedLng}
+          />
+        )}
+      </View>
+    );
+  },
+);
+
+const FinalInvoicePdfTemplate = React.memo(
+  ({
+    translate,
+    userInfo,
+    logoSrc,
+    currentCurrency,
+    logoDimensions,
+    invoice,
+    selectedLng,
+    previousInvoices,
+  }: Props) => {
+    const articleItems = invoice?.items.map((item) => ({
+      ...item,
+      discount: getDiscoutObj(item?.additionalInfo?.discount),
+    }));
+
+    const subtotalExclVat = calculateTotalWithPerItemDiscount(articleItems);
+
+    const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
+      currency: currentCurrency?.code,
+    });
+
+    const subtotalExclVatAfterDiscount = applyDiscount({
+      actualValue: subtotalExclVat,
+      ...(invoice.additionalInfo.discount?.type === DiscountType.AMOUNT
+        ? {amount: invoice.additionalInfo.discount?.amount?.value ?? 0}
+        : {percentage: invoice.additionalInfo.discount?.percentage ?? 0}),
+    });
+
+    const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
+
+    const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
+      itemsAfterPerItemDiscount,
+      invoice.additionalInfo.discount,
+    );
+
+    const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
+      (item) =>
+        item.unitAmount.percentageVat ===
+        articleItems[0].unitAmount.percentageVat,
+    );
+
+    const percentageVats = itemsAfterGlobalDiscount.length
+      ? allItemsHasSameVAT
+        ? [
+            {
+              percentageVat:
+                itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
+              vat:
+                subtotalExclVatAfterDiscount *
+                (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
+            },
+          ]
+        : getAggregatedItemsVats(itemsAfterGlobalDiscount)
+      : [];
+
+    // Final/Upfront section calculations
+    const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
+    const discountAmount = discount?.amount;
+    const discountValue = discountAmount?.value ?? 0;
+
+    const netTotal = (articleItem: InvoiceItem) => {
+      const grossTotal =
+        (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
+      const itemDiscountValue =
+        articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
+
+      return (
+        (grossTotal - itemDiscountValue) /
+          10 ** articleItem.unitAmount.fractionDigits ?? 2
+      );
+    };
+
+    const allItemsHaveZeroDiscount = articleItems?.every(
+      (item) =>
+        item?.additionalInfo?.discount?.amount?.value === 0 ||
+        item?.additionalInfo?.discount?.percentage === 0,
+    );
+
+    const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
 
     const formattedPaymentValues = getFormattedPaymentValues(
       invoice?.additionalInfo.paymentTerm!,
@@ -1555,28 +1064,6 @@ const FinalInvoicePdfTemplate = React.memo(
     };
 
     const styles = getStyles(boldFontStyle, regularFontStyle);
-
-    const paidAmountInclVats = previousInvoices
-      ?.map((i) =>
-        i.payments.reduce(
-          (acc, p) =>
-            acc +
-            (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
-          0,
-        ),
-      )
-      .reduce((acc, a) => acc + a, 0);
-    const outstandingPayments = totalAmountInclVats - (paidAmountInclVats ?? 0);
-
-    const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
-      currency: currentCurrency?.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    });
 
     return (
       <Document>
@@ -1617,7 +1104,7 @@ const FinalInvoicePdfTemplate = React.memo(
                 <Text style={styles.contentBody}>{invoice?.description}</Text>
               )}
 
-              {invoice.additionalInfo.showArticleSection && (
+              {invoice?.additionalInfo.showArticleSection && (
                 <ArticleSection
                   invoice={invoice}
                   currentCurrency={currentCurrency}
@@ -1640,24 +1127,7 @@ const FinalInvoicePdfTemplate = React.memo(
                 invoice={invoice}
                 currentCurrency={currentCurrency}
                 previousInvoices={previousInvoices}
-              />
-              <InvoicedSection
-                translate={translate}
-                currentCurrency={currentCurrency}
-                previousInvoices={previousInvoices}
-                amount={amount}
-                currentInvoiceAmountPercentageVats={
-                  currentInvoiceAmountPercentageVats
-                }
-              />
-
-              <PaymentHistorySection
-                translate={translate}
-                currentCurrency={currentCurrency}
-                previousInvoices={previousInvoices}
-                totalAmountInclVatsFormatted={totalAmountInclVatsFormatted}
-                outstandingAmountFormatted={outstandingAmountFormatted}
-                selectedLng={selectedLng}
+                articleItems={articleItems}
               />
 
               {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
