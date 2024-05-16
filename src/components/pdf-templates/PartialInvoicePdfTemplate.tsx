@@ -919,8 +919,11 @@ const UpfrontPaymentSection = React.memo(
 
     const amount =
       invoice?.additionalInfo.payment?.type === PaymentType.LUMP_SUM
-        ? aggregatedAmountToMoney(invoice?.additionalInfo.payment?.amount)
-            .value ?? 0
+        ? centsToMoney(
+            currentCurrency?.code!,
+            aggregatedAmountToMoney(invoice.additionalInfo.payment?.amount)
+              .value,
+          ) ?? 0
         : invoice?.additionalInfo.payment?.type === PaymentType.PERCENTAGE
         ? (subtotalExclVat *
             (invoice?.additionalInfo.payment?.percentage ?? 0)) /
