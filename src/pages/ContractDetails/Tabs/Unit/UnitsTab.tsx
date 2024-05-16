@@ -292,6 +292,11 @@ export const UnitsTab: FC<Props> = ({
         }}
         illustration="clipboard"
         size="tiny"
+        btnSize="medium"
+        showActionBtn
+        actionButtonIcon={<AddIcon />}
+        btnAction={() => setOpenSelectUnitModal(true)}
+        btnLabel="Add Unit"
       />
     );
   }
