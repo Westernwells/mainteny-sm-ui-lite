@@ -672,8 +672,8 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                             type: 'string',
                           },
                           {
-                            label: 'ASSISTANCE',
-                            value: 'ASSISTANCE',
+                            label: 'ASSISTANT',
+                            value: 'ASSISTANT',
                             type: 'string',
                           },
                           {
