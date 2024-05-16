@@ -260,7 +260,7 @@ export const CustomerOverviewTab = ({
             openTab={() => getCurrentTabIndex && getCurrentTabIndex(2)}
           />
         </Grid>
-        <Grid>
+        <Grid item xs={12}>
           <ContactsWidget
             refId={customerId!}
             refType={ContactPersonAssociationType.PROPERTY_OWNER}
