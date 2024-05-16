@@ -1,5 +1,6 @@
 import {useCallback} from 'react';
 import {UseQueryResult, useQuery} from 'react-query';
+import heic2any from 'heic2any';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
@@ -33,8 +34,36 @@ export const useDownloadUrl = (
     fetchId = companyId;
   }
 
-  const fetchBatchDownloadUrls = async (batch: string[]) =>
-    fetchDownloadUrl(batch, fetchId!);
+  const fetchBatchDownloadUrls = async (batch: string[]) => {
+    const downloadUrls = await fetchDownloadUrl(batch, fetchId!);
+
+    const conversionPromises = Object.keys(downloadUrls).map(async (file) => {
+      const extension = file.split('.').pop()?.toLowerCase();
+      if (extension === 'heic') {
+        try {
+          const res = await fetch(downloadUrls[file]);
+          const blob = await res.blob();
+          const conversionResult = await heic2any({
+            blob,
+            toType: 'image/jpeg',
+          });
+
+          const url = URL.createObjectURL(
+            Array.isArray(conversionResult)
+              ? new Blob(conversionResult, {type: 'image/jpeg'})
+              : conversionResult,
+          );
+          downloadUrls[file] = url;
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    });
+
+    await Promise.all(conversionPromises);
+
+    return downloadUrls;
+  };
 
   const batchSize = 5;
   const batches = Array.from(

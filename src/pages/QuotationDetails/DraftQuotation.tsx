@@ -300,11 +300,10 @@ export const DraftQuotation = ({
         row.paymentTerm ? getFormattedPaymentTerms(row.paymentTerm) : '',
       );
     }
+    formik.setFieldValue('propertyOwnerId', row.id);
     const quotationCustomer = quotation?.elevator?.propertyOwner;
     if (row.id !== quotationCustomer?.id) {
       const emptyAddressState = {fullName: null};
-      formik.setFieldValue('propertyOwnerId', row.id);
-
       if (formType === 'edit' && customer) {
         formik.setFieldValue(
           'billingAddress',

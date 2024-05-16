@@ -78,11 +78,11 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
           description: item.description,
           price: `${formatCurrency(
             item
-              ? item.unitSellingAmount.netAmount /
-                  10 ** item.unitSellingAmount.fractionDigits!
+              ? (item.unitPurchaseAmount?.netAmount ?? 0) /
+                  10 ** (item.unitPurchaseAmount?.fractionDigits ?? 2)
               : 0,
             {
-              currency: item.unitSellingAmount.currency,
+              currency: item.unitPurchaseAmount?.currency,
             },
           )}`,
           article: item,

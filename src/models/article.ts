@@ -207,6 +207,7 @@ export interface ArticleOrderItemRecord {
   unit: string;
   description: string;
   unitSellingAmount: Amount;
+  unitPurchaseAmount?: Amount;
 }
 
 export interface CreateArticleOrderRecord {
