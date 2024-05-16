@@ -137,6 +137,7 @@ const ContactFormDialog = ({
       isSaving={isCreating}
       onCancel={() => {
         setOpenDialog(false);
+        resetForm();
       }}
       onSave={handleSubmit(handleContactFormSubmit)}
       dialogProps={{
