@@ -2523,5 +2523,13 @@
   "Add a connection by clicking the button bellow.": "Dodajte vezu klikom na dugme ispod",
   "Contact Notes": "Kontakt beleške",
   "Remove Discount": "Ukloni popust",
-  "Sum": "Iznos"
+  "Sum": "Iznos",
+  "Portion": "Porcija",
+  "Amount": "Iznos",
+  "Article name": "Naziv članka",
+  "You are about to disconnect contact from this {{refType}}.": "Upravo ćete prekinuti vezu između kontakta i ovog {{refTipe}}.",
+  "Assistant": "Asistent",
+  "No Contact Persons": "Nema kontakt osobe",
+  "Do you want to add someone?": "Da li želite da dodate nekoga?",
+  "New Contact person": "Novi kontakt"
 }
