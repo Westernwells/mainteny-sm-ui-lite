@@ -9,6 +9,8 @@ export const useServiceOrderStatusColor = () => {
     COMPLETED: theme.palette.success.main,
     CANCELLED: theme.palette.action.active,
     EXPIRED: theme.palette.error.main,
+    OVERDUE: theme.palette.error.main,
+    READY_TO_SCHEDULE: theme.palette.warning.main,
   });
 
   return [serviceOrderTypeColor];

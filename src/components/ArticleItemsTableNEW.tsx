@@ -14,10 +14,8 @@ import {
   TableRow,
   TextField,
   tableCellClasses,
-  IconButton,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
 import {
   applyDiscount,
   applyGlobalDiscountOnItems,
@@ -77,6 +75,10 @@ export const ArticleItemsTableNEW = ({
       ? {amount: formik.values.discount?.amount?.value ?? 0}
       : {percentage: formik.values.discount?.percentage ?? 0}),
   });
+  const subtotalExclVatAfterDiscountFormatted = formatCurrency(
+    subtotalExclVatAfterDiscount,
+    {currency: currentCurrency.code},
+  );
   const {company} = useContext(UserCompanyContext);
   const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(items);
 
@@ -357,17 +359,16 @@ export const ArticleItemsTableNEW = ({
                   alignItems: 'center',
                   gap: 2,
                 }}>
-                <Typography variant="body2" color="text.secondary">
-                  {t('Subtotal (excl. VAT)')}
-                </Typography>
-
-                <Typography variant="body2" color="primary.dark">
-                  {subtotalExclVatFormatted}
-                </Typography>
                 {formik.values.discount?.type === DiscountType.AMOUNT ||
                 formik.values.discount?.type === DiscountType.PERCENTAGE ? (
                   <>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {t('Sum')}
+                    </Typography>
+                    <Typography variant="subtitle2" color="primary.dark">
+                      {subtotalExclVatFormatted}
+                    </Typography>
+                    <Typography variant="subtitle2" color="text.secondary">
                       {discountText}
                     </Typography>
                     <Box display="flex" alignItems="center" gap={1}>
@@ -441,12 +442,21 @@ export const ArticleItemsTableNEW = ({
                         }}
                         onValueChange={handleDiscountValueChange}
                       />
-                      <IconButton
-                        onClick={handleRemoveDiscount}
-                        sx={{p: '0px', mr: -3.1, color: 'text.disabled'}}>
-                        <CloseIcon />
-                      </IconButton>
                     </Box>
+                    <Box />
+                    <Button
+                      label="Remove Discount"
+                      buttonProps={{
+                        variant: 'text',
+                        size: 'small',
+                        onClick: handleRemoveDiscount,
+                        sx: {
+                          color: 'error.main',
+                          fontWeight: 400,
+                          p: 0,
+                        },
+                      }}
+                    />
                   </>
                 ) : (
                   <>
@@ -463,12 +473,18 @@ export const ArticleItemsTableNEW = ({
                     />
                   </>
                 )}
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('Subtotal (excl. VAT)')}
+                </Typography>
+                <Typography variant="subtitle2" color="primary.dark">
+                  {subtotalExclVatAfterDiscountFormatted}
+                </Typography>
                 {allItemsHasSameVAT ? (
                   <>
-                    <Typography color="primary.dark">
+                    <Typography color="text.primary">
                       {t('VAT')} {percentageVats[0].percentageVat}%
                     </Typography>
-                    <Typography color="primary.dark">
+                    <Typography color="text.primary">
                       {formatCurrency(totalVAT, {
                         currency: currentCurrency.code,
                       })}
@@ -477,10 +493,10 @@ export const ArticleItemsTableNEW = ({
                 ) : (
                   percentageVats.map((v, index) => (
                     <React.Fragment key={`${index}-${v.percentageVat}`}>
-                      <Typography color="primary.dark">
+                      <Typography color="text.primary">
                         {t('VAT')} {v.percentageVat}%
                       </Typography>
-                      <Typography color="primary.dark">
+                      <Typography color="text.primary">
                         {formatCurrency(fixRounding(v.vat, 2), {
                           currency: currentCurrency.code,
                           minimumFractionDigits: 2,
@@ -491,10 +507,16 @@ export const ArticleItemsTableNEW = ({
                     </React.Fragment>
                   ))
                 )}
-                <Typography color="primary.dark">
+                <Typography
+                  variant="subtitle1"
+                  color="primary.dark"
+                  fontWeight={600}>
                   {t('Total amount (incl. VAT)')}
                 </Typography>
-                <Typography color="primary.dark">
+                <Typography
+                  variant="subtitle1"
+                  color="primary.dark"
+                  fontWeight={600}>
                   {formatCurrency(total, {
                     currency: currentCurrency.code,
                   })}
