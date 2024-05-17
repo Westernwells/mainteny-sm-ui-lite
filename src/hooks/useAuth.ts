@@ -106,6 +106,7 @@ export const useAuth = (): UseAuth => {
       );
       if (result.status === 200) {
         clearUser();
+        axiosClient.defaults.headers.common.Authorization = '';
         if (adminUser) {
           axiosClient.defaults.headers.common.Authorization = `Bearer ${adminUser.token}`;
           updateUser(adminUser);
