@@ -35,6 +35,7 @@ import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
 import {EditCustomer} from './EditCustomer';
 import PaymentTermsWidget from './PaymentTermsWidget';
+import {ContactsWidget as CustomerPortalWidget} from './ContactsWidget';
 
 interface Props {
   customerId?: string;
@@ -259,6 +260,9 @@ export const CustomerOverviewTab = ({
             customerId={customerId}
             openTab={() => getCurrentTabIndex && getCurrentTabIndex(2)}
           />
+        </Grid>
+        <Grid item xs={12}>
+          <CustomerPortalWidget customerId={customerId!} />
         </Grid>
         <Grid item xs={12}>
           <ContactsWidget
