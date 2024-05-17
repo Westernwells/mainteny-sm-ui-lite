@@ -2505,5 +2505,7 @@
   "Amount": "Betrag",
   "Article name": "Artikelname",
   "You are about to disconnect contact from this {{refType}}.": "Sie sind dabei, die Verbindung zu diesem {{refType}} zu trennen.",
-  "Assistant": "Assistent"
+  "Assistant": "Assistent",
+  "No Contact Persons": "Keine Kontaktpersonen",
+  "Do you want to add someone?": "Möchten Sie jemanden hinzufügen?"
 }
