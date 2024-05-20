@@ -242,26 +242,52 @@ export const handleKeyDown = (
   event: KeyboardEvent<HTMLDivElement>,
   editor: CustomEditor,
 ) => {
-  if (event.key === 'Enter') {
-    const {selection} = editor;
+  const {selection} = editor;
 
-    if (!selection || Range.isExpanded(selection)) {
-      return;
-    }
+  if (!selection || Range.isExpanded(selection)) {
+    return;
+  }
 
-    const [node] = Editor.node(editor, selection, {depth: 1}) as [
-      BaseElement,
-      Path,
-    ];
+  const [node] = Editor.node(editor, selection, {depth: 1}) as [
+    BaseElement,
+    Path,
+  ];
 
-    switch (node.type) {
-      case 'numbered-list':
-      case 'bulleted-list':
+  switch (event.key) {
+    case 'Enter':
+      if (
+        node.type === FORMAT['numbered-list'] ||
+        node.type === FORMAT['bulleted-list']
+      ) {
         return handleEnterOnListItem(editor, event, node);
+      }
+      break;
+    case ' ': {
+      const {anchor} = selection;
+      const start = Editor.start(editor, anchor.path);
+      const range = {anchor, focus: start};
+      const text = Editor.string(editor, range);
 
-      default:
-        break;
+      // Check for list shortcuts
+      if (text === '-') {
+        // Create bulleted list
+        event.preventDefault();
+        Transforms.delete(editor, {
+          at: range,
+        });
+        toggleBlock(editor, FORMAT['bulleted-list']);
+      } else if (text === '1.') {
+        // Create ordered list
+        event.preventDefault();
+        Transforms.delete(editor, {
+          at: range,
+        });
+        toggleBlock(editor, FORMAT['numbered-list']);
+      }
+      break;
     }
+    default:
+      break;
   }
 };
 
