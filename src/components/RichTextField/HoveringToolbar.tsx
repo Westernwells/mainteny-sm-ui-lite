@@ -1,5 +1,6 @@
 import {ReactNode, useRef, useEffect, MouseEvent, useState} from 'react';
 import ReactDOM from 'react-dom';
+import {useTranslation} from 'react-i18next';
 import {useSlate, useFocused} from 'slate-react';
 import {Editor, Range} from 'slate';
 import {css} from '@emotion/css';
@@ -51,6 +52,7 @@ const Portal = ({children}: {children?: ReactNode}) =>
     : null;
 
 export const HoveringToolbar = () => {
+  const {t} = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
   const editor = useSlate();
   const inFocus = useFocused();
@@ -159,7 +161,7 @@ export const HoveringToolbar = () => {
           renderValue={(value: string) => (
             <Box display="flex" alignItems="center" gap={1}>
               <TextFields sx={{color: 'white'}} />
-              <Typography>{value}</Typography>
+              <Typography>{t(value)}</Typography>
             </Box>
           )}>
           {[
@@ -168,7 +170,7 @@ export const HoveringToolbar = () => {
             {value: FONT_SIZE.LARGE, label: 'Large'},
           ].map((i) => (
             <MenuItem value={i.value} key={i.value}>
-              {i.label}
+              {t(i.label)}
             </MenuItem>
           ))}
         </Select>
