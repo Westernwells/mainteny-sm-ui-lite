@@ -11,6 +11,14 @@ export enum FONT_SIZE {
 
 export const DEFAULT_FONT_SIZE = FONT_SIZE.NORMAL;
 
+export enum HTML_PDF_FONT_SIZE {
+  SMALL = '9px',
+  NORMAL = '11px',
+  LARGE = '13px',
+}
+
+export const DEFAULT_HTML_PDF_FONT_SIZE = HTML_PDF_FONT_SIZE.NORMAL;
+
 export enum FORMAT {
   'left' = 'left',
   'center' = 'center',
@@ -60,12 +68,18 @@ export const TEXT_TAGS: Record<
   STRONG: () => ({bold: true}),
   EM: () => ({italic: true}),
   U: () => ({underlined: true}),
-  DIV: (el: HTMLElement) => ({
-    fontSize: el.style?.fontSize ? el.style?.fontSize : DEFAULT_FONT_SIZE,
-  }),
-  SPAN: (el: HTMLElement) => ({
-    fontSize: el.style?.fontSize ? el.style?.fontSize : DEFAULT_FONT_SIZE,
-  }),
+  DIV: (el: HTMLElement) =>
+    el.style?.fontSize
+      ? {
+          fontSize: el.style?.fontSize,
+        }
+      : {},
+  SPAN: (el: HTMLElement) =>
+    el.style?.fontSize
+      ? {
+          fontSize: el.style.fontSize,
+        }
+      : {},
 };
 
 export interface BaseText {

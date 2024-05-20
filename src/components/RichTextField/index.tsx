@@ -20,7 +20,6 @@ import {HistoryEditor, withHistory} from 'slate-history';
 import {theme} from 'theme';
 import {debounce} from 'lodash';
 import {
-  DEFAULT_FONT_SIZE,
   FONT_SIZE,
   RenderElementProps,
   RenderLeafProps,
@@ -122,21 +121,20 @@ const Leaf = ({attributes, children, leaf}: RenderLeafProps) => {
     children = <u>{children}</u>;
   }
 
-  const style = {
-    fontSize: DEFAULT_FONT_SIZE,
-  };
-
   if (leaf.fontSize) {
-    style.fontSize = String(leaf.fontSize).endsWith('px')
-      ? leaf.fontSize
-      : (`${String(leaf.fontSize)}px` as FONT_SIZE);
+    const style = {
+      fontSize: String(leaf.fontSize).endsWith('px')
+        ? leaf.fontSize
+        : (`${String(leaf.fontSize)}px` as FONT_SIZE),
+    };
+    return (
+      <span style={style} {...attributes}>
+        {children}
+      </span>
+    );
   }
 
-  return (
-    <span style={style} {...attributes}>
-      {children}
-    </span>
-  );
+  return <span {...attributes}>{children}</span>;
 };
 
 const styles: Record<string, CSSProperties> = {
@@ -178,13 +176,14 @@ const RichTextField = ({
     editorRef.current = withHistory(withReact(createEditor()));
   const editor = editorRef.current;
 
-  const initialValue: Descendant[] = [
-    {
-      type: 'paragraph',
-      children: [{text: ''}],
-    },
-  ];
   const getValue = (htmlString: string) => {
+    const initialValue: Descendant[] = [
+      {
+        type: 'paragraph',
+        children: [{text: ''}],
+      },
+    ];
+
     if (!htmlString) return initialValue;
     // check if htmlString is plain string
     const isPlainString = !/<[^>]+>/.test(htmlString);

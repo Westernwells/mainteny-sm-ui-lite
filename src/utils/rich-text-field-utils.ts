@@ -20,6 +20,7 @@ import {
   FONT_SIZE,
   FORMAT,
   GROUP_TYPES,
+  HTML_PDF_FONT_SIZE,
   Marks,
   NodeType,
   TEXT_TAGS,
@@ -101,7 +102,22 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
   }
 };
 
+const getStyleString = (style: Record<string, string> | {}) =>
+  Object.entries(style).reduce((s, [key, value]) => {
+    let newValue = value;
+    if (key === 'font-size' && !newValue.endsWith('px')) {
+      newValue += 'px';
+    }
+    return `${s}${key}: ${newValue};`;
+  }, '');
+
 export const serialize = (node: Descendant): string => {
+  const style = node.fontSize
+    ? {
+        'font-size': node.fontSize,
+      }
+    : {};
+
   if (Text.isText(node)) {
     let string = escapeHtml(node.text);
     if (node.bold) {
@@ -113,19 +129,11 @@ export const serialize = (node: Descendant): string => {
     if (node.underlined) {
       string = `<u>${string}</u>`;
     }
-    const style = {
-      'font-size': DEFAULT_FONT_SIZE,
-    };
+
     if (node.fontSize) {
-      style['font-size'] = String(node.fontSize).endsWith('px')
-        ? node.fontSize
-        : (`${String(node.fontSize)}px` as FONT_SIZE);
+      return `<span style="${getStyleString(style)}">${string}</span>`;
     }
-    const styleString = Object.entries(style).reduce(
-      (s, [key, value]) => `${s}${key}: ${value};`,
-      '',
-    );
-    return `<span style="${styleString}">${string}</span>`;
+    return string;
   }
 
   const children = node.children.map((n) => serialize(n)).join('');
@@ -137,8 +145,11 @@ export const serialize = (node: Descendant): string => {
       return `<ol>${children}</ol>`;
     case 'bulleted-list':
       return `<ul>${children}</ul>`;
-    case 'list-item':
-      return `<li>${children}</li>`;
+    case 'list-item': {
+      return node.fontSize
+        ? `<li style="${getStyleString(style)}">${children}</li>`
+        : `<li>${children}</li>`;
+    }
     case 'left':
       return `<div style="text-align: left;">${children}</div>`;
     case 'center':
@@ -158,7 +169,7 @@ export const deserialize = (el: HTMLElement) => {
     return null;
   }
   if (el.nodeName === 'BR') {
-    return '\n';
+    return jsx('element', {type: 'paragraph'}, [{text: ''}]);
   }
 
   let children: (string | Descendant | null)[] = Array.from(el.childNodes)
@@ -252,4 +263,28 @@ export const handleKeyDown = (
         break;
     }
   }
+};
+
+export const modifyHTMLFontSizeForPDFRendering = (html: string) => {
+  // Parse the HTML string
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // Select all elements with inline style containing font-size
+  const elements = doc.querySelectorAll('[style*="font-size"]');
+
+  // Loop through each element and set standard font sizes
+  elements.forEach((element) => {
+    const htmlElement = element as HTMLElement;
+    const currentFontSize = htmlElement.style.fontSize;
+    htmlElement.style.fontSize =
+      currentFontSize === FONT_SIZE.SMALL
+        ? HTML_PDF_FONT_SIZE.SMALL
+        : currentFontSize === FONT_SIZE.LARGE
+        ? HTML_PDF_FONT_SIZE.LARGE
+        : HTML_PDF_FONT_SIZE.NORMAL;
+  });
+
+  // Serialize the modified DOM back to HTML string
+  return doc.documentElement.outerHTML;
 };
