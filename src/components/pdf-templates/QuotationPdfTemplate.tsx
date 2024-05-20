@@ -16,6 +16,7 @@ import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
+import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType} from 'models/invoice';
 import {fixRounding, formatAddressFullname} from 'utils/utils';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
@@ -29,19 +30,23 @@ import {
 import {calculateSameVatTotals} from 'utils/calculate-total';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
+import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
+import MontserratBoldItalic from '../../assets/fonts/Montserrat/Montserrat-BoldItalic.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 
 Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
   family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
+  fonts: [
+    {src: MontserratRegular},
+    {src: MontserratBold, fontWeight: 'bold'},
+    {src: MontserratItalic, fontStyle: 'italic'},
+    {
+      src: MontserratBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
 });
 Font.register({
   family: 'NotoSans-Regular',
@@ -117,13 +122,6 @@ const getStyles = (
       color: '#212121',
       ...boldFontStyle,
       marginBottom: 10,
-    },
-    contentBody: {
-      color: '#616161',
-      fontSize: 10,
-      marginVertical: 15,
-      lineHeight: 1.3,
-      maxWidth: '100%',
     },
     notesSection: {
       marginTop: 1,
@@ -417,8 +415,15 @@ const QuotationPdfTemplate = React.memo(
                 {translate('Quotation')} {quotation?.externalId}
               </Text>
 
-              {serviceOrder?.description.trim() !== '' && (
-                <Text style={styles.contentBody}>{quotation?.description}</Text>
+              {quotation?.description.trim() !== '' && (
+                <HtmlPDF
+                  html={quotation?.description || ''}
+                  selectedLng={selectedLng}
+                  rootStyle={{
+                    marginTop: 6,
+                    marginBottom: 16,
+                  }}
+                />
               )}
 
               <View style={styles.table}>
