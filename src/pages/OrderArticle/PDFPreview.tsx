@@ -34,6 +34,13 @@ const PdfPreview = ({blobUrl}: Props) => {
               height: '100% !important',
               overflowY: 'hidden',
             },
+            '& .react-pdf__Page.prevPage': {
+              position: 'absolute !important',
+              zIndex: 1,
+            },
+            '& .react-pdf__Document': {
+              minHeight: '1300px',
+            },
             '&::-webkit-scrollbar': {
               width: '0.25em',
             },
