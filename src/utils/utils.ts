@@ -1,8 +1,6 @@
 import {formatISO} from 'date-fns';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import lodash from 'lodash';
-import {ArticleType} from 'models/article';
-import {InvoiceItem} from 'models/invoice';
 import useHighlightText from '../hooks/useHighlightText';
 import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
 
@@ -521,20 +519,3 @@ export const formatCostText = (
   }
   return inputString;
 };
-
-export const calculateLaborMaterialCost = (
-  articleItems: InvoiceItem[],
-  type: ArticleType,
-) =>
-  articleItems
-    ?.filter((item) => item.article?.type === type)
-    ?.reduce((itemTotal, item) => {
-      const netAmount = item?.unitAmount?.netAmount ?? 0;
-      const fractionDigits = item?.unitAmount?.fractionDigits ?? 2;
-      const quantity = item?.quantity ?? 1;
-      const itemDiscountValue =
-        item?.additionalInfo?.discount?.amount?.value ?? 0;
-      const netTotal = netAmount * quantity;
-
-      return itemTotal + (netTotal - itemDiscountValue) / 10 ** fractionDigits;
-    }, 0);

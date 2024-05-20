@@ -26,18 +26,8 @@ import {
   InvoiceView,
   PaymentType,
 } from 'models/invoice';
-import {
-  calculateLaborMaterialCost,
-  fixRounding,
-  formatCostText,
-} from 'utils/utils';
-import {
-  applyGlobalDiscountOnQuotationItems,
-  applyPerItemDiscountOnQuotationItems,
-  applyQuotationDiscount,
-  getDiscoutObj,
-  getQuotationAggregatedItemsVats,
-} from 'pages/QuotationDetails/utils';
+import {fixRounding, formatCostText} from 'utils/utils';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
   calculateSameVatTotals,
   calculateTotalAmountInclVats,
@@ -50,8 +40,12 @@ import {
 import {ArticleType} from 'models/article';
 import {
   applyDiscount,
+  applyGlobalDiscountOnItems,
+  applyPerItemDiscountOnItems,
+  getAggregatedItemsVats,
   getAggregatedPartialPaymentsVats,
 } from 'pages/InvoiceDetails/utils';
+import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -199,26 +193,6 @@ const getStyles = (
       letterSpacing: -0.15,
       marginTop: 2,
       lineHeight: 1.5,
-    },
-    signatureBox: {
-      display: 'flex',
-      flexDirection: 'column',
-      border: '1px solid #E4E9F2',
-      borderRadius: '8px',
-      marginTop: 5,
-      maxWidth: 270,
-      height: 50,
-      textAlign: 'center',
-      justifyContent: 'space-around',
-      position: 'relative',
-    },
-    signatureText: {
-      position: 'absolute',
-      bottom: -5,
-      left: '16%',
-      backgroundColor: 'white',
-      padding: 1,
-      ...boldFontStyle,
     },
   });
 
@@ -431,6 +405,7 @@ export const PaymentHistorySection = React.memo(
                 marginBottom: 10,
                 borderTopWidth: 1,
                 borderTopColor: '#212121',
+                paddingTop: 8,
               }}>
               <Text style={{width: '60%', textAlign: 'left', ...boldFontStyle}}>
                 {translate('Outstanding payments')}
@@ -1017,6 +992,9 @@ const UpfrontPaymentSection = React.memo(
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
       roundingMode: 'floor',
+      excludeCurrencySymbol: true,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
     });
 
     const hasPayments =
@@ -1290,7 +1268,7 @@ const UpfrontPaymentSection = React.memo(
   },
 );
 
-const PartialPaymentSection = React.memo(
+export const PartialPaymentSection = React.memo(
   ({
     translate,
     currentCurrency,
@@ -1319,8 +1297,11 @@ const PartialPaymentSection = React.memo(
 
     const amount =
       invoice?.additionalInfo.payment?.type === PaymentType.LUMP_SUM
-        ? aggregatedAmountToMoney(invoice?.additionalInfo.payment?.amount)
-            .value ?? 0
+        ? centsToMoney(
+            currentCurrency?.code!,
+            aggregatedAmountToMoney(invoice.additionalInfo.payment?.amount)
+              .value,
+          ) ?? 0
         : invoice?.additionalInfo.payment?.type === PaymentType.PERCENTAGE
         ? (subtotalExclVat *
             (invoice?.additionalInfo.payment?.percentage ?? 0)) /
@@ -1340,8 +1321,7 @@ const PartialPaymentSection = React.memo(
     const totalAmountExclVat =
       amount +
       previousInvoicesTotalExclVat -
-      (invoice?.totalAmount?.netAmount ?? 0) /
-        10 ** (invoice?.totalAmount?.fractionDigits ?? 2);
+      centsToMoney(currentCurrency?.code!, invoice?.totalAmount?.netAmount);
 
     const totalAmountExclVatFormatted = formatCurrency(
       fixRounding(totalAmountExclVat, 2),
@@ -1381,7 +1361,8 @@ const PartialPaymentSection = React.memo(
             {
               percentageVat: articleItems![0].unitAmount.percentageVat,
               vat:
-                amount * (articleItems![0].unitAmount.percentageVat ?? 0 / 100),
+                (amount * (articleItems![0].unitAmount.percentageVat ?? 0)) /
+                100,
             },
           ]
         : getAggregatedPartialPaymentsVats(articleItems!, amount)
@@ -1764,17 +1745,16 @@ const PartialInvoicePdfTemplate = React.memo(
       },
     );
 
-    const subtotalExclVatAfterDiscount = applyQuotationDiscount({
+    const subtotalExclVatAfterDiscount = applyDiscount({
       actualValue: subtotalExclVat,
       ...(discountType === DiscountType.AMOUNT
         ? {amount: discountValue ?? 0}
         : {percentage: discountPercentage ?? 0}),
     });
 
-    const itemsAfterPerItemDiscount =
-      applyPerItemDiscountOnQuotationItems(articleItems);
+    const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
 
-    const itemsAfterGlobalDiscount = applyGlobalDiscountOnQuotationItems(
+    const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
       itemsAfterPerItemDiscount,
       discount,
     );
@@ -1796,7 +1776,7 @@ const PartialInvoicePdfTemplate = React.memo(
                 (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
             },
           ]
-        : getQuotationAggregatedItemsVats(itemsAfterGlobalDiscount)
+        : getAggregatedItemsVats(itemsAfterGlobalDiscount)
       : [];
 
     const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
@@ -1813,14 +1793,15 @@ const PartialInvoicePdfTemplate = React.memo(
       total,
     );
 
-    const laborCost = calculateLaborMaterialCost(
-      articleItems,
+    const laborCost = useCalculateLaborMaterialCost(
+      itemsAfterGlobalDiscount,
       ArticleType.LABOR,
+      currentCurrency,
     );
-
-    const materialCost = calculateLaborMaterialCost(
-      articleItems,
+    const materialCost = useCalculateLaborMaterialCost(
+      itemsAfterGlobalDiscount,
       ArticleType.MATERIAL,
+      currentCurrency,
     );
 
     const boldFontStyle = {

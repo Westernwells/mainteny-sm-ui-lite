@@ -14,11 +14,7 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
-import {
-  calculateLaborMaterialCost,
-  fixRounding,
-  formatCostText,
-} from 'utils/utils';
+import {fixRounding, formatCostText} from 'utils/utils';
 import {
   applyGlobalDiscountOnQuotationItems,
   applyPerItemDiscountOnQuotationItems,
@@ -35,6 +31,7 @@ import {
   replacePaymentTermsPlaceholders,
 } from 'utils/invoice';
 import {ArticleType} from 'models/article';
+import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -285,14 +282,15 @@ const CreditNotePdfTemplate = React.memo(
       selectedLng,
     );
 
-    const laborCost = calculateLaborMaterialCost(
-      articleItems,
+    const laborCost = useCalculateLaborMaterialCost(
+      itemsAfterGlobalDiscount,
       ArticleType.LABOR,
+      currentCurrency,
     );
-
-    const materialCost = calculateLaborMaterialCost(
-      articleItems,
+    const materialCost = useCalculateLaborMaterialCost(
+      itemsAfterGlobalDiscount,
       ArticleType.MATERIAL,
+      currentCurrency,
     );
 
     const boldFontStyle = {
@@ -463,9 +461,10 @@ const CreditNotePdfTemplate = React.memo(
                                 color: '#212121',
                               }}>
                               {formatCurrency(
-                                (articleItem?.unitAmount?.netAmount ?? 0) /
-                                  10 ** articleItem.unitAmount.fractionDigits ??
-                                  0,
+                                centsToMoney(
+                                  currentCurrency?.code!,
+                                  articleItem?.unitAmount?.netAmount,
+                                ),
                                 {
                                   currency: currentCurrency?.code,
                                   excludeCurrencySymbol: true,
