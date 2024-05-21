@@ -22,7 +22,7 @@ export interface QueryProps {
 interface Props<T>
   extends Partial<
     Omit<
-      AutocompleteProps<T, false, false, false, 'div'>,
+      AutocompleteProps<T, false, false, true, 'div'>,
       'renderInput' | 'loading' | 'options'
     >
   > {
@@ -68,18 +68,16 @@ const AsyncSelect = <T,>({
     let mounted = true;
 
     if (open && mounted) {
-      (async () => {
-        await getOptions(query);
-      })();
+      getOptions(query);
     }
     return () => {
       mounted = false;
     };
-  }, [open, query, getOptions]);
+  }, [open, query]);
 
-  const debouncedChangeHandler = _.debounce(
-    (searchText: string) => setQuery(searchText),
-    400,
+  const debouncedChangeHandler = useCallback(
+    _.debounce((searchText: string) => setQuery(searchText), 400),
+    [],
   );
 
   const onInputChange = (searchText: string) => {
@@ -95,8 +93,11 @@ const AsyncSelect = <T,>({
         const {onChange, value: fieldValue} = field;
 
         return (
-          <Autocomplete<T>
+          <Autocomplete<T, false, false, true, 'div'>
             disablePortal
+            autoComplete
+            filterSelectedOptions
+            includeInputInList
             size="small"
             id="asynchronous-demo"
             sx={{width: '100%'}}
@@ -113,6 +114,7 @@ const AsyncSelect = <T,>({
             getOptionLabel={(option) => _.get(option, labelKey) as string}
             loading={loading}
             options={options}
+            filterOptions={(x) => x}
             {...props}
             value={
               fieldValue
@@ -120,7 +122,7 @@ const AsyncSelect = <T,>({
                 : null
             }
             inputValue={inputValue}
-            onChange={(event: any, newValue, reason) => {
+            onChange={(event, newValue, reason, details) => {
               if (control) {
                 if (reason === 'clear') {
                   onChange(null);
@@ -132,11 +134,7 @@ const AsyncSelect = <T,>({
                   setInputValue(_.get(newValue, labelKey) as string);
                 }
               }
-              props?.onChange?.(
-                event,
-                _.get(newValue, valueKey) || null,
-                reason,
-              );
+              props?.onChange?.(event, details?.option as unknown as T, reason);
             }}
             onInputChange={(event, newInputValue, reason) => {
               if (

@@ -98,16 +98,28 @@ export const useAuth = (): UseAuth => {
     authRequest('/user', email, password);
   };
 
-  const signout = (): void => {
-    clearUser();
-    if (adminUser) {
-      axiosClient.defaults.headers.common.Authorization = `Bearer ${adminUser.token}`;
-      updateUser(adminUser);
-      clearStoredAdmin();
-      navigate('/admin/companies', {replace: true});
-      return;
+  const signout = async (): Promise<void> => {
+    try {
+      const result = await axiosClient.post<UserSession>(
+        '/api/sessions/logout',
+        {},
+      );
+      if (result.status === 200) {
+        clearUser();
+        axiosClient.defaults.headers.common.Authorization = '';
+        if (adminUser) {
+          axiosClient.defaults.headers.common.Authorization = `Bearer ${adminUser.token}`;
+          updateUser(adminUser);
+          clearStoredAdmin();
+          navigate('/admin/companies', {replace: true});
+          return;
+        }
+        navigate('/login', {replace: true}); // This resets the location state
+      }
+    } catch (err) {
+      showError(err);
+      console.log(err);
     }
-    navigate('/login', {replace: true}); // This resets the location state
   };
 
   // Return the user object and auth methods

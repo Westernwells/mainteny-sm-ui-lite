@@ -13,6 +13,8 @@ import {ServiceOrderView} from 'models/service-order';
 import {InfoCard} from 'components/InfoCard';
 import {useTranslation} from 'react-i18next';
 import {useEffect} from 'react';
+import ContactsWidget from 'pages/Contacts/ContactsWidget';
+import {ContactPersonAssociationType} from 'models/contacts';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
@@ -99,6 +101,12 @@ export const Overview = ({serviceOrder}: Props) => {
           </Box>
           <Box mt="1em" flexGrow={1}>
             <Attachment order={serviceOrder} />
+          </Box>
+          <Box mt="1em" flexGrow={1}>
+            <ContactsWidget
+              refId={serviceOrder?.id}
+              refType={ContactPersonAssociationType.SERVICE_ORDER}
+            />
           </Box>
         </Box>
       </Grid>
