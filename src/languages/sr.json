@@ -2531,5 +2531,8 @@
   "Assistant": "Asistent",
   "No Contact Persons": "Nema kontakt osobe",
   "Do you want to add someone?": "Da li želite da dodate nekoga?",
-  "New Contact person": "Novi kontakt"
+  "New Contact person": "Novi kontakt",
+  "Small": "Mala",
+  "Normal": "Normalna",
+  "Large": "Velika"
 }

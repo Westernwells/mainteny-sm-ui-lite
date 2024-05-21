@@ -4,6 +4,8 @@ import {useParams} from 'react-router-dom';
 import {ContractStatus, ContractSimpleView} from 'models/contract';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {Progress} from 'components/Progress';
+import ContactsWidget from 'pages/Contacts/ContactsWidget';
+import {ContactPersonAssociationType} from 'models/contacts';
 import {Location} from './Location';
 import General from './General';
 import {Service} from './Service';
@@ -83,6 +85,13 @@ export const OverviewTab = ({getUnitName}: Props) => {
       </Grid>
 
       <ContractServices elevator={elevator!} containerStyles={{mt: '1.2em'}} />
+
+      <Grid item xs={12} sx={{mt: '1.2em'}}>
+        <ContactsWidget
+          refId={elevator?.id!}
+          refType={ContactPersonAssociationType.ELEVATOR}
+        />
+      </Grid>
 
       <PriorityTechnician
         containerStyles={{mt: '1.2em'}}

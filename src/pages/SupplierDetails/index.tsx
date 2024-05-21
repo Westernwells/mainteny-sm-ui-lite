@@ -10,6 +10,8 @@ import {
 import {Progress} from 'components/Progress';
 import {Button} from 'components/Button';
 import {Confirm} from 'components/Confirm';
+import ContactsWidget from 'pages/Contacts/ContactsWidget';
+import {ContactPersonAssociationType} from 'models/contacts';
 import {SupplierBasicInfoCard} from './BasicInfo/SupplierBasicInfoCard';
 
 export const SupplierDetails = () => {
@@ -54,6 +56,12 @@ export const SupplierDetails = () => {
         />
       </Box>
       <SupplierBasicInfoCard supplier={supplierDetail!} />
+
+      <ContactsWidget
+        refId={supplierId!}
+        refType={ContactPersonAssociationType.ARTICLE_SUPPLIER}
+      />
+
       <Confirm
         open={deleteSupplierConfirm}
         onConfirm={() => onDelete()}

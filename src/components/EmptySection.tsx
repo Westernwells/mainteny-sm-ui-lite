@@ -14,6 +14,7 @@ import {ReactComponent as UXAnalytics} from 'assets/illustrations/UXAnalytics.sv
 import {ReactComponent as NotePadIcon} from 'assets/icons/NotePadIcon.svg';
 import {ReactComponent as AttachmentLargeIcon} from 'assets/icons/AttachmentLargeIcon.svg';
 import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
+import {ReactComponent as HeadphonesHumanIcon} from 'assets/icons/HeadphonesHumanIcon.svg';
 import {Button} from './Button';
 
 interface Props extends BoxProps {
@@ -34,7 +35,8 @@ interface Props extends BoxProps {
     | 'articles'
     | 'emptyChecklistComponents'
     | 'file-attachment'
-    | 'lift';
+    | 'lift'
+    | 'contacts';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -96,6 +98,8 @@ export const EmptySection = ({
         return <NotePadIcon style={{width: '50%', height: '100%'}} />;
       case 'lift':
         return <LiftIcon style={{width: '100%', height: '100%'}} />;
+      case 'contacts':
+        return <HeadphonesHumanIcon style={{width: '100%', height: '100%'}} />;
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }

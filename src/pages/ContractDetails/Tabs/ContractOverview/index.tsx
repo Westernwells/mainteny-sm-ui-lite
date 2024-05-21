@@ -47,6 +47,8 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
 import CancelIcon from '@mui/icons-material/Cancel';
 import {UserSession} from 'models/session';
+import ContactsWidget from 'pages/Contacts/ContactsWidget';
+import {ContactPersonAssociationType} from 'models/contacts';
 import {ContractBasic} from './ContractBasic';
 import {ContractTimeline} from './ContractTimeline';
 import {ContractCard} from './ContractCard';
@@ -512,6 +514,13 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
           updateContract={updateContract as unknown as () => void}
           components={contractDetails.components}
         />
+
+        <Grid item xs={12} md={8}>
+          <ContactsWidget
+            refId={contractId!}
+            refType={ContactPersonAssociationType.CONTRACT}
+          />
+        </Grid>
       </Grid>
     </Box>
   );

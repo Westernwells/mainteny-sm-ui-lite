@@ -21,6 +21,7 @@ interface Props {
   formType: 'create' | 'edit';
   openDialog: boolean;
   setOpenDialog: Dispatch<SetStateAction<boolean>>;
+  onAfterSubmit?: (newContactPersonId?: string) => void;
 }
 
 const getDefaultValues = (
@@ -53,6 +54,7 @@ const ContactFormDialog = ({
   formType,
   openDialog,
   setOpenDialog,
+  onAfterSubmit,
 }: Props) => {
   const {user} = useUserSession();
   const {data: uuid} = useUuid();
@@ -99,44 +101,58 @@ const ContactFormDialog = ({
     }
 
     if (formType === 'create') {
-      await createContact({
-        contactPerson: {
-          ...data.contactPerson,
-          roles: [
-            data.contactPerson
-              .roles as unknown as ServiceCompanyContactPersonRole,
-          ],
-          contactPersonId: uuid,
-        },
-        userAccount: {
-          ...data.userAccount,
-          photoUrl,
-          serviceCompanyId,
-        },
-      });
-    } else {
-      await updateContact({
-        body: {
+      await createContact(
+        {
           contactPerson: {
             ...data.contactPerson,
-            roles: Array.isArray(data.contactPerson.roles)
-              ? data.contactPerson.roles
-              : [
-                  data.contactPerson
-                    .roles as unknown as ServiceCompanyContactPersonRole,
-                ],
+            roles: [
+              data.contactPerson
+                .roles as unknown as ServiceCompanyContactPersonRole,
+            ],
+            contactPersonId: uuid,
           },
           userAccount: {
             ...data.userAccount,
-            photoUrl:
-              typeof data.userAccount.photoUrl === 'string'
-                ? data.userAccount.photoUrl
-                : photoUrl,
+            photoUrl,
             serviceCompanyId,
           },
         },
-        contactPersonId: contactPerson?.id || '',
-      });
+        {
+          onSuccess(response) {
+            onAfterSubmit?.(response?.value);
+          },
+        },
+      );
+    } else {
+      await updateContact(
+        {
+          body: {
+            contactPerson: {
+              ...data.contactPerson,
+              roles: Array.isArray(data.contactPerson.roles)
+                ? data.contactPerson.roles
+                : [
+                    data.contactPerson
+                      .roles as unknown as ServiceCompanyContactPersonRole,
+                  ],
+            },
+            userAccount: {
+              ...data.userAccount,
+              photoUrl:
+                typeof data.userAccount.photoUrl === 'string'
+                  ? data.userAccount.photoUrl
+                  : photoUrl,
+              serviceCompanyId,
+            },
+          },
+          contactPersonId: contactPerson?.id || '',
+        },
+        {
+          onSuccess: () => {
+            onAfterSubmit?.();
+          },
+        },
+      );
     }
 
     setOpenDialog(false);
