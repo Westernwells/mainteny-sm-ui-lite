@@ -21,12 +21,14 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   CreateQuotation,
   CreateQuotationComment,
+  PrintQuotationRecord,
   QueryQuotationCommentsParams,
   QueryQuotationParams,
   QuotationActivityView,
   QuotationFilters,
   QuotationView,
   ReplyQuotation,
+  SendQuotationRecord,
   UpdateQuotation,
 } from 'models/quotation';
 import {Comment} from 'models/comment';
@@ -99,6 +101,63 @@ export function useQuotationDetails(
   );
 }
 
+export const postPrintQuotation = async (
+  id: string,
+  body: PrintQuotationRecord,
+) => {
+  await axiosClient.post(`api/quotations/${id}/print`, body);
+};
+
+export const usePrintQuotation = () => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({id, body}: {id: string; body: PrintQuotationRecord}) =>
+      postPrintQuotation(id, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchQuotations]);
+        queryClient.invalidateQueries([qk.quotationById]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const postSendQuotation = async (
+  id: string,
+  body: SendQuotationRecord,
+) => {
+  await axiosClient.post(`api/quotations/${id}/send`, body);
+};
+
+export const useSendQuotation = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({id, body}: {id: string; body: SendQuotationRecord}) =>
+      postSendQuotation(id, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchQuotations]);
+        queryClient.invalidateQueries([qk.quotationById]);
+        enqueueSnackbar(`Quotation sent successfully`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
 export const postPublishQuotation = async (id: string, body: EmailRecord) => {
   await axiosClient.post(`api/quotations/${id}/publish`, body);
 };
@@ -151,7 +210,6 @@ export const useReplyQuotation = () => {
         navigate(`/quotations/details/${quotationId}`);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -182,7 +240,6 @@ export const useCreateQuotation = () => {
       navigate(`/quotations/details/${data.value}`);
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });

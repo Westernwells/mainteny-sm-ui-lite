@@ -519,3 +519,11 @@ export const formatCostText = (
   }
   return inputString;
 };
+
+export async function fetchFile(url: string): Promise<Blob> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Failed to download file');
+  }
+  return response.blob();
+}

@@ -25,18 +25,28 @@ import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {
   useDeleteQuotation,
-  usePublishQuotation,
+  usePrintQuotation,
   useReplyQuotation,
+  useSendQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {QuotationStatus, QuotationView} from 'models/quotation';
-import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import useLogoDimensions from 'hooks/useLogoDimensions';
-import {companyLanguageContextMap} from 'utils/utils';
+import {
+  companyLanguageContextMap,
+  createFilesFromBlobArray,
+  fetchFile,
+} from 'utils/utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {pdf} from '@react-pdf/renderer';
 import {useCurrentCurrency} from 'utils/currency';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 
 interface Props {
   quotation: QuotationView;
@@ -61,9 +71,12 @@ export const Actions = ({quotation, imageUrl}: Props) => {
   const [actionType, setActionType] = useState('');
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
     useState(false);
+  const [blobFile, setBlobFile] = useState<Blob>();
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutate: deleteQuotation} = useDeleteQuotation();
-  const {mutateAsync: publishQuotation} = usePublishQuotation();
+  const {mutateAsync: uploadFiles} = useUploadFiles('');
+  const {mutateAsync: printQuotation} = usePrintQuotation();
+  const {mutateAsync: sendQuotation} = useSendQuotation();
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
   const logoDimensions = useLogoDimensions(imageUrl!);
@@ -84,6 +97,13 @@ export const Actions = ({quotation, imageUrl}: Props) => {
     [company?.language],
   );
 
+  const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
+    quotation && quotation?.additionalInfo.pdfPath
+      ? [quotation.additionalInfo.pdfPath]
+      : [],
+    {enabled: false},
+  );
+
   const generateBlobUrl = async () => {
     const blob = await pdf(
       <QuotationPdfTemplate
@@ -96,19 +116,20 @@ export const Actions = ({quotation, imageUrl}: Props) => {
         translate={translate}
       />,
     ).toBlob();
+    setBlobFile(blob);
     const blobURL = URL.createObjectURL(blob);
     setFilePathToDownload(blobURL);
   };
 
   useEffect(() => {
-    if (imageUrl) {
+    if (imageUrl && quotation.status === QuotationStatus.DRAFT) {
       generateBlobUrl();
     }
   }, [actionType]);
 
   const {downloadFile} = useDownloadFileWithCustomName(
     quotation.number,
-    filePathToDownload,
+    downloadUrl?.[quotation.additionalInfo.pdfPath!] || '',
   );
 
   const handleClick = (event: any) => {
@@ -119,38 +140,75 @@ export const Actions = ({quotation, imageUrl}: Props) => {
     setAnchorEl(null);
   };
 
-  const printQuotation = async (url: string) => {
-    if (quotation.status !== QuotationStatus.DRAFT) {
-      printJS({
-        printable: url,
-        type: 'pdf',
-        showModal: true,
-      });
+  const onPrintQuotation = async (url: string) => {
+    const handlePrintSuccess = () => {
       setIsConfirmPrintDialogOpen(false);
-      return;
+      if (url) {
+        printJS({
+          printable: url,
+          type: 'pdf',
+          showModal: true,
+        });
+      }
+    };
+
+    if (quotation.status !== QuotationStatus.DRAFT) {
+      await printQuotation(
+        {
+          id: quotation.id,
+          body: {
+            pdfPath: quotation.additionalInfo.pdfPath ?? '',
+            sentDate: '',
+          },
+        },
+        {onSuccess: handlePrintSuccess},
+      );
+    } else {
+      const serviceCompanyId = user?.userAccount.serviceCompany.id;
+      const uploadPath = `${serviceCompanyId}/quotations`;
+      const fileNames = [`${quotation.id}.pdf`];
+      const files = createFilesFromBlobArray([blobFile!], fileNames);
+
+      await uploadFiles({files, uploadPath});
+
+      await printQuotation(
+        {
+          id: quotation.id,
+          body: {
+            pdfPath: `${uploadPath}/${fileNames[0]}`,
+            sentDate: '',
+          },
+        },
+        {onSuccess: handlePrintSuccess},
+      );
+    }
+  };
+
+  const handlePrintAction = () => {
+    setActionType('PRINT');
+    if (quotation.status !== QuotationStatus.DRAFT) {
+      refetchDownloadUrl();
+    }
+  };
+
+  useEffect(() => {
+    if (filePathToDownload && actionType === 'PRINT') {
+      onPrintQuotation(filePathToDownload);
+      setFilePathToDownload('');
+      setActionType('');
+    }
+  }, [filePathToDownload, actionType]);
+
+  useEffect(() => {
+    if (downloadUrl?.[filePathToDownload] && actionType === 'DOWNLOAD') {
+      downloadFile();
+      setFilePathToDownload('');
     }
 
-    await publishQuotation(
-      {
-        id: quotation.id,
-        body: {
-          email: '',
-          subject: '',
-          content: '',
-        },
-      },
-      {
-        onSuccess: () => {
-          setIsConfirmPrintDialogOpen(false);
-          printJS({
-            printable: url,
-            type: 'pdf',
-            showModal: true,
-          });
-        },
-      },
-    );
-  };
+    if (quotation.status !== QuotationStatus.DRAFT && actionType === 'PRINT') {
+      setFilePathToDownload(downloadUrl?.[quotation.additionalInfo.pdfPath!]!);
+    }
+  }, [downloadUrl]);
 
   const actions = (() => {
     const printAction = {
@@ -159,7 +217,7 @@ export const Actions = ({quotation, imageUrl}: Props) => {
       onClick: () =>
         quotation.status === QuotationStatus.DRAFT
           ? setIsConfirmPrintDialogOpen(true)
-          : setActionType('PRINT'),
+          : handlePrintAction(),
     };
     const duplicateAction = {
       label: t('Duplicate'),
@@ -171,8 +229,10 @@ export const Actions = ({quotation, imageUrl}: Props) => {
     const downloadAction = {
       label: t('Download'),
       icon: <FileDownload />,
-      onClick: () => {
+      onClick: async () => {
         setActionType('DOWNLOAD');
+        refetchDownloadUrl();
+        setFilePathToDownload(quotation.additionalInfo.pdfPath!);
       },
     };
     const markAcceptedAction = {
@@ -193,7 +253,10 @@ export const Actions = ({quotation, imageUrl}: Props) => {
         {
           label: t('Send'),
           icon: <SendIcon />,
-          onClick: () => setIsSendEmailDialogOpen(true),
+          onClick: () => {
+            refetchDownloadUrl();
+            setIsSendEmailDialogOpen(true);
+          },
         },
         'divider',
         printAction,
@@ -214,7 +277,10 @@ export const Actions = ({quotation, imageUrl}: Props) => {
         {
           label: t('Resend'),
           icon: <ReplayIcon />,
-          onClick: () => setIsSendEmailDialogOpen(true),
+          onClick: () => {
+            refetchDownloadUrl();
+            setIsSendEmailDialogOpen(true);
+          },
         },
         'divider',
         ...defaultActions,
@@ -225,21 +291,6 @@ export const Actions = ({quotation, imageUrl}: Props) => {
 
     return defaultActions;
   })();
-
-  useEffect(() => {
-    if (filePathToDownload) {
-      if (actionType === 'DOWNLOAD') {
-        downloadFile();
-      }
-
-      if (actionType === 'PRINT') {
-        printQuotation(filePathToDownload);
-      }
-
-      setFilePathToDownload('');
-      setActionType('');
-    }
-  }, [filePathToDownload]);
 
   return (
     <Box>
@@ -336,13 +387,85 @@ export const Actions = ({quotation, imageUrl}: Props) => {
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={quotation.id}
-        submitHook={usePublishQuotation}
         email={
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
           quotation?.elevator?.propertyOwner?.contact.email
         }
         subject={quotation.subject}
         content={quotation.description}
+        callback={async (emailRecord) => {
+          setIsSendEmailDialogOpen(false);
+
+          const serviceCompanyId = user?.userAccount.serviceCompany.id;
+          const uploadPath = `${serviceCompanyId}/quotations`;
+
+          if (quotation.status !== QuotationStatus.DRAFT) {
+            const blob = await fetchFile(
+              downloadUrl ? Object.values(downloadUrl)[0] : '',
+            );
+            const fileNames: string[] = [`${quotation.id}.pdf`];
+            const files = createFilesFromBlobArray([blob], fileNames);
+
+            await sendQuotation({
+              id: quotation.id,
+              body: {
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
+                email: {
+                  email: '',
+                  subject: emailRecord.subject,
+                  content: emailRecord.content,
+                  emails: [emailRecord.email],
+                  attachments: files.reduce<FileWithPreview[]>(
+                    (newArr: FileWithPreview[], obj) => [
+                      ...newArr,
+                      {
+                        ...obj,
+                        type: obj.type,
+                        uri: `${uploadPath}/${obj.name}`,
+                        description: obj.name.split('.')[0],
+                      },
+                    ],
+                    [],
+                  ),
+                },
+              },
+            });
+
+            setIsConfirmPrintDialogOpen(false);
+            return;
+          }
+
+          const fileNames: string[] = [`${quotation.id}.pdf`];
+          const files = createFilesFromBlobArray([blobFile!], fileNames);
+          await uploadFiles({files, uploadPath});
+
+          await sendQuotation({
+            id: quotation.id,
+            body: {
+              pdfPath: `${uploadPath}/${fileNames[0]}`,
+              sentDate: '',
+              email: {
+                email: '',
+                subject: emailRecord.subject,
+                content: emailRecord.content,
+                emails: [emailRecord.email],
+                attachments: files.reduce<FileWithPreview[]>(
+                  (newArr: FileWithPreview[], obj) => [
+                    ...newArr,
+                    {
+                      ...obj,
+                      type: obj.type,
+                      uri: `${uploadPath}/${obj.name}`,
+                      description: obj.name.split('.')[0],
+                    },
+                  ],
+                  [],
+                ),
+              },
+            },
+          });
+        }}
       />
       <Confirm
         open={isDeleteDialogOpen}
