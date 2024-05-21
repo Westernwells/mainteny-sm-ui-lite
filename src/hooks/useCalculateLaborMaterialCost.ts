@@ -14,15 +14,12 @@ const useCalculateLaborMaterialCost = (
       articleItems
         ?.filter((item) => item.article?.type === type)
         ?.reduce((itemTotal, item) => {
-          const netAmount = item?.unitAmount?.netAmount ?? 0;
-          const quantity = item?.quantity ?? 1;
-          const itemDiscountValue = item?.discount?.amount?.value ?? 0;
-          const netTotal = netAmount * quantity;
-
-          return (
-            itemTotal +
-            centsToMoney(currentCurrency?.code!, netTotal - itemDiscountValue)
+          const netAmount = centsToMoney(
+            currentCurrency?.code!,
+            item?.unitAmount?.netAmount ?? 0,
           );
+
+          return itemTotal + netAmount;
         }, 0),
     [articleItems, type, currentCurrency],
   );

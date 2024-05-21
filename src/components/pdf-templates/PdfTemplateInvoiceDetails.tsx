@@ -73,6 +73,17 @@ const PdfTemplateInvoiceDetails = ({
   invoice,
   selectedLng,
 }: Props) => {
+  const startDate = invoice?.additionalInfo.deliveryStartDate;
+  const endDate = invoice?.additionalInfo.deliveryEndDate;
+
+  const formattedStartDate = startDate ? formatDate(startDate) : '';
+  const formattedEndDate = endDate ? formatDate(endDate) : '';
+
+  const displayDeliveryDate =
+    formattedStartDate && formattedEndDate
+      ? `${formattedStartDate} - ${formattedEndDate}`
+      : formattedStartDate || formattedEndDate;
+
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
   };
@@ -163,12 +174,10 @@ const PdfTemplateInvoiceDetails = ({
         </View>
       )}
 
-      {invoice?.additionalInfo.deliveryEndDate && (
+      {displayDeliveryDate && (
         <View style={styles.rightAddressContent}>
           <Text style={styles.tag}>{translate('Delivery date')}</Text>
-          <Text style={styles.tagContent}>
-            {formatDate(invoice?.additionalInfo.deliveryEndDate) || '-'}
-          </Text>
+          <Text style={styles.tagContent}>{displayDeliveryDate}</Text>
         </View>
       )}
 
