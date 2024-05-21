@@ -2538,5 +2538,7 @@
   "Amount": "თანხა",
   "Article name": "ნაწილის სახელი",
   "You are about to disconnect contact from this {{refType}}.": "თქვენ აპირებთ კავშირი გაწყვიტოთ კონტაქტთან {{refType}}-დან",
-  "Assistant": "ასისტენტი"
+  "Assistant": "ასისტენტი",
+  "No Contact Persons": "საკონტაქტო პირი არ არის",
+  "Do you want to add someone?": "გს"
 }
