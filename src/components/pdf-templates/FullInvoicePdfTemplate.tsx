@@ -8,7 +8,7 @@ import {
 } from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
-import {formatCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
@@ -150,27 +150,6 @@ const getStyles = (
       flexDirection: 'column',
       paddingVertical: 1.5,
     },
-    table: {
-      width: '100%',
-      display: 'flex',
-    },
-    tableHead: {
-      display: 'flex',
-      flexDirection: 'row',
-      paddingVertical: 4,
-    },
-    tableHeading: {
-      color: '#616161',
-      display: 'flex',
-      fontSize: 6,
-      textTransform: 'uppercase',
-    },
-    tableRow: {
-      display: 'flex',
-      flexDirection: 'row',
-      fontSize: 10,
-      marginVertical: 4,
-    },
     descriptionText: {
       width: '45%',
       display: 'flex',
@@ -217,10 +196,7 @@ const FullInvoicePdfTemplate = React.memo(
       const discountValue =
         articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
 
-      return (
-        (grossTotal - discountValue) /
-          10 ** articleItem.unitAmount.fractionDigits ?? 2
-      );
+      return centsToMoney(currentCurrency?.code!, grossTotal - discountValue);
     };
 
     const discount = getDiscoutObj(invoice?.additionalInfo?.discount);

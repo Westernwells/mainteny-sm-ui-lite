@@ -740,20 +740,16 @@ const FinalInvoicePdfTemplate = React.memo(
                   <Text>
                     {formatCostText(
                       invoice?.additionalInfo?.moreInfo,
-                      laborCost !== 0
-                        ? `${formatCurrency(laborCost, {
-                            currency: currentCurrency?.code,
-                            currencySymbol: currentCurrency?.symbol,
-                            companyLang: selectedLng,
-                          })}`
-                        : '',
-                      materialCost !== 0
-                        ? `${formatCurrency(materialCost, {
-                            currency: currentCurrency?.code,
-                            currencySymbol: currentCurrency?.symbol,
-                            companyLang: selectedLng,
-                          })}`
-                        : '',
+                      `${formatCurrency(laborCost, {
+                        currency: currentCurrency?.code,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      })}`,
+                      `${formatCurrency(materialCost, {
+                        currency: currentCurrency?.code,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      })}`,
                     )}
                   </Text>
                 </View>
