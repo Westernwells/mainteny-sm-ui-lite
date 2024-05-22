@@ -234,218 +234,194 @@ const TableHeading = ({
   </Text>
 );
 
-export const ArticleSection = React.memo(
-  ({
-    invoice,
-    currentCurrency,
-    translate,
-    allItemsHaveZeroDiscount,
-    discountValue,
-    subtotalExclVatFormatted,
-    allItemsHasSameVAT,
-    percentageVats,
-    totalVAT,
-    total,
-    selectedLng,
-    netTotal,
-  }: ArticleSectionProps) => {
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
+export const ArticleSection = ({
+  invoice,
+  currentCurrency,
+  translate,
+  allItemsHaveZeroDiscount,
+  discountValue,
+  subtotalExclVatFormatted,
+  allItemsHasSameVAT,
+  percentageVats,
+  totalVAT,
+  total,
+  selectedLng,
+  netTotal,
+}: ArticleSectionProps) => {
+  const boldFontStyle = {
+    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+  };
 
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
+  const regularFontStyle = {
+    fontFamily:
+      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
+  };
 
-    const styles = getStyles(boldFontStyle, regularFontStyle);
-    return (
-      <View style={styles.table}>
-        <View style={styles.tableHead}>
-          <View style={{...styles.tableRow, width: '100%'}}>
-            <TableHeading text="#" width="2%" textAlign="left" />
+  const styles = getStyles(boldFontStyle, regularFontStyle);
+  return (
+    <View style={styles.table}>
+      <View style={styles.tableHead}>
+        <View style={{...styles.tableRow, width: '100%'}}>
+          <TableHeading text="#" width="2%" textAlign="left" />
+          <TableHeading
+            text={translate('Article Name')}
+            width="37%"
+            textAlign="left"
+            marginLeft={10}
+          />
+          <TableHeading
+            text={translate('Quantity')}
+            width="10%"
+            textAlign="center"
+          />
+          <TableHeading
+            text={translate('Unit')}
+            width="8%"
+            textAlign="center"
+          />
+          <TableHeading
+            text={`${translate('Price')} (${currentCurrency?.symbol})`}
+            width="15%"
+            textAlign="right"
+            marginLeft={5}
+          />
+          {!allItemsHaveZeroDiscount && (
             <TableHeading
-              text={translate('Article Name')}
-              width="37%"
-              textAlign="left"
-              marginLeft={10}
-            />
-            <TableHeading
-              text={translate('Quantity')}
-              width="10%"
-              textAlign="center"
-            />
-            <TableHeading
-              text={translate('Unit')}
-              width="8%"
-              textAlign="center"
-            />
-            <TableHeading
-              text={`${translate('Price')} (${currentCurrency?.symbol})`}
-              width="15%"
-              textAlign="right"
-              marginLeft={5}
-            />
-            {!allItemsHaveZeroDiscount && (
-              <TableHeading
-                text={translate('Discount')}
-                width="13%"
-                textAlign="right"
-              />
-            )}
-            <TableHeading
-              text={`${translate('Total')} (${currentCurrency?.symbol})`}
-              width={allItemsHaveZeroDiscount ? '28%' : '15%'}
+              text={translate('Discount')}
+              width="13%"
               textAlign="right"
             />
-          </View>
+          )}
+          <TableHeading
+            text={`${translate('Total')} (${currentCurrency?.symbol})`}
+            width={allItemsHaveZeroDiscount ? '28%' : '15%'}
+            textAlign="right"
+          />
         </View>
+      </View>
 
-        {invoice.items.length > 0 && (
-          <View style={styles.dataBody}>
-            {invoice.items?.map((articleItem, index) => (
-              <View key={`${articleItem.id} - ${index}`}>
-                <View style={styles.tableRow}>
-                  <Text
-                    style={{
-                      width: '2%',
-                      textAlign: 'left',
-                      marginRight: 10,
-                      color: '#212121',
-                    }}>
-                    {index + 1}
-                  </Text>
-                  <Text
-                    style={{width: '37%', textAlign: 'left', color: '#212121'}}>
-                    {articleItem.name || '-'}
-                  </Text>
-                  <Text
-                    style={{
-                      width: '10%',
-                      textAlign: 'center',
-                      color: '#212121',
-                    }}>
-                    {articleItem.quantity || '-'}
-                  </Text>
-                  <Text
-                    style={{
-                      width: '8%',
-                      textAlign: 'center',
-                      color: '#212121',
-                    }}>
-                    {translate(articleItem?.article?.unit!) || '-'}
-                  </Text>
-                  <Text
-                    style={{
-                      width: '15%',
-                      textAlign: 'right',
-                      color: '#212121',
-                    }}>
-                    {formatCurrency(
-                      centsToMoney(
-                        currentCurrency?.code!,
-                        articleItem?.unitAmount?.netAmount,
-                      ) ?? 0,
-                      {
-                        currency: currentCurrency?.code,
-                        excludeCurrencySymbol: true,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      },
-                    )}
-                  </Text>
-                  {!allItemsHaveZeroDiscount && (
-                    <Text
-                      style={{
-                        width: '13%',
-                        textAlign: 'right',
-                        color: '#212121',
-                      }}>
-                      {articleItem?.additionalInfo?.discount?.percentage !==
-                        0 ||
-                      articleItem?.additionalInfo?.discount?.amount?.value !== 0
-                        ? '-'
-                        : ''}
-                      {articleItem?.additionalInfo?.discount?.type ===
-                      DiscountType.PERCENTAGE
-                        ? articleItem?.additionalInfo?.discount.percentage
-                        : formatCurrency(
-                            centsToMoney(
-                              currentCurrency?.code!,
-                              articleItem?.additionalInfo?.discount?.amount
-                                ?.value,
-                            ),
-                            {
-                              currency: currentCurrency?.code,
-                              excludeCurrencySymbol: true,
-                              currencySymbol: currentCurrency?.symbol,
-                              companyLang: selectedLng,
-                              minimumFractionDigits:
-                                articleItem?.additionalInfo?.discount?.amount
-                                  ?.value === 0
-                                  ? 0
-                                  : 2,
-                              maximumFractionDigits:
-                                articleItem?.additionalInfo?.discount?.amount
-                                  ?.value === 0
-                                  ? 0
-                                  : 2,
-                            },
-                          )}
-                      {articleItem?.additionalInfo?.discount?.type ===
-                      DiscountType.AMOUNT
-                        ? currentCurrency?.symbol
-                        : '%'}
-                    </Text>
-                  )}
-                  <Text
-                    style={{
-                      width: allItemsHaveZeroDiscount ? '28%' : '15%',
-                      textAlign: 'right',
-                      color: '#212121',
-                    }}>
-                    {formatCurrency(netTotal(articleItem), {
+      {invoice.items.length > 0 && (
+        <View style={styles.dataBody}>
+          {invoice.items?.map((articleItem, index) => (
+            <View key={`${articleItem.id} - ${index}`}>
+              <View style={styles.tableRow}>
+                <Text
+                  style={{
+                    width: '2%',
+                    textAlign: 'left',
+                    marginRight: 10,
+                    color: '#212121',
+                  }}>
+                  {index + 1}
+                </Text>
+                <Text
+                  style={{width: '37%', textAlign: 'left', color: '#212121'}}>
+                  {articleItem.name || '-'}
+                </Text>
+                <Text
+                  style={{
+                    width: '10%',
+                    textAlign: 'center',
+                    color: '#212121',
+                  }}>
+                  {articleItem.quantity || '-'}
+                </Text>
+                <Text
+                  style={{
+                    width: '8%',
+                    textAlign: 'center',
+                    color: '#212121',
+                  }}>
+                  {translate(articleItem?.article?.unit!) || '-'}
+                </Text>
+                <Text
+                  style={{
+                    width: '15%',
+                    textAlign: 'right',
+                    color: '#212121',
+                  }}>
+                  {formatCurrency(
+                    centsToMoney(
+                      currentCurrency?.code!,
+                      articleItem?.unitAmount?.netAmount,
+                    ) ?? 0,
+                    {
                       currency: currentCurrency?.code,
                       excludeCurrencySymbol: true,
                       currencySymbol: currentCurrency?.symbol,
                       companyLang: selectedLng,
-                    })}
-                  </Text>
-                </View>
-                {articleItem?.description.trim() && (
-                  <Text style={styles.descriptionText}>
-                    {articleItem?.description}
+                    },
+                  )}
+                </Text>
+                {!allItemsHaveZeroDiscount && (
+                  <Text
+                    style={{
+                      width: '13%',
+                      textAlign: 'right',
+                      color: '#212121',
+                    }}>
+                    {articleItem?.additionalInfo?.discount?.percentage !== 0 ||
+                    articleItem?.additionalInfo?.discount?.amount?.value !== 0
+                      ? '-'
+                      : ''}
+                    {articleItem?.additionalInfo?.discount?.type ===
+                    DiscountType.PERCENTAGE
+                      ? articleItem?.additionalInfo?.discount.percentage
+                      : formatCurrency(
+                          centsToMoney(
+                            currentCurrency?.code!,
+                            articleItem?.additionalInfo?.discount?.amount
+                              ?.value,
+                          ),
+                          {
+                            currency: currentCurrency?.code,
+                            excludeCurrencySymbol: true,
+                            currencySymbol: currentCurrency?.symbol,
+                            companyLang: selectedLng,
+                            minimumFractionDigits:
+                              articleItem?.additionalInfo?.discount?.amount
+                                ?.value === 0
+                                ? 0
+                                : 2,
+                            maximumFractionDigits:
+                              articleItem?.additionalInfo?.discount?.amount
+                                ?.value === 0
+                                ? 0
+                                : 2,
+                          },
+                        )}
+                    {articleItem?.additionalInfo?.discount?.type ===
+                    DiscountType.AMOUNT
+                      ? currentCurrency?.symbol
+                      : '%'}
                   </Text>
                 )}
+                <Text
+                  style={{
+                    width: allItemsHaveZeroDiscount ? '28%' : '15%',
+                    textAlign: 'right',
+                    color: '#212121',
+                  }}>
+                  {formatCurrency(netTotal(articleItem), {
+                    currency: currentCurrency?.code,
+                    excludeCurrencySymbol: true,
+                    currencySymbol: currentCurrency?.symbol,
+                    companyLang: selectedLng,
+                  })}
+                </Text>
               </View>
-            ))}
-          </View>
-        )}
-
-        <View>
-          {discountValue && (
-            <View style={styles.tableRow}>
-              <Text style={{width: '44%'}} />
-              <Text
-                style={{
-                  width: '32%',
-                  color: '#616161',
-                  fontSize: 10,
-                  textAlign: 'right',
-                }}>{`${translate('Discount')} (${
-                currentCurrency?.symbol
-              })`}</Text>
-              <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-                {discountValue > 0 ? '-' : ''}
-                {formatCurrency(discountValue, {
-                  currency: currentCurrency?.code,
-                  excludeCurrencySymbol: true,
-                  currencySymbol: currentCurrency?.symbol,
-                  companyLang: selectedLng,
-                })}
-              </Text>
+              {articleItem?.description.trim() && (
+                <Text style={styles.descriptionText}>
+                  {articleItem?.description}
+                </Text>
+              )}
             </View>
-          )}
+          ))}
+        </View>
+      )}
+
+      <View>
+        {discountValue && (
           <View style={styles.tableRow}>
             <Text style={{width: '44%'}} />
             <Text
@@ -454,85 +430,12 @@ export const ArticleSection = React.memo(
                 color: '#616161',
                 fontSize: 10,
                 textAlign: 'right',
-              }}>
-              {translate('Subtotal excl. VAT')}
-            </Text>
-            <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-              {subtotalExclVatFormatted}
-            </Text>
-          </View>
-          <View>
-            {allItemsHasSameVAT ? (
-              <View style={styles.tableRow}>
-                <Text style={{width: '44%'}} />
-                <Text
-                  style={{
-                    width: '32%',
-                    color: '#616161',
-                    fontSize: 10,
-                    textAlign: 'right',
-                  }}>{`${translate('VAT')} ${
-                  percentageVats[0].percentageVat
-                }%`}</Text>
-                <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-                  {formatCurrency(totalVAT, {
-                    currency: currentCurrency?.code,
-                    excludeCurrencySymbol: true,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  })}
-                </Text>
-              </View>
-            ) : (
-              percentageVats.map((v, index) => (
-                <View
-                  style={styles.tableRow}
-                  key={`${index}-${v.percentageVat}`}>
-                  <Text style={{width: '44%'}} />
-                  <Text
-                    style={{
-                      width: '32%',
-                      color: '#616161',
-                      fontSize: 10,
-                      textAlign: 'right',
-                    }}>{`${translate('VAT')} ${v.percentageVat}%`}</Text>
-                  <Text
-                    style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-                    {formatCurrency(fixRounding(v.vat, 2), {
-                      currency: currentCurrency?.code,
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                      roundingMode: 'floor',
-                      excludeCurrencySymbol: true,
-                      companyLang: selectedLng,
-                      currencySymbol: currentCurrency?.symbol,
-                    })}
-                  </Text>
-                </View>
-              ))
-            )}
-          </View>
-          <View style={styles.tableRow}>
-            <Text style={{width: '44%'}} />
-            <Text
-              style={{
-                width: '32%',
-                color: '#212121',
-                ...boldFontStyle,
-                textAlign: 'right',
-                fontSize: 10,
-              }}>{`${translate('Total incl. VAT')} (${
+              }}>{`${translate('Discount')} (${
               currentCurrency?.symbol
             })`}</Text>
-            <Text
-              style={{
-                width: '24%',
-                textAlign: 'right',
-                color: '#212121',
-                ...boldFontStyle,
-                fontSize: 10,
-              }}>
-              {formatCurrency(total, {
+            <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
+              {discountValue > 0 ? '-' : ''}
+              {formatCurrency(discountValue, {
                 currency: currentCurrency?.code,
                 excludeCurrencySymbol: true,
                 currencySymbol: currentCurrency?.symbol,
@@ -540,11 +443,102 @@ export const ArticleSection = React.memo(
               })}
             </Text>
           </View>
+        )}
+        <View style={styles.tableRow}>
+          <Text style={{width: '44%'}} />
+          <Text
+            style={{
+              width: '32%',
+              color: '#616161',
+              fontSize: 10,
+              textAlign: 'right',
+            }}>
+            {translate('Subtotal excl. VAT')}
+          </Text>
+          <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
+            {subtotalExclVatFormatted}
+          </Text>
+        </View>
+        <View>
+          {allItemsHasSameVAT ? (
+            <View style={styles.tableRow}>
+              <Text style={{width: '44%'}} />
+              <Text
+                style={{
+                  width: '32%',
+                  color: '#616161',
+                  fontSize: 10,
+                  textAlign: 'right',
+                }}>{`${translate('VAT')} ${
+                percentageVats[0].percentageVat
+              }%`}</Text>
+              <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
+                {formatCurrency(totalVAT, {
+                  currency: currentCurrency?.code,
+                  excludeCurrencySymbol: true,
+                  currencySymbol: currentCurrency?.symbol,
+                  companyLang: selectedLng,
+                })}
+              </Text>
+            </View>
+          ) : (
+            percentageVats.map((v, index) => (
+              <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
+                <Text style={{width: '44%'}} />
+                <Text
+                  style={{
+                    width: '32%',
+                    color: '#616161',
+                    fontSize: 10,
+                    textAlign: 'right',
+                  }}>{`${translate('VAT')} ${v.percentageVat}%`}</Text>
+                <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
+                  {formatCurrency(fixRounding(v.vat, 2), {
+                    currency: currentCurrency?.code,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    roundingMode: 'floor',
+                    excludeCurrencySymbol: true,
+                    companyLang: selectedLng,
+                    currencySymbol: currentCurrency?.symbol,
+                  })}
+                </Text>
+              </View>
+            ))
+          )}
+        </View>
+        <View style={styles.tableRow}>
+          <Text style={{width: '44%'}} />
+          <Text
+            style={{
+              width: '32%',
+              color: '#212121',
+              ...boldFontStyle,
+              textAlign: 'right',
+              fontSize: 10,
+            }}>{`${translate('Total incl. VAT')} (${
+            currentCurrency?.symbol
+          })`}</Text>
+          <Text
+            style={{
+              width: '24%',
+              textAlign: 'right',
+              color: '#212121',
+              ...boldFontStyle,
+              fontSize: 10,
+            }}>
+            {formatCurrency(total, {
+              currency: currentCurrency?.code,
+              excludeCurrencySymbol: true,
+              currencySymbol: currentCurrency?.symbol,
+              companyLang: selectedLng,
+            })}
+          </Text>
         </View>
       </View>
-    );
-  },
-);
+    </View>
+  );
+};
 
 const FinalInvoicePdfTemplate = React.memo(
   ({

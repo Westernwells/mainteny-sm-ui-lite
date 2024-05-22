@@ -79,10 +79,17 @@ const PdfTemplateInvoiceDetails = ({
   const formattedStartDate = startDate ? formatDate(startDate) : '';
   const formattedEndDate = endDate ? formatDate(endDate) : '';
 
-  const displayDeliveryDate =
-    formattedStartDate && formattedEndDate
-      ? `${formattedStartDate} - ${formattedEndDate}`
-      : formattedStartDate || formattedEndDate;
+  let displayDeliveryDate;
+
+  if (formattedStartDate && formattedEndDate) {
+    if (formattedStartDate === formattedEndDate) {
+      displayDeliveryDate = formattedStartDate;
+    } else {
+      displayDeliveryDate = `${formattedStartDate} - ${formattedEndDate}`;
+    }
+  } else {
+    displayDeliveryDate = formattedStartDate || formattedEndDate;
+  }
 
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -158,7 +165,7 @@ const PdfTemplateInvoiceDetails = ({
 
       {invoice?.additionalInfo.costCenter && (
         <View style={styles.rightAddressContent}>
-          <Text style={styles.tag}>{translate('Cost center')}</Text>
+          <Text style={styles.tag}>{translate('Cost Center')}</Text>
           <Text style={styles.tagContent}>
             {invoice?.additionalInfo.costCenter}
           </Text>

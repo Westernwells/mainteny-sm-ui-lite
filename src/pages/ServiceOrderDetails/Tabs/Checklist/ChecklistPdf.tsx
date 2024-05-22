@@ -83,7 +83,7 @@ const getStyles = (
       marginBottom: 10,
     },
     contentBody: {
-      color: '#616161',
+      color: '#212121',
       fontSize: 10,
       marginBottom: 10,
       lineHeight: 1.3,
