@@ -112,7 +112,7 @@ const getStyles = (
       marginTop: selectedLng === 'KA' ? 270 : 220,
     },
     contentBody: {
-      color: '#616161',
+      color: '#212121',
       fontSize: 10,
       marginBottom: 10,
       lineHeight: 1.3,
