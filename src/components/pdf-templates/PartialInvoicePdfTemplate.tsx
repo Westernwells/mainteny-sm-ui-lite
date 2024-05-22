@@ -574,22 +574,6 @@ export const PerItemPaymentSection = React.memo(
               </View>
             ))}
         </View>
-        <View
-          style={{
-            display: 'flex',
-            marginTop: 2,
-            justifyContent: 'flex-end',
-            width: '100%',
-            flexDirection: 'row',
-          }}>
-          <View
-            style={{
-              borderBottomWidth: 2,
-              borderBottomColor: '#212121',
-              width: '47%',
-            }}
-          />
-        </View>
       </View>
     );
   },

@@ -154,7 +154,7 @@ const getStyles = (
       color: '#212121',
       paddingLeft: 20,
       letterSpacing: -0.15,
-      marginTop: 2,
+      marginTop: -12,
       lineHeight: 1.5,
     },
     signatureBox: {
