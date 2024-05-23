@@ -35,7 +35,7 @@ export const HtmlPDF = ({
         p: {
           margin: '2px 0px',
         },
-        'p:empty': {
+        'p:empty, ul, ol': {
           margin: '8px 0px',
         },
         ...stylesheet,
