@@ -160,7 +160,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
     const fileNames: string[] = [`${report?.id}.pdf`];
 
-    const files = createFilesFromBlobArray([blobFile!], fileNames);
+    const files = await createFilesFromBlobArray([blobFile!], fileNames);
 
     await uploadFiles({files, uploadPath});
 

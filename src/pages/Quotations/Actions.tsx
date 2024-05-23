@@ -167,7 +167,7 @@ export const Actions = ({quotation, imageUrl}: Props) => {
       const serviceCompanyId = user?.userAccount.serviceCompany.id;
       const uploadPath = `${serviceCompanyId}/quotations`;
       const fileNames = [`${quotation.id}.pdf`];
-      const files = createFilesFromBlobArray([blobFile!], fileNames);
+      const files = await createFilesFromBlobArray([blobFile!], fileNames);
 
       await uploadFiles({files, uploadPath});
 
@@ -404,7 +404,7 @@ export const Actions = ({quotation, imageUrl}: Props) => {
               downloadUrl ? Object.values(downloadUrl)[0] : '',
             );
             const fileNames: string[] = [`${quotation.id}.pdf`];
-            const files = createFilesFromBlobArray([blob], fileNames);
+            const files = await createFilesFromBlobArray([blob], fileNames);
 
             await sendQuotation({
               id: quotation.id,
@@ -437,7 +437,7 @@ export const Actions = ({quotation, imageUrl}: Props) => {
           }
 
           const fileNames: string[] = [`${quotation.id}.pdf`];
-          const files = createFilesFromBlobArray([blobFile!], fileNames);
+          const files = await createFilesFromBlobArray([blobFile!], fileNames);
           await uploadFiles({files, uploadPath});
 
           await sendQuotation({

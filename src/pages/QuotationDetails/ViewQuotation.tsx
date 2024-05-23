@@ -186,7 +186,7 @@ export const ViewQuotation = ({
 
     const fileNames: string[] = [`${quotation.id}.pdf`];
 
-    const files = createFilesFromBlobArray([blobFile!], fileNames);
+    const files = await createFilesFromBlobArray([blobFile!], fileNames);
     await uploadFiles({files, uploadPath});
 
     await printQuotation(
@@ -685,7 +685,7 @@ export const ViewQuotation = ({
           if (quotation.status !== QuotationStatus.DRAFT) {
             const blob = await fetchFile(downloadUrl);
             const fileNames: string[] = [`${quotation.id}.pdf`];
-            const files = createFilesFromBlobArray([blob], fileNames);
+            const files = await createFilesFromBlobArray([blob], fileNames);
 
             await sendQuotation({
               id: quotation.id,
@@ -718,7 +718,7 @@ export const ViewQuotation = ({
           }
 
           const fileNames: string[] = [`${quotation.id}.pdf`];
-          const files = createFilesFromBlobArray([blobFile!], fileNames);
+          const files = await createFilesFromBlobArray([blobFile!], fileNames);
           await uploadFiles({files, uploadPath});
 
           await sendQuotation({
