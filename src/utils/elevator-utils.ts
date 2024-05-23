@@ -177,4 +177,5 @@ export const inspectionCycleLabels = {
   [InspectionCycle.HALF_YEARLY]: 'Every 6 months',
   [InspectionCycle.YEARLY]: 'Every year',
   [InspectionCycle.BIENNIALLY]: 'Every 2 years',
+  [InspectionCycle.TRIENNIALLY]: 'Every 3 years',
 };
