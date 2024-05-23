@@ -36,15 +36,17 @@ import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
+  useInvoiceDetail,
   useInvoicePaymentStatus,
-  usePublishInvoice,
+  usePrintInvoice,
+  useSendInvoice,
+  useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {Confirm} from 'components/Confirm';
-import PathImage from 'assets/images/Path.svg';
 import {SendEmailDialog} from 'components/SendEmailDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -58,13 +60,24 @@ import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus} from 'models/service-order';
 import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
-import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {pdf} from '@react-pdf/renderer';
-import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyNextNumber,
+} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
-import {companyLanguageContextMap, createFilesFromBlobArray} from 'utils/utils';
+import {
+  companyLanguageContextMap,
+  createFilesFromBlobArray,
+  dateToString,
+  fetchFile,
+} from 'utils/utils';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
@@ -72,35 +85,40 @@ import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePd
 import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {ServiceCompanyNumberType} from 'models/service-company';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 
 interface Props {
-  downloadUrl: string;
   invoice: InvoiceView;
   invoiceActivities: InvoiceActivityView[];
-  isLoadingDownloadUrl: boolean;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
 
-export const ViewInvoice = ({
-  downloadUrl,
-  invoice,
-  invoiceActivities,
-  isLoadingDownloadUrl,
-}: Props) => {
+export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {t} = useTranslation();
-  const {enqueueSnackbar, closeSnackbar} = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
   const theme = useTheme();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const [blobFile, setBlobFile] = useState<Blob>();
+  const {
+    data: updatedInvoice,
+    isFetched,
+    refetch: refetchInvoiceData,
+  } = useInvoiceDetail(invoice.id);
 
+  const {
+    data: downloadUrl,
+    isLoading: isLoadingDownloadUrl,
+    refetch: refetchDownloadUrl,
+  } = useDownloadUrl(isFetched ? [updatedInvoice!.additionalInfo.pdfPath] : []);
+
+  const [actionType, setActionType] = useState('');
   const [filePathToDownload, setFilePathToDownload] = useState('');
   const imageUrl = useLogoImage(user);
   const logoDimensions = useLogoDimensions(imageUrl);
@@ -109,6 +127,13 @@ export const ViewInvoice = ({
   const {t: translateCompanyLanguage} = useTranslation('translation', {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
+
+  const {data: companyNextNumber} = useCompanyNextNumber(
+    {
+      type: ServiceCompanyNumberType.INVOICE,
+    },
+    user?.userAccount.serviceCompany.id,
+  );
 
   const translate = useMemo(
     () => (key: string) => {
@@ -121,13 +146,11 @@ export const ViewInvoice = ({
     [company?.language],
   );
 
-  const {mutateAsync: uploadFiles} = useUploadFiles(
-    'The document was sent successfully.',
-  );
+  const {mutateAsync: uploadFiles} = useUploadFiles('');
 
   const {downloadFile} = useDownloadFileWithCustomName(
     invoice.number,
-    downloadUrl,
+    downloadUrl ? Object.values(downloadUrl)[0] : '',
   );
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -137,9 +160,14 @@ export const ViewInvoice = ({
     useState(false);
   const {mutate: markAsPaid} = useInvoicePaymentStatus();
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
-  const {mutateAsync: publishInvoice} = usePublishInvoice({
+  const {mutateAsync: printInvoice} = usePrintInvoice({
     shouldNavigate: false,
   });
+  const {mutateAsync: sendInvoice} = useSendInvoice({
+    shouldNavigate: false,
+  });
+
+  const {mutateAsync: updateInvoiceAsync} = useUpdateInvoice();
 
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
@@ -164,8 +192,7 @@ export const ViewInvoice = ({
     [previousInvoices],
   );
 
-  const {isInvoicePDFGenerated, isPDFsGenerated} =
-    getInvoicePDFStatuses(invoice);
+  const {isInvoicePDFGenerated} = getInvoicePDFStatuses(invoice);
   const serviceOrder = invoice?.serviceOrder;
 
   const {data: serviceOrderCheckLists} = useQueryServiceOrderChecklists({
@@ -263,99 +290,177 @@ export const ViewInvoice = ({
     return items;
   }, [downloadUrl, invoice.status]);
 
-  const generateBlobUrl = async () => {
+  const generateBlobUrl = async (invoiceData: InvoiceView) => {
     let PdfTemplate;
 
     if (
-      invoice.type === InvoiceType.FULL ||
-      invoice.type === InvoiceType.AGGREGATE
+      invoiceData.type === InvoiceType.FULL ||
+      invoiceData.type === InvoiceType.AGGREGATE
     ) {
       PdfTemplate = FullInvoicePdfTemplate;
-    } else if (invoice.type === InvoiceType.CREDIT_NOTE) {
+    } else if (invoiceData.type === InvoiceType.CREDIT_NOTE) {
       PdfTemplate = CreditNotePdfTemplate;
     } else if (
-      invoice.type === InvoiceType.PARTIAL ||
-      invoice.type === InvoiceType.UPFRONT
+      invoiceData.type === InvoiceType.PARTIAL ||
+      invoiceData.type === InvoiceType.UPFRONT
     ) {
       PdfTemplate = PartialInvoicePdfTemplate;
     } else {
       PdfTemplate = FinalInvoicePdfTemplate;
     }
 
-    if (
-      invoice.type === InvoiceType.CREDIT_NOTE ||
-      invoice.type === InvoiceType.FULL ||
-      invoice.type === InvoiceType.AGGREGATE ||
-      invoice.type === InvoiceType.PARTIAL ||
-      invoice.type === InvoiceType.UPFRONT ||
-      invoice.type === InvoiceType.FINAL
-    ) {
-      // TODO: will remove when all invoice types PDFs are ready
-      const blob = await pdf(
-        <PdfTemplate
-          userInfo={user?.userAccount}
-          currentCurrency={currentCurrency}
-          logoSrc={imageUrl}
-          logoDimensions={logoDimensions}
-          invoice={invoice}
-          selectedLng={company?.language}
-          translate={translate}
-          previousInvoices={sortedPreviousInvoices.slice(
-            0,
-            sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
-          )}
-        />,
-      ).toBlob();
-      const blobURL = URL.createObjectURL(blob);
-      setBlobFile(blob);
-      setFilePathToDownload(blobURL);
-    }
+    const blob = await pdf(
+      <PdfTemplate
+        userInfo={user?.userAccount}
+        currentCurrency={currentCurrency}
+        logoSrc={imageUrl}
+        logoDimensions={logoDimensions}
+        invoice={invoiceData}
+        selectedLng={company?.language}
+        translate={translate}
+        previousInvoices={sortedPreviousInvoices.slice(
+          0,
+          sortedPreviousInvoices.findIndex((i) => i.id === invoiceData.id) + 1,
+        )}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    setFilePathToDownload(blobURL);
+    return blob;
   };
 
   useEffect(() => {
     if (invoice.status === InvoiceStatus.DRAFT) {
-      generateBlobUrl();
+      generateBlobUrl(invoice);
     }
   }, [invoice, logoDimensions]);
 
   const onPrintInvoice = async () => {
     setIsConfirmPrintDialogOpen(false);
-    if (filePathToDownload || downloadUrl) {
-      printJS({
-        printable: filePathToDownload || downloadUrl,
-        type: 'pdf',
-        showModal: true,
-      });
+
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      if (invoice.externalId.trim() === '') {
+        await updateInvoiceAsync(
+          {
+            data: {
+              ...invoice,
+              externalId: companyNextNumber?.value!,
+            },
+            invoiceId: invoice.id,
+          },
+          {
+            onSuccess: async () => {
+              const updatedInvoiceData = await refetchInvoiceData();
+              const blobFile = await generateBlobUrl(updatedInvoiceData?.data!);
+
+              const serviceCompanyId = user?.userAccount.serviceCompany.id;
+              const uploadPath = `${serviceCompanyId}/invoices`;
+
+              if (blobFile) {
+                const fileNames: string[] = [
+                  `${updatedInvoiceData.data?.id}.pdf`,
+                ];
+                const files = await createFilesFromBlobArray(
+                  [blobFile!],
+                  fileNames,
+                );
+                await uploadFiles({files, uploadPath});
+                const pdfPath = `${uploadPath}/${updatedInvoiceData.data?.id}.pdf`;
+
+                await printInvoice(
+                  {
+                    id: updatedInvoiceData.data?.id!,
+                    body: {
+                      pdfPath,
+                      externalId: updatedInvoiceData.data?.externalId!,
+                      dueDate:
+                        updatedInvoiceData.data?.dueDate ||
+                        dateToString(new Date()),
+                      sentDate:
+                        updatedInvoiceData.data?.sentDate ||
+                        dateToString(new Date()),
+                    },
+                  },
+                  {
+                    onSuccess: async () => {
+                      await refetchInvoiceData();
+                      await refetchDownloadUrl();
+                      setActionType('PRINT');
+                    },
+                  },
+                );
+              }
+            },
+          },
+        );
+      } else {
+        const blobFile = await generateBlobUrl(invoice);
+
+        const serviceCompanyId = user?.userAccount.serviceCompany.id;
+        const uploadPath = `${serviceCompanyId}/invoices`;
+
+        if (blobFile) {
+          const fileNames: string[] = [`${invoice.id}.pdf`];
+          const files = await createFilesFromBlobArray([blobFile!], fileNames);
+          await uploadFiles({files, uploadPath});
+          const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
+
+          await printInvoice(
+            {
+              id: invoice.id!,
+              body: {
+                pdfPath,
+                externalId: invoice.externalId!,
+                dueDate: invoice.dueDate || dateToString(new Date()),
+                sentDate: invoice.sentDate || dateToString(new Date()),
+              },
+            },
+            {
+              onSuccess: async () => {
+                await refetchDownloadUrl();
+                setActionType('PRINT');
+              },
+            },
+          );
+        }
+      }
+    } else {
+      await printInvoice(
+        {
+          id: invoice.id!,
+          body: {
+            pdfPath: invoice.additionalInfo.pdfPath,
+            externalId: invoice.externalId!,
+            dueDate: invoice.dueDate || dateToString(new Date()),
+            sentDate: invoice.sentDate || dateToString(new Date()),
+          },
+        },
+        {
+          onSuccess: async () => {
+            await refetchDownloadUrl();
+            setFilePathToDownload(
+              downloadUrl ? Object.values(downloadUrl)[0] : '',
+            );
+            setActionType('PRINT');
+          },
+        },
+      );
     }
   };
 
   useEffect(() => {
-    let snackbarId: string | number;
-
-    if (
-      invoice?.additionalInfo.pdfGenerationStatus ===
-      PdfGenerationStatus.RUNNING
-    ) {
-      snackbarId = enqueueSnackbar(
-        <Box display="flex" padding="0em" margin="0em" alignItems="center">
-          <img alt={t('Path Image')} src={PathImage} />{' '}
-          <Typography margin="0em" paddingLeft="0.5em" variant="body2">
-            {t('PDF generation is in progress. Please wait...')}
-          </Typography>
-        </Box>,
-        {
-          variant: 'info',
-          autoHideDuration: null,
-        },
-      );
-    }
-
-    return () => {
-      if (snackbarId) {
-        closeSnackbar(snackbarId);
+    if (actionType === 'PRINT' && filePathToDownload) {
+      if (filePathToDownload) {
+        printJS({
+          printable: filePathToDownload,
+          type: 'pdf',
+          showModal: true,
+        });
       }
-    };
-  }, [invoice?.additionalInfo.pdfGenerationStatus]);
+      setActionType('');
+      setFilePathToDownload('');
+    }
+  }, [actionType, filePathToDownload]);
 
   const onInvoiceSend = () => {
     const errorMessage = validateDueDate(invoice);
@@ -478,7 +583,9 @@ export const ViewInvoice = ({
               invoice.additionalInfo.pdfGenerationStatus ===
                 PdfGenerationStatus.DONE &&
               !isLoadingDownloadUrl ? (
-                <PDFContainer url={downloadUrl} />
+                <PDFContainer
+                  url={downloadUrl ? Object.values(downloadUrl)[0] : ''}
+                />
               ) : (
                 <PageCard>
                   <EmptySection
@@ -696,14 +803,13 @@ export const ViewInvoice = ({
           ...item,
           showBorder: actions[actions.length - 1] !== item,
         }))}
-        isValid={!!downloadUrl.length}
+        isValid={downloadUrl ? !!Object.values(downloadUrl)[0].length : !!''}
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice.id}
-        confirmBtnDisabled={!filePathToDownload || !isPDFsGenerated}
         email={
           invoice.propertyOwner?.additionalInfo.billingEmail ||
           invoice.propertyOwner?.contact.email
@@ -716,40 +822,143 @@ export const ViewInvoice = ({
           const serviceCompanyId = user?.userAccount.serviceCompany.id;
           const uploadPath = `${serviceCompanyId}/invoices`;
 
-          if (blobFile) {
-            const fileNames: string[] = [`${invoice.id}.pdf`];
-            const files = createFilesFromBlobArray([blobFile!], fileNames);
-            await uploadFiles({files, uploadPath});
+          if (invoice.status === InvoiceStatus.DRAFT) {
+            if (invoice.externalId.trim() === '') {
+              await updateInvoiceAsync(
+                {
+                  data: {
+                    ...invoice,
+                    externalId: companyNextNumber?.value!,
+                  },
+                  invoiceId: invoice.id,
+                },
+                {
+                  onSuccess: async () => {
+                    const updatedInvoiceData = await refetchInvoiceData();
+                    const blobFile = await generateBlobUrl(
+                      updatedInvoiceData?.data!,
+                    );
 
-            publishInvoice({
-              id: invoice!.id,
-              body: {
-                email: emailRecord.email,
-                subject: emailRecord.subject,
-                content: emailRecord.content,
-                emails: [emailRecord.email],
-                attachments: files.reduce<FileWithPreview[]>(
-                  (newArr: FileWithPreview[], obj) => [
-                    ...newArr,
-                    {
-                      ...obj,
-                      type: obj.type,
-                      uri: `${uploadPath}/${obj.name}`,
-                      description: obj.name.split('.')[0],
+                    if (blobFile) {
+                      const fileNames: string[] = [
+                        `${updatedInvoiceData.data?.id}.pdf`,
+                      ];
+                      const files = await createFilesFromBlobArray(
+                        [blobFile!],
+                        fileNames,
+                      );
+                      await uploadFiles({files, uploadPath});
+                      const pdfPath = `${uploadPath}/${updatedInvoiceData.data?.id}.pdf`;
+
+                      await sendInvoice({
+                        id: updatedInvoiceData.data?.id!,
+                        body: {
+                          pdfPath,
+                          externalId: updatedInvoiceData.data?.externalId!,
+                          dueDate:
+                            updatedInvoiceData.data?.dueDate ||
+                            dateToString(new Date()),
+                          sentDate:
+                            updatedInvoiceData.data?.sentDate ||
+                            dateToString(new Date()),
+                          email: {
+                            email: '',
+                            subject: emailRecord.subject,
+                            content: emailRecord.content,
+                            emails: [emailRecord.email],
+                            attachments: files.reduce<FileWithPreview[]>(
+                              (newArr: FileWithPreview[], obj) => [
+                                ...newArr,
+                                {
+                                  ...obj,
+                                  type: obj.type,
+                                  uri: `${uploadPath}/${obj.name}`,
+                                  description:
+                                    updatedInvoiceData.data?.externalId,
+                                },
+                              ],
+                              [],
+                            ),
+                          },
+                        },
+                      });
+                    }
+                  },
+                },
+              );
+            } else {
+              const blobFile = await generateBlobUrl(invoice);
+
+              if (blobFile) {
+                const fileNames: string[] = [`${invoice.id}.pdf`];
+                const files = await createFilesFromBlobArray(
+                  [blobFile!],
+                  fileNames,
+                );
+                await uploadFiles({files, uploadPath});
+                const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
+
+                await sendInvoice({
+                  id: invoice.id!,
+                  body: {
+                    pdfPath,
+                    externalId: invoice.externalId!,
+                    dueDate: invoice.dueDate || dateToString(new Date()),
+                    sentDate: invoice.sentDate || dateToString(new Date()),
+                    email: {
+                      email: '',
+                      subject: emailRecord.subject,
+                      content: emailRecord.content,
+                      emails: [emailRecord.email],
+                      attachments: files.reduce<FileWithPreview[]>(
+                        (newArr: FileWithPreview[], obj) => [
+                          ...newArr,
+                          {
+                            ...obj,
+                            type: obj.type,
+                            uri: `${uploadPath}/${obj.name}`,
+                            description: invoice.externalId,
+                          },
+                        ],
+                        [],
+                      ),
                     },
-                  ],
-                  [],
-                ),
-              },
-            });
+                  },
+                });
+              }
+            }
           } else {
-            publishInvoice({
-              id: invoice!.id,
+            const blob = await fetchFile(
+              downloadUrl ? Object.values(downloadUrl)[0] : '',
+            );
+            const fileNames: string[] = [`${invoice.id}.pdf`];
+            const files = await createFilesFromBlobArray([blob], fileNames);
+
+            await sendInvoice({
+              id: invoice.id!,
               body: {
-                email: emailRecord.email,
-                subject: emailRecord.subject,
-                content: emailRecord.content,
-                emails: [emailRecord.email],
+                pdfPath: invoice.additionalInfo.pdfPath,
+                externalId: invoice.externalId!,
+                dueDate: invoice.dueDate || dateToString(new Date()),
+                sentDate: invoice.sentDate || dateToString(new Date()),
+                email: {
+                  email: '',
+                  subject: emailRecord.subject,
+                  content: emailRecord.content,
+                  emails: [emailRecord.email],
+                  attachments: files.reduce<FileWithPreview[]>(
+                    (newArr: FileWithPreview[], obj) => [
+                      ...newArr,
+                      {
+                        ...obj,
+                        type: obj.type,
+                        uri: `${uploadPath}/${obj.name}`,
+                        description: invoice.externalId,
+                      },
+                    ],
+                    [],
+                  ),
+                },
               },
             });
           }

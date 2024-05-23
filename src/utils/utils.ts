@@ -459,10 +459,10 @@ export const scrollTableToBottom = () => {
   }
 };
 
-export const createFilesFromBlobArray = (
+export const createFilesFromBlobArray = async (
   blobs: Blob[],
   fileNames: string[],
-): FileWithPreview[] => {
+): Promise<FileWithPreview[]> => {
   const files: FileWithPreview[] = [];
   blobs.forEach((blob, index) => {
     const file = new File([blob], fileNames[index], {

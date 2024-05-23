@@ -181,7 +181,7 @@ export const InvoiceOverdueNotice = () => {
 
     const fileNames: string[] = [`${overdueNoticeId}.pdf`];
 
-    const files = createFilesFromBlobArray([blobFile!], fileNames);
+    const files = await createFilesFromBlobArray([blobFile!], fileNames);
 
     await uploadFiles({files, uploadPath});
 

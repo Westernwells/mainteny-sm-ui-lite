@@ -35,6 +35,8 @@ import {
   InvoicePaymentRecord,
   CreateInvoiceOverdueNoticeRecord,
   InvoiceActivityView,
+  PrintInvoiceRecord,
+  SendInvoiceRecord,
 } from 'models/invoice';
 import {Comment} from 'models/comment';
 import {languageContextMap} from 'utils/utils';
@@ -153,6 +155,78 @@ export function useInvoiceDetail(invoiceId?: string) {
     enabled: !!invoiceId,
   });
 }
+
+export const postPrintInvoice = async (
+  id: string,
+  body: PrintInvoiceRecord,
+) => {
+  await axiosClient.post<{value: string}>(`api/invoices/${id}/print`, body);
+};
+
+export const usePrintInvoice = ({
+  shouldNavigate = true,
+}: {
+  shouldNavigate?: boolean;
+} = {}) => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({id, body}: {id: string; body: PrintInvoiceRecord}) =>
+      postPrintInvoice(id, body),
+    {
+      onSuccess: (__, {id}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+
+        if (shouldNavigate) {
+          navigate(`/invoices/details/${id}`);
+        }
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+export const postSendInvoice = async (id: string, body: SendInvoiceRecord) => {
+  await axiosClient.post<{value: string}>(`api/invoices/${id}/send`, body);
+};
+
+export const useSendInvoice = ({
+  shouldNavigate = true,
+}: {
+  shouldNavigate?: boolean;
+} = {}) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const navigate = useNavigate();
+
+  return useMutation(
+    ({id, body}: {id: string; body: SendInvoiceRecord}) =>
+      postSendInvoice(id, body),
+    {
+      onSuccess: (__, {id}) => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        enqueueSnackbar(`Invoice sent successfully`, {
+          variant: 'success',
+        });
+        if (shouldNavigate) {
+          navigate(`/invoices/details/${id}`);
+        }
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
 
 export const postPublishInvoice = async (id: string, body: EmailRecord) => {
   await axiosClient.post<{value: string}>(`api/invoices/${id}/publish`, body);

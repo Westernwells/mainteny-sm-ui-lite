@@ -502,3 +502,18 @@ export const ALL_MANUAL_INVOICE_TYPES = [
   InvoiceType.FULL,
   InvoiceType.PARTIAL,
 ];
+
+export interface SendInvoiceRecord {
+  pdfPath: string;
+  externalId: string;
+  dueDate: string;
+  sentDate: string;
+  email: EmailRecord;
+}
+
+export interface PrintInvoiceRecord {
+  pdfPath: string;
+  externalId: string;
+  dueDate: string;
+  sentDate: string;
+}
