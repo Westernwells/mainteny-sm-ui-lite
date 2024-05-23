@@ -46,7 +46,8 @@ export const Actions = ({
       onInvite();
     } else {
       await inviteContact({
-        userName: contactId || '',
+        username: contactId || '',
+        propertyContactPersonId: contactId || '',
       });
     }
 

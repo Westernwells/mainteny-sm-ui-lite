@@ -35,7 +35,7 @@ import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
 import {EditCustomer} from './EditCustomer';
 import PaymentTermsWidget from './PaymentTermsWidget';
-import {ContactsWidget as CustomerPortalWidget} from './ContactsWidget';
+import CustomerPortalWidget from './CustomerPortalWidget';
 
 interface Props {
   customerId?: string;

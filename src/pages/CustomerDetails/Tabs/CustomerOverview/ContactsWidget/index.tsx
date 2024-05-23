@@ -10,7 +10,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import {
-  useContacts,
+  usePropertyOwnerContacts,
   useCreateContact,
   useDeleteContact,
   useInviteContact,
@@ -99,7 +99,7 @@ export const ContactsWidget = ({customerId}: Props) => {
   });
 
   const {data: contactsResource = createEmptyResource<ContactsView>(5)} =
-    useContacts(page, customerId || '');
+    usePropertyOwnerContacts(page, customerId || '');
 
   useEffect(() => {
     setRows(makeRows(contactsResource));
@@ -218,7 +218,8 @@ export const ContactsWidget = ({customerId}: Props) => {
       contactId: activeContact?.id || '',
     });
     await inviteContact({
-      userName: activeContact?.id || '',
+      username: activeContact?.id || '',
+      propertyContactPersonId: activeContact?.id || '',
     });
 
     setOpenDialog(false);

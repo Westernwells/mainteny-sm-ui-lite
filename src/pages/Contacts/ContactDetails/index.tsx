@@ -69,18 +69,18 @@ const ContactDetails = ({
           zIndex={99}>
           <Box display="flex" alignItems="center" gap="1rem">
             <ProfilePicturePreview
-              imageUrl={contactPerson?.userAccount.photoUrl ?? ''}
+              imageUrl={contactPerson?.userAccount?.photoUrl ?? ''}
               contactPerson={{
-                name: contactPerson?.userAccount.firstName ?? '',
-                surname: contactPerson?.userAccount.lastName ?? '',
+                name: contactPerson?.userAccount?.firstName ?? '',
+                surname: contactPerson?.userAccount?.lastName ?? '',
               }}
             />
             <Box display="flex" flexDirection="column">
               <Typography variant="h5">
-                {`${contactPerson?.userAccount.firstName} ${contactPerson?.userAccount.lastName}`}
+                {`${contactPerson?.userAccount?.firstName} ${contactPerson?.userAccount?.lastName}`}
               </Typography>
               <Typography variant="subtitle2" color="text.secondary">
-                {contactPerson?.userAccount.contact.email}
+                {contactPerson?.userAccount?.contact?.email}
               </Typography>
             </Box>
           </Box>

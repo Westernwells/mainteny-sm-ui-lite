@@ -9,6 +9,7 @@ import {
   CreateContactPersonAssociationRecord,
   RefContactPersonView,
   RefContactPersonQueryParams,
+  CreatePropertyContactPersonRecord,
 } from 'models/contacts';
 import {
   useInfiniteQuery,
@@ -29,6 +30,7 @@ import {
 } from 'models/contract';
 import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {Comment, CommentRecord} from 'models/comment';
+import {AxiosError} from 'axios/index';
 import {useUserSession} from './useUserSession';
 
 const fetchContractElevators = async (
@@ -59,7 +61,7 @@ export const getContacts = async (page: Page, customerId: string) => {
   return response.data;
 };
 
-export function useContacts(
+export function usePropertyOwnerContacts(
   page: Page,
   customerId: string,
   options?: UseQueryOptions<any, any, any>,
@@ -72,6 +74,50 @@ export function useContacts(
     },
   );
 }
+
+const deletePropertyOwnerContactPerson = async ({
+  propertyOwnerId,
+  propertyContactPersonId,
+}: {
+  propertyOwnerId: string;
+  propertyContactPersonId: string;
+}) => {
+  await axiosClient.delete<StringValue>(
+    `/api/propertyOwners/${propertyOwnerId}/contactPersons/${propertyContactPersonId}`,
+  );
+};
+export const useDeletePropertyOwnerContactPerson = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({
+      propertyOwnerId,
+      propertyContactPersonId,
+    }: {
+      propertyOwnerId: string;
+      propertyContactPersonId: string;
+    }) =>
+      deletePropertyOwnerContactPerson({
+        propertyOwnerId,
+        propertyContactPersonId,
+      }),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.queryContacts);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
 
 const updateContact = async (body: ContactBody, contactId: string) => {
   await axiosClient.put<StringValue>(
@@ -160,9 +206,14 @@ export const useDeleteContact = (successMsg?: string) => {
   );
 };
 
-const inviteContact = async (userName: string) => {
+const inviteContact = async (
+  propertyContactPersonId: string,
+  username: string,
+) => {
   await axiosClient.post<StringValue>(
-    `/api/users/propertyContactPersons/${userName}/invitation`,
+    `/api/users/propertyContactPersons/${propertyContactPersonId}/invitation`,
+    undefined,
+    {params: {username}, paramsSerializer},
   );
 };
 
@@ -171,7 +222,13 @@ export const useInviteContact = (successMsg?: string) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    ({userName}: {userName: string}) => inviteContact(userName),
+    ({
+      propertyContactPersonId,
+      username,
+    }: {
+      propertyContactPersonId: string;
+      username: string;
+    }) => inviteContact(propertyContactPersonId, username),
     {
       onSuccess: () => {
         if (successMsg) {
@@ -181,9 +238,21 @@ export const useInviteContact = (successMsg?: string) => {
         }
         queryClient.invalidateQueries(queryKeys.queryContacts);
       },
-      onError: (err: any) => {
-        console.log(err);
-        showError(err);
+      onError: (err: AxiosError<RestError>) => {
+        console.error(err);
+        const ALREADY_EXISTS_CODE = 1004;
+        if (err.response?.data?.message) {
+          enqueueSnackbar(
+            err.response.data?.errorCode === ALREADY_EXISTS_CODE
+              ? 'This Email address is already used for a different customer portal'
+              : 'Invalid email address',
+            {
+              variant: 'error',
+            },
+          );
+        } else {
+          showError(err);
+        }
       },
     },
   );
@@ -335,6 +404,8 @@ export const useUpdateServiceCompanyContactPerson = (successMsg?: string) => {
         queryClient.invalidateQueries([
           queryKeys.queryServiceCompanyContactPersons,
         ]);
+        queryClient.invalidateQueries([queryKeys.queryContacts]);
+        queryClient.invalidateQueries([queryKeys.queryRefContactPersons]);
       },
       onError: (err: any) => {
         console.log(err);
@@ -662,3 +733,40 @@ export const useRefContactPersons = (params: RefContactPersonQueryParams) =>
   useQuery([queryKeys.queryRefContactPersons, params.refId], () =>
     queryRefContactPersons(params),
   );
+
+const createPropertyOwnerContactPerson = async (
+  propertyOwnerId: string,
+  body: CreatePropertyContactPersonRecord,
+) => {
+  await axiosClient.post<StringValue>(
+    `/api/propertyOwners/${propertyOwnerId}/contactPersons`,
+    {
+      ...body,
+    },
+  );
+};
+export const useCreatePropertyContactPerson = (
+  propertyOwnerId: string,
+  successMsg?: string,
+) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    (body: CreatePropertyContactPersonRecord) =>
+      createPropertyOwnerContactPerson(propertyOwnerId, body),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.queryRefContactPersons);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
