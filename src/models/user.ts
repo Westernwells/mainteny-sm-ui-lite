@@ -6,6 +6,8 @@ export enum UserAccountStatus {
   NORMAL = 'NORMAL',
   LOCKED = 'LOCKED',
   RESET_PASSWORD = 'RESET_PASSWORD',
+  INVITATION_SENT = 'INVITATION_SENT',
+  INIT = 'INIT',
 }
 
 export enum Role {

@@ -187,13 +187,12 @@ const ContactsWidget = ({refId, refType}: Props) => {
         maxWidth={450}
         disableActions={isDisconnecting}
         open={openDeleteConfirm}
-        onConfirm={async () => {
-          await handleDeleteConfirm({
+        onConfirm={() =>
+          handleDeleteConfirm({
             contactPersonId: selectedContact?.id || '',
             associationId: selectedContact?.associationId || '',
-          });
-          setOpenDeleteConfirm(false);
-        }}
+          })
+        }
         onClose={() => setOpenDeleteConfirm(false)}
         title="Remove connection"
         content={t(

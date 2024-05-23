@@ -1,5 +1,5 @@
 import {Meta, Contact, Priority, Address, CompanyContact, Order} from './misc';
-import {UserAccountView} from './user';
+import {UserAccountStatus, UserAccountView} from './user';
 
 export interface ContactsView {
   id: string;
@@ -8,10 +8,18 @@ export interface ContactsView {
   number: string;
   userAccount: ContactsUserAccount;
   propertyOwner: PropertyOwner;
-  additionalInfo?: {
+  additionalInfo: {
     secondaryPhone?: string;
+    contactPersonId: string;
   };
 }
+
+export const PORTAL_PERSON_STATUS = {
+  ACTIVE: UserAccountStatus.NORMAL || UserAccountStatus.RESET_PASSWORD,
+  PENDING: UserAccountStatus.INVITATION_SENT,
+  REVOKED: UserAccountStatus.LOCKED,
+  INACTIVE: UserAccountStatus.INIT,
+} as const;
 
 export interface PropertyOwner {
   id: string;
@@ -124,6 +132,12 @@ export interface RefContactPersonQueryParams {
   refType: ContactPersonAssociationType;
 }
 
+export interface CreatePropertyContactPersonRecord {
+  contactPersonId: string;
+  username?: string;
+  externalId?: string;
+}
+
 export interface CreateContactPersonAssociationRecord {
   refType: ContactPersonAssociationType;
   refId: string;
@@ -181,8 +195,8 @@ export interface ServiceCompanyContactPeronFormModel {
     lastName: string;
     photoUrl: string;
     contact: {
-      phone: string;
-      email: string;
+      phone?: string;
+      email?: string;
     };
     serviceCompanyId: string;
     category?: string;
