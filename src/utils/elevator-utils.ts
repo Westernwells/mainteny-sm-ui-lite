@@ -137,7 +137,11 @@ export const getListViewFrequency = (
     return key === 'invoiceJob' ? t('After job') : '-';
   }
 
-  return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
+  return frequencySet.size
+    ? Array.from(frequencySet)
+        .map((item) => t(item))
+        .join(', ')
+    : '-';
 };
 
 export const getViewFrequency = (job: JobTimeUnit): string => {
