@@ -46,7 +46,6 @@ import {
   useFetchServiceOrderInvoices,
   useInvoiceDetail,
   useInvoices,
-  usePublishInvoice,
   useSendInvoice,
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';

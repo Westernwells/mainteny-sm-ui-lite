@@ -425,6 +425,7 @@ export interface UpdateInvoice {
   payment?: Payment;
   deliveryStartDate?: string;
   deliveryEndDate?: string;
+  showArticleSection?: boolean;
 }
 
 export interface QueryInvoiceCommentsParams {

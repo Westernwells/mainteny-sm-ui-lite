@@ -37,7 +37,7 @@ import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.tt
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
-import {PartialPaymentSection} from './PartialInvoicePdfTemplate';
+import PdfPartialPaymentSection from './PdfPartialPaymentSection';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -154,7 +154,7 @@ const getStyles = (
       color: '#212121',
       paddingLeft: 20,
       letterSpacing: -0.15,
-      marginTop: -12,
+      marginTop: 2,
       lineHeight: 1.5,
     },
     signatureBox: {
@@ -709,7 +709,7 @@ const FinalInvoicePdfTemplate = React.memo(
                 />
               )}
 
-              <PartialPaymentSection
+              <PdfPartialPaymentSection
                 translate={translate}
                 selectedLng={selectedLng}
                 invoice={invoice}
