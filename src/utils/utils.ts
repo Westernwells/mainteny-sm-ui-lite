@@ -527,3 +527,13 @@ export async function fetchFile(url: string): Promise<Blob> {
   }
   return response.blob();
 }
+
+export const removeUndefinedValues = (
+  obj: Record<string, any>,
+): Record<string, any> =>
+  Object.entries(obj).reduce((acc, [key, value]) => {
+    if (value !== undefined) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as Record<string, any>);

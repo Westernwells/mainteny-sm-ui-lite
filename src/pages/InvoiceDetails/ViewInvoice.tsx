@@ -88,6 +88,7 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
+import {formatInvoiceViewToUpdateInvoice} from './utils';
 
 interface Props {
   invoice: InvoiceView;
@@ -118,7 +119,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     refetch: refetchDownloadUrl,
   } = useDownloadUrl(isFetched ? [updatedInvoice!.additionalInfo.pdfPath] : []);
 
-  const [actionType, setActionType] = useState('');
   const [filePathToDownload, setFilePathToDownload] = useState('');
   const imageUrl = useLogoImage(user);
   const logoDimensions = useLogoDimensions(imageUrl);
@@ -294,46 +294,58 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     let PdfTemplate;
 
     if (
-      invoiceData.type === InvoiceType.FULL ||
-      invoiceData.type === InvoiceType.AGGREGATE
+      invoice.type === InvoiceType.FULL ||
+      invoice.type === InvoiceType.AGGREGATE
     ) {
       PdfTemplate = FullInvoicePdfTemplate;
-    } else if (invoiceData.type === InvoiceType.CREDIT_NOTE) {
+    } else if (invoice.type === InvoiceType.CREDIT_NOTE) {
       PdfTemplate = CreditNotePdfTemplate;
     } else if (
-      invoiceData.type === InvoiceType.PARTIAL ||
-      invoiceData.type === InvoiceType.UPFRONT
+      invoice.type === InvoiceType.PARTIAL ||
+      invoice.type === InvoiceType.UPFRONT
     ) {
       PdfTemplate = PartialInvoicePdfTemplate;
     } else {
       PdfTemplate = FinalInvoicePdfTemplate;
     }
 
-    const blob = await pdf(
-      <PdfTemplate
-        userInfo={user?.userAccount}
-        currentCurrency={currentCurrency}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
-        invoice={invoiceData}
-        selectedLng={company?.language}
-        translate={translate}
-        previousInvoices={sortedPreviousInvoices.slice(
-          0,
-          sortedPreviousInvoices.findIndex((i) => i.id === invoiceData.id) + 1,
-        )}
-      />,
-    ).toBlob();
-    const blobURL = URL.createObjectURL(blob);
-    setFilePathToDownload(blobURL);
-    return blob;
+    if (
+      invoice.type === InvoiceType.CREDIT_NOTE ||
+      invoice.type === InvoiceType.FULL ||
+      invoice.type === InvoiceType.AGGREGATE ||
+      invoice.type === InvoiceType.PARTIAL ||
+      invoice.type === InvoiceType.UPFRONT ||
+      invoice.type === InvoiceType.FINAL
+    ) {
+      // TODO: will remove when all invoice types PDFs are ready
+      const blob = await pdf(
+        <PdfTemplate
+          userInfo={user?.userAccount}
+          currentCurrency={currentCurrency}
+          logoSrc={imageUrl}
+          logoDimensions={logoDimensions}
+          invoice={invoiceData}
+          selectedLng={company?.language}
+          translate={translate}
+          previousInvoices={sortedPreviousInvoices.slice(
+            0,
+            sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+          )}
+        />,
+      ).toBlob();
+      const blobURL = URL.createObjectURL(blob);
+      setFilePathToDownload(blobURL);
+      return blob;
+    }
   };
 
   useEffect(() => {
-    if (invoice.status === InvoiceStatus.DRAFT) {
-      generateBlobUrl(invoice);
+    if (updatedInvoice?.status === InvoiceStatus.DRAFT) {
+      generateBlobUrl(updatedInvoice);
     }
-  }, [invoice, logoDimensions]);
+  }, [updatedInvoice, logoDimensions]);
+
+  const [actionType, setActionType] = useState('');
 
   const onPrintInvoice = async () => {
     setIsConfirmPrintDialogOpen(false);
@@ -342,10 +354,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       if (invoice.externalId.trim() === '') {
         await updateInvoiceAsync(
           {
-            data: {
+            data: formatInvoiceViewToUpdateInvoice({
               ...invoice,
               externalId: companyNextNumber?.value!,
-            },
+            }),
             invoiceId: invoice.id,
           },
           {
@@ -819,17 +831,14 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
-          const serviceCompanyId = user?.userAccount.serviceCompany.id;
-          const uploadPath = `${serviceCompanyId}/invoices`;
-
           if (invoice.status === InvoiceStatus.DRAFT) {
             if (invoice.externalId.trim() === '') {
               await updateInvoiceAsync(
                 {
-                  data: {
+                  data: formatInvoiceViewToUpdateInvoice({
                     ...invoice,
                     externalId: companyNextNumber?.value!,
-                  },
+                  }),
                   invoiceId: invoice.id,
                 },
                 {
@@ -838,6 +847,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     const blobFile = await generateBlobUrl(
                       updatedInvoiceData?.data!,
                     );
+
+                    const serviceCompanyId =
+                      user?.userAccount.serviceCompany.id;
+                    const uploadPath = `${serviceCompanyId}/invoices`;
 
                     if (blobFile) {
                       const fileNames: string[] = [
@@ -889,6 +902,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             } else {
               const blobFile = await generateBlobUrl(invoice);
 
+              const serviceCompanyId = user?.userAccount.serviceCompany.id;
+              const uploadPath = `${serviceCompanyId}/invoices`;
+
               if (blobFile) {
                 const fileNames: string[] = [`${invoice.id}.pdf`];
                 const files = await createFilesFromBlobArray(
@@ -897,7 +913,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                 );
                 await uploadFiles({files, uploadPath});
                 const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
-
                 await sendInvoice({
                   id: invoice.id!,
                   body: {
@@ -928,6 +943,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
               }
             }
           } else {
+            const serviceCompanyId = user?.userAccount.serviceCompany.id;
+            const uploadPath = `${serviceCompanyId}/invoices`;
             const blob = await fetchFile(
               downloadUrl ? Object.values(downloadUrl)[0] : '',
             );
