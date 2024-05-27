@@ -85,11 +85,9 @@ export const CheckList = ({serviceOrder}: Props) => {
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [deleteChecklistConfirm, setDeleteChecklistConfirm] = useState(false);
-  const [blobFile, setBlobFile] = useState<Blob>();
+  const [actionType, setActionType] = useState('');
 
-  const {mutateAsync: uploadFiles} = useUploadFiles(
-    'The document was sent successfully.',
-  );
+  const {mutateAsync: uploadFiles} = useUploadFiles('');
   const {mutateAsync: publishCheckList, isLoading: publishingCheckList} =
     usePublishChecklist();
   const {mutateAsync: deleteServiceOrderChecklist, isLoading: isDeleting} =
@@ -245,35 +243,35 @@ export const CheckList = ({serviceOrder}: Props) => {
         technicianName={technicianName}
       />,
     ).toBlob();
-    setBlobFile(blob);
     const blobURL = URL.createObjectURL(blob);
     setPdfPathToDownload(blobURL);
-  };
-
-  const handleDownload = () => {
-    try {
-      const snackbarKey = enqueueSnackbar(
-        <Box display="flex" padding="0em" margin="0em" alignItems="center">
-          <img alt={t('Path Image')} src={PathImage} />{' '}
-          <Typography margin="0em" paddingLeft="0.5em" variant="body2">
-            {t('PDF generation is in progress. Please wait...')}
-          </Typography>
-        </Box>,
-        {
-          variant: 'info',
-          autoHideDuration: 3000,
-        },
-      );
-      overviewPdfSnackBarRef.current = snackbarKey;
-      downloadFile();
-    } catch (e) {
-      showError(e);
-    }
+    return blob;
   };
 
   useEffect(() => {
-    generatePdfUrl();
-  }, [signatureImageUrl, imageUrl, selectedChecklist]);
+    if (pdfPathToDownload && actionType === 'DOWNLOAD') {
+      try {
+        const snackbarKey = enqueueSnackbar(
+          <Box display="flex" padding="0em" margin="0em" alignItems="center">
+            <img alt={t('Path Image')} src={PathImage} />{' '}
+            <Typography margin="0em" paddingLeft="0.5em" variant="body2">
+              {t('PDF generation is in progress. Please wait...')}
+            </Typography>
+          </Box>,
+          {
+            variant: 'info',
+            autoHideDuration: 3000,
+          },
+        );
+        overviewPdfSnackBarRef.current = snackbarKey;
+        downloadFile();
+        setPdfPathToDownload('');
+        setActionType('');
+      } catch (e) {
+        showError(e);
+      }
+    }
+  }, [pdfPathToDownload, actionType]);
 
   if (isLoadingCheckList) {
     return <Progress />;
@@ -582,7 +580,10 @@ export const CheckList = ({serviceOrder}: Props) => {
                 buttonProps={{
                   variant: 'outlined',
                   size: 'medium',
-                  onClick: handleDownload,
+                  onClick: async () => {
+                    await generatePdfUrl();
+                    setActionType('DOWNLOAD');
+                  },
                   sx: {
                     background: 'transparent',
                   },
@@ -626,13 +627,14 @@ export const CheckList = ({serviceOrder}: Props) => {
                   `${checkListInfo.checkListId}.pdf`,
                 ];
 
+                const blobFile = await generatePdfUrl();
                 const files = await createFilesFromBlobArray(
                   [blobFile!],
                   fileNames,
                 );
                 await uploadFiles({files, uploadPath});
 
-                publishCheckList({
+                await publishCheckList({
                   id: serviceOrder!.id,
                   params: {
                     checkListId: selectedChecklist?.checkListId || '',
@@ -650,7 +652,9 @@ export const CheckList = ({serviceOrder}: Props) => {
                           ...obj,
                           type: obj.type,
                           uri: `${uploadPath}/${obj.name}`,
-                          description: obj.name.split('.')[0],
+                          description:
+                            selectedChecklist?.checkList.number ||
+                            obj.name.split('.')[0],
                         },
                       ],
                       [],
