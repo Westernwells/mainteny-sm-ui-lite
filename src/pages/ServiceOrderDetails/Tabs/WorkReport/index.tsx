@@ -129,9 +129,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
   const {convertedImages, isImageLoading, setShouldFetchImages} =
     useFetchAndConvertMultipleImages(imageDownloadUrls, report?.attachments);
 
-  const [isPdfGenerated, setIsPdfGenerated] = useState(false);
+  const [actionType, setActionType] = useState('');
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
-  const [blobFile, setBlobFile] = useState<Blob>();
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
@@ -151,15 +150,35 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
   const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
     useCompleteServiceOrder('Work report updated successfully!');
-  const {mutateAsync: uploadFiles} = useUploadFiles(
-    'The document was sent successfully.',
-  );
+  const {mutateAsync: uploadFiles} = useUploadFiles('');
+
+  const generateWorkReportPdf = async () => {
+    const blob = await pdf(
+      <WorkReportTemplate
+        userInfo={user?.userAccount}
+        selectedLng={company?.language}
+        logoSrc={imageUrl}
+        logoDimensions={logoDimensions}
+        translate={translate}
+        serviceOrder={serviceOrder}
+        report={report}
+        schedule={schedule}
+        technicianSignatureImage={technicianSignatureImage}
+        customerSignatureImage={customerSignatureImage}
+        workReportPictures={convertedImages}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    setPreviewPdfBlobUrl(blobURL);
+    return blob;
+  };
 
   const onSubmitHandler = async (values: SimpleEmailRecord) => {
     const uploadPath = `${serviceCompanyId}/reports/${report?.id}/`;
 
     const fileNames: string[] = [`${report?.id}.pdf`];
 
+    const blobFile = await generateWorkReportPdf();
     const files = await createFilesFromBlobArray([blobFile!], fileNames);
 
     await uploadFiles({files, uploadPath});
@@ -179,7 +198,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
                 ...obj,
                 type: obj.type,
                 uri: `${uploadPath}/${obj.name}`,
-                description: obj.name.split('.')[0],
+                description:
+                  report?.externalId ||
+                  report?.number ||
+                  obj.name.split('.')[0],
               },
             ],
             [],
@@ -270,39 +292,14 @@ export const WorkReport = ({serviceOrder}: Props) => {
     }
   };
 
-  const generateWorkReportPdf = async () => {
-    const blob = await pdf(
-      <WorkReportTemplate
-        userInfo={user?.userAccount}
-        selectedLng={company?.language}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
-        translate={translate}
-        serviceOrder={serviceOrder}
-        report={report}
-        schedule={schedule}
-        technicianSignatureImage={technicianSignatureImage}
-        customerSignatureImage={customerSignatureImage}
-        workReportPictures={convertedImages}
-      />,
-    ).toBlob();
-    setBlobFile(blob);
-    const blobURL = URL.createObjectURL(blob);
-    setPreviewPdfBlobUrl(blobURL);
-  };
-
   const {downloadFile} = useDownloadFileWithCustomName(
-    report?.externalId || '',
+    report?.externalId || report?.number || '',
     previewPdfBlobUrl,
   );
 
-  const downloadPdf = () => {
-    generateWorkReportPdf();
-    setIsPdfGenerated(true);
-  };
-
-  const handleClickDownload = () => {
-    downloadPdf();
+  const handleClickDownload = async () => {
+    await generateWorkReportPdf();
+    setActionType('DOWNLOAD');
   };
 
   useEffect(() => {
@@ -348,12 +345,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
   }, [imageDownloadUrls, report?.attachments]);
 
   useEffect(() => {
-    if (isPdfGenerated && previewPdfBlobUrl) {
+    if (previewPdfBlobUrl && actionType === 'DOWNLOAD') {
       downloadFile();
-      setIsPdfGenerated(false);
+      setActionType('');
       setPreviewPdfBlobUrl('');
     }
-  }, [isPdfGenerated, previewPdfBlobUrl]);
+  }, [actionType, previewPdfBlobUrl]);
 
   if (!report) {
     return (
@@ -541,7 +538,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
               startIcon: <SendIcon />,
               onClick: () => {
                 setIsSendEmailDialogOpen(true);
-                generateWorkReportPdf();
               },
             }}>
             <Typography variant="subtitle2">{t('Send Work Report')}</Typography>
