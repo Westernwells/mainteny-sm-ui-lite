@@ -17,6 +17,7 @@ interface Props {
   showMenuActionBtn?: Boolean;
   btnLabel?: string;
   btnOnClick?: () => void;
+  btnIcon?: JSX.Element;
   containerStyles?: {[key: string]: string | number};
   menu?: MenuBtnProps[];
   filterItems?: ReactNode;
@@ -30,6 +31,7 @@ export const Widget = ({
   showActionBtn = false,
   hideSearchInput = false,
   btnLabel = '',
+  btnIcon,
   getSearchValue,
   defaultSearchValue = '',
   btnOnClick,
@@ -81,7 +83,7 @@ export const Widget = ({
               variant: 'contained',
               color: 'primary',
               size: 'small',
-              startIcon: <AddIcon />,
+              startIcon: btnIcon || <AddIcon />,
             }}>
             <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
               {t(btnLabel)}

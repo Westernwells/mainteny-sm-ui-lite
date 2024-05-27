@@ -19,7 +19,6 @@ const Integrations = () => {
       showHeaderBackground
       containerStyles={{
         mt: 1.5,
-        height: '100%',
       }}>
       <Grid container direction="column" gap={2}>
         <XeroIntegration />

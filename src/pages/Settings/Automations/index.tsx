@@ -8,7 +8,7 @@ type Props = {
 };
 
 const Automations = ({company}: Props) => (
-  <Grid container width="100%" height="100%" direction="column" gap="1.3em">
+  <Grid container direction="column" gap="1.3em">
     <Job
       company={company}
       containerStyles={{

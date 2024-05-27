@@ -97,7 +97,7 @@ export const Notes = ({invoice}: Props) => {
         <NoteAlt fontSize="small" />
         <Typography variant="subtitle2">{t('Notes')}</Typography>
         <Chip
-          label={totalInvoiceNotes}
+          label={totalInvoiceNotes + totalCustomerNotes}
           color="primary"
           size="small"
           sx={{
