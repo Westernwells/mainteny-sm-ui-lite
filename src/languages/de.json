@@ -2507,5 +2507,9 @@
   "You are about to disconnect contact from this {{refType}}.": "Sie sind dabei, die Verbindung zu diesem {{refType}} zu trennen.",
   "Assistant": "Assistent",
   "No Contact Persons": "Keine Kontaktpersonen",
-  "Do you want to add someone?": "Möchten Sie jemanden hinzufügen?"
+  "Do you want to add someone?": "Möchten Sie jemanden hinzufügen?",
+  "New Contact person": "Neue Kontaktperson",
+  "Small": "Klein",
+  "Normal": "Normal",
+  "Large": "Groß"
 }

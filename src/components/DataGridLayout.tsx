@@ -88,8 +88,8 @@ export const getColumnProps = ({
         {variant === 'noFormat'
           ? t(headerName)
           : variant === 'titleCase'
-          ? t(convertToText(headerName))
-          : t(headerName).toUpperCase()}
+          ? t(convertToText(headerName.toUpperCase()))
+          : t(headerName.toUpperCase()).toUpperCase()}
       </Typography>
     );
   },

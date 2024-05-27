@@ -57,7 +57,7 @@ export const makeRows = (checklists: CheckList[]): GridRowsProp =>
       []
     ).length,
     checklist: item,
-    navigateTo: `/settings/checklists/${item.id}`,
+    navigateTo: `/settings/checklist/${item.id}`,
     navigateOptions: {state: {checklist: item}},
   }));
 
@@ -112,6 +112,10 @@ export const ChecklistDataGrid = () => {
           searchPlaceholder="Search"
           getSearchValue={setQuery}
           refInput={textInput}
+          showActionBtn
+          btnLabel="New Checklist"
+          btnOnClick={() => navigate('/settings/checklist/new')}
+          btnIcon={<ListAltIcon />}
         />
       }>
       <DataGridLayout

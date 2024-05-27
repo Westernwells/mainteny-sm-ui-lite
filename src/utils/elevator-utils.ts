@@ -137,7 +137,11 @@ export const getListViewFrequency = (
     return key === 'invoiceJob' ? t('After job') : '-';
   }
 
-  return frequencySet.size ? Array.from(frequencySet).join(', ') : '-';
+  return frequencySet.size
+    ? Array.from(frequencySet)
+        .map((item) => t(item))
+        .join(', ')
+    : '-';
 };
 
 export const getViewFrequency = (job: JobTimeUnit): string => {
@@ -177,4 +181,5 @@ export const inspectionCycleLabels = {
   [InspectionCycle.HALF_YEARLY]: 'Every 6 months',
   [InspectionCycle.YEARLY]: 'Every year',
   [InspectionCycle.BIENNIALLY]: 'Every 2 years',
+  [InspectionCycle.TRIENNIALLY]: 'Every 3 years',
 };

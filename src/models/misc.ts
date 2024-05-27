@@ -398,4 +398,5 @@ export enum InspectionCycle {
   HALF_YEARLY = 'HALF_YEARLY',
   YEARLY = 'YEARLY',
   BIENNIALLY = 'BIENNIALLY',
+  TRIENNIALLY = 'TRIENNIALLY',
 }

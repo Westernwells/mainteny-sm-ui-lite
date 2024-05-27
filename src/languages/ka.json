@@ -2540,5 +2540,9 @@
   "You are about to disconnect contact from this {{refType}}.": "თქვენ აპირებთ კავშირი გაწყვიტოთ კონტაქტთან {{refType}}-დან",
   "Assistant": "ასისტენტი",
   "No Contact Persons": "საკონტაქტო პირი არ არის",
-  "Do you want to add someone?": "გს"
+  "Do you want to add someone?": "გსურთ ვინმეს დამატება?",
+  "New Contact person": "ახალი საკონტაქტო პირი",
+  "Small": "პატარა",
+  "Normal": "საშუალო",
+  "Large": "დიდი"
 }

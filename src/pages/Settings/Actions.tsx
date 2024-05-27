@@ -45,7 +45,7 @@ export const Actions = ({checklist}: Props) => {
         label: t('Edit'),
         icon: <Edit />,
         onClick: () => {
-          navigate(`/settings/checklists/${checklist.id}?edit=1`, {
+          navigate(`/settings/checklist/${checklist.id}?edit=1`, {
             state: {checklist},
           });
         },

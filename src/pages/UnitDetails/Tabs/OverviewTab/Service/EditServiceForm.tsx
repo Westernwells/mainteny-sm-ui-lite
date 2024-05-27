@@ -173,6 +173,9 @@ export const EditServiceForm = ({formik}: Props) => {
             <MenuItem value={InspectionCycle.BIENNIALLY}>
               {t(inspectionCycleLabels[InspectionCycle.BIENNIALLY])}
             </MenuItem>
+            <MenuItem value={InspectionCycle.TRIENNIALLY}>
+              {t(inspectionCycleLabels[InspectionCycle.TRIENNIALLY])}
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>

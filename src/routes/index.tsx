@@ -37,7 +37,6 @@ import ServiceOrderDetails from 'pages/ServiceOrderDetails';
 import SystemSettings from 'pages/SystemSettings';
 import NewCompany from 'pages/NewCompany';
 import SettingsPage from 'pages/Settings';
-import Checklist from 'pages/Settings/Checklist';
 import NewServiceOrder from 'pages/NewServiceOrder';
 import NewUnit from 'pages/NewUnit';
 import NewCustomer from 'pages/NewCustomer';
@@ -660,54 +659,14 @@ export const Router = () => {
           />
 
           <Route
-            path="/settings"
+            path="/settings/*"
             element={
               <>
                 <Helmet>
                   <title>{`Settings - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout pageScrollable pageTitle="Settings">
+                <PageLayout excludeDefaultSpacing pageTitle="Settings">
                   <SettingsPage />
-                </PageLayout>
-              </>
-            }
-          />
-
-          <Route
-            path="/settings/checklist/new"
-            element={
-              <>
-                <Helmet>
-                  <title>{`New Checklist - ${titleTail}`}</title>
-                </Helmet>
-                <PageLayout
-                  backBtnLabel="New Checklist"
-                  pageScrollable
-                  showBackAction
-                  containerStyles={{
-                    overflow: 'visible',
-                  }}>
-                  <Checklist />
-                </PageLayout>
-              </>
-            }
-          />
-
-          <Route
-            path="/settings/checklists/:id"
-            element={
-              <>
-                <Helmet>
-                  <title>{`Checklist - ${titleTail}`}</title>
-                </Helmet>
-                <PageLayout
-                  backBtnLabel="Checklist"
-                  pageScrollable
-                  showBackAction
-                  containerStyles={{
-                    overflow: 'visible',
-                  }}>
-                  <Checklist />
                 </PageLayout>
               </>
             }
