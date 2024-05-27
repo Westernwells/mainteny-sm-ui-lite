@@ -16,6 +16,12 @@ import {Thumb} from './Thumb';
 export interface FileWithPreview extends FileWithPath {
   preview: string;
 }
+
+export interface MappedFile extends FileWithPreview {
+  uri: string;
+  description: string;
+}
+
 interface Props {
   existingFiles?: FileWithPreview[];
   getAcceptedFiles?: (val: FileWithPreview[]) => void;

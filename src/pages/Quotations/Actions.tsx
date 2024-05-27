@@ -119,13 +119,8 @@ export const Actions = ({quotation, imageUrl}: Props) => {
     setBlobFile(blob);
     const blobURL = URL.createObjectURL(blob);
     setFilePathToDownload(blobURL);
+    return blob;
   };
-
-  useEffect(() => {
-    if (imageUrl && quotation.status === QuotationStatus.DRAFT) {
-      generateBlobUrl();
-    }
-  }, [actionType]);
 
   const {downloadFile} = useDownloadFileWithCustomName(
     quotation.number,
@@ -436,8 +431,9 @@ export const Actions = ({quotation, imageUrl}: Props) => {
             return;
           }
 
+          const blob = await generateBlobUrl();
           const fileNames: string[] = [`${quotation.id}.pdf`];
-          const files = await createFilesFromBlobArray([blobFile!], fileNames);
+          const files = await createFilesFromBlobArray([blob], fileNames);
           await uploadFiles({files, uploadPath});
 
           await sendQuotation({

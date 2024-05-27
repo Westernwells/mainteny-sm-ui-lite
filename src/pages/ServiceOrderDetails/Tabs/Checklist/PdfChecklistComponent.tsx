@@ -101,7 +101,7 @@ export const MultiChoiceComponent = ({
   return (
     <View style={styles.multiChoiceContainer}>
       <View style={styles.multiChoiceHeader}>
-        <Text style={styles.multiChoiceIndex}>{index - 1}</Text>
+        <Text style={styles.multiChoiceIndex}>{index + 1}</Text>
         <Text style={styles.multiChoiceHeaderContent}>{component.subject}</Text>
       </View>
 
@@ -186,7 +186,7 @@ export const TextComponent = ({
           justifyContent: 'space-between',
           paddingTop: 8,
         }}>
-        <Text style={{flex: '0 0 5%'}}>{index - 1}</Text>
+        <Text style={{flex: '0 0 5%'}}>{index}</Text>
         <Text style={{flex: '0 0 95%', ...boldFontStyle}}>
           {component.subject}
         </Text>

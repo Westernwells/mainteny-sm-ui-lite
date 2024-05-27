@@ -44,6 +44,7 @@ import {
 } from 'hooks/reactQuery/useInvoice';
 import {
   getServiceOrderStatusColor,
+  getSignatureKeys,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {Confirm} from 'components/Confirm';
@@ -58,7 +59,7 @@ import GradingOutlinedIcon from '@mui/icons-material/GradingOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {CheckListComponentType} from 'models/checklist';
-import {ChecklistStatus} from 'models/service-order';
+import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
 import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
 import {
   useDownloadFileWithCustomName,
@@ -84,8 +85,12 @@ import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTempl
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
 import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {FileWithPreview, MappedFile} from 'components/MyDropZone/MyDropzone';
 import {ServiceCompanyNumberType} from 'models/service-company';
+import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
+import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
+import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
+import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice} from './utils';
@@ -194,6 +199,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const {isInvoicePDFGenerated} = getInvoicePDFStatuses(invoice);
   const serviceOrder = invoice?.serviceOrder;
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
   const {data: serviceOrderCheckLists} = useQueryServiceOrderChecklists({
     serviceOrderId: serviceOrder?.id || '',
@@ -238,6 +244,150 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     });
     return data;
   }, [serviceOrderCheckLists]);
+
+  const labels =
+    completedChecklists?.map((c) => {
+      const schedule = invoice?.serviceOrder?.schedules.find(
+        (s) => s.technician.id === c.technicianId,
+      );
+      const checklistNumber = c.checkList.number || 'Unassigned';
+      return {
+        value: {
+          checklistId: c.checkListId,
+          technicianId: c.technicianId,
+        },
+        label: `${checklistNumber}-${schedule?.technician.userAccount.firstName} ${schedule?.technician.userAccount.lastName}`,
+      };
+    }) || [];
+
+  const [selectedOption, setSelectedOption] = useState(labels[0]?.value || '');
+
+  const technicianUserAccount = invoice?.serviceOrder?.schedules.find(
+    (s) => s.technician.id === selectedOption.technicianId,
+  )?.technician.userAccount;
+
+  const technicianName = technicianUserAccount
+    ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
+    : '';
+
+  const {data: signatureDownloadUrls = {}} = useDownloadUrl(
+    completedChecklists?.length
+      ? completedChecklists.map(
+          (c) => c.additionalInfo.technicianSignature || '',
+        )
+      : [],
+  );
+
+  const selectedChecklist = completedChecklists?.find(
+    (c) =>
+      c.checkListId === selectedOption.checklistId &&
+      c.technicianId === selectedOption.technicianId,
+  );
+  const sortedChecklistComponents =
+    selectedChecklist?.checkList?.components.sort(
+      (a, b) =>
+        (a.additionalInfo?.orderNumber ?? 0) -
+        (b.additionalInfo?.orderNumber ?? 0),
+    );
+
+  const signaturePath =
+    signatureDownloadUrls[
+      selectedChecklist?.additionalInfo.technicianSignature || ''
+    ];
+
+  const signatureImageUrl = useFetchAndConvertImage(signaturePath);
+
+  const generateChecklistBlob = async () => {
+    const blob = await pdf(
+      <ChecklistPdf
+        userInfo={user?.userAccount}
+        logoSrc={imageUrl}
+        logoDimensions={logoDimensions}
+        selectedLng={company?.language}
+        translate={translate}
+        serviceOrder={invoice?.serviceOrder}
+        selectedChecklist={selectedChecklist}
+        sortedChecklistComponents={sortedChecklistComponents}
+        signaturePath={signatureImageUrl}
+        technicianName={technicianName}
+      />,
+    ).toBlob();
+    return blob;
+  };
+
+  useEffect(() => {
+    if (completedChecklists?.length && !selectedOption) {
+      setSelectedOption(labels[0].value);
+    }
+  }, [completedChecklists]);
+
+  // Handle Work report
+
+  const [report, setReport] = useState<ServiceOrderReportView | undefined>(
+    serviceOrder?.reports?.[0],
+  );
+
+  const reportToUpdate = serviceOrder?.reports?.find(
+    (r) => r.externalId === report?.externalId,
+  );
+
+  const signatureKeys = getSignatureKeys(
+    serviceOrder!,
+    report,
+    serviceCompanyId,
+  );
+
+  const {data: downloadUrls = {}} = useDownloadUrl(
+    report?.signatures?.map((item) => item.fileResource.uri) ?? [],
+    {enabled: !!report?.signatures?.length},
+  );
+
+  const {data: imageDownloadUrls = {}} = useDownloadUrl(
+    report?.attachments?.map((item) => item.fileResource.uri) ?? [],
+    {enabled: true},
+  );
+
+  const schedule = invoice?.serviceOrder?.schedules.find(
+    (s) => s.technician.id === report?.technicianId,
+  );
+
+  const technicianSignatureImage = useFetchAndConvertImage(
+    downloadUrls[signatureKeys.TECHNICIAN],
+  );
+
+  const customerSignatureImage = useFetchAndConvertImage(
+    downloadUrls[signatureKeys.CUSTOMER],
+  );
+
+  const {convertedImages} = useFetchAndConvertMultipleImages(
+    imageDownloadUrls,
+    report?.attachments,
+  );
+
+  const generateWorkReportBlob = async () => {
+    const blob = await pdf(
+      <WorkReportTemplate
+        userInfo={user?.userAccount}
+        selectedLng={company?.language}
+        logoSrc={imageUrl}
+        logoDimensions={logoDimensions}
+        translate={translate}
+        serviceOrder={invoice?.serviceOrder}
+        report={report}
+        schedule={schedule}
+        technicianSignatureImage={technicianSignatureImage}
+        customerSignatureImage={customerSignatureImage}
+        workReportPictures={convertedImages}
+      />,
+    ).toBlob();
+    return blob;
+  };
+
+  useEffect(() => {
+    if (reportToUpdate) {
+      setReport(reportToUpdate);
+    }
+  }, [reportToUpdate]);
 
   const actions = useMemo(() => {
     const items = [];
@@ -339,13 +489,27 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   };
 
+  const [actionType, setActionType] = useState('');
+
   useEffect(() => {
     if (updatedInvoice?.status === InvoiceStatus.DRAFT) {
       generateBlobUrl(updatedInvoice);
     }
   }, [updatedInvoice, logoDimensions]);
 
-  const [actionType, setActionType] = useState('');
+  useEffect(() => {
+    if (actionType === 'PRINT' && filePathToDownload) {
+      if (filePathToDownload) {
+        printJS({
+          printable: filePathToDownload,
+          type: 'pdf',
+          showModal: true,
+        });
+      }
+      setActionType('');
+      setFilePathToDownload('');
+    }
+  }, [actionType, filePathToDownload]);
 
   const onPrintInvoice = async () => {
     setIsConfirmPrintDialogOpen(false);
@@ -365,7 +529,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
               const updatedInvoiceData = await refetchInvoiceData();
               const blobFile = await generateBlobUrl(updatedInvoiceData?.data!);
 
-              const serviceCompanyId = user?.userAccount.serviceCompany.id;
               const uploadPath = `${serviceCompanyId}/invoices`;
 
               if (blobFile) {
@@ -408,7 +571,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       } else {
         const blobFile = await generateBlobUrl(invoice);
 
-        const serviceCompanyId = user?.userAccount.serviceCompany.id;
         const uploadPath = `${serviceCompanyId}/invoices`;
 
         if (blobFile) {
@@ -459,20 +621,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       );
     }
   };
-
-  useEffect(() => {
-    if (actionType === 'PRINT' && filePathToDownload) {
-      if (filePathToDownload) {
-        printJS({
-          printable: filePathToDownload,
-          type: 'pdf',
-          showModal: true,
-        });
-      }
-      setActionType('');
-      setFilePathToDownload('');
-    }
-  }, [actionType, filePathToDownload]);
 
   const onInvoiceSend = () => {
     const errorMessage = validateDueDate(invoice);
@@ -831,154 +979,221 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
-          if (invoice.status === InvoiceStatus.DRAFT) {
-            if (invoice.externalId.trim() === '') {
-              await updateInvoiceAsync(
-                {
-                  data: formatInvoiceViewToUpdateInvoice({
-                    ...invoice,
-                    externalId: companyNextNumber?.value!,
-                  }),
-                  invoiceId: invoice.id,
-                },
-                {
-                  onSuccess: async () => {
-                    const updatedInvoiceData = await refetchInvoiceData();
-                    const blobFile = await generateBlobUrl(
-                      updatedInvoiceData?.data!,
-                    );
+          const generateAndUploadFiles = async (
+            blob: Blob,
+            fileNames: string[],
+            uploadPath: string,
+            description: string,
+          ): Promise<MappedFile[]> => {
+            const files = await createFilesFromBlobArray(
+              blob ? [blob] : [],
+              fileNames,
+            );
+            await uploadFiles({files, uploadPath});
 
-                    const serviceCompanyId =
-                      user?.userAccount.serviceCompany.id;
-                    const uploadPath = `${serviceCompanyId}/invoices`;
+            return files.map((file) => ({
+              ...file,
+              uri: `${uploadPath}/${file.name}`,
+              description,
+              name: file.name,
+              type: file.type,
+            }));
+          };
 
-                    if (blobFile) {
-                      const fileNames: string[] = [
-                        `${updatedInvoiceData.data?.id}.pdf`,
-                      ];
-                      const files = await createFilesFromBlobArray(
-                        [blobFile!],
-                        fileNames,
-                      );
-                      await uploadFiles({files, uploadPath});
-                      const pdfPath = `${uploadPath}/${updatedInvoiceData.data?.id}.pdf`;
+          const generateAdditionalFiles = async (
+            baseFiles: MappedFile[],
+            invoiceData: InvoiceView,
+          ): Promise<FileWithPreview[]> => {
+            let allFiles: MappedFile[] = baseFiles;
+            const checkListInfo = invoiceData?.serviceOrder?.checkLists![0];
 
-                      await sendInvoice({
-                        id: updatedInvoiceData.data?.id!,
-                        body: {
-                          pdfPath,
-                          externalId: updatedInvoiceData.data?.externalId!,
-                          dueDate:
-                            updatedInvoiceData.data?.dueDate ||
-                            dateToString(new Date()),
-                          sentDate:
-                            updatedInvoiceData.data?.sentDate ||
-                            dateToString(new Date()),
-                          email: {
-                            email: '',
-                            subject: emailRecord.subject,
-                            content: emailRecord.content,
-                            emails: [emailRecord.email],
-                            attachments: files.reduce<FileWithPreview[]>(
-                              (newArr: FileWithPreview[], obj) => [
-                                ...newArr,
-                                {
-                                  ...obj,
-                                  type: obj.type,
-                                  uri: `${uploadPath}/${obj.name}`,
-                                  description:
-                                    updatedInvoiceData.data?.externalId,
-                                },
-                              ],
-                              [],
-                            ),
-                          },
-                        },
-                      });
-                    }
-                  },
-                },
+            if (invoiceData.additionalInfo.includeWorkReport) {
+              const workReportBlob = await generateWorkReportBlob();
+              const workReportUploadPath = `${serviceCompanyId}/reports`;
+              const workReportFiles = await generateAndUploadFiles(
+                workReportBlob,
+                [`${report?.id}.pdf`],
+                workReportUploadPath,
+                report?.externalId || report?.number || '',
               );
-            } else {
-              const blobFile = await generateBlobUrl(invoice);
+              allFiles = allFiles.concat(workReportFiles);
+            }
 
-              const serviceCompanyId = user?.userAccount.serviceCompany.id;
-              const uploadPath = `${serviceCompanyId}/invoices`;
+            if (invoiceData.additionalInfo.includeCheckList) {
+              const checklistBlob = await generateChecklistBlob();
+              const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${invoiceData?.serviceOrder?.id}/checkLists/${checkListInfo?.technicianId}`;
+              const checklistFiles = await generateAndUploadFiles(
+                checklistBlob,
+                [`${checkListInfo?.checkListId}.pdf`],
+                checklistUploadPath,
+                selectedChecklist?.checkList.number || '',
+              );
+              allFiles = allFiles.concat(checklistFiles);
+            }
 
-              if (blobFile) {
-                const fileNames: string[] = [`${invoice.id}.pdf`];
-                const files = await createFilesFromBlobArray(
-                  [blobFile!],
-                  fileNames,
-                );
-                await uploadFiles({files, uploadPath});
-                const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
-                await sendInvoice({
-                  id: invoice.id!,
-                  body: {
-                    pdfPath,
-                    externalId: invoice.externalId!,
-                    dueDate: invoice.dueDate || dateToString(new Date()),
-                    sentDate: invoice.sentDate || dateToString(new Date()),
-                    email: {
-                      email: '',
-                      subject: emailRecord.subject,
-                      content: emailRecord.content,
-                      emails: [emailRecord.email],
-                      attachments: files.reduce<FileWithPreview[]>(
-                        (newArr: FileWithPreview[], obj) => [
-                          ...newArr,
-                          {
-                            ...obj,
-                            type: obj.type,
-                            uri: `${uploadPath}/${obj.name}`,
-                            description: invoice.externalId,
+            return allFiles.reduce<FileWithPreview[]>(
+              (newArr, obj) => [
+                ...newArr,
+                {
+                  ...obj,
+                  type: obj.type,
+                  uri: `${obj.uri}`,
+                  description: obj.description,
+                },
+              ],
+              [],
+            );
+          };
+
+          const handleInvoiceUpdateAndSend = async () => {
+            if (invoice.status === InvoiceStatus.DRAFT) {
+              if (invoice.externalId.trim() === '') {
+                await updateInvoiceAsync(
+                  {
+                    data: formatInvoiceViewToUpdateInvoice({
+                      ...invoice,
+                      externalId: companyNextNumber?.value!,
+                    }),
+                    invoiceId: invoice.id,
+                  },
+                  {
+                    onSuccess: async () => {
+                      const updatedInvoiceData = await refetchInvoiceData();
+                      const blobFile = await generateBlobUrl(
+                        updatedInvoiceData?.data!,
+                      );
+
+                      const uploadPath = `${serviceCompanyId}/invoices`;
+
+                      if (blobFile) {
+                        const fileNames: string[] = [
+                          `${updatedInvoiceData.data?.id}.pdf`,
+                        ];
+                        const files = await createFilesFromBlobArray(
+                          [blobFile!],
+                          fileNames,
+                        );
+                        await uploadFiles({files, uploadPath});
+                        const pdfPath = `${uploadPath}/${updatedInvoiceData.data?.id}.pdf`;
+
+                        const allFiles = await generateAdditionalFiles(
+                          files.map((file) => ({
+                            ...file,
+                            uri: `${uploadPath}/${file.name}`,
+                            description:
+                              updatedInvoiceData.data?.externalId || '',
+                            name: file.name,
+                            type: file.type,
+                          })),
+                          updatedInvoiceData?.data!,
+                        );
+
+                        await sendInvoice({
+                          id: updatedInvoiceData.data?.id!,
+                          body: {
+                            pdfPath,
+                            externalId: updatedInvoiceData.data?.externalId!,
+                            dueDate:
+                              updatedInvoiceData.data?.dueDate ||
+                              dateToString(new Date()),
+                            sentDate:
+                              updatedInvoiceData.data?.sentDate ||
+                              dateToString(new Date()),
+                            email: {
+                              email: '',
+                              subject: emailRecord.subject,
+                              content: emailRecord.content,
+                              emails: [emailRecord.email],
+                              attachments: allFiles,
+                            },
                           },
-                        ],
-                        [],
-                      ),
+                        });
+                      }
                     },
                   },
-                });
-              }
-            }
-          } else {
-            const serviceCompanyId = user?.userAccount.serviceCompany.id;
-            const uploadPath = `${serviceCompanyId}/invoices`;
-            const blob = await fetchFile(
-              downloadUrl ? Object.values(downloadUrl)[0] : '',
-            );
-            const fileNames: string[] = [`${invoice.id}.pdf`];
-            const files = await createFilesFromBlobArray([blob], fileNames);
+                );
+              } else {
+                const blobFile = await generateBlobUrl(invoice);
 
-            await sendInvoice({
-              id: invoice.id!,
-              body: {
-                pdfPath: invoice.additionalInfo.pdfPath,
-                externalId: invoice.externalId!,
-                dueDate: invoice.dueDate || dateToString(new Date()),
-                sentDate: invoice.sentDate || dateToString(new Date()),
-                email: {
-                  email: '',
-                  subject: emailRecord.subject,
-                  content: emailRecord.content,
-                  emails: [emailRecord.email],
-                  attachments: files.reduce<FileWithPreview[]>(
-                    (newArr: FileWithPreview[], obj) => [
-                      ...newArr,
-                      {
-                        ...obj,
-                        type: obj.type,
-                        uri: `${uploadPath}/${obj.name}`,
-                        description: invoice.externalId,
+                const uploadPath = `${serviceCompanyId}/invoices`;
+
+                if (blobFile) {
+                  const fileNames: string[] = [`${invoice.id}.pdf`];
+                  const files = await createFilesFromBlobArray(
+                    [blobFile!],
+                    fileNames,
+                  );
+                  await uploadFiles({files, uploadPath});
+                  const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
+
+                  const allFiles = await generateAdditionalFiles(
+                    files.map((file) => ({
+                      ...file,
+                      uri: `${uploadPath}/${file.name}`,
+                      description: invoice.externalId || '',
+                      name: file.name,
+                      type: file.type,
+                    })),
+                    invoice,
+                  );
+
+                  await sendInvoice({
+                    id: invoice.id!,
+                    body: {
+                      pdfPath,
+                      externalId: invoice.externalId!,
+                      dueDate: invoice.dueDate || dateToString(new Date()),
+                      sentDate: invoice.sentDate || dateToString(new Date()),
+                      email: {
+                        email: '',
+                        subject: emailRecord.subject,
+                        content: emailRecord.content,
+                        emails: [emailRecord.email],
+                        attachments: allFiles,
                       },
-                    ],
-                    [],
-                  ),
+                    },
+                  });
+                }
+              }
+            } else {
+              const uploadPath = `${serviceCompanyId}/invoices`;
+              const blob = await fetchFile(
+                downloadUrl ? Object.values(downloadUrl)[0] : '',
+              );
+              const fileNames: string[] = [`${invoice.id}.pdf`];
+              const files = await createFilesFromBlobArray([blob], fileNames);
+
+              const allFiles = await generateAdditionalFiles(
+                files.map((file) => ({
+                  ...file,
+                  uri: `${uploadPath}/${file.name}`,
+                  description: invoice.externalId || '',
+                  name: file.name,
+                  type: file.type,
+                })),
+                invoice,
+              );
+
+              await sendInvoice({
+                id: invoice.id!,
+                body: {
+                  pdfPath: invoice.additionalInfo.pdfPath,
+                  externalId: invoice.externalId!,
+                  dueDate: invoice.dueDate || dateToString(new Date()),
+                  sentDate: invoice.sentDate || dateToString(new Date()),
+                  email: {
+                    email: '',
+                    subject: emailRecord.subject,
+                    content: emailRecord.content,
+                    emails: [emailRecord.email],
+                    attachments: allFiles,
+                  },
                 },
-              },
-            });
-          }
+              });
+            }
+          };
+
+          handleInvoiceUpdateAndSend();
         }}
       />
 
