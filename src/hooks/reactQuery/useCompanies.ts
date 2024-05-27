@@ -72,13 +72,15 @@ export const getCompany = async (companyId: string) => {
   return response.data;
 };
 
-export const useCompanyById = (companyId?: string) => {
+export const useCompanyById = (companyId?: string, shouldFetch?: boolean) => {
   const {showError} = useSnackbar();
+
   return useQuery(
     [queryKeys.fetchCompany, companyId],
     () => getCompany(companyId!),
     {
-      enabled: !!companyId,
+      enabled:
+        shouldFetch !== undefined ? !!companyId && shouldFetch : !!companyId,
       onError: (err: any) => {
         console.log(err);
         showError(err);
@@ -352,12 +354,14 @@ const getCompanyNextNumber = async (
 export const useCompanyNextNumber = (
   params: Partial<ServiceCompanyNextNumberParams>,
   companyId?: string,
+  shouldFetch?: boolean,
 ) =>
   useQuery(
     [queryKeys.fetchcompanyNextNumber, companyId, params.type],
     () => getCompanyNextNumber(params, companyId!),
     {
-      enabled: !!companyId,
+      enabled:
+        shouldFetch !== undefined ? !!companyId && shouldFetch : !!companyId,
     },
   );
 

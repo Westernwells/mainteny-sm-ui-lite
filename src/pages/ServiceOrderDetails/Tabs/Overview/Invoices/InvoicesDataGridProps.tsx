@@ -105,11 +105,7 @@ export const columns: GridColDef[] = [
     headerAlign: 'right',
     variant: 'titleCase',
     renderCell: (params) => (
-      <Actions
-        invoice={params.row.invoice}
-        downloadUrl={params.row.downloadUrl}
-        isInvoiceList={false}
-      />
+      <Actions invoice={params.row.invoice} isInvoiceList={false} />
     ),
     flex: 1,
   }),

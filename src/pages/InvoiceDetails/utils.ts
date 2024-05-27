@@ -15,7 +15,11 @@ import {
 } from 'models/invoice';
 import {getItemRecord} from 'utils/article-utils';
 import {Currencies, moneyRecordForBackend} from 'utils/currency';
-import {dateToString, fixRounding, removeUndefinedValues} from 'utils/utils';
+import {
+  dateToString,
+  fixRounding,
+  removeUndefinedAndEmptyValues,
+} from 'utils/utils';
 
 export const formatInvoiceRecord = (
   value: InvoiceFormData,
@@ -400,5 +404,5 @@ export const formatInvoiceViewToUpdateInvoice = (
     serviceCompanyId: serviceCompany.id,
   };
 
-  return removeUndefinedValues(updateInvoice) as UpdateInvoice;
+  return removeUndefinedAndEmptyValues(updateInvoice) as UpdateInvoice;
 };
