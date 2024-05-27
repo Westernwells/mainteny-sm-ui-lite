@@ -106,7 +106,7 @@ export const PdfInvoicedSection = ({
   const styles = getStyles();
 
   return (
-    <View>
+    <View wrap={false}>
       <View
         style={{
           display: 'flex',

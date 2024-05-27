@@ -1,5 +1,5 @@
 import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
@@ -28,7 +28,11 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {
   useCancelInvoice,
   useDeleteInvoice,
-  usePublishInvoice,
+  useFetchServiceOrderInvoices,
+  useInvoiceDetail,
+  usePrintInvoice,
+  useSendInvoice,
+  useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
 import {
@@ -37,13 +41,39 @@ import {
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
-import {getInvoicePDFStatuses, validateDueDate} from 'utils/invoice-utils';
+import {validateDueDate} from 'utils/invoice-utils';
+import useLogoDimensions from 'hooks/useLogoDimensions';
+import {
+  useCompanyById,
+  useCompanyNextNumber,
+} from 'hooks/reactQuery/useCompanies';
+import {
+  companyLanguageContextMap,
+  createFilesFromBlobArray,
+  dateToString,
+  fetchFile,
+} from 'utils/utils';
+import {useCurrentCurrency} from 'utils/currency';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {ServiceCompanyNumberType} from 'models/service-company';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {pdf} from '@react-pdf/renderer';
+import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
+import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
+import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
+import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {formatInvoiceViewToUpdateInvoice} from 'pages/InvoiceDetails/utils';
 
 interface Props {
   invoice: InvoiceView;
-  downloadUrl: string;
+  imageUrl?: string;
   isInvoiceList?: boolean;
 }
+
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
 
 const Tooltip = ({children, ...props}: TooltipProps) => (
   <MUITooltip
@@ -62,15 +92,13 @@ const Tooltip = ({children, ...props}: TooltipProps) => (
   </MUITooltip>
 );
 
-export const Actions = ({
-  invoice,
-  downloadUrl,
-  isInvoiceList = true,
-}: Props) => {
+export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
+  const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -81,32 +109,134 @@ export const Actions = ({
     useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const {mutateAsync: publishInvoice} = usePublishInvoice({
-    shouldNavigate: false,
-  });
-  const [pdfPathToDownload, setPdfPathToDownload] = useState('');
 
-  const {data: downloadUrls} = useDownloadUrl(
-    pdfPathToDownload ? [pdfPathToDownload] : [],
+  const [actionType, setActionType] = useState('');
+  const [pdfPathToDownload, setPdfPathToDownload] = useState('');
+  const logoDimensions = useLogoDimensions(imageUrl!);
+
+  const [shouldFetchNextNumber, setShouldFetchNextNumber] = useState(false);
+
+  const {data: company} = useCompanyById(
+    user?.userAccount.serviceCompany.id,
+    shouldFetchNextNumber,
   );
 
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
+  const {data: companyNextNumber} = useCompanyNextNumber(
+    {
+      type: ServiceCompanyNumberType.INVOICE,
+    },
+    user?.userAccount.serviceCompany.id,
+    shouldFetchNextNumber,
+  );
+
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceView | null>(
+    null,
+  );
+
+  const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
+    selectedInvoice?.id,
+  );
+
+  const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
+    selectedInvoice?.additionalInfo.pdfPath
+      ? [selectedInvoice?.additionalInfo.pdfPath]
+      : [pdfPathToDownload],
+    {enabled: false},
+  );
+
+  const {mutateAsync: uploadFiles} = useUploadFiles('');
+  const {mutateAsync: updateInvoiceAsync} = useUpdateInvoice();
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
   const {mutateAsync: cancelInvoice} = useCancelInvoice();
+  const {mutateAsync: printInvoice} = usePrintInvoice({shouldNavigate: false});
+  const {mutateAsync: sendInvoice} = useSendInvoice();
 
-  const {isPDFsGenerated, isInvoicePDFGenerated} =
-    getInvoicePDFStatuses(invoice);
-
-  const {downloadFile} = useDownloadFileWithCustomName(
-    invoice?.number,
-    downloadUrls?.[pdfPathToDownload] || '',
+  const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
+    invoice?.serviceOrder?.id,
+    {
+      enabled: false,
+    },
   );
 
-  useEffect(() => {
-    if (downloadUrls?.[pdfPathToDownload]) {
-      downloadFile();
-      setPdfPathToDownload('');
+  const sortedPreviousInvoices = useMemo(
+    () =>
+      [...previousInvoices]
+        .sort(
+          (a, b) =>
+            new Date(a.meta.createdAt).getTime() -
+            new Date(b.meta.createdAt).getTime(),
+        )
+        .map((i) => ({
+          ...i,
+          totalAmount: {
+            ...i.totalAmount,
+            vats: [...i.totalAmount.vats].sort(
+              (a, b) => b.percentageVat - a.percentageVat,
+            ),
+          },
+        })),
+    [previousInvoices],
+  );
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    invoice.externalId || invoice.number,
+    pdfPathToDownload ||
+      (downloadUrl ? downloadUrl[invoice?.additionalInfo.pdfPath] : ''),
+  );
+
+  const generateBlobUrl = async (invoiceData: InvoiceView) => {
+    let PdfTemplate;
+
+    if (
+      invoiceData.type === InvoiceType.FULL ||
+      invoiceData.type === InvoiceType.AGGREGATE
+    ) {
+      PdfTemplate = FullInvoicePdfTemplate;
+    } else if (invoiceData.type === InvoiceType.CREDIT_NOTE) {
+      PdfTemplate = CreditNotePdfTemplate;
+    } else if (
+      invoiceData.type === InvoiceType.PARTIAL ||
+      invoiceData.type === InvoiceType.UPFRONT
+    ) {
+      PdfTemplate = PartialInvoicePdfTemplate;
+    } else {
+      PdfTemplate = FinalInvoicePdfTemplate;
     }
-  }, [downloadUrls]);
+
+    const blob = await pdf(
+      <PdfTemplate
+        userInfo={user?.userAccount}
+        currentCurrency={currentCurrency}
+        logoSrc={imageUrl}
+        logoDimensions={logoDimensions}
+        invoice={invoiceData}
+        selectedLng={company?.language}
+        translate={translate}
+        previousInvoices={sortedPreviousInvoices.slice(
+          0,
+          sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+        )}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    setPdfPathToDownload(blobURL);
+    return blob;
+  };
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -150,25 +280,28 @@ export const Actions = ({
   const downloadItem = {
     label: t('Download'),
     icon: <FileDownload />,
-    onClick: () => {
-      setPdfPathToDownload(invoice.additionalInfo.pdfPath);
+    onClick: async () => {
+      setSelectedInvoice(invoice);
+      setActionType('DOWNLOAD');
+      if (invoice.status === InvoiceStatus.DRAFT) {
+        await generateBlobUrl(invoice);
+      } else {
+        await refetchDownloadUrl();
+        setPdfPathToDownload(
+          downloadUrl ? downloadUrl?.[invoice.additionalInfo.pdfPath!]! : '',
+        );
+      }
     },
   };
 
   const action = useMemo(() => {
     if (invoice.status === InvoiceStatus.DRAFT) {
       return (
-        <Tooltip
-          title={
-            isPDFsGenerated ? t('Send') : t('The PDFs are not generated yet.')
-          }
-          placement="left"
-          arrow>
+        <Tooltip title={t('Send')} placement="left" arrow>
           <span>
             <IconButton
               onClick={handleOpenSendInvoiceModal}
-              sx={{color: 'action.active'}}
-              disabled={!isPDFsGenerated}>
+              sx={{color: 'action.active'}}>
               <SendIcon fontSize="small" />
             </IconButton>
           </span>
@@ -206,7 +339,7 @@ export const Actions = ({
             setIsSendEmailDialogOpen(true);
           },
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        ...[downloadItem],
       );
     } else if (invoice.status === InvoiceStatus.DRAFT) {
       items.push(
@@ -214,7 +347,11 @@ export const Actions = ({
         {
           label: t('Print'),
           icon: <Print />,
-          onClick: () => setIsConfirmPrintDialogOpen(true),
+          onClick: async () => {
+            setIsConfirmPrintDialogOpen(true);
+            setSelectedInvoice(invoice);
+            refetchDownloadUrl();
+          },
         },
         {
           label: t('Edit'),
@@ -230,7 +367,7 @@ export const Actions = ({
             setIsDeleteDialogOpen(true);
           },
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        ...(logoDimensions ? [downloadItem] : []),
       );
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
       items.push(
@@ -251,7 +388,7 @@ export const Actions = ({
           icon: <Payments />,
           onClick: () => setIsCreateCreditNoteDialogOpen(true),
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        ...(logoDimensions ? [downloadItem] : []),
         cancelItem,
       );
     } else if (invoice.status === InvoiceStatus.EXPIRED) {
@@ -278,7 +415,7 @@ export const Actions = ({
           icon: <Payments />,
           onClick: () => setIsCreateCreditNoteDialogOpen(true),
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        ...(logoDimensions ? [downloadItem] : []),
         cancelItem,
       );
     } else if (invoice.status === InvoiceStatus.PAID) {
@@ -295,7 +432,7 @@ export const Actions = ({
           icon: <Payments />,
           onClick: () => setIsCreateCreditNoteDialogOpen(true),
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        ...(logoDimensions ? [downloadItem] : []),
       );
     } else if (invoice.status === InvoiceStatus.PARTIALLY_PAID) {
       items.push(
@@ -321,7 +458,7 @@ export const Actions = ({
           icon: <Payments />,
           onClick: () => setIsCreateCreditNoteDialogOpen(true),
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        ...(logoDimensions ? [downloadItem] : []),
       );
     } else if (invoice.status === InvoiceStatus.CREDITED) {
       items.push(
@@ -340,9 +477,13 @@ export const Actions = ({
         {
           label: t('Print'),
           icon: <Print />,
-          onClick: () => setIsConfirmPrintDialogOpen(true),
+          onClick: async () => {
+            setIsConfirmPrintDialogOpen(true);
+            setSelectedInvoice(invoice);
+            refetchDownloadUrl();
+          },
         },
-        ...(isInvoicePDFGenerated ? [downloadItem] : []),
+        ...(logoDimensions ? [downloadItem] : []),
         cancelItem,
       );
     }
@@ -367,31 +508,156 @@ export const Actions = ({
       return;
     }
 
-    await publishInvoice(
-      {
-        id: invoice.id,
-        body: {
-          email: '',
-          subject: '',
-          content: '',
+    setIsConfirmPrintDialogOpen(false);
+    setShouldFetchNextNumber(true);
+
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      if (invoice.externalId.trim() === '') {
+        await updateInvoiceAsync(
+          {
+            data: formatInvoiceViewToUpdateInvoice({
+              ...invoice,
+              externalId: companyNextNumber?.value!,
+            }),
+            invoiceId: invoice.id,
+          },
+          {
+            onSuccess: async () => {
+              const updatedInvoiceData = await refetchInvoiceData();
+              const blob = await generateBlobUrl(updatedInvoiceData?.data!);
+
+              const serviceCompanyId = user?.userAccount.serviceCompany.id;
+              const uploadPath = `${serviceCompanyId}/invoices`;
+
+              if (blob) {
+                const fileNames: string[] = [
+                  `${updatedInvoiceData?.data?.id}.pdf`,
+                ];
+                const files = await createFilesFromBlobArray(
+                  [blob!],
+                  fileNames,
+                );
+                await uploadFiles({files, uploadPath});
+                const pdfPath = `${uploadPath}/${updatedInvoiceData?.data?.id}.pdf`;
+
+                await printInvoice(
+                  {
+                    id: updatedInvoiceData?.data?.id!,
+                    body: {
+                      pdfPath,
+                      externalId: updatedInvoiceData?.data?.externalId!,
+                      dueDate:
+                        updatedInvoiceData?.data?.dueDate ||
+                        dateToString(new Date()),
+                      sentDate:
+                        updatedInvoiceData?.data?.sentDate ||
+                        dateToString(new Date()),
+                    },
+                  },
+                  {
+                    onSuccess: async () => {
+                      setActionType('PRINT');
+                    },
+                  },
+                );
+              }
+            },
+          },
+        );
+      } else {
+        const blob = await generateBlobUrl(invoice);
+
+        const serviceCompanyId = user?.userAccount.serviceCompany.id;
+        const uploadPath = `${serviceCompanyId}/invoices`;
+
+        if (blob) {
+          const fileNames: string[] = [`${invoice.id}.pdf`];
+          const files = await createFilesFromBlobArray([blob!], fileNames);
+          await uploadFiles({files, uploadPath});
+          const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
+
+          await printInvoice(
+            {
+              id: invoice.id!,
+              body: {
+                pdfPath,
+                externalId: invoice.externalId!,
+                dueDate: invoice.dueDate || dateToString(new Date()),
+                sentDate: invoice.sentDate || dateToString(new Date()),
+              },
+            },
+            {
+              onSuccess: async () => {
+                await refetchDownloadUrl();
+                setActionType('PRINT');
+              },
+            },
+          );
+        }
+      }
+    } else {
+      await printInvoice(
+        {
+          id: invoice.id!,
+          body: {
+            pdfPath: invoice.additionalInfo.pdfPath,
+            externalId: invoice.externalId!,
+            dueDate: invoice.dueDate || dateToString(new Date()),
+            sentDate: invoice.sentDate || dateToString(new Date()),
+          },
         },
-      },
-      {
-        onSuccess: () => {
-          setIsConfirmPrintDialogOpen(false);
-          setTimeout(() => {
-            if (downloadUrl) {
-              printJS({
-                printable: downloadUrl,
-                type: 'pdf',
-                showModal: true,
-              });
-            }
-          }, 6000);
+        {
+          onSuccess: async () => {
+            await refetchDownloadUrl();
+            setPdfPathToDownload(
+              downloadUrl ? Object.values(downloadUrl)[0] : '',
+            );
+            setActionType('PRINT');
+          },
         },
-      },
-    );
+      );
+    }
   };
+
+  useEffect(() => {
+    if (actionType === 'PRINT' && pdfPathToDownload) {
+      if (pdfPathToDownload) {
+        printJS({
+          printable: pdfPathToDownload,
+          type: 'pdf',
+          showModal: true,
+        });
+      }
+      setActionType('');
+      setPdfPathToDownload('');
+    }
+  }, [actionType, pdfPathToDownload]);
+
+  useEffect(() => {
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      if (pdfPathToDownload && actionType === 'DOWNLOAD') {
+        downloadFile();
+        setPdfPathToDownload('');
+        setActionType('');
+      }
+    } else if (
+      actionType === 'DOWNLOAD' &&
+      downloadUrl?.[invoice.additionalInfo.pdfPath!]
+    ) {
+      downloadFile();
+      setActionType('');
+    }
+
+    if (invoice.status !== InvoiceStatus.DRAFT && actionType === 'PRINT') {
+      setPdfPathToDownload(downloadUrl?.[invoice.additionalInfo.pdfPath!]!);
+    }
+  }, [downloadUrl]);
+
+  useEffect(() => {
+    refetchDownloadUrl();
+  }, [updatedInvoice]);
+
+  useEffect(() => {}, []);
 
   const generateEmailSubject = () => {
     const name =
@@ -465,8 +731,149 @@ export const Actions = ({
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice.id}
-        submitHook={usePublishInvoice}
-        confirmBtnDisabled={!isPDFsGenerated}
+        callback={async (emailRecord) => {
+          setIsSendEmailDialogOpen(false);
+
+          const serviceCompanyId = user?.userAccount.serviceCompany.id;
+          const uploadPath = `${serviceCompanyId}/invoices`;
+
+          if (invoice.status === InvoiceStatus.DRAFT) {
+            if (invoice.externalId.trim() === '') {
+              await updateInvoiceAsync(
+                {
+                  data: formatInvoiceViewToUpdateInvoice({
+                    ...invoice,
+                    externalId: companyNextNumber?.value!,
+                  }),
+                  invoiceId: invoice.id,
+                },
+                {
+                  onSuccess: async () => {
+                    const updatedInvoiceData = await refetchInvoiceData();
+                    const blob = await generateBlobUrl(
+                      updatedInvoiceData?.data!,
+                    );
+
+                    if (blob) {
+                      const fileNames: string[] = [`${updatedInvoice?.id}.pdf`];
+                      const files = await createFilesFromBlobArray(
+                        [blob!],
+                        fileNames,
+                      );
+                      await uploadFiles({files, uploadPath});
+                      const pdfPath = `${uploadPath}/${updatedInvoice?.id}.pdf`;
+
+                      await sendInvoice({
+                        id: updatedInvoice?.id!,
+                        body: {
+                          pdfPath,
+                          externalId: updatedInvoice?.externalId!,
+                          dueDate:
+                            updatedInvoice?.dueDate || dateToString(new Date()),
+                          sentDate:
+                            updatedInvoice?.sentDate ||
+                            dateToString(new Date()),
+                          email: {
+                            email: '',
+                            subject: emailRecord.subject,
+                            content: emailRecord.content,
+                            emails: [emailRecord.email],
+                            attachments: files.reduce<FileWithPreview[]>(
+                              (newArr: FileWithPreview[], obj) => [
+                                ...newArr,
+                                {
+                                  ...obj,
+                                  type: obj.type,
+                                  uri: `${uploadPath}/${obj.name}`,
+                                  description: updatedInvoice?.externalId,
+                                },
+                              ],
+                              [],
+                            ),
+                          },
+                        },
+                      });
+                    }
+                  },
+                },
+              );
+            } else {
+              const blob = await generateBlobUrl(invoice);
+
+              if (blob) {
+                const fileNames: string[] = [`${invoice.id}.pdf`];
+                const files = await createFilesFromBlobArray(
+                  [blob!],
+                  fileNames,
+                );
+                await uploadFiles({files, uploadPath});
+                const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
+
+                await sendInvoice({
+                  id: invoice.id!,
+                  body: {
+                    pdfPath,
+                    externalId: invoice.externalId!,
+                    dueDate: invoice.dueDate || dateToString(new Date()),
+                    sentDate: invoice.sentDate || dateToString(new Date()),
+                    email: {
+                      email: '',
+                      subject: emailRecord.subject,
+                      content: emailRecord.content,
+                      emails: [emailRecord.email],
+                      attachments: files.reduce<FileWithPreview[]>(
+                        (newArr: FileWithPreview[], obj) => [
+                          ...newArr,
+                          {
+                            ...obj,
+                            type: obj.type,
+                            uri: `${uploadPath}/${obj.name}`,
+                            description: invoice.externalId,
+                          },
+                        ],
+                        [],
+                      ),
+                    },
+                  },
+                });
+              }
+            }
+          } else {
+            const blob = await fetchFile(
+              downloadUrl ? Object.values(downloadUrl)[0] : '',
+            );
+            const fileNames: string[] = [`${invoice.id}.pdf`];
+            const files = await createFilesFromBlobArray([blob], fileNames);
+
+            await sendInvoice({
+              id: invoice.id!,
+              body: {
+                pdfPath: invoice.additionalInfo.pdfPath,
+                externalId: invoice.externalId!,
+                dueDate: invoice.dueDate || dateToString(new Date()),
+                sentDate: invoice.sentDate || dateToString(new Date()),
+                email: {
+                  email: '',
+                  subject: emailRecord.subject,
+                  content: emailRecord.content,
+                  emails: [emailRecord.email],
+                  attachments: files.reduce<FileWithPreview[]>(
+                    (newArr: FileWithPreview[], obj) => [
+                      ...newArr,
+                      {
+                        ...obj,
+                        type: obj.type,
+                        uri: `${uploadPath}/${obj.name}`,
+                        description: invoice.externalId,
+                      },
+                    ],
+                    [],
+                  ),
+                },
+              },
+            });
+          }
+        }}
         email={
           invoice.propertyOwner?.additionalInfo.billingEmail ||
           invoice.propertyOwner?.contact.email

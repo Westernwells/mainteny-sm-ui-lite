@@ -259,7 +259,7 @@ export const ArticleSection = ({
 
   const styles = getStyles(boldFontStyle, regularFontStyle);
   return (
-    <View style={styles.table}>
+    <View style={styles.table} wrap={false}>
       <View style={styles.tableHead}>
         <View style={{...styles.tableRow, width: '100%'}}>
           <TableHeading text="#" width="2%" textAlign="left" />

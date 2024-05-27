@@ -63,7 +63,7 @@ export const getInvoiceStatusStyles = (
   }
 };
 
-export const columns: GridColDef[] = [
+export const columns = (imageUrl: string): GridColDef[] => [
   getColumnProps({
     field: InvoiceOrderField.EXTERNAL_ID,
     headerName: 'number',
@@ -164,10 +164,7 @@ export const columns: GridColDef[] = [
     headerName: 'actions',
     align: 'center',
     renderCell: (params) => (
-      <Actions
-        invoice={params.row.invoice}
-        downloadUrl={params.row.downloadUrl}
-      />
+      <Actions invoice={params.row.invoice} imageUrl={imageUrl} />
     ),
     flex: 1,
   }),

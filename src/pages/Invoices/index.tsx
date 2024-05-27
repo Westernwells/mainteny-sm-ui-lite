@@ -34,6 +34,7 @@ import {useSearchValues} from 'hooks/useSearchValues';
 import {Widget} from 'components/Widget';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {OrderByParams} from 'models/misc';
+import useLogoImage from 'hooks/useLogoImage';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
 const pageSize = 25;
@@ -42,6 +43,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
+  const imageUrl = useLogoImage(user);
   const navigate = useNavigate();
   const formatDate = useFormatDate();
 
@@ -250,7 +252,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       </Alert>
       <DataGridLayout
         rows={rows || []}
-        columns={columns}
+        columns={columns(imageUrl)}
         loading={isFetching}
         scrollToTop={search}
         pageSize={page.pageSize}

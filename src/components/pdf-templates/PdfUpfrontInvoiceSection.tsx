@@ -186,7 +186,11 @@ const PdfUpfrontInvoiceSection = ({
           {
             percentageVat: articleItems![0].unitAmount.percentageVat,
             vat:
-              amount * ((articleItems![0].unitAmount.percentageVat ?? 0) / 100),
+              amount *
+              centsToMoney(
+                currentCurrency?.code!,
+                articleItems![0].unitAmount.percentageVat ?? 0,
+              ),
           },
         ]
       : getAggregatedPartialPaymentsVats(articleItems!, amount)
@@ -254,152 +258,137 @@ const PdfUpfrontInvoiceSection = ({
   );
 
   return (
-    <View wrap={false}>
-      {invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM && (
-        <PdfPerItemSection
-          translate={translate}
-          selectedLng={selectedLng}
-          currentCurrency={currentCurrency}
-          previousInvoices={previousInvoices}
-          invoice={invoice}
-        />
-      )}
+    <View>
+      {invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM &&
+        previousInvoices.length && (
+          <PdfPerItemSection
+            translate={translate}
+            selectedLng={selectedLng}
+            currentCurrency={currentCurrency}
+            previousInvoices={previousInvoices}
+            invoice={invoice}
+          />
+        )}
 
-      {invoice?.additionalInfo.payment?.type !== PaymentType.PER_ITEM && (
-        <View>
-          <View
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexDirection: 'row',
-              width: '100%',
-              marginTop: 20,
-            }}>
-            <Text
-              style={{
-                ...styles.tableHeading,
-                textAlign: 'left',
-                width: '60%',
-              }}>
-              {translate('Partial Invoices')}
-            </Text>
-
-            {invoice?.additionalInfo.payment?.type ===
-              PaymentType.PERCENTAGE && (
-              <Text
-                style={{
-                  ...styles.tableHeading,
-                  textAlign: 'right',
-                  width: '15%',
-                }}>
-                {translate('Percentage')}
-              </Text>
-            )}
-
-            <Text
-              style={{
-                ...styles.tableHeading,
-                textAlign: 'right',
-                width:
-                  invoice?.additionalInfo.payment?.type ===
-                  PaymentType.PERCENTAGE
-                    ? '25%'
-                    : '40%',
-              }}>
-              {translate('Total')}
-              {` (${currentCurrency?.symbol})`}
-            </Text>
-          </View>
-
-          {previousInvoices.map((previousInvoice, index) => (
+      {invoice?.additionalInfo.payment?.type !== PaymentType.PER_ITEM &&
+        previousInvoices.length && (
+          <View wrap={false}>
             <View
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                width: '100%',
                 flexDirection: 'row',
-                marginVertical: 4,
-                borderBottomWidth:
-                  index === previousInvoices.length - 1 ? 1 : 0,
-                borderBottomColor: '#212121',
-              }}
-              wrap={false}
-              key={previousInvoice.id}>
+                width: '100%',
+                marginTop: 20,
+              }}>
               <Text
                 style={{
+                  ...styles.tableHeading,
                   textAlign: 'left',
-                  color: '#212121',
                   width: '60%',
                 }}>
-                {previousInvoice.additionalInfo.payment?.description}
+                {translate('Partial Invoices')}
               </Text>
+
               {invoice?.additionalInfo.payment?.type ===
                 PaymentType.PERCENTAGE && (
                 <Text
                   style={{
+                    ...styles.tableHeading,
                     textAlign: 'right',
-                    color: '#212121',
                     width: '15%',
                   }}>
-                  {previousInvoice.additionalInfo.payment?.percentage}%
+                  {translate('Percentage')}
                 </Text>
               )}
 
               <Text
                 style={{
+                  ...styles.tableHeading,
                   textAlign: 'right',
-                  color: '#212121',
                   width:
-                    previousInvoice.additionalInfo.payment?.type ===
+                    invoice?.additionalInfo.payment?.type ===
                     PaymentType.PERCENTAGE
                       ? '25%'
                       : '40%',
                 }}>
-                {formatCurrency(
-                  centsToMoney(
-                    currentCurrency?.code!,
-                    aggregatedAmountToMoney(
-                      previousInvoice?.additionalInfo.payment?.amount,
-                    ).value ?? 0,
-                  ),
-                  {
-                    currency: currentCurrency?.code,
-                    excludeCurrencySymbol: true,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  },
-                )}
+                {translate('Total')}
+                {` (${currentCurrency?.symbol})`}
               </Text>
             </View>
-          ))}
-        </View>
-      )}
 
-      <View style={styles.tableRow}>
-        <Text style={{width: '44%'}} />
-        <Text
-          style={{
-            width: '32%',
-            color: '#616161',
-            fontSize: 10,
-            textAlign: 'right',
-          }}>
-          {translate('Subtotal excl. VAT')}
-        </Text>
-        <Text
-          style={{
-            width: '24%',
-            textAlign: 'right',
-            fontSize: 10,
-          }}>
-          {totalAmountExclVatFormatted}
-        </Text>
-      </View>
+            {previousInvoices.map((previousInvoice, index) => (
+              <View
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                  flexDirection: 'row',
+                  marginVertical: 4,
+                  borderBottomWidth:
+                    index === previousInvoices.length - 1 ? 1 : 0,
+                  borderBottomColor: '#212121',
+                }}
+                wrap={false}
+                key={previousInvoice.id}>
+                <Text
+                  style={{
+                    textAlign: 'left',
+                    color: '#212121',
+                    width: '60%',
+                  }}>
+                  {previousInvoice.additionalInfo.payment?.description}
+                </Text>
+                {invoice?.additionalInfo.payment?.type ===
+                  PaymentType.PERCENTAGE && (
+                  <Text
+                    style={{
+                      textAlign: 'right',
+                      color: '#212121',
+                      width: '15%',
+                    }}>
+                    {fixRounding(
+                      previousInvoice.additionalInfo.payment?.percentage ?? 0,
+                      2,
+                    )}
+                    %
+                  </Text>
+                )}
 
-      <View>
-        {allItemsHasSameVAT ? (
+                <Text
+                  style={{
+                    textAlign: 'right',
+                    color: '#212121',
+                    width:
+                      previousInvoice.additionalInfo.payment?.type ===
+                      PaymentType.PERCENTAGE
+                        ? '25%'
+                        : '40%',
+                  }}>
+                  {formatCurrency(
+                    centsToMoney(
+                      currentCurrency?.code!,
+                      aggregatedAmountToMoney(
+                        previousInvoice?.additionalInfo.payment?.amount,
+                      ).value ?? 0,
+                    ),
+                    {
+                      currency: currentCurrency?.code,
+                      excludeCurrencySymbol: true,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    },
+                  )}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+      {previousInvoices.length && (
+        <View wrap={false}>
           <View style={styles.tableRow}>
             <Text style={{width: '44%'}} />
             <Text
@@ -409,7 +398,7 @@ const PdfUpfrontInvoiceSection = ({
                 fontSize: 10,
                 textAlign: 'right',
               }}>
-              {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
+              {translate('Subtotal excl. VAT')}
             </Text>
             <Text
               style={{
@@ -417,72 +406,102 @@ const PdfUpfrontInvoiceSection = ({
                 textAlign: 'right',
                 fontSize: 10,
               }}>
-              {formatCurrency(fixRounding(percentageVats?.[0]?.vat ?? 0, 2), {
-                currency: currentCurrency?.code,
-                excludeCurrencySymbol: true,
-                currencySymbol: currentCurrency?.symbol,
-                companyLang: selectedLng,
-              })}
+              {totalAmountExclVatFormatted}
             </Text>
           </View>
-        ) : (
-          percentageVats.map((v, index) => (
-            <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
-              <Text style={{width: '44%'}} />
-              <Text
-                style={{
-                  width: '32%',
-                  color: '#616161',
-                  fontSize: 10,
-                  textAlign: 'right',
-                }}>
-                {translate('VAT')} {v.percentageVat}%
-              </Text>
-              <Text
-                style={{
-                  width: '24%',
-                  textAlign: 'right',
-                  fontSize: 10,
-                }}>
-                {formatCurrency(fixRounding(v.vat, 2), {
-                  currency: currentCurrency?.code,
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                  roundingMode: 'floor',
-                  excludeCurrencySymbol: true,
-                  companyLang: selectedLng,
-                  currencySymbol: currentCurrency?.symbol,
-                })}
-              </Text>
-            </View>
-          ))
-        )}
-      </View>
 
-      <View style={styles.tableRow}>
-        <Text style={{width: '44%'}} />
-        <Text
-          style={{
-            width: '32%',
-            color: '#212121',
-            ...boldFontStyle,
-            textAlign: 'right',
-            fontSize: 10,
-            paddingLeft: 25,
-          }}>
-          {`${translate('Total incl. VAT')} (${currentCurrency?.symbol})`}
-        </Text>
-        <Text
-          style={{
-            width: '24%',
-            textAlign: 'right',
-            color: '#212121',
-            ...boldFontStyle,
-            fontSize: 10,
-          }}>
-          {totalAmountInclVatsFormatted}
-        </Text>
-      </View>
+          <View>
+            {allItemsHasSameVAT ? (
+              <View style={styles.tableRow}>
+                <Text style={{width: '44%'}} />
+                <Text
+                  style={{
+                    width: '32%',
+                    color: '#616161',
+                    fontSize: 10,
+                    textAlign: 'right',
+                  }}>
+                  {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
+                </Text>
+                <Text
+                  style={{
+                    width: '24%',
+                    textAlign: 'right',
+                    fontSize: 10,
+                  }}>
+                  {formatCurrency(
+                    fixRounding(percentageVats?.[0]?.vat ?? 0, 2),
+                    {
+                      currency: currentCurrency?.code,
+                      excludeCurrencySymbol: true,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    },
+                  )}
+                </Text>
+              </View>
+            ) : (
+              percentageVats.map((v, index) => (
+                <View
+                  style={styles.tableRow}
+                  key={`${index}-${v.percentageVat}`}>
+                  <Text style={{width: '44%'}} />
+                  <Text
+                    style={{
+                      width: '32%',
+                      color: '#616161',
+                      fontSize: 10,
+                      textAlign: 'right',
+                    }}>
+                    {translate('VAT')} {v.percentageVat}%
+                  </Text>
+                  <Text
+                    style={{
+                      width: '24%',
+                      textAlign: 'right',
+                      fontSize: 10,
+                    }}>
+                    {formatCurrency(fixRounding(v.vat, 2), {
+                      currency: currentCurrency?.code,
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                      roundingMode: 'floor',
+                      excludeCurrencySymbol: true,
+                      companyLang: selectedLng,
+                      currencySymbol: currentCurrency?.symbol,
+                    })}
+                  </Text>
+                </View>
+              ))
+            )}
+          </View>
+
+          <View style={styles.tableRow}>
+            <Text style={{width: '44%'}} />
+            <Text
+              style={{
+                width: '32%',
+                color: '#212121',
+                ...boldFontStyle,
+                textAlign: 'right',
+                fontSize: 10,
+                paddingLeft: 25,
+              }}>
+              {`${translate('Total incl. VAT')} (${currentCurrency?.symbol})`}
+            </Text>
+            <Text
+              style={{
+                width: '24%',
+                textAlign: 'right',
+                color: '#212121',
+                ...boldFontStyle,
+                fontSize: 10,
+              }}>
+              {totalAmountInclVatsFormatted}
+            </Text>
+          </View>
+        </View>
+      )}
 
       {hasPreviousInvoices && previousInvoices.length > 1 && (
         <PdfInvoicedSection
