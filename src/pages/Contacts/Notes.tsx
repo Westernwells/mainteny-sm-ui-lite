@@ -16,6 +16,7 @@ import {
   useInfiniteContactPersonNotes,
   useUpdateContactPersonNote,
 } from 'hooks/reactQuery/useContacts';
+import {Chip} from '@mui/material';
 
 interface Props {
   contactPersonId: string;
@@ -173,6 +174,14 @@ const Notes = ({
           }}>
           <NoteAlt fontSize="small" />
           <Typography variant="body2">{t('Notes')}</Typography>
+          <Chip
+            label={notesCount}
+            color="primary"
+            size="small"
+            sx={{
+              marginLeft: '0.5rem',
+            }}
+          />
         </Button>
       ) : (
         <IconButton
