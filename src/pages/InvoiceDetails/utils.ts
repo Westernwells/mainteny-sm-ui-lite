@@ -350,29 +350,7 @@ export const formatInvoiceViewToUpdateInvoice = (
     type,
   } = invoiceView;
 
-  const paymentType = additionalInfo?.payment?.type;
-  let paymentObject = {};
-
-  if (paymentType === PaymentType.PER_ITEM) {
-    paymentObject = {
-      type: InvoiceItemPaymentType.PERCENTAGE,
-      percentage: additionalInfo.payment?.percentage,
-      description: additionalInfo.payment?.description,
-    };
-  } else if (paymentType === PaymentType.LUMP_SUM) {
-    paymentObject = {
-      type: InvoiceItemPaymentType.PERCENTAGE,
-      percentage: additionalInfo.payment?.percentage,
-      description: additionalInfo.payment?.description,
-      amount: additionalInfo.payment?.amount,
-    };
-  } else if (paymentType === PaymentType.PERCENTAGE) {
-    paymentObject = {
-      type: InvoiceItemPaymentType.PERCENTAGE,
-      percentage: additionalInfo.payment?.percentage,
-      description: additionalInfo.payment?.description,
-    };
-  }
+  const {payment, discount} = additionalInfo || {};
 
   const updateInvoice: Record<string, any> = {
     serviceOrderId: serviceOrder?.id,
@@ -383,7 +361,88 @@ export const formatInvoiceViewToUpdateInvoice = (
     description,
     dueDate,
     sentDate,
-    items,
+    items: items
+      .map((item) => invoiceItemToInvoiceItemRecord(item, type))
+      .map((item) => {
+        const {article, ...rest} = item;
+        const modifiedArticle = {...article};
+        const unitSellingAmount = modifiedArticle?.unitSellingAmount;
+        const unitAmount = item?.unitAmount;
+        const isPreDefinedArticle =
+          modifiedArticle?.id && modifiedArticle?.id?.length > 8;
+        if (!isPreDefinedArticle) {
+          delete modifiedArticle?.id;
+        }
+
+        const articleToSend = {
+          ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
+          name: article?.name,
+          type: article?.type,
+          unit: article?.unit,
+          costPackage: article?.costPackage,
+          ...(isPreDefinedArticle &&
+            article?.externalId && {externalId: article?.externalId}),
+          unitSellingAmount: {
+            netAmount: unitSellingAmount?.netAmount,
+            percentageVat: unitSellingAmount?.percentageVat,
+            currency: unitSellingAmount?.currency,
+          },
+        } as ArticleRecord;
+
+        return {
+          ...rest,
+          article: articleToSend,
+          unitAmount: {
+            netAmount: unitAmount?.netAmount,
+            percentageVat: unitAmount?.percentageVat,
+            currency: unitAmount?.currency,
+          },
+          discount: rest.discount
+            ? {
+                ...rest.discount,
+                amount:
+                  rest.discount.type === 'AMOUNT'
+                    ? {
+                        ...rest.discount.amount,
+                        currency: rest.discount.amount?.currency!,
+                        value:
+                          (rest.discount.amount?.value ?? 0) *
+                          10 ** (rest.discount.amount?.fractionDigits ?? 2),
+                      }
+                    : undefined,
+              }
+            : undefined,
+          payment: rest.payment
+            ? rest.payment
+            : payment?.type === PaymentType.PER_ITEM
+            ? {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
+            : undefined,
+        };
+      }),
+    ...(discount && {
+      discount: {
+        ...discount,
+        amount:
+          discount?.type === 'AMOUNT'
+            ? {
+                ...discount?.amount,
+                currency: discount?.amount?.currency!,
+                value:
+                  (discount?.amount?.value ?? 0) *
+                  10 ** (discount?.amount?.fractionDigits ?? 2),
+              }
+            : undefined,
+      },
+    }),
+    ...(payment && {
+      payment: {
+        ...payment,
+        amount:
+          payment?.type === PaymentType.LUMP_SUM
+            ? moneyRecordForBackend(payment.amount)
+            : undefined,
+      },
+    }),
     paymentTerm: additionalInfo?.paymentTerm,
     paymentInfo: additionalInfo?.paymentInfo,
     includeWorkReport: additionalInfo?.includeWorkReport,
@@ -398,8 +457,6 @@ export const formatInvoiceViewToUpdateInvoice = (
     deliveryStartDate: additionalInfo?.deliveryStartDate,
     deliveryEndDate: additionalInfo?.deliveryEndDate,
     showArticleSection: additionalInfo?.showArticleSection,
-    discount: additionalInfo?.discount,
-    payment: paymentObject,
     alternativeServiceCompanyInfo: additionalInfo.alternativeServiceCompanyInfo,
     serviceCompanyId: serviceCompany.id,
   };
