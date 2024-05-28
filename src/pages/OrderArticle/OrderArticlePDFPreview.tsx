@@ -16,6 +16,7 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import {Currency} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
+import {HtmlPDF} from 'components/HtmlPDF';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -114,11 +115,7 @@ const getStyles = (
       ...boldFontStyle,
     },
     contentBody: {
-      color: '#212121',
-      fontSize: 10,
       marginBottom: 10,
-      lineHeight: 1.3,
-      maxWidth: '100%',
     },
     notesSection: {
       paddingBottom: 6,
@@ -290,9 +287,10 @@ const OrderArticlePDFPreview = React.memo(
               </Text>
 
               <View>
-                <Text style={styles.contentBody} wrap={false}>
-                  {formik?.values?.description.split('')}
-                </Text>
+                <HtmlPDF
+                  html={formik?.values?.description || ''}
+                  rootStyle={styles.contentBody}
+                />
               </View>
 
               <View style={styles.table}>

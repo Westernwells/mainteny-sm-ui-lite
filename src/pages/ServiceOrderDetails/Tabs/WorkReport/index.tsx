@@ -24,7 +24,7 @@ import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
 import {SendEmailDialog} from 'components/SendEmailDialog';
-import {FormInput} from 'components/form/FormInput';
+import RichTextField from 'components/RichTextField';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -481,18 +481,11 @@ export const WorkReport = ({serviceOrder}: Props) => {
         </Box>
 
         <Box mt="1em">
-          <FormInput
-            containerStyles={{width: '100%', py: '1rem'}}
-            props={{
-              name: 'description',
-              label: t('Description of Service'),
-              multiline: true,
-              minRows: 4,
-              type: 'text',
-              value: formik.values.description,
-              onChange: formik.handleChange,
-              onBlur: formik.handleBlur,
-            }}
+          <RichTextField
+            label="Description of Service"
+            html={formik.values.description || ''}
+            updateHtml={(h) => formik.setFieldValue('description', h)}
+            minRows={4}
           />
         </Box>
 

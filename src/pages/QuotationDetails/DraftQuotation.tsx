@@ -919,47 +919,34 @@ export const DraftQuotation = ({
             <Box pb={0.5}>
               <SectionTitle Icon={FooterIllustration} title="Footer" />
             </Box>
-            <FormInput
-              props={{
-                id: 'notes',
-                size: 'small',
-                label: notesText,
-                name: 'notes',
-                value: formik.values.notes,
-                onChange: formik.handleChange,
-                minRows: 2,
-                multiline: true,
-              }}
+
+            <RichTextField
+              label={notesText}
+              html={formik.values.notes || ''}
+              updateHtml={(h) => formik.setFieldValue('notes', h)}
+              minRows={2}
             />
 
-            <FormInput
-              props={{
-                id: 'paymentTerms',
-                size: 'small',
-                label: 'Payment terms',
-                name: 'paymentTerms',
-                minRows: 2,
-                multiline: true,
-                value: formik.values.paymentTerms,
-                onChange: formik.handleChange,
-                InputProps: {
-                  endAdornment: (
-                    <InputAdornment
-                      component={IconButton}
-                      disableRipple
-                      position="end"
-                      sx={{
-                        mt: 2,
-                        mr: -1,
-                        alignSelf: 'flex-start',
-                      }}
-                      onClick={() => setOpenContractPaymentTermsDialog(true)}
-                      size="small">
-                      <TextSnippetIcon />
-                    </InputAdornment>
-                  ),
-                },
-              }}
+            <RichTextField
+              label="Payment terms"
+              html={formik.values.paymentTerms || ''}
+              updateHtml={(h) => formik.setFieldValue('paymentTerms', h)}
+              minRows={2}
+              endAdornment={
+                <InputAdornment
+                  component={IconButton}
+                  disableRipple
+                  position="end"
+                  sx={{
+                    mt: 2,
+                    mr: -1,
+                    alignSelf: 'flex-start',
+                  }}
+                  onClick={() => setOpenContractPaymentTermsDialog(true)}
+                  size="small">
+                  <TextSnippetIcon />
+                </InputAdornment>
+              }
             />
           </Grid>
         </Grid>

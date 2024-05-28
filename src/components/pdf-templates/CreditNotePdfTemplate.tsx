@@ -13,6 +13,7 @@ import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
+import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {
@@ -100,11 +101,8 @@ const getStyles = (
       marginBottom: 10,
     },
     contentBody: {
-      color: '#212121',
-      fontSize: 10,
-      marginVertical: 15,
-      lineHeight: 1.3,
-      maxWidth: '100%',
+      marginTop: 6,
+      marginBottom: 16,
     },
     notesSection: {
       marginTop: 5,
@@ -322,7 +320,10 @@ const CreditNotePdfTemplate = React.memo(
               <Text style={styles.contentHeader}>{invoice?.subject}</Text>
 
               {invoice?.description.trim() !== '' && (
-                <Text style={styles.contentBody}>{invoice?.description}</Text>
+                <HtmlPDF
+                  html={invoice?.description || ''}
+                  rootStyle={styles.contentBody}
+                />
               )}
 
               {invoice?.additionalInfo.showArticleSection && (
@@ -347,12 +348,12 @@ const CreditNotePdfTemplate = React.memo(
                   <Text style={styles.sectionHeading}>
                     {translate('Payment terms')}
                   </Text>
-                  <Text>
-                    {replacePaymentTermsPlaceholders(
+                  <HtmlPDF
+                    html={replacePaymentTermsPlaceholders(
                       invoice?.additionalInfo.paymentTerm?.term!,
                       formattedPaymentValues ?? [],
                     )}
-                  </Text>
+                  />
                 </View>
               )}
 
@@ -361,8 +362,8 @@ const CreditNotePdfTemplate = React.memo(
                   <Text style={styles.sectionHeading}>
                     {translate('Notes')}
                   </Text>
-                  <Text>
-                    {formatCostText(
+                  <HtmlPDF
+                    html={formatCostText(
                       invoice?.additionalInfo?.moreInfo,
                       `${formatCurrency(laborCost, {
                         currency: currentCurrency?.code,
@@ -375,7 +376,7 @@ const CreditNotePdfTemplate = React.memo(
                         companyLang: selectedLng,
                       })}`,
                     )}
-                  </Text>
+                  />
                 </View>
               )}
             </View>

@@ -1,4 +1,5 @@
 import {formatISO} from 'date-fns';
+import * as Yup from 'yup';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import lodash from 'lodash';
 import useHighlightText from '../hooks/useHighlightText';
@@ -537,3 +538,26 @@ export const removeUndefinedAndEmptyValues = (
     }
     return acc;
   }, {} as Record<string, any>);
+
+const isEmptyHTML = (htmlString: string) => {
+  // Create a temporary div element
+  const tempDiv = document.createElement('div');
+
+  // Set its innerHTML to the provided HTML string
+  tempDiv.innerHTML = htmlString.trim();
+
+  // Check if the div contains any child nodes with actual content
+  return (
+    tempDiv.innerHTML === '' ||
+    (tempDiv.textContent !== null && tempDiv.textContent.trim() === '')
+  );
+};
+
+export const yupValidations = {
+  richTextField: (message: string) =>
+    Yup.mixed().test(
+      'checkRichTextField',
+      message,
+      (value: string) => !!value && !isEmptyHTML(value),
+    ),
+};

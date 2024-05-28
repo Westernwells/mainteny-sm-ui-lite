@@ -760,7 +760,9 @@ const QuotationPdfTemplate = React.memo(
                   <Text style={styles.sectionHeading}>
                     {translate('Payment terms')}{' '}
                   </Text>
-                  <Text>{quotation?.additionalInfo?.paymentTerms}</Text>
+                  <HtmlPDF
+                    html={quotation?.additionalInfo?.paymentTerms || ''}
+                  />
                 </View>
               )}
 
@@ -769,7 +771,7 @@ const QuotationPdfTemplate = React.memo(
                   <Text style={styles.sectionHeading}>
                     {translate('Notes')}
                   </Text>
-                  <Text>{quotation?.additionalInfo?.notes}</Text>
+                  <HtmlPDF html={quotation?.additionalInfo?.notes || ''} />
                 </View>
               )}
 

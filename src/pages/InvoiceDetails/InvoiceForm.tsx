@@ -131,6 +131,7 @@ import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplat
 import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
+import RichTextField from 'components/RichTextField';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
@@ -1655,23 +1656,11 @@ export const InvoiceForm = ({
               }}
             />
 
-            <FormInput
-              props={{
-                id: 'header-description',
-                name: 'description',
-                value: formik.values.description,
-                label: 'Description',
-                onChange: formik.handleChange,
-                onBlur: formik.handleBlur,
-                error: !!(
-                  formik.touched.description && formik.errors.description
-                ),
-                helperText:
-                  formik.touched.description && formik.errors.description,
-                minRows: 2,
-                multiline: true,
-                fullWidth: true,
-              }}
+            <RichTextField
+              label="Description"
+              html={formik.values.description}
+              updateHtml={(h) => formik.setFieldValue('description', h)}
+              minRows={2}
             />
           </Grid>
 
@@ -1715,46 +1704,39 @@ export const InvoiceForm = ({
             <Box pb={0.5}>
               <SectionTitle Icon={FooterIllustration} title="Footer" />
             </Box>
-            <FormInput
-              props={{
-                id: 'moreInfo',
-                size: 'small',
-                label: notesText,
-                name: 'moreInfo',
-                minRows: 2,
-                multiline: true,
-                value: formik.values.moreInfo,
-                onChange: formik.handleChange,
-              }}
+
+            <RichTextField
+              label={notesText}
+              html={formik.values.moreInfo || ''}
+              updateHtml={(h) => formik.setFieldValue('moreInfo', h)}
+              minRows={2}
             />
-            <FormInput
-              props={{
-                id: 'paymentTerm.term',
-                size: 'small',
-                label: 'Payment terms',
-                name: 'paymentTerm.term',
-                minRows: 2,
-                multiline: true,
-                value: formik.values.paymentTerm?.term,
-                onChange: formik.handleChange,
-                InputProps: {
-                  endAdornment: (
-                    <InputAdornment
-                      component={IconButton}
-                      disableRipple
-                      position="end"
-                      sx={{
-                        mt: 1,
-                        mr: -1,
-                        alignSelf: 'flex-start',
-                      }}
-                      onClick={() => setOpenContractPaymentTermsDialog(true)}
-                      size="small">
-                      <TextSnippetIcon />
-                    </InputAdornment>
-                  ),
-                },
-              }}
+
+            <RichTextField
+              label="Payment terms"
+              html={formik.values.paymentTerm?.term || ''}
+              updateHtml={(h) =>
+                formik.setFieldValue('paymentTerm', {
+                  ...formik.values.paymentTerm,
+                  term: h,
+                })
+              }
+              minRows={2}
+              endAdornment={
+                <InputAdornment
+                  component={IconButton}
+                  disableRipple
+                  position="end"
+                  sx={{
+                    mt: 1,
+                    mr: -1,
+                    alignSelf: 'flex-start',
+                  }}
+                  onClick={() => setOpenContractPaymentTermsDialog(true)}
+                  size="small">
+                  <TextSnippetIcon />
+                </InputAdornment>
+              }
             />
           </Grid>
         </Grid>
