@@ -26,10 +26,6 @@ import {
   getAggregatedItemsVats,
 } from 'pages/InvoiceDetails/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {
-  getFormattedPaymentValues,
-  replacePaymentTermsPlaceholders,
-} from 'utils/invoice';
 import {ArticleType} from 'models/article';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -623,14 +619,6 @@ const FinalInvoicePdfTemplate = React.memo(
 
     const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
 
-    const formattedPaymentValues = getFormattedPaymentValues(
-      invoice?.additionalInfo.paymentTerm!,
-      invoice!,
-      total,
-      currentCurrency,
-      selectedLng,
-    );
-
     const laborCost = useCalculateLaborMaterialCost(
       itemsAfterGlobalDiscount,
       ArticleType.LABOR,
@@ -717,20 +705,6 @@ const FinalInvoicePdfTemplate = React.memo(
                 previousInvoices={previousInvoices}
                 articleItems={articleItems}
               />
-
-              {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
-                <View style={styles.notesSection} wrap={false}>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Payment terms')}
-                  </Text>
-                  <Text>
-                    {replacePaymentTermsPlaceholders(
-                      invoice?.additionalInfo.paymentTerm?.term!,
-                      formattedPaymentValues ?? [],
-                    )}
-                  </Text>
-                </View>
-              )}
 
               {invoice?.additionalInfo?.moreInfo?.trim() && (
                 <View wrap={false}>

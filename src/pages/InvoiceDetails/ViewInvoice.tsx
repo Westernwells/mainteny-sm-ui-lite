@@ -558,7 +558,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                   },
                   {
                     onSuccess: async () => {
-                      await refetchInvoiceData();
                       await refetchDownloadUrl();
                       setActionType('PRINT');
                     },
