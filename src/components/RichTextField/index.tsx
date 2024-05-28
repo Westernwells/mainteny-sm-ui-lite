@@ -18,6 +18,7 @@ import {
 import {createEditor, BaseEditor, Descendant} from 'slate';
 import {HistoryEditor, withHistory} from 'slate-history';
 import {theme} from 'theme';
+import {FormControl, FormHelperText} from '@mui/material';
 import {debounce} from 'lodash';
 import {
   FONT_SIZE,
@@ -145,6 +146,9 @@ const styles: Record<string, CSSProperties> = {
     padding: '8.5px 14px',
     width: '100%',
   },
+  errorFieldset: {
+    border: `1px solid ${theme.palette.error.main}`,
+  },
   legend: {
     color: theme.palette.text.secondary,
     fontWeight: 400,
@@ -152,8 +156,18 @@ const styles: Record<string, CSSProperties> = {
     lineHeight: 2,
     letterSpacing: '0.15px',
   },
+  redText: {
+    color: theme.palette.error.main,
+  },
   editable: {
+    flex: 1,
     outline: 'none',
+  },
+  endAdornment: {
+    marginTop: '-10px',
+  },
+  inputWrapper: {
+    display: 'flex',
   },
 };
 
@@ -162,11 +176,23 @@ const RichTextField = ({
   placeholder = '',
   html,
   updateHtml,
+  required = false,
+  onBlur,
+  error = false,
+  helperText = '',
+  minRows = 1,
+  endAdornment,
 }: {
   label?: string;
   placeholder?: string;
   html: string;
   updateHtml: (html: string) => void;
+  required?: boolean;
+  onBlur?: (e: React.FocusEvent<HTMLDivElement>) => void;
+  error?: boolean;
+  helperText?: string;
+  minRows?: number;
+  endAdornment?: React.ReactNode;
 }) => {
   const {t} = useTranslation();
   const editorRef = useRef<(BaseEditor & ReactEditor & HistoryEditor) | null>(
@@ -231,25 +257,46 @@ const RichTextField = ({
   return (
     <Slate editor={editor} initialValue={value} onChange={handleChange}>
       <HoveringToolbar />
-      <fieldset style={styles.fieldset}>
-        <legend style={{...styles.legend, padding: label ? '2px' : '0'}}>
-          {t(label)}
-        </legend>
-        <Editable
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder={t(placeholder)}
-          renderPlaceholder={({attributes, children}) => (
-            <span
-              {...attributes}
-              style={{...attributes.style, top: 'auto', fontSize: '16px'}}>
-              {children}
-            </span>
-          )}
-          style={{...styles.editable, marginTop: label ? '-10px' : '0px'}}
-          onKeyDown={onKeyDown}
-        />
-      </fieldset>
+      <FormControl fullWidth>
+        <fieldset
+          style={{...styles.fieldset, ...(error && styles.errorFieldset)}}>
+          <legend
+            style={{
+              ...styles.legend,
+              padding: label ? '2px' : '0',
+              ...(error && styles.redText),
+            }}>
+            {t(label)} {required && <span style={styles.redText}>*</span>}
+          </legend>
+          <div style={styles.inputWrapper}>
+            <Editable
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              placeholder={t(placeholder)}
+              renderPlaceholder={({attributes, children}) => (
+                <span
+                  {...attributes}
+                  style={{...attributes.style, top: 'auto', fontSize: '16px'}}>
+                  {children}
+                </span>
+              )}
+              style={{
+                ...styles.editable,
+                marginTop: label ? '-10px' : '0px',
+                minHeight: `${minRows * 24}px`,
+              }}
+              onKeyDown={onKeyDown}
+              onBlur={onBlur}
+            />
+            {endAdornment && (
+              <div style={styles.endAdornment}>{endAdornment}</div>
+            )}
+          </div>
+        </fieldset>
+        {helperText && (
+          <FormHelperText error={error}>{t(helperText)}</FormHelperText>
+        )}
+      </FormControl>
     </Slate>
   );
 };

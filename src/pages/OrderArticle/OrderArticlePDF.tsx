@@ -15,6 +15,7 @@ import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
+import {HtmlPDF} from 'components/HtmlPDF';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -116,11 +117,7 @@ const getStyles = (
       ...boldFontStyle,
     },
     contentBody: {
-      color: '#212121',
-      fontSize: 10,
       marginBottom: 10,
-      lineHeight: 1.3,
-      maxWidth: '100%',
     },
     notesSection: {
       paddingBottom: 6,
@@ -289,9 +286,10 @@ const OrderArticlePDF = React.memo(
               <Text style={styles.contentHeader}>
                 {translate('Article Order for')} {articleOrder?.externalId}
               </Text>
-              <Text style={styles.contentBody}>
-                {articleOrder?.description.split('')}
-              </Text>
+              <HtmlPDF
+                html={articleOrder?.description || ''}
+                rootStyle={styles.contentBody}
+              />
 
               <View style={styles.table}>
                 <View style={styles.tableHead}>

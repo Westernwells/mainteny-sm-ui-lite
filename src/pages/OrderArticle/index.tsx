@@ -29,13 +29,14 @@ import PathImage from 'assets/images/Path.svg';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import Edit from '@mui/icons-material/Edit';
 import {Button} from 'components/Button';
+import RichTextField from 'components/RichTextField';
 import useTheme from '@mui/material/styles/useTheme';
 import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
 import {useCurrentCurrency} from 'utils/currency';
 import useLogoDimensions from 'hooks/useLogoDimensions';
 import useLogoImage from 'hooks/useLogoImage';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {companyLanguageContextMap} from 'utils/utils';
+import {companyLanguageContextMap, yupValidations} from 'utils/utils';
 import {ArticleItemsTable} from './ArticleItemsTable';
 import OrderArticlePDF from './OrderArticlePDF';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
@@ -45,7 +46,7 @@ const validationSchema = Yup.object().shape({
   serviceCompanyId: Yup.string().required('Service company ID is required'),
   externalId: Yup.string(),
   articleSupplierId: Yup.string().required('Article supplier ID is required'),
-  description: Yup.string().required('Description is required'),
+  description: yupValidations.richTextField('Description is required'),
   items: Yup.array()
     .of(
       Yup.object().shape({
@@ -378,21 +379,20 @@ export const OrderArticle = () => {
                     formik.touched.externalId && formik.errors.externalId,
                 }}
               />
-              <FormInput
-                props={{
-                  name: 'description',
-                  label: 'Description',
-                  value: formik.values.description,
-                  onChange: formik.handleChange,
-                  onBlur: formik.handleBlur,
-                  error:
-                    !!formik.errors.description && formik.touched.description,
-                  helperText:
-                    formik.touched.description && formik.errors.description,
-                  required: true,
-                  multiline: true,
-                  rows: 4,
-                }}
+              <RichTextField
+                label="Description"
+                html={formik.values.description || ''}
+                updateHtml={(h) => formik.setFieldValue('description', h)}
+                required
+                onBlur={formik.handleBlur}
+                error={
+                  !!formik.errors.description && formik.touched.description
+                }
+                helperText={
+                  (formik.touched.description && formik.errors.description) ||
+                  ''
+                }
+                minRows={4}
               />
             </Box>
 

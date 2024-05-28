@@ -24,6 +24,7 @@ import {
   getFormattedPaymentValues,
   replacePaymentTermsPlaceholders,
 } from 'utils/invoice';
+import {HtmlPDF} from 'components/HtmlPDF';
 import PdfInvoicedSection from './PdfInvoicedSection';
 import PdfPaymentHistorySection from './PdfPaymentHistorySection';
 import PdfPerItemSection from './PdfPerItemSection';
@@ -531,12 +532,12 @@ const PdfUpfrontInvoiceSection = ({
           <Text style={styles.sectionHeading}>
             {translate('Payment terms')}
           </Text>
-          <Text>
-            {replacePaymentTermsPlaceholders(
+          <HtmlPDF
+            html={replacePaymentTermsPlaceholders(
               invoice?.additionalInfo.paymentTerm?.term!,
               formattedPaymentValues ?? [],
             )}
-          </Text>
+          />
         </View>
       )}
     </View>

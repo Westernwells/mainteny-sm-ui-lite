@@ -13,6 +13,7 @@ import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
+import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
 import {fixRounding, formatCostText} from 'utils/utils';
 import {
@@ -26,10 +27,6 @@ import {
   getAggregatedItemsVats,
 } from 'pages/InvoiceDetails/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {
-  getFormattedPaymentValues,
-  replacePaymentTermsPlaceholders,
-} from 'utils/invoice';
 import {ArticleType} from 'models/article';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -100,11 +97,8 @@ const getStyles = (
       marginBottom: 10,
     },
     contentBody: {
-      color: '#616161',
-      fontSize: 10,
-      marginVertical: 15,
-      lineHeight: 1.3,
-      maxWidth: '100%',
+      marginTop: 6,
+      marginBottom: 16,
     },
     notesSection: {
       marginTop: 5,
@@ -623,14 +617,6 @@ const FinalInvoicePdfTemplate = React.memo(
 
     const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
 
-    const formattedPaymentValues = getFormattedPaymentValues(
-      invoice?.additionalInfo.paymentTerm!,
-      invoice!,
-      total,
-      currentCurrency,
-      selectedLng,
-    );
-
     const laborCost = useCalculateLaborMaterialCost(
       itemsAfterGlobalDiscount,
       ArticleType.LABOR,
@@ -689,7 +675,10 @@ const FinalInvoicePdfTemplate = React.memo(
             <View>
               <Text style={styles.contentHeader}>{invoice?.subject}</Text>
               {invoice?.description.trim() !== '' && (
-                <Text style={styles.contentBody}>{invoice?.description}</Text>
+                <HtmlPDF
+                  html={invoice?.description || ''}
+                  rootStyle={styles.contentBody}
+                />
               )}
 
               {invoice?.additionalInfo.showArticleSection && (
@@ -718,27 +707,13 @@ const FinalInvoicePdfTemplate = React.memo(
                 articleItems={articleItems}
               />
 
-              {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
-                <View style={styles.notesSection} wrap={false}>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Payment terms')}
-                  </Text>
-                  <Text>
-                    {replacePaymentTermsPlaceholders(
-                      invoice?.additionalInfo.paymentTerm?.term!,
-                      formattedPaymentValues ?? [],
-                    )}
-                  </Text>
-                </View>
-              )}
-
               {invoice?.additionalInfo?.moreInfo?.trim() && (
                 <View wrap={false}>
                   <Text style={styles.sectionHeading}>
                     {translate('Notes')}
                   </Text>
-                  <Text>
-                    {formatCostText(
+                  <HtmlPDF
+                    html={formatCostText(
                       invoice?.additionalInfo?.moreInfo,
                       `${formatCurrency(laborCost, {
                         currency: currentCurrency?.code,
@@ -751,7 +726,7 @@ const FinalInvoicePdfTemplate = React.memo(
                         companyLang: selectedLng,
                       })}`,
                     )}
-                  </Text>
+                  />
                 </View>
               )}
             </View>
