@@ -1840,7 +1840,7 @@
   "Not allowed empty invoice items": "ინვოისის ცარიელი ელემენტები დაუშვებელია",
   "Wrong invoice status": "არასწორი ინვოისის სტატუსი",
   "Multiple VAT values are not allowed": "დღგ-ს რამოდენიმე ღირებულება დაუშვებელია",
-  "Invalid user account status": "არასწორი მომხმარებლის ანგარიშის სტატუსი",
+  "Invalid user account status": "მომხმარებლის ანგარიშის სტატუსი არასწორია",
   "Invalid currency": "არასწორი ვალუტა",
   "Invalid contract name": "არასწორი ხელშეკრულების სახელი",
   "Max time range exceeded": "მაქსიმალურ დროის დიაპაზონს გადაჭარბებულია",
@@ -2544,5 +2544,13 @@
   "New Contact person": "ახალი საკონტაქტო პირი",
   "Small": "პატარა",
   "Normal": "საშუალო",
-  "Large": "დიდი"
+  "Large": "დიდი",
+  "This Email address is already used for a different customer portal": "ეს ელ.ფოსტის მისამართი უკვე გამოიყენება მომხმარებლის სხვა პორტალისთვის",
+  "Invalid email address": "ელ.ფოსტის მისამართი არასწორია",
+  "Revoked": "გაუქმებულია",
+  "Resend invite": "მოწვევის ხელახლა გაგზავნა",
+  "Revoke access": "წვდომის გაუქმება",
+  "Customer Portal": "მომხმარებელთა პორტალი",
+  "Customer Portal disabled": "მომხმარებელთა პორტალი გამორთულია",
+  "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.": "მომხმარებელთა პორტალზე წვდომა გამორთულია კომპანიის დონეზე. ყველა მოწვეულ მომხმარებელს არ აქვს წვდომა."
 }
