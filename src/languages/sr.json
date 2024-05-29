@@ -2534,5 +2534,13 @@
   "New Contact person": "Novi kontakt",
   "Small": "Mala",
   "Normal": "Normalna",
-  "Large": "Velika"
+  "Large": "Velika",
+  "This Email address is already used for a different customer portal": "Ova adresa e-pošte se već koristi za drugi korisnički portal",
+  "Invalid email address": "Pogrešna email adresa",
+  "Revoked": "Opozvano",
+  "Resend invite": "Ponovo pošalji",
+  "Revoke access": "Opozvati pristup",
+  "Customer Portal": "Portal za korisnike",
+  "Customer Portal disabled": "Korisnički portal je onemogućen",
+  "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.": "Pristup korisničkom portalu je onemogućen na nivou kompanije. Svi pozvani korisnici nemaju pristup."
 }
