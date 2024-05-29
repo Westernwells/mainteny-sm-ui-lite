@@ -138,6 +138,12 @@ export interface CreatePropertyContactPersonRecord {
   externalId?: string;
 }
 
+export interface UpdatePropertyContactPersonRecord {
+  username?: string;
+  externalId?: string;
+  status?: UserAccountStatus;
+}
+
 export interface CreateContactPersonAssociationRecord {
   refType: ContactPersonAssociationType;
   refId: string;

@@ -18,11 +18,13 @@ interface Props {
   onDelete: (id: string) => void;
   onSendInvite: (id: string) => void;
   onRevokeAccess: (id: string) => void;
+  customerPortalEnabled: boolean;
 }
 export const columns = ({
   onDelete,
   onRevokeAccess,
   onSendInvite,
+  customerPortalEnabled,
 }: Props): GridColDef[] => [
   getColumnProps({
     field: 'name',
@@ -36,6 +38,7 @@ export const columns = ({
           wordBreak: 'break-word',
           whiteSpace: 'wrap',
           color: 'primary.light',
+          opacity: customerPortalEnabled ? 1 : 0.4,
         }}>
         {params.value}
       </Typography>
@@ -52,6 +55,7 @@ export const columns = ({
         sx={{
           wordBreak: 'break-all',
           whiteSpace: 'wrap',
+          opacity: customerPortalEnabled ? 1 : 0.4,
         }}>
         {params.value}
       </Typography>
@@ -66,7 +70,11 @@ export const columns = ({
       const {t} = useTranslation();
       const role = params.value?.[0] || '-';
       return (
-        <Typography variant="body2">{t(convertToText(role).trim())}</Typography>
+        <Typography
+          variant="body2"
+          sx={{opacity: customerPortalEnabled ? 1 : 0.4}}>
+          {t(convertToText(role).trim())}
+        </Typography>
       );
     },
   }),
@@ -133,6 +141,7 @@ export const columns = ({
           onRevokeAccess={onRevokeAccess}
           onSendInvite={onSendInvite}
           contact={contact}
+          customerPortalEnabled={customerPortalEnabled}
         />
       );
     },

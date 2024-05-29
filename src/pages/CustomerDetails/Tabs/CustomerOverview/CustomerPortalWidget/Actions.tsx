@@ -10,6 +10,7 @@ import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import {Box} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {ContactsView, PORTAL_PERSON_STATUS} from 'models/contacts';
+import {UserAccountStatus} from 'models/user';
 
 export interface IActions {
   onDelete: (id: string) => void;
@@ -19,6 +20,7 @@ export interface IActions {
 
 interface Props {
   contact: ContactsView;
+  customerPortalEnabled: boolean;
 }
 
 interface ActionButton {
@@ -32,14 +34,35 @@ const Actions = ({
   onSendInvite,
   onRevokeAccess,
   onDelete,
+  customerPortalEnabled,
 }: Props & IActions) => {
   const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
   const contactId = contact?.id;
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleClose = () => setAnchorEl(null);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleDeleteClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onDelete(contactId);
+  };
+
+  const handleRevokeClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    onRevokeAccess(contactId);
+  };
+
+  const handleSendInviteClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation();
+    onSendInvite(contactId);
   };
 
   const menuActionButtons: ActionButton[] = [
@@ -56,22 +79,31 @@ const Actions = ({
   ];
 
   return (
-    <Box display="flex" alignItems="center">
+    <Box
+      display="flex"
+      alignItems="center"
+      sx={{opacity: customerPortalEnabled ? 1 : 0.4}}>
       <IconButton
-        onClick={(event) => {
-          event.stopPropagation();
-          onDelete(contactId);
-        }}
+        disabled={!customerPortalEnabled}
+        onClick={handleDeleteClick}
         size="small">
         <DeleteOutlinedIcon sx={{color: 'secondary.mainLight'}} />
       </IconButton>
+
+      {contact.userAccount.status === UserAccountStatus.NORMAL && (
+        <IconButton
+          disabled={!customerPortalEnabled}
+          onClick={handleRevokeClick}
+          size="small">
+          <DoDisturbAltOutlinedIcon sx={{color: 'secondary.mainLight'}} />
+        </IconButton>
+      )}
+
       {contact.userAccount.status === PORTAL_PERSON_STATUS.PENDING ? (
         <IconButton
+          disabled={!customerPortalEnabled}
           size="small"
-          onClick={(event) => {
-            event.stopPropagation();
-            setAnchorEl(event.currentTarget);
-          }}
+          onClick={handleMenuClick}
           sx={{ml: '.25em'}}>
           <MoreVertIcon
             sx={{color: open ? 'primary.main' : 'action.active'}}
@@ -79,15 +111,16 @@ const Actions = ({
           />
         </IconButton>
       ) : (
-        <IconButton
-          onClick={(event) => {
-            event.stopPropagation();
-            onSendInvite(contactId);
-          }}
-          size="small">
-          <SendOutlinedIcon sx={{color: 'secondary.mainLight'}} />
-        </IconButton>
+        contact.userAccount.status !== PORTAL_PERSON_STATUS.ACTIVE && (
+          <IconButton
+            disabled={!customerPortalEnabled}
+            onClick={handleSendInviteClick}
+            size="small">
+            <SendOutlinedIcon sx={{color: 'secondary.mainLight'}} />
+          </IconButton>
+        )
       )}
+
       <Menu
         id="actions-menu"
         anchorEl={anchorEl}
@@ -95,32 +128,14 @@ const Actions = ({
         onClose={handleClose}
         sx={{
           minWidth: '12.5em',
-          '& ul[role="menu"]': {
-            padding: 0,
-          },
-          '& li': {
-            padding: '0.6em 1em',
-          },
-          '& li:not(:last-of-type)': {
-            borderBottom: '1px solid #e0e0e0',
-          },
+          '& ul[role="menu"]': {padding: 0},
+          '& li': {padding: '0.6em 1em'},
+          '& li:not(:last-of-type)': {borderBottom: '1px solid #e0e0e0'},
         }}
-        MenuListProps={{
-          'aria-labelledby': 'actions-button',
-        }}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        PaperProps={{
-          style: {
-            width: 180,
-          },
-        }}>
+        MenuListProps={{'aria-labelledby': 'actions-button'}}
+        anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+        transformOrigin={{vertical: 'top', horizontal: 'right'}}
+        PaperProps={{style: {width: 180}}}>
         {menuActionButtons.map((action, index) => (
           <MenuItem
             key={index}
@@ -129,12 +144,7 @@ const Actions = ({
               handleClose();
               action.onClick();
             }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5em',
-              }}>
+            <Box sx={{display: 'flex', alignItems: 'center', gap: '0.5em'}}>
               {action.icon}
               <Typography variant="body2">{t(action.label)}</Typography>
             </Box>

@@ -12,6 +12,7 @@ import {
   useDeletePropertyOwnerContactPerson,
   useInviteContact,
   usePropertyOwnerContacts,
+  useUpdatePropertyContactPerson,
 } from 'hooks/reactQuery/useContacts';
 import {createEmptyResource} from 'utils/paging-utils';
 import {useTranslation} from 'react-i18next';
@@ -21,22 +22,31 @@ import WidgetContactFormDialog from 'pages/Contacts/ContactsWidget/WidgetContact
 import {Confirm} from 'components/Confirm';
 import {Switch} from 'components/Switch';
 import ContactDetails from 'pages/Contacts/ContactDetails';
+import {UserAccountStatus} from 'models/user';
+import {useCustomer} from 'hooks/reactQuery/useCustomers';
+import {Alert} from '@mui/material';
 import {columns, makeRows} from './CustomerPortalDataGridProps';
 
 interface Props {
   customerId: string;
+  customerPortalEnabled: boolean;
 }
 
-const CustomerPortalWidget = ({customerId}: Props) => {
+const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
   const {t} = useTranslation();
 
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [selectedContact, setSelectedContact] = useState<ContactsView>();
   const [openFormDialog, setOpenFormDialog] = useState(false);
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
-  const [isWidgetActive, setIsWidgetActive] = useState(false);
+  const [isWidgetActive, setIsWidgetActive] = useState(customerPortalEnabled);
   const [showSideDrawer, setShowSideDrawer] = useState(false);
 
+  const {updateCustomer} = useCustomer(true);
+  const {mutate: updatePropertyContactPerson} = useUpdatePropertyContactPerson(
+    customerId,
+    'Contact updated successfully',
+  );
   const {mutateAsync: addContact} = useCreatePropertyContactPerson(
     customerId,
     'Contact added successfully',
@@ -62,7 +72,7 @@ const CustomerPortalWidget = ({customerId}: Props) => {
       contactPersonId: newContactPersonId || '',
       externalId: '',
     });
-    await refetch();
+    refetch();
   };
 
   const handleDeleteContact = useCallback(
@@ -74,17 +84,22 @@ const CustomerPortalWidget = ({customerId}: Props) => {
   );
 
   const handleRevokeAccess = useCallback((id: string) => {
-    // TODO: Add revoke access action here
-    console.log('Revoke access', id);
-  }, []);
-
-  const handleSendInvite = useCallback(async (id: string) => {
-    const contact = contactsResource.data.find((el) => el.id === id);
-    await inviteContact({
+    updatePropertyContactPerson({
       propertyContactPersonId: id,
-      username: contact?.userAccount?.contact?.email || '',
+      body: {status: UserAccountStatus.LOCKED},
     });
   }, []);
+
+  const handleSendInvite = useCallback(
+    (id: string) => {
+      const contact = contactsResource.data.find((el) => el.id === id);
+      inviteContact({
+        propertyContactPersonId: id,
+        username: contact?.userAccount?.contact?.email || '',
+      });
+    },
+    [contactsResource],
+  );
 
   const handleDeleteConfirm = async ({
     propertyContactPersonId,
@@ -96,10 +111,9 @@ const CustomerPortalWidget = ({customerId}: Props) => {
     setOpenDeleteConfirm(false);
   };
 
-  const handleSwitchChange = (val: boolean) => {
-    // TODO: Add SWITCH action here
-    console.log('SWITCH', val);
-    setIsWidgetActive(val);
+  const handleSwitchChange = async (isActive: boolean) => {
+    await updateCustomer({customerPortalEnabled: isActive}, customerId);
+    setIsWidgetActive(isActive);
   };
 
   return (
@@ -120,10 +134,22 @@ const CustomerPortalWidget = ({customerId}: Props) => {
           setOpenFormDialog(true);
         }}
         headerActionIcon={
-          rows.length ? (
+          rows.length && isWidgetActive ? (
             <AddOutlinedIcon sx={{color: 'primary.dark'}} />
           ) : undefined
         }>
+        {!customerPortalEnabled && (
+          <Alert severity="warning">
+            <Typography variant="subtitle2">
+              {t('Customer Portal disabled')}
+            </Typography>
+            <Typography variant="body1">
+              {t(
+                'Access to the Customer Portal is disabled on the company level. All invited users don’t have access.',
+              )}
+            </Typography>
+          </Alert>
+        )}
         <DataGridLayout
           isWidget
           fullHeight={false}
@@ -133,17 +159,21 @@ const CustomerPortalWidget = ({customerId}: Props) => {
             onDelete: handleDeleteContact,
             onRevokeAccess: handleRevokeAccess,
             onSendInvite: handleSendInvite,
+            customerPortalEnabled: isWidgetActive,
           })}
           loading={isFetching}
           onCellClick={(params) => {
-            setSelectedContact(params.row.contactPerson as ContactsView);
-            setShowSideDrawer(true);
+            if (isWidgetActive) {
+              setSelectedContact(params.row.contactPerson as ContactsView);
+              setShowSideDrawer(true);
+            }
           }}
           noRowsEmptySection={
             <EmptySection
               showActionBtn
               illustration="contacts"
               size="tiny"
+              disableActionBtn={!isWidgetActive}
               containerStyle={{
                 width: '60%',
                 m: 'auto',
