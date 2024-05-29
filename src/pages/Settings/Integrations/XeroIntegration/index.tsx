@@ -32,7 +32,7 @@ const XeroIntegration: FC = () => {
   const serviceCompanyId = user!.userAccount.serviceCompany.id;
   const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
-  const redirectionUrl = `${window.location.origin}/settings?tab=3`;
+  const redirectionUrl = `${window.location.origin}/settings/integrations`;
 
   const {
     values: {code, error},
