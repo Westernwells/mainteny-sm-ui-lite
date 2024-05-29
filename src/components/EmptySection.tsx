@@ -44,6 +44,7 @@ interface Props extends BoxProps {
   actionButtonEndIcon?: JSX.Element;
   subLabel?: string;
   subLabelProps?: TypographyProps;
+  disableActionBtn?: boolean;
 }
 
 export const EmptySection = ({
@@ -61,6 +62,7 @@ export const EmptySection = ({
   actionButtonEndIcon,
   subLabel = '',
   subLabelProps = {},
+  disableActionBtn = false,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -132,6 +134,7 @@ export const EmptySection = ({
         <Button
           label="Create Service Job"
           buttonProps={{
+            disabled: disableActionBtn,
             onClick: btnAction,
             variant: 'contained',
             size: btnSize || 'small',

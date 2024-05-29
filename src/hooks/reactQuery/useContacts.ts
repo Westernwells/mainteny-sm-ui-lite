@@ -10,6 +10,7 @@ import {
   RefContactPersonView,
   RefContactPersonQueryParams,
   CreatePropertyContactPersonRecord,
+  UpdatePropertyContactPersonRecord,
 } from 'models/contacts';
 import {
   useInfiniteQuery,
@@ -241,10 +242,13 @@ export const useInviteContact = (successMsg?: string) => {
       onError: (err: AxiosError<RestError>) => {
         console.error(err);
         const ALREADY_EXISTS_CODE = 1004;
+        const INVALID_USER_ACCOUNT_CODE = 3047;
         if (err.response?.data?.message) {
           enqueueSnackbar(
             err.response.data?.errorCode === ALREADY_EXISTS_CODE
               ? 'This Email address is already used for a different customer portal'
+              : err.response.data?.errorCode === INVALID_USER_ACCOUNT_CODE
+              ? 'Invalid user account status'
               : 'Invalid email address',
             {
               variant: 'error',
@@ -762,6 +766,56 @@ export const useCreatePropertyContactPerson = (
           });
         }
         queryClient.invalidateQueries(queryKeys.queryRefContactPersons);
+        queryClient.invalidateQueries(queryKeys.queryContacts);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const updatePropertyOwnerContactPerson = async (
+  propertyOwnerId: string,
+  propertyContactPersonId: string,
+  body: UpdatePropertyContactPersonRecord,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/propertyOwners/${propertyOwnerId}/contactPersons/${propertyContactPersonId}`,
+    {
+      ...body,
+    },
+  );
+};
+export const useUpdatePropertyContactPerson = (
+  propertyOwnerId: string,
+  successMsg?: string,
+) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      propertyContactPersonId,
+      body,
+    }: {
+      propertyContactPersonId: string;
+      body: UpdatePropertyContactPersonRecord;
+    }) =>
+      updatePropertyOwnerContactPerson(
+        propertyOwnerId,
+        propertyContactPersonId,
+        body,
+      ),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.queryRefContactPersons);
+        queryClient.invalidateQueries(queryKeys.queryContacts);
       },
       onError: (err: any) => {
         console.log(err);
