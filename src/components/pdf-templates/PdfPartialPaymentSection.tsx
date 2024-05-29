@@ -241,6 +241,9 @@ export const PdfPartialPaymentSection = ({
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
     roundingMode: 'floor',
+    excludeCurrencySymbol: true,
+    currencySymbol: currentCurrency?.symbol,
+    companyLang: selectedLng,
   });
 
   const hasPayments = previousInvoices.map((i) => i.payments).flat().length > 0;
@@ -272,7 +275,6 @@ export const PdfPartialPaymentSection = ({
             selectedLng={selectedLng}
             currentCurrency={currentCurrency}
             previousInvoices={previousInvoices}
-            invoice={invoice}
           />
         )}
 

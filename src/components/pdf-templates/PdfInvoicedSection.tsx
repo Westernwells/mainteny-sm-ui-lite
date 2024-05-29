@@ -263,7 +263,7 @@ export const PdfInvoicedSection = ({
             paddingTop: 3,
           }}>
           <Text style={{width: '30%', ...boldFontStyle}}>
-            {translate('Invoice amount')}
+            {`${translate('Invoice amount')} (${currentCurrency?.symbol})`}
           </Text>
           <Text style={{width: '15%', textAlign: 'right'}} />
           <Text style={{width: '18%', textAlign: 'right', ...boldFontStyle}}>

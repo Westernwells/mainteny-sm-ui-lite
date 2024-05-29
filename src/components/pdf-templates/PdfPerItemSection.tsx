@@ -1,5 +1,5 @@
 import {Text, View, Font, StyleSheet} from '@react-pdf/renderer';
-import {InvoiceView} from 'models/invoice';
+import {AggregatedInvoiceItem, InvoiceView} from 'models/invoice';
 import {formatCurrency, centsToMoney} from 'utils/currency';
 import {Currency} from 'models/misc';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -12,7 +12,6 @@ type PerItemPaymentProps = {
   currentCurrency?: Currency;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
-  invoice: InvoiceView;
 };
 
 Font.register({
@@ -53,7 +52,6 @@ export const PdfPerItemSection = ({
   currentCurrency,
   selectedLng,
   previousInvoices,
-  invoice,
 }: PerItemPaymentProps) => {
   const styles = getStyles();
 
@@ -115,16 +113,40 @@ export const PdfPerItemSection = ({
       <View>
         {hasPreviousInvoices &&
           previousInvoices &&
-          previousInvoices
-            ?.find((prevInvoice) => prevInvoice.id === invoice.id)
-            ?.items?.map((invoiceItem, index) => {
-              const itemTotalPriceExclVat =
-                invoiceItem.unitAmount.netAmount /
-                10 ** invoiceItem.unitAmount.fractionDigits;
+          (() => {
+            const aggregatedItems = previousInvoices.reduce<
+              Record<string, AggregatedInvoiceItem>
+            >((acc, prevInvoice) => {
+              prevInvoice.items.forEach((invoiceItem) => {
+                const itemId = invoiceItem.article?.id!;
 
-              const itemAmountToBePaid =
-                (itemTotalPriceExclVat / 100) *
-                (invoiceItem.additionalInfo?.payment?.percentage ?? 0);
+                if (!acc[itemId]) {
+                  acc[itemId] = {
+                    ...invoiceItem,
+                    totalAmountToBePaid: 0,
+                    totalPercentage: 0,
+                  };
+                }
+                const itemTotalPriceExclVat =
+                  invoiceItem.unitAmount.netAmount /
+                  10 ** invoiceItem.unitAmount.fractionDigits;
+
+                const itemAmountToBePaid =
+                  (itemTotalPriceExclVat / 100) *
+                  (invoiceItem.additionalInfo?.payment?.percentage ?? 0);
+
+                acc[itemId].totalAmountToBePaid! += itemAmountToBePaid;
+                acc[itemId].totalPercentage! +=
+                  invoiceItem.additionalInfo?.payment?.percentage ?? 0;
+              });
+              return acc;
+            }, {});
+
+            const aggregatedItemsArray = Object.values(aggregatedItems);
+
+            return aggregatedItemsArray.map((invoiceItem, index) => {
+              const isLastItem = index === aggregatedItemsArray.length - 1;
+
               return (
                 <View
                   style={{
@@ -134,8 +156,7 @@ export const PdfPerItemSection = ({
                     width: '100%',
                     flexDirection: 'row',
                     marginVertical: 4,
-                    borderBottomWidth:
-                      index === previousInvoices[0]!.items.length - 1 ? 1 : 0,
+                    borderBottomWidth: isLastItem ? 1 : 0,
                     borderBottomColor: '#212121',
                   }}
                   wrap={false}
@@ -162,7 +183,7 @@ export const PdfPerItemSection = ({
                     {formatCurrency(
                       centsToMoney(
                         currentCurrency?.code!,
-                        invoiceItem?.unitAmount.netAmount,
+                        invoiceItem.unitAmount.netAmount,
                       ),
                       {
                         currency: currentCurrency?.code,
@@ -178,7 +199,7 @@ export const PdfPerItemSection = ({
                       color: '#212121',
                       width: '15%',
                     }}>
-                    {invoiceItem?.additionalInfo?.payment?.percentage}%
+                    {invoiceItem.totalPercentage}%
                   </Text>
                   <Text
                     style={{
@@ -186,7 +207,7 @@ export const PdfPerItemSection = ({
                       color: '#212121',
                       width: '25%',
                     }}>
-                    {formatCurrency(itemAmountToBePaid, {
+                    {formatCurrency(invoiceItem.totalAmountToBePaid!, {
                       currency: currentCurrency?.code,
                       excludeCurrencySymbol: true,
                       currencySymbol: currentCurrency?.symbol,
@@ -195,7 +216,8 @@ export const PdfPerItemSection = ({
                   </Text>
                 </View>
               );
-            })}
+            });
+          })()}
       </View>
     </View>
   );
