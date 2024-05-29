@@ -61,6 +61,11 @@ export interface InvoiceItem {
   };
 }
 
+export interface AggregatedInvoiceItem extends InvoiceItem {
+  totalAmountToBePaid: number;
+  totalPercentage: number;
+}
+
 export interface BeneficialDetails {
   name: string;
   address: Address;

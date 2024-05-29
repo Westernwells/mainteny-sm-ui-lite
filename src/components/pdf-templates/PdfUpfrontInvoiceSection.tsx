@@ -267,7 +267,6 @@ const PdfUpfrontInvoiceSection = ({
             selectedLng={selectedLng}
             currentCurrency={currentCurrency}
             previousInvoices={previousInvoices}
-            invoice={invoice}
           />
         )}
 

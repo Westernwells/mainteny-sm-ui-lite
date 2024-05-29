@@ -230,7 +230,9 @@ export const PdfPaymentHistorySection = ({
               paddingTop: 8,
             }}>
             <Text style={{width: '60%', textAlign: 'left', ...boldFontStyle}}>
-              {translate('Outstanding payments')}
+              {`${translate('Outstanding payments')} (${
+                currentCurrency?.symbol
+              })`}
             </Text>
             <Text style={{width: '10%', textAlign: 'right'}} />
             <Text style={{width: '40%', textAlign: 'right', ...boldFontStyle}}>
