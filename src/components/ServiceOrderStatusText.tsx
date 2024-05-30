@@ -125,6 +125,86 @@ export const ServiceOrderStatusText = ({
             </Typography>
           </Box>
         );
+      case ServiceOrderStatus.TECHNICIAN_ASSIGNED:
+        return (
+          <Box display="flex">
+            {showLeftAdornment ? (
+              <Box
+                sx={{
+                  background: statusColor,
+                  height: '0.8rem',
+                  width: '0.8rem',
+                  borderRadius: '50%',
+                  mr: '0.5em',
+                  mb: '0.3em',
+                }}
+              />
+            ) : null}
+            <Typography variant="chip" {...rest}>
+              Technician Assigned
+            </Typography>
+          </Box>
+        );
+      case ServiceOrderStatus.TRAVEL:
+        return (
+          <Box display="flex">
+            {showLeftAdornment ? (
+              <Box
+                sx={{
+                  background: statusColor,
+                  height: '0.8rem',
+                  width: '0.8rem',
+                  borderRadius: '50%',
+                  mr: '0.5em',
+                  mb: '0.3em',
+                }}
+              />
+            ) : null}
+            <Typography variant="chip" {...rest}>
+              Travel
+            </Typography>
+          </Box>
+        );
+      case ServiceOrderStatus.PAUSED:
+        return (
+          <Box display="flex">
+            {showLeftAdornment ? (
+              <Box
+                sx={{
+                  background: statusColor,
+                  height: '0.8rem',
+                  width: '0.8rem',
+                  borderRadius: '50%',
+                  mr: '0.5em',
+                  mb: '0.3em',
+                }}
+              />
+            ) : null}
+            <Typography variant="chip" {...rest}>
+              Paused
+            </Typography>
+          </Box>
+        );
+      case ServiceOrderStatus.ARTICLES_ORDERED:
+        return (
+          <Box display="flex">
+            {showLeftAdornment ? (
+              <Box
+                sx={{
+                  background: statusColor,
+                  height: '0.8rem',
+                  width: '0.8rem',
+                  borderRadius: '50%',
+                  mr: '0.5em',
+                  mb: '0.3em',
+                }}
+              />
+            ) : null}
+            <Typography variant="chip" {...rest}>
+              Articles Ordered
+            </Typography>
+          </Box>
+        );
       default:
         return (
           <Box display="flex">
