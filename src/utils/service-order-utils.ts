@@ -17,9 +17,9 @@ import {toDate, toRestDateTime} from './datetime';
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
     case ServiceOrderStatus.SCHEDULING:
-      return 'secondary';
+      return 'primary.dark';
     case ServiceOrderStatus.SCHEDULED:
-      return 'primary.mainLight';
+      return 'primary.dark';
     case ServiceOrderStatus.IN_PROGRESS:
       return 'warning.light';
     case ServiceOrderStatus.CANCELLED:
@@ -28,6 +28,14 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
       return 'error';
     case ServiceOrderStatus.COMPLETED:
       return 'darkSuccess';
+    case ServiceOrderStatus.PAUSED:
+      return 'warning';
+    case ServiceOrderStatus.TECHNICIAN_ASSIGNED:
+      return 'primary.dark';
+    case ServiceOrderStatus.TRAVEL:
+      return 'warning';
+    case ServiceOrderStatus.ARTICLES_ORDERED:
+      return 'primary.dark';
     default:
       return 'default';
   }
@@ -49,6 +57,14 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
       return 'Overdue';
     case ServiceOrderStatus.COMPLETED:
       return 'Completed';
+    case ServiceOrderStatus.TECHNICIAN_ASSIGNED:
+      return 'Technician Assigned';
+    case ServiceOrderStatus.TRAVEL:
+      return 'Travel';
+    case ServiceOrderStatus.PAUSED:
+      return 'Paused';
+    case ServiceOrderStatus.ARTICLES_ORDERED:
+      return 'Articles Ordered';
     default:
       return 'Unscheduled';
   }
@@ -70,6 +86,14 @@ export const serviceOrderStatusToEnum = (status: string) => {
       return ServiceOrderStatus.OVERDUE;
     case 'Completed':
       return ServiceOrderStatus.COMPLETED;
+    case 'Technician Assigned':
+      return ServiceOrderStatus.TECHNICIAN_ASSIGNED;
+    case 'Travel':
+      return ServiceOrderStatus.TRAVEL;
+    case 'Paused':
+      return ServiceOrderStatus.PAUSED;
+    case 'Articles Ordered':
+      return ServiceOrderStatus.ARTICLES_ORDERED;
     default:
       return ServiceOrderStatus.INIT;
   }
