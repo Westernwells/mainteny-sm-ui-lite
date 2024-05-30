@@ -222,7 +222,7 @@ export const PdfInvoicedSection = ({
                 }}>
                 {invoiceTotalAmount.vats.map((v, idx) => {
                   const vatAmount = Math.abs(
-                    centsToMoney(currentCurrency?.code!),
+                    centsToMoney(currentCurrency?.code!, v.vat),
                   );
                   const vatAmountFormatted = formatCurrency(vatAmount, {
                     currency: currentCurrency?.code,
