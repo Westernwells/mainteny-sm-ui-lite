@@ -88,6 +88,7 @@ import {
   formatAddressFullname,
   formatSearchParams,
   getUserFullName,
+  isNumber,
 } from 'utils/utils';
 import {
   useCompanyNextNumber,
@@ -592,28 +593,65 @@ export const InvoiceForm = ({
   };
 
   const generateSubject = () => {
-    if (invoiceType === InvoiceType.CREDIT_NOTE) {
-      if (!serviceOrder) {
-        return t('Credit note for {{invoiceNumber}}', {
-          invoiceNumber: invoice?.number || '',
-        });
+    const firstInvoice = previousInvoices[0];
+    const lastInvoice = previousInvoices[previousInvoices.length - 1];
+
+    const getInvoiceIndex = () => {
+      const lastInvoiceDescription =
+        lastInvoice?.additionalInfo?.payment?.description;
+      const lastInvoiceIndexString =
+        lastInvoiceDescription?.split?.('.')?.[0] ?? '';
+      const lastInvoiceIndexNumber = Number(lastInvoiceIndexString);
+      const lastInvoiceIndex = isNumber(lastInvoiceIndexNumber)
+        ? lastInvoiceIndexNumber
+        : 0;
+
+      const lastInvoiceIsPartial = lastInvoice?.type === InvoiceType.PARTIAL;
+      const firstInvoiceIsUpfront = firstInvoice?.type === InvoiceType.UPFRONT;
+
+      return firstInvoiceIsUpfront
+        ? lastInvoiceIsPartial
+          ? lastInvoiceIndex + 1
+          : 1
+        : previousInvoices.length + 1;
+    };
+
+    const invoiceIndex = getInvoiceIndex();
+
+    const getTranslatedSubject = () => {
+      switch (invoiceType) {
+        case InvoiceType.CREDIT_NOTE:
+          if (!serviceOrder) {
+            return t('Credit note for {{invoiceNumber}}', {
+              invoiceNumber: invoice?.number || '',
+            });
+          }
+          return t('{{jobType}} - Credit note for {{invoiceNumber}}', {
+            invoiceNumber: invoice?.number ?? '',
+            jobType: t(capitalize([serviceOrder?.type])) ?? '',
+          });
+
+        case InvoiceType.FINAL:
+          return t('Final Invoice');
+
+        case InvoiceType.PARTIAL:
+          return `${invoiceIndex}. ${t('Partial invoice')}`;
+
+        case InvoiceType.UPFRONT:
+          return `${invoiceIndex}. ${t('Upfront invoice')}`;
+
+        case InvoiceType.FULL:
+          return t('Full Invoice');
+
+        default:
+          if (!serviceOrder) {
+            return t('Invoice');
+          }
+          return t(capitalize([serviceOrder?.type]));
       }
+    };
 
-      return t('{{jobType}} - Credit note for {{invoiceNumber}}', {
-        invoiceNumber: invoice?.number ?? '',
-        jobType: t(capitalize([serviceOrder?.type])) ?? '',
-      });
-    }
-
-    if (invoice?.subject) {
-      return invoice?.subject;
-    }
-
-    if (!serviceOrder) {
-      return t('Invoice');
-    }
-
-    return t(capitalize([serviceOrder?.type]));
+    return invoice?.subject ?? getTranslatedSubject();
   };
 
   useEffect(() => {
