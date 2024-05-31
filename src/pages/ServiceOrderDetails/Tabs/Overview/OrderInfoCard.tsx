@@ -134,9 +134,12 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
     }
 
     if (
-      [ServiceOrderStatus.SCHEDULED, ServiceOrderStatus.IN_PROGRESS].includes(
-        serviceOrderDetails.status,
-      )
+      [
+        ServiceOrderStatus.SCHEDULED,
+        ServiceOrderStatus.IN_PROGRESS,
+        ServiceOrderStatus.TECHNICIAN_ASSIGNED,
+        ServiceOrderStatus.ARTICLES_ORDERED,
+      ].includes(serviceOrderDetails.status)
     ) {
       return [
         {

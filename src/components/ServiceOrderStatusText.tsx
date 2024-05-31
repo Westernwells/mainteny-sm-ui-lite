@@ -141,7 +141,7 @@ export const ServiceOrderStatusText = ({
               />
             ) : null}
             <Typography variant="chip" {...rest}>
-              Technician Assigned
+              Assigned
             </Typography>
           </Box>
         );

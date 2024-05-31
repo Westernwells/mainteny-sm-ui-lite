@@ -58,7 +58,7 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
     case ServiceOrderStatus.COMPLETED:
       return 'Completed';
     case ServiceOrderStatus.TECHNICIAN_ASSIGNED:
-      return 'Technician Assigned';
+      return 'Assigned';
     case ServiceOrderStatus.TRAVEL:
       return 'Travel';
     case ServiceOrderStatus.PAUSED:
@@ -86,7 +86,7 @@ export const serviceOrderStatusToEnum = (status: string) => {
       return ServiceOrderStatus.OVERDUE;
     case 'Completed':
       return ServiceOrderStatus.COMPLETED;
-    case 'Technician Assigned':
+    case 'Assigned':
       return ServiceOrderStatus.TECHNICIAN_ASSIGNED;
     case 'Travel':
       return ServiceOrderStatus.TRAVEL;
