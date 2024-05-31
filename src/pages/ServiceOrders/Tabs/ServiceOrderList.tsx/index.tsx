@@ -40,7 +40,7 @@ const serviceOrderStatusMap = {
   Completed: ServiceOrderStatus.COMPLETED,
   Cancelled: ServiceOrderStatus.CANCELLED,
   Overdue: ServiceOrderStatus.OVERDUE,
-  'Technician Assigned': ServiceOrderStatus.TECHNICIAN_ASSIGNED,
+  Assigned: ServiceOrderStatus.TECHNICIAN_ASSIGNED,
   Travel: ServiceOrderStatus.TRAVEL,
   Paused: ServiceOrderStatus.PAUSED,
   'Articles Ordered': ServiceOrderStatus.ARTICLES_ORDERED,
