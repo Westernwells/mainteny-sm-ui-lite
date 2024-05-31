@@ -1811,7 +1811,7 @@
   "Not allowed empty invoice items": "Leere Rechnungspositionen sind nicht zulässig",
   "Wrong invoice status": "Falscher Rechnungsstatus",
   "Multiple VAT values are not allowed": "Mehrere Mehrwertsteuerwerte sind nicht zulässig",
-  "Invalid user account status": "Ungültiger Benutzerkontostatus",
+  "Invalid user account status": "Invalider Nutzer Account Status",
   "Invalid currency": "Ungültige Währung",
   "Invalid contract name": "Ungültiger Vertragsname",
   "Max time range exceeded": "Maximales Zeitfenster überschritten",
@@ -2511,5 +2511,16 @@
   "New Contact person": "Neue Kontaktperson",
   "Small": "Klein",
   "Normal": "Normal",
-  "Large": "Groß"
+  "Large": "Groß",
+  "This Email address is already used for a different customer portal": "Diese E-Mail Adresse wird bereits für ein anderes Kundenportal verwerden. ",
+  "Invalid email address": "Invalide E-Mail Adresse",
+  "Revoked": "Widerrufen",
+  "Resend invite": "Einladung erneut senden",
+  "Revoke access": "Zugang widerrufen",
+  "Customer Portal": "Kundenportal",
+  "Customer Portal disabled": "Kundenportal deaktiviert",
+  "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.": "Das Kundenportal ist auf Firmenebene deaktiviert. Alle eingeladenen Nutzer haben keinen Zugang. ",
+  "Assigned": "Zugewiesen",
+  "Paused": "Pausiert",
+  "Articles Ordered": "Artikel bestellt"
 }
