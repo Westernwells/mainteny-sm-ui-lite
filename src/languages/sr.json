@@ -2542,5 +2542,8 @@
   "Revoke access": "Opozvati pristup",
   "Customer Portal": "Portal za korisnike",
   "Customer Portal disabled": "Korisnički portal je onemogućen",
-  "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.": "Pristup korisničkom portalu je onemogućen na nivou kompanije. Svi pozvani korisnici nemaju pristup."
+  "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.": "Pristup korisničkom portalu je onemogućen na nivou kompanije. Svi pozvani korisnici nemaju pristup.",
+  "Assigned": "Dodeljeno",
+  "Paused": "Pauzirano",
+  "Articles Ordered": "Naručeni članci"
 }

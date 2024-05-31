@@ -2538,5 +2538,22 @@
   "Amount": "Amount",
   "Article name": "Article name",
   "You are about to disconnect contact from this {{refType}}.": "You are about to disconnect contact from this {{refType}}.",
-  "Assistant": "Assistant"
+  "Assistant": "Assistant",
+  "No Contact Persons": "No Contact Persons",
+  "Do you want to add someone?": "Do you want to add someone?",
+  "New Contact person": "New Contact person",
+  "Small": "Small",
+  "Normal": "Normal",
+  "Large": "Large",
+  "This Email address is already used for a different customer portal": "This Email address is already used for a different customer portal",
+  "Invalid email address": "Invalid email address",
+  "Revoked": "Revoked",
+  "Resend invite": "Resend invite",
+  "Revoke access": "Revoke access",
+  "Customer Portal": "Customer Portal",
+  "Customer Portal disabled": "Customer Portal disabled",
+  "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.": "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.",
+  "Assigned": "Assigned",
+  "Paused": "Paused",
+  "Articles Ordered": "Articles Ordered"
 }

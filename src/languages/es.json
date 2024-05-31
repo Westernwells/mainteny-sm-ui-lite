@@ -1856,7 +1856,7 @@
   "Multiple currency found": "Multitud múltiple encontrada",
   "Article is not allowed to delete": "El artículo no puede eliminar",
   "Unit deleted successfully": "Unidad eliminada con éxito",
-  "Travel": "Viajar",
+  "Travel": "Viaje",
   "Work": "Trabajar",
   "Total time must be in 00:00 format": "El tiempo total debe estar en formato 00:00",
   "Show only total time to the customer": "Mostrar solo tiempo total para el cliente",
@@ -2552,5 +2552,8 @@
   "Revoke access": "Revocar el acceso",
   "Customer Portal": "Portal del Cliente",
   "Customer Portal disabled": "Portal del cliente deshabilitado",
-  "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.": "El acceso al Portal del Cliente está deshabilitado a nivel de empresa. Todos los usuarios invitados no tienen acceso."
+  "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.": "El acceso al Portal del Cliente está deshabilitado a nivel de empresa. Todos los usuarios invitados no tienen acceso.",
+  "Assigned": "Asignado",
+  "Paused": "En pausa",
+  "Articles Ordered": "Artículos pedidos"
 }
