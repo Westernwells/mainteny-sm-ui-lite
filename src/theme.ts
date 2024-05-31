@@ -418,7 +418,7 @@ export const theme = createTheme({
     MuiAutocomplete: {
       styleOverrides: {
         tag: {
-          backgroundColor: '#0F4C64',
+          backgroundColor: '#000034',
           color: '#F5FDFE',
           '& .MuiChip-deleteIcon': {
             color: 'white',

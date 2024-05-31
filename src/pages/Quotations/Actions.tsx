@@ -21,7 +21,7 @@ import Print from '@mui/icons-material/Print';
 import Close from '@mui/icons-material/Close';
 import FileDownload from '@mui/icons-material/FileDownload';
 import {Confirm} from 'components/Confirm';
-import {SendEmailDialog} from 'components/SendEmailDialog';
+import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {
   useDeleteQuotation,
@@ -66,6 +66,8 @@ export const Actions = ({quotation, imageUrl}: Props) => {
   const [isRejectedDialogOpen, setIsRejectedDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const [actionType, setActionType] = useState('');
@@ -205,6 +207,41 @@ export const Actions = ({quotation, imageUrl}: Props) => {
     }
   }, [downloadUrl]);
 
+  const getExistingFiles = async (
+    fileDownloadUrl:
+      | {
+          [key: string]: string;
+        }
+      | undefined,
+  ) => {
+    // if quotation is not DRAFT -> download file from server
+    if (quotation.status !== QuotationStatus.DRAFT) {
+      const blob = await fetchFile(
+        fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
+      );
+      const fileNames: string[] = [`${quotation.externalId}.pdf`];
+      const files = await createFilesFromBlobArray([blob], fileNames);
+      setExistingFiles(files);
+
+      // if quotation is DRAFT -> generate file on client
+    } else {
+      const blob = await generateBlobUrl();
+      const fileNames: string[] = [`${quotation.externalId}.pdf`];
+      const files = await createFilesFromBlobArray([blob], fileNames);
+      setExistingFiles(files);
+    }
+  };
+
+  const handleOpenSendEmail = async () => {
+    setIsLoadingFiles(true);
+    setIsSendEmailDialogOpen(true);
+    // using then to wait for refetch and get download url
+    await refetchDownloadUrl().then(async (res) => {
+      await getExistingFiles(res.data);
+    });
+    setIsLoadingFiles(false);
+  };
+
   const actions = (() => {
     const printAction = {
       label: t('Print'),
@@ -248,10 +285,7 @@ export const Actions = ({quotation, imageUrl}: Props) => {
         {
           label: t('Send'),
           icon: <SendIcon />,
-          onClick: () => {
-            refetchDownloadUrl();
-            setIsSendEmailDialogOpen(true);
-          },
+          onClick: handleOpenSendEmail,
         },
         'divider',
         printAction,
@@ -272,10 +306,7 @@ export const Actions = ({quotation, imageUrl}: Props) => {
         {
           label: t('Resend'),
           icon: <ReplayIcon />,
-          onClick: () => {
-            refetchDownloadUrl();
-            setIsSendEmailDialogOpen(true);
-          },
+          onClick: handleOpenSendEmail,
         },
         'divider',
         ...defaultActions,
@@ -378,6 +409,7 @@ export const Actions = ({quotation, imageUrl}: Props) => {
         helperText="This action is irreversible."
       />
       <SendEmailDialog
+        isLoadingFiles={isLoadingFiles}
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
@@ -388,53 +420,30 @@ export const Actions = ({quotation, imageUrl}: Props) => {
         }
         subject={quotation.subject}
         content={quotation.description}
+        existingFiles={existingFiles}
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
           const serviceCompanyId = user?.userAccount.serviceCompany.id;
           const uploadPath = `${serviceCompanyId}/quotations`;
+          const fileNames: string[] = [`${quotation.id}.pdf`];
+          const isDraft = quotation.status === QuotationStatus.DRAFT;
 
-          if (quotation.status !== QuotationStatus.DRAFT) {
-            const blob = await fetchFile(
-              downloadUrl ? Object.values(downloadUrl)[0] : '',
-            );
-            const fileNames: string[] = [`${quotation.id}.pdf`];
-            const files = await createFilesFromBlobArray([blob], fileNames);
+          const allAttachments = emailRecord.attachments || existingFiles;
+          const emailAttachments = (emailRecord.attachments || [])?.filter(
+            (emailAttachedFile) =>
+              !existingFiles.find(
+                (existingFile) => existingFile.name === emailAttachedFile.name,
+              ),
+          );
 
-            await sendQuotation({
-              id: quotation.id,
-              body: {
-                pdfPath: `${uploadPath}/${fileNames[0]}`,
-                sentDate: '',
-                email: {
-                  email: '',
-                  subject: emailRecord.subject,
-                  content: emailRecord.content,
-                  emails: [emailRecord.email],
-                  attachments: files.reduce<FileWithPreview[]>(
-                    (newArr: FileWithPreview[], obj) => [
-                      ...newArr,
-                      {
-                        ...obj,
-                        type: obj.type,
-                        uri: `${uploadPath}/${obj.name}`,
-                        description: obj.name.split('.')[0],
-                      },
-                    ],
-                    [],
-                  ),
-                },
-              },
-            });
-
-            setIsConfirmPrintDialogOpen(false);
-            return;
+          if (isDraft) {
+            await uploadFiles({files: existingFiles, uploadPath});
           }
 
-          const blob = await generateBlobUrl();
-          const fileNames: string[] = [`${quotation.id}.pdf`];
-          const files = await createFilesFromBlobArray([blob], fileNames);
-          await uploadFiles({files, uploadPath});
+          if (emailAttachments.length) {
+            await uploadFiles({files: emailAttachments, uploadPath});
+          }
 
           await sendQuotation({
             id: quotation.id,
@@ -445,22 +454,35 @@ export const Actions = ({quotation, imageUrl}: Props) => {
                 email: '',
                 subject: emailRecord.subject,
                 content: emailRecord.content,
-                emails: [emailRecord.email],
-                attachments: files.reduce<FileWithPreview[]>(
-                  (newArr: FileWithPreview[], obj) => [
-                    ...newArr,
-                    {
-                      ...obj,
-                      type: obj.type,
-                      uri: `${uploadPath}/${obj.name}`,
-                      description: obj.name.split('.')[0],
-                    },
-                  ],
+                emails: emailRecord.emails,
+                ccEmails: emailRecord.ccEmails,
+                bccEmails: emailRecord.bccEmails,
+                attachments: allAttachments.reduce<FileWithPreview[]>(
+                  (newArr: FileWithPreview[], obj, index) => {
+                    // If file is from server -> uri of file should be quotation.id
+                    // If file is from server -> description should be quotation.externalId
+                    const isFileFromServer = !obj.path && index === 0;
+                    return [
+                      ...newArr,
+                      {
+                        ...obj,
+                        type: obj.type,
+                        uri: isFileFromServer
+                          ? `${uploadPath}/${quotation.id}.pdf`
+                          : `${uploadPath}/${obj.name}`,
+                        description: isFileFromServer
+                          ? quotation.externalId
+                          : obj.name.split('.')[0],
+                      },
+                    ];
+                  },
                   [],
                 ),
               },
             },
           });
+
+          setIsConfirmPrintDialogOpen(false);
         }}
       />
       <Confirm

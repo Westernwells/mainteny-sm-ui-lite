@@ -316,8 +316,9 @@ export interface EmailRecord {
   subject: string;
   content: string;
   emails?: string[];
+  ccEmails?: string[];
+  bccEmails?: string[];
   attachments?: FileWithPreview[];
-  firstEmail?: string;
 }
 
 export enum Language {
