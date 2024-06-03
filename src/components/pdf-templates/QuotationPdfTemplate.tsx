@@ -411,9 +411,9 @@ const QuotationPdfTemplate = React.memo(
             </View>
 
             <View>
-              <Text style={styles.contentHeader}>
-                {translate('Quotation')} {quotation?.externalId}
-              </Text>
+              {quotation?.subject && (
+                <Text style={styles.contentHeader}>{quotation?.subject}</Text>
+              )}
 
               {quotation?.description.trim() !== '' && (
                 <HtmlPDF

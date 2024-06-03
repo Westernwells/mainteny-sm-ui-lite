@@ -300,39 +300,44 @@ const ChecklistPdf = ({
               </View>
             </View>
 
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                border: '1px solid #E4E9F2',
-                borderRadius: '8px',
-                marginTop: 20,
-                maxWidth: 150,
-                height: 56,
-                textAlign: 'center',
-                justifyContent: 'space-around',
-                position: 'relative',
-              }}
-              wrap={false}>
-              <View>
-                {signaturePath ? (
-                  <Image src={signaturePath} style={{width: 120, height: 40}} />
-                ) : (
-                  <Text>{translate('No Signature')}</Text>
+            {signaturePath && (
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  border: '1px solid #E4E9F2',
+                  borderRadius: '8px',
+                  marginTop: 20,
+                  maxWidth: 150,
+                  height: 56,
+                  textAlign: 'center',
+                  justifyContent: 'space-around',
+                  position: 'relative',
+                }}
+                wrap={false}>
+                <View>
+                  {signaturePath ? (
+                    <Image
+                      src={signaturePath}
+                      style={{width: 120, height: 40}}
+                    />
+                  ) : (
+                    <Text>{translate('No Signature')}</Text>
+                  )}
+                </View>
+                {technicianName && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      bottom: -5,
+                      textAlign: 'center',
+                      width: '100%',
+                    }}>
+                    <Text>{technicianName}</Text>
+                  </View>
                 )}
               </View>
-              {technicianName && (
-                <View
-                  style={{
-                    position: 'absolute',
-                    bottom: -5,
-                    textAlign: 'center',
-                    width: '100%',
-                  }}>
-                  <Text>{technicianName}</Text>
-                </View>
-              )}
-            </View>
+            )}
           </View>
         </View>
 
