@@ -25,7 +25,21 @@ const defaultProps = {
     );
   },
   renderCell: (params: GridRenderCellParams<any, any, any>) => (
-    <Typography variant="body2" component="span">
+    <Typography
+      variant="body2"
+      component="span"
+      sx={{
+        ...(params.field === 'description' && {
+          display: '-webkit-box',
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          WebkitLineClamp: 2,
+          whiteSpace: 'normal',
+          lineClamp: 2,
+          textOverflow: 'clip',
+          textAlign: 'left',
+        }),
+      }}>
       {params.value}
     </Typography>
   ),
@@ -86,7 +100,7 @@ export const columns: GridColDef[] = [
     field: 'description',
     headerName: 'DESCRIPTION',
     type: 'string',
-    flex: 1,
+    flex: 1.5,
     ...defaultAlignment,
     ...defaultProps,
   },
