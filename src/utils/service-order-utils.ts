@@ -48,7 +48,7 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
     case ServiceOrderStatus.SCHEDULING:
       return 'Scheduling';
     case ServiceOrderStatus.SCHEDULED:
-      return 'Pending';
+      return 'Scheduled';
     case ServiceOrderStatus.IN_PROGRESS:
       return 'Ongoing';
     case ServiceOrderStatus.CANCELLED:
@@ -76,7 +76,7 @@ export const serviceOrderStatusToEnum = (status: string) => {
       return ServiceOrderStatus.READY_TO_SCHEDULE;
     case 'Scheduling':
       return ServiceOrderStatus.SCHEDULING;
-    case 'Pending':
+    case 'Scheduled':
       return ServiceOrderStatus.SCHEDULED;
     case 'Ongoing':
       return ServiceOrderStatus.IN_PROGRESS;

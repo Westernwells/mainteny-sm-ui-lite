@@ -61,7 +61,7 @@ export const ServiceOrderStatusText = ({
               />
             ) : null}
             <Typography variant="chip" {...rest}>
-              Pending
+              Scheduled
             </Typography>
           </Box>
         );
