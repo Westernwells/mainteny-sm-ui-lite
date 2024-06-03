@@ -19,6 +19,7 @@ import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import capitalize from 'lodash/capitalize';
 import {formatAddressFullname} from 'utils/utils';
 import {convertMinutesToHoursAndMinutes} from 'utils/work-hours-utils';
+import {HtmlPDF} from 'components/HtmlPDF';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -454,9 +455,13 @@ const WorkReportTemplate = React.memo(
               </Text>
 
               {serviceOrder?.report?.description.trim() !== '' && (
-                <Text style={styles.contentBody}>
-                  {serviceOrder?.report?.description.split('')}
-                </Text>
+                <HtmlPDF
+                  html={serviceOrder?.report?.description || ''}
+                  selectedLng={selectedLng}
+                  rootStyle={{
+                    ...styles.contentBody,
+                  }}
+                />
               )}
 
               <Text style={styles.sectionHeading}>{translate('Hours')} </Text>
