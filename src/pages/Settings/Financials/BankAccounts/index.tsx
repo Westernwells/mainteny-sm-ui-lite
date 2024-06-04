@@ -1,6 +1,7 @@
 import {MouseEvent, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {t} from 'i18next';
+import {Trans} from 'react-i18next';
 import {theme} from 'theme';
 import {Typography, Box, Avatar, IconButton} from '@mui/material';
 import {AddOutlined, DeleteOutline} from '@mui/icons-material';
@@ -251,12 +252,13 @@ const BankAccounts = ({company}: Props) => {
         onConfirm={handleDelete}
         onClose={() => setOpenConfirmDialog(false)}
         title="Remove bank account"
-        content={t(
-          'You are about to remove {{bankName}} account from your Bank Accounts.',
-          {
-            bankName: selectedBank?.bankName,
-          },
-        )}
+        content={
+          <Trans
+            defaults="You are about to remove <bold>{{bankName}}</bold> account from your Bank Accounts."
+            values={{bankName: selectedBank?.bankName}}
+            components={{bold: <strong />}}
+          />
+        }
         secondContent="Are you sure about it?"
         closeBtnLabel="Cancel"
         confirmBtnLabel="Remove Account"
