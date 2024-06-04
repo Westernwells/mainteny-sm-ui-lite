@@ -94,7 +94,9 @@ export const Dialog = ({
                 size: 'large',
                 onClick: onCancel,
               }}>
-              <Typography variant="subtitle2">{t('Cancel')}</Typography>
+              <Typography variant="subtitle2" color="text.secondary">
+                {t('Cancel')}
+              </Typography>
             </Button>
           )}
           <Button

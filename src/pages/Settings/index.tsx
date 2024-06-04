@@ -1,3 +1,4 @@
+import {Fragment} from 'react';
 import {Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {theme} from 'theme';
@@ -16,6 +17,7 @@ import {
   ExtensionOutlined,
   FactCheckOutlined,
   InfoOutlined,
+  MonetizationOnOutlined,
 } from '@mui/icons-material';
 import {Progress} from 'components/Progress';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
@@ -34,6 +36,7 @@ import {ChecklistDataGrid} from './ChecklistDataGrid';
 import Integrations from './Integrations';
 import Automations from './Automations';
 import Checklist from './Checklist';
+import Financials from './Financials';
 
 interface DrawerItem {
   label: string;
@@ -117,6 +120,12 @@ export const SettingsPage = () => {
           </Grid>
         </>
       ),
+    },
+    {
+      label: 'Financials',
+      icon: <MonetizationOnOutlined />,
+      route: 'financials',
+      component: <Financials company={company!} />,
     },
     {
       label: 'Automations',
@@ -217,12 +226,8 @@ export const SettingsPage = () => {
       </Box>
     );
     return items.map((item, idx) => (
-      <>
-        <Route
-          key={`${item.route}-${idx}`}
-          path={item.route}
-          element={element(item.component)}
-        />
+      <Fragment key={`${item.route}-${idx}`}>
+        <Route path={item.route} element={element(item.component)} />
         {item.children &&
           item.children?.map((i) => (
             <Route
@@ -231,7 +236,7 @@ export const SettingsPage = () => {
               element={element(i.component)}
             />
           ))}
-      </>
+      </Fragment>
     ));
   };
 

@@ -200,6 +200,7 @@ export interface ServiceCompanyUpdateBody {
   postalAddress?: AddressRecord;
   billingAddress?: AddressRecord;
   paymentInfo?: PaymentInfo;
+  paymentInfo2?: PaymentInfo;
   managingDirector?: string;
   arbitrationCourt?: string;
   tradeRegisterNumber?: string;
@@ -217,6 +218,7 @@ export interface ServiceCompanyUpdateBody {
   contractInvoiceGenerationEnabled?: boolean;
   serviceOrderGenerationDaysInAdvance?: number;
   minToHourStep?: MinToStep | number;
+  accountSystem?: AccountSystems;
 }
 
 export interface SystemSettingsUpdateBody {
@@ -323,4 +325,12 @@ export interface TravelWorkFormValues {
   calculationType: TravelWorkCalculationType;
   articleId: string;
   articleSellingPrice?: number;
+}
+
+export enum AccountSystems {
+  Empty = 'Empty',
+  KMU = 'KMU',
+  'SKR 03' = 'SKR 03',
+  'SKR 04' = 'SKR 04',
+  'SKR 07' = 'SKR 07',
 }
