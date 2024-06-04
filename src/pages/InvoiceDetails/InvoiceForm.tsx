@@ -155,6 +155,7 @@ interface Props {
 }
 
 const payment = {
+  bankName: '',
   accountNumber: '',
   bic: '',
   iban: '',

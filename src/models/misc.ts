@@ -4,7 +4,7 @@ import {UseMutationResult} from 'react-query';
 import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
 import {ContractTypes, ContractNameTypes} from './contract';
-import {MinToStep} from './service-company';
+import {AccountSystems, MinToStep} from './service-company';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 
 export interface RestError {
@@ -51,6 +51,7 @@ export interface Settings {
   arbitrationCourt: string;
   tradeRegisterNumber: string;
   paymentInfo: PaymentInfo;
+  paymentInfo2: PaymentInfo;
   timeFormat: string;
   whiteLabel: {
     logoPath: string;
@@ -63,6 +64,7 @@ export interface Settings {
   isContractInvoiceGenerationEnabled?: boolean;
   serviceOrderGenerationDaysInAdvance?: number;
   minToHourStep?: MinToStep | number;
+  accountSystem?: AccountSystems;
 }
 
 export interface Page {
@@ -243,8 +245,9 @@ export interface AmountRecord {
 }
 
 export interface PaymentInfo {
-  accountNumber: string;
-  bic: string;
+  bankName: string;
+  accountNumber?: string;
+  bic?: string;
   iban: string;
 }
 

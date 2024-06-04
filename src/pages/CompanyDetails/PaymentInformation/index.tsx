@@ -46,6 +46,8 @@ export const PaymentInformation = ({containerStyles, company}: Props) => {
     await updateCompany({
       body: {
         paymentInfo: {
+          // TODO: this section will be removed in Basic Info UI update. applied below changes temporarily to just fix type error
+          bankName: '',
           iban: formik.values.iban,
           bic: formik.values.bic,
           accountNumber: formik.values.accountNumber,
