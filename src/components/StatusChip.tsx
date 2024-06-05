@@ -27,6 +27,7 @@ export const statusColor = {
   'warning.dark': 'warning.dark',
   'info.light': 'text.secondary.light',
   darkSuccess: 'success.darkSuccess',
+  'primary.dark': 'primary.dark',
 };
 interface Props {
   label: string | ReactNode;
