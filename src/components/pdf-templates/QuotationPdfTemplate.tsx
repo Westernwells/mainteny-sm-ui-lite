@@ -1,11 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer';
+import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {ServiceOrderView} from 'models/service-order';
@@ -14,7 +7,7 @@ import {formatCurrency} from 'utils/currency';
 import {QuotationItem, QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
-import {Currency} from 'models/misc';
+import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType} from 'models/invoice';
@@ -34,6 +27,10 @@ import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.tt
 import MontserratBoldItalic from '../../assets/fonts/Montserrat/Montserrat-BoldItalic.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import PdfBodyContainer from './containers/PdfBodyContainer';
+import PdfPageContainer from './containers/PdfPageContainer';
+import PdfPageTitle from './containers/PdfPageTitle';
+import TopSectionContainer from './containers/TopSectionContainer';
 
 Font.register({
   family: 'Montserrat-Regular',
@@ -61,34 +58,10 @@ Font.register({
 });
 
 const getStyles = (
-  selectedLng?: string,
   boldFontStyle?: {fontFamily: string},
   regularFontStyle?: {fontFamily: string},
 ) =>
   StyleSheet.create({
-    page: {
-      ...regularFontStyle,
-      fontSize: 10,
-      paddingTop: 25,
-      paddingLeft: 68,
-      paddingRight: 45,
-      backgroundColor: 'white',
-      height: '100%',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      justifyContent: 'space-between',
-      paddingBottom: 95,
-      color: '#212121',
-    },
-    topSection: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 40,
-      alignItems: 'flex-start',
-      marginTop: 5,
-    },
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
@@ -116,12 +89,6 @@ const getStyles = (
     },
     dataBody: {
       borderBottom: '1px solid #212121',
-    },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      ...boldFontStyle,
-      marginBottom: 10,
     },
     notesSection: {
       marginTop: 1,
@@ -201,27 +168,28 @@ const getStyles = (
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  logoSrc?: string;
   currentCurrency?: Currency;
   serviceOrder?: ServiceOrderView;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   quotation?: QuotationView;
   selectedLng?: string;
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 const QuotationPdfTemplate = React.memo(
   ({
     translate,
     userInfo,
-    logoSrc,
     currentCurrency,
     serviceOrder,
-    logoDimensions,
     quotation,
     selectedLng,
+    headerInfo,
+    headerPath,
+    footerInfo,
+    footerPath,
   }: Props) => {
     const articleItems = quotation?.items.map((item) => ({
       ...item,
@@ -311,18 +279,15 @@ const QuotationPdfTemplate = React.memo(
         selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
     };
 
-    const styles = getStyles(selectedLng, boldFontStyle, regularFontStyle);
+    const styles = getStyles(boldFontStyle, regularFontStyle);
 
     return (
       <Document>
-        <Page size="A4" style={styles.page}>
-          <View>
-            <PdfTemplateHeader
-              logoSrc={logoSrc}
-              logoDimensions={logoDimensions}
-            />
+        <PdfPageContainer selectedLng={selectedLng}>
+          <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-            <View style={styles.topSection}>
+          <PdfBodyContainer>
+            <TopSectionContainer>
               <PdfTemplateLeftAddress
                 companyName={userInfo?.serviceCompany?.name}
                 billingAddressName={
@@ -408,11 +373,13 @@ const QuotationPdfTemplate = React.memo(
                   )}
                 </View>
               </View>
-            </View>
+            </TopSectionContainer>
 
             <View>
               {quotation?.subject && (
-                <Text style={styles.contentHeader}>{quotation?.subject}</Text>
+                <PdfPageTitle selectedLng={selectedLng}>
+                  {quotation?.subject}
+                </PdfPageTitle>
               )}
 
               {quotation?.description.trim() !== '' && (
@@ -787,14 +754,16 @@ const QuotationPdfTemplate = React.memo(
                 </View>
               </View>
             </View>
-          </View>
+          </PdfBodyContainer>
 
           <PdfTemplateFooter
             userInfo={userInfo}
             selectedLng={selectedLng}
             translate={translate}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
           />
-        </Page>
+        </PdfPageContainer>
       </Document>
     );
   },

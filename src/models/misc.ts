@@ -413,3 +413,11 @@ export enum InspectionCycle {
   BIENNIALLY = 'BIENNIALLY',
   TRIENNIALLY = 'TRIENNIALLY',
 }
+
+export interface HeaderFooterInfoData {
+  path: string;
+  width: number;
+  height: number;
+  posX: number;
+  posY: number;
+}

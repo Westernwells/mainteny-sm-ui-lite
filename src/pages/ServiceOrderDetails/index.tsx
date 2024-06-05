@@ -24,10 +24,9 @@ import {SnackbarKey} from 'notistack';
 import {useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
-import useLogoDimensions from 'hooks/useLogoDimensions';
-import useLogoImage from 'hooks/useLogoImage';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -67,9 +66,6 @@ export const ServiceOrderDetails = () => {
     serviceOrder?.additionalInfo.quotationId,
   );
   const [filePathToDownload, setFilePathToDownload] = useState('');
-  const imageUrl = useLogoImage(user);
-
-  const logoDimensions = useLogoDimensions(imageUrl);
 
   const filePaths = useMemo(
     () => (filePathToDownload ? [filePathToDownload] : []),
@@ -104,17 +100,39 @@ export const ServiceOrderDetails = () => {
     [company?.language],
   );
 
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
   const generatePreviewPdfBlobUrl = async () => {
     const blob = await pdf(
       <JobOverviewPdfTemplate
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
-        logoSrc={imageUrl}
         serviceOrder={serviceOrder}
-        logoDimensions={logoDimensions}
         quotation={quotation}
         selectedLng={company?.language}
         translate={translate}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -123,7 +141,6 @@ export const ServiceOrderDetails = () => {
 
   const generateWorkOverview = async () => {
     try {
-      downloadFile();
       overviewPdfSnackBarRef.current = enqueueSnackbar(
         <Box display="flex" padding="0em" margin="0em" alignItems="center">
           <img alt={t('Path Image')} src={PathImage} />{' '}
@@ -137,7 +154,7 @@ export const ServiceOrderDetails = () => {
         },
       );
 
-      generatePreviewPdfBlobUrl();
+      await generatePreviewPdfBlobUrl();
 
       await postServiceOrderConfirmationPublish({
         serviceOrder: serviceOrderId as string,
@@ -177,8 +194,11 @@ export const ServiceOrderDetails = () => {
   }, []);
 
   useEffect(() => {
-    generatePreviewPdfBlobUrl();
-  }, [logoDimensions]);
+    if (filePathToDownload) {
+      downloadFile();
+      setFilePathToDownload('');
+    }
+  }, [filePathToDownload]);
 
   if (isLoading) {
     return <Progress />;

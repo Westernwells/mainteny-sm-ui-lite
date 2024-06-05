@@ -1,11 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer';
+import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {ArticleOrderView} from 'models/article';
 import {UserAccount} from 'models/user';
 import React from 'react';
@@ -13,9 +6,13 @@ import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
-import {Currency} from 'models/misc';
+import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
+import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
+import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
+import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
+import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -55,30 +52,6 @@ const getStyles = (
   regularFontStyle?: {fontFamily: string},
 ) =>
   StyleSheet.create({
-    page: {
-      ...regularFontStyle,
-      fontSize: 10,
-      paddingTop: 25,
-      paddingLeft: 68,
-      paddingRight: 45,
-      backgroundColor: 'white',
-      height: '100%',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      justifyContent: 'space-between',
-      paddingBottom: 95,
-      color: '#212121',
-    },
-    topSection: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 40,
-      alignItems: 'flex-start',
-      position: 'absolute',
-      top: 90,
-    },
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
@@ -109,15 +82,12 @@ const getStyles = (
       borderBottom: '1px solid #212121',
       paddingBottom: 1,
     },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      marginTop: 150,
-      marginBottom: 10,
-      ...boldFontStyle,
-    },
     contentBody: {
       marginBottom: 10,
+      paddingTop: 25,
+      maxWidth: '95%',
+      display: 'flex',
+      flexDirection: 'row',
     },
     notesSection: {
       paddingBottom: 6,
@@ -179,25 +149,26 @@ const getStyles = (
 type Props = {
   translate: (key: string) => string;
   articleOrder?: ArticleOrderView | undefined;
-  userInfo?: UserAccount | undefined;
-  logoSrc?: string;
   currentCurrency?: Currency;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   selectedLng?: string;
+  userInfo?: UserAccount | undefined;
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 const OrderArticlePDF = React.memo(
   ({
     articleOrder,
     userInfo,
-    logoSrc,
     currentCurrency,
-    logoDimensions,
     selectedLng,
     translate,
+    headerInfo,
+    headerPath,
+    footerInfo,
+    footerPath,
   }: Props) => {
     const articleItems = convertToArticleOrderItemRecord(articleOrder?.items!);
 
@@ -222,14 +193,11 @@ const OrderArticlePDF = React.memo(
 
     return (
       <Document>
-        <Page size="A4" style={styles.page}>
-          <View>
-            <PdfTemplateHeader
-              logoSrc={logoSrc}
-              logoDimensions={logoDimensions}
-            />
+        <PdfPageContainer selectedLng={selectedLng}>
+          <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-            <View style={styles.topSection}>
+          <PdfBodyContainer>
+            <TopSectionContainer>
               <PdfTemplateLeftAddress
                 companyName={userInfo?.serviceCompany?.name}
                 billingAddressName={
@@ -280,12 +248,13 @@ const OrderArticlePDF = React.memo(
                   </View>
                 )}
               </View>
-            </View>
+            </TopSectionContainer>
 
             <View>
-              <Text style={styles.contentHeader}>
+              <PdfPageTitle selectedLng={selectedLng}>
                 {translate('Article Order for')} {articleOrder?.externalId}
-              </Text>
+              </PdfPageTitle>
+
               <HtmlPDF
                 html={articleOrder?.description || ''}
                 rootStyle={styles.contentBody}
@@ -553,14 +522,16 @@ const OrderArticlePDF = React.memo(
                 </View>
               </View>
             </View>
-          </View>
+          </PdfBodyContainer>
 
           <PdfTemplateFooter
             userInfo={userInfo}
             selectedLng={selectedLng}
             translate={translate}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
           />
-        </Page>
+        </PdfPageContainer>
       </Document>
     );
   },

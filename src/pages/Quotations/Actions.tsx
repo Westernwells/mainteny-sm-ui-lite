@@ -36,7 +36,6 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import useLogoDimensions from 'hooks/useLogoDimensions';
 import {
   companyLanguageContextMap,
   createFilesFromBlobArray,
@@ -47,17 +46,17 @@ import {pdf} from '@react-pdf/renderer';
 import {useCurrentCurrency} from 'utils/currency';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 
 interface Props {
   quotation: QuotationView;
-  imageUrl?: string;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
 
-export const Actions = ({quotation, imageUrl}: Props) => {
+export const Actions = ({quotation}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {user} = useUserSession();
@@ -81,7 +80,6 @@ export const Actions = ({quotation, imageUrl}: Props) => {
   const {mutateAsync: sendQuotation} = useSendQuotation();
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
-  const logoDimensions = useLogoDimensions(imageUrl!);
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
@@ -99,6 +97,26 @@ export const Actions = ({quotation, imageUrl}: Props) => {
     [company?.language],
   );
 
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
   const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
     quotation && quotation?.additionalInfo.pdfPath
       ? [quotation.additionalInfo.pdfPath]
@@ -111,11 +129,13 @@ export const Actions = ({quotation, imageUrl}: Props) => {
       <QuotationPdfTemplate
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         quotation={quotation}
         selectedLng={company?.language}
         translate={translate}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     setBlobFile(blob);

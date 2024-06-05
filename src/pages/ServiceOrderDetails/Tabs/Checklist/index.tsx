@@ -45,8 +45,6 @@ import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
 import {CheckListComponentType} from 'models/checklist';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import useLogoDimensions from 'hooks/useLogoDimensions';
-import useLogoImage from 'hooks/useLogoImage';
 import {companyLanguageContextMap, createFilesFromBlobArray} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
@@ -56,6 +54,7 @@ import {SnackbarKey} from 'notistack';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {ChecklistComponent} from './ChecklistComponent';
 import ChecklistPdf from './ChecklistPdf';
 
@@ -208,8 +207,6 @@ export const CheckList = ({serviceOrder}: Props) => {
       : (checklistSummary.done / checklistSummary.all) * 100,
   );
 
-  const imageUrl = useLogoImage(user);
-  const logoDimensions = useLogoDimensions(imageUrl);
   const signatureImageUrl = useFetchAndConvertImage(signaturePath);
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
@@ -228,12 +225,30 @@ export const CheckList = ({serviceOrder}: Props) => {
     [company?.language],
   );
 
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
   const generatePdfUrl = async () => {
     const blob = await pdf(
       <ChecklistPdf
         userInfo={user?.userAccount}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         selectedLng={company?.language}
         translate={translate}
         serviceOrder={serviceOrder}
@@ -241,6 +256,10 @@ export const CheckList = ({serviceOrder}: Props) => {
         sortedChecklistComponents={sortedChecklistComponents}
         signaturePath={signatureImageUrl}
         technicianName={technicianName}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

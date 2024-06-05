@@ -42,7 +42,10 @@ import {
   fetchFile,
 } from 'utils/utils';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
-import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {ElevatorView} from 'models/elevator';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import queryString from 'query-string';
@@ -54,13 +57,12 @@ import {Dialog} from 'components/Dialog';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {pdf} from '@react-pdf/renderer';
-import useLogoDimensions from 'hooks/useLogoDimensions';
-import useLogoImage from 'hooks/useLogoImage';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {EmptySection} from 'components/EmptySection';
 import {PDFContainer} from 'components/PDFContainer';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -109,8 +111,6 @@ export const ViewQuotation = ({
   const [blobFile, setBlobFile] = useState<Blob>();
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
-  const imageUrl = useLogoImage(user);
-  const logoDimensions = useLogoDimensions(imageUrl);
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
@@ -133,6 +133,26 @@ export const ViewQuotation = ({
       return t(key);
     },
     [company?.language],
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
   );
 
   const {mutate: markAsAccepted} = useReplyQuotation();
@@ -270,11 +290,13 @@ export const ViewQuotation = ({
       <QuotationPdfTemplate
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         quotation={quotation}
         selectedLng={company?.language}
         translate={translate}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     setBlobFile(blob);
@@ -286,7 +308,7 @@ export const ViewQuotation = ({
     if (quotation.status === QuotationStatus.DRAFT) {
       generateBlobUrl();
     }
-  }, [quotation, logoDimensions]);
+  }, [quotation]);
 
   return (
     <Box>

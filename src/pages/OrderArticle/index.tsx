@@ -31,12 +31,14 @@ import Edit from '@mui/icons-material/Edit';
 import {Button} from 'components/Button';
 import RichTextField from 'components/RichTextField';
 import useTheme from '@mui/material/styles/useTheme';
-import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {useCurrentCurrency} from 'utils/currency';
-import useLogoDimensions from 'hooks/useLogoDimensions';
-import useLogoImage from 'hooks/useLogoImage';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {companyLanguageContextMap, yupValidations} from 'utils/utils';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {ArticleItemsTable} from './ArticleItemsTable';
 import OrderArticlePDF from './OrderArticlePDF';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
@@ -105,7 +107,6 @@ export const OrderArticle = () => {
   const [mode, setMode] = useState(DocumentMode.EDIT);
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
   const [printPdfBlobUrl, setPrintPdfBlobUrl] = useState('');
-  const imageUrl = useLogoImage(user);
 
   const {downloadFile} = useDownloadFileWithCustomName(
     `AO_${newArticleOrder?.externalId}`,
@@ -131,8 +132,6 @@ export const OrderArticle = () => {
     formik.setFieldValue('articleSupplierId', row.id);
   };
 
-  const logoDimensions = useLogoDimensions(imageUrl);
-
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
     lng: companyLanguageContextMap[company?.language as string],
@@ -149,6 +148,26 @@ export const OrderArticle = () => {
     [company?.language],
   );
 
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
   const generatePrintBlobUrl = async () => {
     if (newArticleOrder) {
       const blob = await pdf(
@@ -156,8 +175,10 @@ export const OrderArticle = () => {
           articleOrder={newArticleOrder!}
           userInfo={user?.userAccount}
           currentCurrency={currentCurrency}
-          logoSrc={imageUrl}
-          logoDimensions={logoDimensions}
+          headerPath={headerUrl[headerInfo?.path]}
+          headerInfo={headerInfo}
+          footerPath={footerUrl[footerInfo?.path]}
+          footerInfo={footerInfo}
           selectedLng={company?.language}
           translate={translate}
         />,
@@ -202,11 +223,13 @@ export const OrderArticle = () => {
         supplier={supplier!}
         formik={formik}
         userInfo={user?.userAccount}
-        logoSrc={imageUrl}
         currentCurrency={currentCurrency}
-        logoDimensions={logoDimensions}
         selectedLng={company?.language}
         translate={translate}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

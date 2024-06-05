@@ -145,7 +145,7 @@ export const columns = (imageUrl: string): GridColDef[] => [
     field: 'actions',
     align: 'right',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <Actions quotation={params.row.quotation} imageUrl={imageUrl} />
+      <Actions quotation={params.row.quotation} />
     ),
     flex: 0.5,
     sortable: false,

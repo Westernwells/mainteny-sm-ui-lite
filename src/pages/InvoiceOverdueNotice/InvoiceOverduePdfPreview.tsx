@@ -1,11 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer';
+import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -14,11 +7,16 @@ import {FormikProps} from 'formik';
 import {formatDate, toDate} from 'utils/datetime';
 import {formatCurrency} from 'utils/currency';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
-import {Currency} from 'models/misc';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
+import {Currency, HeaderFooterInfoData} from 'models/misc';
+import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
+import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
+import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
+import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
+import {HtmlPDF} from 'components/HtmlPDF';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
+import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
+import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -49,31 +47,6 @@ const getStyles = (
   regularFontStyle?: {fontFamily: string},
 ) =>
   StyleSheet.create({
-    page: {
-      ...regularFontStyle,
-      fontSize: 10,
-      paddingTop: 25,
-      paddingLeft: 68,
-      paddingRight: 45,
-      backgroundColor: 'white',
-      height: '100%',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      justifyContent: 'space-between',
-      paddingBottom: 95,
-      color: '#212121',
-    },
-    topSection: {
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 40,
-      alignItems: 'flex-start',
-      position: 'absolute',
-      top: 90,
-    },
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
@@ -102,13 +75,6 @@ const getStyles = (
     dataBody: {
       borderBottom: '1px solid #212121',
       paddingBottom: 1,
-    },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      marginTop: 150,
-      marginBottom: 20,
-      ...boldFontStyle,
     },
     contentBody: {
       color: '#212121',
@@ -149,12 +115,7 @@ const getStyles = (
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  logoSrc?: string;
   currentCurrency?: Currency;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   selectedLng?: string;
   invoice?: InvoiceView;
   formik: FormikProps<{
@@ -165,17 +126,23 @@ type Props = {
     initialAmount: number;
     handlingFee: number;
   }>;
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 const InvoiceOverduePdfPreview = ({
   translate,
   userInfo,
-  logoSrc,
   currentCurrency,
-  logoDimensions,
   selectedLng,
   invoice,
   formik,
+  headerInfo,
+  headerPath,
+  footerInfo,
+  footerPath,
 }: Props) => {
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -198,14 +165,11 @@ const InvoiceOverduePdfPreview = ({
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <View>
-          <PdfTemplateHeader
-            logoSrc={logoSrc}
-            logoDimensions={logoDimensions}
-          />
+      <PdfPageContainer selectedLng={selectedLng}>
+        <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-          <View style={styles.topSection}>
+        <PdfBodyContainer>
+          <TopSectionContainer>
             <PdfTemplateLeftAddress
               companyName={userInfo?.serviceCompany?.name}
               billingAddressName={
@@ -264,143 +228,148 @@ const InvoiceOverduePdfPreview = ({
                 </View>
               )}
             </View>
-          </View>
+          </TopSectionContainer>
+        </PdfBodyContainer>
 
-          <View>
-            <Text style={styles.contentHeader}>{formik?.values.subject}</Text>
+        <View>
+          <PdfPageTitle selectedLng={selectedLng}>
+            {formik?.values.subject}
+          </PdfPageTitle>
 
-            {formik?.values?.description && (
-              <Text style={styles.contentBody}>
-                {formik?.values?.description}
-              </Text>
-            )}
+          {formik?.values?.description && (
+            <View>
+              <HtmlPDF
+                html={formik?.values?.description || ''}
+                rootStyle={styles.contentBody}
+              />
+            </View>
+          )}
 
-            <View style={styles.table}>
-              <View style={styles.tableHead}>
-                <View style={styles.tableRow}>
-                  <Text
-                    style={{
-                      width: '5%',
-                      textAlign: 'left',
-                      marginRight: 10,
-                      ...styles.tableHeading,
-                    }}>
-                    #
-                  </Text>
-                  <Text
-                    style={{
-                      width: '70%',
-                      textAlign: 'left',
-                      ...styles.tableHeading,
-                    }}>
-                    {translate('Name')}
-                  </Text>
-                  <Text
-                    style={{
-                      width: '25%',
-                      textAlign: 'right',
-                      ...styles.tableHeading,
-                    }}>
-                    {`${translate('Total incl. VAT')} (${
-                      currentCurrency?.symbol
-                    })`}
-                  </Text>
-                </View>
+          <View style={styles.table}>
+            <View style={styles.tableHead}>
+              <View style={styles.tableRow}>
+                <Text
+                  style={{
+                    width: '5%',
+                    textAlign: 'left',
+                    marginRight: 10,
+                    ...styles.tableHeading,
+                  }}>
+                  #
+                </Text>
+                <Text
+                  style={{
+                    width: '70%',
+                    textAlign: 'left',
+                    ...styles.tableHeading,
+                  }}>
+                  {translate('Name')}
+                </Text>
+                <Text
+                  style={{
+                    width: '25%',
+                    textAlign: 'right',
+                    ...styles.tableHeading,
+                  }}>
+                  {`${translate('Total incl. VAT')} (${
+                    currentCurrency?.symbol
+                  })`}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.dataBody}>
+              <View style={styles.tableRow}>
+                <Text
+                  style={{
+                    width: '5%',
+                    textAlign: 'left',
+                    marginRight: 10,
+                    color: '#212121',
+                  }}>
+                  1
+                </Text>
+                <Text
+                  style={{
+                    width: '75%',
+                    textAlign: 'left',
+                    color: '#212121',
+                  }}>
+                  {translate('Initial amount')}
+                </Text>
+                <Text
+                  style={{
+                    width: '20%',
+                    textAlign: 'right',
+                    color: '#212121',
+                  }}>
+                  {formatCurrency(formik?.values.initialAmount ?? 0, {
+                    currency: currentCurrency?.code,
+                    excludeCurrencySymbol: true,
+                    currencySymbol: currentCurrency?.symbol,
+                    companyLang: selectedLng,
+                  })}
+                </Text>
               </View>
 
-              <View style={styles.dataBody}>
-                <View style={styles.tableRow}>
-                  <Text
-                    style={{
-                      width: '5%',
-                      textAlign: 'left',
-                      marginRight: 10,
-                      color: '#212121',
-                    }}>
-                    1
-                  </Text>
-                  <Text
-                    style={{
-                      width: '75%',
-                      textAlign: 'left',
-                      color: '#212121',
-                    }}>
-                    {translate('Initial amount')}
-                  </Text>
-                  <Text
-                    style={{
-                      width: '20%',
-                      textAlign: 'right',
-                      color: '#212121',
-                    }}>
-                    {formatCurrency(formik?.values.initialAmount ?? 0, {
-                      currency: currentCurrency?.code,
-                      excludeCurrencySymbol: true,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    })}
-                  </Text>
-                </View>
-
-                <View style={styles.tableRow}>
-                  <Text
-                    style={{
-                      width: '5%',
-                      textAlign: 'left',
-                      marginRight: 10,
-                      color: '#212121',
-                    }}>
-                    2
-                  </Text>
-                  <Text
-                    style={{
-                      width: '70%',
-                      textAlign: 'left',
-                      color: '#212121',
-                    }}>
-                    {translate('Handling fee')}
-                  </Text>
-                  <Text
-                    style={{
-                      width: '25%',
-                      textAlign: 'right',
-                      color: '#212121',
-                    }}>
-                    {formatCurrency(formik.values.handlingFee ?? 0, {
-                      currency: currentCurrency?.code,
-                      excludeCurrencySymbol: true,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    })}
-                  </Text>
-                </View>
+              <View style={styles.tableRow}>
+                <Text
+                  style={{
+                    width: '5%',
+                    textAlign: 'left',
+                    marginRight: 10,
+                    color: '#212121',
+                  }}>
+                  2
+                </Text>
+                <Text
+                  style={{
+                    width: '70%',
+                    textAlign: 'left',
+                    color: '#212121',
+                  }}>
+                  {translate('Handling fee')}
+                </Text>
+                <Text
+                  style={{
+                    width: '25%',
+                    textAlign: 'right',
+                    color: '#212121',
+                  }}>
+                  {formatCurrency(formik.values.handlingFee ?? 0, {
+                    currency: currentCurrency?.code,
+                    excludeCurrencySymbol: true,
+                    currencySymbol: currentCurrency?.symbol,
+                    companyLang: selectedLng,
+                  })}
+                </Text>
               </View>
+            </View>
 
-              <View>
-                <View style={styles.tableRow}>
-                  <Text style={{width: '42%'}} />
-                  <Text
-                    style={{
-                      width: '38%',
-                      textAlign: 'left',
-                      ...styles.amountText,
-                    }}>
-                    {`${translate('Outstanding amount incl. VAT')} (${
-                      currentCurrency?.symbol
-                    })`}
-                  </Text>
-                  <Text
-                    style={{
-                      width: '20%',
-                      textAlign: 'right',
-                      ...styles.amountText,
-                    }}>
-                    {overdueTotal(
-                      formik.values.initialAmount,
-                      formik.values.handlingFee,
-                    )}
-                  </Text>
-                </View>
+            <View>
+              <View style={styles.tableRow}>
+                <Text style={{width: '42%'}} />
+                <Text
+                  style={{
+                    width: '38%',
+                    textAlign: 'left',
+                    ...styles.amountText,
+                  }}>
+                  {`${translate('Outstanding amount incl. VAT')} (${
+                    currentCurrency?.symbol
+                  })`}
+                </Text>
+                <Text
+                  style={{
+                    width: '20%',
+                    textAlign: 'right',
+                    ...styles.amountText,
+                  }}>
+                  {overdueTotal(
+                    formik.values.initialAmount,
+                    formik.values.handlingFee,
+                  )}
+                </Text>
               </View>
             </View>
           </View>
@@ -410,8 +379,10 @@ const InvoiceOverduePdfPreview = ({
           userInfo={userInfo}
           selectedLng={selectedLng}
           translate={translate}
+          footerInfo={footerInfo}
+          footerPath={footerPath}
         />
-      </Page>
+      </PdfPageContainer>
     </Document>
   );
 };

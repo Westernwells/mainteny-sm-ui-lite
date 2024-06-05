@@ -71,6 +71,7 @@ import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleIm
 import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import {getSignatureKeys} from 'utils/service-order-utils';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 
 interface Props {
   invoice: InvoiceView;
@@ -141,6 +142,26 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
       return t(key);
     },
     [company?.language],
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
   );
 
   const {data: companyNextNumber} = useCompanyNextNumber(
@@ -276,8 +297,6 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
     const blob = await pdf(
       <ChecklistPdf
         userInfo={user?.userAccount}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         selectedLng={company?.language}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
@@ -285,6 +304,10 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
         sortedChecklistComponents={sortedChecklistComponents}
         signaturePath={signatureImageUrl}
         technicianName={technicianName}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     return blob;
@@ -344,8 +367,6 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
       <WorkReportTemplate
         userInfo={user?.userAccount}
         selectedLng={company?.language}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
         report={report}
@@ -353,6 +374,10 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
         technicianSignatureImage={technicianSignatureImage}
         customerSignatureImage={customerSignatureImage}
         workReportPictures={convertedImages}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     return blob;
@@ -381,8 +406,6 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
       <PdfTemplate
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         invoice={invoiceData}
         selectedLng={company?.language}
         translate={translate}
@@ -390,6 +413,10 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
           0,
           sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
         )}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

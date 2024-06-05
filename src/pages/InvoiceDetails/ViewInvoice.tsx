@@ -71,8 +71,6 @@ import {
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import useLogoDimensions from 'hooks/useLogoDimensions';
-import useLogoImage from 'hooks/useLogoImage';
 import {
   companyLanguageContextMap,
   createFilesFromBlobArray,
@@ -91,6 +89,7 @@ import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice} from './utils';
@@ -125,8 +124,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   } = useDownloadUrl(isFetched ? [updatedInvoice!.additionalInfo.pdfPath] : []);
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
-  const imageUrl = useLogoImage(user);
-  const logoDimensions = useLogoDimensions(imageUrl);
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
@@ -149,6 +146,26 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       return t(key);
     },
     [company?.language],
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
   );
 
   const {mutateAsync: uploadFiles} = useUploadFiles('');
@@ -301,8 +318,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     const blob = await pdf(
       <ChecklistPdf
         userInfo={user?.userAccount}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         selectedLng={company?.language}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
@@ -310,6 +325,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         sortedChecklistComponents={sortedChecklistComponents}
         signaturePath={signatureImageUrl}
         technicianName={technicianName}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     return blob;
@@ -369,8 +388,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       <WorkReportTemplate
         userInfo={user?.userAccount}
         selectedLng={company?.language}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
         report={report}
@@ -378,6 +395,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         technicianSignatureImage={technicianSignatureImage}
         customerSignatureImage={customerSignatureImage}
         workReportPictures={convertedImages}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     return blob;
@@ -472,8 +493,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         <PdfTemplate
           userInfo={user?.userAccount}
           currentCurrency={currentCurrency}
-          logoSrc={imageUrl}
-          logoDimensions={logoDimensions}
           invoice={invoiceData}
           selectedLng={company?.language}
           translate={translate}
@@ -481,6 +500,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             0,
             sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
           )}
+          headerPath={headerUrl[headerInfo?.path]}
+          headerInfo={headerInfo}
+          footerPath={footerUrl[footerInfo?.path]}
+          footerInfo={footerInfo}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -495,7 +518,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     if (updatedInvoice?.status === InvoiceStatus.DRAFT) {
       generateBlobUrl(updatedInvoice);
     }
-  }, [updatedInvoice, logoDimensions]);
+  }, [updatedInvoice]);
 
   useEffect(() => {
     if (actionType === 'PRINT' && filePathToDownload) {

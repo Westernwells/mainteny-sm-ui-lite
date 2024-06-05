@@ -33,8 +33,6 @@ import {
 } from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {pdf} from '@react-pdf/renderer';
-import useLogoDimensions from 'hooks/useLogoDimensions';
-import useLogoImage from 'hooks/useLogoImage';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {
@@ -48,6 +46,8 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {SimpleEmailRecord} from 'models/misc';
 import {CreateInvoiceOverdueNoticeRecord} from 'models/invoice';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import InvoiceOverduePdfPreview from './InvoiceOverduePdfPreview';
 
 const validationSchema = Yup.object().shape({
@@ -82,8 +82,6 @@ export const InvoiceOverdueNotice = () => {
   );
 
   const currentCurrency = useCurrentCurrency();
-  const imageUrl = useLogoImage(user);
-  const logoDimensions = useLogoDimensions(imageUrl);
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
   const [blobFile, setBlobFile] = useState<Blob>();
 
@@ -101,6 +99,26 @@ export const InvoiceOverdueNotice = () => {
       return t(key);
     },
     [company?.language],
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
   );
 
   const initialValues = {
@@ -152,13 +170,15 @@ export const InvoiceOverdueNotice = () => {
     const blob = await pdf(
       <InvoiceOverduePdfPreview
         userInfo={user?.userAccount}
-        logoSrc={imageUrl}
         currentCurrency={currentCurrency}
-        logoDimensions={logoDimensions}
         translate={translate}
         invoice={invoice}
         formik={formik}
         selectedLng={company?.language}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     setBlobFile(blob);
@@ -235,7 +255,7 @@ export const InvoiceOverdueNotice = () => {
 
   useEffect(() => {
     handlePreview();
-  }, [logoDimensions, invoice]);
+  }, [invoice]);
 
   useEffect(() => {
     if (isPrinting && previewPdfBlobUrl) {
