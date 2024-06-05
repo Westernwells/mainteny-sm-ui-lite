@@ -1,11 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Image,
-} from '@react-pdf/renderer';
+import {Document, Text, View, StyleSheet, Image} from '@react-pdf/renderer';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import {
@@ -17,6 +10,11 @@ import {UserAccount} from 'models/user';
 import {formatDate} from 'utils/datetime';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {formatAddressFullname} from 'utils/utils';
+import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
+import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
+import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
+import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
+import {HeaderFooterInfoData} from 'models/misc';
 import {PdfChecklistComponent} from './PdfChecklistComponent';
 
 const getStyles = (
@@ -24,29 +22,6 @@ const getStyles = (
   regularFontStyle?: {fontFamily: string},
 ) =>
   StyleSheet.create({
-    page: {
-      ...regularFontStyle,
-      fontSize: 10,
-      paddingTop: 25,
-      paddingLeft: 68,
-      paddingRight: 45,
-      backgroundColor: 'white',
-      height: '100%',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      justifyContent: 'space-between',
-      paddingBottom: 95,
-      color: '#212121',
-    },
-    topSection: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 40,
-      alignItems: 'flex-start',
-      marginTop: 5,
-    },
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
@@ -75,12 +50,6 @@ const getStyles = (
     dataBody: {
       borderBottom: '1px solid #212121',
       paddingBottom: 1,
-    },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      ...boldFontStyle,
-      marginBottom: 10,
     },
     contentBody: {
       color: '#212121',
@@ -148,23 +117,20 @@ const getStyles = (
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  logoSrc?: string;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   selectedLng?: string;
   selectedChecklist?: ServiceOrderCheckListView;
   serviceOrder?: ServiceOrderView;
   sortedChecklistComponents?: CheckListComponentView[];
   technicianName?: string;
   signaturePath?: string;
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 const ChecklistPdf = ({
   userInfo,
-  logoSrc,
-  logoDimensions,
   selectedLng,
   translate,
   selectedChecklist,
@@ -172,6 +138,10 @@ const ChecklistPdf = ({
   sortedChecklistComponents,
   technicianName,
   signaturePath,
+  headerInfo,
+  headerPath,
+  footerInfo,
+  footerPath,
 }: Props) => {
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -188,14 +158,11 @@ const ChecklistPdf = ({
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <View>
-          <PdfTemplateHeader
-            logoSrc={logoSrc}
-            logoDimensions={logoDimensions}
-          />
+      <PdfPageContainer selectedLng={selectedLng}>
+        <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-          <View style={styles.topSection}>
+        <PdfBodyContainer>
+          <TopSectionContainer>
             <PdfTemplateLeftAddress
               companyName={userInfo?.serviceCompany?.name}
               billingAddressName={
@@ -274,12 +241,13 @@ const ChecklistPdf = ({
                 )}
               </View>
             </View>
-          </View>
+          </TopSectionContainer>
 
           <View>
-            <Text style={styles.contentHeader}>
+            <PdfPageTitle selectedLng={selectedLng}>
               {selectedChecklist?.checkList.name}
-            </Text>
+            </PdfPageTitle>
+
             <View style={styles.table}>
               <View style={styles.tableHeader}>
                 <Text style={styles.tableHeaderIndex}>#</Text>
@@ -339,14 +307,16 @@ const ChecklistPdf = ({
               </View>
             )}
           </View>
-        </View>
+        </PdfBodyContainer>
 
         <PdfTemplateFooter
           userInfo={userInfo}
           selectedLng={selectedLng}
           translate={translate}
+          footerInfo={footerInfo}
+          footerPath={footerPath}
         />
-      </Page>
+      </PdfPageContainer>
     </Document>
   );
 };

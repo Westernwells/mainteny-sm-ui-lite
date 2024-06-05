@@ -1,17 +1,10 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer';
+import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
-import {Currency} from 'models/misc';
+import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
@@ -39,6 +32,10 @@ import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgia
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import {ArticleSection} from './FinalInvoicePdfTemplate';
+import PdfPageContainer from './containers/PdfPageContainer';
+import PdfBodyContainer from './containers/PdfBodyContainer';
+import TopSectionContainer from './containers/TopSectionContainer';
+import PdfPageTitle from './containers/PdfPageTitle';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -119,12 +116,6 @@ const getStyles = (
     dataBody: {
       borderBottom: '1px solid #212121',
     },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      ...boldFontStyle,
-      marginBottom: 10,
-    },
     contentBody: {
       marginTop: 6,
       marginBottom: 16,
@@ -163,25 +154,26 @@ const getStyles = (
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  logoSrc?: string;
   currentCurrency?: Currency;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   invoice?: InvoiceView;
   selectedLng?: string;
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 const FullInvoicePdfTemplate = React.memo(
   ({
     translate,
     userInfo,
-    logoSrc,
     currentCurrency,
-    logoDimensions,
     invoice,
     selectedLng,
+    headerInfo,
+    headerPath,
+    footerInfo,
+    footerPath,
   }: Props) => {
     const articleItems = invoice?.items.map((item) => ({
       ...item,
@@ -288,14 +280,11 @@ const FullInvoicePdfTemplate = React.memo(
 
     return (
       <Document>
-        <Page size="A4" style={styles.page}>
-          <View>
-            <PdfTemplateHeader
-              logoSrc={logoSrc}
-              logoDimensions={logoDimensions}
-            />
+        <PdfPageContainer selectedLng={selectedLng}>
+          <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-            <View style={styles.topSection}>
+          <PdfBodyContainer>
+            <TopSectionContainer>
               <PdfTemplateLeftAddress
                 companyName={userInfo?.serviceCompany?.name}
                 billingAddressName={
@@ -317,10 +306,12 @@ const FullInvoicePdfTemplate = React.memo(
                 invoice={invoice}
                 selectedLng={selectedLng}
               />
-            </View>
+            </TopSectionContainer>
 
             <View>
-              <Text style={styles.contentHeader}>{invoice?.subject}</Text>
+              <PdfPageTitle selectedLng={selectedLng}>
+                {invoice?.subject}
+              </PdfPageTitle>
 
               {invoice?.description.trim() !== '' && (
                 <HtmlPDF
@@ -383,14 +374,16 @@ const FullInvoicePdfTemplate = React.memo(
                 </View>
               )}
             </View>
-          </View>
+          </PdfBodyContainer>
 
           <PdfTemplateFooter
             userInfo={userInfo}
             selectedLng={selectedLng}
             translate={translate}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
           />
-        </Page>
+        </PdfPageContainer>
       </Document>
     );
   },

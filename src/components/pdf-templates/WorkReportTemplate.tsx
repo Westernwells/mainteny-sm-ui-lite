@@ -1,6 +1,5 @@
 import {
   Document,
-  Page,
   Text,
   View,
   StyleSheet,
@@ -20,6 +19,7 @@ import capitalize from 'lodash/capitalize';
 import {formatAddressFullname} from 'utils/utils';
 import {convertMinutesToHoursAndMinutes} from 'utils/work-hours-utils';
 import {HtmlPDF} from 'components/HtmlPDF';
+import {HeaderFooterInfoData} from 'models/misc';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -27,6 +27,10 @@ import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-B
 import PdfTemplateFooter from './PdfTemplateFooter';
 import PdfTemplateHeader from './PdfTemplateHeader';
 import PdfTemplateLeftAddress from './PdfTemplateLeftAddress';
+import PdfBodyContainer from './containers/PdfBodyContainer';
+import PdfPageContainer from './containers/PdfPageContainer';
+import PdfPageTitle from './containers/PdfPageTitle';
+import TopSectionContainer from './containers/TopSectionContainer';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -57,28 +61,6 @@ const getStyles = (
   regularFontStyle?: {fontFamily: string},
 ) =>
   StyleSheet.create({
-    page: {
-      ...regularFontStyle,
-      fontSize: 10,
-      paddingTop: 25,
-      paddingLeft: 68,
-      paddingRight: 45,
-      backgroundColor: 'white',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      justifyContent: 'space-between',
-      paddingBottom: 95,
-      color: '#212121',
-    },
-    topSection: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 40,
-      alignItems: 'flex-start',
-      marginTop: 5,
-    },
     rightAddress: {
       minWidth: 200,
       flex: '0 0 42%',
@@ -113,12 +95,6 @@ const getStyles = (
     },
     unitStatus: {
       ...boldFontStyle,
-    },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      ...boldFontStyle,
-      marginBottom: 10,
     },
     contentBody: {
       color: '#212121',
@@ -289,33 +265,34 @@ const BookedHoursRow = ({
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  logoSrc?: string;
   serviceOrder?: ServiceOrderView;
   report?: ServiceOrderReportView;
   schedule?: ServiceOrderScheduleSimpleView;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   selectedLng?: string;
   technicianSignatureImage?: string;
   customerSignatureImage?: string;
   workReportPictures: string[];
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 const WorkReportTemplate = React.memo(
   ({
     userInfo,
-    logoSrc,
     serviceOrder,
     report,
     schedule,
-    logoDimensions,
     selectedLng,
     translate,
     customerSignatureImage,
     technicianSignatureImage,
     workReportPictures,
+    headerInfo,
+    headerPath,
+    footerInfo,
+    footerPath,
   }: Props) => {
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -331,14 +308,11 @@ const WorkReportTemplate = React.memo(
     const elevatorAddress = serviceOrder?.elevator?.address;
     return (
       <Document>
-        <Page size="A4" style={styles.page}>
-          <View>
-            <PdfTemplateHeader
-              logoSrc={logoSrc}
-              logoDimensions={logoDimensions}
-            />
+        <PdfPageContainer selectedLng={selectedLng}>
+          <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-            <View style={styles.topSection}>
+          <PdfBodyContainer>
+            <TopSectionContainer>
               <PdfTemplateLeftAddress
                 companyName={userInfo?.serviceCompany?.name}
                 billingAddressName={
@@ -430,7 +404,7 @@ const WorkReportTemplate = React.memo(
                   )}
                 </View>
               </View>
-            </View>
+            </TopSectionContainer>
 
             <View>
               <View style={styles.statusHeader}>
@@ -450,9 +424,9 @@ const WorkReportTemplate = React.memo(
                 </Text>
               </View>
 
-              <Text style={styles.contentHeader}>
+              <PdfPageTitle selectedLng={selectedLng}>
                 {translate('Work Report')} {report?.number}
-              </Text>
+              </PdfPageTitle>
 
               {serviceOrder?.report?.description.trim() !== '' && (
                 <HtmlPDF
@@ -785,14 +759,16 @@ const WorkReportTemplate = React.memo(
                 )}
               </View>
             </View>
-          </View>
+          </PdfBodyContainer>
 
           <PdfTemplateFooter
             userInfo={userInfo}
             selectedLng={selectedLng}
             translate={translate}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
           />
-        </Page>
+        </PdfPageContainer>
       </Document>
     );
   },

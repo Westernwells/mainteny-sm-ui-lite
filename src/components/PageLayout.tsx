@@ -15,6 +15,7 @@ interface Props {
   excludeDefaultSpacing?: boolean;
   pageScrollable?: boolean;
   containerStyles?: SxProps<Theme>;
+  contentStyles?: SxProps<Theme>;
   pageTitle?: string;
   showBackAction?: boolean;
   backBtnLabel?: string;
@@ -30,6 +31,7 @@ export const PageLayout = ({
   excludeDefaultSpacing,
   pageScrollable,
   containerStyles,
+  contentStyles,
   pageTitle,
   showBackAction,
   backBtnLabel,
@@ -106,6 +108,7 @@ export const PageLayout = ({
             pt: '1em',
             mx: !excludeDefaultSpacing ? '2.2em' : null,
             overflowY: 'auto',
+            ...contentStyles,
           }}
           display="flex"
           flexGrow="1"

@@ -48,13 +48,12 @@ import {theme} from 'theme';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {pdf} from '@react-pdf/renderer';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import useLogoDimensions from 'hooks/useLogoDimensions';
-import useLogoImage from 'hooks/useLogoImage';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {SimpleEmailRecord} from 'models/misc';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -124,8 +123,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
     downloadUrls[signatureKeys.CUSTOMER],
   );
 
-  const imageUrl = useLogoImage(user);
-  const logoDimensions = useLogoDimensions(imageUrl);
   const {convertedImages, isImageLoading, setShouldFetchImages} =
     useFetchAndConvertMultipleImages(imageDownloadUrls, report?.attachments);
 
@@ -148,6 +145,26 @@ export const WorkReport = ({serviceOrder}: Props) => {
     [company?.language],
   );
 
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
   const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
     useCompleteServiceOrder('Work report updated successfully!');
   const {mutateAsync: uploadFiles} = useUploadFiles('');
@@ -157,8 +174,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
       <WorkReportTemplate
         userInfo={user?.userAccount}
         selectedLng={company?.language}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         translate={translate}
         serviceOrder={serviceOrder}
         report={report}
@@ -166,6 +181,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
         technicianSignatureImage={technicianSignatureImage}
         customerSignatureImage={customerSignatureImage}
         workReportPictures={convertedImages}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

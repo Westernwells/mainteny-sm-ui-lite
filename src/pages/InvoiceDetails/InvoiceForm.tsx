@@ -134,8 +134,6 @@ import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTempl
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
 import RichTextField from 'components/RichTextField';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import useLogoDimensions from 'hooks/useLogoDimensions';
-import useLogoImage from 'hooks/useLogoImage';
 import {useCurrentCurrency} from 'utils/currency';
 import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
@@ -144,6 +142,7 @@ import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleIm
 import {getSignatureKeys} from 'utils/service-order-utils';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 
 interface Props {
   invoice?: InvoiceView;
@@ -284,8 +283,6 @@ export const InvoiceForm = ({
     },
   );
 
-  const imageUrl = useLogoImage(user);
-  const logoDimensions = useLogoDimensions(imageUrl);
   const {mutateAsync: uploadFiles} = useUploadFiles('');
   const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
     useUpdateInvoice();
@@ -309,6 +306,26 @@ export const InvoiceForm = ({
       return t(key);
     },
     [company?.language],
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
   );
 
   const {data: companyNextNumber} = useCompanyNextNumber(
@@ -1137,16 +1154,18 @@ export const InvoiceForm = ({
     const blob = await pdf(
       <WorkReportTemplate
         userInfo={user?.userAccount}
-        selectedLng={company?.language}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         translate={translate}
+        selectedLng={company?.language}
         serviceOrder={invoice?.serviceOrder}
         report={report}
         schedule={schedule}
         technicianSignatureImage={technicianSignatureImage}
         customerSignatureImage={customerSignatureImage}
         workReportPictures={convertedImages}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     return blob;
@@ -1218,8 +1237,6 @@ export const InvoiceForm = ({
     const blob = await pdf(
       <ChecklistPdf
         userInfo={user?.userAccount}
-        logoSrc={imageUrl}
-        logoDimensions={logoDimensions}
         selectedLng={company?.language}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
@@ -1227,6 +1244,10 @@ export const InvoiceForm = ({
         sortedChecklistComponents={sortedChecklistComponents}
         signaturePath={signatureImageUrl}
         technicianName={technicianName}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
       />,
     ).toBlob();
     return blob;
@@ -1256,8 +1277,6 @@ export const InvoiceForm = ({
         <PdfTemplate
           userInfo={user?.userAccount}
           currentCurrency={currentCurrency}
-          logoSrc={imageUrl}
-          logoDimensions={logoDimensions}
           invoice={invoiceData}
           selectedLng={company?.language}
           translate={translate}
@@ -1266,6 +1285,10 @@ export const InvoiceForm = ({
             sortedPreviousInvoices.findIndex((i) => i.id === invoiceData.id) +
               1,
           )}
+          headerPath={headerUrl[headerInfo?.path]}
+          headerInfo={headerInfo}
+          footerPath={footerUrl[footerInfo?.path]}
+          footerInfo={footerInfo}
         />,
       ).toBlob();
       return blob;

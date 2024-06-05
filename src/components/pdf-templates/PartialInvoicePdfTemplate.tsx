@@ -1,16 +1,9 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer';
+import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
-import {Currency} from 'models/misc';
+import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {
@@ -41,19 +34,22 @@ import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import {ArticleSection} from './FinalInvoicePdfTemplate';
 import PdfPartialPaymentSection from './PdfPartialPaymentSection';
 import PdfUpfrontInvoiceSection from './PdfUpfrontInvoiceSection';
+import PdfBodyContainer from './containers/PdfBodyContainer';
+import PdfPageContainer from './containers/PdfPageContainer';
+import PdfPageTitle from './containers/PdfPageTitle';
+import TopSectionContainer from './containers/TopSectionContainer';
 
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  logoSrc?: string;
   currentCurrency?: Currency;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   invoice?: InvoiceView;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 Font.register({
@@ -84,29 +80,6 @@ const getStyles = (
   regularFontStyle?: {fontFamily: string},
 ) =>
   StyleSheet.create({
-    page: {
-      ...regularFontStyle,
-      fontSize: 10,
-      paddingTop: 25,
-      paddingLeft: 68,
-      paddingRight: 45,
-      backgroundColor: 'white',
-      height: '100%',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      justifyContent: 'space-between',
-      paddingBottom: 95,
-      color: '#212121',
-    },
-    topSection: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 40,
-      alignItems: 'flex-start',
-      marginTop: 5,
-    },
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
@@ -134,12 +107,6 @@ const getStyles = (
     },
     dataBody: {
       borderBottom: '1px solid #212121',
-    },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      ...boldFontStyle,
-      marginBottom: 10,
     },
     contentBody: {
       marginTop: 6,
@@ -200,12 +167,14 @@ const getStyles = (
 const PartialInvoicePdfTemplate = ({
   translate,
   userInfo,
-  logoSrc,
   currentCurrency,
-  logoDimensions,
   invoice,
   selectedLng,
   previousInvoices,
+  headerInfo,
+  headerPath,
+  footerInfo,
+  footerPath,
 }: Props) => {
   const hasPreviousInvoices = previousInvoices.length > 0;
   const firstInvoiceType = previousInvoices?.[0]?.type ?? null;
@@ -329,14 +298,11 @@ const PartialInvoicePdfTemplate = ({
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <View>
-          <PdfTemplateHeader
-            logoSrc={logoSrc}
-            logoDimensions={logoDimensions}
-          />
+      <PdfPageContainer selectedLng={selectedLng}>
+        <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-          <View style={styles.topSection}>
+        <PdfBodyContainer>
+          <TopSectionContainer>
             <PdfTemplateLeftAddress
               companyName={userInfo?.serviceCompany?.name}
               billingAddressName={
@@ -358,10 +324,12 @@ const PartialInvoicePdfTemplate = ({
               invoice={invoice}
               selectedLng={selectedLng}
             />
-          </View>
+          </TopSectionContainer>
 
           <View>
-            <Text style={styles.contentHeader}>{invoice?.subject}</Text>
+            <PdfPageTitle selectedLng={selectedLng}>
+              {invoice?.subject}
+            </PdfPageTitle>
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF
@@ -430,14 +398,16 @@ const PartialInvoicePdfTemplate = ({
               </View>
             )}
           </View>
-        </View>
+        </PdfBodyContainer>
 
         <PdfTemplateFooter
           userInfo={userInfo}
           selectedLng={selectedLng}
           translate={translate}
+          footerInfo={footerInfo}
+          footerPath={footerPath}
         />
-      </Page>
+      </PdfPageContainer>
     </Document>
   );
 };

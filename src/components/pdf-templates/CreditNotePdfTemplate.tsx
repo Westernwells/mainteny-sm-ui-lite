@@ -1,17 +1,10 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer';
+import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
-import {Currency} from 'models/misc';
+import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
@@ -39,6 +32,10 @@ import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgia
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import {ArticleSection} from './FinalInvoicePdfTemplate';
+import PdfPageContainer from './containers/PdfPageContainer';
+import TopSectionContainer from './containers/TopSectionContainer';
+import PdfBodyContainer from './containers/PdfBodyContainer';
+import PdfPageTitle from './containers/PdfPageTitle';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -63,42 +60,10 @@ Font.register({
   src: NotoSansGeorgianBold,
 });
 
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = (boldFontStyle?: {fontFamily: string}) =>
   StyleSheet.create({
-    page: {
-      ...regularFontStyle,
-      fontSize: 10,
-      paddingTop: 25,
-      paddingLeft: 68,
-      paddingRight: 45,
-      backgroundColor: 'white',
-      height: '100%',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      justifyContent: 'space-between',
-      paddingBottom: 95,
-      color: '#212121',
-    },
-    topSection: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 40,
-      alignItems: 'flex-start',
-      marginTop: 5,
-    },
     dataBody: {
       borderBottom: '1px solid #212121',
-    },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      ...boldFontStyle,
-      marginBottom: 10,
     },
     contentBody: {
       marginTop: 6,
@@ -158,25 +123,26 @@ const getStyles = (
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  logoSrc?: string;
   currentCurrency?: Currency;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   invoice?: InvoiceView;
   selectedLng?: string;
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 const CreditNotePdfTemplate = React.memo(
   ({
     translate,
     userInfo,
-    logoSrc,
     currentCurrency,
-    logoDimensions,
     invoice,
     selectedLng,
+    headerInfo,
+    headerPath,
+    footerInfo,
+    footerPath,
   }: Props) => {
     const articleItems = invoice?.items.map((item) => ({
       ...item,
@@ -276,23 +242,15 @@ const CreditNotePdfTemplate = React.memo(
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
 
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
+    const styles = getStyles(boldFontStyle);
 
     return (
       <Document>
-        <Page size="A4" style={styles.page}>
-          <View>
-            <PdfTemplateHeader
-              logoSrc={logoSrc}
-              logoDimensions={logoDimensions}
-            />
+        <PdfPageContainer selectedLng={selectedLng}>
+          <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-            <View style={styles.topSection}>
+          <PdfBodyContainer>
+            <TopSectionContainer>
               <PdfTemplateLeftAddress
                 companyName={userInfo?.serviceCompany?.name}
                 billingAddressName={
@@ -314,80 +272,82 @@ const CreditNotePdfTemplate = React.memo(
                 invoice={invoice}
                 selectedLng={selectedLng}
               />
-            </View>
+            </TopSectionContainer>
+          </PdfBodyContainer>
 
-            <View>
-              <Text style={styles.contentHeader}>{invoice?.subject}</Text>
+          <View>
+            <PdfPageTitle selectedLng={selectedLng}>
+              {invoice?.subject}
+            </PdfPageTitle>
 
-              {invoice?.description.trim() !== '' && (
+            {invoice?.description.trim() !== '' && (
+              <HtmlPDF
+                html={invoice?.description || ''}
+                rootStyle={styles.contentBody}
+              />
+            )}
+
+            {invoice?.additionalInfo.showArticleSection && (
+              <ArticleSection
+                invoice={invoice}
+                currentCurrency={currentCurrency}
+                translate={translate}
+                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
+                discountValue={discountValue}
+                subtotalExclVatFormatted={subtotalExclVatFormatted}
+                allItemsHasSameVAT={allItemsHasSameVAT}
+                percentageVats={percentageVats}
+                totalVAT={totalVAT}
+                total={total}
+                selectedLng={selectedLng}
+                netTotal={netTotal}
+              />
+            )}
+
+            {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
+              <View style={styles.notesSection} wrap={false}>
+                <Text style={styles.sectionHeading}>
+                  {translate('Payment terms')}
+                </Text>
                 <HtmlPDF
-                  html={invoice?.description || ''}
-                  rootStyle={styles.contentBody}
+                  html={replacePaymentTermsPlaceholders(
+                    invoice?.additionalInfo.paymentTerm?.term!,
+                    formattedPaymentValues ?? [],
+                  )}
                 />
-              )}
+              </View>
+            )}
 
-              {invoice?.additionalInfo.showArticleSection && (
-                <ArticleSection
-                  invoice={invoice}
-                  currentCurrency={currentCurrency}
-                  translate={translate}
-                  allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
-                  discountValue={discountValue}
-                  subtotalExclVatFormatted={subtotalExclVatFormatted}
-                  allItemsHasSameVAT={allItemsHasSameVAT}
-                  percentageVats={percentageVats}
-                  totalVAT={totalVAT}
-                  total={total}
-                  selectedLng={selectedLng}
-                  netTotal={netTotal}
+            {invoice?.additionalInfo?.moreInfo?.trim() && (
+              <View wrap={false}>
+                <Text style={styles.sectionHeading}>{translate('Notes')}</Text>
+                <HtmlPDF
+                  html={formatCostText(
+                    invoice?.additionalInfo?.moreInfo,
+                    `${formatCurrency(laborCost, {
+                      currency: currentCurrency?.code,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    })}`,
+                    `${formatCurrency(materialCost, {
+                      currency: currentCurrency?.code,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    })}`,
+                  )}
                 />
-              )}
-
-              {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
-                <View style={styles.notesSection} wrap={false}>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Payment terms')}
-                  </Text>
-                  <HtmlPDF
-                    html={replacePaymentTermsPlaceholders(
-                      invoice?.additionalInfo.paymentTerm?.term!,
-                      formattedPaymentValues ?? [],
-                    )}
-                  />
-                </View>
-              )}
-
-              {invoice?.additionalInfo?.moreInfo?.trim() && (
-                <View wrap={false}>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Notes')}
-                  </Text>
-                  <HtmlPDF
-                    html={formatCostText(
-                      invoice?.additionalInfo?.moreInfo,
-                      `${formatCurrency(laborCost, {
-                        currency: currentCurrency?.code,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      })}`,
-                      `${formatCurrency(materialCost, {
-                        currency: currentCurrency?.code,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      })}`,
-                    )}
-                  />
-                </View>
-              )}
-            </View>
+              </View>
+            )}
           </View>
 
           <PdfTemplateFooter
             userInfo={userInfo}
             selectedLng={selectedLng}
             translate={translate}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
           />
-        </Page>
+        </PdfPageContainer>
       </Document>
     );
   },
