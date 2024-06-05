@@ -31,11 +31,15 @@ const pageSize = 25;
 const serviceOrderStatusMap = {
   Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE,
   Scheduling: ServiceOrderStatus.SCHEDULING,
-  Pending: ServiceOrderStatus.SCHEDULED,
+  Scheduled: ServiceOrderStatus.SCHEDULED,
   Ongoing: ServiceOrderStatus.IN_PROGRESS,
   Completed: ServiceOrderStatus.COMPLETED,
   Cancelled: ServiceOrderStatus.CANCELLED,
   Overdue: ServiceOrderStatus.OVERDUE,
+  Assigned: ServiceOrderStatus.TECHNICIAN_ASSIGNED,
+  Travel: ServiceOrderStatus.TRAVEL,
+  Paused: ServiceOrderStatus.PAUSED,
+  'Articles Ordered': ServiceOrderStatus.ARTICLES_ORDERED,
 };
 type serviceOrderStatusMapKey = keyof typeof serviceOrderStatusMap;
 
@@ -112,6 +116,10 @@ export const ServiceHistoryTab = () => {
           ServiceOrderStatus.COMPLETED,
           ServiceOrderStatus.CANCELLED,
           ServiceOrderStatus.OVERDUE,
+          ServiceOrderStatus.TECHNICIAN_ASSIGNED,
+          ServiceOrderStatus.TRAVEL,
+          ServiceOrderStatus.PAUSED,
+          ServiceOrderStatus.ARTICLES_ORDERED,
         ].map((item) => serviceOrderStatusToString(item))}
         getSelectedValue={(item) =>
           setStatus(
