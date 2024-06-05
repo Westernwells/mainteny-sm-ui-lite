@@ -18,7 +18,7 @@ const getStyles = (
 ) =>
   StyleSheet.create({
     leftAddress: {
-      flex: '0 0 58%',
+      flex: '0 0 53%',
       display: 'flex',
       flexDirection: 'column',
       ...boldFontStyle,
