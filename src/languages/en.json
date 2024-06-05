@@ -2555,5 +2555,6 @@
   "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.": "Access to the Customer Portal is disabled on the company level. All invited users don’t have access.",
   "Assigned": "Assigned",
   "Paused": "Paused",
-  "Articles Ordered": "Articles Ordered"
+  "Articles Ordered": "Articles Ordered",
+  "Search recipients": "Search recipients"
 }
