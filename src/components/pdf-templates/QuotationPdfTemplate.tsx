@@ -293,7 +293,10 @@ const QuotationPdfTemplate = React.memo(
                 billingAddressName={
                   userInfo?.serviceCompany?.billingAddress?.fullName
                 }
-                receiverName={quotation?.propertyOwner?.name}
+                receiverName={
+                  quotation?.additionalInfo?.billingAddress?.component?.name ||
+                  quotation?.propertyOwner?.name
+                }
                 addressComponent={
                   quotation?.additionalInfo?.billingAddress?.component
                 }

@@ -308,7 +308,10 @@ const PartialInvoicePdfTemplate = ({
               billingAddressName={
                 userInfo?.serviceCompany?.billingAddress?.fullName
               }
-              receiverName={invoice?.propertyOwner?.name}
+              receiverName={
+                invoice?.additionalInfo?.billingAddress?.component?.name ||
+                invoice?.propertyOwner?.name
+              }
               addressComponent={
                 invoice?.additionalInfo?.billingAddress?.component
               }
