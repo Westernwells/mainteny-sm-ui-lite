@@ -1,3 +1,4 @@
+import {ReactNode} from 'react';
 import Dialog from '@mui/material/Dialog';
 import {useTranslation} from 'react-i18next';
 import DialogActions from '@mui/material/DialogActions';
@@ -14,8 +15,8 @@ interface Props {
   onConfirm: () => void;
   onClose: () => void;
   title?: string;
-  content?: string | any[];
-  secondContent?: string | any[];
+  content?: string | ReactNode[] | ReactNode;
+  secondContent?: string | ReactNode[];
   confirmBtnLabel?: string;
   closeBtnLabel?: string;
   helperText?: string;
@@ -64,7 +65,9 @@ export const Confirm = ({
             {typeof content === 'string' ? t(content) : content}
           </Typography>
           <Typography>
-            {typeof content === 'string' ? t(secondContent) : secondContent}
+            {typeof secondContent === 'string'
+              ? t(secondContent)
+              : secondContent}
           </Typography>
           {helperText && <Typography>{t(helperText)}</Typography>}
         </DialogContentText>

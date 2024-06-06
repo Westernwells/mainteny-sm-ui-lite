@@ -1,21 +1,16 @@
-import {useEffect, useRef, useState} from 'react';
-import Grid from '@mui/material/Grid';
+import {useEffect, useState} from 'react';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
-import {useTranslation} from 'react-i18next';
-import Typography from '@mui/material/Typography';
-import EditIcon from '@mui/icons-material/Edit';
-
+import {GavelOutlined, PersonOutline, TagOutlined} from '@mui/icons-material';
 import {Dialog} from 'components/Dialog';
-import {InfoCard} from 'components/InfoCard';
+import {Card} from 'components/Card';
+import {CardDataListItem} from 'components/CardDataListItem';
 import {ServiceCompanyItem} from 'models/service-company';
 import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
-import {LegalInformationSchema} from './LegalInformationSchema';
 import {LegalInformationCompanyFormModel} from './model';
 import {EditLegalInformation} from './EditLegalInformation';
 
 interface Props {
-  containerStyles?: {[key: string]: any};
   company: ServiceCompanyItem;
 }
 
@@ -31,8 +26,7 @@ const validationSchema = Yup.object().shape({
     .required('Trade Register Number is required'),
 });
 
-export const LegalInformation = ({containerStyles, company}: Props) => {
-  const {t} = useTranslation();
+export const LegalInformation = ({company}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const {mutateAsync: updateCompany} = useUpdateCompany(
@@ -62,42 +56,51 @@ export const LegalInformation = ({containerStyles, company}: Props) => {
     setOpenDialog(false);
   };
 
-  const labels = useRef([
-    'managingDirector',
-    'arbitrationCourt',
-    'tradeRegisterNumber',
-  ]).current;
-
   useEffect(() => {
     formik.validateForm();
   }, []);
 
   return (
     <>
-      <InfoCard
-        containerStyles={{...containerStyles}}
-        handleAction={() => setOpenDialog(true)}
-        header={
-          <Typography variant="subtitle1">{t('Legal Information')}</Typography>
-        }
-        showHeaderBackground
-        headerActionIcon={<EditIcon />}>
-        <Grid container spacing={2}>
-          {labels.map((label) => (
-            <Grid key={label} item md={12}>
-              <LegalInformationSchema label={label} company={company} />
-            </Grid>
-          ))}
-        </Grid>
-      </InfoCard>
+      <Card
+        title="Legal"
+        actionHandler={() => setOpenDialog(true)}
+        containerProps={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 0.75,
+          height: '100%',
+        }}>
+        <CardDataListItem
+          label="Managing director"
+          value={company.settings.managingDirector}
+          Icon={PersonOutline}
+        />
+        <CardDataListItem
+          label="Arbitration court"
+          value={company.settings.arbitrationCourt}
+          Icon={GavelOutlined}
+        />
+        <CardDataListItem
+          label="Trade registration number"
+          value={company.settings.tradeRegisterNumber}
+          Icon={TagOutlined}
+        />
+      </Card>
       <Dialog
-        title="Edit Legal Information"
+        title="Edit Legal"
         onCancel={() => setOpenDialog(false)}
         onSave={() => onSave()}
+        saveButtonText="Save Changes"
         disableSaveBtn={!!Object.keys(formik.errors).length}
         dialogProps={{
           maxWidth: 'xs',
           open: openDialog || false,
+        }}
+        dialogContentStyles={{
+          mx: 0,
+          mt: 0,
+          px: 3,
         }}>
         <EditLegalInformation formik={formik} />
       </Dialog>
