@@ -1,8 +1,10 @@
+import {t} from 'i18next';
 import {FormikProps} from 'formik';
-import Grid from '@mui/material/Grid';
-import {Box} from '@mui/material';
-
+import {Box, Grid, Typography} from '@mui/material';
 import {FormSelect} from 'components/form/FormSelect';
+import {FormRadio} from 'components/form/FormRadio';
+import {FormLabel} from 'components/form/FormLabel';
+import {formatDate} from 'utils/datetime';
 import {SettingsCompanyFormModel} from './model';
 
 interface Props {
@@ -57,15 +59,18 @@ export const timeFormats = [
 
 export const dateFormats = [
   {
-    label: 'dd.MM.yyyy',
+    label: 'DD.MM.YYYY',
+    secondaryLabel: formatDate(new Date(), 'dd.MM.yyyy'),
     value: 'dd.MM.yyyy',
   },
   {
-    label: 'dd/MM/yyyy',
+    label: 'DD/MM/YYYY',
+    secondaryLabel: formatDate(new Date(), 'dd/MM/yyyy'),
     value: 'dd/MM/yyyy',
   },
   {
-    label: 'yyyy-MM-dd',
+    label: 'YYYY-MM-DD',
+    secondaryLabel: formatDate(new Date(), 'yyyy-MM-dd'),
     value: 'yyyy-MM-dd',
   },
 ];
@@ -73,30 +78,37 @@ export const dateFormats = [
 export const timeZones = [
   {
     label: 'Europe/Berlin',
+    secondaryLabel: 'CEST',
     value: 'Europe/Berlin',
   },
   {
     label: 'Europe/Belfast',
+    secondaryLabel: 'BST',
     value: 'Europe/Belfast',
   },
   {
     label: 'Europe/Dublin',
+    secondaryLabel: 'IST',
     value: 'Europe/Dublin',
   },
   {
     label: 'Europe/Lisbon',
+    secondaryLabel: 'WET',
     value: 'Europe/Lisbon',
   },
   {
     label: 'Europe/London',
+    secondaryLabel: 'BST',
     value: 'Europe/London',
   },
   {
     label: 'Asia/Tbilisi',
+    secondaryLabel: 'GET',
     value: 'Asia/Tbilisi',
   },
   {
     label: 'Africa/Lagos',
+    secondaryLabel: 'WAT',
     value: 'Africa/Lagos',
   },
 ];
@@ -108,8 +120,8 @@ export const EditSettings = ({formik}: Props) => {
   };
 
   return (
-    <Grid container sx={{mt: '0.5em'}} component="form" spacing={2}>
-      <Grid item xs={12}>
+    <Grid container component="form" spacing={3}>
+      <Grid item xs={6}>
         <FormSelect
           labelId="languageSelect-label"
           label="Language"
@@ -126,62 +138,55 @@ export const EditSettings = ({formik}: Props) => {
           }}
         />
       </Grid>
-      <Grid item xs={12}>
-        <Box marginTop="1em">
-          <FormSelect
-            labelId="dateFormat-label"
-            label="Date Format"
-            options={dateFormats.map(({label, value}) => ({
-              label,
-              value,
-            }))}
-            selectProps={{
-              id: 'dateFormat',
-              value: formik.values.dateFormat,
-              error: !!(formik.touched.dateFormat && formik.errors.dateFormat),
-              name: 'dateFormat',
-              ...defaultProps,
-            }}
-          />
-        </Box>
+      <Grid item xs={6}>
+        <FormSelect
+          labelId="dateFormat-label"
+          label="Date format"
+          options={dateFormats}
+          selectProps={{
+            id: 'dateFormat',
+            value: formik.values.dateFormat,
+            error: !!(formik.touched.dateFormat && formik.errors.dateFormat),
+            name: 'dateFormat',
+            ...defaultProps,
+          }}
+        />
       </Grid>
       <Grid item xs={12}>
-        <Box marginTop="1em">
-          <FormSelect
-            labelId="timeFormat-label"
-            label="Time Format"
-            options={timeFormats.map(({label, value}) => ({
-              label,
-              value,
-            }))}
-            selectProps={{
-              id: 'timeFormat',
-              value: formik.values.timeFormat,
-              error: !!(formik.touched.timeFormat && formik.errors.timeFormat),
-              name: 'timeFormat',
-              ...defaultProps,
-            }}
-          />
+        <Box>
+          <FormLabel text="Time format" />
         </Box>
+        {timeFormats.map((timeFormat) => (
+          <FormRadio
+            key={timeFormat.value}
+            value={timeFormat.value}
+            checked={timeFormat.value === formik.values.timeFormat}
+            name="timeFormat"
+            handleChange={(e) =>
+              formik.setFieldValue('timeFormat', e.target.value)
+            }
+            label={
+              <Typography variant="body2" component="span">
+                {t(timeFormat.label)}
+              </Typography>
+            }
+            radioProps={{size: 'small'}}
+          />
+        ))}
       </Grid>
       <Grid item xs={12}>
-        <Box marginTop="1em">
-          <FormSelect
-            labelId="timeZone-label"
-            label="Time Zone"
-            options={timeZones.map(({label, value}) => ({
-              label,
-              value,
-            }))}
-            selectProps={{
-              id: 'timeZone',
-              value: formik.values.timeZone,
-              error: !!(formik.touched.timeZone && formik.errors.timeZone),
-              name: 'timeZone',
-              ...defaultProps,
-            }}
-          />
-        </Box>
+        <FormSelect
+          labelId="timeZone-label"
+          label="Time zone"
+          options={timeZones}
+          selectProps={{
+            id: 'timeZone',
+            value: formik.values.timeZone,
+            error: !!(formik.touched.timeZone && formik.errors.timeZone),
+            name: 'timeZone',
+            ...defaultProps,
+          }}
+        />
       </Grid>
     </Grid>
   );

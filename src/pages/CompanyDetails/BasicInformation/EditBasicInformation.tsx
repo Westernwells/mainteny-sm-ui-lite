@@ -1,16 +1,54 @@
+import {useRef, useState} from 'react';
+import {t} from 'i18next';
 import {FormikProps} from 'formik';
-import Grid from '@mui/material/Grid';
-
+import {theme} from 'theme';
+import {
+  Grid,
+  InputAdornment,
+  Input,
+  Avatar,
+  IconButton,
+  Button,
+  Box,
+  Tab,
+} from '@mui/material';
+import {TabContext, TabList, TabPanel} from '@mui/lab';
+import {Phone, ImageOutlined} from '@mui/icons-material';
 import {FormInput} from 'components/form/FormInput';
-import {InputAdornment} from '@mui/material';
-import {Phone} from '@mui/icons-material';
 import {BasicInformationCompanyFormModel} from './model';
+import {EditAddress} from './EditAddress';
 
 interface Props {
   formik: FormikProps<BasicInformationCompanyFormModel>;
 }
 
 export const EditBasicInformation = ({formik}: Props) => {
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState(formik.values.logoUrl);
+  const [tabValue, setTabValue] = useState('billingAddress');
+
+  const handleUploadedFile = (event: any) => {
+    const file = event.target.files[0];
+    const urlImage = URL.createObjectURL(file);
+    setPreview(urlImage);
+    formik.setFieldValue('logoFile', file);
+  };
+
+  const onUpload = () => {
+    if (hiddenInputRef.current) {
+      hiddenInputRef.current.click();
+    }
+  };
+
+  const onRemove = () => {
+    setPreview('');
+    formik.setFieldValue('logoUrl', '');
+    formik.setFieldValue('logoFile', null);
+    if (hiddenInputRef.current) {
+      hiddenInputRef.current.value = '';
+    }
+  };
+
   const defaultProps = {
     InputLabelProps: {shrink: true},
     onChange: formik.handleChange,
@@ -18,8 +56,65 @@ export const EditBasicInformation = ({formik}: Props) => {
   };
 
   return (
-    <Grid container sx={{mt: '0.5em'}} component="form" spacing={2}>
+    <Grid container component="form" spacing={3}>
       <Grid item xs={12}>
+        <Grid
+          container
+          width="fit-content"
+          justifyContent="center"
+          direction="column"
+          gap={0.5}>
+          <Grid
+            item
+            sx={{
+              position: 'relative',
+              width: 'fit-content',
+            }}>
+            <Input
+              type="file"
+              sx={{display: 'none'}}
+              name="logoFile"
+              inputProps={{
+                ref: hiddenInputRef,
+                accept: 'image/*',
+                onChange: handleUploadedFile,
+              }}
+            />
+
+            <Avatar
+              src={preview}
+              sx={{width: 80, height: 80}}
+              alt={formik.values.name}
+            />
+
+            <IconButton
+              onClick={onUpload}
+              sx={{
+                border: `1px solid ${theme.palette.secondary.mainLight}`,
+                width: '32px',
+                height: '32px',
+                position: 'absolute',
+                bottom: '0',
+                right: '0',
+                background: 'white',
+                '&:hover': {
+                  background: theme.palette.grey[200],
+                },
+              }}>
+              <ImageOutlined style={{width: '16px', height: '16px'}} />
+            </IconButton>
+          </Grid>
+          {preview && (
+            <Button
+              size="small"
+              sx={{color: theme.palette.error.main, fontSize: '0.75rem'}}
+              onClick={onRemove}>
+              {t('Remove')}
+            </Button>
+          )}
+        </Grid>
+      </Grid>
+      <Grid item xs={6}>
         <FormInput
           props={{
             size: 'small',
@@ -30,12 +125,23 @@ export const EditBasicInformation = ({formik}: Props) => {
             error: !!formik.errors.name && formik.touched.name,
             required: true,
             value: formik.values.name,
-            sx: {mb: '1em'},
             ...defaultProps,
           }}
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={6}>
+        <FormInput
+          props={{
+            size: 'small',
+            placeholder: 'e.g. www.yourcompany.com',
+            label: 'Website',
+            name: 'url',
+            value: formik.values.url,
+            ...defaultProps,
+          }}
+        />
+      </Grid>
+      <Grid item xs={6}>
         <FormInput
           props={{
             size: 'small',
@@ -46,12 +152,11 @@ export const EditBasicInformation = ({formik}: Props) => {
             helperText: formik.touched.email && formik.errors.email,
             error: !!formik.errors.email && formik.touched.email,
             value: formik.values.email,
-            sx: {mb: '1em'},
             ...defaultProps,
           }}
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={6}>
         <FormInput
           props={{
             size: 'small',
@@ -61,7 +166,6 @@ export const EditBasicInformation = ({formik}: Props) => {
             helperText: formik.touched.phone && formik.errors.phone,
             error: !!formik.errors.phone && formik.touched.phone,
             value: formik.values.phone,
-            sx: {mb: '1em'},
             InputProps: {
               startAdornment: (
                 <InputAdornment position="start"> + </InputAdornment>
@@ -77,17 +181,49 @@ export const EditBasicInformation = ({formik}: Props) => {
         />
       </Grid>
       <Grid item xs={12}>
-        <FormInput
-          props={{
-            size: 'small',
-            placeholder: 'e.g. www.yourcompany.com',
-            label: 'Website',
-            name: 'url',
-            value: formik.values.url,
-            sx: {mb: '1em'},
-            ...defaultProps,
-          }}
-        />
+        <TabContext value={tabValue}>
+          <Box sx={{borderBottom: 1, borderColor: 'divider', width: '60%'}}>
+            <TabList
+              onChange={(_, value) => setTabValue(value)}
+              sx={{
+                '& .MuiTabs-indicator': {
+                  backgroundColor: theme.palette.primary.light,
+                },
+              }}>
+              <Tab
+                label={t('Billing address')}
+                value="billingAddress"
+                sx={{textTransform: 'none', typography: 'subtitle1'}}
+              />
+              <Tab
+                label={t('Business address')}
+                value="businessAddress"
+                sx={{textTransform: 'none', typography: 'subtitle1'}}
+              />
+              <Tab
+                label={t('Postal address')}
+                value="postalAddress"
+                sx={{textTransform: 'none', typography: 'subtitle1'}}
+              />
+            </TabList>
+          </Box>
+
+          {['billingAddress', 'businessAddress', 'postalAddress'].map(
+            (address) => (
+              <TabPanel key={address} value={address} sx={{px: 0}}>
+                <EditAddress
+                  address={
+                    address as
+                      | 'billingAddress'
+                      | 'businessAddress'
+                      | 'postalAddress'
+                  }
+                  formik={formik}
+                />
+              </TabPanel>
+            ),
+          )}
+        </TabContext>
       </Grid>
     </Grid>
   );

@@ -1,3 +1,4 @@
+import {outlinedInputClasses} from '@mui/material';
 import {createTheme} from '@mui/material/styles';
 
 export const theme = createTheme({
@@ -225,7 +226,13 @@ export const theme = createTheme({
           fontSize: '0.75rem',
           lineHeight: 2,
           letterSpacing: '0.15px',
-
+          color: '#222B45',
+          '&.Mui-focused': {
+            color: '#222B45',
+          },
+          '&.Mui-disabled': {
+            color: '#8F9BB380',
+          },
           '& .MuiInputLabel-asterisk': {
             color: 'red',
           },
@@ -255,6 +262,58 @@ export const theme = createTheme({
           fontSize: '1rem',
           lineHeight: 1.5,
           letterSpacing: '0.15px',
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        notchedOutline: {
+          borderColor: '#E4E9F2',
+        },
+        root: {
+          color: '#222B45',
+          backgroundColor: '#F7F9FC',
+          borderRadius: '4px',
+          [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: '#b9c6dd',
+          },
+          [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: '#b9c6dd',
+          },
+          [`&.Mui-disabled .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: '#E4E9F2',
+            borderStyle: 'dashed',
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          color: '#222B45',
+          backgroundColor: '#F7F9FC',
+          borderRadius: '4px',
+          [`.${outlinedInputClasses.notchedOutline}`]: {
+            border: '1px solid #E4E9F2',
+          },
+          [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: '#b9c6dd',
+          },
+          [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: '#b9c6dd',
+          },
+          [`&.Mui-disabled .${outlinedInputClasses.notchedOutline}`]: {
+            borderColor: '#E4E9F2',
+            borderStyle: 'dashed',
+          },
+        },
+        select: {
+          '&:focus': {
+            backgroundColor: 'transparent',
+          },
+        },
+        icon: {
+          color: '#8F9BB3',
         },
       },
     },
