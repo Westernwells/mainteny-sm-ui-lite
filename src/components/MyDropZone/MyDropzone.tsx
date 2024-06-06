@@ -80,9 +80,12 @@ export const MyDropZone = forwardRef(
     const [newFileName, setNewFileName] = useState('');
     const [isDragActive, setIsDragActive] = useState(false);
     const isDropzoneWrapperShown = isWrapper && children && !isDragActive;
-    const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
+    const [files, setFiles] = useState<FileWithPreview[]>([]);
+
     useEffect(() => {
-      setFiles(existingFiles);
+      if (existingFiles.length) {
+        setFiles(existingFiles);
+      }
     }, [existingFiles]);
 
     const [cropper, setCropper] = useState<any>();
