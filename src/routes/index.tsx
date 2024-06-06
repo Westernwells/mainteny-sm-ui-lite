@@ -666,10 +666,7 @@ export const Router = () => {
                 <Helmet>
                   <title>{`Settings - ${titleTail}`}</title>
                 </Helmet>
-                <PageLayout
-                  excludeDefaultSpacing
-                  contentStyles={{marginBottom: '3.5em'}}
-                  pageTitle="Settings">
+                <PageLayout excludeDefaultSpacing pageTitle="Settings">
                   <SettingsPage />
                 </PageLayout>
               </>

@@ -16,13 +16,13 @@ export const EditLegalInformation = ({formik}: Props) => {
   };
 
   return (
-    <Grid container sx={{mt: '0.5em'}} component="form" spacing={2}>
+    <Grid container component="form" spacing={3}>
       <Grid item xs={12}>
         <FormInput
           props={{
             size: 'small',
             placeholder: 'e.g. Cable xyz',
-            label: 'Managing Director',
+            label: 'Managing director',
             name: 'managingDirector',
             helperText:
               formik.touched.managingDirector && formik.errors.managingDirector,
@@ -31,7 +31,6 @@ export const EditLegalInformation = ({formik}: Props) => {
               formik.touched.managingDirector,
             required: true,
             value: formik.values.managingDirector,
-            sx: {mb: '1em'},
             ...defaultProps,
           }}
         />
@@ -41,7 +40,7 @@ export const EditLegalInformation = ({formik}: Props) => {
           props={{
             size: 'small',
             placeholder: 'e.g. Cable xyz',
-            label: 'Arbitration Court',
+            label: 'Arbitration court',
             name: 'arbitrationCourt',
             required: true,
             helperText:
@@ -50,7 +49,6 @@ export const EditLegalInformation = ({formik}: Props) => {
               !!formik.errors.arbitrationCourt &&
               formik.touched.arbitrationCourt,
             value: formik.values.arbitrationCourt,
-            sx: {mb: '1em'},
             ...defaultProps,
           }}
         />
@@ -60,7 +58,7 @@ export const EditLegalInformation = ({formik}: Props) => {
           props={{
             size: 'small',
             placeholder: 'e.g. Cable xyz',
-            label: 'Trade Register Number',
+            label: 'Trade registration number',
             name: 'tradeRegisterNumber',
             required: true,
             helperText:
@@ -70,7 +68,6 @@ export const EditLegalInformation = ({formik}: Props) => {
               !!formik.errors.tradeRegisterNumber &&
               formik.touched.tradeRegisterNumber,
             value: formik.values.tradeRegisterNumber,
-            sx: {mb: '1em'},
             ...defaultProps,
           }}
         />

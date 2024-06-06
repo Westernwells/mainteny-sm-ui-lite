@@ -1,27 +1,27 @@
-import {useEffect, useRef, useState} from 'react';
-import Grid from '@mui/material/Grid';
+import {useEffect, useState} from 'react';
+import {
+  AccessTimeOutlined,
+  DateRangeOutlined,
+  PublicOutlined,
+  RequestPageOutlined,
+  TranslateOutlined,
+} from '@mui/icons-material';
 import {useFormik} from 'formik';
-import {useTranslation} from 'react-i18next';
-import Typography from '@mui/material/Typography';
-import EditIcon from '@mui/icons-material/Edit';
-
+import {Card} from 'components/Card';
+import {CardDataListItem} from 'components/CardDataListItem';
 import {Dialog} from 'components/Dialog';
-import {InfoCard} from 'components/InfoCard';
 import {ServiceCompanyItem} from 'models/service-company';
 import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
 import {useQueryClient} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
-import {SettingsSchema} from './SettingsSchema';
 import {SettingsCompanyFormModel} from './model';
-import {EditSettings} from './EditSettings';
+import {EditSettings, languages, timeFormats} from './EditSettings';
 
 interface Props {
-  containerStyles?: {[key: string]: any};
   company: ServiceCompanyItem;
 }
 
-export const Settings = ({containerStyles, company}: Props) => {
-  const {t} = useTranslation();
+export const Settings = ({company}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const queryClient = useQueryClient();
 
@@ -55,41 +55,74 @@ export const Settings = ({containerStyles, company}: Props) => {
     setOpenDialog(false);
   };
 
-  const labels = useRef([
-    'language',
-    'dateFormat',
-    'timeFormat',
-    'timeZone',
-  ]).current;
-
   useEffect(() => {
     formik.validateForm();
   }, []);
 
   return (
     <>
-      <InfoCard
-        containerStyles={{...containerStyles}}
-        handleAction={() => setOpenDialog(true)}
-        header={<Typography variant="subtitle1">{t('Settings')}</Typography>}
-        showHeaderBackground
-        headerActionIcon={<EditIcon />}>
-        <Grid container spacing={2}>
-          {labels.map((label) => (
-            <Grid key={label} item xs={3} md={12}>
-              <SettingsSchema label={label} company={company} />
-            </Grid>
-          ))}
-        </Grid>
-      </InfoCard>
+      <Card
+        title="Global"
+        actionHandler={() => setOpenDialog(true)}
+        containerProps={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 0.75,
+        }}>
+        <CardDataListItem
+          label="Language"
+          value={
+            company.language
+              ? languages.find((item) => item.value === company.language)?.label
+              : company.language
+          }
+          Icon={TranslateOutlined}
+        />
+        <CardDataListItem
+          label="Date format"
+          value={company?.settings.dateFormat.toLowerCase()}
+          Icon={DateRangeOutlined}
+        />
+        <CardDataListItem
+          label="Time format"
+          value={
+            company.settings.timeFormat
+              ? timeFormats.find(
+                  (item) => item.value === company.settings?.timeFormat,
+                )?.label
+              : company.language
+          }
+          Icon={AccessTimeOutlined}
+        />
+        <CardDataListItem
+          label="Time zone"
+          value={company.settings.timezone}
+          Icon={PublicOutlined}
+        />
+        <CardDataListItem
+          label="VAT"
+          value={
+            company.settings.percentageVat
+              ? `${company.settings.percentageVat}%`
+              : '-'
+          }
+          Icon={RequestPageOutlined}
+        />
+      </Card>
       <Dialog
-        title="Edit Settings"
+        title="Edit Global"
         onCancel={() => setOpenDialog(false)}
         onSave={() => onSave()}
+        saveButtonText="Save Changes"
         disableSaveBtn={!!Object.keys(formik.errors).length}
         dialogProps={{
-          maxWidth: 'xs',
+          maxWidth: 'sm',
           open: openDialog || false,
+        }}
+        dialogContentStyles={{
+          mx: 0,
+          mt: 0,
+          px: 3,
         }}>
         <EditSettings formik={formik} />
       </Dialog>

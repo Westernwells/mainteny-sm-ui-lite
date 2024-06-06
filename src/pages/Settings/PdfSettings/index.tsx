@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Grid} from '@mui/material';
+import {Box} from '@mui/material';
 import NewDropZone, {FileWithPreview} from 'components/MyDropZone/NewDropZone';
 import PdfSkeleton from 'assets/images/PdfSkeleton.svg';
 import PdfBigSkeleton from 'assets/images/PdfBigSkeleton.svg';
@@ -267,17 +267,11 @@ const PdfSettings = ({company}: Props) => {
   }
 
   return (
-    <Grid
-      container
-      direction="row"
-      gap="1.3em"
-      style={{
-        height: '100%',
-        position: 'relative',
-        margin: '0 auto',
-        display: 'flex',
-        justifyContent: 'center',
-      }}>
+    <Box
+      position="relative"
+      margin="0 auto"
+      display="flex"
+      justifyContent="center">
       {!showBigger ? (
         <Box
           sx={{
@@ -317,7 +311,7 @@ const PdfSettings = ({company}: Props) => {
           <Box
             sx={{
               width: `${SMALL_SCREEN_WIDTH}px`,
-              margin: '0em auto 10em auto',
+              margin: '0em auto 3.5em auto',
               background: theme.palette.primary.contrastText,
               position: 'absolute',
             }}>
@@ -338,7 +332,7 @@ const PdfSettings = ({company}: Props) => {
         <Box
           sx={{
             width: `${BIG_SCREEN_WIDTH}px`,
-            margin: '0em auto 10em auto',
+            margin: '0em auto 3.5em auto',
             background: theme.palette.primary.contrastText,
           }}>
           {renderDropBox(
@@ -421,7 +415,7 @@ const PdfSettings = ({company}: Props) => {
         <Box
           sx={{
             position: 'fixed',
-            left: '340px',
+            left: 322, // must be equal to sidebar width
             right: 0,
             bottom: 0,
             background: theme.palette.background.paper,
@@ -449,7 +443,7 @@ const PdfSettings = ({company}: Props) => {
           </Button>
         </Box>
       )}
-    </Grid>
+    </Box>
   );
 };
 
