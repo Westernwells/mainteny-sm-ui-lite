@@ -11,6 +11,7 @@ import {ReactComponent as StockIllustration} from 'assets/illustrations/Stock.sv
 import {ReactComponent as SupplierIllustration} from 'assets/illustrations/Supplier.svg';
 import {ReactComponent as MobileUsabilityTesting} from 'assets/illustrations/MobileUsabilityTesting.svg';
 import {ReactComponent as UXAnalytics} from 'assets/illustrations/UXAnalytics.svg';
+import {ReactComponent as BankAccountsIllustration} from 'assets/illustrations/BankAccounts.svg';
 import {ReactComponent as NotePadIcon} from 'assets/icons/NotePadIcon.svg';
 import {ReactComponent as AttachmentLargeIcon} from 'assets/icons/AttachmentLargeIcon.svg';
 import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
@@ -36,6 +37,7 @@ interface Props extends BoxProps {
     | 'emptyChecklistComponents'
     | 'file-attachment'
     | 'lift'
+    | 'bankAccounts'
     | 'contacts';
   showActionBtn?: boolean;
   btnLabel?: string;
@@ -100,6 +102,10 @@ export const EmptySection = ({
         return <LiftIcon style={{width: '100%', height: '100%'}} />;
       case 'contacts':
         return <HeadphonesHumanIcon style={{width: '100%', height: '100%'}} />;
+      case 'bankAccounts':
+        return (
+          <BankAccountsIllustration style={{width: '100%', height: '100%'}} />
+        );
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }

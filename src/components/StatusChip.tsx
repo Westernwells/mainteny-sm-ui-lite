@@ -9,7 +9,7 @@ const statusWidth = {
   long: '10rem',
 };
 
-export const statusColor = {
+export const statusColor: {[key: string]: string} = {
   default: 'warning.main',
   primary: 'primary.main',
   'primary.mainLight': 'primary.mainLight',
@@ -35,7 +35,9 @@ interface Props {
   length?: 'short' | 'medium' | 'long' | 'auto';
   size?: 'small' | 'medium';
   variant?: 'outlined' | 'filled';
-  color?: keyof typeof statusColor;
+  bgColor?: string;
+  borderColor?: string;
+  color?: string;
   maxChars?: number;
 }
 
@@ -44,6 +46,8 @@ export const StatusChip = ({
   style,
   maxChars,
   size = 'small',
+  bgColor,
+  borderColor,
   color = 'default',
   variant = 'filled',
   length = 'auto',
@@ -52,10 +56,16 @@ export const StatusChip = ({
   return (
     <Chip
       sx={{
-        bgcolor: variant === 'filled' ? statusColor[color] : undefined,
-        borderColor: variant === 'outlined' ? statusColor[color] : undefined,
-        color:
-          variant === 'outlined' ? statusColor[color] : 'primary.contrastText',
+        bgcolor:
+          bgColor || (variant === 'filled' ? statusColor[color] : undefined),
+        borderColor:
+          borderColor ||
+          (variant === 'outlined' ? statusColor[color] : undefined),
+        color: !(color in statusColor)
+          ? color
+          : variant === 'outlined'
+          ? statusColor[color]
+          : 'primary.contrastText',
         minWidth: maxChars ? `calc(${maxChars}ch + .5em)` : statusWidth[length],
         boxShadow: 0,
         px: '0.25em',

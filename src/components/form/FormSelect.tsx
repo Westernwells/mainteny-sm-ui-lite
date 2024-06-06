@@ -1,5 +1,5 @@
 import FormControl from '@mui/material/FormControl';
-import {FormHelperText} from '@mui/material';
+import {FormHelperText, Typography} from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
@@ -27,6 +27,7 @@ interface Props<T> {
   options: {
     label: string;
     value: string;
+    secondaryLabel?: string;
   }[];
   selectProps?: SelectProps<T>;
   labelStyles?: SxProps;
@@ -89,7 +90,11 @@ export const FormSelect = ({
   );
 
   return (
-    <FormControl sx={{...containerStyles}} fullWidth required={required}>
+    <FormControl
+      sx={{...containerStyles}}
+      fullWidth
+      required={required}
+      disabled={selectProps?.disabled}>
       <InputLabel
         id={labelId}
         error={!!errorText}
@@ -153,7 +158,11 @@ export const FormSelect = ({
             <MenuItem
               key={option.label}
               value={option.value}
-              sx={{color: theme.palette.primary.main}}>
+              sx={{
+                color: theme.palette.primary.main,
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+              }}>
               {selectProps?.multiple ? (
                 <Checkbox
                   size="small"
@@ -165,6 +174,11 @@ export const FormSelect = ({
                 />
               ) : null}
               {translate(option.label)}
+              {option.secondaryLabel && (
+                <Typography variant="body2" color="text.secondary">
+                  {option.secondaryLabel}
+                </Typography>
+              )}
             </MenuItem>
           )),
           selectProps?.name === 'paymentTermId' && [
