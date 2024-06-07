@@ -51,9 +51,12 @@ const TechnicalData = ({elevator}: Props) => {
   } = useForm<TechnicalDataFormModel>({
     defaultValues: getDefaultValues(elevator),
   });
+
   useEffect(() => {
-    reset(getDefaultValues(elevator));
-  }, [elevator]);
+    if (!openDialog) {
+      reset(getDefaultValues(elevator));
+    }
+  }, [elevator, openDialog]);
 
   const labels = useRef([
     'stops',
