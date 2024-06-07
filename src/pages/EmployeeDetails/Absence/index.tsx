@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {Box, Grid, Typography} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import {useTranslation} from 'react-i18next';
@@ -17,7 +17,12 @@ import {
   useUpdateAbsence,
 } from 'hooks/reactQuery/useAbsence';
 import {convertAbsenceToNormal, formatUpdateAbsence} from 'utils/absence-utils';
-import {getDifferenceInInterval, toRestDateTime} from 'utils/datetime';
+import {
+  getDatesInRange,
+  getDifferenceInInterval,
+  toDate,
+  toRestDateTime,
+} from 'utils/datetime';
 import {createEmptyResource} from 'utils/paging-utils';
 import {olStyles} from 'styles';
 import {UserView} from 'models/user';
@@ -34,7 +39,7 @@ type Props = {
 const initialValues: AbsenceForm = {
   duration: '1 day',
   typeAbsence: 'sick',
-  date: new Date(),
+  date: undefined,
   dateStart: undefined,
   dateEnd: undefined,
   notes: '',
@@ -42,6 +47,10 @@ const initialValues: AbsenceForm = {
 
 const validationSchema = Yup.object().shape({
   duration: Yup.string().nullable(),
+  date: Yup.string().when('duration', {
+    is: (duration: string) => duration === '1 day',
+    then: Yup.string().required('Date is required'),
+  }),
   dateStart: Yup.string().when('duration', {
     is: (duration: string) => duration === 'Multiple days',
     then: Yup.string().required('Date start is required'),
@@ -58,8 +67,6 @@ const EmployeeAbsence = ({employee}: Props) => {
   const {t} = useTranslation();
   const {createAbsence} = useAbsence();
   const theme = useTheme();
-
-  const [absences, setAbsences] = useState<AbsenceItem[]>([]);
 
   const [typeAction, setTypeAction] = useState<'edit' | 'create' | undefined>(
     undefined,
@@ -90,7 +97,7 @@ const EmployeeAbsence = ({employee}: Props) => {
   };
 
   const {
-    data: absencesResource = createEmptyResource<AbsenceItem>(pageSize),
+    data: {data: absences} = createEmptyResource<AbsenceItem>(pageSize),
     isLoading,
   } = useGetAbsence(
     {
@@ -123,7 +130,7 @@ const EmployeeAbsence = ({employee}: Props) => {
     formik.setValues({
       duration: '1 day',
       typeAbsence: 'sick',
-      date: new Date(),
+      date: undefined,
       dateStart: undefined,
       dateEnd: undefined,
       notes: '',
@@ -144,9 +151,9 @@ const EmployeeAbsence = ({employee}: Props) => {
     formik.setValues({
       duration: numberOfDays.days === 0 ? '1 day' : 'Multiple days',
       typeAbsence: convertAbsenceToNormal(absence.eventType),
-      date: absence.startTime || new Date(),
-      dateStart: absence.startTime || undefined,
-      dateEnd: absence.endTime || undefined,
+      date: absence.startTime ? toDate(absence.startTime) : undefined,
+      dateStart: absence.startTime ? toDate(absence.startTime) : undefined,
+      dateEnd: absence.endTime ? toDate(absence.endTime) : undefined,
       notes: absence.notes,
     });
     setTypeAction('edit');
@@ -170,11 +177,11 @@ const EmployeeAbsence = ({employee}: Props) => {
     setOpenDialog(false);
   };
 
-  useEffect(() => {
-    if (!isLoading) {
-      setAbsences(absencesResource.data);
-    }
-  }, [absencesResource, isLoading]);
+  const takenDates = absences?.flatMap((absence) =>
+    absence.durationInDays === 0
+      ? absence.startTime
+      : getDatesInRange(toDate(absence.startTime), toDate(absence.endTime)),
+  );
 
   const renderAbsence = () => {
     if (absences?.length === 0) {
@@ -268,6 +275,7 @@ const EmployeeAbsence = ({employee}: Props) => {
           name={employeeName}
           roles={employeeRoles || []}
           formik={formik}
+          takenDates={takenDates}
         />
       </Dialog>
     </Grid>

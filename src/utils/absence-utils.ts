@@ -26,11 +26,11 @@ export const formatCreateAbsence = (data: AbsenceForm, employeeId: string) => ({
   eventType: getAbsenceType(data.typeAbsence),
   notes: data.notes || '',
   startTime: getFullDate(
-    data.duration === 'Multiple days' ? data.dateStart! : data.date,
+    data.duration === 'Multiple days' ? data.dateStart! : data.date!,
     'start',
   ),
   endTime: getFullDate(
-    data.duration === 'Multiple days' ? data.dateEnd! : data.date,
+    data.duration === 'Multiple days' ? data.dateEnd! : data.date!,
     'end',
   ),
 });
@@ -40,12 +40,12 @@ export const formatUpdateAbsence = (data: AbsenceForm) => ({
   notes: data.notes || '',
   startTime:
     getFullDate(
-      data.duration === 'Multiple days' ? data.dateStart! : data.date,
+      data.duration === 'Multiple days' ? data.dateStart! : data.date!,
       'start',
     ) || '',
   endTime:
     getFullDate(
-      data.duration === 'Multiple days' ? data.dateEnd! : data.date,
+      data.duration === 'Multiple days' ? data.dateEnd! : data.date!,
       'end',
     ) || '',
 });
