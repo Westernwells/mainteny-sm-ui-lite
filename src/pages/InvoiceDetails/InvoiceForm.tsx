@@ -437,26 +437,28 @@ export const InvoiceForm = ({
   }, [invoice]);
 
   const getFormattedPaymentTerms = (paymentTerm: ContractPaymentTermView) => {
-    const discountOptions =
-      paymentTerm.data?.discountOptions
-        .map((d) => {
-          const discountDays = d.discountDays || 0;
-          const discountPercentage = d.discountPercent || 0;
+    const discountOptions = paymentTerm.data?.discountOptions
+      .map((d) => {
+        const discountDays = d.discountDays || 0;
+        const discountPercentage = d.discountPercent || 0;
 
-          if (discountDays === 0 && discountPercentage === 0) {
-            return paymentTerm.term || '';
-          }
+        if (discountDays === 0 && discountPercentage === 0) {
+          return ''; // Return empty string if no valid discount
+        }
 
-          return t(
-            `If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}`,
-            {discountPercentage, lng: companyLanguage},
-          );
-        })
-        .join('\n') || '';
+        return t(
+          `If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}`,
+          {discountPercentage, lng: companyLanguage},
+        );
+      })
+      .filter((option) => option !== '') // Filter out empty strings
+      .join('\n');
 
     return {
       id: paymentTerm.id,
-      term: `${paymentTerm.term}\n${discountOptions}`,
+      term: discountOptions
+        ? `${paymentTerm.term}\n${discountOptions}`
+        : paymentTerm.term,
     };
   };
 
