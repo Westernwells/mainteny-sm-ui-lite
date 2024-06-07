@@ -2590,5 +2590,14 @@
   "Arbitration court": "Arbitražni sud",
   "Trade registration number": "Trgovački registarski broj",
   "Edit Legal": "Uredite Pravno",
-  "Auto Generate ID": "Automatsko generisanje ID-a"
+  "Auto Generate ID": "Automatsko generisanje ID-a",
+  "Deactivated": "Deaktiviran",
+  "Trial": "Probni",
+  "Internal": "Interno",
+  "COMPANY NAME": "IME KOMPANIJE",
+  "COUNTRY": "DRŽAVA",
+  "# OF USERS": "BROJ KORISNIKA",
+  "# OF LICENCES": "BROJ LICENCI",
+  "CREATED": "STVOREN",
+  "LAST ACTIVE": "POSLEDNJA AKTIVNOST"
 }

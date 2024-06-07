@@ -2584,5 +2584,21 @@
   "PDF template updated sucessfully": "Plantilla PDF actualizada correctamente",
   "Drag and drop or": "Arrastrar y soltar o",
   "Click to upload": "Haga clic para cargar",
-  "Delete Image": "Eliminar Imagen"
+  "Delete Image": "Eliminar Imagen",
+  "Business address": "Dirección del negocio",
+  "Edit Basic info": "Editar información básica",
+  "Global": "Global",
+  "Date format": "Formato de fecha",
+  "Time format": "Formato de tiempo",
+  "Time zone": "Zona horaria",
+  "Edit Global": "Editar global",
+  "Company Policy": "Política de la compañía",
+  "Yearly vacation days": "Días de vacaciones anuales",
+  "Edit Company Policy": "Editar política de la empresa",
+  "Legal": "Legal",
+  "Managing director": "Director general",
+  "Arbitration court": "Corte de arbitraje",
+  "Trade registration number": "Número de registro comercial",
+  "Edit Legal": "Editar Legal",
+  "Auto Generate ID": "Generar ID automáticamente"
 }
