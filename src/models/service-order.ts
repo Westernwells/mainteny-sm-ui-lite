@@ -13,6 +13,7 @@ import {
   Order,
   PdfGenerationStatus,
   Address,
+  EmailRecord,
 } from './misc';
 import {
   Technician,
@@ -613,3 +614,9 @@ export const mapServiceOrderPaymentStatus = (
       return ServiceOrderPaymentStatus.NONE;
   }
 };
+
+export interface SendServiceOrderReportRecord {
+  technicianId: string;
+  pdfPath: string;
+  email: EmailRecord;
+}

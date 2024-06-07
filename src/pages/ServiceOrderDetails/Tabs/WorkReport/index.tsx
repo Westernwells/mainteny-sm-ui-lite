@@ -12,7 +12,7 @@ import {EmptySection} from 'components/EmptySection';
 import {FormLabel} from 'components/form/FormLabel';
 import {
   useCompleteServiceOrder,
-  usePublishWorkReport,
+  useSendWorkReport,
 } from 'hooks/reactQuery/useServiceOrder';
 import {
   CompleteServiceOrder,
@@ -42,6 +42,7 @@ import {useSearchParams} from 'react-router-dom';
 import {
   companyLanguageContextMap,
   createFilesFromBlobArray,
+  fetchFile,
   formatSearchParams,
 } from 'utils/utils';
 import {theme} from 'theme';
@@ -49,7 +50,7 @@ import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {pdf} from '@react-pdf/renderer';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
-import {SimpleEmailRecord} from 'models/misc';
+import {PdfGenerationStatus, SimpleEmailRecord} from 'models/misc';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
@@ -95,8 +96,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
   );
 
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
-  const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
-    usePublishWorkReport();
+  const {mutate: sendWorkReport, isLoading: sendingWorkReport} =
+    useSendWorkReport();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
   const signatureKeys = getSignatureKeys(
@@ -192,43 +193,95 @@ export const WorkReport = ({serviceOrder}: Props) => {
     return blob;
   };
 
-  const onSubmitHandler = async (values: SimpleEmailRecord) => {
-    const uploadPath = `${serviceCompanyId}/reports/${report?.id}/`;
+  const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
+    report && report?.additionalInfo.pdfPath
+      ? [report.additionalInfo.pdfPath]
+      : [],
+    {enabled: false},
+  );
 
-    const fileNames: string[] = [`${report?.id}.pdf`];
+  const createEmailAttachments = (
+    files: FileWithPreview[],
+    path: string,
+    fileReport?: ServiceOrderReportView,
+  ) =>
+    files.reduce<FileWithPreview[]>(
+      (newArr: FileWithPreview[], obj) => [
+        ...newArr,
+        {
+          ...obj,
+          type: obj.type,
+          uri: `${path}/${obj.name}`,
+          description:
+            fileReport?.externalId ||
+            fileReport?.number ||
+            obj.name.split('.')[0],
+        },
+      ],
+      [],
+    );
 
-    const blobFile = await generateWorkReportPdf();
-    const files = await createFilesFromBlobArray([blobFile!], fileNames);
-
-    await uploadFiles({files, uploadPath});
-
-    publishWorkReport(
+  const sendEmailReport = async (
+    emailServiceOrder: ServiceOrderView,
+    values: SimpleEmailRecord,
+    files: FileWithPreview[],
+    pdfPath: string,
+    uploadPath: string,
+    fileReport?: ServiceOrderReportView,
+  ) => {
+    sendWorkReport(
       {
-        id: serviceOrder.id,
+        id: emailServiceOrder.id,
         body: {
-          emails: [values.email] || [],
-          email: values.email,
-          subject: values.subject,
-          content: values.content,
-          attachments: files.reduce<FileWithPreview[]>(
-            (newArr: FileWithPreview[], obj) => [
-              ...newArr,
-              {
-                ...obj,
-                type: obj.type,
-                uri: `${uploadPath}/${obj.name}`,
-                description:
-                  report?.externalId ||
-                  report?.number ||
-                  obj.name.split('.')[0],
-              },
-            ],
-            [],
-          ),
+          technicianId: fileReport?.technicianId!,
+          pdfPath,
+          email: {
+            emails: [values.email] || [],
+            email: values.email,
+            subject: values.subject,
+            content: values.content,
+            attachments: createEmailAttachments(files, uploadPath, fileReport),
+          },
         },
       },
       {onSuccess: () => setIsSendEmailDialogOpen(false)},
     );
+  };
+
+  const onSubmitHandler = async (values: SimpleEmailRecord) => {
+    const fileNames: string[] = [`${report?.id}.pdf`];
+    let files: FileWithPreview[] = [];
+    const uploadPath = `${serviceCompanyId}/reports/${report?.id}`;
+
+    if (
+      report?.additionalInfo &&
+      report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
+    ) {
+      const blob = await fetchFile(
+        downloadUrl ? Object.values(downloadUrl)[0] : '',
+      );
+      files = await createFilesFromBlobArray([blob], fileNames);
+      await sendEmailReport(
+        serviceOrder,
+        values,
+        files,
+        report?.additionalInfo.pdfPath!,
+        uploadPath,
+        report,
+      );
+    } else {
+      const blobFile = await generateWorkReportPdf();
+      files = await createFilesFromBlobArray([blobFile!], fileNames);
+      await uploadFiles({files, uploadPath});
+      await sendEmailReport(
+        serviceOrder,
+        values,
+        files,
+        `${uploadPath}/${fileNames[0]}`,
+        uploadPath,
+        report,
+      );
+    }
   };
 
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
@@ -317,7 +370,22 @@ export const WorkReport = ({serviceOrder}: Props) => {
   );
 
   const handleClickDownload = async () => {
-    await generateWorkReportPdf();
+    if (
+      report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
+    ) {
+      const downloadUrlValue = downloadUrl ? Object.values(downloadUrl)[0] : '';
+      if (downloadUrlValue) {
+        try {
+          const blob = await fetchFile(downloadUrlValue);
+          const blobURL = URL.createObjectURL(blob);
+          setPreviewPdfBlobUrl(blobURL);
+        } catch (error) {
+          console.error('Error fetching the file:', error);
+        }
+      }
+    } else {
+      await generateWorkReportPdf();
+    }
     setActionType('DOWNLOAD');
   };
 
@@ -329,7 +397,11 @@ export const WorkReport = ({serviceOrder}: Props) => {
     if (reportToUpdate) {
       setReport(reportToUpdate);
     }
-  }, [reportToUpdate]);
+  }, [serviceOrder]);
+
+  useEffect(() => {
+    refetchDownloadUrl();
+  }, [report]);
 
   useEffect(() => {
     formik.setFieldValue('workTimeRecord', {
@@ -366,8 +438,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
   useEffect(() => {
     if (previewPdfBlobUrl && actionType === 'DOWNLOAD') {
       downloadFile();
-      setActionType('');
       setPreviewPdfBlobUrl('');
+      setActionType('');
     }
   }, [actionType, previewPdfBlobUrl]);
 
@@ -599,7 +671,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
-        confirmBtnDisabled={publishingWorkReport}
+        confirmBtnDisabled={sendingWorkReport}
         title="Send work report"
         confirmBtnLabel="Send Work Report"
         email={
