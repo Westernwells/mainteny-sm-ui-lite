@@ -682,42 +682,44 @@ const WorkReportTemplate = React.memo(
               )}
 
               <View style={styles.signatureWrapper} wrap={false}>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    border: '1px solid #E4E9F2',
-                    borderRadius: '8px',
-                    marginTop: 20,
-                    width: 150,
-                    height: 56,
-                    textAlign: 'center',
-                    justifyContent: 'space-around',
-                    position: 'relative',
-                  }}>
-                  <View>
-                    {technicianSignatureImage ? (
-                      <Image
-                        src={technicianSignatureImage}
-                        style={{width: 120, height: 40}}
-                      />
-                    ) : (
-                      <Text>{translate('No Signature')}</Text>
-                    )}
-                  </View>
+                {technicianSignatureImage && (
                   <View
                     style={{
-                      position: 'absolute',
-                      bottom: -5,
-                      left: '30%',
-                      width: '40%',
-                      backgroundColor: 'white',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      border: '1px solid #E4E9F2',
+                      borderRadius: '8px',
+                      marginTop: 20,
+                      width: 150,
+                      height: 56,
+                      textAlign: 'center',
+                      justifyContent: 'space-around',
+                      position: 'relative',
                     }}>
-                    <Text>{translate('Engineer')}</Text>
+                    <View>
+                      {technicianSignatureImage ? (
+                        <Image
+                          src={technicianSignatureImage}
+                          style={{width: 120, height: 40}}
+                        />
+                      ) : (
+                        <Text>{translate('No Signature')}</Text>
+                      )}
+                    </View>
+                    <View
+                      style={{
+                        position: 'absolute',
+                        bottom: -5,
+                        left: '30%',
+                        width: '40%',
+                        backgroundColor: 'white',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <Text>{translate('Engineer')}</Text>
+                    </View>
                   </View>
-                </View>
+                )}
 
                 {customerSignatureImage && (
                   <View

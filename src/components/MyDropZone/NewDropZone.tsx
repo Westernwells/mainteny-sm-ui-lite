@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useRef, useEffect} from 'react';
 import {useDropzone} from 'react-dropzone';
 import {Box, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
@@ -36,6 +36,8 @@ interface Props {
   showBigger: boolean;
   file: FileWithPreview | null;
   setFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
+  showHandles: boolean;
+  setShowHandles: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NewDropZone: React.FC<Props> = ({
@@ -50,9 +52,10 @@ const NewDropZone: React.FC<Props> = ({
   showBigger,
   file,
   setFile,
+  showHandles,
+  setShowHandles,
 }) => {
   const {t} = useTranslation();
-  const [showHandles, setShowHandles] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const onDrop = (acceptedFiles: File[]) => {

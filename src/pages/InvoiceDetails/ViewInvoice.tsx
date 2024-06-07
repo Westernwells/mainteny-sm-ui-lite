@@ -518,7 +518,11 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     if (updatedInvoice?.status === InvoiceStatus.DRAFT) {
       generateBlobUrl(updatedInvoice);
     }
-  }, [updatedInvoice]);
+  }, [
+    updatedInvoice,
+    headerUrl[headerInfo?.path],
+    footerUrl[footerInfo?.path],
+  ]);
 
   useEffect(() => {
     if (actionType === 'PRINT' && filePathToDownload) {
