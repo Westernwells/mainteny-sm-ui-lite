@@ -12,6 +12,7 @@ import {
   intervalToDuration,
   formatDistance,
   Locale,
+  addDays,
 } from 'date-fns';
 import {useTranslation} from 'react-i18next';
 import {enUS, de, srLatn} from 'date-fns/locale';
@@ -255,4 +256,14 @@ export const isDateInPast = (date: Date | string): boolean => {
   currentDate.setHours(0, 0, 0, 0);
 
   return providedDate < currentDate;
+};
+
+export const getDatesInRange = (startDate: Date, endDate: Date) => {
+  const dates: Date[] = [];
+  let currentDate = startDate;
+  while (currentDate <= endDate) {
+    dates.push(currentDate);
+    currentDate = addDays(currentDate, 1);
+  }
+  return dates;
 };
