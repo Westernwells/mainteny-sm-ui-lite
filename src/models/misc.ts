@@ -256,6 +256,7 @@ export enum PdfGenerationStatus {
   ERROR = 'ERROR',
   INIT = 'INIT',
   RUNNING = 'RUNNING',
+  GENERATION_REQUIRED = 'GENERATION_REQUIRED',
 }
 
 export interface WeekPair {

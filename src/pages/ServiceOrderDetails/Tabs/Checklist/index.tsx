@@ -22,7 +22,7 @@ import {InfoCard} from 'components/InfoCard';
 import {PageCard} from 'components/PageCard';
 import {Progress} from 'components/Progress';
 import {Button} from 'components/Button';
-import {usePublishChecklist} from 'hooks/reactQuery/useServiceOrder';
+import {useSendChecklist} from 'hooks/reactQuery/useServiceOrder';
 import {
   useDeleteServiceOrderChecklist,
   useQueryServiceOrderChecklists,
@@ -45,7 +45,11 @@ import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
 import {CheckListComponentType} from 'models/checklist';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {companyLanguageContextMap, createFilesFromBlobArray} from 'utils/utils';
+import {
+  companyLanguageContextMap,
+  createFilesFromBlobArray,
+  fetchFile,
+} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -55,6 +59,7 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {PdfGenerationStatus} from 'models/misc';
 import {ChecklistComponent} from './ChecklistComponent';
 import ChecklistPdf from './ChecklistPdf';
 
@@ -87,8 +92,8 @@ export const CheckList = ({serviceOrder}: Props) => {
   const [actionType, setActionType] = useState('');
 
   const {mutateAsync: uploadFiles} = useUploadFiles('');
-  const {mutateAsync: publishCheckList, isLoading: publishingCheckList} =
-    usePublishChecklist();
+  const {mutateAsync: sendCheckList, isLoading: sendingCheckList} =
+    useSendChecklist();
   const {mutateAsync: deleteServiceOrderChecklist, isLoading: isDeleting} =
     useDeleteServiceOrderChecklist();
 
@@ -135,6 +140,13 @@ export const CheckList = ({serviceOrder}: Props) => {
         (a.additionalInfo?.orderNumber ?? 0) -
         (b.additionalInfo?.orderNumber ?? 0),
     );
+
+  const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
+    selectedChecklist && selectedChecklist?.additionalInfo.pdfPath
+      ? [selectedChecklist.additionalInfo.pdfPath]
+      : [],
+    {enabled: false},
+  );
 
   const {downloadFile} = useDownloadFileWithCustomName(
     selectedChecklist?.checkList.number,
@@ -267,6 +279,27 @@ export const CheckList = ({serviceOrder}: Props) => {
     return blob;
   };
 
+  const handleDownload = async () => {
+    if (
+      selectedChecklist?.additionalInfo.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE
+    ) {
+      const downloadUrlValue = downloadUrl ? Object.values(downloadUrl)[0] : '';
+      if (downloadUrlValue) {
+        try {
+          const blob = await fetchFile(downloadUrlValue);
+          const blobURL = URL.createObjectURL(blob);
+          setPdfPathToDownload(blobURL);
+        } catch (error) {
+          console.error('Error fetching the file:', error);
+        }
+      }
+    } else {
+      await generatePdfUrl();
+    }
+    setActionType('DOWNLOAD');
+  };
+
   useEffect(() => {
     if (pdfPathToDownload && actionType === 'DOWNLOAD') {
       try {
@@ -291,6 +324,10 @@ export const CheckList = ({serviceOrder}: Props) => {
       }
     }
   }, [pdfPathToDownload, actionType]);
+
+  useEffect(() => {
+    refetchDownloadUrl();
+  }, [selectedChecklist]);
 
   if (isLoadingCheckList) {
     return <Progress />;
@@ -599,10 +636,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                 buttonProps={{
                   variant: 'outlined',
                   size: 'medium',
-                  onClick: async () => {
-                    await generatePdfUrl();
-                    setActionType('DOWNLOAD');
-                  },
+                  onClick: () => handleDownload(),
                   sx: {
                     background: 'transparent',
                   },
@@ -629,7 +663,7 @@ export const CheckList = ({serviceOrder}: Props) => {
             <SendEmailDialog
               open={isSendEmailDialogOpen}
               onClose={() => setIsSendEmailDialogOpen(false)}
-              confirmBtnDisabled={publishingCheckList}
+              confirmBtnDisabled={sendingCheckList}
               email={
                 serviceOrder.elevator.propertyOwner?.additionalInfo
                   .billingEmail ||
@@ -638,48 +672,68 @@ export const CheckList = ({serviceOrder}: Props) => {
               content={serviceOrder.description}
               callback={async (emailRecord) => {
                 setIsSendEmailDialogOpen(false);
+
                 const serviceCompanyId = user?.userAccount.serviceCompany.id;
-                const checkListInfo = serviceOrder?.checkLists![0];
+                const checkListInfo = selectedChecklist!;
                 const uploadPath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/checkLists/${checkListInfo.technicianId}`;
+                const fileNames = [`${checkListInfo.checkListId}.pdf`];
 
-                const fileNames: string[] = [
-                  `${checkListInfo.checkListId}.pdf`,
-                ];
+                const generateFilesAndSendCheckList = async (
+                  blob: Blob,
+                  pdfPath: string,
+                ) => {
+                  const files: FileWithPreview[] =
+                    await createFilesFromBlobArray([blob], fileNames);
+                  const attachments = files.map((file) => ({
+                    ...file,
+                    type: file.type,
+                    uri: pdfPath,
+                    description:
+                      checkListInfo?.checkList.number ||
+                      file.name.split('.')[0],
+                  }));
 
-                const blobFile = await generatePdfUrl();
-                const files = await createFilesFromBlobArray(
-                  [blobFile!],
-                  fileNames,
-                );
-                await uploadFiles({files, uploadPath});
+                  await sendCheckList({
+                    id: serviceOrder!.id,
+                    body: {
+                      checkListId: checkListInfo.checkListId || '',
+                      technicianId: checkListInfo.technicianId || '',
+                      pdfPath,
+                      email: {
+                        email: emailRecord.email,
+                        subject: emailRecord.subject,
+                        content: emailRecord.content,
+                        emails: [emailRecord.email],
+                        attachments,
+                      },
+                    },
+                  });
+                };
 
-                await publishCheckList({
-                  id: serviceOrder!.id,
-                  params: {
-                    checkListId: selectedChecklist?.checkListId || '',
-                    technicianId: selectedChecklist?.technicianId || '',
-                  },
-                  body: {
-                    email: emailRecord.email,
-                    subject: emailRecord.subject,
-                    content: emailRecord.content,
-                    emails: [emailRecord.email],
-                    attachments: files.reduce<FileWithPreview[]>(
-                      (newArr: FileWithPreview[], obj) => [
-                        ...newArr,
-                        {
-                          ...obj,
-                          type: obj.type,
-                          uri: `${uploadPath}/${obj.name}`,
-                          description:
-                            selectedChecklist?.checkList.number ||
-                            obj.name.split('.')[0],
-                        },
-                      ],
-                      [],
-                    ),
-                  },
-                });
+                if (
+                  checkListInfo?.additionalInfo.pdfGenerationStatus ===
+                  PdfGenerationStatus.DONE
+                ) {
+                  const downloadUrlValue = downloadUrl
+                    ? Object.values(downloadUrl)[0]
+                    : '';
+                  const blob = await fetchFile(downloadUrlValue);
+                  await generateFilesAndSendCheckList(
+                    blob,
+                    checkListInfo.additionalInfo.pdfPath!,
+                  );
+                } else {
+                  const blobFile = await generatePdfUrl();
+                  const files = await createFilesFromBlobArray(
+                    [blobFile!],
+                    fileNames,
+                  );
+                  await uploadFiles({files, uploadPath});
+                  await generateFilesAndSendCheckList(
+                    blobFile!,
+                    `${uploadPath}/${fileNames[0]}`,
+                  );
+                }
               }}
             />
           </Box>

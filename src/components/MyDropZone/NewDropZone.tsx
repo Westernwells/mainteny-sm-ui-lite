@@ -84,13 +84,21 @@ const NewDropZone: React.FC<Props> = ({
     setPosition({x: newX, y: newY});
   };
 
-  const handleResizeStop: RndResizeCallback = (_e, _direction, ref) => {
+  const handleResizeStop: RndResizeCallback = (
+    _e,
+    _direction,
+    ref,
+    delta,
+    newPosition,
+  ) => {
     const newWidth = ref.offsetWidth;
     const newHeight = ref.offsetHeight;
     const maxX = BIG_SCREEN_WIDTH - newWidth;
     const maxY = BIG_SCREEN_DROPZONE_HEIGHT - newHeight;
-    const newX = Math.max(0, Math.min(position.x, maxX));
-    const newY = Math.max(0, Math.min(position.y, maxY));
+
+    const newX = Math.max(0, Math.min(newPosition.x, maxX));
+    const newY = Math.max(0, Math.min(newPosition.y, maxY));
+
     setDimensions({width: newWidth, height: newHeight});
     setPosition({x: newX, y: newY});
   };
@@ -126,7 +134,17 @@ const NewDropZone: React.FC<Props> = ({
       className="container"
       component="section"
       width="100%"
-      ref={containerRef}>
+      ref={containerRef}
+      sx={{
+        position: 'relative',
+        height: showBigger
+          ? `${BIG_SCREEN_DROPZONE_HEIGHT}px`
+          : `${SMALL_SCREEN_DROPZONE_HEIGHT}px`,
+        maxWidth: showBigger
+          ? `${BIG_SCREEN_WIDTH}px`
+          : `${SMALL_SCREEN_WIDTH}px`,
+        width: '100%',
+      }}>
       {!file && (
         <Box
           {...getRootProps({className: 'dropzone'})}
@@ -187,9 +205,10 @@ const NewDropZone: React.FC<Props> = ({
           sx={{
             background: file ? '#00D1FF14' : theme.palette.inputBackground.main,
             border: '2px dashed #00D1FF14',
-            height: `${BIG_SCREEN_DROPZONE_HEIGHT}px`,
-            maxWidth: `${BIG_SCREEN_WIDTH}px`,
-            width: `${BIG_SCREEN_WIDTH}px`,
+            height: '100%',
+            maxWidth: '100%',
+            width: '100%',
+            position: 'relative',
           }}
           onClick={() => setShowHandles(false)}>
           <Rnd
@@ -231,7 +250,7 @@ const NewDropZone: React.FC<Props> = ({
                 height: dimensions.height,
                 objectFit: 'contain',
                 maxHeight: `${BIG_SCREEN_DROPZONE_HEIGHT}px`,
-                position: 'relative',
+                position: 'absolute',
               }}
             />
             {showHandles && (
