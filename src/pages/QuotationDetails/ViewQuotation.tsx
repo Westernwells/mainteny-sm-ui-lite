@@ -308,7 +308,7 @@ export const ViewQuotation = ({
     if (quotation.status === QuotationStatus.DRAFT) {
       generateBlobUrl();
     }
-  }, [quotation]);
+  }, [quotation, headerUrl[headerInfo?.path], footerUrl[footerInfo?.path]]);
 
   return (
     <Box>

@@ -18,6 +18,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {Button} from 'components/Button';
 import {ClientDataRecord} from 'models/client-storage';
 import {HeaderFooterInfoData} from 'models/misc';
+import {fetchFile} from 'utils/utils';
 
 const BIG_SCREEN_WIDTH: number = 1038;
 const BIG_SCREEN_DROPZONE_HEIGHT: number = 151;
@@ -42,6 +43,7 @@ type Props = {
 
 const PdfSettings = ({company}: Props) => {
   const {data: uuid} = useUuid();
+
   const [headerPosition, setHeaderPosition] = useState<Position>({x: 0, y: 0});
   const [headerDimensions, setHeaderDimensions] = useState<Dimensions>({
     width: 0,
@@ -56,11 +58,13 @@ const PdfSettings = ({company}: Props) => {
   const [footerFile, setFooterFile] = useState<FileWithPreview | null>(null);
 
   const [showBigger, setShowBigger] = useState<boolean>(false);
+  const [showHandles, setShowHandles] = useState<boolean>(false);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   const uploadPath = `${company.id}/settings/template/${uuid}`;
 
   const {mutateAsync: updateClientStorage} =
-    useUpdateServiceCompanyClientStorage('PDF template updated sucessfully');
+    useUpdateServiceCompanyClientStorage('PDF template updated successfully');
 
   const {mutateAsync: uploadImages} = useUploadFiles('', company?.id);
 
@@ -179,18 +183,195 @@ const PdfSettings = ({company}: Props) => {
         : undefined,
     };
 
-    setShowBigger(false);
-
-    await updateClientStorage({
-      body: {
-        key: 'pdf-template',
-        value: JSON.stringify(dataToSave),
+    await updateClientStorage(
+      {
+        body: {
+          key: 'pdf-template',
+          value: JSON.stringify(dataToSave),
+        },
+        serviceCompanyId: company?.id || '',
       },
-      serviceCompanyId: company?.id || '',
-    });
+      {
+        onSuccess: () => {
+          setShowBigger(false);
+        },
+      },
+    );
 
     handleCancel();
   };
+
+  const scaleDimensionsAndPosition = (
+    position: Position,
+    dimensions: Dimensions,
+    widthScale: number,
+    heightScale: number,
+  ) => ({
+    scaledPosition: {
+      x: position.x * widthScale,
+      y: position.y * heightScale,
+    },
+    scaledDimensions: {
+      width: dimensions.width * widthScale,
+      height: dimensions.height * heightScale,
+    },
+  });
+
+  const createFileWithPreview = async (url: string, name: string) => {
+    const blob = await fetchFile(url);
+    const file = new File([blob], name, {type: blob.type});
+    return Object.assign(file, {preview: URL.createObjectURL(file)});
+  };
+
+  const handleFileUpdates = async (
+    url: string,
+    name: string,
+    position: Position,
+    dimensions: Dimensions,
+    setFile: Function,
+    setPosition: Function,
+    setDimensions: Function,
+    widthScale: number,
+    heightScale: number,
+  ) => {
+    const {scaledPosition, scaledDimensions} = scaleDimensionsAndPosition(
+      position,
+      dimensions,
+      widthScale,
+      heightScale,
+    );
+    const fileWithPreview = await createFileWithPreview(url, name);
+    setFile(fileWithPreview);
+    setPosition(scaledPosition);
+    setDimensions(scaledDimensions);
+  };
+
+  const handleImageClick = async (
+    imageUrl: string | null,
+    locationPosition: Position,
+    locationDimension: Dimensions,
+    isFooter: boolean,
+  ) => {
+    try {
+      if (!imageUrl) throw new Error('Image URL is null');
+
+      const widthScale = BIG_SCREEN_WIDTH / SMALL_SCREEN_WIDTH;
+      const heightScale =
+        BIG_SCREEN_DROPZONE_HEIGHT / SMALL_SCREEN_DROPZONE_HEIGHT;
+
+      if (isFooter) {
+        await handleFileUpdates(
+          imageUrl,
+          uuid,
+          locationPosition,
+          locationDimension,
+          setFooterFile,
+          setFooterPosition,
+          setFooterDimensions,
+          widthScale,
+          heightScale,
+        );
+
+        if (headerUrl[headerInfo?.path]) {
+          const headerPathParts = headerInfo?.path.split('/');
+          await handleFileUpdates(
+            headerUrl[headerInfo?.path],
+            headerPathParts[headerPathParts.length - 1],
+            headerPosition,
+            headerDimensions,
+            setHeaderFile,
+            setHeaderPosition,
+            setHeaderDimensions,
+            widthScale,
+            heightScale,
+          );
+        }
+      } else {
+        await handleFileUpdates(
+          imageUrl,
+          uuid,
+          locationPosition,
+          locationDimension,
+          setHeaderFile,
+          setHeaderPosition,
+          setHeaderDimensions,
+          widthScale,
+          heightScale,
+        );
+
+        if (footerUrl[footerInfo?.path]) {
+          const footerPathParts = footerInfo?.path.split('/');
+          await handleFileUpdates(
+            footerUrl[footerInfo?.path],
+            footerPathParts[footerPathParts.length - 1],
+            footerPosition,
+            footerDimensions,
+            setFooterFile,
+            setFooterPosition,
+            setFooterDimensions,
+            widthScale,
+            heightScale,
+          );
+        }
+      }
+
+      setShowBigger(true);
+      setShowHandles(true);
+      setIsInitialized(true);
+    } catch (error) {
+      console.error('Error fetching image:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (!showBigger) {
+      initializeDimensions(clientStorageData);
+      setIsInitialized(false);
+    } else if (!isInitialized) {
+      const widthScale = BIG_SCREEN_WIDTH / SMALL_SCREEN_WIDTH;
+      const heightScale =
+        BIG_SCREEN_DROPZONE_HEIGHT / SMALL_SCREEN_DROPZONE_HEIGHT;
+
+      const initializeFiles = async () => {
+        try {
+          if (headerUrl[headerInfo?.path]) {
+            const headerPathParts = headerInfo?.path.split('/');
+            await handleFileUpdates(
+              headerUrl[headerInfo?.path],
+              headerPathParts[headerPathParts.length - 1],
+              headerPosition,
+              headerDimensions,
+              setHeaderFile,
+              setHeaderPosition,
+              setHeaderDimensions,
+              widthScale,
+              heightScale,
+            );
+          }
+
+          if (footerUrl[footerInfo?.path]) {
+            const footerPathParts = footerInfo?.path.split('/');
+            await handleFileUpdates(
+              footerUrl[footerInfo?.path],
+              footerPathParts[footerPathParts.length - 1],
+              footerPosition,
+              footerDimensions,
+              setFooterFile,
+              setFooterPosition,
+              setFooterDimensions,
+              widthScale,
+              heightScale,
+            );
+          }
+          setIsInitialized(true);
+        } catch (error) {
+          console.error('Error setting initial files:', error);
+        }
+      };
+
+      initializeFiles();
+    }
+  }, [showBigger]);
 
   useEffect(() => {
     if (clientStorageData) {
@@ -209,15 +390,24 @@ const PdfSettings = ({company}: Props) => {
     setFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>,
     isFooter: boolean,
   ) =>
-    imagePath ? (
+    imagePath && !showBigger ? (
       <Box
         sx={{
           background: theme.palette.inputBackground.main,
           height,
           cursor: 'pointer',
-          width: `${SMALL_SCREEN_WIDTH}px`,
+          width: showBigger
+            ? `${BIG_SCREEN_WIDTH}px`
+            : `${SMALL_SCREEN_WIDTH}px`,
         }}
-        onClick={() => setShowBigger(true)}>
+        onClick={() =>
+          handleImageClick(
+            imagePath,
+            locationImagePosition,
+            locationImageDimensions,
+            isFooter,
+          )
+        }>
         <img
           alt="DropZone"
           src={imagePath}
@@ -250,6 +440,8 @@ const PdfSettings = ({company}: Props) => {
           showBigger={showBigger}
           file={file}
           setFile={setFile}
+          showHandles={showHandles}
+          setShowHandles={setShowHandles}
         />
       </Box>
     );
@@ -275,14 +467,18 @@ const PdfSettings = ({company}: Props) => {
       {!showBigger ? (
         <Box
           sx={{
-            width: `${SMALL_SCREEN_WIDTH}px`,
+            width: showBigger
+              ? `${BIG_SCREEN_WIDTH}px`
+              : `${SMALL_SCREEN_WIDTH}px`,
             margin: '0em auto',
             background: 'white',
             position: 'absolute',
           }}>
           <Box
             sx={{
-              width: `${SMALL_SCREEN_WIDTH}px`,
+              width: showBigger
+                ? `${BIG_SCREEN_WIDTH}px`
+                : `${SMALL_SCREEN_WIDTH}px`,
               position: 'relative',
             }}>
             {renderDropBox(
@@ -310,7 +506,9 @@ const PdfSettings = ({company}: Props) => {
 
           <Box
             sx={{
-              width: `${SMALL_SCREEN_WIDTH}px`,
+              width: showBigger
+                ? `${BIG_SCREEN_WIDTH}px`
+                : `${SMALL_SCREEN_WIDTH}px`,
               margin: '0em auto 3.5em auto',
               background: theme.palette.primary.contrastText,
               position: 'absolute',
@@ -331,12 +529,14 @@ const PdfSettings = ({company}: Props) => {
       ) : (
         <Box
           sx={{
-            width: `${BIG_SCREEN_WIDTH}px`,
+            width: showBigger
+              ? `${BIG_SCREEN_WIDTH}px`
+              : `${SMALL_SCREEN_WIDTH}px`,
             margin: '0em auto 3.5em auto',
             background: theme.palette.primary.contrastText,
           }}>
           {renderDropBox(
-            null,
+            headerFile?.preview || headerUrl[headerInfo?.path] || null,
             151,
             headerDimensions,
             headerPosition,
@@ -398,7 +598,7 @@ const PdfSettings = ({company}: Props) => {
             </Button>
           </Box>
           {renderDropBox(
-            null,
+            footerFile?.preview || footerUrl[footerInfo?.path] || null,
             151,
             footerDimensions,
             footerPosition,
