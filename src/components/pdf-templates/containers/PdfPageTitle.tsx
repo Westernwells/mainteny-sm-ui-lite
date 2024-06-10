@@ -1,4 +1,4 @@
-import {View, StyleSheet, Font} from '@react-pdf/renderer';
+import {Text, StyleSheet, Font} from '@react-pdf/renderer';
 import React, {ReactNode} from 'react';
 import NotoSansGeorgianBold from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import MontserratBold from '../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
@@ -37,7 +37,7 @@ const PdfPageTitle = ({children, selectedLng}: Props) => {
   };
 
   const styles = getStyles(boldFontStyle);
-  return <View style={styles.contentHeader}>{children}</View>;
+  return <Text style={styles.contentHeader}>{children}</Text>;
 };
 
 export default PdfPageTitle;
