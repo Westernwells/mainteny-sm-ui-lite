@@ -239,14 +239,14 @@ export const Actions = ({quotation}: Props) => {
       const blob = await fetchFile(
         fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
       );
-      const fileNames: string[] = [`${quotation.externalId}.pdf`];
+      const fileNames: string[] = [`${quotation.id}.pdf`];
       const files = await createFilesFromBlobArray([blob], fileNames);
       setExistingFiles(files);
 
       // if quotation is DRAFT -> generate file on client
     } else {
       const blob = await generateBlobUrl();
-      const fileNames: string[] = [`${quotation.externalId}.pdf`];
+      const fileNames: string[] = [`${quotation.id}.pdf`];
       const files = await createFilesFromBlobArray([blob], fileNames);
       setExistingFiles(files);
     }
@@ -256,10 +256,13 @@ export const Actions = ({quotation}: Props) => {
     setIsLoadingFiles(true);
     setIsSendEmailDialogOpen(true);
     // using then to wait for refetch and get download url
-    await refetchDownloadUrl().then(async (res) => {
-      await getExistingFiles(res.data);
-    });
-    setIsLoadingFiles(false);
+    try {
+      await refetchDownloadUrl().then(async (res) => {
+        await getExistingFiles(res.data);
+      });
+    } finally {
+      setIsLoadingFiles(false);
+    }
   };
 
   const actions = (() => {
@@ -441,6 +444,7 @@ export const Actions = ({quotation}: Props) => {
         subject={quotation.subject}
         content={quotation.description}
         existingFiles={existingFiles}
+        customExistingFileName={`${quotation.externalId}.pdf`}
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
@@ -451,13 +455,14 @@ export const Actions = ({quotation}: Props) => {
 
           const allAttachments = emailRecord.attachments || existingFiles;
           const emailAttachments = (emailRecord.attachments || [])?.filter(
-            (emailAttachedFile) =>
-              !existingFiles.find(
-                (existingFile) => existingFile.name === emailAttachedFile.name,
-              ),
+            (el) => el.path,
           );
+          const hasExistingFileToUpload = allAttachments.some((obj, index) => {
+            const isExistingFile = !obj.path && index === 0;
+            return isExistingFile;
+          });
 
-          if (isDraft) {
+          if (isDraft && hasExistingFileToUpload) {
             await uploadFiles({files: existingFiles, uploadPath});
           }
 

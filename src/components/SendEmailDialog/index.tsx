@@ -12,7 +12,7 @@ import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
 import {usePublishQuotation} from 'hooks/reactQuery/useQuotation';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import MultipleAsyncSelect from 'components/MultipleAsyncSelect';
 import {
   ServiceCompanyContactPersonOrderField,
@@ -40,6 +40,7 @@ interface Props {
   callback?: ({email, subject, content}: EmailRecord) => void;
   loadingProgress?: number;
   existingFiles?: FileWithPreview[];
+  customExistingFileName?: string;
   isLoadingFiles?: boolean;
 }
 
@@ -57,6 +58,7 @@ export const SendEmailDialog = ({
   content,
   callback,
   existingFiles,
+  customExistingFileName,
   isLoadingFiles = false,
 }: Props) => {
   const {t} = useTranslation();
@@ -71,6 +73,18 @@ export const SendEmailDialog = ({
 
   const [isCcShown, setIsCcShown] = useState(false);
   const [isBccShown, setIsBccShown] = useState(false);
+
+  const existingFilesWithCustomName = useMemo(
+    () =>
+      existingFiles?.map(
+        (file) =>
+          new File([file], customExistingFileName || file.name, {
+            type: file.type,
+            lastModified: file.lastModified,
+          }),
+      ) as FileWithPreview[],
+    [existingFiles, customExistingFileName],
+  );
 
   const {
     control,
@@ -184,6 +198,11 @@ export const SendEmailDialog = ({
               label: 'userAccount.contact.email',
               value: 'userAccount.contact.email',
             }}
+            searchableKeys={[
+              'userAccount.contact.email',
+              'userAccount.lastName',
+              'userAccount.firstName',
+            ]}
             textFieldProps={{
               label: t('Send to'),
               placeholder:
@@ -245,24 +264,6 @@ export const SendEmailDialog = ({
                 </Typography>
               </li>
             )}
-            filterOptions={(options, state) => {
-              const filteredOptions = options.filter((option) => {
-                const firstName = option.userAccount?.firstName.toLowerCase();
-                const lastName = option.userAccount?.lastName.toLowerCase();
-                const emailText =
-                  option.userAccount?.contact?.email.toLowerCase();
-                const searchText = state.inputValue.toLowerCase();
-                return (
-                  firstName.includes(searchText) ||
-                  lastName.includes(searchText) ||
-                  emailText.includes(searchText) ||
-                  searchText.includes(firstName) ||
-                  searchText.includes(lastName) ||
-                  searchText.includes(emailText)
-                );
-              });
-              return filteredOptions;
-            }}
             // disable options that don't have an email
             getOptionDisabled={(option) => !option.userAccount?.contact?.email}
             name="emails"
@@ -285,6 +286,11 @@ export const SendEmailDialog = ({
                   label: 'userAccount.contact.email',
                   value: 'userAccount.contact.email',
                 }}
+                searchableKeys={[
+                  'userAccount.contact.email',
+                  'userAccount.lastName',
+                  'userAccount.firstName',
+                ]}
                 textFieldProps={{
                   label: t('Cc'),
                   placeholder:
@@ -318,24 +324,6 @@ export const SendEmailDialog = ({
                     </Typography>
                   </li>
                 )}
-                filterOptions={(options, state) => {
-                  const filteredOptions = options.filter((option) => {
-                    const firstName =
-                      option.userAccount?.firstName.toLowerCase();
-                    const lastName = option.userAccount?.lastName.toLowerCase();
-                    const emailText = option.userAccount?.contact?.email;
-                    const searchText = state.inputValue.toLowerCase();
-                    return (
-                      firstName.includes(searchText) ||
-                      lastName.includes(searchText) ||
-                      emailText.includes(searchText) ||
-                      searchText.includes(firstName) ||
-                      searchText.includes(lastName) ||
-                      searchText.includes(emailText)
-                    );
-                  });
-                  return filteredOptions;
-                }}
                 // disable options that don't have an email
                 getOptionDisabled={(option) =>
                   !option.userAccount?.contact?.email
@@ -371,6 +359,11 @@ export const SendEmailDialog = ({
                   label: 'userAccount.contact.email',
                   value: 'userAccount.contact.email',
                 }}
+                searchableKeys={[
+                  'userAccount.contact.email',
+                  'userAccount.lastName',
+                  'userAccount.firstName',
+                ]}
                 textFieldProps={{
                   label: t('Bcc'),
                   placeholder:
@@ -404,24 +397,6 @@ export const SendEmailDialog = ({
                     </Typography>
                   </li>
                 )}
-                filterOptions={(options, state) => {
-                  const filteredOptions = options.filter((option) => {
-                    const firstName =
-                      option.userAccount?.firstName.toLowerCase();
-                    const lastName = option.userAccount?.lastName.toLowerCase();
-                    const emailText = option.userAccount?.contact?.email;
-                    const searchText = state.inputValue.toLowerCase();
-                    return (
-                      firstName.includes(searchText) ||
-                      lastName.includes(searchText) ||
-                      emailText.includes(searchText) ||
-                      searchText.includes(firstName) ||
-                      searchText.includes(lastName) ||
-                      searchText.includes(emailText)
-                    );
-                  });
-                  return filteredOptions;
-                }}
                 // disable options that don't have an email
                 getOptionDisabled={(option) =>
                   !option.userAccount?.contact?.email
@@ -461,7 +436,7 @@ export const SendEmailDialog = ({
             label="Text"
             name="content"
             control={control}
-            existingFiles={existingFiles}
+            existingFiles={existingFilesWithCustomName}
             updateFiles={(files) => setValue('attachments', files)}
           />
         </Box>
