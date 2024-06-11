@@ -153,6 +153,14 @@ export const AppTopBar = ({
                   label: 'Spanish',
                   action: () => changeLanguage('es-ES'),
                 },
+                {
+                  label: 'Greek',
+                  action: () => changeLanguage('gr-GR'),
+                },
+                {
+                  label: 'Turkish',
+                  action: () => changeLanguage('tr-TR'),
+                },
               ]}
             />
           </Box>

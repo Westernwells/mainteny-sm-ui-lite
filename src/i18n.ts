@@ -9,6 +9,8 @@ import ru from './languages/ru.json';
 import da from './languages/dk.json';
 import ka from './languages/ka.json';
 import es from './languages/es.json';
+import gr from './languages/gr.json';
+import tr from './languages/tr.json';
 
 export const resources = {
   de: {
@@ -34,6 +36,12 @@ export const resources = {
   },
   es: {
     translation: es,
+  },
+  gr: {
+    translation: gr,
+  },
+  tr: {
+    translation: tr,
   },
 };
 
