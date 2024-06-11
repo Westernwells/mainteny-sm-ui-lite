@@ -19,7 +19,7 @@ import {PageCard} from 'components/PageCard';
 import {FormLabel} from 'components/form/FormLabel';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Confirm} from 'components/Confirm';
-import {SendEmailDialog} from 'components/SendEmailDialog';
+import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {
@@ -63,6 +63,11 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {EmptySection} from 'components/EmptySection';
 import {PDFContainer} from 'components/PDFContainer';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from 'react-query';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -74,6 +79,16 @@ interface Props {
   quotation: QuotationView;
   quotationActivities: QuotationActivityView[];
   isLoadingDownloadUrl: boolean;
+  refetchDownloadUrl: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
+  ) => Promise<
+    QueryObserverResult<
+      {
+        [key: string]: string;
+      },
+      unknown
+    >
+  >;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -85,6 +100,7 @@ export const ViewQuotation = ({
   quotation,
   quotationActivities,
   isLoadingDownloadUrl,
+  refetchDownloadUrl,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -101,6 +117,8 @@ export const ViewQuotation = ({
     useState(false);
   const [isCreateForm, setIsCreateForm] = useState(false);
   const {elevatorId = ''} = queryString.parse(search);
+  const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
 
   const {data: elevator} =
     typeof elevatorId === 'string'
@@ -232,6 +250,77 @@ export const ViewQuotation = ({
     );
   };
 
+  useEffect(() => {
+    if (quotation) {
+      const quotationElevator = quotation.elevator;
+      setUnit(quotationElevator);
+    }
+  }, [quotation]);
+
+  const generateBlobUrl = async () => {
+    const blob = await pdf(
+      <QuotationPdfTemplate
+        userInfo={user?.userAccount}
+        currentCurrency={currentCurrency}
+        quotation={quotation}
+        selectedLng={company?.language}
+        translate={translate}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
+      />,
+    ).toBlob();
+    setBlobFile(blob);
+    const blobURL = URL.createObjectURL(blob);
+    setFilePathToDownload(blobURL);
+    return blob;
+  };
+
+  useEffect(() => {
+    if (quotation.status === QuotationStatus.DRAFT) {
+      generateBlobUrl();
+    }
+  }, [quotation, headerUrl[headerInfo?.path], footerUrl[footerInfo?.path]]);
+
+  const getExistingFiles = async (
+    fileDownloadUrl:
+      | {
+          [key: string]: string;
+        }
+      | undefined,
+  ) => {
+    // if quotation is not DRAFT -> download file from server
+    if (quotation.status !== QuotationStatus.DRAFT) {
+      const blob = await fetchFile(
+        fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
+      );
+      const fileNames: string[] = [`${quotation.id}.pdf`];
+      const files = await createFilesFromBlobArray([blob], fileNames);
+      setExistingFiles(files);
+
+      // if quotation is DRAFT -> generate file on client
+    } else {
+      const blob = await generateBlobUrl();
+      const fileNames: string[] = [`${quotation.id}.pdf`];
+      const files = await createFilesFromBlobArray([blob], fileNames);
+      setExistingFiles(files);
+    }
+  };
+
+  const handleOpenSendEmail = async () => {
+    setIsLoadingFiles(true);
+    setIsSendEmailDialogOpen(true);
+    // using then to wait for refetch and get download url
+    try {
+      await refetchDownloadUrl().then(async (res) => {
+        await getExistingFiles(res.data);
+      });
+    } finally {
+      setIsLoadingFiles(false);
+    }
+  };
+
   const actions = useMemo(() => {
     const items = [];
 
@@ -245,7 +334,7 @@ export const ViewQuotation = ({
       items.push({
         label: t('Resend'),
         icon: <ReplayIcon />,
-        onClick: () => setIsSendEmailDialogOpen(true),
+        onClick: handleOpenSendEmail,
       });
     }
 
@@ -277,38 +366,6 @@ export const ViewQuotation = ({
     }
     return items;
   }, [downloadUrl]);
-
-  useEffect(() => {
-    if (quotation) {
-      const quotationElevator = quotation.elevator;
-      setUnit(quotationElevator);
-    }
-  }, [quotation]);
-
-  const generateBlobUrl = async () => {
-    const blob = await pdf(
-      <QuotationPdfTemplate
-        userInfo={user?.userAccount}
-        currentCurrency={currentCurrency}
-        quotation={quotation}
-        selectedLng={company?.language}
-        translate={translate}
-        headerPath={headerUrl[headerInfo?.path]}
-        headerInfo={headerInfo}
-        footerPath={footerUrl[footerInfo?.path]}
-        footerInfo={footerInfo}
-      />,
-    ).toBlob();
-    setBlobFile(blob);
-    const blobURL = URL.createObjectURL(blob);
-    setFilePathToDownload(blobURL);
-  };
-
-  useEffect(() => {
-    if (quotation.status === QuotationStatus.DRAFT) {
-      generateBlobUrl();
-    }
-  }, [quotation, headerUrl[headerInfo?.path], footerUrl[footerInfo?.path]]);
 
   return (
     <Box>
@@ -675,7 +732,7 @@ export const ViewQuotation = ({
         }
         primaryButtonAction={() => {
           if (quotation.status === QuotationStatus.DRAFT) {
-            setIsSendEmailDialogOpen(true);
+            handleOpenSendEmail();
           } else {
             setIsDialogOpen(true);
           }
@@ -698,50 +755,33 @@ export const ViewQuotation = ({
         }
         subject={quotation.subject}
         content={quotation.description}
+        existingFiles={existingFiles}
+        isLoadingFiles={isLoadingFiles}
+        customExistingFileName={`${quotation.externalId}.pdf`}
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
           const serviceCompanyId = user?.userAccount.serviceCompany.id;
           const uploadPath = `${serviceCompanyId}/quotations`;
+          const fileNames: string[] = [`${quotation.id}.pdf`];
+          const isDraft = quotation.status === QuotationStatus.DRAFT;
 
-          if (quotation.status !== QuotationStatus.DRAFT) {
-            const blob = await fetchFile(downloadUrl);
-            const fileNames: string[] = [`${quotation.id}.pdf`];
-            const files = await createFilesFromBlobArray([blob], fileNames);
+          const allAttachments = emailRecord.attachments || existingFiles;
+          const emailAttachments = (emailRecord.attachments || [])?.filter(
+            (el) => el.path,
+          );
+          const hasExistingFileToUpload = allAttachments.some((obj, index) => {
+            const isExistingFile = !obj.path && index === 0;
+            return isExistingFile;
+          });
 
-            await sendQuotation({
-              id: quotation.id,
-              body: {
-                pdfPath: `${uploadPath}/${fileNames[0]}`,
-                sentDate: '',
-                email: {
-                  email: '',
-                  subject: emailRecord.subject,
-                  content: emailRecord.content,
-                  emails: [emailRecord.email],
-                  attachments: files.reduce<FileWithPreview[]>(
-                    (newArr: FileWithPreview[], obj) => [
-                      ...newArr,
-                      {
-                        ...obj,
-                        type: obj.type,
-                        uri: `${uploadPath}/${obj.name}`,
-                        description: obj.name.split('.')[0],
-                      },
-                    ],
-                    [],
-                  ),
-                },
-              },
-            });
-
-            setIsConfirmPrintDialogOpen(false);
-            return;
+          if (isDraft && hasExistingFileToUpload) {
+            await uploadFiles({files: existingFiles, uploadPath});
           }
 
-          const fileNames: string[] = [`${quotation.id}.pdf`];
-          const files = await createFilesFromBlobArray([blobFile!], fileNames);
-          await uploadFiles({files, uploadPath});
+          if (emailAttachments.length) {
+            await uploadFiles({files: emailAttachments, uploadPath});
+          }
 
           await sendQuotation({
             id: quotation.id,
@@ -752,17 +792,28 @@ export const ViewQuotation = ({
                 email: '',
                 subject: emailRecord.subject,
                 content: emailRecord.content,
-                emails: [emailRecord.email],
-                attachments: files.reduce<FileWithPreview[]>(
-                  (newArr: FileWithPreview[], obj) => [
-                    ...newArr,
-                    {
-                      ...obj,
-                      type: obj.type,
-                      uri: `${uploadPath}/${obj.name}`,
-                      description: obj.name.split('.')[0],
-                    },
-                  ],
+                emails: emailRecord.emails,
+                ccEmails: emailRecord.ccEmails,
+                bccEmails: emailRecord.bccEmails,
+                attachments: allAttachments.reduce<FileWithPreview[]>(
+                  (newArr: FileWithPreview[], obj, index) => {
+                    // If file is from server -> uri of file should be quotation.id
+                    // If file is from server -> description should be quotation.externalId
+                    const isFileFromServer = !obj.path && index === 0;
+                    return [
+                      ...newArr,
+                      {
+                        ...obj,
+                        type: obj.type,
+                        uri: isFileFromServer
+                          ? `${uploadPath}/${quotation.id}.pdf`
+                          : `${uploadPath}/${obj.name}`,
+                        description: isFileFromServer
+                          ? quotation.externalId
+                          : obj.name.split('.')[0],
+                      },
+                    ];
+                  },
                   [],
                 ),
               },

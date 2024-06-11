@@ -43,7 +43,6 @@ const AttachedFiles = ({
   removeFile,
   isLoadingFiles,
 }: AttachedFilesProps) => {
-  const {t} = useTranslation();
   const handleFilePreview = (file: FileWithPreview) => {
     const fileUrl = URL.createObjectURL(
       new Blob([file], {
@@ -55,9 +54,6 @@ const AttachedFiles = ({
 
     window.open(fileUrl, '_blank');
   };
-
-  if (!files.length && !isLoadingFiles)
-    return <Typography>{t('Failed to load PDF file')}</Typography>;
 
   return isLoadingFiles ? (
     <Box display="flex">
