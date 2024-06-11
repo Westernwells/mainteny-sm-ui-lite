@@ -10,8 +10,12 @@ import FormatUnderlineButton from './buttons/FormatUnderlineButton';
 
 interface Props {
   onOpenFileUpload?: () => void;
+  hasAttachFileButton?: boolean;
 }
-const EditorMenuControls = ({onOpenFileUpload}: Props) => {
+const EditorMenuControls = ({
+  onOpenFileUpload,
+  hasAttachFileButton = true,
+}: Props) => {
   const {editor} = useCurrentEditor();
   return (
     <Box display="flex" flexDirection="column">
@@ -47,7 +51,7 @@ const EditorMenuControls = ({onOpenFileUpload}: Props) => {
           sx={{mx: 0.5, my: 1, border: '0.5px solid #8F9BB380'}}
         />
 
-        <AttachFileButton onClick={onOpenFileUpload} />
+        {hasAttachFileButton && <AttachFileButton onClick={onOpenFileUpload} />}
       </Box>
     </Box>
   );
