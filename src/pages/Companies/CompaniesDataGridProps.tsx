@@ -1,60 +1,112 @@
-import {GridColDef} from '@mui/x-data-grid';
+import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
-import {FormatDate} from 'models/misc';
-import {ServiceCompanyItem} from 'models/service-company';
+import {format} from 'date-fns';
+import {StatusChip} from 'components/StatusChip';
+import {getCompanyStatusStyles} from 'utils/company-utils';
+import {
+  ServiceCompanyItem,
+  ServiceCompanyItemNew,
+} from 'models/service-company';
+import {CompanyStatus} from 'models/company';
+import Actions, {IActions} from './Actions';
 
-export const columns: GridColDef[] = [
+export const getColumns = ({
+  onActivate,
+  onDeactivate,
+  onInternalSwitch,
+  onLiveSwitch,
+}: IActions): GridColDef[] => [
   getColumnProps({
-    field: 'name',
-    headerName: 'Name',
+    field: 'companyName',
+    headerName: 'Company Name',
+    align: 'left',
+    flex: 1.5,
+    cellClassName: 'truncateText',
+  }),
+  getColumnProps({
+    field: 'country',
+    headerName: 'Country',
     align: 'left',
     flex: 1,
   }),
   getColumnProps({
-    field: 'email',
-    headerName: 'email',
+    field: 'noOfUsers',
+    headerName: '# of users',
     align: 'left',
     flex: 1,
   }),
   getColumnProps({
-    field: 'phone',
-    headerName: 'PHONE',
-    align: 'left',
-    flex: 1,
-  }),
-  getColumnProps({
-    field: 'website',
-    headerName: 'WEBSITE',
+    field: 'noOfLicense',
+    headerName: '# of licences',
     align: 'left',
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'address',
-    headerName: 'BILLING ADDRESS',
+    field: 'created',
+    headerName: 'Created',
     align: 'left',
     flex: 1.5,
   }),
   getColumnProps({
-    field: 'createdOn',
-    headerName: 'CREATED ON',
+    field: 'lastActive',
+    headerName: 'Last active',
     align: 'left',
     flex: 1,
+  }),
+  getColumnProps({
+    field: 'status',
+    sortable: true,
+    headerName: 'status',
+    align: 'center',
+    headerAlign: 'center',
+    renderCell: (params: GridRenderCellParams<any, any, any>) => (
+      <StatusChip
+        label={getCompanyStatusStyles(params.value).label}
+        color={getCompanyStatusStyles(params.value).color}
+        variant="filled"
+        size="small"
+        maxChars={9}
+        style={{
+          ...(params.value === CompanyStatus.DEACTIVATED && {color: 'black'}),
+        }}
+      />
+    ),
+    flex: 1,
+  }),
+  getColumnProps({
+    field: 'actions',
+    headerName: 'ACTIONS',
+    flex: 1,
+    headerAlign: 'center',
+    align: 'center',
+    renderCell: (params: GridRenderCellParams<ServiceCompanyItemNew>) => (
+      <Actions
+        companyId={params.row.id}
+        onActivate={onActivate}
+        onLiveSwitch={onLiveSwitch}
+        onDeactivate={onDeactivate}
+        onInternalSwitch={onInternalSwitch}
+        status={params.row.status}
+      />
+    ),
   }),
 ];
 
-export const makeRows = (
-  companies: ServiceCompanyItem[],
-  formatDate: FormatDate = () => '',
-) =>
+export const makeRows = (companies: ServiceCompanyItem[]) =>
   companies
-    ? companies.map((item, index) => ({
-        id: index,
-        name: item?.name,
-        email: item?.contact?.email || '-',
-        phone: item?.contact?.phone || '-',
-        address: item?.billingAddress?.fullName || '-',
-        createdOn: formatDate(item?.meta?.createdAt) || '-',
-        website: item?.contact?.url || '-',
+    ? companies.map((item) => ({
+        id: item.id,
+        companyName: item.name,
+        created: format(new Date(item.meta.createdAt), 'dd.MM.yyyy') || '-',
+        lastActive: item.statistics?.lastActivity
+          ? format(new Date(item.statistics?.lastActivity), 'dd.MM.yyyy') || '-'
+          : '-',
+        status: item.settings.status,
+        country: item?.businessAddress
+          ? item?.businessAddress.component?.country
+          : '-',
+        noOfUsers: item.statistics?.numberOfUsers,
+        noOfLicense: item.settings.userLimits.maxMainUserCount || '-',
         navigateTo: `details/${item.id}`,
       }))
     : [];

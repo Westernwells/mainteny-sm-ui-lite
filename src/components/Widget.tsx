@@ -19,11 +19,14 @@ interface Props {
   btnOnClick?: () => void;
   btnIcon?: JSX.Element;
   containerStyles?: {[key: string]: string | number};
+  searchInputStyles?: {[key: string]: string | number};
   menu?: MenuBtnProps[];
   filterItems?: ReactNode;
   refInput?: RefObject<HTMLInputElement>;
   searchInputVariant?: 'standard' | 'filled' | 'outlined' | undefined;
   width?: string;
+  buttonStyles?: {[key: string]: string | number};
+  buttonLabelStyles?: {[key: string]: string | number};
 }
 
 export const Widget = ({
@@ -41,7 +44,10 @@ export const Widget = ({
   filterItems,
   refInput,
   searchInputVariant,
+  searchInputStyles,
   width,
+  buttonLabelStyles,
+  buttonStyles,
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -51,7 +57,7 @@ export const Widget = ({
       {!hideSearchInput ? (
         <Box sx={{mr: '1em'}}>
           <SearchInput
-            containerStyle={{height: '100%'}}
+            containerStyle={{height: '100%', ...searchInputStyles}}
             placeholder={searchPlaceholder && t(searchPlaceholder)}
             onValueChanged={(value: string) =>
               getSearchValue && getSearchValue(value)
@@ -79,13 +85,17 @@ export const Widget = ({
               sx: {
                 textTransform: 'capitalize',
                 ml: '0.8em',
+                fontSize: '14px',
+                ...buttonStyles,
               },
               variant: 'contained',
               color: 'primary',
               size: 'small',
               startIcon: btnIcon || <AddIcon />,
             }}>
-            <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+            <Typography
+              variant="body1"
+              sx={{textTransform: 'capitalize', ...buttonLabelStyles}}>
               {t(btnLabel)}
             </Typography>
           </Button>
