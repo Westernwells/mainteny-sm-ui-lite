@@ -59,7 +59,7 @@ export const Dialog = ({
         id="alert-dialog-title"
         sx={{
           background: 'white',
-          padding: '1em 1.5em',
+          padding: '1em 1em 1em 2.5em',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -74,7 +74,7 @@ export const Dialog = ({
         <DialogContentText
           id="alert-dialog-description"
           component="div"
-          sx={{color: 'text.primary', mt: '1em'}}>
+          sx={{color: 'text.primary'}}>
           {children}
         </DialogContentText>
       </DialogContent>

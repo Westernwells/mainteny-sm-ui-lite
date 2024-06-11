@@ -141,6 +141,7 @@ interface Props {
   existingFiles?: FileWithPreview[];
   updateFiles?: (files: FileWithPreview[]) => void;
   isLoadingFiles?: boolean;
+  hasAttachFileButton?: boolean;
 }
 const RichTextEditor = ({
   required = false,
@@ -153,6 +154,7 @@ const RichTextEditor = ({
   existingFiles = [],
   isLoadingFiles = false,
   updateFiles,
+  hasAttachFileButton,
 }: Props) => {
   const {t} = useTranslation();
   const dropzoneRef = useRef<{
@@ -182,6 +184,7 @@ const RichTextEditor = ({
           </Box>
           <EditorMenuControls
             onOpenFileUpload={() => dropzoneRef?.current?.open()}
+            hasAttachFileButton={hasAttachFileButton}
           />
         </>
       }
