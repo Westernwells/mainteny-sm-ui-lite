@@ -5,6 +5,7 @@ import Autocomplete, {AutocompleteProps} from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import {Control, Controller} from 'react-hook-form';
 import * as _ from 'lodash';
+import {FilterOptionsState} from '@mui/material';
 import {FormInput} from './form/FormInput';
 
 type NestedKeys<T> = {
@@ -31,6 +32,7 @@ interface Props<T>
     label: NestedKeys<T>;
     value: NestedKeys<T>;
   };
+  searchableKeys?: NestedKeys<T>[];
   textFieldProps?: TextFieldProps;
   name: string;
   control?: Control<any>;
@@ -39,6 +41,7 @@ interface Props<T>
 const AsyncSelect = <T,>({
   queryFn,
   keys: {label: labelKey, value: valueKey},
+  searchableKeys = [],
   textFieldProps,
   name,
   control,
@@ -114,7 +117,21 @@ const AsyncSelect = <T,>({
             getOptionLabel={(option) => _.get(option, labelKey) as string}
             loading={loading}
             options={options}
-            filterOptions={(x) => x}
+            filterOptions={(
+              optionsToFilter: T[],
+              state: FilterOptionsState<T>,
+            ) => {
+              const searchText = state.inputValue.toLowerCase();
+              return optionsToFilter.filter((option) =>
+                searchableKeys.some((key) => {
+                  const value = _.get(option, key)?.toString().toLowerCase();
+                  return (
+                    value?.includes(searchText) ||
+                    searchText.includes(value as string)
+                  );
+                }),
+              );
+            }}
             {...props}
             value={
               fieldValue
