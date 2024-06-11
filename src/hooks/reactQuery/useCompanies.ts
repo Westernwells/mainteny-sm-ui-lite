@@ -22,6 +22,7 @@ import {
   SystemSettingsUpdateBody,
   XeroIntegration,
   ServiceCompanyType,
+  ServiceCompanySystemSettings,
 } from 'models/service-company';
 import {
   useInfiniteQuery,
@@ -37,12 +38,17 @@ import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './useUserSession';
 
-export const getCompanies = async (page: Page, query: string) => {
+export const getCompanies = async (
+  page: Page,
+  query: string,
+  status?: string,
+) => {
   const response = await axiosClient.get<Resource<ServiceCompanyItem>>(
     '/api/serviceCompanies',
     {
       params: {
         query,
+        ...(status && {status}),
         ...page,
       },
       paramsSerializer,
@@ -55,10 +61,11 @@ export function useCompanies(
   page: Page,
   query: string,
   options?: UseQueryOptions<any, any, any>,
+  status?: string,
 ) {
   return useQuery<Resource<ServiceCompanyItem>, RestError>(
-    [queryKeys.fetchCompanies, page, query],
-    () => getCompanies(page, query),
+    [queryKeys.fetchCompanies, page, query, status],
+    () => getCompanies(page, query, status),
     {
       ...options,
     },
@@ -474,6 +481,47 @@ export const useQueryContractPaymentTerms = ({
     {
       enabled: !!user,
       ...options,
+    },
+  );
+};
+
+const updateServiceCompanySystemSettings = async (
+  body: ServiceCompanySystemSettings,
+  companyId: string,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceCompanies/${companyId}/systemSettings`,
+    {
+      ...body,
+    },
+  );
+};
+
+export const useUpdateServiceCompanySystemSettings = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({
+      body,
+      companyId,
+    }: {
+      body: ServiceCompanySystemSettings;
+      companyId: string;
+    }) => updateServiceCompanySystemSettings(body, companyId),
+    {
+      onSuccess: async () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchCompanies);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
     },
   );
 };

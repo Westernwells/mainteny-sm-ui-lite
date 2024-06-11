@@ -12,6 +12,7 @@ import {
 import {ServiceOrderSummary, ServiceOrderType} from './service-order';
 import {TechnicianEventView} from './technician';
 import {ArticleView} from './article';
+import {CompanyStatus} from './company';
 
 export enum MinToStep {
   STEP_0 = 0,
@@ -97,6 +98,10 @@ export interface ServiceCompany {
   billingAddress?: Address;
   postalAddress?: Address;
   businessAddress?: Address;
+  statistics?: {
+    numberOfUsers: number;
+    lastActivity?: Date;
+  };
   language: Language;
   meta: Meta;
   settings: Settings;
@@ -333,4 +338,26 @@ export enum AccountSystems {
   'SKR 03' = 'SKR 03',
   'SKR 04' = 'SKR 04',
   'SKR 07' = 'SKR 07',
+}
+
+export interface ServiceCompanyItemNew {
+  id: number;
+  companyName: string;
+  country: string;
+  noOfUsers: number;
+  noOfLicense: number;
+  created: string;
+  lastActive: string;
+  status: string;
+}
+
+export interface ServiceCompanySystemSettings {
+  nightlyShuffleEnabled: boolean;
+  companyDispatchStrategy: string;
+  serviceCompanyStatus: CompanyStatus;
+  expiryDate: string;
+  userLimits: {
+    maxMainUserCount: number;
+    maxContractorCount: number;
+  };
 }
