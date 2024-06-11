@@ -2566,5 +2566,14 @@
   "Arbitration court": "Schiedsgericht",
   "Trade registration number": "Handelsregisternummer",
   "Edit Legal": "Rechtliches bearbeiten",
-  "Auto Generate ID": "ID automatisch generieren"
+  "Auto Generate ID": "ID automatisch generieren",
+  "Live": "Live",
+  "Test": "Test",
+  "Internal": "Intern",
+  "COMPANY NAME": "FIRMEN NAME",
+  "COUNTRY": "LAND",
+  "# OF USERS": "ANZAHL NUTZER",
+  "# OF LICENCES": "ANZAHL LIZENZEN",
+  "CREATED": "ANGELEGT",
+  "LAST ACTIVE": "ZULETZT AKTIV"
 }

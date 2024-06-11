@@ -2600,5 +2600,14 @@
   "Arbitration court": "Corte de arbitraje",
   "Trade registration number": "Número de registro comercial",
   "Edit Legal": "Editar Legal",
-  "Auto Generate ID": "Generar ID automáticamente"
+  "Auto Generate ID": "Generar ID automáticamente",
+  "Live": "En vivo",
+  "Test": "Prueba",
+  "Internal": "Interno",
+  "COMPANY NAME": "NOMBRE DE LA EMPRESA",
+  "COUNTRY": "PAÍS",
+  "# OF USERS": "# NÚMERO DE USUARIOS",
+  "# OF LICENCES": "# NÚMERO DE LICENCIAS",
+  "CREATED": "CREADO",
+  "LAST ACTIVE": "ÚLTIMO ACTIVO"
 }
