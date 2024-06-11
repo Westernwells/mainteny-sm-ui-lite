@@ -126,7 +126,7 @@ export interface QuotationFilters {}
 
 export interface QuotationFormData {
   serviceCompanyId: string;
-  elevatorId?: string;
+  elevatorId?: string | null;
   externalId?: string;
   subject: string;
   description: string;
