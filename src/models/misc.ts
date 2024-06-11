@@ -341,6 +341,8 @@ export enum Language {
   DA_DK = 'DA_DK',
   KA_GE = 'KA_GE',
   ES_ES = 'ES_ES',
+  GR_GR = 'GR_GR',
+  TR_TR = 'TR_TR',
 }
 
 export interface Coord {
