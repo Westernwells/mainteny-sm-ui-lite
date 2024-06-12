@@ -256,16 +256,10 @@ const ChecklistPdf = ({
                 </Text>
               </View>
 
-              <View>
-                {sortedChecklistComponents?.map((component, index) => (
-                  <PdfChecklistComponent
-                    key={component.id}
-                    component={component}
-                    selectedLng={selectedLng}
-                    index={index}
-                  />
-                ))}
-              </View>
+              <PdfChecklistComponent
+                components={sortedChecklistComponents!}
+                selectedLng={selectedLng}
+              />
             </View>
 
             {signaturePath && (
