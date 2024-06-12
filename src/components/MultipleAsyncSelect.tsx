@@ -36,6 +36,11 @@ interface Props<T>
   textFieldProps?: TextFieldProps;
   name: string;
   control?: Control<any>;
+  onInputValueChange?: (value: string) => void;
+  initialValues?: {
+    label: string;
+    value: unknown;
+  }[];
 }
 
 const MultipleAsyncSelect = <T,>({
@@ -45,10 +50,20 @@ const MultipleAsyncSelect = <T,>({
   name,
   control,
   searchableKeys = [],
+  onInputValueChange,
+  initialValues,
   ...props
 }: Props<T>) => {
   const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState<readonly T[]>([]);
+  const [options, setOptions] = useState<readonly T[]>(
+    initialValues
+      ? (initialValues.map((option) => ({
+          [labelKey]: option.label,
+          [valueKey]: option.value,
+        })) as T[])
+      : [],
+  );
+
   const [query, setQuery] = useState<string>('');
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(open && options.length === 0);
@@ -95,12 +110,14 @@ const MultipleAsyncSelect = <T,>({
   const onInputChange = (searchText: string) => {
     setInputValue(searchText);
     debouncedChangeHandler(searchText);
+    onInputValueChange?.(searchText);
   };
 
   return (
     <Controller
       name={name}
       control={control}
+      defaultValue={initialValues?.map((option) => option.value)}
       render={({field}) => {
         const {onChange, value: fieldValue} = field;
 
