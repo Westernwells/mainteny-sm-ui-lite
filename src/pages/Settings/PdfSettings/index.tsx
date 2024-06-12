@@ -419,6 +419,7 @@ const PdfSettings = ({company}: Props) => {
             objectFit: 'contain',
             position: 'absolute',
           }}
+          crossOrigin="anonymous"
         />
       </Box>
     ) : (

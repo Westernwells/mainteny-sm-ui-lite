@@ -252,6 +252,7 @@ const NewDropZone: React.FC<Props> = ({
                 maxHeight: `${BIG_SCREEN_DROPZONE_HEIGHT}px`,
                 position: 'absolute',
               }}
+              crossOrigin="anonymous"
             />
             {showHandles && (
               <>
