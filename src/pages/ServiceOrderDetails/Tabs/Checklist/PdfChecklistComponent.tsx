@@ -5,6 +5,11 @@ import CheckBoxOutlineBlank from 'assets/icons/CheckBoxOutlineBlank.png';
 import RadioButtonChecked from 'assets/icons/RadioButtonChecked.png';
 import TextSnippet from 'assets/icons/TextSnippet.png';
 
+interface PdfChecklistComponentProps {
+  components: CheckListComponentView[];
+  selectedLng?: string;
+}
+
 interface ComponentProps {
   component: CheckListComponentView;
   selectedLng?: string;
@@ -16,6 +21,9 @@ interface ExtendedComponentProps extends ComponentProps {
 
 const getStyles = (boldFontStyle?: {fontFamily: string}) =>
   StyleSheet.create({
+    container: {
+      width: '100%',
+    },
     subject: {
       fontSize: 10,
       color: '#212121',
@@ -101,10 +109,9 @@ export const MultiChoiceComponent = ({
   return (
     <View style={styles.multiChoiceContainer}>
       <View style={styles.multiChoiceHeader}>
-        <Text style={styles.multiChoiceIndex}>{index + 1}</Text>
+        <Text style={styles.multiChoiceIndex}>{index}</Text>
         <Text style={styles.multiChoiceHeaderContent}>{component.subject}</Text>
       </View>
-
       <View style={styles.multiChoiceContent}>
         {component.additionalInfo.options.map((option, optionIndex) => (
           <View
@@ -191,16 +198,17 @@ export const TextComponent = ({
           {component.subject}
         </Text>
       </View>
-
       {component.additionalInfo.note && (
         <View style={styles.textNoteContainer}>
           <Image
             src={TextSnippet}
-            style={{width: 12, height: 12, flex: '0 0 3%'}}
+            style={{
+              width: 12,
+              height: 12,
+              paddingRight: 7,
+            }}
           />
-          <Text style={{flex: '0 0 97%', paddingLeft: 4}}>
-            {component.additionalInfo.note}
-          </Text>
+          <Text>{component.additionalInfo.note}</Text>
         </View>
       )}
     </View>
@@ -208,28 +216,67 @@ export const TextComponent = ({
 };
 
 export const PdfChecklistComponent = ({
-  component,
+  components,
   selectedLng,
-  index,
-}: ExtendedComponentProps) =>
-  component.type === CheckListComponentType.SINGLE_CHECK ? (
-    <MultiChoiceComponent
-      component={component}
-      selectedLng={selectedLng}
-      index={index}
-    />
-  ) : component.type === CheckListComponentType.YES_NO ? (
-    <CheckboxComponent
-      component={component}
-      selectedLng={selectedLng}
-      index={index}
-    />
-  ) : component.type === CheckListComponentType.HEAD ? (
-    <HeaderComponent component={component} selectedLng={selectedLng} />
-  ) : component.type === CheckListComponentType.TEXT ? (
-    <TextComponent
-      component={component}
-      selectedLng={selectedLng}
-      index={index}
-    />
-  ) : null;
+}: PdfChecklistComponentProps) => {
+  const boldFontStyle = {
+    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+  };
+
+  const styles = getStyles(boldFontStyle);
+
+  let index = 1;
+
+  const renderComponent = (component: CheckListComponentView) => {
+    switch (component.type) {
+      case CheckListComponentType.SINGLE_CHECK: {
+        const currentIndex = index;
+        index += 1;
+        return (
+          <MultiChoiceComponent
+            component={component}
+            selectedLng={selectedLng}
+            index={currentIndex}
+          />
+        );
+      }
+      case CheckListComponentType.YES_NO: {
+        const currentIndex = index;
+        index += 1;
+        return (
+          <CheckboxComponent
+            component={component}
+            selectedLng={selectedLng}
+            index={currentIndex}
+          />
+        );
+      }
+      case CheckListComponentType.HEAD: {
+        return (
+          <HeaderComponent component={component} selectedLng={selectedLng} />
+        );
+      }
+      case CheckListComponentType.TEXT: {
+        const currentIndex = index;
+        index += 1;
+        return (
+          <TextComponent
+            component={component}
+            selectedLng={selectedLng}
+            index={currentIndex}
+          />
+        );
+      }
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      {components.map((component, idx) => (
+        <View key={idx}>{renderComponent(component)}</View>
+      ))}
+    </View>
+  );
+};
