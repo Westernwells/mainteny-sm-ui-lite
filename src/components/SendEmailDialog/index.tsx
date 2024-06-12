@@ -98,7 +98,7 @@ export const SendEmailDialog = ({
       email: email || '',
       subject: subject || '',
       content: content || '',
-      emails: [],
+      emails: email ? [email] : [],
       ccEmails: [],
       bccEmails: [],
       attachments: [],
@@ -198,11 +198,13 @@ export const SendEmailDialog = ({
               label: 'userAccount.contact.email',
               value: 'userAccount.contact.email',
             }}
+            initialValues={[{label: email || '', value: email}]}
             searchableKeys={[
               'userAccount.contact.email',
               'userAccount.lastName',
               'userAccount.firstName',
             ]}
+            onInputValueChange={(value) => setEmailInputValue(value)}
             textFieldProps={{
               label: t('Send to'),
               placeholder:
@@ -215,7 +217,6 @@ export const SendEmailDialog = ({
                   paddingRight: '60px',
                 },
               },
-              onChange: (e) => setEmailInputValue(e.target.value),
               error: !!errors.emails,
               required: true,
               InputProps: {
@@ -291,6 +292,7 @@ export const SendEmailDialog = ({
                   'userAccount.lastName',
                   'userAccount.firstName',
                 ]}
+                onInputValueChange={(value) => setCcEmailsInputValue(value)}
                 textFieldProps={{
                   label: t('Cc'),
                   placeholder:
@@ -303,7 +305,6 @@ export const SendEmailDialog = ({
                       paddingRight: '60px',
                     },
                   },
-                  onChange: (e) => setCcEmailsInputValue(e.target.value),
                 }}
                 renderOption={(props, option) => (
                   <li
@@ -364,6 +365,7 @@ export const SendEmailDialog = ({
                   'userAccount.lastName',
                   'userAccount.firstName',
                 ]}
+                onInputValueChange={(value) => setBccEmailsInputValue(value)}
                 textFieldProps={{
                   label: t('Bcc'),
                   placeholder:
@@ -376,7 +378,6 @@ export const SendEmailDialog = ({
                       paddingRight: '60px',
                     },
                   },
-                  onChange: (e) => setBccEmailsInputValue(e.target.value),
                 }}
                 renderOption={(props, option) => (
                   <li
@@ -432,6 +433,7 @@ export const SendEmailDialog = ({
             )}
           />
           <RichTextEditor
+            required
             isLoadingFiles={isLoadingFiles}
             label="Text"
             name="content"
@@ -473,9 +475,9 @@ export const SendEmailDialog = ({
                 disabled:
                   isPublishing ||
                   confirmBtnDisabled ||
-                  (watch('emails')?.length === 0 && emailInputValue === '') ||
-                  watch('subject')?.length === 0 ||
-                  Object.keys(errors).length > 0,
+                  (!watch('emails')?.length && emailInputValue === '') ||
+                  !watch('subject') ||
+                  watch('content') === '<p></p>',
                 onClick: handleSubmit(onSubmit),
               }}>
               <Typography variant="subtitle2">{t(confirmBtnLabel)}</Typography>
