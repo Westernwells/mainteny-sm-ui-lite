@@ -148,11 +148,9 @@ const PdfSettings = ({company}: Props) => {
     const initialX = BIG_SCREEN_WIDTH - 320 - 40;
 
     if (isFooter) {
-      setFooterPosition({x: initialX, y: 30});
-      setFooterDimensions({width: 258, height: 52});
+      setFooterPosition({x: initialX, y: 25});
     } else {
-      setHeaderPosition({x: initialX, y: 30});
-      setHeaderDimensions({width: 258, height: 52});
+      setHeaderPosition({x: initialX, y: 25});
     }
   };
 
@@ -160,7 +158,6 @@ const PdfSettings = ({company}: Props) => {
     setShowBigger(false);
     setHeaderFile(null);
     setFooterFile(null);
-
     initializeDimensions(clientStorageData);
   };
 
