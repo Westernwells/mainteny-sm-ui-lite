@@ -23,7 +23,7 @@ import {
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
-import {SendEmailDialog} from 'components/SendEmailDialog';
+import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import RichTextField from 'components/RichTextField';
 import {
   useDownloadFileWithCustomName,
@@ -50,7 +50,7 @@ import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {pdf} from '@react-pdf/renderer';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
-import {PdfGenerationStatus, SimpleEmailRecord} from 'models/misc';
+import {EmailRecord, PdfGenerationStatus} from 'models/misc';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
@@ -86,6 +86,9 @@ export const WorkReport = ({serviceOrder}: Props) => {
   const [report, setReport] = useState<ServiceOrderReportView | undefined>(
     serviceOrder?.reports?.[0],
   );
+
+  const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
 
   const schedule = serviceOrder.schedules.find(
     (s) => s.technician.id === report?.technicianId,
@@ -205,25 +208,28 @@ export const WorkReport = ({serviceOrder}: Props) => {
     path: string,
     fileReport?: ServiceOrderReportView,
   ) =>
-    files.reduce<FileWithPreview[]>(
-      (newArr: FileWithPreview[], obj) => [
+    files.reduce<FileWithPreview[]>((newArr: FileWithPreview[], obj, index) => {
+      // If file is from server -> uri of file should be report.id
+      // If file is from server -> description should be report.externalId || report.number
+      const isFileFromServer = !obj.path && index === 0;
+      return [
         ...newArr,
         {
           ...obj,
           type: obj.type,
-          uri: `${path}/${obj.name}`,
-          description:
-            fileReport?.externalId ||
-            fileReport?.number ||
-            obj.name.split('.')[0],
+          uri: isFileFromServer
+            ? `${path}/${report?.id}.pdf`
+            : `${path}/${obj.name}`,
+          description: isFileFromServer
+            ? fileReport?.externalId || fileReport?.number
+            : obj.name.split('.')[0],
         },
-      ],
-      [],
-    );
+      ];
+    }, []);
 
   const sendEmailReport = async (
     emailServiceOrder: ServiceOrderView,
-    values: SimpleEmailRecord,
+    values: EmailRecord,
     files: FileWithPreview[],
     pdfPath: string,
     uploadPath: string,
@@ -236,8 +242,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
           technicianId: fileReport?.technicianId!,
           pdfPath,
           email: {
-            emails: [values.email] || [],
-            email: values.email,
+            email: '',
+            emails: values.emails,
+            ccEmails: values.ccEmails,
+            bccEmails: values.bccEmails,
             subject: values.subject,
             content: values.content,
             attachments: createEmailAttachments(files, uploadPath, fileReport),
@@ -248,40 +256,79 @@ export const WorkReport = ({serviceOrder}: Props) => {
     );
   };
 
-  const onSubmitHandler = async (values: SimpleEmailRecord) => {
+  const getExistingFiles = async (
+    fileDownloadUrl:
+      | {
+          [key: string]: string;
+        }
+      | undefined,
+  ) => {
     const fileNames: string[] = [`${report?.id}.pdf`];
     let files: FileWithPreview[] = [];
-    const uploadPath = `${serviceCompanyId}/reports/${report?.id}`;
 
     if (
       report?.additionalInfo &&
       report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
     ) {
       const blob = await fetchFile(
-        downloadUrl ? Object.values(downloadUrl)[0] : '',
+        fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
       );
       files = await createFilesFromBlobArray([blob], fileNames);
-      await sendEmailReport(
-        serviceOrder,
-        values,
-        files,
-        report?.additionalInfo.pdfPath!,
-        uploadPath,
-        report,
-      );
+      setExistingFiles(files);
     } else {
       const blobFile = await generateWorkReportPdf();
       files = await createFilesFromBlobArray([blobFile!], fileNames);
-      await uploadFiles({files, uploadPath});
-      await sendEmailReport(
-        serviceOrder,
-        values,
-        files,
-        `${uploadPath}/${fileNames[0]}`,
-        uploadPath,
-        report,
-      );
+      setExistingFiles(files);
     }
+  };
+
+  const handleOpenSendEmail = async () => {
+    setIsLoadingFiles(true);
+    setIsSendEmailDialogOpen(true);
+    // using 'then' to wait for refetch and get download url
+    try {
+      await refetchDownloadUrl().then(async (res) => {
+        await getExistingFiles(res.data);
+      });
+    } finally {
+      setIsLoadingFiles(false);
+    }
+  };
+
+  const onSubmitHandler = async (values: EmailRecord) => {
+    const fileNames: string[] = [`${report?.id}.pdf`];
+    const uploadPath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report`;
+    const isPDFGenerated =
+      report?.additionalInfo &&
+      report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
+
+    const allAttachments = values.attachments || existingFiles;
+    const emailAttachments = (values.attachments || [])?.filter(
+      (el) => el.path,
+    );
+    const hasExistingFileToUpload = allAttachments.some((obj, index) => {
+      const isExistingFile = !obj.path && index === 0;
+      return isExistingFile;
+    });
+
+    if (!isPDFGenerated && hasExistingFileToUpload) {
+      await uploadFiles({files: existingFiles, uploadPath});
+    }
+
+    if (emailAttachments.length) {
+      await uploadFiles({files: emailAttachments, uploadPath});
+    }
+
+    await sendEmailReport(
+      serviceOrder,
+      values,
+      allAttachments,
+      isPDFGenerated
+        ? report?.additionalInfo.pdfPath!
+        : `${uploadPath}/${fileNames[0]}`,
+      uploadPath,
+      report,
+    );
   };
 
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
@@ -620,9 +667,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
               variant: 'contained',
               disabled: isImageLoading,
               startIcon: <SendIcon />,
-              onClick: () => {
-                setIsSendEmailDialogOpen(true);
-              },
+              onClick: handleOpenSendEmail,
             }}>
             <Typography variant="subtitle2">{t('Send Work Report')}</Typography>
           </Button>
@@ -674,6 +719,9 @@ export const WorkReport = ({serviceOrder}: Props) => {
         confirmBtnDisabled={sendingWorkReport}
         title="Send work report"
         confirmBtnLabel="Send Work Report"
+        existingFiles={existingFiles}
+        isLoadingFiles={isLoadingFiles}
+        customExistingFileName={`${report?.externalId}.pdf`}
         email={
           serviceOrder.elevator.propertyOwner?.additionalInfo.billingEmail ||
           serviceOrder.elevator.propertyOwner?.contact.email
