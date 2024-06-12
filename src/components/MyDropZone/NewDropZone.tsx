@@ -59,14 +59,44 @@ const NewDropZone: React.FC<Props> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const onDrop = (acceptedFiles: File[]) => {
-    const fileWithPreview = Object.assign(acceptedFiles[0], {
-      preview: URL.createObjectURL(acceptedFiles[0]),
-    });
-    setFile(fileWithPreview);
-    setShowHandles(true);
-    getAcceptedFiles?.([fileWithPreview]);
-  };
+    const preview = URL.createObjectURL(acceptedFiles[0]);
 
+    const img = new Image();
+    img.src = preview;
+
+    img.onload = () => {
+      const maxWidth = BIG_SCREEN_WIDTH;
+      const maxHeight = 110; // The desired maximum height
+
+      const aspectRatio = img.width / img.height;
+      let newWidth = img.width;
+      let newHeight = img.height;
+
+      if (newHeight > maxHeight) {
+        newHeight = maxHeight;
+        newWidth = maxHeight * aspectRatio;
+      }
+
+      if (newWidth > maxWidth) {
+        newWidth = maxWidth;
+        newHeight = maxWidth / aspectRatio;
+      }
+
+      const fileWithPreview = Object.assign(acceptedFiles[0], {
+        preview,
+        width: img.width,
+        height: img.height,
+      });
+
+      setFile(fileWithPreview);
+      setDimensions({
+        width: newWidth,
+        height: newHeight,
+      });
+      setShowHandles(true);
+      getAcceptedFiles?.([fileWithPreview]);
+    };
+  };
   const {getRootProps, getInputProps, open} = useDropzone({
     accept: acceptedFileTypes.reduce((acc, type) => {
       acc[type] = [];

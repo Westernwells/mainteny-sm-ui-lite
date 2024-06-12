@@ -232,151 +232,151 @@ const InvoiceOverduePdfPreview = ({
               )}
             </View>
           </TopSectionContainer>
-        </PdfBodyContainer>
 
-        <View>
-          <PdfPageTitle selectedLng={selectedLng}>
-            {formik?.values.subject}
-          </PdfPageTitle>
+          <View>
+            <PdfPageTitle selectedLng={selectedLng}>
+              {formik?.values.subject}
+            </PdfPageTitle>
 
-          {formik?.values?.description && (
-            <View>
-              <HtmlPDF
-                html={formik?.values?.description || ''}
-                rootStyle={styles.contentBody}
-              />
-            </View>
-          )}
-
-          <View style={styles.table}>
-            <View style={styles.tableHead}>
-              <View style={styles.tableRow}>
-                <Text
-                  style={{
-                    width: '5%',
-                    textAlign: 'left',
-                    marginRight: 10,
-                    ...styles.tableHeading,
-                  }}>
-                  #
-                </Text>
-                <Text
-                  style={{
-                    width: '70%',
-                    textAlign: 'left',
-                    ...styles.tableHeading,
-                  }}>
-                  {translate('Name')}
-                </Text>
-                <Text
-                  style={{
-                    width: '25%',
-                    textAlign: 'right',
-                    ...styles.tableHeading,
-                  }}>
-                  {`${translate('Total incl. VAT')} (${
-                    currentCurrency?.symbol
-                  })`}
-                </Text>
+            {formik?.values?.description && (
+              <View>
+                <HtmlPDF
+                  html={formik?.values?.description || ''}
+                  rootStyle={styles.contentBody}
+                />
               </View>
-            </View>
+            )}
 
-            <View style={styles.dataBody}>
-              <View style={styles.tableRow}>
-                <Text
-                  style={{
-                    width: '5%',
-                    textAlign: 'left',
-                    marginRight: 10,
-                    color: '#212121',
-                  }}>
-                  1
-                </Text>
-                <Text
-                  style={{
-                    width: '75%',
-                    textAlign: 'left',
-                    color: '#212121',
-                  }}>
-                  {translate('Initial amount')}
-                </Text>
-                <Text
-                  style={{
-                    width: '20%',
-                    textAlign: 'right',
-                    color: '#212121',
-                  }}>
-                  {formatCurrency(formik?.values.initialAmount ?? 0, {
-                    currency: currentCurrency?.code,
-                    excludeCurrencySymbol: true,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  })}
-                </Text>
+            <View style={styles.table}>
+              <View style={styles.tableHead}>
+                <View style={styles.tableRow}>
+                  <Text
+                    style={{
+                      width: '5%',
+                      textAlign: 'left',
+                      marginRight: 10,
+                      ...styles.tableHeading,
+                    }}>
+                    #
+                  </Text>
+                  <Text
+                    style={{
+                      width: '70%',
+                      textAlign: 'left',
+                      ...styles.tableHeading,
+                    }}>
+                    {translate('Name')}
+                  </Text>
+                  <Text
+                    style={{
+                      width: '25%',
+                      textAlign: 'right',
+                      ...styles.tableHeading,
+                    }}>
+                    {`${translate('Total incl. VAT')} (${
+                      currentCurrency?.symbol
+                    })`}
+                  </Text>
+                </View>
               </View>
 
-              <View style={styles.tableRow}>
-                <Text
-                  style={{
-                    width: '5%',
-                    textAlign: 'left',
-                    marginRight: 10,
-                    color: '#212121',
-                  }}>
-                  2
-                </Text>
-                <Text
-                  style={{
-                    width: '70%',
-                    textAlign: 'left',
-                    color: '#212121',
-                  }}>
-                  {translate('Handling fee')}
-                </Text>
-                <Text
-                  style={{
-                    width: '25%',
-                    textAlign: 'right',
-                    color: '#212121',
-                  }}>
-                  {formatCurrency(formik.values.handlingFee ?? 0, {
-                    currency: currentCurrency?.code,
-                    excludeCurrencySymbol: true,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  })}
-                </Text>
-              </View>
-            </View>
+              <View style={styles.dataBody}>
+                <View style={styles.tableRow}>
+                  <Text
+                    style={{
+                      width: '5%',
+                      textAlign: 'left',
+                      marginRight: 10,
+                      color: '#212121',
+                    }}>
+                    1
+                  </Text>
+                  <Text
+                    style={{
+                      width: '75%',
+                      textAlign: 'left',
+                      color: '#212121',
+                    }}>
+                    {translate('Initial amount')}
+                  </Text>
+                  <Text
+                    style={{
+                      width: '20%',
+                      textAlign: 'right',
+                      color: '#212121',
+                    }}>
+                    {formatCurrency(formik?.values.initialAmount ?? 0, {
+                      currency: currentCurrency?.code,
+                      excludeCurrencySymbol: true,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    })}
+                  </Text>
+                </View>
 
-            <View>
-              <View style={styles.tableRow}>
-                <Text style={{width: '42%'}} />
-                <Text
-                  style={{
-                    width: '38%',
-                    textAlign: 'left',
-                    ...styles.amountText,
-                  }}>
-                  {`${translate('Outstanding amount incl. VAT')} (${
-                    currentCurrency?.symbol
-                  })`}
-                </Text>
-                <Text
-                  style={{
-                    width: '20%',
-                    textAlign: 'right',
-                    ...styles.amountText,
-                  }}>
-                  {overdueTotal(
-                    formik.values.initialAmount,
-                    formik.values.handlingFee,
-                  )}
-                </Text>
+                <View style={styles.tableRow}>
+                  <Text
+                    style={{
+                      width: '5%',
+                      textAlign: 'left',
+                      marginRight: 10,
+                      color: '#212121',
+                    }}>
+                    2
+                  </Text>
+                  <Text
+                    style={{
+                      width: '70%',
+                      textAlign: 'left',
+                      color: '#212121',
+                    }}>
+                    {translate('Handling fee')}
+                  </Text>
+                  <Text
+                    style={{
+                      width: '25%',
+                      textAlign: 'right',
+                      color: '#212121',
+                    }}>
+                    {formatCurrency(formik.values.handlingFee ?? 0, {
+                      currency: currentCurrency?.code,
+                      excludeCurrencySymbol: true,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    })}
+                  </Text>
+                </View>
+              </View>
+
+              <View>
+                <View style={styles.tableRow}>
+                  <Text style={{width: '42%'}} />
+                  <Text
+                    style={{
+                      width: '38%',
+                      textAlign: 'left',
+                      ...styles.amountText,
+                    }}>
+                    {`${translate('Outstanding amount incl. VAT')} (${
+                      currentCurrency?.symbol
+                    })`}
+                  </Text>
+                  <Text
+                    style={{
+                      width: '20%',
+                      textAlign: 'right',
+                      ...styles.amountText,
+                    }}>
+                    {overdueTotal(
+                      formik.values.initialAmount,
+                      formik.values.handlingFee,
+                    )}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
+        </PdfBodyContainer>
 
         <PdfTemplateFooter
           userInfo={userInfo}
