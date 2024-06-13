@@ -2624,5 +2624,8 @@
   "Do you want to delete \"{{textBlockName}}\" from this list?": "¿Quieres eliminar \"{{textBlockName}}\" de esta lista?",
   "Word Count": "Recuento de palabras",
   "Created": "Creado",
-  "Failed to load PDF file": "No se pudo cargar el archivo PDF"
+  "Failed to load PDF file": "No se pudo cargar el archivo PDF",
+  "Text Blocks": "Bloques de texto",
+  "WORD COUNT": "RECUENTO DE PALABRAS",
+  "EDITED": "EDITADO"
 }
