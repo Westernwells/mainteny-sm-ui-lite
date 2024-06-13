@@ -157,7 +157,6 @@ export const SendEmailDialog = ({
       open={open || false}
       onClose={() => {
         onClose();
-        handleResetForm();
       }}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
@@ -477,6 +476,7 @@ export const SendEmailDialog = ({
                   confirmBtnDisabled ||
                   (!watch('emails')?.length && emailInputValue === '') ||
                   !watch('subject') ||
+                  !watch('content') ||
                   watch('content') === '<p></p>',
                 onClick: handleSubmit(onSubmit),
               }}>

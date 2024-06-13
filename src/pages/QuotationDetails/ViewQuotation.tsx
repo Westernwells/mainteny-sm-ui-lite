@@ -175,7 +175,8 @@ export const ViewQuotation = ({
 
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutateAsync: printQuotation} = usePrintQuotation();
-  const {mutateAsync: sendQuotation} = useSendQuotation();
+  const {mutateAsync: sendQuotation, isLoading: sendingQuotation} =
+    useSendQuotation();
 
   const formik = useFormik({
     initialValues: {
@@ -748,7 +749,7 @@ export const ViewQuotation = ({
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={quotation.id}
-        confirmBtnDisabled={!isPDFGenerated}
+        confirmBtnDisabled={sendingQuotation}
         email={
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
           quotation?.elevator?.propertyOwner?.contact.email
