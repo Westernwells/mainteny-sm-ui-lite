@@ -44,6 +44,14 @@ export const languages = [
     label: 'Spanish',
     value: 'es-es',
   },
+  {
+    label: 'Greek',
+    value: 'gr-gr',
+  },
+  {
+    label: 'Turkish',
+    value: 'tr-tr',
+  },
 ];
 
 export const timeFormats = [
