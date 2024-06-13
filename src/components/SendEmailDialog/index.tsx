@@ -157,6 +157,7 @@ export const SendEmailDialog = ({
       open={open || false}
       onClose={() => {
         onClose();
+        setValue('emails', email ? [email] : []);
       }}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
