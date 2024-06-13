@@ -37,12 +37,15 @@ interface AttachedFilesProps {
   files: FileWithPreview[];
   removeFile: ((fileKey: string) => void) | undefined;
   isLoadingFiles?: boolean;
+  hasAttachFileButton?: boolean;
 }
 const AttachedFiles = ({
   files = [],
   removeFile,
   isLoadingFiles,
+  hasAttachFileButton,
 }: AttachedFilesProps) => {
+  const {t} = useTranslation();
   const handleFilePreview = (file: FileWithPreview) => {
     const fileUrl = URL.createObjectURL(
       new Blob([file], {
@@ -54,6 +57,9 @@ const AttachedFiles = ({
 
     window.open(fileUrl, '_blank');
   };
+
+  if (!files.length && !isLoadingFiles && hasAttachFileButton)
+    return <Typography>{t('Failed to load PDF file')}</Typography>;
 
   return isLoadingFiles ? (
     <Box display="flex">
@@ -180,6 +186,7 @@ const RichTextEditor = ({
               isLoadingFiles={isLoadingFiles}
               files={files}
               removeFile={dropzoneRef?.current?.removeFile}
+              hasAttachFileButton={false}
             />
           </Box>
           <EditorMenuControls
