@@ -2590,5 +2590,7 @@
   "Do you want to delete \"{{textBlockName}}\" from this list?": "Möchtest du \"{{textBlockName}}\" aus der liste entfernen?",
   "Word Count": "Wortanzahl",
   "Created": "Erstellt",
-  "Failed to load PDF file": "PDF Ladevorgang abgebrochen"
+  "Failed to load PDF file": "PDF Ladevorgang abgebrochen",
+  "WORD COUNT": "WORTANZAHL",
+  "EDITED": "EDITIERT"
 }
