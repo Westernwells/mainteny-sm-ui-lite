@@ -46,7 +46,7 @@ export const languages = [
   },
   {
     label: 'Greek',
-    value: 'gr-gr',
+    value: 'el-gr',
   },
   {
     label: 'Turkish',
