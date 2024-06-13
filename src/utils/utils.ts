@@ -107,7 +107,7 @@ export const languageMap: {[key: string]: string} = {
   'da-DK': 'da-dk',
   'ka-GE': 'ka-ge',
   'es-ES': 'es-es',
-  'el-GR': 'el-gr',
+  'gr-GR': 'gr-gr',
   'tr-TR': 'tr-tr',
 };
 
@@ -120,13 +120,12 @@ export const mapLanguageToLocale: {[key: string]: string} = {
   'da-DK': 'da',
   'ka-GE': 'ka',
   'es-ES': 'es',
-  'el-GR': 'gr',
+  'gr-GR': 'gr',
   'tr-TR': 'tr',
 };
 
 export const languagesToPars: {[key: string]: string} = {
   KA: 'GE',
-  EL: 'GR',
 };
 
 export const getDataGridHeight = (
@@ -208,7 +207,7 @@ export const languageContextMap: {[key: string]: Language} = {
   DA: Language.DA_DK,
   KA: Language.KA_GE,
   ES: Language.ES_ES,
-  GR: Language.EL_GR,
+  GR: Language.GR_GR,
   TR: Language.TR_TR,
 };
 
@@ -221,7 +220,7 @@ export const companyLanguageContextMap: {[key: string]: string} = {
   'da-dk': 'da',
   'ka-ge': 'ka',
   'es-es': 'es',
-  'el-gr': 'gr',
+  'gr-gr': 'gr',
   'tr-tr': 'tr',
 };
 
@@ -233,7 +232,7 @@ export const companyLanguageToUppercaseMap: {[key: string]: string} = {
   'ru-ru': Language.RU_RU,
   'ka-ge': Language.KA_GE,
   'es-es': Language.ES_ES,
-  'el-gr': Language.EL_GR,
+  'gr-gr': Language.GR_GR,
   'tr-tr': Language.TR_TR,
 };
 

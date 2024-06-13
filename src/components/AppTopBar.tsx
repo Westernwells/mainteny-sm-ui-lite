@@ -155,7 +155,7 @@ export const AppTopBar = ({
                 },
                 {
                   label: 'Greek',
-                  action: () => changeLanguage('el-GR'),
+                  action: () => changeLanguage('gr-GR'),
                 },
                 {
                   label: 'Turkish',
