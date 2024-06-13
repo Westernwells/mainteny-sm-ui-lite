@@ -40,7 +40,7 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {SendEmailDialog} from 'components/SendEmailDialog';
+import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
 import {CheckListComponentType} from 'models/checklist';
@@ -90,6 +90,9 @@ export const CheckList = ({serviceOrder}: Props) => {
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [deleteChecklistConfirm, setDeleteChecklistConfirm] = useState(false);
   const [actionType, setActionType] = useState('');
+
+  const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
 
   const {mutateAsync: uploadFiles} = useUploadFiles('');
   const {mutateAsync: sendCheckList, isLoading: sendingCheckList} =
@@ -298,6 +301,48 @@ export const CheckList = ({serviceOrder}: Props) => {
       await generatePdfUrl();
     }
     setActionType('DOWNLOAD');
+  };
+
+  const getExistingFiles = async (
+    fileDownloadUrl:
+      | {
+          [key: string]: string;
+        }
+      | undefined,
+  ) => {
+    let files: FileWithPreview[] = [];
+
+    const checkListInfo = selectedChecklist!;
+    const fileNames = [`${checkListInfo.technicianId}.pdf`];
+
+    const isPDFGenerated =
+      checkListInfo?.additionalInfo.pdfGenerationStatus ===
+      PdfGenerationStatus.DONE;
+
+    if (isPDFGenerated) {
+      const blob = await fetchFile(
+        fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
+      );
+      files = await createFilesFromBlobArray([blob], fileNames);
+      setExistingFiles(files);
+    } else {
+      const blobFile = await generatePdfUrl();
+      files = await createFilesFromBlobArray([blobFile], fileNames);
+      setExistingFiles(files);
+    }
+  };
+
+  const handleOpenSendEmail = async () => {
+    setIsLoadingFiles(true);
+    setIsSendEmailDialogOpen(true);
+    // using 'then' to wait for refetch and get download url
+    try {
+      await refetchDownloadUrl().then(async (res) => {
+        await getExistingFiles(res.data);
+      });
+    } finally {
+      setIsLoadingFiles(false);
+    }
   };
 
   useEffect(() => {
@@ -650,7 +695,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                 buttonProps={{
                   variant: 'contained',
                   size: 'medium',
-                  onClick: () => setIsSendEmailDialogOpen(true),
+                  onClick: handleOpenSendEmail,
                   sx: {
                     ml: '1em',
                   },
@@ -670,6 +715,9 @@ export const CheckList = ({serviceOrder}: Props) => {
                 serviceOrder.elevator.propertyOwner?.contact.email
               }
               content={serviceOrder.description}
+              existingFiles={existingFiles}
+              isLoadingFiles={isLoadingFiles}
+              customExistingFileName={`${selectedChecklist?.checkList.externalId}.pdf`}
               callback={async (emailRecord) => {
                 setIsSendEmailDialogOpen(false);
 
@@ -677,63 +725,69 @@ export const CheckList = ({serviceOrder}: Props) => {
                 const checkListInfo = selectedChecklist!;
                 const uploadPath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/checkLists/${checkListInfo.technicianId}`;
                 const fileNames = [`${checkListInfo.checkListId}.pdf`];
-
-                const generateFilesAndSendCheckList = async (
-                  blob: Blob,
-                  pdfPath: string,
-                ) => {
-                  const files: FileWithPreview[] =
-                    await createFilesFromBlobArray([blob], fileNames);
-                  const attachments = files.map((file) => ({
-                    ...file,
-                    type: file.type,
-                    uri: pdfPath,
-                    description:
-                      checkListInfo?.checkList.number ||
-                      file.name.split('.')[0],
-                  }));
-
-                  await sendCheckList({
-                    id: serviceOrder!.id,
-                    body: {
-                      checkListId: checkListInfo.checkListId || '',
-                      technicianId: checkListInfo.technicianId || '',
-                      pdfPath,
-                      email: {
-                        email: emailRecord.email,
-                        subject: emailRecord.subject,
-                        content: emailRecord.content,
-                        emails: [emailRecord.email],
-                        attachments,
-                      },
-                    },
-                  });
-                };
-
-                if (
+                const isPDFGenerated =
                   checkListInfo?.additionalInfo.pdfGenerationStatus ===
-                  PdfGenerationStatus.DONE
-                ) {
-                  const downloadUrlValue = downloadUrl
-                    ? Object.values(downloadUrl)[0]
-                    : '';
-                  const blob = await fetchFile(downloadUrlValue);
-                  await generateFilesAndSendCheckList(
-                    blob,
-                    checkListInfo.additionalInfo.pdfPath!,
-                  );
-                } else {
-                  const blobFile = await generatePdfUrl();
-                  const files = await createFilesFromBlobArray(
-                    [blobFile!],
-                    fileNames,
-                  );
-                  await uploadFiles({files, uploadPath});
-                  await generateFilesAndSendCheckList(
-                    blobFile!,
-                    `${uploadPath}/${fileNames[0]}`,
-                  );
+                  PdfGenerationStatus.DONE;
+
+                const allAttachments = emailRecord.attachments || existingFiles;
+                const emailAttachments = (
+                  emailRecord.attachments || []
+                )?.filter((el) => el.path);
+                const hasExistingFileToUpload = allAttachments.some(
+                  (obj, index) => {
+                    const isExistingFile = !obj.path && index === 0;
+                    return isExistingFile;
+                  },
+                );
+
+                if (!isPDFGenerated && hasExistingFileToUpload) {
+                  await uploadFiles({files: existingFiles, uploadPath});
                 }
+
+                if (emailAttachments.length) {
+                  await uploadFiles({files: emailAttachments, uploadPath});
+                }
+
+                await sendCheckList({
+                  id: serviceOrder!.id,
+                  body: {
+                    checkListId: checkListInfo.checkListId || '',
+                    technicianId: checkListInfo.technicianId || '',
+                    pdfPath: isPDFGenerated
+                      ? checkListInfo?.additionalInfo.pdfPath!
+                      : `${uploadPath}/${fileNames[0]}`,
+                    email: {
+                      email: '',
+                      subject: emailRecord.subject,
+                      content: emailRecord.content,
+                      emails: emailRecord.emails,
+                      ccEmails: emailRecord.ccEmails,
+                      bccEmails: emailRecord.bccEmails,
+                      attachments: allAttachments.reduce<FileWithPreview[]>(
+                        (newArr: FileWithPreview[], obj, index) => {
+                          const isFileFromServer = !obj.path && index === 0;
+                          return [
+                            ...newArr,
+                            {
+                              ...obj,
+                              type: obj.type,
+                              uri: isFileFromServer
+                                ? isPDFGenerated
+                                  ? checkListInfo?.additionalInfo.pdfPath!
+                                  : `${uploadPath}/${checkListInfo.checkListId}.pdf`
+                                : `${uploadPath}/${obj.name}`,
+                              description: isFileFromServer
+                                ? checkListInfo.checkList?.externalId ||
+                                  checkListInfo.checkList?.number
+                                : obj.name.split('.')[0],
+                            },
+                          ];
+                        },
+                        [],
+                      ),
+                    },
+                  },
+                });
               }}
             />
           </Box>
