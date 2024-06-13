@@ -107,7 +107,7 @@ export const languageMap: {[key: string]: string} = {
   'da-DK': 'da-dk',
   'ka-GE': 'ka-ge',
   'es-ES': 'es-es',
-  'gr-GR': 'gr-gr',
+  'el-GR': 'el-gr',
   'tr-TR': 'tr-tr',
 };
 
@@ -120,7 +120,7 @@ export const mapLanguageToLocale: {[key: string]: string} = {
   'da-DK': 'da',
   'ka-GE': 'ka',
   'es-ES': 'es',
-  'gr-GR': 'gr',
+  'el-GR': 'gr',
   'tr-TR': 'tr',
 };
 
@@ -207,7 +207,7 @@ export const languageContextMap: {[key: string]: Language} = {
   DA: Language.DA_DK,
   KA: Language.KA_GE,
   ES: Language.ES_ES,
-  GR: Language.GR_GR,
+  GR: Language.EL_GR,
   TR: Language.TR_TR,
 };
 
@@ -220,7 +220,7 @@ export const companyLanguageContextMap: {[key: string]: string} = {
   'da-dk': 'da',
   'ka-ge': 'ka',
   'es-es': 'es',
-  'gr-gr': 'gr',
+  'el-gr': 'gr',
   'tr-tr': 'tr',
 };
 
@@ -232,7 +232,7 @@ export const companyLanguageToUppercaseMap: {[key: string]: string} = {
   'ru-ru': Language.RU_RU,
   'ka-ge': Language.KA_GE,
   'es-es': Language.ES_ES,
-  'gr-egr': Language.GR_GR,
+  'el-gr': Language.EL_GR,
   'tr-tr': Language.TR_TR,
 };
 

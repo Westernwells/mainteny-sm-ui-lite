@@ -341,7 +341,7 @@ export enum Language {
   DA_DK = 'DA_DK',
   KA_GE = 'KA_GE',
   ES_ES = 'ES_ES',
-  GR_GR = 'GR_GR',
+  EL_GR = 'EL_GR',
   TR_TR = 'TR_TR',
 }
 
