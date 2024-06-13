@@ -126,6 +126,7 @@ export const mapLanguageToLocale: {[key: string]: string} = {
 
 export const languagesToPars: {[key: string]: string} = {
   KA: 'GE',
+  EL: 'GR',
 };
 
 export const getDataGridHeight = (
