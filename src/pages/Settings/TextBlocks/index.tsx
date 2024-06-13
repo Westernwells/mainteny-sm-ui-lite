@@ -17,6 +17,7 @@ import {
   TextBlockCategory,
   TextBlockFormModel,
   TextBlockOrderField,
+  TextBlockRow,
   TextBlockView,
 } from 'models/text-block';
 import {
@@ -41,7 +42,7 @@ type Props = {
 };
 
 const validationSchema = Yup.object().shape({
-  subject: Yup.string().required('Subject is required'),
+  name: Yup.string().required('Name is required'),
   category: Yup.string().required('Category is required'),
   text: Yup.string().required('Text is required'),
 });
@@ -68,7 +69,7 @@ const TextBlocks = ({company}: Props) => {
 
   const formik = useFormik<TextBlockFormModel>({
     initialValues: {
-      subject: '',
+      name: '',
       category: TextBlockCategory.QUOTATION,
       text: '',
     },
@@ -124,11 +125,11 @@ const TextBlocks = ({company}: Props) => {
   }, [textBlocks]);
 
   const getEditableTextBlocks = useCallback(
-    (item: any) => {
+    (item: TextBlockRow) => {
       const textBlockItem = mapJsonToTextBlockView(item);
 
       formik.setValues({
-        subject: textBlockItem.name || '',
+        name: textBlockItem.name || '',
         text: textBlockItem?.text || '',
         category: textBlockItem.category || '',
       });
@@ -140,7 +141,7 @@ const TextBlocks = ({company}: Props) => {
     [formik],
   );
 
-  const getPreviewTextBlocks = (item: any) => {
+  const getPreviewTextBlocks = (item: TextBlockRow) => {
     const textBlockItem = mapJsonToTextBlockView(item);
 
     setActiveTextBlock(textBlockItem);
@@ -149,7 +150,7 @@ const TextBlocks = ({company}: Props) => {
 
   const onCreateContact = useCallback(() => {
     formik.setValues({
-      subject: '',
+      name: '',
       text: '',
       category: TextBlockCategory.QUOTATION,
     });
@@ -159,7 +160,7 @@ const TextBlocks = ({company}: Props) => {
     formik.resetForm();
   }, [formik]);
 
-  const getDeletableTextBlocks = useCallback((item: any) => {
+  const getDeletableTextBlocks = useCallback((item: TextBlockRow) => {
     const textBlockItem = mapJsonToTextBlockView(item);
 
     setActiveTextBlock(textBlockItem);
@@ -170,7 +171,7 @@ const TextBlocks = ({company}: Props) => {
     await updateTextBlock({
       textBlockId: activeTextBlock?.id!,
       textBlock: {
-        name: formik.values.subject,
+        name: formik.values.name,
         category: convertCategoryToMacro(formik.values.category),
         text: formik.values.text,
       },
@@ -185,7 +186,7 @@ const TextBlocks = ({company}: Props) => {
     createTextBlock({
       serviceCompanyId,
       category: convertCategoryToMacro(formik.values.category),
-      name: formik.values.subject,
+      name: formik.values.name,
       text: formik.values.text,
     });
     setTypeAction(undefined);
@@ -250,7 +251,7 @@ const TextBlocks = ({company}: Props) => {
           rows={rows}
           columns={columnsMemo()}
           fullHeight={false}
-          isCellClickable={false}
+          isCellClickable
           height={400}
           noRowsEmptySection={
             <EmptySection
@@ -280,6 +281,11 @@ const TextBlocks = ({company}: Props) => {
           totalRows={textBlocks.total}
           loading={isFetching}
           scrollToTop={query}
+          onCellClick={(params) => {
+            if (params.field !== 'actions') {
+              getPreviewTextBlocks(params.row);
+            }
+          }}
         />
       </PageListingLayout>
 
@@ -312,7 +318,7 @@ const TextBlocks = ({company}: Props) => {
         onSave={() => {
           setOpenPreviewDialog(false);
           formik.setValues({
-            subject: activeTextBlock?.name || '',
+            name: activeTextBlock?.name || '',
             text: activeTextBlock?.text || '',
             category: convertCategoryToMacro(activeTextBlock?.category!) || '',
           });
@@ -332,7 +338,18 @@ const TextBlocks = ({company}: Props) => {
                 {item.label.toUpperCase()}
               </Typography>
               {item.label === t('Text') ? (
-                <Typography dangerouslySetInnerHTML={{__html: item.value}} />
+                <Box
+                  dangerouslySetInnerHTML={{__html: item.value}}
+                  sx={{
+                    margin: '0em',
+                    padding: '0em',
+                    '& p': {
+                      margin: 0,
+                      padding: 0,
+                      minHeight: '1em',
+                    },
+                  }}
+                />
               ) : (
                 <Typography
                   color={theme.palette.text.primary}

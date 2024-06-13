@@ -50,8 +50,28 @@ export const textBlockCategoryOptions = Object.values(TextBlockCategory).map(
   (category) => convertCategoryToText(category),
 );
 
-export const stripHtmlTags = (html: string) => {
-  const tmp = document.createElement('DIV');
+export const stripHtmlTags = (html: string): string => {
+  const tmp = document.createElement('div');
   tmp.innerHTML = html;
-  return tmp.textContent || tmp.innerText || '';
+
+  function getText(node: Node): string {
+    let text = '';
+    if (node.nodeType === Node.TEXT_NODE) {
+      text += node.textContent || '';
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const {childNodes} = node;
+      for (let i = 0; i < childNodes.length; i += 1) {
+        const childText = getText(childNodes[i]);
+        if (childText.length > 0) {
+          text += `${childText} `;
+        }
+      }
+    }
+    return text.trim(); // Trim leading and trailing spaces
+  }
+
+  const textContent = getText(tmp);
+
+  // Replace consecutive spaces with a single space
+  return textContent.replace(/\s+/g, ' ').trim();
 };

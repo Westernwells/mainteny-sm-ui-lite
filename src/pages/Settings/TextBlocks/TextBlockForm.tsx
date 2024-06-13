@@ -28,12 +28,12 @@ export const TextBlockForm = ({formik}: Props) => {
           <FormInput
             props={{
               size: 'small',
-              placeholder: 'e.g. John',
-              label: 'Subject',
-              name: 'subject',
-              value: formik.values.subject,
-              helperText: formik.touched.subject && formik.errors.subject,
-              error: !!formik.errors.subject && formik.touched.subject,
+              placeholder: 'Enter text block name',
+              label: 'Name',
+              name: 'name',
+              value: formik.values.name,
+              helperText: formik.touched.name && formik.errors.name,
+              error: !!formik.errors.name && formik.touched.name,
               required: true,
               sx: {
                 mb: '0.5em',

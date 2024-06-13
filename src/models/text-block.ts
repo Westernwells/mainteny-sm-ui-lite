@@ -36,7 +36,7 @@ export interface TextBlockView {
 }
 
 export interface TextBlockFormModel {
-  subject: string;
+  name: string;
   category: string;
   text: string;
 }
@@ -53,4 +53,14 @@ export enum TextBlockCategory {
   SERVICE_ORDER_REPORT = 'SERVICE_ORDER_REPORT',
   ARTICLE_ORDER = 'ARTICLE_ORDER',
   SERVICE_ORDER = 'SERVICE_ORDER',
+}
+
+export interface TextBlockRow {
+  id: string;
+  NAME: string;
+  CATEGORY: string;
+  CREATED_AT: string;
+  text: string;
+  wordCount: number;
+  editedAt: string;
 }

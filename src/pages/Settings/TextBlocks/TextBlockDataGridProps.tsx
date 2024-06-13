@@ -10,7 +10,11 @@ import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {Box, Tooltip} from '@mui/material';
 import {convertToText} from 'utils/utils';
-import {TextBlockOrderField, TextBlockView} from 'models/text-block';
+import {
+  TextBlockOrderField,
+  TextBlockRow,
+  TextBlockView,
+} from 'models/text-block';
 import {format} from 'date-fns';
 import {getColumnProps} from 'components/DataGridLayout';
 import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
@@ -45,9 +49,9 @@ const defaultAlignment: {
 };
 
 export const columns = (
-  getEditableTextBlocks: (item: TextBlockView) => void,
-  getDeletableTextBlocks: (item: TextBlockView) => void,
-  getPreviewTextBlocks: (item: TextBlockView) => void,
+  getEditableTextBlocks: (item: TextBlockRow) => void,
+  getDeletableTextBlocks: (item: TextBlockRow) => void,
+  getPreviewTextBlocks: (item: TextBlockRow) => void,
 ): GridColDef[] => {
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
 
@@ -169,7 +173,9 @@ export const makeRows = (textBlocks: TextBlockView[]): GridRowsProp =>
         [TextBlockOrderField.CREATED_AT]:
           format(new Date(item.meta.createdAt), 'dd.MM.yyyy') || '-',
         text: item.text,
-        wordCount: item.text.length || '-',
+        wordCount: stripHtmlTags(item.text)
+          .split(/\s+/)
+          .filter((word) => word.length > 0).length,
         editedAt:
           format(new Date(item.meta.lastUpdatedAt), 'dd.MM.yyyy') || '-',
       }))
