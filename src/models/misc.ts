@@ -1,11 +1,11 @@
 import {AxiosResponse} from 'axios';
 import {MouseEvent, ReactNode} from 'react';
 import {UseMutationResult} from 'react-query';
-import {number} from 'yup';
 import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
 import {ContractTypes, ContractNameTypes} from './contract';
 import {AccountSystems, MinToStep} from './service-company';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 
 export interface RestError {
   errorCode: number;
@@ -256,6 +256,7 @@ export enum PdfGenerationStatus {
   ERROR = 'ERROR',
   INIT = 'INIT',
   RUNNING = 'RUNNING',
+  GENERATION_REQUIRED = 'GENERATION_REQUIRED',
 }
 
 export interface WeekPair {
@@ -312,6 +313,16 @@ export interface SimpleEmailRecord {
   email: string;
   subject: string;
   content: string;
+}
+
+export interface EmailRecord {
+  email: string;
+  subject: string;
+  content: string;
+  emails?: string[];
+  ccEmails?: string[];
+  bccEmails?: string[];
+  attachments?: FileWithPreview[];
 }
 
 export enum Language {
@@ -404,4 +415,12 @@ export enum InspectionCycle {
   YEARLY = 'YEARLY',
   BIENNIALLY = 'BIENNIALLY',
   TRIENNIALLY = 'TRIENNIALLY',
+}
+
+export interface HeaderFooterInfoData {
+  path: string;
+  width: number;
+  height: number;
+  posX: number;
+  posY: number;
 }

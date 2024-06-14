@@ -5,14 +5,21 @@ import {
   Discount,
   DiscountType,
   InvoiceFormData,
+  InvoiceItem,
   InvoiceItemPaymentType,
   InvoiceItemRecord,
+  InvoiceType,
+  InvoiceView,
   PaymentType,
   UpdateInvoice,
 } from 'models/invoice';
 import {getItemRecord} from 'utils/article-utils';
 import {Currencies, moneyRecordForBackend} from 'utils/currency';
-import {dateToString, fixRounding} from 'utils/utils';
+import {
+  dateToString,
+  fixRounding,
+  removeUndefinedAndEmptyValues,
+} from 'utils/utils';
 
 export const formatInvoiceRecord = (
   value: InvoiceFormData,
@@ -283,4 +290,176 @@ export const articleViewToInvoiceItemRecord = (
     unitAmount: article.unitSellingAmount,
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
+};
+
+export const invoiceItemToInvoiceItemRecord = (
+  invoiceItem: InvoiceItem,
+  invoiceType: InvoiceType,
+): InvoiceItemRecord => {
+  const record: InvoiceItemRecord = {
+    article: invoiceItem.article,
+    name: invoiceItem.name,
+    description: invoiceItem.description,
+    quantity: invoiceItem.quantity,
+    unitAmount:
+      invoiceType === InvoiceType.CREDIT_NOTE
+        ? {
+            ...invoiceItem.unitAmount,
+            grossAmount: -Math.abs(invoiceItem.unitAmount.grossAmount),
+            netAmount: -Math.abs(invoiceItem.unitAmount.netAmount),
+          }
+        : invoiceItem.unitAmount,
+    discount: invoiceItem.additionalInfo?.discount
+      ? {
+          ...invoiceItem.additionalInfo?.discount,
+          type:
+            invoiceItem.additionalInfo?.discount?.type === DiscountType.NONE
+              ? DiscountType.PERCENTAGE
+              : invoiceItem.additionalInfo?.discount?.type,
+          amount: invoiceItem.additionalInfo?.discount?.amount
+            ? {
+                ...invoiceItem.additionalInfo?.discount?.amount,
+                value:
+                  (invoiceItem.additionalInfo?.discount?.amount?.value ?? 0) /
+                  10 **
+                    (invoiceItem.additionalInfo.discount.amount
+                      .fractionDigits ?? 2),
+              }
+            : undefined,
+        }
+      : undefined,
+    payment: invoiceItem.additionalInfo?.payment,
+  };
+  return getItemRecord(record, record.unitAmount.percentageVat);
+};
+
+export const formatInvoiceViewToUpdateInvoice = (
+  invoiceView: InvoiceView,
+): UpdateInvoice => {
+  const {
+    externalId,
+    description,
+    subject,
+    sentDate,
+    dueDate,
+    serviceOrder,
+    propertyOwner,
+    additionalInfo,
+    items,
+    serviceCompany,
+    type,
+  } = invoiceView;
+
+  const {payment, discount} = additionalInfo || {};
+
+  const updateInvoice: Record<string, any> = {
+    serviceOrderId: serviceOrder?.id,
+    propertyOwnerId: propertyOwner?.id,
+    externalId,
+    type,
+    subject,
+    description,
+    dueDate,
+    sentDate,
+    items: items
+      .map((item) => invoiceItemToInvoiceItemRecord(item, type))
+      .map((item) => {
+        const {article, ...rest} = item;
+        const modifiedArticle = {...article};
+        const unitSellingAmount = modifiedArticle?.unitSellingAmount;
+        const unitAmount = item?.unitAmount;
+        const isPreDefinedArticle =
+          modifiedArticle?.id && modifiedArticle?.id?.length > 8;
+        if (!isPreDefinedArticle) {
+          delete modifiedArticle?.id;
+        }
+
+        const articleToSend = {
+          ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
+          name: article?.name,
+          type: article?.type,
+          unit: article?.unit,
+          costPackage: article?.costPackage,
+          ...(isPreDefinedArticle &&
+            article?.externalId && {externalId: article?.externalId}),
+          unitSellingAmount: {
+            netAmount: unitSellingAmount?.netAmount,
+            percentageVat: unitSellingAmount?.percentageVat,
+            currency: unitSellingAmount?.currency,
+          },
+        } as ArticleRecord;
+
+        return {
+          ...rest,
+          article: articleToSend,
+          unitAmount: {
+            netAmount: unitAmount?.netAmount,
+            percentageVat: unitAmount?.percentageVat,
+            currency: unitAmount?.currency,
+          },
+          discount: rest.discount
+            ? {
+                ...rest.discount,
+                amount:
+                  rest.discount.type === 'AMOUNT'
+                    ? {
+                        ...rest.discount.amount,
+                        currency: rest.discount.amount?.currency!,
+                        value:
+                          (rest.discount.amount?.value ?? 0) *
+                          10 ** (rest.discount.amount?.fractionDigits ?? 2),
+                      }
+                    : undefined,
+              }
+            : undefined,
+          payment: rest.payment
+            ? rest.payment
+            : payment?.type === PaymentType.PER_ITEM
+            ? {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
+            : undefined,
+        };
+      }),
+    ...(discount && {
+      discount: {
+        ...discount,
+        amount:
+          discount?.type === 'AMOUNT'
+            ? {
+                ...discount?.amount,
+                currency: discount?.amount?.currency!,
+                value:
+                  (discount?.amount?.value ?? 0) *
+                  10 ** (discount?.amount?.fractionDigits ?? 2),
+              }
+            : undefined,
+      },
+    }),
+    ...(payment && {
+      payment: {
+        ...payment,
+        amount:
+          payment?.type === PaymentType.LUMP_SUM
+            ? moneyRecordForBackend(payment.amount)
+            : undefined,
+      },
+    }),
+    paymentTerm: additionalInfo?.paymentTerm,
+    paymentInfo: additionalInfo?.paymentInfo,
+    includeWorkReport: additionalInfo?.includeWorkReport,
+    includeCheckList: additionalInfo?.includeCheckList,
+    costCenter: additionalInfo?.costCenter,
+    customerSpecificOrderNumber: additionalInfo?.customerSpecificOrderNumber,
+    moreInfo: additionalInfo?.moreInfo,
+    billingAddress: additionalInfo?.billingAddress,
+    beneficiaryAddress: additionalInfo?.beneficiaryAddress,
+    alternativeAddress: additionalInfo?.alternativeAddress,
+    laborMaterialCostText: additionalInfo?.laborMaterialCostText,
+    deliveryStartDate: additionalInfo?.deliveryStartDate,
+    deliveryEndDate: additionalInfo?.deliveryEndDate,
+    showArticleSection: additionalInfo?.showArticleSection,
+    alternativeServiceCompanyInfo: additionalInfo.alternativeServiceCompanyInfo,
+    serviceCompanyId: serviceCompany.id,
+  };
+
+  return removeUndefinedAndEmptyValues(updateInvoice) as UpdateInvoice;
 };

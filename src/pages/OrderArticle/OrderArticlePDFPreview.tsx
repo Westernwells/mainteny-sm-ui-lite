@@ -1,11 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer';
+import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {FormikProps} from 'formik';
 import {ArticleSupplierView, CreateArticleOrderRecord} from 'models/article';
 import {UserAccount} from 'models/user';
@@ -14,8 +7,13 @@ import {formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
-import {Currency} from 'models/misc';
+import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
+import {HtmlPDF} from 'components/HtmlPDF';
+import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
+import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
+import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
+import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -51,31 +49,6 @@ const getStyles = (
   regularFontStyle?: {fontFamily: string},
 ) =>
   StyleSheet.create({
-    page: {
-      ...regularFontStyle,
-      fontSize: 10,
-      paddingTop: 25,
-      paddingLeft: 68,
-      paddingRight: 45,
-      backgroundColor: 'white',
-      height: '100%',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      justifyContent: 'space-between',
-      paddingBottom: 95,
-      color: '#212121',
-    },
-    topSection: {
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 40,
-      alignItems: 'flex-start',
-      position: 'absolute',
-      top: 90,
-    },
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
@@ -106,19 +79,12 @@ const getStyles = (
       borderBottom: '1px solid #212121',
       paddingBottom: 1,
     },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      marginTop: 150,
-      marginBottom: 10,
-      ...boldFontStyle,
-    },
     contentBody: {
-      color: '#616161',
-      fontSize: 10,
       marginBottom: 10,
-      lineHeight: 1.3,
-      maxWidth: '100%',
+      paddingTop: 25,
+      maxWidth: '95%',
+      display: 'flex',
+      flexDirection: 'row',
     },
     notesSection: {
       paddingBottom: 6,
@@ -175,10 +141,6 @@ const getStyles = (
       marginTop: 2,
       lineHeight: 1.3,
     },
-    qrCode: {
-      width: 60,
-      height: 60,
-    },
   });
 
 type Props = {
@@ -186,13 +148,12 @@ type Props = {
   formik: FormikProps<CreateArticleOrderRecord>;
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  logoSrc?: string;
   currentCurrency?: Currency;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   selectedLng?: string;
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 const OrderArticlePDFPreview = React.memo(
@@ -200,11 +161,13 @@ const OrderArticlePDFPreview = React.memo(
     supplier,
     formik,
     userInfo,
-    logoSrc,
     currentCurrency,
-    logoDimensions,
     selectedLng,
     translate,
+    headerInfo,
+    headerPath,
+    footerInfo,
+    footerPath,
   }: Props) => {
     const uniqueVATPercentages = [
       ...new Set(
@@ -228,14 +191,11 @@ const OrderArticlePDFPreview = React.memo(
     const styles = getStyles(boldFontStyle, regularFontStyle);
     return (
       <Document>
-        <Page size="A4" style={styles.page}>
-          <View>
-            <PdfTemplateHeader
-              logoSrc={logoSrc}
-              logoDimensions={logoDimensions}
-            />
+        <PdfPageContainer selectedLng={selectedLng}>
+          <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-            <View style={styles.topSection}>
+          <PdfBodyContainer>
+            <TopSectionContainer>
               <PdfTemplateLeftAddress
                 companyName={userInfo?.serviceCompany?.name}
                 billingAddressName={
@@ -244,6 +204,7 @@ const OrderArticlePDFPreview = React.memo(
                 receiverName={supplier?.name}
                 addressComponent={supplier?.address?.component}
                 selectedLng={selectedLng}
+                translate={translate}
               />
 
               <View style={styles.rightAddress}>
@@ -281,20 +242,21 @@ const OrderArticlePDFPreview = React.memo(
                   </View>
                 )}
               </View>
-            </View>
+            </TopSectionContainer>
 
             <View>
-              <Text style={styles.contentHeader}>
+              <PdfPageTitle selectedLng={selectedLng}>
                 {translate('Article Order for')} {formik?.values?.externalId}
-              </Text>
+              </PdfPageTitle>
 
               <View>
-                <Text style={styles.contentBody} wrap={false}>
-                  {formik?.values?.description.split('')}
-                </Text>
+                <HtmlPDF
+                  html={formik?.values?.description || ''}
+                  rootStyle={styles.contentBody}
+                />
               </View>
 
-              <View style={styles.table}>
+              <View style={styles.table} wrap={false}>
                 <View style={styles.tableHead}>
                   <View style={styles.tableRow}>
                     <Text
@@ -456,7 +418,7 @@ const OrderArticlePDFPreview = React.memo(
                   ))}
                 </View>
 
-                <View>
+                <View wrap={false}>
                   <View style={styles.tableRow}>
                     <Text style={{width: '44%'}} />
                     <Text
@@ -556,14 +518,16 @@ const OrderArticlePDFPreview = React.memo(
                 </View>
               </View>
             </View>
-          </View>
+          </PdfBodyContainer>
 
           <PdfTemplateFooter
             userInfo={userInfo}
             selectedLng={selectedLng}
             translate={translate}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
           />
-        </Page>
+        </PdfPageContainer>
       </Document>
     );
   },

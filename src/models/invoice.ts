@@ -5,6 +5,7 @@ import {
   AddressRecord,
   Amount,
   AmountRecord,
+  EmailRecord,
   Meta,
   Money,
   Order,
@@ -58,6 +59,11 @@ export interface InvoiceItem {
     discount?: Discount;
     payment?: InvoiceItemPaymentRecord;
   };
+}
+
+export interface AggregatedInvoiceItem extends InvoiceItem {
+  totalAmountToBePaid: number;
+  totalPercentage: number;
 }
 
 export interface BeneficialDetails {
@@ -175,6 +181,8 @@ export interface InvoiceView {
   commentCount?: number;
   payments: InvoicePaymentView[];
   refInvoiceId?: string;
+  paymentTerms?: string;
+  discount: Discount;
 }
 
 export interface InvoicePaymentAdditionalInfo {
@@ -270,7 +278,7 @@ export enum InvoiceItemPaymentType {
 
 export interface InvoiceItemPaymentRecord {
   type: InvoiceItemPaymentType;
-  amount?: Money;
+  amount?: Amount;
   percentage?: number;
 }
 
@@ -422,6 +430,7 @@ export interface UpdateInvoice {
   payment?: Payment;
   deliveryStartDate?: string;
   deliveryEndDate?: string;
+  showArticleSection?: boolean;
 }
 
 export interface QueryInvoiceCommentsParams {
@@ -448,6 +457,8 @@ export interface CreateInvoiceOverdueNoticeRecord {
   dueDate: string;
   initialAmount: Money;
   handlingFee: Money;
+  sentDate: string;
+  emailRecord?: EmailRecord;
 }
 
 export enum InvoiceActivityType {
@@ -497,3 +508,18 @@ export const ALL_MANUAL_INVOICE_TYPES = [
   InvoiceType.FULL,
   InvoiceType.PARTIAL,
 ];
+
+export interface SendInvoiceRecord {
+  pdfPath: string;
+  externalId: string;
+  dueDate: string;
+  sentDate: string;
+  email: EmailRecord;
+}
+
+export interface PrintInvoiceRecord {
+  pdfPath: string;
+  externalId: string;
+  dueDate: string;
+  sentDate: string;
+}

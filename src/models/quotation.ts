@@ -5,9 +5,11 @@ import {
   AddressRecord,
   Amount,
   AmountRecord,
+  EmailRecord,
   Meta,
   Order,
   PdfGenerationStatus,
+  SimpleEmailRecord,
 } from './misc';
 import {PropertyOwnerView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
@@ -97,6 +99,7 @@ export interface QuotationView {
   number: string;
   externalId: string;
   description: string;
+  propertyOwner: PropertyOwnerView;
   subject: string;
   moreInfo: string;
   status: QuotationStatus;
@@ -106,7 +109,6 @@ export interface QuotationView {
   meta: Meta;
   items: QuotationItem[];
   commentCount?: number;
-  propertyOwner?: PropertyOwnerView;
 }
 
 export interface QueryQuotationParams {
@@ -229,4 +231,15 @@ export interface QuotationActivityView {
   text: string;
   additionalInfo: string;
   meta: Meta;
+}
+
+export interface PrintQuotationRecord {
+  pdfPath: string;
+  sentDate?: string;
+}
+
+export interface SendQuotationRecord {
+  pdfPath: string;
+  sentDate?: string;
+  email: EmailRecord;
 }

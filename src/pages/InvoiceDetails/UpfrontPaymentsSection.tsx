@@ -109,7 +109,7 @@ export const UpfrontPaymentsSection = ({
     : allPreviousInvoices;
 
   const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
-    formik.values,
+    formik.values.items,
   );
   const subtotalExclVat = applyDiscount({
     actualValue: subtotalExclVatAfterPerItemDiscount,
@@ -445,15 +445,19 @@ export const UpfrontPaymentsSection = ({
                 },
               }}>
               <TableCell />
-              <TableCell width="25%">{T('Invoice amount')}</TableCell>
+              <TableCell width="25%" sx={{typography: 'h6', fontWeight: 600}}>
+                {T('Invoice amount')}
+              </TableCell>
               <TableCell />
-              <TableCell align="right">{amountFormatted}</TableCell>
-              <TableCell align="right">
+              <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
+                {amountFormatted}
+              </TableCell>
+              <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {currentInvoiceAmountPercentageVats.map((v, idx) => (
                   <p key={idx}>{v.percentageVat}%</p>
                 ))}
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {currentInvoiceAmountPercentageVats.map((v, idx) => {
                   const vatAmountFormatted = formatCurrency(v.vat, {
                     currency: currentCurrency.code,
@@ -464,7 +468,7 @@ export const UpfrontPaymentsSection = ({
                   return <p key={idx}>{vatAmountFormatted}</p>;
                 })}
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {formatCurrency(
                   amount +
                     currentInvoiceAmountPercentageVats

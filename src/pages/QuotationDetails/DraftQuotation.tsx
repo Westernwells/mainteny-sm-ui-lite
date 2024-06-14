@@ -26,7 +26,6 @@ import {
   QuotationItemRecord,
   QuotationView,
 } from 'models/quotation';
-import {Discount, DiscountType} from 'models/invoice';
 import {ElevatorView} from 'models/elevator';
 import {
   PropertyOwnerSimpleView,
@@ -83,34 +82,16 @@ import {Progress} from 'components/Progress';
 import {debounce} from 'lodash';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
+import RichTextField from 'components/RichTextField';
 import {ContractTermView} from 'models/contract';
 import NewUnit from './NewUnit';
-import {formatQuotationRecord} from './utils';
+import {formatQuotationRecord, getDiscoutObj} from './utils';
 
 interface Props {
   formType?: string;
   quotation?: QuotationView;
   serviceCompanyType: ServiceCompanyType;
 }
-
-const getDiscoutObj = (discount?: Discount) =>
-  discount
-    ? {
-        ...discount,
-        type:
-          discount?.type === DiscountType.NONE
-            ? DiscountType.PERCENTAGE
-            : discount?.type,
-        amount: discount?.amount
-          ? {
-              ...discount?.amount,
-              value:
-                (discount?.amount?.value ?? 0) /
-                10 ** (discount.amount.fractionDigits ?? 2),
-            }
-          : undefined,
-      }
-    : undefined;
 
 const quotationItemToQuotationItemRecord = (
   quotationItem: QuotationItem,
@@ -288,30 +269,28 @@ export const DraftQuotation = ({
   }
 
   const getFormattedPaymentTerms = (paymentTerm: ContractTermView) => {
-    const discountOptions = paymentTerm.data?.discountOptions
-      .map((d) => {
-        const discountDays = d.discountDays || 0;
-        const discountPercentage = d.discountPercent || 0;
+    const discountOptions =
+      paymentTerm.data?.discountOptions
+        .map((d) => {
+          const discountDays = d.discountDays || 0;
+          const discountPercentage = d.discountPercent || 0;
 
-        if (discountDays === 0 && discountPercentage === 0) {
-          return ''; // Return empty string if no valid discount
-        }
+          if (discountDays === 0 && discountPercentage === 0) {
+            return paymentTerm.term || '';
+          }
 
-        return t(
-          'If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.',
-          {
-            discountDays,
-            discountPercentage,
-            lng: companyLanguage,
-          },
-        );
-      })
-      .filter((option) => option !== '') // Filter out empty strings
-      .join('\n');
+          return t(
+            'If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.',
+            {
+              discountDays,
+              discountPercentage,
+              lng: companyLanguage,
+            },
+          );
+        })
+        .join('\n') || '';
 
-    return discountOptions
-      ? `${paymentTerm.term}\n${discountOptions}`
-      : paymentTerm.term;
+    return `${paymentTerm.term}\n${discountOptions}`;
   };
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
@@ -906,23 +885,10 @@ export const DraftQuotation = ({
               }}
             />
 
-            <FormInput
-              props={{
-                id: 'description',
-                name: 'description',
-                value: formik.values.description,
-                label: 'Description',
-                onChange: formik.handleChange,
-                onBlur: formik.handleBlur,
-                error: !!(
-                  formik.touched.description && formik.errors.description
-                ),
-                helperText:
-                  formik.touched.description && formik.errors.description,
-                minRows: 2,
-                multiline: true,
-                fullWidth: true,
-              }}
+            <RichTextField
+              label="Description"
+              html={formik.values.description}
+              updateHtml={(h) => formik.setFieldValue('description', h)}
             />
           </Grid>
 
@@ -954,47 +920,34 @@ export const DraftQuotation = ({
             <Box pb={0.5}>
               <SectionTitle Icon={FooterIllustration} title="Footer" />
             </Box>
-            <FormInput
-              props={{
-                id: 'notes',
-                size: 'small',
-                label: notesText,
-                name: 'notes',
-                value: formik.values.notes,
-                onChange: formik.handleChange,
-                minRows: 2,
-                multiline: true,
-              }}
+
+            <RichTextField
+              label={notesText}
+              html={formik.values.notes || ''}
+              updateHtml={(h) => formik.setFieldValue('notes', h)}
+              minRows={2}
             />
 
-            <FormInput
-              props={{
-                id: 'paymentTerms',
-                size: 'small',
-                label: 'Payment terms',
-                name: 'paymentTerms',
-                minRows: 2,
-                multiline: true,
-                value: formik.values.paymentTerms,
-                onChange: formik.handleChange,
-                InputProps: {
-                  endAdornment: (
-                    <InputAdornment
-                      component={IconButton}
-                      disableRipple
-                      position="end"
-                      sx={{
-                        mt: 2,
-                        mr: -1,
-                        alignSelf: 'flex-start',
-                      }}
-                      onClick={() => setOpenContractPaymentTermsDialog(true)}
-                      size="small">
-                      <TextSnippetIcon />
-                    </InputAdornment>
-                  ),
-                },
-              }}
+            <RichTextField
+              label="Payment terms"
+              html={formik.values.paymentTerms || ''}
+              updateHtml={(h) => formik.setFieldValue('paymentTerms', h)}
+              minRows={2}
+              endAdornment={
+                <InputAdornment
+                  component={IconButton}
+                  disableRipple
+                  position="end"
+                  sx={{
+                    mt: 2,
+                    mr: -1,
+                    alignSelf: 'flex-start',
+                  }}
+                  onClick={() => setOpenContractPaymentTermsDialog(true)}
+                  size="small">
+                  <TextSnippetIcon />
+                </InputAdornment>
+              }
             />
           </Grid>
         </Grid>

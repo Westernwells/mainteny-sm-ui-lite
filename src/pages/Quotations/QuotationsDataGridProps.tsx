@@ -13,7 +13,6 @@ import {
 } from 'models/quotation';
 import {FormatDate, Resource} from 'models/misc';
 import {Typography} from '@mui/material';
-import CustomTableHeader from 'components/CustomTableHeader';
 import {NotesIndicator} from './NotesIndicator';
 import {Actions} from './Actions';
 import {T} from 'utils/i18n-utils';
@@ -48,7 +47,7 @@ export const getQuotationStatusStyles = (
   }
 };
 
-export const columns: GridColDef[] = [
+export const columns = (imageUrl: string): GridColDef[] => [
   {
     field: QuotationOrderField.EXTERNAL_ID,
     sortable: true,

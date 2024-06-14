@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {useEffect, useMemo, useState} from 'react';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
 import Box from '@mui/material/Box';
@@ -12,7 +12,7 @@ import {EmptySection} from 'components/EmptySection';
 import {FormLabel} from 'components/form/FormLabel';
 import {
   useCompleteServiceOrder,
-  usePublishWorkReport,
+  useSendWorkReport,
 } from 'hooks/reactQuery/useServiceOrder';
 import {
   CompleteServiceOrder,
@@ -20,12 +20,11 @@ import {
   ServiceOrderReportView,
   ServiceOrderView,
 } from 'models/service-order';
-import {PdfGenerationStatus} from 'models/misc';
 import {PageCard} from 'components/PageCard';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
-import {SendEmailDialog} from 'components/SendEmailDialog';
-import {FormInput} from 'components/form/FormInput';
+import {SendEmailDialog} from 'components/SendEmailDialog/index';
+import RichTextField from 'components/RichTextField';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -40,8 +39,22 @@ import {
 import {convertDigitalMinsToHM} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSearchParams} from 'react-router-dom';
-import {formatSearchParams} from 'utils/utils';
+import {
+  companyLanguageContextMap,
+  createFilesFromBlobArray,
+  fetchFile,
+  formatSearchParams,
+} from 'utils/utils';
 import {theme} from 'theme';
+import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
+import {pdf} from '@react-pdf/renderer';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
+import {EmailRecord, PdfGenerationStatus} from 'models/misc';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -51,6 +64,10 @@ import {Pictures} from './Pictures';
 interface Props {
   serviceOrder: ServiceOrderView;
 }
+
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
 
 const validationSchema = Yup.object().shape({
   serviceTimeHM: Yup.string()
@@ -70,6 +87,9 @@ export const WorkReport = ({serviceOrder}: Props) => {
     serviceOrder?.reports?.[0],
   );
 
+  const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+
   const schedule = serviceOrder.schedules.find(
     (s) => s.technician.id === report?.technicianId,
   );
@@ -78,19 +98,9 @@ export const WorkReport = ({serviceOrder}: Props) => {
     (r) => r.externalId === report?.externalId,
   );
 
-  const {data: pdfDownloadUrl = {}} = useDownloadUrl(
-    serviceOrder.reports?.map((i) => i.additionalInfo.pdfPath) || [],
-  );
-  const {downloadFile} = useDownloadFileWithCustomName(
-    report?.externalId || '',
-    pdfDownloadUrl[report?.additionalInfo.pdfPath || ''],
-  );
-  const isWorkReportPdfGenerated =
-    report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
-
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
-  const {mutate: publishWorkReport, isLoading: publishingWorkReport} =
-    usePublishWorkReport();
+  const {mutate: sendWorkReport, isLoading: sendingWorkReport} =
+    useSendWorkReport();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
   const signatureKeys = getSignatureKeys(
@@ -104,8 +114,223 @@ export const WorkReport = ({serviceOrder}: Props) => {
     {enabled: !!report?.signatures?.length},
   );
 
+  const {data: imageDownloadUrls = {}} = useDownloadUrl(
+    report?.attachments?.map((item) => item.fileResource.uri) ?? [],
+    {enabled: true},
+  );
+
+  const technicianSignatureImage = useFetchAndConvertImage(
+    downloadUrls[signatureKeys.TECHNICIAN],
+  );
+
+  const customerSignatureImage = useFetchAndConvertImage(
+    downloadUrls[signatureKeys.CUSTOMER],
+  );
+
+  const {convertedImages, isImageLoading, setShouldFetchImages} =
+    useFetchAndConvertMultipleImages(imageDownloadUrls, report?.attachments);
+
+  const [actionType, setActionType] = useState('');
+  const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
+
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
   const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
     useCompleteServiceOrder('Work report updated successfully!');
+  const {mutateAsync: uploadFiles} = useUploadFiles('');
+
+  const generateWorkReportPdf = async () => {
+    const blob = await pdf(
+      <WorkReportTemplate
+        userInfo={user?.userAccount}
+        selectedLng={company?.language}
+        translate={translate}
+        serviceOrder={serviceOrder}
+        report={report}
+        schedule={schedule}
+        technicianSignatureImage={technicianSignatureImage}
+        customerSignatureImage={customerSignatureImage}
+        workReportPictures={convertedImages}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    setPreviewPdfBlobUrl(blobURL);
+    return blob;
+  };
+
+  const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
+    report && report?.additionalInfo.pdfPath
+      ? [report.additionalInfo.pdfPath]
+      : [],
+    {enabled: false},
+  );
+
+  const createEmailAttachments = (
+    files: FileWithPreview[],
+    path: string,
+    fileReport?: ServiceOrderReportView,
+  ) =>
+    files.reduce<FileWithPreview[]>((newArr: FileWithPreview[], obj, index) => {
+      // If file is from server -> uri of file should be report.id
+      // If file is from server -> description should be report.externalId || report.number
+      const isFileFromServer = !obj.path && index === 0;
+      return [
+        ...newArr,
+        {
+          ...obj,
+          type: obj.type,
+          uri: isFileFromServer
+            ? `${path}/${report?.id}.pdf`
+            : `${path}/${obj.name}`,
+          description: isFileFromServer
+            ? fileReport?.externalId || fileReport?.number
+            : obj.name.split('.')[0],
+        },
+      ];
+    }, []);
+
+  const sendEmailReport = async (
+    emailServiceOrder: ServiceOrderView,
+    values: EmailRecord,
+    files: FileWithPreview[],
+    pdfPath: string,
+    uploadPath: string,
+    fileReport?: ServiceOrderReportView,
+  ) => {
+    sendWorkReport(
+      {
+        id: emailServiceOrder.id,
+        body: {
+          technicianId: fileReport?.technicianId!,
+          pdfPath,
+          email: {
+            email: '',
+            emails: values.emails,
+            ccEmails: values.ccEmails,
+            bccEmails: values.bccEmails,
+            subject: values.subject,
+            content: values.content,
+            attachments: createEmailAttachments(files, uploadPath, fileReport),
+          },
+        },
+      },
+      {onSuccess: () => setIsSendEmailDialogOpen(false)},
+    );
+  };
+
+  const getExistingFiles = async (
+    fileDownloadUrl:
+      | {
+          [key: string]: string;
+        }
+      | undefined,
+  ) => {
+    const fileNames: string[] = [`${report?.id}.pdf`];
+    let files: FileWithPreview[] = [];
+
+    if (
+      report?.additionalInfo &&
+      report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
+    ) {
+      const blob = await fetchFile(
+        fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
+      );
+      files = await createFilesFromBlobArray([blob], fileNames);
+      setExistingFiles(files);
+    } else {
+      const blobFile = await generateWorkReportPdf();
+      files = await createFilesFromBlobArray([blobFile!], fileNames);
+      setExistingFiles(files);
+    }
+  };
+
+  const handleOpenSendEmail = async () => {
+    setIsLoadingFiles(true);
+    setIsSendEmailDialogOpen(true);
+    // using 'then' to wait for refetch and get download url
+    try {
+      await refetchDownloadUrl().then(async (res) => {
+        await getExistingFiles(res.data);
+      });
+    } finally {
+      setIsLoadingFiles(false);
+    }
+  };
+
+  const onSubmitHandler = async (values: EmailRecord) => {
+    const fileNames: string[] = [`${report?.id}.pdf`];
+    const uploadPath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/report`;
+    const isPDFGenerated =
+      report?.additionalInfo &&
+      report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
+
+    const allAttachments = values.attachments || existingFiles;
+    const emailAttachments = (values.attachments || [])?.filter(
+      (el) => el.path,
+    );
+    const hasExistingFileToUpload = allAttachments.some((obj, index) => {
+      const isExistingFile = !obj.path && index === 0;
+      return isExistingFile;
+    });
+
+    if (!isPDFGenerated && hasExistingFileToUpload) {
+      await uploadFiles({files: existingFiles, uploadPath});
+    }
+
+    if (emailAttachments.length) {
+      await uploadFiles({files: emailAttachments, uploadPath});
+    }
+
+    await sendEmailReport(
+      serviceOrder,
+      values,
+      allAttachments,
+      isPDFGenerated
+        ? report?.additionalInfo.pdfPath!
+        : `${uploadPath}/${fileNames[0]}`,
+      uploadPath,
+      report,
+    );
+  };
+
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
     initialValues: {
       articles: articleViewToArticleRecord(articles),
@@ -126,24 +351,30 @@ export const WorkReport = ({serviceOrder}: Props) => {
       },
     },
     onSubmit: (values) => {
-      completeServiceOrder({
-        serviceOrderId: serviceOrder.id ?? '',
-        body: {
-          technicianId: report?.technicianId,
-          description: values.description,
-          articles: articleViewToArticleRecord(articles),
-
-          serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
-          travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
-          onlyShowTotalTime: values.onlyShowTotalTime,
-          workTimeRecord: convertTimeSlotDatesToRestDateTime(
-            values.workTimeRecord,
-          ),
-          travelTimeRecord: convertTimeSlotDatesToRestDateTime(
-            values.travelTimeRecord,
-          ),
+      completeServiceOrder(
+        {
+          serviceOrderId: serviceOrder.id ?? '',
+          body: {
+            technicianId: report?.technicianId,
+            description: values.description,
+            articles: articleViewToArticleRecord(articles),
+            serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
+            travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
+            onlyShowTotalTime: values.onlyShowTotalTime,
+            workTimeRecord: convertTimeSlotDatesToRestDateTime(
+              values.workTimeRecord,
+            ),
+            travelTimeRecord: convertTimeSlotDatesToRestDateTime(
+              values.travelTimeRecord,
+            ),
+          },
         },
-      });
+        {
+          onSuccess: () => {
+            setQueryParams(formatSearchParams({edit: '0'}, queryParams));
+          },
+        },
+      );
     },
     validationSchema,
   });
@@ -180,6 +411,31 @@ export const WorkReport = ({serviceOrder}: Props) => {
     }
   };
 
+  const {downloadFile} = useDownloadFileWithCustomName(
+    report?.externalId || report?.number || '',
+    previewPdfBlobUrl,
+  );
+
+  const handleClickDownload = async () => {
+    if (
+      report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
+    ) {
+      const downloadUrlValue = downloadUrl ? Object.values(downloadUrl)[0] : '';
+      if (downloadUrlValue) {
+        try {
+          const blob = await fetchFile(downloadUrlValue);
+          const blobURL = URL.createObjectURL(blob);
+          setPreviewPdfBlobUrl(blobURL);
+        } catch (error) {
+          console.error('Error fetching the file:', error);
+        }
+      }
+    } else {
+      await generateWorkReportPdf();
+    }
+    setActionType('DOWNLOAD');
+  };
+
   useEffect(() => {
     resetForm();
   }, [report]);
@@ -188,7 +444,11 @@ export const WorkReport = ({serviceOrder}: Props) => {
     if (reportToUpdate) {
       setReport(reportToUpdate);
     }
-  }, [reportToUpdate]);
+  }, [serviceOrder]);
+
+  useEffect(() => {
+    refetchDownloadUrl();
+  }, [report]);
 
   useEffect(() => {
     formik.setFieldValue('workTimeRecord', {
@@ -211,6 +471,24 @@ export const WorkReport = ({serviceOrder}: Props) => {
       formik.setFieldValue('articles', articleViewToArticleRecord(articles));
     }
   }, [articles]);
+
+  useEffect(() => {
+    const hasDownloadUrls = Object.keys(imageDownloadUrls).length > 0;
+    const hasAttachmentUris = report?.attachments?.every(
+      (attachment) => attachment.fileResource?.uri,
+    );
+    if (hasDownloadUrls && hasAttachmentUris) {
+      setShouldFetchImages(true);
+    }
+  }, [imageDownloadUrls, report?.attachments]);
+
+  useEffect(() => {
+    if (previewPdfBlobUrl && actionType === 'DOWNLOAD') {
+      downloadFile();
+      setPreviewPdfBlobUrl('');
+      setActionType('');
+    }
+  }, [actionType, previewPdfBlobUrl]);
 
   if (!report) {
     return (
@@ -341,18 +619,11 @@ export const WorkReport = ({serviceOrder}: Props) => {
         </Box>
 
         <Box mt="1em">
-          <FormInput
-            containerStyles={{width: '100%', py: '1rem'}}
-            props={{
-              name: 'description',
-              label: t('Description of Service'),
-              multiline: true,
-              minRows: 4,
-              type: 'text',
-              value: formik.values.description,
-              onChange: formik.handleChange,
-              onBlur: formik.handleBlur,
-            }}
+          <RichTextField
+            label="Description of Service"
+            html={formik.values.description || ''}
+            updateHtml={(h) => formik.setFieldValue('description', h)}
+            minRows={4}
           />
         </Box>
 
@@ -381,12 +652,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'outlined',
-              disabled: !isWorkReportPdfGenerated,
+              disabled: isImageLoading,
               sx: {
                 background: 'transparent',
               },
               startIcon: <FileDownloadIcon />,
-              onClick: downloadFile,
+              onClick: () => handleClickDownload(),
             }}>
             <Typography variant="subtitle2">{t('Download')}</Typography>
           </Button>
@@ -394,13 +665,15 @@ export const WorkReport = ({serviceOrder}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'contained',
+              disabled: isImageLoading,
               startIcon: <SendIcon />,
-              onClick: () => setIsSendEmailDialogOpen(true),
+              onClick: handleOpenSendEmail,
             }}>
             <Typography variant="subtitle2">{t('Send Work Report')}</Typography>
           </Button>
         </Box>
       </A4Layout>
+
       <BottomDrawer
         isOpen
         primaryButtonLabel={isEditMode ? 'Save' : 'Edit'}
@@ -441,29 +714,21 @@ export const WorkReport = ({serviceOrder}: Props) => {
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
-        confirmBtnDisabled={publishingWorkReport}
+        confirmBtnDisabled={sendingWorkReport}
         title="Send work report"
         confirmBtnLabel="Send Work Report"
+        existingFiles={existingFiles}
+        isLoadingFiles={isLoadingFiles}
+        customExistingFileName={`${report?.externalId}.pdf`}
         email={
           serviceOrder.elevator.propertyOwner?.additionalInfo.billingEmail ||
           serviceOrder.elevator.propertyOwner?.contact.email
         }
         subject=""
         content={formik.values.description}
-        callback={(emailRecord) => {
-          publishWorkReport(
-            {
-              id: serviceOrder.id,
-              body: {
-                email: emailRecord.email,
-                subject: emailRecord.subject,
-                content: emailRecord.content,
-              },
-            },
-            {onSuccess: () => setIsSendEmailDialogOpen(false)},
-          );
-        }}
+        callback={(emailRecord) => onSubmitHandler(emailRecord)}
       />
     </Box>
   );
