@@ -89,6 +89,7 @@ const getStyles = (
     },
     dataBody: {
       borderBottom: '1px solid #212121',
+      paddingBottom: 10,
     },
     notesSection: {
       marginTop: 1,
