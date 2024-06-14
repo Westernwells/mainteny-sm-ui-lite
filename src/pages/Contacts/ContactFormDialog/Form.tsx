@@ -109,8 +109,7 @@ const Form = ({form, initialValues}: Props) => {
         <FormInput
           props={{
             label: 'Email',
-            required: true,
-            ...register('userAccount.contact.email', {required: true}),
+            ...register('userAccount.contact.email'),
           }}
         />
       </Grid>
@@ -126,8 +125,7 @@ const Form = ({form, initialValues}: Props) => {
         <FormInput
           props={{
             label: 'Phone',
-            required: true,
-            ...register('userAccount.contact.phone', {required: true}),
+            ...register('userAccount.contact.phone'),
           }}
         />
       </Grid>

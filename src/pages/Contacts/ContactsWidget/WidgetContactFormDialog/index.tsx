@@ -68,7 +68,7 @@ const ContactFormDialog = ({
 
   const useHookForm = useForm<ServiceCompanyContactPeronFormModel>({
     defaultValues: getDefaultValues(contactPerson, serviceCompanyId),
-    mode: 'onChange',
+    mode: 'all',
   });
   const {handleSubmit, formState, reset} = useHookForm;
   useEffect(() => {

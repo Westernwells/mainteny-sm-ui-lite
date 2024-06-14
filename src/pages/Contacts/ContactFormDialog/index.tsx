@@ -73,7 +73,7 @@ const ContactFormDialog = ({
 
   const useHookForm = useForm<ServiceCompanyContactPeronFormModel>({
     defaultValues: getDefaultValues(contactPerson, serviceCompanyId),
-    mode: 'onChange',
+    mode: 'all',
   });
   const {handleSubmit, formState, reset} = useHookForm;
   useEffect(() => {
@@ -169,6 +169,7 @@ const ContactFormDialog = ({
       isSaving={isCreating}
       onCancel={() => {
         setOpenDialog(false);
+        resetForm();
       }}
       onSave={handleSubmit(handleContactFormSubmit)}
       dialogProps={{
