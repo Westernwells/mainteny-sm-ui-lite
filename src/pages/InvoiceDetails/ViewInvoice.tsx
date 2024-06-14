@@ -522,6 +522,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     updatedInvoice,
     headerUrl[headerInfo?.path],
     footerUrl[footerInfo?.path],
+    previousInvoices,
   ]);
 
   useEffect(() => {
