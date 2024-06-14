@@ -99,8 +99,8 @@ const Form = ({form}: Props) => {
           textFieldProps={{
             label: t('First name'),
             placeholder: t('Select customer'),
-            required: true,
             error: !!errors.contactPerson?.contactPersonId,
+            required: true,
             onChange: (e) => {
               setValue('userAccount.firstName', e.target.value);
             },
@@ -224,8 +224,7 @@ const Form = ({form}: Props) => {
           props={{
             disabled: isContactPersonSelected,
             label: 'Email',
-            required: true,
-            ...register('userAccount.contact.email', {required: true}),
+            ...register('userAccount.contact.email'),
           }}
         />
       </Grid>
@@ -243,8 +242,7 @@ const Form = ({form}: Props) => {
           props={{
             disabled: isContactPersonSelected,
             label: 'Phone',
-            required: true,
-            ...register('userAccount.contact.phone', {required: true}),
+            ...register('userAccount.contact.phone'),
           }}
         />
       </Grid>

@@ -38,6 +38,7 @@ export interface PropertyOwnerAdditionalInfo {
   registrationDate: string;
   vatId?: string;
   offsettingAccount?: string;
+  customerPortalEnabled?: boolean;
 }
 
 export interface PropertyOwnerView {

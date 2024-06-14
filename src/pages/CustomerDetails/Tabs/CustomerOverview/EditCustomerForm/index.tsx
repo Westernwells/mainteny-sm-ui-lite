@@ -76,7 +76,7 @@ export const EditCustomerForm = ({
   };
 
   useEffect(() => {
-    setCurrentCustomerId(formikValues.externalId);
+    setCurrentCustomerId(formikValues.externalId!);
   }, [formikValues.externalId]);
 
   const [showBeneficiaryAddress, setShowBeneficiaryAddress] = useState(
@@ -116,7 +116,7 @@ export const EditCustomerForm = ({
   };
 
   useEffect(() => {
-    setCurrentCustomerId(formikValues.externalId);
+    setCurrentCustomerId(formikValues.externalId!);
   }, [formikValues.externalId]);
 
   return (

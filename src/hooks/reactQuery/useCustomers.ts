@@ -220,7 +220,7 @@ export const useCreateCustomer = (successMsg: string) => {
   });
 };
 
-export const useCustomer = () => {
+export const useCustomer = (partiallyUpdate?: boolean) => {
   const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   const {t} = useTranslation();
@@ -231,7 +231,7 @@ export const useCustomer = () => {
     propertyOwnerId: string,
     onSuccess?: () => void,
   ): Promise<void> => {
-    const requestBody = formatUpdateCustomer(data);
+    const requestBody = partiallyUpdate ? data : formatUpdateCustomer(data);
     try {
       isLoading = true;
       const {status} = await axiosClient.put(
@@ -248,8 +248,8 @@ export const useCustomer = () => {
             variant: 'success',
           },
         );
+        queryClient.invalidateQueries([queryKeys.getCustomer, propertyOwnerId]);
         if (onSuccess) {
-          queryClient.invalidateQueries(queryKeys.getCustomer);
           onSuccess();
         }
       }

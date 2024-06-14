@@ -35,7 +35,7 @@ import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
 import {EditCustomer} from './EditCustomer';
 import PaymentTermsWidget from './PaymentTermsWidget';
-import {ContactsWidget as CustomerPortalWidget} from './ContactsWidget';
+import CustomerPortalWidget from './CustomerPortalWidget';
 
 interface Props {
   customerId?: string;
@@ -93,6 +93,8 @@ export const CustomerOverviewTab = ({
   const [totalUnits, setTotalUnits] = useState(0);
   const [totalContracts, setTotalContracts] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
+  const customerPortalEnabled =
+    !!customer?.additionalInfo?.customerPortalEnabled;
 
   useEffect(() => {
     if (customer) {
@@ -262,14 +264,19 @@ export const CustomerOverviewTab = ({
           />
         </Grid>
         <Grid item xs={12}>
-          <CustomerPortalWidget customerId={customerId!} />
-        </Grid>
-        <Grid item xs={12}>
-          <ContactsWidget
-            refId={customerId!}
-            refType={ContactPersonAssociationType.PROPERTY_OWNER}
+          <CustomerPortalWidget
+            customerId={customerId!}
+            customerPortalEnabled={customerPortalEnabled}
           />
         </Grid>
+        {customerPortalEnabled && (
+          <Grid item xs={12}>
+            <ContactsWidget
+              refId={customerId!}
+              refType={ContactPersonAssociationType.PROPERTY_OWNER}
+            />
+          </Grid>
+        )}
         <Grid item xs={12}>
           <PaymentTermsWidget customer={customer} />
         </Grid>

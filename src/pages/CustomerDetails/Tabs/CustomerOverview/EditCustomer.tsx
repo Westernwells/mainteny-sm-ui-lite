@@ -109,7 +109,7 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
   });
 
   useEffect(() => {
-    setInitialCustomerId(formik.values.externalId);
+    setInitialCustomerId(formik.values.externalId!);
   }, []);
 
   return (
