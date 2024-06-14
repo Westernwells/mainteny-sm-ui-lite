@@ -163,233 +163,228 @@ type Props = {
   footerPath: string;
 };
 
-const FullInvoicePdfTemplate = React.memo(
-  ({
-    translate,
-    userInfo,
+const FullInvoicePdfTemplate = ({
+  translate,
+  userInfo,
+  currentCurrency,
+  invoice,
+  selectedLng,
+  headerInfo,
+  headerPath,
+  footerInfo,
+  footerPath,
+}: Props) => {
+  const articleItems = invoice?.items.map((item) => ({
+    ...item,
+    discount: getDiscoutObj(item?.additionalInfo?.discount),
+  }))!;
+
+  const netTotal = (articleItem: InvoiceItem) => {
+    const grossTotal =
+      (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
+    const discountValue =
+      articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
+
+    return centsToMoney(currentCurrency?.code!, grossTotal - discountValue);
+  };
+
+  const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
+  const discountType = discount?.type;
+  const discountAmount = discount?.amount;
+  const discountPercentage = discount?.percentage;
+  const discountValue = discountAmount?.value ?? 0;
+  const subtotalExclVat = calculateTotalWithPerItemDiscount(articleItems);
+
+  const subtotalExclVatFormatted = formatCurrency(
+    subtotalExclVat - discountValue,
+    {
+      currency: currentCurrency?.code,
+      excludeCurrencySymbol: true,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
+    },
+  );
+
+  const subtotalExclVatAfterDiscount = applyDiscount({
+    actualValue: subtotalExclVat,
+    ...(discountType === DiscountType.AMOUNT
+      ? {amount: discountValue ?? 0}
+      : {percentage: discountPercentage ?? 0}),
+  });
+
+  const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
+
+  const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
+    itemsAfterPerItemDiscount,
+    discount,
+  );
+
+  const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
+    (item) =>
+      item.unitAmount.percentageVat ===
+      articleItems[0].unitAmount.percentageVat,
+  );
+
+  const percentageVats = itemsAfterGlobalDiscount.length
+    ? allItemsHasSameVAT
+      ? [
+          {
+            percentageVat: itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
+            vat:
+              subtotalExclVatAfterDiscount *
+              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
+          },
+        ]
+      : getAggregatedItemsVats(itemsAfterGlobalDiscount)
+    : [];
+
+  const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
+
+  const allItemsHaveZeroDiscount = articleItems.every(
+    (item) =>
+      item?.additionalInfo?.discount?.amount?.value === 0 ||
+      item?.additionalInfo?.discount?.percentage === 0,
+  );
+
+  const formattedPaymentValues = getFormattedPaymentValues(
+    invoice?.additionalInfo.paymentTerm!,
+    invoice!,
+    total,
     currentCurrency,
-    invoice,
     selectedLng,
-    headerInfo,
-    headerPath,
-    footerInfo,
-    footerPath,
-  }: Props) => {
-    const articleItems = invoice?.items.map((item) => ({
-      ...item,
-      discount: getDiscoutObj(item?.additionalInfo?.discount),
-    }))!;
+  );
 
-    const netTotal = (articleItem: InvoiceItem) => {
-      const grossTotal =
-        (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
-      const discountValue =
-        articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
+  const laborCost = useCalculateLaborMaterialCost(
+    itemsAfterGlobalDiscount,
+    ArticleType.LABOR,
+    currentCurrency,
+  );
+  const materialCost = useCalculateLaborMaterialCost(
+    itemsAfterGlobalDiscount,
+    ArticleType.MATERIAL,
+    currentCurrency,
+  );
 
-      return centsToMoney(currentCurrency?.code!, grossTotal - discountValue);
-    };
+  const boldFontStyle = {
+    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+  };
 
-    const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
-    const discountType = discount?.type;
-    const discountAmount = discount?.amount;
-    const discountPercentage = discount?.percentage;
-    const discountValue = discountAmount?.value ?? 0;
-    const subtotalExclVat = calculateTotalWithPerItemDiscount(articleItems);
+  const regularFontStyle = {
+    fontFamily:
+      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
+  };
 
-    const subtotalExclVatFormatted = formatCurrency(
-      subtotalExclVat - discountValue,
-      {
-        currency: currentCurrency?.code,
-        excludeCurrencySymbol: true,
-        currencySymbol: currentCurrency?.symbol,
-        companyLang: selectedLng,
-      },
-    );
+  const styles = getStyles(boldFontStyle, regularFontStyle);
 
-    const subtotalExclVatAfterDiscount = applyDiscount({
-      actualValue: subtotalExclVat,
-      ...(discountType === DiscountType.AMOUNT
-        ? {amount: discountValue ?? 0}
-        : {percentage: discountPercentage ?? 0}),
-    });
+  return (
+    <Document>
+      <PdfPageContainer selectedLng={selectedLng}>
+        <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-    const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
+        <PdfBodyContainer>
+          <TopSectionContainer>
+            <PdfTemplateLeftAddress
+              companyName={userInfo?.serviceCompany?.name}
+              billingAddressName={
+                userInfo?.serviceCompany?.billingAddress?.fullName
+              }
+              receiverName={
+                invoice?.additionalInfo?.billingAddress?.component?.name ||
+                invoice?.propertyOwner?.name
+              }
+              addressComponent={
+                invoice?.additionalInfo?.billingAddress?.component
+              }
+              beneficiaryInfo={
+                invoice?.additionalInfo.beneficiaryAddress?.component
+              }
+              selectedLng={selectedLng}
+              translate={translate}
+            />
 
-    const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
-      itemsAfterPerItemDiscount,
-      discount,
-    );
+            <PdfTemplateInvoiceDetails
+              translate={translate}
+              invoice={invoice}
+              selectedLng={selectedLng}
+            />
+          </TopSectionContainer>
 
-    const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
-      (item) =>
-        item.unitAmount.percentageVat ===
-        articleItems[0].unitAmount.percentageVat,
-    );
+          <View>
+            <PdfPageTitle selectedLng={selectedLng}>
+              {invoice?.subject}
+            </PdfPageTitle>
 
-    const percentageVats = itemsAfterGlobalDiscount.length
-      ? allItemsHasSameVAT
-        ? [
-            {
-              percentageVat:
-                itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
-              vat:
-                subtotalExclVatAfterDiscount *
-                (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
-            },
-          ]
-        : getAggregatedItemsVats(itemsAfterGlobalDiscount)
-      : [];
-
-    const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
-
-    const allItemsHaveZeroDiscount = articleItems.every(
-      (item) =>
-        item?.additionalInfo?.discount?.amount?.value === 0 ||
-        item?.additionalInfo?.discount?.percentage === 0,
-    );
-
-    const formattedPaymentValues = getFormattedPaymentValues(
-      invoice?.additionalInfo.paymentTerm!,
-      invoice!,
-      total,
-      currentCurrency,
-      selectedLng,
-    );
-
-    const laborCost = useCalculateLaborMaterialCost(
-      itemsAfterGlobalDiscount,
-      ArticleType.LABOR,
-      currentCurrency,
-    );
-    const materialCost = useCalculateLaborMaterialCost(
-      itemsAfterGlobalDiscount,
-      ArticleType.MATERIAL,
-      currentCurrency,
-    );
-
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
-
-    return (
-      <Document>
-        <PdfPageContainer selectedLng={selectedLng}>
-          <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
-
-          <PdfBodyContainer>
-            <TopSectionContainer>
-              <PdfTemplateLeftAddress
-                companyName={userInfo?.serviceCompany?.name}
-                billingAddressName={
-                  userInfo?.serviceCompany?.billingAddress?.fullName
-                }
-                receiverName={
-                  invoice?.additionalInfo?.billingAddress?.component?.name ||
-                  invoice?.propertyOwner?.name
-                }
-                addressComponent={
-                  invoice?.additionalInfo?.billingAddress?.component
-                }
-                beneficiaryInfo={
-                  invoice?.additionalInfo.beneficiaryAddress?.component
-                }
-                selectedLng={selectedLng}
-                translate={translate}
+            {invoice?.description.trim() !== '' && (
+              <HtmlPDF
+                html={invoice?.description || ''}
+                rootStyle={styles.contentBody}
               />
+            )}
 
-              <PdfTemplateInvoiceDetails
-                translate={translate}
+            {invoice?.additionalInfo.showArticleSection && (
+              <ArticleSection
                 invoice={invoice}
+                currentCurrency={currentCurrency}
+                translate={translate}
+                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
+                discountValue={discountValue}
+                subtotalExclVatFormatted={subtotalExclVatFormatted}
+                allItemsHasSameVAT={allItemsHasSameVAT}
+                percentageVats={percentageVats}
+                totalVAT={totalVAT}
+                total={total}
                 selectedLng={selectedLng}
+                netTotal={netTotal}
               />
-            </TopSectionContainer>
+            )}
 
-            <View>
-              <PdfPageTitle selectedLng={selectedLng}>
-                {invoice?.subject}
-              </PdfPageTitle>
-
-              {invoice?.description.trim() !== '' && (
+            {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
+              <View style={styles.notesSection} wrap={false}>
+                <Text style={styles.sectionHeading}>
+                  {translate('Payment terms')}
+                </Text>
                 <HtmlPDF
-                  html={invoice?.description || ''}
-                  rootStyle={styles.contentBody}
+                  html={replacePaymentTermsPlaceholders(
+                    invoice?.additionalInfo.paymentTerm?.term!,
+                    formattedPaymentValues ?? [],
+                  )}
                 />
-              )}
+              </View>
+            )}
 
-              {invoice?.additionalInfo.showArticleSection && (
-                <ArticleSection
-                  invoice={invoice}
-                  currentCurrency={currentCurrency}
-                  translate={translate}
-                  allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
-                  discountValue={discountValue}
-                  subtotalExclVatFormatted={subtotalExclVatFormatted}
-                  allItemsHasSameVAT={allItemsHasSameVAT}
-                  percentageVats={percentageVats}
-                  totalVAT={totalVAT}
-                  total={total}
-                  selectedLng={selectedLng}
-                  netTotal={netTotal}
+            {invoice?.additionalInfo?.moreInfo?.trim() && (
+              <View wrap={false}>
+                <Text style={styles.sectionHeading}>{translate('Notes')}</Text>
+                <HtmlPDF
+                  html={formatCostText(
+                    invoice?.additionalInfo?.moreInfo,
+                    `${formatCurrency(laborCost, {
+                      currency: currentCurrency?.code,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    })}`,
+                    `${formatCurrency(materialCost, {
+                      currency: currentCurrency?.code,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    })}`,
+                  )}
                 />
-              )}
+              </View>
+            )}
+          </View>
+        </PdfBodyContainer>
 
-              {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
-                <View style={styles.notesSection} wrap={false}>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Payment terms')}
-                  </Text>
-                  <HtmlPDF
-                    html={replacePaymentTermsPlaceholders(
-                      invoice?.additionalInfo.paymentTerm?.term!,
-                      formattedPaymentValues ?? [],
-                    )}
-                  />
-                </View>
-              )}
-
-              {invoice?.additionalInfo?.moreInfo?.trim() && (
-                <View wrap={false}>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Notes')}
-                  </Text>
-                  <HtmlPDF
-                    html={formatCostText(
-                      invoice?.additionalInfo?.moreInfo,
-                      `${formatCurrency(laborCost, {
-                        currency: currentCurrency?.code,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      })}`,
-                      `${formatCurrency(materialCost, {
-                        currency: currentCurrency?.code,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      })}`,
-                    )}
-                  />
-                </View>
-              )}
-            </View>
-          </PdfBodyContainer>
-
-          <PdfTemplateFooter
-            userInfo={userInfo}
-            selectedLng={selectedLng}
-            translate={translate}
-            footerInfo={footerInfo}
-            footerPath={footerPath}
-          />
-        </PdfPageContainer>
-      </Document>
-    );
-  },
-);
+        <PdfTemplateFooter
+          userInfo={userInfo}
+          selectedLng={selectedLng}
+          translate={translate}
+          footerInfo={footerInfo}
+          footerPath={footerPath}
+        />
+      </PdfPageContainer>
+    </Document>
+  );
+};
 
 export default FullInvoicePdfTemplate;
