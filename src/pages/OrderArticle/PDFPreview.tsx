@@ -28,11 +28,12 @@ const PdfPreview = ({blobUrl}: Props) => {
             '& .react-pdf__message': {
               margin: '1em',
             },
-            '& .react-pdf__Page__canvas': {
-              margin: '0 auto',
-              width: '100% !important',
-              height: '100% !important',
-              overflowY: 'hidden',
+            '& .react-pdf__Page.prevPage': {
+              position: 'absolute !important',
+              zIndex: 1,
+            },
+            '& .react-pdf__Document': {
+              minHeight: '1300px',
             },
             '&::-webkit-scrollbar': {
               width: '0.25em',

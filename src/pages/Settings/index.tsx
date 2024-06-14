@@ -18,6 +18,7 @@ import {
   FactCheckOutlined,
   InfoOutlined,
   MonetizationOnOutlined,
+  PictureAsPdfOutlined,
 } from '@mui/icons-material';
 import {Progress} from 'components/Progress';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
@@ -32,6 +33,7 @@ import Integrations from './Integrations';
 import Automations from './Automations';
 import Checklist from './Checklist';
 import Financials from './Financials';
+import PdfSettings from './PdfSettings';
 
 interface DrawerItem {
   label: string;
@@ -88,6 +90,12 @@ export const SettingsPage = () => {
       icon: <AutoAwesomeOutlined />,
       route: 'automations',
       component: <Automations company={company!} />,
+    },
+    {
+      label: 'PDF',
+      icon: <PictureAsPdfOutlined />,
+      route: 'pdf',
+      component: <PdfSettings company={company!} />,
     },
     {
       label: 'Checklists',

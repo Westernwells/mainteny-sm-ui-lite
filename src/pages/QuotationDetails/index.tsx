@@ -29,7 +29,11 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
   const {data: quotationActivities, isLoading: isLoadingQuotationActivities} =
     useQuotationActivities({quotationId: quotationId ?? ''});
 
-  const {data: downloadUrl, isLoading: isLoadingDownloadUrl} = useDownloadUrl(
+  const {
+    data: downloadUrl,
+    isLoading: isLoadingDownloadUrl,
+    refetch: refetchDownloadUrl,
+  } = useDownloadUrl(
     isFetched && quotation?.additionalInfo.pdfPath
       ? [quotation.additionalInfo.pdfPath]
       : [],
@@ -64,6 +68,7 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
   return isFetched && quotation ? (
     <ViewQuotation
       downloadUrl={downloadUrl ? Object.values(downloadUrl)[0] : ''}
+      refetchDownloadUrl={refetchDownloadUrl}
       quotation={quotation}
       quotationActivities={quotationActivities!}
       isLoadingDownloadUrl={isLoadingDownloadUrl}

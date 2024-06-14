@@ -220,3 +220,22 @@ export const calculateQuotationTotalAmountInclVats = ({
 
   return totalAmountInclVats;
 };
+
+export const getDiscoutObj = (discount?: Discount) =>
+  discount
+    ? {
+        ...discount,
+        type:
+          discount?.type === DiscountType.NONE
+            ? DiscountType.PERCENTAGE
+            : discount?.type,
+        amount: discount?.amount
+          ? {
+              ...discount?.amount,
+              value:
+                (discount?.amount?.value ?? 0) /
+                10 ** (discount.amount.fractionDigits ?? 2),
+            }
+          : undefined,
+      }
+    : undefined;

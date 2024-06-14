@@ -1,4 +1,4 @@
-import {Meta, PdfGenerationStatus} from './misc';
+import {EmailRecord, Meta, PdfGenerationStatus} from './misc';
 import {ChecklistStatus} from './service-order';
 
 export enum CheckListComponentType {
@@ -116,4 +116,11 @@ export interface ServiceOrderCheckListView {
   checkListId: string;
   checkList: CheckList;
   additionalInfo: ServiceOrderCheckListAdditionalInfo;
+}
+
+export interface SendServiceOrderCheckListRecord {
+  technicianId: string;
+  checkListId: string;
+  pdfPath: string;
+  email: EmailRecord;
 }

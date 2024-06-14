@@ -1,4 +1,6 @@
 import {formatISO} from 'date-fns';
+import * as Yup from 'yup';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import lodash from 'lodash';
 import useHighlightText from '../hooks/useHighlightText';
 import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
@@ -467,6 +469,21 @@ export const scrollTableToBottom = () => {
   }
 };
 
+export const createFilesFromBlobArray = async (
+  blobs: Blob[],
+  fileNames: string[],
+): Promise<FileWithPreview[]> => {
+  const files: FileWithPreview[] = [];
+  blobs.forEach((blob, index) => {
+    const file = new File([blob], fileNames[index], {
+      type: blob.type,
+    }) as FileWithPreview;
+    file.preview = URL.createObjectURL(blob);
+    files.push(file);
+  });
+  return files;
+};
+
 /**
  * Filters an array of objects based on a search text within specified property names.
  *
@@ -496,3 +513,60 @@ export const createHighlightedText = (text: string, searchText: string) =>
     text: text !== '' ? text : '-',
     highlight: searchText,
   });
+
+export const formatCostText = (
+  inputString: string,
+  laborCost: string,
+  materialCost: string,
+): string => {
+  if (
+    inputString.includes('{LABOR_COST}') ||
+    inputString.includes('{MATERIAL_COST}')
+  ) {
+    let modifiedString = inputString.replace('{LABOR_COST}', laborCost);
+    modifiedString = modifiedString.replace('{MATERIAL_COST}', materialCost);
+    return modifiedString;
+  }
+  return inputString;
+};
+
+export async function fetchFile(url: string): Promise<Blob> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Failed to download file');
+  }
+  return response.blob();
+}
+
+export const removeUndefinedAndEmptyValues = (
+  obj: Record<string, any>,
+): Record<string, any> =>
+  Object.entries(obj).reduce((acc, [key, value]) => {
+    if (value !== undefined && value !== '') {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as Record<string, any>);
+
+const isEmptyHTML = (htmlString: string) => {
+  // Create a temporary div element
+  const tempDiv = document.createElement('div');
+
+  // Set its innerHTML to the provided HTML string
+  tempDiv.innerHTML = htmlString.trim();
+
+  // Check if the div contains any child nodes with actual content
+  return (
+    tempDiv.innerHTML === '' ||
+    (tempDiv.textContent !== null && tempDiv.textContent.trim() === '')
+  );
+};
+
+export const yupValidations = {
+  richTextField: (message: string) =>
+    Yup.mixed().test(
+      'checkRichTextField',
+      message,
+      (value: string) => !!value && !isEmptyHTML(value),
+    ),
+};

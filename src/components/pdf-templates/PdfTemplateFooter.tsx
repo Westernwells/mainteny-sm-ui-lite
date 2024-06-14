@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text, Font} from '@react-pdf/renderer';
+import {View, StyleSheet, Text, Font, Image} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
@@ -7,20 +7,19 @@ type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount;
   selectedLng?: string;
+  footerInfo: any;
+  footerPath: any;
 };
-
 Font.register({
   family: 'Montserrat-Bold',
   format: 'truetype',
   src: MontserratBold,
 });
-
 Font.register({
   family: 'NotoSans-Bold',
   format: 'truetype',
   src: NotoSansGeorgianBold,
 });
-
 const getStyles = (boldFontStyle?: {fontFamily: string}) =>
   StyleSheet.create({
     footerEmail: {
@@ -39,10 +38,11 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       display: 'flex',
       justifyContent: 'space-between',
       flexDirection: 'row',
-      paddingBottom: 7,
+      paddingBottom: 10,
       borderBottom: '1px solid #616161',
       alignItems: 'center',
-      marginTop: 5,
+      paddingLeft: 57,
+      paddingRight: 35,
     },
     footerEmailWrapper: {
       display: 'flex',
@@ -50,6 +50,9 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       flexDirection: 'row',
       alignItems: 'center',
       marginTop: 5,
+      paddingLeft: 57,
+      paddingRight: 35,
+      paddingBottom: 15,
     },
     leftFooter: {
       display: 'flex',
@@ -68,24 +71,21 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       marginLeft: 4,
       textAlign: 'right',
       ...boldFontStyle,
+      zIndex: 1000,
+      padding: '5px',
+      backgroundColor: 'white',
     },
     numberText: {
       color: '#212121',
     },
     footerContainer: {
       flexDirection: 'column',
-      width: '100%',
-      paddingTop: 10,
-      marginTop: 105,
-      height: 55,
+      width: 595,
+      height: 86,
       position: 'absolute',
-      bottom: 25,
-      left: 68,
-      right: 45,
-    },
-    qrCode: {
-      width: 60,
-      height: 60,
+      bottom: 0,
+      left: 0,
+      right: 0,
     },
     footerContent: {
       marginRight: 10,
@@ -97,15 +97,26 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       fontSize: 5,
       ...boldFontStyle,
     },
+    imageContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 0,
+    },
   });
-
-const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
+const PdfTemplateFooter = ({
+  userInfo,
+  selectedLng,
+  translate,
+  footerInfo,
+  footerPath,
+}: Props) => {
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
   };
-
   const styles = getStyles(boldFontStyle);
-
   return (
     <View fixed style={styles.footerContainer}>
       <View style={styles.footerWrapper}>
@@ -116,37 +127,31 @@ const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
                 {userInfo?.serviceCompany?.name}
               </Text>
             )}
-
             {userInfo?.serviceCompany?.billingAddress?.fullName && (
               <Text style={styles.footerSectionBody}>
                 {userInfo?.serviceCompany?.billingAddress?.fullName}
               </Text>
             )}
-
             {userInfo?.serviceCompany?.contact?.phone && (
               <Text style={styles.footerSectionBody}>
                 {translate('Tel.')}: {userInfo?.serviceCompany?.contact?.phone}
               </Text>
             )}
           </View>
-
           <View style={styles.footerContent}>
             <Text style={styles.footerHeading}>{translate('Bank')}:</Text>
-
             {userInfo?.serviceCompany?.settings?.paymentInfo?.accountNumber && (
               <Text style={styles.footerSectionBody}>
                 {translate('Acc. nr.')}:{' '}
                 {userInfo?.serviceCompany?.settings?.paymentInfo?.accountNumber}
               </Text>
             )}
-
             {userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
               <Text style={styles.footerSectionBody}>
                 {translate('IBAN')}:{' '}
                 {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
               </Text>
             )}
-
             {userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
               <Text style={styles.footerSectionBody}>
                 {translate('BIC')}:{' '}
@@ -154,7 +159,6 @@ const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
               </Text>
             )}
           </View>
-
           <View style={styles.footerContent}>
             {userInfo?.serviceCompany?.settings?.managingDirector && (
               <Text style={styles.footerHeading}>
@@ -162,21 +166,18 @@ const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
                 {userInfo?.serviceCompany?.settings?.managingDirector}
               </Text>
             )}
-
             {userInfo?.serviceCompany?.settings?.arbitrationCourt && (
               <Text style={styles.footerSectionBody}>
                 {translate('Registration court')}:{' '}
                 {userInfo?.serviceCompany?.settings?.arbitrationCourt}
               </Text>
             )}
-
             {userInfo?.serviceCompany?.settings?.vatId && (
               <Text style={styles.footerSectionBody}>
                 {translate('VAT ID')}:{' '}
                 {userInfo?.serviceCompany?.settings?.vatId}{' '}
               </Text>
             )}
-
             {userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
               <Text style={styles.footerSectionBody}>
                 {translate('Certified')}:{' '}
@@ -186,7 +187,6 @@ const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
           </View>
         </View>
       </View>
-
       <View style={styles.footerEmailWrapper}>
         <View style={styles.leftFooter}>
           {userInfo?.serviceCompany?.contact?.url && (
@@ -196,7 +196,6 @@ const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
               </Text>
             </View>
           )}
-
           {userInfo?.serviceCompany.contact.email && (
             <View style={{...styles.footerContent, marginLeft: 2}}>
               <Text style={styles.emailText}>
@@ -204,7 +203,6 @@ const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
               </Text>
             </View>
           )}
-
           <Text style={styles.footerContent} />
         </View>
         <View>
@@ -216,8 +214,23 @@ const PdfTemplateFooter = ({userInfo, selectedLng, translate}: Props) => {
           />
         </View>
       </View>
+      {footerPath && (
+        <View style={styles.imageContainer}>
+          <Image
+            source={footerPath}
+            style={{
+              width: footerInfo.width,
+              height: footerInfo.height,
+              objectFit: 'contain',
+              position: 'absolute',
+              top: footerInfo.posY,
+              left: footerInfo.posX,
+              zIndex: 0,
+            }}
+          />
+        </View>
+      )}
     </View>
   );
 };
-
 export default PdfTemplateFooter;

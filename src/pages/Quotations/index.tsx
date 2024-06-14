@@ -30,6 +30,9 @@ import {Order, OrderByParams} from 'models/misc';
 import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
 import {useSearchValues} from 'hooks/useSearchValues';
+
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import useLogoImage from 'hooks/useLogoImage';
 import {columns, makeRows} from './QuotationsDataGridProps';
 
 const pageSize = 25;
@@ -39,6 +42,8 @@ export const Quotations = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const currentCurrency = useCurrentCurrency();
+  const {user} = useUserSession();
+  const imageUrl = useLogoImage(user);
 
   const [search, setSearch] = useQueryState('searchQuotations');
   const totalQuotationsRef = useRef(0);
@@ -222,7 +227,7 @@ export const Quotations = () => {
       }>
       <DataGridLayout
         rows={rows || []}
-        columns={columns}
+        columns={columns(imageUrl)}
         loading={isFetching}
         scrollToTop={search}
         pageSize={page.pageSize}

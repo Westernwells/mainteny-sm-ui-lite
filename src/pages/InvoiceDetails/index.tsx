@@ -1,10 +1,9 @@
-import {useContext, useEffect, useLayoutEffect} from 'react';
+import {useContext, useLayoutEffect} from 'react';
 import {
   useInvoiceActivities,
   useInvoiceDetail,
 } from 'hooks/reactQuery/useInvoice';
 import {useParams} from 'react-router-dom';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {LanguageContext} from 'context/LanguageProvider';
@@ -18,21 +17,10 @@ interface Props {
 export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
   const {id: invoiceId} = useParams();
   const {t} = useTranslation();
-  const {
-    data: invoice,
-    isLoading,
-    isFetched,
-    refetch,
-  } = useInvoiceDetail(invoiceId);
+  const {data: invoice, isLoading, isFetched} = useInvoiceDetail(invoiceId);
   const {data: invoiceActivities, isLoading: isLoadingInvoiceActivities} =
     useInvoiceActivities({invoiceId: invoiceId ?? ''});
   const {language} = useContext(LanguageContext);
-
-  const {
-    data: downloadUrl,
-    isLoading: isLoadingDownloadUrl,
-    refetch: refetchDownloadUrl,
-  } = useDownloadUrl(isFetched ? [invoice!.additionalInfo.pdfPath] : []);
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle) {
@@ -40,21 +28,11 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     }
   }, [language]);
 
-  useEffect(() => {
-    refetch();
-    refetchDownloadUrl();
-  }, [invoice?.additionalInfo.pdfGenerationStatus]);
-
-  if (isLoading || isLoadingInvoiceActivities || isLoadingDownloadUrl) {
+  if (isLoading || isLoadingInvoiceActivities) {
     return <Progress />;
   }
   return isFetched && invoice ? (
-    <ViewInvoice
-      downloadUrl={downloadUrl ? Object.values(downloadUrl)[0] : ''}
-      invoice={invoice}
-      invoiceActivities={invoiceActivities!}
-      isLoadingDownloadUrl={isLoadingDownloadUrl}
-    />
+    <ViewInvoice invoice={invoice} invoiceActivities={invoiceActivities!} />
   ) : (
     <EmptySection label="Sorry, we couldn't find the invoice." />
   );

@@ -10,8 +10,13 @@ import {
   MyInvoiceActivityView,
 } from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
-import {Currencies} from './currency';
+import {addDays} from 'date-fns';
+import {PaymentTermData} from 'models/contract';
+import {Currency} from 'models/misc';
+import {InvoicePaymentTermRecord} from '../models/invoice';
+import {Currencies, formatCurrency} from './currency';
 import {getAmountFromPercentage} from './utils';
+import {formatDate} from './datetime';
 
 export const getTotalFromArticles = (
   items: QuotationItemRecord[] | InvoiceItemRecord[],
@@ -191,3 +196,73 @@ export const getInvoiceActivityColor = (type: InvoiceActivityType): string => {
       return '';
   }
 };
+
+export const getFormattedPaymentValues = (
+  paymentTerm: InvoicePaymentTermRecord & {
+    data?: PaymentTermData;
+  },
+  invoice: InvoiceView,
+  invoiceAmount: number,
+  currentCurrency?: Currency,
+  selectedLng?: string,
+) => {
+  const formattedInvoiceAmount = formatCurrency(invoiceAmount, {
+    currency: currentCurrency?.code,
+    currencySymbol: currentCurrency?.symbol,
+    companyLang: selectedLng,
+  });
+  const discountValues = paymentTerm?.data?.discountOptions?.map((d) => {
+    const dueDate = addDays(
+      invoice.sentDate ? new Date(invoice.sentDate) : new Date(),
+      d.discountDays || 0,
+    );
+    const formattedDueDate = formatDate(dueDate);
+
+    const discountPercentage = d.discountPercent || 0;
+    const discountAmount = invoiceAmount * (discountPercentage / 100);
+    const formattedDiscountAmount = formatCurrency(discountAmount, {
+      currency: currentCurrency?.code,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
+    });
+    const paymentAmount = invoiceAmount - discountAmount;
+    const formattedPaymentAmount = formatCurrency(paymentAmount, {
+      currency: currentCurrency?.code,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
+    });
+    return {
+      formattedDueDate,
+      formattedInvoiceAmount,
+      formattedDiscountAmount,
+      formattedPaymentAmount,
+    };
+  });
+  return discountValues;
+};
+
+export const replacePaymentTermsPlaceholders = (
+  str: string,
+  replacements: {
+    formattedDueDate?: string;
+    formattedInvoiceAmount?: string;
+    formattedDiscountAmount?: string;
+    formattedPaymentAmount?: string;
+  }[],
+): string =>
+  replacements.reduce((result, replacement) => {
+    result = result.replace('{DUE_DATE}', replacement.formattedDueDate || '');
+    result = result.replace(
+      '{DISCOUNT_AMOUNT}',
+      replacement.formattedDiscountAmount || '',
+    );
+    result = result.replace(
+      '{INVOICE_AMOUNT}',
+      replacement.formattedInvoiceAmount || '',
+    );
+    result = result.replace(
+      '{PAYMENT_AMOUNT}',
+      replacement.formattedPaymentAmount || '',
+    );
+    return result;
+  }, str);

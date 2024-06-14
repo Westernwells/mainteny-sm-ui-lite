@@ -1,0 +1,248 @@
+import {View, Font, Text, StyleSheet} from '@react-pdf/renderer';
+import {InvoiceView, InvoiceType} from 'models/invoice';
+import {formatCurrency} from 'utils/currency';
+import {formatDate, toDate} from 'utils/datetime';
+import {Currency} from 'models/misc';
+import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
+import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
+import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
+import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+
+type PaymentHistorySectionProps = {
+  translate: (key: string) => string;
+  currentCurrency?: Currency;
+  previousInvoices: InvoiceView[];
+  totalAmountInclVatsFormatted: string;
+  outstandingAmountFormatted: string;
+  selectedLng?: string;
+};
+
+Font.register({
+  family: 'Montserrat-Bold',
+  format: 'truetype',
+  src: MontserratBold,
+});
+
+Font.register({
+  family: 'Montserrat-Regular',
+  format: 'truetype',
+  src: MontserratRegular,
+});
+Font.register({
+  family: 'NotoSans-Regular',
+  format: 'truetype',
+  src: NotoSansGeorgianRegular,
+});
+
+Font.register({
+  family: 'NotoSans-Bold',
+  format: 'truetype',
+  src: NotoSansGeorgianBold,
+});
+
+const getStyles = () =>
+  StyleSheet.create({
+    table: {
+      width: '100%',
+      display: 'flex',
+    },
+    tableHead: {
+      display: 'flex',
+      flexDirection: 'row',
+      paddingVertical: 4,
+    },
+    tableHeading: {
+      color: '#616161',
+      display: 'flex',
+      fontSize: 6,
+      textTransform: 'uppercase',
+    },
+    tableRow: {
+      display: 'flex',
+      flexDirection: 'row',
+      fontSize: 10,
+      marginVertical: 4,
+    },
+    descriptionText: {
+      width: '45%',
+      display: 'flex',
+      fontSize: 8.5,
+      color: '#212121',
+      paddingLeft: 20,
+      letterSpacing: -0.15,
+      marginTop: 2,
+      lineHeight: 1.5,
+    },
+  });
+
+export const PdfPaymentHistorySection = ({
+  translate,
+  currentCurrency,
+  previousInvoices,
+  totalAmountInclVatsFormatted,
+  outstandingAmountFormatted,
+  selectedLng,
+}: PaymentHistorySectionProps) => {
+  const paymentHistorySectionColumns: {
+    name: string;
+    align: 'left' | 'right' | 'center' | 'justify' | undefined;
+    width: string;
+  }[] = [
+    {name: 'Payment History', align: 'left', width: '60%'},
+    {name: 'Date', align: 'right', width: '10%'},
+    {
+      name: `Total (${currentCurrency?.symbol})`,
+      align: 'right',
+      width: '30%',
+    },
+  ];
+
+  const boldFontStyle = {
+    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
+  };
+
+  const styles = getStyles();
+
+  return (
+    <View wrap={false}>
+      <View>
+        <View
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            width: '100%',
+            marginTop: 15,
+            marginBottom: 10,
+          }}>
+          {paymentHistorySectionColumns.map((column) => (
+            <Text
+              style={{
+                ...styles.tableHeading,
+                textAlign: column.align,
+                width: column.width,
+              }}
+              key={column.name}>
+              {translate(column.name)}
+            </Text>
+          ))}
+        </View>
+
+        <View>
+          <View
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+              width: '100%',
+              marginBottom: 10,
+            }}>
+            <Text style={{width: '60%', textAlign: 'left'}}>
+              {translate('Total amount (incl. VAT)')}
+            </Text>
+            <Text style={{width: '10%', textAlign: 'right'}} />
+
+            <Text style={{width: '30%', textAlign: 'right'}}>
+              {totalAmountInclVatsFormatted}
+            </Text>
+          </View>
+
+          {previousInvoices?.map((i) => {
+            if (!i.payments.length) {
+              return null;
+            }
+
+            const description = i.additionalInfo?.payment?.description || '-';
+
+            const totalPriceInclVat = Math.abs(
+              i.payments
+                .map(
+                  (p) =>
+                    (p.amount?.value ?? 0) /
+                    10 ** (p.amount?.fractionDigits ?? 2),
+                )
+                .reduce((a, b) => a + b, 0),
+            );
+
+            const totalPriceInclVatFormatted = formatCurrency(
+              totalPriceInclVat,
+              {
+                currency: currentCurrency?.code,
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+                roundingMode: 'floor',
+                excludeCurrencySymbol: true,
+                currencySymbol: currentCurrency?.symbol,
+                companyLang: selectedLng,
+              },
+            );
+
+            const signBeforeNumber =
+              i.type === InvoiceType.CREDIT_NOTE ? '+' : '-';
+
+            return (
+              <View
+                key={i.id}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                  width: '100%',
+                }}>
+                <Text
+                  style={{
+                    ...styles.tableRow,
+                    width: '60%',
+                    textAlign: 'left',
+                  }}>
+                  {description}
+                </Text>
+                <Text
+                  style={{
+                    ...styles.tableRow,
+                    width: '10%',
+                    textAlign: 'right',
+                  }}>
+                  {i.sentDate ? formatDate(toDate(i.sentDate)) : '-'}
+                </Text>
+                <Text
+                  style={{
+                    ...styles.tableRow,
+                    width: '30%',
+                    textAlign: 'right',
+                  }}>
+                  {signBeforeNumber}
+                  {totalPriceInclVatFormatted}
+                </Text>
+              </View>
+            );
+          })}
+
+          <View
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              flexDirection: 'row',
+              width: '100%',
+              marginBottom: 10,
+              borderTopWidth: 1,
+              borderTopColor: '#212121',
+              paddingTop: 8,
+            }}>
+            <Text style={{width: '60%', textAlign: 'left', ...boldFontStyle}}>
+              {`${translate('Outstanding payments')} (${
+                currentCurrency?.symbol
+              })`}
+            </Text>
+            <Text style={{width: '10%', textAlign: 'right'}} />
+            <Text style={{width: '40%', textAlign: 'right', ...boldFontStyle}}>
+              {outstandingAmountFormatted}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+export default PdfPaymentHistorySection;

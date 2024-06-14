@@ -17,31 +17,35 @@ import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
 import {FormLabel} from 'components/form/FormLabel';
-import {PDFContainer} from 'components/PDFContainer';
 import {BottomDrawer} from 'components/BottomDrawer';
-import {EmptySection} from 'components/EmptySection';
 import {Confirm} from 'components/Confirm';
-import {SendEmailDialog} from 'components/SendEmailDialog';
+import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {
-  usePublishQuotation,
+  usePrintQuotation,
   useReplyQuotation,
+  useSendQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {PdfGenerationStatus} from 'models/misc';
 import {
   QuotationActivityView,
   QuotationStatus,
   QuotationView,
 } from 'models/quotation';
-import {formatCurrency} from 'utils/currency';
-import {useTranslation} from 'react-i18next';
-import {useSnackbar} from 'notistack';
-import PathImage from 'assets/images/Path.svg';
-import {convertToMacro} from 'utils/utils';
+import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {
+  companyLanguageContextMap,
+  convertToMacro,
+  createFilesFromBlobArray,
+  fetchFile,
+} from 'utils/utils';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
-import {useDownloadFileWithCustomName} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {ElevatorView} from 'models/elevator';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import queryString from 'query-string';
@@ -50,6 +54,20 @@ import LocationOn from '@mui/icons-material/LocationOn';
 import {Business, Tag} from '@mui/icons-material';
 import {IconButton} from '@mui/material';
 import {Dialog} from 'components/Dialog';
+import PdfPreview from 'pages/OrderArticle/PDFPreview';
+import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
+import {pdf} from '@react-pdf/renderer';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {EmptySection} from 'components/EmptySection';
+import {PDFContainer} from 'components/PDFContainer';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from 'react-query';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -61,24 +79,35 @@ interface Props {
   quotation: QuotationView;
   quotationActivities: QuotationActivityView[];
   isLoadingDownloadUrl: boolean;
+  refetchDownloadUrl: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
+  ) => Promise<
+    QueryObserverResult<
+      {
+        [key: string]: string;
+      },
+      unknown
+    >
+  >;
 }
+
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
 
 export const ViewQuotation = ({
   downloadUrl,
   quotation,
   quotationActivities,
   isLoadingDownloadUrl,
+  refetchDownloadUrl,
 }: Props) => {
   const {t} = useTranslation();
-  const {enqueueSnackbar, closeSnackbar} = useSnackbar();
   const theme = useTheme();
   const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const {search} = useLocation();
-  const {downloadFile} = useDownloadFileWithCustomName(
-    quotation.number,
-    downloadUrl,
-  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -88,6 +117,8 @@ export const ViewQuotation = ({
     useState(false);
   const [isCreateForm, setIsCreateForm] = useState(false);
   const {elevatorId = ''} = queryString.parse(search);
+  const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
 
   const {data: elevator} =
     typeof elevatorId === 'string'
@@ -95,9 +126,57 @@ export const ViewQuotation = ({
       : {data: undefined};
 
   const [unit, setUnit] = useState<ElevatorView | null>(elevator || null);
+  const [blobFile, setBlobFile] = useState<Blob>();
+
+  const [filePathToDownload, setFilePathToDownload] = useState('');
+
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    quotation.number,
+    filePathToDownload,
+  );
+
+  const {mutateAsync: uploadFiles} = useUploadFiles('');
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
 
   const {mutate: markAsAccepted} = useReplyQuotation();
-  const {mutateAsync: publishQuotation} = usePublishQuotation();
+  const {mutateAsync: printQuotation} = usePrintQuotation();
+  const {mutateAsync: sendQuotation, isLoading: sendingQuotation} =
+    useSendQuotation();
 
   const formik = useFormik({
     initialValues: {
@@ -111,37 +190,58 @@ export const ViewQuotation = ({
   };
 
   const isPDFGenerated =
-    quotation.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    !isLoadingDownloadUrl;
+    quotation.additionalInfo.pdfPath && !isLoadingDownloadUrl;
 
   const onPrintQuotation = async () => {
     if (quotation.status !== QuotationStatus.DRAFT) {
-      if (downloadUrl) {
-        printJS({
-          printable: downloadUrl,
-          type: 'pdf',
-          showModal: true,
-        });
-      }
+      await printQuotation(
+        {
+          id: quotation.id,
+          body: {
+            pdfPath: quotation.additionalInfo.pdfPath ?? '',
+            sentDate: '',
+          },
+        },
+        {
+          onSuccess: () => {
+            setIsConfirmPrintDialogOpen(false);
+            if (downloadUrl) {
+              printJS({
+                printable: downloadUrl,
+                type: 'pdf',
+                showModal: true,
+              });
+            }
+          },
+        },
+      );
+
       setIsConfirmPrintDialogOpen(false);
       return;
     }
 
-    await publishQuotation(
+    const serviceCompanyId = user?.userAccount.serviceCompany.id;
+    const uploadPath = `${serviceCompanyId}/quotations`;
+
+    const fileNames: string[] = [`${quotation.id}.pdf`];
+
+    const files = await createFilesFromBlobArray([blobFile!], fileNames);
+    await uploadFiles({files, uploadPath});
+
+    await printQuotation(
       {
         id: quotation.id,
         body: {
-          email: '',
-          subject: '',
-          content: '',
+          pdfPath: `${uploadPath}/${fileNames[0]}`,
+          sentDate: '',
         },
       },
       {
         onSuccess: () => {
           setIsConfirmPrintDialogOpen(false);
-          if (downloadUrl) {
+          if (filePathToDownload) {
             printJS({
-              printable: downloadUrl,
+              printable: filePathToDownload,
               type: 'pdf',
               showModal: true,
             });
@@ -149,6 +249,77 @@ export const ViewQuotation = ({
         },
       },
     );
+  };
+
+  useEffect(() => {
+    if (quotation) {
+      const quotationElevator = quotation.elevator;
+      setUnit(quotationElevator);
+    }
+  }, [quotation]);
+
+  const generateBlobUrl = async () => {
+    const blob = await pdf(
+      <QuotationPdfTemplate
+        userInfo={user?.userAccount}
+        currentCurrency={currentCurrency}
+        quotation={quotation}
+        selectedLng={company?.language}
+        translate={translate}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
+      />,
+    ).toBlob();
+    setBlobFile(blob);
+    const blobURL = URL.createObjectURL(blob);
+    setFilePathToDownload(blobURL);
+    return blob;
+  };
+
+  useEffect(() => {
+    if (quotation.status === QuotationStatus.DRAFT) {
+      generateBlobUrl();
+    }
+  }, [quotation, headerUrl[headerInfo?.path], footerUrl[footerInfo?.path]]);
+
+  const getExistingFiles = async (
+    fileDownloadUrl:
+      | {
+          [key: string]: string;
+        }
+      | undefined,
+  ) => {
+    // if quotation is not DRAFT -> download file from server
+    if (quotation.status !== QuotationStatus.DRAFT) {
+      const blob = await fetchFile(
+        fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
+      );
+      const fileNames: string[] = [`${quotation.id}.pdf`];
+      const files = await createFilesFromBlobArray([blob], fileNames);
+      setExistingFiles(files);
+
+      // if quotation is DRAFT -> generate file on client
+    } else {
+      const blob = await generateBlobUrl();
+      const fileNames: string[] = [`${quotation.id}.pdf`];
+      const files = await createFilesFromBlobArray([blob], fileNames);
+      setExistingFiles(files);
+    }
+  };
+
+  const handleOpenSendEmail = async () => {
+    setIsLoadingFiles(true);
+    setIsSendEmailDialogOpen(true);
+    // using then to wait for refetch and get download url
+    try {
+      await refetchDownloadUrl().then(async (res) => {
+        await getExistingFiles(res.data);
+      });
+    } finally {
+      setIsLoadingFiles(false);
+    }
   };
 
   const actions = useMemo(() => {
@@ -164,7 +335,7 @@ export const ViewQuotation = ({
       items.push({
         label: t('Resend'),
         icon: <ReplayIcon />,
-        onClick: () => setIsSendEmailDialogOpen(true),
+        onClick: handleOpenSendEmail,
       });
     }
 
@@ -197,38 +368,6 @@ export const ViewQuotation = ({
     return items;
   }, [downloadUrl]);
 
-  useEffect(() => {
-    if (quotation) {
-      const quotationElevator = quotation.elevator;
-      setUnit(quotationElevator);
-    }
-
-    if (
-      quotation?.additionalInfo.pdfGenerationStatus ===
-      PdfGenerationStatus.RUNNING
-    ) {
-      enqueueSnackbar(
-        <Box display="flex" padding="0em" margin="0em" alignItems="center">
-          <img alt={t('Path Image')} src={PathImage} />{' '}
-          <Typography margin="0em" paddingLeft="0.5em" variant="body2">
-            {t('PDF generation is in progress. Please wait...')}
-          </Typography>
-        </Box>,
-        {
-          variant: 'info',
-          autoHideDuration: 8000,
-        },
-      );
-    }
-
-    if (
-      quotation?.additionalInfo.pdfGenerationStatus !==
-      PdfGenerationStatus.RUNNING
-    ) {
-      closeSnackbar();
-    }
-  }, [quotation]);
-
   return (
     <Box>
       <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
@@ -254,7 +393,7 @@ export const ViewQuotation = ({
             </Grid>
 
             <Grid item xs={4} textAlign="end">
-              {downloadUrl && (
+              {filePathToDownload && (
                 <Button
                   label="Download Quotation"
                   buttonProps={{
@@ -264,9 +403,7 @@ export const ViewQuotation = ({
                       background: 'transparent',
                     },
                     onClick: downloadFile,
-                    disabled:
-                      quotation!.additionalInfo.pdfGenerationStatus !==
-                        PdfGenerationStatus.DONE || isLoadingDownloadUrl,
+                    disabled: !filePathToDownload,
                     startIcon: <FileDownloadIcon />,
                   }}
                 />
@@ -299,15 +436,29 @@ export const ViewQuotation = ({
               </Typography>
             </Box>
           </PageCard>
-          {isPDFGenerated ? (
-            <PDFContainer url={downloadUrl} />
-          ) : (
-            <PageCard>
-              <EmptySection
-                label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
-                size="small"
-              />
-            </PageCard>
+
+          {quotation.status === QuotationStatus.DRAFT && (
+            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+              <PdfPreview blobUrl={filePathToDownload} />
+            </Box>
+          )}
+
+          {quotation.status !== QuotationStatus.DRAFT && (
+            <Box>
+              {quotation &&
+              quotation.additionalInfo &&
+              quotation.additionalInfo.pdfPath &&
+              !isLoadingDownloadUrl ? (
+                <PDFContainer url={downloadUrl} />
+              ) : (
+                <PageCard>
+                  <EmptySection
+                    label="The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience."
+                    size="small"
+                  />
+                </PageCard>
+              )}
+            </Box>
           )}
         </Grid>
         <Grid item xs sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
@@ -582,7 +733,7 @@ export const ViewQuotation = ({
         }
         primaryButtonAction={() => {
           if (quotation.status === QuotationStatus.DRAFT) {
-            setIsSendEmailDialogOpen(true);
+            handleOpenSendEmail();
           } else {
             setIsDialogOpen(true);
           }
@@ -598,14 +749,78 @@ export const ViewQuotation = ({
         onConfirm={() => setIsSendEmailDialogOpen(false)}
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={quotation.id}
-        submitHook={usePublishQuotation}
-        confirmBtnDisabled={!isPDFGenerated}
+        confirmBtnDisabled={sendingQuotation}
         email={
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
           quotation?.elevator?.propertyOwner?.contact.email
         }
         subject={quotation.subject}
         content={quotation.description}
+        existingFiles={existingFiles}
+        isLoadingFiles={isLoadingFiles}
+        customExistingFileName={`${quotation.externalId}.pdf`}
+        callback={async (emailRecord) => {
+          setIsSendEmailDialogOpen(false);
+
+          const serviceCompanyId = user?.userAccount.serviceCompany.id;
+          const uploadPath = `${serviceCompanyId}/quotations`;
+          const fileNames: string[] = [`${quotation.id}.pdf`];
+          const isDraft = quotation.status === QuotationStatus.DRAFT;
+
+          const allAttachments = emailRecord.attachments || existingFiles;
+          const emailAttachments = (emailRecord.attachments || [])?.filter(
+            (el) => el.path,
+          );
+          const hasExistingFileToUpload = allAttachments.some((obj, index) => {
+            const isExistingFile = !obj.path && index === 0;
+            return isExistingFile;
+          });
+
+          if (isDraft && hasExistingFileToUpload) {
+            await uploadFiles({files: existingFiles, uploadPath});
+          }
+
+          if (emailAttachments.length) {
+            await uploadFiles({files: emailAttachments, uploadPath});
+          }
+
+          await sendQuotation({
+            id: quotation.id,
+            body: {
+              pdfPath: `${uploadPath}/${fileNames[0]}`,
+              sentDate: '',
+              email: {
+                email: '',
+                subject: emailRecord.subject,
+                content: emailRecord.content,
+                emails: emailRecord.emails,
+                ccEmails: emailRecord.ccEmails,
+                bccEmails: emailRecord.bccEmails,
+                attachments: allAttachments.reduce<FileWithPreview[]>(
+                  (newArr: FileWithPreview[], obj, index) => {
+                    // If file is from server -> uri of file should be quotation.id
+                    // If file is from server -> description should be quotation.externalId
+                    const isFileFromServer = !obj.path && index === 0;
+                    return [
+                      ...newArr,
+                      {
+                        ...obj,
+                        type: obj.type,
+                        uri: isFileFromServer
+                          ? `${uploadPath}/${quotation.id}.pdf`
+                          : `${uploadPath}/${obj.name}`,
+                        description: isFileFromServer
+                          ? quotation.externalId
+                          : obj.name.split('.')[0],
+                      },
+                    ];
+                  },
+                  [],
+                ),
+              },
+            },
+          });
+        }}
       />
       <Confirm
         open={isDialogOpen}

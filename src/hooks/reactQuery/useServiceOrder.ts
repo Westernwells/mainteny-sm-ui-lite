@@ -21,7 +21,7 @@ import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
 import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {CheckList} from 'models/checklist';
+import {CheckList, SendServiceOrderCheckListRecord} from 'models/checklist';
 import {LanguageContext} from 'context/LanguageProvider';
 import {languageContextMap} from 'utils/utils';
 import {ServiceOrderArticleRecord} from 'models/article';
@@ -39,14 +39,9 @@ import {
   ServiceOrderArticleView,
   ServiceOrderConfirmationPublishBody,
   CreateServiceOrderRecord,
+  SendServiceOrderReportRecord,
 } from 'models/service-order';
-import {
-  Order,
-  Resource,
-  RestError,
-  SimpleEmailRecord,
-  StringValue,
-} from 'models/misc';
+import {Order, Resource, RestError, StringValue} from 'models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
@@ -415,6 +410,13 @@ export const getServiceOrderChecklist = async (
   return response.data;
 };
 
+export const updateServiceOrderArticles = async (
+  serviceOrderId: string,
+  body: ServiceOrderArticleRecord[],
+) => {
+  await axiosClient.put(`api/serviceOrders/${serviceOrderId}/articles/`, body);
+};
+
 // it is okay to use pass any,information is for react-query & not us.Passing correct types makes simple function gigantic
 export function useServiceOrderCheckList(
   serviceOrderId?: string,
@@ -512,8 +514,10 @@ export const useCompleteServiceOrder = (successMsg?: string) => {
     }) => completeServiceOrder(serviceOrderId, body),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        setTimeout(() => {
+          queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+          queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        }, 10);
         if (successMsg) {
           enqueueSnackbar(successMsg, {
             variant: 'success',
@@ -763,39 +767,29 @@ export const useConfirmAppointment = () => {
   );
 };
 
-export const postPublishChecklist = async (
+export const postSendChecklist = async (
   id: string,
-  params: {checkListId?: string; technicianId?: string},
-  body: SimpleEmailRecord,
+  body: SendServiceOrderCheckListRecord,
 ) => {
   await axiosClient.post<{value: string}>(
-    `api/serviceOrders/${id}/checkList/publish`,
+    `api/serviceOrders/${id}/checkList/send`,
     body,
-    {
-      params,
-      paramsSerializer,
-    },
   );
 };
 
-export const usePublishChecklist = () => {
+export const useSendChecklist = () => {
+  const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
-    ({
-      id,
-      params,
-      body,
-    }: {
-      id: string;
-      params: {checkListId?: string; technicianId?: string};
-      body: SimpleEmailRecord;
-    }) => postPublishChecklist(id, params, body),
+    ({id, body}: {id: string; body: SendServiceOrderCheckListRecord}) =>
+      postSendChecklist(id, body),
     {
       onSuccess: () => {
         enqueueSnackbar(`CheckList sent successfully`, {
           variant: 'success',
         });
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
         console.log(err);
@@ -805,27 +799,29 @@ export const usePublishChecklist = () => {
   );
 };
 
-export const publishWorkReport = async (
+export const postSendWorkReport = async (
   id: string,
-  body: SimpleEmailRecord,
+  body: SendServiceOrderReportRecord,
 ) => {
   await axiosClient.post<{value: string}>(
-    `/api/serviceOrders/${id}/report/publish`,
+    `api/serviceOrders/${id}/report/send`,
     body,
   );
 };
 
-export const usePublishWorkReport = () => {
+export const useSendWorkReport = () => {
+  const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(
-    ({id, body}: {id: string; body: SimpleEmailRecord}) =>
-      publishWorkReport(id, body),
+    ({id, body}: {id: string; body: SendServiceOrderReportRecord}) =>
+      postSendWorkReport(id, body),
     {
       onSuccess: () => {
-        enqueueSnackbar(`Work report sent successfully!`, {
+        enqueueSnackbar(`Work report sent successfully`, {
           variant: 'success',
         });
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
         console.log(err);

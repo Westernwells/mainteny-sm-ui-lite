@@ -1,11 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer';
+import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
@@ -15,9 +8,13 @@ import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
-import {Currency} from 'models/misc';
+import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {formatAddressFullname} from 'utils/utils';
+import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
+import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
+import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
+import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -46,36 +43,8 @@ Font.register({
   src: NotoSansGeorgianBold,
 });
 
-const getStyles = (
-  selectedLng?: string,
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = (boldFontStyle?: {fontFamily: string}) =>
   StyleSheet.create({
-    page: {
-      ...regularFontStyle,
-      fontSize: 10,
-      paddingTop: 25,
-      paddingLeft: 68,
-      paddingRight: 45,
-      backgroundColor: 'white',
-      height: '100%',
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      justifyContent: 'space-between',
-      paddingBottom: 95,
-      color: '#212121',
-    },
-    topSection: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 40,
-      alignItems: 'flex-start',
-      position: 'absolute',
-      top: 90,
-    },
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
@@ -104,15 +73,8 @@ const getStyles = (
       borderBottom: '1px solid #212121',
       paddingBottom: 1,
     },
-    contentHeader: {
-      fontSize: 14,
-      color: '#212121',
-      marginBottom: 10,
-      ...boldFontStyle,
-      marginTop: selectedLng === 'KA' ? 270 : 220,
-    },
     contentBody: {
-      color: '#616161',
+      color: '#212121',
       fontSize: 10,
       marginBottom: 10,
       lineHeight: 1.3,
@@ -178,27 +140,28 @@ const getStyles = (
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  logoSrc?: string;
   currentCurrency?: Currency;
   serviceOrder?: ServiceOrderView;
-  logoDimensions?: {
-    width: number;
-    height: number;
-  } | null;
   quotation?: QuotationView;
   selectedLng?: string;
+  headerInfo: HeaderFooterInfoData;
+  headerPath: string;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
 
 const JobOverviewPdfTemplate = React.memo(
   ({
     translate,
     userInfo,
-    logoSrc,
     currentCurrency,
     serviceOrder,
-    logoDimensions,
     quotation,
     selectedLng,
+    headerInfo,
+    headerPath,
+    footerInfo,
+    footerPath,
   }: Props) => {
     const articleItems = serviceOrder?.articles!;
     const calculateTotal = (arr: ServiceOrderArticleView[]) => {
@@ -241,25 +204,17 @@ const JobOverviewPdfTemplate = React.memo(
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
 
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(selectedLng, boldFontStyle, regularFontStyle);
+    const styles = getStyles(boldFontStyle);
 
     const elevatorAddress = serviceOrder?.elevator?.address;
 
     return (
       <Document>
-        <Page size="A4" style={styles.page}>
-          <View>
-            <PdfTemplateHeader
-              logoSrc={logoSrc}
-              logoDimensions={logoDimensions}
-            />
+        <PdfPageContainer selectedLng={selectedLng}>
+          <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
-            <View style={styles.topSection}>
+          <PdfBodyContainer>
+            <TopSectionContainer>
               <PdfTemplateLeftAddress
                 companyName={userInfo?.serviceCompany?.name}
                 billingAddressName={
@@ -270,6 +225,7 @@ const JobOverviewPdfTemplate = React.memo(
                   serviceOrder?.elevator.propertyOwner.billingAddress?.component
                 }
                 selectedLng={selectedLng}
+                translate={translate}
               />
 
               <View style={styles.rightAddress}>
@@ -351,13 +307,13 @@ const JobOverviewPdfTemplate = React.memo(
                   )}
                 </View>
               </View>
-            </View>
+            </TopSectionContainer>
 
             <View>
-              <Text style={styles.contentHeader}>
+              <PdfPageTitle>
                 {translate('Job Confirmation:')}{' '}
                 {translate(serviceOrderTypeToString(serviceOrder?.type!))}
-              </Text>
+              </PdfPageTitle>
 
               {serviceOrder?.description.trim() !== '' && (
                 <Text style={styles.contentBody}>
@@ -615,14 +571,16 @@ const JobOverviewPdfTemplate = React.memo(
                 )}
               </View>
             </View>
-          </View>
+          </PdfBodyContainer>
 
           <PdfTemplateFooter
             userInfo={userInfo}
             selectedLng={selectedLng}
             translate={translate}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
           />
-        </Page>
+        </PdfPageContainer>
       </Document>
     );
   },
