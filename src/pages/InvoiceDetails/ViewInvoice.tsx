@@ -480,6 +480,19 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       PdfTemplate = FinalInvoicePdfTemplate;
     }
 
+    const shouldIncludePreviousInvoices = !(
+      invoice.type === InvoiceType.CREDIT_NOTE ||
+      invoice.type === InvoiceType.FULL ||
+      invoice.type === InvoiceType.AGGREGATE
+    );
+
+    const previousInvoicesProp = shouldIncludePreviousInvoices
+      ? sortedPreviousInvoices.slice(
+          0,
+          sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+        )
+      : [];
+
     if (
       invoice.type === InvoiceType.CREDIT_NOTE ||
       invoice.type === InvoiceType.FULL ||
@@ -496,10 +509,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           invoice={invoiceData}
           selectedLng={company?.language}
           translate={translate}
-          previousInvoices={sortedPreviousInvoices.slice(
-            0,
-            sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
-          )}
+          previousInvoices={previousInvoicesProp}
           headerPath={headerUrl[headerInfo?.path]}
           headerInfo={headerInfo}
           footerPath={footerUrl[footerInfo?.path]}
@@ -522,7 +532,11 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     updatedInvoice,
     headerUrl[headerInfo?.path],
     footerUrl[footerInfo?.path],
-    previousInvoices,
+    updatedInvoice?.type === InvoiceType.CREDIT_NOTE ||
+    updatedInvoice?.type === InvoiceType.FULL ||
+    updatedInvoice?.type === InvoiceType.AGGREGATE
+      ? null
+      : previousInvoices,
   ]);
 
   useEffect(() => {

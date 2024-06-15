@@ -321,7 +321,7 @@ const FullInvoicePdfTemplate = ({
               />
             )}
 
-            {invoice?.additionalInfo.showArticleSection && (
+            {invoice?.items && (
               <ArticleSection
                 invoice={invoice}
                 currentCurrency={currentCurrency}
