@@ -235,7 +235,7 @@ export const PartialPaymentsSection = ({
       ? formik.values.items
           .map(
             (item) =>
-              (item.unitAmount.netAmount /
+              ((item.unitAmount.netAmount * item.quantity) /
                 10 ** Currencies[item.unitAmount.currency] /
                 100) *
               (item.payment?.percentage ?? 0),
@@ -513,8 +513,8 @@ export const PartialPaymentsSection = ({
                           const itemTotalPriceExclVat =
                             (isEditingCurrentItem
                               ? formik.values.items[itemIndex].unitAmount
-                                  .netAmount
-                              : item.unitAmount.netAmount) /
+                                  .netAmount * item.quantity
+                              : item.unitAmount.netAmount * item.quantity) /
                             10 ** item.unitAmount.fractionDigits;
                           const itemCurrencySymbol =
                             getCurrencySymbol[item.unitAmount.currency];
@@ -660,7 +660,7 @@ export const PartialPaymentsSection = ({
                       )
                       .map((item, index) => {
                         const itemTotalPriceExclVat =
-                          item.unitAmount.netAmount /
+                          (item.unitAmount.netAmount * item.quantity) /
                           10 ** Currencies[item.unitAmount.currency];
                         const itemCurrencySymbol =
                           getCurrencySymbol[item.unitAmount.currency];
