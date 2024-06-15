@@ -35,8 +35,8 @@ export const getInvoicePDFStatuses = (
   invoice: InvoiceView,
 ): InvoicePDFStatuses => {
   const isInvoicePDFGenerated =
-    invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE &&
-    !!invoice.additionalInfo.pdfPath;
+    invoice.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE;
+
   const isWorkReportPDFGenerated = invoice?.additionalInfo?.includeWorkReport
     ? invoice?.serviceOrder?.additionalInfo.workReportGenerated
     : true;
