@@ -45,7 +45,7 @@ type Props = {
   currentCurrency?: Currency;
   invoice?: InvoiceView;
   selectedLng?: string;
-  previousInvoices: InvoiceView[];
+  previousInvoices?: InvoiceView[];
   headerInfo: HeaderFooterInfoData;
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
@@ -176,11 +176,11 @@ const PartialInvoicePdfTemplate = ({
   footerInfo,
   footerPath,
 }: Props) => {
-  const hasPreviousInvoices = previousInvoices.length > 0;
+  const hasPreviousInvoices = previousInvoices!.length > 0;
   const firstInvoiceType = previousInvoices?.[0]?.type ?? null;
   const isFinalInvoice = invoice?.type === InvoiceType.FINAL;
   const isCreditNoteInvoice = invoice?.type === InvoiceType.CREDIT_NOTE;
-  const havePartialInvoices = previousInvoices.some(
+  const havePartialInvoices = previousInvoices?.some(
     (i) => i.type === InvoiceType.PARTIAL,
   );
   const isPartialInvoice =
@@ -364,7 +364,7 @@ const PartialInvoicePdfTemplate = ({
                 selectedLng={selectedLng}
                 invoice={invoice}
                 currentCurrency={currentCurrency}
-                previousInvoices={previousInvoices}
+                previousInvoices={previousInvoices!}
                 articleItems={articleItems}
               />
             )}
@@ -375,7 +375,7 @@ const PartialInvoicePdfTemplate = ({
                 selectedLng={selectedLng}
                 invoice={invoice}
                 currentCurrency={currentCurrency}
-                previousInvoices={previousInvoices}
+                previousInvoices={previousInvoices!}
                 articleItems={articleItems}
               />
             )}
