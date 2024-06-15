@@ -60,7 +60,7 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
-import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
+import {validateDueDate} from 'utils/invoice-utils';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -214,7 +214,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     [previousInvoices],
   );
 
-  const {isInvoicePDFGenerated} = getInvoicePDFStatuses(invoice);
   const serviceOrder = invoice?.serviceOrder;
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
@@ -412,39 +411,47 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const actions = useMemo(() => {
     const items = [];
-    if (
-      isInvoicePDFGenerated &&
-      (invoice.status === InvoiceStatus.DRAFT ||
-        invoice.status === InvoiceStatus.EXPIRED)
-    ) {
-      items.unshift(
-        {
-          label: t('Send Overdue Notice'),
-          icon: <SendIcon />,
-          onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
-        },
-        {
-          label: t('Print'),
-          icon: <Print />,
-          onClick: () => setIsConfirmPrintDialogOpen(true),
-        },
-      );
+
+    if (invoice.status === InvoiceStatus.EXPIRED) {
+      items.push({
+        label: t('Send Overdue Notice'),
+        icon: <SendIcon />,
+        onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
+      });
+
+      items.push({
+        label: t('Print'),
+        icon: <Print />,
+        onClick: () => setIsConfirmPrintDialogOpen(true),
+      });
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
-      items.unshift({
+      items.push({
         label: t('Resend'),
         icon: <ReplayIcon />,
         onClick: () => {
           setIsSendEmailDialogOpen(true);
         },
       });
+
+      items.push({
+        label: t('Print'),
+        icon: <Print />,
+        onClick: () => setIsConfirmPrintDialogOpen(true),
+      });
     }
-    items.push({
-      label: t('Edit'),
-      icon: <Edit />,
-      onClick: () => {
-        navigate(`/invoices/details/${invoice.id}/edit`);
-      },
-    });
+
+    if (
+      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+    ) {
+      items.push({
+        label: t('Edit'),
+        icon: <Edit />,
+        onClick: () => {
+          navigate(`/invoices/details/${invoice.id}/edit`);
+        },
+      });
+    }
+
     if (
       ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
     ) {
@@ -458,8 +465,21 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     } else if (invoice.sentDate || invoice.status === InvoiceStatus.CANCELLED) {
       return items.filter((item) => item.label !== t('Edit'));
     }
+
+    if (
+      ![InvoiceStatus.CANCELLED, InvoiceStatus.PARTIALLY_PAID].includes(
+        invoice.status,
+      )
+    ) {
+      items.push({
+        label: t('Print'),
+        icon: <Print />,
+        onClick: () => setIsConfirmPrintDialogOpen(true),
+      });
+    }
+
     return items;
-  }, [downloadUrl, invoice.status]);
+  }, [downloadUrl, invoice.status, t]);
 
   const generateBlobUrl = async (invoiceData: InvoiceView) => {
     let PdfTemplate;
@@ -480,19 +500,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       PdfTemplate = FinalInvoicePdfTemplate;
     }
 
-    const shouldIncludePreviousInvoices = !(
-      invoice.type === InvoiceType.CREDIT_NOTE ||
-      invoice.type === InvoiceType.FULL ||
-      invoice.type === InvoiceType.AGGREGATE
-    );
-
-    const previousInvoicesProp = shouldIncludePreviousInvoices
-      ? sortedPreviousInvoices.slice(
-          0,
-          sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
-        )
-      : [];
-
     if (
       invoice.type === InvoiceType.CREDIT_NOTE ||
       invoice.type === InvoiceType.FULL ||
@@ -509,7 +516,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           invoice={invoiceData}
           selectedLng={company?.language}
           translate={translate}
-          previousInvoices={previousInvoicesProp}
+          previousInvoices={sortedPreviousInvoices.slice(
+            0,
+            sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+          )}
           headerPath={headerUrl[headerInfo?.path]}
           headerInfo={headerInfo}
           footerPath={footerUrl[footerInfo?.path]}
@@ -532,11 +542,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     updatedInvoice,
     headerUrl[headerInfo?.path],
     footerUrl[footerInfo?.path],
-    updatedInvoice?.type === InvoiceType.CREDIT_NOTE ||
-    updatedInvoice?.type === InvoiceType.FULL ||
-    updatedInvoice?.type === InvoiceType.AGGREGATE
-      ? null
-      : previousInvoices,
+    previousInvoices,
   ]);
 
   useEffect(() => {
