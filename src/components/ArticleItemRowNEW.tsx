@@ -151,7 +151,7 @@ export const ArticleItemRowNEW = ({
   const formik = useFormik<InvoiceItemRecord>({
     initialValues: {
       ...articleItem,
-      quantity: articleItem.quantity !== 0 ? articleItem.quantity : 1,
+      quantity: articleItem.quantity,
       unitAmount: {
         ...articleItem.unitAmount,
         percentageVat:
