@@ -98,7 +98,11 @@ import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
-import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
+import {
+  articleViewToInvoiceItemRecord,
+  formatInvoiceRecord,
+  stripHtmlTags,
+} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
 import {EditFrom} from './EditFrom';
@@ -701,7 +705,10 @@ export const InvoiceForm = ({
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
       if (!formik.values.description && serviceOrder.report?.description) {
-        formik.setFieldValue('description', serviceOrder.report.description);
+        formik.setFieldValue(
+          'description',
+          stripHtmlTags(serviceOrder.report.description),
+        );
       }
       formik.setFieldValue(
         'customerSpecificOrderNumber',

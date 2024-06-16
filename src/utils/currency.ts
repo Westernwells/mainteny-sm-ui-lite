@@ -223,3 +223,9 @@ export const centsToMoney = (currencyCode: string, cents: number = 0) => {
   const fractionDigits = getCurrencyFractionDigits(currencyCode);
   return cents / 10 ** fractionDigits;
 };
+
+export const moneyRecordForLumpSum = (money?: Money) => ({
+  fractionDigits: money?.fractionDigits ?? 2,
+  currency: money?.currency ?? 'EUR',
+  value: money?.value ?? 0,
+});
