@@ -432,12 +432,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           setIsSendEmailDialogOpen(true);
         },
       });
-
-      items.push({
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
     }
 
     if (
