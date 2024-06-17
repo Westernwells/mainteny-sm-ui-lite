@@ -92,7 +92,7 @@ import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleIm
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
-import {formatInvoiceViewToUpdateInvoice} from './utils';
+import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
 
 interface Props {
   invoice: InvoiceView;
@@ -915,7 +915,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
               serviceOrder.report?.description ? (
                 <Typography variant="body1">
                   {formatDate(serviceOrder.actualStartTime)}:
-                  {serviceOrder.report.description}
+                  {stripHtmlTags(serviceOrder.report.description)}
                 </Typography>
               ) : null}
             </PageCard>
