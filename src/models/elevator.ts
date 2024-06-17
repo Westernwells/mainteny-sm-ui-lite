@@ -56,6 +56,7 @@ export enum ElevatorCategory {
   STAIR_LIFT = 'STAIR_LIFT',
   DUMBWAITER = 'DUMBWAITER',
   DISABLED_LIFT = 'DISABLED_LIFT',
+  FREIGHT_AND_PASSENGER_LIFT = 'FREIGHT_AND_PASSENGER_LIFT',
 }
 
 export enum ElevatorOrderField {
