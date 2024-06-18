@@ -22,6 +22,7 @@ import {
   SystemSettingsUpdateBody,
   XeroIntegration,
   ServiceCompanyType,
+  ServiceCompanySystemSettings,
 } from 'models/service-company';
 import {
   useInfiniteQuery,
@@ -33,16 +34,21 @@ import {
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceOrder} from 'models/service-order';
-import {ContractTermView} from 'models/contract';
+import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './useUserSession';
 
-export const getCompanies = async (page: Page, query: string) => {
+export const getCompanies = async (
+  page: Page,
+  query: string,
+  status?: string,
+) => {
   const response = await axiosClient.get<Resource<ServiceCompanyItem>>(
     '/api/serviceCompanies',
     {
       params: {
         query,
+        ...(status && {status}),
         ...page,
       },
       paramsSerializer,
@@ -55,10 +61,11 @@ export function useCompanies(
   page: Page,
   query: string,
   options?: UseQueryOptions<any, any, any>,
+  status?: string,
 ) {
   return useQuery<Resource<ServiceCompanyItem>, RestError>(
-    [queryKeys.fetchCompanies, page, query],
-    () => getCompanies(page, query),
+    [queryKeys.fetchCompanies, page, query, status],
+    () => getCompanies(page, query, status),
     {
       ...options,
     },
@@ -431,6 +438,90 @@ export const useContractTerms = ({
     {
       enabled: !!user,
       ...options,
+    },
+  );
+};
+
+export const queryContractPaymentTerms = async (
+  serviceCompanyId: string,
+  page: Page,
+  query: string,
+) => {
+  const response = await axiosClient.get<Resource<ContractPaymentTermView>>(
+    `/api/serviceCompanies/${serviceCompanyId}/contractPaymentTerms`,
+    {
+      params: {
+        query,
+        ...page,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQueryContractPaymentTerms = ({
+  page,
+  query,
+  options,
+}: {
+  page: Page;
+  query: string;
+  options?: UseQueryOptions<any, any, any>;
+}) => {
+  const {user} = useUserSession();
+  return useQuery<Resource<ContractPaymentTermView>, RestError>(
+    [queryKeys.queryContractPaymentTerms, page, query],
+    () =>
+      queryContractPaymentTerms(
+        user!.userAccount.serviceCompany.id,
+        page,
+        query,
+      ),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+};
+
+const updateServiceCompanySystemSettings = async (
+  body: ServiceCompanySystemSettings,
+  companyId: string,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceCompanies/${companyId}/systemSettings`,
+    {
+      ...body,
+    },
+  );
+};
+
+export const useUpdateServiceCompanySystemSettings = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({
+      body,
+      companyId,
+    }: {
+      body: ServiceCompanySystemSettings;
+      companyId: string;
+    }) => updateServiceCompanySystemSettings(body, companyId),
+    {
+      onSuccess: async () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchCompanies);
+      },
+      onError: (err: any) => {
+        console.log(err);
+        showError(err);
+      },
     },
   );
 };

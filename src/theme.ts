@@ -65,6 +65,9 @@ export const theme = createTheme({
       contrastText: '#FFFFFF',
       outlinedHoverBg: 'rgba(97, 255, 192, 0.08)',
     },
+    grey: {
+      '300': '#E0E0E0',
+    },
     background: {
       default: '#F2F6F8',
     },
