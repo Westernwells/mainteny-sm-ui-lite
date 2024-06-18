@@ -6,6 +6,7 @@ import {UserAccountSimpleView} from './user';
 import {ContractTypes, ContractNameTypes} from './contract';
 import {AccountSystems, MinToStep} from './service-company';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {CompanyStatus} from './company';
 
 export interface RestError {
   errorCode: number;
@@ -65,6 +66,12 @@ export interface Settings {
   serviceOrderGenerationDaysInAdvance?: number;
   minToHourStep?: MinToStep | number;
   accountSystem?: AccountSystems;
+  status: CompanyStatus;
+  userLimits: {
+    maxContractorCount: number;
+    maxMainUserCount: number;
+  };
+  expiryDate: string;
 }
 
 export interface Page {

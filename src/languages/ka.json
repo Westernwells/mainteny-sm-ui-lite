@@ -2487,6 +2487,7 @@
   "Dumbwaiter": "სამზარეულოს ლიფტი",
   "Disabled lift": "შშმპ ლიფტი",
   "Price": "ფასი",
+  "Freight and Passenger lift": "სატვირთო და სამგზავრო ლიფტი",
   "Purchase no.": "შეძენის ნომერი",
   "COMPANY": "კომპანია",
   "PHONE 1": "ტელეფონი 1",
@@ -2620,5 +2621,12 @@
   "New Block": "ახალი ბლოკი",
   "Edit text block": "ტექსტის ბლოკის რედაქტირება",
   "New text block": "ახალი ტექსტის ბლოკი",
-  "Create Block": "ბლოკის შექმნა"
+  "Create Block": "ბლოკის შექმნა",
+  "Do you want to delete \"{{textBlockName}}\" from this list?": "გსურთ ამ სიიდან \"{{textBlockName}}ის\" წაშლა?",
+  "Word Count": "სიტყვების რაოდენობა",
+  "Created": "შეიქმნა",
+  "Failed to load PDF file": "PDF ფაილი ვერ ჩამოიტვირთა",
+  "Text Blocks": "ტექსტის ბლოკი",
+  "WORD COUNT": "სიტყვების რაოდენობა",
+  "EDITED": "რედაქტირებული"
 }
