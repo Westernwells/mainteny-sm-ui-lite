@@ -958,7 +958,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
                 workReportBlob,
                 [`${report?.id}.pdf`],
                 workReportUploadPath,
-                report?.externalId || report?.number || '',
+                `${report?.externalId}.pdf` || `${report?.number}.pdf` || '',
               );
               allFiles = allFiles.concat(workReportFiles);
             }
@@ -970,7 +970,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
                 checklistBlob,
                 [`${checkListInfo?.checkListId}.pdf`],
                 checklistUploadPath,
-                selectedChecklist?.checkList.number || '',
+                `${selectedChecklist?.checkList.number}.pdf` || '',
               );
               allFiles = allFiles.concat(checklistFiles);
             }
@@ -1026,7 +1026,8 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
                             ...file,
                             uri: `${uploadPath}/${file.name}`,
                             description:
-                              updatedInvoiceData?.data?.externalId || '',
+                              `${updatedInvoiceData?.data?.externalId}.pdf` ||
+                              '',
                             name: file.name,
                             type: file.type,
                           })),
@@ -1075,7 +1076,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
                     files.map((file) => ({
                       ...file,
                       uri: `${uploadPath}/${file.name}`,
-                      description: invoice.externalId || '',
+                      description: `${invoice.externalId}.pdf` || '',
                       name: file.name,
                       type: file.type,
                     })),
@@ -1112,7 +1113,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
                 files.map((file) => ({
                   ...file,
                   uri: `${uploadPath}/${file.name}`,
-                  description: invoice.externalId || '',
+                  description: `${invoice.externalId}.pdf` || '',
                   name: file.name,
                   type: file.type,
                 })),

@@ -810,8 +810,8 @@ export const ViewQuotation = ({
                           ? `${uploadPath}/${quotation.id}.pdf`
                           : `${uploadPath}/${obj.name}`,
                         description: isFileFromServer
-                          ? quotation.externalId
-                          : obj.name.split('.')[0],
+                          ? `${quotation.externalId}.pdf`
+                          : `${obj.name.split('.')[0]}`,
                       },
                     ];
                   },
