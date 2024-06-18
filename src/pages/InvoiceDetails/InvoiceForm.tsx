@@ -507,6 +507,7 @@ export const InvoiceForm = ({
             new Date(a.meta.createdAt).getTime() -
             new Date(b.meta.createdAt).getTime(),
         )
+        .filter((item) => item.status !== InvoiceStatus.CANCELLED)
         .map((i) => ({
           ...i,
           totalAmount: {
