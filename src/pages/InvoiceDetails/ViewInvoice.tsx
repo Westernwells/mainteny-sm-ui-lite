@@ -1049,7 +1049,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             return files.map((file) => ({
               ...file,
               uri: `${uploadPath}/${file.name}`,
-              description,
+              description: `${description}.pdf`,
               name: file.name,
               type: file.type,
             }));
@@ -1136,7 +1136,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                             ...file,
                             uri: `${uploadPath}/${file.name}`,
                             description:
-                              updatedInvoiceData.data?.externalId || '',
+                              `${updatedInvoiceData.data?.externalId}.pdf` ||
+                              '',
                             name: file.name,
                             type: file.type,
                           })),
@@ -1185,7 +1186,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     files.map((file) => ({
                       ...file,
                       uri: `${uploadPath}/${file.name}`,
-                      description: invoice.externalId || '',
+                      description: `${invoice.externalId}.pdf` || '',
                       name: file.name,
                       type: file.type,
                     })),
@@ -1222,7 +1223,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                 files.map((file) => ({
                   ...file,
                   uri: `${uploadPath}/${file.name}`,
-                  description: invoice.externalId || '',
+                  description: `${invoice.externalId}.pdf` || '',
                   name: file.name,
                   type: file.type,
                 })),

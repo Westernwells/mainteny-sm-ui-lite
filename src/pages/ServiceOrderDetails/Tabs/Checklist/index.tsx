@@ -777,8 +777,8 @@ export const CheckList = ({serviceOrder}: Props) => {
                                   : `${uploadPath}/${checkListInfo.checkListId}.pdf`
                                 : `${uploadPath}/${obj.name}`,
                               description: isFileFromServer
-                                ? checkListInfo.checkList?.externalId ||
-                                  checkListInfo.checkList?.number
+                                ? `${checkListInfo.checkList?.externalId}.pdf` ||
+                                  `${checkListInfo.checkList?.number}.pdf`
                                 : obj.name.split('.')[0],
                             },
                           ];
