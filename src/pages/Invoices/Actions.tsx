@@ -502,7 +502,11 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
     if (invoice.status === InvoiceStatus.NOT_PAID) {
       return (
         <Tooltip title={t('Payment')} placement="left" arrow>
-          <IconButton onClick={() => setIsDialogOpen(true)}>
+          <IconButton
+            onClick={() => {
+              setIsDialogOpen(true);
+              setSelectedInvoice(invoice);
+            }}>
             <Payments fontSize="small" sx={{color: 'action.active'}} />
           </IconButton>
         </Tooltip>
@@ -908,12 +912,17 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
         ))}
       </Menu>
 
-      <MarkAsPaidDialog
-        invoice={invoice}
-        open={isDialogOpen}
-        onConfirm={() => setIsDialogOpen(false)}
-        onClose={() => setIsDialogOpen(false)}
-      />
+      {selectedInvoice && (
+        <MarkAsPaidDialog
+          invoice={selectedInvoice!}
+          open={isDialogOpen}
+          onConfirm={() => setIsDialogOpen(false)}
+          onClose={() => {
+            setIsDialogOpen(false);
+            setSelectedInvoice(null);
+          }}
+        />
+      )}
 
       <SendEmailDialog
         open={isSendEmailDialogOpen}
