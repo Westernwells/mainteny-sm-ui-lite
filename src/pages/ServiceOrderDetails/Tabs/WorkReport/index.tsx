@@ -221,7 +221,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
             ? `${path}/${report?.id}.pdf`
             : `${path}/${obj.name}`,
           description: isFileFromServer
-            ? fileReport?.externalId || fileReport?.number
+            ? `${fileReport?.externalId}.pdf` || `${fileReport?.number}.pdf`
             : obj.name.split('.')[0],
         },
       ];

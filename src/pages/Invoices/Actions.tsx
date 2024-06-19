@@ -42,7 +42,6 @@ import {
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {validateDueDate} from 'utils/invoice-utils';
-import useLogoDimensions from 'hooks/useLogoDimensions';
 import {
   useCompanyById,
   useCompanyNextNumber,
@@ -75,7 +74,6 @@ import {useQueryClientStorageData} from 'hooks/useClientStorage';
 
 interface Props {
   invoice: InvoiceView;
-  imageUrl?: string;
   isInvoiceList?: boolean;
 }
 
@@ -100,7 +98,7 @@ const Tooltip = ({children, ...props}: TooltipProps) => (
   </MUITooltip>
 );
 
-export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
+export const Actions = ({invoice, isInvoiceList = true}: Props) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
   const navigate = useNavigate();
@@ -120,7 +118,6 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
 
   const [actionType, setActionType] = useState('');
   const [pdfPathToDownload, setPdfPathToDownload] = useState('');
-  const logoDimensions = useLogoDimensions(imageUrl!);
 
   const [shouldFetchNextNumber, setShouldFetchNextNumber] = useState(false);
 
@@ -564,7 +561,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
             setIsDeleteDialogOpen(true);
           },
         },
-        ...(logoDimensions ? [downloadItem] : []),
+        ...[downloadItem],
       );
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
       items.push(
@@ -585,7 +582,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
           icon: <Payments />,
           onClick: () => setIsCreateCreditNoteDialogOpen(true),
         },
-        ...(logoDimensions ? [downloadItem] : []),
+        ...[downloadItem],
         cancelItem,
       );
     } else if (invoice.status === InvoiceStatus.EXPIRED) {
@@ -612,7 +609,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
           icon: <Payments />,
           onClick: () => setIsCreateCreditNoteDialogOpen(true),
         },
-        ...(logoDimensions ? [downloadItem] : []),
+        ...[downloadItem],
         cancelItem,
       );
     } else if (invoice.status === InvoiceStatus.PAID) {
@@ -629,7 +626,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
           icon: <Payments />,
           onClick: () => setIsCreateCreditNoteDialogOpen(true),
         },
-        ...(logoDimensions ? [downloadItem] : []),
+        ...[downloadItem],
       );
     } else if (invoice.status === InvoiceStatus.PARTIALLY_PAID) {
       items.push(
@@ -655,7 +652,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
           icon: <Payments />,
           onClick: () => setIsCreateCreditNoteDialogOpen(true),
         },
-        ...(logoDimensions ? [downloadItem] : []),
+        ...[downloadItem],
       );
     } else if (invoice.status === InvoiceStatus.CREDITED) {
       items.push(
@@ -681,7 +678,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
             refetchDownloadUrl();
           },
         },
-        ...(logoDimensions ? [downloadItem] : []),
+        ...[downloadItem],
         cancelItem,
       );
     }
@@ -961,7 +958,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
                 workReportBlob,
                 [`${report?.id}.pdf`],
                 workReportUploadPath,
-                report?.externalId || report?.number || '',
+                `${report?.externalId}.pdf` || `${report?.number}.pdf` || '',
               );
               allFiles = allFiles.concat(workReportFiles);
             }
@@ -973,7 +970,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
                 checklistBlob,
                 [`${checkListInfo?.checkListId}.pdf`],
                 checklistUploadPath,
-                selectedChecklist?.checkList.number || '',
+                `${selectedChecklist?.checkList.number}.pdf` || '',
               );
               allFiles = allFiles.concat(checklistFiles);
             }
@@ -1029,7 +1026,8 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
                             ...file,
                             uri: `${uploadPath}/${file.name}`,
                             description:
-                              updatedInvoiceData?.data?.externalId || '',
+                              `${updatedInvoiceData?.data?.externalId}.pdf` ||
+                              '',
                             name: file.name,
                             type: file.type,
                           })),
@@ -1078,7 +1076,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
                     files.map((file) => ({
                       ...file,
                       uri: `${uploadPath}/${file.name}`,
-                      description: invoice.externalId || '',
+                      description: `${invoice.externalId}.pdf` || '',
                       name: file.name,
                       type: file.type,
                     })),
@@ -1115,7 +1113,7 @@ export const Actions = ({invoice, isInvoiceList = true, imageUrl}: Props) => {
                 files.map((file) => ({
                   ...file,
                   uri: `${uploadPath}/${file.name}`,
-                  description: invoice.externalId || '',
+                  description: `${invoice.externalId}.pdf` || '',
                   name: file.name,
                   type: file.type,
                 })),

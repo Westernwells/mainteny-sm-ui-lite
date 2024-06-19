@@ -96,7 +96,6 @@ const Form = ({form}: Props) => {
             })
           }
           keys={{label: 'userAccount.firstName', value: 'id'}}
-          searchableKeys={['userAccount.firstName', 'userAccount.lastName']}
           textFieldProps={{
             label: t('First name'),
             placeholder: t('Select customer'),
@@ -127,6 +126,17 @@ const Form = ({form}: Props) => {
           )}
           name="contactPerson.contactPersonId"
           control={control}
+          filterOptions={(options, state) => {
+            const filteredOptions = options.filter((option) => {
+              const firstName = option.userAccount.firstName.toLowerCase();
+              const lastName = option.userAccount.lastName.toLowerCase();
+              const searchText = state.inputValue.toLowerCase();
+              return (
+                firstName.includes(searchText) || lastName.includes(searchText)
+              );
+            });
+            return filteredOptions;
+          }}
           onChange={(e, value, reason) => {
             if (reason === 'clear') {
               reset();

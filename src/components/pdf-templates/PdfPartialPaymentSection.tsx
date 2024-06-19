@@ -144,7 +144,7 @@ export const PdfPartialPaymentSection = ({
       ? articleItems!
           .map(
             (item) =>
-              (item.unitAmount.netAmount /
+              ((item.unitAmount.netAmount * item.quantity) /
                 10 ** Currencies[item.unitAmount.currency] /
                 100) *
               (item.additionalInfo?.payment?.percentage ?? 0),
@@ -274,6 +274,7 @@ export const PdfPartialPaymentSection = ({
             translate={translate}
             selectedLng={selectedLng}
             currentCurrency={currentCurrency}
+            invoice={invoice}
             previousInvoices={previousInvoices}
           />
         )}

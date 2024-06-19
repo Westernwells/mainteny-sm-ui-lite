@@ -60,7 +60,7 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
-import {validateDueDate, getInvoicePDFStatuses} from 'utils/invoice-utils';
+import {validateDueDate} from 'utils/invoice-utils';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -92,7 +92,7 @@ import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleIm
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
-import {formatInvoiceViewToUpdateInvoice} from './utils';
+import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
 
 interface Props {
   invoice: InvoiceView;
@@ -216,7 +216,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     [previousInvoices],
   );
 
-  const {isInvoicePDFGenerated} = getInvoicePDFStatuses(invoice);
   const serviceOrder = invoice?.serviceOrder;
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
@@ -414,25 +413,21 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const actions = useMemo(() => {
     const items = [];
-    if (
-      isInvoicePDFGenerated &&
-      (invoice.status === InvoiceStatus.DRAFT ||
-        invoice.status === InvoiceStatus.EXPIRED)
-    ) {
-      items.unshift(
-        {
-          label: t('Send Overdue Notice'),
-          icon: <SendIcon />,
-          onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
-        },
-        {
-          label: t('Print'),
-          icon: <Print />,
-          onClick: () => setIsConfirmPrintDialogOpen(true),
-        },
-      );
+
+    if (invoice.status === InvoiceStatus.EXPIRED) {
+      items.push({
+        label: t('Send Overdue Notice'),
+        icon: <SendIcon />,
+        onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
+      });
+
+      items.push({
+        label: t('Print'),
+        icon: <Print />,
+        onClick: () => setIsConfirmPrintDialogOpen(true),
+      });
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
-      items.unshift({
+      items.push({
         label: t('Resend'),
         icon: <ReplayIcon />,
         onClick: () => {
@@ -440,13 +435,19 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         },
       });
     }
-    items.push({
-      label: t('Edit'),
-      icon: <Edit />,
-      onClick: () => {
-        navigate(`/invoices/details/${invoice.id}/edit`);
-      },
-    });
+
+    if (
+      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+    ) {
+      items.push({
+        label: t('Edit'),
+        icon: <Edit />,
+        onClick: () => {
+          navigate(`/invoices/details/${invoice.id}/edit`);
+        },
+      });
+    }
+
     if (
       ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
     ) {
@@ -460,8 +461,21 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     } else if (invoice.sentDate || invoice.status === InvoiceStatus.CANCELLED) {
       return items.filter((item) => item.label !== t('Edit'));
     }
+
+    if (
+      ![InvoiceStatus.CANCELLED, InvoiceStatus.PARTIALLY_PAID].includes(
+        invoice.status,
+      )
+    ) {
+      items.push({
+        label: t('Print'),
+        icon: <Print />,
+        onClick: () => setIsConfirmPrintDialogOpen(true),
+      });
+    }
+
     return items;
-  }, [downloadUrl, invoice.status]);
+  }, [downloadUrl, invoice.status, t]);
 
   const generateBlobUrl = async (invoiceData: InvoiceView) => {
     let PdfTemplate;
@@ -482,6 +496,19 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       PdfTemplate = FinalInvoicePdfTemplate;
     }
 
+    const shouldIncludePreviousInvoices = !(
+      invoice.type === InvoiceType.CREDIT_NOTE ||
+      invoice.type === InvoiceType.FULL ||
+      invoice.type === InvoiceType.AGGREGATE
+    );
+
+    const previousInvoicesProp = shouldIncludePreviousInvoices
+      ? sortedPreviousInvoices.slice(
+          0,
+          sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+        )
+      : [];
+
     if (
       invoice.type === InvoiceType.CREDIT_NOTE ||
       invoice.type === InvoiceType.FULL ||
@@ -498,10 +525,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           invoice={invoiceData}
           selectedLng={company?.language}
           translate={translate}
-          previousInvoices={sortedPreviousInvoices.slice(
-            0,
-            sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
-          )}
+          previousInvoices={previousInvoicesProp}
           headerPath={headerUrl[headerInfo?.path]}
           headerInfo={headerInfo}
           footerPath={footerUrl[footerInfo?.path]}
@@ -524,7 +548,11 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     updatedInvoice,
     headerUrl[headerInfo?.path],
     footerUrl[footerInfo?.path],
-    previousInvoices,
+    updatedInvoice?.type === InvoiceType.CREDIT_NOTE ||
+    updatedInvoice?.type === InvoiceType.FULL ||
+    updatedInvoice?.type === InvoiceType.AGGREGATE
+      ? null
+      : previousInvoices,
   ]);
 
   useEffect(() => {
@@ -889,7 +917,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
               serviceOrder.report?.description ? (
                 <Typography variant="body1">
                   {formatDate(serviceOrder.actualStartTime)}:
-                  {serviceOrder.report.description}
+                  {stripHtmlTags(serviceOrder.report.description)}
                 </Typography>
               ) : null}
             </PageCard>
@@ -1023,7 +1051,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             return files.map((file) => ({
               ...file,
               uri: `${uploadPath}/${file.name}`,
-              description,
+              description: `${description}.pdf`,
               name: file.name,
               type: file.type,
             }));
@@ -1110,7 +1138,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                             ...file,
                             uri: `${uploadPath}/${file.name}`,
                             description:
-                              updatedInvoiceData.data?.externalId || '',
+                              `${updatedInvoiceData.data?.externalId}.pdf` ||
+                              '',
                             name: file.name,
                             type: file.type,
                           })),
@@ -1159,7 +1188,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     files.map((file) => ({
                       ...file,
                       uri: `${uploadPath}/${file.name}`,
-                      description: invoice.externalId || '',
+                      description: `${invoice.externalId}.pdf` || '',
                       name: file.name,
                       type: file.type,
                     })),
@@ -1196,7 +1225,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                 files.map((file) => ({
                   ...file,
                   uri: `${uploadPath}/${file.name}`,
-                  description: invoice.externalId || '',
+                  description: `${invoice.externalId}.pdf` || '',
                   name: file.name,
                   type: file.type,
                 })),

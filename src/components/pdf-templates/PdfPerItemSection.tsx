@@ -11,6 +11,7 @@ type PerItemPaymentProps = {
   translate: (key: string) => string;
   currentCurrency?: Currency;
   selectedLng?: string;
+  invoice?: InvoiceView;
   previousInvoices: InvoiceView[];
 };
 
@@ -47,10 +48,11 @@ const getStyles = () =>
     },
   });
 
-export const PdfPerItemSection = ({
+const PdfPerItemSection = ({
   translate,
   currentCurrency,
   selectedLng,
+  invoice,
   previousInvoices,
 }: PerItemPaymentProps) => {
   const styles = getStyles();
@@ -67,6 +69,7 @@ export const PdfPerItemSection = ({
           flexDirection: 'row',
           width: '100%',
           marginTop: 20,
+          paddingBottom: 3,
         }}>
         <Text
           style={{
@@ -117,106 +120,127 @@ export const PdfPerItemSection = ({
             const aggregatedItems = previousInvoices.reduce<
               Record<string, AggregatedInvoiceItem>
             >((acc, prevInvoice) => {
-              prevInvoice.items.forEach((invoiceItem) => {
-                const itemId = invoiceItem.article?.id!;
+              prevInvoice.items.forEach((item) => {
+                if (
+                  item.additionalInfo?.payment?.percentage &&
+                  item.additionalInfo?.payment?.percentage > 0
+                ) {
+                  const itemId = item.article?.id!;
+                  if (!acc[itemId]) {
+                    acc[itemId] = {
+                      ...item,
+                      totalAmountToBePaid: 0,
+                      totalPercentage: 0,
+                    };
+                  }
 
-                if (!acc[itemId]) {
-                  acc[itemId] = {
-                    ...invoiceItem,
-                    totalAmountToBePaid: 0,
-                    totalPercentage: 0,
-                  };
+                  const itemTotalPriceExclVat =
+                    (item.unitAmount.netAmount * item.quantity) /
+                    10 ** item.unitAmount.fractionDigits;
+
+                  const itemAmountToBePaid =
+                    (itemTotalPriceExclVat / 100) *
+                    (item.additionalInfo?.payment?.percentage ?? 0);
+
+                  acc[itemId].totalAmountToBePaid += itemAmountToBePaid;
+                  acc[itemId].totalPercentage +=
+                    item.additionalInfo?.payment?.percentage ?? 0;
                 }
-                const itemTotalPriceExclVat =
-                  invoiceItem.unitAmount.netAmount /
-                  10 ** invoiceItem.unitAmount.fractionDigits;
-
-                const itemAmountToBePaid =
-                  (itemTotalPriceExclVat / 100) *
-                  (invoiceItem.additionalInfo?.payment?.percentage ?? 0);
-
-                acc[itemId].totalAmountToBePaid! += itemAmountToBePaid;
-                acc[itemId].totalPercentage! +=
-                  invoiceItem.additionalInfo?.payment?.percentage ?? 0;
               });
               return acc;
             }, {});
 
-            const aggregatedItemsArray = Object.values(aggregatedItems);
+            const currentInvoiceItems = previousInvoices.flatMap(
+              (prevInvoice) =>
+                prevInvoice.id === invoice?.id
+                  ? prevInvoice.items
+                      .filter(
+                        (item) =>
+                          (item.additionalInfo?.payment?.percentage ?? 0) > 0,
+                      )
+                      .map((item, index) => {
+                        const itemId = item.article?.id!;
+                        const aggregatedItem = aggregatedItems[itemId];
 
-            return aggregatedItemsArray.map((invoiceItem, index) => {
-              const isLastItem = index === aggregatedItemsArray.length - 1;
+                        return (
+                          <View
+                            key={`${prevInvoice.id}-${item.id}`}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              width: '100%',
+                              flexDirection: 'row',
+                              marginVertical: 4,
+                              borderBottomWidth:
+                                index === prevInvoice.items.length - 1 ? 1 : 0,
+                              borderBottomColor: '#212121',
+                              paddingBottom: 3,
+                            }}
+                            wrap={false}>
+                            <Text
+                              style={{
+                                textAlign: 'left',
+                                width: '4%',
+                              }}>
+                              {index + 1}
+                            </Text>
+                            <Text
+                              style={{
+                                textAlign: 'left',
+                                width: '36%',
+                              }}>
+                              {item.name}
+                            </Text>
+                            <Text
+                              style={{
+                                textAlign: 'right',
+                                width: '18%',
+                              }}>
+                              {formatCurrency(
+                                centsToMoney(
+                                  currentCurrency?.code!,
+                                  item.unitAmount.netAmount * item.quantity,
+                                ),
+                                {
+                                  currency: currentCurrency?.code,
+                                  excludeCurrencySymbol: true,
+                                  currencySymbol: currentCurrency?.symbol,
+                                  companyLang: selectedLng,
+                                },
+                              )}
+                            </Text>
+                            <Text
+                              style={{
+                                textAlign: 'right',
+                                color: '#212121',
+                                width: '15%',
+                              }}>
+                              {aggregatedItem.totalPercentage}%
+                            </Text>
+                            <Text
+                              style={{
+                                textAlign: 'right',
+                                color: '#212121',
+                                width: '25%',
+                              }}>
+                              {formatCurrency(
+                                aggregatedItem.totalAmountToBePaid,
+                                {
+                                  currency: currentCurrency?.code,
+                                  excludeCurrencySymbol: true,
+                                  currencySymbol: currentCurrency?.symbol,
+                                  companyLang: selectedLng,
+                                },
+                              )}
+                            </Text>
+                          </View>
+                        );
+                      })
+                  : [],
+            );
 
-              return (
-                <View
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    flexDirection: 'row',
-                    marginVertical: 4,
-                    borderBottomWidth: isLastItem ? 1 : 0,
-                    borderBottomColor: '#212121',
-                  }}
-                  wrap={false}
-                  key={invoiceItem.id}>
-                  <Text
-                    style={{
-                      textAlign: 'left',
-                      width: '4%',
-                    }}>
-                    {index + 1}
-                  </Text>
-                  <Text
-                    style={{
-                      textAlign: 'left',
-                      width: '36%',
-                    }}>
-                    {invoiceItem.name}
-                  </Text>
-                  <Text
-                    style={{
-                      textAlign: 'right',
-                      width: '18%',
-                    }}>
-                    {formatCurrency(
-                      centsToMoney(
-                        currentCurrency?.code!,
-                        invoiceItem.unitAmount.netAmount,
-                      ),
-                      {
-                        currency: currentCurrency?.code,
-                        excludeCurrencySymbol: true,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      },
-                    )}
-                  </Text>
-                  <Text
-                    style={{
-                      textAlign: 'right',
-                      color: '#212121',
-                      width: '15%',
-                    }}>
-                    {invoiceItem.totalPercentage}%
-                  </Text>
-                  <Text
-                    style={{
-                      textAlign: 'right',
-                      color: '#212121',
-                      width: '25%',
-                    }}>
-                    {formatCurrency(invoiceItem.totalAmountToBePaid!, {
-                      currency: currentCurrency?.code,
-                      excludeCurrencySymbol: true,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    })}
-                  </Text>
-                </View>
-              );
-            });
+            return <View>{currentInvoiceItems}</View>;
           })()}
       </View>
     </View>

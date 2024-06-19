@@ -89,24 +89,26 @@ export const NewContractServices = ({
   });
 
   useEffect(() => {
-    formikContractServiceComponent.setFieldValue(
-      'elevators',
-      data
-        ?.map((item) => item.data)
-        .map((item) => ({
-          elevatorId: item.id,
-          externalId: item.externalId,
-          invoiceJob: {timeUnit: ContractTimeUnit.NONE, timeNumbers: []},
-          orderGenerationJob: {
-            timeUnit: ContractTimeUnit.NONE,
-            timeNumbers: [],
-          },
-          price: 0,
-          buildingLocation: item.additionalInfo?.buildingLocation || '-',
-          address: item.address?.fullName || '-',
-          isSelected: true,
-        })) || [],
-    );
+    if (data && !formikContractServiceComponent.values.elevators.length) {
+      formikContractServiceComponent.setFieldValue(
+        'elevators',
+        data
+          ?.map((item) => item.data)
+          .map((item) => ({
+            elevatorId: item.id,
+            externalId: item.externalId,
+            invoiceJob: {timeUnit: ContractTimeUnit.NONE, timeNumbers: []},
+            orderGenerationJob: {
+              timeUnit: ContractTimeUnit.NONE,
+              timeNumbers: [],
+            },
+            price: 0,
+            buildingLocation: item.additionalInfo?.buildingLocation || '-',
+            address: item.address?.fullName || '-',
+            isSelected: true,
+          })) || [],
+      );
+    }
   }, [data, elevatorUnits.length]);
 
   const handleCancel = () => {
