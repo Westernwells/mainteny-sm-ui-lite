@@ -476,6 +476,9 @@ export const InvoiceForm = ({
         setResetDueDatePicker(true);
       }
     }
+
+    formik.setFieldValue('costCenter', row.additionalInfo.costCenter);
+
     // If the chosen customer was already set as the property owner of the invoice
     if (row.id !== invoice?.propertyOwner.id) {
       const emptyAddressState = {fullName: null};
