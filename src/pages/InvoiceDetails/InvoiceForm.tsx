@@ -111,7 +111,11 @@ import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
-import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
+import {
+  articleViewToInvoiceItemRecord,
+  formatInvoiceRecord,
+  stripHtmlTags,
+} from './utils';
 import NewCustomer from './NewCustomer';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
 import {EditFrom} from './EditFrom';
@@ -362,13 +366,8 @@ export const InvoiceForm = ({
     ServiceOrderView | undefined
   >(serviceOrderResource ?? undefined);
 
-  const isWorkReportPDFGenerated =
-    !!serviceOrder?.additionalInfo.workReportGenerated;
-  const isCheckListPDFGenerated =
-    serviceOrder?.checkLists?.length &&
-    serviceOrder.checkLists.every(
-      (c) => c.pdfGenerationStatus === PdfGenerationStatus.DONE,
-    );
+  const isWorkReportPDFGenerated = !!serviceOrder?.reports?.length;
+  const isCheckListPDFGenerated = !!serviceOrder?.checkLists?.length;
 
   const [dueDateError, setDueDateError] = useState('');
 
@@ -528,26 +527,28 @@ export const InvoiceForm = ({
   }, [invoice]);
 
   const getFormattedPaymentTerms = (paymentTerm: ContractPaymentTermView) => {
-    const discountOptions =
-      paymentTerm.data?.discountOptions
-        .map((d) => {
-          const discountDays = d.discountDays || 0;
-          const discountPercentage = d.discountPercent || 0;
+    const discountOptions = paymentTerm.data?.discountOptions
+      .map((d) => {
+        const discountDays = d.discountDays || 0;
+        const discountPercentage = d.discountPercent || 0;
 
-          if (discountDays === 0 && discountPercentage === 0) {
-            return paymentTerm.term || '';
-          }
+        if (discountDays === 0 && discountPercentage === 0) {
+          return ''; // Return empty string if no valid discount
+        }
 
-          return t(
-            `If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}`,
-            {discountPercentage, lng: companyLanguage},
-          );
-        })
-        .join('\n') || '';
+        return t(
+          `If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}`,
+          {discountPercentage, lng: companyLanguage},
+        );
+      })
+      .filter((option) => option !== '') // Filter out empty strings
+      .join('\n');
 
     return {
       id: paymentTerm.id,
-      term: `${paymentTerm.term}\n${discountOptions}`,
+      term: discountOptions
+        ? `${paymentTerm.term}\n${discountOptions}`
+        : paymentTerm.term,
     };
   };
 
@@ -832,7 +833,10 @@ export const InvoiceForm = ({
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
       if (!formik.values.description && serviceOrder.report?.description) {
-        formik.setFieldValue('description', serviceOrder.report.description);
+        formik.setFieldValue(
+          'description',
+          stripHtmlTags(serviceOrder.report.description),
+        );
       }
       formik.setFieldValue(
         'customerSpecificOrderNumber',

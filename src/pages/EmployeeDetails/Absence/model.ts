@@ -1,9 +1,9 @@
 export type AbsenceForm = {
   duration: string;
   typeAbsence: string;
-  date: Date;
-  dateStart: Date | undefined;
-  dateEnd: Date | undefined;
+  date?: Date;
+  dateStart?: Date;
+  dateEnd?: Date;
   notes: string;
 };
 

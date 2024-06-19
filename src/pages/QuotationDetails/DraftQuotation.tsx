@@ -227,6 +227,7 @@ export const DraftQuotation = ({
     expiryDate: quotation?.additionalInfo.expiryDate
       ? new Date(quotation?.additionalInfo.expiryDate)
       : addDays(new Date(), 14),
+    elevatorId: quotation?.elevator?.id || null,
   };
 
   const validationSchema = Yup.object().shape({

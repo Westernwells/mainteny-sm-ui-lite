@@ -111,7 +111,7 @@ const ContactFormDialog = ({
           },
           userAccount: {
             ...data.userAccount,
-            photoUrl: file ? photoUrl : '',
+            photoUrl,
             serviceCompanyId,
           },
         },
