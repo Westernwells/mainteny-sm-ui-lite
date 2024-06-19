@@ -1,16 +1,16 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import GoogleMapReact from 'google-map-react';
 import Box from '@mui/system/Box';
 import {DatePicker} from 'components/DatePicker';
 import useSupercluster from 'use-supercluster';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {getCenter} from 'geolib';
 import Supercluster from 'supercluster';
 import {Typography} from '@mui/material';
 import {LocationPin} from 'components/LocationPin';
-import {Location, Resource} from 'models/misc';
+import {Location, OrderByParams, Resource} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
 import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
@@ -19,6 +19,9 @@ import {useQueryState} from 'hooks/useQueryState';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useTheme} from '@mui/system';
+import {useSearchValues} from 'hooks/useSearchValues';
+
+const pageInfo = makePage(0, 50);
 
 export const UnitMapsView = () => {
   const formatDate = useFormatDate();
@@ -32,11 +35,13 @@ export const UnitMapsView = () => {
     },
   }).current;
   const mapRef = useRef<any>();
-  const [lastVisitStart, setLastVisitStart, clearFilters] =
-    useQueryState<Date | null>('lastVisitStart', {
+  const [lastVisitStart, setLastVisitStart] = useQueryState<Date | null>(
+    'lastVisitStart',
+    {
       defaultValue: null,
       isDate: true,
-    });
+    },
+  );
   const [lastVisitEnd, setLastVisitEnd] = useQueryState<Date | null>(
     'lastVisitEnd',
     {
@@ -58,12 +63,13 @@ export const UnitMapsView = () => {
       isDate: true,
     },
   );
+  const {clearValues} = useSearchValues<OrderByParams<ElevatorOrderField>>();
   const [zoom, setZoom] = useState(20);
   const [search, setSearch] = useQueryState('searchUnitsMapView');
   const [points, setPoints] = useState<any>([]);
   const [bounds, setBounds] = useState<any>([]);
   const [page, setPage] = useQueryState('page', {
-    defaultValue: makePage(0, 100),
+    defaultValue: pageInfo,
   });
   const [resetDatePicker, setResetDatePicker] = useState(false);
   const [elevatorView, setElevatorView] = useState<{
@@ -94,7 +100,10 @@ export const UnitMapsView = () => {
       nextVisitDateEnd: formatDate(nextVisitEnd, 'yyyy-MM-dd'),
     }),
   });
-
+  const memorisedElevatorResponse = useMemo(
+    () => elevatorResponse,
+    [elevatorResponse],
+  );
   useEffect(() => {
     if (page.pageIndex) {
       setPage({...page, pageIndex: 0});
@@ -104,43 +113,46 @@ export const UnitMapsView = () => {
     }
   }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
 
-  const newElevatorView = () =>
-    !search &&
-    !lastVisitStart &&
-    !lastVisitEnd &&
-    !nextVisitStart &&
-    !nextVisitEnd
-      ? {
-          ...elevatorView,
-          elevator: {
-            ...elevatorView.elevator,
-            data: [...elevatorView.elevator.data, ...elevatorResponse.data],
-          },
-        }
-      : {...elevatorView, elevator: elevatorResponse};
-
-  useEffect(() => {
-    if (!isLoading) {
-      const currentTotal = (page.pageIndex + 1) * page.pageSize;
-
-      setElevatorView(newElevatorView());
-
-      if (currentTotal < elevatorResponse.total) {
-        setPage({...page, pageIndex: page.pageIndex + 1});
-      }
+  const newElevatorView = useMemo(() => {
+    if (
+      !search &&
+      !lastVisitStart &&
+      !lastVisitEnd &&
+      !nextVisitStart &&
+      !nextVisitEnd
+    ) {
+      return {
+        ...elevatorView,
+        elevator: {
+          ...elevatorView.elevator,
+          data: [...elevatorView.elevator.data, ...elevatorResponse.data],
+        },
+      };
     }
-  }, [elevatorResponse, isLoading]);
+    return {...elevatorView, elevator: elevatorResponse};
+  }, [
+    search,
+    lastVisitStart,
+    lastVisitEnd,
+    nextVisitStart,
+    nextVisitEnd,
+    elevatorView,
+    elevatorResponse,
+  ]);
 
-  useEffect(() => {
+  const updateElevatorView = useCallback(() => {
     if (!isLoading && !isFetching) {
       const currentTotal = (page.pageIndex + 1) * page.pageSize;
-      if (currentTotal >= elevatorResponse.total) {
-        const latLng = elevatorView.elevator.data.map(
-          (elevator: ElevatorView) => ({
-            latitude: elevator.address.location?.latitude ?? 0.0,
-            longitude: elevator.address.location?.longitude ?? 0.0,
-          }),
-        );
+
+      if (currentTotal < memorisedElevatorResponse.total) {
+        setElevatorView(newElevatorView);
+        setPage({...page, pageIndex: page.pageIndex + 1});
+      }
+      if (currentTotal >= memorisedElevatorResponse.total) {
+        const latLng = elevatorView.elevator.data.map((elevator) => ({
+          latitude: elevator.address.location?.latitude ?? 0.0,
+          longitude: elevator.address.location?.longitude ?? 0.0,
+        }));
 
         const centerCoord = getCenter(latLng) as unknown as Location;
         const centerCoordIsDifferent =
@@ -148,14 +160,26 @@ export const UnitMapsView = () => {
           elevatorView.centerCoord.longitude !== centerCoord.longitude;
 
         if (centerCoord && centerCoordIsDifferent) {
-          setElevatorView({
-            ...elevatorView,
+          setElevatorView((prevState) => ({
+            ...prevState,
             centerCoord,
-          });
+          }));
         }
       }
     }
-  }, [elevatorView, isLoading, isFetching]);
+  }, [
+    isLoading,
+    isFetching,
+    page,
+    setPage,
+    memorisedElevatorResponse,
+    newElevatorView,
+    elevatorView,
+  ]);
+
+  useEffect(() => {
+    updateElevatorView();
+  }, [memorisedElevatorResponse, newElevatorView, updateElevatorView]);
 
   useEffect(() => {
     const result = elevatorView.elevator.data.map((elevator: ElevatorView) => ({
@@ -206,7 +230,27 @@ export const UnitMapsView = () => {
   };
 
   const renderFilterItems = () => (
-    <FilterFields onClear={clearFilters} wrapperStyle={{width: '90%'}}>
+    <FilterFields
+      onClear={() => {
+        clearValues();
+        setResetDatePicker(true);
+        setPage({
+          pageSize: 50,
+          pageIndex: 0,
+        });
+        const res = createEmptyResource<ElevatorView>(10);
+        const latLng = res.data.map((elevator) => ({
+          latitude: elevator.address.location?.latitude ?? 0.0,
+          longitude: elevator.address.location?.longitude ?? 0.0,
+        }));
+
+        const centerCoord = getCenter(latLng) as unknown as Location;
+        setElevatorView({
+          elevator: res,
+          centerCoord,
+        });
+      }}
+      wrapperStyle={{width: '90%'}}>
       <DatePicker
         defaultDate={lastVisitStart}
         containerStyles={{mr: '1em'}}
