@@ -74,7 +74,7 @@ export const Dialog = ({
         <DialogContentText
           id="alert-dialog-description"
           component="div"
-          sx={{color: 'text.primary'}}>
+          sx={{color: 'text.primary', paddingTop: '0.3em'}}>
           {children}
         </DialogContentText>
       </DialogContent>
