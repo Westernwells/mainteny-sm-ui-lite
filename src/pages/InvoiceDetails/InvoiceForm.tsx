@@ -463,15 +463,16 @@ export const InvoiceForm = ({
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
-    if (formType === 'new' && row.paymentTerm) {
+    if (row.paymentTerm) {
       formik.setFieldValue(
         'paymentTerm',
         getFormattedPaymentTerms(row.paymentTerm),
       );
-      if (!!row.paymentTerm?.data?.dueDays) {
+
+      if (formType === 'new' && !!row.paymentTerm.data?.dueDays) {
         formik.setFieldValue(
           'dueDate',
-          addDays(new Date(), row.paymentTerm?.data?.dueDays),
+          addDays(new Date(), row.paymentTerm.data.dueDays),
         );
         setResetDueDatePicker(true);
       }
