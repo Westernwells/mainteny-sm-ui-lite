@@ -171,10 +171,12 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {mutateAsync: uploadFiles} = useUploadFiles('');
 
   const {downloadFile} = useDownloadFileWithCustomName(
-    invoice.number,
-    downloadUrl ? Object.values(downloadUrl)[0] : '',
+    invoice.externalId || invoice.number,
+    filePathToDownload ||
+      (downloadUrl ? downloadUrl[invoice?.additionalInfo.pdfPath] : ''),
   );
 
+  const [actionType, setActionType] = useState<string>('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -409,72 +411,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   }, [reportToUpdate]);
 
-  const actions = useMemo(() => {
-    const items = [];
-
-    if (invoice.status === InvoiceStatus.EXPIRED) {
-      items.push({
-        label: t('Send Overdue Notice'),
-        icon: <SendIcon />,
-        onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
-      });
-
-      items.push({
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
-    } else if (invoice.status === InvoiceStatus.NOT_PAID) {
-      items.push({
-        label: t('Resend'),
-        icon: <ReplayIcon />,
-        onClick: () => {
-          setIsSendEmailDialogOpen(true);
-        },
-      });
-    }
-
-    if (
-      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
-    ) {
-      items.push({
-        label: t('Edit'),
-        icon: <Edit />,
-        onClick: () => {
-          navigate(`/invoices/details/${invoice.id}/edit`);
-        },
-      });
-    }
-
-    if (
-      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
-    ) {
-      items.push({
-        label: t('Delete'),
-        icon: <DeleteIcon />,
-        onClick: () => {
-          setIsDeleteDialogOpen(true);
-        },
-      });
-    } else if (invoice.sentDate || invoice.status === InvoiceStatus.CANCELLED) {
-      return items.filter((item) => item.label !== t('Edit'));
-    }
-
-    if (
-      ![InvoiceStatus.CANCELLED, InvoiceStatus.PARTIALLY_PAID].includes(
-        invoice.status,
-      )
-    ) {
-      items.push({
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
-    }
-
-    return items;
-  }, [downloadUrl, invoice.status, t]);
-
   const generateBlobUrl = async (invoiceData: InvoiceView) => {
     let PdfTemplate;
 
@@ -536,7 +472,98 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   };
 
-  const [actionType, setActionType] = useState('');
+  const handleDownload = async () => {
+    setActionType('DOWNLOAD');
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      await generateBlobUrl(invoice);
+    } else {
+      await refetchDownloadUrl();
+      setFilePathToDownload(
+        downloadUrl ? downloadUrl?.[invoice.additionalInfo.pdfPath!]! : '',
+      );
+    }
+  };
+
+  const actions = useMemo(() => {
+    const items = [];
+
+    if (invoice.status === InvoiceStatus.EXPIRED) {
+      items.push({
+        label: t('Send Overdue Notice'),
+        icon: <SendIcon />,
+        onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
+      });
+      items.push({
+        label: t('Print'),
+        icon: <Print />,
+        onClick: () => setIsConfirmPrintDialogOpen(true),
+      });
+    } else if (invoice.status === InvoiceStatus.NOT_PAID) {
+      items.push({
+        label: t('Resend'),
+        icon: <ReplayIcon />,
+        onClick: () => {
+          setIsSendEmailDialogOpen(true);
+        },
+      });
+    }
+
+    if (
+      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+    ) {
+      items.push({
+        label: t('Edit'),
+        icon: <Edit />,
+        onClick: () => {
+          navigate(`/invoices/details/${invoice.id}/edit`);
+        },
+      });
+    }
+
+    if (
+      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
+    ) {
+      items.push({
+        label: t('Delete'),
+        icon: <DeleteIcon />,
+        onClick: () => {
+          setIsDeleteDialogOpen(true);
+        },
+      });
+    } else if (invoice.sentDate || invoice.status === InvoiceStatus.CANCELLED) {
+      return items.filter((item) => item.label !== t('Edit'));
+    }
+
+    if (
+      ![InvoiceStatus.CANCELLED, InvoiceStatus.PARTIALLY_PAID].includes(
+        invoice.status,
+      )
+    ) {
+      items.push({
+        label: t('Print'),
+        icon: <Print />,
+        onClick: () => setIsConfirmPrintDialogOpen(true),
+      });
+    }
+
+    return items;
+  }, [downloadUrl, invoice.status, t]);
+
+  useEffect(() => {
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      if (filePathToDownload && actionType === 'DOWNLOAD') {
+        downloadFile();
+        setFilePathToDownload('');
+        setActionType('');
+      }
+    } else if (
+      actionType === 'DOWNLOAD' &&
+      downloadUrl?.[invoice.additionalInfo.pdfPath!]
+    ) {
+      downloadFile();
+      setActionType('');
+    }
+  }, [actionType]);
 
   useEffect(() => {
     if (updatedInvoice?.status === InvoiceStatus.DRAFT) {
@@ -738,10 +765,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     sx: {
                       background: 'transparent',
                     },
-                    onClick: downloadFile,
-                    disabled:
-                      invoice!.additionalInfo.pdfGenerationStatus !==
-                        PdfGenerationStatus.DONE || isLoadingDownloadUrl,
+                    onClick: handleDownload,
                     startIcon: <FileDownloadIcon />,
                   }}
                 />
