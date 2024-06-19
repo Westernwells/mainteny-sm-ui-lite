@@ -8,17 +8,22 @@ import {useTheme} from '@mui/material/styles';
 import {DatePicker} from 'components/DatePicker';
 import {FormSelect} from 'components/form/FormSelect';
 import {capitalize} from 'utils/utils';
+import {formatDate} from 'utils/datetime';
 import {AbsenceForm} from './model';
 
 type Props = {
   name: string;
   roles: Role[];
   formik: FormikProps<AbsenceForm>;
+  takenDates: Date[];
 };
 
-const FormAbsence = ({formik, roles, name}: Props) => {
+const FormAbsence = ({formik, roles, name, takenDates}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+
+  const shouldDisableDate = (date: Date) =>
+    takenDates.some((takenDate) => formatDate(takenDate) === formatDate(date));
 
   const options = [
     {label: t('1 Day'), value: '1 day'},
@@ -170,8 +175,16 @@ const FormAbsence = ({formik, roles, name}: Props) => {
             }}
             textFieldProps={{
               label: t('Date'),
+              name: 'date',
+              helperText:
+                formik.errors.date && formik.touched.date
+                  ? formik.errors.date
+                  : '',
+              error: !!(formik.touched.date && formik.errors.date),
             }}
             containerStyles={{mb: '1.5em'}}
+            shouldDisableDate={shouldDisableDate}
+            required
           />
         )}
         {formik.values.duration === 'Multiple days' && (
@@ -196,6 +209,8 @@ const FormAbsence = ({formik, roles, name}: Props) => {
                   : undefined
               }
               containerStyles={{mb: '1.5em'}}
+              shouldDisableDate={shouldDisableDate}
+              required
             />
             <DatePicker
               defaultDate={formik.values.dateEnd}
@@ -217,6 +232,8 @@ const FormAbsence = ({formik, roles, name}: Props) => {
                   : undefined
               }
               containerStyles={{mb: '1.5em'}}
+              shouldDisableDate={shouldDisableDate}
+              required
             />
           </>
         )}

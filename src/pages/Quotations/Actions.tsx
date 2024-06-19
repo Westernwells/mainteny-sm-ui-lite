@@ -496,7 +496,7 @@ export const Actions = ({quotation}: Props) => {
                           ? `${uploadPath}/${quotation.id}.pdf`
                           : `${uploadPath}/${obj.name}`,
                         description: isFileFromServer
-                          ? quotation.externalId
+                          ? `${quotation.externalId}.pdf`
                           : obj.name.split('.')[0],
                       },
                     ];

@@ -31,6 +31,10 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const formatDate = useFormatDate();
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const memorizedRows = useMemo(
+    () => rows.filter((item) => item.status !== InvoiceStatus.CANCELLED),
+    [rows],
+  );
 
   let totalInvoiceRef = useRef(0).current;
 
@@ -122,9 +126,17 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
     <InfoCard
       footer={
         jobInvoices &&
-        jobInvoices?.length !== 0 && (
+        jobInvoices?.filter((item) => item.status !== InvoiceStatus.CANCELLED)
+          ?.length !== 0 && (
           <InfoCardTotalSumFooter
-            amount={jobInvoices && calculateGrossInvoiceTotal(jobInvoices)}
+            amount={
+              jobInvoices &&
+              calculateGrossInvoiceTotal(
+                jobInvoices.filter(
+                  (item) => item.status !== InvoiceStatus.CANCELLED,
+                ),
+              )
+            }
             label={t('Invoiced Sum (incl. VAT)')}
           />
         )
@@ -152,8 +164,12 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
         renderNoRowsSection()
       ) : (
         <DataGridLayout
-          rows={rows}
-          height={getDataGridHeight(rows.length, rows.length, 70)}
+          rows={memorizedRows}
+          height={getDataGridHeight(
+            memorizedRows.length,
+            memorizedRows.length,
+            70,
+          )}
           columns={columns}
           fullHeight={false}
           containerStyle={{

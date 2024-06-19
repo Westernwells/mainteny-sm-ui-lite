@@ -274,72 +274,72 @@ const CreditNotePdfTemplate = ({
               selectedLng={selectedLng}
             />
           </TopSectionContainer>
+
+          <View>
+            <PdfPageTitle selectedLng={selectedLng}>
+              {invoice?.subject}
+            </PdfPageTitle>
+
+            {invoice?.description.trim() !== '' && (
+              <HtmlPDF
+                html={invoice?.description || ''}
+                rootStyle={styles.contentBody}
+              />
+            )}
+
+            {invoice?.items && (
+              <ArticleSection
+                invoice={invoice}
+                currentCurrency={currentCurrency}
+                translate={translate}
+                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
+                discountValue={discountValue}
+                subtotalExclVatFormatted={subtotalExclVatFormatted}
+                allItemsHasSameVAT={allItemsHasSameVAT}
+                percentageVats={percentageVats}
+                totalVAT={totalVAT}
+                total={total}
+                selectedLng={selectedLng}
+                netTotal={netTotal}
+              />
+            )}
+
+            {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
+              <View style={styles.notesSection} wrap={false}>
+                <Text style={styles.sectionHeading}>
+                  {translate('Payment terms')}
+                </Text>
+                <HtmlPDF
+                  html={replacePaymentTermsPlaceholders(
+                    invoice?.additionalInfo.paymentTerm?.term!,
+                    formattedPaymentValues ?? [],
+                  )}
+                />
+              </View>
+            )}
+
+            {invoice?.additionalInfo?.moreInfo?.trim() && (
+              <View wrap={false}>
+                <Text style={styles.sectionHeading}>{translate('Notes')}</Text>
+                <HtmlPDF
+                  html={formatCostText(
+                    invoice?.additionalInfo?.moreInfo,
+                    `${formatCurrency(laborCost, {
+                      currency: currentCurrency?.code,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    })}`,
+                    `${formatCurrency(materialCost, {
+                      currency: currentCurrency?.code,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    })}`,
+                  )}
+                />
+              </View>
+            )}
+          </View>
         </PdfBodyContainer>
-
-        <View>
-          <PdfPageTitle selectedLng={selectedLng}>
-            {invoice?.subject}
-          </PdfPageTitle>
-
-          {invoice?.description.trim() !== '' && (
-            <HtmlPDF
-              html={invoice?.description || ''}
-              rootStyle={styles.contentBody}
-            />
-          )}
-
-          {invoice?.additionalInfo.showArticleSection && (
-            <ArticleSection
-              invoice={invoice}
-              currentCurrency={currentCurrency}
-              translate={translate}
-              allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
-              discountValue={discountValue}
-              subtotalExclVatFormatted={subtotalExclVatFormatted}
-              allItemsHasSameVAT={allItemsHasSameVAT}
-              percentageVats={percentageVats}
-              totalVAT={totalVAT}
-              total={total}
-              selectedLng={selectedLng}
-              netTotal={netTotal}
-            />
-          )}
-
-          {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
-            <View style={styles.notesSection} wrap={false}>
-              <Text style={styles.sectionHeading}>
-                {translate('Payment terms')}
-              </Text>
-              <HtmlPDF
-                html={replacePaymentTermsPlaceholders(
-                  invoice?.additionalInfo.paymentTerm?.term!,
-                  formattedPaymentValues ?? [],
-                )}
-              />
-            </View>
-          )}
-
-          {invoice?.additionalInfo?.moreInfo?.trim() && (
-            <View wrap={false}>
-              <Text style={styles.sectionHeading}>{translate('Notes')}</Text>
-              <HtmlPDF
-                html={formatCostText(
-                  invoice?.additionalInfo?.moreInfo,
-                  `${formatCurrency(laborCost, {
-                    currency: currentCurrency?.code,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  })}`,
-                  `${formatCurrency(materialCost, {
-                    currency: currentCurrency?.code,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  })}`,
-                )}
-              />
-            </View>
-          )}
-        </View>
 
         <PdfTemplateFooter
           userInfo={userInfo}
