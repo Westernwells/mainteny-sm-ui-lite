@@ -435,6 +435,11 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
     setAnchorEl(null);
   };
 
+  const handleOpenPaymentDialog = () => {
+    setIsDialogOpen(true);
+    setSelectedInvoice(invoice);
+  };
+
   const handleOpenSendInvoiceModal = useCallback(() => {
     const errorMessage = validateDueDate(invoice);
 
@@ -502,11 +507,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
     if (invoice.status === InvoiceStatus.NOT_PAID) {
       return (
         <Tooltip title={t('Payment')} placement="left" arrow>
-          <IconButton
-            onClick={() => {
-              setIsDialogOpen(true);
-              setSelectedInvoice(invoice);
-            }}>
+          <IconButton onClick={handleOpenPaymentDialog}>
             <Payments fontSize="small" sx={{color: 'action.active'}} />
           </IconButton>
         </Tooltip>
@@ -579,7 +580,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
         {
           label: t('Payment'),
           icon: <Payments />,
-          onClick: () => setIsDialogOpen(true),
+          onClick: () => handleOpenPaymentDialog(),
         },
         {
           label: t('Create Credit note'),
@@ -606,7 +607,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
         {
           label: t('Payment'),
           icon: <Payments />,
-          onClick: () => setIsDialogOpen(true),
+          onClick: () => handleOpenPaymentDialog(),
         },
         {
           label: t('Create Credit note'),
@@ -644,7 +645,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
         {
           label: t('Payment'),
           icon: <Payments />,
-          onClick: () => setIsDialogOpen(true),
+          onClick: () => handleOpenPaymentDialog(),
         },
         {
           label: t('Send Overdue Notice'),
@@ -670,7 +671,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
         {
           label: t('Payment'),
           icon: <Payments />,
-          onClick: () => setIsDialogOpen(true),
+          onClick: () => handleOpenPaymentDialog(),
         },
         {
           label: t('Print'),
