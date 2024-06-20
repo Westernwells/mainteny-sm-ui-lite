@@ -293,7 +293,8 @@ const FullInvoicePdfTemplate = ({
                 invoice?.propertyOwner?.name
               }
               addressComponent={
-                invoice?.additionalInfo?.billingAddress?.component
+                invoice?.additionalInfo?.billingAddress?.component ||
+                invoice?.propertyOwner.billingAddress?.component
               }
               beneficiaryInfo={
                 invoice?.additionalInfo.beneficiaryAddress?.component
