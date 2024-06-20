@@ -7,7 +7,12 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
+import {
+  DiscountType,
+  InvoiceItem,
+  InvoiceType,
+  InvoiceView,
+} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
@@ -26,6 +31,7 @@ import {
   getAggregatedItemsVats,
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
+import {PropertyOwnerView} from 'models/propertyManager';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -161,6 +167,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  customer?: PropertyOwnerView;
 };
 
 const FullInvoicePdfTemplate = ({
@@ -173,6 +180,7 @@ const FullInvoicePdfTemplate = ({
   headerPath,
   footerInfo,
   footerPath,
+  customer,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -247,7 +255,10 @@ const FullInvoicePdfTemplate = ({
   );
 
   const formattedPaymentValues = getFormattedPaymentValues(
-    invoice?.additionalInfo.paymentTerm!,
+    invoice?.additionalInfo.paymentTerm! ||
+      (invoice?.type === InvoiceType.AGGREGATE
+        ? customer?.paymentTerm!
+        : undefined),
     invoice!,
     total,
     currentCurrency,

@@ -1,7 +1,7 @@
 import {Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {formatDate} from 'utils/datetime';
 import {formatAddressFullname} from 'utils/utils';
-import {InvoiceView} from 'models/invoice';
+import {InvoiceType, InvoiceView} from 'models/invoice';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -163,11 +163,15 @@ const PdfTemplateInvoiceDetails = ({
         </View>
       )}
 
-      {invoice?.additionalInfo.costCenter && (
+      {(invoice?.additionalInfo.costCenter ||
+        (invoice?.type === InvoiceType.AGGREGATE &&
+          invoice?.propertyOwner.additionalInfo.costCenter)) && (
         <View style={styles.rightAddressContent}>
           <Text style={styles.tag}>{translate('Cost Center')}</Text>
           <Text style={styles.tagContent}>
-            {invoice?.additionalInfo.costCenter}
+            {invoice?.additionalInfo.costCenter ||
+              (invoice?.type === InvoiceType.AGGREGATE &&
+                invoice.propertyOwner.additionalInfo.costCenter)}
           </Text>
         </View>
       )}
