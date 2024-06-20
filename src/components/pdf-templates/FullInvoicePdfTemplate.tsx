@@ -256,7 +256,8 @@ const FullInvoicePdfTemplate = ({
 
   const formattedPaymentValues = getFormattedPaymentValues(
     invoice?.additionalInfo.paymentTerm! ||
-      (invoice?.type === InvoiceType.AGGREGATE
+      (invoice?.type === InvoiceType.AGGREGATE ||
+      invoice?.type === InvoiceType.FINAL
         ? customer?.paymentTerm!
         : undefined),
     invoice!,
@@ -318,6 +319,7 @@ const FullInvoicePdfTemplate = ({
               translate={translate}
               invoice={invoice}
               selectedLng={selectedLng}
+              customer={customer}
             />
           </TopSectionContainer>
 
@@ -350,14 +352,16 @@ const FullInvoicePdfTemplate = ({
               />
             )}
 
-            {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
+            {(invoice?.additionalInfo?.paymentTerm?.term?.trim() ||
+              customer?.paymentTerm?.term.trim()) && (
               <View style={styles.notesSection} wrap={false}>
                 <Text style={styles.sectionHeading}>
                   {translate('Payment terms')}
                 </Text>
                 <HtmlPDF
                   html={replacePaymentTermsPlaceholders(
-                    invoice?.additionalInfo.paymentTerm?.term!,
+                    invoice?.additionalInfo.paymentTerm?.term! ||
+                      customer?.paymentTerm?.term!,
                     formattedPaymentValues ?? [],
                   )}
                 />

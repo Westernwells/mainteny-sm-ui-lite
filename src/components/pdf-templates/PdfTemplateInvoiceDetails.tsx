@@ -2,6 +2,7 @@ import {Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {formatDate} from 'utils/datetime';
 import {formatAddressFullname} from 'utils/utils';
 import {InvoiceType, InvoiceView} from 'models/invoice';
+import {PropertyOwnerView} from 'models/propertyManager';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -66,12 +67,14 @@ type Props = {
   translate: (key: string) => string;
   invoice?: InvoiceView;
   selectedLng?: string;
+  customer?: PropertyOwnerView;
 };
 
 const PdfTemplateInvoiceDetails = ({
   translate,
   invoice,
   selectedLng,
+  customer,
 }: Props) => {
   const startDate = invoice?.additionalInfo.deliveryStartDate;
   const endDate = invoice?.additionalInfo.deliveryEndDate;
@@ -164,14 +167,14 @@ const PdfTemplateInvoiceDetails = ({
       )}
 
       {(invoice?.additionalInfo.costCenter ||
-        (invoice?.type === InvoiceType.AGGREGATE &&
-          invoice?.propertyOwner.additionalInfo.costCenter)) && (
+        ((invoice?.type === InvoiceType.AGGREGATE ||
+          invoice?.type === InvoiceType.FINAL) &&
+          customer?.additionalInfo.costCenter)) && (
         <View style={styles.rightAddressContent}>
           <Text style={styles.tag}>{translate('Cost Center')}</Text>
           <Text style={styles.tagContent}>
             {invoice?.additionalInfo.costCenter ||
-              (invoice?.type === InvoiceType.AGGREGATE &&
-                invoice.propertyOwner.additionalInfo.costCenter)}
+              customer?.additionalInfo.costCenter}
           </Text>
         </View>
       )}
