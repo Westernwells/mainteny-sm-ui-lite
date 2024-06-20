@@ -906,6 +906,8 @@ export const InvoiceForm = ({
       handleSelectCustomer(value);
     } else {
       setCustomer(undefined);
+      formik.setFieldValue('costCenter', '');
+      formik.setFieldValue('paymentTerm', {term: ''});
     }
   };
 
