@@ -354,10 +354,35 @@ export const UnitMapsView = () => {
         defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom}
         center={
-          elevatorView.centerCoord && {
-            lat: elevatorView.centerCoord.latitude,
-            lng: elevatorView.centerCoord.longitude,
-          }
+          elevatorView.centerCoord &&
+          clusters.length > 0 &&
+          clusters
+            .filter((c) => c.properties.cluster)
+            .sort(
+              (a, b) =>
+                ((b.properties.point_count as unknown as number) >
+                  a.properties.point_count) as unknown as number,
+            )[0]
+            ? {
+                lat: clusters
+                  .filter((c) => c.properties.cluster)
+                  .sort(
+                    (a, b) =>
+                      ((b.properties.point_count as unknown as number) >
+                        a.properties.point_count) as unknown as number,
+                  )[0].geometry.coordinates[1],
+                lng: clusters
+                  .filter((c) => c.properties.cluster)
+                  .sort(
+                    (a, b) =>
+                      ((b.properties.point_count as unknown as number) >
+                        a.properties.point_count) as unknown as number,
+                  )[0].geometry.coordinates[0],
+              }
+            : {
+                lat: elevatorView.centerCoord.latitude,
+                lng: elevatorView.centerCoord.longitude,
+              }
         }
         zoom={10}>
         {clusters.map((cluster, index) => {
