@@ -1,7 +1,6 @@
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
-import {ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
 import {formatCurrency} from 'utils/currency';
 import {QuotationItem, QuotationView} from 'models/quotation';
@@ -170,7 +169,6 @@ type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
-  serviceOrder?: ServiceOrderView;
   quotation?: QuotationView;
   selectedLng?: string;
   headerInfo: HeaderFooterInfoData;
@@ -184,7 +182,6 @@ const QuotationPdfTemplate = React.memo(
     translate,
     userInfo,
     currentCurrency,
-    serviceOrder,
     quotation,
     selectedLng,
     headerInfo,
@@ -345,11 +342,11 @@ const QuotationPdfTemplate = React.memo(
                   </View>
                 )}
 
-                {serviceOrder?.meta.createdAt && (
+                {quotation?.additionalInfo.expiryDate && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Valid until')}</Text>
                     <Text style={styles.tagContent}>
-                      {formatDate(serviceOrder?.meta.createdAt)}
+                      {formatDate(quotation?.additionalInfo.expiryDate)}
                     </Text>
                   </View>
                 )}
