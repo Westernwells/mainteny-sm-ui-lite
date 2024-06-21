@@ -6,37 +6,46 @@ import {centsToMoney} from 'utils/currency';
 
 const useCalculateLaborMaterialCost = (
   articleItems: InvoiceItemRecord[],
-  type: ArticleType,
+  articleType: ArticleType,
   currentCurrency?: Currency,
 ): number => {
   type CostPackageKey = 'labor' | 'material';
 
+  const getNetAmount = (item: InvoiceItemRecord): number =>
+    centsToMoney(
+      currentCurrency?.code!,
+      item?.additionalInfo?.payment?.amount?.netAmount ?? 0,
+    );
+
+  const getPackageAmount = (
+    item: InvoiceItemRecord,
+    packageKey: CostPackageKey,
+    netAmount: number,
+  ): number => {
+    const percentageKey =
+      packageKey === 'labor' ? 'laborPercentage' : 'materialPercentage';
+    const packageValue =
+      netAmount * (item.article?.costPackage?.[percentageKey] ?? 0);
+    return centsToMoney(currentCurrency?.code!, packageValue);
+  };
+
   return useMemo(
     () =>
       articleItems?.reduce((itemTotal, item) => {
-        if (item.article?.type === type) {
-          // For LABOR and MATERIAL types, use unitAmount netAmount
-          const netAmount = centsToMoney(
-            currentCurrency?.code!,
-            item?.unitAmount?.netAmount ?? 0,
-          );
-          return itemTotal + netAmount;
+        if (item.article?.type === articleType) {
+          return itemTotal + getNetAmount(item);
         }
+
         if (item.article?.type === ArticleType.PACKAGE) {
-          // For PACKAGE type, extract labor or material value from costPackage
           const packageKey: CostPackageKey =
-            type.toLowerCase() as CostPackageKey;
-          const packageValue =
-            item.article?.costPackage?.[packageKey]?.value ?? 0;
-          const packageAmount = centsToMoney(
-            currentCurrency?.code!,
-            packageValue,
-          );
-          return itemTotal + packageAmount;
+            articleType.toLowerCase() as CostPackageKey;
+          const netAmount = getNetAmount(item);
+          return itemTotal + getPackageAmount(item, packageKey, netAmount);
         }
+
         return itemTotal;
       }, 0),
-    [articleItems, type, currentCurrency],
+    [articleItems, articleType, currentCurrency],
   );
 };
 

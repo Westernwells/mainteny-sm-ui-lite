@@ -300,6 +300,12 @@ export interface InvoiceItemRecord {
   quantity: number;
   discount?: Discount;
   payment?: InvoiceItemPaymentRecord;
+  additionalInfo?:
+    | {
+        discount?: Discount | undefined;
+        payment?: InvoiceItemPaymentRecord | undefined;
+      }
+    | undefined;
 }
 
 export enum InvoiceType {
