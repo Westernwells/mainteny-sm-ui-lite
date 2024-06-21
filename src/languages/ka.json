@@ -2628,5 +2628,6 @@
   "Failed to load PDF file": "PDF ფაილი ვერ ჩამოიტვირთა",
   "Text Blocks": "ტექსტის ბლოკი",
   "WORD COUNT": "სიტყვების რაოდენობა",
-  "EDITED": "რედაქტირებული"
+  "EDITED": "რედაქტირებული",
+  "Valid Until": "მოქმედი ერთეული"
 }

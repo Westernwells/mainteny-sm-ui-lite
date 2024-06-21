@@ -2618,5 +2618,6 @@
   "Failed to load PDF file": "Učitavanje PDF datoteke nije uspelo",
   "Text Blocks": "Tekstualni blokovi",
   "WORD COUNT": "BROJ REČI",
-  "EDITED": "UREĐENO JE"
+  "EDITED": "UREĐENO JE",
+  "Valid Until": "Ispravno do"
 }

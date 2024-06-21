@@ -2594,5 +2594,6 @@
   "Failed to load PDF file": "PDF Ladevorgang abgebrochen",
   "Text Blocks": "Textbausteine",
   "WORD COUNT": "WORTANZAHL",
-  "EDITED": "EDITIERT"
+  "EDITED": "EDITIERT",
+  "Valid Until": "Gültig bis"
 }
