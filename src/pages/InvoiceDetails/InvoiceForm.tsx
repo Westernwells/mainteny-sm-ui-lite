@@ -1,5 +1,4 @@
 import {useContext, useEffect, useMemo, useState} from 'react';
-import {t} from 'i18next';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -114,6 +113,7 @@ import {T} from 'utils/i18n-utils';
 import {ServiceCompanyType} from 'models/service-company';
 import {Notes} from './Notes/EditNotes';
 import {CreateNotes} from './Notes/CreateNotes';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   invoice?: InvoiceView;
@@ -203,12 +203,6 @@ const invoiceItemToInvoiceItemRecord = (
   return getItemRecord(record, record.unitAmount.percentageVat);
 };
 
-const DEFAULT_LABOR_COST_TEXT = t('Labor costs without VAT: {LABOR_COST}');
-const DEFAULT_MATERIAL_COST_TEXT = t(
-  'Material costs without VAT: {MATERIAL_COST}',
-);
-const DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT = `${DEFAULT_LABOR_COST_TEXT}\n${DEFAULT_MATERIAL_COST_TEXT}`;
-
 export const InvoiceForm = ({
   invoice,
   serviceOrderResource,
@@ -217,6 +211,19 @@ export const InvoiceForm = ({
   customer: customerByProp,
   serviceCompanyType,
 }: Props) => {
+  const {t} = useTranslation();
+  const DEFAULT_LABOR_COST_TEXT = useMemo(
+    () => t('Labor costs without VAT: {LABOR_COST}'),
+    [t],
+  );
+  const DEFAULT_MATERIAL_COST_TEXT = useMemo(
+    () => t('Material costs without VAT: {MATERIAL_COST}'),
+    [t],
+  );
+  const DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT = useMemo(
+    () => `${DEFAULT_LABOR_COST_TEXT}\n${DEFAULT_MATERIAL_COST_TEXT}`,
+    [DEFAULT_LABOR_COST_TEXT, DEFAULT_MATERIAL_COST_TEXT],
+  );
   const navigate = useNavigate();
   const {language: selectedLng} = useContext(LanguageContext);
   const {company} = useContext(UserCompanyContext);
@@ -756,6 +763,10 @@ export const InvoiceForm = ({
       setCustomer(serviceOrderCustomer);
     }
   }, [serviceOrder]);
+
+  useEffect(() => {
+    formik.setFieldValue('moreInfo', DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT);
+  }, [DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT]);
 
   const isDueDateInPast = () => {
     const localDueDate = formik.values.dueDate as Date;
