@@ -491,7 +491,6 @@ export const InvoiceForm = ({
       navigate(`/invoices/details/${invoiceId}`);
     },
   });
-
   const alternativeAddress = formik.values.alternativeAddress?.component;
   const beneficiaryAddress = formik.values.beneficiaryAddress?.component;
   const billingAddress = formik.values.billingAddress?.component;
@@ -609,6 +608,7 @@ export const InvoiceForm = ({
 
   const onRemoveServiceOrder = () => {
     formik.setFieldValue('customerSpecificOrderNumber', '');
+    formik.setFieldValue('description', '');
     setServiceOrder(undefined);
   };
 
@@ -833,10 +833,7 @@ export const InvoiceForm = ({
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
       if (!formik.values.description && serviceOrder.report?.description) {
-        formik.setFieldValue(
-          'description',
-          stripHtmlTags(serviceOrder.report.description),
-        );
+        formik.setFieldValue('description', serviceOrder.report.description);
       }
       formik.setFieldValue(
         'customerSpecificOrderNumber',
@@ -1725,7 +1722,7 @@ export const InvoiceForm = ({
 
             <RichTextField
               label="Description"
-              html={formik.values.description}
+              html={formik.values.description || ''}
               updateHtml={(h) => formik.setFieldValue('description', h)}
               minRows={2}
             />
