@@ -90,7 +90,6 @@ import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf'
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
-import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -123,8 +122,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     isLoading: isLoadingDownloadUrl,
     refetch: refetchDownloadUrl,
   } = useDownloadUrl(isFetched ? [updatedInvoice!.additionalInfo.pdfPath] : []);
-
-  const {data: customer} = useGetCustomer(updatedInvoice?.propertyOwner.id!);
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
@@ -467,7 +464,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           headerInfo={headerInfo}
           footerPath={footerUrl[footerInfo?.path]}
           footerInfo={footerInfo}
-          customer={customer}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);

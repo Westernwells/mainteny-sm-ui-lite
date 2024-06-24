@@ -7,12 +7,7 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {
-  DiscountType,
-  InvoiceItem,
-  InvoiceType,
-  InvoiceView,
-} from 'models/invoice';
+import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
@@ -31,7 +26,6 @@ import {
   getAggregatedItemsVats,
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
-import {PropertyOwnerView} from 'models/propertyManager';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -167,7 +161,6 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
-  customer?: PropertyOwnerView;
 };
 
 const FullInvoicePdfTemplate = ({
@@ -180,7 +173,6 @@ const FullInvoicePdfTemplate = ({
   headerPath,
   footerInfo,
   footerPath,
-  customer,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -255,11 +247,7 @@ const FullInvoicePdfTemplate = ({
   );
 
   const formattedPaymentValues = getFormattedPaymentValues(
-    invoice?.additionalInfo.paymentTerm! ||
-      (invoice?.type === InvoiceType.AGGREGATE ||
-      invoice?.type === InvoiceType.FINAL
-        ? customer?.paymentTerm!
-        : undefined),
+    invoice?.additionalInfo.paymentTerm!,
     invoice!,
     total,
     currentCurrency,
@@ -319,7 +307,6 @@ const FullInvoicePdfTemplate = ({
               translate={translate}
               invoice={invoice}
               selectedLng={selectedLng}
-              customer={customer}
             />
           </TopSectionContainer>
 
@@ -352,16 +339,14 @@ const FullInvoicePdfTemplate = ({
               />
             )}
 
-            {(invoice?.additionalInfo?.paymentTerm?.term?.trim() ||
-              customer?.paymentTerm?.term.trim()) && (
+            {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
               <View style={styles.notesSection} wrap={false}>
                 <Text style={styles.sectionHeading}>
                   {translate('Payment terms')}
                 </Text>
                 <HtmlPDF
                   html={replacePaymentTermsPlaceholders(
-                    invoice?.additionalInfo.paymentTerm?.term! ||
-                      customer?.paymentTerm?.term!,
+                    invoice?.additionalInfo.paymentTerm?.term!,
                     formattedPaymentValues ?? [],
                   )}
                 />
