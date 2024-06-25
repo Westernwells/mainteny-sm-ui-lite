@@ -26,7 +26,7 @@ export const TextBlockForm = ({formik}: Props) => {
       <Grid container spacing={2}>
         <Grid item md={12}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'Enter text block name',
               label: 'Name',

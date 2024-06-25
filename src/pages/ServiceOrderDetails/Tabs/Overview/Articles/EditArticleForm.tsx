@@ -88,7 +88,7 @@ export const EditArticleForm = ({
     <Box display="flex" flexWrap="wrap" component="form">
       <FormInput
         containerStyles={{...containerStyles, width: '50%', pr: '1rem'}}
-        props={{
+        fieldProps={{
           label: t('Name'),
           name: 'name',
           placeholder: t('e.g. Flat cable, 16G0.75+2x(2x0.5)'),
@@ -110,7 +110,7 @@ export const EditArticleForm = ({
           formik.setFieldValue(values.name as string, values.value);
         }}
         inputType="currency"
-        props={{
+        fieldProps={{
           name: 'unitSellingAmount',
           label: t('Selling price (excl. VAT)'),
           placeholder: t(`e.g. 200{{currencySymbol}}`, {currencySymbol}),
@@ -134,7 +134,7 @@ export const EditArticleForm = ({
 
       <FormInput
         containerStyles={{pr: '1rem', width: '15%'}}
-        props={{
+        fieldProps={{
           placeholder: 'e.g. 200',
           label: t('Quantity'),
           name: 'quantity',

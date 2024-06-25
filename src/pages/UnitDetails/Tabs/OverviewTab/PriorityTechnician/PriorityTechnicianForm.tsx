@@ -43,7 +43,7 @@ export const PriorityTechnicianForm = ({
       </Grid>
       <Grid item xs={12} md={6} sm={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'Enter priority number',
             label: 'Priority',

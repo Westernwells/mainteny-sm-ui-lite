@@ -135,7 +135,7 @@ export const EditCustomerForm = ({
       <Grid container spacing={3}>
         <Grid item md={4}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g Mainteny GmbH',
               label: 'Customer Name',
@@ -150,7 +150,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={4}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g johndoe@example.com',
               label: 'Email',
@@ -164,7 +164,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={4}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g johndoe@example.com',
               label: 'Billing Email Address',
@@ -178,7 +178,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={4}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g +34 12345678',
               label: 'Phone',
@@ -197,7 +197,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={4}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g +34 12345678',
               label: '2nd Phone',
@@ -218,7 +218,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={4}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g mainteny.com',
               label: 'Website/URL',
@@ -302,7 +302,7 @@ export const EditCustomerForm = ({
 
         <Grid item md={4}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g 000 000 000',
               label: 'Cost Center',
@@ -321,7 +321,7 @@ export const EditCustomerForm = ({
 
         <Grid item md={4}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'VAT ID',
               name: 'vatId',
@@ -334,7 +334,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={4}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Offsetting Account',
               name: 'offsettingAccount',
@@ -353,7 +353,7 @@ export const EditCustomerForm = ({
       <Grid container spacing={3}>
         <Grid item md={2.5}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Name',
               name: 'billingAddress.component.name',
@@ -364,7 +364,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={2.5}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Address line 1',
               name: 'billingAddress.component.street',
@@ -375,7 +375,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={2.5}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Address line 2',
               name: 'billingAddress.component.street2',
@@ -386,7 +386,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={2.5}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'City',
               name: 'billingAddress.component.city',
@@ -397,7 +397,7 @@ export const EditCustomerForm = ({
         </Grid>
         <Grid item md={1.5}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'ZIP/Postal Code',
               name: 'billingAddress.component.postalCode',
@@ -457,7 +457,7 @@ export const EditCustomerForm = ({
         <Grid container spacing={3}>
           <Grid item md={2.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Name',
                 name: 'beneficiaryAddress.component.name',
@@ -468,7 +468,7 @@ export const EditCustomerForm = ({
           </Grid>
           <Grid item md={2.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Address line 1',
                 name: 'beneficiaryAddress.component.street',
@@ -479,7 +479,7 @@ export const EditCustomerForm = ({
           </Grid>
           <Grid item md={2.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Address line 2',
                 name: 'beneficiaryAddress.component.street2',
@@ -491,7 +491,7 @@ export const EditCustomerForm = ({
           </Grid>
           <Grid item md={2.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'City',
                 name: 'beneficiaryAddress.component.city',
@@ -502,7 +502,7 @@ export const EditCustomerForm = ({
           </Grid>
           <Grid item md={1.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'ZIP/Postal Code',
                 name: 'beneficiaryAddress.component.postalCode',
@@ -581,7 +581,7 @@ export const EditCustomerForm = ({
         <Grid container spacing={3}>
           <Grid item md={2.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Name',
                 name: 'otherAddress.component.name',
@@ -592,7 +592,7 @@ export const EditCustomerForm = ({
           </Grid>
           <Grid item md={2.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Address line 1',
                 name: 'otherAddress.component.street',
@@ -603,7 +603,7 @@ export const EditCustomerForm = ({
           </Grid>
           <Grid item md={2.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Address line 2',
                 name: 'otherAddress.component.street2',
@@ -614,7 +614,7 @@ export const EditCustomerForm = ({
           </Grid>
           <Grid item md={2.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'City',
                 name: 'otherAddress.component.city',
@@ -625,7 +625,7 @@ export const EditCustomerForm = ({
           </Grid>
           <Grid item md={1.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'ZIP/Postal Code',
                 name: 'otherAddress.component.postalCode',

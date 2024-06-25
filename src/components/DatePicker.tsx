@@ -3,15 +3,15 @@ import {TextFieldProps} from '@mui/material/TextField';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {
+  DatePicker as MuiDatePicker,
   DatePickerProps,
   DatePickerSlotsComponentsProps,
-  DatePicker as MuiDatePicker,
 } from '@mui/x-date-pickers/DatePicker';
 import {InputLabelProps} from '@mui/material/InputLabel';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {mapLanguageToLocale} from 'utils/utils';
-import {ReactNode, useEffect, useRef, useState} from 'react';
-import {locales} from 'utils/datetime';
+import {ReactNode, useEffect, useMemo, useRef, useState} from 'react';
+import {getDatePickerLocale, locales} from 'utils/datetime';
 import Box from '@mui/material/Box';
 import {SxProps, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
@@ -59,7 +59,10 @@ export const DatePicker = ({
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
-  const language = user?.userAccount.serviceCompany.language;
+  const language = useMemo(
+    () => user?.userAccount.serviceCompany.language,
+    [user],
+  );
   const locale = mapLanguageToLocale[language!];
   const [value, setValue] = useState<Date | null>(defaultDate);
   const [open, setOpen] = useState<boolean>(false);
@@ -259,7 +262,11 @@ export const DatePicker = ({
     <Box sx={{...containerStyles}}>
       <LocalizationProvider
         dateAdapter={AdapterDateFns}
-        adapterLocale={locales[locale]}>
+        adapterLocale={locales[locale]}
+        localeText={
+          getDatePickerLocale(language).components.MuiLocalizationProvider
+            .defaultProps.localeText
+        }>
         <MuiDatePicker
           {...props}
           open={open}

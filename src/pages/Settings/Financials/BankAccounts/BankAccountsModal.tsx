@@ -10,7 +10,7 @@ interface Props {
 export const BankAccountsModal = ({form}: Props) => (
   <Grid container component="form" rowGap={3}>
     <FormInput
-      props={{
+      fieldProps={{
         size: 'small',
         label: 'Bank name',
         required: true,
@@ -19,7 +19,7 @@ export const BankAccountsModal = ({form}: Props) => (
     />
 
     <FormInput
-      props={{
+      fieldProps={{
         size: 'small',
         label: 'IBAN',
         required: true,
@@ -29,7 +29,7 @@ export const BankAccountsModal = ({form}: Props) => (
 
     <Box display="flex" gap={1.5} width="100%">
       <FormInput
-        props={{
+        fieldProps={{
           type: 'number',
           size: 'small',
           label: 'Account number',
@@ -38,7 +38,7 @@ export const BankAccountsModal = ({form}: Props) => (
       />
 
       <FormInput
-        props={{
+        fieldProps={{
           size: 'small',
           label: 'BIC',
           ...form.register('bic'),

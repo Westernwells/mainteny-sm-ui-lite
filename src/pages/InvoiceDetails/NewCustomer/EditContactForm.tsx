@@ -68,7 +68,7 @@ export const EditContactForm = ({formik, index}: Props) => {
     <Grid container spacing={2} sx={{mt: '0.5rem'}}>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. John',
             label: 'First Name',
@@ -86,7 +86,7 @@ export const EditContactForm = ({formik, index}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. Meier',
             label: 'Last Name',
@@ -130,7 +130,7 @@ export const EditContactForm = ({formik, index}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             id: 'email',
             name: `contactPersons[${index}].userAccount.contact.email`,
             label: 'Email',
@@ -144,7 +144,7 @@ export const EditContactForm = ({formik, index}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             id: 'phone',
             name: `contactPersons[${index}].userAccount.contact.phone`,
             label: 'Phone',
@@ -164,7 +164,7 @@ export const EditContactForm = ({formik, index}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             id: 'secondaryPhone',
             name: `contactPersons[${index}].propertyContactPerson.secondaryPhone`,
             label: '2nd Phone',

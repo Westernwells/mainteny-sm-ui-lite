@@ -28,7 +28,7 @@ export const UserForm = ({formik, typeForm}: Props) => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g. John',
               label: 'First Name',
@@ -46,7 +46,7 @@ export const UserForm = ({formik, typeForm}: Props) => {
         </Grid>
         <Grid item xs={12}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g. Meier',
               label: 'Last Name',
@@ -84,7 +84,7 @@ export const UserForm = ({formik, typeForm}: Props) => {
           ].map((item, index) => (
             <FormInput
               key={index}
-              props={{
+              fieldProps={{
                 ...item,
                 ...defaultProps,
               }}
@@ -115,7 +115,7 @@ export const UserForm = ({formik, typeForm}: Props) => {
           ].map((item, index) => (
             <FormInput
               key={index}
-              props={{
+              fieldProps={{
                 ...item,
                 ...defaultProps,
               }}
@@ -135,7 +135,7 @@ export const UserForm = ({formik, typeForm}: Props) => {
           ].map((item, index) => (
             <FormInput
               key={index}
-              props={{
+              fieldProps={{
                 ...item,
                 ...defaultProps,
               }}
@@ -184,7 +184,7 @@ export const UserForm = ({formik, typeForm}: Props) => {
           ].map((item, index) => (
             <FormInput
               key={index}
-              props={{
+              fieldProps={{
                 ...item,
                 ...defaultProps,
               }}

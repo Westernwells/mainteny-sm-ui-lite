@@ -45,7 +45,7 @@ export const EditBasicInfoForm = ({
     <Grid container component="form" spacing={3} pt={2}>
       <Grid item xs={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Name',
             name: 'name',
             placeholder: 'e.g. Flat cable, 16G0.75+2x(2x0.5)',
@@ -106,7 +106,7 @@ export const EditBasicInfoForm = ({
 
       <Grid item xs={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Email',
             name: 'email',
             placeholder: 'e.g johndoe@example.com',
@@ -121,7 +121,7 @@ export const EditBasicInfoForm = ({
 
       <Grid item xs={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Phone',
             name: 'phone',
             placeholder: 'e.g. 49 173 12345678',
@@ -155,7 +155,7 @@ export const EditBasicInfoForm = ({
 
       <Grid item xs={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Website',
             name: 'url',
             placeholder: 'e.g. www.web.com',
@@ -170,7 +170,7 @@ export const EditBasicInfoForm = ({
 
       <Grid item xs={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Category',
             name: 'category',
             placeholder: 'e.g. Cable',

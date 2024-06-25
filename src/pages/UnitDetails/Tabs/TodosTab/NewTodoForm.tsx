@@ -35,7 +35,7 @@ export const NewTodoForm = () => {
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Stack gap="1em">
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Subject',
             id: 'subject',
             name: 'subject',
@@ -48,7 +48,7 @@ export const NewTodoForm = () => {
           }}
         />
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Description',
             id: 'content',
             name: 'content',

@@ -421,7 +421,7 @@ export const SendEmailDialog = ({
             control={control}
             render={({field}) => (
               <FormInput
-                props={{
+                fieldProps={{
                   ...field,
                   size: 'small',
                   label: 'Subject',

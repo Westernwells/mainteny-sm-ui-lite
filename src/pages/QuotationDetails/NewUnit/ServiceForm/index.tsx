@@ -111,7 +111,7 @@ export const ServiceForm = ({
 
           <Grid item xs={12} sm={2.4} md={2.4}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'Required time',
                 name: 'serviceTime',
                 placeholder: t('e.g. 45 (in minutes)'),
@@ -134,7 +134,7 @@ export const ServiceForm = ({
 
           <Grid item xs={12} sm={2.4} md={2.4}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'No. of Technicians',
                 name: 'technicianNumber',
                 type: 'number',

@@ -17,7 +17,7 @@ export const EditGeneralInfoModal = ({form}: Props) => {
     <Grid container rowGap={3}>
       <Grid item xs={12}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. DE 123456789',
             label: 'VAT ID',
@@ -28,7 +28,7 @@ export const EditGeneralInfoModal = ({form}: Props) => {
       </Grid>
       <Grid item xs={12}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. 123456789',
             label: 'Tax ID',

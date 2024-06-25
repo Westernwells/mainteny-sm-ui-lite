@@ -223,7 +223,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 placeholder: 'e.g. Elevator Installation Meier',
                 label: 'Manufacturer',
                 name: 'manufacturer',
@@ -319,7 +319,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 placeholder: 'e.g. SHX00000000001',
                 label: 'Serial Number',
                 name: 'serialNumber',
@@ -332,7 +332,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. 10',
                 label: 'Number of Stops',
@@ -348,7 +348,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 name: 'unitCapacity',
                 label: 'Unit Capacity',
                 placeholder: 'e.g. 1000 kg',
@@ -373,7 +373,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. 2 doors',
                 label: 'Cabin Type',
@@ -387,7 +387,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. SafeLine',
                 label: 'Emergency Phone Provider',
@@ -401,7 +401,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 name: 'emergencyContactNumber',
                 label: 'Emergency Contact Number',
                 placeholder: 'e.g. +49 1000 00000000',
@@ -414,7 +414,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 name: 'yearBuilt',
                 label: 'Year Built',
                 placeholder: 'e.g. 2000',
@@ -429,7 +429,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 name: 'modelOfController',
                 label: 'Model of Controller',
                 placeholder: 'e.g. TX2000',
@@ -442,7 +442,7 @@ export const UnitDetailsForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 name: 'manufacturerOfController',
                 label: 'Manufacturer of Controller',
                 placeholder: 'e.g. Schneider',

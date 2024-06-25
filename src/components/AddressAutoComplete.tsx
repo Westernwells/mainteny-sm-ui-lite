@@ -205,7 +205,7 @@ export const AddressAutoComplete = ({
 
           return (
             <FormInput
-              props={{
+              fieldProps={{
                 sx: allowMap
                   ? {
                       '& .MuiInputBase-root': {
