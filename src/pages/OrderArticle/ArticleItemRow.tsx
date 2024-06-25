@@ -67,6 +67,8 @@ export const ArticleItemRow = ({
             fullWidth
             sx={{width: '100%'}}
             required
+            error={!name.trim()}
+            helperText={!name.trim() ? t('Name is required') : ''}
           />
           {description.trim() && (
             <TextField
@@ -88,6 +90,12 @@ export const ArticleItemRow = ({
           fullWidth
           sx={{width: '100%'}}
           required
+          error={!supplierArticleNumber.trim()}
+          helperText={
+            !supplierArticleNumber.trim()
+              ? t('Supplier number is required')
+              : ''
+          }
         />
         <TextField
           value={quantity}
@@ -102,6 +110,8 @@ export const ArticleItemRow = ({
           onChange={(e) => setUnit(e.target.value)}
           size="small"
           required
+          error={!unit.trim()}
+          helperText={!unit.trim() ? t('Unit is required') : ''}
         />
       </Box>
       <Box sx={{float: 'right', mt: '1em'}}>
