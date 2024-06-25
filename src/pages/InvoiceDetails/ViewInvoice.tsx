@@ -196,9 +196,11 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
   );
+
   const sortedPreviousInvoices = useMemo(
     () =>
       [...previousInvoices]
+        .filter((item) => item.status !== InvoiceStatus.CANCELLED)
         .sort(
           (a, b) =>
             new Date(a.meta.createdAt).getTime() -

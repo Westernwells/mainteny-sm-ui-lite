@@ -584,7 +584,7 @@
   "NONE": "NINGUNO",
   "OPENING HOURS": "HORARIO DE APERTURA",
   "REQUIRES NOTIFICATION": "REQUIERE NOTIFICACIÓN",
-  "NOTIFICATION DUE": "NOTIFICATIÓN DEBIDA",
+  "NOTIFICATION DUE": "NOTIFICATIÓN PENDIENTE",
   "5 days": "5 dias",
   "Related Contracts": "Contratos relacionados",
   "Start Date": "Fecha de inicio",
@@ -2628,5 +2628,8 @@
   "Failed to load PDF file": "No se pudo cargar el archivo PDF",
   "Text Blocks": "Bloques de texto",
   "WORD COUNT": "RECUENTO DE PALABRAS",
-  "EDITED": "EDITADO"
+  "EDITED": "EDITADO",
+  "Valid Until": "Válido hasta",
+  "Phone 1": "Teléfono 1",
+  "Anything else that does’t fit the previous types description": "Cualquier otra cosa que no se ajuste a la descripción de los tipos anteriores"
 }

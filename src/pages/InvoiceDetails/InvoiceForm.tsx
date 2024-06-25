@@ -97,23 +97,42 @@ import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
+import {T} from 'utils/i18n-utils';
+import {
+  ServiceCompanyNumberType,
+  ServiceCompanyType,
+} from 'models/service-company';
+import {pdf} from '@react-pdf/renderer';
+import {FileWithPreview, MappedFile} from 'components/MyDropZone/MyDropzone';
+import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
+import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
+import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
+import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
+import RichTextField from 'components/RichTextField';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
+import {useCurrentCurrency} from 'utils/currency';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
+import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
+import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
+import {getSignatureKeys} from 'utils/service-order-utils';
+import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
+import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {CreateNotes} from './Notes/CreateNotes';
+import {Notes} from './Notes/EditNotes';
+import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
+import {PartialPaymentsSection} from './PartialPaymentsSection';
+import {SectionTitle} from './SectionTitle';
+import {EditFrom} from './EditFrom';
+import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
+import NewCustomer from './NewCustomer';
 import {
   articleViewToInvoiceItemRecord,
   formatInvoiceRecord,
   stripHtmlTags,
 } from './utils';
-import NewCustomer from './NewCustomer';
-import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
-import {EditFrom} from './EditFrom';
-import {SectionTitle} from './SectionTitle';
-import {PartialPaymentsSection} from './PartialPaymentsSection';
-import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
 import InvoiceFormArticleSection from './InvoiceFormArticleSection';
-import {T} from 'utils/i18n-utils';
-import {ServiceCompanyType} from 'models/service-company';
-import {Notes} from './Notes/EditNotes';
-import {CreateNotes} from './Notes/CreateNotes';
-import {useTranslation} from 'react-i18next';
 
 interface Props {
   invoice?: InvoiceView;
@@ -423,6 +442,7 @@ export const InvoiceForm = ({
             new Date(a.meta.createdAt).getTime() -
             new Date(b.meta.createdAt).getTime(),
         )
+        .filter((item) => item.status !== InvoiceStatus.CANCELLED)
         .map((i) => ({
           ...i,
           totalAmount: {
@@ -475,8 +495,7 @@ export const InvoiceForm = ({
         'paymentTerm',
         getFormattedPaymentTerms(row.paymentTerm),
       );
-
-      if (formType === 'new' && !!row.paymentTerm.data?.dueDays) {
+      if (row.paymentTerm?.data?.dueDays) {
         formik.setFieldValue(
           'dueDate',
           addDays(new Date(), row.paymentTerm.data.dueDays),
@@ -855,7 +874,7 @@ export const InvoiceForm = ({
         getFormattedPaymentTerms(paymentTermObj),
       );
     }
-    if (!!paymentTermObj?.data?.dueDays) {
+    if (paymentTermObj?.data?.dueDays) {
       formik.setFieldValue(
         'dueDate',
         addDays(new Date(), paymentTermObj?.data?.dueDays),
@@ -1642,8 +1661,18 @@ export const InvoiceForm = ({
                         }
                         checked={formik.values.payment?.type === key}
                         disabled={
-                          (!previousInvoices.length && formType === 'new') ||
-                          (previousInvoices.length === 1 && formType === 'edit')
+                          (!previousInvoices.filter(
+                            (item) => item.status !== InvoiceStatus.CANCELLED,
+                          ).length &&
+                            formType === 'new') ||
+                          (previousInvoices.filter(
+                            (item) => item.status !== InvoiceStatus.CANCELLED,
+                          ).length === 1 &&
+                            formType === 'edit') ||
+                          (!previousInvoices.filter(
+                            (item) => item.status !== InvoiceStatus.CANCELLED,
+                          ).length &&
+                            formType === 'edit')
                             ? false
                             : key !==
                               sortedPreviousInvoices?.[0]?.additionalInfo

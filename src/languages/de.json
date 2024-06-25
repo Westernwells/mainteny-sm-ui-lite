@@ -2546,6 +2546,7 @@
   "Every 3 months": "Alle 3 Monate",
   "Every 6 months": "Alle 6 Monate",
   "OFFSETTING ACCOUNT": "GEGENKONTO",
+  "Remove bank account": "Bankkonto entfernen",
   "You are about to remove <bold>{{bankName}}</bold> account from your Bank Accounts.": "Sie sind dabei das Konto <bold>{{bankName}}</bold> aus ihrer Konto-Übersicht entfernen.",
   "Remove Account": "Konto entfernen",
   "PDF template updated sucessfully": "PDF-Vorlage erfolgreich aktualisiert",
@@ -2594,5 +2595,9 @@
   "Failed to load PDF file": "PDF Ladevorgang abgebrochen",
   "Text Blocks": "Textbausteine",
   "WORD COUNT": "WORTANZAHL",
-  "EDITED": "EDITIERT"
+  "EDITED": "EDITIERT",
+  "Valid Until": "Gültig bis",
+  "Phone 1": "Telefon 1",
+  "Anything else that does’t fit the previous types description": "Alles weitere, was nicht den anderen Feldern zugeordnet werden kann",
+  "Edit job details": "Auftrags Details editiern"
 }
