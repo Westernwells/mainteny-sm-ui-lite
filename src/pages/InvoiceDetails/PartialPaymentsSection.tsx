@@ -103,7 +103,7 @@ const NameInput = ({
   disabledValue,
 }: NameInputProps) => (
   <FormInput
-    props={{
+    fieldProps={{
       size: 'small',
       label: 'Name',
       ...(disabledValue
@@ -530,7 +530,7 @@ export const PartialPaymentsSection = ({
                               <TableCell>{index + 1}</TableCell>
                               <TableCell sx={{width: '45%'}}>
                                 <FormInput
-                                  props={{
+                                  fieldProps={{
                                     value: item.name,
                                     disabled: true,
                                   }}
@@ -539,7 +539,7 @@ export const PartialPaymentsSection = ({
                               <TableCell>
                                 <FormInput
                                   inputType="currency"
-                                  props={{
+                                  fieldProps={{
                                     value: itemTotalPriceExclVat,
                                     InputProps: {
                                       startAdornment: (
@@ -567,7 +567,7 @@ export const PartialPaymentsSection = ({
                                       },
                                     );
                                   }}
-                                  props={{
+                                  fieldProps={{
                                     value:
                                       item.additionalInfo?.payment
                                         ?.percentage ?? 0,
@@ -597,7 +597,7 @@ export const PartialPaymentsSection = ({
                               <TableCell>
                                 <FormInput
                                   inputType="currency"
-                                  props={{
+                                  fieldProps={{
                                     value: itemAmountToBePaid,
                                     InputProps: {
                                       startAdornment: (
@@ -673,7 +673,7 @@ export const PartialPaymentsSection = ({
                             <TableCell>{index + 1}</TableCell>
                             <TableCell sx={{width: '45%'}}>
                               <FormInput
-                                props={{
+                                fieldProps={{
                                   value: item.name,
                                   disabled: true,
                                 }}
@@ -682,7 +682,7 @@ export const PartialPaymentsSection = ({
                             <TableCell>
                               <FormInput
                                 inputType="currency"
-                                props={{
+                                fieldProps={{
                                   value: itemTotalPriceExclVat,
                                   InputProps: {
                                     startAdornment: (
@@ -712,7 +712,7 @@ export const PartialPaymentsSection = ({
                                     },
                                   );
                                 }}
-                                props={{
+                                fieldProps={{
                                   value: item.payment?.percentage ?? 0,
                                   InputProps: {
                                     endAdornment: (
@@ -739,7 +739,7 @@ export const PartialPaymentsSection = ({
                             <TableCell>
                               <FormInput
                                 inputType="currency"
-                                props={{
+                                fieldProps={{
                                   value: itemAmountToBePaid,
                                   InputProps: {
                                     startAdornment: (

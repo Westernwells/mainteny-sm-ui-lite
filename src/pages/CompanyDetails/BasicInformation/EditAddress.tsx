@@ -30,7 +30,7 @@ export const EditAddress = ({
     <Grid container rowSpacing={3} columnSpacing={2}>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             label: 'Address line 1',
             name: `${address}.component.street`,
@@ -41,7 +41,7 @@ export const EditAddress = ({
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             label: 'Address line 2',
             name: `${address}.component.street2`,
@@ -52,7 +52,7 @@ export const EditAddress = ({
       </Grid>
       <Grid item md={3.5}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             label: 'City',
             name: `${address}.component.city`,
@@ -63,7 +63,7 @@ export const EditAddress = ({
       </Grid>
       <Grid item md={2.5}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             label: 'ZIP/Postal Code',
             name: `${address}.component.postalCode`,

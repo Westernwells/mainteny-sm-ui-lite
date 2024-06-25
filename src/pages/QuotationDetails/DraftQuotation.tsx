@@ -871,7 +871,7 @@ export const DraftQuotation = ({
               <SectionTitle Icon={HeaderIllustration} title="Header" />
             </Box>
             <FormInput
-              props={{
+              fieldProps={{
                 id: 'subject',
                 name: 'subject',
                 value: formik.values.subject,
@@ -887,8 +887,9 @@ export const DraftQuotation = ({
 
             <RichTextField
               label="Description"
-              html={formik.values.description}
+              html={formik.values.description || ''}
               updateHtml={(h) => formik.setFieldValue('description', h)}
+              minRows={2}
             />
           </Grid>
 
@@ -1067,7 +1068,7 @@ export const DraftQuotation = ({
               />
             </Box>
             <FormInput
-              props={{
+              fieldProps={{
                 id: 'referenceNumber',
                 name: 'referenceNumber',
                 label: 'Reference Number',

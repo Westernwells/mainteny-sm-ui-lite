@@ -101,7 +101,7 @@ export const CredentialEmployeeForm = ({
                 ].map((item, index) => (
                   <FormInput
                     key={index}
-                    props={{
+                    fieldProps={{
                       ...item,
                       ...defaultProps,
                     }}
@@ -139,7 +139,7 @@ export const CredentialEmployeeForm = ({
                 ].map((item, index) => (
                   <FormInput
                     key={index}
-                    props={{
+                    fieldProps={{
                       ...item,
                       ...defaultProps,
                     }}

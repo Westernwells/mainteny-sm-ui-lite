@@ -69,7 +69,7 @@ export const Thumb = ({
           {isEditingFileName && file.name === currentEditingFileName ? (
             <Box sx={{display: 'flex'}}>
               <FormInput
-                props={{
+                fieldProps={{
                   value: newFileName,
                   size: 'small',
                   fullWidth: true,

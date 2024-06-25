@@ -68,7 +68,7 @@ export const EditServiceForm = ({formik}: Props) => {
 
       <Grid item sm={12} md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Required Time',
             name: 'serviceTime',
             value: formik.values.serviceTime,
@@ -94,7 +94,7 @@ export const EditServiceForm = ({formik}: Props) => {
 
       <Grid item sm={12} md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'No. of technicians',
             name: 'technicianNumber',
             value: formik.values.technicianNumber,

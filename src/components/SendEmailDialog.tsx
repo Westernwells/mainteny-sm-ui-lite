@@ -120,7 +120,7 @@ export const SendEmailDialog = ({
       <DialogContent sx={{p: 0, px: 0, pb: '1.5rem'}}>
         <Box display="flex" flexDirection="column" gap={3} pt="2rem">
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g johndoe@example.com',
               label: 'Email Address',
@@ -133,7 +133,7 @@ export const SendEmailDialog = ({
             }}
           />
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Subject',
               name: 'subject',
@@ -145,7 +145,7 @@ export const SendEmailDialog = ({
             }}
           />
           <FormInput
-            props={{
+            fieldProps={{
               label: 'Text',
               size: 'small',
               name: 'content',

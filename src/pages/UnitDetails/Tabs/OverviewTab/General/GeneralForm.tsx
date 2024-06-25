@@ -127,7 +127,7 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
 
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             placeholder: 'E.g. Thyssenkrupp, schindler',
             label: 'Manufacturer',
             ...register('manufacturer'),
@@ -137,7 +137,7 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
 
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             placeholder: 'Fabric number',
             label: 'Serial Number',
             ...register('serialNumber'),
@@ -187,7 +187,7 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
       <Grid item md={6}>
         <FormInput
           inputType="currency"
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. 150',
             label: 'Spending Limit',
@@ -211,7 +211,7 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
 
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. 2021',
             label: 'Year Built',

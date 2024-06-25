@@ -86,7 +86,7 @@ export const ComboBoxNew = ({
       isOptionEqualToValue={(option, value) => option.value === value.value}
       renderInput={(params) => (
         <FormInput
-          props={{
+          fieldProps={{
             ...params,
             ...textFieldProps,
             InputLabelProps: {

@@ -111,25 +111,11 @@ import {StatusChip} from 'components/StatusChip';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
-import {
-  articleViewToInvoiceItemRecord,
-  formatInvoiceRecord,
-  stripHtmlTags,
-} from './utils';
-import NewCustomer from './NewCustomer';
-import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
-import {EditFrom} from './EditFrom';
-import {SectionTitle} from './SectionTitle';
-import {PartialPaymentsSection} from './PartialPaymentsSection';
-import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
-import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 import {T} from 'utils/i18n-utils';
 import {
   ServiceCompanyNumberType,
   ServiceCompanyType,
 } from 'models/service-company';
-import {Notes} from './Notes/EditNotes';
-import {CreateNotes} from './Notes/CreateNotes';
 import {pdf} from '@react-pdf/renderer';
 import {FileWithPreview, MappedFile} from 'components/MyDropZone/MyDropzone';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
@@ -147,6 +133,20 @@ import {getSignatureKeys} from 'utils/service-order-utils';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {CreateNotes} from './Notes/CreateNotes';
+import {Notes} from './Notes/EditNotes';
+import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
+import {PartialPaymentsSection} from './PartialPaymentsSection';
+import {SectionTitle} from './SectionTitle';
+import {EditFrom} from './EditFrom';
+import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
+import NewCustomer from './NewCustomer';
+import {
+  articleViewToInvoiceItemRecord,
+  formatInvoiceRecord,
+  stripHtmlTags,
+} from './utils';
+import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 
 interface Props {
   invoice?: InvoiceView;
@@ -491,7 +491,6 @@ export const InvoiceForm = ({
       navigate(`/invoices/details/${invoiceId}`);
     },
   });
-
   const alternativeAddress = formik.values.alternativeAddress?.component;
   const beneficiaryAddress = formik.values.beneficiaryAddress?.component;
   const billingAddress = formik.values.billingAddress?.component;
@@ -559,7 +558,7 @@ export const InvoiceForm = ({
         'paymentTerm',
         getFormattedPaymentTerms(row.paymentTerm),
       );
-      if (!!row.paymentTerm?.data?.dueDays) {
+      if (row.paymentTerm?.data?.dueDays) {
         formik.setFieldValue(
           'dueDate',
           addDays(new Date(), row.paymentTerm?.data?.dueDays),
@@ -609,6 +608,7 @@ export const InvoiceForm = ({
 
   const onRemoveServiceOrder = () => {
     formik.setFieldValue('customerSpecificOrderNumber', '');
+    formik.setFieldValue('description', '');
     setServiceOrder(undefined);
   };
 
@@ -833,10 +833,7 @@ export const InvoiceForm = ({
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
       if (!formik.values.description && serviceOrder.report?.description) {
-        formik.setFieldValue(
-          'description',
-          stripHtmlTags(serviceOrder.report.description),
-        );
+        formik.setFieldValue('description', serviceOrder.report.description);
       }
       formik.setFieldValue(
         'customerSpecificOrderNumber',
@@ -968,7 +965,7 @@ export const InvoiceForm = ({
         getFormattedPaymentTerms(paymentTermObj),
       );
     }
-    if (!!paymentTermObj?.data?.dueDays) {
+    if (paymentTermObj?.data?.dueDays) {
       formik.setFieldValue(
         'dueDate',
         addDays(new Date(), paymentTermObj?.data?.dueDays),
@@ -1426,7 +1423,6 @@ export const InvoiceForm = ({
 
     updateAndSendInvoice();
   }, [updatedInvoice, isSendingDocuments]);
-
   return (
     <Box>
       {invoice &&
@@ -1710,7 +1706,7 @@ export const InvoiceForm = ({
               <SectionTitle Icon={HeaderIllustration} title="Header" />
             </Box>
             <FormInput
-              props={{
+              fieldProps={{
                 id: 'subject',
                 name: 'subject',
                 value: formik.values.subject,
@@ -1725,7 +1721,7 @@ export const InvoiceForm = ({
 
             <RichTextField
               label="Description"
-              html={formik.values.description}
+              html={formik.values.description || ''}
               updateHtml={(h) => formik.setFieldValue('description', h)}
               minRows={2}
             />
@@ -1934,7 +1930,7 @@ export const InvoiceForm = ({
             </Box>
             <Box width="100%">
               <FormInput
-                props={{
+                fieldProps={{
                   id: 'externalId',
                   name: 'externalId',
                   placeholder: t('Automatically assigned'),
@@ -1951,7 +1947,7 @@ export const InvoiceForm = ({
               />
             </Box>
             <FormInput
-              props={{
+              fieldProps={{
                 id: 'unitNumber',
                 name: 'unitNumber',
                 label: 'Unit Number',
@@ -1972,7 +1968,7 @@ export const InvoiceForm = ({
               gap={1}
               width="100%">
               <FormInput
-                props={{
+                fieldProps={{
                   id: 'customerSpecificOrderNumber',
                   name: 'customerSpecificOrderNumber',
                   placeholder: 'e.g 000 000 000',
@@ -1990,7 +1986,7 @@ export const InvoiceForm = ({
                 }}
               />
               <FormInput
-                props={{
+                fieldProps={{
                   id: 'costCenter',
                   name: 'costCenter',
                   placeholder: 'e.g 000 000 000',
@@ -2052,8 +2048,18 @@ export const InvoiceForm = ({
                         }
                         checked={formik.values.payment?.type === key}
                         disabled={
-                          (!previousInvoices.length && formType === 'new') ||
-                          (previousInvoices.length === 1 && formType === 'edit')
+                          (!previousInvoices.filter(
+                            (item) => item.status !== InvoiceStatus.CANCELLED,
+                          ).length &&
+                            formType === 'new') ||
+                          (previousInvoices.filter(
+                            (item) => item.status !== InvoiceStatus.CANCELLED,
+                          ).length === 1 &&
+                            formType === 'edit') ||
+                          (!previousInvoices.filter(
+                            (item) => item.status !== InvoiceStatus.CANCELLED,
+                          ).length &&
+                            formType === 'edit')
                             ? false
                             : key !==
                               sortedPreviousInvoices?.[0]?.additionalInfo

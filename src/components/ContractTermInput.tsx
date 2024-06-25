@@ -58,7 +58,7 @@ const DiscountOption = ({
       <Typography variant="body2">{index + 1}</Typography>
 
       <FormInput
-        props={{
+        fieldProps={{
           name: `otherTerm.paymentTermData.discountOptions.${index}.discountDays`,
           label: 'Discount days',
           type: 'number',
@@ -69,7 +69,7 @@ const DiscountOption = ({
       />
 
       <FormInput
-        props={{
+        fieldProps={{
           name: `otherTerm.paymentTermData.discountOptions.${index}.discountPercent`,
           label: 'Discount %',
           type: 'number',
@@ -310,7 +310,7 @@ export const ContractTermInput = ({
 
       <DialogContent sx={{pb: 5}}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: isContract
               ? t('Enter your contract name...')
@@ -330,7 +330,7 @@ export const ContractTermInput = ({
         {!isContract && (
           <>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: t('Due days'),
                 name: 'otherTerm.paymentTermData.dueDays',

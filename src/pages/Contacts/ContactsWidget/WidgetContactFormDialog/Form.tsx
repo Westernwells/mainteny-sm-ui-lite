@@ -171,7 +171,7 @@ const Form = ({form}: Props) => {
       </Grid>
       <Grid item md={4.5}>
         <FormInput
-          props={{
+          fieldProps={{
             disabled: isContactPersonSelected,
             label: 'Last name',
             required: true,
@@ -182,7 +182,7 @@ const Form = ({form}: Props) => {
       {isContactPersonSelected ? (
         <Grid item md={12}>
           <FormInput
-            props={{
+            fieldProps={{
               disabled: true,
               label: 'Role',
               required: true,
@@ -221,7 +221,7 @@ const Form = ({form}: Props) => {
       )}
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             disabled: isContactPersonSelected,
             label: 'Email',
             ...register('userAccount.contact.email'),
@@ -230,7 +230,7 @@ const Form = ({form}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             disabled: isContactPersonSelected,
             label: 'Company',
             ...register('contactPerson.companyName'),
@@ -239,7 +239,7 @@ const Form = ({form}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             disabled: isContactPersonSelected,
             label: 'Phone',
             ...register('userAccount.contact.phone'),
@@ -248,7 +248,7 @@ const Form = ({form}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             disabled: isContactPersonSelected,
             label: 'Phone 2',
             ...register('contactPerson.secondaryPhone'),

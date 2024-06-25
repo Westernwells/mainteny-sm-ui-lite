@@ -174,7 +174,7 @@ const ServicesForm = ({
       <Grid container spacing={2}>
         <Grid item xs={7}>
           <FormInput
-            props={{
+            fieldProps={{
               label: 'Service Name',
               name: 'name',
               value: formikContractServiceComponent.values.name,

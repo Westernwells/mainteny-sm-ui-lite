@@ -164,7 +164,7 @@ const NewSupplier = () => {
         <Grid container spacing={3} component="form">
           <Grid item md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'Name',
                 name: 'name',
                 placeholder: 'e.g. Würth',
@@ -229,7 +229,7 @@ const NewSupplier = () => {
 
           <Grid item md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'Email',
                 name: 'email',
                 placeholder: 'e.g johndoe@example.com',
@@ -244,7 +244,7 @@ const NewSupplier = () => {
 
           <Grid item md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'Phone',
                 name: 'phone',
                 placeholder: 'e.g. 49 173 12345678',
@@ -278,7 +278,7 @@ const NewSupplier = () => {
 
           <Grid item md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'Website',
                 name: 'url',
                 placeholder: 'e.g. www.web.com',
@@ -293,7 +293,7 @@ const NewSupplier = () => {
 
           <Grid item md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'Category',
                 name: 'category',
                 placeholder: 'e.g. Fastening technology',

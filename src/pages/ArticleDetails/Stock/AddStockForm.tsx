@@ -16,7 +16,7 @@ export const AddStockForm = ({
     <Box component="form" sx={{...containerStyles}}>
       <FormInput
         containerStyles={{width: '50%', pr: '1rem'}}
-        props={{
+        fieldProps={{
           name: 'maxStock',
           label: t('Maximum Stock'),
           placeholder: t('e.g. 50'),
@@ -30,7 +30,7 @@ export const AddStockForm = ({
       />
       <FormInput
         containerStyles={{width: '50%', pr: '1rem'}}
-        props={{
+        fieldProps={{
           name: 'currentStock',
           label: t('Current Stock'),
           placeholder: t('e.g. 100'),
@@ -44,7 +44,7 @@ export const AddStockForm = ({
       />
       <FormInput
         containerStyles={{width: '50%', pr: '1rem'}}
-        props={{
+        fieldProps={{
           name: 'minOrderQuantity',
           label: t('Minimum Order Quantity'),
           placeholder: t('e.g. 10'),
@@ -58,7 +58,7 @@ export const AddStockForm = ({
       />
       <FormInput
         containerStyles={{width: '50%', pr: '1rem'}}
-        props={{
+        fieldProps={{
           name: 'minStock',
           label: t('Minimum Stock'),
           placeholder: t('e.g. 50'),

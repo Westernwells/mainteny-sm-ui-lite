@@ -121,7 +121,7 @@ export const MarkAsPaidDialog = ({
             onValueChange={(values) => {
               formik.setFieldValue(values.name as string, values.value);
             }}
-            props={{
+            fieldProps={{
               placeholder: 'e.g. 200',
               label: t('Paid amount (incl. VAT)'),
               name: 'amount.value',

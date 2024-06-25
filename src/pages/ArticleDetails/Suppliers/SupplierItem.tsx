@@ -101,7 +101,7 @@ export const SupplierItem = ({
       />
       <FormInput
         containerStyles={{...containerStyles}}
-        props={{
+        fieldProps={{
           id: 'supplierNumber',
           label: t('Supplier specific article number'),
           placeholder: t('e.g. 00000001'),

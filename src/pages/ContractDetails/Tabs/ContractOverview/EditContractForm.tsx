@@ -123,7 +123,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
           }}
           inputType="currency"
           numericFormatProps={{disabled: true}}
-          props={{
+          fieldProps={{
             placeholder: t('Enter value/year (in {{currencySymbol}})', {
               currencySymbol,
             }),
@@ -233,7 +233,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
 
       <Grid item md={3}>
         <FormInput
-          props={{
+          fieldProps={{
             placeholder: 'Enter yearly price adjustment',
             label: 'Price Adjustment/Year',
             name: 'annualPriceAdjustmentPercentage',
@@ -257,8 +257,8 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
 
       <Grid item md={3}>
         <FormInput
-          props={{
-            placeholder: 'Renewal period (in months)',
+          fieldProps={{
+            placeholder: 'Renewal Period (in months)',
             label: 'Renewal Period (in months)',
             name: 'renewalTerms',
             type: 'number',
@@ -278,9 +278,9 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
 
       <Grid item md={3}>
         <FormInput
-          props={{
-            placeholder: 'Number of Units',
-            label: 'Number of Units',
+          fieldProps={{
+            placeholder: 'Number of units',
+            label: 'Number of units',
             name: 'visitsNumber',
             type: 'number',
             value: Number(formik.values.numberOfUnits).toString(),
@@ -293,7 +293,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
 
       <Grid item md={3}>
         <FormInput
-          props={{
+          fieldProps={{
             placeholder: 'Enter notice period',
             label: 'Notice Period (in months)',
             name: 'noticePeriodInMonth',

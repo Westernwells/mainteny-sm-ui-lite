@@ -400,7 +400,7 @@ export const MutationService = ({
       <Grid container spacing={2}>
         <Grid item xs={7}>
           <FormInput
-            props={{
+            fieldProps={{
               label: 'Service Name',
               name: 'name',
               value: formikContractServiceComponent.values.name,
@@ -721,7 +721,7 @@ export const MutationService = ({
                       onClick: handleClose,
                     }}>
                     <Typography variant="subtitle2" color="text.secondary">
-                      Cancel
+                      {t('Cancel')}
                     </Typography>
                   </Button>
 
@@ -734,7 +734,7 @@ export const MutationService = ({
                       autoFocus: true,
                       variant: 'contained',
                     }}>
-                    <Typography variant="subtitle2">Save</Typography>
+                    <Typography variant="subtitle2">{t('Save')}</Typography>
                   </Button>
                 </Box>
               </>
@@ -775,7 +775,7 @@ export const MutationService = ({
               variant="h5"
               color={theme.palette.text.primary}
               sx={{paddingLeft: '0.5em'}}>
-              Unit Settings
+              {t('Unit Settings')}
             </Typography>
           </Box>
 
