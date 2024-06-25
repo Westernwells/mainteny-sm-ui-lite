@@ -192,7 +192,6 @@ const getStyles = (
   });
 
 type BookedHoursProps = {
-  endTime?: string;
   startTime?: string;
   totalFormatted: string;
   percentageSurcharge?: number;
@@ -203,7 +202,6 @@ type BookedHoursProps = {
 };
 
 const BookedHoursRow = ({
-  endTime,
   startTime,
   totalFormatted,
   percentageSurcharge,
@@ -227,7 +225,7 @@ const BookedHoursRow = ({
     <View style={styles.tableRow}>
       <Text
         style={{width: '15%', textAlign: 'left', ...styles.tableBodyContent}}>
-        {endTime ? formatDate(endTime) : '-'}
+        {startTime ? formatDate(startTime) : '-'}
       </Text>
       <Text
         style={{width: '10%', textAlign: 'right', ...styles.tableBodyContent}}>
@@ -498,7 +496,6 @@ const WorkReportTemplate = React.memo(
                     (s, index) => (
                       <BookedHoursRow
                         key={`${index} - ${s.startTime}`}
-                        endTime={report?.additionalInfo.workTimeInfo?.endTime}
                         startTime={s?.startTime}
                         totalFormatted={convertMinutesToHoursAndMinutes(
                           s?.minutes!,
@@ -523,7 +520,6 @@ const WorkReportTemplate = React.memo(
                     (s, index) => (
                       <BookedHoursRow
                         key={`${index} - ${s.startTime}`}
-                        endTime={report?.additionalInfo.travelTimeInfo?.endTime}
                         startTime={s?.startTime}
                         totalFormatted={convertMinutesToHoursAndMinutes(
                           s?.minutes!,
