@@ -230,8 +230,9 @@ const RichTextField = ({
 
   useEffect(() => {
     const newValue = getValue(html) as Descendant[];
-    editor.children = newValue;
-    setValue(newValue);
+    if (JSON.stringify(value) !== JSON.stringify(newValue)) {
+      setValue(newValue);
+    }
   }, [html]);
 
   const debouncedUpdateHtml = useMemo(
