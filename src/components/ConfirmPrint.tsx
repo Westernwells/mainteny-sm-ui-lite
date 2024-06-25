@@ -12,6 +12,7 @@ interface Props {
   open?: boolean;
   onConfirm: () => void;
   onClose: () => void;
+  isLoading?: boolean;
 }
 
 export const ConfirmPrint = ({
@@ -20,6 +21,7 @@ export const ConfirmPrint = ({
   open,
   onConfirm,
   onClose,
+  isLoading,
 }: Props) => {
   const {t} = useTranslation();
   return (
@@ -59,8 +61,11 @@ export const ConfirmPrint = ({
             size: 'medium',
             variant: 'contained',
             onClick: onConfirm,
+            disabled: isLoading,
           }}>
-          <Typography variant="subtitle2">{t('Print')}</Typography>
+          <Typography variant="subtitle2">
+            {isLoading ? t('Printing...') : t('Print')}
+          </Typography>
         </Button>
       </DialogActions>
     </Dialog>
