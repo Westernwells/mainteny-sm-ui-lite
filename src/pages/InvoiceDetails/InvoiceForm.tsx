@@ -1706,7 +1706,7 @@ export const InvoiceForm = ({
               <SectionTitle Icon={HeaderIllustration} title="Header" />
             </Box>
             <FormInput
-              props={{
+              fieldProps={{
                 id: 'subject',
                 name: 'subject',
                 value: formik.values.subject,
@@ -1930,7 +1930,7 @@ export const InvoiceForm = ({
             </Box>
             <Box width="100%">
               <FormInput
-                props={{
+                fieldProps={{
                   id: 'externalId',
                   name: 'externalId',
                   placeholder: t('Automatically assigned'),
@@ -1947,7 +1947,7 @@ export const InvoiceForm = ({
               />
             </Box>
             <FormInput
-              props={{
+              fieldProps={{
                 id: 'unitNumber',
                 name: 'unitNumber',
                 label: 'Unit Number',
@@ -1968,7 +1968,7 @@ export const InvoiceForm = ({
               gap={1}
               width="100%">
               <FormInput
-                props={{
+                fieldProps={{
                   id: 'customerSpecificOrderNumber',
                   name: 'customerSpecificOrderNumber',
                   placeholder: 'e.g 000 000 000',
@@ -1986,7 +1986,7 @@ export const InvoiceForm = ({
                 }}
               />
               <FormInput
-                props={{
+                fieldProps={{
                   id: 'costCenter',
                   name: 'costCenter',
                   placeholder: 'e.g 000 000 000',

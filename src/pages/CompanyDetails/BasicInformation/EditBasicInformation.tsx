@@ -116,7 +116,7 @@ export const EditBasicInformation = ({formik}: Props) => {
       </Grid>
       <Grid item xs={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. Cable xyz',
             label: 'Name',
@@ -131,7 +131,7 @@ export const EditBasicInformation = ({formik}: Props) => {
       </Grid>
       <Grid item xs={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. www.yourcompany.com',
             label: 'Website',
@@ -143,7 +143,7 @@ export const EditBasicInformation = ({formik}: Props) => {
       </Grid>
       <Grid item xs={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g johndoe@example.com',
             label: 'Email',
@@ -158,7 +158,7 @@ export const EditBasicInformation = ({formik}: Props) => {
       </Grid>
       <Grid item xs={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. +49 173 12345678',
             label: 'Phone',

@@ -8,7 +8,7 @@ import {NumericFormat, NumericFormatProps} from 'react-number-format';
 
 interface Props {
   containerStyles?: {[key: string]: any};
-  props?: TextFieldProps;
+  fieldProps?: TextFieldProps;
   inputLabelProps?: InputLabelProps;
   handleFocus?: (e: any) => void;
   onValueChange?: (values: {name?: string; value?: number}) => void;
@@ -20,7 +20,7 @@ interface Props {
 export const FormInput = forwardRef(
   (
     {
-      props,
+      fieldProps,
       containerStyles,
       inputLabelProps,
       onValueChange,
@@ -38,24 +38,29 @@ export const FormInput = forwardRef(
       <FormControl sx={{...containerStyles}} fullWidth={fullWidth}>
         {inputType === 'currency' ? (
           <NumericFormat
-            // eslint-disable-next-line react/prop-types
-            value={Number(props?.inputProps?.defaultValue || props!.value)}
+            value={Number(
+              fieldProps?.inputProps?.defaultValue || fieldProps!.value,
+            )}
             onValueChange={(values) => {
               if (onValueChange) {
                 onValueChange({
                   value: values.floatValue,
-                  name: props!.name,
+                  name: fieldProps?.name,
                 });
               }
             }}
-            onBlur={props!.onBlur}
-            label={t(props!.label as string)}
-            helperText={props!.helperText}
-            placeholder={props!.placeholder}
-            error={props!.error}
+            onBlur={fieldProps?.onBlur}
+            label={
+              fieldProps?.label ? t(fieldProps.label as string) : undefined
+            } // MUI label field has a complex type (react component, string) TODO extract to new prop for keys ex keys: {label: string, placeholder: string, helperText: string}
+            helperText={fieldProps?.helperText}
+            placeholder={
+              fieldProps?.placeholder ? t(fieldProps.placeholder) : undefined
+            }
+            error={fieldProps?.error}
             decimalScale={2}
-            inputProps={props!.inputProps} // eslint-disable-next-line react/jsx-no-duplicate-props
-            InputProps={props!.InputProps}
+            inputProps={fieldProps?.inputProps} // eslint-disable-next-line react/jsx-no-duplicate-props
+            InputProps={fieldProps?.InputProps}
             getInputRef={ref}
             customInput={TextField}
             decimalSeparator={
@@ -65,7 +70,7 @@ export const FormInput = forwardRef(
               selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
             }
             size="small"
-            sx={props!.sx}
+            sx={fieldProps?.sx}
             {...numericFormatProps}
           />
         ) : (
@@ -76,11 +81,19 @@ export const FormInput = forwardRef(
               ...inputLabelProps,
             }}
             size="small"
-            {...props}
+            {...fieldProps}
             inputRef={ref}
-            label={t(props!.label as string)}
-            helperText={t(props!.helperText as string)}
-            placeholder={t(props!.placeholder as string)}
+            label={
+              fieldProps?.label ? t(fieldProps.label as string) : undefined
+            }
+            helperText={
+              fieldProps?.helperText
+                ? t(fieldProps.helperText as string)
+                : undefined
+            } // MUI label field has a complex type (react component, string) TODO extract to new prop for keys ex keys: {label: string, placeholder: string, helperText: string}
+            placeholder={
+              fieldProps?.placeholder ? t(fieldProps.placeholder) : undefined
+            }
             onFocus={handleFocus}
           />
         )}

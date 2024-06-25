@@ -71,7 +71,7 @@ export const PaymentForm = ({
         <Grid container spacing={2}>
           <Grid item xs={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. DE00 0000 0000 0000 0000 00',
                 label: 'IBAN',
@@ -87,7 +87,7 @@ export const PaymentForm = ({
           </Grid>
           <Grid item xs={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. DEUTDE8CXXX',
                 label: 'BIC',
@@ -103,7 +103,7 @@ export const PaymentForm = ({
           </Grid>
           <Grid item xs={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. 0532013000',
                 label: 'Account Number',
@@ -120,7 +120,7 @@ export const PaymentForm = ({
           </Grid>
           <Grid item xs={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. DE 123456789',
                 label: 'VAT ID',
@@ -136,7 +136,7 @@ export const PaymentForm = ({
           </Grid>
           <Grid item xs={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. 0',
                 label: '% VAT',

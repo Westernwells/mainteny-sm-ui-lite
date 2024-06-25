@@ -99,7 +99,7 @@ export const AddDescription = ({
         <Grid container alignItems="center" spacing={2} mb={3}>
           <Grid item md={4.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'Purchase order number',
                 value: formik.values.purchaseOrderNumber,
                 size: 'small',
@@ -113,7 +113,7 @@ export const AddDescription = ({
 
           <Grid item md={4.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'Caller',
                 value: formik.values.callerName,
                 size: 'small',
@@ -160,7 +160,7 @@ export const AddDescription = ({
         </Grid>
 
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Description to the engineer',
             value: description,
             multiline: true,

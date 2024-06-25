@@ -138,7 +138,7 @@ export const CustomerPricesForm = ({
 
         <Grid item xs={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Category',
               name: 'category',
@@ -179,7 +179,7 @@ export const CustomerPricesForm = ({
 
         <Grid item xs={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Articles & Spare part Number',
               name: 'externalId',
@@ -191,7 +191,7 @@ export const CustomerPricesForm = ({
 
         <Grid item xs={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Unit',
               name: 'unit',
@@ -204,7 +204,7 @@ export const CustomerPricesForm = ({
         <Grid item xs={6}>
           <FormInput
             inputType="currency"
-            props={{
+            fieldProps={{
               label: 'Purchase price (excl. VAT)',
               value:
                 centsToMoney(
@@ -236,7 +236,7 @@ export const CustomerPricesForm = ({
             }}
             inputType="currency"
             numericFormatProps={{required: true}}
-            props={{
+            fieldProps={{
               label: 'Selling price (excl. VAT)',
               name: 'articleSellingPrice',
               value: values.articleSellingPrice ?? 0,

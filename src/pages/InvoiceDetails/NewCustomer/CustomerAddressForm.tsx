@@ -58,7 +58,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
       <Grid container spacing={3}>
         <Grid item md={3}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Name',
               name: 'billingAddress.component.name',
@@ -69,7 +69,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
         </Grid>
         <Grid item md={4.5}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Address line 1',
               name: 'billingAddress.component.street',
@@ -80,7 +80,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
         </Grid>
         <Grid item md={4.5}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Address line 2',
               name: 'billingAddress.component.street2',
@@ -91,7 +91,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
         </Grid>
         <Grid item md={3}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'City',
               name: 'billingAddress.component.city',
@@ -102,7 +102,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
         </Grid>
         <Grid item md={2}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'ZIP/Postal Code',
               name: 'billingAddress.component.postalCode',
@@ -164,7 +164,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
         <Grid container spacing={3}>
           <Grid item md={3}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Name',
                 name: 'beneficiaryAddress.component.name',
@@ -175,7 +175,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={4.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Address line 1',
                 name: 'beneficiaryAddress.component.street',
@@ -187,7 +187,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={4.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Address line 2',
                 name: 'beneficiaryAddress.component.street2',
@@ -199,7 +199,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={3}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'City',
                 name: 'beneficiaryAddress.component.city',
@@ -210,7 +210,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={2}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'ZIP/Postal Code',
                 name: 'beneficiaryAddress.component.postalCode',
@@ -287,7 +287,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
         <Grid container spacing={3}>
           <Grid item md={3}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Name',
                 name: 'otherAddress.component.name',
@@ -298,7 +298,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={4.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Address line 1',
                 name: 'otherAddress.component.street',
@@ -309,7 +309,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={4.5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'Address line 2',
                 name: 'otherAddress.component.street2',
@@ -320,7 +320,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={3}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'City',
                 name: 'otherAddress.component.city',
@@ -331,7 +331,7 @@ export const CustomerAddressForm = ({formik}: Props) => {
           </Grid>
           <Grid item md={2}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 label: 'ZIP/Postal Code',
                 name: 'otherAddress.component.postalCode',

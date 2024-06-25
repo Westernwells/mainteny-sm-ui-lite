@@ -370,7 +370,7 @@ export const InvoiceOverdueNotice = () => {
               </Box>
             </Box>
             <FormInput
-              props={{
+              fieldProps={{
                 name: 'customerAddress',
                 label: t('Customer Address'),
                 placeholder: t(
@@ -388,7 +388,7 @@ export const InvoiceOverdueNotice = () => {
               }}
             />
             <FormInput
-              props={{
+              fieldProps={{
                 name: 'invoiceNumber',
                 label: t('Invoice Number'),
                 variant: 'outlined',
@@ -402,7 +402,7 @@ export const InvoiceOverdueNotice = () => {
               }}
             />
             <FormInput
-              props={{
+              fieldProps={{
                 name: 'subject',
                 label: t('Subject'),
                 placeholder: t('e.g. Late payment'),
@@ -415,7 +415,7 @@ export const InvoiceOverdueNotice = () => {
               }}
             />
             <FormInput
-              props={{
+              fieldProps={{
                 name: 'description',
                 label: t('Description'),
                 placeholder: t(
@@ -447,7 +447,7 @@ export const InvoiceOverdueNotice = () => {
                   formik.setFieldValue(values.name as string, values.value);
                 }}
                 inputType="currency"
-                props={{
+                fieldProps={{
                   name: 'initialAmount',
                   size: 'small',
                   value: formik.values.initialAmount,
@@ -487,7 +487,7 @@ export const InvoiceOverdueNotice = () => {
                   formik.setFieldValue(values.name as string, values.value);
                 }}
                 inputType="currency"
-                props={{
+                fieldProps={{
                   name: 'handlingFee',
                   size: 'small',
                   value: formik.values.handlingFee,

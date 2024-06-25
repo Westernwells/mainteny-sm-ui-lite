@@ -60,7 +60,7 @@ export const EditBasicInfoForm = ({
     <Box display="flex" flexWrap="wrap" component="form">
       <FormInput
         containerStyles={{...containerStyles}}
-        props={{
+        fieldProps={{
           label: t('Name'),
           name: 'name',
           placeholder: t('e.g. Flat cable, 16G0.75+2x(2x0.5)'),
@@ -125,7 +125,7 @@ export const EditBasicInfoForm = ({
 
       <FormInput
         containerStyles={{...containerStyles}}
-        props={{
+        fieldProps={{
           name: 'manufacturer',
           label: t('Manufacturer'),
           placeholder: t('e.g. Meier'),
@@ -139,7 +139,7 @@ export const EditBasicInfoForm = ({
       />
       <FormInput
         containerStyles={{...containerStyles}}
-        props={{
+        fieldProps={{
           name: 'model',
           label: t('Model'),
           placeholder: t('e.g. 16G0.75+2x(2x0.5)'),
@@ -153,7 +153,7 @@ export const EditBasicInfoForm = ({
       />
       <FormInput
         containerStyles={{...containerStyles}}
-        props={{
+        fieldProps={{
           label: t('Category'),
           name: 'category',
           placeholder: t('e.g. Cable'),
@@ -170,7 +170,7 @@ export const EditBasicInfoForm = ({
         sx={{...containerStyles}}>
         <FormInput
           containerStyles={{pr: '1rem'}}
-          props={{
+          fieldProps={{
             name: 'unitPurchaseVat',
             label: t('Purchase VAT'),
             placeholder: t('19%'),
@@ -193,7 +193,7 @@ export const EditBasicInfoForm = ({
         />
 
         <FormInput
-          props={{
+          fieldProps={{
             name: 'unitSellingVat',
             label: t('Selling VAT'),
             placeholder: t('19%'),
@@ -244,7 +244,7 @@ export const EditBasicInfoForm = ({
             formik.setFieldValue(values.name as string, values.value);
           }}
           inputType="currency"
-          props={{
+          fieldProps={{
             name: 'unitPurchaseAmount',
             label: t('Purchase price (excl. VAT)'),
             placeholder: t(`e.g. 150{{currencySymbol}}`, {currencySymbol}),
@@ -268,7 +268,7 @@ export const EditBasicInfoForm = ({
             formik.setFieldValue(values.name as string, values.value);
           }}
           inputType="currency"
-          props={{
+          fieldProps={{
             name: 'unitSellingAmount',
             label: t('Selling price (excl. VAT)'),
             placeholder: t(`e.g. 200{{currencySymbol}}`, {currencySymbol}),
@@ -296,7 +296,7 @@ export const EditBasicInfoForm = ({
 
       <FormInput
         containerStyles={{...containerStyles}}
-        props={{
+        fieldProps={{
           name: 'storageLocation',
           label: t('Storage Location'),
           placeholder: t('e.g. Rack 20, Box 4'),

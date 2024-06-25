@@ -318,7 +318,7 @@ export const EditQuotation = ({quotation}: Props) => {
           <Box mt="1em" key={i.id}>
             <FormLabel text={i.id} required={i.required} />
             <FormInput
-              props={{
+              fieldProps={{
                 id: i.id,
                 value: i.value,
                 onChange: formik.handleChange,
@@ -343,7 +343,7 @@ export const EditQuotation = ({quotation}: Props) => {
         <Box my="1.5em">
           <FormLabel text="Additional Information" />
           <FormInput
-            props={{
+            fieldProps={{
               id: 'moreInfo',
               value: formik.values.moreInfo,
               onChange: formik.handleChange,

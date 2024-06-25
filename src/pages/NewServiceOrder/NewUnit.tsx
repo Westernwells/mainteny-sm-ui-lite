@@ -22,7 +22,7 @@ export const NewUnit = () => (
       <Grid container>
         <Grid item xs={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               //  placeholder: 'Enter Customer Name',
               label: 'customer',

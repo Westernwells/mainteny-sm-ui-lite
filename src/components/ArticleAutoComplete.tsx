@@ -110,7 +110,7 @@ export const ArticleAutocomplete = ({
       inputValue={queryView}
       renderInput={(params) => (
         <FormInput
-          props={{
+          fieldProps={{
             name: 'articleId',
             ...params,
             ...textFieldProps,

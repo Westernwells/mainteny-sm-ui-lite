@@ -139,7 +139,7 @@ export const RebuildForm = () => {
       </Grid>
       <Grid item xs={3}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'eg. 12345',
             label: 'Entity ID',

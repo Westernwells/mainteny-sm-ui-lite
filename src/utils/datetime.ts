@@ -1,21 +1,24 @@
 import {
+  addDays,
   endOfWeek,
   format,
+  formatDistance,
   formatDistanceToNowStrict,
+  intervalToDuration,
   isAfter,
   isToday,
   isTomorrow,
   isYesterday,
+  Locale,
   parseISO,
   startOfWeek,
   subWeeks,
-  intervalToDuration,
-  formatDistance,
-  Locale,
-  addDays,
 } from 'date-fns';
 import {useTranslation} from 'react-i18next';
-import {enUS, de, srLatn} from 'date-fns/locale';
+import {de, enUS, srLatn} from 'date-fns/locale';
+import * as datePickerLocales from '@mui/x-date-pickers/locales';
+import {Language} from '../models/misc';
+import {companyLanguageToUppercaseMap} from './utils';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
 export const locales: {[key: string]: Locale} = {enUS, de, srLatn};
@@ -266,4 +269,22 @@ export const getDatesInRange = (startDate: Date, endDate: Date) => {
     currentDate = addDays(currentDate, 1);
   }
   return dates;
+};
+
+export const getDatePickerLocale = (language?: Language) => {
+  if (!language) return datePickerLocales.enUS;
+  switch (companyLanguageToUppercaseMap[language]) {
+    case Language.DE_DE:
+      return datePickerLocales.deDE;
+    case Language.IT_IT:
+      return datePickerLocales.itIT;
+    case Language.RU_RU:
+      return datePickerLocales.ruRU;
+    case Language.ES_ES:
+      return datePickerLocales.esES;
+    case Language.TR_TR:
+      return datePickerLocales.trTR;
+    default:
+      return datePickerLocales.enUS;
+  }
 };

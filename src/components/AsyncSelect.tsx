@@ -164,7 +164,7 @@ const AsyncSelect = <T,>({
             }}
             renderInput={(params) => (
               <FormInput
-                props={{
+                fieldProps={{
                   ...params,
                   ...textFieldProps,
                   InputLabelProps: {

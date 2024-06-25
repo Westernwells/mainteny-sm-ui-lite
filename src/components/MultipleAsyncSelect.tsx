@@ -218,7 +218,7 @@ const MultipleAsyncSelect = <T,>({
             }}
             renderInput={(params) => (
               <FormInput
-                props={{
+                fieldProps={{
                   ...params,
                   ...textFieldProps,
                   InputLabelProps: {

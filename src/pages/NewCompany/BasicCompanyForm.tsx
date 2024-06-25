@@ -79,7 +79,7 @@ export const BasicCompanyForm = ({
         <Grid container spacing={2}>
           <Grid item md={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. 1&1 Drillisch AG',
                 label: 'Name',
@@ -97,7 +97,7 @@ export const BasicCompanyForm = ({
           </Grid>
           <Grid item md={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. brucewayne@gmail.com',
                 label: 'Email',
@@ -122,7 +122,7 @@ export const BasicCompanyForm = ({
           </Grid>
           <Grid item md={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. +1234567890',
                 label: 'Phone',
@@ -149,7 +149,7 @@ export const BasicCompanyForm = ({
           </Grid>
           <Grid item md={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. www.yourcompany.com',
                 label: 'Website / URL',

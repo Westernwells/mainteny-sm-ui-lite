@@ -125,7 +125,7 @@ const XeroDialog: FC<Props> = ({
               gridTemplateColumns="1fr 1fr"
               gap={3}>
               <FormInput
-                props={{
+                fieldProps={{
                   label: 'Tenant ID',
                   type: 'text',
                   error: Boolean(errors.tenantId),
@@ -139,7 +139,7 @@ const XeroDialog: FC<Props> = ({
                 }}
               />
               <FormInput
-                props={{
+                fieldProps={{
                   label: 'Client ID',
                   type: 'text',
                   error: Boolean(errors.clientId),

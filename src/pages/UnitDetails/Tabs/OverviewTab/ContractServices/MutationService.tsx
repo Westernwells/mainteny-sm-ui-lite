@@ -369,7 +369,7 @@ export const MutationService = ({
       <Grid container spacing={2}>
         <Grid item xs={7}>
           <FormInput
-            props={{
+            fieldProps={{
               label: 'Service Name',
               name: 'name',
               value: formikContractServiceComponent.values.name,
@@ -742,7 +742,7 @@ export const MutationService = ({
               variant="h5"
               color={theme.palette.text.primary}
               sx={{paddingLeft: '0.5em'}}>
-              Unit Settings
+              {t('Unit Settings')}
             </Typography>
           </Box>
 

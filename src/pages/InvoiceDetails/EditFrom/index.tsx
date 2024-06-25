@@ -80,7 +80,7 @@ export const EditFrom = ({
           <Grid container spacing={3}>
             <Grid item md={4}>
               <FormInput
-                props={{
+                fieldProps={{
                   size: 'small',
                   label: 'Name',
                   name: 'name',
@@ -91,7 +91,7 @@ export const EditFrom = ({
             </Grid>
             <Grid item md={4}>
               <FormInput
-                props={{
+                fieldProps={{
                   size: 'small',
                   label: 'Address line',
                   name: 'address.component.street',
@@ -102,7 +102,7 @@ export const EditFrom = ({
             </Grid>
             <Grid item md={2}>
               <FormInput
-                props={{
+                fieldProps={{
                   size: 'small',
                   label: 'City',
                   name: 'address.component.city',
@@ -113,7 +113,7 @@ export const EditFrom = ({
             </Grid>
             <Grid item md={2}>
               <FormInput
-                props={{
+                fieldProps={{
                   size: 'small',
                   label: 'ZIP/Postal Code',
                   name: 'address.component.postalCode',

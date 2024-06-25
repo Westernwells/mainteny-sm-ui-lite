@@ -299,7 +299,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
                         {/* Name */}
                         {editingFileId === file.id ? (
                           <FormInput
-                            props={{
+                            fieldProps={{
                               value: fileName,
                               size: 'small',
                               sx: {ml: '0.1rem', mr: '0.5rem'},
