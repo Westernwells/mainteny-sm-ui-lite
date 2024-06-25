@@ -664,10 +664,7 @@ export const InvoiceForm = ({
           return t('Full Invoice');
 
         default:
-          if (!serviceOrder) {
-            return t('Invoice');
-          }
-          return t(capitalize([serviceOrder?.type]));
+          return t('Invoice');
       }
     };
 
