@@ -1,9 +1,12 @@
 import {useCallback} from 'react';
-import {FormikProps} from 'formik';
+import {FormikProps, getIn} from 'formik';
 import Grid from '@mui/material/Grid';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
+import {AddressAutoComplete} from 'components/AddressAutoComplete';
+import {AddressRecord} from 'models/misc';
+import {useTranslation} from 'react-i18next';
 import {BasicInformationCompanyFormModel} from './model';
 
 export const EditAddress = ({
@@ -15,6 +18,7 @@ export const EditAddress = ({
 }) => {
   const {values, handleChange, handleBlur} = formik;
   const value = values[address];
+  const {t} = useTranslation();
 
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
@@ -29,14 +33,38 @@ export const EditAddress = ({
   return (
     <Grid container rowSpacing={3} columnSpacing={2}>
       <Grid item md={6}>
-        <FormInput
-          props={{
-            size: 'small',
+        <AddressAutoComplete
+          initialValue={
+            formik.values[address]?.component?.street ||
+            formik.values[address]?.fullName ||
+            ''
+          }
+          initialAddress={formik.values[address] as AddressRecord | undefined}
+          inputError={
+            getIn(formik.errors, 'address.fullName') &&
+            getIn(formik.touched, 'address.fullName')
+              ? getIn(formik.errors, 'address.fullName')
+              : ''
+          }
+          handleBlur={formik.handleBlur}
+          textFieldProps={{
+            placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
+            name: 'address.fullName',
             label: 'Address line 1',
-            name: `${address}.component.street`,
-            value: value?.component?.street ?? '',
-            ...defaultProps,
           }}
+          allowMap
+          getAddress={(componentAddress) => {
+            formik.setValues({
+              ...formik.values,
+              [address]: componentAddress
+                ? {
+                    ...componentAddress,
+                    fullName: componentAddress?.fullName as string,
+                  }
+                : undefined,
+            });
+          }}
+          shortAddress
         />
       </Grid>
       <Grid item md={6}>

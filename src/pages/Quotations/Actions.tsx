@@ -78,7 +78,7 @@ export const Actions = ({quotation}: Props) => {
   const {mutateAsync: uploadFiles} = useUploadFiles('');
   const {mutateAsync: printQuotation} = usePrintQuotation();
   const {mutateAsync: sendQuotation} = useSendQuotation();
-
+  const [creatingPdf, setCreatingPdf] = useState(false);
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
@@ -125,6 +125,7 @@ export const Actions = ({quotation}: Props) => {
   );
 
   const generateBlobUrl = async () => {
+    setCreatingPdf(true);
     const blob = await pdf(
       <QuotationPdfTemplate
         userInfo={user?.userAccount}
@@ -186,7 +187,14 @@ export const Actions = ({quotation}: Props) => {
       const fileNames = [`${quotation.id}.pdf`];
       const files = await createFilesFromBlobArray([blobFile!], fileNames);
 
-      await uploadFiles({files, uploadPath});
+      await uploadFiles(
+        {files, uploadPath},
+        {
+          onError: (err) => {
+            console.log('error', err);
+          },
+        },
+      );
 
       await printQuotation(
         {
@@ -196,7 +204,12 @@ export const Actions = ({quotation}: Props) => {
             sentDate: '',
           },
         },
-        {onSuccess: handlePrintSuccess},
+        {
+          onSuccess: () => {
+            setCreatingPdf(false);
+            handlePrintSuccess();
+          },
+        },
       );
     }
   };
@@ -225,7 +238,10 @@ export const Actions = ({quotation}: Props) => {
     if (quotation.status !== QuotationStatus.DRAFT && actionType === 'PRINT') {
       setFilePathToDownload(downloadUrl?.[quotation.additionalInfo.pdfPath!]!);
     }
-  }, [downloadUrl]);
+    if (quotation.status === QuotationStatus.DRAFT && actionType === 'PRINT') {
+      generateBlobUrl();
+    }
+  }, [downloadUrl, actionType]);
 
   const getExistingFiles = async (
     fileDownloadUrl:
@@ -530,6 +546,7 @@ export const Actions = ({quotation}: Props) => {
         onConfirm={() => {
           setActionType('PRINT');
         }}
+        isLoading={creatingPdf}
         onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
     </Box>
