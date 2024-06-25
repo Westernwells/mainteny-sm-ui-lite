@@ -45,11 +45,13 @@ const EditorMenuControls = ({
 
         <FormatListButtons editor={editor} />
 
-        <Divider
-          flexItem
-          orientation="vertical"
-          sx={{mx: 0.5, my: 1, border: '0.5px solid #8F9BB380'}}
-        />
+        {hasAttachFileButton && (
+          <Divider
+            flexItem
+            orientation="vertical"
+            sx={{mx: 0.5, my: 1, border: '0.5px solid #8F9BB380'}}
+          />
+        )}
 
         {hasAttachFileButton && <AttachFileButton onClick={onOpenFileUpload} />}
       </Box>

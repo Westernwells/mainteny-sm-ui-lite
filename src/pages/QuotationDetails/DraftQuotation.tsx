@@ -887,8 +887,9 @@ export const DraftQuotation = ({
 
             <RichTextField
               label="Description"
-              html={formik.values.description}
+              html={formik.values.description || ''}
               updateHtml={(h) => formik.setFieldValue('description', h)}
+              minRows={2}
             />
           </Grid>
 
