@@ -2619,7 +2619,10 @@
   "Text Blocks": "Tekstualni blokovi",
   "WORD COUNT": "BROJ REČI",
   "EDITED": "UREĐENO JE",
-  "Valid Until": "Ispravno do",
   "Phone 1": "Telefon 1",
-  "Anything else that does’t fit the previous types description": "Sve ostalo što se ne uklapa u prethodni opis tipova"
+  "Anything else that does’t fit the previous types description": "Sve ostalo što se ne uklapa u prethodni opis tipova",
+  "Edit job details": "Uredite detalje posla",
+  "Unit is required": "Jedinica je obvezna",
+  "Supplier number is required": "Potreban je broj dobavljača",
+  "Valid until": "Ispravno do"
 }
