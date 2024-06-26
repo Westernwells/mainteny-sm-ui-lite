@@ -2629,7 +2629,10 @@
   "Text Blocks": "Bloques de texto",
   "WORD COUNT": "RECUENTO DE PALABRAS",
   "EDITED": "EDITADO",
-  "Valid Until": "Válido hasta",
   "Phone 1": "Teléfono 1",
-  "Anything else that does’t fit the previous types description": "Cualquier otra cosa que no se ajuste a la descripción de los tipos anteriores"
+  "Anything else that does’t fit the previous types description": "Cualquier otra cosa que no se ajuste a la descripción de los tipos anteriores",
+  "Edit job details": "Editar detalles del trabajo ",
+  "Unit is required": "Se requiere unidad",
+  "Supplier number is required": "Se requiere número de proveedor",
+  "Valid until": "Válido hasta"
 }

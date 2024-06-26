@@ -2629,7 +2629,7 @@
   "Text Blocks": "ტექსტის ბლოკი",
   "WORD COUNT": "სიტყვების რაოდენობა",
   "EDITED": "რედაქტირებული",
-  "Valid Until": "მოქმედი ერთეული",
   "Phone 1": "ტელეფონი 1",
-  "Anything else that does’t fit the previous types description": "სხვა დანარჩენი, რაც არ შეესაბამება წინა ტიპების აღწერილობას"
+  "Anything else that does’t fit the previous types description": "სხვა დანარჩენი, რაც არ შეესაბამება წინა ტიპების აღწერილობას",
+  "Valid until": "მოქმედი ერთეული"
 }
