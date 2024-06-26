@@ -334,7 +334,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
     initialValues: {
       articles: articleViewToArticleRecord(articles),
-      description: '',
+      description: report?.description ?? '',
       startTime: serviceOrder?.actualStartTime,
       endTime: serviceOrder?.actualEndTime,
       travelStartTime: serviceOrder?.travelStartTime,
