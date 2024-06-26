@@ -432,9 +432,7 @@ export const formatInvoiceViewToUpdateInvoice = (
             ? {
                 ...discount?.amount,
                 currency: discount?.amount?.currency!,
-                value:
-                  (discount?.amount?.value ?? 0) *
-                  10 ** (discount?.amount?.fractionDigits ?? 2),
+                value: discount?.amount?.value ?? 0,
               }
             : undefined,
       },
