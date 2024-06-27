@@ -414,7 +414,7 @@ export const Checklist = () => {
               rules={{required: true}}
               render={({field: {onChange, value, onBlur}}) => (
                 <FormInput
-                  props={{
+                  fieldProps={{
                     name: 'name',
                     placeholder: t('Enter your checklist name...'),
                     variant: 'standard',

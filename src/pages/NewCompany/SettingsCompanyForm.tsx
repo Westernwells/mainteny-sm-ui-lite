@@ -218,7 +218,7 @@ export const SettingsCompanyForm = ({
           </Grid>
           <Grid item xs={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. 30',
                 label: 'Yearly Vacation Days',

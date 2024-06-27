@@ -11,7 +11,7 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
   <Grid container spacing={2} sx={{mt: '0.5em'}} component="form">
     <Grid item sm={12}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Manufacturer',
           name: 'emergencyPhoneProvider',
           value: formik.values.emergencyPhoneProvider,
@@ -22,7 +22,7 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
     </Grid>
     <Grid item sm={12}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'System ID',
           name: 'systemId',
           value: formik.values.systemId,
@@ -33,7 +33,7 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
     </Grid>
     <Grid item sm={12}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Phone Connection',
           name: 'phoneConnection',
           value: formik.values.phoneConnection,
@@ -44,7 +44,7 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
     </Grid>
     <Grid item sm={12}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Phone Number',
           name: 'phoneNumber',
           value: formik.values.phoneNumber,
@@ -55,7 +55,7 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
     </Grid>
     <Grid item sm={12}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Sim Card Number',
           name: 'simCardNumber',
           value: formik.values.simCardNumber,
@@ -66,7 +66,7 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
     </Grid>
     <Grid item sm={12}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Sim Pin ',
           name: 'simPin',
           value: formik.values.simPin,
@@ -77,7 +77,7 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
     </Grid>
     <Grid item sm={12}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Call Center',
           name: 'callCenter',
           value: formik.values.callCenter,
@@ -88,7 +88,7 @@ export const EditEmergencyPhoneForm = ({formik}: Props) => (
     </Grid>
     <Grid item sm={12}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Place Of Installation',
           name: 'placeOfInstallation',
           value: formik.values.placeOfInstallation,

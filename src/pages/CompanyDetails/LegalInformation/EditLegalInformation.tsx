@@ -19,7 +19,7 @@ export const EditLegalInformation = ({formik}: Props) => {
     <Grid container component="form" spacing={3}>
       <Grid item xs={12}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. Cable xyz',
             label: 'Managing director',
@@ -37,7 +37,7 @@ export const EditLegalInformation = ({formik}: Props) => {
       </Grid>
       <Grid item xs={12}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. Cable xyz',
             label: 'Arbitration court',
@@ -55,7 +55,7 @@ export const EditLegalInformation = ({formik}: Props) => {
       </Grid>
       <Grid item xs={12}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. Cable xyz',
             label: 'Trade registration number',

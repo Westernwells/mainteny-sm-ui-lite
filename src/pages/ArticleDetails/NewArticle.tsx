@@ -305,7 +305,7 @@ export const NewArticle = () => {
             <PageCard headerLabel={t('Description')} minHeight="100%">
               <FormInput
                 containerStyles={{width: '60%'}}
-                props={{
+                fieldProps={{
                   id: 'description',
                   label: t('Description'),
                   placeholder: t(

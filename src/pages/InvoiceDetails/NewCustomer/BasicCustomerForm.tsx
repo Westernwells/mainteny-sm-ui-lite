@@ -67,7 +67,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
       <Grid container spacing={3}>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g Mainteny GmbH',
               label: 'Customer Name',
@@ -83,7 +83,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g johndoe@example.com',
               label: 'Email',
@@ -105,7 +105,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g johndoe@example.com',
               label: 'Billing Email Address',
@@ -129,7 +129,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g +34 12345678',
               label: 'Phone',
@@ -154,7 +154,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g +34 12345678',
               label: '2nd Phone',
@@ -179,7 +179,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g mainteny.com',
               label: 'Website/URL',
@@ -194,7 +194,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g 1234',
               label: 'Customer Number',
@@ -324,7 +324,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g 000 000 000',
               label: 'Cost Center',
@@ -357,7 +357,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'VAT ID',
               name: 'vatId',
@@ -371,7 +371,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               label: 'Offsetting Account',
               name: 'offsettingAccount',

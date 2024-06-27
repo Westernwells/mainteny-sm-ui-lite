@@ -128,7 +128,7 @@ export const EditAppointmentForm = ({
 
       <Grid item sm={12} xs={12}>
         <FormInput
-          props={{
+          fieldProps={{
             label: t('Notification Due'),
             placeholder: t('E.g. 5 days'),
             type: 'number',

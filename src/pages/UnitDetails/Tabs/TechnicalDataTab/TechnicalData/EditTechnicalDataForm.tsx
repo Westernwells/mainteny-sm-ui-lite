@@ -11,7 +11,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
   <Grid container spacing={2} component="form">
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: 'Can also be number of floors',
           type: 'number',
           label: 'Number of stops',
@@ -21,7 +21,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: 'Gearless',
           label: 'Drive',
           type: 'text',
@@ -31,7 +31,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: '1000',
           type: 'number',
           label: 'Capacity (kg)',
@@ -41,7 +41,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: '1.5',
           label: 'Speed (m/s)',
           type: 'number',
@@ -51,7 +51,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: '24 key input',
           label: 'Controller',
           type: 'text',
@@ -61,7 +61,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: 'IoT IT',
           label: 'IoT device',
           type: 'text',
@@ -71,7 +71,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: 'Single door; Double door',
           label: 'Cabin type',
           type: 'text',
@@ -81,7 +81,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: '1500',
           label: 'Cage weight (kg)',
           type: 'number',
@@ -91,7 +91,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: '1500',
           label: 'Counter weight (kg)',
           type: 'number',
@@ -101,7 +101,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: '240',
           label: 'Hoisting height (m)',
           type: 'number',
@@ -111,7 +111,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: '150',
           label: 'Shaft height (m)',
           type: 'number',
@@ -121,7 +121,7 @@ const EditTechnicalDataForm = ({register}: Props) => (
     </Grid>
     <Grid item md={4}>
       <FormInput
-        props={{
+        fieldProps={{
           placeholder: '3',
           label: 'Number of people',
           type: 'number',

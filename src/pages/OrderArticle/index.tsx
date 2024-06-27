@@ -390,7 +390,7 @@ export const OrderArticle = () => {
 
             <Box display="flex" flexDirection="column" gap={3} pt="2rem">
               <FormInput
-                props={{
+                fieldProps={{
                   name: 'externalId',
                   label: 'Purchase order number',
                   value: formik.values.externalId,

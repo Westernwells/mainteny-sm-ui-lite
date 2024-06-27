@@ -176,7 +176,7 @@ const Notes: FC<Props> = ({
         }}>
         <form onSubmit={formik.handleSubmit}>
           <FormInput
-            props={{
+            fieldProps={{
               label: 'Note message',
               size: 'small',
               name: 'note',

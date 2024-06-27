@@ -62,7 +62,7 @@ const Form = ({form, initialValues}: Props) => {
       </Grid>
       <Grid item md={4.5}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'First name',
             required: true,
             ...register('userAccount.firstName', {required: true}),
@@ -71,7 +71,7 @@ const Form = ({form, initialValues}: Props) => {
       </Grid>
       <Grid item md={4.5}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Last name',
             required: true,
             ...register('userAccount.lastName', {required: true}),
@@ -107,7 +107,7 @@ const Form = ({form, initialValues}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Email',
             ...register('userAccount.contact.email'),
           }}
@@ -115,7 +115,7 @@ const Form = ({form, initialValues}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Company',
             ...register('contactPerson.companyName'),
           }}
@@ -123,7 +123,7 @@ const Form = ({form, initialValues}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Phone',
             ...register('userAccount.contact.phone'),
           }}
@@ -131,7 +131,7 @@ const Form = ({form, initialValues}: Props) => {
       </Grid>
       <Grid item md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             label: 'Phone 2',
             ...register('contactPerson.secondaryPhone'),
           }}

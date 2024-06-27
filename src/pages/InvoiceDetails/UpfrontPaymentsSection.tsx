@@ -677,7 +677,7 @@ export const UpfrontPaymentsSection = ({
               <Fragment key={prevInvoice.id}>
                 <Grid item xs={7}>
                   <FormInput
-                    props={{
+                    fieldProps={{
                       size: 'small',
                       label: 'Name',
                       ...(prevInvoice.id === invoice?.id
@@ -713,7 +713,7 @@ export const UpfrontPaymentsSection = ({
                       {...(prevInvoice.id === invoice?.id && {
                         onValueChange: handleUpfrontPaymentChange,
                       })}
-                      props={{
+                      fieldProps={{
                         value:
                           prevInvoice.id === invoice?.id
                             ? formik.values.payment?.percentage
@@ -745,7 +745,7 @@ export const UpfrontPaymentsSection = ({
                           onValueChange: handleUpfrontPaymentChange,
                         }
                       : {})}
-                    props={{
+                    fieldProps={{
                       value:
                         prevInvoice.id === invoice?.id
                           ? amount
@@ -785,7 +785,7 @@ export const UpfrontPaymentsSection = ({
             <>
               <Grid item xs={7}>
                 <FormInput
-                  props={{
+                  fieldProps={{
                     size: 'small',
                     label: 'Name',
                     name: 'payment.description',
@@ -808,7 +808,7 @@ export const UpfrontPaymentsSection = ({
                   <FormInput
                     inputType="currency"
                     onValueChange={handleUpfrontPaymentChange}
-                    props={{
+                    fieldProps={{
                       value: formik.values.payment?.percentage,
                       label: 'Percentage',
                       InputProps: {
@@ -834,7 +834,7 @@ export const UpfrontPaymentsSection = ({
                         onValueChange: handleUpfrontPaymentChange,
                       }
                     : {})}
-                  props={{
+                  fieldProps={{
                     value: amount,
                     label: 'Amount (excl. VAT)',
                     InputProps: {

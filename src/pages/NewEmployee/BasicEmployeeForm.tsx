@@ -157,7 +157,7 @@ export const BasicEmployeeForm = ({
               ].map((item, index) => (
                 <FormInput
                   key={index}
-                  props={{
+                  fieldProps={{
                     ...item,
                     ...defaultProps,
                   }}
@@ -209,7 +209,7 @@ export const BasicEmployeeForm = ({
               ].map((item, index) => (
                 <FormInput
                   key={index}
-                  props={{
+                  fieldProps={{
                     ...item,
                     ...defaultProps,
                   }}
@@ -257,7 +257,7 @@ export const BasicEmployeeForm = ({
               ].map((item, index) => (
                 <FormInput
                   key={index}
-                  props={{
+                  fieldProps={{
                     ...item,
                     ...defaultProps,
                   }}

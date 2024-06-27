@@ -137,7 +137,7 @@ export const AppointmentPreferenceForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 label: 'Notification Due',
                 name: 'appointmentNotificationDue',
                 placeholder: 'E.g. 5 days',

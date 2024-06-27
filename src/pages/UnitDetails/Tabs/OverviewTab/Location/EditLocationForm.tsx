@@ -98,7 +98,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
       </Grid>
       <Grid item xs={12}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: '',
             label: 'Address line 2',
@@ -110,7 +110,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
       </Grid>
       <Grid item xs={12} sm={6}>
         <FormInput
-          props={{
+          fieldProps={{
             required: true,
             size: 'small',
             placeholder: '',
@@ -123,7 +123,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
       </Grid>
       <Grid item xs={12} sm={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: '',
             label: 'ZIP/Postal Code',
@@ -169,7 +169,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
 
       <Grid item xs={12} md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. A1 first floor',
             label: 'Building',
@@ -182,7 +182,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
 
       <Grid item xs={12} md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. Residential',
             label: 'Property Segment',
@@ -195,7 +195,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
 
       <Grid item xs={12} md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. central parking lot',
             label: 'Parking',
@@ -208,7 +208,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
 
       <Grid item xs={12} md={6}>
         <FormInput
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. Outside key box, pin: 0000',
             label: 'Key Location',
@@ -220,7 +220,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
       </Grid>
       <Grid item xs={12} md={4}>
         <FormInput
-          props={{
+          fieldProps={{
             type: 'number',
             size: 'small',
             placeholder: 'e.g. 5',
@@ -233,7 +233,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
       </Grid>
       <Grid item xs={12} md={4}>
         <FormInput
-          props={{
+          fieldProps={{
             type: 'number',
             size: 'small',
             placeholder: 'e.g. 10 min',
@@ -247,7 +247,7 @@ export const EditLocationForm = ({formik, initialCustomer}: Props) => {
       <Grid item xs={12} md={4}>
         <FormInput
           inputType="currency"
-          props={{
+          fieldProps={{
             size: 'small',
             placeholder: 'e.g. 150',
             label: 'Travel fee',

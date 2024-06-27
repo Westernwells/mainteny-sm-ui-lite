@@ -243,7 +243,7 @@ export const AttachDocument: FC<Props> = ({
                       <Box display="flex" alignItems="center" maxWidth="160px">
                         <Box display="flex" flexDirection="column">
                           <FormInput
-                            props={{
+                            fieldProps={{
                               value: fileName,
                               size: 'small',
                               sx: {ml: '0.1rem'},

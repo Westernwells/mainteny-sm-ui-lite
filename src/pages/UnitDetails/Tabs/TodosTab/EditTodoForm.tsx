@@ -10,7 +10,7 @@ interface Props {
 export const EditTodoForm = ({formik}: Props) => (
   <Stack gap="2em" py="1em">
     <FormInput
-      props={{
+      fieldProps={{
         label: 'Subject',
         id: 'subject',
         name: 'subject',
@@ -23,7 +23,7 @@ export const EditTodoForm = ({formik}: Props) => (
       }}
     />
     <FormInput
-      props={{
+      fieldProps={{
         label: 'Description',
         id: 'content',
         name: 'content',

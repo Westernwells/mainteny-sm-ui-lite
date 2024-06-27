@@ -98,7 +98,7 @@ export const TechnicianAutoComplete = ({
       inputValue={queryView}
       renderInput={(params) => (
         <FormInput
-          props={{
+          fieldProps={{
             name: 'technicianId',
             ...params,
             ...textFieldProps,

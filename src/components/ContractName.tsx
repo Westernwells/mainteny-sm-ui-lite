@@ -46,7 +46,7 @@ const ContractName: FC<Props> = ({formik}) => {
   return (
     <>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Contract Name',
           name: 'name',
           value: formik.values.name,

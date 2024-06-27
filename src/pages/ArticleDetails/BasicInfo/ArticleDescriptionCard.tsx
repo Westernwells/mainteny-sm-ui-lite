@@ -61,7 +61,7 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
         }}>
         <FormInput
           containerStyles={{width: '100%', py: '1rem'}}
-          props={{
+          fieldProps={{
             name: 'description',
             label: t('Description'),
             placeholder: t(

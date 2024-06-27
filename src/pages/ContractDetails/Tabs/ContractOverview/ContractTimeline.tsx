@@ -41,7 +41,7 @@ export const ContractTimeline = ({
         <Box>
           <Typography variant="subtitle1">
             <span style={{fontWeight: 'bold'}}>{t('Contract')}</span>{' '}
-            {t('ends')}
+            {t('Ends')}
           </Typography>
           <Typography
             variant="body1"
@@ -85,7 +85,7 @@ export const ContractTimeline = ({
         <Box>
           <Typography variant="subtitle1">
             <span style={{fontWeight: 'bold'}}>{t('Contract')}</span>{' '}
-            {t('signed')}
+            {t('Signed')}
           </Typography>
           <Typography
             variant="body1"
