@@ -313,7 +313,7 @@ export const CheckList = ({serviceOrder}: Props) => {
     let files: FileWithPreview[] = [];
 
     const checkListInfo = selectedChecklist!;
-    const fileNames = [`${checkListInfo.technicianId}.pdf`];
+    const fileNames = [`${checkListInfo.checkListId}.pdf`];
 
     const isPDFGenerated =
       checkListInfo?.additionalInfo.pdfGenerationStatus ===
