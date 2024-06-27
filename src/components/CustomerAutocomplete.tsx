@@ -100,7 +100,7 @@ export const CustomerAutoComplete = ({
       inputValue={query}
       renderInput={(params) => (
         <FormInput
-          props={{
+          fieldProps={{
             name: 'customerId',
             ...params,
             ...textFieldProps,

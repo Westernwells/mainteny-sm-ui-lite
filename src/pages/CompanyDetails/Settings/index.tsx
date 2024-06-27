@@ -81,6 +81,7 @@ export const Settings = ({company}: Props) => {
         <CardDataListItem
           label="Date format"
           value={company?.settings.dateFormat.toLowerCase()}
+          translateValue={false}
           Icon={DateRangeOutlined}
         />
         <CardDataListItem

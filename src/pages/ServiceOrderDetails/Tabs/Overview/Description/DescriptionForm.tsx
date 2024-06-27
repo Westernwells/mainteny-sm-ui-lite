@@ -11,7 +11,7 @@ export const DescriptionForm = ({formik}: Props) => (
   <Box>
     <FormInput
       containerStyles={{mt: '0.5em'}}
-      props={{
+      fieldProps={{
         size: 'small',
         placeholder: 'Enter description',
         label: 'Description',

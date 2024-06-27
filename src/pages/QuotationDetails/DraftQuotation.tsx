@@ -871,7 +871,7 @@ export const DraftQuotation = ({
               <SectionTitle Icon={HeaderIllustration} title="Header" />
             </Box>
             <FormInput
-              props={{
+              fieldProps={{
                 id: 'subject',
                 name: 'subject',
                 value: formik.values.subject,
@@ -1068,7 +1068,7 @@ export const DraftQuotation = ({
               />
             </Box>
             <FormInput
-              props={{
+              fieldProps={{
                 id: 'referenceNumber',
                 name: 'referenceNumber',
                 label: 'Reference Number',

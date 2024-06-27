@@ -34,7 +34,7 @@ export const EditContactForm = ({formik, typeAction}: Props) => {
         )}
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g. John',
               label: 'First Name',
@@ -52,7 +52,7 @@ export const EditContactForm = ({formik, typeAction}: Props) => {
         </Grid>
         <Grid item md={6}>
           <FormInput
-            props={{
+            fieldProps={{
               size: 'small',
               placeholder: 'e.g. Meier',
               label: 'Last Name',
@@ -101,7 +101,7 @@ export const EditContactForm = ({formik, typeAction}: Props) => {
           ].map((item, index) => (
             <FormInput
               key={index}
-              props={{
+              fieldProps={{
                 ...item,
                 ...defaultProps,
               }}
@@ -143,7 +143,7 @@ export const EditContactForm = ({formik, typeAction}: Props) => {
           <Grid item md={6}>
             <FormInput
               key={index}
-              props={{
+              fieldProps={{
                 ...item,
                 ...defaultProps,
               }}

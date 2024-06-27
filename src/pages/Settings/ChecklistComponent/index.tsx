@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, {MutableRefObject} from 'react';
 import {get} from 'lodash';
 import {theme} from 'theme';
@@ -143,7 +142,7 @@ export const MultiChoiceComponent = ({
         alignItems="center"
         flex={1}>
         <FormInput
-          props={{
+          fieldProps={{
             ...inputRef,
             name: `components.${index}.subject`,
             placeholder: t('Enter multi-choice name...'),
@@ -199,7 +198,7 @@ export const MultiChoiceComponent = ({
                   />
 
                   <FormInput
-                    props={{
+                    fieldProps={{
                       ...textRef,
                       name: `components.${index}.options.${optionIndex}.text`,
                       placeholder: 'Choice one',
@@ -238,7 +237,7 @@ export const MultiChoiceComponent = ({
               <Box display="flex" justifyContent="space-between" ml={-1}>
                 <Radio size="small" checked={false} disabled />
                 <FormInput
-                  props={{
+                  fieldProps={{
                     variant: 'outlined',
                     value: t('Your Choice'),
                     sx: {
@@ -325,7 +324,7 @@ export const CheckboxComponent = ({
       />
 
       <FormInput
-        props={{
+        fieldProps={{
           ...inputRef,
           name: `components.${index}.subject`,
           variant: 'outlined',
@@ -369,7 +368,7 @@ export const HeaderComponent = ({
       alignItems="center"
       flex={1}>
       <FormInput
-        props={{
+        fieldProps={{
           ...inputRef,
           key: component.id,
           name: `components.${index}.subject`,
@@ -426,7 +425,7 @@ export const TextComponent = ({
     <>
       <Box display="flex" alignItems="center">
         <FormInput
-          props={{
+          fieldProps={{
             ...titleRef,
             name: `components.${index}.subject`,
             placeholder: t('Enter text area name...'),

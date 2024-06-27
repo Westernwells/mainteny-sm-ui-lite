@@ -72,7 +72,7 @@ export const CompanyInformation = ({
         <Grid container spacing={2}>
           <Grid item xs={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. Wolfgang Lutz',
                 label: 'Managing Director',
@@ -92,7 +92,7 @@ export const CompanyInformation = ({
           </Grid>
           <Grid item xs={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. Berlin',
                 label: 'Arbitration Court',
@@ -112,7 +112,7 @@ export const CompanyInformation = ({
           </Grid>
           <Grid item xs={5}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. HRB 151080 B, Charlottenburg',
                 label: 'Trade Register Number',

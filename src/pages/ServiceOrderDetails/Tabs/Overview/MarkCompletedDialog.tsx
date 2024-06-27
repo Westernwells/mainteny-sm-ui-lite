@@ -72,7 +72,7 @@ export const MarkCompletedDialog = ({
             <Grid container spacing={4}>
               <Grid item xs={12}>
                 <FormInput
-                  props={{
+                  fieldProps={{
                     type: 'number',
                     label: t('Duration (in minutes)'),
                     name: 'serviceTime',
@@ -94,7 +94,7 @@ export const MarkCompletedDialog = ({
 
               <Grid item xs={12}>
                 <FormInput
-                  props={{
+                  fieldProps={{
                     label: t('Description'),
                     name: 'description',
                     value: formik.values.description,

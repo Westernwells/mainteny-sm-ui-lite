@@ -99,7 +99,7 @@ export const notificationSubtitle = (
     }
     case MessageType.NON_TECHNICIAN_ASSIGNMENT_FOR_SERVICE_ORDER: {
       return t(
-        'No technicians accepted the service job request at {{address}}',
+        'No technicians accepted the service order request at {{address}}',
         {
           address: (notificationData as NonTechnicianAssignmentData)
             .serviceOrder.elevator.address.fullName,

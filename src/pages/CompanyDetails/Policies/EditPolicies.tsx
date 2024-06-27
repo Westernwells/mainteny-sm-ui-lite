@@ -8,7 +8,7 @@ interface Props {
 
 export const EditPolicies = ({formik}: Props) => (
   <FormInput
-    props={{
+    fieldProps={{
       size: 'small',
       placeholder: 'e.g. 30',
       label: 'Yearly vacation days',

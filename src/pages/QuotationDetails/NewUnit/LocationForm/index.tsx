@@ -105,7 +105,7 @@ export const LocationForm = ({
           </Grid>
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: '',
                 label: 'Street',
@@ -119,7 +119,7 @@ export const LocationForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: '',
                 label: 'Street 2',
@@ -133,7 +133,7 @@ export const LocationForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: '',
                 label: 'City',
@@ -147,7 +147,7 @@ export const LocationForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: '',
                 label: 'ZIP/Postal Code',
@@ -197,7 +197,7 @@ export const LocationForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. A1 first floor',
                 label: 'Building',
@@ -210,7 +210,7 @@ export const LocationForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. Residential',
                 label: 'Property Segment',
@@ -223,7 +223,7 @@ export const LocationForm = ({
 
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. Outside key box, pin: 0000',
                 label: 'Key Location',
@@ -238,7 +238,7 @@ export const LocationForm = ({
           </Grid>
           <Grid item xs={12} sm={4} md={4}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. central parking lot',
                 label: 'Parking',

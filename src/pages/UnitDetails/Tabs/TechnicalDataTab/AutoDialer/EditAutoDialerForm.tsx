@@ -11,7 +11,7 @@ const EditAutoDialerForm = ({register}: Props) => (
   <Grid container spacing={2} component="form">
     <Grid item md={6}>
       <FormInput
-        props={{
+        fieldProps={{
           type: 'text',
           label: 'Manufacturer',
           ...register('emergencyPhoneProvider'),
@@ -20,7 +20,7 @@ const EditAutoDialerForm = ({register}: Props) => (
     </Grid>
     <Grid item md={6}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'System ID',
           type: 'text',
           ...register('systemId'),
@@ -29,7 +29,7 @@ const EditAutoDialerForm = ({register}: Props) => (
     </Grid>
     <Grid item md={6}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Phone connection',
           type: 'text',
           ...register('phoneConnection'),
@@ -38,7 +38,7 @@ const EditAutoDialerForm = ({register}: Props) => (
     </Grid>
     <Grid item md={6}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Phone number',
           type: 'text',
           ...register('phoneNumber'),
@@ -47,7 +47,7 @@ const EditAutoDialerForm = ({register}: Props) => (
     </Grid>
     <Grid item md={6}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'SIM card number',
           type: 'text',
           ...register('simCardNumber'),
@@ -56,7 +56,7 @@ const EditAutoDialerForm = ({register}: Props) => (
     </Grid>
     <Grid item md={6}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'SIM pin',
           type: 'text',
           ...register('simPin'),
@@ -65,7 +65,7 @@ const EditAutoDialerForm = ({register}: Props) => (
     </Grid>
     <Grid item md={6}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Call center',
           type: 'text',
           ...register('callCenter'),
@@ -74,7 +74,7 @@ const EditAutoDialerForm = ({register}: Props) => (
     </Grid>
     <Grid item md={6}>
       <FormInput
-        props={{
+        fieldProps={{
           label: 'Place of installation',
           type: 'text',
           ...register('placeOfInstallation'),

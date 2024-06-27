@@ -152,7 +152,7 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
       <Grid item xs={8}>
         <FormInput
           containerStyles={{mt: '1rem'}}
-          props={{
+          fieldProps={{
             label: 'Contract Description',
             name: 'description',
             value: formik.values.description,

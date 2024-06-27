@@ -163,7 +163,7 @@ export const ComboBox = ({
       }
       renderInput={(params) => (
         <FormInput
-          props={{
+          fieldProps={{
             ...params,
             ...textFieldProps,
             InputLabelProps: {

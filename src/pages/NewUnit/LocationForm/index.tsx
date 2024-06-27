@@ -109,7 +109,7 @@ export const LocationForm = ({
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: '',
                 label: 'Address line 2',
@@ -121,7 +121,7 @@ export const LocationForm = ({
           </Grid>
           <Grid item xs={12} sm={3} md={3}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: '',
                 label: 'City',
@@ -135,7 +135,7 @@ export const LocationForm = ({
 
           <Grid item xs={12} sm={3} md={3}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: '',
                 label: 'ZIP/Postal Code',
@@ -189,7 +189,7 @@ export const LocationForm = ({
         <Grid sx={{mt: '50px'}} container spacing={2}>
           <Grid item xs={12} sm={6} md={6}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. A1 first floor',
                 label: 'Building',
@@ -202,7 +202,7 @@ export const LocationForm = ({
 
           <Grid item xs={12} sm={6} md={6}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. Residential',
                 label: 'Property Segment',
@@ -215,7 +215,7 @@ export const LocationForm = ({
 
           <Grid item xs={12} sm={6} md={6}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. Outside key box, pin: 0000',
                 label: 'Key Location',
@@ -229,7 +229,7 @@ export const LocationForm = ({
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
             <FormInput
-              props={{
+              fieldProps={{
                 size: 'small',
                 placeholder: 'e.g. central parking lot',
                 label: 'Parking',

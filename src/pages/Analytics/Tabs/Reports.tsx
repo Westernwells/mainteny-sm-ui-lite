@@ -332,7 +332,7 @@ export const Reports = () => {
                   value={formik.values.excludePreviouslyDownloadedData.toString()}
                   name="excludePreviouslyDownloadedData"
                   handleChange={formik.handleChange}
-                  label="Exclude previously downloaded data"
+                  label={t('Exclude previously downloaded data')}
                 />
               </Grid>
             )}
