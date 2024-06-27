@@ -197,7 +197,7 @@ export const InvoiceOverdueNotice = () => {
 
   const onSubmitHandler = async (values: SimpleEmailRecord) => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id;
-    const uploadPath = `${serviceCompanyId}/invoices/${invoice?.id}/overdueNotices/`;
+    const uploadPath = `${serviceCompanyId}/invoices/${invoice?.id}/overdueNotices`;
 
     const fileNames: string[] = [`${overdueNoticeId}.pdf`];
 
