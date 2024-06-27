@@ -24,7 +24,7 @@ export const Attachment = ({order}: Props) => {
 
   const onSave = async (uploadedFiles: FileWithPreview[]) => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id;
-    const uploadPath = `${serviceCompanyId}/order/${order.id}/documents`;
+    const uploadPath = `${serviceCompanyId}/serviceOrders/${order.id}/documents`;
     await uploadFiles({files: uploadedFiles, uploadPath});
 
     const updatedDocuments = order?.additionalInfo?.documents
