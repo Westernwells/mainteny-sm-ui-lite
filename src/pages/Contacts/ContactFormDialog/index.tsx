@@ -109,11 +109,10 @@ const ContactFormDialog = ({
               data.contactPerson
                 .roles as unknown as ServiceCompanyContactPersonRole,
             ],
-            contactPersonId: uuid,
           },
           userAccount: {
             ...data.userAccount,
-            photoUrl,
+            photoUrl: !!file && typeof file !== 'string' ? photoUrl : '',
             serviceCompanyId,
           },
         },
