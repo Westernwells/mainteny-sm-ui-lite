@@ -1341,7 +1341,7 @@ export const InvoiceForm = ({
           const checkListInfo = updatedInvoice?.serviceOrder?.checkLists![0];
 
           const uploadPath = `${serviceCompanyId}/invoices`;
-          const workReportUploadPath = `${serviceCompanyId}/reports`;
+          const workReportUploadPath = `${serviceCompanyId}/serviceOrders/${updatedInvoice.serviceOrder?.id}/report`;
           const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${updatedInvoice?.serviceOrder?.id}/checkLists/${checkListInfo?.technicianId}`;
 
           const pdfPath = `${uploadPath}/${updatedInvoice.id}.pdf`;
