@@ -2468,7 +2468,6 @@
   "Hours": "Sati",
   "Booked Hours": "Rezervisani sati",
   "This action will set the status of the quotation to sent. You won’t be able to delete it afterwards.": "Ova radnja će postaviti status ponude na poslatu. Nećete moći da ga izbrišete kasnije.",
-  "Delivery date": "Datum isporuke",
   "Credit Note for Invoice": "Kredit za fakturu",
   "Discount": "Popust",
   "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.": "Molimo izaberite odgovarajući tip automatizacije. Ovo će pomoći da se artikal poveže sa ispravnim vrednostima u fakturi. Na primer. ako izaberete Hourli rate (rad) ovaj članak će se koristiti za izračunavanje iznosa za radne sate.",

@@ -2478,7 +2478,6 @@
   "Hours": "Horas",
   "Booked Hours": "Horas reservadas",
   "This action will set the status of the quotation to sent. You won’t be able to delete it afterwards.": "Esta acción establecerá el estado de la cotización como enviado. No podrás eliminarlo después.",
-  "Delivery date": "Fecha de entrega",
   "Credit Note for Invoice": "Nota de crédito para factura",
   "Discount": "Descuento",
   "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.": "Seleccione el tipo de automatización correspondiente. Esto ayudará a conectar el artículo con los valores correctos en la factura. P.ej. Si selecciona Tarifa por hora (trabajo), este artículo se utilizará para calcular el monto de las horas de trabajo.",
