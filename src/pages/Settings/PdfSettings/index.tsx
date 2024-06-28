@@ -61,7 +61,7 @@ const PdfSettings = ({company}: Props) => {
   const [showHandles, setShowHandles] = useState<boolean>(false);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
-  const uploadPath = `${company.id}/settings/template/${uuid}`;
+  const uploadPath = `${company.id}/settings/template`;
 
   const {mutateAsync: updateClientStorage} =
     useUpdateServiceCompanyClientStorage('PDF template updated successfully');
