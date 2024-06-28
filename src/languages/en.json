@@ -2478,7 +2478,6 @@
   "Hours": "Hours",
   "Booked Hours": "Booked Hours",
   "This action will set the status of the quotation to sent. You won’t be able to delete it afterwards.": "This action will set the status of the quotation to sent. You won’t be able to delete it afterwards.",
-  "Delivery date": "Delivery date",
   "Credit Note for Invoice": "Credit Note for Invoice",
   "Discount": "Discount",
   "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.": "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.",
