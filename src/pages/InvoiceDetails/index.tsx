@@ -32,7 +32,13 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     return <Progress />;
   }
   return isFetched && invoice ? (
-    <ViewInvoice invoice={invoice} invoiceActivities={invoiceActivities!} />
+    <ViewInvoice
+      invoice={{
+        ...invoice,
+        subject: invoice.subject === 'Regular' ? 'Invoice' : invoice.subject,
+      }}
+      invoiceActivities={invoiceActivities!}
+    />
   ) : (
     <EmptySection label="Sorry, we couldn't find the invoice." />
   );

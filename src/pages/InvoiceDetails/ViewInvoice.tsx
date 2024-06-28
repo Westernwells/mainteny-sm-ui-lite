@@ -116,12 +116,26 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     isFetched,
     refetch: refetchInvoiceData,
   } = useInvoiceDetail(invoice.id);
-
+  const memorizedUpdateInvoiceData = useMemo(
+    () =>
+      updatedInvoice
+        ? {
+            ...updatedInvoice,
+            subject:
+              updatedInvoice?.subject === 'Regular'
+                ? 'Invoice'
+                : updatedInvoice?.subject,
+          }
+        : undefined,
+    [updatedInvoice],
+  );
   const {
     data: downloadUrl,
     isLoading: isLoadingDownloadUrl,
     refetch: refetchDownloadUrl,
-  } = useDownloadUrl(isFetched ? [updatedInvoice!.additionalInfo.pdfPath] : []);
+  } = useDownloadUrl(
+    isFetched ? [memorizedUpdateInvoiceData!.additionalInfo.pdfPath] : [],
+  );
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
@@ -568,16 +582,16 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   }, [actionType]);
 
   useEffect(() => {
-    if (updatedInvoice?.status === InvoiceStatus.DRAFT) {
-      generateBlobUrl(updatedInvoice);
+    if (memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT) {
+      generateBlobUrl(memorizedUpdateInvoiceData);
     }
   }, [
-    updatedInvoice,
+    memorizedUpdateInvoiceData,
     headerUrl[headerInfo?.path],
     footerUrl[footerInfo?.path],
-    updatedInvoice?.type === InvoiceType.CREDIT_NOTE ||
-    updatedInvoice?.type === InvoiceType.FULL ||
-    updatedInvoice?.type === InvoiceType.AGGREGATE
+    memorizedUpdateInvoiceData?.type === InvoiceType.CREDIT_NOTE ||
+    memorizedUpdateInvoiceData?.type === InvoiceType.FULL ||
+    memorizedUpdateInvoiceData?.type === InvoiceType.AGGREGATE
       ? null
       : previousInvoices,
   ]);
