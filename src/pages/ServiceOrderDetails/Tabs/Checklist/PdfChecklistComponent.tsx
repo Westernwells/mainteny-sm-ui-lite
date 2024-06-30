@@ -89,7 +89,6 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     textNoteContainer: {
       display: 'flex',
       flexDirection: 'row',
-      justifyContent: 'space-between',
       paddingLeft: '5%',
       marginTop: 7,
     },
