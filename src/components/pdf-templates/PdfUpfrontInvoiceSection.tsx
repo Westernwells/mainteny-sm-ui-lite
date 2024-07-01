@@ -17,6 +17,7 @@ import {
   centsToMoney,
   aggregatedAmountToMoney,
   formatCurrency,
+  getCurrencySymbol,
 } from 'utils/currency';
 import {fixRounding} from 'utils/utils';
 import {Currency} from 'models/misc';
@@ -315,7 +316,7 @@ const PdfUpfrontInvoiceSection = ({
                       : '40%',
                 }}>
                 {translate('Total')}
-                {` (${currentCurrency?.symbol})`}
+                {` (${getCurrencySymbol[currentCurrency?.code!]})`}
               </Text>
             </View>
 
@@ -488,7 +489,9 @@ const PdfUpfrontInvoiceSection = ({
                 fontSize: 10,
                 paddingLeft: 25,
               }}>
-              {`${translate('Total incl. VAT')} (${currentCurrency?.symbol})`}
+              {`${translate('Total incl. VAT')} (${
+                getCurrencySymbol[currentCurrency?.code!]
+              })`}
             </Text>
             <Text
               style={{
