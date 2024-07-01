@@ -953,7 +953,7 @@ export const Actions = ({invoice, isInvoiceList = true}: Props) => {
 
             if (invoiceData.additionalInfo.includeWorkReport) {
               const workReportBlob = await generateWorkReportBlob();
-              const workReportUploadPath = `${serviceCompanyId}/reports`;
+              const workReportUploadPath = `${serviceCompanyId}/serviceOrders/${invoiceData.serviceOrder?.id}/report`;
               const workReportFiles = await generateAndUploadFiles(
                 workReportBlob,
                 [`${report?.id}.pdf`],

@@ -2478,7 +2478,6 @@
   "Hours": "საათები",
   "Booked Hours": "დაჯავშნილი საათები",
   "This action will set the status of the quotation to sent. You won’t be able to delete it afterwards.": "ეს ქმედება შეთავაზების სტატუსს შეცვლის გაგზავნილად. ამის შემდეგ თქვენ ვერ შეძლებთ მის წაშლას.",
-  "Delivery date": "მიწოდების თარიღი",
   "Credit Note for Invoice": "საკრედიტო ნოტა ინვოისისთვის",
   "Discount": "ფასდაკლება",
   "Please select the corresponding automation type. This will help to connect the article to the correct values in the invoice. E.g. if you select Hourly Rate (work) this article will be used to calculate the amount for the work hours.": "გთხოვთ, აირჩიოთ შესაბამისი ავტომატიზაციის ტიპი. ეს დაგეხმარებათ დააკავშიროთ ნაწილი ინვოისის სწორ მნიშვნელობებთან. Მაგალითად. თუ აირჩევთ საათობრივი განაკვეთი (სამუშაო), ეს ნაწილი გამოყენებული იქნება სამუშაო საათების თანხის გამოსათვლელად.",
