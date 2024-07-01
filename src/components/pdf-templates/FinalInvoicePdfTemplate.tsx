@@ -1,6 +1,6 @@
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import {centsToMoney, formatCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
@@ -232,7 +232,9 @@ export const ArticleSection = ({
             textAlign="center"
           />
           <TableHeading
-            text={`${translate('Price')} (${currentCurrency?.symbol})`}
+            text={`${translate('Price')} (${
+              getCurrencySymbol[currentCurrency?.code!]
+            })`}
             width="15%"
             textAlign="right"
             marginLeft={5}
@@ -245,7 +247,9 @@ export const ArticleSection = ({
             />
           )}
           <TableHeading
-            text={`${translate('Total')} (${currentCurrency?.symbol})`}
+            text={`${translate('Total')} (${
+              getCurrencySymbol[currentCurrency?.code!]
+            })`}
             width={allItemsHaveZeroDiscount ? '28%' : '15%'}
             textAlign="right"
           />
@@ -344,7 +348,7 @@ export const ArticleSection = ({
                         )}
                     {articleItem?.additionalInfo?.discount?.type ===
                     DiscountType.AMOUNT
-                      ? currentCurrency?.symbol
+                      ? getCurrencySymbol[currentCurrency?.code!]
                       : '%'}
                   </Text>
                 )}
@@ -383,7 +387,7 @@ export const ArticleSection = ({
                 fontSize: 10,
                 textAlign: 'right',
               }}>{`${translate('Discount')} (${
-              currentCurrency?.symbol
+              getCurrencySymbol[currentCurrency?.code!]
             })`}</Text>
             <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
               {discountValue > 0 ? '-' : ''}
@@ -469,7 +473,7 @@ export const ArticleSection = ({
               textAlign: 'right',
               fontSize: 10,
             }}>{`${translate('Total incl. VAT')} (${
-            currentCurrency?.symbol
+            getCurrencySymbol[currentCurrency?.code!]
           })`}</Text>
           <Text
             style={{

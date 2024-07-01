@@ -177,7 +177,7 @@ export const getCurrencySymbol: {[key: string]: string} = {
   CNY: '¥',
   JPY: '¥',
   BAM: 'KM',
-  CHF: '₣',
+  CHF: 'CHF',
   RUB: '₽',
   DKK: 'kr.',
   NGN: '₦',

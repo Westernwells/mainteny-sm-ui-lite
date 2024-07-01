@@ -2,7 +2,7 @@ import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {formatDate} from 'utils/datetime';
-import {formatCurrency} from 'utils/currency';
+import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {QuotationItem, QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -438,7 +438,9 @@ const QuotationPdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {`${translate('Price')} (${currentCurrency?.symbol})`}
+                      {`${translate('Price')} (${
+                        getCurrencySymbol[currentCurrency?.code!]
+                      })`}
                     </Text>
                     {!allItemsHaveZeroDiscount && (
                       <Text
@@ -458,7 +460,9 @@ const QuotationPdfTemplate = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {`${translate('Total')} (${currentCurrency?.symbol})`}
+                      {`${translate('Total')} (${
+                        getCurrencySymbol[currentCurrency?.code!]
+                      })`}
                     </Text>
                   </View>
                 </View>
@@ -544,7 +548,7 @@ const QuotationPdfTemplate = React.memo(
                                   10 ** 2}
                               {articleItem?.additionalInfo?.discount?.type ===
                               DiscountType.AMOUNT
-                                ? currentCurrency?.symbol
+                                ? getCurrencySymbol[currentCurrency?.code!]
                                 : '%'}
                             </Text>
                           )}
@@ -585,7 +589,7 @@ const QuotationPdfTemplate = React.memo(
                           textAlign: 'right',
                         }}>
                         {`${translate('Discount')} (${
-                          currentCurrency?.symbol
+                          getCurrencySymbol[currentCurrency?.code!]
                         })`}
                       </Text>
                       <Text
@@ -701,7 +705,7 @@ const QuotationPdfTemplate = React.memo(
                         fontSize: 10,
                       }}>
                       {`${translate('Total incl. VAT')} (${
-                        currentCurrency?.symbol
+                        getCurrencySymbol[currentCurrency?.code!]
                       })`}
                     </Text>
                     <Text
