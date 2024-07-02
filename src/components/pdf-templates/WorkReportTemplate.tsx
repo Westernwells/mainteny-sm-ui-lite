@@ -426,9 +426,9 @@ const WorkReportTemplate = React.memo(
                 {translate('Work Report')} {report?.number}
               </PdfPageTitle>
 
-              {serviceOrder?.report?.description.trim() !== '' && (
+              {report?.description.trim() !== '' && (
                 <HtmlPDF
-                  html={serviceOrder?.report?.description || ''}
+                  html={report?.description || ''}
                   selectedLng={selectedLng}
                   rootStyle={{
                     ...styles.contentBody,
