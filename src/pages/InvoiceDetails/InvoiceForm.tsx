@@ -523,10 +523,9 @@ export const InvoiceForm = ({
       'externalId',
       formType === 'edit' ? invoice?.externalId : '',
     );
-    formik.setFieldValue(
-      'paymentTerm',
-      formType === 'edit' ? invoice?.paymentTerms : '',
-    );
+    if (formType === 'edit' && invoice?.additionalInfo.paymentTerm) {
+      formik.setFieldValue('paymentTerm', invoice?.additionalInfo.paymentTerm);
+    }
   }, [invoice]);
 
   const getFormattedPaymentTerms = (paymentTerm: ContractPaymentTermView) => {
