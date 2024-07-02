@@ -15,7 +15,7 @@ import {
   ReactEditor,
   DefaultElement,
 } from 'slate-react';
-import {createEditor, BaseEditor, Descendant} from 'slate';
+import {createEditor, BaseEditor, Descendant, Editor, Transforms} from 'slate';
 import {HistoryEditor, withHistory} from 'slate-history';
 import {theme} from 'theme';
 import {FormControl, FormHelperText} from '@mui/material';
@@ -182,6 +182,7 @@ const RichTextField = ({
   helperText = '',
   minRows = 1,
   endAdornment,
+  disabled = false,
 }: {
   label?: string;
   placeholder?: string;
@@ -193,6 +194,7 @@ const RichTextField = ({
   helperText?: string;
   minRows?: number;
   endAdornment?: React.ReactNode;
+  disabled?: boolean;
 }) => {
   const {t} = useTranslation();
   const editorRef = useRef<(BaseEditor & ReactEditor & HistoryEditor) | null>(
@@ -232,6 +234,21 @@ const RichTextField = ({
     const newValue = getValue(html) as Descendant[];
     if (JSON.stringify(value) !== JSON.stringify(newValue)) {
       setValue(newValue);
+      // Delete all entries leaving 1 empty node
+      Transforms.delete(editor, {
+        at: {
+          anchor: Editor.start(editor, []),
+          focus: Editor.end(editor, []),
+        },
+      });
+
+      // Removes empty node
+      Transforms.removeNodes(editor, {
+        at: [0],
+      });
+
+      // Insert array of children nodes
+      Transforms.insertNodes(editor, newValue);
     }
   }, [html]);
 
@@ -257,8 +274,8 @@ const RichTextField = ({
 
   return (
     <Slate editor={editor} initialValue={value} onChange={handleChange}>
-      <HoveringToolbar />
-      <FormControl fullWidth>
+      {disabled ? null : <HoveringToolbar />}
+      <FormControl fullWidth disabled={disabled}>
         <fieldset
           style={{...styles.fieldset, ...(error && styles.errorFieldset)}}>
           <legend
@@ -288,6 +305,7 @@ const RichTextField = ({
               }}
               onKeyDown={onKeyDown}
               onBlur={onBlur}
+              readOnly={disabled}
             />
             {endAdornment && (
               <div style={styles.endAdornment}>{endAdornment}</div>
