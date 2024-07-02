@@ -36,6 +36,7 @@ export enum Priority {
 export interface CallerInfo {
   name: string;
   calledAt?: string;
+  phoneNumber?: string;
 }
 
 export enum ServiceOrderStatus {
@@ -510,8 +511,10 @@ export interface ServiceOrderActivityView {
 export interface UpdateServiceOrderScheduleBody {
   endTime?: string;
   startTime?: string;
-  technicianIds: string[];
-  type: JobScheduleType;
+  technicianIds?: string[];
+  dueDate?: string;
+  purchaseOrderNumber?: string;
+  callerInfo?: Partial<CallerInfo>;
 }
 
 export interface AssignmentBasedOrderBody {
