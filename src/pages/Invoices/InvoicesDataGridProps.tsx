@@ -19,7 +19,11 @@ import {
   InvoiceView,
 } from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
-import {FormatDate} from 'models/misc';
+import {
+  FormatDate,
+  HeaderFooterInfoData,
+  StringValueResponse,
+} from 'models/misc';
 import {toDate} from '../../utils/datetime';
 import {Actions} from './Actions';
 import {NotesIndicator} from './NotesIndicator';
@@ -63,7 +67,17 @@ export const getInvoiceStatusStyles = (
   }
 };
 
-export const columns = (): GridColDef[] => [
+export const columns = (
+  headerInfo: HeaderFooterInfoData,
+  footerInfo: HeaderFooterInfoData,
+  headerUrl: {
+    [key: string]: string;
+  },
+  footerUrl: {
+    [key: string]: string;
+  },
+  companyNextNumber: StringValueResponse | undefined,
+): GridColDef[] => [
   getColumnProps({
     field: InvoiceOrderField.EXTERNAL_ID,
     headerName: 'number',
@@ -163,7 +177,16 @@ export const columns = (): GridColDef[] => [
     field: 'actions',
     headerName: 'actions',
     align: 'center',
-    renderCell: (params) => <Actions invoice={params.row.invoice} />,
+    renderCell: (params) => (
+      <Actions
+        invoice={params.row.invoice}
+        headerInfo={headerInfo}
+        footerInfo={footerInfo}
+        headerUrl={headerUrl}
+        footerUrl={footerUrl}
+        companyNextNumber={companyNextNumber}
+      />
+    ),
     flex: 1,
   }),
 ];

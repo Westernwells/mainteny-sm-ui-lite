@@ -314,6 +314,7 @@ export const CheckList = ({serviceOrder}: Props) => {
 
     const checkListInfo = selectedChecklist!;
     const fileNames = [`${checkListInfo.checkListId}.pdf`];
+    const fileDescriptions = [`${selectedChecklist?.checkList.externalId}.pdf`];
 
     const isPDFGenerated =
       checkListInfo?.additionalInfo.pdfGenerationStatus ===
@@ -323,11 +324,19 @@ export const CheckList = ({serviceOrder}: Props) => {
       const blob = await fetchFile(
         fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
       );
-      files = await createFilesFromBlobArray([blob], fileNames);
+      files = await createFilesFromBlobArray(
+        [blob],
+        fileNames,
+        fileDescriptions,
+      );
       setExistingFiles(files);
     } else {
       const blobFile = await generatePdfUrl();
-      files = await createFilesFromBlobArray([blobFile], fileNames);
+      files = await createFilesFromBlobArray(
+        [blobFile],
+        fileNames,
+        fileDescriptions,
+      );
       setExistingFiles(files);
     }
   };
@@ -717,7 +726,6 @@ export const CheckList = ({serviceOrder}: Props) => {
               content={serviceOrder.description}
               existingFiles={existingFiles}
               isLoadingFiles={isLoadingFiles}
-              customExistingFileName={`${selectedChecklist?.checkList.externalId}.pdf`}
               callback={async (emailRecord) => {
                 setIsSendEmailDialogOpen(false);
 
@@ -729,7 +737,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                   checkListInfo?.additionalInfo.pdfGenerationStatus ===
                   PdfGenerationStatus.DONE;
 
-                const allAttachments = emailRecord.attachments || existingFiles;
+                const allAttachments = emailRecord.attachments || [];
                 const emailAttachments = (
                   emailRecord.attachments || []
                 )?.filter((el) => el.path);

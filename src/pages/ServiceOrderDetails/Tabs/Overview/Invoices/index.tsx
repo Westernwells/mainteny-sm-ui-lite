@@ -17,8 +17,12 @@ import {ServiceOrderPaymentStatus} from 'models/service-order';
 import {InvoiceStatus, InvoiceType} from 'models/invoice';
 import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
-import {columns, makeRows} from './InvoicesDataGridProps';
+import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {ServiceCompanyNumberType} from 'models/service-company';
 import CreateNewInvoiceModal from './CreateNewInvoiceModal';
+import {columns, makeRows} from './InvoicesDataGridProps';
 
 interface Props {
   serviceOrderId: string;
@@ -50,6 +54,34 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   } = useFetchServiceOrderInvoices(serviceOrderId);
 
   totalInvoiceRef = totalInvoiceRef || jobInvoices.length;
+
+  const {data: companyNextNumber} = useCompanyNextNumber(
+    {
+      type: ServiceCompanyNumberType.INVOICE,
+    },
+    user?.userAccount.serviceCompany.id,
+    true,
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: user?.userAccount.serviceCompany.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo?.path] : [],
+    undefined,
+    user?.userAccount.serviceCompany.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo?.path] : [],
+    undefined,
+    user?.userAccount.serviceCompany.id,
+  );
 
   const invoiceTypesToShow = useMemo(() => {
     const defaultTypes = [
@@ -170,7 +202,13 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
             memorizedRows.length,
             70,
           )}
-          columns={columns}
+          columns={columns(
+            headerInfo,
+            footerInfo,
+            headerUrl,
+            footerUrl,
+            companyNextNumber,
+          )}
           fullHeight={false}
           containerStyle={{
             borderBottom: 'none',
