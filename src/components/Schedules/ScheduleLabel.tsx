@@ -41,12 +41,10 @@ export const ScheduleLabel = ({
   }, []);
 
   const getDayString = (dateString: string) => {
-    const date = new Date();
-    const day = Number(`${dateString[0]}${dateString[1]}`);
-    date.setDate(day);
+    const [day, month, year] = dateString.split('.').map(Number);
+    const date = new Date(year, month - 1, day); // Month is 0-indexed
     return formatDate(date, 'EEEE');
   };
-
   const renderSubLabel = () => (
     <Typography variant="caption" sx={{color: grey[600]}}>
       {scheduleType === 'date'

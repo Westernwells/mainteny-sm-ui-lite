@@ -563,10 +563,9 @@ const updateServiceOrderSchedule = async (
   body: UpdateServiceOrderScheduleBody,
   serviceOrderId: string,
 ) => {
-  await axiosClient.put<StringValue>(
-    `/api/serviceOrders/${serviceOrderId}/jobSchedule`,
-    {...body},
-  );
+  await axiosClient.put<StringValue>(`/api/serviceOrders/${serviceOrderId}`, {
+    ...body,
+  });
 };
 
 export const useUpdateServiceOrderSchedule = (successMsg: string) => {

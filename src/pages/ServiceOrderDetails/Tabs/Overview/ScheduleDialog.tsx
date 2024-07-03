@@ -1,4 +1,4 @@
-import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
+import {SyntheticEvent, useCallback, useEffect, useMemo, useState} from 'react';
 import {t} from 'i18next';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -18,43 +18,27 @@ import {createEmptyResource} from 'utils/paging-utils';
 import {Switch} from 'components/Switch';
 import Box from '@mui/material/Box';
 import {TimePicker} from 'components/TimePicker';
-import {useFormik} from 'formik';
-import {ScheduleForm} from 'pages/ServiceOrderDetails/models';
-import * as Yup from 'yup';
 import {Button} from 'components/Button';
 import {EmployeesView} from 'models/employee';
 import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
-import {formatDate, setDateTime, toRestDateTime} from 'utils/datetime';
-import {JobScheduleType} from 'models/service-order';
+import {
+  formatDate,
+  setDateTime,
+  toRestDate,
+  toRestDateTime,
+} from 'utils/datetime';
+import {useForm} from 'react-hook-form';
+import {DatePicker} from '../../../../components/DatePicker';
+import {FormInput} from '../../../../components/form/FormInput';
+import {ScheduleForm} from '../../models';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const validationSchema = Yup.object().shape({
-  switchActive: Yup.boolean(),
-  startDate: Yup.string().nullable().when('switchActive', {
-    is: true,
-    then: Yup.string().nullable().required(),
-    otherwise: Yup.string().nullable(),
-  }),
-  endDate: Yup.string().nullable().when('switchActive', {
-    is: true,
-    then: Yup.string().nullable().required(),
-    otherwise: Yup.string().nullable(),
-  }),
-  startTime: Yup.string().nullable().when('switchActive', {
-    is: true,
-    then: Yup.string().nullable().required(),
-    otherwise: Yup.string().nullable(),
-  }),
-  endTime: Yup.string().nullable().when('switchActive', {
-    is: true,
-    then: Yup.string().nullable().required(),
-    otherwise: Yup.string().nullable(),
-  }),
-  technicianIds: Yup.array().required().min(1),
-});
+interface FormData extends ScheduleForm {
+  switchActive: boolean;
+}
 
 interface Props {
   serviceOrderId: string;
@@ -64,6 +48,11 @@ interface Props {
   defaultTechnicians?: EmployeesView[] | null;
   defaultStartDate?: Date | null;
   defaultEndDate?: Date | null;
+  defaultDueDate?: Date | null;
+  defaultPurchaseOrderNumber?: string | null;
+  defaultCallerName?: string | null;
+  defaultCallerPhoneNumber?: string | null;
+  defaultCallTime?: Date | null;
   onSaveCB?: () => void;
 }
 
@@ -72,9 +61,14 @@ export const ScheduleDialog = ({
   open,
   onClose,
   title = t('Assign Engineer'),
-  defaultTechnicians,
-  defaultStartDate,
-  defaultEndDate,
+  defaultTechnicians = null,
+  defaultStartDate = null,
+  defaultEndDate = null,
+  defaultDueDate = null,
+  defaultPurchaseOrderNumber = null,
+  defaultCallerName = null,
+  defaultCallerPhoneNumber = null,
+  defaultCallTime = null,
   onSaveCB,
 }: Props) => {
   const [query, setQuery] = useState<string>('');
@@ -82,52 +76,108 @@ export const ScheduleDialog = ({
     t('Service job scheduled successfully'),
   );
 
-  const formik = useFormik<ScheduleForm & {switchActive: boolean}>({
-    initialValues: {
+  const defaultValues = useMemo(
+    () => ({
       switchActive: false,
-      startDate: defaultStartDate || null,
-      endDate: defaultEndDate || null,
-      startTime: defaultStartDate || null,
-      endTime: defaultEndDate || null,
+      startDate: defaultStartDate,
+      endDate: defaultEndDate,
+      startTime: defaultStartDate,
+      endTime: defaultEndDate,
+      dueDate: defaultDueDate,
+      purchaseOrderNumber: defaultPurchaseOrderNumber,
+      callerName: defaultCallerName,
+      callerPhoneNumber: defaultCallerPhoneNumber,
+      callTime: defaultCallTime,
       technicianIds:
         defaultTechnicians?.map((technician) => technician.id) || [],
-    },
-    onSubmit: (values) => {
-      let orderStartTime = null;
-      let orderEndTime = null;
-      if (values.switchActive) {
-        orderStartTime = toRestDateTime(
-          setDateTime(
-            values.startDate!,
-            formatDate(values.startTime!, 'HH:mm')!,
-          ),
-        );
+    }),
+    [
+      defaultStartDate,
+      defaultEndDate,
+      defaultStartDate,
+      defaultEndDate,
+      defaultDueDate,
+      defaultPurchaseOrderNumber,
+      defaultCallerName,
+      defaultCallerPhoneNumber,
+      defaultCallTime,
+      defaultTechnicians,
+    ],
+  );
 
-        orderEndTime = toRestDateTime(
-          setDateTime(
-            values?.endDate!,
-            formatDate(values.endTime as Date, 'HH:mm')!,
-          ),
-        );
-      }
+  const form = useForm<FormData>({
+    defaultValues,
+  });
 
-      scheduleServiceOrder(
-        {
-          body: {
-            ...(orderEndTime && {endTime: orderEndTime}),
-            ...(orderStartTime && {startTime: orderStartTime}),
-            technicianIds: values.technicianIds || [],
-            type: JobScheduleType.FIXED,
-          },
-          serviceOrderId,
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    register,
+    formState: {errors, touchedFields, isValid: isFormValid},
+    trigger,
+  } = form;
+
+  const [
+    watchTechnicianIdsField,
+    watchSwitchActive,
+    watchStartDate,
+    watchStartTime,
+    watchEndDate,
+    watchEndTime,
+    watchDueDate,
+    watchCallTime,
+  ] = watch([
+    'technicianIds',
+    'switchActive',
+    'startDate',
+    'startTime',
+    'endDate',
+    'endTime',
+    'dueDate',
+    'callTime',
+  ]);
+
+  const onFormSubmit = handleSubmit((values) => {
+    const {startDate, endDate, startTime, endTime, switchActive, ...rest} =
+      values;
+    const {orderStartTime, orderEndTime} =
+      switchActive && startDate && endDate && startTime && endTime
+        ? {
+            orderStartTime: toRestDateTime(
+              setDateTime(startDate, formatDate(startTime, 'HH:mm')!),
+            ),
+            orderEndTime: toRestDateTime(
+              setDateTime(endDate, formatDate(endTime as Date, 'HH:mm')!),
+            ),
+          }
+        : {orderStartTime: null, orderEndTime: null};
+
+    const callerInfo = {
+      ...(rest.callerName && {name: rest.callerName}),
+      ...(rest.callerPhoneNumber && {phoneNumber: rest.callerPhoneNumber}),
+      ...(rest.callTime && {calledAt: toRestDateTime(new Date(rest.callTime))}),
+    };
+
+    scheduleServiceOrder(
+      {
+        body: {
+          endTime: orderEndTime ?? undefined,
+          startTime: orderStartTime ?? undefined,
+          technicianIds: values.technicianIds ?? undefined,
+          dueDate: values.dueDate
+            ? toRestDate(new Date(values.dueDate))
+            : undefined,
+          callerInfo: Object.keys(callerInfo).length ? callerInfo : undefined,
+          purchaseOrderNumber: values.purchaseOrderNumber ?? undefined,
         },
-        {
-          onSuccess: () => onSaveCB?.(),
-        },
-      );
-      onClose();
-    },
-    validationSchema,
+        serviceOrderId,
+      },
+      {
+        onSuccess: () => onSaveCB?.(),
+      },
+    );
+    onClose();
   });
 
   const {data: techniciansResource = createEmptyResource(10)} =
@@ -138,13 +188,10 @@ export const ScheduleDialog = ({
     });
 
   useEffect(() => {
-    formik.setValues({
-      ...formik.values,
-      startDate: defaultStartDate || null,
-      endDate: defaultEndDate || null,
-      startTime: defaultStartDate || null,
-      endTime: defaultEndDate || null,
-    });
+    setValue('startDate', defaultStartDate || null);
+    setValue('endDate', defaultEndDate || null);
+    setValue('startTime', defaultStartDate || null);
+    setValue('endTime', defaultEndDate || null);
   }, [defaultStartDate?.getTime(), defaultEndDate?.getTime()]);
 
   const debouncedChangeHandler = useCallback(
@@ -154,35 +201,45 @@ export const ScheduleDialog = ({
     [],
   );
 
+  // temporary solution until making Yup resolver work with react-hook-form
+  const formNotValidCustomValidation = useMemo(() => {
+    if (!watchDueDate) return true;
+    return (
+      watchSwitchActive &&
+      (!watchStartTime || !watchEndTime || !watchStartDate || !watchEndDate)
+    );
+  }, [
+    watchStartTime,
+    watchEndTime,
+    watchStartDate,
+    watchEndDate,
+    watchDueDate,
+    watchSwitchActive,
+  ]);
+
   const onInputChange = (e: SyntheticEvent, newValue: string) => {
     debouncedChangeHandler(newValue);
   };
 
   const handleDateSelection = (dateValues: DateRange<Date>) => {
-    formik.setValues({
-      ...formik.values,
-      startDate: dateValues[0],
-      endDate: dateValues[1] || dateValues[0],
-    });
+    setValue('startDate', dateValues[0]);
+    setValue('endDate', dateValues[1] || dateValues[0]);
   };
 
   const clearDateSelection = () => {
-    formik.setValues({
-      ...formik.values,
-      startDate: null,
-      endDate: null,
-    });
+    setValue('startDate', null);
+    setValue('endDate', null);
   };
 
   return (
-    <Box component="form" onSubmit={formik.handleSubmit}>
+    <Box component="form" onSubmit={onFormSubmit}>
       <Dialog
         open={open || false}
         onClose={onClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth
-        maxWidth="xs">
+        maxWidth="sm">
         <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description" component="div">
@@ -193,12 +250,12 @@ export const ScheduleDialog = ({
               id="combo-box-demo"
               sx={{mt: '0.5em'}}
               options={techniciansResource.data}
-              onChange={(_event: any, newValues: EmployeesView[]) =>
-                formik.setValues({
-                  ...formik.values,
-                  technicianIds: newValues.map((value) => value.id),
-                })
-              }
+              onChange={(_event: any, newValues: EmployeesView[]) => {
+                setValue(
+                  'technicianIds',
+                  newValues.map((value) => value.id),
+                );
+              }}
               getOptionLabel={(option) =>
                 `${option.userAccount.firstName} ${option.userAccount.lastName}`
               }
@@ -216,111 +273,164 @@ export const ScheduleDialog = ({
               )}
               onInputChange={onInputChange}
               inputValue={query}
-              onBlur={formik.handleBlur}
+              onBlur={register('technicianIds').onBlur}
               renderInput={(params) => (
                 <TextField
-                  required
                   {...params}
                   label={t('Engineer')}
                   name="technicianIds"
                   error={
-                    !!(
-                      formik.errors.technicianIds &&
-                      formik.touched.technicianIds
-                    )
+                    !!(errors.technicianIds && touchedFields.technicianIds)
                   }
                   helperText={
-                    formik.errors.technicianIds && formik.touched.technicianIds
-                      ? formik.errors.technicianIds
+                    errors.technicianIds && touchedFields.technicianIds
+                      ? errors.technicianIds.message
                       : ''
                   }
                 />
               )}
               getOptionDisabled={(option) =>
-                (formik.values.technicianIds?.length || 0) >= 10 &&
-                !formik.values.technicianIds?.includes(option.id)
+                (watchTechnicianIdsField?.length || 0) >= 10 &&
+                !watchTechnicianIdsField?.includes(option.id)
               }
             />
 
             <Box sx={{mt: '1.5em'}}>
               <Switch
-                value={formik.values.switchActive}
-                getValue={(value) =>
-                  formik.setFieldValue('switchActive', value)
-                }
+                value={watchSwitchActive}
+                getValue={(value) => setValue('switchActive', value)}
                 label="Choose a fixed date and time"
               />
             </Box>
 
-            <Box sx={{mt: '1.5em'}}>
-              <DatePickerRange
-                defaultDate={[formik.values.startDate, formik.values.endDate]}
-                getSelectedDate={handleDateSelection}
+            {watchSwitchActive && (
+              <Box
+                gap={2}
+                sx={{
+                  mt: '1.5em',
+                  display: 'flex',
+                  alignItems: 'end',
+                  justifyContent: 'space-between',
+                }}>
+                <DatePickerRange
+                  defaultDate={[watchStartDate, watchEndDate]}
+                  getSelectedDate={handleDateSelection}
+                  textFieldProps={{
+                    label: t('Start and end date'),
+                    required: true,
+                  }}
+                  onClear={clearDateSelection}
+                  disabled={!watchSwitchActive}
+                  sx={{width: '300px'}}
+                />
+
+                <TimePicker
+                  required
+                  defaultTime={watchStartTime}
+                  getSelectedTime={(time) => {
+                    if (time && !Number.isNaN(time.getTime())) {
+                      const newStartTime = time;
+                      setValue('startTime', newStartTime);
+
+                      if (
+                        watchStartDate &&
+                        watchEndDate &&
+                        watchStartDate.getTime() === watchEndDate.getTime()
+                      ) {
+                        const newEndTime = new Date(newStartTime);
+                        setValue('endTime', newEndTime);
+                      }
+                    }
+                  }}
+                  textFieldProps={{
+                    label: 'Start Time',
+                    name: 'startTime',
+                    error: !!(errors.startTime && touchedFields.startTime),
+                    onBlur: register('startTime').onBlur,
+                  }}
+                />
+
+                <TimePicker
+                  required
+                  minTime={watchStartTime as Date}
+                  defaultTime={watchEndTime || watchEndDate}
+                  getSelectedTime={(time) => {
+                    setValue('endTime', time);
+                  }}
+                  textFieldProps={{
+                    label: 'End Time',
+                    name: 'endTime',
+                    error: !!(errors.endTime && touchedFields.endTime),
+                    onBlur: register('endTime').onBlur,
+                  }}
+                  disabled={!watchSwitchActive}
+                />
+              </Box>
+            )}
+
+            <Box sx={{mt: '1.5em', width: '300px'}}>
+              <DatePicker
+                required
+                defaultDate={watchDueDate}
+                getSelectedDate={(date: Date | null) =>
+                  setValue('dueDate', date)
+                }
+                confirm={() => trigger()}
                 textFieldProps={{
-                  label: t('Start and end date'),
+                  label: t('Due date'),
                   required: true,
-                  sx: {
-                    width: '100%',
-                  },
                 }}
-                onClear={clearDateSelection}
-                disabled={!formik.values.switchActive}
               />
             </Box>
-            <Box
-              sx={{
-                mt: '1.5em',
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}>
-              <TimePicker
-                required
-                defaultTime={formik.values.startTime}
-                containerStyles={{mr: '1em'}}
-                getSelectedTime={(time) => {
-                  if (time && !Number.isNaN(time.getTime())) {
-                    const newStartTime = time;
-                    formik.setFieldValue('startTime', newStartTime);
 
-                    const {startDate, endDate} = formik.values;
-                    if (
-                      startDate &&
-                      endDate &&
-                      startDate.getTime() === endDate.getTime()
-                    ) {
-                      const newEndTime = new Date(newStartTime);
-                      formik.setFieldValue('endTime', newEndTime);
-                    }
-                  }
+            <Box sx={{mt: '2em'}}>
+              <Typography
+                variant="subtitle1"
+                color="text.secondary"
+                sx={{
+                  textTransform: 'uppercase',
+                  letterSpacing: '1.12px',
+                }}>
+                {t('Additional Information')}
+              </Typography>
+            </Box>
+
+            <Box sx={{mt: '2em', display: 'flex'}}>
+              <FormInput
+                fieldProps={{
+                  label: t('Purchase Order Number'),
+                  ...register('purchaseOrderNumber'),
                 }}
-                textFieldProps={{
-                  label: 'Start Time',
-                  name: 'startTime',
-                  error: !!(
-                    formik.errors.startTime && formik.touched.startTime
-                  ),
-                  onBlur: formik.handleBlur,
-                }}
-                disabled={!formik.values.switchActive}
               />
+            </Box>
+
+            <Box sx={{mt: '2em', display: 'flex'}} gap={2}>
+              <Box sx={{width: '50%'}}>
+                <FormInput
+                  fieldProps={{
+                    label: t('Caller'),
+                    ...register('callerName'),
+                  }}
+                />
+              </Box>
+
+              <Box sx={{width: '50%'}}>
+                <FormInput
+                  fieldProps={{
+                    label: t('Caller phone no.'),
+                    ...register('callerPhoneNumber'),
+                  }}
+                />
+              </Box>
 
               <TimePicker
-                required
-                minTime={formik.values.startTime as Date}
-                defaultTime={formik.values.endTime || defaultEndDate}
-                getSelectedTime={(time) => {
-                  formik.setValues({
-                    ...formik.values,
-                    endTime: time,
-                  });
+                defaultTime={watchCallTime}
+                getSelectedTime={(date) => {
+                  setValue('callTime', date);
                 }}
                 textFieldProps={{
-                  label: 'End Time',
-                  name: 'endTime',
-                  error: !!(formik.errors.endTime && formik.touched.endTime),
-                  onBlur: formik.handleBlur,
+                  label: t('Call Time'),
                 }}
-                disabled={!formik.values.switchActive}
               />
             </Box>
           </DialogContentText>
@@ -339,9 +449,9 @@ export const ScheduleDialog = ({
             buttonProps={{
               variant: 'contained',
               size: 'medium',
-              onClick: () => formik.handleSubmit(),
+              onClick: () => onFormSubmit(),
               autoFocus: true,
-              disabled: !formik.isValid,
+              disabled: !isFormValid || formNotValidCustomValidation,
             }}>
             <Typography variant="subtitle2">{t('Save')}</Typography>
           </Button>

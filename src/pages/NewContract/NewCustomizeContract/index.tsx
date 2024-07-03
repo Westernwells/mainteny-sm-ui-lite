@@ -118,7 +118,7 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
               InputLabelProps={{
                 shrink: true,
               }}
-              label={t('Renewal Period')}
+              label={t('Renewal period')}
               onValueChange={(values) => {
                 formik.setFieldValue('renewalTerms', Number(values.value));
               }}
