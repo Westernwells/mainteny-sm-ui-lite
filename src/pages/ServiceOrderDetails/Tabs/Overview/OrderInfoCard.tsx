@@ -213,7 +213,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
                 ml: '0.4em',
                 alignSelf: 'center',
               }}>
-              {`#${serviceOrderDetails.number}`}
+              {`#${serviceOrderDetails.externalId}`}
             </Typography>
 
             <StatusChip
@@ -287,6 +287,23 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           serviceOrderDetails.schedules.length
             ? new Date(serviceOrderDetails.schedules[0].endTime)
             : null
+        }
+        defaultDueDate={
+          serviceOrderDetails.dueDate
+            ? new Date(serviceOrderDetails.dueDate)
+            : null
+        }
+        defaultCallTime={
+          serviceOrderDetails.additionalInfo?.callerInfo?.calledAt
+            ? new Date(serviceOrderDetails.additionalInfo.callerInfo.calledAt)
+            : null
+        }
+        defaultCallerName={serviceOrderDetails.additionalInfo?.callerInfo?.name}
+        defaultPurchaseOrderNumber={
+          serviceOrderDetails.additionalInfo.purchaseOrderNumber
+        }
+        defaultCallerPhoneNumber={
+          serviceOrderDetails.additionalInfo?.callerInfo?.phoneNumber
         }
       />
 
