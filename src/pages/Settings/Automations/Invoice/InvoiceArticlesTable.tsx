@@ -254,7 +254,7 @@ const InvoiceArticlesTable = ({serviceOrderType}: Props) => {
                 illustration="clipboard"
                 size="tiny"
                 label="No articles"
-                subLabel="Add your default articles to be included in every invoice"
+                subLabel="They will appear here once the article is added"
                 btnAction={() => setIsArticleModalOpen(true)}
                 btnLabel="Add Article"
                 containerStyle={{

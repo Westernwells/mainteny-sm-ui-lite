@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import {ElevatorView} from 'models/elevator';
 import {Resource} from 'models/misc';
 import {convertToText} from 'utils/utils';
+import {TFunction} from 'i18next';
 
 const defaultProps = {
   editable: false,
@@ -59,13 +60,21 @@ export const columns: GridColDef[] = [
 
 export const makeRows = (
   units: Resource<ElevatorView>,
-): GridRowModel<{[key: string]: any}[]> =>
-  units.data.length
+  t?: TFunction<'translation', undefined>,
+): GridRowModel<{[key: string]: any}[]> => {
+  const categoryValue = (item: ElevatorView) => {
+    const value = convertToText(item.category);
+    if (!value) return '-';
+    return t ? t(value) : value;
+  };
+
+  return units.data.length
     ? units.data.map((item: ElevatorView, index: number) => ({
         id: index,
         address: item.address.fullName || '-',
         unitNumber: item.externalId || '-',
-        category: convertToText(item.category) || '-',
+        category: categoryValue(item),
         navigateTo: `/units/details/${item.id}`,
       }))
     : [];
+};

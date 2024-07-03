@@ -365,7 +365,7 @@ export const ContractTermInput = ({
             {formik.values.otherTerm.paymentTermData.discountOptions?.length ===
               1 && (
               <Button
-                label="Add Discount Option"
+                label={t('Add Discount Option')}
                 buttonProps={{
                   variant: 'text',
                   size: 'small',

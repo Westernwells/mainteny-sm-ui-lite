@@ -246,7 +246,7 @@ export const BasicCustomerForm = ({formik}: Props) => {
               }}
               textFieldProps={{
                 label: 'Customer Since',
-                placeholder: 'Select date',
+                placeholder: t('Select date'),
                 ...defaultProps,
               }}
             />
