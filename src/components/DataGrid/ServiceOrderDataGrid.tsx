@@ -79,7 +79,7 @@ export const makeRows = (orders: ServiceOrderView[]): GridRowsProp =>
   orders
     ? orders.map((item, index) => ({
         id: index,
-        number: item.number,
+        number: item.externalId, // rename field when redoing table row
         customer: item.elevator.propertyOwner.name,
         address: item.elevator.address.fullName,
         type: item.type,

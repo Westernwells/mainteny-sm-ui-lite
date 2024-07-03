@@ -110,7 +110,7 @@ export const ArticlesModalDataGrid = ({setRowItem}: Props) => {
   return (
     <>
       <SearchInput
-        placeholder="search"
+        placeholder="Search"
         onValueChanged={(value) => setSearch(value)}
       />
       <Box
