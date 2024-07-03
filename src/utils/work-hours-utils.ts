@@ -67,6 +67,8 @@ export const formatServiceName = (
     return 'Modernization';
   if (name === WorkHoursType.GENERAL || name === ServiceOrderType.GENERAL)
     return 'General';
+  if (name === WorkHoursType.OPERATION || name === ServiceOrderType.OPERATION)
+    return 'Operation';
   return name;
 };
 
