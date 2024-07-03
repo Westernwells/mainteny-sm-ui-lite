@@ -119,7 +119,13 @@ export const PdfPartialPaymentSection = ({
   const subtotalExclVat = applyDiscount({
     actualValue: subtotalExclVatAfterPerItemDiscount,
     ...(invoice?.additionalInfo.discount?.type === DiscountType.AMOUNT
-      ? {amount: invoice?.additionalInfo.discount?.amount?.value ?? 0}
+      ? {
+          amount:
+            centsToMoney(
+              currentCurrency?.code!,
+              invoice?.additionalInfo.discount?.amount?.value ?? 0,
+            ) ?? 0,
+        }
       : {percentage: invoice?.additionalInfo.discount?.percentage ?? 0}),
   });
 

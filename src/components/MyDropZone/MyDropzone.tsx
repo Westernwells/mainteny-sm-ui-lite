@@ -21,6 +21,7 @@ import {Thumb} from './Thumb';
 
 export interface FileWithPreview extends FileWithPath {
   preview: string;
+  description?: string;
 }
 
 export interface MappedFile extends FileWithPreview {

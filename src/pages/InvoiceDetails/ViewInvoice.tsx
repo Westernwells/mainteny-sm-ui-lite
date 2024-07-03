@@ -477,9 +477,11 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
 
     if (
-      ![InvoiceStatus.CANCELLED, InvoiceStatus.PARTIALLY_PAID].includes(
-        invoice.status,
-      )
+      ![
+        InvoiceStatus.CANCELLED,
+        InvoiceStatus.PARTIALLY_PAID,
+        InvoiceStatus.CREDITED,
+      ].includes(invoice.status)
     ) {
       items.push({
         label: t('Print'),
