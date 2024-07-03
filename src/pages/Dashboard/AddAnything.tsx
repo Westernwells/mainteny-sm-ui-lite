@@ -27,6 +27,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 
 interface Props extends ButtonProps {
   label?: string;
@@ -191,6 +192,11 @@ export const AddAnything = () => {
           label: 'General',
           action: () => track(() => navigate('/orders/new?type=general')),
           icon: <HandymanIcon fontSize="small" />,
+        },
+        {
+          label: 'Operation',
+          action: () => track(() => navigate('/orders/new?type=operation')),
+          icon: <RemoveRedEyeIcon fontSize="small" />,
         },
       ],
     },

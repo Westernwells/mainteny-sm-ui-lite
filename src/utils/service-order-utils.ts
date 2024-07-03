@@ -172,6 +172,8 @@ export const serviceOrderTypeToString = (type: ServiceOrderType | string) => {
       return 'Modernization';
     case ServiceOrderType.GENERAL:
       return 'General';
+    case ServiceOrderType.OPERATION:
+      return 'Operation';
     default:
       return '-';
   }
@@ -195,6 +197,8 @@ export const serviceOrderTypeToEnum = (type: string) => {
       return ServiceOrderType.MODERNIZATION;
     case 'General':
       return ServiceOrderType.GENERAL;
+    case 'Operation':
+      return ServiceOrderType.OPERATION;
     default:
       return ServiceOrderType.REPAIR;
   }

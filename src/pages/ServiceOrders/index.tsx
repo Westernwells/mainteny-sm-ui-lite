@@ -17,6 +17,7 @@ import {
   serviceOrderTypeColor,
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
 
@@ -113,6 +114,15 @@ export const ServiceOrders = () => {
       icon: (
         <HandymanIcon
           sx={{color: serviceOrderTypeColor(ServiceOrderType.GENERAL)}}
+        />
+      ),
+    },
+    {
+      label: serviceOrderTypeToString(ServiceOrderType.OPERATION),
+      action: () => track(() => navigate('/orders/new?type=operation')),
+      icon: (
+        <RemoveRedEyeIcon
+          sx={{color: serviceOrderTypeColor(ServiceOrderType.OPERATION)}}
         />
       ),
     },
