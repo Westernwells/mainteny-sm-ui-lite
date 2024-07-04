@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import {ArticleView} from 'models/article';
 import {
   ArticleRecord,
@@ -240,17 +241,17 @@ export const applyGlobalDiscountOnItems = (
   return arr.map((item) => {
     const portion =
       item.unitAmount.netAmount === total
-        ? 1
-        : item.unitAmount.netAmount / total;
-    const discount = globalDiscountAmount * portion;
+        ? 1.0
+        : new BigNumber(item.unitAmount.netAmount).dividedBy(total).toNumber();
+    const discount = new BigNumber(globalDiscountAmount).times(portion);
+    const netAfterGlobalDiscount = new BigNumber(
+      item.unitAmount.netAmount,
+    ).minus(discount);
     return {
       ...item,
       unitAmount: {
         ...item.unitAmount,
-        netAmount: applyDiscount({
-          actualValue: item.unitAmount.netAmount,
-          amount: discount,
-        }),
+        netAmount: netAfterGlobalDiscount.toNumber(),
       },
     };
   });

@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -82,11 +82,18 @@ export const ArticleItemsTableNEW = ({
     {currency: currentCurrency.code},
   );
   const {company} = useContext(UserCompanyContext);
-  const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(items);
+  const itemsAfterPerItemDiscount = useMemo(
+    () => applyPerItemDiscountOnItems(items),
+    [items],
+  );
 
-  const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
-    itemsAfterPerItemDiscount,
-    formik.values.discount,
+  const itemsAfterGlobalDiscount = useMemo(
+    () =>
+      applyGlobalDiscountOnItems(
+        itemsAfterPerItemDiscount,
+        formik.values.discount,
+      ),
+    [itemsAfterPerItemDiscount, formik.values.discount],
   );
 
   const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
@@ -227,7 +234,10 @@ export const ArticleItemsTableNEW = ({
   };
   const {user} = useUserSession();
 
-  const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
+  const {total, totalVAT} = useMemo(
+    () => calculateSameVatTotals(itemsAfterGlobalDiscount),
+    [itemsAfterGlobalDiscount],
+  );
 
   return (
     <Box
