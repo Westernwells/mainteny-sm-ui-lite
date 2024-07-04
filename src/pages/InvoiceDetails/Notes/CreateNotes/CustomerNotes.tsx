@@ -1,49 +1,34 @@
-import {Dispatch, FC, useEffect} from 'react';
+import {PropsWithChildren} from 'react';
 import {
-  useInfiniteCustomerNotes,
   useCreateCustomerNote,
   useUpdateCustomerNote,
   useDeleteCustomerNote,
 } from 'hooks/reactQuery/useCustomers';
 import Notes from 'components/Notes';
 import {CreateNoteVars, DeleteNoteVars, UpdateNoteVars} from 'models/note';
-import {MutateOptions} from 'react-query';
-import useTotalNotesData from 'hooks/useTotalNotesData';
+import {InfiniteData, MutateOptions} from 'react-query';
+import {Comment} from 'models/comment';
+import {Resource} from '../../../../models/misc';
 
 interface Props {
   customerId: string;
-  setTotal: Dispatch<number>;
+  notes: InfiniteData<Resource<Comment>>;
+  isLoading: boolean;
+  isFetchingNextPage: boolean;
+  hasNextPage: boolean;
+  fetchNextPage: () => void;
 }
 
-export const CustomerNotes: FC<Props> = ({customerId, setTotal}) => {
-  const {
-    data: notes = {
-      pages: [],
-      pageParams: [],
-    },
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useInfiniteCustomerNotes(customerId, {
-    pageIndex: 0,
-    pageSize: 10,
-  });
+export const CustomerNotes = ({
+  customerId,
+  ...noteProps
+}: PropsWithChildren<Props>) => {
   const {mutate: createCustomerNote, isLoading: isCreating} =
     useCreateCustomerNote();
   const {mutate: deleteCustomerNote, isLoading: isDeleting} =
     useDeleteCustomerNote();
   const {mutate: updateCustomerNote, isLoading: isUpdating} =
     useUpdateCustomerNote();
-
-  const totalCustomerNotes = useTotalNotesData(
-    useInfiniteCustomerNotes,
-    customerId,
-  );
-
-  useEffect(() => {
-    setTotal(totalCustomerNotes || 0);
-  }, [totalCustomerNotes]);
 
   const createNote = async (
     variables: CreateNoteVars,
@@ -68,17 +53,13 @@ export const CustomerNotes: FC<Props> = ({customerId, setTotal}) => {
 
   return (
     <Notes
-      notes={notes}
-      isLoading={isLoading}
-      isFetchingNextPage={isFetchingNextPage}
       isDeleting={isDeleting}
       isUpdating={isUpdating}
       isCreating={isCreating}
-      hasNextPage={hasNextPage}
-      fetchNextPage={fetchNextPage}
       createNote={createNote}
       updateNote={updateNote}
       deleteNote={deleteNote}
+      {...noteProps}
     />
   );
 };

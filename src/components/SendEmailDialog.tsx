@@ -31,6 +31,7 @@ interface Props {
   content?: string;
   callback?: ({email, subject, content}: SimpleEmailRecord) => void;
   loadingProgress?: number;
+  inProgressTooltipTitle?: string;
 }
 
 const validationSchema = Yup.object().shape({
@@ -55,6 +56,7 @@ export const SendEmailDialog = ({
   content,
   callback,
   loadingProgress,
+  inProgressTooltipTitle = 'The PDFs are not generated yet.',
 }: Props) => {
   const {t} = useTranslation();
   const [isPublishing, setIsPublishing] = useState(false);
@@ -208,11 +210,7 @@ export const SendEmailDialog = ({
         </Button>
         <Tooltip
           open={confirmBtnDisabled}
-          title={
-            confirmBtnDisabled
-              ? t('The PDFs are not generated yet.')
-              : t('Send')
-          }
+          title={confirmBtnDisabled ? t(inProgressTooltipTitle) : t('Send')}
           placement="left"
           arrow>
           <span>
