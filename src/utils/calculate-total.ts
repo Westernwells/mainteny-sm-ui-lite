@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import {
   applyDiscount,
   applyGlobalDiscountOnItems,
@@ -155,31 +156,37 @@ export const calculateArticleTotalWithVatFormatted = (
 };
 
 export const calculateSameVatTotals = (items: InvoiceItemRecord[]) => {
-  let total = 0;
-  let totalVAT = 0;
+  let total = new BigNumber(0);
+  let totalVAT = new BigNumber(0);
 
   items.forEach((item) => {
-    const unitNetAmount =
-      (item.unitAmount.netAmount / 10 ** Currencies[item.unitAmount.currency]) *
-      item.quantity;
+    const unitNetAmount = new BigNumber(item.unitAmount.netAmount)
+      .dividedBy(new BigNumber(10).pow(Currencies[item.unitAmount.currency]))
+      .multipliedBy(item.quantity)
+      .decimalPlaces(2);
 
-    const vatPercentage = item.unitAmount.percentageVat;
+    const vatPercentage = new BigNumber(item.unitAmount.percentageVat);
 
-    const itemTotal = fixRounding(
-      unitNetAmount * (1 + vatPercentage / PERCENTAGE_FACTOR),
-      2,
-    );
+    const itemTotal = new BigNumber(unitNetAmount)
+      .multipliedBy(
+        new BigNumber(1).plus(vatPercentage.dividedBy(PERCENTAGE_FACTOR)),
+      )
+      .decimalPlaces(2);
 
-    total += itemTotal;
+    total = total.plus(itemTotal);
 
-    const vatAmount = fixRounding(
-      (vatPercentage / PERCENTAGE_FACTOR) * unitNetAmount,
-      2,
-    );
-    totalVAT += vatAmount;
+    const vatAmount = new BigNumber(vatPercentage)
+      .dividedBy(PERCENTAGE_FACTOR)
+      .multipliedBy(unitNetAmount)
+      .decimalPlaces(2);
+
+    totalVAT = totalVAT.plus(vatAmount);
   });
 
-  return {total, totalVAT};
+  return {
+    total: total.toNumber(),
+    totalVAT: totalVAT.toNumber(),
+  };
 };
 
 export const getArticlesTotalAmountInclVats = (
