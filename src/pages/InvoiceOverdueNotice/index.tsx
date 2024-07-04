@@ -576,6 +576,7 @@ export const InvoiceOverdueNotice = () => {
         onClose={() => setIsSendEmailDialogOpen(false)}
         id={invoice?.id ?? ''}
         confirmBtnDisabled={isUploadLoading}
+        inProgressTooltipTitle=""
         email={
           invoice?.propertyOwner?.additionalInfo.billingEmail ||
           invoice?.propertyOwner?.contact.email
