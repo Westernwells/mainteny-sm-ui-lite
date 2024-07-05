@@ -26,6 +26,7 @@ import {
 } from 'utils/invoice';
 import {ArticleType} from 'models/article';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
+import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -318,26 +319,29 @@ const CreditNotePdfTemplate = ({
               </View>
             )}
 
-            {invoice?.additionalInfo?.moreInfo?.trim() && (
-              <View wrap={false}>
-                <Text style={styles.sectionHeading}>{translate('Notes')}</Text>
-                <HtmlPDF
-                  html={formatCostText(
-                    invoice?.additionalInfo?.moreInfo,
-                    `${formatCurrency(laborCost, {
-                      currency: currentCurrency?.code,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    })}`,
-                    `${formatCurrency(materialCost, {
-                      currency: currentCurrency?.code,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    })}`,
-                  )}
-                />
-              </View>
-            )}
+            {invoice?.additionalInfo?.moreInfo &&
+              stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
+                <View wrap={false}>
+                  <Text style={styles.sectionHeading}>
+                    {translate('Notes')}
+                  </Text>
+                  <HtmlPDF
+                    html={formatCostText(
+                      invoice?.additionalInfo?.moreInfo,
+                      `${formatCurrency(laborCost, {
+                        currency: currentCurrency?.code,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      })}`,
+                      `${formatCurrency(materialCost, {
+                        currency: currentCurrency?.code,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      })}`,
+                    )}
+                  />
+                </View>
+              )}
           </View>
         </PdfBodyContainer>
 

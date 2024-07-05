@@ -24,6 +24,7 @@ import {
   applyGlobalDiscountOnItems,
   applyPerItemDiscountOnItems,
   getAggregatedItemsVats,
+  stripHtmlTags,
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -380,26 +381,29 @@ const PartialInvoicePdfTemplate = ({
               />
             )}
 
-            {invoice?.additionalInfo?.moreInfo?.trim() && (
-              <View wrap={false}>
-                <Text style={styles.sectionHeading}>{translate('Notes')}</Text>
-                <HtmlPDF
-                  html={formatCostText(
-                    invoice?.additionalInfo?.moreInfo,
-                    `${formatCurrency(laborCost, {
-                      currency: currentCurrency?.code,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    })}`,
-                    `${formatCurrency(materialCost, {
-                      currency: currentCurrency?.code,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    })}`,
-                  )}
-                />
-              </View>
-            )}
+            {invoice?.additionalInfo?.moreInfo &&
+              stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
+                <View wrap={false}>
+                  <Text style={styles.sectionHeading}>
+                    {translate('Notes')}
+                  </Text>
+                  <HtmlPDF
+                    html={formatCostText(
+                      invoice?.additionalInfo?.moreInfo,
+                      `${formatCurrency(laborCost, {
+                        currency: currentCurrency?.code,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      })}`,
+                      `${formatCurrency(materialCost, {
+                        currency: currentCurrency?.code,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      })}`,
+                    )}
+                  />
+                </View>
+              )}
           </View>
         </PdfBodyContainer>
 
