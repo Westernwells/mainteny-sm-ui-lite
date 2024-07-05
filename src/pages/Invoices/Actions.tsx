@@ -66,7 +66,11 @@ import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleIm
 import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import {getSignatureKeys} from 'utils/service-order-utils';
-import {HeaderFooterInfoData, StringValueResponse} from 'models/misc';
+import {
+  HeaderFooterInfoData,
+  PdfGenerationStatus,
+  StringValueResponse,
+} from 'models/misc';
 
 interface Props {
   invoice: InvoiceView;
@@ -283,6 +287,13 @@ export const Actions = ({
 
   const signatureImageUrl = useFetchAndConvertImage(signaturePath);
 
+  const {refetch: refetchChecklistDownloadUrl} = useDownloadUrl(
+    selectedChecklist?.additionalInfo.pdfPath
+      ? [selectedChecklist?.additionalInfo.pdfPath]
+      : [],
+    {enabled: false},
+  );
+
   const generateChecklistBlob = async () => {
     const blob = await pdf(
       <ChecklistPdf
@@ -350,6 +361,11 @@ export const Actions = ({
   const {convertedImages} = useFetchAndConvertMultipleImages(
     imageDownloadUrls,
     report?.attachments,
+  );
+
+  const {refetch: refetchWorkReportDownloadUrl} = useDownloadUrl(
+    report?.additionalInfo.pdfPath ? [report?.additionalInfo.pdfPath] : [],
+    {enabled: false},
   );
 
   const generateWorkReportBlob = async () => {
@@ -445,13 +461,19 @@ export const Actions = ({
   };
 
   const getExistingFiles = async (
-    fileDownloadUrl:
+    invoiceDownloadUrlArg:
       | {
           [key: string]: string;
         }
       | undefined,
     invoiceData: InvoiceView,
     nextNumber?: string,
+    workReportDownloadUrlArg?: {
+      [key: string]: string;
+    },
+    checklistDownloadUrlArg?: {
+      [key: string]: string;
+    },
   ) => {
     let allFiles: FileWithPreview[] = [];
     const fileNames: string[] = [`${invoiceData?.id}.pdf`];
@@ -464,7 +486,7 @@ export const Actions = ({
     // BASE FILES
     if (invoiceData?.status !== InvoiceStatus.DRAFT) {
       const blob = await fetchFile(
-        fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
+        invoiceDownloadUrlArg ? Object.values(invoiceDownloadUrlArg)[0] : '',
       );
       allFiles = await createFilesFromBlobArray(
         [blob],
@@ -493,13 +515,29 @@ export const Actions = ({
         }.pdf`,
       ];
 
-      const workReportBlob = await generateWorkReportBlob();
-      const files = await createFilesFromBlobArray(
-        [workReportBlob],
-        workReportFileNames,
-        workReportFileDescriptions,
-      );
-      allFiles = allFiles.concat(files);
+      if (
+        report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
+      ) {
+        const blob = await fetchFile(
+          workReportDownloadUrlArg
+            ? Object.values(workReportDownloadUrlArg)[0]
+            : '',
+        );
+        const files = await createFilesFromBlobArray(
+          [blob],
+          workReportFileNames,
+          workReportFileDescriptions,
+        );
+        allFiles = allFiles.concat(files);
+      } else {
+        const workReportBlob = await generateWorkReportBlob();
+        const files = await createFilesFromBlobArray(
+          [workReportBlob],
+          workReportFileNames,
+          workReportFileDescriptions,
+        );
+        allFiles = allFiles.concat(files);
+      }
     }
 
     if (invoiceData?.additionalInfo.includeCheckList) {
@@ -512,13 +550,30 @@ export const Actions = ({
         }.pdf`,
       ];
 
-      const checklistBlob = await generateChecklistBlob();
-      const files = await createFilesFromBlobArray(
-        [checklistBlob],
-        checklistFileNames,
-        checklistFileDescriptions,
-      );
-      allFiles = allFiles.concat(files);
+      if (
+        selectedChecklist?.additionalInfo.pdfGenerationStatus ===
+        PdfGenerationStatus.DONE
+      ) {
+        const blob = await fetchFile(
+          checklistDownloadUrlArg
+            ? Object.values(checklistDownloadUrlArg)[0]
+            : '',
+        );
+        const files = await createFilesFromBlobArray(
+          [blob],
+          checklistFileNames,
+          checklistFileDescriptions,
+        );
+        allFiles = allFiles.concat(files);
+      } else {
+        const checklistBlob = await generateChecklistBlob();
+        const files = await createFilesFromBlobArray(
+          [checklistBlob],
+          checklistFileNames,
+          checklistFileDescriptions,
+        );
+        allFiles = allFiles.concat(files);
+      }
     }
 
     setExistingFiles(allFiles);
@@ -528,15 +583,21 @@ export const Actions = ({
     setIsLoadingFiles(true);
     setIsSendEmailDialogOpen(true);
 
-    // using 'then' to wait for refetch and get download url
     try {
-      await refetchDownloadUrl().then(async (res) => {
-        await getExistingFiles(
-          res.data,
-          selectedInvoice || invoice,
-          companyNextId,
-        );
-      });
+      // Refetch the download URLs for invoice, work report, and checklist
+      const invoiceDownloadUrlResponse = await refetchDownloadUrl();
+      const workReportDownloadUrlResponse =
+        await refetchWorkReportDownloadUrl();
+      const checklistDownloadUrlResponse = await refetchChecklistDownloadUrl();
+
+      // Ensure all download URLs are fetched before calling getExistingFiles
+      await getExistingFiles(
+        invoiceDownloadUrlResponse.data,
+        invoice,
+        companyNextId,
+        workReportDownloadUrlResponse.data,
+        checklistDownloadUrlResponse.data,
+      );
     } finally {
       setIsLoadingFiles(false);
     }
@@ -1031,8 +1092,8 @@ export const Actions = ({
           const checkListInfo = selectedChecklist!;
           const isDraftInvoice = invoice.status === InvoiceStatus.DRAFT;
           const invoiceUploadPath = `${serviceCompanyId}/invoices`;
-          const workReportUploadPath = `${serviceCompanyId}/reports`;
-          const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${selectedInvoice?.serviceOrder?.id}/checkLists/${checkListInfo?.checkListId}`;
+          const workReportUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/report`;
+          const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${selectedInvoice?.serviceOrder?.id}/checkLists/${checkListInfo?.technicianId}`;
           const fileNames: string[] = [`${selectedInvoice?.id}.pdf`];
           const allAttachments = emailRecord.attachments || [];
 
@@ -1130,7 +1191,7 @@ export const Actions = ({
                           uri: isInvoiceFile
                             ? isDraftInvoice
                               ? `${invoiceUploadPath}/${fileNames[0]}`
-                              : checkListInfo?.additionalInfo.pdfPath!
+                              : invoice?.additionalInfo.pdfPath!
                             : `${uploadPath}/${obj.name}`,
                           description: isAttachedFile
                             ? obj.name.split('.')[0]
