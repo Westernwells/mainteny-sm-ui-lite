@@ -20,6 +20,7 @@ import {
   getQuotationAggregatedItemsVats,
 } from 'pages/QuotationDetails/utils';
 import {calculateSameVatTotals} from 'utils/calculate-total';
+import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
@@ -738,14 +739,15 @@ const QuotationPdfTemplate = React.memo(
                 </View>
               )}
 
-              {quotation?.additionalInfo?.notes?.trim() && (
-                <View>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Notes')}
-                  </Text>
-                  <HtmlPDF html={quotation?.additionalInfo?.notes || ''} />
-                </View>
-              )}
+              {quotation?.additionalInfo?.notes &&
+                stripHtmlTags(quotation?.additionalInfo?.notes) && (
+                  <View>
+                    <Text style={styles.sectionHeading}>
+                      {translate('Notes')}
+                    </Text>
+                    <HtmlPDF html={quotation?.additionalInfo?.notes || ''} />
+                  </View>
+                )}
 
               <View wrap={false} style={styles.signatureBoxWrap}>
                 <Text style={styles.sectionHeading}>
