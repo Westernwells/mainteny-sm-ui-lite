@@ -199,7 +199,7 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
               marginRight: '0.25em',
             }}
           />
-          <Typography variant="body2">{t('Operation')}</Typography>
+          <Typography variant="body2">{t('Elevator Operation')}</Typography>
         </Box>
       ),
     },
