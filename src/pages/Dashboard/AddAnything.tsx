@@ -194,7 +194,7 @@ export const AddAnything = () => {
           icon: <HandymanIcon fontSize="small" />,
         },
         {
-          label: 'Operation',
+          label: 'Elevator Operation',
           action: () => track(() => navigate('/orders/new?type=operation')),
           icon: <RemoveRedEyeIcon fontSize="small" />,
         },
