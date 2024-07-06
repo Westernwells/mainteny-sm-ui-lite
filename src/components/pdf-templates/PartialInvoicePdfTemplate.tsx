@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {formatCurrency} from 'utils/currency';
@@ -6,24 +7,14 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {
-  DiscountType,
-  InvoiceItem,
-  InvoiceType,
-  InvoiceView,
-} from 'models/invoice';
+import {InvoiceItem, InvoiceType, InvoiceView} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {
-  calculateSameVatTotals,
-  calculateTotalWithPerItemDiscount,
-} from 'utils/calculate-total';
+import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {ArticleType} from 'models/article';
 import {
-  applyDiscount,
   applyGlobalDiscountOnItems,
   applyPerItemDiscountOnItems,
-  getAggregatedItemsVats,
   stripHtmlTags,
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
@@ -216,29 +207,8 @@ const PartialInvoicePdfTemplate = ({
   };
 
   const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
-  const discountType = discount?.type;
   const discountAmount = discount?.amount;
-  const discountPercentage = discount?.percentage;
   const discountValue = discountAmount?.value ?? 0;
-
-  const subtotalExclVat = calculateTotalWithPerItemDiscount(articleItems);
-
-  const subtotalExclVatFormatted = formatCurrency(
-    subtotalExclVat - discountValue,
-    {
-      currency: currentCurrency?.code,
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    },
-  );
-
-  const subtotalExclVatAfterDiscount = applyDiscount({
-    actualValue: subtotalExclVat,
-    ...(discountType === DiscountType.AMOUNT
-      ? {amount: discountValue ?? 0}
-      : {percentage: discountPercentage ?? 0}),
-  });
 
   const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
 
@@ -247,26 +217,25 @@ const PartialInvoicePdfTemplate = ({
     discount,
   );
 
-  const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
-    (item) =>
-      item.unitAmount.percentageVat ===
-      articleItems[0].unitAmount.percentageVat,
+  const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} =
+    useMemo(
+      () =>
+        calculateInvoiceAmount({
+          items: articleItems,
+          globalDiscount: discount,
+        }),
+      [articleItems, discount],
+    );
+
+  const amountAfterGlobalDiscountFormatted = formatCurrency(
+    amountAfterGlobalDiscount,
+    {
+      currency: currentCurrency?.code,
+      excludeCurrencySymbol: true,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
+    },
   );
-
-  const percentageVats = itemsAfterGlobalDiscount.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
-            vat:
-              subtotalExclVatAfterDiscount *
-              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
-          },
-        ]
-      : getAggregatedItemsVats(itemsAfterGlobalDiscount)
-    : [];
-
-  const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
 
   const allItemsHaveZeroDiscount = articleItems.every(
     (item) =>
@@ -349,11 +318,9 @@ const PartialInvoicePdfTemplate = ({
                 translate={translate}
                 allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
                 discountValue={discountValue}
-                subtotalExclVatFormatted={subtotalExclVatFormatted}
-                allItemsHasSameVAT={allItemsHasSameVAT}
-                percentageVats={percentageVats}
-                totalVAT={totalVAT}
-                total={total}
+                subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
+                percentageVats={vats}
+                total={amountAfterGlobalDiscountWithVAT}
                 selectedLng={selectedLng}
                 netTotal={netTotal}
               />
