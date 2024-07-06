@@ -16,13 +16,7 @@ import {
   tableCellClasses,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  applyDiscount,
-  applyGlobalDiscountOnItems,
-  applyPerItemDiscountOnItems,
-  articleViewToInvoiceItemRecord,
-  getAggregatedItemsVats,
-} from 'pages/InvoiceDetails/utils';
+import {articleViewToInvoiceItemRecord} from 'pages/InvoiceDetails/utils';
 import {
   DiscountType,
   DiscountTypeOptions,
@@ -33,10 +27,10 @@ import {ArticleType, ArticleView} from 'models/article';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
-  calculateSameVatTotals,
+  calculateInvoiceAmount,
   calculateTotalWithPerItemDiscount,
 } from 'utils/calculate-total';
-import {fixRounding, getUniqueId} from 'utils/utils';
+import {getUniqueId} from 'utils/utils';
 import {useTheme} from '@mui/material/styles';
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -68,51 +62,7 @@ export const ArticleItemsTableNEW = ({
   const subtotalExclVat = calculateTotalWithPerItemDiscount(
     formik.values.items,
   );
-  const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
-    currency: currentCurrency.code,
-  });
-  const subtotalExclVatAfterDiscount = applyDiscount({
-    actualValue: subtotalExclVat,
-    ...(formik.values.discount?.type === DiscountType.AMOUNT
-      ? {amount: formik.values.discount?.amount?.value ?? 0}
-      : {percentage: formik.values.discount?.percentage ?? 0}),
-  });
-  const subtotalExclVatAfterDiscountFormatted = formatCurrency(
-    subtotalExclVatAfterDiscount,
-    {currency: currentCurrency.code},
-  );
   const {company} = useContext(UserCompanyContext);
-  const itemsAfterPerItemDiscount = useMemo(
-    () => applyPerItemDiscountOnItems(items),
-    [items],
-  );
-
-  const itemsAfterGlobalDiscount = useMemo(
-    () =>
-      applyGlobalDiscountOnItems(
-        itemsAfterPerItemDiscount,
-        formik.values.discount,
-      ),
-    [itemsAfterPerItemDiscount, formik.values.discount],
-  );
-
-  const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
-    (item) =>
-      item.unitAmount.percentageVat === items[0].unitAmount.percentageVat,
-  );
-
-  const percentageVats = itemsAfterGlobalDiscount.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
-            vat:
-              subtotalExclVatAfterDiscount *
-              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
-          },
-        ]
-      : getAggregatedItemsVats(itemsAfterGlobalDiscount)
-    : [];
 
   const {language: selectedLng} = useContext(LanguageContext);
 
@@ -234,9 +184,38 @@ export const ArticleItemsTableNEW = ({
   };
   const {user} = useUserSession();
 
-  const {total, totalVAT} = useMemo(
-    () => calculateSameVatTotals(itemsAfterGlobalDiscount),
-    [itemsAfterGlobalDiscount],
+  const {
+    amountBeforeGlobalDiscount,
+    amountAfterGlobalDiscount,
+    vats,
+    amountAfterGlobalDiscountWithVAT,
+  } = useMemo(
+    () =>
+      calculateInvoiceAmount({
+        items: formik.values.items,
+        globalDiscount: formik.values.discount,
+      }),
+    [formik.values.items, formik.values.discount],
+  );
+
+  const amountBeforeGlobalDiscountFormatted = formatCurrency(
+    amountBeforeGlobalDiscount,
+    {currency: currentCurrency.code},
+  );
+
+  const amountAfterGlobalDiscountFormatted = formatCurrency(
+    amountAfterGlobalDiscount,
+    {currency: currentCurrency.code},
+  );
+
+  const vatsFormatted = vats.map((vat) => ({
+    ...vat,
+    vat: formatCurrency(vat.vat, {currency: currentCurrency.code}),
+  }));
+
+  const amountAfterGlobalDiscountWithVATFormatted = formatCurrency(
+    amountAfterGlobalDiscountWithVAT,
+    {currency: currentCurrency.code},
   );
 
   return (
@@ -378,7 +357,7 @@ export const ArticleItemsTableNEW = ({
                       {t('Sum')}
                     </Typography>
                     <Typography variant="subtitle2" color="primary.dark">
-                      {subtotalExclVatFormatted}
+                      {amountBeforeGlobalDiscountFormatted}
                     </Typography>
                     <Typography variant="subtitle2" color="text.secondary">
                       {discountText}
@@ -489,36 +468,16 @@ export const ArticleItemsTableNEW = ({
                   {t('Subtotal (excl. VAT)')}
                 </Typography>
                 <Typography variant="subtitle2" color="primary.dark">
-                  {subtotalExclVatAfterDiscountFormatted}
+                  {amountAfterGlobalDiscountFormatted}
                 </Typography>
-                {allItemsHasSameVAT ? (
-                  <>
+                {vatsFormatted.map((v, index) => (
+                  <React.Fragment key={`${index}-${v.percentageVat}`}>
                     <Typography color="text.primary">
-                      {t('VAT')} {percentageVats[0].percentageVat}%
+                      {t('VAT')} {v.percentageVat}%
                     </Typography>
-                    <Typography color="text.primary">
-                      {formatCurrency(totalVAT, {
-                        currency: currentCurrency.code,
-                      })}
-                    </Typography>
-                  </>
-                ) : (
-                  percentageVats.map((v, index) => (
-                    <React.Fragment key={`${index}-${v.percentageVat}`}>
-                      <Typography color="text.primary">
-                        {t('VAT')} {v.percentageVat}%
-                      </Typography>
-                      <Typography color="text.primary">
-                        {formatCurrency(fixRounding(v.vat, 2), {
-                          currency: currentCurrency.code,
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                          roundingMode: 'floor',
-                        })}
-                      </Typography>
-                    </React.Fragment>
-                  ))
-                )}
+                    <Typography color="text.primary">{v.vat}</Typography>
+                  </React.Fragment>
+                ))}
                 <Typography
                   variant="subtitle1"
                   color="primary.dark"
@@ -529,9 +488,7 @@ export const ArticleItemsTableNEW = ({
                   variant="subtitle1"
                   color="primary.dark"
                   fontWeight={600}>
-                  {formatCurrency(total, {
-                    currency: currentCurrency.code,
-                  })}
+                  {amountAfterGlobalDiscountWithVATFormatted}
                 </Typography>
               </Box>
             </Box>
