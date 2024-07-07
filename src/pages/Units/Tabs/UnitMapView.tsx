@@ -20,6 +20,7 @@ import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useTheme} from '@mui/system';
 import {useSearchValues} from 'hooks/useSearchValues';
+import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 
 const pageInfo = makePage(0, 50);
 
@@ -27,13 +28,25 @@ export const UnitMapsView = () => {
   const formatDate = useFormatDate();
   const {user} = useUserSession();
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {data: userAccount} = useGetUserAccount(user?.userAccount.id);
+  const defaultCenterCoord = {
+    lng:
+      company?.businessAddress?.location?.longitude ??
+      userAccount?.userData?.address?.location?.longitude ??
+      13.390206,
+    lat:
+      company?.businessAddress?.location?.latitude ??
+      userAccount?.userData?.address?.location?.latitude ??
+      52.535152,
+  };
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
     centerCoord: {
-      longitude: company?.businessAddress?.location?.longitude ?? 13.390206,
-      latitude: company?.businessAddress?.location?.latitude ?? 52.535152,
+      longitude: defaultCenterCoord.lng,
+      latitude: defaultCenterCoord.lat,
     },
   }).current;
+
   const mapRef = useRef<any>();
   const [lastVisitStart, setLastVisitStart] = useQueryState<Date | null>(
     'lastVisitStart',
@@ -354,31 +367,9 @@ export const UnitMapsView = () => {
         defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom}
         center={
-          elevatorView.centerCoord &&
-          clusters.length > 0 &&
-          clusters
-            .filter((c) => c.properties.cluster)
-            .sort(
-              (a, b) =>
-                ((b.properties.point_count as unknown as number) >
-                  a.properties.point_count) as unknown as number,
-            )[0]
-            ? {
-                lat: clusters
-                  .filter((c) => c.properties.cluster)
-                  .sort(
-                    (a, b) =>
-                      ((b.properties.point_count as unknown as number) >
-                        a.properties.point_count) as unknown as number,
-                  )[0].geometry.coordinates[1],
-                lng: clusters
-                  .filter((c) => c.properties.cluster)
-                  .sort(
-                    (a, b) =>
-                      ((b.properties.point_count as unknown as number) >
-                        a.properties.point_count) as unknown as number,
-                  )[0].geometry.coordinates[0],
-              }
+          company?.businessAddress?.location ||
+          userAccount?.userData?.address?.location
+            ? defaultCenterCoord
             : {
                 lat: elevatorView.centerCoord.latitude,
                 lng: elevatorView.centerCoord.longitude,
