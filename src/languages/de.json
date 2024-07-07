@@ -521,7 +521,7 @@
   "Priority Engineers": "Prioritäts Techniker",
   "e.g. Max Mustermann": "z.B. Max Mustermann",
   "e.g. 1": "z.B. 1",
-  "Notes": "Notizen",
+  "Notes": "Anmerkungen",
   "Note": "Notiz",
   "Enter a note": "Notiz hinzufügen",
   "Pictures": "Bilder",
@@ -1942,7 +1942,7 @@
   "Update": "Aktualisieren",
   "Invoice type": "Rechnungsart",
   "Payment Due Date": "Fälligkeitsdatum",
-  "Service Deliver Date": "Leistungszeitraum",
+  "Delivery date": "Leistungszeitraum",
   "Purchase order no.": "Bestellnummer",
   "Additional documents": "Zusätzliche Dokumente",
   "To (Customer)": "An (Kunde)",
@@ -2608,5 +2608,6 @@
   "No articles": "Keine Artikel",
   "Add your default articles to be included in every invoice": "Füge Artikel hinzu, die automatisiert auf Rechnungen erscheinen sollen",
   "ARTICLE #": "ARTIKEL NR",
-  "They will appear here once the article is added": "Die Artikel werden hier erscheinen, sobald sie hinzugefügt wurden."
+  "They will appear here once the article is added": "Die Artikel werden hier erscheinen, sobald sie hinzugefügt wurden.",
+  "OPERATION": "AUFZUGSWÄRTER"
 }

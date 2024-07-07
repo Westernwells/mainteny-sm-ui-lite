@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import Box from '@mui/material/Box';
 import NoteAlt from '@mui/icons-material/NoteAlt';
 import {Chip, Drawer, Typography} from '@mui/material';
@@ -14,6 +14,7 @@ import {
 } from 'models/propertyManager';
 import NotesToForm from 'components/NotesToForm';
 import CustomerNotes from './CustomerNotes';
+import {useInfiniteCustomerNotes} from '../../../../hooks/reactQuery/useCustomers';
 
 interface Props {
   formik: FormikProps<InvoiceFormData>;
@@ -30,7 +31,30 @@ export const CreateNotes = ({formik, customer}: Props) => {
   const customerId = customer?.id;
   const [showSideDrawer, setShowSideDrawer] = useState(false);
   const [tabValue, setTabValue] = useState(TabIndex.Invoice);
-  const [totalCustomerNotes, setCustomerTotalNumbers] = useState(0);
+  const {
+    data: customerNotes = {
+      pages: [],
+      pageParams: [],
+    },
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteCustomerNotes(
+    customerId || '',
+    {
+      pageIndex: 0,
+      pageSize: 10,
+    },
+    {
+      enabled: !!customerId,
+    },
+  );
+
+  const totalCustomerNotes = useMemo(
+    () => customerNotes?.pages?.[0]?.total || 0,
+    [customerNotes],
+  );
 
   useEffect(() => {
     if (!customerId) {
@@ -100,7 +124,7 @@ export const CreateNotes = ({formik, customer}: Props) => {
         <NoteAlt fontSize="small" />
         <Typography variant="subtitle2">{t('Notes')}</Typography>
         <Chip
-          label={formik.values.notes?.length || 0}
+          label={(formik.values.notes?.length || 0) + totalCustomerNotes}
           color="primary"
           size="small"
           sx={{
@@ -182,7 +206,11 @@ export const CreateNotes = ({formik, customer}: Props) => {
             <TabsBody value={tabValue} index={TabIndex.Customer}>
               <CustomerNotes
                 customerId={customerId}
-                setTotal={setCustomerTotalNumbers}
+                notes={customerNotes}
+                isLoading={isLoading}
+                isFetchingNextPage={isFetchingNextPage}
+                hasNextPage={hasNextPage || false}
+                fetchNextPage={fetchNextPage}
               />
             </TabsBody>
           )}

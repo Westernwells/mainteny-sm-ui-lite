@@ -105,7 +105,7 @@ const AttachedFiles = ({
             )}
           </Box>
           <Typography sx={{wordBreak: 'break-all', maxWidth: '250px'}}>
-            {file?.name}
+            {file.description || file?.name}
           </Typography>
           <Box position="relative">
             <Typography variant="caption" color="text.secondary" mr={3}>

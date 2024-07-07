@@ -15,6 +15,7 @@ import HandymanIcon from '@mui/icons-material/Handyman';
 import {grey} from '@mui/material/colors';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {WorkHoursType} from 'models/workHours';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 
 interface Props {
   workHourType?: WorkHoursType;
@@ -82,7 +83,13 @@ export const WorkHourIcons = ({workHourType, style, size}: Props) => {
       return <WbSunnyIcon fontSize={size} sx={{color: '#FFB547', ...style}} />;
     case WorkHoursType.BREAK:
       return <CoffeeIcon fontSize={size} sx={{color: '#00A0CC', ...style}} />;
-
+    case WorkHoursType.OPERATION:
+      return (
+        <RemoveRedEyeIcon
+          fontSize={size}
+          sx={{color: theme.palette.primary.main, ...style}}
+        />
+      );
     default:
       return null;
   }

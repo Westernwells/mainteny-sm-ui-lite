@@ -1973,7 +1973,7 @@
   "Update": "Actualizar",
   "Invoice type": "Tipo de factura",
   "Payment Due Date": "Fecha pendiente de pago",
-  "Service Deliver Date": "Fecha de entrega del servicio",
+  "Delivery date": "Fecha de entrega del servicio",
   "Purchase order no.": "Orden de compra número.",
   "Additional documents": "Documentos adicionales",
   "To (Customer)": "Al (cliente)",
@@ -2640,5 +2640,7 @@
   "Add Discount Option": "Añadir opción de descuento",
   "No articles": "No hay artículos",
   "Add your default articles to be included in every invoice": "Añada sus artículos predeterminados para incluirlos en cada factura",
-  "ARTICLE #": "ARTÍCULO #"
+  "ARTICLE #": "ARTÍCULO #",
+  "They will appear here once the article is added": "Aparecerán aquí una vez añadido el artículo",
+  "OPERATION": "OPERACIÓN"
 }

@@ -48,7 +48,7 @@ export const UnitsWidget = ({customerId, getTotalUnits, openTab}: Props) => {
   );
 
   useEffect(() => {
-    setRows(makeRows(elevatorResource));
+    setRows(makeRows(elevatorResource, t));
     setPageCount(Math.ceil(elevatorResource.total / page.pageSize));
     if (getTotalUnits) {
       getTotalUnits(elevatorResource.total);

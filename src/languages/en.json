@@ -1973,7 +1973,7 @@
   "Update": "Update",
   "Invoice type": "Invoice type",
   "Payment Due Date": "Payment Due Date",
-  "Service Deliver Date": "Service Deliver Date",
+  "Delivery date": "Service Deliver Date",
   "Purchase order no.": "Purchase order no.",
   "Additional documents": "Additional documents",
   "To (Customer)": "To (Customer)",
@@ -2556,5 +2556,6 @@
   "Assigned": "Assigned",
   "Paused": "Paused",
   "Articles Ordered": "Articles Ordered",
-  "Search recipients": "Search recipients"
+  "Search recipients": "Search recipients",
+  "OPERATION": "ELEVATOR OPERATION"
 }

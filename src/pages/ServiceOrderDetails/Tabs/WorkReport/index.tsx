@@ -263,7 +263,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
         }
       | undefined,
   ) => {
-    const fileNames: string[] = [`${report?.id}.pdf`];
+    const fileNames = [`${report?.id}.pdf`];
+    const fileDescriptions = [`${report?.externalId}.pdf`];
     let files: FileWithPreview[] = [];
 
     if (
@@ -273,11 +274,19 @@ export const WorkReport = ({serviceOrder}: Props) => {
       const blob = await fetchFile(
         fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
       );
-      files = await createFilesFromBlobArray([blob], fileNames);
+      files = await createFilesFromBlobArray(
+        [blob],
+        fileNames,
+        fileDescriptions,
+      );
       setExistingFiles(files);
     } else {
       const blobFile = await generateWorkReportPdf();
-      files = await createFilesFromBlobArray([blobFile!], fileNames);
+      files = await createFilesFromBlobArray(
+        [blobFile!],
+        fileNames,
+        fileDescriptions,
+      );
       setExistingFiles(files);
     }
   };
@@ -721,7 +730,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
         confirmBtnLabel="Send Work Report"
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}
-        customExistingFileName={`${report?.externalId}.pdf`}
         email={
           serviceOrder.elevator.propertyOwner?.additionalInfo.billingEmail ||
           serviceOrder.elevator.propertyOwner?.contact.email

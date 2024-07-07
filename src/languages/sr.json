@@ -1965,7 +1965,7 @@
   "Update": "Ažuriranje",
   "Invoice type": "Tip fakture",
   "Payment Due Date": "Isplata do datuma",
-  "Service Deliver Date": "Datum isporuke usluge",
+  "Delivery date": "Datum isporuke usluge",
   "Purchase order no.": "Nalog za kupovinu br.",
   "Additional documents": "Dodatni dokumenti",
   "To (Customer)": "Za (kupac)",
@@ -2631,5 +2631,6 @@
   "No articles": "Nema artikala",
   "Add your default articles to be included in every invoice": "Dodajte svoje podrazumevane artikle koji će biti uključeni u svaku fakturu",
   "ARTICLE #": "# ARTIKLA",
-  "They will appear here once the article is added": "Oni će se pojaviti ovde kada se članak doda"
+  "They will appear here once the article is added": "Oni će se pojaviti ovde kada se članak doda",
+  "OPERATION": "Rad lifta"
 }

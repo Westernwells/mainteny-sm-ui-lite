@@ -5,7 +5,11 @@ import {getColumnProps} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {toDate} from 'utils/datetime';
-import {FormatDate} from 'models/misc';
+import {
+  FormatDate,
+  HeaderFooterInfoData,
+  StringValueResponse,
+} from 'models/misc';
 import {Actions} from 'pages/Invoices/Actions';
 import i18next from 'i18next';
 
@@ -45,7 +49,17 @@ export const getInvoiceStatusStyles = (
   }
 };
 
-export const columns: GridColDef[] = [
+export const columns = (
+  headerInfo: HeaderFooterInfoData,
+  footerInfo: HeaderFooterInfoData,
+  headerUrl: {
+    [key: string]: string;
+  },
+  footerUrl: {
+    [key: string]: string;
+  },
+  companyNextNumber: StringValueResponse | undefined,
+): GridColDef[] => [
   getColumnProps({
     field: 'date',
     headerName: 'date',
@@ -105,7 +119,15 @@ export const columns: GridColDef[] = [
     headerAlign: 'right',
     variant: 'titleCase',
     renderCell: (params) => (
-      <Actions invoice={params.row.invoice} isInvoiceList={false} />
+      <Actions
+        invoice={params.row.invoice}
+        headerInfo={headerInfo}
+        footerInfo={footerInfo}
+        headerUrl={headerUrl}
+        footerUrl={footerUrl}
+        companyNextNumber={companyNextNumber}
+        isInvoiceList={false}
+      />
     ),
     flex: 1,
   }),
