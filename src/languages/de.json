@@ -521,7 +521,7 @@
   "Priority Engineers": "Prioritäts Techniker",
   "e.g. Max Mustermann": "z.B. Max Mustermann",
   "e.g. 1": "z.B. 1",
-  "Notes": "Notizen",
+  "Notes": "Anmerkungen",
   "Note": "Notiz",
   "Enter a note": "Notiz hinzufügen",
   "Pictures": "Bilder",
@@ -1942,7 +1942,7 @@
   "Update": "Aktualisieren",
   "Invoice type": "Rechnungsart",
   "Payment Due Date": "Fälligkeitsdatum",
-  "Service Deliver Date": "Leistungszeitraum",
+  "Delivery date": "Leistungszeitraum",
   "Purchase order no.": "Bestellnummer",
   "Additional documents": "Zusätzliche Dokumente",
   "To (Customer)": "An (Kunde)",
@@ -2608,5 +2608,13 @@
   "No articles": "Keine Artikel",
   "Add your default articles to be included in every invoice": "Füge Artikel hinzu, die automatisiert auf Rechnungen erscheinen sollen",
   "ARTICLE #": "ARTIKEL NR",
-  "They will appear here once the article is added": "Die Artikel werden hier erscheinen, sobald sie hinzugefügt wurden."
+  "They will appear here once the article is added": "Die Artikel werden hier erscheinen, sobald sie hinzugefügt wurden.",
+  "Elevator Operation": "Aufzugswärter",
+  "New Elevator Operation Job": "Neuer Aufzugswärter Auftrag",
+  "Date of credit note": "Gutschriftsdatum",
+  "Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Sende Rechnung {{invoiceNumber}} an {{receiverEmail}} von {{senderName}}",
+  "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Sende Mahnung zu Rechnung {{invoiceNumber}} an {{receiverEmail}} von {{senderName}}",
+  "Invoice delivered": "Rechnung zugestellt",
+  "Overdue notice delivered": "Mahnung zugestellt",
+  "The email was successfully delivered to {{receiverEmail}}": "Die E-Mail wurde erfolgreich an {{receiverEmail}} zugestellt"
 }

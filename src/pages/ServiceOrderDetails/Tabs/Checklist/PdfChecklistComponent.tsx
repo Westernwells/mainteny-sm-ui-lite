@@ -273,7 +273,7 @@ export const PdfChecklistComponent = ({
 
   return (
     <View style={styles.container}>
-      {components.map((component, idx) => (
+      {components?.map((component, idx) => (
         <View key={idx}>{renderComponent(component)}</View>
       ))}
     </View>

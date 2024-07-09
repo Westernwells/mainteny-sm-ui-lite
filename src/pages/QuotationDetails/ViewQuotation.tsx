@@ -291,20 +291,28 @@ export const ViewQuotation = ({
         }
       | undefined,
   ) => {
+    const fileNames = [`${quotation.id}.pdf`];
+    const fileDescriptions = [`${quotation.externalId}.pdf`];
     // if quotation is not DRAFT -> download file from server
     if (quotation.status !== QuotationStatus.DRAFT) {
       const blob = await fetchFile(
         fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
       );
-      const fileNames: string[] = [`${quotation.id}.pdf`];
-      const files = await createFilesFromBlobArray([blob], fileNames);
+      const files = await createFilesFromBlobArray(
+        [blob],
+        fileNames,
+        fileDescriptions,
+      );
       setExistingFiles(files);
 
       // if quotation is DRAFT -> generate file on client
     } else {
       const blob = await generateBlobUrl();
-      const fileNames: string[] = [`${quotation.id}.pdf`];
-      const files = await createFilesFromBlobArray([blob], fileNames);
+      const files = await createFilesFromBlobArray(
+        [blob],
+        fileNames,
+        fileDescriptions,
+      );
       setExistingFiles(files);
     }
   };
@@ -758,7 +766,6 @@ export const ViewQuotation = ({
         content={quotation.description}
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}
-        customExistingFileName={`${quotation.externalId}.pdf`}
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
