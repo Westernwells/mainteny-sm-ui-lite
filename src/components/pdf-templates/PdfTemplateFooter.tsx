@@ -139,7 +139,13 @@ const PdfTemplateFooter = ({
             )}
           </View>
           <View style={styles.footerContent}>
-            <Text style={styles.footerHeading}>{translate('Bank')}:</Text>
+            {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
+              <Text style={styles.footerHeading}>
+                {translate('Bank')}:{' '}
+                {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName}
+              </Text>
+            )}
+
             {userInfo?.serviceCompany?.settings?.paymentInfo?.accountNumber && (
               <Text style={styles.footerSectionBody}>
                 {translate('Acc. nr.')}:{' '}
@@ -178,6 +184,14 @@ const PdfTemplateFooter = ({
                 {userInfo?.serviceCompany?.settings?.vatId}{' '}
               </Text>
             )}
+
+            {userInfo?.serviceCompany?.settings?.taxNumber && (
+              <Text style={styles.footerSectionBody}>
+                {translate('Tax ID')}:{' '}
+                {userInfo?.serviceCompany?.settings?.taxNumber}
+              </Text>
+            )}
+
             {userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
               <Text style={styles.footerSectionBody}>
                 {translate('Certified')}:{' '}

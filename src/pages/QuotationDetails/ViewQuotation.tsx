@@ -636,8 +636,8 @@ export const ViewQuotation = ({
                     }}>
                     <QuotationUnitsDataGrid
                       setRowItem={handleSelectUnit}
-                      searchCustomer={quotation?.elevator?.propertyOwner?.name}
-                      propertyOwnerId={quotation?.elevator?.propertyOwner?.id}
+                      searchCustomer={quotation?.propertyOwner?.name}
+                      propertyOwnerId={quotation?.propertyOwner?.id}
                     />
                   </Dialog>
 

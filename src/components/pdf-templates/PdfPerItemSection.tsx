@@ -1,6 +1,6 @@
 import {Text, View, Font, StyleSheet} from '@react-pdf/renderer';
 import {AggregatedInvoiceItem, InvoiceView} from 'models/invoice';
-import {formatCurrency, centsToMoney} from 'utils/currency';
+import {formatCurrency, centsToMoney, getCurrencySymbol} from 'utils/currency';
 import {Currency} from 'models/misc';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
@@ -93,7 +93,9 @@ const PdfPerItemSection = ({
             textAlign: 'right',
             width: '18%',
           }}>
-          {`${translate('Price')} (${currentCurrency?.symbol})`}
+          {`${translate('Price')} (${
+            getCurrencySymbol[currentCurrency?.code!]
+          })`}
         </Text>
         <Text
           style={{
@@ -109,7 +111,9 @@ const PdfPerItemSection = ({
             textAlign: 'right',
             width: '25%',
           }}>
-          {`${translate('Amount')} (${currentCurrency?.symbol})`}
+          {`${translate('Amount')} (${
+            getCurrencySymbol[currentCurrency?.code!]
+          })`}
         </Text>
       </View>
 

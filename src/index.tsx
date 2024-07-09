@@ -13,6 +13,9 @@ import {App} from './App';
 import {theme} from './theme';
 import './assets/fonts/Aventa/Aventa-Regular.ttf';
 import {LicenseInfo} from '@mui/x-license-pro';
+import BigNumber from 'bignumber.js';
+
+BigNumber.config({DECIMAL_PLACES: 2});
 
 const queryClient = new QueryClient({
   defaultOptions: {

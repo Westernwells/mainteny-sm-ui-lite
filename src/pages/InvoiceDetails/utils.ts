@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import {ArticleView} from 'models/article';
 import {
   ArticleRecord,
@@ -165,20 +166,22 @@ export const getAggregatedItemsVats = (items: InvoiceItemRecord[]) =>
   items.reduce((acc, item) => {
     const {percentageVat} = item.unitAmount;
 
-    const vat =
-      (item.unitAmount.netAmount /
-        10 ** Currencies[item.unitAmount.currency]!) *
-      (percentageVat / 100) *
-      item.quantity;
+    const vat = new BigNumber(item.unitAmount.netAmount)
+      .dividedBy(new BigNumber(10).pow(Currencies[item.unitAmount.currency]!))
+      .multipliedBy(new BigNumber(percentageVat).dividedBy(100))
+      .multipliedBy(item.quantity)
+      .decimalPlaces(2);
 
     const foundPercentageVat = acc.find(
       (i) => i.percentageVat === percentageVat,
     );
 
     if (foundPercentageVat) {
-      foundPercentageVat.vat += vat;
+      foundPercentageVat.vat = new BigNumber(foundPercentageVat.vat)
+        .plus(vat)
+        .toNumber();
     } else {
-      acc.push({percentageVat, vat});
+      acc.push({percentageVat, vat: vat.toNumber()});
     }
 
     return acc;
@@ -240,17 +243,17 @@ export const applyGlobalDiscountOnItems = (
   return arr.map((item) => {
     const portion =
       item.unitAmount.netAmount === total
-        ? 1
-        : item.unitAmount.netAmount / total;
-    const discount = globalDiscountAmount * portion;
+        ? 1.0
+        : new BigNumber(item.unitAmount.netAmount).dividedBy(total).toNumber();
+    const discount = new BigNumber(globalDiscountAmount).times(portion);
+    const netAfterGlobalDiscount = new BigNumber(
+      item.unitAmount.netAmount,
+    ).minus(discount);
     return {
       ...item,
       unitAmount: {
         ...item.unitAmount,
-        netAmount: applyDiscount({
-          actualValue: item.unitAmount.netAmount,
-          amount: discount,
-        }),
+        netAmount: netAfterGlobalDiscount.toNumber(),
       },
     };
   });
@@ -432,9 +435,7 @@ export const formatInvoiceViewToUpdateInvoice = (
             ? {
                 ...discount?.amount,
                 currency: discount?.amount?.currency!,
-                value:
-                  (discount?.amount?.value ?? 0) *
-                  10 ** (discount?.amount?.fractionDigits ?? 2),
+                value: discount?.amount?.value ?? 0,
               }
             : undefined,
       },

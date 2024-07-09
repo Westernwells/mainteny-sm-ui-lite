@@ -343,7 +343,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
     initialValues: {
       articles: articleViewToArticleRecord(articles),
-      description: '',
+      description: report?.description ?? '',
       startTime: serviceOrder?.actualStartTime,
       endTime: serviceOrder?.actualEndTime,
       travelStartTime: serviceOrder?.travelStartTime,
@@ -470,9 +470,11 @@ export const WorkReport = ({serviceOrder}: Props) => {
         report?.additionalInfo.travelTimeInfo?.percentageSurcharge ?? 0,
       timeSlots: report?.additionalInfo.travelTimeInfo?.timeSlots ?? [],
     });
+    formik.setFieldValue('description', report?.description || '');
   }, [
     report?.additionalInfo.workTimeInfo,
     report?.additionalInfo.travelTimeInfo,
+    report?.description,
   ]);
 
   useEffect(() => {
@@ -633,6 +635,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
             html={formik.values.description || ''}
             updateHtml={(h) => formik.setFieldValue('description', h)}
             minRows={4}
+            disabled={!isEditMode}
           />
         </Box>
 
