@@ -2643,5 +2643,11 @@
   "ARTICLE #": "ARTÍCULO #",
   "They will appear here once the article is added": "Aparecerán aquí una vez añadido el artículo",
   "Elevator Operation": "Manejo de ascensores",
-  "New Elevator Operation Job": "Nuevo trabajo manejo de ascensores"
+  "New Elevator Operation Job": "Nuevo trabajo manejo de ascensores",
+  "Date of credit note": "Fecha de la nota de crédito",
+  "Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Enviando factura {{invoiceNumber}} a {{receiverEmail}} por {{senderName}}",
+  "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Enviando aviso de demora {{invoiceNumber}} a {{receiverEmail}} por {{senderName}}",
+  "Invoice delivered": "Factura entregada",
+  "Overdue notice delivered": "Aviso de demora entregado",
+  "The email was successfully delivered to {{receiverEmail}}": "El correo electrónico se ha enviado correctamente a {{receiverEmail}}"
 }

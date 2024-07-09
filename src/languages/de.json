@@ -2610,5 +2610,11 @@
   "ARTICLE #": "ARTIKEL NR",
   "They will appear here once the article is added": "Die Artikel werden hier erscheinen, sobald sie hinzugefügt wurden.",
   "Elevator Operation": "Aufzugswärter",
-  "New Elevator Operation Job": "Neuer Aufzugswärter Auftrag"
+  "New Elevator Operation Job": "Neuer Aufzugswärter Auftrag",
+  "Date of credit note": "Gutschriftsdatum",
+  "Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Sende Rechnung {{invoiceNumber}} an {{receiverEmail}} von {{senderName}}",
+  "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Sende Mahnung zu Rechnung {{invoiceNumber}} an {{receiverEmail}} von {{senderName}}",
+  "Invoice delivered": "Rechnung zugestellt",
+  "Overdue notice delivered": "Mahnung zugestellt",
+  "The email was successfully delivered to {{receiverEmail}}": "Die E-Mail wurde erfolgreich an {{receiverEmail}} zugestellt"
 }
