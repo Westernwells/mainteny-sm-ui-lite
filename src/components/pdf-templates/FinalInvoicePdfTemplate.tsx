@@ -1,22 +1,19 @@
+import {useMemo} from 'react';
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import {centsToMoney, formatCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
-import {fixRounding, formatCostText} from 'utils/utils';
+import {formatCostText} from 'utils/utils';
+import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {
-  calculateSameVatTotals,
-  calculateTotalWithPerItemDiscount,
-} from 'utils/calculate-total';
-import {
-  applyDiscount,
   applyGlobalDiscountOnItems,
   applyPerItemDiscountOnItems,
-  getAggregatedItemsVats,
+  stripHtmlTags,
 } from 'pages/InvoiceDetails/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {ArticleType} from 'models/article';
@@ -157,12 +154,10 @@ type ArticleSectionProps = {
   allItemsHaveZeroDiscount: boolean;
   discountValue: number;
   subtotalExclVatFormatted: string;
-  allItemsHasSameVAT: boolean;
   percentageVats: {
     percentageVat: number;
     vat: number;
   }[];
-  totalVAT: number;
   total: number;
   selectedLng?: string;
   netTotal: (articleItem: InvoiceItem) => number;
@@ -198,9 +193,7 @@ export const ArticleSection = ({
   allItemsHaveZeroDiscount,
   discountValue,
   subtotalExclVatFormatted,
-  allItemsHasSameVAT,
   percentageVats,
-  totalVAT,
   total,
   selectedLng,
   netTotal,
@@ -211,7 +204,7 @@ export const ArticleSection = ({
 
   const styles = getStyles(boldFontStyle);
   return (
-    <View style={styles.table} wrap={false}>
+    <View style={styles.table}>
       <View style={styles.tableHead}>
         <View style={{...styles.tableRow, width: '100%'}}>
           <TableHeading text="#" width="2%" textAlign="left" />
@@ -232,7 +225,9 @@ export const ArticleSection = ({
             textAlign="center"
           />
           <TableHeading
-            text={`${translate('Price')} (${currentCurrency?.symbol})`}
+            text={`${translate('Price')} (${
+              getCurrencySymbol[currentCurrency?.code!]
+            })`}
             width="15%"
             textAlign="right"
             marginLeft={5}
@@ -245,7 +240,9 @@ export const ArticleSection = ({
             />
           )}
           <TableHeading
-            text={`${translate('Total')} (${currentCurrency?.symbol})`}
+            text={`${translate('Total')} (${
+              getCurrencySymbol[currentCurrency?.code!]
+            })`}
             width={allItemsHaveZeroDiscount ? '28%' : '15%'}
             textAlign="right"
           />
@@ -344,7 +341,7 @@ export const ArticleSection = ({
                         )}
                     {articleItem?.additionalInfo?.discount?.type ===
                     DiscountType.AMOUNT
-                      ? currentCurrency?.symbol
+                      ? getCurrencySymbol[currentCurrency?.code!]
                       : '%'}
                   </Text>
                 )}
@@ -372,7 +369,7 @@ export const ArticleSection = ({
         </View>
       )}
 
-      <View>
+      <View wrap={false}>
         {discountValue && (
           <View style={styles.tableRow}>
             <Text style={{width: '44%'}} />
@@ -383,7 +380,7 @@ export const ArticleSection = ({
                 fontSize: 10,
                 textAlign: 'right',
               }}>{`${translate('Discount')} (${
-              currentCurrency?.symbol
+              getCurrencySymbol[currentCurrency?.code!]
             })`}</Text>
             <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
               {discountValue > 0 ? '-' : ''}
@@ -412,8 +409,8 @@ export const ArticleSection = ({
           </Text>
         </View>
         <View>
-          {allItemsHasSameVAT ? (
-            <View style={styles.tableRow}>
+          {percentageVats.map((v, index) => (
+            <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
               <Text style={{width: '44%'}} />
               <Text
                 style={{
@@ -421,43 +418,12 @@ export const ArticleSection = ({
                   color: '#616161',
                   fontSize: 10,
                   textAlign: 'right',
-                }}>{`${translate('VAT')} ${
-                percentageVats[0].percentageVat
-              }%`}</Text>
+                }}>{`${translate('VAT')} ${v.percentageVat}%`}</Text>
               <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-                {formatCurrency(totalVAT, {
-                  currency: currentCurrency?.code,
-                  excludeCurrencySymbol: true,
-                  currencySymbol: currentCurrency?.symbol,
-                  companyLang: selectedLng,
-                })}
+                {v.vat}
               </Text>
             </View>
-          ) : (
-            percentageVats.map((v, index) => (
-              <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
-                <Text style={{width: '44%'}} />
-                <Text
-                  style={{
-                    width: '32%',
-                    color: '#616161',
-                    fontSize: 10,
-                    textAlign: 'right',
-                  }}>{`${translate('VAT')} ${v.percentageVat}%`}</Text>
-                <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-                  {formatCurrency(fixRounding(v.vat, 2), {
-                    currency: currentCurrency?.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                    excludeCurrencySymbol: true,
-                    companyLang: selectedLng,
-                    currencySymbol: currentCurrency?.symbol,
-                  })}
-                </Text>
-              </View>
-            ))
-          )}
+          ))}
         </View>
         <View style={styles.tableRow}>
           <Text style={{width: '44%'}} />
@@ -469,7 +435,7 @@ export const ArticleSection = ({
               textAlign: 'right',
               fontSize: 10,
             }}>{`${translate('Total incl. VAT')} (${
-            currentCurrency?.symbol
+            getCurrencySymbol[currentCurrency?.code!]
           })`}</Text>
           <Text
             style={{
@@ -509,47 +475,12 @@ const FinalInvoicePdfTemplate = ({
     discount: getDiscoutObj(item?.additionalInfo?.discount),
   }));
 
-  const subtotalExclVat = calculateTotalWithPerItemDiscount(articleItems);
-
-  const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
-    currency: currentCurrency?.code,
-    excludeCurrencySymbol: true,
-    currencySymbol: currentCurrency?.symbol,
-    companyLang: selectedLng,
-  });
-
-  const subtotalExclVatAfterDiscount = applyDiscount({
-    actualValue: subtotalExclVat,
-    ...(invoice.additionalInfo.discount?.type === DiscountType.AMOUNT
-      ? {amount: invoice.additionalInfo.discount?.amount?.value ?? 0}
-      : {percentage: invoice.additionalInfo.discount?.percentage ?? 0}),
-  });
-
   const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
 
   const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
     itemsAfterPerItemDiscount,
     invoice.additionalInfo.discount,
   );
-
-  const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
-    (item) =>
-      item.unitAmount.percentageVat ===
-      articleItems[0].unitAmount.percentageVat,
-  );
-
-  const percentageVats = itemsAfterGlobalDiscount.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
-            vat:
-              subtotalExclVatAfterDiscount *
-              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
-          },
-        ]
-      : getAggregatedItemsVats(itemsAfterGlobalDiscount)
-    : [];
 
   const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
   const discountAmount = discount?.amount;
@@ -573,7 +504,25 @@ const FinalInvoicePdfTemplate = ({
       item?.additionalInfo?.discount?.percentage === 0,
   );
 
-  const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
+  const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} =
+    useMemo(
+      () =>
+        calculateInvoiceAmount({
+          items: articleItems,
+          globalDiscount: discount,
+        }),
+      [articleItems, discount],
+    );
+
+  const amountAfterGlobalDiscountFormatted = formatCurrency(
+    amountAfterGlobalDiscount,
+    {
+      currency: currentCurrency?.code,
+      excludeCurrencySymbol: true,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
+    },
+  );
 
   const laborCost = useCalculateLaborMaterialCost(
     itemsAfterGlobalDiscount,
@@ -644,11 +593,9 @@ const FinalInvoicePdfTemplate = ({
                 translate={translate}
                 allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
                 discountValue={discountValue}
-                subtotalExclVatFormatted={subtotalExclVatFormatted}
-                allItemsHasSameVAT={allItemsHasSameVAT}
-                percentageVats={percentageVats}
-                totalVAT={totalVAT}
-                total={total}
+                subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
+                percentageVats={vats}
+                total={amountAfterGlobalDiscountWithVAT}
                 selectedLng={selectedLng}
                 netTotal={netTotal}
               />
@@ -663,26 +610,29 @@ const FinalInvoicePdfTemplate = ({
               articleItems={articleItems}
             />
 
-            {invoice?.additionalInfo?.moreInfo?.trim() && (
-              <View wrap={false}>
-                <Text style={styles.sectionHeading}>{translate('Notes')}</Text>
-                <HtmlPDF
-                  html={formatCostText(
-                    invoice?.additionalInfo?.moreInfo,
-                    `${formatCurrency(laborCost, {
-                      currency: currentCurrency?.code,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    })}`,
-                    `${formatCurrency(materialCost, {
-                      currency: currentCurrency?.code,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    })}`,
-                  )}
-                />
-              </View>
-            )}
+            {invoice?.additionalInfo?.moreInfo &&
+              stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
+                <View wrap={false}>
+                  <Text style={styles.sectionHeading}>
+                    {translate('Notes')}
+                  </Text>
+                  <HtmlPDF
+                    html={formatCostText(
+                      invoice?.additionalInfo?.moreInfo,
+                      `${formatCurrency(laborCost, {
+                        currency: currentCurrency?.code,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      })}`,
+                      `${formatCurrency(materialCost, {
+                        currency: currentCurrency?.code,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      })}`,
+                    )}
+                  />
+                </View>
+              )}
           </View>
         </PdfBodyContainer>
 

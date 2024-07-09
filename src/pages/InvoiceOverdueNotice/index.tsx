@@ -231,7 +231,7 @@ export const InvoiceOverdueNotice = () => {
               ...obj,
               type: obj.type,
               uri: `${uploadPath}/${obj.name}`,
-              description: obj.name.split('.')[0],
+              description: `${obj.name}`,
             },
           ],
           [],

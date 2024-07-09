@@ -198,6 +198,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     downloadUrl ? Object.values(downloadUrl)[0] : '',
   );
 
+  const [actionType, setActionType] = useState<string>('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -667,6 +668,18 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   }, [invoice, companyNextNumber]);
 
+  const handleDownload = async () => {
+    setActionType('DOWNLOAD');
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      await generateBlobUrl(invoice, headerUrl, footerUrl);
+    } else {
+      await refetchDownloadUrl();
+      setFilePathToDownload(
+        downloadUrl ? downloadUrl?.[invoice.additionalInfo.pdfPath!]! : '',
+      );
+    }
+  };
+
   const actions = useMemo(() => {
     const items = [];
 
@@ -735,7 +748,21 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     return items;
   }, [downloadUrl, invoice.status, t]);
 
-  const [actionType, setActionType] = useState('');
+  useEffect(() => {
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      if (filePathToDownload && actionType === 'DOWNLOAD') {
+        downloadFile();
+        setFilePathToDownload('');
+        setActionType('');
+      }
+    } else if (
+      actionType === 'DOWNLOAD' &&
+      downloadUrl?.[invoice.additionalInfo.pdfPath!]
+    ) {
+      downloadFile();
+      setActionType('');
+    }
+  }, [actionType]);
 
   useEffect(() => {
     if (memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT) {
@@ -927,10 +954,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     sx: {
                       background: 'transparent',
                     },
-                    onClick: downloadFile,
-                    disabled:
-                      invoice!.additionalInfo.pdfGenerationStatus !==
-                        PdfGenerationStatus.DONE || isLoadingDownloadUrl,
+                    onClick: handleDownload,
                     startIcon: <FileDownloadIcon />,
                   }}
                 />

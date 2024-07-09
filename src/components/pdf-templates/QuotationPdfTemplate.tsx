@@ -1,9 +1,8 @@
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
-import {ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
-import {formatCurrency} from 'utils/currency';
+import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {QuotationItem, QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -21,6 +20,7 @@ import {
   getQuotationAggregatedItemsVats,
 } from 'pages/QuotationDetails/utils';
 import {calculateSameVatTotals} from 'utils/calculate-total';
+import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
@@ -170,7 +170,6 @@ type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
-  serviceOrder?: ServiceOrderView;
   quotation?: QuotationView;
   selectedLng?: string;
   headerInfo: HeaderFooterInfoData;
@@ -184,7 +183,6 @@ const QuotationPdfTemplate = React.memo(
     translate,
     userInfo,
     currentCurrency,
-    serviceOrder,
     quotation,
     selectedLng,
     headerInfo,
@@ -345,11 +343,11 @@ const QuotationPdfTemplate = React.memo(
                   </View>
                 )}
 
-                {serviceOrder?.meta.createdAt && (
+                {quotation?.additionalInfo.expiryDate && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Valid until')}</Text>
                     <Text style={styles.tagContent}>
-                      {formatDate(serviceOrder?.meta.createdAt)}
+                      {formatDate(quotation?.additionalInfo.expiryDate)}
                     </Text>
                   </View>
                 )}
@@ -441,7 +439,9 @@ const QuotationPdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {`${translate('Price')} (${currentCurrency?.symbol})`}
+                      {`${translate('Price')} (${
+                        getCurrencySymbol[currentCurrency?.code!]
+                      })`}
                     </Text>
                     {!allItemsHaveZeroDiscount && (
                       <Text
@@ -461,7 +461,9 @@ const QuotationPdfTemplate = React.memo(
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {`${translate('Total')} (${currentCurrency?.symbol})`}
+                      {`${translate('Total')} (${
+                        getCurrencySymbol[currentCurrency?.code!]
+                      })`}
                     </Text>
                   </View>
                 </View>
@@ -547,7 +549,7 @@ const QuotationPdfTemplate = React.memo(
                                   10 ** 2}
                               {articleItem?.additionalInfo?.discount?.type ===
                               DiscountType.AMOUNT
-                                ? currentCurrency?.symbol
+                                ? getCurrencySymbol[currentCurrency?.code!]
                                 : '%'}
                             </Text>
                           )}
@@ -588,7 +590,7 @@ const QuotationPdfTemplate = React.memo(
                           textAlign: 'right',
                         }}>
                         {`${translate('Discount')} (${
-                          currentCurrency?.symbol
+                          getCurrencySymbol[currentCurrency?.code!]
                         })`}
                       </Text>
                       <Text
@@ -704,7 +706,7 @@ const QuotationPdfTemplate = React.memo(
                         fontSize: 10,
                       }}>
                       {`${translate('Total incl. VAT')} (${
-                        currentCurrency?.symbol
+                        getCurrencySymbol[currentCurrency?.code!]
                       })`}
                     </Text>
                     <Text
@@ -737,14 +739,15 @@ const QuotationPdfTemplate = React.memo(
                 </View>
               )}
 
-              {quotation?.additionalInfo?.notes?.trim() && (
-                <View>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Notes')}
-                  </Text>
-                  <HtmlPDF html={quotation?.additionalInfo?.notes || ''} />
-                </View>
-              )}
+              {quotation?.additionalInfo?.notes &&
+                stripHtmlTags(quotation?.additionalInfo?.notes) && (
+                  <View>
+                    <Text style={styles.sectionHeading}>
+                      {translate('Notes')}
+                    </Text>
+                    <HtmlPDF html={quotation?.additionalInfo?.notes || ''} />
+                  </View>
+                )}
 
               <View wrap={false} style={styles.signatureBoxWrap}>
                 <Text style={styles.sectionHeading}>

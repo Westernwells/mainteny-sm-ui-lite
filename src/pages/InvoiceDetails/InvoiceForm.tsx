@@ -1,5 +1,4 @@
 import {useContext, useEffect, useMemo, useState} from 'react';
-import {t} from 'i18next';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -236,12 +235,6 @@ const invoiceItemToInvoiceItemRecord = (
   return getItemRecord(record, record.unitAmount.percentageVat);
 };
 
-const DEFAULT_LABOR_COST_TEXT = t('Labor costs without VAT: {LABOR_COST}');
-const DEFAULT_MATERIAL_COST_TEXT = t(
-  'Material costs without VAT: {MATERIAL_COST}',
-);
-const DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT = `${DEFAULT_LABOR_COST_TEXT}\n${DEFAULT_MATERIAL_COST_TEXT}`;
-
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
@@ -254,6 +247,19 @@ export const InvoiceForm = ({
   customer: customerByProp,
   serviceCompanyType,
 }: Props) => {
+  const {t} = useTranslation();
+  const DEFAULT_LABOR_COST_TEXT = useMemo(
+    () => t('Labor costs without VAT: {LABOR_COST}'),
+    [t],
+  );
+  const DEFAULT_MATERIAL_COST_TEXT = useMemo(
+    () => t('Material costs without VAT: {MATERIAL_COST}'),
+    [t],
+  );
+  const DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT = useMemo(
+    () => `${DEFAULT_LABOR_COST_TEXT}\n${DEFAULT_MATERIAL_COST_TEXT}`,
+    [DEFAULT_LABOR_COST_TEXT, DEFAULT_MATERIAL_COST_TEXT],
+  );
   const navigate = useNavigate();
   const {language: selectedLng} = useContext(LanguageContext);
   const {company} = useContext(UserCompanyContext);
@@ -569,6 +575,9 @@ export const InvoiceForm = ({
         setResetDueDatePicker(true);
       }
     }
+
+    formik.setFieldValue('costCenter', row.additionalInfo.costCenter);
+
     // If the chosen customer was already set as the property owner of the invoice
     if (row.id !== invoice?.propertyOwner.id) {
       const emptyAddressState = {fullName: null};
@@ -833,7 +842,10 @@ export const InvoiceForm = ({
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
       if (!formik.values.description && serviceOrder.report?.description) {
-        formik.setFieldValue('description', serviceOrder.report.description);
+        formik.setFieldValue(
+          'description',
+          stripHtmlTags(serviceOrder.report.description),
+        );
       }
       formik.setFieldValue(
         'customerSpecificOrderNumber',
@@ -877,6 +889,10 @@ export const InvoiceForm = ({
       setCustomer(serviceOrderCustomer);
     }
   }, [serviceOrder]);
+
+  useEffect(() => {
+    formik.setFieldValue('moreInfo', DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT);
+  }, [DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT]);
 
   const isDueDateInPast = () => {
     const localDueDate = formik.values.dueDate as Date;
@@ -1027,6 +1043,8 @@ export const InvoiceForm = ({
       handleSelectCustomer(value);
     } else {
       setCustomer(undefined);
+      formik.setFieldValue('costCenter', '');
+      formik.setFieldValue('paymentTerm', {term: ''});
     }
   };
 

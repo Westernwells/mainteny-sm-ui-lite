@@ -603,6 +603,11 @@ export const Actions = ({
     }
   };
 
+  const handleOpenPaymentDialog = () => {
+    setIsDialogOpen(true);
+    setSelectedInvoice(invoice);
+  };
+
   const handleOpenSendInvoiceModal = useCallback(() => {
     const errorMessage = validateDueDate(invoice);
 
@@ -672,7 +677,7 @@ export const Actions = ({
     if (invoice.status === InvoiceStatus.NOT_PAID) {
       return (
         <Tooltip title={t('Payment')} placement="left" arrow>
-          <IconButton onClick={() => setIsDialogOpen(true)}>
+          <IconButton onClick={handleOpenPaymentDialog}>
             <Payments fontSize="small" sx={{color: 'action.active'}} />
           </IconButton>
         </Tooltip>
@@ -701,7 +706,6 @@ export const Actions = ({
           onClick: async () => {
             setIsConfirmPrintDialogOpen(true);
             setSelectedInvoice(invoice);
-
             refetchDownloadUrl();
           },
         },
@@ -733,7 +737,7 @@ export const Actions = ({
         {
           label: t('Payment'),
           icon: <Payments />,
-          onClick: () => setIsDialogOpen(true),
+          onClick: () => handleOpenPaymentDialog(),
         },
         {
           label: t('Create Credit note'),
@@ -760,7 +764,7 @@ export const Actions = ({
         {
           label: t('Payment'),
           icon: <Payments />,
-          onClick: () => setIsDialogOpen(true),
+          onClick: () => handleOpenPaymentDialog(),
         },
         {
           label: t('Create Credit note'),
@@ -798,7 +802,7 @@ export const Actions = ({
         {
           label: t('Payment'),
           icon: <Payments />,
-          onClick: () => setIsDialogOpen(true),
+          onClick: () => handleOpenPaymentDialog(),
         },
         {
           label: t('Send Overdue Notice'),
@@ -824,7 +828,7 @@ export const Actions = ({
         {
           label: t('Payment'),
           icon: <Payments />,
-          onClick: () => setIsDialogOpen(true),
+          onClick: () => handleOpenPaymentDialog(),
         },
         {
           label: t('Print'),
@@ -832,7 +836,6 @@ export const Actions = ({
           onClick: async () => {
             setIsConfirmPrintDialogOpen(true);
             setSelectedInvoice(invoice);
-
             refetchDownloadUrl();
           },
         },
@@ -1070,12 +1073,17 @@ export const Actions = ({
         ))}
       </Menu>
 
-      <MarkAsPaidDialog
-        invoice={invoice}
-        open={isDialogOpen}
-        onConfirm={() => setIsDialogOpen(false)}
-        onClose={() => setIsDialogOpen(false)}
-      />
+      {selectedInvoice && (
+        <MarkAsPaidDialog
+          invoice={selectedInvoice!}
+          open={isDialogOpen}
+          onConfirm={() => setIsDialogOpen(false)}
+          onClose={() => {
+            setIsDialogOpen(false);
+            setSelectedInvoice(null);
+          }}
+        />
+      )}
 
       <SendEmailDialog
         open={isSendEmailDialogOpen}

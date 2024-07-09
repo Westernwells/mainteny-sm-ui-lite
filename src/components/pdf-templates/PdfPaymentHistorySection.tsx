@@ -1,6 +1,6 @@
 import {View, Font, Text, StyleSheet} from '@react-pdf/renderer';
 import {InvoiceView, InvoiceType} from 'models/invoice';
-import {formatCurrency} from 'utils/currency';
+import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {formatDate, toDate} from 'utils/datetime';
 import {Currency} from 'models/misc';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -231,7 +231,7 @@ export const PdfPaymentHistorySection = ({
             }}>
             <Text style={{width: '60%', textAlign: 'left', ...boldFontStyle}}>
               {`${translate('Outstanding payments')} (${
-                currentCurrency?.symbol
+                getCurrencySymbol[currentCurrency?.code!]
               })`}
             </Text>
             <Text style={{width: '10%', textAlign: 'right'}} />
