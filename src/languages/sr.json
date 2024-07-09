@@ -2632,5 +2632,7 @@
   "Add your default articles to be included in every invoice": "Dodajte svoje podrazumevane artikle koji će biti uključeni u svaku fakturu",
   "ARTICLE #": "# ARTIKLA",
   "They will appear here once the article is added": "Oni će se pojaviti ovde kada se članak doda",
-  "Elevator Operation": "Rad lifta"
+  "Elevator Operation": "Rad lifta",
+  "New Elevator Operation Job": "Novi posao o radu lifta",
+  "Date of credit note": "Datum kreditne note"
 }
