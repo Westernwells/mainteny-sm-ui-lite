@@ -1,4 +1,5 @@
 import {formatISO} from 'date-fns';
+import BigNumber from 'bignumber.js';
 import * as Yup from 'yup';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import lodash from 'lodash';
@@ -321,9 +322,13 @@ export const stringToTitleCase = (textString: string) =>
 
 // https://stackoverflow.com/a/10880710/9183715
 export const fixRounding = (value: number, precision: number) => {
-  const power = 10 ** (precision || 0);
-  const sign = Math.sign(value);
-  return (sign * Math.round(Math.abs(value) * power)) / power;
+  const power = new BigNumber(10).pow(precision || 0);
+  return new BigNumber(value)
+    .times(power)
+    .integerValue(BigNumber.ROUND_DOWN)
+    .dividedBy(power)
+    .decimalPlaces(2)
+    .toNumber();
 };
 
 export const isJson = (item: string) => {
