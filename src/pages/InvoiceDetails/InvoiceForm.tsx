@@ -653,14 +653,8 @@ export const InvoiceForm = ({
     const getTranslatedSubject = () => {
       switch (invoiceType) {
         case InvoiceType.CREDIT_NOTE:
-          if (!serviceOrder) {
-            return t('Credit note for {{invoiceNumber}}', {
-              invoiceNumber: invoice?.number || '',
-            });
-          }
-          return t('{{jobType}} - Credit note for {{invoiceNumber}}', {
-            invoiceNumber: invoice?.number ?? '',
-            jobType: t(capitalize([serviceOrder?.type])) ?? '',
+          return t('Credit note for {{invoiceNumber}}', {
+            invoiceNumber: invoice?.number || '',
           });
 
         case InvoiceType.FINAL:
@@ -680,7 +674,7 @@ export const InvoiceForm = ({
       }
     };
 
-    return invoice?.subject ?? getTranslatedSubject();
+    return formType === 'new' ? getTranslatedSubject() : invoice?.subject;
   };
 
   useEffect(() => {
