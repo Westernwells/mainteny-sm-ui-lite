@@ -2642,5 +2642,6 @@
   "Add your default articles to be included in every invoice": "Añada sus artículos predeterminados para incluirlos en cada factura",
   "ARTICLE #": "ARTÍCULO #",
   "They will appear here once the article is added": "Aparecerán aquí una vez añadido el artículo",
-  "Elevator Operation": "Manejo de ascensores"
+  "Elevator Operation": "Manejo de ascensores",
+  "New Elevator Operation Job": "Nuevo trabajo manejo de ascensores"
 }
