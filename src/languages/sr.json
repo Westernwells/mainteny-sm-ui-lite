@@ -2634,5 +2634,10 @@
   "They will appear here once the article is added": "Oni će se pojaviti ovde kada se članak doda",
   "Elevator Operation": "Rad lifta",
   "New Elevator Operation Job": "Novi posao o radu lifta",
-  "Date of credit note": "Datum kreditne note"
+  "Date of credit note": "Datum kreditne note",
+  "Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Slanje fakture {{invoiceNumber}} na {{receiverEmail}} od strane {{senderName}}",
+  "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Slanje opomene o kašnjenju {{invoiceNumber}} na {{receiverEmail}} od strane {{senderName}}",
+  "Invoice delivered": "Faktura isporučena",
+  "Overdue notice delivered": "Opomena isporučena",
+  "The email was successfully delivered to {{receiverEmail}}": "Imejl je uspešno isporučen na {{receiverEmail}}"
 }
