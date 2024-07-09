@@ -81,6 +81,7 @@ export enum ServiceOrderType {
   NEW_INSTALLATION = 'NEW_INSTALLATION',
   MODERNIZATION = 'MODERNIZATION',
   GENERAL = 'GENERAL',
+  OPERATION = 'OPERATION',
 }
 
 export enum ServiceOrderTypeKeys {
@@ -92,6 +93,7 @@ export enum ServiceOrderTypeKeys {
   'Installation' = ServiceOrderType.NEW_INSTALLATION,
   'Modernization' = ServiceOrderType.MODERNIZATION,
   'General' = ServiceOrderType.GENERAL,
+  'Operation' = ServiceOrderType.OPERATION,
 }
 
 export const ServiceOrderLabels: Record<ServiceOrderTypeKeys, string> = {
@@ -103,6 +105,7 @@ export const ServiceOrderLabels: Record<ServiceOrderTypeKeys, string> = {
   [ServiceOrderTypeKeys.Installation]: 'New Installation',
   [ServiceOrderTypeKeys.Modernization]: 'Modernization',
   [ServiceOrderTypeKeys.General]: 'General',
+  [ServiceOrderTypeKeys.Operation]: 'Elevator Operation',
 } as const;
 
 export enum ServiceOrderOrderField {

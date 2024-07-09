@@ -7,13 +7,13 @@ import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
 import UploadIcon from '@mui/icons-material/Upload';
 import HandymanIcon from '@mui/icons-material/Handyman';
-
 import {ReactComponent as EmergencyIcon} from 'assets/icons/Emergency.svg';
 import {ReactComponent as RegularIcon} from 'assets/icons/Regular.svg';
 import {ReactComponent as CalloutIcon} from 'assets/icons/Callout.svg';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {ServiceOrderType} from 'models/service-order';
 import {useTranslation} from 'react-i18next';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 
 type Props = {
   values: any;
@@ -59,6 +59,10 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
     GENERAL: {
       label: ServiceOrderType.GENERAL,
       checked: values.serviceOrderTypes.includes(ServiceOrderType.GENERAL),
+    },
+    OPERATION: {
+      label: ServiceOrderType.OPERATION,
+      checked: values.serviceOrderTypes.includes(ServiceOrderType.OPERATION),
     },
   });
 
@@ -180,6 +184,22 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
             }}
           />
           <Typography variant="body2">{t('General')}</Typography>
+        </Box>
+      ),
+    },
+    {
+      checked: serviceOrderTypes.OPERATION.checked,
+      name: serviceOrderTypes.OPERATION.label,
+      label: (
+        <Box display="flex" alignItems="center">
+          <RemoveRedEyeIcon
+            style={{
+              color: theme.palette.primary.main,
+              height: '1em',
+              marginRight: '0.25em',
+            }}
+          />
+          <Typography variant="body2">{t('Elevator Operation')}</Typography>
         </Box>
       ),
     },

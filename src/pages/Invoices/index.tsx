@@ -24,9 +24,12 @@ import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {DataSyncType} from 'models/service-company';
+import {DataSyncType, ServiceCompanyNumberType} from 'models/service-company';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';
-import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyNextNumber,
+  useCompanyXeroInfo,
+} from 'hooks/reactQuery/useCompanies';
 import {Alert, Typography} from '@mui/material';
 import {theme} from 'theme';
 import {useTranslation} from 'react-i18next';
@@ -34,6 +37,8 @@ import {useSearchValues} from 'hooks/useSearchValues';
 import {Widget} from 'components/Widget';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {OrderByParams} from 'models/misc';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
 const pageSize = 25;
@@ -74,6 +79,34 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     syncType: DataSyncType.INVOICE,
   });
 
+  const {data: companyNextNumber} = useCompanyNextNumber(
+    {
+      type: ServiceCompanyNumberType.INVOICE,
+    },
+    user?.userAccount.serviceCompany.id,
+    true,
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: user?.userAccount.serviceCompany.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo?.path] : [],
+    undefined,
+    user?.userAccount.serviceCompany.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo?.path] : [],
+    undefined,
+    user?.userAccount.serviceCompany.id,
+  );
+
   const {
     data: allInvoiceResource = createEmptyResource<InvoiceView>(10),
     isLoading: isLoadingAllInvoiceResource,
@@ -93,7 +126,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       ...(sortOrder && {order: sortOrder}),
       ...(orderByField && {orderByField}),
     },
-    {keepPreviousData: true},
+    {keepPreviousData: true, refetchOnWindowFocus: true},
   );
 
   const {
@@ -250,7 +283,13 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
       </Alert>
       <DataGridLayout
         rows={rows || []}
-        columns={columns()}
+        columns={columns(
+          headerInfo,
+          footerInfo,
+          headerUrl,
+          footerUrl,
+          companyNextNumber,
+        )}
         loading={isFetching}
         scrollToTop={search}
         pageSize={page.pageSize}

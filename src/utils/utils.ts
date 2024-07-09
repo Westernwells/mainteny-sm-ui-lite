@@ -477,6 +477,7 @@ export const scrollTableToBottom = () => {
 export const createFilesFromBlobArray = async (
   blobs: Blob[],
   fileNames: string[],
+  fileDescriptions?: string[],
 ): Promise<FileWithPreview[]> => {
   const files: FileWithPreview[] = [];
   blobs.forEach((blob, index) => {
@@ -484,6 +485,7 @@ export const createFilesFromBlobArray = async (
       type: blob.type,
     }) as FileWithPreview;
     file.preview = URL.createObjectURL(blob);
+    file.description = fileDescriptions?.[index];
     files.push(file);
   });
   return files;

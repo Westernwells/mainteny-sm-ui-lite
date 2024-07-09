@@ -38,6 +38,7 @@ export const useQueryClientStorageData = ({
     () => fetchClientStorageData(serviceCompanyId, params),
     {
       ...options,
+      enabled: !!serviceCompanyId,
     },
   );
 

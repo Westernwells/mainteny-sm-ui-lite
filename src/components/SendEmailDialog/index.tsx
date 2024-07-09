@@ -12,7 +12,7 @@ import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
 import {usePublishQuotation} from 'hooks/reactQuery/useQuotation';
-import {useMemo, useState} from 'react';
+import {useState} from 'react';
 import MultipleAsyncSelect from 'components/MultipleAsyncSelect';
 import {
   ServiceCompanyContactPersonOrderField,
@@ -40,7 +40,6 @@ interface Props {
   callback?: ({email, subject, content}: EmailRecord) => void;
   loadingProgress?: number;
   existingFiles?: FileWithPreview[];
-  customExistingFileName?: string;
   isLoadingFiles?: boolean;
 }
 
@@ -58,7 +57,6 @@ export const SendEmailDialog = ({
   content,
   callback,
   existingFiles,
-  customExistingFileName,
   isLoadingFiles = false,
 }: Props) => {
   const {t} = useTranslation();
@@ -73,18 +71,6 @@ export const SendEmailDialog = ({
 
   const [isCcShown, setIsCcShown] = useState(false);
   const [isBccShown, setIsBccShown] = useState(false);
-
-  const existingFilesWithCustomName = useMemo(
-    () =>
-      existingFiles?.map(
-        (file) =>
-          new File([file], customExistingFileName || file.name, {
-            type: file.type,
-            lastModified: file.lastModified,
-          }),
-      ) as FileWithPreview[],
-    [existingFiles, customExistingFileName],
-  );
 
   const {
     control,
@@ -438,7 +424,7 @@ export const SendEmailDialog = ({
             label="Text"
             name="content"
             control={control}
-            existingFiles={existingFilesWithCustomName}
+            existingFiles={existingFiles}
             updateFiles={(files) => setValue('attachments', files)}
           />
         </Box>

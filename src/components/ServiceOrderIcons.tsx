@@ -6,6 +6,7 @@ import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import BuildCircleIcon from '@mui/icons-material/BuildCircle';
 import UploadIcon from '@mui/icons-material/Upload';
 import HandymanIcon from '@mui/icons-material/Handyman';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import {serviceOrderTypeColor} from 'utils/service-order-utils';
 import {ServiceOrderType} from '../models/service-order';
 
@@ -33,6 +34,8 @@ export const ServiceOrderIcons = ({serviceOrderType, style, size}: Props) => {
       return <UploadIcon fontSize={size} sx={{color, ...style}} />;
     case ServiceOrderType.GENERAL:
       return <HandymanIcon fontSize={size} sx={{color, ...style}} />;
+    case ServiceOrderType.OPERATION:
+      return <RemoveRedEyeIcon fontSize={size} sx={{color, ...style}} />;
     default:
       return null;
   }

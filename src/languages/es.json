@@ -1973,7 +1973,7 @@
   "Update": "Actualizar",
   "Invoice type": "Tipo de factura",
   "Payment Due Date": "Fecha pendiente de pago",
-  "Service Deliver Date": "Fecha de entrega del servicio",
+  "Delivery date": "Fecha de entrega del servicio",
   "Purchase order no.": "Orden de compra número.",
   "Additional documents": "Documentos adicionales",
   "To (Customer)": "Al (cliente)",
@@ -2640,5 +2640,14 @@
   "Add Discount Option": "Añadir opción de descuento",
   "No articles": "No hay artículos",
   "Add your default articles to be included in every invoice": "Añada sus artículos predeterminados para incluirlos en cada factura",
-  "ARTICLE #": "ARTÍCULO #"
+  "ARTICLE #": "ARTÍCULO #",
+  "They will appear here once the article is added": "Aparecerán aquí una vez añadido el artículo",
+  "Elevator Operation": "Manejo de ascensores",
+  "New Elevator Operation Job": "Nuevo trabajo manejo de ascensores",
+  "Date of credit note": "Fecha de la nota de crédito",
+  "Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Enviando factura {{invoiceNumber}} a {{receiverEmail}} por {{senderName}}",
+  "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Enviando aviso de demora {{invoiceNumber}} a {{receiverEmail}} por {{senderName}}",
+  "Invoice delivered": "Factura entregada",
+  "Overdue notice delivered": "Aviso de demora entregado",
+  "The email was successfully delivered to {{receiverEmail}}": "El correo electrónico se ha enviado correctamente a {{receiverEmail}}"
 }
