@@ -1,6 +1,7 @@
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import {capitalize} from 'utils/utils';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {ServiceOrderType} from '../models/service-order';
 
 interface Props {
@@ -24,8 +25,9 @@ export const ServiceOrderTypeText = ({
           ? t(capitalize(['MAINTENANCE']))
           : t('MAINTENANCE')
         : capitalizeText
-        ? serviceOrderType && t(capitalize([serviceOrderType]))
-        : serviceOrderType && t(serviceOrderType)}
+        ? serviceOrderType &&
+          t(capitalize([serviceOrderTypeToString(serviceOrderType)]))
+        : serviceOrderType && t(serviceOrderTypeToString(serviceOrderType))}
     </Typography>
   );
 };

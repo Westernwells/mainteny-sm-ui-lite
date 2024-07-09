@@ -173,7 +173,7 @@ export const serviceOrderTypeToString = (type: ServiceOrderType | string) => {
     case ServiceOrderType.GENERAL:
       return 'General';
     case ServiceOrderType.OPERATION:
-      return 'Operation';
+      return 'Elevator Operation';
     default:
       return '-';
   }

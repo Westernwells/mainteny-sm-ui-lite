@@ -105,7 +105,7 @@ export const ServiceOrderLabels: Record<ServiceOrderTypeKeys, string> = {
   [ServiceOrderTypeKeys.Installation]: 'New Installation',
   [ServiceOrderTypeKeys.Modernization]: 'Modernization',
   [ServiceOrderTypeKeys.General]: 'General',
-  [ServiceOrderTypeKeys.Operation]: 'Operation',
+  [ServiceOrderTypeKeys.Operation]: 'Elevator Operation',
 } as const;
 
 export enum ServiceOrderOrderField {
