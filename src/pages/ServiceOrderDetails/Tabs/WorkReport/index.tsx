@@ -33,7 +33,6 @@ import {
   articleViewToArticleRecord,
   calculateTotalBillableHours,
   convertTimeSlotDatesToRestDateTime,
-  serviceOrderStatusToString,
   getSignatureKeys,
 } from 'utils/service-order-utils';
 import {convertDigitalMinsToHM} from 'utils/datetime';
@@ -41,9 +40,11 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSearchParams} from 'react-router-dom';
 import {
   companyLanguageContextMap,
+  convertToText,
   createFilesFromBlobArray,
   fetchFile,
   formatSearchParams,
+  titleCase,
 } from 'utils/utils';
 import {theme} from 'theme';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
@@ -602,7 +603,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
                 {
                   label: 'Unit Status',
                   value: `${t(
-                    serviceOrderStatusToString(serviceOrder.status),
+                    titleCase(convertToText(serviceOrder.elevator.status)),
                   )}`,
                 },
               ].map((i) => (
