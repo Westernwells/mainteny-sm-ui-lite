@@ -864,8 +864,22 @@ export const ViewQuotation = ({
       />
       <Confirm
         open={isRejectedDialogOpen}
-        onConfirm={() => {
-          if (quotation.id && user)
+        onConfirm={async () => {
+          if (quotation.id && user) {
+            if (quotation.status === QuotationStatus.DRAFT) {
+              const fileDescriptions = [`${quotation.externalId}.pdf`];
+              const blob = await generateBlobUrl();
+              const fileNames: string[] = [`${quotation.id}.pdf`];
+
+              const files = await createFilesFromBlobArray(
+                [blob!],
+                fileNames,
+                fileDescriptions,
+              );
+
+              await uploadFiles({files, uploadPath});
+            }
+
             markAsAccepted({
               quotationId: quotation.id,
               reply: {
@@ -875,7 +889,8 @@ export const ViewQuotation = ({
                 comments: ' ',
               },
             });
-          setIsRejectedDialogOpen(false);
+            setIsRejectedDialogOpen(false);
+          }
         }}
         onClose={() => setIsRejectedDialogOpen(false)}
         title="Mark as rejected"
