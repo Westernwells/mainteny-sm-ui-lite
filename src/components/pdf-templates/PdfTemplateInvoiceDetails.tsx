@@ -66,12 +66,14 @@ type Props = {
   translate: (key: string) => string;
   invoice?: InvoiceView;
   selectedLng?: string;
+  nextCompanyExternalId?: string;
 };
 
 const PdfTemplateInvoiceDetails = ({
   translate,
   invoice,
   selectedLng,
+  nextCompanyExternalId,
 }: Props) => {
   const startDate = invoice?.additionalInfo.deliveryStartDate;
   const endDate = invoice?.additionalInfo.deliveryEndDate;
@@ -103,10 +105,12 @@ const PdfTemplateInvoiceDetails = ({
   const styles = getStyles(boldFontStyle, regularFontStyle);
   return (
     <View style={styles.rightAddress}>
-      {invoice?.externalId && (
+      {(invoice?.externalId || nextCompanyExternalId) && (
         <View style={styles.rightAddressContent}>
           <Text style={styles.tag}>{translate('Invoice no.')}</Text>
-          <Text style={styles.tagContent}>{invoice?.externalId}</Text>
+          <Text style={styles.tagContent}>
+            {invoice?.externalId || nextCompanyExternalId}
+          </Text>
         </View>
       )}
 

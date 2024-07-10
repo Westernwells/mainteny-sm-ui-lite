@@ -145,6 +145,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  nextCompanyExternalId?: string;
 };
 
 type ArticleSectionProps = {
@@ -469,6 +470,7 @@ const FinalInvoicePdfTemplate = ({
   headerPath,
   footerInfo,
   footerPath,
+  nextCompanyExternalId,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -571,6 +573,7 @@ const FinalInvoicePdfTemplate = ({
               translate={translate}
               invoice={invoice}
               selectedLng={selectedLng}
+              nextCompanyExternalId={nextCompanyExternalId}
             />
           </TopSectionContainer>
 
