@@ -169,6 +169,7 @@ export interface InvoiceView {
   totalAmount: AggregatedAmount;
   sentDate?: string;
   dueDate?: string;
+  issuedDate?: string;
   status: InvoiceStatus;
   serviceOrder?: ServiceOrderView;
   propertyOwner: PropertyOwnerSimpleView;
