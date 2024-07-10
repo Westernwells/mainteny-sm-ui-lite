@@ -109,7 +109,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       color: '#212121',
       paddingLeft: 20,
       letterSpacing: -0.15,
-      marginTop: 2,
+      marginVertical: 4,
       lineHeight: 1.5,
     },
     signatureBox: {
