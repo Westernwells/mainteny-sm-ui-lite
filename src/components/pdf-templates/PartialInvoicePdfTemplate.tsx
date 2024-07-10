@@ -42,6 +42,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  nextCompanyExternalId?: string;
 };
 
 Font.register({
@@ -167,6 +168,7 @@ const PartialInvoicePdfTemplate = ({
   headerPath,
   footerInfo,
   footerPath,
+  nextCompanyExternalId,
 }: Props) => {
   const hasPreviousInvoices = previousInvoices!.length > 0;
   const firstInvoiceType = previousInvoices?.[0]?.type ?? null;
@@ -296,6 +298,7 @@ const PartialInvoicePdfTemplate = ({
               translate={translate}
               invoice={invoice}
               selectedLng={selectedLng}
+              nextCompanyExternalId={nextCompanyExternalId}
             />
           </TopSectionContainer>
 
