@@ -189,9 +189,7 @@ const ChecklistPdf = ({
               <View style={styles.rightAddressContent}>
                 <Text style={styles.tag}>{translate('Checklist date')}</Text>
                 <Text style={styles.tagContent}>
-                  {formatDate(
-                    selectedChecklist?.checkList?.meta.createdAt || new Date(),
-                  )}
+                  {formatDate(serviceOrder?.meta.createdAt || new Date())}
                 </Text>
               </View>
 
