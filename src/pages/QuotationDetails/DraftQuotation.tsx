@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import {useContext, useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {useContext, useEffect, useMemo, useState} from 'react';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -11,12 +11,12 @@ import DraftsIcon from '@mui/icons-material/Drafts';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {FormInput} from 'components/form/FormInput';
-import {SendEmailDialog} from 'components/SendEmailDialog';
+import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateQuotation,
-  usePublishQuotation,
   useQuotations,
+  useSendQuotation,
   useUpdateQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {
@@ -24,6 +24,7 @@ import {
   QuotationFormData,
   QuotationItem,
   QuotationItemRecord,
+  QuotationStatus,
   QuotationView,
 } from 'models/quotation';
 import {ElevatorView} from 'models/elevator';
@@ -46,6 +47,8 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import {
   companyLanguageContextMap,
+  createFilesFromBlobArray,
+  fetchFile,
   formatAddressFullname,
   formatSearchParams,
   getUserFullName,
@@ -84,8 +87,15 @@ import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
 import RichTextField from 'components/RichTextField';
 import {ContractTermView} from 'models/contract';
-import NewUnit from './NewUnit';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {pdf} from '@react-pdf/renderer';
+import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {useCurrentCurrency} from 'utils/currency';
+import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
+import NewUnit from './NewUnit';
 
 interface Props {
   formType?: string;
@@ -105,6 +115,10 @@ const quotationItemToQuotationItemRecord = (
     discount: getDiscoutObj(quotationItem.additionalInfo?.discount),
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
+};
+
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
 };
 
 export const DraftQuotation = ({
@@ -127,6 +141,7 @@ export const DraftQuotation = ({
   const {elevatorId = '', customerId = ''} = queryString.parse(search);
 
   const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
   const {language: selectedLng} = useContext(LanguageContext);
   const {company} = useContext(UserCompanyContext);
   const companyLanguage =
@@ -146,8 +161,10 @@ export const DraftQuotation = ({
     useUpdateQuotation();
   const {mutateAsync: createNewQuotation, isLoading: isCreating} =
     useCreateQuotation();
-  const {mutateAsync: publishQuotation, isLoading: publishingQuotation} =
-    usePublishQuotation();
+  const {mutateAsync: sendQuotation, isLoading: sendingQuotation} =
+    useSendQuotation();
+  const {mutateAsync: uploadFiles} = useUploadFiles('');
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [expiryDateError, setExpiryDateError] = useState('');
   const [resetExpiryDatePicker, setResetExpiryDatePicker] = useState(false);
@@ -166,6 +183,54 @@ export const DraftQuotation = ({
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+
+  const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+  const uploadPath = `${serviceCompanyId}/quotations`;
+
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {refetch: refetchDownloadUrl} = useDownloadUrl(
+    quotation && quotation?.additionalInfo.pdfPath
+      ? [quotation.additionalInfo.pdfPath]
+      : [],
+    {enabled: false},
+  );
 
   const [customer, setCustomer] = useState<
     PropertyOwnerView | PropertyOwnerSimpleView | null
@@ -462,6 +527,83 @@ export const DraftQuotation = ({
       Object.keys(formik.errors).length === 0;
 
     return !!valid;
+  };
+
+  const generateBlobUrl = async () => {
+    const blob = await pdf(
+      <QuotationPdfTemplate
+        userInfo={user?.userAccount}
+        currentCurrency={currentCurrency}
+        quotation={quotation}
+        selectedLng={company?.language}
+        translate={translate}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
+      />,
+    ).toBlob();
+    return blob;
+  };
+
+  const getExistingFiles = async (
+    fileDownloadUrl:
+      | {
+          [key: string]: string;
+        }
+      | undefined,
+  ) => {
+    const fileNames = [`${quotation?.id}.pdf`];
+    const fileDescriptions = [`${quotation?.externalId}.pdf`];
+
+    const fetchAndCreateFiles = async (
+      url: string,
+      argfileNames: string[],
+      argfileDescriptions: string[],
+    ) => {
+      const blob = await fetchFile(url);
+      return createFilesFromBlobArray(
+        [blob],
+        argfileNames,
+        argfileDescriptions,
+      );
+    };
+
+    const generateAndCreateFiles = async (
+      argfileNames: string[],
+      argfileDescriptions: string[],
+    ) => {
+      const blob = await generateBlobUrl();
+      return createFilesFromBlobArray(
+        [blob],
+        argfileNames,
+        argfileDescriptions,
+      );
+    };
+
+    const files =
+      quotation?.status !== QuotationStatus.DRAFT
+        ? await fetchAndCreateFiles(
+            fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
+            fileNames,
+            fileDescriptions,
+          )
+        : await generateAndCreateFiles(fileNames, fileDescriptions);
+
+    setExistingFiles(files);
+  };
+
+  const handleOpenSendEmail = async () => {
+    setIsLoadingFiles(true);
+    setIsSendEmailDialogOpen(true);
+    // using then to wait for refetch and get download url
+    try {
+      await refetchDownloadUrl().then(async (res) => {
+        await getExistingFiles(res.data);
+      });
+    } finally {
+      setIsLoadingFiles(false);
+    }
   };
 
   useEffect(() => {
@@ -1094,13 +1236,15 @@ export const DraftQuotation = ({
         primaryButtonLabel={t('Save')}
         primaryButtonAction={formik.handleSubmit}
         listItems={[
-          {
-            label: t('Save & Send'),
-            icon: <DraftsIcon />,
-            onClick: async () => {
-              setIsSendEmailDialogOpen(true);
-            },
-          },
+          ...(formType === 'edit'
+            ? [
+                {
+                  label: t('Save & Send'),
+                  icon: <DraftsIcon />,
+                  onClick: handleOpenSendEmail,
+                },
+              ]
+            : []),
           {
             label: t('Discard'),
             icon: <DeleteIcon />,
@@ -1143,22 +1287,77 @@ export const DraftQuotation = ({
       {isSendEmailDialogOpen && (
         <SendEmailDialog
           open={isSendEmailDialogOpen}
+          onConfirm={() => setIsSendEmailDialogOpen(false)}
           onClose={() => setIsSendEmailDialogOpen(false)}
-          confirmBtnDisabled={publishingQuotation || isCreating}
+          id={quotation?.id}
+          confirmBtnDisabled={sendingQuotation}
           email={
-            customer?.additionalInfo.billingEmail || customer?.contact.email
+            quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
+            quotation?.elevator?.propertyOwner?.contact.email
           }
-          subject={formik.values.subject}
-          content={formik.values.description}
+          subject={quotation?.subject}
+          content={quotation?.description}
+          existingFiles={existingFiles}
+          isLoadingFiles={isLoadingFiles}
           callback={async (emailRecord) => {
-            const response = await save(formik.values);
             setIsSendEmailDialogOpen(false);
-            await publishQuotation({
-              id: response.value,
+
+            const fileNames: string[] = [`${quotation?.id}.pdf`];
+            const isDraft = quotation?.status === QuotationStatus.DRAFT;
+
+            const allAttachments = emailRecord.attachments || existingFiles;
+            const emailAttachments = (emailRecord.attachments || [])?.filter(
+              (el) => el.path,
+            );
+            const hasExistingFileToUpload = allAttachments.some(
+              (obj, index) => {
+                const isExistingFile = !obj.path && index === 0;
+                return isExistingFile;
+              },
+            );
+
+            if (isDraft && hasExistingFileToUpload) {
+              await uploadFiles({files: existingFiles, uploadPath});
+            }
+
+            if (emailAttachments.length) {
+              await uploadFiles({files: emailAttachments, uploadPath});
+            }
+
+            await sendQuotation({
+              id: quotation?.id!,
               body: {
-                email: emailRecord.email,
-                subject: emailRecord.subject,
-                content: emailRecord.content,
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
+                email: {
+                  email: '',
+                  subject: emailRecord.subject,
+                  content: emailRecord.content,
+                  emails: emailRecord.emails,
+                  ccEmails: emailRecord.ccEmails,
+                  bccEmails: emailRecord.bccEmails,
+                  attachments: allAttachments.reduce<FileWithPreview[]>(
+                    (newArr: FileWithPreview[], obj, index) => {
+                      // If file is from server -> uri of file should be quotation.id
+                      // If file is from server -> description should be quotation.externalId
+                      const isFileFromServer = !obj.path && index === 0;
+                      return [
+                        ...newArr,
+                        {
+                          ...obj,
+                          type: obj.type,
+                          uri: isFileFromServer
+                            ? `${uploadPath}/${quotation?.id}.pdf`
+                            : `${uploadPath}/${obj.name}`,
+                          description: isFileFromServer
+                            ? `${quotation?.externalId}.pdf`
+                            : `${obj.name.split('.')[0]}`,
+                        },
+                      ];
+                    },
+                    [],
+                  ),
+                },
               },
             });
           }}
