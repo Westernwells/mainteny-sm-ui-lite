@@ -173,6 +173,9 @@ export const ViewQuotation = ({
     company?.id,
   );
 
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+  const uploadPath = `${serviceCompanyId}/quotations`;
+
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutateAsync: printQuotation} = usePrintQuotation();
   const {mutateAsync: sendQuotation, isLoading: sendingQuotation} =
@@ -219,9 +222,6 @@ export const ViewQuotation = ({
       setIsConfirmPrintDialogOpen(false);
       return;
     }
-
-    const serviceCompanyId = user?.userAccount.serviceCompany.id;
-    const uploadPath = `${serviceCompanyId}/quotations`;
 
     const fileNames: string[] = [`${quotation.id}.pdf`];
 
@@ -769,8 +769,6 @@ export const ViewQuotation = ({
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
-          const serviceCompanyId = user?.userAccount.serviceCompany.id;
-          const uploadPath = `${serviceCompanyId}/quotations`;
           const fileNames: string[] = [`${quotation.id}.pdf`];
           const isDraft = quotation.status === QuotationStatus.DRAFT;
 
@@ -831,8 +829,23 @@ export const ViewQuotation = ({
       />
       <Confirm
         open={isDialogOpen}
-        onConfirm={() => {
-          if (quotation.id && user)
+        onConfirm={async () => {
+          if (quotation.id && user) {
+            const fileNames: string[] = [`${quotation.id}.pdf`];
+
+            if (quotation.status === QuotationStatus.DRAFT) {
+              const fileDescriptions = [`${quotation.externalId}.pdf`];
+              const blob = await generateBlobUrl();
+
+              const files = await createFilesFromBlobArray(
+                [blob!],
+                fileNames,
+                fileDescriptions,
+              );
+
+              await uploadFiles({files, uploadPath});
+            }
+
             markAsAccepted({
               quotationId: quotation.id,
               reply: {
@@ -840,9 +853,12 @@ export const ViewQuotation = ({
                 accepted: true,
                 isAccepted: true,
                 comments: ' ',
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
               },
             });
-          setIsDialogOpen(false);
+            setIsDialogOpen(false);
+          }
         }}
         onClose={() => setIsDialogOpen(false)}
         title="Mark as accepted"
@@ -851,8 +867,23 @@ export const ViewQuotation = ({
       />
       <Confirm
         open={isRejectedDialogOpen}
-        onConfirm={() => {
-          if (quotation.id && user)
+        onConfirm={async () => {
+          if (quotation.id && user) {
+            const fileNames: string[] = [`${quotation.id}.pdf`];
+
+            if (quotation.status === QuotationStatus.DRAFT) {
+              const fileDescriptions = [`${quotation.externalId}.pdf`];
+              const blob = await generateBlobUrl();
+
+              const files = await createFilesFromBlobArray(
+                [blob!],
+                fileNames,
+                fileDescriptions,
+              );
+
+              await uploadFiles({files, uploadPath});
+            }
+
             markAsAccepted({
               quotationId: quotation.id,
               reply: {
@@ -860,9 +891,12 @@ export const ViewQuotation = ({
                 accepted: false,
                 isAccepted: false,
                 comments: ' ',
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
               },
             });
-          setIsRejectedDialogOpen(false);
+            setIsRejectedDialogOpen(false);
+          }
         }}
         onClose={() => setIsRejectedDialogOpen(false)}
         title="Mark as rejected"

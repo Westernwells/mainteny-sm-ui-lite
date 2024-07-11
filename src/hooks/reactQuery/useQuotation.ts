@@ -200,13 +200,18 @@ export const useReplyQuotation = () => {
     ({quotationId, reply}: {quotationId: string; reply: ReplyQuotation}) =>
       putReplyQuotation(quotationId, reply),
     {
-      onSuccess: (_, {quotationId}) => {
+      onSuccess: (_, {quotationId, reply}) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
         queryClient.invalidateQueries([qk.fetchQuotationActivities]);
-        enqueueSnackbar(`Quotation marked as accepted`, {
-          variant: 'success',
-        });
+        enqueueSnackbar(
+          reply.isAccepted
+            ? 'Quotation marked as accepted'
+            : 'Quotation marked as rejected',
+          {
+            variant: reply.isAccepted ? 'success' : 'error',
+          },
+        );
         navigate(`/quotations/details/${quotationId}`);
       },
       onError: (err) => {

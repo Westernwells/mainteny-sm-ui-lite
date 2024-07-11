@@ -1303,6 +1303,7 @@ export const InvoiceForm = ({
           headerInfo={headerInfo}
           footerPath={footerUrl[footerInfo?.path]}
           footerInfo={footerInfo}
+          nextCompanyExternalId={companyNextNumber?.value}
         />,
       ).toBlob();
       return blob;

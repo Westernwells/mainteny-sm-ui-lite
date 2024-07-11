@@ -124,6 +124,9 @@ export const Actions = ({quotation}: Props) => {
     {enabled: false},
   );
 
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+  const uploadPath = `${serviceCompanyId}/quotations`;
+
   const generateBlobUrl = async () => {
     setCreatingPdf(true);
     const blob = await pdf(
@@ -182,19 +185,10 @@ export const Actions = ({quotation}: Props) => {
         {onSuccess: handlePrintSuccess},
       );
     } else {
-      const serviceCompanyId = user?.userAccount.serviceCompany.id;
-      const uploadPath = `${serviceCompanyId}/quotations`;
       const fileNames = [`${quotation.id}.pdf`];
       const files = await createFilesFromBlobArray([blobFile!], fileNames);
 
-      await uploadFiles(
-        {files, uploadPath},
-        {
-          onError: (err) => {
-            console.log('error', err);
-          },
-        },
-      );
+      await uploadFiles({files, uploadPath});
 
       await printQuotation(
         {
@@ -417,8 +411,22 @@ export const Actions = ({quotation}: Props) => {
 
       <Confirm
         open={isDialogOpen}
-        onConfirm={() => {
-          if (quotation.id && user)
+        onConfirm={async () => {
+          if (quotation.id && user) {
+            const fileNames: string[] = [`${quotation.id}.pdf`];
+
+            if (quotation.status === QuotationStatus.DRAFT) {
+              const blob = await generateBlobUrl();
+              const fileDescriptions = [`${quotation.externalId}.pdf`];
+
+              const files = await createFilesFromBlobArray(
+                [blob!],
+                fileNames,
+                fileDescriptions,
+              );
+
+              await uploadFiles({files, uploadPath});
+            }
             markAsAccepted({
               quotationId: quotation.id,
               reply: {
@@ -426,9 +434,13 @@ export const Actions = ({quotation}: Props) => {
                 accepted: true,
                 isAccepted: true,
                 comments: ' ',
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
               },
             });
-          setIsDialogOpen(false);
+
+            setIsDialogOpen(false);
+          }
         }}
         onClose={() => setIsDialogOpen(false)}
         title="Mark as accepted"
@@ -437,8 +449,22 @@ export const Actions = ({quotation}: Props) => {
       />
       <Confirm
         open={isRejectedDialogOpen}
-        onConfirm={() => {
-          if (quotation.id && user)
+        onConfirm={async () => {
+          if (quotation.id && user) {
+            const fileNames: string[] = [`${quotation.id}.pdf`];
+
+            if (quotation.status === QuotationStatus.DRAFT) {
+              const fileDescriptions = [`${quotation.externalId}.pdf`];
+              const blob = await generateBlobUrl();
+
+              const files = await createFilesFromBlobArray(
+                [blob!],
+                fileNames,
+                fileDescriptions,
+              );
+
+              await uploadFiles({files, uploadPath});
+            }
             markAsAccepted({
               quotationId: quotation.id,
               reply: {
@@ -446,9 +472,12 @@ export const Actions = ({quotation}: Props) => {
                 accepted: false,
                 isAccepted: false,
                 comments: ' ',
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
               },
             });
-          setIsRejectedDialogOpen(false);
+            setIsRejectedDialogOpen(false);
+          }
         }}
         onClose={() => setIsRejectedDialogOpen(false)}
         title="Mark as rejected"
@@ -471,8 +500,6 @@ export const Actions = ({quotation}: Props) => {
         callback={async (emailRecord) => {
           setIsSendEmailDialogOpen(false);
 
-          const serviceCompanyId = user?.userAccount.serviceCompany.id;
-          const uploadPath = `${serviceCompanyId}/quotations`;
           const fileNames: string[] = [`${quotation.id}.pdf`];
           const isDraft = quotation.status === QuotationStatus.DRAFT;
 

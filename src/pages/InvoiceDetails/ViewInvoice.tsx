@@ -194,8 +194,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {mutateAsync: uploadFiles} = useUploadFiles('');
 
   const {downloadFile} = useDownloadFileWithCustomName(
-    invoice.number,
-    downloadUrl ? Object.values(downloadUrl)[0] : '',
+    invoice.externalId || invoice.number,
+    filePathToDownload ||
+      (downloadUrl ? downloadUrl[invoice?.additionalInfo.pdfPath] : ''),
   );
 
   const [actionType, setActionType] = useState<string>('');
@@ -504,11 +505,24 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           headerInfo={headerInfo}
           footerPath={footerBlockUrl[footerInfo?.path]}
           footerInfo={footerInfo}
+          nextCompanyExternalId={companyNextNumber?.value}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
       setFilePathToDownload(blobURL);
       return blob;
+    }
+  };
+
+  const handleDownload = async () => {
+    setActionType('DOWNLOAD');
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      await generateBlobUrl(invoice, headerUrl, footerUrl);
+    } else {
+      await refetchDownloadUrl();
+      setFilePathToDownload(
+        downloadUrl ? downloadUrl?.[invoice.additionalInfo.pdfPath!]! : '',
+      );
     }
   };
 
@@ -668,18 +682,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   }, [invoice, companyNextNumber]);
 
-  const handleDownload = async () => {
-    setActionType('DOWNLOAD');
-    if (invoice.status === InvoiceStatus.DRAFT) {
-      await generateBlobUrl(invoice, headerUrl, footerUrl);
-    } else {
-      await refetchDownloadUrl();
-      setFilePathToDownload(
-        downloadUrl ? downloadUrl?.[invoice.additionalInfo.pdfPath!]! : '',
-      );
-    }
-  };
-
   const actions = useMemo(() => {
     const items = [];
 
@@ -689,7 +691,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         icon: <SendIcon />,
         onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
       });
-
       items.push({
         label: t('Print'),
         icon: <Print />,
