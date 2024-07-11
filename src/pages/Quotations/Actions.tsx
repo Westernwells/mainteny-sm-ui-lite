@@ -413,10 +413,11 @@ export const Actions = ({quotation}: Props) => {
         open={isDialogOpen}
         onConfirm={async () => {
           if (quotation.id && user) {
+            const fileNames: string[] = [`${quotation.id}.pdf`];
+
             if (quotation.status === QuotationStatus.DRAFT) {
               const blob = await generateBlobUrl();
               const fileDescriptions = [`${quotation.externalId}.pdf`];
-              const fileNames: string[] = [`${quotation.id}.pdf`];
 
               const files = await createFilesFromBlobArray(
                 [blob!],
@@ -433,6 +434,8 @@ export const Actions = ({quotation}: Props) => {
                 accepted: true,
                 isAccepted: true,
                 comments: ' ',
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
               },
             });
 
@@ -448,10 +451,11 @@ export const Actions = ({quotation}: Props) => {
         open={isRejectedDialogOpen}
         onConfirm={async () => {
           if (quotation.id && user) {
+            const fileNames: string[] = [`${quotation.id}.pdf`];
+
             if (quotation.status === QuotationStatus.DRAFT) {
               const fileDescriptions = [`${quotation.externalId}.pdf`];
               const blob = await generateBlobUrl();
-              const fileNames: string[] = [`${quotation.id}.pdf`];
 
               const files = await createFilesFromBlobArray(
                 [blob!],
@@ -468,6 +472,8 @@ export const Actions = ({quotation}: Props) => {
                 accepted: false,
                 isAccepted: false,
                 comments: ' ',
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
               },
             });
             setIsRejectedDialogOpen(false);
