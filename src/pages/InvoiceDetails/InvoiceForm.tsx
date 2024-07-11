@@ -1,4 +1,4 @@
-import {useContext, useEffect, useMemo, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -31,7 +31,7 @@ import {DatePicker} from 'components/DatePicker';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {Confirm} from 'components/Confirm';
 import {Button} from 'components/Button';
-import {SendEmailDialog} from 'components/SendEmailDialog';
+import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {Tooltip} from 'components/Tooltip';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
@@ -84,6 +84,7 @@ import {
   companyLanguageContextMap,
   createFilesFromBlobArray,
   dateToString,
+  fetchFile,
   formatAddressFullname,
   formatSearchParams,
   getUserFullName,
@@ -239,6 +240,12 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
 
+enum FILE_DESCRIPTION_PREFIXES {
+  INVOICE = 'INV',
+  WORK_REPORT = 'WR',
+  CHECKLIST = 'CHK',
+}
+
 export const InvoiceForm = ({
   invoice,
   serviceOrderResource,
@@ -274,8 +281,8 @@ export const InvoiceForm = ({
   const [updatedInvoiceId, setUpdatedInvoiceId] = useState<string>('');
   const [emailRecord, setEmailRecord] = useState<EmailRecord | null>(null);
 
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isSendingDocuments, setIsSendingDocuments] = useState(false);
+  const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
 
   const {data: updatedInvoice, isFetched} = useInvoiceDetail(updatedInvoiceId);
 
@@ -326,13 +333,21 @@ export const InvoiceForm = ({
   const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
   const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
 
-  const {data: headerUrl = {}} = useDownloadUrl(
+  const {
+    data: headerUrl = {},
+    isLoading: isHeaderUrlLoading,
+    refetch: refetchHeaderUrl,
+  } = useDownloadUrl(
     headerInfo?.path ? [headerInfo.path] : [],
     undefined,
     company?.id,
   );
 
-  const {data: footerUrl = {}} = useDownloadUrl(
+  const {
+    data: footerUrl = {},
+    isLoading: isFooterUrlLoading,
+    refetch: refetchFooterUrl,
+  } = useDownloadUrl(
     footerInfo?.path ? [footerInfo.path] : [],
     undefined,
     company?.id,
@@ -345,7 +360,7 @@ export const InvoiceForm = ({
     user?.userAccount.serviceCompany.id,
   );
 
-  const {data: downloadUrl} = useDownloadUrl(
+  const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
     invoice ? [invoice.additionalInfo.pdfPath] : [],
   );
   const [isDrawerOpen] = useState<boolean>(true);
@@ -487,7 +502,6 @@ export const InvoiceForm = ({
       },
     });
   }
-
   const formik = useFormik<InvoiceFormData>({
     initialValues,
     validationSchema,
@@ -889,10 +903,19 @@ export const InvoiceForm = ({
   }, [DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT]);
 
   const isDueDateInPast = () => {
-    const localDueDate = formik.values.dueDate as Date;
-    const dueDateObject = startOfDay(
-      parseISO(new Date(localDueDate).toISOString()),
-    );
+    const localDueDate = formik.values.dueDate;
+
+    // Check if localDueDate is valid
+    if (!localDueDate) {
+      return false;
+    }
+
+    const parsedDueDate = new Date(localDueDate);
+    if (isNaN(parsedDueDate.getTime())) {
+      return false;
+    }
+
+    const dueDateObject = startOfDay(parseISO(parsedDueDate.toISOString()));
     const todayObject = startOfDay(new Date());
 
     return isBefore(dueDateObject, todayObject);
@@ -908,7 +931,223 @@ export const InvoiceForm = ({
     return errorMessage;
   };
 
-  const onInvoiceSaveAndSend = () => {
+  const generateBlobUrl = async (
+    invoiceData: InvoiceView,
+    headerBlockUrl: {[key: string]: string},
+    footerBlockUrl: {[key: string]: string},
+  ) => {
+    let PdfTemplate;
+
+    if (
+      invoice?.type === InvoiceType.FULL ||
+      invoice?.type === InvoiceType.AGGREGATE
+    ) {
+      PdfTemplate = FullInvoicePdfTemplate;
+    } else if (invoice?.type === InvoiceType.CREDIT_NOTE) {
+      PdfTemplate = CreditNotePdfTemplate;
+    } else if (
+      invoice?.type === InvoiceType.PARTIAL ||
+      invoice?.type === InvoiceType.UPFRONT
+    ) {
+      PdfTemplate = PartialInvoicePdfTemplate;
+    } else {
+      PdfTemplate = FinalInvoicePdfTemplate;
+    }
+
+    const shouldIncludePreviousInvoices = !(
+      invoice?.type === InvoiceType.CREDIT_NOTE ||
+      invoice?.type === InvoiceType.FULL ||
+      invoice?.type === InvoiceType.AGGREGATE
+    );
+
+    const previousInvoicesProp = shouldIncludePreviousInvoices
+      ? sortedPreviousInvoices.slice(
+          0,
+          sortedPreviousInvoices.findIndex((i) => i.id === invoice?.id) + 1,
+        )
+      : [];
+
+    if (
+      invoice?.type === InvoiceType.CREDIT_NOTE ||
+      invoice?.type === InvoiceType.FULL ||
+      invoice?.type === InvoiceType.AGGREGATE ||
+      invoice?.type === InvoiceType.PARTIAL ||
+      invoice?.type === InvoiceType.UPFRONT ||
+      invoice?.type === InvoiceType.FINAL
+    ) {
+      // TODO: will remove when all invoice types PDFs are ready
+      const blob = await pdf(
+        <PdfTemplate
+          userInfo={user?.userAccount}
+          currentCurrency={currentCurrency}
+          invoice={invoiceData}
+          selectedLng={company?.language}
+          translate={translate}
+          previousInvoices={previousInvoicesProp}
+          headerPath={headerBlockUrl[headerInfo?.path]}
+          headerInfo={headerInfo}
+          footerPath={footerBlockUrl[footerInfo?.path]}
+          footerInfo={footerInfo}
+          nextCompanyExternalId={companyNextNumber?.value}
+        />,
+      ).toBlob();
+      const blobURL = URL.createObjectURL(blob);
+      return blob;
+    }
+  };
+
+  const getExistingFiles = async (
+    invoiceDownloadUrlArg:
+      | {
+          [key: string]: string;
+        }
+      | undefined,
+    invoiceData: InvoiceView,
+    nextNumber?: string,
+    workReportDownloadUrlArg?: {
+      [key: string]: string;
+    },
+    checklistDownloadUrlArg?: {
+      [key: string]: string;
+    },
+  ) => {
+    if (isHeaderUrlLoading || isFooterUrlLoading) {
+      refetchHeaderUrl();
+      refetchFooterUrl();
+      return;
+    }
+
+    let allFiles: FileWithPreview[] = [];
+    const fileNames: string[] = [`${invoiceData?.id}.pdf`];
+    const fileDescriptions: string[] = [
+      `${FILE_DESCRIPTION_PREFIXES.INVOICE}-${
+        invoiceData?.externalId || nextNumber
+      }.pdf`,
+    ];
+
+    // Helper function to fetch and create files
+    const fetchAndCreateFiles = async (
+      url: string,
+      argfileNames: string[],
+      argfileDescriptions: string[],
+    ) => {
+      const blob = await fetchFile(url);
+      return createFilesFromBlobArray(
+        [blob],
+        argfileNames,
+        argfileDescriptions,
+      );
+    };
+
+    // Base file operations
+    const baseFileOperations =
+      invoiceData?.status !== InvoiceStatus.DRAFT
+        ? fetchAndCreateFiles(
+            invoiceDownloadUrlArg
+              ? Object.values(invoiceDownloadUrlArg)[0]
+              : '',
+            fileNames,
+            fileDescriptions,
+          )
+        : generateBlobUrl(invoiceData, headerUrl, footerUrl).then((blobFile) =>
+            createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
+          );
+
+    // Work report operations
+    const workReportOperations = invoiceData?.additionalInfo.includeWorkReport
+      ? report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
+        ? fetchAndCreateFiles(
+            workReportDownloadUrlArg
+              ? Object.values(workReportDownloadUrlArg)[0]
+              : '',
+            [`${report?.id}.pdf`],
+            [
+              `${FILE_DESCRIPTION_PREFIXES.WORK_REPORT}-${
+                report?.externalId || invoice?.serviceOrder?.externalId
+              }.pdf`,
+            ],
+          )
+        : generateWorkReportBlob().then((workReportBlob) =>
+            createFilesFromBlobArray(
+              [workReportBlob],
+              [`${report?.id}.pdf`],
+              [
+                `${FILE_DESCRIPTION_PREFIXES.WORK_REPORT}-${
+                  report?.externalId || invoice?.serviceOrder?.externalId
+                }.pdf`,
+              ],
+            ),
+          )
+      : Promise.resolve([]);
+
+    // Checklist operations
+    const checklistOperations = invoiceData?.additionalInfo.includeCheckList
+      ? selectedChecklist?.additionalInfo.pdfGenerationStatus ===
+        PdfGenerationStatus.DONE
+        ? fetchAndCreateFiles(
+            checklistDownloadUrlArg
+              ? Object.values(checklistDownloadUrlArg)[0]
+              : '',
+            [`${selectedChecklist?.checkListId}.pdf`],
+            [
+              `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
+                selectedChecklist?.checkList.externalId ||
+                invoiceData?.serviceOrder?.externalId
+              }.pdf`,
+            ],
+          )
+        : generateChecklistBlob().then((checklistBlob) =>
+            createFilesFromBlobArray(
+              [checklistBlob],
+              [`${selectedChecklist?.checkListId}.pdf`],
+              [
+                `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
+                  selectedChecklist?.checkList.externalId ||
+                  invoiceData?.serviceOrder?.externalId
+                }.pdf`,
+              ],
+            ),
+          )
+      : Promise.resolve([]);
+
+    // Wait for all file operations to complete
+    const [baseFiles, workReportFiles, checklistFiles] = await Promise.all([
+      baseFileOperations,
+      workReportOperations,
+      checklistOperations,
+    ]);
+
+    // Combine all files
+    allFiles = [...baseFiles, ...workReportFiles, ...checklistFiles];
+
+    // Set existing files
+    setExistingFiles(allFiles);
+  };
+
+  const handleOpenSendEmail = async (companyNextId?: string) => {
+    setIsLoadingFiles(true);
+    setIsSendEmailDialogOpen(true);
+
+    try {
+      // Refetch the download URLs for invoice, work report, and checklist
+      const invoiceDownloadUrlResponse = await refetchDownloadUrl();
+      const workReportDownloadUrlResponse =
+        await refetchWorkReportDownloadUrl();
+      const checklistDownloadUrlResponse = await refetchChecklistDownloadUrl();
+      // Ensure all download URLs are fetched before calling getExistingFiles
+      await getExistingFiles(
+        invoiceDownloadUrlResponse.data,
+        invoice!,
+        companyNextId,
+        workReportDownloadUrlResponse.data,
+        checklistDownloadUrlResponse.data,
+      );
+    } finally {
+      setIsLoadingFiles(false);
+    }
+  };
+
+  const onInvoiceSaveAndSend = useCallback(() => {
     const errorMessage = validateDueDate();
 
     if (errorMessage) {
@@ -919,19 +1158,23 @@ export const InvoiceForm = ({
 
       return;
     }
-    setIsSendEmailDialogOpen(true);
-  };
+
+    if (companyNextNumber) {
+      handleOpenSendEmail(companyNextNumber.value);
+    }
+  }, [invoice, companyNextNumber, formik.values.dueDate]);
 
   const actions = useMemo(() => {
-    const items = [
-      {
+    const items = [];
+    if (formType === 'edit') {
+      items.push({
         label: t('Save & Send'),
         icon: <Send />,
         onClick: () => {
           onInvoiceSaveAndSend();
         },
-      },
-    ];
+      });
+    }
     if (
       invoice &&
       ![
@@ -1075,6 +1318,7 @@ export const InvoiceForm = ({
       formik.values?.type === InvoiceType.CREDIT_NOTE
         ? invoice?.serviceCompany.name
         : customer?.name;
+
     const type =
       formik.values?.type === InvoiceType.CREDIT_NOTE
         ? 'Credit Note'
@@ -1164,6 +1408,11 @@ export const InvoiceForm = ({
     report?.attachments,
   );
 
+  const {refetch: refetchWorkReportDownloadUrl} = useDownloadUrl(
+    report?.additionalInfo.pdfPath ? [report?.additionalInfo.pdfPath] : [],
+    {enabled: false},
+  );
+
   const generateWorkReportBlob = async () => {
     const blob = await pdf(
       <WorkReportTemplate
@@ -1247,6 +1496,13 @@ export const InvoiceForm = ({
 
   const signatureImageUrl = useFetchAndConvertImage(signaturePath);
 
+  const {refetch: refetchChecklistDownloadUrl} = useDownloadUrl(
+    selectedChecklist?.additionalInfo.pdfPath
+      ? [selectedChecklist?.additionalInfo.pdfPath]
+      : [],
+    {enabled: false},
+  );
+
   const generateChecklistBlob = async () => {
     const blob = await pdf(
       <ChecklistPdf
@@ -1311,131 +1567,11 @@ export const InvoiceForm = ({
   };
 
   useEffect(() => {
-    if (!formik.values.externalId && formik.initialValues.externalId === '') {
-      formik.setFieldValue(
-        'externalId',
-        isSendEmailDialogOpen ? companyNextNumber?.value : '',
-      );
-    }
-  }, [isSendEmailDialogOpen]);
-
-  const generateAndUploadFiles = async (
-    blob: Blob,
-    fileNames: string[],
-    uploadPath: string,
-    description: string,
-  ): Promise<MappedFile[]> => {
-    const files = await createFilesFromBlobArray(blob ? [blob] : [], fileNames);
-    await uploadFiles({files, uploadPath});
-
-    return files.map((file) => ({
-      ...file,
-      uri: `${uploadPath}/${file.name}`,
-      description,
-      name: file.name,
-      type: file.type,
-    }));
-  };
-
-  useEffect(() => {
     if (reportToUpdate) {
       setReport(reportToUpdate);
     }
   }, [reportToUpdate]);
 
-  useEffect(() => {
-    const updateAndSendInvoice = async () => {
-      if (
-        updatedInvoice?.externalId &&
-        emailRecord &&
-        isFetched &&
-        isSendingDocuments &&
-        !isProcessing
-      ) {
-        setIsProcessing(true);
-        try {
-          const checkListInfo = updatedInvoice?.serviceOrder?.checkLists![0];
-
-          const uploadPath = `${serviceCompanyId}/invoices`;
-          const workReportUploadPath = `${serviceCompanyId}/serviceOrders/${updatedInvoice.serviceOrder?.id}/report`;
-          const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${updatedInvoice?.serviceOrder?.id}/checkLists/${checkListInfo?.technicianId}`;
-
-          const pdfPath = `${uploadPath}/${updatedInvoice.id}.pdf`;
-
-          let allFiles: MappedFile[] = [];
-
-          const blobFile = await generateBlob(updatedInvoice);
-          if (blobFile) {
-            const invoiceFiles = await generateAndUploadFiles(
-              blobFile,
-              [`${updatedInvoice.id}.pdf`],
-              uploadPath,
-              updatedInvoice.externalId || '',
-            );
-            allFiles = allFiles.concat(invoiceFiles);
-          }
-
-          if (updatedInvoice.additionalInfo.includeWorkReport) {
-            const workReportBlob = await generateWorkReportBlob();
-            const workReportFiles = await generateAndUploadFiles(
-              workReportBlob,
-              [`${report?.id}.pdf`],
-              workReportUploadPath,
-              report?.externalId || report?.number || '',
-            );
-            allFiles = allFiles.concat(workReportFiles);
-          }
-
-          if (updatedInvoice.additionalInfo.includeCheckList) {
-            const checklistBlob = await generateChecklistBlob();
-            const checklistFiles = await generateAndUploadFiles(
-              checklistBlob,
-              [`${checkListInfo?.checkListId}.pdf`],
-              checklistUploadPath,
-              selectedChecklist?.checkList.number || '',
-            );
-            allFiles = allFiles.concat(checklistFiles);
-          }
-
-          await sendInvoice({
-            id: updatedInvoice.id!,
-            body: {
-              pdfPath,
-              externalId: updatedInvoice.externalId!,
-              dueDate: updatedInvoice.dueDate || dateToString(new Date()),
-              sentDate: updatedInvoice.sentDate || dateToString(new Date()),
-              email: {
-                email: '',
-                subject: emailRecord.subject,
-                content: emailRecord.content,
-                emails: [emailRecord.email],
-                attachments: allFiles.reduce<FileWithPreview[]>(
-                  (file: FileWithPreview[], obj) => [
-                    ...file,
-                    {
-                      ...obj,
-                      name: obj.name,
-                      type: 'application/pdf',
-                      uri: obj.uri,
-                      description: obj.description,
-                    },
-                  ],
-                  [],
-                ),
-              },
-            },
-          });
-        } catch (error) {
-          console.error('Error in onSuccess async process:', error);
-        } finally {
-          setIsSendingDocuments(false);
-          setIsProcessing(false);
-        }
-      }
-    };
-
-    updateAndSendInvoice();
-  }, [updatedInvoice, isSendingDocuments]);
   return (
     <Box>
       {invoice &&
@@ -2168,20 +2304,141 @@ export const InvoiceForm = ({
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
-        onClose={() => setIsSendEmailDialogOpen(false)}
-        confirmBtnDisabled={isUpdating || isCreating}
-        callback={async (emailRecord) => {
-          const response = await onSave(formik.values);
-          const invoiceId = formType === 'new' ? response.value : invoice?.id;
-          setUpdatedInvoiceId(invoiceId!);
-          setEmailRecord(emailRecord);
-          setIsSendingDocuments(true);
+        onConfirm={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => {
           setIsSendEmailDialogOpen(false);
+        }}
+        id={invoice?.id}
+        existingFiles={existingFiles}
+        isLoadingFiles={isLoadingFiles}
+        callback={async (emailRecord) => {
+          setIsSendEmailDialogOpen(false);
+          const checkListInfo = selectedChecklist!;
+          const invoiceUploadPath = `${serviceCompanyId}/invoices`;
+          const workReportUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/report`;
+          const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/checkLists/${checkListInfo?.technicianId}`;
+          const fileNames: string[] = [`${invoice?.id}.pdf`];
+          const allAttachments = emailRecord.attachments || [];
+
+          // 1. Upload work report files
+          const workReportFiles = emailRecord.attachments?.filter((el) =>
+            el.description?.includes(FILE_DESCRIPTION_PREFIXES.WORK_REPORT),
+          );
+          if (
+            workReportFiles?.length &&
+            report?.additionalInfo.pdfGenerationStatus !==
+              PdfGenerationStatus.DONE
+          ) {
+            await uploadFiles({
+              files: workReportFiles,
+              uploadPath: workReportUploadPath,
+            });
+          }
+
+          // 2. Upload checklist files
+          const checklistFiles = emailRecord.attachments?.filter((el) =>
+            el.description?.includes(FILE_DESCRIPTION_PREFIXES.CHECKLIST),
+          );
+          if (
+            checklistFiles?.length &&
+            selectedChecklist?.additionalInfo.pdfGenerationStatus !==
+              PdfGenerationStatus.DONE
+          ) {
+            await uploadFiles({
+              files: checklistFiles,
+              uploadPath: checklistUploadPath,
+            });
+          }
+
+          // 3. Upload invoice files
+          const invoiceFiles = emailRecord.attachments?.filter((el) =>
+            el.description?.includes(FILE_DESCRIPTION_PREFIXES.INVOICE),
+          );
+          if (invoiceFiles?.length) {
+            await uploadFiles({
+              files: invoiceFiles,
+              uploadPath: invoiceUploadPath,
+            });
+          }
+          // 4. Upload email attachments
+          const emailAttachments = (emailRecord.attachments || [])?.filter(
+            (el) => el.path && !el.description,
+          );
+          if (emailAttachments?.length) {
+            await uploadFiles({
+              files: emailAttachments,
+              uploadPath: invoiceUploadPath,
+            });
+          }
+
+          const sendEmail = async (invoiceData: InvoiceView) => {
+            await sendInvoice({
+              id: invoiceData?.id!,
+              body: {
+                pdfPath: `${invoiceUploadPath}/${fileNames[0]}`,
+                externalId:
+                  invoiceData?.externalId! || companyNextNumber?.value!,
+                dueDate: invoiceData?.dueDate || dateToString(new Date()),
+                sentDate: invoiceData?.sentDate || dateToString(new Date()),
+                email: {
+                  email: '',
+                  subject: emailRecord.subject,
+                  content: emailRecord.content,
+                  emails: emailRecord.emails,
+                  ccEmails: emailRecord.ccEmails,
+                  bccEmails: emailRecord.bccEmails,
+                  attachments: allAttachments.reduce<FileWithPreview[]>(
+                    (newArr: FileWithPreview[], obj) => {
+                      const isInvoiceFile = obj.description?.includes(
+                        FILE_DESCRIPTION_PREFIXES.INVOICE,
+                      );
+                      const isWorkReportFile = obj.description?.includes(
+                        FILE_DESCRIPTION_PREFIXES.WORK_REPORT,
+                      );
+                      const isChecklistFile = obj.description?.includes(
+                        FILE_DESCRIPTION_PREFIXES.CHECKLIST,
+                      );
+                      const isAttachedFile = obj.path && !obj.description;
+
+                      let uploadPath = '';
+
+                      if (isAttachedFile || isInvoiceFile) {
+                        uploadPath = invoiceUploadPath;
+                      } else if (isWorkReportFile) {
+                        uploadPath = workReportUploadPath;
+                      } else if (isChecklistFile) {
+                        uploadPath = checklistUploadPath;
+                      }
+
+                      return [
+                        ...newArr,
+                        {
+                          ...obj,
+                          type: obj.type,
+                          uri: isInvoiceFile
+                            ? `${invoiceUploadPath}/${fileNames[0]}`
+                            : `${uploadPath}/${obj.name}`,
+                          description: isAttachedFile
+                            ? obj.name.split('.')[0]
+                            : obj?.description,
+                        },
+                      ];
+                    },
+                    [],
+                  ),
+                },
+              },
+            });
+          };
+
+          // 5. Send email
+          await sendEmail(updatedInvoice!);
         }}
         email={customer?.additionalInfo.billingEmail || customer?.contact.email}
         subject={generateEmailSubject()}
         content={formik.values.description}
       />
+
       <Confirm
         open={isDeleteDialogOpen}
         onConfirm={() => {

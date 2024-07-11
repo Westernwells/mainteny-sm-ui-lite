@@ -71,13 +71,13 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
   const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
 
-  const {data: headerUrl = {}} = useDownloadUrl(
+  const {data: headerUrl = {}, isLoading: isHeaderUrlLoading} = useDownloadUrl(
     headerInfo?.path ? [headerInfo?.path] : [],
     undefined,
     user?.userAccount.serviceCompany.id,
   );
 
-  const {data: footerUrl = {}} = useDownloadUrl(
+  const {data: footerUrl = {}, isLoading: isFooterUrlLoading} = useDownloadUrl(
     footerInfo?.path ? [footerInfo?.path] : [],
     undefined,
     user?.userAccount.serviceCompany.id,
@@ -208,6 +208,8 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
             headerUrl,
             footerUrl,
             companyNextNumber,
+            isHeaderUrlLoading,
+            isFooterUrlLoading,
           )}
           fullHeight={false}
           containerStyle={{

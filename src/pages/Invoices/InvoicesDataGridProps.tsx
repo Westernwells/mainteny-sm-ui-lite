@@ -77,6 +77,8 @@ export const columns = (
     [key: string]: string;
   },
   companyNextNumber: StringValueResponse | undefined,
+  isHeaderUrlLoading: boolean,
+  isFooterUrlLoading: boolean,
 ): GridColDef[] => [
   getColumnProps({
     field: InvoiceOrderField.EXTERNAL_ID,
@@ -185,6 +187,8 @@ export const columns = (
         headerUrl={headerUrl}
         footerUrl={footerUrl}
         companyNextNumber={companyNextNumber}
+        isHeaderUrlLoading={isHeaderUrlLoading}
+        isFooterUrlLoading={isFooterUrlLoading}
       />
     ),
     flex: 1,
