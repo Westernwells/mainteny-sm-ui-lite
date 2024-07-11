@@ -437,6 +437,7 @@ export const Actions = ({
         headerInfo={headerInfo}
         footerPath={footerBlockUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        nextCompanyExternalId={companyNextNumber?.value}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

@@ -109,7 +109,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       color: '#212121',
       paddingLeft: 20,
       letterSpacing: -0.15,
-      marginTop: 2,
+      marginVertical: 4,
       lineHeight: 1.5,
     },
     signatureBox: {
@@ -145,6 +145,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  nextCompanyExternalId?: string;
 };
 
 type ArticleSectionProps = {
@@ -469,6 +470,7 @@ const FinalInvoicePdfTemplate = ({
   headerPath,
   footerInfo,
   footerPath,
+  nextCompanyExternalId,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -571,6 +573,7 @@ const FinalInvoicePdfTemplate = ({
               translate={translate}
               invoice={invoice}
               selectedLng={selectedLng}
+              nextCompanyExternalId={nextCompanyExternalId}
             />
           </TopSectionContainer>
 
