@@ -59,6 +59,8 @@ export const columns = (
     [key: string]: string;
   },
   companyNextNumber: StringValueResponse | undefined,
+  isHeaderUrlLoading: boolean,
+  isFooterUrlLoading: boolean,
 ): GridColDef[] => [
   getColumnProps({
     field: 'date',
@@ -126,6 +128,8 @@ export const columns = (
         headerUrl={headerUrl}
         footerUrl={footerUrl}
         companyNextNumber={companyNextNumber}
+        isHeaderUrlLoading={isHeaderUrlLoading}
+        isFooterUrlLoading={isFooterUrlLoading}
         isInvoiceList={false}
       />
     ),
