@@ -831,10 +831,11 @@ export const ViewQuotation = ({
         open={isDialogOpen}
         onConfirm={async () => {
           if (quotation.id && user) {
+            const fileNames: string[] = [`${quotation.id}.pdf`];
+
             if (quotation.status === QuotationStatus.DRAFT) {
               const fileDescriptions = [`${quotation.externalId}.pdf`];
               const blob = await generateBlobUrl();
-              const fileNames: string[] = [`${quotation.id}.pdf`];
 
               const files = await createFilesFromBlobArray(
                 [blob!],
@@ -852,6 +853,8 @@ export const ViewQuotation = ({
                 accepted: true,
                 isAccepted: true,
                 comments: ' ',
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
               },
             });
             setIsDialogOpen(false);
@@ -866,10 +869,11 @@ export const ViewQuotation = ({
         open={isRejectedDialogOpen}
         onConfirm={async () => {
           if (quotation.id && user) {
+            const fileNames: string[] = [`${quotation.id}.pdf`];
+
             if (quotation.status === QuotationStatus.DRAFT) {
               const fileDescriptions = [`${quotation.externalId}.pdf`];
               const blob = await generateBlobUrl();
-              const fileNames: string[] = [`${quotation.id}.pdf`];
 
               const files = await createFilesFromBlobArray(
                 [blob!],
@@ -887,6 +891,8 @@ export const ViewQuotation = ({
                 accepted: false,
                 isAccepted: false,
                 comments: ' ',
+                pdfPath: `${uploadPath}/${fileNames[0]}`,
+                sentDate: '',
               },
             });
             setIsRejectedDialogOpen(false);

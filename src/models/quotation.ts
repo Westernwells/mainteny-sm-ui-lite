@@ -201,6 +201,8 @@ export interface ReplyQuotation {
   comments: string;
   isAccepted: boolean;
   accepted: boolean;
+  pdfPath: string;
+  sentDate?: string;
 }
 
 export interface QueryQuotationCommentsParams {
