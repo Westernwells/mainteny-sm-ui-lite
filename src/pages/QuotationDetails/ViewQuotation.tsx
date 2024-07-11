@@ -293,28 +293,42 @@ export const ViewQuotation = ({
   ) => {
     const fileNames = [`${quotation.id}.pdf`];
     const fileDescriptions = [`${quotation.externalId}.pdf`];
-    // if quotation is not DRAFT -> download file from server
-    if (quotation.status !== QuotationStatus.DRAFT) {
-      const blob = await fetchFile(
-        fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
-      );
-      const files = await createFilesFromBlobArray(
-        [blob],
-        fileNames,
-        fileDescriptions,
-      );
-      setExistingFiles(files);
 
-      // if quotation is DRAFT -> generate file on client
-    } else {
-      const blob = await generateBlobUrl();
-      const files = await createFilesFromBlobArray(
+    const fetchAndCreateFiles = async (
+      url: string,
+      argfileNames: string[],
+      argfileDescriptions: string[],
+    ) => {
+      const blob = await fetchFile(url);
+      return createFilesFromBlobArray(
         [blob],
-        fileNames,
-        fileDescriptions,
+        argfileNames,
+        argfileDescriptions,
       );
-      setExistingFiles(files);
-    }
+    };
+
+    const generateAndCreateFiles = async (
+      argfileNames: string[],
+      argfileDescriptions: string[],
+    ) => {
+      const blob = await generateBlobUrl();
+      return createFilesFromBlobArray(
+        [blob],
+        argfileNames,
+        argfileDescriptions,
+      );
+    };
+
+    const files =
+      quotation.status !== QuotationStatus.DRAFT
+        ? await fetchAndCreateFiles(
+            fileDownloadUrl ? Object.values(fileDownloadUrl)[0] : '',
+            fileNames,
+            fileDescriptions,
+          )
+        : await generateAndCreateFiles(fileNames, fileDescriptions);
+
+    setExistingFiles(files);
   };
 
   const handleOpenSendEmail = async () => {
