@@ -12,7 +12,7 @@ import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
 import {usePublishQuotation} from 'hooks/reactQuery/useQuotation';
-import {useState} from 'react';
+import React, {useState} from 'react';
 import MultipleAsyncSelect from 'components/MultipleAsyncSelect';
 import {
   ServiceCompanyContactPersonOrderField,
@@ -41,6 +41,10 @@ interface Props {
   loadingProgress?: number;
   existingFiles?: FileWithPreview[];
   isLoadingFiles?: boolean;
+}
+
+interface CustomKeyboardEvent extends React.KeyboardEvent<HTMLDivElement> {
+  defaultMuiPrevented?: boolean;
 }
 
 export const SendEmailDialog = ({
@@ -95,6 +99,14 @@ export const SendEmailDialog = ({
     reset();
     setIsCcShown(false);
     setIsBccShown(false);
+  };
+
+  const handleKeyDown = (event: CustomKeyboardEvent) => {
+    const inputElement = event.target as HTMLInputElement;
+    if (event.key === 'Enter' && inputElement.value.trim() === '') {
+      // Prevent the default 'Enter' behavior for freeSolo when input is empty.
+      event.defaultMuiPrevented = true;
+    }
   };
 
   const onSubmit = async (values: EmailRecord) => {
@@ -170,6 +182,7 @@ export const SendEmailDialog = ({
           }}>
           <MultipleAsyncSelect<ServiceCompanyContactPersonView>
             freeSolo
+            onKeyDown={handleKeyDown}
             disableClearable
             queryFn={(params) =>
               fetchServiceCompanyContactPersons(serviceCompanyId, {
@@ -190,7 +203,10 @@ export const SendEmailDialog = ({
               'userAccount.lastName',
               'userAccount.firstName',
             ]}
-            onInputValueChange={(value) => setEmailInputValue(value)}
+            onInputValueChange={(value: string) => {
+              const trimmedValue = value.trim();
+              setEmailInputValue(trimmedValue);
+            }}
             textFieldProps={{
               label: t('Send to'),
               placeholder:
@@ -260,6 +276,7 @@ export const SendEmailDialog = ({
             <Box display="flex" flexWrap="nowrap" alignItems="center">
               <MultipleAsyncSelect<ServiceCompanyContactPersonView>
                 freeSolo
+                onKeyDown={handleKeyDown}
                 queryFn={(params) =>
                   fetchServiceCompanyContactPersons(serviceCompanyId, {
                     ...params,
@@ -278,7 +295,10 @@ export const SendEmailDialog = ({
                   'userAccount.lastName',
                   'userAccount.firstName',
                 ]}
-                onInputValueChange={(value) => setCcEmailsInputValue(value)}
+                onInputValueChange={(value: string) => {
+                  const trimmedValue = value.trim();
+                  setCcEmailsInputValue(trimmedValue);
+                }}
                 textFieldProps={{
                   label: t('Cc'),
                   placeholder:
@@ -333,6 +353,7 @@ export const SendEmailDialog = ({
             <Box display="flex" flexWrap="nowrap" alignItems="center">
               <MultipleAsyncSelect<ServiceCompanyContactPersonView>
                 freeSolo
+                onKeyDown={handleKeyDown}
                 queryFn={(params) =>
                   fetchServiceCompanyContactPersons(serviceCompanyId, {
                     ...params,
@@ -351,7 +372,10 @@ export const SendEmailDialog = ({
                   'userAccount.lastName',
                   'userAccount.firstName',
                 ]}
-                onInputValueChange={(value) => setBccEmailsInputValue(value)}
+                onInputValueChange={(value: string) => {
+                  const trimmedValue = value.trim();
+                  setBccEmailsInputValue(trimmedValue);
+                }}
                 textFieldProps={{
                   label: t('Bcc'),
                   placeholder:
