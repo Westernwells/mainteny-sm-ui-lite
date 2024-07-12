@@ -1,3 +1,4 @@
+import {SxProps, Theme} from '@mui/material';
 import MuiButton, {ButtonProps} from '@mui/material/Button';
 import {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -5,7 +6,7 @@ import {useTranslation} from 'react-i18next';
 interface Props {
   label?: string;
   children?: ReactNode;
-  style?: {[key: string]: any};
+  style?: SxProps<Theme>;
   buttonProps?: ButtonProps;
   disabled?: boolean;
   testId?: string;
@@ -24,7 +25,7 @@ export const Button = ({
     <MuiButton
       disabled={disabled}
       disableRipple
-      data-test-id={testId}
+      data-testid={testId}
       disableFocusRipple
       disableElevation
       variant="text"
