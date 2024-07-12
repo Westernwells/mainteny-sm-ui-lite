@@ -26,6 +26,8 @@ const pageInfo = makePage(0, 50);
 
 export const UnitMapsView = () => {
   const formatDate = useFormatDate();
+  const [isFirstFetchingDone, setIsFirstFetchingDone] = useState(false);
+
   const {user} = useUserSession();
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {data: userAccount} = useGetUserAccount(user?.userAccount.id);
@@ -117,14 +119,25 @@ export const UnitMapsView = () => {
     () => elevatorResponse,
     [elevatorResponse],
   );
+  const isFilterActive = useMemo(
+    () =>
+      !!search ||
+      !!lastVisitStart ||
+      !!lastVisitEnd ||
+      !!nextVisitStart ||
+      !!nextVisitEnd,
+    [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd],
+  );
+
   useEffect(() => {
     if (page.pageIndex) {
       setPage({...page, pageIndex: 0});
+      setIsFirstFetchingDone(false);
     }
     if (textInput.current) {
       textInput.current.value = search;
     }
-  }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
+  }, [search]);
 
   const newElevatorView = useMemo(() => {
     if (
@@ -152,7 +165,58 @@ export const UnitMapsView = () => {
     elevatorView,
     elevatorResponse,
   ]);
+  // this handles fetching when when there is filtering
+  const updateElevatorViewFiltering = useCallback(() => {
+    if (!isLoading && !isFetching) {
+      const currentTotal =
+        (page.pageIndex + (isFirstFetchingDone ? 1 : 0)) * page.pageSize;
 
+      if (currentTotal < memorisedElevatorResponse.total) {
+        setElevatorView(newElevatorView);
+        setIsFirstFetchingDone(true);
+        setPage({...page, pageIndex: page.pageIndex + 1});
+      }
+
+      if (currentTotal >= memorisedElevatorResponse.total) {
+        const latLng = elevatorView.elevator.data.map((elevator) => ({
+          latitude: elevator.address.location?.latitude ?? 0.0,
+          longitude: elevator.address.location?.longitude ?? 0.0,
+        }));
+
+        const centerCoord = getCenter(latLng) as unknown as Location;
+        const centerCoordIsDifferent =
+          elevatorView.centerCoord.latitude !== centerCoord.latitude &&
+          elevatorView.centerCoord.longitude !== centerCoord.longitude;
+
+        if (centerCoord && centerCoordIsDifferent && page.pageIndex !== 0) {
+          setElevatorView((prevState) => ({
+            ...prevState,
+            centerCoord,
+          }));
+        } else if (!isFirstFetchingDone) {
+          setIsFirstFetchingDone(true);
+          setElevatorView(newElevatorView);
+        } else if (page.pageIndex === 0) {
+          setIsFirstFetchingDone(false);
+          setPage({...page, pageIndex: page.pageIndex + 1});
+        } else {
+          setIsFirstFetchingDone(true);
+        }
+      }
+    }
+  }, [
+    isLoading,
+    isFetching,
+    page,
+    setPage,
+    memorisedElevatorResponse,
+    newElevatorView,
+    elevatorView,
+    isFilterActive,
+    isFirstFetchingDone,
+  ]);
+
+  // fetching for when there is no filtering
   const updateElevatorView = useCallback(() => {
     if (!isLoading && !isFetching) {
       const currentTotal = (page.pageIndex + 1) * page.pageSize;
@@ -161,6 +225,7 @@ export const UnitMapsView = () => {
         setElevatorView(newElevatorView);
         setPage({...page, pageIndex: page.pageIndex + 1});
       }
+
       if (currentTotal >= memorisedElevatorResponse.total) {
         const latLng = elevatorView.elevator.data.map((elevator) => ({
           latitude: elevator.address.location?.latitude ?? 0.0,
@@ -191,8 +256,17 @@ export const UnitMapsView = () => {
   ]);
 
   useEffect(() => {
-    updateElevatorView();
-  }, [memorisedElevatorResponse, newElevatorView, updateElevatorView]);
+    if (isFilterActive) {
+      updateElevatorViewFiltering();
+    } else {
+      updateElevatorView();
+    }
+  }, [
+    memorisedElevatorResponse,
+    newElevatorView,
+    updateElevatorView,
+    isFilterActive,
+  ]);
 
   useEffect(() => {
     const result = elevatorView.elevator.data.map((elevator: ElevatorView) => ({
@@ -242,96 +316,126 @@ export const UnitMapsView = () => {
     mapRef?.current?.panTo({lat, lng});
   };
 
-  const renderFilterItems = () => (
-    <FilterFields
-      onClear={() => {
-        clearValues();
-        setResetDatePicker(true);
-        setPage({
-          pageSize: 50,
-          pageIndex: 0,
-        });
-        const res = createEmptyResource<ElevatorView>(10);
-        const latLng = res.data.map((elevator) => ({
-          latitude: elevator.address.location?.latitude ?? 0.0,
-          longitude: elevator.address.location?.longitude ?? 0.0,
-        }));
+  const renderFilterItems = useCallback(
+    () => (
+      <FilterFields
+        onClear={() => {
+          clearValues();
+          setResetDatePicker(true);
+          setPage({
+            pageSize: 50,
+            pageIndex: 0,
+          });
+          const res = createEmptyResource<ElevatorView>(10);
+          const latLng = res.data.map((elevator) => ({
+            latitude: elevator.address.location?.latitude ?? 0.0,
+            longitude: elevator.address.location?.longitude ?? 0.0,
+          }));
 
-        const centerCoord = getCenter(latLng) as unknown as Location;
-        setElevatorView({
-          elevator: res,
-          centerCoord,
-        });
-      }}
-      wrapperStyle={{width: '90%'}}>
-      <DatePicker
-        defaultDate={lastVisitStart}
-        containerStyles={{mr: '1em'}}
-        reset={resetDatePicker}
-        getReset={(val) => {
-          if (val) {
-            setResetDatePicker(false);
-          }
+          const centerCoord = getCenter(latLng) as unknown as Location;
+          setElevatorView({
+            elevator: res,
+            centerCoord,
+          });
         }}
-        maxDate={lastVisitEnd || new Date()}
-        getSelectedDate={(date) => setLastVisitStart(date)}
-        textFieldProps={{
-          label: 'Last Visit Start',
-          sx: {background: '#fff'},
-        }}
-      />
-      <DatePicker
-        defaultDate={lastVisitEnd}
-        maxDate={new Date()}
-        reset={resetDatePicker}
-        getReset={(val) => {
-          if (val) {
-            setResetDatePicker(false);
-          }
-        }}
-        minDate={lastVisitStart || undefined}
-        containerStyles={{mr: '1em'}}
-        getSelectedDate={(date) => setLastVisitEnd(date)}
-        textFieldProps={{
-          label: 'Last Visit End',
-          sx: {background: '#fff'},
-        }}
-      />
+        wrapperStyle={{width: '90%'}}>
+        <DatePicker
+          defaultDate={lastVisitStart}
+          containerStyles={{mr: '1em'}}
+          reset={resetDatePicker}
+          getReset={(val) => {
+            if (val) {
+              setResetDatePicker(false);
+            }
+          }}
+          maxDate={lastVisitEnd || new Date()}
+          getSelectedDate={(date) => {
+            setLastVisitStart(date);
+            setIsFirstFetchingDone(false);
+            setPage({...page, pageIndex: 0});
+          }}
+          textFieldProps={{
+            label: 'Last Visit Start',
+            sx: {background: '#fff'},
+          }}
+        />
+        <DatePicker
+          defaultDate={lastVisitEnd}
+          maxDate={new Date()}
+          reset={resetDatePicker}
+          getReset={(val) => {
+            if (val) {
+              setResetDatePicker(false);
+            }
+          }}
+          minDate={lastVisitStart || undefined}
+          containerStyles={{mr: '1em'}}
+          getSelectedDate={(date) => {
+            setLastVisitEnd(date);
+            setIsFirstFetchingDone(false);
+            setPage({...page, pageIndex: 0});
+          }}
+          textFieldProps={{
+            label: 'Last Visit End',
+            sx: {background: '#fff'},
+          }}
+        />
 
-      <DatePicker
-        defaultDate={nextVisitStart}
-        minDate={new Date()}
-        reset={resetDatePicker}
-        getReset={(val) => {
-          if (val) {
-            setResetDatePicker(false);
-          }
-        }}
-        maxDate={nextVisitEnd || undefined}
-        containerStyles={{mr: '1em'}}
-        getSelectedDate={(date) => setNextVisitStart(date)}
-        textFieldProps={{
-          label: 'Next Visit Start',
-          sx: {background: '#fff'},
-        }}
-      />
-      <DatePicker
-        defaultDate={nextVisitEnd}
-        reset={resetDatePicker}
-        getReset={(val) => {
-          if (val) {
-            setResetDatePicker(false);
-          }
-        }}
-        minDate={nextVisitStart || new Date()}
-        containerStyles={{mr: '1em'}}
-        getSelectedDate={(date) => setNextVisitEnd(date)}
-        textFieldProps={{
-          label: 'Next Visit End',
-          sx: {background: '#fff'},
-        }}
-      />
-    </FilterFields>
+        <DatePicker
+          defaultDate={nextVisitStart}
+          minDate={new Date()}
+          reset={resetDatePicker}
+          getReset={(val) => {
+            if (val) {
+              setResetDatePicker(false);
+            }
+          }}
+          maxDate={nextVisitEnd || undefined}
+          containerStyles={{mr: '1em'}}
+          getSelectedDate={(date) => {
+            setNextVisitStart(date);
+            setIsFirstFetchingDone(false);
+            setPage({...page, pageIndex: 0});
+          }}
+          textFieldProps={{
+            label: 'Next Visit Start',
+            sx: {background: '#fff'},
+          }}
+        />
+        <DatePicker
+          defaultDate={nextVisitEnd}
+          reset={resetDatePicker}
+          getReset={(val) => {
+            if (val) {
+              setResetDatePicker(false);
+            }
+          }}
+          minDate={nextVisitStart || new Date()}
+          containerStyles={{mr: '1em'}}
+          getSelectedDate={(date) => {
+            setNextVisitEnd(date);
+            setIsFirstFetchingDone(false);
+            setPage({...page, pageIndex: 0});
+          }}
+          textFieldProps={{
+            label: 'Next Visit End',
+            sx: {background: '#fff'},
+          }}
+        />
+      </FilterFields>
+    ),
+    [
+      clearValues,
+      createEmptyResource,
+      elevatorView,
+      getCenter,
+      lastVisitEnd,
+      lastVisitStart,
+      nextVisitEnd,
+      nextVisitStart,
+      page,
+      resetDatePicker,
+    ],
   );
 
   const renderWidget = () => (
