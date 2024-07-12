@@ -1324,7 +1324,7 @@ export const InvoiceForm = ({
         ? 'Credit Note'
         : 'Invoice';
 
-    return t(`${name} - ${t(type)} {{invoiceNumber}}`, {
+    return t(`${t(type)} {{invoiceNumber}}`, {
       invoiceNumber: invoice?.number ?? '',
     });
   };
