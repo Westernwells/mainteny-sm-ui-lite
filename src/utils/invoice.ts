@@ -116,12 +116,17 @@ export const getInvoiceActivityDescription = (
     activity.meta.creator?.lastName ||
     activity.meta.creator?.username;
 
+  const creatorFullName =
+    activity.meta.creator?.firstName && activity.meta.creator?.lastName
+      ? `${activity.meta.creator?.firstName} ${activity.meta.creator?.lastName}`
+      : null;
+
   switch (activity.type) {
     case InvoiceActivityType.SENT:
       return t(
         `Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}`,
         {
-          senderName: creatorInfo,
+          senderName: creatorFullName ?? creatorInfo,
           receiverEmail: JSON.parse(activity.data).email || '',
           invoiceNumber,
         },
@@ -146,7 +151,7 @@ export const getInvoiceActivityDescription = (
       return t(
         `Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}`,
         {
-          senderName: creatorInfo,
+          senderName: creatorFullName ?? creatorInfo,
           receiverEmail: JSON.parse(activity.data).email || '',
           invoiceNumber,
         },
