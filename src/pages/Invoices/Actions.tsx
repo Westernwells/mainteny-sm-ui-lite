@@ -189,7 +189,9 @@ export const Actions = ({
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
   const {mutateAsync: cancelInvoice} = useCancelInvoice();
   const {mutateAsync: printInvoice} = usePrintInvoice({shouldNavigate: false});
-  const {mutateAsync: sendInvoice} = useSendInvoice();
+  const {mutateAsync: sendInvoice} = useSendInvoice({
+    shouldNavigate: true,
+  });
 
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice?.serviceOrder?.id,

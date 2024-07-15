@@ -179,7 +179,9 @@ export const ViewQuotation = ({
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutateAsync: printQuotation} = usePrintQuotation();
   const {mutateAsync: sendQuotation, isLoading: sendingQuotation} =
-    useSendQuotation();
+    useSendQuotation({
+      shouldNavigate: false,
+    });
 
   const formik = useFormik({
     initialValues: {
