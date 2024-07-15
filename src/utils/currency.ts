@@ -36,7 +36,13 @@ export const formatCurrency = (
   });
 
   if (options?.excludeCurrencySymbol) {
-    return formattedAmount.replace(options?.currencySymbol!, '').trim();
+    const removedCurrencySymbol = options?.currencySymbol
+      ? formattedAmount.replace(options.currencySymbol, '')
+      : formattedAmount;
+    const result = options?.currency
+      ? removedCurrencySymbol.replace(options.currency, '')
+      : removedCurrencySymbol;
+    return result.trim();
   }
 
   return formattedAmount.replace(/\s/g, '');

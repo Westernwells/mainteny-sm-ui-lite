@@ -83,6 +83,8 @@ interface Props {
     [key: string]: string;
   };
   companyNextNumber: StringValueResponse | undefined;
+  isHeaderUrlLoading: boolean;
+  isFooterUrlLoading: boolean;
   isInvoiceList?: boolean;
 }
 
@@ -120,6 +122,8 @@ export const Actions = ({
   headerUrl,
   footerUrl,
   companyNextNumber,
+  isHeaderUrlLoading,
+  isFooterUrlLoading,
   isInvoiceList = true,
 }: Props) => {
   const {t} = useTranslation();
@@ -185,7 +189,9 @@ export const Actions = ({
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
   const {mutateAsync: cancelInvoice} = useCancelInvoice();
   const {mutateAsync: printInvoice} = usePrintInvoice({shouldNavigate: false});
-  const {mutateAsync: sendInvoice} = useSendInvoice();
+  const {mutateAsync: sendInvoice} = useSendInvoice({
+    shouldNavigate: true,
+  });
 
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice?.serviceOrder?.id,
@@ -476,6 +482,10 @@ export const Actions = ({
       [key: string]: string;
     },
   ) => {
+    if (isHeaderUrlLoading || isFooterUrlLoading) {
+      return;
+    }
+
     let allFiles: FileWithPreview[] = [];
     const fileNames: string[] = [`${invoiceData?.id}.pdf`];
     const fileDescriptions: string[] = [
@@ -484,99 +494,102 @@ export const Actions = ({
       }.pdf`,
     ];
 
-    // BASE FILES
-    if (invoiceData?.status !== InvoiceStatus.DRAFT) {
-      const blob = await fetchFile(
-        invoiceDownloadUrlArg ? Object.values(invoiceDownloadUrlArg)[0] : '',
-      );
-      allFiles = await createFilesFromBlobArray(
+    // Helper function to fetch and create files
+    const fetchAndCreateFiles = async (
+      url: string,
+      argfileNames: string[],
+      argfileDescriptions: string[],
+    ) => {
+      const blob = await fetchFile(url);
+      return createFilesFromBlobArray(
         [blob],
-        fileNames,
-        fileDescriptions,
+        argfileNames,
+        argfileDescriptions,
       );
-    } else {
-      const blobFile = await generateBlobUrl(invoiceData, headerUrl, footerUrl);
-      allFiles = await createFilesFromBlobArray(
-        [blobFile],
-        fileNames,
-        fileDescriptions,
-      );
-    }
+    };
 
-    // ADDITIONAL FILES
-    if (invoiceData?.additionalInfo.includeWorkReport) {
-      const workReportFileNames = [
-        `${invoiceData?.serviceOrder?.report?.id}.pdf`,
-      ];
-      const workReportFileDescriptions = [
-        `${FILE_DESCRIPTION_PREFIXES.WORK_REPORT}-${
-          // use externalId if available, otherwise use serviceOrder.externalId as a file description
-          invoiceData?.serviceOrder?.report?.externalId ||
-          invoice?.serviceOrder?.externalId
-        }.pdf`,
-      ];
+    // Base file operations
+    const baseFileOperations =
+      invoiceData?.status !== InvoiceStatus.DRAFT
+        ? fetchAndCreateFiles(
+            invoiceDownloadUrlArg
+              ? Object.values(invoiceDownloadUrlArg)[0]
+              : '',
+            fileNames,
+            fileDescriptions,
+          )
+        : generateBlobUrl(invoiceData, headerUrl, footerUrl).then((blobFile) =>
+            createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
+          );
 
-      if (
-        report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
-      ) {
-        const blob = await fetchFile(
-          workReportDownloadUrlArg
-            ? Object.values(workReportDownloadUrlArg)[0]
-            : '',
-        );
-        const files = await createFilesFromBlobArray(
-          [blob],
-          workReportFileNames,
-          workReportFileDescriptions,
-        );
-        allFiles = allFiles.concat(files);
-      } else {
-        const workReportBlob = await generateWorkReportBlob();
-        const files = await createFilesFromBlobArray(
-          [workReportBlob],
-          workReportFileNames,
-          workReportFileDescriptions,
-        );
-        allFiles = allFiles.concat(files);
-      }
-    }
+    // Work report operations
+    const workReportOperations = invoiceData?.additionalInfo.includeWorkReport
+      ? report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
+        ? fetchAndCreateFiles(
+            workReportDownloadUrlArg
+              ? Object.values(workReportDownloadUrlArg)[0]
+              : '',
+            [`${report?.id}.pdf`],
+            [
+              `${FILE_DESCRIPTION_PREFIXES.WORK_REPORT}-${
+                report?.externalId || invoice?.serviceOrder?.externalId
+              }.pdf`,
+            ],
+          )
+        : generateWorkReportBlob().then((workReportBlob) =>
+            createFilesFromBlobArray(
+              [workReportBlob],
+              [`${report?.id}.pdf`],
+              [
+                `${FILE_DESCRIPTION_PREFIXES.WORK_REPORT}-${
+                  report?.externalId || invoice?.serviceOrder?.externalId
+                }.pdf`,
+              ],
+            ),
+          )
+      : Promise.resolve([]);
 
-    if (invoiceData?.additionalInfo.includeCheckList) {
-      const checklistFileNames = [`${selectedChecklist?.checkListId}.pdf`];
-      const checklistFileDescriptions = [
-        `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
-          // use externalId if available, otherwise use serviceOrder.externalId as a file description
-          selectedChecklist?.checkList.externalId ||
-          invoiceData?.serviceOrder?.externalId
-        }.pdf`,
-      ];
-
-      if (
-        selectedChecklist?.additionalInfo.pdfGenerationStatus ===
+    // Checklist operations
+    const checklistOperations = invoiceData?.additionalInfo.includeCheckList
+      ? selectedChecklist?.additionalInfo.pdfGenerationStatus ===
         PdfGenerationStatus.DONE
-      ) {
-        const blob = await fetchFile(
-          checklistDownloadUrlArg
-            ? Object.values(checklistDownloadUrlArg)[0]
-            : '',
-        );
-        const files = await createFilesFromBlobArray(
-          [blob],
-          checklistFileNames,
-          checklistFileDescriptions,
-        );
-        allFiles = allFiles.concat(files);
-      } else {
-        const checklistBlob = await generateChecklistBlob();
-        const files = await createFilesFromBlobArray(
-          [checklistBlob],
-          checklistFileNames,
-          checklistFileDescriptions,
-        );
-        allFiles = allFiles.concat(files);
-      }
-    }
+        ? fetchAndCreateFiles(
+            checklistDownloadUrlArg
+              ? Object.values(checklistDownloadUrlArg)[0]
+              : '',
+            [`${selectedChecklist?.checkListId}.pdf`],
+            [
+              `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
+                selectedChecklist?.checkList.externalId ||
+                invoiceData?.serviceOrder?.externalId
+              }.pdf`,
+            ],
+          )
+        : generateChecklistBlob().then((checklistBlob) =>
+            createFilesFromBlobArray(
+              [checklistBlob],
+              [`${selectedChecklist?.checkListId}.pdf`],
+              [
+                `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
+                  selectedChecklist?.checkList.externalId ||
+                  invoiceData?.serviceOrder?.externalId
+                }.pdf`,
+              ],
+            ),
+          )
+      : Promise.resolve([]);
 
+    // Wait for all file operations to complete
+    const [baseFiles, workReportFiles, checklistFiles] = await Promise.all([
+      baseFileOperations,
+      workReportOperations,
+      checklistOperations,
+    ]);
+
+    // Combine all files
+    allFiles = [...baseFiles, ...workReportFiles, ...checklistFiles];
+
+    // Set existing files
     setExistingFiles(allFiles);
   };
 
@@ -1161,7 +1174,8 @@ export const Actions = ({
                 pdfPath: isDraftInvoice
                   ? `${invoiceUploadPath}/${fileNames[0]}`
                   : invoiceData?.additionalInfo?.pdfPath!,
-                externalId: invoiceData?.externalId!,
+                externalId:
+                  invoiceData?.externalId! || companyNextNumber?.value!,
                 dueDate: invoiceData?.dueDate || dateToString(new Date()),
                 sentDate: invoiceData?.sentDate || dateToString(new Date()),
                 email: {
@@ -1217,27 +1231,7 @@ export const Actions = ({
             });
           };
 
-          // 5. If invoice has no 'externalId' -> add it
-          if (invoice?.externalId.trim() === '') {
-            await updateInvoiceAsync(
-              {
-                data: formatInvoiceViewToUpdateInvoice({
-                  ...invoice,
-                  externalId: companyNextNumber?.value!,
-                }),
-                invoiceId: invoice.id,
-              },
-              {
-                onSuccess: async () => {
-                  const {data: updatedInvoiceData} = await refetchInvoiceData();
-                  await sendEmail(updatedInvoiceData!);
-                },
-              },
-            );
-            return;
-          }
-
-          // 6. Send email
+          // 5. Send email
           await sendEmail(updatedInvoice!);
         }}
         email={

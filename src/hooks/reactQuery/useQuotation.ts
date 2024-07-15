@@ -135,20 +135,28 @@ export const postSendQuotation = async (
   await axiosClient.post(`api/quotations/${id}/send`, body);
 };
 
-export const useSendQuotation = () => {
+export const useSendQuotation = ({
+  shouldNavigate = true,
+}: {
+  shouldNavigate?: boolean;
+} = {}) => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
+  const navigate = useNavigate();
 
   return useMutation(
     ({id, body}: {id: string; body: SendQuotationRecord}) =>
       postSendQuotation(id, body),
     {
-      onSuccess: () => {
+      onSuccess: (_, {id}) => {
         queryClient.invalidateQueries([qk.fetchQuotations]);
         queryClient.invalidateQueries([qk.quotationById]);
         enqueueSnackbar(`Quotation sent successfully`, {
           variant: 'success',
         });
+        if (shouldNavigate) {
+          navigate(`/quotations/details/${id}`);
+        }
       },
       onError: (err) => {
         console.log(err);
