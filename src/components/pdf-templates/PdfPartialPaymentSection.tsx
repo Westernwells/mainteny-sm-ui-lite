@@ -405,7 +405,7 @@ export const PdfPartialPaymentSection = ({
         )}
 
       {previousInvoices.length && (
-        <View>
+        <View wrap={false}>
           <View style={styles.tableRow}>
             <Text style={{width: '44%'}} />
             <Text
