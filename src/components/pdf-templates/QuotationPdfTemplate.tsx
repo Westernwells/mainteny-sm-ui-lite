@@ -506,7 +506,7 @@ const QuotationPdfTemplate = React.memo(
                               marginLeft: 10,
                               color: '#212121',
                             }}>
-                            {articleItem.article.unit || '-'}
+                            {translate(articleItem.article.unit) || '-'}
                           </Text>
                           <Text
                             style={{

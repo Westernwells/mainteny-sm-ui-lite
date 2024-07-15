@@ -97,6 +97,10 @@ export const getInvoiceActivityTitle = (
       return 'Payment deleted';
     case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED:
       return 'Invoice not sent';
+    case InvoiceActivityType.INVOICE_EMAIL_DELIVERED:
+      return 'Invoice delivered';
+    case InvoiceActivityType.OVERDUE_NOTICE_EMAIL_DELIVERED:
+      return 'Overdue notice delivered';
     default:
       return '';
   }
@@ -106,30 +110,33 @@ export const getInvoiceActivityDescription = (
   activity: InvoiceActivityView,
   invoice: InvoiceView,
 ): string => {
+  const invoiceNumber = invoice.externalId ?? '';
+  const creatorInfo =
+    activity.meta.creator?.firstName ||
+    activity.meta.creator?.lastName ||
+    activity.meta.creator?.username;
+
+  const creatorFullName =
+    activity.meta.creator?.firstName && activity.meta.creator?.lastName
+      ? `${activity.meta.creator?.firstName} ${activity.meta.creator?.lastName}`
+      : null;
+
   switch (activity.type) {
-    case InvoiceActivityType.SENT: {
-      const invoiceNumber = invoice.externalId ?? '';
-      const creatorInfo =
-        activity.meta.creator?.firstName ||
-        activity.meta.creator?.lastName ||
-        activity.meta.creator?.username;
+    case InvoiceActivityType.SENT:
       return t(
-        `Email with {{invoiceDetails}} ${
-          creatorInfo ? `by {{creator}}` : ''
-        } to {{email}} delivered`,
+        `Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}`,
         {
-          creator: creatorInfo,
-          email: JSON.parse(activity.data).email || '',
-          invoiceDetails: invoiceNumber,
+          senderName: creatorFullName ?? creatorInfo,
+          receiverEmail: JSON.parse(activity.data).email || '',
+          invoiceNumber,
         },
       );
-    }
-    case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED: {
-      const invoiceNumber = invoice.externalId ?? '';
-      const creatorInfo =
-        activity.meta.creator?.firstName ||
-        activity.meta.creator?.lastName ||
-        activity.meta.creator?.username;
+    case InvoiceActivityType.INVOICE_EMAIL_DELIVERED ||
+      InvoiceActivityType.OVERDUE_NOTICE_EMAIL_DELIVERED:
+      return t(`The email was successfully delivered to {{receiverEmail}}`, {
+        receiverEmail: JSON.parse(activity.data).receivers.join(', ') || '',
+      });
+    case InvoiceActivityType.INVOICE_EMAIL_SENT_FAILED:
       return t(
         `Email with {{invoiceDetails}} ${
           creatorInfo ? `by {{creator}}` : ''
@@ -140,7 +147,15 @@ export const getInvoiceActivityDescription = (
           invoiceDetails: invoiceNumber,
         },
       );
-    }
+    case InvoiceActivityType.OVERDUE_NOTICE_SENT:
+      return t(
+        `Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}`,
+        {
+          senderName: creatorFullName ?? creatorInfo,
+          receiverEmail: JSON.parse(activity.data).email || '',
+          invoiceNumber,
+        },
+      );
     default:
       return '';
   }

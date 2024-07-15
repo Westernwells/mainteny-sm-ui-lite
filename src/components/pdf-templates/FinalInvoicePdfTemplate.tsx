@@ -8,7 +8,7 @@ import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
-import {formatCostText} from 'utils/utils';
+import {fixRounding, formatCostText} from 'utils/utils';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {
   applyGlobalDiscountOnItems,
@@ -421,7 +421,15 @@ export const ArticleSection = ({
                   textAlign: 'right',
                 }}>{`${translate('VAT')} ${v.percentageVat}%`}</Text>
               <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-                {v.vat}
+                {formatCurrency(fixRounding(v.vat, 2), {
+                  currency: currentCurrency?.code,
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                  roundingMode: 'floor',
+                  excludeCurrencySymbol: true,
+                  companyLang: selectedLng,
+                  currencySymbol: currentCurrency?.symbol,
+                })}
               </Text>
             </View>
           ))}
