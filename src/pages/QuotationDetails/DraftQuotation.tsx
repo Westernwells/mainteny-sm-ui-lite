@@ -162,7 +162,9 @@ export const DraftQuotation = ({
   const {mutateAsync: createNewQuotation, isLoading: isCreating} =
     useCreateQuotation();
   const {mutateAsync: sendQuotation, isLoading: sendingQuotation} =
-    useSendQuotation();
+    useSendQuotation({
+      shouldNavigate: true,
+    });
   const {mutateAsync: uploadFiles} = useUploadFiles('');
 
   const [searchParams, setSearchParams] = useSearchParams();

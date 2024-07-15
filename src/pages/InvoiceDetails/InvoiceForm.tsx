@@ -2435,7 +2435,7 @@ export const InvoiceForm = ({
           };
 
           // 5. Send email
-          await sendEmail(updatedInvoice!);
+          await sendEmail(invoice!);
         }}
         email={customer?.additionalInfo.billingEmail || customer?.contact.email}
         subject={generateEmailSubject()}
