@@ -409,33 +409,41 @@ export const InvoiceForm = ({
       type: serviceCompanyType,
     });
 
-  const initialValues: InvoiceFormData = {
-    subject: '',
-    description: '',
-    externalId: invoice?.externalId || '',
-    type:
-      typeof invoiceType === 'string' &&
-      invoiceType &&
-      invoiceType in InvoiceType
-        ? InvoiceType[invoiceType]
-        : InvoiceType.FULL,
-    items: [],
-    paymentTerm: undefined,
-    propertyOwnerId: '',
-    serviceCompanyId: '',
-    serviceOrderId: '',
-    paymentInfo: payment,
-    shouldSendOut: false,
-    includeWorkReport: false,
-    includeCheckList: false,
-    beneficialName: '',
-    costCenter: '',
-    customerSpecificOrderNumber: '',
-    moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
-    unitNumber: '-',
-    showArticleSection: true,
-    notes: [],
-  };
+  const initialValues: InvoiceFormData = useMemo(
+    () => ({
+      subject: '',
+      description: '',
+      externalId: invoice?.externalId || '',
+      type:
+        typeof invoiceType === 'string' &&
+        invoiceType &&
+        invoiceType in InvoiceType
+          ? InvoiceType[invoiceType]
+          : InvoiceType.FULL,
+      items: [],
+      paymentTerm: undefined,
+      propertyOwnerId: '',
+      serviceCompanyId: '',
+      serviceOrderId: '',
+      paymentInfo: payment,
+      shouldSendOut: false,
+      includeWorkReport: false,
+      includeCheckList: false,
+      beneficialName: '',
+      costCenter: '',
+      customerSpecificOrderNumber: '',
+      moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
+      unitNumber: '-',
+      showArticleSection: true,
+      notes: [],
+      ...(invoice && {
+        billingAddress:
+          invoice.additionalInfo?.billingAddress ||
+          invoice?.propertyOwner?.billingAddress,
+      }),
+    }),
+    [invoice, invoiceType],
+  );
 
   const validationSchema = Yup.object().shape({
     serviceCompanyId: Yup.string().required('Company is required'),
@@ -778,11 +786,6 @@ export const InvoiceForm = ({
         invoice?.additionalInfo?.customerSpecificOrderNumber || '',
       );
       formik.setFieldValue('moreInfo', invoice?.additionalInfo?.moreInfo ?? '');
-      formik.setFieldValue(
-        'billingAddress',
-        invoice.additionalInfo?.billingAddress ||
-          invoiceCustomer?.billingAddress,
-      );
       formik.setFieldValue(
         'beneficiaryAddress',
         invoice.additionalInfo?.beneficiaryAddress ||
