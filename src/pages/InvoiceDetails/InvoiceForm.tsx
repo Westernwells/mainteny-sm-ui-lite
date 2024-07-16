@@ -431,7 +431,9 @@ export const InvoiceForm = ({
       includeCheckList: false,
       beneficialName: '',
       costCenter: '',
-      customerSpecificOrderNumber: '',
+      customerSpecificOrderNumber: serviceOrder
+        ? serviceOrder.additionalInfo.purchaseOrderNumber
+        : '',
       moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
       unitNumber: '-',
       showArticleSection: true,
@@ -638,6 +640,10 @@ export const InvoiceForm = ({
 
   const handleSelectServiceOrder = (selectedServiceOrder: ServiceOrderView) => {
     setServiceOrder(selectedServiceOrder);
+    formik.setFieldValue(
+      'customerSpecificOrderNumber',
+      selectedServiceOrder?.additionalInfo?.purchaseOrderNumber || '',
+    );
   };
 
   const onRemoveServiceOrder = () => {
@@ -858,10 +864,6 @@ export const InvoiceForm = ({
           stripHtmlTags(serviceOrder.report.description),
         );
       }
-      formik.setFieldValue(
-        'customerSpecificOrderNumber',
-        serviceOrder.additionalInfo?.purchaseOrderNumber || '',
-      );
       formik.setFieldValue(
         'propertyOwnerId',
         serviceOrder.elevator.propertyOwner.id,
