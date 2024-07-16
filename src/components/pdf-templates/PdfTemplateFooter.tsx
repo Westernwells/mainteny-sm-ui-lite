@@ -27,7 +27,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       flexDirection: 'row',
     },
     footerSectionBody: {
-      fontSize: 5,
+      fontSize: 6,
       fontWeight: 'light',
       color: '#616161',
       display: 'flex',
@@ -94,7 +94,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     },
     footerHeading: {
       paddingVertical: 0.5,
-      fontSize: 5,
+      fontSize: 6,
       ...boldFontStyle,
     },
     imageContainer: {
