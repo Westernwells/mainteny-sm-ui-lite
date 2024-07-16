@@ -158,12 +158,14 @@ const PdfTemplateInvoiceDetails = ({
         </View>
       )}
 
-      <View style={styles.rightAddressContent}>
-        <Text style={styles.tag}>{translate('Order date')}</Text>
-        <Text style={styles.tagContent}>
-          {formatDate(invoice?.serviceOrder?.meta.createdAt) || '-'}
-        </Text>
-      </View>
+      {invoice?.serviceOrder?.meta.createdAt && (
+        <View style={styles.rightAddressContent}>
+          <Text style={styles.tag}>{translate('Order date')}</Text>
+          <Text style={styles.tagContent}>
+            {formatDate(invoice?.serviceOrder?.meta.createdAt) || '-'}
+          </Text>
+        </View>
+      )}
 
       {invoice?.additionalInfo.customerSpecificOrderNumber && (
         <View style={styles.rightAddressContent}>
