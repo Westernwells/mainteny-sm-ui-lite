@@ -431,7 +431,9 @@ export const InvoiceForm = ({
       includeCheckList: false,
       beneficialName: '',
       costCenter: '',
-      customerSpecificOrderNumber: '',
+      customerSpecificOrderNumber: serviceOrder
+        ? serviceOrder.additionalInfo.purchaseOrderNumber
+        : '',
       moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
       unitNumber: '-',
       showArticleSection: true,
