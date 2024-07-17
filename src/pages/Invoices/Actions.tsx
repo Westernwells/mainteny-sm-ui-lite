@@ -638,7 +638,7 @@ export const Actions = ({
     if (companyNextNumber) {
       handleOpenSendEmail(companyNextNumber.value);
     }
-  }, [invoice, companyNextNumber]);
+  }, [invoice, companyNextNumber, generateBlobUrl]);
 
   const cancelText = selectedLng === 'DE' ? 'Stornieren' : t('Cancel');
   const cancelItem = {
