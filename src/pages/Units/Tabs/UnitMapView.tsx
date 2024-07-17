@@ -1,16 +1,16 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import GoogleMapReact from 'google-map-react';
 import Box from '@mui/system/Box';
 import {DatePicker} from 'components/DatePicker';
 import useSupercluster from 'use-supercluster';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {ElevatorOrderField, ElevatorView} from 'models/elevator';
+import {ElevatorView} from 'models/elevator';
 import {getCenter} from 'geolib';
 import Supercluster from 'supercluster';
 import {Typography} from '@mui/material';
 import {LocationPin} from 'components/LocationPin';
-import {Location, OrderByParams, Resource} from 'models/misc';
+import {Location, Resource} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
 import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
@@ -19,14 +19,9 @@ import {useQueryState} from 'hooks/useQueryState';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useTheme} from '@mui/system';
-import {useSearchValues} from 'hooks/useSearchValues';
-
-const pageInfo = makePage(0, 50);
 
 export const UnitMapsView = () => {
   const formatDate = useFormatDate();
-  const [isFirstFetchingDone, setIsFirstFetchingDone] = useState(false);
-
   const {user} = useUserSession();
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const fallback = useRef({
@@ -37,13 +32,11 @@ export const UnitMapsView = () => {
     },
   }).current;
   const mapRef = useRef<any>();
-  const [lastVisitStart, setLastVisitStart] = useQueryState<Date | null>(
-    'lastVisitStart',
-    {
+  const [lastVisitStart, setLastVisitStart, clearFilters] =
+    useQueryState<Date | null>('lastVisitStart', {
       defaultValue: null,
       isDate: true,
-    },
-  );
+    });
   const [lastVisitEnd, setLastVisitEnd] = useQueryState<Date | null>(
     'lastVisitEnd',
     {
@@ -65,13 +58,12 @@ export const UnitMapsView = () => {
       isDate: true,
     },
   );
-  const {clearValues} = useSearchValues<OrderByParams<ElevatorOrderField>>();
   const [zoom, setZoom] = useState(20);
   const [search, setSearch] = useQueryState('searchUnitsMapView');
   const [points, setPoints] = useState<any>([]);
   const [bounds, setBounds] = useState<any>([]);
   const [page, setPage] = useQueryState('page', {
-    defaultValue: pageInfo,
+    defaultValue: makePage(0, 100),
   });
   const [resetDatePicker, setResetDatePicker] = useState(false);
   const [elevatorView, setElevatorView] = useState<{
@@ -102,122 +94,53 @@ export const UnitMapsView = () => {
       nextVisitDateEnd: formatDate(nextVisitEnd, 'yyyy-MM-dd'),
     }),
   });
-  const memorisedElevatorResponse = useMemo(
-    () => elevatorResponse,
-    [elevatorResponse],
-  );
-  const isFilterActive = useMemo(
-    () =>
-      !!search ||
-      !!lastVisitStart ||
-      !!lastVisitEnd ||
-      !!nextVisitStart ||
-      !!nextVisitEnd,
-    [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd],
-  );
 
   useEffect(() => {
     if (page.pageIndex) {
       setPage({...page, pageIndex: 0});
-      setIsFirstFetchingDone(false);
     }
     if (textInput.current) {
       textInput.current.value = search;
     }
-  }, [search]);
+  }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
 
-  const newElevatorView = useMemo(() => {
-    if (
-      !search &&
-      !lastVisitStart &&
-      !lastVisitEnd &&
-      !nextVisitStart &&
-      !nextVisitEnd
-    ) {
-      return {
-        ...elevatorView,
-        elevator: {
-          ...elevatorView.elevator,
-          data: [...elevatorView.elevator.data, ...elevatorResponse.data],
-        },
-      };
-    }
-    return {...elevatorView, elevator: elevatorResponse};
-  }, [
-    search,
-    lastVisitStart,
-    lastVisitEnd,
-    nextVisitStart,
-    nextVisitEnd,
-    elevatorView,
-    elevatorResponse,
-  ]);
-  // this handles fetching when when there is filtering
-  const updateElevatorViewFiltering = useCallback(() => {
-    if (!isLoading && !isFetching) {
-      const currentTotal =
-        (page.pageIndex + (isFirstFetchingDone ? 1 : 0)) * page.pageSize;
-
-      if (currentTotal < memorisedElevatorResponse.total) {
-        setElevatorView(newElevatorView);
-        setIsFirstFetchingDone(true);
-        setPage({...page, pageIndex: page.pageIndex + 1});
-      }
-
-      if (currentTotal >= memorisedElevatorResponse.total) {
-        const latLng = elevatorView.elevator.data.map((elevator) => ({
-          latitude: elevator.address.location?.latitude ?? 0.0,
-          longitude: elevator.address.location?.longitude ?? 0.0,
-        }));
-
-        const centerCoord = getCenter(latLng) as unknown as Location;
-        const centerCoordIsDifferent =
-          elevatorView.centerCoord.latitude !== centerCoord.latitude &&
-          elevatorView.centerCoord.longitude !== centerCoord.longitude;
-
-        if (centerCoord && centerCoordIsDifferent && page.pageIndex !== 0) {
-          setElevatorView((prevState) => ({
-            ...prevState,
-            centerCoord,
-          }));
-        } else if (!isFirstFetchingDone) {
-          setIsFirstFetchingDone(true);
-          setElevatorView(newElevatorView);
-        } else if (page.pageIndex === 0) {
-          setIsFirstFetchingDone(false);
-          setPage({...page, pageIndex: page.pageIndex + 1});
-        } else {
-          setIsFirstFetchingDone(true);
+  const newElevatorView = () =>
+    !search &&
+    !lastVisitStart &&
+    !lastVisitEnd &&
+    !nextVisitStart &&
+    !nextVisitEnd
+      ? {
+          ...elevatorView,
+          elevator: {
+            ...elevatorView.elevator,
+            data: [...elevatorView.elevator.data, ...elevatorResponse.data],
+          },
         }
-      }
-    }
-  }, [
-    isLoading,
-    isFetching,
-    page,
-    setPage,
-    memorisedElevatorResponse,
-    newElevatorView,
-    elevatorView,
-    isFilterActive,
-    isFirstFetchingDone,
-  ]);
+      : {...elevatorView, elevator: elevatorResponse};
 
-  // fetching for when there is no filtering
-  const updateElevatorView = useCallback(() => {
-    if (!isLoading && !isFetching) {
+  useEffect(() => {
+    if (!isLoading) {
       const currentTotal = (page.pageIndex + 1) * page.pageSize;
 
-      if (currentTotal < memorisedElevatorResponse.total) {
-        setElevatorView(newElevatorView);
+      setElevatorView(newElevatorView());
+
+      if (currentTotal < elevatorResponse.total) {
         setPage({...page, pageIndex: page.pageIndex + 1});
       }
+    }
+  }, [elevatorResponse, isLoading]);
 
-      if (currentTotal >= memorisedElevatorResponse.total) {
-        const latLng = elevatorView.elevator.data.map((elevator) => ({
-          latitude: elevator.address.location?.latitude ?? 0.0,
-          longitude: elevator.address.location?.longitude ?? 0.0,
-        }));
+  useEffect(() => {
+    if (!isLoading && !isFetching) {
+      const currentTotal = (page.pageIndex + 1) * page.pageSize;
+      if (currentTotal >= elevatorResponse.total) {
+        const latLng = elevatorView.elevator.data.map(
+          (elevator: ElevatorView) => ({
+            latitude: elevator.address.location?.latitude ?? 0.0,
+            longitude: elevator.address.location?.longitude ?? 0.0,
+          }),
+        );
 
         const centerCoord = getCenter(latLng) as unknown as Location;
         const centerCoordIsDifferent =
@@ -225,35 +148,14 @@ export const UnitMapsView = () => {
           elevatorView.centerCoord.longitude !== centerCoord.longitude;
 
         if (centerCoord && centerCoordIsDifferent) {
-          setElevatorView((prevState) => ({
-            ...prevState,
+          setElevatorView({
+            ...elevatorView,
             centerCoord,
-          }));
+          });
         }
       }
     }
-  }, [
-    isLoading,
-    isFetching,
-    page,
-    setPage,
-    memorisedElevatorResponse,
-    newElevatorView,
-    elevatorView,
-  ]);
-
-  useEffect(() => {
-    if (isFilterActive) {
-      updateElevatorViewFiltering();
-    } else {
-      updateElevatorView();
-    }
-  }, [
-    memorisedElevatorResponse,
-    newElevatorView,
-    updateElevatorView,
-    isFilterActive,
-  ]);
+  }, [elevatorView, isLoading, isFetching]);
 
   useEffect(() => {
     const result = elevatorView.elevator.data.map((elevator: ElevatorView) => ({
@@ -303,126 +205,76 @@ export const UnitMapsView = () => {
     mapRef?.current?.panTo({lat, lng});
   };
 
-  const renderFilterItems = useCallback(
-    () => (
-      <FilterFields
-        onClear={() => {
-          clearValues();
-          setResetDatePicker(true);
-          setPage({
-            pageSize: 50,
-            pageIndex: 0,
-          });
-          const res = createEmptyResource<ElevatorView>(10);
-          const latLng = res.data.map((elevator) => ({
-            latitude: elevator.address.location?.latitude ?? 0.0,
-            longitude: elevator.address.location?.longitude ?? 0.0,
-          }));
-
-          const centerCoord = getCenter(latLng) as unknown as Location;
-          setElevatorView({
-            elevator: res,
-            centerCoord,
-          });
+  const renderFilterItems = () => (
+    <FilterFields onClear={clearFilters} wrapperStyle={{width: '90%'}}>
+      <DatePicker
+        defaultDate={lastVisitStart}
+        containerStyles={{mr: '1em'}}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
         }}
-        wrapperStyle={{width: '90%'}}>
-        <DatePicker
-          defaultDate={lastVisitStart}
-          containerStyles={{mr: '1em'}}
-          reset={resetDatePicker}
-          getReset={(val) => {
-            if (val) {
-              setResetDatePicker(false);
-            }
-          }}
-          maxDate={lastVisitEnd || new Date()}
-          getSelectedDate={(date) => {
-            setLastVisitStart(date);
-            setIsFirstFetchingDone(false);
-            setPage({...page, pageIndex: 0});
-          }}
-          textFieldProps={{
-            label: 'Last Visit Start',
-            sx: {background: '#fff'},
-          }}
-        />
-        <DatePicker
-          defaultDate={lastVisitEnd}
-          maxDate={new Date()}
-          reset={resetDatePicker}
-          getReset={(val) => {
-            if (val) {
-              setResetDatePicker(false);
-            }
-          }}
-          minDate={lastVisitStart || undefined}
-          containerStyles={{mr: '1em'}}
-          getSelectedDate={(date) => {
-            setLastVisitEnd(date);
-            setIsFirstFetchingDone(false);
-            setPage({...page, pageIndex: 0});
-          }}
-          textFieldProps={{
-            label: 'Last Visit End',
-            sx: {background: '#fff'},
-          }}
-        />
+        maxDate={lastVisitEnd || new Date()}
+        getSelectedDate={(date) => setLastVisitStart(date)}
+        textFieldProps={{
+          label: 'Last Visit Start',
+          sx: {background: '#fff'},
+        }}
+      />
+      <DatePicker
+        defaultDate={lastVisitEnd}
+        maxDate={new Date()}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
+        minDate={lastVisitStart || undefined}
+        containerStyles={{mr: '1em'}}
+        getSelectedDate={(date) => setLastVisitEnd(date)}
+        textFieldProps={{
+          label: 'Last Visit End',
+          sx: {background: '#fff'},
+        }}
+      />
 
-        <DatePicker
-          defaultDate={nextVisitStart}
-          minDate={new Date()}
-          reset={resetDatePicker}
-          getReset={(val) => {
-            if (val) {
-              setResetDatePicker(false);
-            }
-          }}
-          maxDate={nextVisitEnd || undefined}
-          containerStyles={{mr: '1em'}}
-          getSelectedDate={(date) => {
-            setNextVisitStart(date);
-            setIsFirstFetchingDone(false);
-            setPage({...page, pageIndex: 0});
-          }}
-          textFieldProps={{
-            label: 'Next Visit Start',
-            sx: {background: '#fff'},
-          }}
-        />
-        <DatePicker
-          defaultDate={nextVisitEnd}
-          reset={resetDatePicker}
-          getReset={(val) => {
-            if (val) {
-              setResetDatePicker(false);
-            }
-          }}
-          minDate={nextVisitStart || new Date()}
-          containerStyles={{mr: '1em'}}
-          getSelectedDate={(date) => {
-            setNextVisitEnd(date);
-            setIsFirstFetchingDone(false);
-            setPage({...page, pageIndex: 0});
-          }}
-          textFieldProps={{
-            label: 'Next Visit End',
-            sx: {background: '#fff'},
-          }}
-        />
-      </FilterFields>
-    ),
-    [
-      clearValues,
-      createEmptyResource,
-      elevatorView,
-      getCenter,
-      lastVisitEnd,
-      lastVisitStart,
-      nextVisitEnd,
-      nextVisitStart,
-      page,
-      resetDatePicker,
-    ],
+      <DatePicker
+        defaultDate={nextVisitStart}
+        minDate={new Date()}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
+        maxDate={nextVisitEnd || undefined}
+        containerStyles={{mr: '1em'}}
+        getSelectedDate={(date) => setNextVisitStart(date)}
+        textFieldProps={{
+          label: 'Next Visit Start',
+          sx: {background: '#fff'},
+        }}
+      />
+      <DatePicker
+        defaultDate={nextVisitEnd}
+        reset={resetDatePicker}
+        getReset={(val) => {
+          if (val) {
+            setResetDatePicker(false);
+          }
+        }}
+        minDate={nextVisitStart || new Date()}
+        containerStyles={{mr: '1em'}}
+        getSelectedDate={(date) => setNextVisitEnd(date)}
+        textFieldProps={{
+          label: 'Next Visit End',
+          sx: {background: '#fff'},
+        }}
+      />
+    </FilterFields>
   );
 
   const renderWidget = () => (
@@ -458,35 +310,10 @@ export const UnitMapsView = () => {
         defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom}
         center={
-          elevatorView.centerCoord &&
-          clusters.length > 0 &&
-          clusters
-            .filter((c) => c.properties.cluster)
-            .sort(
-              (a, b) =>
-                ((b.properties.point_count as unknown as number) >
-                  a.properties.point_count) as unknown as number,
-            )[0]
-            ? {
-                lat: clusters
-                  .filter((c) => c.properties.cluster)
-                  .sort(
-                    (a, b) =>
-                      ((b.properties.point_count as unknown as number) >
-                        a.properties.point_count) as unknown as number,
-                  )[0].geometry.coordinates[1],
-                lng: clusters
-                  .filter((c) => c.properties.cluster)
-                  .sort(
-                    (a, b) =>
-                      ((b.properties.point_count as unknown as number) >
-                        a.properties.point_count) as unknown as number,
-                  )[0].geometry.coordinates[0],
-              }
-            : {
-                lat: elevatorView.centerCoord.latitude,
-                lng: elevatorView.centerCoord.longitude,
-              }
+          elevatorView.centerCoord && {
+            lat: elevatorView.centerCoord.latitude,
+            lng: elevatorView.centerCoord.longitude,
+          }
         }
         zoom={10}>
         {clusters.map((cluster, index) => {
