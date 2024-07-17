@@ -117,11 +117,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-  const {
-    data: updatedInvoice,
-    isFetched,
-    refetch: refetchInvoiceData,
-  } = useInvoiceDetail(invoice.id);
+  const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
+    invoice.id,
+  );
   const memorizedUpdateInvoiceData = useMemo(
     () =>
       updatedInvoice
@@ -140,7 +138,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     isLoading: isLoadingDownloadUrl,
     refetch: refetchDownloadUrl,
   } = useDownloadUrl(
-    isFetched ? [memorizedUpdateInvoiceData!.additionalInfo.pdfPath] : [],
+    invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
   );
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
@@ -179,21 +177,13 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
   const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
 
-  const {
-    data: headerUrl = {},
-    isLoading: isHeaderUrlLoading,
-    refetch: refetchHeaderUrl,
-  } = useDownloadUrl(
+  const {data: headerUrl = {}, isLoading: isHeaderUrlLoading} = useDownloadUrl(
     headerInfo?.path ? [headerInfo.path] : [],
     undefined,
     company?.id,
   );
 
-  const {
-    data: footerUrl = {},
-    isLoading: isFooterUrlLoading,
-    refetch: refetchFooterUrl,
-  } = useDownloadUrl(
+  const {data: footerUrl = {}, isLoading: isFooterUrlLoading} = useDownloadUrl(
     footerInfo?.path ? [footerInfo.path] : [],
     undefined,
     company?.id,
@@ -534,8 +524,23 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   };
 
+  // Helper function to fetch and create files
+  const fetchAndCreateFiles = async (
+    url: string,
+    argfileNames: string[],
+    argfileDescriptions: string[],
+  ) => {
+    const blob = await fetchFile(url);
+    const filesFromBlob = await createFilesFromBlobArray(
+      [blob],
+      argfileNames,
+      argfileDescriptions,
+    );
+    return filesFromBlob;
+  };
+
   const getExistingFiles = async (
-    invoiceDownloadUrlArg:
+    invoiceDownloadUrl:
       | {
           [key: string]: string;
         }
@@ -550,8 +555,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     },
   ) => {
     if (isHeaderUrlLoading || isFooterUrlLoading) {
-      refetchHeaderUrl();
-      refetchFooterUrl();
       return;
     }
 
@@ -563,33 +566,17 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       }.pdf`,
     ];
 
-    // Helper function to fetch and create files
-    const fetchAndCreateFiles = async (
-      url: string,
-      argfileNames: string[],
-      argfileDescriptions: string[],
-    ) => {
-      const blob = await fetchFile(url);
-      return createFilesFromBlobArray(
-        [blob],
-        argfileNames,
-        argfileDescriptions,
-      );
-    };
-
     // Base file operations
     const baseFileOperations =
       invoiceData?.status !== InvoiceStatus.DRAFT
         ? fetchAndCreateFiles(
-            invoiceDownloadUrlArg
-              ? Object.values(invoiceDownloadUrlArg)[0]
-              : '',
+            invoiceDownloadUrl ? Object.values(invoiceDownloadUrl)[0] : '',
             fileNames,
             fileDescriptions,
           )
         : generateBlobUrl(invoiceData, headerUrl, footerUrl).then((blobFile) =>
             createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
-          );
+          ) || Promise.resolve([]);
 
     // Work report operations
     const workReportOperations = invoiceData?.additionalInfo.includeWorkReport
@@ -668,25 +655,26 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
     try {
       // Refetch the download URLs for invoice, work report, and checklist
-      const invoiceDownloadUrlResponse = await refetchDownloadUrl();
       const workReportDownloadUrlResponse =
         await refetchWorkReportDownloadUrl();
       const checklistDownloadUrlResponse = await refetchChecklistDownloadUrl();
 
       // Ensure all download URLs are fetched before calling getExistingFiles
-      await getExistingFiles(
-        invoiceDownloadUrlResponse.data,
-        invoice,
-        companyNextId,
-        workReportDownloadUrlResponse.data,
-        checklistDownloadUrlResponse.data,
-      );
+      await refetchDownloadUrl().then(async (res) => {
+        await getExistingFiles(
+          res.data,
+          invoice,
+          companyNextId,
+          workReportDownloadUrlResponse.data,
+          checklistDownloadUrlResponse.data,
+        );
+      });
     } finally {
       setIsLoadingFiles(false);
     }
   };
 
-  const handleOpenSendInvoiceModal = useCallback(() => {
+  const handleOpenSendInvoiceModal = useCallback(async () => {
     const errorMessage = validateDueDate(invoice);
 
     if (errorMessage) {
@@ -700,7 +688,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     if (companyNextNumber) {
       handleOpenSendEmail(companyNextNumber.value);
     }
-  }, [invoice, companyNextNumber]);
+  }, [invoice, companyNextNumber, generateBlobUrl]);
 
   const actions = useMemo(() => {
     const items = [];
@@ -1238,7 +1226,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             ? 'Send'
             : 'Payment'
         }
-        primaryButtonAction={() => {
+        primaryButtonAction={async () => {
           if (
             invoice.status === InvoiceStatus.DRAFT ||
             invoice.status === InvoiceStatus.EXPIRED
@@ -1252,13 +1240,18 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           ...item,
           showBorder: actions[actions.length - 1] !== item,
         }))}
-        isValid={downloadUrl ? !!Object.values(downloadUrl)[0].length : !!''}
+        isValid
       />
+
       <SendEmailDialog
         open={isSendEmailDialogOpen}
-        onConfirm={() => setIsSendEmailDialogOpen(false)}
+        onConfirm={() => {
+          setIsSendEmailDialogOpen(false);
+          setExistingFiles([]);
+        }}
         onClose={() => {
           setIsSendEmailDialogOpen(false);
+          setExistingFiles([]);
         }}
         id={invoice.id}
         existingFiles={existingFiles}
