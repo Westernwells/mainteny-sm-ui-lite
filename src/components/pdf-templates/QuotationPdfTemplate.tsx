@@ -29,8 +29,8 @@ import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgia
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageContainer from './containers/PdfPageContainer';
-import PdfPageTitle from './containers/PdfPageTitle';
 import TopSectionContainer from './containers/TopSectionContainer';
+import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 
 Font.register({
   family: 'Montserrat-Regular',
@@ -391,11 +391,10 @@ const QuotationPdfTemplate = React.memo(
             </TopSectionContainer>
 
             <View>
-              {quotation?.subject && (
-                <PdfPageTitle selectedLng={selectedLng}>
-                  {quotation?.subject}
-                </PdfPageTitle>
-              )}
+              <PdfPageTitleHtml
+                value={quotation?.subject}
+                selectedLng={selectedLng}
+              />
 
               {quotation?.description.trim() !== '' && (
                 <HtmlPDF
@@ -495,14 +494,14 @@ const QuotationPdfTemplate = React.memo(
                             }}>
                             {index + 1}
                           </Text>
-                          <Text
-                            style={{
+                          <HtmlPDF
+                            html={articleItem.name || '-'}
+                            rootStyle={{
                               width: '40%',
                               textAlign: 'left',
                               color: '#212121',
-                            }}>
-                            {articleItem.name || '-'}
-                          </Text>
+                            }}
+                          />
 
                           <Text
                             style={{
@@ -577,9 +576,10 @@ const QuotationPdfTemplate = React.memo(
                           </Text>
                         </View>
                         {articleItem?.description.trim() && (
-                          <Text style={styles.descriptionText}>
-                            {articleItem?.description}
-                          </Text>
+                          <HtmlPDF
+                            html={articleItem.description || '-'}
+                            rootStyle={styles.descriptionText}
+                          />
                         )}
                       </View>
                     ))}

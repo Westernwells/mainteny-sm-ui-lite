@@ -334,14 +334,13 @@ const OrderArticlePDFPreview = React.memo(
                           }}>
                           {index + 1}
                         </Text>
-                        <Text
-                          style={{
+                        <HtmlPDF
+                          html={articleOrderItem.articleName || '-'}
+                          rootStyle={{
                             width: '43%',
-                            textAlign: 'left',
                             color: '#212121',
-                          }}>
-                          {articleOrderItem.articleName || '-'}
-                        </Text>
+                          }}
+                        />
                         <Text
                           style={{
                             width: '14%',
@@ -410,9 +409,10 @@ const OrderArticlePDFPreview = React.memo(
                         </Text>
                       </View>
                       {articleOrderItem?.description.trim() !== '' && (
-                        <Text style={styles.descriptionText}>
-                          {articleOrderItem?.description}
-                        </Text>
+                        <HtmlPDF
+                          html={articleOrderItem?.description || ''}
+                          rootStyle={styles.descriptionText}
+                        />
                       )}
                     </View>
                   ))}

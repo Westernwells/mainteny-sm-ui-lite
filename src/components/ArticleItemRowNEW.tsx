@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
 import {isEqual} from 'lodash';
@@ -55,6 +55,11 @@ import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
 import {EmptySection} from './EmptySection';
 import ArticleTypeCard from './ArticleTypeCard';
+import RichTextField from './RichTextField';
+import {
+  getPlainStringFromHtml,
+  isPlainString,
+} from '../utils/rich-field-string';
 
 interface Props {
   articleItem: InvoiceItemRecord;
@@ -84,46 +89,55 @@ const TableRowComponent = ({
   item,
   searchText,
   handleSelectItem,
-}: TableRowProps) => (
-  <TableRow
-    key={item.id}
-    sx={{width: '100%', cursor: 'pointer'}}
-    onClick={() => {
-      handleSelectItem(item, index);
-    }}>
-    <TableCell sx={{padding: '0.8em 0em !important', width: '30%'}}>
-      <Typography variant="subtitle1">
-        {createHighlightedText(item.name, searchText)}
-      </Typography>
-    </TableCell>
-    <TableCell sx={{width: '25%'}}>
-      <Typography variant="subtitle1">
-        {createHighlightedText(item.externalId, searchText)}
-      </Typography>
-    </TableCell>
-    <TableCell sx={{width: '15%'}}>
-      <Typography variant="subtitle1">
-        {createHighlightedText(item.category, searchText)}
-      </Typography>
-    </TableCell>
-    <TableCell
-      sx={{
-        textAlign: 'right',
-        padding: '2em 0em',
-        width: '35%',
+}: TableRowProps) => {
+  // detect html tags in string and remove them if needed
+  const itemName = useMemo(
+    () =>
+      isPlainString(item.name) ? item.name : getPlainStringFromHtml(item.name),
+    [item],
+  );
+
+  return (
+    <TableRow
+      key={item.id}
+      sx={{width: '100%', cursor: 'pointer'}}
+      onClick={() => {
+        handleSelectItem(item, index);
       }}>
-      <Typography variant="subtitle1">
-        {formatCurrency(
-          (item.unitSellingAmount.netAmount ?? 0) /
-            10 ** (item.unitSellingAmount.fractionDigits ?? 0),
-          {
-            currency: item.unitSellingAmount.currency,
-          },
-        )}
-      </Typography>
-    </TableCell>
-  </TableRow>
-);
+      <TableCell sx={{padding: '0.8em 0em !important', width: '30%'}}>
+        <Typography variant="subtitle1">
+          {createHighlightedText(itemName, searchText)}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{width: '25%'}}>
+        <Typography variant="subtitle1">
+          {createHighlightedText(item.externalId, searchText)}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{width: '15%'}}>
+        <Typography variant="subtitle1">
+          {createHighlightedText(item.category, searchText)}
+        </Typography>
+      </TableCell>
+      <TableCell
+        sx={{
+          textAlign: 'right',
+          padding: '2em 0em',
+          width: '35%',
+        }}>
+        <Typography variant="subtitle1">
+          {formatCurrency(
+            (item.unitSellingAmount.netAmount ?? 0) /
+              10 ** (item.unitSellingAmount.fractionDigits ?? 0),
+            {
+              currency: item.unitSellingAmount.currency,
+            },
+          )}
+        </Typography>
+      </TableCell>
+    </TableRow>
+  );
+};
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Article cannot be empty'),
@@ -244,10 +258,11 @@ export const ArticleItemRowNEW = ({
   const [searchText, setSearchText] = useState('');
   const debouncedSearchText = useDebounce(searchText);
 
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [tabValue, setTabValue] = useState(TabValues.ARTICLES);
 
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [showArticleSearch, setShowArticleSearch] = useState<boolean>(false);
+  const articleAnchorEl = useRef<HTMLDivElement>();
   const open = Boolean(anchorEl);
 
   const handleClick = (event: any) => {
@@ -259,18 +274,17 @@ export const ArticleItemRowNEW = ({
     setAnchorEl(null);
   };
 
-  const handleTextFieldChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const {name, value} = event.target;
-    formik.handleChange(event);
-    formik.setFieldTouched(name, true, false);
-    setSearchText(value);
+  const handleTextFieldChange = (fieldName: string) => (value: string) => {
+    formik.setFieldValue(fieldName, value);
+    formik.setFieldTouched(fieldName, true, false);
+    // create plain test search value without html tags
+    const plainText = getPlainStringFromHtml(value);
+    if (isPlainString(plainText)) setSearchText(plainText);
   };
 
-  const handleTextFieldClick = () => {
-    setFocusedIndex(index);
-    setPopperOpen((prevState) => !prevState);
+  const handleArticleTextFieldClick = () => {
+    setShowArticleSearch(true);
+    setPopperOpen(true);
   };
 
   const {
@@ -324,14 +338,8 @@ export const ArticleItemRowNEW = ({
     });
   }, [formik.values.article?.type]);
 
-  useEffect(() => {
-    if (focusedIndex !== null && focusedIndex === index) {
-      setSearchText(formik.values.name);
-    }
-  }, [formik.values.name, focusedIndex, index]);
-
   const handlePopperClose = () => {
-    setPopperOpen(false);
+    setShowArticleSearch(false);
   };
 
   const tabItems: TabItems[] = useMemo(() => {
@@ -435,7 +443,7 @@ export const ArticleItemRowNEW = ({
                 key={item.id}
                 handleSelectItem={() => {
                   handleSelectItem(item, index);
-                  setPopperOpen(false);
+                  setShowArticleSearch(false);
                 }}
               />
             ))}
@@ -466,17 +474,14 @@ export const ArticleItemRowNEW = ({
 
       <TableCell sx={{width: '32%', display: 'inline-block'}}>
         <ClickAwayListener onClickAway={handlePopperClose}>
-          <Box>
-            <TextField
-              name="name"
-              id={`name-${index}`}
-              value={formik.values.name}
-              onChange={handleTextFieldChange}
+          <Box ref={articleAnchorEl}>
+            <RichTextField
+              test-id={`name-${index}`}
+              html={formik.values.name || ''}
+              updateHtml={handleTextFieldChange('name')}
               onBlur={formik.handleBlur}
-              size="small"
-              fullWidth
-              sx={{width: '100%', '& .MuiFormHelperText-root': {mx: '0em'}}}
-              required
+              minRows={0}
+              containerMinHeight={40}
               helperText={
                 (!isHovered && formik.errors.name) ||
                 (formik.errors.name && formik.touched.name)
@@ -487,16 +492,13 @@ export const ArticleItemRowNEW = ({
                 !!(!isHovered && formik.errors.name) ||
                 !!(formik.errors.name && formik.touched.name)
               }
-              autoComplete="off"
-              onClick={handleTextFieldClick}
+              onClick={handleArticleTextFieldClick}
             />
             <Box>
               <Popper
-                open={popperOpen}
+                open={showArticleSearch}
                 placement="bottom-start"
-                anchorEl={
-                  popperOpen ? document.getElementById(`name-${index}`) : null
-                }
+                anchorEl={articleAnchorEl.current}
                 sx={{
                   zIndex: 1,
                 }}>
@@ -875,18 +877,13 @@ export const ArticleItemRowNEW = ({
           <TableCell
             colSpan={12}
             sx={{width: '98%', display: 'inline-block', ml: '2%'}}>
-            <TextField
-              name="description"
-              id={`description-${index}`}
-              size="small"
-              placeholder={t('Description')}
-              multiline
-              fullWidth
-              value={formik.values.description}
-              minRows={1}
-              maxRows={10}
-              onChange={formik.handleChange}
-              sx={{mt: 0.5}}
+            <RichTextField
+              label="Description"
+              test-id={`description-${index}`}
+              placeholder="Description"
+              html={formik.values.description || ''}
+              containerMinHeight={40}
+              updateHtml={(h) => formik.setFieldValue('description', h)}
             />
           </TableCell>
 

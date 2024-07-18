@@ -31,7 +31,7 @@ import {ArticleSection} from './FinalInvoicePdfTemplate';
 import PdfPageContainer from './containers/PdfPageContainer';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
-import PdfPageTitle from './containers/PdfPageTitle';
+import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -289,9 +289,10 @@ const FullInvoicePdfTemplate = ({
           </TopSectionContainer>
 
           <View>
-            <PdfPageTitle selectedLng={selectedLng}>
-              {invoice?.subject}
-            </PdfPageTitle>
+            <PdfPageTitleHtml
+              selectedLng={selectedLng}
+              value={invoice?.subject}
+            />
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF

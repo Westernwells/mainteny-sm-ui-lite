@@ -1,5 +1,5 @@
 import {Dispatch, SetStateAction, useEffect, useState} from 'react';
-import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import {GridCellParams, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
@@ -9,8 +9,14 @@ import {formatCurrency} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
 import {useTranslation} from 'react-i18next';
 import {stringToTitleCase} from 'utils/utils';
+import Typography from '@mui/material/Typography';
+import DOMPurify from 'dompurify';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
+import {
+  hasMultipleParagraphs,
+  returnFirstParagraph,
+} from '../../utils/rich-text-field-utils';
 
 interface Props {
   setRowItem: (row: ArticleView) => void;
@@ -29,6 +35,19 @@ export const columns: GridColDef[] = [
     headerName: 'article name',
     flex: 2,
     cellClassName: 'truncateText',
+    renderCell: (params: GridCellParams) => {
+      const valueToShow = hasMultipleParagraphs(params.formattedValue)
+        ? returnFirstParagraph(params.formattedValue)
+        : params.formattedValue;
+
+      return (
+        <Typography
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(valueToShow),
+          }}
+        />
+      );
+    },
   }),
   getColumnProps({
     field: 'type',
@@ -51,6 +70,19 @@ export const columns: GridColDef[] = [
     cellClassName: 'truncateText',
     headerAlign: 'left',
     flex: 2,
+    renderCell: (params: GridCellParams) => {
+      const valueToShow = hasMultipleParagraphs(params.formattedValue)
+        ? returnFirstParagraph(params.formattedValue)
+        : params.formattedValue;
+
+      return (
+        <Typography
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(valueToShow),
+          }}
+        />
+      );
+    },
   }),
   getColumnProps({
     field: 'price',
