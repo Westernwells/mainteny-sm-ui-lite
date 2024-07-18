@@ -85,6 +85,8 @@ export const ScheduleItem = ({
               padding: '1rem',
               boxShadow: '0px 4px 9px rgba(0, 0, 0, 0.09)',
               maxWidth: '14.25rem',
+              marginRight: '33vw',
+              marginLeft: '14vw',
             },
           },
         }}>

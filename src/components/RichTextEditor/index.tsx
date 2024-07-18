@@ -243,7 +243,7 @@ const RichTextEditor = ({
           '& .ProseMirror-focused': {
             outline: 'none',
           },
-          '& .tiptap p.is-editor-empty:first-child::before': {
+          '& .tiptap p.is-editor-empty:first-of-type::before': {
             color: '#adb5bd',
             content: 'attr(data-placeholder)',
             float: 'left',

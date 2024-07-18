@@ -637,7 +637,7 @@ const WorkReportTemplate = React.memo(
                               textAlign: 'right',
                               ...styles.tableBodyContent,
                             }}>
-                            {articleItem.article.externalId || '-'}
+                            {articleItem.article?.externalId || '-'}
                           </Text>
                           <Text
                             style={{

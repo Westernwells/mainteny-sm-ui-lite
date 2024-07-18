@@ -210,7 +210,7 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
         onChange={(index) => setValue(index)}
         containerStyles={{
           marginBottom: theme.spacing(8),
-          '& > div:first-child': {marginBottom: theme.spacing(2)},
+          '& > div:first-of-type': {marginBottom: theme.spacing(2)},
         }}>
         <TabsBody value={value} index={TabIndex.OVERVIEW}>
           <OverviewTab getUnitName={(name) => setUnitName(name)} />
