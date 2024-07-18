@@ -25,6 +25,7 @@ import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceOrderPaymentStatusView} from '../utils/service-order-utils';
+import {Discount, InvoiceAdditionalInfo} from './invoice';
 
 export enum Priority {
   A = 'A',
@@ -577,6 +578,7 @@ export interface ServiceOrderArticleView {
   article: ArticleRecord;
   unitAmount: Amount;
   quantity: number;
+  additionalInfo?: {discount: Discount};
 }
 
 export interface ServiceOrderItemRecord {
