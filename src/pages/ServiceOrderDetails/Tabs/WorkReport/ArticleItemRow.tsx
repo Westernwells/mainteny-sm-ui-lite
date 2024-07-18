@@ -82,7 +82,7 @@ export const ArticleItemRow = ({
         </Box>
 
         <Typography variant="body2" sx={{ml: 'auto'}}>
-          {articleItem.article.externalId || '-'}
+          {articleItem.article?.externalId || '-'}
         </Typography>
         <NumericFormat
           value={quantity !== 0 ? quantity : ''}
@@ -112,7 +112,9 @@ export const ArticleItemRow = ({
             }
           }}
         />
-        <Typography variant="body2">{articleItem.article.unit}</Typography>
+        <Typography variant="body2">
+          {articleItem.article?.unit || '-'}
+        </Typography>
       </Box>
       <Box sx={{float: 'right', mt: '2rem'}}>
         {!showDescription && (
