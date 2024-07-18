@@ -1,6 +1,6 @@
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {formatDate} from 'utils/datetime';
 import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {QuotationItem, QuotationView} from 'models/quotation';
@@ -10,16 +10,10 @@ import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType} from 'models/invoice';
-import {fixRounding, formatAddressFullname} from 'utils/utils';
+import {formatAddressFullname} from 'utils/utils';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
-import {
-  applyGlobalDiscountOnQuotationItems,
-  applyPerItemDiscountOnQuotationItems,
-  applyQuotationDiscount,
-  getDiscoutObj,
-  getQuotationAggregatedItemsVats,
-} from 'pages/QuotationDetails/utils';
-import {calculateSameVatTotals} from 'utils/calculate-total';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
+import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
@@ -208,9 +202,7 @@ const QuotationPdfTemplate = React.memo(
     };
 
     const discount = getDiscoutObj(quotation?.additionalInfo?.discount);
-    const discountType = discount?.type;
     const discountAmount = discount?.amount;
-    const discountPercentage = discount?.percentage;
     const discountValue = discountAmount?.value ?? 0;
 
     const subtotalExclVat =
@@ -226,42 +218,34 @@ const QuotationPdfTemplate = React.memo(
       },
     );
 
-    const subtotalExclVatAfterDiscount = applyQuotationDiscount({
-      actualValue: subtotalExclVat,
-      ...(discountType === DiscountType.AMOUNT
-        ? {amount: discountValue ?? 0}
-        : {percentage: discountPercentage ?? 0}),
-    });
-
-    const itemsAfterPerItemDiscount =
-      applyPerItemDiscountOnQuotationItems(articleItems);
-
-    const itemsAfterGlobalDiscount = applyGlobalDiscountOnQuotationItems(
-      itemsAfterPerItemDiscount,
-      discount,
+    const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
+      () =>
+        calculateInvoiceAmount({
+          items: articleItems,
+          globalDiscount: discount,
+        }),
+      [articleItems, discount],
     );
 
-    const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
-      (item) =>
-        item.unitAmount.percentageVat ===
-        articleItems[0].unitAmount.percentageVat,
+    const vatsFormatted = vats.map((vat) => ({
+      ...vat,
+      vat: formatCurrency(vat.vat, {
+        currency: currentCurrency?.code,
+        excludeCurrencySymbol: true,
+        currencySymbol: currentCurrency?.symbol,
+        companyLang: selectedLng,
+      }),
+    }));
+
+    const amountAfterGlobalDiscountWithVATFormatted = formatCurrency(
+      amountAfterGlobalDiscountWithVAT,
+      {
+        currency: currentCurrency?.code,
+        excludeCurrencySymbol: true,
+        currencySymbol: currentCurrency?.symbol,
+        companyLang: selectedLng,
+      },
     );
-
-    const percentageVats = itemsAfterGlobalDiscount.length
-      ? allItemsHasSameVAT
-        ? [
-            {
-              percentageVat:
-                itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
-              vat:
-                subtotalExclVatAfterDiscount *
-                (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
-            },
-          ]
-        : getQuotationAggregatedItemsVats(itemsAfterGlobalDiscount)
-      : [];
-
-    const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
 
     const allItemsHaveZeroDiscount = articleItems.every(
       (item) =>
@@ -631,68 +615,38 @@ const QuotationPdfTemplate = React.memo(
                     </Text>
                   </View>
 
-                  <View>
-                    {allItemsHasSameVAT ? (
-                      <View style={styles.tableRow}>
-                        <Text style={{width: '44%'}} />
-                        <Text
-                          style={{
-                            width: '32%',
-                            color: '#616161',
-                            fontSize: 10,
-                            textAlign: 'right',
-                          }}>
-                          {translate('VAT')} {percentageVats[0].percentageVat}%
-                        </Text>
-                        <Text
-                          style={{
-                            width: '24%',
-                            textAlign: 'right',
-                            fontSize: 10,
-                          }}>
-                          {formatCurrency(totalVAT, {
-                            currency: currentCurrency?.code,
-                            excludeCurrencySymbol: true,
-                            currencySymbol: currentCurrency?.symbol,
-                            companyLang: selectedLng,
-                          })}
-                        </Text>
-                      </View>
-                    ) : (
-                      percentageVats.map((v, index) => (
+                  <View style={styles.tableRow}>
+                    <Text style={{width: '44%'}} />
+                    <View style={{width: '56%'}}>
+                      {vatsFormatted.map((v, index) => (
                         <View
-                          style={styles.tableRow}
-                          key={`${index}-${v.percentageVat}`}>
-                          <Text style={{width: '44%'}} />
-
+                          key={`${index}-${v.percentageVat}`}
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            paddingVertical: 4,
+                          }}>
                           <Text
                             style={{
-                              width: '32%',
                               color: '#616161',
                               fontSize: 10,
                               textAlign: 'right',
+                              width: '57%',
                             }}>
                             {translate('VAT')} {v.percentageVat}%
                           </Text>
                           <Text
                             style={{
-                              width: '24%',
-                              textAlign: 'right',
                               fontSize: 10,
+                              textAlign: 'right',
+                              width: '43%',
                             }}>
-                            {formatCurrency(fixRounding(v.vat, 2), {
-                              currency: currentCurrency?.code,
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                              roundingMode: 'floor',
-                              excludeCurrencySymbol: true,
-                              companyLang: selectedLng,
-                              currencySymbol: currentCurrency?.symbol,
-                            })}
+                            {v.vat}
                           </Text>
                         </View>
-                      ))
-                    )}
+                      ))}
+                    </View>
                   </View>
 
                   <View style={styles.tableRow}>
@@ -717,12 +671,7 @@ const QuotationPdfTemplate = React.memo(
                         ...boldFontStyle,
                         fontSize: 10,
                       }}>
-                      {formatCurrency(total, {
-                        currency: currentCurrency?.code,
-                        excludeCurrencySymbol: true,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      })}
+                      {amountAfterGlobalDiscountWithVATFormatted}
                     </Text>
                   </View>
                 </View>
