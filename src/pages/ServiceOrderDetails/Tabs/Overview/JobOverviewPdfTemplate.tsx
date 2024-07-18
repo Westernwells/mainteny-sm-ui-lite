@@ -3,7 +3,7 @@ import {UserAccount} from 'models/user';
 import React from 'react';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
-import {Currencies, formatCurrency} from 'utils/currency';
+import {Currencies, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
@@ -15,6 +15,7 @@ import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContain
 import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
 import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
+import {DiscountType} from 'models/invoice';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -128,7 +129,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     descriptionText: {
       width: '45%',
       display: 'flex',
-      fontSize: 8.5,
+      fontSize: 8,
       color: '#212121',
       paddingLeft: 20,
       letterSpacing: -0.15,
@@ -164,6 +165,19 @@ const JobOverviewPdfTemplate = React.memo(
     footerPath,
   }: Props) => {
     const articleItems = serviceOrder?.articles!;
+
+    const netTotal = (articleItem: ServiceOrderArticleView) => {
+      const grossTotal =
+        (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
+      const discountValue =
+        articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
+
+      return (
+        (grossTotal - discountValue) /
+          10 ** articleItem.unitAmount.fractionDigits ?? 2
+      );
+    };
+
     const calculateTotal = (arr: ServiceOrderArticleView[]) => {
       const sum = 0;
 
@@ -200,13 +214,32 @@ const JobOverviewPdfTemplate = React.memo(
       ...new Set(articleItems?.map((item) => item.unitAmount.percentageVat)),
     ];
 
+    const allItemsHaveZeroDiscount = articleItems.every(
+      (item) =>
+        item?.additionalInfo?.discount?.amount?.value === 0 ||
+        item?.additionalInfo?.discount?.percentage === 0,
+    );
+
+    const elevatorAddress = serviceOrder?.elevator?.address;
+
+    const shouldDisplayDash = (articleOrderItem: ServiceOrderArticleView) => {
+      if (!articleOrderItem || !articleOrderItem.additionalInfo) return '';
+
+      const additionalInfo = articleOrderItem?.additionalInfo;
+      const hasAdditionalInfo = Object.keys(additionalInfo).length !== 0;
+      const discount = additionalInfo?.discount;
+      const hasDiscount = discount?.type !== DiscountType.NONE;
+      const hasDiscountValue =
+        discount?.percentage !== 0 || discount?.amount?.value !== 0;
+
+      return hasAdditionalInfo && hasDiscount && hasDiscountValue ? '-' : '';
+    };
+
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
 
     const styles = getStyles(boldFontStyle);
-
-    const elevatorAddress = serviceOrder?.elevator?.address;
 
     return (
       <Document>
@@ -335,11 +368,11 @@ const JobOverviewPdfTemplate = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: '50%',
+                        width: '40%',
                         textAlign: 'left',
                         ...styles.tableHeading,
                       }}>
-                      {translate('ARTICLE NAME')}
+                      {translate('Article Name')}
                     </Text>
 
                     <Text
@@ -348,7 +381,7 @@ const JobOverviewPdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {translate('QUANTITY')}
+                      {translate('Quantity')}
                     </Text>
                     <Text
                       style={{
@@ -357,7 +390,7 @@ const JobOverviewPdfTemplate = React.memo(
                         marginLeft: 10,
                         ...styles.tableHeading,
                       }}>
-                      {translate('UNIT')}
+                      {translate('Unit')}
                     </Text>
                     <Text
                       style={{
@@ -365,16 +398,31 @@ const JobOverviewPdfTemplate = React.memo(
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
-                      {`${translate('PRICE')} (${currentCurrency?.symbol})`}
+                      {`${translate('Price')} (${
+                        getCurrencySymbol[currentCurrency?.code!]
+                      })`}
                     </Text>
+                    {!allItemsHaveZeroDiscount && (
+                      <Text
+                        style={{
+                          width: '10%',
+                          textAlign: 'right',
+                          ...styles.tableHeading,
+                        }}>
+                        {translate('Discount')}
+                      </Text>
+                    )}
+
                     <Text
                       style={{
-                        width: '15%',
+                        width: allItemsHaveZeroDiscount ? '25%' : '15%',
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
                       {' '}
-                      {`${translate('TOTAL')} (${currentCurrency?.symbol})`}
+                      {`${translate('Total')} (${
+                        getCurrencySymbol[currentCurrency?.code!]
+                      })`}
                     </Text>
                   </View>
                 </View>
@@ -395,7 +443,7 @@ const JobOverviewPdfTemplate = React.memo(
                           </Text>
                           <Text
                             style={{
-                              width: '50%',
+                              width: '40%',
                               textAlign: 'left',
                               color: '#212121',
                             }}>
@@ -417,7 +465,7 @@ const JobOverviewPdfTemplate = React.memo(
                               marginLeft: 10,
                               color: '#212121',
                             }}>
-                            {articleOrderItem.article.unit || '-'}
+                            {translate(articleOrderItem.article.unit) || '-'}
                           </Text>
                           <Text
                             style={{
@@ -438,25 +486,40 @@ const JobOverviewPdfTemplate = React.memo(
                               },
                             )}
                           </Text>
+                          {!allItemsHaveZeroDiscount && (
+                            <Text
+                              style={{
+                                width: '10%',
+                                textAlign: 'right',
+                                color: '#212121',
+                              }}>
+                              {shouldDisplayDash(articleOrderItem)}
+                              {articleOrderItem?.additionalInfo?.discount
+                                ?.type === DiscountType.PERCENTAGE
+                                ? articleOrderItem?.additionalInfo?.discount
+                                    .percentage
+                                : (articleOrderItem?.additionalInfo?.discount
+                                    ?.amount?.value || 0) /
+                                  10 ** 2}
+                              {articleOrderItem?.additionalInfo?.discount
+                                ?.type === DiscountType.AMOUNT
+                                ? getCurrencySymbol[currentCurrency?.code!]
+                                : '%'}
+                            </Text>
+                          )}
+
                           <Text
                             style={{
-                              width: '15%',
+                              width: allItemsHaveZeroDiscount ? '25%' : '15%',
                               textAlign: 'right',
                               color: '#212121',
                             }}>
-                            {formatCurrency(
-                              ((articleOrderItem.unitAmount?.netAmount ?? 0) *
-                                articleOrderItem.quantity) /
-                                10 **
-                                  articleOrderItem.unitAmount.fractionDigits ??
-                                0,
-                              {
-                                currency: currentCurrency?.code,
-                                excludeCurrencySymbol: true,
-                                currencySymbol: currentCurrency?.symbol,
-                                companyLang: selectedLng,
-                              },
-                            )}
+                            {formatCurrency(netTotal(articleOrderItem), {
+                              currency: currentCurrency?.code,
+                              excludeCurrencySymbol: true,
+                              currencySymbol: currentCurrency?.symbol,
+                              companyLang: selectedLng,
+                            })}
                           </Text>
                         </View>
                         {articleOrderItem?.description.trim() !== '' && (
