@@ -29,6 +29,7 @@ import {
 } from 'utils/currency';
 import {convertToText} from 'utils/utils';
 import {createEmptyResource} from 'utils/paging-utils';
+import DOMPurify from 'dompurify';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const isExternalIdUnique = async (resource: ArticleView[], value?: string) => {
@@ -288,7 +289,12 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       headerActionIcon={<EditIcon />}
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      header={<Typography variant="subtitle1">{article?.name}</Typography>}>
+      header={
+        <Typography
+          variant="subtitle1"
+          dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(article?.name)}}
+        />
+      }>
       <Box display="flex" flexWrap="wrap">
         {_.map(basicInfoItems, (item, key) => (
           <CardProps

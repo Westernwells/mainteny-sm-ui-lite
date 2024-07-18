@@ -34,6 +34,7 @@ import {
   convertCategoryToMacro,
   convertCategoryToText,
 } from 'utils/text-block';
+import DOMPurify from 'dompurify';
 import {TextBlockForm} from './TextBlockForm';
 import {columns, makeRows} from './TextBlockDataGridProps';
 
@@ -339,7 +340,9 @@ const TextBlocks = ({company}: Props) => {
               </Typography>
               {item.label === t('Text') ? (
                 <Box
-                  dangerouslySetInnerHTML={{__html: item.value}}
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(item.value),
+                  }}
                   sx={{
                     margin: '0em',
                     padding: '0em',

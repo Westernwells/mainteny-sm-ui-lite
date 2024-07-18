@@ -264,10 +264,16 @@ export const ArticleSection = ({
                   }}>
                   {index + 1}
                 </Text>
-                <Text
-                  style={{width: '37%', textAlign: 'left', color: '#212121'}}>
-                  {articleItem.name || '-'}
-                </Text>
+
+                <HtmlPDF
+                  rootStyle={{
+                    width: '37%',
+                    textAlign: 'left',
+                    color: '#212121',
+                  }}
+                  html={articleItem.name || '-'}
+                />
+
                 <Text
                   style={{
                     width: '10%',
@@ -361,9 +367,10 @@ export const ArticleSection = ({
                 </Text>
               </View>
               {articleItem?.description.trim() && (
-                <Text style={styles.descriptionText}>
-                  {articleItem?.description}
-                </Text>
+                <HtmlPDF
+                  rootStyle={styles.descriptionText}
+                  html={articleItem.description || '-'}
+                />
               )}
             </View>
           ))}
