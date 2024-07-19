@@ -379,8 +379,8 @@ export interface ElevatorRequestBody {
   emergencyContactNumber: string;
   emergencyPhoneProvider: string;
   keyLocation: string;
-  lastInspectionDate: string;
-  lastVisitDate: string;
+  lastInspectionDate: string | null;
+  lastVisitDate: string | null;
   manufacturer: string;
   model: string;
   externalId: string;
