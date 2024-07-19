@@ -213,6 +213,7 @@ export interface ServiceOrderAdditionalInfo {
   candidateTechnicians?: ServiceOrderCandidateTechnician[];
   documents?: FileResource[];
   pictures?: FileResource[];
+  discount?: Discount;
 }
 
 export interface ServiceOrderConfirmationInfo {
