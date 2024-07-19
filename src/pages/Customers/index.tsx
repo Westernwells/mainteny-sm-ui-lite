@@ -83,7 +83,7 @@ export const Customer = () => {
   });
 
   useEffect(() => {
-    if (page.pageIndex) {
+    if (customerResource.total > 0 && customerResource.data.length === 0) {
       setPage({...page, pageIndex: 0});
     }
     if (textInput.current) {
