@@ -95,7 +95,7 @@ export const UnitListingView = () => {
   totalUnitsRef.current = totalUnitsRef.current || elevatorResponse.total;
 
   useEffect(() => {
-    if (page.pageIndex) {
+    if (elevatorResponse.total > 0 && elevatorResponse.data.length === 0) {
       setPage({...page, pageIndex: 0});
     }
     if (textInput.current) {
