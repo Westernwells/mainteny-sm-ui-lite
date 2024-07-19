@@ -147,6 +147,7 @@ import {
   stripHtmlTags,
 } from './utils';
 import InvoiceFormArticleSection from './InvoiceFormArticleSection';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 
 interface Props {
   invoice?: InvoiceView;
@@ -437,6 +438,9 @@ export const InvoiceForm = ({
       moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
       unitNumber: '-',
       showArticleSection: true,
+      discount: serviceOrder?.additionalInfo.discount
+        ? getDiscoutObj(serviceOrder?.additionalInfo.discount)
+        : undefined,
       notes: [],
       ...(invoice && {
         billingAddress:
@@ -884,6 +888,10 @@ export const InvoiceForm = ({
         serviceOrder?.actualEndTime
           ? new Date(serviceOrder.actualEndTime)
           : undefined,
+      );
+      formik.setFieldValue(
+        'discount',
+        getDiscoutObj(serviceOrder?.additionalInfo.discount),
       );
       if (!formik.values.items.length) {
         formik.setFieldValue(

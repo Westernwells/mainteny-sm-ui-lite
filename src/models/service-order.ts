@@ -579,7 +579,11 @@ export interface ServiceOrderArticleView {
   article: ArticleRecord;
   unitAmount: Amount;
   quantity: number;
-  additionalInfo?: {discount: Discount};
+  additionalInfo?:
+    | {
+        discount?: Discount;
+      }
+    | undefined;
 }
 
 export interface ServiceOrderItemRecord {
