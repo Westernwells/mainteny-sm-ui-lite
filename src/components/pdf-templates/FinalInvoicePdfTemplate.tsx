@@ -56,6 +56,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
   StyleSheet.create({
     dataBody: {
       borderBottom: '1px solid #212121',
+      paddingBottom: 10,
     },
     contentBody: {
       marginTop: 6,
