@@ -21,6 +21,7 @@ import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Re
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {HtmlPDF} from '../../../../components/HtmlPDF';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -446,14 +447,15 @@ const JobOverviewPdfTemplate = React.memo(
                             }}>
                             {index + 1}
                           </Text>
-                          <Text
-                            style={{
+
+                          <HtmlPDF
+                            html={articleOrderItem.name || '-'}
+                            rootStyle={{
                               width: '40%',
                               textAlign: 'left',
                               color: '#212121',
-                            }}>
-                            {articleOrderItem.name || '-'}
-                          </Text>
+                            }}
+                          />
 
                           <Text
                             style={{
@@ -528,9 +530,10 @@ const JobOverviewPdfTemplate = React.memo(
                           </Text>
                         </View>
                         {articleOrderItem?.description.trim() !== '' && (
-                          <Text style={styles.descriptionText}>
-                            {articleOrderItem?.description}
-                          </Text>
+                          <HtmlPDF
+                            html={articleOrderItem?.description || '-'}
+                            rootStyle={styles.descriptionText}
+                          />
                         )}
                       </View>
                     ))}
