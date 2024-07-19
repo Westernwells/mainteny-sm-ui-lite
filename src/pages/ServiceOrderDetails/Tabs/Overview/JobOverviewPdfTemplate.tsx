@@ -16,6 +16,7 @@ import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContain
 import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {DiscountType} from 'models/invoice';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -221,6 +222,10 @@ const JobOverviewPdfTemplate = React.memo(
     );
 
     const elevatorAddress = serviceOrder?.elevator?.address;
+
+    const globalDiscount = getDiscoutObj(quotation?.additionalInfo?.discount);
+    const discountAmount = globalDiscount?.amount;
+    const discountValue = discountAmount?.value ?? 0;
 
     const shouldDisplayDash = (articleOrderItem: ServiceOrderArticleView) => {
       if (!articleOrderItem || !articleOrderItem.additionalInfo) return '';
@@ -534,6 +539,37 @@ const JobOverviewPdfTemplate = React.memo(
 
                 {serviceOrder?.articles.length! > 0 && (
                   <View>
+                    {discountValue && (
+                      <View style={styles.tableRow}>
+                        <Text style={{width: '44%'}} />
+                        <Text
+                          style={{
+                            width: '32%',
+                            color: '#616161',
+                            fontSize: 10,
+                            textAlign: 'right',
+                          }}>
+                          {`${translate('Discount')} (${
+                            getCurrencySymbol[currentCurrency?.code!]
+                          })`}
+                        </Text>
+                        <Text
+                          style={{
+                            width: '24%',
+                            textAlign: 'right',
+                            fontSize: 10,
+                          }}>
+                          -
+                          {formatCurrency(discountValue, {
+                            currency: currentCurrency?.code,
+                            excludeCurrencySymbol: true,
+                            currencySymbol: currentCurrency?.symbol,
+                            companyLang: selectedLng,
+                          })}
+                        </Text>
+                      </View>
+                    )}
+
                     <View style={styles.tableRow}>
                       <Text style={{width: '44%'}} />
                       <Text
