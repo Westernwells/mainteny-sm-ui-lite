@@ -147,6 +147,7 @@ import {
   stripHtmlTags,
 } from './utils';
 import InvoiceFormArticleSection from './InvoiceFormArticleSection';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 
 interface Props {
   invoice?: InvoiceView;
@@ -1280,7 +1281,7 @@ export const InvoiceForm = ({
     formik.setFieldValue('items', invoiceItems);
   };
 
-  const handleCustomerChange = (value: PropertyOwnerView | null) => {
+  const handleCustomerChange = (value?: PropertyOwnerView | null) => {
     if (value) {
       handleSelectCustomer(value);
     } else {
@@ -1289,6 +1290,12 @@ export const InvoiceForm = ({
       formik.setFieldValue('paymentTerm', {term: ''});
     }
   };
+
+  const {data: customerDetails} = useGetCustomer(formik.values.propertyOwnerId);
+
+  useEffect(() => {
+    handleCustomerChange(customerDetails);
+  }, [customerDetails]);
 
   const isEditAndNoCreator = formType === 'edit' && !invoice?.meta.creator;
   const hasInvoiceCreator = invoice?.meta?.creator ?? false;
@@ -1526,49 +1533,6 @@ export const InvoiceForm = ({
       />,
     ).toBlob();
     return blob;
-  };
-
-  const generateBlob = async (invoiceData: InvoiceView) => {
-    let PdfTemplate;
-
-    if (invoiceData) {
-      if (
-        invoiceData.type === InvoiceType.FULL ||
-        invoiceData.type === InvoiceType.AGGREGATE
-      ) {
-        PdfTemplate = FullInvoicePdfTemplate;
-      } else if (invoiceData.type === InvoiceType.CREDIT_NOTE) {
-        PdfTemplate = CreditNotePdfTemplate;
-      } else if (
-        invoiceData.type === InvoiceType.PARTIAL ||
-        invoiceData.type === InvoiceType.UPFRONT
-      ) {
-        PdfTemplate = PartialInvoicePdfTemplate;
-      } else {
-        PdfTemplate = FinalInvoicePdfTemplate;
-      }
-
-      const blob = await pdf(
-        <PdfTemplate
-          userInfo={user?.userAccount}
-          currentCurrency={currentCurrency}
-          invoice={invoiceData}
-          selectedLng={company?.language}
-          translate={translate}
-          previousInvoices={sortedPreviousInvoices.slice(
-            0,
-            sortedPreviousInvoices.findIndex((i) => i.id === invoiceData.id) +
-              1,
-          )}
-          headerPath={headerUrl[headerInfo?.path]}
-          headerInfo={headerInfo}
-          footerPath={footerUrl[footerInfo?.path]}
-          footerInfo={footerInfo}
-          nextCompanyExternalId={companyNextNumber?.value}
-        />,
-      ).toBlob();
-      return blob;
-    }
   };
 
   useEffect(() => {
