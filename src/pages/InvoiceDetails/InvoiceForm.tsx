@@ -192,9 +192,9 @@ const articleViewToItem = (
     description: articleView.description,
     quantity: articleView.quantity,
     unitAmount: articleView.unitAmount,
-    additionalInfo: {
-      ...articleView.additionalInfo,
-      discount: getDiscoutObj(articleView.additionalInfo?.discount),
+    discount: {
+      ...articleView.additionalInfo?.discount,
+      type: articleView.additionalInfo?.discount?.type ?? DiscountType.NONE,
     },
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
@@ -442,9 +442,6 @@ export const InvoiceForm = ({
       moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
       unitNumber: '-',
       showArticleSection: true,
-      discount: serviceOrder?.additionalInfo.discount
-        ? getDiscoutObj(serviceOrder?.additionalInfo.discount)
-        : undefined,
       notes: [],
       ...(invoice && {
         billingAddress:
