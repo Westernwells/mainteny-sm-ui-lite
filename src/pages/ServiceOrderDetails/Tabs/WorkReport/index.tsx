@@ -56,6 +56,13 @@ import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import {InputAdornment, IconButton} from '@mui/material';
+import {GridCellParams} from '@mui/x-data-grid';
+import {TextBlockCategory, TextBlockView} from 'models/text-block';
+import {Dialog} from 'components/Dialog';
+import TextBlockActions from 'components/text-blocks/TextBlockActions';
+import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -389,6 +396,25 @@ export const WorkReport = ({serviceOrder}: Props) => {
     validationSchema,
   });
 
+  const [openTextBlockDialog, setOpenTextBlockDialog] =
+    useState<boolean>(false);
+  const [activeSubDialog, setActiveSubDialog] = useState<
+    'edit' | 'preview' | 'delete' | 'create' | undefined
+  >(undefined);
+  const [activeTextBlock, setActiveTextBlock] = useState<
+    TextBlockView | undefined
+  >(undefined);
+
+  const onCloseSubDialogs = () => {
+    setActiveSubDialog(undefined);
+    setOpenTextBlockDialog(true);
+  };
+
+  const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
+    formik.setFieldValue('description', rowParams.row.text);
+    setOpenTextBlockDialog(false);
+  };
+
   const resetForm = () => {
     if (report) {
       let temp: ServiceOrderArticleView[] = [];
@@ -637,6 +663,23 @@ export const WorkReport = ({serviceOrder}: Props) => {
             updateHtml={(h) => formik.setFieldValue('description', h)}
             minRows={4}
             disabled={!isEditMode}
+            endAdornment={
+              <InputAdornment
+                component={IconButton}
+                disableRipple
+                position="end"
+                sx={{
+                  mt: 1,
+                  mr: -1,
+                  alignSelf: 'flex-start',
+                }}
+                onClick={() => {
+                  setOpenTextBlockDialog(true);
+                }}
+                size="small">
+                <TextSnippetIcon />
+              </InputAdornment>
+            }
           />
         </Box>
 
@@ -742,6 +785,42 @@ export const WorkReport = ({serviceOrder}: Props) => {
         content={formik.values.description}
         callback={(emailRecord) => onSubmitHandler(emailRecord)}
       />
+
+      <Dialog
+        title="Click to apply your block"
+        disableSaveBtn={!!Object.keys(formik.errors).length}
+        onCancel={() => {
+          setOpenTextBlockDialog(false);
+        }}
+        dialogProps={{
+          maxWidth: 'sm',
+          open: openTextBlockDialog || false,
+        }}
+        showCancelButton={false}
+        showSaveButton={false}>
+        <TextBlockSelect
+          textBlockCategory={TextBlockCategory.SERVICE_ORDER_REPORT}
+          setOpenTextBlockDialog={setOpenTextBlockDialog}
+          setActiveSubDialog={setActiveSubDialog}
+          setActiveTextBlock={setActiveTextBlock}
+          handleCellClick={handleCellClick}
+        />
+      </Dialog>
+
+      {activeSubDialog && (
+        <TextBlockActions
+          textBlockCategory={TextBlockCategory.SERVICE_ORDER_REPORT}
+          activeSubDialog={activeSubDialog}
+          setActiveSubDialog={setActiveSubDialog}
+          openDialog={
+            activeSubDialog === 'edit' || activeSubDialog === 'create'
+          }
+          openPreviewDialog={activeSubDialog === 'preview'}
+          openCancelConfirm={activeSubDialog === 'delete'}
+          activeTextBlock={activeTextBlock}
+          onCloseSubDialogs={onCloseSubDialogs}
+        />
+      )}
     </Box>
   );
 };

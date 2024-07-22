@@ -81,7 +81,7 @@ export const columns = (
           </Typography>
 
           {hoveredRow === params.row.id && (
-            <Tooltip title={stripHtmlTags(params.row.text)}>
+            <Tooltip title={stripHtmlTags(params.row.text)} placement="top">
               <Typography sx={{marginBottom: '-0.4em'}}>
                 <AlertInfoIcon width="16px" height="16px" />
               </Typography>

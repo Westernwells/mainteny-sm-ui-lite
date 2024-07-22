@@ -9,6 +9,7 @@ import * as Yup from 'yup';
 import {EmptySection} from 'components/EmptySection';
 import {useFormik} from 'formik';
 import {useUpdateServiceOrder} from 'hooks/reactQuery/useServiceOrder';
+import DOMPurify from 'dompurify';
 import {DescriptionFormModel} from './model';
 import {DescriptionForm} from './DescriptionForm';
 
@@ -58,11 +59,11 @@ export const Description = ({content = '', serviceOrderId = ''}: Props) => {
         }}>
         {content ? (
           <Typography
-            variant="body1"
-            color="text.secondary"
-            sx={{whiteSpace: 'pre-line'}}>
-            {content}
-          </Typography>
+            variant="inherit"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(content),
+            }}
+          />
         ) : (
           <Box
             sx={{

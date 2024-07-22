@@ -70,7 +70,7 @@ export const TextBlockForm = ({formik}: Props) => {
             label="Text"
             name="text"
             hasAttachFileButton={false}
-            html={formik.values.text}
+            html={formik.values.text || ''}
             updateHtml={(html) => formik.setFieldValue('text', html)}
           />
         </Grid>

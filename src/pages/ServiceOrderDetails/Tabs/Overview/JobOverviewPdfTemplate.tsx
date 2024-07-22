@@ -355,9 +355,14 @@ const JobOverviewPdfTemplate = React.memo(
               </PdfPageTitle>
 
               {serviceOrder?.description.trim() !== '' && (
-                <Text style={styles.contentBody}>
-                  {serviceOrder?.description}
-                </Text>
+                <HtmlPDF
+                  html={serviceOrder?.description || ''}
+                  selectedLng={selectedLng}
+                  rootStyle={{
+                    marginTop: 6,
+                    marginBottom: 16,
+                  }}
+                />
               )}
 
               <View style={styles.table}>
