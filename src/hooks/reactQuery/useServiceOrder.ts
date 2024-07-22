@@ -226,7 +226,7 @@ export const queryServiceOrders = async (
     await axiosClient.get(`/api/serviceOrders`, {
       params: {
         ...params,
-        paymentStatus,
+        ...(paymentStatus ? {paymentStatus} : {}),
       },
       paramsSerializer,
     });
