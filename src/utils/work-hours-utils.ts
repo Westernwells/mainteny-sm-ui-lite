@@ -1,7 +1,7 @@
 import {hoursToMinutes, secondsToMinutes} from 'date-fns';
 
 import {ServiceOrderType} from 'models/service-order';
-import {Role} from 'models/user';
+import {Role, UserActivityView} from 'models/user';
 import {WorkHoursItem, WorkHoursType} from 'models/workHours';
 import {EmployeeStatus} from 'models/employee';
 import {convertDigitalMinsToHM} from './datetime';
@@ -129,4 +129,17 @@ export const convertHoursAndMinutesToMinutes = (timeString: string): number => {
 
   // Convert hours and minutes to total minutes
   return parseInt(hours, 10) * 60 + parseInt(minutes, 10);
+};
+
+export const calculateTotalActivityTime = (workHours: UserActivityView[]) => {
+  const itemsTime = workHours.map(
+    (item: UserActivityView) => item.billableMinutes,
+  );
+
+  const total = itemsTime.reduce(
+    (accumulator, item) => (accumulator ?? 0) + (item ?? 0),
+    0,
+  );
+
+  return `${convertDigitalMinsToHM(total ?? 0)} h`;
 };
