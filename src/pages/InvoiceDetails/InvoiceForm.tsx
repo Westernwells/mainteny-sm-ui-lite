@@ -192,10 +192,7 @@ const articleViewToItem = (
     description: articleView.description,
     quantity: articleView.quantity,
     unitAmount: articleView.unitAmount,
-    discount: {
-      ...articleView.additionalInfo?.discount,
-      type: articleView.additionalInfo?.discount?.type ?? DiscountType.NONE,
-    },
+    discount: getDiscoutObj(articleView.additionalInfo?.discount),
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
 };
