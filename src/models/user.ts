@@ -1,6 +1,7 @@
 import {ServiceCompany, ServiceCompanyView} from './service-company';
 import {AddressRecord, Meta, Contact, TimeWindowRecord} from './misc';
 import {ServiceOrderType} from './service-order';
+import {WorkHoursType} from './workHours';
 
 export enum UserAccountStatus {
   NORMAL = 'NORMAL',
@@ -124,3 +125,21 @@ export interface UserData {
 }
 
 export interface ServiceManagerData {}
+
+export interface UserActivityAdditionalInfo {
+  comment?: string;
+}
+export interface UserActivityView {
+  id: string;
+  type: WorkHoursType;
+  refId?: string;
+  data: string;
+  user: UserAccountSimpleView;
+  description: string;
+  startTime: string;
+  minutes?: number;
+  billableMinutes?: number;
+  additionalInfo: UserActivityAdditionalInfo;
+  search: string;
+  createdAt?: string;
+}

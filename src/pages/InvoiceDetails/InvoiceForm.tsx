@@ -148,6 +148,7 @@ import {
 } from './utils';
 import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 
 interface Props {
   invoice?: InvoiceView;
@@ -192,6 +193,7 @@ const articleViewToItem = (
     description: articleView.description,
     quantity: articleView.quantity,
     unitAmount: articleView.unitAmount,
+    discount: getDiscoutObj(articleView.additionalInfo?.discount),
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
 };
@@ -885,6 +887,10 @@ export const InvoiceForm = ({
         serviceOrder?.actualEndTime
           ? new Date(serviceOrder.actualEndTime)
           : undefined,
+      );
+      formik.setFieldValue(
+        'discount',
+        getDiscoutObj(serviceOrder?.additionalInfo.discount),
       );
       if (!formik.values.items.length) {
         formik.setFieldValue(

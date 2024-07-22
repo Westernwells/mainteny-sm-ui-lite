@@ -2,7 +2,7 @@ import {Box, Grid, Typography} from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {useTranslation} from 'react-i18next';
 import {InfoCard} from 'components/InfoCard';
-import WorkHourWidget from '../../WorkHours/WorkHourWidget';
+import EmployeeWorkHourWidget from './EmployeeWorkHourWidget';
 
 type EmployeeWorkHoursProps = {
   action: () => void;
@@ -20,7 +20,7 @@ const EmployeeWorkHours = ({action}: EmployeeWorkHoursProps) => {
         headerActionIcon={<OpenInNewIcon />}
         showHeaderBackground>
         <Box>
-          <WorkHourWidget />
+          <EmployeeWorkHourWidget />
         </Box>
       </InfoCard>
     </Grid>

@@ -303,8 +303,8 @@ export interface InvoiceItemRecord {
   payment?: InvoiceItemPaymentRecord;
   additionalInfo?:
     | {
-        discount?: Discount | undefined;
-        payment?: InvoiceItemPaymentRecord | undefined;
+        discount?: Discount;
+        payment?: InvoiceItemPaymentRecord;
       }
     | undefined;
 }

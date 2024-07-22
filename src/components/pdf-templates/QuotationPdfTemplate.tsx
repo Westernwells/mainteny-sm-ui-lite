@@ -128,7 +128,7 @@ const getStyles = (
     descriptionText: {
       width: '45%',
       display: 'flex',
-      fontSize: 8.5,
+      fontSize: 8,
       color: '#212121',
       paddingLeft: 20,
       letterSpacing: -0.15,
@@ -199,6 +199,19 @@ const QuotationPdfTemplate = React.memo(
         (grossTotal - discountValue) /
           10 ** articleItem.unitAmount.fractionDigits ?? 2
       );
+    };
+
+    const shouldDisplayDash = (articleOrderItem: QuotationItem) => {
+      if (!articleOrderItem || !articleOrderItem.additionalInfo) return '';
+
+      const additionalInfo = articleOrderItem?.additionalInfo;
+      const hasAdditionalInfo = Object.keys(additionalInfo).length !== 0;
+      const discount = additionalInfo?.discount;
+      const hasDiscount = discount?.type !== DiscountType.NONE;
+      const hasDiscountValue =
+        discount?.percentage !== 0 || discount?.amount?.value !== 0;
+
+      return hasAdditionalInfo && hasDiscount && hasDiscountValue ? '-' : '';
     };
 
     const discount = getDiscoutObj(quotation?.additionalInfo?.discount);
@@ -518,12 +531,7 @@ const QuotationPdfTemplate = React.memo(
                                 textAlign: 'right',
                                 color: '#212121',
                               }}>
-                              {articleItem?.additionalInfo?.discount
-                                ?.percentage !== 0 ||
-                              articleItem?.additionalInfo?.discount?.amount
-                                ?.value !== 0
-                                ? '-'
-                                : ''}
+                              {shouldDisplayDash(articleItem)}
                               {articleItem?.additionalInfo?.discount?.type ===
                               DiscountType.PERCENTAGE
                                 ? articleItem?.additionalInfo?.discount

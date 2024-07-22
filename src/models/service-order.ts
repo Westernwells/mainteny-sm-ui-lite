@@ -25,6 +25,7 @@ import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceOrderPaymentStatusView} from '../utils/service-order-utils';
+import {Discount, InvoiceAdditionalInfo} from './invoice';
 
 export enum Priority {
   A = 'A',
@@ -212,6 +213,7 @@ export interface ServiceOrderAdditionalInfo {
   candidateTechnicians?: ServiceOrderCandidateTechnician[];
   documents?: FileResource[];
   pictures?: FileResource[];
+  discount?: Discount;
 }
 
 export interface ServiceOrderConfirmationInfo {
@@ -577,6 +579,11 @@ export interface ServiceOrderArticleView {
   article: ArticleRecord;
   unitAmount: Amount;
   quantity: number;
+  additionalInfo?:
+    | {
+        discount?: Discount;
+      }
+    | undefined;
 }
 
 export interface ServiceOrderItemRecord {
