@@ -23,7 +23,7 @@ import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.tt
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
-import {ArticleSection} from './FinalInvoicePdfTemplate';
+import {ArticleSection} from './ArticleSection/ArticleSection';
 import PdfPartialPaymentSection from './PdfPartialPaymentSection';
 import PdfUpfrontInvoiceSection from './PdfUpfrontInvoiceSection';
 import PdfBodyContainer from './containers/PdfBodyContainer';

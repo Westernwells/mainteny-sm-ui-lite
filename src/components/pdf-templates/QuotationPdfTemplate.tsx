@@ -128,6 +128,7 @@ const getStyles = (
     tableRow: {
       display: 'flex',
       flexDirection: 'row',
+      alignItems: 'baseline',
       fontSize: 10,
       marginVertical: 4,
     },
