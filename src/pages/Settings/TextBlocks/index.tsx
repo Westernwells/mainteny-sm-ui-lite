@@ -346,10 +346,9 @@ const TextBlocks = ({company}: Props) => {
                   sx={{
                     margin: '0em',
                     padding: '0em',
-                    '& p': {
-                      margin: 0,
-                      padding: 0,
-                      minHeight: '1em',
+                    '& div': {
+                      marginBottom: '1.5em',
+                      lineHeight: '1.5em',
                     },
                   }}
                 />

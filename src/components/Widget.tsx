@@ -20,6 +20,7 @@ interface Props {
   btnIcon?: JSX.Element;
   containerStyles?: {[key: string]: string | number};
   searchInputStyles?: {[key: string]: string | number};
+  searchInputWrapperStyles?: {[key: string]: string | number};
   menu?: MenuBtnProps[];
   filterItems?: ReactNode;
   refInput?: RefObject<HTMLInputElement>;
@@ -39,6 +40,7 @@ export const Widget = ({
   defaultSearchValue = '',
   btnOnClick,
   containerStyles,
+  searchInputWrapperStyles,
   showMenuActionBtn,
   menu,
   filterItems,
@@ -55,7 +57,7 @@ export const Widget = ({
       display="flex"
       sx={{height: '2.5rem', flexGrow: 1, ...containerStyles}}>
       {!hideSearchInput ? (
-        <Box sx={{mr: '1em'}}>
+        <Box sx={{mr: '1em', ...searchInputWrapperStyles}}>
           <SearchInput
             containerStyle={{height: '100%', ...searchInputStyles}}
             placeholder={searchPlaceholder && t(searchPlaceholder)}

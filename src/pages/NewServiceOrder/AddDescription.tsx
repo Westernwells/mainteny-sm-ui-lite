@@ -1,5 +1,5 @@
 import {useFormik} from 'formik';
-import {Box} from '@mui/material';
+import {Box, IconButton, InputAdornment} from '@mui/material';
 import Grid from '@mui/material/Grid';
 import {FormInput} from 'components/form/FormInput';
 import {ElevatorView} from 'models/elevator';
@@ -12,6 +12,13 @@ import {setDateTime, toRestDateTime} from 'utils/datetime';
 import {ReactComponent as LiftIcon} from 'assets/icons/Lift-1.svg';
 import {ReactComponent as FieldServiceIcon} from 'assets/icons/FieldService.svg';
 import {ReactComponent as CalendarInformationIcon} from 'assets/icons/CalendarInformation.svg';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import {GridCellParams} from '@mui/x-data-grid';
+import TextBlockActions from 'components/text-blocks/TextBlockActions';
+import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
+import {TextBlockCategory, TextBlockView} from 'models/text-block';
+import {Dialog} from 'components/Dialog';
+import RichTextField from 'components/RichTextField';
 import {Summary, SummaryItem} from './Summary';
 
 interface Props {
@@ -44,6 +51,25 @@ export const AddDescription = ({
     },
     onSubmit: () => {},
   });
+
+  const [openTextBlockDialog, setOpenTextBlockDialog] =
+    useState<boolean>(false);
+  const [activeSubDialog, setActiveSubDialog] = useState<
+    'edit' | 'preview' | 'delete' | 'create' | undefined
+  >(undefined);
+  const [activeTextBlock, setActiveTextBlock] = useState<
+    TextBlockView | undefined
+  >(undefined);
+
+  const onCloseSubDialogs = () => {
+    setActiveSubDialog(undefined);
+    setOpenTextBlockDialog(true);
+  };
+
+  const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
+    setDescription(rowParams.row.text);
+    setOpenTextBlockDialog(false);
+  };
 
   useEffect(() => {
     if (getDescription) {
@@ -159,17 +185,66 @@ export const AddDescription = ({
           </Grid>
         </Grid>
 
-        <FormInput
-          fieldProps={{
-            label: 'Description to the engineer',
-            value: description,
-            multiline: true,
-            minRows: 4,
-            type: 'text',
-            onChange: (e) => setDescription(e.target.value),
-          }}
+        <RichTextField
+          label="Description to the engineer"
+          html={description || ''}
+          updateHtml={setDescription}
+          minRows={4}
+          endAdornment={
+            <InputAdornment
+              component={IconButton}
+              disableRipple
+              position="end"
+              sx={{
+                mt: 1,
+                mr: -1,
+                alignSelf: 'flex-start',
+              }}
+              onClick={() => {
+                setOpenTextBlockDialog(true);
+              }}
+              size="small">
+              <TextSnippetIcon />
+            </InputAdornment>
+          }
         />
       </Box>
+
+      <Dialog
+        title="Click to apply your block"
+        disableSaveBtn={!!Object.keys(formik.errors).length}
+        onCancel={() => {
+          setOpenTextBlockDialog(false);
+        }}
+        dialogProps={{
+          maxWidth: 'sm',
+          open: openTextBlockDialog || false,
+        }}
+        showCancelButton={false}
+        showSaveButton={false}>
+        <TextBlockSelect
+          textBlockCategory={TextBlockCategory.SERVICE_ORDER}
+          setOpenTextBlockDialog={setOpenTextBlockDialog}
+          setActiveSubDialog={setActiveSubDialog}
+          setActiveTextBlock={setActiveTextBlock}
+          handleCellClick={handleCellClick}
+        />
+      </Dialog>
+
+      {activeSubDialog && (
+        <TextBlockActions
+          textBlockCategory={TextBlockCategory.SERVICE_ORDER}
+          activeSubDialog={activeSubDialog}
+          setActiveSubDialog={setActiveSubDialog}
+          openDialog={
+            activeSubDialog === 'edit' || activeSubDialog === 'create'
+          }
+          openPreviewDialog={activeSubDialog === 'preview'}
+          openCancelConfirm={activeSubDialog === 'delete'}
+          activeTextBlock={activeTextBlock}
+          onCloseSubDialogs={onCloseSubDialogs}
+        />
+      )}
     </Box>
   );
 };

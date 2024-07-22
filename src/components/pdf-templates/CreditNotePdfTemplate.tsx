@@ -31,7 +31,7 @@ import {ArticleSection} from './FinalInvoicePdfTemplate';
 import PdfPageContainer from './containers/PdfPageContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfBodyContainer from './containers/PdfBodyContainer';
-import PdfPageTitle from './containers/PdfPageTitle';
+import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -253,9 +253,10 @@ const CreditNotePdfTemplate = ({
           </TopSectionContainer>
 
           <View>
-            <PdfPageTitle selectedLng={selectedLng}>
-              {invoice?.subject}
-            </PdfPageTitle>
+            <PdfPageTitleHtml
+              value={invoice?.subject}
+              selectedLng={selectedLng}
+            />
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF

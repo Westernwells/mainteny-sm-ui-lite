@@ -16,6 +16,7 @@ interface Props {
   children: ReactNode;
   onSave?: () => void;
   onCancel: () => void;
+  showSaveButton?: boolean;
   showCancelButton?: boolean;
   disableSaveBtn?: boolean;
   dialogProps: DialogProps;
@@ -35,6 +36,7 @@ export const Dialog = ({
   onSave = () => {},
   onCancel = () => {},
   showCancelButton = true,
+  showSaveButton = true,
   disableSaveBtn,
   dialogProps,
   saveBtnType,
@@ -99,20 +101,23 @@ export const Dialog = ({
               </Typography>
             </Button>
           )}
-          <Button
-            buttonProps={{
-              size: 'large',
-              variant: saveButtonVariant,
-              onClick: onSave,
-              autoFocus: true,
-              disabled: disableSaveBtn || isSaving,
-              type: saveBtnType,
-              ...saveButtonProps,
-            }}>
-            <Typography variant="subtitle2">
-              {isSaving ? `${t('Saving')}...` : t(saveButtonText)}
-            </Typography>
-          </Button>
+
+          {showSaveButton && (
+            <Button
+              buttonProps={{
+                size: 'large',
+                variant: saveButtonVariant,
+                onClick: onSave,
+                autoFocus: true,
+                disabled: disableSaveBtn || isSaving,
+                type: saveBtnType,
+                ...saveButtonProps,
+              }}>
+              <Typography variant="subtitle2">
+                {isSaving ? `${t('Saving')}...` : t(saveButtonText)}
+              </Typography>
+            </Button>
+          )}
         </Box>
       </DialogActions>
     </MuiDialog>
