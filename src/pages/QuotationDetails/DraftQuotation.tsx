@@ -1014,19 +1014,13 @@ export const DraftQuotation = ({
             <Box pb={0.5}>
               <SectionTitle Icon={HeaderIllustration} title="Header" />
             </Box>
-            <FormInput
-              fieldProps={{
-                id: 'subject',
-                name: 'subject',
-                value: formik.values.subject,
-                label: 'Subject',
-                onChange: formik.handleChange,
-                onBlur: formik.handleBlur,
-                error: !!formik.errors.subject,
-                helperText: formik.errors.subject ? formik.errors.subject : '',
-                fullWidth: true,
-                required: true,
-              }}
+            <RichTextField
+              label="Subject"
+              html={formik.values.subject || ''}
+              updateHtml={(h) => formik.setFieldValue('subject', h)}
+              onBlur={formik.handleBlur}
+              helperText={formik.errors.subject ? formik.errors.subject : ''}
+              error={!!formik.errors.subject}
             />
 
             <RichTextField

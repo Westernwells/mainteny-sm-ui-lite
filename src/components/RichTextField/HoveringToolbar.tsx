@@ -115,7 +115,7 @@ export const HoveringToolbar = () => {
           display: flex;
           padding: 8px;
           position: absolute;
-          z-index: 1000;
+          z-index: 9000;
           top: -10000px;
           left: -10000px;
           margin-top: -6px;

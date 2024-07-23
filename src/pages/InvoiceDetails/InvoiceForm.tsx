@@ -1829,18 +1829,15 @@ export const InvoiceForm = ({
             <Box pb={0.5}>
               <SectionTitle Icon={HeaderIllustration} title="Header" />
             </Box>
-            <FormInput
-              fieldProps={{
-                id: 'subject',
-                name: 'subject',
-                value: formik.values.subject,
-                label: 'Subject',
-                onChange: formik.handleChange,
-                onBlur: formik.handleBlur,
-                error: !!(formik.touched.subject && formik.errors.subject),
-                helperText: formik.touched.subject && formik.errors.subject,
-                fullWidth: true,
-              }}
+            <RichTextField
+              label="Subject"
+              html={formik.values.subject || ''}
+              updateHtml={(h) => formik.setFieldValue('subject', h)}
+              onBlur={formik.handleBlur}
+              helperText={
+                formik.touched.subject ? formik.errors.subject : undefined
+              }
+              error={!!(formik.touched.subject && formik.errors.subject)}
             />
 
             <RichTextField

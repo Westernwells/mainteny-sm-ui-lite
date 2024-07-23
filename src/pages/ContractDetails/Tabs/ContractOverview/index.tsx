@@ -409,7 +409,10 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 formatCurrency(
                   (contractDetails?.additionalInfo?.totalYearlyPrice || 0) /
                     10 ** currentCurrency.fractionDigits,
-                  {currency: contractDetails.additionalInfo.price?.currency},
+                  {
+                    currency: currentCurrency.code,
+                    currencySymbol: currentCurrency.symbol,
+                  },
                 ) || '-'
               }
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}

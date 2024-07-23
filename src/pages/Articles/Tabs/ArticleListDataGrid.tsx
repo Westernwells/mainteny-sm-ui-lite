@@ -4,6 +4,7 @@ import {
   GridColDef,
   GridColumnHeaderParams,
   GridRowsProp,
+  GridCellParams,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -27,6 +28,11 @@ import {convertToText, stringToTitleCase} from 'utils/utils';
 import {useQueryState} from 'hooks/useQueryState';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {Order, OrderByParams} from 'models/misc';
+import DOMPurify from 'dompurify';
+import {
+  hasMultipleParagraphs,
+  returnFirstParagraph,
+} from '../../../utils/rich-text-field-utils';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -34,6 +40,19 @@ export const columns: GridColDef[] = [
     headerName: 'NAME',
     cellClassName: 'truncateText',
     sortable: true,
+    renderCell: (params: GridCellParams) => {
+      const valueToShow = hasMultipleParagraphs(params.formattedValue)
+        ? returnFirstParagraph(params.formattedValue)
+        : params.formattedValue;
+
+      return (
+        <Typography
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(valueToShow),
+          }}
+        />
+      );
+    },
   }),
   getColumnProps({
     field: ArticleOrderField.EXTERNAL_ID,
@@ -97,6 +116,17 @@ export const columns: GridColDef[] = [
     sortable: true,
     headerName: 'DESCRIPTION',
     cellClassName: 'truncateText',
+    renderCell: (params: GridCellParams) => {
+      const valueToShow = hasMultipleParagraphs(params.formattedValue)
+        ? returnFirstParagraph(params.formattedValue)
+        : params.formattedValue;
+
+      return (
+        <Typography
+          dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(valueToShow)}}
+        />
+      );
+    },
   }),
   getColumnProps({
     field: ArticleOrderField.SELLING_PERCENTAGE_VAT,

@@ -9,6 +9,8 @@ import {NumericFormat} from 'react-number-format';
 import {ServiceOrderArticleView} from 'models/service-order';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
+import DOMPurify from 'dompurify';
+import RichTextField from '../../../../components/RichTextField';
 
 interface Props<T> {
   articleItem: T;
@@ -64,19 +66,25 @@ export const ArticleItemRow = ({
         }}>
         <Typography variant="body2">{index + 1}</Typography>
 
-        <Box sx={{justifySelf: 'stretch'}}>
-          <Typography variant="body2">{articleItem.name}</Typography>
+        <Box
+          sx={{
+            justifySelf: 'stretch',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+          gap={1}>
+          <Typography
+            variant="body2"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(articleItem.name),
+            }}
+          />
           {showDescription && (
-            <TextField
-              size="small"
+            <RichTextField
               placeholder={t('Description')}
-              multiline
-              fullWidth
-              value={description}
+              html={description || ''}
               minRows={4}
-              maxRows={6}
-              onChange={(e) => setDescription(e.target.value)}
-              sx={{mt: '1.5rem'}}
+              updateHtml={(h) => setDescription(h)}
             />
           )}
         </Box>

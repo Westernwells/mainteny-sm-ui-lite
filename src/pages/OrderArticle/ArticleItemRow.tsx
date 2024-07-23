@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {ArticleOrderItemRecord} from 'models/article';
 import {Button} from 'components/Button';
 import {useTranslation} from 'react-i18next';
+import RichTextField from '../../components/RichTextField';
 
 interface Props<T> {
   articleItem: T;
@@ -59,27 +60,24 @@ export const ArticleItemRow = ({
           gap: '.5em',
         }}>
         <Box alignSelf="center">{index + 1}</Box>
-        <Box sx={{justifySelf: 'stretch'}}>
-          <TextField
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            size="small"
-            fullWidth
-            sx={{width: '100%'}}
-            required
+        <Box
+          sx={{
+            display: 'flex',
+            justifySelf: 'stretch',
+            flexDirection: 'column',
+          }}
+          gap={1}>
+          <RichTextField
+            html={name || ''}
+            updateHtml={(h) => setName(h)}
             error={!name.trim()}
             helperText={!name.trim() ? t('Name is required') : ''}
           />
           {description.trim() && (
-            <TextField
-              size="small"
-              multiline
-              fullWidth
-              value={description}
+            <RichTextField
+              html={description}
               minRows={4}
-              maxRows={6}
-              onChange={(e) => setDescription(e.target.value)}
-              sx={{mt: '.5em'}}
+              updateHtml={(h) => setDescription(h)}
             />
           )}
         </Box>

@@ -2639,5 +2639,13 @@
   "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Slanje opomene o kašnjenju {{invoiceNumber}} na {{receiverEmail}} od strane {{senderName}}",
   "Invoice delivered": "Faktura isporučena",
   "Overdue notice delivered": "Opomena isporučena",
-  "The email was successfully delivered to {{receiverEmail}}": "Imejl je uspešno isporučen na {{receiverEmail}}"
+  "The email was successfully delivered to {{receiverEmail}}": "Imejl je uspešno isporučen na {{receiverEmail}}",
+  "Quotation marked as rejected": "Ponuda je označena kao odbijena",
+  "Quotation marked as accepted": "Ponuda je označena kao prihvaćena",
+  "Click to apply your block": "Kliknite da biste primenili svoj blok",
+  "Find your text block": "Pronađite svoj tekstualni blok",
+  "Create and customize your own block to be used later": "Napravite i prilagodite sopstveni blok koji će se kasnije koristiti",
+  "Service Order Report": "Izveštaj o narudžbini usluge",
+  "Article Order": "Redosled predmeta",
+  "Edit Block": "Uredi blok"
 }
