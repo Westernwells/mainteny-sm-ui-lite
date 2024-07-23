@@ -14,7 +14,6 @@ import {useArticles, useCreateArticle} from 'hooks/reactQuery/useArticle';
 import {Stepper} from 'components/Stepper';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PageCard} from 'components/PageCard';
-import {FormInput} from 'components/form/FormInput';
 import {Button} from 'components/Button';
 import {ArticleType, ArticleView, ExtendedSupplierRecord} from 'models/article';
 import {ArticleBasicFormModel, ArticleStockFormModel} from 'models/articleForm';
@@ -28,6 +27,7 @@ import {getUniqueId} from 'utils/utils';
 import {SupplierItem} from './Suppliers/SupplierItem';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
+import RichTextField from '../../components/RichTextField';
 
 const isExternalIdUnique = async (resource: ArticleView[], value?: string) => {
   if (!value) {
@@ -303,22 +303,14 @@ export const NewArticle = () => {
         {activeStep === 1 && (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <PageCard headerLabel={t('Description')} minHeight="100%">
-              <FormInput
-                containerStyles={{width: '60%'}}
-                fieldProps={{
-                  id: 'description',
-                  label: t('Description'),
-                  placeholder: t(
-                    'e.g. Flat cable used for door engines from the following suppliers.....',
-                  ),
-                  value: description,
-                  variant: 'outlined',
-                  multiline: true,
-                  rows: 10,
-                  minRows: 5,
-                  type: 'text',
-                  onChange: (e) => setDescription(e.target.value),
-                }}
+              <RichTextField
+                label={t('Description')}
+                html={description}
+                minRows={5}
+                placeholder={t(
+                  'e.g. Flat cable used for door engines from the following suppliers.....',
+                )}
+                updateHtml={(h) => setDescription(h)}
               />
             </PageCard>
           </FlexContainer>

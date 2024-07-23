@@ -1,9 +1,15 @@
-import {GridColDef, GridRowsProp} from '@mui/x-data-grid';
+import {GridCellParams, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import {formatCurrency} from 'utils/currency';
 import {ServiceOrderArticleView} from 'models/service-order';
 import {getColumnProps} from 'components/DataGridLayout';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import DOMPurify from 'dompurify';
 import {Actions} from './Actions';
+import {
+  hasMultipleParagraphs,
+  returnFirstParagraph,
+} from '../../../../../utils/rich-text-field-utils';
 
 export enum ActionTypes {
   EDIT = 'EDIT',
@@ -23,6 +29,19 @@ export const columns: GridColDef[] = [
     cellClassName: 'truncateText',
     flex: 2,
     variant: 'titleCase',
+    renderCell: (params: GridCellParams) => {
+      const valueToShow = hasMultipleParagraphs(params.formattedValue)
+        ? returnFirstParagraph(params.formattedValue)
+        : params.formattedValue;
+
+      return (
+        <Typography
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(valueToShow),
+          }}
+        />
+      );
+    },
   }),
   getColumnProps({
     field: 'number',

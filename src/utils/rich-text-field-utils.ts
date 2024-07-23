@@ -314,3 +314,16 @@ export const modifyHTMLFontSizeForPDFRendering = (html: string) => {
   // Serialize the modified DOM back to HTML string
   return doc.documentElement.outerHTML;
 };
+
+export const hasMultipleParagraphs = (value: string) =>
+  value.split('<p>').length > 2;
+
+export const returnFirstParagraph = (value: string) => {
+  const firstString = value
+    .split('<p>')
+    .slice(1) // remove opening p tag
+    [0] // take first line
+    .split('</p>')[0]; // take before closing p tag
+
+  return `<p>${firstString} ...</p>`; // encapsulate in single paragraph
+};

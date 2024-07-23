@@ -3,13 +3,14 @@ import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import {useFormik} from 'formik';
-import {FormInput} from 'components/form/FormInput';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
 import {ArticleDescriptionFormModel} from 'models/articleForm';
+import DOMPurify from 'dompurify';
 import {NoItemSection} from '../NoItemSection';
+import RichTextField from '../../../components/RichTextField';
 
 export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -41,7 +42,12 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
       showHeaderBackground
       header={<Typography variant="subtitle1">{t('Description')}</Typography>}>
       {article.description && (
-        <Typography variant="inherit">{article.description}</Typography>
+        <Typography
+          variant="inherit"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(article.description),
+          }}
+        />
       )}
       {!article.description && (
         <NoItemSection
@@ -59,22 +65,15 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
         dialogProps={{
           open: openDialog || false,
         }}>
-        <FormInput
-          containerStyles={{width: '100%', py: '1rem'}}
-          fieldProps={{
-            name: 'description',
-            label: t('Description'),
-            placeholder: t(
-              'e.g. Flat cable used for door engines from the following suppliers.....',
-            ),
-            multiline: true,
-            rows: 10,
-            minRows: 5,
-            type: 'text',
-            value: formik.values.description,
-            onBlur: formik.handleBlur,
-            onChange: formik.handleChange,
-          }}
+        <RichTextField
+          label={t('Description')}
+          placeholder={t(
+            'e.g. Flat cable used for door engines from the following suppliers.....',
+          )}
+          minRows={5}
+          html={formik.values.description || ''}
+          onBlur={formik.handleBlur}
+          updateHtml={(h) => formik.setFieldValue('description', h)}
         />
       </Dialog>
     </InfoCard>

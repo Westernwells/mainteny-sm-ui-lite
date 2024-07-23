@@ -6,6 +6,7 @@ import React, {
   Ref,
   CSSProperties,
   useState,
+  PropsWithChildren,
 } from 'react';
 import {useTranslation} from 'react-i18next';
 import {
@@ -31,6 +32,7 @@ import {
   serialize,
 } from 'utils/rich-text-field-utils';
 import {HoveringToolbar} from './HoveringToolbar';
+import {isPlainString} from '../../utils/rich-field-string';
 
 const CustomElements = ({
   element,
@@ -171,6 +173,22 @@ const styles: Record<string, CSSProperties> = {
   },
 };
 
+interface Props {
+  label?: string;
+  placeholder?: string;
+  html: string;
+  updateHtml: (html: string) => void;
+  required?: boolean;
+  onBlur?: (e: React.FocusEvent<HTMLDivElement>) => void;
+  error?: boolean;
+  helperText?: string;
+  minRows?: number;
+  containerMinHeight?: number;
+  endAdornment?: React.ReactNode;
+  disabled?: boolean;
+  onClick?: (event: any) => void;
+}
+
 const RichTextField = ({
   label = '',
   placeholder = '',
@@ -181,21 +199,11 @@ const RichTextField = ({
   error = false,
   helperText = '',
   minRows = 1,
+  containerMinHeight,
   endAdornment,
   disabled = false,
-}: {
-  label?: string;
-  placeholder?: string;
-  html: string;
-  updateHtml: (html: string) => void;
-  required?: boolean;
-  onBlur?: (e: React.FocusEvent<HTMLDivElement>) => void;
-  error?: boolean;
-  helperText?: string;
-  minRows?: number;
-  endAdornment?: React.ReactNode;
-  disabled?: boolean;
-}) => {
+  onClick,
+}: PropsWithChildren<Props>) => {
   const {t} = useTranslation();
   const editorRef = useRef<(BaseEditor & ReactEditor & HistoryEditor) | null>(
     null,
@@ -214,9 +222,8 @@ const RichTextField = ({
 
     if (!htmlString) return initialValue;
     // check if htmlString is plain string
-    const isPlainString = !/<[^>]+>/.test(htmlString);
     const parsed = new DOMParser().parseFromString(
-      isPlainString ? `<p>${htmlString}</p>` : htmlString,
+      isPlainString(htmlString) ? `<p>${htmlString}</p>` : htmlString,
       'text/html',
     );
     return deserialize(parsed.body);
@@ -277,7 +284,11 @@ const RichTextField = ({
       {disabled ? null : <HoveringToolbar />}
       <FormControl fullWidth disabled={disabled}>
         <fieldset
-          style={{...styles.fieldset, ...(error && styles.errorFieldset)}}>
+          style={{
+            ...styles.fieldset,
+            ...(error && styles.errorFieldset),
+            ...(containerMinHeight && {minHeight: `${containerMinHeight}px`}),
+          }}>
           <legend
             style={{
               ...styles.legend,
@@ -305,6 +316,7 @@ const RichTextField = ({
               }}
               onKeyDown={onKeyDown}
               onBlur={onBlur}
+              onClick={onClick}
               readOnly={disabled}
             />
             {endAdornment && (

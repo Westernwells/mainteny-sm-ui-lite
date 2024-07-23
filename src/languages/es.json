@@ -2649,5 +2649,13 @@
   "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Enviando aviso de demora {{invoiceNumber}} a {{receiverEmail}} por {{senderName}}",
   "Invoice delivered": "Factura entregada",
   "Overdue notice delivered": "Aviso de demora entregado",
-  "The email was successfully delivered to {{receiverEmail}}": "El correo electrónico se ha enviado correctamente a {{receiverEmail}}"
+  "The email was successfully delivered to {{receiverEmail}}": "El correo electrónico se ha enviado correctamente a {{receiverEmail}}",
+  "Quotation marked as rejected": "Oferta marcada como rechazada",
+  "Quotation marked as accepted": "Oferta marcada como aceptada",
+  "Click to apply your block": "Haga clic para aplicar su bloque",
+  "Find your text block": "Encuentre su bloque de texto",
+  "Create and customize your own block to be used later": "Crea y personaliza tu propio bloque para utilizarlo más adelante",
+  "Service Order Report": "Informe de orden de servicio",
+  "Article Order": "Orden del artículo",
+  "Edit Block": "Editar bloque"
 }

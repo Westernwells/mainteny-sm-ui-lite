@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
 import {isEqual} from 'lodash';
@@ -54,6 +54,11 @@ import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
 import {EmptySection} from './EmptySection';
 import ArticleTypeCard from './ArticleTypeCard';
+import RichTextField from './RichTextField';
+import {
+  getPlainStringFromHtml,
+  isPlainString,
+} from '../utils/rich-field-string';
 
 interface Props {
   articleItem: QuotationItemRecord;
@@ -85,7 +90,10 @@ const TableRowComponent = ({
   searchText,
   handleSelectItem,
 }: TableRowProps) => {
-  const highlightedName = createHighlightedText(item.name, searchText);
+  const itemName = isPlainString(item.name)
+    ? item.name
+    : getPlainStringFromHtml(item.name);
+  const highlightedName = createHighlightedText(itemName, searchText);
 
   const highlightedExternalId = createHighlightedText(
     item.externalId,
@@ -250,10 +258,11 @@ export const ArticleItemRowQuotation = ({
   const [popperOpen, setPopperOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
   const debouncedText = useDebounce(searchText);
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [tabValue, setTabValue] = useState(0);
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const [showArticleSearch, setShowArticleSearch] = useState<boolean>(false);
+  const articleAnchorEl = useRef<HTMLDivElement>();
   const open = Boolean(anchorEl);
 
   const handleClick = (event: any) => {
@@ -265,18 +274,16 @@ export const ArticleItemRowQuotation = ({
     setAnchorEl(null);
   };
 
-  const handleTextFieldChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const {name, value} = event.target;
-    formik.handleChange(event);
-    formik.setFieldTouched(name, true, false);
-    setSearchText(value);
+  const handleTextFieldChange = (fieldName: string) => (value: string) => {
+    formik.setFieldValue(fieldName, value);
+    formik.setFieldTouched(fieldName, true, false);
+    const plainText = getPlainStringFromHtml(value);
+    if (isPlainString(plainText)) setSearchText(plainText);
   };
 
-  const handleTextFieldClick = () => {
-    setFocusedIndex(index);
-    setPopperOpen((prevState) => !prevState);
+  const handleArticleTextFieldClick = () => {
+    setShowArticleSearch(true);
+    setPopperOpen(true);
   };
 
   const {
@@ -324,14 +331,8 @@ export const ArticleItemRowQuotation = ({
     });
   }, [formik.values.article?.type]);
 
-  useEffect(() => {
-    if (focusedIndex !== null && focusedIndex === index) {
-      setSearchText(formik.values.name);
-    }
-  }, [formik.values.name, focusedIndex, index]);
-
   const handlePopperClose = () => {
-    setPopperOpen(false);
+    setShowArticleSearch(false);
   };
 
   const tabItems: TabItems[] = useMemo(() => {
@@ -435,7 +436,7 @@ export const ArticleItemRowQuotation = ({
                 key={item.id}
                 handleSelectItem={() => {
                   handleSelectItem(item, index);
-                  setPopperOpen(false);
+                  setShowArticleSearch(false);
                 }}
               />
             ))}
@@ -467,17 +468,12 @@ export const ArticleItemRowQuotation = ({
 
       <TableCell sx={{width: '32%', display: 'inline-block'}}>
         <ClickAwayListener onClickAway={handlePopperClose}>
-          <Box>
-            <TextField
-              name="name"
-              id={`name-${index}`}
-              value={formik.values.name}
-              onChange={handleTextFieldChange}
-              size="small"
+          <Box ref={articleAnchorEl}>
+            <RichTextField
+              test-id={`name-${index}`}
+              html={formik.values.name}
+              updateHtml={handleTextFieldChange('name')}
               onBlur={formik.handleBlur}
-              fullWidth
-              sx={{width: '100%', '& .MuiFormHelperText-root': {mx: '0em'}}}
-              required
               helperText={
                 (!isHovered && formik.errors.name) ||
                 (formik.errors.name && formik.touched.name)
@@ -488,16 +484,13 @@ export const ArticleItemRowQuotation = ({
                 !!(!isHovered && formik.errors.name) ||
                 !!(formik.errors.name && formik.touched.name)
               }
-              autoComplete="off"
-              onClick={handleTextFieldClick}
+              onClick={handleArticleTextFieldClick}
             />
             <Box>
               <Popper
-                open={popperOpen}
+                open={showArticleSearch}
                 placement="bottom-start"
-                anchorEl={
-                  popperOpen ? document.getElementById(`name-${index}`) : null
-                }
+                anchorEl={articleAnchorEl.current}
                 sx={{width: '800px', zIndex: 10}}>
                 <Paper
                   sx={{
@@ -876,18 +869,13 @@ export const ArticleItemRowQuotation = ({
           <TableCell
             colSpan={12}
             sx={{width: '98%', display: 'inline-block', ml: '2%'}}>
-            <TextField
-              name="description"
-              id={`description-${index}`}
-              size="small"
-              placeholder={t('Description')}
-              multiline
-              fullWidth
-              value={formik.values.description}
+            <RichTextField
+              label="Description"
+              test-id={`description-${index}`}
+              placeholder="Description"
+              html={formik.values.description || ''}
               minRows={1}
-              maxRows={10}
-              onChange={formik.handleChange}
-              sx={{mt: 0.5}}
+              updateHtml={(h) => formik.setFieldValue('description', h)}
             />
           </TableCell>
 
