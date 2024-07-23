@@ -54,6 +54,7 @@ export const columns = (
   getPreviewTextBlocks: (item: TextBlockRow) => void,
 ): GridColDef[] => {
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const {t} = useTranslation();
 
   return [
     {
@@ -100,7 +101,7 @@ export const columns = (
       ...defaultProps,
       renderCell: (params) => (
         <Box display="flex" alignItems="center">
-          {convertToText(params.row[TextBlockOrderField.CATEGORY])}
+          {t(convertToText(params.row[TextBlockOrderField.CATEGORY]))}
         </Box>
       ),
     }),
@@ -143,14 +144,11 @@ export const columns = (
       headerName: 'ACTIONS',
       sortable: false,
       type: 'actions',
-      renderHeader: (params: GridColumnHeaderParams) => {
-        const {t} = useTranslation();
-        return (
-          <Typography variant="subtitle2" color="textSecondary">
-            {params.colDef.headerName && t(params.colDef.headerName)}
-          </Typography>
-        );
-      },
+      renderHeader: (params: GridColumnHeaderParams) => (
+        <Typography variant="subtitle2" color="textSecondary">
+          {params.colDef.headerName && t(params.colDef.headerName)}
+        </Typography>
+      ),
       renderCell: (params) => (
         <Actions
           onEdit={() => getEditableTextBlocks(params.row)}

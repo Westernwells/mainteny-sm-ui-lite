@@ -117,7 +117,8 @@ const TextBlockSelect = ({
   }, []);
 
   const getEditableTextBlocks = useCallback((item: TextBlockRow) => {
-    setActiveTextBlock(mapJsonToTextBlockView(item));
+    const textBlockItem = mapJsonToTextBlockView(item);
+    setActiveTextBlock(textBlockItem);
     setOpenTextBlockDialog(false);
     setActiveSubDialog('edit');
   }, []);

@@ -54,9 +54,9 @@ const TextBlockActions = ({
 
   const formik = useFormik<TextBlockFormModel>({
     initialValues: {
-      name: '',
+      name: activeTextBlock?.name || '',
       category: textBlockCategory,
-      text: '',
+      text: activeTextBlock?.text || '',
     },
     onSubmit: (_, {resetForm}) => {
       resetForm();
@@ -175,12 +175,18 @@ const TextBlockActions = ({
                   sx={{
                     margin: '0em',
                     padding: '0em',
-                    '& div': {
-                      marginBottom: '1.5em',
-                      lineHeight: '1.5em',
+                    '& p': {
+                      marginBottom: '0em',
+                      lineHeight: '1em',
                     },
                   }}
                 />
+              ) : item.label === t('Category') ? (
+                <Typography
+                  color={theme.palette.text.primary}
+                  sx={{mt: '0.3em'}}>
+                  {t(item.value)}
+                </Typography>
               ) : (
                 <Typography
                   color={theme.palette.text.primary}

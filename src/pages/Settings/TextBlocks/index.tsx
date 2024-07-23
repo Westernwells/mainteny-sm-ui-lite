@@ -331,7 +331,7 @@ const TextBlocks = ({company}: Props) => {
           open: openPreviewDialog || false,
         }}>
         <Box>
-          {infoItems.map((item, index) => (
+          {infoItems?.map((item, index) => (
             <Box key={index} sx={{mb: '1.5em'}}>
               <Typography
                 variant="caption"
@@ -346,12 +346,18 @@ const TextBlocks = ({company}: Props) => {
                   sx={{
                     margin: '0em',
                     padding: '0em',
-                    '& div': {
-                      marginBottom: '1.5em',
-                      lineHeight: '1.5em',
+                    '& p': {
+                      marginBottom: '0em',
+                      lineHeight: '1.1em',
                     },
                   }}
                 />
+              ) : item.label === t('Category') ? (
+                <Typography
+                  color={theme.palette.text.primary}
+                  sx={{mt: '0.3em'}}>
+                  {t(item.value)}
+                </Typography>
               ) : (
                 <Typography
                   color={theme.palette.text.primary}
