@@ -83,8 +83,6 @@ const getStyles = (
       marginBottom: 10,
       paddingTop: 25,
       maxWidth: '95%',
-      display: 'flex',
-      flexDirection: 'row',
     },
     notesSection: {
       paddingBottom: 6,
