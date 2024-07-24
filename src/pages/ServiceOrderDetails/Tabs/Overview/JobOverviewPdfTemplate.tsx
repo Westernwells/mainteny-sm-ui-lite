@@ -477,7 +477,7 @@ const JobOverviewPdfTemplate = React.memo(
                               marginLeft: 10,
                               color: '#212121',
                             }}>
-                            {translate(articleOrderItem.article.unit) || '-'}
+                            {translate(articleOrderItem.article?.unit) || '-'}
                           </Text>
                           <Text
                             style={{
