@@ -81,11 +81,12 @@ export const Service = ({
     await updateElevator({
       body: {
         propertyOwnerId,
-        lastVisitDate: formatDate(formik.values.lastVisitDate, 'yyyy-MM-dd'),
-        lastInspectionDate: formatDate(
-          formik.values.lastInspectionDate,
-          'yyyy-MM-dd',
-        ),
+        lastVisitDate: formik.values.lastVisitDate
+          ? formatDate(formik.values.lastVisitDate, 'yyyy-MM-dd')
+          : null,
+        lastInspectionDate: formik.values.lastInspectionDate
+          ? formatDate(formik.values.lastInspectionDate, 'yyyy-MM-dd')
+          : null,
         serviceTime: formik.values.serviceTime,
         technicianNumber: formik.values.technicianNumber,
         priority: formik.values.priority as Priority,

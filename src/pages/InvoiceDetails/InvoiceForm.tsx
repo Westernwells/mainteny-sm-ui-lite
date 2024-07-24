@@ -145,10 +145,15 @@ import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
 import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {Dialog} from 'components/Dialog';
-import {TextBlockCategory, TextBlockView} from 'models/text-block';
+import {
+  TextBlockCategory,
+  TextBlockView,
+  stripHtmlTags,
+} from 'models/text-block';
 import {GridCellParams} from '@mui/x-data-grid';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 
 interface Props {
   invoice?: InvoiceView;
@@ -890,7 +895,10 @@ export const InvoiceForm = ({
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
       if (!formik.values.description && serviceOrder.report?.description) {
-        formik.setFieldValue('description', serviceOrder.report.description);
+        formik.setFieldValue(
+          'description',
+          stripHtmlTags(serviceOrder.report.description),
+        );
       }
       formik.setFieldValue(
         'propertyOwnerId',
@@ -1312,7 +1320,7 @@ export const InvoiceForm = ({
     formik.setFieldValue('items', invoiceItems);
   };
 
-  const handleCustomerChange = (value: PropertyOwnerView | null) => {
+  const handleCustomerChange = (value?: PropertyOwnerView | null) => {
     if (value) {
       handleSelectCustomer(value);
     } else {
@@ -1321,6 +1329,12 @@ export const InvoiceForm = ({
       formik.setFieldValue('paymentTerm', {term: ''});
     }
   };
+
+  const {data: customerDetails} = useGetCustomer(formik.values.propertyOwnerId);
+
+  useEffect(() => {
+    handleCustomerChange(customerDetails);
+  }, [customerDetails]);
 
   const isEditAndNoCreator = formType === 'edit' && !invoice?.meta.creator;
   const hasInvoiceCreator = invoice?.meta?.creator ?? false;
@@ -1558,49 +1572,6 @@ export const InvoiceForm = ({
       />,
     ).toBlob();
     return blob;
-  };
-
-  const generateBlob = async (invoiceData: InvoiceView) => {
-    let PdfTemplate;
-
-    if (invoiceData) {
-      if (
-        invoiceData.type === InvoiceType.FULL ||
-        invoiceData.type === InvoiceType.AGGREGATE
-      ) {
-        PdfTemplate = FullInvoicePdfTemplate;
-      } else if (invoiceData.type === InvoiceType.CREDIT_NOTE) {
-        PdfTemplate = CreditNotePdfTemplate;
-      } else if (
-        invoiceData.type === InvoiceType.PARTIAL ||
-        invoiceData.type === InvoiceType.UPFRONT
-      ) {
-        PdfTemplate = PartialInvoicePdfTemplate;
-      } else {
-        PdfTemplate = FinalInvoicePdfTemplate;
-      }
-
-      const blob = await pdf(
-        <PdfTemplate
-          userInfo={user?.userAccount}
-          currentCurrency={currentCurrency}
-          invoice={invoiceData}
-          selectedLng={company?.language}
-          translate={translate}
-          previousInvoices={sortedPreviousInvoices.slice(
-            0,
-            sortedPreviousInvoices.findIndex((i) => i.id === invoiceData.id) +
-              1,
-          )}
-          headerPath={headerUrl[headerInfo?.path]}
-          headerInfo={headerInfo}
-          footerPath={footerUrl[footerInfo?.path]}
-          footerInfo={footerInfo}
-          nextCompanyExternalId={companyNextNumber?.value}
-        />,
-      ).toBlob();
-      return blob;
-    }
   };
 
   useEffect(() => {

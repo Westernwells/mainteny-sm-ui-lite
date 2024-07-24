@@ -487,6 +487,7 @@ export const SendEmailDialog = ({
                   confirmBtnDisabled ||
                   (!watch('emails')?.length && emailInputValue === '') ||
                   !watch('subject') ||
+                  !watch('content') ||
                   watch('content') === '<p></p>',
                 onClick: handleSubmit(onSubmit),
               }}>

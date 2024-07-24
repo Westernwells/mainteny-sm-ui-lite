@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -22,18 +22,13 @@ import {ArticleType, ArticleView} from 'models/article';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {getItemRecord} from 'utils/article-utils';
-import {fixRounding, getUniqueId} from 'utils/utils';
+import {getUniqueId} from 'utils/utils';
 import {QuotationFormData, QuotationItemRecord} from 'models/quotation';
 import {useTheme} from '@mui/material/styles';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
-import {
-  applyGlobalDiscountOnQuotationItems,
-  applyPerItemDiscountOnQuotationItems,
-  applyQuotationDiscount,
-  getQuotationAggregatedItemsVats,
-} from 'pages/QuotationDetails/utils';
+import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {calculateSameVatTotals} from 'utils/calculate-total';
+import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {FormSelect} from './form/FormSelect';
@@ -74,31 +69,6 @@ export const ArticleItemsTableQuotation = ({
     subtotalExclVatAfterDiscount,
     {currency: currentCurrency.code},
   );
-
-  const itemsAfterPerItemDiscount = applyPerItemDiscountOnQuotationItems(items);
-
-  const itemsAfterGlobalDiscount = applyGlobalDiscountOnQuotationItems(
-    itemsAfterPerItemDiscount,
-    formik.values.discount,
-  );
-
-  const allItemsHasSameVAT = itemsAfterGlobalDiscount.every(
-    (item) =>
-      item.unitAmount.percentageVat === items[0].unitAmount.percentageVat,
-  );
-
-  const percentageVats = itemsAfterGlobalDiscount.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
-            vat:
-              subtotalExclVatAfterDiscount *
-              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat / 100),
-          },
-        ]
-      : getQuotationAggregatedItemsVats(itemsAfterGlobalDiscount)
-    : [];
 
   const {language: selectedLng} = useContext(LanguageContext);
 
@@ -231,7 +201,24 @@ export const ArticleItemsTableQuotation = ({
   };
   const {user} = useUserSession();
 
-  const {total, totalVAT} = calculateSameVatTotals(itemsAfterGlobalDiscount);
+  const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
+    () =>
+      calculateInvoiceAmount({
+        items: formik.values.items,
+        globalDiscount: formik.values.discount,
+      }),
+    [formik.values.items, formik.values.discount],
+  );
+
+  const vatsFormatted = vats.map((vat) => ({
+    ...vat,
+    vat: formatCurrency(vat.vat, {currency: currentCurrency.code}),
+  }));
+
+  const amountAfterGlobalDiscountWithVATFormatted = formatCurrency(
+    amountAfterGlobalDiscountWithVAT,
+    {currency: currentCurrency.code},
+  );
 
   return (
     <Box
@@ -485,34 +472,14 @@ export const ArticleItemsTableQuotation = ({
                 <Typography variant="subtitle2" color="primary.dark">
                   {subtotalExclVatAfterDiscountFormatted}
                 </Typography>
-                {allItemsHasSameVAT ? (
-                  <>
+                {vatsFormatted.map((v, index) => (
+                  <React.Fragment key={`${index}-${v.percentageVat}`}>
                     <Typography color="text.primary">
-                      {t('VAT')} {percentageVats[0].percentageVat}%
+                      {t('VAT')} {v.percentageVat}%
                     </Typography>
-                    <Typography color="text.primary">
-                      {formatCurrency(totalVAT, {
-                        currency: currentCurrency.code,
-                      })}
-                    </Typography>
-                  </>
-                ) : (
-                  percentageVats.map((v, index) => (
-                    <React.Fragment key={`${index}-${v.percentageVat}`}>
-                      <Typography color="text.primary">
-                        {t('VAT')} {v.percentageVat}%
-                      </Typography>
-                      <Typography color="text.primary">
-                        {formatCurrency(fixRounding(v.vat, 2), {
-                          currency: currentCurrency.code,
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                          roundingMode: 'floor',
-                        })}
-                      </Typography>
-                    </React.Fragment>
-                  ))
-                )}
+                    <Typography color="text.primary">{v.vat}</Typography>
+                  </React.Fragment>
+                ))}
                 <Typography
                   variant="subtitle1"
                   color="primary.dark"
@@ -523,9 +490,7 @@ export const ArticleItemsTableQuotation = ({
                   variant="subtitle1"
                   color="primary.dark"
                   fontWeight={600}>
-                  {formatCurrency(total, {
-                    currency: currentCurrency.code,
-                  })}
+                  {amountAfterGlobalDiscountWithVATFormatted}
                 </Typography>
               </Box>
             </Box>
