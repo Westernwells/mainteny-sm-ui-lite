@@ -2,9 +2,7 @@ import {isEqual} from 'lodash';
 
 export default class OrdersPage {
   static visit = () => {
-    cy.visit(`/orders`, {
-      failOnStatusCode: false,
-    });
+    cy.get('ul > div[role="button"][data-testid="Jobs-nav-item"]').click();
   };
 
   static changeTab = (index: number) => {
@@ -12,9 +10,19 @@ export default class OrdersPage {
   };
 
   static changeStatusFilter = (statuses: string[]) => {
-    cy.get('div#Job\\ Status[role="button"]').click();
+    cy.get('div[aria-labelledby="Job Status"]').click();
 
     statuses.forEach((item) => {
+      cy.get('ul[role="listbox"]')
+        .find(`li[role="option"][data-value="${item}"]`)
+        .click();
+    });
+  };
+
+  static changeTypeFilter = (types: string[]) => {
+    cy.get('div[aria-labelledby="Job Type"]').click();
+
+    types.forEach((item) => {
       cy.get('ul[role="listbox"]')
         .find(`li[role="option"][data-value="${item}"]`)
         .click();
