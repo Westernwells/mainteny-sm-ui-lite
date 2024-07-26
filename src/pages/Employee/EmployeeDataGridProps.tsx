@@ -9,7 +9,7 @@ import {ReactComponent as SunIcon} from 'assets/icons/Sun.svg';
 import {capitalize} from 'utils/utils';
 import React from 'react';
 import {getColumnProps} from 'components/DataGridLayout';
-import {UserView, Role} from 'models/user';
+import {UserView} from 'models/user';
 import {TechnicianEventPair} from 'models/technician';
 import {Actions} from './Actions';
 
@@ -132,17 +132,11 @@ export const makeRows = (
 ): GridRowModel<{[key: string]: any}[]> =>
   employees
     ? employees.map((item: UserView, index: number) => {
-        let shift = '-';
-        let event = 'Available';
-        if (item.userAccount.roles.includes(Role.TECHNICIAN)) {
-          shift = item.userData.workingHours.length
-            ? `${item.userData.workingHours[0].fromTime} - ${item.userData.workingHours[0].toTime}`
-            : '-';
-          event = techniciansEvents[item.userData.employeeId]
-            ? techniciansEvents[item.userData.employeeId][0].eventViews[0]
-                .eventType
-            : 'Available';
-        }
+        const {workingHours, employeeId} = item.userData;
+        const [{fromTime, toTime}] = workingHours;
+        const shift = workingHours.length ? `${fromTime} - ${toTime}` : '-';
+        const events = techniciansEvents[employeeId];
+        const event = events ? events[0].eventViews[0].eventType : 'Available';
         return {
           id: index,
           name: `${item.userAccount.firstName} ${item.userAccount.lastName}`,
