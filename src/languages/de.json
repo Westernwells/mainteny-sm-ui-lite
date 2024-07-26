@@ -2624,5 +2624,12 @@
   "Find your text block": "Finde deinen Textbaustein",
   "Create and customize your own block to be used later": "Lege deine eigenen Textbausteine für spätere Verwendung an",
   "Article Order": "Artikel Bestellung",
-  "Edit Block": "Baustein bearbeiten"
+  "Edit Block": "Baustein bearbeiten",
+  "Add a QR page to the invoice": "Einen QR-Code für die Zahlung an die Rechnung anhängen ",
+  "A new page will be appended to your invoice, there you’ll find the QR code.": "Eine weitere Seite mit dem QR-Code wird allen Rechnungen beigefügt ",
+  "Fixed cycle": "Fester Zyklus",
+  "Pick your month(s)": "Wähle Monate",
+  "Every 1 week": "Wöchentlich",
+  "Every 3 week": "Dreiwöchentlich",
+  "Every 1 year": "Jährlich"
 }
