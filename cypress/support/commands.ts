@@ -35,3 +35,24 @@
 //     }
 //   }
 // }
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      login(): Chainable<void>;
+    }
+  }
+}
+
+Cypress.Commands.add('login', () => {
+  const loginURL = `${Cypress.env().REACT_APP_API_URL}/api/sessions/login`;
+  cy.visit('/login', {failOnStatusCode: false});
+  cy.intercept('POST', loginURL).as('loginApi');
+  cy.get('#email').type('e2etest@mainteny.com');
+  cy.get('#password').type('!!abc123', {log: false});
+  cy.get('button[type="submit"]').click();
+  cy.wait('@loginApi');
+});
+
+// hack for cypress typescript issues
+export {};

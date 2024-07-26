@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {addDays, endOfDay, startOfDay} from 'date-fns';
+import {endOfDay, startOfDay} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
 import * as _ from 'lodash';
 
@@ -61,8 +61,8 @@ export const Employees = () => {
   );
 
   const {data: technicianEvents} = useQueryTechnicianEvents({
-    start: toRestDateTime(startOfDay(addDays(new Date(), 1))),
-    end: toRestDateTime(endOfDay(addDays(new Date(), 1))),
+    start: toRestDateTime(startOfDay(new Date())),
+    end: toRestDateTime(endOfDay(new Date())),
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
     eventType: [TechnicianEventType.HOLIDAY, TechnicianEventType.SICK_LEAVE],
