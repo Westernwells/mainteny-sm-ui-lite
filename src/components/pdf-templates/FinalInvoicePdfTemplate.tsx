@@ -1,14 +1,14 @@
 import {useMemo} from 'react';
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {DiscountType, InvoiceItem, InvoiceView} from 'models/invoice';
-import {fixRounding, formatCostText} from 'utils/utils';
+import {InvoiceItem, InvoiceView} from 'models/invoice';
+import {formatCostText} from 'utils/utils';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {
   applyGlobalDiscountOnItems,
@@ -28,6 +28,7 @@ import PdfPageContainer from './containers/PdfPageContainer';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageTitle from './containers/PdfPageTitle';
 import TopSectionContainer from './containers/TopSectionContainer';
+import {ArticleSection} from './ArticleSection/ArticleSection';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -54,16 +55,9 @@ Font.register({
 
 const getStyles = (boldFontStyle?: {fontFamily: string}) =>
   StyleSheet.create({
-    dataBody: {
-      borderBottom: '1px solid #212121',
-      paddingBottom: 10,
-    },
     contentBody: {
       marginTop: 6,
       marginBottom: 16,
-    },
-    notesSection: {
-      marginTop: 5,
     },
     sectionHeading: {
       fontSize: 10,
@@ -73,65 +67,6 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       color: '#212121',
       ...boldFontStyle,
       marginTop: 15,
-    },
-    sectionBody: {
-      fontSize: 10,
-      color: '#616161',
-      display: 'flex',
-      flexDirection: 'column',
-      paddingVertical: 1.5,
-    },
-    table: {
-      width: '100%',
-      display: 'flex',
-    },
-    tableHead: {
-      display: 'flex',
-      flexDirection: 'row',
-      paddingVertical: 4,
-    },
-    tableHeading: {
-      color: '#616161',
-      display: 'flex',
-      fontSize: 6,
-      textTransform: 'uppercase',
-      marginVertical: 4,
-    },
-    tableRow: {
-      display: 'flex',
-      flexDirection: 'row',
-      fontSize: 10,
-      marginVertical: 4,
-    },
-    descriptionText: {
-      width: '37%',
-      display: 'flex',
-      fontSize: 8.5,
-      color: '#212121',
-      paddingLeft: 20,
-      letterSpacing: -0.15,
-      marginVertical: 4,
-      lineHeight: 1.5,
-    },
-    signatureBox: {
-      display: 'flex',
-      flexDirection: 'column',
-      border: '1px solid #E4E9F2',
-      borderRadius: '8px',
-      marginTop: 5,
-      maxWidth: 270,
-      height: 50,
-      textAlign: 'center',
-      justifyContent: 'space-around',
-      position: 'relative',
-    },
-    signatureText: {
-      position: 'absolute',
-      bottom: -5,
-      left: '16%',
-      backgroundColor: 'white',
-      padding: 1,
-      ...boldFontStyle,
     },
   });
 
@@ -147,332 +82,6 @@ type Props = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   nextCompanyExternalId?: string;
-};
-
-type ArticleSectionProps = {
-  translate: (key: string) => string;
-  currentCurrency?: Currency;
-  invoice: InvoiceView;
-  allItemsHaveZeroDiscount: boolean;
-  discountValue: number;
-  subtotalExclVatFormatted: string;
-  percentageVats: {
-    percentageVat: number;
-    vat: number;
-  }[];
-  total: number;
-  selectedLng?: string;
-  netTotal: (articleItem: InvoiceItem) => number;
-};
-
-const TableHeading = ({
-  text,
-  width,
-  textAlign,
-  marginLeft,
-}: {
-  text: string;
-  width: string;
-  textAlign: 'left' | 'right' | 'center' | 'justify' | undefined;
-  marginLeft?: number;
-}) => (
-  <Text
-    style={{
-      width,
-      textAlign,
-      marginLeft,
-      fontSize: 6,
-      textTransform: 'uppercase',
-    }}>
-    {text}
-  </Text>
-);
-
-export const ArticleSection = ({
-  invoice,
-  currentCurrency,
-  translate,
-  allItemsHaveZeroDiscount,
-  discountValue,
-  subtotalExclVatFormatted,
-  percentageVats,
-  total,
-  selectedLng,
-  netTotal,
-}: ArticleSectionProps) => {
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const styles = getStyles(boldFontStyle);
-  return (
-    <View style={styles.table}>
-      <View style={styles.tableHead}>
-        <View style={{...styles.tableRow, width: '100%'}}>
-          <TableHeading text="#" width="2%" textAlign="left" />
-          <TableHeading
-            text={translate('Article Name')}
-            width="37%"
-            textAlign="left"
-            marginLeft={10}
-          />
-          <TableHeading
-            text={translate('Quantity')}
-            width="10%"
-            textAlign="center"
-          />
-          <TableHeading
-            text={translate('Unit')}
-            width="8%"
-            textAlign="center"
-          />
-          <TableHeading
-            text={`${translate('Price')} (${
-              getCurrencySymbol[currentCurrency?.code!]
-            })`}
-            width="15%"
-            textAlign="right"
-            marginLeft={5}
-          />
-          {!allItemsHaveZeroDiscount && (
-            <TableHeading
-              text={translate('Discount')}
-              width="13%"
-              textAlign="right"
-            />
-          )}
-          <TableHeading
-            text={`${translate('Total')} (${
-              getCurrencySymbol[currentCurrency?.code!]
-            })`}
-            width={allItemsHaveZeroDiscount ? '28%' : '15%'}
-            textAlign="right"
-          />
-        </View>
-      </View>
-
-      {invoice.items.length > 0 && (
-        <View style={styles.dataBody}>
-          {invoice.items?.map((articleItem, index) => (
-            <View key={`${articleItem.id} - ${index}`}>
-              <View style={styles.tableRow}>
-                <Text
-                  style={{
-                    width: '2%',
-                    textAlign: 'left',
-                    marginRight: 10,
-                    color: '#212121',
-                  }}>
-                  {index + 1}
-                </Text>
-
-                <HtmlPDF
-                  rootStyle={{
-                    width: '37%',
-                    textAlign: 'left',
-                    color: '#212121',
-                  }}
-                  html={articleItem.name || '-'}
-                />
-
-                <Text
-                  style={{
-                    width: '10%',
-                    textAlign: 'center',
-                    color: '#212121',
-                  }}>
-                  {articleItem.quantity || '-'}
-                </Text>
-                <Text
-                  style={{
-                    width: '8%',
-                    textAlign: 'center',
-                    color: '#212121',
-                  }}>
-                  {translate(articleItem?.article?.unit!) || '-'}
-                </Text>
-                <Text
-                  style={{
-                    width: '15%',
-                    textAlign: 'right',
-                    color: '#212121',
-                  }}>
-                  {formatCurrency(
-                    centsToMoney(
-                      currentCurrency?.code!,
-                      articleItem?.unitAmount?.netAmount,
-                    ) ?? 0,
-                    {
-                      currency: currentCurrency?.code,
-                      excludeCurrencySymbol: true,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    },
-                  )}
-                </Text>
-                {!allItemsHaveZeroDiscount && (
-                  <Text
-                    style={{
-                      width: '13%',
-                      textAlign: 'right',
-                      color: '#212121',
-                    }}>
-                    {articleItem?.additionalInfo?.discount?.percentage !== 0 ||
-                    articleItem?.additionalInfo?.discount?.amount?.value !== 0
-                      ? '-'
-                      : ''}
-                    {articleItem?.additionalInfo?.discount?.type ===
-                    DiscountType.PERCENTAGE
-                      ? articleItem?.additionalInfo?.discount.percentage
-                      : formatCurrency(
-                          centsToMoney(
-                            currentCurrency?.code!,
-                            articleItem?.additionalInfo?.discount?.amount
-                              ?.value,
-                          ),
-                          {
-                            currency: currentCurrency?.code,
-                            excludeCurrencySymbol: true,
-                            currencySymbol: currentCurrency?.symbol,
-                            companyLang: selectedLng,
-                            minimumFractionDigits:
-                              articleItem?.additionalInfo?.discount?.amount
-                                ?.value === 0
-                                ? 0
-                                : 2,
-                            maximumFractionDigits:
-                              articleItem?.additionalInfo?.discount?.amount
-                                ?.value === 0
-                                ? 0
-                                : 2,
-                          },
-                        )}
-                    {articleItem?.additionalInfo?.discount?.type ===
-                    DiscountType.AMOUNT
-                      ? getCurrencySymbol[currentCurrency?.code!]
-                      : '%'}
-                  </Text>
-                )}
-                <Text
-                  style={{
-                    width: allItemsHaveZeroDiscount ? '28%' : '15%',
-                    textAlign: 'right',
-                    color: '#212121',
-                  }}>
-                  {formatCurrency(netTotal(articleItem), {
-                    currency: currentCurrency?.code,
-                    excludeCurrencySymbol: true,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  })}
-                </Text>
-              </View>
-              {articleItem?.description.trim() && (
-                <HtmlPDF
-                  rootStyle={styles.descriptionText}
-                  html={articleItem.description || '-'}
-                />
-              )}
-            </View>
-          ))}
-        </View>
-      )}
-
-      <View wrap={false}>
-        {discountValue && (
-          <View style={styles.tableRow}>
-            <Text style={{width: '44%'}} />
-            <Text
-              style={{
-                width: '32%',
-                color: '#616161',
-                fontSize: 10,
-                textAlign: 'right',
-              }}>{`${translate('Discount')} (${
-              getCurrencySymbol[currentCurrency?.code!]
-            })`}</Text>
-            <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-              {discountValue > 0 ? '-' : ''}
-              {formatCurrency(discountValue, {
-                currency: currentCurrency?.code,
-                excludeCurrencySymbol: true,
-                currencySymbol: currentCurrency?.symbol,
-                companyLang: selectedLng,
-              })}
-            </Text>
-          </View>
-        )}
-        <View style={styles.tableRow}>
-          <Text style={{width: '44%'}} />
-          <Text
-            style={{
-              width: '32%',
-              color: '#616161',
-              fontSize: 10,
-              textAlign: 'right',
-            }}>
-            {translate('Subtotal excl. VAT')}
-          </Text>
-          <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-            {subtotalExclVatFormatted}
-          </Text>
-        </View>
-        <View>
-          {percentageVats.map((v, index) => (
-            <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
-              <Text style={{width: '44%'}} />
-              <Text
-                style={{
-                  width: '32%',
-                  color: '#616161',
-                  fontSize: 10,
-                  textAlign: 'right',
-                }}>{`${translate('VAT')} ${v.percentageVat}%`}</Text>
-              <Text style={{width: '24%', textAlign: 'right', fontSize: 10}}>
-                {formatCurrency(fixRounding(v.vat, 2), {
-                  currency: currentCurrency?.code,
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                  roundingMode: 'floor',
-                  excludeCurrencySymbol: true,
-                  companyLang: selectedLng,
-                  currencySymbol: currentCurrency?.symbol,
-                })}
-              </Text>
-            </View>
-          ))}
-        </View>
-        <View style={styles.tableRow}>
-          <Text style={{width: '44%'}} />
-          <Text
-            style={{
-              width: '32%',
-              color: '#212121',
-              ...boldFontStyle,
-              textAlign: 'right',
-              fontSize: 10,
-            }}>{`${translate('Total incl. VAT')} (${
-            getCurrencySymbol[currentCurrency?.code!]
-          })`}</Text>
-          <Text
-            style={{
-              width: '24%',
-              textAlign: 'right',
-              color: '#212121',
-              ...boldFontStyle,
-              fontSize: 10,
-            }}>
-            {formatCurrency(total, {
-              currency: currentCurrency?.code,
-              excludeCurrencySymbol: true,
-              currencySymbol: currentCurrency?.symbol,
-              companyLang: selectedLng,
-            })}
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
 };
 
 const FinalInvoicePdfTemplate = ({

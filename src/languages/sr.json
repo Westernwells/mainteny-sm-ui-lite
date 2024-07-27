@@ -2647,5 +2647,12 @@
   "Create and customize your own block to be used later": "Napravite i prilagodite sopstveni blok koji će se kasnije koristiti",
   "Service Order Report": "Izveštaj o narudžbini usluge",
   "Article Order": "Redosled predmeta",
-  "Edit Block": "Uredi blok"
+  "Edit Block": "Uredi blok",
+  "Add a QR page to the invoice": "Dodajte KR stranicu na fakturu",
+  "A new page will be appended to your invoice, there you’ll find the QR code.": "Nova stranica će biti dodata vašoj fakturi, tamo ćete pronaći KR kod.",
+  "Fixed cycle": "Fiksni ciklus",
+  "Pick your month(s)": "Izaberite mesec(e)",
+  "Every 1 week": "Svake 1 nedelje",
+  "Every 3 week": "Svake 3 nedelje",
+  "Every 1 year": "Svake 1 godine"
 }
