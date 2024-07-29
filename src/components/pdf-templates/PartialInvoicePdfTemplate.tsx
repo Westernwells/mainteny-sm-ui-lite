@@ -28,7 +28,7 @@ import PdfPartialPaymentSection from './PdfPartialPaymentSection';
 import PdfUpfrontInvoiceSection from './PdfUpfrontInvoiceSection';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageContainer from './containers/PdfPageContainer';
-import PdfPageTitle from './containers/PdfPageTitle';
+import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import TopSectionContainer from './containers/TopSectionContainer';
 
 type Props = {
@@ -303,9 +303,10 @@ const PartialInvoicePdfTemplate = ({
           </TopSectionContainer>
 
           <View>
-            <PdfPageTitle selectedLng={selectedLng}>
-              {invoice?.subject}
-            </PdfPageTitle>
+            <PdfPageTitleHtml
+              selectedLng={selectedLng}
+              value={invoice?.subject}
+            />
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF
