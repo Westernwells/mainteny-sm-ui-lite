@@ -294,6 +294,8 @@ export const DataGridLayout = ({
         }
         onRowClick={onRowClick}
         checkboxSelection={checkboxSelection}
+        // disable virtualization for Cypress tests because it's causing weird issues like clicking on wrong rows
+        disableVirtualization={!!window.Cypress}
         sx={{
           ...olStyles.scrollbar,
           '&.MuiDataGrid-root': {
