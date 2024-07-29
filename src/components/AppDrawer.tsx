@@ -465,7 +465,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                       },
                     }}
                     key={text}
-                    data-testid={`${text}-nav-item`}>
+                    data-testid={`${text.toLowerCase()}-nav-item`}>
                     <ListItemIcon
                       sx={{
                         minWidth: 0,
