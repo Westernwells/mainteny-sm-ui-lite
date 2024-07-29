@@ -1,6 +1,5 @@
 import EmployeesPage from '../pages/employees.page';
 import AppTopBarPage from '../pages/appTopBar.page';
-import {formatDate} from '../../src/utils/datetime';
 
 describe('Employees page - list page', () => {
     beforeEach(() => {
@@ -20,48 +19,48 @@ describe('Employees page - list page', () => {
     });
 
     it('employee availabilty status is showing correctly', () => {
-        cy.get('div[data-field="availability"][role="cell"]')
-            .contains('Available')
-            .parents('div[role="row"]')
-            .invoke('attr', 'data-rowindex')
-            .then((index) => {
-                cy.wrap(index).as('availableEmployeeRowIndex');
-            });
-
-        cy.get('@availableEmployeeRowIndex').then((i) => {
-            cy.get(`div[data-rowindex=${i}]`).click();
+        EmployeesPage.setAvailableEmployeeRowIndex();
+        cy.get<string>('@availableEmployeeRowIndex').then((i) => {
+            EmployeesPage.getEmployeeByIndex(i).click();
         });
-
-        // add holiday
-        cy.get('svg[data-testid="AddIcon"]').click();
-        cy.get('svg[data-testid="WbSunnyIcon"]').click();
-        cy.contains('label', 'Date').click();
-        cy.get('button[aria-current="date"]').click();
-        cy.contains('button', 'Confirm').click();
-        const currentTechnicianAPI = `${Cypress.env().REACT_APP_API_URL}/api/technicians/*/events?*`;
-        cy.intercept('GET', currentTechnicianAPI).as('currentTechnicianAPI');
-        cy.contains('button', 'Save').click();
-        cy.contains('Absence created successfully!');
-        cy.wait('@currentTechnicianAPI');
-        // check if holiday is added
-        const absenceCard = () => cy.contains('Absence').parents('div.MuiPaper-root');
-        absenceCard().contains('Holiday');
-        absenceCard().contains(/\d+ days/); // 1 days
-        absenceCard().contains(formatDate(new Date()));
+        EmployeesPage.addHoliday();
+        EmployeesPage.verifyHoliday();
 
         // check if employee is availablity is updated on employees listing page
         cy.go('back'); // go back to employees listing page
         cy.wait('@employeesAPI');
         cy.wait('@technicianEventsAPI');
-        cy.get('@availableEmployeeRowIndex').then((i) => {
-            cy.get(`div[data-rowindex=${i}]`).contains('Holiday').should('exist');
+        cy.get<string>('@availableEmployeeRowIndex').then((i) => {
+            EmployeesPage.checkEmployeeAvailabilityUpdated(i);
 
             // clean up - remove holiday
-            cy.get(`div[data-rowindex=${i}]`).click();
-            cy.wait('@currentTechnicianAPI');
-            cy.get('svg[data-testid="DeleteIcon"]').first().click();
-            cy.contains('button', 'Yes').click();
-            cy.wait('@currentTechnicianAPI');
+            EmployeesPage.removeHoliday(i);
+        });
+    });
+
+    it('employee availabilty status is showing correctly on employees listing 2nd page', () => {
+        cy.get('button[aria-label="Go to next page"]').click();
+        cy.get("span[role='progressbar']").should('exist');
+        cy.wait('@employeesAPI');
+        cy.get("span[role='progressbar']").should('not.exist');
+        cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
+
+        EmployeesPage.setAvailableEmployeeRowIndex();
+        cy.get<string>('@availableEmployeeRowIndex').then((i) => {
+            EmployeesPage.getEmployeeByIndex(i).click();
+        });
+        EmployeesPage.addHoliday();
+        EmployeesPage.verifyHoliday();
+
+        // check if employee is availablity is updated on employees listing page
+        cy.go('back'); // go back to employees listing page
+        cy.wait('@employeesAPI');
+        cy.wait('@technicianEventsAPI');
+        cy.get<string>('@availableEmployeeRowIndex').then((i) => {
+            EmployeesPage.checkEmployeeAvailabilityUpdated(i);
+
+            // clean up - remove holiday
+            EmployeesPage.removeHoliday(i);
         });
     });
 });

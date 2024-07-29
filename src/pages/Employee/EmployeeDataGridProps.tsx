@@ -133,10 +133,15 @@ export const makeRows = (
   employees
     ? employees.map((item: UserView, index: number) => {
         const {workingHours, employeeId} = item.userData;
-        const [{fromTime, toTime}] = workingHours;
-        const shift = workingHours.length ? `${fromTime} - ${toTime}` : '-';
+        const shift =
+          workingHours && workingHours.length > 0
+            ? `${workingHours[0].fromTime} - ${workingHours[0].toTime}`
+            : '-';
         const events = techniciansEvents[employeeId];
-        const event = events ? events[0].eventViews[0].eventType : 'Available';
+        const event =
+          events && events.length > 0
+            ? events[0].eventViews[0].eventType
+            : 'Available';
         return {
           id: index,
           name: `${item.userAccount.firstName} ${item.userAccount.lastName}`,
