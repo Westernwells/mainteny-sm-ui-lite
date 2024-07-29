@@ -26,7 +26,7 @@ import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import PdfPartialPaymentSection from './PdfPartialPaymentSection';
 import PdfPageContainer from './containers/PdfPageContainer';
 import PdfBodyContainer from './containers/PdfBodyContainer';
-import PdfPageTitle from './containers/PdfPageTitle';
+import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import TopSectionContainer from './containers/TopSectionContainer';
 import {ArticleSection} from './ArticleSection/ArticleSection';
 
@@ -203,9 +203,10 @@ const FinalInvoicePdfTemplate = ({
           </TopSectionContainer>
 
           <View>
-            <PdfPageTitle selectedLng={selectedLng}>
-              {invoice?.subject}
-            </PdfPageTitle>
+            <PdfPageTitleHtml
+              selectedLng={selectedLng}
+              value={invoice?.subject}
+            />
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF
