@@ -63,8 +63,8 @@ export const Employees = () => {
   const {data: technicianEvents} = useQueryTechnicianEvents({
     start: toRestDateTime(startOfDay(new Date())),
     end: toRestDateTime(endOfDay(new Date())),
-    pageIndex: page.pageIndex,
-    pageSize: page.pageSize,
+    pageIndex: 0,
+    pageSize: 500,
     eventType: [TechnicianEventType.HOLIDAY, TechnicianEventType.SICK_LEAVE],
   });
 
