@@ -1,9 +1,9 @@
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import React from 'react';
+import React, {useMemo} from 'react';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
-import {Currencies, formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
@@ -17,6 +17,12 @@ import TopSectionContainer from 'components/pdf-templates/containers/TopSectionC
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {DiscountType} from 'models/invoice';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
+import {calculateInvoiceAmount} from 'utils/calculate-total';
+import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
+import {
+  allItemsHaveZeroDiscount,
+  shouldDisplayDiscountDash,
+} from 'utils/discount';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -180,66 +186,53 @@ const JobOverviewPdfTemplate = React.memo(
       );
     };
 
-    const calculateTotal = (arr: ServiceOrderArticleView[]) => {
-      const sum = 0;
-
-      return arr
-        .map(
-          (arrayItem) =>
-            arrayItem.quantity *
-            (arrayItem.unitAmount.netAmount /
-              10 ** Currencies[arrayItem.unitAmount.currency] ??
-              (currentCurrency && currentCurrency.code)),
-        )
-        .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
-    };
-
-    const calculateTotalVAT = (items: any[]) => {
-      const vatMap = new Map();
-      items?.forEach((item) => {
-        const {percentageVat, netAmount, fractionDigits} = item.unitAmount;
-        const vat =
-          ((percentageVat / 100) * (netAmount * item.quantity)) /
-          10 ** (fractionDigits || 0);
-        if (vatMap.has(percentageVat)) {
-          vatMap.set(percentageVat, vatMap.get(percentageVat) + vat);
-        } else {
-          vatMap.set(percentageVat, vat);
-        }
-      });
-      return vatMap;
-    };
-
-    const totalVATMap = calculateTotalVAT(articleItems);
-
-    const uniqueVATPercentages = [
-      ...new Set(articleItems?.map((item) => item.unitAmount.percentageVat)),
-    ];
-
-    const allItemsHaveZeroDiscount = articleItems.every(
-      (item) =>
-        item?.additionalInfo?.discount?.amount?.value === 0 ||
-        item?.additionalInfo?.discount?.percentage === 0,
-    );
-
     const elevatorAddress = serviceOrder?.elevator?.address;
 
     const globalDiscount = getDiscoutObj(quotation?.additionalInfo?.discount);
     const discountAmount = globalDiscount?.amount;
     const discountValue = discountAmount?.value ?? 0;
 
-    const shouldDisplayDash = (articleOrderItem: ServiceOrderArticleView) => {
-      if (!articleOrderItem || !articleOrderItem.additionalInfo) return '';
+    const subtotalExclVat =
+      calculateQuotationTotalWithPerItemDiscount(articleItems);
 
-      const additionalInfo = articleOrderItem?.additionalInfo;
-      const hasAdditionalInfo = Object.keys(additionalInfo).length !== 0;
-      const discount = additionalInfo?.discount;
-      const hasDiscount = discount?.type !== DiscountType.NONE;
-      const hasDiscountValue =
-        discount?.percentage !== 0 || discount?.amount?.value !== 0;
+    const subtotalExclVatFormatted = formatCurrency(
+      subtotalExclVat - discountValue,
+      {
+        currency: currentCurrency?.code,
+        excludeCurrencySymbol: true,
+        currencySymbol: currentCurrency?.symbol,
+        companyLang: selectedLng,
+      },
+    );
 
-      return hasAdditionalInfo && hasDiscount && hasDiscountValue ? '-' : '';
-    };
+    const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
+      () =>
+        calculateInvoiceAmount({
+          items: articleItems,
+          globalDiscount,
+        }),
+      [articleItems, globalDiscount],
+    );
+
+    const vatsFormatted = vats.map((vat) => ({
+      ...vat,
+      vat: formatCurrency(vat.vat, {
+        currency: currentCurrency?.code,
+        excludeCurrencySymbol: true,
+        currencySymbol: currentCurrency?.symbol,
+        companyLang: selectedLng,
+      }),
+    }));
+
+    const amountAfterGlobalDiscountWithVATFormatted = formatCurrency(
+      amountAfterGlobalDiscountWithVAT,
+      {
+        currency: currentCurrency?.code,
+        excludeCurrencySymbol: true,
+        currencySymbol: currentCurrency?.symbol,
+        companyLang: selectedLng,
+      },
+    );
 
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -355,9 +348,14 @@ const JobOverviewPdfTemplate = React.memo(
               </PdfPageTitle>
 
               {serviceOrder?.description.trim() !== '' && (
-                <Text style={styles.contentBody}>
-                  {serviceOrder?.description}
-                </Text>
+                <HtmlPDF
+                  html={serviceOrder?.description || ''}
+                  selectedLng={selectedLng}
+                  rootStyle={{
+                    marginTop: 6,
+                    marginBottom: 16,
+                  }}
+                />
               )}
 
               <View style={styles.table}>
@@ -408,7 +406,7 @@ const JobOverviewPdfTemplate = React.memo(
                         getCurrencySymbol[currentCurrency?.code!]
                       })`}
                     </Text>
-                    {!allItemsHaveZeroDiscount && (
+                    {!allItemsHaveZeroDiscount(articleItems) && (
                       <Text
                         style={{
                           width: '10%',
@@ -421,7 +419,9 @@ const JobOverviewPdfTemplate = React.memo(
 
                     <Text
                       style={{
-                        width: allItemsHaveZeroDiscount ? '25%' : '15%',
+                        width: allItemsHaveZeroDiscount(articleItems)
+                          ? '25%'
+                          : '15%',
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
@@ -493,21 +493,41 @@ const JobOverviewPdfTemplate = React.memo(
                               },
                             )}
                           </Text>
-                          {!allItemsHaveZeroDiscount && (
+                          {!allItemsHaveZeroDiscount(articleItems) && (
                             <Text
                               style={{
                                 width: '10%',
                                 textAlign: 'right',
                                 color: '#212121',
                               }}>
-                              {shouldDisplayDash(articleOrderItem)}
+                              {shouldDisplayDiscountDash(articleOrderItem)}
                               {articleOrderItem?.additionalInfo?.discount
                                 ?.type === DiscountType.PERCENTAGE
                                 ? articleOrderItem?.additionalInfo?.discount
                                     .percentage
-                                : (articleOrderItem?.additionalInfo?.discount
-                                    ?.amount?.value || 0) /
-                                  10 ** 2}
+                                : formatCurrency(
+                                    centsToMoney(
+                                      currentCurrency?.code!,
+                                      articleOrderItem?.additionalInfo?.discount
+                                        ?.amount?.value,
+                                    ),
+                                    {
+                                      currency: currentCurrency?.code,
+                                      excludeCurrencySymbol: true,
+                                      currencySymbol: currentCurrency?.symbol,
+                                      companyLang: selectedLng,
+                                      minimumFractionDigits:
+                                        articleOrderItem?.additionalInfo
+                                          ?.discount?.amount?.value === 0
+                                          ? 0
+                                          : 2,
+                                      maximumFractionDigits:
+                                        articleOrderItem?.additionalInfo
+                                          ?.discount?.amount?.value === 0
+                                          ? 0
+                                          : 2,
+                                    },
+                                  )}
                               {articleOrderItem?.additionalInfo?.discount
                                 ?.type === DiscountType.AMOUNT
                                 ? getCurrencySymbol[currentCurrency?.code!]
@@ -517,7 +537,9 @@ const JobOverviewPdfTemplate = React.memo(
 
                           <Text
                             style={{
-                              width: allItemsHaveZeroDiscount ? '25%' : '15%',
+                              width: allItemsHaveZeroDiscount(articleItems)
+                                ? '25%'
+                                : '15%',
                               textAlign: 'right',
                               color: '#212121',
                             }}>
@@ -590,46 +612,42 @@ const JobOverviewPdfTemplate = React.memo(
                           textAlign: 'right',
                           fontSize: 10,
                         }}>
-                        {formatCurrency(calculateTotal(articleItems), {
-                          currency: currentCurrency?.code,
-                          excludeCurrencySymbol: true,
-                          currencySymbol: currentCurrency?.symbol,
-                          companyLang: selectedLng,
-                        })}
+                        {subtotalExclVatFormatted}
                       </Text>
                     </View>
 
-                    <View>
-                      {uniqueVATPercentages.map((vatPercentage) => (
-                        <View style={styles.tableRow} key={vatPercentage}>
-                          <Text style={{width: '44%'}} />
-                          <Text
+                    <View style={styles.tableRow}>
+                      <Text style={{width: '44%'}} />
+                      <View style={{width: '56%'}}>
+                        {vatsFormatted.map((v, index) => (
+                          <View
+                            key={`${index}-${v.percentageVat}`}
                             style={{
-                              width: '32%',
-                              color: '#616161',
-                              fontSize: 10,
-                              textAlign: 'right',
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              paddingVertical: 4,
                             }}>
-                            {translate('VAT')} {vatPercentage}%
-                          </Text>
-                          <Text
-                            style={{
-                              width: '24%',
-                              textAlign: 'right',
-                              fontSize: 10,
-                            }}>
-                            {formatCurrency(
-                              totalVATMap.get(vatPercentage) ?? 0,
-                              {
-                                currency: currentCurrency?.code,
-                                excludeCurrencySymbol: true,
-                                currencySymbol: currentCurrency?.symbol,
-                                companyLang: selectedLng,
-                              },
-                            )}
-                          </Text>
-                        </View>
-                      ))}
+                            <Text
+                              style={{
+                                color: '#616161',
+                                fontSize: 10,
+                                textAlign: 'right',
+                                width: '57%',
+                              }}>
+                              {translate('VAT')} {v.percentageVat}%
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: 10,
+                                textAlign: 'right',
+                                width: '43%',
+                              }}>
+                              {v.vat}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
                     </View>
 
                     <View style={styles.tableRow}>
@@ -643,7 +661,7 @@ const JobOverviewPdfTemplate = React.memo(
                           fontSize: 10,
                         }}>
                         {`${translate('Total incl. VAT')} (${
-                          currentCurrency?.symbol
+                          getCurrencySymbol[currentCurrency?.code!]
                         })`}
                       </Text>
                       <Text
@@ -654,19 +672,7 @@ const JobOverviewPdfTemplate = React.memo(
                           ...boldFontStyle,
                           fontSize: 10,
                         }}>
-                        {formatCurrency(
-                          calculateTotal(articleItems) +
-                            Array.from(totalVATMap.values()).reduce(
-                              (acc, curr) => acc + curr,
-                              0,
-                            ),
-                          {
-                            currency: currentCurrency?.code,
-                            excludeCurrencySymbol: true,
-                            currencySymbol: currentCurrency?.symbol,
-                            companyLang: selectedLng,
-                          },
-                        )}
+                        {amountAfterGlobalDiscountWithVATFormatted}
                       </Text>
                     </View>
                   </View>

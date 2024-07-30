@@ -19,6 +19,7 @@ import {
   InfoOutlined,
   MonetizationOnOutlined,
   PictureAsPdfOutlined,
+  TextSnippetOutlined,
 } from '@mui/icons-material';
 import {Progress} from 'components/Progress';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
@@ -34,6 +35,7 @@ import Automations from './Automations';
 import Checklist from './Checklist';
 import Financials from './Financials';
 import PdfSettings from './PdfSettings';
+import TextBlocks from './TextBlocks';
 
 interface DrawerItem {
   label: string;
@@ -116,6 +118,12 @@ export const SettingsPage = () => {
           component: <Checklist />,
         },
       ],
+    },
+    {
+      label: 'Text Blocks',
+      icon: <TextSnippetOutlined />,
+      route: 'text-blocks',
+      component: <TextBlocks company={company!} />,
     },
     {
       label: 'Integrations',

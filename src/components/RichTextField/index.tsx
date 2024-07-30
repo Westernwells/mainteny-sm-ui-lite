@@ -203,6 +203,7 @@ const RichTextField = ({
   endAdornment,
   disabled = false,
   onClick,
+  ...props
 }: PropsWithChildren<Props>) => {
   const {t} = useTranslation();
   const editorRef = useRef<(BaseEditor & ReactEditor & HistoryEditor) | null>(
@@ -282,7 +283,7 @@ const RichTextField = ({
   return (
     <Slate editor={editor} initialValue={value} onChange={handleChange}>
       {disabled ? null : <HoveringToolbar />}
-      <FormControl fullWidth disabled={disabled}>
+      <FormControl fullWidth disabled={disabled} {...props}>
         <fieldset
           style={{
             ...styles.fieldset,

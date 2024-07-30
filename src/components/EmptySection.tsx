@@ -122,7 +122,9 @@ export const EmptySection = ({
       gap="1em"
       mt={3}
       sx={{...containerStyle}}>
-      <Box width={Width[size]}>{getIllustration(illustration)}</Box>
+      <Box width={Width[size]} sx={{textAlign: 'center'}}>
+        {getIllustration(illustration)}
+      </Box>
       <Box display="flex" flexDirection="column">
         <Typography
           variant={labelVariant || 'subtitle2'}

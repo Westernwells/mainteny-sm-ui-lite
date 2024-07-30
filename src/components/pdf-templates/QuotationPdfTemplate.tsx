@@ -2,7 +2,7 @@ import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React, {useMemo} from 'react';
 import {formatDate} from 'utils/datetime';
-import {formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {QuotationItem, QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -15,6 +15,10 @@ import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
+import {
+  shouldDisplayDiscountDash,
+  allItemsHaveZeroDiscount,
+} from 'utils/discount';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
@@ -202,19 +206,6 @@ const QuotationPdfTemplate = React.memo(
       );
     };
 
-    const shouldDisplayDash = (articleOrderItem: QuotationItem) => {
-      if (!articleOrderItem || !articleOrderItem.additionalInfo) return '';
-
-      const additionalInfo = articleOrderItem?.additionalInfo;
-      const hasAdditionalInfo = Object.keys(additionalInfo).length !== 0;
-      const discount = additionalInfo?.discount;
-      const hasDiscount = discount?.type !== DiscountType.NONE;
-      const hasDiscountValue =
-        discount?.percentage !== 0 || discount?.amount?.value !== 0;
-
-      return hasAdditionalInfo && hasDiscount && hasDiscountValue ? '-' : '';
-    };
-
     const discount = getDiscoutObj(quotation?.additionalInfo?.discount);
     const discountAmount = discount?.amount;
     const discountValue = discountAmount?.value ?? 0;
@@ -259,12 +250,6 @@ const QuotationPdfTemplate = React.memo(
         currencySymbol: currentCurrency?.symbol,
         companyLang: selectedLng,
       },
-    );
-
-    const allItemsHaveZeroDiscount = articleItems.every(
-      (item) =>
-        item?.additionalInfo?.discount?.amount?.value === 0 ||
-        item?.additionalInfo?.discount?.percentage === 0,
     );
 
     const boldFontStyle = {
@@ -440,7 +425,7 @@ const QuotationPdfTemplate = React.memo(
                         getCurrencySymbol[currentCurrency?.code!]
                       })`}
                     </Text>
-                    {!allItemsHaveZeroDiscount && (
+                    {!allItemsHaveZeroDiscount(articleItems) && (
                       <Text
                         style={{
                           width: '10%',
@@ -453,7 +438,9 @@ const QuotationPdfTemplate = React.memo(
 
                     <Text
                       style={{
-                        width: allItemsHaveZeroDiscount ? '25%' : '15%',
+                        width: allItemsHaveZeroDiscount(articleItems)
+                          ? '25%'
+                          : '15%',
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
@@ -524,21 +511,41 @@ const QuotationPdfTemplate = React.memo(
                             )}
                           </Text>
 
-                          {!allItemsHaveZeroDiscount && (
+                          {!allItemsHaveZeroDiscount(articleItems) && (
                             <Text
                               style={{
                                 width: '10%',
                                 textAlign: 'right',
                                 color: '#212121',
                               }}>
-                              {shouldDisplayDash(articleItem)}
+                              {shouldDisplayDiscountDash(articleItem)}
                               {articleItem?.additionalInfo?.discount?.type ===
                               DiscountType.PERCENTAGE
                                 ? articleItem?.additionalInfo?.discount
                                     .percentage
-                                : (articleItem?.additionalInfo?.discount?.amount
-                                    ?.value || 0) /
-                                  10 ** 2}
+                                : formatCurrency(
+                                    centsToMoney(
+                                      currentCurrency?.code!,
+                                      articleItem?.additionalInfo?.discount
+                                        ?.amount?.value,
+                                    ),
+                                    {
+                                      currency: currentCurrency?.code,
+                                      excludeCurrencySymbol: true,
+                                      currencySymbol: currentCurrency?.symbol,
+                                      companyLang: selectedLng,
+                                      minimumFractionDigits:
+                                        articleItem?.additionalInfo?.discount
+                                          ?.amount?.value === 0
+                                          ? 0
+                                          : 2,
+                                      maximumFractionDigits:
+                                        articleItem?.additionalInfo?.discount
+                                          ?.amount?.value === 0
+                                          ? 0
+                                          : 2,
+                                    },
+                                  )}
                               {articleItem?.additionalInfo?.discount?.type ===
                               DiscountType.AMOUNT
                                 ? getCurrencySymbol[currentCurrency?.code!]
@@ -548,7 +555,9 @@ const QuotationPdfTemplate = React.memo(
 
                           <Text
                             style={{
-                              width: allItemsHaveZeroDiscount ? '25%' : '15%',
+                              width: allItemsHaveZeroDiscount(articleItems)
+                                ? '25%'
+                                : '15%',
                               textAlign: 'right',
                               color: '#212121',
                             }}>

@@ -1,14 +1,18 @@
 export default class QuotationPage {
   static visit = () => {
-    cy.visit('/quotations', {
-      failOnStatusCode: false,
-    });
+    cy.get(
+      'ul > div[role="button"][data-testid="quotations-nav-item"]',
+    ).click();
   };
 
   static navigateTo = (path: string) => {
     cy.visit(`/quotations/${path}`, {
       failOnStatusCode: false,
     });
+  };
+
+  static openNewQuotation = () => {
+    cy.contains('New Quotation').click();
   };
 
   static openDialog = (dialogTitle: string) => {
