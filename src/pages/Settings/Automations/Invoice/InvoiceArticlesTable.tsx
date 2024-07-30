@@ -32,6 +32,11 @@ import {ArticleView} from 'models/article';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {StringValue} from 'models/misc';
 import {scrollTableToBottom} from 'utils/utils';
+import DOMPurify from 'dompurify';
+import {
+  hasMultipleParagraphs,
+  returnFirstParagraph,
+} from '../../../../utils/rich-text-field';
 
 interface Props {
   serviceOrderType: ServiceOrderType;
@@ -126,9 +131,20 @@ const InvoiceArticlesTable = ({serviceOrderType}: Props) => {
         headerName: 'Name',
         variant: 'uppercase',
         flex: 1,
-        renderCell: (params) => {
-          const {value} = params;
-          return <Box>{value}</Box>;
+        renderCell: ({value}) => {
+          const valueToShow = hasMultipleParagraphs(value)
+            ? returnFirstParagraph(value)
+            : value;
+
+          return (
+            <Box>
+              <Typography
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(valueToShow),
+                }}
+              />
+            </Box>
+          );
         },
       }),
       getColumnProps({
