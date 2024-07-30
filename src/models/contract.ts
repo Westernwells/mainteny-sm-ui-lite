@@ -61,6 +61,7 @@ export enum TimeUnitYearView {
   QUADRENNIALLY = 'Every 4 year',
   WEEKLY = 'Weekly',
   BIWEEKLY = 'Every 2 weeks',
+  TRIWEEKLY = 'Every 3 weeks',
 }
 
 export enum ContractOrderField {
