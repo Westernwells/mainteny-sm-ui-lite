@@ -141,14 +141,19 @@ import {SectionTitle} from './SectionTitle';
 import {EditFrom} from './EditFrom';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
 import NewCustomer from './NewCustomer';
-import {
-  articleViewToInvoiceItemRecord,
-  formatInvoiceRecord,
-  stripHtmlTags,
-} from './utils';
+import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
 import InvoiceFormArticleSection from './InvoiceFormArticleSection';
-import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
+import {Dialog} from 'components/Dialog';
+import {
+  TextBlockCategory,
+  TextBlockView,
+  stripHtmlTags,
+} from 'models/text-block';
+import {GridCellParams} from '@mui/x-data-grid';
+import TextBlockActions from 'components/text-blocks/TextBlockActions';
+import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 
 interface Props {
   invoice?: InvoiceView;
@@ -396,6 +401,34 @@ export const InvoiceForm = ({
   const [dueDateError, setDueDateError] = useState('');
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+
+  const [textBlockField, setTextBlockField] = useState<
+    'SUBJECT' | 'DESCRIPTION' | 'NOTES' | null
+  >(null);
+  const [openTextBlockDialog, setOpenTextBlockDialog] =
+    useState<boolean>(false);
+  const [activeSubDialog, setActiveSubDialog] = useState<
+    'edit' | 'preview' | 'delete' | 'create' | undefined
+  >(undefined);
+  const [activeTextBlock, setActiveTextBlock] = useState<
+    TextBlockView | undefined
+  >(undefined);
+
+  const onCloseSubDialogs = () => {
+    setActiveSubDialog(undefined);
+    setOpenTextBlockDialog(true);
+  };
+
+  const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
+    if (textBlockField === 'SUBJECT') {
+      formik.setFieldValue('subject', rowParams.row.text);
+    } else if (textBlockField === 'DESCRIPTION') {
+      formik.setFieldValue('description', rowParams.row.text);
+    } else if (textBlockField === 'NOTES') {
+      formik.setFieldValue('moreInfo', rowParams.row.text);
+    }
+    setOpenTextBlockDialog(false);
+  };
 
   const [totalAmountFrom, totalAmountTo] = useMemo(
     () => getStartEndPrice([]),
@@ -862,10 +895,7 @@ export const InvoiceForm = ({
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
       if (!formik.values.description && serviceOrder.report?.description) {
-        formik.setFieldValue(
-          'description',
-          stripHtmlTags(serviceOrder.report.description),
-        );
+        formik.setFieldValue('description', serviceOrder.report.description);
       }
       formik.setFieldValue(
         'propertyOwnerId',
@@ -888,10 +918,12 @@ export const InvoiceForm = ({
           ? new Date(serviceOrder.actualEndTime)
           : undefined,
       );
-      formik.setFieldValue(
-        'discount',
-        getDiscoutObj(serviceOrder?.additionalInfo.discount),
-      );
+      if (serviceOrder?.additionalInfo.discount) {
+        formik.setFieldValue(
+          'discount',
+          getDiscoutObj(serviceOrder?.additionalInfo.discount),
+        );
+      }
       if (!formik.values.items.length) {
         formik.setFieldValue(
           'items',
@@ -1838,6 +1870,23 @@ export const InvoiceForm = ({
                 formik.touched.subject ? formik.errors.subject : undefined
               }
               error={!!(formik.touched.subject && formik.errors.subject)}
+              endAdornment={
+                <InputAdornment
+                  component={IconButton}
+                  disableRipple
+                  position="end"
+                  sx={{
+                    mr: -1,
+                    alignSelf: 'center',
+                  }}
+                  onClick={() => {
+                    setOpenTextBlockDialog(true);
+                    setTextBlockField('SUBJECT');
+                  }}
+                  size="small">
+                  <TextSnippetIcon />
+                </InputAdornment>
+              }
             />
 
             <RichTextField
@@ -1845,6 +1894,24 @@ export const InvoiceForm = ({
               html={formik.values.description || ''}
               updateHtml={(h) => formik.setFieldValue('description', h)}
               minRows={2}
+              endAdornment={
+                <InputAdornment
+                  component={IconButton}
+                  disableRipple
+                  position="end"
+                  sx={{
+                    mt: 1,
+                    mr: -1,
+                    alignSelf: 'flex-start',
+                  }}
+                  onClick={() => {
+                    setOpenTextBlockDialog(true);
+                    setTextBlockField('DESCRIPTION');
+                  }}
+                  size="small">
+                  <TextSnippetIcon />
+                </InputAdornment>
+              }
             />
           </Grid>
 
@@ -1894,6 +1961,24 @@ export const InvoiceForm = ({
               html={formik.values.moreInfo || ''}
               updateHtml={(h) => formik.setFieldValue('moreInfo', h)}
               minRows={2}
+              endAdornment={
+                <InputAdornment
+                  component={IconButton}
+                  disableRipple
+                  position="end"
+                  sx={{
+                    mt: 1,
+                    mr: -1,
+                    alignSelf: 'flex-start',
+                  }}
+                  onClick={() => {
+                    setOpenTextBlockDialog(true);
+                    setTextBlockField('NOTES');
+                  }}
+                  size="small">
+                  <TextSnippetIcon />
+                </InputAdornment>
+              }
             />
 
             <RichTextField
@@ -2246,7 +2331,6 @@ export const InvoiceForm = ({
           </Grid>
         </Grid>
       </Grid>
-
       <BottomDrawer
         isOpen={isDrawerOpen}
         isSaving={isUpdating || isCreating}
@@ -2265,7 +2349,6 @@ export const InvoiceForm = ({
           onSave={setNewlyCreatedCustomer}
         />
       )}
-
       <EditFrom
         isDialogOpen={isEditFromDialogOpen}
         onClose={() => setIsEditFromDialogOpen(false)}
@@ -2439,7 +2522,6 @@ export const InvoiceForm = ({
         content="Do you want to delete this Invoice?"
         helperText="This action is irreversible."
       />
-
       {openContractPaymentTermSelectDialog && (
         <ContractTermInput
           title={
@@ -2451,7 +2533,6 @@ export const InvoiceForm = ({
           setEdit={setPaymentTermToEdit}
         />
       )}
-
       {openContractPaymentTermsDialog && (
         <ContractTerm
           title={t('Payment terms')}
@@ -2467,11 +2548,46 @@ export const InvoiceForm = ({
           setEdit={setPaymentTermToEdit}
         />
       )}
-
       {openDialog && (
         <AutoGeneratedIdDialog
           openDialog={openDialog}
           setOpenDialog={setOpenDialog}
+        />
+      )}
+
+      <Dialog
+        title="Click to apply your block"
+        disableSaveBtn={!!Object.keys(formik.errors).length}
+        onCancel={() => {
+          setOpenTextBlockDialog(false);
+        }}
+        dialogProps={{
+          maxWidth: 'sm',
+          open: openTextBlockDialog || false,
+        }}
+        showCancelButton={false}
+        showSaveButton={false}>
+        <TextBlockSelect
+          textBlockCategory={TextBlockCategory.INVOICE}
+          setOpenTextBlockDialog={setOpenTextBlockDialog}
+          setActiveSubDialog={setActiveSubDialog}
+          setActiveTextBlock={setActiveTextBlock}
+          handleCellClick={handleCellClick}
+        />
+      </Dialog>
+
+      {activeSubDialog && (
+        <TextBlockActions
+          textBlockCategory={TextBlockCategory.INVOICE}
+          activeSubDialog={activeSubDialog}
+          setActiveSubDialog={setActiveSubDialog}
+          openDialog={
+            activeSubDialog === 'edit' || activeSubDialog === 'create'
+          }
+          openPreviewDialog={activeSubDialog === 'preview'}
+          openCancelConfirm={activeSubDialog === 'delete'}
+          activeTextBlock={activeTextBlock}
+          onCloseSubDialogs={onCloseSubDialogs}
         />
       )}
     </Box>

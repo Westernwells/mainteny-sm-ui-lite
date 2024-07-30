@@ -16,6 +16,7 @@ interface Props {
   children: ReactNode;
   onSave?: () => void;
   onCancel: () => void;
+  showSaveButton?: boolean;
   showCancelButton?: boolean;
   disableSaveBtn?: boolean;
   dialogProps: DialogProps;
@@ -35,6 +36,7 @@ export const Dialog = ({
   onSave = () => {},
   onCancel = () => {},
   showCancelButton = true,
+  showSaveButton = true,
   disableSaveBtn,
   dialogProps,
   saveBtnType,
@@ -59,7 +61,7 @@ export const Dialog = ({
         id="alert-dialog-title"
         sx={{
           background: 'white',
-          padding: '1em 1.5em',
+          padding: '1em 1em 1em 2.5em',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -74,7 +76,7 @@ export const Dialog = ({
         <DialogContentText
           id="alert-dialog-description"
           component="div"
-          sx={{color: 'text.primary', mt: '1em'}}>
+          sx={{color: 'text.primary', paddingTop: '0.3em'}}>
           {children}
         </DialogContentText>
       </DialogContent>
@@ -99,20 +101,23 @@ export const Dialog = ({
               </Typography>
             </Button>
           )}
-          <Button
-            buttonProps={{
-              size: 'large',
-              variant: saveButtonVariant,
-              onClick: onSave,
-              autoFocus: true,
-              disabled: disableSaveBtn || isSaving,
-              type: saveBtnType,
-              ...saveButtonProps,
-            }}>
-            <Typography variant="subtitle2">
-              {isSaving ? `${t('Saving')}...` : t(saveButtonText)}
-            </Typography>
-          </Button>
+
+          {showSaveButton && (
+            <Button
+              buttonProps={{
+                size: 'large',
+                variant: saveButtonVariant,
+                onClick: onSave,
+                autoFocus: true,
+                disabled: disableSaveBtn || isSaving,
+                type: saveBtnType,
+                ...saveButtonProps,
+              }}>
+              <Typography variant="subtitle2">
+                {isSaving ? `${t('Saving')}...` : t(saveButtonText)}
+              </Typography>
+            </Button>
+          )}
         </Box>
       </DialogActions>
     </MuiDialog>

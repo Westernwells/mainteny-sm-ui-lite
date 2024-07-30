@@ -18,6 +18,7 @@ import {
   stripHtmlTags,
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
+import {allItemsHaveZeroDiscount} from 'utils/discount';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -28,8 +29,8 @@ import PdfPartialPaymentSection from './PdfPartialPaymentSection';
 import PdfUpfrontInvoiceSection from './PdfUpfrontInvoiceSection';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageContainer from './containers/PdfPageContainer';
-import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import TopSectionContainer from './containers/TopSectionContainer';
+import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 
 type Props = {
   translate: (key: string) => string;
@@ -239,12 +240,6 @@ const PartialInvoicePdfTemplate = ({
     },
   );
 
-  const allItemsHaveZeroDiscount = articleItems.every(
-    (item) =>
-      item?.additionalInfo?.discount?.amount?.value === 0 ||
-      item?.additionalInfo?.discount?.percentage === 0,
-  );
-
   const laborCost = useCalculateLaborMaterialCost(
     itemsAfterGlobalDiscount,
     ArticleType.LABOR,
@@ -320,7 +315,9 @@ const PartialInvoicePdfTemplate = ({
                 invoice={invoice}
                 currentCurrency={currentCurrency}
                 translate={translate}
-                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
+                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
+                  articleItems,
+                )}
                 discountValue={discountValue}
                 subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
                 percentageVats={vats}

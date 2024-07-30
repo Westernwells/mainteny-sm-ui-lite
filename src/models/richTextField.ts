@@ -34,7 +34,22 @@ export const ELEMENT_TAGS: Record<
   string,
   (el: HTMLElement | HTMLDivElement) => {type: string} | undefined
 > = {
-  P: () => ({type: 'paragraph'}),
+  P: (el: HTMLElement) => {
+    const style = el.style?.textAlign;
+    if (style) {
+      switch (style) {
+        case 'left':
+          return {type: 'left'};
+        case 'center':
+          return {type: 'center'};
+        case 'right':
+          return {type: 'right'};
+        default:
+          return {type: 'paragraph'};
+      }
+    }
+    return {type: 'paragraph'};
+  },
   OL: () => ({type: 'numbered-list'}),
   UL: () => ({type: 'bulleted-list'}),
   LI: () => ({type: 'list-item'}),
@@ -51,6 +66,7 @@ export const ELEMENT_TAGS: Record<
           return {type: 'paragraph'};
       }
     }
+    return {type: 'paragraph'};
   },
 };
 

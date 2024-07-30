@@ -22,6 +22,7 @@ import {
   stripHtmlTags,
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
+import {allItemsHaveZeroDiscount} from 'utils/discount';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -217,12 +218,6 @@ const FullInvoicePdfTemplate = ({
     },
   );
 
-  const allItemsHaveZeroDiscount = articleItems.every(
-    (item) =>
-      item?.additionalInfo?.discount?.amount?.value === 0 ||
-      item?.additionalInfo?.discount?.percentage === 0,
-  );
-
   const formattedPaymentValues = getFormattedPaymentValues(
     invoice?.additionalInfo.paymentTerm!,
     invoice!,
@@ -306,7 +301,9 @@ const FullInvoicePdfTemplate = ({
                 invoice={invoice}
                 currentCurrency={currentCurrency}
                 translate={translate}
-                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
+                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
+                  articleItems,
+                )}
                 discountValue={discountValue}
                 subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
                 percentageVats={vats}

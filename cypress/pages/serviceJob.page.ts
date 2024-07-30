@@ -1,6 +1,6 @@
 export default class ServiceJobPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="Jobs-nav-item"]').click();
+    cy.get('ul > div[role="button"][data-testid="jobs-nav-item"]').click();
   };
 
   static changeTab = (index: number) => {
