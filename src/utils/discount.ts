@@ -3,12 +3,15 @@ import {QuotationItem} from 'models/quotation';
 import {ServiceOrderArticleView} from 'models/service-order';
 
 export const allItemsHaveZeroDiscount = (articleItems?: any) =>
-  articleItems?.every(
-    (item: any) =>
-      item?.additionalInfo?.discount?.amount?.value === 0 ||
-      item?.additionalInfo?.discount?.percentage === 0 ||
-      item.additionalInfo?.discount?.type === DiscountType.NONE,
-  );
+  articleItems?.every((item: any) => {
+    const discount = item?.additionalInfo?.discount;
+    return (
+      discount?.amount?.value === 0 ||
+      discount?.percentage === 0 ||
+      discount?.type === DiscountType.NONE ||
+      !discount
+    );
+  });
 
 export const shouldDisplayDiscountDash = (
   articleOrderItem: QuotationItem | ServiceOrderArticleView | InvoiceItem,
