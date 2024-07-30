@@ -92,6 +92,7 @@ export const queryKeys = {
   fetchClientStorageData: 'fetchClientStorageData',
   fetchTextBlocks: 'fetchTextBlocks',
   fetchTextBlockDetail: 'fetchTextBlockDetail',
+  getWorkingTechnicians: 'getWorkingTechnicians',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

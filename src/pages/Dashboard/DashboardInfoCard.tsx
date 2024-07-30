@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropsWithChildren} from 'react';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import {InfoCard, Props as InfoCardProps} from 'components/InfoCard';
@@ -23,20 +23,23 @@ const InfoCardHeaderChip = ({label}: {label: string}) => {
   );
 };
 
+type Props = InfoCardProps & {
+  title: string;
+  chipLabel: string;
+  showChip?: boolean;
+  seeMorePath: string;
+  emptySection: {show: boolean; label: string};
+};
+
 export const DashboardInfoCard = ({
   title,
   chipLabel,
   seeMorePath,
   emptySection,
+  showChip = true,
   children,
   ...props
-}: InfoCardProps & {
-  title: string;
-  chipLabel: string;
-  seeMorePath: string;
-  emptySection: {show: boolean; label: string};
-  children: React.ReactNode;
-}) => {
+}: PropsWithChildren<Props>) => {
   const {t} = useTranslation();
   const theme = useTheme();
   return (
@@ -53,7 +56,9 @@ export const DashboardInfoCard = ({
       }}
       header={
         <Typography variant="subtitle1">
-          {t(title)} <InfoCardHeaderChip label={chipLabel} />
+          {t(title)}
+
+          {showChip && <InfoCardHeaderChip label={chipLabel} />}
         </Typography>
       }
       headerStyles={{

@@ -92,3 +92,14 @@ export interface QueryServiceCompanyEmployeeStatusParams {
   query?: string;
   roles: Role[];
 }
+
+export type WorkingEmployeesSummary = {
+  numberOfAvailableEmployees: number;
+};
+
+// Query Request Types
+
+export type WorkingEmployeeSummaryRequest = {
+  time: string;
+  employeeType: Role[];
+};
