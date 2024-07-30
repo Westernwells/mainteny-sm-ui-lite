@@ -921,10 +921,12 @@ export const InvoiceForm = ({
           ? new Date(serviceOrder.actualEndTime)
           : undefined,
       );
-      formik.setFieldValue(
-        'discount',
-        getDiscoutObj(serviceOrder?.additionalInfo.discount),
-      );
+      if (serviceOrder?.additionalInfo.discount) {
+        formik.setFieldValue(
+          'discount',
+          getDiscoutObj(serviceOrder?.additionalInfo.discount),
+        );
+      }
       if (!formik.values.items.length) {
         formik.setFieldValue(
           'items',
