@@ -9,7 +9,7 @@ import {Actions} from './Actions';
 import {
   hasMultipleParagraphs,
   returnFirstParagraph,
-} from '../../../../../utils/rich-text-field-utils';
+} from '../../../../../utils/rich-text-field';
 
 export enum ActionTypes {
   EDIT = 'EDIT',
