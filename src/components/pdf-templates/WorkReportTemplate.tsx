@@ -623,14 +623,14 @@ const WorkReportTemplate = React.memo(
                             }}>
                             {index + 1}
                           </Text>
-                          <Text
-                            style={{
+                          <HtmlPDF
+                            rootStyle={{
                               width: '45%',
                               textAlign: 'left',
                               ...styles.tableBodyContent,
-                            }}>
-                            {articleItem.name || '-'}
-                          </Text>
+                            }}
+                            html={articleItem.name || '-'}
+                          />
                           <Text
                             style={{
                               width: '30%',
