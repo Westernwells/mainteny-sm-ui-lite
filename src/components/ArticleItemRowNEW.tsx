@@ -442,6 +442,11 @@ export const ArticleItemRowNEW = ({
                 searchText={searchText}
                 key={item.id}
                 handleSelectItem={() => {
+                  // if articleItem is the same as item it will not trigger a rerender and we need to set the fields manually
+                  if (articleItem.article?.id === item.id) {
+                    formik.setFieldValue('name', item.name);
+                    formik.setFieldValue('description', item.description);
+                  }
                   handleSelectItem(item, index);
                   setShowArticleSearch(false);
                 }}
