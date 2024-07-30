@@ -1,4 +1,5 @@
 import {Text, View} from '@react-pdf/renderer';
+import {shouldDisplayDiscountDash} from 'utils/discount';
 import {
   centsToMoney,
   formatCurrency,
@@ -157,10 +158,7 @@ export const ArticleSection = ({
                       textAlign: 'right',
                       color: '#212121',
                     }}>
-                    {articleItem?.additionalInfo?.discount?.percentage !== 0 ||
-                    articleItem?.additionalInfo?.discount?.amount?.value !== 0
-                      ? '-'
-                      : ''}
+                    {shouldDisplayDiscountDash(articleItem)}
                     {articleItem?.additionalInfo?.discount?.type ===
                     DiscountType.PERCENTAGE
                       ? articleItem?.additionalInfo?.discount.percentage
