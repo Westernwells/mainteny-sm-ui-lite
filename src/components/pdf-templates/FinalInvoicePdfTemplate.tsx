@@ -18,6 +18,7 @@ import {
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {ArticleType} from 'models/article';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
+import {allItemsHaveZeroDiscount} from 'utils/discount';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -125,12 +126,6 @@ const FinalInvoicePdfTemplate = ({
     );
   };
 
-  const allItemsHaveZeroDiscount = articleItems?.every(
-    (item) =>
-      item?.additionalInfo?.discount?.amount?.value === 0 ||
-      item?.additionalInfo?.discount?.percentage === 0,
-  );
-
   const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} =
     useMemo(
       () =>
@@ -220,7 +215,9 @@ const FinalInvoicePdfTemplate = ({
                 invoice={invoice}
                 currentCurrency={currentCurrency}
                 translate={translate}
-                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount}
+                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
+                  articleItems,
+                )}
                 discountValue={discountValue}
                 subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
                 percentageVats={vats}

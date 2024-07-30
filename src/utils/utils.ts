@@ -3,8 +3,8 @@ import BigNumber from 'bignumber.js';
 import * as Yup from 'yup';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import lodash from 'lodash';
-import useHighlightText from '../hooks/useHighlightText';
 import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
+import useHighlightText from '../hooks/useHighlightText';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
