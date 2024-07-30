@@ -117,6 +117,7 @@ export const getListViewFrequency = (
           break;
         case ContractTimeUnit.WEEKLY:
         case ContractTimeUnit.BIWEEKLY:
+        case ContractTimeUnit.TRIWEEKLY:
         case ContractTimeUnit.ANNUALLY:
         case ContractTimeUnit.BIENNIALLY:
         case ContractTimeUnit.TRIENNIALLY:
