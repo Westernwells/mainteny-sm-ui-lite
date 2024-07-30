@@ -336,28 +336,30 @@ export const DraftQuotation = ({
   }
 
   const getFormattedPaymentTerms = (paymentTerm: ContractTermView) => {
-    const discountOptions =
-      paymentTerm.data?.discountOptions
-        .map((d) => {
-          const discountDays = d.discountDays || 0;
-          const discountPercentage = d.discountPercent || 0;
+    const discountOptions = paymentTerm.data?.discountOptions
+      .map((d) => {
+        const discountDays = d.discountDays || 0;
+        const discountPercentage = d.discountPercent || 0;
 
-          if (discountDays === 0 && discountPercentage === 0) {
-            return paymentTerm.term || '';
-          }
+        if (discountDays === 0 && discountPercentage === 0) {
+          return '';
+        }
 
-          return t(
-            'If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.',
-            {
-              discountDays,
-              discountPercentage,
-              lng: companyLanguage,
-            },
-          );
-        })
-        .join('\n') || '';
+        return t(
+          'If payment is made within {{discountDays}} days, we grant a discount of {{discountPercentage}}% of the invoice amount.',
+          {
+            discountDays,
+            discountPercentage,
+            lng: companyLanguage,
+          },
+        );
+      })
+      .filter((option) => option !== '') // Filter out empty strings
+      .join('\n');
 
-    return `${paymentTerm.term}\n${discountOptions}`;
+    return discountOptions
+      ? `${paymentTerm.term}\n${discountOptions}`
+      : paymentTerm.term;
   };
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
