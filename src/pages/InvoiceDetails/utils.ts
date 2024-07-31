@@ -140,6 +140,7 @@ export const formatInvoiceRecord = (
     },
   }),
   showArticleSection: value.showArticleSection,
+  elevatorExternalId: value.elevatorExternalId,
 });
 
 export const applyDiscount = ({
@@ -358,7 +359,7 @@ export const formatInvoiceViewToUpdateInvoice = (
     type,
   } = invoiceView;
 
-  const {payment, discount} = additionalInfo || {};
+  const {payment, discount, elevatorExternalId} = additionalInfo || {};
 
   const updateInvoice: Record<string, any> = {
     serviceOrderId: serviceOrder?.id,
@@ -465,6 +466,7 @@ export const formatInvoiceViewToUpdateInvoice = (
     showArticleSection: additionalInfo?.showArticleSection,
     alternativeServiceCompanyInfo: additionalInfo.alternativeServiceCompanyInfo,
     serviceCompanyId: serviceCompany.id,
+    elevatorExternalId,
   };
 
   return removeUndefinedAndEmptyValues(updateInvoice) as UpdateInvoice;

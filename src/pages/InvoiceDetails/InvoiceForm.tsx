@@ -805,6 +805,10 @@ export const InvoiceForm = ({
       setServiceOrder(invoice.serviceOrder);
       setCustomer(invoiceCustomer);
 
+      formik.setFieldValue(
+        'elevatorExternalId',
+        invoice.additionalInfo.elevatorExternalId ?? '',
+      );
       formik.setFieldValue('description', invoice?.description ?? '');
       formik.setFieldValue('propertyOwnerId', invoiceCustomer?.id ?? '');
       formik.setFieldValue(
@@ -894,6 +898,7 @@ export const InvoiceForm = ({
   useEffect(() => {
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
+
       if (!formik.values.description && serviceOrder.report?.description) {
         formik.setFieldValue(
           'description',
@@ -909,6 +914,13 @@ export const InvoiceForm = ({
         'unitNumber',
         serviceOrder?.elevator.externalId || '-',
       );
+
+      if (!formik.values.elevatorExternalId) {
+        formik.setFieldValue(
+          'elevatorExternalId',
+          serviceOrder?.elevator.externalId || '-',
+        );
+      }
       formik.setFieldValue(
         'deliveryStartDate',
         serviceOrder?.actualStartTime
@@ -2157,18 +2169,20 @@ export const InvoiceForm = ({
             </Box>
             <FormInput
               fieldProps={{
-                id: 'unitNumber',
-                name: 'unitNumber',
+                id: 'elevatorExternalId',
+                name: 'elevatorExternalId',
                 label: 'Unit Number',
-                value: formik.values.unitNumber,
+                value: formik.values.elevatorExternalId,
                 onChange: formik.handleChange,
                 onBlur: formik.handleBlur,
                 error: !!(
-                  formik.touched.unitNumber && formik.errors.unitNumber
+                  formik.touched.elevatorExternalId &&
+                  formik.errors.elevatorExternalId
                 ),
                 helperText:
-                  formik.touched.unitNumber && formik.errors.unitNumber,
-                disabled: true,
+                  formik.touched.elevatorExternalId &&
+                  formik.errors.elevatorExternalId,
+                disabled: false,
               }}
             />
             <Box

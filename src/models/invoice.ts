@@ -114,6 +114,7 @@ export interface InvoiceAdditionalInfo {
   paymentTerm?: InvoicePaymentTermRecord & {
     data?: PaymentTermData;
   };
+  elevatorExternalId?: string;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -363,6 +364,7 @@ export interface InvoiceFormData {
   deliveryEndDate?: Date;
   showArticleSection?: boolean;
   notes?: CreateInvoiceComment[];
+  elevatorExternalId?: string;
 }
 
 export interface CreateInvoice {
@@ -438,6 +440,7 @@ export interface UpdateInvoice {
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
+  elevatorExternalId?: string;
 }
 
 export interface QueryInvoiceCommentsParams {
