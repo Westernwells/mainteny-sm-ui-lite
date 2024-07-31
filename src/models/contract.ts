@@ -207,6 +207,7 @@ export interface ContractView {
   end: string;
   startTime?: string;
   endTime?: string;
+  numberOfElevators?: number;
 }
 export interface ContractSimpleView {
   id: string;
