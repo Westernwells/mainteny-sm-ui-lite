@@ -68,6 +68,7 @@ import {
   RefetchOptions,
   RefetchQueryFilters,
 } from 'react-query';
+import {stripHtmlTags} from 'utils/text-block';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -778,7 +779,7 @@ export const ViewQuotation = ({
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
           quotation?.elevator?.propertyOwner?.contact.email
         }
-        subject={quotation.subject}
+        subject={stripHtmlTags(quotation.subject)}
         content={quotation.description}
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}
@@ -812,7 +813,7 @@ export const ViewQuotation = ({
               sentDate: '',
               email: {
                 email: '',
-                subject: emailRecord.subject,
+                subject: stripHtmlTags(emailRecord.subject),
                 content: emailRecord.content,
                 emails: emailRecord.emails,
                 ccEmails: emailRecord.ccEmails,
