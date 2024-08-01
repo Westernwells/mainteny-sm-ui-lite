@@ -224,6 +224,9 @@ export interface ServiceCompanyUpdateBody {
   serviceOrderGenerationDaysInAdvance?: number;
   minToHourStep?: MinToStep | number;
   accountSystem?: AccountSystems;
+  accountantNumber?: string;
+  clientNumber?: string;
+  fiscalYearStart?: string;
 }
 
 export interface SystemSettingsUpdateBody {
