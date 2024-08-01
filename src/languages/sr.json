@@ -2654,5 +2654,11 @@
   "Pick your month(s)": "Izaberite mesec(e)",
   "Every 1 week": "Svake 1 nedelje",
   "Every 3 weeks": "Svake 3 nedelje",
-  "Every 1 year": "Svake 1 godine"
+  "Every 1 year": "Svake 1 godine",
+  "Accountant number": "Broj računovođe",
+  "Client number": "Broj klijenta",
+  "Start of fiscal year": "Početak fiskalne godine",
+  "Reference number of your external accountant. If not available please ask your accountant.": "Referentni broj vašeg spoljnog računovođe. Ako nije dostupno, pitajte svog računovođu.",
+  "Your accounting client number. If not available please ask your accountant.": "Broj vašeg klijenta za računovodstvo. Ako nije dostupno, pitajte svog računovođu.",
+  "When does your company's fiscal year start? This can be different from the beginning of the calendar year.": "Kada počinje fiskalna godina vaše kompanije? Ovo može biti drugačije od početka kalendarske godine."
 }
