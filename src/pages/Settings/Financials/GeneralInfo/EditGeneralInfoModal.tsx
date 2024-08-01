@@ -5,6 +5,8 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {AccountSystems, ServiceCompanyUpdateBody} from 'models/service-company';
 import {useCurrentCurrency} from 'utils/currency';
+import {DatePicker} from 'components/DatePicker';
+import {useState} from 'react';
 
 export type Props = {
   form: UseFormReturn<Partial<ServiceCompanyUpdateBody>>;
@@ -12,6 +14,8 @@ export type Props = {
 
 export const EditGeneralInfoModal = ({form}: Props) => {
   const currentCurrency = useCurrentCurrency();
+  const [resetfiscalYearStartPicker, setResetfiscalYearStartPicker] =
+    useState(false);
 
   return (
     <Grid container rowGap={3}>
@@ -72,6 +76,53 @@ export const EditGeneralInfoModal = ({form}: Props) => {
             value: currentCurrency.code,
             disabled: true,
           }}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <FormInput
+          fieldProps={{
+            size: 'small',
+            placeholder: 'e.g. 123456789',
+            label: 'Accountant number',
+            required: false,
+            ...form.register('accountantNumber', {required: false}),
+          }}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <FormInput
+          fieldProps={{
+            size: 'small',
+            placeholder: 'e.g. 123456789',
+            label: 'Client number',
+            required: false,
+            ...form.register('clientNumber', {required: false}),
+          }}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <DatePicker
+          defaultDate={
+            form.getValues().fiscalYearStart
+              ? new Date(form.getValues().fiscalYearStart!)
+              : null
+          }
+          reset={resetfiscalYearStartPicker}
+          getReset={(_reset) => {
+            if (_reset) {
+              setResetfiscalYearStartPicker(false);
+            }
+          }}
+          errorMessage={form.getFieldState('fiscalYearStart').error?.message}
+          getSelectedDate={(newValue) => {
+            if (newValue) {
+              form.setValue('fiscalYearStart', newValue.toISOString());
+            }
+          }}
+          textFieldProps={{
+            label: 'Start of the fiscal year',
+          }}
+          required
         />
       </Grid>
     </Grid>
