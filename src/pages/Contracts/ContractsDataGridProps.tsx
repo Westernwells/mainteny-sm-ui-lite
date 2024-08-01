@@ -108,7 +108,7 @@ export const makeRows = (
         id: index,
         [ContractOrderField.EXTERNAL_ID]: item.externalId || '-',
         [ContractOrderField.PROPERTY_OWNER_NAME]: item.propertyOwner.name,
-        [ContractOrderField.NUMBER_OF_ELEVATOR]: item.elevators.length,
+        [ContractOrderField.NUMBER_OF_ELEVATOR]: item.numberOfElevators,
         [ContractOrderField.START_TIME]: item.start
           ? formatDate(toDate(item.start))
           : '-',

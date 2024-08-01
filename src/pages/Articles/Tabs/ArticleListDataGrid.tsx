@@ -32,7 +32,7 @@ import DOMPurify from 'dompurify';
 import {
   hasMultipleParagraphs,
   returnFirstParagraph,
-} from '../../../utils/rich-text-field-utils';
+} from '../../../utils/rich-text-field';
 
 export const columns: GridColDef[] = [
   getColumnProps({

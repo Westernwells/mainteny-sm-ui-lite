@@ -14,7 +14,7 @@ import {NoRowsEmptySection} from './DataGrid/NoRowsEmptySection';
 import {
   hasMultipleParagraphs,
   returnFirstParagraph,
-} from '../utils/rich-text-field-utils';
+} from '../utils/rich-text-field';
 
 interface Props {
   setRowItem: (row: ArticleView) => void;

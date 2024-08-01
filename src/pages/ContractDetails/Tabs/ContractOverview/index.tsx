@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -76,8 +76,7 @@ const isExternalIdUnique = async (resource: ContractView[], value?: string) => {
     return true;
   }
 };
-
-export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
+export const ContractOverview = ({contractDetails, isLoading}: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const currency = contractDetails?.currency ?? currentCurrency.code;
@@ -416,7 +415,7 @@ export const ContractOverview: FC<Props> = ({contractDetails, isLoading}) => {
                 ) || '-'
               }
               renewalPeriod={contractDetails?.additionalInfo?.renewalTerms}
-              numberOfUnits={contractDetails?.elevators?.length}
+              numberOfUnits={contractDetails?.numberOfElevators}
               name={contractDetails?.name}
               yearlyPriceAdjustment={
                 contractDetails?.additionalInfo?.annualPriceAdjustmentPercentage

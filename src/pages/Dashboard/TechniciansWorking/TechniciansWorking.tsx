@@ -13,24 +13,31 @@ import {getEmployeeStatus} from 'utils/work-hours-utils';
 import {Resource} from 'models/misc';
 import {EmployeeStatus, EmployeeStatusView} from 'models/employee';
 import {useTranslation} from 'react-i18next';
-import {DashboardInfoCard} from './DashboardInfoCard';
+import {DashboardInfoCard} from '../DashboardInfoCard';
 
-export const TechniciansWorking = ({
-  technicians,
-}: {
+export type Props = {
   technicians: Resource<EmployeeStatusView>;
-}) => {
+  workingNumberOfTechnicians?: number;
+  isLoadingEmployeeSummary: boolean;
+};
+
+const TechniciansWorking = ({
+  technicians,
+  workingNumberOfTechnicians,
+  isLoadingEmployeeSummary,
+}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   return (
     <DashboardInfoCard
       title="Technicians working"
-      chipLabel={`${technicians.total}`}
+      chipLabel={`${workingNumberOfTechnicians}`}
       seeMorePath="/employees"
       emptySection={{
-        show: !technicians.total,
+        show: !workingNumberOfTechnicians && !isLoadingEmployeeSummary,
         label: 'No working technicians.',
       }}
+      showChip={!isLoadingEmployeeSummary}
       bodyContainerStyle={{
         height: '100%',
       }}>
@@ -90,3 +97,5 @@ export const TechniciansWorking = ({
     </DashboardInfoCard>
   );
 };
+
+export default TechniciansWorking;
