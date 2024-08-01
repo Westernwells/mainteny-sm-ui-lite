@@ -28,7 +28,7 @@ import {
   getActiveFontSize,
   toggleBlock,
   toggleMark,
-} from 'utils/rich-text-field-utils';
+} from 'utils/rich-text-field';
 import {FONT_SIZE, FORMAT} from 'models/richTextField';
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({theme: t}) => ({

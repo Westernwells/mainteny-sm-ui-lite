@@ -1,7 +1,7 @@
 import {Html, HtmlStyle, HtmlStyles} from 'react-pdf-html';
 import {grey} from '@mui/material/colors';
 import {DEFAULT_HTML_PDF_FONT_SIZE} from 'models/richTextField';
-import {modifyHTMLFontSizeForPDFRendering} from 'utils/rich-text-field-utils';
+import {modifyHTMLFontSizeForPDFRendering} from 'utils/rich-text-field';
 
 export const HtmlPDF = ({
   html,

@@ -3,6 +3,8 @@ import {
   EmployeeStatusView,
   EmployeesView,
   QueryServiceCompanyEmployeeStatusParams,
+  WorkingEmployeesSummary,
+  WorkingEmployeeSummaryRequest,
 } from 'models/employee';
 import {Resource, StringValue} from 'models/misc';
 import {
@@ -10,6 +12,7 @@ import {
   useQuery,
   useQueryClient,
   UseQueryOptions,
+  UseQueryResult,
 } from 'react-query';
 import {queryKeys as qks} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -57,6 +60,35 @@ export const useQueryServiceCompanyEmployeeStatus = (
     {
       enabled: !!user,
       ...options,
+    },
+  );
+};
+
+export const getWorkingEmployeeSummary = async (
+  serviceCompanyId: string,
+  params: WorkingEmployeeSummaryRequest,
+) => {
+  const response = await axiosClient.get<WorkingEmployeesSummary>(
+    `/api/serviceCompanies/${serviceCompanyId}/workSummary`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useWorkingEmployeeSummary = (
+  params: WorkingEmployeeSummaryRequest,
+): UseQueryResult<WorkingEmployeesSummary> => {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  return useQuery<WorkingEmployeesSummary>(
+    [qks.getWorkingTechnicians, serviceCompanyId, params],
+    () => getWorkingEmployeeSummary(serviceCompanyId!, params),
+    {
+      enabled: !!user,
     },
   );
 };

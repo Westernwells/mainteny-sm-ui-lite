@@ -36,7 +36,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {AddAnything} from './AddAnything';
 import {TopCard} from './TopCard';
-import {TechniciansWorking} from './TechniciansWorking';
+import TechniciansWorking from './TechniciansWorking';
 import {AppointmentsToBeScheduled} from './AppointmentsToBeScheduled';
 import {OpenQuotations} from './OpenQuotations';
 import {InvoiceDrafts} from './InvoiceDrafts';
@@ -112,6 +112,7 @@ export const Dashboard = () => {
     pageSize: 5,
     roles: [Role.TECHNICIAN],
   });
+
   const {
     data: activities = {
       pages: [],

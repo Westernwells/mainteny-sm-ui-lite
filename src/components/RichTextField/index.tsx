@@ -26,11 +26,7 @@ import {
   RenderElementProps,
   RenderLeafProps,
 } from 'models/richTextField';
-import {
-  deserialize,
-  handleKeyDown,
-  serialize,
-} from 'utils/rich-text-field-utils';
+import {deserialize, handleKeyDown, serialize} from 'utils/rich-text-field';
 import {HoveringToolbar} from './HoveringToolbar';
 import {isPlainString} from '../../utils/rich-field-string';
 
