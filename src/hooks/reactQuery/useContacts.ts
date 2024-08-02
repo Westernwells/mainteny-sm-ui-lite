@@ -31,7 +31,7 @@ import {
 } from 'models/contract';
 import {Page, Resource, RestError, StringValue} from 'models/misc';
 import {Comment, CommentRecord} from 'models/comment';
-import {AxiosError} from 'axios/index';
+import {AxiosError} from 'axios';
 import {useUserSession} from './useUserSession';
 
 const fetchContractElevators = async (

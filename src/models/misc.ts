@@ -61,6 +61,7 @@ export interface Settings {
   contractTypes: ContractTypes;
   contractNameTypes: ContractNameTypes[];
   serviceOrderGenerationEnabled?: boolean;
+  invoiceQRCodeEnabled?: boolean;
   contractInvoiceGenerationEnabled?: boolean;
   isContractInvoiceGenerationEnabled?: boolean;
   serviceOrderGenerationDaysInAdvance?: number;

@@ -90,6 +90,7 @@ import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf'
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import DOMPurify from 'dompurify';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -1107,9 +1108,12 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     capitalizeText
                   />
                 </Box>
-                <Typography variant="caption">
-                  {serviceOrder?.description}
-                </Typography>
+                <Typography
+                  variant="caption"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(serviceOrder?.description),
+                  }}
+                />
               </Box>
             </PageCard>
           )}

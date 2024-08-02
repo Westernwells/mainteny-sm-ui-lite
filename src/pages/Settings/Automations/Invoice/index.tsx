@@ -26,6 +26,7 @@ const Invoice = ({company, containerStyles}: Props) => {
         (company.settings.contractInvoiceGenerationEnabled ||
           company.settings.isContractInvoiceGenerationEnabled) ??
         false,
+      invoiceQRCodeEnabled: company.settings.invoiceQRCodeEnabled ?? false,
     },
     onSubmit: () => {},
   });
@@ -78,6 +79,41 @@ const Invoice = ({company, containerStyles}: Props) => {
             onChanged={async (value) => {
               await handleSave({contractInvoiceGenerationEnabled: value});
               formik.setFieldValue('contractInvoiceGenerationEnabled', value);
+            }}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              flex: '0 0 80%',
+              display: 'flex',
+              alignItems: 'center',
+            }}>
+            {t('Add a QR page to the invoice')}:
+            <Tooltip
+              title={t(
+                'A new page will be appended to your invoice, there you’ll find the QR code.',
+              )}
+              placement="top"
+              arrow>
+              <Box sx={{ml: 0.5, mb: -0.7}}>
+                <AlertInfoIcon width="16px" height="16px" />
+              </Box>
+            </Tooltip>
+          </Typography>
+
+          <Switch
+            value={formik.values.invoiceQRCodeEnabled}
+            onChanged={async (value) => {
+              await handleSave({invoiceQRCodeEnabled: value});
+              formik.setFieldValue('invoiceQRCodeEnabled', value);
             }}
           />
         </Box>
