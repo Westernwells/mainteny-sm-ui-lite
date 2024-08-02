@@ -227,7 +227,8 @@ export const getDiscoutObj = (discount?: Discount) =>
     ? {
         ...discount,
         type:
-          discount?.type === DiscountType.NONE
+          discount?.type === DiscountType.NONE ||
+          discount.type === DiscountType.PERCENTAGE
             ? DiscountType.PERCENTAGE
             : discount?.type,
         amount: discount?.amount
@@ -238,5 +239,10 @@ export const getDiscoutObj = (discount?: Discount) =>
                 10 ** (discount.amount.fractionDigits ?? 2),
             }
           : undefined,
+        percentage:
+          discount?.type === DiscountType.NONE ||
+          discount.type === DiscountType.PERCENTAGE
+            ? discount?.percentage || 0
+            : undefined,
       }
     : undefined;

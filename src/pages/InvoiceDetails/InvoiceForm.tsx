@@ -80,7 +80,6 @@ import {
 } from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
-  capitalize,
   companyLanguageContextMap,
   createFilesFromBlobArray,
   dateToString,
@@ -286,13 +285,8 @@ export const InvoiceForm = ({
   const currentCurrency = useCurrentCurrency();
   const {enqueueSnackbar} = useSnackbar();
 
-  const [updatedInvoiceId, setUpdatedInvoiceId] = useState<string>('');
-  const [emailRecord, setEmailRecord] = useState<EmailRecord | null>(null);
-
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
-
-  const {data: updatedInvoice, isFetched} = useInvoiceDetail(updatedInvoiceId);
 
   const {
     data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
@@ -936,7 +930,10 @@ export const InvoiceForm = ({
       if (serviceOrder?.additionalInfo.discount) {
         formik.setFieldValue(
           'discount',
-          getDiscoutObj(serviceOrder?.additionalInfo.discount),
+          getDiscoutObj(
+            invoice?.additionalInfo.discount ||
+              serviceOrder?.additionalInfo.discount,
+          ),
         );
       }
       if (!formik.values.items.length) {
