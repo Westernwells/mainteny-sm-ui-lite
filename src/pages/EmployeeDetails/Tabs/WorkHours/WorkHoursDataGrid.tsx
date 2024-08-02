@@ -189,6 +189,7 @@ export const makeRows = (
           </Typography>
         ),
         description: item.description || '-',
+        type: item.type,
         orderType: (
           <Box display="flex" alignItems="center">
             <Box mr="1em">

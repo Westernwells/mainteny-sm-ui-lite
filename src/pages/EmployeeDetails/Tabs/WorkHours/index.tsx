@@ -130,8 +130,8 @@ const WorkHoursTab = ({employeeId}: Props) => {
         pageCount={pageCount}
         totalRows={workHours.total}
         onRowClick={(row) => {
-          const {orderId} = row.row;
-          if (orderId !== '') {
+          const {orderId, type} = row.row;
+          if (orderId !== '' && type.startsWith('SERVICE_ORDER_')) {
             navigate(`/orders/details/${orderId}`);
           }
         }}
