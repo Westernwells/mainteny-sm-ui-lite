@@ -33,15 +33,13 @@ import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
 import {DatePicker} from 'components/DatePicker';
 import {FormInput} from 'components/form/FormInput';
 import {
+  calculateContractInvoicePriceTotal,
   ContractComponentElevator,
   ContractServiceForm,
   ContractServiceFormElevator,
   UpdateContractComponents,
 } from 'models/contract';
-import {
-  calculateFormContractInvoicePriceTotal,
-  componentsToMutate,
-} from 'utils/contract-utils';
+import {componentsToMutate} from 'utils/contract';
 import {theme} from 'theme';
 import {Switch} from 'components/Switch';
 import {FormikProps, getIn} from 'formik';
@@ -1138,7 +1136,7 @@ export const MutationService = ({
               }}>
               <Typography variant="h6">
                 {formatCurrency(
-                  calculateFormContractInvoicePriceTotal(
+                  calculateContractInvoicePriceTotal(
                     formikContractServiceComponent.values.elevators,
                   ) /
                     10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,

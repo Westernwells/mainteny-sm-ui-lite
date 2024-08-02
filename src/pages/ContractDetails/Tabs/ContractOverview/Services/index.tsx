@@ -11,7 +11,6 @@ import {
   ContractComponentView,
   ContractServiceForm,
   ContractView,
-  calculateContractInvoicePriceTotal,
 } from 'models/contract';
 import {EmptySection} from 'components/EmptySection';
 import Divider from '@mui/material/Divider';
@@ -33,10 +32,9 @@ import {Confirm} from 'components/Confirm';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {
   componentsToMutate,
-  calculateContractInvoicePriceGrandTotal,
   parsElevatorRecourses,
   mergeElevators,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {Dialog} from 'components/Dialog';
@@ -411,9 +409,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                       variant="body2">
                       {' '}
                       {formatCurrency(
-                        calculateContractInvoicePriceTotal(
-                          row.additionalInfo.elevators || [],
-                        ) /
+                        row.additionalInfo.yearlyPrice /
                           10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                         {
                           currency: currentCurrency.code,
@@ -474,9 +470,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                   }}>
                   <Typography variant="h6">
                     {formatCurrency(
-                      calculateContractInvoicePriceGrandTotal(
-                        contractDetails.components,
-                      ) /
+                      (contractDetails.additionalInfo.totalYearlyPrice ?? 0) /
                         10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                       {
                         currency: currentCurrency.code,

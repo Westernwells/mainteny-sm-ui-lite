@@ -36,7 +36,7 @@ import {
   calculateContractInvoicePriceGrandTotal,
   parsElevatorRecourses,
   mergeElevators,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {Dialog} from 'components/Dialog';

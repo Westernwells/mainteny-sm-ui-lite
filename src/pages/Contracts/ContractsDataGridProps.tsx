@@ -4,7 +4,7 @@ import {formatCurrency} from 'utils/currency';
 import {FormatDate} from 'models/misc';
 import {ContractOrderField, ContractView} from 'models/contract';
 import {StatusChip} from 'components/StatusChip';
-import {getContractStatusStyles} from 'utils/contract-utils';
+import {getContractStatusStyles} from 'utils/contract';
 import {toDate} from 'utils/datetime';
 import {Actions} from './Actions';
 
