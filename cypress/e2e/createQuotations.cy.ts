@@ -1,25 +1,18 @@
 import {addDays} from 'date-fns';
 import AppTopBarPage from '../pages/appTopBar.page';
-import LoginPage from '../pages/login.page';
 import QuotationPage from '../pages/quotation.page';
 
 describe('Create Quotation', () => {
     beforeEach(() => {
-        LoginPage.visitLoginPage();
-        const loginURL = `${Cypress.env().REACT_APP_API_URL}/api/sessions/login`;
-        cy.intercept('POST', loginURL).as('loginApi');
-        LoginPage.login();
+        cy.login();
 
-        cy.wait('@loginApi').then(() => {
-            AppTopBarPage.selectLanguage('English');
+        AppTopBarPage.selectLanguage('English');
 
-            const addressURL = 'https://maps.googleapis.com/maps/api/place/js/AutocompletionService.GetPredictionsJson?*';
+        const addressURL = 'https://maps.googleapis.com/maps/api/place/js/AutocompletionService.GetPredictionsJson?*';
+        cy.intercept('GET', addressURL).as('addressURLApi');
 
-            cy.intercept('GET', addressURL).as('addressURLApi');
-
-            QuotationPage.visit();
-            QuotationPage.openNewQuotation();
-        });
+        QuotationPage.visit();
+        QuotationPage.openNewQuotation();
     });
 
     it('should add new customer on quotation page', () => {
@@ -109,5 +102,47 @@ describe('Create Quotation', () => {
         cy.contains('Submit').click();
         cy.wait('@createJobAPI');
         cy.contains('Order scheduled successfully');
+    });
+
+    it('should check payment terms are adding properly', () => {
+        const getRichTextField = () => cy.get('div[data-testid="payment-terms-rich-text-field"]');
+        const openPaymentTermsDialog = () => getRichTextField().find('svg[data-testid="TextSnippetIcon"]').click();
+
+        // check payment terms without discount
+        openPaymentTermsDialog();
+        cy.get('div[role="presentation"] label:has(p:only-child)')
+            .first()
+            .click()
+            .then(($label) => {
+                const paymentTerm = $label.text();
+                cy.contains('button', 'Confirm').click();
+                getRichTextField().find('div[role="textbox"]').invoke('text').should('contain', paymentTerm);
+            });
+
+        // check payment terms with discount
+        openPaymentTermsDialog();
+        cy.get('div[role="presentation"] label:has(p:nth-of-type(3))')
+            .first()
+            .click()
+            .then(($label) => {
+                cy.contains('button', 'Confirm').click();
+
+                const paymentTermName = $label.find('h6').text();
+                const discount1 = $label.find('p').eq(0).text();
+                const discount2 = $label.find('p').eq(1).text();
+                const discounts = [discount1, discount2].map((d) => {
+                    const [days, discountPercentage] = d.split(';').map((part) => part.trim().split(' ')[0]);
+                    return {days, discountPercentage};
+                });
+
+                const discountsText = discounts
+                    .map(
+                        ({days, discountPercentage}) =>
+                            `Bei Zahlung innerhalb von ${days} Tagen erhalten Sie ${discountPercentage} Skonto auf den Rechnungsbetrag.`,
+                    )
+                    .join('\n');
+
+                getRichTextField().find('div[role="textbox"]').invoke('text').should('contain', `${paymentTermName}\n${discountsText}`);
+            });
     });
 });

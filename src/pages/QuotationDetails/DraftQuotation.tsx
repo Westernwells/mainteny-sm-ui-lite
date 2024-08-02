@@ -1156,6 +1156,7 @@ export const DraftQuotation = ({
             />
 
             <RichTextField
+              data-testid="payment-terms-rich-text-field"
               label="Payment terms"
               html={formik.values.paymentTerms || ''}
               updateHtml={(h) => formik.setFieldValue('paymentTerms', h)}
