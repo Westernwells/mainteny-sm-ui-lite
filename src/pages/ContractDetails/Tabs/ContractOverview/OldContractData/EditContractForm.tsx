@@ -10,7 +10,7 @@ import {FormikProps} from 'formik';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {FormSelect} from 'components/form/FormSelect';
 import {getCurrencySymbol} from 'utils/currency';
-import {invoiceCycle} from 'utils/contract-utils';
+import {invoiceCycle} from 'utils/contract';
 import {DatePicker} from 'components/DatePicker';
 import {format, getMonth, getYear} from 'date-fns';
 import {toDate} from 'utils/datetime';

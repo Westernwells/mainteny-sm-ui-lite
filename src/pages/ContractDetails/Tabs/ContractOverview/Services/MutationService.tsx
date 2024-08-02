@@ -39,11 +39,9 @@ import {
   UpdateContractComponents,
   ContractTimeUnit,
   ContractComponentElevator,
+  calculateContractInvoicePriceTotal,
 } from 'models/contract';
-import {
-  calculateFormContractInvoicePriceTotal,
-  componentsToMutate,
-} from 'utils/contract-utils';
+import {componentsToMutate} from 'utils/contract';
 import {theme} from 'theme';
 import {Switch} from 'components/Switch';
 import {FormikProps, getIn} from 'formik';
@@ -1171,7 +1169,7 @@ export const MutationService = ({
               }}>
               <Typography variant="h6">
                 {formatCurrency(
-                  calculateFormContractInvoicePriceTotal(
+                  calculateContractInvoicePriceTotal(
                     formikContractServiceComponent.values.elevators,
                   ) /
                     10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,

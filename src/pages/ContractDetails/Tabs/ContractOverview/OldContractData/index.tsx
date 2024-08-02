@@ -41,7 +41,7 @@ import {
   calculateRenewDays,
   contractTypeMap,
   invoiceCycle,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import Tooltip from '@mui/material/Tooltip';
 import {formatDate} from 'utils/datetime';

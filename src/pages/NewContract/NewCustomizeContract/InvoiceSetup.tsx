@@ -32,7 +32,7 @@ import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import {
   canGroupServices,
   convertExtendedRecordsToContractComponentRecords,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {getListViewFrequency} from 'utils/elevator-utils';
 

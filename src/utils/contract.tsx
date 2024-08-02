@@ -319,49 +319,6 @@ export const getElevatorDataByElevator = (
   );
 };
 
-export const calculateFormContractInvoicePriceTotal = (
-  array?: ContractComponentElevator[],
-) => {
-  let totalPrice: number = 0;
-  array?.forEach((item: ContractComponentElevator) => {
-    let timeLength: number = 0;
-    if (item.invoiceJob && item.isChecked) {
-      const invoiceTimeUnit: string = item.invoiceJob.timeUnit;
-      const orderTimeUnit: string = item.orderGenerationJob.timeUnit;
-      if (invoiceTimeUnit === ContractTimeUnit.MONTHLY) {
-        timeLength = item.invoiceJob.timeNumbers
-          ? item.invoiceJob.timeNumbers.length
-          : 0;
-      } else if (
-        invoiceTimeUnit === ContractTimeUnit.ANNUALLY ||
-        invoiceTimeUnit === ContractTimeUnit.BIENNIALLY ||
-        invoiceTimeUnit === ContractTimeUnit.TRIENNIALLY ||
-        invoiceTimeUnit === ContractTimeUnit.QUADRENNIALLY
-      ) {
-        timeLength = 1;
-      } else if (invoiceTimeUnit === ContractTimeUnit.NONE) {
-        if (orderTimeUnit === ContractTimeUnit.MONTHLY) {
-          timeLength = item.orderGenerationJob.timeNumbers
-            ? item.orderGenerationJob.timeNumbers.length
-            : 0;
-        } else if (orderTimeUnit === ContractTimeUnit.WEEKLY) {
-          timeLength = 50;
-        } else if (orderTimeUnit === ContractTimeUnit.BIWEEKLY) {
-          timeLength = 25;
-        } else if (orderTimeUnit === ContractTimeUnit.NONE) {
-          timeLength = 0;
-        }
-      }
-    }
-    if (timeLength > 0) {
-      const itemPrice: number = item.price;
-      const itemTotalPrice: number = timeLength * itemPrice;
-      totalPrice += itemTotalPrice;
-    }
-  });
-  return totalPrice;
-};
-
 /**
  * Checks if services can be grouped for invoicing based on specific criteria.
  *

@@ -23,7 +23,7 @@ import {useCurrentCurrency} from 'utils/currency';
 import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useTranslation} from 'react-i18next';
 import {Order, OrderByParams} from 'models/misc';
