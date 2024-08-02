@@ -89,6 +89,8 @@
     "slate-hyperscript": "^0.100.0",
     "slate-react": "^0.102.0",
     "supercluster": "^7.1.5",
+    "svg-parser": "^2.0.4",
+    "swissqrbill": "^4.0.2",
     "use-supercluster": "^0.4.0",
     "vite-plugin-env-compatible": "^2.0.1",
     "yup": "^0.32.11",
