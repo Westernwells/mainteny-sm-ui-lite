@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {t} from 'i18next';
-import {Typography, Grid, Box, IconButton} from '@mui/material';
-import {EditOutlined} from '@mui/icons-material';
+import {Typography, Grid, Box, IconButton, Tooltip} from '@mui/material';
+import {EditOutlined, InfoOutlined} from '@mui/icons-material';
 import {
   AccountSystems,
   ServiceCompanyItem,
@@ -11,10 +11,52 @@ import {
 import {useCurrentCurrency} from 'utils/currency';
 import {Dialog} from 'components/Dialog';
 import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
+import {toRestDate} from 'utils/datetime';
 import {EditGeneralInfoModal} from './EditGeneralInfoModal';
 
 type Props = {
   company: ServiceCompanyItem;
+};
+
+const GeneralInfoItemLabel = ({
+  label,
+  toolTip,
+}: {
+  label: string;
+  toolTip?: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Grid item xs={6}>
+      <Box display="flex" alignItems="center">
+        <Typography variant="body2" color="text.secondary">
+          {t(label)}
+        </Typography>
+        {!!toolTip && (
+          <Tooltip
+            onOpen={() => {
+              setIsOpen(true);
+            }}
+            onClose={() => {
+              setIsOpen(false);
+            }}
+            title={t(toolTip)}
+            placement="right"
+            arrow>
+            <IconButton
+              sx={{
+                color: isOpen ? 'action.active' : 'secondary.mainLight',
+                p: 0,
+                ml: 0.5,
+              }}>
+              <InfoOutlined fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+    </Grid>
+  );
 };
 
 const GeneralInfo = ({company}: Props) => {
@@ -27,13 +69,21 @@ const GeneralInfo = ({company}: Props) => {
     defaultValues: {
       vatId: company?.settings?.vatId || '',
       taxNumber: company?.settings?.taxNumber || '',
+      fiscalYearStart: company.settings.fiscalYearStart,
+      accountantNumber: company.settings.accountantNumber,
+      clientNumber: company.settings.clientNumber,
     },
   });
 
   const handleSave = (data: Partial<ServiceCompanyUpdateBody>) =>
     updateCompany(
       {
-        body: data,
+        body: {
+          ...data,
+          fiscalYearStart: data.fiscalYearStart
+            ? toRestDate(new Date(data.fiscalYearStart))
+            : data.fiscalYearStart,
+        },
         companyId: company?.id || '',
       },
       {
@@ -101,6 +151,33 @@ const GeneralInfo = ({company}: Props) => {
           <Grid item xs={6} textAlign="right">
             <Typography variant="subtitle2">
               {`${currentCurrency.symbol} - ${currentCurrency.code}`}
+            </Typography>
+          </Grid>
+          <GeneralInfoItemLabel
+            label="Accountant number"
+            toolTip="Reference number of your external accountant. If not available please ask your accountant."
+          />
+          <Grid item xs={6} textAlign="right">
+            <Typography variant="subtitle2">
+              {company.settings.accountantNumber ?? '-'}
+            </Typography>
+          </Grid>
+          <GeneralInfoItemLabel
+            label="Client number"
+            toolTip="Your accounting client number. If not available please ask your accountant."
+          />
+          <Grid item xs={6} textAlign="right">
+            <Typography variant="subtitle2">
+              {company.settings.clientNumber ?? '-'}
+            </Typography>
+          </Grid>
+          <GeneralInfoItemLabel
+            label="Start of fiscal year"
+            toolTip="When does your company's fiscal year start? This can be different from the beginning of the calendar year."
+          />
+          <Grid item xs={6} textAlign="right">
+            <Typography variant="subtitle2">
+              {company.settings.fiscalYearStart ?? '-'}
             </Typography>
           </Grid>
         </Grid>

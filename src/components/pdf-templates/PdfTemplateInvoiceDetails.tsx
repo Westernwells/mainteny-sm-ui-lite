@@ -202,11 +202,11 @@ const PdfTemplateInvoiceDetails = ({
       )}
 
       <View style={{marginTop: 20}}>
-        {invoice?.serviceOrder?.elevator.externalId && (
+        {invoice?.additionalInfo.elevatorExternalId && (
           <View style={styles.rightAddressContent}>
             <Text style={styles.tag}>{translate('Unit no.')}</Text>
             <Text style={styles.tagContent}>
-              {invoice?.serviceOrder?.elevator.externalId}
+              {invoice?.additionalInfo.elevatorExternalId}
             </Text>
           </View>
         )}

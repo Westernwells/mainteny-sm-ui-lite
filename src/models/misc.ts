@@ -72,6 +72,9 @@ export interface Settings {
     maxMainUserCount: number;
   };
   expiryDate: string;
+  accountantNumber?: string;
+  clientNumber?: string;
+  fiscalYearStart?: string;
 }
 
 export interface Page {
