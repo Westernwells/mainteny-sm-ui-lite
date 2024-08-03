@@ -20,6 +20,7 @@ interface Props extends Partial<TimePickerProps<Date>> {
   cancel?: () => void;
   containerStyles?: {[key: string]: any};
   textFieldProps?: TextFieldProps;
+  inputTestId?: string;
   required?: boolean;
   resetValue?: Date;
   saveOnClose?: boolean;
@@ -30,6 +31,7 @@ export const TimePicker = ({
   getSelectedTime,
   containerStyles,
   textFieldProps,
+  inputTestId,
   minTime,
   maxTime,
   confirm,
@@ -249,6 +251,7 @@ export const TimePicker = ({
                 inputProps: {
                   type: 'input',
                   onClick: handleOpen,
+                  'data-testid': inputTestId,
                 },
               },
               inputAdornment: {

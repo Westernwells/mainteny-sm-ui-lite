@@ -54,7 +54,9 @@ export interface UserAccountSimpleView {
   roles: Role[];
   status: UserAccountStatus;
   contact: Contact;
-  meta: Meta;
+  title: string;
+  serviceCompanyId: string;
+  category: string;
 }
 
 export interface CreateUserAccountData {

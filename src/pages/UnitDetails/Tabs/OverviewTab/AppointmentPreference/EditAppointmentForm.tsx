@@ -16,7 +16,7 @@ interface Props {
   watch: UseFormWatch<AppointmentFormModel>;
   register: UseFormRegister<AppointmentFormModel>;
   setValue: UseFormSetValue<AppointmentFormModel>;
-  defaultValues: {openingHour: string; closingHour: string};
+  defaultValues: Partial<AppointmentFormModel>;
 }
 
 const daysOfWeekOptions = {
@@ -94,8 +94,11 @@ export const EditAppointmentForm = ({
           }}
           textFieldProps={{
             label: t('Opening hours start'),
-            ...register('openingHour'),
+            ...register('openingHour', {
+              required: 'Opening hours start is required',
+            }),
           }}
+          inputTestId="opening-hour-start"
         />
       </Grid>
 
@@ -121,8 +124,11 @@ export const EditAppointmentForm = ({
           }}
           textFieldProps={{
             label: t('Opening hours end'),
-            ...register('closingHour'),
+            ...register('closingHour', {
+              required: 'Opening hours end is required',
+            }),
           }}
+          inputTestId="opening-hour-end"
         />
       </Grid>
 

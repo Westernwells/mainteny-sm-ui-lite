@@ -27,7 +27,7 @@ interface Props {
 }
 
 const parseTimeRulesData = (timeRules: ElevatorTimeRuleView[]) => {
-  const daysOfWeekAndTimeRangeTimeRule = timeRules.find(
+  const daysOfWeekAndTimeRangeTimeRule = timeRules?.find(
     (timeRule) =>
       timeRule.type === ElevatorTimeRuleType.DAYS_OF_WEEK_AND_TIME_RANGE,
   );
@@ -80,17 +80,11 @@ export const AppointmentPreference = ({
       false,
   });
 
-  const {
-    watch,
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: {errors},
-  } = useForm<AppointmentFormModel>({
-    defaultValues: getDefaultValues(elevator),
-    mode: 'all',
-  });
+  const {watch, register, handleSubmit, setValue, reset} =
+    useForm<AppointmentFormModel>({
+      defaultValues: getDefaultValues(elevator),
+      mode: 'all',
+    });
 
   useEffect(() => {
     reset(getDefaultValues(elevator));
@@ -175,8 +169,17 @@ export const AppointmentPreference = ({
       </Grid>
       <Dialog
         title="Edit Appointment Preferences"
-        onCancel={() => setOpenDialog(false)}
-        disableSaveBtn={!!Object.keys(errors).length}
+        onCancel={() => {
+          setOpenDialog(false);
+          reset();
+        }}
+        disableSaveBtn={
+          !!(
+            !watch('openingHour') ||
+            !watch('closingHour') ||
+            watch('appointmentDaysOfWeek').length <= 0
+          )
+        }
         onSave={handleSubmit(onSave)}
         dialogProps={{
           maxWidth: 'xs',

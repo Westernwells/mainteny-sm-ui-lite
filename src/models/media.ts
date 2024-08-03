@@ -4,6 +4,7 @@ export interface FileResource {
   type: string;
   description: string;
   createdAt: string;
+  serviceCompanyId?: string;
 }
 
 export interface FileResourceRecord {
