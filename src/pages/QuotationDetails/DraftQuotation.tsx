@@ -99,6 +99,7 @@ import {TextBlockCategory, TextBlockView} from 'models/text-block';
 import {Dialog} from 'components/Dialog';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
+import {stripHtmlTags} from 'utils/text-block';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
 import NewUnit from './NewUnit';
 
@@ -1380,7 +1381,7 @@ export const DraftQuotation = ({
             quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
             quotation?.elevator?.propertyOwner?.contact.email
           }
-          subject={quotation?.subject}
+          subject={stripHtmlTags(quotation?.subject || '')}
           content={quotation?.description}
           existingFiles={existingFiles}
           isLoadingFiles={isLoadingFiles}
@@ -1416,7 +1417,7 @@ export const DraftQuotation = ({
                 sentDate: '',
                 email: {
                   email: '',
-                  subject: emailRecord.subject,
+                  subject: stripHtmlTags(emailRecord.subject),
                   content: emailRecord.content,
                   emails: emailRecord.emails,
                   ccEmails: emailRecord.ccEmails,

@@ -104,7 +104,13 @@ export const ArticleItemsTableNEW = ({
 
   const handleDiscountValueChange = (values: NumberFormatValues) => {
     const {floatValue} = values;
-    if (formik.values.discount?.type === DiscountType.AMOUNT) {
+
+    if (!formik.values.discount?.type) {
+      formik.setFieldValue('discount', {
+        type: DiscountType.PERCENTAGE,
+        percentage: floatValue || 0,
+      });
+    } else if (formik.values.discount?.type === DiscountType.AMOUNT) {
       formik.setFieldValue('discount', {
         ...formik.values.discount,
         amount: {

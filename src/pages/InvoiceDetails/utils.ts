@@ -73,8 +73,13 @@ export const formatInvoiceRecord = (
       discount: rest.discount
         ? {
             ...rest.discount,
+            type:
+              rest.discount?.type === DiscountType.NONE ||
+              rest.discount.type === DiscountType.PERCENTAGE
+                ? DiscountType.PERCENTAGE
+                : rest.discount?.type,
             amount:
-              rest.discount.type === 'AMOUNT'
+              rest.discount.type === DiscountType.AMOUNT && rest.discount.amount
                 ? {
                     ...rest.discount.amount,
                     currency: rest.discount.amount?.currency!,
@@ -82,6 +87,11 @@ export const formatInvoiceRecord = (
                       (rest.discount.amount?.value ?? 0) *
                       10 ** (rest.discount.amount?.fractionDigits ?? 2),
                   }
+                : undefined,
+            percentage:
+              rest.discount.type === DiscountType.NONE ||
+              rest.discount.type === DiscountType.PERCENTAGE
+                ? rest.discount.percentage || 0
                 : undefined,
           }
         : undefined,
@@ -140,6 +150,7 @@ export const formatInvoiceRecord = (
     },
   }),
   showArticleSection: value.showArticleSection,
+  elevatorExternalId: value.elevatorExternalId,
 });
 
 export const applyDiscount = ({
@@ -358,7 +369,7 @@ export const formatInvoiceViewToUpdateInvoice = (
     type,
   } = invoiceView;
 
-  const {payment, discount} = additionalInfo || {};
+  const {payment, discount, elevatorExternalId} = additionalInfo || {};
 
   const updateInvoice: Record<string, any> = {
     serviceOrderId: serviceOrder?.id,
@@ -465,6 +476,7 @@ export const formatInvoiceViewToUpdateInvoice = (
     showArticleSection: additionalInfo?.showArticleSection,
     alternativeServiceCompanyInfo: additionalInfo.alternativeServiceCompanyInfo,
     serviceCompanyId: serviceCompany.id,
+    elevatorExternalId,
   };
 
   return removeUndefinedAndEmptyValues(updateInvoice) as UpdateInvoice;

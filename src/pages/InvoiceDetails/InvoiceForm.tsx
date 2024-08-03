@@ -80,7 +80,6 @@ import {
 } from 'models/misc';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
-  capitalize,
   companyLanguageContextMap,
   createFilesFromBlobArray,
   dateToString,
@@ -286,13 +285,8 @@ export const InvoiceForm = ({
   const currentCurrency = useCurrentCurrency();
   const {enqueueSnackbar} = useSnackbar();
 
-  const [updatedInvoiceId, setUpdatedInvoiceId] = useState<string>('');
-  const [emailRecord, setEmailRecord] = useState<EmailRecord | null>(null);
-
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
-
-  const {data: updatedInvoice, isFetched} = useInvoiceDetail(updatedInvoiceId);
 
   const {
     data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
@@ -805,6 +799,10 @@ export const InvoiceForm = ({
       setServiceOrder(invoice.serviceOrder);
       setCustomer(invoiceCustomer);
 
+      formik.setFieldValue(
+        'elevatorExternalId',
+        invoice.additionalInfo.elevatorExternalId ?? '',
+      );
       formik.setFieldValue('description', invoice?.description ?? '');
       formik.setFieldValue('propertyOwnerId', invoiceCustomer?.id ?? '');
       formik.setFieldValue(
@@ -894,6 +892,7 @@ export const InvoiceForm = ({
   useEffect(() => {
     if (serviceOrder) {
       const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
+
       if (!formik.values.description && serviceOrder.report?.description) {
         formik.setFieldValue('description', serviceOrder.report.description);
       }
@@ -906,6 +905,13 @@ export const InvoiceForm = ({
         'unitNumber',
         serviceOrder?.elevator.externalId || '-',
       );
+
+      if (!formik.values.elevatorExternalId) {
+        formik.setFieldValue(
+          'elevatorExternalId',
+          serviceOrder?.elevator.externalId || '-',
+        );
+      }
       formik.setFieldValue(
         'deliveryStartDate',
         serviceOrder?.actualStartTime
@@ -921,7 +927,10 @@ export const InvoiceForm = ({
       if (serviceOrder?.additionalInfo.discount) {
         formik.setFieldValue(
           'discount',
-          getDiscoutObj(serviceOrder?.additionalInfo.discount),
+          getDiscoutObj(
+            invoice?.additionalInfo.discount ||
+              serviceOrder?.additionalInfo.discount,
+          ),
         );
       }
       if (!formik.values.items.length) {
@@ -2154,18 +2163,20 @@ export const InvoiceForm = ({
             </Box>
             <FormInput
               fieldProps={{
-                id: 'unitNumber',
-                name: 'unitNumber',
+                id: 'elevatorExternalId',
+                name: 'elevatorExternalId',
                 label: 'Unit Number',
-                value: formik.values.unitNumber,
+                value: formik.values.elevatorExternalId,
                 onChange: formik.handleChange,
                 onBlur: formik.handleBlur,
                 error: !!(
-                  formik.touched.unitNumber && formik.errors.unitNumber
+                  formik.touched.elevatorExternalId &&
+                  formik.errors.elevatorExternalId
                 ),
                 helperText:
-                  formik.touched.unitNumber && formik.errors.unitNumber,
-                disabled: true,
+                  formik.touched.elevatorExternalId &&
+                  formik.errors.elevatorExternalId,
+                disabled: false,
               }}
             />
             <Box

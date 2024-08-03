@@ -47,6 +47,7 @@ import {useCurrentCurrency} from 'utils/currency';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {stripHtmlTags} from 'utils/text-block';
 
 interface Props {
   quotation: QuotationView;
@@ -508,7 +509,7 @@ export const Actions = ({quotation}: Props) => {
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
           quotation?.elevator?.propertyOwner?.contact.email
         }
-        subject={quotation.subject}
+        subject={stripHtmlTags(quotation.subject)}
         content={quotation.description}
         existingFiles={existingFiles}
         callback={async (emailRecord) => {
