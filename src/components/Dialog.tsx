@@ -37,7 +37,7 @@ export const Dialog = ({
   onCancel = () => {},
   showCancelButton = true,
   showSaveButton = true,
-  disableSaveBtn,
+  disableSaveBtn = false, // Default value here
   dialogProps,
   saveBtnType,
   saveButtonContainerProps,
@@ -49,6 +49,7 @@ export const Dialog = ({
   dialogContentStyles = {},
 }: Props) => {
   const {t} = useTranslation();
+
   return (
     <MuiDialog
       fullWidth
@@ -104,12 +105,14 @@ export const Dialog = ({
 
           {showSaveButton && (
             <Button
+              testId="saveButton"
               buttonProps={{
                 size: 'large',
                 variant: saveButtonVariant,
                 onClick: onSave,
                 autoFocus: true,
                 disabled: disableSaveBtn || isSaving,
+                'aria-disabled': disableSaveBtn || isSaving,
                 type: saveBtnType,
                 ...saveButtonProps,
               }}>

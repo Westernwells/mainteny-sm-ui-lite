@@ -1,4 +1,13 @@
 import {
+  ElevatorCategory,
+  ElevatorStatus,
+  ElevatorTimeRuleType,
+  ElevatorView,
+} from 'models/elevator';
+import {Priority, InspectionCycle, State} from 'models/misc';
+import {Role, UserAccountStatus} from 'models/user';
+import {vi} from 'vitest';
+import {
   ContractServiceFormElevator,
   ContractTimeUnit,
 } from '../../models/contract';
@@ -41,3 +50,228 @@ export const SERVICE_ELEVATORS: ContractServiceFormElevator[] = [
   elevatorOne,
   elevatorTwo,
 ];
+
+export const mockElevator: ElevatorView = {
+  id: '8cfd0618-feb4-4386-95be-260e90579fda',
+  number: 'U00015',
+  externalId: 'U00015',
+  serialNumber: '',
+  model: '',
+  type: '',
+  capacity: '',
+  category: ElevatorCategory.ELEVATOR,
+  technicianNumber: 2,
+  address: {
+    id: '454832d1-593f-41ef-9d30-b876010b682a',
+    fullName: 'gehsfaveh2, 28372, gaheb, Germany',
+    countryCode: '',
+    location: {
+      longitude: 0,
+      latitude: 0,
+    },
+    component: {
+      name: '',
+      street: 'gehsfaveh2',
+      street2: '',
+      city: 'gaheb',
+      postalCode: '28372',
+      state: '',
+      country: 'Germany',
+    },
+  },
+  propertyOwner: {
+    id: '96288f9d-c8c6-44b1-82b2-666d67ce63a3',
+    name: 'Wohnungsbaugesellschaft Königs Wusterhausen',
+    number: 'CU0007',
+    externalId: 'CU0007',
+    billingAddress: {
+      id: '32be24f2-6fc2-48eb-9b44-105ef5d2cd40',
+      fullName:
+        'Abteilung Sicherheit und Brandschutz z.H. Herr Schmitt und Frau Klecks, Strasse am grossen und kleinen Teich 4, 15712, Königs Wusterhausen OT Zernsdorf, Bremen, Germany',
+      countryCode: '',
+      location: {
+        longitude: 0,
+        latitude: 0,
+      },
+      component: {
+        name: 'Abteilung Sicherheit und Brandschutz z.H. Herr Schmitt und Frau Klecks',
+        street: 'Strasse am grossen und kleinen Teich 4',
+        street2: '',
+        city: 'Königs Wusterhausen OT Zernsdorf',
+        postalCode: '15712',
+        state: 'Bremen',
+        country: 'Germany',
+      },
+    },
+    contact: {
+      phone: '',
+      email: '',
+      url: '',
+    },
+    labels: [],
+    additionalInfo: {
+      priority: Priority.NONE,
+      billingEmail: '',
+      registrationDate: '2024-05-16',
+      costCenter: '',
+      secondaryPhoneNumber: '',
+      vatId: '',
+      offsettingAccount: '',
+      customerPortalEnabled: true,
+    },
+    meta: {
+      creator: {
+        id: '880abb83-79a8-4219-afe5-dd9dbd29eed0',
+        username: 'peikereva@gmail.com',
+        firstName: 'Eva',
+        lastName: 'Peikereva',
+        photoUrl: '',
+        contact: {
+          phone: '+4917647150761',
+          email: 'peikereva@gmail.com',
+        },
+        category: '',
+        title: '',
+        serviceCompanyId: 'b270952a-7d58-458f-8259-4fd4091612fd',
+        roles: [Role.SERVICE_MANAGER, Role.CONTRACTOR, Role.TECHNICIAN],
+        status: UserAccountStatus.RESET_PASSWORD,
+      },
+      createdAt: '2024-05-16T07:01:30.814988Z',
+      lastUpdatedAt: '2024-07-18T07:01:06.919760Z',
+      state: State.ACTIVE,
+    },
+    search: '',
+  },
+  lastVisitDate: '2024-04-03',
+  serviceTime: 60,
+  status: ElevatorStatus.RUNNING,
+  properties: [
+    {
+      id: '6a67aaae-48ae-4c36-b307-2ce10e637075',
+      elevatorId: '8cfd0618-feb4-4386-95be-260e90579fda',
+      key: 'Response time',
+      value: '120.0',
+    },
+    {
+      id: 'f39a70ba-38b3-485d-911b-d7bdad0361db',
+      elevatorId: '8cfd0618-feb4-4386-95be-260e90579fda',
+      key: 'Availability',
+      value: '0.9997716894977169',
+    },
+    {
+      id: '1103699d-34db-426e-9aaa-ad5c8267d26e',
+      elevatorId: '8cfd0618-feb4-4386-95be-260e90579fda',
+      key: 'Statistics last updated',
+      value: '2024-07-21',
+    },
+  ],
+  timeRules: [
+    {
+      type: ElevatorTimeRuleType.DAYS_OF_WEEK_AND_TIME_RANGE,
+      data: JSON.stringify([{daysOfWeek: [], timeRange: {start: '', end: ''}}]),
+      id: '',
+      elevator_id: '',
+    },
+  ],
+  labels: [],
+  additionalInfo: {
+    priority: Priority.NONE,
+    isServiceOrderGenerationEnabled: true,
+    manufacturer: '',
+    keyLocation: '',
+    lastInspectionDate: '2024-04-03',
+    buildingLocation: '',
+    cabinType: '',
+    propertySegment: '',
+    documents: [],
+    pictures: [
+      {
+        id: 'ad8df315-de3e-48e2-b5c8-3a37deb5cb02',
+        uri: 'b270952a-7d58-458f-8259-4fd4091612fd/elevators/8cfd0618-feb4-4386-95be-260e90579fda/images/Bildschirmfoto 2024-05-16 um 09.29.58.png',
+        type: 'image/png',
+        description: 'Bildschirmfoto 2024-05-16 um 09',
+        serviceCompanyId: 'b270952a-7d58-458f-8259-4fd4091612fd',
+        createdAt: '2024-05-16T07:30:21.432089Z',
+      },
+      {
+        id: '33d1a569-cccb-45c7-bc25-0156eff7c644',
+        uri: 'b270952a-7d58-458f-8259-4fd4091612fd/elevators/8cfd0618-feb4-4386-95be-260e90579fda/images/Untitled document.pdf',
+        type: 'application/pdf',
+        description: 'Untitled document',
+        serviceCompanyId: 'b270952a-7d58-458f-8259-4fd4091612fd',
+        createdAt: '2024-05-16T07:30:40.593099Z',
+      },
+    ],
+    parking: '',
+    controllerModel: '',
+    controllerManufacturer: '',
+    customerAppointment: {
+      shouldNotifyCustomer: true,
+      appointmentNotificationDue: 1,
+      requiresAppointment: true,
+    },
+    travelFee: 0,
+    emergencyPhoneProvider: '',
+    numberOfStops: 5,
+    drive: '',
+    speed: '',
+    controller: '',
+    iotDevice: '',
+    cageWeight: '',
+    counterWeight: '',
+    hoistingHeight: '',
+    shaftHeight: '',
+    spendingLimit: 0,
+    distance: 0,
+    travelTime: 0,
+    inspectionCycle: InspectionCycle.NONE,
+    numberOfPeople: 0,
+    deviceIds: [],
+    dueDate: '',
+    serviceOrderGenerationEnabled: false,
+    builtYear: 0,
+    emergencyContactNumber: '',
+  },
+  assignments: [],
+  contracts: [],
+  search:
+    '[address:gehsfaveh2,_28372,_gaheb,_germany_] [status:running] [externalid:u00015] [number:u00015] [serialnumber:] [model:] [type:] [capacity:] [category:elevator] [po:name:customername] [po:number:cu0007] [po:externalid:cu0007] [po:ct:email:] [po:ct:phone:] [po:ct:url:] [po:billingaddress:kunde3,_this_is_a_suuuuuuuuuuuuuuuuuuper_long_street_name_34,_33333,_anda_suuuuuuper_looooooooong_city_name,_bremen,_germany_] [buildinglocation:]',
+  availability: 0,
+  nextVisitDate: '',
+  meta: {
+    creator: {
+      id: '880abb83-79a8-4219-afe5-dd9dbd29eed0',
+      username: 'peikereva@gmail.com',
+      firstName: 'Eva',
+      lastName: 'Peikereva',
+      photoUrl: '',
+      contact: {
+        phone: '+4917647150761',
+        email: 'peikereva@gmail.com',
+      },
+      category: '',
+      title: '',
+      serviceCompanyId: 'b270952a-7d58-458f-8259-4fd4091612fd',
+      roles: [Role.SERVICE_MANAGER, Role.CONTRACTOR, Role.TECHNICIAN],
+      status: UserAccountStatus.RESET_PASSWORD,
+    },
+    createdAt: '2024-05-16T07:01:30.814988Z',
+    lastUpdatedAt: '2024-07-18T07:01:06.919760Z',
+    state: State.ACTIVE,
+  },
+};
+
+export const mockI18n = () => {
+  vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+      t: (str: string) => str,
+      i18n: {
+        changeLanguage: () => new Promise(() => {}),
+      },
+    }),
+    initReactI18next: {
+      type: '3rdParty',
+      init: () => {},
+    },
+  }));
+};
