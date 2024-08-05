@@ -112,11 +112,11 @@ const AddConnectionCard = ({onAddConnection, onCancel}: Props) => {
           size="small"
           shrink
           variant="outlined"
-          id="demo-simple-select-label">
+          id="connection-type-select-label">
           {t('Connection type')}
         </InputLabel>
         <Select
-          labelId="demo-simple-select-label"
+          labelId="connection-type-select-label"
           label={t('Connection type')}
           size="small"
           defaultValue={watch('refType')}
