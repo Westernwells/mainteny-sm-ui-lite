@@ -99,7 +99,7 @@ const AsyncSelect = <T,>({
             filterSelectedOptions
             includeInputInList
             size="small"
-            id="asynchronous-demo"
+            id={`asynchronous-demo-${name}`}
             sx={{width: '100%'}}
             open={open}
             onOpen={() => {
