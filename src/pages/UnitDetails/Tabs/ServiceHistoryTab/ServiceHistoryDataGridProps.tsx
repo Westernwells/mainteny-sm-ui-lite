@@ -20,7 +20,7 @@ export const columns: GridColDef[] = [
   }),
   getColumnProps({
     field: 'date',
-    headerName: 'date',
+    headerName: 'creation date',
     flex: 0.75,
   }),
   getColumnProps({
