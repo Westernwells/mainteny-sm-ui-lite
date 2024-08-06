@@ -9700,22 +9700,10 @@ svg-arc-to-cubic-bezier@^3.0.0, svg-arc-to-cubic-bezier@^3.2.0:
   resolved "https://registry.yarnpkg.com/svg-arc-to-cubic-bezier/-/svg-arc-to-cubic-bezier-3.2.0.tgz#390c450035ae1c4a0104d90650304c3bc814abe6"
   integrity sha512-djbJ/vZKZO+gPoSDThGNpKDO+o+bAeA4XQKovvkNCqnIS2t+S4qnLAGQhyyrulhCFRl1WWzAp0wUDV8PpTVU3g==
 
-svg-engine@^0.2.3:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/svg-engine/-/svg-engine-0.2.4.tgz#904d9494a6221e64dfb316be525199cf3e1a1685"
-  integrity sha512-D1/9a9wtaRDUBgpt7dzhjjA5oTizeFlaj/qyb7MY8rBWTD9U9AN+ojbMEtgtnkJDgzuqErviMcUUJhlG3kPNAA==
-
 svg-parser@^2.0.4:
   version "2.0.4"
-  resolved "https://registry.yarnpkg.com/svg-parser/-/svg-parser-2.0.4.tgz#fdc2e29e13951736140b76cb122c8ee6630eb6b5"
+  resolved "https://registry.npmjs.org/svg-parser/-/svg-parser-2.0.4.tgz"
   integrity sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==
-
-swissqrbill@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/swissqrbill/-/swissqrbill-4.0.2.tgz#58bc15345df22911eaa625a71a9afdedbead4990"
-  integrity sha512-miSuHi+c08zIKTIcbfPp8dexhIAgiFcCPuh/Ou7gc/JGeSMpa5MAjjDyLnK3n0d/jsBXFaeOkKLop2YV3/8bQw==
-  dependencies:
-    svg-engine "^0.2.3"
 
 symbol-tree@^3.2.4:
   version "3.2.4"
