@@ -578,35 +578,3 @@ export const yupValidations = {
       (value: string) => !!value && !isEmptyHTML(value),
     ),
 };
-
-export const svgToJpegPng = (
-  svgElement: SVGSVGElement,
-  callback: (dataURL: string) => void,
-  options = {format: 'jpeg', quality: 1},
-) => {
-  const svgString = new XMLSerializer().serializeToString(svgElement);
-  const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-  const url = URL.createObjectURL(svgBlob);
-
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-
-  const image = new Image();
-  image.onload = () => {
-    if (!context) return;
-
-    canvas.width = image.width;
-    canvas.height = image.height;
-    context.drawImage(image, 0, 0);
-
-    const format = options.format === 'jpeg' ? 'image/jpeg' : 'image/png';
-    const quality = options.quality || 1;
-    const dataURL = canvas.toDataURL(format, quality);
-
-    callback(dataURL);
-
-    URL.revokeObjectURL(url);
-  };
-
-  image.src = url;
-};

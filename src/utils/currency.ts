@@ -1,8 +1,7 @@
 import Dinero, {Currency} from 'dinero.js';
 import i18n from 'i18n';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {AggregatedAmount, InvoiceView} from 'models/invoice';
-import {UserAccount} from 'models/user';
+import {AggregatedAmount} from 'models/invoice';
 import {
   Amount,
   AmountRecord,
@@ -235,41 +234,4 @@ export const moneyRecordForLumpSum = (money?: Money) => ({
   fractionDigits: money?.fractionDigits ?? 2,
   currency: money?.currency ?? 'EUR',
   value: money?.value ?? 0,
-});
-
-export type QRCurrencyCode = 'EUR' | 'CHF';
-
-export const createQrData = (
-  qrCurrency: QRCurrencyCode,
-  invoice?: InvoiceView,
-  currentCurrency?: CurrencyModalType,
-  userInfo?: UserAccount,
-) => ({
-  currency: qrCurrency,
-  amount: centsToMoney(
-    currentCurrency?.code!,
-    invoice?.totalAmount.grossAmount ?? 0,
-  ),
-  creditor: {
-    name: userInfo?.serviceCompany.name || '',
-    address: userInfo?.serviceCompany.billingAddress?.fullName || '',
-    buildingNumber:
-      userInfo?.serviceCompany.billingAddress?.component?.name || '',
-    city: userInfo?.serviceCompany.billingAddress?.component?.city || '',
-    country: userInfo?.serviceCompany.billingAddress?.countryCode || 'CH',
-    zip: userInfo?.serviceCompany.billingAddress?.component?.postalCode || '',
-    account: userInfo?.serviceCompany?.settings?.paymentInfo.iban || '',
-  },
-  debtor: {
-    name:
-      invoice?.additionalInfo?.billingAddress?.component?.name ||
-      invoice?.propertyOwner?.name ||
-      '',
-    address: invoice?.additionalInfo?.billingAddress?.fullName || '',
-    buildingNumber:
-      invoice?.additionalInfo?.billingAddress?.component?.name || '',
-    city: invoice?.additionalInfo?.billingAddress?.component?.city || '',
-    country: invoice?.additionalInfo?.billingAddress?.countryCode || 'CH',
-    zip: invoice?.additionalInfo?.billingAddress?.component?.postalCode || '',
-  },
 });

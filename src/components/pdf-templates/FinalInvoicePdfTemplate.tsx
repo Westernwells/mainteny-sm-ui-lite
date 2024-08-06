@@ -1,14 +1,14 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo} from 'react';
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import {QRCurrencyCode, createQrData, formatCurrency} from 'utils/currency';
+import {formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {InvoiceItem, InvoiceView} from 'models/invoice';
-import {formatCostText, svgToJpegPng} from 'utils/utils';
+import {formatCostText} from 'utils/utils';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {
   applyGlobalDiscountOnItems,
@@ -19,8 +19,6 @@ import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {ArticleType} from 'models/article';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
-// eslint-disable-next-line import/no-unresolved
-import {SwissQRBill} from 'swissqrbill/svg';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -32,7 +30,6 @@ import PdfBodyContainer from './containers/PdfBodyContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import {ArticleSection} from './ArticleSection/ArticleSection';
-import SwissPageTemplate from './SwissPageTemplate';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -101,8 +98,6 @@ const FinalInvoicePdfTemplate = ({
   footerPath,
   nextCompanyExternalId,
 }: Props) => {
-  const [qrImageSrc, setQrImageSrc] = useState<string>('');
-
   const articleItems = invoice?.items.map((item) => ({
     ...item,
     discount: getDiscoutObj(item?.additionalInfo?.discount),
@@ -161,30 +156,6 @@ const FinalInvoicePdfTemplate = ({
     ArticleType.MATERIAL,
     currentCurrency,
   );
-
-  const qrCurrency: QRCurrencyCode =
-    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
-      ? currentCurrency.code
-      : 'EUR';
-
-  const qrBillData = createQrData(
-    qrCurrency,
-    invoice,
-    currentCurrency,
-    userInfo,
-  );
-
-  const qrBillSvg = new SwissQRBill(qrBillData);
-
-  useEffect(() => {
-    svgToJpegPng(
-      qrBillSvg.element as unknown as SVGSVGElement,
-      (result) => {
-        setQrImageSrc(result);
-      },
-      {format: 'jpeg', quality: 1},
-    );
-  }, [qrBillSvg]);
 
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -299,10 +270,6 @@ const FinalInvoicePdfTemplate = ({
           footerPath={footerPath}
         />
       </PdfPageContainer>
-
-      {userInfo?.serviceCompany.settings.invoiceQRCodeEnabled && (
-        <SwissPageTemplate qrImageSrc={qrImageSrc} />
-      )}
     </Document>
   );
 };
