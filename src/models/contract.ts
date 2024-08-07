@@ -733,6 +733,13 @@ const TIME_UNIT_WEEK_TO_NUMBER = new Map<ContractTimeUnit, number>([
   [ContractTimeUnit.TRIWEEKLY, 3],
 ]);
 
+const YEARLY_TIME_UNIT_TO_NUMBER = new Map<ContractTimeUnit, number>([
+  [ContractTimeUnit.ANNUALLY, 1],
+  [ContractTimeUnit.BIENNIALLY, 2],
+  [ContractTimeUnit.TRIENNIALLY, 3],
+  [ContractTimeUnit.QUADRENNIALLY, 4],
+]);
+
 const weeklyDivider = (
   weekOption:
     | ContractTimeUnit.WEEKLY
@@ -745,8 +752,8 @@ const weeklyDivider = (
 
 export const calculateContractInvoicePriceTotal = (
   array: ContractComponentElevator[],
-) => {
-  const invoicePrices = array.map((item: ContractComponentElevator) => {
+) =>
+  array.reduce((acc: number, item: ContractComponentElevator) => {
     let timeLength: number = 0;
 
     if (!item.invoiceJob && !item.orderGenerationJob) return 0;
@@ -758,11 +765,13 @@ export const calculateContractInvoicePriceTotal = (
         ? invoiceTimeUnit
         : orderTimeUnit;
 
+    // monthly based calculations
     if (contractTime === ContractTimeUnit.MONTHLY) {
       const invoiceMonths = item.invoiceJob.timeNumbers;
       const jobMonths = item.orderGenerationJob.timeNumbers;
       timeLength = monthlyBasedCalculations(invoiceMonths ?? jobMonths);
     } else if (TIME_UNIT_WEEK_TO_NUMBER.has(contractTime)) {
+      // weekly based calculations
       timeLength = weeklyDivider(
         contractTime as
           | ContractTimeUnit.WEEKLY
@@ -770,18 +779,19 @@ export const calculateContractInvoicePriceTotal = (
           | ContractTimeUnit.TRIWEEKLY,
       );
     } else if (
-      invoiceTimeUnit === ContractTimeUnit.ANNUALLY ||
-      invoiceTimeUnit === ContractTimeUnit.BIENNIALLY ||
-      invoiceTimeUnit === ContractTimeUnit.TRIENNIALLY ||
-      invoiceTimeUnit === ContractTimeUnit.QUADRENNIALLY
+      YEARLY_TIME_UNIT_TO_NUMBER.has(contractTime) // yearly based calculations
     ) {
-      timeLength = 1;
+      const divider = YEARLY_TIME_UNIT_TO_NUMBER.get(
+        contractTime as
+          | ContractTimeUnit.ANNUALLY
+          | ContractTimeUnit.BIENNIALLY
+          | ContractTimeUnit.TRIENNIALLY
+          | ContractTimeUnit.QUADRENNIALLY,
+      );
+      timeLength = 1 / (divider || 1);
     }
-    return timeLength * item.price;
-  });
-
-  return invoicePrices.reduce((acc, price) => acc + price, 0);
-};
+    return acc + item.price * timeLength;
+  }, 0);
 
 export const calculateContractInvoicePriceGrandTotal = (
   parentArray: ExtendedContractComponentRecord[],
