@@ -704,7 +704,7 @@ export const Actions = ({
         </IconButton>
       </Tooltip>
     );
-  }, [invoice.status, downloadUrl]);
+  }, [invoice, downloadUrl]);
 
   const actions = useMemo(() => {
     const items = [];
@@ -867,7 +867,7 @@ export const Actions = ({
     }
 
     return items;
-  }, [downloadUrl, invoice.status, t]);
+  }, [downloadUrl, invoice, t]);
 
   const onPrintInvoice = async () => {
     const errorMessage = validateDueDate(invoice);
@@ -1091,7 +1091,7 @@ export const Actions = ({
 
       {selectedInvoice && (
         <MarkAsPaidDialog
-          invoice={selectedInvoice!}
+          invoice={selectedInvoice}
           open={isDialogOpen}
           onConfirm={() => setIsDialogOpen(false)}
           onClose={() => {
