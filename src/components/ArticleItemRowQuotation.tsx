@@ -38,10 +38,7 @@ import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
 import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
 import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
 import * as Yup from 'yup';
-import {
-  useArticles,
-  usePropertyOwnerArticles,
-} from 'hooks/reactQuery/useArticle';
+import {useArticles} from 'hooks/reactQuery/useArticle';
 import {createEmptyResource} from 'utils/paging-utils';
 import useHighlightText from 'hooks/useHighlightText';
 import {getArticleTypeText} from 'utils/article-utils';
@@ -49,6 +46,8 @@ import {QuotationItemRecord} from 'models/quotation';
 import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
 import {DragIndicator} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
+import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
+import {ServiceOrderType} from 'models/service-order';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -298,15 +297,14 @@ export const ArticleItemRowQuotation = ({
     {keepPreviousData: true, enabled: popperOpen && tabValue === 0},
   );
 
+  // this is the api used on the custom prices tab
   const {
-    data: customArticleResource = createEmptyResource<ArticleView>(30),
-    isLoading: isCustomPriceLoading,
-  } = usePropertyOwnerArticles(
+    data: travelWorksResource = [],
+    isLoading: isTravelWorksResourceLoading,
+  } = usePropertyOwnerQueryTravelWorks(
     propertyOwnerId,
     {
-      pageIndex: 0,
-      pageSize: 100,
-      query: debouncedText,
+      serviceOrderType: ServiceOrderType.GENERAL,
     },
     {
       keepPreviousData: true,
@@ -513,12 +511,26 @@ export const ArticleItemRowQuotation = ({
                       onChange={(indexValue) => setTabValue(indexValue)}
                       isTextCap>
                       <TabsBody value={tabValue} index={0}>
-                        {renderTable(articleResource.data, isArticleLoading)}
+                        {/* note filtering is done her b'cos the articleView ruturns all articles, including custom prices */}
+                        {renderTable(
+                          articleResource.data.filter(
+                            (item) =>
+                              !travelWorksResource.some(
+                                (tw) => tw.article.id === item.id,
+                              ),
+                          ),
+                          isArticleLoading || isTravelWorksResourceLoading,
+                        )}
                       </TabsBody>
                       <TabsBody value={tabValue} index={1}>
+                        {/* note filtering is also used here cos the custom prices are also returned as part of the article view and there wont be need for mapping the data to the renedere, cos unsimailar data type */}
                         {renderTable(
-                          customArticleResource.data,
-                          isCustomPriceLoading,
+                          articleResource.data.filter((item) =>
+                            travelWorksResource.some(
+                              (tw) => tw.article.id === item.id,
+                            ),
+                          ),
+                          isArticleLoading || isTravelWorksResourceLoading,
                         )}
                       </TabsBody>
                     </Tabs>
