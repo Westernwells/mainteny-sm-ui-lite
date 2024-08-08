@@ -523,14 +523,9 @@ export const ArticleItemRowQuotation = ({
                         )}
                       </TabsBody>
                       <TabsBody value={tabValue} index={1}>
-                        {/* note filtering is also used here cos the custom prices are also returned as part of the article view and there wont be need for mapping the data to the renedere, cos unsimailar data type */}
                         {renderTable(
-                          articleResource.data.filter((item) =>
-                            travelWorksResource.some(
-                              (tw) => tw.article.id === item.id,
-                            ),
-                          ),
-                          isArticleLoading || isTravelWorksResourceLoading,
+                          travelWorksResource.map((item) => item.article),
+                          isTravelWorksResourceLoading,
                         )}
                       </TabsBody>
                     </Tabs>
