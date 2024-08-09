@@ -82,6 +82,7 @@ export const ArticleItemRow = ({
           )}
         </Box>
         <TextField
+          data-testid="supplier-article-number"
           value={supplierArticleNumber}
           onChange={(e) => setSupplierArticleNumber(e.target.value)}
           size="small"

@@ -12,12 +12,13 @@
 // You can read more here:
 // https://on.cypress.io/configuration
 // ***********************************************************
-import '@cypress/code-coverage/support'
+import '@cypress/code-coverage/support';
+import 'cypress-real-events';
 
 // Import commands.js using ES2015 syntax:
 import './commands';
 // Alternatively, if you want to ignore all uncaught exceptions:
-Cypress.on('uncaught:exception', () => false)
+Cypress.on('uncaught:exception', () => false);
 // suppress AssertionError
 Cypress.on('fail', () => false);
 // Alternatively you can use CommonJS syntax:

@@ -40,6 +40,7 @@ declare global {
   namespace Cypress {
     interface Chainable {
       login(): Chainable<void>;
+      fillRichTextField(field: string, value: string): Chainable<void>;
     }
   }
 }
@@ -52,6 +53,18 @@ Cypress.Commands.add('login', () => {
   cy.get('#password').type('!!abc123', {log: false});
   cy.get('button[type="submit"]').click();
   cy.wait('@loginApi');
+});
+
+Cypress.Commands.add('fillRichTextField', (field: string, value: string) => {
+  cy.contains('legend', field)
+    .parents('fieldset')
+    .within(() => {
+      cy.get('div[contenteditable="true"]')
+        .focus()
+        .click()
+        .wait(1000)
+        .realType(value);
+    });
 });
 
 // hack for cypress typescript issues
