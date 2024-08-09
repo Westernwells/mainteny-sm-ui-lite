@@ -10,6 +10,7 @@ import {useEffect, useRef, useState} from 'react';
 import {Dialog} from 'components/Dialog';
 import {AutoDialerFormModel} from 'models/unitForm';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
+import _ from 'lodash';
 import {useForm} from 'react-hook-form';
 import AutoDialerSchema from './AutoDialerSchema';
 import EditAutoDialerForm from './EditAutoDialerForm';
@@ -97,7 +98,7 @@ const AutoDialer = ({elevator}: Props) => {
             }}
           />
           <Typography variant="h5" fontWeight={600}>
-            {t('Auto Dialer')}
+            {_.startCase(_.toLower(t('Auto dialer')))}
           </Typography>
         </Grid>
       }>
