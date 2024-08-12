@@ -28,6 +28,11 @@ interface Props {
   saveButtonProps?: ButtonProps;
   saveButtonContainerProps?: ButtonProps;
   dialogContentStyles?: SxProps<Theme>;
+  dialogTitleStyles?: SxProps<Theme>;
+  sx?: SxProps<Theme>;
+  dialogActionsStyles?: SxProps<Theme>;
+  saveButtonContainerStyles?: SxProps<Theme>;
+  dialogContentTextStyles?: SxProps<Theme>;
 }
 
 export const Dialog = ({
@@ -47,13 +52,22 @@ export const Dialog = ({
   saveButtonVariant = 'contained',
   saveButtonProps,
   dialogContentStyles = {},
+  dialogTitleStyles = {},
+  dialogActionsStyles = {},
+  saveButtonContainerStyles = {},
+  dialogContentTextStyles = {},
+  sx = {},
 }: Props) => {
   const {t} = useTranslation();
 
   return (
     <MuiDialog
       fullWidth
-      sx={{height: '74%', margin: 'auto 0'}}
+      sx={{
+        height: '74%',
+        margin: 'auto 0',
+        ...sx,
+      }}
       onClose={onCancel}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
@@ -66,6 +80,7 @@ export const Dialog = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          ...dialogTitleStyles,
         }}>
         {typeof title === 'string' ? t(title) : title}
         <IconButton onClick={onCancel}>
@@ -77,7 +92,11 @@ export const Dialog = ({
         <DialogContentText
           id="alert-dialog-description"
           component="div"
-          sx={{color: 'text.primary', paddingTop: '0.3em'}}>
+          sx={{
+            color: 'text.primary',
+            paddingTop: '0.3em',
+            ...dialogContentTextStyles,
+          }}>
           {children}
         </DialogContentText>
       </DialogContent>
@@ -88,9 +107,15 @@ export const Dialog = ({
           justifyContent: 'space-between',
           background: 'white',
           marginLeft: '1em',
+          ...dialogActionsStyles,
         }}>
         {leftButton}
-        <Box sx={{marginLeft: 'auto', ...saveButtonContainerProps}}>
+        <Box
+          sx={{
+            marginLeft: 'auto',
+            ...saveButtonContainerProps,
+            ...saveButtonContainerStyles,
+          }}>
           {showCancelButton && (
             <Button
               buttonProps={{

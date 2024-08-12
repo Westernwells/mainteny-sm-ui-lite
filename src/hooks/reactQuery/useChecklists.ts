@@ -14,6 +14,7 @@ import {
   ServiceOrderCheckListView,
   UpdateCheckListRecord,
 } from 'models/checklist';
+import {CheckListAnswerRecord} from 'models/service-order';
 import {useUserSession} from './useUserSession';
 
 export const queryChecklists = async (
@@ -96,6 +97,216 @@ const updateChecklist = async (
     {
       headers: {
         'Content-Type': 'multipart/form-data',
+      },
+    },
+  );
+};
+
+interface AssociateChecklistParam {
+  serviceOrder: string;
+}
+export interface AssociateChecklistBody {
+  checkListId: string;
+  technicianId: string;
+}
+
+const associateChecklistToServiceOrder = async (
+  params: AssociateChecklistParam,
+  body: AssociateChecklistBody,
+) => {
+  const response = await axiosClient.post<ServiceOrderCheckListView>(
+    `/api/serviceOrders/${params.serviceOrder}/checkLists`,
+    {},
+    {
+      params: body,
+    },
+  );
+
+  return response.data;
+};
+
+const uploadChecklistAnswer = async (
+  params: AssociateChecklistParam,
+  queryParams: AssociateChecklistBody,
+  body: CheckListAnswerRecord[],
+) => {
+  const response = await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${params.serviceOrder}/checkList/answers`,
+    body,
+    {
+      params: queryParams,
+    },
+  );
+
+  return response.data;
+};
+
+export const useUploadChecklistAnswer = (successMsg: string) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(
+    ({
+      params,
+      queryParams,
+      body,
+    }: {
+      params: AssociateChecklistParam;
+      queryParams: AssociateChecklistBody;
+      body: CheckListAnswerRecord[];
+    }) => uploadChecklistAnswer(params, queryParams, body),
+    {
+      onSuccess: (_data, variables) => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+
+        queryClient.invalidateQueries([
+          queryKeys.queryServiceOrderChecklists,
+          variables.params.serviceOrder,
+        ]);
+        queryClient.invalidateQueries([
+          queryKeys.getServiceOrderDetails,
+          variables.params.serviceOrder,
+        ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+const disassociateChecklistToServiceOrder = async (
+  params: AssociateChecklistParam,
+  body: AssociateChecklistBody,
+) => {
+  const response = await axiosClient.delete<ServiceOrderCheckListView>(
+    `/api/serviceOrders/${params.serviceOrder}/checkLists`,
+    {
+      params: body,
+    },
+  );
+
+  return response.data;
+};
+
+const associateMultiChecklistToServiceOrder = async (
+  params: AssociateChecklistParam,
+  bodies: AssociateChecklistBody[],
+) => {
+  const promises = bodies.map(async (item) => {
+    const response = await axiosClient.post<ServiceOrderCheckListView>(
+      `/api/serviceOrders/${params.serviceOrder}/checkLists`,
+      {},
+      {
+        params: item,
+      },
+    );
+
+    return response.data;
+  });
+
+  return Promise.all(promises);
+};
+
+export const useAssociateMultiChecklistToServiceOrder = (
+  successMsg: string,
+) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(
+    ({
+      params,
+      body,
+    }: {
+      params: AssociateChecklistParam;
+      body: AssociateChecklistBody[];
+    }) => associateMultiChecklistToServiceOrder(params, body),
+    {
+      onSuccess: (_data, variables) => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+
+        queryClient.invalidateQueries([
+          queryKeys.queryServiceOrderChecklists,
+          variables.params.serviceOrder,
+        ]);
+        queryClient.invalidateQueries([
+          queryKeys.getServiceOrderDetails,
+          variables.params.serviceOrder,
+        ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const useAssociateChecklistToServiceOrder = (successMsg: string) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(
+    ({
+      params,
+      body,
+    }: {
+      params: AssociateChecklistParam;
+      body: AssociateChecklistBody;
+    }) => associateChecklistToServiceOrder(params, body),
+    {
+      onSuccess: (_data, variables) => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries([
+          queryKeys.queryServiceOrderChecklists,
+          variables.params.serviceOrder,
+        ]);
+        queryClient.invalidateQueries([
+          queryKeys.getServiceOrderDetails,
+          variables.params.serviceOrder,
+        ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
+      },
+    },
+  );
+};
+
+export const useDisassociateChecklistToServiceOrder = (successMsg: string) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(
+    ({
+      params,
+      body,
+    }: {
+      params: AssociateChecklistParam;
+      body: AssociateChecklistBody;
+    }) => disassociateChecklistToServiceOrder(params, body),
+    {
+      onSuccess: (_data, variables) => {
+        enqueueSnackbar(successMsg, {
+          variant: 'success',
+        });
+        queryClient.invalidateQueries([
+          queryKeys.queryServiceOrderChecklists,
+          variables.params.serviceOrder,
+        ]);
+        queryClient.invalidateQueries([
+          queryKeys.getServiceOrderDetails,
+          variables.params.serviceOrder,
+        ]);
+      },
+      onError: (err) => {
+        console.log(err);
+        showError(err);
       },
     },
   );
