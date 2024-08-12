@@ -114,6 +114,11 @@ export const ArticleSection = ({
                     color: '#212121',
                   }}
                   html={articleItem.name || '-'}
+                  stylesheet={{
+                    p: {
+                      marginBottom: '2px',
+                    },
+                  }}
                 />
 
                 <Text

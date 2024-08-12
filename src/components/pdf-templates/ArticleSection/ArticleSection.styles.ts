@@ -17,7 +17,7 @@ export const getStyles = () =>
     tableRow: {
       display: 'flex',
       flexDirection: 'row',
-      alignItems: 'baseline',
+      alignItems: 'flex-start',
       fontSize: 10,
       marginVertical: 4,
     },
