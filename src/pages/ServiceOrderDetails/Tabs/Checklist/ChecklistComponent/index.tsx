@@ -1,17 +1,40 @@
-import {Box, Checkbox, Radio, Typography} from '@mui/material';
+import {Box, Checkbox, Radio, TextField, Typography} from '@mui/material';
 import {CheckListComponentType, CheckListComponentView} from 'models/checklist';
+import useTheme from '@mui/material/styles/useTheme';
 
-interface ComponentProps {
+interface ComponentHeaderProps {
   component: CheckListComponentView;
 }
+interface ComponentProps {
+  component: CheckListComponentView;
+  disabled?: boolean;
+  onChange: (newComponent: CheckListComponentView) => void;
+}
 
-export const MultiChoiceComponent = ({component}: ComponentProps) => (
+export const MultiChoiceComponent = ({
+  component,
+  onChange,
+  disabled = false,
+}: ComponentProps) => (
   <Box display="flex" flexDirection="column" rowGap={1.5}>
     <Typography variant="h6">{component.subject}</Typography>
     {component.additionalInfo.options.map((option, optionIndex) => (
       <Box key={optionIndex} display="flex" ml={-1}>
         <Radio
           size="medium"
+          disabled={disabled}
+          value={optionIndex}
+          onChange={(e) => {
+            const componentCloned = {...component};
+
+            if (!componentCloned.additionalInfo.answer) {
+              componentCloned.additionalInfo.answer = [];
+            }
+
+            componentCloned.additionalInfo.answer[0] = e.target.value;
+
+            onChange(componentCloned);
+          }}
           checked={
             !!(component.additionalInfo?.answer?.[0] === String(optionIndex))
           }
@@ -36,11 +59,30 @@ export const MultiChoiceComponent = ({component}: ComponentProps) => (
   </Box>
 );
 
-export const CheckboxComponent = ({component}: ComponentProps) => (
+export const CheckboxComponent = ({
+  component,
+  onChange,
+  disabled = false,
+}: ComponentProps) => (
   <Box display="flex" ml={-1}>
     <Checkbox
       checked={!!(component.additionalInfo?.answer?.[0] === 'y')}
       size="medium"
+      onChange={(e) => {
+        const componentCloned = {...component};
+        if (!componentCloned.additionalInfo.answer) {
+          componentCloned.additionalInfo.answer = [];
+        }
+
+        if (e.target.checked) {
+          componentCloned.additionalInfo.answer[0] = 'y';
+        } else {
+          componentCloned.additionalInfo.answer = [];
+        }
+
+        onChange(componentCloned);
+      }}
+      disabled={disabled}
       sx={{
         '&.Mui-checked': {
           color: '#4CAF50',
@@ -60,32 +102,77 @@ export const CheckboxComponent = ({component}: ComponentProps) => (
   </Box>
 );
 
-export const HeaderComponent = ({component}: ComponentProps) => (
+export const HeaderComponent = ({component}: ComponentHeaderProps) => (
   <Typography variant="h5">{component.subject}</Typography>
 );
 
-export const TextComponent = ({component}: ComponentProps) => (
-  <Box display="flex" flexDirection="column" rowGap={2}>
-    <Typography variant="h6">{component.subject}</Typography>
+export const TextComponent = ({
+  component,
+  onChange,
+  disabled,
+}: ComponentProps) => {
+  const theme = useTheme();
 
-    <Typography
-      variant="body1"
-      p={1.5}
-      border="1px solid #e4e9f2"
-      borderRadius={0.5}
-      minHeight={120}>
-      {component.additionalInfo.note}
-    </Typography>
-  </Box>
-);
+  return (
+    <Box display="flex" flexDirection="column" rowGap={2}>
+      <Typography variant="h6">{component.subject}</Typography>
 
-export const ChecklistComponent = ({component}: ComponentProps) =>
+      <TextField
+        id="outlined-multiline-flexible"
+        multiline
+        disabled={disabled}
+        minRows={6}
+        sx={{
+          color: theme.palette.primary.main,
+          '& .MuiOutlinedInput-input': {
+            color: theme.palette.primary.main,
+            WebkitTextFillColor: theme.palette.primary.main,
+          },
+          '& .Mui-disabled': {
+            color: theme.palette.primary.main,
+            WebkitTextFillColor: theme.palette.primary.main,
+          },
+        }}
+        onChange={(e) => {
+          const componentCloned = {...component};
+          if (!componentCloned.additionalInfo.answer) {
+            componentCloned.additionalInfo.answer = [];
+          }
+
+          componentCloned.additionalInfo.note = e.target.value;
+
+          onChange(componentCloned);
+        }}
+        value={component.additionalInfo.note}
+        maxRows={6}
+      />
+    </Box>
+  );
+};
+
+export const ChecklistComponent = ({
+  component,
+  onChange,
+  disabled = false,
+}: ComponentProps) =>
   component.type === CheckListComponentType.SINGLE_CHECK ? (
-    <MultiChoiceComponent component={component} />
+    <MultiChoiceComponent
+      onChange={onChange}
+      disabled={disabled}
+      component={component}
+    />
   ) : component.type === CheckListComponentType.YES_NO ? (
-    <CheckboxComponent component={component} />
+    <CheckboxComponent
+      onChange={onChange}
+      disabled={disabled}
+      component={component}
+    />
   ) : component.type === CheckListComponentType.HEAD ? (
     <HeaderComponent component={component} />
   ) : component.type === CheckListComponentType.TEXT ? (
-    <TextComponent component={component} />
+    <TextComponent
+      onChange={onChange}
+      disabled={disabled}
+      component={component}
+    />
   ) : null;

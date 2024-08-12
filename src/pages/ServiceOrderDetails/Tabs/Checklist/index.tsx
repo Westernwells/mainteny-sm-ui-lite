@@ -5,20 +5,13 @@ import {
   LinearProgress,
   Typography,
   linearProgressClasses,
-  Chip,
-  FormControl,
-  Select,
-  SelectChangeEvent,
-  MenuItem,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import Send from '@mui/icons-material/Send';
-import {HandymanOutlined, InfoOutlined} from '@mui/icons-material';
+import {InfoOutlined} from '@mui/icons-material';
 import {Box} from '@mui/system';
 import useTheme from '@mui/material/styles/useTheme';
-import {EmptySection} from 'components/EmptySection';
-import {InfoCard} from 'components/InfoCard';
 import {PageCard} from 'components/PageCard';
 import {Progress} from 'components/Progress';
 import {Button} from 'components/Button';
@@ -26,6 +19,7 @@ import {useSendChecklist} from 'hooks/reactQuery/useServiceOrder';
 import {
   useDeleteServiceOrderChecklist,
   useQueryServiceOrderChecklists,
+  useUploadChecklistAnswer,
 } from 'hooks/reactQuery/useChecklists';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
@@ -34,7 +28,11 @@ import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
-import {ChecklistStatus, ServiceOrderView} from 'models/service-order';
+import {
+  CheckListAnswerRecord,
+  ChecklistStatus,
+  ServiceOrderView,
+} from 'models/service-order';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -43,7 +41,11 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {CardProps} from 'components/CardProps';
 import {Confirm} from 'components/Confirm';
-import {CheckListComponentType} from 'models/checklist';
+import {
+  CheckListComponentType,
+  CheckListComponentView,
+  ServiceOrderCheckListView,
+} from 'models/checklist';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {
   companyLanguageContextMap,
@@ -59,18 +61,13 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
-import {PdfGenerationStatus} from 'models/misc';
-import {ChecklistComponent} from './ChecklistComponent';
+import {CreateEditMode, PdfGenerationStatus} from 'models/misc';
+import {BottomDrawer} from 'components/BottomDrawer';
+import _ from 'lodash';
 import ChecklistPdf from './ChecklistPdf';
-
-const EmptyCheckList = () => (
-  <EmptySection
-    illustration="clipboard"
-    size="tiny"
-    containerStyle={{width: '60%'}}
-    label="No checklist yet."
-  />
-);
+import {AddChecklistCard} from './AddChecklistCard';
+import AddChecklistDialog from './AddChecklistDialog';
+import {ChecklistPreviewSection} from './ChecklistPreviewSection';
 
 interface Props {
   serviceOrder: ServiceOrderView;
@@ -79,6 +76,11 @@ interface Props {
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
+
+interface ChecklistDialogState {
+  isOpen: boolean;
+  mode: CreateEditMode;
+}
 
 export const CheckList = ({serviceOrder}: Props) => {
   const theme = useTheme();
@@ -90,15 +92,23 @@ export const CheckList = ({serviceOrder}: Props) => {
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [deleteChecklistConfirm, setDeleteChecklistConfirm] = useState(false);
   const [actionType, setActionType] = useState('');
-
+  const [checklistDialog, setChecklistDialog] = useState<ChecklistDialogState>({
+    isOpen: false,
+    mode: 'create',
+  });
+  const [isCancelEditConfirmDialogOpen, setIsCancelEditConfirmDialogOpen] =
+    useState(false);
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const {mutateAsync: uploadFiles} = useUploadFiles('');
   const {mutateAsync: sendCheckList, isLoading: sendingCheckList} =
     useSendChecklist();
   const {mutateAsync: deleteServiceOrderChecklist, isLoading: isDeleting} =
     useDeleteServiceOrderChecklist();
+  const {mutateAsync: uploadChecklistAnswer, isLoading: isUploadingAnswers} =
+    useUploadChecklistAnswer('Checklist saved successfully');
 
   const {data: serviceOrderCheckLists, isLoading: isLoadingCheckList} =
     useQueryServiceOrderChecklists({serviceOrderId: serviceOrder.id});
@@ -132,11 +142,9 @@ export const CheckList = ({serviceOrder}: Props) => {
     }) || [];
 
   const [selectedOption, setSelectedOption] = useState(labels[0]?.value || '');
-  const selectedChecklist = completedChecklists?.find(
-    (c) =>
-      c.checkListId === selectedOption.checklistId &&
-      c.technicianId === selectedOption.technicianId,
-  );
+  const [selectedChecklist, setSelectedChecklist] =
+    useState<ServiceOrderCheckListView>();
+
   const sortedChecklistComponents =
     selectedChecklist?.checkList?.components.sort(
       (a, b) =>
@@ -162,10 +170,6 @@ export const CheckList = ({serviceOrder}: Props) => {
   const technicianName = technicianUserAccount
     ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
     : '';
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setSelectedOption(JSON.parse(event.target.value));
-  };
 
   const deleteChecklist = async () => {
     await deleteServiceOrderChecklist(
@@ -215,6 +219,27 @@ export const CheckList = ({serviceOrder}: Props) => {
       setSelectedOption(labels[0].value);
     }
   }, [completedChecklists]);
+
+  useEffect(() => {
+    if (!serviceOrderCheckLists?.length) {
+      return;
+    }
+
+    if (!selectedChecklist) {
+      setSelectedChecklist(_.cloneDeep(serviceOrderCheckLists[0]));
+      return;
+    }
+
+    const isFound = serviceOrderCheckLists.some(
+      (item) =>
+        item.checkListId === selectedChecklist.checkListId &&
+        item.technicianId === selectedChecklist.technicianId,
+    );
+
+    if (!isFound) {
+      setSelectedChecklist(_.cloneDeep(serviceOrderCheckLists[0]));
+    }
+  }, [serviceOrderCheckLists]);
 
   const percentComplete = Math.round(
     checklistSummary.all === 0
@@ -354,6 +379,34 @@ export const CheckList = ({serviceOrder}: Props) => {
     }
   };
 
+  const saveChecklistAnswers = () => {
+    const params = {
+      serviceOrder: serviceOrder.id,
+    };
+    const queryParams = {
+      technicianId: selectedChecklist?.technicianId!,
+      checkListId: selectedChecklist?.checkListId!,
+    };
+    const body: CheckListAnswerRecord[] =
+      selectedChecklist?.checkList.components.map((item) => ({
+        componentId: item.id,
+        values: item.additionalInfo.answer ?? [],
+        note: item.additionalInfo.note ?? '',
+      })) ?? [];
+
+    const payload = {
+      params,
+      queryParams,
+      body,
+    };
+
+    uploadChecklistAnswer(payload, {
+      onSuccess: () => {
+        setIsEditing(false);
+      },
+    });
+  };
+
   useEffect(() => {
     if (pdfPathToDownload && actionType === 'DOWNLOAD') {
       try {
@@ -387,428 +440,431 @@ export const CheckList = ({serviceOrder}: Props) => {
     return <Progress />;
   }
 
-  if (!completedChecklists?.length) {
-    return (
-      <InfoCard
-        disabledHeader
-        containerStyles={{
-          mb: '1.2rem',
-          padding: '11rem 0 11rem 0',
-        }}
-        bodyContainerStyle={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <EmptyCheckList />
-      </InfoCard>
-    );
-  }
+  const handleChecklistAddPress = () => {
+    setChecklistDialog({...checklistDialog, isOpen: true, mode: 'create'});
+  };
+
+  const handleChecklistEditPress = (
+    newSelectedChecklist: ServiceOrderCheckListView,
+  ) => {
+    setIsEditing(true);
+    setSelectedChecklist(_.cloneWith(newSelectedChecklist));
+  };
+
+  const onChecklistChange = (
+    newChecklistComponent: CheckListComponentView,
+    index: number,
+  ) => {
+    const selectedChecklistCloned = _.cloneDeep(selectedChecklist);
+
+    selectedChecklistCloned!.checkList.components[index] =
+      newChecklistComponent;
+
+    setSelectedChecklist(selectedChecklistCloned);
+  };
 
   return (
-    <Grid container alignItems="center" justifyContent="center" rowGap="27px">
-      <Grid item lg={8} flexBasis="100%">
-        <Grid container spacing={2}>
-          <Grid
-            item
-            md={8}
-            sx={{
-              py: '0em',
-            }}>
-            <PageCard
-              headerLabel="General Information"
-              headerIcon={
-                <InfoOutlined sx={{color: theme.palette.text.disabled}} />
-              }
-              containerStyles={{
-                borderRadius: '0.5rem',
-              }}
-              contentContainerStyles={{
-                display: 'grid',
-                gridAutoColumns: 'minmax(0, 1fr)',
-                gridAutoFlow: 'column',
-                padding: 1.25,
-                '&:last-child': {
-                  pb: 1.25,
-                },
+    <>
+      <Grid container alignItems="center" justifyContent="center" rowGap="27px">
+        <Grid item lg={12} flexBasis="100%">
+          <Grid container spacing={2}>
+            <Grid
+              item
+              md={8}
+              sx={{
+                py: '0em',
               }}>
-              <CardProps
-                label="Date"
-                containerStyles={{alignItems: 'center'}}
-                bodyTextVariant="subtitle1"
-                bodyText={formatDate(serviceOrder.dueDate)}
-                bodyStyle={{fontWeight: '600'}}
-              />
-              <CardProps
-                label="Type"
-                bodyTextVariant="subtitle1"
-                containerStyles={{alignItems: 'center'}}
-                bodyText={
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <ServiceOrderIcons
-                      serviceOrderType={serviceOrder.type}
-                      size="small"
+              <PageCard
+                headerLabel="General Information"
+                headerIcon={
+                  <InfoOutlined sx={{color: theme.palette.text.disabled}} />
+                }
+                containerStyles={{
+                  borderRadius: '0.5rem',
+                }}
+                contentContainerStyles={{
+                  display: 'grid',
+                  gridAutoColumns: 'minmax(0, 1fr)',
+                  gridAutoFlow: 'column',
+                  padding: 1.25,
+                  '&:last-child': {
+                    pb: 1.25,
+                  },
+                }}>
+                <CardProps
+                  label="Date"
+                  containerStyles={{alignItems: 'center'}}
+                  bodyTextVariant="subtitle1"
+                  bodyText={formatDate(serviceOrder.dueDate)}
+                  bodyStyle={{fontWeight: '600'}}
+                />
+                <CardProps
+                  label="Type"
+                  bodyTextVariant="subtitle1"
+                  containerStyles={{alignItems: 'center'}}
+                  bodyText={
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <ServiceOrderIcons
+                        serviceOrderType={serviceOrder.type}
+                        size="small"
+                      />
+                      <ServiceOrderTypeText
+                        serviceOrderType={serviceOrder.type}
+                        capitalizeText
+                        variant="subtitle1"
+                        style={{fontWeight: '600'}}
+                      />
+                    </Box>
+                  }
+                  bodyStyle={{fontWeight: '600'}}
+                />
+                <CardProps
+                  label="Job ID"
+                  bodyTextVariant="subtitle1"
+                  containerStyles={{alignItems: 'center'}}
+                  bodyText={serviceOrder.number}
+                  bodyStyle={{fontWeight: '600'}}
+                />
+                <CardProps
+                  label="Status"
+                  bodyTextVariant="subtitle1"
+                  containerStyles={{alignItems: 'center'}}
+                  bodyText={
+                    <StatusChip
+                      color={getServiceOrderStatusColor(serviceOrder.status)}
+                      label={serviceOrderStatusToString(serviceOrder.status)}
                     />
-                    <ServiceOrderTypeText
-                      serviceOrderType={serviceOrder.type}
-                      capitalizeText
-                      variant="subtitle1"
-                      style={{fontWeight: '600'}}
+                  }
+                  bodyStyle={{fontWeight: '600'}}
+                />
+              </PageCard>
+              {selectedChecklist && (
+                <Box
+                  bgcolor="white"
+                  border="2px solid #eee"
+                  borderRadius="10px"
+                  sx={{px: 1, py: 3, mt: 2}}>
+                  <Box p={2} pt={0}>
+                    <Box display="flex" justifyContent="space-between">
+                      <Typography variant="subtitle1" color="text.secondary">
+                        {t('Checklist overview')}
+                      </Typography>
+                      <Box minWidth="250px">
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          pb={0.5}>
+                          <Typography variant="caption">
+                            {checklistSummary.done}/{checklistSummary.all}{' '}
+                            {t('options')}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {percentComplete}% {t('complete')}
+                          </Typography>
+                        </Box>
+                        <LinearProgress
+                          variant="determinate"
+                          value={percentComplete}
+                          sx={{
+                            backgroundColor: `${theme.palette.text.secondary}66`,
+                            [`& .${linearProgressClasses.bar}`]: {
+                              backgroundColor: '#4CAF50',
+                            },
+                          }}
+                        />
+                      </Box>
+                    </Box>
+
+                    <ChecklistPreviewSection
+                      sx={{ml: 0, mt: 3}}
+                      onChecklistChange={onChecklistChange}
+                      isEditing={isEditing}
+                      checklist={selectedChecklist?.checkList}
                     />
                   </Box>
-                }
-                bodyStyle={{fontWeight: '600'}}
-              />
-              <CardProps
-                label="Job ID"
-                bodyTextVariant="subtitle1"
-                containerStyles={{alignItems: 'center'}}
-                bodyText={serviceOrder.number}
-                bodyStyle={{fontWeight: '600'}}
-              />
-              <CardProps
-                label="Status"
-                bodyTextVariant="subtitle1"
-                containerStyles={{alignItems: 'center'}}
-                bodyText={
-                  <StatusChip
-                    color={getServiceOrderStatusColor(serviceOrder.status)}
-                    label={serviceOrderStatusToString(serviceOrder.status)}
-                  />
-                }
-                bodyStyle={{fontWeight: '600'}}
-              />
-            </PageCard>
-          </Grid>
-          <Grid
-            item
-            md={4}
-            sx={{
-              py: '0em',
-            }}>
-            <PageCard
-              customHeader={
-                <Box display="flex" gap={1}>
-                  <HandymanOutlined sx={{color: theme.palette.text.disabled}} />
-                  <Typography sx={{fontWeight: '600'}}>
-                    {t('Engineer(s)')}
-                  </Typography>
-                  <Chip
-                    label={completedChecklists?.length || 0}
-                    size="small"
-                    sx={{
-                      color: theme.palette.primary.dark,
-                      bgcolor: 'rgba(143, 155, 179, 0.25)',
-                      width: '1.5rem',
-                      height: '1.5rem',
-                      borderRadius: '50%',
-                      '& .MuiChip-label': {
-                        overflow: 'visible',
-                      },
-                    }}
-                  />
-                </Box>
-              }
-              contentContainerStyles={{
-                display: 'flex',
-                flex: 'wrap',
-                justifyContent: 'space-between',
-                pb: '0.5em !important',
-              }}>
-              <Grid
-                sx={{
-                  minHeight: '60px',
-                }}
-                container>
-                <Grid item sm={12} md={12}>
-                  <FormControl fullWidth sx={{marginBlock: '0.5em'}}>
-                    <Select
-                      labelId="technicianSelect-label"
-                      id="technicianSelect"
-                      value={JSON.stringify(selectedOption)}
-                      size="small"
-                      onChange={handleChange}>
-                      {labels.map((item) => (
-                        <MenuItem
-                          value={JSON.stringify(item.value)}
-                          key={item.label}>
-                          {item.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </PageCard>
-          </Grid>
-        </Grid>
-      </Grid>
 
-      <Grid item lg={8} flexBasis="100%" pb="5rem">
-        <Box
-          bgcolor="white"
-          border="2px solid #eee"
-          borderRadius="10px"
-          sx={{px: 1, py: 3}}>
-          <Box p={2} pt={0}>
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="subtitle1" color="text.secondary">
-                {t('Checklist overview')}
-              </Typography>
-              <Box minWidth="250px">
-                <Box display="flex" justifyContent="space-between" pb={0.5}>
-                  <Typography variant="caption">
-                    {checklistSummary.done}/{checklistSummary.all}{' '}
-                    {t('options')}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {percentComplete}% {t('complete')}
-                  </Typography>
-                </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={percentComplete}
-                  sx={{
-                    backgroundColor: `${theme.palette.text.secondary}66`,
-                    [`& .${linearProgressClasses.bar}`]: {
-                      backgroundColor: '#4CAF50',
-                    },
-                  }}
-                />
-              </Box>
-            </Box>
+                  <Box bgcolor="white" px="1rem" py={4}>
+                    <Typography
+                      variant="caption"
+                      color={theme.palette.text.secondary}>
+                      {t('Signature')}
+                    </Typography>
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      mt="0.5rem"
+                      mb="2.3rem"
+                      py="2.5rem"
+                      border="1px solid"
+                      borderColor="grey.300"
+                      borderRadius="0.5rem"
+                      position="relative"
+                      maxWidth="15rem"
+                      maxHeight="7rem">
+                      <Box>
+                        {signaturePath ? (
+                          <img
+                            alt=""
+                            src={signaturePath}
+                            style={{
+                              objectFit: 'cover',
+                              objectPosition: 'top',
+                              width: '100%',
+                              height: '100%',
+                            }}
+                          />
+                        ) : (
+                          t('No Signature')
+                        )}
+                      </Box>
+                      {technicianName && (
+                        <Box
+                          display="flex"
+                          flexDirection="column"
+                          alignItems="center"
+                          justifyContent="center"
+                          top="6rem"
+                          bgcolor="white"
+                          px="0.625rem"
+                          position="absolute"
+                          maxWidth="17.5rem">
+                          <Typography
+                            variant="subtitle1"
+                            color={theme.palette.text.primary}>
+                            {technicianName}
+                          </Typography>
+                          <Typography
+                            variant="subtitle2"
+                            color={theme.palette.text.secondary}>
+                            {t('Technician')}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
 
-            <Box
-              bgcolor="grey.100"
-              borderRadius="4px"
-              mt={2}
-              p={1}
-              display="flex"
-              flexDirection="column"
-              gap="1rem">
-              <Box
-                bgcolor="white"
-                p={4}
-                display="flex"
-                flexDirection="column"
-                rowGap={2}>
-                <Typography
-                  variant="h5"
-                  color={theme.palette.primary.dark}
-                  fontSize="31px"
-                  py={2}>
-                  {selectedChecklist?.checkList.name ?? ''}
-                </Typography>
-
-                <Box display="flex" flexDirection="column" rowGap={3}>
-                  {sortedChecklistComponents?.map((component) => (
-                    <ChecklistComponent
-                      key={component.id}
-                      component={component}
+                  <Box display="flex" justifyContent="space-between" p={2}>
+                    <Button
+                      label="Delete"
+                      buttonProps={{
+                        color: 'error',
+                        variant: 'text',
+                        size: 'medium',
+                        onClick: () => setDeleteChecklistConfirm(true),
+                        sx: {background: 'transparent'},
+                        startIcon: <DeleteIcon />,
+                      }}
                     />
-                  ))}
-                </Box>
-              </Box>
-            </Box>
-          </Box>
+                    <Box>
+                      <Button
+                        label="Download"
+                        buttonProps={{
+                          variant: 'outlined',
+                          size: 'medium',
+                          onClick: () => handleDownload(),
+                          sx: {
+                            background: 'transparent',
+                          },
 
-          <Box bgcolor="white" px="1rem" py={4}>
-            <Typography variant="caption" color={theme.palette.text.secondary}>
-              {t('Signature')}
-            </Typography>
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              mt="0.5rem"
-              mb="2.3rem"
-              py="2.5rem"
-              border="1px solid"
-              borderColor="grey.300"
-              borderRadius="0.5rem"
-              position="relative"
-              maxWidth="15rem"
-              maxHeight="7rem">
-              <Box>
-                {signaturePath ? (
-                  <img
-                    alt=""
-                    src={signaturePath}
-                    style={{
-                      objectFit: 'cover',
-                      objectPosition: 'top',
-                      width: '100%',
-                      height: '100%',
-                    }}
-                  />
-                ) : (
-                  t('No Signature')
-                )}
-              </Box>
-              {technicianName && (
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  justifyContent="center"
-                  top="6rem"
-                  bgcolor="white"
-                  px="0.625rem"
-                  position="absolute"
-                  maxWidth="17.5rem">
-                  <Typography
-                    variant="subtitle1"
-                    color={theme.palette.text.primary}>
-                    {technicianName}
-                  </Typography>
-                  <Typography
-                    variant="subtitle2"
-                    color={theme.palette.text.secondary}>
-                    {t('Technician')}
-                  </Typography>
+                          startIcon: <FileDownloadIcon />,
+                        }}
+                      />
+
+                      <Button
+                        label={t('Send Checklist')}
+                        buttonProps={{
+                          variant: 'contained',
+                          size: 'medium',
+                          onClick: handleOpenSendEmail,
+                          sx: {
+                            ml: '1em',
+                          },
+
+                          startIcon: <Send />,
+                        }}
+                      />
+                    </Box>
+
+                    <SendEmailDialog
+                      open={isSendEmailDialogOpen}
+                      onClose={() => setIsSendEmailDialogOpen(false)}
+                      confirmBtnDisabled={sendingCheckList}
+                      email={
+                        serviceOrder.elevator.propertyOwner?.additionalInfo
+                          .billingEmail ||
+                        serviceOrder.elevator.propertyOwner?.contact.email
+                      }
+                      content={serviceOrder.description}
+                      existingFiles={existingFiles}
+                      isLoadingFiles={isLoadingFiles}
+                      callback={async (emailRecord) => {
+                        setIsSendEmailDialogOpen(false);
+
+                        const serviceCompanyId =
+                          user?.userAccount.serviceCompany.id;
+                        const checkListInfo = selectedChecklist!;
+                        const uploadPath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/checkLists/${checkListInfo.technicianId}`;
+                        const fileNames = [`${checkListInfo.checkListId}.pdf`];
+                        const isPDFGenerated =
+                          checkListInfo?.additionalInfo.pdfGenerationStatus ===
+                          PdfGenerationStatus.DONE;
+
+                        const allAttachments = emailRecord.attachments || [];
+                        const emailAttachments = (
+                          emailRecord.attachments || []
+                        )?.filter((el) => el.path);
+                        const hasExistingFileToUpload = allAttachments.some(
+                          (obj, index) => {
+                            const isExistingFile = !obj.path && index === 0;
+                            return isExistingFile;
+                          },
+                        );
+
+                        if (!isPDFGenerated && hasExistingFileToUpload) {
+                          await uploadFiles({files: existingFiles, uploadPath});
+                        }
+
+                        if (emailAttachments.length) {
+                          await uploadFiles({
+                            files: emailAttachments,
+                            uploadPath,
+                          });
+                        }
+
+                        await sendCheckList({
+                          id: serviceOrder!.id,
+                          body: {
+                            checkListId: checkListInfo.checkListId || '',
+                            technicianId: checkListInfo.technicianId || '',
+                            pdfPath: isPDFGenerated
+                              ? checkListInfo?.additionalInfo.pdfPath!
+                              : `${uploadPath}/${fileNames[0]}`,
+                            email: {
+                              email: '',
+                              subject: emailRecord.subject,
+                              content: emailRecord.content,
+                              emails: emailRecord.emails,
+                              ccEmails: emailRecord.ccEmails,
+                              bccEmails: emailRecord.bccEmails,
+                              attachments: allAttachments.reduce<
+                                FileWithPreview[]
+                              >((newArr: FileWithPreview[], obj, index) => {
+                                const isFileFromServer =
+                                  !obj.path && index === 0;
+                                return [
+                                  ...newArr,
+                                  {
+                                    ...obj,
+                                    type: obj.type,
+                                    uri: isFileFromServer
+                                      ? isPDFGenerated
+                                        ? checkListInfo?.additionalInfo.pdfPath!
+                                        : `${uploadPath}/${checkListInfo.checkListId}.pdf`
+                                      : `${uploadPath}/${obj.name}`,
+                                    description: isFileFromServer
+                                      ? `${checkListInfo.checkList?.externalId}.pdf` ||
+                                        `${checkListInfo.checkList?.number}.pdf`
+                                      : obj.name.split('.')[0],
+                                  },
+                                ];
+                              }, []),
+                            },
+                          },
+                        });
+                      }}
+                    />
+                  </Box>
                 </Box>
               )}
-            </Box>
-          </Box>
-
-          <Box display="flex" justifyContent="space-between" p={2}>
-            <Button
-              label="Delete"
-              buttonProps={{
-                color: 'error',
-                variant: 'text',
-                size: 'medium',
-                onClick: () => setDeleteChecklistConfirm(true),
-                sx: {background: 'transparent'},
-                startIcon: <DeleteIcon />,
-              }}
-            />
-            <Box>
-              <Button
-                label="Download"
-                buttonProps={{
-                  variant: 'outlined',
-                  size: 'medium',
-                  onClick: () => handleDownload(),
-                  sx: {
-                    background: 'transparent',
-                  },
-
-                  startIcon: <FileDownloadIcon />,
+            </Grid>
+            <Grid
+              item
+              md={4}
+              sx={{
+                py: '0em',
+              }}>
+              <AddChecklistCard
+                checklists={serviceOrderCheckLists}
+                onSelect={(newChecklist) => {
+                  setSelectedChecklist(_.cloneDeep(newChecklist));
                 }}
+                isEditing={isEditing}
+                selectedChecklist={selectedChecklist}
+                serviceOrder={serviceOrder}
+                onAddPress={handleChecklistAddPress}
+                onEditPress={handleChecklistEditPress}
               />
+            </Grid>
+          </Grid>
+        </Grid>
 
-              <Button
-                label={t('Send Checklist')}
-                buttonProps={{
-                  variant: 'contained',
-                  size: 'medium',
-                  onClick: handleOpenSendEmail,
-                  sx: {
-                    ml: '1em',
-                  },
-
-                  startIcon: <Send />,
-                }}
-              />
-            </Box>
-
-            <SendEmailDialog
-              open={isSendEmailDialogOpen}
-              onClose={() => setIsSendEmailDialogOpen(false)}
-              confirmBtnDisabled={sendingCheckList}
-              email={
-                serviceOrder.elevator.propertyOwner?.additionalInfo
-                  .billingEmail ||
-                serviceOrder.elevator.propertyOwner?.contact.email
-              }
-              content={serviceOrder.description}
-              existingFiles={existingFiles}
-              isLoadingFiles={isLoadingFiles}
-              callback={async (emailRecord) => {
-                setIsSendEmailDialogOpen(false);
-
-                const serviceCompanyId = user?.userAccount.serviceCompany.id;
-                const checkListInfo = selectedChecklist!;
-                const uploadPath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/checkLists/${checkListInfo.technicianId}`;
-                const fileNames = [`${checkListInfo.checkListId}.pdf`];
-                const isPDFGenerated =
-                  checkListInfo?.additionalInfo.pdfGenerationStatus ===
-                  PdfGenerationStatus.DONE;
-
-                const allAttachments = emailRecord.attachments || [];
-                const emailAttachments = (
-                  emailRecord.attachments || []
-                )?.filter((el) => el.path);
-                const hasExistingFileToUpload = allAttachments.some(
-                  (obj, index) => {
-                    const isExistingFile = !obj.path && index === 0;
-                    return isExistingFile;
-                  },
-                );
-
-                if (!isPDFGenerated && hasExistingFileToUpload) {
-                  await uploadFiles({files: existingFiles, uploadPath});
-                }
-
-                if (emailAttachments.length) {
-                  await uploadFiles({files: emailAttachments, uploadPath});
-                }
-
-                await sendCheckList({
-                  id: serviceOrder!.id,
-                  body: {
-                    checkListId: checkListInfo.checkListId || '',
-                    technicianId: checkListInfo.technicianId || '',
-                    pdfPath: isPDFGenerated
-                      ? checkListInfo?.additionalInfo.pdfPath!
-                      : `${uploadPath}/${fileNames[0]}`,
-                    email: {
-                      email: '',
-                      subject: emailRecord.subject,
-                      content: emailRecord.content,
-                      emails: emailRecord.emails,
-                      ccEmails: emailRecord.ccEmails,
-                      bccEmails: emailRecord.bccEmails,
-                      attachments: allAttachments.reduce<FileWithPreview[]>(
-                        (newArr: FileWithPreview[], obj, index) => {
-                          const isFileFromServer = !obj.path && index === 0;
-                          return [
-                            ...newArr,
-                            {
-                              ...obj,
-                              type: obj.type,
-                              uri: isFileFromServer
-                                ? isPDFGenerated
-                                  ? checkListInfo?.additionalInfo.pdfPath!
-                                  : `${uploadPath}/${checkListInfo.checkListId}.pdf`
-                                : `${uploadPath}/${obj.name}`,
-                              description: isFileFromServer
-                                ? `${checkListInfo.checkList?.externalId}.pdf` ||
-                                  `${checkListInfo.checkList?.number}.pdf`
-                                : obj.name.split('.')[0],
-                            },
-                          ];
-                        },
-                        [],
-                      ),
-                    },
-                  },
-                });
-              }}
-            />
-          </Box>
-        </Box>
+        <AddChecklistDialog
+          isOpen={checklistDialog.isOpen}
+          serviceOrderCheckLists={serviceOrderCheckLists}
+          serviceOrder={serviceOrder}
+          formType={checklistDialog.mode}
+          onClose={() => {
+            setChecklistDialog({...checklistDialog, isOpen: false});
+          }}
+        />
+        <Confirm
+          open={deleteChecklistConfirm}
+          onConfirm={deleteChecklist}
+          onClose={() => setDeleteChecklistConfirm(false)}
+          title={t('Delete')}
+          content={t('Do you want to delete this checklist?')}
+          disableActions={isDeleting}
+        />
       </Grid>
-      <Confirm
-        open={deleteChecklistConfirm}
-        onConfirm={deleteChecklist}
-        onClose={() => setDeleteChecklistConfirm(false)}
-        title={t('Delete')}
-        content={t('Do you want to delete this checklist?')}
-        disableActions={isDeleting}
+      <BottomDrawer
+        isOpen={isEditing}
+        primaryButtonLabel="Save"
+        primaryButtonAction={() => {
+          saveChecklistAnswers();
+        }}
+        listItems={[]}
+        isSaving={isUploadingAnswers}
+        isValid
+        buttonWrapperStyles={{
+          justifyContent: 'space-between',
+          paddingLeft: '6em',
+        }}
+        secondaryButton={
+          <Button
+            label="Cancel"
+            buttonProps={{
+              variant: 'outlined',
+              sx: {bgcolor: theme.palette.inputBackground.main},
+              size: 'medium',
+              onClick: () => {
+                setIsCancelEditConfirmDialogOpen(true);
+              },
+            }}
+          />
+        }
       />
-    </Grid>
+      <Confirm
+        open={isCancelEditConfirmDialogOpen}
+        onConfirm={() => {
+          setIsEditing(false);
+
+          const freshCopy = serviceOrderCheckLists?.find(
+            (item) =>
+              item.checkListId === selectedChecklist?.checkListId &&
+              item.technicianId === selectedChecklist.technicianId,
+          );
+
+          setSelectedChecklist(freshCopy);
+          setIsCancelEditConfirmDialogOpen(false);
+        }}
+        onClose={() => setIsCancelEditConfirmDialogOpen(false)}
+        title="Cancel editing"
+        content="You are about to cancel editing checklist."
+        secondContent="All your progress will be lost"
+        helperText=""
+      />
+    </>
   );
 };
