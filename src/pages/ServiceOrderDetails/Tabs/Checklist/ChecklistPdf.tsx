@@ -9,12 +9,12 @@ import {ServiceOrderView} from 'models/service-order';
 import {UserAccount} from 'models/user';
 import {formatDate} from 'utils/datetime';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
-import {formatAddressFullname} from 'utils/utils';
 import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
 import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
 import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {HeaderFooterInfoData} from 'models/misc';
+import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {PdfChecklistComponent} from './PdfChecklistComponent';
 
 const getStyles = (
@@ -36,12 +36,12 @@ const getStyles = (
     },
     tag: {
       ...boldFontStyle,
-      fontSize: 10,
+      fontSize: 8.5,
       color: '#212121',
       flex: '0 0 43%',
     },
     tagContent: {
-      fontSize: 10,
+      fontSize: 8.5,
       color: '#616161',
       width: '57%',
       textAlign: 'right',
@@ -231,14 +231,11 @@ const ChecklistPdf = ({
                   </View>
                 )}
 
-                {serviceOrder?.elevator?.address?.fullName && (
-                  <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Unit address')}</Text>
-                    <Text style={styles.tagContent}>{`${
-                      formatAddressFullname(elevatorAddress)?.fullCityName
-                    }`}</Text>
-                  </View>
-                )}
+                <PdfUnitAddress
+                  address={elevatorAddress}
+                  translate={translate}
+                  selectedLng={selectedLng}
+                />
               </View>
             </View>
           </TopSectionContainer>

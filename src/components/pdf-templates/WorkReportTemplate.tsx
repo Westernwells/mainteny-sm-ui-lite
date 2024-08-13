@@ -16,7 +16,6 @@ import {
 import {formatDate} from 'utils/datetime';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import capitalize from 'lodash/capitalize';
-import {formatAddressFullname} from 'utils/utils';
 import {convertMinutesToHoursAndMinutes} from 'utils/work-hours-utils';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {HeaderFooterInfoData} from 'models/misc';
@@ -31,6 +30,7 @@ import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageContainer from './containers/PdfPageContainer';
 import PdfPageTitle from './containers/PdfPageTitle';
 import TopSectionContainer from './containers/TopSectionContainer';
+import PdfUnitAddress from './containers/PdfUnitAddress';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -76,12 +76,12 @@ const getStyles = (
     },
     tag: {
       ...boldFontStyle,
-      fontSize: 9,
+      fontSize: 8.5,
       color: '#212121',
       flex: '0 0 43%',
     },
     tagContent: {
-      fontSize: 9,
+      fontSize: 8.5,
       color: '#616161',
       flex: '0 0 57%',
       textAlign: 'right',
@@ -399,16 +399,11 @@ const WorkReportTemplate = React.memo(
                     </View>
                   )}
 
-                  {formatAddressFullname(elevatorAddress)?.fullCityName && (
-                    <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Unit address')}
-                      </Text>
-                      <Text style={styles.tagContent}>{`${
-                        formatAddressFullname(elevatorAddress)?.fullCityName
-                      }`}</Text>
-                    </View>
-                  )}
+                  <PdfUnitAddress
+                    address={elevatorAddress}
+                    translate={translate}
+                    selectedLng={selectedLng}
+                  />
                 </View>
               </View>
             </TopSectionContainer>

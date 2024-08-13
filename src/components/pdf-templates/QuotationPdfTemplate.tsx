@@ -10,7 +10,6 @@ import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType} from 'models/invoice';
-import {formatAddressFullname} from 'utils/utils';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
@@ -29,6 +28,7 @@ import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageContainer from './containers/PdfPageContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
+import PdfUnitAddress from './containers/PdfUnitAddress';
 
 Font.register({
   family: 'Montserrat-Regular',
@@ -74,12 +74,12 @@ const getStyles = (
     },
     tag: {
       ...boldFontStyle,
-      fontSize: 9,
+      fontSize: 8.5,
       color: '#212121',
       flex: '0 0 43%',
     },
     tagContent: {
-      fontSize: 9,
+      fontSize: 8.5,
       color: '#616161',
       flex: '0 0 57%',
       textAlign: 'right',
@@ -345,17 +345,11 @@ const QuotationPdfTemplate = React.memo(
                     </View>
                   )}
 
-                  {quotation?.elevator?.address?.fullName && (
-                    <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Unit address')}
-                      </Text>
-                      <Text style={styles.tagContent}>{`${
-                        formatAddressFullname(quotation?.elevator?.address)
-                          ?.fullCityName
-                      }`}</Text>
-                    </View>
-                  )}
+                  <PdfUnitAddress
+                    address={quotation?.elevator.address}
+                    translate={translate}
+                    selectedLng={selectedLng}
+                  />
                 </View>
               </View>
             </TopSectionContainer>
