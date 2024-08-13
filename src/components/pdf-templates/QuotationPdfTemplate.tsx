@@ -346,7 +346,7 @@ const QuotationPdfTemplate = React.memo(
                   )}
 
                   <PdfUnitAddress
-                    address={quotation?.elevator.address}
+                    address={quotation?.elevator?.address}
                     translate={translate}
                     selectedLng={selectedLng}
                   />
