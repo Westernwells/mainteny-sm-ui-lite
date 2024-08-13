@@ -1,8 +1,8 @@
 import {Client} from './client';
 import {
-  AmountRecord,
   Address,
   Amount,
+  AmountRecord,
   Meta,
   Order,
   TimeWindowRecord,
@@ -29,7 +29,6 @@ import {FileResource} from './media';
 import {ArticleType, CostPackage} from './article';
 import {toRestDate} from 'utils/datetime';
 import {ServiceCompanyType} from './service-company';
-import {t} from 'i18next';
 import {ServiceOrderType} from './service-order';
 
 export interface QueryContractCommentsParams {
@@ -622,12 +621,12 @@ export interface ContractComponentRecord {
 }
 
 export interface ContractComponentElevator {
-  isChecked?: boolean;
   elevatorId: string;
   invoiceJob: JobTimeUnit;
   orderGenerationJob: JobTimeUnit;
   price: number;
-  isSelected?: boolean;
+  isChecked?: boolean; // on mutate
+  isSelected?: boolean; // on create
 }
 
 export interface JobTimeUnit {
@@ -754,7 +753,7 @@ export const calculateContractInvoicePriceTotal = (
   array: ContractComponentElevator[],
 ) =>
   array.reduce((acc: number, item: ContractComponentElevator) => {
-    if (!item.isChecked) return acc; // item is deselected
+    if (!item.isChecked && !item.isSelected) return acc; // item is deselected
     let timeLength: number = 0;
 
     if (!item.invoiceJob && !item.orderGenerationJob) return 0;
