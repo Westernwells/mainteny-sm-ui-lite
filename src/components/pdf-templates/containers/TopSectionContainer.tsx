@@ -12,7 +12,7 @@ const getStyles = () =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
-      marginBottom: 20,
+      marginBottom: 35,
       paddingTop: 60,
     },
   });

@@ -10,7 +10,6 @@ import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
-import {formatAddressFullname} from 'utils/utils';
 import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
 import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
 import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
@@ -23,6 +22,7 @@ import {
   allItemsHaveZeroDiscount,
   shouldDisplayDiscountDash,
 } from 'utils/discount';
+import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -68,12 +68,12 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     },
     tag: {
       ...boldFontStyle,
-      fontSize: 10,
+      fontSize: 8.5,
       color: '#212121',
       width: '43%',
     },
     tagContent: {
-      fontSize: 10,
+      fontSize: 8.5,
       color: '#616161',
       width: '57%',
       textAlign: 'right',
@@ -327,16 +327,11 @@ const JobOverviewPdfTemplate = React.memo(
                     </View>
                   )}
 
-                  {serviceOrder?.elevator.address.fullName && (
-                    <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Unit address')}
-                      </Text>
-                      <Text style={styles.tagContent}>
-                        {formatAddressFullname(elevatorAddress)?.fullCityName}
-                      </Text>
-                    </View>
-                  )}
+                  <PdfUnitAddress
+                    address={elevatorAddress}
+                    translate={translate}
+                    selectedLng={selectedLng}
+                  />
                 </View>
               </View>
             </TopSectionContainer>
