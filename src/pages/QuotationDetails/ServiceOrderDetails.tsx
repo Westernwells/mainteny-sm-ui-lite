@@ -11,6 +11,7 @@ import {
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import useTheme from '@mui/material/styles/useTheme';
+import DOMPurify from 'dompurify';
 
 interface Props {
   serviceOrderId: string;
@@ -81,7 +82,13 @@ export const ServiceOrderDetails = ({serviceOrderId}: Props) => {
           />
         </Box>
       )}
-      <Typography variant="caption">{serviceOrder?.description}</Typography>
+
+      <Typography
+        variant="caption"
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(serviceOrder?.description!),
+        }}
+      />
     </>
   );
 };
