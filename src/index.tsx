@@ -46,6 +46,12 @@ Sentry.init({
   ],
 });
 
+// Add the script tag dynamically
+const script = document.createElement('script');
+script.src = 'https://design.kalasar.com/static/0.0.1/kalasar.js';
+script.async = true;
+document.head.appendChild(script);
+
 // Updated part for React 18
 const container = document.querySelector('#root') as Element;
 const root = createRoot(container); // Create a root.

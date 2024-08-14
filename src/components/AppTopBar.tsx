@@ -18,6 +18,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import EcologyGlobeMessage from 'assets/icons/EcologyGlobeMessage.svg';
 import {MenuBtn} from './MenuBtn';
 import {BackAction} from './BackAction';
+import KalasarSearchComponent from './KalasarSearchComponent';
 
 interface Props {
   pageTitle?: string;
@@ -164,6 +165,7 @@ export const AppTopBar = ({
               ]}
             />
           </Box>
+          <KalasarSearchComponent />
           <Notifications />
           <Box ml={2} display="flex" alignItems="center">
             <Avatar alt={fullName} src={user?.userAccount.photoUrl} />
