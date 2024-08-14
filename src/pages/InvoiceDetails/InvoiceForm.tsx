@@ -1,5 +1,5 @@
 import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {theme} from 'theme';
@@ -43,6 +43,7 @@ import {
   useCreateInvoice,
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
+  useInvoiceDetail,
   useInvoices,
   useSendInvoice,
   useUpdateInvoice,
@@ -73,6 +74,7 @@ import {
 import {
   AddressComponent,
   AddressRecord,
+  EmailRecord,
   Language,
   PdfGenerationStatus,
 } from 'models/misc';
@@ -151,12 +153,6 @@ import {GridCellParams} from '@mui/x-data-grid';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
-import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
-import {omit, isEqual} from 'lodash';
-import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
-import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
-import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
-import queryString from 'query-string';
 
 interface Props {
   invoice?: InvoiceView;
@@ -257,8 +253,6 @@ enum FILE_DESCRIPTION_PREFIXES {
   CHECKLIST = 'CHK',
 }
 
-const localStorageFormikInvoiceDataKey = 'INVOICE_DATA';
-
 export const InvoiceForm = ({
   invoice,
   serviceOrderResource,
@@ -280,7 +274,6 @@ export const InvoiceForm = ({
     () => `${DEFAULT_LABOR_COST_TEXT}\n${DEFAULT_MATERIAL_COST_TEXT}`,
     [DEFAULT_LABOR_COST_TEXT, DEFAULT_MATERIAL_COST_TEXT],
   );
-  const {search} = useLocation();
   const navigate = useNavigate();
   const {language: selectedLng} = useContext(LanguageContext);
   const {company} = useContext(UserCompanyContext);
@@ -294,15 +287,6 @@ export const InvoiceForm = ({
 
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
-
-  const [openResumeProgressDialog, setOpenResumeProgressDialog] =
-    useState(false);
-  const [openCancelDialog, setOpenCancelDialog] = useState<boolean>(false);
-
-  const [initialLocalStorage, setInitialLocalStorage] = useState(
-    JSON.parse(localStorage.getItem(localStorageFormikInvoiceDataKey)!),
-  );
-  const {serviceOrderId = '', customerId = ''} = queryString.parse(search);
 
   const {
     data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
@@ -371,11 +355,6 @@ export const InvoiceForm = ({
     company?.id,
   );
 
-  const {data: serviceOrderInfo} =
-    typeof serviceOrderId === 'string'
-      ? useServiceOrderDetails(serviceOrderId)
-      : {data: undefined};
-
   const {data: companyNextNumber} = useCompanyNextNumber(
     {
       type: ServiceCompanyNumberType.INVOICE,
@@ -408,7 +387,7 @@ export const InvoiceForm = ({
   >(customerByProp);
   const [serviceOrder, setServiceOrder] = useState<
     ServiceOrderView | undefined
-  >((serviceOrderInfo || serviceOrderResource) ?? undefined);
+  >(serviceOrderResource ?? undefined);
 
   const isWorkReportPDFGenerated = !!serviceOrder?.reports?.length;
   const isCheckListPDFGenerated = !!serviceOrder?.checkLists?.length;
@@ -569,7 +548,6 @@ export const InvoiceForm = ({
     onSubmit: async (values) => {
       const response = await onSave(values);
       const invoiceId = formType === 'new' ? response.value : invoice?.id;
-      resetLocalStorage();
       navigate(`/invoices/details/${invoiceId}`);
     },
   });
@@ -699,7 +677,6 @@ export const InvoiceForm = ({
   };
 
   const onRemoveServiceOrder = () => {
-    formik.setFieldValue('serviceOrderId', '');
     formik.setFieldValue('customerSpecificOrderNumber', '');
     formik.setFieldValue('description', '');
     setServiceOrder(undefined);
@@ -976,12 +953,6 @@ export const InvoiceForm = ({
       setCustomer(serviceOrderCustomer);
     }
   }, [serviceOrder]);
-
-  useEffect(() => {
-    if (serviceOrderInfo) {
-      setServiceOrder(serviceOrderInfo);
-    }
-  }, [serviceOrderInfo]);
 
   useEffect(() => {
     formik.setFieldValue('moreInfo', DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT);
@@ -1365,16 +1336,12 @@ export const InvoiceForm = ({
       handleSelectCustomer(value);
     } else {
       setCustomer(undefined);
-      formik.setFieldValue('propertyOwnerId', '');
       formik.setFieldValue('costCenter', '');
       formik.setFieldValue('paymentTerm', {term: ''});
     }
   };
 
-  const {data: customerDetails} =
-    typeof customerId === 'string'
-      ? useGetCustomer(customerId || formik.values.propertyOwnerId)
-      : {data: undefined};
+  const {data: customerDetails} = useGetCustomer(formik.values.propertyOwnerId);
 
   useEffect(() => {
     handleCustomerChange(customerDetails);
@@ -1623,85 +1590,6 @@ export const InvoiceForm = ({
       setReport(reportToUpdate);
     }
   }, [reportToUpdate]);
-
-  const restoreFormikFromLocalStorage = () => {
-    const localStorageFormikInvoiceData = localStorage.getItem(
-      localStorageFormikInvoiceDataKey,
-    );
-
-    if (localStorageFormikInvoiceData) {
-      formik.setValues({
-        ...initialLocalStorage,
-        deliveryEndDate: initialLocalStorage.deliveryEndDate
-          ? new Date(initialLocalStorage.deliveryEndDate)
-          : undefined,
-        deliveryStartDate: initialLocalStorage.deliveryStartDate
-          ? new Date(initialLocalStorage.deliveryStartDate)
-          : undefined,
-        dueDate: initialLocalStorage.dueDate
-          ? new Date(initialLocalStorage.dueDate)
-          : undefined,
-        sentDate: initialLocalStorage.sentDate
-          ? new Date(initialLocalStorage.sentDate)
-          : undefined,
-      });
-
-      setSearchParams(
-        formatSearchParams(
-          {
-            serviceOrderId: initialLocalStorage.serviceOrderId,
-            customerId: initialLocalStorage.propertyOwnerId,
-          },
-          searchParams,
-        ),
-      );
-    }
-    setOpenResumeProgressDialog(false);
-  };
-
-  const resetLocalStorage = () => {
-    localStorage.removeItem(localStorageFormikInvoiceDataKey);
-    setOpenResumeProgressDialog(false);
-    setInitialLocalStorage(null);
-  };
-
-  const onCancel = () => {
-    resetLocalStorage();
-  };
-
-  useEffectAfterMount(() => {
-    if (formType === 'new') {
-      localStorage.setItem(
-        localStorageFormikInvoiceDataKey,
-        JSON.stringify(formik.values),
-      );
-    }
-  }, [formik.values, openResumeProgressDialog]);
-
-  useEffect(() => {
-    if (formType === 'new') {
-      const localStorageFormikInvoiceData = localStorage.getItem(
-        localStorageFormikInvoiceDataKey,
-      );
-
-      if (localStorageFormikInvoiceData) {
-        const localStorageFormikInvoiceDataParsed = JSON.parse(
-          localStorageFormikInvoiceData,
-        ) as InvoiceFormData;
-
-        if (
-          !isEqual(
-            omit(localStorageFormikInvoiceDataParsed, 'externalId'),
-            omit(formik.values, 'externalId'),
-          )
-        ) {
-          setOpenResumeProgressDialog(true);
-        } else {
-          formik.setValues(localStorageFormikInvoiceDataParsed);
-        }
-      }
-    }
-  }, [formType]);
 
   return (
     <Box>
@@ -2716,18 +2604,6 @@ export const InvoiceForm = ({
           onCloseSubDialogs={onCloseSubDialogs}
         />
       )}
-
-      <ConfirmCancel
-        open={openCancelDialog}
-        onConfirm={onCancel}
-        onClose={() => setOpenCancelDialog(false)}
-      />
-
-      <ResumeProgress
-        open={openResumeProgressDialog}
-        onConfirm={restoreFormikFromLocalStorage}
-        onClose={resetLocalStorage}
-      />
     </Box>
   );
 };
