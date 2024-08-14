@@ -82,7 +82,7 @@ import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import queryString from 'query-string';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {Progress} from 'components/Progress';
-import {debounce, isEqual, omit} from 'lodash';
+import {debounce} from 'lodash';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
 import RichTextField from 'components/RichTextField';
@@ -100,9 +100,6 @@ import {Dialog} from 'components/Dialog';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {stripHtmlTags} from 'utils/text-block';
-import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
-import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
-import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
 import NewUnit from './NewUnit';
 
@@ -130,8 +127,6 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
 
-const localStorageFormikQuotationDataKey = 'QUOTATION_DATA';
-
 export const DraftQuotation = ({
   formType,
   quotation,
@@ -146,8 +141,6 @@ export const DraftQuotation = ({
   >(undefined);
 
   const [isHovered, setIsHovered] = useState<boolean>(true);
-  const [openResumeProgressDialog, setOpenResumeProgressDialog] =
-    useState(false);
 
   const debouncedSetIsHovered = debounce((value) => setIsHovered(value), 300);
 
@@ -198,7 +191,6 @@ export const DraftQuotation = ({
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [openCancelDialog, setOpenCancelDialog] = useState<boolean>(false);
 
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
@@ -329,7 +321,6 @@ export const DraftQuotation = ({
     onSubmit: async (values) => {
       const response = await save(values);
       const quotationId = formType === 'new' ? response.value : quotation?.id;
-      resetLocalStorage();
       navigate(`/quotations/details/${quotationId}`);
     },
   });
@@ -658,50 +649,6 @@ export const DraftQuotation = ({
     setOpenTextBlockDialog(false);
   };
 
-  const [initialLocalStorage, setInitialLocalStorage] = useState(
-    JSON.parse(localStorage.getItem(localStorageFormikQuotationDataKey)!),
-  );
-
-  const [queryParams, setQueryParams] = useSearchParams();
-
-  const restoreFormikFromLocalStorage = () => {
-    const localStorageFormikQuotationData = localStorage.getItem(
-      localStorageFormikQuotationDataKey,
-    );
-
-    if (localStorageFormikQuotationData) {
-      formik.setValues({
-        ...initialLocalStorage,
-        sentDate: initialLocalStorage.sentDate
-          ? new Date(initialLocalStorage.sentDate)
-          : undefined,
-        expiryDate: initialLocalStorage.expiryDate
-          ? new Date(initialLocalStorage.expiryDate)
-          : undefined,
-      });
-      setQueryParams(
-        formatSearchParams(
-          {
-            elevatorId: initialLocalStorage.elevatorId,
-            customerId: initialLocalStorage.propertyOwnerId,
-          },
-          queryParams,
-        ),
-      );
-    }
-    setOpenResumeProgressDialog(false);
-  };
-
-  const resetLocalStorage = () => {
-    localStorage.removeItem(localStorageFormikQuotationDataKey);
-    setOpenResumeProgressDialog(false);
-    setInitialLocalStorage(null);
-  };
-
-  const onCancel = () => {
-    resetLocalStorage();
-  };
-
   useEffect(() => {
     if (user && user.userAccount) {
       formik.setFieldValue(
@@ -867,40 +814,6 @@ export const DraftQuotation = ({
       },
     );
   }, [user, quotation]);
-
-  useEffectAfterMount(() => {
-    if (formType === 'new') {
-      localStorage.setItem(
-        localStorageFormikQuotationDataKey,
-        JSON.stringify(formik.values),
-      );
-    }
-  }, [formik.values, openResumeProgressDialog]);
-
-  useEffect(() => {
-    if (formType === 'new') {
-      const localStorageFormikQuotationData = localStorage.getItem(
-        localStorageFormikQuotationDataKey,
-      );
-
-      if (localStorageFormikQuotationData) {
-        const localStorageFormikQuotationDataParsed = JSON.parse(
-          localStorageFormikQuotationData,
-        ) as QuotationFormData;
-
-        if (
-          !isEqual(
-            omit(localStorageFormikQuotationDataParsed, 'externalId'),
-            omit(formik.values, 'externalId'),
-          )
-        ) {
-          setOpenResumeProgressDialog(true);
-        } else {
-          formik.setValues(localStorageFormikQuotationDataParsed);
-        }
-      }
-    }
-  }, [formType]);
 
   if (isLoadingElevator || isLoadingCustomer) {
     return (
@@ -1609,18 +1522,6 @@ export const DraftQuotation = ({
           onCloseSubDialogs={onCloseSubDialogs}
         />
       )}
-
-      <ConfirmCancel
-        open={openCancelDialog}
-        onConfirm={onCancel}
-        onClose={() => setOpenCancelDialog(false)}
-      />
-
-      <ResumeProgress
-        open={openResumeProgressDialog}
-        onConfirm={restoreFormikFromLocalStorage}
-        onClose={resetLocalStorage}
-      />
     </Box>
   );
 };
