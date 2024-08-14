@@ -2672,5 +2672,6 @@
   "Add {{noOfChecklists}} checklists": "Fügen Sie {{noOfChecklists}} Checklisten hinzu.",
   "Checklist saved successfully": "Checkliste erfolgreich gespeichert.",
   "Checklist associated successfully!": "Checkliste erfolgreich zugeordnet!",
-  "The invoice PDF cannot be generated because the provided IBAN number is either too long or too short. This is a limitation of the Swiss QR Code generator.": "Die Rechnung im PDF-Format kann nicht generiert werden, da die angegebene IBAN-Nummer entweder zu lang oder zu kurz ist. Dies ist eine Einschränkung des Schweizer QR-Code-Generators."
+  "The invoice PDF cannot be generated because the provided IBAN number is either too long or too short. This is a limitation of the Swiss QR Code generator.": "Die Rechnung im PDF-Format kann nicht generiert werden, da die angegebene IBAN-Nummer entweder zu lang oder zu kurz ist. Dies ist eine Einschränkung des Schweizer QR-Code-Generators.",
+  "Add a swiss QR page to the invoice": "Rechnungen Schweizer QR-Code beifügen"
 }
