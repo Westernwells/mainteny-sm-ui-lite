@@ -1,6 +1,6 @@
 import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -23,6 +23,7 @@ import {
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
+// eslint-disable-next-line import/no-unresolved
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -33,6 +34,7 @@ import PdfPageContainer from './containers/PdfPageContainer';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
+import SwissPageTemplate from './SwissPageTemplate';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -159,6 +161,7 @@ type Props = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   nextCompanyExternalId?: string;
+  qrImageSrc?: string;
 };
 
 const FullInvoicePdfTemplate = ({
@@ -172,6 +175,7 @@ const FullInvoicePdfTemplate = ({
   footerInfo,
   footerPath,
   nextCompanyExternalId,
+  qrImageSrc,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -361,6 +365,10 @@ const FullInvoicePdfTemplate = ({
           footerPath={footerPath}
         />
       </PdfPageContainer>
+
+      {userInfo?.serviceCompany.settings.invoiceQRCodeEnabled && (
+        <SwissPageTemplate qrImageSrc={qrImageSrc} />
+      )}
     </Document>
   );
 };

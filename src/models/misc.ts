@@ -62,6 +62,7 @@ export interface Settings {
   contractNameTypes: ContractNameTypes[];
   serviceOrderGenerationEnabled?: boolean;
   contractInvoiceGenerationEnabled?: boolean;
+  invoiceQRCodeEnabled?: boolean;
   isContractInvoiceGenerationEnabled?: boolean;
   serviceOrderGenerationDaysInAdvance?: number;
   minToHourStep?: MinToStep | number;
