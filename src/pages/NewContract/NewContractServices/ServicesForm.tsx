@@ -1,33 +1,34 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
   Box,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
+  Popover,
+  RadioGroup,
+  Select,
+  Table,
   TableBody,
   TableCell,
+  TableCellProps,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  Popover,
-  Tooltip,
-  FormControl,
-  RadioGroup,
   TextField,
-  TableCellProps,
-  Table,
-  InputLabel,
-  Select,
-  MenuItem,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import InvoiceFrequencyPicker from 'components/InvoiceFrequencyPicker';
-import JobFrequencyPicker from 'components/JobFrequencyPicker';
+import JobFrequencyPicker from 'components/JobFrequencyPicker/JobFrequencyPicker';
 import {ReactComponent as BasicInfoIcon} from 'assets/icons/BasicInfoIcon.svg';
 import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
 import {DatePicker} from 'components/DatePicker';
 import {FormInput} from 'components/form/FormInput';
 import {
-  ContractServiceForm,
   calculateContractInvoicePriceTotal,
+  ContractComponentElevator,
+  ContractServiceForm,
 } from 'models/contract';
 import {Switch} from 'components/Switch';
 import {FormikProps, getIn} from 'formik';
@@ -152,6 +153,10 @@ const ServicesForm = ({
       }),
     );
   };
+
+  const handleJobFrequencyChange =
+    (key: string) => (value: ContractComponentElevator[]) =>
+      formikContractServiceComponent.setFieldValue(key, value);
 
   return (
     <>
@@ -737,8 +742,9 @@ const ServicesForm = ({
                         padding: '0em 1.5em 0em 0em',
                       }}>
                       <JobFrequencyPicker
-                        formik={formikContractServiceComponent}
                         componentId={item.elevatorId}
+                        units={formikContractServiceComponent.values.elevators}
+                        onChange={handleJobFrequencyChange('elevators')}
                       />
                     </TableCell>
                   )}
@@ -927,9 +933,7 @@ const ServicesForm = ({
                 <Typography variant="h6">
                   {formatCurrency(
                     calculateContractInvoicePriceTotal(
-                      formikContractServiceComponent.values.elevators.filter(
-                        (elevator) => elevator.isSelected,
-                      ),
+                      formikContractServiceComponent.values.elevators,
                     ) /
                       10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                     {

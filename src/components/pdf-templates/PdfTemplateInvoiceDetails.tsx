@@ -1,11 +1,11 @@
 import {Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {formatDate} from 'utils/datetime';
-import {formatAddressFullname} from 'utils/utils';
 import {InvoiceType, InvoiceView} from 'models/invoice';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import PdfUnitAddress from './containers/PdfUnitAddress';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -49,12 +49,12 @@ const getStyles = (
     },
     tag: {
       ...boldFontStyle,
-      fontSize: 9,
+      fontSize: 8.5,
       color: '#212121',
       flex: '0 0 43%',
     },
     tagContent: {
-      fontSize: 9,
+      fontSize: 8.5,
       color: '#616161',
       flex: '0 0 57%',
       textAlign: 'right',
@@ -211,15 +211,11 @@ const PdfTemplateInvoiceDetails = ({
           </View>
         )}
 
-        {invoice?.serviceOrder?.elevator?.address?.fullName && (
-          <View style={styles.rightAddressContent}>
-            <Text style={styles.tag}>{translate('Unit address')}</Text>
-            <Text style={styles.tagContent}>{`${
-              formatAddressFullname(invoice?.serviceOrder?.elevator?.address)
-                ?.fullCityName
-            }`}</Text>
-          </View>
-        )}
+        <PdfUnitAddress
+          address={invoice?.serviceOrder?.elevator?.address}
+          translate={translate}
+          selectedLng={selectedLng}
+        />
       </View>
     </View>
   );

@@ -1,5 +1,5 @@
 import {useCurrentCurrency} from 'utils/currency';
-import {rangeConvertorInverse} from 'utils/contract-utils';
+import {rangeConvertorInverse} from 'utils/contract';
 import {
   MultipleSelectCheckmarks,
   Props as MultipleSelectCheckmarksProps,

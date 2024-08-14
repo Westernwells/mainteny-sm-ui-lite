@@ -25,7 +25,7 @@ import {
 import {
   calculateContractInvoiceRowPrice,
   getElevatorDataByElevator,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import {useTranslation} from 'react-i18next';
 import {getArticleTypeText} from 'utils/article-utils';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';

@@ -1,4 +1,7 @@
 import {CompanyStatus} from 'models/company';
+import {UserAccount} from 'models/user';
+import {AlternativeServiceCompanyInfo} from 'models/invoice';
+import {formatAddressFullname} from './utils';
 
 export const getCompanyStatusStyles = (
   status: string,
@@ -18,4 +21,23 @@ export const getCompanyStatusStyles = (
     default:
       return {label: '-', color: 'default'};
   }
+};
+
+export const getServiceCompanyInfo = (
+  userInfo?: UserAccount,
+  altServiceCompanyInfo?: AlternativeServiceCompanyInfo,
+) => {
+  const address = altServiceCompanyInfo
+    ? altServiceCompanyInfo.address
+    : userInfo?.serviceCompany?.billingAddress;
+
+  const fullCityName = formatAddressFullname(address)?.fullCityName;
+
+  const companyName = altServiceCompanyInfo
+    ? altServiceCompanyInfo.name
+    : userInfo?.serviceCompany?.name;
+
+  return companyName && fullCityName
+    ? `${companyName}, ${fullCityName}`
+    : fullCityName || '';
 };

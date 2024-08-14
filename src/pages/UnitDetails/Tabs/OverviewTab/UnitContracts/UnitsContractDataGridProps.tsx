@@ -11,7 +11,7 @@ import {convertToText} from 'utils/utils';
 import {ContractSimpleView} from 'models/contract';
 import {useTranslation} from 'react-i18next';
 import {FormatDate} from 'models/misc';
-import {getContractStatusStyles} from 'utils/contract-utils';
+import {getContractStatusStyles} from 'utils/contract';
 
 const defaultProps = {
   editable: false,

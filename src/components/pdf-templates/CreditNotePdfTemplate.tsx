@@ -23,6 +23,7 @@ import {ArticleType} from 'models/article';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
+import {getServiceCompanyInfo} from 'utils/company-utils';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -207,6 +208,11 @@ const CreditNotePdfTemplate = ({
     currentCurrency,
   );
 
+  const serviceCompanyInfo = getServiceCompanyInfo(
+    userInfo,
+    invoice?.additionalInfo?.alternativeServiceCompanyInfo,
+  );
+
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
   };
@@ -221,10 +227,7 @@ const CreditNotePdfTemplate = ({
         <PdfBodyContainer>
           <TopSectionContainer>
             <PdfTemplateLeftAddress
-              companyName={userInfo?.serviceCompany?.name}
-              billingAddressName={
-                userInfo?.serviceCompany?.billingAddress?.fullName
-              }
+              serviceCompanyInfo={serviceCompanyInfo}
               receiverName={
                 invoice?.additionalInfo?.billingAddress?.component?.name ||
                 invoice?.propertyOwner?.name
