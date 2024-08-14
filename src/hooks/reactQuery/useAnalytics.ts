@@ -127,7 +127,7 @@ export const useInvoicesDatev = (
     () => fetchInvoicesDatev(serviceCompanyId, params),
     {
       onSuccess: (data) => {
-        download(data, ReportType.FINANCIALS);
+        download(data, 'EXTF_Buchungsstapel');
         enqueueSnackbar('Report downloaded successfully!', {
           variant: 'success',
         });
