@@ -41,8 +41,6 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       paddingBottom: 10,
       borderBottom: '1px solid #616161',
       alignItems: 'center',
-      paddingLeft: 57,
-      paddingRight: 35,
     },
     footerEmailWrapper: {
       display: 'flex',
@@ -50,8 +48,6 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       flexDirection: 'row',
       alignItems: 'center',
       marginTop: 5,
-      paddingLeft: 57,
-      paddingRight: 35,
       paddingBottom: 15,
     },
     leftFooter: {
@@ -84,8 +80,8 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       height: 86,
       position: 'absolute',
       bottom: 0,
-      left: 0,
-      right: 0,
+      paddingLeft: 57,
+      paddingRight: 35,
     },
     footerContent: {
       marginRight: 10,

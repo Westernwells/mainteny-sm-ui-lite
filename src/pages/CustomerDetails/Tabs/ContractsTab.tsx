@@ -15,7 +15,7 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {useCurrentCurrency} from 'utils/currency';

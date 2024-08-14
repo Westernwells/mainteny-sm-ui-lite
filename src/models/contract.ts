@@ -1,8 +1,8 @@
 import {Client} from './client';
 import {
-  AmountRecord,
   Address,
   Amount,
+  AmountRecord,
   Meta,
   Order,
   TimeWindowRecord,
@@ -29,7 +29,6 @@ import {FileResource} from './media';
 import {ArticleType, CostPackage} from './article';
 import {toRestDate} from 'utils/datetime';
 import {ServiceCompanyType} from './service-company';
-import {t} from 'i18next';
 import {ServiceOrderType} from './service-order';
 
 export interface QueryContractCommentsParams {
@@ -61,6 +60,7 @@ export enum TimeUnitYearView {
   QUADRENNIALLY = 'Every 4 year',
   WEEKLY = 'Weekly',
   BIWEEKLY = 'Every 2 weeks',
+  TRIWEEKLY = 'Every 3 weeks',
 }
 
 export enum ContractOrderField {
@@ -86,6 +86,7 @@ export enum ContractTimeUnit {
   NONE = 'NONE',
   WEEKLY = 'WEEKLY',
   BIWEEKLY = 'BIWEEKLY',
+  TRIWEEKLY = 'TRIWEEKLY',
   MONTHLY = 'MONTHLY',
   ANNUALLY = 'ANNUALLY',
   BIENNIALLY = 'BIENNIALLY',
@@ -578,6 +579,7 @@ export interface ContractComponentAdditionalInfo {
   costPackage?: CostPackage;
   elevators?: ContractComponentElevator[];
   orderType?: ServiceOrderType;
+  yearlyPrice: number;
 }
 
 export interface ContractServiceForm {
@@ -619,12 +621,12 @@ export interface ContractComponentRecord {
 }
 
 export interface ContractComponentElevator {
-  isChecked?: boolean;
   elevatorId: string;
   invoiceJob: JobTimeUnit;
   orderGenerationJob: JobTimeUnit;
   price: number;
-  isSelected?: boolean;
+  isChecked?: boolean; // on mutate
+  isSelected?: boolean; // on create
 }
 
 export interface JobTimeUnit {
@@ -716,53 +718,80 @@ export const getUniqueOrderGenerationTimeNumbers = (
   return sortedNumbers;
 };
 
+const WEEKS_IN_A_YEAR = 52;
+
+// If invoices are based on months
+const monthlyBasedCalculations = (monthInNumbers?: number[]) => {
+  if (!monthInNumbers) return 0;
+  return monthInNumbers.length;
+};
+
+const TIME_UNIT_WEEK_TO_NUMBER = new Map<ContractTimeUnit, number>([
+  [ContractTimeUnit.WEEKLY, 1],
+  [ContractTimeUnit.BIWEEKLY, 2],
+  [ContractTimeUnit.TRIWEEKLY, 3],
+]);
+
+const YEARLY_TIME_UNIT_TO_NUMBER = new Map<ContractTimeUnit, number>([
+  [ContractTimeUnit.ANNUALLY, 1],
+  [ContractTimeUnit.BIENNIALLY, 2],
+  [ContractTimeUnit.TRIENNIALLY, 3],
+  [ContractTimeUnit.QUADRENNIALLY, 4],
+]);
+
+const weeklyDivider = (
+  weekOption:
+    | ContractTimeUnit.WEEKLY
+    | ContractTimeUnit.BIWEEKLY
+    | ContractTimeUnit.TRIWEEKLY,
+) => {
+  const divider = TIME_UNIT_WEEK_TO_NUMBER.get(weekOption) ?? 1;
+  return WEEKS_IN_A_YEAR / divider;
+};
+
 export const calculateContractInvoicePriceTotal = (
   array: ContractComponentElevator[],
-) => {
-  let totalPrice: number = 0;
-
-  array.forEach((item: ContractComponentElevator) => {
+) =>
+  array.reduce((acc: number, item: ContractComponentElevator) => {
+    if (!item.isChecked && !item.isSelected) return acc; // item is deselected
     let timeLength: number = 0;
 
-    if (item.invoiceJob) {
-      const invoiceTimeUnit: string = item.invoiceJob?.timeUnit;
-      const orderTimeUnit: string = item.orderGenerationJob?.timeUnit;
+    if (!item.invoiceJob && !item.orderGenerationJob) return 0;
 
-      if (invoiceTimeUnit === ContractTimeUnit.MONTHLY) {
-        timeLength = item.invoiceJob.timeNumbers
-          ? item.invoiceJob.timeNumbers.length
-          : 0;
-      } else if (
-        invoiceTimeUnit === ContractTimeUnit.ANNUALLY ||
-        invoiceTimeUnit === ContractTimeUnit.BIENNIALLY ||
-        invoiceTimeUnit === ContractTimeUnit.TRIENNIALLY ||
-        invoiceTimeUnit === ContractTimeUnit.QUADRENNIALLY
-      ) {
-        timeLength = 1;
-      } else if (invoiceTimeUnit === ContractTimeUnit.NONE) {
-        if (orderTimeUnit === ContractTimeUnit.MONTHLY) {
-          timeLength = item.orderGenerationJob.timeNumbers
-            ? item.orderGenerationJob.timeNumbers.length
-            : 0;
-        } else if (orderTimeUnit === ContractTimeUnit.WEEKLY) {
-          timeLength = 50;
-        } else if (orderTimeUnit === ContractTimeUnit.BIWEEKLY) {
-          timeLength = 25;
-        } else if (orderTimeUnit === ContractTimeUnit.NONE) {
-          timeLength = 0;
-        }
-      }
+    const invoiceTimeUnit = item.invoiceJob?.timeUnit;
+    const orderTimeUnit = item.orderGenerationJob?.timeUnit;
+    const contractTime =
+      invoiceTimeUnit !== ContractTimeUnit.NONE
+        ? invoiceTimeUnit
+        : orderTimeUnit;
+
+    // monthly based calculations
+    if (contractTime === ContractTimeUnit.MONTHLY) {
+      const invoiceMonths = item.invoiceJob.timeNumbers;
+      const jobMonths = item.orderGenerationJob.timeNumbers;
+      timeLength = monthlyBasedCalculations(invoiceMonths ?? jobMonths);
+    } else if (TIME_UNIT_WEEK_TO_NUMBER.has(contractTime)) {
+      // weekly based calculations
+      timeLength = weeklyDivider(
+        contractTime as
+          | ContractTimeUnit.WEEKLY
+          | ContractTimeUnit.BIWEEKLY
+          | ContractTimeUnit.TRIWEEKLY,
+      );
+    } else if (
+      YEARLY_TIME_UNIT_TO_NUMBER.has(contractTime) // yearly based calculations
+    ) {
+      const divider = YEARLY_TIME_UNIT_TO_NUMBER.get(
+        contractTime as
+          | ContractTimeUnit.ANNUALLY
+          | ContractTimeUnit.BIENNIALLY
+          | ContractTimeUnit.TRIENNIALLY
+          | ContractTimeUnit.QUADRENNIALLY,
+      );
+      timeLength = 1 / (divider || 1);
     }
-
-    if (timeLength > 0) {
-      const itemPrice: number = item.price;
-      const itemTotalPrice: number = timeLength * itemPrice;
-      totalPrice += itemTotalPrice;
-    }
-  });
-
-  return totalPrice;
-};
+    return acc + item.price * timeLength;
+  }, 0);
 
 export const calculateContractInvoicePriceGrandTotal = (
   parentArray: ExtendedContractComponentRecord[],

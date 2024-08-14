@@ -10,7 +10,6 @@ import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType} from 'models/invoice';
-import {formatAddressFullname} from 'utils/utils';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
@@ -19,6 +18,7 @@ import {
   shouldDisplayDiscountDash,
   allItemsHaveZeroDiscount,
 } from 'utils/discount';
+import {getServiceCompanyInfo} from 'utils/company-utils';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
@@ -29,6 +29,7 @@ import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageContainer from './containers/PdfPageContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
+import PdfUnitAddress from './containers/PdfUnitAddress';
 
 Font.register({
   family: 'Montserrat-Regular',
@@ -74,12 +75,12 @@ const getStyles = (
     },
     tag: {
       ...boldFontStyle,
-      fontSize: 9,
+      fontSize: 8.5,
       color: '#212121',
       flex: '0 0 43%',
     },
     tagContent: {
-      fontSize: 9,
+      fontSize: 8.5,
       color: '#616161',
       flex: '0 0 57%',
       textAlign: 'right',
@@ -252,6 +253,11 @@ const QuotationPdfTemplate = React.memo(
       },
     );
 
+    const serviceCompanyInfo = getServiceCompanyInfo(
+      userInfo,
+      quotation?.additionalInfo?.alternativeServiceCompanyInfo,
+    );
+
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
@@ -271,10 +277,7 @@ const QuotationPdfTemplate = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
-                companyName={userInfo?.serviceCompany?.name}
-                billingAddressName={
-                  userInfo?.serviceCompany?.billingAddress?.fullName
-                }
+                serviceCompanyInfo={serviceCompanyInfo}
                 receiverName={
                   quotation?.additionalInfo?.billingAddress?.component?.name ||
                   quotation?.propertyOwner?.name
@@ -348,17 +351,11 @@ const QuotationPdfTemplate = React.memo(
                     </View>
                   )}
 
-                  {quotation?.elevator?.address?.fullName && (
-                    <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Unit address')}
-                      </Text>
-                      <Text style={styles.tagContent}>{`${
-                        formatAddressFullname(quotation?.elevator?.address)
-                          ?.fullCityName
-                      }`}</Text>
-                    </View>
-                  )}
+                  <PdfUnitAddress
+                    address={quotation?.elevator.address}
+                    translate={translate}
+                    selectedLng={selectedLng}
+                  />
                 </View>
               </View>
             </TopSectionContainer>

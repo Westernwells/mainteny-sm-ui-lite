@@ -27,20 +27,19 @@ import {
   Select,
 } from '@mui/material';
 import InvoiceFrequencyPicker from 'components/InvoiceFrequencyPicker';
-import JobFrequencyPicker from 'components/JobFrequencyPicker';
+import JobFrequencyPicker from 'components/JobFrequencyPicker/JobFrequencyPicker';
 import {ReactComponent as BasicInfoIcon} from 'assets/icons/BasicInfoIcon.svg';
 import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
 import {DatePicker} from 'components/DatePicker';
 import {FormInput} from 'components/form/FormInput';
 import {
+  calculateContractInvoicePriceTotal,
+  ContractComponentElevator,
   ContractServiceForm,
   ContractServiceFormElevator,
   UpdateContractComponents,
 } from 'models/contract';
-import {
-  calculateFormContractInvoicePriceTotal,
-  componentsToMutate,
-} from 'utils/contract-utils';
+import {componentsToMutate} from 'utils/contract';
 import {theme} from 'theme';
 import {Switch} from 'components/Switch';
 import {FormikProps, getIn} from 'formik';
@@ -321,6 +320,10 @@ export const MutationService = ({
 
   const lengthOfElevators =
     formikContractServiceComponent.values?.elevators?.length;
+
+  const handleJobFrequencyChange =
+    (key: string) => (value: ContractComponentElevator[]) =>
+      formikContractServiceComponent.setFieldValue(key, value);
 
   return (
     <Dialog
@@ -935,8 +938,9 @@ export const MutationService = ({
                       padding: '0em 1.5em 0em 0em',
                     }}>
                     <JobFrequencyPicker
-                      formik={formikContractServiceComponent}
                       componentId={item.elevatorId}
+                      units={formikContractServiceComponent.values.elevators}
+                      onChange={handleJobFrequencyChange('elevators')}
                     />
                   </TableCell>
                 )}
@@ -1132,7 +1136,7 @@ export const MutationService = ({
               }}>
               <Typography variant="h6">
                 {formatCurrency(
-                  calculateFormContractInvoicePriceTotal(
+                  calculateContractInvoicePriceTotal(
                     formikContractServiceComponent.values.elevators,
                   ) /
                     10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,

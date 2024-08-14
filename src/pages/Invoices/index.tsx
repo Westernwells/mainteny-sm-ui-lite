@@ -15,7 +15,7 @@ import {useNavigate} from 'react-router-dom';
 import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import {mapInvoiceStatus} from 'utils/invoice';
 import {useCurrentCurrency} from 'utils/currency';
 import {Progress} from 'components/Progress';

@@ -23,7 +23,7 @@ import {
   calculateContractInvoicePriceGrandTotalForm,
   canGroupServices,
   convertExtendedRecordsToContractComponentRecords,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import {
   calculateContractInvoicePriceTotal,
   ContractComponentView,

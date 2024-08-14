@@ -19,7 +19,7 @@ import {useQueryState} from 'hooks/useQueryState';
 import {
   costRangeConvertor as crConverter,
   getStartEndPrice,
-} from 'utils/contract-utils';
+} from 'utils/contract';
 import {useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSearchValues} from 'hooks/useSearchValues';

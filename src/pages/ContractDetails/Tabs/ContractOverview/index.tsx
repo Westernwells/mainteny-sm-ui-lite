@@ -33,7 +33,7 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {calculateRenewDays} from 'utils/contract-utils';
+import {calculateRenewDays} from 'utils/contract';
 import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve-gray.svg';
 import {ReactComponent as TimeIcon} from 'assets/icons/time.svg';
 import {Order} from 'models/misc';
