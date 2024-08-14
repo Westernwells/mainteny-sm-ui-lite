@@ -3,8 +3,7 @@ import {Text, View, StyleSheet} from '@react-pdf/renderer';
 import PdfTemplateBeneficiaryAddress from './PdfTemplateBeneficiaryAddress';
 
 type Props = {
-  companyName?: string;
-  billingAddressName?: string | null;
+  serviceCompanyInfo?: string;
   receiverName?: string;
   addressComponent?: AddressComponent | null;
   selectedLng?: string;
@@ -47,8 +46,7 @@ const getStyles = (
   });
 
 const PdfTemplateLeftAddress = ({
-  companyName,
-  billingAddressName,
+  serviceCompanyInfo,
   receiverName,
   addressComponent,
   selectedLng,
@@ -66,22 +64,10 @@ const PdfTemplateLeftAddress = ({
 
   const styles = getStyles(boldFontStyle, regularFontStyle);
 
-  const combinedText = companyName
-    ? `${companyName}, ${billingAddressName}`
-    : `${billingAddressName}`;
-  const maxLength = 65;
-
   return (
     <View style={styles.leftAddress}>
       <View style={styles.addressTextWrapper}>
-        {combinedText.length <= maxLength ? (
-          <Text style={styles.addressText}>{combinedText}</Text>
-        ) : (
-          <>
-            <Text style={styles.addressText}>{companyName}</Text>
-            <Text style={styles.addressText}>{billingAddressName}</Text>
-          </>
-        )}
+        <Text style={styles.addressText}>{serviceCompanyInfo}</Text>
       </View>
 
       <View style={styles.partAddress}>

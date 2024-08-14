@@ -661,7 +661,7 @@ export const DraftQuotation = ({
       'alternativeServiceCompanyInfo',
       quotation?.additionalInfo.alternativeServiceCompanyInfo || {
         name: user?.userAccount.serviceCompany.name || '',
-        address: user?.userAccount.serviceCompany.postalAddress,
+        address: user?.userAccount.serviceCompany.billingAddress,
       },
     );
   }, [user, quotation]);
