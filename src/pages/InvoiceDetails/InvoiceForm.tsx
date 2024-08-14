@@ -637,7 +637,7 @@ export const InvoiceForm = ({
       'alternativeServiceCompanyInfo',
       invoice?.additionalInfo.alternativeServiceCompanyInfo || {
         name: user?.userAccount.serviceCompany.name || '',
-        address: user?.userAccount.serviceCompany.postalAddress,
+        address: user?.userAccount.serviceCompany.billingAddress,
       },
     );
   }, [user, invoice]);

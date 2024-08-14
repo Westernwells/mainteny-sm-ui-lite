@@ -13,6 +13,7 @@ import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
 import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
 import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
+import {getServiceCompanyInfo} from 'utils/company-utils';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -179,6 +180,8 @@ const OrderArticlePDF = React.memo(
       ),
     ];
 
+    const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
+
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
@@ -198,10 +201,7 @@ const OrderArticlePDF = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
-                companyName={userInfo?.serviceCompany?.name}
-                billingAddressName={
-                  userInfo?.serviceCompany?.billingAddress?.fullName
-                }
+                serviceCompanyInfo={serviceCompanyInfo}
                 receiverName={articleOrder?.articleSupplier?.name}
                 addressComponent={
                   articleOrder?.articleSupplier?.address?.component

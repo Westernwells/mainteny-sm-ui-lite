@@ -14,6 +14,7 @@ import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContain
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
 import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
+import {getServiceCompanyInfo} from 'utils/company-utils';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -178,6 +179,8 @@ const OrderArticlePDFPreview = React.memo(
 
     const totalVATMap = calculateTotalVAT(formik.values.items);
 
+    const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
+
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
@@ -196,10 +199,7 @@ const OrderArticlePDFPreview = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
-                companyName={userInfo?.serviceCompany?.name}
-                billingAddressName={
-                  userInfo?.serviceCompany?.billingAddress?.fullName
-                }
+                serviceCompanyInfo={serviceCompanyInfo}
                 receiverName={supplier?.name}
                 addressComponent={supplier?.address?.component}
                 selectedLng={selectedLng}

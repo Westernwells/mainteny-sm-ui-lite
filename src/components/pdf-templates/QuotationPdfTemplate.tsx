@@ -18,6 +18,7 @@ import {
   shouldDisplayDiscountDash,
   allItemsHaveZeroDiscount,
 } from 'utils/discount';
+import {getServiceCompanyInfo} from 'utils/company-utils';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
@@ -252,6 +253,11 @@ const QuotationPdfTemplate = React.memo(
       },
     );
 
+    const serviceCompanyInfo = getServiceCompanyInfo(
+      userInfo,
+      quotation?.additionalInfo?.alternativeServiceCompanyInfo,
+    );
+
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
@@ -271,10 +277,7 @@ const QuotationPdfTemplate = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
-                companyName={userInfo?.serviceCompany?.name}
-                billingAddressName={
-                  userInfo?.serviceCompany?.billingAddress?.fullName
-                }
+                serviceCompanyInfo={serviceCompanyInfo}
                 receiverName={
                   quotation?.additionalInfo?.billingAddress?.component?.name ||
                   quotation?.propertyOwner?.name

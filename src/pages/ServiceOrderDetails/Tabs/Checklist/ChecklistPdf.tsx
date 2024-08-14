@@ -15,6 +15,7 @@ import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContain
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {HeaderFooterInfoData} from 'models/misc';
 import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
+import {getServiceCompanyInfo} from 'utils/company-utils';
 import {PdfChecklistComponent} from './PdfChecklistComponent';
 
 const getStyles = (
@@ -143,6 +144,8 @@ const ChecklistPdf = ({
   footerInfo,
   footerPath,
 }: Props) => {
+  const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
+
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
   };
@@ -164,10 +167,7 @@ const ChecklistPdf = ({
         <PdfBodyContainer>
           <TopSectionContainer>
             <PdfTemplateLeftAddress
-              companyName={userInfo?.serviceCompany?.name}
-              billingAddressName={
-                userInfo?.serviceCompany?.billingAddress?.fullName
-              }
+              serviceCompanyInfo={serviceCompanyInfo}
               receiverName={serviceOrder?.elevator?.propertyOwner?.name}
               addressComponent={
                 serviceOrder?.elevator.propertyOwner.billingAddress?.component

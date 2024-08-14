@@ -13,6 +13,7 @@ import TopSectionContainer from 'components/pdf-templates/containers/TopSectionC
 import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {HtmlPDF} from 'components/HtmlPDF';
+import {getServiceCompanyInfo} from 'utils/company-utils';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -144,6 +145,11 @@ const InvoiceOverduePdfPreview = ({
   footerInfo,
   footerPath,
 }: Props) => {
+  const serviceCompanyInfo = getServiceCompanyInfo(
+    userInfo,
+    invoice?.additionalInfo?.alternativeServiceCompanyInfo,
+  );
+
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
   };
@@ -171,10 +177,7 @@ const InvoiceOverduePdfPreview = ({
         <PdfBodyContainer>
           <TopSectionContainer>
             <PdfTemplateLeftAddress
-              companyName={userInfo?.serviceCompany?.name}
-              billingAddressName={
-                userInfo?.serviceCompany?.billingAddress?.fullName
-              }
+              serviceCompanyInfo={serviceCompanyInfo}
               receiverName={
                 invoice?.additionalInfo?.billingAddress?.component?.name ||
                 invoice?.propertyOwner?.name

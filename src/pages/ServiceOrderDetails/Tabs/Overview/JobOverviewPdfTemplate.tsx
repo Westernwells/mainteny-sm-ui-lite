@@ -23,6 +23,7 @@ import {
   shouldDisplayDiscountDash,
 } from 'utils/discount';
 import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
+import {getServiceCompanyInfo} from 'utils/company-utils';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -234,6 +235,11 @@ const JobOverviewPdfTemplate = React.memo(
       },
     );
 
+    const serviceCompanyInfo = getServiceCompanyInfo(
+      userInfo,
+      quotation?.additionalInfo.alternativeServiceCompanyInfo,
+    );
+
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
@@ -248,10 +254,7 @@ const JobOverviewPdfTemplate = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
-                companyName={userInfo?.serviceCompany?.name}
-                billingAddressName={
-                  userInfo?.serviceCompany?.billingAddress?.fullName
-                }
+                serviceCompanyInfo={serviceCompanyInfo}
                 receiverName={serviceOrder?.elevator?.propertyOwner?.name}
                 addressComponent={
                   serviceOrder?.elevator.propertyOwner.billingAddress?.component
