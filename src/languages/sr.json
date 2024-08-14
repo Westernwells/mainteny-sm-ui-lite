@@ -2694,5 +2694,7 @@
   "Checklist deleted successfully!": "Kontrolna lista je uspešno izbrisana!",
   "Add {{noOfChecklists}} checklists": "Dodajte {{noOfChecklists}} kontrolne liste",
   "Checklist saved successfully": "Kontrolna lista je uspešno sačuvana",
-  "Checklist associated successfully!": "Kontrolna lista je uspešno povezana!"
+  "Checklist associated successfully!": "Kontrolna lista je uspešno povezana!",
+  "The invoice PDF cannot be generated because the provided IBAN number is either too long or too short. This is a limitation of the Swiss QR Code generator.": "PDF faktura ne može da se generiše jer je navedeni IBAN broj ili predugačak ili prekratak. Ovo je ograničenje švajcarskog generatora KR kodova.",
+  "Add a swiss QR page to the invoice": "Dodajte švajcarsku KR stranicu na fakturu"
 }
