@@ -29,7 +29,12 @@ import {
 } from 'models/invoice';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
-import {formatGrossAmount, useCurrentCurrency} from 'utils/currency';
+import {
+  QRCurrencyCode,
+  createQrData,
+  formatGrossAmount,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
@@ -60,7 +65,11 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
-import {validateDueDate} from 'utils/invoice-utils';
+import {
+  getQrErrorMessage,
+  svgToJpegPng,
+  validateDueDate,
+} from 'utils/invoice-utils';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -91,6 +100,8 @@ import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import DOMPurify from 'dompurify';
+// eslint-disable-next-line import/no-unresolved
+import {SwissQRBill} from 'swissqrbill/svg';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -214,6 +225,59 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   });
 
   const {mutateAsync: updateInvoiceAsync} = useUpdateInvoice();
+
+  const [qrImageSrc, setQrImageSrc] = useState<string>('');
+  const [qrError, setQrError] = useState<string>('');
+
+  const qrCurrency: QRCurrencyCode =
+    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
+      ? currentCurrency.code
+      : 'EUR';
+
+  const checkValidQrCode = async () => {
+    if (user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+      try {
+        const qrBillData = createQrData(
+          qrCurrency,
+          invoice,
+          currentCurrency,
+          user?.userAccount,
+        );
+
+        const qrBillSvg = new SwissQRBill(qrBillData);
+
+        svgToJpegPng(
+          qrBillSvg.element as unknown as SVGSVGElement,
+          (result) => {
+            setQrImageSrc(result);
+          },
+          {format: 'jpeg', quality: 1},
+        );
+
+        return '';
+      } catch (error) {
+        if (error instanceof Error) {
+          setQrError(error.message);
+          return t(`${error.message}`);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    checkValidQrCode();
+  }, []);
+
+  useEffect(() => {
+    const errorMessage = getQrErrorMessage(qrError);
+
+    if (errorMessage) {
+      enqueueSnackbar(t(`${errorMessage}`), {
+        variant: 'error',
+      });
+      setQrError('');
+    }
+  }, [qrError]);
 
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
@@ -505,6 +569,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           footerPath={footerBlockUrl[footerInfo?.path]}
           footerInfo={footerInfo}
           nextCompanyExternalId={companyNextNumber?.value}
+          qrImageSrc={qrImageSrc}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -651,27 +716,32 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   };
 
   const handleOpenSendEmail = async (companyNextId?: string) => {
-    setIsLoadingFiles(true);
-    setIsSendEmailDialogOpen(true);
+    const error = await checkValidQrCode();
 
-    try {
-      // Refetch the download URLs for invoice, work report, and checklist
-      const workReportDownloadUrlResponse =
-        await refetchWorkReportDownloadUrl();
-      const checklistDownloadUrlResponse = await refetchChecklistDownloadUrl();
+    if (!error) {
+      setIsLoadingFiles(true);
+      setIsSendEmailDialogOpen(true);
 
-      // Ensure all download URLs are fetched before calling getExistingFiles
-      await refetchDownloadUrl().then(async (res) => {
-        await getExistingFiles(
-          res.data,
-          invoice,
-          companyNextId,
-          workReportDownloadUrlResponse.data,
-          checklistDownloadUrlResponse.data,
-        );
-      });
-    } finally {
-      setIsLoadingFiles(false);
+      try {
+        // Refetch the download URLs for invoice, work report, and checklist
+        const workReportDownloadUrlResponse =
+          await refetchWorkReportDownloadUrl();
+        const checklistDownloadUrlResponse =
+          await refetchChecklistDownloadUrl();
+
+        // Ensure all download URLs are fetched before calling getExistingFiles
+        await refetchDownloadUrl().then(async (res) => {
+          await getExistingFiles(
+            res.data,
+            invoice,
+            companyNextId,
+            workReportDownloadUrlResponse.data,
+            checklistDownloadUrlResponse.data,
+          );
+        });
+      } finally {
+        setIsLoadingFiles(false);
+      }
     }
   };
 

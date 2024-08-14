@@ -221,6 +221,7 @@ export interface ServiceCompanyUpdateBody {
   contractNameTypes?: ContractNameTypes[];
   serviceOrderGenerationEnabled?: boolean;
   contractInvoiceGenerationEnabled?: boolean;
+  invoiceQRCodeEnabled?: boolean;
   serviceOrderGenerationDaysInAdvance?: number;
   minToHourStep?: MinToStep | number;
   accountSystem?: AccountSystems;
