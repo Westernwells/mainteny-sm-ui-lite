@@ -245,24 +245,28 @@ export const UnitMapsView = () => {
 
   const renderFilterItems = () => (
     <FilterFields
+      isFilterApplied={isFilterActive}
       onClear={() => {
-        clearValues();
-        setResetDatePicker(true);
-        setPage({
-          pageSize: 50,
-          pageIndex: 0,
-        });
-        const res = createEmptyResource<ElevatorView>(10);
-        const latLng = res.data.map((elevator) => ({
-          latitude: elevator.address.location?.latitude ?? 0.0,
-          longitude: elevator.address.location?.longitude ?? 0.0,
-        }));
+        if (isFilterActive) {
+          clearValues();
+          setResetDatePicker(true);
+          setPage({
+            pageSize: 50,
+            pageIndex: 0,
+          });
 
-        const centerCoord = getCenter(latLng) as unknown as Location;
-        setElevatorView({
-          elevator: res,
-          centerCoord,
-        });
+          const res = createEmptyResource<ElevatorView>(10);
+          const latLng = res.data.map((elevator) => ({
+            latitude: elevator.address.location?.latitude ?? 0.0,
+            longitude: elevator.address.location?.longitude ?? 0.0,
+          }));
+
+          const centerCoord = getCenter(latLng) as unknown as Location;
+          setElevatorView({
+            elevator: res,
+            centerCoord,
+          });
+        }
       }}
       wrapperStyle={{width: '90%'}}>
       <DatePicker

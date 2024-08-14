@@ -13,6 +13,7 @@ interface Props {
   hideClear?: boolean;
   clearText?: string;
   onClear?: () => void;
+  isFilterApplied?: boolean;
 }
 
 export const FilterFields = ({
@@ -24,6 +25,7 @@ export const FilterFields = ({
   showFilter = true,
   clearText,
   onClear,
+  isFilterApplied,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -38,7 +40,7 @@ export const FilterFields = ({
           onClick={() => onClear && onClear()}
           mt="0.5em"
           sx={{
-            cursor: 'pointer',
+            cursor: isFilterApplied !== false ? 'pointer' : 'default',
             color: theme.palette.text.primary,
             fontWeight: '600',
             ...textStyles,
