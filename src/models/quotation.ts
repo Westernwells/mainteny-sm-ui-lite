@@ -194,6 +194,7 @@ export interface UpdateQuotation {
   expiryDate?: string;
   referenceNumber?: string;
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+  status?: QuotationStatus;
 }
 
 export interface ReplyQuotation {
