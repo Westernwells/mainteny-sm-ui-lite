@@ -143,7 +143,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                 : updatedInvoice?.subject,
           }
         : undefined,
-    [updatedInvoice],
+    [updatedInvoice, invoice],
   );
   const {
     data: downloadUrl,
