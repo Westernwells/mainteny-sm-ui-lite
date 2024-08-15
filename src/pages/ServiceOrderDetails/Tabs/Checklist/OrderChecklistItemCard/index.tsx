@@ -6,8 +6,8 @@ import {PageCard} from 'components/PageCard';
 import {ThreeDotMenu} from 'components/ThreeDotMenu';
 
 import {ServiceOrderCheckListView} from 'models/checklist';
-import {EmployeesSimpleView} from 'models/employee';
 import {ChecklistStatus} from 'models/service-order';
+import {UserAccount} from 'models/user';
 import {useTranslation} from 'react-i18next';
 import {formatDate} from 'utils/datetime';
 import {getUserFullName} from 'utils/utils';
@@ -20,7 +20,7 @@ interface Props {
   onDelete: (selectedChecklist: ServiceOrderCheckListView) => void;
   onEdit: (selectedChecklist: ServiceOrderCheckListView) => void;
   selected?: boolean;
-  technician: EmployeesSimpleView;
+  technician: UserAccount;
   disabled: boolean;
 }
 
@@ -136,9 +136,9 @@ export const OrderChecklistItemCard = ({
             {t('Technician')}
           </Typography>
           <Box display="flex" alignItems="center">
-            <Avatar userAccount={technician.userAccount} sx={{mr: 1}} />
+            <Avatar userAccount={technician} sx={{mr: 1}} />
             <Typography fontSize="14px" fontWeight="bold">
-              {getUserFullName(technician.userAccount)}
+              {getUserFullName(technician)}
             </Typography>
           </Box>
         </Box>

@@ -3,15 +3,17 @@ import {EmptySection} from 'components/EmptySection';
 
 interface Props {
   onAddPress: () => void;
+  disabled?: boolean;
 }
 
-export const NoChecklist = ({onAddPress}: Props) => (
+export const NoChecklist = ({onAddPress, disabled = false}: Props) => (
   <Box display="flex" justifyContent="center">
     <EmptySection
       illustration="checklist"
       size="small"
       containerStyle={{width: '60%', marginTop: 0}}
       showActionBtn
+      disableActionBtn={disabled}
       btnAction={onAddPress}
       btnLabel="Add Checklist"
       labelVariant="h5"

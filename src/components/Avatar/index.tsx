@@ -1,10 +1,10 @@
 import {Avatar as AvatarMui, SxProps, Theme} from '@mui/material';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {UserAccountView} from 'models/user';
+import {UserAccount, UserAccountView} from 'models/user';
 import {getUserFullName} from 'utils/utils';
 
 interface Props {
-  userAccount: UserAccountView;
+  userAccount: UserAccountView | UserAccount;
   sx?: SxProps<Theme>;
 }
 

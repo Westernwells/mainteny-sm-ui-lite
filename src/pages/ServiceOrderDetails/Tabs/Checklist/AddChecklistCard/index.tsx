@@ -14,12 +14,12 @@ import {useTranslation} from 'react-i18next';
 import {ServiceOrderCheckListView} from 'models/checklist';
 import {ChecklistStatus, ServiceOrderView} from 'models/service-order';
 import {useMemo, useState} from 'react';
-import {EmployeesSimpleView} from 'models/employee';
 import {Add} from '@mui/icons-material';
 import {Confirm} from 'components/Confirm';
 import {useDisassociateChecklistToServiceOrder} from 'hooks/reactQuery/useChecklists';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {theme as MuiTheme} from 'theme';
+import {UserAccount} from 'models/user';
 import {OrderChecklistItemCard} from '../OrderChecklistItemCard';
 import {NoChecklist} from '../NoChecklist';
 
@@ -72,15 +72,21 @@ export const AddChecklistCard = ({
   const {mutate: disassociateMultiChecklist} =
     useDisassociateChecklistToServiceOrder('Checklist deleted successfully!');
   const {t} = useTranslation();
-  const technicianMap = useMemo(
-    () =>
-      serviceOrder.schedules.reduce((acc, item) => {
-        acc[item.technician.id] = item.technician;
-
+  const technicianMap = useMemo(() => {
+    const map = serviceOrder.additionalInfo.candidateTechnicians?.reduce(
+      (acc, item) => {
+        acc[item.id] = item.userAccount;
         return acc;
-      }, {} as {[key: string]: EmployeesSimpleView}),
-    [serviceOrder],
-  );
+      },
+      {} as {[key: string]: UserAccount},
+    );
+
+    return serviceOrder.schedules.reduce((acc, item) => {
+      acc[item.technician.id] = item.technician.userAccount;
+
+      return acc;
+    }, map as {[key: string]: UserAccount});
+  }, [serviceOrder]);
 
   const filteredChecklists = useMemo(() => {
     if (checklistFilter === 'COMPLETED') {
@@ -98,6 +104,12 @@ export const AddChecklistCard = ({
     return checklists;
   }, [checklists, checklistFilter]);
 
+  const scheduled = serviceOrder.schedules ?? [];
+  const candidates = serviceOrder.additionalInfo.candidateTechnicians ?? [];
+
+  const technicianNotAssigned =
+    scheduled.length === 0 && candidates.length === 0;
+
   return (
     <>
       <PageCard
@@ -111,40 +123,44 @@ export const AddChecklistCard = ({
               <Typography sx={{fontWeight: '600', color: '#828DA3'}}>
                 {t('Checklists').toUpperCase()}
               </Typography>
-              <Select
-                size="small"
-                required
-                notched
-                onChange={(e) => {
-                  setChecklistFilter(e.target.value);
-                }}
-                value={checklistFilter}
-                sx={{
-                  background: 'transparent',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '& [aria-labelledby="demo-simple-select-label"]': {
-                    fontWeight: 600,
-                  },
-                }}
-                IconComponent={StyledExpandIcon}>
-                {ALL_CHECKLIST_FILTER_OPTIONS.map((type) => (
-                  <MenuItem value={type.value} key={type.value}>
-                    {t(type.label)}
-                  </MenuItem>
-                ))}
-              </Select>
+              {!!checklists?.length && (
+                <Select
+                  size="small"
+                  required
+                  notched
+                  onChange={(e) => {
+                    setChecklistFilter(e.target.value);
+                  }}
+                  value={checklistFilter}
+                  sx={{
+                    background: 'transparent',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                    '& [aria-labelledby="demo-simple-select-label"]': {
+                      fontWeight: 600,
+                    },
+                  }}
+                  IconComponent={StyledExpandIcon}>
+                  {ALL_CHECKLIST_FILTER_OPTIONS.map((type) => (
+                    <MenuItem value={type.value} key={type.value}>
+                      {t(type.label)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
             </Box>
-            <IconButton onClick={onAddPress} sx={{p: 0.5}}>
-              <Add htmlColor={theme.palette.primary.main} />
-            </IconButton>
+            {!!checklists?.length && (
+              <IconButton onClick={onAddPress} sx={{p: 0.5}}>
+                <Add htmlColor={theme.palette.primary.main} />
+              </IconButton>
+            )}
           </Box>
         }
         contentContainerStyles={{
@@ -159,7 +175,12 @@ export const AddChecklistCard = ({
           }}
           container>
           <Grid pb={2} item sm={12} md={12}>
-            {!checklists?.length && <NoChecklist onAddPress={onAddPress} />}
+            {!checklists?.length && (
+              <NoChecklist
+                disabled={technicianNotAssigned}
+                onAddPress={onAddPress}
+              />
+            )}
             {filteredChecklists?.map((item, index) => {
               const key = item.checkListId + item.technicianId;
 
