@@ -10,6 +10,7 @@ import {
   Currency as CurrencyModalType,
   Money,
 } from '../models/misc';
+import {getCountryCode} from './countries';
 
 export const formatCurrency = (
   amount: number,
@@ -256,7 +257,10 @@ export const createQrData = (
     buildingNumber:
       userInfo?.serviceCompany.billingAddress?.component?.street2 || '',
     city: userInfo?.serviceCompany.billingAddress?.component?.city || '',
-    country: userInfo?.serviceCompany.billingAddress?.countryCode || 'CH',
+    country:
+      getCountryCode(
+        userInfo?.serviceCompany.billingAddress?.component?.country!,
+      ) || 'CH',
     zip: userInfo?.serviceCompany.billingAddress?.component?.postalCode || '',
     account: userInfo?.serviceCompany?.settings?.paymentInfo.iban || '',
   },
@@ -269,7 +273,10 @@ export const createQrData = (
     buildingNumber:
       invoice?.additionalInfo?.billingAddress?.component?.street2 || '',
     city: invoice?.additionalInfo?.billingAddress?.component?.city || '',
-    country: invoice?.additionalInfo?.billingAddress?.countryCode || 'CH',
+    country:
+      getCountryCode(
+        invoice?.additionalInfo?.billingAddress?.component?.country!,
+      ) || 'CH',
     zip: invoice?.additionalInfo?.billingAddress?.component?.postalCode || '',
   },
   unstructuredMessage: invoice?.externalId || '',
