@@ -331,7 +331,12 @@ export const DraftQuotation = ({
 
     if (formType === 'edit' && quotation) {
       return updateQuotationAsync({
-        data: formatQuotationRecord({...values}),
+        data: formatQuotationRecord({
+          ...values,
+          ...(quotation.status === QuotationStatus.SENT_TO_CLIENT
+            ? {status: QuotationStatus.DRAFT}
+            : {}),
+        }),
         quotationId: quotation.id,
       });
     }
