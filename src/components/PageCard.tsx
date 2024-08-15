@@ -1,4 +1,4 @@
-import {ReactNode} from 'react';
+import {MouseEventHandler, ReactNode} from 'react';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -18,9 +18,11 @@ export interface Props {
   headerIcon?: JSX.Element;
   headerLabel?: string;
   customHeader?: JSX.Element;
-  containerStyles?: {[key: string]: any};
+  containerStyles?: {[key: string]: any} | SxProps<Theme>;
   contentContainerStyles?: SxProps<Theme>;
   handleAction?: () => void;
+  onClick?: MouseEventHandler<HTMLDivElement>;
+  disabled?: boolean;
 }
 
 export const PageCard = ({
@@ -34,12 +36,15 @@ export const PageCard = ({
   minHeight,
   customHeader,
   contentContainerStyles,
+  onClick,
   handleAction = () => {},
+  disabled = false,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   return (
     <Card
+      onClick={disabled ? undefined : onClick}
       sx={{
         minHeight,
         boxShadow: '0px 4px 15px rgba(144, 144, 144, 0.2)',

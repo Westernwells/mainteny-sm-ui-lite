@@ -434,3 +434,5 @@ export interface HeaderFooterInfoData {
   posX: number;
   posY: number;
 }
+
+export type CreateEditMode = 'create' | 'edit';

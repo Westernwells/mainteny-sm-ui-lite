@@ -1,16 +1,16 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import GoogleMapReact from 'google-map-react';
 import Box from '@mui/system/Box';
 import {DatePicker} from 'components/DatePicker';
 import useSupercluster from 'use-supercluster';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {getCenter} from 'geolib';
 import Supercluster from 'supercluster';
 import {Typography} from '@mui/material';
 import {LocationPin} from 'components/LocationPin';
-import {Location, Resource} from 'models/misc';
+import {Location, OrderByParams, Resource} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
 import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
@@ -19,24 +19,40 @@ import {useQueryState} from 'hooks/useQueryState';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useTheme} from '@mui/system';
+import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
+import {useSearchValues} from 'hooks/useSearchValues';
 
 export const UnitMapsView = () => {
   const formatDate = useFormatDate();
   const {user} = useUserSession();
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {data: userAccount} = useGetUserAccount(user?.userAccount.id);
+
+  const defaultCenterCoord = {
+    lng:
+      company?.businessAddress?.location?.longitude ??
+      userAccount?.userData?.address?.location?.longitude ??
+      13.390206,
+    lat:
+      company?.businessAddress?.location?.latitude ??
+      userAccount?.userData?.address?.location?.latitude ??
+      52.535152,
+  };
   const fallback = useRef({
     elevator: createEmptyResource<ElevatorView>(10),
     centerCoord: {
-      longitude: company?.businessAddress?.location?.longitude ?? 13.390206,
-      latitude: company?.businessAddress?.location?.latitude ?? 52.535152,
+      longitude: defaultCenterCoord.lng,
+      latitude: defaultCenterCoord.lat,
     },
   }).current;
   const mapRef = useRef<any>();
-  const [lastVisitStart, setLastVisitStart, clearFilters] =
-    useQueryState<Date | null>('lastVisitStart', {
+  const [lastVisitStart, setLastVisitStart] = useQueryState<Date | null>(
+    'lastVisitStart',
+    {
       defaultValue: null,
       isDate: true,
-    });
+    },
+  );
   const [lastVisitEnd, setLastVisitEnd] = useQueryState<Date | null>(
     'lastVisitEnd',
     {
@@ -58,6 +74,8 @@ export const UnitMapsView = () => {
       isDate: true,
     },
   );
+  const {clearValues} = useSearchValues<OrderByParams<ElevatorOrderField>>();
+
   const [zoom, setZoom] = useState(20);
   const [search, setSearch] = useQueryState('searchUnitsMapView');
   const [points, setPoints] = useState<any>([]);
@@ -94,6 +112,20 @@ export const UnitMapsView = () => {
       nextVisitDateEnd: formatDate(nextVisitEnd, 'yyyy-MM-dd'),
     }),
   });
+  const isFilterActive = useMemo(
+    () =>
+      !!search ||
+      !!lastVisitStart ||
+      !!lastVisitEnd ||
+      !!nextVisitStart ||
+      !!nextVisitEnd,
+    [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd],
+  );
+  useEffect(() => {
+    if (page.pageIndex) {
+      setPage({...page, pageIndex: 0});
+    }
+  }, [lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
 
   useEffect(() => {
     if (page.pageIndex) {
@@ -102,7 +134,7 @@ export const UnitMapsView = () => {
     if (textInput.current) {
       textInput.current.value = search;
     }
-  }, [search, lastVisitStart, lastVisitEnd, nextVisitStart, nextVisitEnd]);
+  }, [search]);
 
   const newElevatorView = () =>
     !search &&
@@ -126,7 +158,13 @@ export const UnitMapsView = () => {
       setElevatorView(newElevatorView());
 
       if (currentTotal < elevatorResponse.total) {
-        setPage({...page, pageIndex: page.pageIndex + 1});
+        // timeout added to allow the request to finish before updating the page index
+        setTimeout(
+          () => {
+            setPage({...page, pageIndex: page.pageIndex + 1});
+          },
+          isFilterActive ? 100 : 300,
+        );
       }
     }
   }, [elevatorResponse, isLoading]);
@@ -206,7 +244,31 @@ export const UnitMapsView = () => {
   };
 
   const renderFilterItems = () => (
-    <FilterFields onClear={clearFilters} wrapperStyle={{width: '90%'}}>
+    <FilterFields
+      isFilterApplied={isFilterActive}
+      onClear={() => {
+        if (isFilterActive) {
+          clearValues();
+          setResetDatePicker(true);
+          setPage({
+            pageSize: 50,
+            pageIndex: 0,
+          });
+
+          const res = createEmptyResource<ElevatorView>(10);
+          const latLng = res.data.map((elevator) => ({
+            latitude: elevator.address.location?.latitude ?? 0.0,
+            longitude: elevator.address.location?.longitude ?? 0.0,
+          }));
+
+          const centerCoord = getCenter(latLng) as unknown as Location;
+          setElevatorView({
+            elevator: res,
+            centerCoord,
+          });
+        }
+      }}
+      wrapperStyle={{width: '90%'}}>
       <DatePicker
         defaultDate={lastVisitStart}
         containerStyles={{mr: '1em'}}
@@ -310,10 +372,13 @@ export const UnitMapsView = () => {
         defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom}
         center={
-          elevatorView.centerCoord && {
-            lat: elevatorView.centerCoord.latitude,
-            lng: elevatorView.centerCoord.longitude,
-          }
+          company?.businessAddress?.location ||
+          userAccount?.userData?.address?.location
+            ? defaultCenterCoord
+            : {
+                lat: elevatorView.centerCoord.latitude,
+                lng: elevatorView.centerCoord.longitude,
+              }
         }
         zoom={10}>
         {clusters.map((cluster, index) => {
