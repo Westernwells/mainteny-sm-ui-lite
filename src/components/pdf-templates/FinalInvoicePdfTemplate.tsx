@@ -32,6 +32,7 @@ import TopSectionContainer from './containers/TopSectionContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import {ArticleSection} from './ArticleSection/ArticleSection';
 import SwissPageTemplate from './SwissPageTemplate';
+import AlternativeAddressTemplate from './AlternativeAddressTemplate';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -174,6 +175,24 @@ const FinalInvoicePdfTemplate = ({
 
   return (
     <Document>
+      {invoice?.additionalInfo.alternativeAddress &&
+        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !==
+          0 && (
+          <AlternativeAddressTemplate
+            userInfo={userInfo}
+            selectedLng={selectedLng}
+            translate={translate}
+            headerInfo={headerInfo}
+            headerPath={headerPath}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
+            alternativeServiceCompanyInfo={
+              invoice?.additionalInfo.alternativeServiceCompanyInfo
+            }
+            alternativeAddress={invoice?.additionalInfo.alternativeAddress}
+          />
+        )}
+
       <PdfPageContainer selectedLng={selectedLng}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 

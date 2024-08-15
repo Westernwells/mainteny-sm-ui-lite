@@ -30,6 +30,7 @@ import PdfPageContainer from './containers/PdfPageContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import PdfUnitAddress from './containers/PdfUnitAddress';
+import AlternativeAddressTemplate from './AlternativeAddressTemplate';
 
 Font.register({
   family: 'Montserrat-Regular',
@@ -271,6 +272,24 @@ const QuotationPdfTemplate = React.memo(
 
     return (
       <Document>
+        {quotation?.additionalInfo.alternativeAddress &&
+          Object.keys(quotation?.additionalInfo.alternativeAddress!).length !==
+            0 && (
+            <AlternativeAddressTemplate
+              userInfo={userInfo}
+              selectedLng={selectedLng}
+              translate={translate}
+              headerInfo={headerInfo}
+              headerPath={headerPath}
+              footerInfo={footerInfo}
+              footerPath={footerPath}
+              alternativeServiceCompanyInfo={
+                quotation?.additionalInfo.alternativeServiceCompanyInfo
+              }
+              alternativeAddress={quotation?.additionalInfo.alternativeAddress}
+            />
+          )}
+
         <PdfPageContainer selectedLng={selectedLng}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
