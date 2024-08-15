@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {
+  Alert,
   Grid,
   LinearProgress,
   Typography,
@@ -141,7 +142,13 @@ export const CheckList = ({serviceOrder}: Props) => {
       };
     }) || [];
 
-  const [selectedOption, setSelectedOption] = useState(labels[0]?.value || '');
+  const [selectedOption, setSelectedOption] = useState<
+    | {
+        checklistId: string;
+        technicianId: string;
+      }
+    | undefined
+  >(labels[0]?.value);
   const [selectedChecklist, setSelectedChecklist] =
     useState<ServiceOrderCheckListView>();
 
@@ -165,7 +172,7 @@ export const CheckList = ({serviceOrder}: Props) => {
   );
 
   const technicianUserAccount = serviceOrder.schedules.find(
-    (s) => s.technician.id === selectedOption.technicianId,
+    (s) => s.technician.id === selectedOption?.technicianId,
   )?.technician.userAccount;
   const technicianName = technicianUserAccount
     ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
@@ -176,8 +183,8 @@ export const CheckList = ({serviceOrder}: Props) => {
       {
         id: serviceOrder.id,
         params: {
-          checkListId: selectedOption.checklistId,
-          technicianId: selectedOption.technicianId,
+          checkListId: selectedOption?.checklistId!,
+          technicianId: selectedOption?.technicianId!,
         },
       },
       {
@@ -222,6 +229,10 @@ export const CheckList = ({serviceOrder}: Props) => {
 
   useEffect(() => {
     if (!serviceOrderCheckLists?.length) {
+      if (selectedChecklist) {
+        setSelectedChecklist(undefined);
+      }
+
       return;
     }
 
@@ -463,6 +474,12 @@ export const CheckList = ({serviceOrder}: Props) => {
     setSelectedChecklist(selectedChecklistCloned);
   };
 
+  const scheduled = serviceOrder.schedules ?? [];
+  const candidates = serviceOrder.additionalInfo.candidateTechnicians ?? [];
+
+  const technicianNotAssigned =
+    scheduled.length === 0 && candidates.length === 0;
+
   return (
     <>
       <Grid container alignItems="center" justifyContent="center" rowGap="27px">
@@ -483,60 +500,81 @@ export const CheckList = ({serviceOrder}: Props) => {
                   borderRadius: '0.5rem',
                 }}
                 contentContainerStyles={{
-                  display: 'grid',
-                  gridAutoColumns: 'minmax(0, 1fr)',
-                  gridAutoFlow: 'column',
-                  padding: 1.25,
-                  '&:last-child': {
-                    pb: 1.25,
-                  },
+                  paddingBottom: '16px !important',
+                  paddingLeft: 1,
+                  paddingRight: 1,
                 }}>
-                <CardProps
-                  label="Date"
-                  containerStyles={{alignItems: 'center'}}
-                  bodyTextVariant="subtitle1"
-                  bodyText={formatDate(serviceOrder.dueDate)}
-                  bodyStyle={{fontWeight: '600'}}
-                />
-                <CardProps
-                  label="Type"
-                  bodyTextVariant="subtitle1"
-                  containerStyles={{alignItems: 'center'}}
-                  bodyText={
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <ServiceOrderIcons
-                        serviceOrderType={serviceOrder.type}
-                        size="small"
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridAutoColumns: 'minmax(0, 1fr)',
+                    gridAutoFlow: 'column',
+                    padding: 1.25,
+                    '&:last-child': {
+                      pb: 1.25,
+                    },
+                  }}>
+                  <CardProps
+                    label="Date"
+                    containerStyles={{alignItems: 'center'}}
+                    bodyTextVariant="subtitle1"
+                    bodyText={formatDate(serviceOrder.dueDate)}
+                    bodyStyle={{fontWeight: '600'}}
+                  />
+                  <CardProps
+                    label="Type"
+                    bodyTextVariant="subtitle1"
+                    containerStyles={{alignItems: 'center'}}
+                    bodyText={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <ServiceOrderIcons
+                          serviceOrderType={serviceOrder.type}
+                          size="small"
+                        />
+                        <ServiceOrderTypeText
+                          serviceOrderType={serviceOrder.type}
+                          capitalizeText
+                          variant="subtitle1"
+                          style={{fontWeight: '600'}}
+                        />
+                      </Box>
+                    }
+                    bodyStyle={{fontWeight: '600'}}
+                  />
+                  <CardProps
+                    label="Job ID"
+                    bodyTextVariant="subtitle1"
+                    containerStyles={{alignItems: 'center'}}
+                    bodyText={serviceOrder.number}
+                    bodyStyle={{fontWeight: '600'}}
+                  />
+                  <CardProps
+                    label="Status"
+                    bodyTextVariant="subtitle1"
+                    containerStyles={{alignItems: 'center'}}
+                    bodyText={
+                      <StatusChip
+                        color={getServiceOrderStatusColor(serviceOrder.status)}
+                        label={serviceOrderStatusToString(serviceOrder.status)}
                       />
-                      <ServiceOrderTypeText
-                        serviceOrderType={serviceOrder.type}
-                        capitalizeText
-                        variant="subtitle1"
-                        style={{fontWeight: '600'}}
-                      />
-                    </Box>
-                  }
-                  bodyStyle={{fontWeight: '600'}}
-                />
-                <CardProps
-                  label="Job ID"
-                  bodyTextVariant="subtitle1"
-                  containerStyles={{alignItems: 'center'}}
-                  bodyText={serviceOrder.number}
-                  bodyStyle={{fontWeight: '600'}}
-                />
-                <CardProps
-                  label="Status"
-                  bodyTextVariant="subtitle1"
-                  containerStyles={{alignItems: 'center'}}
-                  bodyText={
-                    <StatusChip
-                      color={getServiceOrderStatusColor(serviceOrder.status)}
-                      label={serviceOrderStatusToString(serviceOrder.status)}
-                    />
-                  }
-                  bodyStyle={{fontWeight: '600'}}
-                />
+                    }
+                    bodyStyle={{fontWeight: '600'}}
+                  />
+                </Box>
+                {technicianNotAssigned && (
+                  <Alert severity="warning">
+                    <Typography
+                      fontWeight="bold"
+                      color={theme.palette.info.infoAlert}>
+                      {t('Assign technician to add checklists')}
+                    </Typography>
+                    <Typography color={theme.palette.info.infoAlert}>
+                      {t(
+                        'Checklists can only be added once a technician is assigned to the job.',
+                      )}
+                    </Typography>
+                  </Alert>
+                )}
               </PageCard>
               {selectedChecklist && (
                 <Box
