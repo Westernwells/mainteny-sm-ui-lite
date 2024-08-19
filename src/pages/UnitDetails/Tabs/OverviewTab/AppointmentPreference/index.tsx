@@ -100,12 +100,10 @@ export const AppointmentPreference = ({
 
   const openingHour = watch('openingHour');
   const closingHour = watch('closingHour');
-  const appointmentDaysOfWeek = watch('appointmentDaysOfWeek');
 
   const disableSaveBtn = !!(
     (openingHour && !closingHour) ||
-    (!openingHour && closingHour) ||
-    (openingHour && closingHour && appointmentDaysOfWeek.length <= 0)
+    (!openingHour && closingHour)
   );
 
   return (

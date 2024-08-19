@@ -11,7 +11,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import {UseFormRegister, UseFormSetValue, UseFormWatch} from 'react-hook-form';
-import {useMemo, useState} from 'react';
+import {useState} from 'react';
 import {Typography} from '@mui/material';
 
 interface Props {
@@ -63,13 +63,6 @@ export const EditAppointmentForm = ({
   const openingHour = watch('openingHour');
   const closingHour = watch('closingHour');
 
-  const daysOfWeekError = useMemo(() => {
-    if (openingHour && closingHour && appointmentDaysOfWeek.length === 0) {
-      return t('Select at least one day of the week.');
-    }
-    return null;
-  }, [openingHour, closingHour, appointmentDaysOfWeek, t]);
-
   return (
     <Grid container spacing={2} component="form">
       <Grid item sm={12} md={12} xs={12}>
@@ -89,7 +82,6 @@ export const EditAppointmentForm = ({
             multiple: true,
             ...register('appointmentDaysOfWeek'),
           }}
-          errorText={daysOfWeekError || ''}
         />
       </Grid>
 

@@ -37,7 +37,6 @@ export const TimePicker = ({
   minTime,
   maxTime,
   confirm,
-  cancel,
   resetValue,
   saveOnClose = false,
   required = false,
@@ -52,9 +51,7 @@ export const TimePicker = ({
   };
 
   const handleClose = () => {
-    if (cancel) {
-      setValue(resetValue || null);
-    }
+    setValue(resetValue || null);
     setOpen(false);
   };
 
