@@ -11,6 +11,8 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import {UseFormRegister, UseFormSetValue, UseFormWatch} from 'react-hook-form';
+import {useMemo, useState} from 'react';
+import {Typography} from '@mui/material';
 
 interface Props {
   watch: UseFormWatch<AppointmentFormModel>;
@@ -55,6 +57,19 @@ export const EditAppointmentForm = ({
   const formatDate = useFormatDate();
   const {t} = useTranslation();
 
+  const [timeError, setTimeError] = useState<string | null>(null);
+
+  const appointmentDaysOfWeek = watch('appointmentDaysOfWeek');
+  const openingHour = watch('openingHour');
+  const closingHour = watch('closingHour');
+
+  const daysOfWeekError = useMemo(() => {
+    if (openingHour && closingHour && appointmentDaysOfWeek.length === 0) {
+      return t('Select at least one day of the week.');
+    }
+    return null;
+  }, [openingHour, closingHour, appointmentDaysOfWeek, t]);
+
   return (
     <Grid container spacing={2} component="form">
       <Grid item sm={12} md={12} xs={12}>
@@ -70,10 +85,11 @@ export const EditAppointmentForm = ({
           }
           selectProps={{
             id: 'daysofWeekSelect',
-            value: watch('appointmentDaysOfWeek'),
+            value: appointmentDaysOfWeek,
             multiple: true,
             ...register('appointmentDaysOfWeek'),
           }}
+          errorText={daysOfWeekError || ''}
         />
       </Grid>
 
@@ -84,29 +100,44 @@ export const EditAppointmentForm = ({
               ? setDateTime(new Date(), defaultValues.openingHour)
               : undefined
           }
+          maxTime={
+            closingHour
+              ? setDateTime(new Date(), closingHour as string)
+              : undefined
+          }
           getSelectedTime={(time) => {
-            setValue(
-              'openingHour',
+            const formattedTime =
               time instanceof Date && !Number.isNaN(time.valueOf())
                 ? formatDate(time, 'HH:mm')
-                : '',
-            );
+                : '';
+
+            setValue('openingHour', formattedTime);
+
+            if (!closingHour && formattedTime) {
+              setTimeError(t('Select opening hours end.'));
+            } else {
+              setTimeError(null);
+            }
           }}
           textFieldProps={{
             label: t('Opening hours start'),
-            ...register('openingHour', {
-              required: 'Opening hours start is required',
-            }),
+            ...register('openingHour'),
           }}
           inputTestId="opening-hour-start"
+          popupTestId="opening-hour-popup"
         />
+        {closingHour && !openingHour && timeError && (
+          <Typography color="error" variant="body2">
+            {timeError}
+          </Typography>
+        )}
       </Grid>
 
       <Grid item sm={6} md={6} xs={12}>
         <TimePicker
           minTime={
-            watch('openingHour')
-              ? setDateTime(new Date(), watch('openingHour') as string)
+            openingHour
+              ? setDateTime(new Date(), openingHour as string)
               : undefined
           }
           defaultTime={
@@ -115,21 +146,31 @@ export const EditAppointmentForm = ({
               : undefined
           }
           getSelectedTime={(time) => {
-            setValue(
-              'closingHour',
+            const formattedTime =
               time instanceof Date && !Number.isNaN(time.valueOf())
                 ? formatDate(time, 'HH:mm')
-                : '',
-            );
+                : '';
+
+            setValue('closingHour', formattedTime);
+
+            if (!openingHour && formattedTime) {
+              setTimeError(t('Select opening hours start.'));
+            } else {
+              setTimeError(null);
+            }
           }}
           textFieldProps={{
             label: t('Opening hours end'),
-            ...register('closingHour', {
-              required: 'Opening hours end is required',
-            }),
+            ...register('closingHour'),
           }}
           inputTestId="opening-hour-end"
+          popupTestId="closing-hour-popup"
         />
+        {openingHour && !closingHour && timeError && (
+          <Typography color="error" variant="body2">
+            {timeError}
+          </Typography>
+        )}
       </Grid>
 
       <Grid item sm={12} xs={12}>
