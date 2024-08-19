@@ -97,9 +97,9 @@ export const getQrErrorMessage = (qrError: string): string => {
     'Creditor address must be a maximum of 70 characters.':
       'The invoice PDF cannot be generated because your billing address must be 70 characters or less. This is a limitation of the Swiss QR Code generator.',
     'Debtor buildingNumber must be a maximum of 16 characters.':
-      'The invoice PDF cannot be generated because the customer address must be 70 characters or less. This is a limitation of the Swiss QR Code generator.',
+      'The invoice PDF cannot be generated because the address line 2 of your customer must be 16 characters or less. This is a limitation of the Swiss QR Code generator.',
     'Creditor buildingNumber must be a maximum of 16 characters.':
-      'The invoice PDF cannot be generated because your billing address must be 70 characters or less. This is a limitation of the Swiss QR Code generator.',
+      'The invoice PDF cannot be generated because the address line 2 of your billing address must be 16 characters or less. This is a limitation of the Swiss QR Code generator.',
     'Only CH and LI IBAN numbers are allowed.':
       'The invoice PDF cannot be generated because your IBAN does not match Swiss standard. IBAN must contain CH /LI prefix and 19 numbers. This is a limitation of the Swiss QR Code generator. Please set your IBAN correctly in financial settings.',
     'Currency must be either CHF or EUR.':

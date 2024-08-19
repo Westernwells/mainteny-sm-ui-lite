@@ -156,7 +156,7 @@ export const Actions = ({
   const [pdfPathToDownload, setPdfPathToDownload] = useState('');
 
   const [qrImageSrc, setQrImageSrc] = useState<string>('');
-  const [qrError, setQrError] = useState<string>('');
+  const [qrError, setQrError] = useState<string | null>(null);
 
   const qrCurrency: QRCurrencyCode =
     currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
@@ -608,55 +608,71 @@ export const Actions = ({
     setExistingFiles(allFiles);
   };
 
-  const checkValidQrCode = async () => {
-    if (user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+  const checkValidQrCode = useCallback(
+    async (qrInvoice: InvoiceView) => {
+      if (!user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+        return '';
+      }
+
       try {
         const qrBillData = createQrData(
           qrCurrency,
-          invoice,
+          qrInvoice,
           currentCurrency,
           user?.userAccount,
         );
 
         const qrBillSvg = new SwissQRBill(qrBillData);
 
-        svgToJpegPng(
-          qrBillSvg.element as unknown as SVGSVGElement,
-          (result) => {
-            setQrImageSrc(result);
-          },
-          {format: 'jpeg', quality: 1},
-        );
+        const result = await new Promise<string>((resolve, reject) => {
+          svgToJpegPng(
+            qrBillSvg.element as unknown as SVGSVGElement,
+            (imageResult) => {
+              if (imageResult) {
+                resolve(imageResult); // Resolve on success
+              } else {
+                reject(new Error('Failed to generate QR code image')); // Reject on failure
+              }
+            },
+            {format: 'jpeg', quality: 1},
+          );
+        });
 
+        setQrImageSrc(result);
+
+        setQrError(null);
         return '';
       } catch (error) {
         if (error instanceof Error) {
           setQrError(error.message);
-          return t(`${error.message}`);
+          return error.message;
         }
+        return 'Unknown error occurred'; // Fallback error message
       }
-    }
-  };
+    },
+    [user, currentCurrency, qrCurrency],
+  );
 
   useEffect(() => {
-    const errorMessage = getQrErrorMessage(qrError);
-
-    if (errorMessage) {
-      enqueueSnackbar(t(`${errorMessage}`), {
-        variant: 'error',
-      });
-      setQrError('');
+    if (qrError) {
+      const errorMessage = getQrErrorMessage(qrError);
+      if (errorMessage) {
+        enqueueSnackbar(t(`${errorMessage}`), {
+          variant: 'error',
+        });
+        setQrError(null);
+      }
     }
   }, [qrError]);
 
   const handleOpenSendEmail = async (companyNextId?: string) => {
-    const error = await checkValidQrCode();
+    const error = await checkValidQrCode(invoice);
 
     if (!error) {
-      setIsLoadingFiles(true);
-      setIsSendEmailDialogOpen(true);
-
       try {
+        setIsLoadingFiles(true);
+        setIsSendEmailDialogOpen(true);
+
         // Refetch the download URLs for invoice, work report, and checklist
         const invoiceDownloadUrlResponse = await refetchDownloadUrl();
         const workReportDownloadUrlResponse =
