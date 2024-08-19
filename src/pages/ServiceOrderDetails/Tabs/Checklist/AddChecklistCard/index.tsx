@@ -73,13 +73,11 @@ export const AddChecklistCard = ({
     useDisassociateChecklistToServiceOrder('Checklist deleted successfully!');
   const {t} = useTranslation();
   const technicianMap = useMemo(() => {
-    const map = serviceOrder.additionalInfo.candidateTechnicians?.reduce(
-      (acc, item) => {
+    const map =
+      serviceOrder.additionalInfo.candidateTechnicians?.reduce((acc, item) => {
         acc[item.id] = item.userAccount;
         return acc;
-      },
-      {} as {[key: string]: UserAccount},
-    );
+      }, {} as {[key: string]: UserAccount}) ?? {};
 
     return serviceOrder.schedules.reduce((acc, item) => {
       acc[item.technician.id] = item.technician.userAccount;
