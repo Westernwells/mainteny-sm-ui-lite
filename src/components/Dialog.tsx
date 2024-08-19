@@ -33,6 +33,7 @@ interface Props {
   dialogActionsStyles?: SxProps<Theme>;
   saveButtonContainerStyles?: SxProps<Theme>;
   dialogContentTextStyles?: SxProps<Theme>;
+  dataTestId?: string;
 }
 
 export const Dialog = ({
@@ -57,6 +58,7 @@ export const Dialog = ({
   saveButtonContainerStyles = {},
   dialogContentTextStyles = {},
   sx = {},
+  dataTestId,
 }: Props) => {
   const {t} = useTranslation();
 
@@ -71,7 +73,8 @@ export const Dialog = ({
       onClose={onCancel}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
-      {...dialogProps}>
+      {...dialogProps}
+      data-testid={dataTestId}>
       <DialogTitle
         id="alert-dialog-title"
         sx={{

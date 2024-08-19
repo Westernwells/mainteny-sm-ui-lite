@@ -21,6 +21,7 @@ interface Props extends Partial<TimePickerProps<Date>> {
   containerStyles?: {[key: string]: any};
   textFieldProps?: TextFieldProps;
   inputTestId?: string;
+  popupTestId?: string;
   required?: boolean;
   resetValue?: Date;
   saveOnClose?: boolean;
@@ -32,6 +33,7 @@ export const TimePicker = ({
   containerStyles,
   textFieldProps,
   inputTestId,
+  popupTestId,
   minTime,
   maxTime,
   confirm,
@@ -231,6 +233,7 @@ export const TimePicker = ({
               },
               popper: {
                 sx: popperSx,
+                'data-testid': popupTestId,
               },
               textField: {
                 ...textFieldProps,

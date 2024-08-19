@@ -17,7 +17,8 @@ import {titleCase} from 'utils/utils';
 import {Dialog} from 'components/Dialog';
 import {AppointmentFormModel} from 'models/unitForm';
 import {useForm} from 'react-hook-form';
-import {EditAppointmentForm, mapDaysOfWeekOptions} from './EditAppointmentForm';
+import {mapFormDataToElevatorUpdateRequest} from 'utils/elevator-utils';
+import {EditAppointmentForm} from './EditAppointmentForm';
 import {AppointmentShema} from './AppointmentShema';
 
 interface Props {
@@ -67,8 +68,8 @@ export const AppointmentPreference = ({
   const getDefaultValues = (elevatorData: ElevatorView) => ({
     appointmentDaysOfWeek:
       parsedTimeRulesData?.daysOfWeek.map((val) => titleCase(val)) ?? [],
-    openingHour: parsedTimeRulesData?.timeRange.start ?? '',
-    closingHour: parsedTimeRulesData?.timeRange.end ?? '',
+    openingHour: parsedTimeRulesData?.timeRange?.start ?? '',
+    closingHour: parsedTimeRulesData?.timeRange?.end ?? '',
     shouldNotifyCustomer:
       elevatorData.additionalInfo?.customerAppointment?.shouldNotifyCustomer ??
       false,
@@ -92,36 +93,20 @@ export const AppointmentPreference = ({
 
   const onSave = async (data: AppointmentFormModel) => {
     setOpenDialog(false);
-    await updateElevator({
-      body: {
-        propertyOwnerId,
-        ...(data.openingHour &&
-          data.closingHour && {
-            timeRule: {
-              daysTimeRange: [
-                {
-                  daysOfWeek: data.appointmentDaysOfWeek.map((val) =>
-                    mapDaysOfWeekOptions[
-                      val as keyof typeof mapDaysOfWeekOptions
-                    ].toUpperCase(),
-                  ),
-                  timeRange: {
-                    start: data.openingHour || '',
-                    end: data.closingHour || '',
-                  },
-                },
-              ],
-            },
-          }),
-        customerAppointment: {
-          shouldNotifyCustomer: data.shouldNotifyCustomer,
-          appointmentNotificationDue: data.appointmentNotificationDue,
-          requiresAppointment: data.requiresAppointment,
-        },
-      },
-      elevatorId: elevator.id,
-    });
+    await updateElevator(
+      mapFormDataToElevatorUpdateRequest(data, elevator.id, propertyOwnerId),
+    );
   };
+
+  const openingHour = watch('openingHour');
+  const closingHour = watch('closingHour');
+  const appointmentDaysOfWeek = watch('appointmentDaysOfWeek');
+
+  const disableSaveBtn = !!(
+    (openingHour && !closingHour) ||
+    (!openingHour && closingHour) ||
+    (openingHour && closingHour && appointmentDaysOfWeek.length <= 0)
+  );
 
   return (
     <InfoCard
@@ -168,18 +153,13 @@ export const AppointmentPreference = ({
         ))}
       </Grid>
       <Dialog
+        dataTestId="appointment-preferences-dialog"
         title="Edit Appointment Preferences"
         onCancel={() => {
           setOpenDialog(false);
           reset();
         }}
-        disableSaveBtn={
-          !!(
-            !watch('openingHour') ||
-            !watch('closingHour') ||
-            watch('appointmentDaysOfWeek').length <= 0
-          )
-        }
+        disableSaveBtn={disableSaveBtn}
         onSave={handleSubmit(onSave)}
         dialogProps={{
           maxWidth: 'xs',
