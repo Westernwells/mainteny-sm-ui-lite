@@ -188,7 +188,10 @@ export const AddChecklistCard = ({
                 <OrderChecklistItemCard
                   key={key}
                   containerStyles={index === 0 ? {mt: 0, mb: 1.5} : {my: 1.5}}
-                  selected={selectedChecklist?.checkListId === item.checkListId}
+                  selected={
+                    selectedChecklist?.checkListId === item.checkListId &&
+                    selectedChecklist.technicianId === item.technicianId
+                  }
                   onClick={(newSelectedChecklist) => {
                     onSelect?.(newSelectedChecklist);
                   }}
