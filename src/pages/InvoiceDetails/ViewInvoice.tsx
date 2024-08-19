@@ -102,6 +102,7 @@ import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import DOMPurify from 'dompurify';
 // eslint-disable-next-line import/no-unresolved
 import {SwissQRBill} from 'swissqrbill/svg';
+import {debounce} from 'lodash';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -129,6 +130,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
+
+  const [qrImageSrc, setQrImageSrc] = useState<string>('');
+  const [qrError, setQrError] = useState<string | null>(null);
+
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
   );
@@ -225,59 +230,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   });
 
   const {mutateAsync: updateInvoiceAsync} = useUpdateInvoice();
-
-  const [qrImageSrc, setQrImageSrc] = useState<string>('');
-  const [qrError, setQrError] = useState<string>('');
-
-  const qrCurrency: QRCurrencyCode =
-    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
-      ? currentCurrency.code
-      : 'EUR';
-
-  const checkValidQrCode = async () => {
-    if (user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
-      try {
-        const qrBillData = createQrData(
-          qrCurrency,
-          invoice,
-          currentCurrency,
-          user?.userAccount,
-        );
-
-        const qrBillSvg = new SwissQRBill(qrBillData);
-
-        svgToJpegPng(
-          qrBillSvg.element as unknown as SVGSVGElement,
-          (result) => {
-            setQrImageSrc(result);
-          },
-          {format: 'jpeg', quality: 1},
-        );
-
-        return '';
-      } catch (error) {
-        if (error instanceof Error) {
-          setQrError(error.message);
-          return t(`${error.message}`);
-        }
-      }
-    }
-  };
-
-  useEffect(() => {
-    checkValidQrCode();
-  }, []);
-
-  useEffect(() => {
-    const errorMessage = getQrErrorMessage(qrError);
-
-    if (errorMessage) {
-      enqueueSnackbar(t(`${errorMessage}`), {
-        variant: 'error',
-      });
-      setQrError('');
-    }
-  }, [qrError]);
 
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
@@ -715,8 +667,67 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     setExistingFiles(allFiles);
   };
 
+  const qrCurrency: QRCurrencyCode =
+    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
+      ? currentCurrency.code
+      : 'EUR';
+
+  const checkValidQrCode = useCallback(
+    debounce(async (qrInvoice: InvoiceView) => {
+      if (user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+        try {
+          const qrBillData = createQrData(
+            qrCurrency,
+            qrInvoice,
+            currentCurrency,
+            user?.userAccount,
+          );
+
+          const qrBillSvg = new SwissQRBill(qrBillData);
+
+          svgToJpegPng(
+            qrBillSvg.element as unknown as SVGSVGElement,
+            (result) => {
+              setQrImageSrc(result);
+            },
+            {format: 'jpeg', quality: 1},
+          );
+          setQrError(null);
+          return '';
+        } catch (error) {
+          if (error instanceof Error) {
+            setQrError(error.message);
+            return error.message;
+          }
+        }
+      }
+    }, 500),
+    [user, currentCurrency, qrCurrency],
+  );
+
+  useEffect(() => {
+    if (
+      invoice &&
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled
+    ) {
+      checkValidQrCode(invoice);
+    }
+  }, [invoice]);
+
+  useEffect(() => {
+    if (qrError) {
+      const errorMessage = getQrErrorMessage(qrError);
+      if (errorMessage) {
+        enqueueSnackbar(t(`${errorMessage}`), {
+          variant: 'error',
+        });
+        setQrError(null);
+      }
+    }
+  }, [qrError]);
+
   const handleOpenSendEmail = async (companyNextId?: string) => {
-    const error = await checkValidQrCode();
+    const error = await checkValidQrCode(invoice);
 
     if (!error) {
       setIsLoadingFiles(true);
@@ -845,7 +856,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   }, [actionType]);
 
   useEffect(() => {
-    if (memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT) {
+    if (
+      memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT &&
+      !qrError
+    ) {
       generateBlobUrl(memorizedUpdateInvoiceData, headerUrl, footerUrl);
     }
   }, [
@@ -857,6 +871,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     memorizedUpdateInvoiceData?.type === InvoiceType.AGGREGATE
       ? null
       : previousInvoices,
+    qrError,
+    qrImageSrc,
   ]);
 
   useEffect(() => {

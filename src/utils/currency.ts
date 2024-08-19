@@ -253,7 +253,7 @@ export const createQrData = (
   ),
   creditor: {
     name: userInfo?.serviceCompany.name || '',
-    address: userInfo?.serviceCompany.billingAddress?.fullName || '',
+    address: userInfo?.serviceCompany.billingAddress?.component?.street || '',
     buildingNumber:
       userInfo?.serviceCompany.billingAddress?.component?.street2 || '',
     city: userInfo?.serviceCompany.billingAddress?.component?.city || '',
@@ -269,7 +269,7 @@ export const createQrData = (
       invoice?.additionalInfo?.billingAddress?.component?.name ||
       invoice?.propertyOwner?.name ||
       '',
-    address: invoice?.additionalInfo?.billingAddress?.fullName || '',
+    address: invoice?.additionalInfo?.billingAddress?.component?.street || '',
     buildingNumber:
       invoice?.additionalInfo?.billingAddress?.component?.street2 || '',
     city: invoice?.additionalInfo?.billingAddress?.component?.city || '',
