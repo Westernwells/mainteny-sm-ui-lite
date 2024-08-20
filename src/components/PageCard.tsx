@@ -6,8 +6,7 @@ import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
 import useTheme from '@mui/material/styles/useTheme';
 import {useTranslation} from 'react-i18next';
-import {SxProps, Theme} from '@mui/system';
-import {Box} from '@mui/material';
+import {Box, SxProps, Theme} from '@mui/material';
 
 export interface Props {
   children: ReactNode;
@@ -18,7 +17,7 @@ export interface Props {
   headerIcon?: JSX.Element;
   headerLabel?: string;
   customHeader?: JSX.Element;
-  containerStyles?: {[key: string]: any} | SxProps<Theme>;
+  containerStyles?: SxProps<Theme>;
   contentContainerStyles?: SxProps<Theme>;
   handleAction?: () => void;
   onClick?: MouseEventHandler<HTMLDivElement>;
