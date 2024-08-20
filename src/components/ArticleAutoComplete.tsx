@@ -12,7 +12,7 @@ import {
   getCurrencySymbol,
   useCurrentCurrency,
 } from 'utils/currency';
-import {createHighlightedText} from 'utils/utils';
+import {createHighlightedText, removeHtmlTags} from 'utils/utils';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -166,7 +166,10 @@ export const ArticleAutocomplete = ({
                       wordBreak: 'break-word',
                       textAlign: 'left',
                     }}>
-                    {createHighlightedText(option.name, queryView)}
+                    {createHighlightedText(
+                      removeHtmlTags(option.name),
+                      queryView,
+                    )}
                   </td>
                   <td
                     style={{
