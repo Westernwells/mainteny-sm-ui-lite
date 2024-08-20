@@ -14,6 +14,7 @@ import {theme} from './theme';
 import './assets/fonts/Aventa/Aventa-Regular.ttf';
 import {LicenseInfo} from '@mui/x-license-pro';
 import BigNumber from 'bignumber.js';
+import './utils/withResolversPolyfill';
 
 BigNumber.config({DECIMAL_PLACES: 2});
 

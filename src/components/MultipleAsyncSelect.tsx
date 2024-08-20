@@ -8,12 +8,6 @@ import * as _ from 'lodash';
 import {Box, FilterOptionsState} from '@mui/material';
 import {FormInput} from './form/FormInput';
 
-type NestedKeys<T> = {
-  [K in keyof T]: T[K] extends object
-    ? (K & string) | `${K & string}.${NestedKeys<T[K]> & string}`
-    : K & string;
-}[keyof T];
-
 export interface QueryProps {
   pageIndex: number;
   pageSize: number;
@@ -29,10 +23,10 @@ interface Props<T>
   > {
   queryFn: (params: QueryProps) => Promise<Resource<T>>;
   keys: {
-    label: NestedKeys<T>;
-    value: NestedKeys<T>;
+    label: string;
+    value: string;
   };
-  searchableKeys?: NestedKeys<T>[];
+  searchableKeys?: string[];
   textFieldProps?: TextFieldProps;
   name: string;
   control?: Control<any>;
