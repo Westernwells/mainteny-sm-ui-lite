@@ -11,7 +11,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import {UseFormRegister, UseFormSetValue, UseFormWatch} from 'react-hook-form';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {Typography} from '@mui/material';
 
 interface Props {
@@ -63,6 +63,23 @@ export const EditAppointmentForm = ({
   const openingHour = watch('openingHour');
   const closingHour = watch('closingHour');
 
+  const validateTimes = (opening?: string, closing?: string) => {
+    if (opening && closing) {
+      const openingDateTime = setDateTime(new Date(), opening);
+      const closingDateTime = setDateTime(new Date(), closing);
+
+      if (closingDateTime <= openingDateTime) {
+        setTimeError(t('The end time is before start time.'));
+      } else {
+        setTimeError(null);
+      }
+    }
+  };
+
+  useEffect(() => {
+    validateTimes(openingHour, closingHour);
+  }, [openingHour, closingHour, t]);
+
   return (
     <Grid container spacing={2} component="form">
       <Grid item sm={12} md={12} xs={12}>
@@ -108,17 +125,29 @@ export const EditAppointmentForm = ({
             if (!closingHour && formattedTime) {
               setTimeError(t('Select opening hours end.'));
             } else {
-              setTimeError(null);
+              validateTimes(formattedTime, closingHour);
             }
           }}
           textFieldProps={{
             label: t('Opening hours start'),
-            ...register('openingHour'),
+            size: 'small',
+            InputLabelProps: {
+              shrink: true,
+              required: true,
+            },
+            inputProps: {
+              ...register('openingHour'),
+              'data-testid': 'opening-hour-start',
+            },
+            sx: {
+              width: '100%',
+            },
           }}
           inputTestId="opening-hour-start"
           popupTestId="opening-hour-popup"
         />
-        {closingHour && !openingHour && timeError && (
+
+        {timeError && (
           <Typography color="error" variant="body2">
             {timeError}
           </Typography>
@@ -148,17 +177,28 @@ export const EditAppointmentForm = ({
             if (!openingHour && formattedTime) {
               setTimeError(t('Select opening hours start.'));
             } else {
-              setTimeError(null);
+              validateTimes(openingHour, formattedTime);
             }
           }}
           textFieldProps={{
             label: t('Opening hours end'),
-            ...register('closingHour'),
+            InputLabelProps: {
+              shrink: true,
+              required: true,
+            },
+            inputProps: {
+              ...register('closingHour'),
+              'data-testid': 'opening-hour-end',
+            },
+            sx: {
+              width: '100%',
+            },
           }}
           inputTestId="opening-hour-end"
           popupTestId="closing-hour-popup"
         />
-        {openingHour && !closingHour && timeError && (
+
+        {timeError && (
           <Typography color="error" variant="body2">
             {timeError}
           </Typography>

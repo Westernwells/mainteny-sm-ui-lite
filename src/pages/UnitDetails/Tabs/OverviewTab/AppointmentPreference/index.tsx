@@ -18,6 +18,7 @@ import {Dialog} from 'components/Dialog';
 import {AppointmentFormModel} from 'models/unitForm';
 import {useForm} from 'react-hook-form';
 import {mapFormDataToElevatorUpdateRequest} from 'utils/elevator-utils';
+import {setDateTime} from 'utils/datetime';
 import {EditAppointmentForm} from './EditAppointmentForm';
 import {AppointmentShema} from './AppointmentShema';
 
@@ -103,7 +104,11 @@ export const AppointmentPreference = ({
 
   const disableSaveBtn = !!(
     (openingHour && !closingHour) ||
-    (!openingHour && closingHour)
+    (!openingHour && closingHour) ||
+    (openingHour &&
+      closingHour &&
+      setDateTime(new Date(), closingHour) <=
+        setDateTime(new Date(), openingHour))
   );
 
   return (
