@@ -41,6 +41,45 @@ describe('Appointment Preference component', () => {
     );
   };
 
+  it('should disable save button if closing hour is earlier than or equal to opening hour', async () => {
+    await act(async () => {
+      setup();
+    });
+
+    const editButton = screen.getByTestId('EditOutlinedIcon');
+    await act(async () => {
+      fireEvent.click(editButton);
+    });
+
+    const dialog = screen.getByTestId('appointment-preferences-dialog');
+    expect(dialog).toBeInTheDocument();
+
+    const openingHourPicker = screen.getByTestId('opening-hour-start');
+    fireEvent.click(openingHourPicker);
+
+    const openingHourPopup = screen.getByTestId('opening-hour-popup');
+
+    fireEvent.click(within(openingHourPopup).getByText('14'));
+    fireEvent.click(within(openingHourPopup).getByText('35'));
+    fireEvent.click(within(openingHourPopup).getByText('Confirm'));
+
+    const closingHourPicker = screen.getByTestId('opening-hour-end');
+    fireEvent.click(closingHourPicker);
+
+    const closingHourPopup = screen.getByTestId('closing-hour-popup');
+
+    fireEvent.click(within(closingHourPopup).getByText('13'));
+    fireEvent.click(within(closingHourPopup).getByText('30'));
+    fireEvent.click(within(closingHourPopup).getByText('Confirm'));
+
+    const saveButton = screen.getByTestId('saveButton');
+
+    expect(saveButton).toHaveAttribute('aria-disabled', 'true');
+    expect(dialog).toHaveTextContent(
+      'Closing time must be later than opening time.',
+    );
+  });
+
   it('should enable save button if times are selected but no days of the week are selected', async () => {
     await act(async () => {
       setup();

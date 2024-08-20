@@ -22,7 +22,7 @@ const CustomActionBar = ({onClear, onAccept, isDatePicker}: Props) => {
         width: isDatePicker ? '91%' : '83%',
       }}>
       <Button buttonProps={{onClick: onClear, size: 'large'}}>
-        <Typography variant="subtitle2">{t('Cancel')}</Typography>
+        <Typography variant="subtitle2">{t('Clear')}</Typography>
       </Button>
 
       <Button
