@@ -32,6 +32,7 @@ import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageContainer from './containers/PdfPageContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
+import AlternativeAddressTemplate from './AlternativeAddressTemplate';
 
 type Props = {
   translate: (key: string) => string;
@@ -271,6 +272,24 @@ const PartialInvoicePdfTemplate = ({
 
   return (
     <Document>
+      {invoice?.additionalInfo.alternativeAddress &&
+        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !==
+          0 && (
+          <AlternativeAddressTemplate
+            userInfo={userInfo}
+            selectedLng={selectedLng}
+            translate={translate}
+            headerInfo={headerInfo}
+            headerPath={headerPath}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
+            alternativeServiceCompanyInfo={
+              invoice?.additionalInfo.alternativeServiceCompanyInfo
+            }
+            alternativeAddress={invoice?.additionalInfo.alternativeAddress}
+          />
+        )}
+
       <PdfPageContainer selectedLng={selectedLng}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
