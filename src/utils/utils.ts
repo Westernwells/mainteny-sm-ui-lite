@@ -578,3 +578,7 @@ export const yupValidations = {
       (value: string) => !!value && !isEmptyHTML(value),
     ),
 };
+
+export function removeHtmlTags(str: string) {
+  return str.replace(/<\/?[^>]+(>|$)/g, '');
+}
