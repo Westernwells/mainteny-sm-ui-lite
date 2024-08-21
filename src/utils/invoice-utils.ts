@@ -92,6 +92,8 @@ export const getQrErrorMessage = (qrError: string): string => {
   ];
 
   const errorMessages = {
+    "Cannot read properties of undefined (reading 'iban')":
+      'The invoice PDF cannot be generated because your IBAN does not match Swiss standard. IBAN must contain CH /LI prefix and 19 numbers. This is a limitation of the Swiss QR Code generator.',
     'Debtor address must be a maximum of 70 characters.':
       'The invoice PDF cannot be generated because the customer address must be 70 characters or less. This is a limitation of the Swiss QR Code generator.',
     'Creditor address must be a maximum of 70 characters.':
