@@ -264,8 +264,6 @@ export const DraftQuotation = ({
     }
   };
 
-  const pageSize = 50;
-
   const {data: companyNextNumber} = useCompanyNextNumber(
     {
       type: ServiceCompanyNumberType.QUOTATION,
@@ -281,11 +279,11 @@ export const DraftQuotation = ({
     formik.setFieldValue('externalId', companyNextNumber?.value);
   };
 
-  const {data: contractPaymentTerms = createEmptyResource(pageSize)} =
+  const {data: contractPaymentTerms = createEmptyResource(500)} =
     useContractTerms({
       page: {
         pageIndex: 0,
-        pageSize,
+        pageSize: 500,
       },
       query: '',
       type: serviceCompanyType,

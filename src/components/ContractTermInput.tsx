@@ -127,8 +127,6 @@ interface Props {
   setEdit: Dispatch<SetStateAction<ContractTermView | undefined>>;
 }
 
-const pageSize = 50;
-
 const defaultDiscountOptions = [
   {
     discountDays: 0,
@@ -161,15 +159,14 @@ export const ContractTermInput = ({
     mutateAsync: updateContractPaymentTerm,
     isLoading: updatePaymentTermLoading,
   } = useUpdateContractPaymentTerm();
-  const {data: contractTerms = createEmptyResource(pageSize)} =
-    useContractTerms({
-      page: {
-        pageIndex: 0,
-        pageSize,
-      },
-      query: '',
-      type: serviceCompanyType,
-    });
+  const {data: contractTerms = createEmptyResource(500)} = useContractTerms({
+    page: {
+      pageIndex: 0,
+      pageSize: 500,
+    },
+    query: '',
+    type: serviceCompanyType,
+  });
 
   const handleOnCancel = () => {
     setEdit(undefined);
