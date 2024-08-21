@@ -26,10 +26,10 @@ const ContractName: FC<Props> = ({formik}) => {
   const [edit, setEdit] = useState<ContractTermView | undefined>(undefined);
   const [showDrawer, setShowDrawer] = useState(false);
 
-  const {data: contracts = createEmptyResource(50)} = useContractTerms({
+  const {data: contracts = createEmptyResource(500)} = useContractTerms({
     page: {
       pageIndex: 0,
-      pageSize: 50,
+      pageSize: 500,
     },
     query: '',
     type: ServiceCompanyType.CONTRACT_NAME,

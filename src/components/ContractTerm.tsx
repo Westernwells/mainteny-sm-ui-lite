@@ -38,7 +38,6 @@ interface Props {
   setEdit: Dispatch<SetStateAction<ContractTermView | undefined>>;
 }
 
-const pageSize = 50;
 const text = 'Add your payment terms that would be used later in invoicing';
 
 export const ContractTerm = ({
@@ -76,15 +75,14 @@ export const ContractTerm = ({
     }[]
   >([]);
 
-  const {data: contractTerms = createEmptyResource(pageSize)} =
-    useContractTerms({
-      page: {
-        pageIndex: 0,
-        pageSize,
-      },
-      query: '',
-      type: serviceCompanyType,
-    });
+  const {data: contractTerms = createEmptyResource(500)} = useContractTerms({
+    page: {
+      pageIndex: 0,
+      pageSize: 500,
+    },
+    query: '',
+    type: serviceCompanyType,
+  });
 
   const {refetch: refetchContractResource} = useQueryContract(
     {
@@ -299,96 +297,94 @@ export const ContractTerm = ({
 
       <DialogContent sx={{pb: 1}}>
         {renderContent()}
-        <Grid container>
-          {toggleItems.map?.((pt) => (
-            <Grid
-              container
-              item
-              xs={12}
+        {toggleItems.map?.((pt) => (
+          <Grid
+            container
+            xs={12}
+            key={pt.id}
+            sx={{
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              py: 0.5,
+              flexWrap: 'nowrap',
+            }}>
+            <FormControlLabel
               key={pt.id}
-              sx={{
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                py: 0.5,
-              }}>
-              <FormControlLabel
-                key={pt.id}
-                value={pt.term}
-                control={<Radio size="small" />}
-                label={
-                  isContract ? (
-                    pt.term
-                  ) : (
-                    <Box>
-                      <Typography
-                        variant={
-                          formik.values.termId === pt.id ? 'subtitle2' : 'body2'
-                        }>
-                        {pt.term}
-                      </Typography>
-                      {pt.data?.discountOptions
-                        ? pt.data?.discountOptions
-                            .filter(
-                              (d) =>
-                                d.discountDays !== 0 && d.discountPercent !== 0,
-                            )
-                            .map((d, idx) => (
-                              <Typography
-                                key={idx}
-                                variant="caption"
-                                component="p"
-                                color="text.secondary">
-                                {`${d.discountDays} ${t('days')}; ${
-                                  d.discountPercent
-                                }% ${t('discount')}; ${t(
-                                  convertToText(d.articleType),
-                                )}`}
-                              </Typography>
-                            ))
-                        : null}
-                    </Box>
-                  )
-                }
-                onChange={() => formik.setFieldValue('termId', pt.id)}
-                checked={formik.values.termId === pt.id}
-              />
-              <Grid container item xs={1} justifyContent="center">
-                {pt.isShow ? (
+              value={pt.term}
+              control={<Radio size="small" />}
+              label={
+                isContract ? (
+                  pt.term
+                ) : (
+                  <Box>
+                    <Typography
+                      variant={
+                        formik.values.termId === pt.id ? 'subtitle2' : 'body2'
+                      }>
+                      {pt.term}
+                    </Typography>
+                    {pt.data?.discountOptions
+                      ? pt.data?.discountOptions
+                          .filter(
+                            (d) =>
+                              d.discountDays !== 0 && d.discountPercent !== 0,
+                          )
+                          .map((d, idx) => (
+                            <Typography
+                              key={idx}
+                              variant="caption"
+                              component="p"
+                              color="text.secondary">
+                              {`${d.discountDays} ${t('days')}; ${
+                                d.discountPercent
+                              }% ${t('discount')}; ${t(
+                                convertToText(d.articleType),
+                              )}`}
+                            </Typography>
+                          ))
+                      : null}
+                  </Box>
+                )
+              }
+              onChange={() => formik.setFieldValue('termId', pt.id)}
+              checked={formik.values.termId === pt.id}
+            />
+            <Grid container item xs={1} justifyContent="center">
+              {pt.isShow ? (
+                <IconButton
+                  onClick={() => removeTerm(pt.id)}
+                  sx={{color: 'text.disabled'}}>
+                  <DeleteIcon />
+                </IconButton>
+              ) : (
+                <Box display="flex">
                   <IconButton
-                    onClick={() => removeTerm(pt.id)}
+                    size="small"
+                    onClick={() => {
+                      if (pt) {
+                        setEdit(pt as ContractTermView);
+                        onClick();
+                      }
+                    }}
+                    sx={{color: 'text.disabled'}}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setTermId(pt.id);
+                      if (termId === pt.id) {
+                        asyncFetchContractResource();
+                      }
+                    }}
                     sx={{color: 'text.disabled'}}>
                     <DeleteIcon />
                   </IconButton>
-                ) : (
-                  <Box display="flex">
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        if (pt) {
-                          setEdit(pt as ContractTermView);
-                          onClick();
-                        }
-                      }}
-                      sx={{color: 'text.disabled'}}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        setTermId(pt.id);
-                        if (termId === pt.id) {
-                          asyncFetchContractResource();
-                        }
-                      }}
-                      sx={{color: 'text.disabled'}}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                )}
-              </Grid>
+                </Box>
+              )}
             </Grid>
-          ))}
-        </Grid>
+          </Grid>
+        ))}
 
         <Button
           buttonProps={{

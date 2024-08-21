@@ -186,8 +186,6 @@ const isExternalIdUnique = async (resource: InvoiceView[], value?: string) => {
   }
 };
 
-const pageSize = 50;
-
 const articleViewToItem = (
   articleView: ServiceOrderArticleView,
 ): InvoiceItemRecord => {
@@ -429,11 +427,11 @@ export const InvoiceForm = ({
     [[]],
   );
 
-  const {data: contractPaymentTerms = createEmptyResource(pageSize)} =
+  const {data: contractPaymentTerms = createEmptyResource(500)} =
     useContractTerms({
       page: {
         pageIndex: 0,
-        pageSize,
+        pageSize: 500,
       },
       query: '',
       type: serviceCompanyType,
