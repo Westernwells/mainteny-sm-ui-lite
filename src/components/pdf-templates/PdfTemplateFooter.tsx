@@ -218,9 +218,19 @@ const PdfTemplateFooter = ({
         <View>
           <Text
             style={styles.pageNumberText}
-            render={({pageNumber, totalPages}) =>
-              `${pageNumber} / ${totalPages}`
-            }
+            render={({pageNumber, totalPages}) => {
+              const isQRCodeEnabled =
+                userInfo?.serviceCompany.settings.invoiceQRCodeEnabled;
+              const isLastPage = pageNumber === totalPages;
+
+              if (isQRCodeEnabled && isLastPage) {
+                return '';
+              }
+
+              const adjustedTotalPages = totalPages - (isQRCodeEnabled ? 1 : 0);
+
+              return `${pageNumber} / ${adjustedTotalPages}`;
+            }}
           />
         </View>
       </View>
