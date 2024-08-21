@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import {useContext, useEffect, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
@@ -25,10 +25,7 @@ import {
   QuotationView,
 } from 'models/quotation';
 import {ElevatorView} from 'models/elevator';
-import {
-  PropertyOwnerSimpleView,
-  PropertyOwnerView,
-} from 'models/propertyManager';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {Avatar, Grid, IconButton, InputAdornment, Tooltip} from '@mui/material';
 import {Button} from 'components/Button';
 import {FormLabel} from 'components/form/FormLabel';
@@ -77,7 +74,7 @@ import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import queryString from 'query-string';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {Progress} from 'components/Progress';
-import {debounce} from 'lodash';
+import {debounce, isEqual, omit} from 'lodash';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
 import RichTextField from 'components/RichTextField';
@@ -87,8 +84,11 @@ import {TextBlockCategory, TextBlockView} from 'models/text-block';
 import {Dialog} from 'components/Dialog';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
-import {formatQuotationRecord, getDiscoutObj} from './utils';
+import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
+import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
+import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import NewUnit from './NewUnit';
+import {formatQuotationRecord, getDiscoutObj} from './utils';
 
 interface Props {
   formType?: string;
@@ -110,6 +110,8 @@ const quotationItemToQuotationItemRecord = (
   return getItemRecord(record, record.unitAmount.percentageVat);
 };
 
+const localStorageFormikQuotationDataKey = 'QUOTATION_DATA';
+
 export const DraftQuotation = ({
   formType,
   quotation,
@@ -124,9 +126,16 @@ export const DraftQuotation = ({
   >(undefined);
 
   const [isHovered, setIsHovered] = useState<boolean>(true);
+  const [openResumeProgressDialog, setOpenResumeProgressDialog] =
+    useState(false);
+  const [initialLocalStorage, setInitialLocalStorage] = useState<
+    Partial<QuotationFormData | null>
+  >({});
+  const [pageState, setPageState] = useState('FRESH_NEW');
 
   const debouncedSetIsHovered = debounce((value) => setIsHovered(value), 300);
 
+  const [queryParams, setQueryParams] = useSearchParams();
   const {elevatorId = '', customerId = ''} = queryString.parse(search);
 
   const {user} = useUserSession();
@@ -159,7 +168,7 @@ export const DraftQuotation = ({
     useState<boolean>(false);
   const [isAddNewUnitDialogOpen, setIsAddNewUnitDialogOpen] =
     useState<boolean>(false);
-  const [isDrawerOpen] = useState<boolean>(true);
+  const isDrawerOpen = true;
   const [
     openContractPaymentTermSelectDialog,
     setOpenContractPaymentTermSelectDialog,
@@ -167,10 +176,11 @@ export const DraftQuotation = ({
   const [openContractPaymentTermsDialog, setOpenContractPaymentTermsDialog] =
     useState(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [openCancelDialog, setOpenCancelDialog] = useState<boolean>(false);
 
-  const [customer, setCustomer] = useState<
-    PropertyOwnerView | PropertyOwnerSimpleView | null
-  >(customerData || null);
+  const [customer, setCustomer] = useState<PropertyOwnerView | null>(
+    customerData || null,
+  );
   const [unit, setUnit] = useState<ElevatorView | null>(elevator || null);
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
     [],
@@ -220,6 +230,11 @@ export const DraftQuotation = ({
     });
 
   const initialValues: QuotationFormData = {
+    alternativeServiceCompanyInfo: quotation?.additionalInfo
+      .alternativeServiceCompanyInfo || {
+      name: user?.userAccount.serviceCompany.name || '',
+      address: user?.userAccount.serviceCompany.billingAddress,
+    },
     subject: quotation?.subject || t('Quotation'),
     description: quotation?.description || '',
     notes: quotation?.additionalInfo.notes || '',
@@ -249,6 +264,7 @@ export const DraftQuotation = ({
     onSubmit: async (values) => {
       const response = await save(values);
       const quotationId = formType === 'new' ? response.value : quotation?.id;
+      resetLocalStorage();
       navigate(`/quotations/details/${quotationId}`);
     },
   });
@@ -301,43 +317,80 @@ export const DraftQuotation = ({
       : paymentTerm.term;
   };
 
+  const initializeFormDataFromLocalStorage = () => {
+    const localStorageFormikQuotationData = localStorage.getItem(
+      localStorageFormikQuotationDataKey,
+    );
+    if (localStorageFormikQuotationData) {
+      const parsedData = JSON.parse(
+        localStorageFormikQuotationData,
+      ) as QuotationFormData;
+      if (
+        !isEqual(
+          omit(parsedData, 'externalId'),
+          omit(formik.values, 'externalId'),
+        )
+      ) {
+        setOpenResumeProgressDialog(true);
+      } else {
+        formik.setValues(parsedData);
+      }
+    }
+  };
+
+  const prefillFormWithQuotationData = (quotationData: QuotationView) => {
+    formik.setFieldValue('subject', quotationData.subject, true);
+    formik.setFieldValue('description', quotationData.description, true);
+    formik.setFieldValue('notes', quotationData.additionalInfo.notes, true);
+    setUnit(quotationData.elevator);
+    formik.setFieldValue(
+      'items',
+      quotationData.items.map(quotationItemToQuotationItemRecord),
+      true,
+    );
+    setQuotationItems(
+      quotationData.items.map(
+        (i): QuotationItemRecord => ({
+          article: i.article,
+          description: i.description || i.article.description,
+          name: i.name || i.article.name,
+          quantity: i.quantity,
+          unitAmount: i.unitAmount,
+          discount: getDiscoutObj(i.additionalInfo?.discount),
+        }),
+      ),
+    );
+  };
+
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
-    if (formType === 'new' && row.paymentTerm) {
+
+    if (formType === 'new' && row.paymentTerm && pageState === 'FRESH_NEW') {
       formik.setFieldValue(
         'paymentTerms',
         row.paymentTerm ? getFormattedPaymentTerms(row.paymentTerm) : '',
       );
     }
+
     formik.setFieldValue('propertyOwnerId', row.id);
+
     const quotationCustomer = quotation?.elevator?.propertyOwner;
+
     if (row.id !== quotationCustomer?.id) {
       const emptyAddressState = {fullName: null};
-      if (formType === 'edit' && customer) {
+
+      if (formType === 'edit') {
         formik.setFieldValue(
           'billingAddress',
-          quotation?.additionalInfo.billingAddress,
+          quotation?.additionalInfo.billingAddress || emptyAddressState,
         );
         formik.setFieldValue(
           'beneficiaryAddress',
-          quotation?.additionalInfo.beneficiaryAddress,
+          quotation?.additionalInfo.beneficiaryAddress || emptyAddressState,
         );
         formik.setFieldValue(
           'alternativeAddress',
-          quotation?.additionalInfo.alternativeAddress,
-        );
-      } else {
-        formik.setFieldValue(
-          'billingAddress',
-          row.billingAddress || emptyAddressState,
-        );
-        formik.setFieldValue(
-          'beneficiaryAddress',
-          row.beneficiaryAddress || emptyAddressState,
-        );
-        formik.setFieldValue(
-          'alternativeAddress',
-          row.otherAddress || emptyAddressState,
+          quotation?.additionalInfo.alternativeAddress || emptyAddressState,
         );
       }
     } else {
@@ -360,10 +413,30 @@ export const DraftQuotation = ({
   };
 
   const handleSelectUnit = (row: ElevatorView) => {
+    setQueryParams(
+      formatSearchParams(
+        {
+          ...(row?.id &&
+            !formik.values.propertyOwnerId && {
+              elevatorId: row.id,
+            }),
+          ...(row?.propertyOwner.id &&
+            !formik.values.propertyOwnerId && {
+              customerId: row?.propertyOwner.id,
+            }),
+        },
+        queryParams,
+      ),
+    );
     setUnit(row);
     setCustomer(row.propertyOwner);
     formik.setFieldValue('elevatorId', row.id);
   };
+
+  const handleSelectUnitClose = useCallback(() => {
+    setUnit(null);
+    formik.setFieldValue('elevatorId', null);
+  }, [formik]);
 
   const handleCustomerChange = (value: PropertyOwnerView | null) => {
     if (value) {
@@ -371,6 +444,10 @@ export const DraftQuotation = ({
     } else {
       setCustomer(null);
       setUnit(null);
+      formik.setFieldValue('elevatorId', '');
+      formik.setFieldValue('propertyOwnerId', '');
+      formik.setFieldValue('paymentTerms', '');
+      setPageState('FRESH_NEW');
     }
   };
 
@@ -457,10 +534,13 @@ export const DraftQuotation = ({
     ? undefined
     : quotation?.meta?.creator?.photoUrl ?? user?.userAccount.photoUrl;
 
-  const createdBy = {
-    name: createdByName,
-    photoUrl: createdByPhotoUrl,
-  };
+  const createdBy = useMemo(
+    () => ({
+      name: createdByName,
+      photoUrl: createdByPhotoUrl,
+    }),
+    [createdByName, createdByPhotoUrl],
+  );
 
   const isValid = () => {
     const valid =
@@ -500,6 +580,78 @@ export const DraftQuotation = ({
     setOpenTextBlockDialog(false);
   };
 
+  const restoreFormikFromLocalStorage = () => {
+    setQueryParams(
+      formatSearchParams(
+        {
+          ...(initialLocalStorage?.elevatorId && {
+            elevatorId: initialLocalStorage.elevatorId,
+          }),
+          ...(initialLocalStorage?.propertyOwnerId && {
+            customerId: initialLocalStorage.propertyOwnerId,
+          }),
+        },
+        queryParams,
+      ),
+    );
+
+    if (initialLocalStorage && pageState === 'CONTINUE_NEW') {
+      formik.setValues({
+        ...initialLocalStorage,
+        sentDate: initialLocalStorage?.sentDate
+          ? new Date(initialLocalStorage?.sentDate)
+          : undefined,
+        expiryDate: initialLocalStorage?.expiryDate
+          ? new Date(initialLocalStorage?.expiryDate)
+          : undefined,
+        serviceCompanyId: initialLocalStorage?.serviceCompanyId || '',
+        subject: initialLocalStorage?.subject || '',
+        description: initialLocalStorage?.description || '',
+        items: initialLocalStorage?.items || [],
+      });
+    }
+    setOpenResumeProgressDialog(false);
+    setPageState('CONTINUE_NEW');
+  };
+
+  const resetLocalStorage = () => {
+    localStorage.removeItem(localStorageFormikQuotationDataKey);
+    setInitialLocalStorage(null);
+    setPageState('FRESH_NEW');
+    formik.resetForm();
+    setOpenResumeProgressDialog(false);
+  };
+
+  const onCancel = () => {
+    resetLocalStorage();
+  };
+
+  useEffectAfterMount(() => {
+    if (formType === 'new') {
+      localStorage.setItem(
+        localStorageFormikQuotationDataKey,
+        JSON.stringify(formik.values),
+      );
+    }
+  }, [formik.values]);
+
+  useEffect(() => {
+    if (formType === 'new') {
+      initializeFormDataFromLocalStorage();
+    }
+  }, [formType]);
+
+  useEffect(() => {
+    const localStorageData = localStorage.getItem(
+      localStorageFormikQuotationDataKey,
+    );
+    if (localStorageData) {
+      const restoredValues = JSON.parse(localStorageData);
+      setPageState('CONTINUE_NEW');
+      setInitialLocalStorage(restoredValues || []);
+    }
+  }, []);
+
   useEffect(() => {
     if (user && user.userAccount) {
       formik.setFieldValue(
@@ -513,19 +665,10 @@ export const DraftQuotation = ({
   useEffect(() => {
     if (elevator) {
       const quotationCustomer = elevator?.propertyOwner;
+
       setUnit(elevator);
+
       setCustomer(quotationCustomer!);
-
-      formik.setFieldValue('billingAddress', quotationCustomer?.billingAddress);
-
-      formik.setFieldValue(
-        'beneficiaryAddress',
-        quotationCustomer?.beneficiaryAddress,
-      );
-      formik.setFieldValue(
-        'alternativeAddress',
-        quotationCustomer?.otherAddress,
-      );
 
       formik.setFieldValue('elevatorId', elevator.id);
     }
@@ -533,28 +676,77 @@ export const DraftQuotation = ({
 
   useEffect(() => {
     if (customerData) {
-      setCustomer(customerData);
+      setCustomer({
+        ...customerData,
+        billingAddress: initialLocalStorage?.billingAddress
+          ? {
+              ...initialLocalStorage.billingAddress,
+              id: customerData.billingAddress?.id!,
+            }
+          : customerData.billingAddress,
+        beneficiaryAddress: initialLocalStorage?.beneficiaryAddress
+          ? {
+              ...initialLocalStorage.beneficiaryAddress,
+              id: customerData.beneficiaryAddress?.id!,
+            }
+          : customerData.beneficiaryAddress,
+        otherAddress: initialLocalStorage?.alternativeAddress
+          ? {
+              ...initialLocalStorage.alternativeAddress,
+              id: customerData.otherAddress?.id!,
+            }
+          : customerData.otherAddress,
+      });
     }
   }, [customerData]);
 
   useEffect(() => {
-    if (quotation) {
-      setQuotationItems(
-        quotation.items.map(
-          (i): QuotationItemRecord => ({
-            article: i.article,
-            description: i.description || i.article.description,
-            name: i.name || i.article.name,
-            quantity: i.quantity,
-            unitAmount: i.unitAmount,
-            discount: getDiscoutObj(i.additionalInfo?.discount),
-          }),
-        ),
+    const emptyAddressState = {fullName: null};
+
+    if (
+      formType === 'new' &&
+      pageState === 'CONTINUE_NEW' &&
+      initialLocalStorage
+    ) {
+      formik.setFieldValue(
+        'billingAddress',
+        initialLocalStorage?.billingAddress || emptyAddressState,
       );
-      setUnit(quotation.elevator);
-      formik.setFieldValue('subject', quotation.subject, true);
-      formik.setFieldValue('description', quotation.description, true);
-      formik.setFieldValue('notes', quotation.additionalInfo.notes, true);
+
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        initialLocalStorage?.beneficiaryAddress || emptyAddressState,
+      );
+
+      formik.setFieldValue(
+        'alternativeAddress',
+        initialLocalStorage?.alternativeAddress || emptyAddressState,
+      );
+    }
+  }, [pageState]);
+
+  useEffect(() => {
+    if (customer && pageState === 'FRESH_NEW') {
+      const emptyAddressState = {fullName: null};
+
+      formik.setFieldValue(
+        'billingAddress',
+        customer.billingAddress || emptyAddressState,
+      );
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        customer.beneficiaryAddress || emptyAddressState,
+      );
+      formik.setFieldValue(
+        'alternativeAddress',
+        customer.otherAddress || emptyAddressState,
+      );
+    }
+  }, [customer, pageState]);
+
+  useEffect(() => {
+    if (quotation) {
+      prefillFormWithQuotationData(quotation);
     }
   }, [quotation]);
 
@@ -884,10 +1076,7 @@ export const DraftQuotation = ({
                     </Typography>
                   )
                 }
-                cardOnClose={() => {
-                  setUnit(null);
-                  formik.setFieldValue('elevatorId', null);
-                }}
+                cardOnClose={handleSelectUnitClose}
                 modalHeader="Select unit"
                 modalBody={
                   <UnitsDataGrid
@@ -1284,6 +1473,18 @@ export const DraftQuotation = ({
           onCloseSubDialogs={onCloseSubDialogs}
         />
       )}
+
+      <ConfirmCancel
+        open={openCancelDialog}
+        onConfirm={onCancel}
+        onClose={() => setOpenCancelDialog(false)}
+      />
+
+      <ResumeProgress
+        open={openResumeProgressDialog}
+        onConfirm={restoreFormikFromLocalStorage}
+        onClose={resetLocalStorage}
+      />
     </Box>
   );
 };
