@@ -154,6 +154,7 @@ export interface ContractDiscount {
   days: number;
   discountPercentage: number;
 }
+
 export interface FirstMaintenance {
   year: number;
   month: number;
@@ -208,6 +209,7 @@ export interface ContractView {
   endTime?: string;
   numberOfElevators?: number;
 }
+
 export interface ContractSimpleView {
   id: string;
   type: string;
@@ -215,8 +217,8 @@ export interface ContractSimpleView {
   visitsNumber: number;
   sla: number;
   spendingLimit: number;
-  price: number;
-  number: number;
+  price: number; //  price is not always returned from the BE for every usage of this field -> make it optional?
+  number: string; // this is not a number but a string representation of the contract number (ex: CTA000030)
   currency: string;
   start: string;
   end: string;
@@ -568,7 +570,7 @@ export interface ContractComponentView {
   name: string;
   group?: string;
   additionalInfo: ContractComponentAdditionalInfo;
-  elevators: ContractComponentElevator[];
+  elevators: ContractComponentElevator[]; // field does not exist in return data when getting elevator by id from the API
   isAutomaticJobCycle?: boolean;
 }
 
@@ -623,7 +625,7 @@ export interface ContractComponentRecord {
 export interface ContractComponentElevator {
   elevatorId: string;
   invoiceJob: JobTimeUnit;
-  orderGenerationJob: JobTimeUnit;
+  orderGenerationJob: JobTimeUnit; // is optional in the API
   price: number;
   isChecked?: boolean; // on mutate
   isSelected?: boolean; // on create
