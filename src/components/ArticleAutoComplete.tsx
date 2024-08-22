@@ -99,7 +99,11 @@ export const ArticleAutocomplete = ({
       sx={{minHeight: 0}}
       options={[
         {name: 'autocomplete-table-title'} as ArticleView, // first option will be as table header
-        ...articlesResource.data,
+        ...(articlesResource.data?.map((article) => ({
+          ...article,
+          name: removeHtmlTags(article.name),
+          description: removeHtmlTags(article.description),
+        })) as ArticleView[]),
       ]}
       onChange={(event: any, newValue: ArticleView | null) => {
         setSelectedArticle(newValue);
