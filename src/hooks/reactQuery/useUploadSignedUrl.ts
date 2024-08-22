@@ -5,7 +5,7 @@ import {queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
 
-const getArrayBuffer = (file: FileWithPreview) =>
+const getArrayBuffer = (file: FileWithPreview | File) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsArrayBuffer(file);
@@ -28,7 +28,7 @@ export const getUploadSignedUrl = async (
 };
 
 const uploadAndSave = async (
-  file: FileWithPreview,
+  file: FileWithPreview | File,
   serviceCompanyId: string,
   uploadPath: string,
 ) => {
@@ -47,7 +47,7 @@ const uploadAndSave = async (
 };
 
 export const uploadImages = async (
-  files: FileWithPreview[],
+  files: FileWithPreview[] | File[],
   serviceCompanyId: string,
   uploadPath: string,
 ) =>
@@ -65,8 +65,13 @@ export const useUploadFiles = (successMsg: string, companyId?: string) => {
   }
 
   return useMutation(
-    ({files, uploadPath}: {files: FileWithPreview[]; uploadPath: string}) =>
-      uploadImages(files, fetchId!, uploadPath),
+    ({
+      files,
+      uploadPath,
+    }: {
+      files: FileWithPreview[] | File[];
+      uploadPath: string;
+    }) => uploadImages(files, fetchId!, uploadPath),
     {
       onSuccess: () => {
         if (successMsg) {
