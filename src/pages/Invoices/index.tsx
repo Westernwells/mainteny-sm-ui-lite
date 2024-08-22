@@ -79,13 +79,14 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
     syncType: DataSyncType.INVOICE,
   });
 
-  const {data: companyNextNumber} = useCompanyNextNumber(
-    {
-      type: ServiceCompanyNumberType.INVOICE,
-    },
-    user?.userAccount.serviceCompany.id,
-    true,
-  );
+  const {data: companyNextNumber, refetch: refetchCompanyNextNumber} =
+    useCompanyNextNumber(
+      {
+        type: ServiceCompanyNumberType.INVOICE,
+      },
+      user?.userAccount.serviceCompany.id,
+      true,
+    );
 
   const {data: clientStorageData} = useQueryClientStorageData({
     serviceCompanyId: user?.userAccount.serviceCompany.id!,
@@ -289,6 +290,7 @@ export const Invoices = ({elevatorId}: {elevatorId?: string}) => {
           headerUrl,
           footerUrl,
           companyNextNumber,
+          refetchCompanyNextNumber,
           isHeaderUrlLoading,
           isFooterUrlLoading,
         )}

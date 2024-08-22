@@ -436,7 +436,9 @@ export const InvoiceForm = ({
     onSubmit: async (values) => {
       const response = await onSave(values);
       const invoiceId = formType === 'new' ? response.value : invoice?.id;
-      navigate(`/invoices/details/${invoiceId}`);
+      navigate(`/invoices/details/${invoiceId}`, {
+        replace: true,
+      });
     },
   });
   const alternativeAddress = formik.values.alternativeAddress?.component;
