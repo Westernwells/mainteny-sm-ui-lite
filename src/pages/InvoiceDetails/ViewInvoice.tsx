@@ -99,6 +99,7 @@ import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf'
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import DOMPurify from 'dompurify';
 // eslint-disable-next-line import/no-unresolved
 import {SwissQRBill} from 'swissqrbill/svg';
@@ -165,12 +166,13 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
 
-  const {data: companyNextNumber} = useCompanyNextNumber(
-    {
-      type: ServiceCompanyNumberType.INVOICE,
-    },
-    user?.userAccount.serviceCompany.id,
-  );
+  const {data: companyNextNumber, refetch: refetchCompanyNextNumber} =
+    useCompanyNextNumber(
+      {
+        type: ServiceCompanyNumberType.INVOICE,
+      },
+      user?.userAccount.serviceCompany.id,
+    );
 
   const translate = useMemo(
     () => (key: string) => {
@@ -185,6 +187,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   const {data: clientStorageData} = useQueryClientStorageData({
     serviceCompanyId: company?.id!,
@@ -463,11 +466,19 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   }, [reportToUpdate]);
 
-  const generateBlobUrl = async (
-    invoiceData: InvoiceView,
-    headerBlockUrl: {[key: string]: string},
-    footerBlockUrl: {[key: string]: string},
-  ) => {
+  const generateBlobUrl = async ({
+    invoiceData,
+    headerBlockUrl,
+    footerBlockUrl,
+    invoiceNumber,
+    setInState = true,
+  }: {
+    invoiceData: InvoiceView;
+    headerBlockUrl: {[key: string]: string};
+    footerBlockUrl: {[key: string]: string};
+    invoiceNumber?: string;
+    setInState?: boolean;
+  }) => {
     let PdfTemplate;
 
     if (
@@ -520,12 +531,14 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           headerInfo={headerInfo}
           footerPath={footerBlockUrl[footerInfo?.path]}
           footerInfo={footerInfo}
-          nextCompanyExternalId={companyNextNumber?.value}
+          nextCompanyExternalId={
+            invoiceNumber || translate('Automatically assigned')
+          }
           qrImageSrc={qrImageSrc}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
-      setFilePathToDownload(blobURL);
+      if (setInState) setFilePathToDownload(blobURL);
       return blob;
     }
   };
@@ -533,11 +546,17 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const handleDownload = async () => {
     setActionType('DOWNLOAD');
     if (invoice.status === InvoiceStatus.DRAFT) {
-      await generateBlobUrl(invoice, headerUrl, footerUrl);
+      await generateBlobUrl({
+        invoiceData: invoice,
+        headerBlockUrl: headerUrl,
+        footerBlockUrl: footerUrl,
+      });
     } else {
-      await refetchDownloadUrl();
+      const downloadUrlData = await refetchDownloadUrl();
       setFilePathToDownload(
-        downloadUrl ? downloadUrl?.[invoice.additionalInfo.pdfPath!]! : '',
+        downloadUrlData.data
+          ? downloadUrlData.data?.[invoice.additionalInfo.pdfPath!]!
+          : '',
       );
     }
   };
@@ -592,9 +611,15 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             fileNames,
             fileDescriptions,
           )
-        : generateBlobUrl(invoiceData, headerUrl, footerUrl).then((blobFile) =>
+        : (await generateBlobUrl({
+            invoiceData,
+            headerBlockUrl: headerUrl,
+            footerBlockUrl: footerUrl,
+            invoiceNumber: companyNextNumber?.value,
+            setInState: false,
+          }).then((blobFile) =>
             createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
-          ) || Promise.resolve([]);
+          )) || Promise.resolve([]);
 
     // Work report operations
     const workReportOperations = invoiceData?.additionalInfo.includeWorkReport
@@ -726,30 +751,31 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   }, [qrError]);
 
+  const refetchPDFs = async (companyNextId?: string) => {
+    // Refetch the download URLs for invoice, work report, and checklist
+    const workReportDownloadUrlResponse = await refetchWorkReportDownloadUrl();
+    const checklistDownloadUrlResponse = await refetchChecklistDownloadUrl();
+
+    // Ensure all download URLs are fetched before calling getExistingFiles
+    await refetchDownloadUrl().then(async (res) => {
+      await getExistingFiles(
+        res.data,
+        invoice,
+        companyNextId,
+        workReportDownloadUrlResponse.data,
+        checklistDownloadUrlResponse.data,
+      );
+    });
+  };
+
   const handleOpenSendEmail = async (companyNextId?: string) => {
     const error = await checkValidQrCode(invoice);
 
     if (!error) {
       setIsLoadingFiles(true);
       setIsSendEmailDialogOpen(true);
-
       try {
-        // Refetch the download URLs for invoice, work report, and checklist
-        const workReportDownloadUrlResponse =
-          await refetchWorkReportDownloadUrl();
-        const checklistDownloadUrlResponse =
-          await refetchChecklistDownloadUrl();
-
-        // Ensure all download URLs are fetched before calling getExistingFiles
-        await refetchDownloadUrl().then(async (res) => {
-          await getExistingFiles(
-            res.data,
-            invoice,
-            companyNextId,
-            workReportDownloadUrlResponse.data,
-            checklistDownloadUrlResponse.data,
-          );
-        });
+        await refetchPDFs(companyNextId);
       } finally {
         setIsLoadingFiles(false);
       }
@@ -837,7 +863,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
 
     return items;
-  }, [downloadUrl, invoice.status, t]);
+  }, [downloadUrl, invoice.status, t, companyNextNumber?.value]);
 
   useEffect(() => {
     if (invoice.status === InvoiceStatus.DRAFT) {
@@ -860,7 +886,11 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT &&
       !qrError
     ) {
-      generateBlobUrl(memorizedUpdateInvoiceData, headerUrl, footerUrl);
+      generateBlobUrl({
+        invoiceData: memorizedUpdateInvoiceData,
+        headerBlockUrl: headerUrl,
+        footerBlockUrl: footerUrl,
+      });
     }
   }, [
     memorizedUpdateInvoiceData,
@@ -889,6 +919,19 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   }, [actionType, filePathToDownload]);
 
+  useEffectAfterMount(() => {
+    (async () => {
+      if (companyNextNumber?.value) {
+        try {
+          setIsLoadingFiles(true);
+          await refetchPDFs(companyNextNumber.value);
+        } finally {
+          setIsLoadingFiles(false);
+        }
+      }
+    })();
+  }, [companyNextNumber?.value]);
+
   const onPrintInvoice = async () => {
     setIsConfirmPrintDialogOpen(false);
 
@@ -905,11 +948,12 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           {
             onSuccess: async () => {
               const updatedInvoiceData = await refetchInvoiceData();
-              const blobFile = await generateBlobUrl(
-                updatedInvoiceData?.data!,
-                headerUrl,
-                footerUrl,
-              );
+              const blobFile = await generateBlobUrl({
+                invoiceData: updatedInvoiceData?.data!,
+                headerBlockUrl: headerUrl,
+                footerBlockUrl: footerUrl,
+                invoiceNumber: updatedInvoiceData?.data?.externalId,
+              });
 
               const uploadPath = `${serviceCompanyId}/invoices`;
 
@@ -950,7 +994,12 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           },
         );
       } else {
-        const blobFile = await generateBlobUrl(invoice, headerUrl, footerUrl);
+        const blobFile = await generateBlobUrl({
+          invoiceData: invoice,
+          headerBlockUrl: headerUrl,
+          footerBlockUrl: footerUrl,
+          invoiceNumber: invoice.externalId,
+        });
 
         const uploadPath = `${serviceCompanyId}/invoices`;
 
@@ -1347,136 +1396,149 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}
         callback={async (emailRecord) => {
-          setIsSendEmailDialogOpen(false);
-          const checkListInfo = selectedChecklist!;
-          const isDraftInvoice = invoice.status === InvoiceStatus.DRAFT;
-          const invoiceUploadPath = `${serviceCompanyId}/invoices`;
-          const workReportUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/report`;
-          const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/checkLists/${checkListInfo?.technicianId}`;
-          const fileNames: string[] = [`${invoice?.id}.pdf`];
-          const allAttachments = emailRecord.attachments || [];
+          try {
+            setIsSendingEmail(true);
+            const checkListInfo = selectedChecklist!;
+            const isDraftInvoice = invoice.status === InvoiceStatus.DRAFT;
+            const invoiceUploadPath = `${serviceCompanyId}/invoices`;
+            const workReportUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/report`;
+            const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/checkLists/${checkListInfo?.technicianId}`;
+            const fileNames: string[] = [`${invoice?.id}.pdf`];
+            const allAttachments = emailRecord.attachments || [];
 
-          // 1. Upload work report files
-          const workReportFiles = emailRecord.attachments?.filter((el) =>
-            el.description?.includes(FILE_DESCRIPTION_PREFIXES.WORK_REPORT),
-          );
-          if (
-            workReportFiles?.length &&
-            report?.additionalInfo.pdfGenerationStatus !==
-              PdfGenerationStatus.DONE
-          ) {
-            await uploadFiles({
-              files: workReportFiles,
-              uploadPath: workReportUploadPath,
-            });
-          }
-
-          // 2. Upload checklist files
-          const checklistFiles = emailRecord.attachments?.filter((el) =>
-            el.description?.includes(FILE_DESCRIPTION_PREFIXES.CHECKLIST),
-          );
-          if (
-            checklistFiles?.length &&
-            selectedChecklist?.additionalInfo.pdfGenerationStatus !==
-              PdfGenerationStatus.DONE
-          ) {
-            await uploadFiles({
-              files: checklistFiles,
-              uploadPath: checklistUploadPath,
-            });
-          }
-
-          // 3. Upload invoice files if 'DRAFT' invoice
-          if (isDraftInvoice) {
-            const invoiceFiles = emailRecord.attachments?.filter((el) =>
-              el.description?.includes(FILE_DESCRIPTION_PREFIXES.INVOICE),
+            // 1. Upload work report files
+            const workReportFiles = emailRecord.attachments?.filter((el) =>
+              el.description?.includes(FILE_DESCRIPTION_PREFIXES.WORK_REPORT),
             );
-            if (invoiceFiles?.length) {
+            if (
+              workReportFiles?.length &&
+              report?.additionalInfo.pdfGenerationStatus !==
+                PdfGenerationStatus.DONE
+            ) {
               await uploadFiles({
-                files: invoiceFiles,
+                files: workReportFiles,
+                uploadPath: workReportUploadPath,
+              });
+            }
+
+            // 2. Upload checklist files
+            const checklistFiles = emailRecord.attachments?.filter((el) =>
+              el.description?.includes(FILE_DESCRIPTION_PREFIXES.CHECKLIST),
+            );
+            if (
+              checklistFiles?.length &&
+              selectedChecklist?.additionalInfo.pdfGenerationStatus !==
+                PdfGenerationStatus.DONE
+            ) {
+              await uploadFiles({
+                files: checklistFiles,
+                uploadPath: checklistUploadPath,
+              });
+            }
+
+            // 3. Upload invoice files if 'DRAFT' invoice
+            if (isDraftInvoice) {
+              const invoiceFiles = emailRecord.attachments?.filter((el) =>
+                el.description?.includes(FILE_DESCRIPTION_PREFIXES.INVOICE),
+              );
+              if (invoiceFiles?.length) {
+                await uploadFiles({
+                  files: invoiceFiles,
+                  uploadPath: invoiceUploadPath,
+                });
+              }
+            }
+
+            // 4. Upload email attachments
+            const emailAttachments = (emailRecord.attachments || [])?.filter(
+              (el) => el.path && !el.description,
+            );
+            if (emailAttachments?.length) {
+              await uploadFiles({
+                files: emailAttachments,
                 uploadPath: invoiceUploadPath,
               });
             }
-          }
 
-          // 4. Upload email attachments
-          const emailAttachments = (emailRecord.attachments || [])?.filter(
-            (el) => el.path && !el.description,
-          );
-          if (emailAttachments?.length) {
-            await uploadFiles({
-              files: emailAttachments,
-              uploadPath: invoiceUploadPath,
-            });
-          }
+            const sendEmail = async (invoiceData: InvoiceView) => {
+              await sendInvoice({
+                id: invoiceData?.id!,
+                body: {
+                  pdfPath: isDraftInvoice
+                    ? `${invoiceUploadPath}/${fileNames[0]}`
+                    : invoiceData?.additionalInfo?.pdfPath!,
+                  externalId:
+                    invoiceData?.externalId || companyNextNumber?.value || '',
+                  dueDate: invoiceData?.dueDate || dateToString(new Date()),
+                  sentDate: invoiceData?.sentDate || dateToString(new Date()),
+                  email: {
+                    email: '',
+                    subject: emailRecord.subject,
+                    content: emailRecord.content,
+                    emails: emailRecord.emails,
+                    ccEmails: emailRecord.ccEmails,
+                    bccEmails: emailRecord.bccEmails,
+                    attachments: allAttachments.reduce<FileWithPreview[]>(
+                      (newArr: FileWithPreview[], obj) => {
+                        const isInvoiceFile = obj.description?.includes(
+                          FILE_DESCRIPTION_PREFIXES.INVOICE,
+                        );
+                        const isWorkReportFile = obj.description?.includes(
+                          FILE_DESCRIPTION_PREFIXES.WORK_REPORT,
+                        );
+                        const isChecklistFile = obj.description?.includes(
+                          FILE_DESCRIPTION_PREFIXES.CHECKLIST,
+                        );
+                        const isAttachedFile = obj.path && !obj.description;
 
-          const sendEmail = async (invoiceData: InvoiceView) => {
-            await sendInvoice({
-              id: invoiceData?.id!,
-              body: {
-                pdfPath: isDraftInvoice
-                  ? `${invoiceUploadPath}/${fileNames[0]}`
-                  : invoiceData?.additionalInfo?.pdfPath!,
-                externalId:
-                  invoiceData?.externalId! || companyNextNumber?.value!,
-                dueDate: invoiceData?.dueDate || dateToString(new Date()),
-                sentDate: invoiceData?.sentDate || dateToString(new Date()),
-                email: {
-                  email: '',
-                  subject: emailRecord.subject,
-                  content: emailRecord.content,
-                  emails: emailRecord.emails,
-                  ccEmails: emailRecord.ccEmails,
-                  bccEmails: emailRecord.bccEmails,
-                  attachments: allAttachments.reduce<FileWithPreview[]>(
-                    (newArr: FileWithPreview[], obj) => {
-                      const isInvoiceFile = obj.description?.includes(
-                        FILE_DESCRIPTION_PREFIXES.INVOICE,
-                      );
-                      const isWorkReportFile = obj.description?.includes(
-                        FILE_DESCRIPTION_PREFIXES.WORK_REPORT,
-                      );
-                      const isChecklistFile = obj.description?.includes(
-                        FILE_DESCRIPTION_PREFIXES.CHECKLIST,
-                      );
-                      const isAttachedFile = obj.path && !obj.description;
+                        let uploadPath = '';
 
-                      let uploadPath = '';
+                        if (isAttachedFile || isInvoiceFile) {
+                          uploadPath = invoiceUploadPath;
+                        } else if (isWorkReportFile) {
+                          uploadPath = workReportUploadPath;
+                        } else if (isChecklistFile) {
+                          uploadPath = checklistUploadPath;
+                        }
 
-                      if (isAttachedFile || isInvoiceFile) {
-                        uploadPath = invoiceUploadPath;
-                      } else if (isWorkReportFile) {
-                        uploadPath = workReportUploadPath;
-                      } else if (isChecklistFile) {
-                        uploadPath = checklistUploadPath;
-                      }
-
-                      return [
-                        ...newArr,
-                        {
-                          ...obj,
-                          type: obj.type,
-                          uri: isInvoiceFile
-                            ? isDraftInvoice
-                              ? `${invoiceUploadPath}/${fileNames[0]}`
-                              : invoice?.additionalInfo.pdfPath!
-                            : `${uploadPath}/${obj.name}`,
-                          description: isAttachedFile
-                            ? obj.name.split('.')[0]
-                            : obj?.description,
-                        },
-                      ];
-                    },
-                    [],
-                  ),
+                        return [
+                          ...newArr,
+                          {
+                            ...obj,
+                            type: obj.type,
+                            uri: isInvoiceFile
+                              ? isDraftInvoice
+                                ? `${invoiceUploadPath}/${fileNames[0]}`
+                                : invoice?.additionalInfo.pdfPath!
+                              : `${uploadPath}/${obj.name}`,
+                            description: isAttachedFile
+                              ? obj.name.split('.')[0]
+                              : obj?.description,
+                          },
+                        ];
+                      },
+                      [],
+                    ),
+                  },
                 },
-              },
-            });
-          };
+              }).catch(async (error) => {
+                if (error.message === 'Regenerate PDF') {
+                  await refetchCompanyNextNumber();
+                }
+                throw error;
+              });
+            };
 
-          // 5. Send email
-          await sendEmail(updatedInvoice!);
+            // 5. Send email
+            await sendEmail(updatedInvoice!);
+            setIsSendingEmail(false);
+            setIsSendEmailDialogOpen(false);
+          } catch (error) {
+            setIsSendingEmail(false);
+            throw error;
+          }
         }}
+        isSending={isSendingEmail}
         email={
           invoice.propertyOwner?.additionalInfo.billingEmail ||
           invoice.propertyOwner?.contact.email

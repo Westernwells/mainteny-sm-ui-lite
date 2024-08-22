@@ -55,13 +55,14 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
 
   totalInvoiceRef = totalInvoiceRef || jobInvoices.length;
 
-  const {data: companyNextNumber} = useCompanyNextNumber(
-    {
-      type: ServiceCompanyNumberType.INVOICE,
-    },
-    user?.userAccount.serviceCompany.id,
-    true,
-  );
+  const {data: companyNextNumber, refetch: refetchCompanyNextNumber} =
+    useCompanyNextNumber(
+      {
+        type: ServiceCompanyNumberType.INVOICE,
+      },
+      user?.userAccount.serviceCompany.id,
+      true,
+    );
 
   const {data: clientStorageData} = useQueryClientStorageData({
     serviceCompanyId: user?.userAccount.serviceCompany.id!,
@@ -208,6 +209,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
             headerUrl,
             footerUrl,
             companyNextNumber,
+            refetchCompanyNextNumber,
             isHeaderUrlLoading,
             isFooterUrlLoading,
           )}
