@@ -771,7 +771,9 @@ export const calculateContractInvoicePriceTotal = (
     if (contractTime === ContractTimeUnit.MONTHLY) {
       const invoiceMonths = item.invoiceJob.timeNumbers;
       const jobMonths = item.orderGenerationJob.timeNumbers;
-      timeLength = monthlyBasedCalculations(invoiceMonths ?? jobMonths);
+      timeLength = monthlyBasedCalculations(
+        invoiceMonths.length ? invoiceMonths : jobMonths,
+      );
     } else if (TIME_UNIT_WEEK_TO_NUMBER.has(contractTime)) {
       // weekly based calculations
       timeLength = weeklyDivider(
