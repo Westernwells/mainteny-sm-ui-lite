@@ -918,7 +918,7 @@ const ServicesForm = ({
                   textAlign: 'left',
                 }}>
                 <Typography variant="h6">
-                  {t('Total service price (excl. VAT)')}
+                  {t('Total contract value per year (excl. VAT)')}
                 </Typography>
               </TableCell>
 

@@ -18,9 +18,9 @@ import {formatDate} from 'utils/datetime';
 import {theme} from 'theme';
 import {FormikProps} from 'formik';
 import {
-  ContractServiceForm,
   calculateContractInvoicePriceTotal,
   calculateContractInvoiceRowPrice,
+  ContractServiceForm,
   getSingleItemViewFrequency,
 } from 'models/contract';
 import {useTranslation} from 'react-i18next';
@@ -282,7 +282,7 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
                 textAlign: 'left',
               }}>
               <Typography variant="h6">
-                Total service price (excl. VAT)
+                {t('Total contract value per year (excl. VAT)')}
               </Typography>
             </TableCell>
 

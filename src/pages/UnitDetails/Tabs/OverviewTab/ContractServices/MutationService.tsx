@@ -8,23 +8,23 @@ import React, {
 import {Dialog} from 'components/Dialog';
 import {
   Box,
+  Divider,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
+  Popover,
+  RadioGroup,
+  Select,
   TableBody,
   TableCell,
+  TableCellProps,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  TableCellProps,
-  Popover,
-  Tooltip,
-  FormControl,
-  RadioGroup,
   TextField,
-  Divider,
-  InputLabel,
-  MenuItem,
-  Select,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import InvoiceFrequencyPicker from 'components/InvoiceFrequencyPicker';
 import JobFrequencyPicker from 'components/JobFrequencyPicker/JobFrequencyPicker';
@@ -1122,7 +1122,7 @@ export const MutationService = ({
                 textAlign: 'left',
               }}>
               <Typography variant="h6">
-                {t('Total service price (excl. VAT)')}
+                {t('Total contract value per year (excl. VAT)')}
               </Typography>
             </TableCell>
 
