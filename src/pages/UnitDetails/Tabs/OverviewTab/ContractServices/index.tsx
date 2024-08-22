@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -8,11 +8,11 @@ import useTheme from '@mui/material/styles/useTheme';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import {TableCellProps, useMediaQuery} from '@mui/material';
 import {
+  calculateContractInvoicePriceTotal,
   ContractComponentView,
   ContractServiceForm,
   ContractSimpleView,
   ContractStatus,
-  calculateContractInvoicePriceTotal,
 } from 'models/contract';
 import {EmptySection} from 'components/EmptySection';
 import Divider from '@mui/material/Divider';
@@ -32,10 +32,10 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {Confirm} from 'components/Confirm';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {
-  componentsToMutate,
   calculateContractInvoicePriceGrandTotal,
-  parsElevatorRecourses,
+  componentsToMutate,
   mergeElevators,
+  parsElevatorRecourses,
 } from 'utils/contract';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -91,7 +91,7 @@ const validationSchemaContractServices = Yup.object().shape({
   name: Yup.string().required('Service name cannot be empty'),
 });
 
-const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
+const ContractServices = ({elevator, containerStyles}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const formatDate = useFormatDate();
@@ -142,28 +142,46 @@ const ContractServices: FC<Props> = ({elevator, containerStyles}) => {
     validateOnMount: true,
   });
 
-  const services = useMemo(
-    () =>
-      elevator?.contracts
-        .filter(
-          (item) =>
-            item.meta?.state === State.ACTIVE &&
-            (item.status === ContractStatus.VALID ||
-              item.status === ContractStatus.EXPIRING),
+  const services = useMemo(() => {
+    const elevatorId = elevator.id;
+    return elevator?.contracts.reduce(
+      (acc: Service[], contract: ContractSimpleView) => {
+        if (
+          contract.meta?.state !== State.ACTIVE ||
+          ![ContractStatus.VALID, ContractStatus.EXPIRING].includes(
+            contract.status,
+          )
         )
-        .reduce(
-          (prev: Service[], contract: ContractSimpleView) => [
-            ...prev,
-            ...(contract.components || []).map((component) => ({
-              ...component,
-              contractNumber: contract.externalId,
-              contractId: contract.id,
-            })),
-          ],
-          [],
-        ),
-    [elevator?.contracts, isSuccess, isUpdateLoading],
-  );
+          return acc;
+
+        const components = (contract.components || []).reduce(
+          (componentAcc, component) => {
+            if (
+              !component.additionalInfo?.elevators?.some(
+                (contractElevator) =>
+                  contractElevator.elevatorId === elevatorId,
+              )
+            )
+              return componentAcc;
+            return [
+              ...componentAcc,
+              {
+                ...component,
+                contractNumber: contract.externalId,
+                contractId: contract.id,
+              },
+            ];
+          },
+          // eslint-disable-next-line no-array-constructor
+          new Array<Service>(),
+        );
+
+        return [...acc, ...components];
+      },
+      // eslint-disable-next-line no-array-constructor
+      new Array<Service>(),
+    );
+  }, [elevator?.contracts, isSuccess, isUpdateLoading]);
 
   const deleteComponent = async () => {
     const remainingServices = services
