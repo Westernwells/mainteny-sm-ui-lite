@@ -579,6 +579,22 @@ export const yupValidations = {
     ),
 };
 
+export const fileListToFiles = (fileList: FileList | null) => {
+  const files: File[] = [];
+
+  if (!fileList) {
+    return files;
+  }
+
+  for (let i = 0; i < fileList.length; i += 1) {
+    const file = fileList.item(i);
+
+    files.push(file!);
+  }
+
+  return files;
+};
+
 export function removeHtmlTags(str: string) {
   return str.replace(/<\/?[^>]+(>|$)/g, '');
 }

@@ -65,6 +65,7 @@ import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {CreateEditMode, PdfGenerationStatus} from 'models/misc';
 import {BottomDrawer} from 'components/BottomDrawer';
 import _ from 'lodash';
+import {FileResourceRecord} from 'models/media';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';
@@ -390,19 +391,22 @@ export const CheckList = ({serviceOrder}: Props) => {
     }
   };
 
-  const saveChecklistAnswers = () => {
+  const saveChecklistAnswers = async () => {
     const params = {
       serviceOrder: serviceOrder.id,
     };
+    const {technicianId, checkListId} = selectedChecklist!;
     const queryParams = {
-      technicianId: selectedChecklist?.technicianId!,
-      checkListId: selectedChecklist?.checkListId!,
+      technicianId,
+      checkListId,
     };
+
     const body: CheckListAnswerRecord[] =
       selectedChecklist?.checkList.components.map((item) => ({
         componentId: item.id,
         values: item.additionalInfo.answer ?? [],
         note: item.additionalInfo.note ?? '',
+        pictures: item.additionalInfo.pictures ?? [],
       })) ?? [];
 
     const payload = {
@@ -470,6 +474,44 @@ export const CheckList = ({serviceOrder}: Props) => {
 
     selectedChecklistCloned!.checkList.components[index] =
       newChecklistComponent;
+
+    setSelectedChecklist(selectedChecklistCloned);
+  };
+
+  const onChecklistImageChange = async (
+    _component: CheckListComponentView,
+    files: File[],
+    index: number,
+  ) => {
+    const selectedChecklistCloned = _.cloneDeep(selectedChecklist);
+    const component = selectedChecklistCloned!.checkList.components[index];
+    const {pictures = []} = component.additionalInfo;
+
+    const {technicianId, checkListId} = selectedChecklist!;
+    const serviceCompanyId = user?.userAccount.serviceCompany.id;
+    const basePath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/checkLists`;
+    const uploadPath = `${basePath}/${technicianId}/${checkListId}/images`;
+
+    // Image upload is configured to show loading if the uri equal 'loading'. It's here to show user a visual clue of whats happening
+    const newPicturesLocal: FileResourceRecord[] = files.map((item) => ({
+      uri: 'loading',
+      description: item.name,
+      type: item.type,
+    }));
+    component.additionalInfo.pictures = [...pictures, ...newPicturesLocal];
+    selectedChecklistCloned!.checkList.components[index] = {...component};
+
+    setSelectedChecklist(selectedChecklistCloned);
+
+    await uploadFiles({files, uploadPath});
+
+    const newPictures: FileResourceRecord[] = files.map((item) => ({
+      uri: `${uploadPath}/${item.name}`,
+      description: item.name,
+      type: item.type,
+    }));
+    component.additionalInfo.pictures = [...pictures, ...newPictures];
+    selectedChecklistCloned!.checkList.components[index] = {...component};
 
     setSelectedChecklist(selectedChecklistCloned);
   };
@@ -616,6 +658,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                     <ChecklistPreviewSection
                       sx={{ml: 0, mt: 3}}
                       onChecklistChange={onChecklistChange}
+                      onChecklistImageChange={onChecklistImageChange}
                       isEditing={isEditing}
                       checklist={selectedChecklist?.checkList}
                     />

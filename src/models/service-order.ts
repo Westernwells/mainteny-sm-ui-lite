@@ -385,6 +385,7 @@ export interface CheckListAnswerRecord {
   componentId: string;
   values: string[];
   note: string;
+  pictures?: FileResourceRecord[];
 }
 
 export interface ServiceOrderSummary {
