@@ -35,6 +35,7 @@ import TopSectionContainer from './containers/TopSectionContainer';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import AlternativeAddressTemplate from './AlternativeAddressTemplate';
+import SwissPageTemplate from './SwissPageTemplate';
 
 Font.register({
   family: 'Montserrat-Bold',
@@ -130,6 +131,7 @@ type Props = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   nextCompanyExternalId?: string;
+  qrImageSrc?: string;
 };
 
 const CreditNotePdfTemplate = ({
@@ -143,6 +145,7 @@ const CreditNotePdfTemplate = ({
   footerInfo,
   footerPath,
   nextCompanyExternalId,
+  qrImageSrc,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -347,6 +350,10 @@ const CreditNotePdfTemplate = ({
           footerPath={footerPath}
         />
       </PdfPageContainer>
+
+      {userInfo?.serviceCompany.settings.invoiceQRCodeEnabled && (
+        <SwissPageTemplate qrImageSrc={qrImageSrc} />
+      )}
     </Document>
   );
 };

@@ -2699,5 +2699,10 @@
   "Add a swiss QR page to the invoice": "Dodajte švajcarsku KR stranicu na fakturu",
   "No checklist yet. Please add them by clicking the button below!": "Još nema kontrolne liste. Dodajte ih klikom na dugme ispod!",
   "Assign technician to add checklists": "Dodelite tehničara da doda kontrolne liste",
-  "Checklists can only be added once a technician is assigned to the job.": "Kontrolne liste se mogu dodati samo kada je tehničar dodeljen poslu."
+  "Checklists can only be added once a technician is assigned to the job.": "Kontrolne liste se mogu dodati samo kada je tehničar dodeljen poslu.",
+  "Select at least one day of the week.": "Izaberite bar jedan dan u nedelji.",
+  "Select opening hours end.": "Izaberite kraj radnog vremena.",
+  "Select opening hours start.": "Izaberite početak radnog vremena.",
+  "Show rows per page": "Prikaži redove po stranici",
+  "Closing time must be later than opening time.": "Vreme zatvaranja mora biti kasnije od vremena otvaranja."
 }
