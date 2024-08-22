@@ -33,6 +33,7 @@ import PdfPageContainer from './containers/PdfPageContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import AlternativeAddressTemplate from './AlternativeAddressTemplate';
+import SwissPageTemplate from './SwissPageTemplate';
 
 type Props = {
   translate: (key: string) => string;
@@ -46,6 +47,7 @@ type Props = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   nextCompanyExternalId?: string;
+  qrImageSrc?: string;
 };
 
 Font.register({
@@ -172,6 +174,7 @@ const PartialInvoicePdfTemplate = ({
   footerInfo,
   footerPath,
   nextCompanyExternalId,
+  qrImageSrc,
 }: Props) => {
   const hasPreviousInvoices = previousInvoices!.length > 0;
   const firstInvoiceType = previousInvoices?.[0]?.type ?? null;
@@ -405,6 +408,10 @@ const PartialInvoicePdfTemplate = ({
           footerPath={footerPath}
         />
       </PdfPageContainer>
+
+      {userInfo?.serviceCompany.settings.invoiceQRCodeEnabled && (
+        <SwissPageTemplate qrImageSrc={qrImageSrc} />
+      )}
     </Document>
   );
 };

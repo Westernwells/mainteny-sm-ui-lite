@@ -12,7 +12,7 @@ import {
   getCurrencySymbol,
   useCurrentCurrency,
 } from 'utils/currency';
-import {createHighlightedText} from 'utils/utils';
+import {createHighlightedText, removeHtmlTags} from 'utils/utils';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -99,7 +99,11 @@ export const ArticleAutocomplete = ({
       sx={{minHeight: 0}}
       options={[
         {name: 'autocomplete-table-title'} as ArticleView, // first option will be as table header
-        ...articlesResource.data,
+        ...(articlesResource.data?.map((article) => ({
+          ...article,
+          name: removeHtmlTags(article.name),
+          description: removeHtmlTags(article.description),
+        })) as ArticleView[]),
       ]}
       onChange={(event: any, newValue: ArticleView | null) => {
         setSelectedArticle(newValue);
@@ -166,7 +170,10 @@ export const ArticleAutocomplete = ({
                       wordBreak: 'break-word',
                       textAlign: 'left',
                     }}>
-                    {createHighlightedText(option.name, queryView)}
+                    {createHighlightedText(
+                      removeHtmlTags(option.name),
+                      queryView,
+                    )}
                   </td>
                   <td
                     style={{

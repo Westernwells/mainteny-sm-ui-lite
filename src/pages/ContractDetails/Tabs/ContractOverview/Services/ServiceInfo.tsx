@@ -17,10 +17,10 @@ import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import {formatDate} from 'utils/datetime';
 import {theme} from 'theme';
 import {
+  calculateContractInvoicePriceTotal,
   ContractComponentView,
   ContractElevatorView,
   ContractServiceFormElevator,
-  calculateContractInvoicePriceTotal,
 } from 'models/contract';
 import {
   calculateContractInvoiceRowPrice,
@@ -272,7 +272,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
                 textAlign: 'left',
               }}>
               <Typography variant="h6">
-                {t('Total service price (excl. VAT)')}
+                {t('Total contract value per year (excl. VAT)')}
               </Typography>
             </TableCell>
 

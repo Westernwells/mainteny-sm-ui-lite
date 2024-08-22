@@ -4,7 +4,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatNetAmount} from 'utils/currency';
-import {convertToText} from 'utils/utils';
+import {convertToText, removeHtmlTags} from 'utils/utils';
 import {
   TravelWorkCalculationTypeLabels,
   TravelWorkView,
@@ -27,7 +27,7 @@ export const columns: GridColDef[] = [
       <Typography
         variant="body2"
         sx={{whiteSpace: 'wrap', wordBreak: 'break-all'}}>
-        {t(params.value) || '-'}
+        {removeHtmlTags(t(params.value)) || '-'}
       </Typography>
     ),
   }),
@@ -36,7 +36,9 @@ export const columns: GridColDef[] = [
     headerName: 'type',
     variant: 'titleCase',
     renderCell: (params: GridRenderCellParams<any, any, any>) => (
-      <Typography variant="body2">{t(params.value) || '-'}</Typography>
+      <Typography variant="body2">
+        {removeHtmlTags(t(params.value)) || '-'}
+      </Typography>
     ),
     flex: 0.5,
   }),
@@ -48,7 +50,7 @@ export const columns: GridColDef[] = [
       <Typography
         variant="body2"
         sx={{whiteSpace: 'wrap', wordBreak: 'break-all'}}>
-        {t(params.value) || '-'}
+        {removeHtmlTags(t(params.value)) || '-'}
       </Typography>
     ),
   }),
@@ -61,7 +63,7 @@ export const columns: GridColDef[] = [
       <Typography
         variant="body2"
         sx={{whiteSpace: 'wrap', wordBreak: 'break-all'}}>
-        {t(params.value) || '-'}
+        {removeHtmlTags(t(params.value)) || '-'}
       </Typography>
     ),
   }),

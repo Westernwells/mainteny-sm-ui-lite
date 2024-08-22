@@ -8,23 +8,23 @@ import React, {
 import {Dialog} from 'components/Dialog';
 import {
   Box,
+  Divider,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
+  Popover,
+  RadioGroup,
+  Select,
   TableBody,
   TableCell,
+  TableCellProps,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  TableCellProps,
-  Popover,
-  Tooltip,
-  FormControl,
-  RadioGroup,
   TextField,
-  Divider,
-  InputLabel,
-  Select,
-  MenuItem,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import InvoiceFrequencyPicker from 'components/InvoiceFrequencyPicker';
 import JobFrequencyPicker from 'components/JobFrequencyPicker/JobFrequencyPicker';
@@ -33,13 +33,13 @@ import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
 import {DatePicker} from 'components/DatePicker';
 import {FormInput} from 'components/form/FormInput';
 import {
-  ContractServiceForm,
-  ContractComponentView,
-  ContractServiceFormElevator,
-  UpdateContractComponents,
-  ContractTimeUnit,
-  ContractComponentElevator,
   calculateContractInvoicePriceTotal,
+  ContractComponentElevator,
+  ContractComponentView,
+  ContractServiceForm,
+  ContractServiceFormElevator,
+  ContractTimeUnit,
+  UpdateContractComponents,
 } from 'models/contract';
 import {componentsToMutate} from 'utils/contract';
 import {theme} from 'theme';
@@ -1155,7 +1155,7 @@ export const MutationService = ({
                 textAlign: 'left',
               }}>
               <Typography variant="h6">
-                {t('Total service price (excl. VAT)')}
+                {t('Total contract value per year (excl. VAT)')}
               </Typography>
             </TableCell>
 

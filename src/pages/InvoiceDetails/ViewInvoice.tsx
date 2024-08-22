@@ -29,7 +29,12 @@ import {
 } from 'models/invoice';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
-import {formatGrossAmount, useCurrentCurrency} from 'utils/currency';
+import {
+  QRCurrencyCode,
+  createQrData,
+  formatGrossAmount,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
@@ -60,7 +65,11 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {CheckListComponentType} from 'models/checklist';
 import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
-import {validateDueDate} from 'utils/invoice-utils';
+import {
+  getQrErrorMessage,
+  svgToJpegPng,
+  validateDueDate,
+} from 'utils/invoice-utils';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -91,6 +100,9 @@ import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import DOMPurify from 'dompurify';
+// eslint-disable-next-line import/no-unresolved
+import {SwissQRBill} from 'swissqrbill/svg';
+import {debounce} from 'lodash';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -118,6 +130,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
+
+  const [qrImageSrc, setQrImageSrc] = useState<string>('');
+  const [qrError, setQrError] = useState<string | null>(null);
+
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
   );
@@ -132,7 +148,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                 : updatedInvoice?.subject,
           }
         : undefined,
-    [updatedInvoice],
+    [updatedInvoice, invoice],
   );
   const {
     data: downloadUrl,
@@ -505,6 +521,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           footerPath={footerBlockUrl[footerInfo?.path]}
           footerInfo={footerInfo}
           nextCompanyExternalId={companyNextNumber?.value}
+          qrImageSrc={qrImageSrc}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -650,28 +667,92 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     setExistingFiles(allFiles);
   };
 
+  const qrCurrency: QRCurrencyCode =
+    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
+      ? currentCurrency.code
+      : 'EUR';
+
+  const checkValidQrCode = useCallback(
+    debounce(async (qrInvoice: InvoiceView) => {
+      if (user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+        try {
+          const qrBillData = createQrData(
+            qrCurrency,
+            qrInvoice,
+            currentCurrency,
+            user?.userAccount,
+          );
+
+          const qrBillSvg = new SwissQRBill(qrBillData);
+
+          svgToJpegPng(
+            qrBillSvg.element as unknown as SVGSVGElement,
+            (result) => {
+              setQrImageSrc(result);
+            },
+            {format: 'jpeg', quality: 1},
+          );
+          setQrError(null);
+          return '';
+        } catch (error) {
+          if (error instanceof Error) {
+            setQrError(error.message);
+            return error.message;
+          }
+        }
+      }
+    }, 500),
+    [user, currentCurrency, qrCurrency],
+  );
+
+  useEffect(() => {
+    if (
+      invoice &&
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled
+    ) {
+      checkValidQrCode(invoice);
+    }
+  }, [invoice]);
+
+  useEffect(() => {
+    if (qrError) {
+      const errorMessage = getQrErrorMessage(qrError);
+      if (errorMessage) {
+        enqueueSnackbar(t(`${errorMessage}`), {
+          variant: 'error',
+        });
+        setQrError(null);
+      }
+    }
+  }, [qrError]);
+
   const handleOpenSendEmail = async (companyNextId?: string) => {
-    setIsLoadingFiles(true);
-    setIsSendEmailDialogOpen(true);
+    const error = await checkValidQrCode(invoice);
 
-    try {
-      // Refetch the download URLs for invoice, work report, and checklist
-      const workReportDownloadUrlResponse =
-        await refetchWorkReportDownloadUrl();
-      const checklistDownloadUrlResponse = await refetchChecklistDownloadUrl();
+    if (!error) {
+      setIsLoadingFiles(true);
+      setIsSendEmailDialogOpen(true);
 
-      // Ensure all download URLs are fetched before calling getExistingFiles
-      await refetchDownloadUrl().then(async (res) => {
-        await getExistingFiles(
-          res.data,
-          invoice,
-          companyNextId,
-          workReportDownloadUrlResponse.data,
-          checklistDownloadUrlResponse.data,
-        );
-      });
-    } finally {
-      setIsLoadingFiles(false);
+      try {
+        // Refetch the download URLs for invoice, work report, and checklist
+        const workReportDownloadUrlResponse =
+          await refetchWorkReportDownloadUrl();
+        const checklistDownloadUrlResponse =
+          await refetchChecklistDownloadUrl();
+
+        // Ensure all download URLs are fetched before calling getExistingFiles
+        await refetchDownloadUrl().then(async (res) => {
+          await getExistingFiles(
+            res.data,
+            invoice,
+            companyNextId,
+            workReportDownloadUrlResponse.data,
+            checklistDownloadUrlResponse.data,
+          );
+        });
+      } finally {
+        setIsLoadingFiles(false);
+      }
     }
   };
 
@@ -775,7 +856,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   }, [actionType]);
 
   useEffect(() => {
-    if (memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT) {
+    if (
+      memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT &&
+      !qrError
+    ) {
       generateBlobUrl(memorizedUpdateInvoiceData, headerUrl, footerUrl);
     }
   }, [
@@ -787,6 +871,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     memorizedUpdateInvoiceData?.type === InvoiceType.AGGREGATE
       ? null
       : previousInvoices,
+    qrError,
+    qrImageSrc,
   ]);
 
   useEffect(() => {

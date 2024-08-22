@@ -41,7 +41,11 @@ import {
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
-import {validateDueDate} from 'utils/invoice-utils';
+import {
+  getQrErrorMessage,
+  svgToJpegPng,
+  validateDueDate,
+} from 'utils/invoice-utils';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {
   companyLanguageContextMap,
@@ -49,7 +53,7 @@ import {
   dateToString,
   fetchFile,
 } from 'utils/utils';
-import {useCurrentCurrency} from 'utils/currency';
+import {QRCurrencyCode, createQrData, useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {pdf} from '@react-pdf/renderer';
@@ -71,6 +75,8 @@ import {
   PdfGenerationStatus,
   StringValueResponse,
 } from 'models/misc';
+// eslint-disable-next-line import/no-unresolved
+import {SwissQRBill} from 'swissqrbill/svg';
 
 interface Props {
   invoice: InvoiceView;
@@ -148,6 +154,14 @@ export const Actions = ({
 
   const [actionType, setActionType] = useState('');
   const [pdfPathToDownload, setPdfPathToDownload] = useState('');
+
+  const [qrImageSrc, setQrImageSrc] = useState<string>('');
+  const [qrError, setQrError] = useState<string | null>(null);
+
+  const qrCurrency: QRCurrencyCode =
+    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
+      ? currentCurrency.code
+      : 'EUR';
 
   const {data: company} = useCompanyById(
     user?.userAccount.serviceCompany.id,
@@ -444,6 +458,7 @@ export const Actions = ({
         footerPath={footerBlockUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         nextCompanyExternalId={companyNextNumber?.value}
+        qrImageSrc={qrImageSrc}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -593,27 +608,89 @@ export const Actions = ({
     setExistingFiles(allFiles);
   };
 
+  const checkValidQrCode = useCallback(
+    async (qrInvoice: InvoiceView) => {
+      if (!user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+        return '';
+      }
+
+      try {
+        const qrBillData = createQrData(
+          qrCurrency,
+          qrInvoice,
+          currentCurrency,
+          user?.userAccount,
+        );
+
+        const qrBillSvg = new SwissQRBill(qrBillData);
+
+        const result = await new Promise<string>((resolve, reject) => {
+          svgToJpegPng(
+            qrBillSvg.element as unknown as SVGSVGElement,
+            (imageResult) => {
+              if (imageResult) {
+                resolve(imageResult); // Resolve on success
+              } else {
+                reject(new Error('Failed to generate QR code image')); // Reject on failure
+              }
+            },
+            {format: 'jpeg', quality: 1},
+          );
+        });
+
+        setQrImageSrc(result);
+
+        setQrError(null);
+        return '';
+      } catch (error) {
+        if (error instanceof Error) {
+          setQrError(error.message);
+          return error.message;
+        }
+        return 'Unknown error occurred'; // Fallback error message
+      }
+    },
+    [user, currentCurrency, qrCurrency],
+  );
+
+  useEffect(() => {
+    if (qrError) {
+      const errorMessage = getQrErrorMessage(qrError);
+      if (errorMessage) {
+        enqueueSnackbar(t(`${errorMessage}`), {
+          variant: 'error',
+        });
+        setQrError(null);
+      }
+    }
+  }, [qrError]);
+
   const handleOpenSendEmail = async (companyNextId?: string) => {
-    setIsLoadingFiles(true);
-    setIsSendEmailDialogOpen(true);
+    const error = await checkValidQrCode(invoice);
 
-    try {
-      // Refetch the download URLs for invoice, work report, and checklist
-      const invoiceDownloadUrlResponse = await refetchDownloadUrl();
-      const workReportDownloadUrlResponse =
-        await refetchWorkReportDownloadUrl();
-      const checklistDownloadUrlResponse = await refetchChecklistDownloadUrl();
+    if (!error) {
+      try {
+        setIsLoadingFiles(true);
+        setIsSendEmailDialogOpen(true);
 
-      // Ensure all download URLs are fetched before calling getExistingFiles
-      await getExistingFiles(
-        invoiceDownloadUrlResponse.data,
-        invoice,
-        companyNextId,
-        workReportDownloadUrlResponse.data,
-        checklistDownloadUrlResponse.data,
-      );
-    } finally {
-      setIsLoadingFiles(false);
+        // Refetch the download URLs for invoice, work report, and checklist
+        const invoiceDownloadUrlResponse = await refetchDownloadUrl();
+        const workReportDownloadUrlResponse =
+          await refetchWorkReportDownloadUrl();
+        const checklistDownloadUrlResponse =
+          await refetchChecklistDownloadUrl();
+
+        // Ensure all download URLs are fetched before calling getExistingFiles
+        await getExistingFiles(
+          invoiceDownloadUrlResponse.data,
+          invoice,
+          companyNextId,
+          workReportDownloadUrlResponse.data,
+          checklistDownloadUrlResponse.data,
+        );
+      } finally {
+        setIsLoadingFiles(false);
+      }
     }
   };
 
