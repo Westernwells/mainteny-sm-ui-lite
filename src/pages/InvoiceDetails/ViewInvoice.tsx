@@ -510,54 +510,42 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         )
       : [];
 
-    if (
-      invoice.type === InvoiceType.CREDIT_NOTE ||
-      invoice.type === InvoiceType.FULL ||
-      invoice.type === InvoiceType.AGGREGATE ||
-      invoice.type === InvoiceType.PARTIAL ||
-      invoice.type === InvoiceType.UPFRONT ||
-      invoice.type === InvoiceType.FINAL
-    ) {
-      // TODO: will remove when all invoice types PDFs are ready
-      const blob = await pdf(
-        <PdfTemplate
-          userInfo={user?.userAccount}
-          currentCurrency={currentCurrency}
-          invoice={invoiceData}
-          selectedLng={company?.language}
-          translate={translate}
-          previousInvoices={previousInvoicesProp}
-          headerPath={headerBlockUrl[headerInfo?.path]}
-          headerInfo={headerInfo}
-          footerPath={footerBlockUrl[footerInfo?.path]}
-          footerInfo={footerInfo}
-          nextCompanyExternalId={
-            invoiceNumber || translate('Automatically assigned')
-          }
-          qrImageSrc={qrImageSrc}
-        />,
-      ).toBlob();
-      const blobURL = URL.createObjectURL(blob);
-      if (setInState) setFilePathToDownload(blobURL);
-      return blob;
-    }
+    const blob = await pdf(
+      <PdfTemplate
+        userInfo={user?.userAccount}
+        currentCurrency={currentCurrency}
+        invoice={invoiceData}
+        selectedLng={company?.language}
+        translate={translate}
+        previousInvoices={previousInvoicesProp}
+        headerPath={headerBlockUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerBlockUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
+        nextCompanyExternalId={
+          invoiceNumber || translate('Automatically assigned')
+        }
+        qrImageSrc={qrImageSrc}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    if (setInState) setFilePathToDownload(blobURL);
+    return blob;
   };
 
   const handleDownload = async () => {
-    setActionType('DOWNLOAD');
     if (invoice.status === InvoiceStatus.DRAFT) {
-      await generateBlobUrl({
+      const blob = await generateBlobUrl({
         invoiceData: invoice,
         headerBlockUrl: headerUrl,
         footerBlockUrl: footerUrl,
+        setInState: false,
       });
+      const blobURL = URL.createObjectURL(blob);
+      downloadFile(blobURL);
     } else {
       const downloadUrlData = await refetchDownloadUrl();
-      setFilePathToDownload(
-        downloadUrlData.data
-          ? downloadUrlData.data?.[invoice.additionalInfo.pdfPath!]!
-          : '',
-      );
+      downloadFile(downloadUrlData.data?.[invoice.additionalInfo.pdfPath]);
     }
   };
 
@@ -864,22 +852,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
     return items;
   }, [downloadUrl, invoice.status, t, companyNextNumber?.value]);
-
-  useEffect(() => {
-    if (invoice.status === InvoiceStatus.DRAFT) {
-      if (filePathToDownload && actionType === 'DOWNLOAD') {
-        downloadFile();
-        setFilePathToDownload('');
-        setActionType('');
-      }
-    } else if (
-      actionType === 'DOWNLOAD' &&
-      downloadUrl?.[invoice.additionalInfo.pdfPath!]
-    ) {
-      downloadFile();
-      setActionType('');
-    }
-  }, [actionType]);
 
   useEffect(() => {
     if (
