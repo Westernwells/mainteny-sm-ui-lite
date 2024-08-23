@@ -755,7 +755,6 @@ export const calculateContractInvoicePriceTotal = (
   array: ContractComponentElevator[],
 ) =>
   array.reduce((acc: number, item: ContractComponentElevator) => {
-    if (!item.isChecked && !item.isSelected) return acc; // item is deselected
     let timeLength: number = 0;
 
     if (!item.invoiceJob && !item.orderGenerationJob) return 0;
