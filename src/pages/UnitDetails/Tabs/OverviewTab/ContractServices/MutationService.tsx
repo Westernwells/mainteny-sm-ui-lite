@@ -3,6 +3,7 @@ import React, {
   SetStateAction,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import {Dialog} from 'components/Dialog';
@@ -39,7 +40,7 @@ import {
   ContractServiceFormElevator,
   UpdateContractComponents,
 } from 'models/contract';
-import {componentsToMutate} from 'utils/contract';
+import {componentsToMutate, isUnitSelected} from 'utils/contract';
 import {theme} from 'theme';
 import {Switch} from 'components/Switch';
 import {FormikProps, getIn} from 'formik';
@@ -324,6 +325,12 @@ export const MutationService = ({
   const handleJobFrequencyChange =
     (key: string) => (value: ContractComponentElevator[]) =>
       formikContractServiceComponent.setFieldValue(key, value);
+
+  const selectedElevators = useMemo(
+    () =>
+      formikContractServiceComponent.values.elevators.filter(isUnitSelected),
+    [formikContractServiceComponent.values.elevators],
+  );
 
   return (
     <Dialog
@@ -1136,9 +1143,7 @@ export const MutationService = ({
               }}>
               <Typography variant="h6">
                 {formatCurrency(
-                  calculateContractInvoicePriceTotal(
-                    formikContractServiceComponent.values.elevators,
-                  ) /
+                  calculateContractInvoicePriceTotal(selectedElevators) /
                     10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                   {
                     currency: currentCurrency.code,

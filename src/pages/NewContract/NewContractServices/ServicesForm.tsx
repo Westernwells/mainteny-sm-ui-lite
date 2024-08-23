@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {
   Box,
   FormControl,
@@ -49,6 +49,7 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {useTranslation} from 'react-i18next';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {ServiceOrderLabels, ServiceOrderType} from 'models/service-order';
+import {isUnitSelected} from '../../../utils/contract';
 
 const articleTypes = [
   {
@@ -157,6 +158,12 @@ const ServicesForm = ({
   const handleJobFrequencyChange =
     (key: string) => (value: ContractComponentElevator[]) =>
       formikContractServiceComponent.setFieldValue(key, value);
+
+  const selectedElevators = useMemo(
+    () =>
+      formikContractServiceComponent.values.elevators.filter(isUnitSelected),
+    [formikContractServiceComponent.values.elevators],
+  );
 
   return (
     <>
@@ -932,9 +939,7 @@ const ServicesForm = ({
                 }}>
                 <Typography variant="h6">
                   {formatCurrency(
-                    calculateContractInvoicePriceTotal(
-                      formikContractServiceComponent.values.elevators,
-                    ) /
+                    calculateContractInvoicePriceTotal(selectedElevators) /
                       10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                     {
                       currency: currentCurrency.code,

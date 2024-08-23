@@ -32,7 +32,7 @@ import {
 import {getListViewFrequency} from 'utils/elevator-utils';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {Button} from 'components/Button';
-import {CallSplit, CallMerge} from '@mui/icons-material';
+import {CallMerge, CallSplit} from '@mui/icons-material';
 import {Dialog} from 'components/Dialog';
 import {FormSelect} from 'components/form/FormSelect';
 import Grid from '@mui/material/Grid';
