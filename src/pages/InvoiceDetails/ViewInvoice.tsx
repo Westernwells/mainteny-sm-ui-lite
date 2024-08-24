@@ -103,7 +103,7 @@ import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import DOMPurify from 'dompurify';
 // eslint-disable-next-line import/no-unresolved
 import {SwissQRBill} from 'swissqrbill/svg';
-import {debounce} from 'lodash';
+import _, {debounce} from 'lodash';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -349,7 +349,21 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       (a, b) =>
         (a.additionalInfo?.orderNumber ?? 0) -
         (b.additionalInfo?.orderNumber ?? 0),
-    );
+    ) ?? [];
+
+  const checklistImagesPath = useMemo(
+    () =>
+      (
+        sortedChecklistComponents.map(
+          (component) =>
+            component.additionalInfo.pictures?.map((pic) => pic.uri) ?? [],
+        ) ?? []
+      ).flat(),
+    [sortedChecklistComponents],
+  );
+
+  const {data: checklistImagesDownloadUrl, isLoading: isChecklistImageLoading} =
+    useDownloadUrl(checklistImagesPath);
 
   const signaturePath =
     signatureDownloadUrls[
@@ -366,6 +380,16 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   );
 
   const generateChecklistBlob = async () => {
+    const sortedChecklistComponentsCloned = _.cloneDeep(
+      sortedChecklistComponents ?? [],
+    );
+
+    sortedChecklistComponentsCloned.forEach((component) => {
+      component.additionalInfo.pictures?.forEach((pic) => {
+        pic.uri = checklistImagesDownloadUrl?.[pic.uri] ?? pic.uri;
+      });
+    });
+
     const blob = await pdf(
       <ChecklistPdf
         userInfo={user?.userAccount}
@@ -373,7 +397,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
         selectedChecklist={selectedChecklist}
-        sortedChecklistComponents={sortedChecklistComponents}
+        sortedChecklistComponents={sortedChecklistComponentsCloned}
         signaturePath={signatureImageUrl}
         technicianName={technicianName}
         headerPath={headerUrl[headerInfo?.path]}
@@ -803,6 +827,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     } else if (invoice.status === InvoiceStatus.NOT_PAID) {
       items.push({
         label: t('Resend'),
+
         icon: <ReplayIcon />,
         onClick: () => {
           handleOpenSendInvoiceModal();
@@ -1351,7 +1376,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           ...item,
           showBorder: actions[actions.length - 1] !== item,
         }))}
-        isValid
+        isValid={!isChecklistImageLoading}
       />
 
       <SendEmailDialog
