@@ -23,7 +23,7 @@ export const ImagePicker = ({onChange}: Props) => {
         sx={{display: 'none'}}
         inputProps={{
           ref: hiddenInputRef,
-          accept: 'image/*',
+          accept: 'image/*,image/heic,image/heif',
           onChange,
           multiple: true,
         }}

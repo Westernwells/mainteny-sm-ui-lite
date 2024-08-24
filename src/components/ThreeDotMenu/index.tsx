@@ -18,6 +18,7 @@ interface Action {
   label: string;
   icon: JSX.Element;
   onClick: () => void;
+  disabled?: boolean;
 }
 
 interface Props {
@@ -85,6 +86,7 @@ export const ThreeDotMenu = ({
                 item.onClick();
                 handleClose();
               }}
+              disabled={item.disabled}
               sx={{py: '0.7rem'}}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText>

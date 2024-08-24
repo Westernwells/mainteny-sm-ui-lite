@@ -79,6 +79,7 @@ import {
 // eslint-disable-next-line import/no-unresolved
 import {SwissQRBill} from 'swissqrbill/svg';
 import {QueryObserverResult} from 'react-query';
+import _ from 'lodash';
 
 interface Props {
   invoice: InvoiceView;
@@ -305,7 +306,21 @@ export const Actions = ({
       (a, b) =>
         (a.additionalInfo?.orderNumber ?? 0) -
         (b.additionalInfo?.orderNumber ?? 0),
-    );
+    ) ?? [];
+
+  const checklistImagesPath = useMemo(
+    () =>
+      (
+        sortedChecklistComponents.map(
+          (component) =>
+            component.additionalInfo.pictures?.map((pic) => pic.uri) ?? [],
+        ) ?? []
+      ).flat(),
+    [sortedChecklistComponents],
+  );
+
+  const {data: checklistImagesDownloadUrl, isLoading: isChecklistImageLoading} =
+    useDownloadUrl(checklistImagesPath);
 
   const signaturePath =
     signatureDownloadUrls[
@@ -322,6 +337,16 @@ export const Actions = ({
   );
 
   const generateChecklistBlob = async () => {
+    const sortedChecklistComponentsCloned = _.cloneDeep(
+      sortedChecklistComponents ?? [],
+    );
+
+    sortedChecklistComponentsCloned.forEach((component) => {
+      component.additionalInfo.pictures?.forEach((pic) => {
+        pic.uri = checklistImagesDownloadUrl?.[pic.uri] ?? pic.uri;
+      });
+    });
+
     const blob = await pdf(
       <ChecklistPdf
         userInfo={user?.userAccount}
@@ -329,7 +354,7 @@ export const Actions = ({
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
         selectedChecklist={selectedChecklist}
-        sortedChecklistComponents={sortedChecklistComponents}
+        sortedChecklistComponents={sortedChecklistComponentsCloned}
         signaturePath={signatureImageUrl}
         technicianName={technicianName}
         headerPath={headerUrl[headerInfo?.path]}
@@ -787,6 +812,7 @@ export const Actions = ({
         <Tooltip title={t('Send')} placement="left" arrow>
           <span>
             <IconButton
+              disabled={isChecklistImageLoading}
               onClick={handleOpenSendInvoiceModal}
               sx={{color: 'action.active'}}>
               <SendIcon fontSize="small" />

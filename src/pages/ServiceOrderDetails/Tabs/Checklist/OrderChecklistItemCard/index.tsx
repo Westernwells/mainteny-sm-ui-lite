@@ -97,6 +97,8 @@ export const OrderChecklistItemCard = ({
                 onClick: () => {
                   onEdit(data);
                 },
+                disabled:
+                  data.additionalInfo.status === ChecklistStatus.COMPLETED,
                 icon: <Edit />,
               },
               {
