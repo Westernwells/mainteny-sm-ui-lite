@@ -2704,5 +2704,11 @@
   "Select opening hours end.": "Izaberite kraj radnog vremena.",
   "Select opening hours start.": "Izaberite početak radnog vremena.",
   "Show rows per page": "Prikaži redove po stranici",
-  "Closing time must be later than opening time.": "Vreme zatvaranja mora biti kasnije od vremena otvaranja."
+  "Closing time must be later than opening time.": "Vreme zatvaranja mora biti kasnije od vremena otvaranja.",
+  "Invoice number \"{{invoiceNumber}}\" is already taken. Invoice PDF is regenerated. Try sending again.": "Broj fakture „{{invoiceNumber}}“ je već dodeljen. PDF faktura će biti ponovo kreiran. Pokušajte ponovo.",
+  "Article is not in the inventory": "Artikl nije u inventaru",
+  "Sorry!": "Izvinite",
+  "We will fix this shortly": "Uskoro ćemo ovo popraviti",
+  "Home": "Dom",
+  "Uh-oh! This must be an error from our side": "Uh-oh! Ovo mora da je greška sa naše strane"
 }
