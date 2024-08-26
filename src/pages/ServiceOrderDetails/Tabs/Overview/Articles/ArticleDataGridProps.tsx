@@ -115,7 +115,7 @@ export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
   articles?.map((item, index) => ({
     id: index,
     no: index + 1,
-    number: item.article.externalId,
+    number: item.article?.externalId,
     name: item.name,
     unit: item.article.unit,
     total: formatCurrency(
