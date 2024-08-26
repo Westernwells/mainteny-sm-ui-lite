@@ -87,6 +87,7 @@ import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
+import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
 
@@ -120,7 +121,6 @@ export const DraftQuotation = ({
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {search} = useLocation();
-
   const [paymentTermToEdit, setPaymentTermToEdit] = useState<
     ContractTermView | undefined
   >(undefined);
@@ -143,7 +143,9 @@ export const DraftQuotation = ({
   const {company} = useContext(UserCompanyContext);
   const companyLanguage =
     companyLanguageContextMap[company?.language || Language.EN_US];
-
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguage,
+  } as CustomTranslationOptions);
   const {data: elevator, isLoading: isLoadingElevator} =
     typeof elevatorId === 'string'
       ? useElevatorById(elevatorId)
@@ -284,7 +286,6 @@ export const DraftQuotation = ({
         quotationId: quotation.id,
       });
     }
-
     return createNewQuotation({
       data: formatQuotationRecord({...values}) as CreateQuotation,
     });
@@ -989,6 +990,7 @@ export const DraftQuotation = ({
                     modalHeader="Edit Billing Address"
                     addressType="billingAddress"
                     formik={formik}
+                    translate={translateCompanyLanguage}
                   />
                 </Grid>
                 <Grid item xs={6} pl={2}>
@@ -1004,6 +1006,7 @@ export const DraftQuotation = ({
                     modalHeader="Edit Beneficiary Address"
                     addressType="beneficiaryAddress"
                     formik={formik}
+                    translate={translateCompanyLanguage}
                   />
                 </Grid>
 
@@ -1043,6 +1046,7 @@ export const DraftQuotation = ({
                     modalHeader="Edit Alternative Address"
                     addressType="alternativeAddress"
                     formik={formik}
+                    translate={translateCompanyLanguage}
                   />
                 </Grid>
               </>

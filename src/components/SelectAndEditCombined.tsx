@@ -9,6 +9,7 @@ import {InvoiceFormData} from 'models/invoice';
 import {EditCustomerForm} from 'pages/InvoiceDetails/EditCustomerForm';
 import {AddressRecord} from 'models/misc';
 import {formatAddressFullname} from 'utils/utils';
+import {TFunction} from 'i18next';
 import AddIcon from '@mui/icons-material/Add';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
@@ -28,6 +29,7 @@ interface Props {
   formik: FormikProps<InvoiceFormData>;
   address?: AddressRecord;
   customerName?: string;
+  translate?: TFunction<'translation', 'translation'>;
 }
 
 export const SelectAndEditCombined = ({
@@ -42,6 +44,7 @@ export const SelectAndEditCombined = ({
   formik,
   address,
   customerName,
+  translate,
 }: Props) => {
   const {t} = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,8 +68,21 @@ export const SelectAndEditCombined = ({
       ...formik.values,
       [addressType]: {
         ...formik.values[addressType],
-        fullName: formatAddressFullname(formik.values?.[addressType] ?? null)
-          ?.fullName,
+        component: {
+          ...formik.values[addressType]?.component,
+          country: formik.values[addressType]?.component?.country
+            ? translate
+              ? translate(
+                  formik.values[addressType]?.component
+                    ?.country as unknown as string,
+                )
+              : formik.values[addressType]?.component?.country
+            : '',
+        },
+        fullName: formatAddressFullname(
+          formik.values?.[addressType] ?? null,
+          translate,
+        )?.fullName,
       },
     });
     setIsModalOpen(false);
@@ -119,7 +135,7 @@ export const SelectAndEditCombined = ({
                   {address.component?.name ?? ''}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {formatAddressFullname(address)?.fullName}
+                  {formatAddressFullname(address, translate)?.fullName}
                 </Typography>
               </>
             ) : null

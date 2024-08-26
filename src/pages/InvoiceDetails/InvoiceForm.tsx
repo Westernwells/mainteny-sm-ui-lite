@@ -116,6 +116,7 @@ import queryString from 'query-string';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
+import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 
 interface Props {
   invoice?: InvoiceView;
@@ -246,7 +247,9 @@ export const InvoiceForm = ({
   const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
   const {user} = useUserSession();
   const {enqueueSnackbar} = useSnackbar();
-
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
   const {
     data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
     isLoading: isLoadingCreditNoteArticles,
@@ -1492,6 +1495,7 @@ export const InvoiceForm = ({
                     addressType="billingAddress"
                     formik={formik}
                     customerName={customer?.name}
+                    translate={translateCompanyLanguage}
                   />
                 </Grid>
                 <Grid item xs={6} pl={2}>
@@ -1514,6 +1518,7 @@ export const InvoiceForm = ({
                     addressType="beneficiaryAddress"
                     formik={formik}
                     customerName={customer?.name}
+                    translate={translateCompanyLanguage}
                   />
                 </Grid>
 
@@ -1565,6 +1570,7 @@ export const InvoiceForm = ({
                     addressType="alternativeAddress"
                     formik={formik}
                     customerName={customer?.name}
+                    translate={translateCompanyLanguage}
                   />
                 </Grid>
               </>
