@@ -80,6 +80,9 @@ const GeneralInfo = ({company}: Props) => {
       {
         body: {
           ...data,
+          accountSystem: data.accountSystem
+            ? data.accountSystem
+            : AccountSystems.Empty,
           fiscalYearStart: data.fiscalYearStart
             ? toRestDate(new Date(data.fiscalYearStart))
             : data.fiscalYearStart,
