@@ -1856,7 +1856,7 @@ export const InvoiceForm = ({
             {/* DELIVERY DATE */}
             <Box width="100%">
               <Typography variant="body2" color="grey.700" pb={1.5}>
-                {T('Service Deliver Date')}
+                {T('Delivery date')}
               </Typography>
               <Box display="flex" justifyContent="space-between" gap={1}>
                 <DatePicker

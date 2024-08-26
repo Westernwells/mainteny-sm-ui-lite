@@ -1,4 +1,5 @@
-import React, {ChangeEvent} from 'react';
+import {ChangeEvent} from 'react';
+import {t} from 'i18next';
 import FormControlLabel, {
   FormControlLabelProps,
 } from '@mui/material/FormControlLabel';
@@ -36,7 +37,7 @@ export const FormCheckbox = ({
         name={name}
       />
     }
-    label={label}
+    label={typeof label === 'string' ? t(label) : label}
     componentsProps={{
       typography: {
         ...typographyProps,
