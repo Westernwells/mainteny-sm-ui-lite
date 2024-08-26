@@ -10,6 +10,7 @@ import {formatAddressFullname} from 'utils/utils';
 import {QuotationFormData} from 'models/quotation';
 import {EditCustomerForm} from 'pages/QuotationDetails/EditCustomerForm';
 import AddIcon from '@mui/icons-material/Add';
+import {TFunction} from 'i18next';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
 import {SelectButton} from './SelectButton';
@@ -27,6 +28,7 @@ interface Props {
   addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
   formik: FormikProps<QuotationFormData>;
   address?: AddressRecord;
+  translate?: TFunction<'translation', 'translation'>;
 }
 
 export const QuotationSelectAndEditCombined = ({
@@ -40,6 +42,7 @@ export const QuotationSelectAndEditCombined = ({
   addressType,
   formik,
   address,
+  translate,
 }: Props) => {
   const {t} = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,8 +66,21 @@ export const QuotationSelectAndEditCombined = ({
       ...formik.values,
       [addressType]: {
         ...formik.values[addressType],
-        fullName: formatAddressFullname(formik.values?.[addressType] ?? null)
-          ?.fullName,
+        component: {
+          ...formik.values[addressType]?.component,
+          country: formik.values[addressType]?.component?.country
+            ? translate
+              ? translate(
+                  formik.values[addressType]?.component
+                    ?.country as unknown as string,
+                )
+              : formik.values[addressType]?.component?.country
+            : '',
+        },
+        fullName: formatAddressFullname(
+          formik.values?.[addressType] ?? null,
+          translate,
+        )?.fullName,
       },
     });
     setIsModalOpen(false);
@@ -117,7 +133,7 @@ export const QuotationSelectAndEditCombined = ({
                   {address.component?.name ?? ''}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {formatAddressFullname(address)?.fullName}
+                  {formatAddressFullname(address, translate)?.fullName}
                 </Typography>
               </>
             ) : null

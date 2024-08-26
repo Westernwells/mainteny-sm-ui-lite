@@ -5,16 +5,18 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import {ReactComponent as MapsPinIcon} from 'assets/icons/MapsPinIcon.svg';
 import {ElevatorView} from 'models/elevator';
 import Grid from '@mui/material/Grid';
-import {useRef, useState} from 'react';
+import {useContext, useRef, useState} from 'react';
 import {InfoCard} from 'components/InfoCard';
 import {useFormik} from 'formik';
 import {Dialog} from 'components/Dialog';
 import * as Yup from 'yup';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {LocationFormModel} from 'models/unitForm';
-import {formatAddressFullname} from 'utils/utils';
-import {AddressRecord} from 'models/misc';
+import {UserCompanyContext} from 'context/UserCompanyProvider';
+import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
+import {AddressRecord, Language} from 'models/misc';
 import {centsToMoney, moneyToCents, useCurrentCurrency} from 'utils/currency';
+import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {LocationSchema} from './LocationSchema';
 import {EditLocationForm} from './EditLocationForm';
 
@@ -49,6 +51,12 @@ export const Location = ({
   propertyOwnerId = '',
 }: Props) => {
   const {t} = useTranslation();
+  const {company} = useContext(UserCompanyContext);
+  const language =
+    companyLanguageContextMap[company?.language || Language.EN_US];
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: language,
+  } as CustomTranslationOptions);
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
 
@@ -95,9 +103,10 @@ export const Location = ({
     await updateElevator({
       body: {
         propertyOwnerId: formik.values.propertyOwnerId,
-        address: formatAddressFullname(formik.values.address) as
-          | AddressRecord
-          | undefined,
+        address: formatAddressFullname(
+          formik.values.address,
+          translateCompanyLanguage,
+        ) as AddressRecord | undefined,
         buildingLocation: formik.values.building || '',
         propertySegment: formik.values.propertySegment!,
         keyLocation: formik.values.keyLocation!,

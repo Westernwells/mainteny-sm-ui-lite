@@ -7,6 +7,7 @@ import {
   LocationOnOutlined,
   PhoneOutlined,
 } from '@mui/icons-material';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {Dialog} from 'components/Dialog';
 import {Card} from 'components/Card';
 import {CardDataListItem} from 'components/CardDataListItem';
@@ -17,9 +18,13 @@ import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {formatAddressFullname} from 'utils/utils';
+import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
 import {BasicInformationCompanyFormModel} from './model';
 import {EditBasicInformation} from './EditBasicInformation';
+
+export type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
 
 interface Props {
   company: ServiceCompanyItem;
@@ -34,6 +39,10 @@ const validationSchema = Yup.object().shape({
 });
 
 export const BasicInformation = ({company}: Props) => {
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
   const [openDialog, setOpenDialog] = useState(false);
 
   const {mutateAsync: updateCompany, isLoading: isUpdating} = useUpdateCompany(
@@ -92,20 +101,51 @@ export const BasicInformation = ({company}: Props) => {
         },
         billingAddress: {
           ...formik.values.billingAddress,
+          component: {
+            ...formik.values.billingAddress?.component,
+            country: formik.values.billingAddress?.component?.country
+              ? translateCompanyLanguage(
+                  formik.values.billingAddress?.component?.country,
+                )
+              : '',
+          },
           fullName:
-            formatAddressFullname(formik.values?.billingAddress)?.fullName ||
-            '',
+            formatAddressFullname(
+              formik.values?.billingAddress,
+              translateCompanyLanguage,
+            )?.fullName || '',
         },
         businessAddress: {
           ...formik.values.businessAddress,
+          component: {
+            ...formik.values.businessAddress?.component,
+            country: formik.values.businessAddress?.component?.country
+              ? translateCompanyLanguage(
+                  formik.values.businessAddress?.component?.country,
+                )
+              : '',
+          },
           fullName:
-            formatAddressFullname(formik.values?.businessAddress)?.fullName ||
-            '',
+            formatAddressFullname(
+              formik.values?.businessAddress,
+              translateCompanyLanguage,
+            )?.fullName || '',
         },
         postalAddress: {
           ...formik.values.postalAddress,
+          component: {
+            ...formik.values.postalAddress?.component,
+            country: formik.values.postalAddress?.component?.country
+              ? translateCompanyLanguage(
+                  formik.values.postalAddress?.component?.country,
+                )
+              : '',
+          },
           fullName:
-            formatAddressFullname(formik.values?.postalAddress)?.fullName || '',
+            formatAddressFullname(
+              formik.values?.postalAddress,
+              translateCompanyLanguage,
+            )?.fullName || '',
         },
       },
       companyId: company?.id || '',
