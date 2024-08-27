@@ -245,39 +245,43 @@ export const createQrData = (
   invoice?: InvoiceView,
   currentCurrency?: CurrencyModalType,
   userInfo?: UserAccount,
-) => ({
-  currency: qrCurrency,
-  amount: centsToMoney(
-    currentCurrency?.code!,
-    invoice?.totalAmount.grossAmount ?? 0,
-  ),
-  creditor: {
-    name: userInfo?.serviceCompany.name || '',
-    address: userInfo?.serviceCompany.billingAddress?.component?.street || '',
-    buildingNumber:
-      userInfo?.serviceCompany.billingAddress?.component?.street2 || '',
-    city: userInfo?.serviceCompany.billingAddress?.component?.city || '',
-    country:
-      getCountryCode(
-        userInfo?.serviceCompany.billingAddress?.component?.country!,
-      ) || 'CH',
-    zip: userInfo?.serviceCompany.billingAddress?.component?.postalCode || '',
-    account: userInfo?.serviceCompany?.settings?.paymentInfo.iban || '',
-  },
-  debtor: {
-    name:
-      invoice?.additionalInfo?.billingAddress?.component?.name ||
-      invoice?.propertyOwner?.name ||
-      '',
-    address: invoice?.additionalInfo?.billingAddress?.component?.street || '',
-    buildingNumber:
-      invoice?.additionalInfo?.billingAddress?.component?.street2 || '',
-    city: invoice?.additionalInfo?.billingAddress?.component?.city || '',
-    country:
-      getCountryCode(
-        invoice?.additionalInfo?.billingAddress?.component?.country!,
-      ) || 'CH',
-    zip: invoice?.additionalInfo?.billingAddress?.component?.postalCode || '',
-  },
-  unstructuredMessage: invoice?.externalId || '',
-});
+) => {
+  const serviceCompany = userInfo?.serviceCompany;
+  const billingAddress = serviceCompany?.billingAddress?.component || {};
+  const paymentInfo = serviceCompany?.settings?.paymentInfo?.iban
+    ? serviceCompany?.settings.paymentInfo
+    : serviceCompany?.settings.paymentInfo2;
+
+  const debtorBillingAddress =
+    invoice?.additionalInfo?.billingAddress?.component || {};
+  const debtorName =
+    invoice?.additionalInfo?.billingAddress?.component?.name ||
+    invoice?.propertyOwner?.name ||
+    '';
+
+  return {
+    currency: qrCurrency,
+    amount: centsToMoney(
+      currentCurrency?.code!,
+      invoice?.totalAmount.grossAmount ?? 0,
+    ),
+    creditor: {
+      name: serviceCompany?.name || '',
+      address: billingAddress.street || '',
+      buildingNumber: billingAddress.street2 || '',
+      city: billingAddress.city || '',
+      country: getCountryCode(billingAddress.country!) || 'CH',
+      zip: billingAddress.postalCode || '',
+      account: paymentInfo?.iban || '',
+    },
+    debtor: {
+      name: debtorName,
+      address: debtorBillingAddress.street || '',
+      buildingNumber: debtorBillingAddress.street2 || '',
+      city: debtorBillingAddress.city || '',
+      country: getCountryCode(debtorBillingAddress.country!) || 'CH',
+      zip: debtorBillingAddress.postalCode || '',
+    },
+    unstructuredMessage: invoice?.externalId || '',
+  };
+};
