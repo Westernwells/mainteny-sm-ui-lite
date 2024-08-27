@@ -32,15 +32,15 @@ import {Confirm} from 'components/Confirm';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {
   componentsToMutate,
-  parsElevatorRecourses,
   mergeElevators,
+  parsElevatorRecourses,
 } from 'utils/contract';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {Dialog} from 'components/Dialog';
 import {ArticleType, CostPackage} from 'models/article';
 import {useUuid} from 'hooks/reactQuery/useUuid';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {useContractElevators} from 'hooks/reactQuery/useContacts';
 import {useQueryState} from 'hooks/useQueryState';

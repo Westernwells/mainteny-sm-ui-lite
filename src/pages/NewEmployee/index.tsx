@@ -17,7 +17,7 @@ import {
 import {getRoles} from 'utils/work-hours-utils';
 import {Role, UserView} from 'models/user';
 import {ServiceOrderType} from 'models/service-order';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {EmployeeAccountData} from './model';
 import {AdditionalInformationEmployeeForm} from './AdditionalInformationEmployeeForm';
 import {BasicEmployeeForm} from './BasicEmployeeForm';

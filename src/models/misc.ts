@@ -3,10 +3,11 @@ import {MouseEvent, ReactNode} from 'react';
 import {UseMutationResult} from 'react-query';
 import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
-import {ContractTypes, ContractNameTypes} from './contract';
+import {ContractNameTypes, ContractTypes} from './contract';
 import {AccountSystems, MinToStep} from './service-company';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {CompanyStatus} from './company';
+import {Page} from './pagination';
 
 export interface RestError {
   errorCode: number;
@@ -78,11 +79,6 @@ export interface Settings {
   fiscalYearStart?: string;
 }
 
-export interface Page {
-  pageIndex: number;
-  pageSize: number;
-}
-
 export interface Resource<T> {
   data: T[];
   total: number;
@@ -128,18 +124,8 @@ export interface StringMap<T> {
   [key: string]: T;
 }
 
-export interface HistoryState {
-  search: string;
-  page: Page;
-}
-
 export interface StringValue {
   value: string;
-}
-
-export interface IdValue<T> {
-  id: string;
-  value: T;
 }
 
 export enum TimeWindowType {
@@ -154,29 +140,6 @@ export interface TimeWindowRecord {
   type: TimeWindowType;
 }
 
-export interface KeyValue<T> {
-  key: string;
-  value: T;
-}
-
-export interface Rect {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-}
-
-export enum ValueType {
-  ELEVATOR_TYPE = 'ELEVATOR_TYPE',
-  ELEVATOR_CAPACITY = 'ELEVATOR_CAPACITY',
-  ELEVATOR_MODEL = 'ELEVATOR_MODEL',
-}
-
-export enum SaveMode {
-  NEW,
-  EDIT,
-}
-
 export enum Order {
   ASC = 'ASC',
   DESC = 'DESC',
@@ -185,17 +148,6 @@ export enum Order {
 export interface OrderByParams<T> {
   orderByField: T;
   sortOrder: Order;
-}
-
-export enum TechnicianEventType {
-  SICK_LEAVE = 'SICK_LEAVE',
-  HOLIDAY = 'HOLIDAY',
-  WORK = 'WORK',
-}
-
-export enum ContextActionMenu {
-  EDIT,
-  DELETE,
 }
 
 export enum JobStatus {

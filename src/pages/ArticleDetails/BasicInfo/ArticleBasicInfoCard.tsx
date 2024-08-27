@@ -28,7 +28,7 @@ import {
   makeAmountRecord,
 } from 'utils/currency';
 import {convertToText} from 'utils/utils';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import DOMPurify from 'dompurify';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 

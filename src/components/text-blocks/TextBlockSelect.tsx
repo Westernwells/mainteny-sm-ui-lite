@@ -4,7 +4,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {useTextBlocks} from 'hooks/reactQuery/useTextBlock';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {OrderByParams, Order} from 'models/misc';
+import {Order, OrderByParams} from 'models/misc';
 import {
   TextBlockCategory,
   TextBlockFormModel,
@@ -20,7 +20,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import {makePage, createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {mapJsonToTextBlockView} from 'utils/text-block';
 import {Widget} from 'components/Widget';
 import * as Yup from 'yup';

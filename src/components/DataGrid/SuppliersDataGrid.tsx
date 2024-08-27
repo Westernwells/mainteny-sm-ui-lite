@@ -7,7 +7,7 @@ import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
 import {ArticleSupplierView} from 'models/article';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
 

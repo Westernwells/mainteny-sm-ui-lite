@@ -2,7 +2,7 @@ import {Dispatch, FC, SetStateAction, useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 
 import {DataGridLayout} from 'components/DataGridLayout';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {EmptySection} from 'components/EmptySection';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {

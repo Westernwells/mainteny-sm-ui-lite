@@ -12,7 +12,7 @@ import {useTranslation} from 'react-i18next';
 import TotalTime from 'components/TotalTime';
 import {useWorkHours} from 'hooks/reactQuery/useWorkHours';
 import {WorkHoursItem} from 'models/workHours';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {calculateTotalTime} from 'utils/work-hours-utils';
 import {useWhen} from 'hooks/useWhen';
 import {columnsWidget, makeRows} from './WorkHoursDataGrid';

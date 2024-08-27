@@ -1,17 +1,15 @@
 import {useTranslation} from 'react-i18next';
-import {GridColDef, GridRowModel} from '@mui/x-data-grid';
+import {GridColDef} from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {TechnicianEventType} from 'models/misc';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import {ReactComponent as ThermometerIcon} from 'assets/icons/Thermometer.svg';
 import {ReactComponent as SunIcon} from 'assets/icons/Sun.svg';
 import {capitalize} from 'utils/utils';
 import React from 'react';
 import {getColumnProps} from 'components/DataGridLayout';
-import {UserView} from 'models/user';
-import {TechnicianEventPair} from 'models/technician';
 import {Actions} from './Actions';
+import {TechnicianEventType} from '../../models/technician';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -125,36 +123,3 @@ export const columns: GridColDef[] = [
     flex: 0,
   }),
 ];
-
-export const makeRows = (
-  employees: UserView[],
-  techniciansEvents: {[key: string]: TechnicianEventPair[]},
-): GridRowModel<{[key: string]: any}[]> =>
-  employees
-    ? employees.map((item: UserView, index: number) => {
-        const {workingHours, employeeId} = item.userData;
-        const shift =
-          workingHours && workingHours.length > 0
-            ? `${workingHours[0].fromTime} - ${workingHours[0].toTime}`
-            : '-';
-        const events = techniciansEvents[employeeId];
-        const event =
-          events && events.length > 0
-            ? events[0].eventViews[0].eventType
-            : 'Available';
-        return {
-          id: index,
-          name: `${item.userAccount.firstName} ${item.userAccount.lastName}`,
-          role: item.userAccount.roles,
-          address: item.userData.address?.fullName || '-',
-          phone: item.userAccount.contact.phone,
-          shift,
-          availability: event,
-          navigateTo: `details/${item.id}`,
-          actions: {
-            email: item.userAccount.contact.email,
-            id: item.userData.employeeId,
-          },
-        };
-      })
-    : [];

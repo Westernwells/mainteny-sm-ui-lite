@@ -22,7 +22,7 @@ import {
 } from 'hooks/reactQuery/useArticle';
 import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const isExternalIdUnique = async (

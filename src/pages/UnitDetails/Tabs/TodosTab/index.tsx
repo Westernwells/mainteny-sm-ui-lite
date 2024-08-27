@@ -6,7 +6,7 @@ import {InfoCard} from 'components/InfoCard';
 import {Progress} from 'components/Progress';
 import {useTodos} from 'hooks/reactQuery/useElevator';
 import {ElevatorComment} from 'models/elevator';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {NewTodoForm} from './NewTodoForm';
 import {TodoCard} from './TodoCard';
 

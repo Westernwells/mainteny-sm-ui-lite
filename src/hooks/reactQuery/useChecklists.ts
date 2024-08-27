@@ -7,7 +7,7 @@ import {
 import {queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {Page, Resource, RestError, StringValue} from 'models/misc';
+import {Resource, RestError, StringValue} from 'models/misc';
 import {
   CheckList,
   CreateCheckListRecord,
@@ -16,6 +16,7 @@ import {
 } from 'models/checklist';
 import {CheckListAnswerRecord} from 'models/service-order';
 import {useUserSession} from './useUserSession';
+import {Page} from '../../models/pagination';
 
 export const queryChecklists = async (
   serviceCompanyId: string,

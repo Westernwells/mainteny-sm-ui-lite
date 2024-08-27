@@ -2,7 +2,7 @@ import {Box, InputAdornment} from '@mui/material';
 import {FormInput} from 'components/form/FormInput';
 import {Search} from '@mui/icons-material';
 import {useQueryChecklists} from 'hooks/reactQuery/useChecklists';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {ChangeEvent, useCallback, useEffect, useMemo, useState} from 'react';
 import {CheckList, ServiceOrderCheckListView} from 'models/checklist';
 import {Resource} from 'models/misc';

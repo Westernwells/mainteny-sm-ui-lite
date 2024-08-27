@@ -4,7 +4,7 @@ import Box from '@mui/system/Box';
 import {DatePicker} from 'components/DatePicker';
 import useSupercluster from 'use-supercluster';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {getCenter} from 'geolib';
 import Supercluster from 'supercluster';

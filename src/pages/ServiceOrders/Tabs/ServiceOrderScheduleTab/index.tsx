@@ -4,13 +4,13 @@ import {
   useQueryServiceOrderScheduled,
   useServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {toRestDateTime} from 'utils/datetime';
 import {
+  ServiceOrderOrderField,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
-  ServiceOrderOrderField,
 } from 'models/service-order';
 import {Order} from 'models/misc';
 import {Schedule} from 'components/Schedules';
@@ -30,12 +30,12 @@ import {EmployeesView} from 'models/employee';
 import {ServiceOrderStatusIndicator} from 'components/ServiceOrderStatusIndicator';
 import {Widget} from 'components/Widget';
 import {
-  sortOrderByTime,
-  getServiceOrderStatusList,
   getSelectedOrderStatuses,
-  serviceOrderTypeToString,
-  serviceOrderTypeToEnum,
+  getServiceOrderStatusList,
   serviceOrderStatusToString,
+  serviceOrderTypeToEnum,
+  serviceOrderTypeToString,
+  sortOrderByTime,
 } from 'utils/service-order-utils';
 import Typography from '@mui/material/Typography';
 import {useWhen} from 'hooks/useWhen';

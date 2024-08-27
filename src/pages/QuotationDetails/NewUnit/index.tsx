@@ -9,22 +9,22 @@ import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {Priority} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {useAddElevator, useAllElevators} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {t} from 'i18next';
 import {ElevatorStatus, ElevatorView} from 'models/elevator';
 import {AddressRecord} from 'models/misc';
 import {
-  LocationFormModel,
-  UnitDetailsFormModel,
-  ServiceFormModel,
   AppointmentFormModel,
   AttachmentFormModel,
+  LocationFormModel,
   PriorityTechnicianFormModel,
+  ServiceFormModel,
+  UnitDetailsFormModel,
 } from 'models/unitForm';
 import {mapDaysOfWeekOptions} from 'pages/UnitDetails/Tabs/OverviewTab/AppointmentPreference/EditAppointmentForm';
-import {formatAddressFullname, convertToMacro} from 'utils/utils';
+import {convertToMacro, formatAddressFullname} from 'utils/utils';
 import {QuotationView} from 'models/quotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {convertTechnicianArrayToWeights} from 'utils/elevator-utils';

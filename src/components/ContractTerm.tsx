@@ -11,7 +11,7 @@ import Add from '@mui/icons-material/Add';
 import Close from '@mui/icons-material/Close';
 import {Button} from 'components/Button';
 import {useContractTerms} from 'hooks/reactQuery/useCompanies';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Order} from 'models/misc';
 import {useQueryContract} from 'hooks/reactQuery/useContract';

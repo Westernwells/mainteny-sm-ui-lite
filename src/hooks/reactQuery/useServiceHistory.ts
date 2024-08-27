@@ -2,7 +2,8 @@ import {useQuery} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {ElevatorMaintenanceHistoryView} from '../../models/elevator';
-import {Page, Resource} from '../../models/misc';
+import {Resource} from '../../models/misc';
+import {Page} from '../../models/pagination';
 
 export const fetchServiceHistory = async (elevatorId: string, page: Page) => {
   const response = await axiosClient.get<

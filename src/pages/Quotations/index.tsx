@@ -11,7 +11,7 @@ import {
   QuotationStatusView,
   QuotationView,
 } from 'models/quotation';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {Progress} from 'components/Progress';

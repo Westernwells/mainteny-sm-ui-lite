@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import i18n from 'i18n';
 import {useQueryClient} from 'react-query';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import {axiosClient} from 'utils/axios-utils';
@@ -18,19 +17,9 @@ interface Props {
   children: React.ReactNode;
 }
 
-const useStyles = makeStyles({
-  leftBackground: {
-    background: '#000034',
-  },
-  leftContentText: {
-    color: '#fff',
-  },
-});
-
 export const AuthLayout = ({children}: Props) => {
   const themeX = useTheme();
   const {t} = useTranslation();
-  const classes = useStyles();
   const queryClient = useQueryClient();
   const [selectedLng, setSelectedLng] = useState('');
   useEffect(() => {
@@ -47,7 +36,9 @@ export const AuthLayout = ({children}: Props) => {
   return (
     <Box display="flex" minHeight="100vh" sx={{backgroundColor: '#fff'}}>
       <Box
-        className={classes.leftBackground}
+        sx={{
+          background: '#000034',
+        }}
         width="38vw"
         minHeight="100%"
         position="relative"

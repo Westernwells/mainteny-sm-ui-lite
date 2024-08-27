@@ -16,7 +16,7 @@ import {
 import {DataGridLayout} from 'components/DataGridLayout';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {useCallback, useEffect, useState} from 'react';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {getDataGridHeight} from 'utils/utils';
 import {Confirm} from 'components/Confirm';
 import {EmptySection} from 'components/EmptySection';

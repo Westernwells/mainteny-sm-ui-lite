@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import {useNavigate} from 'react-router-dom';
 import {CheckList, CheckListComponentType} from 'models/checklist';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useQueryChecklists} from 'hooks/reactQuery/useChecklists';
 import {Progress} from 'components/Progress';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';

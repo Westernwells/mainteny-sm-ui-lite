@@ -14,7 +14,7 @@ import {
   usePropertyOwnerContacts,
   useUpdatePropertyContactPerson,
 } from 'hooks/reactQuery/useContacts';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {useTranslation} from 'react-i18next';
 import {getDataGridHeight} from 'utils/utils';
 import {GridRowsProp} from '@mui/x-data-grid';

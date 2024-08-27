@@ -6,7 +6,7 @@ import {GridRowsProp} from '@mui/x-data-grid';
 import {useUseQueryCustomerContracts} from 'hooks/reactQuery/useContract';
 import {ContractOrderField, ContractView} from 'models/contract';
 import {Order} from 'models/misc';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';

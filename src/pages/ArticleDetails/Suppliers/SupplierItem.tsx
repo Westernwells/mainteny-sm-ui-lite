@@ -7,7 +7,7 @@ import {ArticleSupplierView, ExtendedSupplierRecord} from 'models/article';
 import {FormInput} from 'components/form/FormInput';
 import {FormRadio} from 'components/form/FormRadio';
 import {ComboBox} from 'components/ComboBox';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
 import {Button} from 'components/Button';
 

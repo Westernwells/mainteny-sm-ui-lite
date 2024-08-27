@@ -6,9 +6,9 @@ import {
   useEmployeeAccount,
   useQueryUserAccounts,
 } from 'hooks/reactQuery/useUserAccount';
-import {UserView, Role} from 'models/user';
+import {Role, UserView} from 'models/user';
 import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {getRoles} from 'utils/work-hours-utils';
 import {EmployeeAccountData} from './EditEmployeeForm/model';
 import {EditEmployeeForm} from './EditEmployeeForm';

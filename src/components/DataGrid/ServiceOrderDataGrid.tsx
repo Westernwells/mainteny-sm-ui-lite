@@ -9,7 +9,7 @@ import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {StatusChip} from 'components/StatusChip';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderOrderField, ServiceOrderView} from 'models/service-order';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
