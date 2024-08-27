@@ -9,7 +9,7 @@ import {
   ServiceOrderType,
   ServiceOrderView,
 } from 'models/service-order';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {EmptySection} from 'components/EmptySection';
 import {FilterFields} from 'components/FilterFields';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';

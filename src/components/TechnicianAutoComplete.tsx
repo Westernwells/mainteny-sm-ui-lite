@@ -3,7 +3,7 @@ import {TextFieldProps} from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {EmployeesSimpleView, EmployeesView} from 'models/employee';
 import {FormInput} from './form/FormInput';
 

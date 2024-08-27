@@ -9,7 +9,7 @@ import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {
   PropertyOwnerOrderField,
   PropertyOwnerView,

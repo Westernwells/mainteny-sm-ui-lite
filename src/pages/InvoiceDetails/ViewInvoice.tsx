@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
 import useTheme from '@mui/material/styles/useTheme';
 import Box from '@mui/material/Box';
@@ -30,9 +30,9 @@ import {
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {PdfGenerationStatus} from 'models/misc';
 import {
-  QRCurrencyCode,
   createQrData,
   formatGrossAmount,
+  QRCurrencyCode,
   useCurrentCurrency,
 } from 'utils/currency';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';

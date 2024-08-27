@@ -23,7 +23,7 @@ import {
   toDate,
   toRestDateTime,
 } from 'utils/datetime';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {olStyles} from 'styles';
 import {UserView} from 'models/user';
 import {AbsenceItem} from 'models/absence';

@@ -6,7 +6,7 @@ import Email from '@mui/icons-material/Email';
 import {useNavigate} from 'react-router-dom';
 import _ from 'lodash';
 import {ArticleSupplierView, SupplierOrderField} from 'models/article';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
 import {useQueryState} from 'hooks/useQueryState';
 import {Progress} from 'components/Progress';

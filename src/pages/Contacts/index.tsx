@@ -2,7 +2,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {
   ServiceCompanyContactPersonOrderField,
   ServiceCompanyContactPersonView,

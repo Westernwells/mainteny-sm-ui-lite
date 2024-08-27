@@ -29,6 +29,7 @@ interface Props {
   >;
   initialValues?: ServiceCompanyContactPeronFormModel;
 }
+
 const titles = Object.values(ContactTitle);
 const Form = ({form}: Props) => {
   const {t} = useTranslation();
@@ -107,14 +108,14 @@ const Form = ({form}: Props) => {
           }}
           renderOption={(props, option) => (
             <li
+              {...props}
               key={option.id}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 borderBottom: '1px solid #EDF1F7',
                 alignItems: 'flex-start',
-              }}
-              {...props}>
+              }}>
               <Typography>
                 {`${option.userAccount.firstName} ${option.userAccount.lastName}` ||
                   '-'}

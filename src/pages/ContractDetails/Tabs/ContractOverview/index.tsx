@@ -37,7 +37,7 @@ import {calculateRenewDays} from 'utils/contract';
 import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve-gray.svg';
 import {ReactComponent as TimeIcon} from 'assets/icons/time.svg';
 import {Order} from 'models/misc';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';

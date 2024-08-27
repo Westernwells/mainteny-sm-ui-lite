@@ -3,24 +3,24 @@ import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
 import {isEqual} from 'lodash';
 import {
-  IconButton,
-  TableCell,
-  TableRow,
-  TextField,
-  InputAdornment,
   Box,
-  Popover,
-  Typography,
+  ClickAwayListener,
+  IconButton,
+  InputAdornment,
   Paper,
+  Popover,
   Popper,
   Table,
   TableBody,
-  TableContainer,
-  ClickAwayListener,
-  TableCellProps,
-  TableHead,
+  TableCell,
   tableCellClasses,
+  TableCellProps,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
@@ -39,7 +39,7 @@ import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
 import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
 import * as Yup from 'yup';
 import {useArticles} from 'hooks/reactQuery/useArticle';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import useHighlightText from 'hooks/useHighlightText';
 import {getArticleTypeText} from 'utils/article-utils';
 import {QuotationItemRecord} from 'models/quotation';

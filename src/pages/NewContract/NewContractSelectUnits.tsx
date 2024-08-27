@@ -11,7 +11,7 @@ import {
 import {Order, OrderByParams, Resource} from 'models/misc';
 import {DataGridElevatorView} from 'pages/Units/Models';
 import {FC, useCallback, useEffect, useRef, useState} from 'react';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import * as _ from 'lodash';
 import {FormikProps} from 'formik';
 import {useFormatDate} from 'hooks/useFormatDate';

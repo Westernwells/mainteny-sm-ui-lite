@@ -10,7 +10,7 @@ import {SearchInput} from 'components/SearchInput';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {useEffect, useRef, useState} from 'react';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {Progress} from 'components/Progress';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './UnitDataGridProps';

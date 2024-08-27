@@ -48,7 +48,7 @@ import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
 import {capitalize} from 'lodash';
 import {Order} from 'models/misc';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {ContractTerm} from 'components/ContractTerm';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractBasic} from './ContractBasic';

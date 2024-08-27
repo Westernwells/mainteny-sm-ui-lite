@@ -11,7 +11,7 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {useTranslation} from 'react-i18next';
 import TotalTime from 'components/TotalTime';
 import {useWorkHoursActivities} from 'hooks/reactQuery/useWorkHours';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {calculateTotalActivityTime} from 'utils/work-hours-utils';
 import {useWhen} from 'hooks/useWhen';
 import {UserActivityView} from 'models/user';

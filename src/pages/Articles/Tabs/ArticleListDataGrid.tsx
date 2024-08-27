@@ -1,10 +1,10 @@
 import {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {
+  GridCellParams,
   GridColDef,
   GridColumnHeaderParams,
   GridRowsProp,
-  GridCellParams,
 } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -15,7 +15,7 @@ import {useNavigate} from 'react-router-dom';
 import _ from 'lodash';
 import {ArticleOrderField, ArticleType, ArticleView} from 'models/article';
 import {formatCurrency} from 'utils/currency';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {Progress} from 'components/Progress';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';

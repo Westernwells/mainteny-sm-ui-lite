@@ -1,4 +1,4 @@
-import {MouseEvent, useState} from 'react';
+import {useState} from 'react';
 import PersonRemoveAlt1 from '@mui/icons-material/PersonRemoveAlt1';
 import {Confirm} from 'components/Confirm';
 import IconButton from '@mui/material/IconButton';
@@ -16,19 +16,22 @@ export const Actions = ({id, email}: Props) => {
     useDeleteEmployee('Employee removed successfully');
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
 
+  const handleOpenDeleteConfirm = () => {
+    setOpenDeleteConfirm(true);
+  };
+
   return (
     <>
       <Box sx={{display: 'flex'}}>
         <IconButton
           component="a"
-          onClick={(e: MouseEvent<HTMLAnchorElement>) => {
-            e.stopPropagation();
+          onClick={() => {
             window.open(`mailto:${email}`, '_blank');
           }}>
           <SendIcon fontSize="small" sx={{color: 'action.active'}} />
         </IconButton>
 
-        <IconButton component="a" onClick={() => setOpenDeleteConfirm(true)}>
+        <IconButton component="a" onClick={handleOpenDeleteConfirm}>
           <PersonRemoveAlt1 sx={{color: 'action.active'}} />
         </IconButton>
       </Box>

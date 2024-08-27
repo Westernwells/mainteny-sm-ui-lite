@@ -14,7 +14,7 @@ import {useContractTerms} from 'hooks/reactQuery/useCompanies';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {ContractTerm} from 'components/ContractTerm';
 import {ContractTermInput as NewContractName} from 'components/ContractTermInput';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 
 interface Props {
   formik: FormikProps<ContractBasicInfoFormModel | ContractUpdateRequest>;

@@ -24,10 +24,10 @@ import {
 } from 'hooks/reactQuery/useArticle';
 import {
   formatCurrency,
-  useCurrentCurrency,
   getCurrencySymbol,
+  useCurrentCurrency,
 } from 'utils/currency';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {LanguageContext} from 'context/LanguageProvider';
 import {calculateInvoiceTotal, calculateTotal} from 'utils/calculate-total';

@@ -12,7 +12,7 @@ import {InfoCard} from 'components/InfoCard';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {padNumber} from 'utils/utils';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {EmptySection} from 'components/EmptySection';
 import {SearchInput} from 'components/SearchInput';
 import {columns, makeRows} from './UnitsWidgetDataGridProps';

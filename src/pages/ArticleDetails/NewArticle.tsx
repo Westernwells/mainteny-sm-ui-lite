@@ -22,7 +22,7 @@ import {
   makeAmountRecord,
   useCurrentCurrency,
 } from 'utils/currency';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {getUniqueId} from 'utils/utils';
 import {SupplierItem} from './Suppliers/SupplierItem';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';

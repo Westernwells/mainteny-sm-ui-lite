@@ -14,7 +14,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import * as _ from 'lodash';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {useUpdateServiceOrderSchedule} from 'hooks/reactQuery/useServiceOrder';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {Switch} from 'components/Switch';
 import Box from '@mui/material/Box';
 import {TimePicker} from 'components/TimePicker';

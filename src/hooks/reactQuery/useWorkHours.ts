@@ -5,7 +5,8 @@ import {queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {toRestDateTime} from 'utils/datetime';
 import {UserActivityView} from 'models/user';
-import {Page, Resource, RestError} from '../../models/misc';
+import {Resource, RestError} from '../../models/misc';
+import {Page} from '../../models/pagination';
 
 export const getWorkHours = async (
   query: string,

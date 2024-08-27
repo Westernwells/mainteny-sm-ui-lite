@@ -13,7 +13,7 @@ import {
   PropertyOwnerView,
 } from 'models/propertyManager';
 import {Order} from 'models/misc';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';

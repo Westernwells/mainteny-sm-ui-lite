@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import * as _ from 'lodash';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {
   getDateObject,
   getEndOfWeek,

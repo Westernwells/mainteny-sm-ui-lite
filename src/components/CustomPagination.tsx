@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
 import {SelectChangeEvent} from '@mui/material/Select';
-import {makePage} from 'utils/paging-utils';
+import {makePage} from 'utils/paging';
 import {CustomSelect} from './CustomSelect';
 import LastSyncedItem from './LastSyncedItem';
 
