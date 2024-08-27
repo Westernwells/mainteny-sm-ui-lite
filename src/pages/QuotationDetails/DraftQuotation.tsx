@@ -543,6 +543,10 @@ export const DraftQuotation = ({
     [createdByName, createdByPhotoUrl],
   );
 
+  const handleDateFieldChange = (fieldName: string, newValue?: Date | null) => {
+    formik.setFieldValue(fieldName, newValue || undefined);
+  };
+
   const isValid = () => {
     const valid =
       formik.values.subject &&
@@ -1271,10 +1275,11 @@ export const DraftQuotation = ({
               <DatePicker
                 defaultDate={formik.values.sentDate}
                 getSelectedDate={(newValue) => {
-                  if (newValue) formik.setFieldValue('sentDate', newValue);
+                  handleDateFieldChange('sentDate', newValue);
                 }}
                 textFieldProps={{
                   label: 'Quotation Date',
+                  ...formik.getFieldProps('sentDate'),
                 }}
               />
               <DatePicker
@@ -1288,11 +1293,11 @@ export const DraftQuotation = ({
                 errorMessage={expiryDateError}
                 getSelectedDate={(newValue) => {
                   setExpiryDateError('');
-                  if (newValue) formik.setFieldValue('expiryDate', newValue);
+                  handleDateFieldChange('expiryDate', newValue);
                 }}
                 textFieldProps={{
                   label: 'Offer valid until',
-                  name: 'expiryDate',
+                  ...formik.getFieldProps('expiryDate'),
                 }}
               />
             </Box>

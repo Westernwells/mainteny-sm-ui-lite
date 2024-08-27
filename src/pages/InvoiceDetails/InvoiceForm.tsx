@@ -1190,6 +1190,10 @@ export const InvoiceForm = ({
     return items;
   }, [formik.values.dueDate]);
 
+  const handleDateFieldChange = (fieldName: string, newValue?: Date | null) => {
+    formik.setFieldValue(fieldName, newValue || undefined);
+  };
+
   const isValid = () => {
     const valid =
       formik.values.subject &&
@@ -1830,10 +1834,11 @@ export const InvoiceForm = ({
                     : undefined
                 }
                 getSelectedDate={(newValue) => {
-                  if (newValue) formik.setFieldValue('sentDate', newValue);
+                  handleDateFieldChange('sentDate', newValue);
                 }}
                 textFieldProps={{
                   label: 'Invoice Date',
+                  ...formik.getFieldProps('sentDate'),
                 }}
               />
               <DatePicker
@@ -1851,10 +1856,11 @@ export const InvoiceForm = ({
                 errorMessage={dueDateError}
                 getSelectedDate={(newValue) => {
                   setDueDateError('');
-                  if (newValue) formik.setFieldValue('dueDate', newValue);
+                  handleDateFieldChange('dueDate', newValue);
                 }}
                 textFieldProps={{
                   label: 'Payment Due Date',
+                  ...formik.getFieldProps('dueDate'),
                 }}
                 required
               />
@@ -1868,8 +1874,7 @@ export const InvoiceForm = ({
                 <DatePicker
                   defaultDate={formik.values.deliveryStartDate}
                   getSelectedDate={(newValue) => {
-                    if (newValue)
-                      formik.setFieldValue('deliveryStartDate', newValue);
+                    handleDateFieldChange('deliveryStartDate', newValue);
                   }}
                   textFieldProps={{
                     label: 'Start Date',
@@ -1890,11 +1895,11 @@ export const InvoiceForm = ({
                 <DatePicker
                   defaultDate={formik.values.deliveryEndDate}
                   getSelectedDate={(newValue) => {
-                    if (newValue)
-                      formik.setFieldValue('deliveryEndDate', newValue);
+                    handleDateFieldChange('deliveryEndDate', newValue);
                   }}
                   textFieldProps={{
                     label: 'End Date',
+                    ...formik.getFieldProps('deliveryEndDate'),
                     ...(serviceOrder &&
                       !formik.values.deliveryEndDate && {
                         placeholder: t('No End Date set'),
