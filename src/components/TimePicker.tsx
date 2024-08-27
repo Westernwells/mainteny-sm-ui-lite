@@ -50,8 +50,12 @@ export const TimePicker = ({
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClear = () => {
     setValue(resetValue || null);
+    setOpen(false);
+  };
+
+  const handleClose = () => {
     setOpen(false);
   };
 
@@ -202,7 +206,7 @@ export const TimePicker = ({
   const renderActionBar = () => (
     <CustomActionBar
       onAccept={handleConfirm}
-      onClear={handleClose}
+      onClear={handleClear}
       isDatePicker={false}
     />
   );
