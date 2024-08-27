@@ -2688,5 +2688,8 @@
   "We will fix this shortly": "Wir werden dies in Kürze beheben",
   "Home": "Home",
   "Uh-oh! This must be an error from our side": "Oh je! Das muss ein Fehler von unserer Seite sein.",
-  "{{startPageElementNumber}} - {{endPageElementNumber}} of {{totalEntries}} results": "{{startPageElementNumber}} - {{endPageElementNumber}} von {{totalEntries}} Ergebnissen"
+  "{{startPageElementNumber}} - {{endPageElementNumber}} of {{totalEntries}} results": "{{startPageElementNumber}} - {{endPageElementNumber}} von {{totalEntries}} Ergebnissen",
+  "A server error occurred. Redirecting to the home page.": "Ein Serverfehler ist aufgetreten. Sie werden zur Startseite weitergeleitet.",
+  "An error occurred. Redirecting to the home page.": "Ein Fehler ist aufgetreten. Sie werden zur Startseite weitergeleitet.",
+  "Something went wrong while loading the page. Redirecting to the home page. Please try again.": "Beim Laden der Seite ist etwas schiefgelaufen. Sie werden zur Startseite weitergeleitet. Bitte versuchen Sie es erneut."
 }

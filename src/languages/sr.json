@@ -2710,5 +2710,9 @@
   "Sorry!": "Izvinite",
   "We will fix this shortly": "Uskoro ćemo ovo popraviti",
   "Home": "Dom",
-  "Uh-oh! This must be an error from our side": "Uh-oh! Ovo mora da je greška sa naše strane"
+  "Uh-oh! This must be an error from our side": "Uh-oh! Ovo mora da je greška sa naše strane",
+  "{{startPageElementNumber}} - {{endPageElementNumber}} of {{totalEntries}} results": "{{startPageElementNumber}} - {{endPageElementNumber}} od {{totalEntries}} rezultata",
+  "A server error occurred. Redirecting to the home page.": "Došlo je do greške servera. Preusmeravanje na početnu stranicu.",
+  "An error occurred. Redirecting to the home page.": "Došlo je do greške. Preusmeravanje na početnu stranicu.",
+  "Something went wrong while loading the page. Redirecting to the home page. Please try again.": "Nešto je pošlo naopako pri učitavanju stranice. Preusmeravanje na početnu stranicu. Pokušajte ponovo."
 }
