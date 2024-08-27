@@ -45,10 +45,10 @@ const validationSchema = Yup.object().shape({
     .when('startDate', (startDate, schema) => {
       if (startDate) {
         const dayAfter = new Date(startDate);
-        dayAfter.setDate(dayAfter.getDate() + 90);
+        dayAfter.setDate(dayAfter.getDate() + 182);
         return schema.max(
           dayAfter,
-          'Max time range exceeded, the max time range is 90 days',
+          'Max time range exceeded, the max time range is 6 months (183 days)',
         );
       }
       return schema;
