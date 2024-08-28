@@ -106,7 +106,10 @@ export const CheckList = ({serviceOrder}: Props) => {
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const {mutateAsync: uploadFiles} = useUploadFiles('');
+  const {mutateAsync: uploadFiles} = useUploadFiles(
+    '',
+    serviceOrder.serviceCompany.id,
+  );
   const {mutateAsync: sendCheckList, isLoading: sendingCheckList} =
     useSendChecklist();
   const {mutateAsync: deleteServiceOrderChecklist, isLoading: isDeleting} =
@@ -181,7 +184,11 @@ export const CheckList = ({serviceOrder}: Props) => {
   );
 
   const {data: checklistImagesDownloadUrl, isLoading: isChecklistImageLoading} =
-    useDownloadUrl(checklistImagesPath);
+    useDownloadUrl(
+      checklistImagesPath,
+      undefined,
+      serviceOrder.serviceCompany.id,
+    );
 
   const {downloadFile} = useDownloadFileWithCustomName(
     selectedChecklist?.checkList.number,
@@ -514,7 +521,7 @@ export const CheckList = ({serviceOrder}: Props) => {
     const {pictures = []} = component.additionalInfo;
 
     const {technicianId, checkListId} = selectedChecklist!;
-    const serviceCompanyId = user?.userAccount.serviceCompany.id;
+    const serviceCompanyId = serviceOrder.serviceCompany.id;
     const basePath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/checkLists`;
     const uploadPath = `${basePath}/${technicianId}/${checkListId}/images`;
 

@@ -54,6 +54,7 @@ export const ChecklistPreviewSection = ({
             <ChecklistComponent
               disabled={!isEditing}
               isEditing={isEditing}
+              serviceCompanyId={checklist.serviceCompanyId}
               onChange={(newComp) => onChecklistChange?.(newComp, index)}
               onImageChange={(comp, files) =>
                 onChecklistImageChange?.(comp, files, index)
