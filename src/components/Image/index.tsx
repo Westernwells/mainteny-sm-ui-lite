@@ -9,18 +9,28 @@ interface Props {
   data: FileResourceRecord;
   isEditing?: boolean;
   onDelete?: (data: FileResourceRecord) => void;
+  serviceCompanyId?: string;
 }
 
-export const Image = ({data, onDelete, isEditing = false}: Props) => {
+export const Image = ({
+  data,
+  onDelete,
+  serviceCompanyId,
+  isEditing = false,
+}: Props) => {
   const theme = useTheme();
   const url = data.uri;
   const shouldNotDownload =
     url.startsWith('http') || url.includes('localhost') || url === 'loading';
 
-  const {data: urls, isLoading: loadingState} = useDownloadUrl([url], {
-    enabled: !shouldNotDownload && !!url,
-    refetchOnWindowFocus: false,
-  });
+  const {data: urls, isLoading: loadingState} = useDownloadUrl(
+    [url],
+    {
+      enabled: !shouldNotDownload && !!url,
+      refetchOnWindowFocus: false,
+    },
+    serviceCompanyId,
+  );
 
   const urlToUse = useMemo(
     () => (shouldNotDownload ? data.uri : urls?.[url]),

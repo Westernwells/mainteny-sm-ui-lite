@@ -17,6 +17,7 @@ interface ComponentProps {
   onImageChange?: (e: FormEvent<HTMLInputElement>) => void;
   isEditing?: boolean;
   onImageDelete?: (image: FileResourceRecord, index: number) => void;
+  serviceCompanyId?: string;
 }
 
 interface ComponentMainProps {
@@ -25,6 +26,7 @@ interface ComponentMainProps {
   onChange: (newComponent: CheckListComponentView) => void;
   onImageChange?: (component: CheckListComponentView, files: File[]) => void;
   isEditing?: boolean;
+  serviceCompanyId?: string;
 }
 
 export const MultiChoiceComponent = ({
@@ -33,7 +35,7 @@ export const MultiChoiceComponent = ({
   onImageChange,
 
   onImageDelete,
-
+  serviceCompanyId,
   disabled = false,
   isEditing = false,
 }: ComponentProps) => (
@@ -85,6 +87,7 @@ export const MultiChoiceComponent = ({
     <HorizontalChecklistImageList
       onImageDelete={onImageDelete}
       component={component}
+      serviceCompanyId={serviceCompanyId}
       isEditing={isEditing}
     />
   </Box>
@@ -95,6 +98,7 @@ export const CheckboxComponent = ({
   onChange,
   onImageChange,
   onImageDelete,
+  serviceCompanyId,
   isEditing,
   disabled = false,
 }: ComponentProps) => (
@@ -139,6 +143,7 @@ export const CheckboxComponent = ({
     <HorizontalChecklistImageList
       onImageDelete={onImageDelete}
       component={component}
+      serviceCompanyId={serviceCompanyId}
       isEditing={isEditing}
     />
   </>
@@ -155,6 +160,7 @@ export const TextComponent = ({
   isEditing,
   onImageChange,
   onImageDelete,
+  serviceCompanyId,
 }: ComponentProps) => {
   const theme = useTheme();
 
@@ -202,6 +208,7 @@ export const TextComponent = ({
         onImageDelete={onImageDelete}
         component={component}
         isEditing={isEditing}
+        serviceCompanyId={serviceCompanyId}
       />
     </>
   );
@@ -211,6 +218,7 @@ export const ChecklistComponent = ({
   component,
   onChange,
   onImageChange,
+  serviceCompanyId,
   disabled = false,
   isEditing = false,
 }: ComponentMainProps) => {
@@ -233,6 +241,7 @@ export const ChecklistComponent = ({
       return (
         <MultiChoiceComponent
           onChange={onChange}
+          serviceCompanyId={serviceCompanyId}
           onImageChange={handleImageChange}
           onImageDelete={handleImageDelete}
           disabled={disabled}
@@ -245,6 +254,7 @@ export const ChecklistComponent = ({
         <CheckboxComponent
           onChange={onChange}
           disabled={disabled}
+          serviceCompanyId={serviceCompanyId}
           component={component}
           onImageChange={handleImageChange}
           onImageDelete={handleImageDelete}
@@ -258,6 +268,7 @@ export const ChecklistComponent = ({
         <TextComponent
           onChange={onChange}
           disabled={disabled}
+          serviceCompanyId={serviceCompanyId}
           component={component}
           onImageChange={handleImageChange}
           onImageDelete={handleImageDelete}

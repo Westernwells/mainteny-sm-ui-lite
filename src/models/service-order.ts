@@ -25,7 +25,8 @@ import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceOrderPaymentStatusView} from '../utils/service-order-utils';
-import {Discount, InvoiceAdditionalInfo} from './invoice';
+import {Discount} from './invoice';
+import {ServiceCompanySimpleView} from './service-company';
 
 export enum Priority {
   A = 'A',
@@ -260,6 +261,7 @@ export interface ServiceOrderView {
   reports?: ServiceOrderReportView[];
   additionalInfo: ServiceOrderAdditionalInfo;
   checkLists?: ServiceOrderCheckListInfo[];
+  serviceCompany: ServiceCompanySimpleView;
 }
 
 export interface ServiceOrderSimpleView {
