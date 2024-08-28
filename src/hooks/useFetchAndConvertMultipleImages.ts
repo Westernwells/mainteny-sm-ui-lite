@@ -56,7 +56,12 @@ const useFetchAndConvertMultipleImages = (
     }
   }, [shouldFetchImages]);
 
-  return {convertedImages, isImageLoading, setShouldFetchImages};
+  return {
+    convertedImages,
+    isImageLoading,
+    setShouldFetchImages,
+    shouldFetchImages,
+  };
 };
 
 export default useFetchAndConvertMultipleImages;

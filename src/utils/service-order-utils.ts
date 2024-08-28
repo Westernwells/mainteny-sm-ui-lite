@@ -355,11 +355,15 @@ export const serviceOrderTypeColor = (type?: ServiceOrderType) => {
 };
 
 export const getSignatureKeys = (
-  serviceOrder: ServiceOrderView,
+  serviceOrder?: ServiceOrderView,
   report?: ServiceOrderReportView,
   serviceCompanyId?: string,
 ) => {
   let signatureKeys = {CUSTOMER: '', TECHNICIAN: ''};
+
+  if (!serviceOrder) {
+    return signatureKeys;
+  }
 
   report?.signatures?.forEach((item) => {
     const url = item.fileResource.uri;

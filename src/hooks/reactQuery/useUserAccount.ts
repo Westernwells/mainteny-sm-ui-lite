@@ -53,9 +53,13 @@ export const getUserAccount = async (id: string) => {
   return response.data;
 };
 
-export const useGetUserAccount = (id?: string) =>
+export const useGetUserAccount = (
+  id?: string,
+  options?: {enabled?: boolean; refetchOnWindowFocus?: boolean},
+) =>
   useQuery([qks.getUserAccount, id], () => getUserAccount(id!), {
     enabled: !!id,
+    ...(options ?? {}),
   });
 
 export const useEmployeeAccount = () => {
