@@ -1,5 +1,5 @@
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
-
+import {QueryObserverResult} from 'react-query';
 import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
@@ -59,6 +59,9 @@ export const columns = (
     [key: string]: string;
   },
   companyNextNumber: StringValueResponse | undefined,
+  refetchCompanyNextNumber: () => Promise<
+    QueryObserverResult<StringValueResponse>
+  >,
   isHeaderUrlLoading: boolean,
   isFooterUrlLoading: boolean,
 ): GridColDef[] => [
@@ -128,6 +131,7 @@ export const columns = (
         headerUrl={headerUrl}
         footerUrl={footerUrl}
         companyNextNumber={companyNextNumber}
+        refetchCompanyNextNumber={refetchCompanyNextNumber}
         isHeaderUrlLoading={isHeaderUrlLoading}
         isFooterUrlLoading={isFooterUrlLoading}
         isInvoiceList={false}

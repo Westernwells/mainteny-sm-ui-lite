@@ -92,6 +92,11 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       paddingLeft: '5%',
       marginTop: 7,
     },
+    imageContainer: {
+      display: 'flex',
+      flexDirection: 'row',
+      marginVertical: 10,
+    },
   });
 
 export const MultiChoiceComponent = ({
@@ -130,6 +135,20 @@ export const MultiChoiceComponent = ({
           </View>
         ))}
       </View>
+      <View style={styles.imageContainer}>
+        {component.additionalInfo.pictures?.map((pic, i) => (
+          <Image
+            key={pic.uri}
+            src={pic.uri}
+            style={{
+              width: 150,
+              height: 100,
+              marginLeft: i === 0 ? 0 : 10,
+              borderRadius: 5,
+            }}
+          />
+        ))}
+      </View>
     </View>
   );
 };
@@ -146,17 +165,33 @@ export const CheckboxComponent = ({
   const styles = getStyles(boldFontStyle);
 
   return (
-    <View style={styles.checkboxContainer}>
-      <View style={styles.checkboxIndex}>
-        <Text>{index}</Text>
+    <View>
+      <View style={styles.checkboxContainer}>
+        <View style={styles.checkboxIndex}>
+          <Text>{index}</Text>
+        </View>
+        <View style={styles.checkboxContent}>
+          {component.additionalInfo?.answer?.[0] === 'y' ? (
+            <Image src={CheckBox} style={{width: 12, height: 12}} />
+          ) : (
+            <Image src={CheckBoxOutlineBlank} style={{width: 12, height: 12}} />
+          )}
+          <Text style={styles.checkboxText}>{component.subject}</Text>
+        </View>
       </View>
-      <View style={styles.checkboxContent}>
-        {component.additionalInfo?.answer?.[0] === 'y' ? (
-          <Image src={CheckBox} style={{width: 12, height: 12}} />
-        ) : (
-          <Image src={CheckBoxOutlineBlank} style={{width: 12, height: 12}} />
-        )}
-        <Text style={styles.checkboxText}>{component.subject}</Text>
+      <View style={styles.imageContainer}>
+        {component.additionalInfo.pictures?.map((pic, i) => (
+          <Image
+            key={pic.uri}
+            src={pic.uri}
+            style={{
+              width: 150,
+              height: 100,
+              marginLeft: i === 0 ? 0 : 10,
+              borderRadius: 5,
+            }}
+          />
+        ))}
       </View>
     </View>
   );
@@ -210,6 +245,20 @@ export const TextComponent = ({
           <Text>{component.additionalInfo.note}</Text>
         </View>
       )}
+      <View style={styles.imageContainer}>
+        {component.additionalInfo.pictures?.map((pic, i) => (
+          <Image
+            key={pic.uri}
+            src={pic.uri}
+            style={{
+              width: 150,
+              height: 100,
+              marginLeft: i === 0 ? 0 : 10,
+              borderRadius: 5,
+            }}
+          />
+        ))}
+      </View>
     </View>
   );
 };

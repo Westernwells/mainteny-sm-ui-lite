@@ -107,32 +107,35 @@ export const useDownloadFileWithCustomName = (
 ) => {
   const fileExtension = extension || 'pdf';
   let finalFileName = fileName || 'Unassigned';
-  const downloadFile = useCallback(async () => {
-    try {
-      const response = await fetch(downloadUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
+  const downloadFile = useCallback(
+    async (downloadURLArg?: string) => {
+      try {
+        const response = await fetch(downloadURLArg || downloadUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
 
-      // Set the file name
-      const date = new Date();
-      const formattedDate = `${date.getFullYear().toString().substr(-2)}${(
-        date.getMonth() + 1
-      )
-        .toString()
-        .padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-      finalFileName = fileName
-        ? `${fileName}_${formattedDate}.${fileExtension}`
-        : `Unassigned_${formattedDate}.${fileExtension}`;
-      link.download = finalFileName;
+        // Set the file name
+        const date = new Date();
+        const formattedDate = `${date.getFullYear().toString().substr(-2)}${(
+          date.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+        finalFileName = fileName
+          ? `${fileName}_${formattedDate}.${fileExtension}`
+          : `Unassigned_${formattedDate}.${fileExtension}`;
+        link.download = finalFileName;
 
-      link.target = '_blank';
-      link.click();
-    } catch (error) {
-      console.error('Failed to download file:', error);
-    }
-  }, [fileName, downloadUrl]);
+        link.target = '_blank';
+        link.click();
+      } catch (error) {
+        console.error('Failed to download file:', error);
+      }
+    },
+    [fileName, downloadUrl],
+  );
 
   return {downloadFile, fileName: finalFileName};
 };

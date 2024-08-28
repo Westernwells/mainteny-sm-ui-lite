@@ -1,4 +1,5 @@
 import {useContext} from 'react';
+import {useTranslation} from 'react-i18next';
 import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
@@ -7,6 +8,7 @@ import {
   useQueryClient,
   UseQueryOptions,
 } from 'react-query';
+import {AxiosError} from 'axios';
 import * as _ from 'lodash';
 import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -39,6 +41,7 @@ import {
   SendInvoiceRecord,
 } from 'models/invoice';
 import {Comment} from 'models/comment';
+import {ErrorCode} from 'models/error';
 import {languageContextMap} from 'utils/utils';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from './useUserSession';
@@ -204,6 +207,7 @@ export const useSendInvoice = ({
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   return useMutation(
     ({id, body}: {id: string; body: SendInvoiceRecord}) =>
@@ -220,9 +224,23 @@ export const useSendInvoice = ({
           navigate(`/invoices/details/${id}`);
         }
       },
-      onError: (err) => {
+      onError: (err: AxiosError, {body}) => {
         console.log(err);
-        showError(err);
+        const responseErrorCode = (err?.response?.data as RestError)?.errorCode;
+        if (responseErrorCode === ErrorCode.DUPLICATE_INVOICE_EXTERNAL_ID) {
+          enqueueSnackbar(
+            t(
+              'Invoice number "{{invoiceNumber}}" is already taken. Invoice PDF is regenerated. Try sending again.',
+              {invoiceNumber: body.externalId},
+            ),
+            {
+              variant: 'info',
+            },
+          );
+          throw new Error('Regenerate PDF');
+        } else {
+          showError(err);
+        }
       },
     },
   );

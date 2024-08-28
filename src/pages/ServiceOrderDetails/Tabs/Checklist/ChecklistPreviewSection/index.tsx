@@ -11,11 +11,18 @@ interface Props {
     newComponent: CheckListComponentView,
     componentIndex: number,
   ) => void;
+  onChecklistImageChange?: (
+    component: CheckListComponentView,
+    files: File[],
+    index: number,
+  ) => void;
 }
 
 export const ChecklistPreviewSection = ({
   checklist,
   onChecklistChange,
+  onChecklistImageChange,
+
   isEditing = false,
   sx = {},
 }: Props) => {
@@ -46,7 +53,11 @@ export const ChecklistPreviewSection = ({
           {checklist.components?.map((component, index) => (
             <ChecklistComponent
               disabled={!isEditing}
+              isEditing={isEditing}
               onChange={(newComp) => onChecklistChange?.(newComp, index)}
+              onImageChange={(comp, files) =>
+                onChecklistImageChange?.(comp, files, index)
+              }
               key={component.id}
               component={component}
             />

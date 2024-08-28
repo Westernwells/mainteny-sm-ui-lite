@@ -172,14 +172,12 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
               },
             ];
           },
-          // eslint-disable-next-line no-array-constructor
-          new Array<Service>(),
+          [] as Service[],
         );
 
         return [...acc, ...components];
       },
-      // eslint-disable-next-line no-array-constructor
-      new Array<Service>(),
+      [] as Service[],
     );
   }, [elevator?.contracts, isSuccess, isUpdateLoading]);
 

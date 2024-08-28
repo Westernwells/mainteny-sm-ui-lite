@@ -1,3 +1,4 @@
+import {FileResourceRecord} from './media';
 import {EmailRecord, Meta, PdfGenerationStatus} from './misc';
 import {ChecklistStatus} from './service-order';
 
@@ -28,6 +29,7 @@ export interface CheckListComponentAdditionalInfo {
   answer?: string[];
   note?: string;
   moreInfoInNote?: Boolean;
+  pictures?: FileResourceRecord[];
 }
 
 export interface CheckListComponentView {

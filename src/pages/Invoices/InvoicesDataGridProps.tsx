@@ -1,4 +1,5 @@
 import {useTranslation} from 'react-i18next';
+import {QueryObserverResult} from 'react-query';
 import {
   GridColDef,
   GridColumnHeaderParams,
@@ -77,6 +78,9 @@ export const columns = (
     [key: string]: string;
   },
   companyNextNumber: StringValueResponse | undefined,
+  refetchCompanyNextNumber: () => Promise<
+    QueryObserverResult<StringValueResponse>
+  >,
   isHeaderUrlLoading: boolean,
   isFooterUrlLoading: boolean,
 ): GridColDef[] => [
@@ -187,6 +191,7 @@ export const columns = (
         headerUrl={headerUrl}
         footerUrl={footerUrl}
         companyNextNumber={companyNextNumber}
+        refetchCompanyNextNumber={refetchCompanyNextNumber}
         isHeaderUrlLoading={isHeaderUrlLoading}
         isFooterUrlLoading={isFooterUrlLoading}
       />

@@ -37,10 +37,11 @@ interface Props {
   email?: string;
   subject?: string;
   content?: string;
-  callback?: ({email, subject, content}: EmailRecord) => void;
+  callback?: ({email, subject, content}: EmailRecord) => Promise<void>;
   loadingProgress?: number;
   existingFiles?: FileWithPreview[];
   isLoadingFiles?: boolean;
+  isSending?: boolean;
 }
 
 interface CustomKeyboardEvent extends React.KeyboardEvent<HTMLDivElement> {
@@ -62,6 +63,7 @@ export const SendEmailDialog = ({
   callback,
   existingFiles,
   isLoadingFiles = false,
+  isSending = false,
 }: Props) => {
   const {t} = useTranslation();
   const [isPublishing, setIsPublishing] = useState(false);
@@ -135,9 +137,7 @@ export const SendEmailDialog = ({
         {
           onSuccess: () => {
             handleResetForm();
-            if (onConfirm) {
-              onConfirm();
-            }
+            onConfirm?.();
           },
           onSettled: () => {
             setIsPublishing(false);
@@ -145,7 +145,7 @@ export const SendEmailDialog = ({
         },
       );
     } else if (callback) {
-      callback({...valuesToSubmit});
+      await callback({...valuesToSubmit});
       handleResetForm();
     }
   };
@@ -485,6 +485,8 @@ export const SendEmailDialog = ({
                 disabled:
                   isPublishing ||
                   confirmBtnDisabled ||
+                  isSending ||
+                  isLoadingFiles ||
                   (!watch('emails')?.length && emailInputValue === '') ||
                   !watch('subject') ||
                   watch('content') === '<p></p>',

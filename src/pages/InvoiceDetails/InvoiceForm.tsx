@@ -113,6 +113,7 @@ import {GridCellParams} from '@mui/x-data-grid';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 
 interface Props {
   invoice?: InvoiceView;
@@ -231,7 +232,9 @@ export const InvoiceForm = ({
   const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
   const {user} = useUserSession();
   const {enqueueSnackbar} = useSnackbar();
-
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
   const {
     data: creditNoteArticlesResource = createEmptyResource<ArticleView>(1),
     isLoading: isLoadingCreditNoteArticles,
@@ -434,7 +437,9 @@ export const InvoiceForm = ({
     onSubmit: async (values) => {
       const response = await onSave(values);
       const invoiceId = formType === 'new' ? response.value : invoice?.id;
-      navigate(`/invoices/details/${invoiceId}`);
+      navigate(`/invoices/details/${invoiceId}`, {
+        replace: true,
+      });
     },
   });
   const alternativeAddress = formik.values.alternativeAddress?.component;
@@ -1180,6 +1185,7 @@ export const InvoiceForm = ({
                     addressType="billingAddress"
                     formik={formik}
                     customerName={customer?.name}
+                    translate={translateCompanyLanguage}
                   />
                 </Grid>
                 <Grid item xs={6} pl={2}>
@@ -1202,6 +1208,7 @@ export const InvoiceForm = ({
                     addressType="beneficiaryAddress"
                     formik={formik}
                     customerName={customer?.name}
+                    translate={translateCompanyLanguage}
                   />
                 </Grid>
 
@@ -1253,6 +1260,7 @@ export const InvoiceForm = ({
                     addressType="alternativeAddress"
                     formik={formik}
                     customerName={customer?.name}
+                    translate={translateCompanyLanguage}
                   />
                 </Grid>
               </>
@@ -1529,7 +1537,7 @@ export const InvoiceForm = ({
             {/* DELIVERY DATE */}
             <Box width="100%">
               <Typography variant="body2" color="grey.700" pb={1.5}>
-                {T('Service Deliver Date')}
+                {T('Delivery date')}
               </Typography>
               <Box display="flex" justifyContent="space-between" gap={1}>
                 <DatePicker
