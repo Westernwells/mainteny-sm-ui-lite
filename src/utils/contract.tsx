@@ -6,6 +6,7 @@ import {
   subMonths,
 } from 'date-fns';
 import {
+  calculateContractInvoicePriceTotal,
   ContractComponentElevator,
   ContractComponentRecord,
   ContractComponentView,
@@ -17,7 +18,6 @@ import {
   ContractView,
   ExtendedContractComponentRecord,
   UpdateContractComponents,
-  calculateContractInvoicePriceTotal,
 } from 'models/contract';
 import {toDate, toRestDate} from 'utils/datetime';
 import {ElevatorView} from 'models/elevator';
@@ -399,3 +399,8 @@ export const canGroupServices = (
 
   return true;
 };
+
+export const isUnitSelected = (unit: {
+  isChecked?: boolean;
+  isSelected?: boolean;
+}) => unit.isChecked || unit.isSelected;

@@ -427,7 +427,7 @@ export const ViewQuotation = ({
                     sx: {
                       background: 'transparent',
                     },
-                    onClick: downloadFile,
+                    onClick: () => downloadFile(),
                     disabled: !filePathToDownload,
                     startIcon: <FileDownloadIcon />,
                   }}

@@ -1,7 +1,7 @@
 import Grid from '@mui/material/Grid';
 import {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
-import {ContractStatus, ContractSimpleView} from 'models/contract';
+import {ContractSimpleView, ContractStatus} from 'models/contract';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {Progress} from 'components/Progress';
 import ContactsWidget from 'pages/Contacts/ContactsWidget';

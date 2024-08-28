@@ -15,8 +15,11 @@ import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {createEmptyResource} from 'utils/paging-utils';
-import {formatAddressFullname} from 'utils/utils';
+import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
 import {AddressRecord} from 'models/misc';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {useTranslation} from 'react-i18next';
+import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 
 import {
   CustomerAddressFormModel,
@@ -66,7 +69,12 @@ const localStorageFormikContactPersonsKey = 'NEW_CUSTOMER_formikContactPersons';
 export const NewCustomer = ({getCurrentPageTitle}: Props) => {
   const navigate = useNavigate();
   const {user} = useUserSession();
-
+  const {data: companyInfo} = useCompanyById(
+    user?.userAccount.serviceCompany.id,
+  );
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[companyInfo?.language as string],
+  } as CustomTranslationOptions);
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -290,12 +298,15 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
         : '',
       billingAddress: formatAddressFullname(
         formikAddress.values.billingAddress,
+        translateCompanyLanguage,
       ) as AddressRecord | null,
       beneficiaryAddress: formatAddressFullname(
         formikAddress.values.beneficiaryAddress,
+        translateCompanyLanguage,
       ) as AddressRecord | null,
       otherAddress: formatAddressFullname(
         formikAddress.values.otherAddress,
+        translateCompanyLanguage,
       ) as AddressRecord | null,
       contactPersons: formikContactPersons.values.contactPersons,
     };

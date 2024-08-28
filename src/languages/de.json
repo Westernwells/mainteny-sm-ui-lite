@@ -2682,5 +2682,14 @@
   "Select opening hours start.": "Startzeit der Öffnungszeiten auswählen.",
   "Show rows per page": "Zeige Zeilen pro Seite",
   "Closing time must be later than opening time.": "Schließzeit muss später als Öffnungszeit sein.",
-  "Invoice number \"{{invoiceNumber}}\" is already taken. Invoice PDF is regenerated. Try sending again.": "Die Rechnungsnummer \"{{invoiceNumber}}\" ist bereits vergeben. Das Rechnungs PDF wird erneut erstellt. Bitte nochmal versuchen."
+  "Invoice number \"{{invoiceNumber}}\" is already taken. Invoice PDF is regenerated. Try sending again.": "Die Rechnungsnummer \"{{invoiceNumber}}\" ist bereits vergeben. Das Rechnungs PDF wird erneut erstellt. Bitte nochmal versuchen.",
+  "Article is not in the inventory": "Artikel ist nicht im Inventar",
+  "Sorry!": "Entschuldigung!",
+  "We will fix this shortly": "Wir werden dies in Kürze beheben",
+  "Home": "Home",
+  "Uh-oh! This must be an error from our side": "Oh je! Das muss ein Fehler von unserer Seite sein.",
+  "{{startPageElementNumber}} - {{endPageElementNumber}} of {{totalEntries}} results": "{{startPageElementNumber}} - {{endPageElementNumber}} von {{totalEntries}} Ergebnissen",
+  "A server error occurred. Redirecting to the home page.": "Ein Serverfehler ist aufgetreten. Sie werden zur Startseite weitergeleitet.",
+  "An error occurred. Redirecting to the home page.": "Ein Fehler ist aufgetreten. Sie werden zur Startseite weitergeleitet.",
+  "Something went wrong while loading the page. Redirecting to the home page. Please try again.": "Beim Laden der Seite ist etwas schiefgelaufen. Sie werden zur Startseite weitergeleitet. Bitte versuchen Sie es erneut."
 }

@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import * as Yup from 'yup';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import lodash from 'lodash';
+import {TFunction} from 'i18next';
 import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
 import useHighlightText from '../hooks/useHighlightText';
 
@@ -250,6 +251,7 @@ export const getAmountFromPercentage = (percent: number, amount: number) =>
 
 export const formatAddressFullname = (
   address: AddressRecord | null | undefined,
+  translate?: TFunction<'translation', 'translation'>,
 ) => {
   if (!address) return address;
 
@@ -259,7 +261,11 @@ export const formatAddressFullname = (
   const zip = address?.component?.postalCode || '';
   const city = address?.component?.city ? address?.component?.city : '';
   const state = address?.component?.state ? address?.component?.state : '';
-  const country = address?.component?.country || '';
+  const country = address?.component?.country
+    ? translate
+      ? translate(address?.component?.country)
+      : address?.component?.country
+    : '';
 
   const fullName = [name, address1, address2, zip, city, state, country]
     .filter((x) => x !== '')
@@ -576,6 +582,22 @@ export const yupValidations = {
       message,
       (value: string) => !!value && !isEmptyHTML(value),
     ),
+};
+
+export const fileListToFiles = (fileList: FileList | null) => {
+  const files: File[] = [];
+
+  if (!fileList) {
+    return files;
+  }
+
+  for (let i = 0; i < fileList.length; i += 1) {
+    const file = fileList.item(i);
+
+    files.push(file!);
+  }
+
+  return files;
 };
 
 export function removeHtmlTags(str: string) {

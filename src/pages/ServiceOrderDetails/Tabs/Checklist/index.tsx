@@ -65,6 +65,9 @@ import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {CreateEditMode, PdfGenerationStatus} from 'models/misc';
 import {BottomDrawer} from 'components/BottomDrawer';
 import _ from 'lodash';
+import {FileResourceRecord} from 'models/media';
+import {resizeImageToTargetSize} from 'utils/image-compression';
+import {IMAGE_SIZE_IN_MB} from 'utils/constants';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';
@@ -165,6 +168,20 @@ export const CheckList = ({serviceOrder}: Props) => {
       : [],
     {enabled: false},
   );
+
+  const checklistImagesPath = useMemo(
+    () =>
+      (
+        selectedChecklist?.checkList.components.map(
+          (component) =>
+            component.additionalInfo.pictures?.map((pic) => pic.uri) ?? [],
+        ) ?? []
+      ).flat(),
+    [selectedChecklist],
+  );
+
+  const {data: checklistImagesDownloadUrl, isLoading: isChecklistImageLoading} =
+    useDownloadUrl(checklistImagesPath);
 
   const {downloadFile} = useDownloadFileWithCustomName(
     selectedChecklist?.checkList.number,
@@ -297,6 +314,16 @@ export const CheckList = ({serviceOrder}: Props) => {
   );
 
   const generatePdfUrl = async () => {
+    const sortedChecklistComponentsCloned = _.cloneDeep(
+      sortedChecklistComponents ?? [],
+    );
+
+    sortedChecklistComponentsCloned.forEach((component) => {
+      component.additionalInfo.pictures?.forEach((pic) => {
+        pic.uri = checklistImagesDownloadUrl?.[pic.uri] ?? pic.uri;
+      });
+    });
+
     const blob = await pdf(
       <ChecklistPdf
         userInfo={user?.userAccount}
@@ -304,7 +331,7 @@ export const CheckList = ({serviceOrder}: Props) => {
         translate={translate}
         serviceOrder={serviceOrder}
         selectedChecklist={selectedChecklist}
-        sortedChecklistComponents={sortedChecklistComponents}
+        sortedChecklistComponents={sortedChecklistComponentsCloned}
         signaturePath={signatureImageUrl}
         technicianName={technicianName}
         headerPath={headerUrl[headerInfo?.path]}
@@ -390,19 +417,22 @@ export const CheckList = ({serviceOrder}: Props) => {
     }
   };
 
-  const saveChecklistAnswers = () => {
+  const saveChecklistAnswers = async () => {
     const params = {
       serviceOrder: serviceOrder.id,
     };
+    const {technicianId, checkListId} = selectedChecklist!;
     const queryParams = {
-      technicianId: selectedChecklist?.technicianId!,
-      checkListId: selectedChecklist?.checkListId!,
+      technicianId,
+      checkListId,
     };
+
     const body: CheckListAnswerRecord[] =
       selectedChecklist?.checkList.components.map((item) => ({
         componentId: item.id,
         values: item.additionalInfo.answer ?? [],
         note: item.additionalInfo.note ?? '',
+        pictures: item.additionalInfo.pictures ?? [],
       })) ?? [];
 
     const payload = {
@@ -472,6 +502,52 @@ export const CheckList = ({serviceOrder}: Props) => {
       newChecklistComponent;
 
     setSelectedChecklist(selectedChecklistCloned);
+  };
+
+  const onChecklistImageChange = async (
+    _component: CheckListComponentView,
+    files: File[],
+    index: number,
+  ) => {
+    const selectedChecklistCloned = _.cloneDeep(selectedChecklist);
+    const component = selectedChecklistCloned!.checkList.components[index];
+    const {pictures = []} = component.additionalInfo;
+
+    const {technicianId, checkListId} = selectedChecklist!;
+    const serviceCompanyId = user?.userAccount.serviceCompany.id;
+    const basePath = `${serviceCompanyId}/serviceOrders/${serviceOrder.id}/checkLists`;
+    const uploadPath = `${basePath}/${technicianId}/${checkListId}/images`;
+
+    const reducedSizePromises = files.map((item) =>
+      resizeImageToTargetSize(item, IMAGE_SIZE_IN_MB),
+    );
+    const reducedSizeFiles = await Promise.all(reducedSizePromises);
+
+    // Image upload is configured to show loading if the uri equal 'loading'. It's here to show user a visual clue of whats happening
+    const newPicturesLocal: FileResourceRecord[] = reducedSizeFiles.map(
+      (item) => ({
+        uri: 'loading',
+        description: item.name,
+        type: item.type,
+      }),
+    );
+    component.additionalInfo.pictures = [...pictures, ...newPicturesLocal];
+    selectedChecklistCloned!.checkList.components[index] = {...component};
+
+    setSelectedChecklist(selectedChecklistCloned);
+
+    await uploadFiles({files: reducedSizeFiles, uploadPath});
+
+    const newPictures: FileResourceRecord[] = reducedSizeFiles.map((item) => ({
+      uri: `${uploadPath}/${item.name}`,
+      description: item.name,
+      type: item.type,
+    }));
+    component.additionalInfo.pictures = [...pictures, ...newPictures];
+    selectedChecklistCloned!.checkList.components[index] = {...component};
+
+    // It is necessary to spread here. Otherwise useMemo will not run since the reference is not changed
+    setSelectedChecklist({...selectedChecklistCloned!});
   };
 
   const scheduled = serviceOrder.schedules ?? [];
@@ -616,6 +692,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                     <ChecklistPreviewSection
                       sx={{ml: 0, mt: 3}}
                       onChecklistChange={onChecklistChange}
+                      onChecklistImageChange={onChecklistImageChange}
                       isEditing={isEditing}
                       checklist={selectedChecklist?.checkList}
                     />
@@ -705,7 +782,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                           sx: {
                             background: 'transparent',
                           },
-
+                          disabled: isEditing || isChecklistImageLoading,
                           startIcon: <FileDownloadIcon />,
                         }}
                       />
@@ -719,7 +796,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                           sx: {
                             ml: '1em',
                           },
-
+                          disabled: isEditing || isChecklistImageLoading,
                           startIcon: <Send />,
                         }}
                       />
