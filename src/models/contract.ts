@@ -1,21 +1,12 @@
-import {Client} from './client';
+import {Address, Amount, AmountRecord, Meta, Order} from './misc';
 import {
-  Address,
-  Amount,
-  AmountRecord,
-  Meta,
-  Order,
-  TimeWindowRecord,
-  TimeWindowType,
-} from './misc';
-import {
-  Elevator,
   ElevatorAdditionalInfo,
   ElevatorAssignmentSimpleView,
   ElevatorCategory,
   ElevatorOrderField,
   ElevatorProperty,
   ElevatorSimpleView,
+  ElevatorSortableFields,
   ElevatorStatus,
   ElevatorTimeRuleView,
   ElevatorView,
@@ -26,10 +17,11 @@ import {
   PropertyOwnerView,
 } from './propertyManager';
 import {FileResource} from './media';
-import {ArticleType, CostPackage} from './article';
+import {ArticleType, ArticleView, CostPackage} from './article';
 import {toRestDate} from 'utils/datetime';
-import {ServiceCompanyType} from './service-company';
+import {ServiceCompanySimpleView, ServiceCompanyType} from './service-company';
 import {ServiceOrderType} from './service-order';
+import {InvoiceGeneration} from './invoice';
 
 export interface QueryContractCommentsParams {
   pageIndex: number;
@@ -106,37 +98,6 @@ export interface ContractNameTypes {
   type: ContractTypes;
 }
 
-export interface ContractTimeWindow {
-  id: string;
-  contractId: string;
-  fromTime: string;
-  toTime: string;
-  type: TimeWindowType;
-}
-
-export interface ContractElevator {
-  id: string;
-  contractId: string;
-  elevator: Elevator;
-}
-
-export interface Contract {
-  id: string;
-  propertyOwner: Client;
-  type: string;
-  elevators: ContractElevator[];
-  visitsNumber: number;
-  sla: number;
-  spendingLimit: number;
-  price: number;
-  currency: string;
-  startTime: string;
-  endTime: string;
-  timePreference: ContractTimeWindow[];
-  status: ContractStatus;
-  meta: Meta;
-}
-
 export interface QueryContractParams {
   order: Order;
   orderBy: ContractOrderField;
@@ -151,13 +112,18 @@ export interface QueryContractParams {
 }
 
 export interface ContractDiscount {
-  days: number;
-  discountPercentage: number;
+  days?: number;
+  discountPercentage?: number;
 }
 
 export interface FirstMaintenance {
-  year: number;
-  month: number;
+  year?: number;
+  month?: number;
+}
+
+export interface ContractPriceAdjustment {
+  adjustmentClosed?: boolean | null;
+  lastAdjustmentDate?: string | null;
 }
 
 export interface ContractAdditionalInfo {
@@ -170,17 +136,36 @@ export interface ContractAdditionalInfo {
   noticePeriodInMonth?: number;
   invoiceDueDays?: number;
   discounts?: ContractDiscount[];
-  firstMaintenance: FirstMaintenance;
-  firstInvoiceDate: string;
-  autoRenewalCancelled: boolean;
-  renewalDate: string;
+  firstMaintenance?: FirstMaintenance;
+  firstInvoiceDate?: string;
+  autoRenewalCancelled?: boolean;
+  renewalDate?: string;
   totalYearlyPrice?: number;
+  discountPerInvoice?: number;
+  invoiceGeneration?: InvoiceGeneration;
+  priceAdjustment?: ContractPriceAdjustment;
+}
+
+export interface ContractElevatorAdditionalInfo {
+  removalDate?: string | null;
 }
 
 export interface ContractElevatorSimpleView {
   id: string;
   contractId: string;
   elevator: ElevatorSimpleView;
+  additionalInfo?: ContractElevatorAdditionalInfo;
+}
+
+export interface ContractArticleView {
+  article: ArticleView;
+  contractId: string;
+  data: string;
+  description: string;
+  id: string;
+  name: string;
+  quantity: number;
+  unitAmount: Amount;
 }
 
 export interface ContractView {
@@ -191,13 +176,12 @@ export interface ContractView {
   name: string;
   type: ContractTypes;
   visitsNumber: number;
-  number: number;
+  number: string;
   externalId: string;
   sla: number;
   spendingLimit: number;
   currency: string;
   elevators: ContractElevatorSimpleView[];
-  timePreference: ContractTimeWindow[];
   description: string;
   status: ContractStatus;
   search: string;
@@ -208,16 +192,18 @@ export interface ContractView {
   startTime?: string;
   endTime?: string;
   numberOfElevators?: number;
+  contractArticles?: ContractArticleView[] | null;
+  labels: string[];
+  serviceCompany: ServiceCompanySimpleView;
 }
 
 export interface ContractSimpleView {
   id: string;
-  type: string;
+  type: ContractTypes;
   name: string;
-  visitsNumber: number;
-  sla: number;
-  spendingLimit: number;
-  price: number; //  price is not always returned from the BE for every usage of this field -> make it optional?
+  visitsNumber?: number;
+  sla?: number;
+  spendingLimit?: number;
   number: string; // this is not a number but a string representation of the contract number (ex: CTA000030)
   currency: string;
   start: string;
@@ -227,23 +213,29 @@ export interface ContractSimpleView {
   externalId: string;
   meta: Meta;
   additionalInfo: ContractAdditionalInfo;
-  components?: ContractComponentView[];
-}
-
-export interface ContractComponentAdditionalInfoProps {
-  firstOrderDate: Date | null;
-  firstInvoiceDate: Date | null;
-  orderGenerationJob: string;
-  elevators: ContractServiceFormElevator[];
-  costType: ArticleType;
-  costPackage: CostPackage;
-  yearlyPrice?: number;
+  components?: ContractComponentView[] | null;
+  endTime: string;
+  startTime: string;
 }
 
 export interface ContractProps {
-  components: ContractComponentView[];
+  components?: ContractComponentView[];
   id: string;
-  removalDate: string;
+  removalDate?: string;
+  additionalInfo: ContractAdditionalInfo;
+  currency: string;
+  end: string;
+  externalId: string;
+  meta: Meta;
+  name: string;
+  number: string;
+  search: string;
+  sla?: number;
+  spendingLimit?: number;
+  start: string;
+  status: ContractStatus;
+  type: ContractTypes;
+  visitsNumber?: number;
 }
 
 export interface UpdateContractComponents {
@@ -257,30 +249,30 @@ export interface UpdateContractComponents {
 
 export interface ContractElevatorView {
   id: string;
-  number: string;
+  number?: string;
   model: string;
   type: string;
   externalId: string;
   capacity: string;
   category: ElevatorCategory;
-  technicianNumber: number;
+  technicianNumber?: number;
   contracts: ContractProps[];
-  availability: number;
   address: Address;
   propertyOwner: PropertyOwnerView;
-  propertyManager: PropertyContactPersonSimpleView;
   properties: ElevatorProperty[];
-  lastVisitDate: string;
-  nextVisitDate: string;
+  lastVisitDate?: string;
+  nextVisitDate?: string;
   serialNumber: string;
-  serviceTime: number;
+  serviceTime?: number;
   status: ElevatorStatus;
-  labels: [];
+  labels: string[];
   additionalInfo: ElevatorAdditionalInfo;
   assignments: ElevatorAssignmentSimpleView[];
   search: string;
   meta: Meta;
   timeRules: ElevatorTimeRuleView[];
+  contactPerson?: PropertyContactPersonSimpleView;
+  elevatorSortableFields?: ElevatorSortableFields;
 }
 
 export interface CreateContractRecord {
@@ -295,7 +287,6 @@ export interface CreateContractRecord {
   currency: string;
   startDate: string;
   endDate: string;
-  timePreference: TimeWindowRecord[];
 }
 
 export interface UpdateContractRecord {
@@ -308,18 +299,6 @@ export interface UpdateContractRecord {
   currency: string;
   startDate: string;
   endDate: string;
-  timePreference: TimeWindowRecord[];
-}
-
-export interface ContractRecord {
-  contract: ContractView;
-  elevators: ElevatorView[];
-}
-
-export interface ContractFilters {
-  contractor?: string[];
-  expiryDate?: string[];
-  status?: string[];
 }
 
 export interface CustomerContractParams {
@@ -339,12 +318,6 @@ export interface ElevatorContractParams {
   status: ContractStatus[];
 }
 
-export interface ContractTimeWindowRecord {
-  fromTime: string;
-  toTime: string;
-  type: TimeWindowType;
-}
-
 export interface ContractPrice {
   currency?: string;
   netAmount?: number;
@@ -359,7 +332,6 @@ export interface ContractRequestBody {
   sla?: number;
   spendingLimit?: number;
   startDate?: string;
-  timePreference?: ContractTimeWindowRecord[];
   type?: string;
   visitsNumber?: number;
   invoiceDue?: string;
@@ -385,22 +357,6 @@ export interface ContractCustomizeContractFormModel {
   spendingLimit: number;
   annualPriceAdjustmentPercentage?: number;
   autoRenewalCancelled?: boolean;
-}
-
-export interface ContractTermsFormModal {
-  visitsNumber: number | string;
-  invoiceCycle: string;
-  netAmount: number | string;
-  renewalTerms: number | string;
-  spendingLimit: number | string;
-  annualPriceAdjustmentPercentage: number | string;
-  serviceLevelAgreement: number | string;
-  firstMaintenance?: FirstMaintenance;
-  firstInvoiceDate?: string;
-  invoiceDueDays?: number;
-  discounts?: ContractDiscount[];
-  noticePeriodInMonth?: number;
-  paymentTermId?: string;
 }
 
 export interface ContractUpdateRequest {
@@ -527,8 +483,8 @@ export interface ContractServiceForm {
 
 export interface ContractServiceFormElevator {
   elevatorId: string;
-  invoiceJob: JobTimeUnit;
-  orderGenerationJob: JobTimeUnit;
+  invoiceJob?: JobTimeUnit;
+  orderGenerationJob?: JobTimeUnit;
   price: number;
   buildingLocation?: string;
   address?: string;
@@ -558,19 +514,18 @@ export interface ContractComponentRecord {
   name: string;
   group: string;
   elevators: ContractComponentElevator[];
-  firstInvoiceDate: string;
-  firstOrderDate: string;
+  firstInvoiceDate?: string;
+  firstOrderDate?: string;
   costType: ArticleType;
-  costPackage: CostPackage;
-  yearlyPrice?: number;
+  costPackage?: CostPackage;
+  orderType?: string | null;
 }
 
 export interface ContractComponentView {
   id: string;
   name: string;
-  group?: string;
+  group: string;
   additionalInfo: ContractComponentAdditionalInfo;
-  elevators: ContractComponentElevator[]; // field does not exist in return data when getting elevator by id from the API
   isAutomaticJobCycle?: boolean;
 }
 
@@ -579,9 +534,9 @@ export interface ContractComponentAdditionalInfo {
   firstInvoiceDate?: Date | null;
   firstOrderDate?: Date | null;
   costPackage?: CostPackage;
-  elevators?: ContractComponentElevator[];
+  elevators: ContractComponentElevator[];
   orderType?: ServiceOrderType;
-  yearlyPrice: number;
+  yearlyPrice?: number;
 }
 
 export interface ContractServiceForm {
@@ -599,8 +554,8 @@ export interface ContractServiceForm {
 
 export interface ContractServiceFormElevator {
   elevatorId: string;
-  invoiceJob: JobTimeUnit;
-  orderGenerationJob: JobTimeUnit;
+  invoiceJob?: JobTimeUnit;
+  orderGenerationJob?: JobTimeUnit;
   price: number;
   buildingLocation?: string;
   address?: string;
@@ -610,22 +565,10 @@ export interface ContractServiceFormElevator {
   yearlyPrice?: number;
 }
 
-export interface ContractComponentRecord {
-  id?: string;
-  name: string;
-  group: string;
-  elevators: ContractComponentElevator[];
-  firstInvoiceDate: string;
-  firstOrderDate: string;
-  costType: ArticleType;
-  costPackage: CostPackage;
-  orderType?: ServiceOrderType;
-}
-
 export interface ContractComponentElevator {
   elevatorId: string;
-  invoiceJob: JobTimeUnit;
-  orderGenerationJob: JobTimeUnit; // is optional in the API
+  invoiceJob?: JobTimeUnit;
+  orderGenerationJob?: JobTimeUnit;
   price: number;
   isChecked?: boolean; // on mutate
   isSelected?: boolean; // on create
@@ -694,7 +637,7 @@ export const getUniqueInvoiceJobTimeNumbers = (
   let uniqueTimeNumbers = new Set<number>();
 
   inputArray.forEach((item) => {
-    item.invoiceJob.timeNumbers?.forEach((number) => {
+    item.invoiceJob?.timeNumbers?.forEach((number) => {
       uniqueTimeNumbers.add(number);
     });
   });
@@ -710,7 +653,7 @@ export const getUniqueOrderGenerationTimeNumbers = (
   let uniqueTimeNumbers = new Set<number>();
 
   inputArray.forEach((item) => {
-    item.orderGenerationJob.timeNumbers?.forEach((number) => {
+    item.orderGenerationJob?.timeNumbers?.forEach((number) => {
       uniqueTimeNumbers.add(number);
     });
   });
@@ -768,12 +711,12 @@ export const calculateContractInvoicePriceTotal = (
 
     // monthly based calculations
     if (contractTime === ContractTimeUnit.MONTHLY) {
-      const invoiceMonths = item.invoiceJob.timeNumbers;
-      const jobMonths = item.orderGenerationJob.timeNumbers;
+      const invoiceMonths = item.invoiceJob?.timeNumbers;
+      const jobMonths = item.orderGenerationJob?.timeNumbers;
       timeLength = monthlyBasedCalculations(
-        invoiceMonths.length ? invoiceMonths : jobMonths,
+        invoiceMonths?.length ? invoiceMonths : jobMonths,
       );
-    } else if (TIME_UNIT_WEEK_TO_NUMBER.has(contractTime)) {
+    } else if (contractTime && TIME_UNIT_WEEK_TO_NUMBER.has(contractTime)) {
       // weekly based calculations
       timeLength = weeklyDivider(
         contractTime as
@@ -782,6 +725,7 @@ export const calculateContractInvoicePriceTotal = (
           | ContractTimeUnit.TRIWEEKLY,
       );
     } else if (
+      contractTime &&
       YEARLY_TIME_UNIT_TO_NUMBER.has(contractTime) // yearly based calculations
     ) {
       const divider = YEARLY_TIME_UNIT_TO_NUMBER.get(
@@ -793,7 +737,7 @@ export const calculateContractInvoicePriceTotal = (
       );
       timeLength = 1 / (divider || 1);
     }
-    return acc + item.price * timeLength;
+    return acc + (item?.price || 0) * timeLength;
   }, 0);
 
 export const calculateContractInvoicePriceGrandTotal = (
@@ -853,10 +797,10 @@ export const getSingleItemViewFrequency = (
   const frequencySet = new Set<string>();
   const monthlyUnits = new Set<number>();
 
-  const {timeUnit} = elevator[key];
+  const timeUnit = elevator[key] ? elevator[key]?.timeUnit : null;
   switch (timeUnit) {
     case ContractTimeUnit.MONTHLY:
-      elevator[key].timeNumbers.forEach((month) => monthlyUnits.add(month));
+      elevator[key]?.timeNumbers.forEach((month) => monthlyUnits.add(month));
       break;
     case ContractTimeUnit.WEEKLY:
     case ContractTimeUnit.BIWEEKLY:

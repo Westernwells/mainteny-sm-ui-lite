@@ -4,7 +4,7 @@ import {
   ElevatorSimpleView,
   ElevatorView,
 } from './elevator';
-import {Contract, ContractSimpleView} from './contract';
+import {ContractSimpleView} from './contract';
 import {
   Amount,
   Fee,
@@ -153,7 +153,7 @@ export interface ServiceOrder {
   externalID: string;
   articles: ServiceOrderArticleView[];
   elevator: Elevator;
-  contract: Contract;
+  contract: ContractSimpleView;
   description: string;
   type: ServiceOrderType;
   status: ServiceOrderStatus;

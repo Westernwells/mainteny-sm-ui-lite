@@ -194,14 +194,15 @@ export const MutationService = ({
       .map((elevator) => ({
         ...elevator,
         invoiceJob:
-          elevator.invoiceJob.timeUnit === ContractTimeUnit.MONTHLY &&
-          !elevator.invoiceJob.timeNumbers.length
+          elevator.invoiceJob?.timeUnit === ContractTimeUnit.MONTHLY &&
+          !elevator.invoiceJob?.timeNumbers.length
             ? null
             : {...elevator.invoiceJob},
         orderGenerationJob:
-          ((elevator.orderGenerationJob.timeUnit === ContractTimeUnit.MONTHLY ||
-            elevator.orderGenerationJob.timeUnit === ContractTimeUnit.NONE) &&
-            !elevator.orderGenerationJob.timeNumbers.length) ||
+          ((elevator.orderGenerationJob?.timeUnit ===
+            ContractTimeUnit.MONTHLY ||
+            elevator.orderGenerationJob?.timeUnit === ContractTimeUnit.NONE) &&
+            !elevator.orderGenerationJob?.timeNumbers.length) ||
           !values.isAutomaticJobCycle ||
           !values.firstOrderDate
             ? null
