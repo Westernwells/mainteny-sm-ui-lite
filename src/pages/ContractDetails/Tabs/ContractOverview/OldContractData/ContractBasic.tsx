@@ -220,7 +220,7 @@ export const ContractBasic = ({
           iconBackground={theme.palette.info.outlinedHoverBg}
           iconMaxHeight="3rem"
           bodyText={
-            firstMaintenance
+            firstMaintenance && firstMaintenance.year && firstMaintenance.month
               ? `${formatDate(
                   new Date(firstMaintenance.year, firstMaintenance.month - 1),
                   'MMM yyyy',

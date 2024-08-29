@@ -12,15 +12,17 @@ export const getFrequencyDisplay = (
   if (!elevator) return '-';
 
   const elevatorOrder = elevator.orderGenerationJob;
-  const {timeUnit, timeNumbers} = elevatorOrder;
-  const cycleType = UNIT_TYPE_TO_CYCLE_MAP.get(timeUnit);
+  const {timeUnit, timeNumbers} = elevatorOrder || {};
+  const cycleType = timeUnit && UNIT_TYPE_TO_CYCLE_MAP.get(timeUnit);
 
   // map monthly basis
   if (!cycleType || timeUnit === ContractTimeUnit.MONTHLY) {
-    return timeNumbers
-      .sort((a, b) => a - b)
-      .map((unit) => t(monthNames[unit - 1]))
-      .join(', ');
+    return (
+      timeNumbers
+        ?.sort((a, b) => a - b)
+        .map((unit) => t(monthNames[unit - 1]))
+        .join(', ') || '-'
+    );
   }
   const label = CYCLE_TYPE_TO_LABEL_MAP.get(cycleType);
   return label ? t(label) : '-';

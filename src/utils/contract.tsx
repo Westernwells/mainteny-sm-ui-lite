@@ -336,7 +336,7 @@ export const canGroupServices = (
   // Check if there is a leading component
   const leadingService = services.find((service) =>
     service.elevators.some(
-      (elevator) => elevator.invoiceJob.timeUnit === ContractTimeUnit.NONE,
+      (elevator) => elevator.invoiceJob?.timeUnit === ContractTimeUnit.NONE,
     ),
   );
   if (!leadingService) {
@@ -346,7 +346,7 @@ export const canGroupServices = (
   // Check if there is only one leading service
   const numLeadingServices = services.filter((service) =>
     service.elevators.some(
-      (elevator) => elevator.invoiceJob.timeUnit === ContractTimeUnit.NONE,
+      (elevator) => elevator.invoiceJob?.timeUnit === ContractTimeUnit.NONE,
     ),
   ).length;
   if (numLeadingServices > 1) {
@@ -359,7 +359,7 @@ export const canGroupServices = (
 
   // Check if all elevators in the leading service have invoice cycle "After job"
   const leadingElevators = leadingService.elevators.filter(
-    (elevator) => elevator.invoiceJob.timeUnit === ContractTimeUnit.NONE,
+    (elevator) => elevator.invoiceJob?.timeUnit === ContractTimeUnit.NONE,
   );
   if (leadingElevators.length !== leadingService.elevators.length) {
     enqueueSnackbar(
@@ -382,8 +382,8 @@ export const canGroupServices = (
         if (!correspondingElevator) {
           return true;
         }
-        const subset = elevator.invoiceJob.timeNumbers.every((time) =>
-          correspondingElevator.orderGenerationJob.timeNumbers.includes(time),
+        const subset = elevator.invoiceJob?.timeNumbers.every((time) =>
+          correspondingElevator.orderGenerationJob?.timeNumbers.includes(time),
         );
 
         if (!subset) {

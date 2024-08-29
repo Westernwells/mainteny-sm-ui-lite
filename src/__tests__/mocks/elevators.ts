@@ -12,6 +12,7 @@ import {
   ContractSimpleView,
   ContractStatus,
   ContractTimeUnit,
+  ContractTypes,
 } from '../../models/contract';
 import {ArticleType} from '../../models/article';
 import {ServiceOrderType} from '../../models/service-order';
@@ -60,7 +61,7 @@ export const mockValidElevatorContracts = {
   name: 'normal invoice cycle',
   number: 'CTA000030',
   externalId: 'CTA000030',
-  type: 'SERVICE',
+  type: ContractTypes.SERVICE,
   visitsNumber: 0,
   sla: 0,
   spendingLimit: 0,
@@ -182,7 +183,7 @@ export const mockExpiredElevatorContracts = {
   name: 'MEDIUM',
   number: 'CN00000002',
   externalId: 'CTA000014',
-  type: 'SERVICE',
+  type: ContractTypes.SERVICE,
   visitsNumber: 5,
   sla: 0,
   spendingLimit: 0,
