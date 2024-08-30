@@ -503,6 +503,14 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     invoiceNumber?: string;
     setInState?: boolean;
   }) => {
+    if (
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+      !qrImageSrc &&
+      invoice.status === InvoiceStatus.DRAFT
+    ) {
+      return;
+    }
+
     let PdfTemplate;
 
     if (
@@ -558,6 +566,16 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   };
 
   const handleDownload = async () => {
+    if (
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+      !qrImageSrc &&
+      invoice.status === InvoiceStatus.DRAFT
+    ) {
+      enqueueSnackbar(qrError!, {
+        variant: 'error',
+      });
+    }
+
     if (invoice.status === InvoiceStatus.DRAFT) {
       const blob = await generateBlobUrl({
         invoiceData: invoice,
@@ -565,7 +583,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         footerBlockUrl: footerUrl,
         setInState: false,
       });
-      const blobURL = URL.createObjectURL(blob);
+      const blobURL = URL.createObjectURL(blob!);
       downloadFile(blobURL);
     } else {
       const downloadUrlData = await refetchDownloadUrl();
@@ -711,7 +729,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const checkValidQrCode = useCallback(
     debounce(async (qrInvoice: InvoiceView) => {
-      if (user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+      if (
+        user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+        invoice.status === InvoiceStatus.DRAFT
+      ) {
         try {
           const qrBillData = createQrData(
             qrCurrency,
@@ -745,7 +766,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   useEffect(() => {
     if (
       invoice &&
-      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+      invoice.status === InvoiceStatus.DRAFT
     ) {
       checkValidQrCode(invoice);
     }
@@ -931,6 +953,15 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const onPrintInvoice = async () => {
     setIsConfirmPrintDialogOpen(false);
+
+    if (
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+      !qrImageSrc &&
+      invoice.status === InvoiceStatus.DRAFT
+    ) {
+      await checkValidQrCode(invoice);
+      return;
+    }
 
     if (invoice.status === InvoiceStatus.DRAFT) {
       if (invoice.externalId.trim() === '') {
