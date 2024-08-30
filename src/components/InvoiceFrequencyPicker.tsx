@@ -108,7 +108,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
     let selectedCaseFrequency = '';
 
     if (elevator) {
-      switch (elevator.invoiceJob.timeUnit) {
+      switch (elevator.invoiceJob?.timeUnit) {
         case ContractTimeUnit.NONE:
           afterJobCompletion = true;
           yearlyFrequency = false;
@@ -228,7 +228,7 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
         isSelected: formik.values.elevators
           .filter((elevator) => componentId === elevator.elevatorId)
           .some((elevator) =>
-            elevator.invoiceJob.timeNumbers?.includes(month.number),
+            elevator.invoiceJob?.timeNumbers?.includes(month.number),
           ),
       })),
     );

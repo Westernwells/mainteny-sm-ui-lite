@@ -80,9 +80,9 @@ const JobFrequencyPicker = ({componentId, units, onChange}: Props) => {
 
     // prepopulate fields if unit is found
     if (elevator) {
-      const type = UNIT_TYPE_TO_CYCLE_MAP.get(
-        elevator.orderGenerationJob.timeUnit,
-      );
+      const type =
+        elevator.orderGenerationJob?.timeUnit &&
+        UNIT_TYPE_TO_CYCLE_MAP.get(elevator.orderGenerationJob?.timeUnit);
 
       if (type) setSelectedFixedCycle(type);
     }
@@ -175,22 +175,22 @@ const JobFrequencyPicker = ({componentId, units, onChange}: Props) => {
   useEffect(() => {
     if (!foundUnit) return;
 
-    if (foundUnit.orderGenerationJob.timeUnit === ContractTimeUnit.MONTHLY) {
+    if (foundUnit.orderGenerationJob?.timeUnit === ContractTimeUnit.MONTHLY) {
       setCycleType(JOB_CYCLE_TYPE.BY_MONTHS);
       setSelectedMonths(
         monthsData.map((month) => ({
           ...month,
-          isSelected: foundUnit.orderGenerationJob.timeNumbers?.includes(
-            month.number,
-          ),
+          isSelected:
+            foundUnit.orderGenerationJob?.timeNumbers?.includes(month.number) ||
+            false,
         })),
       );
       return;
     }
 
-    const initOption = UNIT_TYPE_TO_CYCLE_MAP.get(
-      foundUnit.orderGenerationJob.timeUnit,
-    );
+    const initOption =
+      foundUnit.orderGenerationJob?.timeUnit &&
+      UNIT_TYPE_TO_CYCLE_MAP.get(foundUnit.orderGenerationJob?.timeUnit);
     if (initOption) setSelectedFixedCycle(initOption);
   }, [open, foundUnit]);
 

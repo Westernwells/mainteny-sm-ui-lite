@@ -535,3 +535,7 @@ export interface PrintInvoiceRecord {
   dueDate: string;
   sentDate: string;
 }
+
+export interface InvoiceGeneration {
+  lastInvoiceDate?: string | null;
+}

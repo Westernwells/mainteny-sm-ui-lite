@@ -62,7 +62,7 @@ export const getFrequency = (elevator: ContractElevatorView) => {
 
   if (foundElevator) {
     const {invoiceJob} = foundElevator;
-    switch (invoiceJob.timeUnit) {
+    switch (invoiceJob?.timeUnit) {
       case ContractTimeUnit.WEEKLY:
         return TimeUnitYearView.WEEKLY;
       case ContractTimeUnit.BIWEEKLY:
@@ -103,7 +103,7 @@ export const getListViewFrequency = (
 
   elevators?.forEach((elevator) => {
     if (elevator[key]) {
-      const {timeUnit} = elevator[key];
+      const timeUnit = elevator[key] ? elevator[key]?.timeUnit : null;
       switch (timeUnit) {
         case ContractTimeUnit.MONTHLY:
           elevator[key]?.timeNumbers?.forEach((month) =>
@@ -145,11 +145,11 @@ export const getListViewFrequency = (
     : '-';
 };
 
-export const getViewFrequency = (job: JobTimeUnit): string => {
+export const getViewFrequency = (job?: JobTimeUnit): string => {
   const frequencySet = new Set<string>();
   const monthlyUnits = new Set<number>();
 
-  switch (job.timeUnit) {
+  switch (job?.timeUnit) {
     case ContractTimeUnit.MONTHLY:
       job?.timeNumbers?.forEach((month) => monthlyUnits.add(month));
       break;

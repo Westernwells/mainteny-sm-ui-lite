@@ -447,3 +447,8 @@ export enum UnitAppointment {
   YES = 'YES',
   NO = 'NO',
 }
+
+export interface ElevatorSortableFields {
+  assignedTechnicianNames: string;
+  numberOfContracts?: number;
+}
