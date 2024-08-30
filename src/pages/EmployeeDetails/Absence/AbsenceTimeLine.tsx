@@ -5,9 +5,9 @@ import useTheme from '@mui/material/styles/useTheme';
 
 import {Confirm} from 'components/Confirm';
 import {useDeleteAbsence} from 'hooks/reactQuery/useAbsence';
-import {convertAbsenceToNormal} from 'utils/absence-utils';
 import {useAbsencedate} from 'hooks/useAbsenceDate';
 import {useTranslation} from 'react-i18next';
+import {convertToText} from 'utils/utils';
 
 type Props = {
   id: string;
@@ -46,8 +46,6 @@ const AbsenceTimeLine = ({
     setOpenDeleteDialog(false);
   };
 
-  const absenceName = convertAbsenceToNormal(type);
-
   return (
     <>
       <Box display="flex" alignItems="center">
@@ -68,7 +66,7 @@ const AbsenceTimeLine = ({
             <Typography
               variant="subtitle1"
               sx={{fontSize: '16px', mr: '0.625em'}}>
-              {t(absenceName)}
+              {t(convertToText(type))}
             </Typography>
           </Grid>
           <Grid item sm={2} md={5} lg={4} sx={{justifyContent: 'left'}}>
