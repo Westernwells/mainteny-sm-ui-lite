@@ -1,5 +1,4 @@
 import {useNavigate} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
 import {setStoredAdmin} from 'userStorage';
 import {axiosClient} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -7,9 +6,8 @@ import {useUserSession} from './useUserSession';
 
 export const useServiceManager = () => {
   const navigate = useNavigate();
-  const {enqueueSnackbar, showError} = useSnackbar();
+  const {showError} = useSnackbar();
   const {user, updateUser} = useUserSession();
-  const {t} = useTranslation();
 
   const getImpersonateUser = async (username: string): Promise<void> => {
     try {
@@ -25,14 +23,6 @@ export const useServiceManager = () => {
 
       if (impersonateUser?.token) {
         if (user) {
-          enqueueSnackbar(
-            t(`You are logged as {{name}}.`, {
-              name: impersonateUser?.userAccount?.username,
-            }),
-            {
-              variant: 'success',
-            },
-          );
           setStoredAdmin(user);
         }
 
