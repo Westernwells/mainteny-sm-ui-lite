@@ -269,14 +269,12 @@ export const CustomerOverviewTab = ({
             customerPortalEnabled={customerPortalEnabled}
           />
         </Grid>
-        {customerPortalEnabled && (
-          <Grid item xs={12}>
-            <ContactsWidget
-              refId={customerId!}
-              refType={ContactPersonAssociationType.PROPERTY_OWNER}
-            />
-          </Grid>
-        )}
+        <Grid item xs={12}>
+          <ContactsWidget
+            refId={customerId!}
+            refType={ContactPersonAssociationType.PROPERTY_OWNER}
+          />
+        </Grid>
         <Grid item xs={12}>
           <PaymentTermsWidget customer={customer} />
         </Grid>

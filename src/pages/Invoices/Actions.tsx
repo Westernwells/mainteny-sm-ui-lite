@@ -658,7 +658,10 @@ export const Actions = ({
 
   const checkValidQrCode = useCallback(
     async (qrInvoice: InvoiceView) => {
-      if (!user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+      if (
+        !user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+        invoice.status !== InvoiceStatus.DRAFT
+      ) {
         return '';
       }
 
@@ -789,19 +792,33 @@ export const Actions = ({
     onClick: async () => {
       setSelectedInvoice(invoice);
       setActionType('DOWNLOAD');
-      if (invoice.status === InvoiceStatus.DRAFT) {
-        await generateBlobUrl({
-          invoiceData: invoice,
-          headerBlockUrl: headerUrl,
-          footerBlockUrl: footerUrl,
-        });
-      } else {
-        const downloadUrlData = await refetchDownloadUrl();
-        setPdfPathToDownload(
-          downloadUrlData.data
-            ? downloadUrlData.data?.[invoice.additionalInfo.pdfPath!]!
-            : '',
-        );
+
+      try {
+        if (
+          user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+          !qrImageSrc &&
+          invoice.status === InvoiceStatus.DRAFT
+        ) {
+          await checkValidQrCode(invoice);
+          return;
+        }
+
+        if (invoice.status === InvoiceStatus.DRAFT) {
+          await generateBlobUrl({
+            invoiceData: invoice,
+            headerBlockUrl: headerUrl,
+            footerBlockUrl: footerUrl,
+          });
+        } else {
+          const downloadUrlData = await refetchDownloadUrl();
+          setPdfPathToDownload(
+            downloadUrlData.data
+              ? downloadUrlData.data?.[invoice.additionalInfo.pdfPath!]!
+              : '',
+          );
+        }
+      } catch (err) {
+        console.error(err);
       }
     },
   };
@@ -1027,6 +1044,15 @@ export const Actions = ({
     }
 
     setIsConfirmPrintDialogOpen(false);
+
+    if (
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+      !qrImageSrc &&
+      invoice.status === InvoiceStatus.DRAFT
+    ) {
+      await checkValidQrCode(invoice);
+      return;
+    }
 
     if (invoice.status === InvoiceStatus.DRAFT) {
       if (invoice.externalId.trim() === '') {
