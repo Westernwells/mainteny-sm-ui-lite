@@ -20,7 +20,7 @@ BigNumber.config({DECIMAL_PLACES: 2});
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      useErrorBoundary: true,
+      useErrorBoundary: false,
       onError: queryErrorHandler,
       // refetchOnWindowFocus: false,
     },
