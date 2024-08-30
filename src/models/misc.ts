@@ -1,7 +1,6 @@
 import {AxiosResponse} from 'axios';
 import {MouseEvent, ReactNode} from 'react';
 import {UseMutationResult} from 'react-query';
-import {GetState, SetState} from 'zustand';
 import {UserAccountSimpleView} from './user';
 import {ContractTypes, ContractNameTypes} from './contract';
 import {AccountSystems, MinToStep} from './service-company';
@@ -24,8 +23,9 @@ export enum DispatchStrategy {
 }
 
 export interface Meta {
-  creator?: UserAccountSimpleView;
   createdAt: string;
+  creator?: UserAccountSimpleView | null;
+  deleted?: boolean;
   lastUpdatedAt: string;
   state: State;
 }
@@ -283,11 +283,6 @@ export interface BasicDetailsValue {
   value: string | ReactNode;
   icon: JSX.Element;
 }
-
-export type StoreSlice<T extends object, E extends object = T> = (
-  set: SetState<E extends T ? E : E & T>,
-  get: GetState<E extends T ? E : E & T>,
-) => T;
 
 export interface MenuBtnProps {
   label: string;

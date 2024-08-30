@@ -211,7 +211,6 @@ export const OldContractData: FC<Props> = ({contractDetails, isLoading}) => {
       spendingLimit: +formik.values.spendingLimit,
       startDate: formik.values.startDate,
       endDate: formik.values.endDate,
-      timePreference: contractDetails?.timePreference || [],
       invoiceDueDays: formik.values.invoiceDueDays,
       annualPriceAdjustmentPercentage:
         formik.values.annualPriceAdjustmentPercentage,

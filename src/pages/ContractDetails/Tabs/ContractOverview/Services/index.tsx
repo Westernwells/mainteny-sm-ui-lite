@@ -409,7 +409,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                       variant="body2">
                       {' '}
                       {formatCurrency(
-                        row.additionalInfo.yearlyPrice /
+                        (row.additionalInfo?.yearlyPrice || 0) /
                           10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
                         {
                           currency: currentCurrency.code,
