@@ -8,7 +8,14 @@ type Props = {
 };
 
 const TableHeader = ({columns, onSort}: Props) => (
-  <Box sx={{display: 'flex', alignItems: 'center'}}>
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      position: 'sticky', // is needed if used without a table body wrapper
+      backgroundColor: '#FFFFFF',
+      top: 0,
+    }}>
     {columns.map((column) => {
       if (column.hide) return;
       return (
