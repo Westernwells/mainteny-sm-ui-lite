@@ -116,4 +116,5 @@ export type EmployeeContractTableRow = {
   phone: string;
   shift: string;
   availability: AvailabilityType;
+  employeeId: string;
 };

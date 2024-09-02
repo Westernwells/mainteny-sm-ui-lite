@@ -1,5 +1,4 @@
 import {IconButton} from '@mui/material';
-import {Box} from '@mui/system';
 import Avatar from '@mui/material/Avatar';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
@@ -13,6 +12,7 @@ import {TableColumn} from '../../../models/table';
 import {Actions} from '../Actions';
 import {StatusChip} from '../../../components/StatusChip';
 import {getAvailabilityChipColor} from '../../../utils/availability';
+import TableRow from '../../../components/Table/TableRow';
 
 type Props = {
   employeeDetails: EmployeeContractTableRow;
@@ -36,13 +36,7 @@ const EmployeeRow = ({employeeDetails, columns, onClick}: Props) => {
   );
 
   return (
-    <Box
-      data-testid="employee-row-container"
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        minHeight: '44px',
-      }}>
+    <TableRow testId="employee-row-container">
       {/* <Cell columnDetails={columns[0]}> */}
       {/*  <Checkbox */}
       {/*    disableRipple */}
@@ -55,7 +49,7 @@ const EmployeeRow = ({employeeDetails, columns, onClick}: Props) => {
       {/* </Cell> */}
       <Cell columnDetails={columns[1]} gap={2} onClick={onClick}>
         <Avatar src={employeeDetails.photoUrl} sx={{width: 24, height: 24}} />
-        {employeeDetails.name}
+        <Typography noWrap>{employeeDetails.name}</Typography>
       </Cell>
       <Cell columnDetails={columns[2]} onClick={onClick}>
         <Typography variant="body2" sx={{textTransform: 'capitalize'}} noWrap>
@@ -66,13 +60,13 @@ const EmployeeRow = ({employeeDetails, columns, onClick}: Props) => {
         <Typography noWrap>{employeeDetails.address}</Typography>
       </Cell>
       <Cell columnDetails={columns[4]} onClick={onClick}>
-        <Typography>{employeeDetails.team}</Typography>
+        <Typography noWrap>{employeeDetails.team}</Typography>
       </Cell>
       <Cell columnDetails={columns[5]} onClick={onClick}>
-        <Typography>{employeeDetails.phone}</Typography>
+        <Typography noWrap>{employeeDetails.phone}</Typography>
       </Cell>
       <Cell columnDetails={columns[6]} onClick={onClick}>
-        <Typography>{employeeDetails.shift}</Typography>
+        <Typography noWrap>{employeeDetails.shift}</Typography>
       </Cell>
       <Cell columnDetails={columns[7]} onClick={onClick}>
         <StatusChip
@@ -101,10 +95,14 @@ const EmployeeRow = ({employeeDetails, columns, onClick}: Props) => {
             horizontal: 'right',
           }}
           onClose={handleToggleNumberPerPageMenu(false)}>
-          <Actions id={employeeDetails.id} email={employeeDetails.email} />
+          <Actions
+            id={employeeDetails.employeeId}
+            email={employeeDetails.email}
+            onClose={() => setOpen(false)}
+          />
         </Menu>
       </Cell>
-    </Box>
+    </TableRow>
   );
 };
 

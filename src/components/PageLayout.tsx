@@ -82,6 +82,7 @@ export const PageLayout = ({
 
   return (
     <Box
+      data-testid="page-layout-container"
       sx={{
         display: 'flex',
         flexDirection: 'column',

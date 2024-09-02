@@ -9,15 +9,21 @@ import {useDeleteEmployee} from 'hooks/reactQuery/useEmployee';
 interface Props {
   id: string;
   email: string;
+  onClose: () => void;
 }
 
-export const Actions = ({id, email}: Props) => {
+export const Actions = ({id, email, onClose}: Props) => {
   const {mutateAsync: deleteEmployee, isLoading: isDeleting} =
     useDeleteEmployee('Employee removed successfully');
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
 
   const handleOpenDeleteConfirm = () => {
     setOpenDeleteConfirm(true);
+  };
+
+  const handleClose = () => {
+    setOpenDeleteConfirm(false);
+    onClose();
   };
 
   return (
@@ -40,9 +46,9 @@ export const Actions = ({id, email}: Props) => {
         open={openDeleteConfirm}
         onConfirm={async () => {
           await deleteEmployee(id!);
-          setOpenDeleteConfirm(false);
+          handleClose();
         }}
-        onClose={() => setOpenDeleteConfirm(false)}
+        onClose={handleClose}
         title="Confirm"
         content="Do you want to remove this employee?"
       />
