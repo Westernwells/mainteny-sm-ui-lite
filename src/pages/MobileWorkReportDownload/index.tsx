@@ -4,12 +4,14 @@ import {useLocation} from 'react-router-dom';
 
 import {pdf} from '@react-pdf/renderer';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {axiosClient} from 'utils/axios-utils';
 import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 
 import usePrepareWorkReportData from 'hooks/usePrepareWorkReportData';
 import {Box, Typography} from '@mui/material';
+import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
+import {companyLanguageContextMap} from 'utils/utils';
 
 interface RNWindow extends Window {
   ReactNativeWebView?: {
@@ -56,13 +58,27 @@ export const MobileWorkReportDownload = () => {
     serviceOrderId: serviceOrderId as string,
     userView: userResponse,
   });
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key);
+      }
+
+      return t(key);
+    },
+    [company?.language],
+  );
 
   const generateWorkReportPdf = async () => {
     const blob = await pdf(
       <WorkReportTemplate
         userInfo={userResponse?.userAccount}
         selectedLng={company?.language}
-        translate={t}
+        translate={translate}
         serviceOrder={serviceOrder}
         report={report}
         schedule={schedule}
