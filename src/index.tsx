@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import {ReactQueryDevtools} from 'react-query/devtools';
 import {createRoot} from 'react-dom/client';
@@ -57,6 +56,19 @@ const container = document.querySelector('#root') as Element;
 const root = createRoot(container); // Create a root.
 
 LicenseInfo.setLicenseKey(import.meta.env.REACT_APP_MUI_PRO_LICENSE);
+
+/*
+When a new deployment occurs, the hosting service may delete the assets from
+previous deployments. As a result, a user who visited our site before the new
+deployment might encounter an import error. This error happens because the
+assets running on that user's device are outdated and it tries to import the
+corresponding old chunk, which is deleted. This event is useful for addressing
+this situation.
+https://vitejs.dev/guide/build#load-error-handling
+*/
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload();
+});
 
 root.render(
   <ThemeProvider theme={theme}>
