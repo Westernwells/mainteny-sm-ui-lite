@@ -16,10 +16,11 @@ import {
 import {formatDate} from 'utils/datetime';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import capitalize from 'lodash/capitalize';
-import {convertMinutesToHoursAndMinutes} from 'utils/work-hours-utils';
+import {convertMinutesWithRounding} from 'utils/work-hours-utils';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {HeaderFooterInfoData} from 'models/misc';
 import {getServiceCompanyInfo} from 'utils/company-utils';
+import {MinToStep} from 'models/service-company';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -302,6 +303,7 @@ const WorkReportTemplate = React.memo(
     footerPath,
   }: Props) => {
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
+    const company = userInfo?.serviceCompany;
 
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -508,12 +510,13 @@ const WorkReportTemplate = React.memo(
                       <BookedHoursRow
                         key={`${index} - ${s.startTime}`}
                         startTime={s?.startTime}
-                        totalFormatted={convertMinutesToHoursAndMinutes(
+                        totalFormatted={convertMinutesWithRounding(
                           s?.minutes!,
                           {
                             hourUnit: 'h',
                           },
                           1,
+                          company?.settings.minToHourStep || MinToStep.STEP_0,
                         )}
                         percentageSurcharge={
                           report?.additionalInfo.workTimeInfo
@@ -533,12 +536,13 @@ const WorkReportTemplate = React.memo(
                       <BookedHoursRow
                         key={`${index} - ${s.startTime}`}
                         startTime={s?.startTime}
-                        totalFormatted={convertMinutesToHoursAndMinutes(
+                        totalFormatted={convertMinutesWithRounding(
                           s?.minutes!,
                           {
                             hourUnit: 'h',
                           },
                           1,
+                          company?.settings.minToHourStep || MinToStep.STEP_0,
                         )}
                         percentageSurcharge={
                           report?.additionalInfo.travelTimeInfo

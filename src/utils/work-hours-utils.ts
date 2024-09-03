@@ -4,6 +4,7 @@ import {ServiceOrderType} from 'models/service-order';
 import {Role, UserActivityView} from 'models/user';
 import {WorkHoursItem, WorkHoursType} from 'models/workHours';
 import {EmployeeStatus} from 'models/employee';
+import {MinToStep} from 'models/service-company';
 import {convertDigitalMinsToHM} from './datetime';
 
 export const calculateTotalTime = (workHours: WorkHoursItem[]) => {
@@ -107,6 +108,24 @@ export const convertMinutesToHoursAndMinutes = (
   {hourUnit = 'h'}: {hourUnit?: string} = {},
   hoursPad = 2,
 ) => {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const hoursPadded = hours.toString().padStart(hoursPad, '0');
+  const minsPadded = mins.toString().padStart(2, '0');
+
+  return `${hoursPadded}:${minsPadded}${hourUnit}`;
+};
+
+export const convertMinutesWithRounding = (
+  minutes: number,
+  {hourUnit = 'h'}: {hourUnit?: string} = {},
+  hoursPad = 2,
+  roundingInterval: MinToStep = MinToStep.STEP_0,
+) => {
+  if (roundingInterval > 0) {
+    minutes = Math.ceil(minutes / roundingInterval) * roundingInterval;
+  }
+
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
   const hoursPadded = hours.toString().padStart(hoursPad, '0');
