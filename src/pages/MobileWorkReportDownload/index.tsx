@@ -12,6 +12,7 @@ import usePrepareWorkReportData from 'hooks/usePrepareWorkReportData';
 import {Box, Typography} from '@mui/material';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {companyLanguageContextMap} from 'utils/utils';
+import i18n from 'i18n';
 
 interface RNWindow extends Window {
   ReactNativeWebView?: {
@@ -74,6 +75,11 @@ export const MobileWorkReportDownload = () => {
   );
 
   const generateWorkReportPdf = async () => {
+    // Necessary for mobile otherwise mobile always picks english
+    if (company?.language) {
+      i18n.changeLanguage(company?.language);
+    }
+
     const blob = await pdf(
       <WorkReportTemplate
         userInfo={userResponse?.userAccount}
