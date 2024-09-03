@@ -33,18 +33,16 @@ export const CustomerAutoComplete = ({
     query: query ? encodeURIComponent(query) : '',
   });
 
+  // Whenever initialValue changes, update customer and query
   useEffect(() => {
-    if (!customer) {
-      setCustomer(initialValue);
-    }
-
+    setCustomer(initialValue);
     setQuery(initialValue?.name || '');
   }, [initialValue]);
 
   const debouncedChangeHandler = useCallback(
     _.debounce((newValue: string) => {
       setQuery(newValue);
-    }, 1),
+    }, 300),
     [],
   );
 
@@ -62,18 +60,14 @@ export const CustomerAutoComplete = ({
   };
 
   useEffect(() => {
-    if (getCustomer) {
-      getCustomer(customer);
-    }
+    getCustomer?.(customer);
   }, [customer]);
 
   useEffect(() => {
     if (!query) {
-      setCustomer(null);
-      getQuery?.('');
-    } else {
-      getQuery?.(query);
+      setCustomer(null); // Reset customer if the query is cleared
     }
+    getQuery?.(query);
   }, [query]);
 
   return (
@@ -86,18 +80,14 @@ export const CustomerAutoComplete = ({
       sx={{minHeight: 0}}
       options={customerResource.data}
       filterOptions={(options) => options}
-      isOptionEqualToValue={(option, value) => {
-        const optionId = option && option.id;
-        const valueId = value && value.id;
-        return optionId === valueId;
-      }}
-      onChange={(event: any, newValue: PropertyOwnerView | null) => {
-        setCustomer(newValue);
-      }}
+      isOptionEqualToValue={(option, value) => option?.id === value?.id}
       getOptionLabel={(option) => option.name}
-      onInputChange={onInputChange}
       value={customer}
       inputValue={query}
+      onChange={(event: any, newValue: PropertyOwnerView | null) =>
+        setCustomer(newValue)
+      }
+      onInputChange={onInputChange}
       renderInput={(params) => (
         <FormInput
           fieldProps={{

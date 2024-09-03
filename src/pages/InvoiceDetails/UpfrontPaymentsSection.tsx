@@ -141,12 +141,12 @@ export const UpfrontPaymentsSection = ({
   };
 
   const previousInvoicesTotalExclVat = previousInvoices
-    .map(
+    ?.map(
       (i) =>
         (i.totalAmount?.netAmount ?? 0) /
         10 ** (i.totalAmount?.fractionDigits ?? 2),
     )
-    .reduce((a, b) => a + b, 0);
+    ?.reduce((a, b) => a + b, 0);
 
   const isAllowedAmountField = (values: NumberFormatValues) => {
     const {floatValue} = values;
@@ -173,8 +173,8 @@ export const UpfrontPaymentsSection = ({
   };
 
   const prevInvoicesPercentage = previousInvoices
-    .map((i) => i.additionalInfo.payment?.percentage ?? 0)
-    .reduce((a, b) => a + b, 0);
+    ?.map((i) => i.additionalInfo.payment?.percentage ?? 0)
+    ?.reduce((a, b) => a + b, 0);
 
   const isAllowedPercentageField = (values: NumberFormatValues) => {
     const {floatValue} = values;
@@ -276,14 +276,16 @@ export const UpfrontPaymentsSection = ({
   const hasPreviousInvoices = previousInvoices.length > 0;
 
   useEffect(() => {
+    if (!previousInvoices.length || !subtotalExclVat) return;
+
     const firstInvoice = previousInvoices[0];
-    const firstInvoicePaymentType = firstInvoice?.additionalInfo.payment?.type;
+    const firstInvoicePaymentType = firstInvoice?.additionalInfo?.payment?.type;
     const isFinalAfterPreviousInvoices =
       hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
-    const invoiceIndex = previousInvoices.length + 1;
+    const invoiceIndex = previousInvoices?.length + 1;
 
     if (isEditing) {
-      // do nothing
+      // do nothing if editing
     } else if (isFinalAfterPreviousInvoices) {
       const description = `${invoiceIndex}. ${t('Final invoice')}`;
       // prefill percentage/amount if it's a final invoice after previous invoices
@@ -315,11 +317,12 @@ export const UpfrontPaymentsSection = ({
         description: `${invoiceIndex}. ${t('Upfront invoice')}`,
       });
     }
-  }, [previousInvoices]);
+  }, [previousInvoices, subtotalExclVat]);
 
   useEffect(() => {
+    if (!invoice) return;
     // initialize payment object if it's not set
-    if (invoice?.additionalInfo.payment && !formik.values.payment) {
+    if (invoice?.additionalInfo?.payment && !formik.values.payment) {
       const amountMoney = aggregatedAmountToMoney(
         invoice.additionalInfo.payment.amount,
       );
@@ -366,7 +369,7 @@ export const UpfrontPaymentsSection = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {previousInvoices.map((i, index) => {
+            {previousInvoices?.map((i, index) => {
               // don't render anything for the editing invoice
               if (isEditing && index === previousInvoices.length - 1) {
                 return null;
@@ -413,12 +416,12 @@ export const UpfrontPaymentsSection = ({
                     {amountExclVatFormatted}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount.vats.map((v, idx) => (
+                    {invoiceTotalAmount?.vats?.map((v, idx) => (
                       <p key={idx}>{v.percentageVat}%</p>
                     ))}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount.vats.map((v, idx) => {
+                    {invoiceTotalAmount?.vats?.map((v, idx) => {
                       const vatAmount = Math.abs(
                         (v?.vat ?? 0) / 10 ** fractionDigits,
                       );
@@ -453,12 +456,12 @@ export const UpfrontPaymentsSection = ({
                 {amountFormatted}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats.map((v, idx) => (
+                {currentInvoiceAmountPercentageVats?.map((v, idx) => (
                   <p key={idx}>{v.percentageVat}%</p>
                 ))}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats.map((v, idx) => {
+                {currentInvoiceAmountPercentageVats?.map((v, idx) => {
                   const vatAmountFormatted = formatCurrency(v.vat, {
                     currency: currentCurrency.code,
                     minimumFractionDigits: 2,
@@ -472,8 +475,8 @@ export const UpfrontPaymentsSection = ({
                 {formatCurrency(
                   amount +
                     currentInvoiceAmountPercentageVats
-                      .map((v) => v.vat)
-                      .reduce((a, b) => a + b, 0),
+                      ?.map((v) => v.vat)
+                      ?.reduce((a, b) => a + b, 0),
                   {
                     currency: currentCurrency.code,
                     minimumFractionDigits: 2,
@@ -503,14 +506,14 @@ export const UpfrontPaymentsSection = ({
   ];
 
   const paidAmountInclVats = previousInvoices
-    .map((i) =>
+    ?.map((i) =>
       i.payments.reduce(
         (acc, p) =>
           acc + (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
         0,
       ),
     )
-    .reduce((acc, a) => acc + a, 0);
+    ?.reduce((acc, a) => acc + a, 0);
   const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency.code,
@@ -543,7 +546,7 @@ export const UpfrontPaymentsSection = ({
                 {totalAmountInclVatsFormatted}
               </TableCell>
             </TableRow>
-            {previousInvoices.map((i, index) => {
+            {previousInvoices?.map((i, index) => {
               if (!i.payments.length) {
                 return null;
               }
@@ -555,13 +558,13 @@ export const UpfrontPaymentsSection = ({
 
               const paidAmountExclVat = Math.abs(
                 i.payments
-                  .map(
+                  ?.map(
                     (p) =>
                       (p.additionalInfo.paymentDetails?.netAmount ?? 0) /
                       10 **
                         (p.additionalInfo.paymentDetails?.fractionDigits ?? 2),
                   )
-                  .reduce((a, b) => a + b, 0),
+                  ?.reduce((a, b) => a + b, 0),
               );
 
               const paidAmountExclVatFormatted = formatCurrency(
@@ -576,13 +579,13 @@ export const UpfrontPaymentsSection = ({
 
               const percentageVats = uniq(
                 i.payments
-                  .map((p) => p.additionalInfo.paymentDetails?.vats)
-                  .flat(),
+                  ?.map((p) => p.additionalInfo.paymentDetails?.vats)
+                  ?.flat(),
               );
 
               const totalPriceInclVat = Math.abs(
                 i.payments
-                  .map(
+                  ?.map(
                     (p) =>
                       (p.amount?.value ?? 0) /
                       10 ** (p.amount?.fractionDigits ?? 2),
@@ -614,12 +617,12 @@ export const UpfrontPaymentsSection = ({
                     {paidAmountExclVatFormatted}
                   </TableCell>
                   <TableCell align="right">
-                    {percentageVats.map((pV) => (
+                    {percentageVats?.map((pV) => (
                       <p key={pV?.percentageVat}>{pV?.percentageVat}%</p>
                     ))}
                   </TableCell>
                   <TableCell align="right">
-                    {percentageVats.map((pV, idx) => (
+                    {percentageVats?.map((pV, idx) => (
                       <p key={`${pV?.percentageVat}-${idx}`}>
                         {signBeforeNumber}
                         {formatCurrency(Math.abs((pV?.vat ?? 0) / 10 ** 2), {
@@ -656,7 +659,8 @@ export const UpfrontPaymentsSection = ({
     </>
   );
 
-  const hasPayments = previousInvoices.map((i) => i.payments).flat().length > 0;
+  const hasPayments =
+    previousInvoices?.map((i) => i.payments).flat().length > 0;
 
   return (
     <Grid item xs={12} bgcolor="white" p={3}>
@@ -673,7 +677,7 @@ export const UpfrontPaymentsSection = ({
         p={2}>
         <Grid container rowGap={2.5} justifyContent="space-between">
           {hasPreviousInvoices &&
-            previousInvoices.map((prevInvoice) => (
+            previousInvoices?.map((prevInvoice) => (
               <Fragment key={prevInvoice.id}>
                 <Grid item xs={7}>
                   <FormInput
@@ -894,7 +898,7 @@ export const UpfrontPaymentsSection = ({
               </Typography>
             </>
           ) : (
-            percentageVats.map((v) => (
+            percentageVats?.map((v) => (
               <Fragment key={v.percentageVat}>
                 <Typography variant="body1" color="primary.dark">
                   {T('VAT')} {v.percentageVat}%

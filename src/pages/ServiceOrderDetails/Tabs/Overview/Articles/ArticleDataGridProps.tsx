@@ -117,7 +117,7 @@ export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
     no: index + 1,
     number: item.article?.externalId,
     name: item.name,
-    unit: item.article.unit,
+    unit: item.article?.unit,
     total: formatCurrency(
       (item.unitAmount.netAmount * item.quantity) /
         10 ** item.unitAmount.fractionDigits!,
@@ -130,5 +130,5 @@ export const makeRows = (articles: ServiceOrderArticleView[]): GridRowsProp =>
     quantity: item.quantity,
     // percent: '-',
     actions: item,
-    navigateTo: `/articles/details/${item.article.id}`,
+    navigateTo: `/articles/details/${item.article?.id}`,
   }));

@@ -72,7 +72,7 @@ export interface PropertyOwnerSimpleView {
   name: string;
   serviceCompanyId: string;
   externalId: string;
-  units?: number;
+  number?: number;
 }
 
 export interface PropertyManager {
