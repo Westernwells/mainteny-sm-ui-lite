@@ -222,7 +222,7 @@ const ReportTimeEntries = ({
                 );
               }}
               customInput={TextField}
-              format="#:##h"
+              format="##:##h"
             />
           ) : (
             <Typography textAlign="end">{timeRawValues[index]}h</Typography>
