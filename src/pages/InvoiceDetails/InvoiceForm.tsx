@@ -1,4 +1,11 @@
-import {useContext, useEffect, useMemo, useState, useCallback} from 'react';
+import {
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from 'react';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -111,7 +118,7 @@ import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
-import {differenceWith, isEqual, omit} from 'lodash';
+import {isEqual} from 'lodash';
 import queryString from 'query-string';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
@@ -271,8 +278,9 @@ export const InvoiceForm = ({
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
 
   const isDrawerOpen = true;
-  const [allowServiceOrderUpdates, setAllowServiceOrderUpdates] =
-    useState(false);
+
+  const [isEditable, setIsEditable] = useState(false);
+  const initialLoadComplete = useRef(false);
 
   const [isAddNewCustomerDialogOpen, setIsAddNewCustomerDialogOpen] =
     useState<boolean>(false);
@@ -550,146 +558,6 @@ export const InvoiceForm = ({
     };
   };
 
-  const prefillFormWithInvoiceData = (invoiceData?: InvoiceView) => {
-    if (invoiceData && formType === 'edit') {
-      const invoiceCustomer = invoiceData.propertyOwner;
-
-      formik.setFieldValue(
-        'elevatorExternalId',
-        invoiceData.additionalInfo.elevatorExternalId ?? '',
-      );
-
-      formik.setFieldValue(
-        'serviceCompanyId',
-        invoice?.serviceCompany.id || user?.userAccount.serviceCompany.id,
-      );
-
-      formik.setFieldValue('description', invoiceData?.description ?? '');
-
-      formik.setFieldValue('propertyOwnerId', invoiceCustomer?.id ?? '');
-
-      formik.setFieldValue(
-        'serviceOrderId',
-        invoiceData?.serviceOrder?.id ?? '',
-      );
-
-      formik.setFieldValue(
-        'includeWorkReport',
-        invoiceData?.additionalInfo.includeWorkReport || false,
-      );
-
-      formik.setFieldValue(
-        'includeCheckList',
-        invoiceData?.additionalInfo.includeCheckList || false,
-      );
-
-      formik.setFieldValue(
-        'beneficialName',
-        invoiceData?.additionalInfo.beneficialDetails?.name || '',
-      );
-
-      formik.setFieldValue(
-        'costCenter',
-        invoiceData?.additionalInfo?.costCenter || '',
-      );
-      formik.setFieldValue(
-        'customerSpecificOrderNumber',
-        invoiceData?.additionalInfo?.customerSpecificOrderNumber || '',
-      );
-      formik.setFieldValue(
-        'moreInfo',
-        invoiceData?.additionalInfo?.moreInfo ?? '',
-      );
-
-      formik.setFieldValue(
-        'beneficiaryAddress',
-        invoiceData.additionalInfo?.beneficiaryAddress ||
-          invoiceCustomer?.beneficiaryAddress,
-      );
-
-      formik.setFieldValue(
-        'alternativeAddress',
-        invoiceData.additionalInfo.alternativeAddress ||
-          invoiceCustomer?.otherAddress,
-      );
-
-      formik.setFieldValue(
-        'dueDate',
-        invoiceData.dueDate ? new Date(invoiceData.dueDate) : undefined,
-      );
-      formik.setFieldValue(
-        'sentDate',
-        invoiceData.sentDate ? new Date(invoiceData.sentDate) : undefined,
-      );
-      formik.setFieldValue(
-        'deliveryStartDate',
-        invoiceData.additionalInfo.deliveryStartDate
-          ? new Date(invoiceData.additionalInfo.deliveryStartDate)
-          : undefined,
-      );
-      formik.setFieldValue(
-        'deliveryEndDate',
-        invoiceData.additionalInfo.deliveryEndDate
-          ? new Date(invoiceData.additionalInfo.deliveryEndDate)
-          : undefined,
-      );
-
-      if (invoiceData?.additionalInfo.paymentTerm) {
-        formik.setFieldValue('paymentTerm', {
-          term: invoiceData.additionalInfo.paymentTerm.term || '',
-        });
-      }
-
-      formik.setFieldValue(
-        'type',
-        formik.values.type === InvoiceType.CREDIT_NOTE
-          ? InvoiceType.CREDIT_NOTE
-          : invoiceData?.type || formik.values.type,
-      );
-
-      formik.setFieldValue(
-        'discount',
-        invoiceData?.additionalInfo?.discount
-          ? {
-              ...invoiceData?.additionalInfo?.discount,
-              amount: invoiceData?.additionalInfo?.discount?.amount
-                ? {
-                    ...invoiceData?.additionalInfo?.discount?.amount,
-                    value:
-                      (invoiceData?.additionalInfo?.discount?.amount?.value ??
-                        0) /
-                        10 **
-                          (invoiceData?.additionalInfo?.discount?.amount
-                            ?.fractionDigits ?? 2) || 0,
-                  }
-                : undefined,
-            }
-          : undefined,
-      );
-
-      formik.setFieldValue(
-        'showArticleSection',
-        invoiceData?.additionalInfo?.showArticleSection ?? true,
-      );
-
-      formik.setFieldValue('items', invoiceData.items);
-
-      formik.setFieldValue(
-        'alternativeServiceCompanyInfo',
-        invoice?.additionalInfo.alternativeServiceCompanyInfo || {
-          name: user?.userAccount.serviceCompany.name || '',
-          address: user?.userAccount.serviceCompany.billingAddress,
-        },
-      );
-    }
-  };
-
-  useEffect(() => {
-    if (invoice) {
-      prefillFormWithInvoiceData(invoice);
-    }
-  }, [invoice]);
-
   const setCreditNoteArticles = () => {
     const creditNoteArticle = articleViewToInvoiceItemRecord(
       creditNoteArticlesResource.data[0],
@@ -728,6 +596,139 @@ export const InvoiceForm = ({
     }
   }, [invoice, isLoadingCreditNoteArticles]);
 
+  const prefillFormWithInvoiceData = (invoiceData?: InvoiceView) => {
+    const invoiceCustomer = invoiceData?.propertyOwner;
+
+    setServiceOrder(invoiceData?.serviceOrder);
+
+    formik.setFieldValue(
+      'elevatorExternalId',
+      invoiceData?.additionalInfo.elevatorExternalId ?? '',
+    );
+
+    formik.setFieldValue(
+      'serviceCompanyId',
+      invoice?.serviceCompany.id || user?.userAccount.serviceCompany.id,
+    );
+
+    formik.setFieldValue('description', invoiceData?.description ?? '');
+
+    formik.setFieldValue('propertyOwnerId', invoiceCustomer?.id ?? '');
+
+    formik.setFieldValue(
+      'includeWorkReport',
+      invoiceData?.additionalInfo.includeWorkReport || false,
+    );
+
+    formik.setFieldValue(
+      'includeCheckList',
+      invoiceData?.additionalInfo.includeCheckList || false,
+    );
+
+    formik.setFieldValue(
+      'beneficialName',
+      invoiceData?.additionalInfo.beneficialDetails?.name || '',
+    );
+
+    formik.setFieldValue(
+      'costCenter',
+      invoiceData?.additionalInfo?.costCenter || '',
+    );
+
+    formik.setFieldValue(
+      'customerSpecificOrderNumber',
+      invoiceData?.additionalInfo?.customerSpecificOrderNumber || '',
+    );
+    formik.setFieldValue(
+      'moreInfo',
+      invoiceData?.additionalInfo?.moreInfo ?? '',
+    );
+
+    formik.setFieldValue(
+      'billingAddress',
+      invoiceData?.additionalInfo?.billingAddress || emptyAddressState,
+    );
+
+    formik.setFieldValue(
+      'beneficiaryAddress',
+      invoiceData?.additionalInfo?.beneficiaryAddress || emptyAddressState,
+    );
+
+    formik.setFieldValue(
+      'alternativeAddress',
+      invoiceData?.additionalInfo.alternativeAddress || emptyAddressState,
+    );
+
+    formik.setFieldValue(
+      'dueDate',
+      invoiceData?.dueDate ? new Date(invoiceData?.dueDate) : undefined,
+    );
+    formik.setFieldValue(
+      'sentDate',
+      invoiceData?.sentDate ? new Date(invoiceData?.sentDate) : undefined,
+    );
+    formik.setFieldValue(
+      'deliveryStartDate',
+      invoiceData?.additionalInfo.deliveryStartDate
+        ? new Date(invoiceData?.additionalInfo.deliveryStartDate)
+        : undefined,
+    );
+    formik.setFieldValue(
+      'deliveryEndDate',
+      invoiceData?.additionalInfo.deliveryEndDate
+        ? new Date(invoiceData?.additionalInfo.deliveryEndDate)
+        : undefined,
+    );
+
+    if (invoiceData?.additionalInfo.paymentTerm) {
+      formik.setFieldValue('paymentTerm', {
+        term: invoiceData.additionalInfo.paymentTerm.term || '',
+      });
+    }
+
+    formik.setFieldValue(
+      'type',
+      formik.values.type === InvoiceType.CREDIT_NOTE
+        ? InvoiceType.CREDIT_NOTE
+        : invoiceData?.type || formik.values.type,
+    );
+
+    formik.setFieldValue(
+      'discount',
+      invoiceData?.additionalInfo?.discount
+        ? {
+            ...invoiceData?.additionalInfo?.discount,
+            amount: invoiceData?.additionalInfo?.discount?.amount
+              ? {
+                  ...invoiceData?.additionalInfo?.discount?.amount,
+                  value:
+                    (invoiceData?.additionalInfo?.discount?.amount?.value ??
+                      0) /
+                      10 **
+                        (invoiceData?.additionalInfo?.discount?.amount
+                          ?.fractionDigits ?? 2) || 0,
+                }
+              : undefined,
+          }
+        : undefined,
+    );
+
+    formik.setFieldValue(
+      'showArticleSection',
+      invoiceData?.additionalInfo?.showArticleSection ?? true,
+    );
+
+    formik.setFieldValue('items', invoiceData?.items);
+
+    formik.setFieldValue(
+      'alternativeServiceCompanyInfo',
+      invoiceData?.additionalInfo.alternativeServiceCompanyInfo || {
+        name: user?.userAccount.serviceCompany.name || '',
+        address: user?.userAccount.serviceCompany.billingAddress,
+      },
+    );
+  };
+
   const setFormFieldsFromPropertyOwner = (propertyOwner: PropertyOwnerView) => {
     formik.setFieldValue(
       'billingAddress',
@@ -760,167 +761,190 @@ export const InvoiceForm = ({
     }
   };
 
-  const setFormFieldsFromInvoice = (invoiceData: InvoiceView) => {
-    formik.setFieldValue(
-      'billingAddress',
-      invoiceData?.additionalInfo.billingAddress || emptyAddressState,
-    );
-    formik.setFieldValue(
-      'beneficiaryAddress',
-      invoiceData?.additionalInfo.beneficiaryAddress || emptyAddressState,
-    );
-    formik.setFieldValue(
-      'alternativeAddress',
-      invoiceData?.additionalInfo.alternativeAddress || emptyAddressState,
-    );
-    formik.setFieldValue('paymentTerm', {
-      term: invoiceData?.additionalInfo.paymentTerm?.term || '',
-    });
-    formik.setFieldValue('costCenter', invoiceData?.additionalInfo.costCenter);
-    formik.setFieldValue('externalId', invoiceData.externalId);
-    formik.setFieldValue(
-      'dueDate',
-      invoiceData?.dueDate ? new Date(invoiceData.dueDate) : undefined,
-    );
-  };
+  const setFormFieldsFromServiceOrder = (serviceOrderArg: ServiceOrderView) => {
+    setServiceOrder(serviceOrderArg);
 
-  const setFormFieldsFromLocalStorage = (
-    localStorageData: Partial<InvoiceFormData | null>,
-  ) => {
-    formik.setFieldValue(
-      'billingAddress',
-      localStorageData?.billingAddress || emptyAddressState,
-    );
-    formik.setFieldValue(
-      'beneficiaryAddress',
-      localStorageData?.beneficiaryAddress || emptyAddressState,
-    );
-    formik.setFieldValue(
-      'alternativeAddress',
-      localStorageData?.alternativeAddress || emptyAddressState,
-    );
-  };
+    formik.setFieldValue('serviceOrderId', serviceOrderArg?.id || '-');
 
-  const setFormFieldsFromServiceOrder = (
-    serviceOrderArg?: ServiceOrderView,
-  ) => {
-    if (!allowServiceOrderUpdates) return;
-
-    if (serviceOrderArg) {
-      formik.setFieldValue('serviceOrderId', serviceOrderArg.id);
-
+    if (!formik.values.description && serviceOrderArg?.report?.description) {
       formik.setFieldValue(
-        'propertyOwnerId',
-        serviceOrderArg.elevator.propertyOwner.id,
+        'description',
+        stripHtmlTags(serviceOrderArg?.report.description),
       );
+    }
 
-      if (!formik.values.description && serviceOrderArg?.report?.description) {
-        formik.setFieldValue(
-          'description',
-          stripHtmlTags(serviceOrderArg?.report.description),
-        );
-      }
+    formik.setFieldValue(
+      'unitNumber',
+      serviceOrderArg?.elevator.externalId || '-',
+    );
 
+    formik.setFieldValue(
+      'elevatorExternalId',
+      serviceOrderArg?.elevator.externalId || '-',
+    );
+
+    formik.setFieldValue(
+      'deliveryStartDate',
+      serviceOrderArg?.actualStartTime
+        ? new Date(serviceOrderArg.actualStartTime)
+        : undefined,
+    );
+
+    formik.setFieldValue(
+      'deliveryEndDate',
+      serviceOrderArg?.actualEndTime
+        ? new Date(serviceOrderArg.actualEndTime)
+        : undefined,
+    );
+
+    if (serviceOrderArg?.additionalInfo.discount) {
       formik.setFieldValue(
-        'unitNumber',
-        serviceOrderArg?.elevator.externalId || '-',
+        'discount',
+        getDiscoutObj(serviceOrderArg?.additionalInfo.discount),
       );
+    }
 
+    if (!formik.values.items.length) {
       formik.setFieldValue(
-        'elevatorExternalId',
-        serviceOrderArg?.elevator.externalId || '-',
+        'items',
+        serviceOrderArg?.articles?.map(articleViewToItem),
       );
-
-      formik.setFieldValue(
-        'deliveryStartDate',
-        serviceOrderArg?.actualStartTime
-          ? new Date(serviceOrderArg.actualStartTime)
-          : undefined,
-      );
-
-      formik.setFieldValue(
-        'deliveryEndDate',
-        serviceOrderArg?.actualEndTime
-          ? new Date(serviceOrderArg.actualEndTime)
-          : undefined,
-      );
-
-      if (serviceOrderArg?.additionalInfo.discount) {
-        formik.setFieldValue(
-          'discount',
-          getDiscoutObj(serviceOrderArg?.additionalInfo.discount),
-        );
-      }
-
-      if (!formik.values.items.length) {
-        formik.setFieldValue(
-          'items',
-          serviceOrderArg?.articles?.map(articleViewToItem),
-        );
-      }
-
-      const dueDays =
-        serviceOrderArg?.contract?.additionalInfo?.invoiceDueDays || 0;
-      if (dueDays > 0 && formType === 'new') {
-        formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
-        setResetDueDatePicker(true);
-      }
-
-      if (pageState === PageState.CONTINUE_NEW) {
-        formik.setFieldValue(
-          'deliveryStartDate',
-          initialLocalStorageData?.deliveryStartDate
-            ? new Date(initialLocalStorageData?.deliveryStartDate)
-            : undefined,
-        );
-
-        formik.setFieldValue(
-          'deliveryEndDate',
-          initialLocalStorageData?.deliveryEndDate
-            ? new Date(initialLocalStorageData?.deliveryEndDate)
-            : undefined,
-        );
-      }
+    }
+    const dueDays =
+      serviceOrderArg?.contract?.additionalInfo?.invoiceDueDays || 0;
+    if (dueDays > 0 && formType === 'new') {
+      formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
+      setResetDueDatePicker(true);
     }
   };
 
-  const handleEditForm = (
-    propertyOwner: PropertyOwnerView,
-    invoiceData?: InvoiceView,
-  ) => {
-    if (propertyOwner.id === invoiceData?.propertyOwner.id) {
-      setFormFieldsFromInvoice(invoiceData);
-    } else {
-      setFormFieldsFromPropertyOwner(propertyOwner);
+  // Prefill exisiting invoice information
+  useEffect(() => {
+    if (
+      !initialLoadComplete.current &&
+      invoice &&
+      formType === 'edit' &&
+      !isEditable
+    ) {
+      prefillFormWithInvoiceData(invoice);
+      initialLoadComplete.current = true; // Mark initial load as complete
     }
-  };
+  }, []);
 
-  const handleNewForm = (
-    propertyOwner: PropertyOwnerView,
-    localStorageData: Partial<InvoiceFormData | null>,
-  ) => {
-    if (pageState === PageState.FRESH_NEW) {
-      setFormFieldsFromPropertyOwner(propertyOwner);
-    } else {
-      setFormFieldsFromLocalStorage(localStorageData);
-    }
-  };
+  // Handle edit mode when customer value changes
 
   useEffect(() => {
-    if (!propertyOwnerData) return;
-
-    setCustomer(propertyOwnerData);
-
-    if (formType === 'edit') {
-      handleEditForm(propertyOwnerData, invoice);
-    } else if (formType === 'new') {
-      handleNewForm(propertyOwnerData, initialLocalStorageData);
+    if (
+      initialLoadComplete.current &&
+      formType === 'edit' &&
+      isEditable &&
+      customer &&
+      invoice
+    ) {
+      setFormFieldsFromPropertyOwner(customer);
     }
-  }, [propertyOwnerData]);
+  }, [customer, formType]);
+
+  // Handle new form mode and editable
+  useEffect(() => {
+    if (
+      formType === 'new' &&
+      isEditable &&
+      customer &&
+      pageState === PageState.FRESH_NEW
+    ) {
+      setFormFieldsFromPropertyOwner(customer);
+    }
+  }, [customer, invoice, isEditable, pageState]);
+
+  // Handle invoice from job flow when there is service order and invoiceType as customer and propertyOwner state changes
+  useEffect(() => {
+    if (
+      !invoice &&
+      formType === 'new' &&
+      isEditable &&
+      invoiceType &&
+      orderId &&
+      customer &&
+      pageState === PageState.FRESH_NEW
+    ) {
+      setFormFieldsFromPropertyOwner(customer);
+
+      if (propertyOwnerData) {
+        if (propertyOwnerData.paymentTerm) {
+          formik.setFieldValue(
+            'paymentTerm',
+            getFormattedPaymentTerms(propertyOwnerData.paymentTerm) || '',
+          );
+        }
+
+        if (propertyOwnerData.paymentTerm?.data?.dueDays) {
+          formik.setFieldValue(
+            'dueDate',
+            addDays(new Date(), propertyOwnerData?.paymentTerm?.data?.dueDays),
+          );
+          setResetDueDatePicker(true);
+        }
+      }
+    }
+  }, [customer, formType, orderId, invoiceType, propertyOwnerData, pageState]);
+
+  // Handle serviceOrder state update in new state, without invoice and there is both customer and service order
+  useEffect(() => {
+    if (serviceOrder) {
+      setCustomer(serviceOrder.elevator.propertyOwner);
+
+      if (
+        isEditable &&
+        !invoice &&
+        formType === 'new' &&
+        invoiceType &&
+        orderId &&
+        customer &&
+        serviceOrder
+      ) {
+        setFormFieldsFromServiceOrder(serviceOrder);
+      }
+    }
+  }, [serviceOrder, orderId, formType, customer, isEditable]);
 
   useEffect(() => {
-    setFormFieldsFromServiceOrder(serviceOrder);
-  }, [serviceOrder]);
+    if (
+      customer &&
+      pageState === PageState.CONTINUE_NEW &&
+      initialLocalStorageData
+    ) {
+      formik.setFieldValue(
+        'billingAddress',
+        initialLocalStorageData?.billingAddress || emptyAddressState,
+      );
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        initialLocalStorageData?.beneficiaryAddress || emptyAddressState,
+      );
+      formik.setFieldValue(
+        'alternativeAddress',
+        initialLocalStorageData?.alternativeAddress || emptyAddressState,
+      );
+    }
+  }, [customer, pageState, initialLocalStorageData]);
+
+  // Update customer value when there is service resource from parent
+
+  useEffect(() => {
+    if (customerResource && customerId) {
+      setCustomer(customerResource);
+    }
+  }, []);
+
+  // Update service order when there is service resource from parent
+  useEffect(() => {
+    if (serviceOrderResource && orderId) {
+      setServiceOrder(serviceOrderResource);
+    }
+  }, []);
+
+  // Update service order when there is a service order data value controlled by formik.values.serviceOrderId
 
   useEffect(() => {
     if (serviceOrderData) {
@@ -928,56 +952,37 @@ export const InvoiceForm = ({
     }
   }, [serviceOrderData]);
 
+  // Handle page update when resuming from where you stopped and there is no service order but there's customer / propertyOwnerData
   useEffect(() => {
-    if (serviceOrderResource && orderId) {
-      setServiceOrder(serviceOrderResource);
-      formik.setFieldValue(
-        'propertyOwnerId',
-        serviceOrderResource.elevator.propertyOwner.id,
-      );
+    if (propertyOwnerData) {
+      setCustomer(propertyOwnerData);
     }
-  }, [serviceOrderResource, orderId]);
+  }, [propertyOwnerData]);
 
-  useEffect(() => {
-    if (customerResource && customerId) {
-      setCustomer(customerResource);
-    }
-  }, [customerResource, customerId]);
-
-  const handleSelectCustomer = (row: PropertyOwnerView) => {
-    formik.setFieldValue('propertyOwnerId', row.id);
-  };
-
-  const handleRemoveCustomer = () => {
-    setServiceOrder(undefined);
+  const handleRemoveCustomer = useCallback(() => {
     setCustomer(undefined);
-    formik.setValues({
-      ...formik.values,
-      serviceOrderId: '',
-      propertyOwnerId: '',
-      costCenter: '',
-      paymentTerm: {term: ''},
-    });
+    setServiceOrder(undefined);
+    formik.setFieldValue('serviceOrderId', '');
+    formik.setFieldValue('propertyOwnerId', '');
+    formik.setFieldValue('costCenter', '');
+    formik.setFieldValue('paymentTerm', {term: ''});
     setPageState(PageState.FRESH_NEW);
-  };
+  }, [formik]);
 
-  const handleCustomerChange = (value?: PropertyOwnerView | null) => {
-    if (value) {
-      handleSelectCustomer(value);
+  const handleCustomerChange = (newCustomer?: PropertyOwnerView | null) => {
+    if (newCustomer) {
+      setCustomer(newCustomer);
+      formik.setFieldValue('propertyOwnerId', newCustomer.id);
+      setIsEditable(true);
     } else {
       handleRemoveCustomer();
     }
   };
 
-  useEffect(() => {
-    // This is important as handleCustomerChange runs on page load and may be null leading to endless re-renders
-    if (customer) {
-      handleCustomerChange(customer);
-    }
-  }, [customer]);
-
   const handleSelectServiceOrder = (selectedServiceOrder: ServiceOrderView) => {
-    setAllowServiceOrderUpdates(true);
+    const selectedCustomer = selectedServiceOrder.elevator.propertyOwner;
+    handleCustomerChange(selectedCustomer);
+    formik.setFieldValue('serviceOrderId', selectedServiceOrder.id);
     setServiceOrder(selectedServiceOrder);
   };
 
@@ -1135,7 +1140,7 @@ export const InvoiceForm = ({
     if (formType === 'new' && !invoiceType && !(customerId || orderId)) {
       initializeFormDataFromLocalStorage();
     }
-  }, [formType, invoiceType]);
+  }, [formType, invoiceType, customerId, orderId]);
 
   useEffectAfterMount(() => {
     if (formType === 'new') {

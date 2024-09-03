@@ -138,9 +138,9 @@ export const PartialPaymentsSection = ({
   // if editing, we need to show only past invoices till this one (editing invoice included)
   // if creating, we need to show all invoices
   const previousInvoices = isEditing
-    ? allPreviousInvoices.slice(
+    ? allPreviousInvoices?.slice(
         0,
-        allPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+        allPreviousInvoices?.findIndex((i) => i.id === invoice?.id) + 1,
       )
     : allPreviousInvoices;
   const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
@@ -173,7 +173,7 @@ export const PartialPaymentsSection = ({
   };
 
   const previousInvoicesTotalExclVat = previousInvoices
-    .map(
+    ?.map(
       (i) =>
         (i.totalAmount?.netAmount ?? 0) /
         10 ** (i.totalAmount?.fractionDigits ?? 2),
@@ -196,16 +196,16 @@ export const PartialPaymentsSection = ({
       subtotalExclVat -
       previousInvoicesTotalExclVat +
       (isEditing
-        ? (invoice.totalAmount?.netAmount ?? 0) /
-          10 ** (invoice.totalAmount?.fractionDigits ?? 2)
+        ? (invoice?.totalAmount?.netAmount ?? 0) /
+          10 ** (invoice?.totalAmount?.fractionDigits ?? 2)
         : 0);
 
     return floatValue <= maxAmount;
   };
 
   const prevInvoicesPercentage = previousInvoices
-    .map((i) => i.additionalInfo.payment?.percentage ?? 0)
-    .reduce((a, b) => a + b, 0);
+    ?.map((i) => i.additionalInfo.payment?.percentage ?? 0)
+    ?.reduce((a, b) => a + b, 0);
 
   const isAllowedPercentageField = (values: NumberFormatValues) => {
     const {floatValue} = values;
@@ -220,7 +220,7 @@ export const PartialPaymentsSection = ({
     const maxPercentage = isEditing
       ? 100 -
         (prevInvoicesPercentage -
-          (invoice.additionalInfo.payment?.percentage ?? 0))
+          (invoice?.additionalInfo?.payment?.percentage ?? 0))
       : 100 - prevInvoicesPercentage;
 
     return floatValue <= maxPercentage;
@@ -233,14 +233,14 @@ export const PartialPaymentsSection = ({
       ? (subtotalExclVat * (formik.values.payment?.percentage ?? 0)) / 100
       : formik.values.payment?.type === PaymentType.PER_ITEM
       ? formik.values.items
-          .map(
+          ?.map(
             (item) =>
               ((item.unitAmount.netAmount * item.quantity) /
                 10 ** Currencies[item.unitAmount.currency] /
                 100) *
               (item.payment?.percentage ?? 0),
           )
-          .reduce((a, b) => a + b, 0)
+          ?.reduce((a, b) => a + b, 0)
       : 0;
 
   const amountFormatted = formatCurrency(fixRounding(amount, 2), {
@@ -252,8 +252,8 @@ export const PartialPaymentsSection = ({
   const totalAmountExclVat = isEditing
     ? amount +
       previousInvoicesTotalExclVat -
-      (invoice.totalAmount?.netAmount ?? 0) /
-        10 ** (invoice.totalAmount?.fractionDigits ?? 2)
+      (invoice?.totalAmount?.netAmount ?? 0) /
+        10 ** (invoice?.totalAmount?.fractionDigits ?? 2)
     : amount + previousInvoicesTotalExclVat;
   const totalAmountExclVatFormatted = formatCurrency(
     fixRounding(totalAmountExclVat, 2),
@@ -333,6 +333,7 @@ export const PartialPaymentsSection = ({
     // 2. Partial invoice
     // 3. Final invoice
     // see the change in invoice index above.
+
     const lastInvoiceDescription =
       lastInvoice?.additionalInfo.payment?.description;
     const lastInvoiceIndexString =
@@ -350,57 +351,63 @@ export const PartialPaymentsSection = ({
       : previousInvoices.length + 1;
 
     if (isEditing) {
-      // do nothing
+      // do nothing if editing
     } else if (isFinalAfterPartial) {
       const description = `${invoiceIndex}. ${t('Final invoice')}`;
-      // prefill percentage/amount if it's a final invoice after partial invoices
-      formik.setFieldValue('payment', {
-        ...formik.values.payment,
-        ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
-          ? {
-              type: PaymentType.PERCENTAGE,
-              description,
-              percentage: 100 - prevInvoicesPercentage,
-            }
-          : firstInvoicePaymentType === PaymentType.PER_ITEM
-          ? {
-              type: PaymentType.PER_ITEM,
-              description,
-            }
-          : {
-              type: PaymentType.LUMP_SUM,
-              description,
-              amount: {
-                ...formik.values.payment?.amount,
-                value: subtotalExclVat - previousInvoicesTotalExclVat,
-              },
-            }),
-      });
-    } else {
-      // change payment type according to first invoice
-      formik.setFieldValue('payment', {
-        ...formik.values.payment,
-        type:
-          firstInvoicePaymentType === PaymentType.PERCENTAGE
-            ? PaymentType.PERCENTAGE
+      // Check before setting the value to avoid unnecessary updates
+      if (formik.values.payment?.description !== description) {
+        formik.setFieldValue('payment', {
+          ...formik.values.payment,
+          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
+            ? {
+                type: PaymentType.PERCENTAGE,
+                description,
+                percentage: 100 - prevInvoicesPercentage,
+              }
             : firstInvoicePaymentType === PaymentType.PER_ITEM
-            ? PaymentType.PER_ITEM
-            : PaymentType.LUMP_SUM,
-        description: `${invoiceIndex}. ${t('Partial invoice')}`,
-      });
+            ? {
+                type: PaymentType.PER_ITEM,
+                description,
+              }
+            : {
+                type: PaymentType.LUMP_SUM,
+                description,
+                amount: {
+                  ...formik.values.payment?.amount,
+                  value: subtotalExclVat - previousInvoicesTotalExclVat,
+                },
+              }),
+        });
+      }
+    } else {
+      const description = `${invoiceIndex}. ${t('Partial invoice')}`;
+      if (formik.values.payment?.description !== description) {
+        formik.setFieldValue('payment', {
+          ...formik.values.payment,
+          type:
+            firstInvoicePaymentType === PaymentType.PERCENTAGE
+              ? PaymentType.PERCENTAGE
+              : firstInvoicePaymentType === PaymentType.PER_ITEM
+              ? PaymentType.PER_ITEM
+              : PaymentType.LUMP_SUM,
+          description,
+        });
+      }
     }
-  }, [previousInvoices]);
+  }, [previousInvoices, formik]);
 
   useEffect(() => {
+    if (!invoice) return;
+
     // initialize payment object if it's not set
     if (invoice?.additionalInfo.payment && !formik.values.payment) {
       const amountMoney = aggregatedAmountToMoney(
-        invoice.additionalInfo.payment.amount,
+        invoice?.additionalInfo?.payment?.amount,
       );
       amountMoney.value =
         (amountMoney?.value ?? 0) / 10 ** (amountMoney?.fractionDigits ?? 2);
       formik.setFieldValue('payment', {
-        ...invoice.additionalInfo.payment,
+        ...invoice?.additionalInfo?.payment,
         amount: amountMoney,
       });
     }
@@ -424,10 +431,10 @@ export const PartialPaymentsSection = ({
   const renderPerItemSection = () => {
     const getItemOverallPercentage = (id: string) =>
       previousInvoices
-        .map((i) => i.items)
-        .flat()
-        .filter((i) => i.article?.id && i.article?.id === id)
-        .reduce(
+        ?.map((i) => i.items)
+        ?.flat()
+        ?.filter((i) => i.article?.id && i.article?.id === id)
+        ?.reduce(
           (acc, i) => acc + (i.additionalInfo?.payment?.percentage ?? 0),
           0,
         );
@@ -459,7 +466,7 @@ export const PartialPaymentsSection = ({
     return (
       <Grid container rowGap={4} justifyContent="space-between">
         {hasPreviousInvoices &&
-          previousInvoices.map((prevInvoice, idx) => (
+          previousInvoices?.map((prevInvoice, idx) => (
             <Fragment key={prevInvoice.id}>
               <Grid item xs={12}>
                 <NameInput
@@ -504,7 +511,7 @@ export const PartialPaymentsSection = ({
                             : (item.additionalInfo?.payment?.percentage ?? 0) >
                                 0;
                         })
-                        .map((item, index) => {
+                        ?.map((item, index) => {
                           const itemIndex = prevInvoice.items.findIndex(
                             (i) => i.article?.id === item.article?.id,
                           );
@@ -620,7 +627,7 @@ export const PartialPaymentsSection = ({
                   </Table>
                 </TableContainer>
               </Grid>
-              {idx <= previousInvoices.length - 1 && (
+              {idx <= previousInvoices?.length - 1 && (
                 <Grid item xs={12}>
                   <Divider sx={{borderColor: theme.palette.grey[300]}} />
                 </Grid>
@@ -653,12 +660,12 @@ export const PartialPaymentsSection = ({
                   </TableHead>
                   <TableBody>
                     {formik.values.items
-                      .filter(
+                      ?.filter(
                         // if item already paid 100% full, don't render it
                         (i) =>
                           getItemOverallPercentage(i.article?.id ?? '') < 100,
                       )
-                      .map((item, index) => {
+                      ?.map((item, index) => {
                         const itemTotalPriceExclVat =
                           (item.unitAmount.netAmount * item.quantity) /
                           10 ** Currencies[item.unitAmount.currency];
@@ -798,9 +805,9 @@ export const PartialPaymentsSection = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {previousInvoices.map((i, index) => {
+            {previousInvoices?.map((i, index) => {
               // don't render anything for the editing invoice
-              if (isEditing && index === previousInvoices.length - 1) {
+              if (isEditing && index === previousInvoices?.length - 1) {
                 return null;
               }
               const invoiceTotalAmount = i.totalAmount;
@@ -845,12 +852,12 @@ export const PartialPaymentsSection = ({
                     {amountExclVatFormatted}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount.vats.map((v, idx) => (
+                    {invoiceTotalAmount?.vats?.map((v, idx) => (
                       <p key={idx}>{v.percentageVat}%</p>
                     ))}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount.vats.map((v, idx) => {
+                    {invoiceTotalAmount?.vats?.map((v, idx) => {
                       const vatAmount = Math.abs(
                         (v?.vat ?? 0) / 10 ** fractionDigits,
                       );
@@ -885,12 +892,12 @@ export const PartialPaymentsSection = ({
                 {amountFormatted}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats.map((v, idx) => (
+                {currentInvoiceAmountPercentageVats?.map((v, idx) => (
                   <p key={idx}>{v.percentageVat}%</p>
                 ))}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats.map((v, idx) => {
+                {currentInvoiceAmountPercentageVats?.map((v, idx) => {
                   const vatAmountFormatted = formatCurrency(v.vat, {
                     currency: currentCurrency.code,
                     minimumFractionDigits: 2,
@@ -904,8 +911,8 @@ export const PartialPaymentsSection = ({
                 {formatCurrency(
                   amount +
                     currentInvoiceAmountPercentageVats
-                      .map((v) => v.vat)
-                      .reduce((a, b) => a + b, 0),
+                      ?.map((v) => v.vat)
+                      ?.reduce((a, b) => a + b, 0),
                   {
                     currency: currentCurrency.code,
                     minimumFractionDigits: 2,
@@ -935,14 +942,14 @@ export const PartialPaymentsSection = ({
   ];
 
   const paidAmountInclVats = previousInvoices
-    .map((i) =>
+    ?.map((i) =>
       i.payments.reduce(
         (acc, p) =>
           acc + (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
         0,
       ),
     )
-    .reduce((acc, a) => acc + a, 0);
+    ?.reduce((acc, a) => acc + a, 0);
   const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency.code,
@@ -975,7 +982,7 @@ export const PartialPaymentsSection = ({
                 {totalAmountInclVatsFormatted}
               </TableCell>
             </TableRow>
-            {previousInvoices.map((i, index) => {
+            {previousInvoices?.map((i, index) => {
               if (!i.payments.length) {
                 return null;
               }
@@ -987,13 +994,13 @@ export const PartialPaymentsSection = ({
 
               const paidAmountExclVat = Math.abs(
                 i.payments
-                  .map(
+                  ?.map(
                     (p) =>
                       (p.additionalInfo.paymentDetails?.netAmount ?? 0) /
                       10 **
                         (p.additionalInfo.paymentDetails?.fractionDigits ?? 2),
                   )
-                  .reduce((a, b) => a + b, 0),
+                  ?.reduce((a, b) => a + b, 0),
               );
 
               const paidAmountExclVatFormatted = formatCurrency(
@@ -1008,13 +1015,13 @@ export const PartialPaymentsSection = ({
 
               const percentageVats = uniq(
                 i.payments
-                  .map((p) => p.additionalInfo.paymentDetails?.vats)
-                  .flat(),
+                  ?.map((p) => p.additionalInfo.paymentDetails?.vats)
+                  ?.flat(),
               );
 
               const totalPriceInclVat = Math.abs(
                 i.payments
-                  .map(
+                  ?.map(
                     (p) =>
                       (p.amount?.value ?? 0) /
                       10 ** (p.amount?.fractionDigits ?? 2),
@@ -1046,12 +1053,12 @@ export const PartialPaymentsSection = ({
                     {paidAmountExclVatFormatted}
                   </TableCell>
                   <TableCell align="right">
-                    {percentageVats.map((pV) => (
+                    {percentageVats?.map((pV) => (
                       <p key={pV?.percentageVat}>{pV?.percentageVat}%</p>
                     ))}
                   </TableCell>
                   <TableCell align="right">
-                    {percentageVats.map((pV, idx) => (
+                    {percentageVats?.map((pV, idx) => (
                       <p key={`${pV?.percentageVat}-${idx}`}>
                         {signBeforeNumber}
                         {formatCurrency(Math.abs((pV?.vat ?? 0) / 10 ** 2), {
@@ -1088,7 +1095,8 @@ export const PartialPaymentsSection = ({
     </>
   );
 
-  const hasPayments = previousInvoices.map((i) => i.payments).flat().length > 0;
+  const hasPayments =
+    previousInvoices?.map((i) => i.payments).flat().length > 0;
 
   return (
     <Grid item xs={12} bgcolor="white" p={3}>
@@ -1108,7 +1116,7 @@ export const PartialPaymentsSection = ({
         ) : (
           <Grid container rowGap={2.5} justifyContent="space-between">
             {hasPreviousInvoices &&
-              previousInvoices.map((prevInvoice) => (
+              previousInvoices?.map((prevInvoice) => (
                 <Fragment key={prevInvoice.id}>
                   <Grid item xs={7}>
                     <NameInput
@@ -1315,7 +1323,7 @@ export const PartialPaymentsSection = ({
               </Typography>
             </>
           ) : (
-            percentageVats.map((v) => (
+            percentageVats?.map((v) => (
               <Fragment key={v.percentageVat}>
                 <Typography variant="body1" color="primary.dark">
                   {T('VAT')} {v.percentageVat}%
@@ -1343,7 +1351,7 @@ export const PartialPaymentsSection = ({
           <>
             {/* INVOICED SECTION */}
             {/* if editing, show invoiced section if there is more than one previous invoice */}
-            {!isEditing || (isEditing && previousInvoices.length > 1) ? (
+            {!isEditing || (isEditing && previousInvoices?.length > 1) ? (
               <>
                 <Divider sx={{borderColor: theme.palette.grey[300]}} />
                 {renderInvoicedSection()}

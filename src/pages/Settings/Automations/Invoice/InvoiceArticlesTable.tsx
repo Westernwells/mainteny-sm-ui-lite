@@ -47,8 +47,8 @@ export const makeRows = (invoiceArticles: TravelWorkView[]): GridRowsProp =>
     ? invoiceArticles.map((item: TravelWorkView, index: number) => ({
         id: index,
         name: item.article?.name,
-        articleNumber: item.article.externalId,
-        unit: item.article.unit,
+        articleNumber: item.article?.externalId,
+        unit: item.article?.unit,
         automate: item,
         sellingPrice: formatCurrency(
           (item.article.unitSellingAmount.netAmount ?? 0) /
