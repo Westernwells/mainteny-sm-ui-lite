@@ -56,7 +56,7 @@ export const SERVICE_ELEVATORS: ContractServiceFormElevator[] = [
   elevatorTwo,
 ];
 
-export const mockValidElevatorContracts = {
+export const mockValidElevatorContracts: ContractSimpleView = {
   id: 'fec39a78-eaad-43ec-8e63-1b16354e523b',
   name: 'normal invoice cycle',
   number: 'CTA000030',
@@ -108,7 +108,6 @@ export const mockValidElevatorContracts = {
         },
         yearlyPrice: 4000,
       },
-      elevators: [], // field from the api is not returned when getting elevator by id
     },
     {
       id: '3b6dd1d9-f17d-4d2b-9afe-6a1a7f2e7e7d',
@@ -130,7 +129,7 @@ export const mockValidElevatorContracts = {
             price: 3000,
           },
           {
-            elevatorId: 'd3cea6f8-6170-497e-9937-2d0bb97bfad7',
+            elevatorId: 'dea7464c-6a50-4ef9-8115-ffc35ceae340',
             invoiceJob: {
               timeUnit: ContractTimeUnit.ANNUALLY,
               timeNumbers: [],
@@ -150,7 +149,6 @@ export const mockValidElevatorContracts = {
         yearlyPrice: 6000,
         orderType: ServiceOrderType.CALLOUT,
       },
-      elevators: [], // field from the api is not returned when getting elevator by id
     },
   ],
   search:
@@ -176,6 +174,9 @@ export const mockValidElevatorContracts = {
     lastUpdatedAt: '2024-08-21T09:45:44.944967Z',
     state: State.ACTIVE,
   },
+  additionalInfo: {},
+  endTime: '',
+  startTime: '',
 };
 
 export const mockExpiredElevatorContracts = {
@@ -224,7 +225,7 @@ export const mockElevatorContracts: Partial<ContractSimpleView>[] = [
 ];
 
 export const mockElevator: ElevatorView = {
-  id: '8cfd0618-feb4-4386-95be-260e90579fda',
+  id: 'd3cea6f8-6170-497e-9937-2d0bb97bfad7',
   number: 'U00015',
   externalId: 'U00015',
   serialNumber: '',
