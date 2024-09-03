@@ -17,6 +17,7 @@ variables:
     - lint-project
     - e2e-tests
     - component-tests
+    - vitest
   script:
     - node -v
     - export NODE_OPTIONS='--max-old-space-size=4096'
@@ -111,6 +112,26 @@ lint-project:
   script:
     - yarn install --frozen-lockfile --cache-folder .yarn-cache
     - yarn check-all
+  rules:
+    - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
+    - when: never
+
+vitest:
+  stage: test
+  image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
+  cache:
+    - <<: *global_cache_node_mods
+      when: on_success
+      policy: pull-push
+  script:
+    - yarn install --frozen-lockfile --cache-folder .yarn-cache
+    - yarn vitest run --coverage --reporter junit --output-file results/vitest-[hash].xml
+  artifacts:
+    when: always
+    paths:
+      - results/vitest-*.xml
+    reports:
+      junit: results/vitest-*.xml
   rules:
     - if: $CI_COMMIT_REF_NAME != 'main' && $CI_COMMIT_REF_NAME != 'develop' && $CI_MERGE_REQUEST_ID
     - when: never

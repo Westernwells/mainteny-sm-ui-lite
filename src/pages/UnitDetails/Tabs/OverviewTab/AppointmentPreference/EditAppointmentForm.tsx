@@ -144,7 +144,7 @@ export const EditAppointmentForm = ({
             },
           }}
           inputTestId="opening-hour-start"
-          popupTestId="opening-hour-popup"
+          popupTestId="opening-hour-start-popup"
         />
 
         {timeError && (
@@ -195,7 +195,7 @@ export const EditAppointmentForm = ({
             },
           }}
           inputTestId="opening-hour-end"
-          popupTestId="closing-hour-popup"
+          popupTestId="opening-hour-end-popup"
         />
 
         {timeError && (
