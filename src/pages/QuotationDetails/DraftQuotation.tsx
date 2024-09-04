@@ -4,7 +4,6 @@ import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {addDays} from 'date-fns';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -242,9 +241,6 @@ export const DraftQuotation = ({
     notes: quotation?.additionalInfo.notes || '',
     items: quotation?.items || [],
     serviceCompanyId: quotation?.serviceCompany.id || '',
-    expiryDate: quotation?.additionalInfo.expiryDate
-      ? new Date(quotation?.additionalInfo.expiryDate)
-      : addDays(new Date(), 14),
     elevatorId: quotation?.elevator?.id || null,
   };
 
