@@ -12,7 +12,6 @@ import {
   ServiceOrderType,
   ServiceOrderView,
 } from 'models/service-order';
-import {Order} from 'models/misc';
 import {Schedule} from 'components/Schedules';
 import {ScheduleItem} from 'components/Schedules/ScheduleItem';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
@@ -41,6 +40,7 @@ import Typography from '@mui/material/Typography';
 import {useWhen} from 'hooks/useWhen';
 import {useQueryState} from 'hooks/useQueryState';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
+import {Order} from '../../../../models/pagination';
 
 export const ServiceOrderScheduleTab = () => {
   const {t} = useTranslation();

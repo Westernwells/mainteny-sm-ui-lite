@@ -26,7 +26,6 @@ import {
 } from 'utils/contract';
 import {PriceRangeDropdown} from 'components/PriceRangeDropdown';
 import {useTranslation} from 'react-i18next';
-import {Order, OrderByParams} from 'models/misc';
 import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
 import {useSearchValues} from 'hooks/useSearchValues';
@@ -34,6 +33,7 @@ import {useSearchValues} from 'hooks/useSearchValues';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import useLogoImage from 'hooks/useLogoImage';
 import {columns, makeRows} from './QuotationsDataGridProps';
+import {Order, OrderByParams} from '../../models/pagination';
 
 const pageSize = 25;
 

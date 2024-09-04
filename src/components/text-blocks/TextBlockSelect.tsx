@@ -4,7 +4,6 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {useTextBlocks} from 'hooks/reactQuery/useTextBlock';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {Order, OrderByParams} from 'models/misc';
 import {
   TextBlockCategory,
   TextBlockFormModel,
@@ -26,6 +25,7 @@ import {Widget} from 'components/Widget';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {columns, makeRows} from './TextBlockSelectGridProps';
+import {Order, OrderByParams} from '../../models/pagination';
 
 type Props = {
   textBlockCategory: TextBlockCategory;

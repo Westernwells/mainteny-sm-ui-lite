@@ -44,12 +44,12 @@ import {createEmptyResource} from 'utils/paging';
 import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {useContractElevators} from 'hooks/reactQuery/useContacts';
 import {useQueryState} from 'hooks/useQueryState';
-import {Order} from 'models/misc';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {ContractCard} from '../ContractCard';
 import {SectionTitle} from '../../../../InvoiceDetails/SectionTitle';
 import ServiceInformationReview from './ServiceInfo';
 import {MutationService} from './MutationService';
+import {Order} from '../../../../../models/pagination';
 
 interface Props {
   contractDetails: ContractView;

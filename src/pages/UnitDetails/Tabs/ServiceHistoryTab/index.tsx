@@ -23,8 +23,8 @@ import {
   serviceOrderTypeToEnum,
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
-import {Order} from 'models/misc';
 import {columns, makeRows} from './ServiceHistoryDataGridProps';
+import {Order} from '../../../../models/pagination';
 
 const pageSize = 25;
 

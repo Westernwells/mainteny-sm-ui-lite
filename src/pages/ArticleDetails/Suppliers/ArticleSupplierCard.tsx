@@ -5,10 +5,11 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import {StatusChip} from 'components/StatusChip';
 import {InfoCard} from 'components/InfoCard';
-import {ArticleView, SupplierRecord} from 'models/article';
+import {ArticleView} from 'models/article';
 import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
 import {NoItemSection} from '../NoItemSection';
 import {ArticleSuppliersForm} from './ArticleSuppliersForm';
+import {SupplierRecord} from '../../../models/supplier';
 
 export const ArticleSupplierCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);

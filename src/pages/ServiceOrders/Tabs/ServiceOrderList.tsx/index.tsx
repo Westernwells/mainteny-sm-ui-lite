@@ -28,9 +28,9 @@ import {
 import {Widget} from 'components/Widget';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
-import {Order, OrderByParams} from 'models/misc';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
+import {Order, OrderByParams} from '../../../../models/pagination';
 
 const serviceOrderStatusMap = {
   Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE,

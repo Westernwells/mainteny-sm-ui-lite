@@ -3,13 +3,16 @@ import Box from '@mui/material/Box';
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
-import {ArticleSupplierView, ExtendedSupplierRecord} from 'models/article';
 import {FormInput} from 'components/form/FormInput';
 import {FormRadio} from 'components/form/FormRadio';
 import {ComboBox} from 'components/ComboBox';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
 import {Button} from 'components/Button';
+import {
+  ArticleSupplierView,
+  ExtendedSupplierRecord,
+} from '../../../models/supplier';
 
 interface Props {
   index: number;

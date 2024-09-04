@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
-import {EmailRecord, Order} from 'models/misc';
+import {EmailRecord} from 'models/misc';
 import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
@@ -24,6 +24,7 @@ import {IconButton, InputAdornment} from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import RichTextEditor from 'components/RichTextEditor';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {Order} from '../../models/pagination';
 
 interface Props {
   open: boolean;

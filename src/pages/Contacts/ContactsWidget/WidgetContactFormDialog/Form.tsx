@@ -17,9 +17,9 @@ import {convertToText} from 'utils/utils';
 import AsyncSelect from 'components/AsyncSelect';
 import {fetchServiceCompanyContactPersons} from 'hooks/reactQuery/useContacts';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {Order} from 'models/misc';
 import {Typography} from '@mui/material';
 import ProfilePictureInput from '../../ProfilePictureInput';
+import {Order} from '../../../../models/pagination';
 
 interface Props {
   form: UseFormReturn<

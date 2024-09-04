@@ -1,5 +1,6 @@
-import {Meta, Contact, Priority, Address, CompanyContact, Order} from './misc';
+import {Address, CompanyContact, Contact, Meta, Priority} from './misc';
 import {UserAccountStatus, UserAccountView} from './user';
+import {Order} from './pagination';
 
 export interface ContactsView {
   id: string;

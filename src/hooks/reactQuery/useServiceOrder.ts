@@ -11,11 +11,11 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   addDays,
   endOfMonth,
-  startOfMonth,
   endOfWeek,
-  startOfDay,
-  getWeek,
   getMonth,
+  getWeek,
+  startOfDay,
+  startOfMonth,
 } from 'date-fns';
 import {queryKeys} from 'reactQuery/constants';
 import {ServiceCompanyTimeUnit} from 'models/service-company';
@@ -26,24 +26,24 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {languageContextMap} from 'utils/utils';
 import {ServiceOrderArticleRecord} from 'models/article';
 import {
+  AppointmentConfirmationRequiredOrdersQueryParams,
   AssignmentBasedOrderBody,
-  UpdateServiceOrderScheduleBody,
+  CompleteServiceOrder,
+  CreateServiceOrderRecord,
+  SendServiceOrderReportRecord,
   ServiceOrderActivityView,
+  ServiceOrderArticleView,
+  ServiceOrderConfirmationPublishBody,
   ServiceOrderOrderField,
+  ServiceOrderPaymentStatus,
+  ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderQueryParams,
   ServiceOrderScheduleParams,
   ServiceOrderView,
-  CompleteServiceOrder,
   UpdateServiceOrderBody,
-  AppointmentConfirmationRequiredOrdersQueryParams,
-  ServiceOrderArticleView,
-  ServiceOrderConfirmationPublishBody,
-  CreateServiceOrderRecord,
-  SendServiceOrderReportRecord,
-  ServiceOrderPaymentStatus,
-  ServiceOrderPaymentWithIndicationStatus,
+  UpdateServiceOrderScheduleBody,
 } from 'models/service-order';
-import {Order, Resource, RestError, StringValue} from 'models/misc';
+import {Resource, RestError, StringValue} from 'models/misc';
 import {
   ElevatorAvailability,
   ElevatorAvailabilityParams,
@@ -52,6 +52,7 @@ import {
   ElevatorView,
 } from 'models/elevator';
 import {useUserSession} from './useUserSession';
+import {Order} from '../../models/pagination';
 
 const filterByNextVisit = (
   serviceOrderViewRes: Resource<ServiceOrderView>,

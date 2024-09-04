@@ -1,5 +1,6 @@
-import {ArticleType, ExtendedSupplierRecord} from './article';
+import {ArticleType} from './article';
 import {Money} from './misc';
+import {ExtendedSupplierRecord} from './supplier';
 
 export interface ArticleBasicFormModel {
   category: string;

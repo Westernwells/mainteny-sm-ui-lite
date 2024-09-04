@@ -6,14 +6,13 @@ import {
 } from './elevator';
 import {ContractSimpleView} from './contract';
 import {
+  Address,
   Amount,
+  EmailRecord,
   Fee,
   JobStatus,
   Meta,
-  Order,
   PdfGenerationStatus,
-  Address,
-  EmailRecord,
 } from './misc';
 import {
   Technician,
@@ -27,6 +26,7 @@ import {FileResource, FileResourceRecord} from './media';
 import {ServiceOrderPaymentStatusView} from '../utils/service-order-utils';
 import {Discount} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
+import {Order} from './pagination';
 
 export enum Priority {
   A = 'A',

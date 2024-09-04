@@ -1,18 +1,13 @@
 import {convertToText} from '../utils/utils';
 import {FileResource, FileResourceRecord} from './media';
-import {
-  Amount,
-  AmountRecord,
-  Meta,
-  Price,
-  Address,
-  AddressRecord,
-  CompanyContact,
-  PdfGenerationStatus,
-  Money,
-  Order,
-} from './misc';
+import {Amount, AmountRecord, Meta, Money, PdfGenerationStatus} from './misc';
 import {ServiceCompany} from './service-company';
+import {Order} from './pagination';
+import {
+  ArticleSupplierSimpleView,
+  ArticleSupplierView,
+  SupplierRecord,
+} from './supplier';
 
 export enum ArticleType {
   LABOR = 'LABOR',
@@ -36,24 +31,6 @@ export enum ArticleOrderField {
   DESCRIPTION = 'DESCRIPTION',
   SELLING_NET_AMOUNT = 'SELLING_NET_AMOUNT',
   SELLING_PERCENTAGE_VAT = 'SELLING_PERCENTAGE_VAT',
-}
-
-export enum SupplierOrderField {
-  EXTERNAL_ID = 'EXTERNAL_ID',
-  NAME = 'NAME',
-  CATEGORY = 'CATEGORY',
-  ADDRESS = 'ADDRESS',
-  PHONE = 'PHONE',
-  EMAIL = 'EMAIL',
-}
-
-export interface QueryArticleSuppliersParams {
-  serviceCompanyId: string;
-  pageIndex: number;
-  pageSize: number;
-  query: string;
-  order?: Order;
-  orderBy?: SupplierOrderField;
 }
 
 export interface ArticleItem {
@@ -182,14 +159,6 @@ export interface ArticleSupplierItemView {
   additionalInfo: string;
 }
 
-export interface SupplierRecord {
-  supplierId?: string;
-  number?: string;
-  isPreferred?: boolean;
-}
-
-export type ExtendedSupplierRecord = SupplierRecord & {id: string};
-
 export interface ServiceOrderArticleRecord {
   articleId: string;
   description: string;
@@ -216,29 +185,6 @@ export interface CreateArticleOrderRecord {
   articleSupplierId: string;
   description: string;
   items: ArticleOrderItemRecord[];
-}
-
-export interface ArticleSupplierView {
-  id: string;
-  serviceCompanyId: string;
-  externalId: string;
-  name: string;
-  address?: Address;
-  contact: CompanyContact;
-  additionalInfo: string;
-  search: string;
-  meta: Meta;
-  category?: string;
-}
-
-export interface ArticleSupplierSimpleView {
-  id: string;
-  serviceCompanyId: string;
-  externalId: string;
-  name: string;
-  address: Address;
-  contact: CompanyContact;
-  additionalInfo: string;
 }
 
 export enum ArticleOrderStatus {
@@ -288,27 +234,6 @@ export interface ArticleOrderView {
   search: string;
   meta: Meta;
   serviceCompany: ServiceCompany;
-}
-
-export interface CreateArticleSupplierRecord {
-  serviceCompanyId: string;
-  externalId: string;
-  name: string;
-  email: string;
-  phone: string;
-  url: string;
-  address: AddressRecord;
-  category: string;
-}
-
-export interface UpdateArticleSupplierRecord {
-  externalId?: string;
-  name?: string;
-  email?: string;
-  phone?: string;
-  url?: string;
-  address?: AddressRecord;
-  category?: string;
 }
 
 export interface PropertyOwnerArticleRecord {

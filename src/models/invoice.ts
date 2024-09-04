@@ -8,13 +8,13 @@ import {
   EmailRecord,
   Meta,
   Money,
-  Order,
   PaymentInfo,
   PdfGenerationStatus,
 } from './misc';
 import {PropertyOwnerSimpleView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
-import {ServiceOrderView, ServiceOrderType} from './service-order';
+import {ServiceOrderType, ServiceOrderView} from './service-order';
+import {Order} from './pagination';
 
 export enum InvoiceStatus {
   PAID = 'PAID',

@@ -1,4 +1,12 @@
-import {Address, Amount, AmountRecord, Meta, Order} from './misc';
+import {Client} from './client';
+import {
+  Address,
+  Amount,
+  AmountRecord,
+  Meta,
+  TimeWindowRecord,
+  TimeWindowType,
+} from './misc';
 import {
   ElevatorAdditionalInfo,
   ElevatorAssignmentSimpleView,
@@ -22,6 +30,7 @@ import {toRestDate} from 'utils/datetime';
 import {ServiceCompanySimpleView, ServiceCompanyType} from './service-company';
 import {ServiceOrderType} from './service-order';
 import {InvoiceGeneration} from './invoice';
+import {Order} from './pagination';
 
 export interface QueryContractCommentsParams {
   pageIndex: number;

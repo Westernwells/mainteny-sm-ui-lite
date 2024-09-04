@@ -20,7 +20,6 @@ import {
   ExtendedContractComponentRecord,
 } from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {Order} from 'models/misc';
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useCurrentCurrency} from 'utils/currency';
@@ -36,6 +35,7 @@ import NewContractSelectUnits from './NewContractSelectUnits';
 import {NewContractCustomer} from './NewContractCustomer';
 import {NewContractServices} from './NewContractServices';
 import NewCustomizeContract from './NewCustomizeContract';
+import {Order} from '../../models/pagination';
 
 const steps = [
   'Select customer',

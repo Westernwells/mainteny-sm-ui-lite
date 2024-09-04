@@ -1,4 +1,4 @@
-import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {ArticleOrderView} from 'models/article';
 import {UserAccount} from 'models/user';
 import React from 'react';
