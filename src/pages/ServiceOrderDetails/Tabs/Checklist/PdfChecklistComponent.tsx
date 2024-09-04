@@ -141,10 +141,11 @@ export const MultiChoiceComponent = ({
             key={pic.uri}
             src={pic.uri}
             style={{
-              width: 150,
+              width: 140,
               height: 100,
               marginLeft: i === 0 ? 0 : 10,
               borderRadius: 5,
+              objectFit: 'cover',
             }}
           />
         ))}
@@ -185,10 +186,11 @@ export const CheckboxComponent = ({
             key={pic.uri}
             src={pic.uri}
             style={{
-              width: 150,
+              width: 140,
               height: 100,
               marginLeft: i === 0 ? 0 : 10,
               borderRadius: 5,
+              objectFit: 'cover',
             }}
           />
         ))}
@@ -251,10 +253,11 @@ export const TextComponent = ({
             key={pic.uri}
             src={pic.uri}
             style={{
-              width: 150,
+              width: 140,
               height: 100,
               marginLeft: i === 0 ? 0 : 10,
               borderRadius: 5,
+              objectFit: 'cover',
             }}
           />
         ))}
