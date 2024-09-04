@@ -120,8 +120,8 @@ export const Employees = () => {
       isHeaderNameHidden: true,
       width: ACTION_CELL_WIDTH, // set static width that will not change
       isLast: true,
-      renderCell: (employee, cellProps) => (
-        <Cell isLast width={ACTION_CELL_WIDTH} onClick={cellProps.onClick}>
+      renderCell: (employee) => (
+        <Cell isLast width={ACTION_CELL_WIDTH}>
           <Actions id={employee.employeeId} email={employee.email} />
         </Cell>
       ),
