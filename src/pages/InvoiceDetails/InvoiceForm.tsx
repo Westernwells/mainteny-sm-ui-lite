@@ -385,7 +385,7 @@ export const InvoiceForm = ({
       },
       subject: '',
       description: '',
-      externalId: invoice?.externalId || '',
+      externalId: '',
       type:
         typeof invoiceType === 'string' &&
         invoiceType &&
@@ -735,6 +735,12 @@ export const InvoiceForm = ({
         address: user?.userAccount.serviceCompany.billingAddress,
       },
     );
+
+    if (formType === 'edit') {
+      formik.setFieldValue('externalId', invoiceData?.externalId ?? '');
+    } else if (formType === 'new') {
+      formik.setFieldValue('externalId', '');
+    }
   };
 
   const setFormFieldsFromPropertyOwner = (propertyOwner: PropertyOwnerView) => {
