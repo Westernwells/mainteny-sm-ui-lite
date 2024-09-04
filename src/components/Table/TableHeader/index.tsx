@@ -15,13 +15,18 @@ const TableHeader = ({columns, onSort}: Props) => (
       position: 'sticky', // is needed if used without a table body wrapper
       backgroundColor: '#FFFFFF',
       top: 0,
+      zIndex: 3,
     }}>
     {columns.map((column) => {
       if (column.hide) return;
       return (
         <TableHeaderCell
           column={column}
-          onSort={onSort ? () => onSort(column.headerName) : undefined}
+          onSort={
+            onSort && column.fieldName
+              ? () => onSort(column.fieldName as string)
+              : undefined
+          }
         />
       );
     })}

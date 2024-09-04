@@ -140,16 +140,6 @@ export interface TimeWindowRecord {
   type: TimeWindowType;
 }
 
-export enum Order {
-  ASC = 'ASC',
-  DESC = 'DESC',
-}
-
-export interface OrderByParams<T> {
-  orderByField: T;
-  sortOrder: Order;
-}
-
 export enum JobStatus {
   INIT = 'INIT',
   RUNNING = 'RUNNING',

@@ -21,12 +21,18 @@ const TableHeaderCell = ({column, gap, onSort}: Props) => {
         padding: '9px 12px',
         alignItems: 'center',
         justifyContent: column.align || 'left',
-        flex: 'auto',
+        flex: '1 1 auto',
+        ...(column.width && {width: column.width}),
+        ...(column.width.slice(-2) === 'px' && {
+          flex: `0 1 ${column.width}`,
+        }),
       }}
       gap={gap}>
       {!column.isHeaderNameHidden && (
         <Box sx={{display: 'flex', alignItems: 'center'}} gap={1}>
-          <Typography>{_.capitalize(t(column.headerName))}</Typography>
+          <Typography variant="subtitle2">
+            {_.capitalize(t(column.headerName))}
+          </Typography>
           {onSort && (
             <IconButton sx={{padding: 0}} onClick={onSort}>
               <SortingArrows />

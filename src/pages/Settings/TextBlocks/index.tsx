@@ -28,7 +28,6 @@ import {
 } from 'hooks/reactQuery/useTextBlock';
 import {theme} from 'theme';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {Order, OrderByParams} from 'models/misc';
 import {
   convertCategoryToMacro,
   convertCategoryToText,
@@ -37,6 +36,7 @@ import {
 import DOMPurify from 'dompurify';
 import {TextBlockForm} from './TextBlockForm';
 import {columns, makeRows} from './TextBlockDataGridProps';
+import {Order, OrderByParams} from '../../../models/pagination';
 
 type Props = {
   company: ServiceCompanyItem;

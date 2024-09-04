@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import {endOfDay, startOfDay} from 'date-fns';
 import * as _ from 'lodash';
 import {EmptySection} from 'components/EmptySection';
@@ -13,75 +13,25 @@ import {toRestDateTime} from 'utils/datetime';
 import {getRoles} from 'utils/work-hours-utils';
 import {Box} from '@mui/system';
 import {useNavigate} from 'react-router-dom';
-import EmployeeRow from './EmployeeRow';
+import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
+import {useTranslation} from 'react-i18next';
 import {aggregateEmployeeRows} from '../../utils/employee';
 import TableContainer from '../../components/Table/TableContainer';
 import PageContainer from '../../components/PageContainer';
 import SearchInput from '../../components/SearchInput/index';
-// import {Option} from '../../models/filter';
-// import {AVAILABILITY_TYPE_TO_TRANSLATION_KEY} from '../../models/availability';
 import {ELEMENTS_PER_PAGE_OPTIONS} from '../../models/pagination';
 import Pagination from '../../components/Pagination';
-import {TableColumn} from '../../models/table';
+import {ACTION_CELL_WIDTH, TableColumnWithRender} from '../../models/table';
 import TableHeader from '../../components/Table/TableHeader';
 import AddButton from '../../components/AddButton';
-import TableBody from '../../components/Table/TableBody';
-
-// const FILTER_OPTIONS: Option[] = [
-// 	{value: null, labelKey: 'All'},
-// 	...Array.from(AVAILABILITY_TYPE_TO_TRANSLATION_KEY.entries()).map(
-// 		([value, labelKey]) => ({
-// 			labelKey,
-// 			value,
-// 		}),
-// 	),
-// ];
-
-const COLUMNS: TableColumn[] = [
-  {
-    headerName: 'select',
-    isHeaderNameHidden: true,
-    width: '3%',
-    isFirst: true,
-    hide: true,
-  },
-  {
-    headerName: 'Employee',
-    width: '15%',
-    isFirst: true, // remove when checkbox are present with bulk action
-  },
-  {
-    headerName: 'ROLE',
-    width: '10%',
-  },
-  {
-    headerName: 'ADDRESS',
-    width: '20%',
-  },
-  {
-    headerName: 'Team',
-    width: '5%',
-    align: 'right',
-  },
-  {
-    headerName: 'PHONE',
-    width: '10%',
-  },
-  {
-    headerName: 'SHIFT',
-    width: '10%',
-  },
-  {
-    headerName: 'AVAILABILITY',
-    width: '10%',
-  },
-  {
-    headerName: 'action',
-    isHeaderNameHidden: true,
-    width: '3%',
-    isLast: true,
-  },
-];
+import {EmployeeContractTableRow} from '../../models/employee';
+import Cell from '../../components/Table/TableCell';
+import TableRow from '../../components/Table/TableRow';
+import {getAvailabilityChipColor} from '../../utils/availability';
+import {StatusChip} from '../../components/StatusChip';
+import {Actions} from './Actions';
+import {capitalize} from '../../utils/utils';
 
 export const Employees = () => {
   const navigate = useNavigate();
@@ -91,10 +41,92 @@ export const Employees = () => {
   });
   const totalEmployeeRef = useRef(0);
   const [search, setSearch] = useQueryState('searchEmployees');
-  // const [role, setRole] = useQueryState<Role | string>('role');
-  // const [availabilityType, setAvailabilityType] =
-  // 	useState<AvailabilityType | null>(null);
   const textInput = useRef<HTMLInputElement>(null);
+  const {t} = useTranslation();
+
+  const COLUMNS = useRef<TableColumnWithRender<EmployeeContractTableRow>[]>([
+    {
+      headerName: 'Employee',
+      width: '15%',
+      renderCell: (employee, cellProps) => (
+        <Cell isFirst width="15%" onClick={cellProps.onClick}>
+          <Avatar src={employee.photoUrl} sx={{width: 24, height: 24}} />
+          <Typography noWrap>{employee.name}</Typography>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'ROLE',
+      width: '10%',
+      renderCell: (employee, cellProps) => (
+        <Cell width="10%" onClick={cellProps.onClick}>
+          <Typography variant="body2" sx={{textTransform: 'capitalize'}} noWrap>
+            {t(capitalize(employee.roles))}
+          </Typography>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'ADDRESS',
+      width: '20%',
+      renderCell: (employee, cellProps) => (
+        <Cell width="20%" onClick={cellProps.onClick}>
+          <Typography noWrap>{employee.address}</Typography>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'Team',
+      width: '5%',
+      align: 'right',
+      renderCell: (employee, cellProps) => (
+        <Cell align="right" width="15%" onClick={cellProps.onClick}>
+          <Typography noWrap>{employee.team}</Typography>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'PHONE',
+      width: '10%',
+      renderCell: (employee, cellProps) => (
+        <Cell width="10%" onClick={cellProps.onClick}>
+          <Typography noWrap>{employee.phone}</Typography>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'SHIFT',
+      width: '10%',
+      renderCell: (employee, cellProps) => (
+        <Cell isFirst width="10%" onClick={cellProps.onClick}>
+          <Typography noWrap>{employee.shift}</Typography>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'AVAILABILITY',
+      width: '10%',
+      renderCell: (employee, cellProps) => (
+        <Cell align="center" width="10%" onClick={cellProps.onClick}>
+          <StatusChip
+            label={employee.availability}
+            {...getAvailabilityChipColor(employee.availability)}
+          />
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'action',
+      isHeaderNameHidden: true,
+      width: ACTION_CELL_WIDTH, // set static width that will not change
+      isLast: true,
+      renderCell: (employee, cellProps) => (
+        <Cell isLast width={ACTION_CELL_WIDTH} onClick={cellProps.onClick}>
+          <Actions id={employee.employeeId} email={employee.email} />
+        </Cell>
+      ),
+    },
+  ]);
 
   const {
     data: userAccountResource = createEmptyResource<UserView>(page.pageSize),
@@ -175,15 +207,6 @@ export const Employees = () => {
     return <Progress />;
   }
 
-  // const handleSortChange = (fieldName: string) => {
-  //   const sorting = values.sortOrder === Order.ASC ? Order.DESC : Order.ASC;
-  //   updateValues({
-  //     ...values,
-  //     orderByField: fieldName,
-  //     sortOrder: sorting,
-  //   });
-  // };
-
   // const handleRoleChange = (value: string[]) => {
   // 	setRole(value[0] as Role);
   // };
@@ -200,13 +223,6 @@ export const Employees = () => {
     setPage({...page, pageSize: value, pageIndex: 0});
   };
 
-  // const handleAvailabilityChange = (value: string | null) => {
-  // 	if (value === null) setAvailabilityType(null);
-  // 	else {
-  // 		// setAvailabilityType(value as AvailabilityType);
-  // 	}
-  // };
-
   return (
     <PageContainer gap={4}>
       <Box gap={4} sx={{display: 'flex', flexDirection: 'column'}}>
@@ -219,26 +235,22 @@ export const Employees = () => {
 
           <AddButton label="New Employee" onClick={handleNewEmployeeClick} />
         </Box>
-        <Box sx={{display: 'flex'}}>
-          {/* <QuickFilter */}
-          {/*	selected={availabilityType} */}
-          {/*	options={FILTER_OPTIONS} */}
-          {/*	onChange={handleAvailabilityChange} */}
-          {/* /> */}
-        </Box>
+        <Box sx={{display: 'flex'}} />
       </Box>
       <TableContainer>
-        <TableHeader columns={COLUMNS} />
-        <TableBody>
-          {/* Row */}
-          {rows.map((entry) => (
-            <EmployeeRow
-              employeeDetails={entry}
-              columns={COLUMNS}
-              onClick={handleEmployeeClick(entry.id)}
-            />
-          ))}
-        </TableBody>
+        <TableHeader columns={COLUMNS.current} />
+        {/* Row */}
+        {rows.map((entry) => (
+          <TableRow
+            key={`employee-row-${entry.id}`}
+            testId="employee-row-container">
+            {COLUMNS.current.map((column) =>
+              column.renderCell(entry, {
+                onClick: handleEmployeeClick(entry.id),
+              }),
+            )}
+          </TableRow>
+        ))}
       </TableContainer>
       <Pagination
         currentIndex={userAccountResource.page.pageIndex}

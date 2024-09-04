@@ -18,7 +18,6 @@ import {ReactNode, useState} from 'react';
 import {ElevatorView} from 'models/elevator';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {ContractView} from 'models/contract';
-import {ArticleSupplierView} from 'models/article';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
@@ -26,6 +25,7 @@ import {
 import {statusColor} from 'components/StatusChip';
 import {ServiceOrderLabels, ServiceOrderView} from 'models/service-order';
 import {Confirm} from 'components/Confirm';
+import {ArticleSupplierView} from '../../../../models/supplier';
 
 interface CardItemProps {
   label: string;

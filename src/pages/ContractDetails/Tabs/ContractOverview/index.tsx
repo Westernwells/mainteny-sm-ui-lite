@@ -36,7 +36,6 @@ import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {calculateRenewDays} from 'utils/contract';
 import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve-gray.svg';
 import {ReactComponent as TimeIcon} from 'assets/icons/time.svg';
-import {Order} from 'models/misc';
 import {createEmptyResource} from 'utils/paging';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -59,6 +58,7 @@ import {Parties} from './Parties';
 import {AttachDocument} from './AttachDocument';
 import {Services} from './Services';
 import InvoiceSetup from './InvoiceSetup';
+import {Order} from '../../../../models/pagination';
 
 interface Props {
   contractDetails: ContractView;

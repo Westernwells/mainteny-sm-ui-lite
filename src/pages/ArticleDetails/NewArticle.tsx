@@ -15,7 +15,7 @@ import {Stepper} from 'components/Stepper';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PageCard} from 'components/PageCard';
 import {Button} from 'components/Button';
-import {ArticleType, ArticleView, ExtendedSupplierRecord} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {ArticleBasicFormModel, ArticleStockFormModel} from 'models/articleForm';
 import {
   amountRecordForBackend,
@@ -28,6 +28,7 @@ import {SupplierItem} from './Suppliers/SupplierItem';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
 import RichTextField from '../../components/RichTextField';
+import {ExtendedSupplierRecord} from '../../models/supplier';
 
 const isExternalIdUnique = async (resource: ArticleView[], value?: string) => {
   if (!value) {

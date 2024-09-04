@@ -21,9 +21,9 @@ import {
 import {EmptySection} from 'components/EmptySection';
 import {useTranslation} from 'react-i18next';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import {Order} from 'models/misc';
 import {debounce, isEqual} from 'lodash';
 import {styles} from './style';
+import {Order} from '../../models/pagination';
 
 interface Props {
   setRowItem: (row: ServiceOrderView) => void;

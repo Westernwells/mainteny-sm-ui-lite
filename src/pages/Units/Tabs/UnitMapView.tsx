@@ -10,7 +10,7 @@ import {getCenter} from 'geolib';
 import Supercluster from 'supercluster';
 import {Typography} from '@mui/material';
 import {LocationPin} from 'components/LocationPin';
-import {Location, OrderByParams, Resource} from 'models/misc';
+import {Location, Resource} from 'models/misc';
 import {FilterFields} from 'components/FilterFields';
 import {Widget} from 'components/Widget';
 import {FlexContainer} from 'components/FlexContainer';
@@ -21,6 +21,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useTheme} from '@mui/system';
 import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 import {useSearchValues} from 'hooks/useSearchValues';
+import {OrderByParams} from '../../../models/pagination';
 
 export const UnitMapsView = () => {
   const formatDate = useFormatDate();

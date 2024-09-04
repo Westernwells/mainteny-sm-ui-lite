@@ -6,10 +6,10 @@ import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
-import {ArticleSupplierView} from 'models/article';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
+import {ArticleSupplierView} from '../../models/supplier';
 
 interface Props {
   setRowItem: (row: ArticleSupplierView) => void;

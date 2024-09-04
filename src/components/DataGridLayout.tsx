@@ -21,9 +21,9 @@ import {useNavigate} from 'react-router-dom';
 import {olStyles} from 'styles';
 import {convertToText} from 'utils/utils';
 import {useQueryState} from 'hooks/useQueryState';
-import {Order} from 'models/misc';
 import {CustomPagination} from './CustomPagination';
 import {EmptySection} from './EmptySection';
+import {Order} from '../models/pagination';
 
 interface Props extends DataGridProps {
   rows: GridRowsProp;

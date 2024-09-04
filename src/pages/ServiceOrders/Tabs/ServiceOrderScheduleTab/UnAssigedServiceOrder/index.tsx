@@ -17,8 +17,9 @@ import {createEmptyResource, makePage} from 'utils/paging';
 import {toRestDate} from 'utils/datetime';
 import {ReactComponent as Layout} from 'assets/icons/Layout.svg';
 import {ReactComponent as FilterIcon} from 'assets/icons/FilterIcon.svg';
-import {Order, Resource} from 'models/misc';
+import {Resource} from 'models/misc';
 import {OrderDetails} from './OrderDetails';
+import {Order} from '../../../../../models/pagination';
 
 interface Props extends BoxProps {
   containerStyles?: {[key: string]: string | number};

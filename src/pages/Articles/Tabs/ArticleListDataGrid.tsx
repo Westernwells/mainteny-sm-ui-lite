@@ -27,12 +27,12 @@ import {PageListingLayout} from 'components/PageListingLayout';
 import {convertToText, stringToTitleCase} from 'utils/utils';
 import {useQueryState} from 'hooks/useQueryState';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {Order, OrderByParams} from 'models/misc';
 import DOMPurify from 'dompurify';
 import {
   hasMultipleParagraphs,
   returnFirstParagraph,
 } from '../../../utils/rich-text-field';
+import {Order, OrderByParams} from '../../../models/pagination';
 
 export const columns: GridColDef[] = [
   getColumnProps({

@@ -15,3 +15,13 @@ export type PageDetails = {
   isSelected: boolean;
   hasDots?: 'left' | 'right';
 };
+
+export enum Order {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
+export interface OrderByParams<T> {
+  orderByField: T;
+  sortOrder: Order;
+}

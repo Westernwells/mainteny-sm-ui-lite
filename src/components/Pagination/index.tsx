@@ -50,21 +50,20 @@ const Pagination = ({
     return [start, end];
   }, [currentIndex, numberOfElementsPerPage, totalEntries]);
 
-  const pagesToShow: PageDetails[] = useMemo(
-    () =>
-      [...Array(totalPages)].reduce((acc, _, index, array) => {
-        // Remove pages
-        if (removePageIndex(index, currentIndex, array.length - 1)) return acc;
-        const element: PageDetails = {
-          value: index + 1,
-          index,
-          isSelected: index === currentIndex,
-          hasDots: getDotsSide(index, currentIndex, array.length - 1),
-        };
-        return [...acc, element];
-      }, []),
-    [currentIndex, totalPages],
-  );
+  const pagesToShow: PageDetails[] | null = useMemo(() => {
+    if (totalPages === 1) return null;
+    return [...Array(totalPages)].reduce((acc, _, index, array) => {
+      // Remove pages
+      if (removePageIndex(index, currentIndex, array.length - 1)) return acc;
+      const element: PageDetails = {
+        value: index + 1,
+        index,
+        isSelected: index === currentIndex,
+        hasDots: getDotsSide(index, currentIndex, array.length - 1),
+      };
+      return [...acc, element];
+    }, []);
+  }, [currentIndex, totalPages]);
 
   return (
     <Box
@@ -129,46 +128,48 @@ const Pagination = ({
             )}
           </Typography>
         </Box>
-        <Box sx={{display: 'flex', alignItems: 'center'}} gap={1}>
-          <PageButton
-            disabled={currentIndex === 0}
-            onClick={() => onChange(currentIndex - 1)}>
-            <KeyboardArrowLeftIcon />
-          </PageButton>
-          {pagesToShow.map(
-            ({value, index, isSelected, hasDots}, arrayIndex, array) => {
-              // remove double stacking dots
-              const isPreviousElementWIthRightDots =
-                arrayIndex + 1 < array.length &&
-                array[arrayIndex + 1].hasDots === 'right';
-              return (
-                <>
-                  {!isPreviousElementWIthRightDots && hasDots === 'left' && (
-                    <PageButton disabled>
-                      <MoreHorizOutlinedIcon />
+        {pagesToShow && (
+          <Box sx={{display: 'flex', alignItems: 'center'}} gap={1}>
+            <PageButton
+              disabled={currentIndex === 0}
+              onClick={() => onChange(currentIndex - 1)}>
+              <KeyboardArrowLeftIcon />
+            </PageButton>
+            {pagesToShow.map(
+              ({value, index, isSelected, hasDots}, arrayIndex, array) => {
+                // remove double stacking dots
+                const isPreviousElementWIthRightDots =
+                  arrayIndex + 1 < array.length &&
+                  array[arrayIndex + 1].hasDots === 'right';
+                return (
+                  <>
+                    {!isPreviousElementWIthRightDots && hasDots === 'left' && (
+                      <PageButton disabled>
+                        <MoreHorizOutlinedIcon />
+                      </PageButton>
+                    )}
+                    <PageButton
+                      disabled={isSelected}
+                      onClick={() => index !== null && onChange(index)}
+                      isSelected={isSelected}>
+                      {value}
                     </PageButton>
-                  )}
-                  <PageButton
-                    disabled={isSelected}
-                    onClick={() => index !== null && onChange(index)}
-                    isSelected={isSelected}>
-                    {value}
-                  </PageButton>
-                  {hasDots === 'right' && (
-                    <PageButton disabled>
-                      <MoreHorizOutlinedIcon />
-                    </PageButton>
-                  )}
-                </>
-              );
-            },
-          )}
-          <PageButton
-            disabled={currentIndex === totalPages - 1}
-            onClick={() => onChange(currentIndex + 1)}>
-            <KeyboardArrowRightIcon />{' '}
-          </PageButton>
-        </Box>
+                    {hasDots === 'right' && (
+                      <PageButton disabled>
+                        <MoreHorizOutlinedIcon />
+                      </PageButton>
+                    )}
+                  </>
+                );
+              },
+            )}
+            <PageButton
+              disabled={currentIndex === totalPages - 1}
+              onClick={() => onChange(currentIndex + 1)}>
+              <KeyboardArrowRightIcon />{' '}
+            </PageButton>
+          </Box>
+        )}
       </Box>
     </Box>
   );

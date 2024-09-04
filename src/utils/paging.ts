@@ -3,6 +3,7 @@ import {
   BOUNDARY_STEP,
   EDGE_LIMIT,
   MAXIMUM_PAGES_AT_ONCE,
+  Order,
   Page,
 } from '../models/pagination';
 
@@ -205,4 +206,9 @@ export const calculateTotalPages = (totalElement: number, pageSize: number) => {
   const quotient = Math.floor(totalElement / pageSize);
   const remainder = totalElement % pageSize;
   return quotient + (remainder > 0 ? 1 : 0);
+};
+
+export const toggleOrder = (order?: Order) => {
+  if (!order) return Order.ASC;
+  return order === Order.ASC ? Order.DESC : Order.ASC;
 };
