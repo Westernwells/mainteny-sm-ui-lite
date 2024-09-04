@@ -68,6 +68,7 @@ import _ from 'lodash';
 import {FileResourceRecord} from 'models/media';
 import {resizeImageToTargetSize} from 'utils/image-compression';
 import {IMAGE_SIZE_IN_MB} from 'utils/constants';
+import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';
@@ -172,15 +173,22 @@ export const CheckList = ({serviceOrder}: Props) => {
     {enabled: false},
   );
 
-  const checklistImagesPath = useMemo(
+  const checklistImages = useMemo(
     () =>
       (
         selectedChecklist?.checkList.components.map(
           (component) =>
-            component.additionalInfo.pictures?.map((pic) => pic.uri) ?? [],
+            component.additionalInfo.pictures?.map((pic) => ({
+              fileResource: pic,
+            })) ?? [],
         ) ?? []
       ).flat(),
     [selectedChecklist],
+  );
+
+  const checklistImagesPath = useMemo(
+    () => checklistImages.map((pic) => pic.fileResource.uri) ?? [],
+    [checklistImages],
   );
 
   const {data: checklistImagesDownloadUrl, isLoading: isChecklistImageLoading} =
@@ -189,6 +197,11 @@ export const CheckList = ({serviceOrder}: Props) => {
       undefined,
       serviceOrder.serviceCompany.id,
     );
+
+  const {
+    convertedImages: checklistConvertedImages,
+    isImageLoading: isChecklistConverting,
+  } = useMultiImagesURLToBase64(checklistImagesDownloadUrl ?? {});
 
   const {downloadFile} = useDownloadFileWithCustomName(
     selectedChecklist?.checkList.number,
@@ -327,7 +340,7 @@ export const CheckList = ({serviceOrder}: Props) => {
 
     sortedChecklistComponentsCloned.forEach((component) => {
       component.additionalInfo.pictures?.forEach((pic) => {
-        pic.uri = checklistImagesDownloadUrl?.[pic.uri] ?? pic.uri;
+        pic.uri = checklistConvertedImages[pic.uri];
       });
     });
 
@@ -789,7 +802,10 @@ export const CheckList = ({serviceOrder}: Props) => {
                           sx: {
                             background: 'transparent',
                           },
-                          disabled: isEditing || isChecklistImageLoading,
+                          disabled:
+                            isEditing ||
+                            isChecklistImageLoading ||
+                            isChecklistConverting,
                           startIcon: <FileDownloadIcon />,
                         }}
                       />
@@ -803,7 +819,10 @@ export const CheckList = ({serviceOrder}: Props) => {
                           sx: {
                             ml: '1em',
                           },
-                          disabled: isEditing || isChecklistImageLoading,
+                          disabled:
+                            isEditing ||
+                            isChecklistImageLoading ||
+                            isChecklistConverting,
                           startIcon: <Send />,
                         }}
                       />
