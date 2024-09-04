@@ -80,6 +80,7 @@ import {
 import {SwissQRBill} from 'swissqrbill/svg';
 import {QueryObserverResult} from 'react-query';
 import _ from 'lodash';
+import CopyAll from '@mui/icons-material/CopyAll';
 
 interface Props {
   invoice: InvoiceView;
@@ -778,6 +779,14 @@ export const Actions = ({
     },
   };
 
+  const duplicateItem = {
+    label: t('Duplicate'),
+    icon: <CopyAll />,
+    onClick: () => {
+      navigate(`/invoices/new?invoiceId=${invoice.id}`);
+    },
+  };
+
   const previewItem = {
     label: t('Preview'),
     icon: <RemoveRedEye />,
@@ -1008,6 +1017,10 @@ export const Actions = ({
       );
     }
 
+    if (invoice.type === InvoiceType.FULL) {
+      items.push(duplicateItem);
+    }
+
     if (invoice.sentDate && invoice.status !== InvoiceStatus.DRAFT) {
       return items.filter(
         (item) => item.label !== t('Edit') && item.label !== t('Delete'),
@@ -1015,7 +1028,7 @@ export const Actions = ({
     }
 
     return items;
-  }, [downloadUrl, invoice.status, t, companyNextNumber?.value]);
+  }, [downloadUrl, invoice.status, t, companyNextNumber?.value, invoice.type]);
 
   useEffectAfterMount(() => {
     (async () => {
