@@ -46,12 +46,8 @@ export const CardProps = ({
   const {t} = useTranslation();
   const theme = useTheme();
 
-  const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (event.currentTarget.getAttribute('to') !== '') {
-      return;
-    }
-    event.preventDefault();
-  };
+  // Helper function to check if the bodyText is an email
+  const isEmail = (text: string) => text.includes('@');
 
   return (
     <Box
@@ -91,57 +87,55 @@ export const CardProps = ({
             alignItems: 'baseline',
             fontWeight: '600',
           }}>
-          {navigateTo ? (
-            <Link
-              component={RouterLink}
-              onClick={handleLinkClick}
-              to={`${navigateTo}`}
-              underline="hover"
-              variant="body2"
-              style={{paddingTop: '0.2em', display: 'flex', fontWeight: '600'}}
-              color={theme.palette.info.main}>
-              {typeof bodyText === 'string' ? (
-                <Typography
-                  component="div"
-                  variant={bodyTextVariant || 'body2'}
-                  sx={{
-                    ...bodyStyle,
-                    fontSize: '0.9rem',
-                    fontWeight: '600',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'wrap',
-                    WebkitLineClamp: '2',
-                    WebkitBoxOrient: 'vertical',
-                    display: '-webkit-box',
-                    wordBreak: 'break-all',
-                  }}>
-                  {hasProtocol(bodyText) ? bodyText : t(bodyText)}
-                </Typography>
-              ) : (
-                bodyText
-              )}
-            </Link>
-          ) : typeof bodyText === 'string' ? (
-            <Typography
-              component="div"
-              variant={bodyTextVariant || 'body2'}
-              sx={{
-                fontSize: '0.9rem',
-                fontWeight: '300',
-                WebkitLineClamp: '2',
-                WebkitBoxOrient: 'vertical',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'wrap',
-                display: '-webkit-box',
-                wordBreak: 'break-all',
-                overflow: 'hidden',
-                ...bodyStyle,
-              }}>
-              {hasProtocol(bodyText) || !shouldTranslate
-                ? bodyText
-                : t(bodyText)}
-            </Typography>
+          {typeof bodyText === 'string' ? (
+            isEmail(bodyText) ? (
+              <Link
+                href={`mailto:${bodyText}`} // mailto: link to open email client
+                underline="hover"
+                variant="body2"
+                style={{
+                  paddingTop: '0.2em',
+                  display: 'flex',
+                  fontWeight: '600',
+                }}
+                color={theme.palette.info.main}>
+                {bodyText}
+              </Link>
+            ) : navigateTo ? (
+              <Link
+                component={RouterLink}
+                to={navigateTo}
+                underline="hover"
+                variant="body2"
+                style={{
+                  paddingTop: '0.2em',
+                  display: 'flex',
+                  fontWeight: '600',
+                }}
+                color={theme.palette.info.main}>
+                {bodyText}
+              </Link>
+            ) : (
+              <Typography
+                component="div"
+                variant={bodyTextVariant || 'body2'}
+                sx={{
+                  fontSize: '0.9rem',
+                  fontWeight: '300',
+                  WebkitLineClamp: '2',
+                  WebkitBoxOrient: 'vertical',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'wrap',
+                  display: '-webkit-box',
+                  wordBreak: 'break-all',
+                  overflow: 'hidden',
+                  ...bodyStyle,
+                }}>
+                {hasProtocol(bodyText) || !shouldTranslate
+                  ? bodyText
+                  : t(bodyText)}
+              </Typography>
+            )
           ) : (
             bodyText
           )}
