@@ -128,7 +128,7 @@ const getStyles = (
     tableRow: {
       display: 'flex',
       flexDirection: 'row',
-      alignItems: 'baseline',
+      alignItems: 'flex-start',
       fontSize: 10,
       marginVertical: 4,
     },
@@ -489,6 +489,11 @@ const QuotationPdfTemplate = React.memo(
                               width: '40%',
                               textAlign: 'left',
                               color: '#212121',
+                            }}
+                            stylesheet={{
+                              p: {
+                                marginBottom: '2px',
+                              },
                             }}
                           />
 

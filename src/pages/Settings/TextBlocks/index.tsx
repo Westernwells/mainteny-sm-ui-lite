@@ -22,16 +22,16 @@ import {
 } from 'models/text-block';
 import {
   useCreateTextBlock,
+  useUpdateTextBlock,
   useDeleteTextBlock,
   useTextBlocks,
-  useUpdateTextBlock,
 } from 'hooks/reactQuery/useTextBlock';
 import {theme} from 'theme';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {
+  mapJsonToTextBlockView,
   convertCategoryToMacro,
   convertCategoryToText,
-  mapJsonToTextBlockView,
 } from 'utils/text-block';
 import DOMPurify from 'dompurify';
 import {TextBlockForm} from './TextBlockForm';

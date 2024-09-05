@@ -128,18 +128,14 @@ export const ComboBox = ({
   return (
     <Autocomplete
       disablePortal
-      open={open && isFocused}
       id="combo-box"
       size="small"
-      freeSolo={
-        textFieldProps?.value === 'externalId' ||
-        textFieldProps?.value === 'employeeId'
-      }
       inputValue={query}
       onFocus={handleFocus}
       onBlur={handleBlur}
       onInputChange={onInputChange}
       options={options}
+      filterOptions={(x) => x}
       onChange={(event: any, newValue: string | Option | null) => {
         if (typeof newValue === 'string') {
           setItem({label: newValue, value: newValue});
@@ -154,13 +150,22 @@ export const ComboBox = ({
         },
         ...containerStyles,
       }}
-      // isOptionEqualToValue={(option, value) => option.value === value.value}
-      PopperComponent={
-        textFieldProps?.name === 'externalId' ||
-        textFieldProps?.name === 'employeeId'
-          ? renderCustomPopper
-          : undefined
+      isOptionEqualToValue={(option, value) =>
+        typeof option !== 'string' && typeof value !== 'string'
+          ? option.value === value.value
+          : option === value
       }
+      getOptionKey={(option) =>
+        typeof option === 'string' ? option : option.value
+      }
+      {...(textFieldProps?.name === 'externalId' ||
+      textFieldProps?.name === 'employeeId'
+        ? {
+            open: open && isFocused,
+            freeSolo: true,
+            PopperComponent: renderCustomPopper,
+          }
+        : {})}
       renderInput={(params) => (
         <FormInput
           fieldProps={{

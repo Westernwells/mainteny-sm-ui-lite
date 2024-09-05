@@ -1,4 +1,5 @@
 import {FormikHelpers, useFormik} from 'formik';
+import * as Yup from 'yup';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
 import {FormInput} from 'components/form/FormInput';
@@ -23,6 +24,15 @@ import {
 } from 'models/service-company';
 import {ServiceOrderType} from 'models/service-order';
 import {useState} from 'react';
+
+const validationSchema = Yup.object().shape({
+  articleId: Yup.string()
+    .uuid('Please select an article')
+    .required('Article ID is required'),
+  articleSellingPrice: Yup.number()
+    .required('Selling price is required')
+    .min(0, 'Selling price is required'),
+});
 
 interface Props {
   title: string;
@@ -71,6 +81,7 @@ export const CustomerPricesForm = ({
   } = useFormik<TravelWorkFormValues>({
     initialValues,
     enableReinitialize: true,
+    validationSchema,
     onSubmit: (formikValues, formikHelpers) => {
       const valuesWithPenniesAmount: TravelWorkFormValues = {
         ...formikValues,

@@ -14,10 +14,12 @@ interface Props {
 export const ServiceOrderStatusIndicator = ({containerStyles}: Props) => {
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
 
-  const reOrderedServiceStatus = Object.values(ServiceOrderStatus).filter(
-    (status) => status !== ServiceOrderStatus.READY_TO_SCHEDULE,
-  );
-  reOrderedServiceStatus.push(ServiceOrderStatus.READY_TO_SCHEDULE);
+  const reOrderedServiceStatus = [
+    ...Object.values(ServiceOrderStatus).filter(
+      (status) => status !== ServiceOrderStatus.READY_TO_SCHEDULE,
+    ),
+    ServiceOrderStatus.READY_TO_SCHEDULE,
+  ];
   const statuses = useRef(
     removeFromList(
       ['ALL', 'INIT', 'SCHEDULING', 'DONE', 'INVOICE_ISSUED'],

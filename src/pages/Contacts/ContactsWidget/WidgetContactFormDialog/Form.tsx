@@ -29,7 +29,6 @@ interface Props {
   >;
   initialValues?: ServiceCompanyContactPeronFormModel;
 }
-
 const titles = Object.values(ContactTitle);
 const Form = ({form}: Props) => {
   const {t} = useTranslation();
