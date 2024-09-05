@@ -59,6 +59,7 @@ export const EditCustomerForm = ({
   } = useFormikContext<CustomerEditForm>();
 
   const [openNewDialog, setOpenNewDialog] = useState<boolean>(false);
+  const emptyAddressState = {fullName: null};
 
   const {data: companyAutoNumberConfig} = useCompanyAutoNumberConfig(
     user?.userAccount.serviceCompany.id,
@@ -96,12 +97,12 @@ export const EditCustomerForm = ({
   );
 
   const removeBeneficiaryAddress = () => {
-    setFieldValue('beneficiaryAddress.fullName', null);
+    setFieldValue('beneficiaryAddress', emptyAddressState);
     setShowBeneficiaryAddress(false);
   };
 
   const removeSendInvoiceViaAddress = () => {
-    setFieldValue('otherAddress.fullName', null);
+    setFieldValue('otherAddress', emptyAddressState);
     setShowSendInvoiceViaAddress(false);
   };
 
