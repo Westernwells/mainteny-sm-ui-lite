@@ -1,12 +1,4 @@
-import {Client} from './client';
-import {
-  Address,
-  Amount,
-  AmountRecord,
-  Meta,
-  TimeWindowRecord,
-  TimeWindowType,
-} from './misc';
+import {Address, Amount, AmountRecord, Meta} from './misc';
 import {
   ElevatorAdditionalInfo,
   ElevatorAssignmentSimpleView,
@@ -17,7 +9,6 @@ import {
   ElevatorSortableFields,
   ElevatorStatus,
   ElevatorTimeRuleView,
-  ElevatorView,
 } from './elevator';
 import {
   PropertyContactPersonSimpleView,

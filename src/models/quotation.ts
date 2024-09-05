@@ -8,6 +8,7 @@ import {
   EmailRecord,
   Meta,
   PdfGenerationStatus,
+  SimpleEmailRecord,
 } from './misc';
 import {PropertyOwnerView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
