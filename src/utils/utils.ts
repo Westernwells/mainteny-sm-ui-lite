@@ -364,13 +364,11 @@ export const getUserFullName = ({
 export const addTimeToDate = (dateObject: string | Date, timeObject: Date) => {
   if (!timeObject) return '';
   const newTime = new Date(dateObject || timeObject);
-
-  newTime.setUTCHours(
-    timeObject.getUTCHours(),
-    timeObject.getUTCMinutes(),
-    timeObject.getUTCSeconds(),
+  newTime.setHours(
+    timeObject.getHours(),
+    timeObject.getMinutes(),
+    timeObject.getSeconds(),
   );
-
   return newTime.toISOString() ?? '';
 };
 
