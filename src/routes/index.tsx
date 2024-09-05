@@ -48,6 +48,7 @@ import NewSupplier from 'pages/NewSupplier';
 import SupplierDetails from 'pages/SupplierDetails';
 import Analytics from 'pages/Analytics';
 import Contacts from 'pages/Contacts';
+import MobileWorkReportDownload from 'pages/MobileWorkReportDownload';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -79,6 +80,10 @@ export const Router = () => {
           }>
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route
+            path="/mobile/work-report-download"
+            element={<MobileWorkReportDownload />}
+          />
         </Route>
         <Route element={<ProtectedRoutes />}>
           <Route

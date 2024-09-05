@@ -23,12 +23,15 @@ import {PatternFormat} from 'react-number-format';
 import {useEffect, useState} from 'react';
 import {
   convertHoursAndMinutesToMinutes,
-  convertMinutesToHoursAndMinutes,
+  convertMinutesWithRounding,
 } from 'utils/work-hours-utils';
 import {addDateToTime, addTimeToDate} from 'utils/utils';
 import _ from 'lodash';
 import {addDays, isSameDay, startOfDay, subDays} from 'date-fns';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {MinToStep} from 'models/service-company';
 
 interface Props {
   formik: FormikProps<CompleteServiceOrder & {serviceTimeHM: string}>;
@@ -45,6 +48,8 @@ const ReportTimeEntries = ({
   totalTravelFormatted,
   totalWorkFormatted,
 }: Props) => {
+  const {user} = useUserSession();
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t} = useTranslation();
   const formatDate = useFormatDate();
   const timeRecordKey = type === 'work' ? 'workTimeRecord' : 'travelTimeRecord';
@@ -61,7 +66,12 @@ const ReportTimeEntries = ({
   useEffect(() => {
     setTimeRawValues(
       timeInfo.timeSlots.map((slot) =>
-        convertMinutesToHoursAndMinutes(slot.minutes ?? 0, {hourUnit: ''}, 1),
+        convertMinutesWithRounding(
+          slot.minutes ?? 0,
+          {hourUnit: ''},
+          1,
+          company?.settings.minToHourStep || MinToStep.STEP_0,
+        ),
       ),
     );
   }, [timeInfo]);
@@ -198,7 +208,7 @@ const ReportTimeEntries = ({
         <Box width={!isEdit ? TIME_SECTION_WIDTH : DURATION_SECTION_WIDTH}>
           {isEdit ? (
             <PatternFormat
-              value={timeRawValues[index] ?? '0:00'}
+              defaultValue="00:00"
               size="small"
               allowEmptyFormatting
               onBlur={formik.handleBlur}
@@ -218,7 +228,7 @@ const ReportTimeEntries = ({
 
                 formik.setFieldValue(
                   `${timeRecordKey}.timeSlots[${index}].minutes`,
-                  convertHoursAndMinutesToMinutes(value),
+                  convertHoursAndMinutesToMinutes(value.trim()),
                 );
               }}
               customInput={TextField}

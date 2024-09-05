@@ -10,15 +10,17 @@ import {Construction, DirectionsCar} from '@mui/icons-material';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import useTheme from '@mui/material/styles/useTheme';
-
 import {
   calculateSlotTotalWithoutSurcharge,
   calculateTotalBillableHours,
 } from 'utils/service-order-utils';
-import {convertMinutesToHoursAndMinutes} from 'utils/work-hours-utils';
+import {convertMinutesWithRounding} from 'utils/work-hours-utils';
 import {NumericFormat} from 'react-number-format';
 import {useContext, useMemo} from 'react';
 import {LanguageContext} from 'context/LanguageProvider';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {MinToStep} from 'models/service-company';
 import ReportTimeEntries from './ReportTimeEntries';
 
 interface Props {
@@ -27,6 +29,8 @@ interface Props {
   schedule?: ServiceOrderScheduleSimpleView;
 }
 export const Maintenance = ({schedule, formik, isEdit}: Props) => {
+  const {user} = useUserSession();
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t} = useTranslation();
   const theme = useTheme();
   const {language: selectedLng} = useContext(LanguageContext);
@@ -36,22 +40,24 @@ export const Maintenance = ({schedule, formik, isEdit}: Props) => {
     formik.values.travelTimeRecord!,
   ]);
 
-  const totalBillableHoursFormatted = convertMinutesToHoursAndMinutes(
+  const totalBillableHoursFormatted = convertMinutesWithRounding(
     totalBillableHours,
     {hourUnit: 'h'},
     1,
+    company?.settings.minToHourStep || MinToStep.STEP_0,
   );
 
   const totalTravelFormatted = useMemo(() => {
     const totalTravelWithoutSurcharge = calculateSlotTotalWithoutSurcharge(
       formik.values.travelTimeRecord,
     );
-    return convertMinutesToHoursAndMinutes(
+    return convertMinutesWithRounding(
       totalTravelWithoutSurcharge,
       {
         hourUnit: 'h',
       },
       1,
+      company?.settings.minToHourStep || MinToStep.STEP_0,
     );
   }, [formik.values.travelTimeRecord]);
 
@@ -59,12 +65,13 @@ export const Maintenance = ({schedule, formik, isEdit}: Props) => {
     const totalWorkWithoutSurcharge = calculateSlotTotalWithoutSurcharge(
       formik.values.workTimeRecord,
     );
-    return convertMinutesToHoursAndMinutes(
+    return convertMinutesWithRounding(
       totalWorkWithoutSurcharge,
       {
         hourUnit: 'h',
       },
       1,
+      company?.settings.minToHourStep || MinToStep.STEP_0,
     );
   }, [formik.values.workTimeRecord]);
 
