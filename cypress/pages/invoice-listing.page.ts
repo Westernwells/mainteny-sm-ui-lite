@@ -10,9 +10,7 @@ export default class InvoiceListingPage {
 
     cy.intercept('GET', apiEndpoint).as('getInvoices');
 
-    cy.visit(`/invoices`, {
-      failOnStatusCode: false,
-    });
+    cy.get('ul > div[role="button"][data-testid="invoices-nav-item"]').click();
 
     cy.wait('@getInvoices');
   };
@@ -109,7 +107,7 @@ export default class InvoiceListingPage {
   };
 
   static navigateToDetailsPage = () => {
-    let getInvoicesInterception: { body: { data: InvoiceView[] } } | undefined;
+    let getInvoicesInterception: {body: {data: InvoiceView[]}} | undefined;
 
     cy.intercept(
       'GET',

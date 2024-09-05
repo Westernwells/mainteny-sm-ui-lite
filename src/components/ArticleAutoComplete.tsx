@@ -46,7 +46,7 @@ export const ArticleAutocomplete = ({
       {
         pageIndex: 0,
         pageSize: 3,
-        query,
+        query: encodeURIComponent(query),
       },
       {keepPreviousData: true},
       true,

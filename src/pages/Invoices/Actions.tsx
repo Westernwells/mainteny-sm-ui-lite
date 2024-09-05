@@ -1280,7 +1280,7 @@ export const Actions = ({
 
       {selectedInvoice && (
         <MarkAsPaidDialog
-          invoice={selectedInvoice!}
+          invoice={selectedInvoice}
           open={isDialogOpen}
           onConfirm={() => setIsDialogOpen(false)}
           onClose={() => {

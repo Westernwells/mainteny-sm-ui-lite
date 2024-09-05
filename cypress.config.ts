@@ -1,9 +1,11 @@
-import { defineConfig } from 'cypress';
+import {defineConfig} from 'cypress';
 import coverage from '@cypress/code-coverage/task';
-import cypressSplit from 'cypress-split'
+import cypressSplit from 'cypress-split';
+import {readPdf} from './cypress/scripts/readPDF';
 
+const fs = require('fs');
 
-require('dotenv').config({ path: '.env.stage' });
+require('dotenv').config({path: '.env.stage'});
 
 export default defineConfig({
   e2e: {
@@ -12,6 +14,21 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       coverage(on, config);
       cypressSplit(on, config);
+      on('task', {
+        readPdf,
+      });
+      on('task', {
+        downloads: (downloadspath) =>
+          fs
+            .readdirSync(downloadspath)
+            .map((name: string) => ({
+              name,
+              time: fs.statSync(`${downloadspath}/${name}`).mtime.getTime(),
+            }))
+            .sort((a: {time: number}, b: {time: number}) => a.time - b.time) // ascending
+            .map((f: {name: string}) => f.name),
+      });
+
       return config;
     },
   },

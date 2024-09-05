@@ -1,20 +1,13 @@
 import InvoiceListingPage from '../pages/invoice-listing.page';
-import LoginPage from '../pages/login.page';
 import AppTopBarPage from '../pages/appTopBar.page';
 import {InvoiceStatusView} from '../../src/models/invoice';
 
 describe('Invoice listing page', () => {
     beforeEach(() => {
-        LoginPage.visitLoginPage();
-        const loginURL = `${Cypress.env().REACT_APP_API_URL}/api/sessions/login`;
-        cy.intercept('POST', loginURL).as('loginApi');
+        cy.login();
 
-        LoginPage.login();
-
-        cy.wait('@loginApi').then(() => {
-            InvoiceListingPage.visit();
-            AppTopBarPage.selectLanguage('English');
-        });
+        AppTopBarPage.selectLanguage('English');
+        InvoiceListingPage.visit();
     });
 
     it('should route to new invoice page on clicking new invoice button', () => {

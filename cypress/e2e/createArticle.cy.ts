@@ -86,7 +86,8 @@ describe('Create Article', () => {
 
         cy.fillRichTextField('Description', 'Test Description');
 
-        cy.get('div[data-testid="supplier-article-number"]').type(getUniqueId());
+        const supplierArticleNumber = getUniqueId();
+        cy.get('div[data-testid="supplier-article-number"]').type(supplierArticleNumber);
         const createArticleOrderAPI = `${Cypress.env().REACT_APP_API_URL}/api/articleOrders`;
         cy.intercept('POST', createArticleOrderAPI).as('createArticleOrderAPI');
         const articleOrderAPI = `${Cypress.env().REACT_APP_API_URL}/api/articleOrders/*`;
@@ -96,6 +97,10 @@ describe('Create Article', () => {
         cy.contains('PDF generation is in progress');
         cy.wait('@articleOrderAPI');
 
+        // check PDF content
+        cy.get('div[class^="react-pdf__Page__textContent"]').contains(supplierArticleNumber);
+
+        // check print function
         cy.get('button').contains('Print order').click();
 
         cy.get('iframe')
@@ -106,5 +111,10 @@ describe('Create Article', () => {
             });
 
         cy.get('@printSpy').should('have.been.called');
+        // check downloaded PDF file content
+        cy.task('downloads', 'cypress/downloads').then((d: string[]) => {
+            const lastDownlodedFile = d[d.length - 1];
+            cy.task('readPdf', `cypress/downloads/${lastDownlodedFile}`).its('text').should('contain', supplierArticleNumber);
+        });
     });
 });

@@ -97,7 +97,6 @@ export const OrderChecklistItemCard = ({
                 onClick: () => {
                   onEdit(data);
                 },
-
                 icon: <Edit />,
               },
               {
