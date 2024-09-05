@@ -207,7 +207,7 @@ const ReportTimeEntries = ({
         <Box width={!isEdit ? TIME_SECTION_WIDTH : DURATION_SECTION_WIDTH}>
           {isEdit ? (
             <PatternFormat
-              value={timeRawValues[index] ?? '0:00'}
+              defaultValue="00:00"
               size="small"
               allowEmptyFormatting
               onBlur={formik.handleBlur}
@@ -227,7 +227,7 @@ const ReportTimeEntries = ({
 
                 formik.setFieldValue(
                   `${timeRecordKey}.timeSlots[${index}].minutes`,
-                  convertHoursAndMinutesToMinutes(value),
+                  convertHoursAndMinutesToMinutes(value.trim()),
                 );
               }}
               customInput={TextField}

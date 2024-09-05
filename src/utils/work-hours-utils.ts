@@ -136,7 +136,7 @@ export const convertMinutesWithRounding = (
 
 export const convertHoursAndMinutesToMinutes = (timeString: string): number => {
   // Regular expression to match the "hh:mm" format
-  const timeRegex = /^(\d{1,2}):(\d{2})$/;
+  const timeRegex = /^(\d{1,2}):(\d{1,2})$/;
 
   // Check if the input string matches the expected format
   if (!timeRegex.test(timeString)) {
