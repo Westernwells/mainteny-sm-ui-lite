@@ -978,6 +978,13 @@ export const InvoiceForm = ({
           propertyOwnerData.beneficiaryAddress ||
           emptyAddressState,
       );
+
+      if (!formik.values.elevatorExternalId) {
+        formik.setFieldValue(
+          'elevatorExternalId',
+          serviceOrder?.elevator.externalId || '-',
+        );
+      }
       formik.setFieldValue(
         'alternativeAddress',
         invoice?.additionalInfo?.alternativeAddress ||
