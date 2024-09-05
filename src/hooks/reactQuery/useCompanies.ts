@@ -79,7 +79,11 @@ export const getCompany = async (companyId: string) => {
   return response.data;
 };
 
-export const useCompanyById = (companyId?: string, shouldFetch?: boolean) => {
+export const useCompanyById = (
+  companyId?: string,
+  shouldFetch?: boolean,
+  options?: {refetchOnWindowFocus?: boolean; useErrorBoundary?: boolean},
+) => {
   const {showError} = useSnackbar();
 
   return useQuery(
@@ -92,6 +96,7 @@ export const useCompanyById = (companyId?: string, shouldFetch?: boolean) => {
         console.log(err);
         showError(err);
       },
+      ...(options ?? {}),
     },
   );
 };
