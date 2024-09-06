@@ -507,11 +507,27 @@ export const InvoiceForm = ({
 
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
+
     if (formType === 'new' && row.paymentTerm) {
       formik.setFieldValue(
         'paymentTerm',
         getFormattedPaymentTerms(row.paymentTerm),
       );
+      if (row.paymentTerm?.data?.dueDays) {
+        formik.setFieldValue(
+          'dueDate',
+          addDays(new Date(), row.paymentTerm?.data?.dueDays),
+        );
+        setResetDueDatePicker(true);
+      }
+    }
+
+    if (formType === 'edit' && row.paymentTerm && !customer) {
+      formik.setFieldValue(
+        'paymentTerm',
+        getFormattedPaymentTerms(row.paymentTerm),
+      );
+
       if (row.paymentTerm?.data?.dueDays) {
         formik.setFieldValue(
           'dueDate',
@@ -953,6 +969,7 @@ export const InvoiceForm = ({
       handleSelectCustomer(value);
     } else {
       setCustomer(undefined);
+      setServiceOrder(undefined);
       formik.setFieldValue('costCenter', '');
       formik.setFieldValue('paymentTerm', {term: ''});
     }
