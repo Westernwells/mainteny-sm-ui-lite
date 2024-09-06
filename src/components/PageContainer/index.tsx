@@ -6,11 +6,11 @@ type Props = {
 };
 
 const PageContainer = ({gap, children}: PropsWithChildren<Props>) => (
-  <Box data-testId="relative" sx={{position: 'relative', flex: '1 1'}}>
+  <Box data-testid="page-container" sx={{position: 'relative', flex: '1 1'}}>
     <Box
       sx={{
         marginTop: '1.1em',
-        padding: '2.2em',
+        padding: '24px',
         backgroundColor: '#FFFFFF',
         display: 'flex',
         flexDirection: 'column',

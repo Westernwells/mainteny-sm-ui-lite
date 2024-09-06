@@ -25,3 +25,8 @@ export interface OrderByParams<T> {
   orderByField: T;
   sortOrder: Order;
 }
+
+export type HeaderSortingState = {
+  columnName: string;
+  order: Order;
+};

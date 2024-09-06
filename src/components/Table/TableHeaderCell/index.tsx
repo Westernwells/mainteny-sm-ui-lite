@@ -8,10 +8,11 @@ import {TableColumn} from '../../../models/table';
 type Props = {
   column: TableColumn;
   gap?: string | number;
+  isSortStateToggled: boolean;
   onSort?: () => void;
 };
 
-const TableHeaderCell = ({column, gap, onSort}: Props) => {
+const TableHeaderCell = ({column, gap, isSortStateToggled, onSort}: Props) => {
   const {t} = useTranslation();
   return (
     <Box
@@ -34,7 +35,15 @@ const TableHeaderCell = ({column, gap, onSort}: Props) => {
             {_.capitalize(t(column.headerName))}
           </Typography>
           {onSort && (
-            <IconButton sx={{padding: 0}} onClick={onSort}>
+            <IconButton
+              sx={{
+                width: '16px',
+                height: '16px',
+                padding: '2px',
+                borderRadius: '4px',
+                ...(isSortStateToggled && {transform: 'rotate(180deg)'}),
+              }}
+              onClick={onSort}>
               <SortingArrows />
             </IconButton>
           )}

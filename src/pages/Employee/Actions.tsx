@@ -3,7 +3,7 @@ import PersonRemoveAlt1 from '@mui/icons-material/PersonRemoveAlt1';
 import {Confirm} from 'components/Confirm';
 import SendIcon from '@mui/icons-material/Send';
 import {useDeleteEmployee} from 'hooks/reactQuery/useEmployee';
-import TableActionMenu from '../../components/TableActionMenu';
+import TableActionMenu from '../../components/Table/TableActionMenu';
 import {Action} from '../../models/table';
 
 interface Props {

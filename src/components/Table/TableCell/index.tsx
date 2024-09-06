@@ -3,6 +3,7 @@ import {PropsWithChildren} from 'react';
 import {CellProps} from '../../../models/table';
 
 type Props = CellProps & {
+  flex?: string;
   gap?: string | number;
   onClick?: () => void;
 };
