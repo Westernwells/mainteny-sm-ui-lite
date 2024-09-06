@@ -854,7 +854,7 @@ export const Actions = ({
         </IconButton>
       </Tooltip>
     );
-  }, [invoice.status, downloadUrl, companyNextNumber?.value]);
+  }, [invoice, downloadUrl, companyNextNumber?.value]);
 
   const actions = useMemo(() => {
     const items = [];
@@ -1017,7 +1017,7 @@ export const Actions = ({
     }
 
     return items;
-  }, [downloadUrl, invoice.status, t, companyNextNumber?.value]);
+  }, [downloadUrl, invoice, t, companyNextNumber?.value]);
 
   useEffectAfterMount(() => {
     (async () => {
