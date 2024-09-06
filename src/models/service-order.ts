@@ -381,6 +381,8 @@ export interface CompleteServiceOrder {
   articles?: ServiceOrderArticleRecord[];
   workTimeRecord?: ServiceOrderReportTimeRecord;
   travelTimeRecord?: ServiceOrderReportTimeRecord;
+  showTime?: boolean;
+  showHours?: boolean;
 }
 
 export interface CheckListAnswerRecord {
@@ -409,6 +411,8 @@ export interface ServiceOrderReportAdditionalInfo {
   pdfPath: string;
   pdfGenerationStatus: PdfGenerationStatus;
   onlyShowTotalTime: boolean;
+  showTime?: boolean;
+  showHours?: boolean;
   workTimeInfo?: {
     timeSlots: ServiceOrderTimeSlot[];
     percentageSurcharge?: number;

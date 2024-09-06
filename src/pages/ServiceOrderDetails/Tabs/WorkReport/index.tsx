@@ -366,6 +366,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
         percentageSurcharge: 0,
         timeSlots: [],
       },
+      showTime: report?.additionalInfo.showTime ?? true,
+      showHours: report?.additionalInfo.showHours ?? true,
     },
     onSubmit: (values) => {
       completeServiceOrder(
@@ -384,6 +386,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
             travelTimeRecord: convertTimeSlotDatesToRestDateTime(
               values.travelTimeRecord,
             ),
+            showHours: values.showHours,
+            showTime: values.showTime,
           },
         },
         {
@@ -498,10 +502,14 @@ export const WorkReport = ({serviceOrder}: Props) => {
       timeSlots: report?.additionalInfo.travelTimeInfo?.timeSlots ?? [],
     });
     formik.setFieldValue('description', report?.description || '');
+    formik.setFieldValue('showHours', report?.additionalInfo.showHours ?? true);
+    formik.setFieldValue('showTime', report?.additionalInfo.showTime ?? true);
   }, [
     report?.additionalInfo.workTimeInfo,
     report?.additionalInfo.travelTimeInfo,
     report?.description,
+    report?.additionalInfo.showHours,
+    report?.additionalInfo.showTime,
   ]);
 
   useEffect(() => {
