@@ -1,7 +1,7 @@
 import SendIcon from '@mui/icons-material/Send';
 import {useRef} from 'react';
 import {Action} from '../../../../../models/table';
-import TableActionMenu from '../../../../../components/TableActionMenu';
+import TableActionMenu from '../../../../../components/Table/TableActionMenu';
 
 interface Props {
   email: string;

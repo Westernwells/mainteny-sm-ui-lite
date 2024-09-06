@@ -117,15 +117,15 @@ const Pagination = ({
       </Box>
       <Box sx={{display: 'flex', alignItems: 'center'}} gap={2}>
         <Box sx={{display: 'flex', alignItems: 'center'}}>
-          <Typography>
-            {t(
-              `{{startPageElementNumber}} - {{endPageElementNumber}} of {{totalEntries}} results`,
-              {
-                startPageElementNumber: startIndexForPage,
-                endPageElementNumber: endIndexForPage,
-                totalEntries,
-              },
-            )}
+          <Typography variant="subtitle2">
+            {startIndexForPage} - {endIndexForPage} &nbsp;
+          </Typography>
+          <Typography variant="body2">
+            {t(`of {{totalEntries}} results`, {
+              startPageElementNumber: startIndexForPage,
+              endPageElementNumber: endIndexForPage,
+              totalEntries,
+            })}
           </Typography>
         </Box>
         {pagesToShow && (

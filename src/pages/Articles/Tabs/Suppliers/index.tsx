@@ -1,7 +1,6 @@
 import {Box} from '@mui/system';
 import {useNavigate} from 'react-router-dom';
 import React, {useEffect, useMemo, useRef} from 'react';
-import Typography from '@mui/material/Typography';
 import SearchInput from '../../../../components/SearchInput/index';
 import AddButton from '../../../../components/AddButton';
 import {useQueryState} from '../../../../hooks/useQueryState';
@@ -33,6 +32,8 @@ import {
 import Cell from '../../../../components/Table/TableCell';
 import {Actions} from './Actions';
 import TableRow from '../../../../components/Table/TableRow';
+import PageHeaderContainer from '../../../../components/PageHeaderContainer';
+import TableCellText from '../../../../components/Table/TableCellText';
 
 const Suppliers = () => {
   const navigate = useNavigate();
@@ -55,9 +56,7 @@ const Suppliers = () => {
       isFirst: true, // remove when checkbox are present with bulk action
       renderCell: (supplier, cellProps) => (
         <Cell isFirst width="15%" onClick={cellProps.onClick}>
-          <Typography variant="body2" noWrap>
-            {supplier.externalId}
-          </Typography>
+          <TableCellText>{supplier.externalId}</TableCellText>
         </Cell>
       ),
     },
@@ -67,9 +66,7 @@ const Suppliers = () => {
       fieldName: SUPPLIER_ORDER_FIELD.NAME,
       renderCell: (supplier, cellProps) => (
         <Cell width="10%" onClick={cellProps.onClick}>
-          <Typography variant="body2" sx={{textTransform: 'capitalize'}} noWrap>
-            {supplier.name}
-          </Typography>
+          <TableCellText capitalize>{supplier.name}</TableCellText>
         </Cell>
       ),
     },
@@ -79,7 +76,7 @@ const Suppliers = () => {
       fieldName: SUPPLIER_ORDER_FIELD.CATEGORY,
       renderCell: (supplier, cellProps) => (
         <Cell width="20%" onClick={cellProps.onClick}>
-          <Typography noWrap>{supplier.category}</Typography>
+          <TableCellText>{supplier.category}</TableCellText>
         </Cell>
       ),
     },
@@ -89,7 +86,7 @@ const Suppliers = () => {
       fieldName: SUPPLIER_ORDER_FIELD.ADDRESS,
       renderCell: (supplier, cellProps) => (
         <Cell width="20%" onClick={cellProps.onClick}>
-          <Typography noWrap>{supplier.address}</Typography>
+          <TableCellText>{supplier.address}</TableCellText>
         </Cell>
       ),
     },
@@ -99,7 +96,7 @@ const Suppliers = () => {
       fieldName: SUPPLIER_ORDER_FIELD.PHONE,
       renderCell: (supplier, cellProps) => (
         <Cell width="10%" onClick={cellProps.onClick}>
-          <Typography noWrap>{supplier.phone}</Typography>
+          <TableCellText>{supplier.phone}</TableCellText>
         </Cell>
       ),
     },
@@ -109,7 +106,7 @@ const Suppliers = () => {
       fieldName: SUPPLIER_ORDER_FIELD.EMAIL,
       renderCell: (supplier, cellProps) => (
         <Cell width="10%" onClick={cellProps.onClick}>
-          <Typography noWrap>{supplier.email}</Typography>
+          <TableCellText>{supplier.email}</TableCellText>
         </Cell>
       ),
     },
@@ -166,7 +163,7 @@ const Suppliers = () => {
   );
 
   const handleNewSupplierClick = () => {
-    navigate('/newSupplier');
+    navigate('/articles/newSupplier');
   };
 
   const handleRowClick = (id: string) => () => {
@@ -193,9 +190,9 @@ const Suppliers = () => {
 
   return (
     <Box
-      gap={4}
+      gap={3}
       sx={{display: 'flex', flexDirection: 'column', flex: '1 1 auto'}}>
-      <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
+      <PageHeaderContainer>
         <SearchInput
           onChanged={(val: string) => setSearch(val)}
           refInput={textInput}
@@ -203,10 +200,14 @@ const Suppliers = () => {
         />
 
         <AddButton label="New Supplier" onClick={handleNewSupplierClick} />
-      </Box>
+      </PageHeaderContainer>
 
       <TableContainer>
-        <TableHeader columns={COLUMNS.current} onSort={handleSortField} />
+        <TableHeader
+          columns={COLUMNS.current}
+          sortState={{columnName: orderByField, order: sortOrder}}
+          onSort={handleSortField}
+        />
         {/* Row */}
         {rows.map((entry) => (
           <TableRow

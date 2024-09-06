@@ -1,9 +1,12 @@
-import {RefObject, useEffect, useMemo} from 'react';
+import {RefObject, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
 import {debounce} from 'lodash';
+import {IconButton} from '@mui/material';
+import {useTheme} from '@mui/system';
 
 type Props = {
   placeholder?: string;
@@ -26,22 +29,32 @@ const SearchInput = ({
   onChanged,
 }: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
+  const [value, setValue] = useState<string>(defaultValue);
 
-  // input delay
+  const handleChange = (e: {target: {value: string}}) => {
+    setValue(e.target.value);
+  };
+
+  const handleClearClick = () => {
+    setValue('');
+  };
+
   const debouncedChangeHandler = useMemo(
     () =>
-      debounce((e) => {
-        onChanged?.(e.target.value);
+      debounce((newValue: string) => {
+        onChanged?.(newValue);
       }, 300),
     [onChanged],
   );
 
-  useEffect(
-    () => () => {
+  // input delay
+  useEffect(() => {
+    debouncedChangeHandler(value);
+    return () => {
       debouncedChangeHandler.cancel();
-    },
-    [debouncedChangeHandler],
-  );
+    };
+  }, [value]);
 
   return (
     <TextField
@@ -49,25 +62,53 @@ const SearchInput = ({
       data-testid="search-input"
       sx={{
         width: width || '20rem',
+
         background: '#fff',
         '& .MuiInputAdornment-root': {
-          marginRight: '-7px',
+          height: '40px',
+        },
+        '& .MuiInputBase-root': {
+          height: '40px',
+          padding: '8px',
         },
         ...containerStyle,
       }}
+      value={value}
       placeholder={placeholder && t(placeholder)}
       variant="outlined"
       label={label && t(label)}
-      defaultValue={defaultValue}
       inputRef={refInput}
-      onChange={debouncedChangeHandler}
+      onChange={handleChange}
       slotProps={{
         input: {
           id: label,
           name: label,
           startAdornment: (
-            <InputAdornment sx={{paddingRight: '8px'}} position="start">
+            <InputAdornment position="start">
               <SearchIcon />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                disabled={!value}
+                sx={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '4px',
+                }}
+                onClick={handleClearClick}>
+                <CloseIcon
+                  sx={{
+                    '&:hover': {
+                      fill: theme.palette.primary,
+                    },
+
+                    width: '16px',
+                    height: '16px',
+                  }}
+                />
+              </IconButton>
             </InputAdornment>
           ),
         },

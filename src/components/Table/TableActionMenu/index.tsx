@@ -4,7 +4,7 @@ import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import IconButton from '@mui/material/IconButton';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
-import {Action} from '../../models/table';
+import {Action} from '../../../models/table';
 
 type Props = {
   options: Action[];
@@ -56,14 +56,16 @@ const TableActionMenu = ({
           {options.map((option) => {
             const IconComponent = option.icon;
             return (
-              <MenuItem onClick={option.onTrigger}>
-                <ListItemButton component="a">
+              <MenuItem sx={{display: 'flex'}} onClick={option.onTrigger}>
+                <ListItemButton sx={{flex: '0 0 auto'}} component="a">
                   <IconComponent
                     fontSize="small"
                     sx={{color: 'action.active'}}
                   />
                 </ListItemButton>
-                <ListItemText>{t(option.label)}</ListItemText>
+                <ListItemText sx={{align: 'left'}}>
+                  {t(option.label)}
+                </ListItemText>
               </MenuItem>
             );
           })}

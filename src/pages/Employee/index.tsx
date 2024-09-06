@@ -11,9 +11,7 @@ import {TechnicianEventPair, TechnicianEventType} from 'models/technician';
 import {calculateTotalPages, createEmptyResource, makePage} from 'utils/paging';
 import {toRestDateTime} from 'utils/datetime';
 import {getRoles} from 'utils/work-hours-utils';
-import {Box} from '@mui/system';
 import {useNavigate} from 'react-router-dom';
-import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import {useTranslation} from 'react-i18next';
 import {aggregateEmployeeRows} from '../../utils/employee';
@@ -32,6 +30,8 @@ import {getAvailabilityChipColor} from '../../utils/availability';
 import {StatusChip} from '../../components/StatusChip';
 import {Actions} from './Actions';
 import {capitalize} from '../../utils/utils';
+import PageHeaderContainer from '../../components/PageHeaderContainer';
+import TableCellText from '../../components/Table/TableCellText';
 
 export const Employees = () => {
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ export const Employees = () => {
       renderCell: (employee, cellProps) => (
         <Cell isFirst width="15%" onClick={cellProps.onClick}>
           <Avatar src={employee.photoUrl} sx={{width: 24, height: 24}} />
-          <Typography noWrap>{employee.name}</Typography>
+          <TableCellText>{employee.name}</TableCellText>
         </Cell>
       ),
     },
@@ -60,9 +60,9 @@ export const Employees = () => {
       width: '10%',
       renderCell: (employee, cellProps) => (
         <Cell width="10%" onClick={cellProps.onClick}>
-          <Typography variant="body2" sx={{textTransform: 'capitalize'}} noWrap>
+          <TableCellText capitalize>
             {t(capitalize(employee.roles))}
-          </Typography>
+          </TableCellText>
         </Cell>
       ),
     },
@@ -71,17 +71,17 @@ export const Employees = () => {
       width: '20%',
       renderCell: (employee, cellProps) => (
         <Cell width="20%" onClick={cellProps.onClick}>
-          <Typography noWrap>{employee.address}</Typography>
+          <TableCellText>{employee.address}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'Team',
-      width: '5%',
+      width: '80px',
       align: 'right',
       renderCell: (employee, cellProps) => (
-        <Cell align="right" width="15%" onClick={cellProps.onClick}>
-          <Typography noWrap>{employee.team}</Typography>
+        <Cell align="right" width="80px" onClick={cellProps.onClick}>
+          <TableCellText>{employee.team}</TableCellText>
         </Cell>
       ),
     },
@@ -90,7 +90,7 @@ export const Employees = () => {
       width: '10%',
       renderCell: (employee, cellProps) => (
         <Cell width="10%" onClick={cellProps.onClick}>
-          <Typography noWrap>{employee.phone}</Typography>
+          <TableCellText>{employee.phone}</TableCellText>
         </Cell>
       ),
     },
@@ -99,15 +99,15 @@ export const Employees = () => {
       width: '10%',
       renderCell: (employee, cellProps) => (
         <Cell isFirst width="10%" onClick={cellProps.onClick}>
-          <Typography noWrap>{employee.shift}</Typography>
+          <TableCellText>{employee.shift}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'AVAILABILITY',
-      width: '10%',
+      width: 'auto',
       renderCell: (employee, cellProps) => (
-        <Cell align="center" width="10%" onClick={cellProps.onClick}>
+        <Cell align="center" width="auto" onClick={cellProps.onClick}>
           <StatusChip
             label={employee.availability}
             {...getAvailabilityChipColor(employee.availability)}
@@ -224,19 +224,16 @@ export const Employees = () => {
   };
 
   return (
-    <PageContainer gap={4}>
-      <Box gap={4} sx={{display: 'flex', flexDirection: 'column'}}>
-        <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-          <SearchInput
-            onChanged={(val: string) => setSearch(val)}
-            refInput={textInput}
-            defaultValue={search}
-          />
+    <PageContainer gap={3}>
+      <PageHeaderContainer>
+        <SearchInput
+          onChanged={(val: string) => setSearch(val)}
+          refInput={textInput}
+          defaultValue={search}
+        />
 
-          <AddButton label="New Employee" onClick={handleNewEmployeeClick} />
-        </Box>
-        <Box sx={{display: 'flex'}} />
-      </Box>
+        <AddButton label="New Employee" onClick={handleNewEmployeeClick} />
+      </PageHeaderContainer>
       <TableContainer>
         <TableHeader columns={COLUMNS.current} />
         {/* Row */}
