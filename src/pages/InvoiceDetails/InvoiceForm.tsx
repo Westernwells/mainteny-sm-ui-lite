@@ -669,11 +669,6 @@ export const InvoiceForm = ({
     );
 
     formik.setFieldValue(
-      'sentDate',
-      invoiceData?.sentDate ? new Date(invoiceData?.sentDate) : undefined,
-    );
-
-    formik.setFieldValue(
       'deliveryStartDate',
       invoiceData?.additionalInfo.deliveryStartDate
         ? new Date(invoiceData?.additionalInfo.deliveryStartDate)
@@ -736,8 +731,14 @@ export const InvoiceForm = ({
 
     if (formType === 'edit') {
       formik.setFieldValue('externalId', invoiceData?.externalId ?? '');
+
+      formik.setFieldValue(
+        'sentDate',
+        invoiceData?.sentDate ? new Date(invoiceData?.sentDate) : undefined,
+      );
     } else if (formType === 'new') {
       formik.setFieldValue('externalId', '');
+      formik.setFieldValue('sentDate', undefined);
     }
   };
 
