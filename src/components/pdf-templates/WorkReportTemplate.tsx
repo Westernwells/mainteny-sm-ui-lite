@@ -201,7 +201,8 @@ type BookedHoursProps = {
   technicianName?: string;
   selectedLng?: string;
   translate: (key: string) => string;
-  onlyShowTime: boolean;
+  showTime: boolean;
+  showHours: boolean;
 };
 
 const BookedHoursRow = ({
@@ -212,7 +213,8 @@ const BookedHoursRow = ({
   technicianName,
   selectedLng,
   translate,
-  onlyShowTime,
+  showTime,
+  showHours,
 }: BookedHoursProps) => {
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -231,7 +233,7 @@ const BookedHoursRow = ({
         style={{width: '15%', textAlign: 'left', ...styles.tableBodyContent}}>
         {startTime ? formatDate(startTime) : '-'}
       </Text>
-      {!onlyShowTime && (
+      {showTime && (
         <Text
           style={{
             width: '10%',
@@ -241,17 +243,23 @@ const BookedHoursRow = ({
           {startTime ? formatDate(startTime, 'HH:mm') : '-'}
         </Text>
       )}
-      <Text
-        style={{width: '13%', textAlign: 'right', ...styles.tableBodyContent}}>
-        {totalFormatted}
-      </Text>
+      {showHours && (
+        <Text
+          style={{
+            width: '13%',
+            textAlign: 'right',
+            ...styles.tableBodyContent,
+          }}>
+          {totalFormatted}
+        </Text>
+      )}
       <Text
         style={{width: '15%', textAlign: 'right', ...styles.tableBodyContent}}>
         {percentageSurcharge ? `${percentageSurcharge}%` : '-'}
       </Text>
       <Text
         style={{
-          width: !onlyShowTime ? '17%' : '20%',
+          width: '17%',
           textAlign: 'right',
           ...styles.tableBodyContent,
         }}>
@@ -259,7 +267,7 @@ const BookedHoursRow = ({
       </Text>
       <Text
         style={{
-          width: !onlyShowTime ? '30%' : '37%',
+          width: '30%',
           textAlign: 'left',
           marginLeft: 36,
           ...styles.tableBodyContent,
@@ -455,7 +463,7 @@ const WorkReportTemplate = React.memo(
                       }}>
                       {translate('Date')}
                     </Text>
-                    {!report?.additionalInfo.onlyShowTotalTime && (
+                    {report?.additionalInfo.showTime && (
                       <Text
                         style={{
                           width: '10%',
@@ -466,14 +474,16 @@ const WorkReportTemplate = React.memo(
                       </Text>
                     )}
 
-                    <Text
-                      style={{
-                        width: '13%',
-                        textAlign: 'right',
-                        ...styles.tableHeading,
-                      }}>
-                      {translate('Hours')}
-                    </Text>
+                    {report?.additionalInfo.showHours && (
+                      <Text
+                        style={{
+                          width: '13%',
+                          textAlign: 'right',
+                          ...styles.tableHeading,
+                        }}>
+                        {translate('Hours')}
+                      </Text>
+                    )}
                     <Text
                       style={{
                         width: '15%',
@@ -484,9 +494,7 @@ const WorkReportTemplate = React.memo(
                     </Text>
                     <Text
                       style={{
-                        width: !report?.additionalInfo.onlyShowTotalTime
-                          ? '17%'
-                          : '20%',
+                        width: '17%',
                         textAlign: 'right',
                         ...styles.tableHeading,
                       }}>
@@ -495,9 +503,7 @@ const WorkReportTemplate = React.memo(
 
                     <Text
                       style={{
-                        width: !report?.additionalInfo.onlyShowTotalTime
-                          ? '30%'
-                          : '37%',
+                        width: '30%',
                         textAlign: 'left',
                         marginLeft: 40,
                         ...styles.tableHeading,
@@ -510,6 +516,8 @@ const WorkReportTemplate = React.memo(
                       <BookedHoursRow
                         key={`${index} - ${s.startTime}`}
                         startTime={s?.startTime}
+                        showHours={report.additionalInfo.showHours!}
+                        showTime={report.additionalInfo.showTime!}
                         totalFormatted={convertMinutesWithRounding(
                           s?.minutes!,
                           {
@@ -526,7 +534,6 @@ const WorkReportTemplate = React.memo(
                         technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
                         selectedLng={selectedLng}
                         translate={translate}
-                        onlyShowTime={report?.additionalInfo.onlyShowTotalTime}
                       />
                     ),
                   )}
@@ -536,6 +543,8 @@ const WorkReportTemplate = React.memo(
                       <BookedHoursRow
                         key={`${index} - ${s.startTime}`}
                         startTime={s?.startTime}
+                        showHours={report.additionalInfo.showHours!}
+                        showTime={report.additionalInfo.showTime!}
                         totalFormatted={convertMinutesWithRounding(
                           s?.minutes!,
                           {
@@ -552,7 +561,6 @@ const WorkReportTemplate = React.memo(
                         technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
                         selectedLng={selectedLng}
                         translate={translate}
-                        onlyShowTime={report?.additionalInfo.onlyShowTotalTime}
                       />
                     ),
                   )}
