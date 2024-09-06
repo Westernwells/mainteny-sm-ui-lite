@@ -96,6 +96,13 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       display: 'flex',
       flexDirection: 'row',
       marginVertical: 10,
+      flexWrap: 'wrap',
+    },
+    image: {
+      height: 100,
+      borderRadius: 5,
+      flexShrink: 0,
+      marginVertical: 5,
     },
   });
 
@@ -109,6 +116,7 @@ export const MultiChoiceComponent = ({
   };
 
   const styles = getStyles(boldFontStyle);
+  const pictures = component.additionalInfo.pictures ?? [];
 
   return (
     <View style={styles.multiChoiceContainer}>
@@ -136,16 +144,13 @@ export const MultiChoiceComponent = ({
         ))}
       </View>
       <View style={styles.imageContainer}>
-        {component.additionalInfo.pictures?.map((pic, i) => (
+        {pictures.map((pic, i) => (
           <Image
             key={pic.uri}
             src={pic.uri}
             style={{
-              width: 140,
-              height: 100,
-              marginLeft: i === 0 ? 0 : 10,
-              borderRadius: 5,
-              objectFit: 'cover',
+              ...styles.image,
+              marginRight: i === pictures.length - 1 ? 0 : 10,
             }}
           />
         ))}
@@ -164,6 +169,7 @@ export const CheckboxComponent = ({
   };
 
   const styles = getStyles(boldFontStyle);
+  const pictures = component.additionalInfo.pictures ?? [];
 
   return (
     <View>
@@ -181,16 +187,13 @@ export const CheckboxComponent = ({
         </View>
       </View>
       <View style={styles.imageContainer}>
-        {component.additionalInfo.pictures?.map((pic, i) => (
+        {pictures.map((pic, i) => (
           <Image
             key={pic.uri}
             src={pic.uri}
             style={{
-              width: 140,
-              height: 100,
-              marginLeft: i === 0 ? 0 : 10,
-              borderRadius: 5,
-              objectFit: 'cover',
+              ...styles.image,
+              marginRight: i === pictures.length - 1 ? 0 : 10,
             }}
           />
         ))}
@@ -220,6 +223,8 @@ export const TextComponent = ({
 
   const styles = getStyles(boldFontStyle);
 
+  const pictures = component.additionalInfo.pictures ?? [];
+
   return (
     <View>
       <View
@@ -248,16 +253,13 @@ export const TextComponent = ({
         </View>
       )}
       <View style={styles.imageContainer}>
-        {component.additionalInfo.pictures?.map((pic, i) => (
+        {pictures.map((pic, i) => (
           <Image
             key={pic.uri}
             src={pic.uri}
             style={{
-              width: 140,
-              height: 100,
-              marginLeft: i === 0 ? 0 : 10,
-              borderRadius: 5,
-              objectFit: 'cover',
+              ...styles.image,
+              marginRight: i === pictures.length - 1 ? 0 : 10,
             }}
           />
         ))}

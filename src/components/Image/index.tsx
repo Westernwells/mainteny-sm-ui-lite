@@ -3,19 +3,23 @@ import {FileResourceRecord} from 'models/media';
 import useTheme from '@mui/material/styles/useTheme';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 
 interface Props {
   data: FileResourceRecord;
   isEditing?: boolean;
   onDelete?: (data: FileResourceRecord) => void;
   serviceCompanyId?: string;
+  onReceiveDownloadUrl?: (data: {path: string; url: string}) => void;
+  onImagePress?: (data: FileResourceRecord, urlToUse?: string) => void;
 }
 
 export const Image = ({
   data,
   onDelete,
   serviceCompanyId,
+  onReceiveDownloadUrl,
+  onImagePress,
   isEditing = false,
 }: Props) => {
   const theme = useTheme();
@@ -38,18 +42,24 @@ export const Image = ({
   );
   const isLoading = loadingState || urlToUse === 'loading';
 
+  useEffect(() => {
+    if (urlToUse?.startsWith('http')) {
+      onReceiveDownloadUrl?.({path: data.uri, url: urlToUse});
+    }
+  }, [urlToUse]);
+
   return (
     <Box
+      onClick={() => {
+        onImagePress?.(data, urlToUse);
+      }}
       sx={{
-        width: 150,
-        height: 150,
-        borderRadius: 1,
         margin: '0 5px',
-        flexShrink: 0,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundImage: `url(${urlToUse})`,
         position: 'relative',
+        flexShrink: 0,
+        width: isLoading ? 150 : 'auto',
+        height: isLoading ? 150 : 'auto',
+        cursor: !onImagePress ? 'default' : 'pointer',
       }}>
       {isLoading && (
         <Box
@@ -63,7 +73,11 @@ export const Image = ({
       {isEditing && (
         <Box sx={{position: 'absolute', right: 5, top: 5}}>
           <IconButton
-            onClick={() => onDelete?.(data)}
+            onClick={(e) => {
+              e.stopPropagation();
+
+              onDelete?.(data);
+            }}
             sx={{
               backgroundColor: theme.palette.secondary.mainLight,
               p: 0.8,
@@ -75,6 +89,14 @@ export const Image = ({
           </IconButton>
         </Box>
       )}
+      <img
+        src={urlToUse}
+        alt={data.description}
+        style={{
+          height: 150,
+          borderRadius: 3,
+        }}
+      />
     </Box>
   );
 };
