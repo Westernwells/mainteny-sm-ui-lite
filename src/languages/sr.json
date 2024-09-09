@@ -1185,6 +1185,7 @@
   "Sorry, there was an error while deleting the todo. Please try again.": "Žao nam je, došlo je do greške prilikom brisanja obaveze. Molim Vas, pokušajte ponovo.",
   "Invoice sent successfully": "Faktura je uspješno poslana",
   "Invoice marked as paid": "Faktura je označena kao plaćena",
+  "Invoice marked as paid!": "Faktura je označena kao plaćena!",
   "Invoice created successfully": "Faktura je uspješno napravljena",
   "Invoice updated successfully": "Faktura je uspješno ažurirana",
   "Invoice deleted successfully": "Faktura je uspješno izbrisana",

@@ -1188,6 +1188,7 @@
   "Sorry, there was an error while deleting the todo. Please try again.": "Lo sentimos, hubo un error al eliminar la tarea. Inténtalo de nuevo.",
   "Invoice sent successfully": "Factura enviada con éxito",
   "Invoice marked as paid": "Factura marcada como pagada",
+  "Invoice marked as paid!": "Factura marcada como pagada!",
   "Invoice created successfully": "Factura creada con éxito",
   "Invoice updated successfully": "Factura actualizada con éxito",
   "Invoice deleted successfully": "Factura eliminada con éxito",

@@ -1187,6 +1187,7 @@
   "Sorry, there was an error while deleting the todo. Please try again.": "Извините, была ошибка при удалении списка задач. Пожалуйста, попробуйте еще раз.",
   "Invoice sent successfully": "Счет отправлен успешно",
   "Invoice marked as paid": "Счет отмечен как оплаченный",
+  "Invoice marked as paid!": "Счет отмечен как оплаченный!",
   "Invoice created successfully": "Счет создан успешно",
   "Invoice updated successfully": "Счет успешно обновлен",
   "Invoice deleted successfully": "Счет удален успешно",

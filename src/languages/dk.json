@@ -1188,6 +1188,7 @@
   "Sorry, there was an error while deleting the todo. Please try again.": "Beklager, der opstod en fejl under sletning af opgaven. Prøv igen.",
   "Invoice sent successfully": "Faktura sendt",
   "Invoice marked as paid": "Faktura markeret som betalt",
+  "Invoice marked as paid!": "Faktura markeret som betalt!",
   "Invoice created successfully": "Faktura oprettet",
   "Invoice updated successfully": "Faktura blev opdateret",
   "Invoice deleted successfully": "Faktura blev slettet",
