@@ -2,7 +2,6 @@ import {
   Box,
   Divider,
   IconButton,
-  TextField,
   Typography,
   useMediaQuery,
   useTheme,
@@ -19,7 +18,6 @@ import {useTranslation} from 'react-i18next';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {Button} from 'components/Button';
 import AddIcon from '@mui/icons-material/Add';
-import {PatternFormat} from 'react-number-format';
 import {useEffect, useState} from 'react';
 import {
   convertHoursAndMinutesToMinutes,
@@ -59,8 +57,8 @@ const ReportTimeEntries = ({
   const isSmallerThan1180 = useMediaQuery(theme.breakpoints.down(1180));
   const DATE_SECTION_WIDTH = isSmallerThan1180 ? 125 : 150;
   const TIME_SECTION_WIDTH = isSmallerThan1180 ? 95 : 120;
-  const DURATION_SECTION_WIDTH = isSmallerThan1180 ? 65 : 80;
   const [tempTime, setTempTime] = useState<string>('');
+  const [tempMinutes, setTempMinutes] = useState<number>(0);
   const [slotDate, setSlotDate] = useState<string>('');
 
   useEffect(() => {
@@ -105,6 +103,13 @@ const ReportTimeEntries = ({
 
   const renderEntry = (slot: ServiceOrderTimeSlot, index: number) => {
     const date = new Date(slot.startTime);
+    const dateString = new Date().toLocaleDateString();
+    const defaultHours = new Date(`${dateString} ${timeRawValues[index]}`);
+    const convertedMinutes = convertMinutesWithRounding(slot.minutes ?? 0, {
+      hourUnit: '',
+    });
+    const resetValueForHours = new Date(`${dateString} ${convertedMinutes}`);
+
     return (
       <Box key={slot.startTime} display="flex" my={1} columnGap={2.5}>
         <Box width={DATE_SECTION_WIDTH}>
@@ -204,34 +209,48 @@ const ReportTimeEntries = ({
             <Typography textAlign="end">{formatDate(date, 'HH:mm')}</Typography>
           )}
         </Box>
-        <Box width={!isEdit ? TIME_SECTION_WIDTH : DURATION_SECTION_WIDTH}>
+        <Box width={TIME_SECTION_WIDTH}>
           {isEdit ? (
-            <PatternFormat
-              defaultValue="00:00"
-              size="small"
-              allowEmptyFormatting
-              onBlur={formik.handleBlur}
-              sx={{
-                width: '100%',
-                input: {
-                  textAlign: 'end',
-                  fontSize: isSmallerThan1180 ? '12px' : undefined,
-                },
+            <TimePicker
+              defaultTime={defaultHours}
+              getSelectedTime={(newTime) => {
+                if (newTime) {
+                  const newTimeFormatted = formatDate(newTime, 'HH:mm')!;
+                  const valuesClone = [...timeRawValues];
+
+                  valuesClone[index] = newTimeFormatted;
+
+                  setTempMinutes(
+                    convertHoursAndMinutesToMinutes(newTimeFormatted.trim()),
+                  );
+                  setTimeRawValues(valuesClone);
+                }
               }}
-              onChange={(e) => {
-                const valuesClone = [...timeRawValues];
-                const value = e.target.value.replace('h', '');
-                valuesClone[index] = value;
-
-                setTimeRawValues(valuesClone);
-
+              confirm={() => {
                 formik.setFieldValue(
                   `${timeRecordKey}.timeSlots[${index}].minutes`,
-                  convertHoursAndMinutesToMinutes(value.trim()),
+                  tempMinutes,
                 );
               }}
-              customInput={TextField}
-              format="##:##h"
+              resetValue={resetValueForHours}
+              cancel={() => setTempMinutes(slot.minutes ?? 0)}
+              textFieldProps={{
+                name: 'minutes',
+                label: '',
+                onBlur: formik.handleBlur,
+                sx: isSmallerThan1180
+                  ? {
+                      '& .MuiInputBase-input': {
+                        fontSize: '12px',
+                      },
+                      '& .MuiSvgIcon-root': {
+                        width: '0.8em',
+                        height: '0.8em',
+                      },
+                    }
+                  : {},
+              }}
+              saveOnClose
             />
           ) : (
             <Typography textAlign="end">{timeRawValues[index]}h</Typography>
