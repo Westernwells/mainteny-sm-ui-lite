@@ -271,15 +271,26 @@ export const Maintenance = ({schedule, formik, isEdit}: Props) => {
               </Box>
             )}
 
-            {isEdit && (
-              <FormCheckbox
-                checked={formik.values.onlyShowTotalTime ?? false}
-                name="onlyShowTotalTime"
-                handleChange={formik.handleChange}
-                label={t('Show only total time to the customer')}
-                typographyProps={{fontWeight: 600}}
-              />
-            )}
+            <FormCheckbox
+              checked={formik.values.showTime}
+              name="showTime"
+              disabled={!isEdit}
+              handleChange={(e) => {
+                formik.setFieldValue('showTime', e.target.checked);
+              }}
+              label={t('Include start time')}
+              typographyProps={{fontWeight: 600}}
+            />
+            <FormCheckbox
+              checked={formik.values.showHours}
+              name="showHours"
+              disabled={!isEdit}
+              handleChange={(e) => {
+                formik.setFieldValue('showHours', e.target.checked);
+              }}
+              label={t('Include hours')}
+              typographyProps={{fontWeight: 600}}
+            />
           </Box>
           {!isEdit && (
             <>
