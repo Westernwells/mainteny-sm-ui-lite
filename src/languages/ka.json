@@ -2720,7 +2720,7 @@
   "We will fix this shortly": "ამას მალე მოვაგვარებთ",
   "Home": "მთავარი გვერდი",
   "Uh-oh! This must be an error from our side": "უი! ეს ჩვენი მხრიდან შეცდომა უნდა იყოს",
-  "{{startPageElementNumber}} - {{endPageElementNumber}} of {{totalEntries}} results": "{{startPageElementNumber}} - {{endPageElementNumber}} {{totalEntries}} შედეგიდან",
+  "of {{totalEntries}} results": "{{totalEntries}} შედეგიდან",
   "A server error occurred. Redirecting to the home page.": "მოხდა სერვერის შეცდომა. გადამისამართება მთავარ გვერდზე.",
   "An error occurred. Redirecting to the home page.": "მოხდა შეცდომა. გადამისამართება მთავარ გვერდზე."
 }
