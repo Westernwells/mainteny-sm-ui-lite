@@ -1,23 +1,7 @@
 import React, {useRef, useEffect} from 'react';
+import HelpIcon from '../assets/icons/HelpIcon.svg';
 
-// Define the props for KalasarSearch
-interface KalasarSearchProps {
-  app_id: string;
-  version_id: string;
-  url: string;
-  user_id: string;
-  lang: string;
-  heading: string;
-  description: string;
-  suggestions: string[];
-}
-
-// Define the shape of the KalasarSearch instance
-interface KalasarSearchInstance {
-  destroy: () => void;
-}
-
-// Declare the global Kalasar namespace
+// Extend the Window interface to include Kalasar
 declare global {
   interface Window {
     Kalasar: {
@@ -29,12 +13,29 @@ declare global {
   }
 }
 
+// Define the props for KalasarSearch
+interface KalasarSearchProps {
+  app_id: string;
+  version_id: string;
+  url: string;
+  user_id: string;
+  lang: string;
+  scrolling: boolean;
+  heading: string;
+  description: string;
+  suggestions: string[];
+  searchBarVisible: boolean;
+}
+
+interface KalasarSearchInstance {
+  destroy: () => void;
+}
+
 const KalasarSearchComponent: React.FC = () => {
   const kalasarInstanceRef = useRef<KalasarSearchInstance | null>(null);
 
   useEffect(
     () => () => {
-      // Cleanup function to destroy the instance when the component unmounts
       if (kalasarInstanceRef.current) {
         kalasarInstanceRef.current.destroy();
       }
@@ -44,7 +45,6 @@ const KalasarSearchComponent: React.FC = () => {
 
   const openKalasarSearchModal = () => {
     if (kalasarInstanceRef.current) {
-      // Destroy the previous instance
       kalasarInstanceRef.current.destroy();
     }
 
@@ -54,6 +54,8 @@ const KalasarSearchComponent: React.FC = () => {
       url: 'https://design.kalasar.com/api/v1/product_tour_request',
       user_id: '2',
       lang: 'de',
+      scrolling: true,
+      searchBarVisible: true,
       heading: 'Top Fragen von Mainteny Kunden',
       suggestions: ['Neuen Kunden anlegen', 'Bestehenden Kunden bearbeiten'],
       description:
@@ -62,7 +64,7 @@ const KalasarSearchComponent: React.FC = () => {
 
     if (window.Kalasar && window.Kalasar.KalasarSearch) {
       kalasarInstanceRef.current = new window.Kalasar.KalasarSearch({
-        target: document.body, // or any other DOM element
+        target: document.body,
         props,
       });
     } else {
@@ -73,8 +75,43 @@ const KalasarSearchComponent: React.FC = () => {
   };
 
   return (
-    <button onClick={openKalasarSearchModal} type="button">
-      Click me
+    <button
+      type="button"
+      onClick={openKalasarSearchModal}
+      style={{
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '4px 8px',
+        borderRadius: '4px',
+      }}>
+      {/* Help Icon */}
+      <img
+        src={HelpIcon}
+        alt="Help Icon"
+        style={{
+          width: '25px',
+          height: '25px',
+          display: 'block',
+          objectFit: 'contain',
+        }}
+      />
+      {/* Help Text */}
+      <span
+        style={{
+          marginLeft: '8px',
+          fontSize: '15px',
+          fontFamily: 'Aventa, sans-serif',
+          fontWeight: 600,
+          lineHeight: '24.9px',
+          letterSpacing: '0.14px',
+          color: '#000034',
+          height: '37px',
+          display: 'flex',
+          alignItems: 'center',
+        }}>
+        Help
+      </span>
     </button>
   );
 };

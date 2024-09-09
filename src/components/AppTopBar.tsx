@@ -110,6 +110,9 @@ export const AppTopBar = ({
         </Typography>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" mt={1} alignItems="center">
+            <Box mr={2} display="flex" alignItems="center">
+              <KalasarSearchComponent />
+            </Box>
             <MenuBtn
               startIcon={
                 <img
@@ -165,7 +168,6 @@ export const AppTopBar = ({
               ]}
             />
           </Box>
-          <KalasarSearchComponent />
           <Notifications />
           <Box ml={2} display="flex" alignItems="center">
             <Avatar alt={fullName} src={user?.userAccount.photoUrl} />
