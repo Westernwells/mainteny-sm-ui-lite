@@ -88,13 +88,14 @@ const PdfTemplateLeftAddress = ({
         )}
 
         <Text style={styles.partialAddressText}>
-          {addressComponent?.postalCode && `${addressComponent.postalCode}`}
+          {addressComponent?.postalCode &&
+            `${addressComponent.postalCode}`.trim()}
           {addressComponent?.postalCode &&
             (addressComponent.city || addressComponent.country) &&
             ' '}
-          {addressComponent?.city && `${addressComponent.city}`}
+          {addressComponent?.city && `${addressComponent.city}`.trim()}
           {addressComponent?.city && addressComponent.country && ', '}
-          {addressComponent?.country && `${addressComponent.country}`}
+          {addressComponent?.country && `${addressComponent.country}`.trim()}
         </Text>
       </View>
 
