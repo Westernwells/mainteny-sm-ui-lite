@@ -2632,8 +2632,8 @@
   "Every 1 week": "Wöchentlich",
   "Every 3 weeks": "Dreiwöchentlich",
   "Every 1 year": "Jährlich",
-  "Accountant number": "Buchhaltungsnummer",
-  "Client number": "Kundennummer",
+  "Accountant number": "Beraternummer",
+  "Client number": "Mandantennummer",
   "Start of fiscal year": "Beginn des Geschäftsjahres",
   "Reference number of your external accountant. If not available please ask your accountant.": "Referenznummer Ihres externen Buchhalters. Falls nicht verfügbar, fragen Sie bitte Ihren Buchhalter.",
   "Your accounting client number. If not available please ask your accountant.": "Ihre Buchhaltungs-Kundennummer. Falls nicht verfügbar, fragen Sie bitte Ihren Buchhalter.",
@@ -2688,8 +2688,10 @@
   "We will fix this shortly": "Wir werden dies in Kürze beheben",
   "Home": "Home",
   "Uh-oh! This must be an error from our side": "Oh je! Das muss ein Fehler von unserer Seite sein.",
-  "{{startPageElementNumber}} - {{endPageElementNumber}} of {{totalEntries}} results": "{{startPageElementNumber}} - {{endPageElementNumber}} von {{totalEntries}} Ergebnissen",
+  "of {{totalEntries}} results": "von {{totalEntries}} Ergebnissen",
   "A server error occurred. Redirecting to the home page.": "Ein Serverfehler ist aufgetreten. Sie werden zur Startseite weitergeleitet.",
   "An error occurred. Redirecting to the home page.": "Ein Fehler ist aufgetreten. Sie werden zur Startseite weitergeleitet.",
-  "Something went wrong while loading the page. Redirecting to the home page. Please try again.": "Beim Laden der Seite ist etwas schiefgelaufen. Sie werden zur Startseite weitergeleitet. Bitte versuchen Sie es erneut."
+  "Something went wrong while loading the page. Redirecting to the home page. Please try again.": "Beim Laden der Seite ist etwas schiefgelaufen. Sie werden zur Startseite weitergeleitet. Bitte versuchen Sie es erneut.",
+  "Include start time": "Startzeit auf PDF anzeigen",
+  "Include hours": "Stunden auf PDF anzeigen"
 }
