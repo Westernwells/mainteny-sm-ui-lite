@@ -48,7 +48,7 @@ Sentry.init({
 
 // Add the script tag dynamically
 const script = document.createElement('script');
-script.src = 'https://design.kalasar.com/static/0.0.1/kalasar.js';
+script.src = 'https://design.kalasar.com/static/0.0.2/kalasar.js';
 script.async = true;
 document.head.appendChild(script);
 
