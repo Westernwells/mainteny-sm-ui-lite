@@ -58,6 +58,7 @@ export const CardProps = ({
     wordBreak: 'break-word',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    textWrap: 'wrap',
   });
 
   return (
@@ -136,6 +137,7 @@ export const CardProps = ({
                   wordBreak: 'break-all',
                   overflow: 'hidden',
                   maxWidth: '300px',
+                  textWrap: 'wrap',
                   ...bodyStyle,
                 }}>
                 {hasProtocol(bodyText) || !shouldTranslate
