@@ -1187,6 +1187,7 @@
   "Sorry, there was an error while deleting the todo. Please try again.": "Üzgünüm, Todo'yu silerken bir hata vardı. Lütfen tekrar deneyin.",
   "Invoice sent successfully": "Fatura başarıyla gönderildi",
   "Invoice marked as paid": "Fatura ödenmiş olarak işaretlendi",
+  "Invoice marked as paid!": "Fatura ödenmiş olarak işaretlendi!",
   "Invoice created successfully": "Fatura başarıyla yaratıldı",
   "Invoice updated successfully": "Fatura başarıyla güncellendi",
   "Invoice deleted successfully": "Fatura başarıyla silindi",
