@@ -143,9 +143,8 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
   });
 
   const services = useMemo(() => {
-    const elevatorId = elevator?.id;
-
-    return elevator.contracts.reduce(
+    const elevatorId = elevator.id;
+    return elevator?.contracts.reduce(
       (acc: Service[], contract: ContractSimpleView) => {
         if (
           contract.meta?.state !== State.ACTIVE ||
