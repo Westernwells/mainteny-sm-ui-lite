@@ -88,7 +88,7 @@ const SearchInput = ({
               <SearchIcon />
             </InputAdornment>
           ),
-          endAdornment: (
+          endAdornment: value && (
             <InputAdornment position="end">
               <IconButton
                 disabled={!value}

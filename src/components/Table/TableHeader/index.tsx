@@ -1,7 +1,7 @@
 import {Box} from '@mui/system';
 import {TableColumn} from '../../../models/table';
 import TableHeaderCell from '../TableHeaderCell';
-import {HeaderSortingState, Order} from '../../../models/pagination';
+import {HeaderSortingState} from '../../../models/pagination';
 
 type Props = {
   columns: TableColumn[];
@@ -18,16 +18,14 @@ const TableHeader = ({columns, sortState, onSort}: Props) => (
       backgroundColor: '#FFFFFF',
       top: 0,
       zIndex: 3,
+      minHeight: '40px',
     }}>
     {columns.map((column) => {
       if (column.hide) return;
       return (
         <TableHeaderCell
           column={column}
-          isSortStateToggled={
-            column.fieldName === sortState?.columnName &&
-            sortState?.order === Order.DESC
-          }
+          sortState={sortState}
           onSort={
             onSort && column.fieldName
               ? () => onSort(column.fieldName as string)
