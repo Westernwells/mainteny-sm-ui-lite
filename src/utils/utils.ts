@@ -353,13 +353,16 @@ export const objectKeyByValue = (obj: Record<string, any>, value: string) =>
 
 export const dateToString = (date: Date) => formatISO(date).split('T')[0];
 
-export const getUserFullName = ({
-  firstName = '',
-  lastName = '',
-}: {
+export const getUserFullName = (userAccount?: {
   firstName?: string;
   lastName?: string;
-}) => `${firstName} ${lastName}`.trim();
+}) => {
+  if (!userAccount) {
+    return '';
+  }
+  const {firstName = '', lastName = ''} = userAccount;
+  return `${firstName} ${lastName}`.trim();
+};
 
 export const addTimeToDate = (dateObject: string | Date, timeObject: Date) => {
   if (!timeObject) return '';
