@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction} from 'react';
+import {Dispatch, SetStateAction, useEffect} from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import {useTheme} from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -38,6 +38,12 @@ export const Carousel = ({
     setActiveStep(step);
   };
 
+  useEffect(() => {
+    if (!images[activeStep]) {
+      setActiveStep(0);
+    }
+  }, [images, activeStep]);
+
   return (
     <>
       <Box
@@ -55,7 +61,7 @@ export const Carousel = ({
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-        <Typography variant="h5">{images[activeStep].label}</Typography>
+        <Typography variant="h5">{images[activeStep]?.label}</Typography>
         <IconButton
           aria-label="close"
           sx={{color: 'white', fontSize: '0.875rem'}}

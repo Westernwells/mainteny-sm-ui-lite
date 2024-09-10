@@ -1181,8 +1181,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             <Box>
               {invoice &&
               invoice.additionalInfo &&
-              invoice.additionalInfo.pdfGenerationStatus ===
-                PdfGenerationStatus.DONE &&
+              invoice.additionalInfo.pdfPath &&
               !isLoadingDownloadUrl ? (
                 <PDFContainer
                   url={downloadUrl ? Object.values(downloadUrl)[0] : ''}

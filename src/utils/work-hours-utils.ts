@@ -162,3 +162,14 @@ export const calculateTotalActivityTime = (workHours: UserActivityView[]) => {
 
   return `${convertDigitalMinsToHM(total ?? 0)} h`;
 };
+
+export const completeTimePadding = (timeStr?: string) => {
+  if (!timeStr) {
+    return '00:00';
+  }
+
+  let [hours, minutes] = timeStr.split(':');
+  hours = hours.padStart(2, '0');
+  minutes = minutes.padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
