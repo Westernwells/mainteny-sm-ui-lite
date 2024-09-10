@@ -8,7 +8,7 @@ import {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {AssignmentDescriptionOrderModel} from 'models/service-order';
 import {TimePicker} from 'components/TimePicker';
-import {setDateTime, toRestDateTime} from 'utils/datetime';
+import {toRestDateTime} from 'utils/datetime';
 import {ReactComponent as LiftIcon} from 'assets/icons/Lift-1.svg';
 import {ReactComponent as FieldServiceIcon} from 'assets/icons/FieldService.svg';
 import {ReactComponent as CalendarInformationIcon} from 'assets/icons/CalendarInformation.svg';
@@ -154,21 +154,11 @@ export const AddDescription = ({
           <Grid item md={3}>
             <TimePicker
               defaultTime={
-                formik.values.callTime
-                  ? setDateTime(new Date(), formik.values.callTime)
-                  : undefined
+                formik.values.callTime ? new Date(formik.values.callTime) : null
               }
-              getSelectedTime={(time) => {
-                if (time && !Number.isNaN(time.getTime())) {
-                  const today = new Date();
-
-                  const hours = time.getHours();
-                  const minutes = time.getMinutes();
-                  const seconds = time.getSeconds();
-
-                  today.setHours(hours, minutes, seconds);
-
-                  formik.setFieldValue('callTime', toRestDateTime(today));
+              getSelectedTime={(date) => {
+                if (date && !Number.isNaN(date.getTime())) {
+                  formik.setFieldValue('callTime', toRestDateTime(date));
                 }
               }}
               textFieldProps={{
