@@ -183,7 +183,7 @@ const Suppliers = () => {
       orderByField === fieldName ? sortOrder : undefined,
     );
     updateValues({
-      orderByField: fieldName as SUPPLIER_ORDER_FIELD,
+      orderByField: order ? (fieldName as SUPPLIER_ORDER_FIELD) : undefined,
       sortOrder: order,
     });
   };

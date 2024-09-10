@@ -210,5 +210,5 @@ export const calculateTotalPages = (totalElement: number, pageSize: number) => {
 
 export const toggleOrder = (order?: Order) => {
   if (!order) return Order.ASC;
-  return order === Order.ASC ? Order.DESC : Order.ASC;
+  return order === Order.ASC ? Order.DESC : undefined;
 };

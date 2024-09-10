@@ -105,9 +105,9 @@ export const Employees = () => {
     },
     {
       headerName: 'AVAILABILITY',
-      width: 'auto',
+      width: '3%',
       renderCell: (employee, cellProps) => (
-        <Cell align="center" width="auto" onClick={cellProps.onClick}>
+        <Cell align="center" width="3%" onClick={cellProps.onClick}>
           <StatusChip
             label={employee.availability}
             {...getAvailabilityChipColor(employee.availability)}
