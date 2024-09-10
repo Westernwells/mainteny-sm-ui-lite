@@ -15,6 +15,7 @@ import {useTranslation} from 'react-i18next';
 import {useEffect} from 'react';
 import ContactsWidget from 'pages/Contacts/ContactsWidget';
 import {ContactPersonAssociationType} from 'models/contacts';
+import {JobOverviewBottomDrawer} from 'components/JobOverviewBottomDrawer';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
@@ -151,6 +152,8 @@ export const Overview = ({serviceOrder}: Props) => {
           </Box>
         </InfoCard>
       </Grid>
+
+      <JobOverviewBottomDrawer serviceOrderDetails={serviceOrder} />
     </Grid>
   );
 };

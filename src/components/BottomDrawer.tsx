@@ -60,7 +60,8 @@ export const BottomDrawer = ({
         sx: {
           background: 'white',
           color: 'primary.main',
-          py: '1em',
+          pt: '1em',
+          pb: '1.8em',
           zIndex: '900',
         },
       }}
