@@ -1,5 +1,7 @@
 import {useCallback, useContext} from 'react';
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -29,7 +31,9 @@ import {
   AppointmentConfirmationRequiredOrdersQueryParams,
   AssignmentBasedOrderBody,
   CompleteServiceOrder,
+  CreateServiceOrderComment,
   CreateServiceOrderRecord,
+  QueryServiceOrderCommentsParams,
   SendServiceOrderReportRecord,
   ServiceOrderActivityView,
   ServiceOrderArticleView,
@@ -51,8 +55,10 @@ import {
   ElevatorsByAddress,
   ElevatorView,
 } from 'models/elevator';
+import {Comment} from 'models/comment';
 import {useUserSession} from './useUserSession';
 import {Order} from '../../models/pagination';
+import {useServiceOrderCommentMutation} from './useServiceOrderCommentMutation';
 
 const filterByNextVisit = (
   serviceOrderViewRes: Resource<ServiceOrderView>,
@@ -500,7 +506,6 @@ export const useCancelServiceOrders = () => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -541,7 +546,6 @@ export const useCompleteServiceOrder = (successMsg?: string) => {
         }
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -568,7 +572,6 @@ export const useUnscheduleServiceOrders = () => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -604,7 +607,6 @@ export const useUpdateServiceOrderSchedule = (successMsg: string) => {
         queryClient.invalidateQueries([queryKeys.queryDueServiceOrders]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -639,7 +641,6 @@ export const useUpdateServiceOrder = (successMsg: string) => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -662,7 +663,6 @@ export const useAssignmentBasedOrder = (successMsg: string) => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -747,7 +747,6 @@ export const useAppointmentNotification = () => {
         ]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -775,7 +774,6 @@ export const useConfirmAppointment = () => {
         ]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -807,7 +805,6 @@ export const useSendChecklist = () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -839,7 +836,6 @@ export const useSendWorkReport = () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -876,7 +872,6 @@ export const useDeleteServiceOrderArticle = () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -912,7 +907,6 @@ export const useCreateServiceOrderArticle = () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -965,7 +959,6 @@ export const useNewUpdateServiceOrderArticles = () => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -991,4 +984,129 @@ export const usePostServiceOrderConfirmationPublish = () =>
       data: ServiceOrderConfirmationPublishBody;
       serviceOrder: string;
     }) => postServiceOrderConfirmationPublish(serviceOrder, data),
+  );
+
+export const fetchServiceOrderComments = async (
+  serviceOrderId: string,
+  params: QueryServiceOrderCommentsParams,
+): Promise<Resource<Comment>> => {
+  const response = await axiosClient.get<Resource<Comment>>(
+    `/api/serviceOrders/${serviceOrderId}/comments`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export function useInvoiceComments(
+  serviceOrderId: string,
+  params: QueryServiceOrderCommentsParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<Resource<Comment>, RestError>(
+    [queryKeys.fetchServiceOrderComments, params, serviceOrderId],
+    () => fetchServiceOrderComments(serviceOrderId, params),
+    {
+      ...options,
+    },
+  );
+}
+
+export function useInfiniteServiceOrderComments(
+  serviceOrderId: string,
+  params: QueryServiceOrderCommentsParams,
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) {
+  return useInfiniteQuery<Resource<Comment>, RestError, Resource<Comment>>(
+    [
+      queryKeys.fetchServiceOrderComments,
+      params,
+      serviceOrderId,
+      {infinite: true},
+    ],
+    ({pageParam = 0}) =>
+      fetchServiceOrderComments(serviceOrderId, {
+        ...params,
+        pageIndex: pageParam,
+      }),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
+      ...options,
+    },
+  );
+}
+
+export const postServiceOrderComment = async (
+  serviceOrderId: string,
+  body: CreateServiceOrderComment,
+) => {
+  const {data} = await axiosClient.post<{value: string}>(
+    `/api/serviceOrders/${serviceOrderId}/comments`,
+    body,
+  );
+  return data;
+};
+
+export const useCreateserviceOrderComment = () =>
+  useServiceOrderCommentMutation(
+    ({
+      serviceOrderId,
+      body,
+    }: {
+      serviceOrderId: string;
+      body: CreateServiceOrderComment;
+    }) => postServiceOrderComment(serviceOrderId, body),
+    queryKeys.fetchServiceOrderComments,
+  );
+
+export const deleteServiceOrderComment = async (
+  serviceOrderId: string,
+  noteId: string,
+) => {
+  const {data} = await axiosClient.delete<{value: string}>(
+    `/api/serviceOrders/${serviceOrderId}/comments/${noteId}`,
+  );
+  return data;
+};
+
+export const useDeleteServiceOrderComment = () =>
+  useServiceOrderCommentMutation<
+    {value: string},
+    {serviceOrderId: string; noteId: string}
+  >(
+    ({serviceOrderId, noteId}) =>
+      deleteServiceOrderComment(serviceOrderId, noteId),
+    queryKeys.fetchServiceOrderComments,
+  );
+
+export const updateServiceOrderComment = async (
+  serviceOrderId: string,
+  noteId: string,
+  body: CreateServiceOrderComment,
+) => {
+  const {data} = await axiosClient.put<{value: string}>(
+    `/api/serviceOrders/${serviceOrderId}/comments/${noteId}`,
+    body,
+  );
+  return data;
+};
+
+export const useUpdateServiceOrderComment = () =>
+  useServiceOrderCommentMutation<
+    {value: string},
+    {serviceOrderId: string; noteId: string; body: CreateServiceOrderComment}
+  >(
+    ({serviceOrderId, noteId, body}) =>
+      updateServiceOrderComment(serviceOrderId, noteId, body),
+    queryKeys.fetchServiceOrderComments,
   );
