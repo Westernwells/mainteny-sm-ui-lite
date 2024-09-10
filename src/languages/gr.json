@@ -1185,6 +1185,7 @@
   "Sorry, there was an error while deleting the todo. Please try again.": "Λυπούμαστε, παρουσιάστηκε σφάλμα κατά τη διαγραφή της εκκρεμότητας. ΠΑΡΑΚΑΛΩ προσπαθησε ξανα.",
   "Invoice sent successfully": "Το τιμολόγιο στάλθηκε με επιτυχία",
   "Invoice marked as paid": "Το τιμολόγιο επισημάνθηκε ως πληρωμένο",
+  "Invoice marked as paid!": "Το τιμολόγιο επισημάνθηκε ως πληρωμένο!",
   "Invoice created successfully": "Το τιμολόγιο δημιουργήθηκε με επιτυχία",
   "Invoice updated successfully": "Το τιμολόγιο ενημερώθηκε με επιτυχία",
   "Invoice deleted successfully": "Το τιμολόγιο διαγράφηκε με επιτυχία",

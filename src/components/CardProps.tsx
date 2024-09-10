@@ -49,6 +49,18 @@ export const CardProps = ({
   // Helper function to check if the bodyText is an email
   const isEmail = (text: string) => text.includes('@');
 
+  const getCommonLinkStyles = () => ({
+    paddingTop: '0.2em',
+    display: 'block',
+    fontWeight: '600',
+    maxWidth: '300px',
+    whiteSpace: 'normal',
+    wordBreak: 'break-word',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    textWrap: 'wrap',
+  });
+
   return (
     <Box
       display="flex"
@@ -86,18 +98,16 @@ export const CardProps = ({
             flexWrap: 'nowrap',
             alignItems: 'baseline',
             fontWeight: '600',
+            maxWidth: '100%',
+            overflow: 'hidden',
           }}>
           {typeof bodyText === 'string' ? (
             isEmail(bodyText) ? (
               <Link
-                href={`mailto:${bodyText}`} // mailto: link to open email client
+                href={`mailto:${bodyText}`}
                 underline="hover"
                 variant="body2"
-                style={{
-                  paddingTop: '0.2em',
-                  display: 'flex',
-                  fontWeight: '600',
-                }}
+                sx={getCommonLinkStyles()}
                 color={theme.palette.info.main}>
                 {bodyText}
               </Link>
@@ -107,11 +117,7 @@ export const CardProps = ({
                 to={navigateTo}
                 underline="hover"
                 variant="body2"
-                style={{
-                  paddingTop: '0.2em',
-                  display: 'flex',
-                  fontWeight: '600',
-                }}
+                sx={getCommonLinkStyles()}
                 color={theme.palette.info.main}>
                 {bodyText}
               </Link>
@@ -125,10 +131,13 @@ export const CardProps = ({
                   WebkitLineClamp: '2',
                   WebkitBoxOrient: 'vertical',
                   textOverflow: 'ellipsis',
-                  whiteSpace: 'wrap',
+                  whiteSpace: 'normal',
+                  wordWrap: 'break-word',
                   display: '-webkit-box',
                   wordBreak: 'break-all',
                   overflow: 'hidden',
+                  maxWidth: '300px',
+                  textWrap: 'wrap',
                   ...bodyStyle,
                 }}>
                 {hasProtocol(bodyText) || !shouldTranslate
@@ -139,6 +148,7 @@ export const CardProps = ({
           ) : (
             bodyText
           )}
+
           {unitText && bodyText !== '-' && <span>{t(unitText)}</span>}
         </Box>
       </Box>
