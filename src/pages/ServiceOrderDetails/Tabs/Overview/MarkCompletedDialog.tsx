@@ -14,6 +14,7 @@ import {Button} from 'components/Button';
 import {CompleteServiceOrder, ServiceOrderView} from 'models/service-order';
 import {FormInput} from 'components/form/FormInput';
 import {useCompleteServiceOrder} from 'hooks/reactQuery/useServiceOrder';
+import {removeHtmlTags} from 'utils/utils';
 
 interface Props {
   open?: boolean;
@@ -45,7 +46,7 @@ export const MarkCompletedDialog = ({
         serviceOrderDetails.serviceTime > 0
           ? serviceOrderDetails.serviceTime
           : 1,
-      description: serviceOrderDetails?.description,
+      description: removeHtmlTags(serviceOrderDetails?.description),
       externalId: serviceOrderDetails?.externalId,
     },
     onSubmit: async (values: CompleteServiceOrder) => {
