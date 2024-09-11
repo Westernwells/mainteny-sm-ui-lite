@@ -640,3 +640,14 @@ export interface SendServiceOrderReportRecord {
   pdfPath: string;
   email: EmailRecord;
 }
+
+export interface QueryServiceOrderCommentsParams {
+  pageIndex: number;
+  pageSize: number;
+}
+
+export interface CreateServiceOrderComment {
+  content: string;
+  subject: string;
+  id?: string;
+}
