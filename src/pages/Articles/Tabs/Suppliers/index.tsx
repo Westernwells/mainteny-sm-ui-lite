@@ -114,9 +114,8 @@ const Suppliers = () => {
       headerName: 'action',
       isHeaderNameHidden: true,
       width: ACTION_CELL_WIDTH,
-      isLast: true,
       renderCell: (supplier) => (
-        <Cell width={ACTION_CELL_WIDTH}>
+        <Cell isLast width={ACTION_CELL_WIDTH}>
           <Actions email={supplier.email} />
         </Cell>
       ),
@@ -191,7 +190,16 @@ const Suppliers = () => {
   return (
     <Box
       gap={3}
-      sx={{display: 'flex', flexDirection: 'column', flex: '1 1 auto'}}>
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        flex: '1 1 auto',
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      }}>
       <PageHeaderContainer>
         <SearchInput
           onChanged={(val: string) => setSearch(val)}

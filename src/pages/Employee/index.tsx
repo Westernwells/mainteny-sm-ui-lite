@@ -106,6 +106,7 @@ export const Employees = () => {
     {
       headerName: 'AVAILABILITY',
       width: '3%',
+      align: 'center',
       renderCell: (employee, cellProps) => (
         <Cell align="center" width="3%" onClick={cellProps.onClick}>
           <StatusChip
