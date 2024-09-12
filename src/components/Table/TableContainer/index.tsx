@@ -8,7 +8,6 @@ const TableContainer = ({children}: PropsWithChildren<unknown>) => (
       display: 'flex',
       flexDirection: 'column',
       overflow: 'auto',
-      position: 'relative',
       flex: '1 1 auto',
     }}>
     {children}
