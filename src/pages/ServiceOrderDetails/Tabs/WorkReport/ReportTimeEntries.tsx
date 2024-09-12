@@ -104,7 +104,9 @@ const ReportTimeEntries = ({
   const renderEntry = (slot: ServiceOrderTimeSlot, index: number) => {
     const date = new Date(slot.startTime);
     const dateString = new Date().toLocaleDateString();
-    const defaultHours = new Date(`${dateString} ${timeRawValues[index]}`);
+    const time = timeRawValues[index];
+    const defaultHours = new Date(`${dateString} ${time}`);
+
     const convertedMinutes = convertMinutesWithRounding(slot.minutes ?? 0, {
       hourUnit: '',
     });
@@ -213,7 +215,7 @@ const ReportTimeEntries = ({
         <Box width={TIME_SECTION_WIDTH}>
           {isEdit ? (
             <TimePicker
-              defaultTime={defaultHours}
+              defaultTime={time ? defaultHours : undefined}
               getSelectedTime={(newTime) => {
                 if (newTime) {
                   const newTimeFormatted = formatDate(newTime, 'HH:mm')!;

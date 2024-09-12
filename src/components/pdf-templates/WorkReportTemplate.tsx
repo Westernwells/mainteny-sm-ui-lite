@@ -178,7 +178,6 @@ const getStyles = (
       flexWrap: 'wrap',
     },
     imageContainer: {
-      width: '30%',
       marginVertical: 5,
       marginHorizontal: 5,
     },
@@ -685,10 +684,10 @@ const WorkReportTemplate = React.memo(
                         <Image
                           src={workReportPictures && workReportPictures[index]}
                           style={{
-                            objectFit: 'cover',
                             height: 100,
-                            width: 140,
-                            marginVertical: 2,
+                            borderRadius: 5,
+                            flexShrink: 0,
+                            marginVertical: 5,
                           }}
                         />
                         {attachment.fileResource.description && (
