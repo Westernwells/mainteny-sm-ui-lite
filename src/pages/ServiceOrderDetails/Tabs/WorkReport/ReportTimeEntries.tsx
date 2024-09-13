@@ -103,7 +103,8 @@ const ReportTimeEntries = ({
 
   const renderEntry = (slot: ServiceOrderTimeSlot, index: number) => {
     const date = new Date(slot.startTime);
-    const dateString = new Date().toLocaleDateString();
+    const dateString = date.toISOString().split('T')[0];
+
     const time = timeRawValues[index];
     const defaultHours = new Date(`${dateString} ${time}`);
 
