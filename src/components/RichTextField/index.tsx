@@ -50,7 +50,12 @@ const CustomElements = ({
     case 'bulleted-list':
       return (
         <ul
-          style={style}
+          style={{
+            ...style,
+            marginLeft: '20px',
+            listStyleType: 'disc',
+            listStylePosition: 'inside',
+          }}
           {...attributes}
           ref={attributes.ref as Ref<HTMLUListElement>}>
           {children}
@@ -68,7 +73,12 @@ const CustomElements = ({
     case 'numbered-list':
       return (
         <ol
-          style={style}
+          style={{
+            ...style,
+            marginLeft: '20px',
+            listStyleType: 'decimal',
+            listStylePosition: 'inside',
+          }}
           {...attributes}
           ref={attributes.ref as Ref<HTMLOListElement>}>
           {children}
