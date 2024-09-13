@@ -38,6 +38,8 @@ export interface PropertyOwnerAdditionalInfo {
   vatId?: string;
   offsettingAccount?: string;
   customerPortalEnabled?: boolean;
+  buyerReference?: string;
+  invoiceFormat: InvoiceFormat;
 }
 
 export interface PropertyOwnerView {
@@ -106,4 +108,10 @@ export interface QueryPropertyOwnersParams {
 
 export interface ContactPropertyOwner extends Contact {
   url: string;
+}
+
+export enum InvoiceFormat {
+  PDF = 'PDF',
+  XML = 'XML',
+  PDF_AND_XML = 'PDF_AND_XML',
 }
