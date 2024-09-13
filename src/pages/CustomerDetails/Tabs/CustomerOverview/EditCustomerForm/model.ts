@@ -18,4 +18,6 @@ export type CustomerEditForm = {
   offsettingAccount?: string;
   paymentTermId?: string;
   customerPortalEnabled?: boolean;
+  buyerReference?: string;
+  invoiceFormat?: string;
 };

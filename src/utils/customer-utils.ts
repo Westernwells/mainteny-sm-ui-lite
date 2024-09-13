@@ -29,6 +29,8 @@ export const formatUpdateCustomer = (data: CustomerEditForm) => ({
   offsettingAccount: data.offsettingAccount,
   paymentTermId: data?.paymentTermId,
   customerPortalEnabled: data?.customerPortalEnabled,
+  buyerReference: data?.buyerReference,
+  invoiceFormat: data?.invoiceFormat,
 });
 
 export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {
