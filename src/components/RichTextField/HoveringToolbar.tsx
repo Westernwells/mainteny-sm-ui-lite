@@ -76,18 +76,12 @@ export const HoveringToolbar = () => {
     }
 
     const domSelection = window.getSelection();
-    if (!domSelection || domSelection.rangeCount === 0) {
-      el.removeAttribute('style');
-      return;
-    }
-
-    const domRange = domSelection.getRangeAt(0);
-    const rect = domRange.getBoundingClientRect() || {
+    const domRange = domSelection?.getRangeAt(0);
+    const rect = domRange?.getBoundingClientRect() || {
       top: 0,
       left: 0,
       width: 0,
     };
-
     el.style.opacity = '1';
     el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`;
     el.style.left = `${
@@ -105,24 +99,13 @@ export const HoveringToolbar = () => {
 
   const handleOpen = () => setOpenSelectFontSize(true);
 
-  const fontSizeOptions = [
-    {value: FONT_SIZE.SMALL, label: 'Small'},
-    {value: FONT_SIZE.NORMAL, label: 'Normal'},
-    {value: FONT_SIZE.LARGE, label: 'Large'},
-  ];
-
-  const renderLabel = (value: string) => {
-    const option = fontSizeOptions.find((opt) => opt.value === value);
-    return option ? option.label : value;
-  };
-
   const activeFontSize = getActiveFontSize(editor);
   const textSize =
     activeFontSize === FONT_SIZE.SMALL
-      ? '12px'
+      ? 'Small'
       : activeFontSize === FONT_SIZE.LARGE
-      ? '20px'
-      : '16px';
+      ? 'Large'
+      : 'Normal';
 
   return (
     <Portal>
@@ -178,10 +161,14 @@ export const HoveringToolbar = () => {
           renderValue={(value: string) => (
             <Box display="flex" alignItems="center" gap={1}>
               <TextFields sx={{color: 'white'}} />
-              <Typography>{t(renderLabel(value))}</Typography>
+              <Typography>{t(value)}</Typography>
             </Box>
           )}>
-          {fontSizeOptions.map((i) => (
+          {[
+            {value: FONT_SIZE.SMALL, label: 'Small'},
+            {value: FONT_SIZE.NORMAL, label: 'Normal'},
+            {value: FONT_SIZE.LARGE, label: 'Large'},
+          ].map((i) => (
             <MenuItem value={i.value} key={i.value}>
               {t(i.label)}
             </MenuItem>
