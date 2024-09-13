@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useNavigate} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';

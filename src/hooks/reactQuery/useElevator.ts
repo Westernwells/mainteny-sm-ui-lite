@@ -15,7 +15,6 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {
   CacheTypes,
   CacheTypesParams,
-  Page,
   Resource,
   RestError,
   StringValue,
@@ -31,6 +30,7 @@ import {
   QueryTodoParams,
 } from 'models/elevator';
 import {useUserSession} from './useUserSession';
+import {Page} from '../../models/pagination';
 
 export const fetchElevators = async (
   params: Partial<ElevatorQueryParams>,

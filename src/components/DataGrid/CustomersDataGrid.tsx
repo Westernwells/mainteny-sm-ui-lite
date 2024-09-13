@@ -12,14 +12,14 @@ import {
   PropertyOwnerOrderField,
   PropertyOwnerView,
 } from 'models/propertyManager';
-import {Order} from 'models/misc';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';
 import {DataSyncType} from 'models/service-company';
 import {styles} from './style';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
+import {Order} from '../../models/pagination';
 
 interface Props {
   setRowItem: (row: PropertyOwnerView) => void;

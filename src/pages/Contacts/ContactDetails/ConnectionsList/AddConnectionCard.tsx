@@ -29,8 +29,6 @@ import {
   queryContracts,
   queryCustomerContract,
 } from 'hooks/reactQuery/useContract';
-import {Order} from 'models/misc';
-import {ArticleSupplierView} from 'models/article';
 import {queryArticleSuppliers} from 'hooks/reactQuery/useArticle';
 import {ServiceOrderOrderField, ServiceOrderView} from 'models/service-order';
 import {
@@ -38,6 +36,8 @@ import {
   queryServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
 import {Button} from 'components/Button';
+import {Order} from '../../../../models/pagination';
+import {ArticleSupplierView} from '../../../../models/supplier';
 
 interface Props {
   onAddConnection: (

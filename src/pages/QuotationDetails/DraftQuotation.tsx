@@ -62,7 +62,7 @@ import {
   useCompanyNextNumber,
   useContractTerms,
 } from 'hooks/reactQuery/useCompanies';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {DatePicker} from 'components/DatePicker';
 import {ComboBox} from 'components/ComboBox';
 import {

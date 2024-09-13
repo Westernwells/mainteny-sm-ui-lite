@@ -34,7 +34,7 @@ import {
   QuotationView,
 } from 'models/quotation';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {
   companyLanguageContextMap,
   convertToMacro,

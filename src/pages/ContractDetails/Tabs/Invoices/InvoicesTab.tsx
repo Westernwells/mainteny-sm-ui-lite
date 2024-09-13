@@ -25,10 +25,10 @@ import useTheme from '@mui/material/styles/useTheme';
 import {useTranslation} from 'react-i18next';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {Widget} from 'components/Widget';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {OrderByParams} from 'models/misc';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {Box} from '@mui/system';
 import {columns, makeRows} from './InvoicesDataGridProps';
+import {OrderByParams} from '../../../../models/pagination';
 
 const pageSize = 25;
 

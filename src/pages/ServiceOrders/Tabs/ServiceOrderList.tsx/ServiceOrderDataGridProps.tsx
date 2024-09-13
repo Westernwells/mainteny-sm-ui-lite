@@ -23,24 +23,13 @@ import {Typography} from '@mui/material';
 import {FormatDate} from 'models/misc';
 import {toDate} from 'utils/datetime';
 import {theme} from 'theme';
+import {StatusColor} from '../../../../models/status';
 
 export const getServiceOrderPaymentStatusStyles = (
   status: string,
 ): {
   label: string;
-  color:
-    | 'default'
-    | 'primary'
-    | 'secondary'
-    | 'error'
-    | 'info'
-    | 'success'
-    | 'primary.mainLight'
-    | 'action.active'
-    | 'warning'
-    | 'warning.dark'
-    | 'warning.light'
-    | 'info.light';
+  color: StatusColor;
 } => {
   switch (status) {
     case ServiceOrderPaymentStatus.PAID:

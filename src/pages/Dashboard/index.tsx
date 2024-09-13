@@ -22,7 +22,7 @@ import {
   useCompanySummary,
   useServiceCompanyActivities,
 } from 'hooks/reactQuery/useCompanies';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {toRestDate} from 'utils/datetime';
 import {Role} from 'models/user';
 import {ServiceOrderView} from 'models/service-order';

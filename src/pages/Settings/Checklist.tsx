@@ -53,7 +53,7 @@ import {
   checkListComponentViewToExtendedCreateCheckListRecord,
   getComponentMock,
 } from 'utils/checklist';
-import {makePage} from 'utils/paging-utils';
+import {makePage} from 'utils/paging';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import {ChecklistComponent} from './ChecklistComponent';
 import {ChecklistPreview} from './ChecklistPreview';

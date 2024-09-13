@@ -1,8 +1,7 @@
 import {FC, useEffect, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
-
 import {DataGridLayout} from 'components/DataGridLayout';
-import {makePage} from 'utils/paging-utils';
+import {makePage} from 'utils/paging';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {EmptySection} from 'components/EmptySection';
 import {useNavigate} from 'react-router-dom';

@@ -4,7 +4,7 @@ import {EmptySection} from 'components/EmptySection';
 import {ServiceCompanyItem} from 'models/service-company';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import * as Yup from 'yup';
 import {Dialog} from 'components/Dialog';
 import {useFormik} from 'formik';
@@ -22,21 +22,21 @@ import {
 } from 'models/text-block';
 import {
   useCreateTextBlock,
-  useUpdateTextBlock,
   useDeleteTextBlock,
   useTextBlocks,
+  useUpdateTextBlock,
 } from 'hooks/reactQuery/useTextBlock';
 import {theme} from 'theme';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {OrderByParams, Order} from 'models/misc';
 import {
-  mapJsonToTextBlockView,
   convertCategoryToMacro,
   convertCategoryToText,
+  mapJsonToTextBlockView,
 } from 'utils/text-block';
 import DOMPurify from 'dompurify';
 import {TextBlockForm} from './TextBlockForm';
 import {columns, makeRows} from './TextBlockDataGridProps';
+import {Order, OrderByParams} from '../../../models/pagination';
 
 type Props = {
   company: ServiceCompanyItem;

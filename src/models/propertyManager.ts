@@ -5,12 +5,11 @@ import {
   CompanyContact,
   Contact,
   Meta,
-  Order,
   Priority,
-  WithOptional,
 } from './misc';
-import {ServiceCompany, ServiceCompanySimpleView} from './service-company';
+import {ServiceCompanySimpleView} from './service-company';
 import {UserAccount, UserAccountSimpleView} from './user';
+import {Order} from './pagination';
 
 export interface PropertyOwner {
   id: string;

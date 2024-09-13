@@ -6,7 +6,7 @@ import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
 import {formatCurrency} from 'utils/currency';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useTranslation} from 'react-i18next';
 import {stringToTitleCase} from 'utils/utils';
 import Typography from '@mui/material/Typography';

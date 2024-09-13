@@ -16,6 +16,7 @@ interface Props {
   defaultValue?: string;
 }
 
+// Deprecated component
 export const SearchInput = ({
   placeholder,
   onValueChanged,

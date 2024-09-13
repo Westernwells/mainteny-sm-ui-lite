@@ -8,10 +8,10 @@ import {
   ElevatorOrderField,
   ElevatorView,
 } from 'models/elevator';
-import {Order, OrderByParams, Resource} from 'models/misc';
+import {Resource} from 'models/misc';
 import {DataGridElevatorView} from 'pages/Units/Models';
 import {FC, useCallback, useEffect, useRef, useState} from 'react';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import * as _ from 'lodash';
 import {FormikProps} from 'formik';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -21,6 +21,7 @@ import {T} from 'utils/i18n-utils';
 import CloseIcon from '@mui/icons-material/Close';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './NewContractUnitsGridProps';
+import {Order, OrderByParams} from '../../models/pagination';
 
 interface Props {
   formik: FormikProps<{elevators: string[]}>;

@@ -1,13 +1,13 @@
 import Dialog from '@mui/material/Dialog';
 import {useTranslation} from 'react-i18next';
-import {useForm, Controller} from 'react-hook-form';
+import {Controller, useForm} from 'react-hook-form';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
-import {EmailRecord, Order} from 'models/misc';
+import {EmailRecord} from 'models/misc';
 import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
@@ -24,6 +24,7 @@ import {IconButton, InputAdornment} from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import RichTextEditor from 'components/RichTextEditor';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {Order} from '../../models/pagination';
 
 interface Props {
   open: boolean;
@@ -250,14 +251,14 @@ export const SendEmailDialog = ({
             }}
             renderOption={(props, option) => (
               <li
+                {...props}
                 key={option.id}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   borderBottom: '1px solid #EDF1F7',
                   alignItems: 'flex-start',
-                }}
-                {...props}>
+                }}>
                 <Typography>
                   {`${option.userAccount?.firstName} ${option.userAccount?.lastName}` ||
                     '-'}
@@ -314,14 +315,14 @@ export const SendEmailDialog = ({
                 }}
                 renderOption={(props, option) => (
                   <li
+                    {...props}
                     key={option.id}
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
                       borderBottom: '1px solid #EDF1F7',
                       alignItems: 'flex-start',
-                    }}
-                    {...props}>
+                    }}>
                     <Typography>
                       {`${option.userAccount?.firstName} ${option.userAccount?.lastName}` ||
                         '-'}
@@ -391,14 +392,14 @@ export const SendEmailDialog = ({
                 }}
                 renderOption={(props, option) => (
                   <li
+                    {...props}
                     key={option.id}
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
                       borderBottom: '1px solid #EDF1F7',
                       alignItems: 'flex-start',
-                    }}
-                    {...props}>
+                    }}>
                     <Typography>
                       {`${option.userAccount?.firstName} ${option.userAccount?.lastName}` ||
                         '-'}

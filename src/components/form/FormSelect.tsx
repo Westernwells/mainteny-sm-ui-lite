@@ -8,7 +8,7 @@ import Select, {SelectProps} from '@mui/material/Select';
 import useTheme from '@mui/material/styles/useTheme';
 import {SxProps} from '@mui/system';
 import {capitalize, companyLanguageContextMap} from 'utils/utils';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ReactNode, useMemo} from 'react';
@@ -29,7 +29,7 @@ interface Props<T> {
     value: string;
     secondaryLabel?: string;
   }[];
-  selectProps?: SelectProps<T>;
+  selectProps?: SelectProps<T> & {notched?: boolean};
   labelStyles?: SxProps;
   selectStyles?: SxProps;
   containerStyles?: {[key: string]: any};

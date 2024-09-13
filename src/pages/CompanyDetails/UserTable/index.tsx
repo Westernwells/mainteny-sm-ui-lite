@@ -17,7 +17,7 @@ import {
 import {useServiceManager} from 'hooks/reactQuery/useServiceManager';
 import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
 import {Role, UserView} from 'models/user';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {columns, makeRows} from './UserDataGridProps';
 import {UserFormTypes} from './model';
 import {UserForm} from './UserForm';

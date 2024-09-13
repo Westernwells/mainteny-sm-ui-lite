@@ -7,12 +7,11 @@ import {
   AmountRecord,
   EmailRecord,
   Meta,
-  Order,
   PdfGenerationStatus,
-  SimpleEmailRecord,
 } from './misc';
 import {PropertyOwnerView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
+import {Order} from './pagination';
 
 export enum QuotationStatus {
   ACCEPTED = 'ACCEPTED',

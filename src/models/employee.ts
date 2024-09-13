@@ -2,6 +2,7 @@ import {Shift} from 'pages/NewEmployee/model';
 import {Address, Meta} from './misc';
 import {ServiceOrderType} from './service-order';
 import {Role, UserAccountView} from './user';
+import {AvailabilityType} from './availability';
 
 export enum UserOrderField {
   CREATED_DATE = 'CREATED_DATE',
@@ -102,4 +103,18 @@ export type WorkingEmployeesSummary = {
 export type WorkingEmployeeSummaryRequest = {
   time: string;
   employeeType: Role[];
+};
+
+export type EmployeeContractTableRow = {
+  id: string;
+  name: string;
+  email: string;
+  photoUrl: string;
+  roles: Role[];
+  address: string;
+  team: string;
+  phone: string;
+  shift: string;
+  availability: AvailabilityType;
+  employeeId: string;
 };

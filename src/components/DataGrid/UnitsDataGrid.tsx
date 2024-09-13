@@ -10,7 +10,7 @@ import {
 } from 'hooks/reactQuery/useElevator';
 import {ElevatorView} from 'models/elevator';
 import {FormatDate} from 'models/misc';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';

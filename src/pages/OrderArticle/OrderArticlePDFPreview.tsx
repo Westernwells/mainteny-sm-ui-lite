@@ -1,6 +1,6 @@
-import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {FormikProps} from 'formik';
-import {ArticleSupplierView, CreateArticleOrderRecord} from 'models/article';
+import {CreateArticleOrderRecord} from 'models/article';
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {formatCurrency} from 'utils/currency';
@@ -20,6 +20,7 @@ import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import {calculateTotal, calculateTotalVAT} from './utils';
+import {ArticleSupplierView} from '../../models/supplier';
 
 Font.register({
   family: 'Montserrat-Bold',

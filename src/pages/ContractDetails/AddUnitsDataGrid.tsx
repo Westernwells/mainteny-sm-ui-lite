@@ -15,7 +15,7 @@ import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {ElevatorView} from 'models/elevator';
 import {FormatDate} from 'models/misc';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {useAttachElevatorsToContract} from 'hooks/reactQuery/useContract';
 
 export const columns: GridColDef[] = [

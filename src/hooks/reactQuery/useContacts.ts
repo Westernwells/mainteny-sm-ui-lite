@@ -1,15 +1,15 @@
 import {
-  ContactsView,
   ContactBody,
+  ContactPersonAssociationQueryParams,
+  ContactPersonAssociationView,
+  ContactsView,
+  CreateContactPersonAssociationRecord,
+  CreatePropertyContactPersonRecord,
+  RefContactPersonQueryParams,
+  RefContactPersonView,
+  ServiceCompanyContactPeronFormModel,
   ServiceCompanyContactPersonQueryParams,
   ServiceCompanyContactPersonView,
-  ServiceCompanyContactPeronFormModel,
-  ContactPersonAssociationView,
-  ContactPersonAssociationQueryParams,
-  CreateContactPersonAssociationRecord,
-  RefContactPersonView,
-  RefContactPersonQueryParams,
-  CreatePropertyContactPersonRecord,
   UpdatePropertyContactPersonRecord,
 } from 'models/contacts';
 import {
@@ -29,10 +29,11 @@ import {
   ContractElevatorUpdate,
   ContractElevatorView,
 } from 'models/contract';
-import {Page, Resource, RestError, StringValue} from 'models/misc';
+import {Resource, RestError, StringValue} from 'models/misc';
 import {Comment, CommentRecord} from 'models/comment';
 import {AxiosError} from 'axios';
 import {useUserSession} from './useUserSession';
+import {Page} from '../../models/pagination';
 
 const fetchContractElevators = async (
   contractId: string,

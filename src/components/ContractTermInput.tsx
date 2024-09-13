@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import {Box, Drawer} from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {useContractTerms} from 'hooks/reactQuery/useCompanies';
 import {Button} from 'components/Button';
 import {Button as LoadingButton} from 'components/LoadingButton';

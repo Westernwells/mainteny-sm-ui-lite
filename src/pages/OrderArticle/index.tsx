@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useLocation} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
@@ -19,7 +19,6 @@ import {
 import {
   ArticleOrderItemRecord,
   ArticleOrderView,
-  ArticleSupplierView,
   ArticleView,
   CreateArticleOrderRecord,
 } from 'models/article';
@@ -50,6 +49,7 @@ import PdfPreview from './PDFPreview';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
 import OrderArticlePDF from './OrderArticlePDF';
 import {ArticleItemsTable} from './ArticleItemsTable';
+import {ArticleSupplierView} from '../../models/supplier';
 
 const validationSchema = Yup.object().shape({
   serviceCompanyId: Yup.string().required('Service company ID is required'),

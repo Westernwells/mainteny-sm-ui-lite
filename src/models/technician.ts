@@ -2,7 +2,6 @@ import {
   Address,
   AddressRecord,
   Meta,
-  TechnicianEventType,
   TimeWindowRecord,
   TimeWindowType,
 } from './misc';
@@ -65,6 +64,12 @@ export interface TechnicianSimpleView {
   isOnline: boolean;
   additionalInfo: TechnicianAdditionalInfo;
   meta: Meta;
+}
+
+export enum TechnicianEventType {
+  SICK_LEAVE = 'SICK_LEAVE',
+  HOLIDAY = 'HOLIDAY',
+  WORK = 'WORK',
 }
 
 export interface TechnicianEventView {

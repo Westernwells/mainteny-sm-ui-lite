@@ -1,22 +1,23 @@
-import {useState, useRef} from 'react';
+import {useRef, useState} from 'react';
 import {ReactComponent as FilterIcon} from 'assets/icons/FilterIcon.svg';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import {Button} from 'components/Button';
 import {
+  Box,
+  Divider,
   IconButton,
   MenuItem,
   MenuList,
   Paper,
-  Typography,
   Popover,
-  Box,
-  Divider,
+  Typography,
 } from '@mui/material';
 import {GridColDef, GridSortDirection} from '@mui/x-data-grid';
 import {useTranslation} from 'react-i18next';
 import {useLocation} from 'react-router-dom';
-import {Order} from 'models/misc';
+
+import {Order} from '../models/pagination';
 
 interface Props {
   column: GridColDef;

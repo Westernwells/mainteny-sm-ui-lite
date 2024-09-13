@@ -13,7 +13,6 @@ import {
 } from '@mui/icons-material';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {ArticleSupplierView, UpdateArticleSupplierRecord} from 'models/article';
 import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
 import {Dialog} from 'components/Dialog';
 import {
@@ -22,8 +21,12 @@ import {
 } from 'hooks/reactQuery/useArticle';
 import {CardProps} from 'components/CardProps';
 import {InfoCard} from 'components/InfoCard';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
+import {
+  ArticleSupplierView,
+  UpdateArticleSupplierRecord,
+} from '../../../models/supplier';
 
 const isExternalIdUnique = async (
   resource: ArticleSupplierView[],

@@ -1,9 +1,4 @@
-import {
-  GridColDef,
-  GridColumnHeaderParams,
-  GridRenderCellParams,
-  GridRowsProp,
-} from '@mui/x-data-grid';
+import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {StatusChip} from 'components/StatusChip';
 import {formatCurrency} from 'utils/currency';
 import {

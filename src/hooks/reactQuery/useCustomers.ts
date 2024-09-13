@@ -1,11 +1,5 @@
 import {useTranslation} from 'react-i18next';
-import {
-  Page,
-  Resource,
-  RestError,
-  StringValue,
-  WithOptional,
-} from 'models/misc';
+import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
 import {
   PropertyOwnerView,
   QueryPropertyOwnersParams,
@@ -14,8 +8,8 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {CustomerEditForm} from 'pages/CustomerDetails/Tabs/CustomerOverview/EditCustomerForm/model';
 import {NewCustomerBody} from 'pages/NewCustomer/model';
 import {
-  UseInfiniteQueryOptions,
   useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -26,6 +20,7 @@ import {formatUpdateCustomer} from 'utils/customer-utils';
 import {CreateCustomerNote} from 'models/customer';
 import {Comment} from 'models/comment';
 import {useUserSession} from './useUserSession';
+import {Page} from '../../models/pagination';
 
 export const queryCustomers = async (params: QueryPropertyOwnersParams) => {
   const response = await axiosClient.get<Resource<PropertyOwnerView>>(

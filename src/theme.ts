@@ -1,6 +1,18 @@
 import {outlinedInputClasses} from '@mui/material';
 import {createTheme} from '@mui/material/styles';
 
+import {Color} from '@mui/material/styles/createPalette';
+
+declare module '@mui/material/styles' {
+  interface PaletteOption {
+    blue: Color;
+  }
+
+  interface Palette {
+    blue: Color;
+  }
+}
+
 export const theme = createTheme({
   palette: {
     primary: {
@@ -66,8 +78,11 @@ export const theme = createTheme({
       outlinedHoverBg: 'rgba(97, 255, 192, 0.08)',
     },
     grey: {
+      '500': '#8F9BB3',
       '300': '#E0E0E0',
+      '200': '#E4E9F2',
     },
+
     background: {
       default: '#F2F6F8',
     },
