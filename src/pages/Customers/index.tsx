@@ -9,7 +9,7 @@ import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {
   PropertyOwnerOrderField,
   PropertyOwnerView,
@@ -21,10 +21,10 @@ import {DataSyncType} from 'models/service-company';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';
 import {useCompanyXeroInfo} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {Order, OrderByParams} from 'models/misc';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './CustomerDataGridProps';
 import {Widget} from '../../components/Widget';
+import {Order, OrderByParams} from '../../models/pagination';
 
 const pageSize = 25;
 

@@ -4,7 +4,6 @@ import {
   Fee,
   InspectionCycle,
   Meta,
-  Order,
   Priority,
   StringMap,
 } from './misc';
@@ -20,6 +19,7 @@ import {
   PropertyOwnerView,
 } from './propertyManager';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {Order} from './pagination';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',

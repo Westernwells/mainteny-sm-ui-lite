@@ -3,13 +3,12 @@ import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {Widget} from 'components/Widget';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useAllElevators} from 'hooks/reactQuery/useElevator';
 import {FilterFields} from 'components/FilterFields';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {DatePicker} from 'components/DatePicker';
-import {Order, OrderByParams} from 'models/misc';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {useNavigate} from 'react-router-dom';
@@ -17,6 +16,7 @@ import {FlexContainer} from 'components/FlexContainer';
 import Box from '@mui/material/Box';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './UnitsDataGridProps';
+import {Order, OrderByParams} from '../../../../models/pagination';
 
 const pageInfo = makePage(0, 50);
 

@@ -10,22 +10,24 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import _ from 'lodash';
 import {
+  ArticleOrderView,
   ArticleView,
+  CreateArticleOrderRecord,
   CreateArticleRecord,
+  PropertyOwnerArticleRecord,
   QueryArticleParams,
   UpdateArticleRecord,
-  CreateArticleOrderRecord,
-  ArticleOrderView,
-  CreateArticleSupplierRecord,
-  ArticleSupplierView,
-  UpdateArticleSupplierRecord,
-  PropertyOwnerArticleRecord,
-  QueryArticleSuppliersParams,
 } from 'models/article';
 import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
 import {data} from 'utils/partial-article-data';
 import {FileResourceRecord} from 'models/media';
 import {useUserSession} from './useUserSession';
+import {
+  ArticleSupplierView,
+  CreateArticleSupplierRecord,
+  QueryArticleSuppliersParams,
+  UpdateArticleSupplierRecord,
+} from '../../models/supplier';
 
 export const fetchArticles = async (
   params: QueryArticleParams,

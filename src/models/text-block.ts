@@ -1,4 +1,5 @@
-import {Meta, Order} from './misc';
+import {Meta} from './misc';
+import {Order} from './pagination';
 
 export interface CreateTextBlockRecord {
   serviceCompanyId: string;

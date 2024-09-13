@@ -5,8 +5,7 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FilterFields} from 'components/FilterFields';
 import {useQueryContract} from 'hooks/reactQuery/useContract';
 import {ContractOrderField, ContractView} from 'models/contract';
-import {Order, OrderByParams} from 'models/misc';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {convertToMacro, convertToText, objectKeyByValue} from 'utils/utils';
@@ -24,6 +23,7 @@ import {useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './ContractsDataGridProps';
+import {Order, OrderByParams} from '../../models/pagination';
 
 const pageSize = 25;
 

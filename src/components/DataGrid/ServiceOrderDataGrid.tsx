@@ -9,7 +9,7 @@ import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {StatusChip} from 'components/StatusChip';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderOrderField, ServiceOrderView} from 'models/service-order';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
@@ -21,8 +21,8 @@ import {
 import {EmptySection} from 'components/EmptySection';
 import {useTranslation} from 'react-i18next';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import {Order} from 'models/misc';
 import {styles} from './style';
+import {Order} from '../../models/pagination';
 
 interface Props {
   setRowItem: (row: ServiceOrderView) => void;

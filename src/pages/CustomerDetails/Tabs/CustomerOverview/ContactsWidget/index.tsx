@@ -10,20 +10,20 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
 import {
-  usePropertyOwnerContacts,
   useCreateContact,
   useDeleteContact,
   useInviteContact,
+  usePropertyOwnerContacts,
   useUpdateContact,
 } from 'hooks/reactQuery/useContacts';
-import {ContactsView, ContactFormModel} from 'models/contacts';
+import {ContactFormModel, ContactsView} from 'models/contacts';
 import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
 import {PropertyContactPersonRole} from 'pages/NewCustomer/model';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmptySection} from 'components/EmptySection';
 import {convertToMacro, convertToText} from 'utils/utils';
 import {Confirm} from 'components/Confirm';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {InfoBanner} from 'components/InfoBanner';
 import {columns, makeRows} from './ContactsWidgetDataGridProps';

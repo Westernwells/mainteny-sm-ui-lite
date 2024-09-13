@@ -2,7 +2,7 @@ import {Dispatch, FC, SetStateAction, useEffect, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 
 import {DataGridLayout} from 'components/DataGridLayout';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {EmptySection} from 'components/EmptySection';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {
@@ -21,7 +21,6 @@ import {Widget} from 'components/Widget';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {useQueryState} from 'hooks/useQueryState';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {Order, OrderByParams} from 'models/misc';
 import {useContractElevators} from 'hooks/reactQuery/useContacts';
 import {FilterFields} from 'components/FilterFields';
 import {DatePicker} from 'components/DatePicker';
@@ -30,6 +29,7 @@ import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {mapAppointment} from 'utils/elevator-utils';
 import {ContractElevatorView} from 'models/contract';
 import {columns, makeRows} from './UnitsDataGridProps';
+import {Order, OrderByParams} from '../../../../models/pagination';
 
 interface Props {
   contractId?: string;

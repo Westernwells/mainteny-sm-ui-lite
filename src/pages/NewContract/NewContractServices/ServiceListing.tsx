@@ -1,14 +1,14 @@
 import {
   Box,
+  IconButton,
+  Table,
   TableBody,
   TableCell,
+  TableCellProps,
   TableContainer,
   TableHead,
   TableRow,
   Typography,
-  TableCellProps,
-  IconButton,
-  Table,
 } from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {formatDate} from 'utils/datetime';
@@ -18,10 +18,10 @@ import {Confirm} from 'components/Confirm';
 import {useState} from 'react';
 import {FormikProps} from 'formik';
 import {
-  ContractServiceForm,
-  ExtendedContractComponentRecord,
   calculateContractInvoicePriceGrandTotal,
   calculateContractInvoicePriceTotal,
+  ContractServiceForm,
+  ExtendedContractComponentRecord,
 } from 'models/contract';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {theme} from 'theme';

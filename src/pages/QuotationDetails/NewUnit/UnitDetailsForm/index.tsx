@@ -8,7 +8,7 @@ import {useEffect, useState} from 'react';
 import {PageCard} from 'components/PageCard';
 import {convertToText} from 'utils/utils';
 import {ComboBox} from 'components/ComboBox';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {useCacheValues} from 'hooks/reactQuery/useElevator';
 import {CacheTypes} from 'models/misc';
 import {ElevatorCategory, ElevatorView} from 'models/elevator';

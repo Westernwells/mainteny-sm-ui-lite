@@ -16,17 +16,16 @@ import {
   ContractOrderField,
   ContractTypes,
   ContractView,
-  ExtendedContractComponentRecord,
   convertExtendedRecordsToContractComponentRecords,
+  ExtendedContractComponentRecord,
 } from 'models/contract';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {Order} from 'models/misc';
 import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useCurrentCurrency} from 'utils/currency';
 import {toRestDate} from 'utils/datetime';
 import * as Yup from 'yup';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {Box, Typography} from '@mui/material';
 import {theme} from 'theme';
 import {useTranslation} from 'react-i18next';
@@ -36,6 +35,7 @@ import NewContractSelectUnits from './NewContractSelectUnits';
 import {NewContractCustomer} from './NewContractCustomer';
 import {NewContractServices} from './NewContractServices';
 import NewCustomizeContract from './NewCustomizeContract';
+import {Order} from '../../models/pagination';
 
 const steps = [
   'Select customer',

@@ -17,7 +17,7 @@ import {mapDaysOfWeekOptions} from 'pages/UnitDetails/Tabs/OverviewTab/Appointme
 import {useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {convertToMacro, formatAddressFullname} from 'utils/utils';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
 import {CustomerForm} from './CustomerForm';

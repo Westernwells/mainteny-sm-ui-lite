@@ -3,7 +3,7 @@ import {PropertyOwnerView} from 'models/propertyManager';
 import {useCustomer, useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {phoneNumberDigitsOnly} from 'utils/customer-utils';
 import {useEffect, useState} from 'react';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import * as Yup from 'yup';
 import {CustomerEditForm} from './EditCustomerForm/model';
 import {EditCustomerForm} from './EditCustomerForm';

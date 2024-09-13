@@ -14,7 +14,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
 import {AddressRecord} from 'models/misc';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';

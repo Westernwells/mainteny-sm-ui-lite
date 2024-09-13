@@ -30,7 +30,7 @@ import {ScheduleBody} from 'components/Schedules/ScheduleBody';
 import {ScheduleBodyCell} from 'components/Schedules/ScheduleBodyCell';
 import {ScheduleItemContainer} from 'components/Schedules/ScheduleItemContainer';
 import {WeekPair} from 'models/misc';
-import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
+import {ServiceOrderView} from 'models/service-order';
 import CardHeader from '@mui/material/CardHeader';
 import {useTheme} from '@mui/material/styles';
 import {
@@ -40,7 +40,7 @@ import {
 } from 'models/employee';
 import {useQueryServiceCompanyEmployeeStatus} from 'hooks/reactQuery/useEmployee';
 import {Role} from 'models/user';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {styles as sx} from './styles';
 import {ScheduleControls} from './ScheduleControls';
 import {ScheduleLabel} from './ScheduleLabel';

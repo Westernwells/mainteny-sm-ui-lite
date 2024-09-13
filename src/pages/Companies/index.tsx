@@ -11,7 +11,7 @@ import {
 } from 'hooks/reactQuery/useCompanies';
 import {useQueryState} from 'hooks/useQueryState';
 import {ServiceCompanyItem} from 'models/service-company';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {Chip, ToggleButton, ToggleButtonGroup} from '@mui/material';
 import {CompanyStatus} from 'models/company';
 import {FilterFields} from 'components/FilterFields';

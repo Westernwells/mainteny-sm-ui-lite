@@ -2,7 +2,7 @@ import {DataGridLayout} from 'components/DataGridLayout';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {
   ServiceCompanyContactPersonOrderField,
   ServiceCompanyContactPersonView,
@@ -16,10 +16,10 @@ import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {Confirm} from 'components/Confirm';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {Order, OrderByParams} from 'models/misc';
 import {getColumns, makeRows} from './ContactsTable/ContactsDataGridProps';
 import ContactDetails from './ContactDetails';
 import ContactFormDialog from './ContactFormDialog';
+import {Order, OrderByParams} from '../../models/pagination';
 
 const PAGE_SIZE = 25;
 

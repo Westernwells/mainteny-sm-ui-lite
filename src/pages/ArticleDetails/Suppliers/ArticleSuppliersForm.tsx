@@ -5,10 +5,10 @@ import Box from '@mui/material/Box';
 import AddIcon from '@mui/icons-material/Add';
 import cloneDeep from 'lodash/cloneDeep';
 import {getUniqueId} from 'utils/utils';
-import {ExtendedSupplierRecord} from 'models/article';
 import {Button} from 'components/Button';
 import {Dialog} from 'components/Dialog';
 import {SupplierItem} from './SupplierItem';
+import {ExtendedSupplierRecord} from '../../../models/supplier';
 
 export interface Props {
   isLoading: boolean;

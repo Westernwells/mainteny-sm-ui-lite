@@ -35,11 +35,11 @@ import {theme} from 'theme';
 import {useTranslation} from 'react-i18next';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {Widget} from 'components/Widget';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
-import {OrderByParams} from 'models/misc';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {columns, makeRows} from './InvoicesDataGridProps';
+import {OrderByParams} from '../../models/pagination';
 
 const pageSize = 25;
 

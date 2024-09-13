@@ -4,7 +4,7 @@ import {GridCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {makePage, createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {useQueryState} from 'hooks/useQueryState';
 import {useNavigate} from 'react-router-dom';

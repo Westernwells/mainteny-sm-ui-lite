@@ -82,6 +82,7 @@ export const PageLayout = ({
 
   return (
     <Box
+      data-testid="page-layout-container"
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -106,7 +107,7 @@ export const PageLayout = ({
         <Box
           sx={{
             pt: '1em',
-            mx: !excludeDefaultSpacing ? '2.2em' : null,
+            mx: !excludeDefaultSpacing ? '24px' : null,
             overflowY: 'auto',
             ...contentStyles,
           }}

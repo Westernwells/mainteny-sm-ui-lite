@@ -13,7 +13,7 @@ import {
 } from 'hooks/reactQuery/useArticle';
 import {ArticleView, PropertyOwnerArticleRecord} from 'models/article';
 import {formatNetAmount} from 'utils/currency';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {convertToText} from 'utils/utils';
 import {styles} from '../style';
 import {CustomerPricesForm} from './CustomPricesForm';

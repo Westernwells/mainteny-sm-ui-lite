@@ -1,10 +1,10 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {t} from 'i18next';
 import * as _ from 'lodash';
-import {Typography, Box, Tooltip, IconButton} from '@mui/material';
+import {Box, IconButton, Tooltip, Typography} from '@mui/material';
 import {InfoOutlined} from '@mui/icons-material';
 import {ContactChannel, ServiceOrderView} from 'models/service-order';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {
   useFetchRecommendedTechnician,
   useQueryServiceCompanyTechnicians,

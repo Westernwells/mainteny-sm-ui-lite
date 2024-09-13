@@ -15,6 +15,7 @@ export const TabsBody = ({value, index, children, containerStyle}: Props) =>
         flexGrow: 1,
         display: 'flex',
         flexDirection: 'column',
+        position: 'relative',
         ...containerStyle,
       }}>
       {children}

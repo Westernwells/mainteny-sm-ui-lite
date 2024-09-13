@@ -11,11 +11,11 @@ import {InfoCard} from 'components/InfoCard';
 import {SearchInput} from 'components/SearchInput';
 import {useUseQueryCustomerContracts} from 'hooks/reactQuery/useContract';
 import {ContractOrderField, ContractView} from 'models/contract';
-import {Order} from 'models/misc';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {padNumber} from 'utils/utils';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {columns, makeRows} from './ContractsWidgetDataGridProps';
+import {Order} from '../../../../../models/pagination';
 
 interface Props {
   customerId?: string;

@@ -2,7 +2,7 @@ import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
 import {TextFieldProps} from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {ArticleView} from 'models/article';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {Typography} from '@mui/material';

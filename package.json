@@ -2,15 +2,39 @@
   "name": "sm-ui",
   "version": "5.0.0",
   "private": true,
+  "scripts": {
+    "prepare_env": "node create_env.mjs",
+    "start": "vite",
+    "build": "tsc && vite build",
+    "coverage": "vitest run --coverage",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "cy": "cypress run",
+    "start:stage": "env-cmd -f .env.stage vite --mode stage",
+    "start:prod": "env-cmd -f .env.prod vite --mode prod",
+    "build:stage": "env-cmd -f .env.stage tsc && vite build --mode stage",
+    "build:prod": "env-cmd -f .env.prod tsc && vite build  --mode prod",
+    "lint": "eslint --fix \"./src/**/*.{js,jsx,ts,tsx,json}\"",
+    "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "check-types": "tsc --pretty --noEmit",
+    "check-format": "prettier --check \"./src/**/*.{js,jsx,ts,tsx,json}\"",
+    "check-lint": "eslint . --ext ts --ext tsx --ext js",
+    "check-all": "yarn check-format && yarn check-lint && yarn check-types",
+    "cypress:install": "cypress install",
+    "cypress:e2e": "cypress run --config video=false --e2e",
+    "cypress:component": "cypress run --config video=false --component",
+    "cypress:run": "yarn cypress:e2e && yarn cypress:component",
+    "cypress:split-e2e": "cypress run --config video=false --e2e --env split=true"
+  },
   "dependencies": {
     "@emotion/css": "^11.11.2",
     "@emotion/styled": "latest",
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
-    "@mui/icons-material": "^5.4.2",
-    "@mui/lab": "^5.0.0-alpha.76",
-    "@mui/material": "^5.4.3",
-    "@mui/styles": "^5.4.2",
-    "@mui/system": "5.4.3",
+    "@mui/icons-material": "next",
+    "@mui/lab": "next",
+    "@mui/material": "next",
+    "@mui/system": "next",
     "@mui/x-data-grid": "5.5.1",
     "@mui/x-date-pickers": "6.18.2",
     "@mui/x-date-pickers-pro": "^6.19.2",
@@ -95,43 +119,6 @@
     "vite-plugin-env-compatible": "^2.0.1",
     "yup": "^0.32.11"
   },
-  "scripts": {
-    "prepare_env": "node create_env.mjs",
-    "start": "vite",
-    "build": "tsc && vite build",
-    "coverage": "vitest run --coverage",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "cy": "cypress run",
-    "start:stage": "env-cmd -f .env.stage vite --mode stage",
-    "start:prod": "env-cmd -f .env.prod vite --mode prod",
-    "build:stage": "env-cmd -f .env.stage tsc && vite build --mode stage",
-    "build:prod": "env-cmd -f .env.prod tsc && vite build  --mode prod",
-    "lint": "eslint --fix \"./src/**/*.{js,jsx,ts,tsx,json}\"",
-    "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "check-types": "tsc --pretty --noEmit",
-    "check-format": "prettier --check \"./src/**/*.{js,jsx,ts,tsx,json}\"",
-    "check-lint": "eslint . --ext ts --ext tsx --ext js",
-    "check-all": "yarn check-format && yarn check-lint && yarn check-types",
-    "cypress:install": "cypress install",
-    "cypress:e2e": "cypress run --config video=false --e2e",
-    "cypress:component": "cypress run --config video=false --component",
-    "cypress:run": "yarn cypress:e2e && yarn cypress:component",
-    "cypress:split-e2e": "cypress run --config video=false --e2e --env split=true"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
     "@cypress/code-coverage": "^3.12.44",
     "@cypress/react18": "^2.0.1",
@@ -175,6 +162,18 @@
     "vite-plugin-svgr": "^2.4.0",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^2.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "husky": {
     "hooks": {

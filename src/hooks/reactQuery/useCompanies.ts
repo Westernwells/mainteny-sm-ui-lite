@@ -3,26 +3,25 @@ import {NewServiceCompanyBody} from 'pages/NewCompany/model';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   Language,
-  Page,
   Resource,
   RestError,
   StringValue,
   WithOptional,
 } from 'models/misc';
 import {
+  AutoNumberConfig,
   ServiceCompanyActivity,
   ServiceCompanyActivityParams,
-  AutoNumberConfig,
   ServiceCompanyItem,
-  StringValueResponse,
   ServiceCompanyNextNumberParams,
   ServiceCompanySummary,
   ServiceCompanySummaryParams,
+  ServiceCompanySystemSettings,
+  ServiceCompanyType,
   ServiceCompanyUpdateBody,
+  StringValueResponse,
   SystemSettingsUpdateBody,
   XeroIntegration,
-  ServiceCompanyType,
-  ServiceCompanySystemSettings,
 } from 'models/service-company';
 import {
   useInfiniteQuery,
@@ -37,6 +36,7 @@ import {ServiceOrder} from 'models/service-order';
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './useUserSession';
+import {Page} from '../../models/pagination';
 
 export const getCompanies = async (
   page: Page,

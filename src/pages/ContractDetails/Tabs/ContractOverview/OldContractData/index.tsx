@@ -47,8 +47,7 @@ import Tooltip from '@mui/material/Tooltip';
 import {formatDate} from 'utils/datetime';
 import {StatusChip} from 'components/StatusChip';
 import {capitalize} from 'lodash';
-import {Order} from 'models/misc';
-import {createEmptyResource} from 'utils/paging-utils';
+import {createEmptyResource} from 'utils/paging';
 import {ContractTerm} from 'components/ContractTerm';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractBasic} from './ContractBasic';
@@ -58,6 +57,7 @@ import {ContractTimeline} from './ContractTimeline';
 import {ContractParties} from './ContractParties';
 import {DescriptionForm} from './DescriptionForm';
 import {AttachDocument} from '../AttachDocument';
+import {Order} from '../../../../../models/pagination';
 
 interface Props {
   contractDetails: ContractView;

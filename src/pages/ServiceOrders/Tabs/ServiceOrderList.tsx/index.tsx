@@ -9,7 +9,7 @@ import {
   ServiceOrderView,
 } from 'models/service-order';
 import {useEffect, useRef, useState} from 'react';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
 import {useNavigate} from 'react-router-dom';
@@ -19,18 +19,18 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {FlexContainer} from 'components/FlexContainer';
 import {
+  serviceOrderPaymentStatusToEnum,
+  serviceOrderPaymentStatusToString,
+  serviceOrderStatusToString,
   serviceOrderTypeToEnum,
   serviceOrderTypeToString,
-  serviceOrderPaymentStatusToString,
-  serviceOrderPaymentStatusToEnum,
-  serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import {Widget} from 'components/Widget';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
-import {Order, OrderByParams} from 'models/misc';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './ServiceOrderDataGridProps';
+import {Order, OrderByParams} from '../../../../models/pagination';
 
 const serviceOrderStatusMap = {
   Unscheduled: ServiceOrderStatus.READY_TO_SCHEDULE,

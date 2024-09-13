@@ -12,13 +12,14 @@ import {ServiceOrderView} from 'models/service-order';
 import {useDueServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useQueryState} from 'hooks/useQueryState';
 import {useInView} from 'react-intersection-observer';
-import {endOfDay, startOfDay, addDays} from 'date-fns';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {addDays, endOfDay, startOfDay} from 'date-fns';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {toRestDate} from 'utils/datetime';
 import {ReactComponent as Layout} from 'assets/icons/Layout.svg';
 import {ReactComponent as FilterIcon} from 'assets/icons/FilterIcon.svg';
-import {Order, Resource} from 'models/misc';
+import {Resource} from 'models/misc';
 import {OrderDetails} from './OrderDetails';
+import {Order} from '../../../../../models/pagination';
 
 interface Props extends BoxProps {
   containerStyles?: {[key: string]: string | number};

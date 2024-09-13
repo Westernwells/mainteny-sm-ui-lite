@@ -5,8 +5,7 @@ import {IconButton} from '@mui/material';
 import Email from '@mui/icons-material/Email';
 import {useNavigate} from 'react-router-dom';
 import _ from 'lodash';
-import {ArticleSupplierView, SupplierOrderField} from 'models/article';
-import {createEmptyResource, makePage} from 'utils/paging-utils';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
 import {useQueryState} from 'hooks/useQueryState';
 import {Progress} from 'components/Progress';
@@ -15,39 +14,44 @@ import {EmptySection} from 'components/EmptySection';
 import {Widget} from 'components/Widget';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {OrderByParams} from 'models/misc';
+
+import {OrderByParams} from '../../../models/pagination';
+import {
+  ArticleSupplierView,
+  SUPPLIER_ORDER_FIELD,
+} from '../../../models/supplier';
 
 export const columns: GridColDef[] = [
   getColumnProps({
-    field: SupplierOrderField.EXTERNAL_ID,
+    field: SUPPLIER_ORDER_FIELD.EXTERNAL_ID,
     sortable: true,
     headerName: 'supplier id',
   }),
   getColumnProps({
-    field: SupplierOrderField.NAME,
+    field: SUPPLIER_ORDER_FIELD.NAME,
     sortable: true,
     headerName: 'name',
   }),
   getColumnProps({
-    field: SupplierOrderField.CATEGORY,
+    field: SUPPLIER_ORDER_FIELD.CATEGORY,
     sortable: true,
     headerName: 'category',
   }),
   getColumnProps({
-    field: SupplierOrderField.ADDRESS,
+    field: SUPPLIER_ORDER_FIELD.ADDRESS,
     sortable: true,
     headerName: 'address',
     cellClassName: 'truncateText',
     flex: 1.5,
   }),
   getColumnProps({
-    field: SupplierOrderField.PHONE,
+    field: SUPPLIER_ORDER_FIELD.PHONE,
     sortable: true,
     headerName: 'phone number',
     flex: 1.5,
   }),
   getColumnProps({
-    field: SupplierOrderField.EMAIL,
+    field: SUPPLIER_ORDER_FIELD.EMAIL,
     sortable: true,
     headerName: 'email address',
     flex: 1.5,
@@ -75,12 +79,12 @@ export const makeRows = (
 ): GridRowsProp =>
   _.map(articleSuppliers, (item, index) => ({
     id: index,
-    [SupplierOrderField.EXTERNAL_ID]: item.externalId,
-    [SupplierOrderField.NAME]: item.name,
-    [SupplierOrderField.CATEGORY]: item.category,
-    [SupplierOrderField.ADDRESS]: item.address?.fullName ?? '',
-    [SupplierOrderField.PHONE]: item.contact.phone,
-    [SupplierOrderField.EMAIL]: item.contact.email,
+    [SUPPLIER_ORDER_FIELD.EXTERNAL_ID]: item.externalId,
+    [SUPPLIER_ORDER_FIELD.NAME]: item.name,
+    [SUPPLIER_ORDER_FIELD.CATEGORY]: item.category,
+    [SUPPLIER_ORDER_FIELD.ADDRESS]: item.address?.fullName ?? '',
+    [SUPPLIER_ORDER_FIELD.PHONE]: item.contact.phone,
+    [SUPPLIER_ORDER_FIELD.EMAIL]: item.contact.email,
     navigateTo: `/articles/supplier/${item.id}`,
     item,
   }));
@@ -97,7 +101,7 @@ export const SupplierListDataGrid = () => {
   const [query, setQuery] = useQueryState('query');
   const textInput = useRef<HTMLInputElement>(null);
 
-  const {values} = useSearchValues<OrderByParams<SupplierOrderField>>();
+  const {values} = useSearchValues<OrderByParams<SUPPLIER_ORDER_FIELD>>();
   const {sortOrder, orderByField} = values;
 
   const {

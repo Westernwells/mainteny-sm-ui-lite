@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useState} from 'react';
 import {UseInfiniteQueryOptions, UseInfiniteQueryResult} from 'react-query';
-import {Page, Resource, RestError} from 'models/misc';
+import {Resource, RestError} from 'models/misc';
+import {Page} from '../models/pagination';
 
 type FetchFunctionType<T> = (
   id: string,
