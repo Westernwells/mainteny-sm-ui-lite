@@ -682,9 +682,10 @@ export const InvoiceForm = ({
     );
 
     if (invoiceData?.additionalInfo.paymentTerm) {
-      formik.setFieldValue('paymentTerm', {
-        term: invoiceData.additionalInfo.paymentTerm.term || '',
-      });
+      formik.setFieldValue(
+        'paymentTerm',
+        invoiceData.additionalInfo.paymentTerm,
+      );
     }
 
     formik.setFieldValue(
@@ -1138,7 +1139,7 @@ export const InvoiceForm = ({
     if (user) {
       formik.setFieldValue(
         'serviceCompanyId',
-        user.userAccount.serviceCompany.id || '',
+        user?.userAccount.serviceCompany.id || '',
       );
       formik.setFieldValue('alternativeServiceCompanyInfo', {
         name: user?.userAccount?.serviceCompany?.name || '',
