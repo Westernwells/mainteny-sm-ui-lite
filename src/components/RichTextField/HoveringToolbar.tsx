@@ -76,8 +76,13 @@ export const HoveringToolbar = () => {
     }
 
     const domSelection = window.getSelection();
-    const domRange = domSelection?.getRangeAt(0);
-    const rect = domRange?.getBoundingClientRect() || {
+    if (!domSelection || domSelection.rangeCount === 0) {
+      el.removeAttribute('style');
+      return;
+    }
+
+    const domRange = domSelection.getRangeAt(0);
+    const rect = domRange.getBoundingClientRect() || {
       top: 0,
       left: 0,
       width: 0,
@@ -99,13 +104,24 @@ export const HoveringToolbar = () => {
 
   const handleOpen = () => setOpenSelectFontSize(true);
 
+  const fontSizeOptions = [
+    {value: FONT_SIZE.SMALL, label: 'Small'},
+    {value: FONT_SIZE.NORMAL, label: 'Normal'},
+    {value: FONT_SIZE.LARGE, label: 'Large'},
+  ];
+
+  const renderLabel = (value: string) => {
+    const option = fontSizeOptions.find((opt) => opt.value === value);
+    return option ? option.label : value;
+  };
+
   const activeFontSize = getActiveFontSize(editor);
   const textSize =
     activeFontSize === FONT_SIZE.SMALL
-      ? 'Small'
+      ? '12px'
       : activeFontSize === FONT_SIZE.LARGE
-      ? 'Large'
-      : 'Normal';
+      ? '20px'
+      : '16px';
 
   return (
     <Portal>
@@ -161,7 +177,7 @@ export const HoveringToolbar = () => {
           renderValue={(value: string) => (
             <Box display="flex" alignItems="center" gap={1}>
               <TextFields sx={{color: 'white'}} />
-              <Typography>{t(value)}</Typography>
+              <Typography>{t(renderLabel(value))}</Typography>
             </Box>
           )}>
           {[

@@ -238,7 +238,8 @@ export const DraftQuotation = ({
     description: quotation?.description || '',
     notes: quotation?.additionalInfo.notes || '',
     items: quotation?.items || [],
-    serviceCompanyId: quotation?.serviceCompany.id || '',
+    serviceCompanyId:
+      quotation?.serviceCompany.id || user?.userAccount.serviceCompany.id || '',
     elevatorId: quotation?.elevator?.id || null,
   };
 
