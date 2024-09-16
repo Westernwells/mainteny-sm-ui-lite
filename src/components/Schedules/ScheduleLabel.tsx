@@ -7,6 +7,8 @@ import {ServiceOrderView} from 'models/service-order';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useTranslation} from 'react-i18next';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {fromDateStringToDate} from 'utils/datetime';
 
 interface Props {
   scheduleType?: 'date' | 'people' | 'default';
@@ -31,6 +33,7 @@ export const ScheduleLabel = ({
   checkedValues = [],
   navigateTo,
 }: Props) => {
+  const {user} = useUserSession();
   const {t} = useTranslation();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
@@ -41,8 +44,10 @@ export const ScheduleLabel = ({
   }, []);
 
   const getDayString = (dateString: string) => {
-    const [day, month, year] = dateString.split('.').map(Number);
-    const date = new Date(year, month - 1, day); // Month is 0-indexed
+    const dateFormat = user?.userAccount.serviceCompany.settings.dateFormat;
+
+    const date = fromDateStringToDate(dateString, dateFormat);
+
     return formatDate(date, 'EEEE');
   };
   const renderSubLabel = () => (
