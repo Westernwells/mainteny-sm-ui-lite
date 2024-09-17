@@ -135,7 +135,7 @@ export const DraftQuotation = ({
   const debouncedSetIsHovered = debounce((value) => setIsHovered(value), 300);
 
   const [queryParams, setQueryParams] = useSearchParams();
-  const {elevatorId = '', customerId = ''} = queryString.parse(search);
+  const {elevatorId = '', customerId = '', id = ''} = queryString.parse(search);
 
   const {user} = useUserSession();
   const {language: selectedLng} = useContext(LanguageContext);
@@ -497,7 +497,7 @@ export const DraftQuotation = ({
 
   const handleContractPaymentTermsModal = (paymentTermId: string) => {
     const paymentTermObj = contractPaymentTerms?.data.find(
-      ({id}) => id === paymentTermId,
+      ({id: termId}) => termId === paymentTermId,
     );
     formik.setFieldValue(
       'paymentTerms',
@@ -635,7 +635,7 @@ export const DraftQuotation = ({
   }, [formik.values]);
 
   useEffect(() => {
-    if (formType === 'new') {
+    if (formType === 'new' && !id) {
       initializeFormDataFromLocalStorage();
     }
   }, [formType]);

@@ -13,7 +13,6 @@ export const formatQuotationRecord = (
   value: QuotationFormData,
 ): UpdateQuotation | CreateQuotation => ({
   ...value,
-  ...value,
   subject: value.subject,
   description: value.description,
   items: value.items.map((item) => {

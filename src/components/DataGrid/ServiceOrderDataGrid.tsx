@@ -29,6 +29,7 @@ interface Props {
   setRowItem: (row: ServiceOrderView) => void;
   selectedCustomer?: PropertyOwnerView | PropertyOwnerSimpleView;
   elevatorId?: string;
+  propertyOwnerId?: string;
 }
 
 export const columns: GridColDef[] = [
@@ -95,6 +96,7 @@ export const ServiceOrdersDataGrid = ({
   setRowItem,
   elevatorId,
   selectedCustomer,
+  propertyOwnerId,
 }: Props) => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -118,6 +120,7 @@ export const ServiceOrdersDataGrid = ({
       query: encodeURIComponent(search),
       order: Order.DESC,
       orderBy: ServiceOrderOrderField.CREATED_TIME,
+      ...(propertyOwnerId ? {propertyOwnerId} : {}),
     },
     {keepPreviousData: true},
   );

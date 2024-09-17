@@ -2,9 +2,9 @@ import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
 import {TextFieldProps} from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
-import {createEmptyResource} from 'utils/paging';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
+import {createEmptyResource} from 'utils/paging';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -35,8 +35,10 @@ export const CustomerAutoComplete = ({
 
   // Whenever initialValue changes, update customer and query
   useEffect(() => {
-    setCustomer(initialValue);
-    setQuery(initialValue?.name || '');
+    if (initialValue) {
+      setCustomer(initialValue);
+      setQuery(initialValue?.name || '');
+    }
   }, [initialValue]);
 
   const debouncedChangeHandler = useCallback(
@@ -56,11 +58,14 @@ export const CustomerAutoComplete = ({
     if (reason === 'clear') {
       setQuery('');
       setCustomer(null);
+      getCustomer?.(null);
     }
   };
 
   useEffect(() => {
-    getCustomer?.(customer);
+    if (customer) {
+      getCustomer?.(customer);
+    }
   }, [customer]);
 
   useEffect(() => {
