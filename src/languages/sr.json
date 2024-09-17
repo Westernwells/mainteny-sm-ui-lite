@@ -2724,5 +2724,7 @@
   "PDF & Xinvoice (XML)": "PDF i Ksinvoice (KSML)",
   "Buyer reference": "Reference kupca",
   "Invoice format": "Format fakture",
-  "Buyer reference is defined by the customer.": "Reference kupca definiše kupac."
+  "Buyer reference is defined by the customer.": "Reference kupca definiše kupac.",
+  "Bold": "Podebljano",
+  "Italic": "Kurziv"
 }
