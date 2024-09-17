@@ -52,6 +52,7 @@ export const NewInvoice = () => {
       serviceCompanyType={ServiceCompanyType.PROPERTY_OWNER_PAYMENT_TERM}
       invoiceType={invoiceType as InvoiceType}
       customerResource={customer}
+      isNewInvoice
     />
   );
 };
