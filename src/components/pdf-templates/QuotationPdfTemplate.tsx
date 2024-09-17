@@ -324,10 +324,8 @@ const QuotationPdfTemplate = React.memo(
                 <View style={styles.rightAddressContent}>
                   <Text style={styles.tag}>{translate('Quotation date')}</Text>
                   <Text style={styles.tagContent}>
-                    {formatDate(
-                      quotation?.additionalInfo.sentDate ||
-                        quotation?.meta.createdAt,
-                    ) || '-'}
+                    {formatDate(quotation?.additionalInfo.sentDate) ||
+                      formatDate(new Date())}
                   </Text>
                 </View>
 

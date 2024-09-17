@@ -199,7 +199,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
               placeholder: 'e.g 1234',
               label: 'Customer Number',
               name: 'externalId',
-              value: formik.values.externalId,
+              value: formik.values.externalId || '',
               helperText: formik.touched.externalId && formik.errors.externalId,
               error: !!formik.errors.externalId && formik.touched.externalId,
               ...defaultProps,
@@ -208,7 +208,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
           />
           {(activeField === 'externalId' || formik.touched.externalId) &&
             formik.values.externalId &&
-            customerResource.filter(
+            customerResource?.filter(
               (item) => item.externalId === formik.values.externalId,
             ).length > 0 && (
               <Typography

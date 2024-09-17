@@ -2,9 +2,9 @@ import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
 import {TextFieldProps} from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
-import {createEmptyResource} from 'utils/paging';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
+import {createEmptyResource} from 'utils/paging';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -33,18 +33,18 @@ export const CustomerAutoComplete = ({
     query: query ? encodeURIComponent(query) : '',
   });
 
+  // Whenever initialValue changes, update customer and query
   useEffect(() => {
-    if (!customer) {
+    if (initialValue) {
       setCustomer(initialValue);
+      setQuery(initialValue?.name || '');
     }
-
-    setQuery(initialValue?.name || '');
   }, [initialValue]);
 
   const debouncedChangeHandler = useCallback(
     _.debounce((newValue: string) => {
       setQuery(newValue);
-    }, 1),
+    }, 300),
     [],
   );
 
@@ -58,22 +58,21 @@ export const CustomerAutoComplete = ({
     if (reason === 'clear') {
       setQuery('');
       setCustomer(null);
+      getCustomer?.(null);
     }
   };
 
   useEffect(() => {
-    if (getCustomer) {
-      getCustomer(customer);
+    if (customer) {
+      getCustomer?.(customer);
     }
   }, [customer]);
 
   useEffect(() => {
     if (!query) {
-      setCustomer(null);
-      getQuery?.('');
-    } else {
-      getQuery?.(query);
+      setCustomer(null); // Reset customer if the query is cleared
     }
+    getQuery?.(query);
   }, [query]);
 
   return (
@@ -86,18 +85,14 @@ export const CustomerAutoComplete = ({
       sx={{minHeight: 0}}
       options={customerResource.data}
       filterOptions={(options) => options}
-      isOptionEqualToValue={(option, value) => {
-        const optionId = option && option.id;
-        const valueId = value && value.id;
-        return optionId === valueId;
-      }}
-      onChange={(event: any, newValue: PropertyOwnerView | null) => {
-        setCustomer(newValue);
-      }}
+      isOptionEqualToValue={(option, value) => option?.id === value?.id}
       getOptionLabel={(option) => option.name}
-      onInputChange={onInputChange}
       value={customer}
       inputValue={query}
+      onChange={(event: any, newValue: PropertyOwnerView | null) =>
+        setCustomer(newValue)
+      }
+      onInputChange={onInputChange}
       renderInput={(params) => (
         <FormInput
           fieldProps={{

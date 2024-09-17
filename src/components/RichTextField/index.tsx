@@ -50,7 +50,12 @@ const CustomElements = ({
     case 'bulleted-list':
       return (
         <ul
-          style={style}
+          style={{
+            ...style,
+            marginLeft: '20px',
+            listStyleType: 'disc',
+            listStylePosition: 'inside',
+          }}
           {...attributes}
           ref={attributes.ref as Ref<HTMLUListElement>}>
           {children}
@@ -68,7 +73,12 @@ const CustomElements = ({
     case 'numbered-list':
       return (
         <ol
-          style={style}
+          style={{
+            ...style,
+            marginLeft: '20px',
+            listStyleType: 'decimal',
+            listStylePosition: 'inside',
+          }}
           {...attributes}
           ref={attributes.ref as Ref<HTMLOListElement>}>
           {children}
@@ -183,6 +193,7 @@ interface Props {
   endAdornment?: React.ReactNode;
   disabled?: boolean;
   onClick?: (event: any) => void;
+  name?: string;
 }
 
 const RichTextField = ({
@@ -199,6 +210,7 @@ const RichTextField = ({
   endAdornment,
   disabled = false,
   onClick,
+  name,
   ...props
 }: PropsWithChildren<Props>) => {
   const {t} = useTranslation();
@@ -296,6 +308,8 @@ const RichTextField = ({
           </legend>
           <div style={styles.inputWrapper}>
             <Editable
+              id={name}
+              name={name}
               renderElement={renderElement}
               renderLeaf={renderLeaf}
               placeholder={t(placeholder)}

@@ -1,4 +1,4 @@
-import {RefObject, useCallback} from 'react';
+import {RefObject, useEffect, useMemo} from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import * as _ from 'lodash';
 import TextField from '@mui/material/TextField';
@@ -29,11 +29,19 @@ export const SearchInput = ({
 }: Props) => {
   const {t} = useTranslation();
 
-  const debouncedChangeHandler = useCallback(
-    _.debounce((e) => {
-      onValueChanged?.(e.nativeEvent.target.value);
-    }, 300),
-    [],
+  const debouncedChangeHandler = useMemo(
+    () =>
+      _.debounce((e) => {
+        onValueChanged?.(e.target.value);
+      }, 300),
+    [onValueChanged],
+  );
+
+  useEffect(
+    () => () => {
+      debouncedChangeHandler.cancel();
+    },
+    [debouncedChangeHandler],
   );
 
   return (
@@ -64,7 +72,6 @@ export const SearchInput = ({
                   borderColor: '#fff',
                 },
               },
-
               '& .MuiOutlinedInput-notchedOutline': {
                 border: '1px solid #fff',
               },
