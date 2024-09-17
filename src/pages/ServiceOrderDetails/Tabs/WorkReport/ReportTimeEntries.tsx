@@ -135,7 +135,6 @@ const ReportTimeEntries = ({
                 );
               }}
               resetValue={new Date(slot.startTime)}
-              cancel={() => setSlotDate(slot.startTime)}
               shouldDisableDate={(tDate) =>
                 timeInfo.timeSlots.some((d) => {
                   const slotDateToCompare = new Date(d.startTime);

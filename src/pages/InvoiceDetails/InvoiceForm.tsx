@@ -1,5 +1,5 @@
-import {useContext, useEffect, useMemo, useState} from 'react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useContext, useEffect, useMemo, useState, useCallback} from 'react';
+import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {theme} from 'theme';
@@ -58,10 +58,7 @@ import {
   PaymentTypeOptions,
 } from 'models/invoice';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
-import {
-  PropertyOwnerSimpleView,
-  PropertyOwnerView,
-} from 'models/propertyManager';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {AddressComponent, AddressRecord, Language} from 'models/misc';
 import {
   companyLanguageContextMap,
@@ -84,24 +81,12 @@ import {ReactComponent as HeaderIllustration} from 'assets/illustrations/invoice
 import {ReactComponent as FooterIllustration} from 'assets/illustrations/invoice/footer.svg';
 import {ReactComponent as PinIllustration} from 'assets/illustrations/invoice/pin.svg';
 import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/invoice/task-list-pen.svg';
-import {StatusChip} from 'components/StatusChip';
-import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
 import {T} from 'utils/i18n-utils';
 import {ServiceCompanyType} from 'models/service-company';
 import RichTextField from 'components/RichTextField';
 import {useTranslation} from 'react-i18next';
-import {CreateNotes} from './Notes/CreateNotes';
-import {Notes} from './Notes/EditNotes';
-import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
-import {PartialPaymentsSection} from './PartialPaymentsSection';
-import {SectionTitle} from './SectionTitle';
-import {EditFrom} from './EditFrom';
-import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
-import NewCustomer from './NewCustomer';
-import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
-import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {Dialog} from 'components/Dialog';
 import {
@@ -113,15 +98,33 @@ import {GridCellParams} from '@mui/x-data-grid';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
+import {isEqual} from 'lodash';
+import queryString from 'query-string';
+import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
+import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
+import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
+import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
+import {StatusChip} from 'components/StatusChip';
+import {EditFrom} from './EditFrom';
+import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
+import InvoiceFormArticleSection from './InvoiceFormArticleSection';
+import NewCustomer from './NewCustomer';
+import {CreateNotes} from './Notes/CreateNotes';
+import {PartialPaymentsSection} from './PartialPaymentsSection';
+import {SectionTitle} from './SectionTitle';
+import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
+import {formatInvoiceRecord, articleViewToInvoiceItemRecord} from './utils';
+import {Notes} from './Notes/EditNotes';
 
 interface Props {
   invoice?: InvoiceView;
-  serviceOrderResource?: ServiceOrderView;
-  formType?: 'new' | 'edit';
   invoiceType?: InvoiceType;
-  customer?: PropertyOwnerView;
   serviceCompanyType: ServiceCompanyType;
+  serviceOrderResource?: ServiceOrderView;
+  customerResource?: PropertyOwnerView;
+  isNewInvoice: boolean;
 }
 
 const payment = {
@@ -202,13 +205,25 @@ const invoiceItemToInvoiceItemRecord = (
   return getItemRecord(record, record.unitAmount.percentageVat);
 };
 
+const localStorageFormikInvoiceDataKey = 'INVOICE_DATA';
+
+enum PageState {
+  FRESH_NEW = 'FRESH_NEW',
+  CONTINUE_FROM_LOCAL_STORAGE = 'CONTINUE_FROM_LOCAL_STORAGE',
+  DUPLICATE = 'DUPLICATE',
+  EDIT = 'EDIT',
+  CONTINUE_EDIT = 'CONTINUE_EDIT',
+}
+
+const emptyAddressState = {fullName: null};
+
 export const InvoiceForm = ({
   invoice,
-  serviceOrderResource,
-  formType = 'new',
   invoiceType,
-  customer: customerByProp,
   serviceCompanyType,
+  serviceOrderResource,
+  customerResource,
+  isNewInvoice,
 }: Props) => {
   const {t} = useTranslation();
   const DEFAULT_LABOR_COST_TEXT = useMemo(
@@ -224,6 +239,7 @@ export const InvoiceForm = ({
     [DEFAULT_LABOR_COST_TEXT, DEFAULT_MATERIAL_COST_TEXT],
   );
   const navigate = useNavigate();
+  const {search} = useLocation();
   const {language: selectedLng} = useContext(LanguageContext);
   const {company} = useContext(UserCompanyContext);
   const companyLanguage =
@@ -249,15 +265,43 @@ export const InvoiceForm = ({
     },
   );
 
-  const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
-    useUpdateInvoice();
   const {mutateAsync: createNewInvoice, isLoading: isCreating} =
     useCreateInvoice();
+  const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
+    useUpdateInvoice();
+
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
 
-  const [isDrawerOpen] = useState<boolean>(true);
+  const {
+    customerId = '',
+    orderId = '',
+    invoiceId = '',
+  } = queryString.parse(search);
+
+  const isDrawerOpen = true;
+
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [initialNewLoadComplete, setInitialNewLoadComplete] = useState(false);
+
+  const [pageState, setPageState] = useState(
+    invoiceId && isNewInvoice
+      ? PageState.DUPLICATE
+      : isNewInvoice
+      ? PageState.FRESH_NEW
+      : PageState.EDIT,
+  );
+
   const [isAddNewCustomerDialogOpen, setIsAddNewCustomerDialogOpen] =
     useState<boolean>(false);
+
+  const [openResumeProgressDialog, setOpenResumeProgressDialog] =
+    useState(false);
+  const [openCancelDialog, setOpenCancelDialog] = useState<boolean>(false);
+
+  const [initialLocalStorageData, setInitialLocalStorageData] = useState<
+    Partial<InvoiceFormData | null>
+  >({});
+
   const [isEditFromDialogOpen, setIsEditFromDialogOpen] =
     useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -271,18 +315,18 @@ export const InvoiceForm = ({
     ContractTermView | undefined
   >(undefined);
 
-  const [customer, setCustomer] = useState<
-    PropertyOwnerView | PropertyOwnerSimpleView | undefined
-  >(customerByProp);
+  const [customer, setCustomer] = useState<PropertyOwnerView | undefined>(
+    isNewInvoice ? customerResource : undefined,
+  );
+
   const [serviceOrder, setServiceOrder] = useState<
     ServiceOrderView | undefined
-  >(serviceOrderResource ?? undefined);
+  >(isNewInvoice ? serviceOrderResource : undefined);
 
   const isWorkReportPDFGenerated = !!serviceOrder?.reports?.length;
   const isCheckListPDFGenerated = !!serviceOrder?.checkLists?.length;
 
   const [dueDateError, setDueDateError] = useState('');
-
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const [textBlockField, setTextBlockField] = useState<
@@ -302,17 +346,6 @@ export const InvoiceForm = ({
     setOpenTextBlockDialog(true);
   };
 
-  const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
-    if (textBlockField === 'SUBJECT') {
-      formik.setFieldValue('subject', rowParams.row.text);
-    } else if (textBlockField === 'DESCRIPTION') {
-      formik.setFieldValue('description', rowParams.row.text);
-    } else if (textBlockField === 'NOTES') {
-      formik.setFieldValue('moreInfo', rowParams.row.text);
-    }
-    setOpenTextBlockDialog(false);
-  };
-
   const [totalAmountFrom, totalAmountTo] = useMemo(
     () => getStartEndPrice([]),
     [[]],
@@ -330,9 +363,13 @@ export const InvoiceForm = ({
 
   const initialValues: InvoiceFormData = useMemo(
     () => ({
-      subject: '',
-      description: '',
-      externalId: invoice?.externalId || '',
+      alternativeServiceCompanyInfo: {
+        name: user?.userAccount.serviceCompany.name || '',
+        address: user?.userAccount.serviceCompany.billingAddress,
+      },
+      subject: !isNewInvoice && invoice ? invoice?.subject : '',
+      description: !isNewInvoice && invoice ? invoice?.description : '',
+      externalId: (!isNewInvoice && invoice?.externalId) || '',
       type:
         typeof invoiceType === 'string' &&
         invoiceType &&
@@ -340,28 +377,53 @@ export const InvoiceForm = ({
           ? InvoiceType[invoiceType]
           : InvoiceType.FULL,
       items: [],
-      paymentTerm: undefined,
-      propertyOwnerId: '',
-      serviceCompanyId: '',
-      serviceOrderId: '',
-      paymentInfo: payment,
+      paymentTerm:
+        (!isNewInvoice && {
+          ...invoice?.additionalInfo.paymentTerm,
+          term: invoice?.additionalInfo.paymentTerm?.term || '',
+        }) ||
+        undefined,
+      propertyOwnerId: (!isNewInvoice && invoice?.propertyOwner.id) || '',
+      serviceCompanyId:
+        (!isNewInvoice && invoice?.serviceCompany.id) ||
+        user?.userAccount.serviceCompany.id ||
+        '',
+      serviceOrderId: (!isNewInvoice && invoice?.serviceOrder?.id) || '',
+      paymentInfo:
+        (!isNewInvoice && invoice?.additionalInfo.paymentInfo) || payment,
       shouldSendOut: false,
-      includeWorkReport: false,
-      includeCheckList: false,
+      includeWorkReport:
+        (!isNewInvoice && invoice?.additionalInfo.includeWorkReport) || false,
+      includeCheckList:
+        (!isNewInvoice && invoice?.additionalInfo.includeCheckList) || false,
       beneficialName: '',
-      costCenter: '',
-      customerSpecificOrderNumber: serviceOrder
-        ? serviceOrder.additionalInfo.purchaseOrderNumber
-        : '',
-      moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
+      costCenter: (!isNewInvoice && invoice?.additionalInfo.costCenter) || '',
+      customerSpecificOrderNumber:
+        (!isNewInvoice &&
+          invoice?.additionalInfo?.customerSpecificOrderNumber) ||
+        '',
+      moreInfo:
+        (!isNewInvoice && invoice?.additionalInfo.moreInfo) ||
+        DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
       unitNumber: '-',
-      showArticleSection: true,
+      showArticleSection:
+        (!isNewInvoice && invoice?.additionalInfo.showArticleSection) || true,
       notes: [],
       ...(invoice && {
         billingAddress:
           invoice.additionalInfo?.billingAddress ||
           invoice?.propertyOwner?.billingAddress,
       }),
+      elevatorExternalId:
+        (!isNewInvoice && invoice?.additionalInfo.elevatorExternalId) || '',
+      deliveryStartDate:
+        !isNewInvoice && invoice?.additionalInfo.deliveryStartDate!
+          ? new Date(invoice?.additionalInfo.deliveryStartDate)
+          : undefined,
+      deliveryEndDate:
+        !isNewInvoice && invoice?.additionalInfo.deliveryStartDate
+          ? new Date(invoice?.additionalInfo.deliveryStartDate)
+          : undefined,
     }),
     [invoice, invoiceType],
   );
@@ -374,7 +436,7 @@ export const InvoiceForm = ({
       'checkExternalId',
       'This ID is already taken. Please enter a different one.',
       async (value) =>
-        formType === 'edit' && value === invoice?.externalId
+        !isNewInvoice && value === invoice?.externalId
           ? true
           : // eslint-disable-next-line @typescript-eslint/no-use-before-define
             isExternalIdUnique(allInvoiceResource.data, value),
@@ -406,12 +468,12 @@ export const InvoiceForm = ({
           subject: note.subject,
         })) || [],
       refInvoiceId:
-        formType === 'new' && invoiceType === InvoiceType.CREDIT_NOTE
+        isNewInvoice && invoiceType === InvoiceType.CREDIT_NOTE
           ? invoice?.id
           : undefined,
     };
 
-    if (formType === 'edit' && invoice) {
+    if (!isNewInvoice && invoice) {
       return updateInvoiceAsync({
         data: formatInvoiceRecord({
           ...values,
@@ -431,23 +493,60 @@ export const InvoiceForm = ({
       },
     });
   }
+
+  const resetLocalStorage = () => {
+    localStorage.removeItem(localStorageFormikInvoiceDataKey);
+    setInitialLocalStorageData(null);
+    setServiceOrder(undefined);
+    setCustomer(undefined);
+    setOpenResumeProgressDialog(false);
+  };
+
+  const onCancel = () => {
+    resetLocalStorage();
+  };
+
   const formik = useFormik<InvoiceFormData>({
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
       const response = await onSave(values);
-      const invoiceId = formType === 'new' ? response.value : invoice?.id;
-      navigate(`/invoices/details/${invoiceId}`, {
+      const newInvoiceId = isNewInvoice ? response.value : invoice?.id;
+      resetLocalStorage();
+      navigate(`/invoices/details/${newInvoiceId}`, {
         replace: true,
       });
     },
   });
+
+  const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
+    if (textBlockField === 'SUBJECT') {
+      formik.setFieldValue('subject', rowParams.row.text);
+    } else if (textBlockField === 'DESCRIPTION') {
+      formik.setFieldValue('description', rowParams.row.text);
+    } else if (textBlockField === 'NOTES') {
+      formik.setFieldValue('moreInfo', rowParams.row.text);
+    }
+    setOpenTextBlockDialog(false);
+  };
+
   const alternativeAddress = formik.values.alternativeAddress?.component;
   const beneficiaryAddress = formik.values.beneficiaryAddress?.component;
   const billingAddress = formik.values.billingAddress?.component;
 
+  const {data: propertyOwnerData} =
+    typeof formik.values.propertyOwnerId === 'string'
+      ? useGetCustomer(formik.values.propertyOwnerId)
+      : {data: undefined};
+
+  const {data: serviceOrderData} =
+    typeof formik.values.serviceOrderId === 'string'
+      ? useServiceOrderDetails(formik.values.serviceOrderId)
+      : {data: undefined};
+
   const {data: previousInvoices = [], isLoading: isLoadingPreviousInvoices} =
-    useFetchServiceOrderInvoices(formik.values.serviceOrderId);
+    useFetchServiceOrderInvoices(serviceOrder?.id);
+
   const sortedPreviousInvoices = useMemo(
     () =>
       [...previousInvoices]
@@ -456,8 +555,8 @@ export const InvoiceForm = ({
             new Date(a.meta.createdAt).getTime() -
             new Date(b.meta.createdAt).getTime(),
         )
-        .filter((item) => item.status !== InvoiceStatus.CANCELLED)
-        .map((i) => ({
+        ?.filter((item) => item.status !== InvoiceStatus.CANCELLED)
+        ?.map((i) => ({
           ...i,
           totalAmount: {
             ...i.totalAmount,
@@ -469,19 +568,11 @@ export const InvoiceForm = ({
     [previousInvoices],
   );
 
-  useEffect(() => {
-    formik.setFieldValue(
-      'externalId',
-      formType === 'edit' ? invoice?.externalId : '',
-    );
-    if (formType === 'edit' && invoice?.additionalInfo.paymentTerm) {
-      formik.setFieldValue('paymentTerm', invoice?.additionalInfo.paymentTerm);
-    }
-  }, [invoice]);
-
-  const getFormattedPaymentTerms = (paymentTerm: ContractPaymentTermView) => {
+  const getFormattedPaymentTerms = (
+    paymentTerm: ContractPaymentTermView | ContractTermView,
+  ) => {
     const discountOptions = paymentTerm.data?.discountOptions
-      .map((d) => {
+      ?.map((d) => {
         const discountDays = d.discountDays || 0;
         const discountPercentage = d.discountPercent || 0;
 
@@ -505,91 +596,521 @@ export const InvoiceForm = ({
     };
   };
 
-  const handleSelectCustomer = (row: PropertyOwnerView) => {
-    setCustomer(row);
+  const setCreditNoteArticles = () => {
+    const creditNoteArticle = articleViewToInvoiceItemRecord(
+      creditNoteArticlesResource.data[0],
+    );
+    formik.setFieldValue('items', [
+      {
+        ...creditNoteArticle,
+        unitAmount: {
+          ...creditNoteArticle.unitAmount,
+          netAmount: -Math.abs(invoice?.totalAmount?.netAmount ?? 0),
+          percentageVat: invoice?.totalAmount?.percentageVat ?? 0,
+        },
+      },
+    ]);
+  };
 
-    if (formType === 'new' && row.paymentTerm) {
-      formik.setFieldValue(
-        'paymentTerm',
-        getFormattedPaymentTerms(row.paymentTerm),
-      );
-      if (row.paymentTerm?.data?.dueDays) {
+  useEffect(() => {
+    if (invoice) {
+      if (
+        invoiceType === InvoiceType.CREDIT_NOTE &&
+        !isNewInvoice &&
+        creditNoteArticlesResource.data.length &&
+        [InvoiceType.PARTIAL, InvoiceType.UPFRONT, InvoiceType.FINAL].includes(
+          invoice?.type || InvoiceType.FULL,
+        )
+      ) {
+        setCreditNoteArticles();
+      } else {
         formik.setFieldValue(
-          'dueDate',
-          addDays(new Date(), row.paymentTerm?.data?.dueDays),
+          'items',
+          invoice.items?.map((invoiceItem) =>
+            invoiceItemToInvoiceItemRecord(invoiceItem, formik.values.type),
+          ),
         );
-        setResetDueDatePicker(true);
       }
     }
+  }, [invoice, isLoadingCreditNoteArticles]);
 
-    if (formType === 'edit' && row.paymentTerm && !customer) {
-      formik.setFieldValue(
-        'paymentTerm',
-        getFormattedPaymentTerms(row.paymentTerm),
-      );
+  const prefillFormWithInvoiceData = (invoiceData?: InvoiceView) => {
+    if (!invoiceData) return;
 
-      if (row.paymentTerm?.data?.dueDays) {
-        formik.setFieldValue(
-          'dueDate',
-          addDays(new Date(), row.paymentTerm?.data?.dueDays),
-        );
-        setResetDueDatePicker(true);
-      }
+    const invoiceServiceOrder = invoiceData.serviceOrder;
+    const invoicePropertyOwner = invoiceData.propertyOwner;
+
+    if (invoicePropertyOwner) {
+      formik.setFieldValue('propertyOwnerId', invoicePropertyOwner?.id || '');
     }
 
-    formik.setFieldValue('costCenter', row.additionalInfo.costCenter);
+    if (invoiceServiceOrder) {
+      formik.setFieldValue('serviceOrderId', invoiceServiceOrder?.id ?? '');
+    }
 
-    // If the chosen customer was already set as the property owner of the invoice
-    if (row.id !== invoice?.propertyOwner.id) {
-      const emptyAddressState = {fullName: null};
-      formik.setFieldValue('propertyOwnerId', row.id);
+    formik.setFieldValue(
+      'elevatorExternalId',
+      invoiceData?.additionalInfo.elevatorExternalId ?? '',
+    );
+
+    formik.setFieldValue(
+      'serviceCompanyId',
+      invoice?.serviceCompany.id || user?.userAccount.serviceCompany.id,
+    );
+
+    formik.setFieldValue('subject', invoiceData?.subject ?? '');
+
+    formik.setFieldValue('description', invoiceData?.description ?? '');
+
+    formik.setFieldValue(
+      'includeWorkReport',
+      invoiceData?.additionalInfo.includeWorkReport || false,
+    );
+
+    formik.setFieldValue(
+      'includeCheckList',
+      invoiceData?.additionalInfo.includeCheckList || false,
+    );
+
+    formik.setFieldValue(
+      'beneficialName',
+      invoiceData?.additionalInfo.beneficialDetails?.name || '',
+    );
+
+    formik.setFieldValue(
+      'costCenter',
+      invoiceData?.additionalInfo?.costCenter || '',
+    );
+
+    formik.setFieldValue(
+      'customerSpecificOrderNumber',
+      invoiceData?.additionalInfo?.customerSpecificOrderNumber || '',
+    );
+    formik.setFieldValue(
+      'moreInfo',
+      invoiceData?.additionalInfo?.moreInfo ?? '',
+    );
+
+    formik.setFieldValue(
+      'billingAddress',
+      invoiceData?.additionalInfo?.billingAddress || emptyAddressState,
+    );
+
+    formik.setFieldValue(
+      'beneficiaryAddress',
+      invoiceData?.additionalInfo?.beneficiaryAddress || emptyAddressState,
+    );
+
+    formik.setFieldValue(
+      'alternativeAddress',
+      invoiceData?.additionalInfo.alternativeAddress || emptyAddressState,
+    );
+
+    formik.setFieldValue(
+      'dueDate',
+      invoiceData?.dueDate ? new Date(invoiceData?.dueDate) : undefined,
+    );
+
+    formik.setFieldValue(
+      'deliveryStartDate',
+      invoiceData?.additionalInfo.deliveryStartDate
+        ? new Date(invoiceData?.additionalInfo.deliveryStartDate)
+        : undefined,
+    );
+    formik.setFieldValue(
+      'deliveryEndDate',
+      invoiceData?.additionalInfo.deliveryEndDate
+        ? new Date(invoiceData?.additionalInfo.deliveryEndDate)
+        : undefined,
+    );
+
+    if (invoiceData?.additionalInfo.paymentTerm) {
+      formik.setFieldValue(
+        'paymentTerm',
+        invoiceData.additionalInfo.paymentTerm,
+      );
+    }
+
+    formik.setFieldValue(
+      'type',
+      formik.values.type === InvoiceType.CREDIT_NOTE
+        ? InvoiceType.CREDIT_NOTE
+        : invoiceData?.type || formik.values.type,
+    );
+
+    formik.setFieldValue(
+      'discount',
+      invoiceData?.additionalInfo?.discount
+        ? {
+            ...invoiceData?.additionalInfo?.discount,
+            amount: invoiceData?.additionalInfo?.discount?.amount
+              ? {
+                  ...invoiceData?.additionalInfo?.discount?.amount,
+                  value:
+                    (invoiceData?.additionalInfo?.discount?.amount?.value ??
+                      0) /
+                      10 **
+                        (invoiceData?.additionalInfo?.discount?.amount
+                          ?.fractionDigits ?? 2) || 0,
+                }
+              : undefined,
+          }
+        : undefined,
+    );
+
+    formik.setFieldValue(
+      'showArticleSection',
+      invoiceData?.additionalInfo?.showArticleSection ?? true,
+    );
+
+    formik.setFieldValue('items', invoiceData?.items);
+
+    formik.setFieldValue(
+      'alternativeServiceCompanyInfo',
+      invoiceData?.additionalInfo.alternativeServiceCompanyInfo || {
+        name: user?.userAccount.serviceCompany.name || '',
+        address: user?.userAccount.serviceCompany.billingAddress,
+      },
+    );
+
+    if (isNewInvoice) {
+      formik.setFieldValue('externalId', '');
+      formik.setFieldValue('sentDate', undefined);
+    } else {
+      formik.setFieldValue('externalId', invoiceData.externalId);
+      formik.setFieldValue(
+        'sentDate',
+        invoiceData?.sentDate ? new Date(invoiceData?.sentDate) : undefined,
+      );
+    }
+  };
+
+  const setFormFieldsFromCustomer = (customerData: PropertyOwnerView) => {
+    const invoicePropertyOwner = invoice?.propertyOwner;
+
+    if (invoice && invoicePropertyOwner && pageState === PageState.DUPLICATE) {
       formik.setFieldValue(
         'billingAddress',
-        row.billingAddress || emptyAddressState,
+        invoice.additionalInfo?.billingAddress || emptyAddressState,
       );
       formik.setFieldValue(
         'beneficiaryAddress',
-        row.beneficiaryAddress || emptyAddressState,
+        invoice.additionalInfo?.beneficiaryAddress || emptyAddressState,
       );
       formik.setFieldValue(
         'alternativeAddress',
-        row.otherAddress || emptyAddressState,
+        invoice.additionalInfo?.alternativeAddress || emptyAddressState,
       );
     } else {
-      const invoiceCustomer = invoice?.propertyOwner;
       formik.setFieldValue(
         'billingAddress',
-        invoice?.additionalInfo?.billingAddress ||
-          invoiceCustomer?.billingAddress,
+        customerData.billingAddress || emptyAddressState,
       );
       formik.setFieldValue(
         'beneficiaryAddress',
-        invoice?.additionalInfo?.beneficiaryAddress ||
-          invoiceCustomer?.beneficiaryAddress,
+        customerData.beneficiaryAddress || emptyAddressState,
       );
       formik.setFieldValue(
         'alternativeAddress',
-        invoice?.additionalInfo.alternativeAddress ||
-          invoiceCustomer?.otherAddress,
+        customerData.otherAddress || emptyAddressState,
       );
+
+      formik.setFieldValue(
+        'costCenter',
+        customerData.additionalInfo.costCenter,
+      );
+
+      if (customerData?.paymentTerm) {
+        formik.setFieldValue(
+          'paymentTerm',
+          getFormattedPaymentTerms(customerData?.paymentTerm),
+        );
+      }
+
+      if (customerData.paymentTerm?.data?.dueDays) {
+        formik.setFieldValue(
+          'dueDate',
+          addDays(new Date(), customerData?.paymentTerm?.data?.dueDays),
+        );
+        setResetDueDatePicker(true);
+      }
+    }
+  };
+
+  const setAddressFromLocalStorage = () => {
+    if (initialLocalStorageData && initialLocalStorageData.propertyOwnerId) {
+      formik.setFieldValue(
+        'billingAddress',
+        initialLocalStorageData?.billingAddress,
+      );
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        initialLocalStorageData?.beneficiaryAddress,
+      );
+      formik.setFieldValue(
+        'alternativeAddress',
+        initialLocalStorageData?.alternativeAddress,
+      );
+    } else {
+      setFormFieldsFromCustomer(customer!);
+    }
+
+    setPageState(PageState.FRESH_NEW);
+    setInitialLocalStorageData(null);
+  };
+
+  const setFormFieldsFromServiceOrder = (serviceOrderArg: ServiceOrderView) => {
+    if (!formik.values.propertyOwnerId) {
+      formik.setFieldValue(
+        'propertyOwnerId',
+        serviceOrderArg?.elevator.propertyOwner.id || '',
+      );
+    }
+
+    if (!formik.values.description && serviceOrderArg?.report?.description) {
+      formik.setFieldValue(
+        'description',
+        stripHtmlTags(serviceOrderArg?.report.description),
+      );
+    }
+
+    formik.setFieldValue(
+      'unitNumber',
+      serviceOrderArg?.elevator.externalId || '-',
+    );
+
+    formik.setFieldValue(
+      'elevatorExternalId',
+      serviceOrderArg?.elevator.externalId || '-',
+    );
+
+    formik.setFieldValue(
+      'deliveryStartDate',
+      serviceOrderArg?.actualStartTime
+        ? new Date(serviceOrderArg.actualStartTime)
+        : undefined,
+    );
+
+    formik.setFieldValue(
+      'deliveryEndDate',
+      serviceOrderArg?.actualEndTime
+        ? new Date(serviceOrderArg.actualEndTime)
+        : undefined,
+    );
+
+    if (serviceOrderArg?.additionalInfo.discount) {
+      formik.setFieldValue(
+        'discount',
+        getDiscoutObj(serviceOrderArg?.additionalInfo.discount),
+      );
+    }
+
+    if (!formik.values.items.length) {
+      formik.setFieldValue(
+        'items',
+        serviceOrderArg?.articles?.map(articleViewToItem),
+      );
+    }
+    const dueDays =
+      serviceOrderArg?.contract?.additionalInfo?.invoiceDueDays || 0;
+
+    if (dueDays > 0 && isNewInvoice) {
+      formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
+      setResetDueDatePicker(true);
+    }
+  };
+
+  const initializeFormDataFromLocalStorage = () => {
+    const localStorageData = localStorage.getItem(
+      localStorageFormikInvoiceDataKey,
+    );
+
+    if (!localStorageData) return;
+
+    try {
+      const parsedData = JSON.parse(localStorageData) as InvoiceFormData;
+
+      const normalizeData = (data: any) =>
+        JSON.parse(
+          JSON.stringify(data, (key, value) =>
+            value === null || value === undefined
+              ? ''
+              : typeof value === 'string'
+              ? stripHtmlTags(value).trim()
+              : value,
+          ),
+        );
+      const normalizedParsedData = normalizeData(parsedData);
+      const normalizedFormikValues = normalizeData(formik.values);
+
+      const isDataEqual = isEqual(normalizedParsedData, normalizedFormikValues);
+
+      if (!isDataEqual && !(customerId || orderId)) {
+        setOpenResumeProgressDialog(true);
+      } else {
+        formik.setValues(parsedData);
+      }
+    } catch (error) {
+      console.error('Failed to parse localStorage data:', error);
+    }
+  };
+
+  const restoreFormikFromLocalStorage = () => {
+    if (initialLocalStorageData && !(customerId || orderId)) {
+      try {
+        if (Object.keys(initialLocalStorageData).length !== 0) {
+          formik.setValues({
+            ...initialLocalStorageData,
+            deliveryEndDate: initialLocalStorageData?.deliveryEndDate
+              ? new Date(initialLocalStorageData.deliveryEndDate)
+              : undefined,
+            deliveryStartDate: initialLocalStorageData?.deliveryStartDate
+              ? new Date(initialLocalStorageData.deliveryStartDate)
+              : undefined,
+            sentDate: initialLocalStorageData?.sentDate
+              ? new Date(initialLocalStorageData.sentDate)
+              : undefined,
+            dueDate: initialLocalStorageData?.dueDate
+              ? new Date(initialLocalStorageData.dueDate)
+              : undefined,
+            serviceCompanyId:
+              initialLocalStorageData?.serviceCompanyId ||
+              user?.userAccount.serviceCompany.id!,
+            subject: initialLocalStorageData?.subject || '',
+            description: initialLocalStorageData?.description || '',
+            items: initialLocalStorageData?.items || [],
+            paymentInfo: initialLocalStorageData?.paymentInfo!,
+            propertyOwnerId: initialLocalStorageData?.propertyOwnerId!,
+            shouldSendOut: initialLocalStorageData?.shouldSendOut!,
+            type: initialLocalStorageData.type!,
+            paymentTerm: initialLocalStorageData.paymentTerm,
+          });
+
+          setOpenResumeProgressDialog(false);
+          setPageState(PageState.CONTINUE_FROM_LOCAL_STORAGE);
+        }
+      } catch (error) {
+        console.error('Error restoring form data from localStorage:', error);
+      }
+    }
+  };
+
+  const handleRemoveCustomer = useCallback(() => {
+    setCustomer(undefined);
+    setServiceOrder(undefined);
+    formik.setValues({
+      ...formik.values,
+      billingAddress: emptyAddressState,
+      beneficiaryAddress: emptyAddressState,
+      alternativeAddress: emptyAddressState,
+      serviceOrderId: '',
+      propertyOwnerId: '',
+      costCenter: '',
+      dueDate: undefined,
+      paymentTerm: {term: ''},
+    });
+    if (isNewInvoice) {
+      setInitialLocalStorageData(null);
+      setPageState(PageState.FRESH_NEW);
+    } else if (!isNewInvoice) {
+      setPageState(PageState.CONTINUE_EDIT);
+    }
+  }, [formik]);
+
+  const handleCustomerChange = (newCustomer?: PropertyOwnerView | null) => {
+    if (newCustomer) {
+      formik.setFieldValue('propertyOwnerId', newCustomer.id);
+    } else {
+      handleRemoveCustomer();
     }
   };
 
   const handleSelectServiceOrder = (selectedServiceOrder: ServiceOrderView) => {
-    setServiceOrder(selectedServiceOrder);
-    formik.setFieldValue(
-      'customerSpecificOrderNumber',
-      selectedServiceOrder?.additionalInfo?.purchaseOrderNumber || '',
-    );
+    formik.setFieldValue('serviceOrderId', selectedServiceOrder.id);
+    const serviceOrderCustomer = selectedServiceOrder.elevator.propertyOwner;
+    handleCustomerChange(serviceOrderCustomer);
   };
 
-  const onRemoveServiceOrder = () => {
-    formik.setFieldValue('customerSpecificOrderNumber', '');
-    formik.setFieldValue('description', '');
+  const onRemoveServiceOrder = useCallback(() => {
     setServiceOrder(undefined);
-  };
+    formik.setFieldValue('serviceOrderId', '');
+  }, [formik]);
 
-  const generateSubject = () => {
+  // Handle updates from duplicated invoice and edit mode
+  useEffect(() => {
+    if (isNewInvoice && !initialNewLoadComplete) {
+      if (invoice && invoiceId && pageState === PageState.DUPLICATE) {
+        prefillFormWithInvoiceData(invoice);
+      } else if (initialLocalStorageData && !(customerId || orderId)) {
+        initializeFormDataFromLocalStorage();
+      } else {
+        formik.resetForm();
+      }
+      setInitialNewLoadComplete(true);
+    } else if (!isNewInvoice && !initialLoadComplete) {
+      if (invoice) {
+        prefillFormWithInvoiceData(invoice);
+      }
+      setInitialLoadComplete(true);
+    }
+  }, [initialNewLoadComplete, initialLoadComplete, invoice]);
+
+  useEffect(() => {
+    if (serviceOrder) {
+      formik.setFieldValue('serviceOrderId', serviceOrder.id);
+      setFormFieldsFromServiceOrder(serviceOrder);
+    }
+  }, [serviceOrder]);
+
+  // Handle customer changes in edit mode
+
+  useEffect(() => {
+    if (customer && pageState === PageState.EDIT && !isNewInvoice) {
+      prefillFormWithInvoiceData(invoice);
+    } else if (customer && pageState !== PageState.EDIT && !isNewInvoice) {
+      setFormFieldsFromCustomer(customer);
+    }
+  }, [customer, invoice]);
+
+  useEffect(() => {
+    if (propertyOwnerData) {
+      setCustomer(propertyOwnerData);
+    }
+  }, [propertyOwnerData]);
+
+  useEffect(() => {
+    if (serviceOrderData) {
+      setServiceOrder(serviceOrderData);
+    }
+  }, [serviceOrderData]);
+
+  useEffect(() => {
+    if (customerResource && customerId) {
+      setCustomer(customerResource);
+    }
+  }, [customerResource, customerId]);
+
+  useEffect(() => {
+    if (serviceOrderResource && orderId) {
+      setServiceOrder(serviceOrderResource);
+    }
+  }, [serviceOrderResource, orderId]);
+
+  useEffect(() => {
+    if (pageState === PageState.CONTINUE_FROM_LOCAL_STORAGE && isNewInvoice) {
+      setAddressFromLocalStorage();
+    }
+
+    if (
+      customer &&
+      pageState !== PageState.CONTINUE_FROM_LOCAL_STORAGE &&
+      isNewInvoice
+    ) {
+      setFormFieldsFromCustomer(customer);
+    }
+  }, [customer]);
+
+  const generateSubject = useCallback(() => {
     const firstInvoice = previousInvoices[0];
     const lastInvoice = previousInvoices[previousInvoices.length - 1];
 
@@ -639,228 +1160,65 @@ export const InvoiceForm = ({
       }
     };
 
-    return formType === 'new' ? getTranslatedSubject() : invoice?.subject;
-  };
+    // Handle duplication case with invoiceId
+    if (invoiceId && invoice?.subject) {
+      return invoice.subject;
+    }
+
+    // Handle new and edit cases
+    return invoice?.subject ? invoice?.subject : getTranslatedSubject() || '';
+  }, [invoice, invoiceId, invoiceType, previousInvoices, t]);
 
   useEffect(() => {
-    const subject = generateSubject();
-    formik.setFieldValue('subject', subject);
-  }, [formik.values.type, invoice, customer, serviceOrder]);
+    formik.setFieldValue('subject', generateSubject());
+  }, [formik.values.type]);
 
   useEffect(() => {
-    formik.setFieldValue(
-      'serviceCompanyId',
-      user?.userAccount.serviceCompany.id || '',
-    );
-    formik.setFieldValue(
-      'alternativeServiceCompanyInfo',
-      invoice?.additionalInfo.alternativeServiceCompanyInfo || {
-        name: user?.userAccount.serviceCompany.name || '',
-        address: user?.userAccount.serviceCompany.billingAddress,
-      },
-    );
-  }, [user, invoice]);
+    if (user) {
+      formik.setFieldValue(
+        'serviceCompanyId',
+        user?.userAccount.serviceCompany.id || '',
+      );
+      formik.setFieldValue('alternativeServiceCompanyInfo', {
+        name: user?.userAccount?.serviceCompany?.name || '',
+        address: user?.userAccount?.serviceCompany?.billingAddress,
+      });
+    }
+  }, [user]);
 
-  const setCreditNoteArticles = () => {
-    const creditNoteArticle = articleViewToInvoiceItemRecord(
-      creditNoteArticlesResource.data[0],
-    );
-    formik.setFieldValue('items', [
-      {
-        ...creditNoteArticle,
-        unitAmount: {
-          ...creditNoteArticle.unitAmount,
-          netAmount: -Math.abs(invoice?.totalAmount?.netAmount ?? 0),
-          percentageVat: invoice?.totalAmount?.percentageVat ?? 0,
-        },
-      },
-    ]);
-  };
+  useEffectAfterMount(() => {
+    if (isNewInvoice) {
+      localStorage.setItem(
+        localStorageFormikInvoiceDataKey,
+        JSON.stringify(formik.values),
+      );
+    }
+  }, [formik.values]);
 
   useEffect(() => {
-    if (invoice) {
-      if (
-        invoiceType === InvoiceType.CREDIT_NOTE &&
-        formType === 'new' &&
-        creditNoteArticlesResource.data.length &&
-        [InvoiceType.PARTIAL, InvoiceType.UPFRONT, InvoiceType.FINAL].includes(
-          invoice?.type || InvoiceType.FULL,
-        )
-      ) {
-        setCreditNoteArticles();
+    if (isNewInvoice) {
+      const localStorageData = localStorage.getItem(
+        localStorageFormikInvoiceDataKey,
+      );
+
+      if (localStorageData) {
+        try {
+          const parsedData = JSON.parse(localStorageData);
+
+          if (typeof parsedData === 'object' && parsedData !== null) {
+            setInitialLocalStorageData(parsedData);
+          } else {
+            setInitialLocalStorageData(null);
+          }
+        } catch (error) {
+          console.error('Error parsing localStorage data:', error);
+          setInitialLocalStorageData(null);
+        }
       } else {
-        formik.setFieldValue(
-          'items',
-          invoice.items.map((invoiceItem) =>
-            invoiceItemToInvoiceItemRecord(invoiceItem, formik.values.type),
-          ),
-        );
+        setInitialLocalStorageData(null);
       }
     }
-  }, [invoice, isLoadingCreditNoteArticles]);
-
-  // Set initial values of Invoice Edit Form
-  useEffect(() => {
-    if (invoice) {
-      const invoiceCustomer = invoice.propertyOwner;
-      setServiceOrder(invoice.serviceOrder);
-      setCustomer(invoiceCustomer);
-
-      formik.setFieldValue(
-        'elevatorExternalId',
-        invoice.additionalInfo.elevatorExternalId ?? '',
-      );
-      formik.setFieldValue('description', invoice?.description ?? '');
-      formik.setFieldValue('propertyOwnerId', invoiceCustomer?.id ?? '');
-      formik.setFieldValue(
-        'includeWorkReport',
-        invoice?.additionalInfo.includeWorkReport || false,
-      );
-      formik.setFieldValue(
-        'includeCheckList',
-        invoice?.additionalInfo.includeCheckList || false,
-      );
-      formik.setFieldValue(
-        'beneficialName',
-        invoice?.additionalInfo.beneficialDetails?.name || '',
-      );
-      formik.setFieldValue(
-        'costCenter',
-        invoice?.additionalInfo?.costCenter || '',
-      );
-      formik.setFieldValue(
-        'customerSpecificOrderNumber',
-        invoice?.additionalInfo?.customerSpecificOrderNumber || '',
-      );
-      formik.setFieldValue('moreInfo', invoice?.additionalInfo?.moreInfo ?? '');
-      formik.setFieldValue(
-        'beneficiaryAddress',
-        invoice.additionalInfo?.beneficiaryAddress ||
-          invoiceCustomer?.beneficiaryAddress,
-      );
-      formik.setFieldValue(
-        'alternativeAddress',
-        invoice.additionalInfo.alternativeAddress ||
-          invoiceCustomer?.otherAddress,
-      );
-
-      if (invoice.dueDate) {
-        formik.setFieldValue('dueDate', new Date(invoice.dueDate));
-      }
-      if (invoice.sentDate) {
-        formik.setFieldValue('sentDate', new Date(invoice.sentDate));
-      }
-      if (invoice?.additionalInfo.paymentTerm) {
-        formik.setFieldValue('paymentTerm', invoice.additionalInfo.paymentTerm);
-      }
-      formik.setFieldValue(
-        'type',
-        formik.values.type === InvoiceType.CREDIT_NOTE
-          ? InvoiceType.CREDIT_NOTE
-          : invoice?.type || formik.values.type,
-      );
-      formik.setFieldValue(
-        'discount',
-        invoice?.additionalInfo?.discount
-          ? {
-              ...invoice?.additionalInfo?.discount,
-              amount: invoice?.additionalInfo?.discount?.amount
-                ? {
-                    ...invoice?.additionalInfo?.discount?.amount,
-                    value:
-                      (invoice?.additionalInfo?.discount?.amount?.value ?? 0) /
-                        10 **
-                          (invoice?.additionalInfo?.discount?.amount
-                            ?.fractionDigits ?? 2) || 0,
-                  }
-                : undefined,
-            }
-          : undefined,
-      );
-      formik.setFieldValue(
-        'deliveryStartDate',
-        invoice?.additionalInfo?.deliveryStartDate
-          ? new Date(invoice.additionalInfo.deliveryStartDate)
-          : undefined,
-      );
-      formik.setFieldValue(
-        'deliveryEndDate',
-        invoice?.additionalInfo?.deliveryEndDate
-          ? new Date(invoice.additionalInfo.deliveryEndDate)
-          : undefined,
-      );
-      formik.setFieldValue(
-        'showArticleSection',
-        invoice?.additionalInfo?.showArticleSection ?? true,
-      );
-    }
-  }, [invoice]);
-
-  useEffect(() => {
-    if (serviceOrder) {
-      const serviceOrderCustomer = serviceOrder.elevator.propertyOwner;
-
-      if (!formik.values.description && serviceOrder.report?.description) {
-        formik.setFieldValue('description', serviceOrder.report.description);
-      }
-      formik.setFieldValue(
-        'propertyOwnerId',
-        serviceOrder.elevator.propertyOwner.id,
-      );
-      formik.setFieldValue('serviceOrderId', serviceOrder.id);
-      formik.setFieldValue(
-        'unitNumber',
-        serviceOrder?.elevator.externalId || '-',
-      );
-
-      if (!formik.values.elevatorExternalId) {
-        formik.setFieldValue(
-          'elevatorExternalId',
-          serviceOrder?.elevator.externalId || '-',
-        );
-      }
-      formik.setFieldValue(
-        'deliveryStartDate',
-        serviceOrder?.actualStartTime
-          ? new Date(serviceOrder.actualStartTime)
-          : undefined,
-      );
-      formik.setFieldValue(
-        'deliveryEndDate',
-        serviceOrder?.actualEndTime
-          ? new Date(serviceOrder.actualEndTime)
-          : undefined,
-      );
-      if (serviceOrder?.additionalInfo.discount) {
-        formik.setFieldValue(
-          'discount',
-          getDiscoutObj(
-            invoice?.additionalInfo.discount ||
-              serviceOrder?.additionalInfo.discount,
-          ),
-        );
-      }
-      if (!formik.values.items.length) {
-        formik.setFieldValue(
-          'items',
-          serviceOrder.articles.map(articleViewToItem),
-        );
-      }
-
-      const dueDays =
-        serviceOrder.contract?.additionalInfo?.invoiceDueDays || 0;
-      if (dueDays > 0 && formType === 'new') {
-        formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
-        setResetDueDatePicker(true);
-      }
-
-      setCustomer(serviceOrderCustomer);
-    }
-  }, [serviceOrder]);
-
-  useEffect(() => {
-    formik.setFieldValue('moreInfo', DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT);
-  }, [DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT]);
+  }, []);
 
   const actions = useMemo(() => {
     const items = [];
@@ -882,6 +1240,10 @@ export const InvoiceForm = ({
     }
     return items;
   }, [formik.values.dueDate]);
+
+  const handleDateFieldChange = (fieldName: string, newValue?: Date | null) => {
+    formik.setFieldValue(fieldName, newValue || undefined);
+  };
 
   const isValid = () => {
     const valid =
@@ -964,24 +1326,7 @@ export const InvoiceForm = ({
     formik.setFieldValue('items', invoiceItems);
   };
 
-  const handleCustomerChange = (value?: PropertyOwnerView | null) => {
-    if (value) {
-      handleSelectCustomer(value);
-    } else {
-      setCustomer(undefined);
-      setServiceOrder(undefined);
-      formik.setFieldValue('costCenter', '');
-      formik.setFieldValue('paymentTerm', {term: ''});
-    }
-  };
-
-  const {data: customerDetails} = useGetCustomer(formik.values.propertyOwnerId);
-
-  useEffect(() => {
-    handleCustomerChange(customerDetails);
-  }, [customerDetails]);
-
-  const isEditAndNoCreator = formType === 'edit' && !invoice?.meta.creator;
+  const isEditAndNoCreator = !isNewInvoice && !invoice?.meta.creator;
   const hasInvoiceCreator = invoice?.meta?.creator ?? false;
 
   const createdByName = isEditAndNoCreator
@@ -1002,10 +1347,13 @@ export const InvoiceForm = ({
     ? undefined
     : invoice?.meta?.creator?.photoUrl ?? user?.userAccount.photoUrl;
 
-  const createdBy = {
-    name: createdByName,
-    photoUrl: createdByPhotoUrl,
-  };
+  const createdBy = useMemo(
+    () => ({
+      name: createdByName,
+      photoUrl: createdByPhotoUrl,
+    }),
+    [createdByName, createdByPhotoUrl],
+  );
 
   const notesText = selectedLng === 'DE' ? 'Anmerkungen' : t('Notes');
 
@@ -1045,23 +1393,22 @@ export const InvoiceForm = ({
 
   return (
     <Box>
-      {invoice &&
-        formType !== 'new' &&
-        invoiceType !== InvoiceType.CREDIT_NOTE && (
-          <Box
-            display="flex"
-            alignItems="flex-end"
-            mb={3}
-            mt={1}
-            justifyContent="space-between">
-            <StatusChip
-              label={getInvoiceStatusStyles(invoice?.status ?? '').label}
-              color={getInvoiceStatusStyles(invoice?.status ?? '').color}
-              size="small"
-              variant="filled"
-            />
-          </Box>
-        )}
+      {invoice && !isNewInvoice && invoiceType !== InvoiceType.CREDIT_NOTE && (
+        <Box
+          display="flex"
+          alignItems="flex-end"
+          mb={3}
+          mt={1}
+          justifyContent="space-between">
+          <StatusChip
+            label={getInvoiceStatusStyles(invoice?.status ?? '').label}
+            color={getInvoiceStatusStyles(invoice?.status ?? '').color}
+            size="small"
+            variant="filled"
+          />
+        </Box>
+      )}
+
       <Grid
         container
         columnGap={3}
@@ -1087,7 +1434,7 @@ export const InvoiceForm = ({
                 />
               </Box>
               <Box pb={0.5}>
-                {formType === 'edit' ? (
+                {!isNewInvoice ? (
                   <Notes invoice={invoice!} />
                 ) : (
                   <CreateNotes formik={formik} customer={customer} />
@@ -1317,6 +1664,7 @@ export const InvoiceForm = ({
                   <ServiceOrdersDataGrid
                     setRowItem={handleSelectServiceOrder}
                     selectedCustomer={customer}
+                    propertyOwnerId={customer?.id}
                   />
                 }
               />
@@ -1329,6 +1677,7 @@ export const InvoiceForm = ({
               <SectionTitle Icon={HeaderIllustration} title="Header" />
             </Box>
             <RichTextField
+              name="subject"
               label="Subject"
               html={formik.values.subject || ''}
               updateHtml={(h) => formik.setFieldValue('subject', h)}
@@ -1357,10 +1706,12 @@ export const InvoiceForm = ({
             />
 
             <RichTextField
+              name="description"
               label="Description"
               html={formik.values.description || ''}
               updateHtml={(h) => formik.setFieldValue('description', h)}
               minRows={2}
+              onBlur={formik.handleBlur}
               endAdornment={
                 <InputAdornment
                   component={IconButton}
@@ -1424,10 +1775,12 @@ export const InvoiceForm = ({
             </Box>
 
             <RichTextField
+              name="moreInfo"
               label={notesText}
               html={formik.values.moreInfo || ''}
               updateHtml={(h) => formik.setFieldValue('moreInfo', h)}
               minRows={2}
+              onBlur={formik.handleBlur}
               endAdornment={
                 <InputAdornment
                   component={IconButton}
@@ -1449,6 +1802,7 @@ export const InvoiceForm = ({
             />
 
             <RichTextField
+              name="paymentTerms"
               label="Payment terms"
               html={formik.values.paymentTerm?.term || ''}
               updateHtml={(h) =>
@@ -1458,6 +1812,7 @@ export const InvoiceForm = ({
                 })
               }
               minRows={2}
+              onBlur={formik.handleBlur}
               endAdornment={
                 <InputAdornment
                   component={IconButton}
@@ -1524,16 +1879,25 @@ export const InvoiceForm = ({
               gap={1}
               width="100%">
               <DatePicker
-                defaultDate={formik.values.sentDate}
+                defaultDate={
+                  formik.values.sentDate
+                    ? new Date(formik.values.sentDate)
+                    : undefined
+                }
                 getSelectedDate={(newValue) => {
-                  if (newValue) formik.setFieldValue('sentDate', newValue);
+                  handleDateFieldChange('sentDate', newValue);
                 }}
                 textFieldProps={{
                   label: 'Invoice Date',
+                  ...formik.getFieldProps('sentDate'),
                 }}
               />
               <DatePicker
-                defaultDate={formik.values.dueDate}
+                defaultDate={
+                  formik.values.dueDate
+                    ? new Date(formik.values.dueDate)
+                    : undefined
+                }
                 reset={resetDueDatePicker}
                 getReset={(_reset) => {
                   if (_reset) {
@@ -1543,10 +1907,11 @@ export const InvoiceForm = ({
                 errorMessage={dueDateError}
                 getSelectedDate={(newValue) => {
                   setDueDateError('');
-                  if (newValue) formik.setFieldValue('dueDate', newValue);
+                  handleDateFieldChange('dueDate', newValue);
                 }}
                 textFieldProps={{
                   label: 'Payment Due Date',
+                  ...formik.getFieldProps('dueDate'),
                 }}
                 required
               />
@@ -1560,11 +1925,11 @@ export const InvoiceForm = ({
                 <DatePicker
                   defaultDate={formik.values.deliveryStartDate}
                   getSelectedDate={(newValue) => {
-                    if (newValue)
-                      formik.setFieldValue('deliveryStartDate', newValue);
+                    handleDateFieldChange('deliveryStartDate', newValue);
                   }}
                   textFieldProps={{
                     label: 'Start Date',
+                    ...formik.getFieldProps('deliveryStartDate'),
                     ...(serviceOrder &&
                       !formik.values.deliveryStartDate && {
                         placeholder: t('No Start Date set'),
@@ -1581,11 +1946,11 @@ export const InvoiceForm = ({
                 <DatePicker
                   defaultDate={formik.values.deliveryEndDate}
                   getSelectedDate={(newValue) => {
-                    if (newValue)
-                      formik.setFieldValue('deliveryEndDate', newValue);
+                    handleDateFieldChange('deliveryEndDate', newValue);
                   }}
                   textFieldProps={{
                     label: 'End Date',
+                    ...formik.getFieldProps('deliveryEndDate'),
                     ...(serviceOrder &&
                       !formik.values.deliveryEndDate && {
                         placeholder: t('No End Date set'),
@@ -1605,7 +1970,6 @@ export const InvoiceForm = ({
               <FormInput
                 fieldProps={{
                   id: 'externalId',
-                  name: 'externalId',
                   placeholder: t('Automatically assigned'),
                   label: 'Invoice Number',
                   value: formik.values.externalId,
@@ -1614,8 +1978,7 @@ export const InvoiceForm = ({
                   error: !!(
                     formik.touched.externalId && formik.errors.externalId
                   ),
-                  helperText:
-                    formik.touched.externalId && formik.errors.externalId,
+                  helperText: formik.errors.externalId,
                 }}
               />
             </Box>
@@ -1726,15 +2089,15 @@ export const InvoiceForm = ({
                           (!previousInvoices.filter(
                             (item) => item.status !== InvoiceStatus.CANCELLED,
                           ).length &&
-                            formType === 'new') ||
+                            isNewInvoice) ||
                           (previousInvoices.filter(
                             (item) => item.status !== InvoiceStatus.CANCELLED,
                           ).length === 1 &&
-                            formType === 'edit') ||
+                            !isNewInvoice) ||
                           (!previousInvoices.filter(
                             (item) => item.status !== InvoiceStatus.CANCELLED,
                           ).length &&
-                            formType === 'edit')
+                            !isNewInvoice)
                             ? false
                             : key !==
                               sortedPreviousInvoices?.[0]?.additionalInfo
@@ -1802,7 +2165,7 @@ export const InvoiceForm = ({
       </Grid>
       <BottomDrawer
         isOpen={isDrawerOpen}
-        isSaving={isUpdating || isCreating}
+        isSaving={isCreating || isUpdating}
         primaryButtonLabel={t('Save')}
         primaryButtonAction={formik.handleSubmit}
         listItems={actions.map((item) => ({
@@ -1923,6 +2286,18 @@ export const InvoiceForm = ({
           onCloseSubDialogs={onCloseSubDialogs}
         />
       )}
+
+      <ConfirmCancel
+        open={openCancelDialog}
+        onConfirm={onCancel}
+        onClose={() => setOpenCancelDialog(false)}
+      />
+
+      <ResumeProgress
+        open={openResumeProgressDialog}
+        onConfirm={restoreFormikFromLocalStorage}
+        onClose={resetLocalStorage}
+      />
     </Box>
   );
 };

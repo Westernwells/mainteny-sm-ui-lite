@@ -105,7 +105,7 @@ export const formatInvoiceRecord = (
   paymentTerm: value.paymentTerm,
   propertyOwnerId: value.propertyOwnerId,
   serviceCompanyId: value.serviceCompanyId,
-  serviceOrderId: value.serviceOrderId,
+  serviceOrderId: value.serviceOrderId || null,
   paymentInfo: value.paymentInfo,
   shouldSendOut: value.shouldSendOut,
   includeWorkReport: value.includeWorkReport,

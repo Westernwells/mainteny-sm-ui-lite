@@ -408,7 +408,7 @@ export interface CreateInvoice {
 }
 
 export interface UpdateInvoice {
-  serviceOrderId?: string;
+  serviceOrderId?: string | null;
   propertyOwnerId?: string;
   externalId?: string;
   subject?: string;

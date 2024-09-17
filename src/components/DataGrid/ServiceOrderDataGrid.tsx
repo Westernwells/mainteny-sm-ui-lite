@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {endOfYear, startOfYear} from 'date-fns';
 import Box from '@mui/material/Box';
@@ -21,6 +21,7 @@ import {
 import {EmptySection} from 'components/EmptySection';
 import {useTranslation} from 'react-i18next';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import {debounce, isEqual} from 'lodash';
 import {styles} from './style';
 import {Order} from '../../models/pagination';
 
@@ -28,6 +29,7 @@ interface Props {
   setRowItem: (row: ServiceOrderView) => void;
   selectedCustomer?: PropertyOwnerView | PropertyOwnerSimpleView;
   elevatorId?: string;
+  propertyOwnerId?: string;
 }
 
 export const columns: GridColDef[] = [
@@ -94,6 +96,7 @@ export const ServiceOrdersDataGrid = ({
   setRowItem,
   elevatorId,
   selectedCustomer,
+  propertyOwnerId,
 }: Props) => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
@@ -114,24 +117,32 @@ export const ServiceOrdersDataGrid = ({
       end: endOfYear(new Date()).toISOString(),
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
-      query: search,
+      query: encodeURIComponent(search),
       order: Order.DESC,
       orderBy: ServiceOrderOrderField.CREATED_TIME,
+      ...(propertyOwnerId ? {propertyOwnerId} : {}),
     },
     {keepPreviousData: true},
   );
 
   useEffect(() => {
-    setPageCount(Math.ceil(serviceOrdersResource.total / page.pageSize));
-  }, [serviceOrdersResource, page.pageSize]);
+    const totalPages = Math.ceil(serviceOrdersResource.total / page.pageSize);
+    setPageCount(totalPages);
+  }, [serviceOrdersResource.total, page.pageSize]);
 
   useEffect(() => {
-    if (serviceOrdersResource.data.length) {
-      setRows(makeRows(serviceOrdersResource.data));
-    } else {
-      setRows([]);
+    const newRows = makeRows(serviceOrdersResource.data);
+    if (!isEqual(newRows, rows)) {
+      setRows(newRows);
     }
-  }, [serviceOrdersResource]);
+  }, [serviceOrdersResource.data]);
+
+  const handleSearchChange = useCallback(
+    debounce((value: string) => {
+      setSearch(value);
+    }, 300),
+    [],
+  );
 
   return (
     <>
@@ -139,7 +150,7 @@ export const ServiceOrdersDataGrid = ({
         variant="outlined"
         label="Search"
         placeholder="Search by number, customer, status etc."
-        onValueChanged={(value) => setSearch(value)}
+        onValueChanged={handleSearchChange}
       />
       <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
         <DataGridLayout
