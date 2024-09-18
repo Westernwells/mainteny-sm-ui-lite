@@ -64,14 +64,15 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
     }
   };
 
-  const discountOptions = customer?.paymentTerm?.data?.discountOptions.map(
-    (o) =>
+  const discountOptions =
+    customer?.paymentTerm?.data?.discountOptions?.map((o) =>
       o.discountDays === 0 && o.discountPercent === 0
         ? ''
         : `${o.discountDays} ${t('days')}; ${o.discountPercent}% ${t(
             'discount',
           )}; ${t(convertToText(o.articleType))}`,
-  );
+    ) ?? [];
+
   const formattedDiscountOptions = discountOptions?.join('\n');
   const paymentTerm = `${customer?.paymentTerm?.term}\n${formattedDiscountOptions}`;
 
