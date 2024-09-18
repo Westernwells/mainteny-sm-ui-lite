@@ -47,9 +47,24 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             icon={<LocalLibrary sx={{color: theme.palette.info.main}} />}
             label={t('Called By').toLocaleUpperCase()}
             bodyText={
-              <Typography variant="body2">
-                {serviceOrderDetails.additionalInfo.callerInfo?.name || '-'}
-              </Typography>
+              <Box>
+                <Typography variant="body2">
+                  {serviceOrderDetails.additionalInfo.callerInfo?.name || '-'}
+                </Typography>
+                {!!serviceOrderDetails.additionalInfo.callerInfo?.calledAt && (
+                  <Typography
+                    variant="body2"
+                    sx={{paddingTop: '0.2em'}}
+                    color={theme.palette.text.secondary}>
+                    {formatDate(
+                      toDate(
+                        serviceOrderDetails.additionalInfo.callerInfo?.calledAt,
+                      ),
+                      'HH:mm',
+                    )}
+                  </Typography>
+                )}
+              </Box>
             }
             iconBackground={theme.palette.info.outlinedHoverBg}
             containerStyles={{mt: '0.5em'}}
