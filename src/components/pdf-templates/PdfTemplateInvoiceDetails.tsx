@@ -1,6 +1,7 @@
 import {Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {formatDate} from 'utils/datetime';
 import {InvoiceType, InvoiceView} from 'models/invoice';
+import {useMemo} from 'react';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -114,6 +115,16 @@ const PdfTemplateInvoiceDetails = ({
       : formatDate(new Date());
   };
 
+  const elevatorExternalId = useMemo(
+    () =>
+      invoice?.additionalInfo.elevatorExternalId ||
+      invoice?.serviceOrder?.elevator.externalId,
+    [
+      invoice?.additionalInfo.elevatorExternalId,
+      invoice?.serviceOrder?.elevator.externalId,
+    ],
+  );
+
   return (
     <View style={styles.rightAddress}>
       {(invoice?.externalId || nextCompanyExternalId) && (
@@ -209,12 +220,10 @@ const PdfTemplateInvoiceDetails = ({
       )}
 
       <View style={{marginTop: 20}}>
-        {invoice?.additionalInfo.elevatorExternalId && (
+        {elevatorExternalId && (
           <View style={styles.rightAddressContent}>
             <Text style={styles.tag}>{translate('Unit no.')}</Text>
-            <Text style={styles.tagContent}>
-              {invoice?.additionalInfo.elevatorExternalId}
-            </Text>
+            <Text style={styles.tagContent}>{elevatorExternalId}</Text>
           </View>
         )}
 
