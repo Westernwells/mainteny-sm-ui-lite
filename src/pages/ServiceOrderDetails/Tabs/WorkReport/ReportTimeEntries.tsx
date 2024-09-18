@@ -25,7 +25,7 @@ import {
 } from 'utils/work-hours-utils';
 import {addDateToTime, addTimeToDate} from 'utils/utils';
 import _ from 'lodash';
-import {addDays, isSameDay, startOfDay, subDays} from 'date-fns';
+import {addDays, startOfDay, subDays} from 'date-fns';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
@@ -135,17 +135,6 @@ const ReportTimeEntries = ({
                 );
               }}
               resetValue={new Date(slot.startTime)}
-              shouldDisableDate={(tDate) =>
-                timeInfo.timeSlots.some((d) => {
-                  const slotDateToCompare = new Date(d.startTime);
-
-                  if (isSameDay(date, slotDateToCompare)) {
-                    return false;
-                  }
-
-                  return isSameDay(slotDateToCompare, tDate);
-                })
-              }
               textFieldProps={{
                 name: 'date',
                 label: '',
