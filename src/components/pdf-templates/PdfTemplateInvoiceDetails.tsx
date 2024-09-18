@@ -111,7 +111,7 @@ const PdfTemplateInvoiceDetails = ({
 
     return invoice?.sentDate
       ? formatDate(invoice?.sentDate)
-      : formatDate(invoice?.meta.createdAt) || '-';
+      : formatDate(new Date());
   };
 
   return (
