@@ -2,7 +2,7 @@ import {View, Font, Text, StyleSheet} from '@react-pdf/renderer';
 import {InvoiceView, InvoiceType} from 'models/invoice';
 import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {formatDate, toDate} from 'utils/datetime';
-import {Currency} from 'models/misc';
+import {Currency, State} from 'models/misc';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -148,7 +148,11 @@ export const PdfPaymentHistorySection = ({
           </View>
 
           {previousInvoices?.map((i) => {
-            if (!i.payments.length) {
+            if (
+              !i.payments?.filter(
+                (payment) => payment.meta.state === State.ACTIVE,
+              ).length
+            ) {
               return null;
             }
 
@@ -156,6 +160,7 @@ export const PdfPaymentHistorySection = ({
 
             const totalPriceInclVat = Math.abs(
               i.payments
+                ?.filter((payment) => payment.meta.state === State.ACTIVE)
                 .map(
                   (p) =>
                     (p.amount?.value ?? 0) /
