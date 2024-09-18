@@ -48,6 +48,7 @@ type Props = {
   footerPath: string;
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
+  showCurrentDateAsInvoiceDate?: boolean;
 };
 
 Font.register({
@@ -175,6 +176,7 @@ const PartialInvoicePdfTemplate = ({
   footerPath,
   nextCompanyExternalId,
   qrImageSrc,
+  showCurrentDateAsInvoiceDate,
 }: Props) => {
   const hasPreviousInvoices = previousInvoices!.length > 0;
   const firstInvoiceType = previousInvoices?.[0]?.type ?? null;
@@ -319,6 +321,7 @@ const PartialInvoicePdfTemplate = ({
               invoice={invoice}
               selectedLng={selectedLng}
               nextCompanyExternalId={nextCompanyExternalId}
+              showCurrentDateAsInvoiceDate={showCurrentDateAsInvoiceDate}
             />
           </TopSectionContainer>
 

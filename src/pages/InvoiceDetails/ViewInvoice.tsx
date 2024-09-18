@@ -496,12 +496,14 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     footerBlockUrl,
     invoiceNumber,
     setInState = true,
+    showCurrentDateAsInvoiceDate = false,
   }: {
     invoiceData: InvoiceView;
     headerBlockUrl: {[key: string]: string};
     footerBlockUrl: {[key: string]: string};
     invoiceNumber?: string;
     setInState?: boolean;
+    showCurrentDateAsInvoiceDate?: boolean;
   }) => {
     if (
       user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
@@ -554,6 +556,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         headerInfo={headerInfo}
         footerPath={footerBlockUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        showCurrentDateAsInvoiceDate={showCurrentDateAsInvoiceDate}
         nextCompanyExternalId={
           invoiceNumber || translate('Automatically assigned')
         }
@@ -647,6 +650,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             footerBlockUrl: footerUrl,
             invoiceNumber: companyNextNumber?.value,
             setInState: false,
+            showCurrentDateAsInvoiceDate: true,
           }).then((blobFile) =>
             createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
           )) || Promise.resolve([]);
