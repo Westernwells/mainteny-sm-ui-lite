@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
@@ -27,10 +27,13 @@ import {
   useInvoicesXero,
   useInvoicesSage50,
   useInvoicesDf2,
+  useInvoicesPdfUrls,
 } from 'hooks/reactQuery/useAnalytics';
 import {convertToText} from 'utils/utils';
 import {toRestDate} from 'utils/datetime';
 import {FormCheckbox} from 'components/form/FormCheckbox';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {downloadAndZipFiles} from 'utils/download';
 
 const validationSchema = Yup.object().shape({
   reportType: Yup.string()
@@ -102,10 +105,39 @@ export const Reports = () => {
   const getInvoicesXLSX = useInvoicesXLSX(serviceCompanyId, reportParams);
   const getInvoicesSage50 = useInvoicesSage50(serviceCompanyId, reportParams);
   const getInvoicesDf2 = useInvoicesDf2(serviceCompanyId, reportParams);
+  const getInvoicesPdfPaths = useInvoicesPdfUrls(
+    serviceCompanyId,
+    reportParams,
+  );
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [pdfPaths, setPdfPaths] = useState<string[]>([]);
+  const {refetch: refetchDownloadUrl} = useDownloadUrl(pdfPaths || []);
+
+  useEffect(() => {
+    const downloadFiles = async () => {
+      const downloadUrlsResult = await refetchDownloadUrl();
+      const pdfUrlsArray = Object.entries(downloadUrlsResult?.data || {});
+
+      if (pdfUrlsArray.length) {
+        await downloadAndZipFiles(pdfUrlsArray, 'invoice_pdfs');
+        setPdfPaths([]);
+      }
+    };
+
+    if (
+      (formik.values.formatType === FormatType.DATEV_WITH_PDF ||
+        formik.values.formatType === FormatType.EXCEL_WITH_PDF) &&
+      pdfPaths.length
+    ) {
+      downloadFiles();
+    }
+  }, [pdfPaths]);
+
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     const {formatType, reportType} = formik.values;
+
     if (reportType === ReportType.WORK_HOURS) {
       if (formatType === FormatType.CSV)
         return getEmployeeWorkingHoursCSV.refetch();
@@ -117,6 +149,19 @@ export const Reports = () => {
       if (formatType === FormatType.EXCEL) return getInvoicesXLSX.refetch();
       if (formatType === FormatType.SAGE50) return getInvoicesSage50.refetch();
       if (formatType === FormatType.DF2) return getInvoicesDf2.refetch();
+      if (
+        formatType === FormatType.DATEV_WITH_PDF ||
+        formatType === FormatType.EXCEL_WITH_PDF
+      ) {
+        if (formatType === FormatType.EXCEL_WITH_PDF) {
+          await getInvoicesXLSX.refetch();
+        } else if (formatType === FormatType.DATEV_WITH_PDF) {
+          await getInvoicesDatev.refetch();
+        }
+
+        const files = await getInvoicesPdfPaths.refetch();
+        setPdfPaths(files.data);
+      }
     }
   };
 
@@ -125,7 +170,10 @@ export const Reports = () => {
     getEmployeeWorkingHoursXLSX.isFetching ||
     getInvoicesDatev.isFetching ||
     getInvoicesXero.isFetching ||
-    getInvoicesXLSX.isFetching;
+    getInvoicesXLSX.isFetching ||
+    getInvoicesDf2.isFetching ||
+    getInvoicesSage50.isFetching ||
+    getInvoicesPdfPaths.isFetching;
 
   const renderReportType = (option: Option, index: number) => {
     const selected = formik.values.reportType === option.value;
@@ -204,6 +252,14 @@ export const Reports = () => {
         {
           label: FormatType.EXCEL,
           value: FormatType.EXCEL,
+        },
+        {
+          label: FormatType.DATEV_WITH_PDF,
+          value: FormatType.DATEV_WITH_PDF,
+        },
+        {
+          label: FormatType.EXCEL_WITH_PDF,
+          value: FormatType.EXCEL_WITH_PDF,
         },
         {
           label: FormatType.SAGE50,

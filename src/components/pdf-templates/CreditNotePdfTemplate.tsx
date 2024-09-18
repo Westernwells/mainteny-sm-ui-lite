@@ -132,6 +132,7 @@ type Props = {
   footerPath: string;
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
+  showCurrentDateAsInvoiceDate?: boolean;
 };
 
 const CreditNotePdfTemplate = ({
@@ -146,6 +147,7 @@ const CreditNotePdfTemplate = ({
   footerPath,
   nextCompanyExternalId,
   qrImageSrc,
+  showCurrentDateAsInvoiceDate,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -269,6 +271,7 @@ const CreditNotePdfTemplate = ({
               invoice={invoice}
               selectedLng={selectedLng}
               nextCompanyExternalId={nextCompanyExternalId}
+              showCurrentDateAsInvoiceDate={showCurrentDateAsInvoiceDate}
             />
           </TopSectionContainer>
 

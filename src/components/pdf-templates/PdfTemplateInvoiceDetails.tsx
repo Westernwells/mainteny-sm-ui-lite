@@ -67,6 +67,7 @@ type Props = {
   invoice?: InvoiceView;
   selectedLng?: string;
   nextCompanyExternalId?: string;
+  showCurrentDateAsInvoiceDate?: boolean;
 };
 
 const PdfTemplateInvoiceDetails = ({
@@ -74,6 +75,7 @@ const PdfTemplateInvoiceDetails = ({
   invoice,
   selectedLng,
   nextCompanyExternalId,
+  showCurrentDateAsInvoiceDate,
 }: Props) => {
   const startDate = invoice?.additionalInfo.deliveryStartDate;
   const endDate = invoice?.additionalInfo.deliveryEndDate;
@@ -103,6 +105,15 @@ const PdfTemplateInvoiceDetails = ({
   };
 
   const styles = getStyles(boldFontStyle, regularFontStyle);
+
+  const getInvoiceDate = () => {
+    if (showCurrentDateAsInvoiceDate) return formatDate(new Date());
+
+    return invoice?.sentDate
+      ? formatDate(invoice?.sentDate)
+      : formatDate(new Date());
+  };
+
   return (
     <View style={styles.rightAddress}>
       {(invoice?.externalId || nextCompanyExternalId) && (
@@ -116,11 +127,7 @@ const PdfTemplateInvoiceDetails = ({
 
       <View style={styles.rightAddressContent}>
         <Text style={styles.tag}>{translate('Invoice date')}</Text>
-        <Text style={styles.tagContent}>
-          {invoice?.sentDate
-            ? formatDate(invoice?.sentDate)
-            : formatDate(invoice?.meta.createdAt) || '-'}
-        </Text>
+        <Text style={styles.tagContent}>{getInvoiceDate()}</Text>
       </View>
 
       {invoice?.type === InvoiceType.CREDIT_NOTE && (

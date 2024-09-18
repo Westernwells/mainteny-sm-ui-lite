@@ -288,3 +288,21 @@ export const getDatePickerLocale = (language?: Language) => {
       return datePickerLocales.enUS;
   }
 };
+
+export const fromDateStringToDate = (
+  dateString: string,
+  companyDateFormat?: string,
+) => {
+  if (companyDateFormat === 'dd/MM/yyyy') {
+    const [day, month, year] = dateString.split('/').map(Number);
+
+    return new Date(year, month - 1, day); // Month is 0-indexed
+  }
+
+  if (companyDateFormat === 'dd.MM.yyyy') {
+    const [day, month, year] = dateString.split('.').map(Number);
+    return new Date(year, month - 1, day); // Month is 0-indexed
+  }
+
+  return new Date(dateString);
+};
