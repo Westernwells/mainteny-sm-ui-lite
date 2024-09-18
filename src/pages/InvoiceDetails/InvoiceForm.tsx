@@ -376,7 +376,12 @@ export const InvoiceForm = ({
         invoiceType in InvoiceType
           ? InvoiceType[invoiceType]
           : InvoiceType.FULL,
-      items: [],
+      items:
+        !isNewInvoice && invoice
+          ? invoice?.items?.map((item) =>
+              invoiceItemToInvoiceItemRecord(item, invoice.type),
+            )
+          : [],
       paymentTerm:
         (!isNewInvoice && {
           ...invoice?.additionalInfo.paymentTerm,
@@ -763,7 +768,12 @@ export const InvoiceForm = ({
       invoiceData?.additionalInfo?.showArticleSection ?? true,
     );
 
-    formik.setFieldValue('items', invoiceData?.items);
+    formik.setFieldValue(
+      'items',
+      invoiceData?.items?.map((item) =>
+        invoiceItemToInvoiceItemRecord(item, invoiceData.type),
+      ),
+    );
 
     formik.setFieldValue(
       'alternativeServiceCompanyInfo',
