@@ -576,14 +576,14 @@ export const InvoiceForm = ({
         const discountDays = d.discountDays || 0;
         const discountPercentage = d.discountPercent || 0;
 
-        if (discountDays === 0 && discountPercentage === 0) {
-          return ''; // Return empty string if no valid discount
+        if (discountDays > 0 && discountPercentage > 0) {
+          return t(
+            `If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}`,
+            {discountPercentage, lng: companyLanguage},
+          );
         }
 
-        return t(
-          `If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}`,
-          {discountPercentage, lng: companyLanguage},
-        );
+        return '';
       })
       .filter((option) => option !== '') // Filter out empty strings
       .join('\n');
@@ -1263,12 +1263,14 @@ export const InvoiceForm = ({
     const paymentTermObj = contractPaymentTerms?.data.find(
       ({id}) => id === paymentTermId,
     );
+
     if (paymentTermObj) {
       formik.setFieldValue(
         'paymentTerm',
         getFormattedPaymentTerms(paymentTermObj),
       );
     }
+
     if (paymentTermObj?.data?.dueDays) {
       formik.setFieldValue(
         'dueDate',
@@ -1276,6 +1278,7 @@ export const InvoiceForm = ({
       );
       setResetDueDatePicker(true);
     }
+
     if (paymentTermId) {
       setOpenContractPaymentTermsDialog(false);
     }

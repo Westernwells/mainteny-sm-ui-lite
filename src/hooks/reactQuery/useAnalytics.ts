@@ -53,7 +53,6 @@ export const useEmployeeWorkingHoursCSV = (params: QueryWorkingHours) => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
       enabled: false,
@@ -90,7 +89,6 @@ export const useEmployeeWorkingHoursXLSX = (params: QueryWorkingHours) => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
       enabled: false,
@@ -133,7 +131,6 @@ export const useInvoicesDatev = (
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
       enabled: false,
@@ -176,7 +173,6 @@ export const useInvoicesXero = (
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
       enabled: false,
@@ -220,7 +216,6 @@ export const useInvoicesXLSX = (
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
       enabled: false,
@@ -263,7 +258,6 @@ export const useInvoicesSage50 = (
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
       enabled: false,
@@ -306,7 +300,6 @@ export const useInvoicesDf2 = (
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
       enabled: false,
@@ -339,6 +332,45 @@ export const useSyncStatusXero = (
     {
       enabled: !!user && !!params.serviceCompanyId && !!xeroInfoData?.enabled,
       ...options,
+    },
+  );
+};
+
+export const fetchInvoicesPdfUrls = async (
+  serviceCompanyId: string,
+  params: QueryFinancials,
+) => {
+  const response = await axiosClient.get(
+    `/api/serviceCompanies/${serviceCompanyId}/invoice/pdfPaths`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export const useInvoicesPdfUrls = (
+  serviceCompanyId: string,
+  params: QueryFinancials,
+) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useQuery(
+    [serviceCompanyId, params],
+    () => fetchInvoicesPdfUrls(serviceCompanyId, params),
+    {
+      onSuccess: (response) => {
+        if (response.length) {
+          enqueueSnackbar('PDF Documents downloaded successfully!', {
+            variant: 'success',
+          });
+        }
+      },
+      onError: (err) => {
+        showError(err);
+      },
+      enabled: false,
     },
   );
 };
