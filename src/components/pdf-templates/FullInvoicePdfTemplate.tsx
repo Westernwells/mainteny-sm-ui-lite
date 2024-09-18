@@ -163,6 +163,7 @@ type Props = {
   footerPath: string;
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
+  showCurrentDateAsInvoiceDate?: boolean;
 };
 
 const FullInvoicePdfTemplate = ({
@@ -177,6 +178,7 @@ const FullInvoicePdfTemplate = ({
   footerPath,
   nextCompanyExternalId,
   qrImageSrc,
+  showCurrentDateAsInvoiceDate,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -305,6 +307,7 @@ const FullInvoicePdfTemplate = ({
               invoice={invoice}
               selectedLng={selectedLng}
               nextCompanyExternalId={nextCompanyExternalId}
+              showCurrentDateAsInvoiceDate={showCurrentDateAsInvoiceDate}
             />
           </TopSectionContainer>
 
