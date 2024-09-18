@@ -5,6 +5,8 @@ import {Typography} from '@mui/material';
 import {Tooltip} from 'components/Tooltip';
 import {Props as OrderDetailsProps} from 'components/OrderDetails';
 import {ServiceOrderView} from 'models/service-order';
+import {removePx} from 'utils/utils';
+import {getViewportWidth} from 'utils/viewport';
 
 interface Props {
   children?: ReactElement;
@@ -37,6 +39,11 @@ export const ScheduleItem = ({
   const [show, setShow] = useState(false);
   const theme = useTheme();
   const close = () => setShow(false);
+
+  const isWidthBig = removePx(width)
+    ? (removePx(width) as number) > getViewportWidth(40)
+    : true;
+
   return (
     <Box
       {...rest}
@@ -85,8 +92,8 @@ export const ScheduleItem = ({
               padding: '1rem',
               boxShadow: '0px 4px 9px rgba(0, 0, 0, 0.09)',
               maxWidth: '14.25rem',
-              marginRight: '33vw',
-              marginLeft: '14vw',
+              marginRight: isWidthBig ? '33vw' : 0,
+              marginLeft: isWidthBig ? '14vw' : 0,
             },
           },
         }}>

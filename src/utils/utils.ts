@@ -605,3 +605,11 @@ export const fileListToFiles = (fileList: FileList | null) => {
 export function removeHtmlTags(str: string) {
   return str.replace(/<\/?[^>]+(>|$)/g, '');
 }
+
+export const removePx = (size?: string) => {
+  if (!size) return size;
+
+  const parts = size.split('px');
+
+  return Number(parts[0]);
+};
