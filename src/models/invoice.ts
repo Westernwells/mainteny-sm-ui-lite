@@ -45,16 +45,14 @@ export enum InvoiceStatusView {
 }
 
 export interface InvoiceItem {
-  totalAmount: Amount;
-  article?: ArticleView;
-  data: string;
-  description: string;
   id: string;
   invoiceId: string;
   articleId?: string;
+  article?: ArticleView;
   name: string;
-  quantity: number;
   unitAmount: Amount;
+  quantity: number;
+  description: string;
   additionalInfo?: {
     discount?: Discount;
     payment?: InvoiceItemPaymentRecord;
