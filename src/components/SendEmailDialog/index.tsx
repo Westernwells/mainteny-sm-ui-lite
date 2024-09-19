@@ -24,6 +24,7 @@ import {IconButton, InputAdornment} from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import RichTextEditor from 'components/RichTextEditor';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
+import {useFetchCompanyEmailConfig} from 'hooks/reactQuery/useEmail';
 import {Order} from '../../models/pagination';
 
 interface Props {
@@ -71,6 +72,7 @@ export const SendEmailDialog = ({
   const publish = submitHook?.();
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id || '';
+  const {data: bccMails} = useFetchCompanyEmailConfig();
 
   const [emailInputValue, setEmailInputValue] = useState('');
   const [ccEmailsInputValue, setCcEmailsInputValue] = useState('');
@@ -86,6 +88,7 @@ export const SendEmailDialog = ({
     reset,
     watch,
     setValue,
+    getValues,
   } = useForm<EmailRecord>({
     defaultValues: {
       email: email || '',
@@ -93,7 +96,12 @@ export const SendEmailDialog = ({
       content: content || '',
       emails: email ? [email] : [],
       ccEmails: [],
-      bccEmails: [],
+      bccEmails:
+        bccMails?.bccEmails && bccMails.bccEmails.length > 0
+          ? bccMails.bccEmails
+          : user?.userAccount.contact.email
+          ? [user?.userAccount.contact.email]
+          : [],
       attachments: [],
     },
   });
@@ -150,7 +158,7 @@ export const SendEmailDialog = ({
       handleResetForm();
     }
   };
-
+  const bccEmails = getValues('bccEmails');
   return (
     <Dialog
       open={open || false}
@@ -368,6 +376,14 @@ export const SendEmailDialog = ({
                   label: 'userAccount.contact.email',
                   value: 'userAccount.contact.email',
                 }}
+                initialValues={
+                  bccEmails
+                    ? bccEmails?.map((mails) => ({
+                        label: mails,
+                        value: mails,
+                      }))
+                    : []
+                }
                 searchableKeys={[
                   'userAccount.contact.email',
                   'userAccount.lastName',
