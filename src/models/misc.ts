@@ -374,3 +374,7 @@ export interface HeaderFooterInfoData {
 }
 
 export type CreateEditMode = 'create' | 'edit';
+
+export type EmailObject = {
+  bccEmails: string[];
+};

@@ -97,4 +97,6 @@ export const queryKeys = {
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',
+  // Fetching config emails
+  fetchCompanyEmailConfig: 'fetchCompanyEmailConfig',
 };
