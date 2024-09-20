@@ -97,13 +97,13 @@ import {ServiceCompanyNumberType} from 'models/service-company';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
-import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import DOMPurify from 'dompurify';
 // eslint-disable-next-line import/no-unresolved
 import {SwissQRBill} from 'swissqrbill/svg';
 import _, {debounce} from 'lodash';
+import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -425,56 +425,87 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     (r) => r.externalId === report?.externalId,
   );
 
-  const signatureKeys = getSignatureKeys(
-    serviceOrder!,
-    report,
-    serviceCompanyId,
-  );
+  const allReportSignature =
+    serviceOrder?.reports?.map((item) => item.signatures).flat() ?? [];
 
-  const {data: downloadUrls = {}} = useDownloadUrl(
-    report?.signatures?.map((item) => item.fileResource.uri) ?? [],
-    {enabled: !!report?.signatures?.length},
-  );
-
-  const {data: imageDownloadUrls = {}} = useDownloadUrl(
-    report?.attachments?.map((item) => item.fileResource.uri) ?? [],
-    {enabled: true},
-  );
-
-  const schedule = invoice?.serviceOrder?.schedules.find(
-    (s) => s.technician.id === report?.technicianId,
-  );
-
-  const technicianSignatureImage = useFetchAndConvertImage(
-    downloadUrls[signatureKeys.TECHNICIAN],
-  );
-
-  const customerSignatureImage = useFetchAndConvertImage(
-    downloadUrls[signatureKeys.CUSTOMER],
-  );
-
-  const {convertedImages} = useFetchAndConvertMultipleImages(
-    imageDownloadUrls,
-    report?.attachments,
-  );
-
-  const {refetch: refetchWorkReportDownloadUrl} = useDownloadUrl(
-    report?.additionalInfo.pdfPath ? [report?.additionalInfo.pdfPath] : [],
+  const {data: downloadUrls = {}, refetch: fetchDownloadUrls} = useDownloadUrl(
+    allReportSignature.map((item) => item.fileResource.uri) ?? [],
     {enabled: false},
   );
 
-  const generateWorkReportBlob = async () => {
+  const allReportsAttachments =
+    serviceOrder?.reports?.map((item) => item.attachments.flat()).flat() ?? [];
+  const {data: imageDownloadUrls = {}, refetch: refetchImageDownloadUrls} =
+    useDownloadUrl(
+      allReportsAttachments.map((item) => item.fileResource.uri),
+      {
+        enabled: false,
+      },
+    );
+
+  const {refetch: refetchConvertedImages} = useMultiImagesURLToBase64(
+    imageDownloadUrls,
+    {enabled: false},
+  );
+  const {refetch: refetchSignatureConvertedImages} = useMultiImagesURLToBase64(
+    downloadUrls,
+    {enabled: false},
+  );
+
+  const reportsWithPath =
+    serviceOrder?.reports?.filter((item) => !!item.additionalInfo.pdfPath) ??
+    [];
+
+  const {refetch: refetchWorkReportDownloadUrl} = useDownloadUrl(
+    reportsWithPath.map((item) => item.additionalInfo.pdfPath),
+    {enabled: false},
+  );
+
+  const generateWorkReportBlob = async (workReport: ServiceOrderReportView) => {
+    const reportImageDownloadUrls =
+      (await refetchImageDownloadUrls()).data ?? {};
+    const convertedImages = await refetchConvertedImages(
+      reportImageDownloadUrls,
+    );
+    const reportSignatureDownloadUrl = (await fetchDownloadUrls()).data;
+    const signatureConvertedImages = await refetchSignatureConvertedImages(
+      reportSignatureDownloadUrl,
+    );
+
+    const workReportPictures = Object.keys(convertedImages)
+      .filter((item) => {
+        const technicianId = item.split('report/')[1].split('/')[0];
+
+        return workReport.technicianId === technicianId;
+      })
+      .map((path) => convertedImages[path]);
+
+    const schedule = invoice?.serviceOrder?.schedules.find(
+      (s) => s.technician.id === workReport?.technicianId,
+    );
+
+    const signatureKeys = getSignatureKeys(
+      invoice?.serviceOrder!,
+      workReport,
+      serviceCompanyId,
+    );
+
+    const technicianSignatureImage =
+      signatureConvertedImages[signatureKeys.TECHNICIAN];
+    const customerSignatureImage =
+      signatureConvertedImages[signatureKeys.CUSTOMER];
+
     const blob = await pdf(
       <WorkReportTemplate
         userInfo={user?.userAccount}
         selectedLng={company?.language}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
-        report={report}
+        report={workReport}
         schedule={schedule}
         technicianSignatureImage={technicianSignatureImage}
         customerSignatureImage={customerSignatureImage}
-        workReportPictures={convertedImages}
+        workReportPictures={workReportPictures}
         headerPath={headerUrl[headerInfo?.path]}
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
@@ -609,6 +640,49 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     return filesFromBlob;
   };
 
+  const getWorkReportOperations = async (
+    invoiceData: InvoiceView,
+    workReportDownloadUrlArg?: {
+      [key: string]: string;
+    },
+  ) => {
+    if (!invoiceData?.additionalInfo.includeWorkReport) {
+      return Promise.resolve([]);
+    }
+
+    const reports = serviceOrder?.reports ?? [];
+
+    const promises = reports.map(async (reportItem) => {
+      const reportId = reportItem?.id;
+      const fileName = `${reportId}.pdf`;
+      const description = `${FILE_DESCRIPTION_PREFIXES.WORK_REPORT}-${
+        reportItem?.externalId || invoice?.serviceOrder?.externalId
+      }.pdf`;
+
+      if (
+        reportItem?.additionalInfo.pdfGenerationStatus ===
+        PdfGenerationStatus.DONE
+      ) {
+        const workReportDownloadUrl =
+          workReportDownloadUrlArg![reportItem.additionalInfo.pdfPath];
+        return fetchAndCreateFiles(
+          workReportDownloadUrl,
+          [fileName],
+          [description],
+        );
+      }
+
+      const workReportBlob = await generateWorkReportBlob(reportItem);
+      return createFilesFromBlobArray(
+        [workReportBlob],
+        [fileName],
+        [description],
+      );
+    });
+
+    return (await Promise.all(promises)).flat();
+  };
+
   const getExistingFiles = async (
     invoiceDownloadUrl:
       | {
@@ -655,32 +729,11 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
           )) || Promise.resolve([]);
 
-    // Work report operations
-    const workReportOperations = invoiceData?.additionalInfo.includeWorkReport
-      ? report?.additionalInfo.pdfGenerationStatus === PdfGenerationStatus.DONE
-        ? fetchAndCreateFiles(
-            workReportDownloadUrlArg
-              ? Object.values(workReportDownloadUrlArg)[0]
-              : '',
-            [`${report?.id}.pdf`],
-            [
-              `${FILE_DESCRIPTION_PREFIXES.WORK_REPORT}-${
-                report?.externalId || invoice?.serviceOrder?.externalId
-              }.pdf`,
-            ],
-          )
-        : generateWorkReportBlob().then((workReportBlob) =>
-            createFilesFromBlobArray(
-              [workReportBlob],
-              [`${report?.id}.pdf`],
-              [
-                `${FILE_DESCRIPTION_PREFIXES.WORK_REPORT}-${
-                  report?.externalId || invoice?.serviceOrder?.externalId
-                }.pdf`,
-              ],
-            ),
-          )
-      : Promise.resolve([]);
+    // // Work report operations
+    const workReportOperations = getWorkReportOperations(
+      invoiceData,
+      workReportDownloadUrlArg,
+    );
 
     // Checklist operations
     const checklistOperations = invoiceData?.additionalInfo.includeCheckList
