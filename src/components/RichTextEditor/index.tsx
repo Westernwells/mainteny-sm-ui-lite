@@ -243,6 +243,21 @@ const RichTextEditor = ({
           '& .ProseMirror-focused': {
             outline: 'none',
           },
+          '& .ProseMirror ul, .ProseMirror ol': {
+            marginLeft: '20px',
+            listStylePosition: 'inside',
+          },
+          '& .ProseMirror ul': {
+            listStyleType: 'disc',
+          },
+          '& .ProseMirror ol': {
+            listStyleType: 'decimal',
+          },
+          '& .ProseMirror li p': {
+            display: 'inline-flex',
+            margin: 0,
+            padding: 0,
+          },
           '& .tiptap p.is-editor-empty:first-of-type::before': {
             color: '#adb5bd',
             content: 'attr(data-placeholder)',

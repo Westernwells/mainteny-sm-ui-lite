@@ -121,7 +121,6 @@ export const usePrintQuotation = () => {
         queryClient.invalidateQueries([qk.quotationById]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -159,7 +158,6 @@ export const useSendQuotation = ({
         }
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -188,7 +186,6 @@ export const usePublishQuotation = () => {
         navigate(`/quotations/details/${id}`);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -282,7 +279,6 @@ export const useUpdateQuotation = () => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -317,7 +313,6 @@ export const useDeleteQuotation = () => {
         if (shouldNavigate) navigate(`/quotations?pageIndex=1&pageSize=25`);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -403,7 +398,6 @@ export const useCreateQuotationComment = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -431,7 +425,6 @@ export const useDeleteQuotationComment = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -468,7 +461,6 @@ export const useUpdateQuotationComment = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchQuotationComments]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },

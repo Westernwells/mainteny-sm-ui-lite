@@ -55,7 +55,7 @@ const TextBlockActions = ({
   const formik = useFormik<TextBlockFormModel>({
     initialValues: {
       name: activeTextBlock?.name || '',
-      category: textBlockCategory,
+      category: activeTextBlock?.category || textBlockCategory,
       text: activeTextBlock?.text || '',
     },
     onSubmit: (_, {resetForm}) => {

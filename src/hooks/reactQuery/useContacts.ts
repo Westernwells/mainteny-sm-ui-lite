@@ -114,7 +114,6 @@ export const useDeletePropertyOwnerContactPerson = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryContacts);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -147,7 +146,6 @@ export const useUpdateContact = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryContacts);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -174,7 +172,6 @@ export const useCreateContact = (successMsg?: string) => {
       queryClient.invalidateQueries(queryKeys.queryContacts);
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -201,7 +198,6 @@ export const useDeleteContact = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryContacts);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -308,7 +304,6 @@ export const useUpdateContractElevator = (successMsg: string) => {
         queryClient.invalidateQueries(queryKeys.fetchContractElevators);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -372,7 +367,6 @@ export const useCreateServiceCompanyContactPerson = (successMsg?: string) => {
         ]);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -413,7 +407,6 @@ export const useUpdateServiceCompanyContactPerson = (successMsg?: string) => {
         queryClient.invalidateQueries([queryKeys.queryRefContactPersons]);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -444,7 +437,6 @@ export const useDeleteServiceCompanyContactPerson = (successMsg?: string) => {
         ]);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -523,7 +515,6 @@ export const useAddContactPersonNote = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryContactPersonNotes);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -566,7 +557,6 @@ export const useUpdateContactPersonNote = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryContactPersonNotes);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -598,7 +588,6 @@ export const useDeleteContactPersonNote = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryContactPersonNotes);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -676,7 +665,6 @@ export const useDisconnectContactPersonAssociation = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchContactPersonAssociations);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -716,7 +704,6 @@ export const useAddContactPersonAssociation = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchContactPersonAssociations);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -770,7 +757,6 @@ export const useCreatePropertyContactPerson = (
         queryClient.invalidateQueries(queryKeys.queryContacts);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -819,7 +805,6 @@ export const useUpdatePropertyContactPerson = (
         queryClient.invalidateQueries(queryKeys.queryContacts);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
