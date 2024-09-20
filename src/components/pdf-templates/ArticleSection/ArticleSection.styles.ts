@@ -4,6 +4,7 @@ export const getStyles = () =>
   StyleSheet.create({
     dataBody: {
       borderBottom: '1px solid #212121',
+      paddingBottom: '12px',
     },
     table: {
       width: '100%',
