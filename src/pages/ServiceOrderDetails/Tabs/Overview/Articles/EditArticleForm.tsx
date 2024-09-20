@@ -20,6 +20,8 @@ import {
   useEffect,
 } from 'react';
 import {LanguageContext} from 'context/LanguageProvider';
+import RichTextField from 'components/RichTextField';
+import {FormControl} from '@mui/material';
 import {EditArticleFormModel} from './models';
 import {SelectArticleType} from './SelectArticleType';
 
@@ -85,24 +87,22 @@ export const EditArticleForm = ({
   }, [formik]);
 
   return (
-    <Box display="flex" flexWrap="wrap" component="form">
-      <FormInput
-        containerStyles={{...containerStyles, width: '50%', pr: '1rem'}}
-        fieldProps={{
-          label: t('Name'),
-          name: 'name',
-          placeholder: t('e.g. Flat cable, 16G0.75+2x(2x0.5)'),
-          type: 'text',
-          required: true,
-          value: formik.values.name,
-          error: !!(formik.touched.name && formik.errors.name),
-          helperText: formik.errors.name,
-          onBlur: formik.handleBlur,
-          onChange: (e: ChangeEvent<HTMLInputElement>) => {
-            formik.setFieldValue('name', e.target.value);
-          },
-        }}
-      />
+    <Box display="flex" flexWrap="wrap" alignItems="flex-end" component="form">
+      <FormControl
+        sx={{...containerStyles, width: '50%', pr: '1rem'}}
+        fullWidth={false}>
+        <RichTextField
+          label="Name"
+          placeholder="e.g. Flat cable, 16G0.75+2x(2x0.5)"
+          html={formik.values.name || ''}
+          updateHtml={(h) => formik.setFieldValue('name', h)}
+          helperText={formik.touched.name ? formik.errors.name : ''}
+          error={!!(formik.touched.name && formik.errors.name)}
+          onBlur={formik.handleBlur}
+          fieldsetStyles={{padding: '5px 8px'}}
+          required
+        />
+      </FormControl>
 
       <FormInput
         containerStyles={{pr: '1rem', width: '15%'}}
