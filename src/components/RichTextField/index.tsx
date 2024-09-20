@@ -194,6 +194,7 @@ interface Props {
   disabled?: boolean;
   onClick?: (event: any) => void;
   name?: string;
+  fieldsetStyles?: React.CSSProperties;
 }
 
 const RichTextField = ({
@@ -211,6 +212,7 @@ const RichTextField = ({
   disabled = false,
   onClick,
   name,
+  fieldsetStyles,
   ...props
 }: PropsWithChildren<Props>) => {
   const {t} = useTranslation();
@@ -297,6 +299,7 @@ const RichTextField = ({
             ...styles.fieldset,
             ...(error && styles.errorFieldset),
             ...(containerMinHeight && {minHeight: `${containerMinHeight}px`}),
+            ...(fieldsetStyles ?? {}),
           }}>
           <legend
             style={{
