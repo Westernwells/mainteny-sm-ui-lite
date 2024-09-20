@@ -110,7 +110,6 @@ export const useDeleteClientStorageData = (successMsg?: string) => {
       queryClient.invalidateQueries(queryKeys.fetchClientStorageData);
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });

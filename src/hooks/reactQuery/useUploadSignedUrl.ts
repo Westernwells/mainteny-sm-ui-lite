@@ -82,7 +82,6 @@ export const useUploadFiles = (successMsg: string, companyId?: string) => {
         queryClient.invalidateQueries(queryKeys.elevatorById);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },

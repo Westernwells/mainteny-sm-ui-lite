@@ -202,7 +202,6 @@ export const useUpdateContract = (successMsg?: string) => {
         }
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -227,7 +226,6 @@ export const useCreateContract = (successMsg: string) => {
       });
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -254,7 +252,6 @@ export const useDeleteContract = (successMsg?: string) => {
       }
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -286,7 +283,6 @@ export const useAttachElevatorsToContract = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.contractDetails);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -327,7 +323,6 @@ export const useCreateContractComment = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchContractComments]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -345,7 +340,6 @@ export const useDeleteContractComment = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchContractComments]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -370,7 +364,6 @@ export const useUpdateContractComment = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([qk.fetchContractComments]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },

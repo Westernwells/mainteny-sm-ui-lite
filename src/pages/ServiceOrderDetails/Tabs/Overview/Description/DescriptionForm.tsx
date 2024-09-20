@@ -80,7 +80,7 @@ export const DescriptionForm = ({formik}: Props) => {
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategory={TextBlockCategory.SERVICE_ORDER}
+          textBlockCategories={[TextBlockCategory.SERVICE_ORDER]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}

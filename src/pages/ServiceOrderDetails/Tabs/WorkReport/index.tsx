@@ -807,7 +807,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategory={TextBlockCategory.SERVICE_ORDER_REPORT}
+          textBlockCategories={[TextBlockCategory.SERVICE_ORDER_REPORT]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}

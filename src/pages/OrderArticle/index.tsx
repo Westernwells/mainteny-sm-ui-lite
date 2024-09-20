@@ -533,7 +533,7 @@ export const OrderArticle = () => {
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategory={TextBlockCategory.ARTICLE_ORDER}
+          textBlockCategories={[TextBlockCategory.ARTICLE_ORDER]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}

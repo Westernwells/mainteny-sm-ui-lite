@@ -120,7 +120,6 @@ export const useCreateCustomerNote = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([queryKeys.fetchCustomerNotes]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -145,7 +144,6 @@ export const useDeleteCustomerNote = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([queryKeys.fetchCustomerNotes]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -182,7 +180,6 @@ export const useUpdateCustomerNote = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([queryKeys.fetchCustomerNotes]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -209,7 +206,6 @@ export const useCreateCustomer = (successMsg: string) => {
       });
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });

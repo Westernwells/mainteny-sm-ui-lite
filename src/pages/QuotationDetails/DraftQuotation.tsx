@@ -1455,7 +1455,7 @@ export const DraftQuotation = ({
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategory={TextBlockCategory.QUOTATION}
+          textBlockCategories={[TextBlockCategory.QUOTATION]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}
