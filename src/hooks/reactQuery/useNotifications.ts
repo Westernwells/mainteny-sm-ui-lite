@@ -67,7 +67,6 @@ export const useMarkNotificationAsRead = () => {
       onSuccess: () =>
         queryClient.invalidateQueries([queryKeys.queryNotifications]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -87,7 +86,6 @@ export const useMarkAllAsRead = () => {
       queryClient.invalidateQueries([queryKeys.queryNotifications]);
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });

@@ -141,7 +141,6 @@ const Form = ({form}: Props) => {
             if (reason === 'clear') {
               reset();
             } else {
-              console.log('value', value);
               const option = value as ServiceCompanyContactPersonView;
               setValue('userAccount.title', option?.userAccount?.title);
               setValue('userAccount.firstName', option?.userAccount?.firstName);

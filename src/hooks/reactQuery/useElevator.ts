@@ -84,7 +84,6 @@ export const useElevatorById = (elevatorId?: string) => {
     {
       enabled: !!elevatorId,
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -135,7 +134,6 @@ export function useAllElevators(
       ...options,
       enabled: !!user,
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -196,7 +194,6 @@ export const useUpdateElevator = (successMsg: string) => {
         queryClient.invalidateQueries(queryKeys.elevatorById);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -311,7 +308,6 @@ export const useUpdateElevatorComment = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryElevatorComment);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -343,7 +339,6 @@ export const useAddElevatorComment = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryElevatorComment);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -372,7 +367,6 @@ export const useDeleteElevatorComment = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryElevatorComment);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -408,7 +402,6 @@ export const useUpdateElevatorTechnician = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.elevatorById);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -437,7 +430,6 @@ export const useAddElevator = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.elevatorById);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -485,7 +477,6 @@ export const useCreateTodo = () => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -522,7 +513,6 @@ export const useUpdateTodo = () => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -548,7 +538,6 @@ export const useDeleteTodo = () => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -576,7 +565,6 @@ export const useDeleteElevator = (successMsg?: string) => {
       }
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });

@@ -2277,7 +2277,7 @@ export const InvoiceForm = ({
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategory={TextBlockCategory.INVOICE}
+          textBlockCategories={[TextBlockCategory.INVOICE]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}

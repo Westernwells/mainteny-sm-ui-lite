@@ -80,7 +80,6 @@ export const useCreateChecklist = (successMsg: string) => {
       queryClient.invalidateQueries([queryKeys.queryChecklists]);
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -171,7 +170,6 @@ export const useUploadChecklistAnswer = (successMsg: string) => {
         ]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -240,7 +238,6 @@ export const useAssociateMultiChecklistToServiceOrder = (
         ]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -273,7 +270,6 @@ export const useAssociateChecklistToServiceOrder = (successMsg: string) => {
         ]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -306,7 +302,6 @@ export const useDisassociateChecklistToServiceOrder = (successMsg: string) => {
         ]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -329,7 +324,6 @@ export const useUpdateChecklist = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.queryChecklists);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -353,7 +347,6 @@ export const useDeleteChecklist = (successMsg?: string) => {
       queryClient.invalidateQueries(queryKeys.queryChecklists);
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -415,7 +408,6 @@ export const useDeleteServiceOrderChecklist = (successMsg?: string) => {
       queryClient.invalidateQueries(queryKeys.queryServiceOrderChecklists);
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });

@@ -47,7 +47,6 @@ export const useCoordsToAddress = (payload: CoordsToAddressPayload | null) => {
     {
       enabled: !!(payload?.lat && payload?.lng),
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
