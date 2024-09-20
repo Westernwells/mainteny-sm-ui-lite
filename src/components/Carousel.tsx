@@ -77,11 +77,17 @@ export const Carousel = ({
         enableMouseEvents
         containerStyle={{alignItems: 'start'}}>
         {images.map((step, index) => (
-          <div key={`${step.label} - ${index}`}>
+          <Box
+            sx={{display: 'flex', justifyContent: 'center'}}
+            key={`${step.label} - ${index}`}>
             {Math.abs(activeStep - index) <= 2 ? (
-              <img width="100%" src={step.imgPath} alt={step.label} />
+              <img
+                style={{height: '85vh'}}
+                src={step.imgPath}
+                alt={step.label}
+              />
             ) : null}
-          </div>
+          </Box>
         ))}
       </SwipeableViews>
 
