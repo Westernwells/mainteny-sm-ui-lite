@@ -81,10 +81,15 @@ export const Carousel = ({
             sx={{display: 'flex', justifyContent: 'center'}}
             key={`${step.label} - ${index}`}>
             {Math.abs(activeStep - index) <= 2 ? (
-              <img
-                style={{height: '85vh'}}
-                src={step.imgPath}
-                alt={step.label}
+              <div
+                style={{
+                  backgroundImage: `url(${step.imgPath})`,
+                  height: '85vh',
+                  width: '100%',
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center',
+                }}
               />
             ) : null}
           </Box>
