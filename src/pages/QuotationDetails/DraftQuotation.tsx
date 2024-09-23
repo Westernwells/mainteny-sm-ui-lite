@@ -87,6 +87,7 @@ import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
+import {addDays} from 'date-fns';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
 
@@ -241,6 +242,9 @@ export const DraftQuotation = ({
     serviceCompanyId:
       quotation?.serviceCompany.id || user?.userAccount.serviceCompany.id || '',
     elevatorId: quotation?.elevator?.id || null,
+    expiryDate: quotation?.additionalInfo.expiryDate
+      ? new Date(quotation?.additionalInfo.expiryDate)
+      : addDays(new Date(), 14),
   };
 
   const validationSchema = Yup.object().shape({
