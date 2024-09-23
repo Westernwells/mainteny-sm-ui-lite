@@ -243,7 +243,7 @@ export const SendEmailDialog = ({
                           </Typography>
                         </IconButton>
                       )}
-                      {!isBccShown && (
+                      {!(isBccShown || (bccEmails && bccEmails.length > 0)) && (
                         <IconButton
                           edge="end"
                           onClick={() => setIsBccShown(true)}>
@@ -358,7 +358,7 @@ export const SendEmailDialog = ({
             </Box>
           ) : null}
 
-          {isBccShown ? (
+          {isBccShown || (bccEmails && bccEmails.length > 0) ? (
             <Box display="flex" flexWrap="nowrap" alignItems="center">
               <MultipleAsyncSelect<ServiceCompanyContactPersonView>
                 freeSolo
