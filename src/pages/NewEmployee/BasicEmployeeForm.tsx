@@ -88,6 +88,8 @@ export const BasicEmployeeForm = ({
       email: initialValues?.email || '',
       employeeId: initialValues?.employeeId || '',
       team: initialValues?.team || '',
+      totalYearlyVacationDaysAllowed:
+        initialValues?.totalYearlyVacationDaysAllowed || 0,
     },
     onSubmit: () => {},
     validationSchema,
@@ -309,6 +311,36 @@ export const BasicEmployeeForm = ({
                   }}
                 />
               </Box>
+            </Box>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2} minHeight={100}>
+          <Grid item md={2}>
+            <Box display="flex" gap="1em">
+              {[
+                {
+                  id: 'totalYearlyVacationDaysAllowed',
+                  name: 'totalYearlyVacationDaysAllowed',
+                  label: 'Yearly vacation days',
+                  placeholder: '28',
+                  value: formik.values.totalYearlyVacationDaysAllowed,
+                  helperText:
+                    formik.touched.totalYearlyVacationDaysAllowed &&
+                    formik.errors.totalYearlyVacationDaysAllowed,
+                  error:
+                    !!formik.errors.totalYearlyVacationDaysAllowed &&
+                    formik.touched.totalYearlyVacationDaysAllowed,
+                },
+              ].map((item, index) => (
+                <FormInput
+                  key={index}
+                  fieldProps={{
+                    ...item,
+                    ...defaultProps,
+                  }}
+                />
+              ))}
             </Box>
           </Grid>
         </Grid>

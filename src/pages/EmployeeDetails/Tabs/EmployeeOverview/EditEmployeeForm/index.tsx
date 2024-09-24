@@ -172,27 +172,48 @@ export const EditEmployeeForm = ({
                   />
                 ))}
                 <SelectAddress />
-                {[
-                  {
-                    id: 'team',
-                    label: t('Team'),
-                    placeholder: '100',
-                    value: formikValues.team,
-                    helperText: touched.team && errors.team,
-                    error: !!errors.team && touched.team,
-                    ...defaultProps,
-                  },
-                ].map((item, index) => (
-                  <FormInput
-                    key={index}
-                    fieldProps={{
-                      ...item,
+
+                <Box>
+                  {[
+                    {
+                      id: 'team',
+                      label: t('Team'),
+                      placeholder: '100',
+                      value: formikValues.team,
+                      helperText: touched.team && errors.team,
+                      error: !!errors.team && touched.team,
                       ...defaultProps,
-                    }}
-                  />
-                ))}
+                    },
+                  ].map((item, index) => (
+                    <FormInput
+                      key={index}
+                      fieldProps={{
+                        ...item,
+                        ...defaultProps,
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+              <Box>
+                {formikValues.roles.includes(Role.TECHNICIAN) && (
+                  <>
+                    <Typography
+                      variant="h6"
+                      mt="1.5em"
+                      mb="0.4em"
+                      sx={{color: theme.palette.text.primary}}>
+                      {t('Order Types')}
+                    </Typography>
+                    <SelectServiceOrderTypes
+                      values={formikValues}
+                      setFieldValue={setFieldValue}
+                    />
+                  </>
+                )}
               </Box>
             </Box>
+
             <Box
               display="flex"
               flexDirection="column"
@@ -274,32 +295,50 @@ export const EditEmployeeForm = ({
                   }}
                 />
               </Box>
+
+              <Box sx={{width: '50%'}}>
+                {[
+                  {
+                    id: 'totalYearlyVacationDaysAllowed',
+                    label: t('Yearly Vacation Days'),
+                    placeholder: '28',
+                    value: formikValues.totalYearlyVacationDaysAllowed,
+                    helperText:
+                      touched.totalYearlyVacationDaysAllowed &&
+                      errors.totalYearlyVacationDaysAllowed,
+                    error:
+                      !!errors.totalYearlyVacationDaysAllowed &&
+                      touched.totalYearlyVacationDaysAllowed,
+                    ...defaultProps,
+                  },
+                ].map((item, index) => (
+                  <FormInput
+                    key={index}
+                    fieldProps={{
+                      ...item,
+                      ...defaultProps,
+                    }}
+                  />
+                ))}
+              </Box>
+
+              <Box>
+                <Typography
+                  variant="h6"
+                  my=".75em"
+                  sx={{color: theme.palette.text.primary}}>
+                  {t('Shift Time')}
+                  <Typography component="span" sx={{color: 'red'}}>
+                    *
+                  </Typography>
+                </Typography>
+                <SelectShift
+                  values={formikValues}
+                  setFieldValue={setFieldValue}
+                />
+              </Box>
             </Box>
           </Box>
-          {formikValues.roles.includes(Role.TECHNICIAN) && (
-            <>
-              <Typography
-                variant="h6"
-                my=".75em"
-                sx={{color: theme.palette.text.primary}}>
-                {t('Order Types')}
-              </Typography>
-              <SelectServiceOrderTypes
-                values={formikValues}
-                setFieldValue={setFieldValue}
-              />
-            </>
-          )}
-          <Typography
-            variant="h6"
-            my=".75em"
-            sx={{color: theme.palette.text.primary}}>
-            {t('Shift Time')}
-            <Typography component="span" sx={{color: 'red'}}>
-              *
-            </Typography>
-          </Typography>
-          <SelectShift values={formikValues} setFieldValue={setFieldValue} />
         </Box>
       </Box>
 
