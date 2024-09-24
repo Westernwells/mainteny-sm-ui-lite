@@ -55,7 +55,7 @@ export default function useExtensions({
 
       // Extensions
       TextAlign.configure({
-        types: ['heading', 'paragraph'],
+        types: ['heading', 'paragraph', 'listItem'],
       }),
       TextStyle,
       ShiftEnterExtension,

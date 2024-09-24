@@ -117,6 +117,7 @@ import {SectionTitle} from './SectionTitle';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
 import {formatInvoiceRecord, articleViewToInvoiceItemRecord} from './utils';
 import {Notes} from './Notes/EditNotes';
+import {cleanHtmlContent} from 'utils/text-block';
 
 interface Props {
   invoice?: InvoiceView;
@@ -525,13 +526,36 @@ export const InvoiceForm = ({
   });
 
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
-    if (textBlockField === 'SUBJECT') {
-      formik.setFieldValue('subject', rowParams.row.text);
-    } else if (textBlockField === 'DESCRIPTION') {
-      formik.setFieldValue('description', rowParams.row.text);
-    } else if (textBlockField === 'NOTES') {
-      formik.setFieldValue('moreInfo', rowParams.row.text);
+    const updateFieldValue = (fieldName: string, currentValue: string) => {
+      const newValue = cleanHtmlContent(
+        `${currentValue} ${rowParams.row.text}`.trim(),
+      );
+      formik.setFieldValue(fieldName, newValue);
+    };
+
+    switch (textBlockField) {
+      case 'SUBJECT':
+        updateFieldValue(
+          'subject',
+          cleanHtmlContent(formik.values.subject || ''),
+        );
+        break;
+      case 'DESCRIPTION':
+        updateFieldValue(
+          'description',
+          cleanHtmlContent(formik.values.description || ''),
+        );
+        break;
+      case 'NOTES':
+        updateFieldValue(
+          'moreInfo',
+          cleanHtmlContent(formik.values.moreInfo || ''),
+        );
+        break;
+      default:
+        break;
     }
+
     setOpenTextBlockDialog(false);
   };
 
@@ -2277,7 +2301,13 @@ export const InvoiceForm = ({
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategory={TextBlockCategory.INVOICE}
+          textBlockCategories={[
+            TextBlockCategory.QUOTATION,
+            TextBlockCategory.ARTICLE_ORDER,
+            TextBlockCategory.INVOICE,
+            TextBlockCategory.SERVICE_ORDER,
+            TextBlockCategory.SERVICE_ORDER_REPORT,
+          ]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}

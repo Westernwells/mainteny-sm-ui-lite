@@ -115,7 +115,6 @@ export const useCreateArticle = (successMsg: string) => {
       });
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -140,7 +139,6 @@ export const useDeleteArticle = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchArticles);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -172,7 +170,6 @@ export const useUpdateArticle = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchArticleDetail);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -201,7 +198,6 @@ export const useCreatePartialArticle = () => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -248,7 +244,6 @@ export const useCreateArticleOrder = (successMsg: string | JSX.Element) => {
         queryClient.invalidateQueries([queryKeys.fetchArticleOrder]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -312,7 +307,6 @@ export const useCreateArticleSupplier = (successMsg: string) => {
         queryClient.invalidateQueries([queryKeys.fetchArticleSuppliers]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -361,7 +355,6 @@ export const useUpdateSupplier = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchArticleSupplier);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -385,7 +378,6 @@ export const useDeleteSupplier = (successMsg?: string) => {
       queryClient.invalidateQueries(queryKeys.queryArticleSuppliers);
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -450,7 +442,6 @@ export const useCreatePropertyOwnerArticle = (successMsg?: string) => {
       queryClient.invalidateQueries(queryKeys.fetchPropertyOwnerArticles);
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -486,7 +477,6 @@ export const useUpdatePropertyOwnerArticle = (successMsg?: string) => {
       queryClient.invalidateQueries(queryKeys.fetchPropertyOwnerArticles);
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -517,7 +507,6 @@ export const useDeletePropertyOwnerArticle = (successMsg?: string) => {
       queryClient.invalidateQueries(queryKeys.fetchPropertyOwnerArticles);
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -552,7 +541,6 @@ export const useCreateArticlePictures = (
         queryClient.invalidateQueries(queryKeys.fetchArticleDetail);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -594,7 +582,6 @@ export const useUpdateArticlePicture = (
         queryClient.invalidateQueries(queryKeys.fetchArticleDetail);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -627,7 +614,6 @@ export const useDeleteArticlePicture = (
         queryClient.invalidateQueries(queryKeys.fetchArticleDetail);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },

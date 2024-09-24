@@ -683,7 +683,6 @@ export const useCreateServiceOrder = (successMsg: string) => {
       });
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });

@@ -19,6 +19,7 @@ import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {TextBlockCategory, TextBlockView} from 'models/text-block';
 import {Dialog} from 'components/Dialog';
 import RichTextField from 'components/RichTextField';
+import {cleanHtmlContent} from 'utils/text-block';
 import {Summary, SummaryItem} from './Summary';
 
 interface Props {
@@ -67,7 +68,7 @@ export const AddDescription = ({
   };
 
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
-    setDescription(rowParams.row.text);
+    setDescription(cleanHtmlContent(rowParams.row.text));
     setOpenTextBlockDialog(false);
   };
 
@@ -213,7 +214,13 @@ export const AddDescription = ({
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategory={TextBlockCategory.SERVICE_ORDER}
+          textBlockCategories={[
+            TextBlockCategory.QUOTATION,
+            TextBlockCategory.ARTICLE_ORDER,
+            TextBlockCategory.INVOICE,
+            TextBlockCategory.SERVICE_ORDER,
+            TextBlockCategory.SERVICE_ORDER_REPORT,
+          ]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}

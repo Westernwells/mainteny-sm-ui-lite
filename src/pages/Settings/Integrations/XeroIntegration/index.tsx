@@ -108,7 +108,6 @@ const XeroIntegration: FC = () => {
           }
         },
         onError: (err: unknown) => {
-          console.log(err);
           if (err instanceof Error) {
             showError(err.message);
           }

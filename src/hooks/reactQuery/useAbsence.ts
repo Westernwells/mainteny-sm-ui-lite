@@ -85,7 +85,6 @@ export const useDeleteAbsence = (successMsg?: string) => {
       queryClient.invalidateQueries(queryKeys.fetchAbsence);
     },
     onError: (err: any) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -115,7 +114,6 @@ export const useUpdateAbsence = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchAbsence);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },

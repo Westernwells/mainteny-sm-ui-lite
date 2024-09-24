@@ -22,6 +22,7 @@ export const formatEmployeeAccountData = (data: EmployeeAccountData) => {
     team: data.team,
     roles: data?.roles || [],
     externalId: data.employeeId || '',
+    totalYearlyVacationDaysAllowed: data?.totalYearlyVacationDaysAllowed,
   };
 
   if (employee.team === '') {
@@ -54,6 +55,7 @@ export const formatUpdateEmployeeAccountData = (
     roles: data.roles,
     team: data?.team || '',
     externalId: data.employeeId || '',
+    totalYearlyVacationDaysAllowed: data?.totalYearlyVacationDaysAllowed,
   };
 
   return {userAccount, employee};

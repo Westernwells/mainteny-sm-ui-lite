@@ -23,7 +23,6 @@ export const useRebuildIndex = (successMsg: string) => {
       });
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -46,7 +45,6 @@ export const useCreateIndex = (successMsg: string) => {
       });
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });

@@ -93,7 +93,6 @@ export const useCompanyById = (
       enabled:
         shouldFetch !== undefined ? !!companyId && shouldFetch : !!companyId,
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
       ...(options ?? {}),
@@ -143,7 +142,6 @@ export const useUpdateCompany = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchCompany);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -179,7 +177,6 @@ export const useUpdateSystemSettings = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchCompany);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -206,7 +203,6 @@ export const useCreateServiceCompany = (successMsg: string) => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -305,7 +301,6 @@ export const useCompanyAutoNumberConfig = (companyId?: string) => {
     {
       enabled: !!companyId,
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -342,7 +337,6 @@ export const useUpdateAutoNumberConfig = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchAutoNumberConfig);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -392,7 +386,6 @@ export const useCompanyXeroInfo = (companyId?: string) => {
     {
       enabled: !!companyId,
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -524,7 +517,6 @@ export const useUpdateServiceCompanySystemSettings = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchCompanies);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },

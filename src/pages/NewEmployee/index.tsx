@@ -56,6 +56,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
       email: '',
       employeeId: '',
       team: '',
+      totalYearlyVacationDaysAllowed: 0,
     });
 
   const [roleEmployeeFormValues, setRoleEmployeeFormValues] =
@@ -163,6 +164,8 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
       employeeId: basicEmployeeFormValues.employeeId,
       password: credentialEmployeeFormValues.password,
       serviceCompanyId: user!.userAccount.serviceCompany.id,
+      totalYearlyVacationDaysAllowed:
+        basicEmployeeFormValues.totalYearlyVacationDaysAllowed,
     };
     addEmployeeAccount(body, () => {
       navigate('/employees?pageIndex=1&pageSize=25');
