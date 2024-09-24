@@ -3,12 +3,12 @@ import Box from '@mui/material/Box';
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
 import EmailIcon from '@mui/icons-material/Email';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import Grid3x3Icon from '@mui/icons-material/Grid3x3';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import {Typography} from '@mui/material';
-
 import {capitalize, convertToText} from 'utils/utils';
 import {theme} from 'theme';
 import {UserView} from 'models/user';
@@ -87,6 +87,19 @@ export const employeeDetailSchema = (employee: UserView) => {
           ? renderShiftTime(employee.userData.workingHours)
           : '-',
       icon: <TimerOutlinedIcon sx={{color: theme.palette.info.dark}} />,
+    },
+    totalYearlyVacationDaysAllowed: {
+      label: 'YEARLY VACATION DAYS',
+      value:
+        employee &&
+        employee.userData.additionalInfo?.totalYearlyVacationDaysAllowed ? (
+          <Typography sx={{fontSize: '14px', lineHeight: '20px'}}>
+            {employee.userData.additionalInfo?.totalYearlyVacationDaysAllowed}
+          </Typography>
+        ) : (
+          '-'
+        ),
+      icon: <WbSunnyOutlinedIcon sx={{color: theme.palette.info.dark}} />,
     },
   };
 };

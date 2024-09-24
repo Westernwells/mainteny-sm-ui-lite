@@ -70,6 +70,7 @@ export interface BasicEmployeeFormModel {
   } | null;
   employeeId: string;
   team: string;
+  totalYearlyVacationDaysAllowed: number;
 }
 
 export interface RoleEmployeeFormModel {

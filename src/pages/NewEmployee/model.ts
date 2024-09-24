@@ -15,4 +15,5 @@ export type EmployeeAccountData = Partial<CreateUserAccountData> & {
   address: AddressRecord | null;
   employeeId: string;
   team?: string;
+  totalYearlyVacationDaysAllowed?: number;
 };
