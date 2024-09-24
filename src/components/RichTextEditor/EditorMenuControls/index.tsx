@@ -5,6 +5,7 @@ import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {TextBlockCategory, TextBlockView} from 'models/text-block';
 import {useTranslation} from 'react-i18next';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
+import {cleanHtmlContent} from 'utils/text-block';
 import FormatHeadingButton from './buttons/FormatHeadingButton';
 import FormatTextAlignButton from './buttons/FormatTextAlignButton';
 import FormatListButtons from './buttons/FormatListButtons';
@@ -143,7 +144,9 @@ const EditorMenuControls = ({
               ]}
               setActiveSubDialog={setActiveSubDialog}
               setActiveTextBlock={setActiveTextBlock}
-              handleCellClick={(params) => handleCellClick(params.row.text)}
+              handleCellClick={(params) =>
+                handleCellClick(cleanHtmlContent(params.row.text))
+              }
               showNewBlockButton={false}
             />
           </Box>

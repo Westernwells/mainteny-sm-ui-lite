@@ -117,10 +117,8 @@ const TextBlockSelect = ({
     setOpenTextBlockDialog?.(false);
     setActiveSubDialog?.('create');
   }, []);
-
   const getEditableTextBlocks = useCallback((item: TextBlockRow) => {
     const textBlockItem = mapJsonToTextBlockView(item);
-    console.log(textBlockItem, 'textBlockItem');
     setActiveTextBlock?.(textBlockItem);
     setOpenTextBlockDialog?.(false);
     setActiveSubDialog?.('edit');

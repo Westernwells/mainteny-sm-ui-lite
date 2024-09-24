@@ -250,6 +250,8 @@ const RichTextField = ({
 
   useEffect(() => {
     const newValue = getValue(html) as Descendant[];
+    const {selection} = editor;
+
     if (JSON.stringify(value) !== JSON.stringify(newValue)) {
       setValue(newValue);
       // Delete all entries leaving 1 empty node
@@ -267,6 +269,10 @@ const RichTextField = ({
 
       // Insert array of children nodes
       Transforms.insertNodes(editor, newValue);
+
+      if (selection) {
+        Transforms.select(editor, selection);
+      }
     }
   }, [html]);
 
