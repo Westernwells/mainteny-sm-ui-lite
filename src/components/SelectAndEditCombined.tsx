@@ -11,6 +11,7 @@ import {AddressRecord} from 'models/misc';
 import {formatAddressFullname} from 'utils/utils';
 import {TFunction} from 'i18next';
 import AddIcon from '@mui/icons-material/Add';
+import {getCountryCode} from 'utils/countries';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
 import {SelectButton} from './SelectButton';
@@ -79,6 +80,11 @@ export const SelectAndEditCombined = ({
               : formik.values[addressType]?.component?.country
             : '',
         },
+        ...(formik.values[addressType]?.component?.country && {
+          countryCode: getCountryCode(
+            formik.values[addressType]?.component?.country,
+          ),
+        }),
         fullName: formatAddressFullname(
           formik.values?.[addressType] ?? null,
           translate,
