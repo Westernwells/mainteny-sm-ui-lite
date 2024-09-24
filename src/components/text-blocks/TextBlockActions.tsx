@@ -17,7 +17,11 @@ import {TextBlockForm} from 'pages/Settings/TextBlocks/TextBlockForm';
 import React, {useContext, Dispatch, SetStateAction} from 'react';
 import {useTranslation} from 'react-i18next';
 import {theme} from 'theme';
-import {convertCategoryToMacro, convertCategoryToText} from 'utils/text-block';
+import {
+  cleanHtmlContent,
+  convertCategoryToMacro,
+  convertCategoryToText,
+} from 'utils/text-block';
 import * as Yup from 'yup';
 
 type Props = {
@@ -171,13 +175,26 @@ const TextBlockActions = ({
               </Typography>
               {item.label === t('Text') ? (
                 <Box
-                  dangerouslySetInnerHTML={{__html: item.value}}
+                  dangerouslySetInnerHTML={{
+                    __html: cleanHtmlContent(item.value),
+                  }}
                   sx={{
                     margin: '0em',
                     padding: '0em',
+                    '& ul, ol': {
+                      marginLeft: '20px',
+                      listStylePosition: 'inside',
+                    },
+                    '& ul': {
+                      listStyleType: 'disc',
+                    },
+                    '& ol': {
+                      listStyleType: 'decimal',
+                    },
                     '& p': {
                       marginBottom: '0em',
                       lineHeight: '1em',
+                      padding: '8px 0px',
                     },
                   }}
                 />

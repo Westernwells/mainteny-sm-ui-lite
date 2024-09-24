@@ -88,6 +88,7 @@ import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {addDays} from 'date-fns';
+import {cleanHtmlContent} from 'utils/text-block';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
 
@@ -574,13 +575,33 @@ export const DraftQuotation = ({
   };
 
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
-    if (textBlockField === 'SUBJECT') {
-      formik.setFieldValue('subject', rowParams.row.text);
-    } else if (textBlockField === 'DESCRIPTION') {
-      formik.setFieldValue('description', rowParams.row.text);
-    } else if (textBlockField === 'NOTES') {
-      formik.setFieldValue('notes', rowParams.row.text);
+    const updateFieldValue = (fieldName: string, currentValue: string) => {
+      const newValue = cleanHtmlContent(
+        `${currentValue} ${rowParams.row.text}`.trim(),
+      );
+      formik.setFieldValue(fieldName, newValue);
+    };
+
+    switch (textBlockField) {
+      case 'SUBJECT':
+        updateFieldValue(
+          'subject',
+          cleanHtmlContent(formik.values.subject || ''),
+        );
+        break;
+      case 'DESCRIPTION':
+        updateFieldValue(
+          'description',
+          cleanHtmlContent(formik.values.description || ''),
+        );
+        break;
+      case 'NOTES':
+        updateFieldValue('notes', cleanHtmlContent(formik.values.notes || ''));
+        break;
+      default:
+        break;
     }
+
     setOpenTextBlockDialog(false);
   };
 
@@ -1459,7 +1480,13 @@ export const DraftQuotation = ({
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategories={[TextBlockCategory.QUOTATION]}
+          textBlockCategories={[
+            TextBlockCategory.QUOTATION,
+            TextBlockCategory.ARTICLE_ORDER,
+            TextBlockCategory.INVOICE,
+            TextBlockCategory.SERVICE_ORDER,
+            TextBlockCategory.SERVICE_ORDER_REPORT,
+          ]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}

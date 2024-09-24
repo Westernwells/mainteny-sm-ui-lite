@@ -9,6 +9,7 @@ import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import {Dialog} from 'components/Dialog';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import RichTextField from 'components/RichTextField';
+import {cleanHtmlContent} from 'utils/text-block';
 import {DescriptionFormModel} from './model';
 
 interface Props {
@@ -31,7 +32,7 @@ export const DescriptionForm = ({formik}: Props) => {
   };
 
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
-    formik.setFieldValue('description', rowParams.row.text);
+    formik.setFieldValue('description', cleanHtmlContent(rowParams.row.text));
     setOpenTextBlockDialog(false);
   };
 
@@ -80,7 +81,13 @@ export const DescriptionForm = ({formik}: Props) => {
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategories={[TextBlockCategory.SERVICE_ORDER]}
+          textBlockCategories={[
+            TextBlockCategory.QUOTATION,
+            TextBlockCategory.ARTICLE_ORDER,
+            TextBlockCategory.INVOICE,
+            TextBlockCategory.SERVICE_ORDER,
+            TextBlockCategory.SERVICE_ORDER_REPORT,
+          ]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}
