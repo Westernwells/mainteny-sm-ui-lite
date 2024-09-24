@@ -81,6 +81,8 @@ export const getRoles = (selectedRole: string) => {
     roles = [Role.TECHNICIAN];
   } else if (selectedRole === 'Contractor') {
     roles = [Role.CONTRACTOR];
+  } else if (selectedRole === 'Both Technician & Service Manager') {
+    roles = [Role.SERVICE_MANAGER, Role.TECHNICIAN];
   }
 
   return roles;
