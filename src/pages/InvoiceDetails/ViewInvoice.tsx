@@ -640,6 +640,16 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     return filesFromBlob;
   };
 
+  const waitForHeaderAndFooter = () =>
+    new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (!isHeaderUrlLoading && !isFooterUrlLoading) {
+          clearInterval(interval);
+          resolve(true);
+        }
+      }, 100); // Check every 100ms
+    });
+
   const getWorkReportOperations = async (
     invoiceData: InvoiceView,
     workReportDownloadUrlArg?: {
@@ -699,7 +709,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     },
   ) => {
     if (isHeaderUrlLoading || isFooterUrlLoading) {
-      return;
+      // wait for header and footer to load
+      await waitForHeaderAndFooter();
     }
 
     let allFiles: FileWithPreview[] = [];

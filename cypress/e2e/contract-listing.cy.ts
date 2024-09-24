@@ -1,29 +1,24 @@
-import LoginPage from '../pages/login.page';
 import AppTopBarPage from '../pages/appTopBar.page';
 import ContractListingPage from '../pages/contact-listing.page';
 import {statusMapping, convertToMacro} from '../utils/utils';
 
 describe('Contract listing page', () => {
     beforeEach(() => {
-        LoginPage.visitLoginPage();
-        const loginURL = `${Cypress.env().REACT_APP_API_URL}/api/sessions/login`;
-        cy.intercept('POST', loginURL).as('loginApi');
-
-        LoginPage.login();
-
-        cy.wait('@loginApi').then(() => {
-            ContractListingPage.visit();
-            AppTopBarPage.selectLanguage('English');
-        });
+        cy.login();
+        AppTopBarPage.selectLanguage('English');
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/contracts?*`).as('getContracts');
+        ContractListingPage.visit();
+        cy.get('span[role="progressbar"]').should('not.exist');
     });
 
     it('should route to new contract page on clicking new contract button', () => {
+        cy.wait('@getContracts');
         cy.contains('New Contract').click();
-        cy.visit(`/contracts/new`);
         cy.url().should('include', `contracts/new`);
     });
 
     it('should clear all filters', () => {
+        cy.wait('@getContracts');
         ContractListingPage.clearFilter();
         cy.url().should('include', '/contracts');
         cy.url().should('not.include', 'cost');
@@ -33,8 +28,7 @@ describe('Contract listing page', () => {
     });
 
     it('should filter with search text and verify API call', () => {
-        const contractURL = `${Cypress.env().REACT_APP_API_URL}/api/contracts?*`;
-        cy.intercept('GET', contractURL).as('contractURL');
+        cy.wait('@getContracts');
 
         const searchText = 'es';
 
@@ -47,7 +41,7 @@ describe('Contract listing page', () => {
                 cy.url().should('include', inputValue);
             });
 
-        cy.wait('@contractURL').then((interception) => {
+        cy.wait('@getContracts').then((interception) => {
             const url = new URL(interception.request.url);
             const pageIndex = url.searchParams.get('pageIndex');
             const pageSize = url.searchParams.get('pageSize');
@@ -62,9 +56,7 @@ describe('Contract listing page', () => {
     });
 
     it(`should show no entries message when filter returns nothing`, () => {
-        const contractURL = `${Cypress.env().REACT_APP_API_URL}/api/contracts?*`;
-        cy.intercept('GET', contractURL).as('contractURL');
-
+        cy.wait('@getContracts');
         const searchText = 'zzzghhdgsshgdhsggdddtuwowuakfdyrdjdjfhssg';
 
         cy.get('input[placeholder="Search by number, customer, contract type etc."]').clear({force: true});
@@ -76,7 +68,7 @@ describe('Contract listing page', () => {
                 cy.url().should('include', inputValue);
             });
 
-        cy.wait('@contractURL').then((interception) => {
+        cy.wait('@getContracts').then((interception) => {
             if (interception.response.body && interception.response.body.data.length === 0) {
                 expect(interception.response.body.data).to.have.lengthOf(0);
                 cy.contains('There are no entries for the applied filters.').should('exist');
@@ -89,29 +81,26 @@ describe('Contract listing page', () => {
     });
 
     it('should filter with price', () => {
-        const contractURL = `${Cypress.env().REACT_APP_API_URL}/api/contracts?*`;
-        cy.intercept('GET', contractURL).as('contractURL');
+        cy.wait('@getContracts');
 
         ContractListingPage.filterContractByPrice();
         cy.url().should('include', 'cost');
 
-        cy.wait('@contractURL').then((interception) => {
+        cy.wait('@getContracts').then((interception) => {
             expect(interception.request.url).to.include('priceStart=0');
             expect(interception.request.url).to.include('priceEnd=50000');
         });
     });
 
     it('should filter the grid based on selected statuses', () => {
-        const apiEndpoint = `/api/contracts?*`;
-        cy.intercept('GET', apiEndpoint).as('getContracts');
-
+        cy.wait('@getContracts');
         cy.get('div[role="combobox"][id="Status"]').click({force: true});
 
         const statuses = ['Active', 'Inactive', 'Expiring'];
 
         statuses.forEach((status, index) => {
-            
-            ContractListingPage.filterContractByStatus(status)
+            ContractListingPage.filterContractByStatus(status);
+            cy.get('span[role="progressbar"]').should('not.exist');
             ContractListingPage.waitForContractApi(
                 '@getContracts',
                 {
@@ -128,7 +117,7 @@ describe('Contract listing page', () => {
                             cy.wait(300);
 
                             cy.get('div[role="grid"]')
-                                .find("div[data-field='status'][role='cell']")
+                                .find("div[data-field='STATUS'][role='cell']")
                                 .each((row) => {
                                     const statusInGrid = row.text().trim();
                                     expect(macroStatuses[index]).to.equal(statusMapping[statusInGrid]);
@@ -140,5 +129,4 @@ describe('Contract listing page', () => {
             );
         });
     });
-
 });

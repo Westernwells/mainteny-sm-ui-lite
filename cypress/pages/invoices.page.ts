@@ -61,4 +61,52 @@ export default class InvoicesPage {
       .then((id) => {
         cy.get(`input[id="${id}"]`);
       });
+
+  static createInvoice = (options?: {setExpiredDueDate?: boolean}) => {
+    cy.contains('button', 'New Invoice').click();
+    cy.get('span[role="progressbar"]').should('not.exist');
+
+    // select customer
+    cy.get('input[role="combobox"][name="propertyOwnerId"]').parent().click();
+    cy.get(`li[role="option"][id="combo-box-demo-option-0"]`).click();
+
+    // add article
+    cy.contains('button', 'Add Article').click();
+    cy.get('div[test-id="name-0"]').click();
+    const articlesTable = cy.get('table[aria-label="articles table"]');
+    // clicking second row because first row is table header
+    const secondRow = articlesTable.find('tr').eq(2);
+    secondRow.click();
+
+    cy.get('input[name="quantity"]').clear().type('1');
+    cy.get('input[name="unitAmount.netAmount"]').clear().type('100');
+
+    if (options?.setExpiredDueDate) {
+      // clear due date in case it's already set
+      cy.contains('label', 'Payment Due Date').click();
+      cy.contains('button', 'Clear').click();
+      cy.wait(1000); // wait for the due date to be cleared
+
+      cy.contains('label', 'Payment Due Date').click();
+      cy.get('button:has(+button[aria-current="date"])').click();
+      cy.contains('button', 'Confirm').click();
+    }
+
+    cy.contains('button', 'Save').click();
+    cy.contains('Invoice created successfully');
+  };
+
+  static sendInvoices = () => {
+    const sendInvoiceAPI = `${
+      Cypress.env().REACT_APP_API_URL
+    }/api/invoices/*/send`;
+    cy.intercept('POST', sendInvoiceAPI).as('sendInvoiceAPI');
+    cy.contains('Send').click();
+    cy.contains('label', 'Send to').click();
+    cy.focused().type('{backspace}noman+1@mainteny.com{enter}');
+    cy.get('div[contenteditable="true"]').type('I am Text!');
+    cy.contains('button', 'Send email').click();
+    cy.wait('@sendInvoiceAPI', {timeout: 30000});
+    cy.contains('Invoice sent successfully');
+  };
 }

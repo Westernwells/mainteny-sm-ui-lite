@@ -184,6 +184,7 @@ e2e-tests:
     when: always
     paths:
       - results/e2e-*.xml
+      - cypress/screenshots/**/*.png
     reports:
       junit: results/e2e-*.xml
 

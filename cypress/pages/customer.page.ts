@@ -1,8 +1,6 @@
 export default class CustomerPage {
   static visit = () => {
-    cy.visit('/customers', {
-      failOnStatusCode: false,
-    });
+    cy.get('ul > div[role="button"][data-testid="customers-nav-item"]').click();
   };
 
   static fillFirstStep = () => {
@@ -13,8 +11,9 @@ export default class CustomerPage {
       .parent()
       .siblings('p')
       .should('have.text', 'Customer Name is required');
-    cy.get('input[name="name"]').type('customer', {delay: 100});
     cy.contains('button', 'Next').should('be.disabled');
+    cy.get('input[name="name"]').type('customer', {delay: 100});
+    cy.contains('button', 'Next').should('not.be.disabled');
     cy.get('input[name="externalId"]').type('15', {delay: 100});
     cy.get('input[name="email"]').type('test@test.com', {delay: 100});
     cy.get('input[name="billingEmail"]').type('test1@test.com', {delay: 100});
@@ -29,7 +28,7 @@ export default class CustomerPage {
     cy.get('div[role="combobox"]').eq(1).click({
       force: true,
     });
-    cy.get('ul > li:nth-child(1)').click();
+    cy.contains('li[role="option"]', 'Baden-Württemberg').click();
   };
 
   static fillThirdStep = () => {

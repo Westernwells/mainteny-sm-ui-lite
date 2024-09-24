@@ -415,7 +415,7 @@ export const ArticleItemRowNEW = ({
               },
             },
           }}
-          aria-label="spanning table">
+          aria-label="articles table">
           <TableHead sx={{position: 'sticky', top: 0, background: '#FFFFFF'}}>
             <TableRow>
               {columns.map((column) => (
@@ -610,6 +610,7 @@ export const ArticleItemRowNEW = ({
           '& .MuiTextField-root': {width: '100%'},
         }}>
         <NumericFormat
+          name="unitAmount.netAmount"
           value={price !== 0 ? price : 0}
           customInput={TextField}
           allowLeadingZeros={false}

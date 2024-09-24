@@ -1,55 +1,40 @@
-import { ServiceOrderTypeKeys } from "../../src/models/service-order";
-import AppTopBarPage from "../pages/appTopBar.page";
-import LoginPage from "../pages/login.page";
-import ServiceJobPage from "../pages/serviceJob.page";
-import NewServiceJobPage from "../pages/new-service.page";
-import { randomEnumKey } from "../utils/utils";
-
-const secondStep: Record<ServiceOrderTypeKeys, Array<() => void>> = {
-  [ServiceOrderTypeKeys.Emergency]: [NewServiceJobPage.selectTechnician],
-  [ServiceOrderTypeKeys.Callout]: [NewServiceJobPage.selectImmediate, NewServiceJobPage.selectADueDate, NewServiceJobPage.selectADateTimeAndTechnician],
-  [ServiceOrderTypeKeys.Repair]: [NewServiceJobPage.selectADueDate, NewServiceJobPage.selectADateTimeAndTechnician],
-  [ServiceOrderTypeKeys.Maintenance]: [NewServiceJobPage.selectADueDate, NewServiceJobPage.selectADateTimeAndTechnician],
-  [ServiceOrderTypeKeys.Inspection]: [NewServiceJobPage.selectADueDate, NewServiceJobPage.selectADateTimeAndTechnician],
-  [ServiceOrderTypeKeys.Installation]: [NewServiceJobPage.selectADueDate, NewServiceJobPage.selectADateTimeAndTechnician],
-  [ServiceOrderTypeKeys.Modernization]: [NewServiceJobPage.selectADueDate, NewServiceJobPage.selectADateTimeAndTechnician],
-  [ServiceOrderTypeKeys.General]: [NewServiceJobPage.selectADueDate, NewServiceJobPage.selectADateTimeAndTechnician],
-}
+import {ServiceOrderTypeKeys} from '../../src/models/service-order';
+import AppTopBarPage from '../pages/appTopBar.page';
+import ServiceJobPage from '../pages/serviceJob.page';
+import NewServiceJobPage from '../pages/new-service.page';
+import {randomEnumKey} from '../utils/utils';
 
 describe('Create Job', () => {
-	beforeEach(() => {
-    LoginPage.visitLoginPage();
-    const loginURL = `${Cypress.env().REACT_APP_API_URL}/api/sessions/login`;
-    cy.intercept('POST', loginURL).as('loginApi');
-    LoginPage.login();
+    beforeEach(() => {
+        cy.login();
 
-    cy.wait('@loginApi').then(() => {
-      AppTopBarPage.selectLanguage('English');
+        AppTopBarPage.selectLanguage('English');
 
-      const unitsURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators`;
+        const unitsURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?*`;
+        cy.intercept('GET', unitsURL).as('unitsApi');
 
-      cy.intercept('GET', unitsURL).as('unitsApi');
-
-			ServiceJobPage.visit();
+        ServiceJobPage.visit();
+        cy.get('span[role="progressbar"]').should('not.exist');
     });
-  });
 
-  it('should create a job', () => {
-    cy.contains('button', 'New Job').should('not.be.disabled').click();
+    it('should create a job', () => {
+        cy.contains('button', 'New Job').should('not.be.disabled').click();
 
-    const randomJobType = randomEnumKey(ServiceOrderTypeKeys);
-    cy.contains('li', randomJobType).click();
-    
-    cy.wait(1000);
-    ServiceJobPage.getFirstTableElement().click();
-    ServiceJobPage.goNext();
+        const randomJobType = randomEnumKey(ServiceOrderTypeKeys);
+        cy.contains('li', randomJobType).click();
 
-    // Execute the steps for the selected job type, each option should be checked
-    secondStep[ServiceOrderTypeKeys[randomJobType]].forEach(step => step());
-    ServiceJobPage.goNext();
+        cy.get("span[role='progressbar']").should('exist');
+        cy.get("span[role='progressbar']").should('not.exist');
+        cy.wait('@unitsApi');
+        ServiceJobPage.getFirstTableElement().click();
+        ServiceJobPage.goNext();
 
-    cy.wait(100);
-    cy.contains('button', 'Submit').should('not.be.disabled').click();
-    cy.contains('Order scheduled successfully');
-  });
+        // Execute the steps for the selected job type
+        NewServiceJobPage.selectADueDate();
+        NewServiceJobPage.selectADateTimeAndTechnician();
+        ServiceJobPage.goNext();
+
+        cy.contains('button', 'Submit').should('not.be.disabled').click();
+        cy.contains('Order scheduled successfully');
+    });
 });

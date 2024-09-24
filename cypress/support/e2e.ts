@@ -17,9 +17,9 @@ import 'cypress-real-events';
 
 // Import commands.js using ES2015 syntax:
 import './commands';
-// Alternatively, if you want to ignore all uncaught exceptions:
-Cypress.on('uncaught:exception', () => false);
-// suppress AssertionError
-Cypress.on('fail', () => false);
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+const installLogsCollector = require('cypress-terminal-report/src/installLogsCollector');
+
+installLogsCollector();
