@@ -109,12 +109,14 @@ const AsyncSelect = <T,>({
               _.get(option, valueKey) === _.get(value, valueKey)
             }
             getOptionLabel={(option) => _.get(option, labelKey) as string}
+            getOptionKey={(option) => _.get(option, valueKey) as string}
             loading={loading}
             options={options}
             filterOptions={(
               optionsToFilter: T[],
               state: FilterOptionsState<T>,
             ) => {
+              if (!searchableKeys.length) return optionsToFilter;
               const searchText = state.inputValue.toLowerCase();
               return optionsToFilter.filter((option) =>
                 searchableKeys.some((key) => {

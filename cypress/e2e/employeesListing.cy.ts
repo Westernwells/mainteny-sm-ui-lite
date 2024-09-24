@@ -14,23 +14,24 @@ describe('Employees page - list page', () => {
         cy.intercept('GET', technicianEventsAPI).as('technicianEventsAPI');
 
         EmployeesPage.visit();
+        cy.get('span[role="progressbar"]').should('not.exist');
         cy.wait('@employeesAPI');
         cy.wait('@technicianEventsAPI');
     });
 
     it('employee availabilty status is showing correctly', () => {
-        EmployeesPage.setAvailableEmployeeRowIndex();
-        cy.get<string>('@availableEmployeeRowIndex').then((i) => {
+        EmployeesPage.getAvailableEmployeeRowIndex().then((i) => {
             EmployeesPage.getEmployeeByIndex(i).click();
-        });
-        EmployeesPage.addHoliday();
-        EmployeesPage.verifyHoliday();
+            cy.get('span[role="progressbar"]').should('not.exist');
+            cy.wait('@employeesAPI');
+            EmployeesPage.addHoliday();
+            EmployeesPage.verifyHoliday();
 
-        // check if employee is availablity is updated on employees listing page
-        cy.go('back'); // go back to employees listing page
-        cy.wait('@employeesAPI');
-        cy.wait('@technicianEventsAPI');
-        cy.get<string>('@availableEmployeeRowIndex').then((i) => {
+            // check if employee is availablity is updated on employees listing page
+            cy.go('back'); // go back to employees listing page
+            cy.get('span[role="progressbar"]').should('not.exist');
+            cy.wait('@employeesAPI');
+            cy.wait('@technicianEventsAPI');
             EmployeesPage.checkEmployeeAvailabilityUpdated(i);
 
             // clean up - remove holiday
@@ -39,24 +40,22 @@ describe('Employees page - list page', () => {
     });
 
     it('employee availabilty status is showing correctly on employees listing 2nd page', () => {
-        cy.get('button[aria-label="Go to next page"]').click();
-        cy.get("span[role='progressbar']").should('exist');
+        cy.get('svg[data-testid="KeyboardArrowRightIcon"]').click();
         cy.wait('@employeesAPI');
-        cy.get("span[role='progressbar']").should('not.exist');
         cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
 
-        EmployeesPage.setAvailableEmployeeRowIndex();
-        cy.get<string>('@availableEmployeeRowIndex').then((i) => {
+        EmployeesPage.getAvailableEmployeeRowIndex().then((i) => {
             EmployeesPage.getEmployeeByIndex(i).click();
-        });
-        EmployeesPage.addHoliday();
-        EmployeesPage.verifyHoliday();
+            cy.get('span[role="progressbar"]').should('not.exist');
+            cy.wait('@employeesAPI');
+            EmployeesPage.addHoliday();
+            EmployeesPage.verifyHoliday();
 
-        // check if employee is availablity is updated on employees listing page
-        cy.go('back'); // go back to employees listing page
-        cy.wait('@employeesAPI');
-        cy.wait('@technicianEventsAPI');
-        cy.get<string>('@availableEmployeeRowIndex').then((i) => {
+            // check if employee is availablity is updated on employees listing page
+            cy.go('back'); // go back to employees listing page
+            cy.get('span[role="progressbar"]').should('not.exist');
+            cy.wait('@employeesAPI');
+            cy.wait('@technicianEventsAPI');
             EmployeesPage.checkEmployeeAvailabilityUpdated(i);
 
             // clean up - remove holiday

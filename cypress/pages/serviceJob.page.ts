@@ -26,6 +26,10 @@ export default class ServiceJobPage {
       this.selectTechnicianWithIndex(i);
     }
 
+    cy.contains('label', 'Due date').click();
+    cy.get('button[aria-current="date"]').click();
+    cy.contains('button', 'Confirm').click({waitForAnimations: false});
+
     if (withSchedule) {
       // enable choose a fixed date and time checkbox
       cy.get('[type="checkbox"]').check();
@@ -34,7 +38,7 @@ export default class ServiceJobPage {
       // select start and end date
       cy.contains('label', 'Start and end date').click();
       cy.get('button[aria-current="date"]').click();
-      cy.contains('button', 'Confirm').click();
+      cy.contains('button', 'Confirm').click({waitForAnimations: false});
 
       // select start time
       cy.contains('label', 'Start Time').click();

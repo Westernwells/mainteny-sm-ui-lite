@@ -32,19 +32,22 @@ const queryClient = new QueryClient({
 
 const isProduction = import.meta.env.MODE === 'prod';
 
-Sentry.init({
-  dsn: import.meta.env.REACT_APP_SENTRY_DSN,
-  environment: isProduction ? 'production' : import.meta.env.MODE,
-  debug: !isProduction,
-  replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
-  replaysOnErrorSampleRate: 1.0,
-  integrations: [
-    new Sentry.Replay({
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-  ],
-});
+// disable Sentry in Cypress e2e tests
+if (!window.Cypress) {
+  Sentry.init({
+    dsn: import.meta.env.REACT_APP_SENTRY_DSN,
+    environment: isProduction ? 'production' : import.meta.env.MODE,
+    debug: !isProduction,
+    replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
+    replaysOnErrorSampleRate: 1.0,
+    integrations: [
+      Sentry.replayIntegration({
+        maskAllText: true,
+        blockAllMedia: true,
+      }),
+    ],
+  });
+}
 
 // Add the script tag dynamically
 const script = document.createElement('script');
@@ -57,19 +60,6 @@ const container = document.querySelector('#root') as Element;
 const root = createRoot(container); // Create a root.
 
 LicenseInfo.setLicenseKey(import.meta.env.REACT_APP_MUI_PRO_LICENSE);
-
-/*
-When a new deployment occurs, the hosting service may delete the assets from
-previous deployments. As a result, a user who visited our site before the new
-deployment might encounter an import error. This error happens because the
-assets running on that user's device are outdated and it tries to import the
-corresponding old chunk, which is deleted. This event is useful for addressing
-this situation.
-https://vitejs.dev/guide/build#load-error-handling
-*/
-window.addEventListener('vite:preloadError', () => {
-  window.location.reload();
-});
 
 root.render(
   <ThemeProvider theme={theme}>
@@ -89,7 +79,7 @@ root.render(
           </UserCompanyProvider>
         </SnackbarProvider>
 
-        <ReactQueryDevtools />
+        {window.Cypress ? null : <ReactQueryDevtools />}
       </QueryClientProvider>
     </LanguageProvider>
   </ThemeProvider>,

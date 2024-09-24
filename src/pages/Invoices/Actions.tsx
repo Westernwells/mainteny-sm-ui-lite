@@ -203,7 +203,9 @@ export const Actions = ({
   const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
     selectedInvoice?.additionalInfo.pdfPath
       ? [selectedInvoice?.additionalInfo.pdfPath]
-      : [pdfPathToDownload],
+      : pdfPathToDownload
+      ? [pdfPathToDownload]
+      : [],
     {enabled: false},
   );
 
@@ -559,6 +561,16 @@ export const Actions = ({
     setSelectedInvoice(invoice);
   };
 
+  const waitForHeaderAndFooter = () =>
+    new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (!isHeaderUrlLoading && !isFooterUrlLoading) {
+          clearInterval(interval);
+          resolve(true);
+        }
+      }, 100); // Check every 100ms
+    });
+
   // Helper function to fetch and create files
   const fetchAndCreateFiles = async (
     url: string,
@@ -628,7 +640,8 @@ export const Actions = ({
     },
   ) => {
     if (isHeaderUrlLoading || isFooterUrlLoading) {
-      return;
+      // wait for header and footer to load
+      await waitForHeaderAndFooter();
     }
 
     let allFiles: FileWithPreview[] = [];
@@ -712,10 +725,7 @@ export const Actions = ({
 
   const checkValidQrCode = useCallback(
     async (qrInvoice: InvoiceView) => {
-      if (
-        !user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
-        invoice.status !== InvoiceStatus.DRAFT
-      ) {
+      if (!user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
         return '';
       }
 
@@ -916,7 +926,7 @@ export const Actions = ({
         </IconButton>
       </Tooltip>
     );
-  }, [invoice.status, downloadUrl, companyNextNumber?.value]);
+  }, [invoice, downloadUrl, companyNextNumber?.value]);
 
   const actions = useMemo(() => {
     const items = [];
@@ -1081,7 +1091,7 @@ export const Actions = ({
     }
 
     return items;
-  }, [downloadUrl, invoice.status, t, companyNextNumber?.value, invoice.type]);
+  }, [downloadUrl, invoice, t, companyNextNumber?.value]);
 
   useEffectAfterMount(() => {
     (async () => {
@@ -1517,6 +1527,7 @@ export const Actions = ({
                       anchorOrigin: {horizontal: 'right', vertical: 'bottom'},
                     },
                   );
+                  setSelectedInvoice(null);
                 },
               },
             );

@@ -29,6 +29,7 @@ import {
 } from 'utils/currency';
 import {convertToText} from 'utils/utils';
 import {createEmptyResource} from 'utils/paging';
+import {getPlainStringFromHtml, isPlainString} from 'utils/rich-field-string';
 import DOMPurify from 'dompurify';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
@@ -69,7 +70,15 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
 
   const validationSchema = Yup.object().shape({
     category: Yup.string().nullable(),
-    name: Yup.string().nullable().required('Name is required'),
+    name: Yup.string().test('checkName', 'Name is required', (value) => {
+      if (
+        !value ||
+        (isPlainString(value) ? value : getPlainStringFromHtml(value)) === ''
+      ) {
+        return false;
+      }
+      return true;
+    }),
     externalId: Yup.string()
       .nullable()
       .test(

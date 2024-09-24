@@ -62,7 +62,7 @@ describe('Create Article', () => {
         ArticlesPage.fillDescription(validArticle.secondStep);
         ArticlesPage.goNext();
 
-        cy.wait('@articleSuppliersAPI', {timeout: 15000})
+        cy.wait('@articleSuppliersAPI')
             .its('response')
             .then((response) => {
                 const {
