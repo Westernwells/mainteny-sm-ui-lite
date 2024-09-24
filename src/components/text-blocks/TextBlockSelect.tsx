@@ -28,13 +28,14 @@ import {columns, makeRows} from './TextBlockSelectGridProps';
 import {Order, OrderByParams} from '../../models/pagination';
 
 type Props = {
-  textBlockCategory: TextBlockCategory;
-  setOpenTextBlockDialog: Dispatch<SetStateAction<boolean>>;
-  setActiveSubDialog: Dispatch<
+  textBlockCategories?: TextBlockCategory[];
+  setOpenTextBlockDialog?: Dispatch<SetStateAction<boolean>>;
+  setActiveSubDialog?: Dispatch<
     SetStateAction<'edit' | 'preview' | 'delete' | 'create' | undefined>
   >;
-  setActiveTextBlock: Dispatch<SetStateAction<TextBlockView | undefined>>;
+  setActiveTextBlock?: Dispatch<SetStateAction<TextBlockView | undefined>>;
   handleCellClick: (rowParams: GridCellParams<any, any, any>) => void;
+  showNewBlockButton?: boolean;
 };
 
 const validationSchema = Yup.object().shape({
@@ -46,11 +47,12 @@ const validationSchema = Yup.object().shape({
 const pageSize = 500;
 
 const TextBlockSelect = ({
-  textBlockCategory,
+  textBlockCategories,
   setOpenTextBlockDialog,
   setActiveSubDialog,
   setActiveTextBlock,
   handleCellClick,
+  showNewBlockButton = true,
 }: Props) => {
   const [page, setPage] = useState(makePage(0, pageSize));
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -82,7 +84,7 @@ const TextBlockSelect = ({
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query,
-      categories: [textBlockCategory],
+      categories: textBlockCategories || [TextBlockCategory.QUOTATION],
       order: sortOrder || Order.DESC,
       orderByField: orderByField || TextBlockOrderField.CREATED_AT,
     },
@@ -111,30 +113,29 @@ const TextBlockSelect = ({
       text: '',
       category: TextBlockCategory.QUOTATION,
     });
-    setActiveTextBlock(undefined);
-    setOpenTextBlockDialog(false);
-    setActiveSubDialog('create');
+    setActiveTextBlock?.(undefined);
+    setOpenTextBlockDialog?.(false);
+    setActiveSubDialog?.('create');
   }, []);
-
   const getEditableTextBlocks = useCallback((item: TextBlockRow) => {
     const textBlockItem = mapJsonToTextBlockView(item);
-    setActiveTextBlock(textBlockItem);
-    setOpenTextBlockDialog(false);
-    setActiveSubDialog('edit');
+    setActiveTextBlock?.(textBlockItem);
+    setOpenTextBlockDialog?.(false);
+    setActiveSubDialog?.('edit');
   }, []);
 
   const getPreviewTextBlocks = (item: TextBlockRow) => {
     const textBlockItem = mapJsonToTextBlockView(item);
-    setActiveTextBlock(textBlockItem);
-    setOpenTextBlockDialog(false);
-    setActiveSubDialog('preview');
+    setActiveTextBlock?.(textBlockItem);
+    setOpenTextBlockDialog?.(false);
+    setActiveSubDialog?.('preview');
   };
 
   const getDeletableTextBlocks = useCallback((item: TextBlockRow) => {
     const textBlockItem = mapJsonToTextBlockView(item);
-    setActiveTextBlock(textBlockItem);
-    setOpenTextBlockDialog(false);
-    setActiveSubDialog('delete');
+    setActiveTextBlock?.(textBlockItem);
+    setOpenTextBlockDialog?.(false);
+    setActiveSubDialog?.('delete');
   }, []);
 
   const columnsMemo = useCallback(
@@ -153,11 +154,11 @@ const TextBlockSelect = ({
         searchPlaceholder="Find your text block"
         getSearchValue={setQuery}
         refInput={textInput}
-        showActionBtn
+        showActionBtn={showNewBlockButton}
         btnLabel="New Block"
         btnOnClick={onCreateContact}
         searchInputStyles={{width: '100%'}}
-        searchInputWrapperStyles={{width: '60%'}}
+        searchInputWrapperStyles={{width: showNewBlockButton ? '60%' : '100%'}}
       />
 
       <DataGridLayout

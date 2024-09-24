@@ -87,7 +87,6 @@ export const useAuth = (): UseAuth => {
     } catch (err: any) {
       showError(err);
       setLoading(false);
-      console.log(err);
     }
   };
 
@@ -118,7 +117,6 @@ export const useAuth = (): UseAuth => {
       }
     } catch (err) {
       showError(err);
-      console.log(err);
     }
   };
 

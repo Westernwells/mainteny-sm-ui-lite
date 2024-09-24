@@ -136,7 +136,6 @@ export const SelectShift = ({values, setFieldValue}: Props) => {
             <InputLabel
               id="shiftDaySelect-label"
               sx={{
-                bgcolor: 'white',
                 color: 'text.primary',
                 paddingInline: '.5em',
               }}

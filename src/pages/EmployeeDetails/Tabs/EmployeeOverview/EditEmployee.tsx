@@ -76,6 +76,8 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
     serviceCompanyId: user?.userAccount.serviceCompany.id,
     employeeId: employee.userData.externalId,
     team: employee.userData.team,
+    totalYearlyVacationDaysAllowed:
+      employee.userData.additionalInfo?.totalYearlyVacationDaysAllowed,
   };
 
   const validationSchema = Yup.object().shape({
@@ -123,7 +125,8 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
     <Formik
       validationSchema={validationSchema}
       initialValues={initialValues}
-      onSubmit={handleSubmit}>
+      onSubmit={handleSubmit}
+      enableReinitialize>
       <EditEmployeeForm
         openDialog={openDialog}
         onClose={onClose}

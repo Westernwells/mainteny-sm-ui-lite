@@ -1,21 +1,24 @@
-import {IconButton} from '@mui/material';
+import {IconButton, Tooltip} from '@mui/material';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import {t} from 'i18next';
 
 interface Props {
   onClick?: () => void;
 }
 const AttachFileButton = ({onClick}: Props) => (
-  <IconButton
-    onClick={onClick}
-    sx={{
-      borderRadius: '4px',
-      padding: '5px',
-    }}>
-    <AttachFileIcon
+  <Tooltip title={t('Attachment')} arrow placement="top">
+    <IconButton
+      onClick={onClick}
       sx={{
-        fontSize: '1.3rem',
-      }}
-    />
-  </IconButton>
+        borderRadius: '4px',
+        padding: '5px',
+      }}>
+      <AttachFileIcon
+        sx={{
+          fontSize: '1.3rem',
+        }}
+      />
+    </IconButton>
+  </Tooltip>
 );
 export default AttachFileButton;

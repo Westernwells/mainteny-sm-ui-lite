@@ -45,6 +45,7 @@ import {IconButton, InputAdornment} from '@mui/material';
 import {Dialog} from 'components/Dialog';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
+import {cleanHtmlContent} from 'utils/text-block';
 import PdfPreview from './PDFPreview';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
 import OrderArticlePDF from './OrderArticlePDF';
@@ -153,7 +154,7 @@ export const OrderArticle = () => {
 
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
     if (textBlockField === 'DESCRIPTION') {
-      formik.setFieldValue('description', rowParams.row.text);
+      formik.setFieldValue('description', cleanHtmlContent(rowParams.row.text));
     }
     setOpenTextBlockDialog(false);
   };
@@ -533,7 +534,13 @@ export const OrderArticle = () => {
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategory={TextBlockCategory.ARTICLE_ORDER}
+          textBlockCategories={[
+            TextBlockCategory.QUOTATION,
+            TextBlockCategory.ARTICLE_ORDER,
+            TextBlockCategory.INVOICE,
+            TextBlockCategory.SERVICE_ORDER,
+            TextBlockCategory.SERVICE_ORDER_REPORT,
+          ]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}

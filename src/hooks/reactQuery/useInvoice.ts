@@ -225,7 +225,6 @@ export const useSendInvoice = ({
         }
       },
       onError: (err: AxiosError, {body}) => {
-        console.log(err);
         const responseErrorCode = (err?.response?.data as RestError)?.errorCode;
         if (responseErrorCode === ErrorCode.DUPLICATE_INVOICE_EXTERNAL_ID) {
           enqueueSnackbar(
@@ -275,7 +274,6 @@ export const usePublishInvoice = ({
         }
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -304,7 +302,6 @@ export const useInvoicePaymentStatus = () => {
         navigate(`/invoices/details/${invoiceId}`);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -343,7 +340,6 @@ export const useAddInvoicePayment = () => {
         navigate(`/invoices/details/${invoiceId}`);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -372,7 +368,6 @@ export const useCreateInvoice = () => {
       // navigate(`/invoices/details/${data.value}`);
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -400,7 +395,6 @@ export const useUpdateInvoice = () => {
         });
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -433,7 +427,6 @@ export const useDeleteInvoice = () => {
         if (shouldNavigate) navigate(`/invoices?pageIndex=1&pageSize=25`);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -530,7 +523,6 @@ export const useCreateInvoiceComment = () => {
     {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -557,7 +549,6 @@ export const useDeleteInvoiceComment = () => {
     {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -593,7 +584,6 @@ export const useUpdateInvoiceComment = () => {
     {
       onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -629,7 +619,6 @@ export const useCreateInvoiceOverdueNotice = () => {
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
       },
       onError: (err) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -672,7 +661,6 @@ export const usePublishInvoiceOverdueNotice = () => {
         navigate(`/invoices/details/${invoiceId}`);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -754,7 +742,6 @@ export const useCancelInvoice = () => {
       navigate(`/invoices/`);
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });

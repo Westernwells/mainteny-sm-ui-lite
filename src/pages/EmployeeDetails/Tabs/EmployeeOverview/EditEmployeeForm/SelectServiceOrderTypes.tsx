@@ -236,6 +236,7 @@ export const SelectServiceOrderTypes = ({values, setFieldValue}: Props) => {
           key={option.name}
           label={option.label}
           handleChange={handleCheckbox}
+          style={{width: '47%'}}
         />
       ))}
     </>

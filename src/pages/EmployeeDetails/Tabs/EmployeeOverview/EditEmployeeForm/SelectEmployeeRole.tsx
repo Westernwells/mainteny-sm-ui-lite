@@ -72,7 +72,6 @@ export const SelectEmployeeRole = () => {
       <InputLabel
         id="roleSelect-label"
         sx={{
-          bgcolor: 'white',
           color: 'text.primary',
           paddingInline: '.5em',
         }}>

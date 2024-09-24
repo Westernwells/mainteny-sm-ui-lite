@@ -63,6 +63,7 @@ import {TextBlockCategory, TextBlockView} from 'models/text-block';
 import {Dialog} from 'components/Dialog';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
+import {cleanHtmlContent} from 'utils/text-block';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -415,7 +416,14 @@ export const WorkReport = ({serviceOrder}: Props) => {
   };
 
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
-    formik.setFieldValue('description', rowParams.row.text);
+    const currentDescription = cleanHtmlContent(
+      formik.values.description || '',
+    );
+    const newDescription = cleanHtmlContent(
+      `${currentDescription} ${rowParams.row.text}`.trim(),
+    );
+
+    formik.setFieldValue('description', newDescription);
     setOpenTextBlockDialog(false);
   };
 
@@ -672,21 +680,23 @@ export const WorkReport = ({serviceOrder}: Props) => {
             minRows={4}
             disabled={!isEditMode}
             endAdornment={
-              <InputAdornment
-                component={IconButton}
-                disableRipple
-                position="end"
-                sx={{
-                  mt: 1,
-                  mr: -1,
-                  alignSelf: 'flex-start',
-                }}
-                onClick={() => {
-                  setOpenTextBlockDialog(true);
-                }}
-                size="small">
-                <TextSnippetIcon />
-              </InputAdornment>
+              isEditMode && (
+                <InputAdornment
+                  component={IconButton}
+                  disableRipple
+                  position="end"
+                  sx={{
+                    mt: 1,
+                    mr: -1,
+                    alignSelf: 'flex-start',
+                  }}
+                  onClick={() => {
+                    setOpenTextBlockDialog(true);
+                  }}
+                  size="small">
+                  <TextSnippetIcon />
+                </InputAdornment>
+              )
             }
           />
         </Box>
@@ -807,7 +817,13 @@ export const WorkReport = ({serviceOrder}: Props) => {
         showCancelButton={false}
         showSaveButton={false}>
         <TextBlockSelect
-          textBlockCategory={TextBlockCategory.SERVICE_ORDER_REPORT}
+          textBlockCategories={[
+            TextBlockCategory.QUOTATION,
+            TextBlockCategory.ARTICLE_ORDER,
+            TextBlockCategory.INVOICE,
+            TextBlockCategory.SERVICE_ORDER,
+            TextBlockCategory.SERVICE_ORDER_REPORT,
+          ]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
           setActiveTextBlock={setActiveTextBlock}

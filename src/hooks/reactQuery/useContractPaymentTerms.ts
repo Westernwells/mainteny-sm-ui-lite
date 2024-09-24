@@ -32,7 +32,6 @@ export const useCreateContractTerm = (successMsg?: string) => {
       queryClient.invalidateQueries([queryKeys.queryContractTerms]);
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -65,7 +64,6 @@ export const useUpdateContractTerm = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.invoiceById);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -93,7 +91,6 @@ export const useDeleteContractTerm = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.contractDetails);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },
@@ -122,7 +119,6 @@ export const useCreateContractPaymentTerm = (successMsg?: string) => {
       queryClient.invalidateQueries([queryKeys.queryContractTerms]);
     },
     onError: (err) => {
-      console.log(err);
       showError(err);
     },
   });
@@ -160,7 +156,6 @@ export const useUpdateContractPaymentTerm = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.invoiceById);
       },
       onError: (err: any) => {
-        console.log(err);
         showError(err);
       },
     },

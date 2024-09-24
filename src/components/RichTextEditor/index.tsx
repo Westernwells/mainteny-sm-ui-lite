@@ -15,6 +15,7 @@ import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import {ONE_KB_IN_BYTES, ONE_MB_IN_BYTES} from 'utils/constants';
 import CircularProgress from '@mui/material/CircularProgress';
+import {cleanHtmlContent} from 'utils/text-block';
 import EditorMenuControls from './EditorMenuControls';
 import useExtensions from './useExtensions';
 
@@ -198,8 +199,10 @@ const RichTextEditor = ({
       extensions={extensions}
       content={value}
       onUpdate={({editor}) => {
-        updateHtml?.(editor.getHTML());
-        onChange(editor.getHTML());
+        const cleanedHtml = cleanHtmlContent(editor.getHTML());
+
+        updateHtml?.(cleanedHtml);
+        onChange(cleanedHtml);
       }}
     />
   );
@@ -242,6 +245,21 @@ const RichTextEditor = ({
           },
           '& .ProseMirror-focused': {
             outline: 'none',
+          },
+          '& .ProseMirror ul, .ProseMirror ol': {
+            marginLeft: '20px',
+            listStylePosition: 'inside',
+          },
+          '& .ProseMirror ul': {
+            listStyleType: 'disc',
+          },
+          '& .ProseMirror ol': {
+            listStyleType: 'decimal',
+          },
+          '& .ProseMirror li p': {
+            display: 'inline-flex',
+            margin: 0,
+            padding: 0,
           },
           '& .tiptap p.is-editor-empty:first-of-type::before': {
             color: '#adb5bd',
