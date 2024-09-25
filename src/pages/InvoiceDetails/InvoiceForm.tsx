@@ -277,6 +277,7 @@ export const InvoiceForm = ({
     customerId = '',
     orderId = '',
     invoiceId = '',
+    isDuplicate = false,
   } = queryString.parse(search);
 
   const isDrawerOpen = true;
@@ -629,27 +630,39 @@ export const InvoiceForm = ({
     const creditNoteArticle = articleViewToInvoiceItemRecord(
       creditNoteArticlesResource.data[0],
     );
-    formik.setFieldValue('items', [
-      {
-        ...creditNoteArticle,
-        unitAmount: {
-          ...creditNoteArticle.unitAmount,
-          netAmount: -Math.abs(invoice?.totalAmount?.netAmount ?? 0),
-          percentageVat: invoice?.totalAmount?.percentageVat ?? 0,
+    if (
+      [InvoiceType.PARTIAL, InvoiceType.UPFRONT, InvoiceType.FINAL].includes(
+        invoice?.type || InvoiceType.FULL,
+      )
+    ) {
+      // for partial, upfront and final invoices, show 1 credit note article with negative net amount
+      formik.setFieldValue('items', [
+        {
+          ...creditNoteArticle,
+          unitAmount: {
+            ...creditNoteArticle.unitAmount,
+            netAmount: -Math.abs(invoice?.totalAmount?.netAmount ?? 0),
+            percentageVat: invoice?.totalAmount?.percentageVat ?? 0,
+          },
         },
-      },
-    ]);
+      ]);
+    } else {
+      // for full invoices, show all articles with negative net amount
+      formik.setFieldValue(
+        'items',
+        invoice?.items?.map((item) => {
+          return invoiceItemToInvoiceItemRecord(item, InvoiceType.CREDIT_NOTE);
+        }),
+      );
+    }
   };
 
   useEffect(() => {
-    if (invoice) {
+    if (invoice && !isLoadingCreditNoteArticles) {
       if (
         invoiceType === InvoiceType.CREDIT_NOTE &&
-        !isNewInvoice &&
-        creditNoteArticlesResource.data.length &&
-        [InvoiceType.PARTIAL, InvoiceType.UPFRONT, InvoiceType.FINAL].includes(
-          invoice?.type || InvoiceType.FULL,
-        )
+        isNewInvoice &&
+        creditNoteArticlesResource.data.length
       ) {
         setCreditNoteArticles();
       } else {
@@ -795,7 +808,7 @@ export const InvoiceForm = ({
     formik.setFieldValue(
       'items',
       invoiceData?.items?.map((item) =>
-        invoiceItemToInvoiceItemRecord(item, invoiceData.type),
+        invoiceItemToInvoiceItemRecord(item, invoiceType || invoiceData.type),
       ),
     );
 
@@ -1194,13 +1207,11 @@ export const InvoiceForm = ({
       }
     };
 
-    // Handle duplication case with invoiceId
-    if (invoiceId && invoice?.subject) {
-      return invoice.subject;
+    if (isNewInvoice && !isDuplicate) {
+      return getTranslatedSubject();
     }
 
-    // Handle new and edit cases
-    return invoice?.subject ? invoice?.subject : getTranslatedSubject() || '';
+    return invoice?.subject ? invoice?.subject : '';
   }, [invoice, invoiceId, invoiceType, previousInvoices, t]);
 
   useEffect(() => {
