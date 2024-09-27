@@ -1,0 +1,264 @@
+{
+  "discount": {
+    "type": "AMOUNT",
+    "amount": {
+      "value": 500000,
+      "currency": "EUR",
+      "fractionDigits": 2
+    },
+    "percentage": 9.615384615384617
+  },
+  "payment": {
+    "type": "PERCENTAGE",
+    "amount": {
+      "netAmount": 4700000,
+      "grossAmount": 5639096,
+      "currency": "EUR",
+      "vats": [
+        {
+          "vat": 17173,
+          "percentageVat": 19
+        },
+        {
+          "vat": 921923,
+          "percentageVat": 20
+        }
+      ],
+      "fractionDigits": 2,
+      "vat": 17173,
+      "percentageVat": 19
+    },
+    "percentage": 100,
+    "description": ""
+  },
+  "amountBeforeGlobalDiscount": {
+    "netAmount": 5200000,
+    "grossAmount": 6239000,
+    "currency": "EUR",
+    "vats": [
+      {
+        "vat": 19000,
+        "percentageVat": 19
+      },
+      {
+        "vat": 1020000,
+        "percentageVat": 20
+      }
+    ],
+    "fractionDigits": 2,
+    "vat": 19000,
+    "percentageVat": 19
+  },
+  "amountAfterGlobalDiscount": {
+    "netAmount": 4700000,
+    "grossAmount": 5639096,
+    "currency": "EUR",
+    "vats": [
+      {
+        "vat": 17173,
+        "percentageVat": 19
+      },
+      {
+        "vat": 921923,
+        "percentageVat": 20
+      }
+    ],
+    "fractionDigits": 2,
+    "vat": 17173,
+    "percentageVat": 19
+  },
+  "items": [
+    {
+      "discount": {
+        "type": "PERCENTAGE",
+        "amount": {
+          "value": 0,
+          "currency": "EUR",
+          "fractionDigits": 2
+        },
+        "percentage": 0
+      },
+      "percentageVat": 20,
+      "amountBeforeItemDiscount": {
+        "netAmount": 100000,
+        "grossAmount": 120000,
+        "vat": 20000,
+        "currency": "EUR",
+        "percentageVat": 20,
+        "fractionDigits": 2
+      },
+      "amountAfterItemDiscount": {
+        "netAmount": 100000,
+        "grossAmount": 120000,
+        "vat": 20000,
+        "currency": "EUR",
+        "percentageVat": 20,
+        "fractionDigits": 2
+      },
+      "amountAfterGlobalDiscount": {
+        "netAmount": 90385,
+        "grossAmount": 108462,
+        "vat": 18077,
+        "currency": "EUR",
+        "percentageVat": 20,
+        "fractionDigits": 2
+      },
+      "payment": {
+        "type": "PERCENTAGE",
+        "amount": {
+          "netAmount": 90385,
+          "grossAmount": 108462,
+          "vat": 18077,
+          "currency": "EUR",
+          "percentageVat": 20,
+          "fractionDigits": 2
+        },
+        "percentage": 100
+      }
+    },
+    {
+      "discount": {
+        "type": "AMOUNT",
+        "amount": {
+          "value": 100000,
+          "currency": "EUR",
+          "fractionDigits": 2
+        },
+        "percentage": 2
+      },
+      "percentageVat": 20,
+      "amountBeforeItemDiscount": {
+        "netAmount": 5000000,
+        "grossAmount": 6000000,
+        "vat": 1000000,
+        "currency": "EUR",
+        "percentageVat": 20,
+        "fractionDigits": 2
+      },
+      "amountAfterItemDiscount": {
+        "netAmount": 4900000,
+        "grossAmount": 5880000,
+        "vat": 980000,
+        "currency": "EUR",
+        "percentageVat": 20,
+        "fractionDigits": 2
+      },
+      "amountAfterGlobalDiscount": {
+        "netAmount": 4428846,
+        "grossAmount": 5314615,
+        "vat": 885769,
+        "currency": "EUR",
+        "percentageVat": 20,
+        "fractionDigits": 2
+      },
+      "payment": {
+        "type": "PERCENTAGE",
+        "amount": {
+          "netAmount": 4428846,
+          "grossAmount": 5314615,
+          "vat": 885769,
+          "currency": "EUR",
+          "percentageVat": 20,
+          "fractionDigits": 2
+        },
+        "percentage": 100
+      }
+    },
+    {
+      "discount": {
+        "type": "PERCENTAGE",
+        "amount": {
+          "value": 0,
+          "currency": "EUR",
+          "fractionDigits": 2
+        },
+        "percentage": 0
+      },
+      "percentageVat": 20,
+      "amountBeforeItemDiscount": {
+        "netAmount": 100000,
+        "grossAmount": 120000,
+        "vat": 20000,
+        "currency": "EUR",
+        "percentageVat": 20,
+        "fractionDigits": 2
+      },
+      "amountAfterItemDiscount": {
+        "netAmount": 100000,
+        "grossAmount": 120000,
+        "vat": 20000,
+        "currency": "EUR",
+        "percentageVat": 20,
+        "fractionDigits": 2
+      },
+      "amountAfterGlobalDiscount": {
+        "netAmount": 90385,
+        "grossAmount": 108462,
+        "vat": 18077,
+        "currency": "EUR",
+        "percentageVat": 20,
+        "fractionDigits": 2
+      },
+      "payment": {
+        "type": "PERCENTAGE",
+        "amount": {
+          "netAmount": 90385,
+          "grossAmount": 108462,
+          "vat": 18077,
+          "currency": "EUR",
+          "percentageVat": 20,
+          "fractionDigits": 2
+        },
+        "percentage": 100
+      }
+    },
+    {
+      "discount": {
+        "type": "PERCENTAGE",
+        "amount": {
+          "value": 0,
+          "currency": "EUR",
+          "fractionDigits": 2
+        },
+        "percentage": 0
+      },
+      "percentageVat": 19,
+      "amountBeforeItemDiscount": {
+        "netAmount": 100000,
+        "grossAmount": 119000,
+        "vat": 19000,
+        "currency": "EUR",
+        "percentageVat": 19,
+        "fractionDigits": 2
+      },
+      "amountAfterItemDiscount": {
+        "netAmount": 100000,
+        "grossAmount": 119000,
+        "vat": 19000,
+        "currency": "EUR",
+        "percentageVat": 19,
+        "fractionDigits": 2
+      },
+      "amountAfterGlobalDiscount": {
+        "netAmount": 90385,
+        "grossAmount": 107558,
+        "vat": 17173,
+        "currency": "EUR",
+        "percentageVat": 19,
+        "fractionDigits": 2
+      },
+      "payment": {
+        "type": "PERCENTAGE",
+        "amount": {
+          "netAmount": 90385,
+          "grossAmount": 107558,
+          "vat": 17173,
+          "currency": "EUR",
+          "percentageVat": 19,
+          "fractionDigits": 2
+        },
+        "percentage": 100
+      }
+    }
+  ]
+}

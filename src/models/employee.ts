@@ -19,6 +19,7 @@ export interface UserQueryParams {
 export interface EmployeeAdditionalInfo {
   leftVacationDays: number;
   assignedServiceOrderTypes?: ServiceOrderType[];
+  totalYearlyVacationDaysAllowed?: number;
 }
 
 export interface EmployeesView {

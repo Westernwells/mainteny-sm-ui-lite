@@ -41,6 +41,7 @@ import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
+  useInvoiceAmountDetail,
   useInvoiceDetail,
   useInvoicePaymentStatus,
   usePrintInvoice,
@@ -138,6 +139,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
   );
+
   const memorizedUpdateInvoiceData = useMemo(
     () =>
       updatedInvoice
@@ -237,6 +239,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
   );
+  const {data: invoiceAmountDetail} = useInvoiceAmountDetail(invoice?.id);
 
   const sortedPreviousInvoices = useMemo(
     () =>
@@ -580,6 +583,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         invoice={invoiceData}
+        invoiceAmountDetail={invoiceAmountDetail}
         selectedLng={company?.language}
         translate={translate}
         previousInvoices={previousInvoicesProp}

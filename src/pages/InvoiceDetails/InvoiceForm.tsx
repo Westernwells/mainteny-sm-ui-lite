@@ -619,6 +619,7 @@ export const InvoiceForm = ({
       .join('\n');
 
     return {
+      data: paymentTerm?.data,
       id: paymentTerm.id,
       term: discountOptions
         ? `${paymentTerm.term}\n${discountOptions}`
