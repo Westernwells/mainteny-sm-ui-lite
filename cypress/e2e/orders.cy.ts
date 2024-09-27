@@ -58,6 +58,7 @@ describe('Orders page - list page', () => {
         cy.get("span[role='progressbar']").should('not.exist');
         cy.wait(100); // Very small delay for the DOM to be updated, can be anything any small amount
         cy.get('div[data-field="JOB_TYPE"][role="cell"]').each(($el) => {
+            cy.wrap($el).scrollIntoView();
             cy.wrap($el).contains(ELEVATOR_OPERATION).should('be.visible');
         });
     });

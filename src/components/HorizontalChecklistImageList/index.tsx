@@ -52,7 +52,16 @@ export const HorizontalChecklistImageList = ({
         />
       ))}
       {openPreview && (
-        <MUIDialog onClose={closePreview} open={openPreview} maxWidth="sm">
+        <MUIDialog
+          onClose={closePreview}
+          open={openPreview}
+          maxWidth="sm"
+          sx={{
+            '& .MuiDialog-container > .MuiPaper-root': {
+              minHeight: '50%',
+              minWidth: '50%',
+            },
+          }}>
           <Carousel
             images={pictures?.map((p) => ({
               label: p.description,
