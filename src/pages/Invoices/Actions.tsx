@@ -29,6 +29,7 @@ import {
   useCancelInvoice,
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
+  useInvoiceAmountDetail,
   useInvoiceDetail,
   usePrintInvoice,
   useSendInvoice,
@@ -198,6 +199,10 @@ export const Actions = ({
 
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     selectedInvoice?.id!,
+  );
+
+  const {data: invoiceAmountDetail} = useInvoiceAmountDetail(
+    selectedInvoice?.id,
   );
 
   const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
@@ -526,6 +531,7 @@ export const Actions = ({
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         invoice={invoiceData}
+        invoiceAmountDetail={invoiceAmountDetail}
         selectedLng={company?.language}
         translate={translate}
         previousInvoices={previousInvoicesProp}

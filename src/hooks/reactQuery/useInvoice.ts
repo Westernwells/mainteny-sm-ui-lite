@@ -746,3 +746,18 @@ export const useCancelInvoice = () => {
     },
   });
 };
+
+export const fetchInvoiceAmountDetail = async (invoiceId: string) => {
+  const response = await axiosClient.get(`/api/invoices/${invoiceId}/amount/`);
+  return response.data;
+};
+
+export function useInvoiceAmountDetail(invoiceId?: string) {
+  return useQuery(
+    [qk.invoiceAmountById, invoiceId],
+    () => fetchInvoiceAmountDetail(invoiceId!),
+    {
+      enabled: !!invoiceId,
+    },
+  );
+}

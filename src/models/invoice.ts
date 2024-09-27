@@ -537,3 +537,20 @@ export interface PrintInvoiceRecord {
 export interface InvoiceGeneration {
   lastInvoiceDate?: string | null;
 }
+
+export interface InvoiceItemAmount {
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeGlobalDiscount: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount: Amount;
+  payment: InvoiceItemPaymentRecord;
+}
+
+export interface InvoiceAmountDetail {
+  discount: Discount;
+  payment: Payment;
+  amountBeforeGlobalDiscount: AggregatedAmount;
+  amountAfterGlobalDiscount: AggregatedAmount;
+  items: InvoiceItemAmount[];
+}

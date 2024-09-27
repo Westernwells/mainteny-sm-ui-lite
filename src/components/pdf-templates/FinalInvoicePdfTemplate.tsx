@@ -7,7 +7,7 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {InvoiceItem, InvoiceView} from 'models/invoice';
+import {InvoiceAmountDetail, InvoiceItem, InvoiceView} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {
@@ -79,6 +79,7 @@ type Props = {
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
   invoice: InvoiceView;
+  invoiceAmountDetail?: InvoiceAmountDetail;
   previousInvoices: InvoiceView[];
   selectedLng?: string;
   headerInfo: HeaderFooterInfoData;
@@ -95,6 +96,7 @@ const FinalInvoicePdfTemplate = ({
   userInfo,
   currentCurrency,
   invoice,
+  invoiceAmountDetail,
   selectedLng,
   previousInvoices,
   headerInfo,
@@ -259,6 +261,7 @@ const FinalInvoicePdfTemplate = ({
               translate={translate}
               selectedLng={selectedLng}
               invoice={invoice}
+              invoiceAmountDetail={invoiceAmountDetail}
               currentCurrency={currentCurrency}
               previousInvoices={previousInvoices}
               articleItems={articleItems}

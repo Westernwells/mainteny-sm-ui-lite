@@ -7,7 +7,7 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {InvoiceItem, InvoiceView} from 'models/invoice';
+import {InvoiceAmountDetail, InvoiceItem, InvoiceView} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {
   applyGlobalDiscountOnQuotationItems,
@@ -125,6 +125,7 @@ type Props = {
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
   invoice?: InvoiceView;
+  invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   headerInfo: HeaderFooterInfoData;
   headerPath: string;
@@ -140,6 +141,7 @@ const CreditNotePdfTemplate = ({
   userInfo,
   currentCurrency,
   invoice,
+  invoiceAmountDetail,
   selectedLng,
   headerInfo,
   headerPath,
@@ -195,11 +197,27 @@ const CreditNotePdfTemplate = ({
     },
   );
 
-  const formattedPaymentValues = getFormattedPaymentValues(
-    invoice?.additionalInfo.paymentTerm!,
-    invoice!,
-    amountAfterGlobalDiscountWithVAT,
-    currentCurrency,
+  const formattedPaymentValues = useMemo(() => {
+    if (
+      invoice?.additionalInfo.paymentTerm &&
+      invoice &&
+      invoiceAmountDetail &&
+      currentCurrency
+    ) {
+      return getFormattedPaymentValues(
+        invoice.additionalInfo.paymentTerm,
+        invoice,
+        invoiceAmountDetail,
+        currentCurrency,
+      );
+    }
+    return [];
+  }, [invoice, invoiceAmountDetail, invoice?.additionalInfo.paymentTerm]);
+
+  const replacedPaymentTerms = replacePaymentTermsPlaceholders(
+    invoice?.additionalInfo.paymentTerm?.term || '',
+    formattedPaymentValues ?? [],
+    currentCurrency!,
     selectedLng,
   );
 
@@ -208,6 +226,7 @@ const CreditNotePdfTemplate = ({
     ArticleType.LABOR,
     currentCurrency,
   );
+
   const materialCost = useCalculateLaborMaterialCost(
     itemsAfterGlobalDiscount,
     ArticleType.MATERIAL,
@@ -310,12 +329,7 @@ const CreditNotePdfTemplate = ({
                 <Text style={styles.sectionHeading}>
                   {translate('Payment terms')}
                 </Text>
-                <HtmlPDF
-                  html={replacePaymentTermsPlaceholders(
-                    invoice?.additionalInfo.paymentTerm?.term!,
-                    formattedPaymentValues ?? [],
-                  )}
-                />
+                <HtmlPDF html={replacedPaymentTerms} />
               </View>
             )}
 

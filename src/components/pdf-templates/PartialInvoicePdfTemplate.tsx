@@ -7,7 +7,12 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {InvoiceItem, InvoiceType, InvoiceView} from 'models/invoice';
+import {
+  InvoiceAmountDetail,
+  InvoiceItem,
+  InvoiceType,
+  InvoiceView,
+} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
@@ -40,6 +45,7 @@ type Props = {
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
   invoice?: InvoiceView;
+  invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   previousInvoices?: InvoiceView[];
   headerInfo: HeaderFooterInfoData;
@@ -168,6 +174,7 @@ const PartialInvoicePdfTemplate = ({
   userInfo,
   currentCurrency,
   invoice,
+  invoiceAmountDetail,
   selectedLng,
   previousInvoices,
   headerInfo,
@@ -360,6 +367,7 @@ const PartialInvoicePdfTemplate = ({
                 translate={translate}
                 selectedLng={selectedLng}
                 invoice={invoice}
+                invoiceAmountDetail={invoiceAmountDetail}
                 currentCurrency={currentCurrency}
                 previousInvoices={previousInvoices!}
                 articleItems={articleItems}
@@ -374,6 +382,7 @@ const PartialInvoicePdfTemplate = ({
                 currentCurrency={currentCurrency}
                 previousInvoices={previousInvoices!}
                 articleItems={articleItems}
+                invoiceAmountDetail={invoiceAmountDetail}
               />
             )}
 
