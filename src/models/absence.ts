@@ -8,6 +8,7 @@ export interface AbsenceItem {
   endTime: Date;
   startTime: Date;
   eventType: string;
+  eventSubtype: string;
   notes: string;
   meta: Meta;
 }

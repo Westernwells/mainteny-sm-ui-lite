@@ -95,6 +95,7 @@ export const queryKeys = {
   fetchTextBlockDetail: 'fetchTextBlockDetail',
   getWorkingTechnicians: 'getWorkingTechnicians',
   fetchServiceOrderComments: 'fetchServiceOrderComments',
+  fetchCompanyEventTypes: 'fetchCompanyEventTypes',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

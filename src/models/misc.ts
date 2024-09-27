@@ -374,7 +374,13 @@ export interface HeaderFooterInfoData {
 }
 
 export type CreateEditMode = 'create' | 'edit';
+export type CreateEditViewMode = 'view' | 'edit' | 'create';
 
 export type EmailObject = {
   bccEmails: string[];
 };
+
+export enum DataEditingScope {
+  ALL = 'ALL',
+  FUTURE = 'FUTURE',
+}
