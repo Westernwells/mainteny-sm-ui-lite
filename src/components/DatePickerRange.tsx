@@ -29,6 +29,8 @@ interface Props extends Partial<DateRangePickerProps<Date>> {
   textFieldProps?: TextFieldProps;
   inputLabelProps?: InputLabelProps;
   onClear: () => void;
+  inputTestId?: string;
+  popupTestId?: string;
 }
 
 const DatePickerRange = ({
@@ -41,6 +43,8 @@ const DatePickerRange = ({
   textFieldProps,
   inputLabelProps,
   onClear,
+  inputTestId,
+  popupTestId,
   ...props
 }: Props) => {
   const {t} = useTranslation();
@@ -169,6 +173,7 @@ const DatePickerRange = ({
                 },
                 popper: {
                   sx: popperSx,
+                  'data-testid': popupTestId,
                 },
                 textField: {
                   ...textFieldProps,
@@ -191,6 +196,7 @@ const DatePickerRange = ({
                     type: 'input',
                     onClick: () => handleOpen(open),
                     ref: inputRef,
+                    'data-testid': inputTestId,
                   },
                 },
               } as unknown as DateRangePickerSlotsComponentsProps<Date>

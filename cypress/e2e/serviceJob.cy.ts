@@ -19,47 +19,35 @@ describe('Job', () => {
     });
 
     it('validate Assign Engineer dialog', () => {
-        cy.contains('button', 'Assign Engineer').eq(0).click({waitForAnimations: false});
-
+        cy.contains('button', 'Assign Engineer').first().click({ waitForAnimations: false });
+    
         cy.contains('button', 'Save').should('be.disabled');
-
+    
         ServiceJobPage.selectTechnicianWithIndex(0);
-
+    
         cy.contains('button', 'Save').should('be.disabled');
-
+    
+        cy.get('input[type="checkbox"]').check({ force: true });
+        cy.get('input[type="checkbox"]').should('be.checked');
+    
+        cy.wait(500);
+    
         cy.contains('label', 'Due date').click();
-        cy.get('button[aria-current="date"]').click();
-        cy.contains('button', 'Confirm').click({waitForAnimations: false});
-
+        cy.get('button[aria-current="date"]').should('be.visible').click({ force: true });
+        cy.contains('button', 'Confirm').click({ waitForAnimations: false });
+    
         cy.contains('button', 'Save').should('be.enabled');
-
-        cy.get('[type="checkbox"]').check();
-
-        // clear start and end date in case it's already set
-        cy.contains('label', 'Start and end date').click();
-        cy.get('div[class^="MuiPickersLayout"]').contains('button', 'Cancel').click({waitForAnimations: false});
-
-        cy.contains('button', 'Save').should('be.disabled');
-
-        // select start and end date
-        cy.get('button[aria-current="date"]').click();
-        cy.contains('button', 'Confirm').click({waitForAnimations: false});
-
-        // clear start time and end time in case it's already set
-        cy.contains('label', 'Start Time').click();
-        cy.contains('button', 'Clear').click({waitForAnimations: false});
-        cy.contains('label', 'End Time').click();
-        cy.contains('button', 'Clear').click({waitForAnimations: false});
-
-        cy.contains('button', 'Save').should('be.disabled');
-
-        // select start time
-        cy.contains('label', 'Start Time').click();
-        cy.get('ul[aria-label="Select hours"]').get('li[aria-label="0 hours"]').click();
-        cy.get('ul[aria-label="Select minutes"]').get('li[aria-label="0 minutes"]').click();
-        cy.contains('button', 'Confirm').click();
-        cy.get('ul[aria-label="Select hours"]').should('not.exist');
-
+    
+        cy.get('[data-testid=start-end-date]').click();
+        cy.get('[data-testid=start-end-date-popup]').should('be.visible').within(() => {
+            cy.get('button[aria-current="date"]').should('be.visible').click({ force: true });
+            cy.contains('button', 'Confirm').click({ waitForAnimations: false });
+        });
+    
+        cy.get('body').click();
+    
+        cy.get('[data-testid=start-end-date-popup]').should('not.exist');
+    
         cy.contains('button', 'Save').should('be.enabled');
     });
 

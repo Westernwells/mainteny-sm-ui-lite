@@ -140,7 +140,13 @@ export const Pictures = ({attachments}: Props) => {
       <MUIDialog
         onClose={() => setOpenPreview(false)}
         open={openPreview}
-        maxWidth="sm">
+        maxWidth="sm"
+        sx={{
+          '& .MuiDialog-container > .MuiPaper-root': {
+            minHeight: '50%',
+            minWidth: '50%',
+          },
+        }}>
         <Carousel
           images={attachments?.map((p) => ({
             label: p.fileResource.description,

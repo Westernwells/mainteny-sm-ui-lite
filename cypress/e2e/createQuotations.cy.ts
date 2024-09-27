@@ -131,7 +131,7 @@ describe('Create Quotation', () => {
                 const discountsText = discounts
                     .map(
                         ({days, discountPercentage}) =>
-                            `Bei Zahlung innerhalb von ${days} Tagen erhalten Sie ${discountPercentage} Skonto auf den Rechnungsbetrag.`,
+                            `If payment is made within ${days} days, we grant a discount of ${discountPercentage} of the invoice amount.`,
                     )
                     .join('\n');
 
