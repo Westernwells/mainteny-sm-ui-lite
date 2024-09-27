@@ -15,7 +15,7 @@ interface Props {
   title: string | JSX.Element;
   children: ReactNode;
   onSave?: () => void;
-  onCancel: () => void;
+  onCancel: (forceClose?: boolean) => void;
   showSaveButton?: boolean;
   showCancelButton?: boolean;
   disableSaveBtn?: boolean;
@@ -24,6 +24,7 @@ interface Props {
   saveBtnType?: 'button' | 'submit' | 'reset';
   leftButton?: React.ReactNode;
   saveButtonText?: string;
+  cancelButtonText?: string;
   saveButtonVariant?: ButtonProps['variant'];
   saveButtonProps?: ButtonProps;
   saveButtonContainerProps?: ButtonProps;
@@ -34,6 +35,7 @@ interface Props {
   saveButtonContainerStyles?: SxProps<Theme>;
   dialogContentTextStyles?: SxProps<Theme>;
   dataTestId?: string;
+  renderRightFooterButton?: () => JSX.Element;
 }
 
 export const Dialog = ({
@@ -49,7 +51,9 @@ export const Dialog = ({
   saveButtonContainerProps,
   isSaving = false,
   leftButton,
+  renderRightFooterButton,
   saveButtonText = 'Save',
+  cancelButtonText = 'Cancel',
   saveButtonVariant = 'contained',
   saveButtonProps,
   dialogContentStyles = {},
@@ -70,7 +74,7 @@ export const Dialog = ({
         margin: 'auto 0',
         ...sx,
       }}
-      onClose={onCancel}
+      onClose={() => onCancel(true)}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       {...dialogProps}
@@ -86,7 +90,7 @@ export const Dialog = ({
           ...dialogTitleStyles,
         }}>
         {typeof title === 'string' ? t(title) : title}
-        <IconButton onClick={onCancel}>
+        <IconButton onClick={() => onCancel(true)}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -123,15 +127,16 @@ export const Dialog = ({
             <Button
               buttonProps={{
                 size: 'large',
-                onClick: onCancel,
+                onClick: () => onCancel(false),
               }}>
               <Typography variant="subtitle2" color="text.secondary">
-                {t('Cancel')}
+                {t(cancelButtonText)}
               </Typography>
             </Button>
           )}
 
-          {showSaveButton && (
+          {renderRightFooterButton?.()}
+          {!renderRightFooterButton && showSaveButton && (
             <Button
               testId="saveButton"
               buttonProps={{

@@ -217,6 +217,7 @@ const EmployeeAbsence = ({employee}: Props) => {
           <AbsenceTimeLine
             id={absence.id}
             type={absence.eventType}
+            eventSubtype={absence.eventSubtype}
             startDate={absence.startTime}
             endDate={absence.endTime}
             duration={absence.durationInDays}

@@ -35,6 +35,10 @@ import {queryKeys} from 'reactQuery/constants';
 import {ServiceOrder} from 'models/service-order';
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
+import {
+  EmployeeEventTypeRecord,
+  SaveEmployeeEventTypeRecords,
+} from 'models/employee';
 import {useUserSession} from './useUserSession';
 import {Page} from '../../models/pagination';
 
@@ -517,6 +521,73 @@ export const useUpdateServiceCompanySystemSettings = (successMsg?: string) => {
         queryClient.invalidateQueries(queryKeys.fetchCompanies);
       },
       onError: (err: any) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+export const getCompanyEventTypes = async (companyId: string) => {
+  const response = await axiosClient.get<EmployeeEventTypeRecord[]>(
+    `/api/serviceCompanies/${companyId}/eventTypes`,
+  );
+  return response.data;
+};
+
+export const useGetCompanyEventTypes = (
+  companyId: string,
+  shouldFetch?: boolean,
+  options?: {refetchOnWindowFocus?: boolean; useErrorBoundary?: boolean},
+) => {
+  const {showError} = useSnackbar();
+
+  return useQuery(
+    [queryKeys.fetchCompanyEventTypes, companyId],
+    () => getCompanyEventTypes(companyId!),
+    {
+      enabled:
+        shouldFetch !== undefined ? !!companyId && shouldFetch : !!companyId,
+      onError: (err) => {
+        showError(err);
+      },
+      ...(options ?? {}),
+    },
+  );
+};
+
+export const updateCompanyEventTypes = async (
+  companyId: string,
+  body: SaveEmployeeEventTypeRecords,
+) => {
+  const response = await axiosClient.put<StringValue>(
+    `/api/serviceCompanies/${companyId}/eventTypes`,
+    body,
+  );
+  return response.data;
+};
+
+export const useUpdateCompanyEventTypes = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({
+      body,
+      companyId,
+    }: {
+      body: SaveEmployeeEventTypeRecords;
+      companyId: string;
+    }) => updateCompanyEventTypes(companyId, body),
+    {
+      onSuccess: async () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchCompanyEventTypes);
+      },
+      onError: (err) => {
         showError(err);
       },
     },

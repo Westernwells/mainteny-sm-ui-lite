@@ -1,5 +1,5 @@
 import {Shift} from 'pages/NewEmployee/model';
-import {Address, Meta} from './misc';
+import {Address, DataEditingScope, Meta} from './misc';
 import {ServiceOrderType} from './service-order';
 import {Role, UserAccountView} from './user';
 import {AvailabilityType} from './availability';
@@ -119,4 +119,35 @@ export type EmployeeContractTableRow = {
   shift: string;
   availability: AvailabilityType;
   employeeId: string;
+};
+
+export enum EmployeeEventType {
+  WORK = 'WORK',
+  WORK_TRAVEL = 'WORK_TRAVEL',
+  VACATION = 'VACATION',
+  SICK_LEAVE = 'SICK_LEAVE',
+  SPECIAL_LEAVE = 'SPECIAL_LEAVE',
+  OTHERS = 'OTHERS',
+  HOLIDAY = 'HOLIDAY',
+  OFFICE_HOURS = 'OFFICE_HOURS',
+  TRAINING = 'TRAINING',
+  BREAK = 'BREAK',
+}
+
+export type EmployeeEventTypeRecord = {
+  subtype: string;
+  type: EmployeeEventType;
+  presence?: boolean;
+};
+
+export type UpdateEmployeeEventTypeRecord = {
+  from: EmployeeEventTypeRecord;
+  to: EmployeeEventTypeRecord;
+  scope: DataEditingScope;
+};
+
+export type SaveEmployeeEventTypeRecords = {
+  added: EmployeeEventTypeRecord[];
+  updated: UpdateEmployeeEventTypeRecord[];
+  deleted: EmployeeEventTypeRecord[];
 };
