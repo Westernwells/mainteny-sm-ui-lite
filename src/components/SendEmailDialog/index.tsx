@@ -124,16 +124,12 @@ export const SendEmailDialog = ({
     const valuesToSubmit = {
       ...values,
       emails: values.emails?.length ? values.emails : [emailInputValue],
-      ccEmails: isCcShown
-        ? values.ccEmails?.length
-          ? values.ccEmails
-          : [ccEmailsInputValue]
-        : [],
-      bccEmails: isBccShown
-        ? values.bccEmails?.length
-          ? values.bccEmails
-          : [bccEmailsInputValue]
-        : [],
+      ccEmails: values.ccEmails?.length
+        ? values.ccEmails
+        : [ccEmailsInputValue],
+      bccEmails: values.bccEmails?.length
+        ? values.bccEmails
+        : [bccEmailsInputValue],
     };
     if (submitHook && publish && id) {
       setIsPublishing(true);
