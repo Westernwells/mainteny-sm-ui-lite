@@ -26,17 +26,17 @@ describe('Job', () => {
         ServiceJobPage.selectTechnicianWithIndex(0);
     
         cy.contains('button', 'Save').should('be.disabled');
-    
-        cy.get('input[type="checkbox"]').check({ force: true });
-        cy.get('input[type="checkbox"]').should('be.checked');
-    
-        cy.wait(500);
-    
+
         cy.contains('label', 'Due date').click();
         cy.get('button[aria-current="date"]').should('be.visible').click({ force: true });
         cy.contains('button', 'Confirm').click({ waitForAnimations: false });
     
         cy.contains('button', 'Save').should('be.enabled');
+    
+        cy.get('input[type="checkbox"]').check({ force: true });
+        cy.get('input[type="checkbox"]').should('be.checked');
+    
+        cy.wait(500);
     
         cy.get('[data-testid=start-end-date]').click();
         cy.get('[data-testid=start-end-date-popup]').should('be.visible').within(() => {
@@ -47,6 +47,23 @@ describe('Job', () => {
         cy.get('body').click();
     
         cy.get('[data-testid=start-end-date-popup]').should('not.exist');
+
+        cy.contains('button', 'Save').should('be.disabled');
+
+        cy.get('[data-testid=start-time]').click();
+        cy.get('[data-testid=start-time-popup]').should('be.visible');
+  
+        cy.get('[data-testid=start-time-popup]').within(() => {
+          cy.get('ul[aria-label="Select hours"]').should('be.visible');
+          cy.get('li[aria-label="2 hours"]').click();
+  
+          cy.get('ul[aria-label="Select minutes"]').should('be.visible');
+          cy.get('li[aria-label="30 minutes"]').click();
+  
+          cy.contains('button', 'Confirm').click();
+        });
+  
+        cy.get('[data-testid=start-time-popup]').should('not.exist');
     
         cy.contains('button', 'Save').should('be.enabled');
     });
