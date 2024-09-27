@@ -26,7 +26,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import {getIn, useFormik} from 'formik';
-import {DiscountType, InvoiceItemRecord} from 'models/invoice';
+import {DiscountType, InvoiceItemRecord, InvoiceType} from 'models/invoice';
 import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
@@ -70,6 +70,7 @@ interface Props {
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
   isHovered?: boolean;
   defaultPercentageVat?: number;
+  invoiceType: InvoiceType;
 }
 
 interface TableRowProps {
@@ -153,6 +154,7 @@ export const ArticleItemRowNEW = ({
   handleSelectItem,
   isHovered,
   defaultPercentageVat,
+  invoiceType,
 }: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -779,6 +781,18 @@ export const ArticleItemRowNEW = ({
             const {floatValue} = values;
             if (!floatValue) {
               return true;
+            }
+
+            if (invoiceType === InvoiceType.CREDIT_NOTE) {
+              if (formik.values.discount?.type === DiscountType.PERCENTAGE) {
+                return floatValue <= 100;
+              }
+
+              if (floatValue > 0) {
+                return false;
+              }
+
+              return floatValue >= totalPriceExclVat;
             }
 
             if (floatValue < 0) {
