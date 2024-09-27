@@ -141,6 +141,7 @@ const EditorMenuControls = ({
                 TextBlockCategory.INVOICE,
                 TextBlockCategory.SERVICE_ORDER,
                 TextBlockCategory.SERVICE_ORDER_REPORT,
+                TextBlockCategory.EMAIL,
               ]}
               setActiveSubDialog={setActiveSubDialog}
               setActiveTextBlock={setActiveTextBlock}

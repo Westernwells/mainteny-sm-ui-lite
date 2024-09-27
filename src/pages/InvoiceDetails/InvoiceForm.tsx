@@ -2318,6 +2318,7 @@ export const InvoiceForm = ({
             TextBlockCategory.INVOICE,
             TextBlockCategory.SERVICE_ORDER,
             TextBlockCategory.SERVICE_ORDER_REPORT,
+            TextBlockCategory.EMAIL,
           ]}
           setOpenTextBlockDialog={setOpenTextBlockDialog}
           setActiveSubDialog={setActiveSubDialog}
