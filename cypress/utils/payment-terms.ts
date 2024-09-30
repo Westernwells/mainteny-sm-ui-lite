@@ -17,6 +17,7 @@ export const getFormattedPaymentValues = (
   },
   invoice: InvoiceView,
   invoiceAmountDetail: InvoiceAmountDetail,
+  grossInvoiceAmount?: number,
   currentCurrency?: Currency,
 ) => {
   const discountValues = paymentTerm?.data?.discountOptions?.map((d) => {
@@ -82,7 +83,7 @@ export const getFormattedPaymentValues = (
     const discountPercentage = d.discountPercent || 0;
     const discountAmount = invoiceAmount * (discountPercentage / 100);
 
-    const paymentAmount = invoiceAmount - discountAmount;
+    const paymentAmount = grossInvoiceAmount - discountAmount;
 
     return {
       formattedDueDate,
@@ -116,20 +117,14 @@ export const replacePaymentTermsPlaceholders = (
     return template;
   }
 
-  // Split the template into sections to handle replacements independently
+  // Split the template into sections
   const sections = template.split('\n');
 
-  let result = '';
+  let result = `${sections[0]  }\n`;
 
-  replacements.forEach((replacement, index) => {
-    if (
-      replacement.discountAmount &&
-      replacement.discountAmount > 0 &&
-      replacement.invoiceAmount &&
-      replacement.invoiceAmount > 0
-    ) {
-      // Target the appropriate section for replacement based on index
-      let sectionToReplace = sections[index + 1];
+  replacements.forEach((replacement) => {
+    if (replacement) {
+      let sectionToReplace = sections[1]; // Only dynamic part with placeholders
 
       if (sectionToReplace) {
         sectionToReplace = sectionToReplace.replace(
@@ -138,7 +133,7 @@ export const replacePaymentTermsPlaceholders = (
         );
         sectionToReplace = sectionToReplace.replace(
           '{DISCOUNT_AMOUNT}',
-          formatCurrency(replacement.discountAmount, {
+          formatCurrency(replacement.discountAmount || 0, {
             currency: currentCurrency?.code,
             currencySymbol: currentCurrency?.symbol,
             companyLang: selectedLng,
@@ -146,7 +141,7 @@ export const replacePaymentTermsPlaceholders = (
         );
         sectionToReplace = sectionToReplace.replace(
           '{INVOICE_AMOUNT}',
-          formatCurrency(replacement.invoiceAmount, {
+          formatCurrency(replacement.invoiceAmount || 0, {
             currency: currentCurrency?.code,
             currencySymbol: currentCurrency?.symbol,
             companyLang: selectedLng,
@@ -161,7 +156,7 @@ export const replacePaymentTermsPlaceholders = (
           }) || '',
         );
 
-        result += `${sections[0]}\n${sectionToReplace}\n`;
+        result += `${sectionToReplace}\n`;
       }
     }
   });
