@@ -461,7 +461,8 @@ export const ScheduleDialog = ({
               onClick: () => onFormSubmit(),
               autoFocus: true,
               disabled: !isFormValid || formNotValidCustomValidation,
-            }}>
+            }}
+            testId="saveButton">
             <Typography variant="subtitle2">{t('Save')}</Typography>
           </Button>
         </DialogActions>

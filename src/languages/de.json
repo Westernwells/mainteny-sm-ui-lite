@@ -2729,8 +2729,8 @@
   "Pick a type": "Wählen Sie einen Typ aus",
   "presence": "Anwesenheit",
   "absence": "Abwesenheit",
-  "Work travel": "Dienstreise",
-  "Special leave": "Sonderurlaub",
+  "Work Travel": "Dienstreise",
+  "Special Leave": "Sonderurlaub",
   "Changes will update the existing type and data.": "Änderungen aktualisieren Typ und die Daten.",
   "Choose the type of update in the next step.": "Wählen Sie im nächsten Schritt die Art der Aktualisierung aus.",
   "Changes will update {{subType}} entries.": "Änderungen aktualisieren {{subType}}-Einträge.",
@@ -2746,5 +2746,8 @@
   "Added by": "Hinzugefügt von",
   "Added by contract": "Hinzugefügt durch Vertrag",
   "Added by Automation": "Hinzugefügt durch Automatisierung",
-  "Start adding your articles and spare parts": "Beginnen Sie mit dem Hinzufügen Ihrer Artikel und Ersatzteile"
+  "Start adding your articles and spare parts": "Beginnen Sie mit dem Hinzufügen Ihrer Artikel und Ersatzteile",
+  "fixed fee": "pauschal",
+  "Go to article": "Gehe zum Artikel",
+  "Vacation": "Urlaub"
 }

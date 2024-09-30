@@ -2751,8 +2751,8 @@
   "Pick a type": "Izaberite tip",
   "presence": "prisustvo",
   "absence": "odsustvo",
-  "Work travel": "Putovanje na posao",
-  "Special leave": "Posebno odsustvo",
+  "Work Travel": "Putovanje na posao",
+  "Special Leave": "Posebno odsustvo",
   "Changes will update the existing type and data.": "Promene će ažurirati postojeći tip i podatke.",
   "Choose the type of update in the next step.": "Izaberite tip ažuriranja u sledećem koraku.",
   "Changes will update {{subType}} entries.": "Promene će ažurirati {{subType}} unose.",
@@ -2764,5 +2764,10 @@
   "Delete {{presenceType}} type": "Izbrišite tip {{presenceType}}",
   "Mainteny platform update": "Održavanje ažuriranja platforme",
   "An improved version of Mainteny is available, please refresh your browser to upgrade.": "Dostupna je poboljšana verzija Mainteni-a, osvežite pregledač za nadogradnju.",
-  "Refresh and update": "Osvežite i ažurirajte"
+  "Refresh and update": "Osvežite i ažurirajte",
+  "Added by": "Dodao/la",
+  "Added by contract": "Dodato ugovorom",
+  "Added by Automation": "Dodao Automation",
+  "Start adding your articles and spare parts": "Počnite da dodajete svoje artikle i rezervne delove",
+  "fixed fee": "fiksna naknada"
 }
