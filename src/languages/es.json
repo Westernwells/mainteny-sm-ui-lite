@@ -2762,8 +2762,8 @@
   "Pick a type": "Elige un tipo",
   "presence": "presencia",
   "absence": "ausencia",
-  "Work travel": "Viaje de trabajo",
-  "Special leave": "Ausencia especial",
+  "Work Travel": "Viaje de trabajo",
+  "Special Leave": "Ausencia especial",
   "Changes will update the existing type and data.": "Los cambios actualizarán el tipo y los datos existentes.",
   "Choose the type of update in the next step.": "Elija el tipo de actualización en el siguiente paso.",
   "Changes will update {{subType}} entries.": "Los cambios actualizarán las entradas {{subType}}.",
@@ -2772,5 +2772,15 @@
   "Update changes": "Actualizar cambios",
   "You are about to delete {{typeName}}": "Estás a punto de eliminar {{typeName}}",
   "Enter the type name to confirm deletion.": "Ingrese el nombre del tipo para confirmar la eliminación.",
-  "Delete {{presenceType}} type": "Eliminar tipo {{presenceType}}"
+  "Delete {{presenceType}} type": "Eliminar tipo {{presenceType}}",
+  "Mainteny platform update": "Actualización de la plataforma Mainteny",
+  "An improved version of Mainteny is available, please refresh your browser to upgrade.": "Una versión mejorada de Mainteny está disponible, por favor actualice su navegador para actualizar.",
+  "Refresh and update": "Refrescar y actualizar",
+  "Added by": "Añadido por",
+  "Added by contract": "Agregado por contrato",
+  "Added by Automation": "Añadido por Automatización",
+  "Start adding your articles and spare parts": "Empiece a añadir sus artículos y repuestos",
+  "fixed fee": "cuota fija",
+  "Go to article": "Ir al artículo",
+  "Vacation": "Vacaciones"
 }
