@@ -35,7 +35,7 @@ export default class InvoiceEditPage {
       .then(($textLayer) => {
         cy.wrap($textLayer).find('span').should('have.length.greaterThan', 0);
       })
-      .wait(500)
+      .wait(5000)
       .then(() => {
         cy.get('div[class^="react-pdf__Page__textContent"]')
           .invoke('text')

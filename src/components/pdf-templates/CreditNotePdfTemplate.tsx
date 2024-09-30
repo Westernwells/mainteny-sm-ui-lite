@@ -197,22 +197,27 @@ const CreditNotePdfTemplate = ({
     },
   );
 
+  const grossInvoiceAmount = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount.grossAmount,
+  );
+
   const formattedPaymentValues = useMemo(() => {
     if (
-      invoice?.additionalInfo.paymentTerm &&
+      invoice?.additionalInfo.paymentTerm?.term &&
       invoice &&
-      invoiceAmountDetail &&
-      currentCurrency
+      invoiceAmountDetail
     ) {
       return getFormattedPaymentValues(
         invoice.additionalInfo.paymentTerm,
         invoice,
         invoiceAmountDetail,
+        grossInvoiceAmount,
         currentCurrency,
       );
     }
     return [];
-  }, [invoice, invoiceAmountDetail, invoice?.additionalInfo.paymentTerm]);
+  }, [invoice, invoiceAmountDetail, invoice?.additionalInfo.paymentTerm?.term]);
 
   const replacedPaymentTerms = replacePaymentTermsPlaceholders(
     invoice?.additionalInfo.paymentTerm?.term || '',

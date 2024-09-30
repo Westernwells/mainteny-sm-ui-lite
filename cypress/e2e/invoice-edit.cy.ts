@@ -1,4 +1,5 @@
 import {DiscountType, PaymentType, InvoiceItemPaymentType} from 'models/invoice';
+import {centsToMoney} from 'utils/currency';
 import InvoiceEditPage from '../pages/invoice-edit.page';
 import AppTopBarPage from '../pages/appTopBar.page';
 import invoiceDetails from '../fixtures/invoiceDetails.json';
@@ -68,6 +69,12 @@ describe('Invoice Edit Flow with Payment Terms', () => {
         cy.wait('@getInvoiceDetails').then(({response}) => {
             const invoice = response.body;
             const invoiceAmountDetail = invoiceAmountDetailsWithEnums;
+            const currentCurrency = {
+                code: 'EUR',
+                fractionDigits: 2,
+                symbol: '€',
+            };
+            const grossInvoiceAmount = centsToMoney(currentCurrency?.code!, invoiceAmountDetail?.amountAfterGlobalDiscount.grossAmount);
 
             cy.contains('If you pay before {DUE_DATE}').should('exist');
             cy.contains('{DISCOUNT_AMOUNT}').should('exist');
@@ -77,17 +84,15 @@ describe('Invoice Edit Flow with Payment Terms', () => {
             InvoiceEditPage.saveInvoice();
             
             // After saving, calculate the dynamic values
-            const discountValues = getFormattedPaymentValues(invoice.additionalInfo.paymentTerm, invoice, invoiceAmountDetail, {
-                code: 'EUR',
-                fractionDigits: 2,
-                symbol: '€',
-            });
+            const discountValues = getFormattedPaymentValues(
+                invoice.additionalInfo.paymentTerm,
+                invoice,
+                invoiceAmountDetail,
+                grossInvoiceAmount,
+                currentCurrency,
+            );
 
-            const formattedTerms = replacePaymentTermsPlaceholders(invoice.additionalInfo?.paymentTerm?.term, discountValues, {
-                code: 'EUR',
-                fractionDigits: 2,
-                symbol: '€',
-            });
+            const formattedTerms = replacePaymentTermsPlaceholders(invoice.additionalInfo?.paymentTerm?.term, discountValues, currentCurrency);
 
             InvoiceEditPage.verifyPaymentTerms(formattedTerms);
         });
