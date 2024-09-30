@@ -613,3 +613,12 @@ export const removePx = (size?: string) => {
 
   return Number(parts[0]);
 };
+
+export const handleHardReload = () => {
+  // Append a cache-busting query parameter
+  const url = new URL(window.location.href);
+  url.searchParams.set('cachebuster', `${Date.now()}`);
+
+  // Redirect to the new URL, forcing the browser to fetch fresh resources
+  window.location.replace(url.toString());
+};

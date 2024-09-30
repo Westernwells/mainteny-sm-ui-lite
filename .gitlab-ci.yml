@@ -89,6 +89,26 @@ variables:
       \",
       \"icon_emoji\": \":rocket:\"
        }" $SLACK_WEBHOOK_URL
+    - |
+      if [ "$ENV" = "prod" ]; then
+        URL="$REACT_APP_API_URL_PROD"
+        APIKEY="$VERSIONS_API_KEY_PROD"
+        TYPE="WEB_PROD"
+      else
+        URL="$REACT_APP_API_URL_STAGE"
+        APIKEY="$VERSIONS_API_KEY_STAGE"
+        TYPE="WEB_STAGING"
+      fi
+      curl -X 'POST' \
+        "$URL/api/versions?apikey=$APIKEY" \
+        -H 'accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d "{
+          \"type\": \"$TYPE\",
+          \"value\": \"$CI_COMMIT_SHORT_SHA\",
+          \"changelog\": \"$CI_COMMIT_MESSAGE\",
+          \"releaseTime\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+        }"
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
       when: never
