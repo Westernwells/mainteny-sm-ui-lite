@@ -83,7 +83,7 @@ export default class ServiceJobPage {
     cy.get('[aria-describedby="alert-dialog-description"]').click({
       force: true,
     });
-    cy.contains('button', 'Save').should('not.be.disabled').click({
+    cy.get('[data-testid=saveButton]').should('not.be.disabled').click({
       force: true,
     });
     cy.contains('Service job scheduled successfully');

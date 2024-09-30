@@ -20,6 +20,15 @@ const requiredVariables = await fs
 await fs.writeFile(envFileName, '', {flag: 'w'}); // Create an empty env file
 
 requiredVariables.forEach(async (variable) => {
+  if (variable === 'REACT_APP_VERSION') {
+    // set REACT_APP_VERSION dynamically with the commit sha
+    await fs.writeFile(
+      envFileName,
+      `REACT_APP_VERSION=${process.env.CI_COMMIT_SHORT_SHA}\n`,
+      {flag: 'a'},
+    );
+    return; // Skip the default write for this variable
+  }
   const variableName = `${variable}_${envSuffix}`;
   console.log(`Processing ${variableName}`);
   const value = process.env[variableName];
