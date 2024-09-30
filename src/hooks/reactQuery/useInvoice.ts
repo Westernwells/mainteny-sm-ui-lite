@@ -43,6 +43,7 @@ import {
 import {Comment} from 'models/comment';
 import {ErrorCode} from 'models/error';
 import {languageContextMap} from 'utils/utils';
+import {transformInvoiceForCreditNote} from 'utils/invoice-utils';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from './useUserSession';
 
@@ -153,9 +154,14 @@ export const fetchInvoice = async (invoiceId: string) => {
   return response.data;
 };
 
-export function useInvoiceDetail(invoiceId?: string) {
+export function useInvoiceDetail(invoiceId?: string, isCreditNote?: boolean) {
   return useQuery([qk.invoiceById, invoiceId], () => fetchInvoice(invoiceId!), {
     enabled: !!invoiceId,
+    ...(isCreditNote
+      ? {
+          select: transformInvoiceForCreditNote,
+        }
+      : {}),
   });
 }
 

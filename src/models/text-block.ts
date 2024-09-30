@@ -54,6 +54,7 @@ export enum TextBlockCategory {
   SERVICE_ORDER_REPORT = 'SERVICE_ORDER_REPORT',
   ARTICLE_ORDER = 'ARTICLE_ORDER',
   SERVICE_ORDER = 'SERVICE_ORDER',
+  EMAIL = 'EMAIL',
 }
 
 export interface TextBlockRow {

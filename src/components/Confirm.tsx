@@ -60,7 +60,8 @@ export const Confirm = ({
       <DialogContent>
         <DialogContentText
           id="alert-dialog-description"
-          sx={{color: 'text.primary'}}>
+          sx={{color: 'text.primary'}}
+          component="div">
           <Typography>
             {typeof content === 'string' ? t(content) : content}
           </Typography>

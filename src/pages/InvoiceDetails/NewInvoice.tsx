@@ -26,7 +26,7 @@ export const NewInvoice = () => {
 
   const {data: invoice, isLoading: isLoadingInvoice} =
     typeof invoiceId === 'string'
-      ? useInvoiceDetail(invoiceId)
+      ? useInvoiceDetail(invoiceId, invoiceType === InvoiceType.CREDIT_NOTE)
       : {data: undefined, isLoading: false};
 
   const {data: customer, isLoading: isLoadingCustomer} =

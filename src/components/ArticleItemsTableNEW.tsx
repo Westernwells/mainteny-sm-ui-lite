@@ -22,6 +22,7 @@ import {
   DiscountTypeOptions,
   InvoiceFormData,
   InvoiceItemRecord,
+  InvoiceType,
 } from 'models/invoice';
 import {ArticleType, ArticleView} from 'models/article';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
@@ -314,6 +315,7 @@ export const ArticleItemsTableNEW = ({
                               user?.userAccount.serviceCompany.settings
                                 .percentageVat
                             }
+                            invoiceType={formik.values.type}
                           />
                         </TableRow>
                       )}
@@ -401,6 +403,21 @@ export const ArticleItemsTableNEW = ({
                           const {floatValue} = values;
                           if (!floatValue) {
                             return true;
+                          }
+
+                          if (formik.values.type === InvoiceType.CREDIT_NOTE) {
+                            if (
+                              formik.values.discount?.type ===
+                              DiscountType.PERCENTAGE
+                            ) {
+                              return floatValue <= 100;
+                            }
+
+                            if (floatValue > 0) {
+                              return false;
+                            }
+
+                            return floatValue >= subtotalExclVat;
                           }
 
                           if (floatValue < 0) {
