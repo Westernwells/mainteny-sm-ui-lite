@@ -1,5 +1,5 @@
 import {isBefore, parseISO, startOfDay} from 'date-fns';
-import {InvoiceStatus, InvoiceView} from '../models/invoice';
+import {InvoiceItem, InvoiceStatus, InvoiceView} from '../models/invoice';
 import {PdfGenerationStatus} from '../models/misc';
 
 export const isDueDateInPast = (invoice: InvoiceView) => {
@@ -119,3 +119,54 @@ export const getQrErrorMessage = (qrError: string): string => {
   // If not a dynamic error, return the corresponding static error message
   return errorMessages[qrError] || qrError;
 };
+
+export const transformInvoiceForCreditNote = (
+  invoice: InvoiceView,
+): InvoiceView => ({
+  ...invoice,
+  additionalInfo: {
+    ...invoice.additionalInfo,
+    ...(invoice.additionalInfo?.discount
+      ? {
+          discount: {
+            ...invoice.additionalInfo?.discount,
+            ...(invoice.additionalInfo?.discount?.amount
+              ? {
+                  amount: {
+                    ...invoice.additionalInfo?.discount?.amount,
+                    value: -(
+                      invoice.additionalInfo?.discount?.amount?.value ?? 0
+                    ),
+                  },
+                }
+              : {}),
+          },
+        }
+      : {}),
+  },
+  items: invoice.items.map(
+    (item): InvoiceItem => ({
+      ...item,
+      additionalInfo: {
+        ...item.additionalInfo,
+        ...(item.additionalInfo?.discount
+          ? {
+              discount: {
+                ...item.additionalInfo?.discount,
+                ...(item.additionalInfo?.discount?.amount
+                  ? {
+                      amount: {
+                        ...item.additionalInfo?.discount?.amount,
+                        value: -(
+                          item.additionalInfo?.discount?.amount?.value ?? 0
+                        ),
+                      },
+                    }
+                  : {}),
+              },
+            }
+          : null),
+      },
+    }),
+  ),
+});

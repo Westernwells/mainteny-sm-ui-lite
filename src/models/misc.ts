@@ -359,6 +359,7 @@ export enum InspectionCycle {
   MONTHLY = 'MONTHLY',
   BIMONTHLY = 'BIMONTHLY',
   QUARTERLY = 'QUARTERLY',
+  QUADRIMESTERLY = 'QUADRIMESTERLY',
   HALF_YEARLY = 'HALF_YEARLY',
   YEARLY = 'YEARLY',
   BIENNIALLY = 'BIENNIALLY',
@@ -374,3 +375,7 @@ export interface HeaderFooterInfoData {
 }
 
 export type CreateEditMode = 'create' | 'edit';
+
+export type EmailObject = {
+  bccEmails: string[];
+};

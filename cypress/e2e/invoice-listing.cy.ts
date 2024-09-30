@@ -1,10 +1,15 @@
 import InvoiceListingPage from '../pages/invoice-listing.page';
 import AppTopBarPage from '../pages/appTopBar.page';
-import {InvoiceStatusView} from '../../src/models/invoice';
+import {InvoiceStatusView, InvoiceType} from '../../src/models/invoice';
+import {getPlainStringFromHtml} from '../../src/utils/rich-field-string';
+import {calculateInvoiceAmount} from '../../src/utils/calculate-total';
+import {formatCurrency} from '../../src/utils/currency';
+import {ServiceCompany} from '../../src/models/service-company';
 
 describe('Invoice listing page', () => {
     beforeEach(() => {
         cy.login();
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
 
         AppTopBarPage.selectLanguage('English');
         InvoiceListingPage.visit();
@@ -143,5 +148,60 @@ describe('Invoice listing page', () => {
 
     it(`should route to the invoice details page`, () => {
         InvoiceListingPage.navigateToDetailsPage();
+    });
+
+    it('should create credit note invoice', () => {
+        InvoiceListingPage.filterInvoicesListByStatus(InvoiceStatusView.NOT_PAID);
+        cy.get('span[role="progressbar"]').should('not.exist');
+
+        cy.wait('@getInvoices').then((interception) => {
+            cy.wait(1000);
+            // pick a sent invoice row
+            const {data} = interception.response.body;
+            const firstFullSentInvoice = data.find((d) => d.type === InvoiceType.FULL);
+
+            // extract invoice number
+            const invoiceNumber = firstFullSentInvoice.externalId;
+
+            // open action menu and click create credit note
+            cy.contains('div[data-field="EXTERNAL_ID"]', invoiceNumber)
+                .parents('div[role="row"]')
+                .find('div[data-field="actions"] button[aria-label="More"]')
+                .click();
+            cy.contains('li', 'Create Credit note').click();
+            cy.contains('button', 'Yes').click();
+
+            // validate credit note invoice subject
+            cy.get('div[role="textbox"][id="subject"]').contains(`Credit note for ${invoiceNumber}`);
+
+            // validate credit note invoice items are same as original invoice items but with negative net amount
+            const originalInvoiceItems = firstFullSentInvoice.items;
+            cy.get('div[test-id="name-0"]').contains(getPlainStringFromHtml(originalInvoiceItems[0].name));
+            cy.get('input[name="unitAmount.netAmount"]')
+                .invoke('attr', 'value')
+                .should('eq', (-originalInvoiceItems[0].unitAmount.netAmount / 100).toLocaleString());
+
+            // validate credit note invoice total amount is same as original invoice but in negative
+            const {amountAfterGlobalDiscountWithVAT} = calculateInvoiceAmount({
+                items: originalInvoiceItems,
+                globalDiscount: firstFullSentInvoice.additionalInfo.discount,
+            });
+            cy.wait('@serviceCompanyApi').then((i) => {
+                const serviceCompany = i.response?.body as ServiceCompany;
+                const {
+                    currencies: [firstCurrency],
+                } = serviceCompany.settings;
+                const {code: currency} = firstCurrency;
+                const amountAfterGlobalDiscountWithVATFormatted = formatCurrency(amountAfterGlobalDiscountWithVAT, {currency});
+                cy.contains(amountAfterGlobalDiscountWithVATFormatted);
+
+                // click save
+                cy.contains('button', 'Save').click();
+
+                // validate newly created credit note invoice total amount is same as original invoice but in negative
+                cy.get('span[role="progressbar"]').should('not.exist');
+                cy.contains(amountAfterGlobalDiscountWithVATFormatted);
+            });
+        });
     });
 });

@@ -836,7 +836,7 @@ export const Actions = ({
     label: t('Duplicate'),
     icon: <CopyAll />,
     onClick: () => {
-      navigate(`/invoices/new?invoiceId=${invoice.id}`);
+      navigate(`/invoices/new?invoiceId=${invoice.id}&isDuplicate=true`);
     },
   };
 
