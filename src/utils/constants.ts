@@ -59,3 +59,11 @@ export const EMPLOYEE_EVENT_TYPES_TO_PRESENCE_BOOLEAN = {
   [EmployeeEventType.WORK]: true,
   [EmployeeEventType.WORK_TRAVEL]: true,
 };
+
+export const DEFAULT_EMPLOYEE_EVENT_TYPES = [
+  'OFFICE_WORK',
+  'FIELD_WORK',
+  'TRAINING',
+  'VACATION',
+  'SICK_LEAVE',
+];

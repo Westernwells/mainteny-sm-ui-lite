@@ -13,7 +13,8 @@ import {CrossButton} from 'components/CrossButton';
 import {DoneButton} from 'components/DoneButton';
 import {Dispatch, SetStateAction, useEffect, useRef} from 'react';
 import {ALL_EMPLOYEE_EVENT_TYPES} from 'utils/constants';
-import {EmployeeEventTypeIcon} from 'components/EmployeeEventTypeIcon';
+import {EmployeeEventTypeIconWithBackground} from 'components/EmployeeEventTypeIcon/EmployeeEventTypeIconWithBackground';
+import {getEventSubtype} from 'utils/employee';
 import {Actions} from './Actions';
 
 const StyledDataListCell = styled(Box)(({theme}) => ({
@@ -173,7 +174,7 @@ export const DataList = ({
             return (
               <StyledDataListRow>
                 <StyledDataListCell>
-                  <EmployeeEventTypeIcon type={item.type} />
+                  <EmployeeEventTypeIconWithBackground type={item.type} />
                   {isEditing ? (
                     <StyledTextField
                       value={form.name}
@@ -188,7 +189,13 @@ export const DataList = ({
                     />
                   ) : (
                     <Typography ml={1} variant="body2">
-                      {item.subtype}
+                      {getEventSubtype(
+                        {
+                          subtype: item.subtype,
+                          type: item.type,
+                        },
+                        t,
+                      )}
                     </Typography>
                   )}
                 </StyledDataListCell>
@@ -246,7 +253,7 @@ export const DataList = ({
           {mode === 'create' && (
             <StyledDataListRow>
               <StyledDataListCell>
-                <EmployeeEventTypeIcon type={form.type} />
+                <EmployeeEventTypeIconWithBackground type={form.type} />
                 <StyledTextField
                   value={form.name}
                   onChange={(e) => {

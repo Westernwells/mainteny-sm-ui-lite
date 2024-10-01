@@ -1,6 +1,7 @@
 import {Card} from 'components/Card';
 import {EmptySection} from 'components/EmptySection';
 import {Dialog} from 'components/Dialog';
+import useTheme from '@mui/material/styles/useTheme';
 
 import {useState} from 'react';
 import {CreateEditViewMode, DataEditingScope} from 'models/misc';
@@ -13,12 +14,19 @@ import {Button} from 'components/Button';
 import {Box} from '@mui/system';
 import {CircularProgress, TextField, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
-import {useUpdateCompanyEventTypes} from 'hooks/reactQuery/useCompanies';
+import {
+  useGetCompanyEventTypes,
+  useUpdateCompanyEventTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EMPLOYEE_EVENT_TYPES_TO_PRESENCE_BOOLEAN} from 'utils/constants';
 import {ConfirmDelete} from 'components/ConfirmDelete';
-import {ConfirmUpdates} from './ConfirmUpdates';
+import {CardDataListItem} from 'components/CardDataListItem';
+import {convertToText} from 'utils/utils';
+import {EmployeeEventTypeIcon} from 'components/EmployeeEventTypeIcon';
+import {getEventSubtype} from 'utils/employee';
 import {AddAbsenceAndPresence} from './AddAbsenceAndPresence';
+import {ConfirmUpdates} from './ConfirmUpdates';
 
 export interface FormState {
   name?: string;
@@ -33,6 +41,7 @@ interface DeleteEventState {
 }
 
 export const AbsenceAndPresence = () => {
+  const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const [dataListMode, setDataListMode] = useState<CreateEditViewMode>('view');
   const [form, setForm] = useState<FormState>({name: ''});
@@ -50,6 +59,7 @@ export const AbsenceAndPresence = () => {
     userTypedName: '',
     isOpen: false,
   });
+  const {data} = useGetCompanyEventTypes(user?.userAccount.serviceCompany.id!);
 
   const resetState = () => {
     setEditingEvent({});
@@ -157,14 +167,33 @@ export const AbsenceAndPresence = () => {
           gap: 0.75,
           height: '100%',
         }}>
-        <EmptySection
-          label="No types defined"
-          size="tiny"
-          subLabel="Create your custom absence and presence types"
-          containerStyle={{height: '100%', my: '2em'}}
-          illustration="calendarClockGrey"
-          subLabelProps={{sx: {color: '#828DA3', mt: 1}}}
-        />
+        {!data ? (
+          <EmptySection
+            label="No types defined"
+            size="tiny"
+            subLabel="Create your custom absence and presence types"
+            containerStyle={{height: '100%', my: '2em'}}
+            illustration="calendarClockGrey"
+            subLabelProps={{sx: {color: '#828DA3', mt: 1}}}
+          />
+        ) : (
+          data.map((item, index) => (
+            <CardDataListItem
+              key={index}
+              label={getEventSubtype(
+                {subtype: item.subtype, type: item.type},
+                t,
+              )}
+              value={t(convertToText(item.type))}
+              iconElement={
+                <EmployeeEventTypeIcon
+                  color={theme.palette.text.disabled}
+                  type={item.type}
+                />
+              }
+            />
+          ))
+        )}
       </Card>
       <Dialog
         title="Absence and Presence"
