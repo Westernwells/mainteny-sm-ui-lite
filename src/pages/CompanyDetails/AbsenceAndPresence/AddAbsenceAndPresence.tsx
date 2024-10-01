@@ -10,6 +10,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 import {CreateEditViewMode, DataEditingScope} from 'models/misc';
 import {EmployeeEventTypeRecord} from 'models/employee';
+import {getEventSubtype} from 'utils/employee';
 import {EmptyContainer} from './EmptyContainer';
 import {DataList} from './DataList';
 import {FormState} from '.';
@@ -66,7 +67,10 @@ export const AddAbsenceAndPresence = ({
   const handleOnEditStart = (event: EmployeeEventTypeRecord, index: number) => {
     setDataListMode('edit');
     setEditingEvent({event, index});
-    setForm({name: event.subtype, type: event.type});
+    setForm({
+      name: getEventSubtype({subtype: event.subtype, type: event.type}, t),
+      type: event.type,
+    });
   };
 
   return (
