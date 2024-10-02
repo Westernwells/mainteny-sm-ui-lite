@@ -293,7 +293,13 @@ export const AbsenceAndPresence = () => {
         })}
         body={[
           t('You are about to delete {{typeName}}', {
-            typeName: deleteEventState.event?.subtype,
+            typeName: getEventSubtype(
+              {
+                subtype: deleteEventState.event?.subtype!,
+                type: deleteEventState.event?.type!,
+              },
+              t,
+            ),
           }),
           t('Enter the type name to confirm deletion.'),
         ]}
@@ -307,7 +313,7 @@ export const AbsenceAndPresence = () => {
               }));
             }}
             size="small"
-            placeholder="Enter type name"
+            placeholder={t('Enter type name')}
             fullWidth
             sx={{mt: 2, mb: 1}}
           />

@@ -6,6 +6,7 @@ import {Dispatch, SetStateAction} from 'react';
 
 import {CreateEditViewMode} from 'models/misc';
 import {EmployeeEventTypeRecord} from 'models/employee';
+import {getEventSubtype} from 'utils/employee';
 import {DataList} from './DataList';
 import {FormState} from '.';
 
@@ -57,7 +58,13 @@ export const ConfirmUpdates = ({
             variant="body1"
             color={theme.palette.info.infoAlert}>
             {t('Changes will update {{subType}} entries.', {
-              subType: editingEvent.event?.subtype,
+              subType: getEventSubtype(
+                {
+                  subtype: editingEvent.event?.subtype!,
+                  type: editingEvent.event?.type!,
+                },
+                t,
+              ),
             })}
           </Typography>
           <Typography variant="body2" color={theme.palette.info.infoAlert}>
