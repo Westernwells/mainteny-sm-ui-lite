@@ -24,6 +24,7 @@ const TableHeader = ({columns, sortState, onSort}: Props) => (
       if (column.hide) return;
       return (
         <TableHeaderCell
+          key={column.headerName}
           column={column}
           sortState={sortState}
           onSort={

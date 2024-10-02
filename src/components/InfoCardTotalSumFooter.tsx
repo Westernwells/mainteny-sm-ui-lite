@@ -18,7 +18,7 @@ export const InfoCardTotalSumFooter = ({amount, label, currency}: Props) => {
         justifyContent: 'flex-end',
         width: '100%',
         background: theme.palette.inputBackground.main,
-        padding: '0.8em',
+        padding: '0.8em 0em',
         alignItems: 'center',
         borderTop: '1px solid #0F4C6414',
         borderBottom: '1px solid #0F4C6414',
@@ -26,14 +26,14 @@ export const InfoCardTotalSumFooter = ({amount, label, currency}: Props) => {
       <Typography
         color={theme.palette.text.secondary}
         variant="subtitle2"
-        sx={{paddingRight: '2em'}}>
+        sx={{paddingRight: '9%'}}>
         {label}
       </Typography>
       <Typography
         color={theme.palette.text.primary}
         variant="subtitle1"
         fontWeight="600"
-        sx={{marginRight: '14%'}}>
+        sx={{marginRight: '4.5%'}}>
         {!!amount && formatCurrency(amount, {...(currency && {currency})})}
       </Typography>
     </Box>

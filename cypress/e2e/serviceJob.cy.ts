@@ -128,7 +128,7 @@ describe('Job', () => {
 
                 // Check if service orders data is available
                 if (serviceOrders && serviceOrders.data.length) {
-                    ServiceJobPage.getFirstTableElement().click();
+                    ServiceJobPage.getFirstTableElement().should('exist').click();
 
                     cy.get('span[role="progressbar"]', {timeout: 120000}).should('not.exist');
 
@@ -142,6 +142,7 @@ describe('Job', () => {
 
                     cy.contains('Service job scheduled successfully');
                 } else {
+                    cy.contains('There are no entries for the applied filters.');
                     throw new Error('No Unscheduled jobs found');
                 }
             });
