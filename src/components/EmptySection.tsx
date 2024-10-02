@@ -12,12 +12,12 @@ import {ReactComponent as SupplierIllustration} from 'assets/illustrations/Suppl
 import {ReactComponent as MobileUsabilityTesting} from 'assets/illustrations/MobileUsabilityTesting.svg';
 import {ReactComponent as UXAnalytics} from 'assets/illustrations/UXAnalytics.svg';
 import {ReactComponent as BankAccountsIllustration} from 'assets/illustrations/BankAccounts.svg';
-import {ReactComponent as NotePadIcon} from 'assets/icons/NotePadIcon.svg';
 import {ReactComponent as AttachmentLargeIcon} from 'assets/icons/AttachmentLargeIcon.svg';
 import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
 import {ReactComponent as HeadphonesHumanIcon} from 'assets/icons/HeadphonesHumanIcon.svg';
 import {ReactComponent as CalendarClockGrey} from 'assets/icons/CalendarClockGrey.svg';
 import {ReactComponent as CalendarClock} from 'assets/icons/CalendarClock.svg';
+import {ReactComponent as ShipmentIcon} from 'assets/icons/ShipmentIcon.svg';
 import {Button} from './Button';
 
 interface Props extends BoxProps {
@@ -103,7 +103,7 @@ export const EmptySection = ({
       case 'emptyChecklistComponents':
         return <UXAnalytics style={{width: '100%', height: '100%'}} />;
       case 'articles':
-        return <NotePadIcon style={{width: '50%', height: '100%'}} />;
+        return <ShipmentIcon style={{width: '100%', height: '100%'}} />;
       case 'lift':
         return <LiftIcon style={{width: '100%', height: '100%'}} />;
       case 'contacts':

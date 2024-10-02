@@ -25,6 +25,8 @@ interface Props {
   leftButton?: React.ReactNode;
   saveButtonText?: string;
   cancelButtonText?: string;
+  cancelButtonTextColor?: string;
+  cancelButtonVariant?: ButtonProps['variant'];
   saveButtonVariant?: ButtonProps['variant'];
   saveButtonProps?: ButtonProps;
   saveButtonContainerProps?: ButtonProps;
@@ -33,6 +35,7 @@ interface Props {
   sx?: SxProps<Theme>;
   dialogActionsStyles?: SxProps<Theme>;
   saveButtonContainerStyles?: SxProps<Theme>;
+  cancelButtonStyles?: SxProps<Theme>;
   dialogContentTextStyles?: SxProps<Theme>;
   dataTestId?: string;
   renderRightFooterButton?: () => JSX.Element;
@@ -54,12 +57,15 @@ export const Dialog = ({
   renderRightFooterButton,
   saveButtonText = 'Save',
   cancelButtonText = 'Cancel',
+  cancelButtonTextColor = 'text.secondary',
+  cancelButtonVariant = 'text',
   saveButtonVariant = 'contained',
   saveButtonProps,
   dialogContentStyles = {},
   dialogTitleStyles = {},
   dialogActionsStyles = {},
   saveButtonContainerStyles = {},
+  cancelButtonStyles = {},
   dialogContentTextStyles = {},
   sx = {},
   dataTestId,
@@ -128,8 +134,10 @@ export const Dialog = ({
               buttonProps={{
                 size: 'large',
                 onClick: () => onCancel(false),
+                variant: cancelButtonVariant,
+                sx: {...cancelButtonStyles},
               }}>
-              <Typography variant="subtitle2" color="text.secondary">
+              <Typography variant="subtitle2" color={cancelButtonTextColor}>
                 {t(cancelButtonText)}
               </Typography>
             </Button>

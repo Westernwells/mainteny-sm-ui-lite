@@ -6,12 +6,14 @@ type Props = CellProps & {
   flex?: string;
   gap?: string | number;
   onClick?: () => void;
+  justifyContent?: string;
 };
 
 const Cell = ({
   gap,
   children,
   onClick,
+  justifyContent = 'left',
   ...cellProps
 }: PropsWithChildren<Props>) => (
   <Box
@@ -27,7 +29,7 @@ const Cell = ({
       flex: `1 1 ${cellProps.width}`,
       alignItems: 'center',
       flexWrap: 'noWrap',
-      justifyContent: cellProps.align || 'left',
+      justifyContent,
       ...(cellProps.isFirst && {borderLeft: 0}),
       ...(cellProps.isLast && {borderRight: 0}),
       ...(cellProps.width && {width: cellProps.width}),
