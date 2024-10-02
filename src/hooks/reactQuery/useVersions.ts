@@ -3,6 +3,7 @@ import {getVersionType, Resource, RestError} from 'models/misc';
 import {GetVersionsParams, Version} from 'models/versions';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
+import {useUserSession} from './useUserSession';
 
 export const fetchVersions = async (params: GetVersionsParams) => {
   const response = await axiosClient.get<Resource<Version>>(`/api/versions`, {
@@ -15,6 +16,7 @@ export const fetchVersions = async (params: GetVersionsParams) => {
 export const useFetchLatestVersion = () => {
   const {hostname} = window.location;
   const type = getVersionType(hostname);
+  const {user} = useUserSession();
 
   return useQuery<Resource<Version>, RestError>(
     [queryKeys.fetchLatestVersion],
@@ -26,7 +28,7 @@ export const useFetchLatestVersion = () => {
       }),
     {
       refetchInterval: 300000, // 5 minutes
-      enabled: hostname !== 'localhost', // don't check for versions if we are running app locally
+      enabled: !!user && hostname !== 'localhost', // don't check for versions if we are running app locally or user is not logged in
     },
   );
 };
