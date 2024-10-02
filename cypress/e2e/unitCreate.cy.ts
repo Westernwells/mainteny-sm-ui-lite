@@ -1,58 +1,41 @@
-import LoginPage from '../pages/login.page';
 import AppTopBarPage from '../pages/appTopBar.page';
 import UnitsPage from '../pages/unit.page';
 
 describe('Create Unit', () => {
-  beforeEach(() => {
-    LoginPage.visitLoginPage();
-    const loginURL = `${Cypress.env().REACT_APP_API_URL}/api/sessions/login`;
-    cy.intercept('POST', loginURL).as('loginApi');
-    LoginPage.login();
-
-    cy.wait('@loginApi').then(() => {
-      AppTopBarPage.selectLanguage('English');
-
-      UnitsPage.visit();
+    beforeEach(() => {
+        cy.login();
+        AppTopBarPage.selectLanguage('English');
+        UnitsPage.visit();
+        cy.get('span[role="progressbar"]').should('not.exist');
     });
-  });
 
-  it('submit unit', () => {
-    UnitsPage.navigateToCreatePage();
-    UnitsPage.getFieldByName('propertyOwnerId').click();
-    cy.wait(100);
-    cy.get('body').click(0, 0);
-    UnitsPage.getFieldByName('propertyOwnerId')
-      .parent()
-      .siblings('p')
-      .contains('Please select an existing customer');
-    cy.wait(100);
-    UnitsPage.getFieldByName('propertyOwnerId').click();
-    cy.wait(100);
-    cy.get('ul > li:nth-child(2)').click();
-    cy.contains('button', 'Next').click();
-    cy.wait(100);
-    cy.get('input[name="address.fullName"]').type('Italy, texas', {delay: 150});
-    cy.wait(200);
-    cy.get('ul > li:nth-child(1)').click();
-    cy.get('input[name="address.component.street"]').type('street', {
-      delay: 150,
+    it('submit unit', () => {
+        UnitsPage.navigateToCreatePage();
+        cy.get('span[role="progressbar"]').should('not.exist');
+        UnitsPage.getFieldByName('propertyOwnerId').click();
+        UnitsPage.getFieldByName('propertyOwnerId').blur();
+        UnitsPage.getFieldByName('propertyOwnerId').parent().siblings('p').contains('Please select an existing customer');
+        UnitsPage.getFieldByName('propertyOwnerId').click();
+        cy.get('ul > li:nth-child(2)').click();
+        cy.contains('button', 'Next').click();
+        cy.wait(5000); // small delay for google autocomplete to load
+        cy.get('input[name="address.fullName"]').type('Italy, texas');
+        cy.contains('Address not found. Please check and try again').should('not.exist');
+        cy.get('ul > li:nth-child(1)').click();
+        cy.wait(200);
+        cy.contains('button', 'Next').click();
+        cy.get('input[name="category"]').type('Elev', {delay: 150});
+        cy.get('ul > li:nth-child(1)').click();
+        cy.contains('button', 'Next').click();
+        cy.get('input[name="lastVisitDate"]').click();
+        cy.get('[role="gridcell"]').first().click();
+        cy.get('input[name="lastInspectionDate"]').click();
+        cy.get('[role="gridcell"]').eq(1).click();
+        cy.contains('h6', 'Service Information').click();
+        cy.get('input[name="serviceTime"]').type('4', {delay: 150});
+        cy.get('input[name="technicianNumber"]').type('4', {delay: 150});
+        cy.contains('button', 'Next').click();
+        cy.contains('button', 'Submit').click();
+        cy.contains('Unit created successfully');
     });
-    cy.contains('button', 'Next').click();
-    cy.get('input[name="category"]').type('Elev', {delay: 150});
-    cy.get('ul > li:nth-child(1)').click();
-    cy.contains('button', 'Next').click();
-    cy.wait(100);
-    cy.get('input[name="lastVisitDate"]').click();
-    cy.get('[role="gridcell"]').first().click();
-    cy.get('input[name="lastInspectionDate"]').click();
-    cy.get('[role="gridcell"]').eq(1).click();
-    cy.get('[role="gridcell"]').eq(1).click();
-    cy.get('body').click(0, 0);
-    cy.get('input[name="serviceTime"]').type('4', {delay: 150});
-    cy.get('input[name="technicianNumber"]').type('4', {delay: 150});
-    cy.contains('button', 'Next').click();
-    cy.wait(100);
-    cy.contains('button', 'Submit').click();
-    cy.contains('Unit created successfully');
-  });
 });

@@ -33,19 +33,22 @@ const queryClient = new QueryClient({
 
 const isProduction = import.meta.env.MODE === 'prod';
 
-Sentry.init({
-  dsn: import.meta.env.REACT_APP_SENTRY_DSN,
-  environment: isProduction ? 'production' : import.meta.env.MODE,
-  debug: !isProduction,
-  replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
-  replaysOnErrorSampleRate: 1.0,
-  integrations: [
-    new Sentry.Replay({
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-  ],
-});
+// disable Sentry in Cypress e2e tests
+if (!window.Cypress) {
+  Sentry.init({
+    dsn: import.meta.env.REACT_APP_SENTRY_DSN,
+    environment: isProduction ? 'production' : import.meta.env.MODE,
+    debug: !isProduction,
+    replaysSessionSampleRate: isProduction ? 0.1 : 1.0,
+    replaysOnErrorSampleRate: 1.0,
+    integrations: [
+      Sentry.replayIntegration({
+        maskAllText: true,
+        blockAllMedia: true,
+      }),
+    ],
+  });
+}
 
 // Updated part for React 18
 const container = document.querySelector('#root') as Element;
@@ -71,7 +74,7 @@ root.render(
           </UserCompanyProvider>
         </SnackbarProvider>
 
-        <ReactQueryDevtools />
+        {window.Cypress ? null : <ReactQueryDevtools />}
       </QueryClientProvider>
     </LanguageProvider>
   </ThemeProvider>,

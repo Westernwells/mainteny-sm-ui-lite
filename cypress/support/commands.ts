@@ -41,6 +41,7 @@ declare global {
     interface Chainable {
       login(): Chainable<void>;
       fillRichTextField(field: string, value: string): Chainable<void>;
+      clearRichTextField(field: string): Chainable<void>;
     }
   }
 }
@@ -64,6 +65,19 @@ Cypress.Commands.add('fillRichTextField', (field: string, value: string) => {
         .click()
         .wait(1000)
         .realType(value);
+    });
+});
+
+Cypress.Commands.add('clearRichTextField', (field: string) => {
+  cy.contains('legend', field)
+    .parents('fieldset')
+    .within(() => {
+      cy.get('div[contenteditable="true"]')
+        .focus()
+        .click()
+        .wait(1000)
+        .realClick({clickCount: 3})
+        .realPress('Backspace');
     });
 });
 

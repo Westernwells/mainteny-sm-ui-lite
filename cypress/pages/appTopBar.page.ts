@@ -32,6 +32,7 @@ const RU_LANG = {
 
 export default class AppTopBarPage {
   static selectLanguage(languageText) {
+    cy.contains('button', 'Login').should('not.exist');
     cy.get('#selectLanguageMenuList').should('not.exist');
 
     // Click the button to reveal the list

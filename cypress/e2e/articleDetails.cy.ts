@@ -1,26 +1,19 @@
-import LoginPage from '../pages/login.page';
 import AppTopBarPage from '../pages/appTopBar.page';
 import ArticlesPage from '../pages/articles-details.page';
 
 describe('Edit Article', () => {
     beforeEach(() => {
-        LoginPage.visitLoginPage();
-        const loginURL = `${Cypress.env().REACT_APP_API_URL}/api/sessions/login`;
-        cy.intercept('POST', loginURL).as('loginApi');
-        LoginPage.login();
+        cy.login();
 
-        cy.wait('@loginApi').then(() => {
-            const articleApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles?query=&pageIndex=0&pageSize=50`;
+        const articleApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles?query=&pageIndex=0&pageSize=50`;
 
-            const articleInfoURL = `${Cypress.env().REACT_APP_API_URL}/api/articles/*`;
+        const articleInfoURL = `${Cypress.env().REACT_APP_API_URL}/api/articles/*`;
 
-            cy.intercept('GET', articleApi).as('articleApi');
-            cy.intercept('GET', articleInfoURL).as('articleInfoApi');
+        cy.intercept('GET', articleApi).as('articleApi');
+        cy.intercept('GET', articleInfoURL).as('articleInfoApi');
 
-            ArticlesPage.visit();
-            AppTopBarPage.selectLanguage('English');
-        });
-
+        ArticlesPage.visit();
+        AppTopBarPage.selectLanguage('English');
         ArticlesPage.navigateToDetailsPage();
     });
 
@@ -29,10 +22,9 @@ describe('Edit Article', () => {
         const outside = cy.get('#alert-dialog-title');
 
         // Validate article name is filled
-        const nameField = cy.get('input[name="name"]');
-        nameField.clear();
+        cy.clearRichTextField('Name');
         outside.click();
-        nameField.parent().siblings('p').should('have.text', 'Name is required');
+        cy.get('div[data-test-id="name"]').contains('Name is required');
         cy.get('button[type="button"]').should('be.disabled');
 
         // Validate purchase VAT is filled
@@ -73,7 +65,7 @@ describe('Edit Article', () => {
     });
 
     it('should show delete article modal with its content and delete article', () => {
-        cy.wait('@articleInfoApi', {timeout: 15000})
+        cy.wait('@articleInfoApi')
             .its('response')
             .then((response) => {
                 const {body: articleData} = response;
@@ -90,7 +82,7 @@ describe('Edit Article', () => {
     });
 
     it('should edit article description', () => {
-        cy.wait('@articleInfoApi', {timeout: 15000})
+        cy.wait('@articleInfoApi')
             .its('response')
             .then((response) => {
                 const {body: articleData} = response;
@@ -116,7 +108,7 @@ describe('Edit Article', () => {
     });
 
     it('should edit article attachments information', () => {
-        cy.wait('@articleInfoApi', {timeout: 15000})
+        cy.wait('@articleInfoApi')
             .its('response')
             .then((response) => {
                 const {body: articleData} = response;
@@ -127,13 +119,13 @@ describe('Edit Article', () => {
                 }
             });
 
-        ArticlesPage.openArticleDialog('Edit Attachments', 4);
+        ArticlesPage.openArticleDialog('Add Attachments', 4);
         cy.wait(200);
-        cy.get('button:contains("Save")').should('be.visible').should('be.disabled');
+        cy.contains('button', 'Upload attachment').should('be.visible').should('be.disabled');
     });
 
     it('should edit article qr code information', () => {
-        cy.wait('@articleInfoApi', {timeout: 15000})
+        cy.wait('@articleInfoApi')
             .its('response')
             .then((response) => {
                 const {body: articleData} = response;

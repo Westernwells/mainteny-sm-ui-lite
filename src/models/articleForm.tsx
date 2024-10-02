@@ -71,6 +71,7 @@ export enum MeasurementUnit {
   pack = 'pack',
   km = 'km',
   UE = 'UE',
+  'fixed fee' = 'fixed fee',
 }
 
 export const createMeasurementOptions = (

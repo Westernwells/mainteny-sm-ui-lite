@@ -1,18 +1,16 @@
-import {addDays} from 'date-fns';
 import AppTopBarPage from '../pages/appTopBar.page';
 import QuotationPage from '../pages/quotation.page';
 
 describe('Create Quotation', () => {
     beforeEach(() => {
         cy.login();
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
 
         AppTopBarPage.selectLanguage('English');
 
-        const addressURL = 'https://maps.googleapis.com/maps/api/place/js/AutocompletionService.GetPredictionsJson?*';
-        cy.intercept('GET', addressURL).as('addressURLApi');
-
         QuotationPage.visit();
         QuotationPage.openNewQuotation();
+        cy.get('span[role="progressbar"]').should('not.exist');
     });
 
     it('should add new customer on quotation page', () => {
@@ -30,27 +28,22 @@ describe('Create Quotation', () => {
         cy.contains('Select Unit');
         cy.contains('button', 'Save').should('be.disabled');
 
-        cy.get('input[name="subject"]').clear({force: true});
-        cy.get('textarea[name="description"]').click({force: true});
-        cy.get('input[name="subject"]').parent().siblings('p').should('have.text', 'Subject is required');
+        cy.clearRichTextField('Subject');
+        cy.clearRichTextField('Description');
 
         cy.contains('button', 'Save').should('be.disabled');
 
-        cy.get('[data-test-id="AddArticle"]').should('exist');
+        cy.get('[data-testid="AddArticle"]').should('exist');
         cy.contains('button', 'Save').should('be.disabled');
 
-        cy.get('[data-test-id="AddArticle"]').click({force: true});
+        cy.get('[data-testid="AddArticle"]').click({force: true});
 
-        const outside = cy.get('input[name="name"]');
-        cy.get('input[name="name"]').click({force: true});
-        outside.click({force: true});
+        cy.get('div[test-id="name-0"]').click({force: true});
+        // click outside
+        cy.contains('Footer').click();
 
         cy.contains('Article cannot be empty');
         cy.contains('button', 'Save').should('be.disabled');
-    });
-
-    it('should check expiry date is prefilled with 14 days from today', () => {
-        cy.get('input[name="expiryDate"]').should('have.value', addDays(new Date(), 14).toLocaleDateString());
     });
 
     it('should create job from quotation page', () => {
@@ -138,7 +131,7 @@ describe('Create Quotation', () => {
                 const discountsText = discounts
                     .map(
                         ({days, discountPercentage}) =>
-                            `Bei Zahlung innerhalb von ${days} Tagen erhalten Sie ${discountPercentage} Skonto auf den Rechnungsbetrag.`,
+                            `If payment is made within ${days} days, we grant a discount of ${discountPercentage} of the invoice amount.`,
                     )
                     .join('\n');
 

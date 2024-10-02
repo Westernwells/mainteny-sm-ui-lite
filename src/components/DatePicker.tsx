@@ -35,6 +35,8 @@ interface Props extends Partial<DatePickerProps<Date>> {
   errorMessage?: string;
   shouldDisableDate?: (tDate: Date) => boolean;
   resetValue?: Date;
+  inputTestId?: string;
+  popupTestId?: string;
 }
 
 export const DatePicker = ({
@@ -53,6 +55,8 @@ export const DatePicker = ({
   dateFormat,
   errorMessage,
   shouldDisableDate,
+  inputTestId,
+  popupTestId,
   ...props
 }: Props) => {
   const {t} = useTranslation();
@@ -284,6 +288,7 @@ export const DatePicker = ({
               },
               popper: {
                 sx: popperSx,
+                'data-testid': popupTestId,
               },
               textField: {
                 sx: {
@@ -304,6 +309,7 @@ export const DatePicker = ({
                   type: 'input',
                   onClick: handleOpen,
                   ref: inputRef,
+                  'data-testid': inputTestId,
                 },
               },
               inputAdornment: {

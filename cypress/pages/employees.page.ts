@@ -2,18 +2,15 @@ import {formatDate} from '../../src/utils/datetime';
 
 export default class EmployeesPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="Employees-nav-item"]').click();
+    cy.get('ul > div[role="button"][data-testid="employees-nav-item"]').click();
   };
 
-  static setAvailableEmployeeRowIndex() {
+  static getAvailableEmployeeRowIndex() {
     return cy
-      .get('div[data-field="availability"][role="cell"]')
+      .get('div span')
       .contains('Available')
       .parents('div[role="row"]')
-      .invoke('attr', 'data-rowindex')
-      .then((index) => {
-        cy.wrap(index).as('availableEmployeeRowIndex');
-      });
+      .invoke('attr', 'data-rowindex');
   }
 
   static getEmployeeByIndex(index: string) {
@@ -25,7 +22,7 @@ export default class EmployeesPage {
     cy.get('svg[data-testid="WbSunnyIcon"]').click();
     cy.contains('label', 'Date').click();
     cy.get('button[aria-current="date"]').click();
-    cy.contains('button', 'Confirm').click();
+    cy.contains('button', 'Confirm').click({waitForAnimations: false});
     const currentTechnicianAPI = `${
       Cypress.env().REACT_APP_API_URL
     }/api/technicians/*/events?*`;

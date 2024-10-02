@@ -106,6 +106,7 @@ const AsyncSelect = <T,>({
               _.get(option, valueKey) === _.get(value, valueKey)
             }
             getOptionLabel={(option) => _.get(option, labelKey) as string}
+            getOptionKey={(option) => _.get(option, valueKey) as string}
             loading={loading}
             options={options}
             filterOptions={(x) => x}

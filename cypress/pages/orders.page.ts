@@ -2,7 +2,7 @@ import {isEqual} from 'lodash';
 
 export default class OrdersPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="Jobs-nav-item"]').click();
+    cy.get('ul > div[role="button"][data-testid="jobs-nav-item"]').click();
   };
 
   static changeTab = (index: number) => {
