@@ -217,7 +217,7 @@ export const DataList = ({
                           <MenuItem
                             key={eventType.value}
                             value={eventType.value}>
-                            {eventType.label}
+                            {t(eventType.label)}
                           </MenuItem>
                         ))}
                       </StyledSelect>
@@ -228,8 +228,8 @@ export const DataList = ({
                         </Typography>
                         <Typography color="#828DA3" variant="caption">
                           {item.presence
-                            ? t('Presence').toUpperCase()
-                            : t('Absence').toUpperCase()}
+                            ? t('presence').toUpperCase()
+                            : t('absence').toUpperCase()}
                         </Typography>
                       </>
                     )}
@@ -263,7 +263,7 @@ export const DataList = ({
                     }));
                   }}
                   size="small"
-                  placeholder="Enter name"
+                  placeholder={t('Enter name')}
                 />
               </StyledDataListCell>
               <StyledDataListCell sx={{flex: 0.8, padding: 0}}>
@@ -282,7 +282,7 @@ export const DataList = ({
                   </MenuItem>
                   {ALL_EMPLOYEE_EVENT_TYPES.map((item) => (
                     <MenuItem key={item.value} value={item.value}>
-                      {item.label}
+                      {t(item.label)}
                     </MenuItem>
                   ))}
                 </StyledSelect>
