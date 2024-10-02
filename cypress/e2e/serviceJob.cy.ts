@@ -114,7 +114,7 @@ describe('Job', () => {
         cy.wait(1000);
 
         // Click the "Unscheduled" option (use the recorded selector for this action)
-        cy.get('.MuiMenuItem-root:nth-child(1) .MuiTypography-root').click({force: true});
+        cy.get('.MuiMenuItem-root:nth-child(7) .MuiTypography-root').click({force: true});
 
         // Click on the backdrop to close the dropdown if necessary
         cy.get('.MuiBackdrop-root').click({force: true});
