@@ -101,7 +101,7 @@ variables:
       fi
       # Use Node.js to JSON.stringify the changelog for escaping special characters
       ESCAPED_CHANGELOG=$(node -p 'JSON.stringify(process.env.CI_COMMIT_MESSAGE || "fallback changelog")')
-      curl --fail-with-body -X 'POST' \
+      curl --fail -X 'POST' \
         "$URL/api/versions?apikey=$APIKEY" \
         -H 'accept: application/json' \
         -H 'Content-Type: application/json' \
