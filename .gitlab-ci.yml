@@ -99,14 +99,16 @@ variables:
         APIKEY="$VERSIONS_API_KEY_STAGE"
         TYPE="WEB_STAGING"
       fi
-      curl -X 'POST' \
+      # Use Node.js to JSON.stringify the changelog for escaping special characters
+      ESCAPED_CHANGELOG=$(node -p 'JSON.stringify(process.env.CI_COMMIT_MESSAGE || "fallback changelog")')
+      curl --fail-with-body -X 'POST' \
         "$URL/api/versions?apikey=$APIKEY" \
         -H 'accept: application/json' \
         -H 'Content-Type: application/json' \
         -d "{
           \"type\": \"$TYPE\",
           \"value\": \"$CI_COMMIT_SHORT_SHA\",
-          \"changelog\": \"$CI_COMMIT_MESSAGE\",
+          \"changelog\": $ESCAPED_CHANGELOG,
           \"releaseTime\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
         }"
   rules:
