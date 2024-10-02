@@ -2774,5 +2774,10 @@
   "Office work": "Kancelarijski rad",
   "Vacation": "Odmor",
   "Field work": "Rad na terenu",
-  "Sick leave": "Bolovanje"
+  "Sick leave": "Bolovanje",
+  "Enter type name": "Unesite naziv tipa",
+  "Enter name": "Unesite ime",
+  "Event type created successfully": "Tip događaja je uspešno napravljen",
+  "Work travel": "Putovanje na posao",
+  "Special leave": "Posebno odsustvo"
 }
