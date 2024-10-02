@@ -2736,7 +2736,7 @@
   "Changes will update {{subType}} entries.": "Änderungen aktualisieren {{subType}}-Einträge.",
   "Retroactive update will affect all previous data, while forward-looking update will apply to all input and exports from now on.": "Rückwirkende Aktualisierung hat Auswirkungen auf alle vorherigen Daten, während vorausschauende Aktualisierung auf alle Eingaben und Exporte ab jetzt angewendet wird.",
   "Retroactive update": "Rückwirkende Aktualisierung",
-  "Update changes": "Änderungen aktualisieren",
+  "Update changes": "Zukünftige Aktualisierung",
   "You are about to delete {{typeName}}": "Sie sind dabei, {{typeName}} zu löschen.",
   "Enter the type name to confirm deletion.": "Geben Sie den Typnamen ein, um die Löschung zu bestätigen.",
   "Delete {{presenceType}} type": "Löschen Sie den Typ {{presenceType}}",
@@ -2749,5 +2749,8 @@
   "Start adding your articles and spare parts": "Beginnen Sie mit dem Hinzufügen Ihrer Artikel und Ersatzteile",
   "fixed fee": "pauschal",
   "Go to article": "Gehe zum Artikel",
-  "Vacation": "Urlaub"
+  "Office work": "Innendienst",
+  "Vacation": "Urlaub",
+  "Field work": "Außendienst",
+  "Sick leave": "Krankheit"
 }
