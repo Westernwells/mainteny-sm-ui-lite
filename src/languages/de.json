@@ -2752,5 +2752,10 @@
   "Office work": "Innendienst",
   "Vacation": "Urlaub",
   "Field work": "Außendienst",
-  "Sick leave": "Krankheit"
+  "Sick leave": "Krankheit",
+  "Enter type name": "Typ festlegen",
+  "Enter name": "Namen eingeben",
+  "Event type created successfully": "Erfolgreich angelegt",
+  "Work travel": "Dienstreise",
+  "Special leave": "Sonderurlaub"
 }
