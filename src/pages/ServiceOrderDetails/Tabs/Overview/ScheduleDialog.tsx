@@ -203,7 +203,7 @@ export const ScheduleDialog = ({
 
   // temporary solution until making Yup resolver work with react-hook-form
   const formNotValidCustomValidation = useMemo(() => {
-    if (!watchDueDate) return true;
+    if (!watchDueDate || !watchTechnicianIdsField?.length) return true;
     return (
       watchSwitchActive &&
       (!watchStartTime || !watchEndTime || !watchStartDate || !watchEndDate)
@@ -214,6 +214,7 @@ export const ScheduleDialog = ({
     watchStartDate,
     watchEndDate,
     watchDueDate,
+    watchTechnicianIdsField,
     watchSwitchActive,
   ]);
 
@@ -322,6 +323,8 @@ export const ScheduleDialog = ({
                   onClear={clearDateSelection}
                   disabled={!watchSwitchActive}
                   sx={{width: '300px'}}
+                  inputTestId="start-end-date"
+                  popupTestId="start-end-date-popup"
                 />
 
                 <TimePicker
@@ -348,6 +351,8 @@ export const ScheduleDialog = ({
                     error: !!(errors.startTime && touchedFields.startTime),
                     onBlur: register('startTime').onBlur,
                   }}
+                  inputTestId="start-time"
+                  popupTestId="start-time-popup"
                 />
 
                 <TimePicker
@@ -364,6 +369,8 @@ export const ScheduleDialog = ({
                     onBlur: register('endTime').onBlur,
                   }}
                   disabled={!watchSwitchActive}
+                  inputTestId="end-time"
+                  popupTestId="end-time-popup"
                 />
               </Box>
             )}
@@ -380,6 +387,8 @@ export const ScheduleDialog = ({
                   label: t('Due date'),
                   required: true,
                 }}
+                inputTestId="due-date"
+                popupTestId="due-date-popup"
               />
             </Box>
 
@@ -452,7 +461,8 @@ export const ScheduleDialog = ({
               onClick: () => onFormSubmit(),
               autoFocus: true,
               disabled: !isFormValid || formNotValidCustomValidation,
-            }}>
+            }}
+            testId="saveButton">
             <Typography variant="subtitle2">{t('Save')}</Typography>
           </Button>
         </DialogActions>

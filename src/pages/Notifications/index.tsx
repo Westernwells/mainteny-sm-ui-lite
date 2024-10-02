@@ -345,7 +345,7 @@ export const Notifications = () => {
           </Typography>
           {tabValue === '0' &&
             !isLoadingUnreadNotifications &&
-            !!unreadNotifications.pages[0].total && (
+            !!unreadNotifications.pages?.[0]?.total && (
               <Button
                 label={t('Mark all as read')}
                 buttonProps={{

@@ -175,7 +175,7 @@ export const Employees = () => {
       (event: TechnicianEventPair) => event.technicianId,
     );
     return aggregateEmployeeRows(userAccountResource.data, eventByTechnicianId);
-  }, [userAccountResource, isLoading]);
+  }, [userAccountResource, isLoading, technicianEvents]);
 
   const totalPages = useMemo(
     () =>
@@ -238,8 +238,9 @@ export const Employees = () => {
       <TableContainer>
         <TableHeader columns={COLUMNS.current} />
         {/* Row */}
-        {rows.map((entry) => (
+        {rows.map((entry, idx) => (
           <TableRow
+            data-rowindex={idx}
             key={`employee-row-${entry.id}`}
             testId="employee-row-container">
             {COLUMNS.current.map((column) =>

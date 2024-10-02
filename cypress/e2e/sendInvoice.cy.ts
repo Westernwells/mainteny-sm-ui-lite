@@ -1,72 +1,55 @@
 import InvoicesPage from '../pages/invoices.page';
-import LoginPage from '../pages/login.page';
-import { InvoiceStatusView } from '../../src/models/invoice';
 import AppTopBarPage from '../pages/appTopBar.page';
-import {getInvoicePDFStatuses, isDueDateInPast} from '../../src/utils/invoice-utils';
-
 
 describe('Send Invoice via Email', () => {
     beforeEach(() => {
-        LoginPage.visitLoginPage();
-        const loginURL = `${Cypress.env().REACT_APP_API_URL}/api/sessions/login`;
-        cy.intercept('POST', loginURL).as('loginApi');
-        LoginPage.login();
+        cy.login();
 
-        cy.wait('@loginApi').then(() => {
-            AppTopBarPage.selectLanguage('English');
-      
-            const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?pageIndex=0&pageSize=25&query=&status=DRAFT`;
-            cy.intercept('GET', invoicesURL).as('invoicesApi');
-            
-            InvoicesPage.visit();
-            InvoicesPage.filterInvoicesListByStatus(InvoiceStatusView.DRAFT);
-        });
+        AppTopBarPage.selectLanguage('English');
+
+        const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
+        cy.intercept('GET', invoicesURL).as('invoicesApi');
+        const sendInvoiceAPI = `${Cypress.env().REACT_APP_API_URL}/api/invoices/*/send`;
+        cy.intercept('POST', sendInvoiceAPI).as('sendInvoiceAPI');
+
+        InvoicesPage.visit();
+        cy.get('span[role="progressbar"]').should('not.exist');
+        cy.wait('@invoicesApi');
     });
 
     it('should send invoice and all form inputs are required', () => {
-        cy.wait('@invoicesApi', { timeout: 15000 }).its('response').then(response => {
-            const { body } = response;
-            const invoicesData = body.data;
+        // create invoice
+        InvoicesPage.createInvoice();
 
-            // First valid invoice
-            const validInvoice = invoicesData.find((invoice) => {
-                const {isPDFsGenerated} = getInvoicePDFStatuses(invoice);
-                return invoice?.dueDate && !isDueDateInPast(invoice) && isPDFsGenerated && invoice?.number;
-            });
+        cy.go('back');
+        cy.get('span[role="progressbar"]').should('not.exist');
+        cy.wait(['@invoicesApi', '@invoicesApi', '@invoicesApi']);
+        cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
 
-            // if valid invoice was found
-            if(validInvoice){
-                InvoicesPage.openSendInvoiceModalByInvoiceNumber(validInvoice?.number);
-    
-                cy.get('input[name="email"]').should('have.attr', 'required');
-                cy.get('input[name="subject"]').should('have.attr', 'required');
-                cy.get('textarea[name="content"]').should('have.attr', 'required');
-    
-                cy.fixture('invoices').then(invoices => InvoicesPage.fillInvoiceDetails(invoices.validInvoice))
-                InvoicesPage.sendInvoice()
-    
-                cy.contains('Invoice sent successfully');
-            }
-        })
+        // send invoice
+        cy.get('svg[data-testid="SendIcon"]').eq(0).click();
+        cy.get('input[id="multiple-asynchronous-demo"]').should('have.attr', 'required');
+        cy.get('input[name="subject"]').should('have.attr', 'required');
+        cy.contains('label', 'Text *');
+        cy.contains('label', 'Send to').click();
+        cy.focused().type('{backspace}noman+1@mainteny.com{enter}');
+        cy.get('div[contenteditable="true"]').type('I am Text!');
+        cy.contains('button', 'Send email').click();
+        cy.wait('@sendInvoiceAPI', {timeout: 30000});
+        cy.contains('Invoice sent successfully');
     });
 
-    it('Should not be able to send email, if invoice.dueDate is empty(undefined) or expired', () => {
-        cy.wait('@invoicesApi', { timeout: 15000 }).its('response').then(response => {
-            const { body } = response;
-            const invoicesData = body.data;
+    it('Should not be able to send email, if invoice.dueDate is expired', () => {
+        // create invoice
+        InvoicesPage.createInvoice({setExpiredDueDate: true});
 
-            // First invoice where invoice.dueDate is expired or undefined
-            const invoiceWithDateIssues = invoicesData.find(invoice => {
-                const {isPDFsGenerated} = getInvoicePDFStatuses(invoice);
-                return !invoice?.dueDate || (!invoice?.dueDate && isDueDateInPast(invoice)) && isPDFsGenerated && invoice.number;
-            });
+        cy.go('back');
+        cy.get('span[role="progressbar"]').should('not.exist');
+        cy.wait(['@invoicesApi', '@invoicesApi', '@invoicesApi']);
+        cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
 
-            // if invoice with dueDate issues was found
-            if(invoiceWithDateIssues?.number){
-                InvoicesPage.openSendInvoiceModalByInvoiceNumber(invoiceWithDateIssues.number);
-                cy.contains(!invoiceWithDateIssues.dueDate ? 'Error: A payment due date is required to send the invoice. Please add this information to proceed' : 'The due date for the invoice has expired');
-            }
-        });
+        // send invoice
+        cy.get('svg[data-testid="SendIcon"]').eq(0).click();
+        cy.contains('The due date for the invoice has expired');
     });
 });
-

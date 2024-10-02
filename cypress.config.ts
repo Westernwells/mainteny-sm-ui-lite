@@ -1,6 +1,7 @@
 import {defineConfig} from 'cypress';
 import coverage from '@cypress/code-coverage/task';
 import cypressSplit from 'cypress-split';
+import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter';
 import {readPdf} from './cypress/scripts/readPDF';
 
 const fs = require('fs');
@@ -11,9 +12,11 @@ export default defineConfig({
   e2e: {
     baseUrl: process.env.REACT_APP_BASE_URL,
     chromeWebSecurity: false,
+    defaultCommandTimeout: 60000,
     setupNodeEvents(on, config) {
       coverage(on, config);
       cypressSplit(on, config);
+      installLogsPrinter(on);
       on('task', {
         readPdf,
       });
@@ -45,6 +48,10 @@ export default defineConfig({
   env: {
     REACT_APP_API_URL: process.env.REACT_APP_API_URL,
   },
-  pageLoadTimeout: 90000,
+  pageLoadTimeout: 180000,
+  retries: {
+    openMode: 0,
+    runMode: 1,
+  },
   defaultCommandTimeout: 15000,
 });

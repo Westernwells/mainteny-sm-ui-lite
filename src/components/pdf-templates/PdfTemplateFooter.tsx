@@ -20,7 +20,11 @@ Font.register({
   format: 'truetype',
   src: NotoSansGeorgianBold,
 });
-const getStyles = (boldFontStyle?: {fontFamily: string}) =>
+const getStyles = (
+  boldFontStyle?: {fontFamily: string},
+  flexBasisValue?: string,
+  itemCount?: number,
+) =>
   StyleSheet.create({
     footerEmail: {
       display: 'flex',
@@ -50,10 +54,16 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       marginTop: 5,
       paddingBottom: 15,
     },
+    leftEmailFooter: {
+      display: 'flex',
+      flexDirection: 'row',
+      flex: itemCount === 3 ? '0 0 85%' : '0 0 60%',
+      justifyContent: 'space-between',
+    },
     leftFooter: {
       display: 'flex',
       flexDirection: 'row',
-      flex: '0 0 75%',
+      flex: '0 0 85%',
       justifyContent: 'space-between',
     },
     emailText: {
@@ -86,7 +96,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     footerContent: {
       marginRight: 10,
       maxWidth: 130,
-      flex: '0 0 32%',
+      flex: `0 0 ${flexBasisValue}`,
     },
     footerHeading: {
       paddingVertical: 0.5,
@@ -112,7 +122,17 @@ const PdfTemplateFooter = ({
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
   };
-  const styles = getStyles(boldFontStyle);
+
+  const visibleBankSections = [
+    userInfo?.serviceCompany?.settings?.paymentInfo?.bankName,
+    userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName,
+  ].filter(Boolean);
+
+  const itemCount = visibleBankSections.length < 2 ? 3 : 4;
+  const flexBasisValue = `${100 / itemCount}%`;
+
+  const styles = getStyles(boldFontStyle, flexBasisValue, itemCount);
+
   return (
     <View fixed style={styles.footerContainer}>
       <View style={styles.footerWrapper}>
@@ -161,6 +181,40 @@ const PdfTemplateFooter = ({
               </Text>
             )}
           </View>
+          {userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
+            <View style={styles.footerContent}>
+              {userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
+                <Text style={styles.footerHeading}>
+                  {translate('Bank')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName}
+                </Text>
+              )}
+
+              {userInfo?.serviceCompany?.settings?.paymentInfo2
+                ?.accountNumber && (
+                <Text style={styles.footerSectionBody}>
+                  {translate('Acc. nr.')}:{' '}
+                  {
+                    userInfo?.serviceCompany?.settings?.paymentInfo2
+                      ?.accountNumber
+                  }
+                </Text>
+              )}
+              {userInfo?.serviceCompany?.settings?.paymentInfo2?.iban && (
+                <Text style={styles.footerSectionBody}>
+                  {translate('IBAN')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.paymentInfo2?.iban}
+                </Text>
+              )}
+              {userInfo?.serviceCompany?.settings?.paymentInfo2?.bic && (
+                <Text style={styles.footerSectionBody}>
+                  {translate('BIC')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.paymentInfo2?.bic}
+                </Text>
+              )}
+            </View>
+          )}
+
           <View style={styles.footerContent}>
             {userInfo?.serviceCompany?.settings?.managingDirector && (
               <Text style={styles.footerHeading}>
@@ -197,8 +251,9 @@ const PdfTemplateFooter = ({
           </View>
         </View>
       </View>
+
       <View style={styles.footerEmailWrapper}>
-        <View style={styles.leftFooter}>
+        <View style={styles.leftEmailFooter}>
           {userInfo?.serviceCompany?.contact?.url && (
             <View style={styles.footerContent}>
               <Text style={styles.emailText}>
@@ -234,6 +289,7 @@ const PdfTemplateFooter = ({
           />
         </View>
       </View>
+
       {footerPath && (
         <View style={styles.imageContainer}>
           <Image

@@ -1,12 +1,13 @@
 import {PropsWithChildren} from 'react';
-import {Box} from '@mui/material';
+import {Box, BoxProps} from '@mui/material';
 
-type Props = {
+interface Props extends BoxProps {
   testId: string;
-};
+}
 
-const TableRow = ({children, testId}: PropsWithChildren<Props>) => (
+const TableRow = ({children, testId, ...props}: PropsWithChildren<Props>) => (
   <Box
+    role="row"
     data-testid={testId}
     sx={{
       display: 'flex',
@@ -16,7 +17,8 @@ const TableRow = ({children, testId}: PropsWithChildren<Props>) => (
       '&:hover': {
         bgcolor: '#F7F9FC',
       },
-    }}>
+    }}
+    {...props}>
     {children}
   </Box>
 );

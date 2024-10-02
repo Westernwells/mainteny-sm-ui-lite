@@ -1,8 +1,6 @@
 export default class UnitsPage {
   static visit = () => {
-    cy.visit(`/units`, {
-      failOnStatusCode: false,
-    });
+    cy.get('ul > div[role="button"][data-testid="units-nav-item"]').click();
   };
 
   static navigateToDetailsPage = () => {
@@ -14,8 +12,8 @@ export default class UnitsPage {
   };
 
   static openDialog = () => {
-    cy.get('[data-testid="EditIcon"]').eq(1).click();
-    cy.contains('Edit Unit Details');
+    cy.get('[data-testid="EditOutlinedIcon"]').eq(0).click();
+    cy.contains('Edit General');
   };
 
   static getFieldByName = (name: string) => cy.get(`input[name=${name}]`);

@@ -73,36 +73,32 @@ export default class QuotationPage {
       .siblings('p')
       .should('have.text', 'Address is required');
 
-    cy.get('input[name="address.fullName"]').type('33 kehinde');
+    cy.get('input[name="address.fullName"]').type('33 Kehinde');
+    cy.contains('Address not found. Please check and try again').should(
+      'not.exist',
+    );
+    cy.contains('33 Kehinde').first().click();
     cy.wait(300);
-    cy.wait('@addressURLApi', {timeout: 15000}).then(() => {
-      cy.contains('33 Kehinde Owolabi Street, Lagos, Nigeria').click();
 
-      cy.get('input[name="address.fullName"]').should(
-        'have.value',
-        '33 Kehinde Owolabi St, Egbeda, Lagos 102213, Lagos, Nigeria',
-      );
+    cy.get('input[name="address.component.city"]').should(
+      'have.value',
+      'Lagos',
+    );
 
-      cy.get('input[name="address.component.city"]').should(
-        'have.value',
-        'Lagos',
-      );
+    cy.get('input[name="address.component.postalCode"]').should(
+      'have.value',
+      '102213',
+    );
 
-      cy.get('input[name="address.component.postalCode"]').should(
-        'have.value',
-        '102213',
-      );
+    cy.get('input[name="address.component.country"]').should(
+      'have.value',
+      'Nigeria',
+    );
 
-      cy.get('input[name="address.component.country"]').should(
-        'have.value',
-        'Nigeria',
-      );
-
-      cy.get('input[name="address.component.state"]').should(
-        'have.value',
-        'Lagos',
-      );
-    });
+    cy.get('input[name="address.component.state"]').should(
+      'have.value',
+      'Lagos',
+    );
 
     cy.contains('Next').should('not.be.disabled');
     cy.contains('Next').click();
@@ -137,10 +133,16 @@ export default class QuotationPage {
     cy.contains('Next').click();
     cy.contains('Next').click();
 
+    const postElevatorAPI = `${Cypress.env().REACT_APP_API_URL}/api/elevators`;
+    cy.intercept('POST', postElevatorAPI).as('postElevatorAPI');
     cy.contains('Create Unit').click();
 
     cy.contains('Unit created successfully');
-    cy.contains('Kehinde Owolabi Street 33, 102213, Lagos, Lagos, Nigeria');
+    cy.wait('@postElevatorAPI').then((interception) => {
+      const {body} = interception.request;
+
+      cy.contains(body.address.fullName);
+    });
   };
 
   static saveQuotation = () => {

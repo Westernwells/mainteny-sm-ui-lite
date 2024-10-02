@@ -1,8 +1,6 @@
 export default class ArticlesPage {
   static visit = () => {
-    cy.visit(`/articles`, {
-      failOnStatusCode: false,
-    });
+    cy.get('ul > div[role="button"][data-testid="articles-nav-item"]').click();
   };
 
   static navigateToDetailsPage = () => {
@@ -14,12 +12,12 @@ export default class ArticlesPage {
   };
 
   static openDeleteArticleModal = () => {
-    cy.get('[data-test-id="articleDelete"]').click();
+    cy.get('button[data-testid="articleDelete"]').click();
   };
 
   static deleteArticle = () => {
-    cy.get('[data-test-id="remove"]').click()
-    cy.contains('Article deleted successfully')
+    cy.contains('button', 'Yes').click();
+    cy.contains('Article deleted successfully');
   };
 
   static openArticleDialog = (dialogTitle: string, eqValue: number) => {
@@ -31,6 +29,4 @@ export default class ArticlesPage {
     cy.get('button').contains('Save').click();
     cy.contains(successMessage);
   };
-
-
 }

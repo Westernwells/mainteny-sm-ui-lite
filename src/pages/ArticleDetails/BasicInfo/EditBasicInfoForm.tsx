@@ -66,6 +66,7 @@ export const EditBasicInfoForm = ({
       <Box sx={{...containerStyles}}>
         <RichTextField
           label="Name"
+          name="name"
           placeholder="e.g. Flat cable, 16G0.75+2x(2x0.5)"
           html={formik.values.name || ''}
           updateHtml={(h) => formik.setFieldValue('name', h)}
@@ -73,6 +74,7 @@ export const EditBasicInfoForm = ({
           error={!!(formik.touched.name && formik.errors.name)}
           onBlur={formik.handleBlur}
           required
+          data-test-id="name"
         />
       </Box>
 

@@ -1,6 +1,6 @@
 import {isEqual} from 'lodash';
 import {InvoiceStatusView} from '../../src/models/invoice';
-import {mapInvoiceStatus, InvoiceView} from '../utils/utils';
+import {mapInvoiceStatus} from '../utils/utils';
 
 export default class InvoiceListingPage {
   static visit = () => {
@@ -12,6 +12,7 @@ export default class InvoiceListingPage {
 
     cy.get('ul > div[role="button"][data-testid="invoices-nav-item"]').click();
 
+    cy.get('span[role="progressbar"]').should('not.exist');
     cy.wait('@getInvoices');
   };
 
@@ -74,10 +75,8 @@ export default class InvoiceListingPage {
     statusToCheck: InvoiceStatusView,
     statusesToExclude: InvoiceStatusView[],
   ) => {
-    const apiEndpoint = `/api/serviceCompanies/*/invoices?*`;
-    cy.intercept('GET', apiEndpoint).as('getInvoices');
-
     InvoiceListingPage.filterInvoicesListByStatus(statusToCheck);
+    cy.get('span[role="progressbar"]').should('not.exist');
 
     cy.url().should('include', `${mapInvoiceStatus(statusToCheck)}`);
 
@@ -87,44 +86,43 @@ export default class InvoiceListingPage {
         status: mapInvoiceStatus(statusToCheck),
       },
       () => {
-        cy.wait(300);
+        cy.wait(1000);
 
-        cy.get('div[role="grid"]').as('grid');
+        cy.get('div[role="grid"]').then((grid) => {
+          if (grid.find("div[data-field='STATUS'][role='cell']").length > 0) {
+            cy.wrap(grid)
+              .find("div[data-field='STATUS'][role='cell']")
+              .each((rowElement) => {
+                const statusText = rowElement.text().trim();
 
-        cy.get(`@grid`)
-          .find("div[data-field='status'][role='cell']")
-          .each((rowElement) => {
-            const statusText = rowElement.text().trim();
+                expect(statusText).to.equal(statusToCheck);
 
-            expect(statusText).to.equal(statusToCheck);
-
-            statusesToExclude.forEach((status: InvoiceStatusView) => {
-              expect(statusText).not.to.equal(status);
-            });
-          });
+                statusesToExclude.forEach((status: InvoiceStatusView) => {
+                  expect(statusText).not.to.equal(status);
+                });
+              });
+          } else {
+            cy.contains('There are no entries for the applied filters.').should(
+              'exist',
+            );
+          }
+        });
       },
     );
   };
 
   static navigateToDetailsPage = () => {
-    let getInvoicesInterception: {body: {data: InvoiceView[]}} | undefined;
-
     cy.intercept(
       'GET',
       `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`,
-      (req) => {
-        req.reply((res) => {
-          getInvoicesInterception = res;
-        });
-      },
     ).as('getInvoices');
 
     cy.visit(`/invoices`, {
       failOnStatusCode: false,
     });
 
-    cy.wait('@getInvoices').then(() => {
-      const invoiceId = getInvoicesInterception.body.data[0]?.id;
+    cy.wait('@getInvoices').then((interception) => {
+      const invoiceId = interception.response.body?.data?.[0]?.id;
       if (invoiceId) {
         cy.get('div[data-colindex="1"]').eq(0).click();
         cy.url().should('contain', `${invoiceId}`);

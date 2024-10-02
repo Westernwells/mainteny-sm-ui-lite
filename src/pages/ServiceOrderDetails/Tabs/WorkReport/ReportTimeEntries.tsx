@@ -80,7 +80,19 @@ const ReportTimeEntries = ({
 
     formik.setFieldValue(timeRecordKey, dataClone);
   };
+  const createDate = (date: Date, time: string) => {
+    if (!time || typeof time !== 'string') {
+      throw new Error('Invalid time format');
+    }
 
+    const [hours, minutes] = time.split(':').map(Number);
+    const newDate = new Date(date);
+
+    // Set the hours and minutes manually
+    newDate.setHours(hours, minutes);
+
+    return newDate;
+  };
   const handleOnAddTime = () => {
     const sortedTimeSlots = _.sortBy(timeInfo.timeSlots, (obj) =>
       new Date(obj.startTime).getTime(),
@@ -104,9 +116,6 @@ const ReportTimeEntries = ({
   const renderEntry = (slot: ServiceOrderTimeSlot, index: number) => {
     const date = new Date(slot.startTime);
     const dateString = date.toISOString().split('T')[0];
-
-    const time = timeRawValues[index];
-    const defaultHours = new Date(`${dateString} ${time}`);
 
     const convertedMinutes = convertMinutesWithRounding(slot.minutes ?? 0, {
       hourUnit: '',
@@ -202,9 +211,13 @@ const ReportTimeEntries = ({
           )}
         </Box>
         <Box width={TIME_SECTION_WIDTH}>
-          {isEdit ? (
+          {isEdit && timeRawValues[index] ? (
             <TimePicker
-              defaultTime={time ? defaultHours : undefined}
+              defaultTime={
+                timeRawValues[index]
+                  ? createDate(new Date(slot.startTime), timeRawValues[index])
+                  : undefined
+              }
               getSelectedTime={(newTime) => {
                 if (newTime) {
                   const newTimeFormatted = formatDate(newTime, 'HH:mm')!;

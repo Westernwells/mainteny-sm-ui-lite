@@ -23,6 +23,8 @@ interface Props extends Partial<TimePickerProps<Date>> {
   required?: boolean;
   resetValue?: Date;
   saveOnClose?: boolean;
+  inputTestId?: string;
+  popupTestId?: string;
 }
 
 export const TimePicker = ({
@@ -36,6 +38,8 @@ export const TimePicker = ({
   resetValue,
   saveOnClose = false,
   required = false,
+  inputTestId,
+  popupTestId,
   ...props
 }: Props) => {
   const {t} = useTranslation();
@@ -230,6 +234,7 @@ export const TimePicker = ({
               },
               popper: {
                 sx: popperSx,
+                'data-testid': popupTestId,
               },
               textField: {
                 ...textFieldProps,
@@ -250,6 +255,7 @@ export const TimePicker = ({
                 inputProps: {
                   type: 'input',
                   onClick: handleOpen,
+                  'data-testid': inputTestId,
                 },
               },
               inputAdornment: {
