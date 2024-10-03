@@ -143,7 +143,7 @@ export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
 
   return (
     <Box>
-      <IconButton onClick={handleClick}>
+      <IconButton onClick={handleClick} sx={{py: 0}}>
         <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
       </IconButton>
       <Menu

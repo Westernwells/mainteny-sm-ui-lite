@@ -84,10 +84,11 @@ export default class InvoicesPage {
     if (options?.setExpiredDueDate) {
       // clear due date in case it's already set
       cy.contains('label', 'Payment Due Date').click();
-      cy.contains('button', 'Clear').click();
+      cy.contains('button', 'Clear').should('exist').click();
       cy.wait(1000); // wait for the due date to be cleared
 
       cy.contains('label', 'Payment Due Date').click();
+      cy.wait(1000);
       cy.get('button:has(+button[aria-current="date"])').click();
       cy.contains('button', 'Confirm').click();
     }

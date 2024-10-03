@@ -33,7 +33,7 @@ export const InfoCardTotalSumFooter = ({amount, label, currency}: Props) => {
         color={theme.palette.text.primary}
         variant="subtitle1"
         fontWeight="600"
-        sx={{marginRight: '4.5%'}}>
+        sx={{marginRight: '5%'}}>
         {!!amount && formatCurrency(amount, {...(currency && {currency})})}
       </Typography>
     </Box>
