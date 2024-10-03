@@ -92,31 +92,33 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
                 />
               )}
             </TableCellText>
-            <IconButton>
-              <Tooltip
-                title={
-                  article.ownerType === ServiceOrderArticleOwnerType.USER &&
-                  article.ownerName.trim()
-                    ? `${t('Added by')} ${article.ownerName}`
-                    : article.ownerType ===
-                        ServiceOrderArticleOwnerType.CONTRACT &&
-                      article.ownerName.trim()
-                    ? `${t('Added by contract')} ${article.ownerName}`
-                    : article.ownerType === ServiceOrderArticleOwnerType.SYSTEM
-                    ? `${t('Added by Automation')}`
-                    : ''
-                }
-                arrow
-                placement="top">
-                {article.ownerType === ServiceOrderArticleOwnerType.USER ? (
-                  <PersonOutlinedIcon />
-                ) : article.ownerType ===
-                  ServiceOrderArticleOwnerType.CONTRACT ? (
-                  <TextSnippetOutlinedIcon />
-                ) : (
-                  <HdrAutoOutlinedIcon />
-                )}
-              </Tooltip>
+            <IconButton sx={{py: 0}}>
+              {article.ownerType === ServiceOrderArticleOwnerType.USER ||
+              article.ownerType === ServiceOrderArticleOwnerType.CONTRACT ||
+              article.ownerType === ServiceOrderArticleOwnerType.TRAVEL_WORK ? (
+                <Tooltip
+                  title={
+                    article.ownerType === ServiceOrderArticleOwnerType.USER &&
+                    article.ownerName.trim()
+                      ? `${t('Added by')} ${article.ownerName}`
+                      : article.ownerType ===
+                          ServiceOrderArticleOwnerType.CONTRACT &&
+                        article.ownerName.trim()
+                      ? `${t('Added by contract')} ${article.ownerName}`
+                      : `${t('Added by Automation')}`
+                  }
+                  arrow
+                  placement="top">
+                  {article.ownerType === ServiceOrderArticleOwnerType.USER ? (
+                    <PersonOutlinedIcon />
+                  ) : article.ownerType ===
+                    ServiceOrderArticleOwnerType.CONTRACT ? (
+                    <TextSnippetOutlinedIcon />
+                  ) : (
+                    <HdrAutoOutlinedIcon />
+                  )}
+                </Tooltip>
+              ) : null}
             </IconButton>
           </Cell>
         );
