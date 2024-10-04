@@ -292,7 +292,7 @@ export const getFormattedPaymentValues = (
     return {
       formattedDueDate,
       discountAmount,
-      invoiceAmount,
+      grossInvoiceAmount,
       paymentAmount,
     };
   });
@@ -305,7 +305,7 @@ export const replacePaymentTermsPlaceholders = (
   replacements: {
     formattedDueDate?: string;
     discountAmount?: number;
-    invoiceAmount?: number;
+    grossInvoiceAmount?: number;
     paymentAmount?: number;
   }[],
   currentCurrency: Currency,
@@ -321,16 +321,15 @@ export const replacePaymentTermsPlaceholders = (
     return template;
   }
 
-  // Split the template into sections
   const sections = template.split('\n');
 
   let result = `${sections[0]}\n`;
 
-  replacements.forEach((replacement) => {
-    if (replacement) {
-      let sectionToReplace = sections[1]; // Only dynamic part with placeholders
+  replacements.forEach((replacement, index) => {
+    if (sections[index + 1] && replacement) {
+      if (replacement.discountAmount && replacement.discountAmount > 0) {
+        let sectionToReplace = sections[index + 1];
 
-      if (sectionToReplace) {
         sectionToReplace = sectionToReplace.replace(
           '{DUE_DATE}',
           replacement.formattedDueDate || '',
@@ -345,7 +344,7 @@ export const replacePaymentTermsPlaceholders = (
         );
         sectionToReplace = sectionToReplace.replace(
           '{INVOICE_AMOUNT}',
-          formatCurrency(replacement.invoiceAmount || 0, {
+          formatCurrency(replacement.grossInvoiceAmount || 0, {
             currency: currentCurrency?.code,
             currencySymbol: currentCurrency?.symbol,
             companyLang: selectedLng,
