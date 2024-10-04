@@ -44,7 +44,7 @@ export const CustomerAutoComplete = ({
   const debouncedChangeHandler = useCallback(
     _.debounce((newValue: string) => {
       setQuery(newValue);
-    }, 300),
+    }, 50),
     [],
   );
 
