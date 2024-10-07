@@ -19,7 +19,7 @@ describe('Mark invoice as paid', () => {
     });
 
     it('should open modal and mark invoice as paid successfully', () => {
-        InvoicesPage.createInvoice();
+        InvoicesPage.createInvoice({setExpiredDueDate: false});
         cy.get('span[role="progressbar"]').should('not.exist');
         cy.wait(['@invoicesApi', '@invoicesApi']);
         cy.wait(5000);
@@ -41,7 +41,7 @@ describe('Mark invoice as paid', () => {
     });
 
     it('should show correct amount when user open mark invoice as paid modal (even after search)', () => {
-        InvoicesPage.createInvoice();
+        InvoicesPage.createInvoice({setExpiredDueDate: false});
         cy.get('span[role="progressbar"]').should('not.exist');
         cy.wait(['@invoicesApi', '@invoicesApi']);
         cy.wait(5000);
@@ -49,7 +49,7 @@ describe('Mark invoice as paid', () => {
         cy.go('back');
         cy.get('span[role="progressbar"]').should('not.exist');
         cy.wait('@invoicesApi');
-        InvoicesPage.createInvoice();
+        InvoicesPage.createInvoice({setExpiredDueDate: false});
         cy.get('span[role="progressbar"]').should('not.exist');
         cy.wait(['@invoicesApi', '@invoicesApi']);
         cy.wait(5000);

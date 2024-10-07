@@ -24,6 +24,9 @@ interface Props {
   saveBtnType?: 'button' | 'submit' | 'reset';
   leftButton?: React.ReactNode;
   saveButtonText?: string;
+  cancelButtonText?: string;
+  cancelButtonTextColor?: string;
+  cancelButtonVariant?: ButtonProps['variant'];
   saveButtonVariant?: ButtonProps['variant'];
   saveButtonProps?: ButtonProps;
   saveButtonContainerProps?: ButtonProps;
@@ -32,7 +35,9 @@ interface Props {
   sx?: SxProps<Theme>;
   dialogActionsStyles?: SxProps<Theme>;
   saveButtonContainerStyles?: SxProps<Theme>;
+  cancelButtonStyles?: SxProps<Theme>;
   dialogContentTextStyles?: SxProps<Theme>;
+  dataTestId?: string;
 }
 
 export const Dialog = ({
@@ -42,23 +47,29 @@ export const Dialog = ({
   onCancel = () => {},
   showCancelButton = true,
   showSaveButton = true,
-  disableSaveBtn,
+  disableSaveBtn = false, // Default value here
   dialogProps,
   saveBtnType,
   saveButtonContainerProps,
   isSaving = false,
   leftButton,
   saveButtonText = 'Save',
+  cancelButtonText = 'Cancel',
+  cancelButtonTextColor = 'text.secondary',
+  cancelButtonVariant = 'text',
   saveButtonVariant = 'contained',
   saveButtonProps,
   dialogContentStyles = {},
   dialogTitleStyles = {},
   dialogActionsStyles = {},
   saveButtonContainerStyles = {},
+  cancelButtonStyles = {},
   dialogContentTextStyles = {},
   sx = {},
+  dataTestId,
 }: Props) => {
   const {t} = useTranslation();
+
   return (
     <MuiDialog
       fullWidth
@@ -70,7 +81,8 @@ export const Dialog = ({
       onClose={onCancel}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
-      {...dialogProps}>
+      {...dialogProps}
+      data-testid={dataTestId}>
       <DialogTitle
         id="alert-dialog-title"
         sx={{
@@ -120,21 +132,25 @@ export const Dialog = ({
               buttonProps={{
                 size: 'large',
                 onClick: onCancel,
+                variant: cancelButtonVariant,
+                sx: {...cancelButtonStyles},
               }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                {t('Cancel')}
+              <Typography variant="subtitle2" color={cancelButtonTextColor}>
+                {t(cancelButtonText)}
               </Typography>
             </Button>
           )}
 
           {showSaveButton && (
             <Button
+              testId="saveButton"
               buttonProps={{
                 size: 'large',
                 variant: saveButtonVariant,
                 onClick: onSave,
                 autoFocus: true,
                 disabled: disableSaveBtn || isSaving,
+                'aria-disabled': disableSaveBtn || isSaving,
                 type: saveBtnType,
                 ...saveButtonProps,
               }}>

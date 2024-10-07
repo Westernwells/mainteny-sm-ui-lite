@@ -242,7 +242,7 @@ export const theme = createTheme({
         root: {
           fontWeight: 400,
           fontSize: '0.75rem',
-          lineHeight: 2,
+          lineHeight: 2.6,
           letterSpacing: '0.15px',
           color: '#222B45',
           '&.Mui-focused': {

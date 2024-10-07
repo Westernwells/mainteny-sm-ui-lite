@@ -1,5 +1,8 @@
 import {UnitAppointment, UnitAppointmentView} from 'models/elevator';
-import {PriorityTechnicianFormModel} from 'models/unitForm';
+import {
+  AppointmentFormModel,
+  PriorityTechnicianFormModel,
+} from 'models/unitForm';
 import {
   ContractComponentElevator,
   ContractElevatorView,
@@ -9,6 +12,7 @@ import {
 } from 'models/contract';
 import {InspectionCycle} from 'models/misc';
 import {t} from 'i18next';
+import {mapDaysOfWeekOptions} from 'pages/UnitDetails/Tabs/OverviewTab/AppointmentPreference/EditAppointmentForm';
 
 export const monthNames = [
   'Jan',
@@ -185,3 +189,37 @@ export const inspectionCycleLabels = {
   [InspectionCycle.BIENNIALLY]: 'Every 2 years',
   [InspectionCycle.TRIENNIALLY]: 'Every 3 years',
 };
+
+export const mapFormDataToElevatorUpdateRequest = (
+  data: AppointmentFormModel,
+  elevatorId: string,
+  propertyOwnerId?: string,
+) => ({
+  body: {
+    propertyOwnerId,
+    timeRule: {
+      daysTimeRange: [
+        {
+          daysOfWeek: data.appointmentDaysOfWeek.map((val: string) =>
+            mapDaysOfWeekOptions[
+              val as keyof typeof mapDaysOfWeekOptions
+            ].toUpperCase(),
+          ),
+          timeRange:
+            data.openingHour || data.closingHour
+              ? {
+                  start: data.openingHour || '',
+                  end: data.closingHour || '',
+                }
+              : undefined,
+        },
+      ],
+    },
+    customerAppointment: {
+      shouldNotifyCustomer: data.shouldNotifyCustomer,
+      appointmentNotificationDue: data.appointmentNotificationDue,
+      requiresAppointment: data.requiresAppointment,
+    },
+  },
+  elevatorId,
+});

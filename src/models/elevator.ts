@@ -122,8 +122,8 @@ export interface ElevatorAdditionalInfo {
   parking: string;
   pictures: FileResource[];
   propertySegment: string;
-  qrCode: FileResourceRecord;
-  elevatorPhone: ElevatorPhone;
+  qrCode?: FileResourceRecord;
+  elevatorPhone?: ElevatorPhone;
   customerAppointment: CustomerAppointment;
   drive: string;
   speed: string;
@@ -208,7 +208,6 @@ export interface ElevatorView {
   availability: number;
   address: Address;
   propertyOwner: PropertyOwnerView;
-  propertyManager: PropertyContactPersonSimpleView;
   properties: ElevatorProperty[];
   lastVisitDate: string;
   nextVisitDate: string;

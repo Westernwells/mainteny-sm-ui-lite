@@ -35,6 +35,13 @@ export enum Priority {
   NONE = 'NONE',
 }
 
+export enum ServiceOrderArticleOwnerType {
+  USER = 'USER',
+  CONTRACT = 'CONTRACT',
+  TRAVEL_WORK = 'TRAVEL_WORK',
+  SYSTEM = 'SYSTEM',
+}
+
 export interface CallerInfo {
   name: string;
   calledAt?: string;
@@ -586,9 +593,14 @@ export interface ServiceOrderArticleView {
   article: ArticleRecord;
   unitAmount: Amount;
   quantity: number;
+  ownerType?: ServiceOrderArticleOwnerType;
   additionalInfo?:
     | {
         discount?: Discount;
+        owner?: {
+          id: string;
+          name: string;
+        };
       }
     | undefined;
 }

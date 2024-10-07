@@ -82,7 +82,7 @@ export const InfoCard = ({
         {children}
       </CardContent>
 
-      <CardActions>{footer}</CardActions>
+      <CardActions sx={{px: 0}}>{footer}</CardActions>
     </Card>
   );
 };

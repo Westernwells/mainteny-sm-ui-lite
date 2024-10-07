@@ -8,6 +8,10 @@ import {
   ArticleSupplierView,
   SupplierRecord,
 } from './supplier';
+import {
+  ServiceOrderArticleOwnerType,
+  ServiceOrderArticleView,
+} from './service-order';
 
 export enum ArticleType {
   LABOR = 'LABOR',
@@ -255,4 +259,28 @@ export interface ArticleRecord {
   unit: string;
   unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
+  generationInfo?: {
+    contractId: string;
+    componentId: string;
+    elevatorId: string;
+    generationDate: Date;
+  };
 }
+
+export type ArticleTableRow = {
+  id: string;
+  no: number;
+  number: string;
+  name: string;
+  description: string;
+  unit: string;
+  total: string;
+  unitPrice: string;
+  quantity: number;
+  percent: string;
+  navigateTo: string;
+  article: ServiceOrderArticleView;
+  ownerName: string;
+  ownerType: ServiceOrderArticleOwnerType;
+  contractNumber: string;
+};

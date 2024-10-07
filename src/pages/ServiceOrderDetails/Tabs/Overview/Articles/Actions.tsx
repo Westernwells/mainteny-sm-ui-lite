@@ -1,5 +1,4 @@
 import {useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -13,13 +12,12 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Confirm} from 'components/Confirm';
-import {ArticleView, ServiceOrderArticleRecord} from 'models/article';
+import {ServiceOrderArticleRecord} from 'models/article';
 import {
   useDeleteServiceOrderArticle,
   useNewUpdateServiceOrderArticles,
   useServiceOrderArticles,
 } from 'hooks/reactQuery/useServiceOrder';
-import {RemoveRedEye} from '@mui/icons-material';
 import {Dialog} from 'components/Dialog';
 import {ArticleBasicFormModel} from 'models/articleForm';
 import {amountRecordForBackend, makeAmountRecord} from 'utils/currency';
@@ -29,18 +27,12 @@ import {EditArticleFormModel} from './models';
 import {EditArticleForm} from './EditArticleForm';
 
 interface Props {
-  article: ArticleView;
   serviceOrderId: string;
   serviceOrderArticleId: string;
 }
 
-export const Actions = ({
-  article,
-  serviceOrderId,
-  serviceOrderArticleId,
-}: Props) => {
+export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
   const {t} = useTranslation();
-  const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -74,12 +66,6 @@ export const Actions = ({
 
   const actions = useMemo(() => {
     const items = [];
-
-    items.push({
-      label: t('Preview'),
-      icon: <RemoveRedEye />,
-      onClick: () => navigate(`/articles/details/${article.id}/`),
-    });
 
     items.push({
       label: t('Edit'),
@@ -157,7 +143,7 @@ export const Actions = ({
 
   return (
     <Box>
-      <IconButton onClick={handleClick}>
+      <IconButton onClick={handleClick} sx={{py: 0}}>
         <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
       </IconButton>
       <Menu
