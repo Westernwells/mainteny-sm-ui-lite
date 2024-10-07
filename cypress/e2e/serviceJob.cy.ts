@@ -115,11 +115,11 @@ describe('Job', () => {
 
         // Click the "Unscheduled" option (use the recorded selector for this action)
         cy.get('.MuiMenuItem-root:nth-child(7) .MuiTypography-root').click({force: true});
-
+        
         // Click on the backdrop to close the dropdown if necessary
         cy.get('.MuiBackdrop-root').click({force: true});
 
-        cy.wait(2000);
+        cy.wait(5000);
 
         cy.wait('@serviceOrdersApi')
             .its('response')
@@ -128,7 +128,7 @@ describe('Job', () => {
 
                 // Check if service orders data is available
                 if (serviceOrders && serviceOrders.data.length) {
-                    ServiceJobPage.getFirstTableElement().click();
+                    ServiceJobPage.getFirstTableElement().should('exist').click();
 
                     cy.get('span[role="progressbar"]', {timeout: 120000}).should('not.exist');
 
@@ -138,10 +138,13 @@ describe('Job', () => {
 
                     cy.get('li[role="menuitem"]').contains('Schedule').click();
 
+                    ServiceJobPage.selectTechnicianWithIndex(1)
+
                     cy.contains('button', 'Save').should('not.be.disabled').click();
 
                     cy.contains('Service job scheduled successfully');
                 } else {
+                    cy.contains('There are no entries for the applied filters.');
                     throw new Error('No Unscheduled jobs found');
                 }
             });

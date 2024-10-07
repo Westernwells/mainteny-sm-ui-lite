@@ -1,16 +1,20 @@
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
-import {DataGridLayout} from 'components/DataGridLayout';
-import {useEffect, useState} from 'react';
-import {getDataGridHeight} from 'utils/utils';
+import {useEffect, useRef, useState} from 'react';
 import {InfoCard} from 'components/InfoCard';
-import {GridRowsProp} from '@mui/x-data-grid';
-import {ServiceOrderArticleView} from 'models/service-order';
+import {
+  ServiceOrderArticleOwnerType,
+  ServiceOrderArticleView,
+} from 'models/service-order';
 import {EmptySection} from 'components/EmptySection';
 import Box from '@mui/material/Box';
 import {SelectModal} from 'components/SelectModal';
 import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
-import {ArticleView, ServiceOrderArticleRecord} from 'models/article';
+import {
+  ArticleTableRow,
+  ArticleView,
+  ServiceOrderArticleRecord,
+} from 'models/article';
 import {Progress} from 'components/Progress';
 import {
   useCreateServiceOrderArticle,
@@ -19,7 +23,28 @@ import {
 import {calculateOrderArticlesTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {useCurrentCurrency} from 'utils/currency';
-import {columns, makeRows} from './ArticleDataGridProps';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import {theme} from 'theme';
+import {IconButton, TableContainer, Tooltip} from '@mui/material';
+import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import Cell from 'components/Table/TableCell';
+import TableCellText from 'components/Table/TableCellText';
+import TableHeader from 'components/Table/TableHeader';
+import TableRow from 'components/Table/TableRow';
+import {useNavigate} from 'react-router-dom';
+import {
+  hasMultipleParagraphs,
+  returnFirstParagraph,
+} from 'utils/rich-text-field';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import TruncatedTooltip from 'components/TruncatedTooltip';
+import {Dialog} from 'components/Dialog';
+import DOMPurify from 'dompurify';
+import {stripHtmlTags} from 'models/text-block';
+import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
+import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
+import {makeRows} from './ArticleDataGridProps';
+import {Actions} from './Actions';
 
 interface Props {
   serviceOrderArticles: ServiceOrderArticleView[] | undefined;
@@ -27,10 +52,178 @@ interface Props {
 }
 
 export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
+  const navigate = useNavigate();
   const {t} = useTranslation();
-  const [rows, setRows] = useState<GridRowsProp>([]);
-  const [openSelectModal, setOpenSelectModal] = useState(false);
   const currentCurrency = useCurrentCurrency();
+  const [rows, setRows] = useState<ArticleTableRow[]>([]);
+  const [openSelectModal, setOpenSelectModal] = useState<boolean>(false);
+  const [isOpenDialog, setIsDialogOpen] = useState<boolean>(false);
+  const [activeArticle, setActiveArticle] = useState<ArticleTableRow>();
+
+  const COLUMNS = useRef<TableColumnWithRender<ArticleTableRow>[]>([
+    {
+      headerName: 'Name',
+      width: '30%',
+      renderCell: (article, cellProps) => {
+        const valueToShow = hasMultipleParagraphs(article.name)
+          ? returnFirstParagraph(article.name)
+          : article.name;
+        return (
+          <Cell
+            isFirst
+            width="30%"
+            onClick={cellProps.onClick}
+            justifyContent="justify-content">
+            <TableCellText tableCellTextStyles={{width: '95%'}}>
+              {article?.description ? (
+                <TruncatedTooltip
+                  textContent={article.description}
+                  valueToShow={valueToShow}
+                  onButtonClick={() => {
+                    setActiveArticle(article);
+                    setIsDialogOpen(true);
+                  }}
+                />
+              ) : (
+                <Typography
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(valueToShow),
+                  }}
+                />
+              )}
+            </TableCellText>
+            <IconButton sx={{py: 0}}>
+              {article.ownerType === ServiceOrderArticleOwnerType.USER ||
+              article.ownerType === ServiceOrderArticleOwnerType.CONTRACT ||
+              article.ownerType === ServiceOrderArticleOwnerType.TRAVEL_WORK ? (
+                <Tooltip
+                  title={
+                    article.ownerType === ServiceOrderArticleOwnerType.USER &&
+                    article.ownerName.trim()
+                      ? `${t('Added by')} ${article.ownerName}`
+                      : article.ownerType ===
+                          ServiceOrderArticleOwnerType.CONTRACT &&
+                        article.ownerName.trim()
+                      ? `${t('Added by contract')} ${article.ownerName}`
+                      : `${t('Added by Automation')}`
+                  }
+                  arrow
+                  placement="top">
+                  {article.ownerType === ServiceOrderArticleOwnerType.USER ? (
+                    <PersonOutlinedIcon />
+                  ) : article.ownerType ===
+                    ServiceOrderArticleOwnerType.CONTRACT ? (
+                    <TextSnippetOutlinedIcon />
+                  ) : (
+                    <HdrAutoOutlinedIcon />
+                  )}
+                </Tooltip>
+              ) : null}
+            </IconButton>
+          </Cell>
+        );
+      },
+    },
+    {
+      headerName: 'Number',
+      width: '12%',
+      align: 'right',
+      renderCell: (article, cellProps) => (
+        <Cell
+          width="12%"
+          onClick={cellProps.onClick}
+          align="right"
+          justifyContent="right">
+          <TableCellText capitalize>{article.number}</TableCellText>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'Price',
+      width: '13%',
+      align: 'right',
+      renderCell: (article, cellProps) => (
+        <Cell
+          width="13%"
+          onClick={cellProps.onClick}
+          align="right"
+          justifyContent="right">
+          <TableCellText>{article.unitPrice}</TableCellText>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'Quantity',
+      width: '10%',
+      align: 'right',
+      renderCell: (article, cellProps) => (
+        <Cell
+          width="10%"
+          onClick={cellProps.onClick}
+          align="right"
+          justifyContent="right">
+          <TableCellText>{article.quantity}</TableCellText>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'Unit',
+      width: '10%',
+      align: 'right',
+      renderCell: (article, cellProps) => (
+        <Cell
+          isFirst
+          width="10%"
+          onClick={cellProps.onClick}
+          align="right"
+          justifyContent="right">
+          <TableCellText>{article.unit}</TableCellText>
+        </Cell>
+      ),
+    },
+    {
+      headerName: '%',
+      width: '5%',
+      align: 'right',
+      renderCell: (article, cellProps) => (
+        <Cell
+          align="right"
+          width="5%"
+          onClick={cellProps.onClick}
+          justifyContent="right">
+          <TableCellText>{article.percent}</TableCellText>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'Total',
+      width: '15%',
+      align: 'right',
+      renderCell: (article, cellProps) => (
+        <Cell
+          width="15%"
+          onClick={cellProps.onClick}
+          align="right"
+          justifyContent="right">
+          <TableCellText capitalize>{article.total}</TableCellText>
+        </Cell>
+      ),
+    },
+    {
+      headerName: 'action',
+      isHeaderNameHidden: true,
+      width: ACTION_CELL_WIDTH,
+      isLast: true,
+      renderCell: (article) => (
+        <Cell isLast width={ACTION_CELL_WIDTH}>
+          <Actions
+            serviceOrderId={serviceOrderId!}
+            serviceOrderArticleId={article.id}
+          />
+        </Cell>
+      ),
+    },
+  ]);
 
   const {mutateAsync: createServiceOrderArticle} =
     useCreateServiceOrderArticle();
@@ -70,6 +263,10 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
     setOpenSelectModal(false);
   };
 
+  const handleArticleClick = (navigateUrl: string) => () => {
+    navigate(navigateUrl);
+  };
+
   const renderNoRowsSection = () => (
     <Box
       sx={{
@@ -79,10 +276,13 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         height: '100%',
       }}>
       <EmptySection
-        illustration="clipboard"
+        illustration="articles"
         size="tiny"
         containerStyle={{m: 'auto', width: '60%'}}
-        label="No articles yet. Please click the button above to add new"
+        showActionBtn
+        btnLabel="Add Articles"
+        btnAction={() => setOpenSelectModal(true)}
+        label="Start adding your articles and spare parts"
       />
     </Box>
   );
@@ -108,24 +308,30 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
             {t('Articles & Spare parts')}
           </Typography>
         }
-        showHeaderBackground
+        showHeaderBackground={false}
         handleAction={() => setOpenSelectModal(true)}
         headerActionIcon={
-          <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
+          <AddOutlinedIcon sx={{color: theme.palette.text.primary}} />
         }>
         {!serviceOrderArticles?.length ? (
           renderNoRowsSection()
         ) : (
-          <DataGridLayout
-            fullHeight={false}
-            height={getDataGridHeight(rows.length, rows.length, 70)}
-            rows={rows}
-            columns={columns}
-            containerStyle={{
-              borderBottom: 'none',
-            }}
-            isWidget
-          />
+          <TableContainer>
+            <TableHeader columns={COLUMNS.current} />
+
+            {rows?.map((entry, idx) => (
+              <TableRow
+                data-rowindex={idx}
+                key={`article-row-${entry.id}`}
+                testId="article-row-container">
+                {COLUMNS.current.map((column) =>
+                  column.renderCell(entry, {
+                    onClick: handleArticleClick(entry.navigateTo),
+                  }),
+                )}
+              </TableRow>
+            ))}
+          </TableContainer>
         )}
       </InfoCard>
 
@@ -139,6 +345,32 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
           <ArticlesModalDataGrid setRowItem={handleSelectArticle} />
         )}
       </SelectModal>
+
+      <Dialog
+        title={stripHtmlTags(activeArticle?.name || '')}
+        onCancel={() => setIsDialogOpen(false)}
+        onSave={() => {
+          navigate(activeArticle?.navigateTo!);
+        }}
+        dialogProps={{
+          maxWidth: 'sm',
+          open: isOpenDialog || false,
+        }}
+        saveButtonText="Go to article"
+        saveButtonContainerStyles={{
+          justifyContent: 'space-between',
+          display: 'flex',
+          width: '100%',
+        }}
+        cancelButtonVariant="outlined"
+        cancelButtonStyles={{border: '1px solid #000034', color: ' #000034'}}
+        cancelButtonTextColor="text.primary">
+        <Typography
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(activeArticle?.description || ''),
+          }}
+        />
+      </Dialog>
     </>
   );
 };

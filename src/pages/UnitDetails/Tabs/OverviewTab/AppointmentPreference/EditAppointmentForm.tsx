@@ -11,12 +11,14 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import {UseFormRegister, UseFormSetValue, UseFormWatch} from 'react-hook-form';
+import {useState, useEffect} from 'react';
+import {Typography} from '@mui/material';
 
 interface Props {
   watch: UseFormWatch<AppointmentFormModel>;
   register: UseFormRegister<AppointmentFormModel>;
   setValue: UseFormSetValue<AppointmentFormModel>;
-  defaultValues: {openingHour: string; closingHour: string};
+  defaultValues: Partial<AppointmentFormModel>;
 }
 
 const daysOfWeekOptions = {
@@ -55,6 +57,29 @@ export const EditAppointmentForm = ({
   const formatDate = useFormatDate();
   const {t} = useTranslation();
 
+  const [timeError, setTimeError] = useState<string | null>(null);
+
+  const appointmentDaysOfWeek = watch('appointmentDaysOfWeek');
+  const openingHour = watch('openingHour');
+  const closingHour = watch('closingHour');
+
+  const validateTimes = (opening?: string, closing?: string) => {
+    if (opening && closing) {
+      const openingDateTime = setDateTime(new Date(), opening);
+      const closingDateTime = setDateTime(new Date(), closing);
+
+      if (closingDateTime <= openingDateTime) {
+        setTimeError(t('The end time is before start time.'));
+      } else {
+        setTimeError(null);
+      }
+    }
+  };
+
+  useEffect(() => {
+    validateTimes(openingHour, closingHour);
+  }, [openingHour, closingHour, t]);
+
   return (
     <Grid container spacing={2} component="form">
       <Grid item sm={12} md={12} xs={12}>
@@ -70,7 +95,7 @@ export const EditAppointmentForm = ({
           }
           selectProps={{
             id: 'daysofWeekSelect',
-            value: watch('appointmentDaysOfWeek'),
+            value: appointmentDaysOfWeek,
             multiple: true,
             ...register('appointmentDaysOfWeek'),
           }}
@@ -84,26 +109,56 @@ export const EditAppointmentForm = ({
               ? setDateTime(new Date(), defaultValues.openingHour)
               : undefined
           }
+          maxTime={
+            closingHour
+              ? setDateTime(new Date(), closingHour as string)
+              : undefined
+          }
           getSelectedTime={(time) => {
-            setValue(
-              'openingHour',
+            const formattedTime =
               time instanceof Date && !Number.isNaN(time.valueOf())
                 ? formatDate(time, 'HH:mm')
-                : '',
-            );
+                : '';
+
+            setValue('openingHour', formattedTime);
+
+            if (!closingHour && formattedTime) {
+              setTimeError(t('Select opening hours end.'));
+            } else {
+              validateTimes(formattedTime, closingHour);
+            }
           }}
           textFieldProps={{
             label: t('Opening hours start'),
-            ...register('openingHour'),
+            size: 'small',
+            InputLabelProps: {
+              shrink: true,
+              required: true,
+            },
+            inputProps: {
+              ...register('openingHour'),
+              'data-testid': 'opening-hour-start',
+            },
+            sx: {
+              width: '100%',
+            },
           }}
+          inputTestId="opening-hour-start"
+          popupTestId="opening-hour-popup"
         />
+
+        {timeError && (
+          <Typography color="error" variant="body2">
+            {timeError}
+          </Typography>
+        )}
       </Grid>
 
       <Grid item sm={6} md={6} xs={12}>
         <TimePicker
           minTime={
-            watch('openingHour')
-              ? setDateTime(new Date(), watch('openingHour') as string)
+            openingHour
+              ? setDateTime(new Date(), openingHour as string)
               : undefined
           }
           defaultTime={
@@ -112,18 +167,42 @@ export const EditAppointmentForm = ({
               : undefined
           }
           getSelectedTime={(time) => {
-            setValue(
-              'closingHour',
+            const formattedTime =
               time instanceof Date && !Number.isNaN(time.valueOf())
                 ? formatDate(time, 'HH:mm')
-                : '',
-            );
+                : '';
+
+            setValue('closingHour', formattedTime);
+
+            if (!openingHour && formattedTime) {
+              setTimeError(t('Select opening hours start.'));
+            } else {
+              validateTimes(openingHour, formattedTime);
+            }
           }}
           textFieldProps={{
             label: t('Opening hours end'),
-            ...register('closingHour'),
+            InputLabelProps: {
+              shrink: true,
+              required: true,
+            },
+            inputProps: {
+              ...register('closingHour'),
+              'data-testid': 'opening-hour-end',
+            },
+            sx: {
+              width: '100%',
+            },
           }}
+          inputTestId="opening-hour-end"
+          popupTestId="closing-hour-popup"
         />
+
+        {timeError && (
+          <Typography color="error" variant="body2">
+            {timeError}
+          </Typography>
+        )}
       </Grid>
 
       <Grid item sm={12} xs={12}>

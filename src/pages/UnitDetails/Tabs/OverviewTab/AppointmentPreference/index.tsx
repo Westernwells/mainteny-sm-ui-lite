@@ -17,7 +17,9 @@ import {titleCase} from 'utils/utils';
 import {Dialog} from 'components/Dialog';
 import {AppointmentFormModel} from 'models/unitForm';
 import {useForm} from 'react-hook-form';
-import {EditAppointmentForm, mapDaysOfWeekOptions} from './EditAppointmentForm';
+import {mapFormDataToElevatorUpdateRequest} from 'utils/elevator-utils';
+import {setDateTime} from 'utils/datetime';
+import {EditAppointmentForm} from './EditAppointmentForm';
 import {AppointmentShema} from './AppointmentShema';
 
 interface Props {
@@ -27,7 +29,7 @@ interface Props {
 }
 
 const parseTimeRulesData = (timeRules: ElevatorTimeRuleView[]) => {
-  const daysOfWeekAndTimeRangeTimeRule = timeRules.find(
+  const daysOfWeekAndTimeRangeTimeRule = timeRules?.find(
     (timeRule) =>
       timeRule.type === ElevatorTimeRuleType.DAYS_OF_WEEK_AND_TIME_RANGE,
   );
@@ -67,8 +69,8 @@ export const AppointmentPreference = ({
   const getDefaultValues = (elevatorData: ElevatorView) => ({
     appointmentDaysOfWeek:
       parsedTimeRulesData?.daysOfWeek.map((val) => titleCase(val)) ?? [],
-    openingHour: parsedTimeRulesData?.timeRange.start ?? '',
-    closingHour: parsedTimeRulesData?.timeRange.end ?? '',
+    openingHour: parsedTimeRulesData?.timeRange?.start ?? '',
+    closingHour: parsedTimeRulesData?.timeRange?.end ?? '',
     shouldNotifyCustomer:
       elevatorData.additionalInfo?.customerAppointment?.shouldNotifyCustomer ??
       false,
@@ -80,17 +82,11 @@ export const AppointmentPreference = ({
       false,
   });
 
-  const {
-    watch,
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: {errors},
-  } = useForm<AppointmentFormModel>({
-    defaultValues: getDefaultValues(elevator),
-    mode: 'all',
-  });
+  const {watch, register, handleSubmit, setValue, reset} =
+    useForm<AppointmentFormModel>({
+      defaultValues: getDefaultValues(elevator),
+      mode: 'all',
+    });
 
   useEffect(() => {
     reset(getDefaultValues(elevator));
@@ -98,36 +94,22 @@ export const AppointmentPreference = ({
 
   const onSave = async (data: AppointmentFormModel) => {
     setOpenDialog(false);
-    await updateElevator({
-      body: {
-        propertyOwnerId,
-        ...(data.openingHour &&
-          data.closingHour && {
-            timeRule: {
-              daysTimeRange: [
-                {
-                  daysOfWeek: data.appointmentDaysOfWeek.map((val) =>
-                    mapDaysOfWeekOptions[
-                      val as keyof typeof mapDaysOfWeekOptions
-                    ].toUpperCase(),
-                  ),
-                  timeRange: {
-                    start: data.openingHour || '',
-                    end: data.closingHour || '',
-                  },
-                },
-              ],
-            },
-          }),
-        customerAppointment: {
-          shouldNotifyCustomer: data.shouldNotifyCustomer,
-          appointmentNotificationDue: data.appointmentNotificationDue,
-          requiresAppointment: data.requiresAppointment,
-        },
-      },
-      elevatorId: elevator.id,
-    });
+    await updateElevator(
+      mapFormDataToElevatorUpdateRequest(data, elevator.id, propertyOwnerId),
+    );
   };
+
+  const openingHour = watch('openingHour');
+  const closingHour = watch('closingHour');
+
+  const disableSaveBtn = !!(
+    (openingHour && !closingHour) ||
+    (!openingHour && closingHour) ||
+    (openingHour &&
+      closingHour &&
+      setDateTime(new Date(), closingHour) <=
+        setDateTime(new Date(), openingHour))
+  );
 
   return (
     <InfoCard
@@ -174,9 +156,13 @@ export const AppointmentPreference = ({
         ))}
       </Grid>
       <Dialog
+        dataTestId="appointment-preferences-dialog"
         title="Edit Appointment Preferences"
-        onCancel={() => setOpenDialog(false)}
-        disableSaveBtn={!!Object.keys(errors).length}
+        onCancel={() => {
+          setOpenDialog(false);
+          reset();
+        }}
+        disableSaveBtn={disableSaveBtn}
         onSave={handleSubmit(onSave)}
         dialogProps={{
           maxWidth: 'xs',

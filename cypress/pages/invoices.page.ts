@@ -81,18 +81,19 @@ export default class InvoicesPage {
     cy.get('input[name="quantity"]').clear().type('1');
     cy.get('input[name="unitAmount.netAmount"]').clear().type('100');
 
-    if (options?.setExpiredDueDate) {
-      // clear due date in case it's already set
-      cy.contains('label', 'Payment Due Date').click();
-      cy.wait(1000); 
-      cy.contains('button', 'Cancel').should('exist').click();
-      cy.wait(1000); // wait for the due date to be cleared
+    cy.contains('label', 'Payment Due Date').click();
+    cy.wait(1000);
+    cy.contains('button', 'Clear').should('exist').click();
+    cy.wait(1000);
+    cy.contains('label', 'Payment Due Date').click();
 
-      cy.contains('label', 'Payment Due Date').click();
+    if (options?.setExpiredDueDate) {
       cy.get('button:has(+button[aria-current="date"])').click();
-      cy.contains('button', 'Confirm').click();
+    } else {
+      cy.get('button[aria-current="date"] + button').click();
     }
 
+    cy.contains('button', 'Confirm').click();
     cy.contains('button', 'Save').click();
     cy.contains('Invoice created successfully');
   };

@@ -54,8 +54,8 @@ export interface PropertyOwnerView {
   additionalInfo: PropertyOwnerAdditionalInfo;
   labels: string[];
   externalId: string;
-  serviceCompany: ServiceCompanySimpleView;
-  contactPersons: CompanyContact;
+  serviceCompany?: ServiceCompanySimpleView;
+  contactPersons?: CompanyContact;
   paymentTerm?: ContractTermView;
 }
 
