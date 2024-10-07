@@ -56,6 +56,7 @@ export const BottomDrawer = ({
 
   return (
     <Drawer
+      data-testid="bottom-drawer"
       PaperProps={{
         sx: {
           background: 'white',

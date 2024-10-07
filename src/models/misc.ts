@@ -7,6 +7,7 @@ import {AccountSystems, MinToStep} from './service-company';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {CompanyStatus} from './company';
 import {Page} from './pagination';
+import {VersionType} from './versions';
 
 export interface RestError {
   errorCode: number;
@@ -378,4 +379,20 @@ export type CreateEditMode = 'create' | 'edit';
 
 export type EmailObject = {
   bccEmails: string[];
+};
+
+export enum DataEditingScope {
+  ALL = 'ALL',
+  FUTURE = 'FUTURE',
+}
+
+export const getVersionType = (hostname: string): VersionType => {
+  switch (hostname) {
+    case 'app.mainteny.com':
+      return VersionType.WEB_PROD;
+    case 'release.mainteny.com':
+      return VersionType.WEB_RELEASE;
+    default:
+      return VersionType.WEB_STAGING;
+  }
 };
