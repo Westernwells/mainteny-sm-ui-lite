@@ -4,8 +4,15 @@ import * as Yup from 'yup';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import lodash from 'lodash';
 import {TFunction} from 'i18next';
-import {AddressRecord, Coord, GeocodeAddress, Language} from '../models/misc';
+import {
+  Address,
+  AddressRecord,
+  Coord,
+  GeocodeAddress,
+  Language,
+} from '../models/misc';
 import useHighlightText from '../hooks/useHighlightText';
+import {getCountryCode} from './countries';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
@@ -622,3 +629,11 @@ export const handleHardReload = () => {
   // Redirect to the new URL, forcing the browser to fetch fresh resources
   window.location.replace(url.toString());
 };
+
+export const applyCountryCode = (address?: AddressRecord | Address | null) =>
+  address && {
+    ...address,
+    ...(address.component?.country && {
+      countryCode: getCountryCode(address.component.country),
+    }),
+  };
