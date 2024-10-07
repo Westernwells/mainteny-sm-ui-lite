@@ -15,7 +15,11 @@ import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {createEmptyResource} from 'utils/paging';
-import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
+import {
+  applyCountryCode,
+  companyLanguageContextMap,
+  formatAddressFullname,
+} from 'utils/utils';
 import {AddressRecord} from 'models/misc';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useTranslation} from 'react-i18next';
@@ -296,17 +300,23 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       secondaryPhoneNumber: formikBasicInfo.values.secondaryPhoneNumber
         ? formatPhoneNumber(formikBasicInfo.values.secondaryPhoneNumber)
         : '',
-      billingAddress: formatAddressFullname(
-        formikAddress.values.billingAddress,
-        translateCompanyLanguage,
+      billingAddress: applyCountryCode(
+        formatAddressFullname(
+          formikAddress.values.billingAddress,
+          translateCompanyLanguage,
+        ),
       ) as AddressRecord | null,
-      beneficiaryAddress: formatAddressFullname(
-        formikAddress.values.beneficiaryAddress,
-        translateCompanyLanguage,
+      beneficiaryAddress: applyCountryCode(
+        formatAddressFullname(
+          formikAddress.values.beneficiaryAddress,
+          translateCompanyLanguage,
+        ),
       ) as AddressRecord | null,
-      otherAddress: formatAddressFullname(
-        formikAddress.values.otherAddress,
-        translateCompanyLanguage,
+      otherAddress: applyCountryCode(
+        formatAddressFullname(
+          formikAddress.values.otherAddress,
+          translateCompanyLanguage,
+        ),
       ) as AddressRecord | null,
       contactPersons: formikContactPersons.values.contactPersons,
     };

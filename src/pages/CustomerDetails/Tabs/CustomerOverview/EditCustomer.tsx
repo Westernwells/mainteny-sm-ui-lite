@@ -5,6 +5,8 @@ import {phoneNumberDigitsOnly} from 'utils/customer-utils';
 import {useEffect, useState} from 'react';
 import {createEmptyResource} from 'utils/paging';
 import * as Yup from 'yup';
+import {getCountryCode} from 'utils/countries';
+import {Address} from 'models/misc';
 import {CustomerEditForm} from './EditCustomerForm/model';
 import {EditCustomerForm} from './EditCustomerForm';
 
@@ -95,9 +97,24 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
       },
     ),
   });
-
+  const applyCountryCode = (address?: Address) =>
+    address && {
+      ...address,
+      ...(address.component?.country && {
+        countryCode: getCountryCode(address.component.country),
+      }),
+    };
   const handleSubmit = async (values: CustomerEditForm) => {
-    updateCustomer(values, customer.id, () => {
+    const data = {
+      ...values,
+      beneficiaryAddress: applyCountryCode(
+        values.beneficiaryAddress as Address,
+      ),
+      otherAddress: applyCountryCode(values.otherAddress as Address),
+      billingAddress: applyCountryCode(values.billingAddress as Address),
+    };
+
+    updateCustomer(data, customer.id, () => {
       onClose();
     });
   };
