@@ -1216,6 +1216,18 @@ export const InvoiceForm = ({
   }, [invoice, invoiceId, invoiceType, previousInvoices, t]);
 
   useEffect(() => {
+    if (sortedPreviousInvoices.length > 0) {
+      formik.setFieldValue(
+        'discount',
+        getDiscoutObj(
+          sortedPreviousInvoices[sortedPreviousInvoices.length - 1]
+            ?.additionalInfo.discount,
+        ),
+      );
+    }
+  }, [previousInvoices]);
+
+  useEffect(() => {
     formik.setFieldValue('subject', generateSubject());
   }, [formik.values.type]);
 
