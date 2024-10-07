@@ -292,7 +292,7 @@ export const getFormattedPaymentValues = (
     return {
       formattedDueDate,
       discountAmount,
-      grossInvoiceAmount,
+      invoiceAmount,
       paymentAmount,
     };
   });
@@ -305,7 +305,7 @@ export const replacePaymentTermsPlaceholders = (
   replacements: {
     formattedDueDate?: string;
     discountAmount?: number;
-    grossInvoiceAmount?: number;
+    invoiceAmount?: number;
     paymentAmount?: number;
   }[],
   currentCurrency: Currency,
@@ -344,7 +344,7 @@ export const replacePaymentTermsPlaceholders = (
         );
         sectionToReplace = sectionToReplace.replace(
           '{INVOICE_AMOUNT}',
-          formatCurrency(replacement.grossInvoiceAmount || 0, {
+          formatCurrency(replacement.invoiceAmount || 0, {
             currency: currentCurrency?.code,
             currencySymbol: currentCurrency?.symbol,
             companyLang: selectedLng,
