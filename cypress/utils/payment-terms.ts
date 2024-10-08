@@ -54,13 +54,14 @@ export const getFormattedPaymentValues = (
     const totalAmountAfterGlobalDiscount = filteredItemDetails?.reduce(
       (sum, itemDetail, index) => {
         const item = filteredItems[index];
-
-        if (item?.article?.type === ArticleType.PACKAGE) {
+    
+        if (item?.article?.type === ArticleType.PACKAGE && d.articleType !== PaymentTermArticleType.ALL) {
+          // Apply percentage split only for LABOR or MATERIAL, not for ALL
           const percentage =
             d.articleType === PaymentTermArticleType.LABOR
               ? item.article?.costPackage?.laborPercentage
               : item.article?.costPackage?.materialPercentage;
-
+    
           return (
             sum +
             ((itemDetail?.amountAfterGlobalDiscount?.grossAmount || 0) *
@@ -68,7 +69,7 @@ export const getFormattedPaymentValues = (
               100
           );
         }
-
+    
         return sum + (itemDetail?.amountAfterGlobalDiscount?.grossAmount || 0);
       },
       0,
