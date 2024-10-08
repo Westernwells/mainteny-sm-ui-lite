@@ -28,6 +28,7 @@ import {olStyles} from 'styles';
 import {UserView} from 'models/user';
 import {AbsenceItem} from 'models/absence';
 import {EMPLOYEE_EVENT_TYPES_TO_PRESENCE_BOOLEAN} from 'utils/constants';
+import {EmployeeEventType} from 'models/employee';
 import AbsenceStatistic from './AbsenceStatistic';
 import {AbsenceForm} from './model';
 import AbsenceTimeLine from './AbsenceTimeLine';
@@ -113,7 +114,9 @@ const EmployeeAbsence = ({employee}: Props) => {
   const absences = useMemo(
     () =>
       employeeEvents.filter(
-        (event) => !EMPLOYEE_EVENT_TYPES_TO_PRESENCE_BOOLEAN[event.eventType],
+        (event) =>
+          !EMPLOYEE_EVENT_TYPES_TO_PRESENCE_BOOLEAN[event.eventType] &&
+          event.eventType !== EmployeeEventType.BREAK,
       ),
     [employeeEvents],
   );
