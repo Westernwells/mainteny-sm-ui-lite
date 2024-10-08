@@ -39,6 +39,7 @@ import {
   InvoiceActivityView,
   PrintInvoiceRecord,
   SendInvoiceRecord,
+  FetchXInvoiceByInvoiceIdParams,
 } from 'models/invoice';
 import {Comment} from 'models/comment';
 import {ErrorCode} from 'models/error';
@@ -767,3 +768,37 @@ export function useInvoiceAmountDetail(invoiceId?: string) {
     },
   );
 }
+
+export const fetchXInvoiceByInvoiceId = async (
+  invoiceId: string,
+  queryParams: FetchXInvoiceByInvoiceIdParams,
+) => {
+  const response = await axiosClient.get<string>(
+    `/api/invoices/${invoiceId}/xInvoice`,
+    {
+      params: queryParams,
+      paramsSerializer,
+      headers: {Accept: 'application/xml'},
+    },
+  );
+  return response.data;
+};
+
+export const useFetchXInvoiceByInvoiceId = () => {
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      invoiceId,
+      params,
+    }: {
+      invoiceId: string;
+      params: FetchXInvoiceByInvoiceIdParams;
+    }) => fetchXInvoiceByInvoiceId(invoiceId, params),
+    {
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
