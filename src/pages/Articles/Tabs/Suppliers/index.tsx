@@ -1,34 +1,28 @@
 import {Box} from '@mui/system';
 import {useNavigate} from 'react-router-dom';
 import React, {useEffect, useMemo, useRef} from 'react';
-import SearchInput from '../../../../components/SearchInput/index';
-import AddButton from '../../../../components/AddButton';
-import {useQueryState} from '../../../../hooks/useQueryState';
+import {useQueryState} from 'hooks/useQueryState';
 import {
   calculateTotalPages,
   createEmptyResource,
   makePage,
   toggleOrder,
-} from '../../../../utils/paging';
-import {
-  ELEMENTS_PER_PAGE_OPTIONS,
-  OrderByParams,
-} from '../../../../models/pagination';
-import Pagination from '../../../../components/Pagination';
-import TableContainer from '../../../../components/Table/TableContainer';
-import TableHeader from '../../../../components/Table/TableHeader';
-import {useQueryArticleSuppliers} from '../../../../hooks/reactQuery/useArticle';
-import {
-  ACTION_CELL_WIDTH,
-  TableColumnWithRender,
-} from '../../../../models/table';
-import {aggregateSupplierRow} from '../../../../utils/supplier';
-import {useSearchValues} from '../../../../hooks/useSearchValues';
+} from 'utils/paging';
+import {ELEMENTS_PER_PAGE_OPTIONS, OrderByParams} from 'models/pagination';
+import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
+import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import {aggregateSupplierRow} from 'utils/supplier';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {
   ArticleSupplierView,
   SUPPLIER_ORDER_FIELD,
   SupplierTableRow,
-} from '../../../../models/supplier';
+} from 'models/supplier';
+import TableHeader from '../../../../components/Table/TableHeader';
+import TableContainer from '../../../../components/Table/TableContainer';
+import Pagination from '../../../../components/Pagination';
+import SearchInput from '../../../../components/SearchInput/index';
+import AddButton from '../../../../components/AddButton';
 import Cell from '../../../../components/Table/TableCell';
 import {Actions} from './Actions';
 import TableRow from '../../../../components/Table/TableRow';
@@ -51,71 +45,75 @@ const Suppliers = () => {
   const COLUMNS = useRef<TableColumnWithRender<SupplierTableRow>[]>([
     {
       headerName: 'Number',
+      key: 'supplier-cell-number',
       fieldName: SUPPLIER_ORDER_FIELD.EXTERNAL_ID,
-      width: '15%',
+      width: '156px',
       isFirst: true, // remove when checkbox are present with bulk action
       renderCell: (supplier, cellProps) => (
-        <Cell isFirst width="15%" onClick={cellProps.onClick}>
+        <Cell isFirst {...cellProps}>
           <TableCellText>{supplier.externalId}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'Name',
-      width: '10%',
+      key: 'supplier-cell-name',
       fieldName: SUPPLIER_ORDER_FIELD.NAME,
       renderCell: (supplier, cellProps) => (
-        <Cell width="10%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText capitalize>{supplier.name}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'Category',
-      width: '20%',
+      key: 'supplier-cell-category',
       fieldName: SUPPLIER_ORDER_FIELD.CATEGORY,
       renderCell: (supplier, cellProps) => (
-        <Cell width="20%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText>{supplier.category}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'ADDRESS',
-      width: '20%',
+      key: 'supplier-cell-address',
       fieldName: SUPPLIER_ORDER_FIELD.ADDRESS,
       renderCell: (supplier, cellProps) => (
-        <Cell width="20%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText>{supplier.address}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'PHONE',
-      width: '10%',
+      key: 'supplier-cell-phone',
       fieldName: SUPPLIER_ORDER_FIELD.PHONE,
       renderCell: (supplier, cellProps) => (
-        <Cell width="10%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText>{supplier.phone}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'Email',
-      width: '10%',
+      key: 'supplier-cell-email',
       fieldName: SUPPLIER_ORDER_FIELD.EMAIL,
       renderCell: (supplier, cellProps) => (
-        <Cell width="10%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText>{supplier.email}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'action',
+      key: 'supplier-cell-action',
       isHeaderNameHidden: true,
       width: ACTION_CELL_WIDTH,
-      renderCell: (supplier) => (
-        <Cell isLast width={ACTION_CELL_WIDTH}>
+      isLast: true,
+      align: 'center',
+      renderCell: (supplier, cellProps) => (
+        <Cell {...cellProps} onClick={undefined}>
           <Actions email={supplier.email} />
         </Cell>
       ),
@@ -153,8 +151,6 @@ const Suppliers = () => {
       setPage({...page, pageIndex: 0});
     }
   }, [search]);
-
-  // navigateTo: `/articles/supplier/${item.id}`,
 
   const rows = useMemo(
     () => aggregateSupplierRow(articleSupplierResource.data),
@@ -202,9 +198,9 @@ const Suppliers = () => {
       }}>
       <PageHeaderContainer>
         <SearchInput
-          onChanged={(val: string) => setSearch(val)}
           refInput={textInput}
           defaultValue={search}
+          onChange={(val: string) => setSearch(val)}
         />
 
         <AddButton label="New Supplier" onClick={handleNewSupplierClick} />
@@ -220,10 +216,11 @@ const Suppliers = () => {
         {rows.map((entry) => (
           <TableRow
             key={`supplier-row-${entry.id}`}
-            testId="supplier-row-container">
-            {COLUMNS.current.map((column) =>
-              column.renderCell(entry, {
+            testId={`supplier-row-${entry.id}`}>
+            {COLUMNS.current.map(({renderCell, ...rest}) =>
+              renderCell(entry, {
                 onClick: handleRowClick(entry.id),
+                ...rest,
               }),
             )}
           </TableRow>

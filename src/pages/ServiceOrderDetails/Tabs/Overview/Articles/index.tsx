@@ -25,7 +25,7 @@ import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {useCurrentCurrency} from 'utils/currency';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import {theme} from 'theme';
-import {IconButton, TableContainer, Tooltip} from '@mui/material';
+import {IconButton, Tooltip} from '@mui/material';
 import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
 import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
@@ -43,6 +43,8 @@ import DOMPurify from 'dompurify';
 import {stripHtmlTags} from 'models/text-block';
 import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
+import TableBody from 'components/Table/TableBody';
+import TableContainer from 'components/Table/TableContainer';
 import {makeRows} from './ArticleDataGridProps';
 import {Actions} from './Actions';
 
@@ -63,17 +65,15 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
   const COLUMNS = useRef<TableColumnWithRender<ArticleTableRow>[]>([
     {
       headerName: 'Name',
-      width: '30%',
+      key: 'articles-cell-name',
+      justifyContent: 'justify-content',
+      isFirst: true,
       renderCell: (article, cellProps) => {
         const valueToShow = hasMultipleParagraphs(article.name)
           ? returnFirstParagraph(article.name)
           : article.name;
         return (
-          <Cell
-            isFirst
-            width="30%"
-            onClick={cellProps.onClick}
-            justifyContent="justify-content">
+          <Cell {...cellProps}>
             <TableCellText tableCellTextStyles={{width: '95%'}}>
               {article?.description ? (
                 <TruncatedTooltip
@@ -126,96 +126,72 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
     },
     {
       headerName: 'Number',
-      width: '12%',
+      key: 'articles-cell-number',
       align: 'right',
       renderCell: (article, cellProps) => (
-        <Cell
-          width="12%"
-          onClick={cellProps.onClick}
-          align="right"
-          justifyContent="right">
+        <Cell {...cellProps}>
           <TableCellText capitalize>{article.number}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'Price',
-      width: '13%',
+      key: 'articles-cell-price',
       align: 'right',
       renderCell: (article, cellProps) => (
-        <Cell
-          width="13%"
-          onClick={cellProps.onClick}
-          align="right"
-          justifyContent="right">
+        <Cell {...cellProps}>
           <TableCellText>{article.unitPrice}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'Quantity',
-      width: '10%',
+      key: 'articles-cell-quantity',
       align: 'right',
       renderCell: (article, cellProps) => (
-        <Cell
-          width="10%"
-          onClick={cellProps.onClick}
-          align="right"
-          justifyContent="right">
+        <Cell {...cellProps}>
           <TableCellText>{article.quantity}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'Unit',
-      width: '10%',
+      key: 'articles-cell-unit',
       align: 'right',
       renderCell: (article, cellProps) => (
-        <Cell
-          isFirst
-          width="10%"
-          onClick={cellProps.onClick}
-          align="right"
-          justifyContent="right">
+        <Cell isFirst {...cellProps}>
           <TableCellText>{article.unit}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: '%',
-      width: '5%',
+      key: 'articles-cell-percent',
       align: 'right',
       renderCell: (article, cellProps) => (
-        <Cell
-          align="right"
-          width="5%"
-          onClick={cellProps.onClick}
-          justifyContent="right">
+        <Cell {...cellProps}>
           <TableCellText>{article.percent}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'Total',
-      width: '15%',
+      key: 'articles-cell-total',
       align: 'right',
       renderCell: (article, cellProps) => (
-        <Cell
-          width="15%"
-          onClick={cellProps.onClick}
-          align="right"
-          justifyContent="right">
+        <Cell {...cellProps}>
           <TableCellText capitalize>{article.total}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'action',
+      key: 'articles-cell-action',
       isHeaderNameHidden: true,
       width: ACTION_CELL_WIDTH,
       isLast: true,
-      renderCell: (article) => (
-        <Cell isLast width={ACTION_CELL_WIDTH}>
+      renderCell: (article, cellProps) => (
+        <Cell {...cellProps} onClick={undefined}>
           <Actions
             serviceOrderId={serviceOrderId!}
             serviceOrderArticleId={article.id}
@@ -319,18 +295,21 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
           <TableContainer>
             <TableHeader columns={COLUMNS.current} />
 
-            {rows?.map((entry, idx) => (
-              <TableRow
-                data-rowindex={idx}
-                key={`article-row-${entry.id}`}
-                testId="article-row-container">
-                {COLUMNS.current.map((column) =>
-                  column.renderCell(entry, {
-                    onClick: handleArticleClick(entry.navigateTo),
-                  }),
-                )}
-              </TableRow>
-            ))}
+            <TableBody>
+              {rows?.map((entry, idx) => (
+                <TableRow
+                  data-rowindex={idx}
+                  key={`article-row-${entry.id}`}
+                  testId="article-row-container">
+                  {COLUMNS.current.map(({renderCell, ...rest}) =>
+                    renderCell(entry, {
+                      onClick: handleArticleClick(entry.navigateTo),
+                      ...rest,
+                    }),
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
           </TableContainer>
         )}
       </InfoCard>

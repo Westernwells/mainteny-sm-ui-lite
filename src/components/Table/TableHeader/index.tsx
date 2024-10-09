@@ -1,7 +1,7 @@
-import {Box} from '@mui/system';
-import {TableColumn} from '../../../models/table';
+import {TableHead} from '@mui/material';
+import {TableColumn} from 'models/table';
+import {HeaderSortingState} from 'models/pagination';
 import TableHeaderCell from '../TableHeaderCell';
-import {HeaderSortingState} from '../../../models/pagination';
 
 type Props = {
   columns: TableColumn[];
@@ -10,11 +10,9 @@ type Props = {
 };
 
 const TableHeader = ({columns, sortState, onSort}: Props) => (
-  <Box
+  <TableHead
     sx={{
-      display: 'flex',
       alignItems: 'center',
-      position: 'sticky', // is needed if used without a table body wrapper
       backgroundColor: '#FFFFFF',
       top: 0,
       zIndex: 3,
@@ -35,7 +33,7 @@ const TableHeader = ({columns, sortState, onSort}: Props) => (
         />
       );
     })}
-  </Box>
+  </TableHead>
 );
 
 export default TableHeader;

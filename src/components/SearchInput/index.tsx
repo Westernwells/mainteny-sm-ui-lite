@@ -15,7 +15,7 @@ type Props = {
   label?: string;
   refInput?: RefObject<HTMLInputElement>;
   defaultValue?: string;
-  onChanged?: (value: string) => void;
+  onChange?: (value: string) => void;
 };
 
 // New Search Input Component
@@ -26,7 +26,7 @@ const SearchInput = ({
   label,
   refInput,
   defaultValue = '',
-  onChanged,
+  onChange,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -43,9 +43,9 @@ const SearchInput = ({
   const debouncedChangeHandler = useMemo(
     () =>
       debounce((newValue: string) => {
-        onChanged?.(newValue);
+        onChange?.(newValue);
       }, 300),
-    [onChanged],
+    [onChange],
   );
 
   // input delay

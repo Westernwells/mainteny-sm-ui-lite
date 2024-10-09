@@ -53,10 +53,13 @@ const TableActionMenu = ({
         }}
         onClose={handleToggleMenu(false)}>
         <>
-          {options.map((option) => {
+          {options.map((option, index) => {
             const IconComponent = option.icon;
             return (
-              <MenuItem sx={{display: 'flex'}} onClick={option.onTrigger}>
+              <MenuItem
+                key={`menu-action-option-${index}`}
+                sx={{display: 'flex'}}
+                onClick={option.onTrigger}>
                 <ListItemButton sx={{flex: '0 0 auto'}} component="a">
                   <IconComponent
                     fontSize="small"

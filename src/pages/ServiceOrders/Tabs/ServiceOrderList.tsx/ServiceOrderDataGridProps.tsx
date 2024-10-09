@@ -1,4 +1,4 @@
-import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
+import {GridColDef, GridRenderCellParams} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -6,7 +6,6 @@ import {
   ServiceOrderOrderField,
   ServiceOrderPaymentStatus,
   ServiceOrderPaymentWithIndicationStatus,
-  ServiceOrderView,
 } from 'models/service-order';
 import {
   getServiceOrderStatusColor,
@@ -20,8 +19,6 @@ import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
 import {olStyles} from 'styles';
 import {Typography} from '@mui/material';
-import {FormatDate} from 'models/misc';
-import {toDate} from 'utils/datetime';
 import {theme} from 'theme';
 import {StatusColor} from '../../../../models/status';
 
@@ -158,43 +155,3 @@ export const columns: GridColDef[] = [
     flex: 0.75,
   }),
 ];
-
-const getTechnicianFullName = (item: ServiceOrderView) => {
-  if (item.schedules.length) {
-    return item.schedules
-      .map(
-        (x) =>
-          `${x.technician.userAccount.firstName} ${x.technician.userAccount.lastName}`,
-      )
-      .join(',');
-  }
-  if (item?.additionalInfo?.candidateTechnician) {
-    return `${item?.additionalInfo?.candidateTechnician?.userAccount.firstName} ${item?.additionalInfo?.candidateTechnician?.userAccount.lastName}`;
-  }
-  return '-';
-};
-
-export const makeRows = (
-  serviceOrders: ServiceOrderView[],
-  formatDate: FormatDate = () => '',
-): GridRowsProp =>
-  serviceOrders.map((item: ServiceOrderView, index: number) => ({
-    id: index,
-    [ServiceOrderOrderField.DUE_DATE]: item.dueDate
-      ? formatDate(toDate(item.dueDate))
-      : '-',
-    [ServiceOrderOrderField.PROPERTY_OWNER_NAME]:
-      item.elevator.propertyOwner.name,
-    [ServiceOrderOrderField.EXTERNAL_ID]: item.number,
-    [ServiceOrderOrderField.JOB_TYPE]: item.type,
-    customer: item.elevator.propertyOwner.name,
-    [ServiceOrderOrderField.ELEVATOR_ADDRESS]:
-      item.elevator.address.fullName || '-',
-    [ServiceOrderOrderField.ELEVATOR_EXTERNAL_ID]:
-      item.elevator.externalId || '-',
-    date: formatDate(item.dueDate),
-    [ServiceOrderOrderField.TECHNICIAN_NAME]: getTechnicianFullName(item),
-    [ServiceOrderOrderField.JOB_STATUS]: item.status,
-    navigateTo: `details/${item.id}`,
-    [ServiceOrderOrderField.PAYMENT_STATUS]: item.additionalInfo.paymentStatus,
-  }));

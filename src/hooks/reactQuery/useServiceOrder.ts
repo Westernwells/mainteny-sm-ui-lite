@@ -56,6 +56,7 @@ import {
   ElevatorView,
 } from 'models/elevator';
 import {Comment} from 'models/comment';
+import {RequestParameters} from 'models/apiRequests';
 import {useUserSession} from './useUserSession';
 import {Order} from '../../models/pagination';
 import {useServiceOrderCommentMutation} from './useServiceOrderCommentMutation';
@@ -1043,6 +1044,27 @@ export function useInfiniteServiceOrderComments(
       ...options,
     },
   );
+}
+
+export function useServiceOrderComments(
+  serviceOrderId: string,
+  params: QueryServiceOrderCommentsParams,
+  requestParams: RequestParameters,
+) {
+  return useQuery<Resource<Comment>, RestError, Resource<Comment>>({
+    queryKey: [
+      queryKeys.fetchServiceOrderComments,
+      params,
+      serviceOrderId,
+      {infinite: true},
+    ],
+    queryFn: ({pageParam = 0}) =>
+      fetchServiceOrderComments(serviceOrderId, {
+        ...params,
+        pageIndex: pageParam,
+      }),
+    enabled: requestParams.enabled,
+  });
 }
 
 export const postServiceOrderComment = async (
