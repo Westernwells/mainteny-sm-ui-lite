@@ -7,7 +7,7 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {InvoiceItem, InvoiceView} from 'models/invoice';
+import {InvoiceAmountDetail, InvoiceItem, InvoiceView} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
@@ -157,6 +157,7 @@ type Props = {
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
   invoice?: InvoiceView;
+  invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   headerInfo: HeaderFooterInfoData;
   headerPath: string;
@@ -172,6 +173,7 @@ const FullInvoicePdfTemplate = ({
   userInfo,
   currentCurrency,
   invoice,
+  invoiceAmountDetail,
   selectedLng,
   headerInfo,
   headerPath,
@@ -226,13 +228,35 @@ const FullInvoicePdfTemplate = ({
     },
   );
 
-  const formattedPaymentValues = getFormattedPaymentValues(
-    invoice?.additionalInfo.paymentTerm!,
-    invoice!,
-    amountAfterGlobalDiscountWithVAT,
-    currentCurrency,
+  const grossInvoiceAmount = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount.grossAmount,
+  );
+
+  const formattedPaymentValues = useMemo(() => {
+    if (
+      invoice?.additionalInfo.paymentTerm?.term &&
+      invoice &&
+      invoiceAmountDetail
+    ) {
+      return getFormattedPaymentValues(
+        invoice.additionalInfo.paymentTerm,
+        invoice,
+        invoiceAmountDetail,
+        grossInvoiceAmount,
+        currentCurrency,
+      );
+    }
+    return [];
+  }, [invoice, invoiceAmountDetail, invoice?.additionalInfo.paymentTerm?.term]);
+
+  const replacedPaymentTerms = replacePaymentTermsPlaceholders(
+    invoice?.additionalInfo.paymentTerm?.term || '',
+    formattedPaymentValues ?? [],
+    currentCurrency!,
     selectedLng,
   );
+  console.log(replacedPaymentTerms, 'replacedPaymentTerms');
 
   const laborCost = useCalculateLaborMaterialCost(
     itemsAfterGlobalDiscount,
@@ -342,17 +366,12 @@ const FullInvoicePdfTemplate = ({
               />
             )}
 
-            {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
+            {invoice?.additionalInfo.paymentTerm?.term?.trim() && (
               <View style={styles.notesSection} wrap={false}>
                 <Text style={styles.sectionHeading}>
                   {translate('Payment terms')}
                 </Text>
-                <HtmlPDF
-                  html={replacePaymentTermsPlaceholders(
-                    invoice?.additionalInfo.paymentTerm?.term!,
-                    formattedPaymentValues ?? [],
-                  )}
-                />
+                <HtmlPDF html={replacedPaymentTerms} />
               </View>
             )}
 

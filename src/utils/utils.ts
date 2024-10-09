@@ -5,6 +5,12 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import lodash from 'lodash';
 import {TFunction} from 'i18next';
 import {
+  FILE_DESCRIPTION_PREFIXES,
+  InvoiceStatus,
+  InvoiceView,
+} from 'models/invoice';
+
+import {
   Address,
   AddressRecord,
   Coord,
@@ -627,6 +633,68 @@ export const handleHardReload = () => {
 
   // Redirect to the new URL, forcing the browser to fetch fresh resources
   window.location.replace(url.toString());
+};
+
+export const decideAttachmentURIForInvoiceEmail = ({
+  invoiceUploadPath,
+  invoice,
+  attachment,
+  workReportUploadPath,
+  checklistUploadPath,
+}: {
+  invoiceUploadPath: string;
+  invoice: InvoiceView;
+  attachment: FileWithPreview;
+  workReportUploadPath: string;
+  checklistUploadPath: string;
+}) => {
+  const isInvoiceFile = attachment.description?.includes(
+    FILE_DESCRIPTION_PREFIXES.INVOICE,
+  );
+  const isDraftInvoice = invoice.status === InvoiceStatus.DRAFT;
+
+  const isAttachedFile = attachment.path && !attachment.description;
+  const isWorkReportFile = attachment.description?.includes(
+    FILE_DESCRIPTION_PREFIXES.WORK_REPORT,
+  );
+  const isChecklistFile = attachment.description?.includes(
+    FILE_DESCRIPTION_PREFIXES.CHECKLIST,
+  );
+  let uploadPath = '';
+
+  if (isAttachedFile || isInvoiceFile) {
+    uploadPath = invoiceUploadPath;
+  } else if (isWorkReportFile) {
+    uploadPath = workReportUploadPath;
+  } else if (isChecklistFile) {
+    uploadPath = checklistUploadPath;
+  }
+
+  if (isInvoiceFile) {
+    const isPDF = attachment.description?.endsWith('pdf');
+
+    if (isDraftInvoice) {
+      return isPDF
+        ? `${invoiceUploadPath}/${invoice?.id}.pdf`
+        : `${invoiceUploadPath}/${invoice?.id}.xml`;
+    }
+
+    return isPDF
+      ? invoice?.additionalInfo.pdfPath!
+      : invoice?.additionalInfo.xmlPath;
+  }
+
+  return `${uploadPath}/${attachment.name}`;
+};
+
+export const decideAttachmentDescriptionForInvoiceEmail = (
+  attachment: FileWithPreview,
+) => {
+  const isAttachedFile = attachment.path && !attachment.description;
+
+  return isAttachedFile
+    ? attachment.name.split('.')[0]
+    : attachment?.description;
 };
 
 export const applyCountryCode = (address?: AddressRecord | Address | null) =>

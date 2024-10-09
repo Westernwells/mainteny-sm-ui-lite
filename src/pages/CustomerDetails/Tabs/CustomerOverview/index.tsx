@@ -12,6 +12,7 @@ import {
   Payment,
   CalendarToday,
   AccountBalance,
+  InfoOutlined,
 } from '@mui/icons-material';
 
 import {useTranslation} from 'react-i18next';
@@ -31,6 +32,8 @@ import {formatDate, getDateObject} from 'utils/datetime';
 import {LanguageContext} from 'context/LanguageProvider';
 import ContactsWidget from 'pages/Contacts/ContactsWidget';
 import {ContactPersonAssociationType} from 'models/contacts';
+import {CUSTOMER_ALL_INVOICE_FORMATS} from 'utils/constants';
+import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import {UnitsWidget} from './UnitsWidget';
 import {ContractsWidget} from './ContractsWidget';
 import {EditCustomer} from './EditCustomer';
@@ -47,6 +50,7 @@ interface BasicDetailsValue {
   label: string;
   value: string | ReactNode;
   icon: JSX.Element;
+  iconTooltip?: string;
 }
 
 interface BasicDetails {
@@ -98,6 +102,10 @@ export const CustomerOverviewTab = ({
 
   useEffect(() => {
     if (customer) {
+      const invoiceFormat = CUSTOMER_ALL_INVOICE_FORMATS.find(
+        (item) => item.value === customer.additionalInfo.invoiceFormat,
+      );
+
       setBasicDetails({
         ...basicDetails,
         billingAddress: {
@@ -170,6 +178,17 @@ export const CustomerOverviewTab = ({
           value: customer.additionalInfo.offsettingAccount || '-',
           icon: <AccountBalance sx={{color: theme.palette.info.dark}} />,
         },
+        buyerReference: {
+          label: 'BUYER REFERENCE',
+          value: customer.additionalInfo.buyerReference || '-',
+          icon: <InfoOutlined sx={{color: theme.palette.info.dark}} />,
+          iconTooltip: 'Buyer reference is defined by the customer.',
+        },
+        invoiceFormat: {
+          label: 'INVOICE FORMAT',
+          value: invoiceFormat?.label || '-',
+          icon: <DocumentScannerIcon sx={{color: theme.palette.info.dark}} />,
+        },
       });
     }
   }, [customer, totalContracts, totalUnits, selectedLng]);
@@ -217,6 +236,9 @@ export const CustomerOverviewTab = ({
                 <CardProps
                   label={basicDetails[item as keyof BasicDetails].label}
                   icon={basicDetails[item as keyof BasicDetails].icon}
+                  iconTooltip={
+                    basicDetails[item as keyof BasicDetails].iconTooltip
+                  }
                   iconBackground={theme.palette.info.outlinedHoverBg}
                   iconMaxHeight="3rem"
                   bodyText={basicDetails[item as keyof BasicDetails].value}

@@ -30,6 +30,7 @@ export const queryKeys = {
   fetchIssueHistory: 'fetchIssueHistory',
   fetchCustomerNotes: 'fetchCustomerNotes',
   invoiceById: 'invoiceById',
+  invoiceAmountById: 'invoiceAmountById',
   quotationById: 'quotationById',
   invoiceDownloadUrl: 'invoiceDownloadUrl',
   queryServiceManager: 'queryServiceManager',

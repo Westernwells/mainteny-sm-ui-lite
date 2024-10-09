@@ -21,6 +21,7 @@ import {PDFContainer} from 'components/PDFContainer';
 import {FormLabel} from 'components/form/FormLabel';
 import {EmptySection} from 'components/EmptySection';
 import {
+  FILE_DESCRIPTION_PREFIXES,
   InvoiceActivityView,
   InvoiceStatus,
   InvoiceType,
@@ -41,6 +42,8 @@ import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
+  useFetchXInvoiceByInvoiceId,
+  useInvoiceAmountDetail,
   useInvoiceDetail,
   useInvoicePaymentStatus,
   usePrintInvoice,
@@ -84,6 +87,8 @@ import {
   companyLanguageContextMap,
   createFilesFromBlobArray,
   dateToString,
+  decideAttachmentDescriptionForInvoiceEmail,
+  decideAttachmentURIForInvoiceEmail,
   fetchFile,
 } from 'utils/utils';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
@@ -104,6 +109,7 @@ import DOMPurify from 'dompurify';
 import {SwissQRBill} from 'swissqrbill/svg';
 import _, {debounce} from 'lodash';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
+import {InvoiceFormat} from 'models/propertyManager';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -116,12 +122,6 @@ interface Props {
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
-
-enum FILE_DESCRIPTION_PREFIXES {
-  INVOICE = 'INV',
-  WORK_REPORT = 'WR',
-  CHECKLIST = 'CHK',
-}
 
 export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {t} = useTranslation();
@@ -138,6 +138,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
   );
+
   const memorizedUpdateInvoiceData = useMemo(
     () =>
       updatedInvoice
@@ -217,6 +218,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       (downloadUrl ? downloadUrl[invoice?.additionalInfo.pdfPath] : ''),
   );
 
+  const {mutateAsync: getXInvoiceByInvoiceId} = useFetchXInvoiceByInvoiceId();
+
   const [actionType, setActionType] = useState<string>('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
@@ -237,6 +240,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
   );
+  const {data: invoiceAmountDetail} = useInvoiceAmountDetail(invoice?.id);
 
   const sortedPreviousInvoices = useMemo(
     () =>
@@ -580,6 +584,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         invoice={invoiceData}
+        invoiceAmountDetail={invoiceAmountDetail}
         selectedLng={company?.language}
         translate={translate}
         previousInvoices={previousInvoicesProp}
@@ -693,6 +698,93 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     return (await Promise.all(promises)).flat();
   };
 
+  const getBaseFileOperations = async (
+    invoiceData: InvoiceView,
+    {
+      invoiceDownloadUrl,
+      nextNumber,
+      forceGet = false,
+    }: {
+      invoiceDownloadUrl?: {
+        [key: string]: string;
+      };
+      nextNumber?: string;
+      forceGet?: boolean;
+    },
+  ) => {
+    if (
+      invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
+        InvoiceFormat.PDF &&
+      invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
+        InvoiceFormat.PDF_AND_XML &&
+      !forceGet
+    ) {
+      return Promise.resolve([]);
+    }
+
+    const fileNames: string[] = [`${invoiceData?.id}.pdf`];
+    const fileDescriptions: string[] = [
+      `${FILE_DESCRIPTION_PREFIXES.INVOICE}-${
+        invoiceData?.externalId || nextNumber
+      }.pdf`,
+    ];
+
+    return invoiceData?.status !== InvoiceStatus.DRAFT
+      ? fetchAndCreateFiles(
+          invoiceDownloadUrl ? Object.values(invoiceDownloadUrl)[0] : '',
+          fileNames,
+          fileDescriptions,
+        )
+      : (await generateBlobUrl({
+          invoiceData,
+          headerBlockUrl: headerUrl,
+          footerBlockUrl: footerUrl,
+          invoiceNumber: companyNextNumber?.value,
+          setInState: false,
+          showCurrentDateAsInvoiceDate: true,
+        }).then((blobFile) =>
+          createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
+        )) || Promise.resolve([]);
+  };
+
+  const getXInvoiceOperation = async (
+    invoiceData: InvoiceView,
+    options?: {forceGet?: boolean; invoiceNumber?: string},
+  ) => {
+    const {forceGet = false, invoiceNumber} = options ?? {};
+
+    // If XML is not opted then do nothing
+    if (
+      invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
+        InvoiceFormat.XML &&
+      invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
+        InvoiceFormat.PDF_AND_XML &&
+      !forceGet
+    ) {
+      return Promise.resolve([]);
+    }
+
+    const response = await getXInvoiceByInvoiceId({
+      invoiceId: invoiceData.id,
+      params: {
+        dueDate: invoiceData.dueDate!,
+        sentDate: invoiceData.sentDate ?? formatDate(new Date(), 'yyyy-MM-dd')!,
+        externalId: invoiceNumber ?? companyNextNumber?.value!,
+      },
+    });
+
+    const blob = new Blob([response], {type: 'application/xml'});
+
+    const fileNames: string[] = [`${invoiceData?.id}.xml`];
+    const fileDescriptions: string[] = [
+      `${FILE_DESCRIPTION_PREFIXES.INVOICE}-${
+        invoiceData?.externalId || companyNextNumber?.value!
+      }.xml`,
+    ];
+
+    return createFilesFromBlobArray([blob], fileNames, fileDescriptions);
+  };
+
   const getExistingFiles = async (
     invoiceDownloadUrl:
       | {
@@ -714,37 +806,20 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
 
     let allFiles: FileWithPreview[] = [];
-    const fileNames: string[] = [`${invoiceData?.id}.pdf`];
-    const fileDescriptions: string[] = [
-      `${FILE_DESCRIPTION_PREFIXES.INVOICE}-${
-        invoiceData?.externalId || nextNumber
-      }.pdf`,
-    ];
 
     // Base file operations
-    const baseFileOperations =
-      invoiceData?.status !== InvoiceStatus.DRAFT
-        ? fetchAndCreateFiles(
-            invoiceDownloadUrl ? Object.values(invoiceDownloadUrl)[0] : '',
-            fileNames,
-            fileDescriptions,
-          )
-        : (await generateBlobUrl({
-            invoiceData,
-            headerBlockUrl: headerUrl,
-            footerBlockUrl: footerUrl,
-            invoiceNumber: companyNextNumber?.value,
-            setInState: false,
-            showCurrentDateAsInvoiceDate: true,
-          }).then((blobFile) =>
-            createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
-          )) || Promise.resolve([]);
+    const baseFileOperations = getBaseFileOperations(invoiceData, {
+      nextNumber,
+      invoiceDownloadUrl,
+    });
 
     // // Work report operations
     const workReportOperations = getWorkReportOperations(
       invoiceData,
       workReportDownloadUrlArg,
     );
+
+    const xInvoiceOperation = getXInvoiceOperation(invoiceData);
 
     // Checklist operations
     const checklistOperations = invoiceData?.additionalInfo.includeCheckList
@@ -777,14 +852,21 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       : Promise.resolve([]);
 
     // Wait for all file operations to complete
-    const [baseFiles, workReportFiles, checklistFiles] = await Promise.all([
-      baseFileOperations,
-      workReportOperations,
-      checklistOperations,
-    ]);
+    const [baseFiles, workReportFiles, checklistFiles, xInvoiceFiles] =
+      await Promise.all([
+        baseFileOperations,
+        workReportOperations,
+        checklistOperations,
+        xInvoiceOperation,
+      ]);
 
     // Combine all files
-    allFiles = [...baseFiles, ...workReportFiles, ...checklistFiles];
+    allFiles = [
+      ...baseFiles,
+      ...workReportFiles,
+      ...checklistFiles,
+      ...xInvoiceFiles,
+    ];
 
     // Set existing files
     setExistingFiles(allFiles);
@@ -1053,6 +1135,14 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
               const uploadPath = `${serviceCompanyId}/invoices`;
 
+              const invoiceXML = await getXInvoiceOperation(
+                updatedInvoiceData?.data!,
+                {
+                  forceGet: true,
+                  invoiceNumber: updatedInvoiceData?.data?.externalId,
+                },
+              );
+
               if (blobFile) {
                 const fileNames: string[] = [
                   `${updatedInvoiceData.data?.id}.pdf`,
@@ -1061,14 +1151,19 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                   [blobFile!],
                   fileNames,
                 );
-                await uploadFiles({files, uploadPath});
+                await uploadFiles({
+                  files: [...files, ...invoiceXML],
+                  uploadPath,
+                });
                 const pdfPath = `${uploadPath}/${updatedInvoiceData.data?.id}.pdf`;
+                const xmlPath = `${uploadPath}/${updatedInvoiceData.data?.id}.xml`;
 
                 await printInvoice(
                   {
                     id: updatedInvoiceData.data?.id!,
                     body: {
                       pdfPath,
+                      xmlPath,
                       externalId: updatedInvoiceData.data?.externalId!,
                       dueDate:
                         updatedInvoiceData.data?.dueDate ||
@@ -1097,19 +1192,25 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           invoiceNumber: invoice.externalId,
         });
 
+        const invoiceXML = await getXInvoiceOperation(invoice, {
+          forceGet: true,
+          invoiceNumber: invoice.externalId,
+        });
         const uploadPath = `${serviceCompanyId}/invoices`;
 
         if (blobFile) {
           const fileNames: string[] = [`${invoice.id}.pdf`];
           const files = await createFilesFromBlobArray([blobFile!], fileNames);
-          await uploadFiles({files, uploadPath});
+          await uploadFiles({files: [...files, ...invoiceXML], uploadPath});
           const pdfPath = `${uploadPath}/${invoice.id}.pdf`;
+          const xmlPath = `${uploadPath}/${invoice.id}.xml`;
 
           await printInvoice(
             {
               id: invoice.id!,
               body: {
                 pdfPath,
+                xmlPath,
                 externalId: invoice.externalId!,
                 dueDate: invoice.dueDate || dateToString(new Date()),
                 sentDate: invoice.sentDate || dateToString(new Date()),
@@ -1130,6 +1231,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           id: invoice.id!,
           body: {
             pdfPath: invoice.additionalInfo.pdfPath,
+            xmlPath: invoice.additionalInfo.xmlPath,
             externalId: invoice.externalId!,
             dueDate: invoice.dueDate || dateToString(new Date()),
             sentDate: invoice.sentDate || dateToString(new Date()),
@@ -1498,7 +1600,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             const invoiceUploadPath = `${serviceCompanyId}/invoices`;
             const workReportUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/report`;
             const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/checkLists/${checkListInfo?.technicianId}`;
-            const fileNames: string[] = [`${invoice?.id}.pdf`];
+            const fileNames: string[] = [
+              `${invoice?.id}.pdf`,
+              `${invoice?.id}.xml`,
+            ];
             const allAttachments = emailRecord.attachments || [];
 
             // 1. Upload work report files
@@ -1533,14 +1638,30 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
             // 3. Upload invoice files if 'DRAFT' invoice
             if (isDraftInvoice) {
-              const invoiceFiles = emailRecord.attachments?.filter((el) =>
-                el.description?.includes(FILE_DESCRIPTION_PREFIXES.INVOICE),
+              const invoiceDownloadResponse = await refetchDownloadUrl();
+              const invoiceDownloadUrl = invoiceDownloadResponse.data;
+
+              const [invoicePDF, invoiceXML] = await Promise.all([
+                getBaseFileOperations(invoice, {
+                  invoiceDownloadUrl,
+                  nextNumber: companyNextNumber?.value,
+                  forceGet: true,
+                }),
+                getXInvoiceOperation(invoice, {forceGet: true}),
+              ]);
+
+              await uploadFiles({
+                files: [...invoicePDF, ...invoiceXML],
+                uploadPath: invoiceUploadPath,
+              });
+
+              const xmlAttachmentIndex = allAttachments.findIndex(
+                (item) => item.name === fileNames[1],
               );
-              if (invoiceFiles?.length) {
-                await uploadFiles({
-                  files: invoiceFiles,
-                  uploadPath: invoiceUploadPath,
-                });
+
+              // Re-set XML just in case the invoice number is changed
+              if (invoiceXML[0] && xmlAttachmentIndex !== -1) {
+                allAttachments.splice(xmlAttachmentIndex, 1, invoiceXML[0]);
               }
             }
 
@@ -1562,6 +1683,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                   pdfPath: isDraftInvoice
                     ? `${invoiceUploadPath}/${fileNames[0]}`
                     : invoiceData?.additionalInfo?.pdfPath!,
+                  xmlPath: isDraftInvoice
+                    ? `${invoiceUploadPath}/${fileNames[1]}`
+                    : invoiceData?.additionalInfo?.xmlPath!,
                   externalId:
                     invoiceData?.externalId || companyNextNumber?.value || '',
                   dueDate: invoiceData?.dueDate || dateToString(new Date()),
@@ -1574,44 +1698,22 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     ccEmails: emailRecord.ccEmails,
                     bccEmails: emailRecord.bccEmails,
                     attachments: allAttachments.reduce<FileWithPreview[]>(
-                      (newArr: FileWithPreview[], obj) => {
-                        const isInvoiceFile = obj.description?.includes(
-                          FILE_DESCRIPTION_PREFIXES.INVOICE,
-                        );
-                        const isWorkReportFile = obj.description?.includes(
-                          FILE_DESCRIPTION_PREFIXES.WORK_REPORT,
-                        );
-                        const isChecklistFile = obj.description?.includes(
-                          FILE_DESCRIPTION_PREFIXES.CHECKLIST,
-                        );
-                        const isAttachedFile = obj.path && !obj.description;
-
-                        let uploadPath = '';
-
-                        if (isAttachedFile || isInvoiceFile) {
-                          uploadPath = invoiceUploadPath;
-                        } else if (isWorkReportFile) {
-                          uploadPath = workReportUploadPath;
-                        } else if (isChecklistFile) {
-                          uploadPath = checklistUploadPath;
-                        }
-
-                        return [
-                          ...newArr,
-                          {
-                            ...obj,
-                            type: obj.type,
-                            uri: isInvoiceFile
-                              ? isDraftInvoice
-                                ? `${invoiceUploadPath}/${fileNames[0]}`
-                                : invoice?.additionalInfo.pdfPath!
-                              : `${uploadPath}/${obj.name}`,
-                            description: isAttachedFile
-                              ? obj.name.split('.')[0]
-                              : obj?.description,
-                          },
-                        ];
-                      },
+                      (newArr: FileWithPreview[], obj) => [
+                        ...newArr,
+                        {
+                          ...obj,
+                          type: obj.type,
+                          uri: decideAttachmentURIForInvoiceEmail({
+                            invoice,
+                            invoiceUploadPath,
+                            workReportUploadPath,
+                            checklistUploadPath,
+                            attachment: obj,
+                          }),
+                          description:
+                            decideAttachmentDescriptionForInvoiceEmail(obj),
+                        },
+                      ],
                       [],
                     ),
                   },

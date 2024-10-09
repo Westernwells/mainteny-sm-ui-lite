@@ -6,6 +6,7 @@ import {
 } from 'models/elevator';
 import {Priority, InspectionCycle, State} from 'models/misc';
 import {Role, UserAccountStatus} from 'models/user';
+import {InvoiceFormat} from 'models/propertyManager';
 import {vi} from 'vitest';
 import {
   ContractServiceFormElevator,
@@ -118,6 +119,7 @@ export const mockElevator: ElevatorView = {
       vatId: '',
       offsettingAccount: '',
       customerPortalEnabled: true,
+      invoiceFormat: InvoiceFormat.PDF,
     },
     meta: {
       creator: {

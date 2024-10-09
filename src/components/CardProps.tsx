@@ -6,6 +6,7 @@ import React, {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 import Link from '@mui/material/Link';
 import {Link as RouterLink} from 'react-router-dom';
+import {Tooltip} from '@mui/material';
 import {hasProtocol} from '../utils/utils';
 
 interface Props {
@@ -24,6 +25,7 @@ interface Props {
   iconContainerStyles?: SxProps;
   enabled?: boolean;
   shouldTranslate?: boolean;
+  iconTooltip?: string;
 }
 
 export const CardProps = ({
@@ -41,6 +43,7 @@ export const CardProps = ({
   labelStyle,
   iconContainerStyles = {},
   enabled,
+  iconTooltip,
   shouldTranslate = true,
 }: Props) => {
   const {t} = useTranslation();
@@ -61,26 +64,50 @@ export const CardProps = ({
     textWrap: 'wrap',
   });
 
+  const renderIcon = () => {
+    if (iconTooltip?.trim().length) {
+      return (
+        <Tooltip title={t(iconTooltip!)} placement="top" arrow>
+          <Box
+            sx={{
+              backgroundColor: iconBackground,
+              p: '0.7em',
+              display: 'flex',
+              justifyContent: 'center',
+              mr: '0.8em',
+              maxHeight: iconMaxHeight || 'default',
+              cursor: 'pointer',
+              ...iconContainerStyles,
+            }}>
+            {icon}
+          </Box>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <Box
+        sx={{
+          backgroundColor: iconBackground,
+          p: '0.7em',
+          display: 'flex',
+          justifyContent: 'center',
+          mr: '0.8em',
+          maxHeight: iconMaxHeight || 'default',
+          ...iconContainerStyles,
+        }}>
+        {icon}
+      </Box>
+    );
+  };
+
   return (
     <Box
       display="flex"
       alignItems={bodyText ? 'flex-start' : 'center'}
       sx={{...containerStyles}}
       minHeight="60px">
-      {icon && (
-        <Box
-          sx={{
-            backgroundColor: iconBackground,
-            p: '0.7em',
-            display: 'flex',
-            justifyContent: 'center',
-            mr: '0.8em',
-            maxHeight: iconMaxHeight || 'default',
-            ...iconContainerStyles,
-          }}>
-          {icon}
-        </Box>
-      )}
+      {icon && renderIcon()}
       <Box sx={{textWrap: 'nowrap'}}>
         <Typography
           component="div"

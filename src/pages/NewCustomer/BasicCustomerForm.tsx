@@ -19,6 +19,8 @@ import {ComboBox} from 'components/ComboBox';
 import {t} from 'i18next';
 import {CustomerBasicInfoFormModel} from './model';
 import {T} from 'utils/i18n-utils';
+import {FormControl, InputLabel, MenuItem, Select} from '@mui/material';
+import {CUSTOMER_ALL_INVOICE_FORMATS} from 'utils/constants';
 
 interface Props {
   formik: FormikProps<CustomerBasicInfoFormModel>;
@@ -312,6 +314,44 @@ export const BasicCustomerForm = ({formik}: Props) => {
                 ...defaultProps,
               }}
             />
+          </Grid>
+          <Grid item md={4}>
+            <FormInput
+              labelTooltip="Buyer reference is defined by the customer."
+              fieldProps={{
+                size: 'small',
+                label: 'Buyer reference',
+                name: 'buyerReference',
+                value: formik.values.buyerReference,
+                helperText:
+                  formik.touched.buyerReference && formik.errors.buyerReference,
+                error:
+                  !!formik.errors.buyerReference &&
+                  formik.touched.buyerReference,
+                ...defaultProps,
+              }}
+            />
+          </Grid>
+          <Grid item md={4}>
+            <FormControl fullWidth required={false}>
+              <InputLabel size="small" shrink variant="outlined">
+                {t('Invoice format')}
+              </InputLabel>
+              <Select
+                label={t('Invoice format')}
+                size="small"
+                value={formik.values.invoiceFormat}
+                name="invoiceFormat"
+                notched
+                {...defaultProps}
+                required={false}>
+                {CUSTOMER_ALL_INVOICE_FORMATS.map((format) => (
+                  <MenuItem value={format.value} key={format.value}>
+                    {t(format.label)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
         </Grid>
       </Box>

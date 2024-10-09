@@ -15,6 +15,8 @@ export type CustomerBasicInfoFormModel = {
   costCenter: string;
   vatId: string;
   offsettingAccount: string;
+  buyerReference?: string;
+  invoiceFormat?: string;
 };
 
 export type CustomerAddressFormModel = {
@@ -79,4 +81,6 @@ export type NewCustomerBody = {
   contactPersons?: CustomerContactPersonFormModel[];
   vatId?: string;
   offsettingAccount?: string;
+  buyerReference?: string;
+  invoiceFormat?: string;
 };

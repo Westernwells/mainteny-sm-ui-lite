@@ -88,6 +88,7 @@ export interface InvoiceAdditionalInfo {
   dueDate: string;
   pdfGenerationStatus: PdfGenerationStatus;
   pdfPath: string;
+  xmlPath?: string;
   includeWorkReport: boolean;
   includeCheckList?: boolean;
   paymentInfo: PaymentInfo;
@@ -521,6 +522,7 @@ export const ALL_MANUAL_INVOICE_TYPES = [
 
 export interface SendInvoiceRecord {
   pdfPath: string;
+  xmlPath?: string;
   externalId: string;
   dueDate: string;
   sentDate: string;
@@ -529,6 +531,7 @@ export interface SendInvoiceRecord {
 
 export interface PrintInvoiceRecord {
   pdfPath: string;
+  xmlPath?: string;
   externalId: string;
   dueDate: string;
   sentDate: string;
@@ -536,4 +539,33 @@ export interface PrintInvoiceRecord {
 
 export interface InvoiceGeneration {
   lastInvoiceDate?: string | null;
+}
+
+export interface InvoiceItemAmount {
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeGlobalDiscount: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount: Amount;
+  payment: InvoiceItemPaymentRecord;
+}
+
+export interface InvoiceAmountDetail {
+  discount: Discount;
+  payment: Payment;
+  amountBeforeGlobalDiscount: AggregatedAmount;
+  amountAfterGlobalDiscount: AggregatedAmount;
+  items: InvoiceItemAmount[];
+}
+
+export interface FetchXInvoiceByInvoiceIdParams {
+  dueDate: string;
+  externalId: string;
+  sentDate: string;
+}
+
+export enum FILE_DESCRIPTION_PREFIXES {
+  INVOICE = 'INV',
+  WORK_REPORT = 'WR',
+  CHECKLIST = 'CHK',
 }
