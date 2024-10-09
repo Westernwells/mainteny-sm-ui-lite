@@ -57,7 +57,14 @@ const KalasarSearchComponent: React.FC = () => {
       scrolling: true,
       searchBarVisible: true,
       heading: 'Top Fragen von Mainteny Kunden',
-      suggestions: ['Neuen Kunden anlegen', 'Bestehenden Kunden bearbeiten'],
+      suggestions: [
+        'Neuen Kunden anlegen',
+        'Bestehenden Kunden bearbeiten',
+        'Anlage anlegen',
+        'Anlage editieren',
+        'Vertrag anlegen',
+        'Textbaustein erstellen/verwenden',
+      ],
       description:
         'Unser KI Assistent wird Sie Schritt für Schritt durch die Prozesse führen',
     };
