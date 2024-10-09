@@ -32,6 +32,7 @@ const SUPPORTED_FILE_TYPES = [
   'image/gif',
   'image/webp',
   'image/svg+xml',
+  'application/xml',
 ];
 
 interface AttachedFilesProps {

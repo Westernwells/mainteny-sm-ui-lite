@@ -4,6 +4,7 @@ import {
   InvoiceItem,
   DiscountType,
   PaymentType,
+  InvoiceAmountDetail,
 } from 'models/invoice';
 import {
   applyDiscount,
@@ -26,6 +27,7 @@ import {
   replacePaymentTermsPlaceholders,
 } from 'utils/invoice';
 import {HtmlPDF} from 'components/HtmlPDF';
+import {useMemo} from 'react';
 import PdfInvoicedSection from './PdfInvoicedSection';
 import PdfPaymentHistorySection from './PdfPaymentHistorySection';
 import PdfPerItemSection from './PdfPerItemSection';
@@ -38,6 +40,7 @@ type PartialProps = {
   translate: (key: string) => string;
   currentCurrency?: Currency;
   invoice?: InvoiceView;
+  invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
   articleItems: InvoiceItem[];
@@ -110,6 +113,7 @@ const PdfUpfrontInvoiceSection = ({
   translate,
   currentCurrency,
   invoice,
+  invoiceAmountDetail,
   selectedLng,
   previousInvoices,
   articleItems,
@@ -255,16 +259,33 @@ const PdfUpfrontInvoiceSection = ({
 
   const styles = getStyles(boldFontStyle);
 
-  const invoiceAmount =
-    amount +
-    currentInvoiceAmountPercentageVats
-      .map((v) => v.vat)
-      .reduce((a, b) => a + b, 0);
+  const grossInvoiceAmount = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount.grossAmount,
+  );
 
-  const formattedPaymentValues = getFormattedPaymentValues(
-    invoice?.additionalInfo.paymentTerm!,
-    invoice!,
-    invoiceAmount,
+  const formattedPaymentValues = useMemo(() => {
+    if (
+      invoice?.additionalInfo.paymentTerm?.term &&
+      invoice &&
+      invoiceAmountDetail
+    ) {
+      return getFormattedPaymentValues(
+        invoice.additionalInfo.paymentTerm,
+        invoice,
+        invoiceAmountDetail,
+        grossInvoiceAmount,
+        currentCurrency,
+      );
+    }
+    return [];
+  }, [invoice, invoiceAmountDetail, invoice?.additionalInfo.paymentTerm?.term]);
+
+  const replacedPaymentTerms = replacePaymentTermsPlaceholders(
+    invoice?.additionalInfo.paymentTerm?.term || '',
+    formattedPaymentValues ?? [],
+    currentCurrency!,
+    selectedLng,
   );
 
   return (
@@ -543,12 +564,7 @@ const PdfUpfrontInvoiceSection = ({
           <Text style={styles.sectionHeading}>
             {translate('Payment terms')}
           </Text>
-          <HtmlPDF
-            html={replacePaymentTermsPlaceholders(
-              invoice?.additionalInfo.paymentTerm?.term!,
-              formattedPaymentValues ?? [],
-            )}
-          />
+          <HtmlPDF html={replacedPaymentTerms} />
         </View>
       )}
     </View>

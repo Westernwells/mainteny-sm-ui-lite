@@ -1,8 +1,12 @@
+import {InfoOutlined} from '@mui/icons-material';
+import {IconButton, Tooltip} from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import {InputLabelProps} from '@mui/material/InputLabel';
 import TextField, {TextFieldProps} from '@mui/material/TextField';
+import {Box} from '@mui/system';
+
 import {LanguageContext} from 'context/LanguageProvider';
-import {forwardRef, useContext} from 'react';
+import {forwardRef, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {NumericFormat, NumericFormatProps} from 'react-number-format';
 
@@ -15,6 +19,7 @@ interface Props {
   inputType?: 'text' | 'currency';
   fullWidth?: boolean;
   numericFormatProps?: NumericFormatProps<TextFieldProps>;
+  labelTooltip?: string;
 }
 
 export const FormInput = forwardRef(
@@ -25,6 +30,7 @@ export const FormInput = forwardRef(
       inputLabelProps,
       onValueChange,
       handleFocus,
+      labelTooltip,
       fullWidth = true,
       inputType = 'text',
       numericFormatProps,
@@ -33,6 +39,39 @@ export const FormInput = forwardRef(
   ) => {
     const {t} = useTranslation();
     const {language: selectedLng} = useContext(LanguageContext);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const renderLabel = () => {
+      if ((labelTooltip?.trim().length ?? 0) > 0) {
+        return (
+          <Box display="flex">
+            <span>{t(fieldProps!.label as string)}</span>
+            <Tooltip
+              onOpen={() => {
+                setIsOpen(true);
+              }}
+              onClose={() => {
+                setIsOpen(false);
+              }}
+              title={t(labelTooltip!)}
+              placement="top"
+              arrow>
+              <IconButton
+                sx={{
+                  color: isOpen ? 'action.active' : 'secondary.mainLight',
+                  p: 0,
+                  ml: 0.3,
+                  mb: 0.5,
+                }}>
+                <InfoOutlined sx={{width: 17, height: 17}} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        );
+      }
+
+      return t(fieldProps!.label as string);
+    };
 
     return (
       <FormControl sx={{...containerStyles}} fullWidth={fullWidth}>
@@ -83,9 +122,7 @@ export const FormInput = forwardRef(
             size="small"
             {...fieldProps}
             inputRef={ref}
-            label={
-              fieldProps?.label ? t(fieldProps.label as string) : undefined
-            }
+            label={fieldProps?.label ? renderLabel() : undefined}
             helperText={
               fieldProps?.helperText
                 ? t(fieldProps.helperText as string)

@@ -319,6 +319,8 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
         ),
       ) as AddressRecord | null,
       contactPersons: formikContactPersons.values.contactPersons,
+      buyerReference: formikBasicInfo.values.buyerReference,
+      invoiceFormat: formikBasicInfo.values.invoiceFormat,
     };
 
     const response = await createCustomer(body);

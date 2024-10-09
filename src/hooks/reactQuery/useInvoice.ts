@@ -39,6 +39,7 @@ import {
   InvoiceActivityView,
   PrintInvoiceRecord,
   SendInvoiceRecord,
+  FetchXInvoiceByInvoiceIdParams,
 } from 'models/invoice';
 import {Comment} from 'models/comment';
 import {ErrorCode} from 'models/error';
@@ -751,4 +752,53 @@ export const useCancelInvoice = () => {
       showError(err);
     },
   });
+};
+
+export const fetchInvoiceAmountDetail = async (invoiceId: string) => {
+  const response = await axiosClient.get(`/api/invoices/${invoiceId}/amount/`);
+  return response.data;
+};
+
+export function useInvoiceAmountDetail(invoiceId?: string) {
+  return useQuery(
+    [qk.invoiceAmountById, invoiceId],
+    () => fetchInvoiceAmountDetail(invoiceId!),
+    {
+      enabled: !!invoiceId,
+    },
+  );
+}
+
+export const fetchXInvoiceByInvoiceId = async (
+  invoiceId: string,
+  queryParams: FetchXInvoiceByInvoiceIdParams,
+) => {
+  const response = await axiosClient.get<string>(
+    `/api/invoices/${invoiceId}/xInvoice`,
+    {
+      params: queryParams,
+      paramsSerializer,
+      headers: {Accept: 'application/xml'},
+    },
+  );
+  return response.data;
+};
+
+export const useFetchXInvoiceByInvoiceId = () => {
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      invoiceId,
+      params,
+    }: {
+      invoiceId: string;
+      params: FetchXInvoiceByInvoiceIdParams;
+    }) => fetchXInvoiceByInvoiceId(invoiceId, params),
+    {
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
 };
