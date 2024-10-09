@@ -99,6 +99,7 @@ export interface AddressComponent {
   postalCode?: string;
   state?: string;
   country?: string;
+  moreInfo?: string;
 }
 
 export interface AddressRecord {

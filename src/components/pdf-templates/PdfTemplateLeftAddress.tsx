@@ -96,6 +96,8 @@ const PdfTemplateLeftAddress = ({
           {addressComponent?.city && `${addressComponent.city}`.trim()}
           {addressComponent?.city && addressComponent.country && ', '}
           {addressComponent?.country && `${addressComponent.country}`.trim()}
+          {addressComponent?.country && addressComponent.moreInfo && ', '}
+          {addressComponent?.moreInfo && `${addressComponent.moreInfo}`.trim()}
         </Text>
       </View>
 
