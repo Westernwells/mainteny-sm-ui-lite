@@ -20,4 +20,5 @@ export type CustomerEditForm = {
   customerPortalEnabled?: boolean;
   buyerReference?: string;
   invoiceFormat?: string;
+  moreInfo?: string;
 };

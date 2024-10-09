@@ -123,6 +123,20 @@ export const EditCustomerForm = ({
           isCompanyTranslation
         />
       </Grid>
+
+      {address === 'billingAddress' && (
+        <Grid item md={3}>
+          <FormInput
+            fieldProps={{
+              size: 'small',
+              label: 'Additional Information',
+              name: `${address}.component.moreInfo`,
+              value: value?.component?.moreInfo ?? '',
+              ...defaultProps,
+            }}
+          />
+        </Grid>
+      )}
     </Grid>
   );
 };

@@ -144,6 +144,17 @@ export const CustomerAddressForm = ({formik}: Props) => {
             isCompanyTranslation
           />
         </Grid>
+        <Grid item md={2.5}>
+          <FormInput
+            fieldProps={{
+              size: 'small',
+              label: 'Additional Information',
+              name: 'billingAddress.component.moreInfo',
+              value: formik.values.billingAddress?.component?.moreInfo ?? '',
+              ...defaultProps,
+            }}
+          />
+        </Grid>
       </Grid>
 
       <Box

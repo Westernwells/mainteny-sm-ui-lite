@@ -112,15 +112,13 @@ describe('Job', () => {
         cy.get('span[role="progressbar"]').should('not.exist');
 
         // Click the "Unscheduled" option (use the recorded selector for this action)
-        OrderPage.changeStatusFilter('Unscheduled');
-        cy.wait(5000);
+        OrderPage.changeStatusFilter('Overdue');
+        cy.wait(3000);
 
         cy.wait('@serviceOrdersApi')
             .its('response')
             .then((response) => {
                 const {body: serviceOrders} = response;
-
-                cy.log(serviceOrders);
 
                 // Check if service orders data is available
                 if (serviceOrders && serviceOrders.data.length) {
@@ -133,6 +131,8 @@ describe('Job', () => {
                     cy.get('#long-button').click();
 
                     cy.get('li[role="menuitem"]').contains('Schedule').click();
+
+                    ServiceJobPage.selectTechnicianWithIndex(1);
 
                     cy.contains('button', 'Save').should('not.be.disabled').click();
 

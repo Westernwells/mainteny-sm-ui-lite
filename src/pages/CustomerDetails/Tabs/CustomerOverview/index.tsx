@@ -72,6 +72,9 @@ export const formatAddress = (address: Address | undefined) => {
   const country = address?.component?.country
     ? address?.component?.country
     : '';
+  const moreInfo = address?.component?.moreInfo
+    ? address?.component?.moreInfo
+    : '';
 
   return (
     <Typography
@@ -79,7 +82,7 @@ export const formatAddress = (address: Address | undefined) => {
       sx={{
         textWrap: 'wrap',
       }}>
-      {name} {address1} {address2} {zip} {city} {country}
+      {name} {address1} {address2} {zip} {city} {country} {moreInfo}
     </Typography>
   );
 };

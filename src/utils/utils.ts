@@ -279,8 +279,20 @@ export const formatAddressFullname = (
       ? translate(address?.component?.country)
       : address?.component?.country
     : '';
+  const moreInfo = address?.component?.moreInfo
+    ? address?.component?.moreInfo
+    : '';
 
-  const fullName = [name, address1, address2, zip, city, state, country]
+  const fullName = [
+    name,
+    address1,
+    address2,
+    zip,
+    city,
+    state,
+    country,
+    moreInfo,
+  ]
     .filter((x) => x !== '')
     .join(', ');
 
@@ -304,6 +316,7 @@ export const formatAddressFullname = (
       city,
       state,
       country,
+      moreInfo,
     },
     fullName,
     fullCityName,

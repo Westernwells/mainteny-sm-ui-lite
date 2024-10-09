@@ -480,6 +480,17 @@ export const EditCustomerForm = ({
             isCompanyTranslation
           />
         </Grid>
+        <Grid item md={2.5}>
+          <FormInput
+            fieldProps={{
+              size: 'small',
+              label: 'Additional Information',
+              name: 'billingAddress.component.moreInfo',
+              value: formikValues.billingAddress?.component?.moreInfo ?? '',
+              ...defaultProps,
+            }}
+          />
+        </Grid>
       </Grid>
 
       <Box
