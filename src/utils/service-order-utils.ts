@@ -1,13 +1,16 @@
 import {addMinutes, differenceInMinutes} from 'date-fns';
 import _ from 'lodash';
 import {amber, grey} from '@mui/material/colors';
+import {EmployeesSimpleView} from 'models/employee';
 import {
+  SearchParameters,
   ServiceOrderArticleView,
   ServiceOrderPaymentStatus,
   ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderReportTimeRecord,
   ServiceOrderReportView,
   ServiceOrderStatus,
+  ServiceOrderTableRow,
   ServiceOrderType,
   ServiceOrderView,
 } from '../models/service-order';
@@ -384,4 +387,39 @@ export const getSignatureKeys = (
     }
   });
   return signatureKeys;
+};
+
+const getTechniciansFromServiceOrder = (
+  item: ServiceOrderView,
+): EmployeesSimpleView[] => {
+  if (item.schedules.length) {
+    return item.schedules.map((x) => x.technician);
+  }
+  if (item?.additionalInfo?.candidateTechnician) {
+    return [item?.additionalInfo?.candidateTechnician];
+  }
+  return [];
+};
+
+export const aggregateServiceOrderRow = (
+  orders: ServiceOrderView[],
+): ServiceOrderTableRow[] =>
+  orders.map((order) => ({
+    id: order.id,
+    elevatorExternalId: order.elevator.externalId,
+    number: order.number,
+    type: order.type,
+    address: order.elevator.address.fullName ?? '-',
+    dueDate: order.dueDate,
+    technicians: getTechniciansFromServiceOrder(order),
+    propertyOwner: order.elevator.propertyOwner,
+    jobStatus: order.status,
+    paymentStatus:
+      order.additionalInfo.paymentStatus ?? ServiceOrderPaymentStatus.NONE,
+    hasNotes: Boolean(order.additionalInfo.commentCount),
+  }));
+
+export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
+  const elements = [search && search, orderNumber && `[number:${orderNumber}]`];
+  return elements.length ? elements.join(' ') : '';
 };

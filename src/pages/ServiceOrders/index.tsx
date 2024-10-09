@@ -1,5 +1,5 @@
 import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab';
+import Tabs from 'components/Tabs';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
@@ -18,17 +18,21 @@ import {
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
-import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
+import React from 'react';
+import PageContainer from 'components/PageContainer';
+import TabsWrapper from 'components/TabsWrapper';
+import {MenuBtnProps} from 'models/misc';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
+import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
 
 const tabItems = [
   {
-    label: 'Schedule',
-    icon: <CalendarTodayIcon />,
-  },
-  {
     label: 'List',
     icon: <ListAltIcon />,
+  },
+  {
+    label: 'Schedule',
+    icon: <CalendarTodayIcon />,
   },
 ];
 
@@ -44,7 +48,7 @@ export const ServiceOrders = () => {
     cb();
   };
 
-  const menu = [
+  const menu: MenuBtnProps[] = [
     {
       label: serviceOrderTypeToString(ServiceOrderType.EMERGENCY),
       action: () => track(() => navigate('/orders/new?type=emergency')),
@@ -129,22 +133,32 @@ export const ServiceOrders = () => {
   ];
 
   return (
-    <Tabs
-      hideBackIcon
-      tabItems={tabItems}
-      showMenuActionBtn
-      menu={menu}
-      btnLabel="New Job"
-      currentIndex={tabValue}
-      pageTitle="Service Jobs"
-      onChange={(index) => setTabValue(index)}>
-      <TabsBody value={tabValue} index={0}>
-        <ServiceOrderScheduleTab />
-      </TabsBody>
-      <TabsBody value={tabValue} index={1}>
-        <ServiceOrderList />
-      </TabsBody>
-    </Tabs>
+    <PageContainer gap={3}>
+      <TabsWrapper
+        hideBackIcon
+        tabItems={tabItems}
+        showMenuActionBtn
+        menu={menu}
+        btnLabel="New Job"
+        currentIndex={tabValue}
+        pageTitle="Service Jobs"
+        onChange={(index) => setTabValue(index)}
+        shouldWrap={tabValue === 1}>
+        {tabValue === 0 && (
+          <Tabs
+            tabItems={tabItems}
+            currentIndex={tabValue}
+            onChange={(index) => setTabValue(index)}
+          />
+        )}
+        <TabsBody value={tabValue} index={0}>
+          <ServiceOrderList menu={menu} />
+        </TabsBody>
+        <TabsBody value={tabValue} index={1}>
+          <ServiceOrderScheduleTab />
+        </TabsBody>
+      </TabsWrapper>
+    </PageContainer>
   );
 };
 

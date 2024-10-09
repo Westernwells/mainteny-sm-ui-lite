@@ -18,7 +18,7 @@ export interface TabItems {
   iconPosition?: 'start' | 'end';
 }
 
-interface Props {
+export interface Props {
   children: ReactNode;
   tabItems: TabItems[];
   onChange?: (tabIndex: number) => void;

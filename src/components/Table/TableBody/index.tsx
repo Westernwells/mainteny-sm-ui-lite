@@ -1,14 +1,14 @@
 import {PropsWithChildren} from 'react';
-import {Box} from '@mui/system';
+import {TableBody as MuiTableBody} from '@mui/material';
 
 const TableBody = ({children}: PropsWithChildren<unknown>) => (
-  <Box
+  <MuiTableBody
     date-testid="table-body-container"
     sx={{
       overflow: 'auto',
     }}>
     {children}
-  </Box>
+  </MuiTableBody>
 );
 
 export default TableBody;

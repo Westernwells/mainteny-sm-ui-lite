@@ -1,7 +1,7 @@
 import {Button, MenuItem, Radio} from '@mui/material';
 import {Box} from '@mui/system';
 import {useTranslation} from 'react-i18next';
-import {useMemo, useRef, useState} from 'react';
+import {Fragment, useMemo, useRef, useState} from 'react';
 import Menu from '@mui/material/Menu';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Typography from '@mui/material/Typography';
@@ -106,7 +106,9 @@ const Pagination = ({
               const isSelected = numberOfElementsPerPage === option;
 
               return (
-                <MenuItem onClick={handleTotalNumberPerPageChange(option)}>
+                <MenuItem
+                  key={`element-per-page-selector-option-${option}`}
+                  onClick={handleTotalNumberPerPageChange(option)}>
                   <Radio checked={isSelected} value={option} disableRipple />
                   <Typography>{option}</Typography>
                 </MenuItem>
@@ -131,6 +133,7 @@ const Pagination = ({
         {pagesToShow && (
           <Box sx={{display: 'flex', alignItems: 'center'}} gap={1}>
             <PageButton
+              key="page-button-left"
               disabled={currentIndex === 0}
               onClick={() => onChange(currentIndex - 1)}>
               <KeyboardArrowLeftIcon />
@@ -142,28 +145,30 @@ const Pagination = ({
                   arrayIndex + 1 < array.length &&
                   array[arrayIndex + 1].hasDots === 'right';
                 return (
-                  <>
+                  <Fragment key={`page-button-fragment-${index}`}>
                     {!isPreviousElementWIthRightDots && hasDots === 'left' && (
-                      <PageButton disabled>
+                      <PageButton key="page-button-left-dont" disabled>
                         <MoreHorizOutlinedIcon />
                       </PageButton>
                     )}
                     <PageButton
+                      key={`page-button-${value}`}
                       disabled={isSelected}
                       onClick={() => index !== null && onChange(index)}
                       isSelected={isSelected}>
                       {value}
                     </PageButton>
                     {hasDots === 'right' && (
-                      <PageButton disabled>
+                      <PageButton key="page-button-right-dots" disabled>
                         <MoreHorizOutlinedIcon />
                       </PageButton>
                     )}
-                  </>
+                  </Fragment>
                 );
               },
             )}
             <PageButton
+              key="page-button-right"
               disabled={currentIndex === totalPages - 1}
               onClick={() => onChange(currentIndex + 1)}>
               <KeyboardArrowRightIcon />{' '}

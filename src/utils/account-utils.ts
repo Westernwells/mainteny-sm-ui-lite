@@ -60,3 +60,8 @@ export const formatUpdateEmployeeAccountData = (
 
   return {userAccount, employee};
 };
+
+export const getInitials = (userAccount: {
+  firstName: string;
+  lastName: string;
+}) => `${userAccount.firstName[0]}${userAccount.lastName[0]}`;

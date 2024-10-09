@@ -1,5 +1,5 @@
 import {Delete, Edit} from '@mui/icons-material';
-import {Box, SxProps, Typography, Theme, Chip} from '@mui/material';
+import {Box, Chip, SxProps, Theme, Typography} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
 import {Avatar} from 'components/Avatar';
 import {PageCard} from 'components/PageCard';
@@ -136,7 +136,7 @@ export const OrderChecklistItemCard = ({
             {t('Technician')}
           </Typography>
           <Box display="flex" alignItems="center">
-            <Avatar userAccount={technician} sx={{mr: 1}} />
+            <Avatar userAccount={technician} sx={{mr: 1}} removeNameText />
             <Typography fontSize="14px" fontWeight="bold">
               {getUserFullName(technician)}
             </Typography>

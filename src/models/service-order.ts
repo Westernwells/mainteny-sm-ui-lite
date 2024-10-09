@@ -6,7 +6,6 @@ import {
 } from './elevator';
 import {ContractSimpleView} from './contract';
 import {
-  Address,
   Amount,
   EmailRecord,
   Fee,
@@ -14,11 +13,7 @@ import {
   Meta,
   PdfGenerationStatus,
 } from './misc';
-import {
-  Technician,
-  TechnicianAdditionalInfo,
-  TechnicianSimpleView,
-} from './technician';
+import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
@@ -27,6 +22,7 @@ import {ServiceOrderPaymentStatusView} from '../utils/service-order-utils';
 import {Discount} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
+import {PropertyOwnerView} from 'models/propertyManager';
 
 export enum Priority {
   A = 'A',
@@ -217,29 +213,18 @@ export interface ServiceOrderAdditionalInfo {
     startTime: string;
     endTime: string;
   };
-  candidateTechnician?: ServiceOrderCandidateTechnician;
-  candidateTechnicians?: ServiceOrderCandidateTechnician[];
+  candidateTechnician?: EmployeesSimpleView;
+  candidateTechnicians?: EmployeesSimpleView[];
   documents?: FileResource[];
   pictures?: FileResource[];
   discount?: Discount;
+  commentCount?: number;
 }
 
 export interface ServiceOrderConfirmationInfo {
   sentDate: string;
   pdfGenerationStatus?: PdfGenerationStatus;
   pdfPath?: string;
-}
-
-export interface ServiceOrderCandidateTechnician {
-  additionalInfo: TechnicianAdditionalInfo;
-  address?: Address;
-  externalId: string;
-  id: string;
-  isOnline: boolean;
-  meta: Meta;
-  number: string;
-  tea: string;
-  userAccount: UserAccount;
 }
 
 export interface ServiceOrderView {
@@ -515,6 +500,9 @@ export interface ServiceOrderQueryParams {
   orderBy?: ServiceOrderOrderField;
   types?: ServiceOrderType[];
   paymentStatus?: ServiceOrderPaymentStatus[];
+  grossAmountFrom?: number;
+  grossAmountTo?: number;
+  hasComments?: boolean;
 }
 
 export interface ServiceOrderActivityView {
@@ -663,3 +651,34 @@ export interface CreateServiceOrderComment {
   subject: string;
   id?: string;
 }
+
+export type ServiceOrderTableRow = {
+  id: string;
+  elevatorExternalId: string;
+  number: string;
+  type: ServiceOrderType;
+  address: string;
+  dueDate: string;
+  technicians: EmployeesSimpleView[];
+  propertyOwner: PropertyOwnerView;
+  jobStatus: ServiceOrderStatus;
+  paymentStatus: ServiceOrderPaymentStatus;
+  hasNotes: boolean;
+};
+
+// used to indicate fields for the search parameter of service order endpoint
+// example query [number:or00000926] [externalid:or00000926] [type:repair] [status:completed] [e:address:münchen_ost,_orleanspl._11,_81667_münchen,_deutschland_de] [e:status:running]
+export type SearchParameters = {
+  search?: string;
+  orderNumber?: string;
+};
+
+export type ServiceOrderFilterForm = {
+  customer?: string;
+  orderNumber?: string;
+  orderTypes: ServiceOrderType[];
+  paymentStatus: ServiceOrderPaymentStatus[];
+  grossAmountMin?: number;
+  grossAmountMax?: number;
+  hasComment?: boolean;
+};
