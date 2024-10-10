@@ -1,22 +1,17 @@
 import {useTranslation} from 'react-i18next';
-import {Box, InputAdornment, TextField, Typography} from '@mui/material';
+import {Box, TextField, Typography} from '@mui/material';
 import {ChangeEvent} from 'react';
+import {SxProps, Theme} from '@mui/system';
 
 type Props = {
   value?: string;
   labelKey?: string;
   placeholder?: string;
-  endPlaceholder?: string;
   onChange: (value: string) => void;
+  styles?: SxProps<Theme>;
 };
 
-const TextInput = ({
-  value,
-  labelKey,
-  placeholder,
-  endPlaceholder,
-  onChange,
-}: Props) => {
+const TextInput = ({value, labelKey, placeholder, styles, onChange}: Props) => {
   const {t} = useTranslation();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -29,20 +24,10 @@ const TextInput = ({
 
       <TextField
         id="fixed-tags-demo"
+        sx={styles}
         value={value}
         {...(placeholder && {placeholder: t(placeholder)})}
         onChange={handleChange}
-        {...(endPlaceholder && {
-          slotProps: {
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Typography>{endPlaceholder}</Typography>
-                </InputAdornment>
-              ),
-            },
-          },
-        })}
       />
     </Box>
   );
