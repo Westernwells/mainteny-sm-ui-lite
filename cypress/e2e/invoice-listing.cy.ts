@@ -176,7 +176,20 @@ describe('Invoice listing page', () => {
 
             // validate credit note invoice items are same as original invoice items but with negative net amount
             const originalInvoiceItems = firstFullSentInvoice.items;
-            cy.get('div[test-id="name-0"]').contains(getPlainStringFromHtml(originalInvoiceItems[0].name));
+
+            cy.get('div[test-id="name-0"]').then(($div) => {
+                // Get the actual text from the element, remove BOM characters, and normalize spaces
+                const actualText = $div
+                    .text()
+                    .replace(/\uFEFF/g, '')
+                    .trim()
+                    .replace(/\s+/g, ' ');
+
+                const expectedText = getPlainStringFromHtml(originalInvoiceItems[0].name).trim().replace(/\s+/g, ' ');
+
+                expect(actualText).to.contain(expectedText);
+            });
+
             cy.get('input[name="unitAmount.netAmount"]')
                 .invoke('attr', 'value')
                 .should('eq', (-originalInvoiceItems[0].unitAmount.netAmount / 100).toLocaleString());
