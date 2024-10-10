@@ -8,7 +8,7 @@ describe('Job', () => {
 
         const technician = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/technicians?*`;
 
-        const serviceOrders = `${Cypress.env().REACT_APP_API_URL}/api/serviceOrders?*`;
+        const serviceOrders = `${Cypress.env().REACT_APP_API_URL}/api/serviceOrders*`;
 
         cy.intercept('GET', serviceOrders).as('serviceOrdersApi');
         cy.intercept('GET', technician).as('technicianApi');
@@ -132,7 +132,7 @@ describe('Job', () => {
 
                     cy.get('li[role="menuitem"]').contains('Schedule').click();
 
-                    ServiceJobPage.selectTechnicianWithIndex(1);
+                    ServiceJobPage.selectTechnicianWithIndex(2);
 
                     cy.contains('button', 'Save').should('not.be.disabled').click();
 

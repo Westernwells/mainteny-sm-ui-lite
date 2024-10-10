@@ -2760,5 +2760,7 @@
   "Special leave": "Sonderurlaub",
   "Forgot Password": "Passwort vergessen",
   "We'll send a password reset code to the below email address": "Wir senden Ihnen einen Code zum Zurücksetzen des Passworts an die unten angegebene E-Mail-Adresse",
-  "The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!": "Die All-in-one Lösung von Mainteny fürs Büro. Alles an einem Ort: Kunden, Anlagen, Aufträge, Angebote, Rechnungen und vieles mehr. Von überall erreichbar, kein Papierkram und mehr Freizeit."
+  "The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!": "Die All-in-one Lösung von Mainteny fürs Büro. Alles an einem Ort: Kunden, Anlagen, Aufträge, Angebote, Rechnungen und vieles mehr. Von überall erreichbar, kein Papierkram und mehr Freizeit.",
+  "Filters": "Filter",
+  "Show Results": "Zeige Resultate"
 }
