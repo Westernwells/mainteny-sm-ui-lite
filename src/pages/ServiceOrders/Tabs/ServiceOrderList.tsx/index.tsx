@@ -210,6 +210,8 @@ export const ServiceOrderList = ({menu}: Props) => {
   const watchOrderTypes = watch('orderTypes');
   const watchPaymentStatus = watch('paymentStatus');
   const watchHasComment = watch('hasComment');
+  const watchGrossMin = watch('grossAmountMin');
+  const watchGrossMax = watch('grossAmountMax');
 
   const {
     data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(10),
@@ -233,8 +235,10 @@ export const ServiceOrderList = ({menu}: Props) => {
       paymentStatus: selectedPaymentStatus,
       orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
       order: sortOrder || Order.DESC,
-      ...(grossAmountMin && {grossAmountFrom: grossAmountMin}),
-      ...(grossAmountMax && {grossAmountTo: grossAmountMax}),
+      ...(grossAmountMin &&
+        grossAmountMin > 0 && {grossAmountFrom: grossAmountMin}),
+      ...(grossAmountMax &&
+        grossAmountMax > 0 && {grossAmountTo: grossAmountMax}),
       ...(isWithNote === 'true' && {hasComments: true}),
       ...(selectedCustomer && {propertyOwnerId: selectedCustomer}),
     },
@@ -314,7 +318,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     setHoverNoteServiceId(undefined);
   };
 
-  const handleFilterAppy: SubmitHandler<ServiceOrderFilterForm> = (data) => {
+  const handleFilterApply: SubmitHandler<ServiceOrderFilterForm> = (data) => {
     setSelectedCustomer(data.customer);
     setSelectedOrderNumber(data.orderNumber);
     setSelectedOrderTypes(data.orderTypes);
@@ -326,9 +330,11 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const getAppliedFilter = useMemo(
     () =>
-      [selectedCustomer, grossAmountMin, grossAmountMax, isWithNote].filter(
+      [selectedCustomer, selectedOrderNumber, isWithNote].filter(
         (field) => !!field,
       ).length +
+      [grossAmountMin, grossAmountMax].filter((field) => !!field && field > 0)
+        .length +
       [selectedPaymentStatus, selectedOrderTypes].filter(
         (field) => field.length > 0,
       ).length,
@@ -385,9 +391,9 @@ export const ServiceOrderList = ({menu}: Props) => {
         ),
       },
       {
-        headerName: 'Unit #',
+        headerName: 'Unit Number',
         key: 'service-order-cell-number-of-units',
-        width: '108px',
+        width: '124px',
         fieldName: ServiceOrderOrderField.ELEVATOR_EXTERNAL_ID,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
@@ -493,7 +499,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         },
       },
       {
-        headerName: 'Notes',
+        headerName: 'NOTES',
         cellKey: 'service-order-cell-notes',
         width: '48px',
         align: 'center',
@@ -659,7 +665,7 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const handleFilterReset = () => {
     setValue('customer', undefined);
-    setValue('orderNumber', undefined);
+    setValue('orderNumber', '');
     setValue('orderTypes', []);
     setValue('paymentStatus', []);
     setValue('grossAmountMin', undefined);
@@ -703,7 +709,7 @@ export const ServiceOrderList = ({menu}: Props) => {
           <Filters
             activeFilters={getAppliedFilter}
             onOpen={handleFilterOpen}
-            onSave={handleSubmit(handleFilterAppy)}
+            onSave={handleSubmit(handleFilterApply)}
             onReset={handleFilterReset}>
             <Box sx={{display: 'flex', flexDirection: 'column'}} gap={2}>
               <CustomerInput
@@ -712,11 +718,17 @@ export const ServiceOrderList = ({menu}: Props) => {
                 onChange={handleCustomerSelect}
               />
 
-              <TextInput
-                value={getValues('orderNumber')}
-                onChange={handleOrderNumberChange}
-                labelKey="Order number"
-                placeholder="Select order number"
+              <Controller
+                control={control}
+                name="orderNumber"
+                render={({field}) => (
+                  <TextInput
+                    {...field}
+                    labelKey="Order number"
+                    placeholder="Select order number"
+                    onChange={handleOrderNumberChange}
+                  />
+                )}
               />
 
               <ChipSelector
@@ -740,11 +752,16 @@ export const ServiceOrderList = ({menu}: Props) => {
                   <Controller
                     control={control}
                     name="grossAmountMin"
-                    render={({field: {value}}) => (
+                    render={() => (
                       <TextInput
-                        value={value ? `${value}` : ''}
+                        value={watchGrossMin ? `${watchGrossMin}` : ''}
+                        placeholder="Min"
+                        styles={{
+                          '& .MuiInputBase-input': {
+                            textAlign: 'end',
+                          },
+                        }}
                         onChange={handleGrossAmountMinChange}
-                        endPlaceholder="Min"
                       />
                     )}
                   />
@@ -752,11 +769,16 @@ export const ServiceOrderList = ({menu}: Props) => {
                   <Controller
                     control={control}
                     name="grossAmountMax"
-                    render={({field: {value}}) => (
+                    render={() => (
                       <TextInput
-                        value={value ? `${value}` : ''}
+                        value={watchGrossMax ? `${watchGrossMax}` : ''}
+                        placeholder="Max"
+                        styles={{
+                          '& .MuiInputBase-input': {
+                            textAlign: 'end',
+                          },
+                        }}
                         onChange={handleGrossAmountMaxChange}
-                        endPlaceholder="Max"
                       />
                     )}
                   />
