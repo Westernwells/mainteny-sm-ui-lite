@@ -12,7 +12,7 @@ const TableRow = ({children, testId, ...props}: PropsWithChildren<Props>) => (
     sx={{
       display: 'flex',
       alignItems: 'center',
-      minHeight: '44px',
+      height: '44px',
       cursor: 'pointer',
       '&:hover': {
         bgcolor: '#F7F9FC',
