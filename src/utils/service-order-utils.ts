@@ -4,6 +4,7 @@ import {amber, grey} from '@mui/material/colors';
 import {EmployeesSimpleView} from 'models/employee';
 import {StatusColor} from 'models/status';
 import {
+  AUTO_GENERATED_TO_PAYMENT_STATUS,
   SearchParameters,
   SERVICE_ORDER_PAYMENT_STATUS_VIEW,
   ServiceOrderArticleView,
@@ -209,17 +210,19 @@ export const serviceOrderPaymentStatusToString = (
     | ServiceOrderPaymentWithIndicationStatus
     | string,
 ) => {
-  switch (type) {
+  const value =
+    AUTO_GENERATED_TO_PAYMENT_STATUS.get(
+      type as ServiceOrderPaymentWithIndicationStatus,
+    ) ?? type;
+
+  switch (value) {
     case ServiceOrderPaymentStatus.NO_INVOICE:
       return SERVICE_ORDER_PAYMENT_STATUS_VIEW.NO_INVOICE;
-    case ServiceOrderPaymentStatus.NOT_PAID ||
-      ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID:
+    case ServiceOrderPaymentStatus.NOT_PAID:
       return SERVICE_ORDER_PAYMENT_STATUS_VIEW.NOT_PAID;
-    case ServiceOrderPaymentStatus.PARTIALLY_PAID ||
-      ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID:
+    case ServiceOrderPaymentStatus.PARTIALLY_PAID:
       return SERVICE_ORDER_PAYMENT_STATUS_VIEW.PARTIALLY_PAID;
-    case ServiceOrderPaymentStatus.OVERDUE ||
-      ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE:
+    case ServiceOrderPaymentStatus.OVERDUE:
       return SERVICE_ORDER_PAYMENT_STATUS_VIEW.OVERDUE;
     case ServiceOrderPaymentStatus.DONE:
       return SERVICE_ORDER_PAYMENT_STATUS_VIEW.DONE;

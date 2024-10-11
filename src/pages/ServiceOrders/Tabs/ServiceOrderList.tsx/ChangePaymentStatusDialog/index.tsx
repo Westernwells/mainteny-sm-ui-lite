@@ -17,6 +17,8 @@ import {ServiceOrderPaymentStatus} from 'models/service-order';
 import Alert from 'components/Alert';
 import useTheme from '@mui/material/styles/useTheme';
 import {useUpdateServiceOrderSchedule} from 'hooks/reactQuery/useServiceOrder';
+import {useQueryClient} from 'react-query';
+import {queryKeys} from 'reactQuery/constants';
 
 type Props = {
   open: boolean;
@@ -27,8 +29,14 @@ type Props = {
 const ChangePaymentStatusDialog = ({open, id, onClose}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+  const queryClient = useQueryClient();
 
-  const {mutate: scheduleServiceOrder} = useUpdateServiceOrderSchedule();
+  const {mutate: scheduleServiceOrder} = useUpdateServiceOrderSchedule(
+    undefined,
+    () => {
+      queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+    },
+  );
 
   const [selectedStatus, setSelectedStatus] =
     useState<ServiceOrderPaymentStatus>();
@@ -37,7 +45,7 @@ const ChangePaymentStatusDialog = ({open, id, onClose}: Props) => {
     setSelectedStatus(e.target.value as ServiceOrderPaymentStatus);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     scheduleServiceOrder({
       body: {paymentStatus: selectedStatus},
       serviceOrderId: id,
