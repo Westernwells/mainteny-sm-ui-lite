@@ -18,7 +18,6 @@ import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
-import {ServiceOrderPaymentStatusView} from '../utils/service-order-utils';
 import {Discount} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
@@ -62,20 +61,44 @@ export enum ServiceOrderStatus {
 }
 
 export enum ServiceOrderPaymentStatus {
+  NO_INVOICE = 'NO_INVOICE',
   NOT_PAID = 'NOT_PAID',
   PARTIALLY_PAID = 'PARTIALLY_PAID',
-  PAID = 'PAID',
-  AUTO_GENERATED = 'AUTO_GENERATED',
-  NOT_SENT = 'NOT_SENT',
-  NONE = 'NONE',
+  OVERDUE = 'OVERDUE',
+  DONE = 'DONE',
+}
+
+export enum SERVICE_ORDER_PAYMENT_STATUS_VIEW {
+  NO_INVOICE = 'No Invoice',
+  NOT_PAID = 'Invoice sent',
+  PARTIALLY_PAID = 'Partially Paid',
+  OVERDUE = 'Overdue',
+  DONE = 'Done ',
 }
 
 export enum ServiceOrderPaymentWithIndicationStatus {
-  AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND = 'AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND',
   AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID = 'AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID',
   AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID = 'AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID',
-  AUTO_GENERATED_ADDITIONAL_INVOICE_PAID = 'AUTO_GENERATED_ADDITIONAL_INVOICE_PAID',
+  AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE = 'AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE',
 }
+
+export const PAYMENT_STATUS_TO_AUTO_GENERATED = new Map<
+  ServiceOrderPaymentStatus,
+  ServiceOrderPaymentWithIndicationStatus
+>([
+  [
+    ServiceOrderPaymentStatus.NOT_PAID,
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID,
+  ],
+  [
+    ServiceOrderPaymentStatus.PARTIALLY_PAID,
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID,
+  ],
+  [
+    ServiceOrderPaymentStatus.OVERDUE,
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE,
+  ],
+]);
 
 export enum ServiceOrderType {
   REGULAR = 'REGULAR',
@@ -198,7 +221,9 @@ export interface ServiceOrderAdditionalInfo {
   confirmationInfo?: ServiceOrderConfirmationInfo;
   purchaseOrderNumber?: string;
   callerInfo?: CallerInfo;
-  paymentStatus?: ServiceOrderPaymentStatus;
+  paymentStatus?:
+    | ServiceOrderPaymentStatus
+    | ServiceOrderPaymentWithIndicationStatus;
   workTimeInfo?: {
     timeSlots: ServiceOrderTimeSlot[];
     percentageSurcharge?: number;
@@ -522,6 +547,7 @@ export interface UpdateServiceOrderScheduleBody {
   dueDate?: string;
   purchaseOrderNumber?: string;
   callerInfo?: Partial<CallerInfo>;
+  paymentStatus?: ServiceOrderPaymentStatus;
 }
 
 export interface AssignmentBasedOrderBody {
@@ -616,25 +642,6 @@ export interface AppointmentConfirmationRequiredOrdersQueryParams {
   serviceCompanyId?: string;
 }
 
-export const mapServiceOrderPaymentStatus = (
-  invoiceStatus: ServiceOrderPaymentStatusView,
-) => {
-  switch (invoiceStatus) {
-    case ServiceOrderPaymentStatusView.PAID:
-      return ServiceOrderPaymentStatus.PAID;
-    case ServiceOrderPaymentStatusView.NOT_PAID:
-      return ServiceOrderPaymentStatus.NOT_PAID;
-    case ServiceOrderPaymentStatusView.PARTIALLY_PAID:
-      return ServiceOrderPaymentStatus.PARTIALLY_PAID;
-    case ServiceOrderPaymentStatusView.AUTO_GENERATED:
-      return ServiceOrderPaymentStatus.AUTO_GENERATED;
-    case ServiceOrderPaymentStatusView.NONE:
-      return ServiceOrderPaymentStatus.NONE;
-    default:
-      return ServiceOrderPaymentStatus.NONE;
-  }
-};
-
 export interface SendServiceOrderReportRecord {
   technicianId: string;
   pdfPath: string;
@@ -662,7 +669,9 @@ export type ServiceOrderTableRow = {
   technicians: EmployeesSimpleView[];
   propertyOwner: PropertyOwnerView;
   jobStatus: ServiceOrderStatus;
-  paymentStatus: ServiceOrderPaymentStatus;
+  paymentStatus:
+    | ServiceOrderPaymentStatus
+    | ServiceOrderPaymentWithIndicationStatus;
   hasNotes: boolean;
 };
 

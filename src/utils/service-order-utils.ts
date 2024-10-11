@@ -2,8 +2,10 @@ import {addMinutes, differenceInMinutes} from 'date-fns';
 import _ from 'lodash';
 import {amber, grey} from '@mui/material/colors';
 import {EmployeesSimpleView} from 'models/employee';
+import {StatusColor} from 'models/status';
 import {
   SearchParameters,
+  SERVICE_ORDER_PAYMENT_STATUS_VIEW,
   ServiceOrderArticleView,
   ServiceOrderPaymentStatus,
   ServiceOrderPaymentWithIndicationStatus,
@@ -101,14 +103,6 @@ export const serviceOrderStatusToEnum = (status: string) => {
       return ServiceOrderStatus.INIT;
   }
 };
-
-export enum ServiceOrderPaymentStatusView {
-  PAID = 'Paid',
-  NOT_PAID = 'Not Paid',
-  AUTO_GENERATED = 'Auto Generated',
-  PARTIALLY_PAID = 'Partially Paid',
-  NONE = 'None',
-}
 
 export const getServiceOrderStatusList = () => {
   let mappedOptions: string[] = [];
@@ -216,43 +210,21 @@ export const serviceOrderPaymentStatusToString = (
     | string,
 ) => {
   switch (type) {
-    case ServiceOrderPaymentStatus.NOT_PAID:
-      return 'Not Paid';
-    case ServiceOrderPaymentStatus.PAID:
-      return 'Paid';
-    case ServiceOrderPaymentStatus.PARTIALLY_PAID:
-      return 'Partially Paid';
-    case ServiceOrderPaymentStatus.AUTO_GENERATED:
-    case ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND:
-    case ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID:
-    case ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID:
-    case ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PAID:
-      return 'Auto Generated';
-    case ServiceOrderPaymentStatus.NOT_SENT:
-      return 'Not Sent';
-    case ServiceOrderPaymentStatus.NONE:
-      return 'No Invoice';
+    case ServiceOrderPaymentStatus.NO_INVOICE:
+      return SERVICE_ORDER_PAYMENT_STATUS_VIEW.NO_INVOICE;
+    case ServiceOrderPaymentStatus.NOT_PAID ||
+      ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID:
+      return SERVICE_ORDER_PAYMENT_STATUS_VIEW.NOT_PAID;
+    case ServiceOrderPaymentStatus.PARTIALLY_PAID ||
+      ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID:
+      return SERVICE_ORDER_PAYMENT_STATUS_VIEW.PARTIALLY_PAID;
+    case ServiceOrderPaymentStatus.OVERDUE ||
+      ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE:
+      return SERVICE_ORDER_PAYMENT_STATUS_VIEW.OVERDUE;
+    case ServiceOrderPaymentStatus.DONE:
+      return SERVICE_ORDER_PAYMENT_STATUS_VIEW.DONE;
     default:
       return '-';
-  }
-};
-
-export const serviceOrderPaymentStatusToEnum = (type: string) => {
-  switch (type) {
-    case 'Paid':
-      return ServiceOrderPaymentStatus.PAID;
-    case 'Not Paid':
-      return ServiceOrderPaymentStatus.NOT_PAID;
-    case 'Auto Generated':
-      return ServiceOrderPaymentStatus.AUTO_GENERATED;
-    case 'Partially Paid':
-      return ServiceOrderPaymentStatus.PARTIALLY_PAID;
-    case 'Not Sent':
-      return ServiceOrderPaymentStatus.NOT_SENT;
-    case '-':
-      return ServiceOrderPaymentStatus.NONE;
-    default:
-      return ServiceOrderPaymentStatus.NONE;
   }
 };
 
@@ -415,11 +387,48 @@ export const aggregateServiceOrderRow = (
     propertyOwner: order.elevator.propertyOwner,
     jobStatus: order.status,
     paymentStatus:
-      order.additionalInfo.paymentStatus ?? ServiceOrderPaymentStatus.NONE,
+      order.additionalInfo.paymentStatus ??
+      ServiceOrderPaymentStatus.NO_INVOICE,
     hasNotes: Boolean(order.additionalInfo.commentCount),
   }));
 
 export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
   const elements = [search && search, orderNumber && `[number:${orderNumber}]`];
   return elements.length ? elements.join(' ') : '';
+};
+
+export const getServiceOrderPaymentStatusStyles = (
+  status: ServiceOrderPaymentStatus | ServiceOrderPaymentWithIndicationStatus,
+): {
+  label: string;
+  color: StatusColor;
+} => {
+  switch (status) {
+    case ServiceOrderPaymentStatus.DONE:
+      return {label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.DONE, color: 'success'};
+
+    case ServiceOrderPaymentStatus.OVERDUE:
+      return {
+        label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.NOT_PAID,
+        color: 'warning',
+      };
+
+    case ServiceOrderPaymentStatus.PARTIALLY_PAID:
+      return {
+        label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.PARTIALLY_PAID,
+        color: 'warning.light',
+      };
+
+    case ServiceOrderPaymentStatus.NOT_PAID:
+      return {label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.NOT_PAID, color: 'info'};
+
+    case ServiceOrderPaymentStatus.NO_INVOICE:
+      return {
+        label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.NO_INVOICE,
+        color: 'info.light',
+      };
+
+    default:
+      return {label: '-', color: 'info.light'};
+  }
 };

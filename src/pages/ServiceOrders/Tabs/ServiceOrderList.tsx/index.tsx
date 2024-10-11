@@ -42,7 +42,7 @@ import TableContainer from 'components/Table/TableContainer';
 import TableHeader from 'components/Table/TableHeader';
 import TableRow from 'components/Table/TableRow';
 import Pagination from 'components/Pagination';
-import {TableColumnWithRender} from 'models/table';
+import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
 import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {
@@ -74,6 +74,7 @@ import TextInput from 'components/TextInput';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
+import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
   {value: ServiceOrderStatus.ALL, labelKey: 'All'},
@@ -101,7 +102,13 @@ const TYPE_OPTIONS: OptionWithTranslationKey[] = [
   {value: ServiceOrderType.OPERATION, labelKey: 'Elevator Operation'},
 ];
 
-const PAYMENT_STATUS_OPTIONS: OptionWithTranslationKey[] = [
+export const PAYMENT_STATUS_OPTIONS: OptionWithTranslationKey[] = [
+  {
+    value: ServiceOrderPaymentStatus.NO_INVOICE,
+    labelKey: serviceOrderPaymentStatusToString(
+      ServiceOrderPaymentStatus.NO_INVOICE,
+    ),
+  },
   {
     value: ServiceOrderPaymentStatus.NOT_PAID,
     labelKey: serviceOrderPaymentStatusToString(
@@ -115,20 +122,14 @@ const PAYMENT_STATUS_OPTIONS: OptionWithTranslationKey[] = [
     ),
   },
   {
-    value: ServiceOrderPaymentStatus.PAID,
-    labelKey: serviceOrderPaymentStatusToString(ServiceOrderPaymentStatus.PAID),
-  },
-  {
-    value: ServiceOrderPaymentStatus.AUTO_GENERATED,
+    value: ServiceOrderPaymentStatus.OVERDUE,
     labelKey: serviceOrderPaymentStatusToString(
-      ServiceOrderPaymentStatus.AUTO_GENERATED,
+      ServiceOrderPaymentStatus.OVERDUE,
     ),
   },
   {
-    value: ServiceOrderPaymentStatus.NOT_SENT,
-    labelKey: serviceOrderPaymentStatusToString(
-      ServiceOrderPaymentStatus.NOT_SENT,
-    ),
+    value: ServiceOrderPaymentStatus.DONE,
+    labelKey: serviceOrderPaymentStatusToString(ServiceOrderPaymentStatus.DONE),
   },
 ];
 
@@ -465,11 +466,11 @@ export const ServiceOrderList = ({menu}: Props) => {
         width: '132px',
         fieldName: ServiceOrderOrderField.PAYMENT_STATUS,
         renderCell: (serviceOrder, cellProps) => {
-          const showIndicator =
-            (serviceOrder.paymentStatus as unknown as
-              | ServiceOrderPaymentStatus
-              | ServiceOrderPaymentWithIndicationStatus) ===
-            ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND;
+          const showIndicator = Object.values(
+            ServiceOrderPaymentWithIndicationStatus,
+          ).includes(
+            serviceOrder.paymentStatus as unknown as ServiceOrderPaymentWithIndicationStatus,
+          );
 
           return (
             <Cell {...cellProps}>
@@ -503,7 +504,6 @@ export const ServiceOrderList = ({menu}: Props) => {
         cellKey: 'service-order-cell-notes',
         width: '48px',
         align: 'center',
-        isLast: true,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps} fieldName="NOTES" noWidthLimit>
             <TableCellText>
@@ -545,6 +545,18 @@ export const ServiceOrderList = ({menu}: Props) => {
                 <NoteAltOutlined fontSize="small" />
               )}
             </TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'action',
+        isHeaderNameHidden: true,
+        align: 'center',
+        width: ACTION_CELL_WIDTH, // set static width that will not change
+        isLast: true,
+        renderCell: (serviceOrder, cellProps) => (
+          <Cell isLast {...cellProps} onClick={undefined}>
+            <Actions id={serviceOrder.id} />
           </Cell>
         ),
       },
