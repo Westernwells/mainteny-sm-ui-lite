@@ -474,7 +474,9 @@ export const ServiceOrderList = ({menu}: Props) => {
 
           return (
             <Cell {...cellProps}>
-              <Box sx={{display: 'flex', alignItems: 'center'}} gap={0.5}>
+              <Box
+                sx={{display: 'flex', alignItems: 'center', width: '100%'}}
+                gap={0.5}>
                 {showIndicator && (
                   <Tooltip
                     title={t(
