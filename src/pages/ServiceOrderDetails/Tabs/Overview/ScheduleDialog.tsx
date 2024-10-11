@@ -210,7 +210,7 @@ export const ScheduleDialog = ({
 
   // temporary solution until making Yup resolver work with react-hook-form
   const formNotValidCustomValidation = useMemo(() => {
-    if (!watchDueDate || !watchTechnicianIdsField?.length) return true;
+    if (!watchDueDate) return true;
     return (
       watchSwitchActive &&
       (!watchStartTime || !watchEndTime || !watchStartDate || !watchEndDate)
@@ -221,7 +221,6 @@ export const ScheduleDialog = ({
     watchStartDate,
     watchEndDate,
     watchDueDate,
-    watchTechnicianIdsField,
     watchSwitchActive,
   ]);
 
