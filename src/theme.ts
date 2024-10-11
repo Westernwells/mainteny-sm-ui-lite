@@ -68,6 +68,8 @@ export const theme = createTheme({
       dark: '#C77700',
       contrastText: '#FFFFFF',
       outlinedHoverBg: 'rgba(237, 108, 2, 0.08)',
+      infoAlert:
+        'linear-gradient(0deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), #ED6C02',
     },
     success: {
       light: '#61FFC0',

@@ -11,9 +11,11 @@ import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {getServiceOrderPaymentStatusStyles} from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ServiceOrderDataGridProps';
 import {StatusChip} from 'components/StatusChip';
-import {ServiceOrderPaymentStatus} from 'models/service-order';
+import {
+  ServiceOrderPaymentStatus,
+  ServiceOrderPaymentWithIndicationStatus,
+} from 'models/service-order';
 import {InvoiceStatus, InvoiceType} from 'models/invoice';
 import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
@@ -21,12 +23,15 @@ import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {ServiceCompanyNumberType} from 'models/service-company';
+import {getServiceOrderPaymentStatusStyles} from 'utils/service-order-utils';
 import CreateNewInvoiceModal from './CreateNewInvoiceModal';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
 interface Props {
   serviceOrderId: string;
-  paymentStatus?: ServiceOrderPaymentStatus;
+  paymentStatus?:
+    | ServiceOrderPaymentStatus
+    | ServiceOrderPaymentWithIndicationStatus;
 }
 
 export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
