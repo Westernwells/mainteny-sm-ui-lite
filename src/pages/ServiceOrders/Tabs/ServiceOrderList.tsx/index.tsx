@@ -356,7 +356,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         headerName: 'Number',
         key: 'service-order-cell-number',
         fieldName: ServiceOrderOrderField.EXTERNAL_ID,
-        width: '156px',
+        width: '124px',
         isFirst: true, // remove when checkbox are present with bulk action
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
@@ -367,7 +367,7 @@ export const ServiceOrderList = ({menu}: Props) => {
       {
         headerName: 'Job Type',
         key: 'service-order-cell-job-type',
-        width: '188px',
+        width: '156px',
         fieldName: ServiceOrderOrderField.JOB_TYPE,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
@@ -375,9 +375,9 @@ export const ServiceOrderList = ({menu}: Props) => {
               serviceOrderType={serviceOrder.type}
               size="small"
             />
-            <Typography variant="body2" sx={{paddingLeft: '0.4em'}}>
+            <TableCellText tableCellTextStyles={{paddingLeft: '0.4em'}}>
               {t(serviceOrderTypeToString(serviceOrder.type))}
-            </Typography>
+            </TableCellText>
           </Cell>
         ),
       },
@@ -474,27 +474,31 @@ export const ServiceOrderList = ({menu}: Props) => {
 
           return (
             <Cell {...cellProps}>
-              {showIndicator ? (
-                <Tooltip
-                  title={t(
-                    `This job contains articles that haven’t been invoiced yet. Check the job details for more information.`,
-                  )}
-                  placement="top"
-                  arrow>
-                  <WarningAmberIcon
-                    sx={{mr: '0.2em', color: theme.palette.text.secondary}}
-                  />
-                </Tooltip>
-              ) : null}
-              <TableCellText
-                tableCellTextStyles={{
-                  letterSpacing: '-0.15px',
-                  lineHeight: '140%',
-                }}>
-                {t(
-                  serviceOrderPaymentStatusToString(serviceOrder.paymentStatus),
+              <Box sx={{display: 'flex', alignItems: 'center'}} gap={0.5}>
+                {showIndicator && (
+                  <Tooltip
+                    title={t(
+                      `This job contains articles that haven’t been invoiced yet. Check the job details for more information.`,
+                    )}
+                    placement="top"
+                    arrow>
+                    <WarningAmberIcon
+                      sx={{color: theme.palette.text.secondary}}
+                    />
+                  </Tooltip>
                 )}
-              </TableCellText>
+                <TableCellText
+                  tableCellTextStyles={{
+                    letterSpacing: '-0.15px',
+                    lineHeight: '140%',
+                  }}>
+                  {t(
+                    serviceOrderPaymentStatusToString(
+                      serviceOrder.paymentStatus,
+                    ),
+                  )}
+                </TableCellText>
+              </Box>
             </Cell>
           );
         },

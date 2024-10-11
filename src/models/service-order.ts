@@ -100,6 +100,24 @@ export const PAYMENT_STATUS_TO_AUTO_GENERATED = new Map<
   ],
 ]);
 
+export const AUTO_GENERATED_TO_PAYMENT_STATUS = new Map<
+  ServiceOrderPaymentWithIndicationStatus,
+  ServiceOrderPaymentStatus
+>([
+  [
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID,
+    ServiceOrderPaymentStatus.NOT_PAID,
+  ],
+  [
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID,
+    ServiceOrderPaymentStatus.PARTIALLY_PAID,
+  ],
+  [
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE,
+    ServiceOrderPaymentStatus.OVERDUE,
+  ],
+]);
+
 export enum ServiceOrderType {
   REGULAR = 'REGULAR',
   EMERGENCY = 'EMERGENCY',

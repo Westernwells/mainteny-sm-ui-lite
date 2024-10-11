@@ -594,8 +594,10 @@ const updateServiceOrderSchedule = async (
   });
 };
 
-export const useUpdateServiceOrderSchedule = (successMsg?: string) => {
-  const queryClient = useQueryClient();
+export const useUpdateServiceOrderSchedule = (
+  successMsg?: string,
+  onSuccess?: () => void,
+) => {
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
@@ -611,8 +613,7 @@ export const useUpdateServiceOrderSchedule = (successMsg?: string) => {
           enqueueSnackbar(successMsg, {
             variant: 'success',
           });
-        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-        queryClient.invalidateQueries([queryKeys.queryDueServiceOrders]);
+        onSuccess?.();
       },
       onError: (err) => {
         showError(err);

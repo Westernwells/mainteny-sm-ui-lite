@@ -29,6 +29,8 @@ import {
   toRestDateTime,
 } from 'utils/datetime';
 import {useForm} from 'react-hook-form';
+import {queryKeys} from 'reactQuery/constants';
+import {useQueryClient} from 'react-query';
 import {DatePicker} from '../../../../components/DatePicker';
 import {FormInput} from '../../../../components/form/FormInput';
 import {ScheduleForm} from '../../models';
@@ -72,8 +74,13 @@ export const ScheduleDialog = ({
   onSaveCB,
 }: Props) => {
   const [query, setQuery] = useState<string>('');
+  const queryClient = useQueryClient();
   const {mutate: scheduleServiceOrder} = useUpdateServiceOrderSchedule(
     t('Service job scheduled successfully'),
+    () => {
+      queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+      queryClient.invalidateQueries([queryKeys.queryDueServiceOrders]);
+    },
   );
 
   const defaultValues = useMemo(
