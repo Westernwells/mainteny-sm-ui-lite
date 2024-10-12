@@ -1,8 +1,10 @@
-import {StringValue} from 'models/misc';
+import {RestError, StringValue} from 'models/misc';
 import {RebuildFormModel} from 'pages/SystemSettings/models';
-import {useMutation} from 'react-query';
-import {axiosClient} from 'utils/axios-utils';
+import {useMutation, useQuery} from 'react-query';
+import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
+import {queryKeys} from 'reactQuery/constants';
+import {SystemSettingRecord} from 'models/system';
 
 const rebuildIndex = async (data: RebuildFormModel): Promise<StringValue> => {
   const response = await axiosClient.post<StringValue>(
@@ -49,3 +51,18 @@ export const useCreateIndex = (successMsg: string) => {
     },
   });
 };
+
+export const fetchSystemSettings = async () => {
+  const response = await axiosClient.get<SystemSettingRecord>(
+    `/api/system/settings`,
+    {
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useFetchSystemSettings = () =>
+  useQuery<SystemSettingRecord, RestError>([queryKeys.fetchLatestVersion], () =>
+    fetchSystemSettings(),
+  );
