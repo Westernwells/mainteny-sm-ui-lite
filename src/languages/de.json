@@ -2763,6 +2763,7 @@
   "The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!": "Die All-in-one Lösung von Mainteny fürs Büro. Alles an einem Ort: Kunden, Anlagen, Aufträge, Angebote, Rechnungen und vieles mehr. Von überall erreichbar, kein Papierkram und mehr Freizeit.",
   "Filters": "Filter",
   "Show Results": "Zeige Resultate",
+  "If you manually update the Job Payment Status, the system will no longer make automatic changes. From this point forward, the status will be controlled by you.": "Wenn Sie den Zahlungsstatus eines Auftrags manuell aktualisieren, nimmt das System keine automatischen Änderungen mehr vor. Ab diesem Zeitpunkt wird der Status von Ihnen gesteuert.",
   "Done": "Erledigt",
   "Change payment status": "Bezahlstatus ändern",
   "Job Payment Status": "Auftrags Bezahlstatus",
