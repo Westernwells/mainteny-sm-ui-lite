@@ -2790,5 +2790,14 @@
   "Enter name": "Ingrese el nombre",
   "Event type created successfully": "Tipo de evento creado exitosamente",
   "Work travel": "Viaje de trabajo",
-  "Special leave": "Permiso especial"
+  "Special leave": "Permiso especial",
+  "Forgot Password": "Olvidé mi contraseña",
+  "We'll send a password reset code to the below email address": "Le enviaremos un código de restablecimiento de contraseña a la siguiente dirección de correo electrónico",
+  "The unified Application made for Service Managers with smart job assignments, real-time overview of Units under Maintenance (UuM) and out-of-the-box ERP Integrations!": "La aplicación unificada hecha para los gestores de servicios con asignaciones de trabajo inteligentes, visión general en tiempo real de las unidades en mantenimiento (UuM) e integraciones de ERP listas para usar.",
+  "Filters": "Filtros",
+  "If you manually update the Job Payment Status, the system will no longer make automatic changes. From this point forward, the status will be controlled by you.": "Si actualiza manualmente el Estado de Pago del Trabajo, el sistema dejará de realizar cambios automáticos. A partir de este momento, el estado será controlado por usted.",
+  "Done": "Hecho",
+  "Change payment status": "Cambiar el estado del pago",
+  "Job Payment Status": "Estado del pago del trabajo",
+  "Confirm Change": "Confirmar el cambio"
 }
