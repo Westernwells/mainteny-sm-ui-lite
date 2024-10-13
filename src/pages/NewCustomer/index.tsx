@@ -279,7 +279,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
     navigate(-1);
   };
 
-  const addNewEmployee = async () => {
+  const addNewPropertyOwner = async () => {
     const body: NewCustomerBody = {
       contact: {
         email: formikBasicInfo.values.email,
@@ -334,7 +334,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
   return (
     <Stepper
       handleCancel={handleCancel}
-      handleSubmit={addNewEmployee}
+      handleSubmit={addNewPropertyOwner}
       disableNextBtn={disableNextBtn}
       initialActiveStep={0}
       stepperStyles={{width: '80%'}}

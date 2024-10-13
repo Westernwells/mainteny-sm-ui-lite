@@ -16,6 +16,7 @@ type Props = {
   endDate: Date;
   duration: number;
   isLast: boolean;
+  eventSubtype: string;
   onEdit: () => void;
 };
 
@@ -27,6 +28,7 @@ const AbsenceTimeLine = ({
   duration,
   isLast,
   onEdit,
+  eventSubtype,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -66,7 +68,7 @@ const AbsenceTimeLine = ({
             <Typography
               variant="subtitle1"
               sx={{fontSize: '16px', mr: '0.625em'}}>
-              {t(convertToText(type))}
+              {eventSubtype || t(convertToText(type))}
             </Typography>
           </Grid>
           <Grid item sm={2} md={5} lg={4} sx={{justifyContent: 'left'}}>

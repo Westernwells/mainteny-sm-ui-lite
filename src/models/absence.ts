@@ -1,4 +1,4 @@
-import {EmployeesView} from './employee';
+import {EmployeeEventType, EmployeesView} from './employee';
 import {Meta} from './misc';
 
 export interface AbsenceItem {
@@ -7,7 +7,8 @@ export interface AbsenceItem {
   employee: EmployeesView;
   endTime: Date;
   startTime: Date;
-  eventType: string;
+  eventType: EmployeeEventType;
+  eventSubtype: string;
   notes: string;
   meta: Meta;
 }

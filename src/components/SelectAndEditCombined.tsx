@@ -82,7 +82,7 @@ export const SelectAndEditCombined = ({
         },
         ...(formik.values[addressType]?.component?.country && {
           countryCode: getCountryCode(
-            formik.values[addressType]?.component?.country,
+            formik.values[addressType]?.component?.country!,
           ),
         }),
         fullName: formatAddressFullname(

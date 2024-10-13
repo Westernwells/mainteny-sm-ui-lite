@@ -19,7 +19,7 @@ describe('Employees page - list page', () => {
         cy.wait('@technicianEventsAPI');
     });
 
-    it('employee availabilty status is showing correctly', () => {
+    it('employee availability status is showing correctly', () => {
         EmployeesPage.getAvailableEmployeeRowIndex().then((i) => {
             EmployeesPage.getEmployeeByIndex(i).click();
             cy.get('span[role="progressbar"]').should('not.exist');
@@ -27,7 +27,7 @@ describe('Employees page - list page', () => {
             EmployeesPage.addHoliday();
             EmployeesPage.verifyHoliday();
 
-            // check if employee is availablity is updated on employees listing page
+            // check if employee is availability is updated on employees listing page
             cy.go('back'); // go back to employees listing page
             cy.get('span[role="progressbar"]').should('not.exist');
             cy.wait('@employeesAPI');

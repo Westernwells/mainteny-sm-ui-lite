@@ -1,5 +1,6 @@
 import AppTopBarPage from '../pages/appTopBar.page';
 import ServiceJobPage from '../pages/serviceJob.page';
+import OrderPage from '../pages/orders.page';
 
 describe('Job', () => {
     beforeEach(() => {
@@ -15,6 +16,7 @@ describe('Job', () => {
         AppTopBarPage.selectLanguage('English');
 
         ServiceJobPage.visit();
+        ServiceJobPage.changeTab(1);
         cy.get('span[role="progressbar"]').should('not.exist');
     });
 
@@ -105,21 +107,13 @@ describe('Job', () => {
     });
 
     it('should assign Technician in orders details page', () => {
-        ServiceJobPage.changeTab(1);
+        ServiceJobPage.changeTab(0);
 
         cy.get('span[role="progressbar"]').should('not.exist');
 
-        cy.get('div[role="combobox"][aria-labelledby="Job Status"]').click({force: true});
-
-        cy.wait(1000);
-
         // Click the "Unscheduled" option (use the recorded selector for this action)
-        cy.get('.MuiMenuItem-root:nth-child(7) .MuiTypography-root').click({force: true});
-        
-        // Click on the backdrop to close the dropdown if necessary
-        cy.get('.MuiBackdrop-root').click({force: true});
-
-        cy.wait(5000);
+        OrderPage.changeStatusFilter('Overdue');
+        cy.wait(3000);
 
         cy.wait('@serviceOrdersApi')
             .its('response')
@@ -138,13 +132,13 @@ describe('Job', () => {
 
                     cy.get('li[role="menuitem"]').contains('Schedule').click();
 
-                    ServiceJobPage.selectTechnicianWithIndex(1)
+                    ServiceJobPage.selectTechnicianWithIndex(1);
 
                     cy.contains('button', 'Save').should('not.be.disabled').click();
 
                     cy.contains('Service job scheduled successfully');
                 } else {
-                    cy.contains('There are no entries for the applied filters.');
+                    cy.get('tbody').children().should('not.exist');
                     throw new Error('No Unscheduled jobs found');
                 }
             });

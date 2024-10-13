@@ -90,7 +90,10 @@ export default class InvoicesPage {
     if (options?.setExpiredDueDate) {
       cy.get('button:has(+button[aria-current="date"])').click();
     } else {
-      cy.get('button[aria-current="date"] + button').click();
+      cy.get('button[aria-current="date"]').invoke('attr', 'data-timestamp').then((timestamp) => {
+        const nextDayTimestamp = parseInt(timestamp, 10) + 86400000; 
+        cy.get(`button[data-timestamp="${nextDayTimestamp}"]`).click(); // Click the button for the next day
+      });
     }
 
     cy.contains('button', 'Confirm').click();

@@ -99,6 +99,7 @@ export interface AddressComponent {
   postalCode?: string;
   state?: string;
   country?: string;
+  moreInfo?: string;
 }
 
 export interface AddressRecord {
@@ -376,6 +377,7 @@ export interface HeaderFooterInfoData {
 }
 
 export type CreateEditMode = 'create' | 'edit';
+export type CreateEditViewMode = 'view' | 'edit' | 'create';
 
 export type EmailObject = {
   bccEmails: string[];

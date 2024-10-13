@@ -10,37 +10,33 @@ describe('Orders page - list page', () => {
         cy.intercept('GET', serviceOrderAPI).as('serviceOrderAPI');
         OrderPage.visit();
         cy.get('span[role="progressbar"]').should('not.exist');
-        cy.wait('@serviceOrderAPI');
     });
 
     it('filter orders by status', () => {
-        const statuses = ['Unscheduled', 'Scheduled', 'Completed'];
-        OrderPage.changeTab(1);
+        const status = 'Scheduled';
 
         cy.wait('@serviceOrderAPI');
-        OrderPage.changeStatusFilter(statuses);
+        OrderPage.changeStatusFilter(status);
 
         // Recursively wait for all job query api calls until the provided query parameter is matched
         OrderPage.waitForAllJobQueryApi(
             '@serviceOrderAPI',
             {
-                status: ['READY_TO_SCHEDULE', 'SCHEDULED', 'COMPLETED'],
+                status: ['SCHEDULED'],
             },
 
             () => {
                 cy.wait(100); // Very small delay for the DOM to be updated, can be anything any small amount
-                const commaSeparatedText = statuses.join(',');
+                cy.contains('div', status).should('exist');
 
-                cy.get('div[aria-labelledby="Job Status"]').should('have.text', commaSeparatedText);
-
-                cy.get(`div[aria-label="jobs-grid"]`)
-                    .find('div[role="row"]')
+                cy.get(`tbody`)
+                    .find('tr[role="row"]')
                     .each((rowElement, index) => {
-                        const statusText = rowElement.find("div[data-field='status'][role='cell']").text().trim();
+                        const statusText = rowElement.find("td[data-field='JOB_STATUS'][role='cell']").text().trim();
 
                         if (!statusText) return;
 
-                        if (!statuses.includes(statusText)) {
+                        if (!status.includes(statusText)) {
                             throw new Error(`Unexpected status at row ${index + 1}: ${statusText}`);
                         }
                     });
@@ -49,15 +45,14 @@ describe('Orders page - list page', () => {
     });
 
     it('filter jobs by type', () => {
-        OrderPage.changeTab(1);
         cy.wait('@serviceOrderAPI');
         const ELEVATOR_OPERATION = 'Elevator Operation';
-        OrderPage.changeTypeFilter([ELEVATOR_OPERATION]);
-        cy.get("span[role='progressbar']").should('exist');
+        OrderPage.openFilters();
+        OrderPage.changeTypeFilter(ELEVATOR_OPERATION);
+
         cy.wait('@serviceOrderAPI');
-        cy.get("span[role='progressbar']").should('not.exist');
         cy.wait(100); // Very small delay for the DOM to be updated, can be anything any small amount
-        cy.get('div[data-field="JOB_TYPE"][role="cell"]').each(($el) => {
+        cy.get('td[data-field="JOB_TYPE"][role="cell"]').each(($el) => {
             cy.wrap($el).scrollIntoView();
             cy.wrap($el).contains(ELEVATOR_OPERATION).should('be.visible');
         });

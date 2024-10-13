@@ -6,7 +6,6 @@ import {
 } from './elevator';
 import {ContractSimpleView} from './contract';
 import {
-  Address,
   Amount,
   EmailRecord,
   Fee,
@@ -14,19 +13,15 @@ import {
   Meta,
   PdfGenerationStatus,
 } from './misc';
-import {
-  Technician,
-  TechnicianAdditionalInfo,
-  TechnicianSimpleView,
-} from './technician';
+import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
-import {ServiceOrderPaymentStatusView} from '../utils/service-order-utils';
 import {Discount} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
+import {PropertyOwnerView} from 'models/propertyManager';
 
 export enum Priority {
   A = 'A',
@@ -66,20 +61,62 @@ export enum ServiceOrderStatus {
 }
 
 export enum ServiceOrderPaymentStatus {
+  NO_INVOICE = 'NO_INVOICE',
   NOT_PAID = 'NOT_PAID',
   PARTIALLY_PAID = 'PARTIALLY_PAID',
-  PAID = 'PAID',
-  AUTO_GENERATED = 'AUTO_GENERATED',
-  NOT_SENT = 'NOT_SENT',
-  NONE = 'NONE',
+  OVERDUE = 'OVERDUE',
+  DONE = 'DONE',
+}
+
+export enum SERVICE_ORDER_PAYMENT_STATUS_VIEW {
+  NO_INVOICE = 'No Invoice',
+  NOT_PAID = 'Invoice sent',
+  PARTIALLY_PAID = 'Partially Paid',
+  OVERDUE = 'Overdue',
+  DONE = 'Done ',
 }
 
 export enum ServiceOrderPaymentWithIndicationStatus {
-  AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND = 'AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_SEND',
   AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID = 'AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID',
   AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID = 'AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID',
-  AUTO_GENERATED_ADDITIONAL_INVOICE_PAID = 'AUTO_GENERATED_ADDITIONAL_INVOICE_PAID',
+  AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE = 'AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE',
 }
+
+export const PAYMENT_STATUS_TO_AUTO_GENERATED = new Map<
+  ServiceOrderPaymentStatus,
+  ServiceOrderPaymentWithIndicationStatus
+>([
+  [
+    ServiceOrderPaymentStatus.NOT_PAID,
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID,
+  ],
+  [
+    ServiceOrderPaymentStatus.PARTIALLY_PAID,
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID,
+  ],
+  [
+    ServiceOrderPaymentStatus.OVERDUE,
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE,
+  ],
+]);
+
+export const AUTO_GENERATED_TO_PAYMENT_STATUS = new Map<
+  ServiceOrderPaymentWithIndicationStatus,
+  ServiceOrderPaymentStatus
+>([
+  [
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_NOT_PAID,
+    ServiceOrderPaymentStatus.NOT_PAID,
+  ],
+  [
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_PARTIALLY_PAID,
+    ServiceOrderPaymentStatus.PARTIALLY_PAID,
+  ],
+  [
+    ServiceOrderPaymentWithIndicationStatus.AUTO_GENERATED_ADDITIONAL_INVOICE_OVERDUE,
+    ServiceOrderPaymentStatus.OVERDUE,
+  ],
+]);
 
 export enum ServiceOrderType {
   REGULAR = 'REGULAR',
@@ -202,7 +239,9 @@ export interface ServiceOrderAdditionalInfo {
   confirmationInfo?: ServiceOrderConfirmationInfo;
   purchaseOrderNumber?: string;
   callerInfo?: CallerInfo;
-  paymentStatus?: ServiceOrderPaymentStatus;
+  paymentStatus?:
+    | ServiceOrderPaymentStatus
+    | ServiceOrderPaymentWithIndicationStatus;
   workTimeInfo?: {
     timeSlots: ServiceOrderTimeSlot[];
     percentageSurcharge?: number;
@@ -217,29 +256,18 @@ export interface ServiceOrderAdditionalInfo {
     startTime: string;
     endTime: string;
   };
-  candidateTechnician?: ServiceOrderCandidateTechnician;
-  candidateTechnicians?: ServiceOrderCandidateTechnician[];
+  candidateTechnician?: EmployeesSimpleView;
+  candidateTechnicians?: EmployeesSimpleView[];
   documents?: FileResource[];
   pictures?: FileResource[];
   discount?: Discount;
+  commentCount?: number;
 }
 
 export interface ServiceOrderConfirmationInfo {
   sentDate: string;
   pdfGenerationStatus?: PdfGenerationStatus;
   pdfPath?: string;
-}
-
-export interface ServiceOrderCandidateTechnician {
-  additionalInfo: TechnicianAdditionalInfo;
-  address?: Address;
-  externalId: string;
-  id: string;
-  isOnline: boolean;
-  meta: Meta;
-  number: string;
-  tea: string;
-  userAccount: UserAccount;
 }
 
 export interface ServiceOrderView {
@@ -515,6 +543,9 @@ export interface ServiceOrderQueryParams {
   orderBy?: ServiceOrderOrderField;
   types?: ServiceOrderType[];
   paymentStatus?: ServiceOrderPaymentStatus[];
+  grossAmountFrom?: number;
+  grossAmountTo?: number;
+  hasComments?: boolean;
 }
 
 export interface ServiceOrderActivityView {
@@ -534,6 +565,7 @@ export interface UpdateServiceOrderScheduleBody {
   dueDate?: string;
   purchaseOrderNumber?: string;
   callerInfo?: Partial<CallerInfo>;
+  paymentStatus?: ServiceOrderPaymentStatus;
 }
 
 export interface AssignmentBasedOrderBody {
@@ -628,25 +660,6 @@ export interface AppointmentConfirmationRequiredOrdersQueryParams {
   serviceCompanyId?: string;
 }
 
-export const mapServiceOrderPaymentStatus = (
-  invoiceStatus: ServiceOrderPaymentStatusView,
-) => {
-  switch (invoiceStatus) {
-    case ServiceOrderPaymentStatusView.PAID:
-      return ServiceOrderPaymentStatus.PAID;
-    case ServiceOrderPaymentStatusView.NOT_PAID:
-      return ServiceOrderPaymentStatus.NOT_PAID;
-    case ServiceOrderPaymentStatusView.PARTIALLY_PAID:
-      return ServiceOrderPaymentStatus.PARTIALLY_PAID;
-    case ServiceOrderPaymentStatusView.AUTO_GENERATED:
-      return ServiceOrderPaymentStatus.AUTO_GENERATED;
-    case ServiceOrderPaymentStatusView.NONE:
-      return ServiceOrderPaymentStatus.NONE;
-    default:
-      return ServiceOrderPaymentStatus.NONE;
-  }
-};
-
 export interface SendServiceOrderReportRecord {
   technicianId: string;
   pdfPath: string;
@@ -663,3 +676,36 @@ export interface CreateServiceOrderComment {
   subject: string;
   id?: string;
 }
+
+export type ServiceOrderTableRow = {
+  id: string;
+  elevatorExternalId: string;
+  number: string;
+  type: ServiceOrderType;
+  address: string;
+  dueDate: string;
+  technicians: EmployeesSimpleView[];
+  propertyOwner: PropertyOwnerView;
+  jobStatus: ServiceOrderStatus;
+  paymentStatus:
+    | ServiceOrderPaymentStatus
+    | ServiceOrderPaymentWithIndicationStatus;
+  hasNotes: boolean;
+};
+
+// used to indicate fields for the search parameter of service order endpoint
+// example query [number:or00000926] [externalid:or00000926] [type:repair] [status:completed] [e:address:münchen_ost,_orleanspl._11,_81667_münchen,_deutschland_de] [e:status:running]
+export type SearchParameters = {
+  search?: string;
+  orderNumber?: string;
+};
+
+export type ServiceOrderFilterForm = {
+  customer?: string;
+  orderNumber?: string;
+  orderTypes: ServiceOrderType[];
+  paymentStatus: ServiceOrderPaymentStatus[];
+  grossAmountMin?: number;
+  grossAmountMax?: number;
+  hasComment?: boolean;
+};

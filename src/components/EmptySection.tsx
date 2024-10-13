@@ -16,6 +16,8 @@ import {ReactComponent as AttachmentLargeIcon} from 'assets/icons/AttachmentLarg
 import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
 import {ReactComponent as HeadphonesHumanIcon} from 'assets/icons/HeadphonesHumanIcon.svg';
 import {ReactComponent as ShipmentIcon} from 'assets/icons/ShipmentIcon.svg';
+import {ReactComponent as CalendarClockGrey} from 'assets/icons/CalendarClockGrey.svg';
+import {ReactComponent as CalendarClock} from 'assets/icons/CalendarClock.svg';
 import {Button} from './Button';
 
 interface Props extends BoxProps {
@@ -38,6 +40,8 @@ interface Props extends BoxProps {
     | 'file-attachment'
     | 'lift'
     | 'bankAccounts'
+    | 'calendarClock'
+    | 'calendarClockGrey'
     | 'contacts';
   showActionBtn?: boolean;
   btnLabel?: string;
@@ -108,6 +112,10 @@ export const EmptySection = ({
         return (
           <BankAccountsIllustration style={{width: '100%', height: '100%'}} />
         );
+      case 'calendarClockGrey':
+        return <CalendarClockGrey style={{width: '100%', height: '100%'}} />;
+      case 'calendarClock':
+        return <CalendarClock style={{width: '100%', height: '100%'}} />;
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }
