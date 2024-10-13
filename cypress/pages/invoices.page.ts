@@ -88,7 +88,10 @@ export default class InvoicesPage {
     cy.contains('label', 'Payment Due Date').click();
 
     if (options?.setExpiredDueDate) {
-      cy.get('button:has(+button[aria-current="date"])').click();
+      cy.get('button[aria-current="date"]').invoke('attr', 'data-timestamp').then((timestamp) => {
+        const previousDayTimestamp = parseInt(timestamp, 10) - 86400000; 
+        cy.get(`button[data-timestamp="${previousDayTimestamp}"]`).click(); // Click the button for the previous day
+    });
     } else {
       cy.get('button[aria-current="date"]').invoke('attr', 'data-timestamp').then((timestamp) => {
         const nextDayTimestamp = parseInt(timestamp, 10) + 86400000; 

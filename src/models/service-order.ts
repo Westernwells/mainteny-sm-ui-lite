@@ -73,7 +73,7 @@ export enum SERVICE_ORDER_PAYMENT_STATUS_VIEW {
   NOT_PAID = 'Invoice sent',
   PARTIALLY_PAID = 'Partially Paid',
   OVERDUE = 'Overdue',
-  DONE = 'Done ',
+  DONE = 'Done',
 }
 
 export enum ServiceOrderPaymentWithIndicationStatus {
