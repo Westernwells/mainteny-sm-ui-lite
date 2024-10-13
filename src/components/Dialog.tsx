@@ -15,7 +15,7 @@ interface Props {
   title: string | JSX.Element;
   children: ReactNode;
   onSave?: () => void;
-  onCancel: () => void;
+  onCancel: (forceClose?: boolean) => void;
   showSaveButton?: boolean;
   showCancelButton?: boolean;
   disableSaveBtn?: boolean;
@@ -38,6 +38,7 @@ interface Props {
   cancelButtonStyles?: SxProps<Theme>;
   dialogContentTextStyles?: SxProps<Theme>;
   dataTestId?: string;
+  renderRightFooterButton?: () => JSX.Element;
 }
 
 export const Dialog = ({
@@ -53,6 +54,7 @@ export const Dialog = ({
   saveButtonContainerProps,
   isSaving = false,
   leftButton,
+  renderRightFooterButton,
   saveButtonText = 'Save',
   cancelButtonText = 'Cancel',
   cancelButtonTextColor = 'text.secondary',
@@ -78,7 +80,7 @@ export const Dialog = ({
         margin: 'auto 0',
         ...sx,
       }}
-      onClose={onCancel}
+      onClose={() => onCancel(true)}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       {...dialogProps}
@@ -94,7 +96,7 @@ export const Dialog = ({
           ...dialogTitleStyles,
         }}>
         {typeof title === 'string' ? t(title) : title}
-        <IconButton onClick={onCancel}>
+        <IconButton onClick={() => onCancel(true)}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -131,7 +133,7 @@ export const Dialog = ({
             <Button
               buttonProps={{
                 size: 'large',
-                onClick: onCancel,
+                onClick: () => onCancel(false),
                 variant: cancelButtonVariant,
                 sx: {...cancelButtonStyles},
               }}>
@@ -141,7 +143,8 @@ export const Dialog = ({
             </Button>
           )}
 
-          {showSaveButton && (
+          {renderRightFooterButton?.()}
+          {!renderRightFooterButton && showSaveButton && (
             <Button
               testId="saveButton"
               buttonProps={{

@@ -1,6 +1,5 @@
 import React, {useEffect, useMemo, useRef} from 'react';
 import {endOfDay, startOfDay} from 'date-fns';
-import * as _ from 'lodash';
 import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
@@ -14,22 +13,24 @@ import {getRoles} from 'utils/work-hours-utils';
 import {useNavigate} from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import {useTranslation} from 'react-i18next';
-import {aggregateEmployeeRows} from '../../utils/employee';
+import TableBody from 'components/Table/TableBody';
+import {aggregateEmployeeRows} from 'utils/employee';
+import {ELEMENTS_PER_PAGE_OPTIONS} from 'models/pagination';
+import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import {EmployeeContractTableRow} from 'models/employee';
+import {getAvailabilityChipColor} from 'utils/availability';
+import {StatusChip} from 'components/StatusChip';
+import {capitalize} from 'utils/utils';
+import {groupBy} from 'lodash';
 import TableContainer from '../../components/Table/TableContainer';
 import PageContainer from '../../components/PageContainer';
 import SearchInput from '../../components/SearchInput/index';
-import {ELEMENTS_PER_PAGE_OPTIONS} from '../../models/pagination';
 import Pagination from '../../components/Pagination';
-import {ACTION_CELL_WIDTH, TableColumnWithRender} from '../../models/table';
 import TableHeader from '../../components/Table/TableHeader';
 import AddButton from '../../components/AddButton';
-import {EmployeeContractTableRow} from '../../models/employee';
 import Cell from '../../components/Table/TableCell';
 import TableRow from '../../components/Table/TableRow';
-import {getAvailabilityChipColor} from '../../utils/availability';
-import {StatusChip} from '../../components/StatusChip';
 import {Actions} from './Actions';
-import {capitalize} from '../../utils/utils';
 import PageHeaderContainer from '../../components/PageHeaderContainer';
 import TableCellText from '../../components/Table/TableCellText';
 
@@ -47,9 +48,10 @@ export const Employees = () => {
   const COLUMNS = useRef<TableColumnWithRender<EmployeeContractTableRow>[]>([
     {
       headerName: 'Employee',
-      width: '15%',
+      key: 'employee-cell-employee',
+      isFirst: true,
       renderCell: (employee, cellProps) => (
-        <Cell isFirst width="15%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <Avatar src={employee.photoUrl} sx={{width: 24, height: 24}} />
           <TableCellText>{employee.name}</TableCellText>
         </Cell>
@@ -57,9 +59,10 @@ export const Employees = () => {
     },
     {
       headerName: 'ROLE',
-      width: '10%',
+      key: 'employee-cell-role',
+      width: '236px',
       renderCell: (employee, cellProps) => (
-        <Cell width="10%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText capitalize>
             {t(capitalize(employee.roles))}
           </TableCellText>
@@ -68,47 +71,50 @@ export const Employees = () => {
     },
     {
       headerName: 'ADDRESS',
-      width: '20%',
+      key: 'employee-cell-address',
       renderCell: (employee, cellProps) => (
-        <Cell width="20%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText>{employee.address}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'Team',
+      key: 'employee-cell-team',
       width: '80px',
       align: 'right',
       renderCell: (employee, cellProps) => (
-        <Cell align="right" width="80px" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText>{employee.team}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'PHONE',
-      width: '10%',
+      key: 'employee-cell-phone',
       renderCell: (employee, cellProps) => (
-        <Cell width="10%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText>{employee.phone}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'SHIFT',
-      width: '10%',
+      key: 'employee-cell-shift',
+      width: '112px',
       renderCell: (employee, cellProps) => (
-        <Cell isFirst width="10%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <TableCellText>{employee.shift}</TableCellText>
         </Cell>
       ),
     },
     {
       headerName: 'AVAILABILITY',
-      width: '3%',
+      key: 'employee-cell-availability',
       align: 'center',
+      width: '136px',
       renderCell: (employee, cellProps) => (
-        <Cell align="center" width="3%" onClick={cellProps.onClick}>
+        <Cell {...cellProps}>
           <StatusChip
             label={employee.availability}
             {...getAvailabilityChipColor(employee.availability)}
@@ -118,11 +124,13 @@ export const Employees = () => {
     },
     {
       headerName: 'action',
+      key: 'employee-cell-action',
       isHeaderNameHidden: true,
+      align: 'center',
       width: ACTION_CELL_WIDTH, // set static width that will not change
       isLast: true,
-      renderCell: (employee) => (
-        <Cell isLast width={ACTION_CELL_WIDTH}>
+      renderCell: (employee, cellProps) => (
+        <Cell {...cellProps} onClick={undefined}>
           <Actions id={employee.employeeId} email={employee.email} />
         </Cell>
       ),
@@ -170,7 +178,7 @@ export const Employees = () => {
 
   const rows = useMemo(() => {
     if (isLoading) return [];
-    const eventByTechnicianId = _.groupBy(
+    const eventByTechnicianId = groupBy(
       technicianEvents?.data,
       (event: TechnicianEventPair) => event.technicianId,
     );
@@ -228,28 +236,31 @@ export const Employees = () => {
     <PageContainer gap={3}>
       <PageHeaderContainer>
         <SearchInput
-          onChanged={(val: string) => setSearch(val)}
           refInput={textInput}
           defaultValue={search}
+          onChange={(val: string) => setSearch(val)}
         />
 
         <AddButton label="New Employee" onClick={handleNewEmployeeClick} />
       </PageHeaderContainer>
       <TableContainer>
         <TableHeader columns={COLUMNS.current} />
-        {/* Row */}
-        {rows.map((entry, idx) => (
-          <TableRow
-            data-rowindex={idx}
-            key={`employee-row-${entry.id}`}
-            testId="employee-row-container">
-            {COLUMNS.current.map((column) =>
-              column.renderCell(entry, {
-                onClick: handleEmployeeClick(entry.id),
-              }),
-            )}
-          </TableRow>
-        ))}
+        <TableBody>
+          {/* Row */}
+          {rows.map((entry, idx) => (
+            <TableRow
+              data-rowindex={idx}
+              key={`employee-row-${entry.id}`}
+              testId={`employee-row-${entry.id}`}>
+              {COLUMNS.current.map(({renderCell, ...rest}) =>
+                renderCell(entry, {
+                  onClick: handleEmployeeClick(entry.id),
+                  ...rest,
+                }),
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
       </TableContainer>
       <Pagination
         currentIndex={userAccountResource.page.pageIndex}

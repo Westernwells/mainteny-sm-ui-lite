@@ -13,19 +13,24 @@ export type HeaderCellProps = {
 };
 
 export type CellProps = {
-  width: string;
+  width?: string;
   isHeaderNameHidden?: boolean;
   align?: 'left' | 'right' | 'center';
+  justifyContent?: 'left' | 'right' | 'center' | 'justify-content';
+  maxWidth?: string;
   flex?: string;
   isFirst?: boolean;
   isLast?: boolean;
   hide?: boolean;
 };
 
-export type TableColumn = CellProps & HeaderCellProps & {};
+export type TableColumn = CellProps & HeaderCellProps & {key?: string};
 
 export type TableColumnWithRender<T> = TableColumn & {
-  renderCell: (renderObject: T, cellProps: CellCallbackProps) => JSX.Element;
+  renderCell: (
+    renderObject: T,
+    cellProps: TableColumn & CellCallbackProps,
+  ) => JSX.Element;
 };
 
 export type Action = {

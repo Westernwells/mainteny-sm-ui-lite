@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next';
 import {Box} from '@mui/system';
-import {IconButton, Typography} from '@mui/material';
+import {IconButton, TableCell, Typography} from '@mui/material';
 import * as _ from 'lodash';
 import {ReactComponent as SortingArrow} from 'assets/icons/SortingArrows.svg';
 import {TableColumn} from 'models/table';
@@ -15,7 +15,7 @@ type Props = {
   onSort?: () => void;
 };
 
-const TableHeaderCell = ({column, gap, sortState, onSort}: Props) => {
+const TableHeaderCell = ({column, gap = 1, sortState, onSort}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
 
@@ -35,32 +35,24 @@ const TableHeaderCell = ({column, gap, sortState, onSort}: Props) => {
   }, [column, sortState]);
 
   return (
-    <Box
+    <TableCell
       sx={{
-        display: 'flex',
-        width: column.width,
-        height: '100%',
         padding: '9px 12px',
         alignItems: 'center',
-        justifyContent: column.align || 'left',
-        flex: '1 1 auto',
-        ...(column.width && {width: column.width}),
-        ...(column.width.slice(-2) === 'px' && {
-          flex: `0 1 ${column.width}`,
-        }),
+        backgroundColor: 'white',
 
         '&:hover .MuiIconButton-root': {
           ...(!isSortingActive && {opacity: 1}),
         },
-      }}
-      gap={gap}>
+      }}>
       {!column.isHeaderNameHidden && (
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
+            justifyContent: column.align || 'left',
           }}
-          gap={1}>
+          gap={gap}>
           <Typography variant="subtitle2">
             {_.capitalize(t(column.headerName))}
           </Typography>
@@ -82,7 +74,7 @@ const TableHeaderCell = ({column, gap, sortState, onSort}: Props) => {
           )}
         </Box>
       )}
-    </Box>
+    </TableCell>
   );
 };
 

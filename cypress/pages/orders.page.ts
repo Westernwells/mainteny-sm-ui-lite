@@ -9,24 +9,17 @@ export default class OrdersPage {
     cy.get(`div[role="tablist"] [data-aria-label="tab-item-${index}"]`).click();
   };
 
-  static changeStatusFilter = (statuses: string[]) => {
-    cy.get('div[aria-labelledby="Job Status"]').click();
-
-    statuses.forEach((item) => {
-      cy.get('ul[role="listbox"]')
-        .find(`li[role="option"][data-value="${item}"]`)
-        .click();
-    });
+  static changeStatusFilter = (status: string) => {
+    cy.contains('button', status).click({force: true});
   };
 
-  static changeTypeFilter = (types: string[]) => {
-    cy.get('div[aria-labelledby="Job Type"]').click();
+  static changeTypeFilter = (type: string) => {
+    cy.contains('span.MuiChip-label', type).click();
+    cy.contains('button', 'Show Results').click();
+  };
 
-    types.forEach((item) => {
-      cy.get('ul[role="listbox"]')
-        .find(`li[role="option"][data-value="${item}"]`)
-        .click();
-    });
+  static openFilters = () => {
+    cy.contains('div', 'Filters').click();
   };
 
   // Recursively wait for all job query api calls until the provided query parameter is matched

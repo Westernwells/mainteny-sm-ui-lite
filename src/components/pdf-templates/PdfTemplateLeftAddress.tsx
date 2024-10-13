@@ -97,6 +97,14 @@ const PdfTemplateLeftAddress = ({
           {addressComponent?.city && addressComponent.country && ', '}
           {addressComponent?.country && `${addressComponent.country}`.trim()}
         </Text>
+
+        <Text style={styles.partialAddressText}>
+          {addressComponent?.moreInfo && `${addressComponent.moreInfo}`.trim()}
+        </Text>
+
+        <Text style={styles.partialAddressText}>
+          {addressComponent?.moreInfo && `${addressComponent.moreInfo}`.trim()}
+        </Text>
       </View>
 
       {(beneficiaryInfo?.name ||

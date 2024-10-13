@@ -7,7 +7,7 @@ interface Props extends TooltipProps {
 
 export const Tooltip = ({children, ...rest}: Props) => (
   <MuiTooltip
-    componentsProps={{
+    slotProps={{
       tooltip: {
         sx: {
           bgcolor: 'common.white',

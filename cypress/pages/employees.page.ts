@@ -9,19 +9,19 @@ export default class EmployeesPage {
     return cy
       .get('div span')
       .contains('Available')
-      .parents('div[role="row"]')
+      .parents('tr[role="row"]')
       .invoke('attr', 'data-rowindex');
   }
 
   static getEmployeeByIndex(index: string) {
-    return cy.get(`div[data-rowindex=${index}]`);
+    return cy.get(`tr[data-rowindex=${index}]`);
   }
 
   static addHoliday() {
     cy.get('svg[data-testid="AddIcon"]').click();
     cy.get('svg[data-testid="WbSunnyIcon"]').click();
     cy.contains('label', 'Date').click();
-    cy.get('button[aria-current="date"]').click();
+    cy.get('button[aria-current="date"]').click({force: true});
     cy.contains('button', 'Confirm').click({waitForAnimations: false});
     const currentTechnicianAPI = `${
       Cypress.env().REACT_APP_API_URL

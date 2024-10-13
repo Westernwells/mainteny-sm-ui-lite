@@ -7,6 +7,7 @@ export interface Props extends PropsWithChildren {
   label: string;
   value?: string | number;
   Icon?: SvgIconComponent;
+  iconElement?: JSX.Element;
   showValue?: boolean;
   iconProps?: SvgIconProps;
   labelProps?: TypographyProps;
@@ -17,6 +18,7 @@ export const CardDataListItem = ({
   label,
   value,
   Icon,
+  iconElement,
   showValue = true,
   iconProps = {},
   labelProps,
@@ -37,6 +39,7 @@ export const CardDataListItem = ({
             {...iconProps}
           />
         )}
+        {!!iconElement && iconElement}
         <Typography variant="subtitle2" color="text.secondary" {...labelProps}>
           {t(label)}
         </Typography>

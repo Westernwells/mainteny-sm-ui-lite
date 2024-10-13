@@ -1,16 +1,15 @@
 import {PropsWithChildren} from 'react';
-import {Box, BoxProps} from '@mui/material';
+import {TableRow as MuiTableRow, TableRowProps} from '@mui/material';
 
-interface Props extends BoxProps {
+interface Props extends TableRowProps {
   testId: string;
 }
 
 const TableRow = ({children, testId, ...props}: PropsWithChildren<Props>) => (
-  <Box
-    role="row"
+  <MuiTableRow
     data-testid={testId}
+    role="row"
     sx={{
-      display: 'flex',
       alignItems: 'center',
       height: '44px',
       cursor: 'pointer',
@@ -20,7 +19,7 @@ const TableRow = ({children, testId, ...props}: PropsWithChildren<Props>) => (
     }}
     {...props}>
     {children}
-  </Box>
+  </MuiTableRow>
 );
 
 export default TableRow;
