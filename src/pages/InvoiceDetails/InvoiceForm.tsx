@@ -908,6 +908,26 @@ export const InvoiceForm = ({
   };
 
   const setFormFieldsFromServiceOrder = (serviceOrderArg: ServiceOrderView) => {
+    if (
+      serviceOrderArg.elevator.additionalInfo.billingAddress &&
+      !invoice?.additionalInfo?.billingAddress?.fullName
+    ) {
+      formik.setFieldValue(
+        'billingAddress',
+        serviceOrderArg.elevator.additionalInfo.billingAddress,
+      );
+    }
+
+    if (
+      serviceOrderArg.elevator.additionalInfo.beneficiaryAddress &&
+      !invoice?.additionalInfo?.beneficiaryAddress?.fullName
+    ) {
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        serviceOrderArg.elevator.additionalInfo.beneficiaryAddress,
+      );
+    }
+
     if (!formik.values.propertyOwnerId) {
       formik.setFieldValue(
         'propertyOwnerId',

@@ -3,15 +3,15 @@ import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import {ReactComponent as MapsPinIcon} from 'assets/icons/MapsPinIcon.svg';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorRequestBody, ElevatorView} from 'models/elevator';
 import Grid from '@mui/material/Grid';
-import {useContext, useRef, useState} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import {InfoCard} from 'components/InfoCard';
 import {useFormik} from 'formik';
 import {Dialog} from 'components/Dialog';
 import * as Yup from 'yup';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
-import {LocationFormModel} from 'models/unitForm';
+import {LocationFormModel, SeparateAddressFormModal} from 'models/unitForm';
 import {UserCompanyContext} from 'context/UserCompanyProvider';
 import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
 import {AddressRecord, Language} from 'models/misc';
@@ -84,6 +84,26 @@ export const Location = ({
     onSubmit: () => {},
     validationSchema,
   });
+
+  const separateAddressFormik = useFormik<SeparateAddressFormModal>({
+    initialValues: {
+      billingAddress: elevator.additionalInfo.billingAddress ?? {
+        fullName: '',
+      },
+      beneficiaryAddress: elevator.additionalInfo.beneficiaryAddress ?? {
+        fullName: '',
+      },
+    },
+    onSubmit: () => {},
+  });
+
+  const doesSeparateAddressExist =
+    !!separateAddressFormik.values.beneficiaryAddress?.fullName ||
+    !!separateAddressFormik.values.billingAddress?.fullName;
+  const [isSeparateAddressEnabled, setIsSeparateAddressEnabled] = useState(
+    doesSeparateAddressExist,
+  );
+
   const labels = useRef([
     'customer',
     'customerNumber',
@@ -100,24 +120,62 @@ export const Location = ({
   const onSave = async () => {
     setOpenDialog(false);
 
+    const body: Partial<ElevatorRequestBody> = {
+      propertyOwnerId: formik.values.propertyOwnerId,
+      address: formatAddressFullname(
+        formik.values.address,
+        translateCompanyLanguage,
+      ) as AddressRecord | undefined,
+      buildingLocation: formik.values.building || '',
+      propertySegment: formik.values.propertySegment!,
+      keyLocation: formik.values.keyLocation!,
+      parking: formik.values.parking!,
+      distance: formik.values.distance!,
+      travelTime: formik.values.travelTime!,
+      travelFee: moneyToCents(currentCurrency.code, formik.values.travelFee!),
+      billingAddress: undefined,
+      beneficiaryAddress: undefined,
+    };
+
+    if (isSeparateAddressEnabled) {
+      body.billingAddress = formatAddressFullname(
+        separateAddressFormik.values.billingAddress,
+        translateCompanyLanguage,
+      ) as AddressRecord | undefined;
+      body.beneficiaryAddress = formatAddressFullname(
+        separateAddressFormik.values.beneficiaryAddress,
+        translateCompanyLanguage,
+      ) as AddressRecord | undefined;
+    }
+
     await updateElevator({
-      body: {
-        propertyOwnerId: formik.values.propertyOwnerId,
-        address: formatAddressFullname(
-          formik.values.address,
-          translateCompanyLanguage,
-        ) as AddressRecord | undefined,
-        buildingLocation: formik.values.building || '',
-        propertySegment: formik.values.propertySegment!,
-        keyLocation: formik.values.keyLocation!,
-        parking: formik.values.parking!,
-        distance: formik.values.distance!,
-        travelTime: formik.values.travelTime!,
-        travelFee: moneyToCents(currentCurrency.code, formik.values.travelFee!),
-      },
+      body,
       elevatorId: elevator.id,
     });
   };
+
+  useEffect(() => {
+    if (!isSeparateAddressEnabled && doesSeparateAddressExist) {
+      setIsSeparateAddressEnabled(true);
+    }
+  }, [
+    separateAddressFormik.values.beneficiaryAddress,
+    separateAddressFormik.values.billingAddress,
+  ]);
+
+  useEffect(() => {
+    separateAddressFormik.setValues({
+      billingAddress: elevator.additionalInfo.billingAddress ?? {
+        fullName: '',
+      },
+      beneficiaryAddress: elevator.additionalInfo.beneficiaryAddress ?? {
+        fullName: '',
+      },
+    });
+  }, [
+    elevator.additionalInfo.billingAddress,
+    elevator.additionalInfo.beneficiaryAddress,
+  ]);
 
   return (
     <InfoCard
@@ -140,16 +198,24 @@ export const Location = ({
         onCancel={() => {
           setOpenDialog(false);
         }}
-        disableSaveBtn={!!Object.keys(formik.errors).length}
+        disableSaveBtn={
+          !!Object.keys(formik.errors).length ||
+          !!Object.keys(separateAddressFormik.errors).length
+        }
         onSave={() => onSave()}
         dialogProps={{
-          maxWidth: 'sm',
+          maxWidth: 'md',
           open: openDialog || false,
           sx: {height: '100%'},
         }}>
         <EditLocationForm
           formik={formik}
+          separateAddressFormik={separateAddressFormik}
           initialCustomer={elevator?.propertyOwner}
+          isSeparateAddressEnabled={isSeparateAddressEnabled}
+          setIsSeparateAddressEnabled={(newBol: boolean) =>
+            setIsSeparateAddressEnabled(newBol)
+          }
         />
       </Dialog>
     </InfoCard>

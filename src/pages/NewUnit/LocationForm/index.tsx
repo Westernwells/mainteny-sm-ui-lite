@@ -2,19 +2,29 @@ import {Box} from '@mui/system';
 import {AddressAutoComplete} from 'components/AddressAutoComplete';
 import {FormInput} from 'components/form/FormInput';
 import Grid from '@mui/material/Grid';
-import {FormikErrors, FormikValues, getIn, useFormik} from 'formik';
-import {LocationFormModel} from 'models/unitForm';
+import {
+  FormikErrors,
+  FormikProps,
+  FormikValues,
+  getIn,
+  useFormik,
+} from 'formik';
+import {LocationFormModel, SeparateAddressFormModal} from 'models/unitForm';
 import * as Yup from 'yup';
 import {useCallback, useEffect} from 'react';
 import {PageCard} from 'components/PageCard';
 import {useTranslation} from 'react-i18next';
 import {FormSelect} from 'components/form/FormSelect';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
+import {SeparateInvoiceAddress} from './SeparateInvoiceAddress';
 
 interface Props {
   getLocationFormErrors?: (val: FormikErrors<LocationFormModel>) => void;
   getLocationFormValues?: (val: FormikValues) => void;
   initialValues?: LocationFormModel;
+  isSeparateAddressEnabled: boolean;
+  setIsSeparateAddressEnabled: (newBol: boolean) => void;
+  separateAddressFormik: FormikProps<SeparateAddressFormModal>;
 }
 
 const validationSchema = Yup.object().shape({
@@ -34,6 +44,9 @@ export const LocationForm = ({
   getLocationFormErrors,
   getLocationFormValues,
   initialValues,
+  isSeparateAddressEnabled,
+  setIsSeparateAddressEnabled,
+  separateAddressFormik,
 }: Props) => {
   const {t} = useTranslation();
   const formik = useFormik<LocationFormModel>({
@@ -68,7 +81,7 @@ export const LocationForm = ({
   return (
     <PageCard
       headerLabel="Location Information"
-      containerStyles={{flexGrow: 1}}
+      containerStyles={{flexGrow: 1, overflowY: 'auto'}}
       headerStyles={{mt: '0.5em'}}>
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
@@ -240,6 +253,11 @@ export const LocationForm = ({
           </Grid>
         </Grid>
       </Box>
+      <SeparateInvoiceAddress
+        isSeparateAddressEnabled={isSeparateAddressEnabled}
+        setIsSeparateAddressEnabled={setIsSeparateAddressEnabled}
+        formik={separateAddressFormik}
+      />
     </PageCard>
   );
 };
