@@ -161,7 +161,6 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
       renderCell: (article, cellProps) => (
         <Cell
           isFirst
-          width="10%"
           onClick={cellProps.onClick}
           align="right"
           justifyContent="right">
