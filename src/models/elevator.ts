@@ -140,6 +140,8 @@ export interface ElevatorAdditionalInfo {
   inspectionCycle: InspectionCycle;
   numberOfPeople: number;
   nextInspectionDate?: string;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
 }
 
 export interface ElevatorMaintainerRecord {
@@ -416,6 +418,8 @@ export interface ElevatorRequestBody {
   travelTime: number;
   travelFee: number;
   numberOfPeople: number;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
 }
 
 export interface ElevatorComment {
