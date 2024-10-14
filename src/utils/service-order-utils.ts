@@ -406,28 +406,35 @@ export const getServiceOrderPaymentStatusStyles = (
   label: string;
   color: StatusColor;
 } => {
-  switch (status) {
+  const value =
+    AUTO_GENERATED_TO_PAYMENT_STATUS.get(
+      status as ServiceOrderPaymentWithIndicationStatus,
+    ) ?? status;
+
+  const label = serviceOrderPaymentStatusToString(value);
+
+  switch (value) {
     case ServiceOrderPaymentStatus.DONE:
-      return {label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.DONE, color: 'success'};
+      return {label, color: 'success'};
 
     case ServiceOrderPaymentStatus.OVERDUE:
       return {
-        label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.NOT_PAID,
+        label,
         color: 'warning',
       };
 
     case ServiceOrderPaymentStatus.PARTIALLY_PAID:
       return {
-        label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.PARTIALLY_PAID,
+        label,
         color: 'warning.light',
       };
 
     case ServiceOrderPaymentStatus.NOT_PAID:
-      return {label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.NOT_PAID, color: 'info'};
+      return {label, color: 'info'};
 
     case ServiceOrderPaymentStatus.NO_INVOICE:
       return {
-        label: SERVICE_ORDER_PAYMENT_STATUS_VIEW.NO_INVOICE,
+        label,
         color: 'info.light',
       };
 
