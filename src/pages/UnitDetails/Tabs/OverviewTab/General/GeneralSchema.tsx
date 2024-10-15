@@ -4,6 +4,7 @@ import ElevatorIcon from '@mui/icons-material/Elevator';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TagIcon from '@mui/icons-material/Tag';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
@@ -93,6 +94,20 @@ export const GeneralSchema = ({label, elevator, currency}: Props) => {
             }
             label="Year built"
             bodyText={elevator.additionalInfo.builtYear || '-'}
+            iconMaxHeight="3em"
+            containerStyles={{alignItems: 'center'}}
+          />
+        );
+      case 'type':
+        return (
+          <CardProps
+            icon={
+              <MiscellaneousServicesIcon
+                sx={{color: theme.palette.primary.light}}
+              />
+            }
+            label="Unit type"
+            bodyText={t(elevator.type) || '-'}
             iconMaxHeight="3em"
             containerStyles={{alignItems: 'center'}}
           />
