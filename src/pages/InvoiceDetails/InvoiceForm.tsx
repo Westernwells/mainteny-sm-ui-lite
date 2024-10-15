@@ -850,14 +850,20 @@ export const InvoiceForm = ({
         invoice.additionalInfo?.alternativeAddress || emptyAddressState,
       );
     } else {
-      formik.setFieldValue(
-        'billingAddress',
-        customerData.billingAddress || emptyAddressState,
-      );
-      formik.setFieldValue(
-        'beneficiaryAddress',
-        customerData.beneficiaryAddress || emptyAddressState,
-      );
+      if (!serviceOrder?.elevator.additionalInfo.billingAddress) {
+        formik.setFieldValue(
+          'billingAddress',
+          customerData.billingAddress || emptyAddressState,
+        );
+      }
+
+      if (!serviceOrder?.elevator.additionalInfo.beneficiaryAddress) {
+        formik.setFieldValue(
+          'beneficiaryAddress',
+          customerData.beneficiaryAddress || emptyAddressState,
+        );
+      }
+
       formik.setFieldValue(
         'alternativeAddress',
         customerData.otherAddress || emptyAddressState,
@@ -1102,7 +1108,16 @@ export const InvoiceForm = ({
   const onRemoveServiceOrder = useCallback(() => {
     setServiceOrder(undefined);
     formik.setFieldValue('serviceOrderId', '');
-  }, [formik]);
+
+    formik.setFieldValue(
+      'billingAddress',
+      customer?.billingAddress || emptyAddressState,
+    );
+    formik.setFieldValue(
+      'beneficiaryAddress',
+      customer?.beneficiaryAddress || emptyAddressState,
+    );
+  }, [formik, customer]);
 
   // Handle updates from duplicated invoice and edit mode
   useEffect(() => {
