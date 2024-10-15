@@ -195,7 +195,9 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
       }
       handleAction={() => setOpenDialog(true)}
       headerActionIcon={
-        <Typography color="info.main">{`+ ${t('Add')}`}</Typography>
+        <Typography color="info.main" data-testid="add-invoice">{`+ ${t(
+          'Add',
+        )}`}</Typography>
       }
       showHeaderBackground>
       {!totalInvoiceRef ? (

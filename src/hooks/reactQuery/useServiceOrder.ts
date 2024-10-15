@@ -1,4 +1,4 @@
-import {useCallback, useContext} from 'react';
+import {useContext} from 'react';
 import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
@@ -7,29 +7,16 @@ import {
   useQueryClient,
   UseQueryOptions,
 } from 'react-query';
-import * as _ from 'lodash';
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {
-  addDays,
-  endOfMonth,
-  endOfWeek,
-  getMonth,
-  getWeek,
-  startOfDay,
-  startOfMonth,
-} from 'date-fns';
 import {queryKeys} from 'reactQuery/constants';
-import {ServiceCompanyTimeUnit} from 'models/service-company';
-import {toDate, toRestDate} from 'utils/datetime';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {CheckList, SendServiceOrderCheckListRecord} from 'models/checklist';
+import {SendServiceOrderCheckListRecord} from 'models/checklist';
 import {LanguageContext} from 'context/LanguageProvider';
 import {languageContextMap} from 'utils/utils';
 import {ServiceOrderArticleRecord} from 'models/article';
 import {
   AppointmentConfirmationRequiredOrdersQueryParams,
-  AssignmentBasedOrderBody,
   CompleteServiceOrder,
   CreateServiceOrderComment,
   CreateServiceOrderRecord,
@@ -39,7 +26,6 @@ import {
   ServiceOrderActivityView,
   ServiceOrderArticleView,
   ServiceOrderConfirmationPublishBody,
-  ServiceOrderOrderField,
   ServiceOrderPaymentStatus,
   ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderQueryParams,
@@ -49,159 +35,11 @@ import {
   UpdateServiceOrderScheduleBody,
 } from 'models/service-order';
 import {Resource, RestError, StringValue} from 'models/misc';
-import {
-  ElevatorAvailability,
-  ElevatorAvailabilityParams,
-  ElevatorOrderPair,
-  ElevatorsByAddress,
-  ElevatorView,
-} from 'models/elevator';
 import {Comment} from 'models/comment';
 import {RequestParameters} from 'models/apiRequests';
 import {useUserSession} from './useUserSession';
 import {Order} from '../../models/pagination';
 import {useServiceOrderCommentMutation} from './useServiceOrderCommentMutation';
-
-const filterByNextVisit = (
-  serviceOrderViewRes: Resource<ServiceOrderView>,
-  nextVisit: string[],
-) => {
-  let mergedResult = [] as ServiceOrderView[];
-  let key: number | string;
-
-  const monthIndex = getMonth(new Date());
-
-  const serviceOrderViewMap = _.groupBy(
-    serviceOrderViewRes.data,
-    (serviceOrder) => {
-      const theDate = toDate(serviceOrder.schedules[0].startTime);
-
-      const month = getMonth(theDate);
-      if (month === monthIndex) {
-        return getWeek(theDate);
-      }
-
-      if (month === monthIndex + 1) {
-        return 'nextMonth';
-      }
-      return null;
-    },
-  );
-
-  nextVisit
-    .map((item) => {
-      switch (item) {
-        case 'This week': // TODO: create an enum
-          key = getWeek(new Date());
-          break;
-        case 'Next week':
-          key = getWeek(addDays(startOfDay(endOfWeek(new Date())), 1));
-          break;
-        case 'Next month':
-          key = 'nextMonth';
-          break;
-        default:
-          break;
-      }
-
-      return serviceOrderViewMap[key];
-    })
-    .filter((item) => item)
-    .forEach((item) => {
-      const diff = _.differenceBy(mergedResult, item, 'id');
-      mergedResult = [...diff, ...item];
-    });
-
-  return mergedResult;
-};
-
-const inRange = (value: number, range: number[][]) => {
-  let result: boolean = false;
-  range.forEach((item) => {
-    if (value > item[0] && value <= item[1]) {
-      result = true;
-    }
-  });
-  return result;
-};
-
-const filterServiceOrder = (
-  serviceOrderViewRes: Resource<ServiceOrderView>,
-  filter: {nextVisit: string[]},
-) => {
-  let result = {...serviceOrderViewRes};
-
-  if (filter.nextVisit.length) {
-    const nextVisitFilter = filterByNextVisit(
-      serviceOrderViewRes,
-      filter.nextVisit,
-    );
-    result = {...result, data: nextVisitFilter, total: nextVisitFilter.length};
-  }
-  return result;
-};
-
-const groupElevatorByAddressList = (
-  serviceOrderView: ServiceOrderView[],
-  elevatorRes?: Resource<ElevatorView>,
-  elevatorAvailability?: ElevatorAvailability,
-) => {
-  const serviceOrderMap = _.groupBy(
-    serviceOrderView,
-    (order: ServiceOrderView) => order.elevator.id,
-  );
-
-  const elevatorWithOrders = elevatorRes!.data.map((elevator) => {
-    const orders = serviceOrderMap[elevator.id];
-    const availability = elevatorAvailability![elevator.id];
-    const elevatorWithOrder: ElevatorOrderPair = {
-      elevator: {
-        ...elevator,
-        availability: Object.values(availability)[0],
-      },
-      serviceOrder: orders && orders[0],
-    };
-    return elevatorWithOrder;
-  });
-
-  const elevatorByAddressList: ElevatorsByAddress[] = _.values(
-    _.groupBy(elevatorWithOrders, (record) => record.elevator.address.id),
-  ).map((elevators) => ({
-    elevators,
-    address: elevators[0].elevator.address,
-  }));
-
-  return elevatorByAddressList;
-};
-
-export const fetchElevatorAvailability = async (
-  params: ElevatorAvailabilityParams,
-) => {
-  const response = await axiosClient.get<ElevatorAvailability>(
-    `/api/availabilities/elevators`,
-    {
-      params,
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
-
-export const useFetchElevatorAvailability = (elevatorIds: string[]) => {
-  const params = {
-    elevatorId: elevatorIds,
-    start: toRestDate(startOfMonth(new Date())),
-    end: toRestDate(endOfMonth(new Date())),
-    timeUnit: ServiceCompanyTimeUnit.MONTHLY,
-  };
-  return useQuery(
-    [queryKeys.fetchElevatorAvailability, params],
-    () => fetchElevatorAvailability(params),
-    {
-      enabled: !!elevatorIds.length,
-    },
-  );
-};
 
 export const queryPropertyOwnerServiceOrders = async (
   params: ServiceOrderQueryParams,
@@ -303,82 +141,6 @@ export function useDueServiceOrders(
   );
 }
 
-// TODO: currently not in uae, we migght have to remove
-// if we realise we'll never need it again
-export function useFetchServiceOrdersByElevators(
-  elevatorRes: Resource<ElevatorView>,
-  filter: {nextVisit: string[]; availabilityRange: number[][]},
-  options?: UseQueryOptions<
-    Resource<ServiceOrderView>,
-    RestError,
-    ElevatorsByAddress[]
-  >,
-) {
-  const {user} = useUserSession();
-  const elevatorIds = elevatorRes?.data.map((elevator) => elevator.id);
-  const {data: availability} = useFetchElevatorAvailability(elevatorIds);
-  const start = startOfDay(new Date()).toISOString();
-  const end = startOfDay(addDays(new Date(), 30)).toISOString();
-  return useQuery<Resource<ServiceOrderView>, RestError, ElevatorsByAddress[]>(
-    [
-      queryKeys.queryServiceOrders,
-      elevatorIds,
-      user?.userAccount.serviceCompany.id,
-    ],
-    () =>
-      queryServiceOrders({
-        start,
-        end,
-        pageSize: 500,
-        pageIndex: 0,
-        elevatorIds,
-        query: '',
-        serviceCompanyId: user!.userAccount.serviceCompany.id,
-        status: [],
-        orderBy: ServiceOrderOrderField.CREATED_TIME,
-        order: Order.DESC,
-      }),
-    {
-      enabled: !!user && !!availability,
-      ...options,
-      select: useCallback(
-        // TODO: refactor into a function
-        (serviceOrderView: Resource<ServiceOrderView>) => {
-          const filterResult = filterServiceOrder(serviceOrderView, filter);
-          let response = groupElevatorByAddressList(
-            filterResult.data,
-            elevatorRes,
-            availability,
-          );
-          if (filter.nextVisit.length) {
-            response = response
-              .filter(
-                (item) => item.elevators.filter((x) => x.serviceOrder).length,
-              )
-              .map((item) => ({
-                ...item,
-                elevators: item.elevators.filter((x) => x.serviceOrder),
-              }));
-          }
-          if (filter.availabilityRange.length) {
-            response = response
-              .map((item) => ({
-                ...item,
-                elevators: item.elevators.filter((x) =>
-                  inRange(x.elevator.availability, filter.availabilityRange),
-                ),
-              }))
-              .filter((item) => item.elevators.length !== 0);
-          }
-          return response;
-        },
-
-        [availability, user, filter],
-      ),
-    },
-  );
-}
-
 export const queryServiceOrderSchedules = async (
   params: ServiceOrderScheduleParams,
 ) => {
@@ -430,33 +192,12 @@ export function useServiceOrderDetails(
   );
 }
 
-export const getServiceOrderChecklist = async (
-  serviceOrderId: string,
-): Promise<CheckList> => {
-  const response = await axiosClient.get<CheckList>(
-    `/api/serviceOrders/${serviceOrderId}/checkList`,
-  );
-  return response.data;
-};
-
 export const updateServiceOrderArticles = async (
   serviceOrderId: string,
   body: ServiceOrderArticleRecord[],
 ) => {
   await axiosClient.put(`api/serviceOrders/${serviceOrderId}/articles/`, body);
 };
-
-// it is okay to use pass any,information is for react-query & not us.Passing correct types makes simple function gigantic
-export function useServiceOrderCheckList(
-  serviceOrderId?: string,
-  options?: UseQueryOptions<any, any, any>,
-) {
-  return useQuery<CheckList, RestError, CheckList>(
-    [queryKeys.fetchServiceOrderChecklist, serviceOrderId],
-    () => getServiceOrderChecklist(serviceOrderId!),
-    {enabled: !!serviceOrderId, ...options},
-  );
-}
 
 const getServiceOrderActivities = async (
   serviceOrderId: string,
@@ -648,28 +389,6 @@ export const useUpdateServiceOrder = (successMsg: string) => {
           variant: 'success',
         });
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
-      },
-      onError: (err) => {
-        showError(err);
-      },
-    },
-  );
-};
-
-const createAssignmentBasedOrder = async (body: AssignmentBasedOrderBody) =>
-  axiosClient.post<StringValue>('/api/serviceOrders/assignmentBased', {
-    ...body,
-  });
-
-export const useAssignmentBasedOrder = (successMsg: string) => {
-  const {enqueueSnackbar, showError} = useSnackbar();
-  return useMutation(
-    (body: AssignmentBasedOrderBody) => createAssignmentBasedOrder(body),
-    {
-      onSuccess: () => {
-        enqueueSnackbar(successMsg, {
-          variant: 'success',
-        });
       },
       onError: (err) => {
         showError(err);
@@ -1008,20 +727,6 @@ export const fetchServiceOrderComments = async (
 
   return response.data;
 };
-
-export function useInvoiceComments(
-  serviceOrderId: string,
-  params: QueryServiceOrderCommentsParams,
-  options?: UseQueryOptions<any, any, any>,
-) {
-  return useQuery<Resource<Comment>, RestError>(
-    [queryKeys.fetchServiceOrderComments, params, serviceOrderId],
-    () => fetchServiceOrderComments(serviceOrderId, params),
-    {
-      ...options,
-    },
-  );
-}
 
 export function useInfiniteServiceOrderComments(
   serviceOrderId: string,
