@@ -97,6 +97,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
     'unitId',
     'spendingLimit',
     'builtYear',
+    'type',
   ]).current;
 
   return (
