@@ -159,8 +159,12 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
       key: 'articles-cell-unit',
       align: 'right',
       renderCell: (article, cellProps) => (
-        <Cell isFirst {...cellProps}>
-          <TableCellText>{article.unit}</TableCellText>
+        <Cell
+          isFirst
+          onClick={cellProps.onClick}
+          align="right"
+          justifyContent="right">
+          <TableCellText>{t(article.unit)}</TableCellText>
         </Cell>
       ),
     },
