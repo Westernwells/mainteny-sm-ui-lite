@@ -2725,6 +2725,7 @@
   "Buyer reference": "Reference kupca",
   "Invoice format": "Format fakture",
   "Buyer reference is defined by the customer.": "Reference kupca definiše kupac.",
+  "PDF Documents downloaded successfully!": "PDF dokumenti su uspešno preuzeti!",
   "Bold": "Podebljano",
   "Italic": "Kurziv",
   "Underline": "Podvuci",
@@ -2789,5 +2790,9 @@
   "Done": "Gotovo",
   "Change payment status": "Promenite status plaćanja",
   "Job Payment Status": "Status plaćanja posla",
-  "Confirm Change": "Potvrdite promenu"
+  "Confirm Change": "Potvrdite promenu",
+  "Add separate invoice address": "Dodajte posebnu adresu fakture",
+  "These addresses be used as primary instead ones from customer details": "Ove adrese se koriste kao primarne umesto onih iz podataka o klijentima",
+  "Invoice address": "Adresa fakture",
+  "Additional info": "Dodatne informacije"
 }

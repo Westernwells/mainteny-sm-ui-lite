@@ -2767,5 +2767,9 @@
   "Done": "Erledigt",
   "Change payment status": "Bezahlstatus ändern",
   "Job Payment Status": "Auftrags Bezahlstatus",
-  "Confirm Change": "Änderung bestätigen"
+  "Confirm Change": "Änderung bestätigen",
+  "Add separate invoice address": "Rechnungsempfänger-Adresse hinzufügen",
+  "These addresses be used as primary instead ones from customer details": "Diese Adressen werden als primäre Adresse verwendet und ersetzen die Kundenadresse.",
+  "Invoice address": "Rechnungsadresse",
+  "Additional info": "Zusätzliche Informationen"
 }
