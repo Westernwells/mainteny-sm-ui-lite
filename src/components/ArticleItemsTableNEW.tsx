@@ -260,7 +260,7 @@ export const ArticleItemsTableNEW = ({
               },
             },
           }}
-          aria-label="spanning table">
+          aria-label="articles section table">
           <TableHead>
             <TableRow>
               {columns.map((column) => (
@@ -394,6 +394,7 @@ export const ArticleItemsTableNEW = ({
                         }}
                       />
                       <NumericFormat
+                        name="globalDiscount"
                         value={
                           formik.values.discount?.type === DiscountType.AMOUNT
                             ? formik.values.discount?.amount?.value

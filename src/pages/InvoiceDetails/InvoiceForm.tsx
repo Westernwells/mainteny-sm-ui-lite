@@ -975,7 +975,7 @@ export const InvoiceForm = ({
     if (serviceOrderArg?.additionalInfo.discount) {
       formik.setFieldValue(
         'discount',
-        getDiscoutObj(serviceOrderArg?.additionalInfo.discount),
+        getDiscoutObj(serviceOrderArg?.additionalInfo.discount, true),
       );
     }
 
@@ -1257,6 +1257,7 @@ export const InvoiceForm = ({
         getDiscoutObj(
           sortedPreviousInvoices[sortedPreviousInvoices.length - 1]
             ?.additionalInfo.discount,
+          true,
         ),
       );
     }
@@ -1898,6 +1899,7 @@ export const InvoiceForm = ({
             />
 
             <RichTextField
+              data-testid="payment-terms-rich-text-field"
               name="paymentTerms"
               label="Payment terms"
               html={formik.values.paymentTerm?.term || ''}

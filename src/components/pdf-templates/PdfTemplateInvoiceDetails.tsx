@@ -1,5 +1,6 @@
 import {Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {formatDate} from 'utils/datetime';
+import {getDisplayDeliveryDate} from 'utils/invoice';
 import {InvoiceType, InvoiceView} from 'models/invoice';
 import {useMemo} from 'react';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -81,20 +82,7 @@ const PdfTemplateInvoiceDetails = ({
   const startDate = invoice?.additionalInfo.deliveryStartDate;
   const endDate = invoice?.additionalInfo.deliveryEndDate;
 
-  const formattedStartDate = startDate ? formatDate(startDate) : '';
-  const formattedEndDate = endDate ? formatDate(endDate) : '';
-
-  let displayDeliveryDate;
-
-  if (formattedStartDate && formattedEndDate) {
-    if (formattedStartDate === formattedEndDate) {
-      displayDeliveryDate = formattedStartDate;
-    } else {
-      displayDeliveryDate = `${formattedStartDate} - ${formattedEndDate}`;
-    }
-  } else {
-    displayDeliveryDate = formattedStartDate || formattedEndDate;
-  }
+  const displayDeliveryDate = getDisplayDeliveryDate(startDate, endDate);
 
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',

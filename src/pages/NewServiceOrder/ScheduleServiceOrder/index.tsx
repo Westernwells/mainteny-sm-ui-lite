@@ -148,8 +148,8 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
         : {notificationChannels}),
     };
 
-    await createServiceOrder(body);
-    navigate('/orders?tab=1');
+    const resp = await createServiceOrder(body);
+    navigate(`/orders/details/${resp.data.value}`, {replace: true});
   };
 
   const selectedDateTimeString =

@@ -149,7 +149,7 @@ export const applyPerItemDiscountOnQuotationItems = (
             ? {
                 amount:
                   (item.discount?.amount?.value ?? 0) *
-                    10 ** (item.discount?.amount?.fractionDigits ?? 2) ?? 0,
+                    10 ** (item.discount?.amount?.fractionDigits ?? 2) || 0,
               }
             : {percentage: item.discount?.percentage ?? 0}),
         }),
@@ -221,15 +221,20 @@ export const calculateQuotationTotalAmountInclVats = ({
   return totalAmountInclVats;
 };
 
-export const getDiscoutObj = (discount?: Discount) =>
+export const getDiscoutObj = (discount?: Discount, isGlobalDiscount = false) =>
   discount
     ? {
         ...discount,
-        type:
-          discount?.type === DiscountType.NONE ||
-          discount.type === DiscountType.PERCENTAGE
-            ? DiscountType.PERCENTAGE
-            : discount?.type,
+        ...(!isGlobalDiscount && {
+          // per item or article discount can be either percentage or amount
+          // but global discount can be either percentage or amount or none
+          // so we should not set type manually to percentage if we are creating discount object for global discount
+          type:
+            discount?.type === DiscountType.NONE ||
+            discount.type === DiscountType.PERCENTAGE
+              ? DiscountType.PERCENTAGE
+              : discount?.type,
+        }),
         amount: discount?.amount
           ? {
               ...discount?.amount,
