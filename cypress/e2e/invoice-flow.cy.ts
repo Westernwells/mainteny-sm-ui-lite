@@ -16,6 +16,7 @@ import AppTopBarPage from '../pages/appTopBar.page';
 import OrdersPage from '../pages/orders.page';
 import NewServiceJobPage from '../pages/new-service.page';
 import {randomEnumKey} from '../utils/utils';
+import InvoicesPage from '../pages/invoices.page';
 
 describe('Invoice flow', () => {
     beforeEach(() => {
@@ -23,6 +24,24 @@ describe('Invoice flow', () => {
         cy.intercept('GET', getServiceCompany).as('getServiceCompany');
         cy.login();
         AppTopBarPage.selectLanguage('English');
+    });
+
+    const visitAndCreateInvoice = (hasDueDate: boolean) => {
+        cy.get('div[data-testid="invoices-nav-item"]').click()
+        InvoicesPage.createInvoice({setExpiredDueDate: false, hasDueDate});
+        cy.get('span[role="progressbar"]').should('not.exist');
+    };
+
+    describe('Invoice printing flow', () => {
+        it('should not print if there is no due date', () => {
+            visitAndCreateInvoice(false);
+            InvoicesPage.printInvoices({hasDueDate: false});
+        });
+
+        it('should print invoice if there is a valid due date', () => {
+            visitAndCreateInvoice(true);
+            InvoicesPage.printInvoices({hasDueDate: true});
+        });
     });
 
     it('should test full invoice type flow', () => {
