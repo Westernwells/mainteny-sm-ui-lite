@@ -57,7 +57,7 @@ export const SeparateInvoiceAddress = ({
       {isSeparateAddressEnabled && (
         <Box>
           <AddressForm
-            title="Invoice address"
+            title="Billing address"
             type="billingAddress"
             columnSettings={columnSettings}
             formik={formik}
