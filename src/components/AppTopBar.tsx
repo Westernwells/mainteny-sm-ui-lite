@@ -16,6 +16,7 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {Language} from 'models/misc';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import EcologyGlobeMessage from 'assets/icons/EcologyGlobeMessage.svg';
+import {useFetchSystemSettings} from 'hooks/reactQuery/useSystem';
 import {MenuBtn} from './MenuBtn';
 import {BackAction} from './BackAction';
 import KalasarSearchComponent from './KalasarSearchComponent';
@@ -50,6 +51,10 @@ export const AppTopBar = ({
       queryClient.invalidateQueries();
     }
   }, [user]);
+  const {data: systemSettings} = useFetchSystemSettings();
+
+  const checkIfCompanyIsInWhiteList = (companyId: string) =>
+    systemSettings?.helpButtonWhiteListCompanies?.includes(companyId) ?? false;
 
   const changeLanguage = (lang: string) => {
     updateUser({
@@ -110,9 +115,14 @@ export const AppTopBar = ({
         </Typography>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" mt={1} alignItems="center">
-            <Box mr={2} display="flex" alignItems="center">
-              <KalasarSearchComponent />
-            </Box>
+            {user &&
+              checkIfCompanyIsInWhiteList(
+                user?.userAccount.serviceCompany.id,
+              ) && (
+                <Box mr={2} display="flex" alignItems="center">
+                  <KalasarSearchComponent />
+                </Box>
+              )}
             <MenuBtn
               startIcon={
                 <img
