@@ -62,7 +62,16 @@ export default class InvoicesPage {
         cy.get(`input[id="${id}"]`);
       });
 
-  static createInvoice = (options?: {setExpiredDueDate?: boolean}) => {
+  static createInvoice = (options?: {
+    setExpiredDueDate?: boolean;
+    hasDueDate?: boolean;
+  }) => {
+
+    const {
+      setExpiredDueDate = false, 
+      hasDueDate = true,  
+    } = options || {};
+
     cy.contains('button', 'New Invoice').click();
     cy.get('span[role="progressbar"]').should('not.exist');
 
@@ -87,18 +96,23 @@ export default class InvoicesPage {
     cy.wait(1000);
     cy.contains('label', 'Payment Due Date').click();
 
-    if (options?.setExpiredDueDate) {
-      cy.get('button[aria-current="date"]').invoke('attr', 'data-timestamp').then((timestamp) => {
-        const previousDayTimestamp = parseInt(timestamp, 10) - 86400000; 
-        cy.get(`button[data-timestamp="${previousDayTimestamp}"]`).click(); // Click the button for the previous day
-    });
-    } else {
-      cy.get('button[aria-current="date"]').invoke('attr', 'data-timestamp').then((timestamp) => {
-        const nextDayTimestamp = parseInt(timestamp, 10) + 86400000; 
-        cy.get(`button[data-timestamp="${nextDayTimestamp}"]`).click(); // Click the button for the next day
-      });
+    if (hasDueDate) {
+      if (setExpiredDueDate) {
+        cy.get('button[aria-current="date"]')
+          .invoke('attr', 'data-timestamp')
+          .then((timestamp) => {
+            const previousDayTimestamp = parseInt(timestamp, 10) - 86400000;
+            cy.get(`button[data-timestamp="${previousDayTimestamp}"]`).click(); // Click the button for the previous day
+          });
+      } else {
+        cy.get('button[aria-current="date"]')
+          .invoke('attr', 'data-timestamp')
+          .then((timestamp) => {
+            const nextDayTimestamp = parseInt(timestamp, 10) + 86400000;
+            cy.get(`button[data-timestamp="${nextDayTimestamp}"]`).click(); // Click the button for the next day
+          });
+      }
     }
-
 
     cy.contains('button', 'Confirm').click();
     cy.contains('button', 'Save').click();
@@ -117,5 +131,22 @@ export default class InvoicesPage {
     cy.contains('button', 'Send email').click();
     cy.wait('@sendInvoiceAPI', {timeout: 30000});
     cy.contains('Invoice sent successfully');
+  };
+
+  static printInvoices = (options?: {hasDueDate?: boolean}) => {
+    cy.get('[data-testid="bottom-drawer"]')
+      .find('button svg[data-testid="MoreVertIcon"]')
+      .click();
+    cy.contains('Print').click();
+    cy.contains('Print invoice').should('exist');
+    cy.contains('button', 'Print').click();
+
+    if (options?.hasDueDate) {
+      cy.contains('Invoice updated successfully').should('exist');
+    } else {
+      cy.contains(
+        'Error: A payment due date is required to send the invoice. Please add this information to proceed',
+      ).should('exist');
+    }
   };
 }
