@@ -480,5 +480,19 @@ describe('Invoice flow', () => {
             .within(() => {
                 [sumAfterGlobalDiscount, ...vats, total].forEach((value) => cy.contains(value));
             });
+
+        /* assert Download PDF */
+        cy.go('back');
+        cy.contains('€8,192.84').parents('div[role="row"]').find('svg[data-testid="MoreVertIcon"]').click();
+        cy.contains('li', 'Download').click();
+        cy.window().then((win) => {
+            cy.spy(win.URL, 'createObjectURL').as('createObjectURLSpy');
+        });
+        cy.get('@createObjectURLSpy').should('have.been.called');
+        cy.wait(5000);
+        cy.task('downloads', 'cypress/downloads').then((d: string[]) => {
+            const lastDownlodedFile = d[d.length - 1];
+            cy.task('readPdf', `cypress/downloads/${lastDownlodedFile}`).its('text').should('contain', '8,192.84');
+        });
     });
 });

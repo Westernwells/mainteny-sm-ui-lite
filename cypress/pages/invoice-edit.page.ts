@@ -10,8 +10,12 @@ export default class InvoiceEditPage {
     }/api/invoices/${invoiceId}`;
 
     cy.intercept('GET', apiEndpoint).as('getInvoiceDetails');
-    cy.visit(`/invoices/details/${invoiceId}/edit`, {failOnStatusCode: false});
+    cy.visit(`/invoices/details/${invoiceId}`, {failOnStatusCode: false});
     cy.wait('@getInvoiceDetails');
+    cy.get('[data-testid="bottom-drawer"]')
+      .find('button svg[data-testid="MoreVertIcon"]')
+      .click();
+    cy.contains('li', 'Edit').click();
   };
 
   static saveInvoice = () => {
@@ -30,7 +34,7 @@ export default class InvoiceEditPage {
     // Extract the text content from the rendered PDF or text content area
     const expectedValues = extractKeyValuesFromFormattedTerms(formattedTerms);
 
-    cy.get('div[class^="react-pdf__Page__textContent"]', {timeout: 15000})
+    cy.get('div[class^="react-pdf__Page__textContent"]')
       .should('exist')
       .then(($textLayer) => {
         cy.wrap($textLayer).find('span').should('have.length.greaterThan', 0);
