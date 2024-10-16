@@ -518,11 +518,14 @@ export const InvoiceForm = ({
     validationSchema,
     onSubmit: async (values) => {
       const response = await onSave(values);
-      const newInvoiceId = isNewInvoice ? response.value : invoice?.id;
       resetLocalStorage();
-      navigate(`/invoices/details/${newInvoiceId}`, {
-        replace: true,
-      });
+      if (isNewInvoice) {
+        navigate(`/invoices/details/${response.value}`, {
+          replace: true,
+        });
+      } else {
+        navigate(-1);
+      }
     },
   });
 
