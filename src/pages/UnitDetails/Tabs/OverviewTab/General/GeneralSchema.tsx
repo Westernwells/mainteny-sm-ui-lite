@@ -106,7 +106,7 @@ export const GeneralSchema = ({label, elevator, currency}: Props) => {
                 sx={{color: theme.palette.primary.light}}
               />
             }
-            label="Unit type"
+            label="Unit Type"
             bodyText={t(elevator.type) || '-'}
             iconMaxHeight="3em"
             containerStyles={{alignItems: 'center'}}
