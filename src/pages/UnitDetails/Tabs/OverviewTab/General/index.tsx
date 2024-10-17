@@ -76,6 +76,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
     await updateElevator({
       body: {
         propertyOwnerId,
+        type: data.unitType || '',
         category: data.category ? convertToMacro(data.category) : '',
         manufacturer: data.manufacturer,
         externalId: data.externalId || '',
@@ -97,6 +98,7 @@ const General = ({containerStyles, elevator, propertyOwnerId}: Props) => {
     'unitId',
     'spendingLimit',
     'builtYear',
+    'type',
   ]).current;
 
   return (

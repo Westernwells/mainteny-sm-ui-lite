@@ -46,6 +46,7 @@ export interface GeneralFormModel {
   spendingLimit?: number;
   number?: string;
   status?: ElevatorStatus;
+  unitType?: string;
 }
 
 export interface TechnicalDataFormModel {
