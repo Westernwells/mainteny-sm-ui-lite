@@ -1,6 +1,6 @@
 import {isEqual} from 'lodash';
 import {InvoiceStatusView} from '../../src/models/invoice';
-import {mapInvoiceStatus} from '../utils/utils';
+import {mapInvoiceStatus, navigateCy} from '../utils/utils';
 
 export default class InvoiceListingPage {
   static visit = () => {
@@ -10,7 +10,7 @@ export default class InvoiceListingPage {
 
     cy.intercept('GET', apiEndpoint).as('getInvoices');
 
-    cy.get('ul > div[role="button"][data-testid="invoices-nav-item"]').click();
+    navigateCy('finance', 'invoices');
 
     cy.get('span[role="progressbar"]').should('not.exist');
     cy.wait('@getInvoices');

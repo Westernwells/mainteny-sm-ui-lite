@@ -1,8 +1,8 @@
+import {navigateCy} from '../utils/utils';
+
 export default class QuotationPage {
   static visit = () => {
-    cy.get(
-      'ul > div[role="button"][data-testid="quotations-nav-item"]',
-    ).click();
+    navigateCy('finance', 'quotations');
   };
 
   static navigateTo = (path: string) => {

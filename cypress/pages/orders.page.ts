@@ -1,8 +1,9 @@
 import {isEqual} from 'lodash';
+import {navigateCy} from '../utils/utils';
 
 export default class OrdersPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="jobs-nav-item"]').click();
+    navigateCy('jobs', 'list');
   };
 
   static changeTab = (index: number) => {

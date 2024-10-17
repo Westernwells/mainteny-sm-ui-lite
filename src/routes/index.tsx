@@ -105,7 +105,6 @@ export const Router = () => {
                 </>
               }
             />
-
             <Route
               path="/units"
               element={
@@ -663,6 +662,20 @@ export const Router = () => {
                     <title>{`Analytics - ${titleTail}`}</title>
                   </Helmet>
                   <PageLayout pageTitle="Analytics">
+                    <Analytics />
+                  </PageLayout>
+                </>
+              }
+            />
+
+            <Route
+              path="/exports"
+              element={
+                <>
+                  <Helmet>
+                    <title>{`Exports - ${titleTail}`}</title>
+                  </Helmet>
+                  <PageLayout pageTitle="Exports">
                     <Analytics />
                   </PageLayout>
                 </>

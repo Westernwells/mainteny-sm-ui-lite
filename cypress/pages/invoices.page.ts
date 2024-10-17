@@ -1,8 +1,9 @@
 import {InvoiceStatusView} from '../../src/models/invoice';
+import {navigateCy} from '../utils/utils';
 
 export default class InvoicesPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="invoices-nav-item"]').click();
+    navigateCy('finance', 'invoices');
   };
 
   static filterInvoicesListByStatus = (status: InvoiceStatusView) => {

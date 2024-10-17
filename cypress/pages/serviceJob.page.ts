@@ -1,6 +1,8 @@
+import {navigateCy} from '../utils/utils';
+
 export default class ServiceJobPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="jobs-nav-item"]').click();
+    navigateCy('jobs', 'list');
   };
 
   static changeTab = (index: number) => {

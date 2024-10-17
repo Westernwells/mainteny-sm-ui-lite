@@ -15,7 +15,7 @@ import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import AppTopBarPage from '../pages/appTopBar.page';
 import OrdersPage from '../pages/orders.page';
 import NewServiceJobPage from '../pages/new-service.page';
-import {randomEnumKey} from '../utils/utils';
+import {navigateCy, randomEnumKey} from '../utils/utils';
 import InvoicesPage from '../pages/invoices.page';
 
 describe('Invoice flow', () => {
@@ -27,7 +27,7 @@ describe('Invoice flow', () => {
     });
 
     const visitAndCreateInvoice = (hasDueDate: boolean) => {
-        cy.get('div[data-testid="invoices-nav-item"]').click()
+        navigateCy('finance', 'invoices');
         InvoicesPage.createInvoice({setExpiredDueDate: false, hasDueDate});
         cy.get('span[role="progressbar"]').should('not.exist');
     };

@@ -724,3 +724,6 @@ export const getRandomIntInRange = (min: number, max: number) =>
 
 export const removeControlCharsAndSpaces = (str: string) =>
   str.replace(/\p{C}/gu, '').replaceAll(' ', '').replaceAll('\n', '');
+
+export const lowerCaseAndJoinByHyphen = (str: string) =>
+  str.toLowerCase().split(' ').join('-');
