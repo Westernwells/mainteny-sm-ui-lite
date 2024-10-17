@@ -19,6 +19,7 @@ import {
   allItemsHaveZeroDiscount,
 } from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
@@ -180,6 +181,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
 const QuotationPdfTemplate = React.memo(
@@ -193,6 +195,7 @@ const QuotationPdfTemplate = React.memo(
     headerPath,
     footerInfo,
     footerPath,
+    pdfConfigClientStorage,
   }: Props) => {
     const articleItems = quotation?.items.map((item) => ({
       ...item,
@@ -351,6 +354,31 @@ const QuotationPdfTemplate = React.memo(
                     </Text>
                   </View>
                 )}
+                {pdfConfigClientStorage.includeUsername && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Contact')}</Text>
+                    <Text style={styles.tagContent}>
+                      {quotation?.propertyOwner?.name}
+                    </Text>
+                  </View>
+                )}
+
+                {pdfConfigClientStorage.includeUsername && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Phone number')}</Text>
+                    <Text style={styles.tagContent}>
+                      {quotation?.propertyOwner?.contact.phone || '-'}
+                    </Text>
+                  </View>
+                )}
+                {pdfConfigClientStorage.includeUsername && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Email address')}</Text>
+                    <Text style={styles.tagContent}>
+                      {quotation?.propertyOwner?.contact.email || '-'}
+                    </Text>
+                  </View>
+                )}
 
                 {quotation?.additionalInfo.expiryDate && (
                   <View style={styles.rightAddressContent}>
@@ -362,11 +390,22 @@ const QuotationPdfTemplate = React.memo(
                 )}
 
                 <View style={{marginTop: 20}}>
-                  {quotation?.elevator?.externalId && (
+                  {pdfConfigClientStorage.includeUnitNumber &&
+                    quotation?.elevator?.externalId && (
+                      <View style={styles.rightAddressContent}>
+                        <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                        <Text style={styles.tagContent}>
+                          {quotation?.elevator?.externalId}
+                        </Text>
+                      </View>
+                    )}
+                  {pdfConfigClientStorage.includeSerialNumber && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                      <Text style={styles.tag}>
+                        {translate('Serial number')}.
+                      </Text>
                       <Text style={styles.tagContent}>
-                        {quotation?.elevator?.externalId}
+                        {quotation?.elevator?.serialNumber || '-'}
                       </Text>
                     </View>
                   )}

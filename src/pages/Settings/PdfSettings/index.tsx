@@ -39,9 +39,10 @@ type PdfTemplateData = {
 
 type Props = {
   company: ServiceCompanyItem;
+  onBigVariantToggle?: (isBig: boolean) => void;
 };
 
-const PdfSettings = ({company}: Props) => {
+const PdfSettings = ({company, onBigVariantToggle}: Props) => {
   const {data: uuid} = useUuid();
 
   const [headerPosition, setHeaderPosition] = useState<Position>({x: 0, y: 0});
@@ -321,6 +322,8 @@ const PdfSettings = ({company}: Props) => {
   };
 
   useEffect(() => {
+    onBigVariantToggle?.(showBigger);
+
     if (!showBigger) {
       initializeDimensions(clientStorageData);
       setIsInitialized(false);

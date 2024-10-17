@@ -3,6 +3,7 @@ import {formatDate} from 'utils/datetime';
 import {getDisplayDeliveryDate} from 'utils/invoice';
 import {InvoiceType, InvoiceView} from 'models/invoice';
 import {useMemo} from 'react';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -70,6 +71,7 @@ type Props = {
   selectedLng?: string;
   nextCompanyExternalId?: string;
   showCurrentDateAsInvoiceDate?: boolean;
+  pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
 const PdfTemplateInvoiceDetails = ({
@@ -78,6 +80,7 @@ const PdfTemplateInvoiceDetails = ({
   selectedLng,
   nextCompanyExternalId,
   showCurrentDateAsInvoiceDate,
+  pdfConfigClientStorage,
 }: Props) => {
   const startDate = invoice?.additionalInfo.deliveryStartDate;
   const endDate = invoice?.additionalInfo.deliveryEndDate;
@@ -145,6 +148,29 @@ const PdfTemplateInvoiceDetails = ({
         </View>
       )}
 
+      {pdfConfigClientStorage.includeUsername && (
+        <View style={styles.rightAddressContent}>
+          <Text style={styles.tag}>{translate('Contact')}</Text>
+          <Text style={styles.tagContent}>{invoice?.propertyOwner.name}</Text>
+        </View>
+      )}
+      {pdfConfigClientStorage.includeUserPhone && (
+        <View style={styles.rightAddressContent}>
+          <Text style={styles.tag}>{translate('Phone number')}</Text>
+          <Text style={styles.tagContent}>
+            {invoice?.propertyOwner.contact.phone ?? '-'}
+          </Text>
+        </View>
+      )}
+      {pdfConfigClientStorage.includeUserPhone && (
+        <View style={styles.rightAddressContent}>
+          <Text style={styles.tag}>{translate('Email address')}</Text>
+          <Text style={styles.tagContent}>
+            {invoice?.propertyOwner.contact.email}
+          </Text>
+        </View>
+      )}
+
       {(invoice?.meta.creator?.firstName ||
         invoice?.meta.creator?.lastName) && (
         <View style={styles.rightAddressContent}>
@@ -208,10 +234,18 @@ const PdfTemplateInvoiceDetails = ({
       )}
 
       <View style={{marginTop: 20}}>
-        {elevatorExternalId && (
+        {pdfConfigClientStorage.includeUnitNumber && elevatorExternalId && (
           <View style={styles.rightAddressContent}>
             <Text style={styles.tag}>{translate('Unit no.')}</Text>
             <Text style={styles.tagContent}>{elevatorExternalId}</Text>
+          </View>
+        )}
+        {pdfConfigClientStorage.includeSerialNumber && (
+          <View style={styles.rightAddressContent}>
+            <Text style={styles.tag}>{translate('Serial number')}.</Text>
+            <Text style={styles.tagContent}>
+              {invoice?.serviceOrder?.elevator.serialNumber ?? '-'}
+            </Text>
           </View>
         )}
 

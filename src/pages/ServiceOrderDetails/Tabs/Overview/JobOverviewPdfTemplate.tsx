@@ -24,6 +24,7 @@ import {
 } from 'utils/discount';
 import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {getServiceCompanyInfo} from 'utils/company-utils';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -158,6 +159,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
 const JobOverviewPdfTemplate = React.memo(
@@ -172,6 +174,7 @@ const JobOverviewPdfTemplate = React.memo(
     headerPath,
     footerInfo,
     footerPath,
+    pdfConfigClientStorage,
   }: Props) => {
     const articleItems = serviceOrder?.articles!;
 
@@ -299,6 +302,32 @@ const JobOverviewPdfTemplate = React.memo(
                     </Text>
                   </View>
                 )}
+                {pdfConfigClientStorage.includeUsername && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Contact')}</Text>
+                    <Text style={styles.tagContent}>
+                      {serviceOrder?.elevator?.propertyOwner?.name}
+                    </Text>
+                  </View>
+                )}
+                {pdfConfigClientStorage.includeUserPhone && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Phone number')}</Text>
+                    <Text style={styles.tagContent}>
+                      {serviceOrder?.elevator?.propertyOwner?.contact.phone ||
+                        '-'}
+                    </Text>
+                  </View>
+                )}
+                {pdfConfigClientStorage.includeUserEmail && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Email address')}</Text>
+                    <Text style={styles.tagContent}>
+                      {serviceOrder?.elevator?.propertyOwner?.contact.email ||
+                        '-'}
+                    </Text>
+                  </View>
+                )}
 
                 {serviceOrder?.meta.createdAt && (
                   <View style={styles.rightAddressContent}>
@@ -321,11 +350,22 @@ const JobOverviewPdfTemplate = React.memo(
                 )}
 
                 <View style={{marginTop: 20}}>
-                  {serviceOrder?.elevator.externalId && (
+                  {pdfConfigClientStorage.includeUnitNumber &&
+                    serviceOrder?.elevator.externalId && (
+                      <View style={styles.rightAddressContent}>
+                        <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                        <Text style={styles.tagContent}>
+                          {serviceOrder?.elevator.externalId}
+                        </Text>
+                      </View>
+                    )}
+                  {pdfConfigClientStorage.includeSerialNumber && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                      <Text style={styles.tag}>
+                        {translate('Serial number')}.
+                      </Text>
                       <Text style={styles.tagContent}>
-                        {serviceOrder?.elevator.externalId}
+                        {serviceOrder?.elevator.serialNumber || '-'}
                       </Text>
                     </View>
                   )}

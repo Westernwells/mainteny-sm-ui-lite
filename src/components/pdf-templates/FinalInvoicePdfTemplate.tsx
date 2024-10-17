@@ -20,6 +20,7 @@ import {ArticleType} from 'models/article';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -92,6 +93,7 @@ type Props = {
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
   showCurrentDateAsInvoiceDate?: boolean;
+  pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
 const FinalInvoicePdfTemplate = ({
@@ -109,6 +111,7 @@ const FinalInvoicePdfTemplate = ({
   nextCompanyExternalId,
   qrImageSrc,
   showCurrentDateAsInvoiceDate,
+  pdfConfigClientStorage,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -227,6 +230,7 @@ const FinalInvoicePdfTemplate = ({
               selectedLng={selectedLng}
               nextCompanyExternalId={nextCompanyExternalId}
               showCurrentDateAsInvoiceDate={showCurrentDateAsInvoiceDate}
+              pdfConfigClientStorage={pdfConfigClientStorage}
             />
           </TopSectionContainer>
 
