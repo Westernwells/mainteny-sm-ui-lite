@@ -2048,7 +2048,7 @@
   "Descending": "Descending",
   "Ascending": "Ascending",
   "Order": "Order",
-  "A payment due date is required to send the invoice. Please add this information to proceed": "A payment due date is required to send the invoice. Please add this information to proceed",
+  "Error: A payment due date is required to send the invoice. Please add this information to proceed": "Error: A payment due date is required to send the invoice. Please add this information to proceed",
   "Upfront": "Upfront",
   "Created Date Range": "Created Date Range",
   "Automatically assigned": "Automatically assigned",
@@ -2577,5 +2577,6 @@
   "Every 2 months": "Every 2 months",
   "Every 3 months": "Every 3 months",
   "Every 6 months": "Every 6 months",
-  "OFFSETTING ACCOUNT": "OFFSETTING ACCOUNT"
+  "OFFSETTING ACCOUNT": "OFFSETTING ACCOUNT",
+  "Elevator operation": "Elevator operation"
 }
