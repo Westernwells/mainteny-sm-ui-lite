@@ -120,8 +120,11 @@ const getStyles = (
       marginTop: 6,
       marginBottom: 16,
     },
-    notesSection: {
+    paymentTermsSection: {
       marginTop: 5,
+    },
+    notesSection: {
+      marginTop: 30,
     },
     sectionHeading: {
       fontSize: 10,
@@ -365,7 +368,7 @@ const FullInvoicePdfTemplate = ({
             )}
 
             {invoice?.additionalInfo.paymentTerm?.term?.trim() && (
-              <View style={styles.notesSection} wrap={false}>
+              <View style={styles.paymentTermsSection} wrap={false}>
                 <Text style={styles.sectionHeading}>
                   {translate('Payment terms')}
                 </Text>
@@ -375,10 +378,7 @@ const FullInvoicePdfTemplate = ({
 
             {invoice?.additionalInfo?.moreInfo &&
               stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
-                <View wrap={false}>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Notes')}
-                  </Text>
+                <View wrap={false} style={styles.notesSection}>
                   <HtmlPDF
                     html={formatCostText(
                       invoice?.additionalInfo?.moreInfo,

@@ -1455,7 +1455,7 @@ export const InvoiceForm = ({
     [createdByName, createdByPhotoUrl],
   );
 
-  const notesText = selectedLng === 'DE' ? 'Anmerkungen' : t('Notes');
+  const notesText = selectedLng === 'DE' ? 'Schlussbemerkungen' : t('Notes');
 
   const getInvoiceTypeText = () => {
     const invoiceLabel =

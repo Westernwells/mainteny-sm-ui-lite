@@ -1,5 +1,5 @@
 import {useMemo} from 'react';
-import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {Document, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
@@ -62,6 +62,9 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     contentBody: {
       marginTop: 6,
       marginBottom: 16,
+    },
+    notesSection: {
+      marginTop: 30,
     },
     sectionHeading: {
       fontSize: 10,
@@ -131,7 +134,7 @@ const FinalInvoicePdfTemplate = ({
 
     return (
       (grossTotal - itemDiscountValue) /
-        10 ** articleItem.unitAmount.fractionDigits ?? 2
+        10 ** articleItem.unitAmount.fractionDigits || 2
     );
   };
 
@@ -269,10 +272,7 @@ const FinalInvoicePdfTemplate = ({
 
             {invoice?.additionalInfo?.moreInfo &&
               stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
-                <View wrap={false}>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Notes')}
-                  </Text>
+                <View wrap={false} style={styles.notesSection}>
                   <HtmlPDF
                     html={formatCostText(
                       invoice?.additionalInfo?.moreInfo,
