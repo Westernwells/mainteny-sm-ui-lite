@@ -1,9 +1,9 @@
 import {isEqual} from 'lodash';
-import {statusMapping} from '../utils/utils';
+import {navigateCy, statusMapping} from '../utils/utils';
 
 export default class ContractListingPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="contracts-nav-item"]').click();
+    navigateCy('customer-center', 'contracts');
   };
 
   static clearFilter = () => {

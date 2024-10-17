@@ -1,6 +1,8 @@
+import {navigateCy} from '../utils/utils';
+
 export default class CustomerPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="customers-nav-item"]').click();
+    navigateCy('customer-center', 'customers');
   };
 
   static fillFirstStep = () => {

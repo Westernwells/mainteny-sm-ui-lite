@@ -1,8 +1,9 @@
 import {formatDate} from '../../src/utils/datetime';
+import {navigateCy} from '../utils/utils';
 
 export default class EmployeesPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="employees-nav-item"]').click();
+    navigateCy('my-company', 'employees');
   };
 
   static getAvailableEmployeeRowIndex() {

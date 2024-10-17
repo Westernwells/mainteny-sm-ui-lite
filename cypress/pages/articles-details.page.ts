@@ -1,6 +1,8 @@
+import {navigateCy} from '../utils/utils';
+
 export default class ArticlesPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="articles-nav-item"]').click();
+    navigateCy('inventory', 'articles-&-suppliers');
   };
 
   static navigateToDetailsPage = () => {
