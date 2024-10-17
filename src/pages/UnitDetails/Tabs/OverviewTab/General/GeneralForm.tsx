@@ -38,6 +38,7 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
   const currentCurrency = useCurrentCurrency();
   const [modelQuery, setModelQuery] = useState('');
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [unitTypeQuery, setUnitTypeQuery] = useState('');
 
   const {data: elevatorModelsResource = createEmptyResource<string>()} =
     useCacheValues(
@@ -67,6 +68,16 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
     }
     setValue('externalId', companyNextNumber?.value);
   };
+
+  const {data: elevatorTypeResource = createEmptyResource<string>()} =
+    useCacheValues(
+      {
+        pageIndex: 0,
+        pageSize: 10,
+        query: unitTypeQuery,
+      },
+      CacheTypes.ELEVATOR_TYPE,
+    );
 
   return (
     <Grid container spacing={2} component="form">
@@ -218,6 +229,32 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
             type: 'number',
             inputProps: {min: 0},
             ...register('yearBuilt'),
+          }}
+        />
+      </Grid>
+
+      <Grid item md={6}>
+        <ComboBoxNew
+          options={elevatorTypeResource.data.map((item) => ({
+            label: item,
+            value: item,
+          }))}
+          getValue={(item) => setValue('unitType', item?.value || undefined)}
+          initialValue={
+            watch('unitType')
+              ? {
+                  label: watch('unitType') as string,
+                  value: watch('unitType') as string,
+                }
+              : null
+          }
+          initialQuery={watch('unitType')}
+          getQuery={(item) => setUnitTypeQuery(item || '')}
+          textFieldProps={{
+            placeholder: 'e.g. Hydraulic',
+            label: 'Unit Type',
+            required: false,
+            ...register('unitType'),
           }}
         />
       </Grid>

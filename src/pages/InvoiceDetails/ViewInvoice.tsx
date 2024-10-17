@@ -1104,6 +1104,15 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const onPrintInvoice = async () => {
     setIsConfirmPrintDialogOpen(false);
 
+    const errorMessage = validateDueDate(invoice);
+
+    if (errorMessage) {
+      enqueueSnackbar(t(errorMessage), {
+        variant: 'error',
+      });
+      return;
+    }
+
     if (
       user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
       !qrImageSrc &&
