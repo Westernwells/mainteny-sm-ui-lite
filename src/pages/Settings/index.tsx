@@ -35,8 +35,8 @@ import Integrations from './Integrations';
 import Automations from './Automations';
 import Checklist from './Checklist';
 import Financials from './Financials';
-import PdfSettings from './PdfSettings';
 import TextBlocks from './TextBlocks';
+import PDFSettingLayout from './PdfSettings/layout';
 
 interface DrawerItem {
   label: string;
@@ -101,7 +101,7 @@ export const SettingsPage = () => {
       label: 'PDF',
       icon: <PictureAsPdfOutlined />,
       route: 'pdf',
-      component: <PdfSettings company={company!} />,
+      component: <PDFSettingLayout company={company!} />,
     },
     {
       label: 'Checklists',

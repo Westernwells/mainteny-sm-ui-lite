@@ -16,6 +16,7 @@ import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {HeaderFooterInfoData} from 'models/misc';
 import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {getServiceCompanyInfo} from 'utils/company-utils';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import {PdfChecklistComponent} from './PdfChecklistComponent';
 
 const getStyles = (
@@ -128,6 +129,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
 const ChecklistPdf = ({
@@ -143,6 +145,7 @@ const ChecklistPdf = ({
   headerPath,
   footerInfo,
   footerPath,
+  pdfConfigClientStorage,
 }: Props) => {
   const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
 
@@ -212,6 +215,32 @@ const ChecklistPdf = ({
                   </Text>
                 </View>
               )}
+              {pdfConfigClientStorage.includeUsername && (
+                <View style={styles.rightAddressContent}>
+                  <Text style={styles.tag}>{translate('Contact')}</Text>
+                  <Text style={styles.tagContent}>
+                    {serviceOrder?.elevator?.propertyOwner?.name}
+                  </Text>
+                </View>
+              )}
+              {pdfConfigClientStorage.includeUserPhone && (
+                <View style={styles.rightAddressContent}>
+                  <Text style={styles.tag}>{translate('Phone number')}</Text>
+                  <Text style={styles.tagContent}>
+                    {serviceOrder?.elevator?.propertyOwner?.contact.phone ||
+                      '-'}
+                  </Text>
+                </View>
+              )}
+              {pdfConfigClientStorage.includeUserEmail && (
+                <View style={styles.rightAddressContent}>
+                  <Text style={styles.tag}>{translate('Email address')}</Text>
+                  <Text style={styles.tagContent}>
+                    {serviceOrder?.elevator?.propertyOwner?.contact.email ||
+                      '-'}
+                  </Text>
+                </View>
+              )}
 
               {serviceOrder?.externalId && (
                 <View style={styles.rightAddressContent}>
@@ -222,11 +251,22 @@ const ChecklistPdf = ({
                 </View>
               )}
               <View style={{marginTop: 20}}>
-                {serviceOrder?.elevator?.externalId && (
+                {pdfConfigClientStorage.includeUnitNumber &&
+                  serviceOrder?.elevator?.externalId && (
+                    <View style={styles.rightAddressContent}>
+                      <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                      <Text style={styles.tagContent}>
+                        {serviceOrder?.elevator?.externalId}
+                      </Text>
+                    </View>
+                  )}
+                {pdfConfigClientStorage.includeSerialNumber && (
                   <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                    <Text style={styles.tag}>
+                      {translate('Serial number')}.
+                    </Text>
                     <Text style={styles.tagContent}>
-                      {serviceOrder?.elevator?.externalId}
+                      {serviceOrder?.elevator?.serialNumber}
                     </Text>
                   </View>
                 )}

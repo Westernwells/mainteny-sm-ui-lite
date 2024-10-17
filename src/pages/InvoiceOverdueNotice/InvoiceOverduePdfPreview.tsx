@@ -14,6 +14,8 @@ import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContain
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {getServiceCompanyInfo} from 'utils/company-utils';
+import {ClientReportForPDFConfig} from 'models/client-storage';
+import {useMemo} from 'react';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -131,6 +133,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
 const InvoiceOverduePdfPreview = ({
@@ -144,6 +147,7 @@ const InvoiceOverduePdfPreview = ({
   headerPath,
   footerInfo,
   footerPath,
+  pdfConfigClientStorage,
 }: Props) => {
   const serviceCompanyInfo = getServiceCompanyInfo(
     userInfo,
@@ -168,6 +172,16 @@ const InvoiceOverduePdfPreview = ({
       currencySymbol: currentCurrency?.symbol,
       companyLang: selectedLng,
     });
+
+  const elevatorExternalId = useMemo(
+    () =>
+      invoice?.additionalInfo.elevatorExternalId ||
+      invoice?.serviceOrder?.elevator.externalId,
+    [
+      invoice?.additionalInfo.elevatorExternalId,
+      invoice?.serviceOrder?.elevator.externalId,
+    ],
+  );
 
   return (
     <Document>
@@ -224,6 +238,30 @@ const InvoiceOverduePdfPreview = ({
                   </Text>
                 </View>
               )}
+              {pdfConfigClientStorage.includeUsername && (
+                <View style={styles.rightAddressContent}>
+                  <Text style={styles.tag}>{translate('Contact')}</Text>
+                  <Text style={styles.tagContent}>
+                    {invoice?.propertyOwner?.name || '-'}{' '}
+                  </Text>
+                </View>
+              )}
+              {pdfConfigClientStorage.includeUserPhone && (
+                <View style={styles.rightAddressContent}>
+                  <Text style={styles.tag}>{translate('Phone number')}</Text>
+                  <Text style={styles.tagContent}>
+                    {invoice?.propertyOwner?.contact.phone || '-'}{' '}
+                  </Text>
+                </View>
+              )}
+              {pdfConfigClientStorage.includeUserEmail && (
+                <View style={styles.rightAddressContent}>
+                  <Text style={styles.tag}>{translate('Email address')}</Text>
+                  <Text style={styles.tagContent}>
+                    {invoice?.propertyOwner?.contact.email || '-'}{' '}
+                  </Text>
+                </View>
+              )}
 
               {invoice?.dueDate && (
                 <View style={styles.rightAddressContent}>
@@ -233,6 +271,28 @@ const InvoiceOverduePdfPreview = ({
                   </Text>
                 </View>
               )}
+
+              <View style={{marginTop: 20}}>
+                {pdfConfigClientStorage.includeUnitNumber &&
+                  elevatorExternalId && (
+                    <View style={styles.rightAddressContent}>
+                      <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                      <Text style={styles.tagContent}>
+                        {elevatorExternalId}
+                      </Text>
+                    </View>
+                  )}
+                {pdfConfigClientStorage.includeSerialNumber && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>
+                      {translate('Serial number')}.
+                    </Text>
+                    <Text style={styles.tagContent}>
+                      {invoice?.serviceOrder?.elevator.serialNumber ?? '-'}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
           </TopSectionContainer>
 

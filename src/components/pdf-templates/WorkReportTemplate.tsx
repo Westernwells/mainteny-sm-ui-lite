@@ -21,6 +21,7 @@ import {HtmlPDF} from 'components/HtmlPDF';
 import {HeaderFooterInfoData} from 'models/misc';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {MinToStep} from 'models/service-company';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -291,6 +292,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
 const WorkReportTemplate = React.memo(
@@ -308,6 +310,7 @@ const WorkReportTemplate = React.memo(
     headerPath,
     footerInfo,
     footerPath,
+    pdfConfigClientStorage,
   }: Props) => {
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
     const company = userInfo?.serviceCompany;
@@ -386,7 +389,32 @@ const WorkReportTemplate = React.memo(
                     </Text>
                   </View>
                 )}
-
+                {pdfConfigClientStorage.includeUsername && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Contact')}</Text>
+                    <Text style={styles.tagContent}>
+                      {serviceOrder?.elevator?.propertyOwner?.name}
+                    </Text>
+                  </View>
+                )}
+                {pdfConfigClientStorage.includeUserPhone && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Phone number')}</Text>
+                    <Text style={styles.tagContent}>
+                      {serviceOrder?.elevator?.propertyOwner?.contact.phone ||
+                        '-'}
+                    </Text>
+                  </View>
+                )}
+                {pdfConfigClientStorage.includeUserEmail && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Email address')}</Text>
+                    <Text style={styles.tagContent}>
+                      {serviceOrder?.elevator?.propertyOwner?.contact.email ||
+                        '-'}
+                    </Text>
+                  </View>
+                )}
                 {(schedule?.technician?.userAccount?.firstName ||
                   schedule?.technician?.userAccount?.lastName) && (
                   <View style={styles.rightAddressContent}>
@@ -399,11 +427,22 @@ const WorkReportTemplate = React.memo(
                 )}
 
                 <View style={{marginTop: 20}}>
-                  {serviceOrder?.elevator?.externalId && (
+                  {pdfConfigClientStorage.includeUnitNumber &&
+                    serviceOrder?.elevator?.externalId && (
+                      <View style={styles.rightAddressContent}>
+                        <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                        <Text style={styles.tagContent}>
+                          {serviceOrder?.elevator?.externalId}
+                        </Text>
+                      </View>
+                    )}
+                  {pdfConfigClientStorage.includeSerialNumber && (
                     <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                      <Text style={styles.tag}>
+                        {translate('Serial number')}.
+                      </Text>
                       <Text style={styles.tagContent}>
-                        {serviceOrder?.elevator?.externalId}
+                        {serviceOrder?.elevator?.serialNumber || '-'}
                       </Text>
                     </View>
                   )}

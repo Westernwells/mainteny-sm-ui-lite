@@ -48,6 +48,10 @@ import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {stripHtmlTags} from 'utils/text-block';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 
 interface Props {
   quotation: QuotationView;
@@ -83,6 +87,15 @@ export const Actions = ({quotation}: Props) => {
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
+
   const {t: translateCompanyLanguage} = useTranslation('translation', {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
@@ -132,6 +145,7 @@ export const Actions = ({quotation}: Props) => {
     setCreatingPdf(true);
     const blob = await pdf(
       <QuotationPdfTemplate
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         quotation={quotation}

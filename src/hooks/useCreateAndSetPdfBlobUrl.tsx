@@ -10,6 +10,11 @@ import {QuotationView} from 'models/quotation';
 import {ServiceOrderView} from 'models/service-order';
 import {UserAccount} from 'models/user';
 import JobOverviewPdfTemplate from 'pages/ServiceOrderDetails/Tabs/Overview/JobOverviewPdfTemplate';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
+import {useQueryClientStorageData} from './useClientStorage';
 
 type UseCreateAndSetPdfBlobUrlProps = {
   serviceOrder: ServiceOrderView;
@@ -41,6 +46,13 @@ export const useCreateAndSetPdfBlobUrl = ({
   const [filePathToDownload, setFilePathToDownload] = useState('');
   const {enqueueSnackbar, closeSnackbar, showError} = useSnackbar();
   const snackBarRef = useRef<SnackbarKey | null>(null);
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: serviceOrder.serviceCompany.id,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
 
   const {downloadFile} = useDownloadFileWithCustomName(
     fileName,
@@ -50,6 +62,7 @@ export const useCreateAndSetPdfBlobUrl = ({
   const generatePdfBlobUrl = async () => {
     const blob = await pdf(
       <JobOverviewPdfTemplate
+        pdfConfigClientStorage={pdfConfig}
         userInfo={userInfo}
         currentCurrency={currentCurrency}
         serviceOrder={serviceOrder}

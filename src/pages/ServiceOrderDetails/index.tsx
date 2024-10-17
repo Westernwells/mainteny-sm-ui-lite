@@ -27,6 +27,10 @@ import {pdf} from '@react-pdf/renderer';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -89,6 +93,14 @@ export const ServiceOrderDetails = () => {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
 
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
+
   const translate = useMemo(
     () => (key: string) => {
       if (company?.language) {
@@ -123,6 +135,7 @@ export const ServiceOrderDetails = () => {
   const generatePreviewPdfBlobUrl = async () => {
     const blob = await pdf(
       <JobOverviewPdfTemplate
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         serviceOrder={serviceOrder}

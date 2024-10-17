@@ -64,6 +64,10 @@ import {Dialog} from 'components/Dialog';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {cleanHtmlContent} from 'utils/text-block';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -166,6 +170,14 @@ export const WorkReport = ({serviceOrder}: Props) => {
   const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
   const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
 
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
+
   const {data: headerUrl = {}} = useDownloadUrl(
     headerInfo?.path ? [headerInfo.path] : [],
     undefined,
@@ -185,6 +197,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
   const generateWorkReportPdf = async () => {
     const blob = await pdf(
       <WorkReportTemplate
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
         translate={translate}

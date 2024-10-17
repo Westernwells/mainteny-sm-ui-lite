@@ -1,3 +1,4 @@
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import {EmployeeEventType} from 'models/employee';
 import {InvoiceFormat} from 'models/propertyManager';
 
@@ -67,3 +68,14 @@ export const DEFAULT_EMPLOYEE_EVENT_TYPES = [
   'VACATION',
   'SICK_LEAVE',
 ];
+
+export const CLIENT_STORAGE_PDF_CONFIG_KEY = 'pdf-configurations';
+
+export const DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE: ClientReportForPDFConfig =
+  {
+    includeUnitNumber: false,
+    includeSerialNumber: false,
+    includeUsername: false,
+    includeUserEmail: false,
+    includeUserPhone: false,
+  };
