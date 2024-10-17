@@ -2040,7 +2040,7 @@
   "Descending": "По убыванию",
   "Ascending": "По возрастанию",
   "Order": "Заказ",
-  "A payment due date is required to send the invoice. Please add this information to proceed": "Для отправки счета требуется дата платежа. Пожалуйста, добавьте эту информацию, чтобы продолжить",
+  "Error: A payment due date is required to send the invoice. Please add this information to proceed": "Для отправки счета требуется дата платежа. Пожалуйста, добавьте эту информацию, чтобы продолжить",
   "Upfront": "Аванс",
   "Created Date Range": "Созданный диапазон дат",
   "Automatically assigned": "Автоматически назначенная",
@@ -2583,5 +2583,6 @@
   "# OF USERS": "# ПОЛЬЗОВАТЕЛЕЙ",
   "# OF LICENCES": "# ЛИЦЕНЗИЙ",
   "CREATED": "СОЗДАНА",
-  "LAST ACTIVE": "ПОСЛЕДНЯЯ АКТИВНОСТЬ"
+  "LAST ACTIVE": "ПОСЛЕДНЯЯ АКТИВНОСТЬ",
+  "CREDIT_NOTE": "Кредитная нота"
 }

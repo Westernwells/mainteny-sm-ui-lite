@@ -2048,7 +2048,7 @@
   "Descending": "Aftagende",
   "Ascending": "Stigende",
   "Order": "Bestille",
-  "A payment due date is required to send the invoice. Please add this information to proceed": "Der kræves en betalingsdato for at sende fakturaen. Tilføj venligst disse oplysninger for at fortsætte",
+  "Error: A payment due date is required to send the invoice. Please add this information to proceed": "Der kræves en betalingsdato for at sende fakturaen. Tilføj venligst disse oplysninger for at fortsætte",
   "Upfront": "På forhånd",
   "Created Date Range": "Oprettet datointerval",
   "Automatically assigned": "Automatisk tildelt",
@@ -2642,7 +2642,7 @@
   "Add your default articles to be included in every invoice": "Tilføj dine standardartikler for at blive inkluderet i hver faktura",
   "ARTICLE #": "ARTIKEL #",
   "They will appear here once the article is added": "De vises her, når artiklen er tilføjet",
-  "Elevator Operation": "Elevator betjening",
+  "Elevator operation": "Elevator betjening",
   "New Elevator Operation Job": "Nyt elevatordriftsjob",
   "Date of credit note": "Dato for kreditnota",
   "Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Sender faktura {{invoiceNumber}} til {{receiverEmail}} af {{senderName}}",
@@ -2652,5 +2652,6 @@
   "The email was successfully delivered to {{receiverEmail}}": "E-mailen blev leveret til {{receiverEmail}}",
   "Quotation marked as rejected": "Tilbud markeret som afvist",
   "Quotation marked as accepted": "Tilbud markeret som accepteret",
-  "testing key (dont add translations this will be removed soon)": "testnøgle (tilføj ikke oversættelser, dette vil snart blive fjernet)"
+  "testing key (dont add translations this will be removed soon)": "testnøgle (tilføj ikke oversættelser, dette vil snart blive fjernet)",
+  "CREDIT_NOTE": "Kreditnota"
 }
