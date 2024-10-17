@@ -512,7 +512,7 @@ export const DraftQuotation = ({
     setOpenContractPaymentTermsDialog(false);
   };
 
-  const notesText = selectedLng === 'DE' ? 'Anmerkungen' : t('Notes');
+  const notesText = selectedLng === 'DE' ? 'Schlussbemerkungen' : t('Notes');
 
   const isEditAndNoCreator = formType === 'edit' && !quotation?.meta.creator;
   const hasInvoiceCreator = quotation?.meta?.creator ?? false;
