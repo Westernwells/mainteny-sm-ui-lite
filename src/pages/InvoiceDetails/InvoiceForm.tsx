@@ -1096,7 +1096,10 @@ export const InvoiceForm = ({
 
   const handleCustomerChange = (newCustomer?: PropertyOwnerView | null) => {
     if (newCustomer) {
-      formik.setFieldValue('propertyOwnerId', newCustomer.id);
+      if (newCustomer.id !== formik.values.propertyOwnerId) {
+        handleRemoveCustomer(); // Remove previous customer and related data
+        formik.setFieldValue('propertyOwnerId', newCustomer.id); // Set new customer
+      }
     } else {
       handleRemoveCustomer();
     }
@@ -1159,7 +1162,10 @@ export const InvoiceForm = ({
   }, [customer, invoice]);
 
   useEffect(() => {
-    if (propertyOwnerData) {
+    if (
+      propertyOwnerData &&
+      (!customer || customer.id !== propertyOwnerData.id)
+    ) {
       setCustomer(propertyOwnerData);
     }
   }, [propertyOwnerData]);

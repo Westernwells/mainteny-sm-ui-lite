@@ -1,4 +1,10 @@
-import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import React, {
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Theme, CSSObject} from '@mui/material/styles';
 import styled from '@mui/material/styles/styled';
@@ -622,7 +628,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
               ) => {
                 if (!access) return null;
                 return (
-                  <>
+                  <Fragment key={text}>
                     <ListItemButton
                       onClick={(e) => {
                         if (!subList) {
@@ -814,7 +820,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                         </List>
                       </Collapse>
                     )}
-                  </>
+                  </Fragment>
                 );
               },
             )}
