@@ -143,4 +143,35 @@ describe('Job', () => {
                 }
             });
     });
+
+    it('overdue jobs should have the Unschedule menu item', () => {
+        ServiceJobPage.changeTab(0);
+
+        cy.get('span[role="progressbar"]').should('not.exist');
+
+        OrderPage.changeStatusFilter('Overdue');
+        cy.wait(3000);
+
+        cy.wait('@serviceOrdersApi')
+            .its('response')
+            .then((response) => {
+                const {body: serviceOrders} = response;
+
+                // Check if service orders data is available
+                if (serviceOrders && serviceOrders.data.length) {
+                    ServiceJobPage.getFirstTableElement().should('exist').click();
+
+                    cy.get('span[role="progressbar"]', {timeout: 120000}).should('not.exist');
+
+                    cy.wait('@serviceOrdersApi');
+
+                    cy.get('#long-button').click();
+
+                    cy.get('li[role="menuitem"]').contains('Unschedule').should('exist');
+                } else {
+                    cy.get('tbody').children().should('not.exist');
+                    throw new Error('No Unscheduled jobs found');
+                }
+            });
+    });
 });
