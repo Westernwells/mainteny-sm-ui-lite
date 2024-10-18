@@ -18,7 +18,7 @@ import {Progress} from 'components/Progress';
 import {Button} from 'components/Button';
 import {useSendChecklist} from 'hooks/reactQuery/useServiceOrder';
 import {
-  useDeleteServiceOrderChecklist,
+  useDisassociateChecklistToServiceOrder,
   useQueryServiceOrderChecklists,
   useUploadChecklistAnswer,
 } from 'hooks/reactQuery/useChecklists';
@@ -117,8 +117,8 @@ export const CheckList = ({serviceOrder}: Props) => {
   );
   const {mutateAsync: sendCheckList, isLoading: sendingCheckList} =
     useSendChecklist();
-  const {mutateAsync: deleteServiceOrderChecklist, isLoading: isDeleting} =
-    useDeleteServiceOrderChecklist();
+  const {mutateAsync: disassociateMultiChecklist, isLoading: isDeleting} =
+    useDisassociateChecklistToServiceOrder('Checklist deleted successfully!');
   const {mutateAsync: uploadChecklistAnswer, isLoading: isUploadingAnswers} =
     useUploadChecklistAnswer('Checklist saved successfully');
 
@@ -138,28 +138,7 @@ export const CheckList = ({serviceOrder}: Props) => {
         )
       : [],
   );
-  const labels =
-    completedChecklists?.map((c) => {
-      const schedule = serviceOrder.schedules.find(
-        (s) => s.technician.id === c.technicianId,
-      );
-      const checklistNumber = c.checkList.number || 'Unassigned';
-      return {
-        value: {
-          checklistId: c.checkListId,
-          technicianId: c.technicianId,
-        },
-        label: `${checklistNumber}-${schedule?.technician.userAccount.firstName} ${schedule?.technician.userAccount.lastName}`,
-      };
-    }) || [];
 
-  const [selectedOption, setSelectedOption] = useState<
-    | {
-        checklistId: string;
-        technicianId: string;
-      }
-    | undefined
-  >(labels[0]?.value);
   const [selectedChecklist, setSelectedChecklist] =
     useState<ServiceOrderCheckListView>();
 
@@ -213,7 +192,7 @@ export const CheckList = ({serviceOrder}: Props) => {
   );
 
   const technicianUserAccount = serviceOrder.schedules.find(
-    (s) => s.technician.id === selectedOption?.technicianId,
+    (s) => s.technician.id === selectedChecklist?.technicianId,
   )?.technician.userAccount;
   const technicianName = technicianUserAccount
     ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
@@ -228,18 +207,17 @@ export const CheckList = ({serviceOrder}: Props) => {
     : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
 
   const deleteChecklist = async () => {
-    await deleteServiceOrderChecklist(
+    await disassociateMultiChecklist(
       {
-        id: serviceOrder.id,
-        params: {
-          checkListId: selectedOption?.checklistId!,
-          technicianId: selectedOption?.technicianId!,
+        params: {serviceOrder: serviceOrder.id},
+        body: {
+          checkListId: selectedChecklist?.checkListId!,
+          technicianId: selectedChecklist?.technicianId!,
         },
       },
       {
         onSuccess: () => {
           setDeleteChecklistConfirm(false);
-          setSelectedOption(labels[0]?.value || '');
         },
       },
     );
@@ -269,12 +247,6 @@ export const CheckList = ({serviceOrder}: Props) => {
 
     return {all: componentsWithoutHead.length, done: doneList.length};
   }, [selectedChecklist]);
-
-  useEffect(() => {
-    if (completedChecklists?.length && !selectedOption) {
-      setSelectedOption(labels[0].value);
-    }
-  }, [completedChecklists]);
 
   useEffect(() => {
     if (!serviceOrderCheckLists?.length) {
