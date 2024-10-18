@@ -772,6 +772,7 @@ export const ArticleItemRowNEW = ({
       {/* DISCOUNT */}
       <TableCell sx={{width: '9%', display: 'inline-block'}}>
         <NumericFormat
+          name="discount"
           value={
             formik.values.discount?.type === DiscountType.AMOUNT
               ? formik.values.discount?.amount?.value

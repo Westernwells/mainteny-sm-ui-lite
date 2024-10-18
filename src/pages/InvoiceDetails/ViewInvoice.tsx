@@ -240,7 +240,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice.serviceOrder?.id,
   );
-  const {data: invoiceAmountDetail} = useInvoiceAmountDetail(invoice?.id);
+  const {data: invoiceAmountDetail, isLoading: isLoadingInvoiceAmountDetail} =
+    useInvoiceAmountDetail(invoice?.id);
 
   const sortedPreviousInvoices = useMemo(
     () =>
@@ -1053,7 +1054,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   useEffect(() => {
     if (
       memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT &&
-      !qrError
+      !qrError &&
+      !isLoadingInvoiceAmountDetail
     ) {
       generateBlobUrl({
         invoiceData: memorizedUpdateInvoiceData,
@@ -1072,6 +1074,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       : previousInvoices,
     qrError,
     qrImageSrc,
+    isLoadingInvoiceAmountDetail,
   ]);
 
   useEffect(() => {

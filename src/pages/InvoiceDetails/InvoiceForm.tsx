@@ -518,11 +518,14 @@ export const InvoiceForm = ({
     validationSchema,
     onSubmit: async (values) => {
       const response = await onSave(values);
-      const newInvoiceId = isNewInvoice ? response.value : invoice?.id;
       resetLocalStorage();
-      navigate(`/invoices/details/${newInvoiceId}`, {
-        replace: true,
-      });
+      if (isNewInvoice) {
+        navigate(`/invoices/details/${response.value}`, {
+          replace: true,
+        });
+      } else {
+        navigate(-1);
+      }
     },
   });
 
@@ -949,7 +952,7 @@ export const InvoiceForm = ({
     if (serviceOrderArg?.additionalInfo.discount) {
       formik.setFieldValue(
         'discount',
-        getDiscoutObj(serviceOrderArg?.additionalInfo.discount),
+        getDiscoutObj(serviceOrderArg?.additionalInfo.discount, true),
       );
     }
 
@@ -1222,6 +1225,7 @@ export const InvoiceForm = ({
         getDiscoutObj(
           sortedPreviousInvoices[sortedPreviousInvoices.length - 1]
             ?.additionalInfo.discount,
+          true,
         ),
       );
     }
@@ -1863,6 +1867,7 @@ export const InvoiceForm = ({
             />
 
             <RichTextField
+              data-testid="payment-terms-rich-text-field"
               name="paymentTerms"
               label="Payment terms"
               html={formik.values.paymentTerm?.term || ''}

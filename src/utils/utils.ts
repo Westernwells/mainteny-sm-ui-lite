@@ -717,3 +717,9 @@ export const applyCountryCode = (address?: AddressRecord | Address | null) =>
       countryCode: getCountryCode(address.component.country),
     }),
   };
+
+export const getRandomIntInRange = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
+
+export const removeControlCharsAndSpaces = (str: string) =>
+  str.replace(/\p{C}/gu, '').replaceAll(' ', '').replaceAll('\n', '');

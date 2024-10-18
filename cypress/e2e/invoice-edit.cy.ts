@@ -82,7 +82,9 @@ describe('Invoice Edit Flow with Payment Terms', () => {
             cy.contains('{PAYMENT_AMOUNT}').should('exist');
 
             InvoiceEditPage.saveInvoice();
-            
+            cy.contains('Loading PDF').should('exist');
+            cy.contains('Loading PDF').should('not.exist');
+
             // After saving, calculate the dynamic values
             const discountValues = getFormattedPaymentValues(
                 invoice.additionalInfo.paymentTerm,
