@@ -2806,5 +2806,17 @@
   "Factory number": "Fabrički broj",
   "No jobs": "Nema poslova",
   "Create a new job to start working and tracking its progress": "Kreirajte novi posao da biste počeli da radite i pratite njegov napredak",
-  "First invoice date is required": "Datum prve fakture je obvezan"
+  "First invoice date is required": "Datum prve fakture je obvezan",
+  "Add new employees and centralize all their information—work hours, absence tracking, contact details, and schedules—in one place to organize your work and enhance efficiency.": "Dodajte nove zaposlene i centralizujte sve njihove informacije – radno vreme, praćenje odsustva, podatke o kontaktu i rasporede – na jednom mestu da biste organizovali svoj posao i poboljšali efikasnost.",
+  "No employees": "Nema zaposlenih",
+  "Exports": "Izvoz",
+  "Select data to auto-include in PDFs, like invoices and quotes.": "Izaberite podatke za automatsko uključivanje u PDF-ove, kao što su fakture i ponude.",
+  "PDF config updated successfully": "PDF konfiguracija je uspešno ažurirana",
+  "Finance": "Finansije",
+  "Inventory": "Inventar",
+  "My Company": "Moja kompanija",
+  "Customer Center": "Centar za korisnike",
+  "Articles & Suppliers": "Artikli i dobavljači",
+  "Select job number": "Izaberite broj posla",
+  "Unit no._elevator": "Broj jedinice"
 }
