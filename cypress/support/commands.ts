@@ -42,6 +42,7 @@ declare global {
       login(): Chainable<void>;
       fillRichTextField(field: string, value: string): Chainable<void>;
       clearRichTextField(field: string): Chainable<void>;
+      waitForSpinnerToDisappear(): Chainable<void>;
     }
   }
 }
@@ -79,6 +80,10 @@ Cypress.Commands.add('clearRichTextField', (field: string) => {
         .realClick({clickCount: 3})
         .realPress('Backspace');
     });
+});
+
+Cypress.Commands.add('waitForSpinnerToDisappear', () => {
+  cy.get('span[role="progressbar"]').should('not.exist');
 });
 
 // hack for cypress typescript issues

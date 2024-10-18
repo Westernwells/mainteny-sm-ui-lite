@@ -370,3 +370,30 @@ export const replacePaymentTermsPlaceholders = (
 
   return result.trim();
 };
+
+export const netTotal = (articleItem: InvoiceItem, currencyCode: string) => {
+  const grossTotal =
+    (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
+  const discountValue =
+    articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
+
+  return centsToMoney(currencyCode, grossTotal - discountValue);
+};
+
+export const getDisplayDeliveryDate = (
+  deliveryStartDate?: string,
+  deliveryEndDate?: string,
+) => {
+  const formattedStartDate = deliveryStartDate
+    ? formatDate(deliveryStartDate)
+    : '';
+  const formattedEndDate = deliveryEndDate ? formatDate(deliveryEndDate) : '';
+
+  if (formattedStartDate && formattedEndDate) {
+    if (formattedStartDate === formattedEndDate) {
+      return formattedStartDate;
+    }
+    return `${formattedStartDate} - ${formattedEndDate}`;
+  }
+  return formattedStartDate || formattedEndDate;
+};
