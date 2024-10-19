@@ -18,6 +18,11 @@ export interface LocationFormModel {
   travelFee?: number;
 }
 
+export interface SeparateAddressFormModal {
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+}
+
 export interface UnitDetailsFormModel {
   category?: string;
   manufacturer?: string;

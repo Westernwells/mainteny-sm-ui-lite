@@ -2048,7 +2048,7 @@
   "Descending": "დაღმავალი",
   "Ascending": "აღმავალი",
   "Order": "თანმიმდებრობა",
-  "A payment due date is required to send the invoice. Please add this information to proceed": "ინვოისის გასაგზავნად საჭიროა გადახდის ვადა. გასაგრძელებლად, გთხოვთ, დაამატეთ ეს ინფორმაცია ",
+  "Error: A payment due date is required to send the invoice. Please add this information to proceed": "ინვოისის გასაგზავნად საჭიროა გადახდის ვადა. გასაგრძელებლად, გთხოვთ, დაამატეთ ეს ინფორმაცია ",
   "Upfront": "წინასწარ",
   "Created Date Range": "შეიქმნილი პერიოდი",
   "Automatically assigned": "ავტომატურად დავალებული",
@@ -2642,7 +2642,7 @@
   "Add your default articles to be included in every invoice": "დაამატეთ საწყისი ნაწილები, რომლებიც იქნება ყველა ინვოისში",
   "ARTICLE #": "ნაწილი #",
   "They will appear here once the article is added": "აქ გამოჩნდება მას შემდეგ, რაც ნაწილები დაემატება",
-  "Elevator Operation": "სალიფტო ოპერაცია",
+  "Elevator operation": "სალიფტო ოპერაცია",
   "New Elevator Operation Job": "ახალი სალიფტო ოპერაციის სამუშაო",
   "Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "ინვოისი {{invoiceNumber}} იგზავნება {{receiverEmail}} -სთან {{senderName}} მიერ",
   "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "დაგვიანების შეტყობინება {{invoiceNumber}} იგზავნება {{receiverEmail}} -სთან {{senderName}} მიერ",
@@ -2743,5 +2743,6 @@
   "Align right": "გასწორება მარჯვნივ",
   "Bulleted list": "ბურთულებიანი სია",
   "Numbered list": "დანომრილი სია",
-  "Attachment": "დანართი"
+  "Attachment": "დანართი",
+  "CREDIT_NOTE": "კრედიტ ნოტა"
 }

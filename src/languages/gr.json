@@ -2045,7 +2045,7 @@
   "Descending": "Φθίνων",
   "Ascending": "Αύξουσα",
   "Order": "Σειρά",
-  "A payment due date is required to send the invoice. Please add this information to proceed": "Απαιτείται ημερομηνία λήξης πληρωμής για την αποστολή του τιμολογίου. Προσθέστε αυτές τις πληροφορίες για να συνεχίσετε",
+  "Error: A payment due date is required to send the invoice. Please add this information to proceed": "Απαιτείται ημερομηνία λήξης πληρωμής για την αποστολή του τιμολογίου. Προσθέστε αυτές τις πληροφορίες για να συνεχίσετε",
   "Upfront": "Εκ των προτέρων",
   "Created Date Range": "Δημιουργήθηκε το εύρος ημερομηνιών",
   "Automatically assigned": "Εκχωρείται αυτόματα",
@@ -2581,5 +2581,6 @@
   "PDF template updated sucessfully": "Το πρότυπο PDF ενημερώθηκε με επιτυχία",
   "Drag and drop or": "Μεταφορά και απόθεση ή",
   "Click to upload": "Κάντε κλικ για μεταφόρτωση",
-  "Delete Image": "Διαγραφή αρχείο "
+  "Delete Image": "Διαγραφή αρχείο ",
+  "CREDIT_NOTE": "Πιστωτικό σημείωμα"
 }

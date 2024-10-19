@@ -132,7 +132,7 @@ describe('Job', () => {
 
                     cy.get('li[role="menuitem"]').contains('Schedule').click();
 
-                    ServiceJobPage.selectTechnicianWithIndex(1);
+                    ServiceJobPage.selectTechnicianWithIndex(2);
 
                     cy.contains('button', 'Save').should('not.be.disabled').click();
 

@@ -853,14 +853,20 @@ export const InvoiceForm = ({
         invoice.additionalInfo?.alternativeAddress || emptyAddressState,
       );
     } else {
-      formik.setFieldValue(
-        'billingAddress',
-        customerData.billingAddress || emptyAddressState,
-      );
-      formik.setFieldValue(
-        'beneficiaryAddress',
-        customerData.beneficiaryAddress || emptyAddressState,
-      );
+      if (!serviceOrder?.elevator.additionalInfo.billingAddress) {
+        formik.setFieldValue(
+          'billingAddress',
+          customerData.billingAddress || emptyAddressState,
+        );
+      }
+
+      if (!serviceOrder?.elevator.additionalInfo.beneficiaryAddress) {
+        formik.setFieldValue(
+          'beneficiaryAddress',
+          customerData.beneficiaryAddress || emptyAddressState,
+        );
+      }
+
       formik.setFieldValue(
         'alternativeAddress',
         customerData.otherAddress || emptyAddressState,
@@ -911,6 +917,26 @@ export const InvoiceForm = ({
   };
 
   const setFormFieldsFromServiceOrder = (serviceOrderArg: ServiceOrderView) => {
+    if (
+      serviceOrderArg.elevator.additionalInfo.billingAddress &&
+      !invoice?.additionalInfo?.billingAddress?.fullName
+    ) {
+      formik.setFieldValue(
+        'billingAddress',
+        serviceOrderArg.elevator.additionalInfo.billingAddress,
+      );
+    }
+
+    if (
+      serviceOrderArg.elevator.additionalInfo.beneficiaryAddress &&
+      !invoice?.additionalInfo?.beneficiaryAddress?.fullName
+    ) {
+      formik.setFieldValue(
+        'beneficiaryAddress',
+        serviceOrderArg.elevator.additionalInfo.beneficiaryAddress,
+      );
+    }
+
     if (!formik.values.propertyOwnerId) {
       formik.setFieldValue(
         'propertyOwnerId',
@@ -1070,7 +1096,10 @@ export const InvoiceForm = ({
 
   const handleCustomerChange = (newCustomer?: PropertyOwnerView | null) => {
     if (newCustomer) {
-      formik.setFieldValue('propertyOwnerId', newCustomer.id);
+      if (newCustomer.id !== formik.values.propertyOwnerId) {
+        handleRemoveCustomer(); // Remove previous customer and related data
+        formik.setFieldValue('propertyOwnerId', newCustomer.id); // Set new customer
+      }
     } else {
       handleRemoveCustomer();
     }
@@ -1085,7 +1114,16 @@ export const InvoiceForm = ({
   const onRemoveServiceOrder = useCallback(() => {
     setServiceOrder(undefined);
     formik.setFieldValue('serviceOrderId', '');
-  }, [formik]);
+
+    formik.setFieldValue(
+      'billingAddress',
+      customer?.billingAddress || emptyAddressState,
+    );
+    formik.setFieldValue(
+      'beneficiaryAddress',
+      customer?.beneficiaryAddress || emptyAddressState,
+    );
+  }, [formik, customer]);
 
   // Handle updates from duplicated invoice and edit mode
   useEffect(() => {
@@ -1124,7 +1162,10 @@ export const InvoiceForm = ({
   }, [customer, invoice]);
 
   useEffect(() => {
-    if (propertyOwnerData) {
+    if (
+      propertyOwnerData &&
+      (!customer || customer.id !== propertyOwnerData.id)
+    ) {
       setCustomer(propertyOwnerData);
     }
   }, [propertyOwnerData]);
@@ -1420,7 +1461,7 @@ export const InvoiceForm = ({
     [createdByName, createdByPhotoUrl],
   );
 
-  const notesText = selectedLng === 'DE' ? 'Anmerkungen' : t('Notes');
+  const notesText = selectedLng === 'DE' ? 'Schlussbemerkungen' : t('Notes');
 
   const getInvoiceTypeText = () => {
     const invoiceLabel =
