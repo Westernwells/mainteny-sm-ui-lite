@@ -114,6 +114,7 @@ export default class InvoicesPage {
       }
     }
 
+
     cy.contains('button', 'Confirm').click();
     cy.contains('button', 'Save').click();
     cy.contains('Invoice created successfully');

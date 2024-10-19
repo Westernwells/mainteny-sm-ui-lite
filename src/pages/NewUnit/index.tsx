@@ -1,15 +1,20 @@
 import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
-import {FormikErrors} from 'formik';
+import {FormikErrors, useFormik} from 'formik';
 import {useAddElevator, useAllElevators} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
-import {ElevatorStatus, ElevatorView} from 'models/elevator';
+import {
+  ElevatorRequestBody,
+  ElevatorStatus,
+  ElevatorView,
+} from 'models/elevator';
 import {AddressRecord, Priority} from 'models/misc';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {
   AppointmentFormModel,
   CustomerFormModel,
   LocationFormModel,
+  SeparateAddressFormModal,
   ServiceFormModel,
   UnitDetailsFormModel,
 } from 'models/unitForm';
@@ -33,13 +38,22 @@ const steps = [
   'Add appointment preferences',
 ];
 
+const LOCATION_DEFAULT_VALUES = {
+  address: undefined,
+  building: '',
+  propertySegment: '',
+  keyLocation: '',
+  parking: '',
+};
+
 export const NewUnit = () => {
   const formatDate = useFormatDate();
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [queryParams] = useSearchParams();
   const {data} = useGetCustomer(queryParams.get('customer') || undefined);
-
+  const [isSeparateAddressEnabled, setIsSeparateAddressEnabled] =
+    useState(false);
   const [customerFormError, setCustomerFormError] = useState<
     FormikErrors<CustomerFormModel>
   >({});
@@ -61,13 +75,19 @@ export const NewUnit = () => {
     FormikErrors<LocationFormModel>
   >({});
   const [locationFormValues, setLocationFormValues] =
-    useState<LocationFormModel>({
-      address: undefined,
-      building: '',
-      propertySegment: '',
-      keyLocation: '',
-      parking: '',
-    });
+    useState<LocationFormModel>(LOCATION_DEFAULT_VALUES);
+
+  const separateAddressFormik = useFormik<SeparateAddressFormModal>({
+    initialValues: {
+      billingAddress: {
+        fullName: '',
+      },
+      beneficiaryAddress: {
+        fullName: '',
+      },
+    },
+    onSubmit: () => {},
+  });
 
   const [unitDetailsFormError, setUnitDetailsFormError] = useState<
     FormikErrors<UnitDetailsFormModel>
@@ -150,7 +170,7 @@ export const NewUnit = () => {
   ]);
 
   const createNewUnit = async () => {
-    const body = {
+    const body: Partial<ElevatorRequestBody> = {
       address: formatAddressFullname(locationFormValues.address) as
         | AddressRecord
         | undefined,
@@ -215,6 +235,16 @@ export const NewUnit = () => {
       },
     };
 
+    if (isSeparateAddressEnabled) {
+      body.beneficiaryAddress = formatAddressFullname(
+        separateAddressFormik.values.beneficiaryAddress,
+      ) as AddressRecord | undefined;
+
+      body.billingAddress = formatAddressFullname(
+        separateAddressFormik.values.billingAddress,
+      ) as AddressRecord | undefined;
+    }
+
     const response = await addNewUnit(body);
     if (response) {
       navigate(`/units/details/${response.value}`, {replace: true});
@@ -262,6 +292,11 @@ export const NewUnit = () => {
             getLocationFormErrors={(errors) => setLocationFormError(errors)}
             getLocationFormValues={(values) => setLocationFormValues(values)}
             initialValues={locationFormValues}
+            isSeparateAddressEnabled={isSeparateAddressEnabled}
+            setIsSeparateAddressEnabled={(newBol: boolean) =>
+              setIsSeparateAddressEnabled(newBol)
+            }
+            separateAddressFormik={separateAddressFormik}
           />
         ) : null}
 

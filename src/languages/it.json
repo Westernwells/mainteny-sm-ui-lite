@@ -1890,5 +1890,6 @@
   "Start time": "Ora di inizio",
   "Discount": "Sconto",
   "Price": "Prezzo",
-  "Invoice for": "fattura per"
+  "Invoice for": "fattura per",
+  "CREDIT_NOTE": "Nota di credito"
 }

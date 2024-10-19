@@ -512,7 +512,7 @@ export const DraftQuotation = ({
     setOpenContractPaymentTermsDialog(false);
   };
 
-  const notesText = selectedLng === 'DE' ? 'Anmerkungen' : t('Notes');
+  const notesText = selectedLng === 'DE' ? 'Schlussbemerkungen' : t('Notes');
 
   const isEditAndNoCreator = formType === 'edit' && !quotation?.meta.creator;
   const hasInvoiceCreator = quotation?.meta?.creator ?? false;
@@ -754,20 +754,38 @@ export const DraftQuotation = ({
     if (customer && pageState === 'FRESH_NEW') {
       const emptyAddressState = {fullName: null};
 
-      formik.setFieldValue(
-        'billingAddress',
-        customer.billingAddress || emptyAddressState,
-      );
-      formik.setFieldValue(
-        'beneficiaryAddress',
-        customer.beneficiaryAddress || emptyAddressState,
-      );
+      if (
+        hasAddressValues(unit?.additionalInfo.beneficiaryAddress?.component!)
+      ) {
+        formik.setFieldValue(
+          'beneficiaryAddress',
+          unit?.additionalInfo.beneficiaryAddress,
+        );
+      } else {
+        formik.setFieldValue(
+          'beneficiaryAddress',
+          customer.beneficiaryAddress || emptyAddressState,
+        );
+      }
+
+      if (hasAddressValues(unit?.additionalInfo.billingAddress?.component!)) {
+        formik.setFieldValue(
+          'billingAddress',
+          unit?.additionalInfo.billingAddress,
+        );
+      } else {
+        formik.setFieldValue(
+          'billingAddress',
+          customer.billingAddress || emptyAddressState,
+        );
+      }
+
       formik.setFieldValue(
         'alternativeAddress',
         customer.otherAddress || emptyAddressState,
       );
     }
-  }, [customer, pageState]);
+  }, [customer, pageState, unit]);
 
   useEffect(() => {
     if (quotation) {

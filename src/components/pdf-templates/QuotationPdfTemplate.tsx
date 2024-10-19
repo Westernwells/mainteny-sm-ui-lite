@@ -91,8 +91,11 @@ const getStyles = (
       borderBottom: '1px solid #212121',
       paddingBottom: 10,
     },
-    notesSection: {
+    paymentTermsSection: {
       marginTop: 1,
+    },
+    notesSection: {
+      marginTop: 30,
     },
     sectionHeading: {
       fontSize: 10,
@@ -204,7 +207,7 @@ const QuotationPdfTemplate = React.memo(
 
       return (
         (grossTotal - discountValue) /
-          10 ** articleItem.unitAmount.fractionDigits ?? 2
+          10 ** articleItem.unitAmount.fractionDigits || 2
       );
     };
 
@@ -522,7 +525,7 @@ const QuotationPdfTemplate = React.memo(
                             }}>
                             {formatCurrency(
                               (articleItem?.unitAmount?.netAmount ?? 0) /
-                                10 ** articleItem.unitAmount.fractionDigits ??
+                                10 ** articleItem.unitAmount.fractionDigits ||
                                 0,
                               {
                                 currency: currentCurrency?.code,
@@ -718,7 +721,7 @@ const QuotationPdfTemplate = React.memo(
               </View>
 
               {quotation?.additionalInfo?.paymentTerms?.trim() && (
-                <View style={styles.notesSection}>
+                <View style={styles.paymentTermsSection}>
                   <Text style={styles.sectionHeading}>
                     {translate('Payment terms')}{' '}
                   </Text>
@@ -730,10 +733,7 @@ const QuotationPdfTemplate = React.memo(
 
               {quotation?.additionalInfo?.notes &&
                 stripHtmlTags(quotation?.additionalInfo?.notes) && (
-                  <View>
-                    <Text style={styles.sectionHeading}>
-                      {translate('Notes')}
-                    </Text>
+                  <View style={styles.notesSection}>
                     <HtmlPDF html={quotation?.additionalInfo?.notes || ''} />
                   </View>
                 )}
