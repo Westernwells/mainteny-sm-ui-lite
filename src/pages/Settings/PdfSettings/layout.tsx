@@ -38,11 +38,8 @@ const PDFSettingLayout = ({company}: Props) => {
     );
 
     return {
-      includeUnitNumber: parsedValue.includeUnitNumber ?? false,
-      includeSerialNumber: parsedValue.includeSerialNumber ?? false,
-      includeUsername: parsedValue.includeUsername ?? false,
-      includeUserEmail: parsedValue.includeUserEmail ?? false,
-      includeUserPhone: parsedValue.includeUserPhone ?? false,
+      ...DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+      ...parsedValue,
     };
   }, [clientStorageData]);
 
