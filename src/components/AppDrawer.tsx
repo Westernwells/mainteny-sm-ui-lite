@@ -244,7 +244,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
 
         setSelectedIndex(index);
-        handleNestControl('jobs');
+        handleNestControl('jobs', 'other');
         setSelectedPath('/orders');
         navigate('/orders');
       },
@@ -295,7 +295,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
 
         setSelectedIndex(index);
-        handleNestControl('customer center');
+        handleNestControl('customer center', 'other');
         setSelectedPath('/units');
         navigate('/units');
       },
@@ -376,7 +376,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
 
         setSelectedIndex(index);
-        handleNestControl('finance');
+        handleNestControl('finance', 'other');
         setSelectedPath('/invoices');
         navigate('/invoices');
       },
@@ -428,7 +428,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
 
         setSelectedIndex(index);
-        handleNestControl('inventory');
+        handleNestControl('inventory', 'other');
         setSelectedPath('/articles');
         navigate('/articles');
       },
@@ -464,7 +464,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         e.preventDefault();
 
         setSelectedIndex(index);
-        handleNestControl('my company');
+        handleNestControl('my company', 'other');
         setSelectedPath('/employees');
         navigate('/employees');
       },
@@ -507,36 +507,22 @@ export const AppDrawer = ({open, setOpen}: Props) => {
       text: 'Settings',
       icon: <SettingsIcon fontSize="1.5rem" />,
       selectIcon: <SettingsIconColor fontSize="1.5rem" />,
-      path: '/settings',
-      access: !isAdmin && isManager,
+      path: isAdmin ? '/admin/system-settings' : '/settings',
+      access: isAdmin || (!isAdmin && isManager),
       onClick: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
         index: number,
       ) => {
         e.preventDefault();
-
         setSelectedIndex(index);
-        setSelectedPath('/settings');
-        setSelectedPathOrigin('');
-        navigate('/settings');
-      },
-    },
-
-    {
-      text: 'Settings',
-      icon: <SettingsIcon fontSize="1.5rem" />,
-      selectIcon: <SettingsIconColor fontSize="1.5rem" />,
-      path: '/admin/system-settings',
-      access: isAdmin,
-      onClick: (
-        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        index: number,
-      ) => {
-        e.preventDefault();
-
-        setSelectedIndex(index);
-        setSelectedPath('/admin/system-settings');
-        navigate('/admin/system-settings');
+        if (isAdmin) {
+          setSelectedPath('/admin/system-settings');
+          navigate('/admin/system-settings');
+        } else {
+          setSelectedPath('/settings');
+          setSelectedPathOrigin('');
+          navigate('/settings');
+        }
       },
     },
   ];
@@ -792,7 +778,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                                 },
                                 '&:hover': {
                                   background: 'transparent',
-                                  borderLeft: 'solid 4px #8F9BB3',
+                                  borderLeft: 'solid 2px #8F9BB3',
                                   color: '#FFF',
                                   '.MuiListItemIcon-root > svg > g': {
                                     opacity: 1.0,
