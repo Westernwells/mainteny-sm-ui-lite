@@ -167,7 +167,9 @@ export const JobOverviewBottomDrawer = ({
             </Button>
           )}
 
-          {serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED && (
+          {[ServiceOrderStatus.SCHEDULED, ServiceOrderStatus.OVERDUE].includes(
+            serviceOrderDetails.status,
+          ) && (
             <Button
               sx={{cursor: 'pointer', margin: '0em 0.5rem', color: '#828DA3'}}
               onClick={() => setOpenUnscheduleConfirm(true)}
