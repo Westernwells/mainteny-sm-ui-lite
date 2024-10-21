@@ -541,13 +541,22 @@ const ServicesForm = ({
                   newValue,
                 );
             }}
-            required
             textFieldProps={{
+              name: 'firstInvoiceDate',
+              id: 'firstInvoiceDate',
+              required: true,
               label: t('First Invoice Date'),
-              helperText: formikContractServiceComponent.errors.firstInvoiceDate
-                ? t(`${formikContractServiceComponent.errors.firstInvoiceDate}`)
-                : '',
-              error: !!formikContractServiceComponent.errors.firstInvoiceDate,
+              helperText:
+                formikContractServiceComponent.errors.firstInvoiceDate &&
+                formikContractServiceComponent.touched.firstInvoiceDate
+                  ? t(
+                      `${formikContractServiceComponent.errors.firstInvoiceDate}`,
+                    )
+                  : '',
+              error:
+                !!formikContractServiceComponent.errors.firstInvoiceDate &&
+                formikContractServiceComponent.touched.firstInvoiceDate,
+              onBlur: formikContractServiceComponent.handleBlur,
             }}
           />
         </Grid>
