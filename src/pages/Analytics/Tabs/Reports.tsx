@@ -118,8 +118,13 @@ export const Reports = () => {
       const downloadUrlsResult = await refetchDownloadUrl();
       const pdfUrlsArray = Object.entries(downloadUrlsResult?.data || {});
 
-      if (pdfUrlsArray.length) {
-        await downloadAndZipFiles(pdfUrlsArray, 'invoice_pdfs');
+      const filesToDownload = pdfUrlsArray.map(([pdfPath, url]) => ({
+        invoiceId: pdfPath.split('/').pop()!.replace('.pdf', ''), // Extract the ID from the path (before .pdf)
+        url,
+      }));
+
+      if (filesToDownload.length) {
+        await downloadAndZipFiles(filesToDownload, 'invoice_pdfs');
         setPdfPaths([]);
       }
     };
