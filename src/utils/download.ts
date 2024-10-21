@@ -1,20 +1,29 @@
 import JSZip from 'jszip';
 import * as Sentry from '@sentry/react';
 import {download} from 'hooks/reactQuery/useAnalytics';
+import {fetchInvoice} from 'hooks/reactQuery/useInvoice';
 
 export const downloadAndZipFiles = async (
-  pdfUrlsArray: [string, string][],
+  filesToDownload: {url: string; invoiceId: string}[],
   zipFileName: string,
 ): Promise<void> => {
   try {
     const zip = new JSZip();
 
-    if (pdfUrlsArray.length) {
+    if (filesToDownload.length) {
       await Promise.all(
-        pdfUrlsArray.map(async ([fileName, pdfUrl]) => {
-          const pdfBlob = await fetch(pdfUrl).then((res) => res.blob());
-          const finalFileName =
-            fileName.split('/').pop() || `file_${Date.now()}.pdf`;
+        filesToDownload.map(async (file) => {
+          // Extract the invoice ID from the file name
+          const {invoiceId} = file;
+
+          const invoiceDetails = await fetchInvoice(invoiceId);
+
+          const finalFileName = invoiceDetails?.externalId
+            ? `${invoiceDetails.externalId}.pdf`
+            : `${invoiceId}.pdf`;
+
+          const pdfBlob = await fetch(file.url).then((res) => res.blob());
+
           zip.file(finalFileName, pdfBlob);
         }),
       );
