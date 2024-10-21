@@ -279,7 +279,7 @@ const BookedHoursRow = ({
 };
 
 type Props = {
-  translate: (key: string) => string;
+  translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount | undefined;
   serviceOrder?: ServiceOrderView;
   report?: ServiceOrderReportView;
@@ -389,14 +389,7 @@ const WorkReportTemplate = React.memo(
                     </Text>
                   </View>
                 )}
-                {pdfConfigClientStorage.includeUsername && (
-                  <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Contact')}</Text>
-                    <Text style={styles.tagContent}>
-                      {serviceOrder?.elevator?.propertyOwner?.name}
-                    </Text>
-                  </View>
-                )}
+
                 {pdfConfigClientStorage.includeUserPhone && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Phone number')}</Text>
@@ -430,7 +423,9 @@ const WorkReportTemplate = React.memo(
                   {pdfConfigClientStorage.includeUnitNumber &&
                     serviceOrder?.elevator?.externalId && (
                       <View style={styles.rightAddressContent}>
-                        <Text style={styles.tag}>{translate('Unit no.')}</Text>
+                        <Text style={styles.tag}>
+                          {translate('Unit no.', {context: 'elevator'})}
+                        </Text>
                         <Text style={styles.tagContent}>
                           {serviceOrder?.elevator?.externalId}
                         </Text>

@@ -73,9 +73,9 @@ export const CLIENT_STORAGE_PDF_CONFIG_KEY = 'pdf-configurations';
 
 export const DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE: ClientReportForPDFConfig =
   {
-    includeUnitNumber: false,
-    includeSerialNumber: false,
-    includeUsername: false,
+    includeUnitNumber: true,
+    includeSerialNumber: true,
+    includeUsername: true,
     includeUserEmail: false,
     includeUserPhone: false,
   };
