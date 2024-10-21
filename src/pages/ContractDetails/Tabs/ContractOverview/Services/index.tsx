@@ -90,6 +90,7 @@ const validationSchemaContractServices = Yup.object().shape({
   name: Yup.string().required('Service name cannot be empty'),
   firstInvoiceDate: Yup.date()
     .nullable()
+    .typeError('First invoice date is required')
     .required('First invoice date is required'),
 });
 
