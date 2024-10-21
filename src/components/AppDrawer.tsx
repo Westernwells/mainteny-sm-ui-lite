@@ -1,3 +1,40 @@
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import MenuIcon from '@mui/icons-material/Menu';
+import {ClickAwayListener} from '@mui/material';
+import Box from '@mui/material/Box';
+import Collapse from '@mui/material/Collapse';
+import MuiDrawer from '@mui/material/Drawer';
+import Fade from '@mui/material/Fade';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import {CSSObject, Theme} from '@mui/material/styles';
+import styled from '@mui/material/styles/styled';
+import useTheme from '@mui/material/styles/useTheme';
+import Typography from '@mui/material/Typography';
+import {ReactComponent as CustomerCenterIcon} from 'assets/icons/CustomerCenter.svg';
+import {ReactComponent as CustomerCenterIconColor} from 'assets/icons/CustomerCenterColor.svg';
+import {ReactComponent as DashboardIcon} from 'assets/icons/Dashboard.svg';
+import {ReactComponent as DashboardIconColor} from 'assets/icons/DashboardIconColor.svg';
+import {ReactComponent as FinanceIcon} from 'assets/icons/FinanceIcon.svg';
+import {ReactComponent as FinanceIconColor} from 'assets/icons/FinanceIconColor.svg';
+import {ReactComponent as InventoryIcon} from 'assets/icons/InventoryIcon.svg';
+import {ReactComponent as InventoryIconColor} from 'assets/icons/InventoryIconColor.svg';
+import {ReactComponent as JobsIcon} from 'assets/icons/Jobs.svg';
+import {ReactComponent as JobsIconColor} from 'assets/icons/JobsIconColor.svg';
+import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
+import {ReactComponent as MaintenyLogoWhite} from 'assets/icons/MaintenyLogoWhite.svg';
+import {ReactComponent as MyCompanyIcon} from 'assets/icons/MyCompanyIcon.svg';
+import {ReactComponent as MyCompanyIconColor} from 'assets/icons/MyCompanyIconColor.svg';
+import {ReactComponent as SettingsIcon} from 'assets/icons/Settings.svg';
+import {ReactComponent as SettingsIconColor} from 'assets/icons/SettingsIconColor.svg';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {Role} from 'models/user';
 import React, {
   Dispatch,
   Fragment,
@@ -6,44 +43,7 @@ import React, {
   useState,
 } from 'react';
 import {useTranslation} from 'react-i18next';
-import {Theme, CSSObject} from '@mui/material/styles';
-import styled from '@mui/material/styles/styled';
-import Box from '@mui/material/Box';
-import MenuIcon from '@mui/icons-material/Menu';
-import useTheme from '@mui/material/styles/useTheme';
-import MuiDrawer from '@mui/material/Drawer';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import IconButton from '@mui/material/IconButton';
 import {useLocation, useNavigate} from 'react-router-dom';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
-import {ReactComponent as Logo} from 'assets/icons/Logo.svg';
-import {ReactComponent as DashboardIcon} from 'assets/icons/Dashboard.svg';
-import {ReactComponent as DashboardIconColor} from 'assets/icons/DashboardIconColor.svg';
-import {ReactComponent as JobsIcon} from 'assets/icons/Jobs.svg';
-import {ReactComponent as JobsIconColor} from 'assets/icons/JobsIconColor.svg';
-import {ReactComponent as InventoryIcon} from 'assets/icons/InventoryIcon.svg';
-import {ReactComponent as InventoryIconColor} from 'assets/icons/InventoryIconColor.svg';
-import {ReactComponent as MyCompanyIcon} from 'assets/icons/MyCompanyIcon.svg';
-import {ReactComponent as MyCompanyIconColor} from 'assets/icons/MyCompanyIconColor.svg';
-import {ReactComponent as FinanceIcon} from 'assets/icons/FinanceIcon.svg';
-import {ReactComponent as FinanceIconColor} from 'assets/icons/FinanceIconColor.svg';
-import {ReactComponent as CustomerCenterIcon} from 'assets/icons/CustomerCenter.svg';
-import {ReactComponent as CustomerCenterIconColor} from 'assets/icons/CustomerCenterColor.svg';
-import {ReactComponent as SettingsIcon} from 'assets/icons/Settings.svg';
-import {ReactComponent as SettingsIconColor} from 'assets/icons/SettingsIconColor.svg';
-import {ReactComponent as MaintenyLogoWhite} from 'assets/icons/MaintenyLogoWhite.svg';
-import Fade from '@mui/material/Fade';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {Role} from 'models/user';
-import {ClickAwayListener} from '@mui/material';
-import Collapse from '@mui/material/Collapse';
 import {lowerCaseAndJoinByHyphen} from 'utils/utils';
 
 function checkPath(
@@ -94,8 +94,7 @@ function checkPath(
   });
 }
 
-// const drawerWidth = "15rem";
-const drawerWidth = '20rem';
+const drawerWidth = '17.5rem';
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -112,10 +111,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: 'hidden',
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up('sm')]: {
-    width: `calc(${theme.spacing(9)} + 1px)`,
-  },
+  width: '81px',
 });
 
 const Drawer = styled(MuiDrawer, {
@@ -143,7 +139,6 @@ interface Props {
 }
 
 const THESUBLISTS = {
-  // jobs: ['list', 'schedule'],
   jobs: ['list', 'schedule'],
   finance: ['invoices', 'quotations', 'purchase invoices'],
   'customer center': ['units', 'customers', 'contracts', 'contacts'],
@@ -166,12 +161,16 @@ export const AppDrawer = ({open, setOpen}: Props) => {
 
   const [openedNests, setOpenedNests] = useState<string[]>([]);
 
-  const handleNestControl = (nestName: string) => {
+  const handleNestControl = (nestName: string, variant?: string) => {
     let prevNests = [...openedNests];
     if (prevNests.includes(nestName)) {
-      prevNests = prevNests.filter(
-        (item) => item.toLocaleLowerCase() !== nestName.toLocaleLowerCase(),
-      );
+      if (variant && variant === 'other') {
+        prevNests = prevNests.filter(
+          (item) => item.toLocaleLowerCase() !== nestName.toLocaleLowerCase(),
+        );
+      } else {
+        return;
+      }
     } else {
       prevNests.push(nestName);
     }
@@ -225,7 +224,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         index: number,
       ) => {
         e.preventDefault();
-        handleDrawerClose();
+
         setSelectedIndex(index);
         setSelectedPath('/');
         setSelectedPathOrigin('');
@@ -243,7 +242,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         index: number,
       ) => {
         e.preventDefault();
-        handleDrawerClose();
+
         setSelectedIndex(index);
         handleNestControl('jobs');
         setSelectedPath('/orders');
@@ -260,7 +259,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/orders');
             navigate('/orders');
@@ -275,7 +274,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/orders?tab=1');
             navigate('/orders?tab=1');
@@ -294,7 +293,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         index: number,
       ) => {
         e.preventDefault();
-        handleDrawerClose();
+
         setSelectedIndex(index);
         handleNestControl('customer center');
         setSelectedPath('/units');
@@ -311,7 +310,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/units');
             navigate('/units');
@@ -326,7 +325,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/customers');
             navigate('/customers');
@@ -341,7 +340,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/contracts');
             navigate('/contracts');
@@ -356,7 +355,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/contacts');
             navigate('/contacts');
@@ -375,7 +374,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         index: number,
       ) => {
         e.preventDefault();
-        handleDrawerClose();
+
         setSelectedIndex(index);
         handleNestControl('finance');
         setSelectedPath('/invoices');
@@ -392,7 +391,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/invoices');
             navigate('/invoices');
@@ -407,7 +406,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/quotations');
             navigate('/quotations');
@@ -427,7 +426,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         index: number,
       ) => {
         e.preventDefault();
-        handleDrawerClose();
+
         setSelectedIndex(index);
         handleNestControl('inventory');
         setSelectedPath('/articles');
@@ -444,7 +443,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/articles');
             navigate('/articles');
@@ -463,7 +462,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         index: number,
       ) => {
         e.preventDefault();
-        handleDrawerClose();
+
         setSelectedIndex(index);
         handleNestControl('my company');
         setSelectedPath('/employees');
@@ -480,7 +479,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/employees');
             navigate('/employees');
@@ -495,7 +494,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             index: number,
           ) => {
             e.preventDefault();
-            handleDrawerClose();
+
             setSelectedIndex(index);
             setSelectedPath('/exports');
             navigate('/exports');
@@ -515,7 +514,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         index: number,
       ) => {
         e.preventDefault();
-        handleDrawerClose();
+
         setSelectedIndex(index);
         setSelectedPath('/settings');
         setSelectedPathOrigin('');
@@ -534,7 +533,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         index: number,
       ) => {
         e.preventDefault();
-        handleDrawerClose();
+
         setSelectedIndex(index);
         setSelectedPath('/admin/system-settings');
         navigate('/admin/system-settings');
@@ -588,7 +587,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
               handleDrawerClose();
               navigate('/');
             }}>
-            <MaintenyLogoWhite width={118.43} height={24} />
+            <MaintenyLogoWhite width={150} height={30} />
           </IconButton>,
           <ArrowBackIosNewIcon />,
         )
@@ -640,8 +639,15 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                         text.toLocaleLowerCase() === selectedPathOrigin
                       }
                       sx={{
-                        paddingTop: 2,
-                        paddingBottom: 2,
+                        paddingTop: '12px',
+                        paddingBottom: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: open ? 'start' : 'center',
+                        paddingLeft: open ? '24px' : '20px',
+                        paddingRight: open ? '24px' : '20px',
+                        gap: '12px',
+
                         transition: (theme) =>
                           theme.transitions.create('margin', {
                             easing: theme.transitions.easing.sharp,
@@ -652,11 +658,32 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                           text.toLocaleLowerCase() === selectedPathOrigin
                             ? '#FFF'
                             : '#8F9BB3',
+
                         '&:hover': {
                           background: '#40748054',
                           color: '#FFF',
                           '.MuiListItemIcon-root > svg > g': {
                             opacity: 1.0,
+                          },
+                        },
+                        '&.Mui-selected': {
+                          background: 'transparent',
+                          boxSizing: 'border-box',
+                          borderLeft: open
+                            ? '0px solid transparent'
+                            : '4px solid #00D1FF',
+                          borderRight: open
+                            ? '0px solid transparent'
+                            : '4px solid transparent',
+
+                          '&:hover': {
+                            background: open ? 'transparent' : '#40748054',
+                            borderLeft: open
+                              ? '0px solid transparent'
+                              : '4px solid #00D1FF',
+                            borderRight: open
+                              ? '0px solid transparent'
+                              : '4px solid transparent',
                           },
                         },
                       }}
@@ -667,17 +694,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                       <ListItemIcon
                         sx={{
                           minWidth: 0,
-                          mr: '12px',
-                          ml:
-                            open && checkPath(path, selectedPath)
-                              ? '0px'
-                              : open && !checkPath(path, selectedPath)
-                              ? '4px'
-                              : !open && checkPath(path, selectedPath)
-                              ? '0px'
-                              : !open && !checkPath(path, selectedPath)
-                              ? '4px'
-                              : '0px',
                         }}>
                         {checkPath(path, selectedPath) ||
                         text.toLocaleLowerCase() === selectedPathOrigin
@@ -701,7 +717,6 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                                 }}>
                                 <Typography
                                   variant="subtitle1"
-                                  ml="12px"
                                   sx={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -713,12 +728,16 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                               {!!subList && (
                                 <div
                                   onClick={() =>
-                                    handleNestControl(text.toLocaleLowerCase())
+                                    handleNestControl(
+                                      text.toLocaleLowerCase(),
+                                      'other',
+                                    )
                                   }
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter' || e.key === ' ') {
                                       handleNestControl(
                                         text.toLocaleLowerCase(),
+                                        'other',
                                       );
                                     }
                                   }}
@@ -751,18 +770,24 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                               onClick={(e) => list.onClick(e, listIndex)}
                               selected={checkPath(list.path, selectedPath)}
                               sx={{
-                                borderLeft: 'solid 4px #8F9BB3',
+                                borderLeft: 'solid 2px #8F9BB3',
                                 background: 'transparent',
+                                paddingTop: '2px',
+                                paddingBottom: '2px',
+                                paddingLeft: '12px',
+                                paddingRight: '0px',
+                                height: '44px',
+                                marginLeft: '35.5px',
+                                marginRight: '24px',
 
-                                ml: 4,
                                 '&.Mui-selected': {
                                   background: 'transparent',
                                   boxSizing: 'border-box',
-                                  borderLeft: '4px solid #00D1FF',
+                                  borderLeft: '2px solid #00D1FF',
 
                                   '&:hover': {
                                     background: 'transparent',
-                                    borderLeft: '4px solid #00D1FF',
+                                    borderLeft: '2px solid #00D1FF',
                                   },
                                 },
                                 '&:hover': {
@@ -783,13 +808,12 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                                   <Fade in={open}>
                                     <Typography
                                       variant="subtitle1"
-                                      ml="12px"
                                       sx={{
-                                        pl: 2,
-                                        pr: 2,
-                                        pt: 1,
-                                        pb: 1,
-                                        borderRadius: '8px',
+                                        pl: 1,
+                                        pr: 1,
+                                        pt: 0.75,
+                                        pb: 0.75,
+                                        borderRadius: '4px',
                                         backgroundColor: checkPath(
                                           list.path,
                                           selectedPath,
