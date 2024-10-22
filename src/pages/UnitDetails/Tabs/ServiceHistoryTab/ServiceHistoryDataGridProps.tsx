@@ -38,8 +38,8 @@ export const columns: GridColDef[] = [
     ),
   }),
   getColumnProps({
-    field: 'technician',
-    headerName: 'technician',
+    field: 'engineer',
+    headerName: 'engineer',
     cellClassName: 'truncateText',
     flex: 1.5,
   }),
@@ -72,9 +72,16 @@ export const makeRows = (
         number: item.number,
         date: formatDate(toDate(item.meta.createdAt)),
         type: item.type,
-        technician:
-          item.schedules.length &&
-          `${item.schedules[0].technician.userAccount.firstName} ${item.schedules[0].technician.userAccount.lastName}`,
+        engineer: item.schedules.length
+          ? item.schedules
+              .map(
+                (i) =>
+                  `${i.technician.userAccount.firstName} ${i.technician.userAccount.lastName}`,
+              )
+              .join(', ')
+          : item.additionalInfo?.candidateTechnician
+          ? `${item.additionalInfo?.candidateTechnician.userAccount.firstName} ${item.additionalInfo?.candidateTechnician.userAccount.lastName}`
+          : '-',
         duration: item.serviceTime && convertMinsToHM(item.serviceTime),
         status: item.status,
         navigateTo: `/orders/details/${item.id}`,
