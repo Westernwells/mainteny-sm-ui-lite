@@ -208,7 +208,9 @@ export const ArticleItemRowNEW = ({
         unitAmount: {
           ...formik.values.unitAmount,
           netAmount: fixRounding(
-            price * 10 ** Currencies[formik.values.unitAmount.currency],
+            Math.round(
+              price * 10 ** Currencies[formik.values.unitAmount.currency],
+            ),
             2,
           ),
         },
