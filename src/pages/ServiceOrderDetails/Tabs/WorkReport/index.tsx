@@ -54,7 +54,6 @@ import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {EmailRecord, PdfGenerationStatus} from 'models/misc';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
-import useFetchAndConvertMultipleImages from 'hooks/useFetchAndConvertMultipleImages';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {InputAdornment, IconButton} from '@mui/material';
@@ -68,6 +67,7 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -99,6 +99,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
   const [report, setReport] = useState<ServiceOrderReportView | undefined>(
     serviceOrder?.reports?.[0],
   );
+  const [shouldFetchImages, setShouldFetchImages] = useState(false);
 
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
@@ -140,8 +141,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
     downloadUrls[signatureKeys.CUSTOMER],
   );
 
-  const {convertedImages, isImageLoading, setShouldFetchImages} =
-    useFetchAndConvertMultipleImages(imageDownloadUrls, report?.attachments);
+  const {convertedImages, isImageLoading} = useMultiImagesURLToBase64(
+    imageDownloadUrls,
+    {enabled: shouldFetchImages},
+  );
 
   const [actionType, setActionType] = useState('');
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
