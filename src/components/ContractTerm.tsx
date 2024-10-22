@@ -337,7 +337,7 @@ export const ContractTerm = ({
                               color="text.secondary">
                               {`${d.discountDays} ${t('days')}; ${
                                 d.discountPercent
-                              }% ${t('discount')}; ${t(
+                              }% ${t('Discount_contract')}; ${t(
                                 convertToText(d.articleType),
                               )}`}
                             </Typography>
