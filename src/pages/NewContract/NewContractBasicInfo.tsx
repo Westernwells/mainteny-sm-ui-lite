@@ -109,6 +109,26 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
       </Grid>
       <Box width="100%" />
       <Grid item xs={4}>
+        <FormInput
+          labelTooltip="Enter a purchase order number here to include it on invoices from this contract. This will override any purchase order number saved at the customer level."
+          fieldProps={{
+            onChange: formik.handleChange,
+            onBlur: formik.handleBlur,
+            size: 'small',
+            label: 'Purchase Order Number',
+            name: 'purchaseOrderNumber',
+            value: formik.values.purchaseOrderNumber,
+            helperText:
+              formik.touched.purchaseOrderNumber &&
+              formik.errors.purchaseOrderNumber,
+            error:
+              !!formik.errors.purchaseOrderNumber &&
+              formik.touched.purchaseOrderNumber,
+          }}
+        />
+      </Grid>
+      <Box width="100%" />
+      <Grid item xs={4}>
         <DatePicker
           getSelectedDate={(newValue) => {
             if (newValue) formik.setFieldValue('startDate', newValue);

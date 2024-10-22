@@ -289,8 +289,22 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
         />
       </Grid>
 
-      <Grid md={6} />
+      <Grid md={3} />
 
+      <Grid item md={3}>
+        <FormInput
+          labelTooltip="Enter a purchase order number here to include it on invoices from this contract. This will override any purchase order number saved at the customer level."
+          fieldProps={{
+            placeholder: 'Enter purchase order number',
+            label: 'Purchase Order Number',
+            name: 'purchaseOrderNumber',
+            value: formik.values.purchaseOrderNumber,
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+            error: !!formik.errors.purchaseOrderNumber,
+          }}
+        />
+      </Grid>
       <Grid item md={3}>
         <FormInput
           fieldProps={{
