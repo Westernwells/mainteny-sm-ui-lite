@@ -297,15 +297,6 @@ const JobOverviewPdfTemplate = React.memo(
                     </View>
                   )}
 
-                {serviceOrder?.elevator?.propertyOwner?.externalId && (
-                  <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Customer no.')}</Text>
-                    <Text style={styles.tagContent}>
-                      {serviceOrder?.elevator?.propertyOwner?.externalId}
-                    </Text>
-                  </View>
-                )}
-
                 {pdfConfigClientStorage.includeUserPhone && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Phone number')}</Text>
@@ -321,6 +312,14 @@ const JobOverviewPdfTemplate = React.memo(
                     <Text style={styles.tagContent}>
                       {serviceOrder?.elevator?.propertyOwner?.contact.email ||
                         '-'}
+                    </Text>
+                  </View>
+                )}
+                {serviceOrder?.elevator?.propertyOwner?.externalId && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Customer no.')}</Text>
+                    <Text style={styles.tagContent}>
+                      {serviceOrder?.elevator?.propertyOwner?.externalId}
                     </Text>
                   </View>
                 )}
