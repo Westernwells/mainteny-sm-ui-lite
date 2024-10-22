@@ -69,7 +69,7 @@ const PaymentTermsWidget: FC<Props> = ({customer}) => {
       o.discountDays === 0 && o.discountPercent === 0
         ? ''
         : `${o.discountDays} ${t('days')}; ${o.discountPercent}% ${t(
-            'discount',
+            'Discount_contract',
           )}; ${t(convertToText(o.articleType))}`,
     ) ?? [];
 

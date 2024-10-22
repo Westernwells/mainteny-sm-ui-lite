@@ -118,10 +118,12 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
             id: 'startDate',
             label: 'Contract Start Date',
             required: true,
-            helperText: formik.errors.startDate
-              ? t(`${formik.errors.startDate}`)
-              : '',
-            error: !!formik.errors.startDate,
+            helperText:
+              formik.errors.startDate && formik.touched.startDate
+                ? t(`${formik.errors.startDate}`)
+                : '',
+            error: !!formik.errors.startDate && formik.touched.startDate,
+            onBlur: formik.handleBlur,
           }}
           defaultDate={formik.values.startDate}
           maxDate={formik.values.endDate!}
@@ -137,10 +139,12 @@ const NewContractBasicInfo: FC<Props> = ({formik}) => {
             id: 'endDate',
             label: 'Contract End Date',
             required: true,
-            helperText: formik.errors.endDate
-              ? t(`${formik.errors.endDate}`)
-              : '',
-            error: !!formik.errors.endDate,
+            helperText:
+              formik.errors.endDate && formik.touched.endDate
+                ? t(`${formik.errors.endDate}`)
+                : '',
+            error: !!formik.errors.endDate && formik.touched.endDate,
+            onBlur: formik.handleBlur,
           }}
           defaultDate={formik.values.endDate}
           minDate={formik.values.startDate!}

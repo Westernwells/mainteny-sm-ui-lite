@@ -88,6 +88,10 @@ export const getAutoJobStatus = (
 
 const validationSchemaContractServices = Yup.object().shape({
   name: Yup.string().required('Service name cannot be empty'),
+  firstInvoiceDate: Yup.date()
+    .nullable()
+    .typeError('First invoice date is required')
+    .required('First invoice date is required'),
 });
 
 export const Services: FC<Props> = ({contractDetails}) => {
@@ -410,7 +414,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                       {' '}
                       {formatCurrency(
                         (row.additionalInfo?.yearlyPrice || 0) /
-                          10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                          10 ** (currentCurrency.fractionDigits ?? 0),
                         {
                           currency: currentCurrency.code,
                         },
@@ -471,7 +475,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
                   <Typography variant="h6">
                     {formatCurrency(
                       (contractDetails.additionalInfo.totalYearlyPrice ?? 0) /
-                        10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                        10 ** (currentCurrency.fractionDigits ?? 0),
                       {
                         currency: currentCurrency.code,
                       },

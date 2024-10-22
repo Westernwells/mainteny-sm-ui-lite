@@ -767,7 +767,21 @@ export const MutationService = ({
                 );
             }}
             textFieldProps={{
+              name: 'firstInvoiceDate',
+              id: 'firstInvoiceDate',
+              required: true,
               label: t('First Invoice Date'),
+              helperText:
+                formikContractServiceComponent.errors.firstInvoiceDate &&
+                formikContractServiceComponent.touched.firstInvoiceDate
+                  ? t(
+                      `${formikContractServiceComponent.errors.firstInvoiceDate}`,
+                    )
+                  : '',
+              error:
+                !!formikContractServiceComponent.errors.firstInvoiceDate &&
+                formikContractServiceComponent.touched.firstInvoiceDate,
+              onBlur: formikContractServiceComponent.handleBlur,
             }}
           />
         </Grid>
@@ -1178,7 +1192,7 @@ export const MutationService = ({
               <Typography variant="h6">
                 {formatCurrency(
                   calculateContractInvoicePriceTotal(selectedElevators) /
-                    10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                    10 ** currentCurrency.fractionDigits,
                   {
                     currency: currentCurrency.code,
                   },
