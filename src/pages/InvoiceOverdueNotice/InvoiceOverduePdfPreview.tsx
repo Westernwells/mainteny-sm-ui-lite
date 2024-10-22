@@ -231,14 +231,6 @@ const InvoiceOverduePdfPreview = ({
                   </View>
                 )}
 
-              {invoice?.propertyOwner?.externalId && (
-                <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}>{translate('Customer no.')}</Text>
-                  <Text style={styles.tagContent}>
-                    {invoice?.propertyOwner?.externalId || '-'}{' '}
-                  </Text>
-                </View>
-              )}
               {pdfConfigClientStorage.includeUserPhone && (
                 <View style={styles.rightAddressContent}>
                   <Text style={styles.tag}>{translate('Phone number')}</Text>
@@ -252,6 +244,14 @@ const InvoiceOverduePdfPreview = ({
                   <Text style={styles.tag}>{translate('Email address')}</Text>
                   <Text style={styles.tagContent}>
                     {invoice?.propertyOwner?.contact.email || '-'}{' '}
+                  </Text>
+                </View>
+              )}
+              {invoice?.propertyOwner?.externalId && (
+                <View style={styles.rightAddressContent}>
+                  <Text style={styles.tag}>{translate('Customer no.')}</Text>
+                  <Text style={styles.tagContent}>
+                    {invoice?.propertyOwner?.externalId || '-'}{' '}
                   </Text>
                 </View>
               )}
