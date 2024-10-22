@@ -50,12 +50,10 @@ function checkPath(
   selectedPath: string | string[],
   currentPath: string,
 ): boolean {
-  // Convert selectedPath to an array if it's a single string
   const paths: string[] = Array.isArray(selectedPath)
     ? selectedPath
     : [selectedPath];
 
-  // Helper function to extract and compare both the path and query params
   const parsePath = (
     path: string,
   ): {basePath: string; params: URLSearchParams} => {
@@ -64,24 +62,18 @@ function checkPath(
     return {basePath, params};
   };
 
-  // Parse the current path
   const {basePath: currentBasePath, params: currentParams} =
     parsePath(currentPath);
 
-  // Check if any path matches the current path and its query params exactly
   return paths.some((path) => {
     const {basePath, params} = parsePath(path);
 
-    // Compare base paths first
     if (basePath !== currentBasePath) return false;
 
-    // Now compare query parameters exactly
-    // First, ensure that both have the same number of query parameters
     if ([...params.keys()].length !== [...currentParams.keys()].length) {
       return false;
     }
 
-    // Ensure all query parameters match exactly
     if (
       ![...params.entries()].every(
         ([key, value]) => currentParams.get(key) === value,
@@ -185,14 +177,12 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     setSelectedPath(fullPath);
 
     const ordersPaths = ['orders?tab=0', 'orders?tab=1', 'orders'];
-    // Check if the current path is related to 'orders'
     const isOrdersPath = ordersPaths.some((path) => fullPath.includes(path));
 
     if (isOrdersPath) {
       setSelectedPathOrigin('jobs');
       return;
     }
-    // Check the path against THESUBLISTSKEYS and THESUBLISTSVALUES
     for (let i = 0; i < THESUBLISTSKEYS.length; i += 1) {
       if (THESUBLISTSVALUES[i].includes(thePath)) {
         setSelectedPathOrigin(THESUBLISTSKEYS[i]);
@@ -615,11 +605,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                 return (
                   <Fragment key={text}>
                     <ListItemButton
-                      onClick={(e) => {
-                        if (!subList) {
-                          onClick(e, index);
-                        }
-                      }}
+                      onClick={(e) => onClick(e, index)}
                       selected={
                         checkPath(path, selectedPath) ||
                         text.toLocaleLowerCase() === selectedPathOrigin
@@ -713,13 +699,15 @@ export const AppDrawer = ({open, setOpen}: Props) => {
                               </Box>
                               {!!subList && (
                                 <div
-                                  onClick={() =>
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     handleNestControl(
                                       text.toLocaleLowerCase(),
                                       'other',
-                                    )
-                                  }
+                                    );
+                                  }}
                                   onKeyDown={(e) => {
+                                    e.stopPropagation();
                                     if (e.key === 'Enter' || e.key === ' ') {
                                       handleNestControl(
                                         text.toLocaleLowerCase(),
