@@ -92,7 +92,10 @@ export const theme = createTheme({
     divider: '#F3F5F6',
     amber: {main: '#FF8F00', light: '#FFF8E1'},
     eden: {main: 'rgba(15, 76, 100)', light: '#0F4C6480'},
-    suvaGrey: {main: 'rgba(144, 144, 144))', light: 'rgba(144, 144, 144, 0.2)'},
+    suvaGrey: {
+      main: 'rgba(144, 144, 144))',
+      light: 'rgba(144, 144, 144, 0.2)',
+    },
     // Used by `getContrastText()` to maximize the contrast between
     // the background and the text.
     contrastThreshold: 3,

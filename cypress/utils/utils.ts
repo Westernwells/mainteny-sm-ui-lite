@@ -80,3 +80,11 @@ export const convertToMacro = (text: string) =>
 export const extractNumbersFromCurrencyString = (amount: string) =>
   // Use regex to remove any non-numeric characters except for the minus sign and dot
   parseFloat(amount.replace(/[^0-9.-]+/g, ''));
+
+export const navigateCy = (primaryId: string, secondaryId: string) => {
+  cy.get(`[data-testid="${primaryId}-nav-item"]`).trigger('mouseover');
+  cy.get(
+    `[data-testid="${primaryId}-nav-item"] [data-testid="ExpandLessIcon"]`,
+  ).click();
+  cy.get(`[data-testid="${secondaryId}-nav-item"]`).click();
+};
