@@ -1,6 +1,7 @@
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {EmployeeEventType} from 'models/employee';
 import {InvoiceFormat} from 'models/propertyManager';
+import {ServiceOrderTypePriority} from 'models/service-order';
 
 export const ONE_KB_IN_BYTES = 1024;
 export const ONE_MB_IN_BYTES = ONE_KB_IN_BYTES * 1024;
@@ -79,3 +80,21 @@ export const DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE: ClientReportForPDFConfig =
     includeUserEmail: false,
     includeUserPhone: false,
   };
+export const ALL_SERVICE_ORDER_TYPE_PRIORITY = [
+  {
+    label: 'Urgent',
+    value: ServiceOrderTypePriority.URGENT,
+  },
+  {
+    label: 'High',
+    value: ServiceOrderTypePriority.HIGH,
+  },
+  {
+    label: 'Medium',
+    value: ServiceOrderTypePriority.MEDIUM,
+  },
+  {
+    label: 'Low',
+    value: ServiceOrderTypePriority.LOW,
+  },
+];

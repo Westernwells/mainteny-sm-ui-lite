@@ -37,7 +37,6 @@ import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {
   companyLanguageContextMap,
-  convertToMacro,
   createFilesFromBlobArray,
   fetchFile,
 } from 'utils/utils';
@@ -710,11 +709,11 @@ export const ViewQuotation = ({
                         },
                         onClick: () => {
                           navigate(
-                            `/orders/new?type=${convertToMacro(
-                              formik.values.createServiceOrder,
-                            ).toLowerCase()}&quotationId=${
-                              quotation.id
-                            }&elevatorId=${unit?.id || quotation.elevator.id}`,
+                            `/orders/new?type=${
+                              formik.values.createServiceOrder
+                            }&quotationId=${quotation.id}&elevatorId=${
+                              unit?.id || quotation.elevator.id
+                            }`,
                           );
                         },
                       }}

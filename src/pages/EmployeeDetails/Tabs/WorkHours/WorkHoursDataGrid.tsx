@@ -13,6 +13,8 @@ import {WorkHoursItem} from 'models/workHours';
 import {FormatDate, Resource} from 'models/misc';
 import {useTranslation} from 'react-i18next';
 import {convertToHourAndMinutes} from 'utils/utils';
+import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
+import {ServiceOrderTypeRecord} from 'models/service-order';
 
 const defaultProps = {
   editable: false,
@@ -171,9 +173,17 @@ const getOrderId = (data: any) => {
 
 export const makeRows = (
   workHours: Resource<WorkHoursItem>,
-  formatDate: FormatDate = () => '',
-): GridRowModel<{[key: string]: any}[]> =>
-  workHours.data.length
+  formatDate: FormatDate,
+  allJobTypes?: ServiceOrderTypeRecord[],
+): GridRowModel<{[key: string]: any}>[] => {
+  const serviceOrderTimeLogTypes = allJobTypes?.map((item) =>
+    `SERVICE_ORDER_${item.name}`.toLowerCase(),
+  );
+
+  const isNotJobType = (detailType: string) =>
+    !serviceOrderTimeLogTypes?.includes(detailType.toLowerCase());
+
+  return workHours.data.length
     ? workHours.data.map((item: WorkHoursItem) => ({
         id: item.id,
         date: formatDate(item.startTime) ?? '-',
@@ -193,7 +203,11 @@ export const makeRows = (
         orderType: (
           <Box display="flex" alignItems="center">
             <Box mr="1em">
-              <WorkHourIcons workHourType={item.type} size="medium" />
+              {isNotJobType(item.type) ? (
+                <WorkHourIcons workHourType={item.type} size="medium" />
+              ) : (
+                <ServiceOrderIcons serviceOrderType={item.type} />
+              )}
             </Box>
             <Box mt="0.05em">
               <WorkHourTypeText
@@ -207,6 +221,7 @@ export const makeRows = (
         orderId: getOrderId(item.data),
       }))
     : [];
+};
 
 // let duration = '-';
 // const startDate =

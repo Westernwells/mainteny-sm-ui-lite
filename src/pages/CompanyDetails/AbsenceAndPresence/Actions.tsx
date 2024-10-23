@@ -1,6 +1,5 @@
 import React, {useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import MUITooltip, {TooltipProps} from '@mui/material/Tooltip';
@@ -11,7 +10,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import MoreIcon from '@mui/icons-material/MoreVert';
-
 import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
 import {EmployeeEventTypeRecord} from 'models/employee';

@@ -15,6 +15,11 @@ import {WorkHoursItem} from 'models/workHours';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {calculateTotalTime} from 'utils/work-hours-utils';
 import {useWhen} from 'hooks/useWhen';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {columnsWidget, makeRows} from './WorkHoursDataGrid';
 
 const WorkHourWidget = () => {
@@ -26,6 +31,7 @@ const WorkHourWidget = () => {
   const [totalTime, setTotalTime] = useState<string>('00:00');
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(makePage(0, 10));
+  const {user} = useUserSession();
 
   const {data: workHours = createEmptyResource<WorkHoursItem>(10)} =
     useWorkHours(
@@ -36,9 +42,24 @@ const WorkHourWidget = () => {
       employeeId || '',
     );
 
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+  const {data: oldJobTypes = []} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  const allJobTypes = [
+    ...jobTypes,
+    ...oldJobTypes.filter(
+      (oldJobType) =>
+        !jobTypes.some((jobType) => jobType.name === oldJobType.name),
+    ),
+  ];
+
   useEffect(() => {
     if (workHours.data) {
-      setRows(makeRows(workHours, () => ''));
+      setRows(makeRows(workHours, () => '', allJobTypes));
       setTotalTime(calculateTotalTime(workHours.data));
     } else {
       setRows([]);

@@ -2,9 +2,6 @@ import {FlexContainer} from 'components/FlexContainer';
 import {Progress} from 'components/Progress';
 import {useLayoutEffect} from 'react';
 import {useSearchParams} from 'react-router-dom';
-import {ServiceOrderType} from 'models/service-order';
-import {convertToMacro} from 'utils/utils';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
@@ -15,11 +12,8 @@ interface Props {
 export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   const [queryParams] = useSearchParams();
   const currentParams = Object.fromEntries([...queryParams]);
-  const type = (
-    currentParams.type
-      ? convertToMacro(currentParams.type)
-      : ServiceOrderType.REGULAR
-  ) as ServiceOrderType;
+
+  const {type} = currentParams;
 
   const {
     data: elevator,
@@ -31,9 +25,7 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle && currentParams) {
-      getCurrentPageTitle(
-        `New ${serviceOrderTypeToString(convertToMacro(type))} Job`,
-      );
+      getCurrentPageTitle(`New ${type} Job`);
     }
   }, []);
 

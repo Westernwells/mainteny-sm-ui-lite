@@ -17,6 +17,11 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {getLastWeek} from 'utils/datetime';
 import {useNavigate} from 'react-router';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {columns, makeRows} from './WorkHoursDataGrid';
 
 interface Props {
@@ -39,15 +44,31 @@ const WorkHoursTab = ({employeeId}: Props) => {
   const {data: workHours = createEmptyResource<WorkHoursItem>(10)} =
     useWorkHours(search, page, startDate, endDate, employeeId || '');
 
+  const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+  const {data: oldJobTypes = []} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  const allJobTypes = [
+    ...jobTypes,
+    ...oldJobTypes.filter(
+      (oldJobType) =>
+        !jobTypes.some((jobType) => jobType.name === oldJobType.name),
+    ),
+  ];
+
   useEffect(() => {
     if (workHours.data) {
-      setRows(makeRows(workHours, formatDate));
+      setRows(makeRows(workHours, formatDate, allJobTypes));
       setTotalTime(calculateTotalTime(workHours.data));
     } else {
       setRows([]);
       setTotalTime('00:00');
     }
-  }, [workHours]);
+  }, [workHours, formatDate, user, jobTypes]);
 
   useEffect(() => {
     setPageCount(Math.ceil(workHours.total / page.pageSize));

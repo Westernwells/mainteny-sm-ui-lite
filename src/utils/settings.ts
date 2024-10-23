@@ -3,7 +3,7 @@ import {t} from 'i18next';
 
 export const generateOptions = () =>
   Array.from({length: 61}, (_, index) => ({
-    label: t(`{{number}} day${index !== 1 ? 's' : ''}`, {
+    label: t(`{{number}} day${index > 1 ? 's' : ''}`, {
       number: index,
     }),
     value: String(index),
