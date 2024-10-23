@@ -1,6 +1,8 @@
+import {navigateCy} from '../utils/utils';
+
 export default class UnitsPage {
   static visit = () => {
-    cy.get('ul > div[role="button"][data-testid="units-nav-item"]').click();
+    navigateCy('customer-center', 'units');
   };
 
   static navigateToDetailsPage = () => {
