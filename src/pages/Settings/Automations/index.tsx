@@ -13,7 +13,7 @@ const Automations = ({company}: Props) => (
       company={company}
       containerStyles={{
         width: '100%',
-        padding: '0 24px',
+        padding: '12px 24px 24px 24px',
       }}
     />
     <Invoice

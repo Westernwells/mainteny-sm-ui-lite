@@ -10,6 +10,7 @@ interface Props {
   variant?: any;
   capitalizeText?: boolean;
 }
+
 export const ServiceOrderTypeText = ({
   serviceOrderType,
   style,
@@ -18,16 +19,29 @@ export const ServiceOrderTypeText = ({
 }: Props) => {
   const {t} = useTranslation();
 
+  const getServiceOrderLabel = (
+    orderType?: string,
+    isTextCapitalized?: boolean,
+  ) => {
+    let label = '-';
+
+    if (orderType === ServiceOrderType.REGULAR) {
+      label = 'MAINTENANCE';
+    } else if (orderType) {
+      const serviceOrderStr = serviceOrderTypeToString(orderType);
+      label = serviceOrderStr !== '-' ? serviceOrderStr : orderType;
+    }
+
+    if (isTextCapitalized) {
+      label = capitalize([label]);
+    }
+
+    return t(label);
+  };
+
   return (
     <Typography variant={variant || 'caption'} sx={{...style}}>
-      {serviceOrderType === ServiceOrderType.REGULAR
-        ? capitalizeText
-          ? t(capitalize(['MAINTENANCE']))
-          : t('MAINTENANCE')
-        : capitalizeText
-        ? serviceOrderType &&
-          t(capitalize([serviceOrderTypeToString(serviceOrderType)]))
-        : serviceOrderType && t(serviceOrderTypeToString(serviceOrderType))}
+      {getServiceOrderLabel(serviceOrderType || undefined, capitalizeText)}
     </Typography>
   );
 };

@@ -74,6 +74,11 @@ import TextInput from 'components/TextInput';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
@@ -88,18 +93,6 @@ const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
   {value: ServiceOrderStatus.TRAVEL, labelKey: 'Travel'},
   {value: ServiceOrderStatus.COMPLETED, labelKey: 'Completed'},
   // {value: ServiceOrderStatus.ARTICLES_ORDERED, labelKey: 'Articles Ordered'}, // disabled for now
-];
-
-const TYPE_OPTIONS: OptionWithTranslationKey[] = [
-  {value: ServiceOrderType.REGULAR, labelKey: 'Maintenance'},
-  {value: ServiceOrderType.EMERGENCY, labelKey: 'Emergency'},
-  {value: ServiceOrderType.CALLOUT, labelKey: 'Callout'},
-  {value: ServiceOrderType.REPAIR, labelKey: 'Repair'},
-  {value: ServiceOrderType.INSPECTION, labelKey: 'Inspection'},
-  {value: ServiceOrderType.NEW_INSTALLATION, labelKey: 'Installation'},
-  {value: ServiceOrderType.MODERNIZATION, labelKey: 'Modernization'},
-  {value: ServiceOrderType.GENERAL, labelKey: 'General'},
-  {value: ServiceOrderType.OPERATION, labelKey: 'Elevator Operation'},
 ];
 
 export const PAYMENT_STATUS_OPTIONS: OptionWithTranslationKey[] = [
@@ -140,6 +133,23 @@ type Props = {
 export const ServiceOrderList = ({menu}: Props) => {
   const navigate = useNavigate();
   const {t} = useTranslation();
+  const {user} = useUserSession();
+
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
   const [page, setPage] = useQueryState('page', {
     defaultValue: makePage(0, 25),
@@ -376,7 +386,9 @@ export const ServiceOrderList = ({menu}: Props) => {
               size="small"
             />
             <TableCellText tableCellTextStyles={{paddingLeft: '0.4em'}}>
-              {t(serviceOrderTypeToString(serviceOrder.type))}
+              {serviceOrderTypeToString(serviceOrder.type) === '-'
+                ? serviceOrder.type
+                : t(serviceOrderTypeToString(serviceOrder.type))}
             </TableCellText>
           </Cell>
         ),
@@ -735,7 +747,6 @@ export const ServiceOrderList = ({menu}: Props) => {
                 customers={customers.data}
                 onChange={handleCustomerSelect}
               />
-
               <Controller
                 control={control}
                 name="orderNumber"
@@ -748,10 +759,15 @@ export const ServiceOrderList = ({menu}: Props) => {
                   />
                 )}
               />
-
               <ChipSelector
                 headerLabel="SERVICE TYPE"
-                options={TYPE_OPTIONS}
+                options={allJobTypes.map((jobType) => ({
+                  value: jobType.name,
+                  labelKey:
+                    serviceOrderTypeToString(jobType.name) === '-'
+                      ? jobType.name
+                      : serviceOrderTypeToString(jobType.name),
+                }))}
                 selectedChips={watchOrderTypes}
                 onChange={handleSelectedOrderTypesChange}
               />
@@ -762,7 +778,6 @@ export const ServiceOrderList = ({menu}: Props) => {
                 selectedChips={watchPaymentStatus}
                 onChange={handleSelectedPaymentStatusChange}
               />
-
               <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
                 <Typography variant="subtitle2">{t('Gross amount')}</Typography>
 

@@ -97,6 +97,8 @@ export const queryKeys = {
   fetchServiceOrderComments: 'fetchServiceOrderComments',
   fetchCompanyEventTypes: 'fetchCompanyEventTypes',
   fetchLatestVersion: 'fetchLatestVersion',
+  fetchCompanyJobTypes: 'fetchCompanyJobTypes',
+  fetchOldCompanyJobTypes: 'fetchOldCompanyJobTypes',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',
