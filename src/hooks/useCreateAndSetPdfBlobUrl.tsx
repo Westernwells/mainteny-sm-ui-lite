@@ -25,7 +25,7 @@ type UseCreateAndSetPdfBlobUrlProps = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
-  translate: (key: string) => string;
+  translate: (key: string, options?: {context: string}) => string;
   selectedLng?: string;
   fileName: string;
 };

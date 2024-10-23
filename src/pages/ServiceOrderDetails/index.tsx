@@ -102,12 +102,12 @@ export const ServiceOrderDetails = () => {
     : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
 
   const translate = useMemo(
-    () => (key: string) => {
+    () => (key: string, options?: {context: string}) => {
       if (company?.language) {
-        return translateCompanyLanguage(key);
+        return translateCompanyLanguage(key, options);
       }
 
-      return t(key);
+      return t(key, options);
     },
     [company?.language],
   );
