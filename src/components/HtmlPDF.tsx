@@ -26,7 +26,7 @@ export const HtmlPDF = ({
         '*': {
           color: grey[700],
         },
-        '*:not(p)': {
+        '*:not(p, div:empty)': {
           margin: '0px',
         },
         body: {
@@ -42,7 +42,7 @@ export const HtmlPDF = ({
         'li, ul, ol': {
           margin: '2px 0px',
         },
-        'p:empty': {
+        'p:empty, div:empty': {
           margin: '8px 0px',
         },
         ...stylesheet,
