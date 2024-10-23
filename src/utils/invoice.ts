@@ -17,7 +17,7 @@ import {PaymentTermArticleType, PaymentTermData} from 'models/contract';
 import {Currency} from 'models/misc';
 import {ArticleType} from 'models/article';
 import {InvoicePaymentTermRecord} from '../models/invoice';
-import {Currencies, centsToMoney, formatCurrency} from './currency';
+import {centsToMoney, Currencies, formatCurrency} from './currency';
 import {getAmountFromPercentage} from './utils';
 import {formatDate} from './datetime';
 
@@ -75,9 +75,17 @@ export const getInvoiceActivityTitle = (
 ): string => {
   switch (type) {
     case InvoiceActivityType.CREATED:
-      return 'Invoice created';
+      return activity?.meta.creator
+        ? t('Invoice created by {{name}}', {
+            name: `${activity?.meta.creator?.firstName} ${activity?.meta.creator?.lastName}`,
+          })
+        : t('Invoice created by System');
     case InvoiceActivityType.UPDATED:
-      return 'Invoice updated';
+      return activity?.meta.creator
+        ? t('Invoice updated by {{name}}', {
+            name: `${activity?.meta.creator?.firstName} ${activity?.meta.creator?.lastName}`,
+          })
+        : t('Invoice updated by System');
     case InvoiceActivityType.SENT:
       return 'Invoice sent';
     case InvoiceActivityType.PRINTED:
