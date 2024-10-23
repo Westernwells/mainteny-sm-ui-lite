@@ -2810,5 +2810,16 @@
   "Search icons": "Symbol suchen",
   "Create your custom job types": "Erstellen Sie Ihre eigenen Auftragsarten",
   "Configure and add custom job types for your specific needs.": "Konfigurieren und fügen Sie Auftragsarten für Ihre spezifischen Anforderungen hinzu.",
-  "Job type created successfully": "Auftragsart erfolgreich erstellt"
+  "Job type created successfully": "Auftragsart erfolgreich erstellt",
+  "Apply Filters": "Filter anwenden",
+  "Enter a purchase order number here to include it on invoices from this contract. This will override any purchase order number saved at the customer level.": "Geben Sie hier eine Bestellnummer ein, um diese in den Rechnungen, welche aus aus dem Vertrag generiert werden, aufzunehmen. Hierdurch wird eine auf Kundenebene gespeicherte Bestellnummer überschrieben.",
+  "Invoice updated by {{name}}": "Rechnung aktualisiert von {{name}}",
+  "Enter purchase order number": "Bestellnummer eingeben",
+  "Invoice created by {{name}}": "Rechnung erstellt von {{name}}",
+  "Quotation created by {{name}}": "Angebot erstellt von {{name}}",
+  "Quotation updated by {{name}}": "Angebot aktualisiert von {{name}}",
+  "Invoice created by System": "Rechnung erstellt von System",
+  "Invoice updated by System": "Rechnung aktualisiert durch System",
+  "Quotation created by System": "Angebot erstellt durch System",
+  "Quotation updated by System": "Angebot aktualisiert durch System"
 }
