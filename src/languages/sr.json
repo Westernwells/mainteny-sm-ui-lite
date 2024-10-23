@@ -2838,5 +2838,12 @@
   "Apply Filters": "Primeni filtere",
   "Enter a purchase order number here to include it on invoices from this contract. This will override any purchase order number saved at the customer level.": "Ovde unesite broj narudžbenice da biste ga uključili u fakture iz ovog ugovora. Ovo će zameniti svaki broj naloga za kupovinu sačuvan na nivou kupca.",
   "Invoice updated by {{name}}": "Fakturu je ažurirao {{name}}",
-  "Enter purchase order number": "Unesite broj naruđbenice"
+  "Enter purchase order number": "Unesite broj naruđbenice",
+  "Invoice created by {{name}}": "Fakturu napravio {{name}}",
+  "Quotation created by {{name}}": "Ponudu napravio {{name}}",
+  "Quotation updated by {{name}}": "Ponudu je ažurirao {{name}}",
+  "Invoice created by System": "Račun kreiran od strane sistema",
+  "Invoice updated by System": "Fakturu je ažurirao sistem",
+  "Quotation created by System": "Ponuda kreirana od strane sistema",
+  "Quotation updated by System": "Ponudu je ažurirao sistem"
 }
