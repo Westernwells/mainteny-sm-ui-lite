@@ -25,13 +25,15 @@ export const HtmlPDF = ({
       stylesheet={{
         '*': {
           color: grey[700],
+        },
+        '*:not(p, div:empty)': {
           margin: '0px',
         },
         body: {
           fontFamily:
             selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
         },
-        p: {
+        'p:not(:empty)': {
           margin: '2px 0px',
         },
         'li > p': {
@@ -40,7 +42,7 @@ export const HtmlPDF = ({
         'li, ul, ol': {
           margin: '2px 0px',
         },
-        'p:empty': {
+        'p:empty, div:empty': {
           margin: '8px 0px',
         },
         ...stylesheet,
