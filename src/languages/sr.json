@@ -2847,5 +2847,5 @@
   "Quotation created by System": "Ponuda kreirana od strane sistema",
   "Quotation updated by System": "Ponudu je ažurirao sistem",
   "Job type deleted successfully": "Tip posla je uspešno izbrisan",
-  "You are about to delete {{serviceOrderTypeName}}": "Spremate se da izbrišete {{serviceOrderTypeName}}"
+  "You are about to delete \"{{serviceOrderTypeName}}\"": "Spremate se da izbrišete \"{{serviceOrderTypeName}}\""
 }
