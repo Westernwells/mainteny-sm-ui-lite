@@ -552,7 +552,7 @@ export const DataList = ({
                 backgroundColor: '#F8F9FC',
                 transition: 'background-color 0.3s ease',
               }}>
-              <StyledDataListCell flex="0 0 5%">
+              <StyledDataListCell flex="0 0 10%">
                 <IconButton
                   sx={{
                     borderRadius: '4px',
@@ -586,7 +586,7 @@ export const DataList = ({
                   placeholder={t('Enter name')}
                 />
               </StyledDataListCell>
-              <StyledDataListCell sx={{flex: '0 0 25%', padding: 0}}>
+              <StyledDataListCell sx={{flex: '0 0 22%', padding: 0}}>
                 <StyledSelect
                   mode={mode}
                   value={form.priority ?? ''}
