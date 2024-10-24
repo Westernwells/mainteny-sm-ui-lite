@@ -53,7 +53,7 @@ export const QuotationActivities = ({
             </TimelineSeparator>
             <TimelineContent sx={{marginTop: '-0.2em'}}>
               <Typography variant="subtitle1">
-                {t(getQuotationActivityTitle(activity.type))}
+                {getQuotationActivityTitle(activity, t)}
               </Typography>
               <Typography
                 variant="caption"

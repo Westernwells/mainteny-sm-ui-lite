@@ -286,7 +286,9 @@ type Props = {
   selectedLng?: string;
   technicianSignatureImage?: string;
   customerSignatureImage?: string;
-  workReportPictures: string[];
+  workReportPictures: {
+    [key: string]: string;
+  };
   headerInfo: HeaderFooterInfoData;
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
@@ -311,6 +313,10 @@ const WorkReportTemplate = React.memo(
   }: Props) => {
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
     const company = userInfo?.serviceCompany;
+    const filteredPictures =
+      report?.attachments?.filter(
+        (item) => !!workReportPictures[item.fileResource.uri],
+      ) ?? [];
 
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -669,37 +675,40 @@ const WorkReportTemplate = React.memo(
                 </View>
               )}
 
-              {report?.attachments.length && workReportPictures.length && (
-                <View>
-                  <Text style={styles.sectionHeading}>
-                    {translate('Images')}{' '}
-                  </Text>
+              {filteredPictures.length &&
+                Object.keys(workReportPictures).length && (
+                  <View>
+                    <Text style={styles.sectionHeading}>
+                      {translate('Images')}{' '}
+                    </Text>
 
-                  <View style={styles.imageWrapper}>
-                    {report?.attachments?.map((attachment, index) => (
-                      <View
-                        style={styles.imageContainer}
-                        key={attachment.id}
-                        wrap={false}>
-                        <Image
-                          src={workReportPictures && workReportPictures[index]}
-                          style={{
-                            height: 100,
-                            borderRadius: 5,
-                            flexShrink: 0,
-                            marginVertical: 5,
-                          }}
-                        />
-                        {attachment.fileResource.description && (
-                          <Text style={styles.imageDescription}>
-                            {attachment.fileResource.description}
-                          </Text>
-                        )}
-                      </View>
-                    ))}
+                    <View style={styles.imageWrapper}>
+                      {filteredPictures.map((attachment) => (
+                        <View
+                          style={styles.imageContainer}
+                          key={attachment.id}
+                          wrap={false}>
+                          <Image
+                            src={
+                              workReportPictures?.[attachment.fileResource.uri]
+                            }
+                            style={{
+                              height: 100,
+                              borderRadius: 5,
+                              flexShrink: 0,
+                              marginVertical: 5,
+                            }}
+                          />
+                          {attachment.fileResource.description && (
+                            <Text style={styles.imageDescription}>
+                              {attachment.fileResource.description}
+                            </Text>
+                          )}
+                        </View>
+                      ))}
+                    </View>
                   </View>
-                </View>
-              )}
+                )}
 
               <View style={styles.signatureWrapper} wrap={false}>
                 {technicianSignatureImage && (

@@ -1,12 +1,12 @@
 import {UserView} from 'models/user';
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {getSignatureKeys} from 'utils/service-order-utils';
 import {useServiceOrderDetails} from './reactQuery/useServiceOrder';
 import {useCompanyById} from './reactQuery/useCompanies';
 import {useDownloadUrl} from './reactQuery/useDownloadUrl';
 import useFetchAndConvertImage from './useFetchAndConvertImage';
-import useFetchAndConvertMultipleImages from './useFetchAndConvertMultipleImages';
 import {useQueryClientStorageData} from './useClientStorage';
+import useMultiImagesURLToBase64 from './useMultiImagesURLToBase64';
 
 interface Props {
   serviceOrderId: string;
@@ -87,12 +87,11 @@ const usePrepareWorkReportData = ({serviceOrderId, userView}: Props) => {
     serviceCompanyId,
   );
 
-  const {
-    convertedImages,
-    isImageLoading,
-    setShouldFetchImages,
-    shouldFetchImages,
-  } = useFetchAndConvertMultipleImages(imageDownloadUrls, report?.attachments);
+  const [shouldFetchImages, setShouldFetchImages] = useState(false);
+  const {convertedImages, isImageLoading} = useMultiImagesURLToBase64(
+    imageDownloadUrls,
+    {enabled: shouldFetchImages},
+  );
 
   const {
     data: clientStorageData,

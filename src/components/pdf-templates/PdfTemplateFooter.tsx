@@ -1,5 +1,6 @@
 import {View, StyleSheet, Text, Font, Image} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
+import {HeaderFooterInfoData} from 'models/misc';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 
@@ -7,9 +8,10 @@ type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount;
   selectedLng?: string;
-  footerInfo: any;
-  footerPath: any;
+  footerInfo: HeaderFooterInfoData;
+  footerPath: string;
 };
+
 Font.register({
   family: 'Montserrat-Bold',
   format: 'truetype',
@@ -37,6 +39,9 @@ const getStyles = (
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 0.5,
+      flexWrap: 'wrap',
+      paddingRight: 1,
+      wordWrap: 'break-word',
     },
     footerWrapper: {
       display: 'flex',
@@ -59,11 +64,12 @@ const getStyles = (
       flexDirection: 'row',
       flex: itemCount === 3 ? '0 0 85%' : '0 0 60%',
       justifyContent: 'space-between',
+      paddingRight: 10,
     },
     leftFooter: {
       display: 'flex',
       flexDirection: 'row',
-      flex: '0 0 85%',
+      flex: '0 0 95%',
       justifyContent: 'space-between',
     },
     emailText: {
@@ -96,8 +102,9 @@ const getStyles = (
     },
     footerContent: {
       marginRight: 10,
-      maxWidth: 130,
+      maxWidth: '100%',
       flex: `0 0 ${flexBasisValue}`,
+      paddingRight: 10,
     },
     footerHeading: {
       paddingVertical: 0.5,
@@ -155,33 +162,54 @@ const PdfTemplateFooter = ({
               </Text>
             )}
           </View>
-          <View style={styles.footerContent}>
-            {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
-              <Text style={styles.footerHeading}>
-                {translate('Bank')}:{' '}
-                {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName}
-              </Text>
-            )}
 
-            {userInfo?.serviceCompany?.settings?.paymentInfo?.accountNumber && (
-              <Text style={styles.footerSectionBody}>
-                {translate('Acc. nr.')}:{' '}
-                {userInfo?.serviceCompany?.settings?.paymentInfo?.accountNumber}
-              </Text>
-            )}
-            {userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
-              <Text style={styles.footerSectionBody}>
-                {translate('IBAN')}:{' '}
-                {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
-              </Text>
-            )}
-            {userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
-              <Text style={styles.footerSectionBody}>
-                {translate('BIC')}:{' '}
-                {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
-              </Text>
-            )}
-          </View>
+          {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
+            <View style={styles.footerContent}>
+              {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
+                <Text style={styles.footerHeading}>
+                  {translate('Bank')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName}
+                </Text>
+              )}
+
+              {userInfo?.serviceCompany?.settings?.paymentInfo
+                ?.accountNumber && (
+                <Text style={styles.footerSectionBody}>
+                  {translate('Acc. nr.')}:{' '}
+                  {
+                    userInfo?.serviceCompany?.settings?.paymentInfo
+                      ?.accountNumber
+                  }
+                </Text>
+              )}
+              {userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap:
+                      userInfo?.serviceCompany?.settings?.paymentInfo?.iban
+                        .length < 23
+                        ? 'nowrap'
+                        : 'wrap',
+                  }}>
+                  <Text style={styles.footerSectionBody}>
+                    {translate('IBAN')}:{' '}
+                  </Text>
+                  <Text style={{...styles.footerSectionBody, flexShrink: 1}}>
+                    {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
+                  </Text>
+                </View>
+              )}
+              {userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
+                <Text style={styles.footerSectionBody}>
+                  {translate('BIC')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
+                </Text>
+              )}
+            </View>
+          )}
+
           {userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
             <View style={styles.footerContent}>
               {userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
@@ -201,12 +229,27 @@ const PdfTemplateFooter = ({
                   }
                 </Text>
               )}
+
               {userInfo?.serviceCompany?.settings?.paymentInfo2?.iban && (
-                <Text style={styles.footerSectionBody}>
-                  {translate('IBAN')}:{' '}
-                  {userInfo?.serviceCompany?.settings?.paymentInfo2?.iban}
-                </Text>
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap:
+                      userInfo?.serviceCompany?.settings?.paymentInfo2?.iban
+                        .length < 23
+                        ? 'nowrap'
+                        : 'wrap',
+                  }}>
+                  <Text style={styles.footerSectionBody}>
+                    {translate('IBAN')}:{' '}
+                  </Text>
+                  <Text style={{...styles.footerSectionBody, flexShrink: 1}}>
+                    {userInfo?.serviceCompany?.settings?.paymentInfo2?.iban}
+                  </Text>
+                </View>
               )}
+
               {userInfo?.serviceCompany?.settings?.paymentInfo2?.bic && (
                 <Text style={styles.footerSectionBody}>
                   {translate('BIC')}:{' '}

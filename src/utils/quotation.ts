@@ -1,28 +1,42 @@
 import {DiscountType} from 'models/invoice';
-import {QuotationActivityType, QuotationItemRecord} from 'models/quotation';
+import {
+  QuotationActivityType,
+  QuotationActivityView,
+  QuotationItemRecord,
+} from 'models/quotation';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
+import {TFunction} from 'i18next';
 import {Currencies} from './currency';
 
 export const getQuotationActivityTitle = (
-  type: QuotationActivityType,
+  activity: QuotationActivityView,
+  t: TFunction,
 ): string => {
-  switch (type) {
+  switch (activity.type) {
     case QuotationActivityType.CREATED:
-      return 'Quotation created';
+      return activity?.meta.creator
+        ? t('Quotation created by {{name}}', {
+            name: `${activity?.meta.creator?.firstName} ${activity?.meta.creator?.lastName}`,
+          })
+        : t('Quotation created by System');
     case QuotationActivityType.UPDATED:
-      return 'Quotation updated';
+      return activity?.meta.creator
+        ? t('Quotation updated by {{name}}', {
+            name: `${activity?.meta.creator?.firstName} ${activity?.meta.creator?.lastName}`,
+          })
+        : t('Quotation updated by System');
     case QuotationActivityType.SENT:
-      return 'Quotation sent';
+      return t('Quotation sent');
     case QuotationActivityType.ACCEPTED:
-      return 'Quotation accepted';
+      return t('Quotation accepted');
     case QuotationActivityType.REJECTED:
-      return 'Quotation rejected';
+      return t('Quotation rejected');
     case QuotationActivityType.SERVICE_ORDER_ADDED:
-      return 'Service Job added';
+      return t('Service Job added');
     case QuotationActivityType.SERVICE_ORDER_REMOVED:
-      return 'Service Job removed';
+      return t('Service Job removed');
     case QuotationActivityType.PRINTED:
-      return 'Quotation printed';
+      return t('Quotation printed');
     default:
       return '';
   }
