@@ -88,7 +88,7 @@
     "lodash": "^4.17.21",
     "mui-address-autocomplete": "^3.0.5",
     "notistack": "^2.0.3",
-    "nuvo-react": "^2.10.5",
+    "nuvo-react": "^2.13.1",
     "print-js": "^1.6.0",
     "pusher-js": "^7.2.0",
     "query-string": "^7.1.1",
