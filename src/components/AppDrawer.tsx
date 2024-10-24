@@ -33,6 +33,8 @@ import {ReactComponent as MyCompanyIcon} from 'assets/icons/MyCompanyIcon.svg';
 import {ReactComponent as MyCompanyIconColor} from 'assets/icons/MyCompanyIconColor.svg';
 import {ReactComponent as SettingsIcon} from 'assets/icons/Settings.svg';
 import {ReactComponent as SettingsIconColor} from 'assets/icons/SettingsIconColor.svg';
+import {ReactComponent as CompanyIcon} from 'assets/icons/Company.svg';
+import {ReactComponent as CompanyIconColor} from 'assets/icons/CompanyIconColor.svg';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Role} from 'models/user';
 import React, {
@@ -513,6 +515,23 @@ export const AppDrawer = ({open, setOpen}: Props) => {
           setSelectedPathOrigin('');
           navigate('/settings');
         }
+      },
+    },
+
+    {
+      text: 'Companies',
+      icon: <CompanyIcon fontSize="1.5rem" />,
+      selectIcon: <CompanyIconColor fontSize="1.5rem" />,
+      path: '/admin/companies',
+      access: isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/admin/companies');
+        navigate('/admin/companies');
       },
     },
   ];
