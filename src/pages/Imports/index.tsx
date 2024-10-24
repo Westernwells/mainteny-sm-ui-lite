@@ -35,6 +35,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                   settings={{
                     developerMode: true,
                     identifier: 'service_company',
+                    inputTypes: ['csv', 'tsv', 'xls', 'xlsx', 'xml', 'pdf'],
                     multipleFileUpload: true,
                     columns: [
                       {
@@ -296,9 +297,8 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                     console.log('Result:', result);
                     console.log('Error rows:', errors);
                     complete();
-                  }}>
-                  Select Company File
-                </NuvoImporter>
+                  }}
+                />
               </Grid>
               <Grid item xs={4} textAlign="center">
                 <Typography>Employee</Typography>
@@ -307,6 +307,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                   settings={{
                     developerMode: true,
                     identifier: 'employee',
+                    inputTypes: ['csv', 'tsv', 'xls', 'xlsx', 'xml', 'pdf'],
                     multipleFileUpload: true,
                     columns: [
                       {
@@ -404,9 +405,8 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                     console.log('Result:', result);
                     console.log('Error rows:', errors);
                     complete();
-                  }}>
-                  Select Employee File
-                </NuvoImporter>
+                  }}
+                />
               </Grid>
               <Grid item xs={4} textAlign="center">
                 <Typography>Customer</Typography>
@@ -415,6 +415,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                   settings={{
                     developerMode: true,
                     identifier: 'customer',
+                    inputTypes: ['csv', 'tsv', 'xls', 'xlsx', 'xml', 'pdf'],
                     multipleFileUpload: true,
                     columns: [
                       {
@@ -620,9 +621,8 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                     console.log('Result:', result);
                     console.log('Error rows:', errors);
                     complete();
-                  }}>
-                  Select Customer File
-                </NuvoImporter>
+                  }}
+                />
               </Grid>
             </Grid>
           </Grid>
@@ -637,108 +637,107 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
         <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
           <Grid item xs={12}>
             <Grid container flexDirection="row">
-              <Grid item xs={4} textAlign="center">
-                <Typography>Contact Person</Typography>
-                <NuvoImporter
-                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
-                  settings={{
-                    developerMode: true,
-                    identifier: 'contact_person',
-                    multipleFileUpload: true,
-                    columns: [
-                      {
-                        key: 'anrede',
-                        label: 'Anrede',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'vorname',
-                        label: 'Vorname',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'nachname',
-                        label: 'Nachname',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'rolle_der_kontaktperson',
-                        label: 'Rolle der Kontaktperson',
-                        columnType: 'category',
-                        dropdownOptions: [
-                          {
-                            label: 'GENERAL_MANAGER',
-                            value: 'GENERAL_MANAGER',
-                            type: 'string',
-                          },
-                          {
-                            label: 'ASSISTANT',
-                            value: 'ASSISTANT',
-                            type: 'string',
-                          },
-                          {
-                            label: 'FACILITY_MANAGER',
-                            value: 'FACILITY_MANAGER',
-                            type: 'string',
-                          },
-                          {
-                            label: 'PROPERTY_MANAGER',
-                            value: 'PROPERTY_MANAGER',
-                            type: 'string',
-                          },
-                          {
-                            label: 'CONTACT_PERSON',
-                            value: 'CONTACT_PERSON',
-                            type: 'string',
-                          },
-                          {
-                            label: 'ASSET_OWNER',
-                            value: 'ASSET_OWNER',
-                            type: 'string',
-                          },
-                          {
-                            label: 'OTHER_CONTACT',
-                            value: 'OTHER_CONTACT',
-                            type: 'string',
-                          },
-                          {
-                            label: 'OTHERS',
-                            value: 'OTHERS',
-                            type: 'string',
-                          },
-                        ],
-                        isMultiSelect: false,
-                      },
-                      {
-                        key: 'email',
-                        label: 'E-Mail',
-                        columnType: 'email',
-                      },
-                      {
-                        key: 'telefon',
-                        label: 'Telefon',
-                        columnType: 'phone',
-                      },
-                      {
-                        key: 'kundenummer',
-                        label: 'Kundenummer',
-                        columnType: 'string',
-                      },
-                      {
-                        key: 'weitere_telefonnummer',
-                        label: 'Weitere Telefonnummer',
-                        columnType: 'string',
-                      },
-                    ],
-                  }}
-                  onResults={(result, errors, complete) => {
-                    console.log('Result:', result);
-                    console.log('Error rows:', errors);
-                    complete();
-                  }}>
-                  Select Contact Person File
-                </NuvoImporter>
-              </Grid>
+              {/* <Grid item xs={4} textAlign="center"> */}
+              {/*  <Typography>Contact Person</Typography> */}
+              {/*  <NuvoImporter */}
+              {/*    licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk=" */}
+              {/*    settings={{ */}
+              {/*      developerMode: true, */}
+              {/*      identifier: 'contact_person', */}
+              {/*      inputTypes: ['csv', 'tsv', 'xls', 'xlsx', 'xml', 'pdf'], */}
+              {/*      multipleFileUpload: true, */}
+              {/*      columns: [ */}
+              {/*        { */}
+              {/*          key: 'anrede', */}
+              {/*          label: 'Anrede', */}
+              {/*          columnType: 'string', */}
+              {/*        }, */}
+              {/*        { */}
+              {/*          key: 'vorname', */}
+              {/*          label: 'Vorname', */}
+              {/*          columnType: 'string', */}
+              {/*        }, */}
+              {/*        { */}
+              {/*          key: 'nachname', */}
+              {/*          label: 'Nachname', */}
+              {/*          columnType: 'string', */}
+              {/*        }, */}
+              {/*        { */}
+              {/*          key: 'rolle_der_kontaktperson', */}
+              {/*          label: 'Rolle der Kontaktperson', */}
+              {/*          columnType: 'category', */}
+              {/*          dropdownOptions: [ */}
+              {/*            { */}
+              {/*              label: 'GENERAL_MANAGER', */}
+              {/*              value: 'GENERAL_MANAGER', */}
+              {/*              type: 'string', */}
+              {/*            }, */}
+              {/*            { */}
+              {/*              label: 'ASSISTANT', */}
+              {/*              value: 'ASSISTANT', */}
+              {/*              type: 'string', */}
+              {/*            }, */}
+              {/*            { */}
+              {/*              label: 'FACILITY_MANAGER', */}
+              {/*              value: 'FACILITY_MANAGER', */}
+              {/*              type: 'string', */}
+              {/*            }, */}
+              {/*            { */}
+              {/*              label: 'PROPERTY_MANAGER', */}
+              {/*              value: 'PROPERTY_MANAGER', */}
+              {/*              type: 'string', */}
+              {/*            }, */}
+              {/*            { */}
+              {/*              label: 'CONTACT_PERSON', */}
+              {/*              value: 'CONTACT_PERSON', */}
+              {/*              type: 'string', */}
+              {/*            }, */}
+              {/*            { */}
+              {/*              label: 'ASSET_OWNER', */}
+              {/*              value: 'ASSET_OWNER', */}
+              {/*              type: 'string', */}
+              {/*            }, */}
+              {/*            { */}
+              {/*              label: 'OTHER_CONTACT', */}
+              {/*              value: 'OTHER_CONTACT', */}
+              {/*              type: 'string', */}
+              {/*            }, */}
+              {/*            { */}
+              {/*              label: 'OTHERS', */}
+              {/*              value: 'OTHERS', */}
+              {/*              type: 'string', */}
+              {/*            }, */}
+              {/*          ], */}
+              {/*          isMultiSelect: false, */}
+              {/*        }, */}
+              {/*        { */}
+              {/*          key: 'email', */}
+              {/*          label: 'E-Mail', */}
+              {/*          columnType: 'email', */}
+              {/*        }, */}
+              {/*        { */}
+              {/*          key: 'telefon', */}
+              {/*          label: 'Telefon', */}
+              {/*          columnType: 'phone', */}
+              {/*        }, */}
+              {/*        { */}
+              {/*          key: 'kundenummer', */}
+              {/*          label: 'Kundenummer', */}
+              {/*          columnType: 'string', */}
+              {/*        }, */}
+              {/*        { */}
+              {/*          key: 'weitere_telefonnummer', */}
+              {/*          label: 'Weitere Telefonnummer', */}
+              {/*          columnType: 'string', */}
+              {/*        }, */}
+              {/*      ], */}
+              {/*    }} */}
+              {/*    onResults={(result, errors, complete) => { */}
+              {/*      console.log('Result:', result); */}
+              {/*      console.log('Error rows:', errors); */}
+              {/*      complete(); */}
+              {/*    }}/> */}
+              {/* </Grid> */}
               <Grid item xs={4} textAlign="center">
                 <Typography>Elevator</Typography>
                 <NuvoImporter
@@ -746,6 +745,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                   settings={{
                     developerMode: true,
                     identifier: 'elevator',
+                    inputTypes: ['csv', 'tsv', 'xls', 'xlsx', 'xml', 'pdf'],
                     multipleFileUpload: true,
                     columns: [
                       {
@@ -1084,9 +1084,8 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                     console.log('Result:', result);
                     console.log('Error rows:', errors);
                     complete();
-                  }}>
-                  Select Elevator File
-                </NuvoImporter>
+                  }}
+                />
               </Grid>
               <Grid item xs={4} textAlign="center">
                 <Typography>Contract</Typography>
@@ -1095,6 +1094,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                   settings={{
                     developerMode: true,
                     identifier: 'contract',
+                    inputTypes: ['csv', 'tsv', 'xls', 'xlsx', 'xml', 'pdf'],
                     multipleFileUpload: true,
                     columns: [
                       {
@@ -1235,23 +1235,9 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                     console.log('Result:', result);
                     console.log('Error rows:', errors);
                     complete();
-                  }}>
-                  Select Contract File
-                </NuvoImporter>
+                  }}
+                />
               </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Divider
-          sx={{background: theme.palette.divider, mt: '1.5em'}}
-          flexItem
-        />
-      </Box>
-      <Divider sx={{background: theme.palette.divider, mt: '1.5em'}} flexItem />
-      <Box>
-        <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
-          <Grid item xs={12}>
-            <Grid container flexDirection="row">
               <Grid item xs={4} textAlign="center">
                 <Typography>Article</Typography>
                 <NuvoImporter
@@ -1259,6 +1245,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                   settings={{
                     developerMode: true,
                     identifier: 'article',
+                    inputTypes: ['csv', 'tsv', 'xls', 'xlsx', 'xml', 'pdf'],
                     multipleFileUpload: true,
                     columns: [
                       {
@@ -1426,9 +1413,8 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
                     console.log('Result:', result);
                     console.log('Error rows:', errors);
                     complete();
-                  }}>
-                  Select Article File
-                </NuvoImporter>
+                  }}
+                />
               </Grid>
             </Grid>
           </Grid>
