@@ -13,7 +13,7 @@ describe('Orders page - list page', () => {
     });
 
     it('filter orders by status', () => {
-        const status = 'Scheduled';
+        const status = 'Overdue';
 
         cy.wait('@serviceOrderAPI');
         OrderPage.changeStatusFilter(status);
@@ -22,7 +22,7 @@ describe('Orders page - list page', () => {
         OrderPage.waitForAllJobQueryApi(
             '@serviceOrderAPI',
             {
-                status: ['SCHEDULED'],
+                status: ['OVERDUE'],
             },
 
             () => {

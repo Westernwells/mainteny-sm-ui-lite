@@ -1,6 +1,5 @@
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {endOfDay, startOfDay} from 'date-fns';
-import {EmptySection} from 'components/EmptySection';
 import {Progress} from 'components/Progress';
 import {useQueryTechnicianEvents} from 'hooks/reactQuery/useTechnician';
 import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
@@ -22,6 +21,7 @@ import {getAvailabilityChipColor} from 'utils/availability';
 import {StatusChip} from 'components/StatusChip';
 import {capitalize} from 'utils/utils';
 import {groupBy} from 'lodash';
+import EmptyTable from 'components/Table/EmptyTable';
 import TableContainer from '../../components/Table/TableContainer';
 import PageContainer from '../../components/PageContainer';
 import SearchInput from '../../components/SearchInput/index';
@@ -45,97 +45,109 @@ export const Employees = () => {
   const textInput = useRef<HTMLInputElement>(null);
   const {t} = useTranslation();
 
-  const COLUMNS = useRef<TableColumnWithRender<EmployeeContractTableRow>[]>([
-    {
-      headerName: 'Employee',
-      key: 'employee-cell-employee',
-      isFirst: true,
-      renderCell: (employee, cellProps) => (
-        <Cell {...cellProps}>
-          <Avatar src={employee.photoUrl} sx={{width: 24, height: 24}} />
-          <TableCellText>{employee.name}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'ROLE',
-      key: 'employee-cell-role',
-      width: '236px',
-      renderCell: (employee, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText capitalize>
-            {t(capitalize(employee.roles))}
-          </TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'ADDRESS',
-      key: 'employee-cell-address',
-      renderCell: (employee, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText>{employee.address}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'Team',
-      key: 'employee-cell-team',
-      width: '80px',
-      align: 'right',
-      renderCell: (employee, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText>{employee.team}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'PHONE',
-      key: 'employee-cell-phone',
-      renderCell: (employee, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText>{employee.phone}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'SHIFT',
-      key: 'employee-cell-shift',
-      width: '112px',
-      renderCell: (employee, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText>{employee.shift}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'AVAILABILITY',
-      key: 'employee-cell-availability',
-      align: 'center',
-      width: '136px',
-      renderCell: (employee, cellProps) => (
-        <Cell {...cellProps}>
-          <StatusChip
-            label={employee.availability}
-            {...getAvailabilityChipColor(employee.availability)}
-          />
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'action',
-      key: 'employee-cell-action',
-      isHeaderNameHidden: true,
-      align: 'center',
-      width: ACTION_CELL_WIDTH, // set static width that will not change
-      isLast: true,
-      renderCell: (employee, cellProps) => (
-        <Cell {...cellProps} onClick={undefined}>
-          <Actions id={employee.employeeId} email={employee.email} />
-        </Cell>
-      ),
-    },
-  ]);
+  const [showLeftShadow, setShowLeftShadow] = useState(false);
+  const [showRightShadow, setShowRightShadow] = useState(false);
+
+  const COLUMNS = useMemo<TableColumnWithRender<EmployeeContractTableRow>[]>(
+    () => [
+      {
+        headerName: 'Employee',
+        key: 'employee-cell-employee',
+        isFirst: true,
+        showShadows: showRightShadow ? 'right' : undefined,
+        renderCell: (employee, cellProps) => (
+          <Cell {...cellProps}>
+            <Avatar src={employee.photoUrl} sx={{width: 24, height: 24}} />
+            <TableCellText>{employee.name}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'ROLE',
+        key: 'employee-cell-role',
+        width: '236px',
+        renderCell: (employee, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText capitalize>
+              {t(capitalize(employee.roles))}
+            </TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'ADDRESS',
+        key: 'employee-cell-address',
+        renderCell: (employee, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{employee.address}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Team',
+        key: 'employee-cell-team',
+        width: '80px',
+        align: 'right',
+        renderCell: (employee, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{employee.team}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'PHONE',
+        key: 'employee-cell-phone',
+        renderCell: (employee, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{employee.phone}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'SHIFT',
+        key: 'employee-cell-shift',
+        width: '112px',
+        renderCell: (employee, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{employee.shift}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'AVAILABILITY',
+        key: 'employee-cell-availability',
+        align: 'center',
+        width: '136px',
+        renderCell: (employee, cellProps) => (
+          <Cell {...cellProps}>
+            <StatusChip
+              label={employee.availability}
+              {...getAvailabilityChipColor(employee.availability)}
+            />
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'action',
+        key: 'employee-cell-action',
+        isHeaderNameHidden: true,
+        align: 'center',
+        width: ACTION_CELL_WIDTH, // set static width that will not change
+        isLast: true,
+        showShadows: showLeftShadow ? 'left' : undefined,
+        renderCell: (employee, cellProps) => (
+          <Cell {...cellProps} onClick={undefined}>
+            <Actions id={employee.employeeId} email={employee.email} />
+          </Cell>
+        ),
+      },
+    ],
+    [showLeftShadow, showRightShadow],
+  );
+
+  const [initialLoadNoEntries, setInitialLoadNoEntries] = useState<
+    boolean | undefined
+  >();
 
   const {
     data: userAccountResource = createEmptyResource<UserView>(page.pageSize),
@@ -198,28 +210,6 @@ export const Employees = () => {
     setPage({...page, pageIndex: value});
   };
 
-  if (isFetched && !totalEmployeeRef.current) {
-    return (
-      <EmptySection
-        label="No employees yet. Please click the button below to add."
-        showActionBtn
-        btnLabel="Add Employee"
-        containerStyle={{
-          height: '100%',
-          mb: '10em',
-        }}
-      />
-    );
-  }
-
-  if (isIdle || isLoading) {
-    return <Progress />;
-  }
-
-  // const handleRoleChange = (value: string[]) => {
-  // 	setRole(value[0] as Role);
-  // };
-
   const handleNewEmployeeClick = () => {
     navigate('/employees/new');
   };
@@ -232,6 +222,36 @@ export const Employees = () => {
     setPage({...page, pageSize: value, pageIndex: 0});
   };
 
+  useEffect(() => {
+    if (!isFetched) return;
+    if (userAccountResource.total === 0 && initialLoadNoEntries !== false) {
+      setInitialLoadNoEntries(true);
+    } else if (userAccountResource.total > 0) {
+      setInitialLoadNoEntries(false);
+    }
+  }, [
+    initialLoadNoEntries,
+    isFetched,
+    userAccountResource,
+    setInitialLoadNoEntries,
+  ]);
+
+  if (isIdle || isLoading) {
+    return <Progress />;
+  }
+
+  if (initialLoadNoEntries) {
+    return (
+      <EmptyTable
+        label="No employees"
+        subLabel="Add new employees and centralize all their information—work hours, absence tracking, contact details, and schedules—in one place to organize your work and enhance efficiency."
+        btnLabel="Add Employee"
+        illustration="employee"
+        onClick={handleNewEmployeeClick}
+      />
+    );
+  }
+
   return (
     <PageContainer gap={3}>
       <PageHeaderContainer>
@@ -243,8 +263,10 @@ export const Employees = () => {
 
         <AddButton label="New Employee" onClick={handleNewEmployeeClick} />
       </PageHeaderContainer>
-      <TableContainer>
-        <TableHeader columns={COLUMNS.current} />
+      <TableContainer
+        setShowLeftShadow={setShowLeftShadow}
+        setShowRightShadow={setShowRightShadow}>
+        <TableHeader columns={COLUMNS} />
         <TableBody>
           {/* Row */}
           {rows.map((entry, idx) => (
@@ -252,7 +274,7 @@ export const Employees = () => {
               data-rowindex={idx}
               key={`employee-row-${entry.id}`}
               testId={`employee-row-${entry.id}`}>
-              {COLUMNS.current.map(({renderCell, ...rest}) =>
+              {COLUMNS.map(({renderCell, ...rest}) =>
                 renderCell(entry, {
                   onClick: handleEmployeeClick(entry.id),
                   ...rest,

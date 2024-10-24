@@ -60,6 +60,42 @@ export enum ServiceOrderStatus {
   ARTICLES_ORDERED = 'ARTICLES_ORDERED',
 }
 
+export enum ServiceOrderStatusFilter {
+  ALL = 'ALL',
+  PENDING = 'PENDING',
+  OVERDUE = 'OVERDUE',
+  ONGOING = 'ONGOING',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+export const ServiceOrderFilterToStatusMap = new Map<
+  ServiceOrderStatusFilter,
+  ServiceOrderStatus[]
+>([
+  [
+    ServiceOrderStatusFilter.PENDING,
+    [
+      ServiceOrderStatus.SCHEDULING,
+      ServiceOrderStatus.SCHEDULED,
+      ServiceOrderStatus.ARTICLES_ORDERED,
+      ServiceOrderStatus.TECHNICIAN_ASSIGNED,
+      ServiceOrderStatus.READY_TO_SCHEDULE,
+    ],
+  ],
+  [ServiceOrderStatusFilter.OVERDUE, [ServiceOrderStatus.OVERDUE]],
+  [
+    ServiceOrderStatusFilter.ONGOING,
+    [
+      ServiceOrderStatus.TRAVEL,
+      ServiceOrderStatus.IN_PROGRESS,
+      ServiceOrderStatus.PAUSED,
+    ],
+  ],
+  [ServiceOrderStatusFilter.COMPLETED, [ServiceOrderStatus.COMPLETED]],
+  [ServiceOrderStatusFilter.CANCELLED, [ServiceOrderStatus.CANCELLED]],
+]);
+
 export enum ServiceOrderPaymentStatus {
   NO_INVOICE = 'NO_INVOICE',
   NOT_PAID = 'NOT_PAID',
@@ -678,11 +714,13 @@ export interface CreateServiceOrderComment {
 }
 
 export type ServiceOrderTableRow = {
+  serviceOrderData: ServiceOrderView;
   id: string;
   elevatorExternalId: string;
   number: string;
   type: ServiceOrderType;
   address: string;
+  fullAddress: string;
   dueDate: string;
   technicians: EmployeesSimpleView[];
   propertyOwner: PropertyOwnerView;
@@ -702,6 +740,7 @@ export type SearchParameters = {
 
 export type ServiceOrderFilterForm = {
   customer?: string;
+  technician?: EmployeesView;
   orderNumber?: string;
   orderTypes: ServiceOrderType[];
   paymentStatus: ServiceOrderPaymentStatus[];

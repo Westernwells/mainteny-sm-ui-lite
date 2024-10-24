@@ -12,9 +12,9 @@ type Props = CellProps & {
   justifyContent?: string;
   maxWidth?: string;
   noWidthLimit?: boolean;
+  fieldName?: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
-  fieldName?: string;
 };
 
 const Cell = ({
@@ -35,10 +35,34 @@ const Cell = ({
       borderColor: '#222b451f',
       minHeight: '44px',
       height: '100%',
-      ...(cellProps.isFirst && {borderLeft: 0}),
-      ...(cellProps.isLast && {borderRight: 0}),
-      ...(cellProps.maxWidth && {maxWidth: cellProps.maxWidth}),
+
+      ...(cellProps.isFirst && {
+        borderLeft: 0,
+        left: 0,
+        position: 'sticky',
+        zIndex: 3,
+        backgroundColor: 'white',
+      }),
+      ...(cellProps.isLast && {
+        borderRight: 0,
+        right: 0,
+        position: 'sticky',
+        zIndex: 3,
+        backgroundColor: 'white',
+      }),
       padding: '9px 12px',
+      ...(cellProps.showShadows === 'left' && {
+        borderLeft: 0,
+        boxShadow: '0 0 14px rgba(0,0,0,0.2)',
+        clipPath: 'inset(0 0 0 -14px)',
+      }),
+      ...(cellProps.showShadows === 'right' && {
+        borderRight: 0,
+        boxShadow: '0 0 14px rgba(0,0,0,0.2)',
+        clipPath: 'inset(0 -14px 0 0)',
+      }),
+
+      ...(cellProps.maxWidth && {maxWidth: cellProps.maxWidth}),
       ...(cellProps?.width && {width: cellProps.width}),
       ...(cellProps?.width?.slice(-2) === 'px' && {
         flex: `0 1 ${cellProps.width}`,

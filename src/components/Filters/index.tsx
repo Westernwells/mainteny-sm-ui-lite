@@ -1,4 +1,4 @@
-import {Box, Button, Chip, Dialog, IconButton, Typography} from '@mui/material';
+import {Box, Button, Chip, Drawer, IconButton, Typography} from '@mui/material';
 import {PropsWithChildren, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -58,30 +58,59 @@ const Filters = ({
           color="primary"
         />
       )}
-      <Dialog open={isOpened} onClose={handleClose}>
+      <Drawer
+        anchor="right"
+        open={isOpened}
+        onClose={handleClose}
+        PaperProps={{
+          sx: {
+            width: '30em',
+            color: 'text.primary',
+            background: 'white',
+            display: 'flex',
+          },
+        }}>
         <Box
+          display="flex"
+          position="sticky"
+          top={0}
+          bgcolor="white"
+          zIndex={99}
+          gap={4}
           sx={{
             display: 'flex',
-            width: '480px',
-            padding: '16px 24px',
             flexDirection: 'column',
-            overflow: 'auto',
-          }}
-          gap={2}>
+            overflow: 'hidden',
+            height: 'inherit',
+            padding: '16px 24px',
+            boxShadow:
+              'box-shadow: 0px 4px 15px 0px rgba(144, 144, 144, 0.20);',
+          }}>
           {/* Header Section */}
           <Box
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              width: '100%',
             }}>
-            <Typography>{capitalize(t('Filters'))}</Typography>
+            <Typography variant="h5">
+              {capitalize(t('Apply Filters'))}
+            </Typography>
             <IconButton onClick={handleClose} disableRipple disableTouchRipple>
               <CloseIcon />
             </IconButton>
           </Box>
           {/* Body Section */}
-          {children}
+          <Box
+            sx={{
+              display: 'flex',
+              width: '100%',
+              height: '100%',
+              overflow: 'auto',
+            }}>
+            {children}
+          </Box>
           {/* Footer Section */}
           <Box
             sx={{
@@ -102,7 +131,7 @@ const Filters = ({
             </Box>
           </Box>
         </Box>
-      </Dialog>
+      </Drawer>
     </Box>
   );
 };

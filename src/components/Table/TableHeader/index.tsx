@@ -14,8 +14,7 @@ const TableHeader = ({columns, sortState, onSort}: Props) => (
     sx={{
       alignItems: 'center',
       backgroundColor: '#FFFFFF',
-      top: 0,
-      zIndex: 3,
+      zIndex: 5,
       minHeight: '40px',
     }}>
     {columns.map((column) => {
@@ -23,6 +22,8 @@ const TableHeader = ({columns, sortState, onSort}: Props) => (
       return (
         <TableHeaderCell
           key={column.headerName}
+          isFirst={column.isFirst}
+          isLast={column.isLast}
           column={column}
           sortState={sortState}
           onSort={

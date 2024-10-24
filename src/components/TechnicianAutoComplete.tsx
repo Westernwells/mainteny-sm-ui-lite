@@ -13,6 +13,8 @@ interface Props {
   initialValue?: EmployeesView | EmployeesSimpleView | null;
   textFieldProps?: TextFieldProps;
   disabled?: boolean;
+  required?: boolean;
+  size?: 'small' | 'medium';
 }
 
 export const TechnicianAutoComplete = ({
@@ -21,6 +23,8 @@ export const TechnicianAutoComplete = ({
   initialValue = null,
   textFieldProps,
   disabled,
+  required = true,
+  size = 'small',
 }: Props) => {
   const [query, setQuery] = useState<string>('');
   const [queryView, setQueryView] = useState(
@@ -76,21 +80,23 @@ export const TechnicianAutoComplete = ({
     }
   }, [queryView]);
 
+  const handleChange = (
+    event: any,
+    newValue: EmployeesView | EmployeesSimpleView | null,
+  ) => {
+    setTechnician(newValue);
+  };
+
   return (
     <Autocomplete
-      size="small"
+      size={size}
       disabled={disabled}
       clearOnBlur={false}
       disablePortal
       id="combo-box-demo"
       sx={{minHeight: 0}}
       options={techniciansResource.data}
-      onChange={(
-        event: any,
-        newValue: EmployeesView | EmployeesSimpleView | null,
-      ) => {
-        setTechnician(newValue);
-      }}
+      onChange={handleChange}
       getOptionLabel={(option) =>
         `${option.userAccount.firstName} ${option.userAccount.lastName}`
       }
@@ -102,7 +108,7 @@ export const TechnicianAutoComplete = ({
             name: 'technicianId',
             ...params,
             ...textFieldProps,
-            required: true,
+            required,
           }}
         />
       )}

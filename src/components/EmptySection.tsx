@@ -18,9 +18,11 @@ import {ReactComponent as HeadphonesHumanIcon} from 'assets/icons/HeadphonesHuma
 import {ReactComponent as CalendarClockGrey} from 'assets/icons/CalendarClockGrey.svg';
 import {ReactComponent as CalendarClock} from 'assets/icons/CalendarClock.svg';
 import {ReactComponent as ShipmentIcon} from 'assets/icons/ShipmentIcon.svg';
+import {ReactComponent as JobsIcon} from 'assets/icons/Jobs.svg';
+import {ReactComponent as MultiplePeople} from 'assets/icons/MultiplePeople.svg';
 import {Button} from './Button';
 
-interface Props extends BoxProps {
+export interface Props extends BoxProps {
   label: string;
   size?: 'tiny' | 'small' | 'medium' | 'large';
   btnSize?: 'small' | 'medium' | 'large';
@@ -42,7 +44,9 @@ interface Props extends BoxProps {
     | 'bankAccounts'
     | 'calendarClock'
     | 'calendarClockGrey'
-    | 'contacts';
+    | 'contacts'
+    | 'jobs'
+    | 'employee';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -50,6 +54,8 @@ interface Props extends BoxProps {
   actionButtonEndIcon?: JSX.Element;
   subLabel?: string;
   subLabelProps?: TypographyProps;
+  illustrationContainerProps?: TypographyProps;
+  illustrationColor?: string;
   disableActionBtn?: boolean;
 }
 
@@ -69,6 +75,8 @@ export const EmptySection = ({
   subLabel = '',
   subLabelProps = {},
   disableActionBtn = false,
+  illustrationContainerProps,
+  illustrationColor,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -116,6 +124,18 @@ export const EmptySection = ({
         return <CalendarClockGrey style={{width: '100%', height: '100%'}} />;
       case 'calendarClock':
         return <CalendarClock style={{width: '100%', height: '100%'}} />;
+      case 'jobs':
+        return (
+          <JobsIcon
+            style={{width: '100%', height: '100%', color: illustrationColor}}
+          />
+        );
+      case 'employee':
+        return (
+          <MultiplePeople
+            style={{width: '100%', height: '100%', color: illustrationColor}}
+          />
+        );
       default:
         return <LaptopIllustration style={{width: '100%', height: '100%'}} />;
     }
@@ -130,7 +150,10 @@ export const EmptySection = ({
       gap="1em"
       mt={3}
       sx={{...containerStyle}}>
-      <Box width={Width[size]} sx={{textAlign: 'center'}}>
+      <Box
+        width={Width[size]}
+        sx={{textAlign: 'center', ...illustrationContainerProps?.sx}}
+        {...illustrationContainerProps}>
         {getIllustration(illustration)}
       </Box>
       <Box display="flex" flexDirection="column">
