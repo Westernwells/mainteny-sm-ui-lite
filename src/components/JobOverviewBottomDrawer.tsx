@@ -128,6 +128,7 @@ export const JobOverviewBottomDrawer = ({
       <Box
         sx={{
           position: 'fixed',
+          zIndex: 20,
           left: `calc(${theme.spacing(7)} - 1px)`,
           [theme.breakpoints.up('sm')]: {
             left: `calc(${theme.spacing(9)} - 1px)`,

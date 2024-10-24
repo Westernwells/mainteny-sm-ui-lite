@@ -22,6 +22,7 @@ export type CellProps = {
   isFirst?: boolean;
   isLast?: boolean;
   hide?: boolean;
+  showShadows?: 'left' | 'right';
 };
 
 export type TableColumn = CellProps & HeaderCellProps & {key?: string};

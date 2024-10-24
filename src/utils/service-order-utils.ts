@@ -3,6 +3,7 @@ import _ from 'lodash';
 import {amber, grey} from '@mui/material/colors';
 import {EmployeesSimpleView} from 'models/employee';
 import {StatusColor} from 'models/status';
+import {Address} from 'models/misc';
 import {
   AUTO_GENERATED_TO_PAYMENT_STATUS,
   SearchParameters,
@@ -364,6 +365,24 @@ export const getSignatureKeys = (
   return signatureKeys;
 };
 
+export const getAddressString = (address?: Address) => {
+  if (!address) return '-';
+
+  if (
+    !address.component?.postalCode ||
+    !address.component?.street ||
+    !address.component?.city
+  )
+    return address.fullName ?? '-';
+  return [
+    address.component?.street,
+    address.component?.postalCode,
+    address.component?.city,
+  ]
+    .filter((value) => !!value)
+    .join(', ');
+};
+
 const getTechniciansFromServiceOrder = (
   item: ServiceOrderView,
 ): EmployeesSimpleView[] => {
@@ -380,11 +399,13 @@ export const aggregateServiceOrderRow = (
   orders: ServiceOrderView[],
 ): ServiceOrderTableRow[] =>
   orders.map((order) => ({
+    serviceOrderData: order,
     id: order.id,
     elevatorExternalId: order.elevator.externalId,
     number: order.number,
     type: order.type,
-    address: order.elevator.address.fullName ?? '-',
+    address: getAddressString(order.elevator.address),
+    fullAddress: order.elevator.address.fullName ?? '-',
     dueDate: order.dueDate,
     technicians: getTechniciansFromServiceOrder(order),
     propertyOwner: order.elevator.propertyOwner,

@@ -12,10 +12,19 @@ type Props = {
   column: TableColumn;
   sortState?: HeaderSortingState;
   gap?: string | number;
+  isFirst?: boolean;
+  isLast?: boolean;
   onSort?: () => void;
 };
 
-const TableHeaderCell = ({column, gap = 1, sortState, onSort}: Props) => {
+const TableHeaderCell = ({
+  column,
+  gap = 1,
+  sortState,
+  isFirst = false,
+  isLast = false,
+  onSort,
+}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
 
@@ -40,6 +49,30 @@ const TableHeaderCell = ({column, gap = 1, sortState, onSort}: Props) => {
         padding: '9px 12px',
         alignItems: 'center',
         backgroundColor: 'white',
+        position: 'sticky',
+        zIndex: 6,
+
+        ...(isFirst && {
+          borderLeft: 0,
+          left: 0,
+          zIndex: 7,
+        }),
+        ...(isLast && {
+          borderRight: 0,
+          right: 0,
+          zIndex: 7,
+        }),
+
+        ...(column.showShadows === 'left' && {
+          borderLeft: 0,
+          boxShadow: '0 0 14px rgba(0,0,0,0.2)',
+          clipPath: 'inset(0 0 0 -14px)',
+        }),
+        ...(column.showShadows === 'right' && {
+          borderRight: 0,
+          boxShadow: '0 0 14px rgba(0,0,0,0.2)',
+          clipPath: 'inset(0 -14px 0 0)',
+        }),
 
         '&:hover .MuiIconButton-root': {
           ...(!isSortingActive && {opacity: 1}),
