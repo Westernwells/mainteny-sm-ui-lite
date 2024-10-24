@@ -2846,5 +2846,19 @@
   "Apply Filters": "Aplicar filtros",
   "Enter a purchase order number here to include it on invoices from this contract. This will override any purchase order number saved at the customer level.": "Ingrese aquí un número de orden de compra para incluirlo en las facturas de este contrato. Esto anulará cualquier número de orden de compra guardado a nivel de cliente.",
   "Invoice updated by {{name}}": "Factura actualizada por {{name}}",
-  "Enter purchase order number": "Ingrese el número de orden de compra"
+  "Enter purchase order number": "Ingrese el número de orden de compra",
+  "Invoice created by {{name}}": "Factura creada por {{name}}",
+  "Quotation created by {{name}}": "Oferta creada por {{name}}",
+  "Quotation updated by {{name}}": "Oferta actualizada por {{name}}",
+  "Invoice created by System": "Factura creada por el sistema",
+  "Invoice updated by System": "Factura actualizada por sistema",
+  "Quotation created by System": "Cotización creada por el sistema",
+  "Quotation updated by System": "Cotización actualizada por Sistema",
+  "Job type deleted successfully": "Tipo de trabajo eliminado correctamente",
+  "You are about to delete \"{{serviceOrderTypeName}}\"": "Estás a punto de eliminar \"{{serviceOrderTypeName}}\"",
+  "No Suppliers": "Sin proveedores",
+  "Add suppliers to process fast article purchases and keep track of your orders": "Agregue proveedores para procesar compras de artículos rápidamente y realizar un seguimiento de sus pedidos",
+  "Delete job type": "Eliminar tipo de trabajo",
+  "Export": "Exportar",
+  "Failed to export CSV": "No se pudo exportar CSV"
 }

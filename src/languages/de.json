@@ -2212,7 +2212,7 @@
   "60 minutes": "60 min",
   "Unit Status": "Anlagenstatus",
   "Unit category": "Anlagenkategorie",
-  "Serial number": "Fabriknummer",
+  "Serial number": "Fabriknr",
   "Unit number": "Anlagennummer",
   "Spending limit": "Ausgabenlimit",
   "Job ongoing": "Auftrag läuft ",
@@ -2823,5 +2823,10 @@
   "Quotation created by System": "Angebot erstellt durch System",
   "Quotation updated by System": "Angebot aktualisiert durch System",
   "Job type deleted successfully": "Auftragsart erfolgreich gelöscht",
-  "You are about to delete {{serviceOrderTypeName}}": "Sie sind dabei die Auftragsart {{serviceOrderTypeName}} zu löschen "
+  "You are about to delete \"{{serviceOrderTypeName}}\"": "Sie sind dabei die Auftragsart \"{{serviceOrderTypeName}}\" zu löschen ",
+  "No Suppliers": "Kein Zulieferer",
+  "Add suppliers to process fast article purchases and keep track of your orders": "Füge Zulieferer hinzu, um Bestellungen auslösen zu können.",
+  "Delete job type": "Auftragsart löschen",
+  "Export": "Export",
+  "Failed to export CSV": "Export fehlgeschlagen"
 }
