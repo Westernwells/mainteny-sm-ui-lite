@@ -40,10 +40,12 @@ const useMultiImagesURLToBase64 = (
         return {base64, path};
       });
 
-      const responses = await Promise.all(promises);
+      const responses = await Promise.allSettled(promises);
 
       const images = responses.reduce((acc, item) => {
-        acc[item.path] = item.base64;
+        if (item.status === 'fulfilled') {
+          acc[item.value.path] = item.value.base64;
+        }
 
         return acc;
       }, {} as {[key: string]: string});

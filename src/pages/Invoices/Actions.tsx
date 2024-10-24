@@ -449,7 +449,10 @@ export const Actions = ({
 
         return workReport.technicianId === technicianId;
       })
-      .map((path) => convertedImages[path]);
+      .reduce((acc, path) => {
+        acc[path] = convertedImages[path];
+        return acc;
+      }, {} as {[key: string]: string});
 
     const schedule = invoice?.serviceOrder?.schedules.find(
       (s) => s.technician.id === workReport?.technicianId,
