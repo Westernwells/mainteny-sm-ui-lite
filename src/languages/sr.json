@@ -2845,5 +2845,7 @@
   "Invoice created by System": "Račun kreiran od strane sistema",
   "Invoice updated by System": "Fakturu je ažurirao sistem",
   "Quotation created by System": "Ponuda kreirana od strane sistema",
-  "Quotation updated by System": "Ponudu je ažurirao sistem"
+  "Quotation updated by System": "Ponudu je ažurirao sistem",
+  "Job type deleted successfully": "Tip posla je uspešno izbrisan",
+  "You are about to delete {{serviceOrderTypeName}}": "Spremate se da izbrišete {{serviceOrderTypeName}}"
 }

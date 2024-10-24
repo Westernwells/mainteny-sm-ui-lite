@@ -472,7 +472,7 @@
   "Model of Controller": "Steuerungsmodell",
   "e.g. TX2000": "z.B. TX2000",
   "e.g. Elevator Installation Meier": "z.B. Aufzugsanlage Meier",
-  "Serial Number": "Fabriknummer",
+  "Serial Number": "Fabriknr.",
   "e.g. SHX00000000001": "z.B. SHX00000000001",
   "Cabin Type": "Kabinentyp",
   "Emergency Contact Number": "Nummer des Notfallkontakts",
@@ -2721,7 +2721,7 @@
   "Gross amount": "Bruttobetrag",
   "Select order number": "Bestellnummer auswählen",
   "Invoices with a note": "Rechnungen mit Notiz",
-  "No types defined": "Keine Typ definiert",
+  "No types defined": "Keine Auftragsart definiert",
   "Create your custom absence and presence types": "Erstellen Sie Ihre benutzerdefinierten Abwesenheits- und Anwesenheitstypen",
   "Absence and Presence": "Abwesenheit & Anwesenheit",
   "New type": "Neuer Typ",
@@ -2812,7 +2812,7 @@
   "Configure and add custom job types for your specific needs.": "Konfigurieren und fügen Sie Auftragsarten für Ihre spezifischen Anforderungen hinzu.",
   "Job type created successfully": "Auftragsart erfolgreich erstellt",
   "Apply Filters": "Filter anwenden",
-  "Enter a purchase order number here to include it on invoices from this contract. This will override any purchase order number saved at the customer level.": "Geben Sie hier eine Bestellnummer ein, um diese in den Rechnungen, welche aus aus dem Vertrag generiert werden, aufzunehmen. Hierdurch wird eine auf Kundenebene gespeicherte Bestellnummer überschrieben.",
+  "Enter a purchase order number here to include it on invoices from this contract. This will override any purchase order number saved at the customer level.": "Geben Sie hier eine Bestellnummer ein, um diese in den Vertragsrechnungen anzuzeigen. Hierdurch wird eine auf Kundenebene gespeicherte Bestellnummer überschrieben.",
   "Invoice updated by {{name}}": "Rechnung aktualisiert von {{name}}",
   "Enter purchase order number": "Bestellnummer eingeben",
   "Invoice created by {{name}}": "Rechnung erstellt von {{name}}",
@@ -2821,5 +2821,7 @@
   "Invoice created by System": "Rechnung erstellt von System",
   "Invoice updated by System": "Rechnung aktualisiert durch System",
   "Quotation created by System": "Angebot erstellt durch System",
-  "Quotation updated by System": "Angebot aktualisiert durch System"
+  "Quotation updated by System": "Angebot aktualisiert durch System",
+  "Job type deleted successfully": "Auftragsart erfolgreich gelöscht",
+  "You are about to delete {{serviceOrderTypeName}}": "Sie sind dabei die Auftragsart {{serviceOrderTypeName}} zu löschen "
 }
