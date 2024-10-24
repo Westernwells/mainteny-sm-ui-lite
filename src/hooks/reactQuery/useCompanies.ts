@@ -663,20 +663,19 @@ export const updateCompanyServiceOrderTypes = async (
   return response.data;
 };
 
-export const useUpdateCompanyJobTypes = (successMsg?: string) => {
-  const {enqueueSnackbar, showError} = useSnackbar();
+export const useUpdateCompanyJobTypes = () => {
+  const {showError} = useSnackbar();
   const queryClient = useQueryClient();
 
-  return useMutation(
-    ({body, companyId}: {body: ServiceOrderTypeRecord[]; companyId: string}) =>
+  return useMutation<
+    ServiceOrderTypeRecord[],
+    unknown,
+    {body: ServiceOrderTypeRecord[]; companyId: string}
+  >(
+    ({body, companyId}) =>
       updateCompanyServiceOrderTypes(companyId, {serviceOrderTypes: body}),
     {
       onSuccess: async () => {
-        if (successMsg) {
-          enqueueSnackbar(successMsg, {
-            variant: 'success',
-          });
-        }
         queryClient.invalidateQueries(queryKeys.fetchCompanyJobTypes);
       },
       onError: (err) => {
