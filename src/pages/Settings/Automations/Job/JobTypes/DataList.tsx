@@ -292,21 +292,20 @@ export const DataList = ({
 
   const renderTableHeader = () => (
     <Box display="flex" flexDirection="row" sx={{position: 'relative'}}>
-      <StyledDataListHeading flex="0 0 5%">
+      <StyledDataListHeading flex="0 0 10%">
         <Typography variant="h6">{t('Icon')}</Typography>
       </StyledDataListHeading>
 
-      <StyledDataListHeading flex="0 0 30%" paddingLeft="1.5em">
+      <StyledDataListHeading flex="0 0 30%">
         <Typography variant="h6">{t('Name')}</Typography>
       </StyledDataListHeading>
 
-      <StyledDataListHeading flex="0 0 25%" paddingLeft="1.5em">
+      <StyledDataListHeading flex="0 0 22%">
         <Typography variant="h6">{t('Priority')}</Typography>
       </StyledDataListHeading>
 
       <StyledDataListHeading
-        flex="0 0 35%"
-        paddingLeft="1.5em"
+        flex="0 0 33%"
         sx={{alignItems: 'center', flexDirection: 'row', display: 'flex'}}>
         <Tooltip
           title={t(
@@ -348,7 +347,7 @@ export const DataList = ({
                   backgroundColor: isEditing ? '#F8F9FC' : 'transparent',
                   transition: 'background-color 0.3s ease',
                 }}>
-                <StyledDataListCell flex="0 0 5%">
+                <StyledDataListCell flex="0 0 10%">
                   {isEditing ? (
                     <IconButton
                       onClick={(event) => handleIconClick(event)}
@@ -424,7 +423,7 @@ export const DataList = ({
                 </StyledDataListCell>
 
                 <StyledDataListCell
-                  flex="0 0 25%"
+                  flex="0 0 22%"
                   sx={isEditing ? {paddingTop: 0, paddingBottom: 0} : {}}>
                   <Box flex={1}>
                     {isEditing ? (
@@ -481,7 +480,7 @@ export const DataList = ({
                 </StyledDataListCell>
 
                 <StyledDataListCell
-                  flex={isEditing ? '0 0 25%' : '0 0 38%'}
+                  flex={isEditing ? '0 0 23%' : '0 0 36%'}
                   sx={isEditing ? {paddingTop: 0, paddingBottom: 0} : {}}>
                   <Box flex={1}>
                     {isEditing ? (

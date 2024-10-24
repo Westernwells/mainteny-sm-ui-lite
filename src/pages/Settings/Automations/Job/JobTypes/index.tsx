@@ -27,6 +27,7 @@ import {EditOutlined} from '@mui/icons-material';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {useFieldArray, useForm} from 'react-hook-form';
 import {ConfirmDelete} from 'components/ConfirmDelete';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {
   PriorityCircle,
   StyledDataListCell,
@@ -53,6 +54,8 @@ export interface DeleteEventState {
 }
 
 const JobTypes = () => {
+  const {user} = useUserSession();
+  const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
   const [dataListMode, setDataListMode] = useState<CreateEditViewMode>('view');
   const [initialJobTypes, setInitialJobTypes] = useState<
@@ -68,10 +71,9 @@ const JobTypes = () => {
     event?: ServiceOrderTypeRecord;
     index?: number;
   }>({});
-  const {user} = useUserSession();
-  const {t} = useTranslation();
+  const {enqueueSnackbar} = useSnackbar();
   const {mutateAsync: updateCompanyJobTypes, isLoading: isUpdating} =
-    useUpdateCompanyJobTypes('Job type created successfully');
+    useUpdateCompanyJobTypes();
   const {data: jobTypes, isLoading: loading} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
@@ -133,15 +135,19 @@ const JobTypes = () => {
 
   const handleCreateOrUpdate = async () => {
     const updatedJobTypes = [...watchedFields];
+    let successMessage = 'Job type created successfully';
 
     if (deleteEventState.event) {
       updatedJobTypes.splice(deleteEventState.index!, 1);
+      successMessage = 'Job type deleted successfully';
     }
 
     await updateCompanyJobTypes({
       companyId: user?.userAccount.serviceCompany.id!,
       body: updatedJobTypes,
     });
+
+    enqueueSnackbar(t(`${successMessage}`), {variant: 'success'});
 
     resetState();
     setOpenDialog(false);
@@ -205,21 +211,20 @@ const JobTypes = () => {
         <>
           {/* Headers */}
           <Box display="flex" flexDirection="row" sx={{position: 'relative'}}>
-            <StyledDataListHeading flex="0 0 5%">
+            <StyledDataListHeading flex="0 0 8%">
               <Typography variant="h6">{t('Icon')}</Typography>
             </StyledDataListHeading>
 
-            <StyledDataListHeading flex="0 0 30%" paddingLeft="1.5em">
+            <StyledDataListHeading flex="0 0 32%">
               <Typography variant="h6">{t('Name')}</Typography>
             </StyledDataListHeading>
 
-            <StyledDataListHeading flex="0 0 25%" paddingLeft="1.5em">
+            <StyledDataListHeading flex="0 0 22%">
               <Typography variant="h6">{t('Priority')}</Typography>
             </StyledDataListHeading>
 
             <StyledDataListHeading
-              flex="0 0 35%"
-              paddingLeft="1.5em"
+              flex="0 0 33%"
               sx={{
                 alignItems: 'center',
                 flexDirection: 'row',
@@ -250,13 +255,13 @@ const JobTypes = () => {
                   backgroundColor: 'transparent',
                   transition: 'background-color 0.3s ease',
                 }}>
-                <StyledDataListCell flex="0 0 5%">
+                <StyledDataListCell flex="0 0 8%">
                   <IconButton>
                     <IconComponent />
                   </IconButton>
                 </StyledDataListCell>
 
-                <StyledDataListCell flex="0 0 30%">
+                <StyledDataListCell flex="0 0 32%">
                   <Typography ml={1} variant="body2">
                     {serviceOrderTypeToString(item.name) === '-'
                       ? item.name
@@ -264,7 +269,7 @@ const JobTypes = () => {
                   </Typography>
                 </StyledDataListCell>
 
-                <StyledDataListCell flex="0 0 25%">
+                <StyledDataListCell flex="0 0 22%">
                   <Box flex={1}>
                     <Box sx={{alignItems: 'center', display: 'flex'}}>
                       <PriorityCircle
@@ -283,7 +288,7 @@ const JobTypes = () => {
                   </Box>
                 </StyledDataListCell>
 
-                <StyledDataListCell flex="0 0 38%">
+                <StyledDataListCell flex="0 0 36%">
                   <Box flex={1}>
                     <Typography color="primary.main" variant="body2">
                       {t(

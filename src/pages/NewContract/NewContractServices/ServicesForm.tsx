@@ -48,7 +48,9 @@ import {theme} from 'theme';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useTranslation} from 'react-i18next';
 import {FormCheckbox} from 'components/form/FormCheckbox';
-import {ServiceOrderLabels, ServiceOrderType} from 'models/service-order';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {isUnitSelected} from '../../../utils/contract';
 
 const articleTypes = [
@@ -81,6 +83,7 @@ const ServicesForm = ({
   isDialogOpen,
 }: Props) => {
   const {t} = useTranslation();
+  const {user} = useUserSession();
 
   const {language: selectedLng} = useContext(LanguageContext);
   const currentCurrency = useCurrentCurrency();
@@ -90,6 +93,10 @@ const ServicesForm = ({
 
   const [showAll, setShowAll] = useState(false);
   const [visibleItems, setVisibleItems] = useState(5);
+
+  const {data: jobTypes, isLoading: isJobTypeLoading} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -626,11 +633,15 @@ const ServicesForm = ({
                 name="orderType"
                 onBlur={formikContractServiceComponent.handleBlur}
                 onChange={formikContractServiceComponent.handleChange}>
-                {Object.values(ServiceOrderType).map((type, index) => (
-                  <MenuItem value={type} key={index}>
-                    {t(ServiceOrderLabels[type])}
-                  </MenuItem>
-                ))}
+                {jobTypes && !isJobTypeLoading
+                  ? jobTypes.map((jobType, index) => (
+                      <MenuItem value={jobType.name} key={index}>
+                        {serviceOrderTypeToString(jobType.name) === '-'
+                          ? jobType.name
+                          : t(serviceOrderTypeToString(jobType.name))}
+                      </MenuItem>
+                    ))
+                  : null}
               </Select>
             </FormControl>
           </Grid>
