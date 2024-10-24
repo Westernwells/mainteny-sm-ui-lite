@@ -128,16 +128,13 @@ const PdfTemplateInvoiceDetails = ({
       )}
 
       <View style={styles.rightAddressContent}>
-        <Text style={styles.tag}>{translate('Invoice date')}</Text>
+        <Text style={styles.tag}>
+          {invoice?.type === InvoiceType.CREDIT_NOTE
+            ? translate('Date of credit note')
+            : translate('Invoice date')}
+        </Text>
         <Text style={styles.tagContent}>{getInvoiceDate()}</Text>
       </View>
-
-      {invoice?.type === InvoiceType.CREDIT_NOTE && (
-        <View style={styles.rightAddressContent}>
-          <Text style={styles.tag}>{translate('Date of credit note')}</Text>
-          <Text style={styles.tagContent}>{formatDate(new Date()) || '-'}</Text>
-        </View>
-      )}
 
       {invoice?.dueDate && (
         <View style={styles.rightAddressContent}>
