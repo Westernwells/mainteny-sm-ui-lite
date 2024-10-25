@@ -727,3 +727,19 @@ export const removeControlCharsAndSpaces = (str: string) =>
 
 export const lowerCaseAndJoinByHyphen = (str: string) =>
   str.toLowerCase().split(' ').join('-');
+
+// Helper function to escape CSV fields
+export const escapeCsv = (field: string) =>
+  // Replace double quotes with two double quotes and wrap the field in double quotes
+  `"${field.replace(/"/g, '""')}"`;
+
+export const createCsvContent = ({
+  headers,
+  rows,
+}: {
+  headers: string[];
+  rows: string[];
+}) => {
+  const csvContent = [headers.map(escapeCsv).join(','), ...rows].join('\n');
+  return csvContent;
+};
