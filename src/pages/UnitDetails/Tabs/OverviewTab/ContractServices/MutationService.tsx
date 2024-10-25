@@ -848,6 +848,7 @@ export const MutationService = ({
                 label: t('First job creation date'),
                 required: true,
               }}
+              disableLeapDay
             />
           </Grid>
         </Grid>
