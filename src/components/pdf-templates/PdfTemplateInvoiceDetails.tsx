@@ -157,22 +157,24 @@ const PdfTemplateInvoiceDetails = ({
           </View>
         )}
 
-      {pdfConfigClientStorage.includeUserPhone && (
-        <View style={styles.rightAddressContent}>
-          <Text style={styles.tag}>{translate('Phone number')}</Text>
-          <Text style={styles.tagContent}>
-            {invoice?.propertyOwner.contact.phone ?? '-'}
-          </Text>
-        </View>
-      )}
-      {pdfConfigClientStorage.includeUserPhone && (
-        <View style={styles.rightAddressContent}>
-          <Text style={styles.tag}>{translate('Email address')}</Text>
-          <Text style={styles.tagContent}>
-            {invoice?.propertyOwner.contact.email}
-          </Text>
-        </View>
-      )}
+      {invoice?.propertyOwner.contact.phone &&
+        pdfConfigClientStorage.includeUserPhone && (
+          <View style={styles.rightAddressContent}>
+            <Text style={styles.tag}>{translate('Phone number')}</Text>
+            <Text style={styles.tagContent}>
+              {invoice?.propertyOwner.contact.phone ?? '-'}
+            </Text>
+          </View>
+        )}
+      {invoice?.propertyOwner.contact.email &&
+        pdfConfigClientStorage.includeUserPhone && (
+          <View style={styles.rightAddressContent}>
+            <Text style={styles.tag}>{translate('Email address')}</Text>
+            <Text style={styles.tagContent}>
+              {invoice?.propertyOwner.contact.email}
+            </Text>
+          </View>
+        )}
 
       {invoice?.propertyOwner?.externalId && (
         <View style={styles.rightAddressContent}>
@@ -235,14 +237,15 @@ const PdfTemplateInvoiceDetails = ({
             <Text style={styles.tagContent}>{elevatorExternalId}</Text>
           </View>
         )}
-        {pdfConfigClientStorage.includeSerialNumber && (
-          <View style={styles.rightAddressContent}>
-            <Text style={styles.tag}>{translate('Serial number')}.</Text>
-            <Text style={styles.tagContent}>
-              {invoice?.serviceOrder?.elevator.serialNumber ?? '-'}
-            </Text>
-          </View>
-        )}
+        {invoice?.serviceOrder?.elevator.serialNumber &&
+          pdfConfigClientStorage.includeSerialNumber && (
+            <View style={styles.rightAddressContent}>
+              <Text style={styles.tag}>{translate('Serial number')}.</Text>
+              <Text style={styles.tagContent}>
+                {invoice?.serviceOrder?.elevator.serialNumber ?? '-'}
+              </Text>
+            </View>
+          )}
 
         <PdfUnitAddress
           address={invoice?.serviceOrder?.elevator?.address}
