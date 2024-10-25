@@ -119,13 +119,39 @@ const Filters = ({
               alignItems: 'center',
             }}>
             <Button onClick={onReset} variant="text">
-              <Typography>{t('Reset All')}</Typography>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  lineHeight: '24px',
+                  letterSpacing: '0.4px',
+                  textTransform: 'capitalize',
+                }}>
+                {t('Reset All')}
+              </Typography>
             </Button>
             <Box sx={{display: 'flex'}} gap={1.5}>
-              <Button onClick={handleClose} color="primary" variant="outlined">
+              <Button
+                sx={{
+                  fontSize: '14px',
+                  lineHeight: '24px',
+                  letterSpacing: '0.4px',
+                  textTransform: 'capitalize',
+                }}
+                onClick={handleClose}
+                color="primary"
+                variant="outlined">
                 <Typography>{t('Cancel')}</Typography>
               </Button>
-              <Button onClick={handleSave} color="primary" variant="contained">
+              <Button
+                sx={{
+                  fontSize: '14px',
+                  lineHeight: '24px',
+                  letterSpacing: '0.4px',
+                  textTransform: 'capitalize',
+                }}
+                onClick={handleSave}
+                color="primary"
+                variant="contained">
                 <Typography>{t('Show Results')}</Typography>
               </Button>
             </Box>

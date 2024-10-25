@@ -35,7 +35,6 @@ const EmptyTable = ({
       containerStyle={{mb: 0, mt: 1}}
       illustration={illustration}
       subLabelProps={{sx: {color: '#828DA3', mt: 1, width: '420px'}}}
-      illustrationContainerProps={{sx: {color: '#828DA3'}}}
       illustrationColor="#828DA3"
       btnAction={onClick}
     />

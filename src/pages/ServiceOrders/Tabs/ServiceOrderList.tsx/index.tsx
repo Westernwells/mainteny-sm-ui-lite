@@ -101,6 +101,7 @@ import TechnicianInput from 'components/TechnicianInput';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {EmployeesView} from 'models/employee';
 
+import {Avatar} from 'components/Avatar';
 import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
@@ -222,15 +223,13 @@ export const ServiceOrderList = ({menu}: Props) => {
     string | undefined
   >();
 
-  const [initialLoadNoEntries, setInitialLoadNoEntries] = useState<
-    boolean | undefined
-  >();
-
   const [selectedServiceOrder, setSelectedServiceOrder] =
     useState<ServiceOrderView>();
 
   const [showLeftShadow, setShowLeftShadow] = useState(false);
   const [showRightShadow, setShowRightShadow] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const {
     values: {sortOrder, orderByField},
@@ -363,10 +362,12 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const handlePageIndexChange = (value: number) => {
     setPage({...page, pageIndex: value});
+    containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
   };
 
   const handleChangeElementsPerPage = (value: number) => {
     setPage({...page, pageSize: value, pageIndex: 0});
+    containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
   };
 
   const handleNoteHover = (serviceOrderId: string) => () => {
@@ -388,7 +389,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     setIsWithNote(data.hasComment ? 'true' : undefined);
   };
 
-  const getAppliedFilter = useMemo(
+  const appliedFilterNumber = useMemo(
     () =>
       [
         selectedCustomer,
@@ -412,6 +413,28 @@ export const ServiceOrderList = ({menu}: Props) => {
       isWithNote,
     ],
   );
+
+  const {emptyTable, noMatchingData} = useMemo(() => {
+    if (!isFetched) return {emptyTable: false, noMatchingData: false};
+
+    if (
+      (appliedFilterNumber > 0 || !!selectedOrderStatus || !!searchQuery) &&
+      serviceOrdersResource.total === 0
+    ) {
+      return {emptyTable: false, noMatchingData: true};
+    }
+
+    // when the user does not have filters applied and there are no entries for the table
+    if (serviceOrdersResource.total === 0) {
+      return {emptyTable: true, noMatchingData: false};
+    }
+
+    return {emptyTable: false, noMatchingData: false};
+  }, [isFetched, serviceOrdersResource]);
+
+  const handleCustomerCellClick = (id: string) => () => {
+    navigate(`/customers/details/${id}?tab=0`);
+  };
 
   const COLUMNS = useMemo<TableColumnWithRender<ServiceOrderTableRow>[]>(
     () => [
@@ -546,8 +569,18 @@ export const ServiceOrderList = ({menu}: Props) => {
         fieldName: ServiceOrderOrderField.PROPERTY_OWNER_NAME,
         getExportValue: (serviceOrder) => serviceOrder.propertyOwner.name,
         renderCell: (serviceOrder, cellProps) => (
-          <Cell {...cellProps}>
-            <TableCellText>{serviceOrder.propertyOwner.name}</TableCellText>
+          <Cell
+            {...cellProps}
+            onClick={handleCustomerCellClick(serviceOrder.propertyOwner.id)}>
+            <TableCellText>
+              <Avatar
+                labelStyles={{
+                  color: theme.palette.primary.light,
+                }}
+                key={`company-avatar-${serviceOrder.id}`}
+                userAccount={{firstName: serviceOrder.propertyOwner.name}}
+              />
+            </TableCellText>
           </Cell>
         ),
       },
@@ -869,20 +902,6 @@ export const ServiceOrderList = ({menu}: Props) => {
   };
 
   useEffect(() => {
-    if (!isFetched) return;
-    if (serviceOrdersResource.total === 0 && initialLoadNoEntries !== false) {
-      setInitialLoadNoEntries(true);
-    } else if (serviceOrdersResource.total > 0) {
-      setInitialLoadNoEntries(false);
-    }
-  }, [
-    initialLoadNoEntries,
-    isFetched,
-    serviceOrdersResource,
-    setInitialLoadNoEntries,
-  ]);
-
-  useEffect(() => {
     setValue('technician', selectedTechnician);
   }, [selectedTechnician]);
 
@@ -890,7 +909,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     return <Progress />;
   }
 
-  if (initialLoadNoEntries) {
+  if (emptyTable) {
     return (
       <EmptyTable
         illustration="jobs"
@@ -944,7 +963,7 @@ export const ServiceOrderList = ({menu}: Props) => {
             onChange={(val: string) => setSearchQuery(val)}
           />
           <Filters
-            activeFilters={getAppliedFilter}
+            activeFilters={appliedFilterNumber}
             onOpen={handleFilterOpen}
             onSave={handleSubmit(handleFilterApply)}
             onReset={handleFilterReset}>
@@ -1096,8 +1115,9 @@ export const ServiceOrderList = ({menu}: Props) => {
           onChange={handleQuickFilterChange}
         />
       </Box>
-
       <TableContainer
+        showNoMatchWarning={noMatchingData}
+        containerRef={containerRef}
         setShowLeftShadow={setShowLeftShadow}
         setShowRightShadow={setShowRightShadow}>
         <TableHeader
@@ -1105,6 +1125,7 @@ export const ServiceOrderList = ({menu}: Props) => {
           sortState={{columnName: orderByField, order: sortOrder}}
           onSort={handleSortField}
         />
+
         <TableBody>
           {/* Row */}
           {rows.map((entry) => (
