@@ -37,6 +37,7 @@ interface Props extends Partial<DatePickerProps<Date>> {
   resetValue?: Date;
   inputTestId?: string;
   popupTestId?: string;
+  disableLeapDay?: boolean;
 }
 
 export const DatePicker = ({
@@ -57,6 +58,7 @@ export const DatePicker = ({
   shouldDisableDate,
   inputTestId,
   popupTestId,
+  disableLeapDay,
   ...props
 }: Props) => {
   const {t} = useTranslation();
@@ -262,6 +264,23 @@ export const DatePicker = ({
       isDatePicker
     />
   );
+
+  const combinedShouldDisableDate = (date: Date) => {
+    let disable = false;
+
+    // Disable Feb 29 if disableLeapDay is true
+    if (disableLeapDay) {
+      disable = date.getMonth() === 1 && date.getDate() === 29; // Months are 0-indexed
+    }
+
+    // Incorporate existing shouldDisableDate logic if provided
+    if (shouldDisableDate) {
+      disable = disable || shouldDisableDate(date);
+    }
+
+    return disable;
+  };
+
   return (
     <Box sx={{...containerStyles}}>
       <LocalizationProvider
@@ -277,7 +296,7 @@ export const DatePicker = ({
           onClose={() => setOpen(false)}
           showDaysOutsideCurrentMonth
           closeOnSelect={false}
-          shouldDisableDate={shouldDisableDate}
+          shouldDisableDate={combinedShouldDisableDate}
           slotProps={
             {
               actionBar: {
