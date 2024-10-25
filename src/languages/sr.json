@@ -2847,5 +2847,10 @@
   "Quotation created by System": "Ponuda kreirana od strane sistema",
   "Quotation updated by System": "Ponudu je ažurirao sistem",
   "Job type deleted successfully": "Tip posla je uspešno izbrisan",
-  "You are about to delete \"{{serviceOrderTypeName}}\"": "Spremate se da izbrišete \"{{serviceOrderTypeName}}\""
+  "You are about to delete \"{{serviceOrderTypeName}}\"": "Spremate se da izbrišete \"{{serviceOrderTypeName}}\"",
+  "No Suppliers": "Nema dobavljača",
+  "Add suppliers to process fast article purchases and keep track of your orders": "Dodajte dobavljače da obradite brzu kupovinu artikala i pratite svoje porudžbine",
+  "Delete job type": "Izbrišite tip posla",
+  "Export": "Izvoz",
+  "Failed to export CSV": "Izvoz CSV-a nije uspeo"
 }
