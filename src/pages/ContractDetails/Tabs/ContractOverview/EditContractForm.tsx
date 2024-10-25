@@ -269,7 +269,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
             helperText: formik.errors.renewalTerms,
             inputProps: {
               min: 0,
-              max: 12,
+              max: 120,
             },
             disabled: formik.values.autoRenewalCancelled,
           }}
