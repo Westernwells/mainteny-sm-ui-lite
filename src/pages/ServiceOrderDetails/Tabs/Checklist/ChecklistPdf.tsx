@@ -208,24 +208,26 @@ const ChecklistPdf = ({
                   </View>
                 )}
 
-              {pdfConfigClientStorage.includeUserPhone && (
-                <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}>{translate('Phone number')}</Text>
-                  <Text style={styles.tagContent}>
-                    {serviceOrder?.elevator?.propertyOwner?.contact.phone ||
-                      '-'}
-                  </Text>
-                </View>
-              )}
-              {pdfConfigClientStorage.includeUserEmail && (
-                <View style={styles.rightAddressContent}>
-                  <Text style={styles.tag}>{translate('Email address')}</Text>
-                  <Text style={styles.tagContent}>
-                    {serviceOrder?.elevator?.propertyOwner?.contact.email ||
-                      '-'}
-                  </Text>
-                </View>
-              )}
+              {serviceOrder?.elevator?.propertyOwner?.contact.phone &&
+                pdfConfigClientStorage.includeUserPhone && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Phone number')}</Text>
+                    <Text style={styles.tagContent}>
+                      {serviceOrder?.elevator?.propertyOwner?.contact.phone ||
+                        '-'}
+                    </Text>
+                  </View>
+                )}
+              {serviceOrder?.elevator?.propertyOwner?.contact.email &&
+                pdfConfigClientStorage.includeUserEmail && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>{translate('Email address')}</Text>
+                    <Text style={styles.tagContent}>
+                      {serviceOrder?.elevator?.propertyOwner?.contact.email ||
+                        '-'}
+                    </Text>
+                  </View>
+                )}
               {serviceOrder?.elevator?.propertyOwner?.externalId && (
                 <View style={styles.rightAddressContent}>
                   <Text style={styles.tag}>{translate('Customer no.')}</Text>
@@ -255,16 +257,17 @@ const ChecklistPdf = ({
                       </Text>
                     </View>
                   )}
-                {pdfConfigClientStorage.includeSerialNumber && (
-                  <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>
-                      {translate('Serial number')}.
-                    </Text>
-                    <Text style={styles.tagContent}>
-                      {serviceOrder?.elevator?.serialNumber}
-                    </Text>
-                  </View>
-                )}
+                {serviceOrder?.elevator?.serialNumber &&
+                  pdfConfigClientStorage.includeSerialNumber && (
+                    <View style={styles.rightAddressContent}>
+                      <Text style={styles.tag}>
+                        {translate('Serial number')}.
+                      </Text>
+                      <Text style={styles.tagContent}>
+                        {serviceOrder?.elevator?.serialNumber}
+                      </Text>
+                    </View>
+                  )}
 
                 <PdfUnitAddress
                   address={elevatorAddress}

@@ -349,22 +349,28 @@ const QuotationPdfTemplate = React.memo(
                     </View>
                   )}
 
-                {pdfConfigClientStorage.includeUserPhone && (
-                  <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Phone number')}</Text>
-                    <Text style={styles.tagContent}>
-                      {quotation?.propertyOwner?.contact.phone || '-'}
-                    </Text>
-                  </View>
-                )}
-                {pdfConfigClientStorage.includeUserEmail && (
-                  <View style={styles.rightAddressContent}>
-                    <Text style={styles.tag}>{translate('Email address')}</Text>
-                    <Text style={styles.tagContent}>
-                      {quotation?.propertyOwner?.contact.email || '-'}
-                    </Text>
-                  </View>
-                )}
+                {quotation?.propertyOwner?.contact.phone &&
+                  pdfConfigClientStorage.includeUserPhone && (
+                    <View style={styles.rightAddressContent}>
+                      <Text style={styles.tag}>
+                        {translate('Phone number')}
+                      </Text>
+                      <Text style={styles.tagContent}>
+                        {quotation?.propertyOwner?.contact.phone || '-'}
+                      </Text>
+                    </View>
+                  )}
+                {quotation?.propertyOwner?.contact.email &&
+                  pdfConfigClientStorage.includeUserEmail && (
+                    <View style={styles.rightAddressContent}>
+                      <Text style={styles.tag}>
+                        {translate('Email address')}
+                      </Text>
+                      <Text style={styles.tagContent}>
+                        {quotation?.propertyOwner?.contact.email || '-'}
+                      </Text>
+                    </View>
+                  )}
                 {quotation?.propertyOwner?.externalId && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Customer no.')}</Text>
@@ -395,16 +401,17 @@ const QuotationPdfTemplate = React.memo(
                         </Text>
                       </View>
                     )}
-                  {pdfConfigClientStorage.includeSerialNumber && (
-                    <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>
-                        {translate('Serial number')}.
-                      </Text>
-                      <Text style={styles.tagContent}>
-                        {quotation?.elevator?.serialNumber || '-'}
-                      </Text>
-                    </View>
-                  )}
+                  {quotation?.elevator?.serialNumber &&
+                    pdfConfigClientStorage.includeSerialNumber && (
+                      <View style={styles.rightAddressContent}>
+                        <Text style={styles.tag}>
+                          {translate('Serial number')}.
+                        </Text>
+                        <Text style={styles.tagContent}>
+                          {quotation?.elevator?.serialNumber || '-'}
+                        </Text>
+                      </View>
+                    )}
 
                   <PdfUnitAddress
                     address={quotation?.elevator?.address}
