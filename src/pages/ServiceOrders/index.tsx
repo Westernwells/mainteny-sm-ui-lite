@@ -86,10 +86,6 @@ export const ServiceOrders = () => {
   const navigate = useNavigate();
   const {user} = useUserSession();
 
-  const track = (cb: () => void) => {
-    cb();
-  };
-
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
@@ -105,10 +101,7 @@ export const ServiceOrders = () => {
           serviceOrderTypeToString(jobType.name) === '-'
             ? jobType.name
             : serviceOrderTypeToString(jobType.name),
-        action: () =>
-          track(() => {
-            navigate(`/orders/new?type=${jobType.name}`);
-          }),
+        action: () => navigate(`/orders/new?type=${jobType.name}`),
         icon: <IconComponent />,
       };
     }) || [];

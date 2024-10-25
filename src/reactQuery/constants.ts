@@ -99,6 +99,7 @@ export const queryKeys = {
   fetchLatestVersion: 'fetchLatestVersion',
   fetchCompanyJobTypes: 'fetchCompanyJobTypes',
   fetchOldCompanyJobTypes: 'fetchOldCompanyJobTypes',
+  queryAllJobs: 'queryAllJobs',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

@@ -40,6 +40,7 @@ import {RequestParameters} from 'models/apiRequests';
 import {useUserSession} from './useUserSession';
 import {Order} from '../../models/pagination';
 import {useServiceOrderCommentMutation} from './useServiceOrderCommentMutation';
+import {useAll} from './useAll';
 
 export const queryPropertyOwnerServiceOrders = async (
   params: ServiceOrderQueryParams,
@@ -103,6 +104,24 @@ export function useServiceOrders(
       }),
     {enabled: !!user, ...options},
   );
+}
+
+export function useAllJobs(
+  params: ServiceOrderQueryParams,
+  options?: UseQueryOptions<ServiceOrderView[], RestError>,
+) {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  return useAll<ServiceOrderQueryParams, ServiceOrderView>({
+    queryKey: [queryKeys.queryAllJobs, params, serviceCompanyId],
+    queryFn: (p) => queryServiceOrders({...p, serviceCompanyId}),
+    params,
+    options: {
+      enabled: !!serviceCompanyId,
+      ...options,
+    },
+  });
 }
 
 export const queryDueServiceOrders = async (
