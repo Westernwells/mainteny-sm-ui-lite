@@ -268,7 +268,7 @@
   "Mark Rejected": "უარყოფილია",
   "Do you want to mark this quotation as rejected": "გსურთ მონიშნოთ ეს შეთავაზება უარყოფილად?",
   "This action is irreversible.": "ეს მოქმედება შეუქცევადია.",
-  "Renewal period must be between 0-12 months": "განახლების პერიოდი უნდა იყოს 0-12 თვემდე",
+  "Renewal period must be between 0-120 months": "განახლების პერიოდი უნდა იყოს 0-120 თვემდე",
   "QR Code": "QR კოდი",
   "No description yet. Please click the button below to add!": "აღწერა ჯერ არ არის. დასამატებლად გთხოვთ დააჭიროთ ქვემოთ მოცემულ ღილაკს!",
   "No description yet. It will appear here once added!": "აღწერა ჯერ არ არის. ის აქ გამოჩნდება დამატების შემდეგ!",
