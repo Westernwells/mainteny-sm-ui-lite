@@ -268,7 +268,7 @@
   "Mark Rejected": "Označi odbijeno",
   "Do you want to mark this quotation as rejected": "Da li želite da označite ovaj citat kao odbijen",
   "This action is irreversible.": "Ova akcija je nepovratna",
-  "Renewal period must be between 0-12 months": "Period obnove mora biti izmedju 0-12 mjeseci",
+  "Renewal period must be between 0-120 months": "Period obnove mora biti izmedju 0-12 mjeseci",
   "QR Code": "QR kod",
   "No description yet. Please click the button below to add!": "Još nema opisa. Kliknite na dugme ispod da dodate!",
   "No description yet. It will appear here once added!": "Još nema opisa. Pojaviće se ovde kada se doda!",
@@ -2852,5 +2852,6 @@
   "Add suppliers to process fast article purchases and keep track of your orders": "Dodajte dobavljače da obradite brzu kupovinu artikala i pratite svoje porudžbine",
   "Delete job type": "Izbrišite tip posla",
   "Export": "Izvoz",
-  "Failed to export CSV": "Izvoz CSV-a nije uspeo"
+  "Failed to export CSV": "Izvoz CSV-a nije uspeo",
+  "Invalid first job creation date, date should not be Feb 29th": "Nevažeći datum otvaranja prvog radnog mesta, datum ne bi trebalo da bude 29. februar"
 }
