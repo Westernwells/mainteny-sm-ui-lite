@@ -18,6 +18,7 @@ import {
   SUPPLIER_ORDER_FIELD,
   SupplierTableRow,
 } from 'models/supplier';
+import EmptyTable from 'components/Table/EmptyTable';
 import TableHeader from '../../../../components/Table/TableHeader';
 import TableContainer from '../../../../components/Table/TableContainer';
 import Pagination from '../../../../components/Pagination';
@@ -124,6 +125,7 @@ const Suppliers = () => {
     data: articleSupplierResource = createEmptyResource<ArticleSupplierView>(
       page.pageSize,
     ),
+    isFetched,
   } = useQueryArticleSuppliers(
     {
       query: search,
@@ -183,6 +185,32 @@ const Suppliers = () => {
     });
   };
 
+  const {emptyTable, noMatchingData} = useMemo(() => {
+    if (!isFetched) return {emptyTable: false, noMatchingData: false};
+    // when the user does not have filters applied and there are no entries for the table
+    if (search && articleSupplierResource.total === 0) {
+      return {emptyTable: false, noMatchingData: true};
+    }
+
+    if (articleSupplierResource.total === 0) {
+      return {emptyTable: true, noMatchingData: false};
+    }
+
+    return {emptyTable: false, noMatchingData: false};
+  }, [isFetched, articleSupplierResource]);
+
+  if (emptyTable) {
+    return (
+      <EmptyTable
+        illustration="jobs"
+        label="No Suppliers"
+        subLabel="Add suppliers to process fast article purchases and keep track of your orders"
+        btnLabel="New Supplier"
+        onClick={handleNewSupplierClick}
+      />
+    );
+  }
+
   return (
     <Box
       gap={3}
@@ -206,7 +234,7 @@ const Suppliers = () => {
         <AddButton label="New Supplier" onClick={handleNewSupplierClick} />
       </PageHeaderContainer>
 
-      <TableContainer>
+      <TableContainer showNoMatchWarning={noMatchingData}>
         <TableHeader
           columns={COLUMNS.current}
           sortState={{columnName: orderByField, order: sortOrder}}

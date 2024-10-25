@@ -54,7 +54,6 @@ export interface Props extends BoxProps {
   actionButtonEndIcon?: JSX.Element;
   subLabel?: string;
   subLabelProps?: TypographyProps;
-  illustrationContainerProps?: TypographyProps;
   illustrationColor?: string;
   disableActionBtn?: boolean;
 }
@@ -75,7 +74,6 @@ export const EmptySection = ({
   subLabel = '',
   subLabelProps = {},
   disableActionBtn = false,
-  illustrationContainerProps,
   illustrationColor,
 }: Props) => {
   const {t} = useTranslation();
@@ -150,10 +148,7 @@ export const EmptySection = ({
       gap="1em"
       mt={3}
       sx={{...containerStyle}}>
-      <Box
-        width={Width[size]}
-        sx={{textAlign: 'center', ...illustrationContainerProps?.sx}}
-        {...illustrationContainerProps}>
+      <Box width={Width[size]} sx={{textAlign: 'center'}}>
         {getIllustration(illustration)}
       </Box>
       <Box display="flex" flexDirection="column">

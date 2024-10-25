@@ -48,6 +48,8 @@ export const Employees = () => {
   const [showLeftShadow, setShowLeftShadow] = useState(false);
   const [showRightShadow, setShowRightShadow] = useState(false);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const COLUMNS = useMemo<TableColumnWithRender<EmployeeContractTableRow>[]>(
     () => [
       {
@@ -145,10 +147,6 @@ export const Employees = () => {
     [showLeftShadow, showRightShadow],
   );
 
-  const [initialLoadNoEntries, setInitialLoadNoEntries] = useState<
-    boolean | undefined
-  >();
-
   const {
     data: userAccountResource = createEmptyResource<UserView>(page.pageSize),
     isFetched,
@@ -208,6 +206,7 @@ export const Employees = () => {
 
   const handlePageIndexChange = (value: number) => {
     setPage({...page, pageIndex: value});
+    containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
   };
 
   const handleNewEmployeeClick = () => {
@@ -220,27 +219,29 @@ export const Employees = () => {
 
   const handleChangeElementsPerPage = (value: number) => {
     setPage({...page, pageSize: value, pageIndex: 0});
+    containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
   };
 
-  useEffect(() => {
-    if (!isFetched) return;
-    if (userAccountResource.total === 0 && initialLoadNoEntries !== false) {
-      setInitialLoadNoEntries(true);
-    } else if (userAccountResource.total > 0) {
-      setInitialLoadNoEntries(false);
+  const {emptyTable, noMatchingData} = useMemo(() => {
+    if (!isFetched) return {emptyTable: false, noMatchingData: false};
+
+    if (search && userAccountResource.total === 0) {
+      return {emptyTable: false, noMatchingData: true};
     }
-  }, [
-    initialLoadNoEntries,
-    isFetched,
-    userAccountResource,
-    setInitialLoadNoEntries,
-  ]);
+
+    // when the user does not have filters applied and there are no entries for the table
+    if (userAccountResource.total === 0) {
+      return {emptyTable: true, noMatchingData: false};
+    }
+
+    return {emptyTable: false, noMatchingData: false};
+  }, [isFetched, userAccountResource]);
 
   if (isIdle || isLoading) {
     return <Progress />;
   }
 
-  if (initialLoadNoEntries) {
+  if (emptyTable) {
     return (
       <EmptyTable
         label="No employees"
@@ -264,6 +265,8 @@ export const Employees = () => {
         <AddButton label="New Employee" onClick={handleNewEmployeeClick} />
       </PageHeaderContainer>
       <TableContainer
+        containerRef={containerRef}
+        showNoMatchWarning={noMatchingData}
         setShowLeftShadow={setShowLeftShadow}
         setShowRightShadow={setShowRightShadow}>
         <TableHeader columns={COLUMNS} />
