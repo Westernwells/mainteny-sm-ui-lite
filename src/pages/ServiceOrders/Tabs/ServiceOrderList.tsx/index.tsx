@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import {capitalize} from 'lodash';
+import {capitalize, reduce} from 'lodash';
 import {
   ServiceOrderFilterForm,
   ServiceOrderFilterToStatusMap,
@@ -8,6 +8,7 @@ import {
   ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderQueryParams,
   ServiceOrderStatusFilter,
+  ServiceOrderStatusToFilter,
   ServiceOrderTableRow,
   ServiceOrderType,
   ServiceOrderView,
@@ -32,6 +33,7 @@ import {
   useAllJobs,
   useServiceOrderComments,
   useServiceOrders,
+  useServiceOrdersStatistics,
 } from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
 import {useNavigate} from 'react-router-dom';
@@ -104,13 +106,17 @@ import {EmployeesView} from 'models/employee';
 import {Avatar} from 'components/Avatar';
 import Actions from './Actions';
 
-const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
-  {value: ServiceOrderStatusFilter.ALL, labelKey: 'All'},
+const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
   {value: ServiceOrderStatusFilter.PENDING, labelKey: 'Pending'},
   {value: ServiceOrderStatusFilter.OVERDUE, labelKey: 'Overdue'},
   {value: ServiceOrderStatusFilter.ONGOING, labelKey: 'Ongoing'},
   {value: ServiceOrderStatusFilter.COMPLETED, labelKey: 'Completed'},
   {value: ServiceOrderStatusFilter.CANCELLED, labelKey: 'Cancelled'},
+];
+
+const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
+  {value: ServiceOrderStatusFilter.ALL, labelKey: 'All'},
+  ...QUICK_FILTER_OPTIONS_WITHOUT_ALL,
 ];
 
 export const PAYMENT_STATUS_OPTIONS: OptionWithTranslationKey[] = [
@@ -184,9 +190,9 @@ export const ServiceOrderList = ({menu}: Props) => {
     string | undefined
   >('selectedOrderNumber', {defaultValue: undefined});
   const [selectedOrderStatus, setSelectedOrderStatus] = useQueryState<
-    ServiceOrderStatusFilter | undefined
+    ServiceOrderStatusFilter[]
   >('selectedOrderStatusFilter', {
-    defaultValue: undefined,
+    defaultValue: [],
   });
   const [selectedOrderTypes, setSelectedOrderTypes] = useQueryState<
     ServiceOrderType[]
@@ -270,11 +276,11 @@ export const ServiceOrderList = ({menu}: Props) => {
       search: searchQuery,
       orderNumber: selectedOrderNumber,
     }),
-    status:
-      selectedOrderStatus &&
-      selectedOrderStatus !== ServiceOrderStatusFilter.ALL
-        ? ServiceOrderFilterToStatusMap.get(selectedOrderStatus)
-        : [],
+    status: selectedOrderStatus.includes(ServiceOrderStatusFilter.ALL)
+      ? []
+      : selectedOrderStatus
+          .flatMap((status) => ServiceOrderFilterToStatusMap.get(status))
+          .filter((status) => !!status),
     types: selectedOrderTypes,
     paymentStatus: selectedPaymentStatus,
     orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
@@ -294,6 +300,26 @@ export const ServiceOrderList = ({menu}: Props) => {
     isFetched,
     isIdle,
   } = useServiceOrders(filters, {keepPreviousData: true});
+
+  const {data: serviceOrdersStatistics} = useServiceOrdersStatistics(filters, {
+    keepPreviousData: true,
+  });
+
+  const aggregatedServiceOrderStatistics = useMemo(() => {
+    if (!serviceOrdersStatistics) return undefined;
+
+    return reduce(
+      serviceOrdersStatistics.numOfServiceOrdersPerStatus,
+      (acc: Record<string, number>, amount, status) => {
+        const mappedStatus = ServiceOrderStatusToFilter[status] ?? status;
+        acc[mappedStatus] = (acc[mappedStatus] ?? 0) + amount;
+        acc[ServiceOrderStatusFilter.ALL] =
+          (acc[ServiceOrderStatusFilter.ALL] ?? 0) + amount;
+        return acc;
+      },
+      {},
+    );
+  }, [serviceOrdersStatistics]);
 
   const {refetch, isFetching: isFetchingAllServiceOrders} = useAllJobs(
     filters,
@@ -739,12 +765,37 @@ export const ServiceOrderList = ({menu}: Props) => {
     navigate(`/orders/details/${id}`);
   };
 
-  const handleQuickFilterChange = (value: string | null) => {
-    if (value === null) {
-      setSelectedOrderStatus(undefined);
+  const handleQuickFilterChange = (value: string) => {
+    // when selecting ALL values remove all other selections
+    if (value === 'ALL') {
+      setSelectedOrderStatus([ServiceOrderStatusFilter.ALL]);
       return;
     }
-    setSelectedOrderStatus(value as ServiceOrderStatusFilter);
+
+    const newValues = selectedOrderStatus.some((option) => option === value)
+      ? selectedOrderStatus.filter((option) => option !== value)
+      : [...selectedOrderStatus, value];
+
+    // remove the ALL status if any other status is selected
+    if (newValues.length > 1 && newValues.includes('ALL')) {
+      setSelectedOrderStatus(
+        newValues.filter(
+          (selectedValues) => selectedValues !== 'ALL',
+        ) as ServiceOrderStatusFilter[],
+      );
+      return;
+    }
+
+    const areAllValuesSelectedIndividually =
+      QUICK_FILTER_OPTIONS_WITHOUT_ALL.every((option) =>
+        newValues.some((selectedValue) => option.value === selectedValue),
+      );
+
+    setSelectedOrderStatus(
+      areAllValuesSelectedIndividually
+        ? [ServiceOrderStatusFilter.ALL]
+        : (newValues as ServiceOrderStatusFilter[]),
+    );
   };
 
   const handleCloseSideDrawer = () => setSelectedServiceOrder(undefined);
@@ -855,11 +906,6 @@ export const ServiceOrderList = ({menu}: Props) => {
     setValue('grossAmountMax', undefined);
     setValue('hasComment', undefined);
   };
-
-  const chipNumber = useMemo(() => {
-    if (!selectedOrderStatus) return undefined;
-    if (!isLoading && isFetched) return serviceOrdersResource.total;
-  }, [isLoading, isFetched, serviceOrdersResource, selectedOrderStatus]);
 
   const handleExport = async () => {
     try {
@@ -1111,7 +1157,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         <QuickFilter
           selected={selectedOrderStatus ?? null}
           options={QUICK_FILTER_OPTIONS}
-          chipNumber={chipNumber}
+          statistics={aggregatedServiceOrderStatistics}
           onChange={handleQuickFilterChange}
         />
       </Box>

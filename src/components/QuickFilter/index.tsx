@@ -1,18 +1,18 @@
 import {Box, useTheme} from '@mui/system';
-import {Button, Chip} from '@mui/material';
+import {Chip} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {OptionWithTranslationKey} from 'models/filter';
 import capitalize from 'lodash/capitalize';
 
 type Props = {
-  selected: string | null;
+  selected: string[];
   options: OptionWithTranslationKey[];
-  chipNumber?: number;
-  onChange: (value: string | null) => void;
+  statistics?: Record<string, number>;
+  onChange: (value: string) => void;
 };
 
-const QuickFilter = ({selected, options, chipNumber, onChange}: Props) => {
+const QuickFilter = ({selected, options, statistics, onChange}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
 
@@ -29,53 +29,52 @@ const QuickFilter = ({selected, options, chipNumber, onChange}: Props) => {
         width: 'fit-content',
       }}>
       {options.map((option) => {
-        if (selected === option.value)
-          return (
-            <Box
-              key={`quick-filter--selected-option-${option.value}`}
+        const isSelected = selected.includes(option.value);
+
+        const chipNumber = statistics?.[option.value] ?? null;
+        return (
+          <Box
+            key={`quick-filter-option-${option.value}`}
+            component="button"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '4px',
+              fontSize: '14px',
+              padding: '4px 12px ',
+              height: '100%',
+              color: '#828DA3',
+
+              '&:hover': {
+                backgroundColor: '#FFFFFF',
+              },
+
+              ...(isSelected && {
+                textTransform: 'capitalize',
+                color: theme.palette.primary.dark,
+                backgroundColor: '#FFFFFF',
+              }),
+            }}
+            onClick={() => onChange(option.value)}
+            gap={0.5}>
+            <Typography
+              variant="subtitle2"
               sx={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '4px',
-                fontSize: '14px',
-                padding: '4px 12px ',
-                backgroundColor: '#FFFFFF',
-                height: '100%',
-              }}
-              gap={0.5}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  display: 'flex',
-                  lineHeight: '22.4px',
-                  cursor: 'pointer',
-                }}>
-                {capitalize(t(option.labelKey))}
-              </Typography>
-              {chipNumber && (
-                <Chip
-                  sx={{height: '25px'}}
-                  label={chipNumber}
-                  variant="outlined"
-                />
-              )}
-            </Box>
-          );
-        return (
-          <Button
-            key={`quick-filter-option-${option.value}`}
-            sx={{
-              padding: '4px 12px ',
-              textTransform: 'capitalized',
-              color: '#828DA3',
-            }}
-            size="large"
-            onClick={() => onChange(option.value)}>
-            <Typography variant="subtitle2">
+                lineHeight: '22.4px',
+                cursor: 'pointer',
+              }}>
               {capitalize(t(option.labelKey))}
             </Typography>
-          </Button>
+            {isSelected && chipNumber && (
+              <Chip
+                sx={{height: '25px'}}
+                label={chipNumber}
+                variant="outlined"
+              />
+            )}
+          </Box>
         );
       })}
     </Box>
