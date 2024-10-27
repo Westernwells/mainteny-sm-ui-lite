@@ -96,6 +96,20 @@ export const ServiceOrderFilterToStatusMap = new Map<
   [ServiceOrderStatusFilter.CANCELLED, [ServiceOrderStatus.CANCELLED]],
 ]);
 
+export const ServiceOrderStatusToFilter: Record<
+  string,
+  ServiceOrderStatusFilter
+> = {
+  [ServiceOrderStatus.SCHEDULING]: ServiceOrderStatusFilter.PENDING,
+  [ServiceOrderStatus.SCHEDULED]: ServiceOrderStatusFilter.PENDING,
+  [ServiceOrderStatus.ARTICLES_ORDERED]: ServiceOrderStatusFilter.PENDING,
+  [ServiceOrderStatus.TECHNICIAN_ASSIGNED]: ServiceOrderStatusFilter.PENDING,
+  [ServiceOrderStatus.READY_TO_SCHEDULE]: ServiceOrderStatusFilter.PENDING,
+  [ServiceOrderStatus.TRAVEL]: ServiceOrderStatusFilter.ONGOING,
+  [ServiceOrderStatus.IN_PROGRESS]: ServiceOrderStatusFilter.ONGOING,
+  [ServiceOrderStatus.PAUSED]: ServiceOrderStatusFilter.ONGOING,
+};
+
 export enum ServiceOrderPaymentStatus {
   NO_INVOICE = 'NO_INVOICE',
   NOT_PAID = 'NOT_PAID',
@@ -761,4 +775,8 @@ export type ServiceOrderTypeRecord = {
   name: string;
   priority: ServiceOrderTypePriority;
   createInAdvanceDays?: number;
+};
+
+export type ServiceOrderStatistics = {
+  numOfServiceOrdersPerStatus: Record<string, number>;
 };
