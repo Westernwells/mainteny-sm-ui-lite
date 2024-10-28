@@ -2852,6 +2852,8 @@
   "Add suppliers to process fast article purchases and keep track of your orders": "Dodajte dobavljače da obradite brzu kupovinu artikala i pratite svoje porudžbine",
   "Delete job type": "Izbrišite tip posla",
   "Export": "Izvoz",
-  "Failed to export CSV": "Izvoz CSV-a nije uspeo",
-  "Invalid first job creation date, date should not be Feb 29th": "Nevažeći datum otvaranja prvog radnog mesta, datum ne bi trebalo da bude 29. februar"
+  "Failed to export Excel": "Izvoz Ekcel-a nije uspeo",
+  "Invalid first job creation date, date should not be Feb 29th": "Nevažeći datum otvaranja prvog radnog mesta, datum ne bi trebalo da bude 29. februar",
+  "No matching search results": "Nema odgovarajućih rezultata pretrage",
+  "Please try again": "Pokušajte ponovo"
 }

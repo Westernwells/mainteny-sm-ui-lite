@@ -2212,7 +2212,7 @@
   "60 minutes": "60 min",
   "Unit Status": "Anlagenstatus",
   "Unit category": "Anlagenkategorie",
-  "Serial number": "Fabriknr",
+  "Serial number": "Fabriknummer",
   "Unit number": "Anlagennummer",
   "Spending limit": "Ausgabenlimit",
   "Job ongoing": "Auftrag läuft ",
@@ -2793,7 +2793,7 @@
   "My Company": "Mein Unternehmen",
   "Customer Center": "Kundenportfolio",
   "Articles & Suppliers": "Artikel & Lieferanten",
-  "Select job number": "Auftragsnummer auswählen",
+  "Select job number": "Auftragsnummer suchen",
   "Unit no._elevator": "Anlagennr.",
   "Create in advance": "Im Voraus erstellen",
   "Job Type Configuration": "Auftragsart konfigurieren",
@@ -2828,5 +2828,8 @@
   "Add suppliers to process fast article purchases and keep track of your orders": "Füge Zulieferer hinzu, um Bestellungen auslösen zu können.",
   "Delete job type": "Auftragsart löschen",
   "Export": "Export",
-  "Failed to export CSV": "Export fehlgeschlagen"
+  "Failed to export Excel": "Export fehlgeschlagen",
+  "Invalid first job creation date, date should not be Feb 29th": "Ungültiges Datum. Das Datum darf nicht der 29. Februar sein.",
+  "No matching search results": "Keine passenden Suchergebnisse.\n",
+  "Please try again": "Bitte versuchen Sie es erneut.\n"
 }
