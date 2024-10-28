@@ -4,7 +4,7 @@ import {FlexContainer} from 'components/FlexContainer';
 import {Stepper} from 'components/Stepper';
 import {useCreateServiceOrder} from 'hooks/reactQuery/useServiceOrder';
 import {ElevatorView} from 'models/elevator';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {
   AssignmentDescriptionOrderModel,
   ContactChannel,
@@ -16,6 +16,7 @@ import {EmployeesView} from 'models/employee';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {toRestDateTime} from 'utils/datetime';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+import {ContractStatus} from 'models/contract';
 import {AddDescription} from '../AddDescription';
 import {SelectTechnicians} from '../SelectTechnicians';
 import {SelectUnit} from '../SelectUnit';
@@ -53,11 +54,30 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
     ContactChannel[]
   >([ContactChannel.PUSH_NOTIFICATION]);
 
+  const {contractPONumber} = useMemo(() => {
+    const activeContracts =
+      selectedUnit?.contracts.filter(
+        (item) =>
+          item.status === ContractStatus.EXPIRING ||
+          item.status === ContractStatus.VALID,
+      ) ?? [];
+
+    const PONumber =
+      activeContracts.length === 1
+        ? activeContracts[0].additionalInfo.purchaseOrderNumber ?? ''
+        : '';
+
+    return {
+      elevatorActiveContracts: activeContracts,
+      contractPONumber: PONumber,
+    };
+  }, [selectedUnit]);
+
   const [descriptionValues, setDescriptionValues] =
     useState<AssignmentDescriptionOrderModel>({
       callTime: '',
       callerName: '',
-      purchaseOrderNumber: '',
+      purchaseOrderNumber: contractPONumber,
     });
 
   const {mutateAsync: createServiceOrder, isLoading: isCreatingOrder} =
@@ -88,6 +108,13 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
       setActiveStep(1);
     }
   }, [elevator]);
+
+  useEffect(() => {
+    setDescriptionValues((prevValues) => ({
+      ...prevValues,
+      purchaseOrderNumber: contractPONumber,
+    }));
+  }, [selectedUnit]);
 
   const handleCancel = () => {
     setActiveStep(0);
