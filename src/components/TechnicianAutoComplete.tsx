@@ -1,10 +1,19 @@
-import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
+import {
+  ReactElement,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import {TextFieldProps} from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete, {
+  AutocompleteRenderInputParams,
+} from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
 import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {createEmptyResource} from 'utils/paging';
 import {EmployeesSimpleView, EmployeesView} from 'models/employee';
+import {useTheme} from '@mui/system';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -14,6 +23,7 @@ interface Props {
   textFieldProps?: TextFieldProps;
   disabled?: boolean;
   required?: boolean;
+  renderInput?: (params: AutocompleteRenderInputParams) => ReactElement;
   size?: 'small' | 'medium';
 }
 
@@ -25,7 +35,9 @@ export const TechnicianAutoComplete = ({
   disabled,
   required = true,
   size = 'small',
+  renderInput,
 }: Props) => {
+  const theme = useTheme();
   const [query, setQuery] = useState<string>('');
   const [queryView, setQueryView] = useState(
     initialValue
@@ -94,7 +106,21 @@ export const TechnicianAutoComplete = ({
       clearOnBlur={false}
       disablePortal
       id="combo-box-demo"
-      sx={{minHeight: 0}}
+      sx={{
+        minHeight: 0,
+        fontSize: '14px',
+        lineHeight: '160%',
+        letterSpacing: '0.1px',
+
+        ...(size === 'small' && {
+          '.MuiFormLabel-root': {
+            fontSize: '14px',
+            lineHeight: '160%',
+            letterSpacing: '0.1px',
+            color: theme.palette.text.secondary,
+          },
+        }),
+      }}
       options={techniciansResource.data}
       onChange={handleChange}
       getOptionLabel={(option) =>
@@ -102,16 +128,20 @@ export const TechnicianAutoComplete = ({
       }
       onInputChange={onInputChange}
       inputValue={queryView}
-      renderInput={(params) => (
-        <FormInput
-          fieldProps={{
-            name: 'technicianId',
-            ...params,
-            ...textFieldProps,
-            required,
-          }}
-        />
-      )}
+      renderInput={(params) =>
+        renderInput ? (
+          renderInput(params)
+        ) : (
+          <FormInput
+            fieldProps={{
+              name: 'technicianId',
+              ...params,
+              ...textFieldProps,
+              required,
+            }}
+          />
+        )
+      }
     />
   );
 };

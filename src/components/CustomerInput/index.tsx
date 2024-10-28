@@ -42,8 +42,14 @@ const CustomerInput = ({selectedValue, customers, onChange}: Props) => {
     <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
       <Typography variant="subtitle2">{capitalize(t('CUSTOMER'))}</Typography>
       <Autocomplete
+        size="small"
         value={selectedCustomer}
         options={customerOptions}
+        sx={{
+          '.MuiFormLabel-root': {
+            marginTop: '-6px',
+          },
+        }}
         placeholderKey="Select customer"
         isOptionEqualToValue={handleMatchingSelectedValueToOptions}
         onChange={handleChange}

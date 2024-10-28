@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Typography} from '@mui/material';
+import {Box, TextField, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import capitalize from 'lodash/capitalize';
 import {TechnicianAutoComplete} from 'components/TechnicianAutoComplete';
@@ -23,12 +23,15 @@ const TechnicianInput = ({selectedTechnician, onChange}: Props) => {
       <Typography variant="subtitle2">{capitalize(t('Engineer'))}</Typography>
       <TechnicianAutoComplete
         getTechnician={handleChange}
-        size="medium"
+        size="small"
         initialValue={selectedTechnician}
         required={false}
         textFieldProps={{
           label: t('Select engineer'),
         }}
+        renderInput={(params) => (
+          <TextField {...params} placeholder={t('Select engineer')} />
+        )}
       />
     </Box>
   );
