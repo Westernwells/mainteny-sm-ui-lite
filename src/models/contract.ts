@@ -31,6 +31,7 @@ import {ServiceCompanySimpleView, ServiceCompanyType} from './service-company';
 import {ServiceOrderType} from './service-order';
 import {InvoiceGeneration} from './invoice';
 import {Order} from './pagination';
+import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 
 export interface QueryContractCommentsParams {
   pageIndex: number;
@@ -153,6 +154,7 @@ export interface ContractAdditionalInfo {
   discountPerInvoice?: number;
   invoiceGeneration?: InvoiceGeneration;
   priceAdjustment?: ContractPriceAdjustment;
+  purchaseOrderNumber?: string;
 }
 
 export interface ContractElevatorAdditionalInfo {
@@ -334,6 +336,11 @@ export interface ContractPrice {
 }
 
 export interface ContractRequestBody {
+  id?: string;
+  propertyOwnerId: string;
+  serviceCompanyId: string;
+  elevators: string[];
+  name: string;
   currency?: string;
   endDate?: string;
   externalId?: string;
@@ -350,6 +357,15 @@ export interface ContractRequestBody {
   noticePeriodInMonth?: number;
   paymentTermId?: string;
   description?: string;
+  purchaseOrderNumber?: string;
+  annualPriceAdjustmentPercentage?: number;
+  autoRenewalCancelled?: boolean;
+  documents?: FileResource[] | FileWithPreview[];
+  components: ContractComponentRecord[];
+  renewalDate?: string;
+  invoiceCycle?: number;
+  firstMaintenance?: FirstMaintenance;
+  firstInvoiceDate?: string;
 }
 
 export interface ContractBasicInfoFormModel {
@@ -358,6 +374,7 @@ export interface ContractBasicInfoFormModel {
   name: string;
   externalId: string;
   description: string;
+  purchaseOrderNumber?: string;
 }
 
 export interface ContractCustomizeContractFormModel {
@@ -393,6 +410,7 @@ export interface ContractUpdateRequest {
   description?: string;
   paymentTermId?: string;
   numberOfUnits?: number;
+  purchaseOrderNumber?: string;
 }
 
 export enum PaymentTermArticleType {

@@ -13,6 +13,8 @@ import {ReactComponent as ElevetorIcon} from 'assets/icons/Elevator.svg';
 import {ReactComponent as BellIcon} from 'assets/icons/bell.svg';
 import useTheme from '@mui/material/styles/useTheme';
 import {useFormatDate} from 'hooks/useFormatDate';
+import TagIcon from '@mui/icons-material/Tag';
+import {ContractView} from 'models/contract';
 
 interface Props {
   name?: string;
@@ -25,6 +27,7 @@ interface Props {
   end?: string;
   contractNumber?: string;
   autoRenewal?: boolean;
+  contractDetails: ContractView;
 }
 
 export const ContractBasic = ({
@@ -38,6 +41,7 @@ export const ContractBasic = ({
   end,
   autoRenewal,
   contractNumber,
+  contractDetails,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -177,7 +181,7 @@ export const ContractBasic = ({
         />
       </Grid>
 
-      <Grid item xs={6} sm={4} md={6}>
+      <Grid item xs={6} sm={4} md={3}>
         <CardProps
           label="Number of units"
           bodyTextVariant="subtitle1"
@@ -193,6 +197,21 @@ export const ContractBasic = ({
 
       <Grid item xs={6} sm={4} md={3} />
 
+      <Grid item xs={6} sm={4} md={3}>
+        <CardProps
+          label="Purchase Order Number"
+          bodyTextVariant="subtitle1"
+          icon={<TagIcon sx={{fontSize: '1.5rem'}} />}
+          containerStyles={{mr: '0.5em'}}
+          iconMaxHeight="3rem"
+          bodyText={contractDetails.additionalInfo.purchaseOrderNumber ?? '-'}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
+        />
+      </Grid>
       <Grid item xs={6} sm={4} md={3}>
         <CardProps
           label="Notice period"

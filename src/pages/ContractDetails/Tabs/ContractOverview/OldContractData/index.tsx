@@ -129,8 +129,8 @@ export const OldContractData: FC<Props> = ({contractDetails, isLoading}) => {
 
   const validationSchema = Yup.object().shape({
     renewalTerms: Yup.number()
-      .min(0, 'Renewal period must be between 0-12 months')
-      .max(12, 'Renewal period must be between 0-12 months'),
+      .min(0, 'Renewal period must be between 0-120 months')
+      .max(120, 'Renewal period must be between 0-120 months'),
     discounts: Yup.number().min(0, 'Discount can not be less than 0'),
     externalId: Yup.string().test(
       'checkExternalId',

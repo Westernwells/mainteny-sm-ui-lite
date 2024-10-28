@@ -649,6 +649,7 @@ const ServicesForm = ({
                 required:
                   !!formikContractServiceComponent.values.isAutomaticJobCycle,
               }}
+              disableLeapDay
             />
           </Grid>
         </Grid>

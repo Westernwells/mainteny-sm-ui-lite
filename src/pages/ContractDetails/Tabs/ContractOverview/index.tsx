@@ -125,8 +125,8 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Contract name is required'),
     renewalTerms: Yup.number()
-      .min(0, 'Renewal period must be between 0-12 months')
-      .max(12, 'Renewal period must be between 0-12 months'),
+      .min(0, 'Renewal period must be between 0-120 months')
+      .max(120, 'Renewal period must be between 0-120 months'),
     discounts: Yup.number().min(0, 'Discount can not be less than 0'),
     externalId: Yup.string().test(
       'checkExternalId',
@@ -169,6 +169,7 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
       autoRenewalCancelled:
         contractDetails?.additionalInfo.autoRenewalCancelled ?? false,
       numberOfUnits: contractDetails?.elevators?.length,
+      purchaseOrderNumber: contractDetails?.additionalInfo?.purchaseOrderNumber,
     },
     onSubmit: () => {},
     enableReinitialize: true,
@@ -190,13 +191,15 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
   }, [contractDetails?.end]);
 
   const onContractSave = async () => {
-    const updatedContract = {
+    const updatedContract: Partial<ContractRequestBody> = {
       ...contractDetails?.additionalInfo,
       type: ContractTypes.SERVICE,
       name: formik.values?.name || '',
-      renewalTerms: formik.values.renewalTerms ? formik.values.renewalTerms : 0,
+      renewalTerms: formik.values.renewalTerms
+        ? Number(formik.values.renewalTerms)
+        : 0,
       renewalDate: formik.values.autoRenewalCancelled
-        ? null
+        ? undefined
         : contractDetails?.additionalInfo.renewalDate,
       price: {
         ...amountRecordForBackend({
@@ -206,7 +209,7 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
             user?.userAccount.serviceCompany.settings.percentageVat || 0,
         }),
       },
-      invoiceCycle: formik.values.invoiceCycle || '',
+      invoiceCycle: formik.values.invoiceCycle || 0,
       visitsNumber: +formik.values.visitsNumber,
       spendingLimit: +formik.values.spendingLimit,
       startDate: formik.values.startDate,
@@ -216,18 +219,19 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
         formik.values.annualPriceAdjustmentPercentage,
       discounts: [{days: 14, discountPercentage: formik.values.discounts}],
       noticePeriodInMonth: formik.values.noticePeriodInMonth
-        ? formik.values.noticePeriodInMonth
-        : null,
+        ? Number(formik.values.noticePeriodInMonth)
+        : undefined,
       firstMaintenance: formik.values.firstMaintenance,
       firstInvoiceDate: formik.values.firstInvoiceDate,
       paymentTermId: formik.values.paymentTermId,
       description: formik.values.description,
       externalId: formik.values.externalId,
       autoRenewalCancelled: formik.values.autoRenewalCancelled,
+      purchaseOrderNumber: formik.values.purchaseOrderNumber,
     };
 
     await updateContract({
-      body: updatedContract as any,
+      body: updatedContract,
       contractId: contractId!,
     });
     setOpenContractDialog(false);
@@ -425,6 +429,7 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
               start={contractDetails.start}
               end={contractDetails.end}
               contractNumber={contractDetails.externalId}
+              contractDetails={contractDetails}
             />
             <Dialog
               title="Edit Contract"
