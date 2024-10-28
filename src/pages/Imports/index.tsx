@@ -10,6 +10,8 @@ interface Props {
   getCurrentPageTitle?: (title: string) => void;
 }
 
+const NUVO_LICENSE = 'Q/B1Ke2EOsypTKfHDHvI74mSTvhWo1R2N/qE+F3Pw/8=';
+
 export const ImportSettings = ({getCurrentPageTitle}: Props) => {
   const theme = useTheme();
 
@@ -31,7 +33,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Company</Typography>
                 <NuvoImporter
-                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
+                  licenseKey={NUVO_LICENSE}
                   settings={{
                     developerMode: true,
                     identifier: 'service_company',
@@ -303,7 +305,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Employee</Typography>
                 <NuvoImporter
-                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
+                  licenseKey={NUVO_LICENSE}
                   settings={{
                     developerMode: true,
                     identifier: 'employee',
@@ -411,7 +413,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Customer</Typography>
                 <NuvoImporter
-                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
+                  licenseKey={NUVO_LICENSE}
                   settings={{
                     developerMode: true,
                     identifier: 'customer',
@@ -640,7 +642,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               {/* <Grid item xs={4} textAlign="center"> */}
               {/*  <Typography>Contact Person</Typography> */}
               {/*  <NuvoImporter */}
-              {/*    licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk=" */}
+              {/*    licenseKey={NUVO_LICENSE */}
               {/*    settings={{ */}
               {/*      developerMode: true, */}
               {/*      identifier: 'contact_person', */}
@@ -741,7 +743,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Elevator</Typography>
                 <NuvoImporter
-                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
+                  licenseKey={NUVO_LICENSE}
                   settings={{
                     developerMode: true,
                     identifier: 'elevator',
@@ -1090,7 +1092,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Contract</Typography>
                 <NuvoImporter
-                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
+                  licenseKey={NUVO_LICENSE}
                   settings={{
                     developerMode: true,
                     identifier: 'contract',
@@ -1241,7 +1243,7 @@ export const ImportSettings = ({getCurrentPageTitle}: Props) => {
               <Grid item xs={4} textAlign="center">
                 <Typography>Article</Typography>
                 <NuvoImporter
-                  licenseKey="C4Z6kzjAJFHbuUO5ut+KN5JAUocfZiYmVS9QMoo1TCk="
+                  licenseKey={NUVO_LICENSE}
                   settings={{
                     developerMode: true,
                     identifier: 'article',

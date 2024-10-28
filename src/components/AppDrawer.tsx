@@ -19,6 +19,8 @@ import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
 import {ReactComponent as CustomerCenterIcon} from 'assets/icons/CustomerCenter.svg';
 import {ReactComponent as CustomerCenterIconColor} from 'assets/icons/CustomerCenterColor.svg';
+import {ReactComponent as CloudUploadIcon} from 'assets/icons/CloudIcon.svg';
+import {ReactComponent as CloudUploadIconColor} from 'assets/icons/CloudUploadIcon.svg';
 import {ReactComponent as DashboardIcon} from 'assets/icons/Dashboard.svg';
 import {ReactComponent as DashboardIconColor} from 'assets/icons/DashboardIconColor.svg';
 import {ReactComponent as FinanceIcon} from 'assets/icons/FinanceIcon.svg';
@@ -532,6 +534,22 @@ export const AppDrawer = ({open, setOpen}: Props) => {
         setSelectedIndex(index);
         setSelectedPath('/admin/companies');
         navigate('/admin/companies');
+      },
+    },
+    {
+      text: 'Imports',
+      icon: <CloudUploadIcon fontSize="1.5rem" />,
+      selectIcon: <CloudUploadIconColor fontSize="1.5rem" />,
+      path: '/admin/imports',
+      access: isAdmin,
+      onClick: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        index: number,
+      ) => {
+        e.preventDefault();
+        setSelectedIndex(index);
+        setSelectedPath('/admin/imports');
+        navigate('/admin/imports');
       },
     },
   ];
