@@ -4,6 +4,7 @@ import {getDisplayDeliveryDate} from 'utils/invoice';
 import {InvoiceType, InvoiceView} from 'models/invoice';
 import {useMemo} from 'react';
 import {ClientReportForPDFConfig} from 'models/client-storage';
+import {UserAccount} from 'models/user';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -72,6 +73,7 @@ type Props = {
   nextCompanyExternalId?: string;
   showCurrentDateAsInvoiceDate?: boolean;
   pdfConfigClientStorage: ClientReportForPDFConfig;
+  userInfo?: UserAccount;
 };
 
 const PdfTemplateInvoiceDetails = ({
@@ -81,6 +83,7 @@ const PdfTemplateInvoiceDetails = ({
   nextCompanyExternalId,
   showCurrentDateAsInvoiceDate,
   pdfConfigClientStorage,
+  userInfo,
 }: Props) => {
   const startDate = invoice?.additionalInfo.deliveryStartDate;
   const endDate = invoice?.additionalInfo.deliveryEndDate;
@@ -157,24 +160,18 @@ const PdfTemplateInvoiceDetails = ({
           </View>
         )}
 
-      {invoice?.propertyOwner.contact.phone &&
-        pdfConfigClientStorage.includeUserPhone && (
-          <View style={styles.rightAddressContent}>
-            <Text style={styles.tag}>{translate('Phone number')}</Text>
-            <Text style={styles.tagContent}>
-              {invoice?.propertyOwner.contact.phone ?? '-'}
-            </Text>
-          </View>
-        )}
-      {invoice?.propertyOwner.contact.email &&
-        pdfConfigClientStorage.includeUserPhone && (
-          <View style={styles.rightAddressContent}>
-            <Text style={styles.tag}>{translate('Email address')}</Text>
-            <Text style={styles.tagContent}>
-              {invoice?.propertyOwner.contact.email}
-            </Text>
-          </View>
-        )}
+      {userInfo?.contact?.phone && pdfConfigClientStorage.includeUserPhone && (
+        <View style={styles.rightAddressContent}>
+          <Text style={styles.tag}>{translate('Phone number')}</Text>
+          <Text style={styles.tagContent}>{userInfo?.contact?.phone}</Text>
+        </View>
+      )}
+      {userInfo?.contact?.email && pdfConfigClientStorage.includeUserEmail && (
+        <View style={styles.rightAddressContent}>
+          <Text style={styles.tag}>{translate('Email address')}</Text>
+          <Text style={styles.tagContent}>{userInfo?.contact?.email}</Text>
+        </View>
+      )}
 
       {invoice?.propertyOwner?.externalId && (
         <View style={styles.rightAddressContent}>

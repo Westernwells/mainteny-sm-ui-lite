@@ -327,6 +327,7 @@ const PartialInvoicePdfTemplate = ({
             />
 
             <PdfTemplateInvoiceDetails
+              userInfo={userInfo}
               pdfConfigClientStorage={pdfConfigClientStorage}
               translate={translate}
               invoice={invoice}
