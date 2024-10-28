@@ -268,7 +268,7 @@
   "Mark Rejected": "Mark afvist",
   "Do you want to mark this quotation as rejected": "Vil du markere dette citat som afvist",
   "This action is irreversible.": "Denne handling er irreversibel.",
-  "Renewal period must be between 0-12 months": "Fornyelsesperioden skal være mellem 0-12 måneder",
+  "Renewal period must be between 0-120 months": "Fornyelsesperioden skal være mellem 0-120 måneder",
   "QR Code": "QR kode",
   "No description yet. Please click the button below to add!": "Ingen beskrivelse endnu. Klik venligst på knappen nedenfor for at tilføje!",
   "No description yet. It will appear here once added!": "Ingen beskrivelse endnu. Den vises her, når den er tilføjet!",

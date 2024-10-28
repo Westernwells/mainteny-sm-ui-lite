@@ -3,7 +3,6 @@ import {useUpdateServiceOrder} from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderView, UpdateServiceOrderBody} from 'models/service-order';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {ContractRequestBody} from 'models/contract';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import AttachmentsCard from 'components/AttachmentsCard';
 
@@ -60,7 +59,7 @@ export const Attachment = ({order}: Props) => {
     updateServiceOrder({
       body: {
         documents: documentsToSave,
-      } as Partial<ContractRequestBody>,
+      } as Partial<UpdateServiceOrderBody>,
       serviceOrderId: order.id,
     });
   };

@@ -995,6 +995,20 @@ export const InvoiceForm = ({
       formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
       setResetDueDatePicker(true);
     }
+
+    if (serviceOrderArg.additionalInfo.purchaseOrderNumber) {
+      formik.setFieldValue(
+        'customerSpecificOrderNumber',
+        serviceOrderArg.additionalInfo.purchaseOrderNumber,
+      );
+    } else if (serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber) {
+      formik.setFieldValue(
+        'customerSpecificOrderNumber',
+        serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber,
+      );
+    } else {
+      formik.setFieldValue('customerSpecificOrderNumber', '');
+    }
   };
 
   const initializeFormDataFromLocalStorage = () => {
@@ -1085,6 +1099,7 @@ export const InvoiceForm = ({
       costCenter: '',
       dueDate: undefined,
       paymentTerm: {term: ''},
+      customerSpecificOrderNumber: '',
     });
     if (isNewInvoice) {
       setInitialLocalStorageData(null);
@@ -1123,6 +1138,7 @@ export const InvoiceForm = ({
       'beneficiaryAddress',
       customer?.beneficiaryAddress || emptyAddressState,
     );
+    formik.setFieldValue('customerSpecificOrderNumber', '');
   }, [formik, customer]);
 
   // Handle updates from duplicated invoice and edit mode

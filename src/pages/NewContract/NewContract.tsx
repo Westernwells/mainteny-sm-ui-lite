@@ -14,6 +14,7 @@ import {
   ContractBasicInfoFormModel,
   ContractCustomizeContractFormModel,
   ContractOrderField,
+  ContractRequestBody,
   ContractTypes,
   ContractView,
   convertExtendedRecordsToContractComponentRecords,
@@ -132,6 +133,7 @@ const NewContract = () => {
       name: '',
       externalId: '',
       description: '',
+      purchaseOrderNumber: '',
     },
     validateOnMount: true,
     onSubmit: () => {},
@@ -210,11 +212,11 @@ const NewContract = () => {
     const contractId = uuid;
 
     const uploadPath = `${serviceCompanyId}/contracts/${contractId}/documents`;
-    const newContract = {
+    const newContract: ContractRequestBody = {
       type: ContractTypes.SERVICE,
       id: contractId,
-      propertyOwnerId: customer?.id,
-      serviceCompanyId,
+      propertyOwnerId: customer?.id!,
+      serviceCompanyId: serviceCompanyId!,
       elevators: formikUnits.values.elevators,
       currency: currentCurrency.code,
       endDate: toRestDate(formikBasicInfo.values.endDate!),
@@ -245,6 +247,7 @@ const NewContract = () => {
       components: convertExtendedRecordsToContractComponentRecords(
         formikContractComponents.values.components,
       ),
+      purchaseOrderNumber: formikBasicInfo.values.purchaseOrderNumber,
     };
 
     await createContract(newContract);
