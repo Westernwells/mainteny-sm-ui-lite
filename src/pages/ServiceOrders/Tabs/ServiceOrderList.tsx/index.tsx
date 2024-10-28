@@ -1037,6 +1037,7 @@ export const ServiceOrderList = ({menu}: Props) => {
                 render={({field}) => (
                   <TextInput
                     {...field}
+                    size="small"
                     labelKey="Job number"
                     placeholder="Select job number"
                     onChange={handleOrderNumberChange}
@@ -1073,6 +1074,7 @@ export const ServiceOrderList = ({menu}: Props) => {
                       <TextInput
                         value={watchGrossMin ? `${watchGrossMin}` : ''}
                         placeholder="Min"
+                        size="small"
                         styles={{
                           '& .MuiInputBase-input': {
                             textAlign: 'end',
@@ -1090,6 +1092,7 @@ export const ServiceOrderList = ({menu}: Props) => {
                       <TextInput
                         value={watchGrossMax ? `${watchGrossMax}` : ''}
                         placeholder="Max"
+                        size="small"
                         styles={{
                           '& .MuiInputBase-input': {
                             textAlign: 'end',

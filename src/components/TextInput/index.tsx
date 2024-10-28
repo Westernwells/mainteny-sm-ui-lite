@@ -5,13 +5,21 @@ import {SxProps, Theme} from '@mui/system';
 
 type Props = {
   value?: string;
+  size?: 'small' | 'medium';
   labelKey?: string;
   placeholder?: string;
   onChange: (value: string) => void;
   styles?: SxProps<Theme>;
 };
 
-const TextInput = ({value, labelKey, placeholder, styles, onChange}: Props) => {
+const TextInput = ({
+  value,
+  labelKey,
+  placeholder,
+  styles,
+  size = 'medium',
+  onChange,
+}: Props) => {
   const {t} = useTranslation();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +31,8 @@ const TextInput = ({value, labelKey, placeholder, styles, onChange}: Props) => {
       {labelKey && <Typography variant="subtitle2">{t(labelKey)}</Typography>}
 
       <TextField
-        id="fixed-tags-demo"
+        size={size}
+        id="text-input-field"
         sx={styles}
         value={value}
         {...(placeholder && {placeholder: t(placeholder)})}

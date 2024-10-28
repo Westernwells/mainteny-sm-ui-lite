@@ -1,14 +1,17 @@
 import MuiAutocomplete from '@mui/material/Autocomplete';
 import {Option, OptionWithTranslationKey} from 'models/filter';
-import {TextField} from '@mui/material';
+import {TextField, Theme} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {SyntheticEvent, useMemo} from 'react';
+import {SxProps} from '@mui/system';
 
 type Props = {
   value?: Option;
   options: Option[] | OptionWithTranslationKey[];
   placeholderKey: string;
+  size?: 'small' | 'medium';
   isOptionEqualToValue?: (option: Option, value: Option) => boolean;
+  sx?: SxProps<Theme>;
   onChange: (event: SyntheticEvent, value: Option | null) => void;
 };
 
@@ -17,6 +20,8 @@ const Autocomplete = ({
   options,
   placeholderKey,
   isOptionEqualToValue,
+  size = 'medium',
+  sx,
   onChange,
   ...props
 }: Props) => {
@@ -39,15 +44,17 @@ const Autocomplete = ({
 
   return (
     <MuiAutocomplete
+      size={size}
       value={value}
       options={mappedOptions}
       onChange={onChange}
+      sx={sx}
       getOptionLabel={handleGetOptionLabel}
       {...(isOptionEqualToValue && {
         isOptionEqualToValue,
       })}
       renderInput={(params) => (
-        <TextField {...params} label={t(placeholderKey)} />
+        <TextField {...params} placeholder={t(placeholderKey)} />
       )}
       {...props}
     />
