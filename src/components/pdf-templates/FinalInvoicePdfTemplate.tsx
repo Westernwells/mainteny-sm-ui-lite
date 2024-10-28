@@ -225,6 +225,7 @@ const FinalInvoicePdfTemplate = ({
             />
 
             <PdfTemplateInvoiceDetails
+              userInfo={userInfo}
               translate={translate}
               invoice={invoice}
               selectedLng={selectedLng}

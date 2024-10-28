@@ -400,27 +400,25 @@ const WorkReportTemplate = React.memo(
                   </View>
                 )}
 
-                {serviceOrder?.elevator?.propertyOwner?.contact.phone &&
+                {userInfo?.contact?.phone &&
                   pdfConfigClientStorage.includeUserPhone && (
                     <View style={styles.rightAddressContent}>
                       <Text style={styles.tag}>
                         {translate('Phone number')}
                       </Text>
                       <Text style={styles.tagContent}>
-                        {serviceOrder?.elevator?.propertyOwner?.contact.phone ||
-                          '-'}
+                        {userInfo?.contact?.phone}
                       </Text>
                     </View>
                   )}
-                {serviceOrder?.elevator?.propertyOwner?.contact.email &&
+                {userInfo?.contact?.email &&
                   pdfConfigClientStorage.includeUserEmail && (
                     <View style={styles.rightAddressContent}>
                       <Text style={styles.tag}>
                         {translate('Email address')}
                       </Text>
                       <Text style={styles.tagContent}>
-                        {serviceOrder?.elevator?.propertyOwner?.contact.email ||
-                          '-'}
+                        {userInfo?.contact?.email}
                       </Text>
                     </View>
                   )}

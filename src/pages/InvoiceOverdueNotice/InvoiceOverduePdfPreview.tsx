@@ -231,21 +231,21 @@ const InvoiceOverduePdfPreview = ({
                   </View>
                 )}
 
-              {invoice?.propertyOwner?.contact.phone &&
+              {userInfo?.contact?.phone &&
                 pdfConfigClientStorage.includeUserPhone && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Phone number')}</Text>
                     <Text style={styles.tagContent}>
-                      {invoice?.propertyOwner?.contact.phone || '-'}{' '}
+                      {userInfo?.contact?.phone}
                     </Text>
                   </View>
                 )}
-              {invoice?.propertyOwner?.contact.email &&
+              {userInfo?.contact?.email &&
                 pdfConfigClientStorage.includeUserEmail && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Email address')}</Text>
                     <Text style={styles.tagContent}>
-                      {invoice?.propertyOwner?.contact.email || '-'}{' '}
+                      {userInfo?.contact?.email}
                     </Text>
                   </View>
                 )}
