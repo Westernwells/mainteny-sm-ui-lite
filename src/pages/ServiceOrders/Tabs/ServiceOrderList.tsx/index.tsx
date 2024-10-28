@@ -77,8 +77,8 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {theme} from 'theme';
 import AvatarGroup from 'components/AvatarGroup';
 import {formatDate} from 'utils/datetime';
-import {createCsvContent, escapeCsv, getUserFullName} from 'utils/utils';
-import {downloadCsv} from 'utils/download';
+import {createExcelContent, getUserFullName} from 'utils/utils';
+import {downloadExcel} from 'utils/download';
 import QuickFilter from 'components/QuickFilter';
 import {OptionWithTranslationKey} from 'models/filter';
 import Filters from 'components/Filters';
@@ -875,29 +875,30 @@ export const ServiceOrderList = ({menu}: Props) => {
         'service-order-cell-action',
       ];
 
-      const filteredColums = COLUMNS.filter(
+      const filteredColumns = COLUMNS.filter(
         (col) => !excludedFields.includes(col.key),
       );
 
-      const headers = filteredColums.map((col) =>
+      const headers = filteredColumns.map((col) =>
         capitalize(t(col.headerName)),
       );
 
-      const csvRows = aggregateServiceOrderRow(data).map((serviceOrder) =>
-        filteredColums
-          .map((col) => {
-            const value = col.getExportValue?.(serviceOrder) || '';
-            return escapeCsv(value);
-          })
-          .join(','),
+      const dataRows = aggregateServiceOrderRow(data).map((serviceOrder) =>
+        filteredColumns.map((col) => col.getExportValue?.(serviceOrder) || ''),
       );
 
-      const csvContent = createCsvContent({headers, rows: csvRows});
+      const filename = 'Jobs';
 
-      downloadCsv({csvContent, filename: 'jobs'});
+      const excelContent = createExcelContent({
+        headers,
+        rows: dataRows,
+        sheetName: filename,
+      });
+
+      downloadExcel({excelContent, filename});
     } catch (error) {
-      console.error('Error exporting CSV:', error);
-      enqueueSnackbar(t('Failed to export CSV'), {variant: 'error'});
+      console.error('Error exporting Excel:', error);
+      enqueueSnackbar(t('Failed to export Excel'), {variant: 'error'});
     }
   };
 
