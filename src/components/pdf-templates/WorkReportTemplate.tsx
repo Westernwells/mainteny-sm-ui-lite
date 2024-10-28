@@ -321,6 +321,8 @@ const WorkReportTemplate = React.memo(
         (item) => !!workReportPictures[item.fileResource.uri],
       ) ?? [];
 
+    const serviceOrderType = serviceOrderTypeToString(serviceOrder?.type!);
+
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
     };
@@ -373,7 +375,9 @@ const WorkReportTemplate = React.memo(
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Job type')}</Text>
                     <Text style={styles.tagContent}>
-                      {translate(serviceOrderTypeToString(serviceOrder?.type!))}{' '}
+                      {serviceOrderType === '-'
+                        ? serviceOrder?.type!
+                        : translate(serviceOrderType)}
                     </Text>
                   </View>
                 )}

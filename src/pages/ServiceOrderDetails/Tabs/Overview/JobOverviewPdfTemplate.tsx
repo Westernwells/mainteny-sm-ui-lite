@@ -238,6 +238,8 @@ const JobOverviewPdfTemplate = React.memo(
       },
     );
 
+    const serviceOrderType = serviceOrderTypeToString(serviceOrder?.type!);
+
     const serviceCompanyInfo = getServiceCompanyInfo(
       userInfo,
       quotation?.additionalInfo.alternativeServiceCompanyInfo,
@@ -386,7 +388,9 @@ const JobOverviewPdfTemplate = React.memo(
             <View>
               <PdfPageTitle>
                 {translate('Job Confirmation:')}{' '}
-                {translate(serviceOrderTypeToString(serviceOrder?.type!))}
+                {serviceOrderType === '-'
+                  ? serviceOrder?.type!
+                  : translate(serviceOrderType)}
               </PdfPageTitle>
 
               {serviceOrder?.description.trim() !== '' && (
