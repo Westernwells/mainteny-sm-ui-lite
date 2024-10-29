@@ -110,6 +110,10 @@ import {SwissQRBill} from 'swissqrbill/svg';
 import _, {debounce} from 'lodash';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {InvoiceFormat} from 'models/propertyManager';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -163,6 +167,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+
   const {t: translateCompanyLanguage} = useTranslation('translation', {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
@@ -176,12 +181,12 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     );
 
   const translate = useMemo(
-    () => (key: string) => {
+    () => (key: string, options?: {context: string}) => {
       if (company?.language) {
-        return translateCompanyLanguage(key);
+        return translateCompanyLanguage(key, options);
       }
 
-      return t(key);
+      return t(key, options);
     },
     [company?.language],
   );
@@ -197,6 +202,14 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
   const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
 
   const {data: headerUrl = {}, isLoading: isHeaderUrlLoading} = useDownloadUrl(
     headerInfo?.path ? [headerInfo.path] : [],
@@ -397,6 +410,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
     const blob = await pdf(
       <ChecklistPdf
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
         translate={translate}
@@ -505,6 +519,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
     const blob = await pdf(
       <WorkReportTemplate
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
         translate={translate}
@@ -586,6 +601,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     const blob = await pdf(
       <PdfTemplate
         userInfo={user?.userAccount}
+        pdfConfigClientStorage={pdfConfig}
         currentCurrency={currentCurrency}
         invoice={invoiceData}
         invoiceAmountDetail={invoiceAmountDetail}

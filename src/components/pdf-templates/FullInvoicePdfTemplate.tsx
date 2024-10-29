@@ -24,7 +24,7 @@ import {
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
-// eslint-disable-next-line import/no-unresolved
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -169,6 +169,7 @@ type Props = {
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
   showCurrentDateAsInvoiceDate?: boolean;
+  pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
 const FullInvoicePdfTemplate = ({
@@ -185,6 +186,7 @@ const FullInvoicePdfTemplate = ({
   nextCompanyExternalId,
   qrImageSrc,
   showCurrentDateAsInvoiceDate,
+  pdfConfigClientStorage,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -331,6 +333,8 @@ const FullInvoicePdfTemplate = ({
             />
 
             <PdfTemplateInvoiceDetails
+              userInfo={userInfo}
+              pdfConfigClientStorage={pdfConfigClientStorage}
               translate={translate}
               invoice={invoice}
               selectedLng={selectedLng}

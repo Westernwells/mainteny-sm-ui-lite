@@ -13,6 +13,11 @@ import {Box, Typography} from '@mui/material';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {companyLanguageContextMap} from 'utils/utils';
 import i18n from 'i18n';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 
 interface RNWindow extends Window {
   ReactNativeWebView?: {
@@ -59,17 +64,24 @@ export const MobileWorkReportDownload = () => {
     serviceOrderId: serviceOrderId as string,
     userView: userResponse,
   });
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
   const {t: translateCompanyLanguage} = useTranslation('translation', {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
 
   const translate = useMemo(
-    () => (key: string) => {
+    () => (key: string, options?: {context: string}) => {
       if (company?.language) {
-        return translateCompanyLanguage(key);
+        return translateCompanyLanguage(key, options);
       }
 
-      return t(key);
+      return t(key, options);
     },
     [company?.language],
   );
@@ -82,6 +94,7 @@ export const MobileWorkReportDownload = () => {
 
     const blob = await pdf(
       <WorkReportTemplate
+        pdfConfigClientStorage={pdfConfig}
         userInfo={userResponse?.userAccount}
         selectedLng={company?.language}
         translate={translate}

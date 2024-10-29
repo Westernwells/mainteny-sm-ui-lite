@@ -87,6 +87,11 @@ import CopyAll from '@mui/icons-material/CopyAll';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {InvoiceFormat} from 'models/propertyManager';
 import {formatDate} from 'utils/datetime';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 
 interface Props {
   invoice: InvoiceView;
@@ -189,12 +194,12 @@ export const Actions = ({
   } as CustomTranslationOptions);
 
   const translate = useMemo(
-    () => (key: string) => {
+    () => (key: string, options?: {context: string}) => {
       if (company?.language) {
-        return translateCompanyLanguage(key);
+        return translateCompanyLanguage(key, options);
       }
 
-      return t(key);
+      return t(key, options);
     },
     [company?.language],
   );
@@ -228,6 +233,14 @@ export const Actions = ({
   const {mutateAsync: sendInvoice} = useSendInvoice({
     shouldNavigate: true,
   });
+
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
 
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice?.serviceOrder?.id,
@@ -363,6 +376,7 @@ export const Actions = ({
 
     const blob = await pdf(
       <ChecklistPdf
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
         translate={translate}
@@ -471,6 +485,7 @@ export const Actions = ({
 
     const blob = await pdf(
       <WorkReportTemplate
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
         translate={translate}
@@ -537,6 +552,7 @@ export const Actions = ({
 
     const blob = await pdf(
       <PdfTemplate
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         invoice={invoiceData}
