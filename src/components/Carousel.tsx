@@ -10,6 +10,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Close from '@mui/icons-material/Close';
 import {useTranslation} from 'react-i18next';
+import {TransformWrapper, TransformComponent} from 'react-zoom-pan-pinch';
 
 export const Carousel = ({
   images,
@@ -73,24 +74,40 @@ export const Carousel = ({
       <SwipeableViews
         axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
         index={activeStep}
+        disabled
         onChangeIndex={handleStepChange}
         enableMouseEvents
         containerStyle={{alignItems: 'start'}}>
         {images.map((step, index) => (
           <Box
-            sx={{display: 'flex', justifyContent: 'center'}}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              '& .react-transform-wrapper': {
+                width: '100%',
+                '& .react-transform-component': {
+                  width: '100%',
+                },
+              },
+            }}
             key={`${step.label} - ${index}`}>
             {Math.abs(activeStep - index) <= 2 ? (
-              <div
-                style={{
-                  backgroundImage: `url(${step.imgPath})`,
-                  height: '85vh',
-                  width: '100%',
-                  backgroundSize: 'contain',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center',
-                }}
-              />
+              <TransformWrapper
+                wheel={{step: 50, smoothStep: 0.001}}
+                pinch={{step: 5}}>
+                <TransformComponent>
+                  <div
+                    style={{
+                      backgroundImage: `url(${step.imgPath})`,
+                      height: '85vh',
+                      width: '100%',
+                      backgroundSize: 'contain',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center',
+                    }}
+                  />
+                </TransformComponent>
+              </TransformWrapper>
             ) : null}
           </Box>
         ))}
