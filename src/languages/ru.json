@@ -2600,5 +2600,9 @@
   "Failed to export Excel": "Не удалось экспортировать Excel",
   "Invalid first job creation date, date should not be Feb 29th": "Неверная дата создания первого задания, дата не должна быть 29 февраля",
   "No matching search results": "Нет совпадающих результатов поиска",
-  "Please try again": "Пожалуйста, попробуйте снова"
+  "Please try again": "Пожалуйста, попробуйте снова",
+  "Job Gross Sum": "Общая сумма заказа",
+  "Job(s) with notes": "Работа(-ы) с пометками",
+  "Search job number": "Поиcк по номеру задания/работы",
+  "Select contract": "Выберите договор"
 }
