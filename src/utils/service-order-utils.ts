@@ -419,7 +419,7 @@ export const aggregateServiceOrderRow = (
 export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
   const elements = [
     search && search,
-    orderNumber && `[externalid:${orderNumber}]`,
+    orderNumber && `[externalid:*${orderNumber}*]`,
   ];
   return elements.length ? elements.join(' ') : '';
 };

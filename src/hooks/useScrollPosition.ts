@@ -59,3 +59,61 @@ export const useScrollHorizontalPosition = (element: HTMLElement | null) => {
     isScrollableX,
   };
 };
+
+export const useScrollVerticalPosition = (element: HTMLElement | null) => {
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  const isAtStart = useMemo(() => {
+    if (element === null) return false;
+    return scrollPosition < SCROLL_PX_BUFFER;
+  }, [scrollPosition, element]);
+
+  const isAtEnd = useMemo(() => {
+    if (element === null) return false;
+    return (
+      scrollPosition + element.clientHeight >=
+      element.scrollHeight - SCROLL_PX_BUFFER
+    );
+  }, [scrollPosition, element]);
+
+  const handleScroll = () => {
+    const position = element?.scrollTop;
+    setScrollPosition(position ?? 0);
+  };
+
+  const isScrollableY = useMemo(() => {
+    if (element === null) return false;
+    // Compare the height to see if the element has scrollable content
+    const hasScrollableContent = element.scrollHeight > element.clientHeight;
+
+    // It's not enough because the element's `overflow-x` style can be set as
+    // * `hidden`
+    // * `hidden !important`
+    // In those cases, the scrollbar isn't shown
+    const overflowXStyle = window.getComputedStyle(element).overflowX;
+    const isOverflowHidden = overflowXStyle.indexOf('hidden') !== -1;
+
+    return hasScrollableContent && !isOverflowHidden;
+  }, [element]);
+
+  useEffect(() => {
+    // Attach the scroll event listener
+    if (element) {
+      element.addEventListener('scroll', handleScroll);
+    }
+
+    // Cleanup event listener on component unmount
+    return () => {
+      if (element) {
+        element.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [element]);
+
+  return {
+    scrollPosition,
+    isAtStart,
+    isAtEnd,
+    isScrollableY,
+  };
+};

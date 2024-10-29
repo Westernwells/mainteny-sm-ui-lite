@@ -37,6 +37,8 @@ const QuickFilter = ({selected, options, statistics, onChange}: Props) => {
             key={`quick-filter-option-${option.value}`}
             component="button"
             sx={{
+              border: 'none',
+              backgroundColor: 'transparent',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

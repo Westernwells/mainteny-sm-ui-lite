@@ -1,10 +1,11 @@
 import {Box, Button, Chip, Drawer, IconButton, Typography} from '@mui/material';
-import {PropsWithChildren, useState} from 'react';
+import {PropsWithChildren, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import {useTheme} from '@mui/system';
 import CloseIcon from '@mui/icons-material/Close';
 import capitalize from 'lodash/capitalize';
+import {useScrollVerticalPosition} from 'hooks/useScrollPosition';
 
 type Props = {
   activeFilters?: number;
@@ -23,6 +24,9 @@ const Filters = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const [isOpened, setIsOpened] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scroller = useScrollVerticalPosition(containerRef?.current ?? null);
 
   const handleOpen = () => {
     if (!isOpened) {
@@ -76,13 +80,11 @@ const Filters = ({
           top={0}
           bgcolor="white"
           zIndex={99}
-          gap={4}
           sx={{
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
             height: 'inherit',
-            padding: '16px 24px',
             boxShadow:
               'box-shadow: 0px 4px 15px 0px rgba(144, 144, 144, 0.20);',
           }}>
@@ -93,6 +95,7 @@ const Filters = ({
               justifyContent: 'space-between',
               alignItems: 'center',
               width: '100%',
+              padding: '16px 24px',
             }}>
             <Typography variant="h5">
               {capitalize(t('Apply Filters'))}
@@ -103,11 +106,35 @@ const Filters = ({
           </Box>
           {/* Body Section */}
           <Box
+            ref={containerRef}
             sx={{
               display: 'flex',
               width: '100%',
               height: '100%',
               overflow: 'auto',
+              padding: '16px 24px',
+
+              ...(!scroller.isAtStart &&
+                !scroller.isAtEnd && {
+                  borderRight: 0,
+                  borderLeft: 0,
+                  boxShadow: '0 0 14px rgba(0,0,0,0.2)',
+                  clipPath: 'inset(-14px 0 -14px 0)',
+                }),
+
+              ...(!scroller.isAtStart &&
+                scroller.isAtEnd && {
+                  borderRight: 0,
+                  boxShadow: '0 0 14px rgba(0,0,0,0.2)',
+                  clipPath: 'inset(-14px 0 0 0)',
+                }),
+
+              ...(!scroller.isAtEnd &&
+                scroller.isAtStart && {
+                  borderLeft: 0,
+                  boxShadow: '0 0 14px rgba(0,0,0,0.2)',
+                  clipPath: 'inset(0 0 -14px 0)',
+                }),
             }}>
             {children}
           </Box>
@@ -117,6 +144,7 @@ const Filters = ({
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              padding: '16px 24px',
             }}>
             <Button onClick={onReset} variant="text">
               <Typography

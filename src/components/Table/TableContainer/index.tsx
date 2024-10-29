@@ -18,7 +18,6 @@ const TableContainer = ({
   setShowLeftShadow,
   containerRef,
 }: PropsWithChildren<Props>) => {
-  // const containerRef = useRef<HTMLDivElement>(null);
   const scroller = useScrollHorizontalPosition(containerRef?.current ?? null);
 
   useEffect(() => {

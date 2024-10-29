@@ -62,13 +62,7 @@ import {
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {
-  Checkbox,
-  CircularProgress,
-  FormControlLabel,
-  TableBody,
-  Typography,
-} from '@mui/material';
+import {Checkbox, CircularProgress, TableBody, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {olStyles} from 'styles';
 import {StatusChip} from 'components/StatusChip';
@@ -104,6 +98,7 @@ import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {EmployeesView} from 'models/employee';
 
 import {Avatar} from 'components/Avatar';
+import ContractInput from 'components/ContractInput';
 import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
@@ -201,6 +196,10 @@ export const ServiceOrderList = ({menu}: Props) => {
     string | undefined
   >('selectedCustomer', {defaultValue: undefined});
 
+  const [selectedContract, setSelectedContract] = useQueryState<
+    string | undefined
+  >('selectedContract', {defaultValue: undefined});
+
   const [selectedTechnicianId, setSelectedTechnicianId] = useQueryState<
     string | undefined
   >('selectedTechnicianId', {defaultValue: undefined});
@@ -292,6 +291,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     ...(isWithNote === 'true' && {hasComments: true}),
     ...(selectedCustomer && {propertyOwnerId: selectedCustomer}),
     ...(selectedTechnicianId && {technicians: [selectedTechnicianId]}),
+    ...(selectedContract && {contractIds: [selectedContract]}),
   };
 
   const defaultStatsFilters: ServiceOrderQueryParams = {
@@ -441,6 +441,7 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const handleFilterApply: SubmitHandler<ServiceOrderFilterForm> = (data) => {
     setSelectedCustomer(data.customer);
+    setSelectedContract(data.contract);
     setSelectedTechnicianId(data.technician?.id);
     setSelectedOrderNumber(data.orderNumber);
     setSelectedOrderTypes(data.orderTypes);
@@ -454,6 +455,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     () =>
       [
         selectedCustomer,
+        selectedContract,
         selectedTechnician,
         selectedOrderNumber,
         isWithNote,
@@ -468,6 +470,7 @@ export const ServiceOrderList = ({menu}: Props) => {
       selectedOrderNumber,
       selectedPaymentStatus,
       selectedCustomer,
+      selectedContract,
       selectedTechnician,
       grossAmountMin,
       grossAmountMax,
@@ -479,7 +482,9 @@ export const ServiceOrderList = ({menu}: Props) => {
     if (!isFetched) return {emptyTable: false, noMatchingData: false};
 
     if (
-      (appliedFilterNumber > 0 || !!selectedOrderStatus || !!searchQuery) &&
+      (appliedFilterNumber > 0 ||
+        selectedOrderStatus.length > 0 ||
+        !!searchQuery) &&
       serviceOrdersResource.total === 0
     ) {
       return {emptyTable: false, noMatchingData: true};
@@ -923,6 +928,7 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const handleFilterOpen = () => {
     setValue('customer', selectedCustomer);
+    setValue('contract', selectedContract);
     setValue('orderNumber', selectedOrderNumber);
     setValue('orderTypes', selectedOrderTypes ?? []);
     setValue('paymentStatus', selectedPaymentStatus ?? []);
@@ -933,6 +939,7 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const handleFilterReset = () => {
     setValue('customer', undefined);
+    setValue('contract', undefined);
     setValue('technician', undefined);
     setValue('orderNumber', '');
     setValue('orderTypes', []);
@@ -1050,35 +1057,6 @@ export const ServiceOrderList = ({menu}: Props) => {
             onSave={handleSubmit(handleFilterApply)}
             onReset={handleFilterReset}>
             <Box sx={{display: 'flex', flexDirection: 'column'}} gap={2}>
-              <CustomerInput
-                selectedValue={getValues('customer')}
-                customers={customers.data}
-                onChange={handleCustomerSelect}
-              />
-              <Controller
-                control={control}
-                name="technician"
-                render={({field}) => (
-                  <TechnicianInput
-                    selectedTechnician={field.value}
-                    onChange={handleTechnicianChange}
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="orderNumber"
-                render={({field}) => (
-                  <TextInput
-                    {...field}
-                    size="small"
-                    labelKey="Job number"
-                    placeholder="Select job number"
-                    onChange={handleOrderNumberChange}
-                  />
-                )}
-              />
               <ChipSelector
                 headerLabel="SERVICE TYPE"
                 options={filteredJobTypes.map((jobType) => ({
@@ -1098,8 +1076,53 @@ export const ServiceOrderList = ({menu}: Props) => {
                 selectedChips={watchPaymentStatus}
                 onChange={handleSelectedPaymentStatusChange}
               />
+
+              <Controller
+                control={control}
+                name="orderNumber"
+                render={({field}) => (
+                  <TextInput
+                    {...field}
+                    size="small"
+                    labelKey="Job number"
+                    placeholder="Search job number"
+                    onChange={handleOrderNumberChange}
+                  />
+                )}
+              />
+
+              <CustomerInput
+                selectedValue={getValues('customer')}
+                customers={customers.data}
+                onChange={handleCustomerSelect}
+              />
+
+              <Controller
+                control={control}
+                name="technician"
+                render={({field}) => (
+                  <TechnicianInput
+                    selectedTechnician={field.value}
+                    onChange={handleTechnicianChange}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="contract"
+                render={({field}) => (
+                  <ContractInput
+                    selectedValue={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+
               <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
-                <Typography variant="subtitle2">{t('Gross amount')}</Typography>
+                <Typography variant="subtitle2">
+                  {t('Job Gross Sum')}
+                </Typography>
 
                 <Box sx={{display: 'flex'}} gap={1}>
                   <Controller
@@ -1139,16 +1162,25 @@ export const ServiceOrderList = ({menu}: Props) => {
                   />
                 </Box>
               </Box>
-              <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
-                <Typography variant="subtitle2">{t('Notes')}</Typography>
-                <FormControlLabel
-                  label={t('Invoices with a note')}
-                  control={
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+                gap={1}>
+                <Typography variant="subtitle2">
+                  {t('Job(s) with notes')}
+                </Typography>
+                <Controller
+                  control={control}
+                  name="grossAmountMax"
+                  render={() => (
                     <Checkbox
                       checked={watchHasComment}
                       onChange={handleWithNoteToggle}
                     />
-                  }
+                  )}
                 />
               </Box>
             </Box>
