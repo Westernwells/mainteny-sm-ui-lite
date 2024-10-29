@@ -2831,5 +2831,9 @@
   "Failed to export Excel": "Export fehlgeschlagen",
   "Invalid first job creation date, date should not be Feb 29th": "Ungültiges Datum. Das Datum darf nicht der 29. Februar sein.",
   "No matching search results": "Keine passenden Suchergebnisse.\n",
-  "Please try again": "Bitte versuchen Sie es erneut.\n"
+  "Please try again": "Bitte versuchen Sie es erneut.\n",
+  "Job Gross Sum": "Auftragsumme (brutto)",
+  "Job(s) with notes": "Aufträge mit Notizen",
+  "Search job number": "Auftragsnummer suchen",
+  "Select contract": "Vertrag auswählen"
 }
