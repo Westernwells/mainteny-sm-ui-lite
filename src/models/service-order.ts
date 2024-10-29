@@ -580,6 +580,7 @@ export interface ServiceOrderScheduleParams {
 
 export interface ServiceOrderQueryParams {
   elevatorIds?: string[];
+  contractIds?: string[];
   end: string;
   start: string;
   pageIndex: number;
@@ -756,6 +757,7 @@ export type ServiceOrderFilterForm = {
   customer?: string;
   technician?: EmployeesView;
   orderNumber?: string;
+  contract?: string;
   orderTypes: ServiceOrderType[];
   paymentStatus: ServiceOrderPaymentStatus[];
   grossAmountMin?: number;

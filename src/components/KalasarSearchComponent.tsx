@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import HelpIcon from '../assets/icons/HelpIcon.svg';
 
 // Extend the Window interface to include Kalasar
@@ -91,6 +91,8 @@ const KalasarSearchComponent: React.FC = () => {
         alignItems: 'center',
         padding: '4px 8px',
         borderRadius: '4px',
+        border: 'none',
+        backgroundColor: 'transparent',
       }}>
       {/* Help Icon */}
       <img

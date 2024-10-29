@@ -1,9 +1,10 @@
-import MuiAutocomplete from '@mui/material/Autocomplete';
+import MuiAutocomplete, {
+  AutocompleteInputChangeReason,
+} from '@mui/material/Autocomplete';
 import {Option, OptionWithTranslationKey} from 'models/filter';
-import {TextField, Theme} from '@mui/material';
+import {SxProps, TextField, Theme} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {SyntheticEvent, useMemo} from 'react';
-import {SxProps} from '@mui/system';
 
 type Props = {
   value?: Option;
@@ -12,6 +13,12 @@ type Props = {
   size?: 'small' | 'medium';
   isOptionEqualToValue?: (option: Option, value: Option) => boolean;
   sx?: SxProps<Theme>;
+  inputValue?: string;
+  onInputChange?: (
+    event: SyntheticEvent<Element, Event>,
+    value: string,
+    reason: AutocompleteInputChangeReason,
+  ) => void;
   onChange: (event: SyntheticEvent, value: Option | null) => void;
 };
 
