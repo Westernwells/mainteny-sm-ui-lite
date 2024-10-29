@@ -34,7 +34,7 @@ export const useQueryClientStorageData = ({
   options?: UseQueryOptions<any, any, any>;
 }) =>
   useQuery<ClientDataRecord, RestError>(
-    [queryKeys.fetchClientStorageData, serviceCompanyId],
+    [queryKeys.fetchClientStorageData, serviceCompanyId, params?.key],
     () => fetchClientStorageData(serviceCompanyId, params),
     {
       ...options,

@@ -48,6 +48,10 @@ import {SimpleEmailRecord} from 'models/misc';
 import {CreateInvoiceOverdueNoticeRecord} from 'models/invoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 import InvoiceOverduePdfPreview from './InvoiceOverduePdfPreview';
 
 const validationSchema = Yup.object().shape({
@@ -91,12 +95,12 @@ export const InvoiceOverdueNotice = () => {
   } as CustomTranslationOptions);
 
   const translate = useMemo(
-    () => (key: string) => {
+    () => (key: string, options?: {context: string}) => {
       if (company?.language) {
-        return translateCompanyLanguage(key);
+        return translateCompanyLanguage(key, options);
       }
 
-      return t(key);
+      return t(key, options);
     },
     [company?.language],
   );
@@ -120,6 +124,14 @@ export const InvoiceOverdueNotice = () => {
     undefined,
     company?.id,
   );
+
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
 
   const initialValues = {
     customerAddress: invoice?.propertyOwner?.billingAddress?.fullName ?? '',
@@ -169,6 +181,7 @@ export const InvoiceOverdueNotice = () => {
   const handlePreview = async () => {
     const blob = await pdf(
       <InvoiceOverduePdfPreview
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         translate={translate}

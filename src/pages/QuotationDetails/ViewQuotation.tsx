@@ -69,6 +69,10 @@ import {
   RefetchQueryFilters,
 } from 'react-query';
 import {stripHtmlTags} from 'utils/text-block';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -136,6 +140,14 @@ export const ViewQuotation = ({
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
 
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
+
   const {downloadFile} = useDownloadFileWithCustomName(
     quotation.number,
     filePathToDownload,
@@ -144,12 +156,12 @@ export const ViewQuotation = ({
   const {mutateAsync: uploadFiles} = useUploadFiles('');
 
   const translate = useMemo(
-    () => (key: string) => {
+    () => (key: string, options?: {context: string}) => {
       if (company?.language) {
-        return translateCompanyLanguage(key);
+        return translateCompanyLanguage(key, options);
       }
 
-      return t(key);
+      return t(key, options);
     },
     [company?.language],
   );
@@ -264,6 +276,7 @@ export const ViewQuotation = ({
   const generateBlobUrl = async () => {
     const blob = await pdf(
       <QuotationPdfTemplate
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         quotation={quotation}

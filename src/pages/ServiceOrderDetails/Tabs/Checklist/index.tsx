@@ -67,7 +67,11 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import _ from 'lodash';
 import {FileResourceRecord} from 'models/media';
 import {resizeImageToTargetSize} from 'utils/image-compression';
-import {IMAGE_SIZE_IN_MB} from 'utils/constants';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+  IMAGE_SIZE_IN_MB,
+} from 'utils/constants';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
@@ -194,6 +198,14 @@ export const CheckList = ({serviceOrder}: Props) => {
     ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
     : '';
 
+  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+    serviceCompanyId: serviceOrder.serviceCompany.id,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+  const pdfConfig = clientStorageDataPdfConfig?.value
+    ? JSON.parse(clientStorageDataPdfConfig?.value)
+    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
+
   const deleteChecklist = async () => {
     await disassociateMultiChecklist(
       {
@@ -275,12 +287,12 @@ export const CheckList = ({serviceOrder}: Props) => {
   } as CustomTranslationOptions);
 
   const translate = useMemo(
-    () => (key: string) => {
+    () => (key: string, options?: {context: string}) => {
       if (company?.language) {
-        return translateCompanyLanguage(key);
+        return translateCompanyLanguage(key, options);
       }
 
-      return t(key);
+      return t(key, options);
     },
     [company?.language],
   );
@@ -318,6 +330,7 @@ export const CheckList = ({serviceOrder}: Props) => {
 
     const blob = await pdf(
       <ChecklistPdf
+        pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
         translate={translate}

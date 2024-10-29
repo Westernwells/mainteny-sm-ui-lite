@@ -21,6 +21,7 @@ import {HtmlPDF} from 'components/HtmlPDF';
 import {HeaderFooterInfoData} from 'models/misc';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {MinToStep} from 'models/service-company';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -278,7 +279,7 @@ const BookedHoursRow = ({
 };
 
 type Props = {
-  translate: (key: string) => string;
+  translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount | undefined;
   serviceOrder?: ServiceOrderView;
   report?: ServiceOrderReportView;
@@ -293,6 +294,7 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
 const WorkReportTemplate = React.memo(
@@ -310,6 +312,7 @@ const WorkReportTemplate = React.memo(
     headerPath,
     footerInfo,
     footerPath,
+    pdfConfigClientStorage,
   }: Props) => {
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
     const company = userInfo?.serviceCompany;
@@ -393,6 +396,28 @@ const WorkReportTemplate = React.memo(
                   </View>
                 )}
 
+                {userInfo?.contact?.phone &&
+                  pdfConfigClientStorage.includeUserPhone && (
+                    <View style={styles.rightAddressContent}>
+                      <Text style={styles.tag}>
+                        {translate('Phone number')}
+                      </Text>
+                      <Text style={styles.tagContent}>
+                        {userInfo?.contact?.phone}
+                      </Text>
+                    </View>
+                  )}
+                {userInfo?.contact?.email &&
+                  pdfConfigClientStorage.includeUserEmail && (
+                    <View style={styles.rightAddressContent}>
+                      <Text style={styles.tag}>
+                        {translate('Email address')}
+                      </Text>
+                      <Text style={styles.tagContent}>
+                        {userInfo?.contact?.email}
+                      </Text>
+                    </View>
+                  )}
                 {(schedule?.technician?.userAccount?.firstName ||
                   schedule?.technician?.userAccount?.lastName) && (
                   <View style={styles.rightAddressContent}>
@@ -405,14 +430,29 @@ const WorkReportTemplate = React.memo(
                 )}
 
                 <View style={{marginTop: 20}}>
-                  {serviceOrder?.elevator?.externalId && (
-                    <View style={styles.rightAddressContent}>
-                      <Text style={styles.tag}>{translate('Unit no.')}</Text>
-                      <Text style={styles.tagContent}>
-                        {serviceOrder?.elevator?.externalId}
-                      </Text>
-                    </View>
-                  )}
+                  {serviceOrder?.elevator?.externalId &&
+                    pdfConfigClientStorage.includeUnitNumber &&
+                    serviceOrder?.elevator?.externalId && (
+                      <View style={styles.rightAddressContent}>
+                        <Text style={styles.tag}>
+                          {translate('Unit no.', {context: 'elevator'})}
+                        </Text>
+                        <Text style={styles.tagContent}>
+                          {serviceOrder?.elevator?.externalId}
+                        </Text>
+                      </View>
+                    )}
+                  {serviceOrder?.elevator?.serialNumber &&
+                    pdfConfigClientStorage.includeSerialNumber && (
+                      <View style={styles.rightAddressContent}>
+                        <Text style={styles.tag}>
+                          {translate('Serial number')}.
+                        </Text>
+                        <Text style={styles.tagContent}>
+                          {serviceOrder?.elevator?.serialNumber || '-'}
+                        </Text>
+                      </View>
+                    )}
 
                   <PdfUnitAddress
                     address={elevatorAddress}
