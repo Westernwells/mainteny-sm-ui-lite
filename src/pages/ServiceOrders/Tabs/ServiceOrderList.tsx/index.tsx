@@ -294,6 +294,16 @@ export const ServiceOrderList = ({menu}: Props) => {
     ...(selectedTechnicianId && {technicians: [selectedTechnicianId]}),
   };
 
+  const defaultStatsFilters: ServiceOrderQueryParams = {
+    end: endOfDay(currentDate).toISOString(),
+    start: startOfDay(subDays(currentDate, 30)).toISOString(),
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
+    order: sortOrder || Order.DESC,
+    query: '',
+  };
+
   const {
     data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(10),
     isLoading,
@@ -304,6 +314,31 @@ export const ServiceOrderList = ({menu}: Props) => {
   const {data: serviceOrdersStatistics} = useServiceOrdersStatistics(filters, {
     keepPreviousData: true,
   });
+
+  const {data: serviceOrdersDefaultStatistics} = useServiceOrdersStatistics(
+    defaultStatsFilters,
+    {
+      keepPreviousData: true,
+    },
+  );
+
+  const filteredJobTypes = useMemo(() => {
+    const jobTypesInStatistics =
+      serviceOrdersDefaultStatistics?.numOfServiceOrdersPerType
+        ? Object.keys(
+            serviceOrdersDefaultStatistics.numOfServiceOrdersPerType,
+          ).filter(
+            (jobType) =>
+              serviceOrdersDefaultStatistics.numOfServiceOrdersPerType[
+                jobType
+              ] > 0,
+          )
+        : [];
+
+    return allJobTypes?.filter((job) =>
+      jobTypesInStatistics.includes(job.name),
+    );
+  }, [serviceOrdersDefaultStatistics, allJobTypes]);
 
   const aggregatedServiceOrderStatistics = useMemo(() => {
     if (!serviceOrdersStatistics) return undefined;
@@ -1046,7 +1081,7 @@ export const ServiceOrderList = ({menu}: Props) => {
               />
               <ChipSelector
                 headerLabel="SERVICE TYPE"
-                options={allJobTypes.map((jobType) => ({
+                options={filteredJobTypes.map((jobType) => ({
                   value: jobType.name,
                   labelKey:
                     serviceOrderTypeToString(jobType.name) === '-'

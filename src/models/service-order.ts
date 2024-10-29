@@ -779,4 +779,5 @@ export type ServiceOrderTypeRecord = {
 
 export type ServiceOrderStatistics = {
   numOfServiceOrdersPerStatus: Record<string, number>;
+  numOfServiceOrdersPerType: Record<string, number>;
 };
