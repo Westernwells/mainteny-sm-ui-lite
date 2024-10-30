@@ -1,4 +1,4 @@
-import {WorkHoursItem} from 'models/workHours';
+import {WorkHourOrderField, WorkHoursItem} from 'models/workHours';
 import {useQuery} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 
@@ -6,7 +6,7 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {toRestDateTime} from 'utils/datetime';
 import {UserActivityView} from 'models/user';
 import {Resource, RestError} from '../../models/misc';
-import {Page} from '../../models/pagination';
+import {Order, Page} from '../../models/pagination';
 
 export const getWorkHours = async (
   query: string,
@@ -14,6 +14,8 @@ export const getWorkHours = async (
   startDate: Date,
   endDate: Date,
   employeeId: string,
+  order: Order,
+  orderByField: WorkHourOrderField,
 ) => {
   const response = await axiosClient.get<Resource<WorkHoursItem>>(
     `/api/users/${employeeId}/timeLogs`,
@@ -22,6 +24,8 @@ export const getWorkHours = async (
         query,
         start: toRestDateTime(startDate),
         end: toRestDateTime(endDate),
+        order,
+        orderByField,
         ...page,
       },
       paramsSerializer,
@@ -36,10 +40,30 @@ export function useWorkHours(
   startDate: Date,
   endDate: Date,
   employeeId: string,
+  order: Order,
+  orderByField: WorkHourOrderField,
 ) {
   return useQuery<Resource<WorkHoursItem>, RestError>(
-    [queryKeys.fetchWorkHours, query, page, startDate, endDate, employeeId],
-    () => getWorkHours(query, page, startDate, endDate, employeeId!),
+    [
+      queryKeys.fetchWorkHours,
+      query,
+      page,
+      startDate,
+      endDate,
+      employeeId,
+      order,
+      orderByField,
+    ],
+    () =>
+      getWorkHours(
+        query,
+        page,
+        startDate,
+        endDate,
+        employeeId!,
+        order,
+        orderByField,
+      ),
   );
 }
 

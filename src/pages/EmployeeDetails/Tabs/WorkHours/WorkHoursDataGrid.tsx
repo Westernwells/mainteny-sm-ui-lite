@@ -18,6 +18,7 @@ import {ServiceOrderTypeRecord} from 'models/service-order';
 
 const defaultProps = {
   editable: false,
+  sortable: false,
   renderHeader: (params: GridColumnHeaderParams) => {
     const {t} = useTranslation();
     return (
@@ -63,6 +64,7 @@ export const columns: GridColDef[] = [
     flex: 0.75,
     ...defaultAlignment,
     ...defaultProps,
+    sortable: true,
   },
   {
     field: 'startTime',
@@ -222,15 +224,3 @@ export const makeRows = (
       }))
     : [];
 };
-
-// let duration = '-';
-// const startDate =
-// if(item.type === WorkHoursType.HOLIDAY) {
-
-// } else {
-//   `${formatDate(item.startTime)} ${formatDate(
-//     item.startTime,
-//     'HH:mm',
-//   )}`
-
-// }

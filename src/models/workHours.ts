@@ -54,3 +54,9 @@ export enum WorkHoursType {
   OFFICE_WORK = 'OFFICE_WORK',
   FIELD_WORK = 'FIELD_WORK',
 }
+
+export enum WorkHourOrderField {
+  START_TIME = 'START_TIME',
+  END_TIME = 'END_TIME',
+  CREATED_TIME = 'CREATED_TIME',
+}
