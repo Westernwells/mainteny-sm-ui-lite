@@ -14,7 +14,6 @@ import {
   ServiceOrderView,
 } from 'models/service-order';
 import {
-  ChangeEvent,
   ReactElement,
   ReactNode,
   useCallback,
@@ -871,13 +870,6 @@ export const ServiceOrderList = ({menu}: Props) => {
     [watchPaymentStatus],
   );
 
-  const handleWithNoteToggle = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      setValue('hasComment', event.target.checked);
-    },
-    [setValue, watchHasComment],
-  );
-
   const handleCustomerSelect = useCallback(
     (value?: string) => {
       setValue('customer', value);
@@ -1174,11 +1166,11 @@ export const ServiceOrderList = ({menu}: Props) => {
                 </Typography>
                 <Controller
                   control={control}
-                  name="grossAmountMax"
-                  render={() => (
+                  name="hasComment"
+                  render={({field}) => (
                     <Checkbox
                       checked={watchHasComment}
-                      onChange={handleWithNoteToggle}
+                      onChange={field.onChange}
                     />
                   )}
                 />
