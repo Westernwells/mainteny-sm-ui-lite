@@ -82,8 +82,6 @@ import CustomerInput from 'components/CustomerInput';
 import TextInput from 'components/TextInput';
 import {Button} from 'components/Button';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
-import {PropertyOwnerView} from 'models/propertyManager';
-import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import EmptyTable from 'components/Table/EmptyTable';
 import {
   useCompanyJobTypes,
@@ -94,7 +92,6 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import JobNotesDrawer from 'pages/ServiceOrderDetails/JobNotesDrawer';
 import TechnicianInput from 'components/TechnicianInput';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
-import {EmployeesView} from 'models/employee';
 
 import {Avatar} from 'components/Avatar';
 import ContractInput from 'components/ContractInput';
@@ -244,7 +241,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     useGetTechniciansByEmployeeId(selectedTechnicianId);
 
   // filter intermediate state
-  const {handleSubmit, getValues, setValue, watch, control} =
+  const {handleSubmit, setValue, watch, control} =
     useForm<ServiceOrderFilterForm>({
       defaultValues: {
         customer: selectedCustomer,
@@ -260,6 +257,9 @@ export const ServiceOrderList = ({menu}: Props) => {
     });
 
   const watchOrderTypes = watch('orderTypes');
+  const watchContract = watch('contract');
+  const watchCustomer = watch('customer');
+  const watchTechnician = watch('technician');
   const watchPaymentStatus = watch('paymentStatus');
   const watchHasComment = watch('hasComment');
   const watchGrossMin = watch('grossAmountMin');
@@ -870,27 +870,6 @@ export const ServiceOrderList = ({menu}: Props) => {
     [watchPaymentStatus],
   );
 
-  const handleCustomerSelect = useCallback(
-    (value?: string) => {
-      setValue('customer', value);
-    },
-    [setValue],
-  );
-
-  const handleOrderNumberChange = useCallback(
-    (value?: string) => {
-      setValue('orderNumber', value);
-    },
-    [setValue],
-  );
-
-  const handleTechnicianChange = useCallback(
-    (value?: EmployeesView) => {
-      setValue('technician', value);
-    },
-    [setValue],
-  );
-
   const handleGrossAmountMinChange = useCallback(
     (value?: string) => {
       const numberValue = Number(value);
@@ -907,21 +886,11 @@ export const ServiceOrderList = ({menu}: Props) => {
     [setValue],
   );
 
-  // load customers for filter option before opening, issues with async autocomplete value on first render
-  const {data: customers = createEmptyResource<PropertyOwnerView>(50)} =
-    useQueryCustomers(
-      {
-        pageIndex: 0,
-        pageSize: 50,
-        query: '',
-      },
-      {keepPreviousData: true},
-    );
-
   const handleFilterOpen = () => {
     setValue('customer', selectedCustomer);
     setValue('contract', selectedContract);
     setValue('orderNumber', selectedOrderNumber);
+    setValue('technician', selectedTechnician);
     setValue('orderTypes', selectedOrderTypes ?? []);
     setValue('paymentStatus', selectedPaymentStatus ?? []);
     setValue('grossAmountMin', grossAmountMin);
@@ -1078,15 +1047,16 @@ export const ServiceOrderList = ({menu}: Props) => {
                     size="small"
                     labelKey="Job number"
                     placeholder="Search job number"
-                    onChange={handleOrderNumberChange}
                   />
                 )}
               />
 
-              <CustomerInput
-                selectedValue={getValues('customer')}
-                customers={customers.data}
-                onChange={handleCustomerSelect}
+              <Controller
+                control={control}
+                name="customer"
+                render={({field}) => (
+                  <CustomerInput selectedValue={watchCustomer} {...field} />
+                )}
               />
 
               <Controller
@@ -1094,8 +1064,8 @@ export const ServiceOrderList = ({menu}: Props) => {
                 name="technician"
                 render={({field}) => (
                   <TechnicianInput
-                    selectedTechnician={field.value}
-                    onChange={handleTechnicianChange}
+                    selectedTechnician={watchTechnician}
+                    {...field}
                   />
                 )}
               />
@@ -1104,10 +1074,7 @@ export const ServiceOrderList = ({menu}: Props) => {
                 control={control}
                 name="contract"
                 render={({field}) => (
-                  <ContractInput
-                    selectedValue={field.value}
-                    onChange={field.onChange}
-                  />
+                  <ContractInput selectedValue={watchContract} {...field} />
                 )}
               />
 
