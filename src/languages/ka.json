@@ -2651,7 +2651,7 @@
   "The email was successfully delivered to {{receiverEmail}}": "ელ.ფოსტა {{receiverEmail}} -სთან წარმატებით გაიგზავნა",
   "Quotation marked as rejected": "შეთავაზება მონიშნულია უარყოფილად",
   "Quotation marked as accepted": "შეთავაზება მონიშნულია მიღებულად",
-  "Click to apply your block": "დაკლიკეთ ბლოკის ასარჩევად",
+  "Click to apply your block": "დააჭირეთ ბლოკის დასამატებლად",
   "Find your text block": "იპოვეთ თქვენი ტექსტ ბლოკი",
   "Create and customize your own block to be used later": "შემენით თქვენი საკუთარი ბლოკი სამომავლო გამოყენებისთვის",
   "Service Order Report": "სერვის შეკვეთის მოხსენება",
@@ -2744,5 +2744,12 @@
   "Bulleted list": "ბურთულებიანი სია",
   "Numbered list": "დანომრილი სია",
   "Attachment": "დანართი",
+  "Reset All": "ყველას გაუქმება",
+  "Show {{number}} Results": "{{number}} შედეგის ჩვენება",
+  "Save changes": "ცვლილებების შენახვა",
+  "DATEV with PDFs": "DATEV PDFs-ით",
+  "Excel with PDFs": "Excel PDFs-ით",
+  "Every 4 months": "ყოველ 4 თვეში",
+  "Gross amount": "მთლიანი თანხა",
   "CREDIT_NOTE": "კრედიტ ნოტა"
 }
