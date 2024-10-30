@@ -23,9 +23,11 @@ const TechnicianInput = ({selectedTechnician, onChange}: Props) => {
       <Typography variant="subtitle2">{capitalize(t('Engineer'))}</Typography>
       <TechnicianAutoComplete
         getTechnician={handleChange}
+        selectedTechnician={selectedTechnician}
         size="small"
         initialValue={selectedTechnician}
         required={false}
+        enableReset
         textFieldProps={{
           label: t('Select engineer'),
         }}

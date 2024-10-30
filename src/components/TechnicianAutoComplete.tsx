@@ -18,23 +18,27 @@ import {FormInput} from './form/FormInput';
 
 interface Props {
   getTechnician?: (val: EmployeesView | EmployeesSimpleView | null) => void;
+  selectedTechnician?: EmployeesView | EmployeesSimpleView;
   getQuery?: (val: string) => void;
   initialValue?: EmployeesView | EmployeesSimpleView | null;
   textFieldProps?: TextFieldProps;
   disabled?: boolean;
   required?: boolean;
+  enableReset?: boolean;
   renderInput?: (params: AutocompleteRenderInputParams) => ReactElement;
   size?: 'small' | 'medium';
 }
 
 export const TechnicianAutoComplete = ({
   getTechnician,
+  selectedTechnician,
   getQuery = () => {},
   initialValue = null,
   textFieldProps,
   disabled,
   required = true,
   size = 'small',
+  enableReset = false,
   renderInput,
 }: Props) => {
   const theme = useTheme();
@@ -67,6 +71,7 @@ export const TechnicianAutoComplete = ({
     newValue: string,
     reason: string,
   ) => {
+    if (reason === 'reset') return;
     setQueryView(newValue);
     debouncedChangeHandler(newValue);
     if (reason === 'clear') {
@@ -98,6 +103,14 @@ export const TechnicianAutoComplete = ({
   ) => {
     setTechnician(newValue);
   };
+
+  // handle reset
+  useEffect(() => {
+    if (!enableReset) return;
+    if (!selectedTechnician) {
+      setQueryView('');
+    }
+  }, [selectedTechnician, enableReset, setQueryView]);
 
   return (
     <Autocomplete
