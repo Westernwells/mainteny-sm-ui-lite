@@ -20,20 +20,19 @@ const ContractInput = ({selectedValue, onChange}: Props) => {
 
   const [query, setQuery] = useState<string>('');
   const [queryView, setQueryView] = useState('');
+  const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
-  const {
-    data: contractResource = createEmptyResource<ContractView>(50),
-    isFetched,
-  } = useQueryContract(
-    {
-      pageIndex: 0,
-      pageSize: 3,
-      query,
-      order: Order.DESC,
-      orderBy: ContractOrderField.CREATED_TIME,
-    },
-    {keepPreviousData: true},
-  );
+  const {data: contractResource = createEmptyResource<ContractView>(50)} =
+    useQueryContract(
+      {
+        pageIndex: 0,
+        pageSize: 3,
+        query,
+        order: Order.DESC,
+        orderBy: ContractOrderField.CREATED_TIME,
+      },
+      {keepPreviousData: true},
+    );
 
   const contractOptions: Option[] = useMemo(
     () =>
@@ -71,13 +70,14 @@ const ContractInput = ({selectedValue, onChange}: Props) => {
 
   // set value on load
   useEffect(() => {
-    if (!isFetched) return;
+    if (!initialLoad) return;
 
     const foundContractId =
       contractOptions.find((contract) => contract.value === selectedValue)
         ?.label || '';
     setQueryView(foundContractId);
-  }, [selectedValue, contractOptions, isFetched]);
+    setInitialLoad(false);
+  }, [selectedValue, contractOptions, initialLoad]);
 
   // handle reset
   useEffect(() => {
