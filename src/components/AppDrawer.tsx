@@ -225,7 +225,7 @@ export const AppDrawer = ({open, setOpen}: Props) => {
     },
     {
       text: 'Jobs',
-      icon: <JobsIcon fontSize="1.5rem" />,
+      icon: <JobsIcon fontSize="1.5rem" style={{color: '#F5FDFE'}} />,
       selectIcon: <JobsIconColor fontSize="1.5rem" />,
       path: '/orders',
       access: !isAdmin,

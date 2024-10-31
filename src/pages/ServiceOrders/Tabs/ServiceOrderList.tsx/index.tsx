@@ -1,16 +1,21 @@
 import Box from '@mui/material/Box';
+import {reduce} from 'lodash';
 import {
   ServiceOrderFilterForm,
+  ServiceOrderFilterToStatusMap,
   ServiceOrderOrderField,
   ServiceOrderPaymentStatus,
   ServiceOrderPaymentWithIndicationStatus,
-  ServiceOrderStatus,
+  ServiceOrderQueryParams,
+  ServiceOrderStatusFilter,
+  ServiceOrderStatusToFilter,
   ServiceOrderTableRow,
   ServiceOrderType,
   ServiceOrderView,
 } from 'models/service-order';
-import React, {
-  ChangeEvent,
+import {
+  ReactElement,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -26,6 +31,7 @@ import {
 import {
   useServiceOrderComments,
   useServiceOrders,
+  useServiceOrdersStatistics,
 } from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
 import {useNavigate} from 'react-router-dom';
@@ -54,7 +60,7 @@ import {
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {Checkbox, FormControlLabel, TableBody, Typography} from '@mui/material';
+import {Checkbox, TableBody, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {olStyles} from 'styles';
 import {StatusChip} from 'components/StatusChip';
@@ -72,22 +78,26 @@ import ChipSelector from 'components/ChipSelector';
 import CustomerInput from 'components/CustomerInput';
 import TextInput from 'components/TextInput';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
-import {PropertyOwnerView} from 'models/propertyManager';
-import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
+import EmptyTable from 'components/Table/EmptyTable';
+import JobNotesDrawer from 'pages/ServiceOrderDetails/JobNotesDrawer';
+import TechnicianInput from 'components/TechnicianInput';
+import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
+
+import {Avatar} from 'components/Avatar';
+import ContractInput from 'components/ContractInput';
 import Actions from './Actions';
 
+const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
+  {value: ServiceOrderStatusFilter.PENDING, labelKey: 'Pending'},
+  {value: ServiceOrderStatusFilter.OVERDUE, labelKey: 'Overdue'},
+  {value: ServiceOrderStatusFilter.ONGOING, labelKey: 'Ongoing'},
+  {value: ServiceOrderStatusFilter.COMPLETED, labelKey: 'Completed'},
+  {value: ServiceOrderStatusFilter.CANCELLED, labelKey: 'Cancelled'},
+];
+
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
-  {value: ServiceOrderStatus.ALL, labelKey: 'All'},
-  // {value: ServiceOrderStatus.SCHEDULING, labelKey: 'SCHEDULING'}, // disabled for now
-  {value: ServiceOrderStatus.SCHEDULED, labelKey: 'Scheduled'},
-  {value: ServiceOrderStatus.READY_TO_SCHEDULE, labelKey: 'Unscheduled'},
-  {value: ServiceOrderStatus.CANCELLED, labelKey: 'Cancelled'},
-  {value: ServiceOrderStatus.OVERDUE, labelKey: 'Overdue'},
-  {value: ServiceOrderStatus.TECHNICIAN_ASSIGNED, labelKey: 'Assigned'},
-  {value: ServiceOrderStatus.PAUSED, labelKey: 'Paused'},
-  {value: ServiceOrderStatus.TRAVEL, labelKey: 'Travel'},
-  {value: ServiceOrderStatus.COMPLETED, labelKey: 'Completed'},
-  // {value: ServiceOrderStatus.ARTICLES_ORDERED, labelKey: 'Articles Ordered'}, // disabled for now
+  {value: ServiceOrderStatusFilter.ALL, labelKey: 'All'},
+  ...QUICK_FILTER_OPTIONS_WITHOUT_ALL,
 ];
 
 const TYPE_OPTIONS: OptionWithTranslationKey[] = [
@@ -155,14 +165,24 @@ export const ServiceOrderList = ({menu}: Props) => {
     string | undefined
   >('selectedOrderNumber', {defaultValue: undefined});
   const [selectedOrderStatus, setSelectedOrderStatus] = useQueryState<
-    ServiceOrderStatus[]
-  >('selectedOrderStatus', {defaultValue: []});
+    ServiceOrderStatusFilter[]
+  >('selectedOrderStatusFilter', {
+    defaultValue: [],
+  });
   const [selectedOrderTypes, setSelectedOrderTypes] = useQueryState<
     ServiceOrderType[]
   >('selectedOrderTypes', {defaultValue: []});
   const [selectedCustomer, setSelectedCustomer] = useQueryState<
     string | undefined
   >('selectedCustomer', {defaultValue: undefined});
+
+  const [selectedContract, setSelectedContract] = useQueryState<
+    string | undefined
+  >('selectedContract', {defaultValue: undefined});
+
+  const [selectedTechnicianId, setSelectedTechnicianId] = useQueryState<
+    string | undefined
+  >('selectedTechnicianId', {defaultValue: undefined});
   const [grossAmountMin, setGrossAmountMin] = useQueryState<number | undefined>(
     'grossAmountMin',
     {
@@ -188,16 +208,28 @@ export const ServiceOrderList = ({menu}: Props) => {
     string | undefined
   >();
 
+  const [selectedServiceOrder, setSelectedServiceOrder] =
+    useState<ServiceOrderView>();
+
+  const [showLeftShadow, setShowLeftShadow] = useState(false);
+  const [showRightShadow, setShowRightShadow] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const {
     values: {sortOrder, orderByField},
     updateValues,
   } = useSearchValues<OrderByParams<ServiceOrderOrderField>>();
 
+  const {data: selectedTechnician} =
+    useGetTechniciansByEmployeeId(selectedTechnicianId);
+
   // filter intermediate state
-  const {handleSubmit, getValues, setValue, watch, control} =
+  const {handleSubmit, setValue, watch, control} =
     useForm<ServiceOrderFilterForm>({
       defaultValues: {
         customer: selectedCustomer,
+        technician: selectedTechnician,
         orderNumber: selectedOrderNumber,
         orderTypes: selectedOrderTypes ?? [],
         paymentStatus: selectedPaymentStatus ?? [],
@@ -209,42 +241,68 @@ export const ServiceOrderList = ({menu}: Props) => {
     });
 
   const watchOrderTypes = watch('orderTypes');
+  const watchContract = watch('contract');
+  const watchCustomer = watch('customer');
+  const watchTechnician = watch('technician');
   const watchPaymentStatus = watch('paymentStatus');
   const watchHasComment = watch('hasComment');
   const watchGrossMin = watch('grossAmountMin');
   const watchGrossMax = watch('grossAmountMax');
+
+  const filters: ServiceOrderQueryParams = {
+    end: endOfDay(currentDate).toISOString(),
+    start: startOfDay(subDays(currentDate, 30)).toISOString(),
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    query: createSearchQuery({
+      search: searchQuery,
+      orderNumber: selectedOrderNumber,
+    }),
+    status: selectedOrderStatus.includes(ServiceOrderStatusFilter.ALL)
+      ? []
+      : selectedOrderStatus
+          .flatMap((status) => ServiceOrderFilterToStatusMap.get(status))
+          .filter((status) => !!status),
+    types: selectedOrderTypes,
+    paymentStatus: selectedPaymentStatus,
+    orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
+    order: sortOrder || Order.DESC,
+    ...(grossAmountMin &&
+      grossAmountMin > 0 && {grossAmountFrom: grossAmountMin}),
+    ...(grossAmountMax &&
+      grossAmountMax > 0 && {grossAmountTo: grossAmountMax}),
+    ...(isWithNote === 'true' && {hasComments: true}),
+    ...(selectedCustomer && {propertyOwnerId: selectedCustomer}),
+    ...(selectedTechnicianId && {technicians: [selectedTechnicianId]}),
+    ...(selectedContract && {contractIds: [selectedContract]}),
+  };
 
   const {
     data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(10),
     isLoading,
     isFetched,
     isIdle,
-  } = useServiceOrders(
-    {
-      end: endOfDay(currentDate).toISOString(),
-      start: startOfDay(subDays(currentDate, 30)).toISOString(),
-      pageIndex: page.pageIndex,
-      pageSize: page.pageSize,
-      query: createSearchQuery({
-        search: searchQuery,
-        orderNumber: selectedOrderNumber,
-      }),
-      status: !selectedOrderStatus.includes(ServiceOrderStatus.ALL)
-        ? selectedOrderStatus
-        : [],
-      types: selectedOrderTypes,
-      paymentStatus: selectedPaymentStatus,
-      orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
-      order: sortOrder || Order.DESC,
-      ...(grossAmountMin &&
-        grossAmountMin > 0 && {grossAmountFrom: grossAmountMin}),
-      ...(grossAmountMax &&
-        grossAmountMax > 0 && {grossAmountTo: grossAmountMax}),
-      ...(isWithNote === 'true' && {hasComments: true}),
-      ...(selectedCustomer && {propertyOwnerId: selectedCustomer}),
-    },
-    {keepPreviousData: true},
-  );
+  } = useServiceOrders(filters, {keepPreviousData: true});
+
+  const {data: serviceOrdersStatistics} = useServiceOrdersStatistics(filters, {
+    keepPreviousData: true,
+  });
+
+  const aggregatedServiceOrderStatistics = useMemo(() => {
+    if (!serviceOrdersStatistics) return undefined;
+
+    return reduce(
+      serviceOrdersStatistics.numOfServiceOrdersPerStatus,
+      (acc: Record<string, number>, amount, status) => {
+        const mappedStatus = ServiceOrderStatusToFilter[status] ?? status;
+        acc[mappedStatus] = (acc[mappedStatus] ?? 0) + amount;
+        acc[ServiceOrderStatusFilter.ALL] =
+          (acc[ServiceOrderStatusFilter.ALL] ?? 0) + amount;
+        return acc;
+      },
+      {},
+    );
+  }, [serviceOrdersStatistics]);
 
   const {data: notes} = useServiceOrderComments(
     hoverNoteServiceId ?? '',
@@ -305,10 +363,12 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const handlePageIndexChange = (value: number) => {
     setPage({...page, pageIndex: value});
+    containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
   };
 
   const handleChangeElementsPerPage = (value: number) => {
     setPage({...page, pageSize: value, pageIndex: 0});
+    containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
   };
 
   const handleNoteHover = (serviceOrderId: string) => () => {
@@ -321,6 +381,8 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const handleFilterApply: SubmitHandler<ServiceOrderFilterForm> = (data) => {
     setSelectedCustomer(data.customer);
+    setSelectedContract(data.contract);
+    setSelectedTechnicianId(data.technician?.id);
     setSelectedOrderNumber(data.orderNumber);
     setSelectedOrderTypes(data.orderTypes);
     setSelectedPaymentStatus(data.paymentStatus);
@@ -329,11 +391,15 @@ export const ServiceOrderList = ({menu}: Props) => {
     setIsWithNote(data.hasComment ? 'true' : undefined);
   };
 
-  const getAppliedFilter = useMemo(
+  const appliedFilterNumber = useMemo(
     () =>
-      [selectedCustomer, selectedOrderNumber, isWithNote].filter(
-        (field) => !!field,
-      ).length +
+      [
+        selectedCustomer,
+        selectedContract,
+        selectedTechnician,
+        selectedOrderNumber,
+        isWithNote,
+      ].filter((field) => !!field).length +
       [grossAmountMin, grossAmountMax].filter((field) => !!field && field > 0)
         .length +
       [selectedPaymentStatus, selectedOrderTypes].filter(
@@ -344,11 +410,37 @@ export const ServiceOrderList = ({menu}: Props) => {
       selectedOrderNumber,
       selectedPaymentStatus,
       selectedCustomer,
+      selectedContract,
+      selectedTechnician,
       grossAmountMin,
       grossAmountMax,
       isWithNote,
     ],
   );
+
+  const {emptyTable, noMatchingData} = useMemo(() => {
+    if (!isFetched) return {emptyTable: false, noMatchingData: false};
+
+    if (
+      (appliedFilterNumber > 0 ||
+        selectedOrderStatus.length > 0 ||
+        !!searchQuery) &&
+      serviceOrdersResource.total === 0
+    ) {
+      return {emptyTable: false, noMatchingData: true};
+    }
+
+    // when the user does not have filters applied and there are no entries for the table
+    if (serviceOrdersResource.total === 0) {
+      return {emptyTable: true, noMatchingData: false};
+    }
+
+    return {emptyTable: false, noMatchingData: false};
+  }, [isFetched, serviceOrdersResource]);
+
+  const handleCustomerCellClick = (id: string) => () => {
+    navigate(`/customers/details/${id}?tab=0`);
+  };
 
   const COLUMNS = useMemo<TableColumnWithRender<ServiceOrderTableRow>[]>(
     () => [
@@ -358,6 +450,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         fieldName: ServiceOrderOrderField.EXTERNAL_ID,
         width: '124px',
         isFirst: true, // remove when checkbox are present with bulk action
+        showShadows: showRightShadow ? 'right' : undefined,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
             <TableCellText>{serviceOrder.number}</TableCellText>
@@ -387,7 +480,35 @@ export const ServiceOrderList = ({menu}: Props) => {
         fieldName: ServiceOrderOrderField.ELEVATOR_ADDRESS,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>{serviceOrder.address}</TableCellText>
+            <TableCellText>
+              <Tooltip
+                title={
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                    gap={theme.spacing(0.5)}>
+                    <Typography
+                      sx={{
+                        lineHeight: '14px',
+                        fontSize: '10px',
+                      }}>
+                      {serviceOrder.fullAddress
+                        ? serviceOrder.fullAddress
+                        : '-'}
+                    </Typography>
+                  </Box>
+                }
+                placement="top"
+                arrow>
+                {
+                  (serviceOrder.address
+                    ? serviceOrder.address
+                    : '-') as unknown as ReactElement<ReactNode>
+                }
+              </Tooltip>
+            </TableCellText>
           </Cell>
         ),
       },
@@ -436,8 +557,18 @@ export const ServiceOrderList = ({menu}: Props) => {
         width: '132px',
         fieldName: ServiceOrderOrderField.PROPERTY_OWNER_NAME,
         renderCell: (serviceOrder, cellProps) => (
-          <Cell {...cellProps}>
-            <TableCellText>{serviceOrder.propertyOwner.name}</TableCellText>
+          <Cell
+            {...cellProps}
+            onClick={handleCustomerCellClick(serviceOrder.propertyOwner.id)}>
+            <TableCellText>
+              <Avatar
+                labelStyles={{
+                  color: theme.palette.primary.light,
+                }}
+                key={`company-avatar-${serviceOrder.id}`}
+                userAccount={{firstName: serviceOrder.propertyOwner.name}}
+              />
+            </TableCellText>
           </Cell>
         ),
       },
@@ -505,11 +636,17 @@ export const ServiceOrderList = ({menu}: Props) => {
       },
       {
         headerName: 'NOTES',
-        cellKey: 'service-order-cell-notes',
+        key: 'service-order-cell-notes',
         width: '48px',
         align: 'center',
         renderCell: (serviceOrder, cellProps) => (
-          <Cell {...cellProps} fieldName="NOTES" noWidthLimit>
+          <Cell
+            {...cellProps}
+            fieldName="NOTES"
+            noWidthLimit
+            onClick={() =>
+              setSelectedServiceOrder(serviceOrder.serviceOrderData)
+            }>
             <TableCellText>
               {serviceOrder.hasNotes ? (
                 <Tooltip
@@ -554,18 +691,20 @@ export const ServiceOrderList = ({menu}: Props) => {
       },
       {
         headerName: 'action',
+        key: 'service-order-cell-action',
         isHeaderNameHidden: true,
         align: 'center',
         width: ACTION_CELL_WIDTH, // set static width that will not change
         isLast: true,
+        showShadows: showLeftShadow ? 'left' : undefined,
         renderCell: (serviceOrder, cellProps) => (
-          <Cell isLast {...cellProps} onClick={undefined}>
+          <Cell {...cellProps} onClick={undefined}>
             <Actions id={serviceOrder.id} />
           </Cell>
         ),
       },
     ],
-    [fetchedNote],
+    [fetchedNote, showLeftShadow, showRightShadow],
   );
 
   const handleSortField = (fieldName: string) => {
@@ -582,13 +721,40 @@ export const ServiceOrderList = ({menu}: Props) => {
     navigate(`/orders/details/${id}`);
   };
 
-  const handleQuickFilterChange = (value: string | null) => {
-    if (value === null) {
-      setSelectedOrderStatus([]);
+  const handleQuickFilterChange = (value: string) => {
+    // when selecting ALL values remove all other selections
+    if (value === 'ALL') {
+      setSelectedOrderStatus([ServiceOrderStatusFilter.ALL]);
       return;
     }
-    setSelectedOrderStatus([value as ServiceOrderStatus]);
+
+    const newValues = selectedOrderStatus.some((option) => option === value)
+      ? selectedOrderStatus.filter((option) => option !== value)
+      : [...selectedOrderStatus, value];
+
+    // remove the ALL status if any other status is selected
+    if (newValues.length > 1 && newValues.includes('ALL')) {
+      setSelectedOrderStatus(
+        newValues.filter(
+          (selectedValues) => selectedValues !== 'ALL',
+        ) as ServiceOrderStatusFilter[],
+      );
+      return;
+    }
+
+    const areAllValuesSelectedIndividually =
+      QUICK_FILTER_OPTIONS_WITHOUT_ALL.every((option) =>
+        newValues.some((selectedValue) => option.value === selectedValue),
+      );
+
+    setSelectedOrderStatus(
+      areAllValuesSelectedIndividually
+        ? [ServiceOrderStatusFilter.ALL]
+        : (newValues as ServiceOrderStatusFilter[]),
+    );
   };
+
+  const handleCloseSideDrawer = () => setSelectedServiceOrder(undefined);
 
   const handleSelectedOrderTypesChange = useCallback(
     (value: string) => {
@@ -621,27 +787,6 @@ export const ServiceOrderList = ({menu}: Props) => {
     [watchPaymentStatus],
   );
 
-  const handleWithNoteToggle = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      setValue('hasComment', event.target.checked);
-    },
-    [setValue, watchHasComment],
-  );
-
-  const handleCustomerSelect = useCallback(
-    (value?: string) => {
-      setValue('customer', value);
-    },
-    [setValue],
-  );
-
-  const handleOrderNumberChange = useCallback(
-    (value?: string) => {
-      setValue('orderNumber', value);
-    },
-    [setValue],
-  );
-
   const handleGrossAmountMinChange = useCallback(
     (value?: string) => {
       const numberValue = Number(value);
@@ -658,20 +803,11 @@ export const ServiceOrderList = ({menu}: Props) => {
     [setValue],
   );
 
-  // load customers for filter option before opening, issues with async autocomplete value on first render
-  const {data: customers = createEmptyResource<PropertyOwnerView>(50)} =
-    useQueryCustomers(
-      {
-        pageIndex: 0,
-        pageSize: 50,
-        query: '',
-      },
-      {keepPreviousData: true},
-    );
-
   const handleFilterOpen = () => {
     setValue('customer', selectedCustomer);
+    setValue('contract', selectedContract);
     setValue('orderNumber', selectedOrderNumber);
+    setValue('technician', selectedTechnician);
     setValue('orderTypes', selectedOrderTypes ?? []);
     setValue('paymentStatus', selectedPaymentStatus ?? []);
     setValue('grossAmountMin', grossAmountMin);
@@ -681,6 +817,8 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const handleFilterReset = () => {
     setValue('customer', undefined);
+    setValue('contract', undefined);
+    setValue('technician', undefined);
     setValue('orderNumber', '');
     setValue('orderTypes', []);
     setValue('paymentStatus', []);
@@ -689,13 +827,41 @@ export const ServiceOrderList = ({menu}: Props) => {
     setValue('hasComment', undefined);
   };
 
-  const chipNumber = useMemo(() => {
-    if (selectedOrderStatus.length === 0) return undefined;
-    if (!isLoading && isFetched) return serviceOrdersResource.total;
-  }, [isLoading, isFetched, serviceOrdersResource, selectedOrderStatus]);
+  useEffect(() => {
+    setValue('technician', selectedTechnician);
+  }, [selectedTechnician]);
 
   if (isIdle || isLoading) {
     return <Progress />;
+  }
+
+  if (emptyTable) {
+    return (
+      <EmptyTable
+        illustration="jobs"
+        label="No jobs"
+        subLabel="Create a new job to start working and tracking its progress"
+        btnLabel="New Job"
+        actionButton={
+          <MenuBtn
+            startIcon={<AddIcon />}
+            label="New Job"
+            menu={menu}
+            size="medium"
+            color="primary"
+            sx={{
+              textTransform: 'inherit',
+              ml: '0.8em',
+              py: '0.7em',
+              height: '40px',
+            }}
+            variant="contained"
+            disableRipple
+            disableFocusRipple
+          />
+        }
+      />
+    );
   }
 
   return (
@@ -723,30 +889,11 @@ export const ServiceOrderList = ({menu}: Props) => {
             onChange={(val: string) => setSearchQuery(val)}
           />
           <Filters
-            activeFilters={getAppliedFilter}
+            activeFilters={appliedFilterNumber}
             onOpen={handleFilterOpen}
             onSave={handleSubmit(handleFilterApply)}
             onReset={handleFilterReset}>
             <Box sx={{display: 'flex', flexDirection: 'column'}} gap={2}>
-              <CustomerInput
-                selectedValue={getValues('customer')}
-                customers={customers.data}
-                onChange={handleCustomerSelect}
-              />
-
-              <Controller
-                control={control}
-                name="orderNumber"
-                render={({field}) => (
-                  <TextInput
-                    {...field}
-                    labelKey="Order number"
-                    placeholder="Select order number"
-                    onChange={handleOrderNumberChange}
-                  />
-                )}
-              />
-
               <ChipSelector
                 headerLabel="SERVICE TYPE"
                 options={TYPE_OPTIONS}
@@ -761,8 +908,50 @@ export const ServiceOrderList = ({menu}: Props) => {
                 onChange={handleSelectedPaymentStatusChange}
               />
 
+              <Controller
+                control={control}
+                name="orderNumber"
+                render={({field}) => (
+                  <TextInput
+                    {...field}
+                    size="small"
+                    labelKey="Job number"
+                    placeholder="Search job number"
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="customer"
+                render={({field}) => (
+                  <CustomerInput selectedValue={watchCustomer} {...field} />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="technician"
+                render={({field}) => (
+                  <TechnicianInput
+                    selectedTechnician={watchTechnician}
+                    {...field}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="contract"
+                render={({field}) => (
+                  <ContractInput selectedValue={watchContract} {...field} />
+                )}
+              />
+
               <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
-                <Typography variant="subtitle2">{t('Gross amount')}</Typography>
+                <Typography variant="subtitle2">
+                  {t('Job Gross Sum')}
+                </Typography>
 
                 <Box sx={{display: 'flex'}} gap={1}>
                   <Controller
@@ -772,6 +961,7 @@ export const ServiceOrderList = ({menu}: Props) => {
                       <TextInput
                         value={watchGrossMin ? `${watchGrossMin}` : ''}
                         placeholder="Min"
+                        size="small"
                         styles={{
                           '& .MuiInputBase-input': {
                             textAlign: 'end',
@@ -789,6 +979,7 @@ export const ServiceOrderList = ({menu}: Props) => {
                       <TextInput
                         value={watchGrossMax ? `${watchGrossMax}` : ''}
                         placeholder="Max"
+                        size="small"
                         styles={{
                           '& .MuiInputBase-input': {
                             textAlign: 'end',
@@ -800,16 +991,25 @@ export const ServiceOrderList = ({menu}: Props) => {
                   />
                 </Box>
               </Box>
-              <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
-                <Typography variant="subtitle2">{t('Notes')}</Typography>
-                <FormControlLabel
-                  label={t('Invoices with a note')}
-                  control={
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+                gap={1}>
+                <Typography variant="subtitle2">
+                  {t('Job(s) with notes')}
+                </Typography>
+                <Controller
+                  control={control}
+                  name="hasComment"
+                  render={({field}) => (
                     <Checkbox
                       checked={watchHasComment}
-                      onChange={handleWithNoteToggle}
+                      onChange={field.onChange}
                     />
-                  }
+                  )}
                 />
               </Box>
             </Box>
@@ -836,19 +1036,23 @@ export const ServiceOrderList = ({menu}: Props) => {
 
       <Box>
         <QuickFilter
-          selected={selectedOrderStatus[0] ?? null}
+          selected={selectedOrderStatus ?? null}
           options={QUICK_FILTER_OPTIONS}
-          chipNumber={chipNumber}
+          statistics={aggregatedServiceOrderStatistics}
           onChange={handleQuickFilterChange}
         />
       </Box>
-
-      <TableContainer>
+      <TableContainer
+        showNoMatchWarning={noMatchingData}
+        containerRef={containerRef}
+        setShowLeftShadow={setShowLeftShadow}
+        setShowRightShadow={setShowRightShadow}>
         <TableHeader
           columns={COLUMNS}
           sortState={{columnName: orderByField, order: sortOrder}}
           onSort={handleSortField}
         />
+
         <TableBody>
           {/* Row */}
           {rows.map((entry) => (
@@ -874,6 +1078,14 @@ export const ServiceOrderList = ({menu}: Props) => {
         onChange={handlePageIndexChange}
         onNumberPerPageChange={handleChangeElementsPerPage}
       />
+
+      {selectedServiceOrder && (
+        <JobNotesDrawer
+          open
+          setOpen={handleCloseSideDrawer}
+          serviceOrder={selectedServiceOrder}
+        />
+      )}
     </Box>
   );
 };

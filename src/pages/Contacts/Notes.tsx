@@ -31,7 +31,7 @@ interface NotesDrawerProps {
   contactPersonId: string;
   shouldGoBack?: boolean;
 }
-const NotesDrawer = ({
+export const NotesDrawer = ({
   showSideDrawer,
   setShowSideDrawer,
   contactPersonId,

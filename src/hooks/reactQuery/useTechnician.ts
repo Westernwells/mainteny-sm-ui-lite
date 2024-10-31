@@ -1,5 +1,9 @@
 import {endOfDay, startOfDay} from 'date-fns';
-import {EmployeesView} from 'models/employee';
+import {
+  EmployeesSimpleView,
+  EmployeesView,
+  QueryServiceCompanyEmployeeStatusParams,
+} from 'models/employee';
 import {Resource, RestError} from 'models/misc';
 import {
   QueryTechniciansParams,
@@ -9,7 +13,6 @@ import {
   TechniciansEventsParams,
   TechnicianView,
 } from 'models/technician';
-import {Role, UserAccountView} from 'models/user';
 import {useQuery, UseQueryOptions} from 'react-query';
 import {queryKeys as qks} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -29,41 +32,32 @@ export const fetchTechnicianEvents = async (technicianId: string) => {
   return response.data;
 };
 
-export const fetchTechnicians = async (usernames: string[]) => {
-  const response = await axiosClient.get<TechnicianView[]>(
-    `/api/users/technicians`,
+export const fetchTechnicians = async (
+  serviceCompanyId: string,
+  params: Omit<QueryServiceCompanyEmployeeStatusParams, 'date'>,
+) => {
+  const response = await axiosClient.get<Resource<EmployeesSimpleView>>(
+    `/api/serviceCompanies/${serviceCompanyId}/employees`,
     {
-      params: {username: usernames},
+      params: {
+        ...params,
+      },
       paramsSerializer,
     },
   );
   return response.data;
 };
 
-export const useFetchTechnicians = (usernames: string[]) =>
-  useQuery(
-    [qks.fetchTechnicians, usernames],
-    () => fetchTechnicians(usernames!),
-    {
-      enabled: !!usernames && !!usernames.length,
-    },
-  );
-
-export const useFetchTechniciansByUserAccounts = (
-  users: UserAccountView[],
-  options?: UseQueryOptions<TechnicianView[], RestError, TechnicianView[]>,
+export const useFetchTechnicians = (
+  params: Omit<QueryServiceCompanyEmployeeStatusParams, 'date'>,
+  options?: any,
 ) => {
-  const usernames = users
-    .map((user) =>
-      user.roles.includes(Role.TECHNICIAN) ? user.username : null,
-    )
-    .filter((x): x is string => !!x);
-
-  return useQuery<TechnicianView[], RestError, TechnicianView[]>(
-    [qks.fetchTechnicians, usernames],
-    () => fetchTechnicians(usernames!),
+  const {user} = useUserSession();
+  return useQuery(
+    [qks.fetchTechnicians, params],
+    () => fetchTechnicians(user!.userAccount.serviceCompany.id, params),
     {
-      enabled: !!usernames.length,
+      enabled: !!user,
       ...options,
     },
   );
@@ -151,6 +145,22 @@ export const useQueryServiceCompanyTechnicians = (
     },
   );
 };
+
+export const getTechnicianByEmployeeId = async (employeeId: string) => {
+  const response = await axiosClient.get<EmployeesView>(
+    `/api/technicians/${employeeId}/`,
+  );
+  return response.data;
+};
+
+export const useGetTechniciansByEmployeeId = (employeeId?: string) =>
+  useQuery<EmployeesView>(
+    [qks.queryServiceCompanyTechnicians, employeeId],
+    () => getTechnicianByEmployeeId(employeeId!),
+    {
+      enabled: !!employeeId,
+    },
+  );
 
 export const fetchDispatchRecommendedTechnician = async (
   params: RecommendTechnicianPayload,
