@@ -90,10 +90,14 @@ variables:
       \"icon_emoji\": \":rocket:\"
        }" $SLACK_WEBHOOK_URL
     - |
-      if [ "$ENV" = "prod" ]; then
+      if [ "$STACK" = "prod" ]; then
         URL="$REACT_APP_API_URL_PROD"
         APIKEY="$VERSIONS_API_KEY_PROD"
         TYPE="WEB_PROD"
+      elif [ "$STACK" = "release" ]; then
+        URL="$REACT_APP_API_URL_STAGE"
+        APIKEY="$VERSIONS_API_KEY_STAGE"
+        TYPE="WEB_RELEASE"
       else
         URL="$REACT_APP_API_URL_STAGE"
         APIKEY="$VERSIONS_API_KEY_STAGE"
