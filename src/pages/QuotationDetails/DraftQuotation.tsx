@@ -822,7 +822,7 @@ export const DraftQuotation = ({
       );
       formik.setFieldValue(
         'sentDate',
-        quotation.additionalInfo.sentDate
+        quotation.additionalInfo.sentDate && formType === 'edit'
           ? new Date(quotation.additionalInfo.sentDate)
           : new Date(),
       );
