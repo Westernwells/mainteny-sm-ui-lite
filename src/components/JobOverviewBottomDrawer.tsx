@@ -256,6 +256,7 @@ export const JobOverviewBottomDrawer = ({
 
       <ScheduleDialog
         serviceOrderId={serviceOrderDetails.id}
+        serviceOrderType={serviceOrderDetails.type}
         title={renderDialogTitle()}
         open={openDialog}
         onClose={() => setOpenDialog(false)}

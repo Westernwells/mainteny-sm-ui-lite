@@ -239,7 +239,7 @@ export const AddAnything = () => {
         ...prevMenu.slice(1),
       ]);
     }
-  }, [jobTypes, loading, navigate]);
+  }, [jobTypes, loading]);
 
   return (
     <MenuBtn

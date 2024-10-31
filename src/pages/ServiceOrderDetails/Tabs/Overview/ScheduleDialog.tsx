@@ -12,14 +12,13 @@ import Checkbox from '@mui/material/Checkbox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import * as _ from 'lodash';
-import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician';
 import {useUpdateServiceOrderSchedule} from 'hooks/reactQuery/useServiceOrder';
 import {createEmptyResource} from 'utils/paging';
 import {Switch} from 'components/Switch';
 import Box from '@mui/material/Box';
 import {TimePicker} from 'components/TimePicker';
 import {Button} from 'components/Button';
-import {EmployeesView} from 'models/employee';
+import {EmployeesSimpleView} from 'models/employee';
 import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
 import {
@@ -31,6 +30,7 @@ import {
 import {useForm} from 'react-hook-form';
 import {queryKeys} from 'reactQuery/constants';
 import {useQueryClient} from 'react-query';
+import {useQueryServiceCompanyEmployees} from 'hooks/reactQuery/useEmployee';
 import {DatePicker} from '../../../../components/DatePicker';
 import {FormInput} from '../../../../components/form/FormInput';
 import {ScheduleForm} from '../../models';
@@ -44,10 +44,11 @@ interface FormData extends ScheduleForm {
 
 interface Props {
   serviceOrderId: string;
+  serviceOrderType?: string;
   open?: boolean;
   onClose: () => void;
   title?: string;
-  defaultTechnicians?: EmployeesView[] | null;
+  defaultTechnicians?: EmployeesSimpleView[] | null;
   defaultStartDate?: Date | null;
   defaultEndDate?: Date | null;
   defaultDueDate?: Date | null;
@@ -60,6 +61,7 @@ interface Props {
 
 export const ScheduleDialog = ({
   serviceOrderId,
+  serviceOrderType,
   open,
   onClose,
   title = t('Assign Engineer'),
@@ -188,10 +190,11 @@ export const ScheduleDialog = ({
   });
 
   const {data: techniciansResource = createEmptyResource(10)} =
-    useQueryServiceCompanyTechnicians({
+    useQueryServiceCompanyEmployees({
       pageIndex: 0,
       pageSize: 10,
       query,
+      serviceOrderType,
     });
 
   useEffect(() => {
@@ -257,7 +260,7 @@ export const ScheduleDialog = ({
               id="combo-box-demo"
               sx={{mt: '0.5em'}}
               options={techniciansResource.data}
-              onChange={(_event: any, newValues: EmployeesView[]) => {
+              onChange={(_event: any, newValues: EmployeesSimpleView[]) => {
                 setValue(
                   'technicianIds',
                   newValues.map((value) => value.id),

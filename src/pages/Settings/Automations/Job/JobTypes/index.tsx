@@ -7,7 +7,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import {useEffect, useState} from 'react';
+import {ChangeEvent, useEffect, useState} from 'react';
 import {Button} from 'components/Button';
 import {Dialog} from 'components/Dialog';
 import {
@@ -28,6 +28,12 @@ import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {useFieldArray, useForm} from 'react-hook-form';
 import {ConfirmDelete} from 'components/ConfirmDelete';
 import {useSnackbar} from 'hooks/useSnackbar';
+import {useQueryContract} from 'hooks/reactQuery/useContract';
+import {ContractView, ContractOrderField} from 'models/contract';
+import {Order} from 'models/pagination';
+import {createEmptyResource} from 'utils/paging';
+import {debounce} from 'lodash';
+import AddJobType, {JobTypeForm} from './AddJobType';
 import {
   PriorityCircle,
   StyledDataListCell,
@@ -37,7 +43,6 @@ import {
   priorityColorMap,
   priorityToText,
 } from './DataList';
-import AddJobType, {JobTypeForm} from './AddJobType';
 
 export interface FormState {
   icon: string;
@@ -57,6 +62,7 @@ const JobTypes = () => {
   const {user} = useUserSession();
   const {t} = useTranslation();
   const [openDialog, setOpenDialog] = useState(false);
+  const [openWarningModal, setOpenWarningModal] = useState(false);
   const [dataListMode, setDataListMode] = useState<CreateEditViewMode>('view');
   const [initialJobTypes, setInitialJobTypes] = useState<
     ServiceOrderTypeRecord[]
@@ -95,6 +101,32 @@ const JobTypes = () => {
   });
 
   const watchedFields = watch('jobTypes');
+
+  const handleInputChange = debounce((value) => {
+    setDeleteEventState((prevData) => ({
+      ...prevData,
+      userTypedName: value,
+    }));
+  }, 50);
+
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    handleInputChange(event.target.value);
+  };
+
+  const {data: contractResource = createEmptyResource<ContractView>(50)} =
+    useQueryContract(
+      {
+        pageIndex: 0,
+        pageSize: 50,
+        query: '',
+        order: Order.DESC,
+        orderBy: ContractOrderField.CREATED_TIME,
+        serviceOrderType: deleteEventState.userTypedName
+          ? [deleteEventState.userTypedName]
+          : [],
+      },
+      {keepPreviousData: true},
+    );
 
   const resetState = () => {
     setEditingEvent({});
@@ -165,6 +197,14 @@ const JobTypes = () => {
 
   const onAddNewType = () => {
     setOpenDialog(true);
+  };
+
+  const handleDeleteAction = async () => {
+    if (contractResource.total > 0) {
+      setOpenWarningModal(true);
+    } else {
+      await handleCreateOrUpdate();
+    }
   };
 
   return (
@@ -366,7 +406,7 @@ const JobTypes = () => {
           resetState();
         }}
         onSave={() => {
-          handleCreateOrUpdate();
+          handleDeleteAction();
         }}
         saveButtonText="Save changes"
         cancelButtonText="Cancel"
@@ -437,12 +477,7 @@ const JobTypes = () => {
         dialogContent={
           <TextField
             value={deleteEventState.userTypedName}
-            onChange={(e) => {
-              setDeleteEventState((prevData) => ({
-                ...prevData,
-                userTypedName: e.target.value,
-              }));
-            }}
+            onChange={onChange}
             size="small"
             placeholder={t('Enter type name')}
             fullWidth
@@ -458,12 +493,12 @@ const JobTypes = () => {
           },
         }}
         disableSave={
-          deleteEventState.event?.name?.toLowerCase() !==
-            deleteEventState.userTypedName?.toLowerCase() || isUpdating
+          deleteEventState.event?.name !== deleteEventState.userTypedName ||
+          isUpdating
         }
         open={deleteEventState.isOpen ?? false}
         onConfirm={() => {
-          handleCreateOrUpdate();
+          handleDeleteAction();
         }}
         onClose={() => {
           setDeleteEventState({
@@ -472,6 +507,40 @@ const JobTypes = () => {
           });
         }}
       />
+
+      <Dialog
+        title="Job types"
+        onSave={() => {
+          setOpenWarningModal(false);
+          setDeleteEventState({
+            userTypedName: '',
+            isOpen: false,
+          });
+        }}
+        saveButtonText="Back"
+        dialogProps={{
+          maxWidth: 'xs',
+          open: openWarningModal || false,
+        }}
+        showCancelButton={false}
+        dialogContentStyles={{
+          mx: 0,
+          mt: 0,
+          px: 3,
+          pb: 0,
+          pt: 3,
+        }}
+        saveButtonVariant="text">
+        <Alert severity="error" sx={{margin: '20px 0px'}}>
+          <Typography variant="h6" gutterBottom>
+            {t('Job types used in active contracts cannot be deleted.')}
+          </Typography>
+          <Typography>
+            {t('Number of affected active contracts:')}{' '}
+            <strong>{contractResource.total}</strong>
+          </Typography>
+        </Alert>
+      </Dialog>
     </Box>
   );
 };
