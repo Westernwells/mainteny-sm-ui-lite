@@ -6,28 +6,35 @@ import {
   Typography,
 } from '@mui/material';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {UserAccount, UserAccountView} from 'models/user';
 import {getUserFullName} from 'utils/utils';
 import {useMemo} from 'react';
 import {getInitials} from 'utils/account-utils';
 import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
-  userAccount: UserAccountView | UserAccount;
+  userAccount: {
+    firstName: string;
+    lastName?: string;
+    photoUrl?: string;
+  };
   sx?: SxProps<Theme>;
+  labelStyles?: SxProps<Theme>;
   removeNameText?: boolean;
+  onlyFirstInitial?: boolean;
 }
 
 export const Avatar = ({
   userAccount,
   sx = {},
+  labelStyles = {},
   removeNameText = false,
+  onlyFirstInitial = false,
 }: Props) => {
   const theme = useTheme();
   const filePath = userAccount?.photoUrl;
 
   const {data} = useDownloadUrl(filePath ? [filePath] : []);
-  const url = data?.[filePath];
+  const url = filePath ? data?.[filePath] : undefined;
 
   const userName = useMemo(() => getUserFullName(userAccount), [userAccount]);
 
@@ -45,8 +52,9 @@ export const Avatar = ({
             fontSize: '10px',
             lineHeight: '10px',
             letterSpacing: '0.1px',
+            textTransform: 'uppercase',
           }}>
-          {getInitials(userAccount)}
+          {getInitials(userAccount, onlyFirstInitial)}
         </Typography>
       ),
     };
@@ -64,7 +72,11 @@ export const Avatar = ({
         }}
         {...avatarProps}
       />
-      {!removeNameText && <Typography variant="body2">{userName}</Typography>}
+      {!removeNameText && (
+        <Typography variant="body2" sx={labelStyles}>
+          {userName}
+        </Typography>
+      )}
     </Box>
   );
 };

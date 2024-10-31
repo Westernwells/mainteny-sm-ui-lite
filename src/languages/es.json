@@ -2860,5 +2860,12 @@
   "Add suppliers to process fast article purchases and keep track of your orders": "Agregue proveedores para procesar compras de artículos rápidamente y realizar un seguimiento de sus pedidos",
   "Delete job type": "Eliminar tipo de trabajo",
   "Export": "Exportar",
-  "Failed to export CSV": "No se pudo exportar CSV"
+  "Failed to export Excel": "No se pudo exportar CSV",
+  "Invalid first job creation date, date should not be Feb 29th": "Fecha de creación del primer empleo inválida, la fecha no debería ser el 29 de febrero.",
+  "No matching search results": "No hay resultados de búsqueda",
+  "Please try again": "Por favor, inténtelo de nuevo",
+  "Job Gross Sum": "Suma bruta del trabajo",
+  "Job(s) with notes": "Trabajo(s) con notas",
+  "Search job number": "Buscar número de trabajo",
+  "Select contract": "Seleccionar contrato"
 }
