@@ -63,6 +63,7 @@ const StyledTextField = styled(TextField)(({theme}) => ({
   '& .MuiInputBase-input': {
     paddingLeft: 0,
     paddingRight: 0,
+    fontWeight: 600,
   },
   '& .MuiOutlinedInput-notchedOutline': {
     borderWidth: '0px',
@@ -85,6 +86,7 @@ const StyledSelect = styled(Select)(({theme}) => ({
     paddingRight: 0,
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(1),
+    fontWeight: 600,
   },
   '& .MuiOutlinedInput-notchedOutline': {
     borderWidth: 0,
@@ -172,7 +174,9 @@ export const DataList = ({
             const isEditing = mode === 'edit' && index === editingEvent.index;
 
             return (
-              <StyledDataListRow>
+              <StyledDataListRow
+                bgcolor={isEditing ? 'inputBackground.main' : 'transparent'}
+                key={`${item.type}-${item.subtype}-${index}`}>
                 <StyledDataListCell>
                   <EmployeeEventTypeIconWithBackground type={item.type} />
                   {isEditing ? (
@@ -251,7 +255,7 @@ export const DataList = ({
             );
           })}
           {mode === 'create' && (
-            <StyledDataListRow>
+            <StyledDataListRow bgcolor="inputBackground.main">
               <StyledDataListCell>
                 <EmployeeEventTypeIconWithBackground type={form.type} />
                 <StyledTextField
