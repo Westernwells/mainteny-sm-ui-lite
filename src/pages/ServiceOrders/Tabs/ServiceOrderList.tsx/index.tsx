@@ -1025,7 +1025,7 @@ export const ServiceOrderList = ({menu}: Props) => {
                   labelKey:
                     serviceOrderTypeToString(jobType.name) === '-'
                       ? jobType.name
-                      : serviceOrderTypeToString(jobType.name),
+                      : t(serviceOrderTypeToString(jobType.name)),
                 }))}
                 selectedChips={watchOrderTypes}
                 onChange={handleSelectedOrderTypesChange}

@@ -1,4 +1,4 @@
-import {useContext, useLayoutEffect, useState} from 'react';
+import {useContext, useLayoutEffect, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
@@ -17,18 +17,11 @@ import {useDeleteElevator} from 'hooks/reactQuery/useElevator';
 import {theme} from 'theme';
 import Box from '@mui/material/Box';
 import {Button} from '@mui/material';
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import BuildCircleIcon from '@mui/icons-material/BuildCircle';
-import UploadIcon from '@mui/icons-material/Upload';
-import HandymanIcon from '@mui/icons-material/Handyman';
-import {ServiceOrderType} from 'models/service-order';
-import {
-  serviceOrderTypeColor,
-  serviceOrderTypeToString,
-} from 'utils/service-order-utils';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import {iconMapping} from 'pages/ServiceOrders';
 import {OverviewTab} from './Tabs/OverviewTab';
 import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 import {TodosTab} from './Tabs/TodosTab';
@@ -80,6 +73,10 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
   const [value, setValue] = useState<TabIndex>(TabIndex.OVERVIEW);
   const {id: elevatorId} = useParams();
   const {t} = useTranslation();
+  const {user} = useUserSession();
+  const {data: jobTypes, isLoading: loading} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const navigate = useNavigate();
   const {language} = useContext(LanguageContext);
@@ -96,106 +93,27 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
     cb();
   };
 
-  const menu = [
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.EMERGENCY),
-      action: () =>
-        track(() =>
-          navigate(`/orders/new?type=emergency&elevatorId=${elevatorId}`),
-        ),
-      icon: (
-        <ReportProblemIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.EMERGENCY)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.CALLOUT),
-      action: () =>
-        track(() =>
-          navigate(`/orders/new?type=callout&elevatorId=${elevatorId}`),
-        ),
-      icon: (
-        <PhoneInTalkIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.CALLOUT)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.REPAIR),
-      action: () =>
-        track(() =>
-          navigate(`/orders/new?type=repair&elevatorId=${elevatorId}`),
-        ),
-      icon: (
-        <SettingsIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.REPAIR)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.REGULAR),
-      action: () =>
-        track(() =>
-          navigate(`/orders/new?type=regular&elevatorId=${elevatorId}`),
-        ),
-      icon: (
-        <RefreshIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.REGULAR)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.INSPECTION),
-      action: () =>
-        track(() =>
-          navigate(`/orders/new?type=inspection&elevatorId=${elevatorId}`),
-        ),
-      icon: (
-        <YoutubeSearchedForIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.INSPECTION)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.NEW_INSTALLATION),
-      action: () =>
-        track(() =>
-          navigate(
-            `/orders/new?type=new_installation&elevatorId=${elevatorId}`,
-          ),
-        ),
-      icon: (
-        <BuildCircleIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.NEW_INSTALLATION)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.MODERNIZATION),
-      action: () =>
-        track(() =>
-          navigate(`/orders/new?type=modernization&elevatorId=${elevatorId}`),
-        ),
-      icon: (
-        <UploadIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.MODERNIZATION)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.GENERAL),
-      action: () =>
-        track(() =>
-          navigate(`/orders/new?type=general&elevatorId=${elevatorId}`),
-        ),
-      icon: (
-        <HandymanIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.GENERAL)}}
-        />
-      ),
-    },
-  ];
+  const menu = useMemo(() => {
+    if (loading || !jobTypes) return [];
+
+    return jobTypes.map((jobType) => {
+      const IconComponent =
+        iconMapping[jobType.icon as keyof typeof iconMapping] ||
+        HelpOutlineOutlinedIcon;
+
+      return {
+        label:
+          serviceOrderTypeToString(jobType.name) === '-'
+            ? jobType.name
+            : t(serviceOrderTypeToString(jobType.name)),
+        action: () =>
+          track(() => {
+            navigate(`/orders/new?type=${jobType.name}`);
+          }),
+        icon: <IconComponent fontSize="small" />,
+      };
+    });
+  }, [jobTypes, loading]);
 
   return (
     <>

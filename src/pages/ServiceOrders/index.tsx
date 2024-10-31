@@ -35,6 +35,7 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import TwoWheelerOutlinedIcon from '@mui/icons-material/TwoWheelerOutlined';
 import UmbrellaOutlinedIcon from '@mui/icons-material/UmbrellaOutlined';
 import ElevatorOutlinedIcon from '@mui/icons-material/ElevatorOutlined';
+import {t} from 'i18next';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
 
@@ -100,7 +101,7 @@ export const ServiceOrders = () => {
         label:
           serviceOrderTypeToString(jobType.name) === '-'
             ? jobType.name
-            : serviceOrderTypeToString(jobType.name),
+            : t(serviceOrderTypeToString(jobType.name)),
         action: () => navigate(`/orders/new?type=${jobType.name}`),
         icon: <IconComponent />,
       };

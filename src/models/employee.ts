@@ -3,6 +3,7 @@ import {Address, DataEditingScope, Meta} from './misc';
 import {ServiceOrderType} from './service-order';
 import {Role, UserAccountView} from './user';
 import {AvailabilityType} from './availability';
+import {Order} from './pagination';
 
 export enum UserOrderField {
   CREATED_DATE = 'CREATED_DATE',
@@ -23,13 +24,31 @@ export interface EmployeeAdditionalInfo {
 }
 
 export interface EmployeesView {
-  address: Address;
-  additionalInfo: EmployeeAdditionalInfo;
   id: string;
-  isOnline: boolean;
-  online: boolean;
-  meta: Meta;
+  number: string;
+  externalId: string;
+  team: string;
+  address: Address;
+  workingHours: EmployeeTimeWindowView[];
   userAccount: UserAccountView;
+  isOnline: boolean;
+  additionalInfo: EmployeeAdditionalInfo;
+  meta: Meta;
+  online: boolean;
+}
+
+export interface EmployeeTimeWindowView {
+  id: string;
+  employeeId: string;
+  fromTime: string;
+  toTime: string;
+  type: TimeWindowType;
+}
+
+export enum TimeWindowType {
+  WEEKDAY = 'WEEKDAY',
+  WEEKEND = 'WEEKEND',
+  PUBLIC_HOLIDAY = 'PUBLIC_HOLIDAY',
 }
 
 export enum EmployeeStatus {
@@ -151,3 +170,23 @@ export type SaveEmployeeEventTypeRecords = {
   updated: UpdateEmployeeEventTypeRecord[];
   deleted: EmployeeEventTypeRecord[];
 };
+
+export enum EmployeeOrderField {
+  NAME = 'NAME',
+  EXTERNAL_ID = 'EXTERNAL_ID',
+  ROLE = 'ROLE',
+  ADDRESS = 'ADDRESS',
+  PHONE = 'PHONE',
+  SHIFT = 'SHIFT',
+  CREATED_DATE = 'CREATED_DATE',
+}
+
+export interface QueryEmployeesParams {
+  order?: Order;
+  orderBy?: EmployeeOrderField;
+  pageIndex?: number;
+  pageSize?: number;
+  query?: string;
+  roles?: Role[];
+  serviceOrderType?: string;
+}

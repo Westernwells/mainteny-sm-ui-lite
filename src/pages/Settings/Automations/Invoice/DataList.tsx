@@ -470,7 +470,7 @@ const DataList = ({
                     color="primary.main"
                     variant="body2"
                     sx={{fontWeight: isEditing ? 'bold' : 'normal'}}>
-                    {item?.article?.unit || '-'}
+                    {t(item?.article?.unit) || '-'}
                   </Typography>
                 </StyledDataListCell>
 

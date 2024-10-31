@@ -6,7 +6,7 @@ describe('Job', () => {
     beforeEach(() => {
         cy.login();
 
-        const technician = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/technicians?*`;
+        const technician = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/employees?*`;
 
         const serviceOrders = `${Cypress.env().REACT_APP_API_URL}/api/serviceOrders*`;
 
