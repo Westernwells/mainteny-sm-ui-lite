@@ -108,8 +108,12 @@ export const useDownloadFileWithCustomName = (
   const fileExtension = extension || 'pdf';
   let finalFileName = fileName || 'Unassigned';
   const downloadFile = useCallback(
-    async (downloadURLArg?: string) => {
+    async (
+      downloadURLArg?: string,
+      options?: {fileNameArg?: string; extensionArg?: string},
+    ) => {
       try {
+        const {fileNameArg, extensionArg} = options ?? {};
         const response = await fetch(downloadURLArg || downloadUrl);
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -123,9 +127,16 @@ export const useDownloadFileWithCustomName = (
         )
           .toString()
           .padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-        finalFileName = fileName
-          ? `${fileName}_${formattedDate}.${fileExtension}`
-          : `Unassigned_${formattedDate}.${fileExtension}`;
+
+        const ext = extensionArg || fileExtension;
+
+        if (fileNameArg) {
+          finalFileName = `${fileNameArg}_${formattedDate}.${ext}`;
+        } else {
+          finalFileName = fileName
+            ? `${fileName}_${formattedDate}.${ext}`
+            : `Unassigned_${formattedDate}.${ext}`;
+        }
         link.download = finalFileName;
 
         link.target = '_blank';
