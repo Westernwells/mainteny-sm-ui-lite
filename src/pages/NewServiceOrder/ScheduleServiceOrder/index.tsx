@@ -251,6 +251,7 @@ export const ScheduleServiceOrder = ({type, elevator}: Props) => {
             notificationChannels={notificationChannels}
             setNotificationChannels={setNotificationChannels}
             selectedUnitChange={selectedUnitChange}
+            serviceOrderType={type}
           />
         ) : (
           <AddDescription
