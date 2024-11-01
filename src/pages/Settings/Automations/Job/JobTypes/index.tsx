@@ -170,16 +170,27 @@ const JobTypes = () => {
     let successMessage = 'Job type created successfully';
 
     if (deleteEventState.event) {
-      updatedJobTypes.splice(deleteEventState.index!, 1);
-      successMessage = 'Job type deleted successfully';
+      if (contractResource.total > 0) {
+        setOpenWarningModal(true);
+      } else {
+        updatedJobTypes.splice(deleteEventState.index!, 1);
+        successMessage = 'Job type deleted successfully';
+
+        await updateCompanyJobTypes({
+          companyId: user?.userAccount.serviceCompany.id!,
+          body: updatedJobTypes,
+        });
+
+        enqueueSnackbar(t(`${successMessage}`), {variant: 'success'});
+      }
+    } else {
+      await updateCompanyJobTypes({
+        companyId: user?.userAccount.serviceCompany.id!,
+        body: updatedJobTypes,
+      });
+
+      enqueueSnackbar(t(`${successMessage}`), {variant: 'success'});
     }
-
-    await updateCompanyJobTypes({
-      companyId: user?.userAccount.serviceCompany.id!,
-      body: updatedJobTypes,
-    });
-
-    enqueueSnackbar(t(`${successMessage}`), {variant: 'success'});
 
     resetState();
     setOpenDialog(false);
@@ -197,14 +208,6 @@ const JobTypes = () => {
 
   const onAddNewType = () => {
     setOpenDialog(true);
-  };
-
-  const handleDeleteAction = async () => {
-    if (contractResource.total > 0) {
-      setOpenWarningModal(true);
-    } else {
-      await handleCreateOrUpdate();
-    }
   };
 
   return (
@@ -406,7 +409,7 @@ const JobTypes = () => {
           resetState();
         }}
         onSave={() => {
-          handleDeleteAction();
+          handleCreateOrUpdate();
         }}
         saveButtonText="Save changes"
         cancelButtonText="Cancel"
@@ -498,7 +501,7 @@ const JobTypes = () => {
         }
         open={deleteEventState.isOpen ?? false}
         onConfirm={() => {
-          handleDeleteAction();
+          handleCreateOrUpdate();
         }}
         onClose={() => {
           setDeleteEventState({
