@@ -141,6 +141,7 @@ export interface TechnicianEventView {
 }
 
 export interface RecommendTechnicianPayload {
-  count: number;
   time: string;
+  count?: number;
+  serviceOrderType?: string;
 }

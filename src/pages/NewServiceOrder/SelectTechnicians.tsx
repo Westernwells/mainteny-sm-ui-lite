@@ -5,10 +5,7 @@ import {Box, IconButton, Tooltip, Typography} from '@mui/material';
 import {InfoOutlined} from '@mui/icons-material';
 import {ContactChannel, ServiceOrderView} from 'models/service-order';
 import {createEmptyResource, makePage} from 'utils/paging';
-import {
-  useFetchRecommendedTechnician,
-  useQueryServiceCompanyTechnicians,
-} from 'hooks/reactQuery/useTechnician';
+import {useFetchRecommendedTechnician} from 'hooks/reactQuery/useTechnician';
 import {useQueryServiceOrderScheduled} from 'hooks/reactQuery/useServiceOrder';
 import {endOfDay, startOfDay} from 'date-fns';
 import {toRestDateTime} from 'utils/datetime';
@@ -18,6 +15,7 @@ import {Switch} from 'components/Switch';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {EmployeesView} from 'models/employee';
 import {sortOrderByTime} from 'utils/service-order-utils';
+import {useQueryServiceCompanyEmployees} from 'hooks/reactQuery/useEmployee';
 import {TechnicianSchedule} from './TechnicianSchedule';
 import {ScheduleForm} from './ScheduleForm';
 import {DueDateFormProps, ScheduleTechnicianForm} from './models';
@@ -39,6 +37,7 @@ interface Props {
   notificationChannels: ContactChannel[];
   setNotificationChannels: (value: ContactChannel[]) => void;
   selectedUnitChange: boolean;
+  serviceOrderType?: string;
 }
 
 interface CheckBoxState {
@@ -62,6 +61,7 @@ export const SelectTechnicians = ({
   notificationChannels,
   setNotificationChannels,
   selectedUnitChange,
+  serviceOrderType,
 }: Props) => {
   const [checkboxState, setCheckboxState] = useState<CheckBoxState>(
     {} as CheckBoxState,
@@ -95,18 +95,21 @@ export const SelectTechnicians = ({
     {
       time: toRestDateTime(queryDate),
       count: 10,
+      serviceOrderType,
     },
     elevatorId,
   );
   const [technicianSearch, setTechnicianSearch] = useState<string>('');
+
   const {
     data: technicianResource = createEmptyResource<EmployeesView>(
       page.pageSize,
     ),
-  } = useQueryServiceCompanyTechnicians({
+  } = useQueryServiceCompanyEmployees({
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
     query: technicianSearch,
+    serviceOrderType,
   });
   const recommendedTechnicians = technicianSearch
     ? technicianResource.data
