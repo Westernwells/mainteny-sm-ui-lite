@@ -16,6 +16,7 @@ import {convertToHourAndMinutes} from 'utils/utils';
 
 const defaultProps = {
   editable: false,
+  sortable: false,
   renderHeader: (params: GridColumnHeaderParams) => {
     const {t} = useTranslation();
     return (
@@ -61,6 +62,7 @@ export const columns: GridColDef[] = [
     flex: 0.75,
     ...defaultAlignment,
     ...defaultProps,
+    sortable: true,
   },
   {
     field: 'startTime',
@@ -207,15 +209,3 @@ export const makeRows = (
         orderId: getOrderId(item.data),
       }))
     : [];
-
-// let duration = '-';
-// const startDate =
-// if(item.type === WorkHoursType.HOLIDAY) {
-
-// } else {
-//   `${formatDate(item.startTime)} ${formatDate(
-//     item.startTime,
-//     'HH:mm',
-//   )}`
-
-// }

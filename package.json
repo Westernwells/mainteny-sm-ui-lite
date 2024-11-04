@@ -111,6 +111,8 @@
     "react-swipeable-views": "^0.14.0",
     "react-top-loading-bar": "^2.1.0",
     "react-virtualized-auto-sizer": "^1.0.21",
+    "react-xml-viewer": "^2.0.4",
+    "react-zoom-pan-pinch": "^3.6.1",
     "slate": "^0.103.0",
     "slate-history": "^0.100.0",
     "slate-hyperscript": "^0.100.0",
