@@ -51,3 +51,9 @@ export enum WorkHoursType {
   BREAK = 'BREAK',
   TRAINING = 'TRAINING',
 }
+
+export enum WorkHourOrderField {
+  START_TIME = 'START_TIME',
+  END_TIME = 'END_TIME',
+  CREATED_TIME = 'CREATED_TIME',
+}

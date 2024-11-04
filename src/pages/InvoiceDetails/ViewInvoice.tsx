@@ -114,6 +114,7 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import XMLViewer from 'react-xml-viewer';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
@@ -135,9 +136,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-
   const [qrImageSrc, setQrImageSrc] = useState<string>('');
   const [qrError, setQrError] = useState<string | null>(null);
+  const [xmlHtmlContent, setXmlHtmlContent] = useState('');
 
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
@@ -162,6 +163,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     refetch: refetchDownloadUrl,
   } = useDownloadUrl(
     invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
+  );
+  const {refetch: refetchXMLDownloadUrl} = useDownloadUrl(
+    invoice?.additionalInfo.xmlPath ? [invoice?.additionalInfo.xmlPath] : [],
   );
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
@@ -635,7 +639,25 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       });
     }
 
+    const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
+
+    const shouldDownloadPDF =
+      invoiceFormat === InvoiceFormat.PDF ||
+      invoiceFormat === InvoiceFormat.PDF_AND_XML;
+    const shouldDownloadXML =
+      invoiceFormat === InvoiceFormat.XML ||
+      invoiceFormat === InvoiceFormat.PDF_AND_XML;
     if (invoice.status === InvoiceStatus.DRAFT) {
+      const response = await getXInvoiceByInvoiceId({
+        invoiceId: invoice.id,
+        params: {
+          dueDate: invoice.dueDate!,
+          sentDate: invoice.sentDate ?? formatDate(new Date(), 'yyyy-MM-dd')!,
+          externalId: invoice.externalId ?? companyNextNumber?.value!,
+        },
+      });
+
+      const xmlBlob = new Blob([response], {type: 'application/xml'});
       const blob = await generateBlobUrl({
         invoiceData: invoice,
         headerBlockUrl: headerUrl,
@@ -643,10 +665,30 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         setInState: false,
       });
       const blobURL = URL.createObjectURL(blob!);
-      downloadFile(blobURL);
+      const xmlBlobURL = URL.createObjectURL(xmlBlob!);
+
+      if (shouldDownloadPDF) {
+        downloadFile(blobURL);
+      }
+      if (shouldDownloadXML) {
+        downloadFile(xmlBlobURL, {extensionArg: '.xml'});
+      }
     } else {
-      const downloadUrlData = await refetchDownloadUrl();
-      downloadFile(downloadUrlData.data?.[invoice.additionalInfo.pdfPath]);
+      const [downloadUrlData, xmlDownloadUrlData] = await Promise.all([
+        refetchDownloadUrl(),
+        refetchXMLDownloadUrl(),
+      ]);
+
+      if (shouldDownloadPDF) {
+        downloadFile(downloadUrlData.data?.[invoice.additionalInfo.pdfPath]);
+      }
+
+      if (shouldDownloadXML && invoice.additionalInfo.xmlPath) {
+        downloadFile(
+          xmlDownloadUrlData.data?.[invoice.additionalInfo.xmlPath],
+          {extensionArg: '.xml'},
+        );
+      }
     }
   };
 
@@ -1096,19 +1138,62 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     isLoadingInvoiceAmountDetail,
   ]);
 
+  const doPrint = async () => {
+    const PDFDownloadURLResponse = await refetchDownloadUrl();
+    const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
+
+    const PDFDownloadURL =
+      PDFDownloadURLResponse.data?.[invoice.additionalInfo.pdfPath];
+    const XMLDownloadURL =
+      XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
+
+    // Fetch XML file
+    const response = await fetch(XMLDownloadURL!);
+    const xmlText = await response.text();
+
+    printJS({
+      printable: PDFDownloadURL,
+      type: 'pdf',
+      showModal: true,
+      onPrintDialogClose: () => {
+        const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
+        if (
+          invoiceFormat === InvoiceFormat.PDF_AND_XML ||
+          invoiceFormat === InvoiceFormat.XML
+        ) {
+          setXmlHtmlContent(xmlText);
+        }
+      },
+    });
+
+    setActionType('');
+    setFilePathToDownload('');
+  };
+
   useEffect(() => {
-    if (actionType === 'PRINT' && filePathToDownload) {
-      if (filePathToDownload) {
-        printJS({
-          printable: filePathToDownload,
-          type: 'pdf',
-          showModal: true,
-        });
-      }
-      setActionType('');
-      setFilePathToDownload('');
+    if (xmlHtmlContent) {
+      printJS({
+        printable: 'xml-content',
+        type: 'html',
+        showModal: true,
+        style: `
+          #xml-content {
+            white-space: break-spaces;
+          }
+        `,
+      });
+
+      setXmlHtmlContent('');
     }
-  }, [actionType, filePathToDownload]);
+  }, [xmlHtmlContent]);
+
+  useEffect(() => {
+    const isSent = invoice.status === InvoiceStatus.NOT_PAID;
+
+    if (actionType === 'PRINT' && isSent) {
+      doPrint();
+    }
+  }, [actionType, invoice]);
 
   useEffectAfterMount(() => {
     (async () => {
@@ -1206,7 +1291,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                   },
                   {
                     onSuccess: async () => {
-                      await refetchDownloadUrl();
                       setActionType('PRINT');
                     },
                   },
@@ -1249,7 +1333,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             },
             {
               onSuccess: async () => {
-                await refetchDownloadUrl();
                 setActionType('PRINT');
               },
             },
@@ -1815,6 +1898,15 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         onConfirm={onPrintInvoice}
         onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
+
+      {/* Hidden container for XML content to be printed */}
+      <div id="xml-content">
+        <XMLViewer
+          indentSize={4}
+          theme={{fontFamily: 'Montserrat'}}
+          xml={xmlHtmlContent}
+        />
+      </div>
     </Box>
   );
 };

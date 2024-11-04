@@ -9,7 +9,8 @@ import {Widget} from 'components/Widget';
 import {DatePicker} from 'components/DatePicker';
 import TotalTime from 'components/TotalTime';
 import {useWorkHours} from 'hooks/reactQuery/useWorkHours';
-import {WorkHoursItem} from 'models/workHours';
+import {WorkHourOrderField, WorkHoursItem} from 'models/workHours';
+import {Order, OrderByParams} from 'models/pagination';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {calculateTotalTime} from 'utils/work-hours-utils';
 import {endOfDay, startOfDay} from 'date-fns';
@@ -17,6 +18,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
 import {getLastWeek} from 'utils/datetime';
 import {useNavigate} from 'react-router';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {columns, makeRows} from './WorkHoursDataGrid';
 
 interface Props {
@@ -32,12 +34,25 @@ const WorkHoursTab = ({employeeId}: Props) => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [totalTime, setTotalTime] = useState<string>('00:00');
   const [pageCount, setPageCount] = useState(0);
-  const [page, setPage] = useState(makePage(0, 10));
+  const [page, setPage] = useState(makePage(0, 25));
   const textInput = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const {values} = useSearchValues<OrderByParams<WorkHourOrderField>>();
+  const {sortOrder = Order.DESC, orderByField = WorkHourOrderField.START_TIME} =
+    values;
 
-  const {data: workHours = createEmptyResource<WorkHoursItem>(10)} =
-    useWorkHours(search, page, startDate, endDate, employeeId || '');
+  const {data: workHours = createEmptyResource<WorkHoursItem>(10), isFetching} =
+    useWorkHours(
+      search,
+      page,
+      startDate,
+      endDate,
+      employeeId || '',
+      sortOrder,
+      orderByField === ('date' as WorkHourOrderField)
+        ? WorkHourOrderField.START_TIME
+        : orderByField,
+    );
 
   useEffect(() => {
     if (workHours.data) {
@@ -119,6 +134,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
         rows={rows}
         columns={columns}
         scrollToTop={search}
+        pageIndex={page.pageIndex + 1}
         pageSize={page.pageSize}
         handlePageSizeChange={(newPageSize: number) =>
           setPage({...page, pageSize: newPageSize})
@@ -129,6 +145,7 @@ const WorkHoursTab = ({employeeId}: Props) => {
         isCellClickable={false}
         pageCount={pageCount}
         totalRows={workHours.total}
+        loading={isFetching}
         onRowClick={(row) => {
           const {orderId, type} = row.row;
           if (orderId !== '' && type.startsWith('SERVICE_ORDER_')) {

@@ -63,6 +63,7 @@ export const fetchSystemSettings = async () => {
 };
 
 export const useFetchSystemSettings = () =>
-  useQuery<SystemSettingRecord, RestError>([queryKeys.fetchLatestVersion], () =>
-    fetchSystemSettings(),
+  useQuery<SystemSettingRecord, RestError>(
+    [queryKeys.fetchSystemSettings],
+    () => fetchSystemSettings(),
   );

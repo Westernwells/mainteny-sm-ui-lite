@@ -12,6 +12,7 @@ import {UserCompanyProvider} from 'context/UserCompanyProvider';
 import {App} from './App';
 import {theme} from './theme';
 import './assets/fonts/Aventa/Aventa-Regular.ttf';
+import './assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import {LicenseInfo} from '@mui/x-license-pro';
 import BigNumber from 'bignumber.js';
 import './utils/withResolversPolyfill';

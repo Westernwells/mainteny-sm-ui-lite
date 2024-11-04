@@ -92,6 +92,7 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import XMLViewer from 'react-xml-viewer';
 
 interface Props {
   invoice: InvoiceView;
@@ -207,6 +208,7 @@ export const Actions = ({
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceView | null>(
     null,
   );
+  const [xmlHtmlContent, setXmlHtmlContent] = useState('');
 
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     selectedInvoice?.id!,
@@ -217,12 +219,15 @@ export const Actions = ({
   );
 
   const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
-    selectedInvoice?.additionalInfo.pdfPath
-      ? [selectedInvoice?.additionalInfo.pdfPath]
+    invoice?.additionalInfo.pdfPath
+      ? [invoice?.additionalInfo.pdfPath]
       : pdfPathToDownload
       ? [pdfPathToDownload]
       : [],
     {enabled: false},
+  );
+  const {refetch: refetchXMLDownloadUrl} = useDownloadUrl(
+    invoice?.additionalInfo.xmlPath ? [invoice?.additionalInfo.xmlPath] : [],
   );
 
   const {mutateAsync: uploadFiles} = useUploadFiles('');
@@ -992,12 +997,7 @@ export const Actions = ({
             footerBlockUrl: footerUrl,
           });
         } else {
-          const downloadUrlData = await refetchDownloadUrl();
-          setPdfPathToDownload(
-            downloadUrlData.data
-              ? downloadUrlData.data?.[invoice.additionalInfo.pdfPath!]!
-              : '',
-          );
+          await refetchDownloadUrl();
         }
       } catch (err) {
         console.error(err);
@@ -1345,7 +1345,6 @@ export const Actions = ({
             },
             {
               onSuccess: async () => {
-                await refetchDownloadUrl();
                 setActionType('PRINT');
               },
             },
@@ -1377,24 +1376,70 @@ export const Actions = ({
     }
   };
 
-  useEffect(() => {
-    if (actionType === 'PRINT' && pdfPathToDownload) {
-      if (pdfPathToDownload) {
-        printJS({
-          printable: pdfPathToDownload,
-          type: 'pdf',
-          showModal: true,
-        });
-      }
-      setActionType('');
-      setPdfPathToDownload('');
-    }
-  }, [actionType, pdfPathToDownload]);
+  const doPrint = async () => {
+    const PDFDownloadURLResponse = await refetchDownloadUrl();
+    const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
 
-  useEffect(() => {
+    const PDFDownloadURL =
+      PDFDownloadURLResponse.data?.[invoice.additionalInfo.pdfPath];
+    const XMLDownloadURL =
+      XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
+
+    // Fetch XML file
+    const response = await fetch(XMLDownloadURL!);
+    const xmlText = await response.text();
+
+    printJS({
+      printable: PDFDownloadURL,
+      type: 'pdf',
+      showModal: true,
+      onPrintDialogClose: () => {
+        const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
+        if (
+          invoiceFormat === InvoiceFormat.PDF_AND_XML ||
+          invoiceFormat === InvoiceFormat.XML
+        ) {
+          setXmlHtmlContent(xmlText);
+        }
+      },
+    });
+
+    setActionType('');
+    setPdfPathToDownload('');
+  };
+
+  const doDownload = async () => {
+    const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
+
+    const shouldDownloadPDF =
+      invoiceFormat === InvoiceFormat.PDF ||
+      invoiceFormat === InvoiceFormat.PDF_AND_XML;
+    const shouldDownloadXML =
+      invoiceFormat === InvoiceFormat.XML ||
+      invoiceFormat === InvoiceFormat.PDF_AND_XML;
+
     if (invoice.status === InvoiceStatus.DRAFT) {
       if (pdfPathToDownload && actionType === 'DOWNLOAD') {
-        downloadFile();
+        if (shouldDownloadXML) {
+          const response = await getXInvoiceByInvoiceId({
+            invoiceId: invoice.id,
+            params: {
+              dueDate: invoice.dueDate!,
+              sentDate:
+                invoice.sentDate ?? formatDate(new Date(), 'yyyy-MM-dd')!,
+              externalId: invoice.externalId ?? companyNextNumber?.value!,
+            },
+          });
+
+          const xmlBlob = new Blob([response], {type: 'application/xml'});
+
+          const xmlBlobURL = URL.createObjectURL(xmlBlob!);
+          downloadFile(xmlBlobURL, {extensionArg: '.xml'});
+        }
+
+        if (shouldDownloadPDF) {
+          downloadFile();
+        }
         setPdfPathToDownload('');
         setActionType('');
       }
@@ -1402,13 +1447,54 @@ export const Actions = ({
       actionType === 'DOWNLOAD' &&
       downloadUrl?.[invoice.additionalInfo.pdfPath!]
     ) {
-      downloadFile();
+      const [xmlDownloadUrlData] = await Promise.all([refetchXMLDownloadUrl()]);
+
+      if (shouldDownloadPDF) {
+        downloadFile(downloadUrl?.[invoice.additionalInfo.pdfPath]);
+      }
+
+      if (shouldDownloadXML && invoice.additionalInfo.xmlPath) {
+        downloadFile(
+          xmlDownloadUrlData.data?.[invoice.additionalInfo.xmlPath],
+          {extensionArg: '.xml'},
+        );
+      }
+
       setActionType('');
     }
 
     if (invoice.status !== InvoiceStatus.DRAFT && actionType === 'PRINT') {
       setPdfPathToDownload(downloadUrl?.[invoice.additionalInfo.pdfPath!]!);
     }
+  };
+
+  useEffect(() => {
+    if (xmlHtmlContent) {
+      printJS({
+        printable: 'xml-content',
+        type: 'html',
+        showModal: true,
+        style: `
+          #xml-content {
+            white-space: break-spaces;
+          }
+        `,
+      });
+
+      setXmlHtmlContent('');
+    }
+  }, [xmlHtmlContent]);
+
+  useEffect(() => {
+    const isSent = invoice?.status === InvoiceStatus.NOT_PAID;
+
+    if (actionType === 'PRINT' && isSent) {
+      doPrint();
+    }
+  }, [actionType, invoice]);
+
+  useEffect(() => {
+    doDownload();
   }, [downloadUrl]);
 
   useEffect(() => {
@@ -1720,6 +1806,14 @@ export const Actions = ({
         content="This action will create a credit note from this invoice details."
         helperText="Do you want to proceed?"
       />
+      {/* Hidden container for XML content to be printed */}
+      <div id="xml-content">
+        <XMLViewer
+          indentSize={4}
+          theme={{fontFamily: 'Montserrat'}}
+          xml={xmlHtmlContent}
+        />
+      </div>
     </Box>
   );
 };
