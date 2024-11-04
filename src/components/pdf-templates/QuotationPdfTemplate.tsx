@@ -276,6 +276,16 @@ const QuotationPdfTemplate = React.memo(
 
     const styles = getStyles(boldFontStyle, regularFontStyle);
 
+    const customerVATId =
+      (pdfConfigClientStorage.includeCustomerVAT &&
+        quotation?.propertyOwner?.additionalInfo?.vatId) ||
+      '';
+
+    const unitBuilding =
+      (pdfConfigClientStorage.includeUnitBuilding &&
+        quotation?.elevator?.additionalInfo?.buildingLocation) ||
+      '';
+
     return (
       <Document>
         {quotation?.additionalInfo.alternativeAddress &&
@@ -315,6 +325,7 @@ const QuotationPdfTemplate = React.memo(
                 beneficiaryInfo={
                   quotation?.additionalInfo.beneficiaryAddress?.component
                 }
+                customerVATId={customerVATId}
               />
 
               <View style={styles.rightAddress}>
@@ -417,6 +428,7 @@ const QuotationPdfTemplate = React.memo(
                     address={quotation?.elevator?.address}
                     translate={translate}
                     selectedLng={selectedLng}
+                    building={unitBuilding}
                   />
                 </View>
               </View>
