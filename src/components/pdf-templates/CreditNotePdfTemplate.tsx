@@ -255,6 +255,11 @@ const CreditNotePdfTemplate = ({
 
   const styles = getStyles(boldFontStyle);
 
+  const customerVATId =
+    (pdfConfigClientStorage.includeCustomerVAT &&
+      invoice?.propertyOwner?.additionalInfo?.vatId) ||
+    '';
+
   return (
     <Document>
       {invoice?.additionalInfo.alternativeAddress &&
@@ -294,6 +299,7 @@ const CreditNotePdfTemplate = ({
               }
               selectedLng={selectedLng}
               translate={translate}
+              customerVATId={customerVATId}
             />
 
             <PdfTemplateInvoiceDetails

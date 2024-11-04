@@ -194,6 +194,40 @@ const PDFSettingLayout = ({company}: Props) => {
                   checked={pdfConfigFormState.includeUserPhone}
                 />
               </Box>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center">
+                <Typography
+                  variant="body2"
+                  fontWeight="bold"
+                  color="primary.main">
+                  {t('Show customer VAT')}
+                </Typography>
+                <Switch
+                  onChange={(event) => {
+                    onCheckChange('includeCustomerVAT', event.target.checked);
+                  }}
+                  checked={pdfConfigFormState.includeCustomerVAT}
+                />
+              </Box>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center">
+                <Typography
+                  variant="body2"
+                  fontWeight="bold"
+                  color="primary.main">
+                  {t('Show unit building')}
+                </Typography>
+                <Switch
+                  onChange={(event) => {
+                    onCheckChange('includeUnitBuilding', event.target.checked);
+                  }}
+                  checked={pdfConfigFormState.includeUnitBuilding}
+                />
+              </Box>
             </Box>
           </Box>
         </InfoCard>

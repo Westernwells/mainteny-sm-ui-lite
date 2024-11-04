@@ -79,7 +79,10 @@ export const DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE: ClientReportForPDFConfig =
     includeUsername: true,
     includeUserEmail: false,
     includeUserPhone: false,
+    includeCustomerVAT: false,
+    includeUnitBuilding: false,
   };
+
 export const ALL_SERVICE_ORDER_TYPE_PRIORITY = [
   {
     label: 'Urgent',
