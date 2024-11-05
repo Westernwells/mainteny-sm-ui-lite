@@ -101,20 +101,18 @@ const Pagination = ({
             horizontal: 'center',
           }}
           onClose={handleToggleNumberPerPageMenu(false)}>
-          <>
-            {ELEMENTS_PER_PAGE_OPTIONS.map((option) => {
-              const isSelected = numberOfElementsPerPage === option;
+          {ELEMENTS_PER_PAGE_OPTIONS.map((option) => {
+            const isSelected = numberOfElementsPerPage === option;
 
-              return (
-                <MenuItem
-                  key={`element-per-page-selector-option-${option}`}
-                  onClick={handleTotalNumberPerPageChange(option)}>
-                  <Radio checked={isSelected} value={option} disableRipple />
-                  <Typography>{option}</Typography>
-                </MenuItem>
-              );
-            })}
-          </>
+            return (
+              <MenuItem
+                key={`element-per-page-selector-option-${option}`}
+                onClick={handleTotalNumberPerPageChange(option)}>
+                <Radio checked={isSelected} value={option} disableRipple />
+                <Typography>{option}</Typography>
+              </MenuItem>
+            );
+          })}
         </Menu>
       </Box>
       <Box sx={{display: 'flex', alignItems: 'center'}} gap={2}>

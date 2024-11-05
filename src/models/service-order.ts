@@ -647,7 +647,7 @@ export enum ContactChannel {
 }
 
 export interface CreateServiceOrderRecord {
-  type: ServiceOrderType;
+  type: string;
   externalId?: string;
   serviceCompanyId: string;
   elevatorId: string;
@@ -765,6 +765,21 @@ export type ServiceOrderFilterForm = {
   hasComment?: boolean;
 };
 
+export enum ServiceOrderTypePriority {
+  URGENT = 'URGENT',
+  HIGH = 'HIGH',
+  MEDIUM = 'MEDIUM',
+  LOW = 'LOW',
+}
+
+export type ServiceOrderTypeRecord = {
+  icon: string;
+  name: string;
+  priority: ServiceOrderTypePriority;
+  createInAdvanceDays?: number;
+};
+
 export type ServiceOrderStatistics = {
   numOfServiceOrdersPerStatus: Record<string, number>;
+  numOfServiceOrdersPerType: Record<string, number>;
 };

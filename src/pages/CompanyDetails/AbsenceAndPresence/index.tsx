@@ -2,7 +2,6 @@ import {Card} from 'components/Card';
 import {EmptySection} from 'components/EmptySection';
 import {Dialog} from 'components/Dialog';
 import useTheme from '@mui/material/styles/useTheme';
-
 import {useState} from 'react';
 import {CreateEditViewMode, DataEditingScope} from 'models/misc';
 import {

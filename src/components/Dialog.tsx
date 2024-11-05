@@ -15,7 +15,7 @@ interface Props {
   title: string | JSX.Element;
   children: ReactNode;
   onSave?: () => void;
-  onCancel: (forceClose?: boolean) => void;
+  onCancel?: (forceClose?: boolean) => void;
   showSaveButton?: boolean;
   showCancelButton?: boolean;
   disableSaveBtn?: boolean;

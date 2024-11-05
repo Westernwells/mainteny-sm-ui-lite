@@ -11,6 +11,7 @@ import {Typography} from '@mui/material';
 import {Role} from 'models/user';
 import {SelectShift} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/SelectShift';
 import {convertToMacro} from 'utils/utils';
+import {ServiceOrderTypeRecord} from 'models/service-order';
 
 interface Props {
   getAdditionalInformationEmployeeFormValues?: (
@@ -18,12 +19,14 @@ interface Props {
   ) => void;
   initialValues?: AdditionalInformationEmployeeFormModel;
   roles: string[];
+  jobTypes?: ServiceOrderTypeRecord[];
 }
 
 export const AdditionalInformationEmployeeForm = ({
   getAdditionalInformationEmployeeFormValues,
   initialValues,
   roles,
+  jobTypes,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -62,6 +65,7 @@ export const AdditionalInformationEmployeeForm = ({
                 <SelectServiceOrderTypes
                   values={formik.values}
                   setFieldValue={formik.setFieldValue}
+                  jobTypes={jobTypes}
                 />
               </Box>
             )}

@@ -32,7 +32,7 @@ import {
   UseQueryOptions,
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
-import {ServiceOrder} from 'models/service-order';
+import {ServiceOrder, ServiceOrderTypeRecord} from 'models/service-order';
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {
@@ -586,6 +586,97 @@ export const useUpdateCompanyEventTypes = (successMsg?: string) => {
           });
         }
         queryClient.invalidateQueries(queryKeys.fetchCompanyEventTypes);
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+export const fetchCompanyJobTypes = async (companyId: string) => {
+  const response = await axiosClient.get<ServiceOrderTypeRecord[]>(
+    `/api/serviceCompanies/${companyId}/serviceOrderTypes`,
+  );
+  return response.data;
+};
+
+export const useCompanyJobTypes = (
+  companyId: string,
+  shouldFetch?: boolean,
+  options?: {refetchOnWindowFocus?: boolean; useErrorBoundary?: boolean},
+) => {
+  const {showError} = useSnackbar();
+
+  return useQuery(
+    [queryKeys.fetchCompanyJobTypes, companyId],
+    () => fetchCompanyJobTypes(companyId!),
+    {
+      enabled:
+        shouldFetch !== undefined ? !!companyId && shouldFetch : !!companyId,
+      onError: (err) => {
+        showError(err);
+      },
+      ...(options ?? {}),
+    },
+  );
+};
+
+export const fetchOldCompanyJobTypes = async (companyId: string) => {
+  const response = await axiosClient.get<ServiceOrderTypeRecord[]>(
+    `/api/serviceCompanies/${companyId}/serviceOrderTypes/old`,
+  );
+  return response.data;
+};
+
+export const useOldCompanyJobTypes = (
+  companyId: string,
+  shouldFetch?: boolean,
+  options?: {refetchOnWindowFocus?: boolean; useErrorBoundary?: boolean},
+) => {
+  const {showError} = useSnackbar();
+
+  return useQuery(
+    [queryKeys.fetchOldCompanyJobTypes, companyId],
+    () => fetchOldCompanyJobTypes(companyId!),
+    {
+      enabled:
+        shouldFetch !== undefined ? !!companyId && shouldFetch : !!companyId,
+      onError: (err) => {
+        showError(err);
+      },
+      ...(options ?? {}),
+    },
+  );
+};
+
+export const updateCompanyServiceOrderTypes = async (
+  companyId: string,
+  body: {
+    serviceOrderTypes: ServiceOrderTypeRecord[];
+  },
+) => {
+  const response = await axiosClient.put<ServiceOrderTypeRecord[]>(
+    `/api/serviceCompanies/${companyId}/serviceOrderTypes`,
+    body,
+  );
+  return response.data;
+};
+
+export const useUpdateCompanyJobTypes = () => {
+  const {showError} = useSnackbar();
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    ServiceOrderTypeRecord[],
+    unknown,
+    {body: ServiceOrderTypeRecord[]; companyId: string}
+  >(
+    ({body, companyId}) =>
+      updateCompanyServiceOrderTypes(companyId, {serviceOrderTypes: body}),
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries(queryKeys.fetchCompanyJobTypes);
       },
       onError: (err) => {
         showError(err);

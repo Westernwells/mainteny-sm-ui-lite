@@ -2,28 +2,70 @@ import {TabsBody} from 'components/TabsBody';
 import Tabs from 'components/Tabs';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
-import SettingsIcon from '@mui/icons-material/Settings';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import BuildCircleIcon from '@mui/icons-material/BuildCircle';
-import UploadIcon from '@mui/icons-material/Upload';
-import HandymanIcon from '@mui/icons-material/Handyman';
 import {useNavigate} from 'react-router-dom';
 import {useQueryState} from 'hooks/useQueryState';
-import {ServiceOrderType} from 'models/service-order';
-import {
-  serviceOrderTypeColor,
-  serviceOrderTypeToString,
-} from 'utils/service-order-utils';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
-import React from 'react';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import PageContainer from 'components/PageContainer';
 import TabsWrapper from 'components/TabsWrapper';
 import {MenuBtnProps} from 'models/misc';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import PhoneInTalkOutlinedIcon from '@mui/icons-material/PhoneInTalkOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import LoopOutlinedIcon from '@mui/icons-material/LoopOutlined';
+import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
+import MemoryOutlinedIcon from '@mui/icons-material/MemoryOutlined';
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import HandymanOutlinedIcon from '@mui/icons-material/HandymanOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import WbIncandescentOutlinedIcon from '@mui/icons-material/WbIncandescentOutlined';
+import WeekendOutlinedIcon from '@mui/icons-material/WeekendOutlined';
+import WifiTetheringOutlinedIcon from '@mui/icons-material/WifiTetheringOutlined';
+import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+import ZoomOutMapOutlinedIcon from '@mui/icons-material/ZoomOutMapOutlined';
+import TextsmsOutlinedIcon from '@mui/icons-material/TextsmsOutlined';
+import WaterDamageOutlinedIcon from '@mui/icons-material/WaterDamageOutlined';
+import WatchOutlinedIcon from '@mui/icons-material/WatchOutlined';
+import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
+import VolumeDownOutlinedIcon from '@mui/icons-material/VolumeDownOutlined';
+import VideoCameraFrontOutlinedIcon from '@mui/icons-material/VideoCameraFrontOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
+import TwoWheelerOutlinedIcon from '@mui/icons-material/TwoWheelerOutlined';
+import UmbrellaOutlinedIcon from '@mui/icons-material/UmbrellaOutlined';
+import ElevatorOutlinedIcon from '@mui/icons-material/ElevatorOutlined';
+import {t} from 'i18next';
 import {ServiceOrderList} from './Tabs/ServiceOrderList.tsx';
 import {ServiceOrderScheduleTab} from './Tabs/ServiceOrderScheduleTab';
+
+export const iconMapping = {
+  LoopOutlinedIcon,
+  WarningAmberOutlinedIcon,
+  SettingsOutlinedIcon,
+  PhoneInTalkOutlinedIcon,
+  BuildOutlinedIcon,
+  MemoryOutlinedIcon,
+  SearchOutlinedIcon,
+  RemoveRedEyeOutlinedIcon,
+  HandymanOutlinedIcon,
+  WbIncandescentOutlinedIcon,
+  WeekendOutlinedIcon,
+  WifiTetheringOutlinedIcon,
+  WorkOutlineOutlinedIcon,
+  ZoomOutMapOutlinedIcon,
+  TextsmsOutlinedIcon,
+  WaterDamageOutlinedIcon,
+  WatchOutlinedIcon,
+  VpnKeyOutlinedIcon,
+  VolumeDownOutlinedIcon,
+  VideoCameraFrontOutlinedIcon,
+  VerifiedUserOutlinedIcon,
+  TwoWheelerOutlinedIcon,
+  UmbrellaOutlinedIcon,
+  ElevatorOutlinedIcon,
+  HelpOutlineOutlinedIcon,
+};
 
 const tabItems = [
   {
@@ -43,94 +85,27 @@ export const ServiceOrders = () => {
     parserOptions: {parseNumbers: true},
   });
   const navigate = useNavigate();
+  const {user} = useUserSession();
 
-  const track = (cb: () => void) => {
-    cb();
-  };
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
-  const menu: MenuBtnProps[] = [
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.EMERGENCY),
-      action: () => track(() => navigate('/orders/new?type=emergency')),
-      icon: (
-        <ReportProblemIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.EMERGENCY)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.CALLOUT),
-      action: () => track(() => navigate('/orders/new?type=callout')),
-      icon: (
-        <PhoneInTalkIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.CALLOUT)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.REPAIR),
-      action: () => track(() => navigate('/orders/new?type=repair')),
-      icon: (
-        <SettingsIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.REPAIR)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.REGULAR),
-      action: () => track(() => navigate('/orders/new?type=regular')),
-      icon: (
-        <RefreshIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.REGULAR)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.INSPECTION),
-      action: () => track(() => navigate('/orders/new?type=inspection')),
-      icon: (
-        <YoutubeSearchedForIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.INSPECTION)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.NEW_INSTALLATION),
-      action: () => track(() => navigate('/orders/new?type=new_installation')),
-      icon: (
-        <BuildCircleIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.NEW_INSTALLATION)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.MODERNIZATION),
-      action: () => track(() => navigate('/orders/new?type=modernization')),
-      icon: (
-        <UploadIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.MODERNIZATION)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.GENERAL),
-      action: () => track(() => navigate('/orders/new?type=general')),
-      icon: (
-        <HandymanIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.GENERAL)}}
-        />
-      ),
-    },
-    {
-      label: serviceOrderTypeToString(ServiceOrderType.OPERATION),
-      action: () => track(() => navigate('/orders/new?type=operation')),
-      icon: (
-        <RemoveRedEyeIcon
-          sx={{color: serviceOrderTypeColor(ServiceOrderType.OPERATION)}}
-        />
-      ),
-    },
-  ];
+  const menu: MenuBtnProps[] =
+    jobTypes?.map((jobType) => {
+      const IconComponent =
+        iconMapping[jobType.icon as keyof typeof iconMapping] ||
+        'HelpOutlineOutlinedIcon';
+
+      return {
+        label:
+          serviceOrderTypeToString(jobType.name) === '-'
+            ? jobType.name
+            : t(serviceOrderTypeToString(jobType.name)),
+        action: () => navigate(`/orders/new?type=${jobType.name}`),
+        icon: <IconComponent />,
+      };
+    }) || [];
 
   return (
     <PageContainer gap={3}>

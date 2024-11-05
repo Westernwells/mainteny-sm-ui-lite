@@ -25,13 +25,14 @@ export type CellProps = {
   showShadows?: 'left' | 'right';
 };
 
-export type TableColumn = CellProps & HeaderCellProps & {key?: string};
+export type TableColumn = CellProps & HeaderCellProps & {key: string};
 
 export type TableColumnWithRender<T> = TableColumn & {
   renderCell: (
     renderObject: T,
     cellProps: TableColumn & CellCallbackProps,
   ) => JSX.Element;
+  getExportValue?: (renderObject: T) => string;
 };
 
 export type Action = {

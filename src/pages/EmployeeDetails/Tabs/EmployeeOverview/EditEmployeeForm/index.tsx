@@ -16,8 +16,10 @@ import {ComboBox} from 'components/ComboBox';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCompanyAutoNumberConfig,
+  useCompanyJobTypes,
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
+import {Progress} from 'components/Progress';
 import {SelectShift} from './SelectShift';
 import {EmployeeAccountData} from './model';
 import {SelectAddress} from './SelectAddress';
@@ -38,6 +40,9 @@ export const EditEmployeeForm = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const {user} = useUserSession();
+  const {data: jobTypes, isLoading: loading} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const {
     values: formikValues,
@@ -81,6 +86,10 @@ export const EditEmployeeForm = ({
   useEffect(() => {
     setCurrentEmployeeId(formikValues.employeeId);
   }, [formikValues.employeeId]);
+
+  if (loading) {
+    return <Progress />;
+  }
 
   return (
     <Dialog
@@ -208,6 +217,7 @@ export const EditEmployeeForm = ({
                     <SelectServiceOrderTypes
                       values={formikValues}
                       setFieldValue={setFieldValue}
+                      jobTypes={jobTypes}
                     />
                   </>
                 )}

@@ -210,6 +210,10 @@ export const NotificationCard = ({
               (notificationData as NonTechnicianAssignmentData)?.serviceOrder
                 ?.id
             }
+            serviceOrderType={
+              (notificationData as NonTechnicianAssignmentData)?.serviceOrder
+                .type
+            }
             open={openAssignTechnicianDialog}
             onClose={() => setOpenAssignTechnicianDialog(false)}
             onSaveCB={handleSaveAssignTechnicianCallback}

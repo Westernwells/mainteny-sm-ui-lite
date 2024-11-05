@@ -303,19 +303,19 @@ export const travelWorkCalculationTypeOptions = Object.values(
 
 export interface TravelWorkView {
   id: string;
-  serviceOrderType: ServiceOrderType;
+  serviceOrderType: string;
   calculationType: TravelWorkCalculationType;
   article: ArticleView;
 }
 
 export interface TravelWorkParams {
-  serviceOrderType: ServiceOrderType;
+  serviceOrderType: string;
 }
 
 export interface CreateTravelWorkRecord {
   serviceCompanyId: string;
   propertyOwnerId?: string;
-  serviceOrderType: ServiceOrderType;
+  serviceOrderType: string;
   calculationType: TravelWorkCalculationType;
   articleId: string;
   articleSellingPrice?: number;
@@ -323,7 +323,7 @@ export interface CreateTravelWorkRecord {
 
 export interface UpdateTravalWorkRecord {
   id: string;
-  serviceOrderType: ServiceOrderType;
+  serviceOrderType: string;
   calculationType: TravelWorkCalculationType;
   articleId: string;
   articleSellingPrice?: number;

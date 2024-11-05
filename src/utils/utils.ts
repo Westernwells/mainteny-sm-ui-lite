@@ -1,4 +1,5 @@
 import {formatISO} from 'date-fns';
+import * as XLSX from 'xlsx';
 import BigNumber from 'bignumber.js';
 import * as Yup from 'yup';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
@@ -726,3 +727,27 @@ export const removeControlCharsAndSpaces = (str: string) =>
 
 export const lowerCaseAndJoinByHyphen = (str: string) =>
   str.toLowerCase().split(' ').join('-');
+
+export const createExcelContent = ({
+  headers,
+  rows,
+  sheetName = 'Sheet 1',
+}: {
+  headers: string[];
+  rows: string[][];
+  sheetName?: string;
+}) => {
+  const worksheetData = [headers, ...rows];
+
+  const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+  const workbookBinary = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
+
+  return workbookBinary;
+};

@@ -119,6 +119,7 @@ export interface QueryContractParams {
   priceStart?: number;
   priceEnd?: number;
   paymentTermId?: string;
+  serviceOrderType?: string[];
 }
 
 export interface ContractDiscount {

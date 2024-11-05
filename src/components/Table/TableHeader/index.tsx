@@ -1,4 +1,4 @@
-import {TableHead} from '@mui/material';
+import {TableHead, TableRow} from '@mui/material';
 import {TableColumn} from 'models/table';
 import {HeaderSortingState} from 'models/pagination';
 import TableHeaderCell from '../TableHeaderCell';
@@ -17,23 +17,25 @@ const TableHeader = ({columns, sortState, onSort}: Props) => (
       zIndex: 5,
       minHeight: '40px',
     }}>
-    {columns.map((column) => {
-      if (column.hide) return;
-      return (
-        <TableHeaderCell
-          key={column.headerName}
-          isFirst={column.isFirst}
-          isLast={column.isLast}
-          column={column}
-          sortState={sortState}
-          onSort={
-            onSort && column.fieldName
-              ? () => onSort(column.fieldName as string)
-              : undefined
-          }
-        />
-      );
-    })}
+    <TableRow>
+      {columns.map((column) => {
+        if (column.hide) return;
+        return (
+          <TableHeaderCell
+            key={column.headerName}
+            isFirst={column.isFirst}
+            isLast={column.isLast}
+            column={column}
+            sortState={sortState}
+            onSort={
+              onSort && column.fieldName
+                ? () => onSort(column.fieldName as string)
+                : undefined
+            }
+          />
+        );
+      })}
+    </TableRow>
   </TableHead>
 );
 

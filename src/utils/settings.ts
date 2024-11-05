@@ -1,8 +1,11 @@
+import {t} from 'i18next';
 import {MinToStep} from 'models/service-company';
 
 export const generateOptions = () =>
   Array.from({length: 61}, (_, index) => ({
-    label: `${index} day${index !== 1 ? 's' : ''}`,
+    label: t(`{{number}} day${index > 1 ? 's' : ''}`, {
+      number: index,
+    }),
     value: String(index),
   }));
 

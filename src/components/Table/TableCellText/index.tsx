@@ -1,16 +1,17 @@
-import {SxProps, Theme} from '@mui/material';
+import {SxProps, Theme, TypographyProps} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import {PropsWithChildren} from 'react';
 
-type Props = {
+interface Props extends TypographyProps {
   capitalize?: boolean;
   tableCellTextStyles?: SxProps<Theme>;
-};
+}
 
 const TableCellText = ({
   capitalize,
   tableCellTextStyles,
   children,
+  ...props
 }: PropsWithChildren<Props>) => (
   <Typography
     variant="body2"
@@ -18,7 +19,8 @@ const TableCellText = ({
       ...tableCellTextStyles,
       ...(capitalize && {textTransform: 'capitalize'}),
     }}
-    noWrap>
+    noWrap
+    {...props}>
     {children}
   </Typography>
 );

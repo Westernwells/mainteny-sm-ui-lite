@@ -13,11 +13,11 @@ const useHighlightText = (options: HighlightTextOptions): React.ReactNode => {
     return text;
   }
 
-  const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+  const parts = text?.split(new RegExp(`(${highlight})`, 'gi'));
 
   return (
     <span>
-      {parts.map((part, index) =>
+      {parts?.map((part, index) =>
         part.toLowerCase() === highlight.toLowerCase() ? (
           <span
             key={index}

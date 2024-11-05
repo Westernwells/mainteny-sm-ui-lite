@@ -10,7 +10,6 @@ import {
   ContactChannel,
   CreateServiceOrderRecord,
   Priority,
-  ServiceOrderType,
 } from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {EmployeesView} from 'models/employee';
@@ -30,7 +29,7 @@ const steps = [
 ];
 
 interface Props {
-  type: ServiceOrderType;
+  type: string;
   elevator?: ElevatorView;
 }
 
