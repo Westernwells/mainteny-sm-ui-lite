@@ -137,18 +137,6 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             iconMaxHeight="3em"
           />
         );
-      case 'contractType':
-        return (
-          <CardProps
-            icon={<InfoOutlined sx={{color: theme.palette.info.main}} />}
-            label="TYPE"
-            bodyText={serviceOrderDetails.contract?.type || '-'}
-            iconBackground={theme.palette.info.outlinedHoverBg}
-            containerStyles={{mt: '0.5em'}}
-            iconMaxHeight="3em"
-            bodyStyle={{color: theme.palette.primary.main, paddingTop: '0.2em'}}
-          />
-        );
       case 'dueDate':
         return (
           <CardProps
