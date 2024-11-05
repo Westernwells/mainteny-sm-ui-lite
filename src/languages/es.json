@@ -900,7 +900,7 @@
   "Partial": "Parcial",
   "Final": "Final",
   "Credit Note": "Nota de crédito",
-  "Subject is required": "Se requiere sujeto",
+  "Subject is required": "Se requiere la materia",
   "Description is required": "Se requiere una descripción",
   "PRICE": "PRECIO",
   "Invoice amount": "Monto de la factura",
@@ -2867,5 +2867,8 @@
   "Job Gross Sum": "Suma bruta del trabajo",
   "Job(s) with notes": "Trabajo(s) con notas",
   "Search job number": "Buscar número de trabajo",
-  "Select contract": "Seleccionar contrato"
+  "Select contract": "Seleccionar contrato",
+  "Job types used in active contracts cannot be deleted.": "Los tipos de trabajo utilizados en contratos activos no pueden borrarse.",
+  "Number of affected active contracts:": "Número de contratos activos afectados:",
+  "Invoice Number is required": "Se requiere número de factura"
 }
