@@ -87,7 +87,7 @@ export const ScheduleDialog = ({
 
   const defaultValues = useMemo(
     () => ({
-      switchActive: false,
+      switchActive: !!(defaultStartDate && defaultEndDate),
       startDate: defaultStartDate,
       endDate: defaultEndDate,
       startTime: defaultStartDate,
