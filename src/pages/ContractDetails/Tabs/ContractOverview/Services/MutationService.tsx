@@ -66,7 +66,9 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {SearchInput} from 'components/SearchInput';
 import {EmptySection} from 'components/EmptySection';
-import {ServiceOrderLabels, ServiceOrderType} from 'models/service-order';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 
 const articleTypes = [
   {
@@ -114,6 +116,7 @@ export const MutationService = ({
   search,
 }: Props) => {
   const {t} = useTranslation();
+  const {user} = useUserSession();
   const {language: selectedLng} = useContext(LanguageContext);
   const formatDate = useFormatDate();
   const currentCurrency = useCurrentCurrency();
@@ -123,6 +126,10 @@ export const MutationService = ({
 
   const [showAll, setShowAll] = useState(false);
   const [visibleItems, setVisibleItems] = useState(5);
+
+  const {data: jobTypes, isLoading: isJobTypeLoading} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const handleCancel = () => {
     setIsDialogOpen(false);
@@ -859,11 +866,15 @@ export const MutationService = ({
                 name="orderType"
                 onBlur={formikContractServiceComponent.handleBlur}
                 onChange={formikContractServiceComponent.handleChange}>
-                {Object.values(ServiceOrderType).map((type, index) => (
-                  <MenuItem value={type} key={index}>
-                    {t(ServiceOrderLabels[type])}
-                  </MenuItem>
-                ))}
+                {jobTypes && !isJobTypeLoading
+                  ? jobTypes.map((jobType, index) => (
+                      <MenuItem value={jobType.name} key={index}>
+                        {serviceOrderTypeToString(jobType.name) === '-'
+                          ? jobType.name
+                          : t(serviceOrderTypeToString(jobType.name))}
+                      </MenuItem>
+                    ))
+                  : null}
               </Select>
             </FormControl>
           </Grid>

@@ -16,8 +16,9 @@ import {
 } from 'models/employee';
 import {getRoles} from 'utils/work-hours-utils';
 import {Role, UserView} from 'models/user';
-import {ServiceOrderType} from 'models/service-order';
 import {createEmptyResource} from 'utils/paging';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {Progress} from 'components/Progress';
 import {EmployeeAccountData} from './model';
 import {AdditionalInformationEmployeeForm} from './AdditionalInformationEmployeeForm';
 import {BasicEmployeeForm} from './BasicEmployeeForm';
@@ -40,6 +41,10 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
   const {addEmployeeAccount} = useEmployeeAccount();
 
   const {user} = useUserSession();
+
+  const {data: jobTypes, isLoading: loading} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -68,7 +73,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     additionalInformationEmployeeFormValues,
     setAdditionalInformationEmployeeFormValues,
   ] = useState<AdditionalInformationEmployeeFormModel>({
-    serviceOrderTypes: Object.values(ServiceOrderType),
+    serviceOrderTypes: jobTypes?.map((jobType) => jobType.name) || [],
     shifts: [],
   });
 
@@ -172,6 +177,10 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     });
   };
 
+  if (loading) {
+    return <Progress />;
+  }
+
   return (
     <Stepper
       handleCancel={handleCancel}
@@ -236,6 +245,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
               }
               initialValues={additionalInformationEmployeeFormValues}
               roles={roleEmployeeFormValues.roles}
+              jobTypes={jobTypes}
             />
           </FlexContainer>
         ) : null}

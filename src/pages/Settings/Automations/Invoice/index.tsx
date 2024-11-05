@@ -119,36 +119,9 @@ const Invoice = ({company, containerStyles}: Props) => {
           />
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              flex: '0 0 80%',
-              display: 'flex',
-              alignItems: 'center',
-            }}>
-            {t('Articles included in invoices')}
-            <Tooltip
-              title={t(
-                'Certain job types require specific invoice articles. Here you can add articles for each job type, which should be included in the invoices after a job is completed. This does not effect invoices created from contracts.',
-              )}
-              placement="top"
-              arrow>
-              <Box sx={{ml: 0.5, mb: -0.7}}>
-                <AlertInfoIcon width="16px" height="16px" />
-              </Box>
-            </Tooltip>
-          </Typography>
-        </Box>
-      </Grid>
-
-      <Grid>
-        <InvoiceArticles />
+        <Grid>
+          <InvoiceArticles />
+        </Grid>
       </Grid>
     </InfoCard>
   );

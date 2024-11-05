@@ -1,27 +1,38 @@
 import {FormSelect} from 'components/form/FormSelect';
-import {ServiceOrderType} from 'models/service-order';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
-import {convertToText} from 'utils/utils';
 
 interface Props {
   value: string;
   onChange: (e: any) => void;
 }
 
-export const CreateServiceOrder = ({value, onChange}: Props) => (
-  <FormSelect
-    labelId="createServiceOrder-label"
-    label="Job Type"
-    required
-    options={Object.keys(ServiceOrderType).map((i) => ({
-      label: serviceOrderTypeToString(i as ServiceOrderType),
-      value: convertToText(i),
-    }))}
-    selectProps={{
-      id: 'createServiceOrder',
-      value,
-      onChange,
-      name: 'createServiceOrder',
-    }}
-  />
-);
+export const CreateServiceOrder = ({value, onChange}: Props) => {
+  const {user} = useUserSession();
+
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  return (
+    <FormSelect
+      labelId="createServiceOrder-label"
+      label="Job Type"
+      required
+      options={jobTypes?.map((i) => ({
+        label:
+          serviceOrderTypeToString(i.name) === '-'
+            ? i.name
+            : serviceOrderTypeToString(i.name),
+        value: i.name,
+      }))}
+      selectProps={{
+        id: 'createServiceOrder',
+        value,
+        onChange,
+        name: 'createServiceOrder',
+      }}
+    />
+  );
+};

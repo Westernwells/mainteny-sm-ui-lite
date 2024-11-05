@@ -88,9 +88,9 @@ describe('Create Quotation', () => {
         cy.get('div[data-rowindex="0"]').click();
         cy.contains('button', 'Select').click();
         cy.get('div[role="combobox"][id="createServiceOrder"]').click();
-        cy.get('li[data-value="Regular"]').click();
+        cy.get('li[data-value="CALLOUT"]').click();
         cy.contains('Create').click();
-        cy.contains('New Maintenance Job');
+        cy.contains('New CALLOUT Job');
         cy.contains('Next').click();
         cy.contains('Submit').click();
         cy.wait('@createJobAPI');

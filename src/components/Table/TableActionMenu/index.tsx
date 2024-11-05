@@ -52,27 +52,22 @@ const TableActionMenu = ({
           horizontal: 'right',
         }}
         onClose={handleToggleMenu(false)}>
-        <>
-          {options.map((option, index) => {
-            const IconComponent = option.icon;
-            return (
-              <MenuItem
-                key={`menu-action-option-${index}`}
-                sx={{display: 'flex'}}
-                onClick={option.onTrigger}>
-                <ListItemButton sx={{flex: '0 0 auto'}} component="a">
-                  <IconComponent
-                    fontSize="small"
-                    sx={{color: 'action.active'}}
-                  />
-                </ListItemButton>
-                <ListItemText sx={{align: 'left'}}>
-                  {t(option.label)}
-                </ListItemText>
-              </MenuItem>
-            );
-          })}
-        </>
+        {options.map((option, index) => {
+          const IconComponent = option.icon;
+          return (
+            <MenuItem
+              key={`menu-action-option-${index}`}
+              sx={{display: 'flex'}}
+              onClick={option.onTrigger}>
+              <ListItemButton sx={{flex: '0 0 auto'}} component="a">
+                <IconComponent fontSize="small" sx={{color: 'action.active'}} />
+              </ListItemButton>
+              <ListItemText sx={{align: 'left'}}>
+                {t(option.label)}
+              </ListItemText>
+            </MenuItem>
+          );
+        })}
       </Menu>
     </>
   );

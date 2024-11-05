@@ -2,6 +2,7 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {
   EmployeeStatusView,
   EmployeesView,
+  QueryEmployeesParams,
   QueryServiceCompanyEmployeeStatusParams,
   WorkingEmployeesSummary,
   WorkingEmployeeSummaryRequest,
@@ -17,6 +18,36 @@ import {
 import {queryKeys as qks} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
+
+export const queryServiceCompanyEmployees = async (
+  serviceCompanyId: string,
+  params: QueryEmployeesParams,
+) => {
+  const response = await axiosClient.get<Resource<EmployeesView>>(
+    `/api/serviceCompanies/${serviceCompanyId}/employees`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQueryServiceCompanyEmployees = (
+  params: QueryEmployeesParams,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+  return useQuery<Resource<EmployeesView>>(
+    [qks.queryServiceCompanyEmployees, serviceCompanyId, params],
+    () => queryServiceCompanyEmployees(serviceCompanyId!, params),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+};
 
 export const getEmployee = async (employeeId: string) => {
   const response = await axiosClient.get<EmployeesView[]>(

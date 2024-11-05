@@ -45,6 +45,7 @@ export const queryKeys = {
   getTechnician: 'getTechnician',
   getUserAccount: 'getUserAccount',
   queryServiceCompanyTechnicians: 'queryServiceCompanyTechnicians',
+  queryServiceCompanyEmployees: 'queryServiceCompanyEmployees',
   queryServiceCompanyEmployeeStatus: 'queryServiceCompanyEmployeeStatus',
   getServiceOrderDetails: 'getServiceOrderDetails',
   serviceOrderActivity: 'serviceOrderActivity',

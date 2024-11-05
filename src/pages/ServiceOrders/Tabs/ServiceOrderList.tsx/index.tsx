@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import {reduce} from 'lodash';
+import {capitalize, reduce} from 'lodash';
 import {
   ServiceOrderFilterForm,
   ServiceOrderFilterToStatusMap,
@@ -29,6 +29,7 @@ import {
   toggleOrder,
 } from 'utils/paging';
 import {
+  useAllJobs,
   useServiceOrderComments,
   useServiceOrders,
   useServiceOrdersStatistics,
@@ -60,7 +61,7 @@ import {
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
-import {Checkbox, TableBody, Typography} from '@mui/material';
+import {Checkbox, CircularProgress, TableBody, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {olStyles} from 'styles';
 import {StatusChip} from 'components/StatusChip';
@@ -71,14 +72,23 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {theme} from 'theme';
 import AvatarGroup from 'components/AvatarGroup';
 import {formatDate} from 'utils/datetime';
+import {createExcelContent, getUserFullName} from 'utils/utils';
+import {downloadExcel} from 'utils/download';
 import QuickFilter from 'components/QuickFilter';
 import {OptionWithTranslationKey} from 'models/filter';
 import Filters from 'components/Filters';
 import ChipSelector from 'components/ChipSelector';
 import CustomerInput from 'components/CustomerInput';
 import TextInput from 'components/TextInput';
+import {Button} from 'components/Button';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
 import EmptyTable from 'components/Table/EmptyTable';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useSnackbar} from 'hooks/useSnackbar';
 import JobNotesDrawer from 'pages/ServiceOrderDetails/JobNotesDrawer';
 import TechnicianInput from 'components/TechnicianInput';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
@@ -98,18 +108,6 @@ const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
   {value: ServiceOrderStatusFilter.ALL, labelKey: 'All'},
   ...QUICK_FILTER_OPTIONS_WITHOUT_ALL,
-];
-
-const TYPE_OPTIONS: OptionWithTranslationKey[] = [
-  {value: ServiceOrderType.REGULAR, labelKey: 'Maintenance'},
-  {value: ServiceOrderType.EMERGENCY, labelKey: 'Emergency'},
-  {value: ServiceOrderType.CALLOUT, labelKey: 'Callout'},
-  {value: ServiceOrderType.REPAIR, labelKey: 'Repair'},
-  {value: ServiceOrderType.INSPECTION, labelKey: 'Inspection'},
-  {value: ServiceOrderType.NEW_INSTALLATION, labelKey: 'Installation'},
-  {value: ServiceOrderType.MODERNIZATION, labelKey: 'Modernization'},
-  {value: ServiceOrderType.GENERAL, labelKey: 'General'},
-  {value: ServiceOrderType.OPERATION, labelKey: 'Elevator Operation'},
 ];
 
 export const PAYMENT_STATUS_OPTIONS: OptionWithTranslationKey[] = [
@@ -150,6 +148,24 @@ type Props = {
 export const ServiceOrderList = ({menu}: Props) => {
   const navigate = useNavigate();
   const {t} = useTranslation();
+  const {user} = useUserSession();
+  const {enqueueSnackbar} = useSnackbar();
+
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
   const [page, setPage] = useQueryState('page', {
     defaultValue: makePage(0, 25),
@@ -202,7 +218,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     },
   );
   const textInput = useRef<HTMLInputElement>(null);
-  const [currentDate] = useState(new Date());
+  const currentDate = new Date();
 
   const [hoverNoteServiceId, setHoverNoteServiceId] = useState<
     string | undefined
@@ -277,6 +293,16 @@ export const ServiceOrderList = ({menu}: Props) => {
     ...(selectedContract && {contractIds: [selectedContract]}),
   };
 
+  const defaultStatsFilters: ServiceOrderQueryParams = {
+    end: endOfDay(currentDate).toISOString(),
+    start: startOfDay(subDays(currentDate, 30)).toISOString(),
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
+    order: sortOrder || Order.DESC,
+    query: '',
+  };
+
   const {
     data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(10),
     isLoading,
@@ -287,6 +313,31 @@ export const ServiceOrderList = ({menu}: Props) => {
   const {data: serviceOrdersStatistics} = useServiceOrdersStatistics(filters, {
     keepPreviousData: true,
   });
+
+  const {data: serviceOrdersDefaultStatistics} = useServiceOrdersStatistics(
+    defaultStatsFilters,
+    {
+      keepPreviousData: true,
+    },
+  );
+
+  const filteredJobTypes = useMemo(() => {
+    const jobTypesInStatistics =
+      serviceOrdersDefaultStatistics?.numOfServiceOrdersPerType
+        ? Object.keys(
+            serviceOrdersDefaultStatistics.numOfServiceOrdersPerType,
+          ).filter(
+            (jobType) =>
+              serviceOrdersDefaultStatistics.numOfServiceOrdersPerType[
+                jobType
+              ] > 0,
+          )
+        : [];
+
+    return allJobTypes?.filter((job) =>
+      jobTypesInStatistics.includes(job.name),
+    );
+  }, [serviceOrdersDefaultStatistics, allJobTypes]);
 
   const aggregatedServiceOrderStatistics = useMemo(() => {
     if (!serviceOrdersStatistics) return undefined;
@@ -303,6 +354,14 @@ export const ServiceOrderList = ({menu}: Props) => {
       {},
     );
   }, [serviceOrdersStatistics]);
+
+  const {refetch, isFetching: isFetchingAllServiceOrders} = useAllJobs(
+    filters,
+    {
+      enabled: false,
+      refetchOnWindowFocus: false,
+    },
+  );
 
   const {data: notes} = useServiceOrderComments(
     hoverNoteServiceId ?? '',
@@ -451,6 +510,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         width: '124px',
         isFirst: true, // remove when checkbox are present with bulk action
         showShadows: showRightShadow ? 'right' : undefined,
+        getExportValue: (serviceOrder) => serviceOrder.number,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
             <TableCellText>{serviceOrder.number}</TableCellText>
@@ -462,6 +522,10 @@ export const ServiceOrderList = ({menu}: Props) => {
         key: 'service-order-cell-job-type',
         width: '156px',
         fieldName: ServiceOrderOrderField.JOB_TYPE,
+        getExportValue: (serviceOrder) =>
+          serviceOrderTypeToString(serviceOrder.type) === '-'
+            ? serviceOrder.type
+            : t(serviceOrderTypeToString(serviceOrder.type)),
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
             <ServiceOrderIcons
@@ -469,7 +533,9 @@ export const ServiceOrderList = ({menu}: Props) => {
               size="small"
             />
             <TableCellText tableCellTextStyles={{paddingLeft: '0.4em'}}>
-              {t(serviceOrderTypeToString(serviceOrder.type))}
+              {serviceOrderTypeToString(serviceOrder.type) === '-'
+                ? serviceOrder.type
+                : t(serviceOrderTypeToString(serviceOrder.type))}
             </TableCellText>
           </Cell>
         ),
@@ -478,6 +544,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         headerName: 'ADDRESS',
         key: 'service-order-cell-address',
         fieldName: ServiceOrderOrderField.ELEVATOR_ADDRESS,
+        getExportValue: (serviceOrder) => serviceOrder.address,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
             <TableCellText>
@@ -517,6 +584,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         key: 'service-order-cell-number-of-units',
         width: '124px',
         fieldName: ServiceOrderOrderField.ELEVATOR_EXTERNAL_ID,
+        getExportValue: (serviceOrder) => serviceOrder.elevatorExternalId,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
             <TableCellText>{serviceOrder.elevatorExternalId}</TableCellText>
@@ -528,6 +596,8 @@ export const ServiceOrderList = ({menu}: Props) => {
         key: 'service-order-cell-due-date',
         width: '112px',
         fieldName: ServiceOrderOrderField.DUE_DATE,
+        getExportValue: (serviceOrder) =>
+          formatDate(serviceOrder.dueDate) || '',
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
             <TableCellText>{formatDate(serviceOrder.dueDate)}</TableCellText>
@@ -539,9 +609,15 @@ export const ServiceOrderList = ({menu}: Props) => {
         key: 'service-order-cell-engineer',
         width: '212px',
         fieldName: ServiceOrderOrderField.TECHNICIAN_NAME,
+        getExportValue: (serviceOrder) =>
+          serviceOrder.technicians.length > 0
+            ? serviceOrder.technicians
+                .map((technician) => getUserFullName(technician.userAccount))
+                .join(', ')
+            : '',
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>
+            <TableCellText component="div">
               <AvatarGroup
                 employees={serviceOrder.technicians.map(
                   (technician) => technician.userAccount,
@@ -556,6 +632,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         key: 'service-order-cell-customer',
         width: '132px',
         fieldName: ServiceOrderOrderField.PROPERTY_OWNER_NAME,
+        getExportValue: (serviceOrder) => serviceOrder.propertyOwner.name,
         renderCell: (serviceOrder, cellProps) => (
           <Cell
             {...cellProps}
@@ -578,9 +655,11 @@ export const ServiceOrderList = ({menu}: Props) => {
         width: '142px',
         align: 'center',
         fieldName: ServiceOrderOrderField.JOB_STATUS,
+        getExportValue: (serviceOrder) =>
+          t(serviceOrderStatusToString(serviceOrder.jobStatus)),
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>
+            <TableCellText component="div">
               <StatusChip
                 color={getServiceOrderStatusColor(serviceOrder.jobStatus)}
                 style={olStyles.orderStatus}
@@ -596,6 +675,8 @@ export const ServiceOrderList = ({menu}: Props) => {
         key: 'service-order-cell-payment',
         width: '132px',
         fieldName: ServiceOrderOrderField.PAYMENT_STATUS,
+        getExportValue: (serviceOrder) =>
+          t(serviceOrderPaymentStatusToString(serviceOrder.paymentStatus)),
         renderCell: (serviceOrder, cellProps) => {
           const showIndicator = Object.values(
             ServiceOrderPaymentWithIndicationStatus,
@@ -605,7 +686,9 @@ export const ServiceOrderList = ({menu}: Props) => {
 
           return (
             <Cell {...cellProps}>
-              <Box sx={{display: 'flex', alignItems: 'center', width: '100%'}}>
+              <Box
+                sx={{display: 'flex', alignItems: 'center', width: '100%'}}
+                gap={0.5}>
                 {showIndicator && (
                   <Tooltip
                     title={t(
@@ -827,6 +910,47 @@ export const ServiceOrderList = ({menu}: Props) => {
     setValue('hasComment', undefined);
   };
 
+  const handleExport = async () => {
+    try {
+      // Initiate the export process by fetching all filtered service orders
+      const {data} = await refetch();
+
+      if (!data || data.length === 0) {
+        return;
+      }
+
+      const excludedFields = [
+        'service-order-cell-notes',
+        'service-order-cell-action',
+      ];
+
+      const filteredColumns = COLUMNS.filter(
+        (col) => !excludedFields.includes(col.key),
+      );
+
+      const headers = filteredColumns.map((col) =>
+        capitalize(t(col.headerName)),
+      );
+
+      const dataRows = aggregateServiceOrderRow(data).map((serviceOrder) =>
+        filteredColumns.map((col) => col.getExportValue?.(serviceOrder) || ''),
+      );
+
+      const filename = 'Jobs';
+
+      const excelContent = createExcelContent({
+        headers,
+        rows: dataRows,
+        sheetName: filename,
+      });
+
+      downloadExcel({excelContent, filename});
+    } catch (error) {
+      console.error('Error exporting Excel:', error);
+      enqueueSnackbar(t('Failed to export Excel'), {variant: 'error'});
+    }
+  };
+
   useEffect(() => {
     setValue('technician', selectedTechnician);
   }, [selectedTechnician]);
@@ -896,7 +1020,13 @@ export const ServiceOrderList = ({menu}: Props) => {
             <Box sx={{display: 'flex', flexDirection: 'column'}} gap={2}>
               <ChipSelector
                 headerLabel="SERVICE TYPE"
-                options={TYPE_OPTIONS}
+                options={filteredJobTypes.map((jobType) => ({
+                  value: jobType.name,
+                  labelKey:
+                    serviceOrderTypeToString(jobType.name) === '-'
+                      ? jobType.name
+                      : t(serviceOrderTypeToString(jobType.name)),
+                }))}
                 selectedChips={watchOrderTypes}
                 onChange={handleSelectedOrderTypesChange}
               />
@@ -1016,22 +1146,41 @@ export const ServiceOrderList = ({menu}: Props) => {
           </Filters>
         </Box>
 
-        <MenuBtn
-          startIcon={<AddIcon />}
-          label="New Job"
-          menu={menu}
-          size="medium"
-          color="primary"
-          sx={{
-            textTransform: 'inherit',
-            ml: '0.8em',
-            py: '0.7em',
-            height: '40px',
-          }}
-          variant="contained"
-          disableRipple
-          disableFocusRipple
-        />
+        <Box display="flex" gap={2}>
+          {rows.length > 0 && (
+            <Button
+              buttonProps={{
+                size: 'medium',
+                variant: 'outlined',
+                color: 'primary',
+                onClick: handleExport,
+                disabled: isFetchingAllServiceOrders,
+              }}
+              style={{
+                borderColor: 'text.primary',
+                height: '36px',
+              }}>
+              {isFetchingAllServiceOrders ? (
+                <CircularProgress size="1rem" sx={{mr: 1}} />
+              ) : null}
+              <Box pt={0.5}>{t('Export')}</Box>
+            </Button>
+          )}
+
+          <MenuBtn
+            startIcon={<AddIcon />}
+            label="New Job"
+            menu={menu}
+            size="medium"
+            color="primary"
+            sx={{
+              textTransform: 'inherit',
+            }}
+            variant="contained"
+            disableRipple
+            disableFocusRipple
+          />
+        </Box>
       </PageHeaderContainer>
 
       <Box>

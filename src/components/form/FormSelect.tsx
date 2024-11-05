@@ -24,7 +24,7 @@ interface Props<T> {
   beforeLabel?: ReactNode;
   required?: boolean;
   isCompanyTranslation?: boolean;
-  options: {
+  options?: {
     label: string;
     value: string;
     secondaryLabel?: string;
@@ -128,7 +128,7 @@ export const FormSelect = ({
             Array.isArray(selectProps.value)
           ) {
             const editedValues = selectProps?.value.map((item) => {
-              const selectedOption = options.find(
+              const selectedOption = options?.find(
                 (option) => option.value === item,
               )?.label;
               return typeof selectedOption === 'string'
@@ -138,7 +138,7 @@ export const FormSelect = ({
 
             selectValue = capitalize((editedValues as string[]) || []);
           } else {
-            selectValue = options.find(
+            selectValue = options?.find(
               ({value}) => value === selectProps?.value,
             )?.label;
           }
@@ -154,7 +154,7 @@ export const FormSelect = ({
           </MenuItem>
         )}
         {[
-          options.map((option) => (
+          options?.map((option) => (
             <MenuItem
               key={option.label}
               value={option.value}
@@ -174,7 +174,7 @@ export const FormSelect = ({
                 />
               ) : null}
               {translate(option.label)}
-              {option.secondaryLabel && (
+              {option?.secondaryLabel && (
                 <Typography variant="body2" color="text.secondary">
                   {option.secondaryLabel}
                 </Typography>
@@ -182,7 +182,7 @@ export const FormSelect = ({
             </MenuItem>
           )),
           selectProps?.name === 'paymentTermId' && [
-            options.length === 0 && (
+            options?.length === 0 && (
               <MenuItem
                 disabled
                 style={{

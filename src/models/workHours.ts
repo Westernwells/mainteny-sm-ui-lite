@@ -50,6 +50,9 @@ export enum WorkHoursType {
   OFFICE_HOURS = 'OFFICE_HOURS',
   BREAK = 'BREAK',
   TRAINING = 'TRAINING',
+  VACATION = 'VACATION',
+  OFFICE_WORK = 'OFFICE_WORK',
+  FIELD_WORK = 'FIELD_WORK',
 }
 
 export enum WorkHourOrderField {

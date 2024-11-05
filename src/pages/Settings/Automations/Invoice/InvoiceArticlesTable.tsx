@@ -1,73 +1,69 @@
-import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
-import Box from '@mui/material/Box';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
+import {Box, Button} from '@mui/material';
 import {EmptySection} from 'components/EmptySection';
 import {
   useCreateTravelWork,
-  useDeleteTravelWork,
   useQueryTravelWorks,
   useUpdateTravelWork,
 } from 'hooks/reactQuery/useTravelWork';
 import {
   TravelWorkCalculationType,
-  TravelWorkCalculationTypeLabels,
   TravelWorkView,
 } from 'models/service-company';
-import {ServiceOrderType} from 'models/service-order';
-import {useEffect, useMemo, useState} from 'react';
-import {Progress} from 'components/Progress';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import {formatCurrency} from 'utils/currency';
-import {theme} from 'theme';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import {Button} from 'components/Button';
-import {SelectModal} from 'components/SelectModal';
-import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
-import {ArticleView} from 'models/article';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {StringValue} from 'models/misc';
-import {scrollTableToBottom} from 'utils/utils';
-import DOMPurify from 'dompurify';
-import {
-  hasMultipleParagraphs,
-  returnFirstParagraph,
-} from '../../../../utils/rich-text-field';
+import {CreateEditViewMode, StringValue} from 'models/misc';
+import AddIcon from '@mui/icons-material/Add';
+import {UseFieldArrayReturn, UseFormReset} from 'react-hook-form';
+import useTheme from '@mui/material/styles/useTheme';
+import DataList, {FormState} from './DataList';
+import {ArticleForm} from './InvoiceArticles';
 
 interface Props {
-  serviceOrderType: ServiceOrderType;
+  serviceOrderType: string;
+  dataListMode: CreateEditViewMode;
+  setDataListMode: (newValue: CreateEditViewMode) => void;
+  form: FormState;
+  setForm: Dispatch<SetStateAction<FormState>>;
+  editingEvent: {
+    event?: TravelWorkView;
+    index?: number;
+  };
+  setEditingEvent: Dispatch<
+    SetStateAction<{
+      event?: TravelWorkView;
+      index?: number;
+    }>
+  >;
+  isUpdating?: boolean;
+  fields: UseFieldArrayReturn<ArticleForm, 'articleList'>['fields'];
+  reset: UseFormReset<ArticleForm>;
+  openDialog: boolean;
+  setOpenDialog: Dispatch<React.SetStateAction<boolean>>;
+  isListingView: boolean;
+  onDeleteStart?: (event: TravelWorkView, index: number) => void;
 }
 
-export const makeRows = (invoiceArticles: TravelWorkView[]): GridRowsProp =>
-  invoiceArticles
-    ? invoiceArticles.map((item: TravelWorkView, index: number) => ({
-        id: index,
-        name: item.article?.name,
-        articleNumber: item.article?.externalId,
-        unit: item.article?.unit,
-        automate: item,
-        sellingPrice: formatCurrency(
-          (item.article.unitSellingAmount.netAmount ?? 0) /
-            (10 ** item.article.unitSellingAmount.fractionDigits ?? 0),
-          {
-            currency: item.article.unitSellingAmount.currency,
-          },
-        ),
-        actions: item.id,
-      }))
-    : [];
-
-const InvoiceArticlesTable = ({serviceOrderType}: Props) => {
+const InvoiceArticlesTable = ({
+  serviceOrderType,
+  dataListMode,
+  setDataListMode,
+  form,
+  setForm,
+  editingEvent,
+  setEditingEvent,
+  isUpdating = false,
+  fields,
+  reset,
+  openDialog,
+  setOpenDialog,
+  isListingView,
+  onDeleteStart,
+}: Props) => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const {user} = useUserSession();
-  const [rows, setRows] = useState<GridRowsProp>([]);
-  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [newlyAddedArticle, setNewlyAddedArticle] = useState<{id: string}>();
-  const isAutoHeightTable = rows.length <= 5;
 
   const handleSuccessResponse = (response: StringValue) => {
     setNewlyAddedArticle({id: response.value});
@@ -80,28 +76,14 @@ const InvoiceArticlesTable = ({serviceOrderType}: Props) => {
   const {mutate: updateTravelWork} = useUpdateTravelWork(
     'Article updated successfully',
   );
-  const {mutate: deleteTravelWork} = useDeleteTravelWork(
-    'Article removed successfully',
-  );
-  const {
-    data: articles,
-    isLoading,
-    isFetched,
-  } = useQueryTravelWorks({serviceOrderType});
-
-  useEffect(() => {
-    setRows(makeRows(articles?.length ? articles : []));
-    if (isFetched && !!newlyAddedArticle) {
-      setTimeout(() => scrollTableToBottom(), 300);
-    }
-  }, [articles, isFetched]);
+  const {data: articles, isFetching} = useQueryTravelWorks({serviceOrderType});
 
   const handleCalculationTypeChange = async (data: {
     articleId: string;
     calculationType: TravelWorkCalculationType;
     id: string;
   }) => {
-    await updateTravelWork({
+    updateTravelWork({
       id: data.id,
       articleId: data.articleId,
       calculationType: data.calculationType,
@@ -111,197 +93,140 @@ const InvoiceArticlesTable = ({serviceOrderType}: Props) => {
       setNewlyAddedArticle(undefined);
     }
   };
-  const handleAddArticle = async (article: ArticleView) => {
-    await createTravelWork({
-      articleId: article.id,
-      calculationType: TravelWorkCalculationType.FIXED_FEE,
-      serviceOrderType,
-      serviceCompanyId: user!.userAccount.serviceCompany.id,
+
+  const handleOnCancel = () => {
+    setForm({
+      name: '',
+      articleNumber: '',
+      unit: '',
+      automate: '',
+      sellingPrice: 0,
     });
-    setIsArticleModalOpen(false);
-  };
-  const handleDeleteArticle = async (id: string) => {
-    await deleteTravelWork(id);
+    setDataListMode('view');
   };
 
-  const columns: GridColDef[] = useMemo(
-    () => [
-      getColumnProps({
-        field: 'name',
-        headerName: 'Name',
-        variant: 'uppercase',
-        flex: 1,
-        renderCell: ({value}) => {
-          const valueToShow = hasMultipleParagraphs(value)
-            ? returnFirstParagraph(value)
-            : value;
+  const handleOnCreate = async () => {
+    if (dataListMode === 'create') {
+      createTravelWork({
+        articleId: form?.article?.id!,
+        calculationType: form.calculationType!,
+        serviceOrderType,
+        serviceCompanyId: user!.userAccount.serviceCompany.id,
+      });
+    } else if (dataListMode === 'edit' && editingEvent.index !== undefined) {
+      handleCalculationTypeChange({
+        articleId: form?.article?.id!,
+        calculationType: form.calculationType!,
+        id: form.realId!,
+      });
+    }
 
-          return (
-            <Box>
-              <Typography
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(valueToShow),
-                }}
-              />
-            </Box>
-          );
-        },
-      }),
-      getColumnProps({
-        field: 'articleNumber',
-        headerName: 'Article #',
-        variant: 'uppercase',
-        flex: 0.7,
-      }),
-      getColumnProps({
-        field: 'unit',
-        headerName: 'Unit',
-        variant: 'uppercase',
-        flex: 1,
-      }),
-      getColumnProps({
-        field: 'automate',
-        headerName: 'Automate',
-        variant: 'uppercase',
-        flex: 2.5,
-        renderCell: (params: GridRenderCellParams<TravelWorkView>) => {
-          const {value} = params;
-          return (
-            <Box
-              width="100%"
-              display="flex"
-              flexDirection="column"
-              position="relative">
-              <Select
-                size="small"
-                sx={{background: 'white', width: '100%'}}
-                onChange={(event) =>
-                  handleCalculationTypeChange({
-                    calculationType: event.target
-                      .value as TravelWorkCalculationType,
-                    articleId: value.article.id,
-                    id: value.id,
-                  })
-                }
-                inputProps={{
-                  name: 'calculationType',
-                  sx: {width: '100%'},
-                  value: value.calculationType,
-                }}>
-                {Object.values(TravelWorkCalculationType).map(
-                  (calculationType, index) => (
-                    <MenuItem
-                      key={index}
-                      value={TravelWorkCalculationType[calculationType]}>
-                      {t(
-                        TravelWorkCalculationTypeLabels[
-                          TravelWorkCalculationType[calculationType]
-                        ],
-                      )}
-                    </MenuItem>
-                  ),
-                )}
-              </Select>
-              {newlyAddedArticle?.id === value.id && (
-                <Typography variant="caption">
-                  {t('Select article automation type')}
-                </Typography>
-              )}
-            </Box>
-          );
-        },
-      }),
-      getColumnProps({
-        field: 'sellingPrice',
-        headerName: 'SELLING PRICE (EXCL. VAT)',
-        flex: 1.5,
-        align: 'right',
-        headerAlign: 'center',
-      }),
-      getColumnProps({
-        field: 'actions',
-        headerName: '',
-        align: 'right',
-        flex: 0.5,
-        renderCell: (params) => (
-          <IconButton onClick={() => handleDeleteArticle(params.value)}>
-            <DeleteOutlinedIcon style={{color: theme.palette.text.secondary}} />
-          </IconButton>
+    handleOnCancel();
+  };
+
+  const handleOnEditStart = (event: TravelWorkView, index: number) => {
+    setDataListMode('edit');
+    setEditingEvent({event, index});
+
+    if (articles?.[index]) {
+      const {article} = articles[index];
+
+      setForm((prevForm) => ({
+        ...prevForm,
+        realId: articles[index].id,
+        name: article.name,
+        calculationType: event.calculationType,
+        article: event.article,
+      }));
+    }
+  };
+
+  const handleAddNewType = () => {
+    setDataListMode('create');
+    setForm({
+      name: '',
+      articleNumber: '',
+      unit: '',
+      automate: '',
+      sellingPrice: 0,
+    });
+  };
+
+  useEffect(() => {
+    if (articles && !isFetching) {
+      reset({
+        articleList: articles?.map(
+          (item) => ({
+            id: item.id,
+            realId: item.id,
+            name: item.article.name,
+            articleNumber: item.article.externalId,
+            calculationType: item.calculationType,
+            unit: item.article.unit,
+            sellingPrice: item.article.unitSellingAmount?.netAmount || 0,
+            article: item.article,
+          }),
+          {keepDirtyValues: true, keepValues: true},
         ),
-      }),
-    ],
-    [articles?.length, newlyAddedArticle],
-  );
+      });
+    }
+  }, [articles, reset, isFetching]);
 
   return (
-    <Box
-      width="100%"
-      height="100%"
-      display="flex"
-      flexDirection="column"
-      justifyContent="space-between">
-      {isLoading ? (
-        <Progress height="100%" />
-      ) : (
-        <Box height="100%">
-          <DataGridLayout
-            isWidget
-            fullHeight={false}
-            height={!isAutoHeightTable ? '90%' : 'auto'}
-            autoHeight={isAutoHeightTable}
-            columns={columns}
-            rows={rows}
-            getRowHeight={(row) =>
-              row?.model?.automate?.id === newlyAddedArticle?.id ? 80 : 52
-            }
-            containerStyle={{
-              width: '100%',
-              height: 'fit-content',
-              '& .MuiDataGrid-row, & .MuiDataGrid-columnHeaders': {
-                background: 'none',
-              },
-              '& .MuiDataGrid-virtualScrollerContent': {
-                ...(rows.length === 0 && {height: '0 !important'}),
-              },
-            }}
-            noRowsEmptySection={
-              <EmptySection
-                showActionBtn
-                illustration="clipboard"
-                size="tiny"
-                label="No articles"
-                subLabel="They will appear here once the article is added"
-                btnAction={() => setIsArticleModalOpen(true)}
-                btnLabel="Add Article"
-                containerStyle={{
-                  height: '100%',
-                  marginTop: '10%',
-                }}
+    <Box sx={{display: 'flex', flexDirection: 'column'}}>
+      <Box mt={2}>
+        <DataList
+          onCancel={handleOnCancel}
+          onCreate={handleOnCreate}
+          onEditStart={handleOnEditStart}
+          onDeleteStart={onDeleteStart}
+          loading={isUpdating || isFetching}
+          mode={dataListMode}
+          data={fields}
+          editingEvent={editingEvent}
+          form={form}
+          setForm={setForm}
+          isListingView={isListingView}
+        />
+      </Box>
+
+      {dataListMode === 'view' && !isListingView && fields.length > 0 && (
+        <Box mt={2}>
+          <Button
+            disabled={dataListMode !== 'view'}
+            onClick={handleAddNewType}
+            startIcon={
+              <AddIcon
+                htmlColor={
+                  dataListMode === 'view'
+                    ? theme.palette.primary.light
+                    : theme.palette.secondary.mainLight
+                }
               />
             }
-          />
-          {articles?.length ? (
-            <Button
-              buttonProps={{
-                startIcon: <AddIcon />,
-                onClick: () => setIsArticleModalOpen(true),
-                sx: {color: theme.palette.primary.light},
-              }}>
-              {t('Add Article')}
-            </Button>
-          ) : null}
-
-          <SelectModal
-            isOpen={isArticleModalOpen}
-            onClose={() => setIsArticleModalOpen(false)}
-            header="Select Article">
-            {isLoading ? (
-              <Progress label="Adding article" />
-            ) : (
-              <ArticlesModalDataGrid setRowItem={handleAddArticle} />
-            )}
-          </SelectModal>
+            sx={{color: theme.palette.primary.light}}
+            variant="text">
+            {t('New Article')}
+          </Button>
         </Box>
+      )}
+
+      {fields.length < 1 && dataListMode === 'view' && (
+        <EmptySection
+          showActionBtn
+          illustration="articles"
+          size="tiny"
+          label="No articles"
+          subLabel="Add your default articles to be included in every invoice"
+          containerStyle={{
+            height: '100%',
+            marginTop: '10%',
+          }}
+          btnAction={
+            openDialog ? () => handleAddNewType() : () => setOpenDialog(true)
+          }
+          btnLabel="Add Article"
+        />
       )}
     </Box>
   );

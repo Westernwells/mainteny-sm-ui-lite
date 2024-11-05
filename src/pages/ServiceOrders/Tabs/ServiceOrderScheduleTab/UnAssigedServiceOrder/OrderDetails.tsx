@@ -9,10 +9,7 @@ import {ServiceOrderView} from 'models/service-order';
 import {Button} from 'components/Button';
 import {useTranslation} from 'react-i18next';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
-import {
-  serviceOrderTypeColor,
-  serviceOrderTypeToString,
-} from 'utils/service-order-utils';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {useFormatDateDistance} from 'hooks/useFormatDateDistance';
 
 interface Props extends BoxProps {
@@ -52,9 +49,10 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
           />
           <Typography
             variant="smallBtnText"
-            color={serviceOrderTypeColor(serviceOrder.type)}
             sx={{textTransform: 'uppercase', ml: '0.5em', pt: 0.1}}>
-            {t(serviceOrderTypeToString(serviceOrder.type))}
+            {serviceOrderTypeToString(serviceOrder.type) === '-'
+              ? serviceOrder.type
+              : t(serviceOrderTypeToString(serviceOrder.type))}
           </Typography>
         </Box>
         <Typography variant="caption">{dueDate}</Typography>
@@ -96,6 +94,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
 
       <ScheduleDialog
         serviceOrderId={serviceOrder.id}
+        serviceOrderType={serviceOrder.type}
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         defaultStartDate={

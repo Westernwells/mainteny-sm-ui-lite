@@ -1,16 +1,8 @@
-import {MouseEvent, useState, useRef} from 'react';
+import {MouseEvent, useState, useEffect} from 'react';
 import {useNavigate} from 'react-router';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import AddIcon from '@mui/icons-material/Add';
-import ReportProblemIcon from '@mui/icons-material/ReportProblemOutlined';
-import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
-import SettingsIcon from '@mui/icons-material/Settings';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import BuildCircleIcon from '@mui/icons-material/BuildCircle';
-import UploadIcon from '@mui/icons-material/Upload';
-import HandymanIcon from '@mui/icons-material/Handyman';
 import Elevator from '@mui/icons-material/Elevator';
 import People from '@mui/icons-material/People';
 import FileCopy from '@mui/icons-material/FileCopy';
@@ -27,7 +19,11 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {iconMapping} from 'pages/Settings/Automations/Job/JobTypes/DataList';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 
 interface Props extends ButtonProps {
   label?: string;
@@ -143,62 +139,19 @@ export const MenuBtn = ({
 
 export const AddAnything = () => {
   const navigate = useNavigate();
-
+  const {t} = useTranslation();
+  const {user} = useUserSession();
+  const {data: jobTypes, isLoading: loading} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const track = (cb: () => void) => {
     cb();
   };
 
-  const menu = useRef([
+  const [menu, setMenu] = useState([
     {
       header: 'New Job',
-      items: [
-        {
-          label: 'Emergency',
-          action: () => track(() => navigate('/orders/new?type=emergency')),
-          icon: <ReportProblemIcon fontSize="small" />,
-        },
-        {
-          label: 'Callout',
-          action: () => track(() => navigate('/orders/new?type=callout')),
-          icon: <PhoneInTalkIcon fontSize="small" />,
-        },
-        {
-          label: 'Repair',
-          action: () => track(() => navigate('/orders/new?type=repair')),
-          icon: <SettingsIcon fontSize="small" />,
-        },
-        {
-          label: 'Maintenance',
-          action: () => track(() => navigate('/orders/new?type=regular')),
-          icon: <RefreshIcon fontSize="small" />,
-        },
-        {
-          label: 'Inspection',
-          action: () => track(() => navigate('/orders/new?type=inspection')),
-          icon: <YoutubeSearchedForIcon fontSize="small" />,
-        },
-        {
-          label: 'Installation',
-          action: () =>
-            track(() => navigate('/orders/new?type=new_installation')),
-          icon: <BuildCircleIcon fontSize="small" />,
-        },
-        {
-          label: 'Modernization',
-          action: () => track(() => navigate('/orders/new?type=modernization')),
-          icon: <UploadIcon fontSize="small" />,
-        },
-        {
-          label: 'General',
-          action: () => track(() => navigate('/orders/new?type=general')),
-          icon: <HandymanIcon fontSize="small" />,
-        },
-        {
-          label: 'Elevator Operation',
-          action: () => track(() => navigate('/orders/new?type=operation')),
-          icon: <RemoveRedEyeIcon fontSize="small" />,
-        },
-      ],
+      items: [],
     },
     {
       header: 'New',
@@ -255,7 +208,38 @@ export const AddAnything = () => {
         },
       ],
     },
-  ]).current;
+  ]);
+
+  // Use useEffect to update the menu when jobTypes are loaded
+  useEffect(() => {
+    if (!loading && jobTypes) {
+      const jobTypeMenu = jobTypes.map((jobType) => {
+        const IconComponent =
+          iconMapping[jobType.icon as keyof typeof iconMapping] ||
+          HelpOutlineOutlinedIcon;
+
+        return {
+          label:
+            serviceOrderTypeToString(jobType.name) === '-'
+              ? jobType.name
+              : t(serviceOrderTypeToString(jobType.name)),
+          action: () =>
+            track(() => {
+              navigate(`/orders/new?type=${jobType.name}`);
+            }),
+          icon: <IconComponent fontSize="small" />,
+        };
+      });
+
+      setMenu((prevMenu) => [
+        {
+          header: 'New Job',
+          items: jobTypeMenu || [],
+        },
+        ...prevMenu.slice(1),
+      ]);
+    }
+  }, [jobTypes, loading]);
 
   return (
     <MenuBtn

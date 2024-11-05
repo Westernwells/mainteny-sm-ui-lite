@@ -1,13 +1,15 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import Box from '@mui/material/Box';
 import {
   useQueryServiceOrderScheduled,
   useServiceOrders,
+  useServiceOrdersStatistics,
 } from 'hooks/reactQuery/useServiceOrder';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {toRestDateTime} from 'utils/datetime';
 import {
   ServiceOrderOrderField,
+  ServiceOrderQueryParams,
   ServiceOrderStatus,
   ServiceOrderType,
   ServiceOrderView,
@@ -39,11 +41,18 @@ import {
 import Typography from '@mui/material/Typography';
 import {useWhen} from 'hooks/useWhen';
 import {useQueryState} from 'hooks/useQueryState';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useSearchValues} from 'hooks/useSearchValues';
 import {UnAssignedServiceOrders} from './UnAssigedServiceOrder';
-import {Order} from '../../../../models/pagination';
+import {Order, OrderByParams} from '../../../../models/pagination';
 
 export const ServiceOrderScheduleTab = () => {
   const {t} = useTranslation();
+  const {user} = useUserSession();
   const getWhen = useWhen();
   const [serviceOrderStatusColor] = useServiceOrderStatusColor();
   const [technicianSearch, setTechnicianSearch] =
@@ -60,6 +69,61 @@ export const ServiceOrderScheduleTab = () => {
   const [selectedOrderTypes, setSelectedOrderTypes, clearFilters] =
     useQueryState<ServiceOrderType[]>('selectedOrderTypes', {defaultValue: []});
   const [page] = useState(makePage(0, 500));
+
+  const {
+    values: {sortOrder, orderByField},
+  } = useSearchValues<OrderByParams<ServiceOrderOrderField>>();
+
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
+  const defaultStatsFilters: ServiceOrderQueryParams = {
+    end: endOfDay(currentDate).toISOString(),
+    start: startOfDay(subDays(currentDate, 30)).toISOString(),
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
+    order: sortOrder || Order.DESC,
+    query: '',
+  };
+
+  const {data: serviceOrdersDefaultStatistics} = useServiceOrdersStatistics(
+    defaultStatsFilters,
+    {
+      keepPreviousData: true,
+    },
+  );
+
+  const filteredJobTypes = useMemo(() => {
+    const jobTypesInStatistics =
+      serviceOrdersDefaultStatistics?.numOfServiceOrdersPerType
+        ? Object.keys(
+            serviceOrdersDefaultStatistics.numOfServiceOrdersPerType,
+          ).filter(
+            (jobType) =>
+              serviceOrdersDefaultStatistics.numOfServiceOrdersPerType[
+                jobType
+              ] > 0,
+          )
+        : [];
+
+    return allJobTypes?.filter((job) =>
+      jobTypesInStatistics.includes(job.name),
+    );
+  }, [serviceOrdersDefaultStatistics, allJobTypes]);
 
   const {data: technicianResource = createEmptyResource<EmployeesView>(10)} =
     useQueryServiceCompanyTechnicians({
@@ -145,8 +209,10 @@ export const ServiceOrderScheduleTab = () => {
     <FilterFields onClear={clearFilters}>
       <MultipleSelectCheckmarks
         label="Job Types"
-        options={Object.keys(ServiceOrderType).map((i) =>
-          serviceOrderTypeToString(i),
+        options={filteredJobTypes.map((jobType) =>
+          serviceOrderTypeToString(jobType.name) === '-'
+            ? jobType.name
+            : serviceOrderTypeToString(jobType.name),
         )}
         initialSelectedItems={selectedOrderTypes.map((i) =>
           serviceOrderTypeToString(i),

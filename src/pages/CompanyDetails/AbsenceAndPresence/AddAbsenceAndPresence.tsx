@@ -1,13 +1,10 @@
 import {Alert, Box, Button, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
-
 import {Dispatch, SetStateAction} from 'react';
 import AddIcon from '@mui/icons-material/Add';
-
 import {useGetCompanyEventTypes} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-
 import {CreateEditViewMode, DataEditingScope} from 'models/misc';
 import {EmployeeEventTypeRecord} from 'models/employee';
 import {getEventSubtype} from 'utils/employee';
