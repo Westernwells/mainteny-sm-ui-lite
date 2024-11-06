@@ -18,6 +18,9 @@ export const EditAddress = ({
 }) => {
   const {values, handleChange, handleBlur} = formik;
   const value = values[address];
+  const formErrors = getIn(formik.errors, address);
+  const formTouched = getIn(formik.touched, address);
+
   const {t} = useTranslation();
 
   const statesByCountry = useCallback(
@@ -48,9 +51,22 @@ export const EditAddress = ({
           }
           handleBlur={formik.handleBlur}
           textFieldProps={{
+            id: 'address.fullName',
             placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
             name: 'address.fullName',
             label: 'Address line 1',
+            ...(address === 'billingAddress' && {
+              required: true,
+              helperText:
+                formErrors?.fullName &&
+                getIn(formik.touched, 'address.fullName')
+                  ? formErrors?.fullName
+                  : '',
+              error:
+                !!formErrors?.fullName &&
+                getIn(formik.touched, 'address.fullName'),
+            }),
+            onBlur: formik.handleBlur,
           }}
           allowMap
           getAddress={(componentAddress) => {
@@ -81,22 +97,46 @@ export const EditAddress = ({
       <Grid item md={3.5}>
         <FormInput
           fieldProps={{
+            id: 'city',
             size: 'small',
             label: 'City',
             name: `${address}.component.city`,
             value: value?.component?.city ?? '',
             ...defaultProps,
+            ...(address === 'billingAddress' && {
+              required: true,
+              helperText:
+                formErrors?.component?.city && formTouched?.component?.city
+                  ? t(`${formErrors?.component?.city}`)
+                  : '',
+              error:
+                !!formErrors?.component?.city && formTouched?.component?.city,
+              onBlur: formik.handleBlur,
+            }),
           }}
         />
       </Grid>
       <Grid item md={2.5}>
         <FormInput
           fieldProps={{
+            id: 'postalCode',
             size: 'small',
             label: 'ZIP/Postal Code',
             name: `${address}.component.postalCode`,
             value: value?.component?.postalCode ?? '',
             ...defaultProps,
+            ...(address === 'billingAddress' && {
+              required: true,
+              helperText:
+                formErrors?.component?.postalCode &&
+                formTouched?.component?.postalCode
+                  ? t(`${formErrors?.component?.postalCode}`)
+                  : '',
+              error:
+                !!formErrors?.component?.postalCode &&
+                formTouched?.component?.postalCode,
+            }),
+            onBlur: formik.handleBlur,
           }}
         />
       </Grid>
@@ -105,13 +145,27 @@ export const EditAddress = ({
           labelId={`${address}.component.country`}
           label="Country"
           options={countriesOptions}
+          errorText={
+            formErrors?.component?.country && formTouched?.component?.country
+              ? t(`${formErrors?.component?.country}`)
+              : ''
+          }
           selectProps={{
             id: 'component.country',
             name: `${address}.component.country`,
             value: value?.component?.country ?? '',
             multiple: false,
             onChange: handleChange,
+            ...(address === 'billingAddress' && {
+              required: true,
+
+              error:
+                !!formErrors?.component?.country &&
+                formTouched?.component?.country,
+            }),
+            onBlur: formik.handleBlur,
           }}
+          required={address === 'billingAddress'}
           isCompanyTranslation
         />
       </Grid>
