@@ -1,4 +1,8 @@
-import {WorkHourOrderField, WorkHoursItem} from 'models/workHours';
+import {
+  WorkHourActivitiesOrderField,
+  WorkHourOrderField,
+  WorkHoursItem,
+} from 'models/workHours';
 import {useQuery} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
 
@@ -73,6 +77,8 @@ export const getWorkHoursActivities = async (
   startDate: Date,
   endDate: Date,
   employeeId: string,
+  order?: Order,
+  orderByField?: WorkHourActivitiesOrderField,
 ) => {
   const response = await axiosClient.get<Resource<UserActivityView>>(
     `/api/users/${employeeId}/activities`,
@@ -81,6 +87,8 @@ export const getWorkHoursActivities = async (
         query,
         start: toRestDateTime(startDate),
         end: toRestDateTime(endDate),
+        ...(order && {order}),
+        ...(orderByField && {orderByField}),
         ...page,
       },
       paramsSerializer,
@@ -95,9 +103,29 @@ export function useWorkHoursActivities(
   startDate: Date,
   endDate: Date,
   employeeId: string,
+  order?: Order,
+  orderByField?: WorkHourActivitiesOrderField,
 ) {
   return useQuery<Resource<UserActivityView>, RestError>(
-    [queryKeys.fetchWorkHours, query, page, startDate, endDate, employeeId],
-    () => getWorkHoursActivities(query, page, startDate, endDate, employeeId!),
+    [
+      queryKeys.fetchWorkHours,
+      query,
+      page,
+      startDate,
+      endDate,
+      employeeId,
+      order,
+      orderByField,
+    ],
+    () =>
+      getWorkHoursActivities(
+        query,
+        page,
+        startDate,
+        endDate,
+        employeeId!,
+        order,
+        orderByField,
+      ),
   );
 }
