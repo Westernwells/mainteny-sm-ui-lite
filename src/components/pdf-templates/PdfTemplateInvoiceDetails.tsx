@@ -172,10 +172,20 @@ const PdfTemplateInvoiceDetails = ({
         </View>
       )}
       {userInfo?.contact?.email && pdfConfigClientStorage.includeUserEmail && (
-        <View style={styles.rightAddressContent}>
-          <Text style={styles.tag}>{translate('Email address')}</Text>
-          <Text style={styles.tagContent}>{userInfo?.contact?.email}</Text>
-        </View>
+        <>
+          <View style={styles.rightAddressContent}>
+            <Text style={styles.tag}>{translate('Email address')}</Text>
+            <Text style={styles.tagContent}>
+              {userInfo.contact.email.split('@')[0]}@
+            </Text>
+          </View>
+          <View style={[styles.rightAddressContent, {marginTop: -6}]}>
+            <Text style={styles.tag} />
+            <Text style={[styles.tagContent, {marginLeft: 10}]}>
+              {userInfo.contact.email.split('@')[1]}
+            </Text>
+          </View>
+        </>
       )}
 
       {invoice?.propertyOwner?.externalId && (
