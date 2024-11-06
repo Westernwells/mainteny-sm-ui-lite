@@ -36,6 +36,14 @@ const validationSchema = Yup.object().shape({
     .email('Enter a valid email')
     .required('Email is required'),
   phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
+  billingAddress: Yup.object().shape({
+    fullName: Yup.string().nullable().required('Address is required'),
+    component: Yup.object().shape({
+      country: Yup.string().required('Country is required'),
+      city: Yup.string().nullable().required('City is required'),
+      postalCode: Yup.string().nullable().required('Postal code is required'),
+    }),
+  }),
 });
 
 export const BasicInformation = ({company}: Props) => {
