@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import {Box} from '@mui/material';
 import {WorkHourIcons} from 'components/WorkHourIcons';
 import {WorkHourTypeText} from 'components/WorkHourTypeText';
-import {WorkHoursItem} from 'models/workHours';
+import {UserActivityView} from 'models/user';
 import {FormatDate, Resource} from 'models/misc';
 import {useTranslation} from 'react-i18next';
 import {convertToHourAndMinutes} from 'utils/utils';
@@ -174,7 +174,7 @@ const getOrderId = (data: any) => {
 };
 
 export const makeRows = (
-  workHours: Resource<WorkHoursItem>,
+  workHours: Resource<UserActivityView>,
   formatDate: FormatDate,
   allJobTypes?: ServiceOrderTypeRecord[],
 ): GridRowModel<{[key: string]: any}>[] => {
@@ -186,13 +186,11 @@ export const makeRows = (
     !serviceOrderTimeLogTypes?.includes(detailType.toLowerCase());
 
   return workHours.data.length
-    ? workHours.data.map((item: WorkHoursItem) => ({
+    ? workHours.data.map((item: UserActivityView) => ({
         id: item.id,
         date: formatDate(item.startTime) ?? '-',
-        billableHours: convertToHourAndMinutes(
-          item.additionalInfo.billableTime,
-        ),
-        duration: convertToHourAndMinutes(item.additionalInfo.baseTime),
+        billableHours: convertToHourAndMinutes(item.billableMinutes),
+        duration: convertToHourAndMinutes(item.minutes),
         startTime: `${formatDate(item.startTime, 'HH:mm')}`,
         address: getAddress(item.data) || '-',
         orderNumber: (

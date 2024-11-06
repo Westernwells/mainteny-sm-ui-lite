@@ -134,6 +134,7 @@ export interface UserActivityAdditionalInfo {
 export interface UserActivityView {
   id: string;
   type: WorkHoursType;
+  subtype: string;
   refId?: string;
   data: string;
   user: UserAccountSimpleView;
@@ -143,5 +144,5 @@ export interface UserActivityView {
   billableMinutes?: number;
   additionalInfo: UserActivityAdditionalInfo;
   search: string;
-  createdAt?: string;
+  createdAt: string;
 }

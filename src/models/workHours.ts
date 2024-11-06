@@ -60,3 +60,9 @@ export enum WorkHourOrderField {
   END_TIME = 'END_TIME',
   CREATED_TIME = 'CREATED_TIME',
 }
+
+export enum WorkHourActivitiesOrderField {
+  START_TIME = 'START_TIME',
+  TYPE = 'TYPE',
+  CREATED_TIME = 'CREATED_TIME',
+}
