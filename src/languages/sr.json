@@ -2886,5 +2886,17 @@
   "Net Amount": "Neto iznos",
   "Tax rate": "Poreska stopa",
   "Tax amount": "Iznos poreza",
-  "Sorry, we couldn't find the purchase invoice.": "Žao nam je, nismo mogli da pronađemo fakturu za kupovinu."
+  "Sorry, we couldn't find the purchase invoice.": "Žao nam je, nismo mogli da pronađemo fakturu za kupovinu.",
+  "Invoice(s) with notes": "Faktura(e) sa napomenama",
+  "Customer ID": "ID klijenta",
+  "Select customer by ID": "Izaberite kupca prema ID-u",
+  "Unit ID": "ID jedinice",
+  "Select unit by ID": "Izaberite jedinicu prema ID-u",
+  "Select job by ID": "Izaberite posao prema ID-u",
+  "Select contract by ID": "Izaberite ugovor prema ID-u",
+  "No invoices": "Nema faktura",
+  "Create a new invoice and send it over to your clients.": "Napravite novu fakturu i pošaljite je svojim klijentima.",
+  "City is required": "Grad je obvezan",
+  "Country is required": "Država je obvezna",
+  "Postal code is required": "Poštanski broj je obvezan"
 }
