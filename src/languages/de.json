@@ -2869,5 +2869,10 @@
   "Unit ID": "Anlagennummer",
   "Select unit by ID": "Anlage nach Nummer auswählen",
   "Select job by ID": "Job nach Nummer auswählen",
-  "Select contract by ID": "Vertrag nach Nummer auswählen"
+  "Select contract by ID": "Vertrag nach Nummer auswählen",
+  "No invoices": "Keine Rechnungen",
+  "Create a new invoice and send it over to your clients.": "Neue Rechnung erstellen und an Kunden senden",
+  "City is required": "Stadt ist notwendig",
+  "Country is required": "Land ist notwendig",
+  "Postal code is required": "PLZ ist notwendig"
 }
