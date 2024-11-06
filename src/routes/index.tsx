@@ -52,6 +52,10 @@ import MobileWorkReportDownload from 'pages/MobileWorkReportDownload';
 import {PageLayout} from 'components/PageLayout';
 import ErrorBoundary from 'components/ErrorBoundary';
 import {UpdateSnackbar} from 'components/UpdateSnackbar';
+import PurchaseInvoices from 'pages/PurchaseInvoices';
+import NewPurchaseInvoice from 'pages/NewPurchaseInvoice';
+import PurchaseDetails from 'pages/PurchaseInvoiceDetails/PurchaseDetails';
+import EditPurchaseInvoice from 'pages/EditPurchaseInvoice';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -302,6 +306,73 @@ export const Router = () => {
                     backBtnLabel="Overdue Notice"
                     showBackAction>
                     <InvoiceOverdueNotice />
+                  </PageLayout>
+                </>
+              }
+            />
+
+            <Route
+              path="/purchase-invoices"
+              element={
+                <>
+                  <Helmet>
+                    <title>{`Purchase Invoices - ${titleTail}`}</title>
+                  </Helmet>
+                  <PageLayout pageTitle="Purchase Invoices">
+                    <PurchaseInvoices />
+                  </PageLayout>
+                </>
+              }
+            />
+
+            <Route
+              path="/purchase-invoices/new"
+              element={
+                <>
+                  <Helmet>
+                    <title>{`New Purchase Invoice - ${titleTail}`}</title>
+                  </Helmet>
+                  <PageLayout
+                    pageScrollable
+                    backBtnLabel="New Purchase Invoice"
+                    showBackAction>
+                    <NewPurchaseInvoice formType="new" />
+                  </PageLayout>
+                </>
+              }
+            />
+
+            <Route
+              path="/purchase-invoices/details/:id"
+              element={
+                <>
+                  <Helmet>
+                    <title>{`Purchase Invoice Details - ${titleTail}`}</title>
+                  </Helmet>
+                  <PageLayout
+                    showBackAction
+                    pageScrollable
+                    backBtnLabel={currentPageTitle}>
+                    <PurchaseDetails
+                      getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                    />
+                  </PageLayout>
+                </>
+              }
+            />
+
+            <Route
+              path="/purchase-invoices/details/:id/edit"
+              element={
+                <>
+                  <Helmet>
+                    <title>{`Edit Purchase Invoice - ${titleTail}`}</title>
+                  </Helmet>
+                  <PageLayout
+                    showBackAction
+                    pageScrollable
+                    backBtnLabel="Edit Purchase Invoice">
+                    <EditPurchaseInvoice />
                   </PageLayout>
                 </>
               }

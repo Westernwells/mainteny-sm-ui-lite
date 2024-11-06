@@ -46,7 +46,8 @@ export interface Props extends BoxProps {
     | 'calendarClockGrey'
     | 'contacts'
     | 'jobs'
-    | 'employee';
+    | 'employee'
+    | 'purchase-invoice';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
