@@ -312,6 +312,7 @@ export interface ServiceOrderAdditionalInfo {
   pictures?: FileResource[];
   discount?: Discount;
   commentCount?: number;
+  totalAmount?: Amount;
 }
 
 export interface ServiceOrderConfirmationInfo {

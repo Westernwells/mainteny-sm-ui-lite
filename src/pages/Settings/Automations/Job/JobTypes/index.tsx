@@ -28,6 +28,7 @@ import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {useFieldArray, useForm} from 'react-hook-form';
 import {ConfirmDelete} from 'components/ConfirmDelete';
 import {useSnackbar} from 'hooks/useSnackbar';
+import {iconMapping} from 'pages/ServiceOrders';
 import {useQueryContract} from 'hooks/reactQuery/useContract';
 import {ContractView, ContractOrderField} from 'models/contract';
 import {Order} from 'models/pagination';
@@ -39,7 +40,6 @@ import {
   StyledDataListCell,
   StyledDataListHeading,
   StyledDataListRow,
-  iconMapping,
   priorityColorMap,
   priorityToText,
 } from './DataList';

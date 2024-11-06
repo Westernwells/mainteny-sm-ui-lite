@@ -193,6 +193,23 @@ export const getCurrencySymbol: {[key: string]: string} = {
   MXN: '$',
 };
 
+export const getCurrencyData: {
+  [key: string]: {symbol: string; flagUrl: string};
+} = {
+  USD: {symbol: '$', flagUrl: '/src/assets/icons/USDollar.svg'},
+  EUR: {symbol: '€', flagUrl: '/src/assets/icons/Euro.svg'},
+  GBP: {symbol: '£', flagUrl: '/src/assets/icons/GBP.svg'},
+  CNY: {symbol: '¥', flagUrl: '/src/assets/icons/ChinaYuan.svg'},
+  JPY: {symbol: '¥', flagUrl: '/src/assets/icons/JPYen.svg'},
+  BAM: {symbol: 'KM', flagUrl: '/src/assets/icons/BAM.svg'},
+  CHF: {symbol: 'CHF', flagUrl: '/src/assets/icons/CHF.svg'},
+  RUB: {symbol: '₽', flagUrl: '/src/assets/icons/RUB.svg'},
+  DKK: {symbol: 'kr', flagUrl: '/src/assets/icons/DKK.svg'},
+  NGN: {symbol: '₦', flagUrl: '/src/assets/icons/NGN.svg'},
+  GEL: {symbol: '₾', flagUrl: '/src/assets/icons/GEL.svg'},
+  MXN: {symbol: '$', flagUrl: '/src/assets/icons/MXN.svg'},
+};
+
 export const useCurrentCurrency = (): CurrencyModalType => {
   const {user} = useUserSession();
 
