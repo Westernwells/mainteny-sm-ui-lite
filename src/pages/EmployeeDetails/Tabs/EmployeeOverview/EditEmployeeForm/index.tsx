@@ -54,6 +54,8 @@ export const EditEmployeeForm = ({
     dirty,
     resetForm,
     setFieldValue,
+    validateForm,
+    setTouched,
   } = useFormikContext<EmployeeAccountData>();
 
   const defaultProps = {
@@ -82,6 +84,22 @@ export const EditEmployeeForm = ({
     resetForm();
     onClose();
   };
+
+  useEffect(() => {
+    if (openDialog) {
+      setTouched({
+        firstName: true,
+        lastName: true,
+        phone: true,
+        email: true,
+        team: true,
+        address: true,
+        employeeId: true,
+        totalYearlyVacationDaysAllowed: true,
+      });
+      validateForm();
+    }
+  }, [openDialog]);
 
   useEffect(() => {
     setCurrentEmployeeId(formikValues.employeeId);
