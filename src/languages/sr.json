@@ -2898,5 +2898,10 @@
   "Create a new invoice and send it over to your clients.": "Napravite novu fakturu i pošaljite je svojim klijentima.",
   "City is required": "Grad je obvezan",
   "Country is required": "Država je obvezna",
-  "Postal code is required": "Poštanski broj je obvezan"
+  "Postal code is required": "Poštanski broj je obvezan",
+  "No units": "Nema jedinica",
+  "Select a supplier": "Izaberite dostavljača",
+  "Enter Supplier ID": "Unesite ID dobavljača",
+  "Add job number": "Dodajte broj posla",
+  "Select a job number": "Izaberite broj posla"
 }
