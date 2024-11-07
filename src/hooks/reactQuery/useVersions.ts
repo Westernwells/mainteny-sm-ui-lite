@@ -1,12 +1,12 @@
 import {useQuery} from 'react-query';
-import {getVersionType, Resource, RestError} from 'models/misc';
+import {getVersionType, RestError} from 'models/misc';
 import {GetVersionsParams, Version} from 'models/versions';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {queryKeys} from 'reactQuery/constants';
 import {useUserSession} from './useUserSession';
 
 export const fetchVersions = async (params: GetVersionsParams) => {
-  const response = await axiosClient.get<Resource<Version>>(`/api/versions`, {
+  const response = await axiosClient.get<Version>(`/api/versions/latest`, {
     params,
     paramsSerializer,
   });
@@ -18,12 +18,10 @@ export const useFetchLatestVersion = () => {
   const type = getVersionType(hostname);
   const {user} = useUserSession();
 
-  return useQuery<Resource<Version>, RestError>(
+  return useQuery<Version, RestError>(
     [queryKeys.fetchLatestVersion],
     () =>
       fetchVersions({
-        pageIndex: 0,
-        pageSize: 1,
         type,
       }),
     {
