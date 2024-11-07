@@ -53,22 +53,23 @@ export const AdditionalInformationEmployeeForm = ({
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
           <Grid item md={12}>
-            {convertToMacro(roles[0]).includes(Role.TECHNICIAN) && (
-              <Box sx={{marginBottom: '1.250em'}}>
-                <Typography
-                  sx={{
-                    color: theme.palette.text.primary,
-                    marginBottom: '0.313em',
-                  }}>
-                  {t('Order Types')}
-                </Typography>
-                <SelectServiceOrderTypes
-                  values={formik.values}
-                  setFieldValue={formik.setFieldValue}
-                  jobTypes={jobTypes}
-                />
-              </Box>
-            )}
+            {convertToMacro(roles[0]).includes(Role.TECHNICIAN) ||
+              (convertToMacro(roles[0]).includes(Role.CONTRACTOR) && (
+                <Box sx={{marginBottom: '1.250em'}}>
+                  <Typography
+                    sx={{
+                      color: theme.palette.text.primary,
+                      marginBottom: '0.313em',
+                    }}>
+                    {t('Order Types')}
+                  </Typography>
+                  <SelectServiceOrderTypes
+                    values={formik.values}
+                    setFieldValue={formik.setFieldValue}
+                    jobTypes={jobTypes}
+                  />
+                </Box>
+              ))}
             <Typography
               sx={{color: theme.palette.text.primary, marginBottom: '0.313em'}}>
               {t('Shift Time')}
