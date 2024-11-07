@@ -9,4 +9,6 @@ export interface ClientReportForPDFConfig {
   includeUsername?: boolean;
   includeUserEmail?: boolean;
   includeUserPhone?: boolean;
+  includeCustomerVAT?: boolean;
+  includeUnitBuilding?: boolean;
 }

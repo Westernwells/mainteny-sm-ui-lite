@@ -285,6 +285,11 @@ const PartialInvoicePdfTemplate = ({
 
   const styles = getStyles(boldFontStyle, regularFontStyle);
 
+  const customerVATId =
+    (pdfConfigClientStorage.includeCustomerVAT &&
+      invoice?.propertyOwner?.additionalInfo?.vatId) ||
+    '';
+
   return (
     <Document>
       {invoice?.additionalInfo.alternativeAddress &&
@@ -324,6 +329,7 @@ const PartialInvoicePdfTemplate = ({
               }
               selectedLng={selectedLng}
               translate={translate}
+              customerVATId={customerVATId}
             />
 
             <PdfTemplateInvoiceDetails

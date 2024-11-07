@@ -36,6 +36,7 @@ type Props = {
   translate: (key: string) => string;
   address?: Address;
   selectedLng?: string;
+  building: string;
 };
 
 const getStyles = (
@@ -65,7 +66,7 @@ const getStyles = (
     },
   });
 
-const PdfUnitAddress = ({translate, address, selectedLng}: Props) => {
+const PdfUnitAddress = ({translate, address, selectedLng, building}: Props) => {
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
   };
@@ -89,6 +90,8 @@ const PdfUnitAddress = ({translate, address, selectedLng}: Props) => {
           flexDirection: 'column',
           ...styles.tagContent,
         }}>
+        {!!building && <Text>{building}</Text>}
+
         {address.component?.street && <Text>{address.component.street}</Text>}
 
         {address.component?.street2 && <Text>{address.component.street2}</Text>}

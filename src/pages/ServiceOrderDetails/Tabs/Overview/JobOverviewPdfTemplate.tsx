@@ -251,6 +251,16 @@ const JobOverviewPdfTemplate = React.memo(
 
     const styles = getStyles(boldFontStyle);
 
+    const customerVATId =
+      (pdfConfigClientStorage.includeCustomerVAT &&
+        serviceOrder?.elevator?.propertyOwner?.additionalInfo?.vatId) ||
+      '';
+
+    const unitBuilding =
+      (pdfConfigClientStorage.includeUnitBuilding &&
+        serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
+      '';
+
     return (
       <Document>
         <PdfPageContainer selectedLng={selectedLng}>
@@ -266,6 +276,7 @@ const JobOverviewPdfTemplate = React.memo(
                 }
                 selectedLng={selectedLng}
                 translate={translate}
+                customerVATId={customerVATId}
               />
 
               <View style={styles.rightAddress}>
@@ -378,6 +389,7 @@ const JobOverviewPdfTemplate = React.memo(
                     address={elevatorAddress}
                     translate={translate}
                     selectedLng={selectedLng}
+                    building={unitBuilding}
                   />
                 </View>
               </View>
