@@ -183,6 +183,11 @@ const InvoiceOverduePdfPreview = ({
     ],
   );
 
+  const customerVATId =
+    (pdfConfigClientStorage.includeCustomerVAT &&
+      invoice?.propertyOwner?.additionalInfo?.vatId) ||
+    '';
+
   return (
     <Document>
       <PdfPageContainer selectedLng={selectedLng}>
@@ -201,6 +206,7 @@ const InvoiceOverduePdfPreview = ({
               }
               selectedLng={selectedLng}
               translate={translate}
+              customerVATId={customerVATId}
             />
 
             <View style={styles.rightAddress}>

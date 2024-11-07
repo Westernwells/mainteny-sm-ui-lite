@@ -336,6 +336,16 @@ const WorkReportTemplate = React.memo(
 
     const elevatorAddress = serviceOrder?.elevator?.address;
 
+    const customerVATId =
+      (pdfConfigClientStorage.includeCustomerVAT &&
+        serviceOrder?.elevator?.propertyOwner?.additionalInfo?.vatId) ||
+      '';
+
+    const unitBuilding =
+      (pdfConfigClientStorage.includeUnitBuilding &&
+        serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
+      '';
+
     return (
       <Document>
         <PdfPageContainer selectedLng={selectedLng}>
@@ -352,6 +362,7 @@ const WorkReportTemplate = React.memo(
                 }
                 selectedLng={selectedLng}
                 translate={translate}
+                customerVATId={customerVATId}
               />
 
               <View style={styles.rightAddress}>
@@ -462,6 +473,7 @@ const WorkReportTemplate = React.memo(
                     address={elevatorAddress}
                     translate={translate}
                     selectedLng={selectedLng}
+                    building={unitBuilding}
                   />
                 </View>
               </View>

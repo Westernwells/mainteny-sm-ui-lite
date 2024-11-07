@@ -290,6 +290,11 @@ const FullInvoicePdfTemplate = ({
 
   const styles = getStyles(boldFontStyle, regularFontStyle);
 
+  const customerVATId =
+    (pdfConfigClientStorage.includeCustomerVAT &&
+      invoice?.propertyOwner?.additionalInfo?.vatId) ||
+    '';
+
   return (
     <Document>
       {invoice?.additionalInfo.alternativeAddress &&
@@ -330,6 +335,7 @@ const FullInvoicePdfTemplate = ({
               }
               selectedLng={selectedLng}
               translate={translate}
+              customerVATId={customerVATId}
             />
 
             <PdfTemplateInvoiceDetails

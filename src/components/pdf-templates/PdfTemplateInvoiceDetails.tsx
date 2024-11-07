@@ -119,6 +119,11 @@ const PdfTemplateInvoiceDetails = ({
     ],
   );
 
+  const unitBuilding =
+    (pdfConfigClientStorage.includeUnitBuilding &&
+      invoice?.serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
+    '';
+
   return (
     <View style={styles.rightAddress}>
       {(invoice?.externalId || nextCompanyExternalId) && (
@@ -258,6 +263,7 @@ const PdfTemplateInvoiceDetails = ({
           address={invoice?.serviceOrder?.elevator?.address}
           translate={translate}
           selectedLng={selectedLng}
+          building={unitBuilding}
         />
       </View>
     </View>
