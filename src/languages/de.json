@@ -2874,5 +2874,10 @@
   "Create a new invoice and send it over to your clients.": "Neue Rechnung erstellen und an Kunden senden",
   "City is required": "Stadt ist notwendig",
   "Country is required": "Land ist notwendig",
-  "Postal code is required": "PLZ ist notwendig"
+  "Postal code is required": "PLZ ist notwendig",
+  "No units": "Keine Anlagen",
+  "Select a supplier": "Wähle einen Lieferanten",
+  "Enter Supplier ID": "Wähle eine Lieferantennummer",
+  "Add job number": "Auftragsnummer hinzufügen",
+  "Select a job number": "Wähle eine Auftragsnummer"
 }
