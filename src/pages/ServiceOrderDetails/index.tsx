@@ -3,6 +3,7 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import GradingIcon from '@mui/icons-material/Grading';
 import FactCheck from '@mui/icons-material/FactCheck';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {Progress} from 'components/Progress';
@@ -35,6 +36,7 @@ import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
 import JobOverviewPdfTemplate from './Tabs/Overview/JobOverviewPdfTemplate';
+import SupplierInvoices from './Tabs/SupplierInvoices';
 
 const tabItems = [
   {
@@ -48,6 +50,10 @@ const tabItems = [
   {
     label: 'Checklist',
     icon: <FactCheck />,
+  },
+  {
+    label: 'Supplier invoices',
+    icon: <ReceiptLongIcon />,
   },
 ];
 
@@ -248,6 +254,12 @@ export const ServiceOrderDetails = () => {
         index={2}
         containerStyle={{height: '1px', overflow: 'auto', marginTop: 3}}>
         <CheckList serviceOrder={serviceOrder!} />
+      </TabsBody>
+      <TabsBody
+        value={tabValue}
+        index={3}
+        containerStyle={{height: '1px', overflow: 'auto', marginTop: 3}}>
+        <SupplierInvoices serviceOrderId={serviceOrder?.id!} />
       </TabsBody>
     </Tabs>
   );

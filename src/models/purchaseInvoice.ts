@@ -93,6 +93,7 @@ export interface QueryPurchaseInvoiceParams {
   orderBy?: PurchaseInvoiceOrderField;
   grossAmountMin?: number;
   grossAmountMax?: number;
+  serviceOrderId?: string[];
 }
 
 export enum PurchaseInvoiceOrderField {
@@ -121,6 +122,7 @@ export interface QueryPurchaseInvoiceStatisticsParams {
   sentDateFrom?: string;
   sentDateTo?: string;
   status?: PurchaseInvoiceStatus[];
+  serviceOrderId?: string[];
 }
 
 export interface PurchaseInvoiceStatistics {

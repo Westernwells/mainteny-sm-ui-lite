@@ -10,6 +10,7 @@ import {DateRange} from '@mui/x-date-pickers-pro';
 import {formatDate, toRestDateTimeFormat} from 'utils/datetime';
 import {t} from 'i18next';
 import {Progress} from 'components/Progress';
+import {QueryPurchaseInvoiceParams} from 'models/purchaseInvoice';
 
 type MetricProps = {
   title: string;
@@ -46,9 +47,10 @@ const Metric = ({
 
 type Props = {
   selectedDateRange: DateRange<Date | null>;
+  filters?: QueryPurchaseInvoiceParams;
 };
 
-const DashboardMetrics = ({selectedDateRange}: Props) => {
+const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
   const [createdDateTimeFrom, createdDateTimeTo] = selectedDateRange;
 
   const formattedCreatedDateTimeFrom = createdDateTimeFrom
@@ -61,6 +63,7 @@ const DashboardMetrics = ({selectedDateRange}: Props) => {
 
   const {data: purchaseInvoiceStatistics, isLoading} =
     usePurchaseInvoiceStatistics({
+      ...filters,
       createdDateTimeFrom: formattedCreatedDateTimeFrom,
       createdDateTimeTo: formattedCreatedDateTimeTo,
     });

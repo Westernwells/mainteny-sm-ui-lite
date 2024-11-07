@@ -100,7 +100,15 @@ export const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
   ...QUICK_FILTER_OPTIONS_WITHOUT_ALL,
 ];
 
-export const PurchaseInvoices = () => {
+type Props = {
+  serviceOrderId?: string;
+  hideFilters?: boolean;
+};
+
+export const PurchaseInvoices = ({
+  serviceOrderId,
+  hideFilters = false,
+}: Props) => {
   const {t} = useTranslation();
 
   const navigate = useNavigate();
@@ -260,6 +268,7 @@ export const PurchaseInvoices = () => {
     ...(isWithAttachments && {hasDocuments: isWithAttachments}),
     ...(netAmountMin && netAmountMin > 0 && {netAmountFrom: netAmountMin}),
     ...(netAmountMax && netAmountMax > 0 && {netAmountTo: netAmountMax}),
+    ...(hideFilters && {serviceOrderId: [serviceOrderId!]}),
   };
 
   const {
@@ -276,7 +285,6 @@ export const PurchaseInvoices = () => {
 
   const {data: purchaseInvoiceStatistics} =
     usePurchaseInvoiceStatistics(filters);
-
   const aggregatedPurchaseInvoiceStatistics = useMemo(() => {
     if (!purchaseInvoiceStatistics) return undefined;
 
@@ -845,52 +853,25 @@ export const PurchaseInvoices = () => {
               inputTestId="start-end-date"
               popupTestId="start-end-date-popup"
             />
-            <Filters
-              activeFilters={appliedFilterNumber}
-              onOpen={handleFilterOpen}
-              onSave={handleSubmit(handleFilterApply)}
-              onReset={handleFilterReset}>
-              <Box
-                sx={{display: 'flex', flexDirection: 'column', width: '100%'}}
-                gap={2}>
-                <Controller
-                  control={control}
-                  name="number"
-                  render={({field}) => (
-                    <TextInput
-                      {...field}
-                      labelKey="Number"
-                      placeholder="Enter invoice number"
-                      onChange={handleInvoiceNumberChange}
-                      size="small"
-                    />
-                  )}
-                />
 
-                <Controller
-                  control={control}
-                  name="subject"
-                  render={({field}) => (
-                    <TextInput
-                      {...field}
-                      labelKey="Subject"
-                      placeholder="Enter subject"
-                      onChange={handleSubjectChange}
-                      size="small"
-                    />
-                  )}
-                />
-
-                <Box sx={{display: 'flex'}} gap={1}>
+            {!hideFilters && (
+              <Filters
+                activeFilters={appliedFilterNumber}
+                onOpen={handleFilterOpen}
+                onSave={handleSubmit(handleFilterApply)}
+                onReset={handleFilterReset}>
+                <Box
+                  sx={{display: 'flex', flexDirection: 'column', width: '100%'}}
+                  gap={2}>
                   <Controller
                     control={control}
-                    name="supplierName"
+                    name="number"
                     render={({field}) => (
                       <TextInput
                         {...field}
-                        labelKey="Supplier Name"
-                        placeholder="Enter supplier name"
-                        onChange={handleSupplierNameChange}
+                        labelKey="Number"
+                        placeholder="Enter invoice number"
+                        onChange={handleInvoiceNumberChange}
                         size="small"
                       />
                     )}
@@ -898,178 +879,212 @@ export const PurchaseInvoices = () => {
 
                   <Controller
                     control={control}
-                    name="supplierId"
+                    name="subject"
                     render={({field}) => (
                       <TextInput
                         {...field}
-                        labelKey="Supplier ID"
-                        placeholder="Enter supplier ID"
-                        onChange={handleSupplierIdChange}
+                        labelKey="Subject"
+                        placeholder="Enter subject"
+                        onChange={handleSubjectChange}
                         size="small"
                       />
                     )}
                   />
-                </Box>
-
-                <Box sx={{display: 'flex'}} gap={1}>
-                  <Box>
-                    <Typography variant="subtitle2">
-                      {t('Start Date')}
-                    </Typography>
-                    <Controller
-                      control={control}
-                      name="sentDateFrom"
-                      render={({field}) => {
-                        const dateValue = field.value
-                          ? new Date(field.value)
-                          : undefined;
-
-                        return (
-                          <DatePicker
-                            {...field}
-                            defaultDate={dateValue}
-                            maxDate={new Date()}
-                            minDate={dateValue || undefined}
-                            reset={resetDatePicker}
-                            getReset={(val) => {
-                              if (val) {
-                                setResetDatePicker(false);
-                              }
-                            }}
-                            containerStyles={{mr: '1em'}}
-                            getSelectedDate={(date) => {
-                              field.onChange(date);
-                              setSentDateFrom(date);
-                            }}
-                            inputLabelProps={{shrink: undefined}}
-                            textFieldProps={{
-                              label: '',
-                              sx: {background: '#fff'},
-                            }}
-                            value={dateValue}
-                          />
-                        );
-                      }}
-                    />
-                  </Box>
-
-                  <Box>
-                    <Typography variant="subtitle2">{t('End Date')}</Typography>
-
-                    <Controller
-                      control={control}
-                      name="sentDateTo"
-                      render={({field}) => {
-                        const dateValue = field.value
-                          ? new Date(field.value)
-                          : null;
-
-                        return (
-                          <DatePicker
-                            {...field}
-                            defaultDate={dateValue}
-                            maxDate={new Date()}
-                            minDate={
-                              sentDateFrom ? new Date(sentDateFrom) : undefined
-                            }
-                            reset={resetDatePicker}
-                            getReset={(val) => {
-                              if (val) {
-                                setResetDatePicker(false);
-                              }
-                            }}
-                            containerStyles={{mr: '1em'}}
-                            getSelectedDate={(date) => {
-                              field.onChange(date);
-                              setSentDateTo(date);
-                            }}
-                            inputLabelProps={{shrink: undefined}}
-                            textFieldProps={{
-                              label: '',
-                              sx: {background: '#fff'},
-                            }}
-                            value={dateValue}
-                          />
-                        );
-                      }}
-                    />
-                  </Box>
-                </Box>
-
-                <ChipSelector
-                  headerLabel="Invoice Status"
-                  options={QUICK_FILTER_OPTIONS}
-                  selectedChips={watchPurchaseInvoiceStatus}
-                  onChange={handleSelectedPurchaseInvoiceStatusChange}
-                />
-
-                <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
-                  <Typography variant="subtitle2">
-                    {t('Amount Range')}
-                  </Typography>
 
                   <Box sx={{display: 'flex'}} gap={1}>
                     <Controller
                       control={control}
-                      name="netAmountMin"
-                      render={() => (
+                      name="supplierName"
+                      render={({field}) => (
                         <TextInput
-                          value={watchNetMin ? `${watchNetMin}` : ''}
-                          placeholder="Min"
-                          styles={{
-                            '& .MuiInputBase-input': {
-                              textAlign: 'end',
-                            },
-                          }}
+                          {...field}
+                          labelKey="Supplier Name"
+                          placeholder="Enter supplier name"
+                          onChange={handleSupplierNameChange}
                           size="small"
-                          onChange={handleNetAmountMinChange}
                         />
                       )}
                     />
 
                     <Controller
                       control={control}
-                      name="netAmountMax"
-                      render={() => (
+                      name="supplierId"
+                      render={({field}) => (
                         <TextInput
-                          value={watchNetMax ? `${watchNetMax}` : ''}
-                          placeholder="Max"
-                          styles={{
-                            '& .MuiInputBase-input': {
-                              textAlign: 'end',
-                            },
-                          }}
+                          {...field}
+                          labelKey="Supplier ID"
+                          placeholder="Enter supplier ID"
+                          onChange={handleSupplierIdChange}
                           size="small"
-                          onChange={handleNetAmountMaxChange}
+                        />
+                      )}
+                    />
+                  </Box>
+
+                  <Box sx={{display: 'flex'}} gap={1}>
+                    <Box>
+                      <Typography variant="subtitle2">
+                        {t('Start Date')}
+                      </Typography>
+                      <Controller
+                        control={control}
+                        name="sentDateFrom"
+                        render={({field}) => {
+                          const dateValue = field.value
+                            ? new Date(field.value)
+                            : undefined;
+
+                          return (
+                            <DatePicker
+                              {...field}
+                              defaultDate={dateValue}
+                              maxDate={new Date()}
+                              minDate={dateValue || undefined}
+                              reset={resetDatePicker}
+                              getReset={(val) => {
+                                if (val) {
+                                  setResetDatePicker(false);
+                                }
+                              }}
+                              containerStyles={{mr: '1em'}}
+                              getSelectedDate={(date) => {
+                                field.onChange(date);
+                                setSentDateFrom(date);
+                              }}
+                              inputLabelProps={{shrink: undefined}}
+                              textFieldProps={{
+                                label: '',
+                                sx: {background: '#fff'},
+                              }}
+                              value={dateValue}
+                            />
+                          );
+                        }}
+                      />
+                    </Box>
+
+                    <Box>
+                      <Typography variant="subtitle2">
+                        {t('End Date')}
+                      </Typography>
+
+                      <Controller
+                        control={control}
+                        name="sentDateTo"
+                        render={({field}) => {
+                          const dateValue = field.value
+                            ? new Date(field.value)
+                            : null;
+
+                          return (
+                            <DatePicker
+                              {...field}
+                              defaultDate={dateValue}
+                              maxDate={new Date()}
+                              minDate={
+                                sentDateFrom
+                                  ? new Date(sentDateFrom)
+                                  : undefined
+                              }
+                              reset={resetDatePicker}
+                              getReset={(val) => {
+                                if (val) {
+                                  setResetDatePicker(false);
+                                }
+                              }}
+                              containerStyles={{mr: '1em'}}
+                              getSelectedDate={(date) => {
+                                field.onChange(date);
+                                setSentDateTo(date);
+                              }}
+                              inputLabelProps={{shrink: undefined}}
+                              textFieldProps={{
+                                label: '',
+                                sx: {background: '#fff'},
+                              }}
+                              value={dateValue}
+                            />
+                          );
+                        }}
+                      />
+                    </Box>
+                  </Box>
+
+                  <ChipSelector
+                    headerLabel="Invoice Status"
+                    options={QUICK_FILTER_OPTIONS}
+                    selectedChips={watchPurchaseInvoiceStatus}
+                    onChange={handleSelectedPurchaseInvoiceStatusChange}
+                  />
+
+                  <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
+                    <Typography variant="subtitle2">
+                      {t('Amount Range')}
+                    </Typography>
+
+                    <Box sx={{display: 'flex'}} gap={1}>
+                      <Controller
+                        control={control}
+                        name="netAmountMin"
+                        render={() => (
+                          <TextInput
+                            value={watchNetMin ? `${watchNetMin}` : ''}
+                            placeholder="Min"
+                            styles={{
+                              '& .MuiInputBase-input': {
+                                textAlign: 'end',
+                              },
+                            }}
+                            size="small"
+                            onChange={handleNetAmountMinChange}
+                          />
+                        )}
+                      />
+
+                      <Controller
+                        control={control}
+                        name="netAmountMax"
+                        render={() => (
+                          <TextInput
+                            value={watchNetMax ? `${watchNetMax}` : ''}
+                            placeholder="Max"
+                            styles={{
+                              '& .MuiInputBase-input': {
+                                textAlign: 'end',
+                              },
+                            }}
+                            size="small"
+                            onChange={handleNetAmountMaxChange}
+                          />
+                        )}
+                      />
+                    </Box>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                    gap={1}>
+                    <Typography variant="subtitle2">
+                      {t('Attachments')}
+                    </Typography>
+                    <Controller
+                      control={control}
+                      name="hasAttachments"
+                      render={() => (
+                        <Checkbox
+                          checked={watchHasAttachments}
+                          onChange={handleWithAttachmentToggle}
                         />
                       )}
                     />
                   </Box>
                 </Box>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                  gap={1}>
-                  <Typography variant="subtitle2">
-                    {t('Attachments')}
-                  </Typography>
-                  <Controller
-                    control={control}
-                    name="hasAttachments"
-                    render={() => (
-                      <Checkbox
-                        checked={watchHasAttachments}
-                        onChange={handleWithAttachmentToggle}
-                      />
-                    )}
-                  />
-                </Box>
-              </Box>
-            </Filters>
+              </Filters>
+            )}
           </Box>
           <Button
             buttonProps={{
@@ -1099,7 +1114,10 @@ export const PurchaseInvoices = () => {
           />
         </Box>
 
-        <DashboardMetrics selectedDateRange={selectedDateRange} />
+        <DashboardMetrics
+          selectedDateRange={selectedDateRange}
+          filters={filters}
+        />
 
         <TableContainer
           showNoMatchWarning={noMatchingData}
