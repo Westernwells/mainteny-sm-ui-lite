@@ -223,22 +223,23 @@ export const EditEmployeeForm = ({
                 </Box>
               </Box>
               <Box>
-                {formikValues.roles.includes(Role.TECHNICIAN) && (
-                  <>
-                    <Typography
-                      variant="h6"
-                      mt="1.5em"
-                      mb="0.4em"
-                      sx={{color: theme.palette.text.primary}}>
-                      {t('Order Types')}
-                    </Typography>
-                    <SelectServiceOrderTypes
-                      values={formikValues}
-                      setFieldValue={setFieldValue}
-                      jobTypes={jobTypes}
-                    />
-                  </>
-                )}
+                {formikValues.roles.includes(Role.TECHNICIAN) ||
+                  (formikValues.roles.includes(Role.CONTRACTOR) && (
+                    <>
+                      <Typography
+                        variant="h6"
+                        mt="1.5em"
+                        mb="0.4em"
+                        sx={{color: theme.palette.text.primary}}>
+                        {t('Order Types')}
+                      </Typography>
+                      <SelectServiceOrderTypes
+                        values={formikValues}
+                        setFieldValue={setFieldValue}
+                        jobTypes={jobTypes}
+                      />
+                    </>
+                  ))}
               </Box>
             </Box>
 
