@@ -56,7 +56,7 @@ import {Progress} from 'components/Progress';
 import EmptyTable from 'components/Table/EmptyTable';
 import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
-import {endOfDay, startOfDay, subDays, subYears} from 'date-fns';
+import {endOfDay, startOfDay, subYears} from 'date-fns';
 import {StatusChip} from 'components/StatusChip';
 import {formatDate} from 'utils/datetime';
 import Filters from 'components/Filters';
@@ -180,15 +180,15 @@ export const PurchaseInvoices = ({
   >('purchaseInvoiceNumber', {
     defaultValue: '',
   });
-  const [sentDateFrom, setSentDateFrom] = useQueryState<Date | string | null>(
-    'sentDateFrom',
+  const [dueDateFrom, setDueDateFrom] = useQueryState<Date | string | null>(
+    'dueDate',
     {
       defaultValue: null,
       isDate: true,
     },
   );
-  const [sentDateTo, setSentDateTo] = useQueryState<Date | string | null>(
-    'sentDateTo',
+  const [dueDateTo, setDueDateTo] = useQueryState<Date | string | null>(
+    'dueDateTo',
     {
       defaultValue: null,
       isDate: true,
@@ -212,6 +212,9 @@ export const PurchaseInvoices = ({
     defaultValue: undefined,
   });
 
+  const [localDueDateFrom, setLocalDueDateFrom] = useState<Date | null>(null);
+  const [localDueDateTo, setLocalDueDateTo] = useState<Date | null>(null);
+
   const [appliedFilters, setAppliedFilters] = useState({
     purchaseInvoiceNumber,
     supplierId,
@@ -229,14 +232,16 @@ export const PurchaseInvoices = ({
       | PurchaseInvoiceStatus.PAID
       | PurchaseInvoiceStatus.ARCHIVED
     )[],
-    sentDateFrom,
-    sentDateTo,
+    dueDateFrom,
+    dueDateTo,
     isWithAttachments,
   });
 
   const filters: QueryPurchaseInvoiceParams = {
-    createdDateTimeTo: endOfDay(currentDate).toISOString(),
-    createdDateTimeFrom: startOfDay(subDays(currentDate, 30)).toISOString(),
+    sentDateTo: endOfDay(currentDate).toISOString().split('T')[0],
+    sentDateFrom: startOfDay(subYears(currentDate, 1))
+      .toISOString()
+      .split('T')[0],
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
     query: createPurchaseInvoiceSearchQuery({
@@ -257,13 +262,13 @@ export const PurchaseInvoices = ({
           ),
     orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
     order: sortOrder || Order.DESC,
-    ...(sentDateFrom instanceof Date &&
-      !Number.isNaN(sentDateFrom.getTime()) && {
-        sentDateFrom: startOfDay(sentDateFrom).toISOString().split('T')[0],
+    ...(dueDateFrom instanceof Date &&
+      !Number.isNaN(dueDateFrom.getTime()) && {
+        dueDateFrom: startOfDay(dueDateFrom).toISOString().split('T')[0],
       }),
-    ...(sentDateTo instanceof Date &&
-      !Number.isNaN(sentDateTo.getTime()) && {
-        sentDateTo: endOfDay(sentDateTo).toISOString().split('T')[0],
+    ...(dueDateTo instanceof Date &&
+      !Number.isNaN(dueDateTo.getTime()) && {
+        dueDateTo: endOfDay(dueDateTo).toISOString().split('T')[0],
       }),
     ...(isWithAttachments && {hasDocuments: isWithAttachments}),
     ...(netAmountMin && netAmountMin > 0 && {netAmountFrom: netAmountMin}),
@@ -358,12 +363,12 @@ export const PurchaseInvoices = ({
   const handleFilterApply: SubmitHandler<PurchaseInvoiceFilterForm> = (
     data,
   ) => {
+    setDueDateFrom(localDueDateFrom);
+    setDueDateTo(localDueDateTo);
     setSupplierId(data.supplierId);
     setSupplierName(data.supplierName);
     setSubject(data.subject);
     setPurchaseInvoiceNumber(data.number);
-    setSentDateFrom(data.sentDateFrom ? new Date(data.sentDateFrom) : null);
-    setSentDateTo(data.sentDateTo ? new Date(data.sentDateTo) : null);
     setNetAmountMin(data.netAmountMin);
     setNetAmountMax(data.netAmountMax);
     setSelectedPurchaseInvoiceStatus(data.purchaseInvoiceStatus);
@@ -386,15 +391,15 @@ export const PurchaseInvoices = ({
         | PurchaseInvoiceStatus.PAID
         | PurchaseInvoiceStatus.ARCHIVED
       )[],
-      sentDateFrom: data.sentDateFrom ? new Date(data.sentDateFrom) : null,
-      sentDateTo: data.sentDateTo ? new Date(data.sentDateTo) : null,
+      dueDateFrom: localDueDateFrom,
+      dueDateTo: localDueDateTo,
       isWithAttachments: data.hasAttachments ? 'true' : undefined,
     });
   };
 
   const appliedFilterNumber = useMemo(() => {
     const dateFilterCount =
-      appliedFilters.sentDateFrom || appliedFilters.sentDateTo ? 1 : 0;
+      appliedFilters.dueDateFrom || appliedFilters.dueDateTo ? 1 : 0;
 
     return (
       [
@@ -576,7 +581,7 @@ export const PurchaseInvoices = ({
         ),
       },
       {
-        headerName: 'ATTACHMENT',
+        headerName: 'Attachment',
         key: 'purchase-invoice-cell-attachments',
         width: '128px',
         align: 'center',
@@ -690,16 +695,6 @@ export const PurchaseInvoices = ({
     setValue('subject', subject);
     setValue('number', purchaseInvoiceNumber);
 
-    // Check the type and convert accordingly
-    setValue(
-      'sentDateFrom',
-      sentDateFrom instanceof Date ? sentDateFrom.toISOString() : null,
-    );
-    setValue(
-      'sentDateTo',
-      sentDateTo instanceof Date ? sentDateTo.toISOString() : null,
-    );
-
     setValue('netAmountMin', netAmountMin);
     setValue('netAmountMax', netAmountMax);
     setValue('hasAttachments', isWithAttachments === 'true');
@@ -712,8 +707,8 @@ export const PurchaseInvoices = ({
     setValue('number', '');
     setValue('subject', '');
     setResetDatePicker(true);
-    setValue('sentDateFrom', null);
-    setValue('sentDateTo', null);
+    setLocalDueDateFrom(null);
+    setLocalDueDateTo(null);
     setValue('netAmountMin', undefined);
     setValue('netAmountMax', undefined);
     setValue('hasAttachments', undefined);
@@ -846,7 +841,7 @@ export const PurchaseInvoices = ({
               defaultDate={selectedDateRange}
               getSelectedDate={handleDateSelection}
               textFieldProps={{
-                label: t('Date Filter'),
+                label: t('Invoice Date Filter'),
               }}
               onClear={() => setSelectedDateRange([null, null])}
               sx={{width: '300px', paddingTop: 0}}
@@ -924,15 +919,13 @@ export const PurchaseInvoices = ({
                   <Box sx={{display: 'flex'}} gap={1}>
                     <Box>
                       <Typography variant="subtitle2">
-                        {t('Start Date')}
+                        {t('Due Date From')}
                       </Typography>
                       <Controller
                         control={control}
-                        name="sentDateFrom"
+                        name="dueDateFrom"
                         render={({field}) => {
-                          const dateValue = field.value
-                            ? new Date(field.value)
-                            : undefined;
+                          const dateValue = localDueDateFrom || undefined;
 
                           return (
                             <DatePicker
@@ -942,15 +935,12 @@ export const PurchaseInvoices = ({
                               minDate={dateValue || undefined}
                               reset={resetDatePicker}
                               getReset={(val) => {
-                                if (val) {
-                                  setResetDatePicker(false);
-                                }
+                                if (val) setResetDatePicker(false);
                               }}
                               containerStyles={{mr: '1em'}}
-                              getSelectedDate={(date) => {
-                                field.onChange(date);
-                                setSentDateFrom(date);
-                              }}
+                              getSelectedDate={(date) =>
+                                setLocalDueDateFrom(date)
+                              }
                               inputLabelProps={{shrink: undefined}}
                               textFieldProps={{
                                 label: '',
@@ -965,38 +955,28 @@ export const PurchaseInvoices = ({
 
                     <Box>
                       <Typography variant="subtitle2">
-                        {t('End Date')}
+                        {t('Due Date To')}
                       </Typography>
-
                       <Controller
                         control={control}
-                        name="sentDateTo"
+                        name="dueDateTo"
                         render={({field}) => {
-                          const dateValue = field.value
-                            ? new Date(field.value)
-                            : null;
+                          const dateValue = localDueDateTo || null;
 
                           return (
                             <DatePicker
                               {...field}
                               defaultDate={dateValue}
                               maxDate={new Date()}
-                              minDate={
-                                sentDateFrom
-                                  ? new Date(sentDateFrom)
-                                  : undefined
-                              }
+                              minDate={localDueDateFrom || undefined}
                               reset={resetDatePicker}
                               getReset={(val) => {
-                                if (val) {
-                                  setResetDatePicker(false);
-                                }
+                                if (val) setResetDatePicker(false);
                               }}
                               containerStyles={{mr: '1em'}}
-                              getSelectedDate={(date) => {
-                                field.onChange(date);
-                                setSentDateTo(date);
-                              }}
+                              getSelectedDate={(date) =>
+                                setLocalDueDateTo(date)
+                              }
                               inputLabelProps={{shrink: undefined}}
                               textFieldProps={{
                                 label: '',
@@ -1009,7 +989,6 @@ export const PurchaseInvoices = ({
                       />
                     </Box>
                   </Box>
-
                   <ChipSelector
                     headerLabel="Invoice Status"
                     options={QUICK_FILTER_OPTIONS}

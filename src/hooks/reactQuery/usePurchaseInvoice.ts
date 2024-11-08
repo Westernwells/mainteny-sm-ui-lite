@@ -93,8 +93,7 @@ export function usePurchaseInvoiceStatistics(
         user!.userAccount.serviceCompany.id,
       ),
     {
-      enabled:
-        !!user && !!(params.createdDateTimeFrom && params.createdDateTimeTo),
+      enabled: !!user && !!(params.sentDateFrom && params.sentDateTo),
       ...options,
     },
   );
