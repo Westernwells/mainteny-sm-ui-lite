@@ -5,7 +5,7 @@ import {ReactComponent as PerformanceMoneyDecrease} from 'assets/icons/Performan
 import {ReactComponent as TimeClockHand} from 'assets/icons/TimeClockHand.svg';
 import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
 import {usePurchaseInvoiceStatistics} from 'hooks/reactQuery/usePurchaseInvoice';
-import {formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {DateRange} from '@mui/x-date-pickers-pro';
 import {formatDate} from 'utils/datetime';
 import {t} from 'i18next';
@@ -53,6 +53,7 @@ type Props = {
 
 const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
   const [sentDateFrom, sentDateTo] = selectedDateRange;
+  const currentCurrency = useCurrentCurrency();
 
   const formattedSentDateFrom = sentDateFrom
     ? startOfDay(sentDateFrom).toISOString().split('T')[0]
@@ -76,7 +77,6 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
 
   const totalAmountCurrency = Object.keys(totalAmounts)[0];
   const totalAmount = totalAmounts[totalAmountCurrency] || 0;
-  const currencySymbol = getCurrencySymbol[totalAmountCurrency] || '';
 
   const pendingAmountCurrency = Object.keys(totalPendingAmounts)[0];
   const totalPendingAmount = totalPendingAmounts[pendingAmountCurrency] || 0;
@@ -114,7 +114,9 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
         sx={{borderRight: '1px solid gray', alignItems: 'center'}}>
         <Metric
           title="Total cost"
-          value={formatCurrency(totalAmount, {currencySymbol})}
+          value={formatCurrency(totalAmount, {
+            currencySymbol: currentCurrency.symbol,
+          })}
           icon={
             <PerformanceMoneyDecrease
               fontSize="2.5rem"
@@ -136,7 +138,7 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
         <Metric
           title="Pending payment"
           value={formatCurrency(totalPendingAmount, {
-            currencySymbol: pendingAmountCurrency,
+            currencySymbol: currentCurrency.symbol,
           })}
           icon={<TimeClockHand fontSize="2.5rem" style={{color: '#828DA3'}} />}
           tooltipText={t(

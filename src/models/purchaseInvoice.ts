@@ -92,7 +92,7 @@ export interface QueryPurchaseInvoiceParams {
   sentDateFrom?: string;
   sentDateTo?: string;
   order?: Order;
-  orderBy?: PurchaseInvoiceOrderField;
+  orderByField?: PurchaseInvoiceOrderField;
   grossAmountMin?: number;
   grossAmountMax?: number;
   serviceOrderId?: string[];

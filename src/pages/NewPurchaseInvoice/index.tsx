@@ -30,7 +30,6 @@ import {ComboBox} from 'components/ComboBox';
 import {DatePicker} from 'components/DatePicker';
 import {
   Currencies,
-  getCurrencyData,
   getCurrencySymbol,
   useCurrentCurrency,
 } from 'utils/currency';
@@ -76,6 +75,7 @@ import ChangePurchaseInvoiceStatusDialog from 'pages/PurchaseInvoices/ChangePurc
 import CustomSnackbar from 'components/CustomSnackbar';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {PurchaseInvoiceInfo} from 'pages/PurchaseInvoiceDetails/PurchaseInvoiceInfo';
+import {getCurrencyData} from 'components/CurrencyIcons';
 
 const NumericFormat = forwardRef<
   HTMLElement,
@@ -740,7 +740,8 @@ const NewPurchaseInvoice = ({
                                   externalId: order.externalId,
                                   address:
                                     order.elevator.address.fullName || '-',
-                                  company: order.serviceCompany.name,
+                                  company:
+                                    order.elevator.propertyOwner.name || '-',
                                   type: order.type,
                                 }),
                               )}
@@ -841,7 +842,7 @@ const NewPurchaseInvoice = ({
                                   },
                                 },
                               }}
-                              label="Net Amount"
+                              label={t('Net Amount')}
                               fullWidth
                               onValueChange={(values: {
                                 floatValue: number | undefined;
@@ -1051,11 +1052,11 @@ const NewPurchaseInvoice = ({
                           labelId="currency-label"
                           label="Currency"
                           options={Object.entries(getCurrencyData).map(
-                            ([label, {symbol, flagUrl}]) => ({
+                            ([label, {symbol, FlagComponent}]) => ({
                               label,
                               value: label,
                               symbol,
-                              flagUrl,
+                              FlagComponent,
                             }),
                           )}
                           value={field.value}
@@ -1109,7 +1110,7 @@ const NewPurchaseInvoice = ({
                               },
                             },
                           }}
-                          label="Net Amount"
+                          label={t('Net Amount')}
                           onValueChange={(values: {
                             floatValue: number | undefined;
                           }) => {
@@ -1171,7 +1172,7 @@ const NewPurchaseInvoice = ({
                                   },
                                 },
                               }}
-                              label="Tax Rate"
+                              label={t('Tax Rate')}
                               isAllowed={(values: {
                                 floatValue: number | undefined;
                               }) => {
@@ -1206,7 +1207,6 @@ const NewPurchaseInvoice = ({
                       </Grid>
 
                       <Grid item xs={vatAmounts.length > 1 ? 5 : 6}>
-                        {/* VAT Amount Input */}
                         <Controller
                           name={`vatAmounts.${index}.vat`}
                           control={control}
@@ -1243,7 +1243,7 @@ const NewPurchaseInvoice = ({
                                   },
                                 },
                               }}
-                              label="Tax Amount"
+                              label={t('Tax Amount')}
                               isAllowed={(values: {
                                 floatValue: number | undefined;
                               }) => {
@@ -1349,7 +1349,7 @@ const NewPurchaseInvoice = ({
                             </InputAdornment>
                           ),
                         }}
-                        label="Discount"
+                        label={t('Discount')}
                         onValueChange={(values) => {
                           const {floatValue} = values;
                           const newValue = floatValue ?? 0;
@@ -1375,7 +1375,7 @@ const NewPurchaseInvoice = ({
                     render={({field, fieldState: {error}}) => (
                       <FormSelect
                         labelId="status-label"
-                        label="Status"
+                        label={t('Status')}
                         options={Object.entries(PurchaseInvoiceStatusView).map(
                           ([key, value]) => ({
                             label: value,

@@ -20,7 +20,11 @@ export const aggregatePurchaseInvoiceRow = (
     supplierId: purchaseInvoice.additionalInfo.supplier.id || '-',
     sentDate: purchaseInvoice.sentDate || '-',
     status: purchaseInvoice.status,
-    amount: formatCurrency(purchaseInvoice.totalAmount.netAmount!) ?? '-',
+    amount:
+      formatCurrency(
+        purchaseInvoice.totalAmount.netAmount! /
+          (10 ** purchaseInvoice.totalAmount.fractionDigits! ?? 0),
+      ) ?? '-',
     hasAttachments: !!purchaseInvoice.additionalInfo.documents.length,
     serviceOrders: purchaseInvoice.additionalInfo.serviceOrders,
   }));

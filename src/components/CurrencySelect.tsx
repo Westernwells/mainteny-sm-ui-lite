@@ -8,12 +8,13 @@ import {
   Grid,
   SelectChangeEvent,
 } from '@mui/material';
+import {SVGProps} from 'react';
 
 interface CurrencyOption {
   label: string;
   value: string;
   symbol: string;
-  flagUrl: string;
+  FlagComponent: (props: SVGProps<SVGSVGElement>) => JSX.Element;
 }
 
 interface CurrencySelectProps {
@@ -51,23 +52,25 @@ const CurrencySelect = ({
         return selectedOption ? (
           <Grid container alignItems="center" spacing={1}>
             <Grid item>
-              <img
-                src={selectedOption.flagUrl}
-                alt={`${selectedOption.label} flag`}
-                style={{
-                  width: '24px',
-                  height: '16px',
-                  marginTop: '0.2em',
-                  marginBottom: '-0.4em',
-                }}
-              />
+              {selectedOption.FlagComponent && (
+                <selectedOption.FlagComponent
+                  style={{
+                    width: '24px',
+                    height: '16px',
+                    marginTop: '0.2em',
+                    marginBottom: '-0.4em',
+                  }}
+                />
+              )}
             </Grid>
             <Grid item>
               <Typography
                 sx={{
                   marginTop: '0.2em',
                   marginBottom: '-0.2em',
-                }}>{`${selectedOption.label} - ${selectedOption.symbol}`}</Typography>
+                }}>
+                {`${selectedOption.label} - ${selectedOption.symbol}`}
+              </Typography>
             </Grid>
           </Grid>
         ) : (
@@ -82,19 +85,21 @@ const CurrencySelect = ({
           },
         },
       }}>
-      {options.map((option) => (
-        <MenuItem
-          key={option.value}
-          value={option.value}
-          sx={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-          <img
-            src={option.flagUrl}
-            alt={`${option.label} flag`}
-            style={{width: '24px', height: '16px'}}
-          />
-          <Typography>{`${option.label} - ${option.symbol}`}</Typography>
-        </MenuItem>
-      ))}
+      {options.map(
+        ({
+          label: currencyLabel,
+          symbol,
+          FlagComponent,
+          value: currencyValue,
+        }) => (
+          <MenuItem key={currencyValue} value={currencyValue}>
+            {FlagComponent && (
+              <FlagComponent style={{width: 24, height: 24, marginRight: 8}} />
+            )}
+            {symbol} - {currencyLabel}
+          </MenuItem>
+        ),
+      )}
     </Select>
     {errorText && <Typography color="error">{errorText}</Typography>}
   </FormControl>
