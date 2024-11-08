@@ -89,6 +89,8 @@ export interface QueryPurchaseInvoiceParams {
   status: PurchaseInvoiceStatus[];
   createdDateTimeTo?: string;
   createdDateTimeFrom?: string;
+  sentDateFrom?: string;
+  sentDateTo?: string;
   order?: Order;
   orderBy?: PurchaseInvoiceOrderField;
   grossAmountMin?: number;
@@ -215,6 +217,8 @@ export type PurchaseInvoiceFilterForm = {
   supplierId?: string;
   sentDateFrom?: string | null;
   sentDateTo?: string | null;
+  dueDateFrom?: string | null;
+  dueDateTo?: string | null;
   orderNumber?: string;
   purchaseInvoiceStatus: PurchaseInvoiceStatus[];
   netAmountMin?: number;

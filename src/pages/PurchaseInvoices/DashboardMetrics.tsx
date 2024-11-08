@@ -7,10 +7,11 @@ import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
 import {usePurchaseInvoiceStatistics} from 'hooks/reactQuery/usePurchaseInvoice';
 import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {DateRange} from '@mui/x-date-pickers-pro';
-import {formatDate, toRestDateTimeFormat} from 'utils/datetime';
+import {formatDate} from 'utils/datetime';
 import {t} from 'i18next';
 import {Progress} from 'components/Progress';
 import {QueryPurchaseInvoiceParams} from 'models/purchaseInvoice';
+import {endOfDay, startOfDay} from 'date-fns';
 
 type MetricProps = {
   title: string;
@@ -51,21 +52,21 @@ type Props = {
 };
 
 const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
-  const [createdDateTimeFrom, createdDateTimeTo] = selectedDateRange;
+  const [sentDateFrom, sentDateTo] = selectedDateRange;
 
-  const formattedCreatedDateTimeFrom = createdDateTimeFrom
-    ? toRestDateTimeFormat(createdDateTimeFrom)
+  const formattedSentDateFrom = sentDateFrom
+    ? startOfDay(sentDateFrom).toISOString().split('T')[0]
     : null;
 
-  const formattedCreatedDateTimeTo = createdDateTimeTo
-    ? toRestDateTimeFormat(createdDateTimeTo)
+  const formattedSentDateTo = sentDateTo
+    ? endOfDay(sentDateTo).toISOString().split('T')[0]
     : null;
 
   const {data: purchaseInvoiceStatistics, isLoading} =
     usePurchaseInvoiceStatistics({
       ...filters,
-      createdDateTimeFrom: formattedCreatedDateTimeFrom,
-      createdDateTimeTo: formattedCreatedDateTimeTo,
+      sentDateFrom: formattedSentDateFrom!,
+      sentDateTo: formattedSentDateTo!,
     });
 
   const numOfInvoices = purchaseInvoiceStatistics?.numOfInvoices || 0;
@@ -99,8 +100,8 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
           tooltipText={t(
             'Total number of invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}',
             {
-              createdDateTimeFrom: formatDate(createdDateTimeFrom!),
-              createdDateTimeTo: formatDate(createdDateTimeTo!),
+              createdDateTimeFrom: formatDate(sentDateFrom!),
+              createdDateTimeTo: formatDate(sentDateTo!),
             },
           )}
         />
@@ -123,8 +124,8 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
           tooltipText={t(
             'Aggregate cost of all invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}',
             {
-              createdDateTimeFrom: formatDate(createdDateTimeFrom!),
-              createdDateTimeTo: formatDate(createdDateTimeTo!),
+              createdDateTimeFrom: formatDate(sentDateFrom!),
+              createdDateTimeTo: formatDate(sentDateTo!),
             },
           )}
           paddingLeft="30%"
@@ -141,8 +142,8 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
           tooltipText={t(
             'Aggregated outstanding amount of all invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}',
             {
-              createdDateTimeFrom: formatDate(createdDateTimeFrom!),
-              createdDateTimeTo: formatDate(createdDateTimeTo!),
+              createdDateTimeFrom: formatDate(sentDateFrom!),
+              createdDateTimeTo: formatDate(sentDateTo!),
             },
           )}
         />
