@@ -31,6 +31,7 @@ interface Props extends Partial<DateRangePickerProps<Date>> {
   onClear: () => void;
   inputTestId?: string;
   popupTestId?: string;
+  onAccept?: () => void;
 }
 
 const DatePickerRange = ({
@@ -66,11 +67,13 @@ const DatePickerRange = ({
   };
 
   const handleSelect = () => {
+    props.onAccept?.();
     setOpen(false);
   };
 
   const handleClose = () => {
     onClear();
+    props.onClose?.();
     setOpen(false);
   };
 

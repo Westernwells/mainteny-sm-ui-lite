@@ -134,7 +134,6 @@ export const columns = (
         refetchCompanyNextNumber={refetchCompanyNextNumber}
         isHeaderUrlLoading={isHeaderUrlLoading}
         isFooterUrlLoading={isFooterUrlLoading}
-        isInvoiceList={false}
       />
     ),
     flex: 1,

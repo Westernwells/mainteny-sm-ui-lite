@@ -78,7 +78,7 @@ import QuickFilter from 'components/QuickFilter';
 import {OptionWithTranslationKey} from 'models/filter';
 import Filters from 'components/Filters';
 import ChipSelector from 'components/ChipSelector';
-import CustomerInput from 'components/CustomerInput';
+import CustomerInput from 'components/Inputs/CustomerInput';
 import TextInput from 'components/TextInput';
 import {Button} from 'components/Button';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
@@ -90,11 +90,11 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSnackbar} from 'hooks/useSnackbar';
 import JobNotesDrawer from 'pages/ServiceOrderDetails/JobNotesDrawer';
-import TechnicianInput from 'components/TechnicianInput';
+import TechnicianInput from 'components/Inputs/TechnicianInput';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 
 import {Avatar} from 'components/Avatar';
-import ContractInput from 'components/ContractInput';
+import ContractInput from 'components/Inputs/ContractInput';
 import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [

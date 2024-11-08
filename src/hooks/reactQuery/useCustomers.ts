@@ -109,7 +109,7 @@ export const postCustomerNote = async (
   return data;
 };
 
-export const useCreateCustomerNote = () => {
+export const useCreateCustomerNote = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   const {showError} = useSnackbar();
 
@@ -117,8 +117,10 @@ export const useCreateCustomerNote = () => {
     ({id, body}: {id: string; body: CreateCustomerNote}) =>
       postCustomerNote(id, body),
     {
-      onSuccess: () =>
-        queryClient.invalidateQueries([queryKeys.fetchCustomerNotes]),
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchCustomerNotes]);
+        onSuccess?.();
+      },
       onError: (err) => {
         showError(err);
       },
@@ -133,7 +135,7 @@ export const deleteCustomerNote = async (id: string, noteId: string) => {
   return data;
 };
 
-export const useDeleteCustomerNote = () => {
+export const useDeleteCustomerNote = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   const {showError} = useSnackbar();
 
@@ -141,8 +143,10 @@ export const useDeleteCustomerNote = () => {
     ({id, noteId}: {id: string; noteId: string}) =>
       deleteCustomerNote(id, noteId),
     {
-      onSuccess: () =>
-        queryClient.invalidateQueries([queryKeys.fetchCustomerNotes]),
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchCustomerNotes]);
+        onSuccess?.();
+      },
       onError: (err) => {
         showError(err);
       },
@@ -162,7 +166,7 @@ export const updateCustomerNote = async (
   return data;
 };
 
-export const useUpdateCustomerNote = () => {
+export const useUpdateCustomerNote = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   const {showError} = useSnackbar();
 
@@ -177,8 +181,10 @@ export const useUpdateCustomerNote = () => {
       body: CreateCustomerNote;
     }) => updateCustomerNote(id, noteId, body),
     {
-      onSuccess: () =>
-        queryClient.invalidateQueries([queryKeys.fetchCustomerNotes]),
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchCustomerNotes]);
+        onSuccess?.();
+      },
       onError: (err) => {
         showError(err);
       },

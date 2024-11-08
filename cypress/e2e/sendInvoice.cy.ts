@@ -27,6 +27,7 @@ describe('Send Invoice via Email', () => {
         cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
 
         // send invoice
+        cy.get('button[data-testid="invoice-action-menu-button"]').eq(0).click();
         cy.get('svg[data-testid="SendIcon"]').eq(0).click();
         cy.get('input[id="multiple-asynchronous-demo"]').should('have.attr', 'required');
         cy.get('input[name="subject"]').should('have.attr', 'required');
@@ -49,6 +50,7 @@ describe('Send Invoice via Email', () => {
         cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
 
         // send invoice
+        cy.get('button[data-testid="invoice-action-menu-button"]').eq(0).click();
         cy.get('svg[data-testid="SendIcon"]').eq(0).click();
         cy.contains('The due date for the invoice has expired');
     });

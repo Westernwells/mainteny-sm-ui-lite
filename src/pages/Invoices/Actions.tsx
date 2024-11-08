@@ -1,5 +1,5 @@
 import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
@@ -36,7 +36,7 @@ import {
   useSendInvoice,
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
-import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
+import {InvoiceStatus, InvoiceType, InvoiceView} from 'models/invoice';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -57,7 +57,7 @@ import {
   decideAttachmentURIForInvoiceEmail,
   fetchFile,
 } from 'utils/utils';
-import {QRCurrencyCode, createQrData, useCurrentCurrency} from 'utils/currency';
+import {createQrData, QRCurrencyCode, useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {pdf} from '@react-pdf/renderer';
@@ -110,7 +110,7 @@ interface Props {
   >;
   isHeaderUrlLoading: boolean;
   isFooterUrlLoading: boolean;
-  isInvoiceList?: boolean;
+  removePadding?: boolean;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -150,7 +150,7 @@ export const Actions = ({
   refetchCompanyNextNumber,
   isHeaderUrlLoading,
   isFooterUrlLoading,
-  isInvoiceList = true,
+  removePadding = false,
 }: Props) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
@@ -1005,41 +1005,22 @@ export const Actions = ({
     },
   };
 
-  const action = useMemo(() => {
-    if (invoice.status === InvoiceStatus.DRAFT) {
-      return (
-        <Tooltip title={t('Send')} placement="left" arrow>
-          <span>
-            <IconButton
-              disabled={isChecklistImageLoading}
-              onClick={handleOpenSendInvoiceModal}
-              sx={{color: 'action.active'}}>
-              <SendIcon fontSize="small" />
-            </IconButton>
-          </span>
-        </Tooltip>
-      );
-    }
-    if (invoice.status === InvoiceStatus.NOT_PAID) {
-      return (
-        <Tooltip title={t('Payment')} placement="left" arrow>
-          <IconButton onClick={handleOpenPaymentDialog}>
-            <Payments fontSize="small" sx={{color: 'action.active'}} />
-          </IconButton>
-        </Tooltip>
-      );
-    }
-    return (
-      <Tooltip title={t('Preview')} placement="left" arrow>
-        <IconButton onClick={() => navigate(`/invoices/details/${invoice.id}`)}>
-          <RemoveRedEye fontSize="small" sx={{color: 'action.active'}} />
-        </IconButton>
-      </Tooltip>
-    );
-  }, [invoice, downloadUrl, companyNextNumber?.value]);
-
   const actions = useMemo(() => {
-    const items = [];
+    const items: {
+      label: string;
+      icon: JSX.Element;
+      onClick: () => void;
+      disabled?: boolean;
+    }[] = [];
+
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      items.push({
+        label: t('Send'),
+        icon: <SendIcon />,
+        onClick: handleOpenSendInvoiceModal,
+        disabled: isChecklistImageLoading,
+      });
+    }
 
     if (invoice.status === InvoiceStatus.CANCELLED) {
       items.push(previewItem, ...[downloadItem]);
@@ -1514,15 +1495,21 @@ export const Actions = ({
 
   return (
     <Box>
-      {isInvoiceList && action}
-
       <Tooltip title={t('More')} placement="right" arrow>
-        <IconButton onClick={handleClick}>
+        <IconButton
+          data-testid="invoice-action-menu-button"
+          sx={{
+            ...(removePadding && {
+              padding: 0,
+            }),
+          }}
+          onClick={handleClick}>
           <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
         </IconButton>
       </Tooltip>
       <Menu
         id="actions-menu"
+        data-testid="invoice-action-menu"
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
@@ -1545,6 +1532,8 @@ export const Actions = ({
               <Divider />
             ) : null}
             <MenuItem
+              data-testid={`invoice-action-menu-item-${item.label}`}
+              disabled={item.disabled ?? false}
               onClick={() => {
                 item.onClick();
                 handleClose();

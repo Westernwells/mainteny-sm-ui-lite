@@ -11,10 +11,15 @@ import {debounce} from 'lodash';
 
 type Props = {
   selectedValue?: string;
+  isSetValueFromParent?: boolean;
   onChange: (value: string | undefined) => void;
 };
 
-const CustomerInput = ({selectedValue, onChange}: Props) => {
+const CustomerInput = ({
+  selectedValue,
+  isSetValueFromParent = false,
+  onChange,
+}: Props) => {
   const {t} = useTranslation();
 
   const [query, setQuery] = useState<string>('');
@@ -69,7 +74,7 @@ const CustomerInput = ({selectedValue, onChange}: Props) => {
 
   // set value on load
   useEffect(() => {
-    if (!initialLoad || !isFetched) return;
+    if ((!initialLoad || !isFetched) && !isSetValueFromParent) return;
 
     const foundContractId =
       customerOptions.find((customer) => customer.value === selectedValue)
@@ -86,7 +91,7 @@ const CustomerInput = ({selectedValue, onChange}: Props) => {
   }, [selectedValue]);
 
   return (
-    <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
+    <Box sx={{display: 'flex', flexDirection: 'column', width: '100%'}} gap={1}>
       <Typography variant="subtitle2">{capitalize(t('CUSTOMER'))}</Typography>
       <Autocomplete
         size="small"

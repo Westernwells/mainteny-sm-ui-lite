@@ -44,7 +44,7 @@ const SearchInput = ({
     () =>
       debounce((newValue: string) => {
         onChange?.(newValue);
-      }, 300),
+      }, 500),
     [onChange],
   );
 
@@ -91,6 +91,7 @@ const SearchInput = ({
           endAdornment: value && (
             <InputAdornment position="end">
               <IconButton
+                data-testid="search-input-clear"
                 disabled={!value}
                 sx={{
                   width: '24px',

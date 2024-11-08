@@ -53,7 +53,6 @@ const QuickFilter = ({selected, options, statistics, onChange}: Props) => {
               },
 
               ...(isSelected && {
-                textTransform: 'capitalize',
                 color: theme.palette.primary.dark,
                 backgroundColor: '#FFFFFF',
               }),

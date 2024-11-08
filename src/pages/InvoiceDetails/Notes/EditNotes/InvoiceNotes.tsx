@@ -1,4 +1,3 @@
-import {FC} from 'react';
 import {InvoiceView} from 'models/invoice';
 import {
   useCreateInvoiceComment,
@@ -12,9 +11,10 @@ import {MutateOptions} from 'react-query';
 
 interface Props {
   invoice: InvoiceView;
+  onChange?: () => void;
 }
 
-export const InvoiceNotes: FC<Props> = ({invoice}) => {
+export const InvoiceNotes = ({invoice, onChange}: Props) => {
   const {
     data: notes = {
       pages: [],
@@ -29,11 +29,11 @@ export const InvoiceNotes: FC<Props> = ({invoice}) => {
     pageSize: 10,
   });
   const {mutate: createInvoiceComment, isLoading: isCreating} =
-    useCreateInvoiceComment();
+    useCreateInvoiceComment(onChange);
   const {mutate: deleteInvoiceComment, isLoading: isDeleting} =
-    useDeleteInvoiceComment();
+    useDeleteInvoiceComment(onChange);
   const {mutate: updateInvoiceComment, isLoading: isUpdating} =
-    useUpdateInvoiceComment();
+    useUpdateInvoiceComment(onChange);
 
   const createNote = async (
     variables: CreateNoteVars,

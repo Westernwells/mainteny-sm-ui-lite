@@ -8,7 +8,7 @@ import {
   useQueryClient,
   UseQueryOptions,
 } from 'react-query';
-import {AxiosError} from 'axios';
+import {AxiosError, AxiosResponse} from 'axios';
 import * as _ from 'lodash';
 import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -16,7 +16,6 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {useNavigate} from 'react-router-dom';
 
 // FIXME: Dummy Import
-
 import {
   EmailRecord,
   Language,
@@ -26,26 +25,29 @@ import {
   StringValue,
 } from 'models/misc';
 import {
-  InvoiceView,
-  QueryInvoiceParams,
-  InvoiceFilters,
-  InvoiceStatus,
   CreateInvoice,
-  UpdateInvoice,
-  QueryInvoiceCommentsParams,
   CreateInvoiceComment,
-  InvoicePaymentRecord,
   CreateInvoiceOverdueNoticeRecord,
-  InvoiceActivityView,
-  PrintInvoiceRecord,
-  SendInvoiceRecord,
   FetchXInvoiceByInvoiceIdParams,
+  InvoiceActivityView,
+  InvoiceFilters,
+  InvoicePaymentRecord,
+  InvoiceStatistics,
+  InvoiceStatus,
+  InvoiceView,
+  PrintInvoiceRecord,
+  QueryInvoiceCommentsParams,
+  QueryInvoiceParams,
+  SendInvoiceRecord,
+  UpdateInvoice,
 } from 'models/invoice';
 import {Comment} from 'models/comment';
 import {ErrorCode} from 'models/error';
 import {languageContextMap} from 'utils/utils';
 import {transformInvoiceForCreditNote} from 'utils/invoice-utils';
 import {LanguageContext} from 'context/LanguageProvider';
+import {QueryElevatorInvoiceParams} from 'models/elevator';
+import {useAll} from 'hooks/reactQuery/useAll';
 import {useUserSession} from './useUserSession';
 
 // TODO: make API call to fetch Invoices
@@ -520,7 +522,7 @@ export const postInvoiceComment = async (
   return data;
 };
 
-export const useCreateInvoiceComment = () => {
+export const useCreateInvoiceComment = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   const {showError} = useSnackbar();
 
@@ -528,7 +530,10 @@ export const useCreateInvoiceComment = () => {
     ({invoiceId, body}: {invoiceId: string; body: CreateInvoiceComment}) =>
       postInvoiceComment(invoiceId, body),
     {
-      onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchInvoiceComments]);
+        onSuccess?.();
+      },
       onError: (err) => {
         showError(err);
       },
@@ -546,7 +551,7 @@ export const deleteInvoiceComment = async (
   return data;
 };
 
-export const useDeleteInvoiceComment = () => {
+export const useDeleteInvoiceComment = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   const {showError} = useSnackbar();
 
@@ -554,7 +559,10 @@ export const useDeleteInvoiceComment = () => {
     ({invoiceId, noteId}: {invoiceId: string; noteId: string}) =>
       deleteInvoiceComment(invoiceId, noteId),
     {
-      onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchInvoiceComments]);
+        onSuccess?.();
+      },
       onError: (err) => {
         showError(err);
       },
@@ -574,7 +582,7 @@ export const updateInvoiceComment = async (
   return data;
 };
 
-export const useUpdateInvoiceComment = () => {
+export const useUpdateInvoiceComment = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   const {showError} = useSnackbar();
 
@@ -589,7 +597,10 @@ export const useUpdateInvoiceComment = () => {
       body: CreateInvoiceComment;
     }) => updateInvoiceComment(invoiceId, noteId, body),
     {
-      onSuccess: () => queryClient.invalidateQueries([qk.fetchInvoiceComments]),
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchInvoiceComments]);
+        onSuccess?.();
+      },
       onError: (err) => {
         showError(err);
       },
@@ -709,7 +720,7 @@ export const useInvoiceActivities = (
 
 const fetchElevatorInvoices = async (
   elevatorId: string,
-  params: QueryInvoiceParams,
+  params: QueryElevatorInvoiceParams,
 ): Promise<Resource<InvoiceView>> => {
   const response = await axiosClient.get<Resource<InvoiceView>>(
     `/api/elevators/${elevatorId}/invoices`,
@@ -723,7 +734,7 @@ const fetchElevatorInvoices = async (
 
 export const useElevatorInvoices = (
   elevatorId: string,
-  params: QueryInvoiceParams,
+  params: QueryElevatorInvoiceParams,
   options?: UseQueryOptions<any, any, any>,
 ) =>
   useQuery<Resource<InvoiceView>, RestError>(
@@ -802,3 +813,59 @@ export const useFetchXInvoiceByInvoiceId = () => {
     },
   );
 };
+
+export const queryInvoiceStatistics = async (
+  serviceCompanyId: string,
+  params: QueryInvoiceParams,
+): Promise<InvoiceStatistics> => {
+  const response: AxiosResponse<InvoiceStatistics> = await axiosClient.get(
+    `/api/serviceCompanies/${serviceCompanyId}/invoices/statistics`,
+    {
+      params: {
+        ...params,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export function useInvoiceStatistics(
+  params: QueryInvoiceParams,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  const {user} = useUserSession();
+  return useQuery<InvoiceStatistics, RestError, InvoiceStatistics>(
+    [
+      queryKeys.queryServiceOrdersStatistics,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () =>
+      queryInvoiceStatistics(user!.userAccount.serviceCompany.id, {
+        ...params,
+      }),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+}
+
+export function useAllInvoices(
+  params: QueryInvoiceParams,
+  options?: UseQueryOptions<InvoiceView[], RestError>,
+) {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  return useAll<QueryInvoiceParams, InvoiceView>({
+    queryKey: [queryKeys.queryAllJobs, params, serviceCompanyId],
+    queryFn: (p) => fetchInvoices(p, serviceCompanyId ?? ''),
+    params,
+    options: {
+      enabled: !!serviceCompanyId,
+      ...options,
+    },
+  });
+}
