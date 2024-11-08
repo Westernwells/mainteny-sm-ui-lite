@@ -53,7 +53,10 @@ export const AdditionalInformationEmployeeForm = ({
       <Box sx={{mt: '0.5em'}} component="form">
         <Grid container spacing={2}>
           <Grid item md={12}>
-            {convertToMacro(roles[0]).includes(Role.TECHNICIAN) && (
+            {(convertToMacro(roles[0]).includes(Role.TECHNICIAN) ||
+              convertToMacro(roles[0]).includes(Role.CONTRACTOR) ||
+              (convertToMacro(roles[0]).includes(Role.TECHNICIAN) &&
+                convertToMacro(roles[0]).includes(Role.SERVICE_MANAGER))) && (
               <Box sx={{marginBottom: '1.250em'}}>
                 <Typography
                   sx={{
@@ -69,6 +72,7 @@ export const AdditionalInformationEmployeeForm = ({
                 />
               </Box>
             )}
+
             <Typography
               sx={{color: theme.palette.text.primary, marginBottom: '0.313em'}}>
               {t('Shift Time')}

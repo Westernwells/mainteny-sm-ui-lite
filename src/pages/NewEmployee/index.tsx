@@ -127,7 +127,10 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     if (
       activeStep === 3 &&
       (additionalInformationEmployeeFormValues.shifts.length === 0 ||
-        (roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) &&
+        ((roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) ||
+          roleEmployeeFormValues.roles.includes(Role.CONTRACTOR) ||
+          (roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) &&
+            roleEmployeeFormValues.roles.includes(Role.SERVICE_MANAGER))) &&
           additionalInformationEmployeeFormValues.serviceOrderTypes.length ===
             0))
     ) {

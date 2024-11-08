@@ -5,9 +5,8 @@ const useVersionCheck = () => {
   const currentVersion = import.meta.env.REACT_APP_VERSION;
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
   const {data} = useFetchLatestVersion();
-
   useEffect(() => {
-    const latestVersion = data?.data?.[0]?.value;
+    const latestVersion = data?.value;
     if (latestVersion && currentVersion && latestVersion !== currentVersion) {
       setIsUpdateAvailable(true);
     }
