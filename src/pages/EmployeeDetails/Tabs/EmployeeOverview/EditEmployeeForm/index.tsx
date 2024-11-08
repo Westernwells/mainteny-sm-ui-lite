@@ -223,7 +223,10 @@ export const EditEmployeeForm = ({
                 </Box>
               </Box>
               <Box>
-                {formikValues.roles.includes(Role.TECHNICIAN) && (
+                {(formikValues.roles.includes(Role.TECHNICIAN) ||
+                  formikValues.roles.includes(Role.CONTRACTOR) ||
+                  (formikValues.roles.includes(Role.TECHNICIAN) &&
+                    formikValues.roles.includes(Role.SERVICE_MANAGER))) && (
                   <>
                     <Typography
                       variant="h6"
