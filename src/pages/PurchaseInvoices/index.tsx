@@ -62,7 +62,6 @@ import {formatDate} from 'utils/datetime';
 import Filters from 'components/Filters';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
 import TextInput from 'components/TextInput';
-import {ServiceOrderOrderField} from 'models/service-order';
 import {DatePicker} from 'components/DatePicker';
 import {reduce} from 'lodash';
 import ChipSelector from 'components/ChipSelector';
@@ -260,7 +259,7 @@ export const PurchaseInvoices = ({
           .filter(
             (status): status is PurchaseInvoiceStatus => status !== undefined,
           ),
-    orderBy: orderByField || ServiceOrderOrderField.CREATED_TIME,
+    orderByField: orderByField || PurchaseInvoiceOrderField.CREATED_AT,
     order: sortOrder || Order.DESC,
     ...(dueDateFrom instanceof Date &&
       !Number.isNaN(dueDateFrom.getTime()) && {
@@ -431,7 +430,6 @@ export const PurchaseInvoices = ({
       return {emptyTable: false, noMatchingData: true};
     }
 
-    // when the user does not have filters applied and there are no entries for the table
     if (purchaseInvoiceResource.total === 0) {
       return {emptyTable: true, noMatchingData: false};
     }
