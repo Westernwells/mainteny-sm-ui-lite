@@ -3,10 +3,17 @@ import {TableRow as MuiTableRow, TableRowProps} from '@mui/material';
 
 interface Props extends TableRowProps {
   testId: string;
+  rowIndex?: number;
 }
 
-const TableRow = ({children, testId, ...props}: PropsWithChildren<Props>) => (
+const TableRow = ({
+  children,
+  testId,
+  rowIndex,
+  ...props
+}: PropsWithChildren<Props>) => (
   <MuiTableRow
+    data-rowindex={rowIndex}
     data-testid={testId}
     role="row"
     sx={{

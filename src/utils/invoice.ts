@@ -6,17 +6,20 @@ import {
   InvoiceAmountDetail,
   InvoiceItem,
   InvoiceItemRecord,
+  InvoicePaymentTermRecord,
   InvoiceStatus,
   InvoiceStatusView,
+  InvoiceTableRow,
+  InvoiceTypeMap,
   InvoiceView,
   MyInvoiceActivityView,
+  SearchParameters,
 } from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
 import {PaymentTermArticleType, PaymentTermData} from 'models/contract';
 import {Currency} from 'models/misc';
 import {ArticleType} from 'models/article';
-import {InvoicePaymentTermRecord} from '../models/invoice';
 import {centsToMoney, Currencies, formatCurrency} from './currency';
 import {getAmountFromPercentage} from './utils';
 import {formatDate} from './datetime';
@@ -404,4 +407,38 @@ export const getDisplayDeliveryDate = (
     return `${formattedStartDate} - ${formattedEndDate}`;
   }
   return formattedStartDate || formattedEndDate;
+};
+
+export const aggregateInvoiceRow = (
+  invoices: InvoiceView[],
+): InvoiceTableRow[] =>
+  invoices.map((invoice) => ({
+    data: invoice,
+    id: invoice.id,
+    number: invoice.number,
+    propertyOwner: invoice.propertyOwner,
+    date: invoice.sentDate,
+    dueDate: invoice.dueDate,
+    jobNumber: invoice.serviceOrder?.number ?? '-',
+    type: InvoiceTypeMap[invoice.type],
+    serviceOrderType: invoice.serviceOrder?.type,
+    total: invoice
+      ? (invoice.totalAmount?.grossAmount ?? 0) /
+        10 ** invoice.totalAmount.fractionDigits!
+      : 0,
+    status: invoice.status,
+    hasComments: !!invoice.commentCount,
+  }));
+
+export const createSearchQuery = ({
+  search,
+  orderNumber,
+  invoiceNumber,
+}: SearchParameters) => {
+  const elements: string[] = [];
+  if (search) elements.push(search);
+  if (orderNumber) elements.push(`[purchaseorder:*${orderNumber}*]`);
+  if (invoiceNumber) elements.push(`[externalid:*${invoiceNumber}*]`);
+
+  return elements.length ? elements.join(' ') : undefined;
 };

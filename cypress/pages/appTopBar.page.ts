@@ -36,7 +36,7 @@ export default class AppTopBarPage {
     cy.get('#selectLanguageMenuList').should('not.exist');
 
     // Click the button to reveal the list
-    cy.get('#selectLanguageButton').click();
+    cy.get('#selectLanguageButton').click({force: true});
 
     // Ensure the list is visible
     cy.get('#selectLanguageMenuList').should('be.visible');

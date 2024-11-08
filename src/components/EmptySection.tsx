@@ -20,6 +20,7 @@ import {ReactComponent as CalendarClock} from 'assets/icons/CalendarClock.svg';
 import {ReactComponent as ShipmentIcon} from 'assets/icons/ShipmentIcon.svg';
 import {ReactComponent as JobsIcon} from 'assets/icons/Jobs.svg';
 import {ReactComponent as MultiplePeople} from 'assets/icons/MultiplePeople.svg';
+import {ReactComponent as InvoiceIcon} from 'assets/icons/Invoice.svg';
 import {Button} from './Button';
 
 export interface Props extends BoxProps {
@@ -47,7 +48,8 @@ export interface Props extends BoxProps {
     | 'contacts'
     | 'jobs'
     | 'employee'
-    | 'purchase-invoice';
+    | 'purchase-invoice'
+    | 'invoice';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -132,6 +134,12 @@ export const EmptySection = ({
       case 'employee':
         return (
           <MultiplePeople
+            style={{width: '100%', height: '100%', color: illustrationColor}}
+          />
+        );
+      case 'invoice':
+        return (
+          <InvoiceIcon
             style={{width: '100%', height: '100%', color: illustrationColor}}
           />
         );
