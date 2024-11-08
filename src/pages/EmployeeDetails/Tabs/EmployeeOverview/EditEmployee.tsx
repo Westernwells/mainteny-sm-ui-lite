@@ -62,9 +62,11 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
     roles: employee.userAccount.roles,
     address: employee.userData.address ? employee.userData.address : null,
     serviceOrderTypes:
-      employee.userAccount.roles.includes(Role.TECHNICIAN) ||
-      (employee.userAccount.roles.includes(Role.CONTRACTOR) &&
-        employee.userData.additionalInfo)
+      (employee.userAccount.roles.includes(Role.TECHNICIAN) ||
+        employee.userAccount.roles.includes(Role.CONTRACTOR) ||
+        (employee.userAccount.roles.includes(Role.TECHNICIAN) &&
+          employee.userAccount.roles.includes(Role.SERVICE_MANAGER))) &&
+      employee.userData.additionalInfo
         ? employee.userData.additionalInfo.assignedServiceOrderTypes || []
         : [],
     shifts: employee.userData.workingHours
