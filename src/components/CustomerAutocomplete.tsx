@@ -1,10 +1,11 @@
-import {SyntheticEvent, useCallback, useEffect, useState} from 'react';
+import {SyntheticEvent, useCallback, useEffect, useMemo, useState} from 'react';
 import {TextFieldProps} from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import * as _ from 'lodash';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {createEmptyResource} from 'utils/paging';
+import {createNameSearchQuery} from 'utils/customer-utils';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
   initialValue?: PropertyOwnerView | null;
   textFieldProps?: TextFieldProps;
   disabled?: boolean;
+  searchOnlyCustomerName?: boolean;
 }
 
 export const CustomerAutoComplete = ({
@@ -21,16 +23,26 @@ export const CustomerAutoComplete = ({
   initialValue = null,
   textFieldProps,
   disabled,
+  searchOnlyCustomerName = false,
 }: Props) => {
   const [query, setQuery] = useState<string>(initialValue?.name || '');
   const [customer, setCustomer] = useState<PropertyOwnerView | null>(
     initialValue,
   );
 
+  const searchQuery = useMemo(() => {
+    if (!query) return '';
+    const queryValue = searchOnlyCustomerName
+      ? createNameSearchQuery(query)
+      : query;
+
+    return encodeURIComponent(queryValue);
+  }, [query, searchOnlyCustomerName]);
+
   const {data: customerResource = createEmptyResource(10)} = useQueryCustomers({
     pageIndex: 0,
     pageSize: 20,
-    query: query ? encodeURIComponent(query) : '',
+    query: searchQuery,
   });
 
   // Whenever initialValue changes, update customer and query
