@@ -2880,5 +2880,14 @@
   "Enter Supplier ID": "Wähle eine Lieferantennummer",
   "Add job number": "Auftragsnummer hinzufügen",
   "Select a job number": "Wähle eine Auftragsnummer",
-  "Enter supplier ID": "Wähle eine Lieferantennummer"
+  "Supplier Invoices": "Lieferanten Rechnungen",
+  "Amount Range": "Preisspanne",
+  "Enter invoice number": "Rechnungsnummer eintragen",
+  "Enter subject": "Betreff eintragen",
+  "Invoice Date Filter": "Rechnungsdatum",
+  "Add tax rate": "Steuersatz wählen",
+  "Enter supplier ID": "Wähle eine Lieferantennummer",
+  "Tax Rate": "Steuersatz",
+  "Tax Amount": "Steuerbetrag",
+  "Search invoice number": "Rechnungsnummer suchen"
 }
