@@ -2904,5 +2904,14 @@
   "Enter Supplier ID": "Unesite ID dobavljača",
   "Add job number": "Dodajte broj posla",
   "Select a job number": "Izaberite broj posla",
-  "Enter supplier ID": "Unesite ID dobavljača"
+  "Supplier Invoices": "Računi dobavljača",
+  "Amount Range": "Raspon iznosa",
+  "Enter invoice number": "Unesi broj fakture",
+  "Enter subject": "Unesite predmet",
+  "Invoice Date Filter": "Filter datuma fakture",
+  "Add tax rate": "Dodajte stopu poreza",
+  "Enter supplier ID": "Unesite ID dobavljača",
+  "Tax Rate": "Poreska stopa",
+  "Tax Amount": "Iznos poreza",
+  "Search invoice number": "Pretražite broj fakture"
 }
