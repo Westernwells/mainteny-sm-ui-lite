@@ -213,8 +213,8 @@ export interface QueryInvoiceParams {
   orderByField?: InvoiceOrderField;
   query?: string;
   contractId?: string[];
-  createdDateTimeFrom?: Date;
-  createdDateTimeTo?: Date;
+  sentDateFrom?: string;
+  sentDateTo?: string;
   status: InvoiceStatus[];
   propertyOwnerId?: string[];
   totalAmountFrom?: number;

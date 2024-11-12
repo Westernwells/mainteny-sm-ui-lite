@@ -112,6 +112,7 @@ const Suppliers = () => {
       isHeaderNameHidden: true,
       width: ACTION_CELL_WIDTH,
       isLast: true,
+      noPadding: true,
       align: 'center',
       renderCell: (supplier, cellProps) => (
         <Cell {...cellProps} onClick={undefined}>

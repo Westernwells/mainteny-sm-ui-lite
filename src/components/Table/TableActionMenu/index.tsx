@@ -4,7 +4,8 @@ import {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import IconButton from '@mui/material/IconButton';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
-import {Action} from '../../../models/table';
+import Box from '@mui/material/Box';
+import {Action} from 'models/table';
 
 type Props = {
   options: Action[];
@@ -31,12 +32,27 @@ const TableActionMenu = ({
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        height: '40px',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
       <IconButton
-        id="employee-action-menu-button"
+        id="action-menu-button"
         ref={anchorEl}
         onClick={handleToggleMenu(true)}
-        sx={{padding: 0}}>
+        sx={{
+          display: 'flex',
+          width: '100%',
+          height: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+
+          padding: 0,
+        }}>
         <MoreVertOutlinedIcon />
       </IconButton>
 
@@ -84,7 +100,7 @@ const TableActionMenu = ({
           ];
         })}
       </Menu>
-    </>
+    </Box>
   );
 };
 
