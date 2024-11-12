@@ -51,6 +51,7 @@ const Autocomplete = ({
 
   return (
     <MuiAutocomplete
+      noOptionsText={t('No options')}
       size={size}
       value={value}
       options={mappedOptions}

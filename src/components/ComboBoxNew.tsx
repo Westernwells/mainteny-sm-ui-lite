@@ -1,6 +1,7 @@
 import {TextFieldProps} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import {SyntheticEvent, useEffect, useState} from 'react';
+import {t} from 'i18next';
 import {FormInput} from './form/FormInput';
 
 interface Option {
@@ -66,6 +67,7 @@ export const ComboBoxNew = ({
 
   return (
     <Autocomplete
+      noOptionsText={t('No options')}
       disablePortal
       id="combo-box"
       size="small"

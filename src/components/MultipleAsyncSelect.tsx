@@ -6,6 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {Control, Controller} from 'react-hook-form';
 import * as _ from 'lodash';
 import {Box, FilterOptionsState} from '@mui/material';
+import {t} from 'i18next';
 import {FormInput} from './form/FormInput';
 
 export interface QueryProps {
@@ -123,6 +124,7 @@ const MultipleAsyncSelect = <T,>({
 
         return (
           <Autocomplete<T, true, true, true, 'div'>
+            noOptionsText={t('No options')}
             multiple
             disablePortal
             autoComplete
