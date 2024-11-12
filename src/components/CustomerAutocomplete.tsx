@@ -6,6 +6,7 @@ import {PropertyOwnerView} from 'models/propertyManager';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {createEmptyResource} from 'utils/paging';
 import {createNameSearchQuery} from 'utils/customer-utils';
+import {t} from 'i18next';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -89,6 +90,7 @@ export const CustomerAutoComplete = ({
 
   return (
     <Autocomplete
+      noOptionsText={t('No options')}
       size="small"
       disabled={disabled}
       clearOnBlur={false}

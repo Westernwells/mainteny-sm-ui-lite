@@ -259,6 +259,7 @@ export const ScheduleDialog = ({
               clearOnBlur={false}
               id="combo-box-demo"
               sx={{mt: '0.5em'}}
+              noOptionsText={t('No options')}
               options={techniciansResource.data}
               onChange={(_event: any, newValues: EmployeesSimpleView[]) => {
                 setValue(

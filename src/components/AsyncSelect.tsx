@@ -6,6 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {Control, Controller} from 'react-hook-form';
 import * as _ from 'lodash';
 import {FilterOptionsState} from '@mui/material';
+import {t} from 'i18next';
 import {FormInput} from './form/FormInput';
 
 export interface QueryProps {
@@ -91,6 +92,7 @@ const AsyncSelect = <T,>({
 
         return (
           <Autocomplete<T, false, false, true, 'div'>
+            noOptionsText={t('No options')}
             disablePortal
             autoComplete
             filterSelectedOptions
