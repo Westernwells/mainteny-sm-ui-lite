@@ -49,6 +49,7 @@ describe('Create Unit', () => {
         customerSearchValue.split('').forEach((char) => {
             cy.get('input[placeholder="Select Customer"]').type(char);
         });
+        cy.wait(5000);
         cy.get('@customerApi.all').then((call) => {
             cy.wrap(Cypress._.last(call)).its('request.query.query').should('include', `[name:*${customerSearchValue}*]`);
         });
