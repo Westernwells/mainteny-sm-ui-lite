@@ -43,7 +43,11 @@ import TableHeader from 'components/Table/TableHeader';
 import TableBody from 'components/Table/TableBody';
 import TableRow from 'components/Table/TableRow';
 import Pagination from 'components/Pagination';
-import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import {
+  ACTION_CELL_WIDTH,
+  NOTES_CELL_WIDTH,
+  TableColumnWithRender,
+} from 'models/table';
 import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {StatusChip} from 'components/StatusChip';
@@ -389,6 +393,7 @@ const Invoices = ({elevatorId}: Props) => {
       {
         headerName: 'Number',
         key: 'invoice-cell-number',
+        width: '124px',
         isFirst: true,
         fieldName: InvoiceOrderField.NUMBER,
         getExportValue: (invoice) => invoice.number,
@@ -402,7 +407,6 @@ const Invoices = ({elevatorId}: Props) => {
       {
         headerName: 'Customer',
         key: 'invoice-cell-customer',
-        width: '112px',
         fieldName: InvoiceOrderField.CUSTOMER_NAME,
         getExportValue: (invoice) => invoice.propertyOwner.name,
         renderCell: (invoice, cellProps) => (
@@ -422,6 +426,7 @@ const Invoices = ({elevatorId}: Props) => {
       {
         headerName: 'Invoice date',
         key: 'invoice-cell-date',
+        width: '124px',
         align: 'right',
         fieldName: InvoiceOrderField.CREATED_DATE,
         getExportValue: (invoice) => formatDate(invoice.date) ?? '',
@@ -472,7 +477,7 @@ const Invoices = ({elevatorId}: Props) => {
         ),
       },
       {
-        headerName: 'Service type',
+        headerName: 'SERVICE TYPE',
         key: 'invoice-cell-service-type',
         width: '136px',
         fieldName: InvoiceOrderField.SERVICE_ORDER_TYPE,
@@ -484,7 +489,11 @@ const Invoices = ({elevatorId}: Props) => {
         },
         renderCell: (invoice, cellProps) => (
           <Cell {...cellProps}>
-            <Box display="flex" alignItems="flex-end" gap="0.5rem">
+            <Box
+              display="flex"
+              alignItems="flex-end"
+              gap="0.5rem"
+              sx={{width: '100%'}}>
               <ServiceOrderIcons
                 serviceOrderType={invoice.serviceOrderType}
                 size="small"
@@ -493,6 +502,7 @@ const Invoices = ({elevatorId}: Props) => {
                 serviceOrderType={invoice.serviceOrderType}
                 capitalizeText
                 variant="body2"
+                noWrap
               />
             </Box>
           </Cell>
@@ -501,7 +511,7 @@ const Invoices = ({elevatorId}: Props) => {
       {
         headerName: 'Total (incl. VAT)',
         key: 'invoice-cell-total',
-        width: '164px',
+        width: '186px',
         align: 'right',
         fieldName: InvoiceOrderField.TOTAL_NET_AMOUNT,
         getExportValue: (invoice) => `${invoice.total}`,
@@ -532,9 +542,8 @@ const Invoices = ({elevatorId}: Props) => {
       {
         headerName: 'NOTES',
         key: 'invoice-cell-notes',
-        width: '48px',
+        width: NOTES_CELL_WIDTH,
         align: 'center',
-        fieldName: InvoiceOrderField.COMMENT_COUNT,
         renderCell: (invoice, cellProps) => (
           <Cell
             {...cellProps}
@@ -586,7 +595,7 @@ const Invoices = ({elevatorId}: Props) => {
         key: 'invoice-cell-action',
         isHeaderNameHidden: true,
         align: 'center',
-        width: ACTION_CELL_WIDTH, // set static width that will not change
+        width: ACTION_CELL_WIDTH,
         isLast: true,
         showShadows: showLeftShadow ? 'left' : undefined,
         renderCell: (invoice, cellProps) => (

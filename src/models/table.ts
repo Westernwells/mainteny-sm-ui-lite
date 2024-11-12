@@ -1,6 +1,7 @@
 import {SvgIconComponent} from '@mui/icons-material';
 
 export const ACTION_CELL_WIDTH = '48px';
+export const NOTES_CELL_WIDTH = '64px';
 
 export type CellCallbackProps = {
   onClick: () => void;
@@ -23,6 +24,7 @@ export type CellProps = {
   isLast?: boolean;
   hide?: boolean;
   showShadows?: 'left' | 'right';
+  noWidthLimit?: boolean;
 };
 
 export type TableColumn = CellProps & HeaderCellProps & {key: string};

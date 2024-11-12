@@ -49,7 +49,11 @@ import TableContainer from 'components/Table/TableContainer';
 import TableHeader from 'components/Table/TableHeader';
 import TableRow from 'components/Table/TableRow';
 import Pagination from 'components/Pagination';
-import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import {
+  ACTION_CELL_WIDTH,
+  NOTES_CELL_WIDTH,
+  TableColumnWithRender,
+} from 'models/table';
 import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {
@@ -720,7 +724,7 @@ export const ServiceOrderList = ({menu}: Props) => {
       {
         headerName: 'NOTES',
         key: 'service-order-cell-notes',
-        width: '48px',
+        width: NOTES_CELL_WIDTH,
         align: 'center',
         renderCell: (serviceOrder, cellProps) => (
           <Cell

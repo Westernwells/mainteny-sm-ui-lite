@@ -9,6 +9,7 @@ interface Props {
   style?: {[key: string]: string | number};
   variant?: any;
   capitalizeText?: boolean;
+  noWrap?: boolean;
 }
 
 export const ServiceOrderTypeText = ({
@@ -16,6 +17,7 @@ export const ServiceOrderTypeText = ({
   style,
   variant,
   capitalizeText,
+  noWrap = false,
 }: Props) => {
   const {t} = useTranslation();
 
@@ -40,7 +42,7 @@ export const ServiceOrderTypeText = ({
   };
 
   return (
-    <Typography variant={variant || 'caption'} sx={{...style}}>
+    <Typography variant={variant || 'caption'} sx={{...style}} noWrap={noWrap}>
       {getServiceOrderLabel(serviceOrderType || undefined, capitalizeText)}
     </Typography>
   );

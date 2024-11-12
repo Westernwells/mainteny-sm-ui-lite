@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next';
 import {Box} from '@mui/system';
-import {IconButton, TableCell, Typography} from '@mui/material';
+import {IconButton, TableCell, Tooltip, Typography} from '@mui/material';
 import * as _ from 'lodash';
 import {ReactComponent as SortingArrow} from 'assets/icons/SortingArrows.svg';
 import {TableColumn} from 'models/table';
@@ -77,6 +77,12 @@ const TableHeaderCell = ({
         '&:hover .MuiIconButton-root': {
           ...(!isSortingActive && {opacity: 1}),
         },
+
+        ...(column.maxWidth && {maxWidth: column.maxWidth}),
+        ...(column?.width && {width: column.width}),
+        ...(column?.width?.slice(-2) === 'px' && {
+          flex: `0 1 ${column.width}`,
+        }), // if the width is in pixels
       }}>
       {!column.isHeaderNameHidden && (
         <Box
@@ -84,11 +90,25 @@ const TableHeaderCell = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: column.align || 'left',
+
+            ...(column?.width &&
+              !column.noWidthLimit && {
+                width: `calc(${column.width} - 12px)`,
+              }),
+            ...(column?.maxWidth &&
+              !column.noWidthLimit && {
+                maxWidth: `calc(${column.maxWidth} - 12px)`,
+              }),
           }}
           gap={gap}>
-          <Typography variant="subtitle2">
-            {_.capitalize(t(column.headerName))}
-          </Typography>
+          <Tooltip
+            title={_.capitalize(t(column.headerName))}
+            arrow
+            placement="top">
+            <Typography sx={{cursor: 'default'}} noWrap variant="subtitle2">
+              {_.capitalize(t(column.headerName))}
+            </Typography>
+          </Tooltip>
           {onSort && (
             <IconButton
               sx={{
