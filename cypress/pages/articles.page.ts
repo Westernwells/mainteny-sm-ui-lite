@@ -35,7 +35,8 @@ export default class ArticlesPage {
       .parent()
       .find('input')
       .type(article.unitSellingAmount.toString());
-    cy.get(`input[type="radio"][value="${article.type}"]`).click();
+      cy.get('label').contains('Type').parent().find('div[role="button"]').click(); 
+      cy.get('li[role="option"]').contains(article.type).click();
   };
 
   static fillDescription = (article: ArticleDescriptionFormModel) => {
