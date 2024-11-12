@@ -11,7 +11,6 @@ type Props = CellProps & {
   align?: string;
   justifyContent?: string;
   maxWidth?: string;
-  noWidthLimit?: boolean;
   fieldName?: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
