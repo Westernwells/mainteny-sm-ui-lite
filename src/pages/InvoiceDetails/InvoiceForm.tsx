@@ -118,6 +118,7 @@ import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
 import {formatInvoiceRecord, articleViewToInvoiceItemRecord} from './utils';
 import {Notes} from './Notes/EditNotes';
 import {cleanHtmlContent} from 'utils/text-block';
+import {t} from 'i18next';
 
 interface Props {
   invoice?: InvoiceView;
@@ -1591,6 +1592,7 @@ export const InvoiceForm = ({
                               formatAddressFullname(
                                 formik.values.alternativeServiceCompanyInfo
                                   .address,
+                                t,
                               )?.fullName
                             }
                           </Typography>
