@@ -64,5 +64,3 @@ export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {
     }
   }
 };
-
-export const createNameSearchQuery = (value: string) => `[name:*${value}*]`;

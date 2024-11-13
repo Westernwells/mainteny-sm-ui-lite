@@ -92,7 +92,6 @@ export const CustomerForm = ({
                 name: 'propertyOwnerId',
                 onBlur: formik.handleBlur,
               }}
-              searchOnlyCustomerName
             />
           </Grid>
         </Grid>

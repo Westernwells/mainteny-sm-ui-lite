@@ -38,19 +38,4 @@ describe('Create Unit', () => {
         cy.contains('button', 'Submit').click();
         cy.contains('Unit created successfully');
     });
-
-    it('customer search to be fuzzy name', () => {
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/propertyOwners*`).as('customerApi');
-
-        const customerSearchValue = 'E2E test';
-
-        UnitsPage.navigateToCreatePage();
-        cy.get('span[role="progressbar"]').should('not.exist');
-        customerSearchValue.split('').forEach((char) => {
-            cy.get('input[placeholder="Select Customer"]').type(char);
-        });
-        cy.get('@customerApi.all').then((call) => {
-            cy.wrap(Cypress._.last(call)).its('request.query.query').should('include', `[name:*${customerSearchValue}*]`);
-        });
-    });
 });
