@@ -87,11 +87,7 @@ export const columns: GridColDef[] = [
     align: 'center',
     headerAlign: 'center',
     renderCell: (params) => (
-      <Actions
-        url={params.value.url}
-        fileName={params.value.fileName}
-        contractId={params.value.contractId}
-      />
+      <Actions url={params.value.url} fileName={params.value.fileName} />
     ),
     flex: 1,
   }),
