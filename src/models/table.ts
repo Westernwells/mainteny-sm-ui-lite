@@ -4,7 +4,7 @@ export const ACTION_CELL_WIDTH = '48px';
 export const NOTES_CELL_WIDTH = '64px';
 
 export type CellCallbackProps = {
-  onClick: () => void;
+  onClick?: () => void;
 };
 
 export type HeaderCellProps = {

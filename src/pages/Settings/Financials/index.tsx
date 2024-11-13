@@ -1,17 +1,19 @@
-import Grid from '@mui/material/Grid';
+import {Box} from '@mui/material';
 import {ServiceCompanyItem} from 'models/service-company';
 import GeneralInfo from './GeneralInfo';
 import BankAccounts from './BankAccounts';
+import TaxRates from './TaxRates';
 
 type Props = {
   company: ServiceCompanyItem;
 };
 
 const Financials = ({company}: Props) => (
-  <Grid container direction="column" gap={3}>
+  <Box display="flex" flexDirection="column" gap={3}>
     <GeneralInfo company={company} />
     <BankAccounts company={company} />
-  </Grid>
+    <TaxRates />
+  </Box>
 );
 
 export default Financials;

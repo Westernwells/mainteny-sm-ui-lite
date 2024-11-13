@@ -1,6 +1,6 @@
 import Menu from '@mui/material/Menu';
-import {ListItemButton, ListItemText, MenuItem} from '@mui/material';
-import React, {useRef, useState} from 'react';
+import {Divider, ListItemButton, ListItemText, MenuItem} from '@mui/material';
+import {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import IconButton from '@mui/material/IconButton';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
@@ -54,19 +54,34 @@ const TableActionMenu = ({
         onClose={handleToggleMenu(false)}>
         {options.map((option, index) => {
           const IconComponent = option.icon;
-          return (
+          return [
             <MenuItem
               key={`menu-action-option-${index}`}
               sx={{display: 'flex'}}
               onClick={option.onTrigger}>
-              <ListItemButton sx={{flex: '0 0 auto'}} component="a">
-                <IconComponent fontSize="small" sx={{color: 'action.active'}} />
+              <ListItemButton
+                sx={{flex: '0 0 auto', p: 0, pr: 1}}
+                component="a">
+                <IconComponent
+                  fontSize="medium"
+                  sx={{color: 'text.secondary'}}
+                />
               </ListItemButton>
-              <ListItemText sx={{align: 'left'}}>
+              <ListItemText
+                sx={{
+                  align: 'left',
+                  typography: 'body2',
+                  color: 'primary.dark',
+                }}>
                 {t(option.label)}
               </ListItemText>
-            </MenuItem>
-          );
+            </MenuItem>,
+            index < options.length - 1 && (
+              <Divider
+                sx={{my: 0.5, borderColor: 'action.disabledBackground'}}
+              />
+            ),
+          ];
         })}
       </Menu>
     </>

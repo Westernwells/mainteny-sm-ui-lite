@@ -35,7 +35,7 @@ export const theme = createTheme({
     },
     text: {
       primary: '#222B45',
-      secondary: '#8F9BB3',
+      secondary: '#828DA3',
       disabled: 'rgba(143, 155, 179, 0.5)',
     },
     action: {
