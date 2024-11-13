@@ -12,6 +12,7 @@ import {ReactComponent as SupplierIllustration} from 'assets/illustrations/Suppl
 import {ReactComponent as MobileUsabilityTesting} from 'assets/illustrations/MobileUsabilityTesting.svg';
 import {ReactComponent as UXAnalytics} from 'assets/illustrations/UXAnalytics.svg';
 import {ReactComponent as BankAccountsIllustration} from 'assets/illustrations/BankAccounts.svg';
+import {ReactComponent as PercentageIllustration} from 'assets/illustrations/Percentage.svg';
 import {ReactComponent as AttachmentLargeIcon} from 'assets/icons/AttachmentLargeIcon.svg';
 import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
 import {ReactComponent as HeadphonesHumanIcon} from 'assets/icons/HeadphonesHumanIcon.svg';
@@ -43,6 +44,7 @@ export interface Props extends BoxProps {
     | 'file-attachment'
     | 'lift'
     | 'bankAccounts'
+    | 'percentage'
     | 'calendarClock'
     | 'calendarClockGrey'
     | 'contacts'
@@ -121,6 +123,17 @@ export const EmptySection = ({
         return (
           <BankAccountsIllustration style={{width: '100%', height: '100%'}} />
         );
+      case 'percentage':
+        return (
+          <PercentageIllustration
+            style={{
+              width: '100%',
+              height: '100%',
+              fill: 'none',
+              color: theme.palette.text.secondary,
+            }}
+          />
+        );
       case 'calendarClockGrey':
         return <CalendarClockGrey style={{width: '100%', height: '100%'}} />;
       case 'calendarClock':
@@ -185,6 +198,11 @@ export const EmptySection = ({
             endIcon: actionButtonEndIcon || null,
             style: {
               backgroundColor: theme.palette.primary.dark,
+            },
+            sx: {
+              '& .MuiButton-startIcon': {
+                marginBottom: '6px',
+              },
             },
           }}>
           {t(btnLabel)}

@@ -88,8 +88,7 @@ export const Dialog = ({
       <DialogTitle
         id="alert-dialog-title"
         sx={{
-          background: 'white',
-          padding: '1em 1em 1em 2.5em',
+          px: 3,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -101,13 +100,13 @@ export const Dialog = ({
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{margin: '1em 0em 0em 1em', ...dialogContentStyles}}>
+      <DialogContent sx={{p: 3, ...dialogContentStyles}}>
         <DialogContentText
           id="alert-dialog-description"
           component="div"
           sx={{
             color: 'text.primary',
-            paddingTop: '0.3em',
+            paddingTop: 1,
             ...dialogContentTextStyles,
           }}>
           {children}
@@ -115,11 +114,10 @@ export const Dialog = ({
       </DialogContent>
       <DialogActions
         sx={{
-          padding: '1.5em 24px 1.5em 1.5em',
+          p: 3,
+          pt: 1.5,
           display: 'flex',
           justifyContent: 'space-between',
-          background: 'white',
-          marginLeft: '1em',
           ...dialogActionsStyles,
         }}>
         {leftButton}
