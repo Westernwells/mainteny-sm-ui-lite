@@ -255,8 +255,8 @@ describe('Invoice flow', () => {
                     if (invoice.serviceOrder?.meta.createdAt) {
                         cy.contains(formatDate(invoice.serviceOrder.meta.createdAt));
                     }
-                    if (invoice.additionalInfo?.customerSpecificOrderNumber) {
-                        cy.contains(invoice.additionalInfo.customerSpecificOrderNumber);
+                    if (invoice.additionalInfo?.purchaseOrderNumber) {
+                        cy.contains(invoice.additionalInfo.purchaseOrderNumber);
                     }
                     if (invoice.additionalInfo?.costCenter) {
                         cy.contains(invoice.additionalInfo.costCenter);
