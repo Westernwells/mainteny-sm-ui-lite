@@ -2913,5 +2913,19 @@
   "Enter supplier ID": "Unesite ID dobavljača",
   "Tax Rate": "Poreska stopa",
   "Tax Amount": "Iznos poreza",
-  "Search invoice number": "Pretražite broj fakture"
+  "Search invoice number": "Pretražite broj fakture",
+  "No tax rate": "Bez poreske stope",
+  "Add tax rate(s) to be used through the platform": "Dodajte poresku stopu(e) koja će se koristiti preko platforme",
+  "New Tax Rate": "Nova poreska stopa",
+  "New tax rate": "nova poreska stopa",
+  "Legal note": "Pravne napomene",
+  "If a legal note is present here and you choose this tax rate, the text automatically appears in the note section of each quotation and invoice for editing.": "Ako je ovde prisutna pravna napomena i izaberete ovu poresku stopu, tekst se automatski pojavljuje u odeljku za napomene svake ponude i fakture za uređivanje.",
+  "Default tax rate": "Podrazumevana poreska stopa",
+  "This standard tax percentage is applied automatically if no specific rate is set.": "Ovaj standardni procenat poreza se primenjuje automatski ako nije određena posebna stopa.",
+  "Set as default": "Postavi kao podrazumevano",
+  "Edit tax rate": "Izmenite poresku stopu",
+  "Save tax rate": "Sačuvaj poresku stopu",
+  "Remove tax rate": "Uklonite poresku stopu",
+  "You are about to remove <bold>{{taxRateName}}</bold> tax rate.": "Spremate se da uklonite poresku stopu <bold>{{taxRateName}}</bold>.",
+  "Tax rates updated": "Poreske stope su ažurirane"
 }
