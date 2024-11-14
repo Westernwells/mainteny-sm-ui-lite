@@ -3,6 +3,7 @@ import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
 import {isEqual} from 'lodash';
 import {
+  Autocomplete,
   Box,
   ClickAwayListener,
   IconButton,
@@ -50,6 +51,7 @@ import {DragIndicator} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
+import {VatView} from 'models/vat';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -70,6 +72,7 @@ interface Props {
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
   isHovered?: boolean;
   defaultPercentageVat?: number;
+  taxRates: VatView[];
   invoiceType: InvoiceType;
 }
 
@@ -155,6 +158,7 @@ export const ArticleItemRowNEW = ({
   isHovered,
   defaultPercentageVat,
   invoiceType,
+  taxRates,
 }: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -690,55 +694,77 @@ export const ArticleItemRowNEW = ({
       </TableCell>
 
       <TableCell sx={{width: '6%', display: 'inline-block'}}>
-        <NumericFormat
-          value={
+        <Autocomplete
+          value={String(
             formik.values.unitAmount.percentageVat !== 0
               ? formik.values.unitAmount.percentageVat
-              : 0
-          }
-          customInput={TextField}
-          suffix="%"
-          allowLeadingZeros={false}
-          decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+              : 0,
+          )}
+          onInputChange={(_event, newValue) => {
+            const val =
+              (typeof newValue === 'string' ? Number(newValue) : newValue) || 0;
+            formik.setFieldValue('unitAmount.percentageVat', val);
+          }}
+          freeSolo
+          disableClearable
+          options={taxRates}
+          getOptionLabel={(option) => {
+            if (typeof option === 'string') {
+              return option;
+            }
+            return `${option.percentage || 0}`;
+          }}
           sx={{
             width: '100%',
-            '& .MuiInputBase-root': {
-              pr: 0,
-            },
-            '& .MuiOutlinedInput-input': {
-              textAlign: 'right',
-            },
+            display: 'inline-flex',
           }}
-          isAllowed={(values) => {
-            const {floatValue} = values;
-            if (!floatValue) {
-              return true;
-            }
-
-            if (floatValue < 0) {
-              return false;
-            }
-
-            const maxValue = 100;
-
-            return floatValue <= maxValue;
-          }}
-          InputProps={{
-            name: 'unitAmount.percentageVat',
-            id: `unitAmount.percentageVat-${index}`,
-            inputMode: 'numeric',
-          }}
-          onValueChange={(values) => {
-            const {floatValue} = values;
-            formik.setFieldValue('unitAmount.percentageVat', floatValue || 0);
-          }}
-          size="small"
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              name="unitAmount.percentageVat"
+              id={`unitAmount.percentageVat-${index}`}
+              type="number"
+              sx={{
+                '& .MuiInputBase-root': {
+                  p: 0,
+                },
+                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button':
+                  {
+                    display: 'none',
+                  },
+                '& input[type=number]': {
+                  MozAppearance: 'textfield',
+                },
+                width: '100%',
+              }}
+              InputProps={{
+                ...params.InputProps,
+                inputProps: {
+                  ...params.inputProps,
+                  min: 0,
+                  style: {textAlign: 'right'},
+                },
+                endAdornment: (
+                  <InputAdornment
+                    position="end"
+                    sx={{
+                      m: '0',
+                      justifyContent: 'center',
+                      height: '100%',
+                      bgcolor: 'action.hover',
+                      borderRadius: 0,
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                      },
+                      width: '30%',
+                    }}>
+                    %
+                  </InputAdornment>
+                ),
+              }}
+              variant="outlined"
+            />
+          )}
         />
       </TableCell>
 

@@ -35,11 +35,12 @@ import {getUniqueId} from 'utils/utils';
 import {useTheme} from '@mui/material/styles';
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {UserCompanyContext} from 'context/UserCompanyProvider';
+import {useVats} from 'hooks/reactQuery/useVats';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {ArticleItemRowNEW} from './ArticleItemRowNEW';
 import {FormSelect} from './form/FormSelect';
+import {Progress} from './Progress';
 
 interface Props {
   items: InvoiceItemRecord[];
@@ -59,11 +60,12 @@ export const ArticleItemsTableNEW = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
+  const {data: taxRates, isLoading: isLoadingTaxRates} = useVats();
 
   const subtotalExclVat = calculateTotalWithPerItemDiscount(
     formik.values.items,
   );
-  const {company} = useContext(UserCompanyContext);
+  const {user} = useUserSession();
 
   const {language: selectedLng} = useContext(LanguageContext);
 
@@ -130,6 +132,11 @@ export const ArticleItemsTableNEW = ({
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
+  const defaultPercentageVat =
+    taxRates?.find((tR) => tR.isDefault)?.percentage ||
+    user?.userAccount.serviceCompany.settings.percentageVat ||
+    0;
+
   const createEmptyItem = () => {
     const blankItem = {
       article: {
@@ -141,7 +148,7 @@ export const ArticleItemsTableNEW = ({
           fractionDigits: currentCurrency.fractionDigits,
           currency: currentCurrency.code,
           grossAmount: 0,
-          percentageVat: company?.settings.percentageVat ?? 0,
+          percentageVat: defaultPercentageVat,
           vat: 0,
         },
       },
@@ -153,7 +160,7 @@ export const ArticleItemsTableNEW = ({
         fractionDigits: currentCurrency.fractionDigits,
         currency: currentCurrency.code,
         grossAmount: 0,
-        percentageVat: company?.settings.percentageVat ?? 0,
+        percentageVat: defaultPercentageVat,
         vat: 0,
       },
       discount: {
@@ -189,7 +196,6 @@ export const ArticleItemsTableNEW = ({
 
     setItems(items);
   };
-  const {user} = useUserSession();
 
   const {
     amountBeforeGlobalDiscount,
@@ -224,6 +230,8 @@ export const ArticleItemsTableNEW = ({
     amountAfterGlobalDiscountWithVAT,
     {currency: currentCurrency.code},
   );
+
+  if (isLoadingTaxRates) return <Progress height="100%" />;
 
   return (
     <Box
@@ -311,10 +319,8 @@ export const ArticleItemsTableNEW = ({
                             propertyOwnerId={propertyOwnerId}
                             handleSelectItem={handleSelectItem}
                             isHovered={isHovered}
-                            defaultPercentageVat={
-                              user?.userAccount.serviceCompany.settings
-                                .percentageVat
-                            }
+                            defaultPercentageVat={defaultPercentageVat}
+                            taxRates={taxRates!}
                             invoiceType={formik.values.type}
                           />
                         </TableRow>
