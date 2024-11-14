@@ -77,7 +77,12 @@ import {OptionWithTranslationKey} from 'models/filter';
 import {capitalize, reduce} from 'lodash';
 import NoteDrawer from 'pages/InvoiceDetails/Notes/NoteDrawer';
 import {Avatar} from 'components/Avatar';
-import {formatDate} from 'utils/datetime';
+import {
+  DEFAULT_DATE_FORMAT,
+  formatDate,
+  fromDateStringToDate,
+  toRestDate,
+} from 'utils/datetime';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {Button} from 'components/Button';
@@ -94,6 +99,7 @@ import DatePickerRange from 'components/DatePickerRange';
 import EmptyTable from 'components/Table/EmptyTable';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {formatCurrency} from 'utils/currency';
 import {getInvoiceStatusStyles} from './InvoicesDataGridProps';
 
 const pageSize = 25;
@@ -169,14 +175,15 @@ const Invoices = ({elevatorId}: Props) => {
     {defaultValue: undefined},
   );
 
-  const [selectedCreationStartDate, setSelectedCreationStartDate] =
-    useQueryState<Date | undefined>('selectedCreationStartDate', {
-      defaultValue: undefined,
-    });
+  const [selectedStartDate, setSelectedStartDate] = useQueryState<
+    string | undefined
+  >('selectedStartDate', {
+    defaultValue: undefined,
+  });
 
-  const [selectedCreationEndDate, setSelectedCreationEndDate] = useQueryState<
-    Date | undefined
-  >('selectedCreationEndDate', {
+  const [selectedEndDate, setSelectedEndDate] = useQueryState<
+    string | undefined
+  >('selectedEndDate', {
     defaultValue: undefined,
   });
 
@@ -206,8 +213,12 @@ const Invoices = ({elevatorId}: Props) => {
   const [showRightShadow, setShowRightShadow] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceView>();
   const [tempDateRange, setTempDateRange] = useState<DateRange<Date>>([
-    selectedCreationStartDate || null,
-    selectedCreationEndDate || null,
+    selectedStartDate
+      ? fromDateStringToDate(selectedStartDate, DEFAULT_DATE_FORMAT)
+      : null,
+    selectedEndDate
+      ? fromDateStringToDate(selectedEndDate, DEFAULT_DATE_FORMAT)
+      : null,
   ]);
 
   const [hoverNoteServiceId, setHoverNoteServiceId] = useState<
@@ -238,11 +249,15 @@ const Invoices = ({elevatorId}: Props) => {
       grossAmountMin > 0 && {grossAmountFrom: grossAmountMin}),
     ...(grossAmountMax &&
       grossAmountMax > 0 && {grossAmountTo: grossAmountMax}),
-    ...(selectedCreationStartDate && {
-      createdDateTimeFrom: selectedCreationStartDate,
+    ...(selectedStartDate && {
+      sentDateFrom: toRestDate(
+        fromDateStringToDate(selectedStartDate, DEFAULT_DATE_FORMAT),
+      ),
     }),
-    ...(selectedCreationEndDate && {
-      createdDateTimeTo: selectedCreationEndDate,
+    ...(selectedEndDate && {
+      sentDateTo: toRestDate(
+        fromDateStringToDate(selectedEndDate, DEFAULT_DATE_FORMAT),
+      ),
     }),
     ...(isWithNote === 'true' && {hasComments: true}),
     ...(selectedCustomer && {propertyOwnerId: [selectedCustomer]}),
@@ -339,13 +354,13 @@ const Invoices = ({elevatorId}: Props) => {
   const handleRangeChange = useCallback(() => {
     const startDate = tempDateRange?.[0] || undefined;
     const endDate = tempDateRange?.[1] || undefined;
-    setSelectedCreationStartDate(startDate);
-    setSelectedCreationEndDate(endDate || startDate);
+    setSelectedStartDate(formatDate(startDate));
+    setSelectedEndDate(formatDate(endDate || startDate));
   }, [tempDateRange]);
 
   const clearDateSelection = () => {
-    setSelectedCreationStartDate(undefined);
-    setSelectedCreationEndDate(undefined);
+    setSelectedStartDate(undefined);
+    setSelectedEndDate(undefined);
   };
 
   const {data: xeroInfoData} = useCompanyXeroInfo(
@@ -477,7 +492,7 @@ const Invoices = ({elevatorId}: Props) => {
         ),
       },
       {
-        headerName: 'SERVICE TYPE',
+        headerName: 'Job Type',
         key: 'invoice-cell-service-type',
         width: '136px',
         fieldName: InvoiceOrderField.SERVICE_ORDER_TYPE,
@@ -517,7 +532,7 @@ const Invoices = ({elevatorId}: Props) => {
         getExportValue: (invoice) => `${invoice.total}`,
         renderCell: (invoice, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>{invoice.total}</TableCellText>
+            <TableCellText>{formatCurrency(invoice.total)}</TableCellText>
           </Cell>
         ),
       },
@@ -598,6 +613,7 @@ const Invoices = ({elevatorId}: Props) => {
         width: ACTION_CELL_WIDTH,
         isLast: true,
         showShadows: showLeftShadow ? 'left' : undefined,
+        noPadding: true,
         renderCell: (invoice, cellProps) => (
           <Cell {...cellProps} onClick={undefined}>
             <Actions
@@ -627,6 +643,8 @@ const Invoices = ({elevatorId}: Props) => {
       companyNextNumber,
       isHeaderUrlLoading,
       isFooterUrlLoading,
+      showLeftShadow,
+      showRightShadow,
     ],
   );
 
@@ -665,10 +683,12 @@ const Invoices = ({elevatorId}: Props) => {
 
   const handlePageIndexChange = (value: number) => {
     setPage({...page, pageIndex: value});
+    containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
   };
 
   const handleChangeElementsPerPage = (value: number) => {
     setPage({...page, pageSize: value, pageIndex: 0});
+    containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
   };
 
   const handleRowClick = (id: string) => () => {
@@ -904,8 +924,8 @@ const Invoices = ({elevatorId}: Props) => {
     if (
       (appliedFilterNumber > 0 ||
         status.length > 0 ||
-        selectedCreationStartDate ||
-        selectedCreationEndDate ||
+        selectedStartDate ||
+        selectedEndDate ||
         !!search) &&
       invoiceResource.total === 0
     ) {

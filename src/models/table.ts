@@ -25,6 +25,7 @@ export type CellProps = {
   hide?: boolean;
   showShadows?: 'left' | 'right';
   noWidthLimit?: boolean;
+  noPadding?: boolean;
 };
 
 export type TableColumn = CellProps & HeaderCellProps & {key: string};

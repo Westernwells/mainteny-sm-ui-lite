@@ -1494,11 +1494,24 @@ export const Actions = ({
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        height: '40px',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
       <Tooltip title={t('More')} placement="right" arrow>
         <IconButton
           data-testid="invoice-action-menu-button"
           sx={{
+            display: 'flex',
+            width: '100%',
+            height: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+
             ...(removePadding && {
               padding: 0,
             }),

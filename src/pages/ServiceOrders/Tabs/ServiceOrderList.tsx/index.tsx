@@ -783,6 +783,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         align: 'center',
         width: ACTION_CELL_WIDTH, // set static width that will not change
         isLast: true,
+        noPadding: true,
         showShadows: showLeftShadow ? 'left' : undefined,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps} onClick={undefined}>
