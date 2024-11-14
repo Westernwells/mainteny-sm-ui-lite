@@ -35,8 +35,10 @@ export default class ArticlesPage {
       .parent()
       .find('input')
       .type(article.unitSellingAmount.toString());
-      cy.get('label').contains('Type').parent().find('div[role="button"]').click(); 
-      cy.get('li[role="option"]').contains(article.type).click();
+    cy.get('div[data-testid="article-type-selector"]').click();
+    cy.get('li[role="option"]')
+      .contains(article.type, {matchCase: false})
+      .click();
   };
 
   static fillDescription = (article: ArticleDescriptionFormModel) => {
