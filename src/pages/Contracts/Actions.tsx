@@ -3,25 +3,18 @@ import IconButton from '@mui/material/IconButton';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FileDownloadOffOutlinedIcon from '@mui/icons-material/FileDownloadOffOutlined';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import Delete from '@mui/icons-material/Delete';
-import {useEffect, useState} from 'react';
-import {useDeleteContract} from 'hooks/reactQuery/useContract';
-import {Confirm} from 'components/Confirm';
+import {useEffect} from 'react';
 
 interface Props {
   url: string;
   fileName: string;
-  contractId: string;
 }
 
-export const Actions = ({url, fileName, contractId}: Props) => {
+export const Actions = ({url, fileName}: Props) => {
   const {data: downloadUrl, refetch: downloadDocument} = useDownloadUrl(
     url ? [url] : [],
     {enabled: false},
   );
-  const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
-  const {mutateAsync: deleteContract, isLoading: isDeleting} =
-    useDeleteContract('Contract deleted successfully');
 
   useEffect(() => {
     if (downloadUrl && Object.values(downloadUrl).length) {
@@ -40,42 +33,20 @@ export const Actions = ({url, fileName, contractId}: Props) => {
   return (
     <Box>
       {url ? (
-        <>
-          <IconButton onClick={() => downloadDocument()}>
-            <FileDownloadOutlinedIcon
-              fontSize="small"
-              sx={{color: 'action.active'}}
-            />
-          </IconButton>
-          <IconButton onClick={() => setOpenDeleteConfirm(true)}>
-            <Delete sx={{ml: '0.5em'}} />
-          </IconButton>
-        </>
+        <IconButton onClick={() => downloadDocument()}>
+          <FileDownloadOutlinedIcon
+            fontSize="small"
+            sx={{color: 'action.active'}}
+          />
+        </IconButton>
       ) : (
-        <>
-          <IconButton disabled>
-            <FileDownloadOffOutlinedIcon
-              fontSize="small"
-              sx={{color: 'action.active', cursor: 'not-allowed'}}
-            />
-          </IconButton>
-          <IconButton onClick={() => setOpenDeleteConfirm(true)}>
-            <Delete sx={{ml: '0.5em'}} />
-          </IconButton>
-        </>
+        <IconButton disabled>
+          <FileDownloadOffOutlinedIcon
+            fontSize="small"
+            sx={{color: 'action.active', cursor: 'not-allowed'}}
+          />
+        </IconButton>
       )}
-
-      <Confirm
-        disableActions={isDeleting}
-        open={openDeleteConfirm}
-        onConfirm={async () => {
-          await deleteContract(contractId!);
-          setOpenDeleteConfirm(false);
-        }}
-        onClose={() => setOpenDeleteConfirm(false)}
-        title="Confirm"
-        content="Do you want to delete this contract?"
-      />
     </Box>
   );
 };
