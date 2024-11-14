@@ -281,6 +281,7 @@ export const ScheduleDialog = ({
                   {`${option.userAccount.firstName} ${option.userAccount.lastName}`}
                 </li>
               )}
+              filterOptions={(x) => x}
               onInputChange={onInputChange}
               inputValue={query}
               onBlur={register('technicianIds').onBlur}

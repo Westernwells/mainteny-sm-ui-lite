@@ -273,8 +273,16 @@ export const formatAddressFullname = (
   const address1 = address?.component?.street ? address?.component?.street : '';
   const address2 = address?.component?.street2 || '';
   const zip = address?.component?.postalCode || '';
-  const city = address?.component?.city ? address?.component?.city : '';
-  const state = address?.component?.state ? address?.component?.state : '';
+  const city = address?.component?.city
+    ? translate
+      ? translate(address?.component?.city)
+      : address?.component?.city
+    : '';
+  const state = address?.component?.state
+    ? translate
+      ? translate(address?.component?.state)
+      : address?.component?.state
+    : '';
   const country = address?.component?.country
     ? translate
       ? translate(address?.component?.country)
