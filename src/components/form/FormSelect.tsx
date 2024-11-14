@@ -20,6 +20,7 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
 
 interface Props<T> {
   labelId: string;
+  testId?: string;
   label: string;
   beforeLabel?: ReactNode;
   required?: boolean;
@@ -56,6 +57,7 @@ const MenuProps = {
 
 export const FormSelect = ({
   labelId,
+  testId = 'form-select',
   beforeLabel,
   label,
   options,
@@ -111,6 +113,7 @@ export const FormSelect = ({
       <Select
         size="small"
         labelId={labelId}
+        data-testid={testId}
         label={
           beforeLabel ? (
             <Grid display="flex" alignItems="center">

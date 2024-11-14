@@ -7,8 +7,8 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {
   ArticleBasicFormModel,
-  MeasurementUnit,
   createMeasurementOptions,
+  MeasurementUnit,
 } from 'models/articleForm';
 import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
 import {ServiceCompanyNumberType} from 'models/service-company';
@@ -356,6 +356,7 @@ export const AddBasicInfoForm = ({
               error: !!(formik.touched.type && formik.errors.type),
             }}
             labelId="article-type"
+            testId="article-type-selector"
             required
           />
         </Grid>
