@@ -8,8 +8,9 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {Widget} from 'components/Widget';
 import {DatePicker} from 'components/DatePicker';
 import TotalTime from 'components/TotalTime';
-import {useWorkHours} from 'hooks/reactQuery/useWorkHours';
-import {WorkHourOrderField, WorkHoursItem} from 'models/workHours';
+import {useWorkHoursActivities} from 'hooks/reactQuery/useWorkHours';
+import {WorkHourActivitiesOrderField} from 'models/workHours';
+import {UserActivityView} from 'models/user';
 import {Order, OrderByParams} from 'models/pagination';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {calculateTotalTime} from 'utils/work-hours-utils';
@@ -42,22 +43,27 @@ const WorkHoursTab = ({employeeId}: Props) => {
   const [page, setPage] = useState(makePage(0, 25));
   const textInput = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const {values} = useSearchValues<OrderByParams<WorkHourOrderField>>();
-  const {sortOrder = Order.DESC, orderByField = WorkHourOrderField.START_TIME} =
-    values;
+  const {values} =
+    useSearchValues<OrderByParams<WorkHourActivitiesOrderField>>();
+  const {
+    sortOrder = Order.DESC,
+    orderByField = WorkHourActivitiesOrderField.START_TIME,
+  } = values;
 
-  const {data: workHours = createEmptyResource<WorkHoursItem>(10), isFetching} =
-    useWorkHours(
-      search,
-      page,
-      startDate,
-      endDate,
-      employeeId || '',
-      sortOrder,
-      orderByField === ('date' as WorkHourOrderField)
-        ? WorkHourOrderField.START_TIME
-        : orderByField,
-    );
+  const {
+    data: workHours = createEmptyResource<UserActivityView>(10),
+    isFetching,
+  } = useWorkHoursActivities(
+    search,
+    page,
+    startDate,
+    endDate,
+    employeeId || '',
+    sortOrder,
+    orderByField === ('date' as WorkHourActivitiesOrderField)
+      ? WorkHourActivitiesOrderField.START_TIME
+      : orderByField,
+  );
 
   const {user} = useUserSession();
   const {data: jobTypes = []} = useCompanyJobTypes(
