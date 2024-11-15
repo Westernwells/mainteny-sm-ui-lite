@@ -2906,5 +2906,9 @@
   "Save tax rate": "Steuersatz speichern",
   "Remove tax rate": "Steuersatz entfernen",
   "You are about to remove <bold>{{taxRateName}}</bold> tax rate.": "Sie sind im Begriff, den <bold>{{taxRateName}}</bold> Steuersatz zu entfernen.",
-  "Tax rates updated": "Steuersätze aktualisiert"
+  "Tax rates updated": "Steuersätze aktualisiert",
+  "Next Inspection": "Nächste Inspektion",
+  "Select model number": "Wähle Modell",
+  "Select unit category": "Wähle Kategorie",
+  "Select fabric number": "Wähle fabric number"
 }
