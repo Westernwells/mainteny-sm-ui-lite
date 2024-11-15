@@ -30,3 +30,13 @@ export const STATUS_TO_COLOR = new Map<StatusColorVariants, StatusColor>([
   [StatusColorVariants.RED, 'error'],
   [StatusColorVariants.SKYBLUE, 'primary.mainLight'],
 ]);
+
+export enum ARCHIVE_ACTION {
+  ARCHIVE = 'archive',
+  UNARCHIVE = 'unarchive',
+}
+
+export enum CANCEL_ACTION {
+  CANCEL = 'cancel',
+  UNCANCEL = 'uncancel',
+}

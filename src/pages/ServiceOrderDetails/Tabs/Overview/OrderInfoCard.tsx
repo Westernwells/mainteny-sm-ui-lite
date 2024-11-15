@@ -21,6 +21,7 @@ import {MenuBtn} from 'components/MenuBtn';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {useTheme} from '@mui/material';
 import {EmployeesView} from 'models/employee';
+import {CANCEL_ACTION} from 'models/status';
 import {ScheduleDialog} from './ScheduleDialog';
 import {MarkCompletedDialog} from './MarkCompletedDialog';
 import {OrderInfo} from './schema';
@@ -76,7 +77,10 @@ const OrderInfoItem = ({
 
 export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {t} = useTranslation();
-  const {mutate: cancelServiceOrder} = useCancelServiceOrders();
+  const {mutate: cancelServiceOrder} = useCancelServiceOrders({
+    serviceOrderId: serviceOrderDetails.id,
+    action: CANCEL_ACTION.CANCEL,
+  });
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
 
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
@@ -258,7 +262,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
       <Confirm
         open={openCancelConfirm}
         onConfirm={() => {
-          cancelServiceOrder(serviceOrderDetails.id);
+          cancelServiceOrder();
           setOpenCancelConfirm(false);
         }}
         onClose={() => setOpenCancelConfirm(false)}

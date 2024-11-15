@@ -112,6 +112,8 @@ export const queryKeys = {
   purchaseInvoiceById: 'purchaseInvoiceById',
   fetchVats: 'fetchVats',
   fetchProperties: 'fetchProperties',
+  archiveServiceOrder: 'archiveServiceOrder',
+  cancelServiceOrder: 'cancelServiceOrder',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',
