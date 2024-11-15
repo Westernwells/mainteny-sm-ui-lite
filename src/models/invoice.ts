@@ -113,6 +113,7 @@ export interface InvoiceAdditionalInfo {
   paymentTerm?: InvoicePaymentTermRecord & {
     data?: PaymentTermData;
   };
+  purchaseOrderNumber?: string;
   elevatorExternalId?: string;
 }
 
@@ -343,7 +344,7 @@ export interface InvoiceFormData {
   includeWorkReport?: boolean;
   includeCheckList?: boolean;
   costCenter?: string;
-  customerSpecificOrderNumber?: string;
+  purchaseOrderNumber?: string;
   beneficialName?: string;
   moreInfo?: string;
   billingAddress?: AddressRecord;
@@ -383,7 +384,7 @@ export interface CreateInvoice {
   includeWorkReport?: boolean;
   includeCheckList?: boolean;
   costCenter?: string;
-  customerSpecificOrderNumber?: string;
+  purchaseOrderNumber?: string;
   integration?: {
     xeroEntityId?: string;
   };
@@ -420,7 +421,7 @@ export interface UpdateInvoice {
   includeWorkReport?: boolean;
   includeCheckList?: boolean;
   costCenter?: string;
-  customerSpecificOrderNumber?: string;
+  purchaseOrderNumber?: string;
   integration?: {
     xeroEntityId?: string;
   };

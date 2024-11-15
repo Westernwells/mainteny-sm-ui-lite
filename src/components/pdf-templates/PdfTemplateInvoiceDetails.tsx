@@ -124,6 +124,11 @@ const PdfTemplateInvoiceDetails = ({
       invoice?.serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
     '';
 
+  const purchaseOrderNumber =
+    invoice?.additionalInfo?.purchaseOrderNumber ||
+    invoice?.additionalInfo?.customerSpecificOrderNumber ||
+    '';
+
   return (
     <View style={styles.rightAddress}>
       {(invoice?.externalId || nextCompanyExternalId) && (
@@ -206,12 +211,10 @@ const PdfTemplateInvoiceDetails = ({
         </View>
       )}
 
-      {invoice?.additionalInfo.customerSpecificOrderNumber && (
+      {!!purchaseOrderNumber && (
         <View style={styles.rightAddressContent}>
           <Text style={styles.tag}>{translate('Purchase no.')}</Text>
-          <Text style={styles.tagContent}>
-            {invoice?.additionalInfo.customerSpecificOrderNumber}
-          </Text>
+          <Text style={styles.tagContent}>{purchaseOrderNumber}</Text>
         </View>
       )}
 

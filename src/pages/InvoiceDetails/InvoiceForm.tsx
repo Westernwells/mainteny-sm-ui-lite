@@ -406,9 +406,10 @@ export const InvoiceForm = ({
         (!isNewInvoice && invoice?.additionalInfo.includeCheckList) || false,
       beneficialName: '',
       costCenter: (!isNewInvoice && invoice?.additionalInfo.costCenter) || '',
-      customerSpecificOrderNumber:
+      purchaseOrderNumber:
         (!isNewInvoice &&
-          invoice?.additionalInfo?.customerSpecificOrderNumber) ||
+          (invoice?.additionalInfo?.purchaseOrderNumber ||
+            invoice?.additionalInfo?.customerSpecificOrderNumber)) ||
         '',
       moreInfo:
         (!isNewInvoice && invoice?.additionalInfo.moreInfo) ||
@@ -730,8 +731,10 @@ export const InvoiceForm = ({
     );
 
     formik.setFieldValue(
-      'customerSpecificOrderNumber',
-      invoiceData?.additionalInfo?.customerSpecificOrderNumber || '',
+      'purchaseOrderNumber',
+      invoiceData?.additionalInfo?.purchaseOrderNumber ||
+        invoice?.additionalInfo?.customerSpecificOrderNumber ||
+        '',
     );
     formik.setFieldValue(
       'moreInfo',
@@ -999,16 +1002,16 @@ export const InvoiceForm = ({
 
     if (serviceOrderArg.additionalInfo.purchaseOrderNumber) {
       formik.setFieldValue(
-        'customerSpecificOrderNumber',
+        'purchaseOrderNumber',
         serviceOrderArg.additionalInfo.purchaseOrderNumber,
       );
     } else if (serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber) {
       formik.setFieldValue(
-        'customerSpecificOrderNumber',
+        'purchaseOrderNumber',
         serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber,
       );
     } else {
-      formik.setFieldValue('customerSpecificOrderNumber', '');
+      formik.setFieldValue('purchaseOrderNumber', '');
     }
   };
 
@@ -1100,7 +1103,7 @@ export const InvoiceForm = ({
       costCenter: '',
       dueDate: undefined,
       paymentTerm: {term: ''},
-      customerSpecificOrderNumber: '',
+      purchaseOrderNumber: '',
     });
     if (isNewInvoice) {
       setInitialLocalStorageData(null);
@@ -1139,7 +1142,7 @@ export const InvoiceForm = ({
       'beneficiaryAddress',
       customer?.beneficiaryAddress || emptyAddressState,
     );
-    formik.setFieldValue('customerSpecificOrderNumber', '');
+    formik.setFieldValue('purchaseOrderNumber', '');
   }, [formik, customer]);
 
   // Handle updates from duplicated invoice and edit mode
@@ -2132,20 +2135,20 @@ export const InvoiceForm = ({
               width="100%">
               <FormInput
                 fieldProps={{
-                  id: 'customerSpecificOrderNumber',
-                  name: 'customerSpecificOrderNumber',
+                  id: 'purchaseOrderNumber',
+                  name: 'purchaseOrderNumber',
                   placeholder: 'e.g 000 000 000',
                   label: 'Purchase order no.',
-                  value: formik.values.customerSpecificOrderNumber,
+                  value: formik.values.purchaseOrderNumber,
                   onChange: formik.handleChange,
                   onBlur: formik.handleBlur,
                   error: !!(
-                    formik.touched.customerSpecificOrderNumber &&
-                    formik.errors.customerSpecificOrderNumber
+                    formik.touched.purchaseOrderNumber &&
+                    formik.errors.purchaseOrderNumber
                   ),
                   helperText:
-                    formik.touched.customerSpecificOrderNumber &&
-                    formik.errors.customerSpecificOrderNumber,
+                    formik.touched.purchaseOrderNumber &&
+                    formik.errors.purchaseOrderNumber,
                 }}
               />
               <FormInput
