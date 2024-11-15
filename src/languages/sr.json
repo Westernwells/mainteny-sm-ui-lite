@@ -2927,5 +2927,9 @@
   "Save tax rate": "Sačuvaj poresku stopu",
   "Remove tax rate": "Uklonite poresku stopu",
   "You are about to remove <bold>{{taxRateName}}</bold> tax rate.": "Spremate se da uklonite poresku stopu <bold>{{taxRateName}}</bold>.",
-  "Tax rates updated": "Poreske stope su ažurirane"
+  "Tax rates updated": "Poreske stope su ažurirane",
+  "Next Inspection": "Sledeća inspekcija",
+  "Select model number": "Izaberite broj modela",
+  "Select unit category": "Izaberite kategoriju jedinice",
+  "Select fabric number": "Izaberite broj materijala"
 }
