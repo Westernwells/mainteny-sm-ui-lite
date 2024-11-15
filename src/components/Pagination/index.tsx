@@ -19,6 +19,7 @@ type Props = {
   totalEntries: number;
   onChange: (page: number) => void;
   onNumberPerPageChange: (page: number) => void;
+  afterPageSelectorComponent?: () => JSX.Element;
 };
 
 const Pagination = ({
@@ -28,6 +29,7 @@ const Pagination = ({
   totalEntries,
   onChange,
   onNumberPerPageChange,
+  afterPageSelectorComponent,
 }: Props) => {
   const {t} = useTranslation();
   const anchorEl = useRef<HTMLButtonElement | null>(null);
@@ -114,6 +116,8 @@ const Pagination = ({
             );
           })}
         </Menu>
+
+        {afterPageSelectorComponent?.()}
       </Box>
       <Box sx={{display: 'flex', alignItems: 'center'}} gap={2}>
         <Box sx={{display: 'flex', alignItems: 'center'}}>

@@ -136,6 +136,7 @@ export const Employees = () => {
         align: 'center',
         width: ACTION_CELL_WIDTH, // set static width that will not change
         isLast: true,
+        noPadding: true,
         showShadows: showLeftShadow ? 'left' : undefined,
         renderCell: (employee, cellProps) => (
           <Cell {...cellProps} onClick={undefined}>

@@ -33,12 +33,13 @@ const ChipSelector = ({
       )}
 
       <Box sx={{display: 'flex'}} flexWrap="wrap" gap={0.75}>
-        {options.map((option) => {
+        {options.map((option, index) => {
           const isSelected = selectedChips.some(
             (selectedValue) => selectedValue === option.value,
           );
           return (
             <Chip
+              key={`chip-selector-option-${option.value}-${index}`}
               sx={{
                 height: '32px',
                 backgroundColor: 'white',

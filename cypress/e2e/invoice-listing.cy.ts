@@ -1,4 +1,5 @@
 import {removeControlCharsAndSpaces} from 'utils/utils';
+import TableFilter from '../utils/tableFilter';
 import InvoiceListingPage from '../pages/invoice-listing.page';
 import AppTopBarPage from '../pages/appTopBar.page';
 import {InvoiceStatusView, InvoiceType} from '../../src/models/invoice';
@@ -6,6 +7,7 @@ import {getPlainStringFromHtml} from '../../src/utils/rich-field-string';
 import {calculateInvoiceAmount} from '../../src/utils/calculate-total';
 import {formatCurrency} from '../../src/utils/currency';
 import {ServiceCompany} from '../../src/models/service-company';
+import Table from '../utils/table';
 
 describe('Invoice listing page', () => {
     beforeEach(() => {
@@ -20,14 +22,6 @@ describe('Invoice listing page', () => {
         cy.contains('New Invoice').click();
         cy.visit(`/invoices/new`);
         cy.url().should('include', `invoices/new`);
-    });
-
-    it('should clear all filters on clicking clear filter button', () => {
-        InvoiceListingPage.clearFilter();
-        cy.url().should('include', '/invoices');
-        cy.url().should('not.include', 'cost');
-        cy.url().should('not.include', 'status');
-        cy.get('input[placeholder="Search by number, customer, service type etc."]').should('have.value', '');
     });
 
     it('should filter data by status', () => {
@@ -88,8 +82,8 @@ describe('Invoice listing page', () => {
 
         const searchText = 'es';
 
-        cy.get('input[placeholder="Search by number, customer, service type etc."]').clear({force: true});
-        cy.get('input[placeholder="Search by number, customer, service type etc."]')
+        cy.get('input[placeholder="Search"]').clear({force: true});
+        cy.get('input[placeholder="Search"]')
             .type(searchText, {force: true})
             .invoke('val')
             .then((inputValue: string) => {
@@ -107,20 +101,23 @@ describe('Invoice listing page', () => {
             expect(query).to.equal(searchText);
         });
 
-        InvoiceListingPage.clearFilter();
-        cy.get('input[placeholder="Search by number, customer, service type etc."]').should('have.value', '');
+        TableFilter.clearQuerySearchFilter();
+        cy.get('input[placeholder="Search"]').should('have.value', '');
     });
 
     it('should filter with price', () => {
         const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
+        const minValue = '100';
+        const maxValue = '50000';
         cy.intercept('GET', invoicesURL).as('invoicesURL');
 
-        InvoiceListingPage.filterInvoicesByPrice();
-        cy.url().should('include', 'cost');
+        InvoiceListingPage.filterInvoicesByPrice({from: minValue, to: maxValue});
+        cy.url().should('include', 'grossAmountMin');
+        cy.url().should('include', 'grossAmountMax');
 
         cy.wait('@invoicesURL').then((interception) => {
-            expect(interception.request.url).to.include('totalAmountFrom=0');
-            expect(interception.request.url).to.include('totalAmountTo=50000');
+            expect(interception.request.url).to.include(`grossAmountFrom=${minValue}`);
+            expect(interception.request.url).to.include(`grossAmountTo=${maxValue}`);
         });
     });
 
@@ -130,8 +127,8 @@ describe('Invoice listing page', () => {
 
         const searchText = 'zzzghhdgsshgdhsggdddtuwowuakfdyrdjdjfhssg';
 
-        cy.get('input[placeholder="Search by number, customer, service type etc."]').clear({force: true});
-        cy.get('input[placeholder="Search by number, customer, service type etc."]')
+        cy.get('input[placeholder="Search"]').clear({force: true});
+        cy.get('input[placeholder="Search"]')
             .type(searchText, {force: true})
             .invoke('val')
             .then((inputValue: string) => {
@@ -142,7 +139,7 @@ describe('Invoice listing page', () => {
         cy.wait('@invoicesURL').then((interception) => {
             if (interception.response.body && interception.response.body.data.length === 0) {
                 expect(interception.response.body.data).to.have.lengthOf(0);
-                cy.contains('There are no entries for the applied filters.').should('exist');
+                Table.validateTableShouldHaveNoMatch();
             }
         });
     });
@@ -165,9 +162,9 @@ describe('Invoice listing page', () => {
             const invoiceNumber = firstFullSentInvoice.externalId;
 
             // open action menu and click create credit note
-            cy.contains('div[data-field="EXTERNAL_ID"]', invoiceNumber)
-                .parents('div[role="row"]')
-                .find('div[data-field="actions"] button[aria-label="More"]')
+            cy.contains('td[data-field="NUMBER"]', invoiceNumber)
+                .parents('tr[role="row"]')
+                .find('button[data-testid="invoice-action-menu-button"]')
                 .click();
             cy.contains('li', 'Create Credit note').click();
             cy.contains('button', 'Yes').click();

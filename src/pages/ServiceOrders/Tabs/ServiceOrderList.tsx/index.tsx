@@ -49,7 +49,11 @@ import TableContainer from 'components/Table/TableContainer';
 import TableHeader from 'components/Table/TableHeader';
 import TableRow from 'components/Table/TableRow';
 import Pagination from 'components/Pagination';
-import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import {
+  ACTION_CELL_WIDTH,
+  NOTES_CELL_WIDTH,
+  TableColumnWithRender,
+} from 'models/table';
 import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {
@@ -78,7 +82,7 @@ import QuickFilter from 'components/QuickFilter';
 import {OptionWithTranslationKey} from 'models/filter';
 import Filters from 'components/Filters';
 import ChipSelector from 'components/ChipSelector';
-import CustomerInput from 'components/CustomerInput';
+import CustomerInput from 'components/Inputs/CustomerInput';
 import TextInput from 'components/TextInput';
 import {Button} from 'components/Button';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
@@ -90,11 +94,11 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSnackbar} from 'hooks/useSnackbar';
 import JobNotesDrawer from 'pages/ServiceOrderDetails/JobNotesDrawer';
-import TechnicianInput from 'components/TechnicianInput';
+import TechnicianInput from 'components/Inputs/TechnicianInput';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 
 import {Avatar} from 'components/Avatar';
-import ContractInput from 'components/ContractInput';
+import ContractInput from 'components/Inputs/ContractInput';
 import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
@@ -720,7 +724,7 @@ export const ServiceOrderList = ({menu}: Props) => {
       {
         headerName: 'NOTES',
         key: 'service-order-cell-notes',
-        width: '48px',
+        width: NOTES_CELL_WIDTH,
         align: 'center',
         renderCell: (serviceOrder, cellProps) => (
           <Cell
@@ -779,6 +783,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         align: 'center',
         width: ACTION_CELL_WIDTH, // set static width that will not change
         isLast: true,
+        noPadding: true,
         showShadows: showLeftShadow ? 'left' : undefined,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps} onClick={undefined}>

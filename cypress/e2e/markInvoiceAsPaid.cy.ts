@@ -58,12 +58,13 @@ describe('Mark invoice as paid', () => {
             } = serviceCompany.settings;
             const {fractionDigits, code: currency} = firstCurrency;
             InvoicesPage.getRowByIndex(0)
-                .find('div[role="cell"][data-field="TOTAL_NET_AMOUNT"]')
+                .find('td[role="cell"][data-field="TOTAL_NET_AMOUNT"]')
                 .invoke('text')
                 .then((amount) => {
                     const amountWithoutCurrency = extractNumbersFromCurrencyString(amount);
                     const formattedAmountWithoutCurrency = amountWithoutCurrency.toLocaleString(currency, {maximumFractionDigits: fractionDigits});
-                    InvoicesPage.getRowByIndex(0).find('button[aria-label="Payment"]').click();
+                    InvoicesPage.getRowByIndex(0).find('button[data-testid="invoice-action-menu-button"]').click();
+                    cy.contains('li', 'Payment').click();
                     InvoicesPage.getInputByLabel('Paid amount (incl. VAT)').should('have.value', formattedAmountWithoutCurrency);
                 });
 
@@ -71,24 +72,24 @@ describe('Mark invoice as paid', () => {
             cy.get('body').click(0, 0);
 
             InvoicesPage.getRowByIndex(0)
-                .find('div[role="cell"][data-field="EXTERNAL_ID"]')
+                .find('td[role="cell"][data-field="NUMBER"]')
                 .invoke('text')
                 .then((invoiceId) => {
                     // search for invoice
-                    cy.get('input[placeholder^="Search by"]').type(invoiceId);
-                    cy.get("span[role='progressbar']").should('exist');
+                    cy.get('input[placeholder^="Search"]').type(invoiceId);
                     cy.wait('@invoicesApi');
                     cy.get("span[role='progressbar']").should('not.exist');
                     cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
                     InvoicesPage.getRowByIndex(0)
-                        .find('div[role="cell"][data-field="TOTAL_NET_AMOUNT"]')
+                        .find('td[role="cell"][data-field="TOTAL_NET_AMOUNT"]')
                         .invoke('text')
                         .then((amount) => {
                             const amountWithoutCurrency = extractNumbersFromCurrencyString(amount);
                             const formattedAmountWithoutCurrency = amountWithoutCurrency.toLocaleString(currency, {
                                 maximumFractionDigits: fractionDigits,
                             });
-                            InvoicesPage.getRowByIndex(0).find('button[aria-label="Payment"]').click();
+                            InvoicesPage.getRowByIndex(0).find('button[data-testid="invoice-action-menu-button"]').click();
+                            cy.contains('li', 'Payment').click();
                             InvoicesPage.getInputByLabel('Paid amount (incl. VAT)').should('have.value', formattedAmountWithoutCurrency);
                         });
                 });

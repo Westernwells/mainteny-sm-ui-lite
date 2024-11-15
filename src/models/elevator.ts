@@ -11,7 +11,7 @@ import {Client} from './client';
 import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
-import {ServiceOrderView} from './service-order';
+import {ServiceOrderType, ServiceOrderView} from './service-order';
 import {ContractSimpleView} from './contract';
 import {EmployeesSimpleView} from './employee';
 import {
@@ -20,6 +20,7 @@ import {
 } from './propertyManager';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {Order} from './pagination';
+import {InvoiceOrderField, InvoiceStatus, InvoiceType} from 'models/invoice';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -454,4 +455,25 @@ export enum UnitAppointment {
 export interface ElevatorSortableFields {
   assignedTechnicianNames: string;
   numberOfContracts?: number;
+}
+
+export interface QueryElevatorInvoiceParams {
+  pageIndex: number;
+  pageSize: number;
+  order?: Order;
+  orderByField?: InvoiceOrderField;
+  query?: string;
+  contractId?: string[];
+  createdDateTimeFrom?: string;
+  createdDateTimeTo?: string;
+  status: InvoiceStatus[];
+  propertyOwnerId?: string[];
+  totalAmountFrom?: number;
+  totalAmountTo?: number;
+  invoiceTypes?: InvoiceType[];
+  serviceOrderTypes?: ServiceOrderType[];
+  totalGrossAmountFrom?: string;
+  totalGrossAmountTo?: string;
+  serviceOrderId?: string;
+  elevatorId?: string;
 }
