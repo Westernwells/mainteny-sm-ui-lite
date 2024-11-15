@@ -11,7 +11,6 @@ type Props = CellProps & {
   align?: string;
   justifyContent?: string;
   maxWidth?: string;
-  noWidthLimit?: boolean;
   fieldName?: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
@@ -24,6 +23,7 @@ const Cell = ({
   align = 'left',
   justifyContent,
   noWidthLimit = false,
+  noPadding = false,
   ...cellProps
 }: PropsWithChildren<Props>) => (
   <TableCell
@@ -50,7 +50,7 @@ const Cell = ({
         zIndex: 3,
         backgroundColor: 'white',
       }),
-      padding: '9px 12px',
+      padding: noPadding ? '0' : '9px 12px',
       ...(cellProps.showShadows === 'left' && {
         borderLeft: 0,
         boxShadow: '0 0 14px rgba(0,0,0,0.2)',
@@ -76,11 +76,11 @@ const Cell = ({
         padding: 0,
         ...(cellProps?.width &&
           !noWidthLimit && {
-            width: `calc(${cellProps.width} - 12px)`,
+            width: `calc(${cellProps.width} - ${noPadding ? 0 : 12}px)`,
           }),
         ...(cellProps?.maxWidth &&
           !noWidthLimit && {
-            maxWidth: `calc(${cellProps.maxWidth} - 12px)`,
+            maxWidth: `calc(${cellProps.maxWidth} -  ${noPadding ? 0 : 12}px)`,
           }),
         alignItems: align,
         justifyContent: justifyContent ?? align,

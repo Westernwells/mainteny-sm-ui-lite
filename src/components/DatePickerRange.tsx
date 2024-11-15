@@ -8,7 +8,7 @@ import {SingleInputDateRangeField} from '@mui/x-date-pickers-pro/SingleInputDate
 import {DemoContainer} from '@mui/x-date-pickers/internals/demo';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {locales} from 'utils/datetime';
+import {getDatePickerLocale, locales} from 'utils/datetime';
 import {mapLanguageToLocale} from 'utils/utils';
 import {ReactNode, useEffect, useRef, useState} from 'react';
 import {Box, InputLabelProps, SxProps, TextFieldProps} from '@mui/material';
@@ -31,6 +31,7 @@ interface Props extends Partial<DateRangePickerProps<Date>> {
   onClear: () => void;
   inputTestId?: string;
   popupTestId?: string;
+  onAccept?: () => void;
 }
 
 const DatePickerRange = ({
@@ -66,11 +67,13 @@ const DatePickerRange = ({
   };
 
   const handleSelect = () => {
+    props.onAccept?.();
     setOpen(false);
   };
 
   const handleClose = () => {
     onClear();
+    props.onClose?.();
     setOpen(false);
   };
 
@@ -139,7 +142,11 @@ const DatePickerRange = ({
     <Box sx={{...containerStyles}}>
       <LocalizationProvider
         dateAdapter={AdapterDateFns}
-        adapterLocale={locales[locale]}>
+        adapterLocale={locales[locale]}
+        localeText={
+          getDatePickerLocale(language).components.MuiLocalizationProvider
+            .defaultProps.localeText
+        }>
         <DemoContainer components={['SingleInputDateRangeField']}>
           <DateRangePicker
             {...props}

@@ -1,10 +1,9 @@
-import {FC} from 'react';
 import {InvoiceView} from 'models/invoice';
 import {
-  useInfiniteCustomerNotes,
   useCreateCustomerNote,
-  useUpdateCustomerNote,
   useDeleteCustomerNote,
+  useInfiniteCustomerNotes,
+  useUpdateCustomerNote,
 } from 'hooks/reactQuery/useCustomers';
 import Notes from 'components/Notes';
 import {CreateNoteVars, DeleteNoteVars, UpdateNoteVars} from 'models/note';
@@ -12,9 +11,10 @@ import {MutateOptions} from 'react-query';
 
 interface Props {
   invoice: InvoiceView;
+  onChange?: () => void;
 }
 
-export const CustomerNotes: FC<Props> = ({invoice}) => {
+export const CustomerNotes = ({invoice, onChange}: Props) => {
   const propertyOwnerId = invoice?.propertyOwner?.id;
 
   const {
@@ -31,11 +31,11 @@ export const CustomerNotes: FC<Props> = ({invoice}) => {
     pageSize: 10,
   });
   const {mutate: createCustomerNote, isLoading: isCreating} =
-    useCreateCustomerNote();
+    useCreateCustomerNote(onChange);
   const {mutate: deleteCustomerNote, isLoading: isDeleting} =
-    useDeleteCustomerNote();
+    useDeleteCustomerNote(onChange);
   const {mutate: updateCustomerNote, isLoading: isUpdating} =
-    useUpdateCustomerNote();
+    useUpdateCustomerNote(onChange);
 
   const createNote = async (
     variables: CreateNoteVars,

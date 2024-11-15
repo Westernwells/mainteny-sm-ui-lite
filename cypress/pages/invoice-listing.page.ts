@@ -1,4 +1,5 @@
-import {isEqual} from 'lodash';
+import {capitalize, isEqual} from 'lodash';
+import TableFilter from '../utils/tableFilter';
 import {InvoiceStatusView} from '../../src/models/invoice';
 import {mapInvoiceStatus, navigateCy} from '../utils/utils';
 
@@ -20,14 +21,18 @@ export default class InvoiceListingPage {
     cy.contains('Clear filter').click({force: true});
   };
 
-  static filterInvoicesByPrice = () => {
-    cy.get('div[role="combobox"][id="Price\\ Range"]').click({force: true});
-    cy.get('ul[role="listbox"] li:nth-child(1)').click({force: true});
+  static filterInvoicesByPrice = ({from, to}: {from: string; to: string}) => {
+    TableFilter.openFilter();
+    cy.get('input[placeholder="Min"]').type(from);
+    cy.wait(500);
+    cy.get('input[placeholder="Max"]').type(to);
+    cy.wait(5000);
+    TableFilter.acceptFilter();
   };
 
   static filterInvoicesListByStatus = (status: InvoiceStatusView) => {
-    cy.get('div[role="combobox"][id="Status"]').click({force: true});
-    cy.get('ul[role="listbox"] li').contains(status).click({force: true});
+    const statusString = capitalize(status);
+    cy.contains('button', statusString).click({force: true});
   };
 
   static waitForInvoiceApi = (
@@ -88,10 +93,12 @@ export default class InvoiceListingPage {
       () => {
         cy.wait(1000);
 
-        cy.get('div[role="grid"]').then((grid) => {
-          if (grid.find("div[data-field='STATUS'][role='cell']").length > 0) {
-            cy.wrap(grid)
-              .find("div[data-field='STATUS'][role='cell']")
+        cy.get('tbody').then((tableBody) => {
+          if (
+            tableBody.find("td[data-field='STATUS'][role='cell']").length > 0
+          ) {
+            cy.wrap(tableBody)
+              .find("td[data-field='STATUS'][role='cell']")
               .each((rowElement) => {
                 const statusText = rowElement.text().trim();
 
@@ -109,6 +116,8 @@ export default class InvoiceListingPage {
         });
       },
     );
+    // deselect status
+    InvoiceListingPage.filterInvoicesListByStatus(statusToCheck);
   };
 
   static navigateToDetailsPage = () => {
@@ -124,7 +133,7 @@ export default class InvoiceListingPage {
     cy.wait('@getInvoices').then((interception) => {
       const invoiceId = interception.response.body?.data?.[0]?.id;
       if (invoiceId) {
-        cy.get('div[data-colindex="1"]').eq(0).click();
+        cy.get('td[role="cell"][data-field="CREATED_DATE"]').eq(0).click();
         cy.url().should('contain', `${invoiceId}`);
       } else {
         cy.log('Unable to retrieve invoice ID from the intercepted data.');

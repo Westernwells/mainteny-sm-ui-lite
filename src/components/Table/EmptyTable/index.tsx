@@ -6,7 +6,7 @@ type Props = {
   label: string;
   subLabel: string;
   btnLabel: string;
-  illustration: 'jobs' | 'supplier' | 'employee';
+  illustration: 'jobs' | 'supplier' | 'employee' | 'invoice';
   actionButton?: ReactNode;
   onClick?: () => void;
 };

@@ -16,10 +16,10 @@ export default class InvoicesPage {
   };
 
   static openPaymentModal = () => {
-    cy.get('svg[data-testid="PaymentsIcon"]')
-      .first()
-      .parent('button[aria-label="Payment"]')
+    InvoicesPage.getRowByIndex(0)
+      .find('button[data-testid="invoice-action-menu-button"]')
       .click();
+    cy.contains('li', 'Payment').click();
   };
 
   static markInvoiceAsPaid = () => {
@@ -53,7 +53,7 @@ export default class InvoicesPage {
   };
 
   static getRowByIndex = (index: number) =>
-    cy.get(`div[role="row"][data-rowindex="${index}"]`);
+    cy.get(`tr[role="row"][data-rowindex="${index}"]`);
 
   static getInputByLabel = (label: string) =>
     cy
@@ -67,11 +67,7 @@ export default class InvoicesPage {
     setExpiredDueDate?: boolean;
     hasDueDate?: boolean;
   }) => {
-
-    const {
-      setExpiredDueDate = false, 
-      hasDueDate = true,  
-    } = options || {};
+    const {setExpiredDueDate = false, hasDueDate = true} = options || {};
 
     cy.contains('button', 'New Invoice').click();
     cy.get('span[role="progressbar"]').should('not.exist');

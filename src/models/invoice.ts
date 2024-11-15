@@ -17,21 +17,24 @@ import {ServiceOrderType, ServiceOrderView} from './service-order';
 import {Order} from './pagination';
 
 export enum InvoiceStatus {
-  PAID = 'PAID',
-  NOT_PAID = 'NOT_PAID',
   DRAFT = 'DRAFT',
-  EXPIRED = 'EXPIRED',
+  NOT_PAID = 'NOT_PAID',
   PARTIALLY_PAID = 'PARTIALLY_PAID',
-  CANCELLED = 'CANCELLED',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
   CREDITED = 'CREDITED',
+  CANCELLED = 'CANCELLED',
 }
 
-export enum InvoiceCycle {
-  AFTER_EACH_VISIT = 'AFTER_EACH_VISIT',
-  HALF_YEARLY = 'HALF_YEARLY',
-  QUARTERLY = 'QUARTERLY',
-  YEARLY = 'YEARLY',
-  MONTHLY = 'MONTHLY',
+export enum InvoiceStatusFilter {
+  ALL = 'ALL',
+  DRAFT = 'DRAFT',
+  NOT_PAID = 'NOT_PAID',
+  PARTIALLY_PAID = 'PARTIALLY_PAID',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
+  CREDITED = 'CREDITED',
+  CANCELLED = 'CANCELLED',
 }
 
 export enum InvoiceStatusView {
@@ -207,12 +210,23 @@ export interface InvoicePaymentView {
 export interface QueryInvoiceParams {
   pageIndex: number;
   pageSize: number;
-  query: string;
-  status: InvoiceStatus[];
-  totalAmountFrom?: number;
-  totalAmountTo?: number;
   order?: Order;
   orderByField?: InvoiceOrderField;
+  query?: string;
+  contractId?: string[];
+  sentDateFrom?: string;
+  sentDateTo?: string;
+  status: InvoiceStatus[];
+  propertyOwnerId?: string[];
+  totalAmountFrom?: number;
+  totalAmountTo?: number;
+  type?: InvoiceType[];
+  serviceOrderTypes?: ServiceOrderType[];
+  totalGrossAmountFrom?: string;
+  totalGrossAmountTo?: string;
+  serviceOrderId?: string;
+  hasComments?: boolean;
+  elevatorId?: string[];
 }
 
 export interface InvoiceFilters {
@@ -570,3 +584,44 @@ export enum FILE_DESCRIPTION_PREFIXES {
   WORK_REPORT = 'WR',
   CHECKLIST = 'CHK',
 }
+
+export type InvoiceTableRow = {
+  data: InvoiceView;
+  id: string;
+  number: string;
+  propertyOwner: PropertyOwnerSimpleView;
+  date?: string;
+  dueDate?: string;
+  jobNumber: string;
+  type: string;
+  serviceOrderType?: ServiceOrderType;
+  total: number;
+  status: InvoiceStatus;
+  hasComments: boolean;
+};
+
+export type InvoiceFilterForm = {
+  number?: string;
+  jobTypes: ServiceOrderType[];
+  customer?: string;
+  orderNumber?: string;
+  customerId?: string;
+  unitId?: string;
+  jobId?: string;
+  contractId?: string;
+  grossAmountMin?: number;
+  grossAmountMax?: number;
+  hasComment?: boolean;
+};
+
+// used to indicate fields for the search parameter in invoice endpoint
+// example query [number:] [externalid:] [purchaseorder:] [contractexternalid:cta000031] [po:name:abcd] [po:number:] [po:externalid:] [po:ct:email:qq@126.com] [po:ct:phone:+4891326643] [po:ct:url:] [po:billingaddress:riem_arcaden,_willy-brandt-platz_5,_munich,_deutschland_de] [po:postaladdress:riem_arcaden,_willy-brandt-platz_5,_munich,_deutschland_de]
+export type SearchParameters = {
+  search?: string;
+  invoiceNumber?: string;
+  orderNumber?: string;
+};
+
+export type InvoiceStatistics = {
+  numOfInvoicesPerStatus: Record<string, number>;
+};

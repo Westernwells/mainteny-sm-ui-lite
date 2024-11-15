@@ -7,7 +7,7 @@ import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import ListIcon from '@mui/icons-material/ListAlt';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
-import {Invoices} from 'pages/Invoices';
+import Invoices from 'pages/Invoices';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {Confirm} from 'components/Confirm';
