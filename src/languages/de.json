@@ -2910,5 +2910,13 @@
   "Next Inspection": "Nächste Inspektion",
   "Select model number": "Wähle Modell",
   "Select unit category": "Wähle Kategorie",
-  "Select fabric number": "Wähle fabric number"
+  "Select fabric number": "Wähle fabric number",
+  "Archive": "Archivieren",
+  "Unarchive": "Aus Archiv entfernen",
+  "Undo cancellation": "Stornierung aufheben",
+  "Service job has been restored": "Auftrag wiederhergestellt ",
+  "Service job has been archived": "Auftrag archiviert",
+  "Service job has been unarchived": "Stornierung aufgehoben",
+  "Due Date From": "Fällgkeit von",
+  "Due Date To": "Fälligkeit bis"
 }
