@@ -1584,6 +1584,15 @@ export const Actions = ({
           id={invoice.id}
           existingFiles={existingFiles}
           isLoadingFiles={isLoadingFiles}
+          onOpen={() => {
+            if (
+              invoice.propertyOwner.additionalInfo.invoiceFormat ===
+              InvoiceFormat.POST
+            )
+              enqueueSnackbar(t('Customer wants to receive invoice via post'), {
+                variant: 'warning',
+              });
+          }}
           callback={async (emailRecord) => {
             try {
               setIsSendingEmail(true);
