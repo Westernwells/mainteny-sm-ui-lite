@@ -25,6 +25,8 @@ export type CellProps = {
   hide?: boolean;
   showShadows?: 'left' | 'right';
   noWidthLimit?: boolean;
+  firstSticky?: boolean;
+  lastSticky?: boolean;
   noPadding?: boolean;
 };
 

@@ -938,7 +938,7 @@ const Invoices = ({elevatorId}: Props) => {
     }
 
     return {emptyTable: false, noMatchingData: false};
-  }, [isFetched, invoiceResource]);
+  }, [appliedFilterNumber, isFetched, invoiceResource]);
 
   const showXeroInfoRender = () => (
     <Box>{xeroInfoData?.enabled ? lastSyncedText : ''}</Box>
@@ -1166,6 +1166,7 @@ const Invoices = ({elevatorId}: Props) => {
                         data-testid="invoice-filter-note-checkbox"
                         checked={watchHasComment}
                         onChange={field.onChange}
+                        sx={{padding: 0}}
                       />
                     )}
                   />

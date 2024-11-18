@@ -1,4 +1,14 @@
-import {UnitAppointment, UnitAppointmentView} from 'models/elevator';
+import {
+  DISTANCE_FILTER,
+  ElevatorAssignmentSimpleView,
+  ElevatorStatus,
+  ElevatorView,
+  SearchParameters,
+  UnitAppointment,
+  UnitAppointmentView,
+  UnitDistanceQuery,
+  UnitTableRow,
+} from 'models/elevator';
 import {
   AppointmentFormModel,
   PriorityTechnicianFormModel,
@@ -6,13 +16,16 @@ import {
 import {
   ContractComponentElevator,
   ContractElevatorView,
-  JobTimeUnit,
   ContractTimeUnit,
+  JobTimeUnit,
   TimeUnitYearView,
 } from 'models/contract';
 import {InspectionCycle} from 'models/misc';
 import {t} from 'i18next';
 import {mapDaysOfWeekOptions} from 'pages/UnitDetails/Tabs/OverviewTab/AppointmentPreference/EditAppointmentForm';
+import {formatDate} from 'utils/datetime';
+import capitalize from 'lodash/capitalize';
+import {getAddressString} from 'utils/address';
 
 export const monthNames = [
   'Jan',
@@ -223,3 +236,76 @@ export const mapFormDataToElevatorUpdateRequest = (
   },
   elevatorId,
 });
+
+const getPriorityTechnician = (assignments: ElevatorAssignmentSimpleView[]) => {
+  let {weight} = assignments[0];
+  const tech: ElevatorAssignmentSimpleView[] = [];
+
+  assignments.forEach((i) => {
+    if (i.weight === weight) {
+      tech.push(i);
+    } else if (i.weight > weight) {
+      weight = i.weight;
+      tech.splice(0, tech.length);
+      tech.push(i);
+    }
+  });
+
+  return tech.map((item) => item.technician);
+};
+
+export const aggregateUnitRow = (units: ElevatorView[]): UnitTableRow[] =>
+  units.map((unit) => ({
+    data: unit,
+    id: unit.id,
+    number: unit.number,
+    address: getAddressString(unit.address),
+    fullAddress: unit.address.fullName ?? '-',
+    building: unit.additionalInfo.buildingLocation,
+    propertyOwner:
+      unit.propertyOwner.meta?.state === 'ACTIVE'
+        ? unit.propertyOwner
+        : undefined,
+    lastMaintenance: unit.lastVisitDate
+      ? formatDate(unit.lastVisitDate)
+      : undefined,
+    nextInspection: unit.nextVisitDate
+      ? formatDate(unit.nextVisitDate)
+      : undefined,
+    engineers: unit.assignments.length
+      ? getPriorityTechnician(unit.assignments)
+      : [],
+    status: unit.status,
+    hasContract: unit.contracts.length > 0 || false,
+  }));
+
+export const createSearchQuery = ({search, address}: SearchParameters) => {
+  const elements: string[] = [];
+  if (search) elements.push(search);
+  if (address) elements.push(`[address:*${address}*]`);
+
+  return elements.length ? elements.join(' ') : undefined;
+};
+
+export const getStatusString = (status: ElevatorStatus) =>
+  status && capitalize(status).replace(/_/g, ' ');
+
+const OPTION_TO_REST_DISTANCE_VALUES: Record<
+  DISTANCE_FILTER,
+  UnitDistanceQuery
+> = {
+  [DISTANCE_FILTER.FIVE]: {
+    distanceStart: 5,
+    distanceEnd: 10,
+  },
+  [DISTANCE_FILTER.TEN]: {
+    distanceStart: 10,
+    distanceEnd: 20,
+  },
+  [DISTANCE_FILTER.TWENTY]: {
+    distanceStart: 20,
+  },
+};
+
+export const getDistanceFromOption = (distance: DISTANCE_FILTER) =>
+  OPTION_TO_REST_DISTANCE_VALUES[distance];

@@ -860,7 +860,7 @@ export function useAllInvoices(
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
   return useAll<QueryInvoiceParams, InvoiceView>({
-    queryKey: [queryKeys.queryAllJobs, params, serviceCompanyId],
+    queryKey: [queryKeys.fetchInvoiceStatistics, params, serviceCompanyId],
     queryFn: (p) => fetchInvoices(p, serviceCompanyId ?? ''),
     params,
     options: {
