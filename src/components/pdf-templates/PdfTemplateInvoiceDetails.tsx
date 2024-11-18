@@ -133,7 +133,11 @@ const PdfTemplateInvoiceDetails = ({
     <View style={styles.rightAddress}>
       {(invoice?.externalId || nextCompanyExternalId) && (
         <View style={styles.rightAddressContent}>
-          <Text style={styles.tag}>{translate('Invoice no.')}</Text>
+          <Text style={styles.tag}>
+            {invoice?.type === InvoiceType.CREDIT_NOTE
+              ? translate('Credit no.')
+              : translate('Invoice no.')}
+          </Text>
           <Text style={styles.tagContent}>
             {invoice?.externalId || nextCompanyExternalId}
           </Text>
