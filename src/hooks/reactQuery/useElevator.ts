@@ -28,9 +28,11 @@ import {
   ElevatorRequestBody,
   ElevatorView,
   QueryTodoParams,
+  UnitStatistics,
 } from 'models/elevator';
-import {useUserSession} from './useUserSession';
+import {useAll} from 'hooks/reactQuery/useAll';
 import {Page} from '../../models/pagination';
+import {useUserSession} from './useUserSession';
 
 export const fetchElevators = async (
   params: Partial<ElevatorQueryParams>,
@@ -568,4 +570,57 @@ export const useDeleteElevator = (successMsg?: string) => {
       showError(err);
     },
   });
+};
+
+export function useAllUnits(
+  params: Partial<ElevatorQueryParams>,
+  options?: UseQueryOptions<ElevatorView[], RestError>,
+) {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  return useAll<Partial<ElevatorQueryParams>, ElevatorView>({
+    queryKey: [queryKeys.queryAllUnits, params, serviceCompanyId],
+    queryFn: (p) => fetchElevators(p, serviceCompanyId ?? ''),
+    params,
+    options: {
+      enabled: !!serviceCompanyId,
+      ...options,
+    },
+  });
+}
+
+export const fetchUnitStatistics = async (
+  params: Partial<ElevatorQueryParams>,
+  serviceCompanyId: string,
+): Promise<UnitStatistics> => {
+  const response: AxiosResponse<UnitStatistics> = await axiosClient.get(
+    `/api/serviceCompanies/${serviceCompanyId}/elevators/statistics`,
+    {
+      params: {
+        ...params,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useUnitStatistics = (
+  params: Partial<ElevatorQueryParams>,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  return useQuery<UnitStatistics, RestError, UnitStatistics>(
+    [
+      queryKeys.fetchElevatorStatistics,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () => fetchUnitStatistics(params, user!.userAccount.serviceCompany.id),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
 };

@@ -499,7 +499,13 @@ export const ServiceOrderList = ({menu}: Props) => {
     }
 
     return {emptyTable: false, noMatchingData: false};
-  }, [isFetched, serviceOrdersResource]);
+  }, [
+    appliedFilterNumber,
+    selectedOrderStatus,
+    isFetched,
+    searchQuery,
+    serviceOrdersResource,
+  ]);
 
   const handleCustomerCellClick = (id: string) => () => {
     navigate(`/customers/details/${id}?tab=0`);
@@ -551,35 +557,35 @@ export const ServiceOrderList = ({menu}: Props) => {
         getExportValue: (serviceOrder) => serviceOrder.address,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>
-              <Tooltip
-                title={
-                  <Box
+            <Tooltip
+              title={
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                  gap={theme.spacing(0.5)}>
+                  <Typography
                     sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                    gap={theme.spacing(0.5)}>
-                    <Typography
-                      sx={{
-                        lineHeight: '14px',
-                        fontSize: '10px',
-                      }}>
-                      {serviceOrder.fullAddress
-                        ? serviceOrder.fullAddress
-                        : '-'}
-                    </Typography>
-                  </Box>
-                }
-                placement="top"
-                arrow>
-                {
-                  (serviceOrder.address
-                    ? serviceOrder.address
-                    : '-') as unknown as ReactElement<ReactNode>
-                }
-              </Tooltip>
-            </TableCellText>
+                      lineHeight: '14px',
+                      fontSize: '10px',
+                    }}>
+                    {serviceOrder.fullAddress ? serviceOrder.fullAddress : '-'}
+                  </Typography>
+                </Box>
+              }
+              placement="top"
+              arrow>
+              <Box>
+                <TableCellText>
+                  {
+                    (serviceOrder.address
+                      ? serviceOrder.address
+                      : '-') as unknown as ReactElement<ReactNode>
+                  }
+                </TableCellText>
+              </Box>
+            </Tooltip>
           </Cell>
         ),
       },
@@ -641,15 +647,13 @@ export const ServiceOrderList = ({menu}: Props) => {
           <Cell
             {...cellProps}
             onClick={handleCustomerCellClick(serviceOrder.propertyOwner.id)}>
-            <TableCellText>
-              <Avatar
-                labelStyles={{
-                  color: theme.palette.primary.light,
-                }}
-                key={`company-avatar-${serviceOrder.id}`}
-                userAccount={{firstName: serviceOrder.propertyOwner.name}}
-              />
-            </TableCellText>
+            <Avatar
+              labelStyles={{
+                color: theme.palette.primary.light,
+              }}
+              key={`company-avatar-${serviceOrder.id}`}
+              userAccount={{firstName: serviceOrder.propertyOwner.name}}
+            />
           </Cell>
         ),
       },
@@ -1143,6 +1147,7 @@ export const ServiceOrderList = ({menu}: Props) => {
                     <Checkbox
                       checked={watchHasComment}
                       onChange={field.onChange}
+                      sx={{padding: 0}}
                     />
                   )}
                 />
