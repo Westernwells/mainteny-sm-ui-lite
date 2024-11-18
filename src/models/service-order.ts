@@ -58,6 +58,7 @@ export enum ServiceOrderStatus {
   TRAVEL = 'TRAVEL',
   PAUSED = 'PAUSED',
   ARTICLES_ORDERED = 'ARTICLES_ORDERED',
+  ARCHIVED = 'ARCHIVED',
 }
 
 export enum ServiceOrderStatusFilter {
@@ -67,6 +68,7 @@ export enum ServiceOrderStatusFilter {
   ONGOING = 'ONGOING',
   COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED',
+  ARCHIVED = 'ARCHIVED',
 }
 
 export const ServiceOrderFilterToStatusMap = new Map<
@@ -83,7 +85,6 @@ export const ServiceOrderFilterToStatusMap = new Map<
       ServiceOrderStatus.READY_TO_SCHEDULE,
     ],
   ],
-  [ServiceOrderStatusFilter.OVERDUE, [ServiceOrderStatus.OVERDUE]],
   [
     ServiceOrderStatusFilter.ONGOING,
     [
@@ -92,8 +93,6 @@ export const ServiceOrderFilterToStatusMap = new Map<
       ServiceOrderStatus.PAUSED,
     ],
   ],
-  [ServiceOrderStatusFilter.COMPLETED, [ServiceOrderStatus.COMPLETED]],
-  [ServiceOrderStatusFilter.CANCELLED, [ServiceOrderStatus.CANCELLED]],
 ]);
 
 export const ServiceOrderStatusToFilter: Record<

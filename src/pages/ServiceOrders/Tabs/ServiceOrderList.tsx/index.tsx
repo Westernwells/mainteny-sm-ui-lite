@@ -7,6 +7,7 @@ import {
   ServiceOrderPaymentStatus,
   ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderQueryParams,
+  ServiceOrderStatus,
   ServiceOrderStatusFilter,
   ServiceOrderStatusToFilter,
   ServiceOrderTableRow,
@@ -101,18 +102,12 @@ import {Avatar} from 'components/Avatar';
 import ContractInput from 'components/Inputs/ContractInput';
 import Actions from './Actions';
 
-const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
-  {value: ServiceOrderStatusFilter.PENDING, labelKey: 'Pending'},
-  {value: ServiceOrderStatusFilter.OVERDUE, labelKey: 'Overdue'},
-  {value: ServiceOrderStatusFilter.ONGOING, labelKey: 'Ongoing'},
-  {value: ServiceOrderStatusFilter.COMPLETED, labelKey: 'Completed'},
-  {value: ServiceOrderStatusFilter.CANCELLED, labelKey: 'Cancelled'},
-];
-
-const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
-  {value: ServiceOrderStatusFilter.ALL, labelKey: 'All'},
-  ...QUICK_FILTER_OPTIONS_WITHOUT_ALL,
-];
+const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = Object.values(
+  ServiceOrderStatusFilter,
+).map((entry: string) => ({
+  value: entry,
+  labelKey: capitalize(entry),
+}));
 
 export const PAYMENT_STATUS_OPTIONS: OptionWithTranslationKey[] = [
   {
@@ -281,7 +276,12 @@ export const ServiceOrderList = ({menu}: Props) => {
     status: selectedOrderStatus.includes(ServiceOrderStatusFilter.ALL)
       ? []
       : selectedOrderStatus
-          .flatMap((status) => ServiceOrderFilterToStatusMap.get(status))
+          .flatMap(
+            (status) =>
+              ServiceOrderFilterToStatusMap.get(status) || [
+                status as unknown as ServiceOrderStatus,
+              ],
+          )
           .filter((status) => !!status),
     types: selectedOrderTypes,
     paymentStatus: selectedPaymentStatus,
@@ -791,7 +791,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         showShadows: showLeftShadow ? 'left' : undefined,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps} onClick={undefined}>
-            <Actions id={serviceOrder.id} />
+            <Actions id={serviceOrder.id} status={serviceOrder.jobStatus} />
           </Cell>
         ),
       },
@@ -816,7 +816,23 @@ export const ServiceOrderList = ({menu}: Props) => {
   const handleQuickFilterChange = (value: string) => {
     // when selecting ALL values remove all other selections
     if (value === 'ALL') {
-      setSelectedOrderStatus([ServiceOrderStatusFilter.ALL]);
+      setSelectedOrderStatus(
+        selectedOrderStatus.length === 1 &&
+          selectedOrderStatus[0] === ServiceOrderStatusFilter.ALL
+          ? []
+          : [ServiceOrderStatusFilter.ALL],
+      );
+      return;
+    }
+
+    // when selecting ARCHIVED values remove all other selections
+    if (value === 'ARCHIVED') {
+      setSelectedOrderStatus(
+        selectedOrderStatus.length === 1 &&
+          selectedOrderStatus[0] === ServiceOrderStatusFilter.ARCHIVED
+          ? []
+          : [ServiceOrderStatusFilter.ARCHIVED],
+      );
       return;
     }
 
@@ -834,10 +850,25 @@ export const ServiceOrderList = ({menu}: Props) => {
       return;
     }
 
-    const areAllValuesSelectedIndividually =
-      QUICK_FILTER_OPTIONS_WITHOUT_ALL.every((option) =>
-        newValues.some((selectedValue) => option.value === selectedValue),
+    // remove the ARCHIVED status if any other status is selected
+    if (newValues.length > 1 && newValues.includes('ARCHIVED')) {
+      setSelectedOrderStatus(
+        newValues.filter(
+          (selectedValues) => selectedValues !== 'ARCHIVED',
+        ) as ServiceOrderStatusFilter[],
       );
+      return;
+    }
+
+    const areAllValuesSelectedIndividually = QUICK_FILTER_OPTIONS.filter(
+      (option) =>
+        ![
+          ServiceOrderStatusFilter.ALL,
+          ServiceOrderStatusFilter.ARCHIVED,
+        ].includes(option.value as ServiceOrderStatusFilter),
+    ).every((option) =>
+      newValues.some((selectedValue) => option.value === selectedValue),
+    );
 
     setSelectedOrderStatus(
       areAllValuesSelectedIndividually
