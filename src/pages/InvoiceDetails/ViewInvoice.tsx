@@ -1695,6 +1695,15 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
       <SendEmailDialog
         open={isSendEmailDialogOpen}
+        onOpen={() => {
+          if (
+            invoice.propertyOwner.additionalInfo.invoiceFormat ===
+            InvoiceFormat.POST
+          )
+            enqueueSnackbar(t('Customer wants to receive invoice via post'), {
+              variant: 'warning',
+            });
+        }}
         onConfirm={() => {
           setIsSendEmailDialogOpen(false);
           setExistingFiles([]);
