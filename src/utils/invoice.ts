@@ -434,11 +434,13 @@ export const createSearchQuery = ({
   search,
   orderNumber,
   invoiceNumber,
+  jobNumber,
 }: SearchParameters) => {
   const elements: string[] = [];
   if (search) elements.push(search);
   if (orderNumber) elements.push(`[purchaseorder:*${orderNumber}*]`);
   if (invoiceNumber) elements.push(`[externalid:*${invoiceNumber}*]`);
+  if (jobNumber) elements.push(`[so:externalid:*${jobNumber}*]`);
 
   return elements.length ? elements.join(' ') : undefined;
 };
