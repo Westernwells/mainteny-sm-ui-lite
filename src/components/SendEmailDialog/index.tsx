@@ -12,7 +12,7 @@ import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
 import {usePublishQuotation} from 'hooks/reactQuery/useQuotation';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import MultipleAsyncSelect from 'components/MultipleAsyncSelect';
 import {
   ServiceCompanyContactPersonOrderField,
@@ -44,6 +44,7 @@ interface Props {
   existingFiles?: FileWithPreview[];
   isLoadingFiles?: boolean;
   isSending?: boolean;
+  onOpen?: () => void;
 }
 
 interface CustomKeyboardEvent extends React.KeyboardEvent<HTMLDivElement> {
@@ -66,6 +67,7 @@ export const SendEmailDialog = ({
   existingFiles,
   isLoadingFiles = false,
   isSending = false,
+  onOpen,
 }: Props) => {
   const {t} = useTranslation();
   const [isPublishing, setIsPublishing] = useState(false);
@@ -155,6 +157,12 @@ export const SendEmailDialog = ({
     }
   };
   const bccEmails = getValues('bccEmails');
+
+  // on entry
+  useEffect(() => {
+    if (open) onOpen?.();
+  }, [open]);
+
   return (
     <Dialog
       open={open || false}
