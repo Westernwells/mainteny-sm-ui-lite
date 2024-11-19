@@ -221,7 +221,7 @@ export interface QueryInvoiceParams {
   totalAmountFrom?: number;
   totalAmountTo?: number;
   type?: InvoiceType[];
-  serviceOrderTypes?: ServiceOrderType[];
+  serviceOrderType?: ServiceOrderType[];
   totalGrossAmountFrom?: string;
   totalGrossAmountTo?: string;
   serviceOrderId?: string;
@@ -607,7 +607,7 @@ export type InvoiceFilterForm = {
   orderNumber?: string;
   customerId?: string;
   unitId?: string;
-  jobId?: string;
+  jobNumber?: string;
   contractId?: string;
   grossAmountMin?: number;
   grossAmountMax?: number;
@@ -620,6 +620,7 @@ export type SearchParameters = {
   search?: string;
   invoiceNumber?: string;
   orderNumber?: string;
+  jobNumber?: string;
 };
 
 export type InvoiceStatistics = {

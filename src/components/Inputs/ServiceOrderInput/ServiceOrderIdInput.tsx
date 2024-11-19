@@ -18,9 +18,14 @@ import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 type Props = {
   selectedValue?: string;
   onChange: (value: string | undefined) => void;
+  useExternalIdAsValue?: boolean;
 };
 
-const ServiceOrderIdInput = ({selectedValue, onChange}: Props) => {
+const ServiceOrderIdInput = ({
+  selectedValue,
+  useExternalIdAsValue = false,
+  onChange,
+}: Props) => {
   const {t} = useTranslation();
   const currentDate = new Date();
 
@@ -68,7 +73,7 @@ const ServiceOrderIdInput = ({selectedValue, onChange}: Props) => {
     () =>
       serviceOrders.data.map((serviceOrder) => ({
         label: serviceOrder.externalId,
-        value: serviceOrder.id,
+        value: useExternalIdAsValue ? serviceOrder.externalId : serviceOrder.id,
       })),
     [serviceOrders],
   );
@@ -81,9 +86,10 @@ const ServiceOrderIdInput = ({selectedValue, onChange}: Props) => {
   useEffect(() => {
     if (!initialLoad || !isFetched) return;
 
-    const foundContractId =
-      customerOptions.find((customer) => customer.value === selectedValue)
-        ?.label || '';
+    const foundContractId = useExternalIdAsValue
+      ? selectedValue ?? ''
+      : customerOptions.find((customer) => customer.value === selectedValue)
+          ?.label || '';
     setQueryView(foundContractId);
     setInitialLoad(false);
   }, [selectedValue, customerOptions, initialLoad, isFetched]);
