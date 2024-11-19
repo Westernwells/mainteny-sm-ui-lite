@@ -4,11 +4,15 @@ import {
   useUnscheduleServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderView} from 'models/service-order';
+import {CANCEL_ACTION} from 'models/status';
 
 export const useServiceOrderActions = (
   serviceOrderDetails: ServiceOrderView,
 ) => {
-  const {mutate: cancelServiceOrder} = useCancelServiceOrders();
+  const {mutate: cancelServiceOrder} = useCancelServiceOrders({
+    serviceOrderId: serviceOrderDetails.id,
+    action: CANCEL_ACTION.CANCEL,
+  });
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
 
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
@@ -28,7 +32,7 @@ export const useServiceOrderActions = (
   };
 
   const confirmCancel = () => {
-    cancelServiceOrder(serviceOrderDetails.id);
+    cancelServiceOrder();
     setOpenCancelConfirm(false);
   };
 

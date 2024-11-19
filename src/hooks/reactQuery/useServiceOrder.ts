@@ -38,6 +38,7 @@ import {
 import {Resource, RestError, StringValue} from 'models/misc';
 import {Comment} from 'models/comment';
 import {RequestParameters} from 'models/apiRequests';
+import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
 import {useUserSession} from './useUserSession';
 import {Order} from '../../models/pagination';
 import {useServiceOrderCommentMutation} from './useServiceOrderCommentMutation';
@@ -305,22 +306,38 @@ export function useServiceOrderActivities(
   );
 }
 
-const cancelServiceOrders = async (serviceOrderId: string) => {
-  await axiosClient.put<StringValue>(
-    `/api/serviceOrders/${serviceOrderId}/cancel`,
-  );
+type CancelServiceOrderParams = {
+  serviceOrderId: string;
+  action: CANCEL_ACTION;
+  message?: string;
 };
 
-export const useCancelServiceOrders = () => {
+const cancelServiceOrders = async ({
+  serviceOrderId,
+  action,
+}: CancelServiceOrderParams) => {
+  const {data} = await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/${action}`,
+  );
+
+  return data;
+};
+
+export const useCancelServiceOrders = ({
+  message,
+  ...params
+}: CancelServiceOrderParams) => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
-    (serviceOrderId: string) => cancelServiceOrders(serviceOrderId),
+    [queryKeys.cancelServiceOrder],
+    () => cancelServiceOrders(params),
     {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
-        enqueueSnackbar('Service job has been cancelled', {
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+        enqueueSnackbar(message ?? 'Service job has been cancelled', {
           variant: 'success',
         });
       },
@@ -915,3 +932,47 @@ export const useUpdateServiceOrderComment = () =>
       updateServiceOrderComment(serviceOrderId, noteId, body),
     queryKeys.fetchServiceOrderComments,
   );
+
+export type ArchiveServiceOrderParams = {
+  serviceOrderId: string;
+  action: ARCHIVE_ACTION;
+  message?: string;
+};
+
+export const archiveServiceOrder = async ({
+  serviceOrderId,
+  action,
+}: ArchiveServiceOrderParams) => {
+  const {data} = await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/${action}`,
+  );
+
+  return data;
+};
+
+export const useArchiveServiceOrder = ({
+  action,
+  serviceOrderId,
+  message,
+}: ArchiveServiceOrderParams) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  const handleSuccess = () => {
+    queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+    enqueueSnackbar(message ?? `Service job has been updated`, {
+      variant: 'success',
+    });
+  };
+
+  return useMutation(
+    [queryKeys.archiveServiceOrder, serviceOrderId],
+    () => archiveServiceOrder({action, serviceOrderId}),
+    {
+      onSuccess: handleSuccess,
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};

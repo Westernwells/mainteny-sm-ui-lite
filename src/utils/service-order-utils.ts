@@ -41,6 +41,8 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
       return 'warning';
     case ServiceOrderStatus.ARTICLES_ORDERED:
       return 'primary.dark';
+    case ServiceOrderStatus.ARCHIVED:
+      return 'action.active';
     default:
       return 'default';
   }
@@ -68,6 +70,8 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
       return 'Travel';
     case ServiceOrderStatus.PAUSED:
       return 'Paused';
+    case ServiceOrderStatus.ARCHIVED:
+      return 'Archived';
     case ServiceOrderStatus.ARTICLES_ORDERED:
       return 'Articles Ordered';
     default:
