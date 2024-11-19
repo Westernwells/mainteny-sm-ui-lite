@@ -61,7 +61,7 @@ export const Avatar = ({
   }, [userAccount]);
 
   return (
-    <Box display="flex" alignItems="center" gap={1}>
+    <Box sx={{width: '100%'}} display="flex" alignItems="center" gap={1}>
       <AvatarMui
         alt={userName}
         sx={{
@@ -73,7 +73,7 @@ export const Avatar = ({
         {...avatarProps}
       />
       {!removeNameText && (
-        <Typography variant="body2" sx={labelStyles}>
+        <Typography noWrap variant="body2" sx={labelStyles}>
           {userName}
         </Typography>
       )}

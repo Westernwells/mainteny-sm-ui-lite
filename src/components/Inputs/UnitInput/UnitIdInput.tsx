@@ -12,9 +12,10 @@ import {ElevatorView} from 'models/elevator';
 type Props = {
   selectedValue?: string;
   onChange: (value: string | undefined) => void;
+  valueMapper?: (unit: ElevatorView) => string;
 };
 
-const UnitIdInput = ({selectedValue, onChange}: Props) => {
+const UnitIdInput = ({selectedValue, onChange, valueMapper}: Props) => {
   const {t} = useTranslation();
 
   const [query, setQuery] = useState<string>('');
@@ -56,7 +57,7 @@ const UnitIdInput = ({selectedValue, onChange}: Props) => {
     () =>
       units.data.map((unit) => ({
         label: unit.externalId,
-        value: unit.id,
+        value: valueMapper ? valueMapper(unit) : unit.id,
       })),
     [units],
   );

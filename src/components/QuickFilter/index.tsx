@@ -29,7 +29,10 @@ const QuickFilter = ({selected, options, statistics, onChange}: Props) => {
         width: 'fit-content',
       }}>
       {options.map((option) => {
-        const isSelected = selected.includes(option.value);
+        const isSelected =
+          selected.length === 0
+            ? option.value === 'ALL'
+            : selected.includes(option.value);
 
         const chipNumber = statistics?.[option.value] ?? null;
         return (
