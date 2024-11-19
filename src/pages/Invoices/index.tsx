@@ -443,7 +443,7 @@ const Invoices = ({elevatorId}: Props) => {
         key: 'invoice-cell-date',
         width: '124px',
         align: 'right',
-        fieldName: InvoiceOrderField.CREATED_DATE,
+        fieldName: InvoiceOrderField.SENT_DATE,
         getExportValue: (invoice) => formatDate(invoice.date) ?? '',
         renderCell: (invoice, cellProps) => (
           <Cell {...cellProps}>
