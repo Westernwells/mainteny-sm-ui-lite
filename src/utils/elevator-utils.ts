@@ -237,22 +237,22 @@ export const mapFormDataToElevatorUpdateRequest = (
   elevatorId,
 });
 
-const getPriorityTechnician = (assignments: ElevatorAssignmentSimpleView[]) => {
-  let {weight} = assignments[0];
-  const tech: ElevatorAssignmentSimpleView[] = [];
-
-  assignments.forEach((i) => {
-    if (i.weight === weight) {
-      tech.push(i);
-    } else if (i.weight > weight) {
-      weight = i.weight;
-      tech.splice(0, tech.length);
-      tech.push(i);
-    }
-  });
-
-  return tech.map((item) => item.technician);
+export const sortTechniciansByPriority = (
+  a: ElevatorAssignmentSimpleView,
+  b: ElevatorAssignmentSimpleView,
+) => {
+  if (a.weight && b.weight && a.weight !== b.weight) {
+    return a.weight - b.weight;
+  }
+  return a.technician.userAccount.firstName.localeCompare(
+    b.technician.userAccount.firstName,
+  );
 };
+
+const getPriorityTechnician = (assignments: ElevatorAssignmentSimpleView[]) =>
+  assignments
+    .sort(sortTechniciansByPriority)
+    .map((assignment) => assignment.technician);
 
 export const aggregateUnitRow = (units: ElevatorView[]): UnitTableRow[] =>
   units.map((unit) => ({
