@@ -64,7 +64,7 @@ import {NOTES_CELL_WIDTH, TableColumnWithRender} from 'models/table';
 import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {theme} from 'theme';
-import {createExcelContent, getUserFullName} from 'utils/utils';
+import {convertToText, createExcelContent, getUserFullName} from 'utils/utils';
 import AvatarGroup from 'components/AvatarGroup';
 import {Avatar} from 'components/Avatar';
 import {StatusChip} from 'components/StatusChip';
@@ -140,7 +140,7 @@ export const UnitListingView = () => {
 
   const [selectedDistance, setSelectedDistance] = useQueryState<
     DISTANCE_FILTER | undefined
-  >('selectedAddress', {
+  >('selectedDistance', {
     defaultValue: undefined,
   });
 
@@ -219,8 +219,9 @@ export const UnitListingView = () => {
     () =>
       createSearchQuery({
         search,
+        address: selectedAddress,
       }),
-    [search],
+    [search, selectedAddress],
   );
 
   const filters: Partial<ElevatorQueryParams> = {
@@ -236,6 +237,7 @@ export const UnitListingView = () => {
       contractStatus: [ContractStatus.VALID, ContractStatus.EXPIRING],
     }),
     ...(selectedCustomer && {propertyOwnerId: [selectedCustomer]}),
+    ...(selectedTechnicianId && {technicianId: [selectedTechnicianId]}),
     ...(selectedAddress &&
       selectedDistance &&
       getDistanceFromOption(selectedDistance)),
@@ -339,7 +341,7 @@ export const UnitListingView = () => {
       {
         headerName: 'Customer',
         key: 'unit-cell-customer',
-        width: '124px',
+        width: '212px',
         fieldName: ElevatorOrderField.PROPERTY_OWNER_NAME,
         getExportValue: (unit) => unit.propertyOwner?.name || '',
         renderCell: (unit, cellProps) => (
@@ -364,7 +366,12 @@ export const UnitListingView = () => {
         key: 'unit-cell-next-inspection',
         width: '132px',
         fieldName: ElevatorOrderField.NEXT_INSPECTION_DATE,
-        getExportValue: (unit) => formatDate(unit.nextInspection) || '',
+        getExportValue: (unit) =>
+          (unit.nextInspection
+            ? formatDate(
+                fromDateStringToDate(unit.nextInspection, DEFAULT_DATE_FORMAT),
+              )
+            : undefined) ?? '',
         renderCell: (unit, cellProps) => (
           <Cell {...cellProps}>
             <TableCellText>
@@ -488,6 +495,7 @@ export const UnitListingView = () => {
     mode: 'all',
   });
 
+  const watchDistance = watch('distance');
   const watchCustomer = watch('customer');
   const watchTechnician = watch('technician');
   const watchUnitNumber = watch('unitNumber');
@@ -645,7 +653,7 @@ export const UnitListingView = () => {
   };
 
   const handleFilterReset = () => {
-    setValue('address', undefined);
+    setValue('address', '');
     setValue('distance', undefined);
     setValue('lastInspectionStart', undefined);
     setValue('lastInspectionEnd', undefined);
@@ -692,10 +700,7 @@ export const UnitListingView = () => {
         return;
       }
 
-      const excludedFields = [
-        'service-order-cell-notes',
-        'service-order-cell-action',
-      ];
+      const excludedFields = ['unit-cell-contract', 'unit-cell-action'];
 
       const filteredColumns = COLUMNS.filter(
         (col) => !excludedFields.includes(col.key),
@@ -859,7 +864,7 @@ export const UnitListingView = () => {
                             }}
                             data-testid={`unit-distance-radio-button-${distanceOption.value}`}
                             control={<Radio />}
-                            checked={field.value === distanceOption.value}
+                            checked={watchDistance === distanceOption.value}
                             value={distanceOption.value}
                             label={t(distanceOption.labelKey)}
                           />
@@ -965,6 +970,7 @@ export const UnitListingView = () => {
                     <UnitIdInput
                       selectedValue={watchUnitNumber}
                       onChange={field.onChange}
+                      valueMapper={(unit: ElevatorView) => unit.externalId}
                     />
                   )}
                 />
@@ -1004,10 +1010,14 @@ export const UnitListingView = () => {
                 render={({field}) => (
                   <PropertyInput
                     selectedValue={watchUnitCategory}
-                    onChange={field.onChange}
                     type={PropertyType.ELEVATOR_CATEGORY}
                     labelKey="Unit category"
                     placeholderKey="Select unit category"
+                    isLabelTranslatable
+                    labelTranslationCallback={(label) =>
+                      t(convertToText(label))
+                    }
+                    onChange={field.onChange}
                   />
                 )}
               />

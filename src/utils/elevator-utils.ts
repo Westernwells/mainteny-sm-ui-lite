@@ -258,7 +258,7 @@ export const aggregateUnitRow = (units: ElevatorView[]): UnitTableRow[] =>
   units.map((unit) => ({
     data: unit,
     id: unit.id,
-    number: unit.number,
+    number: unit.externalId,
     address: getAddressString(unit.address),
     fullAddress: unit.address.fullName ?? '-',
     building: unit.additionalInfo.buildingLocation,
@@ -266,11 +266,11 @@ export const aggregateUnitRow = (units: ElevatorView[]): UnitTableRow[] =>
       unit.propertyOwner.meta?.state === 'ACTIVE'
         ? unit.propertyOwner
         : undefined,
-    lastMaintenance: unit.lastVisitDate
-      ? formatDate(unit.lastVisitDate)
+    lastMaintenance: unit.additionalInfo.lastInspectionDate
+      ? formatDate(unit.additionalInfo.lastInspectionDate)
       : undefined,
-    nextInspection: unit.nextVisitDate
-      ? formatDate(unit.nextVisitDate)
+    nextInspection: unit.additionalInfo.nextInspectionDate
+      ? formatDate(unit.additionalInfo.nextInspectionDate)
       : undefined,
     engineers: unit.assignments.length
       ? getPriorityTechnician(unit.assignments)

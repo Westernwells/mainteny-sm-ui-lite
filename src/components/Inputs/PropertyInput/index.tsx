@@ -15,6 +15,7 @@ type Props = {
   labelKey: string;
   placeholderKey: string;
   isLabelTranslatable?: boolean;
+  labelTranslationCallback?: (label: string) => string;
   onChange: (value: string | undefined) => void;
 };
 
@@ -24,6 +25,7 @@ const PropertyInput = ({
   labelKey,
   placeholderKey,
   isLabelTranslatable = false,
+  labelTranslationCallback,
   onChange,
 }: Props) => {
   const {t} = useTranslation();
@@ -68,10 +70,19 @@ const PropertyInput = ({
     onChange(option?.value ? option.value : undefined);
   };
 
+  const getTranslatedLabel = (label: string) => {
+    if (isLabelTranslatable) {
+      return labelTranslationCallback
+        ? labelTranslationCallback(label)
+        : t(label);
+    }
+    return label;
+  };
+
   const serialNumberOptions: Option[] = useMemo(
     () =>
       unitSerialNumbers.data.map((unit) => ({
-        label: isLabelTranslatable ? t(unit) : unit,
+        label: getTranslatedLabel(unit),
         value: unit,
       })),
     [unitSerialNumbers],

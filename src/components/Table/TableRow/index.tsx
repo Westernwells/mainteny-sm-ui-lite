@@ -20,8 +20,9 @@ const TableRow = ({
       alignItems: 'center',
       minHeight: '44px',
       cursor: 'pointer',
-      '&:hover': {
-        bgcolor: '#F7F9FC',
+
+      '&:hover td': {
+        background: '#F7F9FC',
       },
     }}
     {...props}>
