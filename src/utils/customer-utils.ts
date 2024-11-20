@@ -65,4 +65,10 @@ export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {
   }
 };
 
-export const createNameSearchQuery = (value: string) => `[name:*${value}*]`;
+export const createNameSearchQuery = (value: string) => {
+  const searchTermWithWordSeparation = value
+    .split(' ')
+    .map((word) => `*${word}*`)
+    .join('');
+  return `[name:${searchTermWithWordSeparation}]`;
+};
