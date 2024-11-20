@@ -37,6 +37,7 @@ const ServiceOrderIdInput = ({
     orderBy: ServiceOrderOrderField.CREATED_TIME,
     order: Order.DESC,
     query,
+    includeArchived: true,
   };
 
   const {

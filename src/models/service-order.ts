@@ -597,6 +597,7 @@ export interface ServiceOrderQueryParams {
   grossAmountFrom?: number;
   grossAmountTo?: number;
   hasComments?: boolean;
+  includeArchived?: boolean;
 }
 
 export interface ServiceOrderActivityView {
