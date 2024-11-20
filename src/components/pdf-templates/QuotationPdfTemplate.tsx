@@ -208,7 +208,7 @@ const QuotationPdfTemplate = React.memo(
       const discountValue =
         articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
 
-      return articleItem.quantity === 0
+      return !articleItem.quantity || !articleItem.unitAmount.netAmount
         ? 0
         : (grossTotal - discountValue) /
             10 ** articleItem.unitAmount.fractionDigits || 2;
