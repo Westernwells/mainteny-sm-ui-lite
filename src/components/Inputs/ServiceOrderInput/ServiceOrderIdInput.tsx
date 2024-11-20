@@ -11,7 +11,6 @@ import {
   ServiceOrderQueryParams,
   ServiceOrderView,
 } from 'models/service-order';
-import {endOfDay, startOfDay, subDays} from 'date-fns';
 import {Order} from 'models/pagination';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 
@@ -27,15 +26,12 @@ const ServiceOrderIdInput = ({
   onChange,
 }: Props) => {
   const {t} = useTranslation();
-  const currentDate = new Date();
 
   const [query, setQuery] = useState<string>('');
   const [queryView, setQueryView] = useState('');
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
   const filters: ServiceOrderQueryParams = {
-    end: endOfDay(currentDate).toISOString(),
-    start: startOfDay(subDays(currentDate, 30)).toISOString(),
     pageIndex: 0,
     pageSize: 3,
     orderBy: ServiceOrderOrderField.CREATED_TIME,
