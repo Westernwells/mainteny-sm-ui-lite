@@ -117,7 +117,11 @@ import {
 import XMLViewer from 'react-xml-viewer';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
-import {formatInvoiceViewToUpdateInvoice, stripHtmlTags} from './utils';
+import {
+  correctCreditNoteInvoicesPercentages,
+  formatInvoiceViewToUpdateInvoice,
+  stripHtmlTags,
+} from './utils';
 
 interface Props {
   invoice: InvoiceView;
@@ -596,9 +600,11 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     );
 
     const previousInvoicesProp = shouldIncludePreviousInvoices
-      ? sortedPreviousInvoices.slice(
-          0,
-          sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+      ? correctCreditNoteInvoicesPercentages(
+          sortedPreviousInvoices.slice(
+            0,
+            sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+          ),
         )
       : [];
 

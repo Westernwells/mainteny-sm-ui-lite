@@ -2180,7 +2180,7 @@ export const InvoiceForm = ({
                   <Tooltip
                     title={T(paymentTypeTooltip)}
                     placement="top"
-                    componentsProps={{
+                    slotProps={{
                       tooltip: {
                         sx: {
                           bgcolor: 'common.gray',
