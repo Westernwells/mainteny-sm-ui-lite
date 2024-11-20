@@ -39,10 +39,11 @@ describe('Create Unit', () => {
         cy.contains('Unit created successfully');
     });
 
-    it('customer search to be fuzzy name', () => {
+    it('searching customer should use fuzzy name', () => {
         cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/propertyOwners*`).as('customerApi');
 
         const customerSearchValue = 'E2E test';
+        const expectedSearchTerm = `[name:*E2E**test*]`;
 
         UnitsPage.navigateToCreatePage();
         cy.get('span[role="progressbar"]').should('not.exist');
@@ -51,7 +52,7 @@ describe('Create Unit', () => {
         });
         cy.wait(5000);
         cy.get('@customerApi.all').then((call) => {
-            cy.wrap(Cypress._.last(call)).its('request.query.query').should('include', `[name:*${customerSearchValue}*]`);
+            cy.wrap(Cypress._.last(call)).its('request.query.query').should('include', expectedSearchTerm);
         });
     });
 });
