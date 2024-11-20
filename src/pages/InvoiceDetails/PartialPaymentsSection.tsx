@@ -45,7 +45,11 @@ import {
 import {fixRounding, isNumber} from 'utils/utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
-import {applyDiscount, getAggregatedPartialPaymentsVats} from './utils';
+import {
+  applyDiscount,
+  correctCreditNoteInvoicesPercentages,
+  getAggregatedPartialPaymentsVats,
+} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 
@@ -137,12 +141,14 @@ export const PartialPaymentsSection = ({
   const isEditing = !!invoice;
   // if editing, we need to show only past invoices till this one (editing invoice included)
   // if creating, we need to show all invoices
-  const previousInvoices = isEditing
-    ? allPreviousInvoices?.slice(
-        0,
-        allPreviousInvoices?.findIndex((i) => i.id === invoice?.id) + 1,
-      )
-    : allPreviousInvoices;
+  const previousInvoices = correctCreditNoteInvoicesPercentages(
+    isEditing
+      ? allPreviousInvoices?.slice(
+          0,
+          allPreviousInvoices?.findIndex((i) => i.id === invoice?.id) + 1,
+        )
+      : allPreviousInvoices,
+  );
   const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
     formik.values.items,
   );
