@@ -10,7 +10,11 @@ import {
   createMeasurementOptions,
   MeasurementUnit,
 } from 'models/articleForm';
-import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
+import {
+  formatCurrency,
+  getCurrencySymbol,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {
   useCompanyAutoNumberConfig,
@@ -415,12 +419,11 @@ export const AddBasicInfoForm = ({
                     display: 'flex',
                     py: 1,
                   }}>
-                  {(
+                  {formatCurrency(
                     (Number(formik.values.unitSellingAmount) *
                       Number(formik.values.costPackage.laborPercentage)) /
-                    100
-                  ).toFixed(2)}{' '}
-                  {currentCurrency.symbol}
+                      100,
+                  )}
                 </Typography>
               )}
             </Grid>
@@ -471,13 +474,12 @@ export const AddBasicInfoForm = ({
                     display: 'flex',
                     py: 1,
                   }}>
-                  {(
+                  {formatCurrency(
                     Number(formik.values.unitSellingAmount) -
-                    (Number(formik.values.unitSellingAmount) *
-                      Number(formik.values.costPackage.laborPercentage)) /
-                      100
-                  ).toFixed(2)}{' '}
-                  {currentCurrency.symbol}
+                      (Number(formik.values.unitSellingAmount) *
+                        Number(formik.values.costPackage.laborPercentage)) /
+                        100,
+                  )}
                 </Typography>
               )}
             </Grid>

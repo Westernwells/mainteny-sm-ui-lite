@@ -10,7 +10,7 @@ import {
   MeasurementUnit,
   createMeasurementOptions,
 } from 'models/articleForm';
-import {getCurrencySymbol, useCurrentCurrency} from 'utils/currency';
+import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import * as Yup from 'yup';
 import {
   ChangeEvent,
@@ -59,7 +59,6 @@ export const EditArticleForm = ({
   ) => void;
 }) => {
   const {t} = useTranslation();
-  const currentCurrency = useCurrentCurrency();
   const {language: selectedLng} = useContext(LanguageContext);
   const [openTextBlockDialog, setOpenTextBlockDialog] =
     useState<boolean>(false);
@@ -348,11 +347,12 @@ export const EditArticleForm = ({
                     py: 1,
                     pr: 2,
                   }}>
-                  {getAmountFromPercentage(
-                    Number(formik.values.costPackage?.laborPercentage),
-                    Number(formik.values.unitSellingAmount),
-                  ).toFixed(2)}
-                  {currentCurrency.symbol ?? 'EUR'}
+                  {formatCurrency(
+                    getAmountFromPercentage(
+                      Number(formik.values.costPackage?.laborPercentage),
+                      Number(formik.values.unitSellingAmount),
+                    ),
+                  )}
                 </Typography>
               )}
             </Grid>
@@ -430,14 +430,13 @@ export const EditArticleForm = ({
                   variant="caption"
                   color={theme.palette.primary.main}
                   sx={{justifyContent: 'right', display: 'flex', py: 1}}>
-                  {(
+                  {formatCurrency(
                     Number(formik.values.unitSellingAmount) -
-                    getAmountFromPercentage(
-                      Number(formik.values.costPackage?.laborPercentage),
-                      Number(formik.values.unitSellingAmount),
-                    )
-                  ).toFixed(2)}
-                  {currentCurrency.symbol ?? 'EUR'}
+                      getAmountFromPercentage(
+                        Number(formik.values.costPackage?.laborPercentage),
+                        Number(formik.values.unitSellingAmount),
+                      ),
+                  )}
                 </Typography>
               )}
             </Grid>
