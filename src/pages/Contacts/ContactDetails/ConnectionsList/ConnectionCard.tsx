@@ -21,9 +21,10 @@ import {ContractView} from 'models/contract';
 import {
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
+  serviceOrderTypeToString,
 } from 'utils/service-order-utils';
 import {statusColor} from 'components/StatusChip';
-import {ServiceOrderLabels, ServiceOrderView} from 'models/service-order';
+import {ServiceOrderView} from 'models/service-order';
 import {Confirm} from 'components/Confirm';
 import {ArticleSupplierView} from '../../../../models/supplier';
 
@@ -119,7 +120,11 @@ const getConnectionCardData = (
       return [
         {
           label: t('Job type'),
-          value: t(ServiceOrderLabels[serviceOrder?.type]) || '-',
+          value:
+            serviceOrder?.type &&
+            serviceOrderTypeToString(serviceOrder?.type) === '-'
+              ? serviceOrder?.type
+              : t(serviceOrderTypeToString(serviceOrder?.type!)),
           icon: (
             <StoreMallDirectoryOutlinedIcon sx={{color: 'primary.light'}} />
           ),

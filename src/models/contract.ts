@@ -497,7 +497,7 @@ export interface ContractServiceForm {
   elevators: ContractServiceFormElevator[];
   isAutomaticJobCycle?: boolean;
   yearlyPrice?: number;
-  orderType?: ServiceOrderType;
+  orderType?: string;
 }
 
 export interface ContractServiceFormElevator {
@@ -529,12 +529,13 @@ export interface ExtendedContractComponentRecord {
 }
 
 export interface ContractComponentRecord {
+  componentId?: string;
   id?: string;
   name: string;
   group: string;
   elevators: ContractComponentElevator[];
-  firstInvoiceDate?: string;
-  firstOrderDate?: string;
+  firstInvoiceDate?: string | Date;
+  firstOrderDate?: string | Date;
   costType: ArticleType;
   costPackage?: CostPackage;
   orderType?: string | null;
@@ -554,7 +555,7 @@ export interface ContractComponentAdditionalInfo {
   firstOrderDate?: Date | null;
   costPackage?: CostPackage;
   elevators: ContractComponentElevator[];
-  orderType?: ServiceOrderType;
+  orderType?: string;
   yearlyPrice?: number;
 }
 
