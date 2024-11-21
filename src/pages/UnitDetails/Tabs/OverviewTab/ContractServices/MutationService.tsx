@@ -58,7 +58,6 @@ import {NumericFormat} from 'react-number-format';
 import {LanguageContext} from 'context/LanguageProvider';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import ExpandIcon from '@mui/icons-material/Expand';
-import {T} from 'utils/i18n-utils';
 import {toDate} from 'utils/datetime';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {FormCheckbox} from 'components/form/FormCheckbox';
@@ -275,13 +274,6 @@ export const MutationService = ({
     {name: 'Invoice Price (Excl. VAT)', align: 'right', width: '18%'},
   ];
 
-  const clearElevators = () => {
-    const updatedItems = formikContractServiceComponent.values.elevators.map(
-      (elevator) => ({...elevator, isChecked: false}),
-    );
-    formikContractServiceComponent.setFieldValue('elevators', updatedItems);
-  };
-
   const handleCheckboxChange = (
     item: ContractServiceFormElevator,
     isChecked: boolean,
@@ -296,34 +288,6 @@ export const MutationService = ({
     );
 
     formikContractServiceComponent.setFieldValue('elevators', updatedItems);
-  };
-  const renderClearSelectionsButton = () => {
-    const numberOfUnits =
-      formikContractServiceComponent.values.elevators.filter(
-        (el) => el?.isChecked,
-      ).length;
-
-    return (
-      <Box display="flex" alignItems="center" gap={1}>
-        <Button
-          buttonProps={{
-            variant: 'outlined',
-            size: 'small',
-            sx: {
-              background: 'transparent',
-              marginLeft: '1.5em',
-            },
-            endIcon: <CloseIcon />,
-            onClick: () => clearElevators(),
-          }}>
-          {numberOfUnits === 1
-            ? T('1 Unit Selected')
-            : T('{{numberOfUnits}} Units Selected', {
-                numberOfUnits,
-              })}
-        </Button>
-      </Box>
-    );
   };
 
   const lengthOfElevators =
@@ -767,8 +731,6 @@ export const MutationService = ({
             {t('Select units for which this contract service will apply.')}
           </Typography>
         </Box>
-
-        {renderClearSelectionsButton()}
       </Box>
       <Box display="flex" alignItems="center">
         <Switch
