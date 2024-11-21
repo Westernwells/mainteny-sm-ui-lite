@@ -123,7 +123,7 @@ export const FormSelect = ({
             t(label)
           )
         }
-        renderValue={() => {
+        renderValue={(val) => {
           let selectValue;
           if (
             selectProps &&
@@ -145,7 +145,7 @@ export const FormSelect = ({
               ({value}) => value === selectProps?.value,
             )?.label;
           }
-          return typeof selectValue === 'string' ? translate(selectValue) : '';
+          return typeof selectValue === 'string' ? translate(selectValue) : val;
         }}
         value={selectProps?.value}
         sx={selectStyles}

@@ -117,9 +117,11 @@ export const Location = ({
     'travelFee',
   ]).current;
 
-  const onSave = async () => {
+  const onCloseDialog = () => {
     setOpenDialog(false);
+  };
 
+  const onSave = async () => {
     const body: Partial<ElevatorRequestBody> = {
       propertyOwnerId: formik.values.propertyOwnerId,
       address: formatAddressFullname(
@@ -152,6 +154,8 @@ export const Location = ({
       body,
       elevatorId: elevator.id,
     });
+
+    onCloseDialog();
   };
 
   useEffect(() => {
@@ -195,14 +199,12 @@ export const Location = ({
       </Grid>
       <Dialog
         title="Edit Location"
-        onCancel={() => {
-          setOpenDialog(false);
-        }}
+        onCancel={onCloseDialog}
         disableSaveBtn={
           !!Object.keys(formik.errors).length ||
           !!Object.keys(separateAddressFormik.errors).length
         }
-        onSave={() => onSave()}
+        onSave={onSave}
         dialogProps={{
           maxWidth: 'md',
           open: openDialog || false,
