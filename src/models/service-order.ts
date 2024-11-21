@@ -191,18 +191,6 @@ export enum ServiceOrderTypeKeys {
   'Operation' = ServiceOrderType.OPERATION,
 }
 
-export const ServiceOrderLabels: Record<ServiceOrderTypeKeys, string> = {
-  [ServiceOrderTypeKeys.Maintenance]: 'Maintenance',
-  [ServiceOrderTypeKeys.Emergency]: 'Emergency',
-  [ServiceOrderTypeKeys.Repair]: 'Repair',
-  [ServiceOrderTypeKeys.Callout]: 'Callout',
-  [ServiceOrderTypeKeys.Inspection]: 'Inspection',
-  [ServiceOrderTypeKeys.Installation]: 'New Installation',
-  [ServiceOrderTypeKeys.Modernization]: 'Modernization',
-  [ServiceOrderTypeKeys.General]: 'General',
-  [ServiceOrderTypeKeys.Operation]: 'Elevator Operation',
-} as const;
-
 export enum ServiceOrderOrderField {
   CREATED_TIME = 'CREATED_TIME',
   DUE_DATE = 'DUE_DATE',
