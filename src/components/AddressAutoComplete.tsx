@@ -1,4 +1,4 @@
-import {FocusEvent, useContext, useEffect, useState} from 'react';
+import React, {FocusEvent, useContext, useEffect, useState} from 'react';
 import AddressAutocomplete from 'mui-address-autocomplete';
 import Box from '@mui/material/Box';
 import LocationIcon from '@mui/icons-material/LocationOn';
@@ -9,9 +9,9 @@ import {TextFieldProps} from '@mui/material/TextField';
 import {useTranslation} from 'react-i18next';
 import MapIcon from '@mui/icons-material/Map';
 import {IconButton, InputAdornment} from '@mui/material';
-import {useFetchAddressObjectByName} from 'hooks/reactQuery/useAddress';
 import {UserCompanyContext} from 'context/UserCompanyProvider';
 import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
+import {getAddressRecordFromGoogleAddress} from 'utils/address';
 import {MapLocationPicker} from './MapLocationPicker';
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
   initialValue: string;
   initialAddress?: AddressRecord;
   inputError?: string;
-  handleBlur?: (e: FocusEvent<any, Element>) => void;
+  handleBlur?: (e: FocusEvent<HTMLInputElement, Element>) => void;
   textFieldProps?: TextFieldProps;
   label?: string;
   noOptionsText?: string;
@@ -44,36 +44,11 @@ export const AddressAutoComplete = ({
   const [queryView, setQueryView] = useState(initialValue);
   const {company} = useContext(UserCompanyContext);
   const [isMapOpen, setIsMapOpen] = useState(false);
-  const {data: addressData} = useFetchAddressObjectByName(
-    address?.formatted_address,
-  );
 
   const language =
     companyLanguageContextMap[company?.language || Language.EN_US];
 
   const {t} = useTranslation();
-
-  useEffect(() => {
-    if (getAddress && addressData) {
-      const data: AddressRecord = {
-        countryCode: addressData?.countryCode,
-        fullName: addressData?.fullName as string,
-        component: {
-          postalCode: addressData?.component?.postalCode,
-          country: addressData?.component?.country,
-          city: addressData?.component?.city,
-          state: addressData?.component?.state,
-          street: addressData?.component?.street,
-          street2: addressData?.component?.street2,
-        },
-        location: {
-          latitude: addressData?.location?.latitude as number,
-          longitude: addressData?.location?.longitude as number,
-        },
-      };
-      getAddress(formatAddressFullname(data) as AddressRecord);
-    }
-  }, [addressData]);
 
   useEffect(() => {
     if (address !== null) {
@@ -97,6 +72,8 @@ export const AddressAutoComplete = ({
       } else {
         setQueryView(address.formatted_address);
       }
+      const data = getAddressRecordFromGoogleAddress(address);
+      getAddress?.(formatAddressFullname(data) as AddressRecord);
     }
   }, [address]);
 
@@ -111,13 +88,7 @@ export const AddressAutoComplete = ({
       setOpen(false);
     }
 
-    if (
-      queryView &&
-      queryView.length > 0 &&
-      !addressData &&
-      getAddress &&
-      !address
-    ) {
+    if (queryView && queryView.length > 0 && getAddress && !address) {
       const addressDataObject = {
         countryCode: initialAddress?.countryCode
           ? initialAddress?.countryCode
@@ -140,7 +111,7 @@ export const AddressAutoComplete = ({
     }
   }, [queryView, address]);
 
-  const onInputChange = (e: any) => {
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQueryView(e.target.value);
     setOpen(true);
   };
@@ -167,7 +138,7 @@ export const AddressAutoComplete = ({
           'geometry',
           'place_id',
         ]}
-        onChange={(_, value: any, reason: string) => {
+        onChange={(_, value, reason) => {
           setAddress(value);
           if (reason === 'clear') {
             setQueryView('');
@@ -180,7 +151,7 @@ export const AddressAutoComplete = ({
         onClose={() => setOpen(false)}
         size="small"
         sx={{width: '100%'}}
-        renderOption={(props, option: any) => (
+        renderOption={(props, option) => (
           <Box component="li" {...props}>
             <LocationIcon color="action" />
             <Typography component="span" variant="body2" ml=".5em">

@@ -398,3 +398,9 @@ export const getVersionType = (hostname: string): VersionType => {
       return VersionType.WEB_STAGING;
   }
 };
+
+export interface GoogleAddressComponent {
+  long_name: string;
+  short_name: string;
+  types: string[];
+}
