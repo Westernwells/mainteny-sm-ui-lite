@@ -135,7 +135,10 @@ export const PdfInvoicedSection = ({
             return null;
           }
           const invoiceTotalAmount = i.totalAmount;
-          const description = i.additionalInfo?.payment?.description;
+          const description =
+            i.type === InvoiceType.CREDIT_NOTE
+              ? translate('Credit Note invoice')
+              : i.additionalInfo?.payment?.description || '';
           const fractionDigits = invoiceTotalAmount?.fractionDigits ?? 2;
           const amountExclVat = Math.abs(
             (invoiceTotalAmount?.netAmount ?? 0) / 10 ** fractionDigits,

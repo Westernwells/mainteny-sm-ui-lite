@@ -39,7 +39,11 @@ import {
 } from 'utils/calculate-total';
 import {fixRounding} from 'utils/utils';
 import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
-import {applyDiscount, getAggregatedPartialPaymentsVats} from './utils';
+import {
+  applyDiscount,
+  correctCreditNoteInvoicesPercentages,
+  getAggregatedPartialPaymentsVats,
+} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import {formatDate, toDate} from 'utils/datetime';
@@ -102,12 +106,14 @@ export const UpfrontPaymentsSection = ({
   const isEditing = !!invoice;
   // if editing, we need to show only past invoices till this one (editing invoice included)
   // if creating, we need to show all invoices
-  const previousInvoices = isEditing
-    ? allPreviousInvoices.slice(
-        0,
-        allPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
-      )
-    : allPreviousInvoices;
+  const previousInvoices = correctCreditNoteInvoicesPercentages(
+    isEditing
+      ? allPreviousInvoices.slice(
+          0,
+          allPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+        )
+      : allPreviousInvoices,
+  );
 
   const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
     formik.values.items,
@@ -277,8 +283,6 @@ export const UpfrontPaymentsSection = ({
   const hasPreviousInvoices = previousInvoices.length > 0;
 
   useEffect(() => {
-    if (!previousInvoices.length || !subtotalExclVat) return;
-
     const firstInvoice = previousInvoices[0];
     const firstInvoicePaymentType = firstInvoice?.additionalInfo?.payment?.type;
     const isFinalAfterPreviousInvoices =
@@ -290,35 +294,40 @@ export const UpfrontPaymentsSection = ({
     } else if (isFinalAfterPreviousInvoices) {
       const description = `${invoiceIndex}. ${t('Final invoice')}`;
       // prefill percentage/amount if it's a final invoice after previous invoices
-      formik.setFieldValue('payment', {
-        ...formik.values.payment,
-        ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
-          ? {
-              type: PaymentType.PERCENTAGE,
-              description,
-              percentage: 100 - prevInvoicesPercentage,
-            }
-          : {
-              type: PaymentType.LUMP_SUM,
-              description,
-              amount: {
-                ...formik.values.payment?.amount,
-                value: subtotalExclVat - previousInvoicesTotalExclVat,
-              },
-            }),
-      });
+      if (formik.values.payment?.description !== description) {
+        formik.setFieldValue('payment', {
+          ...formik.values.payment,
+          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
+            ? {
+                type: PaymentType.PERCENTAGE,
+                description,
+                percentage: 100 - prevInvoicesPercentage,
+              }
+            : {
+                type: PaymentType.LUMP_SUM,
+                description,
+                amount: {
+                  ...formik.values.payment?.amount,
+                  value: subtotalExclVat - previousInvoicesTotalExclVat,
+                },
+              }),
+        });
+      }
     } else {
       // change payment type according to first invoice
-      formik.setFieldValue('payment', {
-        ...formik.values.payment,
-        type:
-          firstInvoicePaymentType === PaymentType.PERCENTAGE
-            ? PaymentType.PERCENTAGE
-            : PaymentType.LUMP_SUM,
-        description: `${invoiceIndex}. ${t('Upfront invoice')}`,
-      });
+      const description = `${invoiceIndex}. ${t('Upfront invoice')}`;
+      if (formik.values.payment?.description !== description) {
+        formik.setFieldValue('payment', {
+          ...formik.values.payment,
+          type:
+            firstInvoicePaymentType === PaymentType.PERCENTAGE
+              ? PaymentType.PERCENTAGE
+              : PaymentType.LUMP_SUM,
+          description,
+        });
+      }
     }
-  }, [previousInvoices, subtotalExclVat]);
+  }, [previousInvoices]);
 
   useEffect(() => {
     if (!invoice) return;

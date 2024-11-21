@@ -156,7 +156,10 @@ export const PdfPaymentHistorySection = ({
               return null;
             }
 
-            const description = i.additionalInfo?.payment?.description || '-';
+            const description =
+              i.type === InvoiceType.CREDIT_NOTE
+                ? translate('Credit Note invoice')
+                : i.additionalInfo?.payment?.description || '';
 
             const totalPriceInclVat = Math.abs(
               i.payments

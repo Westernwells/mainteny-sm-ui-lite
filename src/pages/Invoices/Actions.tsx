@@ -66,7 +66,10 @@ import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTem
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
-import {formatInvoiceViewToUpdateInvoice} from 'pages/InvoiceDetails/utils';
+import {
+  correctCreditNoteInvoicesPercentages,
+  formatInvoiceViewToUpdateInvoice,
+} from 'pages/InvoiceDetails/utils';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
@@ -549,9 +552,11 @@ export const Actions = ({
     );
 
     const previousInvoicesProp = shouldIncludePreviousInvoices
-      ? sortedPreviousInvoices.slice(
-          0,
-          sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+      ? correctCreditNoteInvoicesPercentages(
+          sortedPreviousInvoices.slice(
+            0,
+            sortedPreviousInvoices.findIndex((i) => i.id === invoice.id) + 1,
+          ),
         )
       : [];
 

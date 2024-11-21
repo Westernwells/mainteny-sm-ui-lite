@@ -14,7 +14,9 @@ export const HtmlPDF = ({
   rootStyle?: HtmlStyle | HtmlStyle[];
   stylesheet?: HtmlStyles | HtmlStyles[];
 }) => {
-  const modifiedHtmlString = modifyHTMLFontSizeForPDFRendering(html);
+  const modifiedHtmlString = modifyHTMLFontSizeForPDFRendering(html)
+    // Replace tabs with spaces (4 times &nbsp;) because tabs are rendering as square boxes
+    .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
   return (
     <Html
       collapse={false}
