@@ -3,7 +3,6 @@ import {Chip} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {OptionWithTranslationKey} from 'models/filter';
-import capitalize from 'lodash/capitalize';
 
 type Props = {
   selected: string[];
@@ -69,7 +68,7 @@ const QuickFilter = ({selected, options, statistics, onChange}: Props) => {
                 lineHeight: '22.4px',
                 cursor: 'pointer',
               }}>
-              {capitalize(t(option.labelKey))}
+              {t(option.labelKey)}
             </Typography>
             {isSelected && chipNumber && (
               <Chip
