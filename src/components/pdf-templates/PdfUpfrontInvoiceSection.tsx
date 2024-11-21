@@ -5,6 +5,7 @@ import {
   DiscountType,
   PaymentType,
   InvoiceAmountDetail,
+  InvoiceType,
 } from 'models/invoice';
 import {
   applyDiscount,
@@ -370,7 +371,9 @@ const PdfUpfrontInvoiceSection = ({
                     color: '#212121',
                     width: '60%',
                   }}>
-                  {previousInvoice.additionalInfo.payment?.description}
+                  {previousInvoice.type === InvoiceType.CREDIT_NOTE
+                    ? translate('Credit Note invoice')
+                    : previousInvoice.additionalInfo.payment?.description}
                 </Text>
                 {invoice?.additionalInfo.payment?.type ===
                   PaymentType.PERCENTAGE && (

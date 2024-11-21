@@ -507,3 +507,43 @@ export const stripHtmlTags = (html: string): string => {
   // Replace consecutive spaces with a single space
   return textContent.replace(/\s+/g, ' ').trim();
 };
+
+export const correctCreditNoteInvoicesPercentages = (
+  invoices: InvoiceView[],
+): InvoiceView[] =>
+  invoices.map((i) => {
+    if (i.type === InvoiceType.CREDIT_NOTE) {
+      // Find the referenced invoice
+      const refInvoice = invoices?.find(
+        (j) => i.additionalInfo.refInvoiceId === j.id,
+      );
+
+      if (!refInvoice) {
+        return i;
+      }
+
+      const originalAmount = refInvoice.totalAmount.netAmount || 0;
+      const creditAmount = Math.abs(i.totalAmount.netAmount || 0);
+
+      // Calculate the proportion of the credit note relative to the original invoice
+      const proportion = originalAmount > 0 ? creditAmount / originalAmount : 0;
+
+      // Negate the proportion of the original payment percentage
+      const originalPaymentPercentage =
+        refInvoice.additionalInfo?.payment?.percentage || 0;
+      const negatedPercentage = -(originalPaymentPercentage * proportion);
+
+      return {
+        ...i,
+        additionalInfo: {
+          ...i.additionalInfo,
+          payment: {
+            ...(i.additionalInfo?.payment || {}),
+            type: i.additionalInfo?.payment?.type || PaymentType.NONE,
+            percentage: negatedPercentage,
+          },
+        },
+      };
+    }
+    return i;
+  });

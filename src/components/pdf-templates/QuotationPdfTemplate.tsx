@@ -208,10 +208,10 @@ const QuotationPdfTemplate = React.memo(
       const discountValue =
         articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
 
-      return (
-        (grossTotal - discountValue) /
-          10 ** articleItem.unitAmount.fractionDigits || 2
-      );
+      return !articleItem.quantity || !articleItem.unitAmount.netAmount
+        ? 0
+        : (grossTotal - discountValue) /
+            10 ** articleItem.unitAmount.fractionDigits || 2;
     };
 
     const discount = getDiscoutObj(quotation?.additionalInfo?.discount);
@@ -560,7 +560,7 @@ const QuotationPdfTemplate = React.memo(
                               textAlign: 'right',
                               color: '#212121',
                             }}>
-                            {articleItem.quantity || '-'}
+                            {articleItem.quantity || 0}
                           </Text>
                           <Text
                             style={{

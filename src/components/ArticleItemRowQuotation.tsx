@@ -167,7 +167,7 @@ export const ArticleItemRowQuotation = ({
   const formik = useFormik<QuotationItemRecord>({
     initialValues: {
       ...articleItem,
-      quantity: articleItem.quantity !== 0 ? articleItem.quantity : 1,
+      quantity: articleItem.quantity !== 0 ? articleItem.quantity : 0,
       unitAmount: {
         ...articleItem.unitAmount,
         percentageVat:

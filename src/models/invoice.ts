@@ -113,6 +113,7 @@ export interface InvoiceAdditionalInfo {
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
+  refInvoiceId?: string;
   paymentTerm?: InvoicePaymentTermRecord & {
     data?: PaymentTermData;
   };
