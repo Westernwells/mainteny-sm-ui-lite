@@ -52,7 +52,7 @@ const tabItems = [
     icon: <FactCheck />,
   },
   {
-    label: 'Supplier invoices',
+    label: 'Supplier Invoices',
     icon: <ReceiptLongIcon />,
   },
 ];
