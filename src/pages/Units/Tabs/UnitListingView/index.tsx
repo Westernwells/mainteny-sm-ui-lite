@@ -557,7 +557,10 @@ export const UnitListingView = () => {
   const {emptyTable, noMatchingData} = useMemo(() => {
     if (!isFetched) return {emptyTable: false, noMatchingData: false};
 
-    if ((appliedFilterNumber > 0 || !!search) && elevatorResponse.total === 0) {
+    if (
+      (appliedFilterNumber > 0 || selectedStatus.length > 0 || !!search) &&
+      elevatorResponse.total === 0
+    ) {
       return {emptyTable: false, noMatchingData: true};
     }
 
