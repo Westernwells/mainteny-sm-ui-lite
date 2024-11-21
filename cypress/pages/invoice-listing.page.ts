@@ -133,7 +133,7 @@ export default class InvoiceListingPage {
     cy.wait('@getInvoices').then((interception) => {
       const invoiceId = interception.response.body?.data?.[0]?.id;
       if (invoiceId) {
-        cy.get('td[role="cell"][data-field="CREATED_DATE"]').eq(0).click();
+        cy.get('td[role="cell"][data-field="SENT_DATE"]').eq(0).click();
         cy.url().should('contain', `${invoiceId}`);
       } else {
         cy.log('Unable to retrieve invoice ID from the intercepted data.');

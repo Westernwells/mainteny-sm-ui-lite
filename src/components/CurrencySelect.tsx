@@ -8,6 +8,7 @@ import {
   Grid,
   SelectChangeEvent,
 } from '@mui/material';
+import {t} from 'i18next';
 import {SVGProps} from 'react';
 
 interface CurrencyOption {
@@ -39,7 +40,7 @@ const CurrencySelect = ({
   selectProps,
 }: CurrencySelectProps) => (
   <FormControl fullWidth required error={error}>
-    <InputLabel id={labelId}>{label}</InputLabel>
+    <InputLabel id={labelId}>{t(label)}</InputLabel>
     <Select
       size="small"
       labelId={labelId}
