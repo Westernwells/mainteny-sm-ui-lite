@@ -2910,7 +2910,7 @@
   "Next Inspection": "Nächste Inspektion",
   "Select model number": "Wähle Modell",
   "Select unit category": "Wähle Kategorie",
-  "Select fabric number": "Wähle fabric number",
+  "Select fabric number": "Wähle Fabriknummer",
   "Archive": "Archivieren",
   "Unarchive": "Aus Archiv entfernen",
   "Undo cancellation": "Stornierung aufheben",
@@ -2929,5 +2929,6 @@
   "No Purchase Invoices": "Keine Eingangsrechnungen",
   "Create a new purchase invoice to start working and tracking its progress": "Neie Eingangsrechnungen anlegen und beginnen zu bearbeiten",
   "Enter description here...": "Beschreibung eintragen",
-  "Create a new quotation to offer clients tailored service proposals and pricing, ready to be sent out.": "Erstellen Sie ein neues Angebot, um Kunden maßgeschneiderte Servicevorschläge und Preisgestaltungen anzubieten, die direkt versendet werden können."
+  "Create a new quotation to offer clients tailored service proposals and pricing, ready to be sent out.": "Erstellen Sie ein neues Angebot, um Kunden maßgeschneiderte Servicevorschläge und Preisgestaltungen anzubieten, die direkt versendet werden können.",
+  "Select serial number": "Wähle Fabriknummer"
 }
