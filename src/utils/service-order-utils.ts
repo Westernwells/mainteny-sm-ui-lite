@@ -2,7 +2,7 @@ import {addMinutes, differenceInMinutes} from 'date-fns';
 import _ from 'lodash';
 import {EmployeesSimpleView} from 'models/employee';
 import {StatusColor} from 'models/status';
-import {Address} from 'models/misc';
+import {getAddressString} from 'utils/address';
 import {
   AUTO_GENERATED_TO_PAYMENT_STATUS,
   SearchParameters,
@@ -348,24 +348,6 @@ export const getSignatureKeys = (
     }
   });
   return signatureKeys;
-};
-
-export const getAddressString = (address?: Address) => {
-  if (!address) return '-';
-
-  if (
-    !address.component?.postalCode ||
-    !address.component?.street ||
-    !address.component?.city
-  )
-    return address.fullName ?? '-';
-  return [
-    address.component?.street,
-    address.component?.postalCode,
-    address.component?.city,
-  ]
-    .filter((value) => !!value)
-    .join(', ');
 };
 
 const getTechniciansFromServiceOrder = (

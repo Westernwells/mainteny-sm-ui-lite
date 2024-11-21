@@ -114,4 +114,5 @@ export enum InvoiceFormat {
   PDF = 'PDF',
   XML = 'XML',
   PDF_AND_XML = 'PDF_AND_XML',
+  POST = 'POST',
 }

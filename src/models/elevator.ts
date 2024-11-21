@@ -12,8 +12,8 @@ import {TechnicianSimpleView, TechnicianView} from './technician';
 import {FileResource, FileResourceRecord} from './media';
 import {ServiceCompanyTimeUnit} from './service-company';
 import {ServiceOrderType, ServiceOrderView} from './service-order';
-import {ContractSimpleView} from './contract';
-import {EmployeesSimpleView} from './employee';
+import {ContractSimpleView, ContractStatus} from './contract';
+import {EmployeesSimpleView, EmployeesView} from './employee';
 import {
   PropertyContactPersonSimpleView,
   PropertyOwnerView,
@@ -21,6 +21,7 @@ import {
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {Order} from './pagination';
 import {InvoiceOrderField, InvoiceStatus, InvoiceType} from 'models/invoice';
+import {theme} from 'theme';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -28,6 +29,15 @@ export enum ElevatorCommentType {
 }
 
 export enum ElevatorStatus {
+  RUNNING = 'RUNNING',
+  BROKEN = 'BROKEN',
+  JOB_ONGOING = 'JOB_ONGOING',
+  UNKNOWN = 'UNKNOWN',
+  OUT_OF_SERVICE = 'OUT_OF_SERVICE',
+}
+
+export enum ElevatorStatusFilter {
+  ALL = 'ALL',
   RUNNING = 'RUNNING',
   BROKEN = 'BROKEN',
   JOB_ONGOING = 'JOB_ONGOING',
@@ -73,6 +83,7 @@ export enum ElevatorOrderField {
   NUMBER_OF_CONTRACTS = 'NUMBER_OF_CONTRACTS',
   LAST_INSPECTION_DATE = 'LAST_INSPECTION_DATE',
   NEXT_INSPECTION_DATE = 'NEXT_INSPECTION_DATE',
+  STATUS = 'STATUS',
 }
 
 export interface ElevatorQueryParams {
@@ -90,6 +101,21 @@ export interface ElevatorQueryParams {
   query: string;
   swLat: number;
   swLng: number;
+  status: ElevatorStatus[];
+  distanceStart: number;
+  distanceEnd: number;
+  lastInspectionStart: string;
+  lastInspectionEnd: string;
+  nextInspectionStart: string;
+  nextInspectionEnd: string;
+  technicianId: string[];
+  externalId: string[];
+  serialNumber: string[];
+  model: string[];
+  category: string[];
+  contractStatus: ContractStatus[];
+  hasTodo: boolean;
+  propertyOwnerId: string[];
 }
 
 export interface ElevatorPhone {
@@ -320,6 +346,7 @@ export interface AttachmentResource {
   elevatorMaintenanceHistoryId: string;
   fileResource: FileResource;
 }
+
 export interface CustomerElevatorParams {
   pageIndex: number;
   pageSize: number;
@@ -477,3 +504,64 @@ export interface QueryElevatorInvoiceParams {
   serviceOrderId?: string;
   elevatorId?: string;
 }
+
+export type UnitTableRow = {
+  data: ElevatorView;
+  id: string;
+  number: string;
+  address: string;
+  fullAddress: string;
+  building: string;
+  propertyOwner?: PropertyOwnerView;
+  lastMaintenance?: string;
+  nextInspection?: string;
+  engineers: EmployeesSimpleView[];
+  status: ElevatorStatus;
+  hasContract: boolean;
+};
+
+// used to indicate fields for the search parameter in elevator endpoint
+export type SearchParameters = {
+  search?: string;
+  address?: string;
+};
+
+export const STATUS_COLOR = {
+  [ElevatorStatus.RUNNING]: theme.palette.success.darkSuccess,
+  [ElevatorStatus.JOB_ONGOING]: theme.palette.primary.light,
+  [ElevatorStatus.BROKEN]: theme.palette.error.main,
+  [ElevatorStatus.OUT_OF_SERVICE]: theme.palette.warning.main,
+  [ElevatorStatus.UNKNOWN]: theme.palette.grey[200],
+};
+
+export enum DISTANCE_FILTER {
+  FIVE = '5',
+  TEN = '10',
+  TWENTY = '20',
+}
+
+export type UnitDistanceQuery = {
+  distanceStart?: number;
+  distanceEnd?: number;
+};
+
+export type UnitFilterForm = {
+  address?: string;
+  distance?: DISTANCE_FILTER;
+  lastInspectionStart?: string;
+  lastInspectionEnd?: string;
+  nextInspectionStart?: string;
+  nextInspectionEnd?: string;
+  technician?: EmployeesView;
+  unitNumber?: string;
+  fabricNumber?: string;
+  modelNumber?: string;
+  unitCategory?: string;
+  hasActiveContract?: boolean;
+  hasTodos?: boolean;
+  customer?: string;
+};
+
+export type UnitStatistics = {
+  numOfElevatorsPerStatus: Record<string, number>;
+};

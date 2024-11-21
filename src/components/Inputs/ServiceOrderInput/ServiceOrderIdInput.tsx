@@ -11,31 +11,33 @@ import {
   ServiceOrderQueryParams,
   ServiceOrderView,
 } from 'models/service-order';
-import {endOfDay, startOfDay, subDays} from 'date-fns';
 import {Order} from 'models/pagination';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 
 type Props = {
   selectedValue?: string;
   onChange: (value: string | undefined) => void;
+  useExternalIdAsValue?: boolean;
 };
 
-const ServiceOrderIdInput = ({selectedValue, onChange}: Props) => {
+const ServiceOrderIdInput = ({
+  selectedValue,
+  useExternalIdAsValue = false,
+  onChange,
+}: Props) => {
   const {t} = useTranslation();
-  const currentDate = new Date();
 
   const [query, setQuery] = useState<string>('');
   const [queryView, setQueryView] = useState('');
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
   const filters: ServiceOrderQueryParams = {
-    end: endOfDay(currentDate).toISOString(),
-    start: startOfDay(subDays(currentDate, 30)).toISOString(),
     pageIndex: 0,
     pageSize: 3,
     orderBy: ServiceOrderOrderField.CREATED_TIME,
     order: Order.DESC,
     query,
+    includeArchived: true,
   };
 
   const {
@@ -68,7 +70,7 @@ const ServiceOrderIdInput = ({selectedValue, onChange}: Props) => {
     () =>
       serviceOrders.data.map((serviceOrder) => ({
         label: serviceOrder.externalId,
-        value: serviceOrder.id,
+        value: useExternalIdAsValue ? serviceOrder.externalId : serviceOrder.id,
       })),
     [serviceOrders],
   );
@@ -81,9 +83,10 @@ const ServiceOrderIdInput = ({selectedValue, onChange}: Props) => {
   useEffect(() => {
     if (!initialLoad || !isFetched) return;
 
-    const foundContractId =
-      customerOptions.find((customer) => customer.value === selectedValue)
-        ?.label || '';
+    const foundContractId = useExternalIdAsValue
+      ? selectedValue ?? ''
+      : customerOptions.find((customer) => customer.value === selectedValue)
+          ?.label || '';
     setQueryView(foundContractId);
     setInitialLoad(false);
   }, [selectedValue, customerOptions, initialLoad, isFetched]);

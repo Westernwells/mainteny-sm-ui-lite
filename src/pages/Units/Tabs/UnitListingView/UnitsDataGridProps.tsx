@@ -6,11 +6,7 @@ import {getColumnProps} from 'components/DataGridLayout';
 import {FormatDate} from 'models/misc';
 import {StatusChip} from 'components/StatusChip';
 import {toDate} from 'utils/datetime';
-import {
-  ElevatorAssignmentSimpleView,
-  ElevatorOrderField,
-  ElevatorView,
-} from 'models/elevator';
+import {ElevatorOrderField, ElevatorView} from 'models/elevator';
 import {ContractStatus} from 'models/contract';
 import {Actions} from './Action';
 
@@ -120,28 +116,6 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-const getPriorityTechnician = (assignments: ElevatorAssignmentSimpleView[]) => {
-  let {weight} = assignments[0];
-  const tech: ElevatorAssignmentSimpleView[] = [];
-
-  assignments.forEach((i) => {
-    if (i.weight === weight) {
-      tech.push(i);
-    } else if (i.weight > weight) {
-      weight = i.weight;
-      tech.splice(0, tech.length);
-      tech.push(i);
-    }
-  });
-
-  return tech
-    .map(
-      (item) =>
-        `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
-    )
-    .join(', ');
-};
-
 export const makeRows = (
   elevators: ElevatorView[],
   formatDate: FormatDate = () => '',
@@ -166,9 +140,10 @@ export const makeRows = (
       : '-',
     [ElevatorOrderField.ADDRESS]: elevator.address.fullName,
     headerText: elevator.address.fullName,
-    [ElevatorOrderField.ASSIGNED_TECHNICIAN_NAMES]: elevator.assignments.length
-      ? getPriorityTechnician(elevator.assignments)
-      : '-',
+    // [ElevatorOrderField.ASSIGNED_TECHNICIAN_NAMES]: elevator.assignments.length
+    //   ? getPriorityTechnician(elevator.assignments)
+    //   : '-',
+    [ElevatorOrderField.ASSIGNED_TECHNICIAN_NAMES]: '-',
     [ElevatorOrderField.NUMBER_OF_CONTRACTS]:
       !!elevator.contracts.length &&
       elevator.contracts.some(

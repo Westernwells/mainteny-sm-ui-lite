@@ -158,7 +158,10 @@ export const PriorityTechnician = ({
       headerIcon={<UnionIcon style={{width: '2rem', height: '2rem'}} />}
       handleAction={() => onAddButtonClicked()}
       headerActionIcon={
-        <AddOutlinedIcon style={{color: theme.palette.primary.dark}} />
+        <AddOutlinedIcon
+          data-testid="add-technician-button-icon"
+          style={{color: theme.palette.primary.dark}}
+        />
       }>
       {!totalTechnicianRef ? (
         renderNoRowsSection()
@@ -172,6 +175,7 @@ export const PriorityTechnician = ({
           containerStyle={{
             borderBottom: 'none',
           }}
+          testId="priority-engineer-table"
         />
       )}
       {maintainers.length > 3 ? (

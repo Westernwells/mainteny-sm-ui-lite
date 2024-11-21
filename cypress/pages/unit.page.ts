@@ -6,7 +6,7 @@ export default class UnitsPage {
   };
 
   static navigateToDetailsPage = () => {
-    cy.get('div[data-colindex="1"]').eq(0).click();
+    cy.get('td[data-field="ADDRESS"]').eq(0).click();
   };
 
   static navigateToCreatePage = () => {
