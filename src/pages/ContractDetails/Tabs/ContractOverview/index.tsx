@@ -33,10 +33,7 @@ import {
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {
-  calculateRenewDays,
-  transformContractViewComponentToContractRecord,
-} from 'utils/contract';
+import {calculateRenewDays} from 'utils/contract';
 import {ReactComponent as BusinessContractApprove} from 'assets/icons/business-contract-approve-gray.svg';
 import {ReactComponent as TimeIcon} from 'assets/icons/time.svg';
 import {createEmptyResource} from 'utils/paging';
@@ -194,10 +191,6 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
   }, [contractDetails?.end]);
 
   const onContractSave = async () => {
-    const transformedComponentData =
-      transformContractViewComponentToContractRecord(
-        contractDetails.components,
-      );
     const updatedContract: Partial<ContractRequestBody> = {
       ...contractDetails?.additionalInfo,
       type: ContractTypes.SERVICE,
@@ -235,7 +228,6 @@ export const ContractOverview = ({contractDetails, isLoading}: Props) => {
       externalId: formik.values.externalId,
       autoRenewalCancelled: formik.values.autoRenewalCancelled,
       purchaseOrderNumber: formik.values.purchaseOrderNumber,
-      components: transformedComponentData,
     };
 
     await updateContract({
