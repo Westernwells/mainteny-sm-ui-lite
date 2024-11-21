@@ -986,8 +986,8 @@ export const UnitListingView = () => {
                       selectedValue={watchFabricNumber}
                       onChange={field.onChange}
                       type={PropertyType.ELEVATOR_SERIAL_NUMBER}
-                      labelKey="Fabric number"
-                      placeholderKey="Select fabric number"
+                      labelKey="Serial number"
+                      placeholderKey="Select serial number"
                     />
                   )}
                 />
