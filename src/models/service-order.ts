@@ -580,8 +580,8 @@ export interface ServiceOrderScheduleParams {
 export interface ServiceOrderQueryParams {
   elevatorIds?: string[];
   contractIds?: string[];
-  end: string;
-  start: string;
+  end?: string;
+  start?: string;
   pageIndex: number;
   pageSize: number;
   query: string;
@@ -596,6 +596,7 @@ export interface ServiceOrderQueryParams {
   grossAmountFrom?: number;
   grossAmountTo?: number;
   hasComments?: boolean;
+  includeArchived?: boolean;
 }
 
 export interface ServiceOrderActivityView {

@@ -7,11 +7,11 @@ type Props = CellProps & {
   flex?: string;
   gap?: string | number;
   width?: string | number;
-  onClick?: () => void;
   align?: string;
   justifyContent?: string;
   maxWidth?: string;
   fieldName?: string;
+  onClick?: () => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 };
@@ -22,6 +22,8 @@ const Cell = ({
   onClick,
   align = 'left',
   justifyContent,
+  firstSticky = true,
+  lastSticky = true,
   noWidthLimit = false,
   noPadding = false,
   ...cellProps
@@ -38,17 +40,23 @@ const Cell = ({
 
       ...(cellProps.isFirst && {
         borderLeft: 0,
-        left: 0,
-        position: 'sticky',
-        zIndex: 3,
-        backgroundColor: 'white',
+        ...(firstSticky && {
+          backgroundColor: 'white',
+          left: 0,
+          position: 'sticky',
+          zIndex: 3,
+        }),
       }),
+
       ...(cellProps.isLast && {
         borderRight: 0,
-        right: 0,
-        position: 'sticky',
-        zIndex: 3,
-        backgroundColor: 'white',
+
+        ...(lastSticky && {
+          backgroundColor: 'white',
+          right: 0,
+          position: 'sticky',
+          zIndex: 3,
+        }),
       }),
       padding: noPadding ? '0' : '9px 12px',
       ...(cellProps.showShadows === 'left' && {

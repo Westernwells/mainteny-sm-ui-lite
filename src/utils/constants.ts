@@ -20,6 +20,10 @@ export const CUSTOMER_ALL_INVOICE_FORMATS = [
     label: 'PDF & Xinvoice (XML)',
     value: InvoiceFormat.PDF_AND_XML,
   },
+  {
+    label: 'Post',
+    value: InvoiceFormat.POST,
+  },
 ];
 
 export const ALL_EMPLOYEE_EVENT_TYPES = [

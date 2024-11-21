@@ -170,10 +170,9 @@ const Invoices = ({elevatorId}: Props) => {
     {defaultValue: undefined},
   );
 
-  const [selectedJobId, setSelectedJobId] = useQueryState<string | undefined>(
-    'selectedJobId',
-    {defaultValue: undefined},
-  );
+  const [selectedJobNumber, setSelectedJobNumber] = useQueryState<
+    string | undefined
+  >('selectedJobNumber', {defaultValue: undefined});
 
   const [selectedStartDate, setSelectedStartDate] = useQueryState<
     string | undefined
@@ -231,8 +230,9 @@ const Invoices = ({elevatorId}: Props) => {
         search,
         orderNumber: selectedOrderNumber,
         invoiceNumber: selectedInvoiceNumber,
+        jobNumber: selectedJobNumber,
       }),
-    [search, selectedOrderNumber, selectedInvoiceNumber],
+    [search, selectedOrderNumber, selectedInvoiceNumber, selectedJobNumber],
   );
 
   const filters: QueryInvoiceParams = {
@@ -242,13 +242,13 @@ const Invoices = ({elevatorId}: Props) => {
     status: status.includes(InvoiceStatusFilter.ALL)
       ? []
       : (status as unknown as InvoiceStatus[]), // as filter values and statuses are almost identical we can cast it instead of having a mapper
-    serviceOrderTypes: selectedJobTypes,
+    serviceOrderType: selectedJobTypes,
     orderByField: orderByField || InvoiceOrderField.CREATED_DATE,
     order: sortOrder || Order.DESC,
     ...(grossAmountMin &&
-      grossAmountMin > 0 && {grossAmountFrom: grossAmountMin}),
+      grossAmountMin > 0 && {totalGrossAmountFrom: `${grossAmountMin}`}),
     ...(grossAmountMax &&
-      grossAmountMax > 0 && {grossAmountTo: grossAmountMax}),
+      grossAmountMax > 0 && {totalGrossAmountTo: `${grossAmountMax}`}),
     ...(selectedStartDate && {
       sentDateFrom: toRestDate(
         fromDateStringToDate(selectedStartDate, DEFAULT_DATE_FORMAT),
@@ -261,7 +261,7 @@ const Invoices = ({elevatorId}: Props) => {
     }),
     ...(isWithNote === 'true' && {hasComments: true}),
     ...(selectedCustomer && {propertyOwnerId: [selectedCustomer]}),
-    ...(selectedContract && {contractIds: [selectedContract]}),
+    ...(selectedContract && {contractId: [selectedContract]}),
     ...((selectedUnitId || elevatorId) && {
       elevatorId: (elevatorId ? [elevatorId] : [selectedUnitId]) as string[],
     }),
@@ -443,7 +443,7 @@ const Invoices = ({elevatorId}: Props) => {
         key: 'invoice-cell-date',
         width: '124px',
         align: 'right',
-        fieldName: InvoiceOrderField.CREATED_DATE,
+        fieldName: InvoiceOrderField.SENT_DATE,
         getExportValue: (invoice) => formatDate(invoice.date) ?? '',
         renderCell: (invoice, cellProps) => (
           <Cell {...cellProps}>
@@ -657,7 +657,7 @@ const Invoices = ({elevatorId}: Props) => {
       orderNumber: selectedOrderNumber,
       jobTypes: selectedJobTypes ?? [],
       unitId: selectedUnitId,
-      jobId: selectedJobId,
+      jobNumber: selectedJobNumber,
       contractId: selectedContract,
       grossAmountMin,
       grossAmountMax,
@@ -670,7 +670,7 @@ const Invoices = ({elevatorId}: Props) => {
   const watchCustomer = watch('customer');
   const watchContractId = watch('contractId');
   const watchUnitId = watch('unitId');
-  const watchJobId = watch('jobId');
+  const watchJobId = watch('jobNumber');
   const watchHasComment = watch('hasComment');
   const watchGrossMin = watch('grossAmountMin');
   const watchGrossMax = watch('grossAmountMax');
@@ -802,7 +802,7 @@ const Invoices = ({elevatorId}: Props) => {
     setSelectedCustomerId(data.customerId);
     setSelectedContract(data.contractId);
     setSelectedUnitId(data.unitId);
-    setSelectedJobId(data.jobId);
+    setSelectedJobNumber(data.jobNumber);
     setSelectedOrderNumber(data.orderNumber);
     setSelectedJobTypes(data.jobTypes);
     setGrossAmountMin(data.grossAmountMin);
@@ -816,7 +816,7 @@ const Invoices = ({elevatorId}: Props) => {
     setValue('customerId', selectedCustomerId);
     setValue('contractId', selectedContract);
     setValue('unitId', selectedUnitId);
-    setValue('jobId', selectedJobId);
+    setValue('jobNumber', selectedJobNumber);
     setValue('orderNumber', selectedOrderNumber);
     setValue('jobTypes', selectedJobTypes ?? []);
     setValue('grossAmountMin', grossAmountMin);
@@ -830,7 +830,7 @@ const Invoices = ({elevatorId}: Props) => {
     setValue('customerId', undefined);
     setValue('contractId', undefined);
     setValue('unitId', undefined);
-    setValue('jobId', undefined);
+    setValue('jobNumber', undefined);
     setValue('orderNumber', undefined);
     setValue('jobTypes', []);
     setValue('grossAmountMin', undefined);
@@ -846,7 +846,7 @@ const Invoices = ({elevatorId}: Props) => {
         selectedCustomerId,
         selectedContract,
         selectedUnitId,
-        selectedJobId,
+        selectedJobNumber,
         selectedOrderNumber,
         isWithNote,
       ].filter((field) => !!field).length +
@@ -859,7 +859,7 @@ const Invoices = ({elevatorId}: Props) => {
       selectedCustomerId,
       selectedContract,
       selectedUnitId,
-      selectedJobId,
+      selectedJobNumber,
       selectedOrderNumber,
       selectedJobTypes,
       grossAmountMin,
@@ -938,7 +938,7 @@ const Invoices = ({elevatorId}: Props) => {
     }
 
     return {emptyTable: false, noMatchingData: false};
-  }, [isFetched, invoiceResource]);
+  }, [appliedFilterNumber, isFetched, invoiceResource]);
 
   const showXeroInfoRender = () => (
     <Box>{xeroInfoData?.enabled ? lastSyncedText : ''}</Box>
@@ -1050,7 +1050,7 @@ const Invoices = ({elevatorId}: Props) => {
                       value={value}
                       onChange={onChange}
                       size="small"
-                      labelKey="Perchase order number"
+                      labelKey="Purchase order number"
                       placeholder="Search job number"
                     />
                   )}
@@ -1084,10 +1084,11 @@ const Invoices = ({elevatorId}: Props) => {
                 <Box sx={{display: 'flex'}} gap={2}>
                   <Controller
                     control={control}
-                    name="jobId"
+                    name="jobNumber"
                     render={({field}) => (
                       <ServiceOrderIdInput
                         selectedValue={watchJobId}
+                        useExternalIdAsValue
                         onChange={field.onChange}
                       />
                     )}
@@ -1166,6 +1167,7 @@ const Invoices = ({elevatorId}: Props) => {
                         data-testid="invoice-filter-note-checkbox"
                         checked={watchHasComment}
                         onChange={field.onChange}
+                        sx={{padding: 0}}
                       />
                     )}
                   />

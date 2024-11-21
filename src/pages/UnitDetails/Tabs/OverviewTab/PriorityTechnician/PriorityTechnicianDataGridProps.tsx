@@ -12,6 +12,7 @@ import Box from '@mui/material/Box';
 import {ElevatorAssignmentSimpleView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
 import {theme} from 'theme';
+import {sortTechniciansByPriority} from 'utils/elevator-utils';
 
 const defaultProps = (isLink: boolean) => ({
   editable: false,
@@ -110,18 +111,12 @@ export const columns = (
 export const makeRows = (
   maintainers: ElevatorAssignmentSimpleView[],
 ): GridRowsProp =>
-  maintainers
-    .sort((a, b) =>
-      a.technician.userAccount.firstName.localeCompare(
-        b.technician.userAccount.firstName,
-      ),
-    )
-    .map((maintainer) => ({
-      id: maintainer.technician.id,
-      number: maintainer.technician.externalId,
-      name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,
-      address: maintainer.technician.address.fullName,
-      priority: maintainer.weight,
-      actions: maintainer,
-      navigateTo: `/employees/details/${maintainer.technician.userAccount.id}`,
-    }));
+  maintainers.sort(sortTechniciansByPriority).map((maintainer) => ({
+    id: maintainer.technician.id,
+    number: maintainer.technician.externalId,
+    name: `${maintainer.technician.userAccount.firstName} ${maintainer.technician.userAccount.lastName}`,
+    address: maintainer.technician.address.fullName,
+    priority: maintainer.weight,
+    actions: maintainer,
+    navigateTo: `/employees/details/${maintainer.technician.userAccount.id}`,
+  }));

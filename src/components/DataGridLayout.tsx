@@ -50,6 +50,7 @@ interface Props extends DataGridProps {
   scrollToTop?: any;
   isEvenRowDifferentColor?: boolean;
   lastSyncedText?: string;
+  testId?: string;
 }
 
 interface ColumnProps extends GridColDef {
@@ -149,6 +150,7 @@ export const DataGridLayout = ({
   scrollToTop,
   lastSyncedText,
   isEvenRowDifferentColor,
+  testId,
   ...rest
 }: Props) => {
   const navigate = useNavigate();
@@ -243,7 +245,8 @@ export const DataGridLayout = ({
         flexGrow: fullHeight ? 1 : 'unset',
         display: 'flex',
         ...(!fullHeight && {height}),
-      }}>
+      }}
+      data-testid={testId}>
       <DataGrid
         ref={gridRef}
         components={{
