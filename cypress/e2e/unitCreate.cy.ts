@@ -43,7 +43,7 @@ describe('Create Unit', () => {
         cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/propertyOwners*`).as('customerApi');
 
         const customerSearchValue = 'E2E test';
-        const expectedSearchTerm = `[name:*E2E**test*]`;
+        const expectedSearchTerm = `[name:*E2E*][name:*test*]`;
 
         UnitsPage.navigateToCreatePage();
         cy.get('span[role="progressbar"]').should('not.exist');
