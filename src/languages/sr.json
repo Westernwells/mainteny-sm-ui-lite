@@ -2949,5 +2949,7 @@
   "Model number": "Broj modela",
   "No Purchase Invoices": "Nema faktura za kupovinu",
   "Create a new purchase invoice to start working and tracking its progress": "Napravite novu fakturu za kupovinu da biste počeli da radite i pratite njen napredak",
-  "Enter description here...": "Ovde unesite opis..."
+  "Enter description here...": "Ovde unesite opis...",
+  "Create a new quotation to offer clients tailored service proposals and pricing, ready to be sent out.": "Napravite novu ponudu da biste klijentima ponudili prilagođene predloge usluga i cene, spremne za slanje.",
+  "New Purchase Invoice": "Nova faktura za kupovinu"
 }
