@@ -232,6 +232,7 @@ export const MutationService = ({
       costType: values?.costType,
       elevators: elevatorsToSave,
       orderType: values?.orderType,
+      componentId: values?.id,
     } as UpdateContractComponents;
 
     existingData.splice(index, 0, itemToMutate);
@@ -265,6 +266,7 @@ export const MutationService = ({
         costType: values?.costType,
         elevators: elevatorsToSave || [],
         orderType: values?.orderType,
+        componentId: values?.id,
       },
       ...componentsToMutate(updatedComponentsToSave),
     ];
