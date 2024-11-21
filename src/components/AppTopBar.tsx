@@ -97,6 +97,16 @@ export const AppTopBar = ({
     </Box>
   );
 
+  const checkIfCompanyIsGermanSpeaking = () => {
+    if (user?.userAccount.roles.includes(Role.SERVICE_MANAGER)) {
+      const {billingAddress} = user.userAccount.serviceCompany;
+      if (billingAddress?.countryCode) {
+        return ['DE', 'AT', 'CH'].includes(billingAddress?.countryCode);
+      }
+    }
+    return false;
+  };
+
   return (
     <Box
       sx={{
@@ -116,9 +126,10 @@ export const AppTopBar = ({
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" mt={1} alignItems="center">
             {user &&
-              checkIfCompanyIsInWhiteList(
-                user?.userAccount.serviceCompany.id,
-              ) && (
+              (checkIfCompanyIsGermanSpeaking() ||
+                checkIfCompanyIsInWhiteList(
+                  user?.userAccount.serviceCompany.id,
+                )) && (
                 <Box mr={2} display="flex" alignItems="center">
                   <KalasarSearchComponent />
                 </Box>
