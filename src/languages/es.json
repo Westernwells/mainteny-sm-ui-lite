@@ -2949,5 +2949,8 @@
   "Next inspection": "Próxima inspección",
   "Model number": "Número de modelo",
   "No Purchase Invoices": "Sin facturas de compra",
-  "Create a new purchase invoice to start working and tracking its progress": "Crea una nueva factura de compra para empezar a trabajar y seguir su progreso."
+  "Create a new purchase invoice to start working and tracking its progress": "Crea una nueva factura de compra para empezar a trabajar y seguir su progreso.",
+  "Enter description here...": "Introduzca la descripción aquí...",
+  "Create a new quotation to offer clients tailored service proposals and pricing, ready to be sent out.": "Cree un nuevo presupuesto para ofrecer a los clientes propuestas de servicios y precios personalizados, listos para su envío.",
+  "New Purchase Invoice": "Nueva factura de compra"
 }
