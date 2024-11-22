@@ -1189,10 +1189,12 @@ const NewPurchaseInvoice = ({
                                     `vatAmounts.${index}.percentageVat`,
                                     floatValue,
                                   );
-                                  setValue(
-                                    `vatAmounts.${index}.vat`,
-                                    watchedNetAmount * (floatValue / 100),
-                                  );
+                                  if (vatAmounts.length <= 1) {
+                                    setValue(
+                                      `vatAmounts.${index}.vat`,
+                                      watchedNetAmount * (floatValue / 100),
+                                    );
+                                  }
                                 } else {
                                   setValue(`vatAmounts.${index}.vat`, 0);
                                   setValue(
@@ -1266,10 +1268,13 @@ const NewPurchaseInvoice = ({
                                     `vatAmounts.${index}.vat`,
                                     floatValue,
                                   );
-                                  setValue(
-                                    `vatAmounts.${index}.percentageVat`,
-                                    percentageVat,
-                                  );
+
+                                  if (vatAmounts.length <= 1) {
+                                    setValue(
+                                      `vatAmounts.${index}.percentageVat`,
+                                      percentageVat,
+                                    );
+                                  }
                                 } else {
                                   setValue(`vatAmounts.${index}.vat`, 0);
                                   setValue(
