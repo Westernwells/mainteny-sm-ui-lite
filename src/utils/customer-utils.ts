@@ -64,3 +64,9 @@ export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {
     }
   }
 };
+
+export const createNameSearchQuery = (value: string) =>
+  value
+    .split(' ')
+    .map((word) => `[name:*${word}*]`)
+    .join('');
