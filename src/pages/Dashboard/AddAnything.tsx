@@ -22,8 +22,8 @@ import ListItemText from '@mui/material/ListItemText';
 import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
-import {iconMapping} from 'pages/Settings/Automations/Job/JobTypes/DataList';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import {iconMapping} from 'pages/ServiceOrders';
 
 interface Props extends ButtonProps {
   label?: string;

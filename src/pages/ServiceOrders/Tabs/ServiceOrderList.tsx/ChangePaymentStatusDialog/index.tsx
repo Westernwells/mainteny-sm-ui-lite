@@ -116,7 +116,7 @@ const ChangePaymentStatusDialog = ({open, id, onClose}: Props) => {
           <Select
             labelId="change-payment-status-select-label"
             id="change-payment-status-select"
-            data-testId="change-payment-status-select"
+            data-testid="change-payment-status-select"
             value={selectedStatus}
             fullWidth
             label={t('Job Payment Status')}

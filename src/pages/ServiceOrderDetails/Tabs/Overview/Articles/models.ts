@@ -8,4 +8,7 @@ export interface EditArticleFormModel {
   type: ArticleType;
   costPackage?: CostPackage;
   unitPurchaseAmountCurrency: string;
+  externalId?: string;
+  description?: string;
+  unitPurchaseAmount?: number;
 }

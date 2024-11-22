@@ -13,6 +13,18 @@ export default defineConfig(() => ({
   // comment this out if that isn't relevant for your project
   build: {
     outDir: 'build',
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
+      },
+    },
+  },
+  server: {
+    watch: {
+      ignored: ['**/coverage/**'],
+    },
   },
   plugins: [
     react(),

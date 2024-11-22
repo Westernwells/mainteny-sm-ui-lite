@@ -404,6 +404,21 @@ export const AppDrawer = ({open, setOpen}: Props) => {
             navigate('/quotations');
           },
         },
+        {
+          text: 'Purchase Invoices',
+          path: '/purchase-invoices',
+          access: !isAdmin,
+          onClick: (
+            e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+            index: number,
+          ) => {
+            e.preventDefault();
+
+            setSelectedIndex(index);
+            setSelectedPath('/purchase-invoices');
+            navigate('/purchase-invoices');
+          },
+        },
       ],
     },
 

@@ -38,7 +38,7 @@ export const BottomDrawer = ({
   isValid,
   primaryButtonLabel,
   primaryButtonAction,
-  listItems,
+  listItems = [],
   secondaryButton,
   isSaving,
   buttonWrapperStyles,
@@ -87,7 +87,7 @@ export const BottomDrawer = ({
             </MuiButton>
           )}
 
-          {listItems.length > 0 && (
+          {listItems.length! > 0 && (
             <IconButton
               disabled={!isValid || isSaving}
               onClick={handleClick}

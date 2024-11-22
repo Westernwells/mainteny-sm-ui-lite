@@ -6259,9 +6259,15 @@ export const countriesOptions = countries.map((c) => ({
   value: c.name,
 }));
 
+const countryNameMap: Record<string, string> = {
+  Deutschland: 'Germany',
+  Serbien: 'Serbia',
+  'Vereinigtes Königreich': 'United Kingdom',
+};
+
 export const getStatesByCountry = (country: string) =>
   countries
-    .find((c) => c.name === country)
+    .find((c) => c.name === (countryNameMap[country] || country))
     ?.states.map((s) => ({label: s, value: s})) || [];
 
 export const countryToCode: {[key: string]: string} = {

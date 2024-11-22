@@ -7,6 +7,7 @@ export default class UnitsPage {
 
   static navigateToDetailsPage = () => {
     cy.get('td[data-field="ADDRESS"]').eq(0).click();
+    cy.waitForSpinnerToDisappear();
   };
 
   static navigateToCreatePage = () => {

@@ -1,4 +1,4 @@
-import {capitalize, isEqual} from 'lodash';
+import {isEqual} from 'lodash';
 import TableFilter from '../utils/tableFilter';
 import {InvoiceStatusView} from '../../src/models/invoice';
 import {mapInvoiceStatus, navigateCy} from '../utils/utils';
@@ -31,8 +31,9 @@ export default class InvoiceListingPage {
   };
 
   static filterInvoicesListByStatus = (status: InvoiceStatusView) => {
-    const statusString = capitalize(status);
-    cy.contains('button', statusString).click({force: true});
+    cy.contains('button', new RegExp(`^${status}[a-zA-Z]*`)).click({
+      force: true,
+    });
   };
 
   static waitForInvoiceApi = (
@@ -133,7 +134,7 @@ export default class InvoiceListingPage {
     cy.wait('@getInvoices').then((interception) => {
       const invoiceId = interception.response.body?.data?.[0]?.id;
       if (invoiceId) {
-        cy.get('td[role="cell"][data-field="CREATED_DATE"]').eq(0).click();
+        cy.get('td[role="cell"][data-field="SENT_DATE"]').eq(0).click();
         cy.url().should('contain', `${invoiceId}`);
       } else {
         cy.log('Unable to retrieve invoice ID from the intercepted data.');

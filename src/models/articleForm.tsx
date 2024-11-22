@@ -24,6 +24,7 @@ export interface ArticleBasicFormModel {
     materialPercentage?: number;
   };
   quantity?: number;
+  description?: string;
 }
 
 export interface ArticleDescriptionFormModel {

@@ -40,6 +40,7 @@ interface Props {
   isCropped?: boolean;
   children?: React.ReactNode;
   isWrapper?: boolean;
+  bgColor?: string;
 }
 
 type FileErrors = {
@@ -69,6 +70,7 @@ export const MyDropZone = forwardRef(
       cropperTitle,
       children,
       isWrapper = false,
+      bgColor,
     }: Props,
     ref,
   ) => {
@@ -297,7 +299,7 @@ export const MyDropZone = forwardRef(
               alignItems: 'center',
               justifyContent: 'center',
               gap: '1rem',
-              backgroundColor: theme.palette.inputBackground.main,
+              backgroundColor: bgColor || theme.palette.inputBackground.main,
               border: `${
                 isWrapper ? 'none' : '2px dashed rgba(143, 155, 179, 0.5)'
               }`,

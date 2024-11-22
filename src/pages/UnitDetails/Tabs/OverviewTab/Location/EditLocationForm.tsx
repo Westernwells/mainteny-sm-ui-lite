@@ -70,7 +70,11 @@ export const EditLocationForm = ({
         </Grid>
         <Grid item xs={12}>
           <AddressAutoComplete
-            initialValue={formik.values.address?.component?.street || ''}
+            initialValue={
+              formik.values.address?.component?.street ||
+              formik.values.address?.fullName ||
+              ''
+            }
             initialAddress={formik.values.address}
             inputError={
               getIn(formik.errors, 'address.fullName') &&
