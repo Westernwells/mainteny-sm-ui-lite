@@ -1,4 +1,4 @@
-import {capitalize, isEqual} from 'lodash';
+import {isEqual} from 'lodash';
 import TableFilter from '../utils/tableFilter';
 import {InvoiceStatusView} from '../../src/models/invoice';
 import {mapInvoiceStatus, navigateCy} from '../utils/utils';
@@ -31,8 +31,9 @@ export default class InvoiceListingPage {
   };
 
   static filterInvoicesListByStatus = (status: InvoiceStatusView) => {
-    const statusString = capitalize(status);
-    cy.contains('button', statusString).click({force: true});
+    cy.contains('button', new RegExp(`^${status}[a-zA-Z]*`)).click({
+      force: true,
+    });
   };
 
   static waitForInvoiceApi = (
