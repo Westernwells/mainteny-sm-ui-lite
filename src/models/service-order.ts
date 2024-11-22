@@ -772,3 +772,8 @@ export type ServiceOrderStatistics = {
   numOfServiceOrdersPerStatus: Record<string, number>;
   numOfServiceOrdersPerType: Record<string, number>;
 };
+
+export interface ServiceOrderNameChangedRecord {
+  fromName: string;
+  toName: string;
+}

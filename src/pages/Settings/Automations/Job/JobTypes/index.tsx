@@ -167,7 +167,32 @@ const JobTypes = () => {
 
   const handleCreateOrUpdate = async () => {
     const updatedJobTypes = [...watchedFields];
+
     let successMessage = 'Job type created successfully';
+
+    const changedServiceOrderNames = jobTypes?.map((originalJobType, index) => {
+      const updatedJob = updatedJobTypes[index];
+
+      if (!updatedJob) {
+        return {
+          fromName: originalJobType.name,
+          toName: '',
+        };
+      }
+
+      return {
+        fromName: originalJobType.name,
+        toName: updatedJob.name !== originalJobType.name ? updatedJob.name : '',
+      };
+    });
+
+    // Handle additional entries in updatedJobTypes (newly added job types)
+    updatedJobTypes.slice(jobTypes?.length).forEach((newJobType) => {
+      changedServiceOrderNames?.push({
+        fromName: '',
+        toName: newJobType.name,
+      });
+    });
 
     if (deleteEventState.event) {
       if (contractResource.total > 0) {
@@ -178,7 +203,10 @@ const JobTypes = () => {
 
         await updateCompanyJobTypes({
           companyId: user?.userAccount.serviceCompany.id!,
-          body: updatedJobTypes,
+          body: {
+            serviceOrderTypes: updatedJobTypes,
+            changedServiceOrderNames,
+          },
         });
 
         enqueueSnackbar(t(`${successMessage}`), {variant: 'success'});
@@ -186,7 +214,10 @@ const JobTypes = () => {
     } else {
       await updateCompanyJobTypes({
         companyId: user?.userAccount.serviceCompany.id!,
-        body: updatedJobTypes,
+        body: {
+          serviceOrderTypes: updatedJobTypes,
+          changedServiceOrderNames,
+        },
       });
 
       enqueueSnackbar(t(`${successMessage}`), {variant: 'success'});
