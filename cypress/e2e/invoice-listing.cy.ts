@@ -116,8 +116,8 @@ describe('Invoice listing page', () => {
         cy.url().should('include', 'grossAmountMax');
 
         cy.wait('@invoicesURL').then((interception) => {
-            expect(interception.request.url).to.include(`grossAmountFrom=${minValue}`);
-            expect(interception.request.url).to.include(`grossAmountTo=${maxValue}`);
+            expect(interception.request.url).to.include(`totalGrossAmountFrom=${minValue}`);
+            expect(interception.request.url).to.include(`totalGrossAmountTo=${maxValue}`);
         });
     });
 

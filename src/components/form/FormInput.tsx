@@ -98,8 +98,13 @@ export const FormInput = forwardRef(
             }
             error={fieldProps?.error}
             decimalScale={2}
-            inputProps={fieldProps?.inputProps} // eslint-disable-next-line react/jsx-no-duplicate-props
-            InputProps={fieldProps?.InputProps}
+            InputProps={{
+              ...fieldProps?.InputProps,
+              style: {
+                paddingTop: '3px',
+                paddingBottom: '0px',
+              },
+            }}
             getInputRef={ref}
             customInput={TextField}
             decimalSeparator={
@@ -114,9 +119,14 @@ export const FormInput = forwardRef(
           />
         ) : (
           <TextField
+            InputProps={{
+              style: {
+                paddingTop: '3px',
+                paddingBottom: '0px',
+              },
+            }}
             InputLabelProps={{
               shrink: true,
-
               ...inputLabelProps,
             }}
             size="small"

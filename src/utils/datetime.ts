@@ -306,3 +306,6 @@ export const fromDateStringToDate = (
 
   return new Date(dateString);
 };
+
+export const toRestDateTimeFormat = (date: Date) =>
+  format(date, "yyyy-MM-dd'T'HH:mm:ss'Z'");

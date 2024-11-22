@@ -26,33 +26,9 @@ import {
 } from 'models/service-order';
 import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
-import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
-import PhoneInTalkOutlinedIcon from '@mui/icons-material/PhoneInTalkOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import LoopOutlinedIcon from '@mui/icons-material/LoopOutlined';
-import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
-import MemoryOutlinedIcon from '@mui/icons-material/MemoryOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-import HandymanOutlinedIcon from '@mui/icons-material/HandymanOutlined';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import WbIncandescentOutlinedIcon from '@mui/icons-material/WbIncandescentOutlined';
-import WeekendOutlinedIcon from '@mui/icons-material/WeekendOutlined';
-import WifiTetheringOutlinedIcon from '@mui/icons-material/WifiTetheringOutlined';
-import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
-import ZoomOutMapOutlinedIcon from '@mui/icons-material/ZoomOutMapOutlined';
-import TextsmsOutlinedIcon from '@mui/icons-material/TextsmsOutlined';
-import WaterDamageOutlinedIcon from '@mui/icons-material/WaterDamageOutlined';
-import WatchOutlinedIcon from '@mui/icons-material/WatchOutlined';
-import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
-import VolumeDownOutlinedIcon from '@mui/icons-material/VolumeDownOutlined';
-import VideoCameraFrontOutlinedIcon from '@mui/icons-material/VideoCameraFrontOutlined';
-import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import TwoWheelerOutlinedIcon from '@mui/icons-material/TwoWheelerOutlined';
-import UmbrellaOutlinedIcon from '@mui/icons-material/UmbrellaOutlined';
-import ElevatorOutlinedIcon from '@mui/icons-material/ElevatorOutlined';
 import {generateOptions} from 'utils/settings';
 import {IconPicker} from 'components/IconPicker';
+import {iconMapping} from 'pages/ServiceOrders';
 import {Actions} from './Actions';
 
 interface StyledProps {
@@ -148,34 +124,6 @@ const menuProps = {
       maxHeight: 230,
     },
   },
-};
-
-export const iconMapping = {
-  LoopOutlinedIcon,
-  WarningAmberOutlinedIcon,
-  SettingsOutlinedIcon,
-  PhoneInTalkOutlinedIcon,
-  BuildOutlinedIcon,
-  MemoryOutlinedIcon,
-  SearchOutlinedIcon,
-  RemoveRedEyeOutlinedIcon,
-  HandymanOutlinedIcon,
-  WbIncandescentOutlinedIcon,
-  WeekendOutlinedIcon,
-  WifiTetheringOutlinedIcon,
-  WorkOutlineOutlinedIcon,
-  ZoomOutMapOutlinedIcon,
-  TextsmsOutlinedIcon,
-  WaterDamageOutlinedIcon,
-  WatchOutlinedIcon,
-  VpnKeyOutlinedIcon,
-  VolumeDownOutlinedIcon,
-  VideoCameraFrontOutlinedIcon,
-  VerifiedUserOutlinedIcon,
-  TwoWheelerOutlinedIcon,
-  UmbrellaOutlinedIcon,
-  ElevatorOutlinedIcon,
-  HelpOutlineOutlinedIcon,
 };
 
 export const PriorityCircle = styled(Box)(({color}) => ({

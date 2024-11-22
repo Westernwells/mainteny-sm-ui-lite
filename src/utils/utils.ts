@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx';
 import BigNumber from 'bignumber.js';
 import * as Yup from 'yup';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
-import lodash from 'lodash';
+import {get} from 'lodash';
 import {TFunction} from 'i18next';
 import {
   FILE_DESCRIPTION_PREFIXES,
@@ -550,7 +550,7 @@ export const filterArrayBySearchText = <T>(
     ? items.filter((item) => {
         const lowerCaseSearchText = searchText.toLowerCase();
         return propNames.some((propName) =>
-          String(lodash.get(item, propName))
+          String(get(item, propName))
             .toLowerCase()
             .includes(lowerCaseSearchText),
         );

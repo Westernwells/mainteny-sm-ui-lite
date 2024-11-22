@@ -116,13 +116,13 @@ export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
         articleId: item.article.id,
         article: {
           id: item.article.id,
-          externalId: item.article.externalId,
+          externalId: formikValues?.externalId || item.article.externalId,
           type: formikValues!.type,
           unit: formikValues!.unit,
           costPackage: formikValues!.costPackage!,
         },
         name: formikValues!.name,
-        description: item.description,
+        description: formikValues?.description || '',
         quantity: Number(formikValues!.quantity!),
         unitAmount: amountRecordForBackend(
           makeAmountRecord(
@@ -190,7 +190,7 @@ export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
         onSave={() => handleUpdateArticle()}
         isSaving={isLoading}
         dialogProps={{
-          maxWidth: 'lg',
+          maxWidth: 'md',
           open: openEditDialog,
         }}>
         <EditArticleForm
