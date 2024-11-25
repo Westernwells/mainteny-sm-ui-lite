@@ -225,7 +225,9 @@ export const deserialize = (el: HTMLElement) => {
 
   if (TEXT_TAGS[nodeName]) {
     const attrs = TEXT_TAGS[nodeName](el);
-    return children.map((child) => jsx('text', attrs, child));
+    return children.map((child) =>
+      jsx('text', attrs, typeof child === 'string' ? {text: child} : child),
+    );
   }
 
   return children;
