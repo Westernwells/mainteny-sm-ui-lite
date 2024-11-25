@@ -167,28 +167,31 @@ const JobTypes = () => {
 
   const handleCreateOrUpdate = async () => {
     const updatedJobTypes = [...watchedFields];
-
     let successMessage = 'Job type created successfully';
 
-    const changedServiceOrderNames = jobTypes?.map((originalJobType, index) => {
-      const updatedJob = updatedJobTypes[index];
+    let changedServiceOrderNames =
+      jobTypes?.map((originalJobType, index) => {
+        const updatedJob = updatedJobTypes[index];
 
-      if (!updatedJob) {
+        if (!updatedJob) {
+          return {
+            fromName: originalJobType.name,
+            toName: '',
+          };
+        }
+
         return {
           fromName: originalJobType.name,
-          toName: '',
+          toName:
+            updatedJob.name !== originalJobType.name
+              ? updatedJob.name
+              : originalJobType.name,
         };
-      }
-
-      return {
-        fromName: originalJobType.name,
-        toName: updatedJob.name !== originalJobType.name ? updatedJob.name : '',
-      };
-    });
+      }) || [];
 
     // Handle additional entries in updatedJobTypes (newly added job types)
     updatedJobTypes.slice(jobTypes?.length).forEach((newJobType) => {
-      changedServiceOrderNames?.push({
+      changedServiceOrderNames.push({
         fromName: '',
         toName: newJobType.name,
       });
@@ -198,8 +201,18 @@ const JobTypes = () => {
       if (contractResource.total > 0) {
         setOpenWarningModal(true);
       } else {
-        updatedJobTypes.splice(deleteEventState.index!, 1);
+        const deletedJobType = updatedJobTypes.splice(
+          deleteEventState.index!,
+          1,
+        )[0];
         successMessage = 'Job type deleted successfully';
+
+        // Filter out the deleted item from `changedServiceOrderNames`
+        changedServiceOrderNames = changedServiceOrderNames.filter(
+          (entry) =>
+            entry.fromName !== deletedJobType.name &&
+            entry.toName !== deletedJobType.name,
+        );
 
         await updateCompanyJobTypes({
           companyId: user?.userAccount.serviceCompany.id!,
