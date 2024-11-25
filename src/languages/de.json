@@ -1996,7 +1996,7 @@
   "Per Article": "Je Artikel ",
   "Total amount:": "Gesamtbetrag:",
   "Partial Payments": "Teilzahlung",
-  "Amount (excl. VAT)": "Betrag (ohne MwSt.)",
+  "Amount (excl. VAT)": "Betrag (netto)",
   "Total amount (excl. VAT)": "Gesamtbetrag (ohne MwSt.)",
   "Portion %": "Anteil in %",
   "Amount to be paid": "Zu zahlender Betrag",
@@ -2927,9 +2927,13 @@
   "Next inspection": "Nächste Inspektion",
   "Model number": "Modell",
   "No Purchase Invoices": "Keine Eingangsrechnungen",
-  "Create a new purchase invoice to start working and tracking its progress": "Neie Eingangsrechnungen anlegen und beginnen zu bearbeiten",
+  "Create a new purchase invoice to start working and tracking its progress": "Neue Eingangsrechnungen anlegen, um alle Kosten im Blick zu halten",
   "Enter description here...": "Beschreibung eintragen",
   "Create a new quotation to offer clients tailored service proposals and pricing, ready to be sent out.": "Erstellen Sie ein neues Angebot, um Kunden maßgeschneiderte Servicevorschläge und Preisgestaltungen anzubieten, die direkt versendet werden können.",
   "New Purchase Invoice": "Neue Eingangsrechnung",
-  "Select serial number": "Wähle Fabriknummer"
+  "Sent to client": "An Kunden gesendet",
+  "No quotations": "Keine Angebote",
+  "Select serial number": "Wähle Fabriknummer",
+  "Quote(s) with notes": "Notizen",
+  "Net amount": "Betrag (netto)"
 }

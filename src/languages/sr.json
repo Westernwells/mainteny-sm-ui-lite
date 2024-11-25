@@ -2952,5 +2952,9 @@
   "Enter description here...": "Ovde unesite opis...",
   "Create a new quotation to offer clients tailored service proposals and pricing, ready to be sent out.": "Napravite novu ponudu da biste klijentima ponudili prilagođene predloge usluga i cene, spremne za slanje.",
   "New Purchase Invoice": "Nova faktura za kupovinu",
-  "Select serial number": "Izaberite serijski broj"
+  "Sent to client": "Poslato klijentu",
+  "No quotations": "Bez citata",
+  "Select serial number": "Izaberite serijski broj",
+  "Quote(s) with notes": "Citati sa beleškama",
+  "Net amount": "Neto iznos"
 }
