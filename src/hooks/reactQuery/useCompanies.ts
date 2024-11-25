@@ -32,7 +32,11 @@ import {
   UseQueryOptions,
 } from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
-import {ServiceOrder, ServiceOrderTypeRecord} from 'models/service-order';
+import {
+  ServiceOrder,
+  ServiceOrderNameChangedRecord,
+  ServiceOrderTypeRecord,
+} from 'models/service-order';
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {
@@ -654,6 +658,7 @@ export const updateCompanyServiceOrderTypes = async (
   companyId: string,
   body: {
     serviceOrderTypes: ServiceOrderTypeRecord[];
+    changedServiceOrderNames?: ServiceOrderNameChangedRecord[];
   },
 ) => {
   const response = await axiosClient.put<ServiceOrderTypeRecord[]>(
@@ -670,17 +675,19 @@ export const useUpdateCompanyJobTypes = () => {
   return useMutation<
     ServiceOrderTypeRecord[],
     unknown,
-    {body: ServiceOrderTypeRecord[]; companyId: string}
-  >(
-    ({body, companyId}) =>
-      updateCompanyServiceOrderTypes(companyId, {serviceOrderTypes: body}),
     {
-      onSuccess: async () => {
-        queryClient.invalidateQueries(queryKeys.fetchCompanyJobTypes);
-      },
-      onError: (err) => {
-        showError(err);
-      },
+      body: {
+        serviceOrderTypes: ServiceOrderTypeRecord[];
+        changedServiceOrderNames?: ServiceOrderNameChangedRecord[];
+      };
+      companyId: string;
+    }
+  >(({body, companyId}) => updateCompanyServiceOrderTypes(companyId, body), {
+    onSuccess: async () => {
+      queryClient.invalidateQueries(queryKeys.fetchCompanyJobTypes);
     },
-  );
+    onError: (err) => {
+      showError(err);
+    },
+  });
 };

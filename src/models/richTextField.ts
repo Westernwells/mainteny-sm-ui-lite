@@ -82,20 +82,18 @@ export const TEXT_TAGS: Record<
     | undefined
 > = {
   STRONG: () => ({bold: true}),
+  B: () => ({bold: true}),
   EM: () => ({italic: true}),
+  I: () => ({italic: true}),
   U: () => ({underlined: true}),
-  DIV: (el: HTMLElement) =>
-    el.style?.fontSize
-      ? {
-          fontSize: el.style?.fontSize,
-        }
-      : {},
-  SPAN: (el: HTMLElement) =>
-    el.style?.fontSize
-      ? {
-          fontSize: el.style.fontSize,
-        }
-      : {},
+  SPAN: (el: HTMLElement) => {
+    const fontSize = el.style?.fontSize;
+    return fontSize ? {fontSize} : undefined;
+  },
+  DIV: (el: HTMLElement) => {
+    const fontSize = el.style?.fontSize;
+    return fontSize ? {fontSize} : undefined;
+  },
 };
 
 export interface BaseText {

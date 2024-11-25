@@ -404,3 +404,27 @@ export const isUnitSelected = (unit: {
   isChecked?: boolean;
   isSelected?: boolean;
 }) => unit.isChecked || unit.isSelected;
+
+export const transformContractViewComponentToContractRecord = (
+  components: ContractComponentView[],
+): ContractComponentRecord[] =>
+  components.map((component) => ({
+    componentId: component.id,
+    name: component.name,
+    group: component.group,
+    elevators: component.additionalInfo.elevators.map((elevator) => ({
+      elevatorId: elevator.elevatorId,
+      invoiceJob: elevator.invoiceJob,
+      orderGenerationJob: elevator.orderGenerationJob,
+      price: elevator.price,
+    })),
+    firstInvoiceDate: component.additionalInfo.firstInvoiceDate
+      ? component.additionalInfo.firstInvoiceDate
+      : undefined,
+    firstOrderDate: component.additionalInfo.firstOrderDate
+      ? component.additionalInfo.firstOrderDate
+      : undefined,
+    costType: component.additionalInfo.costType,
+    costPackage: component.additionalInfo.costPackage,
+    orderType: component.additionalInfo.orderType ?? undefined,
+  }));
