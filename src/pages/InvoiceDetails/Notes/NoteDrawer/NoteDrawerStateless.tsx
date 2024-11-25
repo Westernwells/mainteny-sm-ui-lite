@@ -4,10 +4,10 @@ import {Button} from 'components/Button';
 import {TabItems, Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
 import InvoiceNotes from 'pages/InvoiceDetails/Notes/EditNotes/InvoiceNotes';
-import CustomerNotes from 'pages/InvoiceDetails/Notes/EditNotes/CustomerNotes';
 import {InvoiceView} from 'models/invoice';
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import CustomerNotes from 'components/CustomerNotes';
 
 export type Props = {
   invoice: InvoiceView;
@@ -146,7 +146,10 @@ const NoteDrawerStateless = ({
           <InvoiceNotes invoice={invoice} onChange={onChange} />
         </TabsBody>
         <TabsBody value={tabValue} index={TabIndex.Customer}>
-          <CustomerNotes invoice={invoice} onChange={onChange} />
+          <CustomerNotes
+            propertyOwnerId={invoice.propertyOwner.id}
+            onChange={onChange}
+          />
         </TabsBody>
       </Tabs>
     </Drawer>

@@ -2,12 +2,7 @@ import {Box} from '@mui/system';
 import {useNavigate} from 'react-router-dom';
 import React, {useEffect, useMemo, useRef} from 'react';
 import {useQueryState} from 'hooks/useQueryState';
-import {
-  calculateTotalPages,
-  createEmptyResource,
-  makePage,
-  toggleOrder,
-} from 'utils/paging';
+import {createEmptyResource, makePage, toggleOrder} from 'utils/paging';
 import {ELEMENTS_PER_PAGE_OPTIONS, OrderByParams} from 'models/pagination';
 import {useQueryArticleSuppliers} from 'hooks/reactQuery/useArticle';
 import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
@@ -137,15 +132,6 @@ const Suppliers = () => {
     {keepPreviousData: true},
   );
 
-  const totalPages = useMemo(
-    () =>
-      calculateTotalPages(
-        articleSupplierResource.total,
-        articleSupplierResource.page.pageSize,
-      ),
-    [articleSupplierResource],
-  );
-
   useEffect(() => {
     if (
       articleSupplierResource.total > 0 &&
@@ -260,7 +246,6 @@ const Suppliers = () => {
         currentIndex={articleSupplierResource.page.pageIndex}
         numberOfElementsPerPage={articleSupplierResource.page.pageSize}
         totalEntries={articleSupplierResource.total}
-        totalPages={totalPages}
         onChange={handlePageIndexChange}
         onNumberPerPageChange={handleChangeElementsPerPage}
       />

@@ -12,15 +12,10 @@ import {useQueryState} from 'hooks/useQueryState';
 import {Box, Checkbox, TableBody, Tooltip, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {useSearchValues} from 'hooks/useSearchValues';
+import {createEmptyResource, makePage, toggleOrder} from 'utils/paging';
 import {
-  calculateTotalPages,
-  createEmptyResource,
-  makePage,
-  toggleOrder,
-} from 'utils/paging';
-import {
-  usePurchaseInvoiceStatistics,
   usePurchaseInvoices,
+  usePurchaseInvoiceStatistics,
 } from 'hooks/reactQuery/usePurchaseInvoice';
 import {
   PurchaseInvoiceFilterForm,
@@ -309,15 +304,6 @@ export const PurchaseInvoices = ({
 
   const rows = useMemo(
     () => aggregatePurchaseInvoiceRow(purchaseInvoiceResource.data),
-    [purchaseInvoiceResource],
-  );
-
-  const totalPages = useMemo(
-    () =>
-      calculateTotalPages(
-        purchaseInvoiceResource.total,
-        purchaseInvoiceResource.page.pageSize,
-      ),
     [purchaseInvoiceResource],
   );
 
@@ -1126,7 +1112,6 @@ export const PurchaseInvoices = ({
           currentIndex={purchaseInvoiceResource.page.pageIndex}
           numberOfElementsPerPage={purchaseInvoiceResource.page.pageSize}
           totalEntries={purchaseInvoiceResource.total}
-          totalPages={totalPages}
           onChange={handlePageIndexChange}
           onNumberPerPageChange={handleChangeElementsPerPage}
         />

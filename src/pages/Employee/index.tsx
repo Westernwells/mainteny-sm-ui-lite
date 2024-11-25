@@ -6,7 +6,7 @@ import {useQueryUserAccounts} from 'hooks/reactQuery/useUserAccount';
 import {useQueryState} from 'hooks/useQueryState';
 import {UserView} from 'models/user';
 import {TechnicianEventPair, TechnicianEventType} from 'models/technician';
-import {calculateTotalPages, createEmptyResource, makePage} from 'utils/paging';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {toRestDateTime} from 'utils/datetime';
 import {getRoles} from 'utils/work-hours-utils';
 import {useNavigate} from 'react-router-dom';
@@ -196,15 +196,6 @@ export const Employees = () => {
     return aggregateEmployeeRows(userAccountResource.data, eventByTechnicianId);
   }, [userAccountResource, isLoading, technicianEvents]);
 
-  const totalPages = useMemo(
-    () =>
-      calculateTotalPages(
-        userAccountResource.total,
-        userAccountResource.page.pageSize,
-      ),
-    [userAccountResource],
-  );
-
   const handlePageIndexChange = (value: number) => {
     setPage({...page, pageIndex: value});
     containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
@@ -292,7 +283,6 @@ export const Employees = () => {
         currentIndex={userAccountResource.page.pageIndex}
         numberOfElementsPerPage={userAccountResource.page.pageSize}
         totalEntries={userAccountResource.total}
-        totalPages={totalPages}
         onChange={handlePageIndexChange}
         onNumberPerPageChange={handleChangeElementsPerPage}
       />

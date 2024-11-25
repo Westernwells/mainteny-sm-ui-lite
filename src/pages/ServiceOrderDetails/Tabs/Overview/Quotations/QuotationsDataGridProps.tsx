@@ -4,7 +4,7 @@ import {getColumnProps} from 'components/DataGridLayout';
 import {formatCurrency} from 'utils/currency';
 import {QuotationStatus, QuotationView} from 'models/quotation';
 import {FormatDate} from 'models/misc';
-import {Actions} from 'pages/Quotations/Actions';
+import Actions from 'pages/Quotations/OldTableActions';
 
 export const getQuotationStatusStyles = (
   status: string,

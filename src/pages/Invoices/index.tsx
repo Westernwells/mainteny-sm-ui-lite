@@ -28,12 +28,7 @@ import {
 } from 'hooks/reactQuery/useCompanies';
 import {useTranslation} from 'react-i18next';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {
-  calculateTotalPages,
-  createEmptyResource,
-  makePage,
-  toggleOrder,
-} from 'utils/paging';
+import {createEmptyResource, makePage, toggleOrder} from 'utils/paging';
 import PageContainer from 'components/PageContainer';
 import PageHeaderContainer from 'components/PageHeaderContainer';
 import SearchInput from 'components/SearchInput/index';
@@ -99,7 +94,11 @@ import DatePickerRange from 'components/DatePickerRange';
 import EmptyTable from 'components/Table/EmptyTable';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {formatCurrency} from 'utils/currency';
+import {
+  convertNumberToAmountNumber,
+  formatCurrency,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {getInvoiceStatusStyles} from './InvoicesDataGridProps';
 
 const pageSize = 25;
@@ -126,6 +125,7 @@ const Invoices = ({elevatorId}: Props) => {
   const {user} = useUserSession();
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
+  const currentCurrency = useCurrentCurrency();
 
   const {
     values: {sortOrder, orderByField},
@@ -246,9 +246,19 @@ const Invoices = ({elevatorId}: Props) => {
     orderByField: orderByField || InvoiceOrderField.CREATED_DATE,
     order: sortOrder || Order.DESC,
     ...(grossAmountMin &&
-      grossAmountMin > 0 && {totalGrossAmountFrom: `${grossAmountMin}`}),
+      grossAmountMin > 0 && {
+        totalGrossAmountFrom: `${convertNumberToAmountNumber(
+          grossAmountMin,
+          currentCurrency,
+        )}`,
+      }),
     ...(grossAmountMax &&
-      grossAmountMax > 0 && {totalGrossAmountTo: `${grossAmountMax}`}),
+      grossAmountMax > 0 && {
+        totalGrossAmountTo: `${convertNumberToAmountNumber(
+          grossAmountMax,
+          currentCurrency,
+        )}`,
+      }),
     ...(selectedStartDate && {
       sentDateFrom: toRestDate(
         fromDateStringToDate(selectedStartDate, DEFAULT_DATE_FORMAT),
@@ -674,12 +684,6 @@ const Invoices = ({elevatorId}: Props) => {
   const watchHasComment = watch('hasComment');
   const watchGrossMin = watch('grossAmountMin');
   const watchGrossMax = watch('grossAmountMax');
-
-  const totalPages = useMemo(
-    () =>
-      calculateTotalPages(invoiceResource.total, invoiceResource.page.pageSize),
-    [invoiceResource],
-  );
 
   const handlePageIndexChange = (value: number) => {
     setPage({...page, pageIndex: value});
@@ -1237,7 +1241,6 @@ const Invoices = ({elevatorId}: Props) => {
           currentIndex={invoiceResource.page.pageIndex}
           numberOfElementsPerPage={invoiceResource.page.pageSize}
           totalEntries={invoiceResource.total}
-          totalPages={totalPages}
           afterPageSelectorComponent={showXeroInfoRender}
           onChange={handlePageIndexChange}
           onNumberPerPageChange={handleChangeElementsPerPage}
@@ -1255,5 +1258,4 @@ const Invoices = ({elevatorId}: Props) => {
     </>
   );
 };
-
 export default Invoices;
