@@ -248,7 +248,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
         : '',
       costType,
       costPackage,
-      id: extendedContractRecord.id,
+      componentId: extendedContractRecord.id,
     };
 
     return contractComponentRecord;
