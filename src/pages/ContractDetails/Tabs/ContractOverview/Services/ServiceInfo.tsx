@@ -32,7 +32,7 @@ import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {getViewFrequency} from 'utils/elevator-utils';
 import {ArticleType} from 'models/article';
 import {ElevatorView} from 'models/elevator';
-import {ServiceOrderLabels} from 'models/service-order';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 
 type Props = {
   service?: ContractComponentView;
@@ -104,9 +104,15 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
               {t('Job type')}
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
-              {service?.additionalInfo?.orderType
-                ? t(ServiceOrderLabels[service?.additionalInfo.orderType])
-                : '-'}
+              {service?.additionalInfo.orderType &&
+              serviceOrderTypeToString(service?.additionalInfo.orderType) ===
+                '-'
+                ? service?.additionalInfo.orderType
+                : t(
+                    serviceOrderTypeToString(
+                      service?.additionalInfo.orderType!,
+                    ),
+                  )}
             </Typography>
           </Box>
         </Grid>

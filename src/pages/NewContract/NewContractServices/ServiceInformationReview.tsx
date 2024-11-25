@@ -26,7 +26,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {getArticleTypeText} from 'utils/article-utils';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
-import {ServiceOrderLabels} from 'models/service-order';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 
 type Props = {
   formikContractServiceComponent: FormikProps<ContractServiceForm>;
@@ -94,13 +94,16 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
               {t('Job type')}
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
-              {formikContractServiceComponent.values.orderType
-                ? t(
-                    ServiceOrderLabels[
-                      formikContractServiceComponent.values.orderType
-                    ],
-                  )
-                : '-'}
+              {formikContractServiceComponent.values.orderType &&
+              serviceOrderTypeToString(
+                formikContractServiceComponent.values.orderType,
+              ) === '-'
+                ? formikContractServiceComponent.values.orderType
+                : t(
+                    serviceOrderTypeToString(
+                      formikContractServiceComponent.values.orderType!,
+                    ),
+                  )}
             </Typography>
           </Box>
         </Grid>
