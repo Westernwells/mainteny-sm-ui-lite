@@ -8,11 +8,11 @@ import {
   EmailRecord,
   Meta,
   PdfGenerationStatus,
-  SimpleEmailRecord,
 } from './misc';
 import {PropertyOwnerView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
+import {theme} from 'theme';
 
 export enum QuotationStatus {
   ACCEPTED = 'ACCEPTED',
@@ -21,11 +21,12 @@ export enum QuotationStatus {
   SENT_TO_CLIENT = 'SENT_TO_CLIENT',
 }
 
-export enum QuotationStatusView {
+export enum QUOTATION_STATUS_FILTER {
+  ALL = 'ALL',
   ACCEPTED = 'ACCEPTED',
   DRAFT = 'DRAFT',
   REJECTED = 'REJECTED',
-  SENT = 'SENT_TO_CLIENT',
+  SENT = 'SENT',
 }
 
 export enum QuotationOrderField {
@@ -39,6 +40,7 @@ export enum QuotationOrderField {
   TOTAL_NET_AMOUNT = 'TOTAL_NET_AMOUNT',
   COMMENT_COUNT = 'COMMENT_COUNT',
   STATUS = 'STATUS',
+  SUBJECT = 'SUBJECT',
 }
 
 export type QuotationAdditionalInfo = {
@@ -114,17 +116,21 @@ export interface QuotationView {
 export interface QueryQuotationParams {
   pageIndex: number;
   pageSize: number;
-  query: string;
+  query?: string;
   status: QuotationStatus[];
   createdDateStart?: Date;
   createdDateEnd?: Date;
-  salesPriceStart?: number;
-  salesPriceEnd?: number;
+  totalNetAmountFrom?: string;
+  totalNetAmountTo?: string;
+  totalGrossAmountFrom?: string;
+  totalGrossAmountTo?: string;
   order?: Order;
   orderByField?: QuotationOrderField;
+  elevatorId?: string[];
+  propertyOwnerId?: string[];
+  serviceOrderId?: string[];
+  hasComments?: boolean;
 }
-
-export interface QuotationFilters {}
 
 export interface QuotationFormData {
   serviceCompanyId: string;
@@ -246,3 +252,43 @@ export interface SendQuotationRecord {
   sentDate?: string;
   email: EmailRecord;
 }
+
+export type QuotationTableRow = {
+  data: QuotationView;
+  id: string;
+  number: string;
+  subject: string;
+  propertyOwner: PropertyOwnerView;
+  createdDate: string;
+  status: QuotationStatus;
+  amount: string;
+  hasComments: boolean;
+};
+
+export type QuotationFilterForm = {
+  number?: string;
+  customer?: string;
+  customerId?: string;
+  orderNumber?: string;
+  unitId?: string;
+  jobNumber?: string;
+  netAmountMin?: number;
+  netAmountMax?: number;
+  hasComment?: boolean;
+};
+
+export type SearchParameters = {
+  search?: string;
+  quotationNumber?: string;
+};
+
+export type QuotationStatistics = {
+  numOfQuotationsPerStatus: Record<string, number>;
+};
+
+export const STATUS_COLOR = {
+  [QuotationStatus.ACCEPTED]: theme.palette.success.darkSuccess,
+  [QuotationStatus.DRAFT]: theme.palette.action.active,
+  [QuotationStatus.REJECTED]: theme.palette.error.main,
+  [QuotationStatus.SENT_TO_CLIENT]: theme.palette.primary.mainLight,
+};

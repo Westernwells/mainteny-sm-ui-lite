@@ -107,6 +107,7 @@ export const queryKeys = {
   queryAllJobs: 'queryAllJobs',
   queryAllInvoices: 'queryAllInvoices',
   queryAllUnits: 'queryAllUnits',
+  queryAllQuotations: 'queryAllQuotations',
   fetchPurchaseInvoices: 'fetchPurchaseInvoices',
   fetchPurchaseInvoiceStatistics: 'fetchPurchaseInvoiceStatistics',
   purchaseInvoiceById: 'purchaseInvoiceById',

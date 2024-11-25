@@ -1,4 +1,3 @@
-import {FC} from 'react';
 import {
   useCreateQuotationComment,
   useDeleteQuotationComment,
@@ -12,9 +11,10 @@ import {MutateOptions} from 'react-query';
 
 interface Props {
   quotation: QuotationView;
+  onChange?: () => void;
 }
 
-export const QuotationNotes: FC<Props> = ({quotation}) => {
+export const QuotationNotes = ({quotation, onChange}: Props) => {
   const {
     data: notes = {
       pages: [],
@@ -29,11 +29,11 @@ export const QuotationNotes: FC<Props> = ({quotation}) => {
     pageSize: 10,
   });
   const {mutate: createQuotationComment, isLoading: isCreating} =
-    useCreateQuotationComment();
+    useCreateQuotationComment(onChange);
   const {mutate: deleteQuotationComment, isLoading: isDeleting} =
-    useDeleteQuotationComment();
+    useDeleteQuotationComment(onChange);
   const {mutate: updateQuotationComment, isLoading: isUpdating} =
-    useUpdateQuotationComment();
+    useUpdateQuotationComment(onChange);
 
   const createNote = async (
     variables: CreateNoteVars,

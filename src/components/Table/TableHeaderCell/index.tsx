@@ -1,12 +1,12 @@
 import {useTranslation} from 'react-i18next';
 import {Box} from '@mui/system';
 import {IconButton, TableCell, Tooltip, Typography} from '@mui/material';
-import * as _ from 'lodash';
 import {ReactComponent as SortingArrow} from 'assets/icons/SortingArrows.svg';
 import {TableColumn} from 'models/table';
 import {HeaderSortingState, Order} from 'models/pagination';
 import {useMemo} from 'react';
 import useTheme from '@mui/material/styles/useTheme';
+import {capitalize} from 'lodash';
 
 type Props = {
   column: TableColumn;
@@ -18,11 +18,12 @@ type Props = {
 };
 
 const TableHeaderCell = ({
-  column,
+  column: {firstSticky = true, lastSticky = true, ...column},
   gap = 1,
   sortState,
   isFirst = false,
   isLast = false,
+
   onSort,
 }: Props) => {
   const {t} = useTranslation();
@@ -52,16 +53,18 @@ const TableHeaderCell = ({
         position: 'sticky',
         zIndex: 6,
 
-        ...(isFirst && {
-          borderLeft: 0,
-          left: 0,
-          zIndex: 7,
-        }),
-        ...(isLast && {
-          borderRight: 0,
-          right: 0,
-          zIndex: 7,
-        }),
+        ...(isFirst &&
+          firstSticky && {
+            borderLeft: 0,
+            left: 0,
+            zIndex: 7,
+          }),
+        ...(isLast &&
+          lastSticky && {
+            borderRight: 0,
+            right: 0,
+            zIndex: 7,
+          }),
 
         ...(column.showShadows === 'left' && {
           borderLeft: 0,
@@ -102,11 +105,11 @@ const TableHeaderCell = ({
           }}
           gap={gap}>
           <Tooltip
-            title={_.capitalize(t(column.headerName))}
+            title={capitalize(t(column.headerName))}
             arrow
             placement="top">
             <Typography sx={{cursor: 'default'}} noWrap variant="subtitle2">
-              {_.capitalize(t(column.headerName))}
+              {capitalize(t(column.headerName))}
             </Typography>
           </Tooltip>
           {onSort && (

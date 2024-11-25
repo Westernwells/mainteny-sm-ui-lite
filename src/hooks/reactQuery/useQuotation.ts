@@ -1,4 +1,4 @@
-import {useCallback, useContext} from 'react';
+import {useContext} from 'react';
 import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
@@ -8,7 +8,7 @@ import {
   UseQueryOptions,
 } from 'react-query';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {queryKeys as qk} from 'reactQuery/constants';
+import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
 import {useNavigate} from 'react-router-dom';
 import {
   EmailRecord,
@@ -25,7 +25,7 @@ import {
   QueryQuotationCommentsParams,
   QueryQuotationParams,
   QuotationActivityView,
-  QuotationFilters,
+  QuotationStatistics,
   QuotationView,
   ReplyQuotation,
   SendQuotationRecord,
@@ -34,6 +34,8 @@ import {
 import {Comment} from 'models/comment';
 import {languageContextMap} from 'utils/utils';
 import {LanguageContext} from 'context/LanguageProvider';
+import {AxiosResponse} from 'axios';
+import {useAll} from 'hooks/reactQuery/useAll';
 import {useUserSession} from './useUserSession';
 
 export const fetchQuotations = async (
@@ -51,31 +53,19 @@ export const fetchQuotations = async (
   return response.data;
 };
 
-const filterQuotations = (quotationsRes: Resource<QuotationView>) => {
-  const result = {...quotationsRes};
-
-  return result;
-};
-
 export function useQuotations(
   params: QueryQuotationParams,
-  filters: QuotationFilters,
-  options?: any,
+  options?: UseQueryOptions<any, any, any>,
 ) {
   const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
   return useQuery<Resource<QuotationView>, RestError>(
-    [qk.fetchQuotations, params, user?.userAccount.id],
-    () => fetchQuotations(params, user!.userAccount.serviceCompany.id),
+    [qk.fetchQuotations, params, serviceCompanyId],
+    () => fetchQuotations(params, serviceCompanyId ?? ''),
     {
-      enabled: !!user,
       ...options,
-      select: useCallback(
-        (quotationsRes: Resource<QuotationView>) => {
-          const filterResult = filterQuotations(quotationsRes);
-          return filterResult;
-        },
-        [filters],
-      ),
+      enabled: !!serviceCompanyId,
     },
   );
 }
@@ -382,7 +372,7 @@ export const postQuotationComment = async (
   return data;
 };
 
-export const useCreateQuotationComment = () => {
+export const useCreateQuotationComment = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   const {showError} = useSnackbar();
 
@@ -395,8 +385,10 @@ export const useCreateQuotationComment = () => {
       body: CreateQuotationComment;
     }) => postQuotationComment(quotationId, body),
     {
-      onSuccess: () =>
-        queryClient.invalidateQueries([qk.fetchQuotationComments]),
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchQuotationComments]);
+        onSuccess?.();
+      },
       onError: (err) => {
         showError(err);
       },
@@ -414,7 +406,7 @@ export const deleteQuotationComment = async (
   return data;
 };
 
-export const useDeleteQuotationComment = () => {
+export const useDeleteQuotationComment = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   const {showError} = useSnackbar();
 
@@ -422,8 +414,10 @@ export const useDeleteQuotationComment = () => {
     ({quotationId, noteId}: {quotationId: string; noteId: string}) =>
       deleteQuotationComment(quotationId, noteId),
     {
-      onSuccess: () =>
-        queryClient.invalidateQueries([qk.fetchQuotationComments]),
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchQuotationComments]);
+        onSuccess?.();
+      },
       onError: (err) => {
         showError(err);
       },
@@ -443,7 +437,7 @@ export const updateQuotationComment = async (
   return data;
 };
 
-export const useUpdateQuotationComment = () => {
+export const useUpdateQuotationComment = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   const {showError} = useSnackbar();
 
@@ -458,8 +452,10 @@ export const useUpdateQuotationComment = () => {
       body: CreateQuotationComment;
     }) => updateQuotationComment(quotationId, noteId, body),
     {
-      onSuccess: () =>
-        queryClient.invalidateQueries([qk.fetchQuotationComments]),
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchQuotationComments]);
+        onSuccess?.();
+      },
       onError: (err) => {
         showError(err);
       },
@@ -499,3 +495,56 @@ export const useQuotationActivities = (
     },
   );
 };
+
+export const fetchQuotationStatistics = async (
+  params: QueryQuotationParams,
+  serviceCompanyId: string,
+): Promise<QuotationStatistics> => {
+  const response: AxiosResponse<QuotationStatistics> = await axiosClient.get(
+    `/api/serviceCompanies/${serviceCompanyId}/quotations/statistics`,
+    {
+      params: {
+        ...params,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useQuotationStatistics = (
+  params: QueryQuotationParams,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  return useQuery<QuotationStatistics, RestError, QuotationStatistics>(
+    [
+      queryKeys.fetchElevatorStatistics,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () => fetchQuotationStatistics(params, user!.userAccount.serviceCompany.id),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+};
+
+export function useAllQuotations(
+  params: QueryQuotationParams,
+  options?: UseQueryOptions<QuotationView[], RestError>,
+) {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  return useAll<QueryQuotationParams, QuotationView>({
+    queryKey: [queryKeys.queryAllQuotations, params, serviceCompanyId],
+    queryFn: (p) => fetchQuotations(p, serviceCompanyId ?? ''),
+    params,
+    options: {
+      enabled: !!serviceCompanyId,
+      ...options,
+    },
+  });
+}

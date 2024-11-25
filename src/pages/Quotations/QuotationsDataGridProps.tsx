@@ -9,7 +9,7 @@ import {
 import {FormatDate, Resource} from 'models/misc';
 import {Typography} from '@mui/material';
 import {NotesIndicator} from './NotesIndicator';
-import {Actions} from './Actions';
+import Actions from './OldTableActions';
 import {T} from 'utils/i18n-utils';
 
 export const getQuotationStatusStyles = (

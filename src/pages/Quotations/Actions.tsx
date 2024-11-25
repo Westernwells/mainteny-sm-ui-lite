@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -61,7 +61,7 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
 
-export const Actions = ({quotation}: Props) => {
+const Actions = ({quotation}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {user} = useUserSession();
@@ -348,7 +348,18 @@ export const Actions = ({quotation}: Props) => {
       onClick: () => setIsRejectedDialogOpen(true),
     };
 
-    const defaultActions = [printAction, duplicateAction, downloadAction];
+    const editAction = {
+      label: t('Edit'),
+      icon: <Edit />,
+      onClick: () => navigate(`/quotations/details/${quotation.id}/edit`),
+    };
+
+    const defaultActions = [
+      ...(quotation.status !== QuotationStatus.ACCEPTED ? [editAction] : []),
+      printAction,
+      duplicateAction,
+      downloadAction,
+    ];
 
     if (quotation.status === QuotationStatus.DRAFT) {
       return [
@@ -358,6 +369,7 @@ export const Actions = ({quotation}: Props) => {
           onClick: handleOpenSendEmail,
         },
         'divider',
+        editAction,
         printAction,
         duplicateAction,
         markAcceptedAction,
@@ -390,14 +402,6 @@ export const Actions = ({quotation}: Props) => {
 
   return (
     <Box>
-      {quotation.status !== QuotationStatus.ACCEPTED && (
-        <IconButton
-          onClick={() => navigate(`/quotations/details/${quotation.id}/edit`)}
-          sx={{color: 'action.active'}}>
-          <Edit fontSize="small" />
-        </IconButton>
-      )}
-
       <IconButton onClick={handleClick}>
         <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
       </IconButton>
@@ -615,3 +619,5 @@ export const Actions = ({quotation}: Props) => {
     </Box>
   );
 };
+
+export default Actions;
