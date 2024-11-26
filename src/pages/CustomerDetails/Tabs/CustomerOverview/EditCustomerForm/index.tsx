@@ -34,6 +34,7 @@ import {
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useVats} from 'hooks/reactQuery/useVats';
 import {CUSTOMER_ALL_INVOICE_FORMATS} from 'utils/constants';
 import {CustomerEditForm} from './model';
 import {SelectPriority} from './SelectPriority';
@@ -78,6 +79,8 @@ export const EditCustomerForm = ({
     },
     user?.userAccount.serviceCompany.id,
   );
+
+  const {data: taxRates} = useVats();
 
   const generateNextNumber = () => {
     setFieldValue('externalId', companyNextNumber?.value);
@@ -382,6 +385,27 @@ export const EditCustomerForm = ({
               {CUSTOMER_ALL_INVOICE_FORMATS.map((invoiceFormat) => (
                 <MenuItem value={invoiceFormat.value} key={invoiceFormat.value}>
                   {t(invoiceFormat.label)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid item md={4}>
+          <FormControl fullWidth required={false}>
+            <InputLabel size="small" shrink variant="outlined">
+              {t('Tax rate')}
+            </InputLabel>
+            <Select
+              label={t('Tax rate')}
+              size="small"
+              value={formikValues.vat}
+              name="vat"
+              notched
+              {...defaultProps}>
+              {taxRates?.map((taxRate) => (
+                <MenuItem value={taxRate.id} key={taxRate.id}>
+                  {taxRate.percentage || 0}%
                 </MenuItem>
               ))}
             </Select>

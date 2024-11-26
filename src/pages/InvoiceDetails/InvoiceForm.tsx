@@ -1865,7 +1865,7 @@ export const InvoiceForm = ({
             setItems={setInvoiceItems}
             formik={formik}
             showArticleSection={formik.values.showArticleSection}
-            propertyOwnerId={customer?.id ?? ''}
+            propertyOwner={customer}
             enableCollapse={formik.values.type !== InvoiceType.FULL}
           />
 

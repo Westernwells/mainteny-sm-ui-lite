@@ -25,6 +25,7 @@ import {
   InvoiceType,
 } from 'models/invoice';
 import {ArticleType, ArticleView} from 'models/article';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
@@ -45,7 +46,7 @@ import {Progress} from './Progress';
 interface Props {
   items: InvoiceItemRecord[];
   setItems: (items: InvoiceItemRecord[]) => void;
-  propertyOwnerId: string;
+  propertyOwner?: PropertyOwnerView;
   formik: FormikProps<InvoiceFormData>;
   isHovered?: boolean;
 }
@@ -53,7 +54,7 @@ interface Props {
 export const ArticleItemsTableNEW = ({
   items,
   setItems,
-  propertyOwnerId,
+  propertyOwner,
   formik,
   isHovered,
 }: Props) => {
@@ -133,6 +134,7 @@ export const ArticleItemsTableNEW = ({
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
   const defaultPercentageVat =
+    propertyOwner?.additionalInfo.vat?.percentage ||
     taxRates?.find((tR) => tR.isDefault)?.percentage ||
     user?.userAccount.serviceCompany.settings.percentageVat ||
     0;
@@ -316,7 +318,7 @@ export const ArticleItemsTableNEW = ({
                             index={index}
                             deleteItem={deleteItem}
                             setItemAtIndex={setItemAtIndex}
-                            propertyOwnerId={propertyOwnerId}
+                            propertyOwner={propertyOwner}
                             handleSelectItem={handleSelectItem}
                             isHovered={isHovered}
                             defaultPercentageVat={defaultPercentageVat}

@@ -21,4 +21,5 @@ export type CustomerEditForm = {
   buyerReference?: string;
   invoiceFormat?: string;
   moreInfo?: string;
+  vat?: string;
 };

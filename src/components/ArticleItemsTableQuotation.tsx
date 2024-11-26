@@ -24,6 +24,7 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {getItemRecord} from 'utils/article-utils';
 import {getUniqueId} from 'utils/utils';
 import {QuotationFormData, QuotationItemRecord} from 'models/quotation';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {useTheme} from '@mui/material/styles';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
 import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
@@ -39,7 +40,7 @@ import {Progress} from './Progress';
 interface Props {
   items: QuotationItemRecord[];
   setItems: (items: QuotationItemRecord[]) => void;
-  propertyOwnerId: string;
+  propertyOwner?: PropertyOwnerView | null;
   formik: FormikProps<QuotationFormData>;
   isHovered?: boolean;
 }
@@ -47,7 +48,7 @@ interface Props {
 export const ArticleItemsTableQuotation = ({
   items,
   setItems,
-  propertyOwnerId,
+  propertyOwner,
   formik,
   isHovered,
 }: Props) => {
@@ -145,6 +146,7 @@ export const ArticleItemsTableQuotation = ({
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
   const defaultPercentageVat =
+    propertyOwner?.additionalInfo.vat?.percentage ||
     taxRates?.find((tR) => tR.isDefault)?.percentage ||
     user?.userAccount.serviceCompany.settings.percentageVat ||
     0;
@@ -313,7 +315,7 @@ export const ArticleItemsTableQuotation = ({
                             index={index}
                             deleteItem={deleteItem}
                             setItemAtIndex={setItemAtIndex}
-                            propertyOwnerId={propertyOwnerId}
+                            propertyOwner={propertyOwner}
                             handleSelectItem={handleSelectItem}
                             isHovered={isHovered}
                             defaultPercentageVat={defaultPercentageVat}

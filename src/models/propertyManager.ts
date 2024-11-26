@@ -40,6 +40,12 @@ export interface PropertyOwnerAdditionalInfo {
   customerPortalEnabled?: boolean;
   buyerReference?: string;
   invoiceFormat: InvoiceFormat;
+  vat?: {
+    id: string;
+    name: string;
+    percentage?: number;
+    legalNote: string;
+  };
 }
 
 export interface PropertyOwnerView {
