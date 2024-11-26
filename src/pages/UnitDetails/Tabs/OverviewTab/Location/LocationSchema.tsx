@@ -14,11 +14,7 @@ import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
 import Typography from '@mui/material/Typography';
 import {useNavigate} from 'react-router';
-import {
-  centsToMoney,
-  getCurrencySymbol,
-  useCurrentCurrency,
-} from 'utils/currency';
+import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 
 interface Props {
   label: string;
@@ -159,11 +155,10 @@ export const LocationSchema = ({label, elevator}: Props) => {
           <CardProps
             icon={<AttachMoneyIcon sx={{color: theme.palette.primary.light}} />}
             label="Travel fee"
-            unitText={getCurrencySymbol[currentCurrency.code]}
             bodyText={
-              centsToMoney(
-                currentCurrency.code,
-                elevator.additionalInfo.travelFee,
+              formatCurrency(
+                elevator.additionalInfo.travelFee /
+                  10 ** currentCurrency.fractionDigits,
               ) || '-'
             }
             containerStyles={{alignItems: 'center'}}
