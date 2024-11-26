@@ -26,7 +26,7 @@ import {InfoCard} from 'components/InfoCard';
 import {Progress} from 'components/Progress';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
-import {formatPhoneNumber} from 'utils/customer-utils';
+import {formatPhoneNumber, getTaxRate} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {LanguageContext} from 'context/LanguageProvider';
@@ -192,6 +192,11 @@ export const CustomerOverviewTab = ({
           value: invoiceFormat?.label || '-',
           icon: <DocumentScannerIcon sx={{color: theme.palette.info.dark}} />,
         },
+        taxRate: {
+          label: 'Tax rate',
+          value: getTaxRate(customer.additionalInfo.vat),
+          icon: <AttachMoney sx={{color: theme.palette.info.dark}} />,
+        },
       });
     }
   }, [customer, totalContracts, totalUnits, selectedLng]);
@@ -238,6 +243,7 @@ export const CustomerOverviewTab = ({
               <Grid key={index} item xs={12} md={3.5}>
                 <CardProps
                   label={basicDetails[item as keyof BasicDetails].label}
+                  labelStyle={{textTransform: 'uppercase'}}
                   icon={basicDetails[item as keyof BasicDetails].icon}
                   iconTooltip={
                     basicDetails[item as keyof BasicDetails].iconTooltip

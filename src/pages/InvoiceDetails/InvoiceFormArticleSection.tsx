@@ -10,6 +10,7 @@ import {
 import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
 import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {InvoiceFormData, InvoiceItemRecord} from 'models/invoice';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {FormikProps} from 'formik';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -80,7 +81,7 @@ export const ArticleSectionTitleAction = ({
 
 interface Props {
   setItems: (items: InvoiceItemRecord[]) => void;
-  propertyOwnerId: string;
+  propertyOwner?: PropertyOwnerView;
   formik: FormikProps<InvoiceFormData>;
   enableCollapse?: boolean;
   showArticleSection?: boolean;
@@ -89,7 +90,7 @@ interface Props {
 const InvoiceFormArticleSection = ({
   setItems,
   formik,
-  propertyOwnerId,
+  propertyOwner,
   enableCollapse = false,
   showArticleSection = true,
 }: Props) => {
@@ -150,7 +151,7 @@ const InvoiceFormArticleSection = ({
             items={formik.values.items}
             setItems={setItems}
             formik={formik}
-            propertyOwnerId={propertyOwnerId}
+            propertyOwner={propertyOwner}
             isHovered={isHovered}
           />
         </AccordionDetails>

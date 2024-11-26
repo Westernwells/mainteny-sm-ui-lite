@@ -3,7 +3,6 @@ import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
 import {isEqual} from 'lodash';
 import {
-  Autocomplete,
   Box,
   ClickAwayListener,
   IconButton,
@@ -50,6 +49,7 @@ import {useDebounce} from 'hooks/useDebounce';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
 import {VatView} from 'models/vat';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -66,7 +66,7 @@ interface Props {
   index: number;
   deleteItem: (indexPos: number) => void;
   setItemAtIndex: (indexPos: number, item: QuotationItemRecord) => void;
-  propertyOwnerId: string;
+  propertyOwner?: PropertyOwnerView | null;
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
   isHovered?: boolean;
   defaultPercentageVat?: number;
@@ -154,7 +154,7 @@ export const ArticleItemRowQuotation = ({
   index,
   deleteItem,
   setItemAtIndex,
-  propertyOwnerId,
+  propertyOwner,
   handleSelectItem,
   isHovered,
   defaultPercentageVat,
@@ -306,13 +306,13 @@ export const ArticleItemRowQuotation = ({
     data: travelWorksResource = [],
     isLoading: isTravelWorksResourceLoading,
   } = usePropertyOwnerQueryTravelWorks(
-    propertyOwnerId,
+    propertyOwner?.id || '',
     {
       serviceOrderType: ServiceOrderType.GENERAL,
     },
     {
       keepPreviousData: true,
-      enabled: popperOpen && tabValue === 1 && !!propertyOwnerId,
+      enabled: popperOpen && tabValue === 1 && !!propertyOwner?.id,
     },
   );
 
@@ -344,14 +344,14 @@ export const ArticleItemRowQuotation = ({
         icon: <HomeRepairServiceIcon />,
       },
     ];
-    if (propertyOwnerId) {
+    if (propertyOwner?.id) {
       tItems.push({
         label: 'Custom prices',
         icon: <ReceiptLongIcon />,
       });
     }
     return tItems;
-  }, [propertyOwnerId]);
+  }, [propertyOwner]);
 
   const columns: {name: string; align?: TableCellProps['align']}[] = [
     {name: 'Name'},
@@ -688,77 +688,55 @@ export const ArticleItemRowQuotation = ({
       </TableCell>
 
       <TableCell sx={{width: '6%', display: 'inline-block'}}>
-        <Autocomplete
-          value={String(
-            formik.values.unitAmount.percentageVat !== 0
-              ? formik.values.unitAmount.percentageVat
-              : 0,
-          )}
-          onInputChange={(_event, newValue) => {
-            const val =
-              (typeof newValue === 'string' ? Number(newValue) : newValue) || 0;
-            formik.setFieldValue('unitAmount.percentageVat', val);
+        <FormSelect
+          labelId={`select-tax-label-${index}`}
+          label=""
+          selectProps={{
+            value: String(
+              formik.values.unitAmount.percentageVat !== 0
+                ? formik.values.unitAmount.percentageVat
+                : 0,
+            ),
+            onChange: (event) => {
+              const val = Number(event.target.value) || 0;
+              formik.setFieldValue('unitAmount.percentageVat', val);
+            },
+            name: 'unitAmount.percentageVat',
+            id: `unitAmount.percentageVat-${index}`,
+            IconComponent: () => null,
+            renderValue: (val) => `${val}%`,
           }}
-          freeSolo
-          disableClearable
-          options={taxRates}
-          getOptionLabel={(option) => {
-            if (typeof option === 'string') {
-              return option;
-            }
-            return `${option.percentage || 0}`;
+          options={taxRates.map((rate) => ({
+            value: String(rate.percentage || 0),
+            label: `${rate.percentage || 0}%`,
+          }))}
+          selectStyles={{
+            '& .MuiSelect-select': {
+              textAlign: 'right',
+              paddingRight: '5px !important',
+            },
           }}
-          sx={{
-            width: '100%',
-            display: 'inline-flex',
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              name="unitAmount.percentageVat"
-              id={`unitAmount.percentageVat-${index}`}
-              type="number"
-              sx={{
-                '& .MuiInputBase-root': {
-                  p: 0,
-                },
-                '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button':
-                  {
-                    display: 'none',
+          menuProps={{
+            anchorOrigin: {
+              vertical: 'bottom',
+              horizontal: 'right',
+            },
+            transformOrigin: {
+              vertical: 'top',
+              horizontal: 'right',
+            },
+            slotProps: {
+              paper: {
+                sx: {
+                  width: '100% !important',
+                  maxWidth: '80px !important',
+                  '& .MuiMenuItem-root': {
+                    alignItems: 'flex-end',
                   },
-                '& input[type=number]': {
-                  MozAppearance: 'textfield',
                 },
-                width: '100%',
-              }}
-              InputProps={{
-                ...params.InputProps,
-                inputProps: {
-                  ...params.inputProps,
-                  min: 0,
-                  style: {textAlign: 'right'},
-                },
-                endAdornment: (
-                  <InputAdornment
-                    position="end"
-                    sx={{
-                      m: '0',
-                      justifyContent: 'center',
-                      height: '100%',
-                      bgcolor: 'action.hover',
-                      borderRadius: 0,
-                      '&:hover': {
-                        bgcolor: 'action.hover',
-                      },
-                      width: '30%',
-                    }}>
-                    %
-                  </InputAdornment>
-                ),
-              }}
-              variant="outlined"
-            />
-          )}
+              },
+            },
+          }}
         />
       </TableCell>
 

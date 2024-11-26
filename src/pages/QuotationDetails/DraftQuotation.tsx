@@ -1210,7 +1210,7 @@ export const DraftQuotation = ({
                 items={formik.values.items}
                 setItems={setQuotationItems}
                 formik={formik}
-                propertyOwnerId={customer?.id ?? ''}
+                propertyOwner={customer}
                 isHovered={isHovered}
               />
             </Box>
