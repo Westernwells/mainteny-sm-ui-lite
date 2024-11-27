@@ -21,8 +21,8 @@ const AddButton = ({label, styles, labelStyles, Icon, onClick}: Props) => {
         onClick,
         sx: {
           textTransform: 'capitalize',
-          ml: '0.8em',
           fontSize: '14px',
+          height: '36px',
           ...styles,
         },
         variant: 'contained',

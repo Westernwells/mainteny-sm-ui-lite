@@ -402,7 +402,7 @@ const Actions = ({quotation}: Props) => {
 
   return (
     <Box>
-      <IconButton onClick={handleClick}>
+      <IconButton sx={{padding: 0}} onClick={handleClick}>
         <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
       </IconButton>
       <Menu

@@ -36,13 +36,14 @@ export enum ElevatorStatus {
   OUT_OF_SERVICE = 'OUT_OF_SERVICE',
 }
 
+// order matters for quick filter
 export enum ElevatorStatusFilter {
   ALL = 'ALL',
   RUNNING = 'RUNNING',
-  BROKEN = 'BROKEN',
   JOB_ONGOING = 'JOB_ONGOING',
-  UNKNOWN = 'UNKNOWN',
+  BROKEN = 'BROKEN',
   OUT_OF_SERVICE = 'OUT_OF_SERVICE',
+  UNKNOWN = 'UNKNOWN',
 }
 
 export enum ElevatorCategory {

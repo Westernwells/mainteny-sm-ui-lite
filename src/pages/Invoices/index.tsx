@@ -46,12 +46,9 @@ import {
 import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {StatusChip} from 'components/StatusChip';
-import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import {theme} from 'theme';
 import {Checkbox, CircularProgress, Typography} from '@mui/material';
-import NoteAlt from '@mui/icons-material/NoteAlt';
-import {NoteAltOutlined} from '@mui/icons-material';
 import {Order, OrderByParams} from 'models/pagination';
 import {Actions} from 'pages/Invoices/Actions';
 import Filters from 'components/Filters';
@@ -99,6 +96,7 @@ import {
   formatCurrency,
   useCurrentCurrency,
 } from 'utils/currency';
+import NoteIcon from 'components/NoteIcon';
 import {getInvoiceStatusStyles} from './InvoicesDataGridProps';
 
 const pageSize = 25;
@@ -575,43 +573,13 @@ const Invoices = ({elevatorId}: Props) => {
             fieldName="NOTES"
             noWidthLimit
             onClick={() => setSelectedInvoice(invoice.data)}>
-            {invoice.hasComments ? (
-              <Tooltip
-                onMouseEnter={handleNoteHover(invoice.id)}
-                onMouseLeave={handleNoteHover(undefined)}
-                title={
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                    gap={theme.spacing(0.5)}>
-                    <Typography
-                      sx={{
-                        color: '#BDBDBD',
-                        lineHeight: '14px',
-                        fontSize: '10px',
-                        letterSpacing: '0.8px',
-                        textTransform: 'uppercase',
-                      }}>
-                      {formatDate(fetchedNote?.meta.lastUpdatedAt)}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        lineHeight: '14px',
-                        fontSize: '10px',
-                      }}>
-                      {fetchedNote?.content}
-                    </Typography>
-                  </Box>
-                }
-                arrow
-                placement="top">
-                <NoteAlt fontSize="small" />
-              </Tooltip>
-            ) : (
-              <NoteAltOutlined fontSize="small" />
-            )}
+            <NoteIcon
+              hasNotes={invoice.hasComments}
+              timeStamp={formatDate(fetchedNote?.meta.lastUpdatedAt)}
+              noteContent={fetchedNote?.content}
+              onMouseEnter={handleNoteHover(invoice.id)}
+              onMouseLeave={handleNoteHover(undefined)}
+            />
           </Cell>
         ),
       },
