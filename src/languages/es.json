@@ -2953,5 +2953,10 @@
   "Enter description here...": "Introduzca la descripción aquí...",
   "Create a new quotation to offer clients tailored service proposals and pricing, ready to be sent out.": "Cree un nuevo presupuesto para ofrecer a los clientes propuestas de servicios y precios personalizados, listos para su envío.",
   "New Purchase Invoice": "Nueva factura de compra",
-  "Select serial number": "Seleccione el número de serie"
+  "Sent to client": "Enviado al cliente",
+  "No quotations": "Sin cotizaciones",
+  "Select serial number": "Seleccione el número de serie",
+  "Quote(s) with notes": "Cotización(es) con notas",
+  "Net amount": "Importe neto",
+  "Search quotation number": "Buscar número de cotización"
 }

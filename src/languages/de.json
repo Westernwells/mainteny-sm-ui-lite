@@ -2902,6 +2902,7 @@
   "Default tax rate": "Standard-Steuersatz",
   "This standard tax percentage is applied automatically if no specific rate is set.": "Dieser Standard-Steuersatz wird automatisch angewendet, wenn kein Kundenspezifischer Satz festgelegt ist.",
   "Set as default": "Als Standard festlegen",
+  "Default": "Standard ",
   "Edit tax rate": "Steuersatz bearbeiten",
   "Save tax rate": "Steuersatz speichern",
   "Remove tax rate": "Steuersatz entfernen",
