@@ -1,11 +1,13 @@
-import {useEffect, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {GridCellParams, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
+import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ArticleView} from 'models/article';
+import {ServiceOrderType} from 'models/service-order';
 import {formatNetAmount} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging';
 import DOMPurify from 'dompurify';
@@ -18,6 +20,7 @@ import {
 
 interface Props {
   setRowItem: (row: ArticleView) => void;
+  customerId?: string;
 }
 
 export const columns: GridColDef[] = [
@@ -83,11 +86,9 @@ export const makeRows = (articles: ArticleView[]): GridRowsProp =>
 
 const pageSize = 25;
 
-export const ArticlesModalDataGrid = ({setRowItem}: Props) => {
+export const ArticlesModalDataGrid = ({setRowItem, customerId}: Props) => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(makePage(0, pageSize));
-  const [rows, setRows] = useState<GridRowsProp>([]);
-  const [pageCount, setPageCount] = useState(0);
 
   const {
     data: articleResource = createEmptyResource<ArticleView>(pageSize),
@@ -104,17 +105,41 @@ export const ArticlesModalDataGrid = ({setRowItem}: Props) => {
     true,
   );
 
-  useEffect(() => {
-    setPageCount(Math.ceil(articleResource.total / page.pageSize));
-  }, [articleResource, page.pageSize]);
+  const {data: customPrices = [], isLoading: isCustomPriceLoading} =
+    usePropertyOwnerQueryTravelWorks(
+      customerId || '',
+      {
+        serviceOrderType: ServiceOrderType.GENERAL,
+      },
+      {enabled: !!customerId},
+    );
 
-  useEffect(() => {
-    if (!isLoading) {
-      setRows(makeRows(articleResource.data));
+  const pageCount = useMemo(() => {
+    if (!articleResource.total || !page.pageSize) {
+      return 0;
     }
-  }, [articleResource, isLoading]);
+    return Math.ceil(articleResource.total / page.pageSize);
+  }, [articleResource.total, page.pageSize]);
 
-  if (isIdle || isLoading) {
+  const rows = useMemo(() => {
+    const articlesUpdatedWithCustomPrice = articleResource.data.map(
+      (article) => {
+        const customPriceArticle = customPrices.find(
+          (c) => c.article.id === article.id,
+        );
+        if (customPriceArticle) {
+          return {
+            ...article,
+            unitSellingAmount: customPriceArticle.article.unitSellingAmount,
+          };
+        }
+        return article;
+      },
+    );
+    return makeRows(articlesUpdatedWithCustomPrice);
+  }, [articleResource, customPrices]);
+
+  if (isIdle || isLoading || isCustomPriceLoading) {
     return (
       <Box
         display="flex"
