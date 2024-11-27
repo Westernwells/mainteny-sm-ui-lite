@@ -52,6 +52,7 @@ const TableHeaderCell = ({
         backgroundColor: 'white',
         position: 'sticky',
         zIndex: 6,
+        minHeight: 40,
 
         ...(isFirst &&
           firstSticky && {

@@ -7,7 +7,6 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {
   ServiceOrderReportView,
   ServiceOrderStatus,
-  ServiceOrderType,
   ServiceOrderView,
 } from 'models/service-order';
 import {
@@ -26,7 +25,7 @@ import {useTranslation} from 'react-i18next';
 
 interface Props {
   date: string;
-  type: ServiceOrderType;
+  type: string;
   number: string;
   status: ServiceOrderStatus;
   order: ServiceOrderView;

@@ -28,16 +28,22 @@ const Metric = ({
   tooltipText,
   paddingLeft,
 }: MetricProps) => (
-  <Box display="flex" flexDirection="column" paddingLeft={paddingLeft || '2em'}>
-    <Box sx={{display: 'flex', alignItems: 'center'}}>
-      <Typography variant="h6">{t(title)}</Typography>
+  <Box
+    display="flex"
+    flexDirection="column"
+    paddingLeft={paddingLeft || '2em'}
+    height="66px">
+    <Box sx={{display: 'flex', alignItems: 'center', height: '22px', pb: 2}}>
+      <Typography variant="h6" color="#828DA3">
+        {t(title)}
+      </Typography>
       <Tooltip title={t(tooltipText)} placement="top" arrow>
         <Box sx={{ml: 0.5, mb: -0.7, cursor: 'pointer'}}>
           <AlertInfoIcon width="16px" height="16px" />
         </Box>
       </Tooltip>
     </Box>
-    <Box display="flex" alignItems="center" gap={1}>
+    <Box display="flex" alignItems="center" gap={1} height="37px">
       {icon}
       <Typography variant="h3" sx={{pt: '0.2em'}}>
         {value}
@@ -45,6 +51,12 @@ const Metric = ({
     </Box>
   </Box>
 );
+
+const iconStyles = {
+  color: '#828DA3',
+  width: '32px',
+  height: '32px',
+};
 
 type Props = {
   selectedDateRange: DateRange<Date | null>;
@@ -88,15 +100,19 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
   return (
     <Grid
       container
-      py={4}
+      py="24px"
+      mt="40px"
+      mb="48px"
+      pt={0}
+      height="66px"
       spacing={2}
       justifyContent="space-between"
       alignItems="center">
-      <Grid item xs={12} sm={3} sx={{borderRight: '1px solid gray'}}>
+      <Grid item xs={12} sm={3} sx={{borderRight: '1px solid #D9D9D9'}}>
         <Metric
           title="Number of invoices"
           value={numOfInvoices}
-          icon={<ReceiptDollar fontSize="2.5rem" style={{color: '#828DA3'}} />}
+          icon={<ReceiptDollar fontSize="2.5rem" style={iconStyles} />}
           tooltipText={t(
             'Total number of invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}',
             {
@@ -111,17 +127,14 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
         item
         xs={12}
         sm={5.5}
-        sx={{borderRight: '1px solid gray', alignItems: 'center'}}>
+        sx={{borderRight: '1px solid #D9D9D9', alignItems: 'center'}}>
         <Metric
           title="Total cost"
           value={formatCurrency(totalAmount, {
             currencySymbol: currentCurrency.symbol,
           })}
           icon={
-            <PerformanceMoneyDecrease
-              fontSize="2.5rem"
-              style={{color: '#828DA3'}}
-            />
+            <PerformanceMoneyDecrease fontSize="2.5rem" style={iconStyles} />
           }
           tooltipText={t(
             'Aggregate cost of all invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}',
@@ -140,7 +153,7 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
           value={formatCurrency(totalPendingAmount, {
             currencySymbol: currentCurrency.symbol,
           })}
-          icon={<TimeClockHand fontSize="2.5rem" style={{color: '#828DA3'}} />}
+          icon={<TimeClockHand fontSize="2.5rem" style={iconStyles} />}
           tooltipText={t(
             'Aggregated outstanding amount of all invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}',
             {
