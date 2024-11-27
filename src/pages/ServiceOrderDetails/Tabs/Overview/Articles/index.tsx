@@ -51,9 +51,14 @@ import {Actions} from './Actions';
 interface Props {
   serviceOrderArticles: ServiceOrderArticleView[] | undefined;
   serviceOrderId?: string;
+  customerId?: string;
 }
 
-export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
+export const Articles = ({
+  serviceOrderArticles,
+  serviceOrderId,
+  customerId,
+}: Props) => {
   const navigate = useNavigate();
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -160,6 +165,7 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
       align: 'right',
       renderCell: (article, cellProps) => (
         <Cell
+          {...cellProps}
           isFirst
           onClick={cellProps.onClick}
           align="right"
@@ -325,7 +331,10 @@ export const Articles = ({serviceOrderArticles, serviceOrderId}: Props) => {
         {isLoading ? (
           <Progress label="Adding article" />
         ) : (
-          <ArticlesModalDataGrid setRowItem={handleSelectArticle} />
+          <ArticlesModalDataGrid
+            setRowItem={handleSelectArticle}
+            customerId={customerId}
+          />
         )}
       </SelectModal>
 
