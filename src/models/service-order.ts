@@ -316,7 +316,7 @@ export interface ServiceOrderView {
   elevator: ElevatorView;
   contract?: ContractSimpleView;
   description: string;
-  type: ServiceOrderType;
+  type: ServiceOrderType | string;
   status: ServiceOrderStatus;
   lastVisitDate: string;
   expectedVisitDate: string;
@@ -722,7 +722,7 @@ export type ServiceOrderTableRow = {
   id: string;
   elevatorExternalId: string;
   number: string;
-  type: ServiceOrderType;
+  type: ServiceOrderType | string;
   address: string;
   fullAddress: string;
   dueDate: string;

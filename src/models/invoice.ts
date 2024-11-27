@@ -595,7 +595,7 @@ export type InvoiceTableRow = {
   dueDate?: string;
   jobNumber: string;
   type: string;
-  serviceOrderType?: ServiceOrderType;
+  serviceOrderType?: string;
   total: number;
   status: InvoiceStatus;
   hasComments: boolean;

@@ -121,7 +121,7 @@ export const ServiceOrderComboBox = forwardRef(
         size="small"
         inputValue={query}
         onInputChange={onInputChange}
-        options={options}
+        options={item ? [item] : options}
         filterOptions={(x) => x}
         getOptionLabel={(option: ServiceOrderOption) => option.externalId}
         onChange={(

@@ -106,7 +106,7 @@ export const PageLayout = ({
         <Box width="4.5rem" />
         <Box
           sx={{
-            pt: '1em',
+            p: '24px',
             mx: !excludeDefaultSpacing ? '24px' : null,
             overflowY: 'auto',
             ...contentStyles,

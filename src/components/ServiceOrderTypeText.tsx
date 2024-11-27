@@ -5,7 +5,7 @@ import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {ServiceOrderType} from '../models/service-order';
 
 interface Props {
-  serviceOrderType?: ServiceOrderType | null;
+  serviceOrderType?: string | null;
   style?: {[key: string]: string | number};
   variant?: any;
   capitalizeText?: boolean;

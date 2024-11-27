@@ -46,7 +46,10 @@ import {
   PurchaseInvoiceView,
   UpdatePurchaseInvoiceRecord,
 } from 'models/purchaseInvoice';
-import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+import {
+  useServiceOrders,
+  useServiceOrderDetails,
+} from 'hooks/reactQuery/useServiceOrder';
 import {useQueryState} from 'hooks/useQueryState';
 import {ServiceOrderOrderField, ServiceOrderView} from 'models/service-order';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
@@ -64,7 +67,7 @@ import {
 } from 'hooks/reactQuery/usePurchaseInvoice';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useLocation} from 'react-router-dom';
 import {ServiceOrderComboBox} from 'components/ServiceOrderComboBox';
 import CurrencySelect from 'components/CurrencySelect';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -76,6 +79,7 @@ import CustomSnackbar from 'components/CustomSnackbar';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {PurchaseInvoiceInfo} from 'pages/PurchaseInvoiceDetails/PurchaseInvoiceInfo';
 import {getCurrencyData} from 'components/CurrencyIcons';
+import queryString from 'query-string';
 
 const NumericFormat = forwardRef<
   HTMLElement,
@@ -136,6 +140,7 @@ const NewPurchaseInvoice = ({
   const {t} = useTranslation();
   const {user} = useUserSession();
   const navigate = useNavigate();
+  const {search} = useLocation();
   const currentCurrency = useCurrentCurrency();
   const {enqueueSnackbar} = useSnackbar();
   const {data: uuid} = useUuid();
@@ -147,6 +152,11 @@ const NewPurchaseInvoice = ({
   const [dueDateTouched, setDueDateTouched] = useState(false);
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
+
+  const {orderId} = queryString.parse(search);
+
+  const {data: serviceOrderDetail, isLoading: isLoadingServiceOrder} =
+    useServiceOrderDetails(orderId as string);
 
   const {mutateAsync: deletePurchaseInvoice, isLoading: isDeleting} =
     useDeletePurchaseInvoice();
@@ -231,6 +241,22 @@ const NewPurchaseInvoice = ({
     control,
     name: 'serviceOrders',
   });
+
+  useEffect(() => {
+    if (serviceOrderDetail) {
+      appendServiceOrder({
+        serviceOrderId: serviceOrderDetail.id,
+        netAmount: 0,
+      });
+
+      setValue('serviceOrders', [
+        {
+          serviceOrderId: serviceOrderDetail.id,
+          netAmount: 0,
+        },
+      ]);
+    }
+  }, [serviceOrderDetail]);
 
   const {
     fields: vatAmounts,
@@ -732,6 +758,7 @@ const NewPurchaseInvoice = ({
                           control={control}
                           render={({field}) => (
                             <ServiceOrderComboBox
+                              key={`service-order-combo-box-${index}`}
                               {...field}
                               containerStyles={{width: '100%'}}
                               options={serviceOrdersResource.data.map(
@@ -760,9 +787,8 @@ const NewPurchaseInvoice = ({
                               }}
                               getQuery={(item) => setSearchQuery(item || '')}
                               initialValue={
-                                purchaseInvoice?.additionalInfo.serviceOrders[
-                                  index
-                                ]
+                                purchaseInvoice?.additionalInfo
+                                  ?.serviceOrders?.[index]
                                   ? {
                                       id: purchaseInvoice?.additionalInfo
                                         .serviceOrders[index].serviceOrder.id,
@@ -777,22 +803,36 @@ const NewPurchaseInvoice = ({
                                             purchaseInvoice?.additionalInfo
                                               .serviceOrders[index].serviceOrder
                                               .id,
-                                        )?.elevator.address.fullName || '-',
+                                        )?.elevator?.address?.fullName || '-',
                                       company:
                                         serviceOrdersResource.data.find(
                                           (order) =>
                                             order.id ===
-                                            purchaseInvoice.additionalInfo
+                                            purchaseInvoice?.additionalInfo
                                               .serviceOrders[index].serviceOrder
                                               .id,
-                                        )?.serviceCompany.name || '-',
-                                      type: serviceOrdersResource.data.find(
-                                        (order) =>
-                                          order.id ===
-                                          purchaseInvoice.additionalInfo
-                                            .serviceOrders[index].serviceOrder
-                                            .id,
-                                      )?.type!,
+                                        )?.serviceCompany?.name || '-',
+                                      type:
+                                        serviceOrdersResource.data.find(
+                                          (order) =>
+                                            order.id ===
+                                            purchaseInvoice?.additionalInfo
+                                              .serviceOrders[index].serviceOrder
+                                              .id,
+                                        )?.type || '-',
+                                    }
+                                  : serviceOrderDetail &&
+                                    serviceOrders.length < 2
+                                  ? {
+                                      id: serviceOrderDetail.id,
+                                      externalId: serviceOrderDetail.externalId,
+                                      address:
+                                        serviceOrderDetail.elevator?.address
+                                          ?.fullName || '-',
+                                      company:
+                                        serviceOrderDetail.elevator
+                                          ?.propertyOwner?.name || '-',
+                                      type: serviceOrderDetail.type,
                                     }
                                   : null
                               }
@@ -804,7 +844,6 @@ const NewPurchaseInvoice = ({
                           )}
                         />
                       </Grid>
-
                       <Grid item xs={serviceOrders.length > 1 ? 5 : 6}>
                         <Controller
                           name={`serviceOrders.${index}.netAmount`}
@@ -1410,7 +1449,12 @@ const NewPurchaseInvoice = ({
 
       <BottomDrawer
         isOpen={isDrawerOpen}
-        isSaving={isUploading || isCreatingPurchaseInvoice || isUpdating}
+        isSaving={
+          isUploading ||
+          isCreatingPurchaseInvoice ||
+          isUpdating ||
+          isLoadingServiceOrder
+        }
         primaryButtonLabel={
           formType === 'edit' ||
           formType === 'new' ||
