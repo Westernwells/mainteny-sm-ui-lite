@@ -21,12 +21,13 @@ export enum QuotationStatus {
   SENT_TO_CLIENT = 'SENT_TO_CLIENT',
 }
 
+// order matters for quick filter displaying
 export enum QUOTATION_STATUS_FILTER {
   ALL = 'ALL',
   ACCEPTED = 'ACCEPTED',
+  SENT = 'SENT',
   DRAFT = 'DRAFT',
   REJECTED = 'REJECTED',
-  SENT = 'SENT',
 }
 
 export enum QuotationOrderField {

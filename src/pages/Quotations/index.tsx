@@ -38,8 +38,6 @@ import {
   formatDate,
   fromDateStringToDate,
 } from 'utils/datetime';
-import NoteAlt from '@mui/icons-material/NoteAlt';
-import {NoteAltOutlined} from '@mui/icons-material';
 import {StatusChip} from 'components/StatusChip';
 import {
   aggregateQuotationRow,
@@ -72,7 +70,6 @@ import Pagination from 'components/Pagination';
 import EmptyTable from 'components/Table/EmptyTable';
 import {OptionWithTranslationKey} from 'models/filter';
 import {capitalize, reduce} from 'lodash';
-import Tooltip from '@mui/material/Tooltip';
 import {createExcelContent} from 'utils/utils';
 import {downloadExcel} from 'utils/download';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -84,6 +81,7 @@ import {
 } from 'utils/filter';
 import {InvoiceOrderField} from 'models/invoice';
 import {convertNumberToAmountNumber, useCurrentCurrency} from 'utils/currency';
+import NoteIcon from 'components/NoteIcon';
 
 const pageSize = 25;
 
@@ -271,10 +269,7 @@ export const Quotations = () => {
       refetchOnWindowFocus: false,
     });
 
-  const fetchedNote = useMemo(() => {
-    if (!hoverNoteServiceId) return undefined;
-    return notes?.data[0];
-  }, [hoverNoteServiceId, notes]);
+  const fetchedNote = useMemo(() => notes?.data[0], [notes]);
 
   const navigateToNewQuotation = () => {
     navigate('new');
@@ -328,7 +323,8 @@ export const Quotations = () => {
         headerName: 'Subject',
         key: 'quotation-cell-subject',
         fieldName: QuotationOrderField.SUBJECT,
-        getExportValue: (quotation) => quotation.subject,
+        getExportValue: (quotation) =>
+          getPlainStringFromHtml(quotation.subject),
         renderCell: (quotation, cellProps) => (
           <Cell {...cellProps}>
             <TableCellText>
@@ -401,43 +397,13 @@ export const Quotations = () => {
             fieldName="NOTES"
             noWidthLimit
             onClick={() => setSelectedQuotation(quotation.data)}>
-            {quotation.hasComments ? (
-              <Tooltip
-                onMouseEnter={handleNoteHover(quotation.id)}
-                onMouseLeave={handleNoteHover(undefined)}
-                title={
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                    gap={theme.spacing(0.5)}>
-                    <Typography
-                      sx={{
-                        color: '#BDBDBD',
-                        lineHeight: '14px',
-                        fontSize: '10px',
-                        letterSpacing: '0.8px',
-                        textTransform: 'uppercase',
-                      }}>
-                      {formatDate(fetchedNote?.meta.lastUpdatedAt)}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        lineHeight: '14px',
-                        fontSize: '10px',
-                      }}>
-                      {fetchedNote?.content}
-                    </Typography>
-                  </Box>
-                }
-                arrow
-                placement="top">
-                <NoteAlt fontSize="small" />
-              </Tooltip>
-            ) : (
-              <NoteAltOutlined fontSize="small" />
-            )}
+            <NoteIcon
+              hasNotes={quotation.hasComments}
+              timeStamp={formatDate(fetchedNote?.meta.lastUpdatedAt)}
+              noteContent={fetchedNote?.content}
+              onMouseEnter={handleNoteHover(quotation.id)}
+              onMouseLeave={handleNoteHover(undefined)}
+            />
           </Cell>
         ),
       },
@@ -449,6 +415,7 @@ export const Quotations = () => {
         width: ACTION_CELL_WIDTH, // set static width that will not change
         isLast: true,
         showShadows: showLeftShadow ? 'left' : undefined,
+        noPadding: true,
         renderCell: (quotation, cellProps) => (
           <Cell {...cellProps} onClick={undefined}>
             <Actions quotation={quotation.data} />
@@ -456,7 +423,7 @@ export const Quotations = () => {
         ),
       },
     ],
-    [showLeftShadow, showRightShadow],
+    [showLeftShadow, showRightShadow, fetchedNote],
   );
 
   // filter intermediate state
@@ -898,6 +865,7 @@ export const Quotations = () => {
                 style={{
                   borderColor: 'text.primary',
                   height: '36px',
+                  paddingTop: 0,
                 }}>
                 {isFetchingAllQuotations ? (
                   <CircularProgress size="1rem" sx={{mr: 1}} />
