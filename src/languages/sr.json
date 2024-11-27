@@ -2923,6 +2923,7 @@
   "Default tax rate": "Podrazumevana poreska stopa",
   "This standard tax percentage is applied automatically if no specific rate is set.": "Ovaj standardni procenat poreza se primenjuje automatski ako nije određena posebna stopa.",
   "Set as default": "Postavi kao podrazumevano",
+  "Default": "Podrazumevano",
   "Edit tax rate": "Izmenite poresku stopu",
   "Save tax rate": "Sačuvaj poresku stopu",
   "Remove tax rate": "Uklonite poresku stopu",
@@ -2956,5 +2957,7 @@
   "No quotations": "Bez citata",
   "Select serial number": "Izaberite serijski broj",
   "Quote(s) with notes": "Citati sa beleškama",
-  "Net amount": "Neto iznos"
+  "Net amount": "Neto iznos",
+  "Search quotation number": "Pretražite broj ponude",
+  "Quotation number": "Broj ponude"
 }
