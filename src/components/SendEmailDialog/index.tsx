@@ -163,6 +163,12 @@ export const SendEmailDialog = ({
     if (open) onOpen?.();
   }, [open]);
 
+  useEffect(() => {
+    if (bccMails?.bccEmails && bccMails.bccEmails.length > 0) {
+      setValue('bccEmails', bccMails.bccEmails);
+    }
+  }, [bccMails]);
+
   return (
     <Dialog
       open={open || false}
