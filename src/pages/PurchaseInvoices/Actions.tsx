@@ -4,7 +4,7 @@ import {Action} from 'models/table';
 import TableActionMenu from 'components/Table/TableActionMenu';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {Confirm} from 'components/Confirm';
 import {useDeletePurchaseInvoice} from 'hooks/reactQuery/usePurchaseInvoice';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -17,6 +17,7 @@ type Props = {
 
 const Actions = ({id}: Props) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {enqueueSnackbar} = useSnackbar();
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
@@ -61,7 +62,14 @@ const Actions = ({id}: Props) => {
     {
       icon: EditIcon,
       label: 'Edit',
-      onTrigger: () => navigate(`/purchase-invoices/details/${id}/edit`),
+      onTrigger: () =>
+        navigate(`/purchase-invoices/details/${id}/edit`, {
+          state: {
+            from: location?.pathname?.includes('/orders')
+              ? location?.pathname
+              : `/purchase-invoices/`,
+          },
+        }),
     },
     {
       icon: DeleteIcon,
