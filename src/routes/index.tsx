@@ -354,14 +354,9 @@ export const Router = () => {
                   <Helmet>
                     <title>{`Purchase Invoice Details - ${titleTail}`}</title>
                   </Helmet>
-                  <PageLayout
-                    showBackAction
-                    pageScrollable
-                    backBtnLabel={currentPageTitle}>
-                    <PurchaseDetails
-                      getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
-                    />
-                  </PageLayout>
+                  <PurchaseDetails
+                    getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
+                  />
                 </>
               }
             />

@@ -141,6 +141,7 @@ const NewPurchaseInvoice = ({
   const {user} = useUserSession();
   const navigate = useNavigate();
   const {search} = useLocation();
+  const location = useLocation();
   const currentCurrency = useCurrentCurrency();
   const {enqueueSnackbar} = useSnackbar();
   const {data: uuid} = useUuid();
@@ -317,11 +318,14 @@ const NewPurchaseInvoice = ({
         dueDate: formData.dueDate,
         sentDate: formData.sentDate,
         currency: formData.currency,
-        serviceOrders: formData.serviceOrders.map((order) => ({
-          ...order,
-          netAmount:
-            (order.netAmount ?? 0) * 10 ** Currencies[formData.currency],
-        })),
+        serviceOrders:
+          formData.serviceOrders
+            .filter((order) => order.serviceOrderId?.trim())
+            .map((order) => ({
+              ...order,
+              netAmount:
+                (order.netAmount ?? 0) * 10 ** Currencies[formData.currency],
+            })) || [],
         netAmount:
           (formData?.netAmount ?? 0) * 10 ** Currencies[formData.currency],
         vats: formData.vatAmounts.map((item) => ({
@@ -355,7 +359,13 @@ const NewPurchaseInvoice = ({
         invoiceId: purchaseInvoice?.id!,
       });
 
-      navigate(`/purchase-invoices/details/${purchaseInvoice?.id}`);
+      navigate(`/purchase-invoices/details/${purchaseInvoice?.id}`, {
+        state: {
+          from: location?.state?.from?.includes('/orders')
+            ? `${location?.state?.from}?tab=3`
+            : `/purchase-invoices/`,
+        },
+      });
     } else {
       const newPurchaseInvoice: CreatePurchaseInvoiceRecord = {
         serviceCompanyId: formData.serviceCompanyId,
@@ -370,11 +380,14 @@ const NewPurchaseInvoice = ({
         dueDate: formData.dueDate,
         sentDate: formData.sentDate,
         currency: formData.currency,
-        serviceOrders: formData.serviceOrders.map((order) => ({
-          ...order,
-          netAmount:
-            (order.netAmount ?? 0) * 10 ** Currencies[formData.currency],
-        })),
+        serviceOrders:
+          formData.serviceOrders
+            .filter((order) => order.serviceOrderId?.trim())
+            .map((order) => ({
+              ...order,
+              netAmount:
+                (order.netAmount ?? 0) * 10 ** Currencies[formData.currency],
+            })) || [],
         netAmount:
           (formData?.netAmount ?? 0) * 10 ** Currencies[formData.currency],
         vatAmounts: formData.vatAmounts.map((item) => ({
@@ -405,7 +418,13 @@ const NewPurchaseInvoice = ({
         await uploadFiles({files: formData.documents, uploadPath});
       }
 
-      navigate(`/purchase-invoices/details/${response.value}`);
+      navigate(`/purchase-invoices/details/${response.value}`, {
+        state: {
+          from: location?.state?.from?.includes('/orders')
+            ? location?.state?.from
+            : `/purchase-invoices/`,
+        },
+      });
     }
   };
 
@@ -465,12 +484,6 @@ const NewPurchaseInvoice = ({
       watch('supplierId')
     );
 
-    const hasValidServiceOrder = watch('serviceOrders').some(
-      (serviceOrder) =>
-        typeof serviceOrder?.serviceOrderId === 'string' &&
-        serviceOrder.serviceOrderId.trim() !== '',
-    );
-
     const hasValidDates = !!(watch('sentDate') && watch('dueDate'));
     const hasExternalId = !!watch('externalId');
     const hasSubject = !!watch('subject');
@@ -481,7 +494,6 @@ const NewPurchaseInvoice = ({
     return (
       !formType ||
       (isSupplierValid &&
-        hasValidServiceOrder &&
         hasValidDates &&
         hasExternalId &&
         hasSubject &&
@@ -1073,6 +1085,7 @@ const NewPurchaseInvoice = ({
                           helperText: error ? error.message : null,
                           multiline: true,
                           rows: 4,
+                          sx: {paddingTop: '0.5em'},
                         }}
                       />
                     )}

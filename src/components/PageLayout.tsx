@@ -19,6 +19,8 @@ interface Props {
   pageTitle?: string;
   showBackAction?: boolean;
   backBtnLabel?: string;
+  path?: string;
+  onBackAction?: () => void;
 }
 
 interface OpenContext {
@@ -35,6 +37,8 @@ export const PageLayout = ({
   pageTitle,
   showBackAction,
   backBtnLabel,
+  path,
+  onBackAction,
 }: Props) => {
   const {t} = useTranslation();
   const queryClient = useQueryClient();
@@ -99,6 +103,8 @@ export const PageLayout = ({
           pageTitle={pageTitle && t(pageTitle)}
           showBackAction={showBackAction}
           backBtnLabel={backBtnLabel && t(backBtnLabel)}
+          path={path}
+          onBackAction={onBackAction}
         />
       </Box>
       <Box

@@ -67,7 +67,6 @@ import Actions from './Actions';
 const pageSize = 25;
 
 const getCommonLinkStyles = () => ({
-  paddingTop: '0.2em',
   display: 'block',
   fontWeight: '600',
   maxWidth: '300px',
@@ -149,7 +148,13 @@ export const PurchaseInvoices = ({
   };
 
   const handleRowClick = (id: string) => () => {
-    navigate(`/purchase-invoices/details/${id}`);
+    navigate(`/purchase-invoices/details/${id}`, {
+      state: {
+        from: serviceOrderId
+          ? `/orders/details/${serviceOrderId}?tab=3`
+          : `/purchase-invoices`,
+      },
+    });
   };
 
   const [resetDatePicker, setResetDatePicker] = useState(false);
@@ -495,7 +500,6 @@ export const PurchaseInvoices = ({
                         <Typography
                           key={index}
                           sx={{
-                            lineHeight: '14px',
                             fontSize: '10px',
                           }}>
                           {order.serviceOrder.externalId}
@@ -595,6 +599,7 @@ export const PurchaseInvoices = ({
         width: ACTION_CELL_WIDTH, // set static width that will not change
         isLast: true,
         showShadows: showLeftShadow ? 'left' : undefined,
+        noPadding: true,
         renderCell: (purchaseInvoice, cellProps) => (
           <Cell {...cellProps} onClick={undefined}>
             <Actions id={purchaseInvoice.id} />
@@ -756,9 +761,13 @@ export const PurchaseInvoices = ({
 
   const navigateToNewInvoice = () => {
     if (serviceOrderId) {
-      navigate(`/purchase-invoices/new?orderId=${serviceOrderId}`);
+      navigate(`/purchase-invoices/new?orderId=${serviceOrderId}`, {
+        state: {from: `/orders/details/${serviceOrderId}?tab=3`},
+      });
     } else {
-      navigate(`/purchase-invoices/new`);
+      navigate(`/purchase-invoices/new`, {
+        state: {from: `/purchase-invoices`},
+      });
     }
   };
 

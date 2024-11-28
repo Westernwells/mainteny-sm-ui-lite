@@ -82,49 +82,51 @@ export const PurchaseInvoiceInfo = ({
           </Grid>
         </Grid>
 
-        <Grid item xs={12}>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography variant="subtitle2" color="textSecondary">
-                {t('Job number')}
-              </Typography>
-              {purchaseInvoice?.additionalInfo.serviceOrders.map(
-                (serviceOrder, index) => (
-                  <Link
-                    component={RouterLink}
-                    key={`${serviceOrder.serviceOrder.id}-${index}`}
-                    to={`/orders/details/${serviceOrder.serviceOrder.id}`}
-                    underline="hover"
-                    variant="body2"
-                    sx={getCommonLinkStyles()}
-                    color={theme.palette.info.main}>
-                    {serviceOrder.serviceOrder.externalId || '-'}
-                  </Link>
-                ),
-              )}
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="subtitle2" color="textSecondary">
-                {t('Net Amount')}
-              </Typography>
-              {purchaseInvoice?.additionalInfo.serviceOrders.map(
-                (serviceOrder, index) => (
-                  <Typography
-                    variant="body1"
-                    key={`${serviceOrder.serviceOrder.id}-${index}`}
-                    color={theme.palette.primary.dark}>
-                    {formatCurrency(
-                      centsToMoney(
-                        purchaseInvoice?.totalAmount.currency!,
-                        serviceOrder.netAmount!,
-                      ),
-                    )}
-                  </Typography>
-                ),
-              )}
+        {(purchaseInvoice?.additionalInfo?.serviceOrders?.length ?? 0) > 0 && (
+          <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="subtitle2" color="textSecondary">
+                  {t('Job number')}
+                </Typography>
+                {purchaseInvoice?.additionalInfo.serviceOrders.map(
+                  (serviceOrder, index) => (
+                    <Link
+                      component={RouterLink}
+                      key={`${serviceOrder.serviceOrder.id}-${index}`}
+                      to={`/orders/details/${serviceOrder.serviceOrder.id}`}
+                      underline="hover"
+                      variant="body2"
+                      sx={getCommonLinkStyles()}
+                      color={theme.palette.info.main}>
+                      {serviceOrder.serviceOrder.externalId || '-'}
+                    </Link>
+                  ),
+                )}
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="subtitle2" color="textSecondary">
+                  {t('Net Amount')}
+                </Typography>
+                {purchaseInvoice?.additionalInfo.serviceOrders.map(
+                  (serviceOrder, index) => (
+                    <Typography
+                      variant="body1"
+                      key={`${serviceOrder.serviceOrder.id}-${index}`}
+                      color={theme.palette.primary.dark}>
+                      {formatCurrency(
+                        centsToMoney(
+                          purchaseInvoice?.totalAmount.currency!,
+                          serviceOrder.netAmount!,
+                        ),
+                      )}
+                    </Typography>
+                  ),
+                )}
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
+        )}
 
         <Grid item xs={12}>
           <Grid container spacing={2}>

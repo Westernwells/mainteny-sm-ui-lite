@@ -25,12 +25,16 @@ interface Props {
   pageTitle?: string;
   showBackAction?: boolean;
   backBtnLabel?: string;
+  path?: string;
+  onBackAction?: () => void;
 }
 
 export const AppTopBar = ({
   pageTitle,
   showBackAction,
   backBtnLabel = '',
+  path,
+  onBackAction,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -115,7 +119,12 @@ export const AppTopBar = ({
       <Box width="4.5rem" />
       <Box sx={{display: 'flex', justifyContent: 'space-between', flexGrow: 1}}>
         {showBackAction ? (
-          <BackAction label={backBtnLabel} containerStyle={{mt: '1em'}} />
+          <BackAction
+            label={backBtnLabel}
+            containerStyle={{mt: '1em'}}
+            path={path}
+            onBackAction={onBackAction}
+          />
         ) : null}
         <Typography
           variant="h4"

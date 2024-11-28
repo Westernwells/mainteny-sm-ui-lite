@@ -157,8 +157,8 @@ export const LocationSchema = ({label, elevator}: Props) => {
             label="Travel fee"
             bodyText={
               formatCurrency(
-                elevator.additionalInfo.travelFee ??
-                  0 / 10 ** currentCurrency.fractionDigits,
+                (elevator.additionalInfo.travelFee ?? 0) /
+                  10 ** currentCurrency.fractionDigits,
               ) || '-'
             }
             containerStyles={{alignItems: 'center'}}
