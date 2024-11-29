@@ -3,14 +3,12 @@ import {useNavigate} from 'react-router-dom';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import MoreIcon from '@mui/icons-material/MoreVert';
 import Edit from '@mui/icons-material/Edit';
 import CopyAll from '@mui/icons-material/CopyAll';
 import CheckIcon from '@mui/icons-material/Check';
@@ -52,6 +50,7 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import TableActionButton from 'components/Table/TableActionButton';
 
 interface Props {
   quotation: QuotationView;
@@ -401,10 +400,19 @@ const Actions = ({quotation}: Props) => {
   })();
 
   return (
-    <Box>
-      <IconButton sx={{padding: 0}} onClick={handleClick}>
-        <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
-      </IconButton>
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        height: '40px',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <TableActionButton
+        testId="quotation-action-menu-button"
+        removePadding
+        onClick={handleClick}
+      />
       <Menu
         id="actions-menu"
         anchorEl={anchorEl}

@@ -30,7 +30,7 @@ describe('Create Contact', () => {
         // open contact person details
         const contactPersonsAssociationsAPI = `${Cypress.env().REACT_APP_API_URL}/api/contactPersons/*/associations?*`;
         cy.intercept('GET', contactPersonsAssociationsAPI).as('contactPersonsAssociationsAPI');
-        cy.get('div[role="cell"][data-field="NAME"]').contains(fullName).click();
+        cy.get('td[role="cell"][data-field="NAME"]').contains(fullName).click();
         cy.wait('@contactPersonsAssociationsAPI');
 
         // assign contact to unit
@@ -63,7 +63,7 @@ describe('Create Contact', () => {
         // close contact details
         cy.get('body').click(0, 0);
         // open actions
-        cy.get('div[role="cell"][data-field="NAME"]').contains(fullName).parents('div[role="row"]').find('svg[data-testid="MoreVertIcon"]').click();
+        cy.get('td[role="cell"][data-field="NAME"]').contains(fullName).parents('tr[role="row"]').find('svg[data-testid="MoreVertIcon"]').click();
         // delete contact
         cy.contains('li', 'Delete').click();
         const deleteContactPersonAPI = `${Cypress.env().REACT_APP_API_URL}/api/contactPersons/*`;

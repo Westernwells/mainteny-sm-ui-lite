@@ -18,6 +18,7 @@ import AsyncSelect from 'components/AsyncSelect';
 import {fetchServiceCompanyContactPersons} from 'hooks/reactQuery/useContacts';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Typography} from '@mui/material';
+import {Role} from 'models/user';
 import ProfilePictureInput from '../../ProfilePictureInput';
 import {Order} from '../../../../models/pagination';
 
@@ -90,7 +91,7 @@ const Form = ({form}: Props) => {
             fetchServiceCompanyContactPersons(serviceCompanyId, {
               ...params,
               pageSize: 3,
-              role: [...Object.values(ServiceCompanyContactPersonRole)],
+              role: [...Object.values(Role)],
               order: Order.DESC,
               orderBy: ServiceCompanyContactPersonOrderField.CREATED_DATE,
             })
