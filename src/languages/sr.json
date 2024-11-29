@@ -2959,5 +2959,20 @@
   "Quote(s) with notes": "Citati sa beleškama",
   "Net amount": "Neto iznos",
   "Search quotation number": "Pretražite broj ponude",
-  "Quotation number": "Broj ponude"
+  "Quotation number": "Broj ponude",
+  "No Technical Data": "Nema tehničkih podataka",
+  "Add a data category to speed up your workflow": "Dodajte kategoriju podataka da biste ubrzali tok posla",
+  "New Technical Data": "Novi tehnički podaci",
+  "Create your own Technical Data fields": "Napravite sopstvena polja za tehničke podatke",
+  "Add and customize data input fields that best fit your needs.": "Dodajte i prilagodite polja za unos podataka koja najbolje odgovaraju vašim potrebama.",
+  "Enter your category name": "Unesite naziv svoje kategorije",
+  "Custom field": "Prilagođeno polje",
+  "General manager": "Generalni direktor",
+  "Facility manager": "Menadžer objekta",
+  "Property manager": "Upravnik imovine",
+  "Asset owner": "Vlasnik imovine",
+  "Other contact": "Drugi kontakt",
+  "Add a new contact person and always have their information readily available for efficient communication.": "Dodajte novu kontakt osobu i uvek imajte njene informacije na raspolaganju za efikasnu komunikaciju.",
+  "New Contact": "Novi kontakt",
+  "No contacts": "Nema kontakata"
 }
