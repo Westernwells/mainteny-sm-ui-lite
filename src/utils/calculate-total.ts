@@ -255,10 +255,12 @@ export const sumArticlesAmount = (
   items: (InvoiceItemRecord & {total: number})[],
 ) =>
   fixRounding(
-    items.reduce(
-      (prevValue, currentValue) => prevValue + currentValue.total,
-      0,
-    ),
+    items
+      .reduce(
+        (prevValue, currentValue) => prevValue.plus(currentValue.total),
+        new BigNumber(0),
+      )
+      .toNumber(),
     2,
   );
 

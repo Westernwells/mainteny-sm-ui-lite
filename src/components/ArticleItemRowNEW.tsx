@@ -30,12 +30,13 @@ import {DiscountType, InvoiceItemRecord, InvoiceType} from 'models/invoice';
 import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
-import {Currencies, formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {
-  createHighlightedText,
-  filterArrayBySearchText,
-  fixRounding,
-} from 'utils/utils';
+  convertNumberToAmountNumber,
+  Currencies,
+  formatCurrency,
+  useCurrentCurrency,
+} from 'utils/currency';
+import {createHighlightedText, filterArrayBySearchText} from 'utils/utils';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {ArticleType, ArticleView} from 'models/article';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
@@ -211,10 +212,7 @@ export const ArticleItemRowNEW = ({
         },
         unitAmount: {
           ...formik.values.unitAmount,
-          netAmount: fixRounding(
-            price * 10 ** Currencies[formik.values.unitAmount.currency],
-            2,
-          ),
+          netAmount: convertNumberToAmountNumber(price, currentCurrency),
         },
       });
     }
@@ -647,8 +645,7 @@ export const ArticleItemRowNEW = ({
             if (floatValue) {
               formik.setFieldValue(
                 'unitAmount.netAmount',
-                floatValue *
-                  10 ** Currencies[formik.values.unitAmount.currency],
+                convertNumberToAmountNumber(floatValue, currentCurrency),
               );
             } else {
               formik.setFieldValue('unitAmount.netAmount', 0);
