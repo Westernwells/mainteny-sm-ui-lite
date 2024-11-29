@@ -17,12 +17,7 @@ import {
   UnitFilterForm,
   UnitTableRow,
 } from 'models/elevator';
-import {
-  calculateTotalPages,
-  createEmptyResource,
-  makePage,
-  toggleOrder,
-} from 'utils/paging';
+import {createEmptyResource, makePage, toggleOrder} from 'utils/paging';
 import {
   useAllElevators,
   useAllUnits,
@@ -98,21 +93,15 @@ import {
 import {ContractStatus} from 'models/contract';
 import PropertyInput from 'components/Inputs/PropertyInput';
 import {PropertyType} from 'models/valueProperty';
+import {
+  createQuickFilterOptions,
+  filterOutQuickFilterOptions,
+} from 'utils/filter';
 
 const pageInfo = makePage(0, 50);
 
-const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
-  {value: ElevatorStatusFilter.RUNNING, labelKey: 'Running'},
-  {value: ElevatorStatusFilter.BROKEN, labelKey: 'Broken'},
-  {value: ElevatorStatusFilter.JOB_ONGOING, labelKey: 'Job ongoing'},
-  {value: ElevatorStatusFilter.UNKNOWN, labelKey: 'Unknown'},
-  {value: ElevatorStatusFilter.OUT_OF_SERVICE, labelKey: 'Out of service'},
-];
-
-const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
-  {value: ElevatorStatusFilter.ALL, labelKey: 'All'},
-  ...QUICK_FILTER_OPTIONS_WITHOUT_ALL,
-];
+const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] =
+  createQuickFilterOptions(ElevatorStatusFilter);
 
 const DISTANCE_OPTION: OptionWithTranslationKey[] = [
   {value: DISTANCE_FILTER.FIVE, labelKey: '+5km'},
@@ -272,7 +261,7 @@ export const UnitListingView = () => {
     keepPreviousData: true,
   });
 
-  const handleCustomerCellClick = (id: string) => () => {
+  const handleCustomerCellClick = (id: string) => {
     navigate(`/customers/details/${id}?tab=0`);
   };
 
@@ -572,15 +561,6 @@ export const UnitListingView = () => {
     return {emptyTable: false, noMatchingData: false};
   }, [appliedFilterNumber, isFetched, elevatorResponse, search]);
 
-  const totalPages = useMemo(
-    () =>
-      calculateTotalPages(
-        elevatorResponse.total,
-        elevatorResponse.page.pageSize,
-      ),
-    [elevatorResponse],
-  );
-
   const handlePageIndexChange = (value: number) => {
     setPage({...page, pageIndex: value});
     containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
@@ -626,10 +606,11 @@ export const UnitListingView = () => {
       return;
     }
 
-    const areAllValuesSelectedIndividually =
-      QUICK_FILTER_OPTIONS_WITHOUT_ALL.every((option) =>
-        newValues.some((selectedValue) => option.value === selectedValue),
-      );
+    const areAllValuesSelectedIndividually = filterOutQuickFilterOptions({
+      options: QUICK_FILTER_OPTIONS,
+    }).every((option) =>
+      newValues.some((selectedValue) => option.value === selectedValue),
+    );
 
     setSelectedStatus(
       areAllValuesSelectedIndividually
@@ -1144,7 +1125,6 @@ export const UnitListingView = () => {
         currentIndex={elevatorResponse.page.pageIndex}
         numberOfElementsPerPage={elevatorResponse.page.pageSize}
         totalEntries={elevatorResponse.total}
-        totalPages={totalPages}
         onChange={handlePageIndexChange}
         onNumberPerPageChange={handleChangeElementsPerPage}
       />

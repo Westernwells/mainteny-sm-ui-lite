@@ -1,5 +1,4 @@
 import Notes from 'components/Notes';
-import {FC} from 'react';
 import {CreateNoteVars, DeleteNoteVars, UpdateNoteVars} from 'models/note';
 import {MutateOptions} from 'react-query';
 import {
@@ -11,9 +10,10 @@ import {
 
 interface Props {
   propertyOwnerId: string;
+  onChange?: () => void;
 }
 
-export const CustomerNotes: FC<Props> = ({propertyOwnerId}) => {
+export const CustomerNotes = ({propertyOwnerId, onChange}: Props) => {
   const {
     data: notes = {
       pages: [],
@@ -28,11 +28,11 @@ export const CustomerNotes: FC<Props> = ({propertyOwnerId}) => {
     pageSize: 10,
   });
   const {mutate: createCustomerNote, isLoading: isCreating} =
-    useCreateCustomerNote();
+    useCreateCustomerNote(onChange);
   const {mutate: deleteCustomerNote, isLoading: isDeleting} =
-    useDeleteCustomerNote();
+    useDeleteCustomerNote(onChange);
   const {mutate: updateCustomerNote, isLoading: isUpdating} =
-    useUpdateCustomerNote();
+    useUpdateCustomerNote(onChange);
 
   const createNote = async (
     variables: CreateNoteVars,
