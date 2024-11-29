@@ -1,5 +1,5 @@
 import {ServiceCompany, ServiceCompanyView} from './service-company';
-import {AddressRecord, Meta, Contact, TimeWindowRecord} from './misc';
+import {AddressRecord, Contact, Meta, TimeWindowRecord} from './misc';
 import {ServiceOrderType} from './service-order';
 import {WorkHoursType} from './workHours';
 
@@ -12,6 +12,16 @@ export enum UserAccountStatus {
 }
 
 export enum Role {
+  GENERAL_MANAGER = 'GENERAL_MANAGER',
+  ASSISTANT = 'ASSISTANT',
+  FACILITY_MANAGER = 'FACILITY_MANAGER',
+  PROPERTY_MANAGER = 'PROPERTY_MANAGER',
+  CONTACT_PERSON = 'CONTACT_PERSON',
+  ASSET_OWNER = 'ASSET_OWNER',
+  OTHER_CONTACT = 'OTHER_CONTACT',
+  OTHERS = 'OTHERS',
+
+  // deprecated
   ADMIN = 'ADMIN',
   SERVICE_MANAGER = 'SERVICE_MANAGER',
   TECHNICIAN = 'TECHNICIAN',

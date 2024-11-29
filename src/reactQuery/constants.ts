@@ -107,6 +107,7 @@ export const queryKeys = {
   queryAllJobs: 'queryAllJobs',
   queryAllInvoices: 'queryAllInvoices',
   queryAllUnits: 'queryAllUnits',
+  queryAllQuotations: 'queryAllQuotations',
   fetchPurchaseInvoices: 'fetchPurchaseInvoices',
   fetchPurchaseInvoiceStatistics: 'fetchPurchaseInvoiceStatistics',
   purchaseInvoiceById: 'purchaseInvoiceById',
@@ -114,6 +115,9 @@ export const queryKeys = {
   fetchProperties: 'fetchProperties',
   archiveServiceOrder: 'archiveServiceOrder',
   cancelServiceOrder: 'cancelServiceOrder',
+  fetchContactStatistics: 'fetchContactStatistics',
+  fetchContactNotes: 'fetchContactNotes',
+  queryAllContactPersons: 'queryAllContactPersons',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

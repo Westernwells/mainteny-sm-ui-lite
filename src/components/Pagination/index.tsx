@@ -8,13 +8,12 @@ import Typography from '@mui/material/Typography';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import {ELEMENTS_PER_PAGE_OPTIONS, PageDetails} from '../../models/pagination';
+import {ELEMENTS_PER_PAGE_OPTIONS, PageDetails} from 'models/pagination';
+import {calculateTotalPages, getDotsSide, removePageIndex} from 'utils/paging';
 import PageButton from './PageButton';
-import {getDotsSide, removePageIndex} from '../../utils/paging';
 
 type Props = {
   currentIndex: number;
-  totalPages: number;
   numberOfElementsPerPage: number;
   totalEntries: number;
   onChange: (page: number) => void;
@@ -24,7 +23,6 @@ type Props = {
 
 const Pagination = ({
   currentIndex,
-  totalPages,
   numberOfElementsPerPage,
   totalEntries,
   onChange,
@@ -43,6 +41,11 @@ const Pagination = ({
     onNumberPerPageChange(value);
     setOpen(false);
   };
+
+  const totalPages = useMemo(
+    () => calculateTotalPages(totalEntries, numberOfElementsPerPage),
+    [totalEntries, numberOfElementsPerPage],
+  );
 
   const [startIndexForPage, endIndexForPage] = useMemo(() => {
     const start = currentIndex * numberOfElementsPerPage + 1;

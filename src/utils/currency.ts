@@ -1,4 +1,4 @@
-import Dinero, {Currency} from 'dinero.js';
+import Dinero, {Currency as DineroCurrency} from 'dinero.js';
 import i18n from 'i18n';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {AggregatedAmount, InvoiceView} from 'models/invoice';
@@ -6,9 +6,10 @@ import {UserAccount} from 'models/user';
 import {
   Amount,
   AmountRecord,
-  StringMap,
+  Currency,
   Currency as CurrencyModalType,
   Money,
+  StringMap,
 } from '../models/misc';
 import {getCountryCode} from './countries';
 
@@ -57,10 +58,11 @@ function formatAmount(amount?: Amount, value?: number): string {
 
   return Dinero({
     amount: value,
-    currency: amount.currency as Currency,
+    currency: amount.currency as DineroCurrency,
     precision: amount.fractionDigits,
   }).toFormat();
 }
+
 // display the amount from backend
 export function formatNetAmount(amount?: Amount): string {
   return formatAmount(amount, amount?.netAmount);
@@ -165,6 +167,7 @@ export function makeAmountRecord(
     percentageVat,
   };
 }
+
 // transform the amount from backend to frontend for calculation (e.g. amount value in editing form)
 export function amountForView(amount: Amount): Amount {
   const factor = currencyFactor(amount);
@@ -284,4 +287,16 @@ export const createQrData = (
     },
     unstructuredMessage: invoice?.externalId || '',
   };
+};
+
+export const convertNumberToAmountNumber = (
+  value: number,
+  currency: Currency,
+) => {
+  const factor = currencyFactor({
+    currency: currency.code,
+    fractionDigits: currency.fractionDigits,
+  });
+
+  return value * factor;
 };

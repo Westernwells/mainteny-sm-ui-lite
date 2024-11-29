@@ -1,16 +1,14 @@
 import {useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import MoreIcon from '@mui/icons-material/MoreVert';
 import Edit from '@mui/icons-material/Edit';
 import CopyAll from '@mui/icons-material/CopyAll';
 import CheckIcon from '@mui/icons-material/Check';
@@ -52,6 +50,7 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import TableActionButton from 'components/Table/TableActionButton';
 
 interface Props {
   quotation: QuotationView;
@@ -61,7 +60,7 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
 
-export const Actions = ({quotation}: Props) => {
+const Actions = ({quotation}: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const {user} = useUserSession();
@@ -348,7 +347,18 @@ export const Actions = ({quotation}: Props) => {
       onClick: () => setIsRejectedDialogOpen(true),
     };
 
-    const defaultActions = [printAction, duplicateAction, downloadAction];
+    const editAction = {
+      label: t('Edit'),
+      icon: <Edit />,
+      onClick: () => navigate(`/quotations/details/${quotation.id}/edit`),
+    };
+
+    const defaultActions = [
+      ...(quotation.status !== QuotationStatus.ACCEPTED ? [editAction] : []),
+      printAction,
+      duplicateAction,
+      downloadAction,
+    ];
 
     if (quotation.status === QuotationStatus.DRAFT) {
       return [
@@ -358,6 +368,7 @@ export const Actions = ({quotation}: Props) => {
           onClick: handleOpenSendEmail,
         },
         'divider',
+        editAction,
         printAction,
         duplicateAction,
         markAcceptedAction,
@@ -389,18 +400,19 @@ export const Actions = ({quotation}: Props) => {
   })();
 
   return (
-    <Box>
-      {quotation.status !== QuotationStatus.ACCEPTED && (
-        <IconButton
-          onClick={() => navigate(`/quotations/details/${quotation.id}/edit`)}
-          sx={{color: 'action.active'}}>
-          <Edit fontSize="small" />
-        </IconButton>
-      )}
-
-      <IconButton onClick={handleClick}>
-        <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
-      </IconButton>
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        height: '40px',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <TableActionButton
+        testId="quotation-action-menu-button"
+        removePadding
+        onClick={handleClick}
+      />
       <Menu
         id="actions-menu"
         anchorEl={anchorEl}
@@ -615,3 +627,5 @@ export const Actions = ({quotation}: Props) => {
     </Box>
   );
 };
+
+export default Actions;

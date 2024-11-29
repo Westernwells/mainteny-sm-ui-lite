@@ -23,12 +23,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import {
-  calculateTotalPages,
-  createEmptyResource,
-  makePage,
-  toggleOrder,
-} from 'utils/paging';
+import {createEmptyResource, makePage, toggleOrder} from 'utils/paging';
 import {
   useAllJobs,
   useServiceOrderComments,
@@ -100,14 +95,14 @@ import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 
 import {Avatar} from 'components/Avatar';
 import ContractInput from 'components/Inputs/ContractInput';
+import {
+  createQuickFilterOptions,
+  filterOutQuickFilterOptions,
+} from 'utils/filter';
 import Actions from './Actions';
 
-const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = Object.values(
-  ServiceOrderStatusFilter,
-).map((entry: string) => ({
-  value: entry,
-  labelKey: capitalize(entry),
-}));
+const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] =
+  createQuickFilterOptions(ServiceOrderStatusFilter);
 
 export const PAYMENT_STATUS_OPTIONS: OptionWithTranslationKey[] = [
   {
@@ -412,15 +407,6 @@ export const ServiceOrderList = ({menu}: Props) => {
 
   const rows = useMemo(
     () => aggregateServiceOrderRow(serviceOrdersResource.data),
-    [serviceOrdersResource],
-  );
-
-  const totalPages = useMemo(
-    () =>
-      calculateTotalPages(
-        serviceOrdersResource.total,
-        serviceOrdersResource.page.pageSize,
-      ),
     [serviceOrdersResource],
   );
 
@@ -860,13 +846,13 @@ export const ServiceOrderList = ({menu}: Props) => {
       return;
     }
 
-    const areAllValuesSelectedIndividually = QUICK_FILTER_OPTIONS.filter(
-      (option) =>
-        ![
-          ServiceOrderStatusFilter.ALL,
-          ServiceOrderStatusFilter.ARCHIVED,
-        ].includes(option.value as ServiceOrderStatusFilter),
-    ).every((option) =>
+    const areAllValuesSelectedIndividually = filterOutQuickFilterOptions({
+      options: QUICK_FILTER_OPTIONS,
+      statusToExclude: [
+        ServiceOrderStatusFilter.ALL,
+        ServiceOrderStatusFilter.ARCHIVED,
+      ],
+    }).every((option) =>
       newValues.some((selectedValue) => option.value === selectedValue),
     );
 
@@ -1264,7 +1250,6 @@ export const ServiceOrderList = ({menu}: Props) => {
         currentIndex={serviceOrdersResource.page.pageIndex}
         numberOfElementsPerPage={serviceOrdersResource.page.pageSize}
         totalEntries={serviceOrdersResource.total}
-        totalPages={totalPages}
         onChange={handlePageIndexChange}
         onNumberPerPageChange={handleChangeElementsPerPage}
       />

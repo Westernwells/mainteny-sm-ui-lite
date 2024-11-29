@@ -22,6 +22,12 @@ export const paramsSerializer = (parameters: {[key: string]: any}) => {
     if (Array.isArray(value)) {
       return value.map((v) => `${key}=${v}`);
     }
+
+    // serialize default date object
+    if (value instanceof Date) {
+      return `${key}=${(value as Date).toJSON()}`;
+    }
+
     return `${key}=${value}`;
   });
 

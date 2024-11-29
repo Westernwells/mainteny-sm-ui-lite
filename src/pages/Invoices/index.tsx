@@ -28,12 +28,7 @@ import {
 } from 'hooks/reactQuery/useCompanies';
 import {useTranslation} from 'react-i18next';
 import {useSearchValues} from 'hooks/useSearchValues';
-import {
-  calculateTotalPages,
-  createEmptyResource,
-  makePage,
-  toggleOrder,
-} from 'utils/paging';
+import {createEmptyResource, makePage, toggleOrder} from 'utils/paging';
 import PageContainer from 'components/PageContainer';
 import PageHeaderContainer from 'components/PageHeaderContainer';
 import SearchInput from 'components/SearchInput/index';
@@ -51,12 +46,9 @@ import {
 import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {StatusChip} from 'components/StatusChip';
-import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
 import {theme} from 'theme';
 import {Checkbox, CircularProgress, Typography} from '@mui/material';
-import NoteAlt from '@mui/icons-material/NoteAlt';
-import {NoteAltOutlined} from '@mui/icons-material';
 import {Order, OrderByParams} from 'models/pagination';
 import {Actions} from 'pages/Invoices/Actions';
 import Filters from 'components/Filters';
@@ -99,7 +91,12 @@ import DatePickerRange from 'components/DatePickerRange';
 import EmptyTable from 'components/Table/EmptyTable';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {formatCurrency} from 'utils/currency';
+import {
+  convertNumberToAmountNumber,
+  formatCurrency,
+  useCurrentCurrency,
+} from 'utils/currency';
+import NoteIcon from 'components/NoteIcon';
 import {getInvoiceStatusStyles} from './InvoicesDataGridProps';
 
 const pageSize = 25;
@@ -126,6 +123,7 @@ const Invoices = ({elevatorId}: Props) => {
   const {user} = useUserSession();
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
+  const currentCurrency = useCurrentCurrency();
 
   const {
     values: {sortOrder, orderByField},
@@ -246,9 +244,19 @@ const Invoices = ({elevatorId}: Props) => {
     orderByField: orderByField || InvoiceOrderField.CREATED_DATE,
     order: sortOrder || Order.DESC,
     ...(grossAmountMin &&
-      grossAmountMin > 0 && {totalGrossAmountFrom: `${grossAmountMin}`}),
+      grossAmountMin > 0 && {
+        totalGrossAmountFrom: `${convertNumberToAmountNumber(
+          grossAmountMin,
+          currentCurrency,
+        )}`,
+      }),
     ...(grossAmountMax &&
-      grossAmountMax > 0 && {totalGrossAmountTo: `${grossAmountMax}`}),
+      grossAmountMax > 0 && {
+        totalGrossAmountTo: `${convertNumberToAmountNumber(
+          grossAmountMax,
+          currentCurrency,
+        )}`,
+      }),
     ...(selectedStartDate && {
       sentDateFrom: toRestDate(
         fromDateStringToDate(selectedStartDate, DEFAULT_DATE_FORMAT),
@@ -565,43 +573,13 @@ const Invoices = ({elevatorId}: Props) => {
             fieldName="NOTES"
             noWidthLimit
             onClick={() => setSelectedInvoice(invoice.data)}>
-            {invoice.hasComments ? (
-              <Tooltip
-                onMouseEnter={handleNoteHover(invoice.id)}
-                onMouseLeave={handleNoteHover(undefined)}
-                title={
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                    gap={theme.spacing(0.5)}>
-                    <Typography
-                      sx={{
-                        color: '#BDBDBD',
-                        lineHeight: '14px',
-                        fontSize: '10px',
-                        letterSpacing: '0.8px',
-                        textTransform: 'uppercase',
-                      }}>
-                      {formatDate(fetchedNote?.meta.lastUpdatedAt)}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        lineHeight: '14px',
-                        fontSize: '10px',
-                      }}>
-                      {fetchedNote?.content}
-                    </Typography>
-                  </Box>
-                }
-                arrow
-                placement="top">
-                <NoteAlt fontSize="small" />
-              </Tooltip>
-            ) : (
-              <NoteAltOutlined fontSize="small" />
-            )}
+            <NoteIcon
+              hasNotes={invoice.hasComments}
+              timeStamp={formatDate(fetchedNote?.meta.lastUpdatedAt)}
+              noteContent={fetchedNote?.content}
+              onMouseEnter={handleNoteHover(invoice.id)}
+              onMouseLeave={handleNoteHover(undefined)}
+            />
           </Cell>
         ),
       },
@@ -674,12 +652,6 @@ const Invoices = ({elevatorId}: Props) => {
   const watchHasComment = watch('hasComment');
   const watchGrossMin = watch('grossAmountMin');
   const watchGrossMax = watch('grossAmountMax');
-
-  const totalPages = useMemo(
-    () =>
-      calculateTotalPages(invoiceResource.total, invoiceResource.page.pageSize),
-    [invoiceResource],
-  );
 
   const handlePageIndexChange = (value: number) => {
     setPage({...page, pageIndex: value});
@@ -1237,7 +1209,6 @@ const Invoices = ({elevatorId}: Props) => {
           currentIndex={invoiceResource.page.pageIndex}
           numberOfElementsPerPage={invoiceResource.page.pageSize}
           totalEntries={invoiceResource.total}
-          totalPages={totalPages}
           afterPageSelectorComponent={showXeroInfoRender}
           onChange={handlePageIndexChange}
           onNumberPerPageChange={handleChangeElementsPerPage}
@@ -1255,5 +1226,4 @@ const Invoices = ({elevatorId}: Props) => {
     </>
   );
 };
-
 export default Invoices;

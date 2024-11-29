@@ -1,15 +1,16 @@
 import React, {useState} from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import IconButton from '@mui/material/IconButton';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Typography from '@mui/material/Typography';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {Box} from '@mui/material';
 import {useTranslation} from 'react-i18next';
+import {Confirm} from 'components/Confirm';
+import {useDeleteServiceCompanyContactPerson} from 'hooks/reactQuery/useContacts';
+import TableActionButton from 'components/Table/TableActionButton';
 
 export interface IActions {
   onDelete: (id: string) => void;
@@ -37,7 +38,21 @@ const Actions = ({
 }: Props & IActions) => {
   const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const open = Boolean(anchorEl);
+
+  const {mutate: deleteContact, isLoading: isDeleting} =
+    useDeleteServiceCompanyContactPerson('Contact person deleted successfully');
+
+  const handleDeleteConfirm = async (id: string) => {
+    await deleteContact(id);
+    setOpenDeleteConfirm(false);
+    onDelete(id);
+  };
+
+  const handleDelete = () => {
+    setOpenDeleteConfirm(true);
+  };
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -62,24 +77,27 @@ const Actions = ({
     {
       icon: <DeleteOutlinedIcon sx={{color: 'text.secondary'}} />,
       label: 'Delete',
-      onClick: () => onDelete(contactId),
+      onClick: () => handleDelete(),
     },
   ];
 
   return (
-    <Box>
-      <IconButton
-        size="small"
+    <Box
+      sx={{
+        display: 'flex',
+        width: '100%',
+        height: '40px',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <TableActionButton
+        testId="contact-action-menu-button"
+        removePadding
         onClick={(event) => {
           event.stopPropagation();
           setAnchorEl(event.currentTarget);
         }}
-        sx={{ml: '.25em'}}>
-        <MoreVertIcon
-          sx={{color: open ? 'primary.main' : 'action.active'}}
-          fontSize="small"
-        />
-      </IconButton>
+      />
       <Menu
         id="actions-menu"
         anchorEl={anchorEl}
@@ -132,6 +150,18 @@ const Actions = ({
           </MenuItem>
         ))}
       </Menu>
+
+      <Confirm
+        maxWidth={400}
+        disableActions={isDeleting}
+        open={openDeleteConfirm}
+        onConfirm={async () => {
+          await handleDeleteConfirm(contactId || '');
+        }}
+        onClose={() => setOpenDeleteConfirm(false)}
+        title="Delete contact person"
+        content="You are about to delete this contact person. Are you sure about it?"
+      />
     </Box>
   );
 };
