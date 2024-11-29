@@ -80,6 +80,7 @@ export const Overview = ({serviceOrder}: Props) => {
             <Articles
               serviceOrderArticles={serviceOrderArticles}
               serviceOrderId={serviceOrder?.id}
+              customerId={serviceOrder?.elevator?.propertyOwner?.id}
             />
           </Box>
 

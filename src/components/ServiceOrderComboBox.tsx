@@ -12,6 +12,7 @@ import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {iconMapping} from 'pages/ServiceOrders';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import {t} from 'i18next';
 import {FormInput} from './form/FormInput';
 
 interface ServiceOrderOption {
@@ -113,6 +114,7 @@ export const ServiceOrderComboBox = forwardRef(
 
     return (
       <Autocomplete
+        noOptionsText={t('No options')}
         ref={ref}
         disablePortal
         id="service-order-combo-box"
