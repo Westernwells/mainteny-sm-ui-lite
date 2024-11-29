@@ -322,7 +322,6 @@ export const Quotations = () => {
       {
         headerName: 'Subject',
         key: 'quotation-cell-subject',
-        fieldName: QuotationOrderField.SUBJECT,
         getExportValue: (quotation) =>
           getPlainStringFromHtml(quotation.subject),
         renderCell: (quotation, cellProps) => (

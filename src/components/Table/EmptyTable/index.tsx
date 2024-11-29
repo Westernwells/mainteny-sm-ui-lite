@@ -13,7 +13,8 @@ type Props = {
     | 'purchase-invoice'
     | 'invoice'
     | 'quotation'
-    | 'lift';
+    | 'lift'
+    | 'contacts';
   actionButton?: ReactNode;
   onClick?: () => void;
 };

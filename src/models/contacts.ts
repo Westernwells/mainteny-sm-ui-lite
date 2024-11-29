@@ -1,5 +1,5 @@
 import {Address, CompanyContact, Contact, Meta, Priority} from './misc';
-import {UserAccountStatus, UserAccountView} from './user';
+import {Role, UserAccountStatus, UserAccountView} from './user';
 import {Order} from './pagination';
 
 export interface ContactsView {
@@ -99,10 +99,23 @@ export enum ServiceCompanyContactPersonOrderField {
   CREATED_DATE = 'CREATED_DATE',
 }
 
+// Deprecated
 export enum ServiceCompanyContactPersonRole {
   GENERAL_MANAGER = 'GENERAL_MANAGER',
   ASSISTANT = 'ASSISTANT',
   FACILITY_MANAGER = 'FACILITY_MANAGER',
+  PROPERTY_MANAGER = 'PROPERTY_MANAGER',
+  CONTACT_PERSON = 'CONTACT_PERSON',
+  ASSET_OWNER = 'ASSET_OWNER',
+  OTHER_CONTACT = 'OTHER_CONTACT',
+  OTHERS = 'OTHERS',
+}
+
+export enum CONTRACT_ROLE_FILTER {
+  ALL = 'ALL',
+  GENERAL_MANAGER = 'GENERAL_MANAGER',
+  FACILITY_MANAGER = 'FACILITY_MANAGER',
+  ASSISTANT = 'ASSISTANT',
   PROPERTY_MANAGER = 'PROPERTY_MANAGER',
   CONTACT_PERSON = 'CONTACT_PERSON',
   ASSET_OWNER = 'ASSET_OWNER',
@@ -116,7 +129,7 @@ export interface ServiceCompanyContactPersonQueryParams {
   pageIndex?: number;
   pageSize: number;
   query?: string;
-  role: ServiceCompanyContactPersonRole[];
+  role: Role[];
 }
 
 export interface ContactPersonAssociationQueryParams {
@@ -218,3 +231,19 @@ export interface ServiceCompanyContactPeronFormModel {
     secondaryPhone?: string;
   };
 }
+
+export type ContactTableRow = {
+  data: ServiceCompanyContactPersonView;
+  id: string;
+  userAccount: UserAccountView;
+  companyName: string;
+  email: string;
+  primaryPhone: string;
+  secondaryPhone?: string;
+  roles: Role[];
+  hasComments: boolean;
+};
+
+export type ContactStatistics = {
+  numOfContactPersonsPerRole: Record<string, number>;
+};

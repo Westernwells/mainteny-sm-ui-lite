@@ -2,6 +2,7 @@ import {
   ContactBody,
   ContactPersonAssociationQueryParams,
   ContactPersonAssociationView,
+  ContactStatistics,
   ContactsView,
   CreateContactPersonAssociationRecord,
   CreatePropertyContactPersonRecord,
@@ -31,9 +32,10 @@ import {
 } from 'models/contract';
 import {Resource, RestError, StringValue} from 'models/misc';
 import {Comment, CommentRecord} from 'models/comment';
-import {AxiosError} from 'axios';
+import {AxiosError, AxiosResponse} from 'axios';
+import {useAll} from 'hooks/reactQuery/useAll';
+import {Page} from 'models/pagination';
 import {useUserSession} from './useUserSession';
-import {Page} from '../../models/pagination';
 
 const fetchContractElevators = async (
   contractId: string,
@@ -170,6 +172,7 @@ export const useCreateContact = (successMsg?: string) => {
         });
       }
       queryClient.invalidateQueries(queryKeys.queryContacts);
+      queryClient.invalidateQueries(queryKeys.fetchContactStatistics);
     },
     onError: (err: any) => {
       showError(err);
@@ -456,6 +459,20 @@ const queryContactPersonNotes = async (
   );
   return response.data;
 };
+
+export function useContactPersonComments(
+  contactPersonId: string,
+  params: Page,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<Resource<Comment>, RestError>(
+    [queryKeys.fetchContactNotes, params, contactPersonId],
+    () => queryContactPersonNotes(params, contactPersonId),
+    {
+      ...options,
+    },
+  );
+}
 
 export const useInfiniteContactPersonNotes = (
   contactPersonId: string,
@@ -809,4 +826,60 @@ export const useUpdatePropertyContactPerson = (
       },
     },
   );
+};
+
+export const fetchContactStatistics = async (
+  params: Partial<ServiceCompanyContactPersonQueryParams>,
+  serviceCompanyId: string,
+): Promise<ContactStatistics> => {
+  const response: AxiosResponse<ContactStatistics> = await axiosClient.get(
+    `/api/serviceCompanies/${serviceCompanyId}/contactPersons/statistics`,
+    {
+      params: {
+        ...params,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useContactStatistics = (
+  params: Partial<ServiceCompanyContactPersonQueryParams>,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  return useQuery<ContactStatistics, RestError, ContactStatistics>(
+    [
+      queryKeys.fetchContactStatistics,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () => fetchContactStatistics(params, user!.userAccount.serviceCompany.id),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+};
+
+export const useAllContactPersons = (
+  params: Partial<ServiceCompanyContactPersonQueryParams>,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  return useAll<
+    Partial<ServiceCompanyContactPersonQueryParams>,
+    ServiceCompanyContactPersonView
+  >({
+    queryKey: [queryKeys.queryAllContactPersons, serviceCompanyId, params],
+    queryFn: () => fetchServiceCompanyContactPersons(serviceCompanyId!, params),
+    params,
+    options: {
+      ...options,
+      enabled: !!user,
+    },
+  });
 };
