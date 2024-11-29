@@ -67,6 +67,7 @@ export const ChecklistAutocomplete = ({
 
   return (
     <Autocomplete
+      noOptionsText={t('No options')}
       size="small"
       disabled={disabled}
       clearOnBlur={false}

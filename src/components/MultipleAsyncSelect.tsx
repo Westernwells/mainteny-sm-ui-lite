@@ -6,6 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {Control, Controller} from 'react-hook-form';
 import * as _ from 'lodash';
 import {Box, FilterOptionsState} from '@mui/material';
+import {t} from 'i18next';
 import {FormInput} from './form/FormInput';
 
 export interface QueryProps {
@@ -116,13 +117,19 @@ const MultipleAsyncSelect = <T,>({
         const {onChange, value: fieldValue} = field;
 
         const selectedItems = fieldValue
-          ? (fieldValue as unknown as T[]).map((val) =>
-              options.find((opt) => _.get(opt, valueKey) === val),
-            )
+          ? (fieldValue as unknown as T[]).map((val) => {
+              const existingOption = options.find(
+                (opt) => _.get(opt, valueKey) === val,
+              );
+              return (
+                existingOption || ({[labelKey]: val, [valueKey]: val} as T)
+              );
+            })
           : [];
 
         return (
           <Autocomplete<T, true, true, true, 'div'>
+            noOptionsText={t('No options')}
             multiple
             disablePortal
             autoComplete

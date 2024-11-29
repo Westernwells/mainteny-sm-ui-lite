@@ -14,6 +14,7 @@ import {useQueryServiceCompanyTechnicians} from 'hooks/reactQuery/useTechnician'
 import {createEmptyResource} from 'utils/paging';
 import {EmployeesSimpleView, EmployeesView} from 'models/employee';
 import {useTheme} from '@mui/system';
+import {t} from 'i18next';
 import {FormInput} from './form/FormInput';
 
 interface Props {
@@ -114,6 +115,7 @@ export const TechnicianAutoComplete = ({
 
   return (
     <Autocomplete
+      noOptionsText={t('No options')}
       size={size}
       disabled={disabled}
       clearOnBlur={false}
