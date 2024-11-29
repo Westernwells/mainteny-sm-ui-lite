@@ -297,7 +297,7 @@ const Contacts = () => {
         ),
       },
       {
-        headerName: 'Email address',
+        headerName: 'EMAIL',
         key: 'contact-cell-email-address',
         fieldName: ServiceCompanyContactPersonOrderField.EMAIL,
         getExportValue: (contact) => contact.email,
