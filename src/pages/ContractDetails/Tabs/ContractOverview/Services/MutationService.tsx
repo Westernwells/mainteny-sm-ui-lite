@@ -973,6 +973,7 @@ export const MutationService = ({
                       componentId={item.elevatorId}
                       units={formikContractServiceComponent.values.elevators}
                       onChange={handleJobFrequencyChange('elevators')}
+                      mode="edit"
                     />
                   </TableCell>
                 )}
@@ -988,6 +989,7 @@ export const MutationService = ({
                   <InvoiceFrequencyPicker
                     formik={formikContractServiceComponent}
                     componentId={item.elevatorId}
+                    mode="edit"
                   />
                 </TableCell>
 
