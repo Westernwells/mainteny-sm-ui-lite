@@ -34,7 +34,7 @@ const validationSchema = Yup.object().shape({
       fullName: Yup.string().nullable().required('Address is required'),
       component: Yup.object().shape({
         country: Yup.string().required('Country is required'),
-        state: Yup.string().required('State is required'),
+        state: Yup.string(),
         city: Yup.string().required('City is required'),
       }),
     }),
@@ -194,7 +194,6 @@ export const LocationForm = ({
                 notched: true,
                 placeholder: '',
               }}
-              required
               isCompanyTranslation
             />
           </Grid>
