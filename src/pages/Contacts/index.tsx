@@ -5,6 +5,7 @@ import {
   CONTRACT_ROLE_FILTER,
   ServiceCompanyContactPersonOrderField,
   ServiceCompanyContactPersonQueryParams,
+  ServiceCompanyContactPersonRole,
   ServiceCompanyContactPersonView,
 } from 'models/contacts';
 import {
@@ -31,7 +32,6 @@ import Pagination from 'components/Pagination';
 import PageContainer from 'components/PageContainer';
 import {useQueryState} from 'hooks/useQueryState';
 import {useTranslation} from 'react-i18next';
-import {Role} from 'models/user';
 import EmptyTable from 'components/Table/EmptyTable';
 import {aggregateContactRow} from 'utils/contact';
 import ContactFormDialog from 'pages/Contacts/ContactFormDialog';
@@ -105,7 +105,7 @@ const Contacts = () => {
     order: sortOrder || Order.DESC,
     role: selectedContactRole.includes(CONTRACT_ROLE_FILTER.ALL)
       ? []
-      : (selectedContactRole as unknown as Role[]),
+      : (selectedContactRole as unknown as ServiceCompanyContactPersonRole[]),
   };
 
   const {

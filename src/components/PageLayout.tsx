@@ -2,13 +2,12 @@ import Box from '@mui/material/Box';
 import {SxProps, Theme} from '@mui/system';
 import {useOutletContext} from 'react-router';
 import {useTranslation} from 'react-i18next';
-import {Dispatch, ReactNode, SetStateAction, Suspense} from 'react';
+import {Dispatch, ReactNode, SetStateAction} from 'react';
 import {usePusher} from 'hooks/usePusher';
 import {queryKeys} from 'reactQuery/constants';
 import {MessageType} from 'models/notification';
 import {useQueryClient} from 'react-query';
 import {AppTopBar} from './AppTopBar';
-import {Progress} from './Progress';
 
 interface Props {
   children: ReactNode;
@@ -121,7 +120,7 @@ export const PageLayout = ({
           flexGrow="1"
           width="0"
           flexDirection="column">
-          <Suspense fallback={<Progress />}>{children}</Suspense>
+          {children}
         </Box>
       </Box>
     </Box>
