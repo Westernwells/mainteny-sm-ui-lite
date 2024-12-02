@@ -50,9 +50,15 @@ type Props = {
   componentId: string;
   units: ContractServiceFormElevator[];
   onChange: (value: ContractComponentElevator[]) => void;
+  mode?: 'edit' | 'new';
 };
 
-const JobFrequencyPicker = ({componentId, units, onChange}: Props) => {
+const JobFrequencyPicker = ({
+  componentId,
+  units,
+  onChange,
+  mode = 'new',
+}: Props) => {
   const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedMonths, setSelectedMonths] = useState(monthsData);
@@ -118,7 +124,9 @@ const JobFrequencyPicker = ({componentId, units, onChange}: Props) => {
 
     // Business logic: if changing first entry save to all other entries as well
     if (
-      units.findIndex((elevator) => elevator.elevatorId === componentId) === 0
+      units.findIndex((elevator) => elevator.elevatorId === componentId) ===
+        0 &&
+      mode === 'new'
     ) {
       const updatedElevators = units.map((elevator) => ({
         ...elevator,
