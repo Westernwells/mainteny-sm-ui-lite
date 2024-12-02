@@ -99,7 +99,6 @@ export enum ServiceCompanyContactPersonOrderField {
   CREATED_DATE = 'CREATED_DATE',
 }
 
-// Deprecated
 export enum ServiceCompanyContactPersonRole {
   GENERAL_MANAGER = 'GENERAL_MANAGER',
   ASSISTANT = 'ASSISTANT',
@@ -129,7 +128,7 @@ export interface ServiceCompanyContactPersonQueryParams {
   pageIndex?: number;
   pageSize: number;
   query?: string;
-  role: Role[];
+  role: ServiceCompanyContactPersonRole[];
 }
 
 export interface ContactPersonAssociationQueryParams {
