@@ -1056,31 +1056,10 @@ export const MutationService = ({
                       if (floatValue) {
                         const newPrice = floatValue;
 
-                        if (index === 0) {
-                          formikContractServiceComponent.setFieldValue(
-                            `elevators[${index}].price`,
-                            newPrice * 10 ** currentCurrency.fractionDigits,
-                          );
-
-                          const updatedElevators =
-                            formikContractServiceComponent.values.elevators.map(
-                              (elevator) => ({
-                                ...elevator,
-                                price:
-                                  newPrice *
-                                  10 ** currentCurrency.fractionDigits,
-                              }),
-                            );
-                          formikContractServiceComponent.setFieldValue(
-                            'elevators',
-                            updatedElevators,
-                          );
-                        } else {
-                          formikContractServiceComponent.setFieldValue(
-                            `elevators[${index}].price`,
-                            newPrice * 10 ** currentCurrency.fractionDigits,
-                          );
-                        }
+                        formikContractServiceComponent.setFieldValue(
+                          `elevators[${index}].price`,
+                          newPrice * 10 ** currentCurrency.fractionDigits,
+                        );
                       }
                     }}
                     size="small"
