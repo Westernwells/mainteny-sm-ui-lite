@@ -4,7 +4,6 @@ import svgrPlugin from 'vite-plugin-svgr';
 import envCompatible from 'vite-plugin-env-compatible';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import istanbul from 'vite-plugin-istanbul';
-import {sentryVitePlugin} from '@sentry/vite-plugin';
 // import shimReactPdf from "vite-plugin-shim-react-pdf";
 
 // https://vitejs.dev/config/
@@ -14,7 +13,6 @@ export default defineConfig(() => ({
   // comment this out if that isn't relevant for your project
   build: {
     outDir: 'build',
-    sourcemap: 'hidden' as 'hidden',
   },
   server: {
     watch: {
@@ -36,14 +34,6 @@ export default defineConfig(() => ({
       svgrOptions: {
         icon: true,
         // ...svgr options (https://react-svgr.com/docs/options/)
-      },
-    }),
-    sentryVitePlugin({
-      org: 'mainteny',
-      project: 'mainteny-web',
-      authToken: process.env.REACT_APP_SENTRY_AUTH_TOKEN,
-      sourcemaps: {
-        filesToDeleteAfterUpload: '**/*.map',
       },
     }),
   ],
