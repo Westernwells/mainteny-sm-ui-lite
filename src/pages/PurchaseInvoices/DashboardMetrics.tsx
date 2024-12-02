@@ -1,11 +1,15 @@
 import React from 'react';
-import {Grid, Typography, Box, Tooltip} from '@mui/material';
+import {Grid, Typography, Box, Tooltip, Divider} from '@mui/material';
 import {ReactComponent as ReceiptDollar} from 'assets/icons/ReceiptDollar.svg';
 import {ReactComponent as PerformanceMoneyDecrease} from 'assets/icons/PerformanceMoneyDecrease.svg';
 import {ReactComponent as TimeClockHand} from 'assets/icons/TimeClockHand.svg';
 import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
 import {usePurchaseInvoiceStatistics} from 'hooks/reactQuery/usePurchaseInvoice';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {
+  formatCurrency,
+  getCurrencyFractionDigits,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {DateRange} from '@mui/x-date-pickers-pro';
 import {formatDate} from 'utils/datetime';
 import {t} from 'i18next';
@@ -31,7 +35,7 @@ const Metric = ({
   <Box
     display="flex"
     flexDirection="column"
-    paddingLeft={paddingLeft || '2em'}
+    paddingLeft={paddingLeft || '1em'}
     height="66px">
     <Box sx={{display: 'flex', alignItems: 'center', height: '22px', pb: 2}}>
       <Typography variant="h6" color="#828DA3">
@@ -89,9 +93,14 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
 
   const totalAmountCurrency = Object.keys(totalAmounts)[0];
   const totalAmount = totalAmounts[totalAmountCurrency] || 0;
+  const totalAmountFractionDigits =
+    getCurrencyFractionDigits(totalAmountCurrency);
 
   const pendingAmountCurrency = Object.keys(totalPendingAmounts)[0];
   const totalPendingAmount = totalPendingAmounts[pendingAmountCurrency] || 0;
+  const totalPendingFractionDigits = getCurrencyFractionDigits(
+    pendingAmountCurrency,
+  );
 
   if (isLoading) {
     return <Progress />;
@@ -108,7 +117,7 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
       spacing={2}
       justifyContent="space-between"
       alignItems="center">
-      <Grid item xs={12} sm={3} sx={{borderRight: '1px solid #D9D9D9'}}>
+      <Grid item xs={12} sm={3}>
         <Metric
           title="Number of invoices"
           value={numOfInvoices}
@@ -122,15 +131,15 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
           )}
         />
       </Grid>
-
-      <Grid
-        item
-        xs={12}
-        sm={5.5}
-        sx={{borderRight: '1px solid #D9D9D9', alignItems: 'center'}}>
+      <Divider
+        orientation="vertical"
+        flexItem
+        style={{borderColor: '#D9D9D9'}}
+      />
+      <Grid item xs={12} sm={5}>
         <Metric
           title="Total cost"
-          value={formatCurrency(totalAmount, {
+          value={formatCurrency(totalAmount / 10 ** totalAmountFractionDigits, {
             currencySymbol: currentCurrency.symbol,
           })}
           icon={
@@ -146,13 +155,24 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
           paddingLeft="30%"
         />
       </Grid>
-
-      <Grid item xs={12} sm={3}>
+      <Divider
+        orientation="vertical"
+        flexItem
+        style={{borderColor: '#D9D9D9'}}
+      />
+      <Grid
+        item
+        xs={12}
+        sm={3.5}
+        sx={{display: 'flex', justifyContent: 'flex-end', pr: 4}}>
         <Metric
           title="Pending payment"
-          value={formatCurrency(totalPendingAmount, {
-            currencySymbol: currentCurrency.symbol,
-          })}
+          value={formatCurrency(
+            totalPendingAmount / 10 ** totalPendingFractionDigits,
+            {
+              currencySymbol: currentCurrency.symbol,
+            },
+          )}
           icon={<TimeClockHand fontSize="2.5rem" style={iconStyles} />}
           tooltipText={t(
             'Aggregated outstanding amount of all invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}',
