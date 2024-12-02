@@ -518,5 +518,53 @@ describe('calculateInvoiceAmount', () => {
       vats: [{percentageVat: 19, vat: 21.12}],
       amountAfterGlobalDiscountWithVAT: 132.36,
     });
+
+    result = calculateInvoiceAmount({
+      items: [
+        createMockInvoiceItem({
+          name: 'Article 1',
+          unitAmount: {
+            currency: 'EUR',
+            netAmount: 7460,
+            percentageVat: 19,
+          },
+          quantity: 4.5,
+        }),
+        createMockInvoiceItem({
+          name: 'Article 2',
+          unitAmount: {
+            currency: 'EUR',
+            netAmount: 220,
+            percentageVat: 19,
+          },
+          quantity: 4.5,
+        }),
+        createMockInvoiceItem({
+          name: 'Article 3',
+          unitAmount: {
+            currency: 'EUR',
+            netAmount: 1250,
+            percentageVat: 19,
+          },
+          quantity: 1,
+        }),
+        createMockInvoiceItem({
+          name: 'Article 4',
+          unitAmount: {
+            currency: 'EUR',
+            netAmount: 4300,
+            percentageVat: 19,
+          },
+          quantity: 1,
+        }),
+      ],
+    });
+
+    expect(result).toStrictEqual({
+      amountBeforeGlobalDiscount: 401.1,
+      amountAfterGlobalDiscount: 401.1,
+      vats: [{percentageVat: 19, vat: 76.21}],
+      amountAfterGlobalDiscountWithVAT: 477.31,
+    });
   });
 });

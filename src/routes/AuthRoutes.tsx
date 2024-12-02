@@ -1,4 +1,3 @@
-import {Suspense} from 'react';
 import {Navigate, Outlet, useLocation} from 'react-router-dom';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
@@ -33,9 +32,5 @@ export const AuthRoutes = () => {
       />
     );
   }
-  return (
-    <Suspense fallback={null}>
-      <Outlet />
-    </Suspense>
-  );
+  return <Outlet />;
 };
