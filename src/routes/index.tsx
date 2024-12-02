@@ -1,82 +1,84 @@
 import {Helmet} from 'react-helmet';
 import {Route, Routes, useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
-import {useState, lazy} from 'react';
+import {useEffect, useState} from 'react';
+import * as Sentry from '@sentry/react';
 import {axiosClient} from 'utils/axios-utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import useVersionCheck from 'hooks/useVersionCheck';
+import Login from 'pages/Login';
+import ResetPassword from 'pages/ResetPassword';
+import MyUnits from 'pages/Units';
+import UnitsDetail from 'pages/UnitDetails';
+import Contracts from 'pages/Contracts';
+import NewContract from 'pages/NewContract/NewContract';
+import Customer from 'pages/Customers';
+import ContractDetails from 'pages/ContractDetails';
+import CustomerDetails from 'pages/CustomerDetails';
+import Invoices from 'pages/Invoices';
+import NewInvoice from 'pages/InvoiceDetails/NewInvoice';
+import InvoiceDetails from 'pages/InvoiceDetails';
+import EditInvoicePage from 'pages/EditInvoice';
+import InvoiceOverdueNotice from 'pages/InvoiceOverdueNotice';
+import Employees from 'pages/Employee';
+import EmployeeDetails from 'pages/EmployeeDetails';
+import Quotations from 'pages/Quotations';
+import NewQuotation from 'pages/QuotationDetails/NewQuotation';
+import QuotationDetails from 'pages/QuotationDetails';
+import EditQuotationPage from 'pages/EditQuotation';
+import Notifications from 'pages/Notifications';
+import PageNotFound from 'pages/PageNotFound';
+import Dashboard from 'pages/Dashboard';
+import ServiceOrders from 'pages/ServiceOrders';
+import NewEmployee from 'pages/NewEmployee';
+import Companies from 'pages/Companies';
+import CompanyDetails from 'pages/CompanyDetails';
+import ServiceOrderDetails from 'pages/ServiceOrderDetails';
+import SystemSettings from 'pages/SystemSettings';
+import NewCompany from 'pages/NewCompany';
+import SettingsPage from 'pages/Settings';
+import NewServiceOrder from 'pages/NewServiceOrder';
+import NewUnit from 'pages/NewUnit';
+import NewCustomer from 'pages/NewCustomer';
+import Articles from 'pages/Articles';
+import ArticleOverView from 'pages/ArticleDetails';
+import OrderArticle from 'pages/OrderArticle';
+import NewArticle from 'pages/ArticleDetails/NewArticle';
+import NewSupplier from 'pages/NewSupplier';
+import SupplierDetails from 'pages/SupplierDetails';
+import Analytics from 'pages/Analytics';
+import Contacts from 'pages/Contacts';
+import MobileWorkReportDownload from 'pages/MobileWorkReportDownload';
+import PurchaseInvoices from 'pages/PurchaseInvoices';
+import NewPurchaseInvoice from 'pages/NewPurchaseInvoice';
+import PurchaseDetails from 'pages/PurchaseInvoiceDetails/PurchaseDetails';
+import EditPurchaseInvoice from 'pages/EditPurchaseInvoice';
 import {PageLayout} from 'components/PageLayout';
 import ErrorBoundary from 'components/ErrorBoundary';
 import {UpdateSnackbar} from 'components/UpdateSnackbar';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
-const Login = lazy(() => import('pages/Login'));
-const ResetPassword = lazy(() => import('pages/ResetPassword'));
-const MyUnits = lazy(() => import('pages/Units'));
-const UnitsDetail = lazy(() => import('pages/UnitDetails'));
-const Contracts = lazy(() => import('pages/Contracts'));
-const NewContract = lazy(() => import('pages/NewContract/NewContract'));
-const Customer = lazy(() => import('pages/Customers'));
-const ContractDetails = lazy(() => import('pages/ContractDetails'));
-const CustomerDetails = lazy(() => import('pages/CustomerDetails'));
-const Invoices = lazy(() => import('pages/Invoices'));
-const NewInvoice = lazy(() => import('pages/InvoiceDetails/NewInvoice'));
-const InvoiceDetails = lazy(() => import('pages/InvoiceDetails'));
-const EditInvoicePage = lazy(() => import('pages/EditInvoice'));
-const InvoiceOverdueNotice = lazy(() => import('pages/InvoiceOverdueNotice'));
-const Employees = lazy(() => import('pages/Employee'));
-const EmployeeDetails = lazy(() => import('pages/EmployeeDetails'));
-const Quotations = lazy(() => import('pages/Quotations'));
-const NewQuotation = lazy(() => import('pages/QuotationDetails/NewQuotation'));
-const QuotationDetails = lazy(() => import('pages/QuotationDetails'));
-const EditQuotationPage = lazy(() => import('pages/EditQuotation'));
-const Notifications = lazy(() => import('pages/Notifications'));
-const PageNotFound = lazy(() => import('pages/PageNotFound'));
-const Dashboard = lazy(() => import('pages/Dashboard'));
-const ServiceOrders = lazy(() => import('pages/ServiceOrders'));
-const NewEmployee = lazy(() => import('pages/NewEmployee'));
-const Companies = lazy(() => import('pages/Companies'));
-const CompanyDetails = lazy(() => import('pages/CompanyDetails'));
-const ServiceOrderDetails = lazy(() => import('pages/ServiceOrderDetails'));
-const SystemSettings = lazy(() => import('pages/SystemSettings'));
-const NewCompany = lazy(() => import('pages/NewCompany'));
-const SettingsPage = lazy(() => import('pages/Settings'));
-const NewServiceOrder = lazy(() => import('pages/NewServiceOrder'));
-const NewUnit = lazy(() => import('pages/NewUnit'));
-const NewCustomer = lazy(() => import('pages/NewCustomer'));
-const Articles = lazy(() => import('pages/Articles'));
-const ArticleOverView = lazy(() => import('pages/ArticleDetails'));
-const OrderArticle = lazy(() => import('pages/OrderArticle'));
-const NewArticle = lazy(() => import('pages/ArticleDetails/NewArticle'));
-const NewSupplier = lazy(() => import('pages/NewSupplier'));
-const SupplierDetails = lazy(() => import('pages/SupplierDetails'));
-const Analytics = lazy(() => import('pages/Analytics'));
-const Contacts = lazy(() => import('pages/Contacts'));
-const MobileWorkReportDownload = lazy(
-  () => import('pages/MobileWorkReportDownload'),
-);
-const PurchaseInvoices = lazy(() => import('pages/PurchaseInvoices'));
-const NewPurchaseInvoice = lazy(() => import('pages/NewPurchaseInvoice'));
-const PurchaseDetails = lazy(
-  () => import('pages/PurchaseInvoiceDetails/PurchaseDetails'),
-);
-const EditPurchaseInvoice = lazy(() => import('pages/EditPurchaseInvoice'));
-
 export const Router = () => {
   const titleTail = 'Service Manager Portal';
   const {user} = useUserSession();
   const {t} = useTranslation();
   const {isUpdateAvailable} = useVersionCheck();
-
-  if (user) {
-    axiosClient.defaults.headers.common.language =
-      user?.userAccount.serviceCompany.language;
-  }
-
   const [currentPageTitle, setCurrentPageTitle] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (user) {
+      axiosClient.defaults.headers.common.language =
+        user?.userAccount.serviceCompany.language;
+      Sentry.setUser({
+        id: user.userAccount.id,
+        email: user.userAccount.contact.email,
+        username: `${user.userAccount.serviceCompany.name} (${user.userAccount.username})`,
+      });
+    }
+  }, [user]);
 
   return (
     <>

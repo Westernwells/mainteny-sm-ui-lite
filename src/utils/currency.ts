@@ -1,4 +1,5 @@
 import Dinero, {Currency as DineroCurrency} from 'dinero.js';
+import BigNumber from 'bignumber.js';
 import i18n from 'i18n';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {AggregatedAmount, InvoiceView} from 'models/invoice';
@@ -293,10 +294,12 @@ export const convertNumberToAmountNumber = (
   value: number,
   currency: Currency,
 ) => {
+  const bigValue = new BigNumber(value);
   const factor = currencyFactor({
     currency: currency.code,
     fractionDigits: currency.fractionDigits,
   });
-
-  return value * factor;
+  const amount = bigValue.multipliedBy(factor);
+  const amountRounded = amount.integerValue(BigNumber.ROUND_DOWN);
+  return amountRounded.toNumber();
 };
