@@ -15,7 +15,7 @@ const TableHeader = ({columns, sortState, onSort}: Props) => (
       alignItems: 'center',
       backgroundColor: '#FFFFFF',
       zIndex: 5,
-      minHeight: '40px',
+      height: '40px',
     }}>
     <TableRow>
       {columns.map((column) => {

@@ -266,14 +266,10 @@ export const EditLocationForm = ({
               size: 'small',
               placeholder: 'e.g. 150',
               label: 'Travel fee',
-              type: 'number',
-              inputProps: {
-                min: 0,
-                defaultValue: formik.values.travelFee,
-                name: 'travelFee',
-                value: formik.values.travelFee,
-                onChange: formik.handleChange,
-              },
+              name: 'travelFee',
+              value: formik.values.travelFee,
+              onBlur: formik.handleBlur,
+              onChange: formik.handleChange,
               InputProps: {
                 sx: {alignItems: 'center'},
                 startAdornment: (
@@ -282,6 +278,12 @@ export const EditLocationForm = ({
                   </InputAdornment>
                 ),
               },
+            }}
+            onValueChange={({value}) => {
+              formik.setFieldValue('travelFee', value);
+            }}
+            numericFormatProps={{
+              decimalScale: 2,
             }}
           />
         </Grid>

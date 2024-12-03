@@ -67,7 +67,6 @@ import Actions from './Actions';
 const pageSize = 25;
 
 const getCommonLinkStyles = () => ({
-  paddingTop: '0.2em',
   display: 'block',
   fontWeight: '600',
   maxWidth: '300px',
@@ -149,7 +148,13 @@ export const PurchaseInvoices = ({
   };
 
   const handleRowClick = (id: string) => () => {
-    navigate(`/purchase-invoices/details/${id}`);
+    navigate(`/purchase-invoices/details/${id}`, {
+      state: {
+        from: serviceOrderId
+          ? `/orders/details/${serviceOrderId}?tab=3`
+          : `/purchase-invoices`,
+      },
+    });
   };
 
   const [resetDatePicker, setResetDatePicker] = useState(false);
@@ -495,7 +500,6 @@ export const PurchaseInvoices = ({
                         <Typography
                           key={index}
                           sx={{
-                            lineHeight: '14px',
                             fontSize: '10px',
                           }}>
                           {order.serviceOrder.externalId}
@@ -595,6 +599,7 @@ export const PurchaseInvoices = ({
         width: ACTION_CELL_WIDTH, // set static width that will not change
         isLast: true,
         showShadows: showLeftShadow ? 'left' : undefined,
+        noPadding: true,
         renderCell: (purchaseInvoice, cellProps) => (
           <Cell {...cellProps} onClick={undefined}>
             <Actions id={purchaseInvoice.id} />
@@ -755,7 +760,15 @@ export const PurchaseInvoices = ({
   };
 
   const navigateToNewInvoice = () => {
-    navigate('/purchase-invoices/new');
+    if (serviceOrderId) {
+      navigate(`/purchase-invoices/new?orderId=${serviceOrderId}`, {
+        state: {from: `/orders/details/${serviceOrderId}?tab=3`},
+      });
+    } else {
+      navigate(`/purchase-invoices/new`, {
+        state: {from: `/purchase-invoices`},
+      });
+    }
   };
 
   if (isIdle || isPurchaseInvoiceLoading) {
@@ -794,63 +807,86 @@ export const PurchaseInvoices = ({
 
   return (
     <PageContainer gap={3}>
-      <Box
-        gap={3}
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          flex: '1 1 auto',
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          p: 3,
-        }}>
-        <PageHeaderContainer>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
+      <PageHeaderContainer>
+        <Box
+          sx={{
+            display: 'flex',
+          }}
+          gap={2}>
+          <SearchInput
+            refInput={textInput}
+            defaultValue={searchQuery}
+            onChange={(val: string) => setSearchQuery(val)}
+            containerStyle={{paddingTop: '8px'}}
+          />
+
+          <DatePickerRange
+            defaultDate={selectedDateRange}
+            getSelectedDate={handleDateSelection}
+            textFieldProps={{
+              label: '',
+              sx: {
+                width: '100%',
+              },
             }}
-            gap={2}>
-            <SearchInput
-              refInput={textInput}
-              defaultValue={searchQuery}
-              onChange={(val: string) => setSearchQuery(val)}
-              containerStyle={{paddingTop: '8px'}}
-            />
+            onClear={() => setSelectedDateRange([null, null])}
+            sx={{width: '300px', paddingTop: 0}}
+            inputTestId="start-end-date"
+            popupTestId="start-end-date-popup"
+          />
 
-            <DatePickerRange
-              defaultDate={selectedDateRange}
-              getSelectedDate={handleDateSelection}
-              textFieldProps={{
-                label: t('Invoice Date Filter'),
-              }}
-              onClear={() => setSelectedDateRange([null, null])}
-              sx={{width: '300px', paddingTop: 0}}
-              inputTestId="start-end-date"
-              popupTestId="start-end-date-popup"
-            />
+          {!hideFilters && (
+            <Filters
+              activeFilters={appliedFilterNumber}
+              onOpen={handleFilterOpen}
+              onSave={handleSubmit(handleFilterApply)}
+              onReset={handleFilterReset}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '100%',
+                  mt: 2,
+                }}
+                gap={2}>
+                <Controller
+                  control={control}
+                  name="number"
+                  render={({field}) => (
+                    <TextInput
+                      {...field}
+                      labelKey="Number"
+                      placeholder="Enter invoice number"
+                      onChange={handleInvoiceNumberChange}
+                      size="small"
+                    />
+                  )}
+                />
 
-            {!hideFilters && (
-              <Filters
-                activeFilters={appliedFilterNumber}
-                onOpen={handleFilterOpen}
-                onSave={handleSubmit(handleFilterApply)}
-                onReset={handleFilterReset}>
-                <Box
-                  sx={{display: 'flex', flexDirection: 'column', width: '100%'}}
-                  gap={2}>
+                <Controller
+                  control={control}
+                  name="subject"
+                  render={({field}) => (
+                    <TextInput
+                      {...field}
+                      labelKey="Subject"
+                      placeholder="Enter subject"
+                      onChange={handleSubjectChange}
+                      size="small"
+                    />
+                  )}
+                />
+
+                <Box sx={{display: 'flex'}} gap={1}>
                   <Controller
                     control={control}
-                    name="number"
+                    name="supplierName"
                     render={({field}) => (
                       <TextInput
                         {...field}
-                        labelKey="Number"
-                        placeholder="Enter invoice number"
-                        onChange={handleInvoiceNumberChange}
+                        labelKey="Supplier Name"
+                        placeholder="Enter supplier name"
+                        onChange={handleSupplierNameChange}
                         size="small"
                       />
                     )}
@@ -858,264 +894,232 @@ export const PurchaseInvoices = ({
 
                   <Controller
                     control={control}
-                    name="subject"
+                    name="supplierId"
                     render={({field}) => (
                       <TextInput
                         {...field}
-                        labelKey="Subject"
-                        placeholder="Enter subject"
-                        onChange={handleSubjectChange}
+                        labelKey="Supplier ID"
+                        placeholder="Enter supplier ID"
+                        onChange={handleSupplierIdChange}
                         size="small"
                       />
                     )}
                   />
+                </Box>
+
+                <Box sx={{display: 'flex'}} gap={1}>
+                  <Box>
+                    <Typography variant="subtitle2">
+                      {t('Due Date From')}
+                    </Typography>
+                    <Controller
+                      control={control}
+                      name="dueDateFrom"
+                      render={({field}) => {
+                        const dateValue = localDueDateFrom || undefined;
+
+                        return (
+                          <DatePicker
+                            {...field}
+                            defaultDate={dateValue}
+                            maxDate={new Date()}
+                            minDate={dateValue || undefined}
+                            reset={resetDatePicker}
+                            getReset={(val) => {
+                              if (val) setResetDatePicker(false);
+                            }}
+                            containerStyles={{mr: '1em'}}
+                            getSelectedDate={(date) =>
+                              setLocalDueDateFrom(date)
+                            }
+                            inputLabelProps={{shrink: undefined}}
+                            textFieldProps={{
+                              label: '',
+                              sx: {background: '#fff'},
+                            }}
+                            value={dateValue}
+                          />
+                        );
+                      }}
+                    />
+                  </Box>
+
+                  <Box>
+                    <Typography variant="subtitle2">
+                      {t('Due Date To')}
+                    </Typography>
+                    <Controller
+                      control={control}
+                      name="dueDateTo"
+                      render={({field}) => {
+                        const dateValue = localDueDateTo || null;
+
+                        return (
+                          <DatePicker
+                            {...field}
+                            defaultDate={dateValue}
+                            maxDate={new Date()}
+                            minDate={localDueDateFrom || undefined}
+                            reset={resetDatePicker}
+                            getReset={(val) => {
+                              if (val) setResetDatePicker(false);
+                            }}
+                            containerStyles={{mr: '1em'}}
+                            getSelectedDate={(date) => setLocalDueDateTo(date)}
+                            inputLabelProps={{shrink: undefined}}
+                            textFieldProps={{
+                              label: '',
+                              sx: {background: '#fff'},
+                            }}
+                            value={dateValue}
+                          />
+                        );
+                      }}
+                    />
+                  </Box>
+                </Box>
+                <ChipSelector
+                  headerLabel="Invoice Status"
+                  options={QUICK_FILTER_OPTIONS}
+                  selectedChips={watchPurchaseInvoiceStatus}
+                  onChange={handleSelectedPurchaseInvoiceStatusChange}
+                />
+
+                <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
+                  <Typography variant="subtitle2">
+                    {t('Amount Range')}
+                  </Typography>
 
                   <Box sx={{display: 'flex'}} gap={1}>
                     <Controller
                       control={control}
-                      name="supplierName"
-                      render={({field}) => (
-                        <TextInput
-                          {...field}
-                          labelKey="Supplier Name"
-                          placeholder="Enter supplier name"
-                          onChange={handleSupplierNameChange}
-                          size="small"
-                        />
-                      )}
-                    />
-
-                    <Controller
-                      control={control}
-                      name="supplierId"
-                      render={({field}) => (
-                        <TextInput
-                          {...field}
-                          labelKey="Supplier ID"
-                          placeholder="Enter supplier ID"
-                          onChange={handleSupplierIdChange}
-                          size="small"
-                        />
-                      )}
-                    />
-                  </Box>
-
-                  <Box sx={{display: 'flex'}} gap={1}>
-                    <Box>
-                      <Typography variant="subtitle2">
-                        {t('Due Date From')}
-                      </Typography>
-                      <Controller
-                        control={control}
-                        name="dueDateFrom"
-                        render={({field}) => {
-                          const dateValue = localDueDateFrom || undefined;
-
-                          return (
-                            <DatePicker
-                              {...field}
-                              defaultDate={dateValue}
-                              maxDate={new Date()}
-                              minDate={dateValue || undefined}
-                              reset={resetDatePicker}
-                              getReset={(val) => {
-                                if (val) setResetDatePicker(false);
-                              }}
-                              containerStyles={{mr: '1em'}}
-                              getSelectedDate={(date) =>
-                                setLocalDueDateFrom(date)
-                              }
-                              inputLabelProps={{shrink: undefined}}
-                              textFieldProps={{
-                                label: '',
-                                sx: {background: '#fff'},
-                              }}
-                              value={dateValue}
-                            />
-                          );
-                        }}
-                      />
-                    </Box>
-
-                    <Box>
-                      <Typography variant="subtitle2">
-                        {t('Due Date To')}
-                      </Typography>
-                      <Controller
-                        control={control}
-                        name="dueDateTo"
-                        render={({field}) => {
-                          const dateValue = localDueDateTo || null;
-
-                          return (
-                            <DatePicker
-                              {...field}
-                              defaultDate={dateValue}
-                              maxDate={new Date()}
-                              minDate={localDueDateFrom || undefined}
-                              reset={resetDatePicker}
-                              getReset={(val) => {
-                                if (val) setResetDatePicker(false);
-                              }}
-                              containerStyles={{mr: '1em'}}
-                              getSelectedDate={(date) =>
-                                setLocalDueDateTo(date)
-                              }
-                              inputLabelProps={{shrink: undefined}}
-                              textFieldProps={{
-                                label: '',
-                                sx: {background: '#fff'},
-                              }}
-                              value={dateValue}
-                            />
-                          );
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                  <ChipSelector
-                    headerLabel="Invoice Status"
-                    options={QUICK_FILTER_OPTIONS}
-                    selectedChips={watchPurchaseInvoiceStatus}
-                    onChange={handleSelectedPurchaseInvoiceStatusChange}
-                  />
-
-                  <Box sx={{display: 'flex', flexDirection: 'column'}} gap={1}>
-                    <Typography variant="subtitle2">
-                      {t('Amount Range')}
-                    </Typography>
-
-                    <Box sx={{display: 'flex'}} gap={1}>
-                      <Controller
-                        control={control}
-                        name="netAmountMin"
-                        render={() => (
-                          <TextInput
-                            value={watchNetMin ? `${watchNetMin}` : ''}
-                            placeholder="Min"
-                            styles={{
-                              '& .MuiInputBase-input': {
-                                textAlign: 'end',
-                              },
-                            }}
-                            size="small"
-                            onChange={handleNetAmountMinChange}
-                          />
-                        )}
-                      />
-
-                      <Controller
-                        control={control}
-                        name="netAmountMax"
-                        render={() => (
-                          <TextInput
-                            value={watchNetMax ? `${watchNetMax}` : ''}
-                            placeholder="Max"
-                            styles={{
-                              '& .MuiInputBase-input': {
-                                textAlign: 'end',
-                              },
-                            }}
-                            size="small"
-                            onChange={handleNetAmountMaxChange}
-                          />
-                        )}
-                      />
-                    </Box>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                    gap={1}>
-                    <Typography variant="subtitle2">
-                      {t('Attachments')}
-                    </Typography>
-                    <Controller
-                      control={control}
-                      name="hasAttachments"
+                      name="netAmountMin"
                       render={() => (
-                        <Checkbox
-                          checked={watchHasAttachments}
-                          onChange={handleWithAttachmentToggle}
+                        <TextInput
+                          value={watchNetMin ? `${watchNetMin}` : ''}
+                          placeholder="Min"
+                          styles={{
+                            '& .MuiInputBase-input': {
+                              textAlign: 'end',
+                            },
+                          }}
+                          size="small"
+                          onChange={handleNetAmountMinChange}
+                        />
+                      )}
+                    />
+
+                    <Controller
+                      control={control}
+                      name="netAmountMax"
+                      render={() => (
+                        <TextInput
+                          value={watchNetMax ? `${watchNetMax}` : ''}
+                          placeholder="Max"
+                          styles={{
+                            '& .MuiInputBase-input': {
+                              textAlign: 'end',
+                            },
+                          }}
+                          size="small"
+                          onChange={handleNetAmountMaxChange}
                         />
                       )}
                     />
                   </Box>
                 </Box>
-              </Filters>
-            )}
-          </Box>
-          <Button
-            buttonProps={{
-              onClick: navigateToNewInvoice,
-              sx: {
-                textTransform: 'capitalize',
-                ml: '0.8em',
-                fontSize: '14px',
-              },
-              variant: 'contained',
-              color: 'primary',
-              size: 'small',
-              startIcon: <AddIcon />,
-            }}>
-            <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
-              {t('New Invoice')}
-            </Typography>
-          </Button>
-        </PageHeaderContainer>
 
-        <Box>
-          <QuickFilter
-            selected={selectedPurchaseInvoiceStatus ?? null}
-            options={QUICK_FILTER_OPTIONS}
-            statistics={aggregatedPurchaseInvoiceStatistics}
-            onChange={handleQuickFilterChange}
-          />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                  gap={1}>
+                  <Typography variant="subtitle2">
+                    {t('Attachments')}
+                  </Typography>
+                  <Controller
+                    control={control}
+                    name="hasAttachments"
+                    render={() => (
+                      <Checkbox
+                        checked={watchHasAttachments}
+                        onChange={handleWithAttachmentToggle}
+                      />
+                    )}
+                  />
+                </Box>
+              </Box>
+            </Filters>
+          )}
         </Box>
+        <Button
+          buttonProps={{
+            onClick: navigateToNewInvoice,
+            sx: {
+              textTransform: 'capitalize',
+              ml: '0.8em',
+              fontSize: '14px',
+            },
+            variant: 'contained',
+            color: 'primary',
+            size: 'small',
+            startIcon: <AddIcon />,
+          }}>
+          <Typography variant="body1" sx={{textTransform: 'capitalize'}}>
+            {t('New Invoice')}
+          </Typography>
+        </Button>
+      </PageHeaderContainer>
 
-        <DashboardMetrics
-          selectedDateRange={selectedDateRange}
-          filters={filters}
-        />
-
-        <TableContainer
-          showNoMatchWarning={noMatchingData}
-          containerRef={containerRef}
-          setShowLeftShadow={setShowLeftShadow}
-          setShowRightShadow={setShowRightShadow}>
-          <TableHeader
-            columns={COLUMNS}
-            sortState={{columnName: orderByField, order: sortOrder}}
-            onSort={handleSortField}
-          />
-          <TableBody>
-            {rows.map((entry) => (
-              <TableRow
-                key={`purchase-invoice-row-${entry.id}`}
-                testId={`purchase-invoice-row-${entry.id}`}>
-                {COLUMNS.map(({renderCell, ...rest}) =>
-                  renderCell(entry, {
-                    onClick: handleRowClick(entry.id),
-                    ...rest,
-                  }),
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </TableContainer>
-
-        <Pagination
-          currentIndex={purchaseInvoiceResource.page.pageIndex}
-          numberOfElementsPerPage={purchaseInvoiceResource.page.pageSize}
-          totalEntries={purchaseInvoiceResource.total}
-          onChange={handlePageIndexChange}
-          onNumberPerPageChange={handleChangeElementsPerPage}
+      <Box>
+        <QuickFilter
+          selected={selectedPurchaseInvoiceStatus ?? null}
+          options={QUICK_FILTER_OPTIONS}
+          statistics={aggregatedPurchaseInvoiceStatistics}
+          onChange={handleQuickFilterChange}
         />
       </Box>
+
+      <DashboardMetrics
+        selectedDateRange={selectedDateRange}
+        filters={filters}
+      />
+
+      <TableContainer
+        showNoMatchWarning={noMatchingData}
+        containerRef={containerRef}
+        setShowLeftShadow={setShowLeftShadow}
+        setShowRightShadow={setShowRightShadow}>
+        <TableHeader
+          columns={COLUMNS}
+          sortState={{columnName: orderByField, order: sortOrder}}
+          onSort={handleSortField}
+        />
+        <TableBody>
+          {rows.map((entry) => (
+            <TableRow
+              key={`purchase-invoice-row-${entry.id}`}
+              testId={`purchase-invoice-row-${entry.id}`}>
+              {COLUMNS.map(({renderCell, ...rest}) =>
+                renderCell(entry, {
+                  onClick: handleRowClick(entry.id),
+                  ...rest,
+                }),
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </TableContainer>
+
+      <Pagination
+        currentIndex={purchaseInvoiceResource.page.pageIndex}
+        numberOfElementsPerPage={purchaseInvoiceResource.page.pageSize}
+        totalEntries={purchaseInvoiceResource.total}
+        onChange={handlePageIndexChange}
+        onNumberPerPageChange={handleChangeElementsPerPage}
+      />
     </PageContainer>
   );
 };

@@ -50,6 +50,7 @@ const Filters = ({
         display: 'flex',
         alignItems: 'center',
         cursor: 'pointer',
+        pt: 1,
       }}
       gap={1}
       onClick={handleOpen}>
