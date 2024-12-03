@@ -46,7 +46,10 @@ import {
   PurchaseInvoiceView,
   UpdatePurchaseInvoiceRecord,
 } from 'models/purchaseInvoice';
-import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+import {
+  useServiceOrders,
+  useServiceOrderDetails,
+} from 'hooks/reactQuery/useServiceOrder';
 import {useQueryState} from 'hooks/useQueryState';
 import {ServiceOrderOrderField, ServiceOrderView} from 'models/service-order';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
@@ -64,7 +67,7 @@ import {
 } from 'hooks/reactQuery/usePurchaseInvoice';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useLocation} from 'react-router-dom';
 import {ServiceOrderComboBox} from 'components/ServiceOrderComboBox';
 import CurrencySelect from 'components/CurrencySelect';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -76,6 +79,7 @@ import CustomSnackbar from 'components/CustomSnackbar';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {PurchaseInvoiceInfo} from 'pages/PurchaseInvoiceDetails/PurchaseInvoiceInfo';
 import {getCurrencyData} from 'components/CurrencyIcons';
+import queryString from 'query-string';
 
 const NumericFormat = forwardRef<
   HTMLElement,
@@ -136,6 +140,8 @@ const NewPurchaseInvoice = ({
   const {t} = useTranslation();
   const {user} = useUserSession();
   const navigate = useNavigate();
+  const {search} = useLocation();
+  const location = useLocation();
   const currentCurrency = useCurrentCurrency();
   const {enqueueSnackbar} = useSnackbar();
   const {data: uuid} = useUuid();
@@ -147,6 +153,11 @@ const NewPurchaseInvoice = ({
   const [dueDateTouched, setDueDateTouched] = useState(false);
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
+
+  const {orderId} = queryString.parse(search);
+
+  const {data: serviceOrderDetail, isLoading: isLoadingServiceOrder} =
+    useServiceOrderDetails(orderId as string);
 
   const {mutateAsync: deletePurchaseInvoice, isLoading: isDeleting} =
     useDeletePurchaseInvoice();
@@ -232,6 +243,22 @@ const NewPurchaseInvoice = ({
     name: 'serviceOrders',
   });
 
+  useEffect(() => {
+    if (serviceOrderDetail) {
+      appendServiceOrder({
+        serviceOrderId: serviceOrderDetail.id,
+        netAmount: 0,
+      });
+
+      setValue('serviceOrders', [
+        {
+          serviceOrderId: serviceOrderDetail.id,
+          netAmount: 0,
+        },
+      ]);
+    }
+  }, [serviceOrderDetail]);
+
   const {
     fields: vatAmounts,
     append: appendVatAmount,
@@ -291,11 +318,14 @@ const NewPurchaseInvoice = ({
         dueDate: formData.dueDate,
         sentDate: formData.sentDate,
         currency: formData.currency,
-        serviceOrders: formData.serviceOrders.map((order) => ({
-          ...order,
-          netAmount:
-            (order.netAmount ?? 0) * 10 ** Currencies[formData.currency],
-        })),
+        serviceOrders:
+          formData.serviceOrders
+            .filter((order) => order.serviceOrderId?.trim())
+            .map((order) => ({
+              ...order,
+              netAmount:
+                (order.netAmount ?? 0) * 10 ** Currencies[formData.currency],
+            })) || [],
         netAmount:
           (formData?.netAmount ?? 0) * 10 ** Currencies[formData.currency],
         vats: formData.vatAmounts.map((item) => ({
@@ -329,7 +359,13 @@ const NewPurchaseInvoice = ({
         invoiceId: purchaseInvoice?.id!,
       });
 
-      navigate(`/purchase-invoices/details/${purchaseInvoice?.id}`);
+      navigate(`/purchase-invoices/details/${purchaseInvoice?.id}`, {
+        state: {
+          from: location?.state?.from?.includes('/orders')
+            ? `${location?.state?.from}?tab=3`
+            : `/purchase-invoices/`,
+        },
+      });
     } else {
       const newPurchaseInvoice: CreatePurchaseInvoiceRecord = {
         serviceCompanyId: formData.serviceCompanyId,
@@ -344,11 +380,14 @@ const NewPurchaseInvoice = ({
         dueDate: formData.dueDate,
         sentDate: formData.sentDate,
         currency: formData.currency,
-        serviceOrders: formData.serviceOrders.map((order) => ({
-          ...order,
-          netAmount:
-            (order.netAmount ?? 0) * 10 ** Currencies[formData.currency],
-        })),
+        serviceOrders:
+          formData.serviceOrders
+            .filter((order) => order.serviceOrderId?.trim())
+            .map((order) => ({
+              ...order,
+              netAmount:
+                (order.netAmount ?? 0) * 10 ** Currencies[formData.currency],
+            })) || [],
         netAmount:
           (formData?.netAmount ?? 0) * 10 ** Currencies[formData.currency],
         vatAmounts: formData.vatAmounts.map((item) => ({
@@ -379,7 +418,13 @@ const NewPurchaseInvoice = ({
         await uploadFiles({files: formData.documents, uploadPath});
       }
 
-      navigate(`/purchase-invoices/details/${response.value}`);
+      navigate(`/purchase-invoices/details/${response.value}`, {
+        state: {
+          from: location?.state?.from?.includes('/orders')
+            ? location?.state?.from
+            : `/purchase-invoices/`,
+        },
+      });
     }
   };
 
@@ -439,12 +484,6 @@ const NewPurchaseInvoice = ({
       watch('supplierId')
     );
 
-    const hasValidServiceOrder = watch('serviceOrders').some(
-      (serviceOrder) =>
-        typeof serviceOrder?.serviceOrderId === 'string' &&
-        serviceOrder.serviceOrderId.trim() !== '',
-    );
-
     const hasValidDates = !!(watch('sentDate') && watch('dueDate'));
     const hasExternalId = !!watch('externalId');
     const hasSubject = !!watch('subject');
@@ -455,7 +494,6 @@ const NewPurchaseInvoice = ({
     return (
       !formType ||
       (isSupplierValid &&
-        hasValidServiceOrder &&
         hasValidDates &&
         hasExternalId &&
         hasSubject &&
@@ -732,6 +770,7 @@ const NewPurchaseInvoice = ({
                           control={control}
                           render={({field}) => (
                             <ServiceOrderComboBox
+                              key={`service-order-combo-box-${index}`}
                               {...field}
                               containerStyles={{width: '100%'}}
                               options={serviceOrdersResource.data.map(
@@ -760,9 +799,8 @@ const NewPurchaseInvoice = ({
                               }}
                               getQuery={(item) => setSearchQuery(item || '')}
                               initialValue={
-                                purchaseInvoice?.additionalInfo.serviceOrders[
-                                  index
-                                ]
+                                purchaseInvoice?.additionalInfo
+                                  ?.serviceOrders?.[index]
                                   ? {
                                       id: purchaseInvoice?.additionalInfo
                                         .serviceOrders[index].serviceOrder.id,
@@ -777,22 +815,36 @@ const NewPurchaseInvoice = ({
                                             purchaseInvoice?.additionalInfo
                                               .serviceOrders[index].serviceOrder
                                               .id,
-                                        )?.elevator.address.fullName || '-',
+                                        )?.elevator?.address?.fullName || '-',
                                       company:
                                         serviceOrdersResource.data.find(
                                           (order) =>
                                             order.id ===
-                                            purchaseInvoice.additionalInfo
+                                            purchaseInvoice?.additionalInfo
                                               .serviceOrders[index].serviceOrder
                                               .id,
-                                        )?.serviceCompany.name || '-',
-                                      type: serviceOrdersResource.data.find(
-                                        (order) =>
-                                          order.id ===
-                                          purchaseInvoice.additionalInfo
-                                            .serviceOrders[index].serviceOrder
-                                            .id,
-                                      )?.type!,
+                                        )?.serviceCompany?.name || '-',
+                                      type:
+                                        serviceOrdersResource.data.find(
+                                          (order) =>
+                                            order.id ===
+                                            purchaseInvoice?.additionalInfo
+                                              .serviceOrders[index].serviceOrder
+                                              .id,
+                                        )?.type || '-',
+                                    }
+                                  : serviceOrderDetail &&
+                                    serviceOrders.length < 2
+                                  ? {
+                                      id: serviceOrderDetail.id,
+                                      externalId: serviceOrderDetail.externalId,
+                                      address:
+                                        serviceOrderDetail.elevator?.address
+                                          ?.fullName || '-',
+                                      company:
+                                        serviceOrderDetail.elevator
+                                          ?.propertyOwner?.name || '-',
+                                      type: serviceOrderDetail.type,
                                     }
                                   : null
                               }
@@ -804,7 +856,6 @@ const NewPurchaseInvoice = ({
                           )}
                         />
                       </Grid>
-
                       <Grid item xs={serviceOrders.length > 1 ? 5 : 6}>
                         <Controller
                           name={`serviceOrders.${index}.netAmount`}
@@ -1034,6 +1085,7 @@ const NewPurchaseInvoice = ({
                           helperText: error ? error.message : null,
                           multiline: true,
                           rows: 4,
+                          sx: {paddingTop: '0.5em'},
                         }}
                       />
                     )}
@@ -1410,7 +1462,12 @@ const NewPurchaseInvoice = ({
 
       <BottomDrawer
         isOpen={isDrawerOpen}
-        isSaving={isUploading || isCreatingPurchaseInvoice || isUpdating}
+        isSaving={
+          isUploading ||
+          isCreatingPurchaseInvoice ||
+          isUpdating ||
+          isLoadingServiceOrder
+        }
         primaryButtonLabel={
           formType === 'edit' ||
           formType === 'new' ||
