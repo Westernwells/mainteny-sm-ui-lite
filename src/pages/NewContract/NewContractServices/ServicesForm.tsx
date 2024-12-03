@@ -778,6 +778,7 @@ const ServicesForm = ({
                         componentId={item.elevatorId}
                         units={formikContractServiceComponent.values.elevators}
                         onChange={handleJobFrequencyChange('elevators')}
+                        mode="new"
                       />
                     </TableCell>
                   )}
@@ -793,6 +794,7 @@ const ServicesForm = ({
                     <InvoiceFrequencyPicker
                       formik={formikContractServiceComponent}
                       componentId={item.elevatorId}
+                      mode="new"
                     />
                   </TableCell>
 

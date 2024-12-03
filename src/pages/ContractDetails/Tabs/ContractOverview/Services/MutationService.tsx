@@ -971,6 +971,7 @@ export const MutationService = ({
                       componentId={item.elevatorId}
                       units={formikContractServiceComponent.values.elevators}
                       onChange={handleJobFrequencyChange('elevators')}
+                      mode={isEditForm ? 'edit' : 'new'}
                     />
                   </TableCell>
                 )}
@@ -986,6 +987,7 @@ export const MutationService = ({
                   <InvoiceFrequencyPicker
                     formik={formikContractServiceComponent}
                     componentId={item.elevatorId}
+                    mode={isEditForm ? 'edit' : 'new'}
                   />
                 </TableCell>
 
@@ -1054,7 +1056,7 @@ export const MutationService = ({
                       if (floatValue) {
                         const newPrice = floatValue;
 
-                        if (index === 0) {
+                        if (index === 0 && !isEditForm) {
                           formikContractServiceComponent.setFieldValue(
                             `elevators[${index}].price`,
                             newPrice * 10 ** currentCurrency.fractionDigits,
