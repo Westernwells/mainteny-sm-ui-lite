@@ -30,6 +30,7 @@ type MonthData = {
 type Props = {
   componentId: string;
   formik: FormikProps<ContractServiceForm>;
+  mode?: 'edit' | 'new';
 };
 
 const monthsData: MonthData[] = [
@@ -47,7 +48,11 @@ const monthsData: MonthData[] = [
   {month: 'December', isSelected: false, number: 12},
 ];
 
-const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
+const InvoiceFrequencyPicker: React.FC<Props> = ({
+  componentId,
+  formik,
+  mode = 'new',
+}) => {
   const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedMonths, setSelectedMonths] = useState<MonthData[]>(monthsData);
@@ -172,7 +177,8 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({componentId, formik}) => {
     if (
       formik.values.elevators.findIndex(
         (elevator) => elevator.elevatorId === componentId,
-      ) === 0
+      ) === 0 &&
+      mode === 'new'
     ) {
       const updatedElevators = formik.values.elevators.map((elevator) => ({
         ...elevator,
