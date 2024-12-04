@@ -355,7 +355,11 @@ const Actions = ({quotation}: Props) => {
 
     const defaultActions = [
       ...(quotation.status !== QuotationStatus.ACCEPTED ? [editAction] : []),
-      printAction,
+      ...(![QuotationStatus.ACCEPTED, QuotationStatus.REJECTED].includes(
+        quotation.status,
+      )
+        ? [printAction]
+        : []),
       duplicateAction,
       downloadAction,
     ];
