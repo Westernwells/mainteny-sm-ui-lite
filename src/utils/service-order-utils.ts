@@ -432,3 +432,15 @@ export const getServiceOrderPaymentStatusStyles = (
       return {label: '-', color: 'info.light'};
   }
 };
+
+export const canMarkCompleted = (
+  status: ServiceOrderStatus,
+  schedulesCount: number,
+): boolean =>
+  (status === ServiceOrderStatus.OVERDUE ||
+    status === ServiceOrderStatus.SCHEDULED ||
+    status === ServiceOrderStatus.TRAVEL ||
+    status === ServiceOrderStatus.PAUSED ||
+    status === ServiceOrderStatus.IN_PROGRESS ||
+    status === ServiceOrderStatus.COMPLETED) &&
+  schedulesCount > 0;

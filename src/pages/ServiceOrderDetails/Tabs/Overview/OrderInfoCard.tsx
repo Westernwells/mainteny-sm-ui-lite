@@ -14,6 +14,7 @@ import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {StatusChip} from 'components/StatusChip';
 import {
+  canMarkCompleted,
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
@@ -112,6 +113,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
     ServiceOrderStatus.READY_TO_SCHEDULE,
     ServiceOrderStatus.SCHEDULING,
     ServiceOrderStatus.OVERDUE,
+    ServiceOrderStatus.IN_PROGRESS,
   ].includes(serviceOrderDetails.status);
 
   const orderAction = () => {
@@ -125,47 +127,25 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
           label: t('Schedule'),
           action: () => setOpenDialog(true),
         },
-        ...(serviceOrderDetails.status === ServiceOrderStatus.OVERDUE
+        ...(canMarkCompleted(
+          serviceOrderDetails.status,
+          serviceOrderDetails.schedules.length,
+        )
           ? [
               {
                 label: t('Mark Completed'),
                 action: () => setOpenMarkCompletedDialog(true),
               },
+            ]
+          : []),
+        ...(serviceOrderDetails.status === ServiceOrderStatus.OVERDUE
+          ? [
               {
                 label: t('Unschedule'),
                 action: () => setOpenUnscheduleConfirm(true),
               },
             ]
           : []),
-      ];
-    }
-
-    if (
-      [
-        ServiceOrderStatus.SCHEDULED,
-        ServiceOrderStatus.IN_PROGRESS,
-        ServiceOrderStatus.TECHNICIAN_ASSIGNED,
-        ServiceOrderStatus.ARTICLES_ORDERED,
-        ServiceOrderStatus.PAUSED,
-      ].includes(serviceOrderDetails.status)
-    ) {
-      return [
-        {
-          label: t('Reschedule'),
-          action: () => setOpenDialog(true),
-        },
-        {
-          label: t('Unschedule'),
-          action: () => setOpenUnscheduleConfirm(true),
-        },
-        {
-          label: t('Mark Completed'),
-          action: () => setOpenMarkCompletedDialog(true),
-        },
-        {
-          label: t('Cancel Job'),
-          action: () => setOpenCancelConfirm(true),
-        },
       ];
     }
     return [];
