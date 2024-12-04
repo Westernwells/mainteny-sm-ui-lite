@@ -268,7 +268,9 @@ const RichTextField = ({
       });
 
       // Insert array of children nodes
-      Transforms.insertNodes(editor, newValue);
+      Transforms.insertNodes(editor, newValue, {
+        at: [editor.children.length],
+      });
 
       if (selection) {
         Transforms.select(editor, selection);
