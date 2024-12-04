@@ -2953,5 +2953,13 @@
   "Other contact": "Andere Kontaktperson",
   "Add a new contact person and always have their information readily available for efficient communication.": "Fügen Sie eine neue Kontaktperson hinzu und haben Sie deren Informationen immer griffbereit für eine effiziente Kommunikation.",
   "New Contact": "Neuer Kontakt",
-  "No contacts": "Keine Kontakte"
+  "No contacts": "Keine Kontakte",
+  "Total revenue": "Gesamtumsatz",
+  "Number of jobs": "Anzahl der Jobs",
+  "Phone numbers": "Telefonnummern",
+  "VAT rate": "Mehrwertsteuersatz",
+  "Buyer Reference": "Kundenreferenz",
+  "Delete contact": "Kontakt löschen",
+  "Delete customer": "Kunde löschen",
+  "You are about to delete customer \"{{customerName}}\"": "Sie sind dabei, den Kunden \"{{customerName}}\" zu löschen"
 }

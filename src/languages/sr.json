@@ -2539,7 +2539,7 @@
   "This Email address is already used for a different customer portal": "Ova adresa e-pošte se već koristi za drugi korisnički portal",
   "Invalid email address": "Pogrešna email adresa",
   "Revoked": "Opozvano",
-  "Resend invite": "Ponovo pošalji",
+  "Resend invite": "Ponovo pošaljite pozivnicu",
   "Revoke access": "Opozvati pristup",
   "Customer Portal": "Portal za korisnike",
   "Customer Portal disabled": "Korisnički portal je onemogućen",
@@ -2974,5 +2974,13 @@
   "Other contact": "Drugi kontakt",
   "Add a new contact person and always have their information readily available for efficient communication.": "Dodajte novu kontakt osobu i uvek imajte njene informacije na raspolaganju za efikasnu komunikaciju.",
   "New Contact": "Novi kontakt",
-  "No contacts": "Nema kontakata"
+  "No contacts": "Nema kontakata",
+  "Total revenue": "Ukupni prihod",
+  "Number of jobs": "Broj poslova",
+  "Phone numbers": "Brojevi telefona",
+  "VAT rate": "Stopa PDV-a",
+  "Buyer Reference": "Referenca za kupca",
+  "Delete contact": "Izbriši kontakt",
+  "Delete customer": "Izbriši kupca",
+  "You are about to delete customer \"{{customerName}}\"": "Spremate se da izbrišete klijenta „{{customerName}}“"
 }
