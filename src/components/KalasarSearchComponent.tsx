@@ -17,6 +17,7 @@ declare global {
 interface KalasarSearchProps {
   app_id: string;
   version_id: string;
+  meeting_link: string;
   url: string;
   user_id: string;
   lang: string;
@@ -51,6 +52,8 @@ const KalasarSearchComponent: React.FC = () => {
     const props: KalasarSearchProps = {
       app_id: 'd6bfd7f4-39a0-4824-8720-a8b79d32f586',
       version_id: '3c8deb5a-a9be-4c8e-a839-a17c9dd367a7',
+      meeting_link:
+        'https://meetings.hubspot.com/madeleine-brandt/checkin-mainteny?uuid=5c7b2b69-1127-4e6f-919c-e9203ec2c73e',
       url: 'https://design.kalasar.com/api/v1/product_tour_request',
       user_id: '2',
       lang: 'de',
