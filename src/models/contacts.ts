@@ -187,6 +187,7 @@ export interface ContactPersonAssociationView {
 }
 
 export interface RefContactPersonView extends ServiceCompanyContactPersonView {
+  propertyOwner: any;
   associationId: string;
 }
 
@@ -246,3 +247,15 @@ export type ContactTableRow = {
 export type ContactStatistics = {
   numOfContactPersonsPerRole: Record<string, number>;
 };
+
+export interface RefContactTableRow {
+  contactResourceData: RefContactPersonView;
+  id: string;
+  contactId: string;
+  name: string;
+  company: string;
+  phone: string;
+  secondaryPhoneNumber: string;
+  emailAddress: string;
+  role: string[];
+}
