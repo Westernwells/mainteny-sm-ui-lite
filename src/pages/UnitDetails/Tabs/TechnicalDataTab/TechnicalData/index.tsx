@@ -1,139 +1,199 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorDataSchemaView, ElevatorView} from 'models/elevator';
 import {InfoCard} from 'components/InfoCard';
 import EditOutlined from '@mui/icons-material/EditOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import {Dialog} from 'components/Dialog';
 import {useForm} from 'react-hook-form';
-import {TechnicalDataFormModel} from 'models/unitForm';
-import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
-import TechnicalDataSchema from './TechnicalDataShema';
+import {
+  useFetchElevatorDataItems,
+  useUpdateElevatorDataItems,
+} from 'hooks/reactQuery/useElevator';
+import {Box} from '@mui/system';
+import {Button} from 'components/Button';
 import EditTechnicalDataForm from './EditTechnicalDataForm';
+import TechnicalDataView from './TechnicalDataView';
 
 interface Props {
   elevator: ElevatorView;
+  schema: ElevatorDataSchemaView;
 }
 
-const TechnicalData = ({elevator}: Props) => {
-  const propertyOwnerId = elevator?.propertyOwner?.id;
+const NO_OF_ITEMS_TO_SHOW = 10;
+
+type DialogState = {
+  open: boolean;
+  mode: 'view' | 'edit';
+};
+
+const INITIAL_DIALOG_STATE: DialogState = {
+  open: false,
+  mode: 'view',
+};
+
+const TechnicalData = ({elevator, schema}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
-  const {mutateAsync: updateElevator} = useUpdateElevator(
-    'Unit details updated successfully',
+
+  const {mutateAsync: updateElevatorDataItem, isLoading: isUpdating} =
+    useUpdateElevatorDataItems();
+
+  const {data: elevatorDataItemsResponse} = useFetchElevatorDataItems(
+    elevator.id,
+    {
+      schemaId: schema.id,
+    },
+  );
+
+  const elevatorDataItems = elevatorDataItemsResponse?.[schema.id] ?? [];
+
+  const elevatorDataItemMapping = useMemo(
+    () =>
+      elevatorDataItems.reduce((acc, item) => {
+        acc[item.name] = item.value;
+        return acc;
+      }, {} as {[key: string]: string}),
+    [elevatorDataItemsResponse],
   );
 
   const [openDialog, setOpenDialog] = useState(false);
+  const [dialogState, setDialogState] = useState(INITIAL_DIALOG_STATE);
 
-  const getDefaultValues = (elevatorData: ElevatorView) => ({
-    numberOfStops: Number(elevatorData.additionalInfo.numberOfStops),
-    drive: elevatorData.additionalInfo.drive,
-    capacity: elevatorData.capacity,
-    speed: elevatorData.additionalInfo.speed,
-    controller: elevator.additionalInfo.controller,
-    iotDevice: elevator.additionalInfo.iotDevice,
-    cabinType: elevatorData.additionalInfo.cabinType,
-    cageWeight: elevator.additionalInfo.cageWeight,
-    counterWeight: elevator.additionalInfo.counterWeight,
-    hoistingHeight: elevator.additionalInfo.hoistingHeight,
-    shaftHeight: elevator.additionalInfo.shaftHeight,
-    numberOfPeople: elevator.additionalInfo.numberOfPeople,
-  });
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: {errors},
-  } = useForm<TechnicalDataFormModel>({
-    defaultValues: getDefaultValues(elevator),
+  const {register, reset, getValues} = useForm<{
+    [key: string]: string;
+  }>({
+    defaultValues: {},
   });
 
   useEffect(() => {
     if (!openDialog) {
-      reset(getDefaultValues(elevator));
+      reset({});
     }
   }, [elevator, openDialog]);
 
-  const labels = useRef([
-    'stops',
-    'drive',
-    'capacity',
-    'speed',
-    'controller',
-    'iotDevice',
-    'cabinType',
-    'cageWeight',
-    'counterWeight',
-    'hoistingHeight',
-    'shaftHeight',
-    'numberOfPeople',
-  ]).current;
+  const onSubmit = async () => {
+    const values = getValues();
 
-  const onSubmit = async (data: TechnicalDataFormModel) => {
-    setOpenDialog(false);
-    await updateElevator({
-      body: {
-        propertyOwnerId,
-        capacity: String(data.capacity),
-        numberOfStops: data.numberOfStops,
-        drive: data.drive,
-        speed: String(data.speed),
-        cabinType: data.cabinType,
-        cageWeight: data.cageWeight,
-        counterWeight: data.counterWeight,
-        hoistingHeight: data.hoistingHeight,
-        shaftHeight: data.shaftHeight,
-        controller: data.controller,
-        iotDevice: data.iotDevice,
-        numberOfPeople: data.numberOfPeople,
+    await updateElevatorDataItem({
+      queryParams: {
+        elevatorId: elevator.id,
+        schemaId: schema.id,
       },
-      elevatorId: elevator.id,
+      body: {
+        items: elevatorDataItems.map((item) => ({
+          name: item.name,
+          value: values[item.name] ?? '',
+        })),
+      },
     });
+
+    setDialogState(INITIAL_DIALOG_STATE);
+  };
+
+  const showShowMore = schema.additionalInfo.items.length > NO_OF_ITEMS_TO_SHOW;
+
+  const openEditDialog = () => {
+    setDialogState({...dialogState, open: true, mode: 'edit'});
+    reset(
+      elevatorDataItems.reduce((acc, dataItem) => {
+        acc[dataItem.name] = dataItem.value;
+        return acc;
+      }, {} as {[key: string]: string}),
+    );
   };
 
   return (
     <InfoCard
+      containerStyles={{height: '100%', paddingBottom: 0}}
       handleAction={() => setOpenDialog(true)}
       headerActionIcon={
-        <EditOutlined style={{color: theme.palette.secondary.mainLight}} />
+        <EditOutlined
+          onClick={openEditDialog}
+          style={{color: theme.palette.secondary.mainLight}}
+        />
       }
       header={
         <Grid container wrap="nowrap" gap={1}>
-          <SettingsOutlinedIcon
-            style={{
-              transform: 'rotate(45deg)',
-              color: theme.palette.text.secondary,
-            }}
-          />
           <Typography variant="h5" fontWeight={600}>
-            {t('Technical Data')}
+            {t(schema.name)}
           </Typography>
         </Grid>
       }>
-      <Grid container spacing={2}>
-        {labels.map((label) => (
-          <Grid key={label} item xs={12} sm={4} md={4}>
-            <TechnicalDataSchema label={label} elevator={elevator} />
-          </Grid>
-        ))}
-      </Grid>
+      <Box>
+        {schema.additionalInfo.items
+          .slice(0, NO_OF_ITEMS_TO_SHOW)
+          .map((item, index) => (
+            <Box
+              key={index}
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                my: 1,
+              }}>
+              <Typography fontWeight={400} color="#828DA3">
+                {item.name}
+              </Typography>
+              {elevatorDataItemMapping[item.name] && (
+                <Typography fontWeight={400} color="#000034">
+                  {elevatorDataItemMapping[item.name]} {t(item.unit)}
+                </Typography>
+              )}
+            </Box>
+          ))}
+        <Box sx={{display: 'flex', justifyContent: 'center'}}>
+          {showShowMore && (
+            <Button
+              style={{color: '#0092B2', px: 2}}
+              buttonProps={{
+                onClick: () => {
+                  setDialogState({open: true, mode: 'view'});
+                },
+              }}
+              enableRipple
+              variant="text"
+              label={t('See {{count}} more', {
+                count: schema.additionalInfo.items.length - NO_OF_ITEMS_TO_SHOW,
+              })}
+            />
+          )}
+        </Box>
+      </Box>
       <Dialog
-        title="Edit Technical Data"
-        onCancel={() => {
-          reset();
-          setOpenDialog(false);
+        title={`${schema.name}`}
+        dialogContentTextStyles={dialogState.mode === 'view' ? {pt: 0} : {}}
+        dialogTitleStyles={dialogState.mode === 'view' ? {pb: 0} : {}}
+        saveButtonText={dialogState.mode === 'view' ? 'Edit' : 'Save'}
+        isSaving={isUpdating}
+        onSave={() => {
+          if (dialogState.mode === 'view') {
+            openEditDialog();
+          }
+
+          if (dialogState.mode === 'edit') {
+            onSubmit();
+          }
         }}
-        disableSaveBtn={!!Object.keys(errors).length}
-        onSave={handleSubmit(onSubmit)}
+        onCancel={() => {
+          reset({});
+          setDialogState(INITIAL_DIALOG_STATE);
+        }}
         dialogProps={{
-          maxWidth: 'md',
-          open: openDialog || false,
+          maxWidth: 'sm',
+          open: dialogState.open || false,
         }}>
-        <EditTechnicalDataForm register={register} />
+        {dialogState.mode === 'view' && (
+          <TechnicalDataView elevatorDataItems={elevatorDataItems} />
+        )}
+        {dialogState.mode === 'edit' && (
+          <EditTechnicalDataForm
+            elevatorDataItems={elevatorDataItems}
+            register={register}
+          />
+        )}
       </Dialog>
     </InfoCard>
   );

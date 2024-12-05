@@ -24,11 +24,14 @@ import {
   CustomerElevatorParams,
   ElevatorComment,
   ElevatorCommentRecord,
+  ElevatorDataItemView,
   ElevatorQueryParams,
   ElevatorRequestBody,
   ElevatorView,
+  FetchElevatorDataItemsParams,
   QueryTodoParams,
   UnitStatistics,
+  UpdateElevatorDataItemBody,
 } from 'models/elevator';
 import {useAll} from 'hooks/reactQuery/useAll';
 import {Page} from '../../models/pagination';
@@ -621,6 +624,77 @@ export const useUnitStatistics = (
     {
       enabled: !!user,
       ...options,
+    },
+  );
+};
+
+export const fetchElevatorDataItems = async (
+  elevatorId: string,
+  params: FetchElevatorDataItemsParams,
+): Promise<{[key: string]: ElevatorDataItemView[]}> => {
+  const response: AxiosResponse<{[key: string]: ElevatorDataItemView[]}> =
+    await axiosClient.get(`/api/elevators/${elevatorId}/dataItems`, {
+      params,
+      paramsSerializer,
+    });
+  return response.data;
+};
+
+export const useFetchElevatorDataItems = (
+  elevatorId: string,
+  params: FetchElevatorDataItemsParams,
+  options?: {refetchOnWindowFocus?: boolean; useErrorBoundary?: boolean},
+) => {
+  const {user} = useUserSession();
+  return useQuery<
+    {[key: string]: ElevatorDataItemView[]},
+    RestError,
+    {[key: string]: ElevatorDataItemView[]}
+  >(
+    [queryKeys.fetchElevatorDataItems, params.schemaId, elevatorId],
+    () => fetchElevatorDataItems(elevatorId, params),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+};
+
+export const updateElevatorDataItems = async (
+  {elevatorId, schemaId}: {elevatorId: string; schemaId: string},
+  body: UpdateElevatorDataItemBody,
+) => {
+  await axiosClient.put(
+    `/api/elevators/${elevatorId}/schemas/${schemaId}/dataItems`,
+    body,
+  );
+};
+
+export const useUpdateElevatorDataItems = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      queryParams,
+      body,
+    }: {
+      queryParams: {elevatorId: string; schemaId: string};
+      body: UpdateElevatorDataItemBody;
+    }) => updateElevatorDataItems(queryParams, body),
+    {
+      onSuccess: (_, {queryParams}) => {
+        queryClient.invalidateQueries([
+          queryKeys.fetchElevatorDataItems,
+          queryParams.schemaId,
+        ]);
+        enqueueSnackbar(`Technical data fields updated successfully`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        showError(err);
+      },
     },
   );
 };

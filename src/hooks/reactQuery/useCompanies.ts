@@ -10,6 +10,7 @@ import {
 } from 'models/misc';
 import {
   AutoNumberConfig,
+  FetchElevatorDataSchemaParams,
   ServiceCompanyActivity,
   ServiceCompanyActivityParams,
   ServiceCompanyItem,
@@ -43,6 +44,7 @@ import {
   EmployeeEventTypeRecord,
   SaveEmployeeEventTypeRecords,
 } from 'models/employee';
+import {ElevatorDataSchemaView} from 'models/elevator';
 import {useUserSession} from './useUserSession';
 import {Page} from '../../models/pagination';
 
@@ -690,4 +692,44 @@ export const useUpdateCompanyJobTypes = () => {
       showError(err);
     },
   });
+};
+
+export const fetchElevatorDataSchemas = async (
+  companyId: string,
+  params: FetchElevatorDataSchemaParams,
+) => {
+  const response = await axiosClient.get<Resource<ElevatorDataSchemaView>>(
+    `/api/serviceCompanies/${companyId}/elevatorDataSchemas`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useFetchElevatorDataSchemas = (
+  companyId: string,
+  params: FetchElevatorDataSchemaParams,
+  options?: {refetchOnWindowFocus?: boolean; useErrorBoundary?: boolean},
+) => {
+  const {showError} = useSnackbar();
+
+  return useQuery(
+    [
+      queryKeys.fetchElevatorDataSchemas,
+      companyId,
+      params.pageIndex,
+      params.pageSize,
+      params.query,
+    ],
+    () => fetchElevatorDataSchemas(companyId!, params),
+    {
+      enabled: !!companyId,
+      onError: (err) => {
+        showError(err);
+      },
+      ...(options ?? {}),
+    },
+  );
 };
