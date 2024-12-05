@@ -220,7 +220,7 @@ export const JobOverviewBottomDrawer = ({
                 />
               }
               onClick={() => setOpenMarkCompletedDialog(true)}>
-              {t('Mark completed')}
+              {t('Mark Completed')}
             </Button>
           )}
 

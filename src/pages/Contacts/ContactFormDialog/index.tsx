@@ -80,7 +80,7 @@ const ContactFormDialog = ({
     if (formType === 'edit') {
       reset(getDefaultValues(contactPerson, serviceCompanyId));
     }
-  }, [contactPerson, formType, reset, serviceCompanyId]);
+  }, [contactPerson, openDialog, formType, reset, serviceCompanyId]);
 
   const resetForm = () => {
     reset(getDefaultValues(undefined, serviceCompanyId));

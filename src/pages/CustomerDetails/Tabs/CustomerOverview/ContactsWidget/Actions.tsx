@@ -1,123 +1,38 @@
-import {useState} from 'react';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import IconButton from '@mui/material/IconButton';
-import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
-import {Delete, Edit, MoreHoriz} from '@mui/icons-material';
-import {Box} from '@mui/material';
-
-import {useInviteContact} from 'hooks/reactQuery/useContacts';
-import {ContactsStatus} from 'models/contacts';
+import React, {useRef, useState} from 'react';
+import {DeleteOutlined, EditOutlined} from '@mui/icons-material';
+import TableActionMenu from 'components/Table/TableActionMenu';
+import {Action} from 'models/table';
 import {useTranslation} from 'react-i18next';
 
 interface Props {
   onEdit: () => void;
   onDelete: () => void;
-  onInvite: () => void;
-  contactId: string;
-  status: string;
-  canInvite: boolean;
 }
 
-export const Actions = ({
-  onEdit,
-  onDelete,
-  onInvite,
-  contactId,
-  status,
-  canInvite,
-}: Props) => {
+const Actions = ({onEdit, onDelete}: Props) => {
   const {t} = useTranslation();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const {mutateAsync: inviteContact} = useInviteContact(
-    'Contact invited successfully',
-  );
-  const handleClick = (event: any) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const [open, setOpen] = useState<boolean>(false);
 
-  const handleInvite = async () => {
-    if (!canInvite) {
-      onInvite();
-    } else {
-      await inviteContact({
-        username: contactId || '',
-        propertyContactPersonId: contactId || '',
-      });
-    }
-
-    handleClose();
-  };
-
-  const getTypeInvite = () => {
-    switch (status) {
-      case ContactsStatus.ACTIVE:
-        return {
-          // TODO: add revoke Access action
-          action: () => console.log('revoke access'),
-          label: 'Revoke Access',
-        };
-      case ContactsStatus.PENDING:
-        return {
-          action: handleInvite,
-          label: 'Resend Invite',
-        };
-      default:
-        return {
-          action: handleInvite,
-          label: 'Invite',
-        };
-    }
-  };
+  const menuActions = useRef<Action[]>([
+    {
+      icon: EditOutlined,
+      label: t('Edit'),
+      onTrigger: () => onEdit(),
+    },
+    {
+      icon: DeleteOutlined,
+      label: t('Delete'),
+      onTrigger: () => onDelete(),
+    },
+  ]);
 
   return (
-    <Box>
-      <IconButton component="a" onClick={onEdit}>
-        <Edit sx={{color: 'action.active'}} fontSize="small" />
-      </IconButton>
-      <IconButton component="a" onClick={onDelete}>
-        <Delete sx={{color: 'action.active'}} fontSize="small" />
-      </IconButton>
-      <IconButton size="small" onClick={handleClick} sx={{ml: '.25em'}}>
-        <MoreHoriz sx={{color: 'action.active'}} fontSize="small" />
-      </IconButton>
-      <Menu
-        id="actions-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        sx={{minWidth: '12.5em'}}
-        MenuListProps={{
-          'aria-labelledby': 'actions-button',
-        }}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        PaperProps={{
-          style: {
-            width: 200,
-          },
-        }}>
-        <MenuItem
-          onClick={() => {
-            handleClose();
-            getTypeInvite().action();
-          }}>
-          <ListItemText>
-            <Typography variant="body2">{t(getTypeInvite().label)}</Typography>
-          </ListItemText>
-        </MenuItem>
-      </Menu>
-    </Box>
+    <TableActionMenu
+      options={menuActions.current}
+      isOpen={open}
+      onToggle={setOpen}
+    />
   );
 };
+
+export default React.memo(Actions);

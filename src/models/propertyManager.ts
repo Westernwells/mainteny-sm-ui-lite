@@ -40,12 +40,14 @@ export interface PropertyOwnerAdditionalInfo {
   customerPortalEnabled?: boolean;
   buyerReference?: string;
   invoiceFormat: InvoiceFormat;
+  ean?: string;
   vat?: {
     id: string;
     name: string;
     percentage?: number;
     legalNote: string;
   };
+  customerImagePath?: string;
 }
 
 export interface PropertyOwnerView {
@@ -55,6 +57,8 @@ export interface PropertyOwnerView {
   billingAddress?: Address;
   beneficiaryAddress?: Address;
   otherAddress?: Address;
+  businessAddress?: Address;
+  postalAddress?: Address;
   contact: ContactPropertyOwner;
   search: string;
   meta: Meta;
