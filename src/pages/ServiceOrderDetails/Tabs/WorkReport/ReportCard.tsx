@@ -22,6 +22,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {Chip, FormControl, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
+import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
+import {getTechnicianName} from 'utils/employee';
 
 interface Props {
   date: string;
@@ -45,15 +47,20 @@ export const ReportCard = ({
   const {t} = useTranslation();
 
   const labels =
-    reports?.map((r) => {
+    reports.map((r) => {
       const schedule = order.schedules.find(
         (s) => s.technician.id === r?.technicianId,
       );
+
+      const {data: selectedTechnician} = useGetTechniciansByEmployeeId(
+        r?.technicianId || '',
+      );
+
+      const technicianName = getTechnicianName(schedule, selectedTechnician);
+
       return {
         value: r.id,
-        label: `${r.number || ''}-${
-          schedule?.technician.userAccount.firstName
-        } ${schedule?.technician.userAccount.lastName}`,
+        label: `${r.number || ''} - ${technicianName}`,
       };
     }) || [];
 
