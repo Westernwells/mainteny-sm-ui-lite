@@ -3,7 +3,7 @@ import {FormikProps} from 'formik';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid2';
 import InputAdornment from '@mui/material/InputAdornment';
-import {Email, Phone} from '@mui/icons-material';
+import {Email, Phone, Receipt} from '@mui/icons-material';
 import {PageCard} from 'components/PageCard';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FormInput} from 'components/form/FormInput';
@@ -20,7 +20,14 @@ import {ComboBox} from 'components/ComboBox';
 import {t} from 'i18next';
 import {CustomerBasicInfoFormModel} from './model';
 import {T} from 'utils/i18n-utils';
-import {FormControl, InputLabel, MenuItem, Select} from '@mui/material';
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import {CUSTOMER_ALL_INVOICE_FORMATS} from 'utils/constants';
 
 interface Props {
@@ -373,13 +380,49 @@ export const BasicCustomerForm = ({formik}: Props) => {
                 label={t('Tax rate')}
                 size="small"
                 value={formik.values.vat}
+                renderValue={(value) =>
+                  taxRates?.find((item) => item.id === value)?.name || ''
+                }
                 name="vat"
                 notched
                 {...defaultProps}
-                required={false}>
+                required={false}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  },
+                  transformOrigin: {
+                    vertical: 'top',
+                    horizontal: 'right',
+                  },
+                  slotProps: {
+                    paper: {
+                      sx: {
+                        maxWidth: '20rem',
+                      },
+                    },
+                  },
+                }}>
                 {taxRates?.map((taxRate) => (
-                  <MenuItem value={taxRate.id} key={taxRate.id}>
-                    {taxRate.percentage || 0}%
+                  <MenuItem
+                    value={taxRate.id}
+                    key={taxRate.id}
+                    sx={{
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                    }}>
+                    <Box display="flex" maxWidth="100%" gap={1}>
+                      <Typography variant="body1" noWrap color="primary.dark">
+                        {taxRate.name}
+                      </Typography>
+                      <Tooltip title={taxRate.legalNote} arrow placement="top">
+                        <Receipt fontSize="small" />
+                      </Tooltip>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      {taxRate.percentage}%
+                    </Typography>
                   </MenuItem>
                 ))}
               </Select>

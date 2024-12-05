@@ -74,7 +74,7 @@ export const EditCustomer = ({customer, openDialog, onClose}: Props) => {
     offsettingAccount: customer.additionalInfo.offsettingAccount || '',
     buyerReference: customer.additionalInfo.buyerReference,
     invoiceFormat: customer.additionalInfo.invoiceFormat,
-    vat: customer.additionalInfo.vat?.id,
+    vat: customer.additionalInfo.vat?.id || '',
   };
 
   const validationSchema = Yup.object().shape({

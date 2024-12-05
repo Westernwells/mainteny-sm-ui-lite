@@ -169,7 +169,7 @@ describe('Invoice flow', () => {
                             .invoke('attr', 'value')
                             .should('eq', (a.unitAmount.netAmount / 100).toLocaleString());
                         cy.get('input[name="quantity"]').invoke('attr', 'value').should('eq', `${a.quantity}`);
-                        cy.get('input[name="unitAmount.percentageVat"]').invoke('attr', 'value').should('eq', `${a.unitAmount.percentageVat}`);
+                        cy.get('div[aria-labelledby^="select-tax-label"]').contains(`${a.unitAmount.percentageVat}%`);
 
                         // input some values to assert later on
                         cy.get('input[name="quantity"]')

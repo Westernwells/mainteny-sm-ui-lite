@@ -5,11 +5,15 @@ import {isEqual} from 'lodash';
 import {
   Box,
   ClickAwayListener,
+  FormControl,
   IconButton,
   InputAdornment,
+  MenuItem,
   Paper,
   Popover,
   Popper,
+  Select,
+  SelectChangeEvent,
   Table,
   TableBody,
   TableCell,
@@ -44,7 +48,7 @@ import useHighlightText from 'hooks/useHighlightText';
 import {getArticleTypeText} from 'utils/article-utils';
 import {QuotationItemRecord} from 'models/quotation';
 import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
-import {DragIndicator} from '@mui/icons-material';
+import {DragIndicator, Receipt} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
@@ -335,6 +339,17 @@ export const ArticleItemRowQuotation = ({
 
   const handlePopperClose = () => {
     setShowArticleSearch(false);
+  };
+
+  const onChangePercentageVat = (event: SelectChangeEvent<string>) => {
+    const vatId = event.target.value;
+    const taxRate = taxRates.find((rate) => rate.id === vatId);
+    formik.setFieldValue('unitAmount', {
+      ...formik.values.unitAmount,
+      vatId: taxRate?.id || '',
+      vatName: taxRate?.name || '',
+      percentageVat: taxRate?.percentage || 0,
+    });
   };
 
   const tabItems: TabItems[] = useMemo(() => {
@@ -688,56 +703,78 @@ export const ArticleItemRowQuotation = ({
       </TableCell>
 
       <TableCell sx={{width: '6%', display: 'inline-block'}}>
-        <FormSelect
-          labelId={`select-tax-label-${index}`}
-          label=""
-          selectProps={{
-            value: String(
-              formik.values.unitAmount.percentageVat !== 0
-                ? formik.values.unitAmount.percentageVat
-                : 0,
-            ),
-            onChange: (event) => {
-              const val = Number(event.target.value) || 0;
-              formik.setFieldValue('unitAmount.percentageVat', val);
-            },
-            name: 'unitAmount.percentageVat',
-            id: `unitAmount.percentageVat-${index}`,
-            IconComponent: () => null,
-            renderValue: (val) => `${val}%`,
-          }}
-          options={taxRates.map((rate) => ({
-            value: String(rate.percentage || 0),
-            label: `${rate.percentage || 0}%`,
-          }))}
-          selectStyles={{
-            '& .MuiSelect-select': {
-              textAlign: 'right',
-              paddingRight: '5px !important',
-            },
-          }}
-          menuProps={{
-            anchorOrigin: {
-              vertical: 'bottom',
-              horizontal: 'right',
-            },
-            transformOrigin: {
-              vertical: 'top',
-              horizontal: 'right',
-            },
-            slotProps: {
-              paper: {
-                sx: {
-                  width: '100% !important',
-                  maxWidth: '80px !important',
-                  '& .MuiMenuItem-root': {
-                    alignItems: 'flex-end',
+        <FormControl fullWidth required={false}>
+          <Select
+            labelId={`select-tax-label-${index}`}
+            size="small"
+            value={
+              formik.values.unitAmount.vatId ||
+              String(
+                formik.values.unitAmount.percentageVat !== 0
+                  ? formik.values.unitAmount.percentageVat
+                  : 0,
+              ) ||
+              ''
+            }
+            renderValue={(value) =>
+              `${
+                taxRates?.find((item) => item.id === value)?.percentage ||
+                value ||
+                0
+              }%`
+            }
+            name="unitAmount.vatId"
+            id={`unitAmount.vatId-${index}`}
+            notched
+            onChange={onChangePercentageVat}
+            onBlur={formik.handleBlur}
+            IconComponent={() => null}
+            MenuProps={{
+              anchorOrigin: {
+                vertical: 'bottom',
+                horizontal: 'right',
+              },
+              transformOrigin: {
+                vertical: 'top',
+                horizontal: 'right',
+              },
+              slotProps: {
+                paper: {
+                  sx: {
+                    maxWidth: '20rem',
                   },
                 },
               },
-            },
-          }}
-        />
+            }}
+            sx={{
+              '& .MuiSelect-select': {
+                textAlign: 'right',
+                px: '5px !important',
+              },
+            }}>
+            {taxRates?.map((taxRate) => (
+              <MenuItem
+                value={taxRate.id}
+                key={taxRate.id}
+                sx={{
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                }}>
+                <Box display="flex" maxWidth="100%" gap={1}>
+                  <Typography variant="body1" noWrap color="primary.dark">
+                    {taxRate.name}
+                  </Typography>
+                  <Tooltip title={taxRate.legalNote} arrow placement="top">
+                    <Receipt fontSize="small" />
+                  </Tooltip>
+                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  {taxRate.percentage}%
+                </Typography>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </TableCell>
 
       <TableCell sx={{width: '10%', display: 'inline-block'}}>

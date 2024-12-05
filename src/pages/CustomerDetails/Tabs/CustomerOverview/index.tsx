@@ -26,7 +26,7 @@ import {InfoCard} from 'components/InfoCard';
 import {Progress} from 'components/Progress';
 import {TabContentContainer} from 'components/TabContentContainer';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
-import {formatPhoneNumber, getTaxRate} from 'utils/customer-utils';
+import {formatPhoneNumber} from 'utils/customer-utils';
 import EmployeeAvatar from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EmployeeAvatar';
 import {formatDate, getDateObject} from 'utils/datetime';
 import {LanguageContext} from 'context/LanguageProvider';
@@ -194,7 +194,7 @@ export const CustomerOverviewTab = ({
         },
         taxRate: {
           label: 'Tax rate',
-          value: getTaxRate(customer.additionalInfo.vat),
+          value: customer.additionalInfo.vat?.name || '-',
           icon: <AttachMoney sx={{color: theme.palette.info.dark}} />,
         },
       });
