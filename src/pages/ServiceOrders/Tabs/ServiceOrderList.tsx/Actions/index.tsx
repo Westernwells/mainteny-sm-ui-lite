@@ -1,6 +1,7 @@
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import UndoIcon from '@mui/icons-material/Undo';
 import React, {useMemo, useState} from 'react';
 import {Action} from 'models/table';
 import TableActionMenu from 'components/Table/TableActionMenu';
@@ -8,6 +9,7 @@ import ChangePaymentStatusDialog from 'pages/ServiceOrders/Tabs/ServiceOrderList
 import {
   useArchiveServiceOrder,
   useCancelServiceOrders,
+  useUncompleteServiceOrder,
 } from 'hooks/reactQuery/useServiceOrder';
 import {ServiceOrderStatus} from 'models/service-order';
 import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
@@ -20,6 +22,13 @@ type Props = {
 const Actions = ({id, status}: Props) => {
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
   const [open, setOpen] = useState<boolean>(false);
+
+  const {mutateAsync: handleUncompleteServiceOrder} = useUncompleteServiceOrder(
+    {
+      serviceOrderId: id,
+      message: 'Service job has been restored',
+    },
+  );
 
   const {mutateAsync: archiveServiceOrder} = useArchiveServiceOrder({
     serviceOrderId: id,
@@ -87,7 +96,7 @@ const Actions = ({id, status}: Props) => {
         ? [
             {
               icon: CancelOutlinedIcon,
-              label: 'Cancel',
+              label: 'table_action_option.cancel',
               onTrigger: handleCancelClick(CANCEL_ACTION.CANCEL),
             },
           ]
@@ -119,6 +128,16 @@ const Actions = ({id, status}: Props) => {
               icon: Inventory2OutlinedIcon,
               label: 'Unarchive',
               onTrigger: handleArchiveClick(ARCHIVE_ACTION.UNARCHIVE),
+            },
+          ]
+        : []),
+
+      ...(status === ServiceOrderStatus.COMPLETED
+        ? [
+            {
+              icon: UndoIcon,
+              label: 'Reopen',
+              onTrigger: () => handleUncompleteServiceOrder(),
             },
           ]
         : []),

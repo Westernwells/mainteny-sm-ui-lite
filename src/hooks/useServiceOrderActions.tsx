@@ -1,19 +1,25 @@
 import {useState} from 'react';
 import {
   useCancelServiceOrders,
+  useUncompleteServiceOrder,
   useUnscheduleServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
-import {ServiceOrderView} from 'models/service-order';
 import {CANCEL_ACTION} from 'models/status';
 
-export const useServiceOrderActions = (
-  serviceOrderDetails: ServiceOrderView,
-) => {
+export const useServiceOrderActions = (id: string) => {
   const {mutate: cancelServiceOrder} = useCancelServiceOrders({
-    serviceOrderId: serviceOrderDetails.id,
+    serviceOrderId: id,
     action: CANCEL_ACTION.CANCEL,
   });
+
   const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
+
+  const {mutateAsync: handleUncompleteServiceOrder} = useUncompleteServiceOrder(
+    {
+      serviceOrderId: id,
+      message: 'Service job has been restored',
+    },
+  );
 
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
@@ -37,7 +43,7 @@ export const useServiceOrderActions = (
   };
 
   const confirmUnschedule = () => {
-    unscheduleServiceOrder(serviceOrderDetails.id);
+    unscheduleServiceOrder(id);
     setOpenUnscheduleConfirm(false);
   };
 
@@ -45,6 +51,7 @@ export const useServiceOrderActions = (
     openCancelConfirm,
     openUnscheduleConfirm,
     openDialog,
+    handleUncompleteServiceOrder,
     setOpenCancelConfirm,
     setOpenUnscheduleConfirm,
     setOpenDialog,
