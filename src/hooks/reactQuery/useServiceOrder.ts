@@ -388,6 +388,46 @@ export const useCompleteServiceOrder = (successMsg?: string) => {
   );
 };
 
+type UncompleteServiceOrderParams = {
+  serviceOrderId: string;
+  message?: string;
+};
+
+const uncompleteServiceOrder = async ({
+  serviceOrderId,
+}: Omit<UncompleteServiceOrderParams, 'message'>) => {
+  const {data} = await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/uncomplete`,
+  );
+
+  return data;
+};
+
+export const useUncompleteServiceOrder = ({
+  serviceOrderId,
+  message,
+}: UncompleteServiceOrderParams) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(() => uncompleteServiceOrder({serviceOrderId}), {
+    onSuccess: () => {
+      setTimeout(() => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+      }, 10);
+      if (message) {
+        enqueueSnackbar(message, {
+          variant: 'success',
+        });
+      }
+    },
+    onError: (err) => {
+      showError(err);
+    },
+  });
+};
+
 const unschedulerServiceOrder = async (serviceOrderId: string) => {
   await axiosClient.put<StringValue>(
     `/api/serviceOrders/${serviceOrderId}/unschedule`,

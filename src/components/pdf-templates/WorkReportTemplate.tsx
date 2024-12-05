@@ -8,11 +8,7 @@ import {
 } from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
-import {
-  ServiceOrderReportView,
-  ServiceOrderScheduleSimpleView,
-  ServiceOrderView,
-} from 'models/service-order';
+import {ServiceOrderReportView, ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import capitalize from 'lodash/capitalize';
@@ -283,7 +279,6 @@ type Props = {
   userInfo?: UserAccount | undefined;
   serviceOrder?: ServiceOrderView;
   report?: ServiceOrderReportView;
-  schedule?: ServiceOrderScheduleSimpleView;
   selectedLng?: string;
   technicianSignatureImage?: string;
   customerSignatureImage?: string;
@@ -295,6 +290,7 @@ type Props = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
+  technicianName: string;
 };
 
 const WorkReportTemplate = React.memo(
@@ -302,7 +298,6 @@ const WorkReportTemplate = React.memo(
     userInfo,
     serviceOrder,
     report,
-    schedule,
     selectedLng,
     translate,
     customerSignatureImage,
@@ -313,6 +308,7 @@ const WorkReportTemplate = React.memo(
     footerInfo,
     footerPath,
     pdfConfigClientStorage,
+    technicianName,
   }: Props) => {
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
     const company = userInfo?.serviceCompany;
@@ -433,14 +429,10 @@ const WorkReportTemplate = React.memo(
                       </Text>
                     </View>
                   )}
-                {(schedule?.technician?.userAccount?.firstName ||
-                  schedule?.technician?.userAccount?.lastName) && (
+                {technicianName && (
                   <View style={styles.rightAddressContent}>
                     <Text style={styles.tag}>{translate('Engineer')}</Text>
-                    <Text style={styles.tagContent}>
-                      {schedule?.technician?.userAccount?.firstName}{' '}
-                      {schedule?.technician?.userAccount?.lastName}
-                    </Text>
+                    <Text style={styles.tagContent}>{technicianName}</Text>
                   </View>
                 )}
 
@@ -592,7 +584,7 @@ const WorkReportTemplate = React.memo(
                             ?.percentageSurcharge
                         }
                         type="Work"
-                        technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
+                        technicianName={technicianName}
                         selectedLng={selectedLng}
                         translate={translate}
                       />
@@ -619,7 +611,7 @@ const WorkReportTemplate = React.memo(
                             ?.percentageSurcharge
                         }
                         type="Travel"
-                        technicianName={`${schedule?.technician?.userAccount?.firstName} ${schedule?.technician?.userAccount?.lastName}`}
+                        technicianName={technicianName}
                         selectedLng={selectedLng}
                         translate={translate}
                       />

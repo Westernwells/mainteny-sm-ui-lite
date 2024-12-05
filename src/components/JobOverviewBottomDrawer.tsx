@@ -19,6 +19,8 @@ import {companyLanguageContextMap} from 'utils/utils';
 import {useCurrentCurrency} from 'utils/currency';
 import {MarkCompletedDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/MarkCompletedDialog';
 import {EmployeesView} from 'models/employee';
+import {canMarkCompleted} from 'utils/service-order-utils';
+import UndoIcon from '@mui/icons-material/Undo';
 import {Confirm} from './Confirm';
 
 interface BottomDrawerProps {
@@ -92,6 +94,7 @@ export const JobOverviewBottomDrawer = ({
     openCancelConfirm,
     openUnscheduleConfirm,
     openDialog,
+    handleUncompleteServiceOrder,
     handleCancel,
     handleSchedule,
     confirmCancel,
@@ -99,7 +102,7 @@ export const JobOverviewBottomDrawer = ({
     setOpenCancelConfirm,
     setOpenUnscheduleConfirm,
     setOpenDialog,
-  } = useServiceOrderActions(serviceOrderDetails);
+  } = useServiceOrderActions(serviceOrderDetails.id);
 
   const {data: quotation} = useQuotationDetails(
     serviceOrderDetails?.additionalInfo.quotationId,
@@ -205,8 +208,10 @@ export const JobOverviewBottomDrawer = ({
             </Button>
           )}
 
-          {(serviceOrderDetails.status === ServiceOrderStatus.OVERDUE ||
-            serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED) && (
+          {canMarkCompleted(
+            serviceOrderDetails.status,
+            serviceOrderDetails.schedules.length,
+          ) && (
             <Button
               sx={{cursor: 'pointer', margin: '0em 0.5rem', color: '#828DA3'}}
               startIcon={
@@ -216,6 +221,17 @@ export const JobOverviewBottomDrawer = ({
               }
               onClick={() => setOpenMarkCompletedDialog(true)}>
               {t('Mark completed')}
+            </Button>
+          )}
+
+          {serviceOrderDetails.status === ServiceOrderStatus.COMPLETED && (
+            <Button
+              sx={{cursor: 'pointer', margin: '0em 0.5rem', color: '#828DA3'}}
+              startIcon={
+                <UndoIcon style={{color: theme.palette.action.disabled}} />
+              }
+              onClick={() => handleUncompleteServiceOrder()}>
+              {t('Reopen')}
             </Button>
           )}
 

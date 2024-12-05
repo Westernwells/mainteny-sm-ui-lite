@@ -50,7 +50,6 @@ export const MobileWorkReportDownload = () => {
     company,
     serviceOrder,
     report,
-    schedule,
     technicianSignatureImage,
     customerSignatureImage,
     convertedImages,
@@ -60,6 +59,7 @@ export const MobileWorkReportDownload = () => {
     footerUrl,
     isAllSuccess,
     isError,
+    technicianName,
   } = usePrepareWorkReportData({
     serviceOrderId: serviceOrderId as string,
     userView: userResponse,
@@ -100,7 +100,6 @@ export const MobileWorkReportDownload = () => {
         translate={translate}
         serviceOrder={serviceOrder}
         report={report}
-        schedule={schedule}
         technicianSignatureImage={technicianSignatureImage}
         customerSignatureImage={customerSignatureImage}
         workReportPictures={convertedImages}
@@ -108,6 +107,7 @@ export const MobileWorkReportDownload = () => {
         headerInfo={headerInfo}
         footerPath={footerUrl?.[footerInfo?.path]!}
         footerInfo={footerInfo}
+        technicianName={technicianName}
       />,
     ).toBlob();
 

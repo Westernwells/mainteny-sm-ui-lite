@@ -1,7 +1,12 @@
 import {TFunction} from 'i18next';
+import {ServiceOrderScheduleSimpleView} from 'models/service-order';
 import {UserView} from '../models/user';
 import {TechnicianEventPair} from '../models/technician';
-import {EmployeeContractTableRow, EmployeeEventType} from '../models/employee';
+import {
+  EmployeeContractTableRow,
+  EmployeeEventType,
+  EmployeesView,
+} from '../models/employee';
 import {AvailabilityType} from '../models/availability';
 import {getAvailabilityTypeFromTechnicianEventType} from './availability';
 import {convertToText, titleCase} from './utils';
@@ -56,4 +61,17 @@ export const getEventSubtype = (
   }
 
   return subtype || t(type);
+};
+
+export const getTechnicianName = (
+  technicianSchedule?: ServiceOrderScheduleSimpleView,
+  fetchedTechnician?: EmployeesView,
+): string => {
+  if (technicianSchedule) {
+    return `${technicianSchedule.technician.userAccount.firstName} ${technicianSchedule.technician.userAccount.lastName}`;
+  }
+  if (fetchedTechnician) {
+    return `${fetchedTechnician.userAccount.firstName} ${fetchedTechnician.userAccount.lastName}`;
+  }
+  return '-';
 };
