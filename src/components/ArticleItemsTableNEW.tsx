@@ -133,9 +133,11 @@ export const ArticleItemsTableNEW = ({
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
+  const defaultVat =
+    propertyOwner?.additionalInfo.vat || taxRates?.find((tR) => tR.isDefault);
+
   const defaultPercentageVat =
-    propertyOwner?.additionalInfo.vat?.percentage ||
-    taxRates?.find((tR) => tR.isDefault)?.percentage ||
+    defaultVat?.percentage ||
     user?.userAccount.serviceCompany.settings.percentageVat ||
     0;
 
@@ -151,6 +153,8 @@ export const ArticleItemsTableNEW = ({
           currency: currentCurrency.code,
           grossAmount: 0,
           percentageVat: defaultPercentageVat,
+          vatId: defaultVat?.id || '',
+          vatName: defaultVat?.name || '',
           vat: 0,
         },
       },
@@ -163,6 +167,8 @@ export const ArticleItemsTableNEW = ({
         currency: currentCurrency.code,
         grossAmount: 0,
         percentageVat: defaultPercentageVat,
+        vatId: defaultVat?.id || '',
+        vatName: defaultVat?.name || '',
         vat: 0,
       },
       discount: {
@@ -530,7 +536,7 @@ export const ArticleItemsTableNEW = ({
             <Typography variant="body2">1</Typography>
             <SelectButton
               text="Add Article"
-              onClick={() => createEmptyItem()}
+              onClick={createEmptyItem}
               sxContainer={{flexGrow: 1}}
             />
           </Box>

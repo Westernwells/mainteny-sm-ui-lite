@@ -71,10 +71,3 @@ export const createNameSearchQuery = (value: string) =>
     .split(' ')
     .map((word) => `[name:*${word}*]`)
     .join('');
-
-export const getTaxRate = (taxRate?: {percentage?: number}) =>
-  taxRate?.percentage === 0
-    ? '0%'
-    : taxRate?.percentage
-    ? `${taxRate?.percentage}%`
-    : '-';
