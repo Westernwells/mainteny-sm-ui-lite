@@ -1,12 +1,14 @@
 import {UserView} from 'models/user';
 import {useEffect, useMemo, useState} from 'react';
 import {getSignatureKeys} from 'utils/service-order-utils';
+import {getTechnicianName} from 'utils/employee';
 import {useServiceOrderDetails} from './reactQuery/useServiceOrder';
 import {useCompanyById} from './reactQuery/useCompanies';
 import {useDownloadUrl} from './reactQuery/useDownloadUrl';
 import useFetchAndConvertImage from './useFetchAndConvertImage';
 import {useQueryClientStorageData} from './useClientStorage';
 import useMultiImagesURLToBase64 from './useMultiImagesURLToBase64';
+import {useGetTechniciansByEmployeeId} from './reactQuery/useTechnician';
 
 interface Props {
   serviceOrderId: string;
@@ -43,6 +45,12 @@ const usePrepareWorkReportData = ({serviceOrderId, userView}: Props) => {
   const schedule = serviceOrder?.schedules.find(
     (s) => s.technician.id === report?.technicianId,
   );
+  const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
+    report?.technicianId || '',
+  );
+
+  const technicianName = getTechnicianName(schedule, fetchedTechnician);
+
   const signatureKeys = getSignatureKeys(
     serviceOrder,
     report,
@@ -188,6 +196,7 @@ const usePrepareWorkReportData = ({serviceOrderId, userView}: Props) => {
     footerInfo,
     isAllSuccess,
     isError,
+    technicianName,
   };
 };
 
