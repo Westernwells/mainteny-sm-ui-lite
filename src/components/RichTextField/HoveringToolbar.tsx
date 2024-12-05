@@ -1,4 +1,11 @@
-import {ReactNode, useRef, useEffect, MouseEvent, useState} from 'react';
+import {
+  ReactNode,
+  useRef,
+  useEffect,
+  MouseEvent,
+  useState,
+  useMemo,
+} from 'react';
 import ReactDOM from 'react-dom';
 import {useTranslation} from 'react-i18next';
 import {useSlate, useFocused} from 'slate-react';
@@ -115,7 +122,7 @@ export const HoveringToolbar = () => {
     return option ? option.label : value;
   };
 
-  const activeFontSize = getActiveFontSize(editor);
+  const activeFontSize = useMemo(() => getActiveFontSize(editor), [editor]);
   const textSize =
     activeFontSize === FONT_SIZE.SMALL
       ? '12px'

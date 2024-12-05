@@ -68,6 +68,8 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
+import {getTechnicianName} from 'utils/employee';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -106,6 +108,15 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
   const schedule = serviceOrder.schedules.find(
     (s) => s.technician.id === report?.technicianId,
+  );
+
+  const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
+    report?.technicianId || '',
+  );
+
+  const technicianName = useMemo(
+    () => getTechnicianName(schedule, fetchedTechnician),
+    [schedule, fetchedTechnician],
   );
 
   const reportToUpdate = serviceOrder?.reports?.find(
@@ -206,7 +217,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
         translate={translate}
         serviceOrder={serviceOrder}
         report={report}
-        schedule={schedule}
         technicianSignatureImage={technicianSignatureImage}
         customerSignatureImage={customerSignatureImage}
         workReportPictures={convertedImages}
@@ -214,6 +224,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        technicianName={technicianName}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -654,9 +665,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
                 },
                 {
                   label: 'Technician',
-                  value:
-                    schedule &&
-                    `${schedule.technician.userAccount.firstName} ${schedule.technician.userAccount.lastName}`,
+                  value: technicianName,
                 },
                 {
                   label: 'Unit Status',
@@ -726,11 +735,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
               url={downloadUrls[signatureKeys.CUSTOMER]}
             />
             <Signature
-              name={
-                schedule
-                  ? `${schedule.technician.userAccount.firstName} ${schedule.technician.userAccount.lastName}`
-                  : '-'
-              }
+              name={technicianName}
               designation="Engineer"
               url={downloadUrls[signatureKeys.TECHNICIAN]}
             />

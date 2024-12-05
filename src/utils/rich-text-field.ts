@@ -46,8 +46,8 @@ export const isBlockActive = (editor: CustomEditor, format: string) => {
 
 export const getActiveFontSize = (editor: CustomEditor) => {
   const marks = Editor.marks(editor);
-  if (marks) {
-    return marks.fontSize || DEFAULT_FONT_SIZE;
+  if (marks && marks.fontSize) {
+    return marks.fontSize;
   }
   return DEFAULT_FONT_SIZE;
 };

@@ -96,6 +96,8 @@ import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import XMLViewer from 'react-xml-viewer';
+import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
+import {getTechnicianName} from 'utils/employee';
 
 interface Props {
   invoice: InvoiceView;
@@ -315,13 +317,26 @@ export const Actions = ({
 
   const [selectedOption, setSelectedOption] = useState(labels[0]?.value || '');
 
-  const technicianUserAccount = invoice?.serviceOrder?.schedules.find(
-    (s) => s.technician.id === selectedOption.technicianId,
-  )?.technician.userAccount;
+  const [report, setReport] = useState<ServiceOrderReportView | undefined>(
+    serviceOrder?.reports?.[0],
+  );
 
-  const technicianName = technicianUserAccount
-    ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
-    : '';
+  const reportToUpdate = serviceOrder?.reports?.find(
+    (r) => r.externalId === report?.externalId,
+  );
+
+  const technicianSchedule = invoice?.serviceOrder?.schedules.find(
+    (s) => s.technician.id === selectedOption.technicianId,
+  );
+
+  const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
+    report?.technicianId || '',
+  );
+
+  const technicianName = getTechnicianName(
+    technicianSchedule,
+    fetchedTechnician,
+  );
 
   const {data: signatureDownloadUrls = {}} = useDownloadUrl(
     completedChecklists?.length
@@ -410,14 +425,6 @@ export const Actions = ({
 
   // Handle Work report
 
-  const [report, setReport] = useState<ServiceOrderReportView | undefined>(
-    serviceOrder?.reports?.[0],
-  );
-
-  const reportToUpdate = serviceOrder?.reports?.find(
-    (r) => r.externalId === report?.externalId,
-  );
-
   const allReportSignature =
     invoice.serviceOrder?.reports?.map((item) => item.signatures).flat() ?? [];
   const {data: downloadUrls = {}, refetch: fetchDownloadUrls} = useDownloadUrl(
@@ -476,10 +483,6 @@ export const Actions = ({
         return acc;
       }, {} as {[key: string]: string});
 
-    const schedule = invoice?.serviceOrder?.schedules.find(
-      (s) => s.technician.id === workReport?.technicianId,
-    );
-
     const signatureKeys = getSignatureKeys(
       invoice?.serviceOrder!,
       workReport,
@@ -499,7 +502,6 @@ export const Actions = ({
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
         report={workReport}
-        schedule={schedule}
         technicianSignatureImage={technicianSignatureImage}
         customerSignatureImage={customerSignatureImage}
         workReportPictures={workReportPictures}
@@ -507,6 +509,7 @@ export const Actions = ({
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        technicianName={technicianName}
       />,
     ).toBlob();
     return blob;
