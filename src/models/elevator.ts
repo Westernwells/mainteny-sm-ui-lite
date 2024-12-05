@@ -566,3 +566,72 @@ export type UnitFilterForm = {
 export type UnitStatistics = {
   numOfElevatorsPerStatus: Record<string, number>;
 };
+
+export type ElevatorDataSchemaItem = {
+  type: string;
+  name: string;
+  unit: string;
+};
+
+export interface ElevatorDataSchemaItemWithState
+  extends ElevatorDataSchemaItem {
+  isEditing?: boolean;
+  dataMigrationItem?: ElevatorDataMigrationItem;
+  fromDatabase?: boolean;
+}
+
+export type ElevatorDataSchemaAdditionalInfo = {
+  items: ElevatorDataSchemaItem[];
+};
+
+export type ElevatorDataSchemaView = {
+  id: string;
+  name: string;
+  additionalInfo: ElevatorDataSchemaAdditionalInfo;
+  meta: Meta;
+};
+
+export interface ElevatorDataSchemasTableRow {
+  id: string;
+  name: string;
+  noOfFields: number;
+  createdAt: string;
+  lastUpdatedAt: string;
+}
+
+export interface CreateElevatorDataSchemaBody {
+  serviceCompanyId: string;
+  name: string;
+  items: ElevatorDataSchemaItem[];
+}
+
+export interface ElevatorDataMigrationItem {
+  fromName: string;
+  toName: string;
+}
+
+export interface EditElevatorDataSchemaBody {
+  name: string;
+  items: ElevatorDataSchemaItem[];
+  dataMigrationItems?: ElevatorDataMigrationItem[];
+}
+
+export interface FetchElevatorDataItemsParams {
+  schemaId: string;
+}
+
+export interface ElevatorDataItemView {
+  type: string;
+  name: string;
+  value: string;
+  unit: string;
+}
+
+export interface ElevatorDataItemRecord {
+  name: string;
+  value: string;
+}
+
+export interface UpdateElevatorDataItemBody {
+  items: ElevatorDataItemRecord[];
+}

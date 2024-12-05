@@ -1,135 +1,45 @@
+import {InputAdornment} from '@mui/material';
 import Grid from '@mui/material/Grid';
 import {FormInput} from 'components/form/FormInput';
-import {TechnicalDataFormModel} from 'models/unitForm';
+import {ElevatorDataItemView} from 'models/elevator';
 import {UseFormRegister} from 'react-hook-form';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
-  register: UseFormRegister<TechnicalDataFormModel>;
+  register: UseFormRegister<{
+    [key: string]: string;
+  }>;
+  elevatorDataItems: ElevatorDataItemView[];
 }
 
-const EditTechnicalDataForm = ({register}: Props) => (
-  <Grid container spacing={2} component="form">
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: 'Can also be number of floors',
-          type: 'number',
-          label: 'Number of stops',
-          ...register('numberOfStops'),
-        }}
-      />
+const EditTechnicalDataForm = ({elevatorDataItems, register}: Props) => {
+  const {t} = useTranslation();
+
+  return (
+    <Grid container spacing={2} component="form">
+      {elevatorDataItems.map((item) => (
+        <Grid item md={4} sm={6} xs={12}>
+          <FormInput
+            fieldProps={{
+              slotProps: {
+                input: {
+                  endAdornment: item.unit ? (
+                    <InputAdornment position="end">
+                      {t(item.unit)}
+                    </InputAdornment>
+                  ) : null,
+                },
+              },
+              placeholder: '',
+              type: 'text',
+              label: item.name,
+              ...register(item.name),
+            }}
+          />
+        </Grid>
+      ))}
     </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: 'Gearless',
-          label: 'Drive',
-          type: 'text',
-          ...register('drive'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: '1000',
-          type: 'number',
-          label: 'Capacity (kg)',
-          ...register('capacity'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: '1.5',
-          label: 'Speed (m/s)',
-          type: 'number',
-          ...register('speed'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: '24 key input',
-          label: 'Controller',
-          type: 'text',
-          ...register('controller'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: 'IoT IT',
-          label: 'IoT device',
-          type: 'text',
-          ...register('iotDevice'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: 'Single door; Double door',
-          label: 'Cabin type',
-          type: 'text',
-          ...register('cabinType'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: '1500',
-          label: 'Cage weight (kg)',
-          type: 'number',
-          ...register('cageWeight'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: '1500',
-          label: 'Counter weight (kg)',
-          type: 'number',
-          ...register('counterWeight'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: '240',
-          label: 'Hoisting height (m)',
-          type: 'number',
-          ...register('hoistingHeight'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: '150',
-          label: 'Shaft height (m)',
-          type: 'number',
-          ...register('shaftHeight'),
-        }}
-      />
-    </Grid>
-    <Grid item md={4}>
-      <FormInput
-        fieldProps={{
-          placeholder: '3',
-          label: 'Number of people',
-          type: 'number',
-          ...register('numberOfPeople'),
-        }}
-      />
-    </Grid>
-  </Grid>
-);
+  );
+};
 
 export default EditTechnicalDataForm;
