@@ -263,7 +263,6 @@
   "Customer Since": "Cliente dal",
   "Select date": "Seleziona Data",
   "Print": "Stampa",
-  "Mark as rejected ": "Segna come rifiutato",
   "Mark Rejected": "Mark rifiutato",
   "This action is irreversible.": "Questa azione è irreversibile.",
   "Renewal period must be between 0-120 months": "Il periodo di rinnovo deve essere tra 0-120 mesi",
@@ -1883,5 +1882,6 @@
   "Price": "Prezzo",
   "Invoice for": "fattura per",
   "CREDIT_NOTE": "Nota di credito",
-  "Do you want to mark this quotation as rejected?": "Vuoi segnare questa citazione come rifiutato"
+  "Do you want to mark this quotation as rejected?": "Vuoi segnare questa citazione come rifiutato",
+  "Mark as rejected": "Segna come rifiutato"
 }

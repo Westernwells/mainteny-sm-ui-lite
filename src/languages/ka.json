@@ -263,7 +263,6 @@
   "Customer Since": "მომხმარებელი ...-დან",
   "Select date": "თარიღის არჩევა",
   "Print": "დაბეჭდვა",
-  "Mark as rejected ": "უარყოფილად მონიშვნა",
   "Mark Rejected": "უარყოფილია",
   "This action is irreversible.": "ეს მოქმედება შეუქცევადია.",
   "Renewal period must be between 0-120 months": "განახლების პერიოდი უნდა იყოს 0-120 თვემდე",
@@ -2760,5 +2759,6 @@
   "Retroactive update will affect all previous data, while forward-looking update will apply to all input and exports from now on.": "რეტროაქტიული განახლება გავლენას მოახდენს ყველა წინა მონაცემზე, ხოლო მომავალზე ორიენტირებული განახლება გავრცელდება ყველა შენატანსა და ექსპორტზე.",
   "Retroactive update": "რეტროაქტიული განახლება",
   "CREDIT_NOTE": "კრედიტ ნოტა",
-  "Do you want to mark this quotation as rejected?": "გსურთ მონიშნოთ ეს შეთავაზება უარყოფილად?"
+  "Do you want to mark this quotation as rejected?": "გსურთ მონიშნოთ ეს შეთავაზება უარყოფილად?",
+  "Mark as rejected": "უარყოფილად მონიშვნა"
 }
