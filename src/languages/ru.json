@@ -264,7 +264,6 @@
   "Customer Since": "Клиент с",
   "Select date": "Выберите дату",
   "Print": "Распечатать",
-  "Mark as rejected ": "Отметить как отклоненную",
   "Mark Rejected": "Отметить как отклоненную",
   "This action is irreversible.": "Это действие необратимо.",
   "Renewal period must be between 0-120 months": "Период продления должен быть 0-120 месяцев",
@@ -2701,5 +2700,6 @@
   "No quotations": "Нет предложений",
   "Select serial number": "Выберите серийный номер",
   "Quote(s) with notes": "Предложение(-я) с примечаниями",
-  "Do you want to mark this quotation as rejected?": "Вы хотите отметить эту оферту как отклоненную"
+  "Do you want to mark this quotation as rejected?": "Вы хотите отметить эту оферту как отклоненную",
+  "Mark as rejected": "Отметить как отклоненную"
 }

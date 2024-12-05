@@ -263,7 +263,6 @@
   "Customer Since": "Müşteri O zamandan beri",
   "Select date": "Tarih seç",
   "Print": "Yazdır",
-  "Mark as rejected ": "Reddedildiği gibi işaret",
   "Mark Rejected": "Mark reddetti",
   "This action is irreversible.": "Bu eylem geri döndürülemez.",
   "Renewal period must be between 0-120 months": "Yenileme süresi 0-120 ay arasında olmalıdır",
@@ -1882,5 +1881,6 @@
   "Price": "FİYAT",
   "Invoice for": "faturası",
   "CREDIT_NOTE": "Kredi notu",
-  "Do you want to mark this quotation as rejected?": "Bu alıntıyı reddedildiği gibi işaretlemek ister misiniz?"
+  "Do you want to mark this quotation as rejected?": "Bu alıntıyı reddedildiği gibi işaretlemek ister misiniz?",
+  "Mark as rejected": "Reddedildiği gibi işaret"
 }

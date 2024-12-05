@@ -264,7 +264,6 @@
   "Customer Since": "Kupac od",
   "Select date": "Izaberite datum",
   "Print": "Printaj",
-  "Mark as rejected ": "Označi kao odbijeno",
   "Mark Rejected": "Označi odbijeno",
   "This action is irreversible.": "Ova akcija je nepovratna",
   "Renewal period must be between 0-120 months": "Period obnove mora biti izmedju 0-12 mjeseci",
@@ -3002,5 +3001,6 @@
   "Reopen": "Ponovo otvori",
   "table_action_option.cancel": "Otkazano",
   "Unknown Technician": "Nepoznati tehničar",
-  "Do you want to mark this quotation as rejected?": "Da li želite da označite ovaj citat kao odbijen"
+  "Do you want to mark this quotation as rejected?": "Da li želite da označite ovaj citat kao odbijen",
+  "Mark as rejected": "Označi kao odbijeno"
 }

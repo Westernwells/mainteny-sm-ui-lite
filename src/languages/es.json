@@ -263,7 +263,6 @@
   "Customer Since": "Cliente desde",
   "Select date": "Seleccione fecha",
   "Print": "Imprimir",
-  "Mark as rejected ": "Marcar como rechazado",
   "Mark Rejected": "Marcar rechazado",
   "This action is irreversible.": "Esta acción es irreversible.",
   "Renewal period must be between 0-120 months": "El período de renovación debe ser entre 0 y 120 meses",
@@ -2958,5 +2957,6 @@
   "Quote(s) with notes": "Cotización(es) con notas",
   "Net amount": "Importe neto",
   "Search quotation number": "Buscar número de cotización",
-  "Do you want to mark this quotation as rejected?": "¿Quieres marcar este presupuesto como rechazada?"
+  "Do you want to mark this quotation as rejected?": "¿Quieres marcar este presupuesto como rechazada?",
+  "Mark as rejected": "Marcar como rechazado"
 }
