@@ -266,7 +266,6 @@
   "Print": "Print",
   "Mark as rejected ": "Markér som afvist ",
   "Mark Rejected": "Markér afviste",
-  "Do you want to mark this quotation as rejected?": "Vil du markere dette tilbud som afvist",
   "This action is irreversible.": "Denne handling kan ikke fortrydes.",
   "Renewal period must be between 0-120 months": "Fornyelsesperioden skal være mellem 0-12 måneder",
   "QR Code": "QR kode",
@@ -2652,5 +2651,6 @@
   "The email was successfully delivered to {{receiverEmail}}": "E-mailen blev leveret til {{receiverEmail}}",
   "Quotation marked as rejected": "Tilbud markeret som afvist",
   "Quotation marked as accepted": "Tilbud markeret som accepteret",
-  "testing key (dont add translations this will be removed soon)": "testnøgle (tilføj ikke oversættelser, dette vil snart blive fjernet)"
+  "testing key (dont add translations this will be removed soon)": "testnøgle (tilføj ikke oversættelser, dette vil snart blive fjernet)",
+  "Do you want to mark this quotation as rejected?": "Vil du markere dette tilbud som afvist"
 }

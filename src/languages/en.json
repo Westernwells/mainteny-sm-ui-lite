@@ -266,7 +266,6 @@
   "Print": "Print",
   "Mark as rejected ": "Mark as rejected ",
   "Mark Rejected": "Mark Rejected",
-  "Do you want to mark this quotation as rejected?": "Do you want to mark this quotation as rejected",
   "This action is irreversible.": "This action is irreversible.",
   "Renewal period must be between 0-120 months": "Renewal period must be between 0-120 months",
   "QR Code": "QR Code",
@@ -2571,5 +2570,6 @@
   "Every 6 months": "Every 6 months",
   "OFFSETTING ACCOUNT": "OFFSETTING ACCOUNT",
   "Elevator operation": "Elevator operation",
-  "table_action_option.cancel": "Cancel"
+  "table_action_option.cancel": "Cancel",
+  "Do you want to mark this quotation as rejected?": "Do you want to mark this quotation as rejected"
 }

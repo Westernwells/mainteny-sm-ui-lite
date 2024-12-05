@@ -262,7 +262,6 @@
   "Print": "εκτυπώνω",
   "Mark as rejected ": "Επισήμανση ως απορριφθέντος ",
   "Mark Rejected": "μαρκάρισμα απόρριψης",
-  "Do you want to mark this quotation as rejected?": "Θέλετε να επισημάνετε αυτήν την προσφορά ως απορριφθείσα;",
   "This action is irreversible.": "Αυτή η ενέργεια είναι μη αναστρέψιμη.",
   "Renewal period must be between 0-120 months": "Η περίοδος ανανέωσης πρέπει να είναι μεταξύ 0-120 μηνών",
   "QR Code": "Κωδικός QR",
@@ -2574,5 +2573,6 @@
   "Drag and drop or": "Μεταφορά και απόθεση ή",
   "Click to upload": "Κάντε κλικ για μεταφόρτωση",
   "Delete Image": "Διαγραφή αρχείο ",
-  "CREDIT_NOTE": "Πιστωτικό σημείωμα"
+  "CREDIT_NOTE": "Πιστωτικό σημείωμα",
+  "Do you want to mark this quotation as rejected?": "Θέλετε να επισημάνετε αυτήν την προσφορά ως απορριφθείσα;"
 }

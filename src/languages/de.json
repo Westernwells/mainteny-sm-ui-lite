@@ -266,7 +266,6 @@
   "Print": "Drucken",
   "Mark as rejected ": "Als abgelehnt markieren",
   "Mark Rejected": "Abgelehnt markieren",
-  "Do you want to mark this quotation as rejected?": "Möchten Sie dieses Angebot als abgelehnt markieren",
   "This action is irreversible.": "Diese Aktion ist unwiderruflich.",
   "Renewal period must be between 0-120 months": "Der Verlängerungszeitraum muss zwischen 0-120 Monaten liegen",
   "QR Code": "QR-Code",
@@ -2980,5 +2979,6 @@
   "Changes will update the existing data fields.": "Änderungen aktualisieren die bestehenden Datenfelder.",
   "Number of affected data fields {{count}}": "Anzahl der betroffenen Datenfelder {{count}}",
   "Reopen": "Wieder öffnen",
-  "table_action_option.cancel": "Stornieren"
+  "table_action_option.cancel": "Stornieren",
+  "Do you want to mark this quotation as rejected?": "Möchten Sie dieses Angebot als abgelehnt markieren"
 }
