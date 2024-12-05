@@ -265,7 +265,6 @@
   "Print": "Yazdır",
   "Mark as rejected ": "Reddedildiği gibi işaret",
   "Mark Rejected": "Mark reddetti",
-  "Do you want to mark this quotation as rejected?": "Bu alıntıyı reddedildiği gibi işaretlemek ister misiniz?",
   "This action is irreversible.": "Bu eylem geri döndürülemez.",
   "Renewal period must be between 0-120 months": "Yenileme süresi 0-120 ay arasında olmalıdır",
   "QR Code": "QR kod",
@@ -1882,5 +1881,6 @@
   "Discount": "İndirim",
   "Price": "FİYAT",
   "Invoice for": "faturası",
-  "CREDIT_NOTE": "Kredi notu"
+  "CREDIT_NOTE": "Kredi notu",
+  "Do you want to mark this quotation as rejected?": "Bu alıntıyı reddedildiği gibi işaretlemek ister misiniz?"
 }
