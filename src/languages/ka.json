@@ -265,7 +265,7 @@
   "Print": "დაბეჭდვა",
   "Mark as rejected ": "უარყოფილად მონიშვნა",
   "Mark Rejected": "უარყოფილია",
-  "Do you want to mark this quotation as rejected": "გსურთ მონიშნოთ ეს შეთავაზება უარყოფილად?",
+  "Do you want to mark this quotation as rejected?": "გსურთ მონიშნოთ ეს შეთავაზება უარყოფილად?",
   "This action is irreversible.": "ეს მოქმედება შეუქცევადია.",
   "Renewal period must be between 0-120 months": "განახლების პერიოდი უნდა იყოს 0-120 თვემდე",
   "QR Code": "QR კოდი",
@@ -2758,5 +2758,7 @@
   "Changes will update the existing type and data.": "ცვლილებები განაახლებს არსებულ ტიპს და მონაცემებს.",
   "Choose the type of update in the next step.": "აირჩიეთ განახლების ტიპი შემდეგ ეტაპზე.",
   "Changes will update {{subType}} entries.": "ცვლილებები განაახლებს {{subType}} ჩანაწერს.",
+  "Retroactive update will affect all previous data, while forward-looking update will apply to all input and exports from now on.": "რეტროაქტიული განახლება გავლენას მოახდენს ყველა წინა მონაცემზე, ხოლო მომავალზე ორიენტირებული განახლება გავრცელდება ყველა შენატანსა და ექსპორტზე.",
+  "Retroactive update": "რეტროაქტიული განახლება",
   "CREDIT_NOTE": "კრედიტ ნოტა"
 }
