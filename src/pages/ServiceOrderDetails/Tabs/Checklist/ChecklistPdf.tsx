@@ -270,7 +270,7 @@ const ChecklistPdf = ({
                   pdfConfigClientStorage.includeSerialNumber && (
                     <View style={styles.rightAddressContent}>
                       <Text style={styles.tag}>
-                        {translate('Serial number')}.
+                        {translate('Serial number')}
                       </Text>
                       <Text style={styles.tagContent}>
                         {serviceOrder?.elevator?.serialNumber}
