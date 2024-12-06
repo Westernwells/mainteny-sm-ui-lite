@@ -578,7 +578,7 @@
   "REQUIRED TIME": "POTREBNO VRIJEME",
   "NO. OF ENGINEERS": "Broj servisera",
   "PRIORITY": "Prioritet",
-  "NONE": "NIJEDAN",
+  "NONE": "NE",
   "OPENING HOURS": "RADNO VRIJEME",
   "REQUIRES NOTIFICATION": "ZAHTJEVA OBAVJEŠTENJE",
   "NOTIFICATION DUE": "DOSTUPNO OBAVJEŠTENJE",
@@ -3002,5 +3002,9 @@
   "table_action_option.cancel": "Otkazano",
   "Unknown Technician": "Nepoznati tehničar",
   "Do you want to mark this quotation as rejected?": "Da li želite da označite ovaj citat kao odbijen",
-  "Mark as rejected": "Označi kao odbijeno"
+  "Total net revenue of all invoices sent from {{startDate}} to {{endDate}}. Draft invoices won't be counted.": "Ukupan neto prihod svih faktura poslatih od {{startDate}} do {{endDate}}. Nacrti faktura se neće računati.",
+  "Total number of all jobs completed from {{startDate}} to {{endDate}}. Cancelled & archived jobs won’t be counted.": "Ukupan broj svih poslova završenih od {{startDate}} do {{endDate}}. Otkazani i arhivirani poslovi se neće računati.",
+  "Total number of units between {{startDate}} to {{endDate}}. Archived units won’t be counted.": "Ukupan broj jedinica između {{startDate}} i {{endDate}}. Arhivirane jedinice se neće računati.",
+  "Mark as rejected": "Označi kao odbijeno",
+  "Selling price": "Prodajna cijena"
 }
