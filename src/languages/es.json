@@ -263,9 +263,7 @@
   "Customer Since": "Cliente desde",
   "Select date": "Seleccione fecha",
   "Print": "Imprimir",
-  "Mark as rejected ": "Marcar como rechazado",
   "Mark Rejected": "Marcar rechazado",
-  "Do you want to mark this quotation as rejected": "¿Quieres marcar este presupuesto como rechazada?",
   "This action is irreversible.": "Esta acción es irreversible.",
   "Renewal period must be between 0-120 months": "El período de renovación debe ser entre 0 y 120 meses",
   "QR Code": "Código QR",
@@ -2953,5 +2951,13 @@
   "Enter description here...": "Introduzca la descripción aquí...",
   "Create a new quotation to offer clients tailored service proposals and pricing, ready to be sent out.": "Cree un nuevo presupuesto para ofrecer a los clientes propuestas de servicios y precios personalizados, listos para su envío.",
   "New Purchase Invoice": "Nueva factura de compra",
-  "Select serial number": "Seleccione el número de serie"
+  "Sent to client": "Enviado al cliente",
+  "No quotations": "Sin cotizaciones",
+  "Select serial number": "Seleccione el número de serie",
+  "Quote(s) with notes": "Cotización(es) con notas",
+  "Net amount": "Importe neto",
+  "Search quotation number": "Buscar número de cotización",
+  "Do you want to mark this quotation as rejected?": "¿Quieres marcar este presupuesto como rechazada?",
+  "Mark as rejected": "Marcar como rechazado",
+  "Selling price": "Precio de venta"
 }
