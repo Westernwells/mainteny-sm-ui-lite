@@ -125,7 +125,7 @@ const JobTypes = () => {
           ? [deleteEventState.userTypedName]
           : [],
       },
-      {keepPreviousData: true},
+      {keepPreviousData: true, enabled: !!deleteEventState.userTypedName},
     );
 
   const resetState = () => {

@@ -515,6 +515,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
         components={contractDetails?.components}
         setIsDialogOpen={setIsDialogOpen}
         isDialogOpen={isDialogOpen}
+        isUpdateLoading={isUpdateLoading}
         updateContract={updateContract}
         isEditForm={isEditForm}
         contractId={contractDetails.id}

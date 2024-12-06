@@ -94,6 +94,7 @@ interface Props {
   loading: boolean;
   setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
   isEditForm: boolean;
+  isUpdateLoading: boolean;
   updateContract: (obj: any) => void;
   components: Service[];
   contractId: string;
@@ -105,6 +106,7 @@ export const MutationService = ({
   isDialogOpen,
   setIsDialogOpen,
   isEditForm,
+  isUpdateLoading,
   updateContract,
   components,
   contractId,
@@ -258,6 +260,20 @@ export const MutationService = ({
     });
   };
 
+  const handleSave = async () => {
+    try {
+      if (isEditForm) {
+        updateServiceMutation();
+      } else {
+        createServiceMutation();
+      }
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const columns: {
     name: string;
     align?: TableCellProps['align'];
@@ -317,6 +333,7 @@ export const MutationService = ({
         maxWidth: 'lg',
       }}
       disableSaveBtn={
+        isUpdateLoading ||
         !!Object.keys(formikContractServiceComponent.errors).length ||
         (formikContractServiceComponent.values.isAutomaticJobCycle &&
           !formikContractServiceComponent.values.firstOrderDate) ||
@@ -325,15 +342,7 @@ export const MutationService = ({
       }
       saveButtonText={isEditForm ? t('Save') : t('Add Service')}
       isSaving={loading}
-      onSave={() => {
-        if (isEditForm) {
-          updateServiceMutation();
-        } else {
-          createServiceMutation();
-        }
-        setIsDialogOpen(false);
-        resetForm();
-      }}>
+      onSave={handleSave}>
       <Box
         sx={{
           display: 'flex',
