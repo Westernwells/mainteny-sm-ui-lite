@@ -531,6 +531,7 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
         components={services}
         setIsDialogOpen={setIsDialogOpen}
         isDialogOpen={isDialogOpen}
+        isUpdateLoading={isUpdateLoading}
         updateContract={updateContract}
         isEditForm={isEditForm}
         contractId={currentService?.contractId as string}
