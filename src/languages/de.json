@@ -2981,5 +2981,13 @@
   "table_action_option.cancel": "Stornieren",
   "Unknown Technician": "Unbekannter Techniker",
   "Do you want to mark this quotation as rejected?": "Möchten Sie dieses Angebot als abgelehnt markieren",
-  "Mark as rejected": "Als abgelehnt markieren"
+  "Total net revenue of all invoices sent from {{startDate}} to {{endDate}}. Draft invoices won't be counted.": "Gesamtnettoumsatz aller Rechnungen, die zwischen {{startDate}} und {{endDate}} versendet wurden. Entwürfe werden nicht berücksichtigt.",
+  "Total number of all jobs completed from {{startDate}} to {{endDate}}. Cancelled & archived jobs won’t be counted.": "Gesamtanzahl aller abgeschlossenen Aufträge zwischen {{startDate}} und {{endDate}}. Stornierte und archivierte Aufträge werden nicht berücksichtigt.",
+  "Total number of units between {{startDate}} to {{endDate}}. Archived units won’t be counted.": "Gesamtanzahl aller Anlagen zwischen {{startDate}} und {{endDate}}. Archivierte Anlagen werden nicht berücksichtigt.",
+  "Mark as rejected": "Als abgelehnt markieren",
+  "Storage location": "Lagerort",
+  "Buying price": "Einkaufspreis",
+  "Selling price": "Verkaufspreis",
+  "Please provide a valid date for the job creation date": "Bitte ein valides Datum für die erste Auftragserstellung hinterlegen.",
+  "Please provide a valid date for the first invoice date": "Bitte ein valides Datum für die erste Rechnungserstellung hinterlegen."
 }
