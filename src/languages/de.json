@@ -1963,6 +1963,7 @@
   "pack": "Pkt.",
   "Created on {{creationDate}}": "Erstellt am {{creationDate}}",
   "Exclude previously downloaded data": "Zuvor heruntergeladene Daten ausschließen",
+  "Payment data included": "Zahlungsdaten enthalten",
   "Article cannot be empty": "Der Artikel darf nicht leer sein",
   "Article Type": "Artikeltyp",
   "Article #": "Artikel Nr.",

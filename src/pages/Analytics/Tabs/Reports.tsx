@@ -79,6 +79,7 @@ export const Reports = () => {
       startDate: null,
       endDate: null,
       excludePreviouslyDownloadedData: false,
+      includePaymentData: true,
     },
     onSubmit: () => {},
     validationSchema,
@@ -100,6 +101,7 @@ export const Reports = () => {
   const getInvoicesDatev = useInvoicesDatev(serviceCompanyId, {
     ...reportParams,
     full: !formik.values.excludePreviouslyDownloadedData,
+    includePayments: formik.values.includePaymentData,
   });
   const getInvoicesXero = useInvoicesXero(serviceCompanyId, reportParams);
   const getInvoicesXLSX = useInvoicesXLSX(serviceCompanyId, reportParams);
@@ -397,6 +399,18 @@ export const Reports = () => {
                 />
               </Grid>
             )}
+
+          {(formik?.values?.formatType === FormatType.DATEV ||
+            formik?.values?.formatType === FormatType.DATEV_WITH_PDF) && (
+            <Grid item xs={12}>
+              <FormCheckbox
+                name="includePaymentData"
+                checked={formik.values.includePaymentData}
+                handleChange={formik.handleChange}
+                label={t('Payment data included')}
+              />
+            </Grid>
+          )}
 
           <Grid item xs={12} textAlign="end">
             <Button
