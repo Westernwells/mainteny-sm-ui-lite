@@ -1,7 +1,7 @@
 {
   "Service Manager Portal": "Service Manager Portal",
   "Login": "Login",
-  "Email address": "Email address",
+  "Email Address": "Email Address",
   "Password": "Password",
   "Forgot Password?": "Forgot Password?",
   "Enter a valid email": "Enter a valid email",
@@ -1379,7 +1379,6 @@
   "Selected Unit": "Selected Unit",
   "Please describe what happened": "Please describe what happened",
   "Send email": "Send email",
-  "Email Address": "Email Address",
   "Supplier Article": "Supplier Article",
   "No documents attached. They will appear here once added!": "No documents attached. They will appear here once added!",
   "PAYMENT DUE": "PAYMENT DUE",
