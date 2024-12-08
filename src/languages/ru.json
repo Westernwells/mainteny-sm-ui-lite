@@ -1,7 +1,7 @@
 {
   "Service Manager Portal": "Портал сервис-менеджера",
   "Login": "Авторизоваться",
-  "Email address": "Электронная почта ",
+  "Email Address": "Адрес электронной почты",
   "Password": "Пароль",
   "Forgot Password?": "Забыли пароль?",
   "Enter a valid email": "Введите действующую электронную почту",
@@ -1384,7 +1384,6 @@
   "Selected Unit": "Выбранное устройство",
   "Please describe what happened": "Пожалуйста, опишите, что случилось",
   "Send email": "Отправить электронное письмо",
-  "Email Address": "Адрес электронной почты",
   "Supplier Article": "Позиция поставщика",
   "No documents attached. They will appear here once added!": "Нет прикрепленных документов. Они появятся здесь после добавления!",
   "PAYMENT DUE": "ЗАПЛАТИТЬ ДО",

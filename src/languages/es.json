@@ -1,7 +1,7 @@
 {
   "Service Manager Portal": "Portal de gerente de servicio",
   "Login": "Inicio de sesión",
-  "Email address": "Dirección de correo electrónico",
+  "Email Address": "Dirección de correo electrónico",
   "Password": "Contraseña",
   "Forgot Password?": "¿Has olvidado tu contraseña?",
   "Enter a valid email": "Ingrese un correo electrónico válido",
@@ -1379,7 +1379,6 @@
   "Selected Unit": "Unidad seleccionada",
   "Please describe what happened": "Describe lo que pasó",
   "Send email": "Enviar correo electrónico",
-  "Email Address": "Dirección de correo electrónico",
   "Supplier Article": "Artículo de proveedor",
   "No documents attached. They will appear here once added!": "No hay documentos adjuntos. ¡Aparecerán aquí una vez agregados!",
   "PAYMENT DUE": "FECHA DE PAGO",

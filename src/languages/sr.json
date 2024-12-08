@@ -1,7 +1,7 @@
 {
   "Service Manager Portal": "Portal menadžera usluga",
   "Login": "Prijavite se",
-  "Email address": "Adresa E-pošte",
+  "Email Address": "Adresa E-pošte",
   "Password": "Lozinka",
   "Forgot Password?": "Zaboravili ste lozinku?",
   "Enter a valid email": "Unesite važeću e-poštu",
@@ -1382,7 +1382,6 @@
   "Selected Unit": "Izabrana jedinica",
   "Please describe what happened": "Molim Vas opišite šta se dogodilo",
   "Send email": "Šalji e-poštu",
-  "Email Address": "Adresa E-pošte",
   "Supplier Article": "Artikal dobavljača",
   "No documents attached. They will appear here once added!": "Nema priloženih dokumenata. Oni će se pojaviti ovde kada se dodaju!",
   "PAYMENT DUE": "PLAĆANJE ZBOG",

@@ -1,7 +1,7 @@
 {
   "Service Manager Portal": "Πύλη Υπεύθυνου Υπηρεσιών",
   "Login": "Σύνδεση",
-  "Email address": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
+  "Email Address": "ηλεκτρονική διεύθυνση (email)",
   "Password": "Κωδικός πρόσβασης",
   "Forgot Password?": "Ξεχάσατε τον κωδικό;",
   "Enter a valid email": "Εισαγάγετε ένα έγκυρο email",
@@ -1376,7 +1376,6 @@
   "Selected Unit": "Επιλεγμένη μονάδα",
   "Please describe what happened": "Περιγράψτε τι συνέβη",
   "Send email": "αποστολή ηλεκτρονική διεύθυνση (email)",
-  "Email Address": "ηλεκτρονική διεύθυνση (email)",
   "Supplier Article": "Άρθρο προμηθευτή",
   "No documents attached. They will appear here once added!": "Δεν επισυνάπτονται έγγραφα. Θα εμφανιστούν εδώ μόλις προστεθούν!",
   "PAYMENT DUE": "ΟΦΕΙΛΗ ΠΛΗΡΩΜΗΣ",
