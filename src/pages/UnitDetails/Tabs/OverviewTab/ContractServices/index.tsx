@@ -198,12 +198,12 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
   const setAddFormData = () => {
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
-      elevators: parsElevatorRecourses([elevator] || []),
+      elevators: parsElevatorRecourses([elevator]),
     });
   };
 
   const setEditFormData = (row: ContractComponentView) => {
-    const allItems = mergeElevators([elevator] || [], row);
+    const allItems = mergeElevators([elevator], row);
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
       id: row.id,
@@ -413,7 +413,7 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
                           calculateContractInvoicePriceTotal(
                             row.additionalInfo.elevators || [],
                           ) /
-                            10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                            10 ** currentCurrency.fractionDigits,
                           {
                             currency: currentCurrency.code,
                           },
@@ -490,7 +490,7 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
                     <Typography variant="h6">
                       {formatCurrency(
                         calculateContractInvoicePriceGrandTotal(services) /
-                          10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                          10 ** currentCurrency.fractionDigits,
                         {
                           currency: currentCurrency.code,
                         },

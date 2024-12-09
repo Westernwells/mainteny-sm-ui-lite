@@ -86,7 +86,7 @@ const GeneralInformationWidget = ({customer}: Props) => {
 
     if (!!file && typeof file !== 'string') {
       await uploadImages({
-        files: [file] || [],
+        files: [file],
         uploadPath,
       });
     }

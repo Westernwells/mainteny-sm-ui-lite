@@ -149,7 +149,7 @@ export const ArticleListDataGrid = () => {
       [ArticleOrderField.UNIT]: item.unit,
       [ArticleOrderField.SELLING_NET_AMOUNT]: formatCurrency(
         (item.unitSellingAmount.netAmount ?? 0) /
-          (10 ** item.unitSellingAmount.fractionDigits ?? 0),
+          10 ** item.unitSellingAmount.fractionDigits,
         {
           currency: item.unitSellingAmount.currency,
         },

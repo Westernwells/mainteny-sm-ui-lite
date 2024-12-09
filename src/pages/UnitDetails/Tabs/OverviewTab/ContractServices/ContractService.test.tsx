@@ -2,7 +2,7 @@ import {render, screen} from '@testing-library/react';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import {SnackbarProvider} from 'notistack';
 import {beforeEach, expect, it, describe} from 'vitest';
-import {act} from 'react-dom/test-utils';
+import {act} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import ContractServices from './index';
 import {ElevatorView} from '../../../../../models/elevator';

@@ -93,7 +93,7 @@ export const BasicInformation = ({company}: Props) => {
     // If file type is File object, upload it
     if (!!file && typeof file !== 'string') {
       await uploadImages({
-        files: [file] || [],
+        files: [file],
         uploadPath,
       });
     }

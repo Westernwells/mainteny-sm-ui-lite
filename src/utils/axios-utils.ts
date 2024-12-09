@@ -27,7 +27,11 @@ if (user) {
           status: error.response?.status,
           message: error.response?.data?.message,
         });
-        Sentry.captureException(error);
+        Sentry.captureException(
+          error.response?.data?.message
+            ? new Error(error.response?.data?.message)
+            : error,
+        );
       } else {
         Sentry.captureException(error);
       }
