@@ -165,7 +165,7 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
         ),
       },
       {
-        headerName: 'Email address',
+        headerName: 'Email Address',
         key: 'customer-portal-cell-email',
         width: '362px',
         renderCell: (customerPortal, cellProps) => (
@@ -193,7 +193,7 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
                   ? theme.palette.primary.light
                   : theme.palette.text.disabled,
               }}>
-              {customerPortal.role}
+              {t(customerPortal.role)}
             </TableCellText>
           </Cell>
         ),
@@ -208,7 +208,21 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
           return (
             <Cell {...cellProps}>
               <TableCellText>
-                {label && <StatusChip label={label} />}
+                {label && (
+                  <StatusChip
+                    label={label}
+                    style={{
+                      background:
+                        label === 'Active'
+                          ? theme.palette.success.main
+                          : label === 'Pending'
+                          ? theme.palette.primary.mainLight
+                          : label === 'Revoked'
+                          ? theme.palette.error.main
+                          : theme.palette.text.secondary,
+                    }}
+                  />
+                )}
               </TableCellText>
             </Cell>
           );

@@ -1,13 +1,14 @@
-import {useEffect, useLayoutEffect, useState} from 'react';
-import {TabsBody} from 'components/TabsBody';
+import React, {useEffect, useState} from 'react';
+import {Box} from '@mui/material';
 import {useSearchParams, useParams} from 'react-router-dom';
-import {Tabs} from 'components/Tab';
 import ElevatorIcon from '@mui/icons-material/Elevator';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import {Box} from '@mui/material';
+import {Tabs} from 'components/Tab';
+import {TabsBody} from 'components/TabsBody';
 import {formatSearchParams} from 'utils/utils';
+
 import {CustomerOverviewTab} from './Tabs/CustomerOverview';
 import {ContractsTab} from './Tabs/ContractsTab';
 import {UnitsTab} from './Tabs/UnitsTab';
@@ -17,71 +18,84 @@ interface Props {
   getCurrentPageTitle?: (title: string) => void;
 }
 
-const tabItems = [
+const tabConfig = [
   {
     label: 'Overview',
     icon: <ManageSearchIcon />,
+    component: (
+      customerId: string,
+      setCustomerName: (name: string) => void,
+    ) => (
+      <CustomerOverviewTab
+        customerId={customerId}
+        getCustomerName={setCustomerName}
+      />
+    ),
   },
   {
     label: 'Units',
     icon: <ElevatorIcon />,
+    component: (customerId: string) => <UnitsTab customerId={customerId} />,
   },
   {
     label: 'Contracts',
     icon: <FileCopyIcon />,
+    component: (customerId: string) => <ContractsTab customerId={customerId} />,
   },
   {
     label: 'Custom prices',
     icon: <ReceiptLongIcon />,
+    component: (customerId: string) => (
+      <CustomPricesTab propertyOwnerId={customerId} />
+    ),
   },
 ];
 
 export const CustomerDetails = ({getCurrentPageTitle}: Props) => {
-  const [tabValue, setTabValue] = useState(0);
   const {id: customerId = ''} = useParams();
-  const [customerName, setCustomerName] = useState('');
   const [queryParams, setQueryParams] = useSearchParams();
+  const [customerName, setCustomerName] = useState('');
+  const [tabValue, setTabValue] = useState(0);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+    if (currentParams.tab) {
+      setTabValue(Number(currentParams.tab));
+    }
+
     if (getCurrentPageTitle) {
       getCurrentPageTitle(customerName);
     }
   }, [customerName]);
 
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    setTabValue(Number(currentParams.tab));
-  }, []);
+  const handleTabChange = (index: number) => {
+    setQueryParams(formatSearchParams({tab: index.toString()}, queryParams));
+    setTabValue(index);
+  };
 
   return (
-    <Box display="flex" flex={1} justifyContent="space-between">
+    <Box
+      display="flex"
+      flex={1}
+      justifyContent="space-between"
+      sx={{background: 'inherit'}}>
       <Tabs
-        tabItems={tabItems}
+        tabItems={tabConfig.map(({label, icon}) => ({label, icon}))}
         currentIndex={tabValue}
-        onChange={(index) => {
-          setQueryParams(
-            formatSearchParams({tab: index.toString()}, queryParams),
-          );
-          setTabValue(index);
-        }}
+        onChange={handleTabChange}
         backBtnLabel={customerName}
         showMenuActionBtn
-        hideDivider>
-        <TabsBody value={tabValue} index={0}>
-          <CustomerOverviewTab
-            customerId={customerId}
-            getCustomerName={(name) => setCustomerName(name)}
-          />
-        </TabsBody>
-        <TabsBody value={tabValue} index={1}>
-          <UnitsTab customerId={customerId} />
-        </TabsBody>
-        <TabsBody value={tabValue} index={2}>
-          <ContractsTab customerId={customerId} />
-        </TabsBody>
-        <TabsBody value={tabValue} index={3}>
-          <CustomPricesTab propertyOwnerId={customerId} />
-        </TabsBody>
+        hideDivider
+        tabStyle={{background: 'white', mb: '20px', px: '48px'}}>
+        {tabConfig.map((tab, index) => (
+          <TabsBody
+            key={tab.label}
+            value={tabValue}
+            index={index}
+            containerStyle={{margin: '0 auto', width: '95%'}}>
+            {tab.component(customerId, setCustomerName)}
+          </TabsBody>
+        ))}
       </Tabs>
     </Box>
   );

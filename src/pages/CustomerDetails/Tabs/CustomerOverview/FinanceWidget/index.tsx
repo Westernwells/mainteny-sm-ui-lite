@@ -34,6 +34,7 @@ const FinanceWidget = ({customer}: Props) => {
   const {updateCustomer} = useCustomer(true);
 
   const {handleSubmit, control, setValue, watch, reset, formState} = useForm({
+    mode: 'onChange',
     defaultValues: {
       vat: customer.additionalInfo.vat?.id || '',
       paymentTermId: customer.paymentTerm?.id || '',

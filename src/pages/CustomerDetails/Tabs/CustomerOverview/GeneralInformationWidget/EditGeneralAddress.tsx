@@ -30,6 +30,8 @@ export const EditGeneralAddress = ({
 }) => {
   const {t} = useTranslation();
 
+  const countryValue = watch(`${address}.component.country`);
+
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
     [],
@@ -60,9 +62,14 @@ export const EditGeneralAddress = ({
           allowMap
           getAddress={(componentAddress) => {
             const currentValues = watch(address);
+
             setValue(address, {
               ...currentValues,
-              ...componentAddress,
+
+              component: {
+                ...currentValues?.component,
+                ...componentAddress?.component,
+              },
               id: currentValues?.id!,
               fullName: componentAddress?.fullName || '',
             });
@@ -160,7 +167,7 @@ export const EditGeneralAddress = ({
             <FormSelect
               labelId={`${address}.component.state`}
               label="State/Province/Region"
-              options={statesByCountry(field.value)}
+              options={statesByCountry(countryValue)}
               selectProps={{
                 ...field,
                 multiple: false,

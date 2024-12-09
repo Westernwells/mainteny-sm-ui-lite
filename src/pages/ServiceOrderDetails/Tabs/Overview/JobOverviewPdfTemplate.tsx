@@ -256,6 +256,9 @@ const JobOverviewPdfTemplate = React.memo(
         serviceOrder?.elevator?.propertyOwner?.additionalInfo?.vatId) ||
       '';
 
+    const eanValue =
+      serviceOrder?.elevator?.propertyOwner?.additionalInfo.ean || '';
+
     const unitBuilding =
       (pdfConfigClientStorage.includeUnitBuilding &&
         serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
@@ -277,6 +280,7 @@ const JobOverviewPdfTemplate = React.memo(
                 selectedLng={selectedLng}
                 translate={translate}
                 customerVATId={customerVATId}
+                eanValue={eanValue}
               />
 
               <View style={styles.rightAddress}>

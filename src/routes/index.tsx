@@ -403,7 +403,9 @@ export const Router = () => {
                   <PageLayout
                     showBackAction
                     pageScrollable
-                    backBtnLabel={currentPageTitle}>
+                    backBtnLabel={currentPageTitle}
+                    excludeDefaultSpacing
+                    contentStyles={{p: 0}}>
                     <CustomerDetails
                       getCurrentPageTitle={(val) => setCurrentPageTitle(val)}
                     />

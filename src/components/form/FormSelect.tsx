@@ -106,7 +106,7 @@ export const FormSelect = ({
           alignItems: 'center',
           ...labelStyles,
         }}
-        shrink={selectProps?.notched}>
+        shrink={selectProps?.notched || true}>
         {beforeLabel || null}
         {t(label)}
       </InputLabel>
