@@ -217,6 +217,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
       costType,
       costPackage,
       groupNumber,
+      orderType,
     } = extendedContractRecord;
 
     const convertedElevators: ContractComponentElevator[] = elevators.map(
@@ -249,6 +250,7 @@ export const convertExtendedRecordsToContractComponentRecords = (
       costType,
       costPackage,
       componentId: extendedContractRecord.id,
+      orderType,
     };
 
     return contractComponentRecord;

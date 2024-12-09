@@ -181,7 +181,7 @@ export const MutationService = ({
     });
   }, [formikContractServiceComponent.values.costType]);
 
-  const updateServiceMutation = () => {
+  const updateServiceMutation = async () => {
     const index = components.findIndex(
       (c) => c.id === formikContractServiceComponent.values?.id,
     );
@@ -214,13 +214,13 @@ export const MutationService = ({
 
     existingData.splice(index, 0, itemToMutate);
 
-    updateContract({
+    return updateContract({
       body: {components: existingData},
       contractId,
     });
   };
 
-  const createServiceMutation = () => {
+  const createServiceMutation = async () => {
     const updatedComponentsToSave = components.filter(
       (c) => c.id !== formikContractServiceComponent.values?.id,
     );
@@ -248,7 +248,7 @@ export const MutationService = ({
       ...componentsToMutate(updatedComponentsToSave),
     ];
 
-    updateContract({
+    return updateContract({
       body: {components: componentsToSave},
       contractId,
     });
@@ -261,17 +261,13 @@ export const MutationService = ({
   };
 
   const handleSave = async () => {
-    try {
-      if (isEditForm) {
-        updateServiceMutation();
-      } else {
-        createServiceMutation();
-      }
-      setIsDialogOpen(false);
-      resetForm();
-    } catch (error) {
-      console.error(error);
+    if (isEditForm) {
+      await updateServiceMutation();
+    } else {
+      await createServiceMutation();
     }
+    setIsDialogOpen(false);
+    resetForm();
   };
 
   const columns: {
@@ -336,12 +332,11 @@ export const MutationService = ({
         isUpdateLoading ||
         !!Object.keys(formikContractServiceComponent.errors).length ||
         (formikContractServiceComponent.values.isAutomaticJobCycle &&
-          !formikContractServiceComponent.values.firstOrderDate) ||
-        (formikContractServiceComponent.values.isAutomaticJobCycle &&
-          !formikContractServiceComponent.values.orderType)
+          (!formikContractServiceComponent.values.orderType ||
+            !formikContractServiceComponent.values.firstOrderDate))
       }
       saveButtonText={isEditForm ? t('Save') : t('Add Service')}
-      isSaving={loading}
+      isSaving={loading || isUpdateLoading}
       onSave={handleSave}>
       <Box
         sx={{
@@ -715,7 +710,21 @@ export const MutationService = ({
                 );
             }}
             textFieldProps={{
+              name: 'firstInvoiceDate',
+              id: 'firstInvoiceDate',
+              required: true,
               label: t('First Invoice Date'),
+              helperText:
+                formikContractServiceComponent.errors.firstInvoiceDate &&
+                formikContractServiceComponent.touched.firstInvoiceDate
+                  ? t(
+                      `${formikContractServiceComponent.errors.firstInvoiceDate}`,
+                    )
+                  : '',
+              error:
+                !!formikContractServiceComponent.errors.firstInvoiceDate &&
+                formikContractServiceComponent.touched.firstInvoiceDate,
+              onBlur: formikContractServiceComponent.handleBlur,
             }}
           />
         </Grid>
