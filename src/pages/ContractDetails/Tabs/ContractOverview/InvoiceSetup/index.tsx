@@ -72,6 +72,7 @@ const InvoiceSetup = ({components, updateContract, contractId}: Props) => {
         costType: c.additionalInfo.costType,
         costPackage: c.additionalInfo.costPackage,
         isAutomaticJobCycle: false,
+        orderType: c.additionalInfo.orderType,
       })) as ExtendedContractComponentRecord[],
     [components],
   );
