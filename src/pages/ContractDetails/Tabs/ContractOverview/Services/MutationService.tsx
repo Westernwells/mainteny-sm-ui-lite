@@ -186,7 +186,7 @@ export const MutationService = ({
     });
   }, [formikContractServiceComponent.values.costType]);
 
-  const updateServiceMutation = () => {
+  const updateServiceMutation = async () => {
     const index = components.findIndex(
       (c) => c.id === formikContractServiceComponent.values?.id,
     );
@@ -239,13 +239,13 @@ export const MutationService = ({
 
     existingData.splice(index, 0, itemToMutate);
 
-    updateContract({
+    return updateContract({
       body: {components: existingData},
       contractId,
     });
   };
 
-  const createServiceMutation = () => {
+  const createServiceMutation = async () => {
     const updatedComponentsToSave = components.filter(
       (c) => c.id !== formikContractServiceComponent.values?.id,
     );
@@ -273,7 +273,7 @@ export const MutationService = ({
       ...componentsToMutate(updatedComponentsToSave),
     ];
 
-    updateContract({
+    return updateContract({
       body: {components: componentsToSave},
       contractId,
     });
@@ -286,17 +286,13 @@ export const MutationService = ({
   };
 
   const handleSave = async () => {
-    try {
-      if (isEditForm) {
-        updateServiceMutation();
-      } else {
-        createServiceMutation();
-      }
-      setIsDialogOpen(false);
-      resetForm();
-    } catch (error) {
-      console.error(error);
+    if (isEditForm) {
+      await updateServiceMutation();
+    } else {
+      await createServiceMutation();
     }
+    setIsDialogOpen(false);
+    resetForm();
   };
 
   const columns: {
@@ -366,7 +362,7 @@ export const MutationService = ({
           !formikContractServiceComponent.values.orderType)
       }
       saveButtonText={isEditForm ? t('Save') : t('Add Service')}
-      isSaving={loading}
+      isSaving={loading || isUpdateLoading}
       onSave={handleSave}>
       <Box
         sx={{
