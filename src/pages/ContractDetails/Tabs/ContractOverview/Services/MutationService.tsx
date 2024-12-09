@@ -96,6 +96,7 @@ interface Props {
   loading: boolean;
   setIsDialogOpen: Dispatch<SetStateAction<boolean>>;
   isEditForm: boolean;
+  isUpdateLoading: boolean;
   updateContract: (obj: any) => void;
   components: ContractComponentView[];
   contractId: string;
@@ -108,6 +109,7 @@ export const MutationService = ({
   isDialogOpen,
   setIsDialogOpen,
   isEditForm,
+  isUpdateLoading,
   updateContract,
   components,
   contractId,
@@ -184,7 +186,7 @@ export const MutationService = ({
     });
   }, [formikContractServiceComponent.values.costType]);
 
-  const updateServiceMutation = () => {
+  const updateServiceMutation = async () => {
     const index = components.findIndex(
       (c) => c.id === formikContractServiceComponent.values?.id,
     );
@@ -236,13 +238,13 @@ export const MutationService = ({
 
     existingData.splice(index, 0, itemToMutate);
 
-    updateContract({
+    return updateContract({
       body: {components: existingData},
       contractId,
     });
   };
 
-  const createServiceMutation = () => {
+  const createServiceMutation = async () => {
     const updatedComponentsToSave = components.filter(
       (c) => c.id !== formikContractServiceComponent.values?.id,
     );
@@ -269,7 +271,7 @@ export const MutationService = ({
       ...componentsToMutate(updatedComponentsToSave),
     ];
 
-    updateContract({
+    return updateContract({
       body: {components: componentsToSave},
       contractId,
     });
@@ -279,6 +281,16 @@ export const MutationService = ({
     formikContractServiceComponent.resetForm({
       values: formikContractServiceInitialValues,
     });
+  };
+
+  const handleSave = async () => {
+    if (isEditForm) {
+      await updateServiceMutation();
+    } else {
+      await createServiceMutation();
+    }
+    setIsDialogOpen(false);
+    resetForm();
   };
 
   const columns: {
@@ -340,6 +352,7 @@ export const MutationService = ({
         maxWidth: 'lg',
       }}
       disableSaveBtn={
+        isUpdateLoading ||
         !!Object.keys(formikContractServiceComponent.errors).length ||
         (formikContractServiceComponent.values.isAutomaticJobCycle &&
           !formikContractServiceComponent.values.firstOrderDate) ||
@@ -347,16 +360,8 @@ export const MutationService = ({
           !formikContractServiceComponent.values.orderType)
       }
       saveButtonText={isEditForm ? t('Save') : t('Add Service')}
-      isSaving={loading}
-      onSave={() => {
-        if (isEditForm) {
-          updateServiceMutation();
-        } else {
-          createServiceMutation();
-        }
-        setIsDialogOpen(false);
-        resetForm();
-      }}>
+      isSaving={loading || isUpdateLoading}
+      onSave={handleSave}>
       <Box
         sx={{
           display: 'flex',

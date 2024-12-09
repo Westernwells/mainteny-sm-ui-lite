@@ -89,6 +89,10 @@ export const getAutoJobStatus = (
 
 const validationSchemaContractServices = Yup.object().shape({
   name: Yup.string().required('Service name cannot be empty'),
+  firstInvoiceDate: Yup.date()
+    .nullable()
+    .typeError('First invoice date is required')
+    .required('First invoice date is required'),
 });
 
 const ContractServices = ({elevator, containerStyles}: Props) => {
@@ -524,6 +528,7 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
         components={services}
         setIsDialogOpen={setIsDialogOpen}
         isDialogOpen={isDialogOpen}
+        isUpdateLoading={isUpdateLoading}
         updateContract={updateContract}
         isEditForm={isEditForm}
         contractId={currentService?.contractId as string}
