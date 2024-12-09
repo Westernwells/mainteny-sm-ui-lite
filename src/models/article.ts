@@ -20,6 +20,15 @@ export enum ArticleType {
   OTHER = 'OTHER',
 }
 
+// order matters for quick filter displaying
+export enum ARTICLE_TYPE_FILTER {
+  ALL = 'ALL',
+  MATERIAL = 'MATERIAL',
+  LABOR = 'LABOR',
+  PACKAGE = 'PACKAGE',
+  OTHER = 'OTHER',
+}
+
 export const articleTypeOptions = Object.values(ArticleType).map((value) => ({
   value,
   label: convertToText(value),
@@ -35,6 +44,8 @@ export enum ArticleOrderField {
   DESCRIPTION = 'DESCRIPTION',
   SELLING_NET_AMOUNT = 'SELLING_NET_AMOUNT',
   SELLING_PERCENTAGE_VAT = 'SELLING_PERCENTAGE_VAT',
+  CATEGORY = 'CATEGORY',
+  MANUFACTURER = 'MANUFACTURER',
 }
 
 export interface ArticleItem {
@@ -145,6 +156,12 @@ export interface QueryArticleParams {
   supplier?: string;
   order?: Order;
   orderByField?: ArticleOrderField;
+  sellingPriceStart?: string;
+  sellingPriceEnd?: string;
+  purchasePriceStart?: string;
+  purchasePriceEnd?: string;
+  sellingVatPercent?: number;
+  unit?: string[];
 }
 
 export interface Stock {
@@ -267,7 +284,8 @@ export interface ArticleRecord {
   };
 }
 
-export type ArticleTableRow = {
+// used in job details section
+export type ArticleSectionTableRow = {
   id: string;
   no: number;
   number: string;
@@ -283,4 +301,40 @@ export type ArticleTableRow = {
   ownerName: string;
   ownerType: ServiceOrderArticleOwnerType;
   contractNumber: string;
+};
+
+export type ArticleTableRow = {
+  id: string;
+  data: ArticleView;
+  number?: string;
+  name: string;
+  manufacturer: string;
+  description?: string;
+  category: string;
+  type: ArticleType;
+  unit: string;
+  price: string;
+};
+
+export type ArticleStatistics = {
+  numOfArticlesPerType: Record<string, number>;
+};
+
+export type ArticleFilterForm = {
+  unitId?: string;
+  sellingPriceMin?: number;
+  sellingPriceMax?: number;
+  buyingPriceMin?: number;
+  buyingPriceMax?: number;
+  vatPercentage?: number;
+  storageLocation?: string;
+  category?: string;
+  manufacturer?: string;
+};
+
+export type SearchParameters = {
+  search?: string;
+  storageLocation?: string;
+  category?: string;
+  manufacturer?: string;
 };
