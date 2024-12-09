@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 import {SelectModal} from 'components/SelectModal';
 import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
 import {
-  ArticleTableRow,
+  ArticleSectionTableRow,
   ArticleView,
   ServiceOrderArticleRecord,
 } from 'models/article';
@@ -62,12 +62,12 @@ export const Articles = ({
   const navigate = useNavigate();
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
-  const [rows, setRows] = useState<ArticleTableRow[]>([]);
+  const [rows, setRows] = useState<ArticleSectionTableRow[]>([]);
   const [openSelectModal, setOpenSelectModal] = useState<boolean>(false);
   const [isOpenDialog, setIsDialogOpen] = useState<boolean>(false);
-  const [activeArticle, setActiveArticle] = useState<ArticleTableRow>();
+  const [activeArticle, setActiveArticle] = useState<ArticleSectionTableRow>();
 
-  const COLUMNS = useRef<TableColumnWithRender<ArticleTableRow>[]>([
+  const COLUMNS = useRef<TableColumnWithRender<ArticleSectionTableRow>[]>([
     {
       headerName: 'Name',
       key: 'articles-cell-name',

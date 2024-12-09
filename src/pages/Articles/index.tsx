@@ -6,7 +6,7 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import {useQueryState} from 'hooks/useQueryState';
 import {useNavigate} from 'react-router-dom';
 import TabsWrapper from 'components/TabsWrapper';
-import {ArticleListDataGrid} from './Tabs/ArticleListDataGrid';
+import ArticleList from 'pages/Articles/Tabs/ArticleList';
 import PageContainer from '../../components/PageContainer';
 import Suppliers from './Tabs/Suppliers';
 
@@ -37,20 +37,18 @@ export const Articles = () => {
         tabItems={tabItems}
         showActionBtn
         btnLabel={tabValue === 0 ? t('New Article') : t('New Supplier')}
-        shouldWrap={tabValue === 0}
         onChange={(index) => setTabValue(index)}
         btnOnClick={() =>
           tabValue === 0 ? navigate('new') : navigate('newSupplier')
-        }>
-        {tabValue === 1 && (
-          <Tabs
-            tabItems={tabItems}
-            currentIndex={tabValue}
-            onChange={(index) => setTabValue(index)}
-          />
-        )}
+        }
+        shouldWrap={false}>
+        <Tabs
+          tabItems={tabItems}
+          currentIndex={tabValue}
+          onChange={(index) => setTabValue(index)}
+        />
         <TabsBody value={tabValue} index={0}>
-          <ArticleListDataGrid />
+          <ArticleList />
         </TabsBody>
         <TabsBody value={tabValue} index={1}>
           <Suppliers />
