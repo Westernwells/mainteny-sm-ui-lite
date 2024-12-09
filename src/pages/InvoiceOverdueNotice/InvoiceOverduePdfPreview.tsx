@@ -166,7 +166,7 @@ const InvoiceOverduePdfPreview = ({
   const styles = getStyles(boldFontStyle, regularFontStyle);
 
   const overdueTotal = (initialAmount: number, handlingAmount: number) =>
-    formatCurrency(handlingAmount + initialAmount ?? 0, {
+    formatCurrency(handlingAmount + initialAmount, {
       currency: currentCurrency?.code,
       excludeCurrencySymbol: true,
       currencySymbol: currentCurrency?.symbol,

@@ -234,7 +234,7 @@ const ServiceListing = ({
                           (elevator) => elevator.isSelected,
                         ),
                       ) /
-                        10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                        10 ** (currentCurrency.fractionDigits ?? 0),
                       {
                         currency: currentCurrency.code,
                       },
@@ -307,7 +307,7 @@ const ServiceListing = ({
                     calculateContractInvoicePriceGrandTotal(
                       formik.values.components,
                     ) /
-                      10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                      10 ** (currentCurrency.fractionDigits ?? 0),
                     {
                       currency: currentCurrency.code,
                     },

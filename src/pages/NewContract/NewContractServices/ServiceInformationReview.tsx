@@ -303,7 +303,7 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
                   calculateContractInvoicePriceTotal(
                     formikContractServiceComponent.values.elevators,
                   ) /
-                    10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                    10 ** (currentCurrency.fractionDigits ?? 0),
                   {
                     currency: currentCurrency.code,
                   },

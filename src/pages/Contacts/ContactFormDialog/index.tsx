@@ -71,7 +71,11 @@ const ContactFormDialog = ({
     formType === 'edit' ? contactPerson?.id : uuid
   }`;
 
-  const useHookForm = useForm<ServiceCompanyContactPeronFormModel>({
+  const useHookForm = useForm<
+    ServiceCompanyContactPeronFormModel,
+    any,
+    ServiceCompanyContactPeronFormModel
+  >({
     defaultValues: getDefaultValues(contactPerson, serviceCompanyId),
     mode: 'all',
   });
@@ -95,7 +99,7 @@ const ContactFormDialog = ({
     // If file type is File object, upload it
     if (!!file && typeof file !== 'string') {
       await uploadImages({
-        files: [file] || [],
+        files: [file],
         uploadPath,
       });
     }

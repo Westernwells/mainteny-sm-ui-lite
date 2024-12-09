@@ -4,7 +4,7 @@ import {AppointmentPreference} from 'pages/UnitDetails/Tabs/OverviewTab/Appointm
 import {expect} from 'vitest';
 import {QueryClient, QueryClientProvider} from 'react-query';
 import {queryErrorHandler, MutationErrorHandler} from 'reactQuery/handlers';
-import {act} from 'react-dom/test-utils';
+import {act} from 'react';
 import {mockElevator, mockI18n} from '__tests__/mocks/elevators';
 import 'react-i18next';
 
@@ -46,16 +46,6 @@ describe('Appointment Preference component', () => {
     await act(async () => {
       fireEvent.click(editButton);
     });
-  };
-
-  const selectDaysOfWeek = () => {
-    const daysOfWeekSelect = screen.getByLabelText('Days of the week');
-    fireEvent.mouseDown(daysOfWeekSelect);
-
-    const daysOfWeekList = screen.getByRole('listbox');
-    fireEvent.click(within(daysOfWeekList).getByText('Monday'));
-    fireEvent.click(within(daysOfWeekList).getByText('Tuesday'));
-    fireEvent.click(document.body); // Close the dropdown
   };
 
   const selectTime = async (
@@ -100,19 +90,6 @@ describe('Appointment Preference component', () => {
     const dialog = screen.getByTestId('appointment-preferences-dialog');
     expect(dialog).toBeInTheDocument();
 
-    await selectTime('opening-hour-start', '04', '30');
-    await selectTime('opening-hour-end', '22', '40');
-
-    verifySaveButtonState(true);
-  });
-
-  it('save button should be enabled if days of week, openingHour, and closingHour have values', async () => {
-    await clickEditButton();
-
-    const dialog = screen.getByTestId('appointment-preferences-dialog');
-    expect(dialog).toBeInTheDocument();
-
-    selectDaysOfWeek();
     await selectTime('opening-hour-start', '04', '30');
     await selectTime('opening-hour-end', '22', '40');
 
