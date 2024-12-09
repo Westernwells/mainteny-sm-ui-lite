@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {DeleteOutlined, EditOutlined} from '@mui/icons-material';
 import TableActionMenu from 'components/Table/TableActionMenu';
 import {Action} from 'models/table';
@@ -13,7 +13,7 @@ const Actions = ({onEdit, onDelete}: Props) => {
   const {t} = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
 
-  const menuActions = useRef<Action[]>([
+  const menuActions: Action[] = [
     {
       icon: EditOutlined,
       label: t('Edit'),
@@ -24,14 +24,10 @@ const Actions = ({onEdit, onDelete}: Props) => {
       label: t('Delete'),
       onTrigger: () => onDelete(),
     },
-  ]);
+  ];
 
   return (
-    <TableActionMenu
-      options={menuActions.current}
-      isOpen={open}
-      onToggle={setOpen}
-    />
+    <TableActionMenu options={menuActions} isOpen={open} onToggle={setOpen} />
   );
 };
 

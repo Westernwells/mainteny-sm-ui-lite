@@ -72,7 +72,7 @@ export const EditFinanceInformation = ({
     <Grid container spacing={3}>
       <Grid size={{xs: 12}}>
         <TabContext value={activeTab}>
-          <Box sx={{borderBottom: 1, borderColor: 'divider', width: '60%'}}>
+          <Box sx={{borderBottom: 1, borderColor: 'divider', width: '70%'}}>
             <TabList
               onChange={(_, newValue) => setActiveTab(newValue)}
               sx={{
@@ -83,17 +83,29 @@ export const EditFinanceInformation = ({
               <Tab
                 label={t('Billing address')}
                 value="billingAddress"
-                sx={{textTransform: 'none', typography: 'subtitle1'}}
+                sx={{
+                  textTransform: 'none',
+                  typography: 'subtitle2',
+                  fontWeight: '600',
+                }}
               />
               <Tab
                 label={t('Send invoice via')}
                 value="otherAddress"
-                sx={{textTransform: 'none', typography: 'subtitle1'}}
+                sx={{
+                  textTransform: 'none',
+                  typography: 'subtitle2',
+                  fontWeight: '600',
+                }}
               />
               <Tab
                 label={t('Beneficiary address')}
                 value="beneficiaryAddress"
-                sx={{textTransform: 'none', typography: 'subtitle1'}}
+                sx={{
+                  textTransform: 'none',
+                  typography: 'subtitle2',
+                  fontWeight: '600',
+                }}
               />
             </TabList>
           </Box>
@@ -120,7 +132,7 @@ export const EditFinanceInformation = ({
           )}
         </TabContext>
       </Grid>
-      <Grid size={{xs: 12}} py={0} my={-1}>
+      <Grid size={{xs: 12}} py={0} mt={-1}>
         <Typography variant="h6" color="primary.dark">
           {t('Other')}
         </Typography>
@@ -323,7 +335,6 @@ export const EditFinanceInformation = ({
           }}
         />
       </Grid>
-      ;
       {openContractPaymentTermSelectDialog && (
         <ContractTermInput
           title={

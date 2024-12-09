@@ -22,6 +22,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {t} from 'i18next';
 import EditCustomerGeneralInformation from './EditCustomerGeneralInformation';
 
 type Props = {
@@ -52,6 +53,7 @@ const GeneralInformationWidget = ({customer}: Props) => {
   const uploadPath = `${serviceCompanyId}/customers/${uuid}`;
 
   const {handleSubmit, control, setValue, watch, reset, formState} = useForm({
+    mode: 'onChange',
     defaultValues: {
       name: customer.name || '',
       externalId: customer.externalId || '',
@@ -194,7 +196,7 @@ const GeneralInformationWidget = ({customer}: Props) => {
 
           <CardDataListItem
             label="Priority"
-            value={customer?.additionalInfo.priority || '-'}
+            value={t(customer?.additionalInfo.priority) || '-'}
             Icon={LowPriorityOutlined}
           />
         </Box>

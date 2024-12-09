@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState} from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
@@ -38,7 +38,7 @@ const Actions = ({
 
   const handleMenuClose = () => setMenuAnchorEl(null);
 
-  const menuActions = useRef([
+  const menuActions = [
     {
       icon: <SendOutlinedIcon sx={{color: 'text.secondary'}} />,
       label: t('Resend invite'),
@@ -68,7 +68,7 @@ const Actions = ({
       },
       visible: true,
     },
-  ]);
+  ];
 
   return (
     <Box display="flex" alignItems="center">
@@ -96,7 +96,7 @@ const Actions = ({
         MenuListProps={{'aria-labelledby': 'actions-button'}}
         anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
         transformOrigin={{vertical: 'top', horizontal: 'right'}}>
-        {menuActions.current
+        {menuActions
           .filter((action) => action.visible)
           .map((action, index) => (
             <MenuItem

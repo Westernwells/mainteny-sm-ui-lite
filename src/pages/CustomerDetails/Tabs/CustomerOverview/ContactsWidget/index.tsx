@@ -175,12 +175,17 @@ const ContactsWidget = ({refId, refType}: Props) => {
         ),
       },
       {
-        headerName: 'Email address',
+        headerName: 'Email Address',
         key: 'customer-contact-cell-email',
         width: '209px',
         renderCell: (refContact, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>{refContact.emailAddress}</TableCellText>
+            <TableCellText
+              tableCellTextStyles={{
+                color: theme.palette.primary.light,
+              }}>
+              <TableCellText>{refContact.emailAddress}</TableCellText>
+            </TableCellText>
           </Cell>
         ),
       },
@@ -190,7 +195,7 @@ const ContactsWidget = ({refId, refType}: Props) => {
         width: '209px',
         renderCell: (refContact, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>{refContact.role}</TableCellText>
+            <TableCellText>{t(refContact.role)}</TableCellText>
           </Cell>
         ),
       },

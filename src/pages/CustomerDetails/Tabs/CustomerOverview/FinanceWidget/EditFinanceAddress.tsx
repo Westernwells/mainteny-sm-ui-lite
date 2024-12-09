@@ -30,6 +30,8 @@ export const EditFinanceAddress = ({
 }) => {
   const {t} = useTranslation();
 
+  const countryValue = watch(`${address}.component.country`);
+
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
     [],
@@ -60,9 +62,14 @@ export const EditFinanceAddress = ({
           allowMap
           getAddress={(componentAddress) => {
             const currentValues = watch(address);
+
             setValue(address, {
               ...currentValues,
-              ...componentAddress,
+
+              component: {
+                ...currentValues?.component,
+                ...componentAddress?.component,
+              },
               id: currentValues?.id!,
               fullName: componentAddress?.fullName || '',
             });
@@ -160,7 +167,7 @@ export const EditFinanceAddress = ({
             <FormSelect
               labelId={`${address}.component.state`}
               label="State/Province/Region"
-              options={statesByCountry(field.value)}
+              options={statesByCountry(countryValue)}
               selectProps={{
                 ...field,
                 multiple: false,
@@ -176,12 +183,20 @@ export const EditFinanceAddress = ({
           <Controller
             name="billingEmail"
             control={control}
+            rules={{
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: t('Please enter a valid email address'),
+              },
+            }}
             render={({field}) => (
               <FormInput
                 fieldProps={{
                   size: 'small',
-                  label: 'Billing email address',
+                  label: t('Billing email address'),
                   ...field,
+                  error: !!errors?.billingEmail,
+                  helperText: errors?.billingEmail?.message || '',
                 }}
               />
             )}

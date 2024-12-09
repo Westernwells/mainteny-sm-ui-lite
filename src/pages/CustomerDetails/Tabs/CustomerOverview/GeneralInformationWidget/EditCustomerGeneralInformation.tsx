@@ -160,12 +160,20 @@ const EditCustomerGeneralInformation = ({
         <Controller
           name="email"
           control={control}
+          rules={{
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: t('Please enter a valid email address'),
+            },
+          }}
           render={({field}) => (
             <FormInput
               fieldProps={{
                 size: 'small',
                 label: 'Email address',
                 ...field,
+                error: !!errors?.email,
+                helperText: errors?.email?.message || '',
               }}
             />
           )}

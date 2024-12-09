@@ -154,7 +154,7 @@ const PerformanceWidget = ({customer}: Props) => {
             value={totalRevenue}
             align="left"
             tooltipText={t(
-              `Total net revenue of all invoices sent from {{endDate}}. Draft invoices won't be counted.`,
+              `Total net revenue of all invoices sent from {{startDate}} to {{endDate}}. Draft invoices won't be counted.`,
               {
                 startDate: formatDate(startDate!),
                 endDate: formatDate(endDate!),
@@ -170,7 +170,7 @@ const PerformanceWidget = ({customer}: Props) => {
             value={numberOfJobs || '-'}
             align="center"
             tooltipText={t(
-              'Total number of all jobs completed from {{startDate}} to {{endDate}}. Cancelled & archived jobs won’t be counted',
+              'Total number of all jobs completed from {{startDate}} to {{endDate}}. Cancelled & archived jobs won’t be counted.',
               {
                 startDate: formatDate(startDate!),
                 endDate: formatDate(endDate!),
@@ -186,7 +186,7 @@ const PerformanceWidget = ({customer}: Props) => {
             value={customer.unitNumber || '-'}
             align="right"
             tooltipText={t(
-              'Total number of units between {{startDate}} to {{endDate}}. Archived units won’t be counted',
+              'Total number of units between {{startDate}} to {{endDate}}. Archived units won’t be counted.',
               {
                 startDate: formatDate(startDate!),
                 endDate: formatDate(endDate!),
