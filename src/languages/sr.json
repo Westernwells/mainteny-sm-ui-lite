@@ -3005,5 +3005,10 @@
   "Total number of all jobs completed from {{startDate}} to {{endDate}}. Cancelled & archived jobs won’t be counted.": "Ukupan broj svih poslova završenih od {{startDate}} do {{endDate}}. Otkazani i arhivirani poslovi se neće računati.",
   "Total number of units between {{startDate}} to {{endDate}}. Archived units won’t be counted.": "Ukupan broj jedinica između {{startDate}} i {{endDate}}. Arhivirane jedinice se neće računati.",
   "Mark as rejected": "Označi kao odbijeno",
-  "Selling price": "Prodajna cijena"
+  "Storage location": "Mesto skladištenja",
+  "Buying price": "Kupovna cena",
+  "Selling price": "Prodajna cijena",
+  "Please provide a valid date for the job creation date": "Navedite važeći datum za datum otvaranja posla",
+  "Please provide a valid date for the first invoice date": "Navedite važeći datum za prvi datum fakture",
+  "Payment data included": "Podaci o plaćanju uključeni"
 }
