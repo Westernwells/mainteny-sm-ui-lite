@@ -1986,6 +1986,7 @@
   "pack": "pakovanje",
   "Created on {{creationDate}}": "Napravljeno {{creationDate}}",
   "Exclude previously downloaded data": "Izuzmi prethodno preuzete podatke",
+  "Payment data included": "Подаци о плаћању укључени",
   "Article cannot be empty": "Stavka ne može biti prazna",
   "Article Type": "Tip stavka",
   "Article #": "Stavka #",

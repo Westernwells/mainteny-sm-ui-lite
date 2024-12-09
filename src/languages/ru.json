@@ -1986,6 +1986,7 @@
   "pack": "пакет",
   "Created on {{creationDate}}": "Создано {{creationDate}}",
   "Exclude previously downloaded data": "Исключить ранее загруженные данные",
+  "Payment data included": "Платежные данные включены",
   "Article cannot be empty": "Позиция не может быть пустой",
   "Article Type": "Тип позиции",
   "Article #": "Позиция #",
