@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Servis Yöneticisi Portalı",
   "Login": "Giriş yapmak",
-  "Email Address": "E -posta adresi",
   "Password": "Şifre",
   "Forgot Password?": "Parolanızı mı unuttunuz?",
   "Enter a valid email": "Geçerli bir e-posta giriniz",
@@ -1378,6 +1377,7 @@
   "Selected Unit": "Seçilen Birim",
   "Please describe what happened": "Lütfen ne olduğunu açıklayın",
   "Send email": "Eposta gönder",
+  "Email Address": "E -posta adresi",
   "Supplier Article": "Tedarikçi makalesi",
   "No documents attached. They will appear here once added!": "Ekli belge. Burada eklendiğinde burada görünecekler!",
   "PAYMENT DUE": "Ödenmesi gereken ödeme",

@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Büroanwendung",
   "Login": "Anmelden",
-  "Email Address": "Email Adresse",
   "Password": "Passwort",
   "Forgot Password?": "Passwort vergessen?",
   "Enter a valid email": "Geben Sie eine gültige E-Mail ein",
@@ -1373,6 +1372,7 @@
   "Selected Unit": "Gewählte Anlage",
   "Please describe what happened": "Bitte beschreiben Sie",
   "Send email": "Email senden",
+  "Email Address": "E-Mail Adresse",
   "Supplier Article": "Lieferantenartikelnr.",
   "No documents attached. They will appear here once added!": "Keine Dokumente beigefügt. Sie werden hier erscheinen, sobald sie hinzugefügt wurden!",
   "PAYMENT DUE": "ZAHLUNGSFRIST",
@@ -1963,7 +1963,6 @@
   "pack": "Pkt.",
   "Created on {{creationDate}}": "Erstellt am {{creationDate}}",
   "Exclude previously downloaded data": "Zuvor heruntergeladene Daten ausschließen",
-  "Payment data included": "Zahlungsdaten enthalten",
   "Article cannot be empty": "Der Artikel darf nicht leer sein",
   "Article Type": "Artikeltyp",
   "Article #": "Artikel Nr.",

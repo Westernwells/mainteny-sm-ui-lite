@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Портал сервис-менеджера",
   "Login": "Авторизоваться",
-  "Email Address": "Адрес электронной почты",
   "Password": "Пароль",
   "Forgot Password?": "Забыли пароль?",
   "Enter a valid email": "Введите действующую электронную почту",
@@ -1384,6 +1383,7 @@
   "Selected Unit": "Выбранное устройство",
   "Please describe what happened": "Пожалуйста, опишите, что случилось",
   "Send email": "Отправить электронное письмо",
+  "Email Address": "Электронная почта ",
   "Supplier Article": "Позиция поставщика",
   "No documents attached. They will appear here once added!": "Нет прикрепленных документов. Они появятся здесь после добавления!",
   "PAYMENT DUE": "ЗАПЛАТИТЬ ДО",
@@ -1986,7 +1986,6 @@
   "pack": "пакет",
   "Created on {{creationDate}}": "Создано {{creationDate}}",
   "Exclude previously downloaded data": "Исключить ранее загруженные данные",
-  "Payment data included": "Платежные данные включены",
   "Article cannot be empty": "Позиция не может быть пустой",
   "Article Type": "Тип позиции",
   "Article #": "Позиция #",
