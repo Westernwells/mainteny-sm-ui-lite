@@ -7,15 +7,17 @@ type Props = {
   columns: TableColumn[];
   sortState?: HeaderSortingState;
   onSort?: (column: string) => void;
+  capitalize?: boolean;
 };
 
-const TableHeader = ({columns, sortState, onSort}: Props) => (
+const TableHeader = ({columns, sortState, onSort, capitalize}: Props) => (
   <TableHead
     sx={{
       alignItems: 'center',
       backgroundColor: '#FFFFFF',
       zIndex: 5,
       height: '40px',
+      ...(capitalize && {textTransform: 'capitalize'}),
     }}>
     <TableRow>
       {columns.map((column) => {

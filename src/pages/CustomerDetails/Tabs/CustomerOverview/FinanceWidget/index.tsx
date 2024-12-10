@@ -16,12 +16,17 @@ import {PropertyOwnerView} from 'models/propertyManager';
 import {Dialog} from 'components/Dialog';
 import {useForm} from 'react-hook-form';
 import {CustomerFinanceFormModel} from 'models/customer';
-import {getCountryCode} from 'utils/countries';
-import {Address} from 'models/misc';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
 import {t} from 'i18next';
-import {convertToText} from 'utils/utils';
+import {
+  companyLanguageContextMap,
+  convertToText,
+  formatAddressFullname,
+} from 'utils/utils';
 import {ReactComponent as SavingBankCash} from 'assets/illustrations/SavingBankCash.svg';
+import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
+import {useTranslation} from 'react-i18next';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {EditFinanceInformation} from './EditFinanceInformation';
 
 type Props = {
@@ -32,6 +37,12 @@ const FinanceWidget = ({customer}: Props) => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const {updateCustomer} = useCustomer(true);
+
+  const {data: company} = useCompanyById(customer?.serviceCompany?.id);
+
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
 
   const {handleSubmit, control, setValue, watch, reset, formState} = useForm({
     mode: 'onChange',
@@ -50,14 +61,6 @@ const FinanceWidget = ({customer}: Props) => {
     },
   });
 
-  const applyCountryCode = (address?: Address) =>
-    address && {
-      ...address,
-      ...(address.component?.country && {
-        countryCode: getCountryCode(address.component.country),
-      }),
-    };
-
   const {errors} = formState;
 
   const discountOptions =
@@ -73,14 +76,61 @@ const FinanceWidget = ({customer}: Props) => {
   const paymentTerm = `${customer?.paymentTerm?.term}\n${formattedDiscountOptions}`;
 
   const onSave = async (data: CustomerFinanceFormModel) => {
-    const payload = {
+    const finalData = {
       ...data,
-      beneficiaryAddress: applyCountryCode(data.beneficiaryAddress as Address),
-      otherAddress: applyCountryCode(data.otherAddress as Address),
-      billingAddress: applyCountryCode(data.billingAddress as Address),
+      beneficiaryAddress: data.beneficiaryAddress
+        ? {
+            ...data.beneficiaryAddress,
+            component: {
+              ...data.beneficiaryAddress?.component,
+              country: data.beneficiaryAddress?.component?.country
+                ? translateCompanyLanguage(
+                    data.beneficiaryAddress.component.country,
+                  )
+                : '',
+            },
+            fullName:
+              formatAddressFullname(
+                data.beneficiaryAddress,
+                translateCompanyLanguage,
+              )?.fullName || '',
+          }
+        : null,
+      otherAddress: data.otherAddress
+        ? {
+            ...data.otherAddress,
+            component: {
+              ...data.otherAddress?.component,
+              country: data.otherAddress?.component?.country
+                ? translateCompanyLanguage(data.otherAddress.component.country)
+                : '',
+            },
+            fullName:
+              formatAddressFullname(data.otherAddress, translateCompanyLanguage)
+                ?.fullName || '',
+          }
+        : null,
+      billingAddress: data.billingAddress
+        ? {
+            ...data.billingAddress,
+            component: {
+              ...data.billingAddress?.component,
+              country: data.billingAddress?.component?.country
+                ? translateCompanyLanguage(
+                    data.billingAddress.component.country,
+                  )
+                : '',
+            },
+            fullName:
+              formatAddressFullname(
+                data.billingAddress,
+                translateCompanyLanguage,
+              )?.fullName || '',
+          }
+        : null,
     };
 
-    updateCustomer(payload, customer.id, () => {
+    updateCustomer(finalData, customer.id, () => {
       setOpenDialog(false);
     });
   };

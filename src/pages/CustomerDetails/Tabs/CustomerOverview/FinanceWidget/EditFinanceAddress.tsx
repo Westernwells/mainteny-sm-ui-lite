@@ -37,6 +37,8 @@ export const EditFinanceAddress = ({
     [],
   );
 
+  const allValues = watch();
+
   return (
     <Grid container rowSpacing={3} columnSpacing={2}>
       <Grid size={{md: 6}}>
@@ -64,12 +66,8 @@ export const EditFinanceAddress = ({
             const currentValues = watch(address);
 
             setValue(address, {
-              ...currentValues,
-
-              component: {
-                ...currentValues?.component,
-                ...componentAddress?.component,
-              },
+              ...allValues[address],
+              ...componentAddress,
               id: currentValues?.id!,
               fullName: componentAddress?.fullName || '',
             });
