@@ -29,6 +29,7 @@ import {ServiceCompanyType} from 'models/service-company';
 import {useContractTerms} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging';
 import {convertToText} from 'utils/utils';
+import {Receipt} from '@mui/icons-material';
 import {EditFinanceAddress} from './EditFinanceAddress';
 
 interface Props {
@@ -273,11 +274,11 @@ export const EditFinanceInformation = ({
                           size="small"
                           sx={{
                             p: 0,
-                            color: taxRate.isDefault
+                            color: taxRate.legalNote
                               ? theme.palette.text.primary
                               : theme.palette.text.disabled,
                           }}>
-                          <TextSnippetIcon />
+                          <Receipt fontSize="small" />
                         </IconButton>
                       </Box>
                     </Tooltip>

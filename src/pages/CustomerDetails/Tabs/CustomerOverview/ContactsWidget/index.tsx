@@ -247,7 +247,7 @@ const ContactsWidget = ({refId, refType}: Props) => {
           containerRef={containerRef}
           setShowLeftShadow={setShowLeftShadow}
           setShowRightShadow={setShowRightShadow}>
-          <TableHeader columns={COLUMNS} />
+          <TableHeader columns={COLUMNS} capitalize />
           <TableBody>
             {rows.map((entry) => (
               <TableRow
