@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Πύλη Υπεύθυνου Υπηρεσιών",
   "Login": "Σύνδεση",
-  "Email Address": "ηλεκτρονική διεύθυνση (email)",
   "Password": "Κωδικός πρόσβασης",
   "Forgot Password?": "Ξεχάσατε τον κωδικό;",
   "Enter a valid email": "Εισαγάγετε ένα έγκυρο email",
@@ -1376,6 +1375,7 @@
   "Selected Unit": "Επιλεγμένη μονάδα",
   "Please describe what happened": "Περιγράψτε τι συνέβη",
   "Send email": "αποστολή ηλεκτρονική διεύθυνση (email)",
+  "Email Address": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
   "Supplier Article": "Άρθρο προμηθευτή",
   "No documents attached. They will appear here once added!": "Δεν επισυνάπτονται έγγραφα. Θα εμφανιστούν εδώ μόλις προστεθούν!",
   "PAYMENT DUE": "ΟΦΕΙΛΗ ΠΛΗΡΩΜΗΣ",
@@ -1983,7 +1983,6 @@
   "pack": "πακέτο",
   "Created on {{creationDate}}": "Δημιουργήθηκε στις {{creationDate}}",
   "Exclude previously downloaded data": "Εξαιρέστε δεδομένα που έχετε λάβει προηγουμένως",
-  "Payment data included": "Συμπεριλαμβάνονται δεδομένα πληρωμής",
   "Article cannot be empty": "Το προϊόν δεν μπορεί να είναι κενό",
   "Article Type": "Τύπος προϊόν",
   "Article #": "αριθμός προϊόν",

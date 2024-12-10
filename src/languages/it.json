@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Portale di Service Manager",
   "Login": "Login",
-  "Email Address": "Indirizzo e-mail",
   "Password": "Parola d'ordine",
   "Forgot Password?": "Ha dimenticato la password?",
   "Enter a valid email": "Inserisci un'e -mail valida",
@@ -1378,6 +1377,7 @@
   "Selected Unit": "Unità selezionata",
   "Please describe what happened": "Per favore descrivi cosa è successo",
   "Send email": "Invia una email",
+  "Email Address": "Indirizzo e-mail",
   "Supplier Article": "Articolo del fornitore",
   "No documents attached. They will appear here once added!": "Nessun documento allegato. Appariranno qui una volta aggiunti!",
   "PAYMENT DUE": "PAGAMENTO DOVUTO",

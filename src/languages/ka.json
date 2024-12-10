@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "მომსახურების მენეჯერის პორტალი",
   "Login": "შესვლა",
-  "Email Address": "ელ.ფოსტის მისამართი",
   "Password": "პაროლი",
   "Forgot Password?": "დაგავიწყდათ პაროლი?",
   "Enter a valid email": "შეიყვანეთ მოქმედი ელ.ფოსტა",
@@ -1379,6 +1378,7 @@
   "Selected Unit": "არჩეული ერთეული",
   "Please describe what happened": "გთხოვთ აღწეროთ რა მოხდა",
   "Send email": "ელ.ფოსტის გაგზავნა",
+  "Email Address": "ელ.ფოსტის მისამართი",
   "Supplier Article": "მომმარაგებლის ნაწილი",
   "No documents attached. They will appear here once added!": "დოკუმენტები არ არის მიმაგრებული. ისინი აქ გამოჩნდებიან დამატების შემდეგ!",
   "PAYMENT DUE": "გადახდის ვადა",
@@ -1986,7 +1986,6 @@
   "pack": "პაკეტი",
   "Created on {{creationDate}}": "შექმნილია {{creationDate}}",
   "Exclude previously downloaded data": "გამორიცხეთ ადრე გადმოწერილი მონაცემები",
-  "Payment data included": "შედის გადახდის მონაცემები",
   "Article cannot be empty": "ნაწილი ვერ იქნება ცარიელი",
   "Article Type": "ნაწილის ტიპი",
   "Article #": "ნაწილის #",
