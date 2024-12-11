@@ -2999,7 +2999,11 @@
   "Number of affected data fields {{count}}": "Número de campos de datos afectados {{count}}",
   "Reopen": "Reabrir",
   "table_action_option.cancel": "table_action_option.cancelar",
+  "Unknown Technician": "Técnico Desconocido",
   "Do you want to mark this quotation as rejected?": "¿Quieres marcar este presupuesto como rechazada?",
+  "Total net revenue of all invoices sent from {{startDate}} to {{endDate}}. Draft invoices won't be counted.": "Total de ingresos netos de todas las facturas enviadas desde {{startDate}} hasta {{endDate}}. Los borradores de facturas no se contabilizarán.",
+  "Total number of all jobs completed from {{startDate}} to {{endDate}}. Cancelled & archived jobs won’t be counted.": "Número total de trabajos completados desde {{startDate}} hasta {{endDate}}. Los trabajos cancelados y archivados no se contabilizarán.",
+  "Total number of units between {{startDate}} to {{endDate}}. Archived units won’t be counted.": "Número total de unidades entre {{startDate}} y {{endDate}}. Las unidades archivadas no se contabilizarán.",
   "Mark as rejected": "Marcar como rechazado",
   "Selling price": "Precio de venta",
   "Payment data included": "Datos de pago incluidos"
