@@ -650,9 +650,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
     const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
 
-    const shouldDownloadPDF =
-      invoiceFormat === InvoiceFormat.PDF ||
-      invoiceFormat === InvoiceFormat.PDF_AND_XML;
     const shouldDownloadXML =
       invoiceFormat === InvoiceFormat.XML ||
       invoiceFormat === InvoiceFormat.PDF_AND_XML;
@@ -676,9 +673,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       const blobURL = URL.createObjectURL(blob!);
       const xmlBlobURL = URL.createObjectURL(xmlBlob!);
 
-      if (shouldDownloadPDF) {
-        downloadFile(blobURL);
-      }
+      downloadFile(blobURL); // pdf
       if (shouldDownloadXML) {
         downloadFile(xmlBlobURL, {extensionArg: '.xml'});
       }
@@ -688,9 +683,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         refetchXMLDownloadUrl(),
       ]);
 
-      if (shouldDownloadPDF) {
-        downloadFile(downloadUrlData.data?.[invoice.additionalInfo.pdfPath]);
-      }
+      downloadFile(downloadUrlData.data?.[invoice.additionalInfo.pdfPath]); // pdf
 
       if (shouldDownloadXML && invoice.additionalInfo.xmlPath) {
         downloadFile(
