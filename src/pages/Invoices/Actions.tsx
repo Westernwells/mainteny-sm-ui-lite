@@ -325,17 +325,8 @@ export const Actions = ({
     (r) => r.externalId === report?.externalId,
   );
 
-  const technicianSchedule = invoice?.serviceOrder?.schedules.find(
-    (s) => s.technician.id === selectedOption.technicianId,
-  );
-
   const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
     report?.technicianId || '',
-  );
-
-  const technicianName = getTechnicianName(
-    technicianSchedule,
-    fetchedTechnician,
   );
 
   const {data: signatureDownloadUrls = {}} = useDownloadUrl(
@@ -397,6 +388,15 @@ export const Actions = ({
       });
     });
 
+    const technicianSchedule = invoice?.serviceOrder?.schedules.find(
+      (s) => s.technician.id === selectedChecklist?.technicianId,
+    );
+
+    const technicianNameForChecklist = getTechnicianName(
+      technicianSchedule,
+      fetchedTechnician,
+    );
+
     const blob = await pdf(
       <ChecklistPdf
         pdfConfigClientStorage={pdfConfig}
@@ -407,13 +407,14 @@ export const Actions = ({
         selectedChecklist={selectedChecklist}
         sortedChecklistComponents={sortedChecklistComponentsCloned}
         signaturePath={signatureImageUrl}
-        technicianName={technicianName}
+        technicianName={technicianNameForChecklist}
         headerPath={headerUrl[headerInfo?.path]}
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
       />,
     ).toBlob();
+
     return blob;
   };
 
@@ -462,20 +463,28 @@ export const Actions = ({
   );
 
   const generateWorkReportBlob = async (workReport: ServiceOrderReportView) => {
+    const technicianSchedule = invoice?.serviceOrder?.schedules.find(
+      (s) => s.technician.id === workReport.technicianId,
+    );
+
+    const technicianNameForReport = getTechnicianName(
+      technicianSchedule,
+      fetchedTechnician,
+    );
+
     const reportImageDownloadUrls =
       (await refetchImageDownloadUrls()).data ?? {};
     const convertedImages = await refetchConvertedImages(
       reportImageDownloadUrls,
     );
-    const reportSignaturesDownloadUrl = (await fetchDownloadUrls()).data;
+    const reportSignatureDownloadUrl = (await fetchDownloadUrls()).data;
     const signatureConvertedImages = await refetchSignatureConvertedImages(
-      reportSignaturesDownloadUrl,
+      reportSignatureDownloadUrl,
     );
 
     const workReportPictures = Object.keys(convertedImages)
       .filter((item) => {
         const technicianId = item.split('report/')[1].split('/')[0];
-
         return workReport.technicianId === technicianId;
       })
       .reduce((acc, path) => {
@@ -509,9 +518,10 @@ export const Actions = ({
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
-        technicianName={technicianName}
+        technicianName={technicianNameForReport}
       />,
     ).toBlob();
+
     return blob;
   };
 
