@@ -35,7 +35,7 @@ const SwissPageTemplate = ({qrImageSrc}: Props) => {
   return (
     <Page style={[styles.page, styles.qrCodePage]}>
       <View style={styles.qrBorder}>
-        <Image source={qrImageSrc} />
+        {qrImageSrc ? <Image source={qrImageSrc} /> : null}
       </View>
     </Page>
   );
