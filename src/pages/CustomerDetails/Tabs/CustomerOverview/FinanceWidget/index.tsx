@@ -130,8 +130,21 @@ const FinanceWidget = ({customer}: Props) => {
         : null,
     };
 
-    updateCustomer(finalData, customer.id, () => {
+    await updateCustomer(finalData, customer.id, () => {
       setOpenDialog(false);
+      reset({
+        vat: finalData.vat || '',
+        paymentTermId: finalData.paymentTermId || '',
+        ean: finalData.ean || '',
+        invoiceFormat: finalData.invoiceFormat || '',
+        offsettingAccount: finalData.offsettingAccount || '',
+        costCenter: finalData.costCenter || '',
+        buyerReference: finalData.buyerReference || '',
+        billingAddress: finalData.billingAddress || null,
+        otherAddress: finalData.otherAddress || null,
+        beneficiaryAddress: finalData.beneficiaryAddress || null,
+        billingEmail: finalData.billingEmail || '',
+      });
     });
   };
 
