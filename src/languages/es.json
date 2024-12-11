@@ -3005,6 +3005,10 @@
   "Total number of all jobs completed from {{startDate}} to {{endDate}}. Cancelled & archived jobs won’t be counted.": "Número total de trabajos completados desde {{startDate}} hasta {{endDate}}. Los trabajos cancelados y archivados no se contabilizarán.",
   "Total number of units between {{startDate}} to {{endDate}}. Archived units won’t be counted.": "Número total de unidades entre {{startDate}} y {{endDate}}. Las unidades archivadas no se contabilizarán.",
   "Mark as rejected": "Marcar como rechazado",
+  "Storage location": "Almacén",
+  "Buying price": "Precio de compra",
   "Selling price": "Precio de venta",
+  "Please provide a valid date for the job creation date": "Por favor indique una fecha válida para la creación del empleo",
+  "Please provide a valid date for the first invoice date": "Por favor indique una fecha válida para la primera factura",
   "Payment data included": "Datos de pago incluidos"
 }
