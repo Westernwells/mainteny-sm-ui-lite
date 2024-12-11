@@ -140,6 +140,7 @@ export const MapLocationPickerInner = ({
               }}
               bootstrapURLKeys={{
                 key: import.meta.env.REACT_APP_GOOGLE_MAPS_KEY!,
+                version: 'weekly',
               }}
               yesIWantToUseGoogleMapApiInternals
               onGoogleApiLoaded={({map}) => {

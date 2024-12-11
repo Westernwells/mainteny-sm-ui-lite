@@ -109,8 +109,23 @@ const GeneralInformationWidget = ({customer}: Props) => {
       postalAddress: applyCountryCode(data.postalAddress as Address),
     };
 
-    updateCustomer(payload, customer.id, () => {
+    await updateCustomer(payload, customer.id, () => {
       setOpenDialog(false);
+
+      reset({
+        name: payload.name || '',
+        externalId: payload.externalId || '',
+        priority: payload.priority || '',
+        url: payload.contact.url || '',
+        customerImagePath: payload.customerImagePath || '',
+        logoFile: null,
+        phone: payload.contact.phone || '',
+        email: payload.contact.email || '',
+        secondaryPhoneNumber: payload.secondaryPhoneNumber || '',
+        vatId: payload.vatId || '',
+        postalAddress: payload.postalAddress || null,
+        businessAddress: payload.businessAddress || null,
+      });
     });
   };
 
