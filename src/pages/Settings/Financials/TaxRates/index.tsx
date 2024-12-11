@@ -3,7 +3,7 @@ import {useForm} from 'react-hook-form';
 import {t} from 'i18next';
 import {theme} from 'theme';
 import {Typography, Box, Tooltip, Chip} from '@mui/material';
-import {AddOutlined, Receipt} from '@mui/icons-material';
+import {AddOutlined, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {VatView} from 'models/vat';
 import {TableColumnWithRender} from 'models/table';
 import {Button} from 'components/Button';
@@ -64,11 +64,16 @@ const COLUMNS: TableColumnWithRender<VatView>[] = [
     key: 'tax-rate-cell-legal-note',
     fieldName: 'legalNote',
     align: 'center',
+    textTransform: false,
     renderCell: (taxRate, cellProps) => (
       <Cell {...cellProps}>
         <TableCellText>
           <Tooltip title={taxRate.legalNote} arrow placement="top">
-            <Receipt fontSize="small" />
+            {taxRate.legalNote ? (
+              <Receipt fontSize="small" />
+            ) : (
+              <ReceiptOutlined fontSize="small" />
+            )}
           </Tooltip>
         </TableCellText>
       </Cell>

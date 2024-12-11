@@ -18,7 +18,12 @@ type Props = {
 };
 
 const TableHeaderCell = ({
-  column: {firstSticky = true, lastSticky = true, ...column},
+  column: {
+    firstSticky = true,
+    lastSticky = true,
+    textTransform = true,
+    ...column
+  },
   gap = 1,
   sortState,
   isFirst = false,
@@ -106,11 +111,17 @@ const TableHeaderCell = ({
           }}
           gap={gap}>
           <Tooltip
-            title={capitalize(t(column.headerName))}
+            title={
+              textTransform
+                ? capitalize(t(column.headerName))
+                : t(column.headerName)
+            }
             arrow
             placement="top">
             <Typography sx={{cursor: 'default'}} noWrap variant="subtitle2">
-              {capitalize(t(column.headerName))}
+              {textTransform
+                ? capitalize(t(column.headerName))
+                : t(column.headerName)}
             </Typography>
           </Tooltip>
           {onSort && (

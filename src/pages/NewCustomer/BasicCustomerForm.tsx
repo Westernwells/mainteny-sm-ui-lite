@@ -3,7 +3,7 @@ import {FormikProps} from 'formik';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid2';
 import InputAdornment from '@mui/material/InputAdornment';
-import {Email, Phone, Receipt} from '@mui/icons-material';
+import {Email, Phone, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {PageCard} from 'components/PageCard';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import {FormInput} from 'components/form/FormInput';
@@ -417,7 +417,11 @@ export const BasicCustomerForm = ({formik}: Props) => {
                         {taxRate.name}
                       </Typography>
                       <Tooltip title={taxRate.legalNote} arrow placement="top">
-                        <Receipt fontSize="small" />
+                        {taxRate.legalNote ? (
+                          <Receipt fontSize="small" />
+                        ) : (
+                          <ReceiptOutlined fontSize="small" />
+                        )}
                       </Tooltip>
                     </Box>
                     <Typography variant="body2" color="text.secondary">

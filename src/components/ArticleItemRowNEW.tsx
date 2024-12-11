@@ -51,7 +51,7 @@ import * as Yup from 'yup';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {createEmptyResource} from 'utils/paging';
 import {getArticleTypeText} from 'utils/article-utils';
-import {DragIndicator, Receipt} from '@mui/icons-material';
+import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
@@ -719,13 +719,17 @@ export const ArticleItemRowNEW = ({
               ) ||
               ''
             }
-            renderValue={(value) =>
-              `${
-                taxRates?.find((item) => item.id === value)?.percentage ||
-                value ||
-                0
-              }%`
-            }
+            renderValue={(value) => {
+              const taxRatePercentage = taxRates?.find(
+                (item) => item.id === value,
+              )?.percentage;
+
+              return `${
+                typeof taxRatePercentage === 'number'
+                  ? taxRatePercentage
+                  : value || 0
+              }%`;
+            }}
             name="unitAmount.vatId"
             id={`unitAmount.vatId-${index}`}
             notched
@@ -768,7 +772,11 @@ export const ArticleItemRowNEW = ({
                     {taxRate.name}
                   </Typography>
                   <Tooltip title={taxRate.legalNote} arrow placement="top">
-                    <Receipt fontSize="small" />
+                    {taxRate.legalNote ? (
+                      <Receipt fontSize="small" />
+                    ) : (
+                      <ReceiptOutlined fontSize="small" />
+                    )}
                   </Tooltip>
                 </Box>
                 <Typography variant="body2" color="text.secondary">
