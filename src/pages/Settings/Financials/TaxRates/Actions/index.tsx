@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {
   DeleteOutline,
@@ -9,7 +9,7 @@ import {Action} from 'models/table';
 import TableActionMenu from 'components/Table/TableActionMenu';
 import {Confirm} from 'components/Confirm';
 import {useDeleteVat, useUpdateVat} from 'hooks/reactQuery/useVats';
-import {Trans} from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import {VatView} from 'models/vat';
 import {Dialog} from 'components/Dialog';
 import {theme} from 'theme';
@@ -20,6 +20,7 @@ type Props = {
 };
 
 const Actions = ({taxRate}: Props) => {
+  const {t} = useTranslation();
   const {mutate: updateTaxRate} = useUpdateVat();
   const {mutate: deleteTaxRate} = useDeleteVat();
   const [openActionMenu, setOpenActionMenu] = useState<boolean>(false);
@@ -72,10 +73,10 @@ const Actions = ({taxRate}: Props) => {
     });
   };
 
-  const OPTIONS = useRef<Action[]>([
+  const OPTIONS: Action[] = [
     {
       icon: PushPinOutlined,
-      label: 'Set as default',
+      label: t('Set as default'),
       onTrigger: () => {
         setOpenActionMenu(false);
         handleSave({...taxRate, isDefault: true});
@@ -83,7 +84,7 @@ const Actions = ({taxRate}: Props) => {
     },
     {
       icon: EditOutlined,
-      label: 'Edit',
+      label: t('Edit'),
       onTrigger: () => {
         setOpenActionMenu(false);
         setOpenEditDialog(true);
@@ -91,15 +92,15 @@ const Actions = ({taxRate}: Props) => {
     },
     {
       icon: DeleteOutline,
-      label: 'Delete',
+      label: t('Delete'),
       onTrigger: onDelete,
     },
-  ]);
+  ];
 
   return (
     <>
       <TableActionMenu
-        options={OPTIONS.current}
+        options={OPTIONS}
         isOpen={openActionMenu}
         onToggle={setOpenActionMenu}
       />

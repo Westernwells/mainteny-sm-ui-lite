@@ -121,8 +121,7 @@ export const TaxRatesModal = ({form}: Props) => (
           multiline: true,
           minRows: 4,
           size: 'small',
-          required: true,
-          ...form.register('legalNote', {required: true}),
+          ...form.register('legalNote'),
         }}
       />
     </Grid>

@@ -48,7 +48,7 @@ import useHighlightText from 'hooks/useHighlightText';
 import {getArticleTypeText} from 'utils/article-utils';
 import {QuotationItemRecord} from 'models/quotation';
 import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
-import {DragIndicator, Receipt} from '@mui/icons-material';
+import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
@@ -716,13 +716,17 @@ export const ArticleItemRowQuotation = ({
               ) ||
               ''
             }
-            renderValue={(value) =>
-              `${
-                taxRates?.find((item) => item.id === value)?.percentage ||
-                value ||
-                0
-              }%`
-            }
+            renderValue={(value) => {
+              const taxRatePercentage = taxRates?.find(
+                (item) => item.id === value,
+              )?.percentage;
+
+              return `${
+                typeof taxRatePercentage === 'number'
+                  ? taxRatePercentage
+                  : value || 0
+              }%`;
+            }}
             name="unitAmount.vatId"
             id={`unitAmount.vatId-${index}`}
             notched
@@ -765,7 +769,11 @@ export const ArticleItemRowQuotation = ({
                     {taxRate.name}
                   </Typography>
                   <Tooltip title={taxRate.legalNote} arrow placement="top">
-                    <Receipt fontSize="small" />
+                    {taxRate.legalNote ? (
+                      <Receipt fontSize="small" />
+                    ) : (
+                      <ReceiptOutlined fontSize="small" />
+                    )}
                   </Tooltip>
                 </Box>
                 <Typography variant="body2" color="text.secondary">

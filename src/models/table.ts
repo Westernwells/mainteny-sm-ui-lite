@@ -28,6 +28,7 @@ export type CellProps = {
   firstSticky?: boolean;
   lastSticky?: boolean;
   noPadding?: boolean;
+  textTransform?: boolean;
 };
 
 export type TableColumn = CellProps & HeaderCellProps & {key: string};
