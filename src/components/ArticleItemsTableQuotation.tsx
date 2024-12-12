@@ -79,6 +79,7 @@ export const ArticleItemsTableQuotation = ({
 
   const articleViewToItem = (article: ArticleView): QuotationItemRecord => {
     const record: QuotationItemRecord = {
+      id: article.id,
       article,
       name: article.name,
       description: article.description,
@@ -293,44 +294,44 @@ export const ArticleItemsTableQuotation = ({
                 <TableBody
                   ref={providedDrop.innerRef}
                   {...providedDrop.droppableProps}>
-                  {items.map((item, index) => (
-                    <Draggable
-                      key={index + (item.article?.id || item.name)}
-                      draggableId={index + (item.article?.id || item.name)}
-                      index={index}>
-                      {(provided) => (
-                        <TableRow
-                          sx={{
-                            position: 'relative',
-                            width: '100%',
-                            '& .MuiTableCell-root': {
-                              verticalAlign: 'top',
-                            },
-                            ':hover': {
-                              '.drag-indicator': {
-                                visibility: 'visible',
+                  {items.map((item, index) => {
+                    const key = index + (item.article?.id || item.id || '');
+                    return (
+                      <Draggable key={key} draggableId={key} index={index}>
+                        {(provided) => (
+                          <TableRow
+                            sx={{
+                              position: 'relative',
+                              width: '100%',
+                              '& .MuiTableCell-root': {
+                                verticalAlign: 'top',
                               },
-                            },
-                          }}
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}>
-                          <ArticleItemRowQuotation
-                            key={index + (item.article?.id || item.name)}
-                            articleItem={item}
-                            index={index}
-                            deleteItem={deleteItem}
-                            setItemAtIndex={setItemAtIndex}
-                            propertyOwner={propertyOwner}
-                            handleSelectItem={handleSelectItem}
-                            isHovered={isHovered}
-                            defaultPercentageVat={defaultPercentageVat}
-                            taxRates={taxRates!}
-                          />
-                        </TableRow>
-                      )}
-                    </Draggable>
-                  ))}
+                              ':hover': {
+                                '.drag-indicator': {
+                                  visibility: 'visible',
+                                },
+                              },
+                            }}
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}>
+                            <ArticleItemRowQuotation
+                              key={key}
+                              articleItem={item}
+                              index={index}
+                              deleteItem={deleteItem}
+                              setItemAtIndex={setItemAtIndex}
+                              propertyOwner={propertyOwner}
+                              handleSelectItem={handleSelectItem}
+                              isHovered={isHovered}
+                              defaultPercentageVat={defaultPercentageVat}
+                              taxRates={taxRates!}
+                            />
+                          </TableRow>
+                        )}
+                      </Draggable>
+                    );
+                  })}
                   {providedDrop.placeholder}
                 </TableBody>
               )}
