@@ -681,11 +681,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
               ))}
           </Box>
         </Box>
-        <Maintenance
-          schedule={schedule}
-          formik={formik}
-          isEdit={isEditMode || false}
-        />
+        <Maintenance formik={formik} isEdit={isEditMode || false} />
 
         <ArticleItemsTable
           items={articles}
