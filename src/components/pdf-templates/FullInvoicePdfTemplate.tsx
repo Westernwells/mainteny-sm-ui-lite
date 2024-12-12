@@ -295,6 +295,8 @@ const FullInvoicePdfTemplate = ({
       invoice?.propertyOwner?.additionalInfo?.vatId) ||
     '';
 
+  const eanValue = invoice?.propertyOwner.additionalInfo.ean || '';
+
   return (
     <Document>
       {invoice?.additionalInfo.alternativeAddress &&
@@ -336,6 +338,7 @@ const FullInvoicePdfTemplate = ({
               selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
+              eanValue={eanValue}
             />
 
             <PdfTemplateInvoiceDetails

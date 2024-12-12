@@ -5,7 +5,6 @@ import {
   QueryPropertyOwnersParams,
 } from 'models/propertyManager';
 import {useSnackbar} from 'hooks/useSnackbar';
-import {CustomerEditForm} from 'pages/CustomerDetails/Tabs/CustomerOverview/EditCustomerForm/model';
 import {NewCustomerBody} from 'pages/NewCustomer/model';
 import {
   useInfiniteQuery,
@@ -17,7 +16,11 @@ import {
 import {queryKeys as qks, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {formatUpdateCustomer} from 'utils/customer-utils';
-import {CreateCustomerNote} from 'models/customer';
+import {
+  CreateCustomerNote,
+  CustomerEditForm,
+  CustomerStatisticsParams,
+} from 'models/customer';
 import {Comment} from 'models/comment';
 import {useUserSession} from './useUserSession';
 import {Page} from '../../models/pagination';
@@ -293,6 +296,34 @@ export const useDeleteCustomer = (successMsg?: string) => {
         );
         showError(err);
       },
+    },
+  );
+};
+
+export const queryCustomerStatistics = async (
+  id: string,
+  params: CustomerStatisticsParams,
+) => {
+  const response = await axiosClient.get(
+    `/api/propertyOwners/${id}/statistics`,
+    {params, paramsSerializer},
+  );
+  return response.data;
+};
+
+export const useUseQueryCustomerStatistics = (
+  id: string,
+  params: CustomerStatisticsParams,
+  options?: any,
+) => {
+  const {user} = useUserSession();
+
+  return useQuery(
+    [queryKeys.queryCustomerStatistics, params, id],
+    () => queryCustomerStatistics(id, params),
+    {
+      enabled: !!id && !!user && !!(params.startDate && params.endDate),
+      ...options,
     },
   );
 };

@@ -1,386 +1,333 @@
-import {useCallback, useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {Box, Typography} from '@mui/material';
-import {GridRowsProp} from '@mui/x-data-grid';
-import Add from '@mui/icons-material/Add';
-import * as Yup from 'yup';
-import {useFormik} from 'formik';
-
-import {DataGridLayout} from 'components/DataGridLayout';
-import {Dialog} from 'components/Dialog';
+import {useState, useMemo, useRef} from 'react';
+import Typography from '@mui/material/Typography';
 import {InfoCard} from 'components/InfoCard';
+import {ReactComponent as HeadphonesHumanIcon} from 'assets/icons/HeadphonesHumanIcon.svg';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import {useTranslation} from 'react-i18next';
 import {
-  useCreateContact,
-  useDeleteContact,
-  useInviteContact,
-  usePropertyOwnerContacts,
-  useUpdateContact,
+  RefContactPersonView,
+  ContactPersonAssociationType,
+  ConnectionTypeLabels,
+  RefContactTableRow,
+} from 'models/contacts';
+import {
+  useAddContactPersonAssociation,
+  useDisconnectContactPersonAssociation,
+  useRefContactPersons,
 } from 'hooks/reactQuery/useContacts';
-import {ContactFormModel, ContactsView} from 'models/contacts';
-import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
-import {PropertyContactPersonRole} from 'pages/NewCustomer/model';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {EmptySection} from 'components/EmptySection';
-import {convertToMacro, convertToText} from 'utils/utils';
+import {createEmptyResource} from 'utils/paging';
 import {Confirm} from 'components/Confirm';
-import {createEmptyResource, makePage} from 'utils/paging';
-import {formatPhoneNumber} from 'utils/customer-utils';
-import {InfoBanner} from 'components/InfoBanner';
-import {columns, makeRows} from './ContactsWidgetDataGridProps';
-import {EditContactForm} from './EditContactForm';
+import {EmptySection} from 'components/EmptySection';
+import ContactDetails from 'pages/Contacts/ContactDetails';
+import WidgetContactFormDialog from 'pages/Contacts/ContactsWidget/WidgetContactFormDialog';
+import ContactFormDialog from 'pages/Contacts/ContactFormDialog';
+import TableContainer from 'components/Table/TableContainer';
+import TableHeader from 'components/Table/TableHeader';
+import TableBody from 'components/Table/TableBody';
+import TableRow from 'components/Table/TableRow';
+import {aggregateCustomerContactsRow} from 'utils/contact';
+import Cell from 'components/Table/TableCell';
+import TableCellText from 'components/Table/TableCellText';
+import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import {useNavigate} from 'react-router-dom';
+import {Avatar} from 'components/Avatar';
+import {theme} from 'theme';
+import Actions from './Actions';
 
 interface Props {
-  customerId: string;
+  refId: string;
+  refType: ContactPersonAssociationType;
 }
 
-const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required('First name is required'),
-  lastName: Yup.string().required('Last name is required'),
-  phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
-  roles: Yup.string().required('Role is required'),
-});
+const PAGE_SIZE = 25;
 
-const validationSchemaWithEmailRequired = Yup.object().shape({
-  firstName: Yup.string().required('First name is required'),
-  lastName: Yup.string().required('Last name is required'),
-  phone: Yup.string().matches(phoneValidationRE, 'Phone number is not valid'),
-  roles: Yup.string().required('Role is required'),
-  email: Yup.string().required('Email is required'),
-});
-
-export const ContactsWidget = ({customerId}: Props) => {
+const ContactsWidget = ({refId, refType}: Props) => {
   const {t} = useTranslation();
-  const {user} = useUserSession();
-  const [page, setPage] = useState(makePage(0, 5));
-  const [pageCount, setPageCount] = useState(0);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
+  const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedContact, setSelectedContact] = useState<
+    RefContactPersonView | undefined
+  >();
+  const [openFormDialog, setOpenFormDialog] = useState(false);
+  const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
+  const [formType, setFormType] = useState<'create' | 'edit'>('create');
+  const [showSideDrawer, setShowSideDrawer] = useState(false);
+  const [showLeftShadow, setShowLeftShadow] = useState(false);
+  const [showRightShadow, setShowRightShadow] = useState(false);
 
-  const [rows, setRows] = useState<GridRowsProp>([]);
+  const {
+    data: contactPersonsResource = createEmptyResource<RefContactPersonView>(
+      PAGE_SIZE,
+    ),
+    refetch,
+  } = useRefContactPersons({refType, refId, pageSize: PAGE_SIZE, pageIndex: 0});
 
-  const [activeContact, setActiveContact] = useState<ContactsView | undefined>(
-    undefined,
+  const {mutateAsync: addContactConnection} = useAddContactPersonAssociation(
+    'Connection successfully added',
   );
-  const [typeAction, setTypeAction] = useState<
-    'edit' | 'create' | 'invite' | undefined
-  >(undefined);
+  const {mutateAsync: disconnect, isLoading: isDisconnecting} =
+    useDisconnectContactPersonAssociation('Connection removed');
 
-  const {mutateAsync: updateContact} = useUpdateContact(
-    'Contact updated successfully',
-  );
-
-  const {mutateAsync: createContact} = useCreateContact(
-    'Contact added successfully',
-  );
-
-  const {mutateAsync: deleteContact} = useDeleteContact(
-    'Contact deleted successfully',
-  );
-  const {mutateAsync: inviteContact} = useInviteContact(
-    'Contact invited successfully',
-  );
-
-  const formik = useFormik<ContactFormModel>({
-    initialValues: {
-      phone: '',
-      secondaryPhone: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      roles: convertToText(PropertyContactPersonRole.FACILITY_MANAGER),
-    },
-    onSubmit: (values, {resetForm}) => {
-      resetForm();
-    },
-    validationSchema:
-      typeAction === 'invite'
-        ? validationSchemaWithEmailRequired
-        : validationSchema,
-  });
-
-  const {data: contactsResource = createEmptyResource<ContactsView>(5)} =
-    usePropertyOwnerContacts(page, customerId || '');
-
-  useEffect(() => {
-    setRows(makeRows(contactsResource));
-    setPageCount(Math.ceil(contactsResource.total / page.pageSize));
-  }, [contactsResource, page.pageSize]);
-
-  const getEditableContacts = (item: ContactsView) => {
-    formik.setValues({
-      phone: item?.userAccount.contact.phone.replace(/[^\d]/g, '') || '',
-      secondaryPhone:
-        item?.additionalInfo?.secondaryPhone?.replace(/[^\d]/g, '') ?? '',
-      firstName: item?.userAccount.firstName || '',
-      lastName: item?.userAccount.lastName || '',
-      email: item?.userAccount.contact.email || '',
-      roles: item?.userAccount.roles[0] || '',
-    });
-
-    setActiveContact(item);
-    setOpenDialog(true);
-    setTypeAction('edit');
+  const handleDeleteContact = (refContact: RefContactPersonView) => {
+    setSelectedContact(refContact);
+    setOpenDeleteConfirm(true);
   };
 
-  const getInvitableContacts = (item: ContactsView) => {
-    formik.setValues({
-      phone: item?.userAccount.contact.phone.replace(/[^\d]/g, '') || '',
-      secondaryPhone:
-        item?.additionalInfo?.secondaryPhone?.replace(/[^\d]/g, '') ?? '',
-      firstName: item?.userAccount.firstName || '',
-      lastName: item?.userAccount.lastName || '',
-      email: item?.userAccount.contact.email || '',
-      roles: item?.userAccount.roles[0] || '',
-    });
-
-    setActiveContact(item);
-    setOpenDialog(true);
-    setTypeAction('invite');
+  const handleEditContact = async (refContact: RefContactPersonView) => {
+    setSelectedContact(refContact);
+    setFormType('edit');
+    setOpenFormDialog(true);
   };
 
-  const onCreateContact = () => {
-    formik.setValues({
-      phone: '',
-      secondaryPhone: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      roles: convertToText(PropertyContactPersonRole.FACILITY_MANAGER),
-    });
-
-    setActiveContact(undefined);
-    setOpenDialog(true);
-    setTypeAction('create');
-    formik.resetForm();
+  const handleAddContact = async () => {
+    setSelectedContact(undefined);
+    setFormType('create');
+    setOpenFormDialog(true);
   };
 
-  const getDeletableContacts = (item: ContactsView) => {
-    setActiveContact(item);
-    setOpenCancelConfirm(true);
-  };
-
-  const updateCurrentContact = async () => {
-    await updateContact({
-      body: {
-        propertyContactPerson: {
-          externalId: customerId,
-          roles: [convertToMacro(formik.values.roles)],
-          secondaryPhone: formik.values.secondaryPhone
-            ? formatPhoneNumber(formik.values.secondaryPhone)
-            : '',
-        },
-        userAccount: {
-          category: activeContact?.userAccount.category || '',
-          contact: {
-            email: formik.values.email,
-            phone: formik.values.phone
-              ? formatPhoneNumber(formik.values.phone)
-              : '',
-          },
-          firstName: formik.values.firstName,
-          lastName: formik.values.lastName,
-          photoUrl: activeContact?.userAccount.photoUrl || '',
-          title: activeContact?.userAccount.title || '',
-          username: formik.values.email || '',
-        },
-      },
-      contactId: activeContact?.id || '',
-    });
-
-    setOpenDialog(false);
-  };
-
-  const updateCurrentContactAndInvite = async () => {
-    await updateContact({
-      body: {
-        propertyContactPerson: {
-          externalId: customerId,
-          roles: [convertToMacro(formik.values.roles)],
-          secondaryPhone: formik.values.secondaryPhone
-            ? formatPhoneNumber(formik.values.secondaryPhone)
-            : '',
-        },
-        userAccount: {
-          category: activeContact?.userAccount.category || '',
-          contact: {
-            email: formik.values.email,
-            phone: formik.values.phone
-              ? formatPhoneNumber(formik.values.phone)
-              : '',
-          },
-          firstName: formik.values.firstName,
-          lastName: formik.values.lastName,
-          photoUrl: activeContact?.userAccount.photoUrl || '',
-          title: activeContact?.userAccount.title || '',
-          username: formik.values.email || '',
-        },
-      },
-      contactId: activeContact?.id || '',
-    });
-    await inviteContact({
-      username: activeContact?.id || '',
-      propertyContactPersonId: activeContact?.id || '',
-    });
-
-    setOpenDialog(false);
-  };
-
-  const saveNewContact = async () => {
-    await createContact({
-      body: {
-        propertyContactPerson: {
-          externalId: customerId,
-          roles: [convertToMacro(formik.values.roles)],
-          propertyOwnerId: customerId,
-          secondaryPhone: formik.values.secondaryPhone
-            ? formatPhoneNumber(formik.values.secondaryPhone)
-            : '',
-        },
-        userAccount: {
-          category: '',
-          contact: {
-            email: formik.values.email,
-            phone: formik.values.phone
-              ? formatPhoneNumber(formik.values.phone)
-              : '',
-          },
-          firstName: formik.values.firstName,
-          lastName: formik.values.lastName,
-          photoUrl: '',
-          title: '',
-          username: formik.values.email,
-          serviceCompanyId: user?.userAccount.serviceCompany.id || '',
-        },
-      },
-    });
-    setOpenDialog(false);
-  };
-
-  const onDelete = async () => {
-    await deleteContact({
-      contactId: activeContact?.id || '',
-    });
-
-    setOpenCancelConfirm(false);
-  };
-
-  const handleEditOnSave = () => {
-    if (typeAction === 'edit') {
-      updateCurrentContact();
+  const handleAfterSubmit = async (newContactPersonId?: string) => {
+    if (formType === 'create') {
+      await addContactConnection({
+        body: {refId, refType},
+        contactPersonId: newContactPersonId || '',
+      });
     }
-
-    if (typeAction === 'create') {
-      saveNewContact();
-    }
-
-    if (typeAction === 'invite') {
-      updateCurrentContactAndInvite();
-    }
+    await refetch();
+    setSelectedContact(undefined);
   };
+
+  const handleDeleteConfirm = async ({
+    contactPersonId,
+    associationId,
+  }: {
+    contactPersonId: string;
+    associationId: string;
+  }) => {
+    await disconnect({contactPersonId, associationId});
+    await refetch();
+    setOpenDeleteConfirm(false);
+  };
+
+  const handleRowClick = (params: RefContactPersonView) => () => {
+    setSelectedContact(params as RefContactPersonView);
+    setShowSideDrawer(true);
+  };
+
+  const handleEmployeeCellClick = (id: string) => () => {
+    navigate(`/employees/details/${id}`);
+  };
+
+  const rows = useMemo(
+    () => aggregateCustomerContactsRow(contactPersonsResource.data),
+    [contactPersonsResource],
+  );
+
+  const COLUMNS = useMemo<TableColumnWithRender<RefContactTableRow>[]>(
+    () => [
+      {
+        headerName: 'Name',
+        key: 'customer-contact-portal-cell-name',
+        width: '209px',
+        isFirst: true,
+        showShadows: showRightShadow ? 'right' : undefined,
+        renderCell: (refContact, cellProps) => (
+          <Cell
+            {...cellProps}
+            onClick={handleEmployeeCellClick(refContact.contactId)}>
+            <Avatar
+              labelStyles={{
+                color: theme.palette.primary.light,
+              }}
+              key={`company-avatar-${refContact.contactId}`}
+              userAccount={{firstName: refContact.name}}
+            />
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Company',
+        key: 'customer-contact-cell-company',
+        width: '209px',
+        renderCell: (refContact, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{refContact.company}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Phone',
+        key: 'customer-contact-cell-phone',
+        width: '209px',
+        renderCell: (refContact, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{refContact.phone}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Phone 2',
+        key: 'customer-contact-cell-secondary-phone',
+        width: '209px',
+        renderCell: (refContact, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{refContact.secondaryPhoneNumber}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Email Address',
+        key: 'customer-contact-cell-email',
+        width: '209px',
+        renderCell: (refContact, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText
+              tableCellTextStyles={{
+                color: theme.palette.primary.light,
+              }}>
+              <TableCellText>{refContact.emailAddress}</TableCellText>
+            </TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Role',
+        key: 'customer-contact-cell-role',
+        width: '209px',
+        renderCell: (refContact, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{t(refContact.role)}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'action',
+        key: 'customer-contact-cell-actions',
+        isHeaderNameHidden: true,
+        align: 'center',
+        width: ACTION_CELL_WIDTH, // set static width that will not change
+        isLast: true,
+        noPadding: true,
+        showShadows: showLeftShadow ? 'left' : undefined,
+        renderCell: (refContact, cellProps) => (
+          <Cell {...cellProps} onClick={undefined}>
+            <Actions
+              onEdit={() => handleEditContact(refContact.contactResourceData)}
+              onDelete={() =>
+                handleDeleteContact(refContact.contactResourceData)
+              }
+            />
+          </Cell>
+        ),
+      },
+    ],
+    [showLeftShadow, showRightShadow],
+  );
+
+  const currentContact = useMemo(
+    () =>
+      contactPersonsResource.data.find((el) => el.id === selectedContact?.id) ||
+      selectedContact,
+    [contactPersonsResource.data, selectedContact],
+  );
 
   return (
-    <Box>
+    <>
       <InfoCard
-        header={
-          <Typography variant="subtitle1">{t('Contact Persons')}</Typography>
+        header={<Typography variant="h5">{t('Contacts')}</Typography>}
+        headerIcon={
+          <HeadphonesHumanIcon style={{width: '2rem', height: '2rem'}} />
         }
-        containerStyles={{flexGrow: 1}}
-        headerStyles={{mt: '0.5em'}}
-        handleAction={onCreateContact}
+        handleAction={handleAddContact}
         headerActionIcon={
-          <Typography
-            color="primary.main"
-            display="flex"
-            alignItems="center"
-            gap={1}>
-            <Add fontSize="small" />
-            {t('Contact Person')}
-          </Typography>
-        }
-        showHeaderBackground>
-        <InfoBanner
-          title="An email address is required to invite others to Mainteny"
-          body={[
-            'But it is optional when setting up account',
-            'Add an email address by editing the contact person information',
-          ]}
-        />
+          rows.length ? (
+            <AddOutlinedIcon sx={{color: 'primary.dark'}} />
+          ) : undefined
+        }>
+        <TableContainer
+          containerRef={containerRef}
+          setShowLeftShadow={setShowLeftShadow}
+          setShowRightShadow={setShowRightShadow}>
+          <TableHeader columns={COLUMNS} capitalize />
+          <TableBody>
+            {rows.map((entry) => (
+              <TableRow
+                key={`customer-contact-portal-row-${entry.id}`}
+                testId={`customer-contact-portal-row-${entry.id}`}>
+                {COLUMNS.map(({renderCell, ...rest}) =>
+                  renderCell(entry, {
+                    onClick: handleRowClick(entry.contactResourceData),
+                    ...rest,
+                  }),
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </TableContainer>
 
-        <DataGridLayout
-          fullHeight={false}
-          isCellClickable={false}
-          height={400}
-          rows={rows}
-          columns={useCallback(
-            () =>
-              columns(
-                getEditableContacts,
-                getDeletableContacts,
-                getInvitableContacts,
-              ),
-            [],
-          )()}
-          noRowsEmptySection={
-            <EmptySection
-              illustration="clipboard"
-              size="tiny"
-              containerStyle={{my: '6rem'}}
-              label="No Contact Persons. Do you want to add someone?"
-              showActionBtn
-              btnLabel="Contact person"
-              btnAction={onCreateContact}
-            />
-          }
-          isWidget
-          containerStyle={{
-            borderBottom: 'none',
-          }}
-          pageIndex={page.pageIndex + 1}
-          pageSize={page.pageSize}
-          handlePageSizeChange={(newPageSize: number) =>
-            setPage({...page, pageSize: newPageSize})
-          }
-          handlePageChange={(newPage: number) => {
-            setPage({...page, pageIndex: newPage - 1});
-          }}
-          pageCount={pageCount}
-          totalRows={contactsResource.total}
-        />
+        {rows.length < 1 && (
+          <EmptySection
+            showActionBtn
+            illustration="contacts"
+            size="tiny"
+            containerStyle={{width: '60%', m: 'auto', paddingTop: '50px'}}
+            label={t('No Contact Persons')}
+            subLabel={t('Do you want to add someone?')}
+            btnLabel={t('New Contact person')}
+            btnAction={handleAddContact}
+          />
+        )}
       </InfoCard>
-      <Dialog
-        title={
-          typeAction === 'edit' || typeAction === 'invite'
-            ? 'Edit Contact Person'
-            : 'Add Contact Person'
-        }
-        saveButtonText={typeAction === 'invite' ? 'Save and Send' : 'Save'}
-        disableSaveBtn={!!Object.keys(formik.errors).length}
-        onCancel={() => {
-          if (typeAction !== 'edit') {
-            setOpenDialog(false);
-          }
 
-          setOpenDialog(false);
-        }}
-        onSave={handleEditOnSave}
-        dialogProps={{
-          maxWidth: 'sm',
-          open: openDialog || false,
-        }}>
-        <EditContactForm typeAction={typeAction} formik={formik} />
-      </Dialog>
-      <Confirm
-        open={openCancelConfirm}
-        onConfirm={() => onDelete()}
-        onClose={() => setOpenCancelConfirm(false)}
-        title="Delete"
-        content={t(
-          'Do you want to delete {{customerName}} from the contact persons list?',
-          {
-            customerName: `${activeContact?.userAccount.firstName} ${activeContact?.userAccount.lastName}`,
-          },
+      <ContactDetails
+        showSideDrawer={showSideDrawer}
+        setShowSideDrawer={setShowSideDrawer}
+        contactPerson={contactPersonsResource.data.find(
+          (el) => el.id === selectedContact?.id,
         )}
       />
-    </Box>
+
+      {formType === 'create' ? (
+        <WidgetContactFormDialog
+          contactPerson={currentContact}
+          formType={formType}
+          openDialog={openFormDialog}
+          setOpenDialog={setOpenFormDialog}
+          onAfterSubmit={handleAfterSubmit}
+        />
+      ) : (
+        <ContactFormDialog
+          contactPerson={currentContact}
+          formType={formType}
+          openDialog={openFormDialog}
+          setOpenDialog={setOpenFormDialog}
+          onAfterSubmit={handleAfterSubmit}
+        />
+      )}
+
+      <Confirm
+        maxWidth={450}
+        disableActions={isDisconnecting}
+        open={openDeleteConfirm}
+        onConfirm={() =>
+          handleDeleteConfirm({
+            contactPersonId: selectedContact?.id || '',
+            associationId: selectedContact?.associationId || '',
+          })
+        }
+        onClose={() => setOpenDeleteConfirm(false)}
+        title={t('Remove connection')}
+        content={t(
+          'You are about to disconnect contact from this {{refType}}.',
+          {
+            refType: t(ConnectionTypeLabels[refType]),
+          },
+        )}
+        secondContent={t('Are you sure about it?')}
+        closeBtnLabel={t('Cancel')}
+        confirmBtnLabel={t('Remove')}
+      />
+    </>
   );
 };
+
+export default ContactsWidget;

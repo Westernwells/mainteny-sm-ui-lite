@@ -43,6 +43,7 @@ export const queryKeys = {
   queryTechniciansEvents: 'queryTechniciansEvents',
   getCustomer: 'getCustomer',
   queryCustomerContract: 'queryCustomerContract',
+  queryCustomerStatistics: 'queryCustomerStatistics',
   queryUnitsByCustomer: 'queryUnitsByCustomer',
   getTechnician: 'getTechnician',
   getUserAccount: 'getUserAccount',

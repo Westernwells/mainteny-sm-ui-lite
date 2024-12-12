@@ -166,7 +166,7 @@ const InvoiceOverduePdfPreview = ({
   const styles = getStyles(boldFontStyle, regularFontStyle);
 
   const overdueTotal = (initialAmount: number, handlingAmount: number) =>
-    formatCurrency(handlingAmount + initialAmount ?? 0, {
+    formatCurrency(handlingAmount + initialAmount, {
       currency: currentCurrency?.code,
       excludeCurrencySymbol: true,
       currencySymbol: currentCurrency?.symbol,
@@ -188,6 +188,8 @@ const InvoiceOverduePdfPreview = ({
       invoice?.propertyOwner?.additionalInfo?.vatId) ||
     '';
 
+  const eanValue = invoice?.propertyOwner.additionalInfo.ean || '';
+
   return (
     <Document>
       <PdfPageContainer selectedLng={selectedLng}>
@@ -207,6 +209,7 @@ const InvoiceOverduePdfPreview = ({
               selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
+              eanValue={eanValue}
             />
 
             <View style={styles.rightAddress}>

@@ -30,9 +30,26 @@ export const CardDataListItem = ({
     return value;
   }, [value, translateValue]);
 
+  const isEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+
+  const isWebsite = (val: string) =>
+    /^(https?:\/\/)?(www\.)?[\w-]+(\.[\w-]+)+[/#?]?.*$/.test(val);
+
+  const handleLink = (val: string) => {
+    if (isEmail(val)) {
+      return `mailto:${val}`;
+    }
+    if (isWebsite(val)) {
+      return val.startsWith('http') ? val : `https://${val}`;
+    }
+    return null;
+  };
+
+  const link = handleLink(displayValue as string);
+
   return (
-    <Box display="flex" alignItems="center" justifyContent="space-between">
-      <Box display="flex" alignItems="center" gap={1}>
+    <Box display="flex" alignItems="flex-start" justifyContent="space-between">
+      <Box display="flex" alignItems="center" gap={1} sx={{minWidth: 200}}>
         {!!Icon && (
           <Icon
             sx={{color: 'text.disabled', fontSize: '1.3rem', ...iconProps.sx}}
@@ -45,9 +62,26 @@ export const CardDataListItem = ({
         </Typography>
       </Box>
       {showValue ? (
-        <Typography variant="subtitle2" color="primary.dark">
-          {displayValue}
-        </Typography>
+        link ? (
+          <Typography
+            variant="subtitle2"
+            color="#0092B2"
+            textAlign="right"
+            component="a"
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{textDecoration: 'none'}}>
+            {displayValue}
+          </Typography>
+        ) : (
+          <Typography
+            variant="subtitle2"
+            color="primary.dark"
+            textAlign="right">
+            {displayValue}
+          </Typography>
+        )
       ) : null}
     </Box>
   );

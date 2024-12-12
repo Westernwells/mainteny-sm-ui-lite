@@ -26,8 +26,10 @@ export const calculateTotal = (
       (arrayItem) =>
         arrayItem.quantity *
         ((arrayItem.unitPurchaseAmount?.netAmount ?? 0) /
-          10 ** Currencies[arrayItem.unitSellingAmount.currency] ??
-          currencyCode),
+          10 **
+            Currencies[
+              arrayItem.unitSellingAmount.currency || currencyCode || 'EUR'
+            ]),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
 };

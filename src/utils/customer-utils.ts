@@ -1,5 +1,6 @@
-import {CustomerEditForm} from 'pages/CustomerDetails/Tabs/CustomerOverview/EditCustomerForm/model';
-import {formatAddressFullname} from './utils';
+import {CustomerEditForm, CustomerPortalTableRow} from 'models/customer';
+import {ContactsView, PORTAL_PERSON_STATUS} from 'models/contacts';
+import {convertToText, formatAddressFullname} from './utils';
 
 export const formatPhoneNumber = (phoneNumber: string) =>
   `+${phoneNumber.replaceAll('+', '')}`;
@@ -70,3 +71,38 @@ export const createNameSearchQuery = (value: string) =>
     .split(' ')
     .map((word) => `[name:*${word}*]`)
     .join('');
+
+export const getTaxRate = (taxRate?: {percentage?: number}) =>
+  taxRate?.percentage === 0
+    ? '0%'
+    : taxRate?.percentage
+    ? `${taxRate?.percentage}%`
+    : '-';
+
+export const aggregateCustomerPortalRow = (
+  contactResources: ContactsView[],
+): CustomerPortalTableRow[] =>
+  contactResources.map((contactResource) => ({
+    contactResourceData: contactResource,
+    id: contactResource.id,
+    customerId: contactResource.userAccount.id,
+    name: `${contactResource.userAccount.firstName} ${contactResource.userAccount.lastName}`,
+    emailAddress: contactResource.userAccount.contact.email || '-',
+    role: contactResource.userAccount.roles.map((role) => convertToText(role)),
+    access: contactResource.userAccount.status,
+  }));
+
+export const getStatusLabel = (access: string): string | null => {
+  switch (access) {
+    case PORTAL_PERSON_STATUS.ACTIVE:
+      return 'Active';
+    case PORTAL_PERSON_STATUS.PENDING:
+      return 'Pending';
+    case PORTAL_PERSON_STATUS.REVOKED:
+      return 'Revoked';
+    case PORTAL_PERSON_STATUS.INACTIVE:
+      return 'Inactive';
+    default:
+      return null;
+  }
+};

@@ -55,7 +55,7 @@ export const FieldActivities = ({
   const isElevatorDeleted = useCallback(
     (elevatorId: string) =>
       entitiesStates?.find((entityState) => entityState.id === elevatorId)
-        ?.state === State.DELETED ?? true,
+        ?.state === State.DELETED,
     [entitiesStates],
   );
 

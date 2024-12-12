@@ -1117,7 +1117,7 @@ export const MutationService = ({
               <Typography variant="h6">
                 {formatCurrency(
                   calculateContractInvoicePriceTotal(selectedElevators) /
-                    10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                    10 ** currentCurrency.fractionDigits,
                   {
                     currency: currentCurrency.code,
                   },

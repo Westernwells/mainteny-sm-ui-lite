@@ -23,7 +23,7 @@ export const aggregatePurchaseInvoiceRow = (
     amount:
       formatCurrency(
         purchaseInvoice.totalAmount.netAmount! /
-          (10 ** purchaseInvoice.totalAmount.fractionDigits! ?? 0),
+          10 ** purchaseInvoice.totalAmount.fractionDigits!,
       ) ?? '-',
     hasAttachments: !!purchaseInvoice.additionalInfo.documents.length,
     serviceOrders: purchaseInvoice.additionalInfo.serviceOrders,

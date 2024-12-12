@@ -281,6 +281,8 @@ const QuotationPdfTemplate = React.memo(
         quotation?.propertyOwner?.additionalInfo?.vatId) ||
       '';
 
+    const eanValue = quotation?.propertyOwner.additionalInfo.ean || '';
+
     const unitBuilding =
       (pdfConfigClientStorage.includeUnitBuilding &&
         quotation?.elevator?.additionalInfo?.buildingLocation) ||
@@ -326,6 +328,7 @@ const QuotationPdfTemplate = React.memo(
                   quotation?.additionalInfo.beneficiaryAddress?.component
                 }
                 customerVATId={customerVATId}
+                eanValue={eanValue}
               />
 
               <View style={styles.rightAddress}>
