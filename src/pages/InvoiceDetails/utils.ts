@@ -214,7 +214,7 @@ export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord[]) =>
             ? {
                 amount:
                   (item.discount?.amount?.value ?? 0) *
-                    10 ** (item.discount?.amount?.fractionDigits ?? 2) ?? 0,
+                  10 ** (item.discount?.amount?.fractionDigits ?? 2),
               }
             : {percentage: item.discount?.percentage ?? 0}),
         }),

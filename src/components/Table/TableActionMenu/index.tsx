@@ -1,91 +1,60 @@
-import Menu from '@mui/material/Menu';
-import {ListItemButton, ListItemText, MenuItem} from '@mui/material';
 import React, {useRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
-import Box from '@mui/material/Box';
 import {Action} from 'models/table';
 
 type Props = {
   options: Action[];
-  isOpen?: boolean; // optional when states need to be external
+  isOpen?: boolean;
   onToggle?: (value: boolean) => void;
 };
 
 const TableActionMenu = ({
-  isOpen: externalOpenState,
   options,
+  isOpen: externalOpenState,
   onToggle: externalSetOpenState,
 }: Props) => {
-  const {t} = useTranslation();
-
   const anchorEl = useRef<HTMLButtonElement | null>(null);
-  const [open, setOpen] = useState<boolean>(false);
+  const [internalOpen, setInternalOpen] = useState(false);
 
-  const handleToggleMenu = (value: boolean) => () => {
-    if (externalSetOpenState) {
-      externalSetOpenState?.(value);
-      return;
-    }
-    setOpen(value);
-  };
+  const isOpen =
+    externalOpenState !== undefined ? externalOpenState : internalOpen;
+  const setOpen = externalSetOpenState || setInternalOpen;
+
+  const handleClose = () => setOpen(false);
+  const handleOpen = () => setOpen(true);
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        width: '100%',
-        height: '40px',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+    <>
       <IconButton
-        id="action-menu-button"
         ref={anchorEl}
-        onClick={handleToggleMenu(true)}
-        sx={{
-          display: 'flex',
-          width: '100%',
-          height: '100%',
-          alignItems: 'center',
-          justifyContent: 'center',
-
-          padding: 0,
-        }}>
+        onClick={handleOpen}
+        aria-controls={isOpen ? 'action-menu' : undefined}
+        aria-haspopup="true">
         <MoreVertOutlinedIcon />
       </IconButton>
-
       <Menu
-        open={externalOpenState !== undefined ? externalOpenState : open}
+        id="action-menu"
         anchorEl={anchorEl.current}
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        onClose={handleToggleMenu(false)}>
-        {options.map((option, index) => {
-          const IconComponent = option.icon;
-          return (
-            <MenuItem
-              key={`menu-action-option-${index}`}
-              sx={{display: 'flex'}}
-              onClick={option.onTrigger}>
-              <ListItemButton sx={{flex: '0 0 auto'}} component="a">
-                <IconComponent fontSize="small" sx={{color: 'action.active'}} />
-              </ListItemButton>
-              <ListItemText sx={{align: 'left'}}>
-                {t(option.label)}
-              </ListItemText>
-            </MenuItem>
-          );
-        })}
+        open={isOpen}
+        onClose={handleClose}
+        anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+        transformOrigin={{vertical: 'top', horizontal: 'right'}}>
+        {options.map((option, index) => (
+          <MenuItem
+            key={index}
+            onClick={() => {
+              option.onTrigger();
+              handleClose();
+            }}>
+            <option.icon style={{marginRight: '8px'}} />
+            {option.label}
+          </MenuItem>
+        ))}
       </Menu>
-    </Box>
+    </>
   );
 };
 

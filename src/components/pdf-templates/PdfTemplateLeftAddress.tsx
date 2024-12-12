@@ -10,6 +10,7 @@ type Props = {
   translate: (key: string) => string;
   beneficiaryInfo?: AddressComponent | null;
   customerVATId?: string;
+  eanValue?: string;
 };
 
 const getStyles = (
@@ -54,6 +55,7 @@ const PdfTemplateLeftAddress = ({
   translate,
   beneficiaryInfo,
   customerVATId,
+  eanValue,
 }: Props) => {
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -108,6 +110,12 @@ const PdfTemplateLeftAddress = ({
       {!!customerVATId && (
         <Text style={styles.partialAddressText}>
           {translate('VAT ID')}: {customerVATId}
+        </Text>
+      )}
+
+      {!!eanValue && (
+        <Text style={styles.partialAddressText}>
+          {translate('EAN')}: {eanValue}
         </Text>
       )}
 

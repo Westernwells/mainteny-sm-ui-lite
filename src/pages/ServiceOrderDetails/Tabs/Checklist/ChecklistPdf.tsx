@@ -167,6 +167,9 @@ const ChecklistPdf = ({
       serviceOrder?.elevator?.propertyOwner?.additionalInfo?.vatId) ||
     '';
 
+  const eanValue =
+    serviceOrder?.elevator?.propertyOwner?.additionalInfo.ean || '';
+
   const unitBuilding =
     (pdfConfigClientStorage.includeUnitBuilding &&
       serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
@@ -188,6 +191,7 @@ const ChecklistPdf = ({
               selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
+              eanValue={eanValue}
             />
 
             <View style={styles.rightAddress}>

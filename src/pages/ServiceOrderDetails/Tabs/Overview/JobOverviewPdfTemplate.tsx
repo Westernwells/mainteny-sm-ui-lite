@@ -186,7 +186,7 @@ const JobOverviewPdfTemplate = React.memo(
 
       return (
         (grossTotal - discountValue) /
-          10 ** articleItem.unitAmount.fractionDigits ?? 2
+        10 ** articleItem.unitAmount.fractionDigits
       );
     };
 
@@ -256,6 +256,9 @@ const JobOverviewPdfTemplate = React.memo(
         serviceOrder?.elevator?.propertyOwner?.additionalInfo?.vatId) ||
       '';
 
+    const eanValue =
+      serviceOrder?.elevator?.propertyOwner?.additionalInfo.ean || '';
+
     const unitBuilding =
       (pdfConfigClientStorage.includeUnitBuilding &&
         serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
@@ -277,6 +280,7 @@ const JobOverviewPdfTemplate = React.memo(
                 selectedLng={selectedLng}
                 translate={translate}
                 customerVATId={customerVATId}
+                eanValue={eanValue}
               />
 
               <View style={styles.rightAddress}>
@@ -539,8 +543,7 @@ const JobOverviewPdfTemplate = React.memo(
                             {formatCurrency(
                               (articleOrderItem.unitAmount?.netAmount ?? 0) /
                                 10 **
-                                  articleOrderItem.unitAmount.fractionDigits ??
-                                0,
+                                  articleOrderItem.unitAmount.fractionDigits,
                               {
                                 currency: currentCurrency?.code,
                                 excludeCurrencySymbol: true,

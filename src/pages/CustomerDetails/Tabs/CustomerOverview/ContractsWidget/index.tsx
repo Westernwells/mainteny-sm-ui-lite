@@ -4,7 +4,6 @@ import {useTranslation} from 'react-i18next';
 import {OpenInNew} from '@mui/icons-material';
 import {Box, Typography} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
-
 import {DataGridLayout} from 'components/DataGridLayout';
 import {EmptySection} from 'components/EmptySection';
 import {InfoCard} from 'components/InfoCard';

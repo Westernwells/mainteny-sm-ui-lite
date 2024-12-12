@@ -446,7 +446,7 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                     variant="body2">
                     {formatCurrency(
                       calculateContractInvoicePriceGrandTotal(group.services) /
-                        10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                        10 ** (currentCurrency.fractionDigits ?? 0),
                       {
                         currency: currentCurrency.code,
                       },
@@ -581,9 +581,7 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                                           elevatorItem.isSelected,
                                       ),
                                     ) /
-                                      10 **
-                                        (currentCurrency.fractionDigits ?? 0) ??
-                                      0,
+                                      10 ** currentCurrency.fractionDigits,
                                     {
                                       currency: currentCurrency.code,
                                     },
@@ -731,8 +729,7 @@ const InvoiceSetup = ({formikContractComponents}: Props) => {
                                   (elevator) => elevator.isSelected,
                                 ),
                               ) /
-                                10 ** (currentCurrency.fractionDigits ?? 0) ??
-                                0,
+                                10 ** (currentCurrency.fractionDigits || 0),
                               {
                                 currency: currentCurrency.code,
                               },

@@ -151,7 +151,7 @@ export const MyDropZone = forwardRef(
         getAcceptedFiles(files);
       }
       if (getRejectedFileWithErrors) {
-        getRejectedFileWithErrors(fileRejections);
+        getRejectedFileWithErrors(fileRejections as FileRejection[]);
       }
     };
 

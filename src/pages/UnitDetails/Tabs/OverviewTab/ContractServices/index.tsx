@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import {useUpdateContract} from 'hooks/reactQuery/useContract';
 import useTheme from '@mui/material/styles/useTheme';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import {TableCellProps, useMediaQuery} from '@mui/material';
+import {Table, TableCellProps, useMediaQuery} from '@mui/material';
 import {
   calculateContractInvoicePriceTotal,
   ContractComponentView,
@@ -202,12 +202,12 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
   const setAddFormData = () => {
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
-      elevators: parsElevatorRecourses([elevator] || []),
+      elevators: parsElevatorRecourses([elevator]),
     });
   };
 
   const setEditFormData = (row: ContractComponentView) => {
-    const allItems = mergeElevators([elevator] || [], row);
+    const allItems = mergeElevators([elevator], row);
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
       id: row.id,
@@ -255,249 +255,256 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
         header={<Typography variant="h5">{t('Contract Services')}</Typography>}>
         {services.length ? (
           <TableContainer sx={{...olStyles.scrollbar}}>
-            <TableHead
-              sx={{display: 'block', borderBottom: '1px solid #8F9BB380'}}>
-              <TableRow sx={{display: 'block'}}>
-                {serviceListingColumns.map((col) => (
-                  <TableCell
-                    key={col.name}
-                    align={col.align || 'right'}
-                    sx={{
-                      display: 'inline-block',
-                      padding: '1em 0em',
-                      fontWeight: '600',
-                      color: 'text.secondary',
-                    }}
-                    width={col.width}>
-                    {t(col.name)}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody sx={{display: 'block'}}>
-              {services.map((row) => (
-                <TableRow
-                  sx={{
-                    width: '100%',
-                    display: 'block',
-                    cursor: 'pointer',
-                    padding: '0.1em 0em',
-                    '&:hover': {
-                      background: '#F2F6F8',
-                    },
-                  }}
-                  key={row.id}>
-                  <TableCell
-                    onClick={() => openViewDialog(row)}
-                    sx={{
-                      width: '15%',
-                      display: 'inline-block',
-                      padding: '0.5em',
-                      borderBottom: 'none',
-                    }}>
-                    <Typography
-                      sx={{color: '#0092B2', fontWeight: '600'}}
-                      variant="body2">
-                      {row.name}
-                    </Typography>
-                  </TableCell>
-                  <TableCell
-                    onClick={() => openViewDialog(row)}
-                    sx={{
-                      width: '17%',
-                      borderBottom: 'none',
-                      textAlign: 'left',
-                      display: 'inline-block',
-                      padding: '0.5em 0em',
-                    }}>
-                    <Link
-                      to={`/contracts/details/${row.contractId}`}
-                      style={{
-                        textDecoration: 'none',
-                        width: 'fit-content',
+            <Table>
+              <TableHead
+                sx={{display: 'block', borderBottom: '1px solid #8F9BB380'}}>
+                <TableRow sx={{display: 'block'}}>
+                  {serviceListingColumns.map((col) => (
+                    <TableCell
+                      key={col.name}
+                      align={col.align || 'right'}
+                      sx={{
                         display: 'inline-block',
+                        padding: '1em 0em',
+                        fontWeight: '600',
+                        color: 'text.secondary',
+                      }}
+                      width={col.width}>
+                      {t(col.name)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody sx={{display: 'block'}}>
+                {services.map((row) => (
+                  <TableRow
+                    sx={{
+                      width: '100%',
+                      display: 'block',
+                      cursor: 'pointer',
+                      padding: '0.1em 0em',
+                      '&:hover': {
+                        background: '#F2F6F8',
+                      },
+                    }}
+                    key={row.id}>
+                    <TableCell
+                      onClick={() => openViewDialog(row)}
+                      sx={{
+                        width: '15%',
+                        display: 'inline-block',
+                        padding: '0.5em',
+                        borderBottom: 'none',
                       }}>
                       <Typography
                         sx={{color: '#0092B2', fontWeight: '600'}}
                         variant="body2">
-                        {row?.contractNumber || '-'}
+                        {row.name}
                       </Typography>
-                    </Link>
-                  </TableCell>
+                    </TableCell>
+                    <TableCell
+                      onClick={() => openViewDialog(row)}
+                      sx={{
+                        width: '17%',
+                        borderBottom: 'none',
+                        textAlign: 'left',
+                        display: 'inline-block',
+                        padding: '0.5em 0em',
+                      }}>
+                      <Link
+                        to={`/contracts/details/${row.contractId}`}
+                        style={{
+                          textDecoration: 'none',
+                          width: 'fit-content',
+                          display: 'inline-block',
+                        }}>
+                        <Typography
+                          sx={{color: '#0092B2', fontWeight: '600'}}
+                          variant="body2">
+                          {row?.contractNumber || '-'}
+                        </Typography>
+                      </Link>
+                    </TableCell>
+                    <TableCell
+                      onClick={() => openViewDialog(row)}
+                      sx={{
+                        width: '5%',
+                        display: 'inline-block',
+                        borderBottom: 'none',
+                        padding: '0.5em 0em',
+                        textAlign: 'left',
+                      }}>
+                      <Typography
+                        color={theme.palette.text.primary}
+                        variant="body2">
+                        {row.additionalInfo.firstInvoiceDate
+                          ? formatDate(row.additionalInfo.firstInvoiceDate)
+                          : '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      onClick={() => openViewDialog(row)}
+                      sx={{
+                        width: '13%',
+                        display: 'inline-block',
+                        borderBottom: 'none',
+                        padding: '0.5em 0em',
+                        textAlign: 'center',
+                      }}>
+                      <StatusChip
+                        label={
+                          getAutoJobStatus(
+                            row.additionalInfo.firstOrderDate as Date,
+                          ).label
+                        }
+                        color={
+                          getAutoJobStatus(
+                            row.additionalInfo.firstOrderDate as Date,
+                          ).color
+                        }
+                        maxChars={8}
+                        variant="outlined"
+                      />
+                    </TableCell>
+                    <TableCell
+                      onClick={() => openViewDialog(row)}
+                      sx={{
+                        width: '15%',
+                        display: 'inline-block',
+                        textAlign: 'left',
+                        borderBottom: 'none',
+                        padding: '0em 1em 0em 0em',
+                      }}>
+                      <Typography
+                        color={theme.palette.text.primary}
+                        variant="body2">
+                        {getListViewFrequency(
+                          'orderGenerationJob',
+                          row.additionalInfo.elevators,
+                        )}
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      onClick={() => openViewDialog(row)}
+                      sx={{
+                        width: '20%',
+                        display: 'inline-block',
+                        textAlign: 'left',
+                        borderBottom: 'none',
+                        padding: '0em 1em 0em 0em',
+                      }}>
+                      <Typography
+                        color={theme.palette.text.primary}
+                        variant="body2">
+                        {getListViewFrequency(
+                          'invoiceJob',
+                          row.additionalInfo.elevators,
+                        )}
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      onClick={() => openViewDialog(row)}
+                      sx={{
+                        width: '6%',
+                        display: 'inline-block',
+                        textAlign: 'left',
+                        borderBottom: 'none',
+                      }}>
+                      <Typography
+                        color={theme.palette.text.primary}
+                        variant="body2">
+                        {formatCurrency(
+                          calculateContractInvoicePriceTotal(
+                            row.additionalInfo.elevators || [],
+                          ) /
+                            10 ** currentCurrency.fractionDigits,
+                          {
+                            currency: currentCurrency.code,
+                          },
+                        )}
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        width: '5%',
+                        display: 'inline-block',
+                        textAlign: 'right',
+                        borderBottom: 'none',
+                        padding: '0.5em 0em 0.5em 2em',
+                      }}>
+                      <Box sx={{display: 'flex'}}>
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentService(row);
+                            setEditFormData(row);
+                            setIsDialogOpen(true);
+                            setIsEditForm(true);
+                          }}>
+                          <EditOutlinedIcon
+                            sx={{color: theme.palette.secondary.mainLight}}
+                          />
+                        </IconButton>
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentService(row);
+                            setIsDeleteDialogOpen(true);
+                          }}>
+                          <DeleteOutlineIcon
+                            sx={{color: theme.palette.secondary.mainLight}}
+                          />
+                        </IconButton>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                <Divider
+                  sx={{
+                    width: '100%',
+                    borderColor: '#8F9BB380',
+                    padding: '0.2em',
+                  }}
+                />
+                <TableRow
+                  sx={{
+                    width: '100%',
+                    display: 'block',
+                    padding: '0em',
+                  }}>
+                  <TableCell sx={{width: '40%', display: 'inline-block'}} />
                   <TableCell
-                    onClick={() => openViewDialog(row)}
                     sx={{
-                      width: '5%',
                       display: 'inline-block',
                       borderBottom: 'none',
-                      padding: '0.5em 0em',
-                      textAlign: 'left',
+                      width: '40%',
                     }}>
-                    <Typography
-                      color={theme.palette.text.primary}
-                      variant="body2">
-                      {row.additionalInfo.firstInvoiceDate
-                        ? formatDate(row.additionalInfo.firstInvoiceDate)
-                        : '-'}
+                    <Typography variant="h6" align="right">
+                      {t('Total contract value per year (excl. VAT)')}
                     </Typography>
                   </TableCell>
                   <TableCell
-                    onClick={() => openViewDialog(row)}
                     sx={{
-                      width: '13%',
                       display: 'inline-block',
+                      textAlign: 'right',
                       borderBottom: 'none',
-                      padding: '0.5em 0em',
-                      textAlign: 'center',
+                      padding: '0em',
+                      width: '10%',
                     }}>
-                    <StatusChip
-                      label={
-                        getAutoJobStatus(
-                          row.additionalInfo.firstOrderDate as Date,
-                        ).label
-                      }
-                      color={
-                        getAutoJobStatus(
-                          row.additionalInfo.firstOrderDate as Date,
-                        ).color
-                      }
-                      maxChars={8}
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell
-                    onClick={() => openViewDialog(row)}
-                    sx={{
-                      width: '15%',
-                      display: 'inline-block',
-                      textAlign: 'left',
-                      borderBottom: 'none',
-                      padding: '0em 1em 0em 0em',
-                    }}>
-                    <Typography
-                      color={theme.palette.text.primary}
-                      variant="body2">
-                      {getListViewFrequency(
-                        'orderGenerationJob',
-                        row.additionalInfo.elevators,
-                      )}
-                    </Typography>
-                  </TableCell>
-                  <TableCell
-                    onClick={() => openViewDialog(row)}
-                    sx={{
-                      width: '20%',
-                      display: 'inline-block',
-                      textAlign: 'left',
-                      borderBottom: 'none',
-                      padding: '0em 1em 0em 0em',
-                    }}>
-                    <Typography
-                      color={theme.palette.text.primary}
-                      variant="body2">
-                      {getListViewFrequency(
-                        'invoiceJob',
-                        row.additionalInfo.elevators,
-                      )}
-                    </Typography>
-                  </TableCell>
-                  <TableCell
-                    onClick={() => openViewDialog(row)}
-                    sx={{
-                      width: '6%',
-                      display: 'inline-block',
-                      textAlign: 'left',
-                      borderBottom: 'none',
-                    }}>
-                    <Typography
-                      color={theme.palette.text.primary}
-                      variant="body2">
-                      {' '}
+                    <Typography variant="h6">
                       {formatCurrency(
-                        calculateContractInvoicePriceTotal(
-                          row.additionalInfo.elevators || [],
-                        ) /
-                          10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
+                        calculateContractInvoicePriceGrandTotal(services) /
+                          10 ** currentCurrency.fractionDigits,
                         {
                           currency: currentCurrency.code,
                         },
                       )}
                     </Typography>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      width: '5%',
-                      display: 'inline-block',
-                      textAlign: 'right',
-                      borderBottom: 'none',
-                      padding: '0.5em 0em 0.5em 2em',
-                    }}>
-                    <Box sx={{display: 'flex'}}>
-                      <IconButton
-                        onClick={() => {
-                          setCurrentService(row);
-                          setEditFormData(row);
-                          setIsDialogOpen(true);
-                          setIsEditForm(true);
-                        }}>
-                        <EditOutlinedIcon
-                          sx={{color: theme.palette.secondary.mainLight}}
-                        />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => {
-                          setCurrentService(row);
-                          setIsDeleteDialogOpen(true);
-                        }}>
-                        <DeleteOutlineIcon
-                          sx={{color: theme.palette.secondary.mainLight}}
-                        />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
+                  <TableCell sx={{width: '10%', display: 'inline-block'}} />
                 </TableRow>
-              ))}
-              <Divider
-                sx={{width: '100%', borderColor: '#8F9BB380', padding: '0.2em'}}
-              />
-              <TableRow
-                sx={{
-                  width: '100%',
-                  display: 'block',
-                  padding: '0em',
-                }}>
-                <TableCell sx={{width: '40%', display: 'inline-block'}} />
-                <TableCell
-                  sx={{
-                    display: 'inline-block',
-                    borderBottom: 'none',
-                    width: '40%',
-                  }}>
-                  <Typography variant="h6" align="right">
-                    {t('Total contract value per year (excl. VAT)')}
-                  </Typography>
-                </TableCell>
-                <TableCell
-                  sx={{
-                    display: 'inline-block',
-                    textAlign: 'right',
-                    borderBottom: 'none',
-                    padding: '0em',
-                    width: '10%',
-                  }}>
-                  <Typography variant="h6">
-                    {formatCurrency(
-                      calculateContractInvoicePriceGrandTotal(services) /
-                        10 ** (currentCurrency.fractionDigits ?? 0) ?? 0,
-                      {
-                        currency: currentCurrency.code,
-                      },
-                    )}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{width: '10%', display: 'inline-block'}} />
-              </TableRow>
-            </TableBody>
+              </TableBody>
+            </Table>
           </TableContainer>
         ) : (
           <EmptySection

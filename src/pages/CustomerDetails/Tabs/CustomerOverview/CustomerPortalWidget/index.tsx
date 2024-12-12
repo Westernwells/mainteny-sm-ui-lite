@@ -1,12 +1,10 @@
-import {EmptySection} from 'components/EmptySection';
 import {ContactsView, ServiceCompanyContactPersonView} from 'models/contacts';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import {ReactComponent as MonitorTeamIcon} from 'assets/icons/MonitorTeamIcon.svg';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import {InfoCard} from 'components/InfoCard';
-import {DataGridLayout} from 'components/DataGridLayout';
 import {
   useCreatePropertyContactPerson,
   useDeletePropertyOwnerContactPerson,
@@ -16,8 +14,6 @@ import {
 } from 'hooks/reactQuery/useContacts';
 import {createEmptyResource} from 'utils/paging';
 import {useTranslation} from 'react-i18next';
-import {getDataGridHeight} from 'utils/utils';
-import {GridRowsProp} from '@mui/x-data-grid';
 import WidgetContactFormDialog from 'pages/Contacts/ContactsWidget/WidgetContactFormDialog';
 import {Confirm} from 'components/Confirm';
 import {Switch} from 'components/Switch';
@@ -25,7 +21,21 @@ import ContactDetails from 'pages/Contacts/ContactDetails';
 import {UserAccountStatus} from 'models/user';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
 import {Alert} from '@mui/material';
-import {columns, makeRows} from './CustomerPortalDataGridProps';
+import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import {CustomerPortalTableRow} from 'models/customer';
+import Cell from 'components/Table/TableCell';
+import TableCellText from 'components/Table/TableCellText';
+import TableContainer from 'components/Table/TableContainer';
+import TableBody from 'components/Table/TableBody';
+import TableRow from 'components/Table/TableRow';
+import TableHeader from 'components/Table/TableHeader';
+import {aggregateCustomerPortalRow, getStatusLabel} from 'utils/customer-utils';
+import {StatusChip} from 'components/StatusChip';
+import {EmptySection} from 'components/EmptySection';
+import {useNavigate} from 'react-router-dom';
+import {Avatar} from 'components/Avatar';
+import {theme} from 'theme';
+import Actions from './Actions';
 
 interface Props {
   customerId: string;
@@ -34,13 +44,15 @@ interface Props {
 
 const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
   const {t} = useTranslation();
-
-  const [rows, setRows] = useState<GridRowsProp>([]);
+  const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement>(null);
   const [selectedContact, setSelectedContact] = useState<ContactsView>();
   const [openFormDialog, setOpenFormDialog] = useState(false);
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const [isWidgetActive, setIsWidgetActive] = useState(customerPortalEnabled);
   const [showSideDrawer, setShowSideDrawer] = useState(false);
+  const [showLeftShadow, setShowLeftShadow] = useState(false);
+  const [showRightShadow, setShowRightShadow] = useState(false);
 
   const {updateCustomer} = useCustomer(true);
   const {mutate: updatePropertyContactPerson} = useUpdatePropertyContactPerson(
@@ -58,14 +70,8 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
     useDeletePropertyOwnerContactPerson('Contact deleted successfully');
   const {
     data: contactsResource = createEmptyResource<ContactsView>(5),
-    isFetching,
     refetch,
   } = usePropertyOwnerContacts({pageIndex: 0, pageSize: 25}, customerId);
-  useEffect(() => {
-    if (!isFetching) {
-      setRows(makeRows(contactsResource));
-    }
-  }, [contactsResource, isFetching]);
 
   const handleAfterSubmit = async (newContactPersonId?: string) => {
     await addContact({
@@ -118,6 +124,135 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
     setIsWidgetActive(isActive);
   };
 
+  const handleRowClick = (params: ContactsView) => () => {
+    if (isWidgetActive) {
+      setSelectedContact(params as ContactsView);
+      setShowSideDrawer(true);
+    }
+  };
+
+  const handleEmployeeCellClick = (id: string) => () => {
+    navigate(`/employees/details/${id}`);
+  };
+
+  const rows = useMemo(
+    () => aggregateCustomerPortalRow(contactsResource.data),
+    [contactsResource],
+  );
+
+  const COLUMNS = useMemo<TableColumnWithRender<CustomerPortalTableRow>[]>(
+    () => [
+      {
+        headerName: 'Name',
+        key: 'customer-portal-cell-name',
+        width: '362px',
+        isFirst: true,
+        showShadows: showRightShadow ? 'right' : undefined,
+        renderCell: (customerPortal, cellProps) => (
+          <Cell
+            {...cellProps}
+            onClick={handleEmployeeCellClick(customerPortal.customerId)}>
+            <Avatar
+              labelStyles={{
+                color: isWidgetActive
+                  ? theme.palette.primary.light
+                  : theme.palette.text.disabled,
+              }}
+              key={`company-avatar-${customerPortal.customerId}`}
+              userAccount={{firstName: customerPortal.name}}
+            />
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Email Address',
+        key: 'customer-portal-cell-email',
+        width: '362px',
+        renderCell: (customerPortal, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText
+              tableCellTextStyles={{
+                color: isWidgetActive
+                  ? theme.palette.primary.light
+                  : theme.palette.text.disabled,
+              }}>
+              {customerPortal.emailAddress}
+            </TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Role',
+        key: 'customer-portal-cell-role',
+        width: '362px',
+        renderCell: (customerPortal, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText
+              tableCellTextStyles={{
+                color: isWidgetActive
+                  ? theme.palette.primary.light
+                  : theme.palette.text.disabled,
+              }}>
+              {t(customerPortal.role)}
+            </TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Access',
+        key: 'customer-portal-cell-access',
+        width: '220px',
+        align: 'center',
+        renderCell: (customerPortal, cellProps) => {
+          const label = getStatusLabel(customerPortal.access);
+          return (
+            <Cell {...cellProps}>
+              <TableCellText>
+                {label && (
+                  <StatusChip
+                    label={label}
+                    style={{
+                      background:
+                        label === 'Active'
+                          ? theme.palette.success.main
+                          : label === 'Pending'
+                          ? theme.palette.primary.mainLight
+                          : label === 'Revoked'
+                          ? theme.palette.error.main
+                          : theme.palette.text.secondary,
+                    }}
+                  />
+                )}
+              </TableCellText>
+            </Cell>
+          );
+        },
+      },
+      {
+        headerName: 'action',
+        key: 'customer-portal-cell-actions',
+        isHeaderNameHidden: true,
+        align: 'center',
+        width: ACTION_CELL_WIDTH, // set static width that will not change
+        isLast: true,
+        noPadding: true,
+        showShadows: showLeftShadow ? 'left' : undefined,
+        renderCell: (customerPortal, cellProps) => (
+          <Cell {...cellProps} onClick={undefined}>
+            <Actions
+              onDelete={handleDeleteContact}
+              onRevokeAccess={handleRevokeAccess}
+              onSendInvite={handleSendInvite}
+              contact={customerPortal.contactResourceData}
+              customerPortalEnabled={isWidgetActive}
+            />
+          </Cell>
+        ),
+      },
+    ],
+    [isWidgetActive, showLeftShadow, showRightShadow],
+  );
+
   return (
     <>
       <InfoCard
@@ -131,8 +266,8 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
           </Box>
         }
         headerIcon={<MonitorTeamIcon style={{width: '2rem', height: '2rem'}} />}
-        handleAction={async () => {
-          await setSelectedContact(undefined);
+        handleAction={() => {
+          setSelectedContact(undefined);
           setOpenFormDialog(true);
         }}
         headerActionIcon={
@@ -152,46 +287,50 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
             </Typography>
           </Alert>
         )}
-        <DataGridLayout
-          isWidget
-          fullHeight={false}
-          height={getDataGridHeight(rows.length, rows.length)}
-          rows={rows}
-          columns={columns({
-            onDelete: handleDeleteContact,
-            onRevokeAccess: handleRevokeAccess,
-            onSendInvite: handleSendInvite,
-            customerPortalEnabled: isWidgetActive,
-          })}
-          loading={isFetching}
-          onCellClick={(params) => {
-            if (isWidgetActive) {
-              setSelectedContact(params.row.contactPerson as ContactsView);
-              setShowSideDrawer(true);
-            }
-          }}
-          noRowsEmptySection={
-            <EmptySection
-              showActionBtn
-              illustration="contacts"
-              size="tiny"
-              disableActionBtn={!isWidgetActive}
-              containerStyle={{
-                width: '60%',
-                m: 'auto',
-                paddingTop: '50px',
-              }}
-              label="No Contact Persons"
-              subLabel="Do you want to add someone?"
-              btnLabel="New Contact person"
-              btnAction={async () => {
-                await setSelectedContact(undefined);
-                setOpenFormDialog(true);
-              }}
-            />
-          }
-        />
+
+        <TableContainer
+          containerRef={containerRef}
+          setShowLeftShadow={setShowLeftShadow}
+          setShowRightShadow={setShowRightShadow}>
+          <TableHeader columns={COLUMNS} capitalize />
+          <TableBody>
+            {rows.map((entry) => (
+              <TableRow
+                key={`customer-portal-row-${entry.id}`}
+                testId={`customer-portal-row-${entry.id}`}>
+                {COLUMNS.map(({renderCell, ...rest}) =>
+                  renderCell(entry, {
+                    onClick: handleRowClick(entry.contactResourceData),
+                    ...rest,
+                  }),
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </TableContainer>
+
+        {rows.length < 1 && (
+          <EmptySection
+            showActionBtn
+            illustration="contacts"
+            size="tiny"
+            disableActionBtn={!isWidgetActive}
+            containerStyle={{
+              width: '60%',
+              m: 'auto',
+              paddingTop: '50px',
+            }}
+            label="No Contact Persons"
+            subLabel="Do you want to add someone?"
+            btnLabel="New Contact person"
+            btnAction={() => {
+              setSelectedContact(undefined);
+              setOpenFormDialog(true);
+            }}
+          />
+        )}
       </InfoCard>
+
       <ContactDetails
         showSideDrawer={showSideDrawer}
         setShowSideDrawer={setShowSideDrawer}

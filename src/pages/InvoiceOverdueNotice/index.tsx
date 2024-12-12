@@ -234,7 +234,7 @@ export const InvoiceOverdueNotice = () => {
       sentDate: dateToString(new Date()),
       emailRecord: {
         email: '',
-        emails: [values.email] || [],
+        emails: values.email ? [values.email] : [],
         subject: values.subject,
         content: values.content || sendEmailDescription,
         attachments: files.reduce<FileWithPreview[]>(
