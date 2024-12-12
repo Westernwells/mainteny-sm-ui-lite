@@ -2989,5 +2989,6 @@
   "Selling price": "Verkaufspreis",
   "Please provide a valid date for the job creation date": "Bitte ein valides Datum für die erste Auftragserstellung hinterlegen.",
   "Please provide a valid date for the first invoice date": "Bitte ein valides Datum für die erste Rechnungserstellung hinterlegen.",
-  "Payment data included": "Zahlungsdaten enthalten"
+  "Payment data included": "Zahlungsdaten enthalten",
+  "Email address": "Email Adresse"
 }
