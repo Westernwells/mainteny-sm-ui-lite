@@ -103,6 +103,7 @@ const quotationItemToQuotationItemRecord = (
   quotationItem: QuotationItem,
 ): QuotationItemRecord => {
   const record: QuotationItemRecord = {
+    id: quotationItem.id,
     article: quotationItem.article,
     name: quotationItem.name,
     description: quotationItem.description,
@@ -354,6 +355,7 @@ export const DraftQuotation = ({
     setQuotationItems(
       quotationData.items.map(
         (i): QuotationItemRecord => ({
+          id: i.id,
           article: i.article,
           description: i.description || i.article.description,
           name: i.name || i.article.name,
@@ -877,6 +879,7 @@ export const DraftQuotation = ({
       'items',
       quotationItems.map(
         (item): QuotationItemRecord => ({
+          id: item.id,
           article: item.article,
           description: item.description,
           name: item.name,

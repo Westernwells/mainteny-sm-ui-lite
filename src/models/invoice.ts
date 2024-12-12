@@ -310,6 +310,7 @@ export interface ArticleRecord {
 }
 
 export interface InvoiceItemRecord {
+  id?: string;
   article?: ArticleRecord;
   name: string;
   description?: string;
