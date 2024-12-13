@@ -361,6 +361,17 @@ export const ArticleItemRowNEW = ({
     });
   };
 
+  const vatValue = (() => {
+    const {vatId} = formik.values.unitAmount;
+    return vatId && taxRates?.find((item) => item.id === vatId)
+      ? vatId
+      : String(
+          formik.values.unitAmount.percentageVat !== 0
+            ? formik.values.unitAmount.percentageVat
+            : 0,
+        ) || '';
+  })();
+
   const tabItems: TabItems[] = useMemo(() => {
     const tItems = [
       {
@@ -710,15 +721,7 @@ export const ArticleItemRowNEW = ({
           <Select
             labelId={`select-tax-label-${index}`}
             size="small"
-            value={
-              formik.values.unitAmount.vatId ||
-              String(
-                formik.values.unitAmount.percentageVat !== 0
-                  ? formik.values.unitAmount.percentageVat
-                  : 0,
-              ) ||
-              ''
-            }
+            value={vatValue}
             renderValue={(value) => {
               const taxRatePercentage = taxRates?.find(
                 (item) => item.id === value,
