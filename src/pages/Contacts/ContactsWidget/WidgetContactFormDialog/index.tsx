@@ -54,7 +54,7 @@ const ContactFormDialog = ({
   onAfterSubmit,
 }: Props) => {
   const {user} = useUserSession();
-  const {data: uuid} = useUuid();
+  const {data: uuid, refetch} = useUuid();
   const serviceCompanyId = user?.userAccount.serviceCompany.id || '';
 
   const {mutate: createContact, isLoading: isCreating} =
@@ -115,8 +115,8 @@ const ContactFormDialog = ({
           },
           userAccount: {
             ...data.userAccount,
-            photoUrl,
             serviceCompanyId,
+            photoUrl: file?.name ? photoUrl : '',
           },
         },
         {
@@ -133,6 +133,11 @@ const ContactFormDialog = ({
     setOpenDialog(false);
     resetForm();
   };
+
+  useEffect(() => {
+    refetch();
+  }, [openDialog]);
+
   return (
     <Dialog
       title={formType === 'edit' ? 'Edit Contact' : 'Add Contact'}
