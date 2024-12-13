@@ -20,6 +20,7 @@ import Payments from '@mui/icons-material/Payments';
 import FileDownload from '@mui/icons-material/FileDownload';
 import Edit from '@mui/icons-material/Edit';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
+import {addDays} from 'date-fns';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
@@ -920,6 +921,17 @@ export const Actions = ({
     }
   }, [qrError]);
 
+  const paymentTermDueDays =
+    invoice?.additionalInfo?.paymentTerm?.data?.dueDays;
+  const dueDate =
+    typeof paymentTermDueDays === 'number'
+      ? dateToString(addDays(new Date(), paymentTermDueDays))
+      : invoice?.dueDate || dateToString(new Date());
+  const invoiceWithUpdatedDueDate = {
+    ...invoice,
+    dueDate,
+  };
+
   const refetchPDFs = async (companyNextId?: string) => {
     // Refetch the download URLs for invoice, work report, and checklist
     const invoiceDownloadUrlResponse = await refetchDownloadUrl();
@@ -929,7 +941,7 @@ export const Actions = ({
     // Ensure all download URLs are fetched before calling getExistingFiles
     await getExistingFiles(
       invoiceDownloadUrlResponse.data,
-      invoice,
+      invoiceWithUpdatedDueDate,
       companyNextId,
       workReportDownloadUrlResponse.data,
       checklistDownloadUrlResponse.data,
@@ -1240,13 +1252,17 @@ export const Actions = ({
 
     setIsConfirmPrintDialogOpen(false);
 
+    let qrImageSrcProp = qrImageSrc;
     if (
       user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
-      !qrImageSrc &&
+      !qrImageSrcProp &&
       invoice.status === InvoiceStatus.DRAFT
     ) {
-      await checkValidQrCode(invoice);
-      return;
+      const error = await checkValidQrCode(invoice);
+      if (error) {
+        return;
+      }
+      qrImageSrcProp = await getQrImageSrc(invoice);
     }
 
     if (invoice.status === InvoiceStatus.DRAFT) {
@@ -1256,6 +1272,7 @@ export const Actions = ({
             data: formatInvoiceViewToUpdateInvoice({
               ...invoice,
               externalId: companyNextNumber?.value!,
+              dueDate,
             }),
             invoiceId: invoice.id,
           },
@@ -1267,6 +1284,7 @@ export const Actions = ({
                 headerBlockUrl: headerUrl,
                 footerBlockUrl: footerUrl,
                 invoiceNumber: updatedInvoiceData?.data?.externalId,
+                qrImageSrcProp,
               });
 
               const uploadPath = `${serviceCompanyId}/invoices`;
@@ -1321,16 +1339,20 @@ export const Actions = ({
         );
       } else {
         const blob = await generateBlobUrl({
-          invoiceData: invoice,
+          invoiceData: invoiceWithUpdatedDueDate,
           headerBlockUrl: headerUrl,
           footerBlockUrl: footerUrl,
           invoiceNumber: invoice.externalId,
+          qrImageSrcProp,
         });
 
-        const invoiceXML = await getXInvoiceOperation(invoice, {
-          forceGet: true,
-          invoiceNumber: invoice.externalId,
-        });
+        const invoiceXML = await getXInvoiceOperation(
+          invoiceWithUpdatedDueDate,
+          {
+            forceGet: true,
+            invoiceNumber: invoice.externalId,
+          },
+        );
 
         const uploadPath = `${serviceCompanyId}/invoices`;
 
@@ -1348,7 +1370,7 @@ export const Actions = ({
                 pdfPath,
                 xmlPath,
                 externalId: invoice.externalId!,
-                dueDate: invoice.dueDate || dateToString(new Date()),
+                dueDate,
                 sentDate: invoice.sentDate || dateToString(new Date()),
               },
             },
@@ -1658,12 +1680,14 @@ export const Actions = ({
                 const invoiceDownloadUrl = invoiceDownloadResponse.data;
 
                 const [invoicePDF, invoiceXML] = await Promise.all([
-                  getBaseFileOperations(invoice, {
+                  getBaseFileOperations(invoiceWithUpdatedDueDate, {
                     invoiceDownloadUrl,
                     nextNumber: companyNextNumber?.value,
                     forceGet: true,
                   }),
-                  getXInvoiceOperation(invoice, {forceGet: true}),
+                  getXInvoiceOperation(invoiceWithUpdatedDueDate, {
+                    forceGet: true,
+                  }),
                 ]);
 
                 await uploadFiles({
@@ -1704,7 +1728,7 @@ export const Actions = ({
                       : invoiceData?.additionalInfo?.xmlPath!,
                     externalId:
                       invoiceData?.externalId! || companyNextNumber?.value!,
-                    dueDate: invoiceData?.dueDate || dateToString(new Date()),
+                    dueDate,
                     sentDate: invoiceData?.sentDate || dateToString(new Date()),
                     email: {
                       email: '',
