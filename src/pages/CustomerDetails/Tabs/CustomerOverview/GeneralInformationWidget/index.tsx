@@ -167,7 +167,7 @@ const GeneralInformationWidget = ({customer}: Props) => {
               </Typography>
             )}
             <Typography variant="subtitle2" color="text.secondary">
-              {customer.contact.phone || '-'}
+              {customer.externalId || '-'}
             </Typography>
           </Box>
         </Box>
