@@ -13,6 +13,7 @@ import SendIcon from '@mui/icons-material/Send';
 import Print from '@mui/icons-material/Print';
 import Edit from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import {addDays} from 'date-fns';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
@@ -1009,6 +1010,17 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   }, [qrError]);
 
+  const paymentTermDueDays =
+    invoice?.additionalInfo?.paymentTerm?.data?.dueDays;
+  const dueDate =
+    typeof paymentTermDueDays === 'number'
+      ? dateToString(addDays(new Date(), paymentTermDueDays))
+      : invoice?.dueDate || dateToString(new Date());
+  const invoiceWithUpdatedDueDate = {
+    ...invoice,
+    dueDate,
+  };
+
   const refetchPDFs = async (companyNextId?: string) => {
     // Refetch the download URLs for invoice, work report, and checklist
     const workReportDownloadUrlResponse = await refetchWorkReportDownloadUrl();
@@ -1018,7 +1030,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     await refetchDownloadUrl().then(async (res) => {
       await getExistingFiles(
         res.data,
-        invoice,
+        invoiceWithUpdatedDueDate,
         companyNextId,
         workReportDownloadUrlResponse.data,
         checklistDownloadUrlResponse.data,
@@ -1248,6 +1260,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             data: formatInvoiceViewToUpdateInvoice({
               ...invoice,
               externalId: companyNextNumber?.value!,
+              dueDate,
             }),
             invoiceId: invoice.id,
           },
@@ -1313,16 +1326,19 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         );
       } else {
         const blobFile = await generateBlobUrl({
-          invoiceData: invoice,
+          invoiceData: invoiceWithUpdatedDueDate,
           headerBlockUrl: headerUrl,
           footerBlockUrl: footerUrl,
           invoiceNumber: invoice.externalId,
         });
 
-        const invoiceXML = await getXInvoiceOperation(invoice, {
-          forceGet: true,
-          invoiceNumber: invoice.externalId,
-        });
+        const invoiceXML = await getXInvoiceOperation(
+          invoiceWithUpdatedDueDate,
+          {
+            forceGet: true,
+            invoiceNumber: invoice.externalId,
+          },
+        );
         const uploadPath = `${serviceCompanyId}/invoices`;
 
         if (blobFile) {
@@ -1339,7 +1355,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                 pdfPath,
                 xmlPath,
                 externalId: invoice.externalId!,
-                dueDate: invoice.dueDate || dateToString(new Date()),
+                dueDate,
                 sentDate: invoice.sentDate || dateToString(new Date()),
               },
             },
@@ -1777,12 +1793,14 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
               const invoiceDownloadUrl = invoiceDownloadResponse.data;
 
               const [invoicePDF, invoiceXML] = await Promise.all([
-                getBaseFileOperations(invoice, {
+                getBaseFileOperations(invoiceWithUpdatedDueDate, {
                   invoiceDownloadUrl,
                   nextNumber: companyNextNumber?.value,
                   forceGet: true,
                 }),
-                getXInvoiceOperation(invoice, {forceGet: true}),
+                getXInvoiceOperation(invoiceWithUpdatedDueDate, {
+                  forceGet: true,
+                }),
               ]);
 
               await uploadFiles({
@@ -1823,7 +1841,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     : invoiceData?.additionalInfo?.xmlPath!,
                   externalId:
                     invoiceData?.externalId || companyNextNumber?.value || '',
-                  dueDate: invoiceData?.dueDate || dateToString(new Date()),
+                  dueDate,
                   sentDate: invoiceData?.sentDate || dateToString(new Date()),
                   email: {
                     email: '',
