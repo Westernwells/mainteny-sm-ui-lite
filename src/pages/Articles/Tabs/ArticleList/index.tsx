@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import {convertNumberToAmountNumber, useCurrentCurrency} from 'utils/currency';
 import {useQueryState} from 'hooks/useQueryState';
 import {createEmptyResource, makePage, toggleOrder} from 'utils/paging';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {Order, OrderByParams} from 'models/pagination';
 import {TableColumnWithRender} from 'models/table';
@@ -22,7 +22,6 @@ import Box from '@mui/material/Box';
 import SearchInput from 'components/SearchInput/index';
 import Filters from 'components/Filters';
 import TextInput from 'components/TextInput';
-import UnitIdInput from 'components/Inputs/UnitInput/UnitIdInput';
 import {CircularProgress, Typography} from '@mui/material';
 import {Button} from 'components/Button';
 import AddButton from 'components/AddButton';
@@ -51,6 +50,9 @@ import {aggregateArticleRow, createSearchQuery} from 'utils/article-utils';
 import {useExportTableSheet} from 'hooks/useExport';
 import {getPlainStringFromHtml} from 'utils/rich-field-string';
 import {stringToTitleCase} from 'utils/utils';
+import {FormSelect} from 'components/form/FormSelect';
+import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
+import {LanguageContext} from 'context/LanguageProvider';
 
 const pageSize = 25;
 
@@ -61,6 +63,7 @@ const ArticleList = () => {
   const {t} = useTranslation();
   const navigate = useNavigate();
   const currentCurrency = useCurrentCurrency();
+  const {language: selectedLng} = useContext(LanguageContext);
 
   const [search, setSearch] = useQueryState('searchQuotations');
 
@@ -71,8 +74,8 @@ const ArticleList = () => {
     },
   );
 
-  const [selectedUnitId, setSelectedUnitId] = useQueryState<string | undefined>(
-    'selectedUnitId',
+  const [selectedUnit, setSelectedUnit] = useQueryState<string | undefined>(
+    'selectedUnit',
     {defaultValue: undefined},
   );
 
@@ -153,19 +156,19 @@ const ArticleList = () => {
     type: selectedType.includes(ARTICLE_TYPE_FILTER.ALL)
       ? []
       : (selectedType as unknown as ArticleType[]),
-    ...(selectedUnitId && {unit: [selectedUnitId]}),
+    ...(selectedUnit && {unit: [selectedUnit]}),
     ...(vat && {sellingVatPercent: vat}),
 
     ...(sellingPriceMin &&
       sellingPriceMin > 0 && {
-        sellingPriceStart: `${convertNumberToAmountNumber(
+        netSellingPriceStart: `${convertNumberToAmountNumber(
           sellingPriceMin,
           currentCurrency,
         )}`,
       }),
     ...(sellingPriceMax &&
       sellingPriceMax > 0 && {
-        sellingPriceEnd: `${convertNumberToAmountNumber(
+        netSellingPriceEnd: `${convertNumberToAmountNumber(
           sellingPriceMax,
           currentCurrency,
         )}`,
@@ -173,14 +176,14 @@ const ArticleList = () => {
 
     ...(buyingPriceMin &&
       buyingPriceMin > 0 && {
-        purchasePriceStart: `${convertNumberToAmountNumber(
+        netPurchasePriceStart: `${convertNumberToAmountNumber(
           buyingPriceMin,
           currentCurrency,
         )}`,
       }),
     ...(buyingPriceMax &&
       buyingPriceMax > 0 && {
-        purchasePriceEnd: `${convertNumberToAmountNumber(
+        netPurchasePriceEnd: `${convertNumberToAmountNumber(
           buyingPriceMax,
           currentCurrency,
         )}`,
@@ -328,7 +331,7 @@ const ArticleList = () => {
   // filter intermediate state
   const {handleSubmit, setValue, watch, control} = useForm<ArticleFilterForm>({
     defaultValues: {
-      unitId: selectedUnitId,
+      unit: selectedUnit,
       sellingPriceMin,
       sellingPriceMax,
       buyingPriceMin,
@@ -337,7 +340,7 @@ const ArticleList = () => {
     mode: 'all',
   });
 
-  const watchUnitId = watch('unitId');
+  const watchUnit = watch('unit');
   const watchSellingPriceMin = watch('sellingPriceMin');
   const watchSellingPriceMax = watch('sellingPriceMax');
   const watchBuyingPriceMin = watch('buyingPriceMin');
@@ -350,7 +353,7 @@ const ArticleList = () => {
   );
 
   const handleFilterApply: SubmitHandler<ArticleFilterForm> = (data) => {
-    setSelectedUnitId(data.unitId);
+    setSelectedUnit(data.unit);
     setSellingPriceMin(data.sellingPriceMin);
     setSellingPriceMax(data.sellingPriceMax);
     setBuyingPriceMin(data.buyingPriceMin);
@@ -362,7 +365,7 @@ const ArticleList = () => {
   };
 
   const handleFilterOpen = () => {
-    setValue('unitId', selectedUnitId);
+    setValue('unit', selectedUnit);
     setValue('sellingPriceMin', sellingPriceMin);
     setValue('sellingPriceMax', sellingPriceMax);
     setValue('buyingPriceMin', buyingPriceMin);
@@ -374,7 +377,7 @@ const ArticleList = () => {
   };
 
   const handleFilterReset = () => {
-    setValue('unitId', undefined);
+    setValue('unit', undefined);
     setValue('sellingPriceMin', undefined);
     setValue('sellingPriceMax', undefined);
     setValue('buyingPriceMin', undefined);
@@ -387,14 +390,14 @@ const ArticleList = () => {
 
   const appliedFilterNumber = useMemo(
     () =>
-      [vat, selectedUnitId, storageLocation, category, manufacturer].filter(
+      [vat, selectedUnit, storageLocation, category, manufacturer].filter(
         (field) => !!field,
       ).length +
       [sellingPriceMin, sellingPriceMax, buyingPriceMin, buyingPriceMax].filter(
         (field) => !!field && field > 0,
       ).length,
     [
-      selectedUnitId,
+      selectedUnit,
       sellingPriceMin,
       sellingPriceMax,
       buyingPriceMin,
@@ -521,10 +524,10 @@ const ArticleList = () => {
   if (emptyTable) {
     return (
       <EmptyTable
-        illustration="quotation"
-        label="No quotations"
-        subLabel="Create a new quotation to offer clients tailored service proposals and pricing, ready to be sent out."
-        btnLabel="New Quotation"
+        illustration="articles"
+        label="No articles"
+        subLabel="Add articles to manage resources and materials used in job operations, ensuring accurate tracking and billing."
+        btnLabel="New Article"
         onClick={navigateToNew}
       />
     );
@@ -680,12 +683,26 @@ const ArticleList = () => {
 
               <Controller
                 control={control}
-                name="unitId"
+                name="unit"
                 render={({field}) => (
-                  <UnitIdInput
-                    selectedValue={watchUnitId}
-                    onChange={field.onChange}
-                  />
+                  <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                    <Typography variant="subtitle2">{t('Unit')}</Typography>
+                    <FormSelect
+                      labelId="select-article-unit"
+                      label=""
+                      options={createMeasurementOptions(
+                        selectedLng,
+                        MeasurementUnit.UE,
+                      )}
+                      resetOption={{label: t('Select Unit')}}
+                      selectProps={{
+                        id: 'article-filter-select-unit',
+                        value: watchUnit,
+                        onChange: field.onChange,
+                        placeholder: t('Select Unit'),
+                      }}
+                    />
+                  </Box>
                 )}
               />
 
