@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {DeleteOutlined, EditOutlined} from '@mui/icons-material';
 import TableActionMenu from 'components/Table/TableActionMenu';
 import {Action} from 'models/table';
-import {useTranslation} from 'react-i18next';
 
 interface Props {
   onEdit: () => void;
@@ -10,18 +9,17 @@ interface Props {
 }
 
 const Actions = ({onEdit, onDelete}: Props) => {
-  const {t} = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
 
   const menuActions: Action[] = [
     {
       icon: EditOutlined,
-      label: t('Edit'),
+      label: 'Edit',
       onTrigger: () => onEdit(),
     },
     {
       icon: DeleteOutlined,
-      label: t('Delete'),
+      label: 'Delete',
       onTrigger: () => onDelete(),
     },
   ];
