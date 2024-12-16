@@ -156,8 +156,12 @@ export interface QueryArticleParams {
   supplier?: string;
   order?: Order;
   orderByField?: ArticleOrderField;
+  netSellingPriceStart?: string;
+  netSellingPriceEnd?: string;
   sellingPriceStart?: string;
   sellingPriceEnd?: string;
+  netPurchasePriceStart?: string;
+  netPurchasePriceEnd?: string;
   purchasePriceStart?: string;
   purchasePriceEnd?: string;
   sellingVatPercent?: number;
@@ -321,7 +325,7 @@ export type ArticleStatistics = {
 };
 
 export type ArticleFilterForm = {
-  unitId?: string;
+  unit?: string;
   sellingPriceMin?: number;
   sellingPriceMax?: number;
   buyingPriceMin?: number;
