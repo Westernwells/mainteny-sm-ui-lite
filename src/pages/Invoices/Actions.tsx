@@ -20,6 +20,7 @@ import Payments from '@mui/icons-material/Payments';
 import FileDownload from '@mui/icons-material/FileDownload';
 import Edit from '@mui/icons-material/Edit';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
+import {addDays} from 'date-fns';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
@@ -532,6 +533,7 @@ export const Actions = ({
     invoiceNumber,
     setInState = true,
     showCurrentDateAsInvoiceDate = false,
+    qrImageSrcProp,
   }: {
     invoiceData: InvoiceView;
     headerBlockUrl: {[key: string]: string};
@@ -539,6 +541,7 @@ export const Actions = ({
     invoiceNumber?: string;
     setInState?: boolean;
     showCurrentDateAsInvoiceDate?: boolean;
+    qrImageSrcProp?: string;
   }) => {
     let PdfTemplate;
 
@@ -587,7 +590,7 @@ export const Actions = ({
         headerInfo={headerInfo}
         footerPath={footerBlockUrl[footerInfo?.path]}
         footerInfo={footerInfo}
-        qrImageSrc={qrImageSrc}
+        qrImageSrc={qrImageSrcProp || qrImageSrc}
         nextCompanyExternalId={
           invoiceNumber || translate('Automatically assigned')
         }
@@ -856,6 +859,33 @@ export const Actions = ({
     setExistingFiles(allFiles);
   };
 
+  const getQrImageSrc = async (qrInvoice: InvoiceView) => {
+    const qrBillData = createQrData(
+      qrCurrency,
+      qrInvoice,
+      currentCurrency,
+      user?.userAccount,
+    );
+
+    const qrBillSvg = new SwissQRBill(qrBillData);
+
+    const result = await new Promise<string>((resolve, reject) => {
+      svgToJpegPng(
+        qrBillSvg.element as unknown as SVGSVGElement,
+        (imageResult) => {
+          if (imageResult) {
+            resolve(imageResult); // Resolve on success
+          } else {
+            reject(new Error('Failed to generate QR code image')); // Reject on failure
+          }
+        },
+        {format: 'jpeg', quality: 1},
+      );
+    });
+
+    return result;
+  };
+
   const checkValidQrCode = useCallback(
     async (qrInvoice: InvoiceView) => {
       if (!user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
@@ -863,29 +893,7 @@ export const Actions = ({
       }
 
       try {
-        const qrBillData = createQrData(
-          qrCurrency,
-          qrInvoice,
-          currentCurrency,
-          user?.userAccount,
-        );
-
-        const qrBillSvg = new SwissQRBill(qrBillData);
-
-        const result = await new Promise<string>((resolve, reject) => {
-          svgToJpegPng(
-            qrBillSvg.element as unknown as SVGSVGElement,
-            (imageResult) => {
-              if (imageResult) {
-                resolve(imageResult); // Resolve on success
-              } else {
-                reject(new Error('Failed to generate QR code image')); // Reject on failure
-              }
-            },
-            {format: 'jpeg', quality: 1},
-          );
-        });
-
+        const result = await getQrImageSrc(qrInvoice);
         setQrImageSrc(result);
 
         setQrError(null);
@@ -913,6 +921,17 @@ export const Actions = ({
     }
   }, [qrError]);
 
+  const paymentTermDueDays =
+    invoice?.additionalInfo?.paymentTerm?.data?.dueDays;
+  const dueDate =
+    typeof paymentTermDueDays === 'number'
+      ? dateToString(addDays(new Date(), paymentTermDueDays))
+      : invoice?.dueDate || dateToString(new Date());
+  const invoiceWithUpdatedDueDate = {
+    ...invoice,
+    dueDate,
+  };
+
   const refetchPDFs = async (companyNextId?: string) => {
     // Refetch the download URLs for invoice, work report, and checklist
     const invoiceDownloadUrlResponse = await refetchDownloadUrl();
@@ -922,7 +941,7 @@ export const Actions = ({
     // Ensure all download URLs are fetched before calling getExistingFiles
     await getExistingFiles(
       invoiceDownloadUrlResponse.data,
-      invoice,
+      invoiceWithUpdatedDueDate,
       companyNextId,
       workReportDownloadUrlResponse.data,
       checklistDownloadUrlResponse.data,
@@ -999,13 +1018,17 @@ export const Actions = ({
       setActionType('DOWNLOAD');
 
       try {
+        let qrImageSrcProp = qrImageSrc;
         if (
           user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
-          !qrImageSrc &&
+          !qrImageSrcProp &&
           invoice.status === InvoiceStatus.DRAFT
         ) {
-          await checkValidQrCode(invoice);
-          return;
+          const error = await checkValidQrCode(invoice);
+          if (error) {
+            return;
+          }
+          qrImageSrcProp = await getQrImageSrc(invoice);
         }
 
         if (invoice.status === InvoiceStatus.DRAFT) {
@@ -1013,6 +1036,7 @@ export const Actions = ({
             invoiceData: invoice,
             headerBlockUrl: headerUrl,
             footerBlockUrl: footerUrl,
+            qrImageSrcProp,
           });
         } else {
           await refetchDownloadUrl();
@@ -1230,13 +1254,17 @@ export const Actions = ({
 
     setIsConfirmPrintDialogOpen(false);
 
+    let qrImageSrcProp = qrImageSrc;
     if (
       user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
-      !qrImageSrc &&
+      !qrImageSrcProp &&
       invoice.status === InvoiceStatus.DRAFT
     ) {
-      await checkValidQrCode(invoice);
-      return;
+      const error = await checkValidQrCode(invoice);
+      if (error) {
+        return;
+      }
+      qrImageSrcProp = await getQrImageSrc(invoice);
     }
 
     if (invoice.status === InvoiceStatus.DRAFT) {
@@ -1246,6 +1274,7 @@ export const Actions = ({
             data: formatInvoiceViewToUpdateInvoice({
               ...invoice,
               externalId: companyNextNumber?.value!,
+              dueDate,
             }),
             invoiceId: invoice.id,
           },
@@ -1257,6 +1286,7 @@ export const Actions = ({
                 headerBlockUrl: headerUrl,
                 footerBlockUrl: footerUrl,
                 invoiceNumber: updatedInvoiceData?.data?.externalId,
+                qrImageSrcProp,
               });
 
               const uploadPath = `${serviceCompanyId}/invoices`;
@@ -1311,16 +1341,20 @@ export const Actions = ({
         );
       } else {
         const blob = await generateBlobUrl({
-          invoiceData: invoice,
+          invoiceData: invoiceWithUpdatedDueDate,
           headerBlockUrl: headerUrl,
           footerBlockUrl: footerUrl,
           invoiceNumber: invoice.externalId,
+          qrImageSrcProp,
         });
 
-        const invoiceXML = await getXInvoiceOperation(invoice, {
-          forceGet: true,
-          invoiceNumber: invoice.externalId,
-        });
+        const invoiceXML = await getXInvoiceOperation(
+          invoiceWithUpdatedDueDate,
+          {
+            forceGet: true,
+            invoiceNumber: invoice.externalId,
+          },
+        );
 
         const uploadPath = `${serviceCompanyId}/invoices`;
 
@@ -1338,7 +1372,7 @@ export const Actions = ({
                 pdfPath,
                 xmlPath,
                 externalId: invoice.externalId!,
-                dueDate: invoice.dueDate || dateToString(new Date()),
+                dueDate,
                 sentDate: invoice.sentDate || dateToString(new Date()),
               },
             },
@@ -1410,9 +1444,6 @@ export const Actions = ({
   const doDownload = async () => {
     const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
 
-    const shouldDownloadPDF =
-      invoiceFormat === InvoiceFormat.PDF ||
-      invoiceFormat === InvoiceFormat.PDF_AND_XML;
     const shouldDownloadXML =
       invoiceFormat === InvoiceFormat.XML ||
       invoiceFormat === InvoiceFormat.PDF_AND_XML;
@@ -1436,9 +1467,7 @@ export const Actions = ({
           downloadFile(xmlBlobURL, {extensionArg: '.xml'});
         }
 
-        if (shouldDownloadPDF) {
-          downloadFile();
-        }
+        downloadFile(); // pdf
         setPdfPathToDownload('');
         setActionType('');
       }
@@ -1448,9 +1477,7 @@ export const Actions = ({
     ) {
       const [xmlDownloadUrlData] = await Promise.all([refetchXMLDownloadUrl()]);
 
-      if (shouldDownloadPDF) {
-        downloadFile(downloadUrl?.[invoice.additionalInfo.pdfPath]);
-      }
+      downloadFile(downloadUrl?.[invoice.additionalInfo.pdfPath]); // pdf
 
       if (shouldDownloadXML && invoice.additionalInfo.xmlPath) {
         downloadFile(
@@ -1655,12 +1682,14 @@ export const Actions = ({
                 const invoiceDownloadUrl = invoiceDownloadResponse.data;
 
                 const [invoicePDF, invoiceXML] = await Promise.all([
-                  getBaseFileOperations(invoice, {
+                  getBaseFileOperations(invoiceWithUpdatedDueDate, {
                     invoiceDownloadUrl,
                     nextNumber: companyNextNumber?.value,
                     forceGet: true,
                   }),
-                  getXInvoiceOperation(invoice, {forceGet: true}),
+                  getXInvoiceOperation(invoiceWithUpdatedDueDate, {
+                    forceGet: true,
+                  }),
                 ]);
 
                 await uploadFiles({
@@ -1701,7 +1730,7 @@ export const Actions = ({
                       : invoiceData?.additionalInfo?.xmlPath!,
                     externalId:
                       invoiceData?.externalId! || companyNextNumber?.value!,
-                    dueDate: invoiceData?.dueDate || dateToString(new Date()),
+                    dueDate,
                     sentDate: invoiceData?.sentDate || dateToString(new Date()),
                     email: {
                       email: '',

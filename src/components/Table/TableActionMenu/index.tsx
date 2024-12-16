@@ -4,6 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import {Action} from 'models/table';
+import {t} from 'i18next';
 
 type Props = {
   options: Action[];
@@ -50,7 +51,7 @@ const TableActionMenu = ({
               handleClose();
             }}>
             <option.icon style={{marginRight: '8px'}} />
-            {option.label}
+            {t(option.label)}
           </MenuItem>
         ))}
       </Menu>
