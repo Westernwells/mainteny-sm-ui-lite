@@ -283,10 +283,16 @@ export const UpfrontPaymentsSection = ({
 
   useEffect(() => {
     const firstInvoice = previousInvoices[0];
-    const firstInvoicePaymentType = firstInvoice?.additionalInfo?.payment?.type;
+    const firstInvoicePayment = firstInvoice?.additionalInfo.payment;
+    const firstInvoicePaymentType = firstInvoicePayment?.type;
     const isFinalAfterPreviousInvoices =
       hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
     const invoiceIndex = previousInvoices?.length + 1;
+    const articlesAreSame =
+      ((firstInvoicePayment?.amount?.netAmount || 0) /
+        (subtotalExclVat * 100)) *
+        100 ===
+      firstInvoicePayment?.percentage;
 
     if (isEditing) {
       // do nothing if editing
@@ -296,7 +302,8 @@ export const UpfrontPaymentsSection = ({
       if (formik.values.payment?.description !== description) {
         formik.setFieldValue('payment', {
           ...formik.values.payment,
-          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
+          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE &&
+          articlesAreSame
             ? {
                 type: PaymentType.PERCENTAGE,
                 description,
@@ -319,7 +326,8 @@ export const UpfrontPaymentsSection = ({
         formik.setFieldValue('payment', {
           ...formik.values.payment,
           type:
-            firstInvoicePaymentType === PaymentType.PERCENTAGE
+            firstInvoicePaymentType === PaymentType.PERCENTAGE &&
+            articlesAreSame
               ? PaymentType.PERCENTAGE
               : PaymentType.LUMP_SUM,
           description,

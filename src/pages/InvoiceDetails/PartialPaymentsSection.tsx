@@ -324,7 +324,8 @@ export const PartialPaymentsSection = ({
   useEffect(() => {
     const firstInvoice = previousInvoices[0];
     const lastInvoice = previousInvoices[previousInvoices.length - 1];
-    const firstInvoicePaymentType = firstInvoice?.additionalInfo.payment?.type;
+    const firstInvoicePayment = firstInvoice?.additionalInfo.payment;
+    const firstInvoicePaymentType = firstInvoicePayment?.type;
     const isFinalAfterPartial =
       hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
 
@@ -355,6 +356,11 @@ export const PartialPaymentsSection = ({
         ? lastInvoiceIndex + 1
         : 1
       : previousInvoices.length + 1;
+    const articlesAreSame =
+      ((firstInvoicePayment?.amount?.netAmount || 0) /
+        (subtotalExclVat * 100)) *
+        100 ===
+      firstInvoicePayment?.percentage;
 
     if (isEditing) {
       // do nothing if editing
@@ -364,7 +370,8 @@ export const PartialPaymentsSection = ({
       if (formik.values.payment?.description !== description) {
         formik.setFieldValue('payment', {
           ...formik.values.payment,
-          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
+          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE &&
+          articlesAreSame
             ? {
                 type: PaymentType.PERCENTAGE,
                 description,
@@ -391,7 +398,8 @@ export const PartialPaymentsSection = ({
         formik.setFieldValue('payment', {
           ...formik.values.payment,
           type:
-            firstInvoicePaymentType === PaymentType.PERCENTAGE
+            firstInvoicePaymentType === PaymentType.PERCENTAGE &&
+            articlesAreSame
               ? PaymentType.PERCENTAGE
               : firstInvoicePaymentType === PaymentType.PER_ITEM
               ? PaymentType.PER_ITEM
