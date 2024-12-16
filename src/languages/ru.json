@@ -2703,5 +2703,13 @@
   "Mark as rejected": "Отметить как отклоненную",
   "Selling price": "Цена продажи",
   "Payment data included": "Платежные данные включены",
-  "Email address": "Адрес электронной почты"
+  "Auto Dialer": "Автоответчик",
+  "Sim Pin": "Сим-пин",
+  "Place of Installation": "Место установки",
+  "IoT Device": "IoT-устройство",
+  "Cage Weight": "Вес клетки",
+  "Hoisting Height": "Высота подъема",
+  "Shaft Height": "Высота вала",
+  "Email address": "Адрес электронной почты",
+  "Number of People": "Число людей"
 }

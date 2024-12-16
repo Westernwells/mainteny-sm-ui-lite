@@ -2773,5 +2773,13 @@
   "Mark as rejected": "უარყოფილად მონიშვნა",
   "Selling price": "გასაყიდი ფასი",
   "Payment data included": "შედის გადახდის მონაცემები",
-  "Email address": "ელ.ფოსტის მისამართი"
+  "Auto Dialer": "ავტომატური დარეკვა",
+  "Sim Pin": "სიმ პინი",
+  "Place of Installation": "ინსტალაციის ადგილი",
+  "IoT Device": "IoT მოწყობილობა",
+  "Cage Weight": "გალიის წონა",
+  "Hoisting Height": "ამწე სიმაღლე",
+  "Shaft Height": "შახტის სიმაღლე",
+  "Email address": "ელ.ფოსტის მისამართი",
+  "Number of People": "ადამიანების რაოდენობა"
 }
