@@ -3011,5 +3011,13 @@
   "Please provide a valid date for the job creation date": "Por favor indique una fecha válida para la creación del empleo",
   "Please provide a valid date for the first invoice date": "Por favor indique una fecha válida para la primera factura",
   "Payment data included": "Datos de pago incluidos",
-  "Email address": "Dirección de correo electrónico"
+  "Auto Dialer": "Marcador automático",
+  "Sim Pin": "pin sim",
+  "Place of Installation": "Lugar de instalación",
+  "IoT Device": "dispositivo de IoT",
+  "Cage Weight": "Peso de la jaula",
+  "Hoisting Height": "Altura de elevación",
+  "Shaft Height": "Altura de eje",
+  "Email address": "Dirección de correo electrónico",
+  "Number of People": "Número de personas"
 }

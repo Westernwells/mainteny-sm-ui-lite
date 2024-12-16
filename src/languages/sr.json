@@ -3011,5 +3011,13 @@
   "Please provide a valid date for the job creation date": "Navedite važeći datum za datum otvaranja posla",
   "Please provide a valid date for the first invoice date": "Navedite važeći datum za prvi datum fakture",
   "Payment data included": "Podaci o plaćanju uključeni",
-  "Email address": "Adresa E-pošte"
+  "Auto Dialer": "Automatski birač",
+  "Sim Pin": "SIM pin",
+  "Place of Installation": "Mesto ugradnje",
+  "IoT Device": "IoT uređaj",
+  "Cage Weight": "Težina kaveza",
+  "Hoisting Height": "Visina podizanja",
+  "Shaft Height": "Visina osovine",
+  "Email address": "Adresa E-pošte",
+  "Number of People": "Broj ljudi"
 }

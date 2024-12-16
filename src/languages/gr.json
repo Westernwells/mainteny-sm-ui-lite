@@ -2576,5 +2576,13 @@
   "Mark as rejected": "Επισήμανση ως απορριφθέντος ",
   "Selling price": "Τιμή πωλήσεως",
   "Payment data included": "Συμπεριλαμβάνονται δεδομένα πληρωμής",
-  "Email address": "ηλεκτρονική διεύθυνση (email)"
+  "Auto Dialer": "Σύστημα κλήσης έκτακτης ανάγκης",
+  "Sim Pin": "Καρφίτσα Sim",
+  "Place of Installation": "Τόπος εγκατάστασης",
+  "IoT Device": "Συσκευή IoT",
+  "Cage Weight": "Βάρος κλουβιού",
+  "Hoisting Height": "Ύψος ανύψωσης",
+  "Shaft Height": "Ύψος άξονα",
+  "Email address": "ηλεκτρονική διεύθυνση (email)",
+  "Number of People": "Αριθμός των ανθρώπων"
 }

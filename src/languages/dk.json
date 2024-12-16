@@ -2654,5 +2654,13 @@
   "Mark as rejected": "Markér som afvist ",
   "Selling price": "Salgspris",
   "Payment data included": "Betalingsdata inkluderet",
-  "Email address": "Email Adresse"
+  "Auto Dialer": "Tryghedsalarm",
+  "Sim Pin": "Sim pin",
+  "Place of Installation": "Installationssted",
+  "IoT Device": "IoT-enhed",
+  "Cage Weight": "Stolvægt",
+  "Hoisting Height": "Løftehøjde",
+  "Shaft Height": "Skakthøjde",
+  "Email address": "Email Adresse",
+  "Number of People": "Antal personer"
 }
