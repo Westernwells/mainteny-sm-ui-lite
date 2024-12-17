@@ -1001,7 +1001,7 @@ const Invoices = ({elevatorId}: Props) => {
                       value={value}
                       onChange={onChange}
                       size="small"
-                      labelKey="Invoicing number"
+                      labelKey="Invoice number"
                       placeholder="Search invoice number"
                     />
                   )}
