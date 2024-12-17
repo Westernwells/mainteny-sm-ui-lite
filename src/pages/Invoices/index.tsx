@@ -40,6 +40,7 @@ import TableRow from 'components/Table/TableRow';
 import Pagination from 'components/Pagination';
 import {
   ACTION_CELL_WIDTH,
+  ExportColumn,
   NOTES_CELL_WIDTH,
   TableColumnWithRender,
 } from 'models/table';
@@ -745,12 +746,35 @@ const Invoices = ({elevatorId}: Props) => {
         (col) => !excludedFields.includes(col.key),
       );
 
+      const exportColumns: ExportColumn<InvoiceTableRow>[] =
+        filteredColumns.map((col) => ({
+          getExportValue: col.getExportValue,
+        }));
+
       const headers = filteredColumns.map((col) =>
         capitalize(t(col.headerName)),
       );
 
+      const ONLY_EXPORT_NEW_COLUMN_NET_SUM_POSITION_START = 7;
+
+      exportColumns.splice(ONLY_EXPORT_NEW_COLUMN_NET_SUM_POSITION_START, 0, {
+        getExportValue: (invoice: InvoiceTableRow) =>
+          `${
+            invoice
+              ? (invoice.data.totalAmount?.netAmount ?? 0) /
+                10 ** invoice.data.totalAmount.fractionDigits!
+              : 0
+          }`,
+      });
+
+      headers.splice(
+        ONLY_EXPORT_NEW_COLUMN_NET_SUM_POSITION_START,
+        0,
+        capitalize(t('Net amount')),
+      );
+
       const dataRows = aggregateInvoiceRow(data).map((invoice) =>
-        filteredColumns.map((col) => col.getExportValue?.(invoice) || ''),
+        exportColumns.map((col) => col.getExportValue?.(invoice) || ''),
       );
 
       const filename = 'Invoices';
