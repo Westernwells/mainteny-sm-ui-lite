@@ -635,3 +635,7 @@ export interface ElevatorDataItemRecord {
 export interface UpdateElevatorDataItemBody {
   items: ElevatorDataItemRecord[];
 }
+
+export interface GetElevatorDataSchemasAffectedFieldParams {
+  fieldNames: string[];
+}

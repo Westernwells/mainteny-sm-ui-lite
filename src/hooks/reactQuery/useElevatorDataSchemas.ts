@@ -2,11 +2,12 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {
   CreateElevatorDataSchemaBody,
   EditElevatorDataSchemaBody,
+  GetElevatorDataSchemasAffectedFieldParams,
 } from 'models/elevator';
-import {StringValue} from 'models/misc';
-import {useMutation, useQueryClient} from 'react-query';
+import {RestError, StringValue} from 'models/misc';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {queryKeys} from 'reactQuery/constants';
-import {axiosClient} from 'utils/axios-utils';
+import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 
 const createElevatorDataSchemas = async (
   body: CreateElevatorDataSchemaBody,
@@ -96,3 +97,40 @@ export const useDeleteElevatorDataSchemas = (successMsg?: string) => {
     },
   );
 };
+
+const getElevatorDataSchemasAffectedFields = async (
+  schemaId: string,
+  query: GetElevatorDataSchemasAffectedFieldParams,
+) => {
+  const response = await axiosClient.get<{[key: string]: number}>(
+    `/api/elevatorDataSchemas/${schemaId}/affectedFields`,
+    {
+      params: query,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export const useGetElevatorDataSchemasAffectedFields = (
+  schemaId?: string,
+  params?: GetElevatorDataSchemasAffectedFieldParams,
+  options?: {
+    enabled?: boolean;
+    refetchOnWindowFocus?: boolean;
+    useErrorBoundary?: boolean;
+  },
+) =>
+  useQuery<{[key: string]: number}, RestError>(
+    [
+      queryKeys.getElevatorDataSchemasAffectedFields,
+      schemaId,
+      params?.fieldNames,
+    ],
+    () => getElevatorDataSchemasAffectedFields(schemaId!, params!),
+    {
+      ...options,
+      enabled: options?.enabled && !!schemaId,
+    },
+  );

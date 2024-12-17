@@ -14,6 +14,7 @@ import {
 } from 'hooks/reactQuery/useElevator';
 import {Box} from '@mui/system';
 import {Button} from 'components/Button';
+import {getTechnicalFieldCategory, getTechnicalFieldName} from 'utils/utils';
 import EditTechnicalDataForm from './EditTechnicalDataForm';
 import TechnicalDataView from './TechnicalDataView';
 
@@ -77,16 +78,20 @@ const TechnicalData = ({elevator, schema}: Props) => {
   const onSubmit = async () => {
     const values = getValues();
 
+    const items = elevatorDataItems
+      .map((item) => ({
+        name: item.name,
+        value: values[item.name],
+      }))
+      .filter((item) => !!item.value);
+
     await updateElevatorDataItem({
       queryParams: {
         elevatorId: elevator.id,
         schemaId: schema.id,
       },
       body: {
-        items: elevatorDataItems.map((item) => ({
-          name: item.name,
-          value: values[item.name] ?? '',
-        })),
+        items,
       },
     });
 
@@ -118,7 +123,7 @@ const TechnicalData = ({elevator, schema}: Props) => {
       header={
         <Grid container wrap="nowrap" gap={1}>
           <Typography variant="h5" fontWeight={600}>
-            {t(schema.name)}
+            {getTechnicalFieldCategory({name: schema.name}, t)}
           </Typography>
         </Grid>
       }>
@@ -135,7 +140,7 @@ const TechnicalData = ({elevator, schema}: Props) => {
                 my: 1,
               }}>
               <Typography fontWeight={400} color="#828DA3">
-                {item.name}
+                {getTechnicalFieldName({name: item.name}, t)}
               </Typography>
               {elevatorDataItemMapping[item.name] && (
                 <Typography fontWeight={400} color="#000034">

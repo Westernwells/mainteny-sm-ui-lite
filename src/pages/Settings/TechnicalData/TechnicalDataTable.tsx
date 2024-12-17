@@ -11,6 +11,8 @@ import {Resource} from 'models/misc';
 import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
 import {useMemo, useRef, useState} from 'react';
 import {formatDate} from 'utils/datetime';
+import {getTechnicalFieldCategory} from 'utils/utils';
+import {useTranslation} from 'react-i18next';
 import Actions from './components/Actions';
 
 interface Props {
@@ -35,6 +37,7 @@ const TechnicalDataTable = ({
   const [showLeftShadow, setShowLeftShadow] = useState(false);
   const [showRightShadow, setShowRightShadow] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const {t} = useTranslation();
 
   const rows = useMemo(() => dataResource?.data ?? [], [dataResource]);
 
@@ -46,10 +49,14 @@ const TechnicalDataTable = ({
         fieldName: 'name',
         width: '450px',
         showShadows: showRightShadow ? 'right' : undefined,
-        getExportValue: (elevatorDataSchema) => elevatorDataSchema.name,
+        textTransform: false,
+        getExportValue: (elevatorDataSchema) =>
+          getTechnicalFieldCategory({name: elevatorDataSchema.name}, t),
         renderCell: (elevatorDataSchema, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>{elevatorDataSchema.name}</TableCellText>
+            <TableCellText>
+              {getTechnicalFieldCategory({name: elevatorDataSchema.name}, t)}
+            </TableCellText>
           </Cell>
         ),
       },
@@ -58,6 +65,7 @@ const TechnicalDataTable = ({
         key: 'elevator-data-schema-no-of-fields',
         width: '90px',
         fieldName: 'noOfFields',
+        textTransform: false,
         getExportValue: (elevatorDataSchema) =>
           elevatorDataSchema.additionalInfo.items.length.toString(),
         renderCell: (elevatorDataSchema, cellProps) => (
@@ -72,6 +80,7 @@ const TechnicalDataTable = ({
         headerName: 'Created',
         key: 'elevator-data-schema-created-at',
         width: '100px',
+        textTransform: false,
 
         fieldName: 'createdAt',
         getExportValue: (elevatorDataSchema) =>
@@ -89,6 +98,8 @@ const TechnicalDataTable = ({
         key: 'elevator-data-schema-edited-at',
         width: '100px',
         fieldName: 'lastUpdatedAt',
+        textTransform: false,
+
         getExportValue: (elevatorDataSchema) =>
           formatDate(new Date(elevatorDataSchema.meta.lastUpdatedAt))!,
         renderCell: (elevatorDataSchema, cellProps) => (
@@ -105,6 +116,8 @@ const TechnicalDataTable = ({
         key: 'service-order-cell-action',
         isHeaderNameHidden: true,
         align: 'center',
+        textTransform: false,
+
         width: ACTION_CELL_WIDTH, // set static width that will not change
         isLast: true,
         noPadding: true,
@@ -130,6 +143,7 @@ const TechnicalDataTable = ({
       onOpenDeleteDialog,
       onOpenEditDialog,
       onDuplicate,
+      t,
     ],
   );
 
@@ -150,6 +164,9 @@ const TechnicalDataTable = ({
               testId={`service-order-row-${entry.id}`}>
               {COLUMNS.map(({renderCell, ...rest}) =>
                 renderCell(entry, {
+                  onClick: () => {
+                    onOpenPreviewDialog(entry);
+                  },
                   ...rest,
                 }),
               )}

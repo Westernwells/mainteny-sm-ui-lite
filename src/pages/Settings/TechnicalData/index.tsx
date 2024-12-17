@@ -283,9 +283,11 @@ const TechnicalData = () => {
     <>
       <InfoCard
         header={
-          <Typography variant="subtitle1">{t('Technical Data')}</Typography>
+          <Typography fontWeight="bold" variant="subtitle1">
+            {t('Technical Data')}
+          </Typography>
         }
-        showHeaderBackground
+        showHeaderBackground={false}
         bodyContainerStyle={{
           flex: 1,
           display: 'flex',
@@ -374,6 +376,8 @@ const TechnicalData = () => {
             setCategoryName={setCategoryName}
             items={items}
             mode={dialogState.mode}
+            isDialogOpen={dialogState.open}
+            selectedSchema={dialogState.selectedSchema}
             setItems={setItems}
           />
         )}

@@ -126,4 +126,6 @@ export const queryKeys = {
   coordsToAddress: 'coordsToAddress',
   // Fetching config emails
   fetchCompanyEmailConfig: 'fetchCompanyEmailConfig',
+
+  getElevatorDataSchemasAffectedFields: 'getElevatorDataSchemasAffectedFields',
 };

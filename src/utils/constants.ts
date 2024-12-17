@@ -105,3 +105,31 @@ export const ALL_SERVICE_ORDER_TYPE_PRIORITY = [
     value: ServiceOrderTypePriority.LOW,
   },
 ];
+
+export const DEFAULT_ELEVATOR_TECHNICAL_FIELD_NAMES = [
+  '# stops',
+  'drive',
+  'capacity',
+  'speed',
+  'controller',
+  'iot device',
+  'cabin type',
+  'cage weight',
+  'counterweight',
+  'hoisting height',
+  'shaft height',
+  'number of people',
+  'manufacturer',
+  'system id',
+  'phone connection',
+  'phone number',
+  'sim card number',
+  'sim pin',
+  'call center',
+  'place of installation',
+];
+
+export const DEFAULT_ELEVATOR_TECHNICAL_FIELD_CATEGORIES = [
+  'technical data',
+  'auto dialer',
+];

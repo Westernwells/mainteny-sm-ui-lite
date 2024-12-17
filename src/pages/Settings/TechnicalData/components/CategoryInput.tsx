@@ -1,23 +1,36 @@
 import {EditOutlined} from '@mui/icons-material';
 import {Box} from '@mui/material';
-import {ChangeEventHandler} from 'react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {getTechnicalFieldCategory} from 'utils/utils';
 
+export type EventTargetWithValue = {
+  target: {value: string};
+};
 interface Props {
   value?: string;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
+  onChange?: (e: EventTargetWithValue) => void;
 }
 
 export const CategoryInput = ({onChange, value}: Props) => {
   const {t} = useTranslation();
+
+  const [stopTranslating, setStopTranslating] = useState(false);
 
   return (
     <Box sx={{display: 'flex', flexDirection: 'row', alignContent: 'center'}}>
       <Box
         component="input"
         placeholder={`${t('Enter your category name')}...`}
-        value={value}
-        onChange={onChange}
+        value={
+          stopTranslating
+            ? value
+            : getTechnicalFieldCategory({name: value ?? ''}, t)
+        }
+        onChange={(e) => {
+          onChange?.(e as never as EventTargetWithValue);
+          setStopTranslating(true);
+        }}
         sx={{
           border: 'none',
           width: 300,

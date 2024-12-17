@@ -28,7 +28,6 @@ const TableHeaderCell = ({
   sortState,
   isFirst = false,
   isLast = false,
-
   onSort,
 }: Props) => {
   const {t} = useTranslation();
