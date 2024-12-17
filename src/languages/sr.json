@@ -3019,5 +3019,18 @@
   "Hoisting Height": "Visina podizanja",
   "Shaft Height": "Visina osovine",
   "Email address": "Adresa E-pošte",
-  "Number of People": "Broj ljudi"
+  "Number of People": "Broj ljudi",
+  "Add articles to manage resources and materials used in job operations, ensuring accurate tracking and billing.": "Dodajte članke za upravljanje resursima i materijalima koji se koriste u poslovima, obezbeđujući tačno praćenje i naplatu.",
+  "Help": "Pomoć",
+  "Email Signature": "Potpis e-pošte",
+  "Add a signature to be appended at the end of your outgoing emails.": "Dodajte potpis koji će biti dodat na kraju vaših odlaznih e-poruka.",
+  "Use this signature on all outgoing emails": "Koristite ovaj potpis na svim odlaznim imejlovima",
+  "Signature Preview": "Pretpregled potpisa",
+  "Email layout example with your signature appended.": "Primer izgleda e-pošte sa dodatkom vašeg potpisa.",
+  "Close Preview": "Zatvori pregled",
+  "Save Signature": "Sačuvaj potpis",
+  "Edit Email Signature": "Uredite potpis e-pošte",
+  "Customize Signature": "Prilagodite potpis",
+  "Delete Signature": "Izbriši potpis",
+  "You are about to delete this email signature. Are you sure about it?": "Spremate se da izbrišete ovaj potpis e-pošte. Jeste li sigurni u to?"
 }

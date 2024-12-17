@@ -2998,5 +2998,18 @@
   "Hoisting Height": "Förderhöhe",
   "Shaft Height": "Schachthöhe",
   "Email address": "Email Adresse",
-  "Number of People": "Personenanzahl"
+  "Number of People": "Personenanzahl",
+  "Add articles to manage resources and materials used in job operations, ensuring accurate tracking and billing.": "Fügen Sie Artikel hinzu, um Ressourcen und Materialien zu verwalten, die in Auftragsabläufen verwendet werden, und stellen Sie eine genaue Nachverfolgung und Abrechnung sicher.",
+  "Help": "Hilfe",
+  "Email Signature": "E-Mail-Signatur",
+  "Add a signature to be appended at the end of your outgoing emails.": "Fügen Sie eine Signatur hinzu, die an das Ende Ihrer ausgehenden E-Mails angehängt wird.",
+  "Use this signature on all outgoing emails": "Diese Signatur für alle ausgehenden E-Mails verwenden",
+  "Signature Preview": "Signaturvorschau",
+  "Email layout example with your signature appended.": "E-Mail-Beispiel mit angehängter Signatur",
+  "Close Preview": "Vorschau schließen",
+  "Save Signature": "Signatur speichern",
+  "Edit Email Signature": "E-Mail-Signatur bearbeiten",
+  "Customize Signature": "Signatur anpassen",
+  "Delete Signature": "Signatur löschen",
+  "You are about to delete this email signature. Are you sure about it?": "Sie sind dabei, diese E-Mail-Signatur zu löschen. Sind Sie sicher?"
 }
