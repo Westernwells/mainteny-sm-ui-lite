@@ -179,9 +179,9 @@ export const ArticleItemRowQuotation = ({
       unitAmount: {
         ...articleItem.unitAmount,
         percentageVat:
-          articleItem.unitAmount.percentageVat !== 0
-            ? articleItem.unitAmount.percentageVat
-            : defaultPercentageVat || 0,
+          defaultPercentageVat !== undefined
+            ? defaultPercentageVat
+            : articleItem.unitAmount.percentageVat,
       },
     },
     onSubmit: () => {},

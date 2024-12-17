@@ -180,11 +180,9 @@ export const ArticleItemRowNEW = ({
       unitAmount: {
         ...articleItem.unitAmount,
         percentageVat:
-          articleItem.unitAmount.percentageVat !== 0
-            ? articleItem.unitAmount.percentageVat
-            : articleItem.unitAmount.percentageVat === 0
-            ? 0
-            : defaultPercentageVat || 0,
+          defaultPercentageVat !== undefined
+            ? defaultPercentageVat
+            : articleItem.unitAmount.percentageVat,
       },
     },
     onSubmit: () => {},
