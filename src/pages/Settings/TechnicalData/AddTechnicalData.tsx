@@ -3,12 +3,15 @@ import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
 import {Button} from 'components/Button';
 import AddIcon from '@mui/icons-material/Add';
-import {ChangeEvent, Dispatch, SetStateAction, useRef} from 'react';
+import {Dispatch, SetStateAction, useMemo, useRef, useState} from 'react';
 import {
   ElevatorDataSchemaItem,
   ElevatorDataSchemaItemWithState,
+  ElevatorDataSchemaView,
 } from 'models/elevator';
-import {CategoryInput} from './components/CategoryInput';
+import {useGetElevatorDataSchemasAffectedFields} from 'hooks/reactQuery/useElevatorDataSchemas';
+import {isElevatorDataSchemaItemChanged} from 'utils/utils';
+import {CategoryInput, EventTargetWithValue} from './components/CategoryInput';
 import {AddFieldInput} from './components/AddFieldInput';
 import TechFieldEditDelete from './components/TechFieldEditDelete';
 
@@ -18,17 +21,47 @@ interface Props {
   setCategoryName: Dispatch<SetStateAction<string>>;
   setItems: Dispatch<SetStateAction<ElevatorDataSchemaItemWithState[]>>;
   mode: 'create' | 'edit';
+  selectedSchema?: ElevatorDataSchemaView;
+  isDialogOpen?: boolean;
 }
+
 export const AddTechnicalData = ({
   items,
   setCategoryName,
   setItems,
   categoryName,
+  selectedSchema,
+  isDialogOpen = false,
   mode = 'create',
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const boxRef = useRef<HTMLDivElement>(null);
+  const [affectedFields, setAffectedFields] = useState<Set<string>>(new Set());
+
+  const affectedFieldsArr = Array.from(affectedFields);
+  const {data: affectedFieldsCount} = useGetElevatorDataSchemasAffectedFields(
+    selectedSchema?.id,
+    {fieldNames: affectedFieldsArr},
+    {enabled: affectedFieldsArr.length > 0},
+  );
+
+  const originalItemsNameToIndexMapping = useMemo(() => {
+    const selectedSchemaItems = selectedSchema?.additionalInfo.items ?? [];
+
+    return selectedSchemaItems.reduce((acc, item, index) => {
+      acc[item.name] = index;
+      return acc;
+    }, {} as {[key: string]: number});
+  }, [selectedSchema]);
+
+  const count = useMemo(() => {
+    const fields = affectedFieldsCount ?? {};
+    return Object.keys(fields).reduce(
+      (acc, item) => acc + (fields[item] ?? 0),
+      0,
+    );
+  }, [affectedFieldsCount]);
 
   const scrollToBottom = () => {
     if (boxRef.current) {
@@ -39,7 +72,7 @@ export const AddTechnicalData = ({
     }
   };
 
-  const handleCategoryTextChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleCategoryTextChange = (e: EventTargetWithValue) => {
     setCategoryName(e.target.value);
   };
 
@@ -60,15 +93,28 @@ export const AddTechnicalData = ({
     const item = {...itemsCopy[index]};
     itemsCopy[index] = {...item, ...values, isEditing: false};
 
-    if (
-      item.fromDatabase &&
-      values.name.toLowerCase() !== item.name.toLowerCase()
-    ) {
+    if (item.fromDatabase) {
       const originalName = item.dataMigrationItem?.fromName ?? item.name;
-      itemsCopy[index].dataMigrationItem = {
-        fromName: originalName,
-        toName: values.name,
-      };
+      const originalItemIndex = originalItemsNameToIndexMapping[originalName];
+      const originalItem =
+        selectedSchema?.additionalInfo.items[originalItemIndex];
+
+      if (values.name.toLowerCase() !== item.name.toLowerCase()) {
+        itemsCopy[index].dataMigrationItem = {
+          fromName: originalName,
+          toName: values.name,
+        };
+      }
+
+      const isChanged = isElevatorDataSchemaItemChanged(originalItem!, values);
+
+      if (isChanged) {
+        affectedFields.add(originalItem?.name!);
+      } else {
+        affectedFields.delete(originalItem?.name!);
+      }
+
+      setAffectedFields(affectedFields);
     }
 
     setItems(itemsCopy);
@@ -97,11 +143,17 @@ export const AddTechnicalData = ({
 
   const handleFieldEditDelete = (index: number) => {
     const itemsCopy = [...items];
+    const itemToDelete = {...itemsCopy[index]};
+
+    affectedFields.add(itemToDelete?.name!);
+    setAffectedFields(affectedFields);
 
     itemsCopy.splice(index, 1);
 
     setItems(itemsCopy);
   };
+
+  if (!isDialogOpen) return null;
 
   return (
     <Box sx={{flex: 1, display: 'flex', flexDirection: 'column'}}>
@@ -125,7 +177,7 @@ export const AddTechnicalData = ({
             </Typography>
             <Typography variant="body2" color={theme.palette.info.infoAlert}>
               {t('Number of affected data fields {{count}}', {
-                count: items.length,
+                count,
               })}
             </Typography>
           </Alert>

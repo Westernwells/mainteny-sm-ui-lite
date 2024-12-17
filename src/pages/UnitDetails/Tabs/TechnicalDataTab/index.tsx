@@ -13,7 +13,7 @@ const TechnicalDataTab = () => {
   const {data: elevatorDataSchemaResource} = useFetchElevatorDataSchemas(
     user?.userAccount.serviceCompany.id!,
     {
-      ...makePage(0, 20),
+      ...makePage(0, 100),
     },
   );
 

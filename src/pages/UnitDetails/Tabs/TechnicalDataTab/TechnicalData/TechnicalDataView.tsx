@@ -2,6 +2,7 @@ import {Typography} from '@mui/material';
 import {Box} from '@mui/system';
 import {ElevatorDataItemView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
+import {getTechnicalFieldName} from 'utils/utils';
 
 interface Props {
   elevatorDataItems: ElevatorDataItemView[];
@@ -21,7 +22,7 @@ const TechnicalDataView = ({elevatorDataItems}: Props) => {
             my: 1.5,
           }}>
           <Typography fontWeight={400} color="#828DA3">
-            {dataItem.name}
+            {getTechnicalFieldName({name: dataItem.name}, t)}
           </Typography>
           {dataItem.value && (
             <Typography fontWeight={400} color="#000034">

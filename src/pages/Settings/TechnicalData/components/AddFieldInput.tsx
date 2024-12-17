@@ -5,9 +5,10 @@ import {FormSelect} from 'components/form/FormSelect';
 import {LanguageContext} from 'context/LanguageProvider';
 import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
 import {ElevatorDataSchemaItem} from 'models/elevator';
-import {useContext, useMemo} from 'react';
+import {useContext, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useTranslation} from 'react-i18next';
+import {getTechnicalFieldName} from 'utils/utils';
 
 const FIELD_TYPE_OPTIONS = [
   {
@@ -26,9 +27,17 @@ interface Props {
   initialValues: ElevatorDataSchemaItem;
 }
 
+const DEFAULT_STOP_TRANSLATING_VALUES = {
+  name: false,
+  unit: false,
+  type: false,
+};
 export const AddFieldInput = ({initialValues, onConfirm, onCancel}: Props) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
+  const [stopTranslating, setStopTranslating] = useState(
+    DEFAULT_STOP_TRANSLATING_VALUES,
+  );
 
   const {register, getValues, setValue, watch} =
     useForm<ElevatorDataSchemaItem>({
@@ -134,6 +143,13 @@ export const AddFieldInput = ({initialValues, onConfirm, onCancel}: Props) => {
               placeholder: '',
               required: true,
               ...register('name'),
+              value: stopTranslating.name
+                ? enteredName
+                : getTechnicalFieldName({name: enteredName}, t),
+              onChange: (event) => {
+                handleChange('name', event.target.value as string);
+                setStopTranslating({...stopTranslating, name: true});
+              },
             }}
           />
         </Box>
