@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useEffect} from 'react';
 import {Grid2 as Grid} from '@mui/material';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
 import {FormInput} from 'components/form/FormInput';
@@ -30,6 +30,7 @@ export const EditFinanceAddress = ({
 }) => {
   const {t} = useTranslation();
 
+  const addressValue = watch(`${address}.component.name`);
   const countryValue = watch(`${address}.component.country`);
 
   const statesByCountry = useCallback(
@@ -37,10 +38,29 @@ export const EditFinanceAddress = ({
     [],
   );
 
-  const allValues = watch();
+  useEffect(() => {
+    if (addressValue) {
+      setValue(`${address}.component.name`, addressValue);
+    }
+  }, [address, addressValue]);
 
   return (
     <Grid container rowSpacing={3} columnSpacing={2}>
+      <Grid size={{md: 6}}>
+        <Controller
+          name={`${address}.component.name`}
+          control={control}
+          render={({field}) => (
+            <FormInput
+              fieldProps={{
+                ...field,
+                size: 'small',
+                label: 'Name',
+              }}
+            />
+          )}
+        />
+      </Grid>
       <Grid size={{md: 6}}>
         <AddressAutoComplete
           initialValue={
@@ -66,7 +86,6 @@ export const EditFinanceAddress = ({
             const currentValues = watch(address);
 
             setValue(address, {
-              ...allValues[address],
               ...componentAddress,
               id: currentValues?.id!,
               fullName: componentAddress?.fullName || '',
