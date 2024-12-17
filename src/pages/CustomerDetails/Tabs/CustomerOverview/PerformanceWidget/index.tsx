@@ -5,7 +5,7 @@ import {ReactComponent as AccountingBills} from 'assets/illustrations/Accounting
 import {ReactComponent as UnionIcon} from 'assets/icons/union.svg';
 import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
 import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
-import {Grid2 as Grid, Tooltip, Typography, Box} from '@mui/material';
+import {Box, Grid2 as Grid, Tooltip, Typography} from '@mui/material';
 import {t} from 'i18next';
 import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
@@ -205,7 +205,7 @@ const PerformanceWidget = ({customer}: Props) => {
               color="text.secondary"
               fontWeight="600"
               pl={1}>
-              {t('Customer since')} :{' '}
+              {`${t('Customer since')} : `}
             </Typography>
             <Typography
               variant="body2"
