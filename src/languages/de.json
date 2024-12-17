@@ -3011,5 +3011,9 @@
   "Edit Email Signature": "E-Mail-Signatur bearbeiten",
   "Customize Signature": "Signatur anpassen",
   "Delete Signature": "Signatur löschen",
-  "You are about to delete this email signature. Are you sure about it?": "Sie sind dabei, diese E-Mail-Signatur zu löschen. Sind Sie sicher?"
+  "You are about to delete this email signature. Are you sure about it?": "Sie sind dabei, diese E-Mail-Signatur zu löschen. Sind Sie sicher?",
+  "Invoice number": "Rechnungsnummer",
+  "Pick article": "Artikel auswählen",
+  "Auto type": "Automate Generierung",
+  "Customer since": "Kunde seit"
 }
