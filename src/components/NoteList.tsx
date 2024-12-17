@@ -14,6 +14,7 @@ import {Theme} from '@mui/material/styles';
 import {FormikProps} from 'formik';
 import {Comment} from 'models/comment';
 import {Note} from 'models/note';
+import {useTranslation} from 'react-i18next';
 
 interface GroupedNotes {
   [key: string]: Note[];
@@ -48,59 +49,62 @@ const NoteList: React.FC<Props> = ({
   notesTopRef,
   activeNote,
   setActiveNote,
-}) => (
-  <>
-    {Object.entries(groupedNotes).map(([date, notes], index) => (
-      <Fragment key={date}>
-        <Box
-          display="flex"
-          alignItems="center"
-          py="10px"
-          px="1.5rem"
-          bgcolor={theme.palette.grey[50]}
-          {...(index === 0 && {ref: notesTopRef})}>
-          <Typography variant="overline" textTransform="uppercase">
-            {date}
-          </Typography>
-        </Box>
-        <Box sx={{width: '100%'}}>
-          {notes.map((note) => (
-            <Fragment key={note.id}>
-              <Box ref={notesRef}>
-                <NoteCard
-                  note={note as unknown as Comment}
-                  onDelete={() => {
-                    setActiveNote({id: note.id, action: 'delete'});
-                  }}
-                  onEdit={() => {
-                    setActiveNote({id: note.id, action: 'edit'});
-                    inputRef?.current?.focus();
-                    if (activeNote.id === note.id) return;
-                    formik.setValues({note: note.content});
-                  }}
-                  isEditing={
-                    activeNote.id === note.id && activeNote.action === 'edit'
-                  }
-                  styles={{
-                    backgroundColor:
-                      activeNote.id === note.id
-                        ? theme.palette.action.hover
-                        : 'inherit',
-                  }}
-                />
-                {activeNote.id === note.id && (isDeleting || isUpdating) ? (
-                  <Box height="4px">
-                    <LinearProgress />
-                  </Box>
-                ) : null}
-                <Divider />
-              </Box>
-            </Fragment>
-          ))}
-        </Box>
-      </Fragment>
-    ))}
-  </>
-);
+}) => {
+  const {t} = useTranslation();
+  return (
+    <>
+      {Object.entries(groupedNotes).map(([date, notes], index) => (
+        <Fragment key={date}>
+          <Box
+            display="flex"
+            alignItems="center"
+            py="10px"
+            px="1.5rem"
+            bgcolor={theme.palette.grey[50]}
+            {...(index === 0 && {ref: notesTopRef})}>
+            <Typography variant="overline" textTransform="uppercase">
+              {date === 'Today' ? t('Today') : date}
+            </Typography>
+          </Box>
+          <Box sx={{width: '100%'}}>
+            {notes.map((note) => (
+              <Fragment key={note.id}>
+                <Box ref={notesRef}>
+                  <NoteCard
+                    note={note as unknown as Comment}
+                    onDelete={() => {
+                      setActiveNote({id: note.id, action: 'delete'});
+                    }}
+                    onEdit={() => {
+                      setActiveNote({id: note.id, action: 'edit'});
+                      inputRef?.current?.focus();
+                      if (activeNote.id === note.id) return;
+                      formik.setValues({note: note.content});
+                    }}
+                    isEditing={
+                      activeNote.id === note.id && activeNote.action === 'edit'
+                    }
+                    styles={{
+                      backgroundColor:
+                        activeNote.id === note.id
+                          ? theme.palette.action.hover
+                          : 'inherit',
+                    }}
+                  />
+                  {activeNote.id === note.id && (isDeleting || isUpdating) ? (
+                    <Box height="4px">
+                      <LinearProgress />
+                    </Box>
+                  ) : null}
+                  <Divider />
+                </Box>
+              </Fragment>
+            ))}
+          </Box>
+        </Fragment>
+      ))}
+    </>
+  );
+};
 
 export default NoteList;

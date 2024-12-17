@@ -281,6 +281,20 @@ export const DatePicker = ({
     return disable;
   };
 
+  const handleDateChange = (newValue: Date | null) => {
+    if (newValue) {
+      // Normalize to UTC
+      const normalizedDate = new Date(
+        Date.UTC(
+          newValue.getFullYear(),
+          newValue.getMonth(),
+          newValue.getDate(),
+        ),
+      );
+      setValue(normalizedDate);
+    }
+  };
+
   return (
     <Box sx={{...containerStyles}}>
       <LocalizationProvider
@@ -347,9 +361,7 @@ export const DatePicker = ({
           value={value}
           minDate={minDate}
           maxDate={maxDate}
-          onChange={(newValue) => {
-            setValue(newValue);
-          }}
+          onChange={handleDateChange}
         />
       </LocalizationProvider>
       {!!errorMessage && (

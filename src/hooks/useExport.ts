@@ -8,19 +8,19 @@ import {QueryObserverResult} from 'react-query';
 import {RestError} from 'models/misc';
 
 type ExportTableSheetProps<T, K> = {
-  excludedFields: string[];
-  refetchCallback: () => Promise<QueryObserverResult<K[], RestError>>;
   columns: TableColumnWithRender<T>[];
-  aggregateCallback: (data: K[]) => T[];
   fileName: string;
+  excludedFields?: string[];
+  aggregateCallback: (data: K[]) => T[];
+  refetchCallback: () => Promise<QueryObserverResult<K[], RestError>>;
 };
 
 export function useExportTableSheet<T, K>({
-  excludedFields,
-  refetchCallback,
   columns,
-  aggregateCallback,
   fileName,
+  excludedFields = [],
+  aggregateCallback,
+  refetchCallback,
 }: ExportTableSheetProps<T, K>) {
   const {t} = useTranslation();
   const {enqueueSnackbar} = useSnackbar();

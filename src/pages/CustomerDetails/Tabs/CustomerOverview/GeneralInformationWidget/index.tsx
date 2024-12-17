@@ -13,8 +13,6 @@ import {
 import {Dialog} from 'components/Dialog';
 import {useForm} from 'react-hook-form';
 import {CustomerGeneralInformationFormModel} from 'models/customer';
-import {Address} from 'models/misc';
-import {getCountryCode} from 'utils/countries';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
 import {ReactComponent as TwoPin} from 'assets/illustrations/TwoPin.svg';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
@@ -23,6 +21,10 @@ import {useUuid} from 'hooks/reactQuery/useUuid';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {t} from 'i18next';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
+import {useTranslation} from 'react-i18next';
+import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
 import EditCustomerGeneralInformation from './EditCustomerGeneralInformation';
 
 type Props = {
@@ -33,6 +35,12 @@ const GeneralInformationWidget = ({customer}: Props) => {
   const {user} = useUserSession();
   const {data: uuid} = useUuid();
   const serviceCompanyId = user?.userAccount.serviceCompany.id || '';
+
+  const {data: company} = useCompanyById(customer?.serviceCompany?.id);
+
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
 
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -72,14 +80,6 @@ const GeneralInformationWidget = ({customer}: Props) => {
 
   const {errors} = formState;
 
-  const applyCountryCode = (address?: Address) =>
-    address && {
-      ...address,
-      ...(address.component?.country && {
-        countryCode: getCountryCode(address.component.country),
-      }),
-    };
-
   const onSave = async (data: CustomerGeneralInformationFormModel) => {
     const file = watch('logoFile') as unknown as FileWithPreview;
     const photoUrl = `${uploadPath}/${file?.name}`;
@@ -105,8 +105,40 @@ const GeneralInformationWidget = ({customer}: Props) => {
       customerImagePath: watch('logoFile')
         ? photoUrl
         : customer.additionalInfo.customerImagePath,
-      businessAddress: applyCountryCode(data.businessAddress as Address),
-      postalAddress: applyCountryCode(data.postalAddress as Address),
+      businessAddress: data.businessAddress
+        ? {
+            ...data.businessAddress,
+            component: {
+              ...data.businessAddress?.component,
+              country: data.businessAddress?.component?.country
+                ? translateCompanyLanguage(
+                    data.businessAddress.component.country,
+                  )
+                : '',
+            },
+            fullName:
+              formatAddressFullname(
+                data.businessAddress,
+                translateCompanyLanguage,
+              )?.fullName || '',
+          }
+        : null,
+      postalAddress: data.postalAddress
+        ? {
+            ...data.postalAddress,
+            component: {
+              ...data.postalAddress?.component,
+              country: data.postalAddress?.component?.country
+                ? translateCompanyLanguage(data.postalAddress.component.country)
+                : '',
+            },
+            fullName:
+              formatAddressFullname(
+                data.postalAddress,
+                translateCompanyLanguage,
+              )?.fullName || '',
+          }
+        : null,
     };
 
     await updateCustomer(payload, customer.id, () => {

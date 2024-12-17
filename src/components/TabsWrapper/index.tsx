@@ -2,11 +2,11 @@ import {PropsWithChildren} from 'react';
 import {Props as OldTabsProps, Tabs as OldTabs} from '../Tab';
 
 interface TabWrapperProps extends OldTabsProps {
-  shouldWrap: boolean;
+  shouldWrap?: boolean;
 }
 
 const TabsWrapper = ({
-  shouldWrap,
+  shouldWrap = false,
   children,
   onChange,
   ...tabsProps
