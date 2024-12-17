@@ -1,6 +1,6 @@
 import {formatCurrency} from 'utils/currency';
 import {ServiceOrderArticleView} from 'models/service-order';
-import {ArticleTableRow} from 'models/article';
+import {ArticleSectionTableRow} from 'models/article';
 
 export enum ActionTypes {
   EDIT = 'EDIT',
@@ -9,7 +9,7 @@ export enum ActionTypes {
 
 export const makeRows = (
   articles: ServiceOrderArticleView[],
-): ArticleTableRow[] =>
+): ArticleSectionTableRow[] =>
   articles?.map((item, index) => ({
     id: item.id,
     no: index + 1,

@@ -1,4 +1,7 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useContext, useEffect, useRef} from 'react';
+import {t} from 'i18next';
+import {LanguageContext} from 'context/LanguageProvider';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import HelpIcon from '../assets/icons/HelpIcon.svg';
 
 // Extend the Window interface to include Kalasar
@@ -34,6 +37,8 @@ interface KalasarSearchInstance {
 
 const KalasarSearchComponent: React.FC = () => {
   const kalasarInstanceRef = useRef<KalasarSearchInstance | null>(null);
+  const {language: selectedLng} = useContext(LanguageContext);
+  const {user} = useUserSession();
 
   useEffect(
     () => () => {
@@ -55,8 +60,8 @@ const KalasarSearchComponent: React.FC = () => {
       meeting_link:
         'https://meetings.hubspot.com/madeleine-brandt/checkin-mainteny?uuid=5c7b2b69-1127-4e6f-919c-e9203ec2c73e',
       url: 'https://design.kalasar.com/api/v1/product_tour_request',
-      user_id: '2',
-      lang: 'de',
+      user_id: user?.userAccount.id!,
+      lang: selectedLng.toLowerCase() || 'en',
       scrolling: true,
       searchBarVisible: true,
       heading: 'Top Fragen von Mainteny Kunden',
@@ -122,7 +127,7 @@ const KalasarSearchComponent: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
         }}>
-        Help
+        {t('Help')}
       </span>
     </button>
   );

@@ -6,7 +6,7 @@ export default class ArticlesPage {
   };
 
   static navigateToDetailsPage = () => {
-    cy.get('div[data-colindex="1"]').eq(1).click();
+    cy.get('td[role="cell"][data-field="TYPE"]').eq(1).click({force: true});
   };
 
   static orderArticle = () => {

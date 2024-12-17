@@ -79,7 +79,6 @@ import {
   createQuickFilterOptions,
   filterOutQuickFilterOptions,
 } from 'utils/filter';
-import {InvoiceOrderField} from 'models/invoice';
 import {convertNumberToAmountNumber, useCurrentCurrency} from 'utils/currency';
 import NoteIcon from 'components/NoteIcon';
 
@@ -356,7 +355,7 @@ export const Quotations = () => {
         key: 'quotation-cell-total',
         width: '186px',
         align: 'right',
-        fieldName: InvoiceOrderField.TOTAL_NET_AMOUNT,
+        fieldName: QuotationOrderField.TOTAL_NET_AMOUNT,
         getExportValue: (quotation) => quotation.amount,
         renderCell: (quotation, cellProps) => (
           <Cell {...cellProps}>

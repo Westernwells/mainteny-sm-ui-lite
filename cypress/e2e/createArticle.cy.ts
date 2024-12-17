@@ -1,6 +1,7 @@
 import {ArticleType} from '../../src/models/article';
 import AppTopBarPage from '../pages/appTopBar.page';
 import ArticlesPage from '../pages/articles.page';
+import ArticlesPageDetails from '../pages/articles-details.page';
 import {ArticleBasicFormModel, ArticleDescriptionFormModel, ArticleStockFormModel} from '../../src/models/articleForm';
 import {getUniqueId} from '../../src/utils/utils';
 
@@ -9,6 +10,7 @@ interface ICreateArticleForm {
     secondStep: ArticleDescriptionFormModel;
     thirdStep: ArticleStockFormModel;
 }
+
 const validArticle: ICreateArticleForm = {
     firstStep: {
         name: 'Test Article',
@@ -81,7 +83,7 @@ describe('Create Article', () => {
     });
 
     it('should order article', () => {
-        cy.get('div[role="row"][data-rowindex="0"]').click();
+        ArticlesPageDetails.navigateToDetailsPage();
         cy.contains('button', 'Order Article').click();
 
         cy.fillRichTextField('Description', 'Test Description');

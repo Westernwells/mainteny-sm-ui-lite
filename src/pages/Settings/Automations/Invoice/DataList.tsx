@@ -16,12 +16,12 @@ import {
   Table,
   TableBody,
   TableCell,
+  tableCellClasses,
   TableCellProps,
   TableContainer,
   TableHead,
   TableRow,
   Typography,
-  tableCellClasses,
 } from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {
@@ -31,8 +31,8 @@ import {
 import {
   TravelWorkCalculationType,
   TravelWorkCalculationTypeLabels,
-  TravelWorkView,
   travelWorkCalculationTypeOptions,
+  TravelWorkView,
 } from 'models/service-company';
 import {CrossButton} from 'components/CrossButton';
 import {DoneButton} from 'components/DoneButton';
@@ -697,7 +697,7 @@ const DataList = ({
                     background: '#ffdfde',
                   }}>
                   <Typography color="#FF182F" variant="body2">
-                    {t('Article cannot be empty.')}
+                    {t('Article cannot be empty')}
                   </Typography>
                 </Box>
               )}

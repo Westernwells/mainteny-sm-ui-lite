@@ -11,6 +11,7 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import _ from 'lodash';
 import {
   ArticleOrderView,
+  ArticleStatistics,
   ArticleView,
   CreateArticleOrderRecord,
   CreateArticleRecord,
@@ -21,13 +22,15 @@ import {
 import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
 import {data} from 'utils/partial-article-data';
 import {FileResourceRecord} from 'models/media';
-import {useUserSession} from './useUserSession';
+import {useAll} from 'hooks/reactQuery/useAll';
+import {AxiosResponse} from 'axios';
 import {
   ArticleSupplierView,
   CreateArticleSupplierRecord,
   QueryArticleSuppliersParams,
   UpdateArticleSupplierRecord,
 } from '../../models/supplier';
+import {useUserSession} from './useUserSession';
 
 export const fetchArticles = async (
   params: QueryArticleParams,
@@ -619,3 +622,56 @@ export const useDeleteArticlePicture = (
     },
   );
 };
+
+export const fetchArticleStatistics = async (
+  params: QueryArticleParams,
+  serviceCompanyId: string,
+): Promise<ArticleStatistics> => {
+  const response: AxiosResponse<ArticleStatistics> = await axiosClient.get(
+    `/api/serviceCompanies/${serviceCompanyId}/articles/statistics`,
+    {
+      params: {
+        ...params,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useArticleStatistics = (
+  params: QueryArticleParams,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  return useQuery<ArticleStatistics, RestError, ArticleStatistics>(
+    [
+      queryKeys.fetchElevatorStatistics,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () => fetchArticleStatistics(params, user!.userAccount.serviceCompany.id),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+};
+
+export function useAllArticles(
+  params: QueryArticleParams,
+  options?: UseQueryOptions<ArticleView[], RestError>,
+) {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  return useAll<QueryArticleParams, ArticleView>({
+    queryKey: [queryKeys.queryAllQuotations, params, serviceCompanyId],
+    queryFn: (p) => fetchArticles(p, serviceCompanyId ?? ''),
+    params,
+    options: {
+      enabled: !!serviceCompanyId,
+      ...options,
+    },
+  });
+}

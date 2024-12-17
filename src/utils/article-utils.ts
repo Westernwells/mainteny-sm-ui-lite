@@ -1,10 +1,15 @@
 import * as Yup from 'yup';
 import {AnyObject} from 'yup/lib/types';
 import {TestContextExtended} from 'models/articleForm';
-import {ArticleType} from 'models/article';
+import {
+  ArticleTableRow,
+  ArticleType,
+  ArticleView,
+  SearchParameters,
+} from 'models/article';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
-import {Currencies} from './currency';
+import {Currencies, formatCurrency} from './currency';
 
 export const handleCostPackageValidation = (
   value: number | undefined,
@@ -61,4 +66,41 @@ export const getArticleTypeText = (type: ArticleType): string => {
     default:
       return '';
   }
+};
+
+export const aggregateArticleRow = (
+  articles: ArticleView[],
+): ArticleTableRow[] =>
+  articles.map((article) => ({
+    data: article,
+    id: article.id,
+    number: article.externalId,
+    name: article.name,
+    description: article.description,
+    manufacturer: article.manufacturer,
+    category: article.category,
+    type: article.type,
+    unit: article.unit,
+    price: formatCurrency(
+      (article.unitSellingAmount.netAmount ?? 0) /
+        (10 ** article.unitSellingAmount.fractionDigits || 0),
+      {
+        currency: article.unitSellingAmount.currency,
+      },
+    ),
+  }));
+
+export const createSearchQuery = ({
+  search,
+  storageLocation,
+  category,
+  manufacturer,
+}: SearchParameters) => {
+  const elements: string[] = [];
+  if (search) elements.push(search);
+  if (storageLocation) elements.push(`[storagelocation:*${storageLocation}*]`);
+  if (category) elements.push(`[category:*${category}*]`);
+  if (manufacturer) elements.push(`[manufacture:*${manufacturer}*]`);
+
+  return elements.length ? elements.join(' ') : undefined;
 };

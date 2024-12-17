@@ -45,3 +45,7 @@ export type Action = {
   label: string;
   onTrigger: () => void;
 };
+
+export type ExportColumn<T> = {
+  getExportValue?: (renderObject: T) => string;
+};
