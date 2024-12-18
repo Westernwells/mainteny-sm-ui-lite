@@ -1012,10 +1012,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const paymentTermDueDays =
     invoice?.additionalInfo?.paymentTerm?.data?.dueDays;
-  const dueDate =
-    typeof paymentTermDueDays === 'number'
-      ? dateToString(addDays(new Date(), paymentTermDueDays))
-      : invoice?.dueDate || dateToString(new Date());
+  const hasPaymentTermDueDays = typeof paymentTermDueDays === 'number';
+  const dueDate = hasPaymentTermDueDays
+    ? dateToString(addDays(new Date(), paymentTermDueDays))
+    : invoice?.dueDate || dateToString(new Date());
   const invoiceWithUpdatedDueDate = {
     ...invoice,
     dueDate,
@@ -1055,7 +1055,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const handleOpenSendInvoiceModal = useCallback(async () => {
     const errorMessage = validateDueDate(invoice);
 
-    if (errorMessage) {
+    if (errorMessage && !hasPaymentTermDueDays) {
       enqueueSnackbar(t(errorMessage), {
         variant: 'error',
       });
@@ -1237,7 +1237,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
     const errorMessage = validateDueDate(invoice);
 
-    if (errorMessage) {
+    if (errorMessage && !hasPaymentTermDueDays) {
       enqueueSnackbar(t(errorMessage), {
         variant: 'error',
       });

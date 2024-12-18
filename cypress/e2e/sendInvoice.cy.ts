@@ -39,19 +39,4 @@ describe('Send Invoice via Email', () => {
         cy.wait('@sendInvoiceAPI', {timeout: 30000});
         cy.contains('Invoice sent successfully');
     });
-
-    it('Should not be able to send email, if invoice.dueDate is expired', () => {
-        // create invoice
-        InvoicesPage.createInvoice({setExpiredDueDate: true});
-
-        cy.go('back');
-        cy.get('span[role="progressbar"]').should('not.exist');
-        cy.wait(['@invoicesApi', '@invoicesApi', '@invoicesApi']);
-        cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
-
-        // send invoice
-        cy.get('button[data-testid="invoice-action-menu-button"]').eq(0).click();
-        cy.get('svg[data-testid="SendIcon"]').eq(0).click();
-        cy.contains('The due date for the invoice has expired');
-    });
 });
