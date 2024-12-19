@@ -99,7 +99,8 @@ const PerformanceWidget = ({customer}: Props) => {
 
   const totalRevenue = customerStats?.totalRevenue
     ? formatCurrency(
-        customerStats?.totalRevenue ?? 0 / 10 ** currentCurrency.fractionDigits,
+        (customerStats?.totalRevenue ?? 0) /
+          10 ** currentCurrency.fractionDigits,
       )
     : '-';
 
