@@ -15,6 +15,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import {useFormatDate} from 'hooks/useFormatDate';
 import TagIcon from '@mui/icons-material/Tag';
 import {ContractView} from 'models/contract';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 
 interface Props {
   name?: string;
@@ -46,6 +47,18 @@ export const ContractBasic = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const formatDate = useFormatDate();
+
+  const discountOptions =
+    contractDetails?.paymentTerm?.data?.discountOptions?.map((o) =>
+      o.discountDays === 0 && o.discountPercent === 0
+        ? ''
+        : `${o.discountDays} ${t('days')}; ${o.discountPercent}% ${t(
+            'Discount_contract',
+          )}; ${t(convertToText(o.articleType))}`,
+    ) ?? [];
+
+  const formattedDiscountOptions = discountOptions?.join('\n');
+  const paymentTerm = `${contractDetails?.paymentTerm?.term} \n${formattedDiscountOptions}`;
 
   return (
     <Grid container rowGap={2}>
@@ -195,7 +208,19 @@ export const ContractBasic = ({
         />
       </Grid>
 
-      <Grid item xs={6} sm={4} md={3} />
+      <Grid item xs={6} sm={4} md={3}>
+        <CardProps
+          label="Payment terms"
+          bodyTextVariant="subtitle1"
+          icon={<TextSnippetIcon />}
+          bodyText={`${contractDetails.paymentTerm ? paymentTerm : '-'}` || '-'}
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
+        />
+      </Grid>
 
       <Grid item xs={6} sm={4} md={3}>
         <CardProps
