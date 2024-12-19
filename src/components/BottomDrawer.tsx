@@ -1,4 +1,4 @@
-import React, {ReactNode, useState} from 'react';
+import React, {useState} from 'react';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -14,23 +14,17 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import {useTheme} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {SxProps} from '@mui/system';
-
-interface ListMenu {
-  label: string;
-  icon: ReactNode;
-  onClick: () => void;
-  showBorder?: boolean;
-}
+import {MenuAction} from 'models/action';
 
 interface Props {
-  isOpen: boolean;
-  isValid: boolean;
-  primaryButtonLabel?: string | React.ReactNode;
-  primaryButtonAction?: () => void;
-  listItems: ListMenu[];
-  secondaryButton?: React.ReactNode;
   buttonWrapperStyles?: SxProps;
+  isOpen: boolean;
   isSaving?: boolean;
+  isValid: boolean;
+  listItems: MenuAction[];
+  primaryButtonAction?: () => void;
+  primaryButtonLabel?: string | React.ReactNode;
+  secondaryButton?: React.ReactNode;
 }
 
 export const BottomDrawer = ({

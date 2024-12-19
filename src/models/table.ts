@@ -41,6 +41,7 @@ export type TableColumnWithRender<T> = TableColumn & {
   getExportValue?: (renderObject: T) => string;
 };
 
+// Deprecated used MenuAction
 export type Action = {
   icon: SvgIconComponent;
   label: string;

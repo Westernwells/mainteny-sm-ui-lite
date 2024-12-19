@@ -3,8 +3,9 @@ import PersonRemoveAlt1 from '@mui/icons-material/PersonRemoveAlt1';
 import {Confirm} from 'components/Confirm';
 import SendIcon from '@mui/icons-material/Send';
 import {useDeleteEmployee} from 'hooks/reactQuery/useEmployee';
+import {MenuAction} from 'models/action';
+import {useTranslation} from 'react-i18next';
 import TableActionMenu from '../../components/Table/TableActionMenu';
-import {Action} from '../../models/table';
 
 interface Props {
   id: string;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export const Actions = ({id, email}: Props) => {
+  const {t} = useTranslation();
   const {mutateAsync: deleteEmployee, isLoading: isDeleting} =
     useDeleteEmployee('Employee removed successfully');
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
@@ -26,18 +28,18 @@ export const Actions = ({id, email}: Props) => {
     setOpen(false);
   };
 
-  const OPTIONS = useRef<Action[]>([
+  const OPTIONS = useRef<MenuAction[]>([
     {
-      icon: SendIcon,
-      label: 'Send email',
-      onTrigger: () => {
+      icon: <SendIcon />,
+      label: t('Send email'),
+      onClick: () => {
         window.open(`mailto:${email}`, '_blank');
       },
     },
     {
-      icon: PersonRemoveAlt1,
-      label: 'Remove Employee',
-      onTrigger: handleOpenDeleteConfirm,
+      icon: <PersonRemoveAlt1 />,
+      label: t('Remove Employee'),
+      onClick: handleOpenDeleteConfirm,
     },
   ]);
 

@@ -1,4 +1,4 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import printJS from 'print-js';
@@ -12,20 +12,11 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import MoreIcon from '@mui/icons-material/MoreVert';
-import SendIcon from '@mui/icons-material/Send';
-import CancelIcon from '@mui/icons-material/Cancel';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Print from '@mui/icons-material/Print';
-import Payments from '@mui/icons-material/Payments';
-import FileDownload from '@mui/icons-material/FileDownload';
-import Edit from '@mui/icons-material/Edit';
-import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import {addDays} from 'date-fns';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {ConfirmPrintInvoice} from 'components/ConfirmPrintInvoice';
-import {LanguageContext} from 'context/LanguageProvider';
 import {
   useCancelInvoice,
   useDeleteInvoice,
@@ -87,7 +78,6 @@ import {
 import {SwissQRBill} from 'swissqrbill/svg';
 import {QueryObserverResult} from 'react-query';
 import _ from 'lodash';
-import CopyAll from '@mui/icons-material/CopyAll';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {InvoiceFormat} from 'models/propertyManager';
 import {formatDate} from 'utils/datetime';
@@ -99,6 +89,7 @@ import {
 import XMLViewer from 'react-xml-viewer';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
+import useInvoiceMenuActions from 'hooks/useInvoiceMenuActions';
 
 interface Props {
   invoice: InvoiceView;
@@ -159,7 +150,6 @@ export const Actions = ({
   removePadding = false,
 }: Props) => {
   const {t} = useTranslation();
-  const {language: selectedLng} = useContext(LanguageContext);
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
   const {user} = useUserSession();
@@ -985,246 +975,61 @@ export const Actions = ({
     }
   }, [invoice, companyNextNumber, generateBlobUrl]);
 
-  const cancelText = selectedLng === 'DE' ? 'Stornieren' : t('Cancel');
-  const cancelItem = {
-    label: cancelText,
-    icon: <CancelIcon />,
-    onClick: () => {
+  const handlePrint = useCallback(() => {
+    setIsConfirmPrintDialogOpen(true);
+    setSelectedInvoice(invoice);
+    refetchDownloadUrl();
+  }, [companyNextNumber?.value]);
+
+  const handleDownload = useCallback(async () => {
+    setSelectedInvoice(invoice);
+    setActionType('DOWNLOAD');
+
+    try {
+      let qrImageSrcProp = qrImageSrc;
+      if (
+        user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+        !qrImageSrcProp &&
+        invoice.status === InvoiceStatus.DRAFT
+      ) {
+        const error = await checkValidQrCode(invoice);
+        if (error) {
+          return;
+        }
+        qrImageSrcProp = await getQrImageSrc(invoice);
+      }
+
+      if (invoice.status === InvoiceStatus.DRAFT) {
+        await generateBlobUrl({
+          invoiceData: invoice,
+          headerBlockUrl: headerUrl,
+          footerBlockUrl: footerUrl,
+          qrImageSrcProp,
+        });
+      } else {
+        await refetchDownloadUrl();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [invoice, qrImageSrc, downloadUrl]);
+
+  const {actions} = useInvoiceMenuActions({
+    invoice,
+    isChecklistImageLoading,
+    onSend: handleOpenSendInvoiceModal,
+    onPrint: handlePrint,
+    onCreateCreditNote: () => setIsCreateCreditNoteDialogOpen(true),
+    onDownload: handleDownload,
+    onDelete: () => {
+      setIsDeleteDialogOpen(true);
+    },
+    onCancel: () => {
       setIsCancelledDialogOpen(true);
     },
-  };
-
-  const duplicateItem = {
-    label: t('Duplicate'),
-    icon: <CopyAll />,
-    onClick: () => {
-      navigate(`/invoices/new?invoiceId=${invoice.id}&isDuplicate=true`);
-    },
-  };
-
-  const previewItem = {
-    label: t('Preview'),
-    icon: <RemoveRedEye />,
-    onClick: () => {
-      navigate(`/invoices/details/${invoice.id}`);
-    },
-  };
-
-  const downloadItem = {
-    label: t('Download'),
-    icon: <FileDownload />,
-    onClick: async () => {
-      setSelectedInvoice(invoice);
-      setActionType('DOWNLOAD');
-
-      try {
-        let qrImageSrcProp = qrImageSrc;
-        if (
-          user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
-          !qrImageSrcProp &&
-          invoice.status === InvoiceStatus.DRAFT
-        ) {
-          const error = await checkValidQrCode(invoice);
-          if (error) {
-            return;
-          }
-          qrImageSrcProp = await getQrImageSrc(invoice);
-        }
-
-        if (invoice.status === InvoiceStatus.DRAFT) {
-          await generateBlobUrl({
-            invoiceData: invoice,
-            headerBlockUrl: headerUrl,
-            footerBlockUrl: footerUrl,
-            qrImageSrcProp,
-          });
-        } else {
-          await refetchDownloadUrl();
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    },
-  };
-
-  const actions = useMemo(() => {
-    const items: {
-      label: string;
-      icon: JSX.Element;
-      onClick: () => void;
-      disabled?: boolean;
-    }[] = [];
-
-    if (invoice.status === InvoiceStatus.DRAFT) {
-      items.push({
-        label: t('Send'),
-        icon: <SendIcon />,
-        onClick: handleOpenSendInvoiceModal,
-        disabled: isChecklistImageLoading,
-      });
-    }
-
-    if (invoice.status === InvoiceStatus.CANCELLED) {
-      items.push(previewItem, ...[downloadItem]);
-    } else if (invoice.status === InvoiceStatus.DRAFT) {
-      items.push(
-        previewItem,
-        {
-          label: t('Print'),
-          icon: <Print />,
-          onClick: async () => {
-            setIsConfirmPrintDialogOpen(true);
-            setSelectedInvoice(invoice);
-            refetchDownloadUrl();
-          },
-        },
-        {
-          label: t('Edit'),
-          icon: <Edit />,
-          onClick: () => {
-            navigate(`/invoices/details/${invoice.id}/edit`);
-          },
-        },
-        {
-          label: t('Delete'),
-          icon: <DeleteIcon />,
-          onClick: () => {
-            setIsDeleteDialogOpen(true);
-          },
-        },
-        ...[downloadItem],
-      );
-    } else if (invoice.status === InvoiceStatus.NOT_PAID) {
-      items.push(
-        {
-          label: t('Preview'),
-          icon: <RemoveRedEye />,
-          onClick: () => {
-            navigate(`/invoices/details/${invoice.id}`);
-          },
-        },
-        {
-          label: t('Payment'),
-          icon: <Payments />,
-          onClick: () => handleOpenPaymentDialog(),
-        },
-        {
-          label: t('Create Credit note'),
-          icon: <Payments />,
-          onClick: () => setIsCreateCreditNoteDialogOpen(true),
-        },
-        ...[downloadItem],
-        cancelItem,
-      );
-    } else if (invoice.status === InvoiceStatus.EXPIRED) {
-      items.push(
-        {
-          label: t('Preview'),
-          icon: <RemoveRedEye />,
-          onClick: () => {
-            navigate(`/invoices/details/${invoice.id}`);
-          },
-        },
-        {
-          label: t('Send Overdue Notice'),
-          icon: <SendIcon />,
-          onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
-        },
-        {
-          label: t('Payment'),
-          icon: <Payments />,
-          onClick: () => handleOpenPaymentDialog(),
-        },
-        {
-          label: t('Create Credit note'),
-          icon: <Payments />,
-          onClick: () => setIsCreateCreditNoteDialogOpen(true),
-        },
-        ...[downloadItem],
-        cancelItem,
-      );
-    } else if (invoice.status === InvoiceStatus.PAID) {
-      items.push(
-        {
-          label: t('Preview'),
-          icon: <RemoveRedEye />,
-          onClick: () => {
-            navigate(`/invoices/details/${invoice.id}`);
-          },
-        },
-        {
-          label: t('Create Credit note'),
-          icon: <Payments />,
-          onClick: () => setIsCreateCreditNoteDialogOpen(true),
-        },
-        ...[downloadItem],
-      );
-    } else if (invoice.status === InvoiceStatus.PARTIALLY_PAID) {
-      items.push(
-        {
-          label: t('Preview'),
-          icon: <RemoveRedEye />,
-          onClick: () => {
-            navigate(`/invoices/details/${invoice.id}`);
-          },
-        },
-        {
-          label: t('Payment'),
-          icon: <Payments />,
-          onClick: () => handleOpenPaymentDialog(),
-        },
-        {
-          label: t('Send Overdue Notice'),
-          icon: <SendIcon />,
-          onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
-        },
-        {
-          label: t('Create Credit note'),
-          icon: <Payments />,
-          onClick: () => setIsCreateCreditNoteDialogOpen(true),
-        },
-        ...[downloadItem],
-      );
-    } else if (invoice.status === InvoiceStatus.CREDITED) {
-      items.push(
-        {
-          label: t('Preview'),
-          icon: <RemoveRedEye />,
-          onClick: () => {
-            navigate(`/invoices/details/${invoice.id}`);
-          },
-        },
-        {
-          label: t('Payment'),
-          icon: <Payments />,
-          onClick: () => handleOpenPaymentDialog(),
-        },
-        {
-          label: t('Print'),
-          icon: <Print />,
-          onClick: async () => {
-            setIsConfirmPrintDialogOpen(true);
-            setSelectedInvoice(invoice);
-            refetchDownloadUrl();
-          },
-        },
-        ...[downloadItem],
-        cancelItem,
-      );
-    }
-
-    if (invoice.type === InvoiceType.FULL) {
-      items.push(duplicateItem);
-    }
-
-    if (invoice.sentDate && invoice.status !== InvoiceStatus.DRAFT) {
-      return items.filter(
-        (item) => item.label !== t('Edit') && item.label !== t('Delete'),
-      );
-    }
-
-    return items;
-  }, [downloadUrl, invoice, t, companyNextNumber?.value]);
+    onResend: handleOpenSendInvoiceModal,
+    onPayment: handleOpenPaymentDialog,
+  });
 
   useEffectAfterMount(() => {
     (async () => {
