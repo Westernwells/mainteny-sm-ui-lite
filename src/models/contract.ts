@@ -302,6 +302,7 @@ export interface UpdateContractRecord {
   currency: string;
   startDate: string;
   endDate: string;
+  paymentTermId?: string;
 }
 
 export interface CustomerContractParams {
