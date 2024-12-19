@@ -1,6 +1,6 @@
 import {addMinutes, differenceInMinutes} from 'date-fns';
 import _ from 'lodash';
-import {EmployeesSimpleView} from 'models/employee';
+import {EmployeesSimpleView, EmployeesView} from 'models/employee';
 import {StatusColor} from 'models/status';
 import {getAddressString} from 'utils/address';
 import {
@@ -444,3 +444,32 @@ export const canMarkCompleted = (
     status === ServiceOrderStatus.IN_PROGRESS ||
     status === ServiceOrderStatus.COMPLETED) &&
   schedulesCount > 0;
+
+export const getIsNotPendingStatus = (status: ServiceOrderStatus) =>
+  [
+    ServiceOrderStatus.INIT,
+    ServiceOrderStatus.READY_TO_SCHEDULE,
+    ServiceOrderStatus.SCHEDULING,
+    ServiceOrderStatus.OVERDUE,
+    ServiceOrderStatus.IN_PROGRESS,
+  ].includes(status);
+
+// scheduled => perfill technicians from schedules and time
+// unscheduled => prefill the technicians from candidateTechnicians
+export const getDefaultTechnician = (serviceOrder: ServiceOrderView) =>
+  serviceOrder.schedules.length
+    ? serviceOrder.schedules.map((schedule) => schedule.technician)
+    : serviceOrder.additionalInfo.candidateTechnicians?.length
+    ? (serviceOrder.additionalInfo
+        .candidateTechnicians as unknown as EmployeesView[])
+    : serviceOrder.additionalInfo.candidateTechnician
+    ? ([
+        serviceOrder.additionalInfo.candidateTechnician,
+      ] as unknown as EmployeesView[])
+    : null;
+
+export const getDialogTitle = (serviceOrder: ServiceOrderView) =>
+  serviceOrder.status === ServiceOrderStatus.SCHEDULED ||
+  serviceOrder.status === ServiceOrderStatus.IN_PROGRESS
+    ? 'Reschedule Job'
+    : 'Schedule Job';

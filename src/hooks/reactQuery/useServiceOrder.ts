@@ -467,6 +467,7 @@ export const useUpdateServiceOrderSchedule = (
   successMsg?: string,
   onSuccess?: () => void,
 ) => {
+  const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
@@ -478,6 +479,7 @@ export const useUpdateServiceOrderSchedule = (
     }) => updateServiceOrderSchedule(body, serviceOrderId),
     {
       onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         if (successMsg)
           enqueueSnackbar(successMsg, {
             variant: 'success',

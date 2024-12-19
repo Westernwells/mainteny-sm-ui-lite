@@ -1,6 +1,5 @@
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import {useRef, useState} from 'react';
-import {Action} from 'models/table';
 import TableActionMenu from 'components/Table/TableActionMenu';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,6 +8,8 @@ import {Confirm} from 'components/Confirm';
 import {useDeletePurchaseInvoice} from 'hooks/reactQuery/usePurchaseInvoice';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
+import {MenuAction} from 'models/action';
+import {useTranslation} from 'react-i18next';
 import ChangePurchaseInvoiceStatusDialog from './ChangePurchaseInvoiceStatusDialog';
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
 };
 
 const Actions = ({id}: Props) => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const {enqueueSnackbar} = useSnackbar();
@@ -53,16 +55,16 @@ const Actions = ({id}: Props) => {
       );
   };
 
-  const OPTIONS = useRef<Action[]>([
+  const OPTIONS = useRef<MenuAction[]>([
     {
-      icon: CompareArrowsOutlinedIcon,
-      label: 'Change status',
-      onTrigger: handleOpenDeleteConfirm,
+      icon: <CompareArrowsOutlinedIcon />,
+      label: t('Change status'),
+      onClick: handleOpenDeleteConfirm,
     },
     {
-      icon: EditIcon,
-      label: 'Edit',
-      onTrigger: () =>
+      icon: <EditIcon />,
+      label: t('Edit'),
+      onClick: () =>
         navigate(`/purchase-invoices/details/${id}/edit`, {
           state: {
             from: location?.pathname?.includes('/orders')
@@ -72,9 +74,9 @@ const Actions = ({id}: Props) => {
         }),
     },
     {
-      icon: DeleteIcon,
-      label: 'Delete',
-      onTrigger: () => setOpenDeleteConfirm(true),
+      icon: <DeleteIcon />,
+      label: t('Delete'),
+      onClick: () => setOpenDeleteConfirm(true),
     },
   ]);
 

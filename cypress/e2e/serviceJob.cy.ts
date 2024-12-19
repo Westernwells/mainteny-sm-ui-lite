@@ -128,7 +128,7 @@ describe('Job', () => {
 
                     cy.wait('@serviceOrdersApi');
 
-                    cy.get('#long-button').click();
+                    cy.get('button[data-testid="action-menu-horizontal"]').click();
 
                     cy.get('li[role="menuitem"]').contains('Schedule').click();
 
@@ -165,7 +165,7 @@ describe('Job', () => {
 
                     cy.wait('@serviceOrdersApi');
 
-                    cy.get('#long-button').click();
+                    cy.get('button[data-testid="action-menu-horizontal"]').click();
 
                     cy.get('li[role="menuitem"]').contains('Unschedule').should('exist');
                 } else {

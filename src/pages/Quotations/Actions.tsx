@@ -1,5 +1,4 @@
 import {useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
@@ -9,15 +8,6 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import Edit from '@mui/icons-material/Edit';
-import CopyAll from '@mui/icons-material/CopyAll';
-import CheckIcon from '@mui/icons-material/Check';
-import SendIcon from '@mui/icons-material/Send';
-import ReplayIcon from '@mui/icons-material/Replay';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Print from '@mui/icons-material/Print';
-import Close from '@mui/icons-material/Close';
-import FileDownload from '@mui/icons-material/FileDownload';
 import {Confirm} from 'components/Confirm';
 import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
@@ -51,6 +41,7 @@ import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import TableActionButton from 'components/Table/TableActionButton';
+import useQuotationMenuActions from 'hooks/useQuotationMenuActions';
 
 interface Props {
   quotation: QuotationView;
@@ -62,7 +53,6 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
 
 const Actions = ({quotation}: Props) => {
   const {t} = useTranslation();
-  const navigate = useNavigate();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -311,97 +301,22 @@ const Actions = ({quotation}: Props) => {
     }
   };
 
-  const actions = (() => {
-    const printAction = {
-      label: t('Print'),
-      icon: <Print />,
-      onClick: () =>
-        quotation.status === QuotationStatus.DRAFT
-          ? setIsConfirmPrintDialogOpen(true)
-          : handlePrintAction(),
-    };
-    const duplicateAction = {
-      label: t('Duplicate'),
-      icon: <CopyAll />,
-      onClick: () => {
-        navigate(`/quotations/new?id=${quotation.id}`);
-      },
-    };
-    const downloadAction = {
-      label: t('Download'),
-      icon: <FileDownload />,
-      onClick: async () => {
-        setActionType('DOWNLOAD');
-        refetchDownloadUrl();
-        setFilePathToDownload(quotation.additionalInfo.pdfPath!);
-      },
-    };
-    const markAcceptedAction = {
-      label: t('Mark Accepted'),
-      icon: <CheckIcon />,
-      onClick: () => setIsDialogOpen(true),
-    };
-    const markRejectedAction = {
-      label: t('Mark Rejected'),
-      icon: <Close />,
-      onClick: () => setIsRejectedDialogOpen(true),
-    };
-
-    const editAction = {
-      label: t('Edit'),
-      icon: <Edit />,
-      onClick: () => navigate(`/quotations/details/${quotation.id}/edit`),
-    };
-
-    const defaultActions = [
-      ...(quotation.status !== QuotationStatus.ACCEPTED ? [editAction] : []),
-      ...(![QuotationStatus.ACCEPTED, QuotationStatus.REJECTED].includes(
-        quotation.status,
-      )
-        ? [printAction]
-        : []),
-      duplicateAction,
-      downloadAction,
-    ];
-
-    if (quotation.status === QuotationStatus.DRAFT) {
-      return [
-        {
-          label: t('Send'),
-          icon: <SendIcon />,
-          onClick: handleOpenSendEmail,
-        },
-        'divider',
-        editAction,
-        printAction,
-        duplicateAction,
-        markAcceptedAction,
-        markRejectedAction,
-        'divider',
-        {
-          label: t('Delete'),
-          icon: <DeleteIcon />,
-          onClick: () => setIsDeleteDialogOpen(true),
-        },
-      ];
-    }
-
-    if (quotation.status === QuotationStatus.SENT_TO_CLIENT) {
-      return [
-        {
-          label: t('Resend'),
-          icon: <ReplayIcon />,
-          onClick: handleOpenSendEmail,
-        },
-        'divider',
-        ...defaultActions,
-        markAcceptedAction,
-        markRejectedAction,
-      ];
-    }
-
-    return defaultActions;
-  })();
+  const {actions} = useQuotationMenuActions({
+    quotation,
+    onDownload: async () => {
+      setActionType('DOWNLOAD');
+      refetchDownloadUrl();
+      setFilePathToDownload(quotation.additionalInfo.pdfPath!);
+    },
+    onDelete: () => setIsDeleteDialogOpen(true),
+    onResend: handleOpenSendEmail,
+    onMarkAccepted: () => setIsDialogOpen(true),
+    onMarkRejected: () => setIsRejectedDialogOpen(true),
+    onPrint: () =>
+      quotation.status === QuotationStatus.DRAFT
+        ? setIsConfirmPrintDialogOpen(true)
+        : handlePrintAction(),
+  });
 
   return (
     <Box

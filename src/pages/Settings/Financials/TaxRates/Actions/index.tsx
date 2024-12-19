@@ -5,14 +5,14 @@ import {
   EditOutlined,
   PushPinOutlined,
 } from '@mui/icons-material';
-import {Action} from 'models/table';
 import TableActionMenu from 'components/Table/TableActionMenu';
 import {Confirm} from 'components/Confirm';
 import {useDeleteVat, useUpdateVat} from 'hooks/reactQuery/useVats';
-import {Trans} from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import {VatView} from 'models/vat';
 import {Dialog} from 'components/Dialog';
 import {theme} from 'theme';
+import {MenuAction} from 'models/action';
 import {TaxRatesModal} from '../TaxRatesModal';
 
 type Props = {
@@ -20,6 +20,7 @@ type Props = {
 };
 
 const Actions = ({taxRate}: Props) => {
+  const {t} = useTranslation();
   const {mutate: updateTaxRate} = useUpdateVat();
   const {mutate: deleteTaxRate} = useDeleteVat();
   const [openActionMenu, setOpenActionMenu] = useState<boolean>(false);
@@ -72,27 +73,27 @@ const Actions = ({taxRate}: Props) => {
     });
   };
 
-  const OPTIONS: Action[] = [
+  const OPTIONS: MenuAction[] = [
     {
-      icon: PushPinOutlined,
-      label: 'Set as default',
-      onTrigger: () => {
+      icon: <PushPinOutlined />,
+      label: t('Set as default'),
+      onClick: () => {
         setOpenActionMenu(false);
         handleSave({...taxRate, isDefault: true});
       },
     },
     {
-      icon: EditOutlined,
-      label: 'Edit',
-      onTrigger: () => {
+      icon: <EditOutlined />,
+      label: t('Edit'),
+      onClick: () => {
         setOpenActionMenu(false);
         setOpenEditDialog(true);
       },
     },
     {
-      icon: DeleteOutline,
-      label: 'Delete',
-      onTrigger: onDelete,
+      icon: <DeleteOutline />,
+      label: t('Delete'),
+      onClick: onDelete,
     },
   ];
 
