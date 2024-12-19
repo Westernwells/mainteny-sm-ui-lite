@@ -73,6 +73,8 @@ import {
   IMAGE_SIZE_IN_MB,
 } from 'utils/constants';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
+import {UserAccount} from 'models/user';
+import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';
@@ -142,6 +144,31 @@ export const CheckList = ({serviceOrder}: Props) => {
   const [selectedChecklist, setSelectedChecklist] =
     useState<ServiceOrderCheckListView>();
 
+  const serviceOrderTechnicianById = useMemo(() => {
+    const candidateTechnicianById =
+      serviceOrder.additionalInfo.candidateTechnicians?.reduce((acc, item) => {
+        acc[item.id] = item.userAccount;
+        return acc;
+      }, {} as {[key: string]: UserAccount}) ?? {};
+
+    return serviceOrder.schedules.reduce((acc, item) => {
+      acc[item.technician.id] = item.technician.userAccount;
+
+      return acc;
+    }, candidateTechnicianById as {[key: string]: UserAccount});
+  }, [serviceOrder]);
+
+  const technicianFromServiceOrder = selectedChecklist?.technicianId
+    ? serviceOrderTechnicianById[selectedChecklist?.technicianId]
+    : undefined;
+
+  const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
+    !technicianFromServiceOrder ? selectedChecklist?.technicianId : undefined,
+  );
+
+  const technicianToDisplay =
+    fetchedTechnician?.userAccount || technicianFromServiceOrder;
+
   const sortedChecklistComponents =
     selectedChecklist?.checkList?.components.sort(
       (a, b) =>
@@ -191,11 +218,8 @@ export const CheckList = ({serviceOrder}: Props) => {
     pdfPathToDownload,
   );
 
-  const technicianUserAccount = serviceOrder.schedules.find(
-    (s) => s.technician.id === selectedChecklist?.technicianId,
-  )?.technician.userAccount;
-  const technicianName = technicianUserAccount
-    ? `${technicianUserAccount.firstName} ${technicianUserAccount.lastName}`
+  const technicianName = technicianToDisplay
+    ? `${technicianToDisplay.firstName} ${technicianToDisplay.lastName}`
     : '';
 
   const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
@@ -919,6 +943,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                 isEditing={isEditing}
                 selectedChecklist={selectedChecklist}
                 serviceOrder={serviceOrder}
+                serviceOrderTechnicianById={serviceOrderTechnicianById}
                 onAddPress={handleChecklistAddPress}
                 onEditPress={handleChecklistEditPress}
               />
