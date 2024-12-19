@@ -1,5 +1,5 @@
 import {Delete, Edit} from '@mui/icons-material';
-import {Box, Chip, SxProps, Theme, Typography} from '@mui/material';
+import {Box, Chip, Skeleton, SxProps, Theme, Typography} from '@mui/material';
 import useTheme from '@mui/material/styles/useTheme';
 import {Avatar} from 'components/Avatar';
 import {PageCard} from 'components/PageCard';
@@ -11,6 +11,7 @@ import {UserAccount} from 'models/user';
 import {useTranslation} from 'react-i18next';
 import {formatDate} from 'utils/datetime';
 import {getUserFullName} from 'utils/utils';
+import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 
 interface Props {
   containerStyles?: SxProps<Theme>;
@@ -20,7 +21,7 @@ interface Props {
   onDelete: (selectedChecklist: ServiceOrderCheckListView) => void;
   onEdit: (selectedChecklist: ServiceOrderCheckListView) => void;
   selected?: boolean;
-  technician: UserAccount;
+  technician?: UserAccount;
   disabled: boolean;
 }
 
@@ -36,6 +37,12 @@ export const OrderChecklistItemCard = ({
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
+
+  const {data: fetchedTechnician, isLoading} = useGetTechniciansByEmployeeId(
+    !technician ? data.technicianId : undefined,
+  );
+
+  const technicianToDisplay = fetchedTechnician?.userAccount || technician;
 
   const isCompleted = data.additionalInfo.status === ChecklistStatus.COMPLETED;
 
@@ -67,6 +74,26 @@ export const OrderChecklistItemCard = ({
         label={t('Incomplete')}
       />
     );
+  };
+
+  const renderTechnician = () => {
+    if (isLoading) return <Skeleton variant="text" width={124} height={42} />;
+    if (technicianToDisplay)
+      return (
+        <>
+          <Avatar
+            userAccount={technicianToDisplay}
+            sx={{mr: 1}}
+            removeNameText
+          />
+
+          <Typography fontSize="14px" fontWeight="bold">
+            {getUserFullName(technicianToDisplay)}
+          </Typography>
+        </>
+      );
+
+    return '-';
   };
 
   return (
@@ -136,10 +163,7 @@ export const OrderChecklistItemCard = ({
             {t('Technician')}
           </Typography>
           <Box display="flex" alignItems="center">
-            <Avatar userAccount={technician} sx={{mr: 1}} removeNameText />
-            <Typography fontSize="14px" fontWeight="bold">
-              {getUserFullName(technician)}
-            </Typography>
+            {renderTechnician()}
           </Box>
         </Box>
       </Box>

@@ -29,6 +29,7 @@ interface Props {
   selectedChecklist?: ServiceOrderCheckListView;
   onSelect: (newChecklist: ServiceOrderCheckListView) => void;
   serviceOrder: ServiceOrderView;
+  serviceOrderTechnicianById: {[key: string]: UserAccount};
   onEditPress: (newChecklist: ServiceOrderCheckListView) => void;
   isEditing: boolean;
 }
@@ -58,6 +59,7 @@ export const AddChecklistCard = ({
   selectedChecklist,
   onSelect,
   serviceOrder,
+  serviceOrderTechnicianById,
   onEditPress,
   isEditing = false,
 }: Props) => {
@@ -72,19 +74,6 @@ export const AddChecklistCard = ({
   const {mutate: disassociateMultiChecklist} =
     useDisassociateChecklistToServiceOrder('Checklist deleted successfully!');
   const {t} = useTranslation();
-  const technicianMap = useMemo(() => {
-    const map =
-      serviceOrder.additionalInfo.candidateTechnicians?.reduce((acc, item) => {
-        acc[item.id] = item.userAccount;
-        return acc;
-      }, {} as {[key: string]: UserAccount}) ?? {};
-
-    return serviceOrder.schedules.reduce((acc, item) => {
-      acc[item.technician.id] = item.technician.userAccount;
-
-      return acc;
-    }, map as {[key: string]: UserAccount});
-  }, [serviceOrder]);
 
   const filteredChecklists = useMemo(() => {
     if (checklistFilter === 'COMPLETED') {
@@ -201,7 +190,7 @@ export const AddChecklistCard = ({
                       checklist: newSelectedChecklist,
                     });
                   }}
-                  technician={technicianMap[item.technicianId]}
+                  technician={serviceOrderTechnicianById[item.technicianId]}
                   data={item}
                 />
               );
