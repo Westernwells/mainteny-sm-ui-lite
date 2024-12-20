@@ -86,6 +86,7 @@ export interface ArticleRecord {
 }
 
 export interface QuotationItemRecord {
+  id?: string;
   articleId?: string;
   article?: ArticleRecord;
   name: string;

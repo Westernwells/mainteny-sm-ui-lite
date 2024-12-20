@@ -56,7 +56,11 @@ import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
 import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
 import {NumericFormat} from 'react-number-format';
 import {LanguageContext} from 'context/LanguageProvider';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {
+  convertNumberToAmountNumber,
+  formatCurrency,
+  useCurrentCurrency,
+} from 'utils/currency';
 import ExpandIcon from '@mui/icons-material/Expand';
 import {toDate} from 'utils/datetime';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -1023,11 +1027,14 @@ export const MutationService = ({
                       const {floatValue} = values;
 
                       if (floatValue) {
-                        const newPrice = floatValue;
+                        const newPrice = convertNumberToAmountNumber(
+                          floatValue,
+                          currentCurrency,
+                        );
 
                         formikContractServiceComponent.setFieldValue(
                           `elevators[${index}].price`,
-                          newPrice * 10 ** currentCurrency.fractionDigits,
+                          newPrice,
                         );
                       }
                     }}

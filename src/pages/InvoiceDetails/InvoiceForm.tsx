@@ -758,7 +758,15 @@ export const InvoiceForm = ({
 
     formik.setFieldValue(
       'dueDate',
-      invoiceData?.dueDate ? new Date(invoiceData?.dueDate) : undefined,
+      typeof invoiceData?.additionalInfo?.paymentTerm?.data?.dueDays ===
+        'number'
+        ? addDays(
+            new Date(),
+            invoiceData?.additionalInfo?.paymentTerm?.data?.dueDays,
+          )
+        : invoiceData?.dueDate
+        ? new Date(invoiceData?.dueDate)
+        : undefined,
     );
 
     formik.setFieldValue(
@@ -888,7 +896,7 @@ export const InvoiceForm = ({
         );
       }
 
-      if (customerData.paymentTerm?.data?.dueDays) {
+      if (typeof customerData.paymentTerm?.data?.dueDays === 'number') {
         formik.setFieldValue(
           'dueDate',
           addDays(new Date(), customerData?.paymentTerm?.data?.dueDays),
@@ -992,10 +1000,9 @@ export const InvoiceForm = ({
         serviceOrderArg?.articles?.map(articleViewToItem),
       );
     }
-    const dueDays =
-      serviceOrderArg?.contract?.additionalInfo?.invoiceDueDays || 0;
+    const dueDays = serviceOrderArg?.contract?.additionalInfo?.invoiceDueDays;
 
-    if (dueDays > 0 && isNewInvoice) {
+    if (typeof dueDays === 'number' && isNewInvoice) {
       formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
       setResetDueDatePicker(true);
     }
@@ -1394,7 +1401,7 @@ export const InvoiceForm = ({
       );
     }
 
-    if (paymentTermObj?.data?.dueDays) {
+    if (typeof paymentTermObj?.data?.dueDays === 'number') {
       formik.setFieldValue(
         'dueDate',
         addDays(new Date(), paymentTermObj?.data?.dueDays),
