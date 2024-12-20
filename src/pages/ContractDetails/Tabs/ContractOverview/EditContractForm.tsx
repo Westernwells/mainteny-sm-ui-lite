@@ -67,7 +67,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
         pageSize: 500,
       },
       query: '',
-      type: ServiceCompanyType.PROPERTY_OWNER_PAYMENT_TERM,
+      type: ServiceCompanyType.CONTRACT_NAME,
     });
 
   const {data: companyAutoNumberConfig} = useCompanyAutoNumberConfig(
@@ -426,6 +426,7 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
           defaultValue={formik.values.paymentTermId || ''}
           onClick={() => setOpenContractPaymentTermSelectDialog(true)}
           setEdit={setPaymentTermToEdit}
+          serviceCompanyType={ServiceCompanyType.CONTRACT_NAME}
         />
       )}
     </Grid>
