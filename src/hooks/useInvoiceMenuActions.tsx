@@ -1,5 +1,5 @@
 import {useMemo} from 'react';
-import {InvoiceStatus, InvoiceView} from 'models/invoice';
+import {InvoiceStatus, InvoiceType, InvoiceView} from 'models/invoice';
 import SendIcon from '@mui/icons-material/Send';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
 import Print from '@mui/icons-material/Print';
@@ -111,13 +111,15 @@ const useInvoiceMenuActions = ({
       });
     }
 
-    items.push({
-      label: t('Duplicate'),
-      icon: <CopyAll />,
-      onClick: () => {
-        navigate(`/invoices/new?invoiceId=${invoice.id}&isDuplicate=true`);
-      },
-    });
+    if ([InvoiceType.FULL, InvoiceType.AGGREGATE].includes(invoice.type)) {
+      items.push({
+        label: t('Duplicate'),
+        icon: <CopyAll />,
+        onClick: () => {
+          navigate(`/invoices/new?invoiceId=${invoice.id}&isDuplicate=true`);
+        },
+      });
+    }
 
     items.push({
       label: t('Download'),
