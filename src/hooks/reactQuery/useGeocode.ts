@@ -6,7 +6,8 @@ import {useSnackbar} from 'hooks/useSnackbar';
 import {Coord, GeocodeAddressView} from 'models/misc';
 import {useContext} from 'react';
 import {UserCompanyContext} from 'context/UserCompanyProvider';
-import {companyLanguageContextMap} from 'utils/utils';
+
+import {companyLanguageContextMap} from 'utils/language';
 
 const BASE_URL = 'https://maps.googleapis.com/maps/api';
 

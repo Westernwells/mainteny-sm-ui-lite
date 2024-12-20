@@ -39,7 +39,6 @@ import {convertDigitalMinsToHM} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSearchParams} from 'react-router-dom';
 import {
-  companyLanguageContextMap,
   convertToText,
   createFilesFromBlobArray,
   fetchFile,
@@ -70,6 +69,7 @@ import {
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
+import {companyLanguageContextMap} from 'utils/language';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';

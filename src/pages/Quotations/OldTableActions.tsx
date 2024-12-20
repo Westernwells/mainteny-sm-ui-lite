@@ -36,11 +36,7 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {
-  companyLanguageContextMap,
-  createFilesFromBlobArray,
-  fetchFile,
-} from 'utils/utils';
+import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {pdf} from '@react-pdf/renderer';
 import {useCurrentCurrency} from 'utils/currency';
@@ -52,6 +48,7 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import {companyLanguageContextMap} from 'utils/language';
 
 interface Props {
   quotation: QuotationView;

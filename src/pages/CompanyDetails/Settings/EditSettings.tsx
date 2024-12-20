@@ -52,6 +52,10 @@ export const languages = [
     label: 'Turkish',
     value: 'tr-tr',
   },
+  {
+    label: 'Lithuanian',
+    value: 'it-lt',
+  },
 ];
 
 export const timeFormats = [

@@ -17,8 +17,8 @@ import {
 import {useTranslation} from 'react-i18next';
 import {de, enUS, srLatn} from 'date-fns/locale';
 import * as datePickerLocales from '@mui/x-date-pickers/locales';
+import {companyLanguageToUppercaseMap} from 'utils/language';
 import {Language} from '../models/misc';
-import {companyLanguageToUppercaseMap} from './utils';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
 export const locales: {[key: string]: Locale} = {enUS, de, srLatn};

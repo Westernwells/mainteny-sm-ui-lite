@@ -48,11 +48,7 @@ import {
   ServiceOrderCheckListView,
 } from 'models/checklist';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {
-  companyLanguageContextMap,
-  createFilesFromBlobArray,
-  fetchFile,
-} from 'utils/utils';
+import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -75,6 +71,7 @@ import {
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {UserAccount} from 'models/user';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
+import {companyLanguageContextMap} from 'utils/language';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';

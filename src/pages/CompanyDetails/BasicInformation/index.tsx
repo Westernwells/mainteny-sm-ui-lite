@@ -18,7 +18,8 @@ import {useUpdateCompany} from 'hooks/reactQuery/useCompanies';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
+import {formatAddressFullname} from 'utils/utils';
+import {companyLanguageContextMap} from 'utils/language';
 import {BasicInformationCompanyFormModel} from './model';
 import {EditBasicInformation} from './EditBasicInformation';
 

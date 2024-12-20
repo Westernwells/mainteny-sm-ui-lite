@@ -42,7 +42,6 @@ import {
 } from 'utils/invoice-utils';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {
-  companyLanguageContextMap,
   createFilesFromBlobArray,
   dateToString,
   decideAttachmentDescriptionForInvoiceEmail,
@@ -90,6 +89,7 @@ import XMLViewer from 'react-xml-viewer';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
 import useInvoiceMenuActions from 'hooks/useInvoiceMenuActions';
+import {companyLanguageContextMap} from 'utils/language';
 
 interface Props {
   invoice: InvoiceView;

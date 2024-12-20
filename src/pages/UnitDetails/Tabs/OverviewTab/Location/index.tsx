@@ -13,10 +13,11 @@ import * as Yup from 'yup';
 import {useUpdateElevator} from 'hooks/reactQuery/useElevator';
 import {LocationFormModel, SeparateAddressFormModal} from 'models/unitForm';
 import {UserCompanyContext} from 'context/UserCompanyProvider';
-import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
+import {formatAddressFullname} from 'utils/utils';
 import {AddressRecord, Language} from 'models/misc';
 import {centsToMoney, moneyToCents, useCurrentCurrency} from 'utils/currency';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
+import {companyLanguageContextMap} from 'utils/language';
 import {LocationSchema} from './LocationSchema';
 import {EditLocationForm} from './EditLocationForm';
 

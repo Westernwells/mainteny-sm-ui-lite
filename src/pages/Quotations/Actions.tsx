@@ -24,11 +24,7 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {
-  companyLanguageContextMap,
-  createFilesFromBlobArray,
-  fetchFile,
-} from 'utils/utils';
+import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {pdf} from '@react-pdf/renderer';
 import {useCurrentCurrency} from 'utils/currency';
@@ -42,6 +38,7 @@ import {
 } from 'utils/constants';
 import TableActionButton from 'components/Table/TableActionButton';
 import useQuotationMenuActions from 'hooks/useQuotationMenuActions';
+import {companyLanguageContextMap} from 'utils/language';
 
 interface Props {
   quotation: QuotationView;
