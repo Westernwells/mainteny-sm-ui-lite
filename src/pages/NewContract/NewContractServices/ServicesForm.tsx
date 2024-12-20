@@ -42,7 +42,11 @@ import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
 import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
 import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
 import {NumericFormat} from 'react-number-format';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {
+  convertNumberToAmountNumber,
+  formatCurrency,
+  useCurrentCurrency,
+} from 'utils/currency';
 import ExpandIcon from '@mui/icons-material/Expand';
 import {theme} from 'theme';
 import {LanguageContext} from 'context/LanguageProvider';
@@ -859,21 +863,22 @@ const ServicesForm = ({
                       onValueChange={(values) => {
                         const {floatValue} = values;
                         if (floatValue) {
-                          const newPrice = floatValue;
+                          const newPrice = convertNumberToAmountNumber(
+                            floatValue,
+                            currentCurrency,
+                          );
 
                           if (index === 0) {
                             formikContractServiceComponent.setFieldValue(
                               `elevators[${index}].price`,
-                              newPrice * 10 ** currentCurrency.fractionDigits,
+                              newPrice,
                             );
 
                             const updatedElevators =
                               formikContractServiceComponent.values.elevators.map(
                                 (elevator) => ({
                                   ...elevator,
-                                  price:
-                                    newPrice *
-                                    10 ** currentCurrency.fractionDigits,
+                                  price: newPrice,
                                 }),
                               );
                             formikContractServiceComponent.setFieldValue(
@@ -883,7 +888,7 @@ const ServicesForm = ({
                           } else {
                             formikContractServiceComponent.setFieldValue(
                               `elevators[${index}].price`,
-                              newPrice * 10 ** currentCurrency.fractionDigits,
+                              newPrice,
                             );
                           }
                         }

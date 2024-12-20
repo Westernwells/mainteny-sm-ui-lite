@@ -280,47 +280,47 @@ export const ArticleItemsTableNEW = ({
                 <TableBody
                   ref={providedDrop.innerRef}
                   {...providedDrop.droppableProps}>
-                  {items.map((item, index) => (
-                    <Draggable
-                      key={index + (item.article?.id || item.name)}
-                      draggableId={index + (item.article?.id || item.name)}
-                      index={index}>
-                      {(provided) => (
-                        <TableRow
-                          sx={{
-                            position: 'relative',
-                            width: '100%',
-                            '& .MuiTableCell-root': {
-                              verticalAlign: 'top',
-                            },
-                            ':hover': {
-                              '.drag-indicator': {
-                                visibility: 'visible',
+                  {items.map((item, index) => {
+                    const key = index + (item.article?.id || item.id || '');
+                    return (
+                      <Draggable key={key} draggableId={key} index={index}>
+                        {(provided) => (
+                          <TableRow
+                            sx={{
+                              position: 'relative',
+                              width: '100%',
+                              '& .MuiTableCell-root': {
+                                verticalAlign: 'top',
                               },
-                            },
-                          }}
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}>
-                          <ArticleItemRowNEW
-                            key={index + (item.article?.id || item.name)}
-                            articleItem={item}
-                            index={index}
-                            deleteItem={deleteItem}
-                            setItemAtIndex={setItemAtIndex}
-                            propertyOwnerId={propertyOwnerId}
-                            handleSelectItem={handleSelectItem}
-                            isHovered={isHovered}
-                            defaultPercentageVat={
-                              user?.userAccount.serviceCompany.settings
-                                .percentageVat
-                            }
-                            invoiceType={formik.values.type}
-                          />
-                        </TableRow>
-                      )}
-                    </Draggable>
-                  ))}
+                              ':hover': {
+                                '.drag-indicator': {
+                                  visibility: 'visible',
+                                },
+                              },
+                            }}
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}>
+                            <ArticleItemRowNEW
+                              key={key}
+                              articleItem={item}
+                              index={index}
+                              deleteItem={deleteItem}
+                              setItemAtIndex={setItemAtIndex}
+                              propertyOwnerId={propertyOwnerId}
+                              handleSelectItem={handleSelectItem}
+                              isHovered={isHovered}
+                              defaultPercentageVat={
+                                user?.userAccount.serviceCompany.settings
+                                  .percentageVat
+                              }
+                              invoiceType={formik.values.type}
+                            />
+                          </TableRow>
+                        )}
+                      </Draggable>
+                    );
+                  })}
                   {providedDrop.placeholder}
                 </TableBody>
               )}
