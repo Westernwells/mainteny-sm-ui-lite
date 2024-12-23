@@ -1987,6 +1987,7 @@
   "pack": "embalar",
   "Created on {{creationDate}}": "Creado el {{creationDate}}",
   "Exclude previously downloaded data": "Excluir datos descargados previamente",
+  "Payment data included": "Datos de pago incluidos",
   "Article cannot be empty": "El artículo no puede estar vacío.",
   "Article Type": "Tipo de artículo",
   "Article #": "Artículo #",

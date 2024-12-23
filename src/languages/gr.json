@@ -1984,6 +1984,7 @@
   "pack": "πακέτο",
   "Created on {{creationDate}}": "Δημιουργήθηκε στις {{creationDate}}",
   "Exclude previously downloaded data": "Εξαιρέστε δεδομένα που έχετε λάβει προηγουμένως",
+  "Payment data included": "Συμπεριλαμβάνονται δεδομένα πληρωμής",
   "Article cannot be empty": "Το προϊόν δεν μπορεί να είναι κενό",
   "Article Type": "Τύπος προϊόν",
   "Article #": "αριθμός προϊόν",

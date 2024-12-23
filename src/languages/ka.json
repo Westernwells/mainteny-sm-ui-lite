@@ -1987,6 +1987,7 @@
   "pack": "პაკეტი",
   "Created on {{creationDate}}": "შექმნილია {{creationDate}}",
   "Exclude previously downloaded data": "გამორიცხეთ ადრე გადმოწერილი მონაცემები",
+  "Payment data included": "შედის გადახდის მონაცემები",
   "Article cannot be empty": "ნაწილი ვერ იქნება ცარიელი",
   "Article Type": "ნაწილის ტიპი",
   "Article #": "ნაწილის #",
