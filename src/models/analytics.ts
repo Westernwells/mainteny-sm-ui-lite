@@ -24,4 +24,5 @@ export interface QueryFinancials {
   startDate: string;
   endDate: string;
   full?: boolean;
+  includePayments?: boolean;
 }

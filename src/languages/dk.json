@@ -1995,6 +1995,7 @@
   "pack": "pakke",
   "Created on {{creationDate}}": "Oprettet {{creationDate}}",
   "Exclude previously downloaded data": "Ekskluder tidligere downloadede data",
+  "Payment data included": "Betalingsdata inkluderet",
   "Article cannot be empty": "Varen/ydelsen må ikke være tom",
   "Article Type": "Vare/ydelsestype",
   "Article #": "Vare #",

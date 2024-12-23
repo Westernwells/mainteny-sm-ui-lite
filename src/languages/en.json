@@ -1987,6 +1987,7 @@
   "pack": "pack",
   "Created on {{creationDate}}": "Created on {{creationDate}}",
   "Exclude previously downloaded data": "Exclude previously downloaded data",
+  "Payment data included": "Payment data included",
   "Article cannot be empty": "Article cannot be empty",
   "Article Type": "Article Type",
   "Article #": "Article #",
