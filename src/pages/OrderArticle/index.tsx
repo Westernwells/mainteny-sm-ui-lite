@@ -36,7 +36,7 @@ import {
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useCurrentCurrency} from 'utils/currency';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {companyLanguageContextMap, yupValidations} from 'utils/utils';
+import {yupValidations} from 'utils/utils';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {GridCellParams} from '@mui/x-data-grid';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
@@ -46,6 +46,7 @@ import {Dialog} from 'components/Dialog';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {cleanHtmlContent} from 'utils/text-block';
+import {companyLanguageContextMap} from 'utils/language';
 import PdfPreview from './PDFPreview';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
 import OrderArticlePDF from './OrderArticlePDF';

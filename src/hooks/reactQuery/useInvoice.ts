@@ -43,11 +43,11 @@ import {
 } from 'models/invoice';
 import {Comment} from 'models/comment';
 import {ErrorCode} from 'models/error';
-import {languageContextMap} from 'utils/utils';
 import {transformInvoiceForCreditNote} from 'utils/invoice-utils';
 import {LanguageContext} from 'context/LanguageProvider';
 import {QueryElevatorInvoiceParams} from 'models/elevator';
 import {useAll} from 'hooks/reactQuery/useAll';
+import {languageContextMap} from 'utils/language';
 import {useUserSession} from './useUserSession';
 
 // TODO: make API call to fetch Invoices

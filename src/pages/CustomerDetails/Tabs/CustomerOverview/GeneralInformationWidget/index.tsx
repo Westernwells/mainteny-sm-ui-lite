@@ -24,7 +24,8 @@ import {t} from 'i18next';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useTranslation} from 'react-i18next';
-import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
+import {formatAddressFullname} from 'utils/utils';
+import {companyLanguageContextMap} from 'utils/language';
 import EditCustomerGeneralInformation from './EditCustomerGeneralInformation';
 
 type Props = {

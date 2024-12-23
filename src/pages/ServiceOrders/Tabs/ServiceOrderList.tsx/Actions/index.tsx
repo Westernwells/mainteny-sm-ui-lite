@@ -16,7 +16,6 @@ import {useTranslation} from 'react-i18next';
 import {Confirm} from 'components/Confirm';
 import {MarkCompletedDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/MarkCompletedDialog';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {companyLanguageContextMap} from 'utils/utils';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -24,6 +23,7 @@ import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useCurrentCurrency} from 'utils/currency';
+import {companyLanguageContextMap} from 'utils/language';
 
 type Props = {
   serviceOrder: ServiceOrderView;

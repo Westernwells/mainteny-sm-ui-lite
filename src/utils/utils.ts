@@ -12,13 +12,7 @@ import {
 } from 'models/invoice';
 
 import {ElevatorDataSchemaItem} from 'models/elevator';
-import {
-  Address,
-  AddressRecord,
-  Coord,
-  GeocodeAddress,
-  Language,
-} from '../models/misc';
+import {Address, AddressRecord, Coord, GeocodeAddress} from '../models/misc';
 import useHighlightText from '../hooks/useHighlightText';
 import {getCountryCode} from './countries';
 import {
@@ -119,36 +113,6 @@ export const daysTime: {[key: number]: string[]}[] = [
   {6: twentyFourHourTime},
 ];
 
-export const languageMap: {[key: string]: string} = {
-  'en-US': 'en-us',
-  'de-DE': 'de-de',
-  'sr-SP': 'sr-sp',
-  'it-IT': 'it-it',
-  'ru-RU': 'ru-ru',
-  'da-DK': 'da-dk',
-  'ka-GE': 'ka-ge',
-  'es-ES': 'es-es',
-  'gr-GR': 'gr-gr',
-  'tr-TR': 'tr-tr',
-};
-
-export const mapLanguageToLocale: {[key: string]: string} = {
-  'en-us': 'enUS',
-  'de-de': 'de',
-  'sr-SP': 'sr',
-  'it-it': 'it',
-  'ru-ru': 'ru',
-  'da-DK': 'da',
-  'ka-GE': 'ka',
-  'es-ES': 'es',
-  'gr-GR': 'gr',
-  'tr-TR': 'tr',
-};
-
-export const languagesToPars: {[key: string]: string} = {
-  KA: 'GE',
-};
-
 export const getDataGridHeight = (
   currentTotal: number,
   maxItems: number,
@@ -218,44 +182,6 @@ export const waitForSeconds = (seconds: number) =>
       resolve('done');
     }, seconds * 1000);
   });
-
-export const languageContextMap: {[key: string]: Language} = {
-  EN: Language.EN_US,
-  DE: Language.DE_DE,
-  SR: Language.SR_RS,
-  RU: Language.RU_RU,
-  IT: Language.IT_IT,
-  DA: Language.DA_DK,
-  KA: Language.KA_GE,
-  ES: Language.ES_ES,
-  GR: Language.GR_GR,
-  TR: Language.TR_TR,
-};
-
-export const companyLanguageContextMap: {[key: string]: string} = {
-  'de-de': 'de',
-  'en-us': 'en',
-  'sr-rs': 'sr',
-  'it-it': 'it',
-  'ru-ru': 'ru',
-  'da-dk': 'da',
-  'ka-ge': 'ka',
-  'es-es': 'es',
-  'gr-gr': 'gr',
-  'tr-tr': 'tr',
-};
-
-export const companyLanguageToUppercaseMap: {[key: string]: string} = {
-  'de-de': Language.DE_DE,
-  'en-us': Language.EN_US,
-  'sr-rs': Language.SR_RS,
-  'it-it': Language.IT_IT,
-  'ru-ru': Language.RU_RU,
-  'ka-ge': Language.KA_GE,
-  'es-es': Language.ES_ES,
-  'gr-gr': Language.GR_GR,
-  'tr-tr': Language.TR_TR,
-};
 
 export const titleCase = (str: string) =>
   `${str[0].toUpperCase()}${str.slice(1).toLowerCase()}`;
@@ -453,9 +379,6 @@ export const convertToHourAndMinutes = (timeInMinutes?: number) => {
 
   return `${formattedHours}:${formattedMinutes}h`;
 };
-
-export const convertLanguageIfNeeded = (key: string) =>
-  languagesToPars[key] || key;
 
 export const getBase64FromUrl = async (url: string) => {
   const data = await fetch(url, {

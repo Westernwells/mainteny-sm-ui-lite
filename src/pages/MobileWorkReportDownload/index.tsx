@@ -11,13 +11,13 @@ import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 import usePrepareWorkReportData from 'hooks/usePrepareWorkReportData';
 import {Box, Typography} from '@mui/material';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
-import {companyLanguageContextMap} from 'utils/utils';
 import i18n from 'i18n';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import {companyLanguageContextMap} from 'utils/language';
 
 interface RNWindow extends Window {
   ReactNativeWebView?: {

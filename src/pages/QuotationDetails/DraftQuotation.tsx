@@ -39,7 +39,6 @@ import {theme} from 'theme';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import {
-  companyLanguageContextMap,
   formatAddressFullname,
   formatSearchParams,
   getUserFullName,
@@ -90,6 +89,7 @@ import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {addDays} from 'date-fns';
 import {cleanHtmlContent} from 'utils/text-block';
+import {companyLanguageContextMap} from 'utils/language';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
 

@@ -7,12 +7,13 @@ import Grid from '@mui/material/Grid';
 import Select, {SelectProps} from '@mui/material/Select';
 import useTheme from '@mui/material/styles/useTheme';
 import {SxProps} from '@mui/system';
-import {capitalize, companyLanguageContextMap} from 'utils/utils';
+import {capitalize} from 'utils/utils';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import SettingsIcon from '@mui/icons-material/Settings';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ReactNode, useMemo} from 'react';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {companyLanguageContextMap} from 'utils/language';
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;

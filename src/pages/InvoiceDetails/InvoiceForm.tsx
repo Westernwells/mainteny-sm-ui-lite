@@ -61,7 +61,6 @@ import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {AddressComponent, AddressRecord, Language} from 'models/misc';
 import {
-  companyLanguageContextMap,
   formatAddressFullname,
   formatSearchParams,
   getUserFullName,
@@ -120,6 +119,7 @@ import {formatInvoiceRecord, articleViewToInvoiceItemRecord} from './utils';
 import {Notes} from './Notes/EditNotes';
 import {cleanHtmlContent} from 'utils/text-block';
 import {t} from 'i18next';
+import {companyLanguageContextMap} from 'utils/language';
 
 interface Props {
   invoice?: InvoiceView;

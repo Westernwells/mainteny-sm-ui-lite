@@ -13,7 +13,6 @@ import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {SendServiceOrderCheckListRecord} from 'models/checklist';
 import {LanguageContext} from 'context/LanguageProvider';
-import {languageContextMap} from 'utils/utils';
 import {ServiceOrderArticleRecord} from 'models/article';
 import {
   AppointmentConfirmationRequiredOrdersQueryParams,
@@ -39,6 +38,7 @@ import {Resource, RestError, StringValue} from 'models/misc';
 import {Comment} from 'models/comment';
 import {RequestParameters} from 'models/apiRequests';
 import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
+import {languageContextMap} from 'utils/language';
 import {useUserSession} from './useUserSession';
 import {Order} from '../../models/pagination';
 import {useServiceOrderCommentMutation} from './useServiceOrderCommentMutation';

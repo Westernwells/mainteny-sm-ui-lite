@@ -13,7 +13,6 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
-import {companyLanguageContextMap} from 'utils/utils';
 import {useCurrentCurrency} from 'utils/currency';
 import {MarkCompletedDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/MarkCompletedDialog';
 import {getDefaultTechnician, getDialogTitle} from 'utils/service-order-utils';
@@ -25,6 +24,7 @@ import {
 } from 'hooks/reactQuery/useServiceOrder';
 import ChangePaymentStatusDialog from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ChangePaymentStatusDialog';
 import {MenuAction} from 'models/action';
+import {companyLanguageContextMap} from 'utils/language';
 import {Confirm} from './Confirm';
 
 interface BottomDrawerProps {

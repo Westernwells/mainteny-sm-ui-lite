@@ -1,7 +1,7 @@
 import {formatDistance} from 'date-fns';
 import {srLatn} from 'date-fns/locale';
 import {locales} from 'utils/datetime';
-import {mapLanguageToLocale} from 'utils/utils';
+import {mapLanguageToLocale} from 'utils/language';
 import {useUserSession} from './reactQuery/useUserSession';
 
 export const useFormatDateDistance = () => {

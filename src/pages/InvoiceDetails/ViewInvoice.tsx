@@ -81,7 +81,6 @@ import {
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
-  companyLanguageContextMap,
   createFilesFromBlobArray,
   dateToString,
   decideAttachmentDescriptionForInvoiceEmail,
@@ -115,6 +114,7 @@ import XMLViewer from 'react-xml-viewer';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
 import useInvoiceMenuActions from 'hooks/useInvoiceMenuActions';
+import {companyLanguageContextMap} from 'utils/language';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
