@@ -8,7 +8,7 @@ import React, {
   useImperativeHandle,
   useState,
 } from 'react';
-import {FileWithPath, useDropzone, FileRejection} from 'react-dropzone';
+import {FileRejection, FileWithPath, useDropzone} from 'react-dropzone';
 import useTheme from '@mui/material/styles/useTheme';
 import {Cropper} from 'react-cropper';
 import 'styles/cropper.css';
@@ -202,7 +202,7 @@ export const MyDropZone = forwardRef(
     };
 
     useImperativeHandle(ref, () => ({
-      open: () => open(),
+      open,
       removeFile: (fileKey: string) => removeFile(fileKey),
       files,
     }));
@@ -260,6 +260,7 @@ export const MyDropZone = forwardRef(
         .then((res) => res.arrayBuffer())
         .then((buf) => new File([buf], filename, {type: mimeType}));
     }
+
     const getCropData = async () => {
       let resultFile = null;
       if (typeof cropper !== 'undefined') {
@@ -289,7 +290,11 @@ export const MyDropZone = forwardRef(
           : {})}
         onClick={(e) => e.stopPropagation()}>
         {isDropzoneWrapperShown ? (
-          children
+          <>
+            {/* Needs input tag to be present to open file explorer */}
+            <input type="file" {...getInputProps()} style={{display: 'none'}} />
+            {children}
+          </>
         ) : (
           <Box
             component="div"
