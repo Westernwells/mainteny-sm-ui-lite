@@ -38,7 +38,7 @@ import {
   ServiceOrderNameChangedRecord,
   ServiceOrderTypeRecord,
 } from 'models/service-order';
-import {ContractPaymentTermView, ContractTermView} from 'models/contract';
+import {ContractTermView} from 'models/contract';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {
   EmployeeEventTypeRecord,
@@ -402,7 +402,7 @@ export const useCompanyXeroInfo = (companyId?: string) => {
   );
 };
 
-export const queryContractTerms = async (
+export const queryCompanyTerms = async (
   serviceCompanyId: string,
   page: Page,
   query: string,
@@ -422,10 +422,10 @@ export const queryContractTerms = async (
   return response.data;
 };
 
-export const useContractTerms = ({
+export const useCompanyTerms = ({
   page,
   query,
-  type,
+  type = ServiceCompanyType.PROPERTY_OWNER_PAYMENT_TERM,
   options,
 }: {
   page: Page;
@@ -437,55 +437,7 @@ export const useContractTerms = ({
   return useQuery<Resource<ContractTermView>, RestError>(
     [queryKeys.queryContractTerms, page, query],
     () =>
-      queryContractTerms(
-        user!.userAccount.serviceCompany.id,
-        page,
-        query,
-        type,
-      ),
-    {
-      enabled: !!user,
-      ...options,
-    },
-  );
-};
-
-export const queryContractPaymentTerms = async (
-  serviceCompanyId: string,
-  page: Page,
-  query: string,
-) => {
-  const response = await axiosClient.get<Resource<ContractPaymentTermView>>(
-    `/api/serviceCompanies/${serviceCompanyId}/contractPaymentTerms`,
-    {
-      params: {
-        query,
-        ...page,
-      },
-      paramsSerializer,
-    },
-  );
-  return response.data;
-};
-
-export const useQueryContractPaymentTerms = ({
-  page,
-  query,
-  options,
-}: {
-  page: Page;
-  query: string;
-  options?: UseQueryOptions<any, any, any>;
-}) => {
-  const {user} = useUserSession();
-  return useQuery<Resource<ContractPaymentTermView>, RestError>(
-    [queryKeys.queryContractPaymentTerms, page, query],
-    () =>
-      queryContractPaymentTerms(
-        user!.userAccount.serviceCompany.id,
-        page,
-        query,
-      ),
+      queryCompanyTerms(user!.userAccount.serviceCompany.id, page, query, type),
     {
       enabled: !!user,
       ...options,

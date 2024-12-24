@@ -10,7 +10,6 @@ import {Alert, Box, Drawer, FormControlLabel, Radio} from '@mui/material';
 import Add from '@mui/icons-material/Add';
 import Close from '@mui/icons-material/Close';
 import {Button} from 'components/Button';
-import {useContractTerms} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {useQueryContract} from 'hooks/reactQuery/useContract';
@@ -24,6 +23,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import {compareArrays} from 'utils/contract-terms';
 import {useDeleteContractTerm} from 'hooks/reactQuery/useContractPaymentTerms';
 import {convertToText} from 'utils/utils';
+import {useCompanyTerms} from 'hooks/reactQuery/useCompanies';
 import {Order} from '../models/pagination';
 
 interface Props {
@@ -75,7 +75,7 @@ export const ContractTerm = ({
     }[]
   >([]);
 
-  const {data: contractTerms = createEmptyResource(500)} = useContractTerms({
+  const {data: contractTerms = createEmptyResource(500)} = useCompanyTerms({
     page: {
       pageIndex: 0,
       pageSize: 500,
