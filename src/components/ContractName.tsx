@@ -10,7 +10,7 @@ import {
 import {ServiceCompanyType} from 'models/service-company';
 import {FormikProps} from 'formik';
 import {IconButton} from '@mui/material';
-import {useContractTerms} from 'hooks/reactQuery/useCompanies';
+import {useCompanyTerms} from 'hooks/reactQuery/useCompanies';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {ContractTerm} from 'components/ContractTerm';
 import {ContractTermInput as NewContractName} from 'components/ContractTermInput';
@@ -26,7 +26,7 @@ const ContractName: FC<Props> = ({formik}) => {
   const [edit, setEdit] = useState<ContractTermView | undefined>(undefined);
   const [showDrawer, setShowDrawer] = useState(false);
 
-  const {data: contracts = createEmptyResource(500)} = useContractTerms({
+  const {data: contracts = createEmptyResource(500)} = useCompanyTerms({
     page: {
       pageIndex: 0,
       pageSize: 500,

@@ -8,7 +8,6 @@ import {Box, Drawer} from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {createEmptyResource} from 'utils/paging';
-import {useContractTerms} from 'hooks/reactQuery/useCompanies';
 import {Button} from 'components/Button';
 import {Button as LoadingButton} from 'components/LoadingButton';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -28,6 +27,7 @@ import {
   useUpdateContractTerm,
 } from 'hooks/reactQuery/useContractPaymentTerms';
 import {ServiceCompanyType} from 'models/service-company';
+import {useCompanyTerms} from 'hooks/reactQuery/useCompanies';
 import {FormInput} from './form/FormInput';
 import {FormSelect} from './form/FormSelect';
 
@@ -159,7 +159,7 @@ export const ContractTermInput = ({
     mutateAsync: updateContractPaymentTerm,
     isLoading: updatePaymentTermLoading,
   } = useUpdateContractPaymentTerm();
-  const {data: contractTerms = createEmptyResource(500)} = useContractTerms({
+  const {data: contractTerms = createEmptyResource(500)} = useCompanyTerms({
     page: {
       pageIndex: 0,
       pageSize: 500,

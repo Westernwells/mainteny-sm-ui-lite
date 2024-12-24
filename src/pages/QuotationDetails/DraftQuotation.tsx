@@ -56,7 +56,7 @@ import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {
   useCompanyAutoNumberConfig,
   useCompanyNextNumber,
-  useContractTerms,
+  useCompanyTerms,
 } from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging';
 import {DatePicker} from 'components/DatePicker';
@@ -222,7 +222,7 @@ export const DraftQuotation = ({
   };
 
   const {data: contractPaymentTerms = createEmptyResource(500)} =
-    useContractTerms({
+    useCompanyTerms({
       page: {
         pageIndex: 0,
         pageSize: 500,
