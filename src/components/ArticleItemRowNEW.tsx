@@ -79,6 +79,7 @@ interface Props {
   defaultPercentageVat?: number;
   taxRates: VatView[];
   invoiceType: InvoiceType;
+  jobArticleVat?: number;
 }
 
 interface TableRowProps {
@@ -164,6 +165,7 @@ export const ArticleItemRowNEW = ({
   defaultPercentageVat,
   invoiceType,
   taxRates,
+  jobArticleVat,
 }: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -180,7 +182,9 @@ export const ArticleItemRowNEW = ({
       unitAmount: {
         ...articleItem.unitAmount,
         percentageVat:
-          defaultPercentageVat !== undefined
+          jobArticleVat !== undefined
+            ? jobArticleVat
+            : defaultPercentageVat !== undefined
             ? defaultPercentageVat
             : articleItem.unitAmount.percentageVat,
       },

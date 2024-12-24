@@ -150,9 +150,9 @@ export const ArticleItemsTableQuotation = ({
     propertyOwner?.additionalInfo.vat || taxRates?.find((tR) => tR.isDefault);
 
   const defaultPercentageVat =
-    defaultVat?.percentage ||
-    user?.userAccount.serviceCompany.settings.percentageVat ||
-    0;
+    typeof defaultVat?.percentage === 'number'
+      ? defaultVat.percentage
+      : user?.userAccount.serviceCompany.settings.percentageVat || 0;
 
   const createEmptyItem = () => {
     const blankItem = {

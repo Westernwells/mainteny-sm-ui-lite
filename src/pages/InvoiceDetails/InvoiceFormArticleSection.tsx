@@ -10,6 +10,7 @@ import {
 import {ArticleItemsTableNEW} from 'components/ArticleItemsTableNEW';
 import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {InvoiceFormData, InvoiceItemRecord} from 'models/invoice';
+import {ServiceOrderArticleView} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {FormikProps} from 'formik';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -85,6 +86,7 @@ interface Props {
   formik: FormikProps<InvoiceFormData>;
   enableCollapse?: boolean;
   showArticleSection?: boolean;
+  jobArticles?: ServiceOrderArticleView[];
 }
 
 const InvoiceFormArticleSection = ({
@@ -93,6 +95,7 @@ const InvoiceFormArticleSection = ({
   propertyOwner,
   enableCollapse = false,
   showArticleSection = true,
+  jobArticles,
 }: Props) => {
   const [shouldShow, setShouldShow] = useState(showArticleSection);
   const currentCurrency = useCurrentCurrency();
@@ -153,6 +156,7 @@ const InvoiceFormArticleSection = ({
             formik={formik}
             propertyOwner={propertyOwner}
             isHovered={isHovered}
+            jobArticles={jobArticles}
           />
         </AccordionDetails>
       </Accordion>

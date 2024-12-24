@@ -11,4 +11,5 @@ export interface EditArticleFormModel {
   externalId?: string;
   description?: string;
   unitPurchaseAmount?: number;
+  percentageVat?: number;
 }

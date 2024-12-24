@@ -1,6 +1,5 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
-import {endOfYear, startOfYear} from 'date-fns';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
@@ -113,8 +112,6 @@ export const ServiceOrdersDataGrid = ({
   } = useServiceOrders(
     {
       elevatorIds: elevatorId ? [elevatorId] : [],
-      start: startOfYear(new Date(2000, 1, 1)).toISOString(),
-      end: endOfYear(new Date()).toISOString(),
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: encodeURIComponent(search),
