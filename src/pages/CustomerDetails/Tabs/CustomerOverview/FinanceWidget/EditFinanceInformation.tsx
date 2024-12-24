@@ -25,11 +25,11 @@ import {ContractTerm} from 'components/ContractTerm';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTermView} from 'models/contract';
 import {ServiceCompanyType} from 'models/service-company';
-import {useContractTerms} from 'hooks/reactQuery/useCompanies';
 import {createEmptyResource} from 'utils/paging';
 import {convertToText} from 'utils/utils';
 import {Receipt} from '@mui/icons-material';
 import {useVats} from 'hooks/reactQuery/useVats';
+import {useCompanyTerms} from 'hooks/reactQuery/useCompanies';
 import {EditFinanceAddress} from './EditFinanceAddress';
 
 interface Props {
@@ -56,7 +56,7 @@ export const EditFinanceInformation = ({
   >(undefined);
 
   const {data: contractPaymentTerms = createEmptyResource(500)} =
-    useContractTerms({
+    useCompanyTerms({
       page: {
         pageIndex: 0,
         pageSize: 500,

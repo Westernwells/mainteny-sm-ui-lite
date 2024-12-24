@@ -78,8 +78,8 @@ export enum ActivityMessageType {
 }
 
 export enum ServiceCompanyType {
-  PROPERTY_OWNER_PAYMENT_TERM = 'PROPERTY_OWNER_PAYMENT_TERM',
   CONTRACT_NAME = 'CONTRACT_NAME',
+  PROPERTY_OWNER_PAYMENT_TERM = 'PROPERTY_OWNER_PAYMENT_TERM',
 }
 
 export interface ServiceCompanyView {
