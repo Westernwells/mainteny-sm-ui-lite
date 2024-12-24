@@ -35,6 +35,7 @@ import {
 import {getUniqueId} from 'utils/utils';
 import {useTheme} from '@mui/material/styles';
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
+import {ServiceOrderArticleView} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useVats} from 'hooks/reactQuery/useVats';
 import {Button} from './Button';
@@ -49,6 +50,7 @@ interface Props {
   propertyOwner?: PropertyOwnerView;
   formik: FormikProps<InvoiceFormData>;
   isHovered?: boolean;
+  jobArticles?: ServiceOrderArticleView[];
 }
 
 export const ArticleItemsTableNEW = ({
@@ -57,6 +59,7 @@ export const ArticleItemsTableNEW = ({
   propertyOwner,
   formik,
   isHovered,
+  jobArticles,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -137,9 +140,9 @@ export const ArticleItemsTableNEW = ({
     propertyOwner?.additionalInfo.vat || taxRates?.find((tR) => tR.isDefault);
 
   const defaultPercentageVat =
-    defaultVat?.percentage ||
-    user?.userAccount.serviceCompany.settings.percentageVat ||
-    0;
+    typeof defaultVat?.percentage === 'number'
+      ? defaultVat.percentage
+      : user?.userAccount.serviceCompany.settings.percentageVat || 0;
 
   const createEmptyItem = () => {
     const blankItem = {
@@ -329,6 +332,11 @@ export const ArticleItemsTableNEW = ({
                               defaultPercentageVat={defaultPercentageVat}
                               taxRates={taxRates!}
                               invoiceType={formik.values.type}
+                              jobArticleVat={
+                                jobArticles?.find(
+                                  (ja) => ja.article.id === item.article?.id,
+                                )?.unitAmount.percentageVat
+                              }
                             />
                           </TableRow>
                         )}

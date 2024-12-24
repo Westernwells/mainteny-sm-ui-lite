@@ -1885,6 +1885,7 @@ export const InvoiceForm = ({
             showArticleSection={formik.values.showArticleSection}
             propertyOwner={customer}
             enableCollapse={formik.values.type !== InvoiceType.FULL}
+            jobArticles={serviceOrder?.articles}
           />
 
           {/* PARTIAL PAYMENTS */}

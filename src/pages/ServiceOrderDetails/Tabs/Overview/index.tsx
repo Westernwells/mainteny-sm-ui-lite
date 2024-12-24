@@ -79,7 +79,7 @@ export const Overview = ({serviceOrder}: Props) => {
           <Box mt="1em" flexGrow={1}>
             <Articles
               serviceOrderArticles={serviceOrderArticles}
-              serviceOrderId={serviceOrder?.id}
+              serviceOrder={serviceOrder}
               customerId={serviceOrder?.elevator?.propertyOwner?.id}
             />
           </Box>
