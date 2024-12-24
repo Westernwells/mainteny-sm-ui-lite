@@ -2989,7 +2989,7 @@
   "Selling price": "Verkaufspreis",
   "Please provide a valid date for the job creation date": "Bitte ein valides Datum für die erste Auftragserstellung hinterlegen.",
   "Please provide a valid date for the first invoice date": "Bitte ein valides Datum für die erste Rechnungserstellung hinterlegen.",
-  "Payment data included": "Zahlungsdaten enthalten",
+  "Payment data included": "Zahlungsbelege inkludieren",
   "Auto Dialer": "Notrufsystem",
   "Sim Pin": "SIM-Pin",
   "Place of Installation": "Installationsort",
@@ -3015,5 +3015,10 @@
   "Invoice number": "Rechnungsnummer",
   "Pick article": "Artikel auswählen",
   "Auto type": "Automate Generierung",
-  "Customer since": "Kunde seit"
+  "Customer since": "Kunde seit",
+  "Insert Link": "Link einfügen",
+  "Email Signature updated successfully": "E-Mail-Signatur erfolgreich aktualisiert",
+  "No email signatures": "Keine E-Mail-Signatur",
+  "Create a customised email signature": "Erstellen Sie eine angepasste E-Mail-Signatur",
+  "New Signature": "Neue Signatur"
 }

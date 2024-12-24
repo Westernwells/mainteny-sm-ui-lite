@@ -3036,5 +3036,11 @@
   "Invoice number": "Broj fakture",
   "Pick article": "Izaberite članak",
   "Auto type": "Auto tip",
-  "Customer since": "Kupac od"
+  "Customer since": "Kupac od",
+  "Insert Link": "Umetni vezu",
+  "Email Signature updated successfully": "Potpis e-pošte je uspešno ažuriran",
+  "No email signatures": "Nema potpisa e-pošte",
+  "Create a customised email signature": "Napravite prilagođeni potpis e-pošte",
+  "New Signature": "Novi potpis",
+  "Enter the URL, email address, or telephone number:": "Unesite URL, adresu e-pošte ili broj telefona:"
 }
