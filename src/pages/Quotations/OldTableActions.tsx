@@ -49,6 +49,8 @@ import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {companyLanguageContextMap} from 'utils/language';
+import {EmailSignature} from 'models/employee';
+import {FileResourceRecord} from 'models/media';
 
 interface Props {
   quotation: QuotationView;
@@ -86,6 +88,13 @@ const OldTableActions = ({quotation}: Props) => {
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
 
+  const [activeSignature, setActiveSignature] = useState<
+    EmailSignature | undefined
+  >();
+
+  const {data: signatureUrls = {}} = useDownloadUrl(
+    activeSignature?.content?.images || [],
+  );
   const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
     serviceCompanyId: company?.id!,
     params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
@@ -547,6 +556,30 @@ const OldTableActions = ({quotation}: Props) => {
             await uploadFiles({files: emailAttachments, uploadPath});
           }
 
+          let file: File | undefined;
+
+          if (activeSignature && activeSignature.content.images) {
+            const response = await fetch(
+              signatureUrls[activeSignature.content.images[0]!],
+            );
+
+            const blob = await response.blob();
+            file = new File([blob], activeSignature.name, {
+              type: blob.type,
+            });
+          }
+
+          let signatureAttachment: FileResourceRecord | undefined;
+
+          if (file && activeSignature) {
+            signatureAttachment = {
+              type: file.type,
+              uri: activeSignature.content.images[0]!,
+              description: activeSignature.name,
+              contentId: activeSignature.content.images[0]!,
+            };
+          }
+
           await sendQuotation({
             id: quotation.id,
             body: {
@@ -564,19 +597,30 @@ const OldTableActions = ({quotation}: Props) => {
                     // If file is from server -> uri of file should be quotation.id
                     // If file is from server -> description should be quotation.externalId
                     const isFileFromServer = !obj.path && index === 0;
-                    return [
-                      ...newArr,
-                      {
-                        ...obj,
-                        type: obj.type,
-                        uri: isFileFromServer
-                          ? `${uploadPath}/${quotation.id}.pdf`
-                          : `${uploadPath}/${obj.name}`,
-                        description: isFileFromServer
-                          ? `${quotation.externalId}.pdf`
-                          : obj.name.split('.')[0],
-                      },
-                    ];
+
+                    newArr.push({
+                      ...obj,
+                      type: obj.type,
+                      uri: isFileFromServer
+                        ? `${uploadPath}/${quotation.id}.pdf`
+                        : `${uploadPath}/${obj.name}`,
+                      description: isFileFromServer
+                        ? `${quotation.externalId}.pdf`
+                        : obj.name.split('.')[0],
+                    });
+
+                    // Add signatureAttachment if it exists and is not already in the list
+                    if (
+                      signatureAttachment &&
+                      !newArr.some(
+                        (attachment) =>
+                          attachment.uri === signatureAttachment.contentId,
+                      )
+                    ) {
+                      newArr.push(signatureAttachment as FileWithPreview);
+                    }
+
+                    return newArr;
                   },
                   [],
                 ),
@@ -586,6 +630,8 @@ const OldTableActions = ({quotation}: Props) => {
 
           setIsConfirmPrintDialogOpen(false);
         }}
+        activeSignature={activeSignature}
+        onSignatureSelect={(signature) => setActiveSignature(signature)}
       />
       <Confirm
         open={isDeleteDialogOpen}

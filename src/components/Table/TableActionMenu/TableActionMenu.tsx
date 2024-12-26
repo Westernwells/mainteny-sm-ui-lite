@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import React from 'react';
 import {MenuAction} from 'models/action';
+import {t} from 'i18next';
 
 type Props = {
   options: MenuAction[];
@@ -38,7 +39,7 @@ const TableActionMenu = ({options, isOpen, anchorEl, onClose}: Props) => {
             }}>
             <ListItemIcon>{option.icon}</ListItemIcon>
             <ListItemText>
-              <Typography variant="body2">{option.label}</Typography>
+              <Typography variant="body2">{t(option.label)}</Typography>
             </ListItemText>
           </MenuItem>
           {option.showBorder && <Divider />}
