@@ -13,10 +13,16 @@ import {useMemo} from 'react';
 import History from '@tiptap/extension-history';
 import OrderedList from '@tiptap/extension-ordered-list';
 import Placeholder from '@tiptap/extension-placeholder';
+import {Link} from '@tiptap/extension-link';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
 
 // custom extensions
 import ShiftEnterExtension from './customExtensions/ShiftEnterExtension';
 import FontSize from './customExtensions/FontSizeExtension';
+import {ImageExtension} from './customExtensions/ImageExtension';
 
 export type UseExtensionsOptions = {
   /** Placeholder hint to show in the text input area before a user types a message. */
@@ -59,6 +65,14 @@ export default function useExtensions({
       }),
       TextStyle,
       ShiftEnterExtension,
+      Link.configure({
+        openOnClick: false,
+      }),
+      ImageExtension.configure({inline: true, allowBase64: true}),
+      Table,
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     [placeholder],
   );

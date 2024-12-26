@@ -1,5 +1,7 @@
 import {useSnackbar} from 'hooks/useSnackbar';
 import {
+  CreateEmailSignatureRecord,
+  EmailSignature,
   EmployeeStatusView,
   EmployeesView,
   QueryEmployeesParams,
@@ -18,6 +20,7 @@ import {
 import {queryKeys as qks} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useUserSession} from './useUserSession';
+import {useGetUserAccount} from './useUserAccount';
 
 export const queryServiceCompanyEmployees = async (
   serviceCompanyId: string,
@@ -147,4 +150,129 @@ export const useDeleteEmployee = (successMsg?: string) => {
       showError(err);
     },
   });
+};
+
+export const queryEmployeeSignature = async (employeeId: string) => {
+  const response = await axiosClient.get<EmailSignature[]>(
+    `/api/employees/${employeeId}/emailSignatures`,
+  );
+  return response.data;
+};
+
+export const useQueryEmployeeSignature = (
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  const {data: userAccount} = useGetUserAccount(user?.userAccount.id);
+  const employeeId = userAccount?.userData.employeeId!;
+  return useQuery<EmailSignature[]>(
+    [qks.fetchEmployeeEmailSignatures, employeeId],
+    () => queryEmployeeSignature(employeeId!),
+    {
+      enabled: !!user && !!employeeId,
+      ...options,
+    },
+  );
+};
+
+export const postEmployeeEmailSignature = async (
+  employeeId: string,
+  body: CreateEmailSignatureRecord,
+) => {
+  await axiosClient.post(`api/employees/${employeeId}/emailSignatures`, body);
+};
+
+export const usePostEmployeeEmailSignature = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      employeeId,
+      body,
+    }: {
+      employeeId: string;
+      body: CreateEmailSignatureRecord;
+    }) => postEmployeeEmailSignature(employeeId, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qks.fetchEmployeeEmailSignatures]);
+        enqueueSnackbar(`Email signature created successfully`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+export const putEmployeeEmailSignature = async (
+  body: CreateEmailSignatureRecord,
+  employeeId: string,
+  signatureId: string,
+) => {
+  const {data} = await axiosClient.put<StringValue>(
+    `api/employees/${employeeId}/emailSignatures/${signatureId}`,
+    body,
+  );
+  return data;
+};
+
+export const useUpdateEmployeeEmailSignature = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      data,
+      employeeId,
+      signatureId,
+    }: {
+      data: CreateEmailSignatureRecord;
+      employeeId: string;
+      signatureId: string;
+    }) => putEmployeeEmailSignature(data, employeeId, signatureId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qks.fetchEmployeeEmailSignatures]);
+        queryClient.invalidateQueries([qks.fetchEmployeeEmailSignatureById]);
+        enqueueSnackbar(`Email Signature updated successfully`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+export const deleteEmployeeEmailSignature = async (
+  employeeId: string,
+  signatureId: string,
+) => {
+  await axiosClient.delete(
+    `api/employees/${employeeId}/emailSignatures/${signatureId}`,
+  );
+};
+
+export const useDeleteEmployeeEmailSignature = () => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({employeeId, signatureId}: {employeeId: string; signatureId: string}) =>
+      deleteEmployeeEmailSignature(employeeId, signatureId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qks.fetchEmployeeEmailSignatures]);
+        queryClient.invalidateQueries([qks.fetchEmployeeEmailSignatureById]);
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
 };

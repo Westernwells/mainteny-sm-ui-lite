@@ -12,6 +12,7 @@ import {ReactComponent as SupplierIllustration} from 'assets/illustrations/Suppl
 import {ReactComponent as MobileUsabilityTesting} from 'assets/illustrations/MobileUsabilityTesting.svg';
 import {ReactComponent as UXAnalytics} from 'assets/illustrations/UXAnalytics.svg';
 import {ReactComponent as BankAccountsIllustration} from 'assets/illustrations/BankAccounts.svg';
+import {ReactComponent as EmailSignatureIllustration} from 'assets/illustrations/EmailAction.svg';
 import {ReactComponent as PercentageIllustration} from 'assets/illustrations/Percentage.svg';
 import {ReactComponent as AttachmentLargeIcon} from 'assets/icons/AttachmentLargeIcon.svg';
 import {ReactComponent as LiftIcon} from 'assets/icons/LiftIcon.svg';
@@ -55,7 +56,8 @@ export interface Props extends BoxProps {
     | 'purchase-invoice'
     | 'invoice'
     | 'quotation'
-    | 'hierarchy';
+    | 'hierarchy'
+    | 'emailSignature';
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
@@ -126,6 +128,10 @@ export const EmptySection = ({
       case 'bankAccounts':
         return (
           <BankAccountsIllustration style={{width: '100%', height: '100%'}} />
+        );
+      case 'emailSignature':
+        return (
+          <EmailSignatureIllustration style={{width: '100%', height: '100%'}} />
         );
       case 'percentage':
         return (

@@ -72,6 +72,7 @@ import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {UserAccount} from 'models/user';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {companyLanguageContextMap} from 'utils/language';
+import {EmailSignature} from 'models/employee';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';
@@ -110,6 +111,13 @@ export const CheckList = ({serviceOrder}: Props) => {
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  const [activeSignature, setActiveSignature] = useState<
+    EmailSignature | undefined
+  >();
+
+  const {data: signatureUrls = {}} = useDownloadUrl(
+    activeSignature?.content?.images || [],
+  );
   const {mutateAsync: uploadFiles} = useUploadFiles(
     '',
     serviceOrder.serviceCompany.id,
@@ -880,6 +888,30 @@ export const CheckList = ({serviceOrder}: Props) => {
                           });
                         }
 
+                        let file: File | undefined;
+
+                        if (activeSignature && activeSignature.content.images) {
+                          const response = await fetch(
+                            signatureUrls[activeSignature.content.images[0]!],
+                          );
+
+                          const blob = await response.blob();
+                          file = new File([blob], activeSignature.name, {
+                            type: blob.type,
+                          });
+                        }
+
+                        let signatureAttachment: FileResourceRecord | undefined;
+
+                        if (file && activeSignature) {
+                          signatureAttachment = {
+                            type: file.type,
+                            uri: activeSignature.content.images[0]!,
+                            description: activeSignature.name,
+                            contentId: activeSignature.content.images[0]!,
+                          };
+                        }
+
                         await sendCheckList({
                           id: serviceOrder!.id,
                           body: {
@@ -900,27 +932,45 @@ export const CheckList = ({serviceOrder}: Props) => {
                               >((newArr: FileWithPreview[], obj, index) => {
                                 const isFileFromServer =
                                   !obj.path && index === 0;
-                                return [
-                                  ...newArr,
-                                  {
-                                    ...obj,
-                                    type: obj.type,
-                                    uri: isFileFromServer
-                                      ? isPDFGenerated
-                                        ? checkListInfo?.additionalInfo.pdfPath!
-                                        : `${uploadPath}/${checkListInfo.checkListId}.pdf`
-                                      : `${uploadPath}/${obj.name}`,
-                                    description: isFileFromServer
-                                      ? `${checkListInfo.checkList?.externalId}.pdf` ||
-                                        `${checkListInfo.checkList?.number}.pdf`
-                                      : obj.name.split('.')[0],
-                                  },
-                                ];
+
+                                newArr.push({
+                                  ...obj,
+                                  type: obj.type,
+                                  uri: isFileFromServer
+                                    ? isPDFGenerated
+                                      ? checkListInfo?.additionalInfo.pdfPath!
+                                      : `${uploadPath}/${checkListInfo.checkListId}.pdf`
+                                    : `${uploadPath}/${obj.name}`,
+                                  description: isFileFromServer
+                                    ? `${checkListInfo.checkList?.externalId}.pdf` ||
+                                      `${checkListInfo.checkList?.number}.pdf`
+                                    : obj.name.split('.')[0],
+                                });
+
+                                // Add signatureAttachment if it doesn't already exist
+                                if (
+                                  signatureAttachment &&
+                                  !newArr.some(
+                                    (attachment) =>
+                                      attachment.uri ===
+                                      signatureAttachment.contentId,
+                                  )
+                                ) {
+                                  newArr.push(
+                                    signatureAttachment as FileWithPreview,
+                                  );
+                                }
+
+                                return newArr;
                               }, []),
                             },
                           },
                         });
                       }}
+                      activeSignature={activeSignature}
+                      onSignatureSelect={(signature) =>
+                        setActiveSignature(signature)
+                      }
                     />
                   </Box>
                 </Box>

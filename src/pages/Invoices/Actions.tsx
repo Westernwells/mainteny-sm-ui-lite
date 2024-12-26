@@ -90,6 +90,8 @@ import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
 import useInvoiceMenuActions from 'hooks/useInvoiceMenuActions';
 import {companyLanguageContextMap} from 'utils/language';
+import {EmailSignature} from 'models/employee';
+import {FileResourceRecord} from 'models/media';
 
 interface Props {
   invoice: InvoiceView;
@@ -234,6 +236,14 @@ export const Actions = ({
   const {mutateAsync: sendInvoice} = useSendInvoice({
     shouldNavigate: true,
   });
+
+  const [activeSignature, setActiveSignature] = useState<
+    EmailSignature | undefined
+  >();
+
+  const {data: signatureUrls = {}} = useDownloadUrl(
+    activeSignature?.content?.images || [],
+  );
 
   const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
     serviceCompanyId: company?.id!,
@@ -1521,6 +1531,30 @@ export const Actions = ({
                 });
               }
 
+              let file: File | undefined;
+
+              if (activeSignature && activeSignature.content.images) {
+                const response = await fetch(
+                  signatureUrls[activeSignature.content.images[0]!],
+                );
+
+                const blob = await response.blob();
+                file = new File([blob], activeSignature.name, {
+                  type: blob.type,
+                });
+              }
+
+              let signatureAttachment: FileResourceRecord | undefined;
+
+              if (file && activeSignature) {
+                signatureAttachment = {
+                  type: file.type,
+                  uri: activeSignature.content.images[0]!,
+                  description: activeSignature.name,
+                  contentId: activeSignature.content.images[0]!,
+                };
+              }
+
               const sendEmail = async (invoiceData: InvoiceView) => {
                 await sendInvoice({
                   id: invoiceData?.id!,
@@ -1543,9 +1577,8 @@ export const Actions = ({
                       ccEmails: emailRecord.ccEmails,
                       bccEmails: emailRecord.bccEmails,
                       attachments: allAttachments.reduce<FileWithPreview[]>(
-                        (newArr: FileWithPreview[], obj) => [
-                          ...newArr,
-                          {
+                        (newArr: FileWithPreview[], obj) => {
+                          newArr.push({
                             ...obj,
                             type: obj.type,
                             uri: decideAttachmentURIForInvoiceEmail({
@@ -1557,8 +1590,22 @@ export const Actions = ({
                             }),
                             description:
                               decideAttachmentDescriptionForInvoiceEmail(obj),
-                          },
-                        ],
+                          });
+
+                          // Add signatureAttachment if it exists and is not already in the list
+                          if (
+                            signatureAttachment &&
+                            !newArr.some(
+                              (attachment) =>
+                                attachment.uri ===
+                                signatureAttachment.contentId,
+                            )
+                          ) {
+                            newArr.push(signatureAttachment as FileWithPreview);
+                          }
+
+                          return newArr;
+                        },
                         [],
                       ),
                     },
@@ -1587,6 +1634,8 @@ export const Actions = ({
           }
           subject={generateEmailSubject()}
           content={invoice.description}
+          activeSignature={activeSignature}
+          onSignatureSelect={(signature) => setActiveSignature(signature)}
         />
       ) : null}
 

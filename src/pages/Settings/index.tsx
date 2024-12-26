@@ -21,6 +21,7 @@ import {
   PictureAsPdfOutlined,
   TextSnippetOutlined,
   AccountTree,
+  EditOutlined,
 } from '@mui/icons-material';
 import {Progress} from 'components/Progress';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
@@ -39,6 +40,7 @@ import Financials from './Financials';
 import TextBlocks from './TextBlocks';
 import PDFSettingLayout from './PdfSettings/layout';
 import TechnicalData from './TechnicalData';
+import SignatureEmail from './SignatureEmail';
 
 interface DrawerItem {
   label: string;
@@ -130,6 +132,12 @@ export const SettingsPage = () => {
       icon: <TextSnippetOutlined />,
       route: 'text-blocks',
       component: <TextBlocks company={company!} />,
+    },
+    {
+      label: 'Email Signature',
+      icon: <EditOutlined />,
+      route: 'email-signature',
+      component: <SignatureEmail />,
     },
     {
       label: 'Integrations',
