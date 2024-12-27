@@ -1797,7 +1797,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                   externalId:
                     invoiceData?.externalId || companyNextNumber?.value || '',
                   dueDate,
-                  sentDate: invoiceData?.sentDate || dateToString(new Date()),
+                  sentDate: dateToString(new Date()), // Updating the invoice send date to reflect when it was actually send
                   email: {
                     email: '',
                     subject: emailRecord.subject,
