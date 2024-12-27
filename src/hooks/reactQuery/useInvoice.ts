@@ -431,7 +431,6 @@ export const useDeleteInvoice = () => {
     {
       onSuccess: (__, {shouldNavigate}) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
-        queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         if (shouldNavigate) navigate(`/invoices?pageIndex=1&pageSize=25`);
       },
