@@ -91,11 +91,19 @@ const NewContract = () => {
 
   const validationSchemaBasicInfo = Yup.object().shape({
     name: Yup.string().required('Contract name is required'),
-    startDate: Yup.date().nullable().required('Start date is required'),
+    startDate: Yup.date()
+      .nullable()
+      .typeError('Please enter a valid date')
+      .required('Start date is required'),
     endDate: Yup.date()
-      .default(null)
+      .nullable()
+      .typeError('Please enter a valid date')
       .when('startDate', (startDate, schema) => {
-        if (startDate) {
+        if (
+          startDate &&
+          startDate instanceof Date &&
+          startDate.toString() !== 'Invalid Date'
+        ) {
           const dayAfter = new Date(startDate.getTime() + 86400000);
           return schema.min(
             dayAfter,
@@ -104,7 +112,6 @@ const NewContract = () => {
         }
         return schema;
       })
-      .nullable()
       .required('End date is required'),
     externalId: Yup.string().test(
       'checkExternalId',
