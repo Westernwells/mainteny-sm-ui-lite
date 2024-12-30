@@ -29,7 +29,7 @@ export const generateSignatureHtml = (
           <td>
             <img src="${imageSrc}" 
               alt="${value.name}" 
-              style="width: 88px; max-height: 88px; border-radius: 50%; margin-right: 16px" />
+              style="width: 88px; max-height: 88px; border-radius: 50%; margin-right: 16px; object-fit:cover; min-height: 88px" />
           </td>
         </tr>`
       : '';

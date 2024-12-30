@@ -51,12 +51,12 @@ const SignatureButton = ({
         logoUrl!,
       );
 
+      const editorContent = editor.getHTML();
+
       editor
         .chain()
         .focus()
-        .insertContent(browserHtml, {
-          parseOptions: {preserveWhitespace: false},
-        })
+        .setContent(`${editorContent}<br />${browserHtml}`)
         .run();
 
       onSignatureSelect?.(activeSignature);
@@ -73,12 +73,40 @@ const SignatureButton = ({
     if (!value) {
       setSelectedSignature('No Signature');
       setActiveSignature(undefined);
+
+      const editorContent = editor.getHTML();
+
+      // Create a DOM parser to manipulate the HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(editorContent, 'text/html');
+
+      // Find and remove the signature table (or any specific element)
+      const signatureTable = doc.querySelector('table');
+      if (signatureTable) {
+        signatureTable.remove();
+      }
+
+      // Serialize the updated HTML back to a string
+      const updatedContent = doc.body.innerHTML;
+
+      // Update the editor content
+      editor.chain().focus().setContent(updatedContent).run();
       return;
     }
 
     setSelectedSignature(value.name);
     setActiveSignature(value);
   };
+
+  useEffect(() => {
+    const filteredSignature = signatures?.find(
+      (signature) => signature.enabled,
+    );
+
+    if (filteredSignature) {
+      handleSignatureChange(filteredSignature);
+    }
+  }, [signatures]);
 
   return (
     <>
@@ -91,6 +119,7 @@ const SignatureButton = ({
           alignItems: 'center',
           gap: '8px',
           marginLeft: 'auto',
+          fontSize: '0.8rem',
         }}>
         {t(selectedSignature)}
         <span
@@ -111,7 +140,7 @@ const SignatureButton = ({
           position: 'absolute',
           right: 0,
         }}>
-        <Paper sx={{padding: '0em', maxWidth: '200px'}}>
+        <Paper sx={{padding: '0em', minWidth: '200px'}}>
           <MenuItem
             value="No Signature"
             sx={{
