@@ -976,19 +976,25 @@ export const InvoiceForm = ({
       serviceOrderArg?.elevator.externalId || '-',
     );
 
-    formik.setFieldValue(
-      'deliveryStartDate',
+    if (
+      !invoice?.additionalInfo?.deliveryStartDate &&
       serviceOrderArg?.actualStartTime
-        ? new Date(serviceOrderArg.actualStartTime)
-        : undefined,
-    );
+    ) {
+      formik.setFieldValue(
+        'deliveryStartDate',
+        new Date(serviceOrderArg.actualStartTime),
+      );
+    }
 
-    formik.setFieldValue(
-      'deliveryEndDate',
+    if (
+      !invoice?.additionalInfo?.deliveryEndDate &&
       serviceOrderArg?.actualEndTime
-        ? new Date(serviceOrderArg.actualEndTime)
-        : undefined,
-    );
+    ) {
+      formik.setFieldValue(
+        'deliveryEndDate',
+        new Date(serviceOrderArg.actualEndTime),
+      );
+    }
 
     if (serviceOrderArg?.additionalInfo.discount) {
       formik.setFieldValue(
