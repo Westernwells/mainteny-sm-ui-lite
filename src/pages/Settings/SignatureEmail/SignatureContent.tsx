@@ -87,6 +87,10 @@ const SignatureContent = ({
             sx={{
               margin: '0em',
               padding: '0em',
+              '& p:empty': {
+                margin: '8px 0px',
+                display: 'inline-block',
+              },
               '& p': {
                 marginBottom: '0em',
                 lineHeight: '0.6em',
