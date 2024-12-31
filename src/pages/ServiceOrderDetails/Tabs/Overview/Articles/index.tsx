@@ -249,8 +249,8 @@ export const Articles = ({
     setOpenSelectModal(false);
   };
 
-  const handleArticleClick = (navigateUrl: string) => () => {
-    navigate(navigateUrl);
+  const handleRowClick = (id: string) => () => {
+    navigate(`/articles/details/${id}`);
   };
 
   const renderNoRowsSection = () => (
@@ -313,7 +313,11 @@ export const Articles = ({
                   testId="article-row-container">
                   {COLUMNS.current.map(({renderCell, ...rest}) =>
                     renderCell(entry, {
-                      onClick: handleArticleClick(entry.navigateTo),
+                      onClick: handleRowClick(
+                        entry.article?.article?.id ||
+                          entry.article?.id ||
+                          entry.id,
+                      ),
                       ...rest,
                     }),
                   )}

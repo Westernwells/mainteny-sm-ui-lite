@@ -19,19 +19,25 @@ if (user) {
     (response) => response,
     (error) => {
       if (Axios.isAxiosError(error)) {
-        Sentry.setContext('Axios', {
-          method: error.config?.method,
-          endpoint: error.config?.url,
-          fullUrl: error.request?.responseURL,
-          body: error.config?.data,
-          status: error.response?.status,
-          message: error.response?.data?.message,
-        });
-        Sentry.captureException(
-          error.response?.data?.message
-            ? new Error(error.response?.data?.message)
-            : error,
-        );
+        // Don't log 401 unauthorized errors or network errors to Sentry
+        if (
+          error.response?.status !== 401 &&
+          error.message !== 'Network Error'
+        ) {
+          Sentry.setContext('Axios', {
+            method: error.config?.method,
+            endpoint: error.config?.url,
+            fullUrl: error.request?.responseURL,
+            body: error.config?.data,
+            status: error.response?.status,
+            message: error.response?.data?.message,
+          });
+          Sentry.captureException(
+            error.response?.data?.message
+              ? new Error(error.response?.data?.message)
+              : error,
+          );
+        }
       } else {
         Sentry.captureException(error);
       }
