@@ -7,8 +7,8 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {
   ArticleBasicFormModel,
-  MeasurementUnit,
   createMeasurementOptions,
+  MeasurementUnit,
 } from 'models/articleForm';
 import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import * as Yup from 'yup';
@@ -52,7 +52,7 @@ const validationSchema = Yup.object().shape({
   unitSellingAmount: Yup.number().nullable().required('Unit price is required'),
   quantity: Yup.number()
     .nullable()
-    .min(1, "Can't be less than 1")
+    .min(0, "Can't be less than 0")
     .required('Quantity is required'),
   type: Yup.string().nullable().required('Type is required'),
 });
