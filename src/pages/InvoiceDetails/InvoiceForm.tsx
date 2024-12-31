@@ -772,18 +772,19 @@ export const InvoiceForm = ({
         : undefined,
     );
 
-    formik.setFieldValue(
-      'deliveryStartDate',
-      invoiceData?.additionalInfo.deliveryStartDate
-        ? new Date(invoiceData?.additionalInfo.deliveryStartDate)
-        : undefined,
-    );
-    formik.setFieldValue(
-      'deliveryEndDate',
-      invoiceData?.additionalInfo.deliveryEndDate
-        ? new Date(invoiceData?.additionalInfo.deliveryEndDate)
-        : undefined,
-    );
+    if (invoiceData?.additionalInfo?.deliveryStartDate) {
+      formik.setFieldValue(
+        'deliveryStartDate',
+        invoiceData.additionalInfo.deliveryStartDate,
+      );
+    }
+
+    if (invoiceData?.additionalInfo?.deliveryEndDate) {
+      formik.setFieldValue(
+        'deliveryEndDate',
+        invoiceData.additionalInfo.deliveryEndDate,
+      );
+    }
 
     if (invoiceData?.additionalInfo.paymentTerm) {
       formik.setFieldValue(
