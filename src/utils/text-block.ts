@@ -89,6 +89,9 @@ export const cleanHtmlContent = (html: string): string => {
     '<tbody style="display:flex;justify-content: space-between">',
   );
 
+  // Replace empty <p> tags with a non-breaking space
+  html = html.replace(/<p([^>]*)>\s*<\/p>/gi, '<p$1>&nbsp;</p>');
+
   return html;
 };
 

@@ -4,7 +4,6 @@ import {BulletList} from '@tiptap/extension-bullet-list';
 import {Document} from '@tiptap/extension-document';
 import {Italic} from '@tiptap/extension-italic';
 import {ListItem} from '@tiptap/extension-list-item';
-import {Paragraph} from '@tiptap/extension-paragraph';
 import {Text} from '@tiptap/extension-text';
 import {TextAlign} from '@tiptap/extension-text-align';
 import {TextStyle} from '@tiptap/extension-text-style';
@@ -23,6 +22,7 @@ import TableRow from '@tiptap/extension-table-row';
 import ShiftEnterExtension from './customExtensions/ShiftEnterExtension';
 import FontSize from './customExtensions/FontSizeExtension';
 import {ImageExtension} from './customExtensions/ImageExtension';
+import CustomParagraph from './customExtensions/CustomParagraph';
 
 export type UseExtensionsOptions = {
   /** Placeholder hint to show in the text input area before a user types a message. */
@@ -53,7 +53,7 @@ export default function useExtensions({
         keepAttributes: true,
         keepMarks: true,
       }),
-      Paragraph,
+      CustomParagraph,
       Text,
       Bold,
       Italic,
