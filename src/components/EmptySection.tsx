@@ -223,7 +223,7 @@ export const EmptySection = ({
             },
             sx: {
               '& .MuiButton-startIcon': {
-                marginBottom: '6px',
+                marginBottom: '4px',
               },
             },
           }}>

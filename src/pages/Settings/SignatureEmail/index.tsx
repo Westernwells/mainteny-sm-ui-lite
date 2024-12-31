@@ -49,6 +49,7 @@ const SignatureEmail = () => {
   const [activeEmailSignature, setActiveSignature] = useState<EmailSignature>();
 
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isPreviewingDraft, setIsPreviewingDraft] = useState(false);
 
   const {data: logoUrl = {}, refetch} = useDownloadUrl(
     activeEmailSignature?.content.images || [],
@@ -83,15 +84,16 @@ const SignatureEmail = () => {
     });
   };
 
-  const {control, handleSubmit, setValue, watch, reset} = useForm<FormValues>({
-    defaultValues: {
-      text: '',
-      logoUrl: '',
-      logoFile: null,
-      name:
-        `${user?.userAccount.firstName} ${user?.userAccount.lastName}` || '',
-    },
-  });
+  const {control, handleSubmit, setValue, watch, reset, getValues} =
+    useForm<FormValues>({
+      defaultValues: {
+        text: '',
+        logoUrl: '',
+        logoFile: null,
+        name:
+          `${user?.userAccount.firstName} ${user?.userAccount.lastName}` || '',
+      },
+    });
 
   const preview = watch('logoUrl');
   const name = watch('name');
@@ -208,8 +210,18 @@ const SignatureEmail = () => {
     setActiveSignature(undefined);
   };
 
-  const onPreviewSubmit = () => {
+  const onPreviewSubmit = async () => {
+    if (isPreviewingDraft) {
+      const data = getValues();
+      await onSubmit(data);
+    }
     setOpenPreviewDialog(false);
+    setIsPreviewingDraft(false);
+  };
+
+  const handleDraftPreview = () => {
+    setIsPreviewingDraft(true);
+    setOpenPreviewDialog(true);
   };
 
   const handleActionPreview = (employeeSignature: EmailSignature) => {
@@ -318,9 +330,7 @@ const SignatureEmail = () => {
             handleCancel={() => {
               setIsEditMode(false);
             }}
-            handlePreview={() => {
-              setOpenPreviewDialog(true);
-            }}
+            handlePreview={handleDraftPreview}
             isCreatingSignature={isCreatingSignature || isUploadingLogo}
           />
         )}
@@ -396,10 +406,18 @@ const SignatureEmail = () => {
             px: 3,
           }}>
           <PreviewSignature
-            previewHtml={activeEmailSignature?.content.html || watch('text')}
+            previewHtml={
+              isPreviewingDraft
+                ? watch('text')
+                : activeEmailSignature?.content.html
+            }
             logoSrc={
-              logoUrl[activeEmailSignature?.content.images[0]!] ||
-              watch('logoUrl')
+              isPreviewingDraft
+                ? watch('logoUrl')
+                : logoUrl[activeEmailSignature?.content.images[0]!]
+            }
+            employeeSignature={
+              isPreviewingDraft ? undefined : activeEmailSignature
             }
           />
         </Dialog>
