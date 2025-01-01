@@ -9,7 +9,9 @@ import {
 } from 'models/article';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
+import {VatView} from 'models/vat';
 import {Currencies, formatCurrency} from './currency';
+import {cleanHtmlContent, replaceTextInHtml, stripHtmlTags} from './text-block';
 
 export const handleCostPackageValidation = (
   value: number | undefined,
@@ -103,4 +105,55 @@ export const createSearchQuery = ({
   if (manufacturer) elements.push(`[manufacture:*${manufacturer}*]`);
 
   return elements.length ? elements.join(' ') : undefined;
+};
+
+export const syncVatLegalNotesWithNotes = ({
+  oldArticles,
+  newArticles,
+  currentNotes,
+  taxRates,
+}: {
+  oldArticles: QuotationItemRecord[];
+  newArticles: QuotationItemRecord[];
+  currentNotes: string;
+  taxRates?: VatView[];
+}) => {
+  let notes = currentNotes || '';
+
+  if (!taxRates) {
+    return notes;
+  }
+
+  const getLegalNoteForVatId = (vatId?: string) => {
+    if (!vatId) return '';
+    return taxRates.find((rate) => rate.id === vatId)?.legalNote || '';
+  };
+
+  // Add new legal notes
+  newArticles.forEach((item) => {
+    const {vatId} = item.unitAmount;
+    const legalNote = getLegalNoteForVatId(vatId);
+    if (!legalNote) {
+      return;
+    }
+    if (stripHtmlTags(notes).includes(legalNote)) {
+      return;
+    }
+    const newValue = cleanHtmlContent(`<p>${legalNote}</p>`);
+    notes += ` ${newValue}`;
+  });
+
+  // Remove obsolete legal notes
+  oldArticles.forEach((item) => {
+    const {vatId} = item.unitAmount;
+    const legalNote = getLegalNoteForVatId(vatId);
+    if (!legalNote) {
+      return;
+    }
+    if (newArticles.every((newItem) => newItem.unitAmount.vatId !== vatId)) {
+      notes = replaceTextInHtml(notes, `<p>${legalNote}</p>`, '');
+    }
+  });
+
+  return notes;
 };

@@ -169,7 +169,7 @@ describe('Invoice flow', () => {
                             .invoke('attr', 'value')
                             .should('eq', (a.unitAmount.netAmount / 100).toLocaleString());
                         cy.get('input[name="quantity"]').invoke('attr', 'value').should('eq', `${a.quantity}`);
-                        cy.get('input[name="unitAmount.percentageVat"]').invoke('attr', 'value').should('eq', `${a.unitAmount.percentageVat}`);
+                        cy.get('div[aria-labelledby^="select-tax-label"]').contains(`${a.unitAmount.percentageVat}%`);
 
                         // input some values to assert later on
                         cy.get('input[name="quantity"]')
@@ -464,7 +464,8 @@ describe('Invoice flow', () => {
                 cy.get('input[name="unitAmount.netAmount"]')
                     .clear()
                     .type(`{selectAll}${a.unitAmount.netAmount / 100}`);
-                cy.get('input[name="unitAmount.percentageVat"]').clear().type(`{selectAll}${a.unitAmount.percentageVat}`);
+                cy.get('div[aria-labelledby^="select-tax-label"]').click();
+                cy.document().its('body').find('li[role="option"]').contains(`${a.unitAmount.percentageVat}%`).click();
                 if (a.discount.type === DiscountType.AMOUNT) {
                     cy.get('input[name="discount"').parent().find('button').click();
                     cy.get('input[name="discount"]').clear().type(`{selectAll}${a.discount.amount.value}`);

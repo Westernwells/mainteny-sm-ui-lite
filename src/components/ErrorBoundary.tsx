@@ -7,6 +7,7 @@ import {ReactComponent as UnexpectedErrorIllustration} from 'assets/illustration
 import {Button} from 'components/Button';
 import {withSnackbar, WithSnackbarProps} from 'notistack';
 import {withTranslation, WithTranslation} from 'react-i18next';
+import {handleHardReload} from 'utils/utils';
 import {PageLayout} from './PageLayout';
 
 interface Props extends WithSnackbarProps, WithTranslation {
@@ -79,20 +80,27 @@ class ErrorBoundary extends React.Component<Props, State> {
               alignItems="center"
               justifyContent="center"
               flexDirection="column"
-              px="10%">
-              <UnexpectedErrorIllustration />
+              px="10%"
+              maxWidth="70rem"
+              margin="auto">
+              <UnexpectedErrorIllustration
+                style={{width: '60%', height: 'auto'}}
+              />
               <Typography variant="h4" textAlign="center" mt={6}>
-                {t('Uh-oh! This must be an error from our side 🙃')}
-                <br />
-                {t('We will fix this shortly 🙏🏻')}
+                {t('Oh no, something went wrong!')}
+              </Typography>
+              <Typography variant="body1" textAlign="center" mt={2}>
+                {t(
+                  "Please click the button below to reload the page and resolve any potential issues. If this doesn't help, feel free to contact our support team – we are happy to assist you!",
+                )}
               </Typography>
               <Box mt={6}>
                 <Button
-                  label={t('Home')}
+                  label={t('Refresh Page')}
                   buttonProps={{
                     variant: 'contained',
                     size: 'large',
-                    onClick: () => navigate('/', {replace: true}),
+                    onClick: handleHardReload,
                   }}
                   style={{width: '150px', height: '50px'}}
                 />

@@ -17,6 +17,7 @@ export type CustomerBasicInfoFormModel = {
   offsettingAccount: string;
   buyerReference?: string;
   invoiceFormat?: string;
+  vat?: string;
 };
 
 export type CustomerAddressFormModel = {
@@ -83,4 +84,5 @@ export type NewCustomerBody = {
   offsettingAccount?: string;
   buyerReference?: string;
   invoiceFormat?: string;
+  vat?: string;
 };

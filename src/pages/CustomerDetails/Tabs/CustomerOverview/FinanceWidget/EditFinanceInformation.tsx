@@ -21,13 +21,14 @@ import {TabContext, TabList, TabPanel} from '@mui/lab';
 import {CustomerFinanceFormModel} from 'models/customer';
 import RichTextField from 'components/RichTextField';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import Receipt from '@mui/icons-material/Receipt';
+import ReceiptOutlined from '@mui/icons-material/ReceiptOutlined';
 import {ContractTerm} from 'components/ContractTerm';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTermView} from 'models/contract';
 import {ServiceCompanyType} from 'models/service-company';
 import {createEmptyResource} from 'utils/paging';
 import {convertToText} from 'utils/utils';
-import {Receipt} from '@mui/icons-material';
 import {useVats} from 'hooks/reactQuery/useVats';
 import {useCompanyTerms} from 'hooks/reactQuery/useCompanies';
 import {EditFinanceAddress} from './EditFinanceAddress';
@@ -242,46 +243,47 @@ export const EditFinanceInformation = ({
                   return selectedTaxRate
                     ? `${selectedTaxRate.percentage || 0}%`
                     : '';
+                }}
+                MenuProps={{
+                  anchorOrigin: {
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  },
+                  transformOrigin: {
+                    vertical: 'top',
+                    horizontal: 'right',
+                  },
+                  slotProps: {
+                    paper: {
+                      sx: {
+                        maxWidth: '20rem',
+                      },
+                    },
+                  },
                 }}>
                 {taxRates?.map((taxRate) => (
                   <MenuItem
                     value={taxRate.id}
                     key={taxRate.id}
                     sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
                     }}>
-                    <Box>
-                      <Typography
-                        variant="body2"
-                        color="primary.dark"
-                        sx={{fontWeight: 'bold'}}>
+                    <Box display="flex" maxWidth="100%" gap={1}>
+                      <Typography variant="body1" noWrap color="primary.dark">
                         {taxRate.name}
                       </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{color: theme.palette.text.secondary}}>
-                        {taxRate.percentage || 0}%
-                      </Typography>
-                    </Box>
-                    <Tooltip
-                      title={taxRate.legalNote || ''}
-                      arrow
-                      placement="top">
-                      <Box>
-                        <IconButton
-                          size="small"
-                          sx={{
-                            p: 0,
-                            color: taxRate.legalNote
-                              ? theme.palette.text.primary
-                              : theme.palette.text.disabled,
-                          }}>
+                      <Tooltip title={taxRate.legalNote} arrow placement="top">
+                        {taxRate.legalNote ? (
                           <Receipt fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    </Tooltip>
+                        ) : (
+                          <ReceiptOutlined fontSize="small" />
+                        )}
+                      </Tooltip>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      {taxRate.percentage}%
+                    </Typography>
                   </MenuItem>
                 ))}
               </Select>

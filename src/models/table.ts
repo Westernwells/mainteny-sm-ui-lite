@@ -4,7 +4,7 @@ export const ACTION_CELL_WIDTH = '48px';
 export const NOTES_CELL_WIDTH = '64px';
 
 export type CellCallbackProps = {
-  onClick: () => void;
+  onClick?: () => void;
 };
 
 export type HeaderCellProps = {
@@ -28,6 +28,7 @@ export type CellProps = {
   firstSticky?: boolean;
   lastSticky?: boolean;
   noPadding?: boolean;
+  textTransform?: boolean;
 };
 
 export type TableColumn = CellProps & HeaderCellProps & {key: string};

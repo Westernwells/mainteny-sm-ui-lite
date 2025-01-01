@@ -79,8 +79,9 @@ export const Confirm = ({
           label={t('Create Service Job')}
           buttonProps={{
             onClick: onClose,
+            size: 'medium',
           }}>
-          <Typography variant="subtitle2" color="text.secondary">
+          <Typography variant="subtitle2" color="primary.dark">
             {closeBtnLabel ? t(closeBtnLabel) : t('No')}
           </Typography>
         </Button>
@@ -91,6 +92,7 @@ export const Confirm = ({
           buttonProps={{
             onClick: onConfirm,
             autoFocus: true,
+            size: 'medium',
             sx: {
               bgcolor: 'error.light',
               color: 'primary.contrastText',
@@ -98,6 +100,8 @@ export const Confirm = ({
                 bgcolor: 'error.light',
                 color: 'primary.contrastText',
               },
+              py: '6px',
+              px: '16px',
             },
           }}>
           <Typography data-test-id="remove" variant="subtitle2">

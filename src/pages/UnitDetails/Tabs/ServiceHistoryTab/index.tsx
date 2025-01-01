@@ -1,6 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {endOfYear, startOfYear} from 'date-fns';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {
@@ -65,8 +64,6 @@ export const ServiceHistoryTab = () => {
     isFetched,
   } = useServiceOrders({
     elevatorIds: elevatorId ? [elevatorId] : undefined,
-    start: startOfYear(new Date()).toISOString(),
-    end: endOfYear(new Date()).toISOString(),
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
     query: search,

@@ -32,6 +32,7 @@ export const formatUpdateCustomer = (data: CustomerEditForm) => ({
   customerPortalEnabled: data?.customerPortalEnabled,
   buyerReference: data?.buyerReference,
   invoiceFormat: data?.invoiceFormat,
+  vat: data?.vat,
 });
 
 export const getFilterUnitNumber = (value: string, type: 'start' | 'end') => {
@@ -71,13 +72,6 @@ export const createNameSearchQuery = (value: string) =>
     .split(' ')
     .map((word) => `[name:*${word}*]`)
     .join('');
-
-export const getTaxRate = (taxRate?: {percentage?: number}) =>
-  taxRate?.percentage === 0
-    ? '0%'
-    : taxRate?.percentage
-    ? `${taxRate?.percentage}%`
-    : '-';
 
 export const aggregateCustomerPortalRow = (
   contactResources: ContactsView[],
