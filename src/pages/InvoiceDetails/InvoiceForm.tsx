@@ -979,21 +979,21 @@ export const InvoiceForm = ({
 
     if (
       !invoice?.additionalInfo?.deliveryStartDate &&
-      serviceOrderArg?.actualStartTime
+      serviceOrderArg?.schedules?.[0]?.startTime
     ) {
       formik.setFieldValue(
         'deliveryStartDate',
-        new Date(serviceOrderArg.actualStartTime),
+        new Date(serviceOrderArg.schedules[0].startTime),
       );
     }
 
     if (
       !invoice?.additionalInfo?.deliveryEndDate &&
-      serviceOrderArg?.actualEndTime
+      serviceOrderArg?.schedules?.[0]?.endTime
     ) {
       formik.setFieldValue(
         'deliveryEndDate',
-        new Date(serviceOrderArg.actualEndTime),
+        new Date(serviceOrderArg.schedules[0].endTime),
       );
     }
 
