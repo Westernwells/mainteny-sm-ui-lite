@@ -5,11 +5,15 @@ import {isEqual} from 'lodash';
 import {
   Box,
   ClickAwayListener,
+  FormControl,
   IconButton,
   InputAdornment,
+  MenuItem,
   Paper,
   Popover,
   Popper,
+  Select,
+  SelectChangeEvent,
   Table,
   TableBody,
   TableCell,
@@ -47,10 +51,12 @@ import * as Yup from 'yup';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {createEmptyResource} from 'utils/paging';
 import {getArticleTypeText} from 'utils/article-utils';
-import {DragIndicator} from '@mui/icons-material';
+import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
+import {VatView} from 'models/vat';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -67,11 +73,13 @@ interface Props {
   index: number;
   deleteItem: (indexPos: number) => void;
   setItemAtIndex: (indexPos: number, item: InvoiceItemRecord) => void;
-  propertyOwnerId: string;
+  propertyOwner?: PropertyOwnerView;
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
   isHovered?: boolean;
   defaultPercentageVat?: number;
+  taxRates: VatView[];
   invoiceType: InvoiceType;
+  jobArticleVat?: number;
 }
 
 interface TableRowProps {
@@ -151,11 +159,13 @@ export const ArticleItemRowNEW = ({
   index,
   deleteItem,
   setItemAtIndex,
-  propertyOwnerId,
+  propertyOwner,
   handleSelectItem,
   isHovered,
   defaultPercentageVat,
   invoiceType,
+  taxRates,
+  jobArticleVat,
 }: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -172,11 +182,11 @@ export const ArticleItemRowNEW = ({
       unitAmount: {
         ...articleItem.unitAmount,
         percentageVat:
-          articleItem.unitAmount.percentageVat !== 0
-            ? articleItem.unitAmount.percentageVat
-            : articleItem.unitAmount.percentageVat === 0
-            ? 0
-            : defaultPercentageVat || 0,
+          jobArticleVat !== undefined
+            ? jobArticleVat
+            : defaultPercentageVat !== undefined
+            ? defaultPercentageVat
+            : articleItem.unitAmount.percentageVat,
       },
     },
     onSubmit: () => {},
@@ -301,13 +311,13 @@ export const ArticleItemRowNEW = ({
 
   const {data: customArticleResource = [], isLoading: isCustomPriceLoading} =
     usePropertyOwnerQueryTravelWorks(
-      propertyOwnerId,
+      propertyOwner?.id || '',
       {
         serviceOrderType: ServiceOrderType.GENERAL,
       },
       {
         keepPreviousData: true,
-        enabled: popperOpen && tabValue === 1 && !!propertyOwnerId,
+        enabled: popperOpen && tabValue === 1 && !!propertyOwner?.id,
       },
     );
 
@@ -342,6 +352,28 @@ export const ArticleItemRowNEW = ({
     setShowArticleSearch(false);
   };
 
+  const onChangePercentageVat = (event: SelectChangeEvent<string>) => {
+    const vatId = event.target.value;
+    const taxRate = taxRates.find((rate) => rate.id === vatId);
+    formik.setFieldValue('unitAmount', {
+      ...formik.values.unitAmount,
+      vatId: taxRate?.id || '',
+      vatName: taxRate?.name || '',
+      percentageVat: taxRate?.percentage || 0,
+    });
+  };
+
+  const vatValue = (() => {
+    const {vatId} = formik.values.unitAmount;
+    return vatId && taxRates?.find((item) => item.id === vatId)
+      ? vatId
+      : String(
+          formik.values.unitAmount.percentageVat !== 0
+            ? formik.values.unitAmount.percentageVat
+            : 0,
+        ) || '';
+  })();
+
   const tabItems: TabItems[] = useMemo(() => {
     const tItems = [
       {
@@ -349,14 +381,14 @@ export const ArticleItemRowNEW = ({
         icon: <HomeRepairServiceIcon />,
       },
     ];
-    if (propertyOwnerId) {
+    if (propertyOwner?.id) {
       tItems.push({
         label: 'Custom prices',
         icon: <ReceiptLongIcon />,
       });
     }
     return tItems;
-  }, [propertyOwnerId]);
+  }, [propertyOwner]);
 
   const columns: {name: string; align?: TableCellProps['align']}[] = [
     {name: 'Name'},
@@ -687,56 +719,78 @@ export const ArticleItemRowNEW = ({
       </TableCell>
 
       <TableCell sx={{width: '6%', display: 'inline-block'}}>
-        <NumericFormat
-          value={
-            formik.values.unitAmount.percentageVat !== 0
-              ? formik.values.unitAmount.percentageVat
-              : 0
-          }
-          customInput={TextField}
-          suffix="%"
-          allowLeadingZeros={false}
-          decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
-          sx={{
-            width: '100%',
-            '& .MuiInputBase-root': {
-              pr: 0,
-            },
-            '& .MuiOutlinedInput-input': {
-              textAlign: 'right',
-            },
-          }}
-          isAllowed={(values) => {
-            const {floatValue} = values;
-            if (!floatValue) {
-              return true;
-            }
+        <FormControl fullWidth required={false}>
+          <Select
+            labelId={`select-tax-label-${index}`}
+            size="small"
+            value={vatValue}
+            renderValue={(value) => {
+              const taxRatePercentage = taxRates?.find(
+                (item) => item.id === value,
+              )?.percentage;
 
-            if (floatValue < 0) {
-              return false;
-            }
-
-            const maxValue = 100;
-
-            return floatValue <= maxValue;
-          }}
-          InputProps={{
-            name: 'unitAmount.percentageVat',
-            id: `unitAmount.percentageVat-${index}`,
-            inputMode: 'numeric',
-          }}
-          onValueChange={(values) => {
-            const {floatValue} = values;
-            formik.setFieldValue('unitAmount.percentageVat', floatValue || 0);
-          }}
-          size="small"
-        />
+              return `${
+                typeof taxRatePercentage === 'number'
+                  ? taxRatePercentage
+                  : value || 0
+              }%`;
+            }}
+            name="unitAmount.vatId"
+            id={`unitAmount.vatId-${index}`}
+            notched
+            onChange={onChangePercentageVat}
+            onBlur={formik.handleBlur}
+            IconComponent={() => null}
+            MenuProps={{
+              anchorOrigin: {
+                vertical: 'bottom',
+                horizontal: 'right',
+              },
+              transformOrigin: {
+                vertical: 'top',
+                horizontal: 'right',
+              },
+              slotProps: {
+                paper: {
+                  sx: {
+                    maxWidth: '20rem',
+                  },
+                },
+              },
+            }}
+            sx={{
+              '& .MuiSelect-select': {
+                textAlign: 'right',
+                px: '5px !important',
+              },
+            }}>
+            {taxRates?.map((taxRate) => (
+              <MenuItem
+                value={taxRate.id}
+                key={taxRate.id}
+                sx={{
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                }}>
+                <Box display="flex" maxWidth="100%" gap={1}>
+                  <Typography variant="body1" noWrap color="primary.dark">
+                    {taxRate.name}
+                  </Typography>
+                  <Tooltip title={taxRate.legalNote} arrow placement="top">
+                    {taxRate.legalNote ? (
+                      <Receipt fontSize="small" />
+                    ) : (
+                      <ReceiptOutlined fontSize="small" />
+                    )}
+                  </Tooltip>
+                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  {taxRate.percentage}%
+                </Typography>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </TableCell>
 
       <TableCell sx={{width: '10%', display: 'inline-block'}}>

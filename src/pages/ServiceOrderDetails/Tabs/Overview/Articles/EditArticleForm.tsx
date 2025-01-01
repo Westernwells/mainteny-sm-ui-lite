@@ -22,16 +22,28 @@ import {
 } from 'react';
 import {LanguageContext} from 'context/LanguageProvider';
 import RichTextField from 'components/RichTextField';
-import {Grid, IconButton, TextField, Typography} from '@mui/material';
+import {
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import {ArticleType, articleTypeOptions} from 'models/article';
 import {NumericFormat} from 'react-number-format';
 import {theme} from 'theme';
 import {getAmountFromPercentage} from 'utils/utils';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import {Receipt, ReceiptOutlined} from '@mui/icons-material';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {TextBlockCategory, TextBlockView} from 'models/text-block';
 import {Dialog} from 'components/Dialog';
 import {GridCellParams} from '@mui/x-data-grid';
+import {useVats} from 'hooks/reactQuery/useVats';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import {EditArticleFormModel} from './models';
 
@@ -61,6 +73,7 @@ export const EditArticleForm = ({
 }) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
+  const {data: taxRates} = useVats();
   const [openTextBlockDialog, setOpenTextBlockDialog] =
     useState<boolean>(false);
   const [activeSubDialog, setActiveSubDialog] = useState<
@@ -92,11 +105,11 @@ export const EditArticleForm = ({
       },
       unitPurchaseAmountCurrency:
         getCurrencySymbol[serviceOrderArticle.unitAmount.currency],
+      percentageVat: serviceOrderArticle.unitAmount.percentageVat,
     },
     onSubmit: () => {},
     validationSchema,
   });
-  console.log(serviceOrderArticle, 'serviceOrderArticle');
 
   const handleSelectChange = (selectedValue: string) => {
     formik.setFieldValue('unit', selectedValue);
@@ -170,7 +183,7 @@ export const EditArticleForm = ({
           />
         </Grid>
 
-        <Grid item xs={6} sm={4}>
+        <Grid item xs={6} sm={3}>
           <FormInput
             containerStyles={{width: '100%'}}
             onValueChange={(values) => {
@@ -195,7 +208,7 @@ export const EditArticleForm = ({
           />
         </Grid>
 
-        <Grid item xs={6} sm={4}>
+        <Grid item xs={6} sm={3}>
           <FormInput
             containerStyles={{width: '100%'}}
             onValueChange={(values) => {
@@ -245,6 +258,66 @@ export const EditArticleForm = ({
               type: 'number',
             }}
           />
+        </Grid>
+        <Grid item xs={6} sm={2}>
+          <FormControl fullWidth required={false}>
+            <InputLabel size="small" shrink variant="outlined">
+              {t('Tax rate')}
+            </InputLabel>
+            <Select
+              label={t('Tax rate')}
+              size="small"
+              value={formik.values.percentageVat}
+              renderValue={(value) => `${value}%`}
+              name="percentageVat"
+              notched
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              required={false}
+              MenuProps={{
+                anchorOrigin: {
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                },
+                transformOrigin: {
+                  vertical: 'top',
+                  horizontal: 'right',
+                },
+                slotProps: {
+                  paper: {
+                    sx: {
+                      maxWidth: '20rem',
+                    },
+                  },
+                },
+              }}>
+              {taxRates?.map((taxRate) => (
+                <MenuItem
+                  value={taxRate.percentage}
+                  key={taxRate.id}
+                  sx={{
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                  }}>
+                  <Box display="flex" maxWidth="100%" gap={1}>
+                    <Typography variant="body1" noWrap color="primary.dark">
+                      {taxRate.name}
+                    </Typography>
+                    <Tooltip title={taxRate.legalNote} arrow placement="top">
+                      {taxRate.legalNote ? (
+                        <Receipt fontSize="small" />
+                      ) : (
+                        <ReceiptOutlined fontSize="small" />
+                      )}
+                    </Tooltip>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    {taxRate.percentage}%
+                  </Typography>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
 
         <Grid item xs={6} sm={2}>

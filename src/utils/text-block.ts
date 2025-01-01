@@ -78,3 +78,29 @@ export const stripHtmlTags = (html: string): string => {
 
 export const cleanHtmlContent = (html: string): string =>
   html.replaceAll(/<li><p>(.*?)<\/p><(\/?)(ol|li|ul)>/gi, '<li>$1<$2$3>');
+
+// Function to escape special regex characters in the string
+const escapeRegExp = (str: string) =>
+  str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// Function to encode double quotes to &quot;
+const encodeDoubleQuotes = (str: string) => str.replace(/"/g, '&quot;');
+
+export const replaceTextInHtml = (
+  html: string,
+  text: string,
+  replaceWith: string,
+) => {
+  // Encode the text
+  const encodedText = encodeDoubleQuotes(text);
+
+  // Escape for use in regex
+  const escapedEncodedText = escapeRegExp(encodedText);
+
+  // Create a global regex
+  const regex = new RegExp(escapedEncodedText, 'g');
+
+  // Perform the replacement
+  const replacedHtml = html.replace(regex, replaceWith);
+  return replacedHtml;
+};

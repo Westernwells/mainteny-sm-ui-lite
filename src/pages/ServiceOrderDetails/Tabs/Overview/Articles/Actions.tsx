@@ -128,7 +128,9 @@ export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
           makeAmountRecord(
             Number(formikValues!.unitSellingAmount),
             currentArticle!.unitAmount.currency,
-            currentArticle!.unitAmount.percentageVat,
+            typeof formikValues!.percentageVat === 'number'
+              ? formikValues!.percentageVat
+              : currentArticle!.unitAmount.percentageVat,
           ),
         ),
       }))[0];

@@ -197,6 +197,8 @@ export interface AmountRecord {
   currency: string;
   netAmount: number;
   percentageVat: number;
+  vatId?: string;
+  vatName?: string;
 }
 
 export interface PaymentInfo {

@@ -24,20 +24,23 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {getItemRecord} from 'utils/article-utils';
 import {getUniqueId} from 'utils/utils';
 import {QuotationFormData, QuotationItemRecord} from 'models/quotation';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {useTheme} from '@mui/material/styles';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
 import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useVats} from 'hooks/reactQuery/useVats';
 import {calculateInvoiceAmount} from 'utils/calculate-total';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {FormSelect} from './form/FormSelect';
 import {ArticleItemRowQuotation} from './ArticleItemRowQuotation';
+import {Progress} from './Progress';
 
 interface Props {
   items: QuotationItemRecord[];
   setItems: (items: QuotationItemRecord[]) => void;
-  propertyOwnerId: string;
+  propertyOwner?: PropertyOwnerView | null;
   formik: FormikProps<QuotationFormData>;
   isHovered?: boolean;
 }
@@ -45,13 +48,15 @@ interface Props {
 export const ArticleItemsTableQuotation = ({
   items,
   setItems,
-  propertyOwnerId,
+  propertyOwner,
   formik,
   isHovered,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
+  const {user} = useUserSession();
+  const {data: taxRates, isLoading: isLoadingTaxRates} = useVats();
 
   const subtotalExclVat = calculateQuotationTotalWithPerItemDiscount(
     formik.values.items,
@@ -141,6 +146,14 @@ export const ArticleItemsTableQuotation = ({
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
+  const defaultVat =
+    propertyOwner?.additionalInfo.vat || taxRates?.find((tR) => tR.isDefault);
+
+  const defaultPercentageVat =
+    typeof defaultVat?.percentage === 'number'
+      ? defaultVat.percentage
+      : user?.userAccount.serviceCompany.settings.percentageVat || 0;
+
   const createEmptyItem = () => {
     const blankItem = {
       article: {
@@ -152,7 +165,9 @@ export const ArticleItemsTableQuotation = ({
           fractionDigits: currentCurrency.fractionDigits,
           currency: currentCurrency.code,
           grossAmount: 0,
-          percentageVat: 0,
+          percentageVat: defaultPercentageVat,
+          vatId: defaultVat?.id || '',
+          vatName: defaultVat?.name || '',
           vat: 0,
         },
       },
@@ -164,7 +179,9 @@ export const ArticleItemsTableQuotation = ({
         fractionDigits: currentCurrency.fractionDigits,
         currency: currentCurrency.code,
         grossAmount: 0,
-        percentageVat: 0,
+        percentageVat: defaultPercentageVat,
+        vatId: defaultVat?.id || '',
+        vatName: defaultVat?.name || '',
         vat: 0,
       },
       discount: {
@@ -200,7 +217,6 @@ export const ArticleItemsTableQuotation = ({
 
     setItems(items);
   };
-  const {user} = useUserSession();
 
   const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
     () =>
@@ -220,6 +236,8 @@ export const ArticleItemsTableQuotation = ({
     amountAfterGlobalDiscountWithVAT,
     {currency: currentCurrency.code},
   );
+
+  if (isLoadingTaxRates) return <Progress height="100%" />;
 
   return (
     <Box
@@ -303,13 +321,11 @@ export const ArticleItemsTableQuotation = ({
                               index={index}
                               deleteItem={deleteItem}
                               setItemAtIndex={setItemAtIndex}
-                              propertyOwnerId={propertyOwnerId}
+                              propertyOwner={propertyOwner}
                               handleSelectItem={handleSelectItem}
                               isHovered={isHovered}
-                              defaultPercentageVat={
-                                user?.userAccount.serviceCompany.settings
-                                  .percentageVat
-                              }
+                              defaultPercentageVat={defaultPercentageVat}
+                              taxRates={taxRates!}
                             />
                           </TableRow>
                         )}
@@ -501,7 +517,7 @@ export const ArticleItemsTableQuotation = ({
             <Typography variant="body2">1</Typography>
             <SelectButton
               text="Add Article"
-              onClick={() => createEmptyItem()}
+              onClick={createEmptyItem}
               sxContainer={{flexGrow: 1}}
               testId="AddArticle"
             />

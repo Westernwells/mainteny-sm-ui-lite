@@ -40,7 +40,6 @@ export const formatInvoiceRecord = (
     const {article, ...rest} = item;
     const modifiedArticle = {...article};
     const unitSellingAmount = modifiedArticle?.unitSellingAmount;
-    const unitAmount = item?.unitAmount;
     const isPreDefinedArticle =
       modifiedArticle?.id && modifiedArticle?.id?.length > 8;
     if (!isPreDefinedArticle) {
@@ -65,11 +64,6 @@ export const formatInvoiceRecord = (
     return {
       ...rest,
       article: articleToSend,
-      unitAmount: {
-        netAmount: unitAmount?.netAmount,
-        percentageVat: unitAmount?.percentageVat,
-        currency: unitAmount?.currency,
-      },
       discount: rest.discount
         ? {
             ...rest.discount,

@@ -142,6 +142,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       costCenter: '',
       vatId: '',
       offsettingAccount: '',
+      vat: '',
     },
     onSubmit: () => {},
     validationSchema: validationSchemaBasicInfo,
@@ -321,6 +322,7 @@ export const NewCustomer = ({getCurrentPageTitle}: Props) => {
       contactPersons: formikContactPersons.values.contactPersons,
       buyerReference: formikBasicInfo.values.buyerReference,
       invoiceFormat: formikBasicInfo.values.invoiceFormat,
+      vat: formikBasicInfo.values.vat,
     };
 
     const response = await createCustomer(body);

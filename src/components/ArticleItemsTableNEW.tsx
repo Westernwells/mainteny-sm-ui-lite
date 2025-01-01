@@ -25,6 +25,7 @@ import {
   InvoiceType,
 } from 'models/invoice';
 import {ArticleType, ArticleView} from 'models/article';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
@@ -34,36 +35,41 @@ import {
 import {getUniqueId} from 'utils/utils';
 import {useTheme} from '@mui/material/styles';
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd';
+import {ServiceOrderArticleView} from 'models/service-order';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {UserCompanyContext} from 'context/UserCompanyProvider';
+import {useVats} from 'hooks/reactQuery/useVats';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {ArticleItemRowNEW} from './ArticleItemRowNEW';
 import {FormSelect} from './form/FormSelect';
+import {Progress} from './Progress';
 
 interface Props {
   items: InvoiceItemRecord[];
   setItems: (items: InvoiceItemRecord[]) => void;
-  propertyOwnerId: string;
+  propertyOwner?: PropertyOwnerView;
   formik: FormikProps<InvoiceFormData>;
   isHovered?: boolean;
+  jobArticles?: ServiceOrderArticleView[];
 }
 
 export const ArticleItemsTableNEW = ({
   items,
   setItems,
-  propertyOwnerId,
+  propertyOwner,
   formik,
   isHovered,
+  jobArticles,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const currentCurrency = useCurrentCurrency();
+  const {data: taxRates, isLoading: isLoadingTaxRates} = useVats();
 
   const subtotalExclVat = calculateTotalWithPerItemDiscount(
     formik.values.items,
   );
-  const {company} = useContext(UserCompanyContext);
+  const {user} = useUserSession();
 
   const {language: selectedLng} = useContext(LanguageContext);
 
@@ -130,6 +136,14 @@ export const ArticleItemsTableNEW = ({
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
 
+  const defaultVat =
+    propertyOwner?.additionalInfo.vat || taxRates?.find((tR) => tR.isDefault);
+
+  const defaultPercentageVat =
+    typeof defaultVat?.percentage === 'number'
+      ? defaultVat.percentage
+      : user?.userAccount.serviceCompany.settings.percentageVat || 0;
+
   const createEmptyItem = () => {
     const blankItem = {
       article: {
@@ -141,7 +155,9 @@ export const ArticleItemsTableNEW = ({
           fractionDigits: currentCurrency.fractionDigits,
           currency: currentCurrency.code,
           grossAmount: 0,
-          percentageVat: company?.settings.percentageVat ?? 0,
+          percentageVat: defaultPercentageVat,
+          vatId: defaultVat?.id || '',
+          vatName: defaultVat?.name || '',
           vat: 0,
         },
       },
@@ -153,7 +169,9 @@ export const ArticleItemsTableNEW = ({
         fractionDigits: currentCurrency.fractionDigits,
         currency: currentCurrency.code,
         grossAmount: 0,
-        percentageVat: company?.settings.percentageVat ?? 0,
+        percentageVat: defaultPercentageVat,
+        vatId: defaultVat?.id || '',
+        vatName: defaultVat?.name || '',
         vat: 0,
       },
       discount: {
@@ -189,7 +207,6 @@ export const ArticleItemsTableNEW = ({
 
     setItems(items);
   };
-  const {user} = useUserSession();
 
   const {
     amountBeforeGlobalDiscount,
@@ -224,6 +241,8 @@ export const ArticleItemsTableNEW = ({
     amountAfterGlobalDiscountWithVAT,
     {currency: currentCurrency.code},
   );
+
+  if (isLoadingTaxRates) return <Progress height="100%" />;
 
   return (
     <Box
@@ -307,14 +326,17 @@ export const ArticleItemsTableNEW = ({
                               index={index}
                               deleteItem={deleteItem}
                               setItemAtIndex={setItemAtIndex}
-                              propertyOwnerId={propertyOwnerId}
+                              propertyOwner={propertyOwner}
                               handleSelectItem={handleSelectItem}
                               isHovered={isHovered}
-                              defaultPercentageVat={
-                                user?.userAccount.serviceCompany.settings
-                                  .percentageVat
-                              }
+                              defaultPercentageVat={defaultPercentageVat}
+                              taxRates={taxRates!}
                               invoiceType={formik.values.type}
+                              jobArticleVat={
+                                jobArticles?.find(
+                                  (ja) => ja.article.id === item.article?.id,
+                                )?.unitAmount.percentageVat
+                              }
                             />
                           </TableRow>
                         )}
@@ -522,7 +544,7 @@ export const ArticleItemsTableNEW = ({
             <Typography variant="body2">1</Typography>
             <SelectButton
               text="Add Article"
-              onClick={() => createEmptyItem()}
+              onClick={createEmptyItem}
               sxContainer={{flexGrow: 1}}
             />
           </Box>

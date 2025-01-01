@@ -5,6 +5,7 @@ import {InfoCard} from 'components/InfoCard';
 import {
   ServiceOrderArticleOwnerType,
   ServiceOrderArticleView,
+  ServiceOrderView,
 } from 'models/service-order';
 import {EmptySection} from 'components/EmptySection';
 import Box from '@mui/material/Box';
@@ -20,6 +21,8 @@ import {
   useCreateServiceOrderArticle,
   useNewUpdateServiceOrderArticles,
 } from 'hooks/reactQuery/useServiceOrder';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {calculateOrderArticlesTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {useCurrentCurrency} from 'utils/currency';
@@ -50,18 +53,22 @@ import {Actions} from './Actions';
 
 interface Props {
   serviceOrderArticles: ServiceOrderArticleView[] | undefined;
-  serviceOrderId?: string;
+  serviceOrder: ServiceOrderView;
   customerId?: string;
 }
 
 export const Articles = ({
   serviceOrderArticles,
-  serviceOrderId,
+  serviceOrder,
   customerId,
 }: Props) => {
   const navigate = useNavigate();
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
+  const {user} = useUserSession();
+  const {data: customer} = useGetCustomer(
+    serviceOrder.elevator.propertyOwner.id,
+  );
   const [rows, setRows] = useState<ArticleSectionTableRow[]>([]);
   const [openSelectModal, setOpenSelectModal] = useState<boolean>(false);
   const [isOpenDialog, setIsDialogOpen] = useState<boolean>(false);
@@ -203,7 +210,7 @@ export const Articles = ({
       renderCell: (article, cellProps) => (
         <Cell {...cellProps} onClick={undefined}>
           <Actions
-            serviceOrderId={serviceOrderId!}
+            serviceOrderId={serviceOrder.id}
             serviceOrderArticleId={article.id}
           />
         </Cell>
@@ -221,6 +228,15 @@ export const Articles = ({
   }, [serviceOrderArticles]);
 
   const handleSelectArticle = async (article: ArticleView) => {
+    const customerVat = customer?.additionalInfo?.vat;
+    const companyVatPercentage =
+      user?.userAccount?.serviceCompany?.settings?.percentageVat;
+    const percentageVat =
+      customerVat && typeof customerVat.percentage === 'number'
+        ? customerVat.percentage
+        : typeof companyVatPercentage === 'number'
+        ? companyVatPercentage
+        : article.unitSellingAmount.percentageVat;
     const body: ServiceOrderArticleRecord = {
       articleId: article.id,
       article: {
@@ -238,12 +254,12 @@ export const Articles = ({
       unitAmount: {
         currency: article.unitSellingAmount.currency,
         netAmount: article.unitSellingAmount.netAmount,
-        percentageVat: article.unitSellingAmount.percentageVat,
+        percentageVat,
       },
     };
 
     await createServiceOrderArticle({
-      serviceOrder: serviceOrderId!,
+      serviceOrder: serviceOrder.id,
       body,
     });
     setOpenSelectModal(false);

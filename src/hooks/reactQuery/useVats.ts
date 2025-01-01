@@ -2,8 +2,8 @@ import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RestError, StringValue} from 'models/misc';
 import {axiosClient} from 'utils/axios-utils';
 import {queryKeys as qk} from 'reactQuery/constants';
-import {useSnackbar} from 'hooks/useSnackbar';
 import {VatView} from 'models/vat';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './useUserSession';
 
 const fetchVats = async (serviceCompanyId: string): Promise<VatView[]> => {
