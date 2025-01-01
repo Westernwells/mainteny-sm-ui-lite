@@ -775,14 +775,14 @@ export const InvoiceForm = ({
     if (invoiceData?.additionalInfo?.deliveryStartDate) {
       formik.setFieldValue(
         'deliveryStartDate',
-        invoiceData.additionalInfo.deliveryStartDate,
+        new Date(invoiceData.additionalInfo.deliveryStartDate),
       );
     }
 
     if (invoiceData?.additionalInfo?.deliveryEndDate) {
       formik.setFieldValue(
         'deliveryEndDate',
-        invoiceData.additionalInfo.deliveryEndDate,
+        new Date(invoiceData.additionalInfo.deliveryEndDate),
       );
     }
 
