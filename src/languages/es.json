@@ -3019,5 +3019,6 @@
   "Hoisting Height": "Altura de elevación",
   "Shaft Height": "Altura de eje",
   "Email address": "Dirección de correo electrónico",
-  "Number of People": "Número de personas"
+  "Number of People": "Número de personas",
+  "Can't be less than 0": "No puede ser menos de 0"
 }
