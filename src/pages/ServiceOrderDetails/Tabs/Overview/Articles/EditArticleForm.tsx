@@ -524,7 +524,6 @@ export const EditArticleForm = ({
             error={!!(formik.touched.description && formik.errors.description)}
             onBlur={formik.handleBlur}
             fieldsetStyles={{padding: '5px 8px'}}
-            required
             minRows={4}
             endAdornment={
               <InputAdornment
