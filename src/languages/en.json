@@ -2580,5 +2580,6 @@
   "Hoisting Height": "Hoisting height",
   "Shaft Height": "Shaft height",
   "Email address": "Email Address",
-  "Number of People": "Number of people"
+  "Number of People": "Number of people",
+  "Can't be less than 0": "Can't be less than 1"
 }

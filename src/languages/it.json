@@ -1886,5 +1886,6 @@
   "Selling price": "Prezzo di vendita",
   "Payment data included": "Dati di pagamento inclusi",
   "Auto Dialer": "Dialer automatico",
-  "Email address": "Indirizzo e-mail"
+  "Email address": "Indirizzo e-mail",
+  "Can't be less than 0": "Non può essere inferiore a 0"
 }

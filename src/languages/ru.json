@@ -2711,5 +2711,6 @@
   "Hoisting Height": "Высота подъема",
   "Shaft Height": "Высота вала",
   "Email address": "Адрес электронной почты",
-  "Number of People": "Число людей"
+  "Number of People": "Число людей",
+  "Can't be less than 0": "Не может быть меньше 0"
 }

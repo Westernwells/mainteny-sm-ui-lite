@@ -2781,5 +2781,6 @@
   "Hoisting Height": "ამწე სიმაღლე",
   "Shaft Height": "შახტის სიმაღლე",
   "Email address": "ელ.ფოსტის მისამართი",
-  "Number of People": "ადამიანების რაოდენობა"
+  "Number of People": "ადამიანების რაოდენობა",
+  "Can't be less than 0": "არ შეიძლება იყოს 0 -ზე ნაკლები"
 }
