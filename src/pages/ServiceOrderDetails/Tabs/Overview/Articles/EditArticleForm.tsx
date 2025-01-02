@@ -50,10 +50,7 @@ import {EditArticleFormModel} from './models';
 const validationSchema = Yup.object().shape({
   name: Yup.string().nullable().required('Name is required'),
   unitSellingAmount: Yup.number().nullable().required('Unit price is required'),
-  quantity: Yup.number()
-    .nullable()
-    .min(0, "Can't be less than 0")
-    .required('Quantity is required'),
+  quantity: Yup.number().nullable().min(0, "Can't be less than 0"),
   type: Yup.string().nullable().required('Type is required'),
 });
 
@@ -253,7 +250,6 @@ export const EditArticleForm = ({
               },
               error: !!(formik.touched.quantity && formik.errors.quantity),
               helperText: formik.touched.quantity ? formik.errors.quantity : '',
-              required: true,
               type: 'number',
             }}
           />
