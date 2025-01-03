@@ -3,7 +3,6 @@ import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {theme} from 'theme';
-import {addDays} from 'date-fns';
 import {
   Avatar,
   Box,
@@ -119,7 +118,7 @@ import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
 import {Notes} from './Notes/EditNotes';
 import {cleanHtmlContent} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
-import {getInvoiceDueDate} from 'utils/invoice-utils';
+import {getInvoiceDueDate, GetInvoiceDueDateProps} from 'utils/invoice-utils';
 
 interface Props {
   invoice?: InvoiceView;
@@ -523,6 +522,11 @@ export const InvoiceForm = ({
     },
   });
 
+  const handleDueDateChange = useCallback(
+    (props: Omit<GetInvoiceDueDateProps, 'invoiceType'>) =>
+      getInvoiceDueDate({invoiceType: formik.values.type, ...props}),
+    [formik.values.type],
+  );
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
     const updateFieldValue = (fieldName: string, currentValue: string) => {
       const newValue = cleanHtmlContent(
@@ -750,7 +754,15 @@ export const InvoiceForm = ({
 
     formik.setFieldValue(
       'dueDate',
-      getInvoiceDueDate(invoiceData, formik.values.type),
+      handleDueDateChange({
+        numberOfDaysToAdd:
+          typeof invoice?.additionalInfo?.paymentTerm?.data?.dueDays ===
+          'number'
+            ? invoice?.additionalInfo?.paymentTerm?.data?.dueDays
+            : undefined,
+        useFallback: true,
+        fallbackDate: invoice?.dueDate,
+      }),
     );
 
     if (invoiceData?.additionalInfo?.deliveryStartDate) {
@@ -884,7 +896,9 @@ export const InvoiceForm = ({
       if (typeof customerData.paymentTerm?.data?.dueDays === 'number') {
         formik.setFieldValue(
           'dueDate',
-          addDays(new Date(), customerData?.paymentTerm?.data?.dueDays),
+          handleDueDateChange({
+            numberOfDaysToAdd: customerData?.paymentTerm?.data?.dueDays,
+          }),
         );
         setResetDueDatePicker(true);
       }
@@ -994,7 +1008,12 @@ export const InvoiceForm = ({
     const dueDays = serviceOrderArg?.contract?.additionalInfo?.invoiceDueDays;
 
     if (typeof dueDays === 'number' && isNewInvoice) {
-      formik.setFieldValue('dueDate', addDays(new Date(), dueDays));
+      formik.setFieldValue(
+        'dueDate',
+        handleDueDateChange({
+          numberOfDaysToAdd: dueDays,
+        }),
+      );
       setResetDueDatePicker(true);
     }
 
@@ -1395,7 +1414,9 @@ export const InvoiceForm = ({
     if (typeof paymentTermObj?.data?.dueDays === 'number') {
       formik.setFieldValue(
         'dueDate',
-        addDays(new Date(), paymentTermObj?.data?.dueDays),
+        handleDueDateChange({
+          numberOfDaysToAdd: paymentTermObj?.data?.dueDays,
+        }),
       );
       setResetDueDatePicker(true);
     }

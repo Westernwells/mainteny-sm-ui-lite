@@ -177,17 +177,24 @@ export const transformInvoiceForCreditNote = (
   ),
 });
 
-export const getInvoiceDueDate = (
-  invoice: InvoiceView | undefined,
-  invoiceType: InvoiceType,
-): Date | undefined => {
+export type GetInvoiceDueDateProps = {
+  invoiceType?: InvoiceType;
+  numberOfDaysToAdd?: number;
+  useFallback?: boolean;
+  fallbackDate?: Date | string;
+  where?: string;
+};
+
+export const getInvoiceDueDate = ({
+  invoiceType,
+  numberOfDaysToAdd = 0,
+  useFallback = false,
+  fallbackDate,
+}: GetInvoiceDueDateProps): Date | undefined => {
   if (invoiceType === InvoiceType.CREDIT_NOTE) return addWeeks(new Date(), 2);
 
-  if (typeof invoice?.additionalInfo?.paymentTerm?.data?.dueDays === 'number')
-    return addDays(
-      new Date(),
-      invoice?.additionalInfo?.paymentTerm?.data?.dueDays,
-    );
+  if (numberOfDaysToAdd !== 0 || !useFallback)
+    return addDays(new Date(), numberOfDaysToAdd);
 
-  if (invoice?.dueDate) return new Date(invoice?.dueDate);
+  if (fallbackDate) return new Date(fallbackDate);
 };
