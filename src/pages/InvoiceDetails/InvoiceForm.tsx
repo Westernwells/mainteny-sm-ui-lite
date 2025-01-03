@@ -772,18 +772,19 @@ export const InvoiceForm = ({
         : undefined,
     );
 
-    formik.setFieldValue(
-      'deliveryStartDate',
-      invoiceData?.additionalInfo.deliveryStartDate
-        ? new Date(invoiceData?.additionalInfo.deliveryStartDate)
-        : undefined,
-    );
-    formik.setFieldValue(
-      'deliveryEndDate',
-      invoiceData?.additionalInfo.deliveryEndDate
-        ? new Date(invoiceData?.additionalInfo.deliveryEndDate)
-        : undefined,
-    );
+    if (invoiceData?.additionalInfo?.deliveryStartDate) {
+      formik.setFieldValue(
+        'deliveryStartDate',
+        new Date(invoiceData.additionalInfo.deliveryStartDate),
+      );
+    }
+
+    if (invoiceData?.additionalInfo?.deliveryEndDate) {
+      formik.setFieldValue(
+        'deliveryEndDate',
+        new Date(invoiceData.additionalInfo.deliveryEndDate),
+      );
+    }
 
     if (invoiceData?.additionalInfo.paymentTerm) {
       formik.setFieldValue(
@@ -976,19 +977,25 @@ export const InvoiceForm = ({
       serviceOrderArg?.elevator.externalId || '-',
     );
 
-    formik.setFieldValue(
-      'deliveryStartDate',
-      serviceOrderArg?.actualStartTime
-        ? new Date(serviceOrderArg.actualStartTime)
-        : undefined,
-    );
+    if (
+      !invoice?.additionalInfo?.deliveryStartDate &&
+      serviceOrderArg?.schedules?.[0]?.startTime
+    ) {
+      formik.setFieldValue(
+        'deliveryStartDate',
+        new Date(serviceOrderArg.schedules[0].startTime),
+      );
+    }
 
-    formik.setFieldValue(
-      'deliveryEndDate',
-      serviceOrderArg?.actualEndTime
-        ? new Date(serviceOrderArg.actualEndTime)
-        : undefined,
-    );
+    if (
+      !invoice?.additionalInfo?.deliveryEndDate &&
+      serviceOrderArg?.schedules?.[0]?.endTime
+    ) {
+      formik.setFieldValue(
+        'deliveryEndDate',
+        new Date(serviceOrderArg.schedules[0].endTime),
+      );
+    }
 
     if (serviceOrderArg?.additionalInfo.discount) {
       formik.setFieldValue(

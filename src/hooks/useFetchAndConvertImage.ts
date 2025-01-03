@@ -1,10 +1,11 @@
-import {useState, useEffect} from 'react';
-import {getBase64FromUrl, convertBase64ToPNG} from 'utils/utils';
+import {useEffect, useState} from 'react';
+import {convertBase64ToPNG, getBase64FromUrl} from 'utils/utils';
 
 const useFetchAndConvertImage = (downloadUrl: string) => {
   const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
+    setImageUrl(''); // reset image on downloadUrl change
     let isMounted = true;
 
     const fetchImages = async () => {
