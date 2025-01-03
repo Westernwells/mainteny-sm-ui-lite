@@ -1,6 +1,9 @@
 import {Html, HtmlStyle, HtmlStyles} from 'react-pdf-html';
 import {grey} from '@mui/material/colors';
-import {DEFAULT_HTML_PDF_FONT_SIZE} from 'models/richTextField';
+import {
+  DEFAULT_HTML_PDF_FONT_SIZE,
+  HTML_PDF_FONT_SIZE,
+} from 'models/richTextField';
 import {modifyHTMLFontSizeForPDFRendering} from 'utils/rich-text-field';
 
 export const HtmlPDF = ({
@@ -28,15 +31,12 @@ export const HtmlPDF = ({
         '*': {
           color: grey[700],
         },
-        '*:not(p, div:empty)': {
+        '*:not(div:empty)': {
           margin: '0px',
         },
         body: {
           fontFamily:
             selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-        },
-        'p:not(:empty)': {
-          margin: '2px 0px',
         },
         'li > p': {
           margin: '-0.3px 0px',
@@ -44,8 +44,17 @@ export const HtmlPDF = ({
         'li, ul, ol': {
           margin: '2px 0px',
         },
-        'p:empty, div:empty': {
+        'div:empty': {
           margin: '8px 0px',
+        },
+        'p:empty': {
+          minHeight: '13px',
+        },
+        [`span[style*="font-size: ${HTML_PDF_FONT_SIZE.SMALL}"]`]: {
+          minHeight: '11px',
+        },
+        [`span[style*="font-size: ${HTML_PDF_FONT_SIZE.LARGE}"]`]: {
+          minHeight: '15px',
         },
         ...stylesheet,
       }}>
