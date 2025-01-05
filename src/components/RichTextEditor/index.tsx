@@ -16,6 +16,7 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import {ONE_KB_IN_BYTES, ONE_MB_IN_BYTES} from 'utils/constants';
 import CircularProgress from '@mui/material/CircularProgress';
 import {cleanHtmlContent} from 'utils/text-block';
+import {EmailSignature} from 'models/employee';
 import EditorMenuControls from './EditorMenuControls';
 import useExtensions from './useExtensions';
 
@@ -150,6 +151,8 @@ interface Props {
   updateFiles?: (files: FileWithPreview[]) => void;
   isLoadingFiles?: boolean;
   hasAttachFileButton?: boolean;
+  hasSignatureButton?: boolean;
+  onSignatureSelect?: (signature?: EmailSignature) => void;
 }
 const RichTextEditor = ({
   required = false,
@@ -163,6 +166,8 @@ const RichTextEditor = ({
   isLoadingFiles = false,
   updateFiles,
   hasAttachFileButton,
+  hasSignatureButton = false,
+  onSignatureSelect,
 }: Props) => {
   const {t} = useTranslation();
   const dropzoneRef = useRef<{
@@ -172,7 +177,6 @@ const RichTextEditor = ({
   }>(null);
 
   const extensions = useExtensions({placeholder});
-
   const [focused, setFocused] = useState(false);
   const [files, setFiles] = useState<FileWithPreview[]>(existingFiles);
   useEffect(() => {
@@ -194,6 +198,8 @@ const RichTextEditor = ({
           <EditorMenuControls
             onOpenFileUpload={() => dropzoneRef?.current?.open()}
             hasAttachFileButton={hasAttachFileButton}
+            hasSignatureButton={hasSignatureButton}
+            onSignatureSelect={onSignatureSelect}
           />
         </>
       }
@@ -201,7 +207,6 @@ const RichTextEditor = ({
       content={value}
       onUpdate={({editor}) => {
         const cleanedHtml = cleanHtmlContent(editor.getHTML());
-
         updateHtml?.(cleanedHtml);
         onChange(cleanedHtml);
       }}
@@ -262,6 +267,13 @@ const RichTextEditor = ({
             margin: 0,
             padding: 0,
           },
+          '& .ProseMirror a': {
+            color: '#0092B2 !important',
+            textDecoration: 'underline',
+          },
+          '& .ProseMirror a:hover': {
+            textDecoration: 'underline',
+          },
           '& .tiptap p.is-editor-empty:first-of-type::before': {
             color: '#adb5bd',
             content: 'attr(data-placeholder)',
@@ -269,6 +281,10 @@ const RichTextEditor = ({
             height: '0',
             pointerEvents: 'none',
             position: 'absolute',
+          },
+          '& .ProseMirror table tbody': {
+            display: 'flex',
+            justifyContent: 'space-between',
           },
           background: '#F7F9FC',
         }}
