@@ -1,10 +1,5 @@
-import {addDays, addWeeks, isBefore, parseISO, startOfDay} from 'date-fns';
-import {
-  InvoiceItem,
-  InvoiceStatus,
-  InvoiceType,
-  InvoiceView,
-} from '../models/invoice';
+import {isBefore, parseISO, startOfDay} from 'date-fns';
+import {InvoiceItem, InvoiceStatus, InvoiceView} from '../models/invoice';
 import {PdfGenerationStatus} from '../models/misc';
 
 export const isDueDateInPast = (invoice: InvoiceView) => {
@@ -36,7 +31,6 @@ interface InvoicePDFStatuses {
   isWorkReportPDFGenerated: boolean;
   isPDFsGenerated: boolean;
 }
-
 export const getInvoicePDFStatuses = (
   invoice: InvoiceView,
 ): InvoicePDFStatuses => {
@@ -176,18 +170,3 @@ export const transformInvoiceForCreditNote = (
     }),
   ),
 });
-
-export const getInvoiceDueDate = (
-  invoice: InvoiceView | undefined,
-  invoiceType: InvoiceType,
-): Date | undefined => {
-  if (invoiceType === InvoiceType.CREDIT_NOTE) return addWeeks(new Date(), 2);
-
-  if (typeof invoice?.additionalInfo?.paymentTerm?.data?.dueDays === 'number')
-    return addDays(
-      new Date(),
-      invoice?.additionalInfo?.paymentTerm?.data?.dueDays,
-    );
-
-  if (invoice?.dueDate) return new Date(invoice?.dueDate);
-};

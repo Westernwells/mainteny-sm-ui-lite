@@ -1,9 +1,9 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState, useCallback} from 'react';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {theme} from 'theme';
-import {addDays} from 'date-fns';
+import {addDays, addYears} from 'date-fns';
 import {
   Avatar,
   Box,
@@ -116,10 +116,10 @@ import {CreateNotes} from './Notes/CreateNotes';
 import {PartialPaymentsSection} from './PartialPaymentsSection';
 import {SectionTitle} from './SectionTitle';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
-import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
+import {formatInvoiceRecord, articleViewToInvoiceItemRecord} from './utils';
 import {Notes} from './Notes/EditNotes';
 import {cleanHtmlContent} from 'utils/text-block';
-import {getInvoiceDueDate} from 'utils/invoice-utils';
+import {t} from 'i18next';
 
 interface Props {
   invoice?: InvoiceView;
@@ -468,6 +468,11 @@ export const InvoiceForm = ({
     if (!values.description.length) values.description = '';
     if (!values?.moreInfo?.length) values.moreInfo = '';
 
+    const dueDate =
+      values.type === InvoiceType.CREDIT_NOTE
+        ? addYears(new Date(), 1)
+        : values.dueDate;
+
     const createData = {
       notes:
         values.notes?.map((note) => ({
@@ -482,14 +487,20 @@ export const InvoiceForm = ({
 
     if (!isNewInvoice && invoice) {
       return updateInvoiceAsync({
-        data: formatInvoiceRecord(values),
+        data: formatInvoiceRecord({
+          ...values,
+          dueDate,
+        }),
         invoiceId: invoice.id,
       });
     }
 
     return createNewInvoice({
       data: {
-        ...(formatInvoiceRecord(values) as CreateInvoice),
+        ...(formatInvoiceRecord({
+          ...values,
+          dueDate,
+        }) as CreateInvoice),
         ...createData,
       },
     });
@@ -750,7 +761,15 @@ export const InvoiceForm = ({
 
     formik.setFieldValue(
       'dueDate',
-      getInvoiceDueDate(invoiceData, formik.values.type),
+      typeof invoiceData?.additionalInfo?.paymentTerm?.data?.dueDays ===
+        'number'
+        ? addDays(
+            new Date(),
+            invoiceData?.additionalInfo?.paymentTerm?.data?.dueDays,
+          )
+        : invoiceData?.dueDate
+        ? new Date(invoiceData?.dueDate)
+        : undefined,
     );
 
     if (invoiceData?.additionalInfo?.deliveryStartDate) {
