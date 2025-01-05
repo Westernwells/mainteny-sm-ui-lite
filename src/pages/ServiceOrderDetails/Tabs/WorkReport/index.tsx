@@ -70,6 +70,8 @@ import {
 } from 'utils/constants';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
+import {EmailSignature} from 'models/employee';
+import {FileResourceRecord} from 'models/media';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -204,6 +206,14 @@ export const WorkReport = ({serviceOrder}: Props) => {
     company?.id,
   );
 
+  const [activeSignature, setActiveSignature] = useState<
+    EmailSignature | undefined
+  >();
+
+  const {data: signatureUrls = {}} = useDownloadUrl(
+    activeSignature?.content?.images || [],
+  );
+
   const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
     useCompleteServiceOrder('Work report updated successfully!');
   const {mutateAsync: uploadFiles} = useUploadFiles('');
@@ -243,25 +253,42 @@ export const WorkReport = ({serviceOrder}: Props) => {
     files: FileWithPreview[],
     path: string,
     fileReport?: ServiceOrderReportView,
-  ) =>
-    files.reduce<FileWithPreview[]>((newArr: FileWithPreview[], obj, index) => {
-      // If file is from server -> uri of file should be report.id
-      // If file is from server -> description should be report.externalId || report.number
-      const isFileFromServer = !obj.path && index === 0;
-      return [
-        ...newArr,
-        {
+    signatureAttachment?: FileWithPreview,
+  ) => {
+    const attachments = files.reduce<FileWithPreview[]>(
+      (newArr, obj, index) => {
+        // If file is from server -> uri of file should be report.id
+        // If file is from server -> description should be report.externalId || report.number
+        const isFileFromServer = !obj.path && index === 0;
+
+        newArr.push({
           ...obj,
           type: obj.type,
           uri: isFileFromServer
-            ? `${path}/${report?.id}.pdf`
+            ? `${path}/${fileReport?.id}.pdf`
             : `${path}/${obj.name}`,
           description: isFileFromServer
             ? `${fileReport?.externalId}.pdf` || `${fileReport?.number}.pdf`
             : obj.name.split('.')[0],
-        },
-      ];
-    }, []);
+        });
+
+        return newArr;
+      },
+      [],
+    );
+
+    // Add signatureAttachment if it exists and is not already in the list
+    if (
+      signatureAttachment &&
+      !attachments.some(
+        (attachment) => attachment.uri === signatureAttachment.contentId,
+      )
+    ) {
+      attachments.push(signatureAttachment);
+    }
+
+    return attachments;
+  };
 
   const sendEmailReport = async (
     emailServiceOrder: ServiceOrderView,
@@ -270,6 +297,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
     pdfPath: string,
     uploadPath: string,
     fileReport?: ServiceOrderReportView,
+    signatureAttachment?: FileWithPreview,
   ) => {
     sendWorkReport(
       {
@@ -284,7 +312,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
             bccEmails: values.bccEmails,
             subject: values.subject,
             content: values.content,
-            attachments: createEmailAttachments(files, uploadPath, fileReport),
+            attachments: createEmailAttachments(
+              files,
+              uploadPath,
+              fileReport,
+              signatureAttachment,
+            ),
           },
         },
       },
@@ -364,6 +397,30 @@ export const WorkReport = ({serviceOrder}: Props) => {
       await uploadFiles({files: emailAttachments, uploadPath});
     }
 
+    let file: File | undefined;
+
+    if (activeSignature && activeSignature.content.images) {
+      const response = await fetch(
+        signatureUrls[activeSignature.content.images[0]!],
+      );
+
+      const blob = await response.blob();
+      file = new File([blob], activeSignature.name, {
+        type: blob.type,
+      });
+    }
+
+    let signatureAttachment: FileResourceRecord | undefined;
+
+    if (file && activeSignature) {
+      signatureAttachment = {
+        type: file.type,
+        uri: activeSignature.content.images[0]!,
+        description: activeSignature.name,
+        contentId: activeSignature.content.images[0]!,
+      };
+    }
+
     await sendEmailReport(
       serviceOrder,
       values,
@@ -373,6 +430,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         : `${uploadPath}/${fileNames[0]}`,
       uploadPath,
       report,
+      signatureAttachment as FileWithPreview,
     );
   };
 
@@ -819,6 +877,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
         subject=""
         content={formik.values.description}
         callback={(emailRecord) => onSubmitHandler(emailRecord)}
+        activeSignature={activeSignature}
+        onSignatureSelect={(signature) => setActiveSignature(signature)}
       />
 
       <Dialog

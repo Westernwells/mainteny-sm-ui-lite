@@ -76,8 +76,24 @@ export const stripHtmlTags = (html: string): string => {
   return textContent.replace(/\s+/g, ' ').trim();
 };
 
-export const cleanHtmlContent = (html: string): string =>
-  html.replaceAll(/<li><p>(.*?)<\/p><(\/?)(ol|li|ul)>/gi, '<li>$1<$2$3>');
+export const cleanHtmlContent = (html: string): string => {
+  // Clean up list HTML
+  html = html.replaceAll(
+    /<li><p>(.*?)<\/p><(\/?)(ol|li|ul)>/gi,
+    '<li>$1<$2$3>',
+  );
+
+  // Add styles to <tbody> to support positioning of the signature
+  html = html.replace(
+    '<tbody>',
+    '<tbody style="display:flex;justify-content: space-between">',
+  );
+
+  // Replace empty <p> tags with a non-breaking space
+  html = html.replace(/<p([^>]*)>\s*<\/p>/gi, '<p$1>&nbsp;</p>');
+
+  return html;
+};
 
 // Function to escape special regex characters in the string
 const escapeRegExp = (str: string) =>

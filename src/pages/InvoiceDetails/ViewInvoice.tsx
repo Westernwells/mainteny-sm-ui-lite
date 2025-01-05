@@ -118,6 +118,8 @@ import {
 import XMLViewer from 'react-xml-viewer';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
+import {EmailSignature} from 'models/employee';
+import {FileResourceRecord} from 'models/media';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -149,6 +151,14 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
+  );
+
+  const [activeSignature, setActiveSignature] = useState<
+    EmailSignature | undefined
+  >();
+
+  const {data: signatureUrls = {}} = useDownloadUrl(
+    activeSignature?.content?.images || [],
   );
 
   const memorizedUpdateInvoiceData = useMemo(
@@ -1822,11 +1832,36 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             const emailAttachments = (emailRecord.attachments || [])?.filter(
               (el) => el.path && !el.description,
             );
+
             if (emailAttachments?.length) {
               await uploadFiles({
                 files: emailAttachments,
                 uploadPath: invoiceUploadPath,
               });
+            }
+
+            let file: File | undefined;
+
+            if (activeSignature && activeSignature.content.images) {
+              const response = await fetch(
+                signatureUrls[activeSignature.content.images[0]!],
+              );
+
+              const blob = await response.blob();
+              file = new File([blob], activeSignature.name, {
+                type: blob.type,
+              });
+            }
+
+            let signatureAttachment: FileResourceRecord | undefined;
+
+            if (file && activeSignature) {
+              signatureAttachment = {
+                type: file.type,
+                uri: activeSignature.content.images[0]!,
+                description: activeSignature.name,
+                contentId: activeSignature.content.images[0]!,
+              };
             }
 
             const sendEmail = async (invoiceData: InvoiceView) => {
@@ -1851,22 +1886,33 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     ccEmails: emailRecord.ccEmails,
                     bccEmails: emailRecord.bccEmails,
                     attachments: allAttachments.reduce<FileWithPreview[]>(
-                      (newArr: FileWithPreview[], obj) => [
-                        ...newArr,
-                        {
+                      (newArr, obj) => {
+                        newArr.push({
                           ...obj,
                           type: obj.type,
                           uri: decideAttachmentURIForInvoiceEmail({
-                            invoice,
                             invoiceUploadPath,
+                            invoice,
+                            attachment: obj,
                             workReportUploadPath,
                             checklistUploadPath,
-                            attachment: obj,
                           }),
                           description:
                             decideAttachmentDescriptionForInvoiceEmail(obj),
-                        },
-                      ],
+                        });
+
+                        if (
+                          signatureAttachment &&
+                          !newArr.some(
+                            (attachment) =>
+                              attachment.uri === signatureAttachment.contentId,
+                          )
+                        ) {
+                          newArr.push(signatureAttachment as FileWithPreview);
+                        }
+
+                        return newArr;
+                      },
                       [],
                     ),
                   },
@@ -1895,6 +1941,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         }
         subject={generateEmailSubject()}
         content={invoice.description}
+        activeSignature={activeSignature}
+        onSignatureSelect={(signature) => setActiveSignature(signature)}
       />
 
       <MarkAsPaidDialog

@@ -25,6 +25,8 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import RichTextEditor from 'components/RichTextEditor';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useFetchCompanyEmailConfig} from 'hooks/reactQuery/useEmail';
+import {useCurrentEditor} from '@tiptap/react';
+import {EmailSignature} from 'models/employee';
 import {Order} from '../../models/pagination';
 
 interface Props {
@@ -45,6 +47,8 @@ interface Props {
   isLoadingFiles?: boolean;
   isSending?: boolean;
   onOpen?: () => void;
+  activeSignature?: EmailSignature;
+  onSignatureSelect?: (signature?: EmailSignature) => void;
 }
 
 interface CustomKeyboardEvent extends React.KeyboardEvent<HTMLDivElement> {
@@ -68,12 +72,15 @@ export const SendEmailDialog = ({
   isLoadingFiles = false,
   isSending = false,
   onOpen,
+  onSignatureSelect,
 }: Props) => {
   const {t} = useTranslation();
   const [isPublishing, setIsPublishing] = useState(false);
   const publish = submitHook?.();
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id || '';
+  const {editor} = useCurrentEditor();
+
   const {data: bccMails} = useFetchCompanyEmailConfig();
 
   const [emailInputValue, setEmailInputValue] = useState('');
@@ -112,6 +119,13 @@ export const SendEmailDialog = ({
     reset();
     setIsCcShown(false);
     setIsBccShown(false);
+  };
+
+  const handleCloseDialog = () => {
+    handleResetForm();
+    editor?.chain().setContent('').run();
+    onClose();
+    setValue('emails', email ? [email] : []);
   };
 
   const handleKeyDown = (event: CustomKeyboardEvent) => {
@@ -172,10 +186,7 @@ export const SendEmailDialog = ({
   return (
     <Dialog
       open={open || false}
-      onClose={() => {
-        onClose();
-        setValue('emails', email ? [email] : []);
-      }}
+      onClose={handleCloseDialog}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       fullWidth
@@ -477,6 +488,10 @@ export const SendEmailDialog = ({
             control={control}
             existingFiles={existingFiles}
             updateFiles={(files) => setValue('attachments', files)}
+            hasSignatureButton
+            onSignatureSelect={(signature?: EmailSignature) => {
+              onSignatureSelect?.(signature);
+            }}
           />
         </Box>
       </DialogContent>

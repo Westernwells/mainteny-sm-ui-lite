@@ -11,4 +11,5 @@ export interface FileResourceRecord {
   description: string;
   type: string;
   uri: string;
+  contentId?: string;
 }

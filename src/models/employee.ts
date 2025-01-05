@@ -190,3 +190,21 @@ export interface QueryEmployeesParams {
   roles?: Role[];
   serviceOrderType?: string;
 }
+
+export interface EmailSignature {
+  id: string;
+  name: string;
+  content: SignatureContent;
+  createdAt: Date;
+  enabled?: boolean;
+}
+
+export interface SignatureContent {
+  images: string[];
+  html: string;
+}
+export interface CreateEmailSignatureRecord {
+  name: string;
+  content: SignatureContent;
+  enabled?: boolean;
+}

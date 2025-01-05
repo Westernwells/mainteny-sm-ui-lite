@@ -119,6 +119,8 @@ export const queryKeys = {
   fetchContactStatistics: 'fetchContactStatistics',
   fetchContactNotes: 'fetchContactNotes',
   queryAllContactPersons: 'queryAllContactPersons',
+  fetchEmployeeEmailSignatures: 'fetchEmployeeEmailSignatures',
+  fetchEmployeeEmailSignatureById: 'fetchEmployeeEmailSignatureById',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',
