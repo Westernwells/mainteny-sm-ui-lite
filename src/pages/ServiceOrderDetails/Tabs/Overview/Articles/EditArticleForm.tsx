@@ -7,8 +7,8 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {
   ArticleBasicFormModel,
-  createMeasurementOptions,
   MeasurementUnit,
+  createMeasurementOptions,
 } from 'models/articleForm';
 import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import * as Yup from 'yup';
@@ -50,7 +50,10 @@ import {EditArticleFormModel} from './models';
 const validationSchema = Yup.object().shape({
   name: Yup.string().nullable().required('Name is required'),
   unitSellingAmount: Yup.number().nullable().required('Unit price is required'),
-  quantity: Yup.number().nullable().min(0, "Can't be less than 0"),
+  quantity: Yup.number()
+    .nullable()
+    .min(1, "Can't be less than 1")
+    .required('Quantity is required'),
   unit: Yup.string().nullable().required('Unit is required'),
   type: Yup.string().nullable().required('Type is required'),
 });
@@ -251,6 +254,7 @@ export const EditArticleForm = ({
               },
               error: !!(formik.touched.quantity && formik.errors.quantity),
               helperText: formik.touched.quantity ? formik.errors.quantity : '',
+              required: true,
               type: 'number',
             }}
           />
@@ -525,6 +529,7 @@ export const EditArticleForm = ({
             error={!!(formik.touched.description && formik.errors.description)}
             onBlur={formik.handleBlur}
             fieldsetStyles={{padding: '5px 8px'}}
+            required
             minRows={4}
             endAdornment={
               <InputAdornment
