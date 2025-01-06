@@ -582,7 +582,9 @@ export const DraftQuotation = ({
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
     const updateFieldValue = (fieldName: string, currentValue: string) => {
       // Remove first line if its empty
-      const isCurrentEmpty = getPlainStringFromHtml(currentValue) === '&nbsp;';
+      const plainTextValue = getPlainStringFromHtml(currentValue);
+      const isCurrentEmpty =
+        plainTextValue === '&nbsp;' || plainTextValue === '';
 
       const newValue = cleanHtmlContent(
         `${isCurrentEmpty ? '' : currentValue} ${rowParams.row.text}`.trim(),
