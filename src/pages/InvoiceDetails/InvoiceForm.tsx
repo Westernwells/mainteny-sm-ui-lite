@@ -523,9 +523,13 @@ export const InvoiceForm = ({
   });
 
   const handleDueDateChange = useCallback(
-    (props: Omit<GetInvoiceDueDateProps, 'invoiceType'>) =>
-      getInvoiceDueDate({invoiceType: formik.values.type, ...props}),
-    [formik.values.type],
+    (props: Omit<GetInvoiceDueDateProps, 'invoiceType' | 'isNewInvoice'>) =>
+      getInvoiceDueDate({
+        invoiceType: formik.values.type,
+        isNewInvoice,
+        ...props,
+      }),
+    [formik.values.type, isNewInvoice],
   );
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
     const updateFieldValue = (fieldName: string, currentValue: string) => {
