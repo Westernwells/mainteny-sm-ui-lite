@@ -1,5 +1,10 @@
-import {isBefore, parseISO, startOfDay} from 'date-fns';
-import {InvoiceItem, InvoiceStatus, InvoiceView} from '../models/invoice';
+import {addDays, addWeeks, isBefore, parseISO, startOfDay} from 'date-fns';
+import {
+  InvoiceItem,
+  InvoiceStatus,
+  InvoiceType,
+  InvoiceView,
+} from '../models/invoice';
 import {PdfGenerationStatus} from '../models/misc';
 
 export const isDueDateInPast = (invoice: InvoiceView) => {
@@ -31,6 +36,7 @@ interface InvoicePDFStatuses {
   isWorkReportPDFGenerated: boolean;
   isPDFsGenerated: boolean;
 }
+
 export const getInvoicePDFStatuses = (
   invoice: InvoiceView,
 ): InvoicePDFStatuses => {
@@ -170,3 +176,29 @@ export const transformInvoiceForCreditNote = (
     }),
   ),
 });
+
+export type GetInvoiceDueDateProps = {
+  invoiceType?: InvoiceType;
+  isNewInvoice?: boolean;
+  numberOfDaysToAdd?: number;
+  useFallback?: boolean;
+  fallbackDate?: Date | string;
+};
+
+export const getInvoiceDueDate = ({
+  invoiceType,
+  isNewInvoice = false,
+  numberOfDaysToAdd = 0,
+  useFallback = false,
+  fallbackDate,
+}: GetInvoiceDueDateProps): Date | undefined => {
+  // has payment terms
+  if (numberOfDaysToAdd !== 0 || !useFallback)
+    return addDays(new Date(), numberOfDaysToAdd);
+
+  // default date for credit note
+  if (invoiceType === InvoiceType.CREDIT_NOTE && isNewInvoice)
+    return addWeeks(new Date(), 2);
+
+  if (useFallback && fallbackDate) return new Date(fallbackDate);
+};

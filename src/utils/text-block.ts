@@ -1,4 +1,5 @@
-import {TextBlockView, TextBlockCategory} from 'models/text-block';
+import {TextBlockCategory, TextBlockView} from 'models/text-block';
+import {getPlainStringFromHtml} from 'utils/rich-field-string';
 
 export const mapJsonToTextBlockView = (json: any): TextBlockView => ({
   id: json.id,
@@ -119,4 +120,17 @@ export const replaceTextInHtml = (
   // Perform the replacement
   const replacedHtml = html.replace(regex, replaceWith);
   return replacedHtml;
+};
+
+export const getUpdatedTextBlockValue = (
+  currentValue: string,
+  valueToAdd: string,
+) => {
+  // Remove first line if its empty
+  const plainTextValue = getPlainStringFromHtml(currentValue);
+  const isCurrentEmpty = plainTextValue === '&nbsp;' || plainTextValue === '';
+
+  return cleanHtmlContent(
+    `${isCurrentEmpty ? '' : currentValue} ${valueToAdd}`.trim(),
+  );
 };

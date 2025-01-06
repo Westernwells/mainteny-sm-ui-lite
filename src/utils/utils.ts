@@ -11,6 +11,7 @@ import {
   InvoiceView,
 } from 'models/invoice';
 
+import {ElevatorDataSchemaItem} from 'models/elevator';
 import {
   Address,
   AddressRecord,
@@ -20,6 +21,10 @@ import {
 } from '../models/misc';
 import useHighlightText from '../hooks/useHighlightText';
 import {getCountryCode} from './countries';
+import {
+  DEFAULT_ELEVATOR_TECHNICAL_FIELD_CATEGORIES,
+  DEFAULT_ELEVATOR_TECHNICAL_FIELD_NAMES,
+} from './constants';
 
 export const capitalize = (role: any[]) => {
   let roles = '';
@@ -758,4 +763,58 @@ export const createExcelContent = ({
   });
 
   return workbookBinary;
+};
+
+export const isElevatorDataSchemaItemChanged = (
+  originalItem: ElevatorDataSchemaItem,
+  newItem: ElevatorDataSchemaItem,
+) => {
+  const isNameChanged = originalItem.name !== newItem.name;
+  const isTypeChanged = originalItem.type !== newItem.type;
+  const isUnitChanged = originalItem.unit !== newItem.unit;
+
+  return isNameChanged || isTypeChanged || isUnitChanged;
+};
+
+export const getTechnicalFieldName = (
+  type?: {name: string},
+  t?: TFunction<'translation', undefined>,
+) => {
+  if (!type) {
+    return '';
+  }
+
+  if (!t) {
+    return type.name;
+  }
+
+  const {name} = type;
+
+  if (DEFAULT_ELEVATOR_TECHNICAL_FIELD_NAMES.includes(name.toLowerCase())) {
+    return t!(name);
+  }
+
+  return name;
+};
+
+export const getTechnicalFieldCategory = (
+  type?: {name: string},
+  t?: TFunction<'translation', undefined>,
+) => {
+  if (!type) {
+    return '';
+  }
+
+  if (!t) {
+    return type.name;
+  }
+
+  const {name} = type;
+  if (
+    DEFAULT_ELEVATOR_TECHNICAL_FIELD_CATEGORIES.includes(name.toLowerCase())
+  ) {
+    return t!(name);
+  }
+
+  return name;
 };

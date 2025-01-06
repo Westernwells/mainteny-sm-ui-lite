@@ -21,6 +21,7 @@ import {
   PictureAsPdfOutlined,
   TextSnippetOutlined,
   EditOutlined,
+  AccountTree,
 } from '@mui/icons-material';
 import {Progress} from 'components/Progress';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
@@ -39,6 +40,7 @@ import Financials from './Financials';
 import TextBlocks from './TextBlocks';
 import PDFSettingLayout from './PdfSettings/layout';
 import SignatureEmail from './SignatureEmail';
+import TechnicalData from './TechnicalData';
 
 interface DrawerItem {
   label: string;
@@ -142,6 +144,12 @@ export const SettingsPage = () => {
       icon: <ExtensionOutlined />,
       route: 'integrations',
       component: <Integrations />,
+    },
+    {
+      label: 'Technical Data',
+      icon: <AccountTree />,
+      route: 'technical-data',
+      component: <TechnicalData />,
     },
   ];
 

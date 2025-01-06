@@ -10,6 +10,8 @@ interface Props {
   buttonProps?: ButtonProps;
   disabled?: boolean;
   testId?: string;
+  variant?: 'text' | 'outlined' | 'contained';
+  enableRipple?: boolean;
 }
 
 export const Button = ({
@@ -19,16 +21,18 @@ export const Button = ({
   buttonProps,
   disabled,
   testId,
+  enableRipple = false,
+  variant = 'text',
 }: Props) => {
   const {t} = useTranslation();
   return (
     <MuiButton
       disabled={disabled}
-      disableRipple
+      disableRipple={!enableRipple}
       data-testid={testId}
       disableFocusRipple
       disableElevation
-      variant="text"
+      variant={variant}
       size="small"
       sx={{
         ...style,
