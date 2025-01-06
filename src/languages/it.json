@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Portale di Service Manager",
   "Login": "Login",
-  "Email address": "Indirizzo e-mail",
   "Password": "Parola d'ordine",
   "Forgot Password?": "Ha dimenticato la password?",
   "Enter a valid email": "Inserisci un'e -mail valida",
@@ -1885,5 +1884,8 @@
   "Do you want to mark this quotation as rejected?": "Vuoi segnare questa citazione come rifiutato",
   "Mark as rejected": "Segna come rifiutato",
   "Selling price": "Prezzo di vendita",
-  "Payment data included": "Dati di pagamento inclusi"
+  "Payment data included": "Dati di pagamento inclusi",
+  "Auto Dialer": "Dialer automatico",
+  "Email address": "Indirizzo e-mail",
+  "Can't be less than 0": "Non può essere inferiore a 0"
 }

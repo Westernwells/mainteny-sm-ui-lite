@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Service Manager Portal",
   "Login": "Log på",
-  "Email address": "Email adresse",
   "Password": "Adgangskode",
   "Forgot Password?": "Glemt kodeord?",
   "Enter a valid email": "Indtast en gyldig e-mail",
@@ -1385,7 +1384,7 @@
   "Selected Unit": "Valgt enhed",
   "Please describe what happened": "Beskriv venligst hvad der skete",
   "Send email": "Send e-mail",
-  "Email Address": "Email adresse",
+  "Email Address": "Email Adresse",
   "Supplier Article": "Leverandørartikel",
   "No documents attached. They will appear here once added!": "Ingen dokumenter vedhæftet. De vises her, når de er tilføjet!",
   "PAYMENT DUE": "BETALINGSFRIST",
@@ -1995,7 +1994,6 @@
   "pack": "pakke",
   "Created on {{creationDate}}": "Oprettet {{creationDate}}",
   "Exclude previously downloaded data": "Ekskluder tidligere downloadede data",
-  "Payment data included": "Betalingsdata inkluderet",
   "Article cannot be empty": "Varen/ydelsen må ikke være tom",
   "Article Type": "Vare/ydelsestype",
   "Article #": "Vare #",
@@ -2654,5 +2652,16 @@
   "testing key (dont add translations this will be removed soon)": "testnøgle (tilføj ikke oversættelser, dette vil snart blive fjernet)",
   "Do you want to mark this quotation as rejected?": "Vil du markere dette tilbud som afvist",
   "Mark as rejected": "Markér som afvist ",
-  "Selling price": "Salgspris"
+  "Selling price": "Salgspris",
+  "Payment data included": "Betalingsdata inkluderet",
+  "Auto Dialer": "Tryghedsalarm",
+  "Sim Pin": "Sim pin",
+  "Place of Installation": "Installationssted",
+  "IoT Device": "IoT-enhed",
+  "Cage Weight": "Stolvægt",
+  "Hoisting Height": "Løftehøjde",
+  "Shaft Height": "Skakthøjde",
+  "Email address": "Email Adresse",
+  "Number of People": "Antal personer",
+  "Can't be less than 0": "Kan ikke være mindre end 0"
 }

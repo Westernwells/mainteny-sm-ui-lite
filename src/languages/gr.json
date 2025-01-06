@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Πύλη Υπεύθυνου Υπηρεσιών",
   "Login": "Σύνδεση",
-  "Email address": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
   "Password": "Κωδικός πρόσβασης",
   "Forgot Password?": "Ξεχάσατε τον κωδικό;",
   "Enter a valid email": "Εισαγάγετε ένα έγκυρο email",
@@ -1376,7 +1375,7 @@
   "Selected Unit": "Επιλεγμένη μονάδα",
   "Please describe what happened": "Περιγράψτε τι συνέβη",
   "Send email": "αποστολή ηλεκτρονική διεύθυνση (email)",
-  "Email Address": "ηλεκτρονική διεύθυνση (email)",
+  "Email Address": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
   "Supplier Article": "Άρθρο προμηθευτή",
   "No documents attached. They will appear here once added!": "Δεν επισυνάπτονται έγγραφα. Θα εμφανιστούν εδώ μόλις προστεθούν!",
   "PAYMENT DUE": "ΟΦΕΙΛΗ ΠΛΗΡΩΜΗΣ",
@@ -1984,7 +1983,6 @@
   "pack": "πακέτο",
   "Created on {{creationDate}}": "Δημιουργήθηκε στις {{creationDate}}",
   "Exclude previously downloaded data": "Εξαιρέστε δεδομένα που έχετε λάβει προηγουμένως",
-  "Payment data included": "Συμπεριλαμβάνονται δεδομένα πληρωμής",
   "Article cannot be empty": "Το προϊόν δεν μπορεί να είναι κενό",
   "Article Type": "Τύπος προϊόν",
   "Article #": "αριθμός προϊόν",
@@ -2576,5 +2574,16 @@
   "CREDIT_NOTE": "Πιστωτικό σημείωμα",
   "Do you want to mark this quotation as rejected?": "Θέλετε να επισημάνετε αυτήν την προσφορά ως απορριφθείσα;",
   "Mark as rejected": "Επισήμανση ως απορριφθέντος ",
-  "Selling price": "Τιμή πωλήσεως"
+  "Selling price": "Τιμή πωλήσεως",
+  "Payment data included": "Συμπεριλαμβάνονται δεδομένα πληρωμής",
+  "Auto Dialer": "Σύστημα κλήσης έκτακτης ανάγκης",
+  "Sim Pin": "Καρφίτσα Sim",
+  "Place of Installation": "Τόπος εγκατάστασης",
+  "IoT Device": "Συσκευή IoT",
+  "Cage Weight": "Βάρος κλουβιού",
+  "Hoisting Height": "Ύψος ανύψωσης",
+  "Shaft Height": "Ύψος άξονα",
+  "Email address": "ηλεκτρονική διεύθυνση (email)",
+  "Number of People": "Αριθμός των ανθρώπων",
+  "Can't be less than 0": "Δεν μπορεί να είναι λιγότερο από 1"
 }

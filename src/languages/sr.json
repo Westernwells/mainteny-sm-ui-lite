@@ -3037,5 +3037,17 @@
   "Invoice number": "Broj fakture",
   "Pick article": "Izaberite članak",
   "Auto type": "Auto tip",
-  "Customer since": "Kupac od"
+  "Customer since": "Kupac od",
+  "Insert Link": "Umetni vezu",
+  "Email Signature updated successfully": "Potpis e-pošte je uspešno ažuriran",
+  "No email signatures": "Nema potpisa e-pošte",
+  "Create a customised email signature": "Napravite prilagođeni potpis e-pošte",
+  "New Signature": "Novi potpis",
+  "Enter the URL, email address, or telephone number:": "Unesite URL, adresu e-pošte ili broj telefona:",
+  "Lithuanian": "Litvanski",
+  "Email signature created successfully": "Potpis e-pošte je uspešno kreiran",
+  "Can't be less than 0": "Ne može biti manje od 0",
+  "Oh no, something went wrong!": "O ne, nešto je pošlo po zlu!",
+  "Please click the button below to reload the page and resolve any potential issues. If this doesn't help, feel free to contact our support team – we are happy to assist you!": "Kliknite na dugme ispod da biste ponovo učitali stranicu i rešili sve potencijalne probleme. Ako ovo ne pomogne, slobodno kontaktirajte naš tim za podršku – rado ćemo vam pomoći!",
+  "Refresh Page": "Osveži stranicu"
 }
