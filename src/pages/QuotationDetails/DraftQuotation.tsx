@@ -88,9 +88,8 @@ import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {addDays} from 'date-fns';
-import {cleanHtmlContent} from 'utils/text-block';
+import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
-import {getPlainStringFromHtml} from 'utils/rich-field-string';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
 
@@ -581,15 +580,10 @@ export const DraftQuotation = ({
 
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
     const updateFieldValue = (fieldName: string, currentValue: string) => {
-      // Remove first line if its empty
-      const plainTextValue = getPlainStringFromHtml(currentValue);
-      const isCurrentEmpty =
-        plainTextValue === '&nbsp;' || plainTextValue === '';
-
-      const newValue = cleanHtmlContent(
-        `${isCurrentEmpty ? '' : currentValue} ${rowParams.row.text}`.trim(),
+      formik.setFieldValue(
+        fieldName,
+        getUpdatedTextBlockValue(currentValue, rowParams.row.text),
       );
-      formik.setFieldValue(fieldName, newValue);
     };
 
     switch (textBlockField) {

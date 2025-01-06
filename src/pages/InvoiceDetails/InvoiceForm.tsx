@@ -116,7 +116,7 @@ import {SectionTitle} from './SectionTitle';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
 import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
 import {Notes} from './Notes/EditNotes';
-import {cleanHtmlContent} from 'utils/text-block';
+import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
 import {getInvoiceDueDate, GetInvoiceDueDateProps} from 'utils/invoice-utils';
 
@@ -529,10 +529,10 @@ export const InvoiceForm = ({
   );
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
     const updateFieldValue = (fieldName: string, currentValue: string) => {
-      const newValue = cleanHtmlContent(
-        `${currentValue} ${rowParams.row.text}`.trim(),
+      formik.setFieldValue(
+        fieldName,
+        getUpdatedTextBlockValue(currentValue, rowParams.row.text),
       );
-      formik.setFieldValue(fieldName, newValue);
     };
 
     switch (textBlockField) {
