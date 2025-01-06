@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Servis Yöneticisi Portalı",
   "Login": "Giriş yapmak",
-  "Email address": "E -posta adresi",
   "Password": "Şifre",
   "Forgot Password?": "Parolanızı mı unuttunuz?",
   "Enter a valid email": "Geçerli bir e-posta giriniz",
@@ -1884,5 +1883,8 @@
   "Do you want to mark this quotation as rejected?": "Bu alıntıyı reddedildiği gibi işaretlemek ister misiniz?",
   "Mark as rejected": "Reddedildiği gibi işaret",
   "Selling price": "Satış fiyatı",
-  "Payment data included": "Ödeme verileri dahil"
+  "Payment data included": "Ödeme verileri dahil",
+  "Auto Dialer": "Otomatik çevirici",
+  "Email address": "E -posta adresi",
+  "Can't be less than 0": "0'den az olamaz"
 }

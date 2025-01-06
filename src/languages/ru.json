@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Портал сервис-менеджера",
   "Login": "Авторизоваться",
-  "Email address": "Электронная почта ",
   "Password": "Пароль",
   "Forgot Password?": "Забыли пароль?",
   "Enter a valid email": "Введите действующую электронную почту",
@@ -1384,7 +1383,7 @@
   "Selected Unit": "Выбранное устройство",
   "Please describe what happened": "Пожалуйста, опишите, что случилось",
   "Send email": "Отправить электронное письмо",
-  "Email Address": "Адрес электронной почты",
+  "Email Address": "Электронная почта ",
   "Supplier Article": "Позиция поставщика",
   "No documents attached. They will appear here once added!": "Нет прикрепленных документов. Они появятся здесь после добавления!",
   "PAYMENT DUE": "ЗАПЛАТИТЬ ДО",
@@ -1987,7 +1986,6 @@
   "pack": "пакет",
   "Created on {{creationDate}}": "Создано {{creationDate}}",
   "Exclude previously downloaded data": "Исключить ранее загруженные данные",
-  "Payment data included": "Платежные данные включены",
   "Article cannot be empty": "Позиция не может быть пустой",
   "Article Type": "Тип позиции",
   "Article #": "Позиция #",
@@ -2703,5 +2701,16 @@
   "Quote(s) with notes": "Предложение(-я) с примечаниями",
   "Do you want to mark this quotation as rejected?": "Вы хотите отметить эту оферту как отклоненную",
   "Mark as rejected": "Отметить как отклоненную",
-  "Selling price": "Цена продажи"
+  "Selling price": "Цена продажи",
+  "Payment data included": "Платежные данные включены",
+  "Auto Dialer": "Автоответчик",
+  "Sim Pin": "Сим-пин",
+  "Place of Installation": "Место установки",
+  "IoT Device": "IoT-устройство",
+  "Cage Weight": "Вес клетки",
+  "Hoisting Height": "Высота подъема",
+  "Shaft Height": "Высота вала",
+  "Email address": "Адрес электронной почты",
+  "Number of People": "Число людей",
+  "Can't be less than 0": "Не может быть меньше 0"
 }

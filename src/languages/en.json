@@ -1,7 +1,6 @@
 {
   "Service Manager Portal": "Service Manager Portal",
   "Login": "Login",
-  "Email address": "Email address",
   "Password": "Password",
   "Forgot Password?": "Forgot Password?",
   "Enter a valid email": "Enter a valid email",
@@ -1379,7 +1378,7 @@
   "Selected Unit": "Selected Unit",
   "Please describe what happened": "Please describe what happened",
   "Send email": "Send email",
-  "Email Address": "Email Address",
+  "Email Address": "Email address",
   "Supplier Article": "Supplier Article",
   "No documents attached. They will appear here once added!": "No documents attached. They will appear here once added!",
   "PAYMENT DUE": "PAYMENT DUE",
@@ -1987,7 +1986,6 @@
   "pack": "pack",
   "Created on {{creationDate}}": "Created on {{creationDate}}",
   "Exclude previously downloaded data": "Exclude previously downloaded data",
-  "Payment data included": "Payment data included",
   "Article cannot be empty": "Article cannot be empty",
   "Article Type": "Article Type",
   "Article #": "Article #",
@@ -2573,5 +2571,15 @@
   "table_action_option.cancel": "Cancel",
   "Do you want to mark this quotation as rejected?": "Do you want to mark this quotation as rejected",
   "Mark as rejected": "Mark as rejected ",
-  "Selling price": "Selling Price"
+  "Selling price": "Selling Price",
+  "Auto Dialer": "Auto dialer",
+  "Sim Pin": "Sim pin",
+  "Place of Installation": "Place of installation",
+  "IoT Device": "IoT device",
+  "Cage Weight": "Cage weight",
+  "Hoisting Height": "Hoisting height",
+  "Shaft Height": "Shaft height",
+  "Email address": "Email Address",
+  "Number of People": "Number of people",
+  "Can't be less than 0": "Can't be less than 1"
 }
