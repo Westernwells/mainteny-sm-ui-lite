@@ -365,3 +365,9 @@ export interface ServiceCompanySystemSettings {
     maxContractorCount: number;
   };
 }
+
+export interface FetchElevatorDataSchemaParams {
+  pageIndex: number;
+  pageSize: number;
+  query?: string;
+}

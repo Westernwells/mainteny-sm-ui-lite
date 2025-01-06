@@ -6,6 +6,7 @@ export const queryKeys = {
   propertyManager: 'propertyManager',
   serviceManager: 'serviceManager',
   fetchAllElevators: 'fetchAllElevators',
+  fetchElevatorDataItems: 'fetchElevatorDataItems',
   fetchElevatorStatistics: 'fetchElevatorStatistics',
   fetchElevatorMaintenanceHistory: 'fetchElevatorMaintenanceHistory',
   queryServiceOrders: 'queryServiceOrders',
@@ -105,6 +106,7 @@ export const queryKeys = {
   fetchSystemSettings: 'fetchSystemSettings',
   fetchCompanyJobTypes: 'fetchCompanyJobTypes',
   fetchOldCompanyJobTypes: 'fetchOldCompanyJobTypes',
+  fetchElevatorDataSchemas: 'fetchElevatorDataSchemas',
   queryAllJobs: 'queryAllJobs',
   queryAllInvoices: 'queryAllInvoices',
   queryAllUnits: 'queryAllUnits',
@@ -126,4 +128,6 @@ export const queryKeys = {
   coordsToAddress: 'coordsToAddress',
   // Fetching config emails
   fetchCompanyEmailConfig: 'fetchCompanyEmailConfig',
+
+  getElevatorDataSchemasAffectedFields: 'getElevatorDataSchemasAffectedFields',
 };

@@ -24,6 +24,7 @@ import {ReactComponent as JobsIcon} from 'assets/icons/Jobs.svg';
 import {ReactComponent as MultiplePeople} from 'assets/icons/MultiplePeople.svg';
 import {ReactComponent as InvoiceIcon} from 'assets/icons/Invoice.svg';
 import {ReactComponent as BasicInfoIcon} from 'assets/icons/BasicInfoIcon.svg';
+import {ReactComponent as HierarchyIcon} from 'assets/icons/Hierarchy.svg';
 import {Button} from './Button';
 
 export interface Props extends BoxProps {
@@ -167,6 +168,12 @@ export const EmptySection = ({
       case 'quotation':
         return (
           <BasicInfoIcon
+            style={{width: '100%', height: '100%', color: illustrationColor}}
+          />
+        );
+      case 'hierarchy':
+        return (
+          <HierarchyIcon
             style={{width: '100%', height: '100%', color: illustrationColor}}
           />
         );

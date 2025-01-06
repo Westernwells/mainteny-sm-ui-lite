@@ -216,9 +216,11 @@ export const FormSelect = ({
           ],
         ]}
       </Select>
-      <FormHelperText sx={{color: 'error.main', mx: '0em'}}>
-        {errorText}
-      </FormHelperText>
+      {!!errorText && (
+        <FormHelperText sx={{color: 'error.main', mx: '0em'}}>
+          {errorText}
+        </FormHelperText>
+      )}
     </FormControl>
   );
 };
