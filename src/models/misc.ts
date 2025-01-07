@@ -149,6 +149,11 @@ export enum JobStatus {
   ERROR = 'ERROR',
 }
 
+export enum ReportStatus {
+  INIT = 'INIT',
+  COMPLETED = 'COMPLETED',
+}
+
 export interface DateRange {
   start: Date;
   end: Date;
