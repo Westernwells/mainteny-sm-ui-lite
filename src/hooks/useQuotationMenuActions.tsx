@@ -48,7 +48,7 @@ const useQuotationMenuActions = ({
       });
     }
 
-    if (quotation.status === QuotationStatus.DRAFT) {
+    if (quotation.status !== QuotationStatus.ACCEPTED) {
       items.push({
         label: t('Mark Accepted'),
         icon: <Check />,
@@ -56,11 +56,13 @@ const useQuotationMenuActions = ({
       });
     }
 
-    items.push({
-      label: t('Mark Rejected'),
-      icon: <Close />,
-      onClick: onMarkRejected,
-    });
+    if (quotation.status !== QuotationStatus.REJECTED) {
+      items.push({
+        label: t('Mark Rejected'),
+        icon: <Close />,
+        onClick: onMarkRejected,
+      });
+    }
 
     items.push({
       label: t('Duplicate'),
@@ -106,9 +108,11 @@ const useQuotationMenuActions = ({
     });
 
     if (
-      ![QuotationStatus.SENT_TO_CLIENT, QuotationStatus.ACCEPTED].includes(
-        quotation.status,
-      )
+      ![
+        QuotationStatus.SENT_TO_CLIENT,
+        QuotationStatus.ACCEPTED,
+        QuotationStatus.REJECTED,
+      ].includes(quotation.status)
     ) {
       items.push({
         label: t('Edit'),
