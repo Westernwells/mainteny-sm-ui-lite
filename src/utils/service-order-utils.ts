@@ -441,8 +441,7 @@ export const canMarkCompleted = (
     status === ServiceOrderStatus.SCHEDULED ||
     status === ServiceOrderStatus.TRAVEL ||
     status === ServiceOrderStatus.PAUSED ||
-    status === ServiceOrderStatus.IN_PROGRESS ||
-    status === ServiceOrderStatus.COMPLETED) &&
+    status === ServiceOrderStatus.IN_PROGRESS) &&
   schedulesCount > 0;
 
 export const getIsNotPendingStatus = (status: ServiceOrderStatus) =>

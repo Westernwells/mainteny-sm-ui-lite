@@ -298,9 +298,7 @@ export const ViewQuotation = ({
   };
 
   useEffect(() => {
-    if (quotation.status === QuotationStatus.DRAFT) {
-      generateBlobUrl();
-    }
+    generateBlobUrl();
   }, [quotation, headerUrl[headerInfo?.path], footerUrl[footerInfo?.path]]);
 
   const getExistingFiles = async (
@@ -381,9 +379,14 @@ export const ViewQuotation = ({
     }
   };
 
+  const shouldShowDownloadAsPrimaryAction = [
+    QuotationStatus.ACCEPTED,
+    QuotationStatus.REJECTED,
+  ].includes(quotation.status);
+
   const {actions} = useQuotationMenuActions({
     quotation,
-    onDownload: filePathToDownload ? downloadFile : undefined,
+    onDownload: !shouldShowDownloadAsPrimaryAction ? downloadFile : undefined,
     onDelete: () => setIsDeleteDialogOpen(true),
     onResend: handleOpenSendEmail,
     onMarkAccepted: () => setIsDialogOpen(true),
@@ -398,11 +401,7 @@ export const ViewQuotation = ({
     bottomDrawerPrimaryLabel: string;
     bottomDrawerPrimaryAction?: () => void;
   } = useMemo(() => {
-    if (
-      [QuotationStatus.ACCEPTED, QuotationStatus.REJECTED].includes(
-        quotation.status,
-      )
-    )
+    if (shouldShowDownloadAsPrimaryAction)
       return {
         bottomDrawerPrimaryLabel: 'Download',
         bottomDrawerPrimaryAction: handleDownload,

@@ -443,6 +443,7 @@ export const useUnscheduleServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
         enqueueSnackbar('Service job has been unscheduled', {
           variant: 'success',
         });
@@ -480,6 +481,8 @@ export const useUpdateServiceOrderSchedule = (
     {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
         if (successMsg)
           enqueueSnackbar(successMsg, {
             variant: 'success',
@@ -1002,6 +1005,7 @@ export const useArchiveServiceOrder = ({
 
   const handleSuccess = () => {
     queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+    queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
     enqueueSnackbar(message ?? `Service job has been updated`, {
       variant: 'success',
     });

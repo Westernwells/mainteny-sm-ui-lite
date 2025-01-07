@@ -300,6 +300,7 @@ const Actions = ({quotation}: Props) => {
 
   const {actions} = useQuotationMenuActions({
     quotation,
+    onSend: handleOpenSendEmail,
     onDownload: async () => {
       setActionType('DOWNLOAD');
       refetchDownloadUrl();
