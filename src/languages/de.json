@@ -3027,5 +3027,6 @@
   "Can't be less than 0": "Darf nicht kleiner als 0 sein",
   "Oh no, something went wrong!": "Oh nein, etwas ist schief gelaufen!",
   "Please click the button below to reload the page and resolve any potential issues. If this doesn't help, feel free to contact our support team – we are happy to assist you!": "Bitte klicken Sie auf die Schaltfläche unten, um die Seite neu zu laden und eventuelle Probleme zu beheben. Sollte dies nicht helfen, wenden Sie sich bitte an unser Support-Team - wir helfen Ihnen gerne weiter!",
-  "Refresh Page": "Seite aktualisieren"
+  "Refresh Page": "Seite aktualisieren",
+  "Change Payment Status": "Bezahlstatus ändern"
 }
