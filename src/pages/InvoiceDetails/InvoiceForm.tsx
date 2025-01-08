@@ -1430,7 +1430,7 @@ export const InvoiceForm = ({
   };
 
   const handleClearContractPaymentTermsModal = () => {
-    formik.setFieldValue('paymentTerm', '');
+    formik.setFieldValue('paymentTerm', undefined);
   };
 
   const removeAddress = (
@@ -1968,11 +1968,13 @@ export const InvoiceForm = ({
               name="paymentTerms"
               label="Payment terms"
               html={formik.values.paymentTerm?.term || ''}
-              updateHtml={(h) =>
-                formik.setFieldValue('paymentTerm', {
-                  ...formik.values.paymentTerm,
-                  term: h,
-                })
+              updateHtml={(term) =>
+                stripHtmlTags(term)
+                  ? formik.setFieldValue('paymentTerm', {
+                      ...formik.values.paymentTerm,
+                      term,
+                    })
+                  : formik.setFieldValue('paymentTerm', undefined)
               }
               minRows={2}
               onBlur={formik.handleBlur}
@@ -2105,7 +2107,6 @@ export const InvoiceForm = ({
                   ...formik.getFieldProps('dueDate'),
                 }}
                 disabled={!!formik.values.paymentTerm?.id}
-                required
               />
             </Box>
             {/* DELIVERY DATE */}

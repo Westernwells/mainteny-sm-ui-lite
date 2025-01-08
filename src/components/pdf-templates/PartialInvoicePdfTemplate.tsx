@@ -55,7 +55,6 @@ type Props = {
   footerPath: string;
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
-  showCurrentDateAsInvoiceDate?: boolean;
   pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
@@ -185,7 +184,6 @@ const PartialInvoicePdfTemplate = ({
   footerPath,
   nextCompanyExternalId,
   qrImageSrc,
-  showCurrentDateAsInvoiceDate,
   pdfConfigClientStorage,
 }: Props) => {
   const hasPreviousInvoices = previousInvoices!.length > 0;
@@ -342,7 +340,6 @@ const PartialInvoicePdfTemplate = ({
               invoice={invoice}
               selectedLng={selectedLng}
               nextCompanyExternalId={nextCompanyExternalId}
-              showCurrentDateAsInvoiceDate={showCurrentDateAsInvoiceDate}
             />
           </TopSectionContainer>
 
