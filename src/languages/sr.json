@@ -3049,5 +3049,8 @@
   "Oh no, something went wrong!": "O ne, nešto je pošlo po zlu!",
   "Please click the button below to reload the page and resolve any potential issues. If this doesn't help, feel free to contact our support team – we are happy to assist you!": "Kliknite na dugme ispod da biste ponovo učitali stranicu i rešili sve potencijalne probleme. Ako ovo ne pomogne, slobodno kontaktirajte naš tim za podršku – rado ćemo vam pomoći!",
   "Refresh Page": "Osveži stranicu",
-  "Change Payment Status": "Promenite status plaćanja"
+  "Change Payment Status": "Promenite status plaćanja",
+  "The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.": "Datum fakture se automatski postavlja kada pošaljete fakturu. Ako želite da sami unesete datum, zapamtite da ćete takođe morati ručno da podesite datum dospeća plaćanja.",
+  "The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.": "Datum dospeća plaćanja ove fakture kontrolišu vaši uslovi plaćanja. Automatski će se ažurirati nakon uređivanja i slanja. Ako želite da ručno kontrolišete rok dospeća plaćanja, uklonite uslove plaćanja.",
+  "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "Datum dospeća plaćanja se automatski ažurira ako ste dodali uslove plaćanja na fakturu. Ovi uslovi prilagođavaju datum dospeća kad god izmenite ili pošaljete fakturu. Ako ne koristite uslove plaćanja, možete ručno da podesite datum dospeća."
 }
