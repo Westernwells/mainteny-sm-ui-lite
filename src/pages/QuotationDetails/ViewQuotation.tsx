@@ -782,7 +782,10 @@ export const ViewQuotation = ({
       <SendEmailDialog
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
-        onClose={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => {
+          setIsSendEmailDialogOpen(false);
+          setActiveSignature(undefined);
+        }}
         id={quotation.id}
         confirmBtnDisabled={sendingQuotation}
         email={
@@ -818,7 +821,7 @@ export const ViewQuotation = ({
 
           let file: File | undefined;
 
-          if (activeSignature && activeSignature.content.images) {
+          if (activeSignature && activeSignature.content.images.length > 0) {
             const response = await fetch(
               signatureUrls[activeSignature.content.images[0]!],
             );
@@ -887,6 +890,8 @@ export const ViewQuotation = ({
               },
             },
           });
+
+          setActiveSignature(undefined);
         }}
         activeSignature={activeSignature}
         onSignatureSelect={(signature) => setActiveSignature(signature)}

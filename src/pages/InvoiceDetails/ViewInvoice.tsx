@@ -1700,6 +1700,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         onClose={() => {
           setIsSendEmailDialogOpen(false);
           setExistingFiles([]);
+          setActiveSignature(undefined);
         }}
         id={invoice.id}
         existingFiles={existingFiles}
@@ -1793,7 +1794,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
             let file: File | undefined;
 
-            if (activeSignature && activeSignature.content.images) {
+            if (activeSignature && activeSignature.content.images.length > 0) {
               const response = await fetch(
                 signatureUrls[activeSignature.content.images[0]!],
               );
@@ -1880,6 +1881,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             await sendEmail(updatedInvoice!);
             setIsSendingEmail(false);
             setIsSendEmailDialogOpen(false);
+            setActiveSignature(undefined);
           } catch (error) {
             setIsSendingEmail(false);
             throw error;

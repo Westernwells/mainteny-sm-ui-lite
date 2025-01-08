@@ -18,13 +18,17 @@ export const generateSignatureHtml = (
   value: EmailSignature,
   isPreview: boolean,
   logoUrl: string,
-): string => {
-  const imageSrc = isPreview ? logoUrl : `cid:${value.content.images[0]}`;
+): string | undefined => {
+  if (!value?.content.html) {
+    return undefined;
+  }
+
+  const imageSrc = isPreview ? logoUrl : `cid:${value?.content.images[0]}`;
 
   const imageHtml =
-    value.content.images &&
-    value.content.images.length > 0 &&
-    value.content.images[0] !== ''
+    value?.content.images &&
+    value?.content.images.length > 0 &&
+    value?.content.images[0] !== ''
       ? `<tr>
           <td>
             <img src="${imageSrc}" 
