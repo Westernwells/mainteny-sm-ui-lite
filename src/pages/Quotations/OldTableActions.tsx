@@ -36,11 +36,7 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {
-  companyLanguageContextMap,
-  createFilesFromBlobArray,
-  fetchFile,
-} from 'utils/utils';
+import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {pdf} from '@react-pdf/renderer';
 import {useCurrentCurrency} from 'utils/currency';
@@ -54,6 +50,7 @@ import {
 } from 'utils/constants';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
+import {companyLanguageContextMap} from 'utils/language';
 
 interface Props {
   quotation: QuotationView;
@@ -527,7 +524,10 @@ const OldTableActions = ({quotation}: Props) => {
         isLoadingFiles={isLoadingFiles}
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
-        onClose={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => {
+          setIsSendEmailDialogOpen(false);
+          setActiveSignature(undefined);
+        }}
         id={quotation.id}
         email={
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
@@ -561,7 +561,7 @@ const OldTableActions = ({quotation}: Props) => {
 
           let file: File | undefined;
 
-          if (activeSignature && activeSignature.content.images) {
+          if (activeSignature && activeSignature.content.images.length > 0) {
             const response = await fetch(
               signatureUrls[activeSignature.content.images[0]!],
             );
@@ -632,6 +632,7 @@ const OldTableActions = ({quotation}: Props) => {
           });
 
           setIsConfirmPrintDialogOpen(false);
+          setActiveSignature(undefined);
         }}
         activeSignature={activeSignature}
         onSignatureSelect={(signature) => setActiveSignature(signature)}

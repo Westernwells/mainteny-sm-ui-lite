@@ -2249,8 +2249,8 @@
   "Add Priority Engineer": "Prioritäts Techniker hinzufügen",
   "Edit Priority Engineer": "Prioritäts Techniker bearbeiten",
   "Technical Data": "Technische Daten",
-  "Number of stops": "Anzahl der Stopps",
-  "# stops": "# Stopps",
+  "Number of stops": "Anzahl Haltestellen",
+  "# stops": "# Haltestellen",
   "Drive": "Antrieb",
   "Capacity (kg)": "Kapazität (kg)",
   "Capacity": "Kapazität",
@@ -3028,5 +3028,9 @@
   "Can't be less than 0": "Darf nicht kleiner als 0 sein",
   "Oh no, something went wrong!": "Oh nein, etwas ist schief gelaufen!",
   "Please click the button below to reload the page and resolve any potential issues. If this doesn't help, feel free to contact our support team – we are happy to assist you!": "Bitte klicken Sie auf die Schaltfläche unten, um die Seite neu zu laden und eventuelle Probleme zu beheben. Sollte dies nicht helfen, wenden Sie sich bitte an unser Support-Team - wir helfen Ihnen gerne weiter!",
-  "Refresh Page": "Seite aktualisieren"
+  "Refresh Page": "Seite aktualisieren",
+  "Change Payment Status": "Bezahlstatus ändern",
+  "The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.": "Das Rechnungsdatum wird automatisch festgelegt, wenn Sie die Rechnung senden. Wenn Sie das Datum selbst eingeben möchten, denken Sie daran, dass Sie auch das Zahlungsfälligkeitsdatum manuell festlegen müssen.",
+  "The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.": "Das Zahlungsfälligkeitsdatum dieser Rechnung wird durch Ihre Zahlungsbedingungen gesteuert. Es wird automatisch aktualisiert, wenn Sie die Rechnung bearbeiten und senden. Wenn Sie das Zahlungsfälligkeitsdatum manuell festlegen möchten, entfernen Sie bitte die Zahlungsbedingungen.",
+  "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "Das Zahlungsfälligkeitsdatum wird automatisch aktualisiert, wenn Sie Zahlungsbedingungen zur Rechnung hinzugefügt haben. Diese Bedingungen passen das Fälligkeitsdatum jedes Mal an, wenn Sie die Rechnung bearbeiten oder senden. Wenn Sie keine Zahlungsbedingungen verwenden, können Sie das Fälligkeitsdatum manuell festlegen."
 }

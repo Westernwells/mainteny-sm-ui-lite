@@ -5,8 +5,8 @@ import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import {axiosClient} from 'utils/axios-utils';
-import {languageMap} from 'utils/utils';
 import useTheme from '@mui/material/styles/useTheme';
+import {languageMap} from 'utils/language';
 import {ReactComponent as PolygonTop} from '../assets/icons/polygonTop.svg';
 import {ReactComponent as PolygonBottom} from '../assets/icons/polygonBottom.svg';
 import {ReactComponent as MaintenyLogo} from '../assets/icons/MaintenyLogo.svg';
@@ -140,6 +140,8 @@ export const AuthLayout = ({children}: Props) => {
                 ? 'Greek'
                 : selectedLng === 'TR'
                 ? 'Turkish'
+                : selectedLng === 'LT'
+                ? 'Lithuanian'
                 : 'English'
             }
             menu={[
@@ -182,6 +184,10 @@ export const AuthLayout = ({children}: Props) => {
               {
                 label: 'Turkish',
                 action: () => changeLanguage('tr-tr', 'TR'),
+              },
+              {
+                label: 'Lithuanian',
+                action: () => changeLanguage('it-lt', 'LT'),
               },
             ]}
           />

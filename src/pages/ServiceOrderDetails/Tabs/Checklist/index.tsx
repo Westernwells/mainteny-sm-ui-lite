@@ -48,11 +48,7 @@ import {
   ServiceOrderCheckListView,
 } from 'models/checklist';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {
-  companyLanguageContextMap,
-  createFilesFromBlobArray,
-  fetchFile,
-} from 'utils/utils';
+import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -75,6 +71,7 @@ import {
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {UserAccount} from 'models/user';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
+import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature} from 'models/employee';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
@@ -847,7 +844,10 @@ export const CheckList = ({serviceOrder}: Props) => {
 
                     <SendEmailDialog
                       open={isSendEmailDialogOpen}
-                      onClose={() => setIsSendEmailDialogOpen(false)}
+                      onClose={() => {
+                        setIsSendEmailDialogOpen(false);
+                        setActiveSignature(undefined);
+                      }}
                       confirmBtnDisabled={sendingCheckList}
                       email={
                         serviceOrder.elevator.propertyOwner?.additionalInfo
@@ -893,7 +893,10 @@ export const CheckList = ({serviceOrder}: Props) => {
 
                         let file: File | undefined;
 
-                        if (activeSignature && activeSignature.content.images) {
+                        if (
+                          activeSignature &&
+                          activeSignature.content.images.length > 0
+                        ) {
                           const response = await fetch(
                             signatureUrls[activeSignature.content.images[0]!],
                           );
@@ -969,6 +972,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                             },
                           },
                         });
+                        setActiveSignature(undefined);
                       }}
                       activeSignature={activeSignature}
                       onSignatureSelect={(signature) =>

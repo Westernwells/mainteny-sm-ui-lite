@@ -7,12 +7,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import ReplayIcon from '@mui/icons-material/Replay';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import SendIcon from '@mui/icons-material/Send';
-import Print from '@mui/icons-material/Print';
-import Edit from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import {addDays} from 'date-fns';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
@@ -41,6 +36,7 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {MarkAsPaidDialog} from 'components/MarkAsPaidDialog';
 import {
+  useCancelInvoice,
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
   useFetchXInvoiceByInvoiceId,
@@ -85,7 +81,6 @@ import {
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
-  companyLanguageContextMap,
   createFilesFromBlobArray,
   dateToString,
   decideAttachmentDescriptionForInvoiceEmail,
@@ -118,8 +113,10 @@ import {
 import XMLViewer from 'react-xml-viewer';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
+import useInvoiceMenuActions from 'hooks/useInvoiceMenuActions';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
+import {companyLanguageContextMap} from 'utils/language';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -148,6 +145,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const [qrImageSrc, setQrImageSrc] = useState<string>('');
   const [qrError, setQrError] = useState<string | null>(null);
   const [xmlHtmlContent, setXmlHtmlContent] = useState('');
+  const [isCreateCreditNoteDialogOpen, setIsCreateCreditNoteDialogOpen] =
+    useState(false);
+  const [isCancelledDialogOpen, setIsCancelledDialogOpen] = useState(false);
 
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
@@ -160,6 +160,8 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {data: signatureUrls = {}} = useDownloadUrl(
     activeSignature?.content?.images || [],
   );
+
+  const {mutateAsync: cancelInvoice} = useCancelInvoice();
 
   const memorizedUpdateInvoiceData = useMemo(
     () =>
@@ -582,14 +584,12 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     footerBlockUrl,
     invoiceNumber,
     setInState = true,
-    showCurrentDateAsInvoiceDate = false,
   }: {
     invoiceData: InvoiceView;
     headerBlockUrl: {[key: string]: string};
     footerBlockUrl: {[key: string]: string};
     invoiceNumber?: string;
     setInState?: boolean;
-    showCurrentDateAsInvoiceDate?: boolean;
   }) => {
     if (
       user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
@@ -646,7 +646,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         headerInfo={headerInfo}
         footerPath={footerBlockUrl[footerInfo?.path]}
         footerInfo={footerInfo}
-        showCurrentDateAsInvoiceDate={showCurrentDateAsInvoiceDate}
         nextCompanyExternalId={
           invoiceNumber || translate('Automatically assigned')
         }
@@ -658,7 +657,50 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     return blob;
   };
 
+  const qrCurrency: QRCurrencyCode =
+    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
+      ? currentCurrency.code
+      : 'EUR';
+
+  const checkValidQrCode = useCallback(
+    debounce(async (qrInvoice: InvoiceView) => {
+      if (
+        user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+        invoice.status === InvoiceStatus.DRAFT
+      ) {
+        try {
+          const qrBillData = createQrData(
+            qrCurrency,
+            qrInvoice,
+            currentCurrency,
+            user?.userAccount,
+          );
+
+          const qrBillSvg = new SwissQRBill(qrBillData);
+
+          svgToJpegPng(
+            qrBillSvg.element as unknown as SVGSVGElement,
+            (result) => {
+              setQrImageSrc(result);
+            },
+            {format: 'jpeg', quality: 1},
+          );
+          setQrError(null);
+          return '';
+        } catch (error) {
+          if (error instanceof Error) {
+            setQrError(error.message);
+            return error.message;
+          }
+        }
+      }
+    }, 500),
+    [user, currentCurrency, qrCurrency],
+  );
+
   const handleDownload = async () => {
+    await checkValidQrCode(invoice);
+
     if (
       user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
       !qrImageSrc &&
@@ -691,6 +733,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         footerBlockUrl: footerUrl,
         setInState: false,
       });
+
       const blobURL = URL.createObjectURL(blob!);
       const xmlBlobURL = URL.createObjectURL(xmlBlob!);
 
@@ -826,7 +869,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           footerBlockUrl: footerUrl,
           invoiceNumber: companyNextNumber?.value,
           setInState: false,
-          showCurrentDateAsInvoiceDate: true,
         }).then((blobFile) =>
           createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
         )) || Promise.resolve([]);
@@ -957,47 +999,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     setExistingFiles(allFiles);
   };
 
-  const qrCurrency: QRCurrencyCode =
-    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
-      ? currentCurrency.code
-      : 'EUR';
-
-  const checkValidQrCode = useCallback(
-    debounce(async (qrInvoice: InvoiceView) => {
-      if (
-        user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
-        invoice.status === InvoiceStatus.DRAFT
-      ) {
-        try {
-          const qrBillData = createQrData(
-            qrCurrency,
-            qrInvoice,
-            currentCurrency,
-            user?.userAccount,
-          );
-
-          const qrBillSvg = new SwissQRBill(qrBillData);
-
-          svgToJpegPng(
-            qrBillSvg.element as unknown as SVGSVGElement,
-            (result) => {
-              setQrImageSrc(result);
-            },
-            {format: 'jpeg', quality: 1},
-          );
-          setQrError(null);
-          return '';
-        } catch (error) {
-          if (error instanceof Error) {
-            setQrError(error.message);
-            return error.message;
-          }
-        }
-      }
-    }, 500),
-    [user, currentCurrency, qrCurrency],
-  );
-
   useEffect(() => {
     if (
       invoice &&
@@ -1078,73 +1079,23 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     }
   }, [invoice, companyNextNumber, generateBlobUrl]);
 
-  const actions = useMemo(() => {
-    const items = [];
-
-    if (invoice.status === InvoiceStatus.EXPIRED) {
-      items.push({
-        label: t('Send Overdue Notice'),
-        icon: <SendIcon />,
-        onClick: () => navigate(`/invoices/${invoice.id}/overdue-notice`),
-      });
-      items.push({
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
-    } else if (invoice.status === InvoiceStatus.NOT_PAID) {
-      items.push({
-        label: t('Resend'),
-
-        icon: <ReplayIcon />,
-        onClick: () => {
-          handleOpenSendInvoiceModal();
-        },
-      });
-    }
-
-    if (
-      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
-    ) {
-      items.push({
-        label: t('Edit'),
-        icon: <Edit />,
-        onClick: () => {
-          navigate(`/invoices/details/${invoice.id}/edit`);
-        },
-      });
-    }
-
-    if (
-      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(invoice.status)
-    ) {
-      items.push({
-        label: t('Delete'),
-        icon: <DeleteIcon />,
-        onClick: () => {
-          setIsDeleteDialogOpen(true);
-        },
-      });
-    } else if (invoice.sentDate || invoice.status === InvoiceStatus.CANCELLED) {
-      return items.filter((item) => item.label !== t('Edit'));
-    }
-
-    if (
-      ![
-        InvoiceStatus.CANCELLED,
-        InvoiceStatus.PARTIALLY_PAID,
-        InvoiceStatus.CREDITED,
-      ].includes(invoice.status)
-    ) {
-      items.push({
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
-    }
-
-    return items;
-  }, [downloadUrl, invoice.status, t, companyNextNumber?.value]);
+  const {actions} = useInvoiceMenuActions({
+    invoice,
+    isChecklistImageLoading,
+    showPreview: false,
+    showSend: false,
+    onSend: handleOpenSendInvoiceModal,
+    onPrint: () => setIsConfirmPrintDialogOpen(true),
+    onCreateCreditNote: () => setIsCreateCreditNoteDialogOpen(true),
+    onDownload: handleDownload,
+    onDelete: () => {
+      setIsDeleteDialogOpen(true);
+    },
+    onCancel: () => {
+      setIsCancelledDialogOpen(true);
+    },
+    onResend: handleOpenSendInvoiceModal,
+  });
 
   useEffect(() => {
     if (
@@ -1749,6 +1700,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         onClose={() => {
           setIsSendEmailDialogOpen(false);
           setExistingFiles([]);
+          setActiveSignature(undefined);
         }}
         id={invoice.id}
         existingFiles={existingFiles}
@@ -1842,7 +1794,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
             let file: File | undefined;
 
-            if (activeSignature && activeSignature.content.images) {
+            if (activeSignature && activeSignature.content.images.length > 0) {
               const response = await fetch(
                 signatureUrls[activeSignature.content.images[0]!],
               );
@@ -1877,7 +1829,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                   externalId:
                     invoiceData?.externalId || companyNextNumber?.value || '',
                   dueDate,
-                  sentDate: dateToString(new Date()), // Updating the invoice send date to reflect when it was actually send
+                  sentDate: invoiceData?.sentDate || dateToString(new Date()),
                   email: {
                     email: '',
                     subject: emailRecord.subject,
@@ -1929,6 +1881,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
             await sendEmail(updatedInvoice!);
             setIsSendingEmail(false);
             setIsSendEmailDialogOpen(false);
+            setActiveSignature(undefined);
           } catch (error) {
             setIsSendingEmail(false);
             throw error;
@@ -1985,6 +1938,51 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         onConfirm={onPrintInvoice}
         onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
+
+      {isCreateCreditNoteDialogOpen && (
+        <Confirm
+          open={isCreateCreditNoteDialogOpen}
+          onConfirm={() => {
+            setIsCreateCreditNoteDialogOpen(false);
+            navigate(
+              `/invoices/new?invoiceId=${invoice.id}&invoiceType=${InvoiceType.CREDIT_NOTE}`,
+            );
+          }}
+          onClose={() => setIsCreateCreditNoteDialogOpen(false)}
+          title="Create Credit note"
+          content="This action will create a credit note from this invoice details."
+          helperText="Do you want to proceed?"
+        />
+      )}
+
+      {isCancelledDialogOpen && (
+        <Confirm
+          open={isCancelledDialogOpen}
+          onConfirm={() => {
+            if (invoice.id)
+              cancelInvoice(invoice.id, {
+                onSuccess: () => {
+                  enqueueSnackbar(
+                    <CustomSnackbar
+                      message="Invoice cancelled"
+                      snackIcon="cancel"
+                    />,
+                    {
+                      variant: 'info',
+                      anchorOrigin: {horizontal: 'right', vertical: 'bottom'},
+                    },
+                  );
+                },
+              });
+
+            setIsCancelledDialogOpen(false);
+          }}
+          onClose={() => setIsCancelledDialogOpen(false)}
+          title="Cancel Invoice"
+          content="You are about to cancel this invoice."
+          helperText="Are you sure you want to proceed?"
+        />
+      )}
 
       {/* Hidden container for XML content to be printed */}
       <div id="xml-content">

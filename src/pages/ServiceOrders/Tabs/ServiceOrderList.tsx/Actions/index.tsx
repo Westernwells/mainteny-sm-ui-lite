@@ -1,66 +1,81 @@
-import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import UndoIcon from '@mui/icons-material/Undo';
 import React, {useMemo, useState} from 'react';
-import {Action} from 'models/table';
 import TableActionMenu from 'components/Table/TableActionMenu';
 import ChangePaymentStatusDialog from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ChangePaymentStatusDialog';
 import {
   useArchiveServiceOrder,
   useCancelServiceOrders,
   useUncompleteServiceOrder,
+  useUnscheduleServiceOrders,
 } from 'hooks/reactQuery/useServiceOrder';
-import {ServiceOrderStatus} from 'models/service-order';
+import {ServiceOrderView} from 'models/service-order';
 import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
+import useServiceOrderMenuActions from 'hooks/useServiceOrderMenuActions';
+import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
+import {getDefaultTechnician, getDialogTitle} from 'utils/service-order-utils';
+import {useTranslation} from 'react-i18next';
+import {Confirm} from 'components/Confirm';
+import {MarkCompletedDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/MarkCompletedDialog';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
+import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useCurrentCurrency} from 'utils/currency';
+import {companyLanguageContextMap} from 'utils/language';
 
 type Props = {
-  id: string;
-  status: ServiceOrderStatus;
+  serviceOrder: ServiceOrderView;
 };
 
-const Actions = ({id, status}: Props) => {
+const Actions = ({serviceOrder}: Props) => {
+  const {t} = useTranslation();
+  const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
+
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
   const [open, setOpen] = useState<boolean>(false);
+  const [openScheduleDialog, setOpenScheduleDialog] = useState(false);
+  const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
+  const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
 
   const {mutateAsync: handleUncompleteServiceOrder} = useUncompleteServiceOrder(
     {
-      serviceOrderId: id,
+      serviceOrderId: serviceOrder.id,
       message: 'Service job has been restored',
     },
   );
 
   const {mutateAsync: archiveServiceOrder} = useArchiveServiceOrder({
-    serviceOrderId: id,
+    serviceOrderId: serviceOrder.id,
     action: ARCHIVE_ACTION.ARCHIVE,
     message: 'Service job has been archived',
   });
   const {mutateAsync: unarchiveServiceOrder} = useArchiveServiceOrder({
-    serviceOrderId: id,
+    serviceOrderId: serviceOrder.id,
     action: ARCHIVE_ACTION.UNARCHIVE,
     message: 'Service job has been unarchived',
   });
 
   const {mutateAsync: cancelServiceOrder} = useCancelServiceOrders({
-    serviceOrderId: id,
+    serviceOrderId: serviceOrder.id,
     action: CANCEL_ACTION.CANCEL,
   });
   const {mutateAsync: uncancelServiceOrder} = useCancelServiceOrders({
-    serviceOrderId: id,
+    serviceOrderId: serviceOrder.id,
     action: CANCEL_ACTION.UNCANCEL,
     message: 'Service job has been restored',
   });
 
-  const handleOpenDeleteConfirm = () => {
-    setOpenPaymentStatusChange(true);
+  const {mutate: unscheduleServiceOrder} = useUnscheduleServiceOrders();
+
+  const handleOpenChangeClick = (value: boolean) => () => {
+    setOpenPaymentStatusChange(value);
   };
 
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const handleDeleteDialogClose = () => {
-    setOpenPaymentStatusChange(false);
   };
 
   const handleArchiveClick = (action: ARCHIVE_ACTION) => async () => {
@@ -82,77 +97,145 @@ const Actions = ({id, status}: Props) => {
     handleClose();
   };
 
-  const OPTIONS = useMemo<Action[]>(
-    () => [
-      {
-        icon: CompareArrowsOutlinedIcon,
-        label: 'Change payment status',
-        onTrigger: handleOpenDeleteConfirm,
-      },
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
 
-      ...(![ServiceOrderStatus.ARCHIVED, ServiceOrderStatus.CANCELLED].includes(
-        status,
-      )
-        ? [
-            {
-              icon: CancelOutlinedIcon,
-              label: 'table_action_option.cancel',
-              onTrigger: handleCancelClick(CANCEL_ACTION.CANCEL),
-            },
-          ]
-        : []),
+  const translate = useMemo(
+    () => (key: string, options?: {context: string}) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key, options);
+      }
 
-      ...(status === ServiceOrderStatus.CANCELLED
-        ? [
-            {
-              icon: CancelOutlinedIcon,
-              label: 'Undo cancellation',
-              onTrigger: handleCancelClick(CANCEL_ACTION.UNCANCEL),
-            },
-          ]
-        : []),
-
-      ...(status !== ServiceOrderStatus.ARCHIVED
-        ? [
-            {
-              icon: Inventory2OutlinedIcon,
-              label: 'Archive',
-              onTrigger: handleArchiveClick(ARCHIVE_ACTION.ARCHIVE),
-            },
-          ]
-        : []),
-
-      ...(status === ServiceOrderStatus.ARCHIVED
-        ? [
-            {
-              icon: Inventory2OutlinedIcon,
-              label: 'Unarchive',
-              onTrigger: handleArchiveClick(ARCHIVE_ACTION.UNARCHIVE),
-            },
-          ]
-        : []),
-
-      ...(status === ServiceOrderStatus.COMPLETED
-        ? [
-            {
-              icon: UndoIcon,
-              label: 'Reopen',
-              onTrigger: () => handleUncompleteServiceOrder(),
-            },
-          ]
-        : []),
-    ],
-    [status],
+      return t(key, options);
+    },
+    [company?.language],
   );
+
+  const {data: clientStorageData} = useQueryClientStorageData({
+    serviceCompanyId: company?.id!,
+    params: {key: 'pdf-template'},
+  });
+
+  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
+  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+
+  const {data: headerUrl = {}} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: footerUrl = {}} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    company?.id,
+  );
+
+  const {data: quotation} = useQuotationDetails(
+    serviceOrder?.additionalInfo.quotationId,
+  );
+
+  const {createAndSetPdfBlobUrl} = useCreateAndSetPdfBlobUrl({
+    serviceOrder,
+    quotation,
+    userInfo: user?.userAccount,
+    currentCurrency,
+    headerInfo,
+    headerPath: headerUrl[headerInfo?.path],
+    footerInfo,
+    footerPath: footerUrl[footerInfo?.path],
+    translate,
+    fileName: serviceOrder?.number,
+    selectedLng: company?.language,
+  });
+
+  const handleMenuItemClick = () => {
+    createAndSetPdfBlobUrl();
+  };
+
+  const {actions} = useServiceOrderMenuActions({
+    serviceOrder,
+    onChangeStatus: handleOpenChangeClick(true),
+    onReopen: () => handleUncompleteServiceOrder(),
+    onCancel: handleCancelClick(CANCEL_ACTION.CANCEL),
+    onUndoCancel: handleCancelClick(CANCEL_ACTION.UNCANCEL),
+    onArchive: handleArchiveClick(ARCHIVE_ACTION.ARCHIVE),
+    onUnarchive: handleArchiveClick(ARCHIVE_ACTION.UNARCHIVE),
+    onSchedule: () => setOpenScheduleDialog(true),
+    onReschedule: () => setOpenScheduleDialog(true),
+    onUnschedule: () => setOpenUnscheduleConfirm(true),
+    onMarkCompleted: () => setOpenMarkCompletedDialog(true),
+    onDownload: handleMenuItemClick,
+  });
 
   return (
     <>
-      <TableActionMenu options={OPTIONS} isOpen={open} onToggle={setOpen} />
+      <TableActionMenu options={actions} isOpen={open} onToggle={setOpen} />
       <ChangePaymentStatusDialog
         open={openPaymentStatusChange}
-        id={id}
-        onClose={handleDeleteDialogClose}
+        id={serviceOrder.id}
+        onClose={handleOpenChangeClick(false)}
       />
+
+      {openScheduleDialog && (
+        <ScheduleDialog
+          serviceOrderId={serviceOrder.id}
+          serviceOrderType={serviceOrder.type}
+          title={t(getDialogTitle(serviceOrder))}
+          open={openScheduleDialog}
+          onClose={() => setOpenScheduleDialog(false)}
+          defaultTechnicians={getDefaultTechnician(serviceOrder)}
+          defaultStartDate={
+            serviceOrder.schedules.length
+              ? new Date(serviceOrder.schedules[0].startTime)
+              : null
+          }
+          defaultEndDate={
+            serviceOrder.schedules.length
+              ? new Date(serviceOrder.schedules[0].endTime)
+              : null
+          }
+          defaultDueDate={
+            serviceOrder.dueDate ? new Date(serviceOrder.dueDate) : null
+          }
+          defaultCallTime={
+            serviceOrder.additionalInfo?.callerInfo?.calledAt
+              ? new Date(serviceOrder.additionalInfo.callerInfo.calledAt)
+              : null
+          }
+          defaultCallerName={serviceOrder.additionalInfo?.callerInfo?.name}
+          defaultPurchaseOrderNumber={
+            serviceOrder.additionalInfo.purchaseOrderNumber
+          }
+          defaultCallerPhoneNumber={
+            serviceOrder.additionalInfo?.callerInfo?.phoneNumber
+          }
+        />
+      )}
+
+      {openUnscheduleConfirm && (
+        <Confirm
+          open={openUnscheduleConfirm}
+          onConfirm={() => {
+            unscheduleServiceOrder(serviceOrder.id);
+            setOpenUnscheduleConfirm(false);
+          }}
+          onClose={() => setOpenUnscheduleConfirm(false)}
+          title="Confirm"
+          content="Do you want to unschedule the service job?"
+        />
+      )}
+
+      {openMarkCompletedDialog && (
+        <MarkCompletedDialog
+          serviceOrderDetails={serviceOrder}
+          title={t('Mark Completed')}
+          open={openMarkCompletedDialog}
+          onClose={() => setOpenMarkCompletedDialog(false)}
+        />
+      )}
     </>
   );
 };

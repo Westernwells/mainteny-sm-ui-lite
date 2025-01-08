@@ -11,6 +11,7 @@ import ka from './languages/ka.json';
 import es from './languages/es.json';
 import gr from './languages/gr.json';
 import tr from './languages/tr.json';
+import lt from './languages/lt.json';
 
 export const resources = {
   de: {
@@ -42,6 +43,9 @@ export const resources = {
   },
   tr: {
     translation: tr,
+  },
+  lt: {
+    translation: lt,
   },
 };
 

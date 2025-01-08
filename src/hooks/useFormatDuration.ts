@@ -1,7 +1,7 @@
 import {formatDuration, Locale} from 'date-fns';
 import {useCallback} from 'react';
 import {locales} from 'utils/datetime';
-import {mapLanguageToLocale} from 'utils/utils';
+import {mapLanguageToLocale} from 'utils/language';
 import {useUserSession} from './reactQuery/useUserSession';
 
 export interface DateDuration {

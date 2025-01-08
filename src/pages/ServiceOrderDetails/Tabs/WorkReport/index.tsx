@@ -39,7 +39,6 @@ import {convertDigitalMinsToHM} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSearchParams} from 'react-router-dom';
 import {
-  companyLanguageContextMap,
   convertToText,
   createFilesFromBlobArray,
   fetchFile,
@@ -72,6 +71,7 @@ import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
+import {companyLanguageContextMap} from 'utils/language';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -399,7 +399,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
     let file: File | undefined;
 
-    if (activeSignature && activeSignature.content.images) {
+    if (activeSignature && activeSignature.content.images.length > 0) {
       const response = await fetch(
         signatureUrls[activeSignature.content.images[0]!],
       );
@@ -432,6 +432,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
       report,
       signatureAttachment as FileWithPreview,
     );
+
+    setActiveSignature(undefined);
   };
 
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
@@ -864,7 +866,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
       <SendEmailDialog
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
-        onClose={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => {
+          setIsSendEmailDialogOpen(false);
+          setActiveSignature(undefined);
+        }}
         confirmBtnDisabled={sendingWorkReport}
         title="Send work report"
         confirmBtnLabel="Send Work Report"

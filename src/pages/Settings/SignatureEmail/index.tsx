@@ -132,19 +132,20 @@ const SignatureEmail = () => {
   };
 
   const onSubmit = async (data: FormValues) => {
-    const file = watch('logoFile') as unknown as FileWithPreview;
+    const file = watch('logoFile') as unknown as FileWithPreview | null;
     const uploadPath = `${serviceCompanyId}/employees/${userAccount?.userData
       .employeeId!}`;
 
-    const trimmedFileName = file?.name.replace(/\s+/g, '');
-
-    const fileWithTrimmedName = new File([file], trimmedFileName, {
-      type: file.type,
-    });
-
-    const photoUrl = `${uploadPath}/${trimmedFileName}`;
+    let finalLogoUrl: string[] = [];
 
     if (file && typeof file !== 'string') {
+      const trimmedFileName = file.name.replace(/\s+/g, '');
+      const fileWithTrimmedName = new File([file], trimmedFileName, {
+        type: file.type,
+      });
+
+      finalLogoUrl = [`${uploadPath}/${trimmedFileName}`];
+
       await uploadImages({
         files: [fileWithTrimmedName],
         uploadPath,
@@ -155,9 +156,10 @@ const SignatureEmail = () => {
       employeeId: userAccount?.userData.employeeId!,
       body: {
         name: `${user?.userAccount.firstName} ${user?.userAccount.lastName}`,
-        content: {images: [watch('logoFile') ? photoUrl : ''], html: data.text},
+        content: {images: finalLogoUrl, html: data.text},
       },
     });
+
     setOpenEditDialog(false);
     setIsEditMode(false);
     reset();
@@ -165,10 +167,9 @@ const SignatureEmail = () => {
   };
 
   const onSubmitEdit = async (data: FormValues) => {
-    const logoFile = watch('logoFile');
+    const logoFile = watch('logoFile') as File | null;
     const uploadPath = `${serviceCompanyId}/employees/${userAccount?.userData.employeeId}`;
 
-    let imagesToUpload: (File | FileWithPreview)[] = [];
     let finalLogoUrl: string[] = [];
 
     if (logoFile) {
@@ -179,10 +180,8 @@ const SignatureEmail = () => {
 
       finalLogoUrl = [`${uploadPath}/${trimmedFileName}`];
 
-      imagesToUpload = [fileWithTrimmedName];
-
       await uploadImages({
-        files: imagesToUpload,
+        files: [fileWithTrimmedName],
         uploadPath,
       });
     } else if (!watch('logoUrl')) {

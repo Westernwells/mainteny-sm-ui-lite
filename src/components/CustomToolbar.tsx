@@ -22,7 +22,11 @@ const CustomToolBar = ({toolBarTitle, onClose, isDatePicker}: Props) => {
         alignItems: 'center',
         position: 'relative',
       }}>
-      <Typography variant="subtitle2">{t(`${toolBarTitle}`)}</Typography>
+      {typeof toolBarTitle === 'string' ? (
+        <Typography variant="subtitle2">{t(`${toolBarTitle}`)}</Typography>
+      ) : (
+        toolBarTitle
+      )}
 
       {isDatePicker && (
         <Button

@@ -16,7 +16,7 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useParams, useSearchParams} from 'react-router-dom';
-import {companyLanguageContextMap, formatSearchParams} from 'utils/utils';
+import {formatSearchParams} from 'utils/utils';
 import {Box, Typography} from '@mui/material';
 import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -32,6 +32,7 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import {companyLanguageContextMap} from 'utils/language';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';

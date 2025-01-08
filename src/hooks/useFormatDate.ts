@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 import {formatDate, locales} from 'utils/datetime';
-import {mapLanguageToLocale} from 'utils/utils';
+import {mapLanguageToLocale} from 'utils/language';
 import {useUserSession} from './reactQuery/useUserSession';
 
 export const useFormatDate = () => {

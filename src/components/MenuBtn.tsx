@@ -9,6 +9,7 @@ import {MouseEvent, useState} from 'react';
 import {ListItemIcon, MenuListProps} from '@mui/material';
 
 interface Props extends ButtonProps {
+  open?: boolean;
   label?: string | JSX.Element;
   menu: MenuBtnProps[];
   startIcon?: JSX.Element;
@@ -22,6 +23,7 @@ interface Props extends ButtonProps {
 }
 
 export const MenuBtn = ({
+  open,
   label = '',
   menu,
   startIcon,
@@ -36,7 +38,7 @@ export const MenuBtn = ({
 }: Props) => {
   const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const internalOpen = Boolean(anchorEl);
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -68,7 +70,7 @@ export const MenuBtn = ({
       )}
       <Menu
         anchorEl={anchorEl}
-        open={open}
+        open={open !== undefined ? open : internalOpen}
         onClose={handleClose}
         MenuListProps={{
           'aria-labelledby': 'basic-button',

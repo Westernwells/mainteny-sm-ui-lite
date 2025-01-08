@@ -7,8 +7,6 @@ import {EmailSignature} from 'models/employee';
 import DOMPurify from 'dompurify';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {Action} from 'models/table';
-import {useRef} from 'react';
 
 type Props = {
   hasActionMenu?: boolean;
@@ -37,23 +35,23 @@ const SignatureContent = ({
     serviceCompanyId,
   );
 
-  const OPTIONS = useRef<Action[]>([
+  const OPTIONS = [
     {
-      icon: RemoveRedEye,
+      icon: <RemoveRedEye sx={{color: 'text.secondary'}} />,
       label: 'Preview',
-      onTrigger: () => onPreview!(employeeSignature!),
+      onClick: () => onPreview!(employeeSignature!),
     },
     {
-      icon: Edit,
+      icon: <Edit sx={{color: 'text.secondary'}} />,
       label: 'Edit',
-      onTrigger: () => onEdit!(employeeSignature!),
+      onClick: () => onEdit!(employeeSignature!),
     },
     {
-      icon: DeleteIcon,
+      icon: <DeleteIcon sx={{color: 'text.secondary'}} />,
       label: 'Delete',
-      onTrigger: () => onDelete!(employeeSignature!),
+      onClick: () => onDelete!(employeeSignature!),
     },
-  ]);
+  ];
 
   return (
     <Grid
@@ -108,7 +106,7 @@ const SignatureContent = ({
 
       {hasActionMenu && (
         <Grid>
-          <TableActionMenu options={OPTIONS.current} />
+          <TableActionMenu options={OPTIONS} />
         </Grid>
       )}
     </Grid>

@@ -8,11 +8,6 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import ReplayIcon from '@mui/icons-material/Replay';
-import Print from '@mui/icons-material/Print';
-import Edit from '@mui/icons-material/Edit';
-import Check from '@mui/icons-material/Check';
-import Close from '@mui/icons-material/Close';
 import {Button} from 'components/Button';
 import {StatusChip} from 'components/StatusChip';
 import {PageCard} from 'components/PageCard';
@@ -23,6 +18,7 @@ import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps';
 import {
+  useDeleteQuotation,
   usePrintQuotation,
   useReplyQuotation,
   useSendQuotation,
@@ -35,11 +31,7 @@ import {
 } from 'models/quotation';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
-import {
-  companyLanguageContextMap,
-  createFilesFromBlobArray,
-  fetchFile,
-} from 'utils/utils';
+import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import {
   useDownloadFileWithCustomName,
@@ -72,8 +64,10 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import useQuotationMenuActions from 'hooks/useQuotationMenuActions';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
+import {companyLanguageContextMap} from 'utils/language';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -125,6 +119,9 @@ export const ViewQuotation = ({
   const {elevatorId = ''} = queryString.parse(search);
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const {mutate: deleteQuotation} = useDeleteQuotation();
 
   const {data: elevator} =
     typeof elevatorId === 'string'
@@ -216,9 +213,6 @@ export const ViewQuotation = ({
     setUnit(row);
   };
 
-  const isPDFGenerated =
-    quotation.additionalInfo.pdfPath && !isLoadingDownloadUrl;
-
   const onPrintQuotation = async () => {
     if (quotation.status !== QuotationStatus.DRAFT) {
       await printQuotation(
@@ -304,9 +298,7 @@ export const ViewQuotation = ({
   };
 
   useEffect(() => {
-    if (quotation.status === QuotationStatus.DRAFT) {
-      generateBlobUrl();
-    }
+    generateBlobUrl();
   }, [quotation, headerUrl[headerInfo?.path], footerUrl[footerInfo?.path]]);
 
   const getExistingFiles = async (
@@ -369,51 +361,61 @@ export const ViewQuotation = ({
     }
   };
 
-  const actions = useMemo(() => {
-    const items = [];
+  const handlePrint = () => {
+    if (quotation.status !== QuotationStatus.DRAFT && !isLoadingDownloadUrl)
+      return onPrintQuotation;
+    if (!isLoadingDownloadUrl) return () => setIsConfirmPrintDialogOpen(true);
+  };
 
-    if (quotation.status === QuotationStatus.DRAFT) {
-      items.push({
-        label: t('Mark Accepted'),
-        icon: <Check />,
-        onClick: () => setIsDialogOpen(true),
+  const handleDownload = async () => {
+    setIsLoadingFiles(true);
+    // using then to wait for refetch and get download url
+    try {
+      await refetchDownloadUrl().then(async (res) => {
+        await getExistingFiles(res.data);
       });
-    } else {
-      items.push({
-        label: t('Resend'),
-        icon: <ReplayIcon />,
-        onClick: handleOpenSendEmail,
-      });
+    } finally {
+      setIsLoadingFiles(false);
     }
+  };
 
-    if (isPDFGenerated) {
-      items.push({
-        label: t('Print'),
-        icon: <Print />,
-        onClick: () => setIsConfirmPrintDialogOpen(true),
-      });
-    }
+  const shouldShowDownloadAsPrimaryAction = [
+    QuotationStatus.ACCEPTED,
+    QuotationStatus.REJECTED,
+  ].includes(quotation.status);
 
-    items.push(
-      ...[
-        {
-          label: t('Edit'),
-          icon: <Edit />,
-          onClick: () => navigate(`/quotations/details/${quotation.id}/edit`),
-        },
-        {
-          label: t('Mark Rejected'),
-          icon: <Close />,
-          onClick: () => setIsRejectedDialogOpen(true),
-        },
-      ],
-    );
+  const {actions} = useQuotationMenuActions({
+    quotation,
+    onDownload: !shouldShowDownloadAsPrimaryAction ? downloadFile : undefined,
+    onDelete: () => setIsDeleteDialogOpen(true),
+    onResend: handleOpenSendEmail,
+    onMarkAccepted: () => setIsDialogOpen(true),
+    onMarkRejected: () => setIsRejectedDialogOpen(true),
+    onPrint: handlePrint(),
+  });
 
-    if (quotation.status === QuotationStatus.SENT_TO_CLIENT) {
-      return items.filter((item) => item.label !== t('Edit'));
-    }
-    return items;
-  }, [downloadUrl]);
+  const {
+    bottomDrawerPrimaryLabel,
+    bottomDrawerPrimaryAction,
+  }: {
+    bottomDrawerPrimaryLabel: string;
+    bottomDrawerPrimaryAction?: () => void;
+  } = useMemo(() => {
+    if (shouldShowDownloadAsPrimaryAction)
+      return {
+        bottomDrawerPrimaryLabel: 'Download',
+        bottomDrawerPrimaryAction: handleDownload,
+      };
+    if (quotation.status === QuotationStatus.DRAFT)
+      return {
+        bottomDrawerPrimaryLabel: 'Send',
+        bottomDrawerPrimaryAction: handleOpenSendEmail,
+      };
+    return {
+      bottomDrawerPrimaryLabel: 'Mark Accepted',
+      bottomDrawerPrimaryAction: () => setIsDialogOpen(true),
+    };
+  }, [quotation]);
 
   return (
     <Box>
@@ -771,30 +773,19 @@ export const ViewQuotation = ({
         </Grid>
       </Grid>
       <BottomDrawer
-        isOpen={
-          quotation.status !== QuotationStatus.ACCEPTED &&
-          quotation.status !== QuotationStatus.REJECTED
-        }
-        primaryButtonLabel={
-          quotation.status === QuotationStatus.DRAFT ? 'Send' : 'Mark Accepted'
-        }
-        primaryButtonAction={() => {
-          if (quotation.status === QuotationStatus.DRAFT) {
-            handleOpenSendEmail();
-          } else {
-            setIsDialogOpen(true);
-          }
-        }}
-        listItems={actions.map((item, index) => ({
-          ...item,
-          showBorder: actions.length === index + 2,
-        }))}
+        isOpen
+        primaryButtonLabel={bottomDrawerPrimaryLabel}
+        primaryButtonAction={bottomDrawerPrimaryAction}
+        listItems={actions}
         isValid
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
-        onClose={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => {
+          setIsSendEmailDialogOpen(false);
+          setActiveSignature(undefined);
+        }}
         id={quotation.id}
         confirmBtnDisabled={sendingQuotation}
         email={
@@ -830,7 +821,7 @@ export const ViewQuotation = ({
 
           let file: File | undefined;
 
-          if (activeSignature && activeSignature.content.images) {
+          if (activeSignature && activeSignature.content.images.length > 0) {
             const response = await fetch(
               signatureUrls[activeSignature.content.images[0]!],
             );
@@ -899,6 +890,8 @@ export const ViewQuotation = ({
               },
             },
           });
+
+          setActiveSignature(undefined);
         }}
         activeSignature={activeSignature}
         onSignatureSelect={(signature) => setActiveSignature(signature)}
@@ -979,6 +972,24 @@ export const ViewQuotation = ({
         content="Do you want to mark this quotation as rejected?"
         helperText="This action is irreversible."
       />
+
+      {isDeleteDialogOpen && (
+        <Confirm
+          open={isDeleteDialogOpen}
+          onConfirm={() => {
+            if (quotation.id)
+              deleteQuotation({
+                quotationId: quotation.id,
+                shouldNavigate: false,
+              });
+            setIsDeleteDialogOpen(false);
+          }}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          title="Delete Quotation"
+          content="Do you want to delete this Quotation?"
+          helperText="This action is irreversible."
+        />
+      )}
 
       <ConfirmPrintQuotation
         open={isConfirmPrintDialogOpen}

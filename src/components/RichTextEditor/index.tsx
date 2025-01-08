@@ -200,6 +200,8 @@ const RichTextEditor = ({
             hasAttachFileButton={hasAttachFileButton}
             hasSignatureButton={hasSignatureButton}
             onSignatureSelect={onSignatureSelect}
+            updateHtml={updateHtml}
+            onChange={onChange}
           />
         </>
       }

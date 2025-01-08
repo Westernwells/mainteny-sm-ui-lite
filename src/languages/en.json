@@ -2581,5 +2581,18 @@
   "Shaft Height": "Shaft height",
   "Email address": "Email Address",
   "Number of People": "Number of people",
+  "Delete Signature": "Delete Signature",
+  "You are about to delete this email signature. Are you sure about it?": "You are about to delete this email signature. Are you sure about it?",
+  "Pick article": "Pick article",
+  "Auto type": "Auto type",
+  "Customer since": "Customer since",
+  "Insert Link": "Insert Link",
+  "Email Signature updated successfully": "Email Signature updated successfully",
+  "No email signatures": "No email signatures",
+  "Create a customised email signature": "Create a customised email signature",
+  "New Signature": "New Signature",
+  "Enter the URL, email address, or telephone number:": "Enter the URL, email address, or telephone number:",
+  "Lithuanian": "Lithuanian",
+  "Email signature created successfully": "Email signature created successfully",
   "Can't be less than 0": "Can't be less than 1"
 }

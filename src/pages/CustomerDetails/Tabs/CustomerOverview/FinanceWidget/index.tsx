@@ -18,15 +18,12 @@ import {useForm} from 'react-hook-form';
 import {CustomerFinanceFormModel} from 'models/customer';
 import {useCustomer} from 'hooks/reactQuery/useCustomers';
 import {t} from 'i18next';
-import {
-  companyLanguageContextMap,
-  convertToText,
-  formatAddressFullname,
-} from 'utils/utils';
+import {convertToText, formatAddressFullname} from 'utils/utils';
 import {ReactComponent as SavingBankCash} from 'assets/illustrations/SavingBankCash.svg';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useTranslation} from 'react-i18next';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {companyLanguageContextMap} from 'utils/language';
 import {EditFinanceInformation} from './EditFinanceInformation';
 
 type Props = {

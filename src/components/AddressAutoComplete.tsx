@@ -10,8 +10,9 @@ import {useTranslation} from 'react-i18next';
 import MapIcon from '@mui/icons-material/Map';
 import {IconButton, InputAdornment} from '@mui/material';
 import {UserCompanyContext} from 'context/UserCompanyProvider';
-import {companyLanguageContextMap, formatAddressFullname} from 'utils/utils';
+import {formatAddressFullname} from 'utils/utils';
 import {getAddressRecordFromGoogleAddress} from 'utils/address';
+import {companyLanguageContextMap} from 'utils/language';
 import {MapLocationPicker} from './MapLocationPicker';
 
 interface Props {

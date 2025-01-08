@@ -32,10 +32,10 @@ import {
   UpdateQuotation,
 } from 'models/quotation';
 import {Comment} from 'models/comment';
-import {languageContextMap} from 'utils/utils';
 import {LanguageContext} from 'context/LanguageProvider';
 import {AxiosResponse} from 'axios';
 import {useAll} from 'hooks/reactQuery/useAll';
+import {languageContextMap} from 'utils/language';
 import {useUserSession} from './useUserSession';
 
 export const fetchQuotations = async (
