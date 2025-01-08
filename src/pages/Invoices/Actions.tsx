@@ -532,7 +532,6 @@ export const Actions = ({
     footerBlockUrl,
     invoiceNumber,
     setInState = true,
-    showCurrentDateAsInvoiceDate = false,
     qrImageSrcProp,
   }: {
     invoiceData: InvoiceView;
@@ -540,7 +539,6 @@ export const Actions = ({
     footerBlockUrl: {[key: string]: string};
     invoiceNumber?: string;
     setInState?: boolean;
-    showCurrentDateAsInvoiceDate?: boolean;
     qrImageSrcProp?: string;
   }) => {
     let PdfTemplate;
@@ -594,7 +592,6 @@ export const Actions = ({
         nextCompanyExternalId={
           invoiceNumber || translate('Automatically assigned')
         }
-        showCurrentDateAsInvoiceDate={showCurrentDateAsInvoiceDate}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -724,7 +721,6 @@ export const Actions = ({
           footerBlockUrl: footerUrl,
           invoiceNumber: companyNextNumber?.value,
           setInState: false,
-          showCurrentDateAsInvoiceDate: true,
         }).then((blobFile) =>
           createFilesFromBlobArray([blobFile!], fileNames, fileDescriptions),
         )) || Promise.resolve([]);

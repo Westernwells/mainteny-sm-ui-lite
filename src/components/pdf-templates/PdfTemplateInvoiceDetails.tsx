@@ -71,7 +71,6 @@ type Props = {
   invoice?: InvoiceView;
   selectedLng?: string;
   nextCompanyExternalId?: string;
-  showCurrentDateAsInvoiceDate?: boolean;
   pdfConfigClientStorage: ClientReportForPDFConfig;
   userInfo?: UserAccount;
 };
@@ -81,7 +80,6 @@ const PdfTemplateInvoiceDetails = ({
   invoice,
   selectedLng,
   nextCompanyExternalId,
-  showCurrentDateAsInvoiceDate,
   pdfConfigClientStorage,
   userInfo,
 }: Props) => {
@@ -101,13 +99,8 @@ const PdfTemplateInvoiceDetails = ({
 
   const styles = getStyles(boldFontStyle, regularFontStyle);
 
-  const getInvoiceDate = () => {
-    if (showCurrentDateAsInvoiceDate) return formatDate(new Date());
-
-    return invoice?.sentDate
-      ? formatDate(invoice?.sentDate)
-      : formatDate(new Date());
-  };
+  const getInvoiceDate = () =>
+    invoice?.sentDate ? formatDate(invoice?.sentDate) : formatDate(new Date());
 
   const elevatorExternalId = useMemo(
     () =>
