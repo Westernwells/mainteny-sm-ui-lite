@@ -32,6 +32,7 @@ interface Props {
   onCancel: () => void;
   onClick: () => void;
   onSave: (paymentTermId: string) => void;
+  onClear?: () => void;
   title: string;
   alertText?: string;
   defaultValue?: string | ContractTermView;
@@ -46,6 +47,7 @@ export const ContractTerm = ({
   title,
   onClick,
   onSave,
+  onClear,
   serviceCompanyType = ServiceCompanyType.PROPERTY_OWNER_PAYMENT_TERM,
   defaultValue = '',
   setEdit,
@@ -216,6 +218,12 @@ export const ContractTerm = ({
       setToggleItems(contractTerms.data);
     }
   }, [contractTerms.data]);
+
+  const handleClear = () => {
+    formik.setFieldValue('termId', '');
+    onClear?.();
+    onCancel();
+  };
 
   const renderContent = () => {
     if (!isContract && isShow) {
@@ -417,17 +425,30 @@ export const ContractTerm = ({
             {t('Cancel')}
           </Typography>
         </Button>
-        <Button
-          buttonProps={{
-            variant: 'contained',
-            size: 'medium',
-            disabled:
-              (!formik.isValid && !!formik.values.otherTerms.length) ||
-              !formik.values.termId,
-            onClick: () => formik.handleSubmit(),
-          }}>
-          <Typography variant="subtitle2">{t('Confirm')}</Typography>
-        </Button>
+        <Box display="flex" gap={2}>
+          {onClear && (
+            <Button
+              buttonProps={{
+                size: 'medium',
+                variant: 'outlined',
+                disabled: !formik.values.termId,
+                onClick: handleClear,
+              }}>
+              <Typography variant="subtitle2">{t('Clear')}</Typography>
+            </Button>
+          )}
+          <Button
+            buttonProps={{
+              variant: 'contained',
+              size: 'medium',
+              disabled:
+                (!formik.isValid && !!formik.values.otherTerms.length) ||
+                !formik.values.termId,
+              onClick: () => formik.handleSubmit(),
+            }}>
+            <Typography variant="subtitle2">{t('Confirm')}</Typography>
+          </Button>
+        </Box>
       </Box>
     </Drawer>
   );
