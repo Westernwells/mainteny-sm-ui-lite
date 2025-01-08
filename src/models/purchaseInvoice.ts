@@ -144,7 +144,7 @@ export interface CreatePurchaseInvoiceRecord {
   externalId: string;
   subject: string;
   description: string;
-  supplier: PurchaseInvoiceSupplier;
+  supplier: PurchaseInvoiceSupplier | null;
   dueDate: string;
   sentDate: string;
   currency: string;
@@ -198,7 +198,7 @@ export interface UpdatePurchaseInvoiceRecord {
   externalId: string;
   subject?: string;
   description?: string;
-  supplier?: PurchaseInvoiceSupplier;
+  supplier?: PurchaseInvoiceSupplier | null;
   dueDate?: string;
   sentDate?: string;
   currency?: string;
