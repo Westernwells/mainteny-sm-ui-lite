@@ -1568,7 +1568,7 @@ export const Actions = ({
                     externalId:
                       invoiceData?.externalId! || companyNextNumber?.value!,
                     dueDate,
-                    sentDate: dateToString(new Date()), // Updating the invoice send date to reflect when it was actually send
+                    sentDate: invoiceData?.sentDate || dateToString(new Date()),
                     email: {
                       email: '',
                       subject: emailRecord.subject,

@@ -332,7 +332,10 @@ export const DatePicker = ({
                 },
                 ...textFieldProps,
                 size: textFieldProps?.size || 'small',
-                label: t(`${textFieldProps?.label}`),
+                label:
+                  typeof textFieldProps?.label === 'string'
+                    ? t(`${textFieldProps?.label}`)
+                    : textFieldProps?.label,
                 InputLabelProps: {
                   shrink: true,
                   required,
