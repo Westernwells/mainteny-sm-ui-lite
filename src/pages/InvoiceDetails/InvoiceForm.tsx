@@ -60,7 +60,6 @@ import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {AddressComponent, AddressRecord, Language} from 'models/misc';
 import {
-  companyLanguageContextMap,
   formatAddressFullname,
   formatSearchParams,
   getUserFullName,
@@ -120,6 +119,7 @@ import {Notes} from './Notes/EditNotes';
 import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
 import {t} from 'i18next';
 import {getInvoiceDueDate, GetInvoiceDueDateProps} from 'utils/invoice-utils';
+import {companyLanguageContextMap} from 'utils/language';
 
 interface Props {
   invoice?: InvoiceView;
@@ -843,10 +843,9 @@ export const InvoiceForm = ({
       formik.setFieldValue('sentDate', undefined);
     } else {
       formik.setFieldValue('externalId', invoiceData.externalId);
-      formik.setFieldValue(
-        'sentDate',
-        invoiceData?.sentDate ? new Date(invoiceData?.sentDate) : undefined,
-      );
+      if (invoiceData?.sentDate) {
+        formik.setFieldValue('sentDate', new Date(invoiceData?.sentDate));
+      }
     }
   };
 
@@ -1431,6 +1430,10 @@ export const InvoiceForm = ({
     }
   };
 
+  const handleClearContractPaymentTermsModal = () => {
+    formik.setFieldValue('paymentTerm', undefined);
+  };
+
   const removeAddress = (
     addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress',
   ) => {
@@ -1966,11 +1969,13 @@ export const InvoiceForm = ({
               name="paymentTerms"
               label="Payment terms"
               html={formik.values.paymentTerm?.term || ''}
-              updateHtml={(h) =>
-                formik.setFieldValue('paymentTerm', {
-                  ...formik.values.paymentTerm,
-                  term: h,
-                })
+              updateHtml={(term) =>
+                stripHtmlTags(term)
+                  ? formik.setFieldValue('paymentTerm', {
+                      ...formik.values.paymentTerm,
+                      term,
+                    })
+                  : formik.setFieldValue('paymentTerm', undefined)
               }
               minRows={2}
               onBlur={formik.handleBlur}
@@ -2049,7 +2054,20 @@ export const InvoiceForm = ({
                   handleDateFieldChange('sentDate', newValue);
                 }}
                 textFieldProps={{
-                  label: 'Invoice Date',
+                  label: (
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      {t('Invoice Date')}
+                      <Tooltip
+                        title={t(
+                          `The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.`,
+                        )}
+                        placement="top">
+                        <IconButton sx={{padding: 0}}>
+                          <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0.5}} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ),
                   ...formik.getFieldProps('sentDate'),
                 }}
               />
@@ -2071,10 +2089,25 @@ export const InvoiceForm = ({
                   handleDateFieldChange('dueDate', newValue);
                 }}
                 textFieldProps={{
-                  label: 'Payment Due Date',
+                  label: (
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      {t('Payment Due Date')}
+                      <Tooltip
+                        title={t(
+                          formik.values.paymentTerm?.id
+                            ? 'The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.'
+                            : 'The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.',
+                        )}
+                        placement="top">
+                        <IconButton sx={{padding: 0}}>
+                          <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0.5}} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ),
                   ...formik.getFieldProps('dueDate'),
                 }}
-                required
+                disabled={!!formik.values.paymentTerm?.id}
               />
             </Box>
             {/* DELIVERY DATE */}
@@ -2396,6 +2429,7 @@ export const InvoiceForm = ({
           open={openContractPaymentTermsDialog}
           onCancel={() => setOpenContractPaymentTermsDialog(false)}
           onSave={handleContractPaymentTermsModal}
+          onClear={handleClearContractPaymentTermsModal}
           defaultValue={
             contractPaymentTerms?.data.find(
               (c) => c.id === formik.values.paymentTerm?.id,

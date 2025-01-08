@@ -1,6 +1,7 @@
 import SendIcon from '@mui/icons-material/Send';
-import {useRef} from 'react';
-import {Action} from '../../../../../models/table';
+import {useMemo} from 'react';
+import {MenuAction} from 'models/action';
+import {useTranslation} from 'react-i18next';
 import TableActionMenu from '../../../../../components/Table/TableActionMenu';
 
 interface Props {
@@ -8,15 +9,19 @@ interface Props {
 }
 
 export const Actions = ({email}: Props) => {
-  const OPTIONS = useRef<Action[]>([
-    {
-      icon: SendIcon,
-      label: 'Send email',
-      onTrigger: () => {
-        window.open(`mailto:${email}`, '_blank');
+  const {t} = useTranslation();
+  const OPTIONS = useMemo<MenuAction[]>(
+    () => [
+      {
+        icon: <SendIcon />,
+        label: t('Send email'),
+        onClick: () => {
+          window.open(`mailto:${email}`, '_blank');
+        },
       },
-    },
-  ]);
+    ],
+    [t],
+  );
 
-  return <TableActionMenu options={OPTIONS.current} />;
+  return <TableActionMenu options={OPTIONS} />;
 };

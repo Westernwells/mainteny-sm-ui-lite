@@ -2,10 +2,8 @@ import React, {useMemo, useState} from 'react';
 import {Box, Button} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {useTheme} from '@mui/material/styles';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
 import JobNotes from 'pages/ServiceOrderDetails/JobNotes';
-import {ServiceOrderStatus, ServiceOrderView} from 'models/service-order';
+import {ServiceOrderView} from 'models/service-order';
 import {useServiceOrderActions} from 'hooks/useServiceOrderActions';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
@@ -15,12 +13,18 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
-import {companyLanguageContextMap} from 'utils/utils';
 import {useCurrentCurrency} from 'utils/currency';
 import {MarkCompletedDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/MarkCompletedDialog';
-import {EmployeesView} from 'models/employee';
-import {canMarkCompleted} from 'utils/service-order-utils';
-import UndoIcon from '@mui/icons-material/Undo';
+import {getDefaultTechnician, getDialogTitle} from 'utils/service-order-utils';
+import useServiceOrderMenuActions from 'hooks/useServiceOrderMenuActions';
+import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
+import {
+  useArchiveServiceOrder,
+  useCancelServiceOrders,
+} from 'hooks/reactQuery/useServiceOrder';
+import ChangePaymentStatusDialog from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ChangePaymentStatusDialog';
+import {MenuAction} from 'models/action';
+import {companyLanguageContextMap} from 'utils/language';
 import {Confirm} from './Confirm';
 
 interface BottomDrawerProps {
@@ -36,6 +40,28 @@ export const JobOverviewBottomDrawer = ({
   const currentCurrency = useCurrentCurrency();
 
   const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
+  const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
+
+  const {mutateAsync: archiveServiceOrder} = useArchiveServiceOrder({
+    serviceOrderId: serviceOrderDetails.id,
+    action: ARCHIVE_ACTION.ARCHIVE,
+    message: 'Service job has been archived',
+  });
+  const {mutateAsync: unarchiveServiceOrder} = useArchiveServiceOrder({
+    serviceOrderId: serviceOrderDetails.id,
+    action: ARCHIVE_ACTION.UNARCHIVE,
+    message: 'Service job has been unarchived',
+  });
+
+  const {mutateAsync: cancelServiceOrder} = useCancelServiceOrders({
+    serviceOrderId: serviceOrderDetails.id,
+    action: CANCEL_ACTION.CANCEL,
+  });
+  const {mutateAsync: uncancelServiceOrder} = useCancelServiceOrders({
+    serviceOrderId: serviceOrderDetails.id,
+    action: CANCEL_ACTION.UNCANCEL,
+    message: 'Service job has been restored',
+  });
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
@@ -73,37 +99,6 @@ export const JobOverviewBottomDrawer = ({
     company?.id,
   );
 
-  const defaultTechnicians = serviceOrderDetails.schedules.length
-    ? serviceOrderDetails.schedules.map((s) => s.technician)
-    : serviceOrderDetails.additionalInfo.candidateTechnicians?.length
-    ? (serviceOrderDetails.additionalInfo
-        .candidateTechnicians as unknown as EmployeesView[])
-    : serviceOrderDetails.additionalInfo.candidateTechnician
-    ? ([
-        serviceOrderDetails.additionalInfo.candidateTechnician,
-      ] as unknown as EmployeesView[])
-    : null;
-
-  const renderDialogTitle = () =>
-    serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED ||
-    serviceOrderDetails.status === ServiceOrderStatus.IN_PROGRESS
-      ? t('Reschedule Job')
-      : t('Schedule Job');
-
-  const {
-    openCancelConfirm,
-    openUnscheduleConfirm,
-    openDialog,
-    handleUncompleteServiceOrder,
-    handleCancel,
-    handleSchedule,
-    confirmCancel,
-    confirmUnschedule,
-    setOpenCancelConfirm,
-    setOpenUnscheduleConfirm,
-    setOpenDialog,
-  } = useServiceOrderActions(serviceOrderDetails.id);
-
   const {data: quotation} = useQuotationDetails(
     serviceOrderDetails?.additionalInfo.quotationId,
   );
@@ -126,6 +121,81 @@ export const JobOverviewBottomDrawer = ({
     createAndSetPdfBlobUrl();
   };
 
+  const {
+    openCancelConfirm,
+    openUnscheduleConfirm,
+    openDialog: openScheduleDialog,
+    handleUncompleteServiceOrder,
+    handleCancel,
+    handleSchedule,
+    confirmCancel,
+    confirmUnschedule,
+    setOpenCancelConfirm,
+    setOpenUnscheduleConfirm,
+    setOpenDialog: setOpenScheduleDialog,
+  } = useServiceOrderActions(serviceOrderDetails.id);
+
+  const handleArchiveClick = (action: ARCHIVE_ACTION) => async () => {
+    if (action === ARCHIVE_ACTION.ARCHIVE) {
+      await archiveServiceOrder();
+    } else {
+      await unarchiveServiceOrder();
+    }
+  };
+
+  const handleCancelClick = (action: CANCEL_ACTION) => async () => {
+    if (action === CANCEL_ACTION.CANCEL) {
+      await cancelServiceOrder();
+    } else {
+      await uncancelServiceOrder();
+    }
+  };
+
+  const handleOpenChangeConfirm = () => {
+    setOpenPaymentStatusChange(true);
+  };
+
+  const handleDeleteDialogClose = () => {
+    setOpenPaymentStatusChange(false);
+  };
+
+  const {actions} = useServiceOrderMenuActions({
+    serviceOrder: serviceOrderDetails,
+    onChangeStatus: handleOpenChangeConfirm,
+    onReopen: () => handleUncompleteServiceOrder(),
+    onCancel: handleCancel,
+    onUndoCancel: handleCancelClick(CANCEL_ACTION.UNCANCEL),
+    onArchive: handleArchiveClick(ARCHIVE_ACTION.ARCHIVE),
+    onUnarchive: handleArchiveClick(ARCHIVE_ACTION.UNARCHIVE),
+    onSchedule: handleSchedule,
+    onReschedule: handleSchedule,
+    onUnschedule: () => setOpenUnscheduleConfirm(true),
+    onMarkCompleted: () => setOpenMarkCompletedDialog(true),
+    onDownload: () => handleMenuItemClick,
+  });
+
+  const {hasDownloadAction, actionsWithoutDownload} = useMemo(
+    () =>
+      actions.reduce(
+        (acc, current) => {
+          if (current.label === t('Download'))
+            return {
+              hasDownloadAction: true,
+              actionsWithoutDownload: [...acc.actionsWithoutDownload],
+            };
+          return {
+            hasDownloadAction: acc.hasDownloadAction,
+            actionsWithoutDownload: [...acc.actionsWithoutDownload, current],
+          };
+        },
+        {
+          hasDownloadAction: false,
+          actionsWithoutDownload: [] as MenuAction[],
+        },
+      ),
+    [actions],
+  );
+
   return (
     <>
       <Box
@@ -145,108 +215,28 @@ export const JobOverviewBottomDrawer = ({
           padding: '0.6rem 2rem',
         }}>
         <Box>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={handleMenuItemClick}
-            sx={{
-              borderColor: theme.palette.primary.main,
-              color: theme.palette.primary.main,
-              backgroundColor: 'white',
-              margin: '0em 0.5rem',
-            }}>
-            {t('Download Job Overview')}
-          </Button>
-
-          {serviceOrderDetails.status === ServiceOrderStatus.SCHEDULED && (
+          {hasDownloadAction && (
             <Button
-              sx={{cursor: 'pointer', margin: '0em 0.5rem', color: '#828DA3'}}
-              onClick={handleSchedule}
-              startIcon={
-                <ScheduleOutlinedIcon
-                  style={{color: theme.palette.action.disabled}}
-                />
-              }>
-              {t('Reschedule')}
-            </Button>
-          )}
-
-          {[ServiceOrderStatus.SCHEDULED, ServiceOrderStatus.OVERDUE].includes(
-            serviceOrderDetails.status,
-          ) && (
-            <Button
-              sx={{cursor: 'pointer', margin: '0em 0.5rem', color: '#828DA3'}}
-              onClick={() => setOpenUnscheduleConfirm(true)}
-              startIcon={
-                <ScheduleOutlinedIcon
-                  style={{color: theme.palette.action.disabled}}
-                />
-              }>
-              {t('Unschedule')}
-            </Button>
-          )}
-
-          {(serviceOrderDetails.status === ServiceOrderStatus.OVERDUE ||
-            ![
-              ServiceOrderStatus.SCHEDULED,
-              ServiceOrderStatus.COMPLETED,
-              ServiceOrderStatus.CANCELLED,
-            ].includes(serviceOrderDetails.status)) && (
-            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleMenuItemClick}
               sx={{
-                cursor: 'pointer',
+                borderColor: theme.palette.primary.main,
+                color: theme.palette.primary.main,
+                backgroundColor: 'white',
                 margin: '0em 0.5rem',
-                color: '#828DA3',
-              }}
-              onClick={handleSchedule}
-              startIcon={
-                <ScheduleOutlinedIcon
-                  style={{color: theme.palette.action.disabled}}
-                />
-              }>
-              {t('Schedule')}
+              }}>
+              {t('Download Job Overview')}
             </Button>
           )}
-
-          {canMarkCompleted(
-            serviceOrderDetails.status,
-            serviceOrderDetails.schedules.length,
-          ) && (
+          {actionsWithoutDownload.map((action) => (
             <Button
               sx={{cursor: 'pointer', margin: '0em 0.5rem', color: '#828DA3'}}
-              startIcon={
-                <EditOutlinedIcon
-                  style={{color: theme.palette.action.disabled}}
-                />
-              }
-              onClick={() => setOpenMarkCompletedDialog(true)}>
-              {t('Mark Completed')}
+              onClick={action.onClick}
+              startIcon={action.icon}>
+              {action.label}
             </Button>
-          )}
-
-          {serviceOrderDetails.status === ServiceOrderStatus.COMPLETED && (
-            <Button
-              sx={{cursor: 'pointer', margin: '0em 0.5rem', color: '#828DA3'}}
-              startIcon={
-                <UndoIcon style={{color: theme.palette.action.disabled}} />
-              }
-              onClick={() => handleUncompleteServiceOrder()}>
-              {t('Reopen')}
-            </Button>
-          )}
-
-          {serviceOrderDetails.status !== ServiceOrderStatus.CANCELLED &&
-            serviceOrderDetails.status !== ServiceOrderStatus.COMPLETED && (
-              <Button
-                onClick={handleCancel}
-                sx={{
-                  cursor: 'pointer',
-                  margin: '0em 0.5rem',
-                  color: '#828DA3',
-                }}>
-                {t('Cancel')}
-              </Button>
-            )}
+          ))}
         </Box>
 
         <Box>
@@ -270,48 +260,58 @@ export const JobOverviewBottomDrawer = ({
         content={t('Do you want to unschedule the service job?')}
       />
 
-      <ScheduleDialog
-        serviceOrderId={serviceOrderDetails.id}
-        serviceOrderType={serviceOrderDetails.type}
-        title={renderDialogTitle()}
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        defaultTechnicians={defaultTechnicians}
-        defaultStartDate={
-          serviceOrderDetails.schedules.length
-            ? new Date(serviceOrderDetails.schedules[0].startTime)
-            : null
-        }
-        defaultEndDate={
-          serviceOrderDetails.schedules.length
-            ? new Date(serviceOrderDetails.schedules[0].endTime)
-            : null
-        }
-        defaultDueDate={
-          serviceOrderDetails.dueDate
-            ? new Date(serviceOrderDetails.dueDate)
-            : null
-        }
-        defaultCallTime={
-          serviceOrderDetails.additionalInfo?.callerInfo?.calledAt
-            ? new Date(serviceOrderDetails.additionalInfo.callerInfo.calledAt)
-            : null
-        }
-        defaultCallerName={serviceOrderDetails.additionalInfo?.callerInfo?.name}
-        defaultPurchaseOrderNumber={
-          serviceOrderDetails.additionalInfo.purchaseOrderNumber
-        }
-        defaultCallerPhoneNumber={
-          serviceOrderDetails.additionalInfo?.callerInfo?.phoneNumber
-        }
-      />
-
       <MarkCompletedDialog
         serviceOrderDetails={serviceOrderDetails}
         title={t('Mark Completed')}
         open={openMarkCompletedDialog}
         onClose={() => setOpenMarkCompletedDialog(false)}
       />
+
+      <ChangePaymentStatusDialog
+        open={openPaymentStatusChange}
+        id={serviceOrderDetails.id}
+        onClose={handleDeleteDialogClose}
+      />
+
+      {openScheduleDialog && (
+        <ScheduleDialog
+          serviceOrderId={serviceOrderDetails.id}
+          serviceOrderType={serviceOrderDetails.type}
+          title={t(getDialogTitle(serviceOrderDetails))}
+          open={openScheduleDialog}
+          onClose={() => setOpenScheduleDialog(false)}
+          defaultTechnicians={getDefaultTechnician(serviceOrderDetails)}
+          defaultStartDate={
+            serviceOrderDetails.schedules.length
+              ? new Date(serviceOrderDetails.schedules[0].startTime)
+              : null
+          }
+          defaultEndDate={
+            serviceOrderDetails.schedules.length
+              ? new Date(serviceOrderDetails.schedules[0].endTime)
+              : null
+          }
+          defaultDueDate={
+            serviceOrderDetails.dueDate
+              ? new Date(serviceOrderDetails.dueDate)
+              : null
+          }
+          defaultCallTime={
+            serviceOrderDetails.additionalInfo?.callerInfo?.calledAt
+              ? new Date(serviceOrderDetails.additionalInfo.callerInfo.calledAt)
+              : null
+          }
+          defaultCallerName={
+            serviceOrderDetails.additionalInfo?.callerInfo?.name
+          }
+          defaultPurchaseOrderNumber={
+            serviceOrderDetails.additionalInfo.purchaseOrderNumber
+          }
+          defaultCallerPhoneNumber={
+            serviceOrderDetails.additionalInfo?.callerInfo?.phoneNumber
+          }
+        />
+      )}
     </>
   );
 };

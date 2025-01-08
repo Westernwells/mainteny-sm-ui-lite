@@ -282,6 +282,7 @@ export enum Language {
   DE_DE = 'DE_DE',
   SR_RS = 'SR_RS',
   IT_IT = 'IT_IT',
+  IT_LT = 'IT_LT',
   RU_RU = 'RU_RU',
   DA_DK = 'DA_DK',
   KA_GE = 'KA_GE',

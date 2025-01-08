@@ -5,7 +5,6 @@ import {
   EditOutlined,
   PushPinOutlined,
 } from '@mui/icons-material';
-import {Action} from 'models/table';
 import TableActionMenu from 'components/Table/TableActionMenu';
 import {Confirm} from 'components/Confirm';
 import {useDeleteVat, useUpdateVat} from 'hooks/reactQuery/useVats';
@@ -13,6 +12,7 @@ import {Trans, useTranslation} from 'react-i18next';
 import {VatView} from 'models/vat';
 import {Dialog} from 'components/Dialog';
 import {theme} from 'theme';
+import {MenuAction} from 'models/action';
 import {TaxRatesModal} from '../TaxRatesModal';
 
 type Props = {
@@ -73,27 +73,27 @@ const Actions = ({taxRate}: Props) => {
     });
   };
 
-  const OPTIONS: Action[] = [
+  const OPTIONS: MenuAction[] = [
     {
-      icon: PushPinOutlined,
+      icon: <PushPinOutlined />,
       label: t('Set as default'),
-      onTrigger: () => {
+      onClick: () => {
         setOpenActionMenu(false);
         handleSave({...taxRate, isDefault: true});
       },
     },
     {
-      icon: EditOutlined,
+      icon: <EditOutlined />,
       label: t('Edit'),
-      onTrigger: () => {
+      onClick: () => {
         setOpenActionMenu(false);
         setOpenEditDialog(true);
       },
     },
     {
-      icon: DeleteOutline,
+      icon: <DeleteOutline />,
       label: t('Delete'),
-      onTrigger: onDelete,
+      onClick: onDelete,
     },
   ];
 

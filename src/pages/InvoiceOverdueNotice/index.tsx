@@ -35,11 +35,7 @@ import {formatDate} from 'utils/datetime';
 import {pdf} from '@react-pdf/renderer';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
-import {
-  companyLanguageContextMap,
-  createFilesFromBlobArray,
-  dateToString,
-} from 'utils/utils';
+import {createFilesFromBlobArray, dateToString} from 'utils/utils';
 import printJS from 'print-js';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
@@ -52,6 +48,7 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import {companyLanguageContextMap} from 'utils/language';
 import InvoiceOverduePdfPreview from './InvoiceOverduePdfPreview';
 
 const validationSchema = Yup.object().shape({

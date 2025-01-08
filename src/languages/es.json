@@ -3020,5 +3020,6 @@
   "Shaft Height": "Altura de eje",
   "Email address": "Dirección de correo electrónico",
   "Number of People": "Número de personas",
-  "Can't be less than 0": "No puede ser menos de 0"
+  "Can't be less than 0": "No puede ser menos de 0",
+  "Change Payment Status": "Cambiar el estado del pago"
 }

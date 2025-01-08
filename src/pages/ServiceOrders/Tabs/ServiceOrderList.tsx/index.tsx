@@ -777,7 +777,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         showShadows: showLeftShadow ? 'left' : undefined,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps} onClick={undefined}>
-            <Actions id={serviceOrder.id} status={serviceOrder.jobStatus} />
+            <Actions serviceOrder={serviceOrder.serviceOrderData} />
           </Cell>
         ),
       },

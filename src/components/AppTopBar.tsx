@@ -9,7 +9,7 @@ import {useAuth} from 'hooks/useAuth';
 import {useContext, useEffect} from 'react';
 import {axiosClient} from 'utils/axios-utils';
 import {Role} from 'models/user';
-import {convertLanguageIfNeeded, convertToText, languageMap} from 'utils/utils';
+import {convertToText} from 'utils/utils';
 import {useQueryClient} from 'react-query';
 import {Notifications} from 'pages/Notifications';
 import {LanguageContext} from 'context/LanguageProvider';
@@ -17,6 +17,12 @@ import {Language} from 'models/misc';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import EcologyGlobeMessage from 'assets/icons/EcologyGlobeMessage.svg';
 import {useFetchSystemSettings} from 'hooks/reactQuery/useSystem';
+import {
+  companyLanguageContextMap,
+  convertLanguageIfNeeded,
+  languageMap,
+  mapExceptionLanguage,
+} from 'utils/language';
 import {MenuBtn} from './MenuBtn';
 import {BackAction} from './BackAction';
 import KalasarSearchComponent from './KalasarSearchComponent';
@@ -49,8 +55,10 @@ export const AppTopBar = ({
     if (user) {
       const {language: lang} = user.userAccount.serviceCompany;
       axiosClient.defaults.headers.common.language = lang;
-      i18n.changeLanguage(lang);
-      const value = lang.split('-')[0].toUpperCase();
+      const mappedLanguage = companyLanguageContextMap[lang];
+      i18n.changeLanguage(mappedLanguage);
+      const value =
+        mapExceptionLanguage(lang) ?? lang.split('-')[0].toUpperCase();
       setLanguage(value);
       queryClient.invalidateQueries();
     }
@@ -194,6 +202,10 @@ export const AppTopBar = ({
                 {
                   label: 'Turkish',
                   action: () => changeLanguage('tr-TR'),
+                },
+                {
+                  label: 'Lithuanian',
+                  action: () => changeLanguage('it-LT'),
                 },
               ]}
             />

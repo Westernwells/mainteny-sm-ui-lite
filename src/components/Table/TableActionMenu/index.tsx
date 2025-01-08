@@ -1,18 +1,16 @@
 import React, {useRef, useState} from 'react';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
-import {Action} from 'models/table';
-import {t} from 'i18next';
+import {MenuAction} from 'models/action';
+import TableActionMenu from './TableActionMenu';
 
 type Props = {
-  options: Action[];
+  options: MenuAction[];
   isOpen?: boolean;
   onToggle?: (value: boolean) => void;
 };
 
-const TableActionMenu = ({
+const TableActionMenuWithButton = ({
   options,
   isOpen: externalOpenState,
   onToggle: externalSetOpenState,
@@ -32,31 +30,19 @@ const TableActionMenu = ({
       <IconButton
         ref={anchorEl}
         onClick={handleOpen}
-        aria-controls={isOpen ? 'action-menu' : undefined}
+        aria-controls={isOpen ? 'action-menu-vertical' : undefined}
         aria-haspopup="true">
         <MoreVertOutlinedIcon />
       </IconButton>
-      <Menu
-        id="action-menu"
-        anchorEl={anchorEl.current}
-        open={isOpen}
+
+      <TableActionMenu
+        isOpen={isOpen}
         onClose={handleClose}
-        anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
-        transformOrigin={{vertical: 'top', horizontal: 'right'}}>
-        {options.map((option, index) => (
-          <MenuItem
-            key={index}
-            onClick={() => {
-              option.onTrigger();
-              handleClose();
-            }}>
-            <option.icon style={{marginRight: '8px'}} />
-            {t(option.label)}
-          </MenuItem>
-        ))}
-      </Menu>
+        anchorEl={anchorEl.current}
+        options={options}
+      />
     </>
   );
 };
 
-export default TableActionMenu;
+export default TableActionMenuWithButton;

@@ -1,8 +1,8 @@
 import {DataSyncType} from 'models/service-company';
 import {useEffect, useState} from 'react';
-import {mapLanguageToLocale} from 'utils/utils';
 import {locales} from 'utils/datetime';
 import {srLatn} from 'date-fns/locale';
+import {mapLanguageToLocale} from 'utils/language';
 import {useSyncStatusXero} from './reactQuery/useAnalytics';
 import {useUserSession} from './reactQuery/useUserSession';
 import {useFormatDateDistance} from './useFormatDateDistance';

@@ -15,16 +15,13 @@ import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {formatPhoneNumber} from 'utils/customer-utils';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {createEmptyResource} from 'utils/paging';
-import {
-  applyCountryCode,
-  companyLanguageContextMap,
-  formatAddressFullname,
-} from 'utils/utils';
+import {applyCountryCode, formatAddressFullname} from 'utils/utils';
 import {AddressRecord} from 'models/misc';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useTranslation} from 'react-i18next';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 
+import {companyLanguageContextMap} from 'utils/language';
 import {
   CustomerAddressFormModel,
   CustomerBasicInfoFormModel,

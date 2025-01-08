@@ -24,6 +24,8 @@ interface Props {
   hasAttachFileButton?: boolean;
   hasSignatureButton?: boolean;
   onSignatureSelect?: (signature?: EmailSignature) => void;
+  updateHtml?: (value: string) => void;
+  onChange: (value: string) => void;
 }
 
 const EditorMenuControls = ({
@@ -31,6 +33,8 @@ const EditorMenuControls = ({
   hasAttachFileButton = true,
   hasSignatureButton = false,
   onSignatureSelect,
+  updateHtml,
+  onChange,
 }: Props) => {
   const {t} = useTranslation();
   const {editor} = useCurrentEditor();
@@ -189,6 +193,8 @@ const EditorMenuControls = ({
               editor={editor}
               signatures={signatures}
               onSignatureSelect={onSignatureSelect}
+              updateHtml={updateHtml}
+              onChange={onChange}
             />
           </Box>
         )}

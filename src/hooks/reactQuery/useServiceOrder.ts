@@ -13,7 +13,6 @@ import {queryKeys} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {SendServiceOrderCheckListRecord} from 'models/checklist';
 import {LanguageContext} from 'context/LanguageProvider';
-import {languageContextMap} from 'utils/utils';
 import {ServiceOrderArticleRecord} from 'models/article';
 import {
   AppointmentConfirmationRequiredOrdersQueryParams,
@@ -39,6 +38,7 @@ import {Resource, RestError, StringValue} from 'models/misc';
 import {Comment} from 'models/comment';
 import {RequestParameters} from 'models/apiRequests';
 import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
+import {languageContextMap} from 'utils/language';
 import {useUserSession} from './useUserSession';
 import {Order} from '../../models/pagination';
 import {useServiceOrderCommentMutation} from './useServiceOrderCommentMutation';
@@ -443,6 +443,7 @@ export const useUnscheduleServiceOrders = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
         enqueueSnackbar('Service job has been unscheduled', {
           variant: 'success',
         });
@@ -467,6 +468,7 @@ export const useUpdateServiceOrderSchedule = (
   successMsg?: string,
   onSuccess?: () => void,
 ) => {
+  const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
   return useMutation(
     ({
@@ -478,6 +480,9 @@ export const useUpdateServiceOrderSchedule = (
     }) => updateServiceOrderSchedule(body, serviceOrderId),
     {
       onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
         if (successMsg)
           enqueueSnackbar(successMsg, {
             variant: 'success',
@@ -1000,6 +1005,7 @@ export const useArchiveServiceOrder = ({
 
   const handleSuccess = () => {
     queryClient.invalidateQueries([queryKeys.queryServiceOrders]);
+    queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
     enqueueSnackbar(message ?? `Service job has been updated`, {
       variant: 'success',
     });

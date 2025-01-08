@@ -9,12 +9,12 @@ import {DemoContainer} from '@mui/x-date-pickers/internals/demo';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {getDatePickerLocale, locales} from 'utils/datetime';
-import {mapLanguageToLocale} from 'utils/utils';
 import {ReactNode, useEffect, useRef, useState} from 'react';
 import {Box, InputLabelProps, SxProps, TextFieldProps} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import {parseISO} from 'date-fns';
+import {mapLanguageToLocale} from 'utils/language';
 import DateRangeCustomToolbar from './DateRangeCustomToolbar';
 import DateRangeActionBar from './DateRangeActionBar';
 
