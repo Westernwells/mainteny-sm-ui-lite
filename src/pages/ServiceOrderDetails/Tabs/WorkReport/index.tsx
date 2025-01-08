@@ -399,7 +399,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
     let file: File | undefined;
 
-    if (activeSignature && activeSignature.content.images) {
+    if (activeSignature && activeSignature.content.images.length > 0) {
       const response = await fetch(
         signatureUrls[activeSignature.content.images[0]!],
       );
@@ -432,6 +432,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
       report,
       signatureAttachment as FileWithPreview,
     );
+
+    setActiveSignature(undefined);
   };
 
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
@@ -864,7 +866,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
       <SendEmailDialog
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
-        onClose={() => setIsSendEmailDialogOpen(false)}
+        onClose={() => {
+          setIsSendEmailDialogOpen(false);
+          setActiveSignature(undefined);
+        }}
         confirmBtnDisabled={sendingWorkReport}
         title="Send work report"
         confirmBtnLabel="Send Work Report"

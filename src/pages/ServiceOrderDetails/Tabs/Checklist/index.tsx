@@ -844,7 +844,10 @@ export const CheckList = ({serviceOrder}: Props) => {
 
                     <SendEmailDialog
                       open={isSendEmailDialogOpen}
-                      onClose={() => setIsSendEmailDialogOpen(false)}
+                      onClose={() => {
+                        setIsSendEmailDialogOpen(false);
+                        setActiveSignature(undefined);
+                      }}
                       confirmBtnDisabled={sendingCheckList}
                       email={
                         serviceOrder.elevator.propertyOwner?.additionalInfo
@@ -890,7 +893,10 @@ export const CheckList = ({serviceOrder}: Props) => {
 
                         let file: File | undefined;
 
-                        if (activeSignature && activeSignature.content.images) {
+                        if (
+                          activeSignature &&
+                          activeSignature.content.images.length > 0
+                        ) {
                           const response = await fetch(
                             signatureUrls[activeSignature.content.images[0]!],
                           );
@@ -966,6 +972,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                             },
                           },
                         });
+                        setActiveSignature(undefined);
                       }}
                       activeSignature={activeSignature}
                       onSignatureSelect={(signature) =>

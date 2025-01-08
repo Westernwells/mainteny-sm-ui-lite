@@ -1440,6 +1440,7 @@ export const Actions = ({
           onClose={() => {
             setIsSendEmailDialogOpen(false);
             setSelectedInvoice(null);
+            setActiveSignature(undefined);
           }}
           id={invoice.id}
           existingFiles={existingFiles}
@@ -1533,7 +1534,10 @@ export const Actions = ({
 
               let file: File | undefined;
 
-              if (activeSignature && activeSignature.content.images) {
+              if (
+                activeSignature &&
+                activeSignature.content.images.length > 0
+              ) {
                 const response = await fetch(
                   signatureUrls[activeSignature.content.images[0]!],
                 );
@@ -1622,6 +1626,7 @@ export const Actions = ({
               await sendEmail(updatedInvoice!);
               setIsSendingEmail(false);
               setIsSendEmailDialogOpen(false);
+              setActiveSignature(undefined);
             } catch (error) {
               setIsSendingEmail(false);
               throw error;

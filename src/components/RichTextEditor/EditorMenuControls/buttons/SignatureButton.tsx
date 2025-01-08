@@ -12,12 +12,16 @@ interface SignatureButtonProps {
   editor: Editor | null;
   signatures?: EmailSignature[];
   onSignatureSelect?: (signature?: EmailSignature) => void;
+  updateHtml?: (value: string) => void;
+  onChange?: (value: string) => void;
 }
 
 const SignatureButton = ({
   editor,
   signatures,
   onSignatureSelect,
+  updateHtml,
+  onChange,
 }: SignatureButtonProps) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -53,11 +57,12 @@ const SignatureButton = ({
 
       const editorContent = editor.getHTML();
 
-      editor
-        .chain()
-        .focus()
-        .setContent(`${editorContent}<br />${browserHtml}`)
-        .run();
+      const finalContent = `${editorContent}<br />${browserHtml}`;
+
+      editor.chain().focus().setContent(finalContent).run();
+
+      updateHtml?.(finalContent);
+      onChange?.(finalContent);
 
       onSignatureSelect?.(activeSignature);
     };
