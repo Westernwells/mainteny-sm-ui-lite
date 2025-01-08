@@ -55,11 +55,7 @@ import {ServiceOrderOrderField, ServiceOrderView} from 'models/service-order';
 import {endOfDay, startOfDay, subDays} from 'date-fns';
 import {Order} from 'models/pagination';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {
-  FileWithPreview,
-  MappedFile,
-  MyDropZone,
-} from 'components/MyDropZone/MyDropzone';
+import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {
   useCreatePurchaseInvoice,
   useDeletePurchaseInvoice,
@@ -200,10 +196,10 @@ const NewPurchaseInvoice = ({
         externalId: purchaseInvoice?.externalId || '',
         subject: purchaseInvoice?.subject || '',
         description: purchaseInvoice?.description || '',
-        supplierId: purchaseInvoice?.additionalInfo.supplier.id || '',
-        supplierName: purchaseInvoice?.additionalInfo.supplier.name || '',
+        supplierId: purchaseInvoice?.additionalInfo?.supplier?.id || '',
+        supplierName: purchaseInvoice?.additionalInfo?.supplier?.name || '',
         supplierExternalId:
-          purchaseInvoice?.additionalInfo.supplier.externalId || '',
+          purchaseInvoice?.additionalInfo?.supplier?.externalId || '',
         dueDate: purchaseInvoice?.dueDate || '',
         sentDate: purchaseInvoice?.sentDate || '',
         currency: purchaseInvoice?.totalAmount.currency || '',
@@ -289,7 +285,6 @@ const NewPurchaseInvoice = ({
 
   const onSubmit = async (formData: FormValues) => {
     const purchaseInvoiceId = uuid;
-
     const uploadPath = `${serviceCompanyId}/purchaseInvoices/${purchaseInvoiceId}/documents`;
 
     const formattedDiscount = {
@@ -305,16 +300,20 @@ const NewPurchaseInvoice = ({
       percentage: discountType === DiscountType.PERCENTAGE ? inputValue : 0,
     };
 
+    const existingDocuments = purchaseInvoice?.additionalInfo?.documents || []; // Existing documents
+
     if (formType === 'edit' || !formType) {
       const updatePurchaseInvoice: UpdatePurchaseInvoiceRecord = {
         externalId: formData.externalId,
         subject: formData.subject,
         description: formData.description,
-        supplier: {
-          id: formData.supplierId,
-          name: formData.supplierName,
-          externalId: formData.supplierExternalId,
-        },
+        supplier: formData.supplierId
+          ? {
+              id: formData.supplierId,
+              name: formData.supplierName,
+              externalId: formData.supplierExternalId,
+            }
+          : null,
         dueDate: formData.dueDate,
         sentDate: formData.sentDate,
         currency: formData.currency,
@@ -333,24 +332,17 @@ const NewPurchaseInvoice = ({
           percentageVat: Number(item.percentageVat),
         })),
         discount: formattedDiscount,
-        status: formData.status,
-        ...(initialDocuments?.length &&
-          !purchaseInvoice?.additionalInfo.documents.length && {
-            documents: formData.documents.reduce<FileWithPreview[]>(
-              (newArr: any[], obj) => [
-                ...newArr,
-                {
-                  type: obj.type,
-                  uri: `${uploadPath}/${obj.name}`,
-                  description: obj.name.split('.')[0],
-                },
-              ],
-              [],
-            ),
-          }),
+        documents:
+          existingDocuments.length > 0
+            ? existingDocuments // Keep existing documents if they exist
+            : formData.documents.map((doc) => ({
+                type: doc.type,
+                uri: `${uploadPath}/${doc.name}`,
+                description: doc.description || doc.name.split('.')[0],
+              })),
       };
 
-      if (formData.documents.length || initialDocuments?.length) {
+      if (existingDocuments.length === 0 && formData.documents.length > 0) {
         await uploadFiles({files: formData.documents, uploadPath});
       }
 
@@ -372,11 +364,13 @@ const NewPurchaseInvoice = ({
         externalId: formData.externalId,
         subject: formData.subject,
         description: formData.description,
-        supplier: {
-          id: formData.supplierId,
-          name: formData.supplierName,
-          externalId: formData.supplierExternalId,
-        },
+        supplier: formData.supplierId
+          ? {
+              id: formData.supplierId,
+              name: formData.supplierName,
+              externalId: formData.supplierExternalId,
+            }
+          : null,
         dueDate: formData.dueDate,
         sentDate: formData.sentDate,
         currency: formData.currency,
@@ -395,26 +389,19 @@ const NewPurchaseInvoice = ({
           percentageVat: Number(item.percentageVat),
         })),
         discount: formattedDiscount,
+        documents: formData.documents.map((doc) => ({
+          type: doc.type,
+          uri: `${uploadPath}/${doc.name}`,
+          description: doc.description || doc.name.split('.')[0],
+        })),
         status: formData.status,
-        documents: formData.documents.reduce<MappedFile[]>(
-          (newArr: MappedFile[], obj) => [
-            ...newArr,
-            {
-              ...obj,
-              type: obj.type,
-              uri: `${uploadPath}/${obj.name}`,
-              description: obj.name.split('.')[0],
-            },
-          ],
-          [],
-        ),
       };
 
       const response = await createPurchaseInvoice({
         data: {...newPurchaseInvoice},
       });
 
-      if (formData.documents.length) {
+      if (formData.documents.length > 0) {
         await uploadFiles({files: formData.documents, uploadPath});
       }
 
@@ -461,9 +448,9 @@ const NewPurchaseInvoice = ({
     name: string;
     externalId: string;
   }) => {
-    setValue('supplierId', selectedSupplier.id);
-    setValue('supplierName', selectedSupplier.name);
-    setValue('supplierExternalId', selectedSupplier.externalId);
+    setValue('supplierId', selectedSupplier?.id);
+    setValue('supplierName', selectedSupplier?.name);
+    setValue('supplierExternalId', selectedSupplier?.externalId);
   };
 
   const {
@@ -478,12 +465,6 @@ const NewPurchaseInvoice = ({
   );
 
   const isValid = () => {
-    const isSupplierValid = !!(
-      watch('supplierExternalId') &&
-      watch('supplierName') &&
-      watch('supplierId')
-    );
-
     const hasValidDates = !!(watch('sentDate') && watch('dueDate'));
     const hasExternalId = !!watch('externalId');
     const hasSubject = !!watch('subject');
@@ -493,8 +474,7 @@ const NewPurchaseInvoice = ({
 
     return (
       !formType ||
-      (isSupplierValid &&
-        hasValidDates &&
+      (hasValidDates &&
         hasExternalId &&
         hasSubject &&
         hasDescription &&
@@ -564,16 +544,16 @@ const NewPurchaseInvoice = ({
   useEffect(() => {
     if (formType === 'edit' && purchaseInvoice) {
       const {supplier} = purchaseInvoice.additionalInfo;
-      setValue('supplierId', supplier.id || '');
-      setValue('supplierName', supplier.name);
-      setValue('supplierExternalId', supplier.externalId);
+      setValue('supplierId', supplier?.id || '');
+      setValue('supplierName', supplier?.name);
+      setValue('supplierExternalId', supplier?.externalId);
     }
   }, [formType, purchaseInvoice]);
 
   useEffect(() => {
     if (initialDocuments && initialDocuments.length > 0 && purchaseInvoice) {
       const {supplier} = purchaseInvoice.additionalInfo;
-      setValue('supplierId', supplier.id || '', {
+      setValue('supplierId', supplier?.id || '', {
         shouldValidate: true,
         shouldDirty: true,
       });
@@ -724,10 +704,11 @@ const NewPurchaseInvoice = ({
                           purchaseInvoice?.additionalInfo.supplier
                             ? {
                                 label:
-                                  purchaseInvoice?.additionalInfo.supplier.name,
+                                  purchaseInvoice?.additionalInfo?.supplier
+                                    ?.name,
                                 value:
-                                  purchaseInvoice?.additionalInfo.supplier.id ||
-                                  '',
+                                  purchaseInvoice?.additionalInfo?.supplier
+                                    ?.id || '',
                               }
                             : null
                         }

@@ -459,15 +459,29 @@ export const PurchaseInvoices = ({
         key: 'purchase-invoice-cell-supplier',
         width: '214px',
         fieldName: PurchaseInvoiceOrderField.SUPPLIER_NAME,
-        renderCell: (purchaseInvoice, cellProps) => (
-          <Cell
-            {...cellProps}
-            onClick={handleSupplierCellClick(purchaseInvoice.supplierId)}>
-            <TableCellText sx={getCommonLinkStyles()}>
-              {purchaseInvoice.supplierName || '-'}
-            </TableCellText>
-          </Cell>
-        ),
+        renderCell: (purchaseInvoice, cellProps) => {
+          const isValidSupplier =
+            purchaseInvoice.supplierName &&
+            purchaseInvoice.supplierId &&
+            purchaseInvoice.supplierName !== '-';
+
+          return (
+            <Cell
+              {...cellProps}
+              onClick={
+                isValidSupplier
+                  ? handleSupplierCellClick(purchaseInvoice.supplierId)
+                  : undefined
+              }>
+              <TableCellText
+                sx={{
+                  ...getCommonLinkStyles(),
+                }}>
+                {purchaseInvoice.supplierName || '-'}
+              </TableCellText>
+            </Cell>
+          );
+        },
       },
       {
         headerName: 'SUPPLIER ID',

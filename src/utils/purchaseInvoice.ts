@@ -14,10 +14,10 @@ export const aggregatePurchaseInvoiceRow = (
     id: purchaseInvoice.id,
     externalId: purchaseInvoice.externalId,
     subject: purchaseInvoice.subject,
-    supplierName: purchaseInvoice.additionalInfo.supplier.name,
+    supplierName: purchaseInvoice?.additionalInfo?.supplier?.name || '-',
     supplierExternalId:
-      purchaseInvoice.additionalInfo.supplier.externalId || '-',
-    supplierId: purchaseInvoice.additionalInfo.supplier.id || '-',
+      purchaseInvoice?.additionalInfo?.supplier?.externalId || '-',
+    supplierId: purchaseInvoice?.additionalInfo?.supplier?.id || '-',
     sentDate: purchaseInvoice.sentDate || '-',
     status: purchaseInvoice.status,
     amount:
