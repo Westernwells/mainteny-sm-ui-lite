@@ -12,6 +12,7 @@ import {
   JobStatus,
   Meta,
   PdfGenerationStatus,
+  ReportStatus,
 } from './misc';
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
@@ -500,6 +501,7 @@ export interface ServiceOrderReportAdditionalInfo {
     startTime: string;
     endTime: string;
   };
+  status?: ReportStatus;
 }
 
 export interface ServiceOrderReportArticleView {
