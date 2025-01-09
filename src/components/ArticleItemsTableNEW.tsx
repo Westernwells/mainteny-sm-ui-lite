@@ -78,13 +78,32 @@ export const ArticleItemsTableNEW = ({
     setItems(newItems);
   };
 
+  const defaultVat =
+    propertyOwner?.additionalInfo.vat || taxRates?.find((tR) => tR.isDefault);
+
+  const defaultPercentageVat =
+    typeof defaultVat?.percentage === 'number'
+      ? defaultVat.percentage
+      : user?.userAccount.serviceCompany.settings.percentageVat || 0;
+
   const handleSelectItem = (row: ArticleView, indexPosition: number) => {
     if (indexPosition >= 0 && indexPosition < items.length) {
       const updatedItems = [...items];
-      updatedItems[indexPosition] = articleViewToInvoiceItemRecord(row);
+      updatedItems[indexPosition] = articleViewToInvoiceItemRecord(row, {
+        percentageVat: defaultPercentageVat,
+        vatId: defaultVat?.id || '',
+        vatName: defaultVat?.name || '',
+      });
       setItems(updatedItems);
     } else {
-      setItems([...items, articleViewToInvoiceItemRecord(row)]);
+      setItems([
+        ...items,
+        articleViewToInvoiceItemRecord(row, {
+          percentageVat: defaultPercentageVat,
+          vatId: defaultVat?.id || '',
+          vatName: defaultVat?.name || '',
+        }),
+      ]);
     }
   };
 
@@ -135,14 +154,6 @@ export const ArticleItemsTableNEW = ({
   };
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
-
-  const defaultVat =
-    propertyOwner?.additionalInfo.vat || taxRates?.find((tR) => tR.isDefault);
-
-  const defaultPercentageVat =
-    typeof defaultVat?.percentage === 'number'
-      ? defaultVat.percentage
-      : user?.userAccount.serviceCompany.settings.percentageVat || 0;
 
   const createEmptyItem = () => {
     const blankItem = {

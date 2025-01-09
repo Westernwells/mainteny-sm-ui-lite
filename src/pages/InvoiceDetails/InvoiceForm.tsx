@@ -1124,6 +1124,7 @@ export const InvoiceForm = ({
       dueDate: undefined,
       paymentTerm: {term: ''},
       purchaseOrderNumber: '',
+      moreInfo: '',
     });
     if (isNewInvoice) {
       setInitialLocalStorageData(null);
@@ -1138,6 +1139,13 @@ export const InvoiceForm = ({
       if (newCustomer.id !== formik.values.propertyOwnerId) {
         handleRemoveCustomer(); // Remove previous customer and related data
         formik.setFieldValue('propertyOwnerId', newCustomer.id); // Set new customer
+        const customerLegalNote = newCustomer?.additionalInfo?.vat?.legalNote;
+        if (customerLegalNote) {
+          const newNotes = `${formik.values.moreInfo} ${cleanHtmlContent(
+            `<p>${customerLegalNote}</p>`,
+          )}`;
+          formik.setFieldValue('moreInfo', newNotes);
+        }
       }
     } else {
       handleRemoveCustomer();
