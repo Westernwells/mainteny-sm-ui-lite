@@ -297,13 +297,21 @@ export const getAggregatedPartialPaymentsVats = (
 
 export const articleViewToInvoiceItemRecord = (
   article: ArticleView,
+  unitAmountAddtionalValues?: {
+    percentageVat: number;
+    vatId: string;
+    vatName: string;
+  },
 ): InvoiceItemRecord => {
   const record: InvoiceItemRecord = {
     article,
     name: article.name,
     description: article.description,
     quantity: 1,
-    unitAmount: article.unitSellingAmount,
+    unitAmount: {
+      ...article.unitSellingAmount,
+      ...unitAmountAddtionalValues,
+    },
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
 };

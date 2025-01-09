@@ -77,6 +77,14 @@ export const ArticleItemsTableQuotation = ({
 
   const {language: selectedLng} = useContext(LanguageContext);
 
+  const defaultVat =
+    propertyOwner?.additionalInfo.vat || taxRates?.find((tR) => tR.isDefault);
+
+  const defaultPercentageVat =
+    typeof defaultVat?.percentage === 'number'
+      ? defaultVat.percentage
+      : user?.userAccount.serviceCompany.settings.percentageVat || 0;
+
   const articleViewToItem = (article: ArticleView): QuotationItemRecord => {
     const record: QuotationItemRecord = {
       id: article.id,
@@ -84,7 +92,12 @@ export const ArticleItemsTableQuotation = ({
       name: article.name,
       description: article.description,
       quantity: 1,
-      unitAmount: article.unitSellingAmount,
+      unitAmount: {
+        ...article.unitSellingAmount,
+        percentageVat: defaultPercentageVat,
+        vatId: defaultVat?.id || '',
+        vatName: defaultVat?.name || '',
+      },
     };
     return getItemRecord(record, record.unitAmount.percentageVat);
   };
@@ -145,14 +158,6 @@ export const ArticleItemsTableQuotation = ({
   };
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
-
-  const defaultVat =
-    propertyOwner?.additionalInfo.vat || taxRates?.find((tR) => tR.isDefault);
-
-  const defaultPercentageVat =
-    typeof defaultVat?.percentage === 'number'
-      ? defaultVat.percentage
-      : user?.userAccount.serviceCompany.settings.percentageVat || 0;
 
   const createEmptyItem = () => {
     const blankItem = {
