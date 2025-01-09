@@ -264,43 +264,54 @@ export const applyGlobalDiscountOnItems = (
   });
 };
 
+const getDiscountedAmount = (item: InvoiceItemRecord) => {
+  const baseAmount = item.unitAmount.netAmount * item.quantity;
+  const discount = item.additionalInfo?.discount || item.discount;
+  const discountParams =
+    discount?.type === DiscountType.AMOUNT
+      ? {amount: discount.amount?.value ?? 0}
+      : {percentage: discount?.percentage ?? 0};
+  return applyDiscount({actualValue: baseAmount, ...discountParams});
+};
+
 export const getAggregatedPartialPaymentsVats = (
   items: InvoiceItemRecord[],
   totalAmountExclVat: number,
 ) => {
-  const total = items
-    .map((item) => item.unitAmount.netAmount * item.quantity)
-    .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
+  const total = items.reduce((sum, item) => sum + getDiscountedAmount(item), 0);
 
   return items.reduce((acc, item) => {
     const {percentageVat} = item.unitAmount;
-    const totalNetAmount = item.unitAmount.netAmount * item.quantity;
-    const portion = totalNetAmount === total ? 1 : totalNetAmount / total;
+    const discountedAmount = getDiscountedAmount(item);
+    const portion = discountedAmount === total ? 1 : discountedAmount / total;
     const vat = totalAmountExclVat * (percentageVat / 100) * portion;
 
-    const foundPercentageVat = acc.find(
-      (i) => i.percentageVat === percentageVat,
-    );
-
-    if (foundPercentageVat) {
-      foundPercentageVat.vat += vat;
-    } else {
-      acc.push({percentageVat, vat});
+    const existing = acc.find((i) => i.percentageVat === percentageVat);
+    if (existing) {
+      existing.vat += vat;
+      return acc;
     }
-
-    return acc;
+    return [...acc, {percentageVat, vat}];
   }, [] as {percentageVat: number; vat: number}[]);
 };
 
 export const articleViewToInvoiceItemRecord = (
   article: ArticleView,
+  unitAmountAddtionalValues?: {
+    percentageVat: number;
+    vatId: string;
+    vatName: string;
+  },
 ): InvoiceItemRecord => {
   const record: InvoiceItemRecord = {
     article,
     name: article.name,
     description: article.description,
     quantity: 1,
-    unitAmount: article.unitSellingAmount,
+    unitAmount: {
+      ...article.unitSellingAmount,
+      ...unitAmountAddtionalValues,
+    },
   };
   return getItemRecord(record, record.unitAmount.percentageVat);
 };

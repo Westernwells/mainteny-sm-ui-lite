@@ -55,32 +55,34 @@ export const PurchaseInvoiceInfo = ({
           <SectionTitle Icon={PinIllustration} title="General Info" />
         </Box>
 
-        <Grid item xs={12}>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography variant="subtitle2" color="textSecondary">
-                {t('Supplier')}
-              </Typography>
-              <Link
-                component={RouterLink}
-                to={`/articles/supplier/${purchaseInvoice?.additionalInfo.supplier.id}`}
-                underline="hover"
-                variant="body2"
-                sx={getCommonLinkStyles()}
-                color={theme.palette.info.main}>
-                {purchaseInvoice?.additionalInfo.supplier.name || '-'}
-              </Link>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="subtitle2" color="textSecondary">
-                {t('Supplier ID')}
-              </Typography>
-              <Typography variant="body1" color={theme.palette.primary.dark}>
-                {purchaseInvoice?.additionalInfo.supplier.externalId || '-'}
-              </Typography>
+        {purchaseInvoice?.additionalInfo.supplier && (
+          <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="subtitle2" color="textSecondary">
+                  {t('Supplier')}
+                </Typography>
+                <Link
+                  component={RouterLink}
+                  to={`/articles/supplier/${purchaseInvoice?.additionalInfo.supplier.id}`}
+                  underline="hover"
+                  variant="body2"
+                  sx={getCommonLinkStyles()}
+                  color={theme.palette.info.main}>
+                  {purchaseInvoice?.additionalInfo.supplier.name || '-'}
+                </Link>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="subtitle2" color="textSecondary">
+                  {t('Supplier ID')}
+                </Typography>
+                <Typography variant="body1" color={theme.palette.primary.dark}>
+                  {purchaseInvoice?.additionalInfo.supplier.externalId || '-'}
+                </Typography>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
+        )}
 
         {(purchaseInvoice?.additionalInfo?.serviceOrders?.length ?? 0) > 0 && (
           <Grid item xs={12}>

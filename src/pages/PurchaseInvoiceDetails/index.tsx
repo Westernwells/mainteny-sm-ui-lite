@@ -67,7 +67,7 @@ export const PurchaseInvoiceDetails = ({purchaseInvoice}: Props) => {
   const handleDeleteInvoice = () => {
     if (purchaseInvoice.id)
       deletePurchaseInvoice(
-        {invoiceId: purchaseInvoice.id, shouldNavigate: false},
+        {invoiceId: purchaseInvoice.id, shouldNavigate: true},
         {
           onSuccess: () => {
             enqueueSnackbar(

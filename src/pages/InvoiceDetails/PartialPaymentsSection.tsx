@@ -32,8 +32,8 @@ import {
 } from 'models/invoice';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
-  Currencies,
   aggregatedAmountToMoney,
+  centsToMoney,
   formatCurrency,
   getCurrencySymbol,
   useCurrentCurrency,
@@ -179,13 +179,12 @@ export const PartialPaymentsSection = ({
     }
   };
 
-  const previousInvoicesTotalExclVat = previousInvoices
-    ?.map(
-      (i) =>
-        (i.totalAmount?.netAmount ?? 0) /
-        10 ** (i.totalAmount?.fractionDigits ?? 2),
-    )
-    .reduce((a, b) => a + b, 0);
+  const previousInvoicesTotalExclVat = centsToMoney(
+    currentCurrency?.code!,
+    previousInvoices
+      ?.map((i) => i.totalAmount?.netAmount || 0)
+      .reduce((a, b) => a + b, 0),
+  );
 
   const isAllowedAmountField = (values: NumberFormatValues) => {
     const {floatValue} = values;
@@ -240,13 +239,28 @@ export const PartialPaymentsSection = ({
       ? (subtotalExclVat * (formik.values.payment?.percentage ?? 0)) / 100
       : formik.values.payment?.type === PaymentType.PER_ITEM
       ? formik.values.items
-          ?.map(
-            (item) =>
-              ((item.unitAmount.netAmount * item.quantity) /
-                10 ** Currencies[item.unitAmount.currency] /
-                100) *
-              (item.payment?.percentage ?? 0),
-          )
+          ?.map((item) => {
+            // Calculate base amount from unit price and quantity
+            const baseAmount = centsToMoney(
+              item.unitAmount.currency,
+              item.unitAmount.netAmount * item.quantity,
+            );
+
+            // Get discount from either additionalInfo or direct discount field
+            const discount = item.additionalInfo?.discount || item.discount;
+
+            // Calculate discounted price
+            const itemTotalPriceExclVat = applyDiscount({
+              actualValue: baseAmount,
+              ...(discount?.type === DiscountType.AMOUNT
+                ? {amount: discount?.amount?.value ?? 0}
+                : {percentage: discount?.percentage ?? 0}),
+            });
+
+            // Calculate final amount based on payment percentage
+            const paymentPercentage = item.payment?.percentage ?? 0;
+            return (itemTotalPriceExclVat / 100) * paymentPercentage;
+          })
           ?.reduce((a, b) => a + b, 0)
       : 0;
 
@@ -524,12 +538,42 @@ export const PartialPaymentsSection = ({
                           );
                           const isEditingCurrentItem =
                             prevInvoice.id === invoice?.id;
-                          const itemTotalPriceExclVat =
-                            (isEditingCurrentItem
-                              ? formik.values.items[itemIndex].unitAmount
-                                  .netAmount * item.quantity
-                              : item.unitAmount.netAmount * item.quantity) /
-                            10 ** item.unitAmount.fractionDigits;
+                          const currentItem = formik.values.items[itemIndex];
+                          const currentDiscount = currentItem?.discount;
+                          const itemDiscount = item?.additionalInfo?.discount;
+
+                          // Calculate base amount before discounts
+                          const baseAmount = isEditingCurrentItem
+                            ? centsToMoney(
+                                item.unitAmount.currency,
+                                currentItem.unitAmount.netAmount *
+                                  item.quantity,
+                              )
+                            : item.unitAmount.netAmount * item.quantity;
+
+                          // Get discount parameters based on whether editing current item
+                          const discountParams = isEditingCurrentItem
+                            ? currentDiscount?.type === DiscountType.AMOUNT
+                              ? {amount: currentDiscount?.amount?.value ?? 0}
+                              : {percentage: currentDiscount?.percentage ?? 0}
+                            : itemDiscount?.type === DiscountType.AMOUNT
+                            ? {amount: itemDiscount?.amount?.value ?? 0}
+                            : {percentage: itemDiscount?.percentage ?? 0};
+
+                          // Apply discount to base amount
+                          const discountedAmount = applyDiscount({
+                            actualValue: baseAmount,
+                            ...discountParams,
+                          });
+
+                          // Convert to currency if not editing current item
+                          const itemTotalPriceExclVat = isEditingCurrentItem
+                            ? discountedAmount
+                            : centsToMoney(
+                                currentCurrency?.code!,
+                                discountedAmount,
+                              );
+
                           const itemCurrencySymbol =
                             getCurrencySymbol[item.unitAmount.currency];
                           const itemAmountToBePaid =
@@ -673,9 +717,23 @@ export const PartialPaymentsSection = ({
                           getItemOverallPercentage(i.article?.id ?? '') < 100,
                       )
                       ?.map((item, index) => {
-                        const itemTotalPriceExclVat =
-                          (item.unitAmount.netAmount * item.quantity) /
-                          10 ** Currencies[item.unitAmount.currency];
+                        // Calculate base amount before discounts
+                        const baseAmount = centsToMoney(
+                          item.unitAmount.currency,
+                          item.unitAmount.netAmount * item.quantity,
+                        );
+
+                        // Apply discount based on discount type (amount or percentage)
+                        const discountParams =
+                          item?.discount?.type === DiscountType.AMOUNT
+                            ? {amount: item?.discount?.amount?.value ?? 0}
+                            : {percentage: item?.discount?.percentage ?? 0};
+
+                        const itemTotalPriceExclVat = applyDiscount({
+                          actualValue: baseAmount,
+                          ...discountParams,
+                        });
+
                         const itemCurrencySymbol =
                           getCurrencySymbol[item.unitAmount.currency];
                         const itemAmountToBePaid =

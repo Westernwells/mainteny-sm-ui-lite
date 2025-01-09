@@ -137,6 +137,7 @@ export const useCreatePurchaseInvoice = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([qk.fetchPurchaseInvoices]);
         queryClient.invalidateQueries([qk.purchaseInvoiceById]);
+        queryClient.invalidateQueries([qk.fetchPurchaseInvoiceStatistics]);
 
         enqueueSnackbar(`Purchase Invoice created successfully`, {
           variant: 'success',
@@ -176,6 +177,7 @@ export const useUpdatePurchaseInvoice = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([qk.fetchPurchaseInvoices]);
         queryClient.invalidateQueries([qk.purchaseInvoiceById]);
+        queryClient.invalidateQueries([qk.fetchPurchaseInvoiceStatistics]);
         enqueueSnackbar(`Purchase Invoice updated successfully`, {
           variant: 'success',
         });
@@ -209,6 +211,7 @@ export const useDeletePurchaseInvoice = () => {
       onSuccess: (__, {shouldNavigate}) => {
         queryClient.invalidateQueries([qk.fetchPurchaseInvoices]);
         queryClient.invalidateQueries([qk.purchaseInvoiceById]);
+        queryClient.invalidateQueries([qk.fetchPurchaseInvoiceStatistics]);
         if (shouldNavigate)
           navigate(`/purchase-invoices?pageIndex=1&pageSize=25`);
       },
