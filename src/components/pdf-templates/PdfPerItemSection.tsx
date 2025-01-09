@@ -1,7 +1,8 @@
 import {Text, View, Font, StyleSheet} from '@react-pdf/renderer';
-import {AggregatedInvoiceItem, InvoiceView} from 'models/invoice';
+import {AggregatedInvoiceItem, InvoiceView, DiscountType} from 'models/invoice';
 import {formatCurrency, centsToMoney, getCurrencySymbol} from 'utils/currency';
 import {Currency} from 'models/misc';
+import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -138,17 +139,38 @@ const PdfPerItemSection = ({
                     };
                   }
 
-                  const itemTotalPriceExclVat =
-                    (item.unitAmount.netAmount * item.quantity) /
-                    10 ** item.unitAmount.fractionDigits;
+                  // Calculate base amount from unit price and quantity
+                  const baseAmount = item.unitAmount.netAmount * item.quantity;
 
-                  const itemAmountToBePaid =
-                    (itemTotalPriceExclVat / 100) *
-                    (item.additionalInfo?.payment?.percentage ?? 0);
+                  // Get discount parameters based on discount type
+                  const discount = item.additionalInfo?.discount;
+                  const discountParams =
+                    discount?.type === DiscountType.AMOUNT
+                      ? {
+                          amount: discount?.amount?.value ?? 0,
+                        }
+                      : {
+                          percentage: discount?.percentage ?? 0,
+                        };
 
-                  acc[itemId].totalAmountToBePaid += itemAmountToBePaid;
-                  acc[itemId].totalPercentage +=
+                  // Apply discount to get total price excluding VAT
+                  const itemTotalPriceExclVat = applyDiscount({
+                    actualValue: baseAmount,
+                    ...discountParams,
+                  });
+
+                  // Calculate amount to be paid based on payment percentage
+                  const paymentPercentage =
                     item.additionalInfo?.payment?.percentage ?? 0;
+                  const itemAmountToBePaid =
+                    (itemTotalPriceExclVat / 100) * paymentPercentage;
+
+                  // Update accumulated totals
+                  acc[itemId].totalAmountToBePaid += centsToMoney(
+                    item.unitAmount.currency,
+                    itemAmountToBePaid,
+                  );
+                  acc[itemId].totalPercentage += paymentPercentage;
                 }
               });
               return acc;
@@ -165,6 +187,42 @@ const PdfPerItemSection = ({
                       .map((item, index) => {
                         const itemId = item.article?.id!;
                         const aggregatedItem = aggregatedItems[itemId];
+                        // Calculate base amount from unit price and quantity
+                        const baseAmount =
+                          item.unitAmount.netAmount * item.quantity;
+
+                        // Get discount parameters based on discount type
+                        const discount = item.additionalInfo?.discount;
+                        const discountParams =
+                          discount?.type === DiscountType.AMOUNT
+                            ? {
+                                amount: discount?.amount?.value ?? 0,
+                              }
+                            : {
+                                percentage: discount?.percentage ?? 0,
+                              };
+
+                        // Apply discount and convert to money
+                        const discountedAmount = applyDiscount({
+                          actualValue: baseAmount,
+                          ...discountParams,
+                        });
+
+                        const amountInMoney = centsToMoney(
+                          currentCurrency?.code!,
+                          discountedAmount,
+                        );
+
+                        // Format amount with currency
+                        const itemTotalPriceExclVat = formatCurrency(
+                          amountInMoney,
+                          {
+                            currency: currentCurrency?.code,
+                            excludeCurrencySymbol: true,
+                            currencySymbol: currentCurrency?.symbol,
+                            companyLang: selectedLng,
+                          },
+                        );
 
                         return (
                           <View
@@ -201,18 +259,7 @@ const PdfPerItemSection = ({
                                 textAlign: 'right',
                                 width: '18%',
                               }}>
-                              {formatCurrency(
-                                centsToMoney(
-                                  currentCurrency?.code!,
-                                  item.unitAmount.netAmount * item.quantity,
-                                ),
-                                {
-                                  currency: currentCurrency?.code,
-                                  excludeCurrencySymbol: true,
-                                  currencySymbol: currentCurrency?.symbol,
-                                  companyLang: selectedLng,
-                                },
-                              )}
+                              {itemTotalPriceExclVat}
                             </Text>
                             <Text
                               style={{
