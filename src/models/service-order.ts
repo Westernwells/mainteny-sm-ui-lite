@@ -754,6 +754,7 @@ export type ServiceOrderFilterForm = {
   grossAmountMin?: number;
   grossAmountMax?: number;
   hasComment?: boolean;
+  isAppointmentRequired?: boolean;
 };
 
 export enum ServiceOrderTypePriority {

@@ -1,7 +1,7 @@
 import {Dispatch, SetStateAction, useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {
-  ServiceCompanyContactPeronFormModel,
+  ServiceCompanyContactPersonFormModel,
   ServiceCompanyContactPersonRole,
   ServiceCompanyContactPersonView,
 } from 'models/contacts';
@@ -24,7 +24,7 @@ interface Props {
 const getDefaultValues = (
   contactPerson: ServiceCompanyContactPersonView | undefined,
   serviceCompanyId: string,
-): ServiceCompanyContactPeronFormModel => ({
+): ServiceCompanyContactPersonFormModel => ({
   contactPerson: {
     roles:
       (contactPerson?.userAccount
@@ -67,9 +67,9 @@ const ContactFormDialog = ({
   }`;
 
   const useHookForm = useForm<
-    ServiceCompanyContactPeronFormModel,
+    ServiceCompanyContactPersonFormModel,
     any,
-    ServiceCompanyContactPeronFormModel
+    ServiceCompanyContactPersonFormModel
   >({
     defaultValues: getDefaultValues(contactPerson, serviceCompanyId),
     mode: 'all',
@@ -86,7 +86,7 @@ const ContactFormDialog = ({
   };
 
   const handleContactFormSubmit = async (
-    data: ServiceCompanyContactPeronFormModel,
+    data: ServiceCompanyContactPersonFormModel,
   ) => {
     const file = data.userAccount.photoUrl?.[0] as unknown as FileWithPreview;
     const photoUrl = `${uploadPath}/${file?.name}`;

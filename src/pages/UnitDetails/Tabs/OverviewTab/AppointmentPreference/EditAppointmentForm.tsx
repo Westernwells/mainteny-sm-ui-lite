@@ -12,7 +12,11 @@ import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import {UseFormRegister, UseFormSetValue, UseFormWatch} from 'react-hook-form';
 import {useState, useEffect} from 'react';
-import {Typography} from '@mui/material';
+import {Alert, Typography} from '@mui/material';
+import {ServiceCompanyContactPersonView} from 'models/contacts';
+import {useServiceCompanyContactPersons} from 'hooks/reactQuery/useContacts';
+import {ContactPersonDropdown} from 'components/ContactPersonDropdown';
+import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
   watch: UseFormWatch<AppointmentFormModel>;
@@ -54,6 +58,7 @@ export const EditAppointmentForm = ({
   register,
   defaultValues,
 }: Props) => {
+  const theme = useTheme();
   const formatDate = useFormatDate();
   const {t} = useTranslation();
 
@@ -62,6 +67,25 @@ export const EditAppointmentForm = ({
   const appointmentDaysOfWeek = watch('appointmentDaysOfWeek');
   const openingHour = watch('openingHour');
   const closingHour = watch('closingHour');
+
+  const {data: contactPersons} = useServiceCompanyContactPersons({
+    pageSize: 100,
+  });
+
+  const handleContactChange = (
+    contact: ServiceCompanyContactPersonView | null,
+  ) => {
+    if (contact) {
+      setValue('contactPersonId', contact.id);
+      setValue(
+        'contactPersonName',
+        `${contact.userAccount.firstName} ${contact.userAccount.lastName}`,
+      );
+    } else {
+      setValue('contactPersonId', '');
+      setValue('contactPersonName', '');
+    }
+  };
 
   const validateTimes = (opening?: string, closing?: string) => {
     if (opening && closing) {
@@ -82,7 +106,17 @@ export const EditAppointmentForm = ({
 
   return (
     <Grid container spacing={2} component="form">
-      <Grid item sm={12} md={12} xs={12}>
+      <Grid item sm={12} md={12} xs={12} sx={{pb: 2}}>
+        <Alert severity="warning">
+          <Typography variant="body2" color={theme.palette.info.infoAlert}>
+            {t(
+              'Please note that when you edit this you are editing the appointment preferences for the unit for all future jobs.',
+            )}
+          </Typography>
+        </Alert>
+      </Grid>
+
+      <Grid item sm={4} md={4} xs={12}>
         <FormSelect
           labelId="daysOfWeek-label"
           label="Days of the week"
@@ -102,7 +136,7 @@ export const EditAppointmentForm = ({
         />
       </Grid>
 
-      <Grid item sm={6} md={6} xs={12}>
+      <Grid item sm={4} md={4} xs={12}>
         <TimePicker
           defaultTime={
             defaultValues.openingHour
@@ -154,7 +188,7 @@ export const EditAppointmentForm = ({
         )}
       </Grid>
 
-      <Grid item sm={6} md={6} xs={12}>
+      <Grid item sm={4} md={4} xs={12}>
         <TimePicker
           minTime={
             openingHour
@@ -205,19 +239,7 @@ export const EditAppointmentForm = ({
         )}
       </Grid>
 
-      <Grid item sm={12} xs={12}>
-        <FormInput
-          fieldProps={{
-            label: t('Notification Due'),
-            placeholder: t('E.g. 5 days'),
-            type: 'number',
-            inputProps: {min: 0},
-            ...register('appointmentNotificationDue'),
-          }}
-        />
-      </Grid>
-
-      <Grid item md={6} sm={6} xs={12}>
+      <Grid item md={4} sm={4} xs={12}>
         <FormControl fullWidth>
           <InputLabel
             size="small"
@@ -239,7 +261,7 @@ export const EditAppointmentForm = ({
         </FormControl>
       </Grid>
 
-      <Grid item md={6} sm={6} xs={12}>
+      <Grid item md={4} sm={4} xs={12}>
         <FormControl fullWidth>
           <InputLabel
             size="small"
@@ -259,6 +281,38 @@ export const EditAppointmentForm = ({
             <MenuItem value="false">{t('No')}</MenuItem>
           </Select>
         </FormControl>
+      </Grid>
+
+      <Grid item md={4} sm={4} xs={12}>
+        <FormInput
+          fieldProps={{
+            label: t('Notification Due'),
+            placeholder: t('E.g. 5 days'),
+            type: 'number',
+            inputProps: {min: 0},
+            ...register('appointmentNotificationDue'),
+          }}
+        />
+      </Grid>
+
+      <Grid item md={12} sm={12} xs={12}>
+        <ContactPersonDropdown
+          contactPersons={contactPersons?.data}
+          selectedContactId={watch('contactPersonId')}
+          onContactChange={handleContactChange}
+        />
+      </Grid>
+
+      <Grid item md={12} sm={12} xs={12}>
+        <FormInput
+          fieldProps={{
+            label: t('Description'),
+            ...register('description'),
+            multiline: true,
+            rows: 4,
+            sx: {pt: '1em'},
+          }}
+        />
       </Grid>
     </Grid>
   );

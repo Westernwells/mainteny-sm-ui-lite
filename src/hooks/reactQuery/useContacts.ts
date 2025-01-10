@@ -8,7 +8,7 @@ import {
   CreatePropertyContactPersonRecord,
   RefContactPersonQueryParams,
   RefContactPersonView,
-  ServiceCompanyContactPeronFormModel,
+  ServiceCompanyContactPersonFormModel,
   ServiceCompanyContactPersonQueryParams,
   ServiceCompanyContactPersonView,
   UpdatePropertyContactPersonRecord,
@@ -343,7 +343,7 @@ export const useServiceCompanyContactPersons = (
 };
 
 const createServiceCompanyContactPerson = async (
-  body: ServiceCompanyContactPeronFormModel,
+  body: ServiceCompanyContactPersonFormModel,
 ) => {
   const response = await axiosClient.post<StringValue>(`/api/contactPersons`, {
     ...body,
@@ -356,7 +356,7 @@ export const useCreateServiceCompanyContactPerson = (successMsg?: string) => {
   const {enqueueSnackbar, showError} = useSnackbar();
   const queryClient = useQueryClient();
   return useMutation(
-    (data: ServiceCompanyContactPeronFormModel) =>
+    (data: ServiceCompanyContactPersonFormModel) =>
       createServiceCompanyContactPerson(data),
     {
       onSuccess: () => {
@@ -377,7 +377,7 @@ export const useCreateServiceCompanyContactPerson = (successMsg?: string) => {
 };
 
 const updateServiceCompanyContactPerson = async (
-  body: ServiceCompanyContactPeronFormModel,
+  body: ServiceCompanyContactPersonFormModel,
   contactPersonId: string,
 ) => {
   await axiosClient.put<StringValue>(`/api/contactPersons/${contactPersonId}`, {
@@ -393,7 +393,7 @@ export const useUpdateServiceCompanyContactPerson = (successMsg?: string) => {
       body,
       contactPersonId,
     }: {
-      body: ServiceCompanyContactPeronFormModel;
+      body: ServiceCompanyContactPersonFormModel;
       contactPersonId: string;
     }) => updateServiceCompanyContactPerson(body, contactPersonId),
     {
