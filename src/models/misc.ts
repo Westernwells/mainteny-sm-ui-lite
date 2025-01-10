@@ -24,10 +24,13 @@ export enum DispatchStrategy {
   ASSIGNMENT_WEIGHTS = 'ASSIGNMENT_WEIGHTS',
 }
 
-export interface Meta {
-  createdAt: string;
+export interface Meta extends SimpleMeta {
   creator?: UserAccountSimpleView | null;
   deleted?: boolean;
+}
+
+export interface SimpleMeta {
+  createdAt: string;
   lastUpdatedAt: string;
   state: State;
 }

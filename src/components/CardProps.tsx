@@ -26,6 +26,7 @@ interface Props {
   enabled?: boolean;
   shouldTranslate?: boolean;
   iconTooltip?: string;
+  hasMaxWidth?: boolean;
 }
 
 export const CardProps = ({
@@ -45,6 +46,7 @@ export const CardProps = ({
   enabled,
   iconTooltip,
   shouldTranslate = true,
+  hasMaxWidth = true,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -71,10 +73,11 @@ export const CardProps = ({
           <Box
             sx={{
               backgroundColor: iconBackground,
-              p: '0.7em',
+              py: '0.7em',
+              pr: '0.2em',
               display: 'flex',
               justifyContent: 'center',
-              mr: '0.8em',
+              mr: '0.5em',
               maxHeight: iconMaxHeight || 'default',
               cursor: 'pointer',
               ...iconContainerStyles,
@@ -163,8 +166,9 @@ export const CardProps = ({
                   display: '-webkit-box',
                   wordBreak: 'break-all',
                   overflow: 'hidden',
-                  maxWidth: '300px',
+                  ...(hasMaxWidth && {maxWidth: '300px'}),
                   textWrap: 'wrap',
+                  flex: 1,
                   ...bodyStyle,
                 }}>
                 {hasProtocol(bodyText) || !shouldTranslate

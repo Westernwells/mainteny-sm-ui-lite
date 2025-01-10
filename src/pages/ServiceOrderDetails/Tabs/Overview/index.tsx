@@ -22,6 +22,7 @@ import {Invoices} from './Invoices';
 import {Articles} from './Articles';
 import {Description} from './Description';
 import {Attachment} from './Attachment';
+import {AppointmentPreferences} from './AppointmentPreferences';
 
 interface Props {
   serviceOrder: ServiceOrderView;
@@ -74,6 +75,10 @@ export const Overview = ({serviceOrder}: Props) => {
           }}>
           <Box>
             <OrderInfoCard serviceOrderDetails={serviceOrder!} />
+          </Box>
+
+          <Box mt="1em" flexGrow={1}>
+            <AppointmentPreferences order={serviceOrder} />
           </Box>
 
           <Box mt="1em" flexGrow={1}>
