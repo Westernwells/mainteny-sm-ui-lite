@@ -37,6 +37,7 @@ export const Signature = ({url, name, designation}: Props) => {
               objectPosition: 'top',
               maxWidth: '100%',
               maxHeight: '300%',
+              height: '100%',
             }}
           />
         ) : (
