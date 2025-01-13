@@ -22,14 +22,14 @@ export const useAppointmentPreferences = (elevator: ElevatorView) => {
     requiresAppointment:
       elevator.additionalInfo?.customerAppointment?.requiresAppointment ??
       false,
-    description: elevator.additionalInfo.customerAppointment.description ?? '',
+    description: elevator.additionalInfo.customerAppointment?.description ?? '',
     contactPersonId:
-      elevator.additionalInfo.customerAppointment.contactPerson?.id ?? '',
+      elevator.additionalInfo.customerAppointment?.contactPerson?.id ?? '',
     contactPersonName: `${
-      elevator.additionalInfo.customerAppointment.contactPerson?.userAccount
+      elevator.additionalInfo.customerAppointment?.contactPerson?.userAccount
         .firstName || ''
     } ${
-      elevator.additionalInfo.customerAppointment.contactPerson?.userAccount
+      elevator.additionalInfo.customerAppointment?.contactPerson?.userAccount
         .lastName || ''
     }`,
   });

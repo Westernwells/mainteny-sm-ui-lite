@@ -22,7 +22,7 @@ describe('Settings page', () => {
     });
 
     it('test edit basic info modal', () => {
-        cy.get('svg[data-testid="EditOutlinedIcon"]').eq(0).click();
+        cy.get('svg[data-testid="EditOutlinedIcon"]').eq(1).click();
 
         cy.get('input[name="email"]')
             .invoke('val')
@@ -37,8 +37,6 @@ describe('Settings page', () => {
                 cy.contains('Enter a valid email').should('not.exist');
                 cy.get('button[type="submit"]').should('not.be.disabled');
             });
-
-        //
 
         cy.get('input[name="name"]')
             .invoke('val')
