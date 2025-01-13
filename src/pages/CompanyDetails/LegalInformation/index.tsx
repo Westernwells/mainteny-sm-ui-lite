@@ -15,15 +15,11 @@ interface Props {
 }
 
 const validationSchema = Yup.object().shape({
-  managingDirector: Yup.string()
-    .nullable()
-    .required('Managing Director is required'),
-  arbitrationCourt: Yup.string()
-    .nullable()
-    .required('Arbitration Court is required'),
-  tradeRegisterNumber: Yup.string()
-    .nullable()
-    .required('Trade Register Number is required'),
+  managingDirector: Yup.string().nullable(),
+  owner: Yup.string().nullable(),
+  representedBy: Yup.string()
+    .required('You must select a representation option')
+    .oneOf(['owner', 'managingDirector'], 'Invalid option selected'),
 });
 
 export const LegalInformation = ({company}: Props) => {
@@ -38,22 +34,45 @@ export const LegalInformation = ({company}: Props) => {
       managingDirector: company?.settings?.managingDirector || '',
       arbitrationCourt: company?.settings?.arbitrationCourt || '',
       tradeRegisterNumber: company?.settings?.tradeRegisterNumber || '',
+      owner: company?.settings?.owner || '',
+      representedBy: company?.settings?.managingDirector?.trim()
+        ? 'managingDirector'
+        : 'owner',
     },
-    onSubmit: () => {},
     validationSchema,
+    onSubmit: async () => {
+      const {managingDirector, owner, representedBy} = formik.values;
+
+      const updatedData = {
+        managingDirector:
+          representedBy === 'managingDirector' ? managingDirector || '' : '',
+        owner: representedBy === 'owner' ? owner || '' : '',
+        arbitrationCourt: formik.values.arbitrationCourt,
+        tradeRegisterNumber: formik.values.tradeRegisterNumber,
+      };
+
+      await updateCompany({
+        body: updatedData,
+        companyId: company?.id || '',
+      });
+
+      formik.resetForm({
+        values: {
+          ...formik.values,
+          managingDirector: updatedData.managingDirector,
+          owner: updatedData.owner,
+          arbitrationCourt: updatedData.arbitrationCourt,
+          tradeRegisterNumber: updatedData.tradeRegisterNumber,
+          representedBy,
+        },
+      });
+
+      setOpenDialog(false);
+    },
   });
 
   const onSave = async () => {
-    await updateCompany({
-      body: {
-        managingDirector: formik.values.managingDirector,
-        arbitrationCourt: formik.values.arbitrationCourt,
-        tradeRegisterNumber: formik.values.tradeRegisterNumber,
-      },
-      companyId: company?.id || '',
-    });
-
-    setOpenDialog(false);
+    await formik.submitForm();
   };
 
   useEffect(() => {
@@ -77,6 +96,11 @@ export const LegalInformation = ({company}: Props) => {
           Icon={PersonOutline}
         />
         <CardDataListItem
+          label="Owner"
+          value={company.settings.owner}
+          Icon={PersonOutline}
+        />
+        <CardDataListItem
           label="Arbitration court"
           value={company.settings.arbitrationCourt}
           Icon={GavelOutlined}
@@ -90,11 +114,11 @@ export const LegalInformation = ({company}: Props) => {
       <Dialog
         title="Edit Legal"
         onCancel={() => setOpenDialog(false)}
-        onSave={() => onSave()}
+        onSave={onSave}
         saveButtonText="Save Changes"
         disableSaveBtn={!!Object.keys(formik.errors).length}
         dialogProps={{
-          maxWidth: 'xs',
+          maxWidth: 'sm',
           open: openDialog || false,
         }}
         dialogContentStyles={{
