@@ -3055,5 +3055,7 @@
   "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "Datum dospeća plaćanja se automatski ažurira ako ste dodali uslove plaćanja na fakturu. Ovi uslovi prilagođavaju datum dospeća kad god izmenite ili pošaljete fakturu. Ako ne koristite uslove plaćanja, možete ručno da podesite datum dospeća.",
   "Appointment required": "Zakazivanje potrebno",
   "Please note that when you edit this you are editing the appointment preferences for the unit for all future jobs.": "Imajte na umu da kada uređujete ovo, uređujete postavke termina za jedinicu za sve buduće poslove.",
-  "Owner": "Vlasnik"
+  "Owner": "Vlasnik",
+  "Represented by": "Zastupljeno od",
+  "Choose one option to be displayed on the PDF files": "Izaberite jednu opciju koja će se prikazati na PDF datotekama"
 }
