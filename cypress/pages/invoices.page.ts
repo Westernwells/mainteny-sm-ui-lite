@@ -87,11 +87,15 @@ export default class InvoicesPage {
     cy.get('input[name="quantity"]').clear().type('1');
     cy.get('input[name="unitAmount.netAmount"]').clear().type('100');
 
-    cy.contains('label', 'Payment Due Date').click();
-    cy.wait(1000);
+    cy.get('div[role="textbox"][name="paymentTerms"]').clear();
+
+    cy.get('[data-testid=payment-due-date]').click();
+    cy.get('[data-testid=payment-due-date-popup]').should('be.visible');
+
     cy.contains('button', 'Clear').should('exist').click();
     cy.wait(1000);
-    cy.contains('label', 'Payment Due Date').click();
+
+    cy.get('[data-testid=payment-due-date]').click();
 
     if (hasDueDate) {
       if (setExpiredDueDate) {

@@ -2115,6 +2115,8 @@ export const InvoiceForm = ({
                   ...formik.getFieldProps('dueDate'),
                 }}
                 disabled={!!formik.values.paymentTerm?.id}
+                inputTestId="payment-due-date"
+                popupTestId="payment-due-date-popup"
               />
             </Box>
             {/* DELIVERY DATE */}

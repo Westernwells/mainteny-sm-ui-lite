@@ -119,12 +119,14 @@ export default class QuotationPage {
       .siblings('p')
       .should('have.text', 'Last visit is required');
 
-    cy.get('.MuiPickersDay-today').then((todayButton) => {
-      const todayTimestamp = todayButton.attr('data-timestamp');
-      cy.get(`[data-timestamp="${todayTimestamp}"]`)
-        .next('button')
-        .click({force: true});
-    });
+    cy.get('button[aria-current="date"]')
+      .invoke('attr', 'data-timestamp')
+      .then((timestamp) => {
+        const todayDateTimestamp = parseInt(timestamp, 10);
+        cy.get(`button[data-timestamp="${todayDateTimestamp}"]`).click({
+          force: true,
+        });
+      });
 
     cy.contains('Next').should('not.be.disabled');
 
