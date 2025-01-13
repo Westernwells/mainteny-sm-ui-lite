@@ -91,7 +91,7 @@ export const LegalInformation = ({company}: Props) => {
           height: '100%',
         }}>
         <CardDataListItem
-          label="Managing director"
+          label="Managing Director"
           value={company.settings.managingDirector}
           Icon={PersonOutline}
         />
