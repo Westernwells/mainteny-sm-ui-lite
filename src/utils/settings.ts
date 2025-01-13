@@ -1,5 +1,6 @@
 import {MinToStep} from 'models/service-company';
 import {t} from 'i18next';
+import {Settings} from 'models/misc';
 
 export const generateOptions = () =>
   Array.from({length: 61}, (_, index) => ({
@@ -32,3 +33,16 @@ export const generateMinStepOptions = () => [
     value: String(MinToStep.STEP_60),
   },
 ];
+
+export const getRepresentationText = (
+  translate: (key: string) => string,
+  settings?: Settings,
+) => {
+  if (settings?.owner) {
+    return `${translate('Owner')}: ${settings.owner}`;
+  }
+  if (settings?.managingDirector) {
+    return `${translate('Managing Director')}: ${settings.managingDirector}`;
+  }
+  return null;
+};

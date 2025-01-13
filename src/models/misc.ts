@@ -54,6 +54,7 @@ export interface Settings {
   emailBasedServiceOrderProvider: string;
   timezone: string;
   managingDirector: string;
+  owner?: string;
   arbitrationCourt: string;
   tradeRegisterNumber: string;
   paymentInfo: PaymentInfo;
