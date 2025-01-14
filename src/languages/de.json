@@ -3034,5 +3034,7 @@
   "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "Das Zahlungsfälligkeitsdatum wird automatisch aktualisiert, wenn Sie Zahlungsbedingungen zur Rechnung hinzugefügt haben. Diese Bedingungen passen das Fälligkeitsdatum jedes Mal an, wenn Sie die Rechnung bearbeiten oder senden. Wenn Sie keine Zahlungsbedingungen verwenden, können Sie das Fälligkeitsdatum manuell festlegen.",
   "Appointment required": "Termin erforderlich",
   "Please note that when you edit this you are editing the appointment preferences for the unit for all future jobs.": "Bitte beachten Sie, dass Sie beim Bearbeiten dieser Einstellung die Terminpräferenzen für die Anlage für alle zukünftigen Aufträge bearbeiten.",
-  "Owner": "Inhaber"
+  "Owner": "Inhaber",
+  "Represented by": "Vertreten durch",
+  "Choose one option to be displayed on the PDF files": "Wählen Sie eine Option, die auf den PDF-Dateien angezeigt werden soll"
 }
