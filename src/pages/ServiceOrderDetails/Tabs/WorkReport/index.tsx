@@ -18,6 +18,7 @@ import {
 import {
   CompleteServiceOrder,
   ServiceOrderArticleView,
+  ServiceOrderReportAttachmentView,
   ServiceOrderReportView,
   ServiceOrderView,
 } from 'models/service-order';
@@ -487,11 +488,20 @@ export const WorkReport = ({serviceOrder}: Props) => {
         showTime: values.showTime,
       };
 
+      const updatedReport: CompleteServiceOrder = {
+        ...body,
+        attachments: report?.attachments.map((attachment) => ({
+          uri: attachment.fileResource.uri,
+          description: attachment.fileResource.description,
+          type: attachment.fileResource.type,
+        })),
+      };
+
       if (report?.additionalInfo.status === ReportStatus.COMPLETED) {
         return completeServiceOrder(
           {
             serviceOrderId: serviceOrder.id ?? '',
-            body,
+            body: updatedReport,
           },
           {
             onSuccess: handleReportUpdateSuccess,
@@ -502,7 +512,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
       return updateServiceOrderReport(
         {
           qs: {serviceOrderId: serviceOrder.id!, reportId: report?.id!},
-          body,
+          body: updatedReport,
         },
         {
           onSuccess: handleReportUpdateSuccess,
@@ -593,6 +603,16 @@ export const WorkReport = ({serviceOrder}: Props) => {
       await generateWorkReportPdf();
     }
     setActionType('DOWNLOAD');
+  };
+
+  const handleDeleteImage = (image: ServiceOrderReportAttachmentView) => {
+    const updatedAttachments = report?.attachments.filter(
+      (attachment) => attachment.fileResource.uri !== image.fileResource.uri,
+    );
+    setReport((prevReport) => ({
+      ...prevReport!,
+      attachments: updatedAttachments!,
+    }));
   };
 
   useEffect(() => {
@@ -774,7 +794,11 @@ export const WorkReport = ({serviceOrder}: Props) => {
         />
 
         <Box mt="1em">
-          <Pictures attachments={report.attachments} />
+          <Pictures
+            attachments={report.attachments}
+            onDeleteImage={handleDeleteImage}
+            isEditMode={isEditMode}
+          />
         </Box>
 
         <Box mt="1em">

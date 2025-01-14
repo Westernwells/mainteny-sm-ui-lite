@@ -36,7 +36,7 @@ export const EditLegalInformation = ({formik}: Props) => {
             fieldProps={{
               size: 'small',
               name: 'owner',
-              label: t('Owner'),
+              label: 'Owner',
               helperText: formik.touched.owner && formik.errors.owner,
               error: !!formik.errors.owner && formik.touched.owner,
               required: false,
@@ -50,7 +50,7 @@ export const EditLegalInformation = ({formik}: Props) => {
             fieldProps={{
               size: 'small',
               name: 'managingDirector',
-              label: t('Managing Director'),
+              label: 'Managing Director',
               helperText:
                 formik.touched.managingDirector &&
                 formik.errors.managingDirector,
@@ -71,7 +71,11 @@ export const EditLegalInformation = ({formik}: Props) => {
           value={formik.values.representedBy}
           onChange={formik.handleChange}
           row>
-          <FormControlLabel value="owner" control={<Radio />} label="Owner" />
+          <FormControlLabel
+            value="owner"
+            control={<Radio />}
+            label={t('Owner')}
+          />
           <FormControlLabel
             value="managingDirector"
             control={<Radio />}

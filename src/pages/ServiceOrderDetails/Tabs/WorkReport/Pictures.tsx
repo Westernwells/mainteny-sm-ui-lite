@@ -9,15 +9,18 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useState} from 'react';
 import {EmptySection} from 'components/EmptySection';
 import {olStyles} from 'styles';
-import {Grid} from '@mui/material';
+import {Grid, IconButton} from '@mui/material';
 import {format} from 'date-fns';
 import {ServiceOrderReportAttachmentView} from 'models/service-order';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 
 interface Props {
   attachments: ServiceOrderReportAttachmentView[];
+  onDeleteImage: (picture: ServiceOrderReportAttachmentView) => void;
+  isEditMode: boolean;
 }
 
-export const Pictures = ({attachments}: Props) => {
+export const Pictures = ({attachments, onDeleteImage, isEditMode}: Props) => {
   const {t} = useTranslation();
   const [openPreview, setOpenPreview] = useState(false);
   const theme = useTheme();
@@ -100,7 +103,7 @@ export const Pictures = ({attachments}: Props) => {
                     setOpenPreview(true);
                     setActiveStep(index);
                   }}
-                  sx={{cursor: 'pointer'}}>
+                  sx={{cursor: 'pointer', position: 'relative'}}>
                   <img
                     alt=""
                     width="100%"
@@ -108,6 +111,24 @@ export const Pictures = ({attachments}: Props) => {
                     src={downloadUrls[picture.fileResource.uri]}
                     style={{objectFit: 'cover'}}
                   />
+                  {isEditMode && (
+                    <IconButton
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onDeleteImage(picture);
+                      }}
+                      sx={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        background: '#8F9BB380',
+                        zIndex: 2,
+                        borderRadius: '50%',
+                        '&:hover': {background: '#828DA3'},
+                      }}>
+                      <DeleteOutlineOutlinedIcon sx={{color: 'white'}} />
+                    </IconButton>
+                  )}
                 </Box>
 
                 <Typography
