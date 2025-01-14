@@ -7,7 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {UseFormReturn} from 'react-hook-form';
 import {
   ContactTitle,
-  ServiceCompanyContactPeronFormModel,
+  ServiceCompanyContactPersonFormModel,
   ServiceCompanyContactPersonOrderField,
   ServiceCompanyContactPersonRole,
   ServiceCompanyContactPersonView,
@@ -23,11 +23,11 @@ import {Order} from '../../../../models/pagination';
 
 interface Props {
   form: UseFormReturn<
-    ServiceCompanyContactPeronFormModel,
+    ServiceCompanyContactPersonFormModel,
     any,
-    ServiceCompanyContactPeronFormModel
+    ServiceCompanyContactPersonFormModel
   >;
-  initialValues?: ServiceCompanyContactPeronFormModel;
+  initialValues?: ServiceCompanyContactPersonFormModel;
 }
 
 const titles = Object.values(ContactTitle);

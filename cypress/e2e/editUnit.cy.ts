@@ -15,27 +15,23 @@ describe('Edit Unit', () => {
     it('should validate unit', () => {
         UnitsPage.navigateToDetailsPage();
         UnitsPage.openDialog();
-        const categoryField = cy.get('input[name="category"]');
-        const outside = cy.get('#alert-dialog-title');
-        categoryField.clear();
-        outside.click();
+        cy.get('input[name="category"]').clear();
+        cy.get('#alert-dialog-title').click();
         cy.get('button[type="button"]').should('be.disabled');
     });
 
     it('validate data', () => {
         UnitsPage.navigateToDetailsPage();
         UnitsPage.openDialog();
-        const outside = cy.get('#alert-dialog-title');
-        cy.get('input[name="category"]').click();
         cy.get('input[name="category"]').then((input) => {
             const val = input.val();
             if (val === 'Escalator') {
-                cy.get('input[name="category"]').type('Elevator');
+                cy.wrap(input).clear().type('Elevator');
             } else {
-                cy.get('input[name="category"]').type('Escalator');
+                cy.wrap(input).clear().type('Escalator');
             }
-            outside.click();
-            cy.contains('button', 'Save').should('not.be.disabled');
         });
+        cy.get('#alert-dialog-title').click();
+        cy.contains('button', 'Save').should('not.be.disabled');
     });
 });

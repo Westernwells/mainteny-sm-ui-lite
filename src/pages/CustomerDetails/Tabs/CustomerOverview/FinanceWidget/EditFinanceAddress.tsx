@@ -196,6 +196,24 @@ export const EditFinanceAddress = ({
       </Grid>
 
       {address === 'billingAddress' && (
+        <Grid size={{md: 6}}>
+          <Controller
+            name={`${address}.component.moreInfo`}
+            control={control}
+            render={({field}) => (
+              <FormInput
+                fieldProps={{
+                  ...field,
+                  size: 'small',
+                  label: 'Additional Information',
+                }}
+              />
+            )}
+          />
+        </Grid>
+      )}
+
+      {address === 'billingAddress' && (
         <Grid size={{xs: 6}}>
           <Controller
             name="billingEmail"

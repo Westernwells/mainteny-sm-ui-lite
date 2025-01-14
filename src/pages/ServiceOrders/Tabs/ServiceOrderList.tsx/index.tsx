@@ -69,6 +69,7 @@ import NoteAlt from '@mui/icons-material/NoteAlt';
 import {NoteAltOutlined} from '@mui/icons-material';
 import Tooltip from '@mui/material/Tooltip';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import {ReactComponent as CalendarVectorIcon} from 'assets/icons/CalendarVector.svg';
 import {theme} from 'theme';
 import AvatarGroup from 'components/AvatarGroup';
 import {formatDate} from 'utils/datetime';
@@ -99,6 +100,7 @@ import {
   createQuickFilterOptions,
   filterOutQuickFilterOptions,
 } from 'utils/filter';
+import TableCellTextWithTooltip from 'components/Table/TableCellTextWithTooltip';
 import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] =
@@ -211,6 +213,10 @@ export const ServiceOrderList = ({menu}: Props) => {
       defaultValue: undefined,
     },
   );
+  const [isWithAppointmentRequired, setIsWithAppointmentRequired] =
+    useQueryState<string | undefined>('withAppointmentRequired', {
+      defaultValue: undefined,
+    });
   const textInput = useRef<HTMLInputElement>(null);
   const currentDate = new Date();
 
@@ -246,6 +252,7 @@ export const ServiceOrderList = ({menu}: Props) => {
         grossAmountMin,
         grossAmountMax,
         hasComment: isWithNote === 'true',
+        isAppointmentRequired: isWithAppointmentRequired === 'true',
       },
       mode: 'all',
     });
@@ -256,6 +263,7 @@ export const ServiceOrderList = ({menu}: Props) => {
   const watchTechnician = watch('technician');
   const watchPaymentStatus = watch('paymentStatus');
   const watchHasComment = watch('hasComment');
+  const watchIsAppointmentRequired = watch('isAppointmentRequired');
   const watchGrossMin = watch('grossAmountMin');
   const watchGrossMax = watch('grossAmountMax');
 
@@ -287,6 +295,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     ...(grossAmountMax &&
       grossAmountMax > 0 && {grossAmountTo: grossAmountMax}),
     ...(isWithNote === 'true' && {hasComments: true}),
+    ...(isWithAppointmentRequired === 'true' && {requiresAppointment: true}),
     ...(selectedCustomer && {propertyOwnerId: selectedCustomer}),
     ...(selectedTechnicianId && {technicians: [selectedTechnicianId]}),
     ...(selectedContract && {contractIds: [selectedContract]}),
@@ -438,6 +447,9 @@ export const ServiceOrderList = ({menu}: Props) => {
     setGrossAmountMin(data.grossAmountMin);
     setGrossAmountMax(data.grossAmountMax);
     setIsWithNote(data.hasComment ? 'true' : undefined);
+    setIsWithAppointmentRequired(
+      data.isAppointmentRequired ? 'true' : undefined,
+    );
   };
 
   const appliedFilterNumber = useMemo(
@@ -503,13 +515,30 @@ export const ServiceOrderList = ({menu}: Props) => {
         headerName: 'Number',
         key: 'service-order-cell-number',
         fieldName: ServiceOrderOrderField.EXTERNAL_ID,
-        width: '124px',
+        width: '166px',
         isFirst: true, // remove when checkbox are present with bulk action
         showShadows: showRightShadow ? 'right' : undefined,
         getExportValue: (serviceOrder) => serviceOrder.number,
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>{serviceOrder.number}</TableCellText>
+            <TableCellTextWithTooltip
+              mainContent={serviceOrder.number}
+              showSecondaryContent={
+                serviceOrder.serviceOrderData.elevator?.additionalInfo
+                  ?.customerAppointment?.requiresAppointment || false
+              }
+              secondaryContent={
+                serviceOrder.serviceOrderData.elevator?.additionalInfo
+                  ?.customerAppointment?.description || ''
+              }
+              secondaryIcon={
+                <CalendarVectorIcon
+                  fontSize="large"
+                  color="action"
+                  style={{cursor: 'pointer', marginLeft: '0.4em'}}
+                />
+              }
+            />
           </Cell>
         ),
       },
@@ -922,6 +951,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     setValue('grossAmountMin', grossAmountMin);
     setValue('grossAmountMax', grossAmountMax);
     setValue('hasComment', isWithNote === 'true');
+    setValue('isAppointmentRequired', isWithAppointmentRequired === 'true');
   };
 
   const handleFilterReset = () => {
@@ -934,6 +964,7 @@ export const ServiceOrderList = ({menu}: Props) => {
     setValue('grossAmountMin', undefined);
     setValue('grossAmountMax', undefined);
     setValue('hasComment', undefined);
+    setValue('isAppointmentRequired', undefined);
   };
 
   const handleExport = async () => {
@@ -1163,6 +1194,28 @@ export const ServiceOrderList = ({menu}: Props) => {
                   render={({field}) => (
                     <Checkbox
                       checked={watchHasComment}
+                      onChange={field.onChange}
+                      sx={{padding: 0}}
+                    />
+                  )}
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+                gap={1}>
+                <Typography variant="subtitle2">
+                  {t('Appointment required')}
+                </Typography>
+                <Controller
+                  control={control}
+                  name="isAppointmentRequired"
+                  render={({field}) => (
+                    <Checkbox
+                      checked={watchIsAppointmentRequired}
                       onChange={field.onChange}
                       sx={{padding: 0}}
                     />

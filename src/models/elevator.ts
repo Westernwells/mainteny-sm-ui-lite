@@ -5,6 +5,7 @@ import {
   InspectionCycle,
   Meta,
   Priority,
+  SimpleMeta,
   StringMap,
 } from './misc';
 import {Client} from './client';
@@ -22,6 +23,8 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {Order} from './pagination';
 import {InvoiceOrderField, InvoiceStatus, InvoiceType} from 'models/invoice';
 import {theme} from 'theme';
+import {UserAccountSimpleView} from './user';
+import {ContactPersonAdditionalInfo} from './contacts';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -392,9 +395,16 @@ export interface ElevatorTimeRuleRecord {
 }
 
 export interface CustomerAppointment {
-  shouldNotifyCustomer: boolean;
-  appointmentNotificationDue: number;
-  requiresAppointment: boolean;
+  shouldNotifyCustomer?: boolean;
+  appointmentNotificationDue?: number;
+  requiresAppointment?: boolean;
+  description?: string;
+  contactPerson?: {
+    id: string;
+    userAccount: UserAccountSimpleView;
+    additionalInfo: ContactPersonAdditionalInfo;
+    meta: SimpleMeta;
+  };
 }
 
 export interface ElevatorRequestBody {

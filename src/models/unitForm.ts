@@ -1,6 +1,8 @@
-import {AddressRecord, InspectionCycle} from 'models/misc';
+import {AddressRecord, InspectionCycle, SimpleMeta} from 'models/misc';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {ElevatorStatus} from './elevator';
+import {ContactPersonAdditionalInfo} from './contacts';
+import {UserAccountSimpleView} from './user';
 
 export interface AttachmentFormModel {
   documents?: FileWithPreview[];
@@ -97,6 +99,9 @@ export interface AppointmentFormModel {
   shouldNotifyCustomer: boolean;
   requiresAppointment: boolean;
   appointmentNotificationDue: number;
+  description?: string;
+  contactPersonId?: string;
+  contactPersonName?: string;
 }
 
 export interface EmergencyPhoneFormModel {
