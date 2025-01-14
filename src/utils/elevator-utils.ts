@@ -1,7 +1,10 @@
 import {
   DISTANCE_FILTER,
+  DaysTimeRange,
   ElevatorAssignmentSimpleView,
   ElevatorStatus,
+  ElevatorTimeRuleType,
+  ElevatorTimeRuleView,
   ElevatorView,
   SearchParameters,
   UnitAppointment,
@@ -232,6 +235,8 @@ export const mapFormDataToElevatorUpdateRequest = (
       shouldNotifyCustomer: data.shouldNotifyCustomer,
       appointmentNotificationDue: data.appointmentNotificationDue,
       requiresAppointment: data.requiresAppointment,
+      contactPersonId: data.contactPersonId,
+      description: data.description,
     },
   },
   elevatorId,
@@ -309,3 +314,37 @@ const OPTION_TO_REST_DISTANCE_VALUES: Record<
 
 export const getDistanceFromOption = (distance: DISTANCE_FILTER) =>
   OPTION_TO_REST_DISTANCE_VALUES[distance];
+
+export const parseTimeRulesData = (timeRules: ElevatorTimeRuleView[]) => {
+  const daysOfWeekAndTimeRangeTimeRule = timeRules?.find(
+    (timeRule) =>
+      timeRule.type === ElevatorTimeRuleType.DAYS_OF_WEEK_AND_TIME_RANGE,
+  );
+  if (!daysOfWeekAndTimeRangeTimeRule) return null;
+
+  const parsedData = (
+    JSON.parse(daysOfWeekAndTimeRangeTimeRule.data) as DaysTimeRange[]
+  )[0];
+
+  return parsedData;
+};
+
+export const removeSecondsFromTimeString = (time: string) =>
+  time.slice(0, time.lastIndexOf(':'));
+
+export const formatOpeningHours = (
+  timeRange: {start: string; end: string} | undefined,
+): string =>
+  timeRange
+    ? `${removeSecondsFromTimeString(
+        timeRange.start,
+      )} - ${removeSecondsFromTimeString(timeRange.end)}`
+    : '-';
+
+export const formatDaysOfWeek = (daysOfWeek: string[] | undefined): string =>
+  daysOfWeek
+    ? daysOfWeek
+        .map((day) => `${day[0].toUpperCase()}${day.slice(1).toLowerCase()}`)
+        .map((formattedDay) => t(formattedDay))
+        .join(', ')
+    : '-';

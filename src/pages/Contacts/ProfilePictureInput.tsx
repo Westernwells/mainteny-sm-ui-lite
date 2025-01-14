@@ -8,12 +8,12 @@ import {UseFormRegister, UseFormSetValue} from 'react-hook-form';
 import {Button, IconButton, Typography} from '@mui/material';
 import {theme} from 'theme';
 import {useTranslation} from 'react-i18next';
-import {ServiceCompanyContactPeronFormModel} from 'models/contacts';
+import {ServiceCompanyContactPersonFormModel} from 'models/contacts';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 
 interface Props {
-  register: UseFormRegister<ServiceCompanyContactPeronFormModel>;
-  setValue: UseFormSetValue<ServiceCompanyContactPeronFormModel>;
+  register: UseFormRegister<ServiceCompanyContactPersonFormModel>;
+  setValue: UseFormSetValue<ServiceCompanyContactPersonFormModel>;
   imageUrl: string;
   readOnly?: boolean;
 }

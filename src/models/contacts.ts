@@ -209,7 +209,7 @@ export const ConnectionTypeLabels: {
   [ContactPersonAssociationType.SERVICE_ORDER]: 'Job',
 };
 
-export interface ServiceCompanyContactPeronFormModel {
+export interface ServiceCompanyContactPersonFormModel {
   userAccount: {
     firstName: string;
     lastName: string;

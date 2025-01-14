@@ -3,9 +3,13 @@ import ViewWeekIcon from '@mui/icons-material/ViewWeek';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
 import useTheme from '@mui/material/styles/useTheme';
 import {ElevatorView} from 'models/elevator';
 import {useTranslation} from 'react-i18next';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import {Box, Typography} from '@mui/material';
+import Link from '@mui/material/Link';
 
 interface Props {
   label: string;
@@ -14,7 +18,7 @@ interface Props {
   openingHours: string;
 }
 
-export const AppointmentShema = ({
+export const AppointmentSchema = ({
   label,
   daysOfWeek,
   openingHours,
@@ -106,7 +110,77 @@ export const AppointmentShema = ({
             containerStyles={{alignItems: 'center'}}
           />
         );
+      case 'contactPerson':
+        return (
+          <CardProps
+            icon={
+              <PersonOutlinedIcon
+                style={{color: theme.palette.primary.light}}
+              />
+            }
+            label="Contact person"
+            bodyText={
+              elevator.additionalInfo.customerAppointment?.contactPerson ? (
+                <Box sx={{display: 'flex', flexDirection: 'column'}}>
+                  <Typography variant="body2" sx={{fontWeight: 600}}>
+                    {`${elevator.additionalInfo.customerAppointment?.contactPerson.userAccount.firstName} ${elevator.additionalInfo.customerAppointment?.contactPerson.userAccount.lastName}`}
+                  </Typography>
+                  {elevator.additionalInfo.customerAppointment?.contactPerson
+                    .userAccount.contact?.email && (
+                    <Link
+                      href={`mailto:${elevator.additionalInfo.customerAppointment?.contactPerson.userAccount.contact.email}`}
+                      underline="hover"
+                      variant="body2"
+                      sx={{
+                        display: 'block',
+                        fontWeight: '400',
+                        color: theme.palette.info.main,
+                      }}>
+                      {
+                        elevator.additionalInfo.customerAppointment
+                          ?.contactPerson.userAccount.contact.email
+                      }
+                    </Link>
+                  )}
+                  {elevator.additionalInfo.customerAppointment?.contactPerson
+                    .userAccount.contact?.phone && (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 400,
+                        color: theme.palette.text.primary,
+                      }}>
+                      {
+                        elevator.additionalInfo.customerAppointment
+                          ?.contactPerson.userAccount.contact.phone
+                      }
+                    </Typography>
+                  )}
+                </Box>
+              ) : (
+                '-'
+              )
+            }
+            iconMaxHeight="3em"
+            containerStyles={{alignItems: 'center'}}
+          />
+        );
 
+      case 'description':
+        return (
+          <CardProps
+            icon={
+              <AlertInfoIcon style={{color: theme.palette.primary.light}} />
+            }
+            label="Description"
+            bodyText={
+              elevator.additionalInfo.customerAppointment?.description || '-'
+            }
+            iconMaxHeight="3em"
+            containerStyles={{alignItems: 'center'}}
+            hasMaxWidth={false}
+          />
+        );
       default:
         return null;
     }

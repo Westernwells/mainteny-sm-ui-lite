@@ -207,6 +207,7 @@ export interface ServiceCompanyUpdateBody {
   paymentInfo?: PaymentInfo;
   paymentInfo2?: PaymentInfo;
   managingDirector?: string;
+  owner?: string;
   arbitrationCourt?: string;
   tradeRegisterNumber?: string;
   vatId?: string;

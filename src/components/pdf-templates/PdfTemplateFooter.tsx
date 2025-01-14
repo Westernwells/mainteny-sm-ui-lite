@@ -1,6 +1,7 @@
 import {View, StyleSheet, Text, Font, Image} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {HeaderFooterInfoData} from 'models/misc';
+import {getRepresentationText} from 'utils/settings';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 
@@ -141,6 +142,11 @@ const PdfTemplateFooter = ({
 
   const styles = getStyles(boldFontStyle, flexBasisValue, itemCount);
 
+  const representationText = getRepresentationText(
+    translate,
+    userInfo?.serviceCompany?.settings,
+  );
+
   return (
     <View fixed style={styles.footerContainer}>
       <View style={styles.footerWrapper}>
@@ -260,12 +266,10 @@ const PdfTemplateFooter = ({
           )}
 
           <View style={styles.footerContent}>
-            {userInfo?.serviceCompany?.settings?.managingDirector && (
-              <Text style={styles.footerHeading}>
-                {translate('Managing Director')}:{' '}
-                {userInfo?.serviceCompany?.settings?.managingDirector}
-              </Text>
+            {representationText && (
+              <Text style={styles.footerHeading}>{representationText}</Text>
             )}
+
             {userInfo?.serviceCompany?.settings?.arbitrationCourt && (
               <Text style={styles.footerSectionBody}>
                 {translate('Registration court')}:{' '}

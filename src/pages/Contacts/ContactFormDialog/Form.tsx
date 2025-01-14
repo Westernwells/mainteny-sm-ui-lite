@@ -7,7 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {UseFormReturn} from 'react-hook-form';
 import {
   ContactTitle,
-  ServiceCompanyContactPeronFormModel,
+  ServiceCompanyContactPersonFormModel,
   ServiceCompanyContactPersonRole,
 } from 'models/contacts';
 import {FormInput} from 'components/form/FormInput';
@@ -16,11 +16,11 @@ import ProfilePictureInput from '../ProfilePictureInput';
 
 interface Props {
   form: UseFormReturn<
-    ServiceCompanyContactPeronFormModel,
+    ServiceCompanyContactPersonFormModel,
     any,
-    ServiceCompanyContactPeronFormModel
+    ServiceCompanyContactPersonFormModel
   >;
-  initialValues?: ServiceCompanyContactPeronFormModel;
+  initialValues?: ServiceCompanyContactPersonFormModel;
 }
 const titles = Object.values(ContactTitle);
 const Form = ({form, initialValues}: Props) => {

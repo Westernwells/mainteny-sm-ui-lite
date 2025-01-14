@@ -1,7 +1,11 @@
 import {FormikProps} from 'formik';
 import Grid from '@mui/material/Grid';
-
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Radio from '@mui/material/Radio';
 import {FormInput} from 'components/form/FormInput';
+import {Typography} from '@mui/material';
+import {useTranslation} from 'react-i18next';
 import {LegalInformationCompanyFormModel} from './model';
 
 interface Props {
@@ -9,6 +13,7 @@ interface Props {
 }
 
 export const EditLegalInformation = ({formik}: Props) => {
+  const {t} = useTranslation();
   const defaultProps = {
     InputLabelProps: {shrink: true},
     onChange: formik.handleChange,
@@ -18,31 +23,74 @@ export const EditLegalInformation = ({formik}: Props) => {
   return (
     <Grid container component="form" spacing={3}>
       <Grid item xs={12}>
-        <FormInput
-          fieldProps={{
-            size: 'small',
-            placeholder: 'e.g. Cable xyz',
-            label: 'Managing director',
-            name: 'managingDirector',
-            helperText:
-              formik.touched.managingDirector && formik.errors.managingDirector,
-            error:
-              !!formik.errors.managingDirector &&
-              formik.touched.managingDirector,
-            required: true,
-            value: formik.values.managingDirector,
-            ...defaultProps,
-          }}
-        />
+        <Typography variant="subtitle2" color="primary.dark">
+          {t('Represented by')}
+        </Typography>
+        <Typography variant="body2" color="textSecondary" pt={1}>
+          {t('Choose one option to be displayed on the PDF files')}
+        </Typography>
+      </Grid>
+      <Grid item xs={12}>
+        {formik.values.representedBy === 'owner' && (
+          <FormInput
+            fieldProps={{
+              size: 'small',
+              name: 'owner',
+              label: t('Owner'),
+              helperText: formik.touched.owner && formik.errors.owner,
+              error: !!formik.errors.owner && formik.touched.owner,
+              required: false,
+              value: formik.values.owner,
+              ...defaultProps,
+            }}
+          />
+        )}
+        {formik.values.representedBy === 'managingDirector' && (
+          <FormInput
+            fieldProps={{
+              size: 'small',
+              name: 'managingDirector',
+              label: t('Managing Director'),
+              helperText:
+                formik.touched.managingDirector &&
+                formik.errors.managingDirector,
+              error:
+                !!formik.errors.managingDirector &&
+                formik.touched.managingDirector,
+              required: false,
+              value: formik.values.managingDirector,
+              ...defaultProps,
+            }}
+          />
+        )}
+      </Grid>
+
+      <Grid xs={12} px={4} pt={2}>
+        <RadioGroup
+          name="representedBy"
+          value={formik.values.representedBy}
+          onChange={formik.handleChange}
+          row>
+          <FormControlLabel
+            value="owner"
+            control={<Radio />}
+            label={t('Owner')}
+          />
+          <FormControlLabel
+            value="managingDirector"
+            control={<Radio />}
+            label={t('Managing Director')}
+            sx={{ml: '3em'}}
+          />
+        </RadioGroup>
       </Grid>
       <Grid item xs={12}>
         <FormInput
           fieldProps={{
             size: 'small',
-            placeholder: 'e.g. Cable xyz',
+            placeholder: 'e.g. Berlin',
             label: 'Arbitration court',
             name: 'arbitrationCourt',
-            required: true,
             helperText:
               formik.touched.arbitrationCourt && formik.errors.arbitrationCourt,
             error:
@@ -57,10 +105,9 @@ export const EditLegalInformation = ({formik}: Props) => {
         <FormInput
           fieldProps={{
             size: 'small',
-            placeholder: 'e.g. Cable xyz',
+            placeholder: 'e.g. HRB 151080 B, Charlottenburg',
             label: 'Trade registration number',
             name: 'tradeRegisterNumber',
-            required: true,
             helperText:
               formik.touched.tradeRegisterNumber &&
               formik.errors.tradeRegisterNumber,
