@@ -13,6 +13,7 @@ import {FormLabel} from 'components/form/FormLabel';
 import {
   useCompleteServiceOrder,
   useSendWorkReport,
+  useUpdateServiceOrderReport,
 } from 'hooks/reactQuery/useServiceOrder';
 import {
   CompleteServiceOrder,
@@ -50,7 +51,7 @@ import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {pdf} from '@react-pdf/renderer';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
-import {EmailRecord, PdfGenerationStatus} from 'models/misc';
+import {EmailRecord, PdfGenerationStatus, ReportStatus} from 'models/misc';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
@@ -159,6 +160,9 @@ export const WorkReport = ({serviceOrder}: Props) => {
     {enabled: shouldFetchImages},
   );
 
+  const isReportDisabled =
+    report?.additionalInfo.status !== ReportStatus.COMPLETED;
+
   const [actionType, setActionType] = useState('');
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
 
@@ -216,6 +220,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
   const {mutate: completeServiceOrder, isLoading: updatingServiceOrder} =
     useCompleteServiceOrder('Work report updated successfully!');
+  const {
+    mutate: updateServiceOrderReport,
+    isLoading: isUpdatingServiceOrderReport,
+  } = useUpdateServiceOrderReport('Work report updated successfully!');
   const {mutateAsync: uploadFiles} = useUploadFiles('');
 
   const generateWorkReportPdf = async () => {
@@ -436,6 +444,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
     setActiveSignature(undefined);
   };
 
+  const handleReportUpdateSuccess = () => {
+    setQueryParams(formatSearchParams({edit: '0'}, queryParams));
+  };
+
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
     initialValues: {
       articles: articleViewToArticleRecord(articles),
@@ -458,30 +470,42 @@ export const WorkReport = ({serviceOrder}: Props) => {
       showHours: report?.additionalInfo.showHours ?? true,
     },
     onSubmit: (values) => {
-      completeServiceOrder(
-        {
-          serviceOrderId: serviceOrder.id ?? '',
-          body: {
-            technicianId: report?.technicianId,
-            description: values.description,
-            articles: articleViewToArticleRecord(articles),
-            serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
-            travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
-            onlyShowTotalTime: values.onlyShowTotalTime,
-            workTimeRecord: convertTimeSlotDatesToRestDateTime(
-              values.workTimeRecord,
-            ),
-            travelTimeRecord: convertTimeSlotDatesToRestDateTime(
-              values.travelTimeRecord,
-            ),
-            showHours: values.showHours,
-            showTime: values.showTime,
+      const body = {
+        technicianId: report?.technicianId,
+        description: values.description,
+        articles: articleViewToArticleRecord(articles),
+        serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
+        travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
+        onlyShowTotalTime: values.onlyShowTotalTime,
+        workTimeRecord: convertTimeSlotDatesToRestDateTime(
+          values.workTimeRecord,
+        ),
+        travelTimeRecord: convertTimeSlotDatesToRestDateTime(
+          values.travelTimeRecord,
+        ),
+        showHours: values.showHours,
+        showTime: values.showTime,
+      };
+
+      if (report?.additionalInfo.status === ReportStatus.COMPLETED) {
+        return completeServiceOrder(
+          {
+            serviceOrderId: serviceOrder.id ?? '',
+            body,
           },
+          {
+            onSuccess: handleReportUpdateSuccess,
+          },
+        );
+      }
+
+      return updateServiceOrderReport(
+        {
+          qs: {serviceOrderId: serviceOrder.id!, reportId: report?.id!},
+          body,
         },
         {
-          onSuccess: () => {
-            setQueryParams(formatSearchParams({edit: '0'}, queryParams));
-          },
+          onSuccess: handleReportUpdateSuccess,
         },
       );
     },
@@ -803,7 +827,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'outlined',
-              disabled: isImageLoading,
+              disabled: isImageLoading || isReportDisabled,
               sx: {
                 background: 'transparent',
               },
@@ -816,7 +840,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'contained',
-              disabled: isImageLoading,
+              disabled: isImageLoading || isReportDisabled,
               startIcon: <SendIcon />,
               onClick: handleOpenSendEmail,
             }}>
@@ -836,7 +860,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
           setQueryParams(formatSearchParams({edit: '1'}, queryParams));
         }}
         listItems={[]}
-        isSaving={updatingServiceOrder}
+        isSaving={updatingServiceOrder || isUpdatingServiceOrderReport}
         isValid={!isEditMode ? formik.isValid : true}
         buttonWrapperStyles={
           isEditMode

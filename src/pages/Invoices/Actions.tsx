@@ -917,10 +917,10 @@ export const Actions = ({
     }
   }, [qrError]);
 
-  const paymentTermDueDays =
-    invoice?.additionalInfo?.paymentTerm?.data?.dueDays;
-  const hasPaymentTermDueDays = typeof paymentTermDueDays === 'number';
-  const dueDate = hasPaymentTermDueDays
+  const paymentTerm = invoice?.additionalInfo?.paymentTerm;
+  const hasPaymentTerm = typeof paymentTerm?.id === 'string';
+  const paymentTermDueDays = paymentTerm?.data?.dueDays || 0;
+  const dueDate = hasPaymentTerm
     ? dateToString(addDays(new Date(), paymentTermDueDays))
     : invoice?.dueDate || dateToString(new Date());
   const invoiceWithUpdatedDueDate = {
@@ -966,7 +966,7 @@ export const Actions = ({
   const handleOpenSendInvoiceModal = useCallback(() => {
     const errorMessage = validateDueDate(invoice);
 
-    if (errorMessage && !hasPaymentTermDueDays) {
+    if (errorMessage && !hasPaymentTerm) {
       enqueueSnackbar(t(errorMessage), {
         variant: 'error',
       });
@@ -1053,7 +1053,7 @@ export const Actions = ({
   const onPrintInvoice = async () => {
     const errorMessage = validateDueDate(invoice);
 
-    if (errorMessage && !hasPaymentTermDueDays) {
+    if (errorMessage && !hasPaymentTerm) {
       enqueueSnackbar(t(errorMessage), {
         variant: 'error',
       });

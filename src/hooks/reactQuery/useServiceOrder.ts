@@ -388,6 +388,46 @@ export const useCompleteServiceOrder = (successMsg?: string) => {
   );
 };
 
+const updateServiceOrderReport = async (
+  {serviceOrderId, reportId}: {serviceOrderId: string; reportId: string},
+  body: CompleteServiceOrder,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/serviceOrders/${serviceOrderId}/reports/${reportId}`,
+    {...body},
+  );
+};
+
+export const useUpdateServiceOrderReport = (successMsg?: string) => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+  return useMutation(
+    ({
+      qs,
+      body,
+    }: {
+      qs: {serviceOrderId: string; reportId: string};
+      body: CompleteServiceOrder;
+    }) => updateServiceOrderReport(qs, body),
+    {
+      onSuccess: () => {
+        setTimeout(() => {
+          queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+          queryClient.invalidateQueries([queryKeys.serviceOrderActivity]);
+        }, 10);
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
 type UncompleteServiceOrderParams = {
   serviceOrderId: string;
   message?: string;
