@@ -1225,8 +1225,8 @@
   "Contact added successfully": "Kontakt erfolgreich hinzugefügt.",
   "No data entries yet. They will appear here once added.": "Es wurden noch keine Informationen eingetragen. Diese werden hier angezeigt, sobald sie hinzugefügt wurden.",
   "There are no entires for the applied filters.": "Für die angewendeten Filter sind keine Einträge vorhanden.",
-  "Sorry, we couldn't find any ${placeholder} that matches the search text. If you like to add a new ${placeholder}, please click the button below.": "Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.",
-  "No ${placeholder} yet. Please click the button below to add.": "Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.",
+  "Sorry, we couldn't find any {{placeholder}} that matches the search text. If you like to add a new {{placeholder}}, please click the button below.": "Entschuldigung, wir konnten für Ihre Suche keine Informationen finden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.",
+  "No {{placeholder}} yet. Please click the button below to add.": "Keine Informationen vorhanden. Zum Hinzufügen klicken Sie bitte auf die Schaltfläche unten.",
   "No contracts yet. Please click the button below to add!": "Es sind noch keine Verträge vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.",
   "No units yet. Please click the button below add.": "Es wurden noch keine Anlagen angelegt. Bitte klicken Sie auf die Schaltfläche unten, um eine Anlage hinzuzufügen!",
   "No customers yet. Please click the button below to add.": "Es sind noch keine Kunden vorhanden. Bitte klicken Sie zum Hinzufügen auf die Schaltfläche unten.",
@@ -1963,7 +1963,6 @@
   "pack": "Pkt.",
   "Created on {{creationDate}}": "Erstellt am {{creationDate}}",
   "Exclude previously downloaded data": "Zuvor heruntergeladene Daten ausschließen",
-  "Payment data included": "Zahlungsdaten enthalten",
   "Article cannot be empty": "Der Artikel darf nicht leer sein",
   "Article Type": "Artikeltyp",
   "Article #": "Artikel Nr.",
@@ -3032,5 +3031,10 @@
   "Change Payment Status": "Bezahlstatus ändern",
   "The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.": "Das Rechnungsdatum wird automatisch festgelegt, wenn Sie die Rechnung senden. Wenn Sie das Datum selbst eingeben möchten, denken Sie daran, dass Sie auch das Zahlungsfälligkeitsdatum manuell festlegen müssen.",
   "The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.": "Das Zahlungsfälligkeitsdatum dieser Rechnung wird durch Ihre Zahlungsbedingungen gesteuert. Es wird automatisch aktualisiert, wenn Sie die Rechnung bearbeiten und senden. Wenn Sie das Zahlungsfälligkeitsdatum manuell festlegen möchten, entfernen Sie bitte die Zahlungsbedingungen.",
-  "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "Das Zahlungsfälligkeitsdatum wird automatisch aktualisiert, wenn Sie Zahlungsbedingungen zur Rechnung hinzugefügt haben. Diese Bedingungen passen das Fälligkeitsdatum jedes Mal an, wenn Sie die Rechnung bearbeiten oder senden. Wenn Sie keine Zahlungsbedingungen verwenden, können Sie das Fälligkeitsdatum manuell festlegen."
+  "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "Das Zahlungsfälligkeitsdatum wird automatisch aktualisiert, wenn Sie Zahlungsbedingungen zur Rechnung hinzugefügt haben. Diese Bedingungen passen das Fälligkeitsdatum jedes Mal an, wenn Sie die Rechnung bearbeiten oder senden. Wenn Sie keine Zahlungsbedingungen verwenden, können Sie das Fälligkeitsdatum manuell festlegen.",
+  "Appointment required": "Termin erforderlich",
+  "Please note that when you edit this you are editing the appointment preferences for the unit for all future jobs.": "Bitte beachten Sie, dass Sie beim Bearbeiten dieser Einstellung die Terminpräferenzen für die Anlage für alle zukünftigen Aufträge bearbeiten.",
+  "Owner": "Inhaber",
+  "Represented by": "Vertreten durch",
+  "Choose one option to be displayed on the PDF files": "Wählen Sie eine Option, die auf den PDF-Dateien angezeigt werden soll"
 }
