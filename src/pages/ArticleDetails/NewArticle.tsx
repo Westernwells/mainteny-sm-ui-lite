@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -47,6 +47,10 @@ export const NewArticle = () => {
   const [activeStep, setActiveStep] = useState(0);
   const {user} = useUserSession();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const articleName = searchParams.get('articleName') || '';
   const theme = useTheme();
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -122,7 +126,7 @@ export const NewArticle = () => {
       category: '',
       manufacturer: '',
       model: '',
-      name: '',
+      name: articleName || '',
       externalId: '',
       storageLocation: '',
       type: ArticleType.LABOR,
