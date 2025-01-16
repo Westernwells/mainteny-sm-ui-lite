@@ -99,9 +99,9 @@ export const ServiceOrders = () => {
 
       return {
         label:
-          serviceOrderTypeToString(jobType.name) === '-'
-            ? jobType.name
-            : t(serviceOrderTypeToString(jobType.name)),
+          serviceOrderTypeToString(jobType?.givenName!) === '-'
+            ? jobType.givenName!
+            : t(serviceOrderTypeToString(jobType?.givenName!)),
         action: () => navigate(`/orders/new?type=${jobType.name}`),
         icon: <IconComponent />,
       };

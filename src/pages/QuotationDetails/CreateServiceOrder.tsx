@@ -22,9 +22,9 @@ export const CreateServiceOrder = ({value, onChange}: Props) => {
       required
       options={jobTypes?.map((i) => ({
         label:
-          serviceOrderTypeToString(i.name) === '-'
-            ? i.name
-            : serviceOrderTypeToString(i.name),
+          serviceOrderTypeToString(i?.givenName!) === '-'
+            ? i.givenName!
+            : serviceOrderTypeToString(i?.givenName!),
         value: i.name,
       }))}
       selectProps={{

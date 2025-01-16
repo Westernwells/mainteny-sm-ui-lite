@@ -1080,9 +1080,9 @@ export const ServiceOrderList = ({menu}: Props) => {
                 options={filteredJobTypes.map((jobType) => ({
                   value: jobType.name,
                   labelKey:
-                    serviceOrderTypeToString(jobType.name) === '-'
-                      ? jobType.name
-                      : t(serviceOrderTypeToString(jobType.name)),
+                    serviceOrderTypeToString(jobType?.givenName!) === '-'
+                      ? jobType?.givenName!
+                      : t(serviceOrderTypeToString(jobType?.givenName!)),
                 }))}
                 selectedChips={watchOrderTypes}
                 onChange={handleSelectedOrderTypesChange}
