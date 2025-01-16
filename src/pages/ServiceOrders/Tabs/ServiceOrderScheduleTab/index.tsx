@@ -210,9 +210,9 @@ export const ServiceOrderScheduleTab = () => {
       <MultipleSelectCheckmarks
         label="Job Types"
         options={filteredJobTypes.map((jobType) =>
-          serviceOrderTypeToString(jobType.name) === '-'
-            ? jobType.name
-            : serviceOrderTypeToString(jobType.name),
+          serviceOrderTypeToString(jobType?.givenName!) === '-'
+            ? jobType?.givenName!
+            : serviceOrderTypeToString(jobType?.givenName!),
         )}
         initialSelectedItems={selectedOrderTypes.map((i) =>
           serviceOrderTypeToString(i),

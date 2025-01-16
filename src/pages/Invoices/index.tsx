@@ -1016,9 +1016,9 @@ const Invoices = ({elevatorId}: Props) => {
                       options={filteredJobTypes.map((jobType) => ({
                         value: jobType.name,
                         labelKey:
-                          serviceOrderTypeToString(jobType.name) === '-'
-                            ? jobType.name
-                            : serviceOrderTypeToString(jobType.name),
+                          serviceOrderTypeToString(jobType?.givenName!) === '-'
+                            ? jobType.givenName!
+                            : serviceOrderTypeToString(jobType?.givenName!),
                       }))}
                       selectedChips={watchJobTypes}
                       onChange={handleJobTypesChange}

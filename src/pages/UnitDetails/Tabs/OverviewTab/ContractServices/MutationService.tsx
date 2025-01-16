@@ -807,9 +807,9 @@ export const MutationService = ({
                 {jobTypes && !isJobTypeLoading
                   ? jobTypes.map((jobType, index) => (
                       <MenuItem value={jobType.name} key={index}>
-                        {serviceOrderTypeToString(jobType.name) === '-'
-                          ? jobType.name
-                          : t(serviceOrderTypeToString(jobType.name))}
+                        {serviceOrderTypeToString(jobType?.givenName!) === '-'
+                          ? jobType?.givenName!
+                          : t(serviceOrderTypeToString(jobType?.givenName!))}
                       </MenuItem>
                     ))
                   : null}
