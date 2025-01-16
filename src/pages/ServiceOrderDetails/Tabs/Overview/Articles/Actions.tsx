@@ -21,17 +21,18 @@ import {
 import {Dialog} from 'components/Dialog';
 import {ArticleBasicFormModel} from 'models/articleForm';
 import {amountRecordForBackend, makeAmountRecord} from 'utils/currency';
-import {ServiceOrderArticleView} from 'models/service-order';
+import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {FormikErrors} from 'formik';
+import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
 import {EditArticleFormModel} from './models';
 import {EditArticleForm} from './EditArticleForm';
 
 interface Props {
-  serviceOrderId: string;
+  serviceOrder: ServiceOrderView;
   serviceOrderArticleId: string;
 }
 
-export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
+export const Actions = ({serviceOrder, serviceOrderArticleId}: Props) => {
   const {t} = useTranslation();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -48,13 +49,15 @@ export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
     EditArticleFormModel | ArticleBasicFormModel
   >();
 
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+
   const {mutateAsync: deleteServiceOrderArticle} =
     useDeleteServiceOrderArticle();
 
   const {mutateAsync: updateServiceOrderArticle, isLoading} =
     useNewUpdateServiceOrderArticles();
 
-  const {data: serviceOrderArticles} = useServiceOrderArticles(serviceOrderId);
+  const {data: serviceOrderArticles} = useServiceOrderArticles(serviceOrder.id);
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -103,7 +106,7 @@ export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
 
   const deleteArticle = async () => {
     await deleteServiceOrderArticle({
-      serviceOrder: serviceOrderId!,
+      serviceOrder: serviceOrder.id,
       serviceOrderArticleId: serviceOrderArticleId!,
     });
     setIsDeleteDialogOpen(false);
@@ -136,11 +139,20 @@ export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
       }))[0];
     await updateServiceOrderArticle({
       data: body!,
-      serviceOrder: serviceOrderId!,
+      serviceOrder: serviceOrder.id,
       serviceOrderArticleId: currentArticle?.id!,
     });
     setOpenEditDialog(false);
     setCurrentArticle(undefined);
+  };
+
+  const handleConfirmClose = () => {
+    setOpenConfirmDialog(false);
+  };
+
+  const handleConfirmAccept = async () => {
+    handleUpdateArticle();
+    handleConfirmClose();
   };
 
   return (
@@ -189,7 +201,7 @@ export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
           setIsEditing(false);
         }}
         disableSaveBtn={!!Object.keys(formikErrors).length}
-        onSave={() => handleUpdateArticle()}
+        onSave={() => setOpenConfirmDialog(true)}
         isSaving={isLoading}
         dialogProps={{
           maxWidth: 'md',
@@ -215,7 +227,17 @@ export const Actions = ({serviceOrderId, serviceOrderArticleId}: Props) => {
         title="Delete Article"
         content="Do you want to delete this article?"
         helperText="This action is irreversible."
+        helperTextSecondLine="The changes will also reflect on any draft invoice attached to the job."
       />
+
+      {openConfirmDialog && (
+        <UpdateConfirmationModal
+          open={openConfirmDialog}
+          order={serviceOrder}
+          onConfirm={handleConfirmAccept}
+          onCancel={handleConfirmClose}
+        />
+      )}
     </Box>
   );
 };

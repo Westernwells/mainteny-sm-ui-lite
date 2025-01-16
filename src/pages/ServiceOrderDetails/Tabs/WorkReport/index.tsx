@@ -74,6 +74,7 @@ import {getTechnicianName} from 'utils/employee';
 import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
+import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -109,6 +110,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
   const schedule = serviceOrder.schedules.find(
     (s) => s.technician.id === report?.technicianId,
@@ -615,6 +617,15 @@ export const WorkReport = ({serviceOrder}: Props) => {
     }));
   };
 
+  const handleConfirmClose = () => {
+    setOpenConfirmDialog(false);
+  };
+
+  const handleConfirmAccept = () => {
+    formik.handleSubmit();
+    handleConfirmClose();
+  };
+
   useEffect(() => {
     resetForm();
   }, [report]);
@@ -878,7 +889,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         primaryButtonLabel={isEditMode ? 'Save' : 'Edit'}
         primaryButtonAction={() => {
           if (isEditMode) {
-            formik.handleSubmit();
+            setOpenConfirmDialog(true);
             return;
           }
           setQueryParams(formatSearchParams({edit: '1'}, queryParams));
@@ -974,6 +985,15 @@ export const WorkReport = ({serviceOrder}: Props) => {
           openCancelConfirm={activeSubDialog === 'delete'}
           activeTextBlock={activeTextBlock}
           onCloseSubDialogs={onCloseSubDialogs}
+        />
+      )}
+
+      {openConfirmDialog && (
+        <UpdateConfirmationModal
+          open={openConfirmDialog}
+          order={serviceOrder}
+          onConfirm={handleConfirmAccept}
+          onCancel={handleConfirmClose}
         />
       )}
     </Box>
