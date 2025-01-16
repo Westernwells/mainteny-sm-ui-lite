@@ -2594,5 +2594,6 @@
   "Enter the URL, email address, or telephone number:": "Enter the URL, email address, or telephone number:",
   "Lithuanian": "Lithuanian",
   "Email signature created successfully": "Email signature created successfully",
-  "Can't be less than 0": "Can't be less than 1"
+  "Can't be less than 0": "Can't be less than 1",
+  "Add New": "ADD NEW"
 }

@@ -3055,5 +3055,6 @@
   "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "La fecha de vencimiento del pago se actualiza automáticamente si ha añadido condiciones de pago a la factura. Estas condiciones ajustan la fecha de vencimiento cada vez que editas o envías la factura. Si no utilizas condiciones de pago, puedes establecer la fecha de vencimiento manualmente.",
   "Appointment required": "Se requiere cita previa",
   "Please note that when you edit this you are editing the appointment preferences for the unit for all future jobs.": "Tenga en cuenta que al editar esto está editando las preferencias de cita de la unidad para todos los trabajos futuros.",
-  "Owner": "Propietario"
+  "Owner": "Propietario",
+  "Add New": "AÑADIR NUEVO"
 }
