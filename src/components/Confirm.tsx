@@ -20,6 +20,7 @@ interface Props {
   confirmBtnLabel?: string;
   closeBtnLabel?: string;
   helperText?: string;
+  helperTextSecondLine?: string;
   disableActions?: boolean;
   maxWidth?: string | number;
 }
@@ -34,6 +35,7 @@ export const Confirm = ({
   closeBtnLabel,
   confirmBtnLabel,
   helperText,
+  helperTextSecondLine,
   disableActions = false,
   maxWidth,
 }: Props) => {
@@ -71,6 +73,9 @@ export const Confirm = ({
               : secondContent}
           </Typography>
           {helperText && <Typography>{t(helperText)}</Typography>}
+          {helperTextSecondLine && (
+            <Typography>{t(helperTextSecondLine)}</Typography>
+          )}
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{padding: '1em'}}>
