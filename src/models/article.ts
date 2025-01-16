@@ -342,3 +342,13 @@ export type SearchParameters = {
   category?: string;
   manufacturer?: string;
 };
+
+export interface QueryArticleCommentsParams {
+  pageIndex: number;
+  pageSize: number;
+}
+
+export interface ArticleComment {
+  content: string;
+  subject: string;
+}

@@ -92,6 +92,7 @@ import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
+import {Notes} from './Notes';
 
 interface Props {
   formType?: string;
@@ -952,12 +953,20 @@ export const DraftQuotation = ({
             p={3}
             rowGap={2}
             flexWrap="wrap">
-            <Grid item xs={12}>
-              <Box pb={0.5}>
+            <Grid
+              item
+              xs={12}
+              display="flex"
+              justifyContent="space-between"
+              pb={0.5}>
+              <Box>
                 <SectionTitle
                   Icon={MapPinIllustration}
                   title="Address information"
                 />
+              </Box>
+              <Box>
+                {formType === 'edit' ? <Notes quotation={quotation!} /> : null}
               </Box>
             </Grid>
 
