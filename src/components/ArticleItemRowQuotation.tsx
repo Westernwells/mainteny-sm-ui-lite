@@ -324,11 +324,11 @@ export const ArticleItemRowQuotation = ({
     const defaultPackageValues = {
       laborPercentage:
         formik.values.article?.type === ArticleType.PACKAGE
-          ? articleItem.article?.costPackage?.laborPercentage || 50
+          ? articleItem.article?.costPackage?.laborPercentage || 0
           : 0,
       materialPercentage:
         formik.values.article?.type === ArticleType.PACKAGE
-          ? articleItem.article?.costPackage?.materialPercentage! || 50
+          ? articleItem.article?.costPackage?.materialPercentage! || 0
           : 0,
     };
     formik.setFieldValue('article.costPackage', {
