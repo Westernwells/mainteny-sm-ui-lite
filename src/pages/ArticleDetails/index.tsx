@@ -17,6 +17,7 @@ import {ArticleStockCard} from './Stock/ArticleStockCard';
 import {ArticleSupplierCard} from './Suppliers/ArticleSupplierCard';
 import {ArticleAttachmentCard} from './Pictures/ArticleAttachmentCard';
 import {ArticleQRCard} from './Pictures/ArticleQRCard';
+import {Notes} from './Notes';
 
 export const ArticleOverView = () => {
   const {id: articleId} = useParams();
@@ -46,6 +47,7 @@ export const ArticleOverView = () => {
   return (
     <>
       <Box display="flex" justifyContent="flex-end" gap={3} mb="1.5rem">
+        <Notes articleId={articleDetail!.id} />
         <Button
           label={t('Order Article')}
           data-testid="orderArticle"

@@ -541,7 +541,11 @@ const Invoices = ({elevatorId}: Props) => {
         getExportValue: (invoice) => `${invoice.total}`,
         renderCell: (invoice, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>{formatCurrency(invoice.total)}</TableCellText>
+            <TableCellText>
+              {formatCurrency(invoice.total, {
+                currency: currentCurrency.code,
+              })}
+            </TableCellText>
           </Cell>
         ),
       },

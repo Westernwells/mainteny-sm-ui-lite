@@ -14,8 +14,8 @@ export const NoRowsEmptySection = ({placeholder, action}: Props) => {
       size="tiny"
       containerStyle={{m: 'auto', width: '60%'}}
       label={t(
-        "Sorry, we couldn't find any {{placeholderText}} that matches the search text. For adding a new {{placeholderText}}, please click the button below",
-        {placeholderText: t(placeholder)},
+        "Sorry, we couldn't find any {{placeholder}} that matches the search text. If you like to add a new {{placeholder}}, please click the button below.",
+        {placeholder: t(placeholder)},
       )}
       showActionBtn
       btnLabel={t('Add New')}

@@ -187,7 +187,14 @@ export const ArticlesModalDataGrid = ({setRowItem, customerId}: Props) => {
               pageIndex: value - 1,
             }))
           }
-          noRowsEmptySection={<NoRowsEmptySection placeholder="article" />}
+          noRowsEmptySection={
+            <NoRowsEmptySection
+              placeholder="article"
+              action={() =>
+                window.open(`/articles/new?articleName=${search}`, '_blank')
+              }
+            />
+          }
         />
       </Box>
     </>

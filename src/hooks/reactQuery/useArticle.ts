@@ -1,5 +1,7 @@
 import {useCallback} from 'react';
 import {
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
   useMutation,
   useQuery,
   useQueryClient,
@@ -10,15 +12,18 @@ import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import _ from 'lodash';
 import {
+  ArticleComment,
   ArticleOrderView,
   ArticleStatistics,
   ArticleView,
   CreateArticleOrderRecord,
   CreateArticleRecord,
   PropertyOwnerArticleRecord,
+  QueryArticleCommentsParams,
   QueryArticleParams,
   UpdateArticleRecord,
 } from 'models/article';
+import {Comment} from 'models/comment';
 import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
 import {data} from 'utils/partial-article-data';
 import {FileResourceRecord} from 'models/media';
@@ -666,7 +671,7 @@ export function useAllArticles(
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
   return useAll<QueryArticleParams, ArticleView>({
-    queryKey: [queryKeys.queryAllQuotations, params, serviceCompanyId],
+    queryKey: [queryKeys.queryAllArticles, params, serviceCompanyId],
     queryFn: (p) => fetchArticles(p, serviceCompanyId ?? ''),
     params,
     options: {
@@ -675,3 +680,128 @@ export function useAllArticles(
     },
   });
 }
+
+export const fetchArticleComments = async (
+  articleId: string,
+  params: QueryArticleCommentsParams,
+): Promise<Resource<Comment>> => {
+  const response = await axiosClient.get<Resource<Comment>>(
+    `/api/articles/${articleId}/comments`,
+    {
+      params,
+      paramsSerializer,
+    },
+  );
+
+  return response.data;
+};
+
+export function useInfiniteArticleComments(
+  articleId: string,
+  params: QueryArticleCommentsParams,
+  options?: UseInfiniteQueryOptions<any, any, any>,
+) {
+  return useInfiniteQuery<Resource<Comment>, RestError, Resource<Comment>>(
+    [qk.fetchArticleComments, params, articleId, {infinite: true}],
+    ({pageParam = 0}) =>
+      fetchArticleComments(articleId, {...params, pageIndex: pageParam}),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentTotal =
+          (lastPage.page.pageIndex + 1) * lastPage.page.pageSize;
+        if (lastPage.total && currentTotal < lastPage.total) {
+          return lastPage.page.pageIndex + 1;
+        }
+        return undefined;
+      },
+      ...options,
+    },
+  );
+}
+
+export const createArticleComment = async (
+  id: string,
+  body: ArticleComment,
+) => {
+  const response = await axiosClient.post<{value: string}>(
+    `/api/articles/${id}/comments`,
+    body,
+  );
+  return response.data;
+};
+
+export const useCreateArticleComment = (onSuccess?: () => void) => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({id, body}: {id: string; body: ArticleComment}) =>
+      createArticleComment(id, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchArticleComments]);
+        onSuccess?.();
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+export const deleteArticleComment = async (id: string, commentId: string) => {
+  const response = await axiosClient.delete<{value: string}>(
+    `/api/articles/${id}/comments/${commentId}`,
+  );
+  return response.data;
+};
+
+export const useDeleteArticleComment = (onSuccess?: () => void) => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({id, noteId}: {id: string; noteId: string}) =>
+      deleteArticleComment(id, noteId),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchArticleComments]);
+        onSuccess?.();
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+export const updateArticleComment = async (
+  id: string,
+  commentId: string,
+  body: ArticleComment,
+) => {
+  const response = await axiosClient.put<{value: string}>(
+    `/api/articles/${id}/comments/${commentId}`,
+    body,
+  );
+  return response.data;
+};
+
+export const useUpdateArticleComment = (onSuccess?: () => void) => {
+  const queryClient = useQueryClient();
+  const {showError} = useSnackbar();
+
+  return useMutation(
+    ({id, noteId, body}: {id: string; noteId: string; body: ArticleComment}) =>
+      updateArticleComment(id, noteId, body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchArticleComments]);
+        onSuccess?.();
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
