@@ -73,3 +73,13 @@ export interface UpdateArticleSupplierRecord {
   address?: AddressRecord;
   category?: string;
 }
+
+export interface QuerySupplierCommentsParams {
+  pageIndex: number;
+  pageSize: number;
+}
+
+export interface SupplierComment {
+  content: string;
+  subject: string;
+}

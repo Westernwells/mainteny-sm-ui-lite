@@ -13,6 +13,7 @@ import {Confirm} from 'components/Confirm';
 import ContactsWidget from 'pages/Contacts/ContactsWidget';
 import {ContactPersonAssociationType} from 'models/contacts';
 import {SupplierBasicInfoCard} from './BasicInfo/SupplierBasicInfoCard';
+import {Notes} from './Notes';
 
 export const SupplierDetails = () => {
   const {id: supplierId} = useParams();
@@ -42,6 +43,7 @@ export const SupplierDetails = () => {
   return (
     <>
       <Box display="flex" justifyContent="flex-end" gap={3} mb="1.5rem">
+        <Notes supplierId={supplierId!} />
         <Button
           label={t('Delete')}
           buttonProps={{
