@@ -38,6 +38,7 @@ const serviceOrderStatusMap = {
   Assigned: ServiceOrderStatus.TECHNICIAN_ASSIGNED,
   Travel: ServiceOrderStatus.TRAVEL,
   Paused: ServiceOrderStatus.PAUSED,
+  Archived: ServiceOrderStatus.ARCHIVED,
   'Articles Ordered': ServiceOrderStatus.ARTICLES_ORDERED,
 };
 type serviceOrderStatusMapKey = keyof typeof serviceOrderStatusMap;
@@ -69,6 +70,7 @@ export const ServiceHistoryTab = () => {
     query: search,
     order: Order.DESC,
     orderBy: ServiceOrderOrderField.CREATED_TIME,
+    includeArchived: status.length === 0,
     status,
     types,
   });
@@ -117,6 +119,7 @@ export const ServiceHistoryTab = () => {
           ServiceOrderStatus.TRAVEL,
           ServiceOrderStatus.PAUSED,
           ServiceOrderStatus.ARTICLES_ORDERED,
+          ServiceOrderStatus.ARCHIVED,
         ].map((item) => serviceOrderStatusToString(item))}
         getSelectedValue={(item) =>
           setStatus(
