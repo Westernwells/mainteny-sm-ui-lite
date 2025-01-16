@@ -3053,5 +3053,11 @@
   "Change Payment Status": "Promenite status plaćanja",
   "The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.": "Datum fakture se automatski postavlja kada pošaljete fakturu. Ako želite da sami unesete datum, zapamtite da ćete takođe morati ručno da podesite datum dospeća plaćanja.",
   "The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.": "Datum dospeća plaćanja ove fakture kontrolišu vaši uslovi plaćanja. Automatski će se ažurirati nakon uređivanja i slanja. Ako želite da ručno kontrolišete rok dospeća plaćanja, uklonite uslove plaćanja.",
-  "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "Datum dospeća plaćanja se automatski ažurira ako ste dodali uslove plaćanja na fakturu. Ovi uslovi prilagođavaju datum dospeća kad god izmenite ili pošaljete fakturu. Ako ne koristite uslove plaćanja, možete ručno da podesite datum dospeća."
+  "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "Datum dospeća plaćanja se automatski ažurira ako ste dodali uslove plaćanja na fakturu. Ovi uslovi prilagođavaju datum dospeća kad god izmenite ili pošaljete fakturu. Ako ne koristite uslove plaćanja, možete ručno da podesite datum dospeća.",
+  "Appointment required": "Zakazivanje potrebno",
+  "Please note that when you edit this you are editing the appointment preferences for the unit for all future jobs.": "Imajte na umu da kada uređujete ovo, uređujete postavke termina za jedinicu za sve buduće poslove.",
+  "Owner": "Vlasnik",
+  "Represented by": "Zastupljeno od",
+  "Choose one option to be displayed on the PDF files": "Izaberite jednu opciju koja će se prikazati na PDF datotekama",
+  "Add New": "Dodaj Novi"
 }

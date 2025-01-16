@@ -3021,5 +3021,15 @@
   "Email address": "Dirección de correo electrónico",
   "Number of People": "Número de personas",
   "Can't be less than 0": "No puede ser menos de 0",
-  "Change Payment Status": "Cambiar el estado del pago"
+  "Oh no, something went wrong!": "¡Oh no, algo salió mal!",
+  "Please click the button below to reload the page and resolve any potential issues. If this doesn't help, feel free to contact our support team – we are happy to assist you!": "Haga clic en el botón de abajo para recargar la página y resolver cualquier posible problema. Si esto no le ayuda, no dude en ponerse en contacto con nuestro equipo de asistencia: ¡estaremos encantados de ayudarle!",
+  "Refresh Page": "Actualizar la página",
+  "Change Payment Status": "Cambiar el estado del pago",
+  "The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.": "La fecha de facturación se establece automáticamente al enviar la factura. Si prefieres introducir una fecha tú mismo, recuerda que también tendrás que establecer manualmente la fecha de vencimiento del pago.",
+  "The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.": "La fecha de vencimiento del pago de esta factura está controlada por sus condiciones de pago. Se actualizará automáticamente al editarla y enviarla. Si desea controlar manualmente la fecha de vencimiento del pago, elimine las condiciones de pago.",
+  "The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.": "La fecha de vencimiento del pago se actualiza automáticamente si ha añadido condiciones de pago a la factura. Estas condiciones ajustan la fecha de vencimiento cada vez que editas o envías la factura. Si no utilizas condiciones de pago, puedes establecer la fecha de vencimiento manualmente.",
+  "Appointment required": "Se requiere cita previa",
+  "Please note that when you edit this you are editing the appointment preferences for the unit for all future jobs.": "Tenga en cuenta que al editar esto está editando las preferencias de cita de la unidad para todos los trabajos futuros.",
+  "Owner": "Propietario",
+  "Add New": "Añadir Nuevo"
 }
