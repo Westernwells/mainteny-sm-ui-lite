@@ -1053,9 +1053,7 @@ export const CheckList = ({serviceOrder}: Props) => {
               variant: 'outlined',
               sx: {bgcolor: theme.palette.inputBackground.main},
               size: 'medium',
-              onClick: () => {
-                setIsCancelEditConfirmDialogOpen(true);
-              },
+              onClick: () => setIsCancelEditConfirmDialogOpen(true),
             }}
           />
         }
