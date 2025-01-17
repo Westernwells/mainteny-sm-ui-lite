@@ -3037,5 +3037,12 @@
   "Owner": "Inhaber",
   "Represented by": "Vertreten durch",
   "Choose one option to be displayed on the PDF files": "Wählen Sie eine Option, die auf den PDF-Dateien angezeigt werden soll",
-  "Add New": "Neu Hinzufügen"
+  "Can not print invoice that is not in DRAFT": "Rechnung kann nicht gedruckt werden, wenn sie sich nicht im Entwurf befindet.",
+  "There are unsaved changes made to the job order <bold>{{invoiceId}}</bold> and these will be reflected on the invoice.": "Es gibt ungespeicherte Änderungen am Arbeitsauftrag <bold>{{invoiceId}}</bold>, und diese werden in der Rechnung übernommen.",
+  "Are you sure you want to continue?": "Sind Sie sicher, dass Sie fortfahren möchten?",
+  "Job update": "Auftragsaktualisierung",
+  "The changes will also reflect on any draft invoice attached to the job.": "Die Änderungen werden auch in jeder Entwurfsrechnung übernommen, die dem Auftrag zugeordnet ist.",
+  "Save and Update": "Speichern und aktualisieren",
+  "Add New": "Neu hinzufügen",
+  "You are about to cancel editing work report.": "Sie sind dabei, die Bearbeitung des Arbeitsberichts abzubrechen."
 }
