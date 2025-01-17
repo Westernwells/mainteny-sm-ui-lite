@@ -26,13 +26,17 @@ import {useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
-import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {companyLanguageContextMap} from 'utils/language';
+import {getJobTypeGivenName} from 'utils/service-order-utils';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -71,6 +75,9 @@ export const ServiceOrderDetails = () => {
   const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const currentCurrency = useCurrentCurrency();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
   const {data: quotation} = useQuotationDetails(
@@ -153,6 +160,7 @@ export const ServiceOrderDetails = () => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

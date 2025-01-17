@@ -33,7 +33,6 @@ export const MultiChoiceComponent = ({
   component,
   onChange,
   onImageChange,
-
   onImageDelete,
   serviceCompanyId,
   disabled = false,

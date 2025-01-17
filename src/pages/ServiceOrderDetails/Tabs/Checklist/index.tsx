@@ -26,6 +26,7 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {StatusChip} from 'components/StatusChip';
 import {
+  getJobTypeGivenName,
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
@@ -47,7 +48,10 @@ import {
   CheckListComponentView,
   ServiceOrderCheckListView,
 } from 'models/checklist';
-import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
@@ -95,6 +99,9 @@ export const CheckList = ({serviceOrder}: Props) => {
   const theme = useTheme();
   const formatDate = useFormatDate();
   const {user} = useUserSession();
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const {t} = useTranslation();
   const {enqueueSnackbar, showError} = useSnackbar();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
@@ -642,7 +649,10 @@ export const CheckList = ({serviceOrder}: Props) => {
                           size="small"
                         />
                         <ServiceOrderTypeText
-                          serviceOrderType={serviceOrder.type}
+                          serviceOrderType={getJobTypeGivenName(
+                            serviceOrder.type,
+                            jobTypes,
+                          )}
                           capitalizeText
                           variant="subtitle1"
                           style={{fontWeight: '600'}}
@@ -1043,9 +1053,7 @@ export const CheckList = ({serviceOrder}: Props) => {
               variant: 'outlined',
               sx: {bgcolor: theme.palette.inputBackground.main},
               size: 'medium',
-              onClick: () => {
-                setIsCancelEditConfirmDialogOpen(true);
-              },
+              onClick: () => setIsCancelEditConfirmDialogOpen(true),
             }}
           />
         }

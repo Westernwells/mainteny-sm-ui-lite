@@ -55,11 +55,7 @@ const validationSchema = Yup.object().shape({
   type: Yup.string().nullable().required('Type is required'),
 });
 
-export const EditArticleForm = ({
-  serviceOrderArticle,
-  setFormikValues,
-  getFormErrors,
-}: {
+type Props = {
   serviceOrderArticle: ServiceOrderArticleView;
   setFormikValues: Dispatch<
     SetStateAction<EditArticleFormModel | ArticleBasicFormModel | undefined>
@@ -67,7 +63,13 @@ export const EditArticleForm = ({
   getFormErrors: (
     errors: FormikErrors<EditArticleFormModel | ArticleBasicFormModel>,
   ) => void;
-}) => {
+};
+
+export const EditArticleForm = ({
+  serviceOrderArticle,
+  setFormikValues,
+  getFormErrors,
+}: Props) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
   const {data: taxRates} = useVats();

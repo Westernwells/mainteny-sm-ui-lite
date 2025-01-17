@@ -40,9 +40,9 @@ export const SelectServiceOrderTypes = ({
         <Box display="flex" alignItems="center">
           <IconComponent />
           <Typography variant="body2" ml=".25em">
-            {serviceOrderTypeToString(jobType.name) === '-'
-              ? jobType.name
-              : t(serviceOrderTypeToString(jobType.name))}
+            {serviceOrderTypeToString(jobType?.givenName!) === '-'
+              ? jobType.givenName
+              : t(serviceOrderTypeToString(jobType?.givenName!))}
           </Typography>
         </Box>
       ),

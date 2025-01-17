@@ -48,6 +48,7 @@ import {
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {
+  getJobTypeGivenName,
   getServiceOrderStatusColor,
   getSignatureKeys,
   serviceOrderStatusToString,
@@ -77,6 +78,7 @@ import {
 import {pdf} from '@react-pdf/renderer';
 import {
   useCompanyById,
+  useCompanyJobTypes,
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -139,6 +141,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {enqueueSnackbar} = useSnackbar();
   const theme = useTheme();
   const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
@@ -566,6 +571,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
       />,
     ).toBlob();
 
@@ -1539,7 +1545,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                     size="small"
                   />
                   <ServiceOrderTypeText
-                    serviceOrderType={serviceOrder?.type}
+                    serviceOrderType={getJobTypeGivenName(
+                      serviceOrder?.type,
+                      jobTypes,
+                    )}
                     capitalizeText
                   />
                 </Box>

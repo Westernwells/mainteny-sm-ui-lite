@@ -209,9 +209,9 @@ const InvoiceArticles = () => {
                   color={theme.palette.primary.main}>
                   <ServiceOrderIcons serviceOrderType={jobType.name} />
                   <span className="label">
-                    {serviceOrderTypeToString(jobType.name) === '-'
-                      ? jobType.name
-                      : t(serviceOrderTypeToString(jobType.name))}
+                    {serviceOrderTypeToString(jobType.givenName!) === '-'
+                      ? jobType.givenName
+                      : t(serviceOrderTypeToString(jobType.givenName!))}
                   </span>
                 </Box>
               }
@@ -222,7 +222,7 @@ const InvoiceArticles = () => {
         {jobTypes.map((jobType, index) => (
           <TabPanel key={index} value={tabValue} index={index}>
             <InvoiceArticlesTable
-              serviceOrderType={jobType.name}
+              serviceOrderType={jobType.givenName!}
               dataListMode={dataListMode}
               setDataListMode={(newValue: CreateEditViewMode) => {
                 setDataListMode(newValue);
@@ -370,9 +370,9 @@ const InvoiceArticles = () => {
                     <ServiceOrderIcons serviceOrderType={jobType.name} />
                     <span className="label">
                       {' '}
-                      {serviceOrderTypeToString(jobType.name) === '-'
-                        ? jobType.name
-                        : t(serviceOrderTypeToString(jobType.name))}
+                      {serviceOrderTypeToString(jobType.givenName!) === '-'
+                        ? jobType.givenName
+                        : t(serviceOrderTypeToString(jobType.givenName!))}
                     </span>
                   </Box>
                 }
@@ -383,7 +383,7 @@ const InvoiceArticles = () => {
           {jobTypes.map((jobType, index) => (
             <TabPanel key={index} value={tabValue} index={index}>
               <InvoiceArticlesTable
-                serviceOrderType={jobType.name}
+                serviceOrderType={jobType.givenName!}
                 dataListMode={dataListMode}
                 setDataListMode={(newValue: CreateEditViewMode) => {
                   setDataListMode(newValue);

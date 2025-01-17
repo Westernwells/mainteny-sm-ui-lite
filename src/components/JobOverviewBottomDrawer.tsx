@@ -8,14 +8,21 @@ import {useServiceOrderActions} from 'hooks/useServiceOrderActions';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useCurrentCurrency} from 'utils/currency';
 import {MarkCompletedDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/MarkCompletedDialog';
-import {getDefaultTechnician, getDialogTitle} from 'utils/service-order-utils';
+import {
+  getDefaultTechnician,
+  getDialogTitle,
+  getJobTypeGivenName,
+} from 'utils/service-order-utils';
 import useServiceOrderMenuActions from 'hooks/useServiceOrderMenuActions';
 import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
 import {
@@ -38,6 +45,9 @@ export const JobOverviewBottomDrawer = ({
   const {t} = useTranslation();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
@@ -276,7 +286,10 @@ export const JobOverviewBottomDrawer = ({
       {openScheduleDialog && (
         <ScheduleDialog
           serviceOrderId={serviceOrderDetails.id}
-          serviceOrderType={serviceOrderDetails.type}
+          serviceOrderType={getJobTypeGivenName(
+            serviceOrderDetails.type,
+            jobTypes,
+          )}
           title={t(getDialogTitle(serviceOrderDetails))}
           open={openScheduleDialog}
           onClose={() => setOpenScheduleDialog(false)}

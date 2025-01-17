@@ -34,6 +34,7 @@ import {
   articleViewToArticleRecord,
   calculateTotalBillableHours,
   convertTimeSlotDatesToRestDateTime,
+  getJobTypeGivenName,
   getSignatureKeys,
 } from 'utils/service-order-utils';
 import {convertDigitalMinsToHM} from 'utils/datetime';
@@ -49,7 +50,10 @@ import {
 import {theme} from 'theme';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {pdf} from '@react-pdf/renderer';
-import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {EmailRecord, PdfGenerationStatus, ReportStatus} from 'models/misc';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
@@ -73,6 +77,8 @@ import {getTechnicianName} from 'utils/employee';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {companyLanguageContextMap} from 'utils/language';
+import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
+import {Confirm} from 'components/Confirm';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -98,6 +104,9 @@ const validationSchema = Yup.object().shape({
 export const WorkReport = ({serviceOrder}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const [queryParams, setQueryParams] = useSearchParams();
   const isEditMode = queryParams.get('edit') === '1';
   const [articles, setArticles] = useState<ServiceOrderArticleView[]>([]);
@@ -105,9 +114,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
     serviceOrder?.reports?.[0],
   );
   const [shouldFetchImages, setShouldFetchImages] = useState(false);
+  const [isCancelEditConfirmDialogOpen, setIsCancelEditConfirmDialogOpen] =
+    useState(false);
 
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
   const schedule = serviceOrder.schedules.find(
     (s) => s.technician.id === report?.technicianId,
@@ -243,6 +255,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         technicianName={technicianName}
+        serviceOrderType={getJobTypeGivenName(serviceOrder.type, jobTypes)}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -487,11 +500,20 @@ export const WorkReport = ({serviceOrder}: Props) => {
         showTime: values.showTime,
       };
 
+      const updatedReport: CompleteServiceOrder = {
+        ...body,
+        attachments: report?.attachments.map((attachment) => ({
+          uri: attachment.fileResource.uri,
+          description: attachment.fileResource.description,
+          type: attachment.fileResource.type,
+        })),
+      };
+
       if (report?.additionalInfo.status === ReportStatus.COMPLETED) {
         return completeServiceOrder(
           {
             serviceOrderId: serviceOrder.id ?? '',
-            body,
+            body: updatedReport,
           },
           {
             onSuccess: handleReportUpdateSuccess,
@@ -502,7 +524,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
       return updateServiceOrderReport(
         {
           qs: {serviceOrderId: serviceOrder.id!, reportId: report?.id!},
-          body,
+          body: updatedReport,
         },
         {
           onSuccess: handleReportUpdateSuccess,
@@ -595,6 +617,15 @@ export const WorkReport = ({serviceOrder}: Props) => {
     setActionType('DOWNLOAD');
   };
 
+  const handleConfirmClose = () => {
+    setOpenConfirmDialog(false);
+  };
+
+  const handleConfirmAccept = () => {
+    formik.handleSubmit();
+    handleConfirmClose();
+  };
+
   useEffect(() => {
     resetForm();
   }, [report]);
@@ -667,7 +698,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
     <Box width="min(calc(1240px + 1.25em), 100%)" mx="auto">
       <ReportCard
         date={report.meta.createdAt}
-        type={serviceOrder.type}
+        type={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
         number={serviceOrder.number}
         status={serviceOrder.status}
         order={serviceOrder}
@@ -774,7 +805,14 @@ export const WorkReport = ({serviceOrder}: Props) => {
         />
 
         <Box mt="1em">
-          <Pictures attachments={report.attachments} />
+          <Pictures
+            report={report}
+            attachments={report.attachments}
+            serviceCompanyId={serviceCompanyId!}
+            serviceOrder={serviceOrder}
+            isEditMode={isEditMode}
+            setReport={setReport}
+          />
         </Box>
 
         <Box mt="1em">
@@ -854,7 +892,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         primaryButtonLabel={isEditMode ? 'Save' : 'Edit'}
         primaryButtonAction={() => {
           if (isEditMode) {
-            formik.handleSubmit();
+            setOpenConfirmDialog(true);
             return;
           }
           setQueryParams(formatSearchParams({edit: '1'}, queryParams));
@@ -878,15 +916,27 @@ export const WorkReport = ({serviceOrder}: Props) => {
                 variant: 'outlined',
                 sx: {bgcolor: theme.palette.inputBackground.main},
                 size: 'medium',
-                onClick: () => {
-                  setQueryParams(formatSearchParams({edit: '0'}, queryParams));
-                  resetForm();
-                },
+                onClick: () => setIsCancelEditConfirmDialogOpen(true),
               }}
             />
           )
         }
       />
+
+      <Confirm
+        open={isCancelEditConfirmDialogOpen}
+        onConfirm={() => {
+          setQueryParams(formatSearchParams({edit: '0'}, queryParams));
+          setReport(reportToUpdate);
+          setIsCancelEditConfirmDialogOpen(false);
+        }}
+        onClose={() => setIsCancelEditConfirmDialogOpen(false)}
+        title="Cancel editing"
+        content="You are about to cancel editing work report."
+        secondContent="All your progress will be lost"
+        helperText=""
+      />
+
       <SendEmailDialog
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
@@ -950,6 +1000,15 @@ export const WorkReport = ({serviceOrder}: Props) => {
           openCancelConfirm={activeSubDialog === 'delete'}
           activeTextBlock={activeTextBlock}
           onCloseSubDialogs={onCloseSubDialogs}
+        />
+      )}
+
+      {openConfirmDialog && (
+        <UpdateConfirmationModal
+          open={openConfirmDialog}
+          order={serviceOrder}
+          onConfirm={handleConfirmAccept}
+          onCancel={handleConfirmClose}
         />
       )}
     </Box>

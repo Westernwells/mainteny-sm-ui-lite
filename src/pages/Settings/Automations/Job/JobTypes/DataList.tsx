@@ -155,6 +155,7 @@ export const priorityToText = (priority: string): string => {
 
 interface FormState {
   name: string;
+  givenName?: string;
   icon: string;
   priority: ServiceOrderTypePriority;
   createInAdvanceDays: number;
@@ -226,7 +227,7 @@ export const DataList = ({
     }
   };
 
-  const isValid = !!form.name && !!form.icon && !!form.priority;
+  const isValid = !!form.givenName && !!form.icon && !!form.priority;
 
   useEffect(() => {
     if (mode === 'create') {
@@ -290,7 +291,7 @@ export const DataList = ({
 
             return (
               <StyledDataListRow
-                key={`${item.name}-${index}`}
+                key={`${item.givenName}-${index}`}
                 sx={{
                   backgroundColor: isEditing ? '#F8F9FC' : 'transparent',
                   transition: 'background-color 0.3s ease',
@@ -351,11 +352,11 @@ export const DataList = ({
                 <StyledDataListCell flex="0 0 30%">
                   {isEditing ? (
                     <StyledTextField
-                      value={form.name}
+                      value={form.givenName}
                       onChange={(e) =>
                         setForm((prevForm) => ({
                           ...prevForm,
-                          name: e.target.value,
+                          givenName: e.target.value,
                         }))
                       }
                       size="small"
@@ -363,9 +364,9 @@ export const DataList = ({
                     />
                   ) : (
                     <Typography ml={1} variant="body2">
-                      {serviceOrderTypeToString(item.name) === '-'
-                        ? item.name
-                        : t(serviceOrderTypeToString(item.name))}
+                      {serviceOrderTypeToString(item?.givenName!) === '-'
+                        ? item.givenName
+                        : t(serviceOrderTypeToString(item?.givenName!))}
                     </Typography>
                   )}
                 </StyledDataListCell>
@@ -523,11 +524,11 @@ export const DataList = ({
               </StyledDataListCell>
               <StyledDataListCell flex="0 0 30%">
                 <StyledTextField
-                  value={form.name}
+                  value={form.givenName}
                   onChange={(e) => {
                     setForm((prevForm) => ({
                       ...prevForm,
-                      name: e.target.value,
+                      givenName: e.target.value,
                     }));
                   }}
                   size="small"

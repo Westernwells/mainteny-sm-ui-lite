@@ -103,9 +103,9 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
 
       return {
         label:
-          serviceOrderTypeToString(jobType.name) === '-'
-            ? jobType.name
-            : t(serviceOrderTypeToString(jobType.name)),
+          serviceOrderTypeToString(jobType?.givenName!) === '-'
+            ? jobType?.givenName!
+            : t(serviceOrderTypeToString(jobType?.givenName!)),
         action: () =>
           track(() => {
             navigate(`/orders/new?type=${jobType.name}`);
