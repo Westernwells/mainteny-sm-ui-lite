@@ -3058,5 +3058,9 @@
   "Owner": "Vlasnik",
   "Represented by": "Zastupljeno od",
   "Choose one option to be displayed on the PDF files": "Izaberite jednu opciju koja će se prikazati na PDF datotekama",
+  "Can not print invoice that is not in DRAFT": "Nije moguće štampati fakturu koja nije u DRAFT",
+  "There are unsaved changes made to the job order <bold>{{invoiceId}}</bold> and these will be reflected on the invoice.": "Postoje nesačuvane promene u nalogu za posao <bold>{{invoiceId}}</bold> i one će se odraziti na fakturi.",
+  "Are you sure you want to continue?": "Da li ste sigurni da želite da nastavite?",
+  "Job update": "Ažuriranje posla",
   "Add New": "Dodaj Novi"
 }
