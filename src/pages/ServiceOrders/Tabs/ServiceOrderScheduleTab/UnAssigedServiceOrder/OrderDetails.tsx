@@ -9,14 +9,23 @@ import {ServiceOrderView} from 'models/service-order';
 import {Button} from 'components/Button';
 import {useTranslation} from 'react-i18next';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {
+  getJobTypeGivenName,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
 import {useFormatDateDistance} from 'hooks/useFormatDateDistance';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface Props extends BoxProps {
   serviceOrder: ServiceOrderView;
 }
 
 export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
+  const {user} = useUserSession();
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const {t, i18n} = useTranslation();
   const formatDateDistance = useFormatDateDistance();
   const [openDialog, setOpenDialog] = useState(false);
@@ -50,9 +59,15 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
           <Typography
             variant="smallBtnText"
             sx={{textTransform: 'uppercase', ml: '0.5em', pt: 0.1}}>
-            {serviceOrderTypeToString(serviceOrder.type) === '-'
-              ? serviceOrder.type
-              : t(serviceOrderTypeToString(serviceOrder.type))}
+            {serviceOrderTypeToString(
+              getJobTypeGivenName(serviceOrder?.type, jobTypes),
+            ) === '-'
+              ? getJobTypeGivenName(serviceOrder?.type, jobTypes)
+              : t(
+                  serviceOrderTypeToString(
+                    getJobTypeGivenName(serviceOrder?.type, jobTypes),
+                  ),
+                )}
           </Typography>
         </Box>
         <Typography variant="caption">{dueDate}</Typography>
@@ -94,7 +109,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
 
       <ScheduleDialog
         serviceOrderId={serviceOrder.id}
-        serviceOrderType={serviceOrder.type}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         defaultStartDate={

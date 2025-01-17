@@ -4,7 +4,6 @@ import React, {useMemo} from 'react';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
 import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -160,6 +159,7 @@ type Props = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
+  serviceOrderType: string;
 };
 
 const JobOverviewPdfTemplate = React.memo(
@@ -175,6 +175,7 @@ const JobOverviewPdfTemplate = React.memo(
     footerInfo,
     footerPath,
     pdfConfigClientStorage,
+    serviceOrderType,
   }: Props) => {
     const articleItems = serviceOrder?.articles!;
 
@@ -237,8 +238,6 @@ const JobOverviewPdfTemplate = React.memo(
         companyLang: selectedLng,
       },
     );
-
-    const serviceOrderType = serviceOrderTypeToString(serviceOrder?.type!);
 
     const serviceCompanyInfo = getServiceCompanyInfo(
       userInfo,

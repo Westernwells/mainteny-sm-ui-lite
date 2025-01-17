@@ -7,9 +7,14 @@ import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {StatusChip} from 'components/StatusChip';
 import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
-import {ServiceOrderOrderField, ServiceOrderView} from 'models/service-order';
+import {
+  ServiceOrderOrderField,
+  ServiceOrderTypeRecord,
+  ServiceOrderView,
+} from 'models/service-order';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {
+  getJobTypeGivenName,
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
@@ -21,6 +26,8 @@ import {EmptySection} from 'components/EmptySection';
 import {useTranslation} from 'react-i18next';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {debounce, isEqual} from 'lodash';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {styles} from './style';
 import {Order} from '../../models/pagination';
 
@@ -76,14 +83,17 @@ export const columns: GridColDef[] = [
   }),
 ];
 
-export const makeRows = (orders: ServiceOrderView[]): GridRowsProp =>
+export const makeRows = (
+  orders: ServiceOrderView[],
+  jobTypes: ServiceOrderTypeRecord[],
+): GridRowsProp =>
   orders
     ? orders.map((item, index) => ({
         id: index,
         number: item.externalId, // rename field when redoing table row
         customer: item.elevator.propertyOwner.name,
         address: item.elevator.address.fullName,
-        type: item.type,
+        type: getJobTypeGivenName(item.type, jobTypes),
         status: item.status,
         serviceOrder: item,
       }))
@@ -102,6 +112,10 @@ export const ServiceOrdersDataGrid = ({
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [pageCount, setPageCount] = useState(0);
   const {t} = useTranslation();
+  const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const {
     data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(
@@ -128,7 +142,7 @@ export const ServiceOrdersDataGrid = ({
   }, [serviceOrdersResource.total, page.pageSize]);
 
   useEffect(() => {
-    const newRows = makeRows(serviceOrdersResource.data);
+    const newRows = makeRows(serviceOrdersResource.data, jobTypes);
     if (!isEqual(newRows, rows)) {
       setRows(newRows);
     }

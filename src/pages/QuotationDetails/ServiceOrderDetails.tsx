@@ -7,11 +7,14 @@ import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useTranslation} from 'react-i18next';
 import {
+  getJobTypeGivenName,
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
 import useTheme from '@mui/material/styles/useTheme';
 import DOMPurify from 'dompurify';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface Props {
   serviceOrderId: string;
@@ -19,6 +22,10 @@ interface Props {
 
 export const ServiceOrderDetails = ({serviceOrderId}: Props) => {
   const {t} = useTranslation();
+  const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const theme = useTheme();
   const formatDate = useFormatDate();
   const {data: serviceOrder, isLoading} =
@@ -77,7 +84,7 @@ export const ServiceOrderDetails = ({serviceOrderId}: Props) => {
             size="small"
           />
           <ServiceOrderTypeText
-            serviceOrderType={serviceOrder.type}
+            serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
             capitalizeText
           />
         </Box>

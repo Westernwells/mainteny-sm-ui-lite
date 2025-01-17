@@ -11,11 +11,18 @@ import {ServiceOrderView} from 'models/service-order';
 import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
 import useServiceOrderMenuActions from 'hooks/useServiceOrderMenuActions';
 import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
-import {getDefaultTechnician, getDialogTitle} from 'utils/service-order-utils';
+import {
+  getDefaultTechnician,
+  getDialogTitle,
+  getJobTypeGivenName,
+} from 'utils/service-order-utils';
 import {useTranslation} from 'react-i18next';
 import {Confirm} from 'components/Confirm';
 import {MarkCompletedDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/MarkCompletedDialog';
-import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -33,6 +40,9 @@ const Actions = ({serviceOrder}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
   const [open, setOpen] = useState<boolean>(false);
@@ -182,7 +192,7 @@ const Actions = ({serviceOrder}: Props) => {
       {openScheduleDialog && (
         <ScheduleDialog
           serviceOrderId={serviceOrder.id}
-          serviceOrderType={serviceOrder.type}
+          serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
           title={t(getDialogTitle(serviceOrder))}
           open={openScheduleDialog}
           onClose={() => setOpenScheduleDialog(false)}

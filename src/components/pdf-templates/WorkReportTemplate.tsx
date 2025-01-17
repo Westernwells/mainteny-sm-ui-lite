@@ -10,7 +10,6 @@ import {UserAccount} from 'models/user';
 import React from 'react';
 import {ServiceOrderReportView, ServiceOrderView} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import capitalize from 'lodash/capitalize';
 import {convertMinutesWithRounding} from 'utils/work-hours-utils';
 import {HtmlPDF} from 'components/HtmlPDF';
@@ -291,6 +290,7 @@ type Props = {
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
   technicianName: string;
+  serviceOrderType: string;
 };
 
 const WorkReportTemplate = React.memo(
@@ -309,6 +309,7 @@ const WorkReportTemplate = React.memo(
     footerPath,
     pdfConfigClientStorage,
     technicianName,
+    serviceOrderType,
   }: Props) => {
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
     const company = userInfo?.serviceCompany;
@@ -316,8 +317,6 @@ const WorkReportTemplate = React.memo(
       report?.attachments?.filter(
         (item) => !!workReportPictures[item.fileResource.uri],
       ) ?? [];
-
-    const serviceOrderType = serviceOrderTypeToString(serviceOrder?.type!);
 
     const boldFontStyle = {
       fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',

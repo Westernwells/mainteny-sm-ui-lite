@@ -35,6 +35,7 @@ import {
   articleViewToArticleRecord,
   calculateTotalBillableHours,
   convertTimeSlotDatesToRestDateTime,
+  getJobTypeGivenName,
   getSignatureKeys,
 } from 'utils/service-order-utils';
 import {convertDigitalMinsToHM} from 'utils/datetime';
@@ -50,7 +51,10 @@ import {
 import {theme} from 'theme';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {pdf} from '@react-pdf/renderer';
-import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {EmailRecord, PdfGenerationStatus, ReportStatus} from 'models/misc';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
@@ -100,6 +104,9 @@ const validationSchema = Yup.object().shape({
 export const WorkReport = ({serviceOrder}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const [queryParams, setQueryParams] = useSearchParams();
   const isEditMode = queryParams.get('edit') === '1';
   const [articles, setArticles] = useState<ServiceOrderArticleView[]>([]);
@@ -246,6 +253,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         technicianName={technicianName}
+        serviceOrderType={getJobTypeGivenName(serviceOrder.type, jobTypes)}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -698,7 +706,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
     <Box width="min(calc(1240px + 1.25em), 100%)" mx="auto">
       <ReportCard
         date={report.meta.createdAt}
-        type={serviceOrder.type}
+        type={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
         number={serviceOrder.number}
         status={serviceOrder.status}
         order={serviceOrder}

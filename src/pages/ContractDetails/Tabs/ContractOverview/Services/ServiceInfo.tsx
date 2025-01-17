@@ -32,7 +32,12 @@ import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {getViewFrequency} from 'utils/elevator-utils';
 import {ArticleType} from 'models/article';
 import {ElevatorView} from 'models/elevator';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {
+  getJobTypeGivenName,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 type Props = {
   service?: ContractComponentView;
@@ -41,6 +46,10 @@ type Props = {
 
 const ServiceInformationReview = ({service, elevators}: Props) => {
   const {t} = useTranslation();
+  const {user} = useUserSession();
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const currentCurrency = useCurrentCurrency();
 
   const elevatorsData = getElevatorDataByElevator(
@@ -105,12 +114,22 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
               {service?.additionalInfo.orderType &&
-              serviceOrderTypeToString(service?.additionalInfo.orderType) ===
-                '-'
-                ? service?.additionalInfo.orderType
+              serviceOrderTypeToString(
+                getJobTypeGivenName(
+                  service?.additionalInfo.orderType,
+                  jobTypes,
+                ),
+              ) === '-'
+                ? getJobTypeGivenName(
+                    service?.additionalInfo.orderType,
+                    jobTypes,
+                  )
                 : t(
                     serviceOrderTypeToString(
-                      service?.additionalInfo.orderType!,
+                      getJobTypeGivenName(
+                        service?.additionalInfo.orderType,
+                        jobTypes,
+                      ),
                     ),
                   )}
             </Typography>
