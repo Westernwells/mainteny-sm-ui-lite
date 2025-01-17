@@ -18,7 +18,6 @@ import {
 import {
   CompleteServiceOrder,
   ServiceOrderArticleView,
-  ServiceOrderReportAttachmentView,
   ServiceOrderReportView,
   ServiceOrderView,
 } from 'models/service-order';
@@ -75,6 +74,7 @@ import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
+import {Confirm} from 'components/Confirm';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -107,6 +107,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
     serviceOrder?.reports?.[0],
   );
   const [shouldFetchImages, setShouldFetchImages] = useState(false);
+  const [isCancelEditConfirmDialogOpen, setIsCancelEditConfirmDialogOpen] =
+    useState(false);
 
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
@@ -607,16 +609,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
     setActionType('DOWNLOAD');
   };
 
-  const handleDeleteImage = (image: ServiceOrderReportAttachmentView) => {
-    const updatedAttachments = report?.attachments.filter(
-      (attachment) => attachment.fileResource.uri !== image.fileResource.uri,
-    );
-    setReport((prevReport) => ({
-      ...prevReport!,
-      attachments: updatedAttachments!,
-    }));
-  };
-
   const handleConfirmClose = () => {
     setOpenConfirmDialog(false);
   };
@@ -806,9 +798,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
         <Box mt="1em">
           <Pictures
+            report={report}
             attachments={report.attachments}
-            onDeleteImage={handleDeleteImage}
+            serviceCompanyId={serviceCompanyId!}
+            serviceOrder={serviceOrder}
             isEditMode={isEditMode}
+            setReport={setReport}
           />
         </Box>
 
@@ -913,15 +908,27 @@ export const WorkReport = ({serviceOrder}: Props) => {
                 variant: 'outlined',
                 sx: {bgcolor: theme.palette.inputBackground.main},
                 size: 'medium',
-                onClick: () => {
-                  setQueryParams(formatSearchParams({edit: '0'}, queryParams));
-                  resetForm();
-                },
+                onClick: () => setIsCancelEditConfirmDialogOpen(true),
               }}
             />
           )
         }
       />
+
+      <Confirm
+        open={isCancelEditConfirmDialogOpen}
+        onConfirm={() => {
+          setQueryParams(formatSearchParams({edit: '0'}, queryParams));
+          setReport(reportToUpdate);
+          setIsCancelEditConfirmDialogOpen(false);
+        }}
+        onClose={() => setIsCancelEditConfirmDialogOpen(false)}
+        title="Cancel editing"
+        content="You are about to cancel editing work report."
+        secondContent="All your progress will be lost"
+        helperText=""
+      />
+
       <SendEmailDialog
         open={isSendEmailDialogOpen}
         onConfirm={() => setIsSendEmailDialogOpen(false)}
