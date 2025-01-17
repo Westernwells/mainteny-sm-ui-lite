@@ -3063,5 +3063,7 @@
   "Are you sure you want to continue?": "Da li ste sigurni da želite da nastavite?",
   "Job update": "Ažuriranje posla",
   "The changes will also reflect on any draft invoice attached to the job.": "Promene će se takođe odraziti na bilo koju nacrt fakture priloženu poslu.",
-  "Add New": "Dodaj Novi"
+  "Save and Update": "Sačuvaj i ažuriraj",
+  "Add New": "Dodaj Novi",
+  "You are about to cancel editing work report.": "Spremate se da otkažete uređivanje izveštaja o radu."
 }
