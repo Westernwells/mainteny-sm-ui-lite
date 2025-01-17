@@ -20,9 +20,11 @@ import {addDays} from 'date-fns';
 import {PaymentTermArticleType, PaymentTermData} from 'models/contract';
 import {Currency} from 'models/misc';
 import {ArticleType} from 'models/article';
+import {ServiceOrderTypeRecord} from 'models/service-order';
 import {centsToMoney, Currencies, formatCurrency} from './currency';
 import {getAmountFromPercentage} from './utils';
 import {formatDate} from './datetime';
+import {getJobTypeGivenName} from './service-order-utils';
 
 export const getTotalFromArticles = (
   items: QuotationItemRecord[] | InvoiceItemRecord[],
@@ -411,6 +413,7 @@ export const getDisplayDeliveryDate = (
 
 export const aggregateInvoiceRow = (
   invoices: InvoiceView[],
+  jobTypes: ServiceOrderTypeRecord[],
 ): InvoiceTableRow[] =>
   invoices.map((invoice) => ({
     data: invoice,
@@ -421,7 +424,7 @@ export const aggregateInvoiceRow = (
     dueDate: invoice.dueDate,
     jobNumber: invoice.serviceOrder?.number ?? '-',
     type: InvoiceTypeMap[invoice.type],
-    serviceOrderType: invoice.serviceOrder?.type,
+    serviceOrderType: getJobTypeGivenName(invoice.serviceOrder?.type, jobTypes),
     total: invoice
       ? (invoice.totalAmount?.grossAmount ?? 0) /
         10 ** invoice.totalAmount.fractionDigits!

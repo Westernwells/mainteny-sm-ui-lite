@@ -10,6 +10,7 @@ import {
   ServiceOrderView,
 } from 'models/service-order';
 import {
+  getJobTypeGivenName,
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
@@ -24,6 +25,8 @@ import {Chip, FormControl, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface Props {
   date: string;
@@ -45,6 +48,10 @@ export const ReportCard = ({
   const formatDate = useFormatDate();
   const reports = order.reports || [];
   const {t} = useTranslation();
+  const {user} = useUserSession();
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const labels =
     reports.map((r) => {
@@ -119,7 +126,7 @@ export const ReportCard = ({
                   <Box display="flex" alignItems="center" gap={1}>
                     <ServiceOrderIcons serviceOrderType={type} size="small" />
                     <ServiceOrderTypeText
-                      serviceOrderType={type}
+                      serviceOrderType={getJobTypeGivenName(type, jobTypes)}
                       capitalizeText
                       variant="subtitle1"
                       style={{fontWeight: '600'}}

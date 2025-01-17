@@ -15,6 +15,7 @@ import {
   ServiceOrderStatus,
   ServiceOrderTableRow,
   ServiceOrderType,
+  ServiceOrderTypeRecord,
   ServiceOrderView,
 } from '../models/service-order';
 import {toDate, toRestDateTime} from './datetime';
@@ -472,3 +473,15 @@ export const getDialogTitle = (serviceOrder: ServiceOrderView) =>
   serviceOrder.status === ServiceOrderStatus.IN_PROGRESS
     ? 'Reschedule Job'
     : 'Schedule Job';
+
+export const getJobTypeGivenName = (
+  orderType: string | undefined,
+  jobTypes?: ServiceOrderTypeRecord[],
+): string => {
+  if (!orderType || !jobTypes) return '-';
+
+  const matchingJobType = jobTypes.find(
+    (jobType) => jobType.name === orderType,
+  );
+  return matchingJobType?.givenName || '-';
+};

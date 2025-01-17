@@ -14,7 +14,10 @@ import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import {getJobTypeGivenName} from 'utils/service-order-utils';
 import {useQueryClientStorageData} from './useClientStorage';
+import {useCompanyJobTypes} from './reactQuery/useCompanies';
+import {useUserSession} from './reactQuery/useUserSession';
 
 type UseCreateAndSetPdfBlobUrlProps = {
   serviceOrder: ServiceOrderView;
@@ -43,6 +46,10 @@ export const useCreateAndSetPdfBlobUrl = ({
   selectedLng,
   fileName,
 }: UseCreateAndSetPdfBlobUrlProps) => {
+  const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const [filePathToDownload, setFilePathToDownload] = useState('');
   const {enqueueSnackbar, closeSnackbar, showError} = useSnackbar();
   const snackBarRef = useRef<SnackbarKey | null>(null);
@@ -73,6 +80,7 @@ export const useCreateAndSetPdfBlobUrl = ({
         headerPath={headerPath}
         footerInfo={footerInfo}
         footerPath={footerPath}
+        serviceOrderType={getJobTypeGivenName(serviceOrder.type, jobTypes)}
       />,
     ).toBlob();
 

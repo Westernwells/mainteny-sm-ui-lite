@@ -18,6 +18,9 @@ import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {companyLanguageContextMap} from 'utils/language';
+import {getJobTypeGivenName} from 'utils/service-order-utils';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface RNWindow extends Window {
   ReactNativeWebView?: {
@@ -28,7 +31,10 @@ interface RNWindow extends Window {
 
 export const MobileWorkReportDownload = () => {
   const {t} = useTranslation();
-
+  const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const {search} = useLocation();
   const {
     token: QSToken,
@@ -108,6 +114,7 @@ export const MobileWorkReportDownload = () => {
         footerPath={footerUrl?.[footerInfo?.path]!}
         footerInfo={footerInfo}
         technicianName={technicianName}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
       />,
     ).toBlob();
 

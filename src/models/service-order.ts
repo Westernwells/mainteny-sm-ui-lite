@@ -767,6 +767,7 @@ export enum ServiceOrderTypePriority {
 export type ServiceOrderTypeRecord = {
   icon: string;
   name: string;
+  givenName?: string;
   priority: ServiceOrderTypePriority;
   createInAdvanceDays?: number;
 };

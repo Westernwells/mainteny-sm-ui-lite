@@ -47,6 +47,7 @@ import {
 export interface FormState {
   icon: string;
   name: string;
+  givenName?: string;
   priority: ServiceOrderTypePriority;
   createInAdvanceDays: number;
 }
@@ -69,6 +70,7 @@ const JobTypes = () => {
   >([]);
   const [form, setForm] = useState<FormState>({
     name: '',
+    givenName: '',
     icon: '',
     priority: ServiceOrderTypePriority.LOW,
     createInAdvanceDays: 0,
@@ -132,6 +134,7 @@ const JobTypes = () => {
     setEditingEvent({});
     setForm({
       name: '',
+      givenName: '',
       icon: '',
       priority: ServiceOrderTypePriority.LOW,
       createInAdvanceDays: 0,
@@ -157,7 +160,7 @@ const JobTypes = () => {
     return watchedFields?.some((field, index) => {
       const initial = initialJobTypes[index];
       return (
-        field.name !== initial.name ||
+        field.givenName !== initial.givenName ||
         field.icon !== initial.icon ||
         field.priority !== initial.priority ||
         field.createInAdvanceDays !== initial.createInAdvanceDays
@@ -166,59 +169,25 @@ const JobTypes = () => {
   };
 
   const handleCreateOrUpdate = async () => {
-    const updatedJobTypes = [...watchedFields];
+    const updatedJobTypes = watchedFields.map((field) => ({
+      ...field,
+      givenName: field.givenName,
+    }));
+
     let successMessage = 'Job type created successfully';
-
-    let changedServiceOrderNames =
-      jobTypes?.map((originalJobType, index) => {
-        const updatedJob = updatedJobTypes[index];
-
-        if (!updatedJob) {
-          return {
-            fromName: originalJobType.name,
-            toName: '',
-          };
-        }
-
-        return {
-          fromName: originalJobType.name,
-          toName:
-            updatedJob.name !== originalJobType.name
-              ? updatedJob.name
-              : originalJobType.name,
-        };
-      }) || [];
-
-    // Handle additional entries in updatedJobTypes (newly added job types)
-    updatedJobTypes.slice(jobTypes?.length).forEach((newJobType) => {
-      changedServiceOrderNames.push({
-        fromName: '',
-        toName: newJobType.name,
-      });
-    });
 
     if (deleteEventState.event) {
       if (contractResource.total > 0) {
         setOpenWarningModal(true);
       } else {
-        const deletedJobType = updatedJobTypes.splice(
-          deleteEventState.index!,
-          1,
-        )[0];
-        successMessage = 'Job type deleted successfully';
+        updatedJobTypes.splice(deleteEventState.index!, 1);
 
-        // Filter out the deleted item from `changedServiceOrderNames`
-        changedServiceOrderNames = changedServiceOrderNames.filter(
-          (entry) =>
-            entry.fromName !== deletedJobType.name &&
-            entry.toName !== deletedJobType.name,
-        );
+        successMessage = 'Job type deleted successfully';
 
         await updateCompanyJobTypes({
           companyId: user?.userAccount.serviceCompany.id!,
           body: {
             serviceOrderTypes: updatedJobTypes,
-            changedServiceOrderNames,
           },
         });
 
@@ -229,7 +198,6 @@ const JobTypes = () => {
         companyId: user?.userAccount.serviceCompany.id!,
         body: {
           serviceOrderTypes: updatedJobTypes,
-          changedServiceOrderNames,
         },
       });
 
@@ -350,9 +318,9 @@ const JobTypes = () => {
 
                 <StyledDataListCell flex="0 0 32%">
                   <Typography ml={1} variant="body2">
-                    {serviceOrderTypeToString(item.name) === '-'
-                      ? item.name
-                      : t(serviceOrderTypeToString(item.name))}
+                    {serviceOrderTypeToString(item?.givenName!) === '-'
+                      ? item?.givenName
+                      : t(serviceOrderTypeToString(item?.givenName!))}
                   </Typography>
                 </StyledDataListCell>
 
@@ -517,7 +485,7 @@ const JobTypes = () => {
         title={t(`Delete job type`)}
         body={[
           t('You are about to delete "{{serviceOrderTypeName}}"', {
-            serviceOrderTypeName: deleteEventState.event?.name,
+            serviceOrderTypeName: deleteEventState.event?.givenName,
           }),
           t('Enter the type name to confirm deletion.'),
         ]}
@@ -540,8 +508,8 @@ const JobTypes = () => {
           },
         }}
         disableSave={
-          deleteEventState.event?.name !== deleteEventState.userTypedName ||
-          isUpdating
+          deleteEventState.event?.givenName !==
+            deleteEventState.userTypedName || isUpdating
         }
         open={deleteEventState.isOpen ?? false}
         onConfirm={() => {

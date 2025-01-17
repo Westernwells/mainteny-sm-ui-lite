@@ -1,9 +1,9 @@
 import {IconButton, Input} from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import {FormEvent, useRef} from 'react';
+import {ChangeEvent, useRef} from 'react';
 
 interface Props {
-  onChange?: (e: FormEvent<HTMLInputElement>) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const ImagePicker = ({onChange}: Props) => {

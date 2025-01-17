@@ -55,6 +55,7 @@ import TableCellText from 'components/Table/TableCellText';
 import {
   aggregateServiceOrderRow,
   createSearchQuery,
+  getJobTypeGivenName,
   getServiceOrderStatusColor,
   serviceOrderPaymentStatusToString,
   serviceOrderStatusToString,
@@ -548,9 +549,15 @@ export const ServiceOrderList = ({menu}: Props) => {
         width: '156px',
         fieldName: ServiceOrderOrderField.JOB_TYPE,
         getExportValue: (serviceOrder) =>
-          serviceOrderTypeToString(serviceOrder.type) === '-'
-            ? serviceOrder.type
-            : t(serviceOrderTypeToString(serviceOrder.type)),
+          serviceOrderTypeToString(
+            getJobTypeGivenName(serviceOrder?.type, jobTypes),
+          ) === '-'
+            ? getJobTypeGivenName(serviceOrder?.type, jobTypes)
+            : t(
+                serviceOrderTypeToString(
+                  getJobTypeGivenName(serviceOrder?.type, jobTypes),
+                ),
+              ),
         renderCell: (serviceOrder, cellProps) => (
           <Cell {...cellProps}>
             <ServiceOrderIcons
@@ -558,9 +565,15 @@ export const ServiceOrderList = ({menu}: Props) => {
               size="small"
             />
             <TableCellText tableCellTextStyles={{paddingLeft: '0.4em'}}>
-              {serviceOrderTypeToString(serviceOrder.type) === '-'
-                ? serviceOrder.type
-                : t(serviceOrderTypeToString(serviceOrder.type))}
+              {serviceOrderTypeToString(
+                getJobTypeGivenName(serviceOrder.type, jobTypes),
+              ) === '-'
+                ? getJobTypeGivenName(serviceOrder.type, jobTypes)
+                : t(
+                    serviceOrderTypeToString(
+                      getJobTypeGivenName(serviceOrder.type, jobTypes),
+                    ),
+                  )}
             </TableCellText>
           </Cell>
         ),
@@ -1080,9 +1093,9 @@ export const ServiceOrderList = ({menu}: Props) => {
                 options={filteredJobTypes.map((jobType) => ({
                   value: jobType.name,
                   labelKey:
-                    serviceOrderTypeToString(jobType.name) === '-'
-                      ? jobType.name
-                      : t(serviceOrderTypeToString(jobType.name)),
+                    serviceOrderTypeToString(jobType?.givenName!) === '-'
+                      ? jobType?.givenName!
+                      : t(serviceOrderTypeToString(jobType?.givenName!)),
                 }))}
                 selectedChips={watchOrderTypes}
                 onChange={handleSelectedOrderTypesChange}

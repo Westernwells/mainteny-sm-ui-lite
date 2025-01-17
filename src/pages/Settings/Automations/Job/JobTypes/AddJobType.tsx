@@ -21,6 +21,7 @@ export interface JobTypeForm {
   jobTypes: {
     icon: string;
     name: string;
+    givenName?: string;
     priority: ServiceOrderTypePriority;
     createInAdvanceDays: number;
   }[];
@@ -76,6 +77,7 @@ const AddJobType = ({
       reset({
         jobTypes: data.map((item) => ({
           name: item.name,
+          givenName: item.givenName,
           icon: item.icon,
           priority: item.priority,
           createInAdvanceDays: item.createInAdvanceDays || 0,
@@ -88,6 +90,7 @@ const AddJobType = ({
     setDataListMode('create');
     setForm({
       name: '',
+      givenName: '',
       icon: 'HelpOutlineOutlinedIcon',
       priority: ServiceOrderTypePriority.LOW,
       createInAdvanceDays: 0,
@@ -99,6 +102,7 @@ const AddJobType = ({
     setForm({
       icon: '',
       name: '',
+      givenName: '',
       priority: ServiceOrderTypePriority.LOW,
       createInAdvanceDays: 0,
     });
@@ -106,7 +110,7 @@ const AddJobType = ({
 
   const handleOnCreate = async () => {
     if (dataListMode === 'create') {
-      append(form);
+      append({...form, name: form.givenName || ''});
     } else if (dataListMode === 'edit' && editingEvent.index !== undefined) {
       update(editingEvent.index, form);
     }
@@ -118,10 +122,11 @@ const AddJobType = ({
     setEditingEvent({event, index});
 
     setForm({
-      name:
-        serviceOrderTypeToString(event.name) === '-'
-          ? event.name
-          : serviceOrderTypeToString(event.name),
+      name: event.name,
+      givenName:
+        serviceOrderTypeToString(event?.givenName!) === '-'
+          ? event.givenName
+          : serviceOrderTypeToString(event?.givenName!),
       icon: event.icon,
       priority: event.priority,
       createInAdvanceDays: event.createInAdvanceDays || 0,

@@ -48,6 +48,7 @@ import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import TableBody from 'components/Table/TableBody';
 import TableContainer from 'components/Table/TableContainer';
+import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
 import {makeRows} from './ArticleDataGridProps';
 import {Actions} from './Actions';
 
@@ -73,6 +74,11 @@ export const Articles = ({
   const [openSelectModal, setOpenSelectModal] = useState<boolean>(false);
   const [isOpenDialog, setIsDialogOpen] = useState<boolean>(false);
   const [activeArticle, setActiveArticle] = useState<ArticleSectionTableRow>();
+
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [articleSelected, setArticleSelected] = useState<
+    ArticleView | undefined
+  >();
 
   const COLUMNS = useRef<TableColumnWithRender<ArticleSectionTableRow>[]>([
     {
@@ -210,7 +216,7 @@ export const Articles = ({
       renderCell: (article, cellProps) => (
         <Cell {...cellProps} onClick={undefined}>
           <Actions
-            serviceOrderId={serviceOrder.id}
+            serviceOrder={serviceOrder}
             serviceOrderArticleId={article.id}
           />
         </Cell>
@@ -227,7 +233,7 @@ export const Articles = ({
     setRows(makeRows(serviceOrderArticles || []));
   }, [serviceOrderArticles]);
 
-  const handleSelectArticle = async (article: ArticleView) => {
+  const handleSaveArticle = async (article: ArticleView) => {
     const customerVat = customer?.additionalInfo?.vat;
     const companyVatPercentage =
       user?.userAccount?.serviceCompany?.settings?.percentageVat;
@@ -263,6 +269,23 @@ export const Articles = ({
       body,
     });
     setOpenSelectModal(false);
+  };
+
+  const handleSelectArticle = (article: ArticleView) => {
+    setArticleSelected(article);
+    setOpenConfirmDialog(true);
+  };
+
+  const handleConfirmClose = () => {
+    setArticleSelected(undefined);
+    setOpenConfirmDialog(false);
+  };
+
+  const handleConfirmAccept = () => {
+    if (articleSelected) {
+      handleSaveArticle(articleSelected);
+      handleConfirmClose();
+    }
   };
 
   const handleRowClick = (id: string) => () => {
@@ -383,6 +406,15 @@ export const Articles = ({
           }}
         />
       </Dialog>
+
+      {openConfirmDialog && (
+        <UpdateConfirmationModal
+          open={openConfirmDialog}
+          order={serviceOrder}
+          onConfirm={handleConfirmAccept}
+          onCancel={handleConfirmClose}
+        />
+      )}
     </>
   );
 };
