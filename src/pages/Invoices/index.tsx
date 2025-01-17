@@ -694,7 +694,7 @@ const Invoices = ({elevatorId}: Props) => {
   }, [search]);
 
   const rows = useMemo(
-    () => aggregateInvoiceRow(invoiceResource.data),
+    () => aggregateInvoiceRow(invoiceResource.data, jobTypes || []),
     [invoiceResource],
   );
 
@@ -777,8 +777,9 @@ const Invoices = ({elevatorId}: Props) => {
         capitalize(t('Net amount')),
       );
 
-      const dataRows = aggregateInvoiceRow(data).map((invoice) =>
-        exportColumns.map((col) => col.getExportValue?.(invoice) || ''),
+      const dataRows = aggregateInvoiceRow(data, jobTypes || []).map(
+        (invoice) =>
+          exportColumns.map((col) => col.getExportValue?.(invoice) || ''),
       );
 
       const filename = 'Invoices';

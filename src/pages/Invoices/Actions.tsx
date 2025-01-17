@@ -40,7 +40,10 @@ import {
   svgToJpegPng,
   validateDueDate,
 } from 'utils/invoice-utils';
-import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {
   createFilesFromBlobArray,
   dateToString,
@@ -67,7 +70,7 @@ import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
-import {getSignatureKeys} from 'utils/service-order-utils';
+import {getJobTypeGivenName, getSignatureKeys} from 'utils/service-order-utils';
 import {
   HeaderFooterInfoData,
   PdfGenerationStatus,
@@ -155,6 +158,9 @@ export const Actions = ({
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
   const {user} = useUserSession();
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   const currentCurrency = useCurrentCurrency();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
@@ -520,6 +526,7 @@ export const Actions = ({
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
       />,
     ).toBlob();
 

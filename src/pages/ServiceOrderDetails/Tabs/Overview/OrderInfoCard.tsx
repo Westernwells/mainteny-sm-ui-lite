@@ -17,6 +17,7 @@ import {StatusChip} from 'components/StatusChip';
 import {
   getDefaultTechnician,
   getDialogTitle,
+  getJobTypeGivenName,
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
 } from 'utils/service-order-utils';
@@ -26,7 +27,10 @@ import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
 import useServiceOrderMenuActions from 'hooks/useServiceOrderMenuActions';
 import ChangePaymentStatusDialog from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ChangePaymentStatusDialog';
 import InfoCardMenu from 'components/InfoCardMenu';
-import {useCompanyById} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
@@ -92,6 +96,9 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
@@ -250,7 +257,10 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
                 variant="subtitle1"
                 style={{ml: '0.5em'}}
                 capitalizeText
-                serviceOrderType={serviceOrderDetails.type}
+                serviceOrderType={getJobTypeGivenName(
+                  serviceOrderDetails.type,
+                  jobTypes,
+                )}
               />
             </Box>
 

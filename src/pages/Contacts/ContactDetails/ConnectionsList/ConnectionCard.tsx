@@ -19,6 +19,7 @@ import {ElevatorView} from 'models/elevator';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {ContractView} from 'models/contract';
 import {
+  getJobTypeGivenName,
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
   serviceOrderTypeToString,
@@ -26,6 +27,8 @@ import {
 import {statusColor} from 'components/StatusChip';
 import {ServiceOrderView} from 'models/service-order';
 import {Confirm} from 'components/Confirm';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ArticleSupplierView} from '../../../../models/supplier';
 
 interface CardItemProps {
@@ -37,6 +40,10 @@ const getConnectionCardData = (
   connection: ContactPersonAssociationView,
 ): CardItemProps[] => {
   const {t} = useTranslation();
+  const {user} = useUserSession();
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
   switch (connection.refType) {
     case ContactPersonAssociationType.ELEVATOR: {
       const elevator = connection?.data as ElevatorView;
@@ -122,9 +129,15 @@ const getConnectionCardData = (
           label: t('Job type'),
           value:
             serviceOrder?.type &&
-            serviceOrderTypeToString(serviceOrder?.type) === '-'
+            serviceOrderTypeToString(
+              getJobTypeGivenName(serviceOrder?.type, jobTypes),
+            ) === '-'
               ? serviceOrder?.type
-              : t(serviceOrderTypeToString(serviceOrder?.type!)),
+              : t(
+                  serviceOrderTypeToString(
+                    getJobTypeGivenName(serviceOrder?.type!, jobTypes),
+                  ),
+                ),
           icon: (
             <StoreMallDirectoryOutlinedIcon sx={{color: 'primary.light'}} />
           ),
