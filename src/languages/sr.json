@@ -3062,5 +3062,6 @@
   "There are unsaved changes made to the job order <bold>{{invoiceId}}</bold> and these will be reflected on the invoice.": "Postoje nesačuvane promene u nalogu za posao <bold>{{invoiceId}}</bold> i one će se odraziti na fakturi.",
   "Are you sure you want to continue?": "Da li ste sigurni da želite da nastavite?",
   "Job update": "Ažuriranje posla",
+  "The changes will also reflect on any draft invoice attached to the job.": "Promene će se takođe odraziti na bilo koju nacrt fakture priloženu poslu.",
   "Add New": "Dodaj Novi"
 }
