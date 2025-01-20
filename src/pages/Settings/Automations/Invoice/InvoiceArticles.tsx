@@ -222,7 +222,7 @@ const InvoiceArticles = () => {
         {jobTypes.map((jobType, index) => (
           <TabPanel key={index} value={tabValue} index={index}>
             <InvoiceArticlesTable
-              serviceOrderType={jobType.givenName!}
+              serviceOrderTypeName={jobType.name}
               dataListMode={dataListMode}
               setDataListMode={(newValue: CreateEditViewMode) => {
                 setDataListMode(newValue);
@@ -383,7 +383,7 @@ const InvoiceArticles = () => {
           {jobTypes.map((jobType, index) => (
             <TabPanel key={index} value={tabValue} index={index}>
               <InvoiceArticlesTable
-                serviceOrderType={jobType.givenName!}
+                serviceOrderTypeName={jobType.name}
                 dataListMode={dataListMode}
                 setDataListMode={(newValue: CreateEditViewMode) => {
                   setDataListMode(newValue);

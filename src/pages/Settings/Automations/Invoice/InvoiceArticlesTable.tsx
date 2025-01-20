@@ -20,7 +20,7 @@ import DataList, {FormState} from './DataList';
 import {ArticleForm} from './InvoiceArticles';
 
 interface Props {
-  serviceOrderType: string;
+  serviceOrderTypeName: string;
   dataListMode: CreateEditViewMode;
   setDataListMode: (newValue: CreateEditViewMode) => void;
   form: FormState;
@@ -45,7 +45,7 @@ interface Props {
 }
 
 const InvoiceArticlesTable = ({
-  serviceOrderType,
+  serviceOrderTypeName,
   dataListMode,
   setDataListMode,
   form,
@@ -76,7 +76,9 @@ const InvoiceArticlesTable = ({
   const {mutate: updateTravelWork} = useUpdateTravelWork(
     'Article updated successfully',
   );
-  const {data: articles, isFetching} = useQueryTravelWorks({serviceOrderType});
+  const {data: articles, isFetching} = useQueryTravelWorks({
+    serviceOrderType: serviceOrderTypeName,
+  });
 
   const handleCalculationTypeChange = async (data: {
     articleId: string;
@@ -87,7 +89,7 @@ const InvoiceArticlesTable = ({
       id: data.id,
       articleId: data.articleId,
       calculationType: data.calculationType,
-      serviceOrderType,
+      serviceOrderType: serviceOrderTypeName,
     });
     if (data.id === newlyAddedArticle?.id) {
       setNewlyAddedArticle(undefined);
@@ -110,7 +112,7 @@ const InvoiceArticlesTable = ({
       createTravelWork({
         articleId: form?.article?.id!,
         calculationType: form.calculationType!,
-        serviceOrderType,
+        serviceOrderType: serviceOrderTypeName,
         serviceCompanyId: user!.userAccount.serviceCompany.id,
       });
     } else if (dataListMode === 'edit' && editingEvent.index !== undefined) {
