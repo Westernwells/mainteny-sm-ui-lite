@@ -50,7 +50,10 @@ import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
 import * as Yup from 'yup';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {createEmptyResource} from 'utils/paging';
-import {getArticleTypeText} from 'utils/article-utils';
+import {
+  calculatePackageMaterialLaborPercentages,
+  getArticleTypeText,
+} from 'utils/article-utils';
 import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
@@ -332,20 +335,19 @@ export const ArticleItemRowNEW = ({
   );
 
   useEffect(() => {
-    const defaultPackageValues = {
-      laborPercentage:
-        formik.values.article?.type === ArticleType.PACKAGE
-          ? articleItem.article?.costPackage?.laborPercentage || 0
-          : 0,
-      materialPercentage:
-        formik.values.article?.type === ArticleType.PACKAGE
-          ? articleItem.article?.costPackage?.materialPercentage! || 0
-          : 0,
-    };
-    formik.setFieldValue('article.costPackage', {
-      ...formik.values.article?.costPackage,
-      ...defaultPackageValues,
-    });
+    if (formik.values.article?.type === ArticleType.PACKAGE) {
+      const {laborPercentage, materialPercentage} =
+        calculatePackageMaterialLaborPercentages(
+          articleItem.article?.costPackage ||
+            articleItem.article?.additionalInfo?.costPackage,
+        );
+
+      formik.setFieldValue('article.costPackage', {
+        ...formik.values.article?.costPackage,
+        laborPercentage,
+        materialPercentage,
+      });
+    }
   }, [formik.values.article?.type]);
 
   const handlePopperClose = () => {

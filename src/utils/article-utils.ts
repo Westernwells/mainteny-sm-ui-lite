@@ -157,3 +157,36 @@ export const syncVatLegalNotesWithNotes = ({
 
   return notes;
 };
+
+export const calculatePackageMaterialLaborPercentages = (costPackage?: {
+  laborPercentage?: number;
+  materialPercentage?: number;
+}) => {
+  const labor = costPackage?.laborPercentage ?? 0;
+  const material = costPackage?.materialPercentage ?? 0;
+
+  let laborPercentage = labor;
+  let materialPercentage = material;
+
+  // If both are 0, set default 50-50 split
+  if (labor === 0 && material === 0) {
+    laborPercentage = 50;
+    materialPercentage = 50;
+  }
+  // If one is 0, set the other to remaining percentage
+  else if (labor === 0) {
+    materialPercentage = Math.min(material, 100);
+    laborPercentage = 100 - materialPercentage;
+  } else if (material === 0) {
+    laborPercentage = Math.min(labor, 100);
+    materialPercentage = 100 - laborPercentage;
+  }
+  // If sum > 100, scale down proportionally
+  else if (labor + material > 100) {
+    const total = labor + material;
+    laborPercentage = Math.round((labor / total) * 100);
+    materialPercentage = 100 - laborPercentage;
+  }
+
+  return {laborPercentage, materialPercentage};
+};
