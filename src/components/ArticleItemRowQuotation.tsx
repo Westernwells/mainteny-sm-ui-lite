@@ -45,7 +45,10 @@ import * as Yup from 'yup';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {createEmptyResource} from 'utils/paging';
 import useHighlightText from 'hooks/useHighlightText';
-import {getArticleTypeText} from 'utils/article-utils';
+import {
+  calculatePackageMaterialLaborPercentages,
+  getArticleTypeText,
+} from 'utils/article-utils';
 import {QuotationItemRecord} from 'models/quotation';
 import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
 import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
@@ -321,20 +324,19 @@ export const ArticleItemRowQuotation = ({
   );
 
   useEffect(() => {
-    const defaultPackageValues = {
-      laborPercentage:
-        formik.values.article?.type === ArticleType.PACKAGE
-          ? articleItem.article?.costPackage?.laborPercentage || 0
-          : 0,
-      materialPercentage:
-        formik.values.article?.type === ArticleType.PACKAGE
-          ? articleItem.article?.costPackage?.materialPercentage! || 0
-          : 0,
-    };
-    formik.setFieldValue('article.costPackage', {
-      ...formik.values.article?.costPackage,
-      ...defaultPackageValues,
-    });
+    if (formik.values.article?.type === ArticleType.PACKAGE) {
+      const {laborPercentage, materialPercentage} =
+        calculatePackageMaterialLaborPercentages(
+          articleItem.article?.costPackage ||
+            articleItem.article?.additionalInfo?.costPackage,
+        );
+
+      formik.setFieldValue('article.costPackage', {
+        ...formik.values.article?.costPackage,
+        laborPercentage,
+        materialPercentage,
+      });
+    }
   }, [formik.values.article?.type]);
 
   const handlePopperClose = () => {

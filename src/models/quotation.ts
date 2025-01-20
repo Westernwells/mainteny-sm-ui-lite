@@ -1,4 +1,9 @@
-import {ArticleType, ArticleView, CostPackage} from './article';
+import {
+  ArticleAdditionalInfo,
+  ArticleType,
+  ArticleView,
+  CostPackage,
+} from './article';
 import {ElevatorView} from './elevator';
 import {AlternativeServiceCompanyInfo, Discount} from './invoice';
 import {
@@ -83,6 +88,7 @@ export interface ArticleRecord {
   unit?: string;
   unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
+  additionalInfo?: ArticleAdditionalInfo;
 }
 
 export interface QuotationItemRecord {
