@@ -1,4 +1,9 @@
-import {ArticleType, ArticleView, CostPackage} from './article';
+import {
+  ArticleAdditionalInfo,
+  ArticleType,
+  ArticleView,
+  CostPackage,
+} from './article';
 import {PaymentTermData} from './contract';
 import {
   Address,
@@ -307,6 +312,7 @@ export interface ArticleRecord {
   unit?: string;
   unitSellingAmount?: AmountRecord;
   costPackage?: CostPackage;
+  additionalInfo?: ArticleAdditionalInfo;
 }
 
 export interface InvoiceItemRecord {
