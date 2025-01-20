@@ -29,23 +29,33 @@ export const generateSignatureHtml = (
     value?.content.images &&
     value?.content.images.length > 0 &&
     value?.content.images[0] !== ''
-      ? `<tr>
-          <td>
-            <img src="${imageSrc}" 
-              alt="${value.name}" 
-              style="width: 88px; max-height: 88px; border-radius: 50%; margin-right: 16px; object-fit:cover; min-height: 88px" />
-          </td>
-        </tr>`
+      ? `
+        <!--[if mso]>
+        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+          style="height:88px; width:88px; v-text-anchor:middle;" arcsize="50%" strokecolor="none" fill="t">
+          <v:fill src="${imageSrc}" type="frame" />
+          <w:wrap type="none" />
+        </v:roundrect>
+        <![endif]-->
+        <!--[if !mso]><!-- -->
+        <img src="${imageSrc}" 
+          alt="${value.name}" 
+          style="width: 88px; height: 88px; max-height: 88px; border-radius: 50%; object-fit: cover; display: block;" />
+        <!--<![endif]-->
+      `
       : '';
-
   return `
-<table style="width:100%">
-  <tbody style="display:flex;justify-content: space-between">
-    ${imageHtml}
-    <tr>
-      <td>${value.content.html}</td>
-    </tr>
-  </tbody>
+<table style="border-collapse: separate; width: 100%; table-layout: fixed;border-spacing: 0 50px">
+  <tr>
+    <td style="width: ${
+      imageHtml ? '88px' : '0px'
+    };vertical-align: top;padding-right:${imageHtml ? '16px' : '0px'}">
+      ${imageHtml}
+    </td>
+    <td class="html-content" style="vertical-align: top; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #000;">
+      ${value.content.html}
+    </td>
+  </tr>
 </table>
 `;
 };

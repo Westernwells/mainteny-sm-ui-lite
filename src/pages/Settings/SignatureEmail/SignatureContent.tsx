@@ -61,7 +61,11 @@ const SignatureContent = ({
       direction="row"
       justifyContent="space-between"
       display="flex">
-      <Grid direction="row" justifyContent="space-between" display="flex">
+      <Grid
+        direction="row"
+        justifyContent="space-between"
+        display="flex"
+        flex="0 0 90%">
         {(employeeSignature?.content.images[0] || logoSrc) && (
           <Grid sx={{mr: 4}}>
             <Box display="flex" alignItems="center" gap={1}>
@@ -77,7 +81,13 @@ const SignatureContent = ({
           </Grid>
         )}
 
-        <Grid direction="column">
+        <Grid
+          direction="column"
+          flex={
+            employeeSignature?.content.images[0] || logoSrc
+              ? '0 0 83%'
+              : '0 0 95%'
+          }>
           <Box
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(

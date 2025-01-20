@@ -87,7 +87,41 @@ export const cleanHtmlContent = (html: string): string => {
   // Add styles to <tbody> to support positioning of the signature
   html = html.replace(
     '<tbody>',
-    '<tbody style="display:flex;justify-content: space-between">',
+    '<tbody style="display: flex; justify-content: space-between; width: 100%;">',
+  );
+
+  html = html.replace(/<tr>/g, '<tr style="width: 100%; padding-right: 1em;">');
+
+  // Dynamically handle <td> based on child count and content
+  html = html.replace(
+    /<tr(.*?)>(.*?)<\/tr>/gis,
+    (match, trAttributes, trContent) => {
+      const tdMatches = trContent.match(/<td(.*?)>(.*?)<\/td>/gis) || [];
+      const tdCount = tdMatches.length;
+
+      // Process each <td> dynamically
+      return `<tr${trAttributes}>${tdMatches
+        .map((tdMatch: string, index: number) => {
+          const tdContent = tdMatch
+            .replace(/<td(.*?)>/, '')
+            .replace('</td>', '')
+            .trim();
+          const isEmpty = tdContent === '' || tdContent === '<p><br></p>';
+          const style =
+            index === 1
+              ? tdCount === 2
+                ? 'width: 90%;' // Second <td> when two are present
+                : 'width: 100%;' // Single <td> fills entire width
+              : isEmpty
+              ? 'width: 0px;' // Hide empty first <td>
+              : 'width: 88px; padding-right: 16px;'; // Visible first <td>
+
+          return tdMatch.includes('style=')
+            ? tdMatch.replace(/style="(.*?)"/, `style="$1; ${style}"`)
+            : `<td style="${style}">${tdContent}</td>`;
+        })
+        .join('')}</tr>`;
+    },
   );
 
   // Replace empty <p> tags with a non-breaking space
