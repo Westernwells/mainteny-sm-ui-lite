@@ -331,7 +331,6 @@ export interface ServiceOrderView {
   labels: string[];
   search: string;
   meta: Meta;
-  report?: ServiceOrderReportView;
   reports?: ServiceOrderReportView[];
   additionalInfo: ServiceOrderAdditionalInfo;
   checkLists?: ServiceOrderCheckListInfo[];
