@@ -113,12 +113,12 @@ import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import XMLViewer from 'react-xml-viewer';
-import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
+import {getTechnicianByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
 import useInvoiceMenuActions from 'hooks/useInvoiceMenuActions';
-import {EmailSignature} from 'models/employee';
-import {FileResourceRecord} from 'models/media';
 import {companyLanguageContextMap} from 'utils/language';
+import {EmailSignature, EmployeesView} from 'models/employee';
+import {FileResourceRecord} from 'models/media';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -377,10 +377,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     (r) => r.externalId === report?.externalId,
   );
 
-  const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
-    report?.technicianId || '',
-  );
-
   const {data: signatureDownloadUrls = {}} = useDownloadUrl(
     completedChecklists?.length
       ? completedChecklists.map(
@@ -444,9 +440,23 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       (s) => s.technician.id === selectedChecklist?.technicianId,
     );
 
+    let technicianData: EmployeesView | undefined;
+
+    if (selectedChecklist?.technicianId) {
+      try {
+        technicianData = await getTechnicianByEmployeeId(
+          selectedChecklist?.technicianId,
+        );
+      } catch (error) {
+        enqueueSnackbar(t('Failed to fetch technician data'), {
+          variant: 'error',
+        });
+      }
+    }
+
     const technicianNameForChecklist = getTechnicianName(
       technicianSchedule,
-      fetchedTechnician,
+      technicianData,
     );
 
     const blob = await pdf(
@@ -519,9 +529,23 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       (s) => s.technician.id === workReport.technicianId,
     );
 
+    let technicianData: EmployeesView | undefined;
+
+    if (workReport.technicianId) {
+      try {
+        technicianData = await getTechnicianByEmployeeId(
+          workReport.technicianId,
+        );
+      } catch (error) {
+        enqueueSnackbar(t('Failed to fetch technician data'), {
+          variant: 'error',
+        });
+      }
+    }
+
     const technicianNameForReport = getTechnicianName(
       technicianSchedule,
-      fetchedTechnician,
+      technicianData,
     );
 
     const reportImageDownloadUrls =
@@ -1563,7 +1587,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           )}
 
           {/* WORK REPORT CARD */}
-          {serviceOrder?.report && (
+          {serviceOrder?.reports?.[0] && (
             <PageCard
               headerLabel={t('Work Report')}
               headerIcon={<GradingOutlinedIcon sx={{color: '#8F9BB380'}} />}
@@ -1582,10 +1606,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                 navigate(`/orders/details/${serviceOrder?.id}?tab=1`)
               }>
               {serviceOrder.actualStartTime &&
-              serviceOrder.report?.description ? (
+              serviceOrder.reports[0]?.description ? (
                 <Typography variant="body1">
                   {formatDate(serviceOrder.actualStartTime)}:
-                  {stripHtmlTags(serviceOrder.report.description)}
+                  {stripHtmlTags(serviceOrder.reports[0].description)}
                 </Typography>
               ) : null}
             </PageCard>
