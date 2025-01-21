@@ -1587,7 +1587,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
           )}
 
           {/* WORK REPORT CARD */}
-          {serviceOrder?.report && (
+          {serviceOrder?.reports?.[0] && (
             <PageCard
               headerLabel={t('Work Report')}
               headerIcon={<GradingOutlinedIcon sx={{color: '#8F9BB380'}} />}
@@ -1606,10 +1606,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                 navigate(`/orders/details/${serviceOrder?.id}?tab=1`)
               }>
               {serviceOrder.actualStartTime &&
-              serviceOrder.report?.description ? (
+              serviceOrder.reports[0]?.description ? (
                 <Typography variant="body1">
                   {formatDate(serviceOrder.actualStartTime)}:
-                  {stripHtmlTags(serviceOrder.report.description)}
+                  {stripHtmlTags(serviceOrder.reports[0].description)}
                 </Typography>
               ) : null}
             </PageCard>

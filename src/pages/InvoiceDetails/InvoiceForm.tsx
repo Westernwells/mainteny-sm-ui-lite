@@ -963,10 +963,13 @@ export const InvoiceForm = ({
       );
     }
 
-    if (!formik.values.description && serviceOrderArg?.report?.description) {
+    if (
+      !formik.values.description &&
+      serviceOrderArg?.reports?.[0].description
+    ) {
       formik.setFieldValue(
         'description',
-        stripHtmlTags(serviceOrderArg?.report.description),
+        stripHtmlTags(serviceOrderArg?.reports[0].description),
       );
     }
 
