@@ -243,7 +243,8 @@ export const JobOverviewBottomDrawer = ({
             <Button
               sx={{cursor: 'pointer', margin: '0em 0.5rem', color: '#828DA3'}}
               onClick={action.onClick}
-              startIcon={action.icon}>
+              startIcon={action.icon}
+              key={action.label}>
               {action.label}
             </Button>
           ))}
