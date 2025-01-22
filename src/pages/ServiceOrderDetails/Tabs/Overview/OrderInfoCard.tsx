@@ -30,6 +30,7 @@ import InfoCardMenu from 'components/InfoCardMenu';
 import {
   useCompanyById,
   useCompanyJobTypes,
+  useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
@@ -99,6 +100,19 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
+
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
@@ -259,7 +273,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
                 capitalizeText
                 serviceOrderType={getJobTypeGivenName(
                   serviceOrderDetails.type,
-                  jobTypes,
+                  allJobTypes,
                 )}
               />
             </Box>

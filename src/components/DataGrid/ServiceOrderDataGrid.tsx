@@ -26,7 +26,10 @@ import {EmptySection} from 'components/EmptySection';
 import {useTranslation} from 'react-i18next';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {debounce, isEqual} from 'lodash';
-import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {styles} from './style';
 import {Order} from '../../models/pagination';
@@ -117,6 +120,19 @@ export const ServiceOrdersDataGrid = ({
     user?.userAccount.serviceCompany.id!,
   );
 
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const {
     data: serviceOrdersResource = createEmptyResource<ServiceOrderView>(
       pageSize,
@@ -142,7 +158,7 @@ export const ServiceOrdersDataGrid = ({
   }, [serviceOrdersResource.total, page.pageSize]);
 
   useEffect(() => {
-    const newRows = makeRows(serviceOrdersResource.data, jobTypes);
+    const newRows = makeRows(serviceOrdersResource.data, allJobTypes);
     if (!isEqual(newRows, rows)) {
       setRows(newRows);
     }

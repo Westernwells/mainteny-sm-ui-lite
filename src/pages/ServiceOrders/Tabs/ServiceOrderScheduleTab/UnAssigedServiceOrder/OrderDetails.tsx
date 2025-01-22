@@ -14,7 +14,10 @@ import {
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
 import {useFormatDateDistance} from 'hooks/useFormatDateDistance';
-import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface Props extends BoxProps {
@@ -23,11 +26,25 @@ interface Props extends BoxProps {
 
 export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
   const {user} = useUserSession();
+  const {t, i18n} = useTranslation();
+  const formatDateDistance = useFormatDateDistance();
+
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
-  const {t, i18n} = useTranslation();
-  const formatDateDistance = useFormatDateDistance();
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const [openDialog, setOpenDialog] = useState(false);
 
   const dueDate = useMemo(() => {
@@ -60,12 +77,12 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
             variant="smallBtnText"
             sx={{textTransform: 'uppercase', ml: '0.5em', pt: 0.1}}>
             {serviceOrderTypeToString(
-              getJobTypeGivenName(serviceOrder?.type, jobTypes),
+              getJobTypeGivenName(serviceOrder?.type, allJobTypes),
             ) === '-'
-              ? getJobTypeGivenName(serviceOrder?.type, jobTypes)
+              ? getJobTypeGivenName(serviceOrder?.type, allJobTypes)
               : t(
                   serviceOrderTypeToString(
-                    getJobTypeGivenName(serviceOrder?.type, jobTypes),
+                    getJobTypeGivenName(serviceOrder?.type, allJobTypes),
                   ),
                 )}
           </Typography>
@@ -109,7 +126,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
 
       <ScheduleDialog
         serviceOrderId={serviceOrder.id}
-        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         defaultStartDate={

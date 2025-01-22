@@ -36,7 +36,10 @@ import {
   getJobTypeGivenName,
   serviceOrderTypeToString,
 } from 'utils/service-order-utils';
-import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Service} from '.';
 
@@ -49,9 +52,23 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
   const {user} = useUserSession();
+
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
+
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
   const elevatorsData = getElevatorDataByElevator(
     elevators,
@@ -118,18 +135,18 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
               serviceOrderTypeToString(
                 getJobTypeGivenName(
                   service?.additionalInfo.orderType,
-                  jobTypes,
+                  allJobTypes,
                 ),
               ) === '-'
                 ? getJobTypeGivenName(
                     service?.additionalInfo.orderType,
-                    jobTypes,
+                    allJobTypes,
                   )
                 : t(
                     serviceOrderTypeToString(
                       getJobTypeGivenName(
                         service?.additionalInfo.orderType,
-                        jobTypes,
+                        allJobTypes,
                       ),
                     ),
                   )}

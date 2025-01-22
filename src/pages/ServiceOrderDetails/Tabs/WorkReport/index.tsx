@@ -53,6 +53,7 @@ import {pdf} from '@react-pdf/renderer';
 import {
   useCompanyById,
   useCompanyJobTypes,
+  useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {EmailRecord, PdfGenerationStatus, ReportStatus} from 'models/misc';
@@ -104,11 +105,25 @@ const validationSchema = Yup.object().shape({
 export const WorkReport = ({serviceOrder}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const [queryParams, setQueryParams] = useSearchParams();
+  const isEditMode = queryParams.get('edit') === '1';
+
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
-  const [queryParams, setQueryParams] = useSearchParams();
-  const isEditMode = queryParams.get('edit') === '1';
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const [articles, setArticles] = useState<ServiceOrderArticleView[]>([]);
   const [report, setReport] = useState<ServiceOrderReportView | undefined>(
     serviceOrder?.reports?.[0],
@@ -255,7 +270,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         technicianName={technicianName}
-        serviceOrderType={getJobTypeGivenName(serviceOrder.type, jobTypes)}
+        serviceOrderType={getJobTypeGivenName(serviceOrder.type, allJobTypes)}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -698,7 +713,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
     <Box width="min(calc(1240px + 1.25em), 100%)" mx="auto">
       <ReportCard
         date={report.meta.createdAt}
-        type={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
+        type={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
         number={serviceOrder.number}
         status={serviceOrder.status}
         order={serviceOrder}

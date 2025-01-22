@@ -11,6 +11,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCompanyById,
   useCompanyJobTypes,
+  useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
@@ -48,6 +49,19 @@ export const JobOverviewBottomDrawer = ({
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
+
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
   const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
@@ -289,7 +303,7 @@ export const JobOverviewBottomDrawer = ({
           serviceOrderId={serviceOrderDetails.id}
           serviceOrderType={getJobTypeGivenName(
             serviceOrderDetails.type,
-            jobTypes,
+            allJobTypes,
           )}
           title={t(getDialogTitle(serviceOrderDetails))}
           open={openScheduleDialog}
