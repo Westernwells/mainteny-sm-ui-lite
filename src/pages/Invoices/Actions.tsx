@@ -50,6 +50,7 @@ import {
   decideAttachmentDescriptionForInvoiceEmail,
   decideAttachmentURIForInvoiceEmail,
   fetchFile,
+  getUserFullName,
 } from 'utils/utils';
 import {createQrData, QRCurrencyCode, useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -309,16 +310,18 @@ export const Actions = ({
 
   const labels =
     completedChecklists?.map((c) => {
-      const schedule = invoice?.serviceOrder?.schedules.find(
-        (s) => s.technician.id === c.technicianId,
-      );
+      const schedule = invoice?.serviceOrder?.schedules
+        .filter((item) => !!item.technician)
+        .find((s) => s.technician!.id === c.technicianId);
       const checklistNumber = c.checkList.number || 'Unassigned';
       return {
         value: {
           checklistId: c.checkListId,
           technicianId: c.technicianId,
         },
-        label: `${checklistNumber}-${schedule?.technician.userAccount.firstName} ${schedule?.technician.userAccount.lastName}`,
+        label: `${checklistNumber}-${getUserFullName(
+          schedule?.technician?.userAccount,
+        )}`,
       };
     }) || [];
 
@@ -391,9 +394,9 @@ export const Actions = ({
       });
     });
 
-    const technicianSchedule = invoice?.serviceOrder?.schedules.find(
-      (s) => s.technician.id === selectedChecklist?.technicianId,
-    );
+    const technicianSchedule = invoice?.serviceOrder?.schedules
+      .filter((item) => !!item.technician)
+      .find((s) => s.technician!.id === selectedChecklist?.technicianId);
 
     let technicianData: EmployeesView | undefined;
 
@@ -480,9 +483,9 @@ export const Actions = ({
   );
 
   const generateWorkReportBlob = async (workReport: ServiceOrderReportView) => {
-    const technicianSchedule = invoice?.serviceOrder?.schedules.find(
-      (s) => s.technician.id === workReport.technicianId,
-    );
+    const technicianSchedule = invoice?.serviceOrder?.schedules
+      .filter((item) => !!item.technician)
+      .find((s) => s.technician!.id === workReport.technicianId);
 
     let technicianData: EmployeesView | undefined;
 

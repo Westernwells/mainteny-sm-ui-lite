@@ -60,6 +60,7 @@ export enum ServiceOrderStatus {
   PAUSED = 'PAUSED',
   ARTICLES_ORDERED = 'ARTICLES_ORDERED',
   ARCHIVED = 'ARCHIVED',
+  PLANNED = 'PLANNED',
 }
 
 export enum ServiceOrderStatusFilter {
@@ -84,6 +85,7 @@ export const ServiceOrderFilterToStatusMap = new Map<
       ServiceOrderStatus.ARTICLES_ORDERED,
       ServiceOrderStatus.TECHNICIAN_ASSIGNED,
       ServiceOrderStatus.READY_TO_SCHEDULE,
+      ServiceOrderStatus.PLANNED,
     ],
   ],
   [
@@ -294,8 +296,6 @@ export interface ServiceOrderAdditionalInfo {
     startTime: string;
     endTime: string;
   };
-  candidateTechnician?: EmployeesSimpleView;
-  candidateTechnicians?: EmployeesSimpleView[];
   documents?: FileResource[];
   pictures?: FileResource[];
   discount?: Discount;
@@ -408,7 +408,7 @@ export interface ServiceOrderSchedule {
 export interface ServiceOrderScheduleSimpleView {
   id: string;
   serviceOrderId: string;
-  technician: EmployeesSimpleView;
+  technician?: EmployeesSimpleView;
   startTime: string;
   endTime: string;
   type: JobScheduleType;

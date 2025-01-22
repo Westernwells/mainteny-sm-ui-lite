@@ -153,7 +153,9 @@ export const SelectTechnicians = ({
       const sortedOrder = sortOrderByTime(serviceOrders.data);
       const groupByTechnicianId = _.groupBy(
         sortedOrder,
-        (serviceOrder) => serviceOrder.schedules[0].technician.id,
+        (serviceOrder) =>
+          serviceOrder.schedules.filter((item) => !!item.technician)[0]
+            .technician!.id,
       );
       setOrders(groupByTechnicianId);
     }

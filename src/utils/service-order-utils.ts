@@ -1,6 +1,6 @@
 import {addMinutes, differenceInMinutes} from 'date-fns';
 import _ from 'lodash';
-import {EmployeesSimpleView, EmployeesView} from 'models/employee';
+import {EmployeesSimpleView} from 'models/employee';
 import {StatusColor} from 'models/status';
 import {getAddressString} from 'utils/address';
 import {
@@ -25,6 +25,8 @@ export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
     case ServiceOrderStatus.SCHEDULING:
       return 'primary.dark';
     case ServiceOrderStatus.SCHEDULED:
+      return 'primary.dark';
+    case ServiceOrderStatus.PLANNED:
       return 'primary.dark';
     case ServiceOrderStatus.IN_PROGRESS:
       return 'warning.light';
@@ -75,6 +77,8 @@ export const serviceOrderStatusToString = (status: ServiceOrderStatus) => {
       return 'Archived';
     case ServiceOrderStatus.ARTICLES_ORDERED:
       return 'Articles Ordered';
+    case ServiceOrderStatus.PLANNED:
+      return 'Planned';
     default:
       return 'Unscheduled';
   }
@@ -104,6 +108,8 @@ export const serviceOrderStatusToEnum = (status: string) => {
       return ServiceOrderStatus.PAUSED;
     case 'Articles Ordered':
       return ServiceOrderStatus.ARTICLES_ORDERED;
+    case 'Planned':
+      return ServiceOrderStatus.PLANNED;
     default:
       return ServiceOrderStatus.INIT;
   }
@@ -355,11 +361,11 @@ const getTechniciansFromServiceOrder = (
   item: ServiceOrderView,
 ): EmployeesSimpleView[] => {
   if (item.schedules.length) {
-    return item.schedules.map((x) => x.technician);
+    return item.schedules
+      .filter((scheduleItem) => !!scheduleItem.technician)
+      .map((x) => x.technician!);
   }
-  if (item?.additionalInfo?.candidateTechnician) {
-    return [item?.additionalInfo?.candidateTechnician];
-  }
+
   return [];
 };
 
@@ -452,21 +458,14 @@ export const getIsNotPendingStatus = (status: ServiceOrderStatus) =>
     ServiceOrderStatus.SCHEDULING,
     ServiceOrderStatus.OVERDUE,
     ServiceOrderStatus.IN_PROGRESS,
+    ServiceOrderStatus.PLANNED,
   ].includes(status);
 
 // scheduled => perfill technicians from schedules and time
-// unscheduled => prefill the technicians from candidateTechnicians
 export const getDefaultTechnician = (serviceOrder: ServiceOrderView) =>
-  serviceOrder.schedules.length
-    ? serviceOrder.schedules.map((schedule) => schedule.technician)
-    : serviceOrder.additionalInfo.candidateTechnicians?.length
-    ? (serviceOrder.additionalInfo
-        .candidateTechnicians as unknown as EmployeesView[])
-    : serviceOrder.additionalInfo.candidateTechnician
-    ? ([
-        serviceOrder.additionalInfo.candidateTechnician,
-      ] as unknown as EmployeesView[])
-    : null;
+  serviceOrder.schedules
+    ?.filter((item) => !!item.technician)
+    .map((item) => item.technician!) ?? null;
 
 export const getDialogTitle = (serviceOrder: ServiceOrderView) =>
   serviceOrder.status === ServiceOrderStatus.SCHEDULED ||

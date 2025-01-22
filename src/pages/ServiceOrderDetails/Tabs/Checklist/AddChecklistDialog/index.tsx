@@ -56,21 +56,14 @@ const AddChecklistDialog = ({
 
   const handleSave = async () => {
     const body = checkedChecklists
-      .map((checklist) => {
-        if (serviceOrder.schedules.length) {
-          return serviceOrder.schedules.map((schedule) => ({
-            technicianId: schedule.technician.id,
+      .map((checklist) =>
+        serviceOrder.schedules
+          .filter((schedule) => !!schedule.technician)
+          .map((schedule) => ({
+            technicianId: schedule.technician!.id,
             checkListId: checklist.id,
-          }));
-        }
-
-        return (
-          serviceOrder.additionalInfo.candidateTechnicians?.map((tech) => ({
-            technicianId: tech.id,
-            checkListId: checklist.id,
-          })) ?? []
-        );
-      })
+          })),
+      )
       .flat();
 
     associateMultiChecklist(
