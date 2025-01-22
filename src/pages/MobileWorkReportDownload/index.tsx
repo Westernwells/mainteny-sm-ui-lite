@@ -19,7 +19,10 @@ import {
 } from 'utils/constants';
 import {companyLanguageContextMap} from 'utils/language';
 import {getJobTypeGivenName} from 'utils/service-order-utils';
-import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface RNWindow extends Window {
@@ -35,6 +38,19 @@ export const MobileWorkReportDownload = () => {
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const {search} = useLocation();
   const {
     token: QSToken,
@@ -114,7 +130,7 @@ export const MobileWorkReportDownload = () => {
         footerPath={footerUrl?.[footerInfo?.path]!}
         footerInfo={footerInfo}
         technicianName={technicianName}
-        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
       />,
     ).toBlob();
 

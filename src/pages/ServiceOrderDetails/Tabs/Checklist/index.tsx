@@ -51,6 +51,7 @@ import {
 import {
   useCompanyById,
   useCompanyJobTypes,
+  useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -99,12 +100,26 @@ export const CheckList = ({serviceOrder}: Props) => {
   const theme = useTheme();
   const formatDate = useFormatDate();
   const {user} = useUserSession();
-  const {data: jobTypes} = useCompanyJobTypes(
-    user?.userAccount.serviceCompany.id!,
-  );
   const {t} = useTranslation();
   const {enqueueSnackbar, showError} = useSnackbar();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [deleteChecklistConfirm, setDeleteChecklistConfirm] = useState(false);
   const [actionType, setActionType] = useState('');
@@ -651,7 +666,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                         <ServiceOrderTypeText
                           serviceOrderType={getJobTypeGivenName(
                             serviceOrder.type,
-                            jobTypes,
+                            allJobTypes,
                           )}
                           capitalizeText
                           variant="subtitle1"
