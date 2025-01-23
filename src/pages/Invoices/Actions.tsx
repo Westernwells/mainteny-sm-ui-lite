@@ -43,6 +43,7 @@ import {
 import {
   useCompanyById,
   useCompanyJobTypes,
+  useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {
   createFilesFromBlobArray,
@@ -158,10 +159,24 @@ export const Actions = ({
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
   const {user} = useUserSession();
+  const currentCurrency = useCurrentCurrency();
+
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
-  const currentCurrency = useCurrentCurrency();
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -550,7 +565,7 @@ export const Actions = ({
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
-        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
       />,
     ).toBlob();
 
@@ -1457,6 +1472,7 @@ export const Actions = ({
             setIsDialogOpen(false);
             setSelectedInvoice(null);
           }}
+          disableNavigate
         />
       )}
 

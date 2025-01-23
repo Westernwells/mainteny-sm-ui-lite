@@ -27,7 +27,10 @@ import {
 import {statusColor} from 'components/StatusChip';
 import {ServiceOrderView} from 'models/service-order';
 import {Confirm} from 'components/Confirm';
-import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ArticleSupplierView} from '../../../../models/supplier';
 
@@ -44,6 +47,18 @@ const getConnectionCardData = (
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
   switch (connection.refType) {
     case ContactPersonAssociationType.ELEVATOR: {
       const elevator = connection?.data as ElevatorView;
@@ -130,12 +145,12 @@ const getConnectionCardData = (
           value:
             serviceOrder?.type &&
             serviceOrderTypeToString(
-              getJobTypeGivenName(serviceOrder?.type, jobTypes),
+              getJobTypeGivenName(serviceOrder?.type, allJobTypes),
             ) === '-'
               ? serviceOrder?.type
               : t(
                   serviceOrderTypeToString(
-                    getJobTypeGivenName(serviceOrder?.type!, jobTypes),
+                    getJobTypeGivenName(serviceOrder?.type!, allJobTypes),
                   ),
                 ),
           icon: (

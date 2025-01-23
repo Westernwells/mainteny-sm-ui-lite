@@ -75,6 +75,7 @@ export const DEFAULT_EMPLOYEE_EVENT_TYPES = [
 ];
 
 export const CLIENT_STORAGE_PDF_CONFIG_KEY = 'pdf-configurations';
+export const CLIENT_STORAGE_PDF_TEMPLATE_KEY = 'pdf-template';
 
 export const DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE: ClientReportForPDFConfig =
   {

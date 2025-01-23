@@ -24,6 +24,7 @@ interface Props {
   onConfirm: () => void;
   onClose: () => void;
   invoice: InvoiceView;
+  disableNavigate?: boolean;
 }
 
 const validationSchema = Yup.object().shape({
@@ -38,9 +39,11 @@ export const MarkAsPaidDialog = ({
   onConfirm,
   onClose,
   invoice,
+  disableNavigate = false,
 }: Props) => {
   const {t} = useTranslation();
-  const {mutateAsync: addInvoicePayment} = useAddInvoicePayment();
+  const {mutateAsync: addInvoicePayment} =
+    useAddInvoicePayment(disableNavigate);
   const formik = useFormik<InvoicePaymentRecord>({
     initialValues: {
       amount: {

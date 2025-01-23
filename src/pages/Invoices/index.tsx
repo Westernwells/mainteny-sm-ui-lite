@@ -298,6 +298,9 @@ const Invoices = ({elevatorId}: Props) => {
       !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
   );
 
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const {
     data: invoiceResource = createEmptyResource<InvoiceView>(10),
     isLoading,
@@ -694,7 +697,7 @@ const Invoices = ({elevatorId}: Props) => {
   }, [search]);
 
   const rows = useMemo(
-    () => aggregateInvoiceRow(invoiceResource.data, jobTypes || []),
+    () => aggregateInvoiceRow(invoiceResource.data, allJobTypes || []),
     [invoiceResource],
   );
 
@@ -777,7 +780,7 @@ const Invoices = ({elevatorId}: Props) => {
         capitalize(t('Net amount')),
       );
 
-      const dataRows = aggregateInvoiceRow(data, jobTypes || []).map(
+      const dataRows = aggregateInvoiceRow(data, allJobTypes || []).map(
         (invoice) =>
           exportColumns.map((col) => col.getExportValue?.(invoice) || ''),
       );
@@ -868,9 +871,6 @@ const Invoices = ({elevatorId}: Props) => {
       isWithNote,
     ],
   );
-
-  // Combine jobTypes and the filtered oldJobTypes
-  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
   const filteredJobTypes = useMemo(() => {
     const jobTypesInStatistics =

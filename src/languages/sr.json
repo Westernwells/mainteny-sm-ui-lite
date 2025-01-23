@@ -3066,5 +3066,11 @@
   "The changes will also reflect on any draft invoice attached to the job.": "Promene će se takođe odraziti na bilo koju nacrt fakture priloženu poslu.",
   "Save and Update": "Sačuvaj i ažuriraj",
   "Add New": "Dodaj Novi",
-  "You are about to cancel editing work report.": "Spremate se da otkažete uređivanje izveštaja o radu."
+  "You are about to cancel editing work report.": "Spremate se da otkažete uređivanje izveštaja o radu.",
+  "Failed to fetch technician data": "Preuzimanje podataka tehničara nije uspelo",
+  "Unable to create credit note for deleted invoice. Please create a negative invoice instead.": "Nije moguće kreirati kreditno obaveštenje za izbrisanu fakturu. Umesto toga, napravite negativnu fakturu.",
+  "# of units": "Broj jedinica",
+  "Start date": "Datum početka",
+  "End date": "Datum završetka",
+  "Job trigger month": "Mesec za pokretanje posla"
 }

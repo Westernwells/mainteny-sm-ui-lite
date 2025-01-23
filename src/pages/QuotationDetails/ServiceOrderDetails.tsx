@@ -13,7 +13,10 @@ import {
 } from 'utils/service-order-utils';
 import useTheme from '@mui/material/styles/useTheme';
 import DOMPurify from 'dompurify';
-import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 interface Props {
@@ -23,11 +26,25 @@ interface Props {
 export const ServiceOrderDetails = ({serviceOrderId}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const theme = useTheme();
+  const formatDate = useFormatDate();
+
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
-  const theme = useTheme();
-  const formatDate = useFormatDate();
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const {data: serviceOrder, isLoading} =
     useServiceOrderDetails(serviceOrderId);
 
@@ -84,7 +101,10 @@ export const ServiceOrderDetails = ({serviceOrderId}: Props) => {
             size="small"
           />
           <ServiceOrderTypeText
-            serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
+            serviceOrderType={getJobTypeGivenName(
+              serviceOrder?.type,
+              allJobTypes,
+            )}
             capitalizeText
           />
         </Box>
