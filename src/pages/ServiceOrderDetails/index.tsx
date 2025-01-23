@@ -29,6 +29,7 @@ import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {
   useCompanyById,
   useCompanyJobTypes,
+  useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {
@@ -75,11 +76,26 @@ export const ServiceOrderDetails = () => {
   const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
   const {t} = useTranslation();
   const {user} = useUserSession();
+
+  const currentCurrency = useCurrentCurrency();
+  const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
-  const currentCurrency = useCurrentCurrency();
-  const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const {data: quotation} = useQuotationDetails(
     serviceOrder?.additionalInfo.quotationId,
   );
@@ -160,7 +176,7 @@ export const ServiceOrderDetails = () => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
-        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

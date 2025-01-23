@@ -16,7 +16,10 @@ import {
 } from 'utils/constants';
 import {getJobTypeGivenName} from 'utils/service-order-utils';
 import {useQueryClientStorageData} from './useClientStorage';
-import {useCompanyJobTypes} from './reactQuery/useCompanies';
+import {
+  useCompanyJobTypes,
+  useOldCompanyJobTypes,
+} from './reactQuery/useCompanies';
 import {useUserSession} from './reactQuery/useUserSession';
 
 type UseCreateAndSetPdfBlobUrlProps = {
@@ -50,6 +53,18 @@ export const useCreateAndSetPdfBlobUrl = ({
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
   const [filePathToDownload, setFilePathToDownload] = useState('');
   const {enqueueSnackbar, closeSnackbar, showError} = useSnackbar();
   const snackBarRef = useRef<SnackbarKey | null>(null);
@@ -80,7 +95,7 @@ export const useCreateAndSetPdfBlobUrl = ({
         headerPath={headerPath}
         footerInfo={footerInfo}
         footerPath={footerPath}
-        serviceOrderType={getJobTypeGivenName(serviceOrder.type, jobTypes)}
+        serviceOrderType={getJobTypeGivenName(serviceOrder.type, allJobTypes)}
       />,
     ).toBlob();
 

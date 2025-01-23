@@ -330,7 +330,7 @@ export const addInvoicePayment = async ({
   );
 };
 
-export const useAddInvoicePayment = () => {
+export const useAddInvoicePayment = (disableNavigate = false) => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
@@ -346,7 +346,9 @@ export const useAddInvoicePayment = () => {
         enqueueSnackbar(`Invoice marked as paid!`, {
           variant: 'success',
         });
-        navigate(`/invoices/details/${invoiceId}`);
+        if (!disableNavigate) {
+          navigate(`/invoices/details/${invoiceId}`);
+        }
       },
       onError: (err) => {
         showError(err);

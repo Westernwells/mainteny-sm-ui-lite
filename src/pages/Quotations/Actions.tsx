@@ -64,7 +64,7 @@ const Actions = ({quotation}: Props) => {
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
     useState(false);
   const [blobFile, setBlobFile] = useState<Blob>();
-  const {mutate: markAsAccepted} = useReplyQuotation();
+  const {mutate: markAsAccepted} = useReplyQuotation(true);
   const {mutate: deleteQuotation} = useDeleteQuotation();
   const {mutateAsync: uploadFiles} = useUploadFiles('');
   const {mutateAsync: printQuotation} = usePrintQuotation();

@@ -3044,5 +3044,11 @@
   "The changes will also reflect on any draft invoice attached to the job.": "Die Änderungen werden auch in jeder Entwurfsrechnung übernommen, die dem Auftrag zugeordnet ist.",
   "Save and Update": "Speichern und aktualisieren",
   "Add New": "Neu hinzufügen",
-  "You are about to cancel editing work report.": "Sie sind dabei, die Bearbeitung des Arbeitsberichts abzubrechen."
+  "You are about to cancel editing work report.": "Sie sind dabei, die Bearbeitung des Arbeitsberichts abzubrechen.",
+  "Failed to fetch technician data": "Aufrufen der Technischen Daten fehlgeschlagen",
+  "Unable to create credit note for deleted invoice. Please create a negative invoice instead.": "Gutschrift für gelöschte Rechnung kann nicht erstellt werden. Bitte erstellen Sie stattdessen eine normale Rechnung mit negativem Betrag.",
+  "# of units": "Anzahl der Anlagen",
+  "Start date": "Startdatum",
+  "End date": "Enddatum",
+  "Job trigger month": "Auto-Auftragsmonat"
 }

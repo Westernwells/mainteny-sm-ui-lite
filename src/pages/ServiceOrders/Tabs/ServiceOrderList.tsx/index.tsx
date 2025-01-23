@@ -566,12 +566,12 @@ export const ServiceOrderList = ({menu}: Props) => {
             />
             <TableCellText tableCellTextStyles={{paddingLeft: '0.4em'}}>
               {serviceOrderTypeToString(
-                getJobTypeGivenName(serviceOrder.type, jobTypes),
+                getJobTypeGivenName(serviceOrder.type, allJobTypes),
               ) === '-'
-                ? getJobTypeGivenName(serviceOrder.type, jobTypes)
+                ? getJobTypeGivenName(serviceOrder.type, allJobTypes)
                 : t(
                     serviceOrderTypeToString(
-                      getJobTypeGivenName(serviceOrder.type, jobTypes),
+                      getJobTypeGivenName(serviceOrder.type, allJobTypes),
                     ),
                   )}
             </TableCellText>

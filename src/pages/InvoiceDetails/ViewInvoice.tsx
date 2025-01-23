@@ -80,6 +80,7 @@ import {
   useCompanyById,
   useCompanyJobTypes,
   useCompanyNextNumber,
+  useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
@@ -141,12 +142,27 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const {enqueueSnackbar} = useSnackbar();
   const theme = useTheme();
   const {user} = useUserSession();
-  const {data: jobTypes = []} = useCompanyJobTypes(
-    user?.userAccount.serviceCompany.id!,
-  );
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
+
+  const {data: jobTypes = []} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  const {data: oldJobTypes} = useOldCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
+
+  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
+  const filteredOldJobTypes = oldJobTypes?.filter(
+    (oldJobType) =>
+      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
+  );
+
+  // Combine jobTypes and the filtered oldJobTypes
+  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
+
   const [qrImageSrc, setQrImageSrc] = useState<string>('');
   const [qrError, setQrError] = useState<string | null>(null);
   const [xmlHtmlContent, setXmlHtmlContent] = useState('');
@@ -595,7 +611,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
-        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, jobTypes)}
+        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
       />,
     ).toBlob();
 
@@ -1571,7 +1587,7 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                   <ServiceOrderTypeText
                     serviceOrderType={getJobTypeGivenName(
                       serviceOrder?.type,
-                      jobTypes,
+                      allJobTypes,
                     )}
                     capitalizeText
                   />

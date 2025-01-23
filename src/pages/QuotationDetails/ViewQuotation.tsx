@@ -53,21 +53,18 @@ import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {EmptySection} from 'components/EmptySection';
 import {PDFContainer} from 'components/PDFContainer';
-import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {
   QueryObserverResult,
   RefetchOptions,
   RefetchQueryFilters,
 } from 'react-query';
 import {stripHtmlTags} from 'utils/text-block';
-import {
-  CLIENT_STORAGE_PDF_CONFIG_KEY,
-  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
-} from 'utils/constants';
 import useQuotationMenuActions from 'hooks/useQuotationMenuActions';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {companyLanguageContextMap} from 'utils/language';
+import {HeaderFooterInfoData} from 'models/misc';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -89,6 +86,11 @@ interface Props {
       unknown
     >
   >;
+  pdfConfig: ClientReportForPDFConfig;
+  headerInfo: HeaderFooterInfoData;
+  footerInfo: HeaderFooterInfoData;
+  headerUrl: string;
+  footerUrl: string;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -101,6 +103,11 @@ export const ViewQuotation = ({
   quotationActivities,
   isLoadingDownloadUrl,
   refetchDownloadUrl,
+  pdfConfig,
+  headerInfo,
+  footerInfo,
+  headerUrl,
+  footerUrl,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -138,14 +145,6 @@ export const ViewQuotation = ({
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
 
-  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
-  });
-  const pdfConfig = clientStorageDataPdfConfig?.value
-    ? JSON.parse(clientStorageDataPdfConfig?.value)
-    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
-
   const {downloadFile} = useDownloadFileWithCustomName(
     quotation.number,
     filePathToDownload,
@@ -170,26 +169,6 @@ export const ViewQuotation = ({
       return t(key, options);
     },
     [company?.language],
-  );
-
-  const {data: clientStorageData} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: 'pdf-template'},
-  });
-
-  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
-  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
-
-  const {data: headerUrl = {}} = useDownloadUrl(
-    headerInfo?.path ? [headerInfo.path] : [],
-    undefined,
-    company?.id,
-  );
-
-  const {data: footerUrl = {}} = useDownloadUrl(
-    footerInfo?.path ? [footerInfo.path] : [],
-    undefined,
-    company?.id,
   );
 
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
@@ -285,9 +264,9 @@ export const ViewQuotation = ({
         quotation={quotation}
         selectedLng={company?.language}
         translate={translate}
-        headerPath={headerUrl[headerInfo?.path]}
+        headerPath={headerUrl}
         headerInfo={headerInfo}
-        footerPath={footerUrl[footerInfo?.path]}
+        footerPath={footerUrl}
         footerInfo={footerInfo}
       />,
     ).toBlob();
@@ -299,7 +278,7 @@ export const ViewQuotation = ({
 
   useEffect(() => {
     generateBlobUrl();
-  }, [quotation, headerUrl[headerInfo?.path], footerUrl[footerInfo?.path]]);
+  }, [quotation, headerUrl, footerUrl]);
 
   const getExistingFiles = async (
     fileDownloadUrl:
