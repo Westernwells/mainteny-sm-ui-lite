@@ -186,7 +186,7 @@ export const putReplyQuotation = async (id: string, body: ReplyQuotation) => {
   await axiosClient.put(`api/quotations/${id}/reply`, body);
 };
 
-export const useReplyQuotation = () => {
+export const useReplyQuotation = (disableNavigate = false) => {
   const queryClient = useQueryClient();
   const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
@@ -207,7 +207,9 @@ export const useReplyQuotation = () => {
             variant: reply.isAccepted ? 'success' : 'error',
           },
         );
-        navigate(`/quotations/details/${quotationId}`);
+        if (!disableNavigate) {
+          navigate(`/quotations/details/${quotationId}`);
+        }
       },
       onError: (err) => {
         showError(err);
