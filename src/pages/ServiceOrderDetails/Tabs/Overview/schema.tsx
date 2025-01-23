@@ -171,7 +171,9 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             }
             bodyText={
               serviceOrderDetails.schedules &&
-              serviceOrderDetails.schedules.length ? (
+              serviceOrderDetails.schedules.filter(
+                (item) => !!item.startTime && !!item.endTime,
+              ).length ? (
                 <Box>
                   <Typography variant="body2" sx={{paddingTop: '0.2em'}}>
                     {serviceOrderDetails.status ===
