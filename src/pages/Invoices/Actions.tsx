@@ -1475,6 +1475,7 @@ export const Actions = ({
             setIsDialogOpen(false);
             setSelectedInvoice(null);
           }}
+          disableNavigate
         />
       )}
 
