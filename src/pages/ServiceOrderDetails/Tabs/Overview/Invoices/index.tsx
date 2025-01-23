@@ -24,6 +24,11 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {getServiceOrderPaymentStatusStyles} from 'utils/service-order-utils';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  CLIENT_STORAGE_PDF_TEMPLATE_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 import CreateNewInvoiceModal from './CreateNewInvoiceModal';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
@@ -69,13 +74,37 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
       true,
     );
 
-  const {data: clientStorageData} = useQueryClientStorageData({
+  const {
+    data: clientStorageDataPdfConfig,
+    isLoading: isLoadingClientStorageDataPdfConfig,
+  } = useQueryClientStorageData({
     serviceCompanyId: user?.userAccount.serviceCompany.id!,
-    params: {key: 'pdf-template'},
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
   });
 
-  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
-  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+  const pdfConfig = useMemo(
+    () =>
+      clientStorageDataPdfConfig?.value
+        ? JSON.parse(clientStorageDataPdfConfig.value)
+        : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+    [clientStorageDataPdfConfig?.value],
+  );
+
+  const {
+    data: clientStorageDataTemplate,
+    isLoading: isLoadingClientStorageDataTemplate,
+  } = useQueryClientStorageData({
+    serviceCompanyId: user?.userAccount.serviceCompany.id!,
+    params: {key: CLIENT_STORAGE_PDF_TEMPLATE_KEY},
+  });
+
+  const {headerInfo, footerInfo} = useMemo(() => {
+    const parsedData = JSON.parse(clientStorageDataTemplate?.value || '{}');
+    return {
+      headerInfo: parsedData.header,
+      footerInfo: parsedData.footer,
+    };
+  }, [clientStorageDataTemplate?.value]);
 
   const {data: headerUrl = {}, isLoading: isHeaderUrlLoading} = useDownloadUrl(
     headerInfo?.path ? [headerInfo?.path] : [],
@@ -156,7 +185,14 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
     </Box>
   );
 
-  if (isIdle || isLoading) {
+  if (
+    isIdle ||
+    isLoading ||
+    isHeaderUrlLoading ||
+    isFooterUrlLoading ||
+    isLoadingClientStorageDataPdfConfig ||
+    isLoadingClientStorageDataTemplate
+  ) {
     return <Progress />;
   }
 
@@ -217,8 +253,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
             footerUrl,
             companyNextNumber,
             refetchCompanyNextNumber,
-            isHeaderUrlLoading,
-            isFooterUrlLoading,
+            pdfConfig,
           )}
           fullHeight={false}
           containerStyle={{
