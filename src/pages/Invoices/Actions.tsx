@@ -85,11 +85,6 @@ import _ from 'lodash';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {InvoiceFormat} from 'models/propertyManager';
 import {formatDate} from 'utils/datetime';
-import {useQueryClientStorageData} from 'hooks/useClientStorage';
-import {
-  CLIENT_STORAGE_PDF_CONFIG_KEY,
-  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
-} from 'utils/constants';
 import XMLViewer from 'react-xml-viewer';
 import {getTechnicianByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
@@ -97,6 +92,7 @@ import useInvoiceMenuActions from 'hooks/useInvoiceMenuActions';
 import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature, EmployeesView} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 
 interface Props {
   invoice: InvoiceView;
@@ -112,9 +108,8 @@ interface Props {
   refetchCompanyNextNumber: () => Promise<
     QueryObserverResult<StringValueResponse>
   >;
-  isHeaderUrlLoading: boolean;
-  isFooterUrlLoading: boolean;
   removePadding?: boolean;
+  pdfConfig: ClientReportForPDFConfig;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -152,9 +147,8 @@ export const Actions = ({
   footerUrl,
   companyNextNumber,
   refetchCompanyNextNumber,
-  isHeaderUrlLoading,
-  isFooterUrlLoading,
   removePadding = false,
+  pdfConfig,
 }: Props) => {
   const {t} = useTranslation();
   const navigate = useNavigate();
@@ -266,14 +260,6 @@ export const Actions = ({
   const {data: signatureUrls = {}} = useDownloadUrl(
     activeSignature?.content?.images || [],
   );
-
-  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
-  });
-  const pdfConfig = clientStorageDataPdfConfig?.value
-    ? JSON.parse(clientStorageDataPdfConfig?.value)
-    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
 
   const {data: previousInvoices = []} = useFetchServiceOrderInvoices(
     invoice?.serviceOrder?.id,
@@ -664,16 +650,6 @@ export const Actions = ({
     setSelectedInvoice(invoice);
   };
 
-  const waitForHeaderAndFooter = () =>
-    new Promise((resolve) => {
-      const interval = setInterval(() => {
-        if (!isHeaderUrlLoading && !isFooterUrlLoading) {
-          clearInterval(interval);
-          resolve(true);
-        }
-      }, 100); // Check every 100ms
-    });
-
   // Helper function to fetch and create files
   const fetchAndCreateFiles = async (
     url: string,
@@ -732,25 +708,13 @@ export const Actions = ({
     {
       invoiceDownloadUrl,
       nextNumber,
-      forceGet = false,
     }: {
       invoiceDownloadUrl?: {
         [key: string]: string;
       };
       nextNumber?: string;
-      forceGet?: boolean;
     },
   ) => {
-    if (
-      invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
-        InvoiceFormat.PDF &&
-      invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
-        InvoiceFormat.PDF_AND_XML &&
-      !forceGet
-    ) {
-      return Promise.resolve([]);
-    }
-
     const fileNames: string[] = [`${invoiceData?.id}.pdf`];
     const fileDescriptions: string[] = [
       `${FILE_DESCRIPTION_PREFIXES.INVOICE}-${
@@ -832,11 +796,6 @@ export const Actions = ({
       [key: string]: string;
     },
   ) => {
-    if (isHeaderUrlLoading || isFooterUrlLoading) {
-      // wait for header and footer to load
-      await waitForHeaderAndFooter();
-    }
-
     let allFiles: FileWithPreview[] = [];
 
     // Base file operations
@@ -1545,7 +1504,6 @@ export const Actions = ({
                   getBaseFileOperations(invoiceWithUpdatedDueDate, {
                     invoiceDownloadUrl,
                     nextNumber: companyNextNumber?.value,
-                    forceGet: true,
                   }),
                   getXInvoiceOperation(invoiceWithUpdatedDueDate, {
                     forceGet: true,

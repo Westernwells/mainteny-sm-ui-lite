@@ -81,6 +81,11 @@ import {ServiceOrderTypeText} from 'components/ServiceOrderTypeText';
 import {Button} from 'components/Button';
 import {createExcelContent} from 'utils/utils';
 import {downloadExcel} from 'utils/download';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  CLIENT_STORAGE_PDF_TEMPLATE_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 import useLastSyncedItem from 'hooks/useLastSyncedItem';
 import UnitIdInput from 'components/Inputs/UnitInput/UnitIdInput';
@@ -395,13 +400,37 @@ const Invoices = ({elevatorId}: Props) => {
     navigate(`/customers/details/${id}?tab=0`);
   };
 
-  const {data: clientStorageData} = useQueryClientStorageData({
+  const {
+    data: clientStorageDataPdfConfig,
+    isLoading: isLoadingClientStorageDataPdfConfig,
+  } = useQueryClientStorageData({
     serviceCompanyId: user?.userAccount.serviceCompany.id!,
-    params: {key: 'pdf-template'},
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
   });
 
-  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
-  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
+  const pdfConfig = useMemo(
+    () =>
+      clientStorageDataPdfConfig?.value
+        ? JSON.parse(clientStorageDataPdfConfig.value)
+        : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+    [clientStorageDataPdfConfig?.value],
+  );
+
+  const {
+    data: clientStorageDataTemplate,
+    isLoading: isLoadingClientStorageDataTemplate,
+  } = useQueryClientStorageData({
+    serviceCompanyId: user?.userAccount.serviceCompany.id!,
+    params: {key: CLIENT_STORAGE_PDF_TEMPLATE_KEY},
+  });
+
+  const {headerInfo, footerInfo} = useMemo(() => {
+    const parsedData = JSON.parse(clientStorageDataTemplate?.value || '{}');
+    return {
+      headerInfo: parsedData.header,
+      footerInfo: parsedData.footer,
+    };
+  }, [clientStorageDataTemplate?.value]);
 
   const {data: headerUrl = {}, isLoading: isHeaderUrlLoading} = useDownloadUrl(
     headerInfo?.path ? [headerInfo?.path] : [],
@@ -610,9 +639,8 @@ const Invoices = ({elevatorId}: Props) => {
               footerUrl={footerUrl}
               companyNextNumber={companyNextNumber}
               refetchCompanyNextNumber={refetchCompanyNextNumber}
-              isHeaderUrlLoading={isHeaderUrlLoading}
-              isFooterUrlLoading={isFooterUrlLoading}
               removePadding
+              pdfConfig={pdfConfig}
             />
           </Cell>
         ),
@@ -627,10 +655,9 @@ const Invoices = ({elevatorId}: Props) => {
       headerUrl,
       footerUrl,
       companyNextNumber,
-      isHeaderUrlLoading,
-      isFooterUrlLoading,
       showLeftShadow,
       showRightShadow,
+      pdfConfig,
     ],
   );
 
@@ -945,7 +972,14 @@ const Invoices = ({elevatorId}: Props) => {
     <Box>{xeroInfoData?.enabled ? lastSyncedText : ''}</Box>
   );
 
-  if (isIdle || isLoading) {
+  if (
+    isIdle ||
+    isLoading ||
+    isHeaderUrlLoading ||
+    isFooterUrlLoading ||
+    isLoadingClientStorageDataPdfConfig ||
+    isLoadingClientStorageDataTemplate
+  ) {
     return <Progress />;
   }
 
