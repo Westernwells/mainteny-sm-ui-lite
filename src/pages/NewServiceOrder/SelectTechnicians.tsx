@@ -155,7 +155,7 @@ export const SelectTechnicians = ({
         sortedOrder,
         (serviceOrder) =>
           serviceOrder.schedules.filter((item) => !!item.technician)[0]
-            .technician!.id,
+            ?.technician!.id,
       );
       setOrders(groupByTechnicianId);
     }
