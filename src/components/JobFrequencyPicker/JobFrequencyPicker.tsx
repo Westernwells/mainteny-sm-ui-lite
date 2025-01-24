@@ -25,26 +25,12 @@ import {FormSelect} from '../form/FormSelect';
 import {
   CYCLE_OPTION_TO_UNIT_TIME_MAP,
   CYCLE_OPTIONS,
+  DEFAULT_MONTH_FREQUENCY_DATA,
   FIXED_CYCLE_TYPE,
   JOB_CYCLE_TYPE,
   UNIT_TYPE_TO_CYCLE_MAP,
 } from '../../models/jobFrequency';
 import {getFrequencyDisplay} from '../../utils/jobFrequency';
-
-const monthsData = [
-  {month: 'January', isSelected: false, number: 1},
-  {month: 'February', isSelected: false, number: 2},
-  {month: 'March', isSelected: false, number: 3},
-  {month: 'April', isSelected: false, number: 4},
-  {month: 'May', isSelected: false, number: 5},
-  {month: 'June', isSelected: false, number: 6},
-  {month: 'July', isSelected: false, number: 7},
-  {month: 'August', isSelected: false, number: 8},
-  {month: 'September', isSelected: false, number: 9},
-  {month: 'October', isSelected: false, number: 10},
-  {month: 'November', isSelected: false, number: 11},
-  {month: 'December', isSelected: false, number: 12},
-];
 
 type Props = {
   componentId: string;
@@ -61,7 +47,9 @@ const JobFrequencyPicker = ({
 }: Props) => {
   const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedMonths, setSelectedMonths] = useState(monthsData);
+  const [selectedMonths, setSelectedMonths] = useState(
+    DEFAULT_MONTH_FREQUENCY_DATA,
+  );
   const [cycleType, setCycleType] = useState<JOB_CYCLE_TYPE>(
     JOB_CYCLE_TYPE.FIXED,
   );
@@ -96,7 +84,7 @@ const JobFrequencyPicker = ({
 
   const handleClose = () => {
     setAnchorEl(null);
-    setSelectedMonths(monthsData);
+    setSelectedMonths(DEFAULT_MONTH_FREQUENCY_DATA);
   };
 
   const foundUnit = useMemo(
@@ -186,7 +174,7 @@ const JobFrequencyPicker = ({
     if (foundUnit.orderGenerationJob?.timeUnit === ContractTimeUnit.MONTHLY) {
       setCycleType(JOB_CYCLE_TYPE.BY_MONTHS);
       setSelectedMonths(
-        monthsData.map((month) => ({
+        DEFAULT_MONTH_FREQUENCY_DATA.map((month) => ({
           ...month,
           isSelected:
             foundUnit.orderGenerationJob?.timeNumbers?.includes(month.number) ||

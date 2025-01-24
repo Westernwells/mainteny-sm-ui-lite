@@ -46,6 +46,14 @@ export enum ContractStatus {
   EXPIRING = 'EXPIRING',
 }
 
+// order matters for quick filter displaying
+export enum CONTRACT_STATUS_FILTER {
+  ALL = 'ALL',
+  ACTIVE = 'ACTIVE',
+  EXPIRING = 'EXPIRING',
+  INACTIVE = 'INACTIVE',
+}
+
 export enum TimeUnitYearView {
   ANNUALLY = 'Every year',
   BIENNIALLY = 'Every 2 year',
@@ -104,13 +112,24 @@ export interface QueryContractParams {
   orderBy: ContractOrderField;
   pageIndex: number;
   pageSize: number;
-  query: string;
-  serviceCompanyId: string;
-  status?: string[];
+  serviceCompanyId?: string; // deprecated -> set on hook level
+  query?: string;
+  status?: ContractStatus[];
   priceStart?: number;
   priceEnd?: number;
   paymentTermId?: string;
   serviceOrderType?: string[];
+  numberOfElevatorsFrom?: number;
+  numberOfElevatorsTo?: number;
+  orderGenerationMonth?: number[];
+  elevatorId?: string[];
+  elevatorSerialNumber?: string[];
+  expiryDateStart?: string;
+  expiryDateEnd?: string;
+  propertyOwnerId?: string;
+  totalYearNetAmountStart?: number;
+  totalYearNetAmountEnd?: number;
+  types?: string[];
 }
 
 export interface ContractDiscount {
@@ -851,3 +870,55 @@ export interface ContractPaymentTermView {
   additionalInfo: string;
   meta: Meta;
 }
+
+export type ContractTableRow = {
+  data: ContractView;
+  id: string;
+  propertyOwner: PropertyOwnerSimpleView;
+  number: string;
+  contractName: string;
+  numberOfUnits?: number;
+  price?: Amount;
+  startDate: string;
+  endDate: string;
+  status: ContractStatus;
+};
+
+export type ContractFilterForm = {
+  customer?: string;
+  unitId?: string;
+  serialNumber?: string;
+  jobTypes: ServiceOrderType[];
+  netAmountMin?: number;
+  netAmountMax?: number;
+  numberOfUnitsMin?: number;
+  numberOfUnitsMax?: number;
+  triggerMonths: number[];
+};
+
+export type ContractStatistics = {
+  numOfContractsPerStatus: Record<string, number>;
+};
+
+export const FILTER_OPTIONS_TO_STATUSES: Record<
+  CONTRACT_STATUS_FILTER,
+  ContractStatus[]
+> = {
+  [CONTRACT_STATUS_FILTER.ACTIVE]: [ContractStatus.VALID],
+  [CONTRACT_STATUS_FILTER.EXPIRING]: [ContractStatus.EXPIRING],
+  [CONTRACT_STATUS_FILTER.INACTIVE]: [
+    ContractStatus.PENDING,
+    ContractStatus.EXPIRED,
+  ],
+  [CONTRACT_STATUS_FILTER.ALL]: [],
+};
+
+export const STATUS_TO_FILTER_OPTION: Record<
+  ContractStatus,
+  CONTRACT_STATUS_FILTER
+> = {
+  [ContractStatus.VALID]: CONTRACT_STATUS_FILTER.ACTIVE,
+  [ContractStatus.EXPIRING]: CONTRACT_STATUS_FILTER.EXPIRING,
+  [ContractStatus.PENDING]: CONTRACT_STATUS_FILTER.INACTIVE,
+  [ContractStatus.EXPIRED]: CONTRACT_STATUS_FILTER.INACTIVE,
+};

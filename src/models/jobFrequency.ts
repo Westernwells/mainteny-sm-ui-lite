@@ -1,5 +1,26 @@
 import {ContractTimeUnit} from './contract';
 
+export type MonthFrequency = {
+  month: string;
+  isSelected: boolean;
+  number: number;
+};
+
+export const DEFAULT_MONTH_FREQUENCY_DATA: MonthFrequency[] = [
+  {month: 'January', isSelected: false, number: 1},
+  {month: 'February', isSelected: false, number: 2},
+  {month: 'March', isSelected: false, number: 3},
+  {month: 'April', isSelected: false, number: 4},
+  {month: 'May', isSelected: false, number: 5},
+  {month: 'June', isSelected: false, number: 6},
+  {month: 'July', isSelected: false, number: 7},
+  {month: 'August', isSelected: false, number: 8},
+  {month: 'September', isSelected: false, number: 9},
+  {month: 'October', isSelected: false, number: 10},
+  {month: 'November', isSelected: false, number: 11},
+  {month: 'December', isSelected: false, number: 12},
+];
+
 export enum JOB_CYCLE_TYPE {
   FIXED = 'FIXED',
   BY_MONTHS = 'BY_MONTHS',
