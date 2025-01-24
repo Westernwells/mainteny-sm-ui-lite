@@ -119,8 +119,12 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
       pdfConfig={pdfConfig}
       headerInfo={headerInfo}
       footerInfo={footerInfo}
-      headerUrl={headerUrl ? headerUrl[headerInfo.path] : ''}
-      footerUrl={footerUrl ? footerUrl[footerInfo.path] : ''}
+      headerUrl={
+        headerUrl && headerInfo?.path ? headerUrl[headerInfo.path] : ''
+      }
+      footerUrl={
+        footerUrl && footerInfo?.path ? footerUrl[footerInfo.path] : ''
+      }
     />
   ) : (
     <EmptySection label="Sorry, we couldn't find the invoice." />
