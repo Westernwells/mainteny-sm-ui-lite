@@ -400,7 +400,7 @@ export interface TechnicianDispatchJobView {
 export interface ServiceOrderSchedule {
   id: string;
   serviceOrderId: string;
-  technician: EmployeesView;
+  technician?: EmployeesView;
   startTime: string;
   endTime: string;
 }
