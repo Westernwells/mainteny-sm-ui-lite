@@ -983,7 +983,7 @@ export const InvoiceForm = ({
 
     if (
       !formik.values.description &&
-      serviceOrderArg?.reports?.[0].description
+      serviceOrderArg?.reports?.[0]?.description
     ) {
       formik.setFieldValue(
         'description',
