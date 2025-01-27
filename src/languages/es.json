@@ -3056,5 +3056,21 @@
   "Appointment required": "Se requiere cita previa",
   "Please note that when you edit this you are editing the appointment preferences for the unit for all future jobs.": "Tenga en cuenta que al editar esto está editando las preferencias de cita de la unidad para todos los trabajos futuros.",
   "Owner": "Propietario",
-  "Add New": "Añadir Nuevo"
+  "Represented by": "Representado por",
+  "Choose one option to be displayed on the PDF files": "Elija una opción para que se muestre en los archivos PDF",
+  "Can not print invoice that is not in DRAFT": "No se puede imprimir la factura que no está en BORRADOR",
+  "There are unsaved changes made to the job order <bold>{{invoiceId}}</bold> and these will be reflected on the invoice.": "Hay cambios no guardados realizados en la orden de trabajo <bold>{{invoiceId}}</bold> y estos se reflejarán en la factura.",
+  "Are you sure you want to continue?": "¿Estás seguro de que quieres continuar?",
+  "Job update": "Actualización de trabajo",
+  "The changes will also reflect on any draft invoice attached to the job.": "Los cambios también se reflejarán en cualquier borrador de factura adjunto al trabajo.",
+  "Save and Update": "Guardar y actualizar",
+  "Add New": "Añadir Nuevo",
+  "You are about to cancel editing work report.": "Está a punto de cancelar la edición del informe de trabajo.",
+  "Failed to fetch technician data": "No se pudieron recuperar los datos del técnico",
+  "Unable to create credit note for deleted invoice. Please create a negative invoice instead.": "No se puede crear una nota de crédito para la factura eliminada. En su lugar, cree una factura negativa.",
+  "# of units": "# de unidades",
+  "Start date": "Fecha de inicio",
+  "End date": "Fecha de finalización",
+  "Job trigger month": "Mes de activación del trabajo",
+  "Planned": "Planificado"
 }
