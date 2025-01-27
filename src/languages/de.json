@@ -1000,7 +1000,7 @@
   "Created 03.09.2022 | 13:15": "Erstellt am 03.09.2022 | 13:15",
   "System": "System",
   "Signature": "Unterschrift",
-  "No Signature": "Keine Unterschrift",
+  "No Signature": "Keine Signatur",
   "Send Checklist": "Checkliste senden",
   "CheckList sent successfully": "Checkliste erfolgreich gesendet",
   "No description yet. It will appear here once it is added": "Keine Beschreibung vorhanden. Die Beschreibung wird hier erscheinen, sobald sie hinzugefügt wurde.",
@@ -3050,5 +3050,6 @@
   "# of units": "Anzahl der Anlagen",
   "Start date": "Startdatum",
   "End date": "Enddatum",
-  "Job trigger month": "Auto-Auftragsmonat"
+  "Job trigger month": "Auto-Auftragsmonat",
+  "Planned": "Terminiert"
 }

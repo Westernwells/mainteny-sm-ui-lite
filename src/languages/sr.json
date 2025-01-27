@@ -3071,5 +3071,6 @@
   "# of units": "Broj jedinica",
   "Start date": "Datum početka",
   "End date": "Datum završetka",
-  "Job trigger month": "Mesec za pokretanje posla"
+  "Job trigger month": "Mesec za pokretanje posla",
+  "Planned": "Planirano"
 }
