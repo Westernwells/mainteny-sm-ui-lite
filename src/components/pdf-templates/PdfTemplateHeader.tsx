@@ -23,7 +23,7 @@ const PdfTemplateHeader = ({headerInfo, headerPath}: Props) => {
 
   return (
     <View style={styles.header}>
-      {headerPath && (
+      {!!headerPath && (
         <Image
           source={headerPath}
           style={{
