@@ -92,11 +92,13 @@ const PdfUnitAddress = ({translate, address, selectedLng, building}: Props) => {
         }}>
         {!!building && <Text>{building}</Text>}
 
-        {address.component?.street && <Text>{address.component.street}</Text>}
+        {!!address.component?.street && <Text>{address.component.street}</Text>}
 
-        {address.component?.street2 && <Text>{address.component.street2}</Text>}
+        {!!address.component?.street2 && (
+          <Text>{address.component.street2}</Text>
+        )}
 
-        {(address.component?.postalCode || address.component?.city) && (
+        {!!(address.component?.postalCode || address.component?.city) && (
           <Text>
             {address.component?.postalCode} {address.component?.city}
           </Text>
