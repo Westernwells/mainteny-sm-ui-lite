@@ -72,4 +72,49 @@ describe('Create Contact', () => {
         cy.wait('@deleteContactPersonAPI');
         cy.contains('Contact person deleted successfully');
     });
+
+    it('should be able to submit with entered mandatory fields', () => {
+        // create new contact
+        cy.contains('button', 'Contact').click();
+        const uniqueId = getUniqueId();
+        const firstName = `First${uniqueId}`;
+        const lastName = 'Last';
+        cy.get('input[name="userAccount.firstName"]').type(firstName);
+        cy.get('input[name="userAccount.lastName"]').type(lastName);
+        cy.get('div[role="combobox"][aria-labelledby$="contactPerson.roles"]').click();
+        cy.get('li[role="option"][data-value="CONTACT_PERSON"]').click();
+        cy.get('input[name="userAccount.contact.email"]').type(`${firstName}@example.com`);
+        cy.contains('button', 'Confirm').should('not.be.disabled');
+    });
+
+    it('should be able to submit with entered optional field "First Name"', () => {
+        // create new contact
+        cy.contains('button', 'Contact').click();
+        const lastName = 'Last';
+        cy.get('input[name="userAccount.lastName"]').type(lastName);
+        cy.get('div[role="combobox"][aria-labelledby$="contactPerson.roles"]').click();
+        cy.get('li[role="option"][data-value="CONTACT_PERSON"]').click();
+        cy.get('input[name="userAccount.contact.email"]').click();
+        cy.contains('button', 'Confirm').should('not.be.disabled');
+    });
+
+    it('should not be able to submit without mandatory fields "Last Name"', () => {
+        // create new contact
+        cy.contains('button', 'Contact').click();
+        const uniqueId = getUniqueId();
+        const firstName = `First${uniqueId}`;
+        cy.get('input[name="userAccount.firstName"]').type(firstName);
+        cy.get('div[role="combobox"][aria-labelledby$="contactPerson.roles"]').click();
+        cy.get('li[role="option"][data-value="CONTACT_PERSON"]').click();
+        cy.get('input[name="userAccount.contact.email"]').type(`${firstName}@example.com`);
+        cy.contains('button', 'Confirm').should('be.disabled');
+    });
+
+    it('should not be able to submit without mandatory fields "Role"', () => {
+        // create new contact
+        cy.contains('button', 'Contact').click();
+        const lastName = 'Last';
+        cy.get('input[name="userAccount.lastName"]').type(lastName);
+        cy.contains('button', 'Confirm').should('be.disabled');
+    });
 });
