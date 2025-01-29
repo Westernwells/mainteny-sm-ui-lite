@@ -878,7 +878,7 @@ export type ContractTableRow = {
   number: string;
   contractName: string;
   numberOfUnits?: number;
-  price?: Amount;
+  price?: string;
   startDate: string;
   endDate: string;
   status: ContractStatus;
@@ -898,6 +898,7 @@ export type ContractFilterForm = {
 
 export type ContractStatistics = {
   numOfContractsPerStatus: Record<string, number>;
+  numOfContractsPerOrderType: Record<string, number>;
 };
 
 export const FILTER_OPTIONS_TO_STATUSES: Record<

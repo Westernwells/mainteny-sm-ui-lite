@@ -26,6 +26,8 @@ import {
 import {toDate, toRestDate} from 'utils/datetime';
 import {ElevatorView} from 'models/elevator';
 import {OptionsObject, SnackbarKey, SnackbarMessage} from 'notistack';
+import {formatCurrency} from 'utils/currency';
+import {Currency} from 'models/misc';
 
 export const costRangeConvertor = (
   selectedItems: string[],
@@ -414,6 +416,7 @@ export const isUnitSelected = (unit: {
 
 export const aggregateContractRow = (
   contracts: ContractView[],
+  currentCurrency: Currency,
 ): ContractTableRow[] =>
   contracts.map((contract) => ({
     data: contract,
@@ -422,7 +425,15 @@ export const aggregateContractRow = (
     number: contract.number,
     contractName: contract.name,
     numberOfUnits: contract.numberOfElevators,
-    price: contract.additionalInfo.price,
+    price: `${formatCurrency(
+      contract.additionalInfo.totalYearlyPrice
+        ? contract.additionalInfo.totalYearlyPrice /
+            10 ** currentCurrency.fractionDigits!
+        : 0,
+      {
+        currency: currentCurrency.code,
+      },
+    )}`,
     startDate: contract.start,
     endDate: contract.end,
     status: contract.status,

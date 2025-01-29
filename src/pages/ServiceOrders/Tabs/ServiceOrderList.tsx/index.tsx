@@ -55,6 +55,7 @@ import TableCellText from 'components/Table/TableCellText';
 import {
   aggregateServiceOrderRow,
   createSearchQuery,
+  filterServiceOrderTypes,
   getJobTypeGivenName,
   getServiceOrderStatusColor,
   serviceOrderPaymentStatusToString,
@@ -330,23 +331,14 @@ export const ServiceOrderList = ({menu}: Props) => {
     },
   );
 
-  const filteredJobTypes = useMemo(() => {
-    const jobTypesInStatistics =
-      serviceOrdersDefaultStatistics?.numOfServiceOrdersPerType
-        ? Object.keys(
-            serviceOrdersDefaultStatistics.numOfServiceOrdersPerType,
-          ).filter(
-            (jobType) =>
-              serviceOrdersDefaultStatistics.numOfServiceOrdersPerType[
-                jobType
-              ] > 0,
-          )
-        : [];
-
-    return allJobTypes?.filter((job) =>
-      jobTypesInStatistics.includes(job.name),
-    );
-  }, [serviceOrdersDefaultStatistics, allJobTypes]);
+  const filteredJobTypes = useMemo(
+    () =>
+      filterServiceOrderTypes({
+        statistic: serviceOrdersDefaultStatistics?.numOfServiceOrdersPerType,
+        allServiceOrderTypes: allJobTypes,
+      }),
+    [serviceOrdersDefaultStatistics, allJobTypes],
+  );
 
   const aggregatedServiceOrderStatistics = useMemo(() => {
     if (!serviceOrdersStatistics) return undefined;
