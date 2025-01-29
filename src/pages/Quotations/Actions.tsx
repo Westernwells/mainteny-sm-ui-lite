@@ -495,6 +495,12 @@ const Actions = ({quotation}: Props) => {
                     // If file is from server -> uri of file should be quotation.id
                     // If file is from server -> description should be quotation.externalId
                     const isFileFromServer = !obj.path && index === 0;
+                    const fileName = obj.name;
+                    const fileExtension = fileName?.split('.')?.pop() || '';
+                    const fileNameWithoutExtension = fileName.substring(
+                      0,
+                      fileName.lastIndexOf('.'),
+                    );
                     return [
                       ...newArr,
                       {
@@ -505,7 +511,7 @@ const Actions = ({quotation}: Props) => {
                           : `${uploadPath}/${obj.name}`,
                         description: isFileFromServer
                           ? `${quotation.externalId}.pdf`
-                          : obj.name.split('.')[0],
+                          : `${fileNameWithoutExtension}.${fileExtension}`,
                       },
                     ];
                   },

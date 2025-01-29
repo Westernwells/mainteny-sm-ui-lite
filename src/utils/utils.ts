@@ -641,10 +641,16 @@ export const decideAttachmentURIForInvoiceEmail = ({
 export const decideAttachmentDescriptionForInvoiceEmail = (
   attachment: FileWithPreview,
 ) => {
-  const isAttachedFile = attachment.path && !attachment.description;
+  const noFileDescription = attachment.path && !attachment.description;
+  const fileName = attachment.name;
+  const fileExtension = fileName?.split('.')?.pop() || '';
+  const fileNameWithoutExtension = fileName.substring(
+    0,
+    fileName.lastIndexOf('.'),
+  );
 
-  return isAttachedFile
-    ? attachment.name.split('.')[0]
+  return noFileDescription
+    ? `${fileNameWithoutExtension}.${fileExtension}`
     : attachment?.description;
 };
 
