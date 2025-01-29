@@ -284,7 +284,6 @@ export const UnitListingView = () => {
         headerName: 'Number',
         key: 'unit-cell-number',
         fieldName: ElevatorOrderField.EXTERNAL_ID,
-        width: '166px',
         isFirst: true, // remove when checkbox are present with bulk action
         showShadows: showRightShadow ? 'right' : undefined,
         getExportValue: (unit) => unit.number,
@@ -461,8 +460,6 @@ export const UnitListingView = () => {
         key: 'unit-cell-status',
         width: '142px',
         align: 'center',
-        isLast: true,
-        lastSticky: false,
         fieldName: ElevatorOrderField.STATUS,
         getExportValue: (unit) => t(getStatusString(unit.status)),
         renderCell: (unit, cellProps) => (
@@ -562,6 +559,7 @@ export const UnitListingView = () => {
         textTransform: false,
         key: 'unit-cell-required-time',
         width: '84px',
+        fieldName: ElevatorOrderField.REQUIRED_TIME,
         getExportValue: (unit) => `${unit.requiredTime}`,
         renderCell: (unit, cellProps) => (
           <Cell {...cellProps}>
@@ -575,6 +573,7 @@ export const UnitListingView = () => {
         textTransform: false,
         key: 'unit-cell-distance',
         width: '84px',
+        fieldName: ElevatorOrderField.DISTANCE,
         getExportValue: (unit) => `${unit.distance}`,
         renderCell: (unit, cellProps) => (
           <Cell {...cellProps}>
@@ -606,24 +605,25 @@ export const UnitListingView = () => {
         (
           acc: TableColumnWithRender<UnitTableRow>[],
           column: TableColumnWithRender<UnitTableRow>,
-          index: number,
-          arr: TableColumnWithRender<UnitTableRow>[],
         ) => {
           const isColumnFixed = fixedTableColumns.some(
             (customizedColumn) => customizedColumn.id === column.id,
           );
+
+          const isCustomizedColumnLast =
+            selectedTableColumns[selectedTableColumns.length - 1] === column.id;
+
           const isSelectedColumn = column.id
             ? selectedTableColumns.includes(column.id)
             : false;
 
-          const itemToAdd =
-            index === arr.length - 1
-              ? {
-                  ...column,
-                  isLast: true,
-                  lastSticky: false,
-                }
-              : column;
+          const itemToAdd = isCustomizedColumnLast
+            ? {
+                ...column,
+                isLast: true,
+                lastSticky: false,
+              }
+            : column;
 
           if (isColumnFixed || isSelectedColumn) return [...acc, itemToAdd];
 
