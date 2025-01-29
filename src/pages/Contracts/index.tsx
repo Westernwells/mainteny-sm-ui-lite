@@ -24,11 +24,7 @@ import {
   mapFilterOptionToStatus,
   mapStatusToFilterOptions,
 } from 'utils/contract';
-import {
-  convertNumberToAmountNumber,
-  formatNetAmount,
-  useCurrentCurrency,
-} from 'utils/currency';
+import {convertNumberToAmountNumber, useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useSearchValues} from 'hooks/useSearchValues';
 import EmptyTable from 'components/Table/EmptyTable';
@@ -70,7 +66,10 @@ import {DEFAULT_DATE_FORMAT, fromDateStringToDate} from 'utils/datetime';
 import {useExportTableSheet} from 'hooks/useExport';
 import {reduce} from 'lodash';
 import ChipSelector from 'components/ChipSelector';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {
+  filterServiceOrderTypes,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
 import {
   useCompanyJobTypes,
   useOldCompanyJobTypes,
@@ -234,6 +233,13 @@ export const Contracts = () => {
     }),
   };
 
+  const defaultFilters: QueryContractParams = {
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    order: sortOrder || Order.DESC,
+    orderBy: orderByField || ContractOrderField.CREATED_TIME,
+  };
+
   const {
     data: contractResource = createEmptyResource<ContractView>(10),
     isLoading,
@@ -250,6 +256,13 @@ export const Contracts = () => {
   const {data: contractStatistics} = useContractStatistics(filters, {
     keepPreviousData: true,
   });
+
+  const {data: defaultContractStatistics} = useContractStatistics(
+    defaultFilters,
+    {
+      keepPreviousData: true,
+    },
+  );
 
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -325,6 +338,7 @@ export const Contracts = () => {
         key: 'contract-cell-number-of-units',
         width: '132px',
         align: 'right',
+        textTransform: false,
         fieldName: ContractOrderField.NUMBER_OF_ELEVATOR,
         getExportValue: (contract) =>
           contract.numberOfUnits ? `${contract.numberOfUnits}` : '',
@@ -341,17 +355,10 @@ export const Contracts = () => {
         width: '132px',
         align: 'right',
         fieldName: ContractOrderField.NET_PRICE,
-        getExportValue: (contract) =>
-          contract.price
-            ? `${
-                contract.price.netAmount / 10 ** contract.price.fractionDigits
-              }`
-            : '',
+        getExportValue: (contract) => contract.price || '',
         renderCell: (contract, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>
-              {contract.price ? formatNetAmount(contract.price) : '-'}
-            </TableCellText>
+            <TableCellText>{contract.price || '-'}</TableCellText>
           </Cell>
         ),
       },
@@ -464,8 +471,8 @@ export const Contracts = () => {
   );
 
   const rows = useMemo(
-    () => aggregateContractRow(contractResource.data),
-    [contractResource],
+    () => aggregateContractRow(contractResource.data, currentCurrency),
+    [contractResource, currentCurrency],
   );
 
   const handleFilterApply: SubmitHandler<ContractFilterForm> = (data) => {
@@ -611,7 +618,7 @@ export const Contracts = () => {
     excludedFields: ['contract-cell-action'],
     refetchCallback: refetchAllContracts,
     columns: COLUMNS,
-    aggregateCallback: aggregateContractRow,
+    aggregateCallback: (data) => aggregateContractRow(data, currentCurrency),
     fileName: 'Contracts',
   });
 
@@ -633,6 +640,15 @@ export const Contracts = () => {
       {},
     );
   }, [contractStatistics]);
+
+  const filteredJobTypes = useMemo(
+    () =>
+      filterServiceOrderTypes({
+        statistic: defaultContractStatistics?.numOfContractsPerOrderType,
+        allServiceOrderTypes: allJobTypes,
+      }),
+    [contractStatistics, allJobTypes],
+  );
 
   useEffect(() => {
     if (textInput.current && !textInput.current.value) {
@@ -661,6 +677,15 @@ export const Contracts = () => {
 
     return {emptyTable: false, noMatchingData: false};
   }, [appliedFilterNumber, isFetched, contractResource]);
+
+  useEffect(() => {
+    if (contractResource.total > 0 && contractResource.data.length === 0) {
+      setPage({
+        ...page,
+        pageIndex: 0,
+      });
+    }
+  }, [search, selectedStatus, contractResource]);
 
   if (isIdle || isLoading) {
     return <Progress />;
@@ -755,7 +780,7 @@ export const Contracts = () => {
 
               <ChipSelector
                 headerLabel="SERVICE TYPE"
-                options={allJobTypes.map((jobType) => ({
+                options={filteredJobTypes.map((jobType) => ({
                   value: jobType.name,
                   labelKey:
                     serviceOrderTypeToString(jobType?.givenName!) === '-'
