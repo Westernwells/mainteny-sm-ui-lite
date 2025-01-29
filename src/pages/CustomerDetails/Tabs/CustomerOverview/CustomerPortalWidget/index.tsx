@@ -250,7 +250,7 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
         ),
       },
     ],
-    [isWidgetActive, showLeftShadow, showRightShadow],
+    [isWidgetActive, showLeftShadow, showRightShadow, handleDeleteContact],
   );
 
   return (
