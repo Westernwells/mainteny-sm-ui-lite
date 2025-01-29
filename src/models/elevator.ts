@@ -91,6 +91,8 @@ export enum ElevatorOrderField {
   STATUS = 'STATUS',
   MANUFACTURER = 'MANUFACTURER',
   SERIAL_NUMBER = 'SERIAL_NUMBER',
+  REQUIRED_TIME = 'REQUIRED_TIME',
+  DISTANCE = 'DISTANCE',
 }
 
 export interface ElevatorQueryParams {
@@ -770,16 +772,9 @@ export const UNIT_TABLE_COLUMNS: CustomizableColumn[] = [
     default: false,
   },
   {
-    id: TABLE_COLUMNS_ID.APPOINTMENT_PREFERENCE,
-    columnName: 'Appointment required',
-    orderIndex: 13,
-    fixed: false,
-    default: false,
-  },
-  {
     id: TABLE_COLUMNS_ID.DISTANCE,
     columnName: 'Distance',
-    orderIndex: 14,
+    orderIndex: 13,
     fixed: false,
     default: false,
   },
