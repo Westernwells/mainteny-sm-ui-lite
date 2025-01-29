@@ -1,6 +1,6 @@
 import {
-  DISTANCE_FILTER,
   DaysTimeRange,
+  DISTANCE_FILTER,
   ElevatorAssignmentSimpleView,
   ElevatorStatus,
   ElevatorTimeRuleType,
@@ -271,17 +271,23 @@ export const aggregateUnitRow = (units: ElevatorView[]): UnitTableRow[] =>
       unit.propertyOwner.meta?.state === 'ACTIVE'
         ? unit.propertyOwner
         : undefined,
-    lastMaintenance: unit.additionalInfo.lastInspectionDate
-      ? formatDate(unit.additionalInfo.lastInspectionDate)
-      : undefined,
-    nextInspection: unit.additionalInfo.nextInspectionDate
-      ? formatDate(unit.additionalInfo.nextInspectionDate)
+    lastVisitDate: unit.lastVisitDate
+      ? formatDate(unit.lastVisitDate)
       : undefined,
     engineers: unit.assignments.length
       ? getPriorityTechnician(unit.assignments)
       : [],
     status: unit.status,
     hasContract: unit.contracts.length > 0 || false,
+    serialNumber: unit.serialNumber,
+    manufacturer: unit.additionalInfo.manufacturer,
+    model: unit.model,
+    lastInspectionDate: unit.additionalInfo.lastInspectionDate
+      ? formatDate(unit.additionalInfo.lastInspectionDate)
+      : undefined,
+    requiredTime: unit.serviceTime,
+    // appointmentPreference
+    distance: unit.additionalInfo.distance,
   }));
 
 export const createSearchQuery = ({search, address}: SearchParameters) => {

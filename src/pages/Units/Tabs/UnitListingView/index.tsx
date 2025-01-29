@@ -14,6 +14,8 @@ import {
   ElevatorStatusFilter,
   ElevatorView,
   STATUS_COLOR,
+  TABLE_COLUMNS_ID,
+  UNIT_TABLE_COLUMNS,
   UnitFilterForm,
   UnitTableRow,
 } from 'models/elevator';
@@ -30,6 +32,7 @@ import {useNavigate} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import {useSearchValues} from 'hooks/useSearchValues';
 import EmptyTable from 'components/Table/EmptyTable';
+import {ReactComponent as CalendarVectorIcon} from 'assets/icons/CalendarVector.svg';
 import {
   aggregateUnitRow,
   createSearchQuery,
@@ -55,11 +58,15 @@ import TableContainer from 'components/Table/TableContainer';
 import TableHeader from 'components/Table/TableHeader';
 import TableRow from 'components/Table/TableRow';
 import Pagination from 'components/Pagination';
-import {NOTES_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import {
+  CustomizableTable,
+  NOTES_CELL_WIDTH,
+  TableColumnWithRender,
+} from 'models/table';
 import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {theme} from 'theme';
-import {convertToText, createExcelContent, getUserFullName} from 'utils/utils';
+import {convertToText, getUserFullName} from 'utils/utils';
 import AvatarGroup from 'components/AvatarGroup';
 import {Avatar} from 'components/Avatar';
 import {StatusChip} from 'components/StatusChip';
@@ -71,9 +78,7 @@ import {useTranslation} from 'react-i18next';
 import {OptionWithTranslationKey} from 'models/filter';
 import AddButton from 'components/AddButton';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
-import {capitalize, reduce} from 'lodash';
-import {downloadExcel} from 'utils/download';
-import {useSnackbar} from 'hooks/useSnackbar';
+import {reduce} from 'lodash';
 import {Button} from 'components/Button';
 import CustomerInput from 'components/Inputs/CustomerInput';
 import TechnicianInput from 'components/Inputs/TechnicianInput';
@@ -97,6 +102,10 @@ import {
   createQuickFilterOptions,
   filterOutQuickFilterOptions,
 } from 'utils/filter';
+import CustomizeTable from 'components/Table/CustomizeTable';
+import useCustomizableColumns from 'hooks/useCustomizableColumns';
+import {useExportTableSheet} from 'hooks/useExport';
+import TableCellTextWithTooltip from 'components/Table/TableCellTextWithTooltip';
 
 const pageInfo = makePage(0, 50);
 
@@ -113,7 +122,10 @@ export const UnitListingView = () => {
   const navigate = useNavigate();
   const formatDate = useFormatDate();
   const {t} = useTranslation();
-  const {enqueueSnackbar} = useSnackbar();
+  const {selectedTableColumns, fixedTableColumns} = useCustomizableColumns(
+    CustomizableTable.UNIT,
+    UNIT_TABLE_COLUMNS,
+  );
 
   const [selectedStatus, setSelectedStatus] = useQueryState<
     ElevatorStatusFilter[]
@@ -266,22 +278,40 @@ export const UnitListingView = () => {
   };
 
   const COLUMNS = useMemo<TableColumnWithRender<UnitTableRow>[]>(
-    () => [
+    (): TableColumnWithRender<UnitTableRow>[] => [
       {
+        id: TABLE_COLUMNS_ID.NUMBER,
         headerName: 'Number',
         key: 'unit-cell-number',
         fieldName: ElevatorOrderField.EXTERNAL_ID,
-        width: '124px',
+        width: '166px',
         isFirst: true, // remove when checkbox are present with bulk action
         showShadows: showRightShadow ? 'right' : undefined,
         getExportValue: (unit) => unit.number,
         renderCell: (unit, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellText>{unit.number}</TableCellText>
+            <TableCellTextWithTooltip
+              mainContent={unit.number}
+              showSecondaryContent={
+                unit.data.additionalInfo?.customerAppointment
+                  ?.requiresAppointment || false
+              }
+              secondaryContent={
+                unit.data.additionalInfo?.customerAppointment?.description || ''
+              }
+              secondaryIcon={
+                <CalendarVectorIcon
+                  fontSize="large"
+                  color="action"
+                  style={{cursor: 'pointer', marginLeft: '0.4em'}}
+                />
+              }
+            />
           </Cell>
         ),
       },
       {
+        id: TABLE_COLUMNS_ID.ADDRESS,
         headerName: 'Address',
         key: 'unit-cell-address',
         fieldName: ElevatorOrderField.ADDRESS,
@@ -317,6 +347,7 @@ export const UnitListingView = () => {
         ),
       },
       {
+        id: TABLE_COLUMNS_ID.BUILDING,
         headerName: 'Building',
         key: 'unit-cell-building',
         fieldName: ElevatorOrderField.BUILDING_LOCATION,
@@ -328,9 +359,11 @@ export const UnitListingView = () => {
         ),
       },
       {
+        id: TABLE_COLUMNS_ID.CUSTOMER,
         headerName: 'Customer',
         key: 'unit-cell-customer',
         width: '212px',
+        textTransform: false,
         fieldName: ElevatorOrderField.PROPERTY_OWNER_NAME,
         getExportValue: (unit) => unit.propertyOwner?.name || '',
         renderCell: (unit, cellProps) => (
@@ -351,23 +384,25 @@ export const UnitListingView = () => {
         ),
       },
       {
-        headerName: 'Next inspection',
-        key: 'unit-cell-next-inspection',
+        id: TABLE_COLUMNS_ID.LAST_VISIT,
+        headerName: 'Last visit',
+        key: 'unit-cell-last-visit',
         width: '132px',
-        fieldName: ElevatorOrderField.NEXT_INSPECTION_DATE,
+        textTransform: false,
+        fieldName: ElevatorOrderField.LAST_VISIT_DATE,
         getExportValue: (unit) =>
-          (unit.nextInspection
+          (unit.lastVisitDate
             ? formatDate(
-                fromDateStringToDate(unit.nextInspection, DEFAULT_DATE_FORMAT),
+                fromDateStringToDate(unit.lastVisitDate, DEFAULT_DATE_FORMAT),
               )
             : undefined) ?? '',
         renderCell: (unit, cellProps) => (
           <Cell {...cellProps}>
             <TableCellText>
-              {unit.nextInspection
+              {unit.lastVisitDate
                 ? formatDate(
                     fromDateStringToDate(
-                      unit.nextInspection,
+                      unit.lastVisitDate,
                       DEFAULT_DATE_FORMAT,
                     ),
                   )
@@ -377,9 +412,11 @@ export const UnitListingView = () => {
         ),
       },
       {
+        id: TABLE_COLUMNS_ID.ENGINEERS,
         headerName: 'Engineer',
         key: 'unit-cell-engineer',
         width: '212px',
+        textTransform: false,
         fieldName: ElevatorOrderField.ASSIGNED_TECHNICIAN_NAMES,
         getExportValue: (unit) =>
           unit.engineers.length > 0
@@ -400,9 +437,11 @@ export const UnitListingView = () => {
         ),
       },
       {
+        id: TABLE_COLUMNS_ID.ACTIVE_CONTRACTS,
         headerName: 'Contract',
         key: 'unit-cell-contract',
         width: NOTES_CELL_WIDTH,
+        textTransform: false,
         align: 'center',
         fieldName: ElevatorOrderField.NUMBER_OF_CONTRACTS,
         renderCell: (unit, cellProps) => (
@@ -416,7 +455,9 @@ export const UnitListingView = () => {
         ),
       },
       {
+        id: TABLE_COLUMNS_ID.STATUS,
         headerName: 'Status',
+        textTransform: false,
         key: 'unit-cell-status',
         width: '142px',
         align: 'center',
@@ -442,6 +483,105 @@ export const UnitListingView = () => {
           </Cell>
         ),
       },
+      {
+        id: TABLE_COLUMNS_ID.SERIAL_NUMBER,
+        headerName: 'Serial number',
+        textTransform: false,
+        key: 'unit-cell-serial-number',
+        width: '142px',
+        fieldName: ElevatorOrderField.SERIAL_NUMBER,
+        getExportValue: (unit) => unit.serialNumber,
+        renderCell: (unit, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText component="div">{unit.serialNumber}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        id: TABLE_COLUMNS_ID.MANUFACTURER,
+        headerName: 'Manufacturer',
+        textTransform: false,
+        key: 'unit-cell-manufacturer',
+        width: '142px',
+        fieldName: ElevatorOrderField.MANUFACTURER,
+        getExportValue: (unit) => unit.manufacturer,
+        renderCell: (unit, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{unit.manufacturer}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        id: TABLE_COLUMNS_ID.MODEL,
+        headerName: 'Model',
+        textTransform: false,
+        key: 'unit-cell-model',
+        width: '142px',
+        fieldName: ElevatorOrderField.MODEL,
+        getExportValue: (unit) => unit.model,
+        renderCell: (unit, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{unit.model}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        id: TABLE_COLUMNS_ID.LAST_INSPECTION,
+        headerName: 'Last inspection',
+        textTransform: false,
+        key: 'unit-cell-last-inspection',
+        width: '132px',
+        fieldName: ElevatorOrderField.LAST_INSPECTION_DATE,
+        getExportValue: (unit) =>
+          (unit.lastInspectionDate
+            ? formatDate(
+                fromDateStringToDate(
+                  unit.lastInspectionDate,
+                  DEFAULT_DATE_FORMAT,
+                ),
+              )
+            : undefined) ?? '',
+        renderCell: (unit, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>
+              {unit.lastInspectionDate
+                ? formatDate(
+                    fromDateStringToDate(
+                      unit.lastInspectionDate,
+                      DEFAULT_DATE_FORMAT,
+                    ),
+                  )
+                : '-'}
+            </TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        id: TABLE_COLUMNS_ID.REQUIRED_TIME,
+        headerName: 'Required time',
+        textTransform: false,
+        key: 'unit-cell-required-time',
+        width: '84px',
+        getExportValue: (unit) => `${unit.requiredTime}`,
+        renderCell: (unit, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{unit.requiredTime}</TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        id: TABLE_COLUMNS_ID.DISTANCE,
+        headerName: 'Distance',
+        textTransform: false,
+        key: 'unit-cell-distance',
+        width: '84px',
+        getExportValue: (unit) => `${unit.distance}`,
+        renderCell: (unit, cellProps) => (
+          <Cell {...cellProps}>
+            <TableCellText>{unit.distance}</TableCellText>
+          </Cell>
+        ),
+      },
       // {
       //   headerName: 'action',
       //   key: 'unit-cell-action',
@@ -458,6 +598,40 @@ export const UnitListingView = () => {
       // },
     ],
     [showLeftShadow, showRightShadow],
+  );
+
+  const customizedColumns = useMemo(
+    () =>
+      COLUMNS.reduce(
+        (
+          acc: TableColumnWithRender<UnitTableRow>[],
+          column: TableColumnWithRender<UnitTableRow>,
+          index: number,
+          arr: TableColumnWithRender<UnitTableRow>[],
+        ) => {
+          const isColumnFixed = fixedTableColumns.some(
+            (customizedColumn) => customizedColumn.id === column.id,
+          );
+          const isSelectedColumn = column.id
+            ? selectedTableColumns.includes(column.id)
+            : false;
+
+          const itemToAdd =
+            index === arr.length - 1
+              ? {
+                  ...column,
+                  isLast: true,
+                  lastSticky: false,
+                }
+              : column;
+
+          if (isColumnFixed || isSelectedColumn) return [...acc, itemToAdd];
+
+          return acc;
+        },
+        [] as TableColumnWithRender<UnitTableRow>[],
+      ),
+    [COLUMNS, selectedTableColumns, fixedTableColumns],
   );
 
   const {data: selectedTechnician} =
@@ -670,48 +844,19 @@ export const UnitListingView = () => {
     setSelectedCustomer(data.customer);
   };
 
-  const {refetch, isFetching: isFetchingAllUnits} = useAllUnits(filters, {
-    enabled: false,
-    refetchOnWindowFocus: false,
+  const {refetch: refetchAllUnits, isFetching: isFetchingAllUnits} =
+    useAllUnits(filters, {
+      enabled: false,
+      refetchOnWindowFocus: false,
+    });
+
+  const handleExport = useExportTableSheet<UnitTableRow, ElevatorView>({
+    excludedFields: ['unit-cell-contract', 'unit-cell-action'],
+    refetchCallback: refetchAllUnits,
+    columns: customizedColumns,
+    aggregateCallback: aggregateUnitRow,
+    fileName: 'Units',
   });
-
-  const handleExport = async () => {
-    try {
-      // Initiate the export process by fetching all filtered service orders
-      const {data} = await refetch();
-
-      if (!data || data.length === 0) {
-        return;
-      }
-
-      const excludedFields = ['unit-cell-contract', 'unit-cell-action'];
-
-      const filteredColumns = COLUMNS.filter(
-        (col) => !excludedFields.includes(col.key),
-      );
-
-      const headers = filteredColumns.map((col) =>
-        capitalize(t(col.headerName)),
-      );
-
-      const dataRows = aggregateUnitRow(data).map((unit) =>
-        filteredColumns.map((col) => col.getExportValue?.(unit) || ''),
-      );
-
-      const filename = 'Units';
-
-      const excelContent = createExcelContent({
-        headers,
-        rows: dataRows,
-        sheetName: filename,
-      });
-
-      downloadExcel({excelContent, filename});
-    } catch (error) {
-      console.error('Error exporting Excel:', error);
-      enqueueSnackbar(t('Failed to export Excel'), {variant: 'error'});
-    }
-  };
 
   const handleChangeDateRange =
     (formKey: 'lastInspection' | 'nextInspection') =>
@@ -1062,6 +1207,10 @@ export const UnitListingView = () => {
         </Box>
 
         <Box display="flex" gap={2}>
+          <CustomizeTable
+            table={CustomizableTable.UNIT}
+            allColumns={UNIT_TABLE_COLUMNS}
+          />
           {rows.length > 0 && (
             <Button
               buttonProps={{
@@ -1099,7 +1248,7 @@ export const UnitListingView = () => {
         setShowLeftShadow={setShowLeftShadow}
         setShowRightShadow={setShowRightShadow}>
         <TableHeader
-          columns={COLUMNS}
+          columns={customizedColumns}
           sortState={{columnName: orderByField, order: sortOrder}}
           onSort={handleSortField}
         />
@@ -1110,7 +1259,7 @@ export const UnitListingView = () => {
             <TableRow
               key={`unit-row-${entry.id}`}
               testId={`unit-row-${entry.id}`}>
-              {COLUMNS.map(({renderCell, ...rest}) =>
+              {customizedColumns.map(({renderCell, ...rest}) =>
                 renderCell(entry, {
                   onClick: handleRowClick(entry.id),
                   ...rest,
