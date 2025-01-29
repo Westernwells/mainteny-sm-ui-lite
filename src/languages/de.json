@@ -3070,7 +3070,7 @@
   "Delete Sub-Position": "Subposition löschen",
   "Enter the sub-position name to confirm deletion.": "Geben Sie den Namen der Subposition ein, um die Löschung zu bestätigen.",
   "Warning! You are about to delete \"{{articleName}}\" mixed position. This action is irreversible": "Warnung! Sie sind dabei, die Mischposition \"{{articleName}}\" zu löschen. Diese Aktion ist unwiderruflich.",
-  "Sub-position name": "Name der Unterposition",
-  "Add sub-position": "Unterposition hinzufügen",
+  "Sub-position name": "Name der Subposition",
+  "Add sub-position": "Subposition hinzufügen",
   "COLUMN NAME": "SPALTENNAME"
 }
