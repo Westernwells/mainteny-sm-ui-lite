@@ -138,9 +138,11 @@ const useInvoiceMenuActions = ({
     }
 
     if (
-      ![InvoiceStatus.NOT_PAID, InvoiceStatus.EXPIRED].includes(
-        invoice.status,
-      ) ||
+      ![
+        InvoiceStatus.NOT_PAID,
+        InvoiceStatus.EXPIRED,
+        InvoiceStatus.CANCELLED,
+      ].includes(invoice.status) ||
       !invoice.sentDate
     ) {
       items.push({

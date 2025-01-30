@@ -1,5 +1,10 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from 'react-query';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
 import useTheme from '@mui/material/styles/useTheme';
@@ -25,7 +30,11 @@ import {
   InvoiceView,
 } from 'models/invoice';
 import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
-import {PdfGenerationStatus} from 'models/misc';
+import {
+  HeaderFooterInfoData,
+  PdfGenerationStatus,
+  StringValueResponse,
+} from 'models/misc';
 import {
   createQrData,
   formatGrossAmount,
@@ -79,7 +88,6 @@ import {pdf} from '@react-pdf/renderer';
 import {
   useCompanyById,
   useCompanyJobTypes,
-  useCompanyNextNumber,
   useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -97,11 +105,9 @@ import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePd
 import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
-import {ServiceCompanyNumberType} from 'models/service-company';
 import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
-import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import DOMPurify from 'dompurify';
 // eslint-disable-next-line import/no-unresolved
@@ -109,10 +115,6 @@ import {SwissQRBill} from 'swissqrbill/svg';
 import _, {debounce} from 'lodash';
 import useMultiImagesURLToBase64 from 'hooks/useMultiImagesURLToBase64';
 import {InvoiceFormat} from 'models/propertyManager';
-import {
-  CLIENT_STORAGE_PDF_CONFIG_KEY,
-  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
-} from 'utils/constants';
 import XMLViewer from 'react-xml-viewer';
 import {getTechnicianByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {getTechnicianName} from 'utils/employee';
@@ -120,6 +122,7 @@ import useInvoiceMenuActions from 'hooks/useInvoiceMenuActions';
 import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature, EmployeesView} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -131,13 +134,32 @@ import {
 interface Props {
   invoice: InvoiceView;
   invoiceActivities: InvoiceActivityView[];
+  companyNextNumber: StringValueResponse;
+  refetchCompanyNextNumber: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
+  ) => Promise<QueryObserverResult<StringValueResponse, unknown>>;
+  pdfConfig: ClientReportForPDFConfig;
+  headerInfo: HeaderFooterInfoData;
+  footerInfo: HeaderFooterInfoData;
+  headerUrl: string;
+  footerUrl: string;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
   lng?: string;
 };
 
-export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
+export const ViewInvoice = ({
+  invoice,
+  invoiceActivities,
+  companyNextNumber,
+  refetchCompanyNextNumber,
+  pdfConfig,
+  headerInfo,
+  footerInfo,
+  headerUrl,
+  footerUrl,
+}: Props) => {
   const {t} = useTranslation();
   const {enqueueSnackbar} = useSnackbar();
   const theme = useTheme();
@@ -216,14 +238,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
 
-  const {data: companyNextNumber, refetch: refetchCompanyNextNumber} =
-    useCompanyNextNumber(
-      {
-        type: ServiceCompanyNumberType.INVOICE,
-      },
-      user?.userAccount.serviceCompany.id,
-    );
-
   const translate = useMemo(
     () => (key: string, options?: {context: string}) => {
       if (company?.language) {
@@ -238,34 +252,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
   const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
-
-  const {data: clientStorageData} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: 'pdf-template'},
-  });
-
-  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
-  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
-
-  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
-  });
-  const pdfConfig = clientStorageDataPdfConfig?.value
-    ? JSON.parse(clientStorageDataPdfConfig?.value)
-    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
-
-  const {data: headerUrl = {}, isLoading: isHeaderUrlLoading} = useDownloadUrl(
-    headerInfo?.path ? [headerInfo.path] : [],
-    undefined,
-    company?.id,
-  );
-
-  const {data: footerUrl = {}, isLoading: isFooterUrlLoading} = useDownloadUrl(
-    footerInfo?.path ? [footerInfo.path] : [],
-    undefined,
-    company?.id,
-  );
 
   const {mutateAsync: uploadFiles} = useUploadFiles('');
 
@@ -486,9 +472,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         sortedChecklistComponents={sortedChecklistComponentsCloned}
         signaturePath={signatureImageUrl}
         technicianName={technicianNameForChecklist}
-        headerPath={headerUrl[headerInfo?.path]}
+        headerPath={headerUrl}
         headerInfo={headerInfo}
-        footerPath={footerUrl[footerInfo?.path]}
+        footerPath={footerUrl}
         footerInfo={footerInfo}
       />,
     ).toBlob();
@@ -606,9 +592,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         technicianSignatureImage={technicianSignatureImage}
         customerSignatureImage={customerSignatureImage}
         workReportPictures={workReportPictures}
-        headerPath={headerUrl[headerInfo?.path]}
+        headerPath={headerUrl}
         headerInfo={headerInfo}
-        footerPath={footerUrl[footerInfo?.path]}
+        footerPath={footerUrl}
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
         serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
@@ -626,14 +612,10 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
 
   const generateBlobUrl = async ({
     invoiceData,
-    headerBlockUrl,
-    footerBlockUrl,
     invoiceNumber,
     setInState = true,
   }: {
     invoiceData: InvoiceView;
-    headerBlockUrl: {[key: string]: string};
-    footerBlockUrl: {[key: string]: string};
     invoiceNumber?: string;
     setInState?: boolean;
   }) => {
@@ -688,9 +670,9 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         selectedLng={company?.language}
         translate={translate}
         previousInvoices={previousInvoicesProp}
-        headerPath={headerBlockUrl[headerInfo?.path]}
+        headerPath={headerUrl}
         headerInfo={headerInfo}
-        footerPath={footerBlockUrl[footerInfo?.path]}
+        footerPath={footerUrl}
         footerInfo={footerInfo}
         nextCompanyExternalId={
           invoiceNumber || translate('Automatically assigned')
@@ -775,8 +757,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       const xmlBlob = new Blob([response], {type: 'application/xml'});
       const blob = await generateBlobUrl({
         invoiceData: invoice,
-        headerBlockUrl: headerUrl,
-        footerBlockUrl: footerUrl,
         setInState: false,
       });
 
@@ -818,16 +798,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     );
     return filesFromBlob;
   };
-
-  const waitForHeaderAndFooter = () =>
-    new Promise((resolve) => {
-      const interval = setInterval(() => {
-        if (!isHeaderUrlLoading && !isFooterUrlLoading) {
-          clearInterval(interval);
-          resolve(true);
-        }
-      }, 100); // Check every 100ms
-    });
 
   const getWorkReportOperations = async (
     invoiceData: InvoiceView,
@@ -877,25 +847,13 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     {
       invoiceDownloadUrl,
       nextNumber,
-      forceGet = false,
     }: {
       invoiceDownloadUrl?: {
         [key: string]: string;
       };
       nextNumber?: string;
-      forceGet?: boolean;
     },
   ) => {
-    if (
-      invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
-        InvoiceFormat.PDF &&
-      invoiceData?.propertyOwner.additionalInfo.invoiceFormat !==
-        InvoiceFormat.PDF_AND_XML &&
-      !forceGet
-    ) {
-      return Promise.resolve([]);
-    }
-
     const fileNames: string[] = [`${invoiceData?.id}.pdf`];
     const fileDescriptions: string[] = [
       `${FILE_DESCRIPTION_PREFIXES.INVOICE}-${
@@ -911,8 +869,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
         )
       : (await generateBlobUrl({
           invoiceData,
-          headerBlockUrl: headerUrl,
-          footerBlockUrl: footerUrl,
           invoiceNumber: companyNextNumber?.value,
           setInState: false,
         }).then((blobFile) =>
@@ -973,11 +929,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       [key: string]: string;
     },
   ) => {
-    if (isHeaderUrlLoading || isFooterUrlLoading) {
-      // wait for header and footer to load
-      await waitForHeaderAndFooter();
-    }
-
     let allFiles: FileWithPreview[] = [];
 
     // Base file operations
@@ -1151,14 +1102,12 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
     ) {
       generateBlobUrl({
         invoiceData: memorizedUpdateInvoiceData,
-        headerBlockUrl: headerUrl,
-        footerBlockUrl: footerUrl,
       });
     }
   }, [
     memorizedUpdateInvoiceData,
-    headerUrl[headerInfo?.path],
-    footerUrl[footerInfo?.path],
+    headerUrl,
+    footerUrl,
     memorizedUpdateInvoiceData?.type === InvoiceType.CREDIT_NOTE ||
     memorizedUpdateInvoiceData?.type === InvoiceType.FULL ||
     memorizedUpdateInvoiceData?.type === InvoiceType.AGGREGATE
@@ -1276,8 +1225,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
               const updatedInvoiceData = await refetchInvoiceData();
               const blobFile = await generateBlobUrl({
                 invoiceData: updatedInvoiceData?.data!,
-                headerBlockUrl: headerUrl,
-                footerBlockUrl: footerUrl,
                 invoiceNumber: updatedInvoiceData?.data?.externalId,
               });
 
@@ -1334,8 +1281,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
       } else {
         const blobFile = await generateBlobUrl({
           invoiceData: invoiceWithUpdatedDueDate,
-          headerBlockUrl: headerUrl,
-          footerBlockUrl: footerUrl,
           invoiceNumber: invoice.externalId,
         });
 
@@ -1807,7 +1752,6 @@ export const ViewInvoice = ({invoice, invoiceActivities}: Props) => {
                 getBaseFileOperations(invoiceWithUpdatedDueDate, {
                   invoiceDownloadUrl,
                   nextNumber: companyNextNumber?.value,
-                  forceGet: true,
                 }),
                 getXInvoiceOperation(invoiceWithUpdatedDueDate, {
                   forceGet: true,

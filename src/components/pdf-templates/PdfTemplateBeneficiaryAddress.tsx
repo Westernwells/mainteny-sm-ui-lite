@@ -54,15 +54,15 @@ const PdfTemplateBeneficiaryAddress = ({
     <View style={styles.leftAddress}>
       <Text style={styles.addressText}>{translate('Beneficiary Address')}</Text>
 
-      {beneficiaryInfo?.name && (
+      {!!beneficiaryInfo?.name && (
         <Text style={styles.partialAddressText}>{beneficiaryInfo?.name}</Text>
       )}
 
-      {beneficiaryInfo?.street && (
+      {!!beneficiaryInfo?.street && (
         <Text style={styles.partialAddressText}>{beneficiaryInfo?.street}</Text>
       )}
 
-      {beneficiaryInfo?.street2 && (
+      {!!beneficiaryInfo?.street2 && (
         <Text style={styles.partialAddressText}>
           {beneficiaryInfo?.street2}
         </Text>

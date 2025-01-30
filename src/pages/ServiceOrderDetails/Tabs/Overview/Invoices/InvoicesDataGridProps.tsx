@@ -10,6 +10,7 @@ import {
   HeaderFooterInfoData,
   StringValueResponse,
 } from 'models/misc';
+import {ClientReportForPDFConfig} from 'models/client-storage';
 import {Actions} from 'pages/Invoices/Actions';
 import i18next from 'i18next';
 
@@ -62,8 +63,7 @@ export const columns = (
   refetchCompanyNextNumber: () => Promise<
     QueryObserverResult<StringValueResponse>
   >,
-  isHeaderUrlLoading: boolean,
-  isFooterUrlLoading: boolean,
+  pdfConfig: ClientReportForPDFConfig,
 ): GridColDef[] => [
   getColumnProps({
     field: 'date',
@@ -132,8 +132,7 @@ export const columns = (
         footerUrl={footerUrl}
         companyNextNumber={companyNextNumber}
         refetchCompanyNextNumber={refetchCompanyNextNumber}
-        isHeaderUrlLoading={isHeaderUrlLoading}
-        isFooterUrlLoading={isFooterUrlLoading}
+        pdfConfig={pdfConfig}
       />
     ),
     flex: 1,

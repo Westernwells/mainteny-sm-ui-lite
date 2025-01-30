@@ -75,35 +75,36 @@ const PdfTemplateLeftAddress = ({
       </View>
 
       <View style={styles.partAddress}>
-        {receiverName && (
+        {!!receiverName && (
           <Text style={styles.partialAddressText}>{receiverName}</Text>
         )}
 
-        {addressComponent?.street && (
+        {!!addressComponent?.street && (
           <Text style={styles.partialAddressText}>
             {addressComponent?.street}
           </Text>
         )}
 
-        {addressComponent?.street2 && (
+        {!!addressComponent?.street2 && (
           <Text style={styles.partialAddressText}>
             {addressComponent?.street2}
           </Text>
         )}
 
         <Text style={styles.partialAddressText}>
-          {addressComponent?.postalCode &&
+          {!!addressComponent?.postalCode &&
             `${addressComponent.postalCode}`.trim()}
-          {addressComponent?.postalCode &&
+          {!!addressComponent?.postalCode &&
             (addressComponent.city || addressComponent.country) &&
             ' '}
-          {addressComponent?.city && `${addressComponent.city}`.trim()}
-          {addressComponent?.city && addressComponent.country && ', '}
-          {addressComponent?.country && `${addressComponent.country}`.trim()}
+          {!!addressComponent?.city && `${addressComponent.city}`.trim()}
+          {!!addressComponent?.city && !!addressComponent?.country && ', '}
+          {!!addressComponent?.country && `${addressComponent.country}`.trim()}
         </Text>
 
         <Text style={styles.partialAddressText}>
-          {addressComponent?.moreInfo && `${addressComponent.moreInfo}`.trim()}
+          {!!addressComponent?.moreInfo &&
+            `${addressComponent.moreInfo}`.trim()}
         </Text>
       </View>
 
@@ -119,9 +120,11 @@ const PdfTemplateLeftAddress = ({
         </Text>
       )}
 
-      {(beneficiaryInfo?.name ||
+      {!!(
+        beneficiaryInfo?.name ||
         beneficiaryInfo?.city ||
-        beneficiaryInfo?.street) && (
+        beneficiaryInfo?.street
+      ) && (
         <PdfTemplateBeneficiaryAddress
           selectedLng={selectedLng}
           translate={translate}
