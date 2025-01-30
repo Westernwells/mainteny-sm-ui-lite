@@ -152,24 +152,24 @@ const PdfTemplateFooter = ({
       <View style={styles.footerWrapper}>
         <View style={styles.leftFooter}>
           <View style={styles.footerContent}>
-            {userInfo?.serviceCompany.name && (
+            {!!userInfo?.serviceCompany.name && (
               <Text style={styles.footerHeading}>
                 {userInfo?.serviceCompany?.name}
               </Text>
             )}
-            {userInfo?.serviceCompany?.billingAddress?.fullName && (
+            {!!userInfo?.serviceCompany?.billingAddress?.fullName && (
               <Text style={styles.footerSectionBody}>
                 {userInfo?.serviceCompany?.billingAddress?.fullName}
               </Text>
             )}
-            {userInfo?.serviceCompany?.contact?.phone && (
+            {!!userInfo?.serviceCompany?.contact?.phone && (
               <Text style={styles.footerSectionBody}>
                 {translate('Tel.')}: {userInfo?.serviceCompany?.contact?.phone}
               </Text>
             )}
           </View>
 
-          {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
+          {!!userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
             <View style={styles.footerContent}>
               {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
                 <Text style={styles.footerHeading}>
@@ -178,7 +178,7 @@ const PdfTemplateFooter = ({
                 </Text>
               )}
 
-              {userInfo?.serviceCompany?.settings?.paymentInfo
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo
                 ?.accountNumber && (
                 <Text style={styles.footerSectionBody}>
                   {translate('Acc. nr.')}:{' '}
@@ -188,7 +188,7 @@ const PdfTemplateFooter = ({
                   }
                 </Text>
               )}
-              {userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
                 <View
                   style={{
                     display: 'flex',
@@ -207,7 +207,7 @@ const PdfTemplateFooter = ({
                   </Text>
                 </View>
               )}
-              {userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
                 <Text style={styles.footerSectionBody}>
                   {translate('BIC')}:{' '}
                   {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
@@ -216,16 +216,16 @@ const PdfTemplateFooter = ({
             </View>
           )}
 
-          {userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
+          {!!userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
             <View style={styles.footerContent}>
-              {userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
                 <Text style={styles.footerHeading}>
                   {translate('Bank')}:{' '}
                   {userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName}
                 </Text>
               )}
 
-              {userInfo?.serviceCompany?.settings?.paymentInfo2
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo2
                 ?.accountNumber && (
                 <Text style={styles.footerSectionBody}>
                   {translate('Acc. nr.')}:{' '}
@@ -236,7 +236,7 @@ const PdfTemplateFooter = ({
                 </Text>
               )}
 
-              {userInfo?.serviceCompany?.settings?.paymentInfo2?.iban && (
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo2?.iban && (
                 <View
                   style={{
                     display: 'flex',
@@ -256,7 +256,7 @@ const PdfTemplateFooter = ({
                 </View>
               )}
 
-              {userInfo?.serviceCompany?.settings?.paymentInfo2?.bic && (
+              {!!userInfo?.serviceCompany?.settings?.paymentInfo2?.bic && (
                 <Text style={styles.footerSectionBody}>
                   {translate('BIC')}:{' '}
                   {userInfo?.serviceCompany?.settings?.paymentInfo2?.bic}
@@ -270,27 +270,27 @@ const PdfTemplateFooter = ({
               <Text style={styles.footerHeading}>{representationText}</Text>
             )}
 
-            {userInfo?.serviceCompany?.settings?.arbitrationCourt && (
+            {!!userInfo?.serviceCompany?.settings?.arbitrationCourt && (
               <Text style={styles.footerSectionBody}>
                 {translate('Registration court')}:{' '}
                 {userInfo?.serviceCompany?.settings?.arbitrationCourt}
               </Text>
             )}
-            {userInfo?.serviceCompany?.settings?.vatId && (
+            {!!userInfo?.serviceCompany?.settings?.vatId && (
               <Text style={styles.footerSectionBody}>
                 {translate('VAT ID')}:{' '}
                 {userInfo?.serviceCompany?.settings?.vatId}{' '}
               </Text>
             )}
 
-            {userInfo?.serviceCompany?.settings?.taxNumber && (
+            {!!userInfo?.serviceCompany?.settings?.taxNumber && (
               <Text style={styles.footerSectionBody}>
                 {translate('Tax ID')}:{' '}
                 {userInfo?.serviceCompany?.settings?.taxNumber}
               </Text>
             )}
 
-            {userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
+            {!!userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
               <Text style={styles.footerSectionBody}>
                 {translate('Certified')}:{' '}
                 {userInfo?.serviceCompany?.settings?.tradeRegisterNumber}
@@ -302,14 +302,14 @@ const PdfTemplateFooter = ({
 
       <View style={styles.footerEmailWrapper}>
         <View style={styles.leftEmailFooter}>
-          {userInfo?.serviceCompany?.contact?.url && (
+          {!!userInfo?.serviceCompany?.contact?.url && (
             <View style={styles.footerContent}>
               <Text style={styles.emailText}>
                 {userInfo?.serviceCompany?.contact?.url}
               </Text>
             </View>
           )}
-          {userInfo?.serviceCompany.contact.email && (
+          {!!userInfo?.serviceCompany.contact.email && (
             <View style={{...styles.footerContent, marginLeft: 2}}>
               <Text style={styles.emailText}>
                 {userInfo?.serviceCompany?.contact?.email}
@@ -338,7 +338,7 @@ const PdfTemplateFooter = ({
         </View>
       </View>
 
-      {footerPath && (
+      {!!footerPath && (
         <View style={styles.imageContainer}>
           <Image
             source={footerPath}
