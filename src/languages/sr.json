@@ -3092,5 +3092,7 @@
   "Enter the sub-position name to confirm deletion.": "Unesite naziv podpozicije da biste potvrdili brisanje.",
   "Warning! You are about to delete \"{{articleName}}\" mixed position. This action is irreversible": "Upozorenje! Spremate se da izbrišete mešovitu poziciju „{{articleName}}“. Ova akcija je nepovratna",
   "Sub-position name": "Naziv podpozicije",
-  "Add sub-position": "Dodajte podpoziciju"
+  "Add sub-position": "Dodajte podpoziciju",
+  "COLUMN NAME": "NAZIV KOLONE",
+  "Contact deleted successfully": "Kontakt je uspešno izbrisan"
 }
