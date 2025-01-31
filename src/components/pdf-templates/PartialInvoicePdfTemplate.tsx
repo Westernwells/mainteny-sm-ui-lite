@@ -220,7 +220,7 @@ const PartialInvoicePdfTemplate = ({
 
     return (
       (grossTotal - discountValue) /
-        10 ** articleItem.unitAmount.fractionDigits || 2
+      10 ** (articleItem.unitAmount.fractionDigits || 2)
     );
   };
 
