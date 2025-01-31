@@ -211,7 +211,7 @@ const QuotationPdfTemplate = React.memo(
       return !articleItem.quantity || !articleItem.unitAmount.netAmount
         ? 0
         : (grossTotal - discountValue) /
-            10 ** articleItem.unitAmount.fractionDigits || 2;
+            10 ** (articleItem.unitAmount.fractionDigits || 2);
     };
 
     const discount = getDiscoutObj(quotation?.additionalInfo?.discount);
