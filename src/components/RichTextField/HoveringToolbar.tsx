@@ -1,11 +1,4 @@
-import {
-  ReactNode,
-  useRef,
-  useEffect,
-  MouseEvent,
-  useState,
-  useMemo,
-} from 'react';
+import {ReactNode, useRef, useEffect, MouseEvent, useState} from 'react';
 import ReactDOM from 'react-dom';
 import {useTranslation} from 'react-i18next';
 import {useSlate, useFocused} from 'slate-react';
@@ -66,39 +59,47 @@ export const HoveringToolbar = () => {
   const [openSelectFontSize, setOpenSelectFontSize] = useState(false);
 
   useEffect(() => {
-    const el = ref.current;
-    const {selection} = editor;
-    if (!el) {
-      return;
-    }
+    try {
+      const el = ref.current;
+      const {selection} = editor;
+      if (!el) {
+        return;
+      }
 
-    if (
-      !selection ||
-      (!inFocus && !openSelectFontSize) ||
-      Range.isCollapsed(selection) ||
-      Editor.string(editor, selection) === ''
-    ) {
-      el.removeAttribute('style');
-      return;
-    }
+      if (
+        !selection ||
+        (!inFocus && !openSelectFontSize) ||
+        Range.isCollapsed(selection) ||
+        Editor.string(editor, selection) === ''
+      ) {
+        el.removeAttribute('style');
+        return;
+      }
 
-    const domSelection = window.getSelection();
-    if (!domSelection || domSelection.rangeCount === 0) {
-      el.removeAttribute('style');
-      return;
-    }
+      const domSelection = window.getSelection();
+      if (!domSelection || domSelection.rangeCount === 0) {
+        el.removeAttribute('style');
+        return;
+      }
 
-    const domRange = domSelection.getRangeAt(0);
-    const rect = domRange.getBoundingClientRect() || {
-      top: 0,
-      left: 0,
-      width: 0,
-    };
-    el.style.opacity = '1';
-    el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`;
-    el.style.left = `${
-      rect.left + window.pageXOffset - el.offsetWidth / 2 + rect.width / 2 + 90
-    }px`;
+      const domRange = domSelection.getRangeAt(0);
+      const rect = domRange.getBoundingClientRect() || {
+        top: 0,
+        left: 0,
+        width: 0,
+      };
+      el.style.opacity = '1';
+      el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`;
+      el.style.left = `${
+        rect.left +
+        window.pageXOffset -
+        el.offsetWidth / 2 +
+        rect.width / 2 +
+        90
+      }px`;
+    } catch (error) {
+      console.error('Error updating hovering toolbar position:', error);
+    }
   }, [inFocus, editor.selection, openSelectFontSize]);
 
   const handleMark = (_event: MouseEvent<HTMLElement>, format: string) =>
@@ -122,7 +123,7 @@ export const HoveringToolbar = () => {
     return option ? option.label : value;
   };
 
-  const activeFontSize = useMemo(() => getActiveFontSize(editor), [editor]);
+  const activeFontSize = getActiveFontSize(editor);
   const textSize =
     activeFontSize === FONT_SIZE.SMALL
       ? '12px'
