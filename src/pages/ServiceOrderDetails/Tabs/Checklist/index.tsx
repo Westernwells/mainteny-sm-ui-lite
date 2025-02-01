@@ -963,6 +963,14 @@ export const CheckList = ({serviceOrder}: Props) => {
                               >((newArr: FileWithPreview[], obj, index) => {
                                 const isFileFromServer =
                                   !obj.path && index === 0;
+                                const fileName = obj.name;
+                                const fileExtension =
+                                  fileName?.split('.')?.pop() || '';
+                                const fileNameWithoutExtension =
+                                  fileName.substring(
+                                    0,
+                                    fileName.lastIndexOf('.'),
+                                  );
 
                                 newArr.push({
                                   ...obj,
@@ -975,7 +983,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                                   description: isFileFromServer
                                     ? `${checkListInfo.checkList?.externalId}.pdf` ||
                                       `${checkListInfo.checkList?.number}.pdf`
-                                    : obj.name.split('.')[0],
+                                    : `${fileNameWithoutExtension}.${fileExtension}`,
                                 });
 
                                 // Add signatureAttachment if it doesn't already exist

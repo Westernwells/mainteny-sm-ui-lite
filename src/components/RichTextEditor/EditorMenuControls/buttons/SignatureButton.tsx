@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import {useState, useRef, useEffect} from 'react';
 import {Button, MenuItem, Paper, Popper, Radio} from '@mui/material';
 import {ChevronLeftOutlined} from '@mui/icons-material';
 import {EmailSignature} from 'models/employee';
@@ -97,6 +97,24 @@ const SignatureButton = ({
       // Update the editor content
       editor.chain().focus().setContent(updatedContent).run();
       return;
+    }
+
+    // Check if this signature is already active to prevent duplicate insertions
+    if (value.id === activeSignature?.id) {
+      return;
+    }
+
+    // Check if there's already a signature table in the content
+    const currentContent = editor.getHTML();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(currentContent, 'text/html');
+    const existingSignature = doc.querySelector('table');
+
+    if (existingSignature) {
+      // Remove existing signature before adding new one
+      existingSignature.remove();
+      const updatedContent = doc.body.innerHTML;
+      editor.chain().focus().setContent(updatedContent).run();
     }
 
     setSelectedSignature(value.name);

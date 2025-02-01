@@ -50,15 +50,15 @@ export const paramsSerializer = (parameters: {[key: string]: any}) => {
   const items = Object.keys(parameters).map((key) => {
     const value = parameters[key];
     if (Array.isArray(value)) {
-      return value.map((v) => `${key}=${v}`);
+      return value.map((v) => `${key}=${encodeURIComponent(v)}`);
     }
 
     // serialize default date object
     if (value instanceof Date) {
-      return `${key}=${(value as Date).toJSON()}`;
+      return `${key}=${encodeURIComponent((value as Date).toJSON())}`;
     }
 
-    return `${key}=${value}`;
+    return `${key}=${encodeURIComponent(value)}`;
   });
 
   return items.flat().join('&');
