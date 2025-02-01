@@ -296,6 +296,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
         // If file is from server -> uri of file should be report.id
         // If file is from server -> description should be report.externalId || report.number
         const isFileFromServer = !obj.path && index === 0;
+        const fileName = obj.name;
+        const fileExtension = fileName?.split('.')?.pop() || '';
+        const fileNameWithoutExtension = fileName.substring(
+          0,
+          fileName.lastIndexOf('.'),
+        );
 
         newArr.push({
           ...obj,
@@ -305,7 +311,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
             : `${path}/${obj.name}`,
           description: isFileFromServer
             ? `${fileReport?.externalId}.pdf` || `${fileReport?.number}.pdf`
-            : obj.name.split('.')[0],
+            : `${fileNameWithoutExtension}.${fileExtension}`,
         });
 
         return newArr;

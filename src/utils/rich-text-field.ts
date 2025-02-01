@@ -45,11 +45,15 @@ export const isBlockActive = (editor: CustomEditor, format: string) => {
 };
 
 export const getActiveFontSize = (editor: CustomEditor) => {
-  const marks = Editor.marks(editor);
-  if (marks && marks.fontSize) {
-    return marks.fontSize;
+  try {
+    const marks = Editor.marks(editor);
+    if (marks && marks.fontSize) {
+      return marks.fontSize;
+    }
+    return DEFAULT_FONT_SIZE;
+  } catch {
+    return DEFAULT_FONT_SIZE;
   }
-  return DEFAULT_FONT_SIZE;
 };
 
 export const toggleMark = (
