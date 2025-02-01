@@ -136,9 +136,9 @@ export const WorkReport = ({serviceOrder}: Props) => {
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
-  const schedule = serviceOrder.schedules.find(
-    (s) => s.technician.id === report?.technicianId,
-  );
+  const schedule = serviceOrder.schedules
+    .filter((item) => !!item.technician)
+    .find((s) => s.technician!.id === report?.technicianId);
 
   const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
     report?.technicianId || '',

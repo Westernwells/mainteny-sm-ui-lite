@@ -43,7 +43,7 @@ const usePrepareWorkReportData = ({serviceOrderId, userView}: Props) => {
     [serviceOrder],
   );
   const schedule = serviceOrder?.schedules.find(
-    (s) => s.technician.id === report?.technicianId,
+    (s) => s.technician?.id === report?.technicianId,
   );
   const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
     report?.technicianId || '',

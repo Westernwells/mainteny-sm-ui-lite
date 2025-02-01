@@ -92,10 +92,9 @@ export const AddChecklistCard = ({
   }, [checklists, checklistFilter]);
 
   const scheduled = serviceOrder.schedules ?? [];
-  const candidates = serviceOrder.additionalInfo.candidateTechnicians ?? [];
 
   const technicianNotAssigned =
-    scheduled.length === 0 && candidates.length === 0;
+    scheduled.filter((item) => !!item.technician).length === 0;
 
   return (
     <>

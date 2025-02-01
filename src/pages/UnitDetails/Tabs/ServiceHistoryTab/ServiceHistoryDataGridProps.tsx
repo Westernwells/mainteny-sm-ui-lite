@@ -10,6 +10,7 @@ import {
 } from 'utils/service-order-utils';
 import {FormatDate} from 'models/misc';
 import {convertMinsToHM, toDate} from 'utils/datetime';
+import {getUserFullName} from 'utils/utils';
 
 export const columns: GridColDef[] = [
   getColumnProps({
@@ -67,23 +68,25 @@ export const makeRows = (
   formatDate: FormatDate = () => '',
 ): GridRowsProp =>
   serviceOrders.length
-    ? serviceOrders.map((item, index: number) => ({
-        id: index,
-        number: item.number,
-        date: formatDate(toDate(item.meta.createdAt)),
-        type: item.type,
-        engineer: item.schedules.length
-          ? item.schedules
-              .map(
-                (i) =>
-                  `${i.technician.userAccount.firstName} ${i.technician.userAccount.lastName}`,
-              )
-              .join(', ')
-          : item.additionalInfo?.candidateTechnician
-          ? `${item.additionalInfo?.candidateTechnician.userAccount.firstName} ${item.additionalInfo?.candidateTechnician.userAccount.lastName}`
-          : '-',
-        duration: item.serviceTime && convertMinsToHM(item.serviceTime),
-        status: item.status,
-        navigateTo: `/orders/details/${item.id}`,
-      }))
+    ? serviceOrders.map((item, index: number) => {
+        const schedules =
+          item.schedules.filter((scheduleItem) => !!scheduleItem.technician) ??
+          [];
+
+        return {
+          id: index,
+          number: item.number,
+          date: formatDate(toDate(item.meta.createdAt)),
+          type: item.type,
+          engineer: schedules.length
+            ? schedules
+                .filter((scheduleItem) => !!scheduleItem.technician)
+                .map((i) => getUserFullName(i.technician!.userAccount))
+                .join(', ')
+            : '-',
+          duration: item.serviceTime && convertMinsToHM(item.serviceTime),
+          status: item.status,
+          navigateTo: `/orders/details/${item.id}`,
+        };
+      })
     : [];

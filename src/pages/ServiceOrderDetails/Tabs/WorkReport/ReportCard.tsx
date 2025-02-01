@@ -71,9 +71,9 @@ export const ReportCard = ({
 
   const labels =
     reports.map((r) => {
-      const schedule = order.schedules.find(
-        (s) => s.technician.id === r?.technicianId,
-      );
+      const schedule = order.schedules
+        .filter((item) => !!item.technician)
+        .find((s) => s.technician!.id === r?.technicianId);
 
       const {data: selectedTechnician} = useGetTechniciansByEmployeeId(
         r?.technicianId || '',

@@ -83,8 +83,9 @@ export const FieldActivities = ({
       <Timeline sx={{padding: 0, marginTop: 0}}>
         {activities.pages.map((page) =>
           page.data.map((activity) => {
-            const technician =
-              activity.data.schedules?.[0]?.technician.userAccount;
+            const technician = activity.data.schedules?.filter(
+              (item) => !!item.technician,
+            )?.[0]?.technician?.userAccount;
             const technicianName = technician
               ? `${technician.firstName ?? ''} ${technician.lastName ?? ''}`
               : '-';

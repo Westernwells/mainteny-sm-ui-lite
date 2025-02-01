@@ -56,8 +56,9 @@ export const AppointmentsToBeScheduled = ({
           }}>
           <TableBody>
             {appointments.data.map((appointment) => {
-              const technician =
-                appointment.schedules?.[0]?.technician.userAccount;
+              const technician = appointment.schedules?.filter(
+                (item) => !!item.technician,
+              )?.[0]?.technician!.userAccount;
               const technicianName = `${technician?.firstName ?? ''} ${
                 technician?.lastName ?? ''
               }`;

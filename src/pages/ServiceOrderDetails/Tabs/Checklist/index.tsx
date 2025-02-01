@@ -173,16 +173,14 @@ export const CheckList = ({serviceOrder}: Props) => {
 
   const serviceOrderTechnicianById = useMemo(() => {
     const candidateTechnicianById =
-      serviceOrder.additionalInfo.candidateTechnicians?.reduce((acc, item) => {
-        acc[item.id] = item.userAccount;
+      serviceOrder.schedules?.reduce((acc, item) => {
+        if (item.technician) {
+          acc[item.id] = item.technician.userAccount;
+        }
         return acc;
       }, {} as {[key: string]: UserAccount}) ?? {};
 
-    return serviceOrder.schedules.reduce((acc, item) => {
-      acc[item.technician.id] = item.technician.userAccount;
-
-      return acc;
-    }, candidateTechnicianById as {[key: string]: UserAccount});
+    return candidateTechnicianById;
   }, [serviceOrder]);
 
   const technicianFromServiceOrder = selectedChecklist?.technicianId
@@ -607,10 +605,9 @@ export const CheckList = ({serviceOrder}: Props) => {
   };
 
   const scheduled = serviceOrder.schedules ?? [];
-  const candidates = serviceOrder.additionalInfo.candidateTechnicians ?? [];
 
   const technicianNotAssigned =
-    scheduled.length === 0 && candidates.length === 0;
+    scheduled.filter((item) => !!item.technician).length === 0;
 
   return (
     <>
