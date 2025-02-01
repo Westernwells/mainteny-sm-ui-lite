@@ -7,21 +7,27 @@ import {
 } from 'date-fns';
 import {
   calculateContractInvoicePriceTotal,
+  CONTRACT_STATUS_FILTER,
   ContractComponentElevator,
   ContractComponentRecord,
   ContractComponentView,
   ContractElevatorView,
   ContractServiceFormElevator,
   ContractStatus,
+  ContractTableRow,
   ContractTimeUnit,
   ContractTypes,
   ContractView,
   ExtendedContractComponentRecord,
+  FILTER_OPTIONS_TO_STATUSES,
+  STATUS_TO_FILTER_OPTION,
   UpdateContractComponents,
 } from 'models/contract';
 import {toDate, toRestDate} from 'utils/datetime';
 import {ElevatorView} from 'models/elevator';
 import {OptionsObject, SnackbarKey, SnackbarMessage} from 'notistack';
+import {formatCurrency} from 'utils/currency';
+import {Currency} from 'models/misc';
 
 export const costRangeConvertor = (
   selectedItems: string[],
@@ -406,6 +412,39 @@ export const isUnitSelected = (unit: {
   isChecked?: boolean;
   isSelected?: boolean;
 }) => unit.isChecked || unit.isSelected;
+
+export const aggregateContractRow = (
+  contracts: ContractView[],
+  currentCurrency: Currency,
+): ContractTableRow[] =>
+  contracts.map((contract) => ({
+    data: contract,
+    id: contract.id,
+    propertyOwner: contract.propertyOwner,
+    number: contract.number,
+    contractName: contract.name,
+    numberOfUnits: contract.numberOfElevators,
+    price: `${formatCurrency(
+      contract.additionalInfo.totalYearlyPrice
+        ? contract.additionalInfo.totalYearlyPrice /
+            10 ** currentCurrency.fractionDigits!
+        : 0,
+      {
+        currency: currentCurrency.code,
+      },
+    )}`,
+    startDate: contract.start,
+    endDate: contract.end,
+    status: contract.status,
+  }));
+
+export const mapFilterOptionToStatus = (
+  option: CONTRACT_STATUS_FILTER,
+): ContractStatus[] => FILTER_OPTIONS_TO_STATUSES[option];
+
+export const mapStatusToFilterOptions = (
+  status: ContractStatus,
+): CONTRACT_STATUS_FILTER => STATUS_TO_FILTER_OPTION[status];
 
 export const transformContractViewComponentToContractRecord = (
   components: ContractComponentView[],

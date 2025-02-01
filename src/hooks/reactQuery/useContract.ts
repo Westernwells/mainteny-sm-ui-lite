@@ -10,6 +10,7 @@ import {queryKeys as qk, queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
   ContractRequestBody,
+  ContractStatistics,
   ContractView,
   CreateContractComment,
   CustomerContractParams,
@@ -21,11 +22,16 @@ import {
 import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {Comment} from 'models/comment';
+import {useAll} from 'hooks/reactQuery/useAll';
+import {AxiosResponse} from 'axios';
 import {useUserSession} from './useUserSession';
 
-export const queryContracts = async (params: QueryContractParams) => {
+export const queryContracts = async (
+  params: QueryContractParams,
+  serviceCompanyId: string,
+) => {
   const response = await axiosClient.get<Resource<ContractView>>(
-    `/api/contracts`,
+    `/api/serviceCompanies/${serviceCompanyId}/contracts`,
     {
       params,
       paramsSerializer,
@@ -36,7 +42,7 @@ export const queryContracts = async (params: QueryContractParams) => {
 };
 
 export const useQueryContract = (
-  params: WithOptional<QueryContractParams, 'serviceCompanyId'>,
+  params: QueryContractParams,
   options?: UseQueryOptions<
     Resource<ContractView>,
     RestError,
@@ -44,15 +50,14 @@ export const useQueryContract = (
   >,
 ) => {
   const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
   return useQuery<Resource<ContractView>, RestError, Resource<ContractView>>(
     [qk.contracts, params],
-    () =>
-      queryContracts({
-        ...params,
-        serviceCompanyId: user!.userAccount.serviceCompany.id,
-      }),
+    () => queryContracts(params, serviceCompanyId!!),
     {
       ...options,
+      enabled: !!user,
     },
   );
 };
@@ -368,4 +373,57 @@ export const useUpdateContractComment = () => {
       },
     },
   );
+};
+
+export const fetchContractStatistics = async (
+  params: QueryContractParams,
+  serviceCompanyId: string,
+): Promise<ContractStatistics> => {
+  const response: AxiosResponse<ContractStatistics> = await axiosClient.get(
+    `/api/serviceCompanies/${serviceCompanyId}/contracts/statistics`,
+    {
+      params: {
+        ...params,
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export const useContractStatistics = (
+  params: QueryContractParams,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  return useQuery<ContractStatistics, RestError, ContractStatistics>(
+    [
+      queryKeys.fetchContractStatistics,
+      params,
+      user?.userAccount.serviceCompany.id,
+    ],
+    () => fetchContractStatistics(params, user!.userAccount.serviceCompany.id),
+    {
+      enabled: !!user,
+      ...options,
+    },
+  );
+};
+
+export const useAllContracts = (
+  params: QueryContractParams,
+  options?: UseQueryOptions<any, any, any>,
+) => {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  return useAll<QueryContractParams, ContractView>({
+    queryKey: [queryKeys.queryAllContracts, params],
+    queryFn: () => queryContracts(params, serviceCompanyId!!),
+    params,
+    options: {
+      ...options,
+      enabled: !!user,
+    },
+  });
 };

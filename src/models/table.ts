@@ -14,6 +14,7 @@ export type HeaderCellProps = {
 };
 
 export type CellProps = {
+  id?: string;
   width?: string;
   isHeaderNameHidden?: boolean;
   align?: 'left' | 'right' | 'center';
@@ -41,7 +42,7 @@ export type TableColumnWithRender<T> = TableColumn & {
   getExportValue?: (renderObject: T) => string;
 };
 
-// Deprecated used MenuAction
+// Deprecated => use MenuAction
 export type Action = {
   icon: SvgIconComponent;
   label: string;
@@ -51,3 +52,15 @@ export type Action = {
 export type ExportColumn<T> = {
   getExportValue?: (renderObject: T) => string;
 };
+
+export type CustomizableColumn = {
+  id: string;
+  columnName: string;
+  orderIndex: number;
+  fixed: boolean;
+  default: boolean;
+};
+
+export enum CustomizableTable {
+  UNIT = 'UNIT',
+}

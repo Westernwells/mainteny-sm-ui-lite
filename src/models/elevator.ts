@@ -25,6 +25,7 @@ import {InvoiceOrderField, InvoiceStatus, InvoiceType} from 'models/invoice';
 import {theme} from 'theme';
 import {UserAccountSimpleView} from './user';
 import {ContactPersonAdditionalInfo} from './contacts';
+import {CustomizableColumn} from 'models/table';
 
 export enum ElevatorCommentType {
   TODO = 'TODO',
@@ -88,6 +89,10 @@ export enum ElevatorOrderField {
   LAST_INSPECTION_DATE = 'LAST_INSPECTION_DATE',
   NEXT_INSPECTION_DATE = 'NEXT_INSPECTION_DATE',
   STATUS = 'STATUS',
+  MANUFACTURER = 'MANUFACTURER',
+  SERIAL_NUMBER = 'SERIAL_NUMBER',
+  REQUIRED_TIME = 'REQUIRED_TIME',
+  DISTANCE = 'DISTANCE',
 }
 
 export interface ElevatorQueryParams {
@@ -524,11 +529,17 @@ export type UnitTableRow = {
   fullAddress: string;
   building: string;
   propertyOwner?: PropertyOwnerView;
-  lastMaintenance?: string;
-  nextInspection?: string;
+  lastVisitDate?: string;
   engineers: EmployeesSimpleView[];
   status: ElevatorStatus;
   hasContract: boolean;
+  serialNumber: string;
+  manufacturer: string;
+  model: string;
+  lastInspectionDate?: string;
+  requiredTime: number;
+  // appointmentPreference
+  distance: number;
 };
 
 // used to indicate fields for the search parameter in elevator endpoint
@@ -649,3 +660,122 @@ export interface UpdateElevatorDataItemBody {
 export interface GetElevatorDataSchemasAffectedFieldParams {
   fieldNames: string[];
 }
+
+export enum TABLE_COLUMNS_ID {
+  NUMBER = 'NUMBER',
+  BUILDING = 'BUILDING',
+  ADDRESS = 'ADDRESS',
+  CUSTOMER = 'CUSTOMER',
+  LAST_VISIT = 'LAST_VISIT',
+  ENGINEERS = 'ENGINEERS',
+  ACTIVE_CONTRACTS = 'ACTIVE_CONTRACTS',
+  STATUS = 'STATUS',
+  SERIAL_NUMBER = 'SERIAL_NUMBER',
+  MANUFACTURER = 'MANUFACTURER',
+  MODEL = 'MODEL',
+  LAST_INSPECTION = 'LAST_INSPECTION',
+  REQUIRED_TIME = 'REQUIRED_TIME',
+  APPOINTMENT_PREFERENCE = 'APPOINTMENT_PREFERENCE',
+  DISTANCE = 'DISTANCE',
+}
+
+export const UNIT_TABLE_COLUMNS: CustomizableColumn[] = [
+  {
+    id: TABLE_COLUMNS_ID.NUMBER,
+    columnName: 'Number',
+    orderIndex: 0,
+    fixed: true,
+    default: true,
+  },
+  {
+    id: TABLE_COLUMNS_ID.BUILDING,
+    columnName: 'Building',
+    orderIndex: 1,
+    fixed: false,
+    default: true,
+  },
+  {
+    id: TABLE_COLUMNS_ID.ADDRESS,
+    columnName: 'Address',
+    orderIndex: 2,
+    fixed: false,
+    default: true,
+  },
+  {
+    id: TABLE_COLUMNS_ID.CUSTOMER,
+    columnName: 'Customer',
+    orderIndex: 3,
+    fixed: false,
+    default: true,
+  },
+  {
+    id: TABLE_COLUMNS_ID.LAST_VISIT,
+    columnName: 'Last visit',
+    orderIndex: 4,
+    fixed: false,
+    default: true,
+  },
+  {
+    id: TABLE_COLUMNS_ID.ENGINEERS,
+    columnName: 'Engineers',
+    orderIndex: 5,
+    fixed: false,
+    default: true,
+  },
+  {
+    id: TABLE_COLUMNS_ID.ACTIVE_CONTRACTS,
+    columnName: 'Active Contracts',
+    orderIndex: 6,
+    fixed: false,
+    default: true,
+  },
+  {
+    id: TABLE_COLUMNS_ID.STATUS,
+    columnName: 'Status',
+    orderIndex: 7,
+    fixed: false,
+    default: true,
+  },
+  {
+    id: TABLE_COLUMNS_ID.SERIAL_NUMBER,
+    columnName: 'Serial number',
+    orderIndex: 8,
+    fixed: false,
+    default: false,
+  },
+  {
+    id: TABLE_COLUMNS_ID.MANUFACTURER,
+    columnName: 'Manufacturer',
+    orderIndex: 9,
+    fixed: false,
+    default: false,
+  },
+  {
+    id: TABLE_COLUMNS_ID.MODEL,
+    columnName: 'Model',
+    orderIndex: 10,
+    fixed: false,
+    default: false,
+  },
+  {
+    id: TABLE_COLUMNS_ID.LAST_INSPECTION,
+    columnName: 'Last inspection',
+    orderIndex: 11,
+    fixed: false,
+    default: false,
+  },
+  {
+    id: TABLE_COLUMNS_ID.REQUIRED_TIME,
+    columnName: 'Required time',
+    orderIndex: 12,
+    fixed: false,
+    default: false,
+  },
+  {
+    id: TABLE_COLUMNS_ID.DISTANCE,
+    columnName: 'Distance',
+    orderIndex: 13,
+    fixed: false,
+    default: false,
+  },
+];

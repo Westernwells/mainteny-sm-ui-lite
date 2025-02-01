@@ -2,9 +2,17 @@ import {t} from 'i18next';
 import {
   CYCLE_TYPE_TO_LABEL_MAP,
   UNIT_TYPE_TO_CYCLE_MAP,
-} from '../models/jobFrequency';
-import {ContractComponentElevator, ContractTimeUnit} from '../models/contract';
+} from 'models/jobFrequency';
+import {ContractComponentElevator, ContractTimeUnit} from 'models/contract';
 import {monthNames} from './elevator-utils';
+
+export const displayMonths = (timeNumbers?: number[]) => {
+  if (!Array.isArray(timeNumbers) || timeNumbers.length === 0) return '-';
+  return timeNumbers
+    .sort((a, b) => a - b)
+    .map((unit) => t(monthNames[unit - 1]))
+    .join(', ');
+};
 
 export const getFrequencyDisplay = (
   elevator?: ContractComponentElevator,
@@ -17,12 +25,7 @@ export const getFrequencyDisplay = (
 
   // map monthly basis
   if (!cycleType || timeUnit === ContractTimeUnit.MONTHLY) {
-    return (
-      timeNumbers
-        ?.sort((a, b) => a - b)
-        .map((unit) => t(monthNames[unit - 1]))
-        .join(', ') || '-'
-    );
+    return displayMonths(timeNumbers);
   }
   const label = CYCLE_TYPE_TO_LABEL_MAP.get(cycleType);
   return label ? t(label) : '-';
