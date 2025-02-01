@@ -1849,7 +1849,11 @@ export const InvoiceForm = ({
                       />
                       <Typography variant="caption" component="p">
                         {serviceOrder.schedules.length
-                          ? `${serviceOrder.schedules[0].technician.userAccount.firstName} ${serviceOrder.schedules[0].technician.userAccount.lastName}`
+                          ? `${getUserFullName(
+                              serviceOrder.schedules.filter(
+                                (item) => !!item.technician,
+                              )[0].technician?.userAccount,
+                            )}`
                           : '-'}
                       </Typography>
                     </>

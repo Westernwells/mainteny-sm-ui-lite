@@ -9,7 +9,7 @@ import {
 } from '../models/employee';
 import {AvailabilityType} from '../models/availability';
 import {getAvailabilityTypeFromTechnicianEventType} from './availability';
-import {convertToText, titleCase} from './utils';
+import {convertToText, getUserFullName, titleCase} from './utils';
 import {DEFAULT_EMPLOYEE_EVENT_TYPES} from './constants';
 
 export const aggregateEmployeeRows = (
@@ -68,7 +68,7 @@ export const getTechnicianName = (
   fetchedTechnician?: EmployeesView,
 ): string => {
   if (technicianSchedule) {
-    return `${technicianSchedule.technician.userAccount.firstName} ${technicianSchedule.technician.userAccount.lastName}`;
+    return getUserFullName(technicianSchedule?.technician?.userAccount);
   }
   if (fetchedTechnician) {
     return `${fetchedTechnician.userAccount.firstName} ${fetchedTechnician.userAccount.lastName}`;

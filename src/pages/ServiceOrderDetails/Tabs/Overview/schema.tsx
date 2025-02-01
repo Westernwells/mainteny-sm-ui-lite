@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import {Box, Typography} from '@mui/material';
 import {useTranslation} from 'react-i18next';
+import {getUserFullName} from 'utils/utils';
 
 interface OrderInfoProps {
   serviceOrderDetails: ServiceOrderView;
@@ -27,6 +28,10 @@ interface OrderInfoProps {
 export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
   const formatDate = useFormatDate();
   const {t} = useTranslation();
+
+  const schedule =
+    serviceOrderDetails.schedules.filter((item) => !!item.technician) ?? [];
+
   const renderSection = () => {
     switch (label) {
       case 'customer':
@@ -166,7 +171,9 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             }
             bodyText={
               serviceOrderDetails.schedules &&
-              serviceOrderDetails.schedules.length ? (
+              serviceOrderDetails.schedules.filter(
+                (item) => !!item.startTime && !!item.endTime,
+              ).length ? (
                 <Box>
                   <Typography variant="body2" sx={{paddingTop: '0.2em'}}>
                     {serviceOrderDetails.status ===
@@ -216,16 +223,13 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
             icon={<ManageAccountsIcon sx={{color: theme.palette.info.main}} />}
             label="TECHNICIAN"
             bodyText={
-              serviceOrderDetails.schedules &&
-              serviceOrderDetails.schedules.length
-                ? serviceOrderDetails.schedules
-                    .map(
-                      (item) =>
-                        `${item.technician.userAccount.firstName} ${item.technician.userAccount.lastName}`,
+              schedule.length
+                ? schedule
+                    .filter((item) => !!item.technician)
+                    .map((item) =>
+                      getUserFullName(item.technician!.userAccount),
                     )
                     .join(', ')
-                : serviceOrderDetails.additionalInfo?.candidateTechnician
-                ? `${serviceOrderDetails.additionalInfo?.candidateTechnician.userAccount.firstName} ${serviceOrderDetails.additionalInfo?.candidateTechnician.userAccount.lastName}`
                 : '-'
             }
             iconBackground={theme.palette.info.outlinedHoverBg}

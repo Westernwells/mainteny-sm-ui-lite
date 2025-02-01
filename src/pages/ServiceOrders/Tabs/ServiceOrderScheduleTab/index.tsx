@@ -175,18 +175,20 @@ export const ServiceOrderScheduleTab = () => {
       let groupByTechnicianId: {[key: string]: ServiceOrderView[]} = {};
 
       sortedOrder.forEach((serviceOrder) => {
-        serviceOrder.schedules.forEach((schedule) => {
-          const technicianId = schedule.technician.id;
-          const group = groupByTechnicianId[technicianId];
-          if (!group) {
-            groupByTechnicianId[technicianId] = [serviceOrder];
-          } else {
-            groupByTechnicianId = {
-              ...groupByTechnicianId,
-              [technicianId]: [...group, serviceOrder],
-            };
-          }
-        });
+        serviceOrder.schedules
+          .filter((item) => !!item.technician)
+          .forEach((schedule) => {
+            const technicianId = schedule.technician!.id;
+            const group = groupByTechnicianId[technicianId];
+            if (!group) {
+              groupByTechnicianId[technicianId] = [serviceOrder];
+            } else {
+              groupByTechnicianId = {
+                ...groupByTechnicianId,
+                [technicianId]: [...group, serviceOrder],
+              };
+            }
+          });
       });
       setOrders(groupByTechnicianId);
     }
