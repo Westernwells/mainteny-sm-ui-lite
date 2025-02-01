@@ -1,9 +1,10 @@
 import {SxProps, Theme} from '@mui/material';
 import MuiButton, {ButtonProps} from '@mui/material/Button';
-import {ReactNode} from 'react';
+import {MutableRefObject, ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 
 interface Props {
+  ref?: MutableRefObject<HTMLButtonElement | null>;
   label?: string;
   children?: ReactNode;
   style?: SxProps<Theme>;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export const Button = ({
+  ref,
   label,
   children,
   style,
@@ -27,6 +29,7 @@ export const Button = ({
   const {t} = useTranslation();
   return (
     <MuiButton
+      ref={ref}
       disabled={disabled}
       disableRipple={!enableRipple}
       data-testid={testId}

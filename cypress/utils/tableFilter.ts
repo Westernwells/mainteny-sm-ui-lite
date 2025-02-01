@@ -10,4 +10,10 @@ export default class TableFilter {
   static clearQuerySearchFilter = () => {
     cy.get('button[data-testid="search-input-clear"]').click({force: true});
   };
+
+  static filterListByStatus = (status: string) => {
+    cy.contains('button', new RegExp(`^${status}[a-zA-Z]*`)).click({
+      force: true,
+    });
+  };
 }

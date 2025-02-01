@@ -484,3 +484,21 @@ export const getJobTypeGivenName = (
   );
   return matchingJobType?.givenName || '-';
 };
+
+type FilterServiceOrderTypeProps = {
+  statistic?: Record<string, number>;
+  allServiceOrderTypes: ServiceOrderTypeRecord[];
+};
+
+export const filterServiceOrderTypes = ({
+  statistic,
+  allServiceOrderTypes,
+}: FilterServiceOrderTypeProps) => {
+  const jobTypesInStatistics = statistic
+    ? Object.keys(statistic).filter((jobType) => statistic[jobType] > 0)
+    : [];
+
+  return allServiceOrderTypes?.filter((job) =>
+    jobTypesInStatistics.includes(job.name),
+  );
+};

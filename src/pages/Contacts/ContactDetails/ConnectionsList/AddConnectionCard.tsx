@@ -214,12 +214,15 @@ const AddConnectionCard = ({onAddConnection, onCancel}: Props) => {
                   },
                   watch('customerId'),
                 )
-              : queryContracts({
-                  ...params,
+              : queryContracts(
+                  {
+                    ...params,
+                    serviceCompanyId,
+                    order: Order.DESC,
+                    orderBy: ContractOrderField.CREATED_TIME,
+                  },
                   serviceCompanyId,
-                  order: Order.DESC,
-                  orderBy: ContractOrderField.CREATED_TIME,
-                })
+                )
           }
           keys={{label: 'name', value: 'id'}}
           name="refId"
