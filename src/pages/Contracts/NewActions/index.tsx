@@ -15,6 +15,7 @@ const NewActions = ({contract}: Props) => {
   const {t} = useTranslation();
 
   const [open, setOpen] = useState(false);
+  const [shouldDownload, setShouldDownload] = useState(false); // quick fix solution, change using implementation from  MT-5859
 
   const url = contract?.additionalInfo?.documents?.[0]?.uri || '';
   const fileName =
@@ -36,10 +37,12 @@ const NewActions = ({contract}: Props) => {
   };
 
   useEffect(() => {
-    if (downloadUrl && Object.values(downloadUrl).length) {
-      handleDownload(downloadUrl);
+    if (shouldDownload && downloadUrl && Object.values(downloadUrl).length) {
+      handleDownload(downloadUrl).then(() => {
+        setShouldDownload(false);
+      });
     }
-  }, [downloadUrl]);
+  }, [downloadUrl, shouldDownload]);
 
   const actions = useMemo(() => {
     const items: MenuAction[] = [];
@@ -48,7 +51,10 @@ const NewActions = ({contract}: Props) => {
       items.push({
         label: t('Download'),
         icon: <FileDownloadOutlinedIcon />,
-        onClick: () => downloadDocument(),
+        onClick: async () => {
+          await downloadDocument();
+          setShouldDownload(true);
+        },
       });
     } else {
       items.push({
