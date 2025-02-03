@@ -33,11 +33,7 @@ export const CustomerAutoComplete = ({
 
   const searchQuery = useMemo(() => {
     if (!query) return '';
-    const queryValue = searchOnlyCustomerName
-      ? createNameSearchQuery(query)
-      : query;
-
-    return encodeURIComponent(queryValue);
+    return searchOnlyCustomerName ? createNameSearchQuery(query) : query;
   }, [query, searchOnlyCustomerName]);
 
   const {data: customerResource = createEmptyResource(10)} = useQueryCustomers({
