@@ -78,6 +78,7 @@ export const GeneralSchema = ({label, elevator, currency}: Props) => {
       case 'spendingLimit':
         return (
           <CardProps
+            testId="unit_spending_limit"
             icon={<AttachMoneyIcon sx={{color: theme.palette.primary.light}} />}
             label="Spending limit"
             unitText={currency}

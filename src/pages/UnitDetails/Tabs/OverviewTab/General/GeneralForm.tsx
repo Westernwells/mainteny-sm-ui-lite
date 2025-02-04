@@ -197,7 +197,11 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
 
       <Grid item md={6}>
         <FormInput
+          testId="unit_spending_limit_input_field"
           inputType="currency"
+          onValueChange={(values: {name?: string; value?: number}) => {
+            setValue('spendingLimit', values.value);
+          }}
           fieldProps={{
             size: 'small',
             placeholder: 'e.g. 150',

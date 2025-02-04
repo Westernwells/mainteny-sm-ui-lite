@@ -20,6 +20,7 @@ interface Props {
   fullWidth?: boolean;
   numericFormatProps?: NumericFormatProps<TextFieldProps>;
   labelTooltip?: string;
+  testId?: string;
 }
 
 export const FormInput = forwardRef(
@@ -34,6 +35,7 @@ export const FormInput = forwardRef(
       fullWidth = true,
       inputType = 'text',
       numericFormatProps,
+      testId,
     }: Props,
     ref,
   ) => {
@@ -74,7 +76,10 @@ export const FormInput = forwardRef(
     };
 
     return (
-      <FormControl sx={{...containerStyles}} fullWidth={fullWidth}>
+      <FormControl
+        data-testid={testId}
+        sx={{...containerStyles}}
+        fullWidth={fullWidth}>
         {inputType === 'currency' ? (
           <NumericFormat
             value={Number(
