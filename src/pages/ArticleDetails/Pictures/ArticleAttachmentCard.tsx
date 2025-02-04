@@ -60,31 +60,33 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
 
   const {data: pictureUrls = {}} = useDownloadUrl(
     _.map(
-      article.additionalInfo.pictures?.map((item: FileResource) => item.uri),
+      article.additionalInfo?.pictures?.map((item: FileResource) => item.uri),
       (item) => item,
     ),
   );
   const isEmpty =
-    !article.additionalInfo.pictures ||
-    article.additionalInfo.pictures.length === 0;
+    !article.additionalInfo?.pictures ||
+    article.additionalInfo?.pictures.length === 0;
 
   const sortedFiles = useMemo(
     () =>
-      article.additionalInfo.pictures?.sort((a, b) =>
+      article.additionalInfo?.pictures?.sort((a, b) =>
         sortByName(sortOrder)(a.type, b.type),
       ),
-    [article.additionalInfo.pictures, sortOrder],
+    [article.additionalInfo?.pictures, sortOrder],
   );
   const images = useMemo(
     () =>
-      article.additionalInfo.pictures?.filter((file) =>
+      article.additionalInfo?.pictures?.filter((file) =>
         file.type.includes('image'),
       ),
-    [article.additionalInfo.pictures],
+    [article.additionalInfo?.pictures],
   );
   const handleFileNameChange = (fileId?: string) => {
     if (fileId) {
-      const file = article.additionalInfo.pictures.find((p) => p.id === fileId);
+      const file = article.additionalInfo?.pictures?.find(
+        (p) => p.id === fileId,
+      );
       setFileName(file?.description ?? '');
       setEditingFileId(fileId);
     } else {
@@ -109,8 +111,8 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
   };
 
   const handlePreviewFile = (picture: FileResource) => {
-    if (images.includes(picture)) {
-      const index = images.indexOf(picture);
+    if (images?.includes(picture)) {
+      const index = images?.indexOf(picture);
       setOpenPreview(true);
       setActiveStep(index);
     } else {
@@ -188,7 +190,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
     if (isEmpty) {
       return renderEmptySection();
     }
-    if (article.additionalInfo?.pictures.length) {
+    if (article.additionalInfo?.pictures?.length) {
       return (
         <Box
           display="flex"
@@ -276,7 +278,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
                             minWidth: 48,
                             minHeight: 48,
                           }}>
-                          {images.includes(file) ? (
+                          {images?.includes(file) ? (
                             <img
                               loading="lazy"
                               alt=""
@@ -504,10 +506,12 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
             },
           }}>
           <Carousel
-            images={images?.map((p) => ({
-              label: p.description,
-              imgPath: pictureUrls[p.uri],
-            }))}
+            images={
+              images?.map((p) => ({
+                label: p.description,
+                imgPath: pictureUrls[p.uri],
+              })) || []
+            }
             onClose={() => setOpenPreview(false)}
             activeStep={activeStep}
             setActiveStep={setActiveStep}

@@ -168,7 +168,8 @@ export const makeRows = (
     [QuotationOrderField.CREATED_DATE]: formatDate(item.meta.createdAt),
     [QuotationOrderField.TOTAL_NET_AMOUNT]: `${formatCurrency(
       item
-        ? item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!
+        ? (item.totalAmount.netAmount ?? 0) /
+            10 ** item.totalAmount.fractionDigits!
         : 0,
       {
         currency: item.totalAmount.currency,

@@ -178,10 +178,10 @@ const PdfUpfrontInvoiceSection = ({
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: articleItems[0].unitAmount.percentageVat,
+            percentageVat: articleItems[0].unitAmount.percentageVat ?? 0,
             vat:
               totalAmountExclVat *
-              (articleItems[0].unitAmount.percentageVat / 100),
+              ((articleItems[0].unitAmount.percentageVat ?? 0) / 100),
           },
         ]
       : getAggregatedPartialPaymentsVats(articleItems, totalAmountExclVat)
@@ -191,7 +191,7 @@ const PdfUpfrontInvoiceSection = ({
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: articleItems![0].unitAmount.percentageVat,
+            percentageVat: articleItems![0].unitAmount.percentageVat ?? 0,
             vat:
               amount *
               centsToMoney(

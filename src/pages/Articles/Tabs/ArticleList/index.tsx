@@ -545,6 +545,7 @@ const ArticleList = () => {
         bottom: 0,
         left: 0,
         right: 0,
+        padding: '24px',
       }}>
       <PageHeaderContainer>
         <Box
@@ -794,8 +795,8 @@ const ArticleList = () => {
           {rows.map((entry, index) => (
             <TableRow
               rowIndex={index}
-              key={`quotation-row-${entry.id}`}
-              testId={`quotation-row-${entry.id}`}>
+              key={`article-row-${entry.id}`}
+              testId={`article-row-${entry.id}`}>
               {COLUMNS.map(({renderCell, ...rest}) =>
                 renderCell(entry, {
                   onClick: handleRowClick(entry.id),

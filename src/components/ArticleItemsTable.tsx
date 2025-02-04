@@ -25,6 +25,8 @@ import {
 import {
   formatCurrency,
   getCurrencySymbol,
+  getDecimalSeparator,
+  getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging';
@@ -546,12 +548,8 @@ export const ArticleItemsTable = ({
                       suffix="%"
                       allowLeadingZeros={false}
                       decimalScale={2}
-                      decimalSeparator={
-                        selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                      }
-                      thousandSeparator={
-                        selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                      }
+                      decimalSeparator={getDecimalSeparator(selectedLng)}
+                      thousandSeparator={getThousandsSeparator(selectedLng)}
                       inputProps={{
                         inputMode: 'numeric',
                         pattern: '[0-9]*',

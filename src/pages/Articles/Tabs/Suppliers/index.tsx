@@ -210,6 +210,7 @@ const Suppliers = () => {
         bottom: 0,
         left: 0,
         right: 0,
+        padding: '24px',
       }}>
       <PageHeaderContainer>
         <SearchInput

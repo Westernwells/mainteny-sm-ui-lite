@@ -295,20 +295,20 @@ const RichTextEditor = ({
           '& .ProseMirror table tbody tr': {
             width: '100%',
           },
-          '& .ProseMirror table tbody tr td:nth-child(1)': {
-            width: '100%',
+          '& .ProseMirror table tbody tr td:nth-of-type(1)': {
+            width: '100px',
             verticalAlign: 'top',
             paddingRight: '1em',
           },
-          '& .ProseMirror table tbody tr td:nth-child(1):has(p:empty), & .ProseMirror table tbody tr td:nth-child(1):has(p br)':
+          '& .ProseMirror table tbody tr td:nth-of-type(1):has(p:empty), & .ProseMirror table tbody tr td:nth-of-type(1):has(p br)':
             {
               width: '0px', // Collapse width for an "empty" first <td>
             },
-          '& .ProseMirror table tbody tr td:nth-child(1):has(p:empty) + td, & .ProseMirror table tbody tr td:nth-child(1):has(p br) + td':
+          '& .ProseMirror table tbody tr td:nth-of-type(1):has(p:empty) + td, & .ProseMirror table tbody tr td:nth-of-type(1):has(p br) + td':
             {
               width: '100%', // Make the second <td> take the full width when the first <td> is "empty"
             },
-          '& .ProseMirror table tbody tr td:nth-child(2)': {
+          '& .ProseMirror table tbody tr td:nth-of-type(2)': {
             width: '93%', // When the first <td> contains meaningful content (like an image)
           },
 

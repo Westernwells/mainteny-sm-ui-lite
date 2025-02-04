@@ -77,7 +77,7 @@ export const OpenQuotations = ({
               <ListItemText>
                 {formatCurrency(
                   quotation
-                    ? quotation.totalAmount.netAmount /
+                    ? (quotation.totalAmount.netAmount ?? 0) /
                         10 ** quotation.totalAmount.fractionDigits!
                     : 0,
                   {

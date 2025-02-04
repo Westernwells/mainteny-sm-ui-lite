@@ -1,7 +1,6 @@
 import {useEffect, useLayoutEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {Grid} from '@mui/material';
-
 import {Progress} from 'components/Progress';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {BasicInformation} from './BasicInformation';

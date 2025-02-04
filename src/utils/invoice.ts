@@ -33,7 +33,7 @@ export const getTotalFromArticles = (
     .map(
       (item) =>
         item.quantity *
-        (item.unitAmount.netAmount /
+        ((item.unitAmount.netAmount ?? 0) /
           10 ** Currencies[item.unitAmount.currency]),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
@@ -46,8 +46,8 @@ export const getTotalWithVatFromArticles = (
       (item) =>
         item.quantity *
         (getAmountFromPercentage(
-          item.unitAmount.percentageVat,
-          item.unitAmount.netAmount,
+          item.unitAmount.percentageVat ?? 0,
+          item.unitAmount.netAmount ?? 0,
         ) /
           10 ** Currencies[item.unitAmount.currency]),
     )

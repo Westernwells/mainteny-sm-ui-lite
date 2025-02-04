@@ -10,7 +10,12 @@ import {
   createMeasurementOptions,
   MeasurementUnit,
 } from 'models/articleForm';
-import {formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {
+  formatCurrency,
+  getCurrencySymbol,
+  getDecimalSeparator,
+  getThousandsSeparator,
+} from 'utils/currency';
 import * as Yup from 'yup';
 import {
   ChangeEvent,
@@ -93,7 +98,7 @@ export const EditArticleForm = ({
       externalId: serviceOrderArticle.article.externalId,
       unit: serviceOrderArticle.article.unit,
       unitSellingAmount:
-        serviceOrderArticle.unitAmount.netAmount /
+        (serviceOrderArticle.unitAmount.netAmount ?? 0) /
         10 ** serviceOrderArticle.unitAmount.fractionDigits!,
       quantity: serviceOrderArticle.quantity,
       type: serviceOrderArticle.article.type,
@@ -361,12 +366,8 @@ export const EditArticleForm = ({
                 suffix="%"
                 allowLeadingZeros={false}
                 decimalScale={2}
-                decimalSeparator={
-                  selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                }
-                thousandSeparator={
-                  selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                }
+                decimalSeparator={getDecimalSeparator(selectedLng)}
+                thousandSeparator={getThousandsSeparator(selectedLng)}
                 sx={{
                   width: '100%',
                   bgcolor: 'white',
@@ -439,12 +440,8 @@ export const EditArticleForm = ({
                 suffix="%"
                 allowLeadingZeros={false}
                 decimalScale={2}
-                decimalSeparator={
-                  selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                }
-                thousandSeparator={
-                  selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                }
+                decimalSeparator={getDecimalSeparator(selectedLng)}
+                thousandSeparator={getThousandsSeparator(selectedLng)}
                 sx={{
                   width: '100%',
                   bgcolor: 'white',

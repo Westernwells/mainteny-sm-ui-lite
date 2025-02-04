@@ -26,7 +26,7 @@ export default class CustomerPage {
     cy.get('div[role="combobox"]').eq(0).click({
       force: true,
     });
-    cy.get('ul > li:nth-child(1)').click();
+    cy.get('ul > li:nth-of-type(1)').click();
     cy.get('div[role="combobox"]').eq(1).click({
       force: true,
     });

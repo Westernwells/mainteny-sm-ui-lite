@@ -18,6 +18,7 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {MinToStep} from 'models/service-company';
+import {getDecimalSeparator, getThousandsSeparator} from 'utils/currency';
 import ReportTimeEntries from './ReportTimeEntries';
 
 interface Props {
@@ -157,12 +158,8 @@ export const Maintenance = ({formik, isEdit}: Props) => {
                     label={t('Surcharge')}
                     allowLeadingZeros={false}
                     decimalScale={2}
-                    decimalSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                    }
-                    thousandSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                    }
+                    decimalSeparator={getDecimalSeparator(selectedLng)}
+                    thousandSeparator={getThousandsSeparator(selectedLng)}
                     sx={{
                       width: 100,
                       '& .MuiInputBase-root': {
@@ -204,12 +201,8 @@ export const Maintenance = ({formik, isEdit}: Props) => {
                     label={t('Surcharge')}
                     allowLeadingZeros={false}
                     decimalScale={2}
-                    decimalSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                    }
-                    thousandSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                    }
+                    decimalSeparator={getDecimalSeparator(selectedLng)}
+                    thousandSeparator={getThousandsSeparator(selectedLng)}
                     sx={{
                       width: 100,
                       '& .MuiInputBase-root': {

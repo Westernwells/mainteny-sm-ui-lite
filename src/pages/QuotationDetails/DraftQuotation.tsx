@@ -112,7 +112,7 @@ const quotationItemToQuotationItemRecord = (
     unitAmount: quotationItem.unitAmount,
     discount: getDiscoutObj(quotationItem.additionalInfo?.discount),
   };
-  return getItemRecord(record, record.unitAmount.percentageVat);
+  return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
 };
 
 const localStorageFormikQuotationDataKey = 'QUOTATION_DATA';

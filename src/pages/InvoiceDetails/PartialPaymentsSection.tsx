@@ -36,6 +36,8 @@ import {
   centsToMoney,
   formatCurrency,
   getCurrencySymbol,
+  getDecimalSeparator,
+  getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
 import {
@@ -242,7 +244,7 @@ export const PartialPaymentsSection = ({
             // Calculate base amount from unit price and quantity
             const baseAmount = centsToMoney(
               item.unitAmount.currency,
-              item.unitAmount.netAmount * item.quantity,
+              (item.unitAmount.netAmount ?? 0) * item.quantity,
             );
 
             // Get discount from either additionalInfo or direct discount field
@@ -295,10 +297,10 @@ export const PartialPaymentsSection = ({
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: formik.values.items[0].unitAmount.percentageVat,
+            percentageVat: formik.values.items[0].unitAmount.percentageVat ?? 0,
             vat:
               totalAmountExclVat *
-              (formik.values.items[0].unitAmount.percentageVat / 100),
+              ((formik.values.items[0].unitAmount.percentageVat ?? 0) / 100),
           },
         ]
       : getAggregatedPartialPaymentsVats(
@@ -312,7 +314,8 @@ export const PartialPaymentsSection = ({
           {
             percentageVat: formik.values.items[0].unitAmount.percentageVat,
             vat:
-              amount * (formik.values.items[0].unitAmount.percentageVat / 100),
+              amount *
+              ((formik.values.items[0].unitAmount.percentageVat ?? 0) / 100),
           },
         ]
       : getAggregatedPartialPaymentsVats(formik.values.items, amount)
@@ -553,10 +556,10 @@ export const PartialPaymentsSection = ({
                           const baseAmount = isEditingCurrentItem
                             ? centsToMoney(
                                 item.unitAmount.currency,
-                                currentItem.unitAmount.netAmount *
+                                (currentItem.unitAmount.netAmount ?? 0) *
                                   item.quantity,
                               )
-                            : item.unitAmount.netAmount * item.quantity;
+                            : (item.unitAmount.netAmount ?? 0) * item.quantity;
 
                           // Get discount parameters based on whether editing current item
                           const discountParams = isEditingCurrentItem
@@ -727,7 +730,7 @@ export const PartialPaymentsSection = ({
                         // Calculate base amount before discounts
                         const baseAmount = centsToMoney(
                           item.unitAmount.currency,
-                          item.unitAmount.netAmount * item.quantity,
+                          (item.unitAmount.netAmount ?? 0) * item.quantity,
                         );
 
                         // Apply discount based on discount type (amount or percentage)
@@ -1264,12 +1267,8 @@ export const PartialPaymentsSection = ({
                       label={t('Amount (excl. VAT)')}
                       allowLeadingZeros={false}
                       decimalScale={2}
-                      decimalSeparator={
-                        selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                      }
-                      thousandSeparator={
-                        selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                      }
+                      decimalSeparator={getDecimalSeparator(selectedLng)}
+                      thousandSeparator={getThousandsSeparator(selectedLng)}
                       size="small"
                       InputProps={{
                         startAdornment: (
@@ -1332,12 +1331,8 @@ export const PartialPaymentsSection = ({
                     label={t('Amount (excl. VAT)')}
                     allowLeadingZeros={false}
                     decimalScale={2}
-                    decimalSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                    }
-                    thousandSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                    }
+                    decimalSeparator={getDecimalSeparator(selectedLng)}
+                    thousandSeparator={getThousandsSeparator(selectedLng)}
                     size="small"
                     InputProps={{
                       startAdornment: (

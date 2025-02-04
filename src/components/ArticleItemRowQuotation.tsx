@@ -34,7 +34,13 @@ import {DiscountType} from 'models/invoice';
 import {MeasurementUnit} from 'models/articleForm';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
-import {Currencies, formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {
+  Currencies,
+  formatCurrency,
+  getDecimalSeparator,
+  getThousandsSeparator,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {fixRounding} from 'utils/utils';
 import {ArticleType, ArticleView} from 'models/article';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
@@ -192,7 +198,7 @@ export const ArticleItemRowQuotation = ({
   });
 
   const price =
-    formik.values.unitAmount.netAmount /
+    (formik.values.unitAmount.netAmount ?? 0) /
     10 ** Currencies[formik.values.unitAmount.currency];
 
   const totalPriceExclVat = price * formik.values.quantity;
@@ -631,12 +637,8 @@ export const ArticleItemRowQuotation = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           sx={{
             '& .MuiOutlinedInput-input': {
@@ -674,12 +676,8 @@ export const ArticleItemRowQuotation = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           onValueChange={(values) => {
             const {floatValue} = values;
@@ -845,12 +843,8 @@ export const ArticleItemRowQuotation = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           sx={{
             width: '100%',
@@ -894,12 +888,8 @@ export const ArticleItemRowQuotation = ({
           customInput={TextField}
           decimalScale={2}
           fixedDecimalScale
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           disabled
           sx={{

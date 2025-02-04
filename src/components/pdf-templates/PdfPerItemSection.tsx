@@ -140,7 +140,8 @@ const PdfPerItemSection = ({
                   }
 
                   // Calculate base amount from unit price and quantity
-                  const baseAmount = item.unitAmount.netAmount * item.quantity;
+                  const baseAmount =
+                    (item.unitAmount.netAmount ?? 0) * item.quantity;
 
                   // Get discount parameters based on discount type
                   const discount = item.additionalInfo?.discount;
@@ -189,7 +190,7 @@ const PdfPerItemSection = ({
                         const aggregatedItem = aggregatedItems[itemId];
                         // Calculate base amount from unit price and quantity
                         const baseAmount =
-                          item.unitAmount.netAmount * item.quantity;
+                          (item.unitAmount.netAmount ?? 0) * item.quantity;
 
                         // Get discount parameters based on discount type
                         const discount = item.additionalInfo?.discount;

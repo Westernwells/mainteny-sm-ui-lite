@@ -55,7 +55,7 @@ export const calculateQuotationTotalWithPerItemDiscount = (
     .map((item: QuotationItemRecord) =>
       applyDiscount({
         actualValue:
-          (item.unitAmount.netAmount /
+          ((item.unitAmount.netAmount ?? 0) /
             10 ** Currencies[item.unitAmount.currency]) *
           item.quantity,
         ...(item.discount?.type === DiscountType.AMOUNT
@@ -87,7 +87,7 @@ export const aggregateQuotationRow = (
     status: quotation.status,
     amount: `${formatCurrency(
       quotation
-        ? quotation.totalAmount.netAmount /
+        ? (quotation.totalAmount.netAmount ?? 0) /
             10 ** quotation.totalAmount.fractionDigits!
         : 0,
       {
