@@ -3094,5 +3094,12 @@
   "Sub-position name": "Naziv podpozicije",
   "Add sub-position": "Dodajte podpoziciju",
   "COLUMN NAME": "NAZIV KOLONE",
-  "Contact deleted successfully": "Kontakt je uspešno izbrisan"
+  "Contact deleted successfully": "Kontakt je uspešno izbrisan",
+  "Mixed position PDF preview": "Mešovita pozicija PDF pregled",
+  "Click to show this section on the invoice. Visible sections will appear in the final document and all exported versions.": "Kliknite da biste prikazali ovaj odeljak na fakturi. Vidljivi delovi će se pojaviti u konačnom dokumentu i svim izvezenim verzijama.",
+  "Mixed Positions": "Mješovite pozicije",
+  "Complete creation of mixed position before adding a new one.": "Završite kreiranje mešovite pozicije pre dodavanja nove.",
+  "Complete creation of mixed position before adding a sub-position.": "Završite kreiranje mešovite pozicije pre dodavanja podpozicije.",
+  "Complete creation of sub-position before adding a new sub-position.": "Završite kreiranje podpozicije pre dodavanja nove podpozicije.",
+  "Show on PDF": "Prikaži u PDF-u"
 }
