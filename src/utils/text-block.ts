@@ -97,7 +97,6 @@ export const cleanHtmlContent = (html: string): string => {
     /<tr(.*?)>(.*?)<\/tr>/gis,
     (match, trAttributes, trContent) => {
       const tdMatches = trContent.match(/<td(.*?)>(.*?)<\/td>/gis) || [];
-      const tdCount = tdMatches.length;
 
       // Process each <td> dynamically
       return `<tr${trAttributes}>${tdMatches
@@ -109,12 +108,10 @@ export const cleanHtmlContent = (html: string): string => {
           const isEmpty = tdContent === '' || tdContent === '<p><br></p>';
           const style =
             index === 1
-              ? tdCount === 2
-                ? 'width: 90%;' // Second <td> when two are present
-                : 'width: 100%;' // Single <td> fills entire width
+              ? 'width: 100%;'
               : isEmpty
               ? 'width: 0px;' // Hide empty first <td>
-              : 'width: 88px; padding-right: 16px;'; // Visible first <td>
+              : 'padding-right: 16px;'; // Visible first <td>
 
           return tdMatch.includes('style=')
             ? tdMatch.replace(/style="(.*?)"/, `style="$1; ${style}"`)

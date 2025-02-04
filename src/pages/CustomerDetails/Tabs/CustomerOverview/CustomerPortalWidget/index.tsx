@@ -32,7 +32,6 @@ import TableHeader from 'components/Table/TableHeader';
 import {aggregateCustomerPortalRow, getStatusLabel} from 'utils/customer-utils';
 import {StatusChip} from 'components/StatusChip';
 import {EmptySection} from 'components/EmptySection';
-import {useNavigate} from 'react-router-dom';
 import {Avatar} from 'components/Avatar';
 import {theme} from 'theme';
 import Actions from './Actions';
@@ -44,7 +43,6 @@ interface Props {
 
 const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
   const {t} = useTranslation();
-  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedContact, setSelectedContact] = useState<ContactsView>();
   const [openFormDialog, setOpenFormDialog] = useState(false);
@@ -131,10 +129,6 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
     }
   };
 
-  const handleEmployeeCellClick = (id: string) => () => {
-    navigate(`/employees/details/${id}`);
-  };
-
   const rows = useMemo(
     () => aggregateCustomerPortalRow(contactsResource.data),
     [contactsResource],
@@ -151,7 +145,7 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
         renderCell: (customerPortal, cellProps) => (
           <Cell
             {...cellProps}
-            onClick={handleEmployeeCellClick(customerPortal.customerId)}>
+            onClick={handleRowClick(customerPortal.contactResourceData)}>
             <Avatar
               labelStyles={{
                 color: isWidgetActive
@@ -250,7 +244,7 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
         ),
       },
     ],
-    [isWidgetActive, showLeftShadow, showRightShadow],
+    [isWidgetActive, showLeftShadow, showRightShadow, handleDeleteContact],
   );
 
   return (
