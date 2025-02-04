@@ -168,7 +168,7 @@ const articleViewToItem = (
     unitAmount: articleView.unitAmount,
     discount: getDiscoutObj(articleView.additionalInfo?.discount),
   };
-  return getItemRecord(record, record.unitAmount.percentageVat);
+  return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
 };
 
 const invoiceItemToInvoiceItemRecord = (
@@ -184,8 +184,8 @@ const invoiceItemToInvoiceItemRecord = (
       invoiceType === InvoiceType.CREDIT_NOTE
         ? {
             ...invoiceItem.unitAmount,
-            grossAmount: -Math.abs(invoiceItem.unitAmount.grossAmount),
-            netAmount: -Math.abs(invoiceItem.unitAmount.netAmount),
+            grossAmount: -Math.abs(invoiceItem.unitAmount.grossAmount ?? 0),
+            netAmount: -Math.abs(invoiceItem.unitAmount.netAmount ?? 0),
           }
         : invoiceItem.unitAmount,
     discount: invoiceItem.additionalInfo?.discount
@@ -209,7 +209,7 @@ const invoiceItemToInvoiceItemRecord = (
       : undefined,
     payment: invoiceItem.additionalInfo?.payment,
   };
-  return getItemRecord(record, record.unitAmount.percentageVat);
+  return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
 };
 
 const localStorageFormikInvoiceDataKey = 'INVOICE_DATA';

@@ -30,7 +30,7 @@ export const calculateTotal = (arr: InvoiceItemRecord[]) => {
     .map(
       (item) =>
         item.quantity *
-        (item.unitAmount.netAmount /
+        ((item.unitAmount.netAmount ?? 0) /
           10 ** Currencies[item.unitAmount.currency]),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
@@ -43,7 +43,7 @@ export const calculateTotalWithPerItemDiscount = (
     ?.map((item: InvoiceItemRecord) =>
       applyDiscount({
         actualValue:
-          (item.unitAmount.netAmount /
+          ((item.unitAmount.netAmount ?? 0) /
             10 ** Currencies[item.unitAmount.currency]) *
           item.quantity,
         ...(item.discount?.type === DiscountType.AMOUNT
@@ -102,7 +102,7 @@ export const calculateOrderArticlesTotal = (arr: ServiceOrderArticleView[]) => {
   return arr
     ?.map(
       (item) =>
-        (item.unitAmount.netAmount * item.quantity) /
+        (item.unitAmount.netAmount ?? 0 * item.quantity) /
         10 ** item.unitAmount.fractionDigits!,
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, sum);
@@ -137,10 +137,11 @@ export const calculateArticleTotalWithVatFormatted = (
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: itemsAfterGlobalDiscount[0].unitAmount.percentageVat,
+            percentageVat:
+              itemsAfterGlobalDiscount[0].unitAmount.percentageVat ?? 0,
             vat:
               subtotalExclVatAfterDiscount *
-              (itemsAfterGlobalDiscount[0].unitAmount.percentageVat /
+              ((itemsAfterGlobalDiscount[0].unitAmount.percentageVat ?? 0) /
                 PERCENTAGE_FACTOR),
           },
         ]
@@ -165,12 +166,12 @@ export const calculateSameVatTotals = (items: InvoiceItemRecord[]) => {
   let totalVAT = new BigNumber(0);
 
   items.forEach((item) => {
-    const unitNetAmount = new BigNumber(item.unitAmount.netAmount)
+    const unitNetAmount = new BigNumber(item.unitAmount.netAmount ?? 0)
       .dividedBy(new BigNumber(10).pow(Currencies[item.unitAmount.currency]))
       .multipliedBy(item.quantity)
       .decimalPlaces(2);
 
-    const vatPercentage = new BigNumber(item.unitAmount.percentageVat);
+    const vatPercentage = new BigNumber(item.unitAmount.percentageVat ?? 0);
 
     const itemTotal = new BigNumber(unitNetAmount)
       .multipliedBy(
@@ -222,7 +223,7 @@ export const convertCentsToActualAmount = (items: InvoiceItemRecord[]) =>
 
 export const applyPerItemDiscount = (items: InvoiceItemRecord[]) =>
   items.map((item) => {
-    const total = new BigNumber(item.unitAmount.netAmount)
+    const total = new BigNumber(item.unitAmount.netAmount ?? 0)
       .multipliedBy(item.quantity)
       .decimalPlaces(2);
 
@@ -305,7 +306,7 @@ export const calculateVAT = (items: (InvoiceItemRecord & {total: number})[]) =>
     const {percentageVat} = item.unitAmount;
 
     const vat = new BigNumber(item.total)
-      .multipliedBy(percentageVat / PERCENTAGE_FACTOR)
+      .multipliedBy((percentageVat ?? 0) / PERCENTAGE_FACTOR)
       .decimalPlaces(2);
 
     const foundPercentageVat = acc.find(
@@ -317,7 +318,7 @@ export const calculateVAT = (items: (InvoiceItemRecord & {total: number})[]) =>
         .plus(vat)
         .toNumber();
     } else {
-      acc.push({percentageVat, vat: vat.toNumber()});
+      acc.push({percentageVat: percentageVat ?? 0, vat: vat.toNumber()});
     }
 
     return acc;

@@ -241,10 +241,10 @@ export const UpfrontPaymentsSection = ({
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: formik.values.items[0].unitAmount.percentageVat,
+            percentageVat: formik.values.items[0].unitAmount.percentageVat ?? 0,
             vat:
               totalAmountExclVat *
-              (formik.values.items[0].unitAmount.percentageVat / 100),
+              ((formik.values.items[0].unitAmount.percentageVat ?? 0) / 100),
           },
         ]
       : getAggregatedPartialPaymentsVats(
@@ -258,7 +258,8 @@ export const UpfrontPaymentsSection = ({
           {
             percentageVat: formik.values.items[0].unitAmount.percentageVat,
             vat:
-              amount * (formik.values.items[0].unitAmount.percentageVat / 100),
+              amount *
+              ((formik.values.items[0].unitAmount.percentageVat ?? 0) / 100),
           },
         ]
       : getAggregatedPartialPaymentsVats(formik.values.items, amount)

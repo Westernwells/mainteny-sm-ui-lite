@@ -15,13 +15,17 @@ import {
   ArticleComment,
   ArticleOrderView,
   ArticleStatistics,
+  ArticleSubAssociationView,
   ArticleView,
   CreateArticleOrderRecord,
   CreateArticleRecord,
+  CreateArticleSubAssociationRecord,
+  CreateMixArticleRecord,
   PropertyOwnerArticleRecord,
   QueryArticleCommentsParams,
   QueryArticleParams,
   UpdateArticleRecord,
+  UpdateArticleSubAssociationBody,
 } from 'models/article';
 import {Comment} from 'models/comment';
 import {Resource, RestError, StringValue, WithOptional} from 'models/misc';
@@ -116,11 +120,13 @@ const createArticle = async (
 
 export const useCreateArticle = (successMsg: string) => {
   const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
   return useMutation((body: CreateArticleRecord) => createArticle(body), {
     onSuccess: () => {
       enqueueSnackbar(successMsg, {
         variant: 'success',
       });
+      queryClient.invalidateQueries(queryKeys.fetchArticles);
     },
     onError: (err) => {
       showError(err);
@@ -176,6 +182,7 @@ export const useUpdateArticle = (successMsg?: string) => {
           });
         }
         queryClient.invalidateQueries(queryKeys.fetchArticleDetail);
+        queryClient.invalidateQueries(queryKeys.fetchArticles);
       },
       onError: (err: any) => {
         showError(err);
@@ -800,6 +807,173 @@ export const useUpdateArticleComment = (onSuccess?: () => void) => {
         onSuccess?.();
       },
       onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+const createArticleMix = async (
+  body: CreateMixArticleRecord,
+): Promise<StringValue> => {
+  const response = await axiosClient.post<StringValue>('/api/articles/mix', {
+    ...body,
+  });
+  return response.data;
+};
+
+export const useCreateArticleMix = (successMsg: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+
+  return useMutation((body: CreateMixArticleRecord) => createArticleMix(body), {
+    onSuccess: () => {
+      enqueueSnackbar(successMsg, {
+        variant: 'success',
+      });
+      queryClient.invalidateQueries(queryKeys.fetchArticles);
+    },
+    onError: (err) => {
+      showError(err);
+    },
+  });
+};
+
+export const fetchArticleSubAssociations = async (articleId: string) => {
+  const response = await axiosClient.get<ArticleSubAssociationView[]>(
+    `/api/articles/${articleId}/subAssociations`,
+  );
+  return response.data;
+};
+
+export const useArticleSubAssociations = (articleId?: string) =>
+  useQuery([qk.fetchArticleSubAssociations, articleId], () =>
+    fetchArticleSubAssociations(articleId!),
+  );
+
+const createArticleSubAssociation = async (
+  articleId: string,
+  body: CreateArticleSubAssociationRecord,
+): Promise<StringValue> => {
+  const response = await axiosClient.post<StringValue>(
+    `/api/articles/${articleId}/subAssociations`,
+    {
+      ...body,
+    },
+  );
+  return response.data;
+};
+
+export const useCreateArticleSubAssociation = (successMsg: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({
+      articleId,
+      body,
+    }: {
+      articleId: string;
+      body: CreateArticleSubAssociationRecord;
+    }) => createArticleSubAssociation(articleId, body),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchArticleSubAssociations);
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+const updateArticleSubAssociation = async (
+  articleId: string,
+  associationId: string,
+  article: UpdateArticleSubAssociationBody,
+  quantity?: number,
+  seqNumber?: number,
+) => {
+  await axiosClient.put<StringValue>(
+    `/api/articles/${articleId}/subAssociations/${associationId}`,
+    {
+      article,
+      quantity,
+      seqNumber,
+    },
+  );
+};
+
+export const useUpdateArticleSubAssociation = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({
+      articleId,
+      associationId,
+      article,
+      quantity,
+      seqNumber,
+    }: {
+      articleId: string;
+      associationId: string;
+      article: UpdateArticleSubAssociationBody;
+      quantity?: number;
+      seqNumber?: number;
+    }) =>
+      updateArticleSubAssociation(
+        articleId,
+        associationId,
+        article,
+        quantity,
+        seqNumber,
+      ),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchArticleSubAssociations);
+      },
+      onError: (err: any) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+const deleteArticleSubAssociation = async (
+  articleId: string,
+  associationId: string,
+) => {
+  await axiosClient.delete<StringValue>(
+    `/api/articles/${articleId}/subAssociations/${associationId}`,
+  );
+};
+
+export const useDeleteArticleSubAssociation = (successMsg?: string) => {
+  const {enqueueSnackbar, showError} = useSnackbar();
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({articleId, associationId}: {articleId: string; associationId: string}) =>
+      deleteArticleSubAssociation(articleId, associationId),
+    {
+      onSuccess: () => {
+        if (successMsg) {
+          enqueueSnackbar(successMsg, {
+            variant: 'success',
+          });
+        }
+        queryClient.invalidateQueries(queryKeys.fetchArticleSubAssociations);
+      },
+      onError: (err: any) => {
         showError(err);
       },
     },

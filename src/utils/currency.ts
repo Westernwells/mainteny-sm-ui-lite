@@ -104,10 +104,10 @@ export function multipleAmount(amount: Amount, quantity: number): Amount {
   return {
     currency: amount.currency,
     fractionDigits: amount.fractionDigits,
-    grossAmount: amount.grossAmount * quantity,
-    netAmount: amount.netAmount * quantity,
+    grossAmount: (amount.grossAmount ?? 0) * quantity,
+    netAmount: (amount.netAmount ?? 0) * quantity,
     percentageVat: amount.percentageVat,
-    vat: amount.vat * quantity,
+    vat: (amount.vat ?? 0) * quantity,
   };
 }
 
@@ -151,7 +151,7 @@ export function currencyFactor(money: {
 export function amountRecordForBackend(amount: AmountRecord): AmountRecord {
   const factor = currencyFactor(amount);
   return {
-    netAmount: Math.round(amount.netAmount * factor),
+    netAmount: Math.round((amount.netAmount ?? 0) * factor),
     currency: amount.currency,
     percentageVat: amount.percentageVat,
   };
@@ -173,9 +173,9 @@ export function makeAmountRecord(
 export function amountForView(amount: Amount): Amount {
   const factor = currencyFactor(amount);
   return {
-    netAmount: amount.netAmount / factor,
-    grossAmount: amount.grossAmount / factor,
-    vat: amount.vat / factor,
+    netAmount: (amount.netAmount ?? 0) / factor,
+    grossAmount: (amount.grossAmount ?? 0) / factor,
+    vat: (amount.vat ?? 0) / factor,
     currency: amount.currency,
     percentageVat: amount.percentageVat,
     fractionDigits: amount.fractionDigits,
@@ -303,3 +303,20 @@ export const convertNumberToAmountNumber = (
   const amountRounded = amount.integerValue(BigNumber.ROUND_DOWN);
   return amountRounded.toNumber();
 };
+
+export const currencyFormatting = (
+  amount: number,
+  currentCurrency: Currency,
+  companyLang?: string,
+) =>
+  formatCurrency(amount / 10 ** currentCurrency.fractionDigits, {
+    currency: currentCurrency.code,
+    currencySymbol: currentCurrency?.symbol,
+    companyLang,
+  });
+
+export const getDecimalSeparator = (selectedLng: string): string =>
+  selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.';
+
+export const getThousandsSeparator = (selectedLng: string): string =>
+  selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ',';

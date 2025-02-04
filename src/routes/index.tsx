@@ -57,6 +57,7 @@ import EditPurchaseInvoice from 'pages/EditPurchaseInvoice';
 import {PageLayout} from 'components/PageLayout';
 import ErrorBoundary from 'components/ErrorBoundary';
 import {UpdateSnackbar} from 'components/UpdateSnackbar';
+import MixedPositions from 'pages/Articles/Tabs/MixedPositions';
 import {ProtectedRoutes} from './ProtectedRoutes';
 import {AuthRoutes} from './AuthRoutes';
 
@@ -611,7 +612,11 @@ export const Router = () => {
                   <Helmet>
                     <title>{`Articles - ${titleTail}`}</title>
                   </Helmet>
-                  <PageLayout pageTitle="Articles & Packages">
+                  <PageLayout
+                    pageTitle="Articles & Packages"
+                    pageScrollable
+                    excludeDefaultSpacing
+                    contentStyles={{p: 0}}>
                     <Articles />
                   </PageLayout>
                 </>
@@ -706,6 +711,22 @@ export const Router = () => {
                     showBackAction
                     pageScrollable>
                     <OrderArticle />
+                  </PageLayout>
+                </>
+              }
+            />
+
+            <Route
+              path="/articles/mixedPositions"
+              element={
+                <>
+                  <Helmet>
+                    <title>{`${t('Mixed Positions')} - ${titleTail}`}</title>
+                  </Helmet>
+                  <PageLayout
+                    backBtnLabel="Mixed Positions"
+                    showBackAction={false}>
+                    <MixedPositions />
                   </PageLayout>
                 </>
               }

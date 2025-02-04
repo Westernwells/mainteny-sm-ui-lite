@@ -119,20 +119,18 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     storageLocation: article.storageLocation,
     type: article.type,
     unit: article.unit,
-    unitPurchaseVat: article.unitPurchaseAmount
-      ? article.unitPurchaseAmount.percentageVat
-      : 0,
+    unitPurchaseVat: article.unitPurchaseAmount?.percentageVat ?? 0,
     unitPurchaseAmount: (article.unitPurchaseAmount
-      ? article.unitPurchaseAmount.netAmount /
+      ? (article.unitPurchaseAmount.netAmount ?? 0) /
         currencyFactor(article.unitPurchaseAmount)
       : 0
     ).toFixed(2),
     unitPurchaseAmountCurrency: article.unitPurchaseAmount
       ? article.unitPurchaseAmount.currency
       : article.unitSellingAmount.currency,
-    unitSellingVat: article.unitSellingAmount.percentageVat,
+    unitSellingVat: article.unitSellingAmount.percentageVat ?? 0,
     unitSellingAmount: (article.unitSellingAmount
-      ? article.unitSellingAmount.netAmount /
+      ? (article.unitSellingAmount.netAmount ?? 0) /
         currencyFactor(article.unitSellingAmount)
       : 0
     ).toFixed(2),
@@ -161,19 +159,19 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     formik.setValues({
       ...formik.values,
       unitPurchaseAmount: (article.unitPurchaseAmount
-        ? article.unitPurchaseAmount.netAmount /
+        ? (article.unitPurchaseAmount.netAmount ?? 0) /
           currencyFactor(article.unitPurchaseAmount)
         : 0
       ).toFixed(2),
       unitSellingAmount: (article.unitSellingAmount
-        ? article.unitSellingAmount.netAmount /
+        ? (article.unitSellingAmount.netAmount ?? 0) /
           currencyFactor(article.unitSellingAmount)
         : 0
       ).toFixed(2),
       costPackage: {
-        laborPercentage: article.additionalInfo.costPackage?.laborPercentage,
+        laborPercentage: article.additionalInfo?.costPackage?.laborPercentage,
         materialPercentage:
-          article.additionalInfo.costPackage?.materialPercentage,
+          article.additionalInfo?.costPackage?.materialPercentage,
       },
       externalId: article.externalId,
     });
@@ -251,7 +249,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       label: t('Selling Price'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
       body: formatCurrency(
-        article.unitSellingAmount.netAmount /
+        (article.unitSellingAmount.netAmount ?? 0) /
           10 ** article.unitSellingAmount.fractionDigits!,
       ),
     },
@@ -271,13 +269,13 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     {
       label: t('Selling VAT'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
-      body: article?.unitSellingAmount.percentageVat.toString().concat('%'),
+      body: article?.unitSellingAmount.percentageVat?.toString().concat('%'),
     },
     {
       label: t('Purchase VAT'),
       icon: <LocalOfferRoundedIcon sx={{color: theme.palette.info.dark}} />,
       body: article.unitPurchaseAmount
-        ? article?.unitPurchaseAmount.percentageVat.toString().concat('%')
+        ? article?.unitPurchaseAmount.percentageVat?.toString().concat('%')
         : 0,
     },
     {

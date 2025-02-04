@@ -14,7 +14,7 @@ import {Button} from 'components/Button';
 import {CompleteServiceOrder, ServiceOrderView} from 'models/service-order';
 import {FormInput} from 'components/form/FormInput';
 import {useCompleteServiceOrder} from 'hooks/reactQuery/useServiceOrder';
-import {removeHtmlTags} from 'utils/utils';
+import {removeHtmlTags} from 'utils/rich-field-string';
 
 interface Props {
   open?: boolean;

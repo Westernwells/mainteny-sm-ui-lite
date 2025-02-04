@@ -9,6 +9,7 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {forwardRef, useContext, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {NumericFormat, NumericFormatProps} from 'react-number-format';
+import {getDecimalSeparator, getThousandsSeparator} from 'utils/currency';
 
 interface Props {
   containerStyles?: {[key: string]: any};
@@ -112,12 +113,8 @@ export const FormInput = forwardRef(
             }}
             getInputRef={ref}
             customInput={TextField}
-            decimalSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-            }
-            thousandSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-            }
+            decimalSeparator={getDecimalSeparator(selectedLng)}
+            thousandSeparator={getThousandsSeparator(selectedLng)}
             size="small"
             sx={fieldProps?.sx}
             {...numericFormatProps}

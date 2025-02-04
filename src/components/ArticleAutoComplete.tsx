@@ -12,7 +12,8 @@ import {
   getCurrencySymbol,
   useCurrentCurrency,
 } from 'utils/currency';
-import {createHighlightedText, removeHtmlTags} from 'utils/utils';
+import {createHighlightedText} from 'utils/utils';
+import {removeHtmlTags} from 'utils/rich-field-string';
 import {FormInput} from './form/FormInput';
 
 interface Props {

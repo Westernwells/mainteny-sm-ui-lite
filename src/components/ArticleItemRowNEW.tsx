@@ -38,6 +38,8 @@ import {
   convertNumberToAmountNumber,
   Currencies,
   formatCurrency,
+  getDecimalSeparator,
+  getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
 import {createHighlightedText, filterArrayBySearchText} from 'utils/utils';
@@ -197,7 +199,7 @@ export const ArticleItemRowNEW = ({
   });
 
   const price =
-    formik.values.unitAmount.netAmount /
+    (formik.values.unitAmount.netAmount ?? 0) /
     10 ** Currencies[formik.values.unitAmount.currency];
 
   const totalPriceExclVat = price * formik.values.quantity;
@@ -649,12 +651,8 @@ export const ArticleItemRowNEW = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           sx={{
             '& .MuiOutlinedInput-input': {
@@ -690,12 +688,8 @@ export const ArticleItemRowNEW = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           onValueChange={(values) => {
             const {floatValue} = values;
@@ -863,12 +857,8 @@ export const ArticleItemRowNEW = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           sx={{
             width: '100%',
@@ -912,12 +902,8 @@ export const ArticleItemRowNEW = ({
           customInput={TextField}
           decimalScale={2}
           fixedDecimalScale
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           disabled
           sx={{

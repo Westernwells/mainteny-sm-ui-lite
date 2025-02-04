@@ -114,8 +114,9 @@ export const getQuotationAggregatedItemsVats = (items: QuotationItemRecord[]) =>
     const {percentageVat} = item.unitAmount;
 
     const vat =
-      (item.unitAmount.netAmount / 10 ** Currencies[item.unitAmount.currency]) *
-      (percentageVat / 100) *
+      ((item.unitAmount.netAmount ?? 0) /
+        10 ** Currencies[item.unitAmount.currency]) *
+      ((percentageVat ?? 0) / 100) *
       item.quantity;
 
     const foundPercentageVat = acc.find(
@@ -125,7 +126,7 @@ export const getQuotationAggregatedItemsVats = (items: QuotationItemRecord[]) =>
     if (foundPercentageVat) {
       foundPercentageVat.vat += vat;
     } else {
-      acc.push({percentageVat, vat});
+      acc.push({percentageVat: percentageVat ?? 0, vat});
     }
 
     return acc;
@@ -144,7 +145,7 @@ export const applyPerItemDiscountOnQuotationItems = (
       unitAmount: {
         ...item.unitAmount,
         netAmount: applyQuotationDiscount({
-          actualValue: item.unitAmount.netAmount,
+          actualValue: item.unitAmount.netAmount ?? 0,
           ...(item.discount?.type === DiscountType.AMOUNT
             ? {
                 amount:
@@ -171,7 +172,7 @@ export const applyGlobalDiscountOnQuotationItems = (
       unitAmount: {
         ...item.unitAmount,
         netAmount: applyQuotationDiscount({
-          actualValue: item.unitAmount.netAmount,
+          actualValue: item.unitAmount.netAmount ?? 0,
           percentage: globalDiscount.percentage,
         }),
       },
@@ -179,7 +180,7 @@ export const applyGlobalDiscountOnQuotationItems = (
   }
 
   const total = arr
-    .map((item) => item.unitAmount.netAmount * item.quantity)
+    .map((item) => (item.unitAmount.netAmount ?? 0) * item.quantity)
     .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
 
   const globalDiscountAmount =
@@ -190,10 +191,12 @@ export const applyGlobalDiscountOnQuotationItems = (
     const portion =
       item.unitAmount.netAmount === total
         ? 1.0
-        : new BigNumber(item.unitAmount.netAmount).dividedBy(total).toNumber();
+        : new BigNumber(item.unitAmount.netAmount ?? 0)
+            .dividedBy(total)
+            .toNumber();
     const discount = new BigNumber(globalDiscountAmount).times(portion);
     const netAfterGlobalDiscount = new BigNumber(
-      item.unitAmount.netAmount,
+      item.unitAmount.netAmount ?? 0,
     ).minus(discount);
     return {
       ...item,

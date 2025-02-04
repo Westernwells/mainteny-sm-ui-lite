@@ -169,11 +169,11 @@ export const applyDiscount = ({
 
 export const getAggregatedItemsVats = (items: InvoiceItemRecord[]) =>
   items.reduce((acc, item) => {
-    const {percentageVat} = item.unitAmount;
+    const percentageVat = item.unitAmount.percentageVat ?? 0;
 
-    const vat = new BigNumber(item.unitAmount.netAmount)
+    const vat = new BigNumber(item.unitAmount.netAmount ?? 0)
       .dividedBy(new BigNumber(10).pow(Currencies[item.unitAmount.currency]!))
-      .multipliedBy(new BigNumber(percentageVat).dividedBy(100))
+      .multipliedBy(new BigNumber(percentageVat ?? 0).dividedBy(100))
       .multipliedBy(item.quantity)
       .decimalPlaces(2);
 
@@ -186,7 +186,7 @@ export const getAggregatedItemsVats = (items: InvoiceItemRecord[]) =>
         .plus(vat)
         .toNumber();
     } else {
-      acc.push({percentageVat, vat: vat.toNumber()});
+      acc.push({percentageVat: percentageVat ?? 0, vat: vat.toNumber()});
     }
 
     return acc;
@@ -203,7 +203,7 @@ export const applyPerItemDiscountOnItems = (arr: InvoiceItemRecord[]) =>
       unitAmount: {
         ...item.unitAmount,
         netAmount: applyDiscount({
-          actualValue: item.unitAmount.netAmount,
+          actualValue: item.unitAmount.netAmount ?? 0,
           ...(item.discount?.type === DiscountType.AMOUNT
             ? {
                 amount:
@@ -230,7 +230,7 @@ export const applyGlobalDiscountOnItems = (
       unitAmount: {
         ...item.unitAmount,
         netAmount: applyDiscount({
-          actualValue: item.unitAmount.netAmount,
+          actualValue: item.unitAmount.netAmount ?? 0,
           percentage: globalDiscount.percentage,
         }),
       },
@@ -238,7 +238,7 @@ export const applyGlobalDiscountOnItems = (
   }
 
   const total = arr
-    .map((item) => item.unitAmount.netAmount * item.quantity)
+    .map((item) => (item.unitAmount.netAmount ?? 0) * item.quantity)
     .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
 
   const globalDiscountAmount =
@@ -249,10 +249,12 @@ export const applyGlobalDiscountOnItems = (
     const portion =
       item.unitAmount.netAmount === total
         ? 1.0
-        : new BigNumber(item.unitAmount.netAmount).dividedBy(total).toNumber();
+        : new BigNumber(item.unitAmount.netAmount ?? 0)
+            .dividedBy(total)
+            .toNumber();
     const discount = new BigNumber(globalDiscountAmount).times(portion);
     const netAfterGlobalDiscount = new BigNumber(
-      item.unitAmount.netAmount,
+      item.unitAmount.netAmount ?? 0,
     ).minus(discount);
     return {
       ...item,
@@ -265,7 +267,7 @@ export const applyGlobalDiscountOnItems = (
 };
 
 const getDiscountedAmount = (item: InvoiceItemRecord) => {
-  const baseAmount = item.unitAmount.netAmount * item.quantity;
+  const baseAmount = (item.unitAmount.netAmount ?? 0) * item.quantity;
   const discount = item.additionalInfo?.discount || item.discount;
   const discountParams =
     discount?.type === DiscountType.AMOUNT
@@ -284,14 +286,14 @@ export const getAggregatedPartialPaymentsVats = (
     const {percentageVat} = item.unitAmount;
     const discountedAmount = getDiscountedAmount(item);
     const portion = discountedAmount === total ? 1 : discountedAmount / total;
-    const vat = totalAmountExclVat * (percentageVat / 100) * portion;
+    const vat = totalAmountExclVat * ((percentageVat ?? 0) / 100) * portion;
 
     const existing = acc.find((i) => i.percentageVat === percentageVat);
     if (existing) {
       existing.vat += vat;
       return acc;
     }
-    return [...acc, {percentageVat, vat}];
+    return [...acc, {percentageVat: percentageVat ?? 0, vat}];
   }, [] as {percentageVat: number; vat: number}[]);
 };
 
@@ -313,7 +315,7 @@ export const articleViewToInvoiceItemRecord = (
       ...unitAmountAddtionalValues,
     },
   };
-  return getItemRecord(record, record.unitAmount.percentageVat);
+  return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
 };
 
 export const invoiceItemToInvoiceItemRecord = (
@@ -329,8 +331,8 @@ export const invoiceItemToInvoiceItemRecord = (
       invoiceType === InvoiceType.CREDIT_NOTE
         ? {
             ...invoiceItem.unitAmount,
-            grossAmount: -Math.abs(invoiceItem.unitAmount.grossAmount),
-            netAmount: -Math.abs(invoiceItem.unitAmount.netAmount),
+            grossAmount: -Math.abs(invoiceItem.unitAmount.grossAmount ?? 0),
+            netAmount: -Math.abs(invoiceItem.unitAmount.netAmount ?? 0),
           }
         : invoiceItem.unitAmount,
     discount: invoiceItem.additionalInfo?.discount
@@ -354,7 +356,7 @@ export const invoiceItemToInvoiceItemRecord = (
       : undefined,
     payment: invoiceItem.additionalInfo?.payment,
   };
-  return getItemRecord(record, record.unitAmount.percentageVat);
+  return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
 };
 
 export const formatInvoiceViewToUpdateInvoice = (

@@ -149,7 +149,7 @@ export const OldContractData: FC<Props> = ({contractDetails, isLoading}) => {
       type: contractDetails?.type!,
       name: contractDetails?.name!,
       price: contractDetails?.additionalInfo?.price
-        ? amountForView(contractDetails?.additionalInfo?.price).netAmount
+        ? amountForView(contractDetails?.additionalInfo?.price).netAmount ?? 0
         : '',
       invoiceCycle: contractDetails?.additionalInfo?.invoiceCycle!,
       renewalTerms: contractDetails?.additionalInfo?.renewalTerms || '',

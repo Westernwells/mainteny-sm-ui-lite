@@ -187,7 +187,7 @@ const JobOverviewPdfTemplate = React.memo(
 
       return (
         (grossTotal - discountValue) /
-        10 ** articleItem.unitAmount.fractionDigits
+        10 ** (articleItem.unitAmount.fractionDigits ?? 2)
       );
     };
 
@@ -542,7 +542,8 @@ const JobOverviewPdfTemplate = React.memo(
                             {formatCurrency(
                               (articleOrderItem.unitAmount?.netAmount ?? 0) /
                                 10 **
-                                  articleOrderItem.unitAmount.fractionDigits,
+                                  (articleOrderItem.unitAmount.fractionDigits ??
+                                    2),
                               {
                                 currency: currentCurrency?.code,
                                 excludeCurrencySymbol: true,

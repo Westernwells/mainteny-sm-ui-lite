@@ -63,3 +63,13 @@ export const generateSignatureHtml = (
 </table>
 `;
 };
+
+export function removeHtmlTags(str: string) {
+  // Handle <p> tags with non-breaking space
+  str = str.replace(/<p[^>]*>&nbsp;<\/p>/gi, '');
+
+  str = str.replace(/&nbsp;/gi, '');
+
+  // Remove all other HTML tags
+  return str.replace(/<\/?[^>]+(>|$)/g, '');
+}

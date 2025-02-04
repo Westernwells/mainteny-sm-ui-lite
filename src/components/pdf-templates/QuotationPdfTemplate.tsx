@@ -587,8 +587,9 @@ const QuotationPdfTemplate = React.memo(
                             }}>
                             {formatCurrency(
                               (articleItem?.unitAmount?.netAmount ?? 0) /
-                                10 ** articleItem.unitAmount.fractionDigits ||
-                                0,
+                                10 **
+                                  (articleItem.unitAmount.fractionDigits ??
+                                    2) || 0,
                               {
                                 currency: currentCurrency?.code,
                                 excludeCurrencySymbol: true,

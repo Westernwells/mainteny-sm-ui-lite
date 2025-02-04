@@ -8,6 +8,7 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {CompanyStatus} from './company';
 import {Page} from './pagination';
 import {VersionType} from './versions';
+import {VatAmount} from './invoice';
 
 export interface RestError {
   errorCode: number;
@@ -195,17 +196,28 @@ export interface Price {
 
 export interface Amount {
   currency: string;
-  fractionDigits: number;
-  grossAmount: number;
-  netAmount: number;
-  percentageVat: number;
-  vat: number;
+  fractionDigits?: number;
+  grossAmount?: number;
+  netAmount?: number;
+  percentageVat?: number;
+  vat?: number;
 }
 
+export interface MultiVatsAmount extends Amount {
+  vatId?: string;
+  vatName?: string;
+  vats: VatAmount[];
+  vatInfos?: VatInfo[];
+}
+
+export interface VatInfo {
+  vatId?: string;
+  vatName?: string;
+}
 export interface AmountRecord {
   currency: string;
-  netAmount: number;
-  percentageVat: number;
+  netAmount?: number;
+  percentageVat?: number;
   vatId?: string;
   vatName?: string;
 }

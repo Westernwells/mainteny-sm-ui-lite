@@ -10,6 +10,7 @@ import {ServiceOrderArticleView} from 'models/service-order';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
 import DOMPurify from 'dompurify';
+import {getDecimalSeparator, getThousandsSeparator} from 'utils/currency';
 import RichTextField from '../../../../components/RichTextField';
 
 interface Props<T> {
@@ -97,12 +98,8 @@ export const ArticleItemRow = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           inputProps={{
             inputMode: 'numeric',
             pattern: '[0-9]*',

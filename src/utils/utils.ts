@@ -565,10 +565,6 @@ export const fileListToFiles = (fileList: FileList | null) => {
   return files;
 };
 
-export function removeHtmlTags(str: string) {
-  return str.replace(/<\/?[^>]+(>|$)/g, '');
-}
-
 export const removePx = (size?: string) => {
   if (!size) return size;
 

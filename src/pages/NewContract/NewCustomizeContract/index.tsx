@@ -1,7 +1,11 @@
 import {useContext} from 'react';
 import {Box, Grid, TextField, Typography} from '@mui/material';
 import {Switch} from 'components/Switch';
-import {useCurrentCurrency} from 'utils/currency';
+import {
+  getDecimalSeparator,
+  getThousandsSeparator,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {useTranslation} from 'react-i18next';
 import {ReactComponent as BusinessContractApproveIcon} from 'assets/icons/ContractApproveIcon.svg';
 import {theme} from 'theme';
@@ -75,12 +79,8 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
               customInput={TextField}
               allowLeadingZeros={false}
               decimalScale={0}
-              decimalSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-              }
-              thousandSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-              }
+              decimalSeparator={getDecimalSeparator(selectedLng)}
+              thousandSeparator={getThousandsSeparator(selectedLng)}
               sx={{
                 width: '100%',
                 bgcolor: 'white',
@@ -141,12 +141,8 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
             customInput={TextField}
             allowLeadingZeros={false}
             decimalScale={0}
-            decimalSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-            }
-            thousandSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-            }
+            decimalSeparator={getDecimalSeparator(selectedLng)}
+            thousandSeparator={getThousandsSeparator(selectedLng)}
             sx={{
               width: '100%',
               bgcolor: 'white',
@@ -205,12 +201,8 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
             prefix={currentCurrency.symbol}
             allowLeadingZeros={false}
             decimalScale={2}
-            decimalSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-            }
-            thousandSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-            }
+            decimalSeparator={getDecimalSeparator(selectedLng)}
+            thousandSeparator={getThousandsSeparator(selectedLng)}
             sx={{
               width: '100%',
               bgcolor: 'white',
@@ -275,12 +267,8 @@ const NewCustomizeContract = ({formik, formikContractComponents}: Props) => {
             suffix="%"
             allowLeadingZeros={false}
             decimalScale={2}
-            decimalSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-            }
-            thousandSeparator={
-              selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-            }
+            decimalSeparator={getDecimalSeparator(selectedLng)}
+            thousandSeparator={getThousandsSeparator(selectedLng)}
             sx={{
               width: '100%',
               '& .MuiInputBase-root': {

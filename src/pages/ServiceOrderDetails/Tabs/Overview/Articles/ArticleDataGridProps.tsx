@@ -18,12 +18,12 @@ export const makeRows = (
     description: item.description,
     unit: item.article?.unit || '-',
     total: formatCurrency(
-      (item.unitAmount.netAmount * item.quantity) /
+      ((item.unitAmount.netAmount ?? 0) * item.quantity) /
         10 ** item.unitAmount.fractionDigits!,
       {currency: item.unitAmount.currency},
     ),
     unitPrice: formatCurrency(
-      item.unitAmount.netAmount / 10 ** item.unitAmount.fractionDigits!,
+      (item.unitAmount.netAmount ?? 0) / 10 ** item.unitAmount.fractionDigits!,
       {currency: item.unitAmount.currency},
     ),
     quantity: item.quantity,
