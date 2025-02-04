@@ -27,6 +27,7 @@ interface Props {
   shouldTranslate?: boolean;
   iconTooltip?: string;
   hasMaxWidth?: boolean;
+  testId?: string;
 }
 
 export const CardProps = ({
@@ -47,6 +48,7 @@ export const CardProps = ({
   iconTooltip,
   shouldTranslate = true,
   hasMaxWidth = true,
+  testId,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -106,6 +108,7 @@ export const CardProps = ({
 
   return (
     <Box
+      data-testid={`${testId}_container`}
       display="flex"
       alignItems={bodyText ? 'flex-start' : 'center'}
       sx={{...containerStyles}}
@@ -123,6 +126,7 @@ export const CardProps = ({
         </Typography>
 
         <Box
+          data-testid={testId}
           sx={{
             display: 'flex',
             flexWrap: 'nowrap',

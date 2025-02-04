@@ -34,4 +34,14 @@ describe('Edit Unit', () => {
         cy.get('#alert-dialog-title').click();
         cy.contains('button', 'Save').should('not.be.disabled');
     });
+
+    it('update spending limit', () => {
+        UnitsPage.navigateToDetailsPage();
+        UnitsPage.openDialog();
+        cy.get('div[data-testid="unit_spending_limit_input_field"]').click().clear().type('1000');
+        cy.get('#alert-dialog-title').click();
+        cy.contains('button', 'Save').click();
+
+        cy.get('div[data-testid="unit_spending_limit"]').should('contain', '1000');
+    });
 });
