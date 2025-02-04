@@ -135,7 +135,7 @@ const FinalInvoicePdfTemplate = ({
 
     return (
       (grossTotal - itemDiscountValue) /
-        10 ** articleItem.unitAmount.fractionDigits || 2
+      10 ** (articleItem.unitAmount.fractionDigits || 2)
     );
   };
 

@@ -296,7 +296,7 @@ const RichTextEditor = ({
             width: '100%',
           },
           '& .ProseMirror table tbody tr td:nth-child(1)': {
-            width: '100px',
+            width: '100%',
             verticalAlign: 'top',
             paddingRight: '1em',
           },

@@ -1852,7 +1852,7 @@ export const InvoiceForm = ({
                           ? `${getUserFullName(
                               serviceOrder.schedules.filter(
                                 (item) => !!item.technician,
-                              )[0].technician?.userAccount,
+                              )?.[0]?.technician?.userAccount,
                             )}`
                           : '-'}
                       </Typography>

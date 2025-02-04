@@ -44,14 +44,18 @@ export const generateSignatureHtml = (
         <!--<![endif]-->
       `
       : '';
+
   return `
 <table style="border-collapse: separate; width: 100%; table-layout: fixed;border-spacing: 0 50px">
   <tr>
-    <td style="width: ${
-      imageHtml ? '88px' : '0px'
-    };vertical-align: top;padding-right:${imageHtml ? '16px' : '0px'}">
-      ${imageHtml}
-    </td>
+    ${
+      imageHtml
+        ? `
+        <td style="width: 88px;vertical-align: top;padding-right:16px">
+          ${imageHtml}
+        </td>`
+        : ''
+    }
     <td class="html-content" style="vertical-align: top; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #000;">
       ${value.content.html}
     </td>
