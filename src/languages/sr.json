@@ -3077,7 +3077,7 @@
   "New feature available!": "Dostupna nova funkcija!",
   "We are expanding our feature set with long awaited and requested Mixed Positions. This feature will help you to streamline accounting and diversify your offering.": "Proširujemo naš skup funkcija sa dugo očekivanim i traženim mešovitim pozicijama. Ova funkcija će vam pomoći da pojednostavite računovodstvo i diversifikujete svoju ponudu.",
   "Coming soon to Quotations and Invoices.": "Uskoro u Ponudama i fakturama.",
-  "Price (net)": "Cena (neto)",
+  "Price (Net)": "Cena (neto)",
   "New Mixed Position": "Nova mešovita pozicija",
   "Margin": "Margina",
   "Unit price": "Jedinična cena",
@@ -3101,5 +3101,13 @@
   "Complete creation of mixed position before adding a new one.": "Završite kreiranje mešovite pozicije pre dodavanja nove.",
   "Complete creation of mixed position before adding a sub-position.": "Završite kreiranje mešovite pozicije pre dodavanja podpozicije.",
   "Complete creation of sub-position before adding a new sub-position.": "Završite kreiranje podpozicije pre dodavanja nove podpozicije.",
-  "Show on PDF": "Prikaži u PDF-u"
+  "Show on PDF": "Prikaži u PDF-u",
+  "Navigate": "Navigacija",
+  "Dismiss": "Odbaci",
+  "esc": "esc",
+  "Complete creation of sub-position before adding a new mixed position.": "Završite kreiranje podpozicije pre dodavanja nove mešovite pozicije.",
+  "Invoice has been restored": "Faktura je vraćena",
+  "Article deleted successfully": "Članak je uspešno izbrisan",
+  "Mixed Position created successfully": "Mešovita pozicija je uspešno napravljena",
+  "Sub-position created successfully": "Podpozicija je uspešno kreirana"
 }

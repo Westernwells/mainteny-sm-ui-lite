@@ -3056,7 +3056,7 @@
   "New feature available!": "Neue Funktion verfügbar!",
   "We are expanding our feature set with long awaited and requested Mixed Positions. This feature will help you to streamline accounting and diversify your offering.": "Wir erweitern unser Funktionsangebot um die lang erwarteten und oft angefragten Mischpositionen. Diese Funktion hilft Ihnen, die Kalkulation zu optimieren und Ihr Angebot zu diversifizieren.",
   "Coming soon to Quotations and Invoices.": "Bald verfügbar für Angebote und Rechnungen.",
-  "Price (net)": "Preis (netto)",
+  "Price (Net)": "Preis (netto)",
   "New Mixed Position": "Neue Mischposition",
   "Margin": "Marge",
   "Unit price": "Einzelpreis",
@@ -3080,5 +3080,14 @@
   "Complete creation of mixed position before adding a new one.": "Vervollständigen Sie die Erstellung der Mischposition, bevor Sie eine neue hinzufügen.",
   "Complete creation of mixed position before adding a sub-position.": "Vervollständigen Sie die Erstellung der Mischposition, bevor Sie eine Unterposition hinzufügen.",
   "Complete creation of sub-position before adding a new sub-position.": "Vervollständigen Sie die Erstellung der Unterposition, bevor Sie eine neue Unterposition hinzufügen.",
-  "Show on PDF": "Auf PDF anzeigen"
+  "Show on PDF": "Auf PDF anzeigen",
+  "Navigate": "Navigieren",
+  "Dismiss": "Schließen",
+  "esc": "esc",
+  "Complete creation of sub-position before adding a new mixed position.": "Vervollständigen Sie die Erstellung der Unterposition, bevor Sie eine neue Mischposition hinzufügen.",
+  "Invoice has been restored": "Rechnung wurde wiederhergestellt",
+  "Article deleted successfully": "Artikel erfolgreich gelöscht",
+  "Mixed Position created successfully": "Mischposition erfolgreich erstellt",
+  "Sub-position created successfully": "Unterposition erfolgreich erstellt",
+  "Qty": "Menge"
 }
