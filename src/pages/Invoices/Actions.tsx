@@ -93,6 +93,7 @@ import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature, EmployeesView} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {ClientReportForPDFConfig} from 'models/client-storage';
+import {CANCEL_ACTION} from 'models/status';
 
 interface Props {
   invoice: InvoiceView;
@@ -247,7 +248,14 @@ export const Actions = ({
   const {mutateAsync: uploadFiles} = useUploadFiles('');
   const {mutateAsync: updateInvoiceAsync} = useUpdateInvoice();
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
-  const {mutateAsync: cancelInvoice} = useCancelInvoice();
+  const {mutateAsync: cancelInvoice} = useCancelInvoice({
+    disableNavigate: true,
+    action: CANCEL_ACTION.CANCEL,
+  });
+  const {mutateAsync: undoCancelInvoice} = useCancelInvoice({
+    disableNavigate: true,
+    action: CANCEL_ACTION.UNCANCEL,
+  });
   const {mutateAsync: printInvoice} = usePrintInvoice({shouldNavigate: false});
   const {mutateAsync: sendInvoice} = useSendInvoice({
     shouldNavigate: true,
@@ -1040,6 +1048,15 @@ export const Actions = ({
     },
     onCancel: () => {
       setIsCancelledDialogOpen(true);
+    },
+    onUndoCancel: () => {
+      undoCancelInvoice(invoice.id, {
+        onSuccess: () => {
+          enqueueSnackbar(t('Invoice has been restored'), {
+            variant: 'success',
+          });
+        },
+      });
     },
     onResend: handleOpenSendInvoiceModal,
     onPayment: handleOpenPaymentDialog,
