@@ -267,7 +267,9 @@ const Contacts = () => {
         isFirst: true,
         fieldName: ServiceCompanyContactPersonOrderField.NAME,
         getExportValue: (contact) =>
-          `${contact.userAccount.firstName} ${contact.userAccount.lastName}`,
+          contact.userAccount.firstName
+            ? contact.userAccount.lastName
+            : `${contact.userAccount.firstName} ${contact.userAccount.lastName}`,
         showShadows: showRightShadow ? 'right' : undefined,
         renderCell: (contact, cellProps) => (
           <Cell {...cellProps}>
@@ -277,8 +279,12 @@ const Contacts = () => {
               }}
               key={`contact-user-avatar-${contact.id}`}
               userAccount={{
-                firstName: contact.userAccount.firstName,
-                lastName: contact.userAccount.lastName,
+                firstName: contact.userAccount.firstName
+                  ? contact.userAccount.firstName
+                  : contact.userAccount.lastName,
+                lastName: contact.userAccount.firstName
+                  ? contact.userAccount.lastName
+                  : undefined,
               }}
             />
           </Cell>
