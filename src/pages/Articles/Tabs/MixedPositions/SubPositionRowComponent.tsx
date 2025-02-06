@@ -61,6 +61,7 @@ import {
 import {useTheme} from '@mui/material/styles';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {removeHtmlTags} from 'utils/rich-field-string';
+import {ACTION_CELL_WIDTH} from 'models/table';
 import {DeleteEventState, getIconByType} from '.';
 import {Actions} from './Actions';
 
@@ -110,6 +111,8 @@ type Props = {
   refetchArticles: <TPageData>(
     options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
   ) => Promise<QueryObserverResult<Resource<ArticleView>, RestError>>;
+  showRightShadow?: boolean;
+  showLeftShadow?: boolean;
 };
 
 const SubPositionRowComponent = ({
@@ -127,6 +130,8 @@ const SubPositionRowComponent = ({
   handlePreview,
   setDeleteEventState,
   refetchArticles,
+  showRightShadow,
+  showLeftShadow,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -140,7 +145,7 @@ const SubPositionRowComponent = ({
   const {data: taxRates} = useVats();
 
   const {mutateAsync: createArticleSubPosition} =
-    useCreateArticleSubAssociation('Sub-Position created successfully');
+    useCreateArticleSubAssociation('Sub-position created successfully');
 
   const {mutateAsync: updateArticleSubPosition, isLoading: isUpdating} =
     useUpdateArticleSubAssociation('');
@@ -540,7 +545,10 @@ const SubPositionRowComponent = ({
         noPadding
         onDoubleClick={() =>
           handleSubPositionEditStart(subPosition, 'externalId')
-        }>
+        }
+        showShadows={showRightShadow ? 'right' : undefined}
+        isFirst
+        sx={{background: '#f7f9fc'}}>
         {subPositionEditState.field === 'externalId' &&
         subPositionEditState.id === subPosition.id ? (
           <FormInput
@@ -1081,9 +1089,7 @@ const SubPositionRowComponent = ({
         ) : (
           // Show VAT from mixedPosition (not from subPosition)
           <Typography sx={{paddingRight: '12px'}} variant="body2">
-            {row.data?.unitSellingAmount?.percentageVat
-              ? `${row.data?.unitSellingAmount.percentageVat}%`
-              : '-'}
+            {`${row.data.unitSellingAmount?.percentageVat}%`}
           </Typography>
         )}
       </TableCell>
@@ -1149,7 +1155,13 @@ const SubPositionRowComponent = ({
         </Typography>
       </TableCell>
 
-      <TableCell noPadding align="right" sx={{paddingRight: '0.85em'}}>
+      <TableCell
+        noPadding
+        align="right"
+        isLast
+        width={ACTION_CELL_WIDTH}
+        showShadows={showLeftShadow ? 'left' : undefined}
+        sx={{background: '#f7f9fc'}}>
         <Actions
           onPreview={() => handlePreview(row.data.id)}
           onDelete={() => {

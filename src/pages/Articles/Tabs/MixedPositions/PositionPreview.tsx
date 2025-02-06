@@ -75,7 +75,6 @@ const PositionPreview = ({
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const currentCurrency = useCurrentCurrency();
   const [zoomLevel, setZoomLevel] = useState(100);
-
   const handleZoomIn = () =>
     setZoomLevel((prev) => Math.min(prev + ZOOM_LIMITS.step, ZOOM_LIMITS.max));
   const handleZoomOut = () =>
@@ -120,7 +119,7 @@ const PositionPreview = ({
           </TableCell>
           <TableCell sx={defaultCellStyles}>
             <Typography
-              sx={bodyStyles}
+              sx={{...bodyStyles}}
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(mixedPosition?.data.name || ''),
               }}
@@ -165,7 +164,12 @@ const PositionPreview = ({
           <TableCell colSpan={1} sx={defaultCellStyles} />
           <TableCell colSpan={5} sx={defaultCellStyles}>
             <Typography
-              sx={{...bodyStyles, width: '100%'}}
+              sx={{
+                width: '100%',
+                color: '#212121',
+                lineHeight: '12.6px',
+                letterSpacing: '-0.15px',
+              }}
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(
                   mixedPosition?.data.description || '',
@@ -234,7 +238,12 @@ const PositionPreview = ({
             <TableCell colSpan={1} sx={defaultCellStyles} />
             <TableCell colSpan={5} sx={defaultCellStyles}>
               <Typography
-                sx={{...bodyStyles, width: '100%'}}
+                sx={{
+                  color: '#212121',
+                  lineHeight: '12.6px',
+                  letterSpacing: '-0.15px',
+                  width: '100%',
+                }}
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(
                     subPosition.article.description || '',
