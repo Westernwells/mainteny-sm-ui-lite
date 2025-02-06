@@ -99,6 +99,10 @@ export const getInvoiceActivityTitle = (
       return 'Overdue notice sent';
     case InvoiceActivityType.CANCELLED:
       return 'Invoice cancelled';
+    case InvoiceActivityType.UNCANCELLED:
+      return t('Invoice restored by {{name}}', {
+        name: `${activity?.meta.creator?.firstName} ${activity?.meta.creator?.lastName}`,
+      });
     case InvoiceActivityType.PAID:
       return 'Invoice paid';
     case InvoiceActivityType.EXPIRED:
