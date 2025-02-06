@@ -324,6 +324,14 @@ export const NewArticleAutoComplete = ({
           minOrderQuantity: 1,
           minStock: 1,
         },
+        description: '',
+        model: '',
+        category: '',
+        subCategory: '',
+        manufacturer: '',
+        unit: '',
+        storageLocation: '',
+        contractName: '',
       };
 
       if (typeof articleBody === 'string') {

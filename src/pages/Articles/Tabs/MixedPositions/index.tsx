@@ -134,6 +134,9 @@ const MixedPositions = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textInput = useRef<HTMLInputElement>(null);
 
+  const [showLeftShadow, setShowLeftShadow] = useState(false);
+  const [showRightShadow, setShowRightShadow] = useState(false);
+
   const [page, setPage] = useQueryState('page', {
     defaultValue: makePage(0, pageSize),
   });
@@ -178,6 +181,22 @@ const MixedPositions = () => {
     name: 'description',
   });
 
+  const filters: QueryArticleParams = {
+    pageIndex: page.pageIndex,
+    pageSize: page.pageSize,
+    order: Order.DESC,
+    orderByField: ArticleOrderField.CREATED_DATE,
+    type: [ArticleType.MIX],
+    query: search,
+  };
+
+  const {
+    data: articleResource = createEmptyResource<ArticleView>(pageSize),
+    isLoading,
+    isFetched,
+    refetch: refetchArticles,
+  } = useArticles(filters, {keepPreviousData: true}, true);
+
   const resetAndUpdateSubRows = async (parentId: string) => {
     setSubPositionEditState({id: null, field: null, values: {}});
     const subAssociations = await fetchArticleSubAssociations(parentId);
@@ -193,25 +212,35 @@ const MixedPositions = () => {
   const handleDelete = async () => {
     const {event} = deleteEventState;
 
-    if (event?.type === 'sub' && event?.articleId) {
+    if (event?.type === 'sub') {
       const parentId = Object.keys(subRows).find((key) =>
-        subRows[key]?.some((sub) => sub.id === event.id),
+        subRows[key]?.some((sub) => {
+          if (sub.id === event?.id) {
+            return true;
+          }
+          return false;
+        }),
       );
+
       try {
         await deleteArticleSubPosition({
-          articleId: event.articleId,
+          articleId: parentId!,
           associationId: event.id,
         });
 
         resetAndUpdateSubRows(parentId!);
       } catch (error) {
         showError(error);
+      } finally {
+        refetchArticles();
       }
     } else if (event?.type === 'mixed') {
       try {
         await deleteArticle({articleId: event.id});
       } catch (error) {
         showError(error);
+      } finally {
+        refetchArticles();
       }
     }
 
@@ -232,15 +261,6 @@ const MixedPositions = () => {
     handleInputChange(event.target.value);
   };
 
-  const filters: QueryArticleParams = {
-    pageIndex: page.pageIndex,
-    pageSize: page.pageSize,
-    order: Order.DESC,
-    orderByField: ArticleOrderField.CREATED_DATE,
-    type: [ArticleType.MIX],
-    query: search,
-  };
-
   const handlePageIndexChange = (value: number) => {
     setPage({...page, pageIndex: value});
     containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
@@ -250,13 +270,6 @@ const MixedPositions = () => {
     setPage({...page, pageSize: value, pageIndex: 0});
     containerRef?.current?.scrollTo({top: 0, behavior: 'smooth'});
   };
-
-  const {
-    data: articleResource = createEmptyResource<ArticleView>(pageSize),
-    isLoading,
-    isFetched,
-    refetch: refetchArticles,
-  } = useArticles(filters, {keepPreviousData: true}, true);
 
   const rows = useMemo(() => [...localRows], [localRows]);
 
@@ -269,7 +282,7 @@ const MixedPositions = () => {
 
     // when the user does not have filters applied and there are no entries for the table
     if (articleResource.total === 0) {
-      return {emptyTable: true, noMatchingData: false};
+      return {emptyTable: true, noMatchingData: true};
     }
 
     return {emptyTable: false, noMatchingData: false};
@@ -415,6 +428,7 @@ const MixedPositions = () => {
   };
 
   const handleNewMixedPosition = async () => {
+    setSearch('');
     const refetchData = await refetchCompanyNumber();
     const nextCompanyExternalId = refetchData.data?.value || '';
 
@@ -425,7 +439,7 @@ const MixedPositions = () => {
     );
 
     const hasSubId = Object.values(subRows).some((subPositionArray) =>
-      subPositionArray.some((row) => row.id.includes('sub')),
+      subPositionArray?.some((row) => row.id.includes('sub')),
     );
 
     if (hasSubId) {
@@ -740,6 +754,7 @@ const MixedPositions = () => {
         headerName: 'Article no.',
         key: 'position-cell-number',
         width: '132px',
+        showShadows: showRightShadow ? 'right' : undefined,
         isFirst: true,
         renderCell: (cellProps) => <TableCell {...cellProps} />,
       },
@@ -810,13 +825,14 @@ const MixedPositions = () => {
         key: 'position-cell-actions',
         width: ACTION_CELL_WIDTH,
         isHeaderNameHidden: true,
+        showShadows: showLeftShadow ? 'left' : undefined,
         isLast: true,
         noPadding: true,
         align: 'center',
         renderCell: (cellProps) => <TableCell {...cellProps} />,
       },
     ],
-    [],
+    [showLeftShadow, showRightShadow],
   );
 
   if (isLoading) {
@@ -875,7 +891,9 @@ const MixedPositions = () => {
 
         <TableContainer
           showNoMatchWarning={noMatchingData}
-          containerRef={containerRef}>
+          containerRef={containerRef}
+          setShowLeftShadow={setShowLeftShadow}
+          setShowRightShadow={setShowRightShadow}>
           <TableHeader columns={COLUMNS} />
           <TableBody>
             {rows &&
@@ -909,6 +927,8 @@ const MixedPositions = () => {
                       handleDescriptionClick={handleDescriptionClick}
                       handlePreview={handlePreview}
                       setDeleteEventState={setDeleteEventState}
+                      showLeftShadow={showLeftShadow}
+                      showRightShadow={showRightShadow}
                     />
                   </TableRow>
 
@@ -930,6 +950,8 @@ const MixedPositions = () => {
                         setDeleteEventState={setDeleteEventState}
                         refetchArticles={refetchArticles}
                         serviceCompanyId={serviceCompanyId}
+                        showLeftShadow={showLeftShadow}
+                        showRightShadow={showRightShadow}
                       />
                     ))}
 

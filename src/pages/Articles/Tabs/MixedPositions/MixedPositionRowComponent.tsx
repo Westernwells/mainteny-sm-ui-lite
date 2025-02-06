@@ -30,6 +30,7 @@ import {t} from 'i18next';
 import {transformToSubPositionRow} from 'utils/article-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {removeHtmlTags} from 'utils/rich-field-string';
+import {ACTION_CELL_WIDTH} from 'models/table';
 import {Actions} from './Actions';
 import {DeleteEventState, getIconByType} from '.';
 
@@ -82,6 +83,8 @@ type Props = {
   >;
   localRows: MixedPositionRow[];
   setLocalRows: React.Dispatch<React.SetStateAction<MixedPositionRow[]>>;
+  showRightShadow?: boolean;
+  showLeftShadow?: boolean;
 };
 
 const MixedPositionRowComponent = ({
@@ -101,6 +104,8 @@ const MixedPositionRowComponent = ({
   setSubRows,
   localRows,
   setLocalRows,
+  showRightShadow,
+  showLeftShadow,
 }: Props) => {
   const {showError} = useSnackbar();
   const currentCurrency = useCurrentCurrency();
@@ -294,10 +299,12 @@ const MixedPositionRowComponent = ({
   return (
     <>
       <TableCell
+        isFirst
         noPadding={
           editState.field === 'externalId' && editState.id === row.data.id
         }
-        onDoubleClick={() => handleEditStart(row, 'externalId')}>
+        onDoubleClick={() => handleEditStart(row, 'externalId')}
+        showShadows={showRightShadow ? 'right' : undefined}>
         {editState.field === 'externalId' && editState.id === row.data.id ? (
           renderEditableCell('externalId', 'Article Number', 'text')
         ) : (
@@ -460,9 +467,7 @@ const MixedPositionRowComponent = ({
       </TableCell>
       <TableCell align="right">
         <Typography sx={{fontSize: '14px', fontWeight: '600'}}>
-          {row.data.unitSellingAmount?.percentageVat
-            ? `${row.data.unitSellingAmount?.percentageVat}%`
-            : '-'}
+          {`${row.data.unitSellingAmount?.percentageVat}%`}
         </Typography>
       </TableCell>
       <TableCell
@@ -523,7 +528,12 @@ const MixedPositionRowComponent = ({
           )}
         </Typography>
       </TableCell>
-      <TableCell align="center" noPadding>
+      <TableCell
+        align="right"
+        noPadding
+        isLast
+        width={ACTION_CELL_WIDTH}
+        showShadows={showLeftShadow ? 'left' : undefined}>
         <Actions
           onPreview={() => handlePreview(row.id)}
           onAddSubPosition={() => handleNewSubPosition(row.id)}
