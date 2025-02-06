@@ -3,21 +3,21 @@ import {t} from 'i18next';
 import {uniq} from 'lodash';
 import {theme} from 'theme';
 import {
-  Grid,
-  Typography,
   Box,
-  InputAdornment,
   Divider,
-  TextField,
-  TableContainer,
+  Grid,
+  InputAdornment,
+  SxProps,
   Table as MuiTable,
+  TableBody,
+  TableCell,
   tableCellClasses,
+  TableCellProps,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
-  TableCellProps,
-  SxProps,
+  TextField,
+  Typography,
 } from '@mui/material';
 import {FormikProps, getIn} from 'formik';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
@@ -54,6 +54,7 @@ import {
 } from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
+import InvoiceShowOnPDFSwitch from 'components/Switch/InvoiceShowOnPDFSwitch';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -426,6 +427,14 @@ export const PartialPaymentsSection = ({
       }
     }
   }, [previousInvoices, formik]);
+
+  const onInvoicedSectionToggle = (newState: boolean) => {
+    formik.setFieldValue('showInvoicedSection', newState);
+  };
+
+  const onPaymentSectionToggle = (newState: boolean) => {
+    formik.setFieldValue('showPaymentSection', newState);
+  };
 
   useEffect(() => {
     if (!invoice) return;
@@ -865,9 +874,18 @@ export const PartialPaymentsSection = ({
 
   const renderInvoicedSection = () => (
     <>
-      <Typography variant="h6" color="primary.dark">
-        {T('Invoiced')}
-      </Typography>
+      <Box>
+        <Typography variant="h6" color="primary.dark">
+          {T('Invoiced')}
+        </Typography>
+
+        <InvoiceShowOnPDFSwitch
+          shouldShow={formik.values.showInvoicedSection || false}
+          onToggle={onInvoicedSectionToggle}
+          enableCollapse
+        />
+      </Box>
+
       <TableContainer>
         <Table>
           <TableHead>
@@ -1035,9 +1053,18 @@ export const PartialPaymentsSection = ({
 
   const renderPaymentHistorySection = () => (
     <>
-      <Typography variant="h6" color="primary.dark">
-        {T('Payment history')}
-      </Typography>
+      <Box>
+        <Typography variant="h6" color="primary.dark">
+          {T('Payment history')}
+        </Typography>
+
+        <InvoiceShowOnPDFSwitch
+          shouldShow={formik.values.showPaymentSection || false}
+          onToggle={onPaymentSectionToggle}
+          enableCollapse
+        />
+      </Box>
+
       <TableContainer>
         <Table>
           <TableHead>

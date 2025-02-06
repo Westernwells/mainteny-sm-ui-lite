@@ -443,6 +443,10 @@ export const InvoiceForm = ({
       unitNumber: '-',
       showArticleSection:
         (!isNewInvoice && invoice?.additionalInfo.showArticleSection) || true,
+      showInvoicedSection:
+        (!isNewInvoice && invoice?.additionalInfo.showInvoicedSection) || true,
+      showPaymentSection:
+        (!isNewInvoice && invoice?.additionalInfo.showPaymentSection) || true,
       notes: [],
       ...(invoice && {
         billingAddress:

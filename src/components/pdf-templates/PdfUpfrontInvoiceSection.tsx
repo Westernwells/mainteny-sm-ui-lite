@@ -531,19 +531,21 @@ const PdfUpfrontInvoiceSection = ({
         </View>
       )}
 
-      {hasPreviousInvoices && previousInvoices.length > 1 && (
-        <PdfInvoicedSection
-          translate={translate}
-          currentCurrency={currentCurrency}
-          previousInvoices={previousInvoices}
-          amount={amount}
-          currentInvoiceAmountPercentageVats={
-            currentInvoiceAmountPercentageVats
-          }
-        />
-      )}
+      {hasPreviousInvoices &&
+        previousInvoices.length > 1 &&
+        invoice?.additionalInfo.showInvoicedSection && (
+          <PdfInvoicedSection
+            translate={translate}
+            currentCurrency={currentCurrency}
+            previousInvoices={previousInvoices}
+            amount={amount}
+            currentInvoiceAmountPercentageVats={
+              currentInvoiceAmountPercentageVats
+            }
+          />
+        )}
 
-      {hasPayments && (
+      {hasPayments && invoice?.additionalInfo.showPaymentSection && (
         <PdfPaymentHistorySection
           translate={translate}
           currentCurrency={currentCurrency}
