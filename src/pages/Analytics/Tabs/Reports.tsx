@@ -104,7 +104,10 @@ export const Reports = () => {
     includePayments: formik.values.includePaymentData,
   });
   const getInvoicesXero = useInvoicesXero(serviceCompanyId, reportParams);
-  const getInvoicesXLSX = useInvoicesXLSX(serviceCompanyId, reportParams);
+  const getInvoicesXLSX = useInvoicesXLSX(serviceCompanyId, {
+    ...reportParams,
+    full: true,
+  });
   const getInvoicesSage50 = useInvoicesSage50(serviceCompanyId, reportParams);
   const getInvoicesDf2 = useInvoicesDf2(serviceCompanyId, reportParams);
   const getInvoicesPdfPaths = useInvoicesPdfUrls(
