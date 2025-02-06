@@ -77,13 +77,10 @@ const TechnicalData = ({elevator, schema}: Props) => {
 
   const onSubmit = async () => {
     const values = getValues();
-
-    const items = elevatorDataItems
-      .map((item) => ({
-        name: item.name,
-        value: values[item.name],
-      }))
-      .filter((item) => !!item.value);
+    const items = elevatorDataItems.map((item) => ({
+      name: item.name,
+      value: values[item.name] || '',
+    }));
 
     await updateElevatorDataItem({
       queryParams: {
