@@ -63,12 +63,18 @@ export const formatUpdateEmployeeAccountData = (
 
 export const getInitials = (
   userAccount: {
-    firstName: string;
+    firstName?: string;
     lastName?: string;
   },
   onlyFirstInitial = false,
 ) => {
-  if (onlyFirstInitial || !userAccount.lastName)
-    return userAccount.firstName[0];
-  return `${userAccount.firstName[0]}${userAccount.lastName[0]}`;
+  const {firstName, lastName} = userAccount;
+
+  if (!firstName && !lastName) return;
+
+  const nameToUse = firstName || lastName;
+
+  if (onlyFirstInitial || !firstName || !lastName) return nameToUse?.[0];
+
+  if (firstName && lastName) return `${firstName[0]}${lastName[0]}`;
 };
