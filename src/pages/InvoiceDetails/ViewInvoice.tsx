@@ -124,6 +124,7 @@ import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature, EmployeesView} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {ClientReportForPDFConfig} from 'models/client-storage';
+import {CANCEL_ACTION} from 'models/status';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -205,7 +206,15 @@ export const ViewInvoice = ({
     activeSignature?.content?.images || [],
   );
 
-  const {mutateAsync: cancelInvoice} = useCancelInvoice();
+  const {mutateAsync: cancelInvoice} = useCancelInvoice({
+    disableNavigate: true,
+    action: CANCEL_ACTION.CANCEL,
+  });
+
+  const {mutateAsync: undoCancelInvoice} = useCancelInvoice({
+    disableNavigate: true,
+    action: CANCEL_ACTION.UNCANCEL,
+  });
 
   const memorizedUpdateInvoiceData = useMemo(
     () =>
@@ -1093,6 +1102,15 @@ export const ViewInvoice = ({
     },
     onCancel: () => {
       setIsCancelledDialogOpen(true);
+    },
+    onUndoCancel: () => {
+      undoCancelInvoice(invoice.id, {
+        onSuccess: () => {
+          enqueueSnackbar(t('Invoice has been restored'), {
+            variant: 'success',
+          });
+        },
+      });
     },
     onResend: handleOpenSendInvoiceModal,
   });

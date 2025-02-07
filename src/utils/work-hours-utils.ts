@@ -6,10 +6,11 @@ import {MinToStep} from 'models/service-company';
 import {convertDigitalMinsToHM} from './datetime';
 
 export const calculateTotalTime = (workHours: UserActivityView[]) => {
-  const total = workHours.reduce(
-    (accumulator, item) => accumulator + (item.billableMinutes || 0),
-    0,
-  );
+  const total = workHours.reduce((accumulator, item) => {
+    if (item.type === WorkHoursType.BREAK) return accumulator;
+
+    return accumulator + (item.billableMinutes || 0);
+  }, 0);
 
   return `${convertDigitalMinsToHM(total)} h`;
 };

@@ -36,6 +36,7 @@ import {
   InvoiceStatus,
   InvoiceView,
   PrintInvoiceRecord,
+  QueryCancelInvoiceParams,
   QueryInvoiceCommentsParams,
   QueryInvoiceParams,
   SendInvoiceRecord,
@@ -744,26 +745,44 @@ export const useElevatorInvoices = (
     {enabled: !!elevatorId, ...options},
   );
 
-export const cancelInvoice = async (id: string) => {
-  await axiosClient.put(`api/invoices/${id}/cancel`);
+const cancelInvoice = async ({
+  invoiceId,
+  action,
+}: Omit<QueryCancelInvoiceParams, 'disableNavigate'>) => {
+  const {data} = await axiosClient.put<StringValue>(
+    `/api/invoices/${invoiceId}/${action}`,
+  );
+
+  return data;
 };
 
-export const useCancelInvoice = () => {
+export const useCancelInvoice = ({
+  disableNavigate = false,
+  action,
+}: Omit<QueryCancelInvoiceParams, 'invoiceId'>) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const {showError} = useSnackbar();
 
-  return useMutation((invoiceId: string) => cancelInvoice(invoiceId), {
-    onSuccess: () => {
-      queryClient.invalidateQueries([qk.fetchInvoices]);
-      queryClient.invalidateQueries([qk.invoiceById]);
-      queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
-      navigate(`/invoices/`);
+  return useMutation(
+    (invoiceId: string) =>
+      cancelInvoice({
+        invoiceId,
+        action,
+      }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([qk.fetchInvoices]);
+        queryClient.invalidateQueries([qk.invoiceById]);
+        queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        queryClient.invalidateQueries([qk.fetchInvoiceStatistics]);
+        if (!disableNavigate) navigate(`/invoices/`);
+      },
+      onError: (err) => {
+        showError(err);
+      },
     },
-    onError: (err) => {
-      showError(err);
-    },
-  });
+  );
 };
 
 export const fetchInvoiceAmountDetail = async (invoiceId: string) => {

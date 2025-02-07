@@ -13,6 +13,7 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import {MenuAction} from 'models/action';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 
 type Props = {
   invoice: InvoiceView;
@@ -25,6 +26,7 @@ type Props = {
   onDownload: () => void;
   onDelete: () => void;
   onCancel: () => void;
+  onUndoCancel: () => void;
   onResend: () => void;
   onPayment?: () => void;
 };
@@ -40,6 +42,7 @@ const useInvoiceMenuActions = ({
   onDownload,
   onDelete,
   onCancel,
+  onUndoCancel,
   onResend,
   onPayment,
 }: Props) => {
@@ -163,6 +166,14 @@ const useInvoiceMenuActions = ({
         label: t('table_action_option.cancel'), // Cancel
         icon: <CancelIcon />,
         onClick: onCancel,
+      });
+    }
+
+    if (invoice.status === InvoiceStatus.CANCELLED) {
+      items.push({
+        label: t('Undo cancellation'),
+        icon: <CancelOutlinedIcon />,
+        onClick: onUndoCancel,
       });
     }
 

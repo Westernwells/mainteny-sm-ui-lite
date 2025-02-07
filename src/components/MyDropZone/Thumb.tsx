@@ -9,6 +9,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {CheckCircleRounded} from '@mui/icons-material';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import Grid from '@mui/material/Grid';
+import {Tooltip} from '@mui/material';
 import {FormInput} from '../form/FormInput';
 import {FileWithPreview} from './MyDropzone';
 
@@ -79,7 +80,18 @@ export const Thumb = ({
               />
             </Box>
           ) : (
-            <Typography variant="body2">{file.name}</Typography>
+            <Tooltip title={file.name}>
+              <Typography
+                variant="body2"
+                sx={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: 200,
+                }}>
+                {file.name}
+              </Typography>
+            </Tooltip>
           )}
 
           <Typography variant="caption" color="text.secondary">

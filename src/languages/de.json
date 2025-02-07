@@ -3089,5 +3089,6 @@
   "Article deleted successfully": "Artikel erfolgreich gelöscht",
   "Mixed Position created successfully": "Mischposition erfolgreich erstellt",
   "Sub-position created successfully": "Unterposition erfolgreich erstellt",
-  "Qty": "Menge"
+  "Qty": "Menge",
+  "Invoice restored by {{name}}": "Rechnung wurde von {{name}} wiederhergestellt"
 }

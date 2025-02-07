@@ -3110,5 +3110,6 @@
   "Invoice has been restored": "Faktura je vraćena",
   "Article deleted successfully": "Članak je uspešno izbrisan",
   "Mixed Position created successfully": "Mešovita pozicija je uspešno napravljena",
-  "Sub-position created successfully": "Podpozicija je uspešno kreirana"
+  "Sub-position created successfully": "Podpozicija je uspešno kreirana",
+  "Qty": "Kol"
 }
