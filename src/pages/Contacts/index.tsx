@@ -279,12 +279,8 @@ const Contacts = () => {
               }}
               key={`contact-user-avatar-${contact.id}`}
               userAccount={{
-                firstName: contact.userAccount.firstName
-                  ? contact.userAccount.firstName
-                  : contact.userAccount.lastName,
-                lastName: contact.userAccount.firstName
-                  ? contact.userAccount.lastName
-                  : undefined,
+                firstName: contact.userAccount.firstName,
+                lastName: contact.userAccount.lastName,
               }}
             />
           </Cell>
