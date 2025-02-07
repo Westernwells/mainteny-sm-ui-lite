@@ -29,18 +29,34 @@ export const Attachment = ({order}: Props) => {
     const updatedDocuments = order?.additionalInfo?.documents
       ? [
           ...order.additionalInfo.documents,
-          ...uploadedFiles.map((item) => ({
-            description: item.name.split('.')[0],
-            type: item.type,
-            uri: `${uploadPath}/${item.name}`,
-          })),
+          ...uploadedFiles.map((item) => {
+            const lastDotIndex = item.name.lastIndexOf('.');
+            const description =
+              item.name.lastIndexOf('.') > 0
+                ? item.name.substring(0, lastDotIndex)
+                : item.name;
+
+            return {
+              description,
+              type: item.type,
+              uri: `${uploadPath}/${item.name}`,
+            };
+          }),
         ]
       : [
-          ...uploadedFiles.map((item) => ({
-            description: item.name.split('.')[0],
-            type: item.type,
-            uri: `${uploadPath}/${item.name}`,
-          })),
+          ...uploadedFiles.map((item) => {
+            const lastDotIndex = item.name.lastIndexOf('.');
+            const description =
+              lastDotIndex > 0
+                ? item.name.substring(0, lastDotIndex)
+                : item.name;
+
+            return {
+              description,
+              type: item.type,
+              uri: `${uploadPath}/${item.name}`,
+            };
+          }),
         ];
 
     updateServiceOrder({
