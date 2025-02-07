@@ -63,6 +63,7 @@ import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
 import {VatView} from 'models/vat';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {stripHtmlTags} from 'models/text-block';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -156,7 +157,13 @@ const TableRowComponent = ({
 };
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required('Article cannot be empty'),
+  name: Yup.string()
+    .test(
+      'is-not-empty',
+      'Article cannot be empty',
+      (value) => !!stripHtmlTags(value || ''),
+    )
+    .required('Article cannot be empty'),
   article: Yup.object().shape({
     type: Yup.string().required('Article type is required'),
   }),
@@ -501,21 +508,27 @@ export const ArticleItemRowQuotation = ({
           <Box ref={articleAnchorEl}>
             <RichTextField
               test-id={`name-${index}`}
-              html={formik.values.name}
-              updateHtml={handleTextFieldChange('name')}
-              onBlur={formik.handleBlur}
+              html={formik.values.name || ''}
+              updateHtml={handleTextFieldChange(`name`)}
+              onBlur={(event) => {
+                formik.setFieldTouched(`name`, true, false);
+                formik.handleBlur(event);
+              }}
               helperText={
-                (!isHovered && formik.errors.name) ||
-                (formik.errors.name && formik.touched.name)
-                  ? formik.errors.name
+                !isHovered &&
+                getIn(formik.touched, `name`) &&
+                getIn(formik.errors, `name`)
+                  ? getIn(formik.errors, `name`)
                   : ''
               }
               error={
-                !!(!isHovered && formik.errors.name) ||
-                !!(formik.errors.name && formik.touched.name)
+                !isHovered &&
+                !!getIn(formik.touched, `name`) &&
+                !!getIn(formik.errors, `name`)
               }
               onClick={handleArticleTextFieldClick}
             />
+
             <Box>
               <Popper
                 open={showArticleSearch}

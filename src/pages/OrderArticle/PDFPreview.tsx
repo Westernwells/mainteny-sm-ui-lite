@@ -15,6 +15,7 @@ type Props = {
 
 const PdfPreview = ({blobUrl, scale = 1.428}: Props) => {
   const [pages, setPages] = useState<number>(0);
+
   const pageRef = useRef<HTMLDivElement>(null);
 
   function onDocumentLoadSuccess({numPages}: {numPages: number}) {
@@ -29,22 +30,14 @@ const PdfPreview = ({blobUrl, scale = 1.428}: Props) => {
           overflow="hidden"
           sx={{
             overflowY: pages > 1 ? 'scroll' : 'initial',
-            '& .react-pdf__message': {
-              margin: '1em',
-            },
+            '& .react-pdf__message': {margin: '1em'},
             '& .react-pdf__Page.prevPage': {
               position: 'absolute !important',
               zIndex: 1,
             },
-            '& .react-pdf__Document': {
-              minHeight: '1300px',
-            },
-            '&::-webkit-scrollbar': {
-              width: '0.25em',
-            },
-            '&::-webkit-scrollbar-track': {
-              background: 'transparent',
-            },
+            '& .react-pdf__Document': {minHeight: '1300px'},
+            '&::-webkit-scrollbar': {width: '0.25em'},
+            '&::-webkit-scrollbar-track': {background: 'transparent'},
             '&::-webkit-scrollbar-thumb': {
               backgroundColor: 'action.disabled',
               borderRadius: '0.25em',
@@ -53,11 +46,7 @@ const PdfPreview = ({blobUrl, scale = 1.428}: Props) => {
           <Document file={blobUrl} onLoadSuccess={onDocumentLoadSuccess}>
             {pages &&
               [...Array(pages).keys()].map((index) => (
-                <div
-                  key={`page_${index + 1}`}
-                  style={{
-                    marginBottom: '2em',
-                  }}>
+                <div key={`page_${index + 1}`} style={{marginBottom: '2em'}}>
                   <Page
                     pageNumber={index + 1}
                     renderMode="canvas"

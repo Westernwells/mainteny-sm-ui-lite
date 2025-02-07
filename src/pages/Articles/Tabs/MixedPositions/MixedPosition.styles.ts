@@ -35,7 +35,9 @@ export const zoomButtonStyles = {
   marginTop: '8px',
   fontWeight: 'bold',
   borderRadius: '4px',
-  boxShadow: '0px 4px 15px 0px #90909033',
+  boxShadow:
+    '0px 1px 10px 0px #0000001F, 0px 4px 5px 0px #00000024, 0px 2px 4px -1px #00000033',
   background: 'white',
+  border: '1px solid #00000024',
   zIndex: 10,
 };

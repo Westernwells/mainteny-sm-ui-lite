@@ -39,8 +39,12 @@ describe('Create Quotation', () => {
         cy.get('[data-testid="AddArticle"]').click({force: true});
 
         cy.get('div[test-id="name-0"]').click({force: true});
+
+        // 🛠 Fix: Simulate user input interaction to trigger Formik validation
+        cy.get('div[test-id="name-0"]').type('e').clear();
+
         // click outside
-        cy.contains('Footer').click();
+        cy.clearRichTextField('Payment terms');
 
         cy.contains('Article cannot be empty');
         cy.contains('button', 'Save').should('be.disabled');
@@ -84,6 +88,7 @@ describe('Create Quotation', () => {
         const getUnitsAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?*`;
         cy.intercept('GET', getUnitsAPI).as('getUnitsAPI');
         cy.contains('Select Unit').click();
+        cy.get('input[name="Search"]').clear().type('e');
         cy.wait('@getUnitsAPI');
         cy.get('div[data-rowindex="0"]').click();
         cy.contains('button', 'Select').click();
