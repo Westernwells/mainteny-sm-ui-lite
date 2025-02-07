@@ -848,6 +848,16 @@ export const InvoiceForm = ({
     );
 
     formik.setFieldValue(
+      'showInvoicedSection',
+      invoiceData?.additionalInfo?.showInvoicedSection ?? true,
+    );
+
+    formik.setFieldValue(
+      'showPaymentSection',
+      invoiceData?.additionalInfo?.showPaymentSection ?? true,
+    );
+
+    formik.setFieldValue(
       'items',
       invoiceData?.items?.map((item) =>
         invoiceItemToInvoiceItemRecord(item, invoiceType || invoiceData.type),
