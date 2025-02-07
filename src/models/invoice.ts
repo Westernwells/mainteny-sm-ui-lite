@@ -20,6 +20,7 @@ import {PropertyOwnerSimpleView} from './propertyManager';
 import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderType, ServiceOrderView} from './service-order';
 import {Order} from './pagination';
+import {CANCEL_ACTION} from 'models/status';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT',
@@ -498,6 +499,7 @@ export enum InvoiceActivityType {
   UPDATED = 'UPDATED',
   SENT = 'SENT',
   CANCELLED = 'CANCELLED',
+  UNCANCELLED = 'UNCANCELLED',
   PRINTED = 'PRINTED',
   OVERDUE_NOTICE_SENT = 'OVERDUE_NOTICE_SENT',
   PAID = 'PAID',
@@ -633,4 +635,10 @@ export type SearchParameters = {
 
 export type InvoiceStatistics = {
   numOfInvoicesPerStatus: Record<string, number>;
+};
+
+export type QueryCancelInvoiceParams = {
+  invoiceId: string;
+  action: CANCEL_ACTION;
+  disableNavigate?: boolean;
 };

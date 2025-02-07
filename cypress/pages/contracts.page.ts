@@ -6,7 +6,9 @@ export default class ContractsPage {
   };
 
   static navigateToDetailsPage = () => {
-    cy.get('div[data-colindex="1"]').eq(2).click();
+    cy.get('tr[data-rowindex="1"]').then((row) => {
+      cy.wrap(row).find("td[data-field='EXTERNAL_ID'][role='cell']").click();
+    });
   };
 
   static openDialog = () => {

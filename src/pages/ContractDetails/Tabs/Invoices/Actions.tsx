@@ -35,12 +35,13 @@ import {
   useDeleteInvoice,
   usePublishInvoice,
 } from 'hooks/reactQuery/useInvoice';
-import {InvoiceStatus, InvoiceView, InvoiceType} from 'models/invoice';
+import {InvoiceStatus, InvoiceType, InvoiceView} from 'models/invoice';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
 import {getInvoicePDFStatuses, validateDueDate} from 'utils/invoice-utils';
 import useTheme from '@mui/material/styles/useTheme';
+import {CANCEL_ACTION} from 'models/status';
 import {Tooltip} from '../utils/utils';
 
 interface Props {
@@ -79,7 +80,9 @@ export const Actions = ({
   );
 
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
-  const {mutateAsync: cancelInvoice} = useCancelInvoice();
+  const {mutateAsync: cancelInvoice} = useCancelInvoice({
+    action: CANCEL_ACTION.CANCEL,
+  });
 
   const {isPDFsGenerated, isInvoicePDFGenerated} =
     getInvoicePDFStatuses(invoice);
