@@ -28,18 +28,34 @@ export const Pictures = ({elevator, propertyOwnerId}: Props) => {
     const updatedPictures = elevator.additionalInfo.pictures
       ? [
           ...elevator.additionalInfo.pictures,
-          ...uploadedFiles.map((item) => ({
-            description: item.name.split('.')[0],
-            type: item.type,
-            uri: `${uploadPath}/${item.name}`,
-          })),
+          ...uploadedFiles.map((item) => {
+            const lastDotIndex = item.name.lastIndexOf('.');
+            const description =
+              lastDotIndex > 0
+                ? item.name.substring(0, lastDotIndex)
+                : item.name;
+
+            return {
+              description,
+              type: item.type,
+              uri: `${uploadPath}/${item.name}`,
+            };
+          }),
         ]
       : [
-          ...uploadedFiles.map((item) => ({
-            description: item.name.split('.')[0],
-            type: item.type,
-            uri: `${uploadPath}/${item.name}`,
-          })),
+          ...uploadedFiles.map((item) => {
+            const lastDotIndex = item.name.lastIndexOf('.');
+            const description =
+              lastDotIndex > 0
+                ? item.name.substring(0, lastDotIndex)
+                : item.name;
+
+            return {
+              description,
+              type: item.type,
+              uri: `${uploadPath}/${item.name}`,
+            };
+          }),
         ];
 
     await updateElevator({
