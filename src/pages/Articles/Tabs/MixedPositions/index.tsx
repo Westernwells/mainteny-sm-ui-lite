@@ -64,7 +64,10 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {Dialog} from 'components/Dialog';
 import RichTextEditor from 'components/RichTextEditor';
 import {Button} from 'components/Button';
-import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
+import {
+  useCompanyById,
+  useCompanyNextNumber,
+} from 'hooks/reactQuery/useCompanies';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined';
 import {useTheme} from '@mui/material/styles';
@@ -72,6 +75,10 @@ import {State} from 'models/misc';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useCurrentCurrency} from 'utils/currency';
 import {removeHtmlTags} from 'utils/rich-field-string';
+import MixedPositionPdf from 'components/pdf-templates/MixedPositionPdf';
+import {pdf} from '@react-pdf/renderer';
+import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {companyLanguageContextMap} from 'utils/language';
 import PositionPreview from './PositionPreview';
 import SubPositionRowComponent from './SubPositionRowComponent';
 import MixedPositionRowComponent from './MixedPositionRowComponent';
@@ -89,6 +96,10 @@ export interface DeleteEventState {
   };
   index?: number;
 }
+
+type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
+  lng?: string;
+};
 
 export const getIconByType = (type: ArticleType) => {
   switch (type) {
@@ -141,16 +152,30 @@ const MixedPositions = () => {
     defaultValue: makePage(0, pageSize),
   });
 
+  const [filePathToDownload, setFilePathToDownload] = useState('');
+
+  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {t: translateCompanyLanguage} = useTranslation('translation', {
+    lng: companyLanguageContextMap[company?.language as string],
+  } as CustomTranslationOptions);
+
+  const translate = useMemo(
+    () => (key: string, options?: {context: string}) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key, options);
+      }
+
+      return t(key, options);
+    },
+    [company?.language],
+  );
+
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
   const [search, setSearch] = useQueryState('mixedPositions');
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
   const [localRows, setLocalRows] = useState<MixedPositionRow[]>([]);
   const [subRows, setSubRows] = useState<Record<string, SubPositionRow[]>>({});
-  const [previewData, setPreviewData] = useState<{
-    mixedPosition: MixedPositionRow | null;
-    subPositions: ArticleSubAssociationView[] | null;
-  }>({mixedPosition: null, subPositions: null});
   const [deleteEventState, setDeleteEventState] = useState<DeleteEventState>({
     userTypedName: '',
     isOpen: false,
@@ -723,18 +748,38 @@ const MixedPositions = () => {
     }
   };
 
+  const generateBlobUrl = async (
+    mixedPos: MixedPositionRow | null,
+    subPos: ArticleSubAssociationView[] | null,
+  ) => {
+    const blob = await pdf(
+      <MixedPositionPdf
+        currentCurrency={currentCurrency}
+        selectedLng={company?.language}
+        translate={translate}
+        mixedPosition={mixedPos}
+        subPositions={subPos}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    setFilePathToDownload(blobURL);
+  };
+
   const handlePreview = async (parentId: string) => {
-    const mixedPosition = localRows.find((row) => row.data.id === parentId);
+    const mixedPosition = localRows?.find((row) => row.data.id === parentId);
+
     if (!mixedPosition) return;
 
     const subPositions = await fetchArticleSubAssociations(parentId);
 
-    setPreviewData({
-      mixedPosition: mixedPosition || null,
-      subPositions: subPositions || [],
-    });
+    await generateBlobUrl(mixedPosition, subPositions);
 
     setOpenPreviewDialog(true);
+  };
+
+  const handleClosePreview = () => {
+    setOpenPreviewDialog(false);
+    setFilePathToDownload('');
   };
 
   useEffect(() => {
@@ -744,7 +789,7 @@ const MixedPositions = () => {
   }, []);
 
   useEffect(() => {
-    const fetchedRows = aggregateMixedPositionRow(articleResource.data);
+    const fetchedRows = aggregateMixedPositionRow(articleResource?.data);
     setLocalRows(fetchedRows);
   }, [articleResource.data]);
 
@@ -1093,10 +1138,7 @@ const MixedPositions = () => {
 
         <Dialog
           title={t('Mixed position PDF preview')}
-          onCancel={() => {
-            setOpenPreviewDialog(false);
-            setPreviewData({mixedPosition: null, subPositions: null});
-          }}
+          onCancel={handleClosePreview}
           dialogProps={{
             open: openPreviewDialog || false,
           }}
@@ -1104,16 +1146,14 @@ const MixedPositions = () => {
             '& .MuiDialog-paper': {
               width: '750px',
               maxWidth: 'none',
+              padding: '0em',
             },
           }}
           leftButton={
             <Button
               label="Cancel"
               buttonProps={{
-                onClick: () => {
-                  setOpenPreviewDialog(false);
-                  setPreviewData({mixedPosition: null, subPositions: null});
-                },
+                onClick: handleClosePreview,
                 variant: 'outlined',
                 size: 'medium',
                 sx: {background: 'white'},
@@ -1122,10 +1162,7 @@ const MixedPositions = () => {
           }
           showSaveButton={false}
           showCancelButton={false}>
-          <PositionPreview
-            mixedPosition={previewData.mixedPosition}
-            subPositions={previewData.subPositions}
-          />
+          <PositionPreview filePathToDownload={filePathToDownload} />
         </Dialog>
       </Grid>
     </Box>

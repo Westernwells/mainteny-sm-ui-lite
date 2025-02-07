@@ -10,9 +10,10 @@ if (window.Cypress) {
 }
 type Props = {
   blobUrl: string;
+  scale?: number;
 };
 
-const PdfPreview = ({blobUrl}: Props) => {
+const PdfPreview = ({blobUrl, scale = 1.428}: Props) => {
   const [pages, setPages] = useState<number>(0);
   const pageRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +64,7 @@ const PdfPreview = ({blobUrl}: Props) => {
                     pageIndex={index}
                     renderAnnotationLayer={false}
                     inputRef={pageRef}
-                    scale={1.428}
+                    scale={scale}
                   />
                 </div>
               ))}
