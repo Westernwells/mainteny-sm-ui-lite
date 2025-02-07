@@ -7,6 +7,8 @@ import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
+import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import {useParams} from 'react-router-dom';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
@@ -17,7 +19,9 @@ import {
   CLIENT_STORAGE_PDF_TEMPLATE_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import {getUserFullName} from 'utils/utils';
 import {ServiceCompanyNumberType} from 'models/service-company';
+import {ChecklistStatus} from 'models/service-order';
 import {ViewInvoice} from './ViewInvoice';
 
 interface Props {
@@ -90,6 +94,85 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     serviceCompanyId,
   );
 
+  const serviceOrder = invoice?.serviceOrder;
+
+  const {
+    data: serviceOrderCheckLists,
+    isLoading: isLoadingServiceOrderCheckLists,
+  } = useQueryServiceOrderChecklists({
+    serviceOrderId: serviceOrder?.id || '',
+    options: {
+      enabled: !!serviceOrder?.id,
+    },
+  });
+
+  const completedChecklists = serviceOrderCheckLists?.filter(
+    (c) => c.additionalInfo.status === ChecklistStatus.COMPLETED,
+  );
+
+  const {
+    data: signatureDownloadUrls = {},
+    isLoading: isLoadingSignatureDownloadUrls,
+  } = useDownloadUrl(
+    completedChecklists?.length
+      ? completedChecklists.map(
+          (c) => c.additionalInfo.technicianSignature || '',
+        )
+      : [],
+  );
+
+  const labels = completedChecklists?.map((c) => {
+    const schedule = invoice?.serviceOrder?.schedules
+      .filter((item) => !!item.technician)
+      .find((s) => s.technician!.id === c.technicianId);
+    const checklistNumber = c.checkList.number || 'Unassigned';
+    return {
+      value: {
+        checklistId: c.checkListId,
+        technicianId: c.technicianId,
+      },
+      label: `${checklistNumber}-${getUserFullName(
+        schedule?.technician?.userAccount,
+      )}`,
+    };
+  });
+
+  const selectedOption = labels?.[0]?.value;
+
+  const selectedChecklist = completedChecklists?.find(
+    (c) =>
+      c.checkListId === selectedOption?.checklistId &&
+      c.technicianId === selectedOption?.technicianId,
+  );
+
+  const signaturePath =
+    signatureDownloadUrls[
+      selectedChecklist?.additionalInfo.technicianSignature || ''
+    ];
+
+  const signatureImageUrl = useFetchAndConvertImage(signaturePath);
+
+  const sortedChecklistComponents =
+    selectedChecklist?.checkList?.components.sort(
+      (a, b) =>
+        (a.additionalInfo?.orderNumber ?? 0) -
+        (b.additionalInfo?.orderNumber ?? 0),
+    ) ?? [];
+
+  const checklistImagesPath = useMemo(
+    () =>
+      (
+        sortedChecklistComponents.map(
+          (component) =>
+            component.additionalInfo.pictures?.map((pic) => pic.uri) ?? [],
+        ) ?? []
+      ).flat(),
+    [sortedChecklistComponents],
+  );
+
+  const {data: checklistImagesDownloadUrl, isLoading: isChecklistImageLoading} =
+    useDownloadUrl(checklistImagesPath);
+
   useLayoutEffect(() => {
     if (getCurrentPageTitle) {
       getCurrentPageTitle(`${t('Invoice Details')}`);
@@ -103,7 +186,10 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     isLoadingClientStorageDataPdfConfig ||
     isLoadingClientStorageDataTemplate ||
     isLoadingHeaderUrl ||
-    isLoadingFooterUrl
+    isLoadingFooterUrl ||
+    isLoadingServiceOrderCheckLists ||
+    isLoadingSignatureDownloadUrls ||
+    isChecklistImageLoading
   ) {
     return <Progress />;
   }
@@ -125,6 +211,13 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
       footerUrl={
         footerUrl && footerInfo?.path ? footerUrl[footerInfo.path] : ''
       }
+      checklistProps={{
+        completedChecklists,
+        signatureImageUrl,
+        selectedChecklist,
+        sortedChecklistComponents,
+        checklistImagesDownloadUrl,
+      }}
     />
   ) : (
     <EmptySection label="Sorry, we couldn't find the invoice." />

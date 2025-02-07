@@ -17,7 +17,6 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 
 type Props = {
   invoice: InvoiceView;
-  isChecklistImageLoading: boolean;
   showPreview?: boolean;
   showSend?: boolean;
   onSend: () => void;
@@ -33,7 +32,6 @@ type Props = {
 
 const useInvoiceMenuActions = ({
   invoice,
-  isChecklistImageLoading,
   showPreview = true,
   showSend = true,
   onSend,
@@ -57,7 +55,6 @@ const useInvoiceMenuActions = ({
         label: t('Send'),
         icon: <SendIcon />,
         onClick: onSend,
-        disabled: isChecklistImageLoading,
       });
     }
 

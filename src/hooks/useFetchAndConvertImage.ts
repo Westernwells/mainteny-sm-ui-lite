@@ -1,6 +1,26 @@
 import {useEffect, useState} from 'react';
 import {convertBase64ToPNG, getBase64FromUrl} from 'utils/utils';
 
+export const fetchAndConvertImageToBase64 = async (url: string) => {
+  try {
+    const fetchedImageUrl = await getBase64FromUrl(url);
+    if (fetchedImageUrl) {
+      let finalImageUrl = fetchedImageUrl;
+      if (fetchedImageUrl.startsWith('data:image/jpeg')) {
+        try {
+          finalImageUrl = await convertBase64ToPNG(fetchedImageUrl);
+        } catch (error) {
+          console.error('Error converting JPEG to PNG:', error);
+        }
+      }
+      return finalImageUrl;
+    }
+  } catch (error) {
+    console.error('Error fetching image:', error);
+  }
+  return '';
+};
+
 const useFetchAndConvertImage = (downloadUrl: string) => {
   const [imageUrl, setImageUrl] = useState('');
 
@@ -8,33 +28,16 @@ const useFetchAndConvertImage = (downloadUrl: string) => {
     setImageUrl(''); // reset image on downloadUrl change
     let isMounted = true;
 
-    const fetchImages = async () => {
-      if (downloadUrl) {
-        try {
-          const fetchedImageUrl = await getBase64FromUrl(downloadUrl);
-          if (isMounted && fetchedImageUrl) {
-            let finalImageUrl = fetchedImageUrl;
-            if (fetchedImageUrl.startsWith('data:image/jpeg')) {
-              try {
-                finalImageUrl = await convertBase64ToPNG(fetchedImageUrl);
-              } catch (error) {
-                console.error('Error converting JPEG to PNG:', error);
-              }
-            }
-            setImageUrl(finalImageUrl);
-          }
-        } catch (error) {
-          console.error('Error fetching image:', error);
-        }
-      }
-    };
-
-    fetchImages();
+    if (isMounted) {
+      fetchAndConvertImageToBase64(downloadUrl).then((url) => {
+        setImageUrl(url);
+      });
+    }
 
     return () => {
       isMounted = false;
     };
-  }, [downloadUrl]);
+  }, [downloadUrl, fetchAndConvertImageToBase64]);
 
   return imageUrl;
 };
