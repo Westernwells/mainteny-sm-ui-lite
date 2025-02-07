@@ -95,7 +95,7 @@ export default class InvoicesPage {
     cy.contains('button', 'Clear').should('exist').click();
     cy.wait(1000);
 
-    cy.get('[data-testid=payment-due-date]').click();
+    cy.get('[data-testid=payment-due-date]').click({force: true});
 
     if (hasDueDate) {
       if (setExpiredDueDate) {

@@ -3238,6 +3238,11 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.5.13.tgz#87b309a6379c22b926e696893237826f64339b6f"
   integrity sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==
 
+"@wojtekmaj/react-hooks@^1.22.0":
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/@wojtekmaj/react-hooks/-/react-hooks-1.22.0.tgz#3793c3a68dc97bf32462edaaceb25fd681979e59"
+  integrity sha512-DtYasEbduZqTjlZRcAuX9CafESUtNwhO2eCPJ5/r8HfXqqUbsUDoRg4IecCNRaPEdiqC6V2syhAWaW0J3Ry4uw==
+
 "@xobotyi/scrollbar-width@^1.9.5":
   version "1.9.5"
   resolved "https://registry.yarnpkg.com/@xobotyi/scrollbar-width/-/scrollbar-width-1.9.5.tgz#80224a6919272f405b87913ca13b92929bdf3c4d"

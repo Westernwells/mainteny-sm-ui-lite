@@ -5,17 +5,22 @@ import {
   CostPackage,
 } from './article';
 import {ElevatorView} from './elevator';
-import {AlternativeServiceCompanyInfo, Discount} from './invoice';
+import {
+  AggregatedAmount,
+  AlternativeServiceCompanyInfo,
+  Discount,
+} from './invoice';
 import {
   AddressRecord,
   Amount,
   AmountRecord,
+  Currency,
   EmailRecord,
   Meta,
   PdfGenerationStatus,
 } from './misc';
 import {PropertyOwnerView} from './propertyManager';
-import {ServiceCompanySimpleView} from './service-company';
+import {ServiceCompanyItem, ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
 import {theme} from 'theme';
 
@@ -94,7 +99,7 @@ export interface ArticleRecord {
 export interface QuotationItemRecord {
   id?: string;
   articleId?: string;
-  article?: ArticleRecord;
+  article?: ArticleRecord | ArticleView;
   name: string;
   unitAmount: AmountRecord;
   quantity: number;
@@ -113,7 +118,7 @@ export interface QuotationView {
   subject: string;
   moreInfo: string;
   status: QuotationStatus;
-  totalAmount: Amount;
+  totalAmount: AggregatedAmount;
   additionalInfo: QuotationAdditionalInfo;
   search: string;
   meta: Meta;

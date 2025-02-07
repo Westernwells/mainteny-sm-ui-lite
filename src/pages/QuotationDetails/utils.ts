@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import {ArticleView} from 'models/article';
 import {DiscountType, Discount, ArticleRecord} from 'models/invoice';
 import {
   CreateQuotation,
@@ -17,17 +18,15 @@ export const formatQuotationRecord = (
   description: value.description,
   items: value.items.map((item) => {
     const {article, ...rest} = item;
-    const modifiedArticle = {...article};
+    const modifiedArticle: ArticleView | ArticleRecord = {...article};
+    const {id, ...articleWithoutId} = modifiedArticle;
     const unitSellingAmount = modifiedArticle?.unitSellingAmount;
 
     const isPreDefinedArticle =
-      modifiedArticle?.id && modifiedArticle?.id?.length > 8;
-    if (!isPreDefinedArticle) {
-      delete modifiedArticle?.id;
-    }
+      modifiedArticle.id && modifiedArticle.id.length > 8;
 
     const articleToSend = {
-      ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
+      ...(!isPreDefinedArticle ? articleWithoutId : {id}),
       name: article?.name,
       type: article?.type,
       unit: article?.unit,
