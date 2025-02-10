@@ -572,6 +572,8 @@ export interface ServiceOrderQueryParams {
   contractIds?: string[];
   end?: string;
   start?: string;
+  dueDateStart?: string;
+  dueDateEnd?: string;
   pageIndex: number;
   pageSize: number;
   query: string;

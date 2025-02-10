@@ -444,6 +444,10 @@ export const InvoiceForm = ({
       unitNumber: '-',
       showArticleSection:
         (!isNewInvoice && invoice?.additionalInfo.showArticleSection) || true,
+      showInvoicedSection:
+        (!isNewInvoice && invoice?.additionalInfo.showInvoicedSection) || true,
+      showPaymentSection:
+        (!isNewInvoice && invoice?.additionalInfo.showPaymentSection) || true,
       notes: [],
       ...(invoice && {
         billingAddress:
@@ -842,6 +846,16 @@ export const InvoiceForm = ({
     formik.setFieldValue(
       'showArticleSection',
       invoiceData?.additionalInfo?.showArticleSection ?? true,
+    );
+
+    formik.setFieldValue(
+      'showInvoicedSection',
+      invoiceData?.additionalInfo?.showInvoicedSection ?? true,
+    );
+
+    formik.setFieldValue(
+      'showPaymentSection',
+      invoiceData?.additionalInfo?.showPaymentSection ?? true,
     );
 
     formik.setFieldValue(

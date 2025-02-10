@@ -119,6 +119,8 @@ export interface InvoiceAdditionalInfo {
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
   refInvoiceId?: string;
   paymentTerm?: InvoicePaymentTermRecord & {
     data?: PaymentTermData;
@@ -386,6 +388,8 @@ export interface InvoiceFormData {
   deliveryStartDate?: Date;
   deliveryEndDate?: Date;
   showArticleSection?: boolean;
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
   notes?: CreateInvoiceComment[];
   elevatorExternalId?: string;
 }

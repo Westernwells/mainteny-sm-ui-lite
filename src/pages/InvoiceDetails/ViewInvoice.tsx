@@ -72,9 +72,12 @@ import {LinearProgress, linearProgressClasses} from '@mui/material';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 import GradingOutlinedIcon from '@mui/icons-material/GradingOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
-import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
-import {CheckListComponentType} from 'models/checklist';
-import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
+import {
+  CheckListComponentType,
+  CheckListComponentView,
+  ServiceOrderCheckListView,
+} from 'models/checklist';
+import {ServiceOrderReportView} from 'models/service-order';
 import {
   getQrErrorMessage,
   svgToJpegPng,
@@ -97,7 +100,6 @@ import {
   decideAttachmentDescriptionForInvoiceEmail,
   decideAttachmentURIForInvoiceEmail,
   fetchFile,
-  getUserFullName,
 } from 'utils/utils';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
@@ -106,7 +108,6 @@ import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePd
 import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
-import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
@@ -145,6 +146,15 @@ interface Props {
   footerInfo: HeaderFooterInfoData;
   headerUrl: string;
   footerUrl: string;
+  checklistProps: {
+    serviceOrderCheckLists?: ServiceOrderCheckListView[];
+    signatureImageUrl: string;
+    selectedChecklist?: ServiceOrderCheckListView;
+    sortedChecklistComponents: CheckListComponentView[];
+    checklistImagesDownloadUrl?: {
+      [key: string]: string;
+    };
+  };
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -161,6 +171,13 @@ export const ViewInvoice = ({
   footerInfo,
   headerUrl,
   footerUrl,
+  checklistProps: {
+    serviceOrderCheckLists,
+    signatureImageUrl,
+    selectedChecklist,
+    sortedChecklistComponents,
+    checklistImagesDownloadUrl,
+  },
 }: Props) => {
   const {t} = useTranslation();
   const {enqueueSnackbar} = useSnackbar();
@@ -320,19 +337,8 @@ export const ViewInvoice = ({
   const serviceOrder = invoice?.serviceOrder;
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
-  const {data: serviceOrderCheckLists} = useQueryServiceOrderChecklists({
-    serviceOrderId: serviceOrder?.id || '',
-    options: {
-      enabled: !!serviceOrder?.id,
-    },
-  });
-
-  const completedChecklists = serviceOrderCheckLists?.filter(
-    (c) => c.additionalInfo.status === ChecklistStatus.COMPLETED,
-  );
-
   const checklistSummaries = useMemo(() => {
-    const data = completedChecklists?.map((checklist) => {
+    const data = serviceOrderCheckLists?.map((checklist) => {
       const componentsWithoutHead =
         checklist?.checkList.components.filter(
           (c) => c.type !== CheckListComponentType.HEAD,
@@ -364,25 +370,6 @@ export const ViewInvoice = ({
     return data;
   }, [serviceOrderCheckLists]);
 
-  const labels =
-    completedChecklists?.map((c) => {
-      const schedule = invoice?.serviceOrder?.schedules
-        .filter((item) => !!item.technician)
-        .find((s) => s.technician!.id === c.technicianId);
-      const checklistNumber = c.checkList.number || 'Unassigned';
-      return {
-        value: {
-          checklistId: c.checkListId,
-          technicianId: c.technicianId,
-        },
-        label: `${checklistNumber}-${getUserFullName(
-          schedule?.technician?.userAccount,
-        )}`,
-      };
-    }) || [];
-
-  const [selectedOption, setSelectedOption] = useState(labels[0]?.value || '');
-
   const [report, setReport] = useState<ServiceOrderReportView | undefined>(
     serviceOrder?.reports?.[0],
   );
@@ -390,47 +377,6 @@ export const ViewInvoice = ({
   const reportToUpdate = serviceOrder?.reports?.find(
     (r) => r.externalId === report?.externalId,
   );
-
-  const {data: signatureDownloadUrls = {}} = useDownloadUrl(
-    completedChecklists?.length
-      ? completedChecklists.map(
-          (c) => c.additionalInfo.technicianSignature || '',
-        )
-      : [],
-  );
-
-  const selectedChecklist = completedChecklists?.find(
-    (c) =>
-      c.checkListId === selectedOption.checklistId &&
-      c.technicianId === selectedOption.technicianId,
-  );
-  const sortedChecklistComponents =
-    selectedChecklist?.checkList?.components.sort(
-      (a, b) =>
-        (a.additionalInfo?.orderNumber ?? 0) -
-        (b.additionalInfo?.orderNumber ?? 0),
-    ) ?? [];
-
-  const checklistImagesPath = useMemo(
-    () =>
-      (
-        sortedChecklistComponents.map(
-          (component) =>
-            component.additionalInfo.pictures?.map((pic) => pic.uri) ?? [],
-        ) ?? []
-      ).flat(),
-    [sortedChecklistComponents],
-  );
-
-  const {data: checklistImagesDownloadUrl, isLoading: isChecklistImageLoading} =
-    useDownloadUrl(checklistImagesPath);
-
-  const signaturePath =
-    signatureDownloadUrls[
-      selectedChecklist?.additionalInfo.technicianSignature || ''
-    ];
-
-  const signatureImageUrl = useFetchAndConvertImage(signaturePath);
 
   const {refetch: refetchChecklistDownloadUrl} = useDownloadUrl(
     selectedChecklist?.additionalInfo.pdfPath
@@ -493,12 +439,6 @@ export const ViewInvoice = ({
 
     return blob;
   };
-
-  useEffect(() => {
-    if (completedChecklists?.length && !selectedOption) {
-      setSelectedOption(labels[0].value);
-    }
-  }, [completedChecklists]);
 
   // Handle Work report
 
@@ -1090,7 +1030,6 @@ export const ViewInvoice = ({
 
   const {actions} = useInvoiceMenuActions({
     invoice,
-    isChecklistImageLoading,
     showPreview: false,
     showSend: false,
     onSend: handleOpenSendInvoiceModal,
@@ -1598,7 +1537,7 @@ export const ViewInvoice = ({
           )}
 
           {/* CHECKLIST CARD */}
-          {(completedChecklists?.length ?? 0) > 0 && (
+          {(serviceOrderCheckLists?.length ?? 0) > 0 && (
             <PageCard
               headerLabel={t('Checklist')}
               headerIcon={<FactCheckOutlinedIcon sx={{color: '#8F9BB380'}} />}
@@ -1694,7 +1633,7 @@ export const ViewInvoice = ({
           ...item,
           showBorder: actions[actions.length - 1] !== item,
         }))}
-        isValid={!isChecklistImageLoading}
+        isValid
       />
 
       <SendEmailDialog
