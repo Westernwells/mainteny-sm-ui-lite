@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {UseQueryResult, useQuery} from 'react-query';
+import {UseQueryOptions, UseQueryResult, useQuery} from 'react-query';
 import heic2any from 'heic2any';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -20,9 +20,43 @@ export const fetchDownloadUrl = async (
   return response.data;
 };
 
+export const fetchDownloadUrls = async (
+  batch: string[],
+  serviceCompanyId: string,
+) => {
+  const downloadUrls = await fetchDownloadUrl(batch, serviceCompanyId);
+
+  const conversionPromises = Object.keys(downloadUrls).map(async (file) => {
+    const extension = file.split('.').pop()?.toLowerCase();
+    if (extension === 'heic') {
+      try {
+        const res = await fetch(downloadUrls[file]);
+        const blob = await res.blob();
+        const conversionResult = await heic2any({
+          blob,
+          toType: 'image/jpeg',
+        });
+
+        const url = URL.createObjectURL(
+          Array.isArray(conversionResult)
+            ? new Blob(conversionResult, {type: 'image/jpeg'})
+            : conversionResult,
+        );
+        downloadUrls[file] = url;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  });
+
+  await Promise.all(conversionPromises);
+
+  return downloadUrls;
+};
+
 export const useDownloadUrl = (
   filePath: string[],
-  options?: {[key: string]: any},
+  options?: UseQueryOptions<{[key: string]: string}>,
   companyId?: string,
 ): UseQueryResult<{[key: string]: string}> => {
   const {user} = useUserSession();
@@ -34,37 +68,6 @@ export const useDownloadUrl = (
     fetchId = companyId;
   }
 
-  const fetchBatchDownloadUrls = async (batch: string[]) => {
-    const downloadUrls = await fetchDownloadUrl(batch, fetchId!);
-
-    const conversionPromises = Object.keys(downloadUrls).map(async (file) => {
-      const extension = file.split('.').pop()?.toLowerCase();
-      if (extension === 'heic') {
-        try {
-          const res = await fetch(downloadUrls[file]);
-          const blob = await res.blob();
-          const conversionResult = await heic2any({
-            blob,
-            toType: 'image/jpeg',
-          });
-
-          const url = URL.createObjectURL(
-            Array.isArray(conversionResult)
-              ? new Blob(conversionResult, {type: 'image/jpeg'})
-              : conversionResult,
-          );
-          downloadUrls[file] = url;
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    });
-
-    await Promise.all(conversionPromises);
-
-    return downloadUrls;
-  };
-
   const batchSize = 5;
   const batches = Array.from(
     {length: Math.ceil(filePath.length / batchSize)},
@@ -75,10 +78,16 @@ export const useDownloadUrl = (
     },
   );
 
-  return useQuery(
+  return useQuery<{[key: string]: string}>(
     [qk.invoiceDownloadUrl, filePath, fetchId],
     () => {
-      const promises = batches.map((batch) => fetchBatchDownloadUrls(batch));
+      if (!filePath.length) {
+        return Promise.resolve({});
+      }
+
+      const promises = batches.map((batch) =>
+        fetchDownloadUrls(batch, fetchId!),
+      );
       return Promise.all(promises).then((results) =>
         Object.assign({}, ...results),
       );

@@ -8,8 +8,12 @@ import IconButton from '@mui/material/IconButton';
 import {SearchInput} from 'components/SearchInput';
 import {PageCard} from 'components/PageCard';
 import DatePickerRange from 'components/DatePickerRange';
-import {ServiceOrderView} from 'models/service-order';
-import {useDueServiceOrders} from 'hooks/reactQuery/useServiceOrder';
+import {
+  ServiceOrderOrderField,
+  ServiceOrderStatus,
+  ServiceOrderView,
+} from 'models/service-order';
+import {useServiceOrders} from 'hooks/reactQuery/useServiceOrder';
 import {useQueryState} from 'hooks/useQueryState';
 import {useInView} from 'react-intersection-observer';
 import {addDays, endOfDay, startOfDay} from 'date-fns';
@@ -50,14 +54,19 @@ export const UnAssignedServiceOrders = ({containerStyles, ...rest}: Props) => {
   const {
     data: serviceOrders = createEmptyResource<ServiceOrderView>(page.pageSize),
     isLoading,
-  } = useDueServiceOrders({
-    end: toRestDate(endDate),
-    start: toRestDate(startDate),
+  } = useServiceOrders({
+    dueDateEnd: toRestDate(endDate),
+    dueDateStart: toRestDate(startDate),
     pageSize: page.pageSize,
     pageIndex: page.pageIndex,
     query: search,
     order,
-    candidateTechnicianAssigned: false,
+    orderBy: ServiceOrderOrderField.DUE_DATE,
+    status: [
+      ServiceOrderStatus.PLANNED,
+      ServiceOrderStatus.READY_TO_SCHEDULE,
+      ServiceOrderStatus.TECHNICIAN_ASSIGNED,
+    ],
   });
 
   useEffect(() => {

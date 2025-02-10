@@ -32,6 +32,7 @@ import {InvoiceStatus, InvoiceType, InvoiceView} from 'models/invoice';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
+  fetchDownloadUrls as fetchDownloadUrlsUtil,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {useSnackbar} from 'hooks/useSnackbar';
 import CustomSnackbar from 'components/CustomSnackbar';
@@ -68,9 +69,9 @@ import {
 } from 'pages/InvoiceDetails/utils';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
-import useFetchAndConvertImage from 'hooks/useFetchAndConvertImage';
+import {fetchAndConvertImageToBase64} from 'hooks/useFetchAndConvertImage';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
-import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
+import {ServiceOrderReportView} from 'models/service-order';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import {getJobTypeGivenName, getSignatureKeys} from 'utils/service-order-utils';
 import {
@@ -94,6 +95,10 @@ import {EmailSignature, EmployeesView} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {CANCEL_ACTION} from 'models/status';
+import {
+  CheckListComponentView,
+  ServiceOrderCheckListView,
+} from 'models/checklist';
 
 interface Props {
   invoice: InvoiceView;
@@ -306,35 +311,12 @@ export const Actions = ({
   const serviceOrder = selectedInvoice?.serviceOrder;
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
-  const {data: serviceOrderCheckLists} = useQueryServiceOrderChecklists({
+  const {refetch: refetchChecklists} = useQueryServiceOrderChecklists({
     serviceOrderId: serviceOrder?.id || '',
     options: {
-      enabled: !!serviceOrder?.id,
+      enabled: false,
     },
   });
-
-  const completedChecklists = serviceOrderCheckLists?.filter(
-    (c) => c.additionalInfo.status === ChecklistStatus.COMPLETED,
-  );
-
-  const labels =
-    completedChecklists?.map((c) => {
-      const schedule = invoice?.serviceOrder?.schedules
-        .filter((item) => !!item.technician)
-        .find((s) => s.technician!.id === c.technicianId);
-      const checklistNumber = c.checkList.number || 'Unassigned';
-      return {
-        value: {
-          checklistId: c.checkListId,
-          technicianId: c.technicianId,
-        },
-        label: `${checklistNumber}-${getUserFullName(
-          schedule?.technician?.userAccount,
-        )}`,
-      };
-    }) || [];
-
-  const [selectedOption, setSelectedOption] = useState(labels[0]?.value || '');
 
   const [report, setReport] = useState<ServiceOrderReportView | undefined>(
     serviceOrder?.reports?.[0],
@@ -344,75 +326,42 @@ export const Actions = ({
     (r) => r.externalId === report?.externalId,
   );
 
-  const {data: signatureDownloadUrls = {}} = useDownloadUrl(
-    completedChecklists?.length
-      ? completedChecklists.map(
-          (c) => c.additionalInfo.technicianSignature || '',
-        )
-      : [],
-  );
-
-  const selectedChecklist = completedChecklists?.find(
-    (c) =>
-      c.checkListId === selectedOption.checklistId &&
-      c.technicianId === selectedOption.technicianId,
-  );
-  const sortedChecklistComponents =
-    selectedChecklist?.checkList?.components.sort(
-      (a, b) =>
-        (a.additionalInfo?.orderNumber ?? 0) -
-        (b.additionalInfo?.orderNumber ?? 0),
-    ) ?? [];
-
-  const checklistImagesPath = useMemo(
-    () =>
-      (
-        sortedChecklistComponents.map(
-          (component) =>
-            component.additionalInfo.pictures?.map((pic) => pic.uri) ?? [],
-        ) ?? []
-      ).flat(),
-    [sortedChecklistComponents],
-  );
-
-  const {data: checklistImagesDownloadUrl, isLoading: isChecklistImageLoading} =
-    useDownloadUrl(checklistImagesPath);
-
-  const signaturePath =
-    signatureDownloadUrls[
-      selectedChecklist?.additionalInfo.technicianSignature || ''
-    ];
-
-  const signatureImageUrl = useFetchAndConvertImage(signaturePath);
-
-  const {refetch: refetchChecklistDownloadUrl} = useDownloadUrl(
-    selectedChecklist?.additionalInfo.pdfPath
-      ? [selectedChecklist?.additionalInfo.pdfPath]
-      : [],
-    {enabled: false},
-  );
-
-  const generateChecklistBlob = async () => {
+  const generateChecklistBlob = async ({
+    checklistData,
+  }: {
+    checklistData: {
+      signatureImageUrl: string;
+      selectedChecklist?: ServiceOrderCheckListView;
+      sortedChecklistComponents: CheckListComponentView[];
+      checklistImagesDownloadUrl: {
+        [key: string]: string;
+      };
+    };
+  }) => {
     const sortedChecklistComponentsCloned = _.cloneDeep(
-      sortedChecklistComponents ?? [],
+      checklistData.sortedChecklistComponents ?? [],
     );
 
     sortedChecklistComponentsCloned.forEach((component) => {
       component.additionalInfo.pictures?.forEach((pic) => {
-        pic.uri = checklistImagesDownloadUrl?.[pic.uri] ?? pic.uri;
+        pic.uri =
+          checklistData.checklistImagesDownloadUrl?.[pic.uri] ?? pic.uri;
       });
     });
 
     const technicianSchedule = invoice?.serviceOrder?.schedules
       .filter((item) => !!item.technician)
-      .find((s) => s.technician!.id === selectedChecklist?.technicianId);
+      .find(
+        (s) =>
+          s.technician!.id === checklistData.selectedChecklist?.technicianId,
+      );
 
     let technicianData: EmployeesView | undefined;
 
-    if (selectedChecklist?.technicianId) {
+    if (checklistData.selectedChecklist?.technicianId) {
       try {
         technicianData = await getTechnicianByEmployeeId(
-          selectedChecklist?.technicianId,
+          checklistData.selectedChecklist?.technicianId,
         );
       } catch (error) {
         enqueueSnackbar(t('Failed to fetch technician data'), {
@@ -433,9 +382,9 @@ export const Actions = ({
         selectedLng={company?.language}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
-        selectedChecklist={selectedChecklist}
+        selectedChecklist={checklistData.selectedChecklist}
         sortedChecklistComponents={sortedChecklistComponentsCloned}
-        signaturePath={signatureImageUrl}
+        signaturePath={checklistData.signatureImageUrl}
         technicianName={technicianNameForChecklist}
         headerPath={headerUrl[headerInfo?.path]}
         headerInfo={headerInfo}
@@ -446,12 +395,6 @@ export const Actions = ({
 
     return blob;
   };
-
-  useEffect(() => {
-    if (completedChecklists?.length && !selectedOption) {
-      setSelectedOption(labels[0].value);
-    }
-  }, [completedChecklists]);
 
   // Handle Work report
 
@@ -789,6 +732,135 @@ export const Actions = ({
     return createFilesFromBlobArray([blob], fileNames, fileDescriptions);
   };
 
+  const getChecklistData = async () => {
+    const {data: checklists} = await refetchChecklists();
+
+    const labels =
+      checklists?.map((c) => {
+        const schedule = invoice?.serviceOrder?.schedules
+          .filter((item) => !!item.technician)
+          .find((s) => s.technician!.id === c.technicianId);
+        const checklistNumber = c.checkList.number || 'Unassigned';
+        return {
+          value: {
+            checklistId: c.checkListId,
+            technicianId: c.technicianId,
+          },
+          label: `${checklistNumber}-${getUserFullName(
+            schedule?.technician?.userAccount,
+          )}`,
+        };
+      }) || [];
+
+    const selectedOption = labels?.[0]?.value;
+
+    const selectedChecklist = checklists?.find(
+      (c) =>
+        c.checkListId === selectedOption?.checklistId &&
+        c.technicianId === selectedOption?.technicianId,
+    );
+
+    const sortedChecklistComponents =
+      selectedChecklist?.checkList?.components.sort(
+        (a, b) =>
+          (a.additionalInfo?.orderNumber ?? 0) -
+          (b.additionalInfo?.orderNumber ?? 0),
+      ) ?? [];
+
+    const checklistImagesPath = (
+      sortedChecklistComponents.map(
+        (component) =>
+          component.additionalInfo.pictures?.map((pic) => pic.uri) ?? [],
+      ) ?? []
+    ).flat();
+
+    return {
+      selectedChecklist,
+      checklistImagesPath,
+      checklists,
+      sortedChecklistComponents,
+    };
+  };
+
+  const getChecklistOperations = async (invoiceData: InvoiceView) => {
+    const {
+      checklistImagesPath,
+      checklists,
+      selectedChecklist,
+      sortedChecklistComponents,
+    } = await getChecklistData();
+
+    const checklistImagesDownloadUrl = await fetchDownloadUrlsUtil(
+      checklistImagesPath,
+      user?.userAccount.serviceCompany.id!,
+    );
+
+    const signatureDownloadUrls = await fetchDownloadUrlsUtil(
+      checklists?.length
+        ? checklists.map((c) => c.additionalInfo.technicianSignature || '')
+        : [],
+      user?.userAccount.serviceCompany.id!,
+    );
+
+    const signaturePath =
+      signatureDownloadUrls?.[
+        selectedChecklist?.additionalInfo?.technicianSignature || ''
+      ] || '';
+
+    const signatureImageUrl = await fetchAndConvertImageToBase64(signaturePath);
+
+    // Checklist operations
+    let checklistOperations;
+    if (invoiceData?.additionalInfo.includeCheckList) {
+      if (
+        selectedChecklist?.additionalInfo.pdfGenerationStatus ===
+          PdfGenerationStatus.DONE &&
+        selectedChecklist?.additionalInfo.pdfPath
+      ) {
+        const checklistDownloadUrl = await fetchDownloadUrlsUtil(
+          [selectedChecklist?.additionalInfo.pdfPath],
+          user?.userAccount.serviceCompany.id!,
+        );
+        checklistOperations = fetchAndCreateFiles(
+          checklistDownloadUrl ? Object.values(checklistDownloadUrl)[0] : '',
+          [`${selectedChecklist?.checkListId}.pdf`],
+          [
+            `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
+              selectedChecklist?.checkList.externalId ||
+              invoiceData?.serviceOrder?.externalId
+            }.pdf`,
+          ],
+        );
+      } else {
+        checklistOperations = generateChecklistBlob({
+          checklistData: {
+            sortedChecklistComponents,
+            selectedChecklist,
+            signatureImageUrl,
+            checklistImagesDownloadUrl,
+          },
+        }).then((checklistBlob) =>
+          createFilesFromBlobArray(
+            [checklistBlob],
+            [`${selectedChecklist?.checkListId}.pdf`],
+            [
+              `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
+                selectedChecklist?.checkList.externalId ||
+                invoiceData?.serviceOrder?.externalId
+              }.pdf`,
+            ],
+          ),
+        );
+      }
+    }
+
+    if (!checklistOperations) {
+      checklistOperations = Promise.resolve([]);
+    }
+
+    return checklistOperations;
+  };
+
   const getExistingFiles = async (
     invoiceDownloadUrlArg:
       | {
@@ -798,9 +870,6 @@ export const Actions = ({
     invoiceData: InvoiceView,
     nextNumber?: string,
     workReportDownloadUrlArg?: {
-      [key: string]: string;
-    },
-    checklistDownloadUrlArg?: {
       [key: string]: string;
     },
   ) => {
@@ -820,35 +889,7 @@ export const Actions = ({
 
     const xInvoiceOperation = getXInvoiceOperation(invoiceData);
 
-    // Checklist operations
-    const checklistOperations = invoiceData?.additionalInfo.includeCheckList
-      ? selectedChecklist?.additionalInfo.pdfGenerationStatus ===
-        PdfGenerationStatus.DONE
-        ? fetchAndCreateFiles(
-            checklistDownloadUrlArg
-              ? Object.values(checklistDownloadUrlArg)[0]
-              : '',
-            [`${selectedChecklist?.checkListId}.pdf`],
-            [
-              `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
-                selectedChecklist?.checkList.externalId ||
-                invoiceData?.serviceOrder?.externalId
-              }.pdf`,
-            ],
-          )
-        : generateChecklistBlob().then((checklistBlob) =>
-            createFilesFromBlobArray(
-              [checklistBlob],
-              [`${selectedChecklist?.checkListId}.pdf`],
-              [
-                `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
-                  selectedChecklist?.checkList.externalId ||
-                  invoiceData?.serviceOrder?.externalId
-                }.pdf`,
-              ],
-            ),
-          )
-      : Promise.resolve([]);
+    const checklistOperations = await getChecklistOperations(invoiceData);
 
     // Wait for all file operations to complete
     const [baseFiles, workReportFiles, checklistFiles, xInvoiceFiles] =
@@ -948,7 +989,6 @@ export const Actions = ({
     // Refetch the download URLs for invoice, work report, and checklist
     const invoiceDownloadUrlResponse = await refetchDownloadUrl();
     const workReportDownloadUrlResponse = await refetchWorkReportDownloadUrl();
-    const checklistDownloadUrlResponse = await refetchChecklistDownloadUrl();
 
     // Ensure all download URLs are fetched before calling getExistingFiles
     await getExistingFiles(
@@ -956,7 +996,6 @@ export const Actions = ({
       invoiceWithUpdatedDueDate,
       companyNextId,
       workReportDownloadUrlResponse.data,
-      checklistDownloadUrlResponse.data,
     );
   };
 
@@ -1038,7 +1077,6 @@ export const Actions = ({
 
   const {actions} = useInvoiceMenuActions({
     invoice,
-    isChecklistImageLoading,
     onSend: handleOpenSendInvoiceModal,
     onPrint: handlePrint,
     onCreateCreditNote: () => setIsCreateCreditNoteDialogOpen(true),
@@ -1479,11 +1517,11 @@ export const Actions = ({
           callback={async (emailRecord) => {
             try {
               setIsSendingEmail(true);
-              const checkListInfo = selectedChecklist!;
+              const {selectedChecklist} = await getChecklistData();
               const isDraftInvoice = invoice.status === InvoiceStatus.DRAFT;
               const invoiceUploadPath = `${serviceCompanyId}/invoices`;
               const workReportUploadPath = `${serviceCompanyId}/serviceOrders/${invoice?.serviceOrder?.id}/report`;
-              const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${selectedInvoice?.serviceOrder?.id}/checkLists/${checkListInfo?.technicianId}`;
+              const checklistUploadPath = `${serviceCompanyId}/serviceOrders/${selectedInvoice?.serviceOrder?.id}/checkLists/${selectedChecklist?.technicianId}`;
               const fileNames: string[] = [
                 `${selectedInvoice?.id}.pdf`,
                 `${selectedInvoice?.id}.xml`,
