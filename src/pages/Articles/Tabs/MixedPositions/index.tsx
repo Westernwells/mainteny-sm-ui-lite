@@ -79,6 +79,7 @@ import MixedPositionPdf from 'components/pdf-templates/MixedPositionPdf';
 import {pdf} from '@react-pdf/renderer';
 import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {companyLanguageContextMap} from 'utils/language';
+import {EmptySection} from 'components/EmptySection';
 import PositionPreview from './PositionPreview';
 import SubPositionRowComponent from './SubPositionRowComponent';
 import MixedPositionRowComponent from './MixedPositionRowComponent';
@@ -298,7 +299,7 @@ const MixedPositions = () => {
 
   const rows = useMemo(() => [...localRows], [localRows]);
 
-  const {noMatchingData} = useMemo(() => {
+  const {emptyTable, noMatchingData} = useMemo(() => {
     if (!isFetched) return {emptyTable: false, noMatchingData: false};
 
     if (!!search && articleResource.total === 0) {
@@ -306,7 +307,7 @@ const MixedPositions = () => {
     }
 
     // when the user does not have filters applied and there are no entries for the table
-    if (articleResource.total === 0) {
+    if (!search && articleResource.total === 0) {
       return {emptyTable: true, noMatchingData: true};
     }
 
@@ -888,6 +889,57 @@ const MixedPositions = () => {
         justifyContent="center"
         alignItems="center">
         <CircularProgress size={25} />
+      </Box>
+    );
+  }
+
+  if (emptyTable && !localRows.length) {
+    return (
+      <Box
+        gap={3}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: '1 1 auto',
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '24px',
+        }}>
+        {renderAlert(true)}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '60%',
+            mt: 12,
+          }}>
+          <EmptySection
+            label="No mixed positions"
+            subLabel="Group several positions and services allowing you to create quotes and invoices quicker with greater clarity."
+            illustration="mixedPositions"
+            size="tiny"
+            containerStyle={{
+              height: '100%',
+            }}
+            btnLabel="New Mixed Position"
+            btnAction={() => {
+              handleNewMixedPosition();
+            }}
+            showActionBtn
+            labelVariant="h5"
+            subLabelProps={{
+              color: '#828DA3',
+              maxWidth: '420px',
+              mt: 1,
+              mb: 0.5,
+              fontWeight: 600,
+            }}
+          />
+        </Box>
       </Box>
     );
   }
