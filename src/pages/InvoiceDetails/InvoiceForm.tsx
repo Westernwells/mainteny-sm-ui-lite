@@ -1700,7 +1700,7 @@ export const InvoiceForm = ({
 
     await generateBlobUrl({
       invoiceData: pdfInvoice,
-      invoiceNumber: companyNextNumber?.value,
+      invoiceNumber: translate('Automatically assigned'),
       setInState: true,
     });
   };
