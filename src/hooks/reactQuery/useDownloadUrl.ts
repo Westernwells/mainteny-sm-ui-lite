@@ -81,6 +81,10 @@ export const useDownloadUrl = (
   return useQuery<{[key: string]: string}>(
     [qk.invoiceDownloadUrl, filePath, fetchId],
     () => {
+      if (!filePath.length) {
+        return Promise.resolve({});
+      }
+
       const promises = batches.map((batch) =>
         fetchDownloadUrls(batch, fetchId!),
       );

@@ -71,7 +71,7 @@ import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
 import {useQueryServiceOrderChecklists} from 'hooks/reactQuery/useChecklists';
 import {fetchAndConvertImageToBase64} from 'hooks/useFetchAndConvertImage';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
-import {ChecklistStatus, ServiceOrderReportView} from 'models/service-order';
+import {ServiceOrderReportView} from 'models/service-order';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import {getJobTypeGivenName, getSignatureKeys} from 'utils/service-order-utils';
 import {
@@ -735,12 +735,8 @@ export const Actions = ({
   const getChecklistData = async () => {
     const {data: checklists} = await refetchChecklists();
 
-    const completedChecklists = checklists?.filter(
-      (c) => c.additionalInfo.status === ChecklistStatus.COMPLETED,
-    );
-
     const labels =
-      completedChecklists?.map((c) => {
+      checklists?.map((c) => {
         const schedule = invoice?.serviceOrder?.schedules
           .filter((item) => !!item.technician)
           .find((s) => s.technician!.id === c.technicianId);
@@ -758,7 +754,7 @@ export const Actions = ({
 
     const selectedOption = labels?.[0]?.value;
 
-    const selectedChecklist = completedChecklists?.find(
+    const selectedChecklist = checklists?.find(
       (c) =>
         c.checkListId === selectedOption?.checklistId &&
         c.technicianId === selectedOption?.technicianId,
@@ -781,7 +777,7 @@ export const Actions = ({
     return {
       selectedChecklist,
       checklistImagesPath,
-      completedChecklists,
+      checklists,
       sortedChecklistComponents,
     };
   };
@@ -789,7 +785,7 @@ export const Actions = ({
   const getChecklistOperations = async (invoiceData: InvoiceView) => {
     const {
       checklistImagesPath,
-      completedChecklists,
+      checklists,
       selectedChecklist,
       sortedChecklistComponents,
     } = await getChecklistData();
@@ -800,10 +796,8 @@ export const Actions = ({
     );
 
     const signatureDownloadUrls = await fetchDownloadUrlsUtil(
-      completedChecklists?.length
-        ? completedChecklists.map(
-            (c) => c.additionalInfo.technicianSignature || '',
-          )
+      checklists?.length
+        ? checklists.map((c) => c.additionalInfo.technicianSignature || '')
         : [],
       user?.userAccount.serviceCompany.id!,
     );
