@@ -137,7 +137,7 @@ export const Actions = ({
     label: t('Download'),
     icon: <FileDownload />,
     onClick: () => {
-      setPdfPathToDownload(invoice.additionalInfo.pdfPath);
+      setPdfPathToDownload(invoice.additionalInfo?.pdfPath ?? '');
     },
   };
 

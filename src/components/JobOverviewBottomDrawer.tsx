@@ -298,48 +298,44 @@ export const JobOverviewBottomDrawer = ({
         onClose={handleDeleteDialogClose}
       />
 
-      {openScheduleDialog && (
-        <ScheduleDialog
-          serviceOrderId={serviceOrderDetails.id}
-          serviceOrderType={getJobTypeGivenName(
-            serviceOrderDetails.type,
-            allJobTypes,
-          )}
-          title={t(getDialogTitle(serviceOrderDetails))}
-          open={openScheduleDialog}
-          onClose={() => setOpenScheduleDialog(false)}
-          defaultTechnicians={getDefaultTechnician(serviceOrderDetails)}
-          defaultStartDate={
-            serviceOrderDetails.schedules.length
-              ? new Date(serviceOrderDetails.schedules[0].startTime)
-              : null
-          }
-          defaultEndDate={
-            serviceOrderDetails.schedules.length
-              ? new Date(serviceOrderDetails.schedules[0].endTime)
-              : null
-          }
-          defaultDueDate={
-            serviceOrderDetails.dueDate
-              ? new Date(serviceOrderDetails.dueDate)
-              : null
-          }
-          defaultCallTime={
-            serviceOrderDetails.additionalInfo?.callerInfo?.calledAt
-              ? new Date(serviceOrderDetails.additionalInfo.callerInfo.calledAt)
-              : null
-          }
-          defaultCallerName={
-            serviceOrderDetails.additionalInfo?.callerInfo?.name
-          }
-          defaultPurchaseOrderNumber={
-            serviceOrderDetails.additionalInfo.purchaseOrderNumber
-          }
-          defaultCallerPhoneNumber={
-            serviceOrderDetails.additionalInfo?.callerInfo?.phoneNumber
-          }
-        />
-      )}
+      <ScheduleDialog
+        serviceOrderId={serviceOrderDetails.id}
+        serviceOrderType={getJobTypeGivenName(
+          serviceOrderDetails.type,
+          allJobTypes,
+        )}
+        title={t(getDialogTitle(serviceOrderDetails))}
+        open={openScheduleDialog}
+        onClose={() => setOpenScheduleDialog(false)}
+        defaultTechnicians={getDefaultTechnician(serviceOrderDetails)}
+        defaultStartDate={
+          serviceOrderDetails.schedules.length
+            ? new Date(serviceOrderDetails.schedules[0].startTime)
+            : null
+        }
+        defaultEndDate={
+          serviceOrderDetails.schedules.length
+            ? new Date(serviceOrderDetails.schedules[0].endTime)
+            : null
+        }
+        defaultDueDate={
+          serviceOrderDetails.dueDate
+            ? new Date(serviceOrderDetails.dueDate)
+            : null
+        }
+        defaultCallTime={
+          serviceOrderDetails.additionalInfo?.callerInfo?.calledAt
+            ? new Date(serviceOrderDetails.additionalInfo.callerInfo.calledAt)
+            : null
+        }
+        defaultCallerName={serviceOrderDetails.additionalInfo?.callerInfo?.name}
+        defaultPurchaseOrderNumber={
+          serviceOrderDetails.additionalInfo.purchaseOrderNumber
+        }
+        defaultCallerPhoneNumber={
+          serviceOrderDetails.additionalInfo?.callerInfo?.phoneNumber
+        }
+      />
     </>
   );
 };

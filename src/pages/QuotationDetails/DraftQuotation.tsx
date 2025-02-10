@@ -1711,7 +1711,6 @@ export const DraftQuotation = ({
 
       <Dialog
         title={t('Quotation preview')}
-        disableSaveBtn={!!Object.keys(formik.errors).length}
         onClose={handlePreviewClose}
         onCancel={() => downloadFile()}
         dialogProps={{

@@ -285,7 +285,7 @@ export const ViewInvoice = ({
   const {downloadFile} = useDownloadFileWithCustomName(
     invoice.externalId || invoice.number,
     filePathToDownload ||
-      (downloadUrl ? downloadUrl[invoice?.additionalInfo.pdfPath] : ''),
+      (downloadUrl ? downloadUrl[invoice?.additionalInfo?.pdfPath ?? ''] : ''),
   );
 
   const {mutateAsync: getXInvoiceByInvoiceId} = useFetchXInvoiceByInvoiceId();
@@ -725,7 +725,9 @@ export const ViewInvoice = ({
         refetchXMLDownloadUrl(),
       ]);
 
-      downloadFile(downloadUrlData.data?.[invoice.additionalInfo.pdfPath]); // pdf
+      downloadFile(
+        downloadUrlData.data?.[invoice.additionalInfo?.pdfPath ?? ''],
+      ); // pdf
 
       if (shouldDownloadXML && invoice.additionalInfo.xmlPath) {
         downloadFile(
@@ -1083,7 +1085,7 @@ export const ViewInvoice = ({
     const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
 
     const PDFDownloadURL =
-      PDFDownloadURLResponse.data?.[invoice.additionalInfo.pdfPath];
+      PDFDownloadURLResponse.data?.[invoice.additionalInfo?.pdfPath ?? ''];
     const XMLDownloadURL =
       XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
 
@@ -1284,7 +1286,7 @@ export const ViewInvoice = ({
         {
           id: invoice.id!,
           body: {
-            pdfPath: invoice.additionalInfo.pdfPath,
+            pdfPath: invoice.additionalInfo?.pdfPath ?? '',
             xmlPath: invoice.additionalInfo.xmlPath,
             externalId: invoice.externalId!,
             dueDate: invoice.dueDate || dateToString(new Date()),

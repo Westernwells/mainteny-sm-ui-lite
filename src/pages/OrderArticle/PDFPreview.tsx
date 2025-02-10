@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import React, {useRef, useState} from 'react';
+import {useRef, useState} from 'react';
 import {Document, Page, pdfjs} from 'react-pdf';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 

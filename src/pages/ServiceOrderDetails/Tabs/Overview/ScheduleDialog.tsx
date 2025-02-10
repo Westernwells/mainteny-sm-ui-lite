@@ -31,6 +31,7 @@ import {useForm} from 'react-hook-form';
 import {queryKeys} from 'reactQuery/constants';
 import {useQueryClient} from 'react-query';
 import {useQueryServiceCompanyEmployees} from 'hooks/reactQuery/useEmployee';
+import isValid from 'date-fns/isValid';
 import {DatePicker} from '../../../../components/DatePicker';
 import {FormInput} from '../../../../components/form/FormInput';
 import {ScheduleForm} from '../../models';
@@ -147,17 +148,33 @@ export const ScheduleDialog = ({
     'callTime',
   ]);
 
+  const validStartDate =
+    watchSwitchActive &&
+    watchStartDate &&
+    isValid(watchStartDate) &&
+    watchStartTime &&
+    isValid(watchStartTime);
+
+  const validEndDate =
+    watchSwitchActive &&
+    watchEndDate &&
+    isValid(watchEndDate) &&
+    watchEndTime &&
+    isValid(watchEndTime);
+
   const onFormSubmit = handleSubmit((values) => {
-    const {startDate, endDate, startTime, endTime, switchActive, ...rest} =
-      values;
+    const {...rest} = values;
     const {orderStartTime, orderEndTime} =
-      switchActive && startDate && endDate && startTime && endTime
+      validStartDate && validEndDate
         ? {
             orderStartTime: toRestDateTime(
-              setDateTime(startDate, formatDate(startTime, 'HH:mm')!),
+              setDateTime(watchStartDate, formatDate(watchStartTime, 'HH:mm')!),
             ),
             orderEndTime: toRestDateTime(
-              setDateTime(endDate, formatDate(endTime as Date, 'HH:mm')!),
+              setDateTime(
+                watchEndDate,
+                formatDate(watchEndTime as Date, 'HH:mm')!,
+              ),
             ),
           }
         : {orderStartTime: null, orderEndTime: null};
@@ -213,16 +230,29 @@ export const ScheduleDialog = ({
 
   // temporary solution until making Yup resolver work with react-hook-form
   const formNotValidCustomValidation = useMemo(() => {
-    if (!watchDueDate) return true;
-    return (
-      watchSwitchActive &&
-      (!watchStartTime || !watchEndTime || !watchStartDate || !watchEndDate)
-    );
+    // If there is no dueDate, also invalid
+    if (!watchDueDate || !isValid(watchDueDate)) return true;
+
+    // If switch is on, ensure all 4 date/time values are valid
+    if (watchSwitchActive) {
+      return (
+        !watchStartDate ||
+        !watchEndDate ||
+        !watchStartTime ||
+        !watchEndTime ||
+        !isValid(watchStartDate) ||
+        !isValid(watchEndDate) ||
+        !isValid(watchStartTime) ||
+        !isValid(watchEndTime)
+      );
+    }
+
+    return false;
   }, [
-    watchStartTime,
-    watchEndTime,
     watchStartDate,
     watchEndDate,
+    watchStartTime,
+    watchEndTime,
     watchDueDate,
     watchSwitchActive,
   ]);

@@ -134,6 +134,10 @@ describe('Job', () => {
 
                     ServiceJobPage.selectTechnicianWithIndex(2);
 
+                    cy.get('[data-testid="due-date"]').click();
+                    cy.get('button[aria-current="date"]').click({force: true});
+                    cy.contains('button', 'Confirm').click({waitForAnimations: false});
+
                     cy.contains('button', 'Save').should('not.be.disabled').click();
 
                     cy.contains('Service job scheduled successfully');
