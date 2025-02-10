@@ -21,7 +21,6 @@ import {
 } from 'utils/constants';
 import {getUserFullName} from 'utils/utils';
 import {ServiceCompanyNumberType} from 'models/service-company';
-import {ChecklistStatus} from 'models/service-order';
 import {ViewInvoice} from './ViewInvoice';
 
 interface Props {
@@ -106,22 +105,18 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
     },
   });
 
-  const completedChecklists = serviceOrderCheckLists?.filter(
-    (c) => c.additionalInfo.status === ChecklistStatus.COMPLETED,
-  );
-
   const {
     data: signatureDownloadUrls = {},
     isLoading: isLoadingSignatureDownloadUrls,
   } = useDownloadUrl(
-    completedChecklists?.length
-      ? completedChecklists.map(
+    serviceOrderCheckLists?.length
+      ? serviceOrderCheckLists.map(
           (c) => c.additionalInfo.technicianSignature || '',
         )
       : [],
   );
 
-  const labels = completedChecklists?.map((c) => {
+  const labels = serviceOrderCheckLists?.map((c) => {
     const schedule = invoice?.serviceOrder?.schedules
       .filter((item) => !!item.technician)
       .find((s) => s.technician!.id === c.technicianId);
@@ -139,7 +134,7 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
 
   const selectedOption = labels?.[0]?.value;
 
-  const selectedChecklist = completedChecklists?.find(
+  const selectedChecklist = serviceOrderCheckLists?.find(
     (c) =>
       c.checkListId === selectedOption?.checklistId &&
       c.technicianId === selectedOption?.technicianId,
@@ -212,7 +207,7 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
         footerUrl && footerInfo?.path ? footerUrl[footerInfo.path] : ''
       }
       checklistProps={{
-        completedChecklists,
+        serviceOrderCheckLists,
         signatureImageUrl,
         selectedChecklist,
         sortedChecklistComponents,

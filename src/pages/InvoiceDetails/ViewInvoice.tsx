@@ -147,7 +147,7 @@ interface Props {
   headerUrl: string;
   footerUrl: string;
   checklistProps: {
-    completedChecklists?: ServiceOrderCheckListView[];
+    serviceOrderCheckLists?: ServiceOrderCheckListView[];
     signatureImageUrl: string;
     selectedChecklist?: ServiceOrderCheckListView;
     sortedChecklistComponents: CheckListComponentView[];
@@ -172,7 +172,7 @@ export const ViewInvoice = ({
   headerUrl,
   footerUrl,
   checklistProps: {
-    completedChecklists,
+    serviceOrderCheckLists,
     signatureImageUrl,
     selectedChecklist,
     sortedChecklistComponents,
@@ -338,7 +338,7 @@ export const ViewInvoice = ({
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
   const checklistSummaries = useMemo(() => {
-    const data = completedChecklists?.map((checklist) => {
+    const data = serviceOrderCheckLists?.map((checklist) => {
       const componentsWithoutHead =
         checklist?.checkList.components.filter(
           (c) => c.type !== CheckListComponentType.HEAD,
@@ -368,7 +368,7 @@ export const ViewInvoice = ({
       };
     });
     return data;
-  }, [completedChecklists]);
+  }, [serviceOrderCheckLists]);
 
   const [report, setReport] = useState<ServiceOrderReportView | undefined>(
     serviceOrder?.reports?.[0],
@@ -1539,7 +1539,7 @@ export const ViewInvoice = ({
           )}
 
           {/* CHECKLIST CARD */}
-          {(completedChecklists?.length ?? 0) > 0 && (
+          {(serviceOrderCheckLists?.length ?? 0) > 0 && (
             <PageCard
               headerLabel={t('Checklist')}
               headerIcon={<FactCheckOutlinedIcon sx={{color: '#8F9BB380'}} />}
