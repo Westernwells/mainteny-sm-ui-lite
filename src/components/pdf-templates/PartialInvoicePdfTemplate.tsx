@@ -288,7 +288,7 @@ const PartialInvoicePdfTemplate = ({
       invoice?.propertyOwner?.additionalInfo?.vatId) ||
     '';
 
-  const eanValue = invoice?.propertyOwner.additionalInfo.ean || '';
+  const eanValue = invoice?.propertyOwner.additionalInfo?.ean || '';
 
   return (
     <Document>

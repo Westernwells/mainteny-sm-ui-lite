@@ -270,7 +270,11 @@ export const TimePicker = ({
           }}
           value={value}
           onChange={(newValue) => {
-            setValue(newValue);
+            if (!newValue || Number.isNaN(newValue.getTime())) {
+              setValue(null);
+            } else {
+              setValue(newValue);
+            }
           }}
           minTime={minTime}
           maxTime={maxTime}

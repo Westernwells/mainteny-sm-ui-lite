@@ -40,6 +40,7 @@ import {
   useCreateInvoice,
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
+  useInvoiceAmountDetail,
   useInvoices,
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
@@ -67,6 +68,7 @@ import {
 } from 'utils/utils';
 import {
   useCompanyJobTypes,
+  useCompanyNextNumber,
   useCompanyTerms,
   useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
@@ -86,7 +88,10 @@ import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/in
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
 import {T} from 'utils/i18n-utils';
-import {ServiceCompanyType} from 'models/service-company';
+import {
+  ServiceCompanyNumberType,
+  ServiceCompanyType,
+} from 'models/service-company';
 import RichTextField from 'components/RichTextField';
 import {useTranslation} from 'react-i18next';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
@@ -101,8 +106,9 @@ import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import {useVats} from 'hooks/reactQuery/useVats';
-import {isEqual} from 'lodash';
+import {debounce, isEqual} from 'lodash';
 import queryString from 'query-string';
 import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
@@ -118,12 +124,46 @@ import {CreateNotes} from './Notes/CreateNotes';
 import {PartialPaymentsSection} from './PartialPaymentsSection';
 import {SectionTitle} from './SectionTitle';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
-import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
+import {
+  articleViewToInvoiceItemRecord,
+  correctCreditNoteInvoicesPercentages,
+  formatInvoiceRecord,
+} from './utils';
 import {Notes} from './Notes/EditNotes';
 import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
-import {getInvoiceDueDate, GetInvoiceDueDateProps} from 'utils/invoice-utils';
+import {
+  getInvoiceDueDate,
+  GetInvoiceDueDateProps,
+  svgToJpegPng,
+} from 'utils/invoice-utils';
 import {getJobTypeGivenName} from 'utils/service-order-utils';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
+import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
+import {pdf} from '@react-pdf/renderer';
+import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
+import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
+import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
+import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
+import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+  CLIENT_STORAGE_PDF_TEMPLATE_KEY,
+} from 'utils/constants';
+import {
+  QRCurrencyCode,
+  createQrData,
+  moneyToCents,
+  useCurrentCurrency,
+} from 'utils/currency';
+import {generatePdfInvoice} from 'utils/invoice';
+import {SwissQRBill} from 'swissqrbill/svg';
+import {calculateInvoiceAmount} from 'utils/calculate-total';
 
 interface Props {
   invoice?: InvoiceView;
@@ -234,7 +274,7 @@ export const InvoiceForm = ({
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
-
+  const currentCurrency = useCurrentCurrency();
   const DEFAULT_LABOR_COST_TEXT = useMemo(
     () => t('Labor costs without VAT: {LABOR_COST}'),
     [t],
@@ -311,6 +351,82 @@ export const InvoiceForm = ({
 
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [initialNewLoadComplete, setInitialNewLoadComplete] = useState(false);
+
+  const serviceCompanyId = user?.userAccount.serviceCompany.id || '';
+
+  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
+  const [filePathToDownload, setFilePathToDownload] = useState('');
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    invoice?.externalId,
+    filePathToDownload,
+  );
+
+  const translate = useMemo(
+    () => (key: string, options?: {context: string}) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key, options);
+      }
+
+      return t(key, options);
+    },
+    [company?.language],
+  );
+
+  const [qrImageSrc, setQrImageSrc] = useState<string>('');
+  const [qrError, setQrError] = useState<string | null>(null);
+
+  const {data: companyNextNumber} = useCompanyNextNumber(
+    {type: ServiceCompanyNumberType.INVOICE},
+    serviceCompanyId,
+  );
+
+  const {data: invoiceAmountDetail, isLoading: isLoadingInvoiceAmountDetail} =
+    useInvoiceAmountDetail(invoice?.id);
+
+  const {
+    data: clientStorageDataPdfConfig,
+    isLoading: isLoadingClientStorageDataPdfConfig,
+  } = useQueryClientStorageData({
+    serviceCompanyId,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+
+  const pdfConfig = useMemo(
+    () =>
+      clientStorageDataPdfConfig?.value
+        ? JSON.parse(clientStorageDataPdfConfig.value)
+        : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+    [clientStorageDataPdfConfig?.value],
+  );
+
+  const {
+    data: clientStorageDataTemplate,
+    isLoading: isLoadingClientStorageDataTemplate,
+  } = useQueryClientStorageData({
+    serviceCompanyId,
+    params: {key: CLIENT_STORAGE_PDF_TEMPLATE_KEY},
+  });
+
+  const {headerInfo, footerInfo} = useMemo(() => {
+    const parsedData = JSON.parse(clientStorageDataTemplate?.value || '{}');
+    return {
+      headerInfo: parsedData.header,
+      footerInfo: parsedData.footer,
+    };
+  }, [clientStorageDataTemplate?.value]);
+
+  const {data: headerUrl = {}, isLoading: isLoadingHeaderUrl} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    serviceCompanyId,
+  );
+
+  const {data: footerUrl = {}, isLoading: isLoadingFooterUrl} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    serviceCompanyId,
+  );
 
   const [pageState, setPageState] = useState(
     invoiceId && isNewInvoice
@@ -534,6 +650,11 @@ export const InvoiceForm = ({
     resetLocalStorage();
   };
 
+  const handlePreviewClose = () => {
+    setOpenPreviewDialog(false);
+    setFilePathToDownload('');
+  };
+
   const formik = useFormik<InvoiceFormData>({
     initialValues,
     validationSchema,
@@ -746,11 +867,6 @@ export const InvoiceForm = ({
     formik.setFieldValue(
       'includeCheckList',
       invoiceData?.additionalInfo.includeCheckList || false,
-    );
-
-    formik.setFieldValue(
-      'beneficialName',
-      invoiceData?.additionalInfo.beneficialDetails?.name || '',
     );
 
     formik.setFieldValue(
@@ -1433,6 +1549,160 @@ export const InvoiceForm = ({
 
   const handleDateFieldChange = (fieldName: string, newValue?: Date | null) => {
     formik.setFieldValue(fieldName, newValue || undefined);
+  };
+
+  const qrCurrency: QRCurrencyCode =
+    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
+      ? currentCurrency.code
+      : 'EUR';
+
+  const checkValidQrCode = useCallback(
+    debounce(async (qrInvoice: InvoiceView) => {
+      if (user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+        try {
+          const qrBillData = createQrData(
+            qrCurrency,
+            qrInvoice,
+            currentCurrency,
+            user?.userAccount,
+          );
+
+          const qrBillSvg = new SwissQRBill(qrBillData);
+
+          svgToJpegPng(
+            qrBillSvg.element as unknown as SVGSVGElement,
+            (result) => {
+              setQrImageSrc(result);
+            },
+            {format: 'jpeg', quality: 1},
+          );
+          setQrError(null);
+          return '';
+        } catch (error) {
+          if (error instanceof Error) {
+            setQrError(error.message);
+            return error.message;
+          }
+        }
+      }
+    }, 500),
+    [user, currentCurrency, qrCurrency],
+  );
+
+  const generateBlobUrl = async ({
+    invoiceData,
+    invoiceNumber,
+    setInState = true,
+  }: {
+    invoiceData: InvoiceView;
+    invoiceNumber?: string;
+    setInState?: boolean;
+  }) => {
+    if (
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+      !qrImageSrc
+    ) {
+      enqueueSnackbar(qrError!, {
+        variant: 'error',
+      });
+      return;
+    }
+
+    let PdfTemplate;
+
+    if (
+      formik.values.type === InvoiceType.FULL ||
+      formik.values.type === InvoiceType.AGGREGATE
+    ) {
+      PdfTemplate = FullInvoicePdfTemplate;
+    } else if (formik.values.type === InvoiceType.CREDIT_NOTE) {
+      PdfTemplate = CreditNotePdfTemplate;
+    } else if (
+      formik.values?.type === InvoiceType.PARTIAL ||
+      formik.values?.type === InvoiceType.UPFRONT
+    ) {
+      PdfTemplate = PartialInvoicePdfTemplate;
+    } else {
+      PdfTemplate = FinalInvoicePdfTemplate;
+    }
+
+    const shouldIncludePreviousInvoices = !(
+      formik.values?.type === InvoiceType.CREDIT_NOTE ||
+      formik.values?.type === InvoiceType.FULL ||
+      formik.values?.type === InvoiceType.AGGREGATE
+    );
+
+    const previousInvoicesProp = shouldIncludePreviousInvoices
+      ? correctCreditNoteInvoicesPercentages(
+          sortedPreviousInvoices.slice(
+            0,
+            sortedPreviousInvoices.findIndex((i) => i.id === invoice?.id) + 1,
+          ),
+        )
+      : [];
+
+    const blob = await pdf(
+      <PdfTemplate
+        userInfo={user?.userAccount}
+        pdfConfigClientStorage={pdfConfig}
+        currentCurrency={currentCurrency}
+        invoice={invoiceData}
+        invoiceAmountDetail={invoiceAmountDetail}
+        selectedLng={company?.language}
+        translate={translate}
+        previousInvoices={previousInvoicesProp}
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
+        nextCompanyExternalId={
+          invoiceNumber || translate('Automatically assigned')
+        }
+        qrImageSrc={qrImageSrc}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    if (setInState) setFilePathToDownload(blobURL);
+    return blob;
+  };
+
+  const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
+    () =>
+      calculateInvoiceAmount({
+        items: formik.values.items,
+        globalDiscount: formik.values.discount,
+      }),
+    [formik.values.items, formik.values.discount],
+  );
+
+  const handlePreview = async () => {
+    const subtotalExclVat = calculateQuotationTotalWithPerItemDiscount(
+      formik.values.items,
+    );
+
+    const mappedVats = vats.map((vat) => ({
+      ...vat,
+      vat: moneyToCents(currentCurrency.code, vat.vat),
+    }));
+
+    const pdfInvoice = generatePdfInvoice(
+      formik.values,
+      currentCurrency,
+      subtotalExclVat,
+      amountAfterGlobalDiscountWithVAT,
+      mappedVats,
+      company,
+      serviceOrder,
+      customer,
+    );
+
+    await checkValidQrCode(pdfInvoice);
+
+    await generateBlobUrl({
+      invoiceData: pdfInvoice,
+      invoiceNumber: companyNextNumber?.value,
+      setInState: true,
+    });
   };
 
   const isValid = () => {
@@ -2421,6 +2691,30 @@ export const InvoiceForm = ({
           showBorder: actions[actions.length - 1] !== item,
         }))}
         isValid={isValid()}
+        previewButton={
+          <Button
+            label="Preview"
+            buttonProps={{
+              variant: 'outlined',
+              size: 'small',
+              startIcon: <RemoveRedEyeOutlinedIcon />,
+              onClick: async () => {
+                await handlePreview();
+                setOpenPreviewDialog(true);
+              },
+              disabled:
+                isLoadingHeaderUrl ||
+                isLoadingFooterUrl ||
+                isLoadingClientStorageDataTemplate ||
+                isLoadingClientStorageDataPdfConfig ||
+                isLoadingInvoiceAmountDetail,
+              sx: {
+                color: theme.palette.primary.dark,
+                padding: '0.3em 1.5em',
+              },
+            }}
+          />
+        }
       />
       {isAddNewCustomerDialogOpen && (
         <NewCustomer
@@ -2542,6 +2836,42 @@ export const InvoiceForm = ({
           onCloseSubDialogs={onCloseSubDialogs}
         />
       )}
+
+      <Dialog
+        title={t('Invoice preview')}
+        onClose={handlePreviewClose}
+        onCancel={() => downloadFile()}
+        dialogProps={{
+          open: openPreviewDialog || false,
+        }}
+        sx={{
+          '& .MuiDialog-paper': {
+            width: '750px',
+            maxWidth: 'none',
+            maxHeight: '844px',
+          },
+        }}
+        leftButton={
+          <Button
+            label="Close"
+            buttonProps={{
+              onClick: handlePreviewClose,
+              variant: 'text',
+              size: 'medium',
+              sx: {background: 'white'},
+            }}
+          />
+        }
+        cancelButtonText={t('Download')}
+        cancelButtonVariant="outlined"
+        cancelButtonStyles={{marginRight: '1em', border: '1px solid #000034'}}
+        cancelButtonTextColor="text.primary"
+        saveButtonText={t('Continue editing')}
+        onSave={handlePreviewClose}
+        showSaveButton
+        showCancelButton>
+        <DialogPdfPreview filePathToDownload={filePathToDownload} />
+      </Dialog>
 
       <ConfirmCancel
         open={openCancelDialog}

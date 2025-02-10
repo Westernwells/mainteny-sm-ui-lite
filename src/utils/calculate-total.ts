@@ -373,15 +373,3 @@ export const calculateInvoiceAmount = ({
     amountAfterGlobalDiscountWithVAT,
   };
 };
-
-export const getArticlesTotalAmountInclVats = (
-  invoice: InvoiceFormData | InvoiceView,
-) => {
-  const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(invoice.items);
-  const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
-    itemsAfterPerItemDiscount,
-    invoice.discount,
-  );
-  const {total} = calculateSameVatTotals(itemsAfterGlobalDiscount);
-  return total;
-};

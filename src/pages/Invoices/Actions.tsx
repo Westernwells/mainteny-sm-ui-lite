@@ -305,7 +305,7 @@ export const Actions = ({
   const {downloadFile} = useDownloadFileWithCustomName(
     invoice.externalId || invoice.number,
     pdfPathToDownload ||
-      (downloadUrl ? downloadUrl[invoice?.additionalInfo.pdfPath] : ''),
+      (downloadUrl ? downloadUrl[invoice.additionalInfo?.pdfPath ?? ''] : ''),
   );
 
   const serviceOrder = selectedInvoice?.serviceOrder;
@@ -1267,7 +1267,7 @@ export const Actions = ({
         {
           id: invoice.id!,
           body: {
-            pdfPath: invoice.additionalInfo.pdfPath,
+            pdfPath: invoice.additionalInfo?.pdfPath ?? '',
             xmlPath: invoice.additionalInfo.xmlPath,
             externalId: invoice.externalId!,
             dueDate: invoice.dueDate || dateToString(new Date()),
@@ -1292,9 +1292,9 @@ export const Actions = ({
     const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
 
     const PDFDownloadURL =
-      PDFDownloadURLResponse.data?.[invoice.additionalInfo.pdfPath];
+      PDFDownloadURLResponse.data?.[invoice.additionalInfo?.pdfPath ?? ''];
     const XMLDownloadURL =
-      XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
+      XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath ?? ''];
 
     // Fetch XML file
     const response = await fetch(XMLDownloadURL!);
@@ -1355,7 +1355,7 @@ export const Actions = ({
     ) {
       const [xmlDownloadUrlData] = await Promise.all([refetchXMLDownloadUrl()]);
 
-      downloadFile(downloadUrl?.[invoice.additionalInfo.pdfPath]); // pdf
+      downloadFile(downloadUrl?.[invoice.additionalInfo?.pdfPath ?? '']); // pdf
 
       if (shouldDownloadXML && invoice.additionalInfo.xmlPath) {
         downloadFile(
