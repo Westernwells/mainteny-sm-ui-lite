@@ -1694,6 +1694,7 @@ export const InvoiceForm = ({
       company,
       serviceOrder,
       customer,
+      invoice,
     );
 
     await checkValidQrCode(pdfInvoice);

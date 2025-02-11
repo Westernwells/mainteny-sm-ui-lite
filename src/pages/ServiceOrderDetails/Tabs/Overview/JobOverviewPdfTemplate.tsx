@@ -262,7 +262,6 @@ const JobOverviewPdfTemplate = React.memo(
       (pdfConfigClientStorage.includeUnitBuilding &&
         serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
       '';
-
     return (
       <Document>
         <PdfPageContainer selectedLng={selectedLng}>
