@@ -22,6 +22,7 @@ interface Props {
   >;
   initialValues?: ServiceCompanyContactPersonFormModel;
 }
+
 const titles = Object.values(ContactTitle);
 const Form = ({form, initialValues}: Props) => {
   const {t} = useTranslation();
@@ -64,8 +65,7 @@ const Form = ({form, initialValues}: Props) => {
         <FormInput
           fieldProps={{
             label: 'First name',
-            required: true,
-            ...register('userAccount.firstName', {required: true}),
+            ...register('userAccount.firstName'),
           }}
         />
       </Grid>

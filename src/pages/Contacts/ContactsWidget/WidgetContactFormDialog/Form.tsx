@@ -101,7 +101,6 @@ const Form = ({form}: Props) => {
             label: t('First name'),
             placeholder: t('Select customer'),
             error: !!errors.contactPerson?.contactPersonId,
-            required: true,
             onChange: (e) => {
               setValue('userAccount.firstName', e.target.value);
             },

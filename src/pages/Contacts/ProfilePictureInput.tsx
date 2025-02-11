@@ -1,15 +1,20 @@
 import Input from '@mui/material/Input';
-import Avatar from '@mui/material/Avatar';
 import Grid from '@mui/material/Grid';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import {ReactComponent as AvatarIcon} from 'assets/icons/AvatarIcon.svg';
-import {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {UseFormRegister, UseFormSetValue} from 'react-hook-form';
-import {Button, IconButton, Typography} from '@mui/material';
+import {
+  Avatar as MuiAvatar,
+  Button,
+  IconButton,
+  Typography,
+} from '@mui/material';
 import {theme} from 'theme';
 import {useTranslation} from 'react-i18next';
 import {ServiceCompanyContactPersonFormModel} from 'models/contacts';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {getInitials} from 'utils/account-utils';
 
 interface Props {
   register: UseFormRegister<ServiceCompanyContactPersonFormModel>;
@@ -102,11 +107,11 @@ const ProfilePictureInput = ({
           }}
         />
 
-        <Avatar
+        <MuiAvatar
           src={isImageValid ? preview : ''}
           sx={{width: 80, height: 80, background: '#0F4C6414'}}>
           <AvatarIcon width="75%" height="100%" />
-        </Avatar>
+        </MuiAvatar>
 
         {!readOnly && (
           <IconButton
@@ -146,6 +151,7 @@ interface ProfilePicturePreviewProps {
     surname: string;
   };
 }
+
 export const ProfilePicturePreview = ({
   imageUrl,
   contactPerson,
@@ -175,17 +181,26 @@ export const ProfilePicturePreview = ({
     checkImageValidness(preview);
   }, [preview]);
 
-  const initials =
-    `${contactPerson.name[0]}${contactPerson.surname[0]}`.toUpperCase();
+  const userAccount = {
+    firstName: contactPerson?.name,
+    lastName: contactPerson?.surname,
+    photoUrl: isImageValid ? imageUrl : undefined,
+  };
+
+  const initials = getInitials(userAccount);
 
   return (
-    <Avatar
+    <MuiAvatar
       src={isImageValid ? preview : ''}
       sx={{width: 56, height: 56, background: '#0F4C6414'}}>
-      <Typography variant="h5" color="primary" lineHeight={1}>
-        {initials}
+      <Typography
+        variant="h5"
+        color="primary"
+        lineHeight={1}
+        sx={{textTransform: 'uppercase'}}>
+        {initials && initials}
       </Typography>
-    </Avatar>
+    </MuiAvatar>
   );
 };
 

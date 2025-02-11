@@ -13,7 +13,7 @@ import useTheme from '@mui/material/styles/useTheme';
 
 interface Props {
   userAccount: {
-    firstName: string;
+    firstName?: string;
     lastName?: string;
     photoUrl?: string;
   };
@@ -21,6 +21,7 @@ interface Props {
   labelStyles?: SxProps<Theme>;
   removeNameText?: boolean;
   onlyFirstInitial?: boolean;
+  key?: string;
 }
 
 export const Avatar = ({
@@ -38,6 +39,8 @@ export const Avatar = ({
 
   const userName = useMemo(() => getUserFullName(userAccount), [userAccount]);
 
+  const initialsToShow = getInitials(userAccount, onlyFirstInitial);
+
   const avatarProps = useMemo(() => {
     if (url)
       return {
@@ -54,7 +57,7 @@ export const Avatar = ({
             letterSpacing: '0.1px',
             textTransform: 'uppercase',
           }}>
-          {getInitials(userAccount, onlyFirstInitial)}
+          {initialsToShow && initialsToShow}
         </Typography>
       ),
     };
