@@ -267,7 +267,9 @@ const Contacts = () => {
         isFirst: true,
         fieldName: ServiceCompanyContactPersonOrderField.NAME,
         getExportValue: (contact) =>
-          `${contact.userAccount.firstName} ${contact.userAccount.lastName}`,
+          contact.userAccount.firstName
+            ? contact.userAccount.lastName
+            : `${contact.userAccount.firstName} ${contact.userAccount.lastName}`,
         showShadows: showRightShadow ? 'right' : undefined,
         renderCell: (contact, cellProps) => (
           <Cell {...cellProps}>

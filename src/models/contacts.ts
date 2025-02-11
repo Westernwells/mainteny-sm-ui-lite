@@ -211,7 +211,7 @@ export const ConnectionTypeLabels: {
 
 export interface ServiceCompanyContactPersonFormModel {
   userAccount: {
-    firstName: string;
+    firstName?: string;
     lastName: string;
     photoUrl: string;
     contact: {
