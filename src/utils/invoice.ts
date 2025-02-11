@@ -31,6 +31,7 @@ import {
 import {ServiceCompanyItem} from 'models/service-company';
 import {
   centsToMoney,
+  convertNumberToAmountNumber,
   Currencies,
   formatCurrency,
   moneyToCents,
@@ -497,6 +498,7 @@ export const generatePdfInvoice = (
   company?: ServiceCompanyItem,
   serviceOrder?: ServiceOrderView,
   customer?: PropertyOwnerView | null,
+  existingInvoice?: InvoiceView,
 ): InvoiceView => ({
   id: '',
   number: formikValues.externalId ?? '',
@@ -504,16 +506,18 @@ export const generatePdfInvoice = (
   description: formikValues.description ?? '',
   subject: formikValues.subject ?? '',
   type: formikValues.type,
-  totalAmount: {
-    currency: currentCurrency.code,
-    fractionDigits: currentCurrency.fractionDigits,
-    netAmount: moneyToCents(currentCurrency.code, subtotalExclVat),
-    grossAmount: moneyToCents(
-      currentCurrency.code,
-      amountAfterGlobalDiscountWithVAT,
-    ),
-    vats: mappedVats,
-  },
+  totalAmount: existingInvoice
+    ? existingInvoice.totalAmount
+    : {
+        currency: currentCurrency.code,
+        fractionDigits: currentCurrency.fractionDigits,
+        netAmount: moneyToCents(currentCurrency.code, subtotalExclVat),
+        grossAmount: moneyToCents(
+          currentCurrency.code,
+          amountAfterGlobalDiscountWithVAT,
+        ),
+        vats: mappedVats,
+      },
   sentDate: formikValues.sentDate ? dateToString(formikValues.sentDate) : '',
   dueDate: formikValues.dueDate ? dateToString(formikValues.dueDate) : '',
   status: InvoiceStatus.DRAFT,
@@ -545,7 +549,20 @@ export const generatePdfInvoice = (
     costCenter: formikValues.costCenter ?? '',
     includeWorkReport: formikValues.includeWorkReport ?? false,
     includeCheckList: formikValues.includeCheckList ?? false,
-    payment: formikValues.payment as Payment<AggregatedAmount>,
+    payment: {
+      ...formikValues.payment,
+      amount: {
+        currency:
+          formikValues.payment?.amount?.currency || currentCurrency.code,
+        fractionDigits:
+          formikValues.payment?.amount?.fractionDigits ||
+          currentCurrency.fractionDigits,
+        netAmount: convertNumberToAmountNumber(
+          formikValues.payment?.amount?.value ?? 0,
+          currentCurrency,
+        ),
+      },
+    } as Payment<AggregatedAmount>,
     deliveryStartDate: formikValues.deliveryStartDate
       ? dateToString(formikValues.deliveryStartDate)
       : '',
