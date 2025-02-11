@@ -15,6 +15,7 @@ import './assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import {LicenseInfo} from '@mui/x-license-pro';
 import BigNumber from 'bignumber.js';
 import './utils/withResolversPolyfill';
+import posthog from 'posthog-js';
 
 BigNumber.config({DECIMAL_PLACES: 2});
 
@@ -50,7 +51,13 @@ if (!window.Cypress) {
   });
 }
 
-// Add the script tag dynamically
+// PostHog Initialization
+posthog.init('phc_MaZLYyraIgdIfMqEZf4zYpTEJ78zpUQWTnMedonMvrv', {
+  api_host: 'https://eu.i.posthog.com',
+  person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+});
+
+// Add Kalasar script dynamically
 const script = document.createElement('script');
 script.src = 'https://design.kalasar.com/static/mainteny@staging/kalasar.js';
 script.async = true;

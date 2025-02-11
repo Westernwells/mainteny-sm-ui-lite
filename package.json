@@ -96,6 +96,7 @@
     "mui-address-autocomplete": "^3.0.5",
     "notistack": "^2.0.3",
     "nuvo-react": "^2.13.1",
+    "posthog-js": "^1.215.3",
     "print-js": "^1.6.0",
     "pusher-js": "^7.2.0",
     "query-string": "^7.1.1",
