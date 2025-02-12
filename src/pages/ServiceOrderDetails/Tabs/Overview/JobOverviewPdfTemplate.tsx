@@ -15,8 +15,10 @@ import TopSectionContainer from 'components/pdf-templates/containers/TopSectionC
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {DiscountType} from 'models/invoice';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {calculateInvoiceAmount} from 'utils/calculate-total';
-import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
+import {
+  calculateArticlesAmount,
+  getItemTotalAfterPerItemDiscount,
+} from 'utils/calculate-total';
 import {
   allItemsHaveZeroDiscount,
   shouldDisplayDiscountDash,
@@ -180,15 +182,18 @@ const JobOverviewPdfTemplate = React.memo(
     const articleItems = serviceOrder?.articles!;
 
     const netTotal = (articleItem: ServiceOrderArticleView) => {
-      const grossTotal =
-        (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
-      const discountValue =
-        articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
+      const total = getItemTotalAfterPerItemDiscount({
+        item: {
+          unitAmount: {
+            netAmount: articleItem?.unitAmount?.netAmount,
+          },
+          quantity: articleItem.quantity,
+          discount: articleItem?.additionalInfo?.discount,
+        },
+        precision: 0,
+      });
 
-      return (
-        (grossTotal - discountValue) /
-        10 ** (articleItem.unitAmount.fractionDigits ?? 2)
-      );
+      return centsToMoney(currentCurrency?.code!, total);
     };
 
     const elevatorAddress = serviceOrder?.elevator?.address;
@@ -197,26 +202,19 @@ const JobOverviewPdfTemplate = React.memo(
     const discountAmount = globalDiscount?.amount;
     const discountValue = discountAmount?.value ?? 0;
 
-    const subtotalExclVat =
-      calculateQuotationTotalWithPerItemDiscount(articleItems);
+    const {vats, amountAfterGlobalDiscountWithVAT, amountAfterGlobalDiscount} =
+      useMemo(
+        () =>
+          calculateArticlesAmount({
+            items: articleItems,
+            globalDiscount,
+          }),
+        [articleItems, globalDiscount],
+      );
 
-    const subtotalExclVatFormatted = formatCurrency(
-      subtotalExclVat - discountValue,
-      {
-        currency: currentCurrency?.code,
-        excludeCurrencySymbol: true,
-        currencySymbol: currentCurrency?.symbol,
-        companyLang: selectedLng,
-      },
-    );
-
-    const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
-      () =>
-        calculateInvoiceAmount({
-          items: articleItems,
-          globalDiscount,
-        }),
-      [articleItems, globalDiscount],
+    const amountAfterGlobalDiscountFormatted = formatCurrency(
+      amountAfterGlobalDiscount,
+      {currency: currentCurrency?.code},
     );
 
     const vatsFormatted = vats.map((vat) => ({
@@ -667,7 +665,7 @@ const JobOverviewPdfTemplate = React.memo(
                           textAlign: 'right',
                           fontSize: 10,
                         }}>
-                        {subtotalExclVatFormatted}
+                        {amountAfterGlobalDiscountFormatted}
                       </Text>
                     </View>
 

@@ -1,7 +1,7 @@
 import {useMemo} from 'react';
 import {Document, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import {formatCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
@@ -9,7 +9,10 @@ import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddr
 import {HtmlPDF} from 'components/HtmlPDF';
 import {InvoiceAmountDetail, InvoiceItem, InvoiceView} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
-import {calculateInvoiceAmount} from 'utils/calculate-total';
+import {
+  calculateArticlesAmount,
+  getItemTotalAfterPerItemDiscount,
+} from 'utils/calculate-total';
 import {
   applyGlobalDiscountOnItems,
   applyPerItemDiscountOnItems,
@@ -128,21 +131,23 @@ const FinalInvoicePdfTemplate = ({
   const discountValue = discountAmount?.value ?? 0;
 
   const netTotal = (articleItem: InvoiceItem) => {
-    const grossTotal =
-      (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
-    const itemDiscountValue =
-      articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
-
-    return (
-      (grossTotal - itemDiscountValue) /
-      10 ** (articleItem.unitAmount.fractionDigits || 2)
-    );
+    const total = getItemTotalAfterPerItemDiscount({
+      item: {
+        unitAmount: {
+          netAmount: articleItem?.unitAmount?.netAmount,
+        },
+        quantity: articleItem.quantity,
+        discount: articleItem?.additionalInfo?.discount,
+      },
+      precision: 0,
+    });
+    return centsToMoney(currentCurrency?.code!, total);
   };
 
   const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} =
     useMemo(
       () =>
-        calculateInvoiceAmount({
+        calculateArticlesAmount({
           items: articleItems,
           globalDiscount: discount,
         }),
