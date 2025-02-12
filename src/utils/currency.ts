@@ -300,7 +300,7 @@ export const convertNumberToAmountNumber = (
     fractionDigits: currency.fractionDigits,
   });
   const amount = bigValue.multipliedBy(factor);
-  const amountRounded = amount.integerValue(BigNumber.ROUND_DOWN);
+  const amountRounded = amount.integerValue(BigNumber.ROUND_HALF_UP);
   return amountRounded.toNumber();
 };
 

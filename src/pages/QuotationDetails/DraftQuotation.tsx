@@ -109,7 +109,7 @@ import {
   calculateQuotationTotalWithPerItemDiscount,
   generatePdfQuotation,
 } from 'utils/quotation';
-import {calculateInvoiceAmount} from 'utils/calculate-total';
+import {calculateArticlesAmount} from 'utils/calculate-total';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
 import {Notes} from './Notes';
@@ -363,7 +363,7 @@ export const DraftQuotation = ({
 
   const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
     () =>
-      calculateInvoiceAmount({
+      calculateArticlesAmount({
         items: formik.values.items,
         globalDiscount: formik.values.discount,
       }),

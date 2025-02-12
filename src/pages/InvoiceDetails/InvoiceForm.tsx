@@ -163,7 +163,7 @@ import {
 } from 'utils/currency';
 import {generatePdfInvoice} from 'utils/invoice';
 import {SwissQRBill} from 'swissqrbill/svg';
-import {calculateInvoiceAmount} from 'utils/calculate-total';
+import {calculateArticlesAmount} from 'utils/calculate-total';
 
 interface Props {
   invoice?: InvoiceView;
@@ -1668,7 +1668,7 @@ export const InvoiceForm = ({
 
   const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
     () =>
-      calculateInvoiceAmount({
+      calculateArticlesAmount({
         items: formik.values.items,
         globalDiscount: formik.values.discount,
       }),
