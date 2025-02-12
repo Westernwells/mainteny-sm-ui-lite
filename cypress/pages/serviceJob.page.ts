@@ -1,8 +1,45 @@
 import {navigateCy} from '../utils/utils';
+import OrdersPage from './orders.page';
 
 export default class ServiceJobPage {
   static visit = () => {
     navigateCy('jobs', 'list');
+  };
+
+  static openAssignEngineerDialog = () => {
+    cy.get('[data-testid="assign-engineer"]:visible', {timeout: 5000})
+      .should('be.visible')
+      .first()
+      .click({waitForAnimations: true});
+  };
+
+  static assignEngineer = (withSchedule = true, engineersCount = 1) => {
+    cy.wait('@technicianApi')
+      .its('response.body.data')
+      .then((technicians) => {
+        if (technicians.length) {
+          ServiceJobPage.submitData({
+            withSchedule,
+            assignEngineersCount: engineersCount,
+          });
+        }
+      });
+  };
+
+  static unscheduleFirstJob = () => {
+    OrdersPage.changeStatusFilter('Pending');
+    cy.get('table', {timeout: 5000}).should('be.visible');
+    cy.contains('td', /Scheduled/, {timeout: 5000})
+      .first()
+      .closest('tr')
+      .within(() => {
+        cy.get('button[aria-haspopup="true"]').click();
+      });
+    cy.contains('li', 'Unschedule').click();
+    cy.contains('button', 'Yes').click();
+    cy.contains('Service job has been unscheduled', {timeout: 5000}).should(
+      'be.visible',
+    );
   };
 
   static changeTab = (index: number) => {
