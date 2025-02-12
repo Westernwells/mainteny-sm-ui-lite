@@ -122,6 +122,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
             '&:hover': {bgcolor: 'primary.dark', color: 'white'},
           },
         }}
+        testId="assign-engineer"
       />
 
       <ScheduleDialog
@@ -130,12 +131,12 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         defaultStartDate={
-          serviceOrder.schedules.length
+          serviceOrder.schedules.length && serviceOrder.schedules[0]?.startTime
             ? new Date(serviceOrder.schedules[0].startTime)
             : null
         }
         defaultEndDate={
-          serviceOrder.schedules.length
+          serviceOrder.schedules.length && serviceOrder.schedules[0]?.endTime
             ? new Date(serviceOrder.schedules[0].endTime)
             : null
         }
