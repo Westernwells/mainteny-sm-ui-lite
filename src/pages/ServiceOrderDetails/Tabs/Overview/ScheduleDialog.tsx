@@ -88,7 +88,7 @@ export const ScheduleDialog = ({
 
   const defaultValues = useMemo(
     () => ({
-      switchActive: !!(defaultStartDate && defaultEndDate),
+      switchActive: Boolean(defaultStartDate && defaultEndDate),
       startDate: defaultStartDate,
       endDate: defaultEndDate,
       startTime: defaultStartDate,
@@ -126,6 +126,7 @@ export const ScheduleDialog = ({
     register,
     formState: {errors, touchedFields, isValid: isFormValid},
     trigger,
+    reset,
   } = form;
 
   const [
@@ -204,6 +205,7 @@ export const ScheduleDialog = ({
       },
     );
     onClose();
+    reset();
   });
 
   const {data: techniciansResource = createEmptyResource(10)} =
@@ -275,7 +277,10 @@ export const ScheduleDialog = ({
     <Box component="form" onSubmit={onFormSubmit}>
       <Dialog
         open={open || false}
-        onClose={onClose}
+        onClose={() => {
+          onClose();
+          reset();
+        }}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth
@@ -489,7 +494,10 @@ export const ScheduleDialog = ({
           <Button
             buttonProps={{
               size: 'medium',
-              onClick: onClose,
+              onClick: () => {
+                onClose();
+                reset();
+              },
             }}>
             <Typography variant="subtitle2" color="text.secondary">
               {t('Cancel')}

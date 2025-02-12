@@ -95,15 +95,58 @@ describe('Job', () => {
     });
 
     it('should assign multiple Engineers with schedule in jobs page', () => {
-        cy.contains('button', 'Assign Engineer').eq(0).click({waitForAnimations: false});
-        cy.wait('@technicianApi')
-            .its('response')
-            .then((response) => {
-                const {body: technicians} = response;
-                if (technicians.data.length) {
-                    ServiceJobPage.submitData({assignEngineersCount: 2});
-                }
-            });
+        cy.wait(2000);
+
+        cy.get('body').then(($body) => {
+            const hasUnscheduledJobs = $body.find('[data-testid="assign-engineer"]:visible').length > 0;
+
+            if (hasUnscheduledJobs) {
+                // Click Assign Engineer if it exists
+                cy.get('[data-testid="assign-engineer"]:visible', {timeout: 10000}).should('be.visible').first().click({waitForAnimations: false});
+
+                cy.wait('@technicianApi')
+                    .its('response')
+                    .then((response) => {
+                        const {body: technicians} = response;
+                        if (technicians.data.length) {
+                            ServiceJobPage.submitData({assignEngineersCount: 2});
+                        }
+                    });
+            } else {
+                ServiceJobPage.changeTab(0);
+
+                OrderPage.changeStatusFilter('Pending');
+
+                cy.get('table', {timeout: 5000}).should('be.visible');
+
+                ServiceJobPage.getFirstTableElement().should('exist').click();
+
+                cy.contains('td', /Scheduled/, {timeout: 5000})
+                    .first()
+                    .closest('tr')
+                    .within(() => {
+                        cy.get('button[aria-haspopup="true"]').click();
+                    });
+
+                cy.contains('li', 'Unschedule').click();
+                cy.contains('button', 'Yes').click();
+                cy.contains('Service job has been unscheduled', {timeout: 5000}).should('be.visible');
+
+                ServiceJobPage.changeTab(1);
+                cy.get('[data-testid="assign-engineer"]:visible', {timeout: 5000}).should('be.visible');
+
+                cy.get('[data-testid="assign-engineer"]:visible').first().click({waitForAnimations: false});
+
+                cy.wait('@technicianApi')
+                    .its('response')
+                    .then((response) => {
+                        const {body: technicians} = response;
+                        if (technicians.data.length) {
+                            ServiceJobPage.submitData({assignEngineersCount: 2});
+                        }
+                    });
+            }
+        });
     });
 
     it('should assign Technician in orders details page', () => {
@@ -113,6 +156,7 @@ describe('Job', () => {
 
         // Click the "Unscheduled" option (use the recorded selector for this action)
         OrderPage.changeStatusFilter('Overdue');
+
         cy.wait(3000);
 
         cy.wait('@serviceOrdersApi')
