@@ -3110,5 +3110,8 @@
   "Article deleted successfully": "Članak je uspešno izbrisan",
   "Mixed Position created successfully": "Mešovita pozicija je uspešno napravljena",
   "Sub-position created successfully": "Podpozicija je uspešno kreirana",
-  "Qty": "Kol"
+  "Qty": "Kol",
+  "Invoice restored by {{name}}": "Fakturu je vratio {{name}}",
+  "Additional names will be added underneath the main name on pdf documents.": "Dodatna imena će biti dodata ispod glavnog imena u pdf dokumentima.",
+  "Additional Name": "Dodatno ime"
 }
