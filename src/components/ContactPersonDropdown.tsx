@@ -1,48 +1,117 @@
-import React from 'react';
-import {Autocomplete, TextField, Typography, Box} from '@mui/material';
-import {ServiceCompanyContactPersonView} from 'models/contacts';
-import {useTranslation} from 'react-i18next';
+import React, {
+  HTMLAttributes,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import {useServiceCompanyContactPersons} from 'hooks/reactQuery/useContacts';
+import {debounce} from 'lodash';
+import {Option} from 'models/filter';
+import Autocomplete from 'components/Autocomplete';
+import {Box, Typography} from '@mui/material';
 
 interface ContactPersonDropdownProps {
-  contactPersons?: ServiceCompanyContactPersonView[];
   selectedContactId: string | undefined;
-  onContactChange: (contact: ServiceCompanyContactPersonView | null) => void;
+  onContactChange: (id: string | null) => void;
 }
 
-export const ContactPersonDropdown: React.FC<ContactPersonDropdownProps> = ({
-  contactPersons,
+export const ContactPersonDropdown = ({
   selectedContactId,
   onContactChange,
-}) => {
-  const {t} = useTranslation();
+}: ContactPersonDropdownProps) => {
+  const [query, setQuery] = useState<string>('');
+  const [queryView, setQueryView] = useState('');
+  const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
-  const selectedContact = contactPersons?.find(
-    (contact) => contact.id === selectedContactId,
+  const {data: contactPersonsResource, isFetched} =
+    useServiceCompanyContactPersons({
+      pageSize: 100,
+      query,
+    });
+
+  const contactOptions: Option[] = useMemo(
+    () =>
+      contactPersonsResource?.data.map((contact) => ({
+        label: contact.userAccount.firstName
+          ? `${contact.userAccount.firstName} ${contact.userAccount.lastName}`
+          : contact.userAccount.lastName,
+        value: contact.id,
+      })) || [],
+    [contactPersonsResource],
   );
+
+  const contactPersonById = useMemo(
+    () =>
+      new Map(
+        contactPersonsResource?.data.map((contact) => [contact.id, contact]) ||
+          [],
+      ),
+    [contactPersonsResource],
+  );
+
+  const debouncedChangeHandler = useCallback(
+    debounce((newValue: string) => {
+      setQuery(newValue);
+    }, 250),
+    [],
+  );
+
+  const handleInputChange = (
+    e: SyntheticEvent,
+    newValue: string,
+    reason: string,
+  ) => {
+    if (reason === 'reset') return;
+    setQueryView(newValue);
+    debouncedChangeHandler(newValue);
+    if (reason === 'clear') {
+      setQueryView('');
+      onContactChange(null);
+    }
+  };
+
+  const handleChange = (_: SyntheticEvent, option: Option | null) => {
+    onContactChange(option?.value ? option.value : null);
+  };
+
+  // set value on load
+  useEffect(() => {
+    if (!initialLoad || !isFetched) return;
+
+    const foundContractId =
+      contactOptions.find((contact) => contact.value === selectedContactId)
+        ?.label || '';
+    setQueryView(foundContractId);
+    setInitialLoad(false);
+  }, [selectedContactId, contactOptions, initialLoad, isFetched]);
+
+  // handle reset
+  useEffect(() => {
+    if (selectedContactId === undefined) {
+      setQueryView('');
+    }
+  }, [selectedContactId]);
 
   return (
     <Autocomplete
-      options={contactPersons!}
-      value={selectedContact || null}
-      getOptionLabel={(option) =>
-        `${option.userAccount.firstName} ${option.userAccount.lastName}`
-      }
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label={t('Contact Person')}
-          sx={{
-            '& .MuiInputBase-root': {
-              padding: '4px 8px',
-            },
-          }}
-        />
-      )}
-      renderOption={(props, option) => (
+      size="small"
+      options={contactOptions}
+      onInputChange={handleInputChange}
+      inputValue={queryView}
+      sx={{
+        '.MuiFormLabel-root': {
+          marginTop: '-6px',
+        },
+      }}
+      placeholderKey="Select contact"
+      onChange={handleChange}
+      renderOption={(props: HTMLAttributes<HTMLLIElement>, option: Option) => (
         <Box
           component="li"
           {...props}
-          key={option.id}
+          key={option.value}
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -54,7 +123,7 @@ export const ContactPersonDropdown: React.FC<ContactPersonDropdownProps> = ({
               textAlign: 'left',
               width: '100%',
             }}>
-            {`${option.userAccount.firstName} ${option.userAccount.lastName}`}
+            {option.label}
           </Typography>
           <Typography
             variant="body2"
@@ -63,18 +132,10 @@ export const ContactPersonDropdown: React.FC<ContactPersonDropdownProps> = ({
               textAlign: 'left',
               width: '100%',
             }}>
-            {option.companyName || '-'}
+            {contactPersonById.get(option.value)?.companyName || '-'}
           </Typography>
         </Box>
       )}
-      onChange={(event, value) => onContactChange(value || null)}
-      ListboxProps={{
-        style: {
-          maxHeight: '180px',
-          overflow: 'auto',
-        },
-      }}
-      isOptionEqualToValue={(option, value) => option.id === value?.id}
     />
   );
 };
