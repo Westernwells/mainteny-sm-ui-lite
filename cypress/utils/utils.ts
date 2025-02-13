@@ -3,10 +3,10 @@ import {
   InvoiceStatus,
   AggregatedAmount,
   InvoiceAdditionalInfo,
-  InvoiceItem,
   InvoiceOverdueNoticeSimpleView,
   InvoicePaymentView,
   InvoiceType,
+  InvoiceItemView,
 } from '../../src/models/invoice';
 import {Meta} from '../../src/models/misc';
 import {PropertyOwnerSimpleView} from '../../src/models/propertyManager';
@@ -59,7 +59,7 @@ export interface InvoiceView {
   serviceOrder?: ServiceOrderView;
   propertyOwner: PropertyOwnerSimpleView;
   serviceCompany: ServiceCompanySimpleView;
-  items: InvoiceItem[];
+  items: InvoiceItemView[];
   search: string;
   meta: Meta;
   additionalInfo: InvoiceAdditionalInfo;

@@ -361,24 +361,35 @@ export const ArticleItemRowNEW = ({
 
   const onChangePercentageVat = (event: SelectChangeEvent<string>) => {
     const vatId = event.target.value;
-    const taxRate = taxRates.find((rate) => rate.id === vatId);
+    const taxRate = taxRates?.find((rate) => rate.id === vatId);
+
     formik.setFieldValue('unitAmount', {
-      ...formik.values.unitAmount,
+      netAmount: formik.values.unitAmount.netAmount || 0,
+      percentageVat: taxRate?.percentage || 0,
+      currency: formik.values.unitAmount.currency || currentCurrency.code,
       vatId: taxRate?.id || '',
       vatName: taxRate?.name || '',
-      percentageVat: taxRate?.percentage || 0,
     });
   };
 
   const vatValue = (() => {
-    const {vatId} = formik.values.unitAmount;
-    return vatId && taxRates?.find((item) => item.id === vatId)
-      ? vatId
-      : String(
-          formik.values.unitAmount.percentageVat !== 0
-            ? formik.values.unitAmount.percentageVat
-            : 0,
-        ) || '';
+    const {vatId, percentageVat} = formik.values.unitAmount;
+
+    // If vatId exists and matches a valid tax rate, use it
+    if (vatId && taxRates?.some((item) => item.id === vatId)) {
+      return vatId;
+    }
+
+    // If percentageVat exists, try to find a taxRate with that percentage
+    const matchingTaxRate = taxRates?.find(
+      (item) => item.percentage === percentageVat,
+    );
+
+    if (matchingTaxRate) {
+      return matchingTaxRate.id;
+    }
+
+    return '0';
   })();
 
   const tabItems: TabItems[] = useMemo(() => {
@@ -724,15 +735,19 @@ export const ArticleItemRowNEW = ({
             size="small"
             value={vatValue}
             renderValue={(value) => {
-              const taxRatePercentage = taxRates?.find(
-                (item) => item.id === value,
-              )?.percentage;
+              let taxRate = taxRates?.find((item) => item.id === value);
 
-              return `${
-                typeof taxRatePercentage === 'number'
-                  ? taxRatePercentage
-                  : value || 0
-              }%`;
+              // If taxRate is not found by id and value is a number (percentage), find by percentage
+              if (!taxRate && !Number.isNaN(Number(value))) {
+                taxRate = taxRates?.find(
+                  (item) => item.percentage === Number(value),
+                );
+              }
+
+              // Get the percentage, defaulting to 0 if not found
+              const taxRatePercentage = taxRate?.percentage ?? 0;
+
+              return `${taxRatePercentage}%`;
             }}
             name="unitAmount.vatId"
             id={`unitAmount.vatId-${index}`}

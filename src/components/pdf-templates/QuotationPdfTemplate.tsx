@@ -3,7 +3,7 @@ import {UserAccount} from 'models/user';
 import React, {useMemo} from 'react';
 import {formatDate} from 'utils/datetime';
 import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
-import {QuotationItem, QuotationView} from 'models/quotation';
+import {QuotationItemView, QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
@@ -204,7 +204,7 @@ const QuotationPdfTemplate = React.memo(
       discount: getDiscoutObj(item.additionalInfo.discount),
     }))!;
 
-    const netTotal = (articleItem: QuotationItem) => {
+    const netTotal = (articleItem: QuotationItemView) => {
       const total = getItemTotalAfterPerItemDiscount({
         item: {
           unitAmount: {
@@ -577,7 +577,7 @@ const QuotationPdfTemplate = React.memo(
                               marginLeft: 10,
                               color: '#212121',
                             }}>
-                            {translate(articleItem.article.unit) || '-'}
+                            {translate(articleItem.article?.unit || '') || '-'}
                           </Text>
                           <Text
                             style={{

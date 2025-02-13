@@ -14,9 +14,9 @@ import {
   AddressRecord,
   Amount,
   AmountRecord,
-  Currency,
   EmailRecord,
   Meta,
+  MultiVatsAmount,
   PdfGenerationStatus,
 } from './misc';
 import {PropertyOwnerView} from './propertyManager';
@@ -74,15 +74,34 @@ export type QuotationAdditionalInfo = {
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
 };
 
-export interface QuotationItem {
-  additionalInfo: QuotationAdditionalInfo;
-  article: ArticleView;
+export interface QuotationItemView {
   id: string;
-  description: string;
-  name: string;
-  quantity: number;
   quotationId: string;
-  unitAmount: Amount;
+  articleId?: string;
+  article?: QuotationItemArticleView;
+  name: string;
+  unitPurchaseAmount?: MultiVatsAmount;
+  unitAmount: MultiVatsAmount;
+  quantity: number;
+  description: string;
+  additionalInfo: QuotationAdditionalInfo;
+}
+
+export interface QuotationItemArticleView {
+  id?: string;
+  name: string;
+  externalId?: string;
+  type: ArticleType;
+  unit?: string;
+  unitSellingAmount: Amount;
+  unitPurchaseAmount?: Amount;
+  costPackage?: CostPackage;
+  generationInfo?: {
+    contractId: string;
+    componentId: string;
+    elevatorId: string;
+    generationDate: Date;
+  };
 }
 
 export interface ArticleRecord {
@@ -122,7 +141,7 @@ export interface QuotationView {
   additionalInfo: QuotationAdditionalInfo;
   search: string;
   meta: Meta;
-  items: QuotationItem[];
+  items: QuotationItemView[];
   commentCount?: number;
 }
 

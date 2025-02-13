@@ -18,7 +18,7 @@ import {
 import {
   CreateQuotation,
   QuotationFormData,
-  QuotationItem,
+  QuotationItemView,
   QuotationItemRecord,
   QuotationStatus,
   QuotationView,
@@ -121,7 +121,7 @@ interface Props {
 }
 
 const quotationItemToQuotationItemRecord = (
-  quotationItem: QuotationItem,
+  quotationItem: QuotationItemView,
 ): QuotationItemRecord => {
   const record: QuotationItemRecord = {
     id: quotationItem.id,
@@ -453,8 +453,8 @@ export const DraftQuotation = ({
         (i): QuotationItemRecord => ({
           id: i.id,
           article: i.article,
-          description: i.description || i.article.description,
-          name: i.name || i.article.name,
+          description: i.description || '',
+          name: i.name || i.article?.name || '',
           quantity: i.quantity,
           unitAmount: i.unitAmount,
           discount: getDiscoutObj(i.additionalInfo?.discount),

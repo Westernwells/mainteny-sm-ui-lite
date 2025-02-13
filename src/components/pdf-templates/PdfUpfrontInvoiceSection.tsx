@@ -1,7 +1,7 @@
 import {Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {
   InvoiceView,
-  InvoiceItem,
+  InvoiceItemView,
   DiscountType,
   PaymentType,
   InvoiceAmountDetail,
@@ -44,7 +44,7 @@ type PartialProps = {
   invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
-  articleItems: InvoiceItem[];
+  articleItems: InvoiceItemView[];
 };
 
 Font.register({

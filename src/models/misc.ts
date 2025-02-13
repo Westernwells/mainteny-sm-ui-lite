@@ -201,11 +201,11 @@ export interface Amount {
   netAmount?: number;
   percentageVat?: number;
   vat?: number;
+  vatId?: string;
+  vatName?: string;
 }
 
 export interface MultiVatsAmount extends Amount {
-  vatId?: string;
-  vatName?: string;
   vats: VatAmount[];
   vatInfos?: VatInfo[];
 }

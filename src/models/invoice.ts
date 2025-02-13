@@ -13,6 +13,7 @@ import {
   EmailRecord,
   Meta,
   Money,
+  MultiVatsAmount,
   PaymentInfo,
   PdfGenerationStatus,
 } from './misc';
@@ -59,7 +60,22 @@ export interface InvoiceItem {
   articleId?: string;
   article?: ArticleView;
   name: string;
-  unitAmount: Amount;
+  unitAmount: MultiVatsAmount;
+  quantity: number;
+  description: string;
+  additionalInfo?: {
+    discount?: Discount;
+    payment?: InvoiceItemPaymentRecord;
+  };
+}
+
+export interface InvoiceItemView {
+  id: string;
+  invoiceId?: string;
+  articleId?: string;
+  article?: ArticleView;
+  name: string;
+  unitAmount: MultiVatsAmount;
   quantity: number;
   description: string;
   additionalInfo?: {
@@ -191,7 +207,7 @@ export interface InvoiceView {
   dueDate?: string;
   status: InvoiceStatus;
   serviceOrder?: ServiceOrderView;
-  items: InvoiceItem[];
+  items: InvoiceItemView[];
   totalAmount: AggregatedAmount;
   additionalInfo: InvoiceAdditionalInfo;
   payments: InvoicePaymentView[];

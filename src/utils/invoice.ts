@@ -6,7 +6,7 @@ import {
   InvoiceActivityView,
   InvoiceAmountDetail,
   InvoiceFormData,
-  InvoiceItem,
+  InvoiceItemView,
   InvoiceItemRecord,
   InvoicePaymentTermRecord,
   InvoiceStatus,
@@ -263,7 +263,7 @@ export const getFormattedPaymentValues = (
     );
     const formattedDueDate = formatDate(dueDate);
 
-    let filteredItems: InvoiceItem[] = [];
+    let filteredItems: InvoiceItemView[] = [];
     if (d.articleType === PaymentTermArticleType.LABOR) {
       filteredItems = invoice?.items?.filter(
         (item) =>
@@ -403,7 +403,10 @@ export const replacePaymentTermsPlaceholders = (
   return result.trim();
 };
 
-export const netTotal = (articleItem: InvoiceItem, currencyCode: string) => {
+export const netTotal = (
+  articleItem: InvoiceItemView,
+  currencyCode: string,
+) => {
   const grossTotal =
     (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
   const discountValue =
@@ -528,7 +531,7 @@ export const generatePdfInvoice = (
     name: company?.name ?? '',
     meta: company?.meta!,
   },
-  items: transformFormikItems(formikValues.items),
+  items: transformFormikItems(formikValues.items) as InvoiceItemView[],
   search: '',
   meta: {
     createdAt: Date.now().toString(),

@@ -1,5 +1,5 @@
-import {DiscountType, InvoiceItem} from 'models/invoice';
-import {QuotationItem} from 'models/quotation';
+import {DiscountType, InvoiceItemView} from 'models/invoice';
+import {QuotationItemView} from 'models/quotation';
 import {ServiceOrderArticleView} from 'models/service-order';
 
 export const allItemsHaveZeroDiscount = (articleItems?: any) =>
@@ -14,7 +14,10 @@ export const allItemsHaveZeroDiscount = (articleItems?: any) =>
   });
 
 export const shouldDisplayDiscountDash = (
-  articleOrderItem: QuotationItem | ServiceOrderArticleView | InvoiceItem,
+  articleOrderItem:
+    | QuotationItemView
+    | ServiceOrderArticleView
+    | InvoiceItemView,
 ): string => {
   if (!articleOrderItem || !articleOrderItem.additionalInfo) return '';
 
