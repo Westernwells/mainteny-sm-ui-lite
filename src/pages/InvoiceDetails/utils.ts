@@ -6,7 +6,7 @@ import {
   Discount,
   DiscountType,
   InvoiceFormData,
-  InvoiceItem,
+  InvoiceItemView,
   InvoiceItemPaymentType,
   InvoiceItemRecord,
   InvoiceType,
@@ -14,6 +14,8 @@ import {
   PaymentType,
   UpdateInvoice,
 } from 'models/invoice';
+import {Currency} from 'models/misc';
+import {VatView} from 'models/vat';
 import {getItemRecord} from 'utils/article-utils';
 import {
   Currencies,
@@ -29,6 +31,7 @@ import {
 
 export const formatInvoiceRecord = (
   value: InvoiceFormData,
+  currentCurrency: Currency,
 ): CreateInvoice | UpdateInvoice => ({
   ...value,
   subject: value.subject,
@@ -37,9 +40,17 @@ export const formatInvoiceRecord = (
   sentDate: value.sentDate ? dateToString(value.sentDate) : '',
   type: value.type,
   items: value.items.map((item) => {
-    const {article, ...rest} = item;
+    const {article, unitAmount, discount, payment, ...rest} = item;
+
+    const cleanedUnitAmount = {
+      netAmount: unitAmount?.netAmount || 0,
+      percentageVat: unitAmount?.percentageVat || 0,
+      currency: unitAmount?.currency || currentCurrency.code,
+      vatId: unitAmount?.vatId || '',
+      vatName: unitAmount?.vatName || '',
+    };
+
     const modifiedArticle = {...article};
-    const unitSellingAmount = modifiedArticle?.unitSellingAmount;
     const isPreDefinedArticle =
       modifiedArticle?.id && modifiedArticle?.id?.length > 8;
     if (!isPreDefinedArticle) {
@@ -47,53 +58,57 @@ export const formatInvoiceRecord = (
     }
 
     const articleToSend = {
-      ...(isPreDefinedArticle && {id: modifiedArticle?.id}),
-      name: article?.name,
-      type: article?.type,
-      unit: article?.unit,
-      costPackage: article?.costPackage,
+      ...(isPreDefinedArticle && {id: modifiedArticle.id}),
+      name: modifiedArticle.name,
+      type: modifiedArticle.type,
+      unit: modifiedArticle.unit,
+      costPackage: modifiedArticle.costPackage,
       ...(isPreDefinedArticle &&
-        article?.externalId && {externalId: article?.externalId}),
+        modifiedArticle.externalId && {externalId: modifiedArticle.externalId}),
       unitSellingAmount: {
-        netAmount: unitSellingAmount?.netAmount,
-        percentageVat: unitSellingAmount?.percentageVat,
-        currency: unitSellingAmount?.currency,
+        netAmount: modifiedArticle?.unitSellingAmount?.netAmount,
+        percentageVat: modifiedArticle?.unitSellingAmount?.percentageVat,
+        currency:
+          modifiedArticle?.unitSellingAmount?.currency || currentCurrency.code,
       },
-    } as ArticleRecord;
+    };
 
     return {
       ...rest,
       article: articleToSend,
-      discount: rest.discount
+
+      unitAmount: cleanedUnitAmount,
+      discount: discount
         ? {
-            ...rest.discount,
+            ...discount,
             type:
-              rest.discount?.type === DiscountType.NONE ||
-              rest.discount.type === DiscountType.PERCENTAGE
+              discount?.type === DiscountType.NONE ||
+              discount.type === DiscountType.PERCENTAGE
                 ? DiscountType.PERCENTAGE
-                : rest.discount?.type,
+                : discount.type,
             amount:
-              rest.discount.type === DiscountType.AMOUNT && rest.discount.amount
+              discount.type === DiscountType.AMOUNT && discount.amount
                 ? {
-                    ...rest.discount.amount,
-                    currency: rest.discount.amount?.currency!,
+                    ...discount.amount,
+                    currency: discount.amount.currency!,
                     value:
-                      (rest.discount.amount?.value ?? 0) *
-                      10 ** (rest.discount.amount?.fractionDigits ?? 2),
+                      (discount.amount.value ?? 0) *
+                      10 ** (discount.amount.fractionDigits ?? 2),
                   }
                 : undefined,
             percentage:
-              rest.discount.type === DiscountType.NONE ||
-              rest.discount.type === DiscountType.PERCENTAGE
-                ? rest.discount.percentage || 0
+              discount.type === DiscountType.NONE ||
+              discount.type === DiscountType.PERCENTAGE
+                ? discount.percentage || 0
                 : undefined,
           }
         : undefined,
-      payment: rest.payment
-        ? rest.payment
-        : value.payment?.type === PaymentType.PER_ITEM
-        ? {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
-        : undefined,
+
+      payment:
+        payment ||
+        (value.payment?.type === PaymentType.PER_ITEM
+          ? {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0}
+          : undefined),
     };
   }),
   paymentTerm: value.paymentTerm,
@@ -319,9 +334,17 @@ export const articleViewToInvoiceItemRecord = (
 };
 
 export const invoiceItemToInvoiceItemRecord = (
-  invoiceItem: InvoiceItem,
+  invoiceItem: InvoiceItemView,
   invoiceType: InvoiceType,
+  currentCurrency: Currency,
+  taxRates?: VatView[],
 ): InvoiceItemRecord => {
+  const taxRate =
+    taxRates?.find((rate) => rate.id === invoiceItem.unitAmount.vatId) ||
+    taxRates?.find(
+      (rate) => rate.percentage === invoiceItem.unitAmount.percentageVat,
+    );
+
   const record: InvoiceItemRecord = {
     article: invoiceItem.article,
     name: invoiceItem.name,
@@ -331,10 +354,16 @@ export const invoiceItemToInvoiceItemRecord = (
       invoiceType === InvoiceType.CREDIT_NOTE
         ? {
             ...invoiceItem.unitAmount,
-            grossAmount: -Math.abs(invoiceItem.unitAmount.grossAmount ?? 0),
             netAmount: -Math.abs(invoiceItem.unitAmount.netAmount ?? 0),
           }
-        : invoiceItem.unitAmount,
+        : {
+            netAmount: invoiceItem.unitAmount.netAmount || 0,
+            percentageVat:
+              invoiceItem.unitAmount.percentageVat || taxRate?.percentage || 0,
+            currency: invoiceItem.unitAmount.currency || currentCurrency.code,
+            vatId: invoiceItem.unitAmount.vatId || taxRate?.id || '',
+            vatName: invoiceItem.unitAmount.vatName || taxRate?.name || '',
+          },
     discount: invoiceItem.additionalInfo?.discount
       ? {
           ...invoiceItem.additionalInfo?.discount,
@@ -361,6 +390,8 @@ export const invoiceItemToInvoiceItemRecord = (
 
 export const formatInvoiceViewToUpdateInvoice = (
   invoiceView: InvoiceView,
+  currentCurrency: Currency,
+  taxRates?: VatView[],
 ): UpdateInvoice => {
   const {
     externalId,
@@ -388,7 +419,9 @@ export const formatInvoiceViewToUpdateInvoice = (
     dueDate,
     sentDate,
     items: items
-      .map((item) => invoiceItemToInvoiceItemRecord(item, type))
+      .map((item) =>
+        invoiceItemToInvoiceItemRecord(item, type, currentCurrency, taxRates),
+      )
       .map((item) => {
         const {article, ...rest} = item;
         const modifiedArticle = {...article};

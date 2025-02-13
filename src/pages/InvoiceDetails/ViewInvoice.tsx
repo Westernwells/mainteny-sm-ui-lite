@@ -126,6 +126,7 @@ import {EmailSignature, EmployeesView} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {CANCEL_ACTION} from 'models/status';
+import {useVats} from 'hooks/reactQuery/useVats';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -186,7 +187,7 @@ export const ViewInvoice = ({
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-
+  const {data: taxRates} = useVats();
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
@@ -1190,11 +1191,15 @@ export const ViewInvoice = ({
       if (invoice.externalId.trim() === '') {
         await updateInvoiceAsync(
           {
-            data: formatInvoiceViewToUpdateInvoice({
-              ...invoice,
-              externalId: companyNextNumber?.value!,
-              dueDate,
-            }),
+            data: formatInvoiceViewToUpdateInvoice(
+              {
+                ...invoice,
+                externalId: companyNextNumber?.value!,
+                dueDate,
+              },
+              currentCurrency,
+              taxRates,
+            ),
             invoiceId: invoice.id,
           },
           {

@@ -9,7 +9,7 @@ import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddr
 import {HtmlPDF} from 'components/HtmlPDF';
 import {
   InvoiceAmountDetail,
-  InvoiceItem,
+  InvoiceItemView,
   InvoiceType,
   InvoiceView,
 } from 'models/invoice';
@@ -215,7 +215,7 @@ const PartialInvoicePdfTemplate = ({
     discount: getDiscoutObj(item?.additionalInfo?.discount),
   }))!;
 
-  const netTotal = (articleItem: InvoiceItem) => {
+  const netTotal = (articleItem: InvoiceItemView) => {
     const total = getItemTotalAfterPerItemDiscount({
       item: {
         unitAmount: {

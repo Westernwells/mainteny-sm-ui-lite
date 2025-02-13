@@ -11,6 +11,7 @@ import {
   Fee,
   JobStatus,
   Meta,
+  MultiVatsAmount,
   PdfGenerationStatus,
   ReportStatus,
 } from './misc';
@@ -666,7 +667,7 @@ export interface ServiceOrderArticleView {
   description: string;
   serviceOrderId: string;
   article: ArticleRecord;
-  unitAmount: Amount;
+  unitAmount: MultiVatsAmount;
   quantity: number;
   ownerType?: ServiceOrderArticleOwnerType;
   additionalInfo?:

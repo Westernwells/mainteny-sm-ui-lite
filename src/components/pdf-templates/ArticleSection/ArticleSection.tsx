@@ -6,7 +6,11 @@ import {
   getCurrencySymbol,
 } from '../../../utils/currency';
 import {HtmlPDF} from '../../HtmlPDF';
-import {DiscountType, InvoiceItem, InvoiceView} from '../../../models/invoice';
+import {
+  DiscountType,
+  InvoiceItemView,
+  InvoiceView,
+} from '../../../models/invoice';
 import {fixRounding} from '../../../utils/utils';
 import {Currency} from '../../../models/misc';
 import {getStyles} from './ArticleSection.styles';
@@ -25,7 +29,7 @@ type Props = {
   }[];
   total: number;
   selectedLng?: string;
-  netTotal: (articleItem: InvoiceItem) => number;
+  netTotal: (articleItem: InvoiceItemView) => number;
 };
 
 export const ArticleSection = ({

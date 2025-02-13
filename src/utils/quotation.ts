@@ -4,8 +4,8 @@ import {
   QuotationActivityType,
   QuotationActivityView,
   QuotationFormData,
-  QuotationItem,
   QuotationItemRecord,
+  QuotationItemView,
   QuotationStatus,
   QuotationTableRow,
   QuotationView,
@@ -19,6 +19,7 @@ import {Currency, PdfGenerationStatus, State} from 'models/misc';
 import {ServiceCompanyItem} from 'models/service-company';
 import {ElevatorView} from 'models/elevator';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {InvoiceItemView} from '../models/invoice';
 import {dateToString} from './utils';
 import {Currencies, formatCurrency, moneyToCents} from './currency';
 
@@ -136,7 +137,7 @@ export const mapStatusToFilterOptions = (
 
 export const transformFormikItems = (
   items: QuotationItemRecord[],
-): QuotationItem[] =>
+): QuotationItemView[] | InvoiceItemView[] =>
   items.map((item) => ({
     id: item.id || item.articleId || item.article?.id!,
     name: item.name,
@@ -147,6 +148,14 @@ export const transformFormikItems = (
       currency: item.unitAmount.currency,
       netAmount: item.unitAmount.netAmount,
       percentageVat: item.unitAmount.percentageVat,
+      vats: [
+        {
+          percentageVat: item.unitAmount.percentageVat || 0,
+          vat:
+            (item.unitAmount.percentageVat ?? 0 / 100) *
+            (item.unitAmount.netAmount ?? 0),
+        },
+      ],
     },
     additionalInfo: {
       discount: item.discount,
@@ -215,6 +224,6 @@ export const generatePdfQuotation = (
     lastUpdatedAt: Date.now().toString(),
     state: State.ACTIVE,
   },
-  items: transformFormikItems(formikValues.items),
+  items: transformFormikItems(formikValues.items) as QuotationItemView[],
   commentCount: 0,
 });

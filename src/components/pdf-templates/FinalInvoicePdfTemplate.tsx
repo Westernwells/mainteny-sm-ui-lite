@@ -7,7 +7,11 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {InvoiceAmountDetail, InvoiceItem, InvoiceView} from 'models/invoice';
+import {
+  InvoiceAmountDetail,
+  InvoiceItemView,
+  InvoiceView,
+} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {
   calculateArticlesAmount,
@@ -130,7 +134,7 @@ const FinalInvoicePdfTemplate = ({
   const discountAmount = discount?.amount;
   const discountValue = discountAmount?.value ?? 0;
 
-  const netTotal = (articleItem: InvoiceItem) => {
+  const netTotal = (articleItem: InvoiceItemView) => {
     const total = getItemTotalAfterPerItemDiscount({
       item: {
         unitAmount: {

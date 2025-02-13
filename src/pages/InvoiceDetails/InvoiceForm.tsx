@@ -46,9 +46,7 @@ import {
 } from 'hooks/reactQuery/useInvoice';
 import {
   CreateInvoice,
-  DiscountType,
   InvoiceFormData,
-  InvoiceItem,
   InvoiceItemRecord,
   InvoiceStatus,
   InvoiceType,
@@ -59,7 +57,7 @@ import {
 } from 'models/invoice';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {AddressComponent, AddressRecord, Language} from 'models/misc';
+import {AddressComponent, AddressRecord, Currency, Language} from 'models/misc';
 import {
   formatAddressFullname,
   formatSearchParams,
@@ -68,7 +66,6 @@ import {
 } from 'utils/utils';
 import {
   useCompanyJobTypes,
-  useCompanyNextNumber,
   useCompanyTerms,
   useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
@@ -88,10 +85,7 @@ import {ReactComponent as TaskListPenIllustration} from 'assets/illustrations/in
 import {ContractPaymentTermView, ContractTermView} from 'models/contract';
 import {ArticleView} from 'models/article';
 import {T} from 'utils/i18n-utils';
-import {
-  ServiceCompanyNumberType,
-  ServiceCompanyType,
-} from 'models/service-company';
+import {ServiceCompanyType} from 'models/service-company';
 import RichTextField from 'components/RichTextField';
 import {useTranslation} from 'react-i18next';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
@@ -128,6 +122,7 @@ import {
   articleViewToInvoiceItemRecord,
   correctCreditNoteInvoicesPercentages,
   formatInvoiceRecord,
+  invoiceItemToInvoiceItemRecord,
 } from './utils';
 import {Notes} from './Notes/EditNotes';
 import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
@@ -164,6 +159,7 @@ import {
 import {generatePdfInvoice} from 'utils/invoice';
 import {SwissQRBill} from 'swissqrbill/svg';
 import {calculateArticlesAmount} from 'utils/calculate-total';
+import {VatView} from 'models/vat';
 
 interface Props {
   invoice?: InvoiceView;
@@ -199,55 +195,29 @@ const isExternalIdUnique = async (resource: InvoiceView[], value?: string) => {
 
 const articleViewToItem = (
   articleView: ServiceOrderArticleView,
+  currentCurrency: Currency,
+  taxRates?: VatView[],
 ): InvoiceItemRecord => {
+  const taxRate =
+    taxRates?.find((rate) => rate.id === articleView.unitAmount.vatId) ||
+    taxRates?.find(
+      (rate) => rate.percentage === articleView.unitAmount.percentageVat,
+    );
+
   const record: InvoiceItemRecord = {
     article: articleView.article,
     name: articleView.name,
     description: articleView.description,
     quantity: articleView.quantity,
-    unitAmount: articleView.unitAmount,
+    unitAmount: {
+      netAmount: articleView.unitAmount.netAmount || 0,
+      percentageVat:
+        articleView.unitAmount.percentageVat || taxRate?.percentage || 0,
+      currency: articleView.unitAmount.currency || currentCurrency.code,
+      vatId: articleView.unitAmount.vatId || taxRate?.id || '',
+      vatName: articleView.unitAmount.vatName || taxRate?.name || '',
+    },
     discount: getDiscoutObj(articleView.additionalInfo?.discount),
-  };
-  return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
-};
-
-const invoiceItemToInvoiceItemRecord = (
-  invoiceItem: InvoiceItem,
-  invoiceType: InvoiceType,
-): InvoiceItemRecord => {
-  const record: InvoiceItemRecord = {
-    article: invoiceItem.article,
-    name: invoiceItem.name,
-    description: invoiceItem.description,
-    quantity: invoiceItem.quantity,
-    unitAmount:
-      invoiceType === InvoiceType.CREDIT_NOTE
-        ? {
-            ...invoiceItem.unitAmount,
-            grossAmount: -Math.abs(invoiceItem.unitAmount.grossAmount ?? 0),
-            netAmount: -Math.abs(invoiceItem.unitAmount.netAmount ?? 0),
-          }
-        : invoiceItem.unitAmount,
-    discount: invoiceItem.additionalInfo?.discount
-      ? {
-          ...invoiceItem.additionalInfo?.discount,
-          type:
-            invoiceItem.additionalInfo?.discount?.type === DiscountType.NONE
-              ? DiscountType.PERCENTAGE
-              : invoiceItem.additionalInfo?.discount?.type,
-          amount: invoiceItem.additionalInfo?.discount?.amount
-            ? {
-                ...invoiceItem.additionalInfo?.discount?.amount,
-                value:
-                  (invoiceItem.additionalInfo?.discount?.amount?.value ?? 0) /
-                  10 **
-                    (invoiceItem.additionalInfo.discount.amount
-                      .fractionDigits ?? 2),
-              }
-            : undefined,
-        }
-      : undefined,
-    payment: invoiceItem.additionalInfo?.payment,
   };
   return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
 };
@@ -290,7 +260,7 @@ export const InvoiceForm = ({
   );
   const navigate = useNavigate();
   const {search} = useLocation();
-  const {data: taxRates} = useVats();
+  const {data: taxRates, isLoading: isLoadingTaxRates} = useVats();
 
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -375,11 +345,6 @@ export const InvoiceForm = ({
 
   const [qrImageSrc, setQrImageSrc] = useState<string>('');
   const [qrError, setQrError] = useState<string | null>(null);
-
-  const {data: companyNextNumber} = useCompanyNextNumber(
-    {type: ServiceCompanyNumberType.INVOICE},
-    serviceCompanyId,
-  );
 
   const {data: invoiceAmountDetail, isLoading: isLoadingInvoiceAmountDetail} =
     useInvoiceAmountDetail(invoice?.id);
@@ -524,7 +489,12 @@ export const InvoiceForm = ({
       items:
         !isNewInvoice && invoice
           ? invoice?.items?.map((item) =>
-              invoiceItemToInvoiceItemRecord(item, invoice.type),
+              invoiceItemToInvoiceItemRecord(
+                item,
+                invoice.type,
+                currentCurrency,
+                taxRates,
+              ),
             )
           : [],
       paymentTerm:
@@ -625,14 +595,14 @@ export const InvoiceForm = ({
 
     if (!isNewInvoice && invoice) {
       return updateInvoiceAsync({
-        data: formatInvoiceRecord(values),
+        data: formatInvoiceRecord(values, currentCurrency),
         invoiceId: invoice.id,
       });
     }
 
     return createNewInvoice({
       data: {
-        ...(formatInvoiceRecord(values) as CreateInvoice),
+        ...(formatInvoiceRecord(values, currentCurrency) as CreateInvoice),
         ...createData,
       },
     });
@@ -806,7 +776,12 @@ export const InvoiceForm = ({
       formik.setFieldValue(
         'items',
         invoice?.items?.map((item) => {
-          return invoiceItemToInvoiceItemRecord(item, InvoiceType.CREDIT_NOTE);
+          return invoiceItemToInvoiceItemRecord(
+            item,
+            InvoiceType.CREDIT_NOTE,
+            currentCurrency,
+            taxRates,
+          );
         }),
       );
     }
@@ -824,12 +799,17 @@ export const InvoiceForm = ({
         formik.setFieldValue(
           'items',
           invoice.items?.map((invoiceItem) =>
-            invoiceItemToInvoiceItemRecord(invoiceItem, formik.values.type),
+            invoiceItemToInvoiceItemRecord(
+              invoiceItem,
+              formik.values.type,
+              currentCurrency,
+              taxRates,
+            ),
           ),
         );
       }
     }
-  }, [invoice, isLoadingCreditNoteArticles]);
+  }, [invoice, isLoadingCreditNoteArticles, taxRates]);
 
   const prefillFormWithInvoiceData = (invoiceData?: InvoiceView) => {
     if (!invoiceData) return;
@@ -976,7 +956,12 @@ export const InvoiceForm = ({
     formik.setFieldValue(
       'items',
       invoiceData?.items?.map((item) =>
-        invoiceItemToInvoiceItemRecord(item, invoiceType || invoiceData.type),
+        invoiceItemToInvoiceItemRecord(
+          item,
+          invoiceType || invoiceData.type,
+          currentCurrency,
+          taxRates,
+        ),
       ),
     );
 
@@ -1160,7 +1145,9 @@ export const InvoiceForm = ({
     if (!formik.values.items.length) {
       formik.setFieldValue(
         'items',
-        serviceOrderArg?.articles?.map(articleViewToItem),
+        serviceOrderArg?.articles?.map((articleItem) =>
+          articleViewToItem(articleItem, currentCurrency, taxRates),
+        ),
       );
     }
     const dueDays = serviceOrderArg?.contract?.additionalInfo?.invoiceDueDays;
@@ -1867,6 +1854,18 @@ export const InvoiceForm = ({
   const paymentTypeTooltip = isPartialInvoice
     ? 'Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article, You can’t change your selection later.'
     : 'Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.';
+
+  if (isLoadingTaxRates || isLoadingCreditNoteArticles) {
+    return (
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        flexGrow={1}>
+        <Progress height="100%" />
+      </Box>
+    );
+  }
 
   return (
     <Box>

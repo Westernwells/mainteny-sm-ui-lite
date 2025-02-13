@@ -99,6 +99,7 @@ import {
   CheckListComponentView,
   ServiceOrderCheckListView,
 } from 'models/checklist';
+import {useVats} from 'hooks/reactQuery/useVats';
 
 interface Props {
   invoice: InvoiceView;
@@ -161,7 +162,7 @@ export const Actions = ({
   const {enqueueSnackbar} = useSnackbar();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
-
+  const {data: taxRates} = useVats();
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
@@ -1143,11 +1144,15 @@ export const Actions = ({
       if (invoice.externalId.trim() === '') {
         await updateInvoiceAsync(
           {
-            data: formatInvoiceViewToUpdateInvoice({
-              ...invoice,
-              externalId: companyNextNumber?.value!,
-              dueDate,
-            }),
+            data: formatInvoiceViewToUpdateInvoice(
+              {
+                ...invoice,
+                externalId: companyNextNumber?.value!,
+                dueDate,
+              },
+              currentCurrency,
+              taxRates,
+            ),
             invoiceId: invoice.id,
           },
           {
