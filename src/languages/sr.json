@@ -3113,5 +3113,6 @@
   "Qty": "Kol",
   "Invoice restored by {{name}}": "Fakturu je vratio {{name}}",
   "Additional names will be added underneath the main name on pdf documents.": "Dodatna imena će biti dodata ispod glavnog imena u pdf dokumentima.",
-  "Additional Name": "Dodatno ime"
+  "Additional Name": "Dodatno ime",
+  "Select contact": "Izaberite kontakt"
 }
