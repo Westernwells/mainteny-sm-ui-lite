@@ -31,7 +31,7 @@ const PdfPageContainer = ({children, selectedLng}: Props) => {
 
   const styles = getStyles(regularFontStyle);
   return (
-    <Page size="A4" style={styles.page} wrap={false}>
+    <Page size="A4" style={styles.page}>
       {children}
     </Page>
   );
