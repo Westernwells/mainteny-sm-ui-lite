@@ -14,6 +14,7 @@ import {Confirm} from 'components/Confirm';
 import {PageListingLayout} from 'components/PageListingLayout';
 import {Widget} from 'components/Widget';
 import {
+  CUSTOM_ERROR_TEXT,
   TextBlockCategory,
   TextBlockFormModel,
   TextBlockOrderField,
@@ -22,16 +23,17 @@ import {
 } from 'models/text-block';
 import {
   useCreateTextBlock,
-  useUpdateTextBlock,
   useDeleteTextBlock,
   useTextBlocks,
+  useUpdateTextBlock,
 } from 'hooks/reactQuery/useTextBlock';
 import {theme} from 'theme';
 import {useSearchValues} from 'hooks/useSearchValues';
 import {
-  mapJsonToTextBlockView,
   convertCategoryToMacro,
   convertCategoryToText,
+  isFileSizeValid,
+  mapJsonToTextBlockView,
 } from 'utils/text-block';
 import DOMPurify from 'dompurify';
 import {TextBlockForm} from './TextBlockForm';
@@ -45,7 +47,11 @@ type Props = {
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
   category: Yup.string().required('Category is required'),
-  text: Yup.string().required('Text is required'),
+  text: Yup.string()
+    .required('Text is required')
+    .test('checkTextSize', CUSTOM_ERROR_TEXT.text, async (value) =>
+      isFileSizeValid(value),
+    ),
 });
 
 const pageSize = 25;
