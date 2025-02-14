@@ -139,7 +139,7 @@ const getStyles = (
       marginVertical: 4,
     },
     descriptionText: {
-      width: '45%',
+      width: '85%',
       display: 'flex',
       fontSize: 8,
       color: '#212121',
@@ -444,20 +444,24 @@ const QuotationPdfTemplate = React.memo(
             </TopSectionContainer>
 
             <View>
-              <PdfPageTitleHtml
-                value={quotation?.subject}
-                selectedLng={selectedLng}
-              />
+              <View>
+                <PdfPageTitleHtml
+                  value={quotation?.subject}
+                  selectedLng={selectedLng}
+                />
+              </View>
 
               {quotation?.description.trim() !== '' && (
-                <HtmlPDF
-                  html={quotation?.description || ''}
-                  selectedLng={selectedLng}
-                  rootStyle={{
-                    marginTop: 6,
-                    marginBottom: 16,
-                  }}
-                />
+                <View>
+                  <HtmlPDF
+                    html={quotation?.description || ''}
+                    selectedLng={selectedLng}
+                    rootStyle={{
+                      marginTop: 6,
+                      marginBottom: 16,
+                    }}
+                  />
+                </View>
               )}
 
               <View style={styles.table}>
@@ -658,14 +662,16 @@ const QuotationPdfTemplate = React.memo(
                           </Text>
                         </View>
                         {!!articleItem?.description?.trim() && (
-                          <HtmlPDF
-                            html={articleItem.description || '-'}
-                            rootStyle={{
-                              ...styles.descriptionText,
-                              marginBottom:
-                                index === quotation.items.length - 1 ? 0 : 20,
-                            }}
-                          />
+                          <View>
+                            <HtmlPDF
+                              html={articleItem.description || '-'}
+                              rootStyle={{
+                                ...styles.descriptionText,
+                                marginBottom:
+                                  index === quotation.items.length - 1 ? 0 : 20,
+                              }}
+                            />
+                          </View>
                         )}
                       </View>
                     ))}
