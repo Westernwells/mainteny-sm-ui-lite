@@ -78,7 +78,6 @@ import {ServiceOrderType} from 'models/service-order';
 import PropertyInput from 'components/Inputs/PropertyInput';
 import {PropertyType} from 'models/valueProperty';
 import MonthInput from 'components/Inputs/MonthInput';
-import TableCellTextWithTooltip from 'components/Table/TableCellTextWithTooltip';
 
 const pageSize = 25;
 
@@ -317,12 +316,7 @@ export const Contracts = () => {
         getExportValue: (contract) => contract.number,
         renderCell: (contract, cellProps) => (
           <Cell {...cellProps}>
-            <TableCellTextWithTooltip
-              mainContent={contract.number || '-'}
-              showSecondaryContent={false}
-              secondaryContent={contract.number || '-'}
-              containerStyles={{maxWidth: '115px'}}
-            />
+            <TableCellText>{contract.number}</TableCellText>
           </Cell>
         ),
       },

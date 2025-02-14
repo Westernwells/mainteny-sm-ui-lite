@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, SxProps, Tooltip} from '@mui/material';
+import {Box, Tooltip} from '@mui/material';
 import {ReactComponent as CalendarVectorIcon} from 'assets/icons/CalendarVector.svg';
 import TableCellText from '../TableCellText';
 
@@ -8,7 +8,6 @@ type TableCellTextWithTooltipProps = {
   showSecondaryContent: boolean;
   secondaryContent?: string;
   secondaryIcon?: React.ReactNode;
-  containerStyles?: SxProps;
 };
 
 const TableCellTextWithTooltip = ({
@@ -16,14 +15,12 @@ const TableCellTextWithTooltip = ({
   showSecondaryContent,
   secondaryContent,
   secondaryIcon,
-  containerStyles,
 }: TableCellTextWithTooltipProps) => (
   <Box
     sx={{
       display: 'flex',
       alignItems: 'center',
       gap: 1,
-      ...containerStyles,
     }}>
     <TableCellText>{mainContent}</TableCellText>
 

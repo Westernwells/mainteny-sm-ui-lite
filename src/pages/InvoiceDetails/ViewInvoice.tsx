@@ -1028,10 +1028,6 @@ export const ViewInvoice = ({
     }
   }, [invoice, companyNextNumber, generateBlobUrl]);
 
-  const handleOpenPaymentDialog = () => {
-    setIsDialogOpen(true);
-  };
-
   const {actions} = useInvoiceMenuActions({
     invoice,
     showPreview: false,
@@ -1056,18 +1052,7 @@ export const ViewInvoice = ({
       });
     },
     onResend: handleOpenSendInvoiceModal,
-    onPayment: handleOpenPaymentDialog,
   });
-
-  const primaryLabel =
-    invoice.status === InvoiceStatus.DRAFT ||
-    invoice.status === InvoiceStatus.EXPIRED
-      ? 'Send'
-      : 'Payment';
-
-  const filteredActions = actions.filter(
-    (action) => action.label !== primaryLabel,
-  );
 
   useEffect(() => {
     if (
@@ -1628,7 +1613,12 @@ export const ViewInvoice = ({
 
       <BottomDrawer
         isOpen={invoice.status !== InvoiceStatus.PAID}
-        primaryButtonLabel={primaryLabel}
+        primaryButtonLabel={
+          invoice.status === InvoiceStatus.DRAFT ||
+          invoice.status === InvoiceStatus.EXPIRED
+            ? 'Send'
+            : 'Payment'
+        }
         primaryButtonAction={async () => {
           if (
             invoice.status === InvoiceStatus.DRAFT ||
@@ -1639,9 +1629,9 @@ export const ViewInvoice = ({
             setIsDialogOpen(true);
           }
         }}
-        listItems={filteredActions.map((item) => ({
+        listItems={actions.map((item) => ({
           ...item,
-          showBorder: filteredActions[filteredActions.length - 1] !== item,
+          showBorder: actions[actions.length - 1] !== item,
         }))}
         isValid
       />

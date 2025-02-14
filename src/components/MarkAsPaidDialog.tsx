@@ -17,8 +17,7 @@ import {FormInput} from 'components/form/FormInput';
 import {Button} from 'components/Button';
 import {DatePicker} from 'components/DatePicker';
 import {FormCheckbox} from 'components/form/FormCheckbox';
-import {getBalanceAmount} from 'utils/invoice';
-import {useMemo} from 'react';
+import {State} from 'models/misc';
 
 interface Props {
   open?: boolean;
@@ -45,22 +44,21 @@ export const MarkAsPaidDialog = ({
   const {t} = useTranslation();
   const {mutateAsync: addInvoicePayment} =
     useAddInvoicePayment(disableNavigate);
-
-  const initialValues = useMemo<InvoicePaymentRecord>(
-    () => ({
+  const formik = useFormik<InvoicePaymentRecord>({
+    initialValues: {
       amount: {
-        value: getBalanceAmount(invoice),
+        value:
+          (invoice.totalAmount?.grossAmount ?? 0) /
+            10 ** invoice.totalAmount.fractionDigits! -
+          invoice.payments
+            .filter((item) => item.meta?.state === State.ACTIVE)
+            .reduce((partialSum, a) => partialSum + a.amount.value!, 0) /
+            10 ** invoice.totalAmount.fractionDigits!,
         currency: invoice.totalAmount.currency,
       },
-      paidDate: formatDate(new Date(), 'yyyy-MM-dd')!,
+      paidDate: new Date().toString(),
       markAsPaid: false,
-    }),
-    [invoice],
-  );
-
-  const formik = useFormik<InvoicePaymentRecord>({
-    enableReinitialize: true,
-    initialValues,
+    },
     onSubmit: async (values, {setSubmitting}) => {
       await addInvoicePayment(
         {
@@ -89,7 +87,6 @@ export const MarkAsPaidDialog = ({
     },
     validationSchema,
   });
-
   return (
     <Dialog
       open={open || false}
