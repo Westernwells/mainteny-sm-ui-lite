@@ -44,4 +44,23 @@ describe('Edit Unit', () => {
 
         cy.get('div[data-testid="unit_spending_limit"]').should('contain', '1000');
     });
+
+    it('should search contacts for Appointment Preference', () => {
+        UnitsPage.navigateToDetailsPage();
+        UnitsPage.openAppointmentPreferenceDialog();
+
+        const searchText = 'Schönhauser';
+        const encodedSearchText = encodeURIComponent(searchText);
+
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/contactPersons?*`).as('searchContactPersonApi');
+
+        cy.get('input[placeholder="Select contact"]').type(searchText);
+
+        cy.wait('@searchContactPersonApi').then((interception) => {
+            const url = new URL(interception.request.url);
+            const query = url.searchParams.get('query');
+            expect(query).to.equal(searchText);
+            expect(interception.request.url).to.include(`query=${encodedSearchText}`);
+        });
+    });
 });

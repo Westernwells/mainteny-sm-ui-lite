@@ -69,6 +69,7 @@ export const AppointmentPreference = ({
     <InfoCard
       containerStyles={{...containerStyles}}
       handleAction={() => setOpenDialog(true)}
+      testId="approintment-preference-edit-icon"
       headerIcon={
         <CalendarInformationIcon style={{width: '2rem', height: '2rem'}} />
       }

@@ -4,7 +4,7 @@ import MuiAutocomplete, {
 import {Option, OptionWithTranslationKey} from 'models/filter';
 import {SxProps, TextField, Theme} from '@mui/material';
 import {useTranslation} from 'react-i18next';
-import {SyntheticEvent, useMemo} from 'react';
+import {HTMLAttributes, SyntheticEvent, useMemo} from 'react';
 
 type Props = {
   value?: Option;
@@ -20,6 +20,10 @@ type Props = {
     reason: AutocompleteInputChangeReason,
   ) => void;
   onChange: (event: SyntheticEvent, value: Option | null) => void;
+  renderOption?: (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: Option,
+  ) => JSX.Element;
 };
 
 const Autocomplete = ({
