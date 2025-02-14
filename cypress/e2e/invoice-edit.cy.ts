@@ -5,6 +5,7 @@ import AppTopBarPage from '../pages/appTopBar.page';
 import invoiceDetails from '../fixtures/invoiceDetails.json';
 import invoiceAmountDetails from '../fixtures/invoiceAmountDetails.json';
 import {getFormattedPaymentValues, replacePaymentTermsPlaceholders} from '../utils/payment-terms';
+import InvoicesPage from '../pages/invoices.page';
 
 const mapJsonToEnum = (json: any): any => {
     json.discount.type = DiscountType[json.discount.type as keyof typeof DiscountType];
@@ -98,5 +99,33 @@ describe('Invoice Edit Flow with Payment Terms', () => {
 
             InvoiceEditPage.verifyPaymentTerms(formattedTerms);
         });
+    });
+
+    it('should keep Material & Labor Cost text field value when customer or job is changed', () => {
+        const laborCostText = 'Labor costs without VAT: {LABOR_COST}';
+        const materialCostText = 'Material costs without VAT: {MATERIAL_COST}';
+        const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
+        cy.intercept('GET', invoicesURL).as('invoicesApi');
+
+        InvoicesPage.visit();
+        cy.get('span[role="progressbar"]').should('not.exist');
+        cy.wait('@invoicesApi');
+
+        cy.contains('New Invoice').click();
+
+        cy.contains(laborCostText);
+        cy.contains(materialCostText);
+
+        // change customer
+        cy.get('input[name="propertyOwnerId"]').click();
+        cy.get('li[role="option"]').first().click();
+        cy.contains(laborCostText);
+        cy.contains(materialCostText);
+
+        // change job
+        cy.contains('button', 'Select Job').click();
+        cy.get('div[role="row"]').first().click();
+        cy.contains(laborCostText);
+        cy.contains(materialCostText);
     });
 });
