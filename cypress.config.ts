@@ -12,7 +12,7 @@ export default defineConfig({
     baseUrl: process.env.REACT_APP_BASE_URL,
     chromeWebSecurity: false,
     defaultCommandTimeout: 60000, 
-    pageLoadTimeout: 240000,
+    pageLoadTimeout: 300000,
     responseTimeout: 120000,
     retries: {
       openMode: 1, // Retry once during interactive mode

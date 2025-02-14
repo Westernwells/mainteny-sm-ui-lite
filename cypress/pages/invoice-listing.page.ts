@@ -82,42 +82,31 @@ export default class InvoiceListingPage {
     statusesToExclude: InvoiceStatusView[],
   ) => {
     InvoiceListingPage.filterInvoicesListByStatus(statusToCheck);
+
     cy.get('span[role="progressbar"]').should('not.exist');
 
+    // Ensure the correct status is applied in the URL
     cy.url().should('include', `${mapInvoiceStatus(statusToCheck)}`);
 
     InvoiceListingPage.waitForInvoiceApi(
       '@getInvoices',
-      {
-        status: mapInvoiceStatus(statusToCheck),
-      },
+      {status: mapInvoiceStatus(statusToCheck)},
       () => {
         cy.wait(1000);
 
-        cy.get('tbody').then((tableBody) => {
-          if (
-            tableBody.find("td[data-field='STATUS'][role='cell']").length > 0
-          ) {
-            cy.wrap(tableBody)
-              .find("td[data-field='STATUS'][role='cell']")
-              .each((rowElement) => {
-                const statusText = rowElement.text().trim();
+        cy.get("td[data-field='STATUS'][role='cell']")
+          .should('have.length.greaterThan', 0)
+          .each(($row) => {
+            cy.wrap($row).invoke('text').should('equal', statusToCheck)
 
-                expect(statusText).to.equal(statusToCheck);
-
-                statusesToExclude.forEach((status: InvoiceStatusView) => {
-                  expect(statusText).not.to.equal(status);
-                });
-              });
-          } else {
-            cy.contains('There are no entries for the applied filters.').should(
-              'exist',
-            );
-          }
-        });
+            statusesToExclude.forEach((status) => {
+              cy.wrap($row).invoke('text').should('not.equal', status);
+            });
+          });
       },
     );
-    // deselect status
+
+    // Deselect the status to reset filters
     InvoiceListingPage.filterInvoicesListByStatus(statusToCheck);
   };
 
