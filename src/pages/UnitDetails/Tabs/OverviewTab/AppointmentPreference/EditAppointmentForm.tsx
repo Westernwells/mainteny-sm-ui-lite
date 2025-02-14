@@ -11,10 +11,8 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import {UseFormRegister, UseFormSetValue, UseFormWatch} from 'react-hook-form';
-import {useState, useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {Alert, Typography} from '@mui/material';
-import {ServiceCompanyContactPersonView} from 'models/contacts';
-import {useServiceCompanyContactPersons} from 'hooks/reactQuery/useContacts';
 import {ContactPersonDropdown} from 'components/ContactPersonDropdown';
 import useTheme from '@mui/material/styles/useTheme';
 
@@ -68,22 +66,11 @@ export const EditAppointmentForm = ({
   const openingHour = watch('openingHour');
   const closingHour = watch('closingHour');
 
-  const {data: contactPersons} = useServiceCompanyContactPersons({
-    pageSize: 100,
-  });
-
-  const handleContactChange = (
-    contact: ServiceCompanyContactPersonView | null,
-  ) => {
-    if (contact) {
-      setValue('contactPersonId', contact.id);
-      setValue(
-        'contactPersonName',
-        `${contact.userAccount.firstName} ${contact.userAccount.lastName}`,
-      );
+  const handleContactChange = (id: string | null) => {
+    if (id) {
+      setValue('contactPersonId', id);
     } else {
       setValue('contactPersonId', '');
-      setValue('contactPersonName', '');
     }
   };
 
@@ -297,7 +284,6 @@ export const EditAppointmentForm = ({
 
       <Grid item md={12} sm={12} xs={12}>
         <ContactPersonDropdown
-          contactPersons={contactPersons?.data}
           selectedContactId={watch('contactPersonId')}
           onContactChange={handleContactChange}
         />

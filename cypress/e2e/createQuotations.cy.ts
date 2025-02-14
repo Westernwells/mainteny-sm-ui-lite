@@ -138,4 +138,24 @@ describe('Create Quotation', () => {
                 getRichTextField().find('div[role="textbox"]').invoke('text').should('contain', `${paymentTermName}\n${discountsText}`);
             });
     });
+
+    it('should search for unit', () => {
+        const searchText = 'Schönhauser';
+        const encodedSearchText = encodeURIComponent(searchText);
+
+        cy.contains('button', 'Select Unit').click();
+
+        cy.wait(5000);
+
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?*`).as('searchElevatorsApi');
+
+        cy.get('input[id="Search"]').type(searchText);
+
+        cy.wait('@searchElevatorsApi').then((interception) => {
+            const url = new URL(interception.request.url);
+            const query = url.searchParams.get('query');
+            expect(query).to.equal(searchText);
+            expect(interception.request.url).to.include(`query=${encodedSearchText}`);
+        });
+    });
 });

@@ -19,5 +19,10 @@ export default class UnitsPage {
     cy.contains('Edit General');
   };
 
+  static openAppointmentPreferenceDialog = () => {
+    cy.get('[data-test-id="approintment-preference-edit-icon"]').click();
+    cy.contains('Edit Appointment Preferences');
+  };
+
   static getFieldByName = (name: string) => cy.get(`input[name=${name}]`);
 }

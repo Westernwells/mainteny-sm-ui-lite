@@ -81,7 +81,7 @@ export const UnitsDataGrid = ({
     isLoading: isCustomerLoading,
   } = useQueryCustomerElevator(
     {
-      query: encodeURIComponent(search!!),
+      query: search!!,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
@@ -97,7 +97,7 @@ export const UnitsDataGrid = ({
     refetch: refetchElevatorResource,
   } = useAllElevators(
     {
-      query: encodeURIComponent(search!!),
+      query: search!!,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
