@@ -32,6 +32,7 @@ import {
 export const formatInvoiceRecord = (
   value: InvoiceFormData,
   currentCurrency: Currency,
+  taxRates?: VatView[],
 ): CreateInvoice | UpdateInvoice => ({
   ...value,
   subject: value.subject,
@@ -41,13 +42,19 @@ export const formatInvoiceRecord = (
   type: value.type,
   items: value.items.map((item) => {
     const {article, unitAmount, discount, payment, ...rest} = item;
+    const {vatId, percentageVat, vatName, netAmount, currency} =
+      unitAmount ?? {};
+
+    const requestVat =
+      taxRates?.find((taxItem) => taxItem.id === vatId) ??
+      taxRates?.find((taxItem) => taxItem.percentage === percentageVat);
 
     const cleanedUnitAmount = {
-      netAmount: unitAmount?.netAmount || 0,
-      percentageVat: unitAmount?.percentageVat || 0,
-      currency: unitAmount?.currency || currentCurrency.code,
-      vatId: unitAmount?.vatId || '',
-      vatName: unitAmount?.vatName || '',
+      netAmount: netAmount ?? 0,
+      percentageVat: percentageVat ?? 0,
+      currency: currency ?? currentCurrency.code,
+      vatId: vatId || requestVat?.id || '',
+      vatName: vatName || requestVat?.name || '',
     };
 
     const modifiedArticle = {...article};

@@ -595,14 +595,18 @@ export const InvoiceForm = ({
 
     if (!isNewInvoice && invoice) {
       return updateInvoiceAsync({
-        data: formatInvoiceRecord(values, currentCurrency),
+        data: formatInvoiceRecord(values, currentCurrency, taxRates),
         invoiceId: invoice.id,
       });
     }
 
     return createNewInvoice({
       data: {
-        ...(formatInvoiceRecord(values, currentCurrency) as CreateInvoice),
+        ...(formatInvoiceRecord(
+          values,
+          currentCurrency,
+          taxRates,
+        ) as CreateInvoice),
         ...createData,
       },
     });
@@ -1694,11 +1698,22 @@ export const InvoiceForm = ({
   };
 
   const isValid = () => {
+    const hasValidVat = formik.values.items.every((item) => {
+      const {vatId, percentageVat} = item.unitAmount;
+
+      return taxRates?.some(
+        (rate) =>
+          rate.id === vatId ||
+          (percentageVat !== undefined && rate.percentage === percentageVat),
+      );
+    });
+
     const valid =
       formik.values.subject &&
       formik.values.type.length &&
       formik.values.items.length &&
       !!customer &&
+      hasValidVat &&
       Object.keys(formik.errors).length === 0;
 
     if (formik.values.type !== InvoiceType.CREDIT_NOTE) {
