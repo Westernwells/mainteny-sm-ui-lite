@@ -1,6 +1,12 @@
 import {Meta} from './misc';
 import {Order} from './pagination';
 
+export const TEXT_BLOCK_MEMORY_SIZE_UPPER_LIMIT = 50000; // 50 KB, this is only for the FE, BE has its own value that we need to keep same as FE
+
+export const CUSTOM_ERROR_TEXT = {
+  text: 'Text block size is too big',
+};
+
 export interface CreateTextBlockRecord {
   serviceCompanyId: string;
   category: string;
@@ -66,6 +72,7 @@ export interface TextBlockRow {
   wordCount: number;
   editedAt: string;
 }
+
 export const mapJsonToTextBlockView = (json: any): TextBlockView => {
   return {
     id: json.id,
