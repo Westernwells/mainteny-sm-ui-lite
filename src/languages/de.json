@@ -3093,5 +3093,6 @@
   "Invoice restored by {{name}}": "Rechnung wurde von {{name}} wiederhergestellt",
   "Additional names will be added underneath the main name on pdf documents.": "Zusätzliche Namen werden unter dem Hauptnamen in PDFs hinzugefügt.",
   "Additional Name": "Zusätzlicher Name",
-  "Select contact": "Kontakt wählen"
+  "Select contact": "Kontakt wählen",
+  "Text block is too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes": "Textblock ist zu groß. Unterstützte Größe: {{sizeLimit}} Bytes, aktuelle Größe: {{currentSize}} Bytes."
 }
