@@ -19,7 +19,7 @@ const setupTest = () => {
     cy.get('span[role="progressbar"]').should('not.exist');
 };
 
-describe('Job Management Tests', () => {
+describe('Service Job Tests', () => {
     beforeEach(setupTest);
 
     it('should validate Assign Engineer dialog', () => {
@@ -81,7 +81,12 @@ describe('Job Management Tests', () => {
                 if (serviceOrders.length) {
                     ServiceJobPage.getFirstTableElement().should('exist').click();
                     cy.get('button[data-testid="action-menu-horizontal"]').click();
-                    cy.contains('li', 'Schedule').click();
+                    cy.get('[id="action-menu"]')
+                        .find('[data-testid^="container-menu-option-"]')
+                        .contains('li', /^Schedule$/) // Match exactly "Schedule"
+                        .should('be.visible')
+                        .click();
+
                     ServiceJobPage.assignEngineer();
                     cy.contains('Service job scheduled successfully');
                 } else {
@@ -100,7 +105,10 @@ describe('Job Management Tests', () => {
                 if (serviceOrders.length) {
                     ServiceJobPage.getFirstTableElement().should('exist').click();
                     cy.get('button[data-testid="action-menu-horizontal"]').click();
-                    cy.contains('li', 'Unschedule').should('exist');
+                    cy.get('[id="action-menu"]')
+                        .find('[data-testid^="container-menu-option-"]')
+                        .contains('li', /^Unschedule$/) // Match exactly "Unschedule"
+                        .should('exist');
                 } else {
                     cy.get('tbody').children().should('not.exist');
                     throw new Error('No Unscheduled jobs found');

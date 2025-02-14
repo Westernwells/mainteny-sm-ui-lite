@@ -5,8 +5,7 @@ describe('Edit Article', () => {
     beforeEach(() => {
         cy.login();
 
-        const articleApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles?query=&pageIndex=0&pageSize=50`;
-
+        const articleApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles*`;
         const articleInfoURL = `${Cypress.env().REACT_APP_API_URL}/api/articles/*`;
 
         cy.intercept('GET', articleApi).as('articleApi');
@@ -14,6 +13,9 @@ describe('Edit Article', () => {
 
         ArticlesPage.visit();
         AppTopBarPage.selectLanguage('English');
+
+        cy.wait('@articleApi', {timeout: 120000}).its('response.statusCode').should('eq', 200);
+
         ArticlesPage.navigateToDetailsPage();
     });
 

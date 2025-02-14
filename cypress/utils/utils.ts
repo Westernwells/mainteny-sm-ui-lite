@@ -39,6 +39,8 @@ export const mapInvoiceStatus = (invoiceStatus: InvoiceStatusView) => {
       return InvoiceStatus.PARTIALLY_PAID;
     case InvoiceStatusView.CANCELLED:
       return InvoiceStatus.CANCELLED;
+    case InvoiceStatusView.CREDITED:
+      return InvoiceStatus.CREDITED;
     default:
       return InvoiceStatus.DRAFT;
   }
