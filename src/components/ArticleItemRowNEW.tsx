@@ -389,7 +389,7 @@ export const ArticleItemRowNEW = ({
       return matchingTaxRate.id;
     }
 
-    return '0';
+    return '';
   })();
 
   const tabItems: TabItems[] = useMemo(() => {
@@ -728,8 +728,30 @@ export const ArticleItemRowNEW = ({
         />
       </TableCell>
 
-      <TableCell sx={{width: '6%', display: 'inline-block'}}>
-        <FormControl fullWidth required={false}>
+      <TableCell sx={{width: '7%', display: 'inline-block'}}>
+        <FormControl
+          fullWidth
+          required={false}
+          error={!taxRates.some((item) => item.id === vatValue)}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                border: !taxRates.some((item) => item.id === vatValue)
+                  ? '2px solid red'
+                  : 'inherit',
+              },
+              '&:hover fieldset': {
+                border: !taxRates.some((item) => item.id === vatValue)
+                  ? '2px solid red'
+                  : 'inherit',
+              },
+              '&.Mui-focused fieldset': {
+                border: !taxRates.some((item) => item.id === vatValue)
+                  ? '2px solid red'
+                  : 'inherit',
+              },
+            },
+          }}>
           <Select
             labelId={`select-tax-label-${index}`}
             size="small"
@@ -737,55 +759,41 @@ export const ArticleItemRowNEW = ({
             renderValue={(value) => {
               let taxRate = taxRates?.find((item) => item.id === value);
 
-              // If taxRate is not found by id and value is a number (percentage), find by percentage
-              if (!taxRate && !Number.isNaN(Number(value))) {
+              // Convert value to a number before checking for percentage match
+              const numericValue = Number(value);
+
+              if (!taxRate && !Number.isNaN(numericValue)) {
                 taxRate = taxRates?.find(
-                  (item) => item.percentage === Number(value),
+                  (item) => item.percentage === numericValue,
                 );
               }
 
-              // Get the percentage, defaulting to 0 if not found
-              const taxRatePercentage = taxRate?.percentage ?? 0;
-
-              return `${taxRatePercentage}%`;
+              // Ensure 0 is displayed as "0%", but an empty or undefined value remains empty
+              return taxRate?.percentage !== undefined
+                ? `${taxRate.percentage}%`
+                : numericValue === 0
+                ? '0%'
+                : '';
             }}
             name="unitAmount.vatId"
             id={`unitAmount.vatId-${index}`}
             notched
             onChange={onChangePercentageVat}
             onBlur={formik.handleBlur}
-            IconComponent={() => null}
             MenuProps={{
-              anchorOrigin: {
-                vertical: 'bottom',
-                horizontal: 'right',
-              },
-              transformOrigin: {
-                vertical: 'top',
-                horizontal: 'right',
-              },
+              anchorOrigin: {vertical: 'bottom', horizontal: 'right'},
+              transformOrigin: {vertical: 'top', horizontal: 'right'},
               slotProps: {
                 paper: {
-                  sx: {
-                    maxWidth: '20rem',
-                  },
+                  sx: {maxWidth: '20rem'},
                 },
-              },
-            }}
-            sx={{
-              '& .MuiSelect-select': {
-                textAlign: 'right',
-                px: '5px !important',
               },
             }}>
             {taxRates?.map((taxRate) => (
               <MenuItem
                 value={taxRate.id}
                 key={taxRate.id}
-                sx={{
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                }}>
+                sx={{flexDirection: 'column', alignItems: 'flex-start'}}>
                 <Box display="flex" maxWidth="100%" gap={1}>
                   <Typography variant="body1" noWrap color="primary.dark">
                     {taxRate.name}
@@ -807,7 +815,7 @@ export const ArticleItemRowNEW = ({
         </FormControl>
       </TableCell>
 
-      <TableCell sx={{width: '10%', display: 'inline-block'}}>
+      <TableCell sx={{width: '9%', display: 'inline-block'}}>
         <FormSelect
           labelId={`select-unit-label-${index}`}
           label=""
