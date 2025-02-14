@@ -3092,5 +3092,6 @@
   "Qty": "Menge",
   "Invoice restored by {{name}}": "Rechnung wurde von {{name}} wiederhergestellt",
   "Additional names will be added underneath the main name on pdf documents.": "Zusätzliche Namen werden unter dem Hauptnamen in PDFs hinzugefügt.",
-  "Additional Name": "Zusätzlicher Name"
+  "Additional Name": "Zusätzlicher Name",
+  "Select contact": "Kontakt wählen"
 }
