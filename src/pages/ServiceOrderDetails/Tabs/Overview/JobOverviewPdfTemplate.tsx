@@ -196,7 +196,8 @@ const JobOverviewPdfTemplate = React.memo(
       return centsToMoney(currentCurrency?.code!, total);
     };
 
-    const elevatorAddress = serviceOrder?.elevator?.address;
+    const elevatorAddress =
+      quotation?.elevator?.address ?? serviceOrder?.elevator?.address;
 
     const globalDiscount = getDiscoutObj(quotation?.additionalInfo?.discount);
     const discountAmount = globalDiscount?.amount;
