@@ -421,7 +421,7 @@ export const aggregateContractRow = (
     data: contract,
     id: contract.id,
     propertyOwner: contract.propertyOwner,
-    number: contract.number,
+    number: contract.externalId,
     contractName: contract.name,
     numberOfUnits: contract.numberOfElevators,
     price: `${formatCurrency(

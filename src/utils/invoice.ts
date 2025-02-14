@@ -18,7 +18,7 @@ import {
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
 import {PaymentTermArticleType, PaymentTermData} from 'models/contract';
-import {Currency} from 'models/misc';
+import {Currency, State} from 'models/misc';
 import {ArticleType} from 'models/article';
 import {ServiceOrderTypeRecord} from 'models/service-order';
 import {centsToMoney, Currencies, formatCurrency} from './currency';
@@ -450,4 +450,16 @@ export const createSearchQuery = ({
   if (jobNumber) elements.push(`[so:externalid:*${jobNumber}*]`);
 
   return elements.length ? elements.join(' ') : undefined;
+};
+
+export const getBalanceAmount = (invoice: InvoiceView) => {
+  const totalGross =
+    (invoice.totalAmount?.grossAmount ?? 0) /
+    10 ** invoice.totalAmount.fractionDigits!;
+  const paidSum =
+    invoice.payments
+      .filter((p) => p.meta?.state === State.ACTIVE)
+      .reduce((sum, p) => sum + p.amount.value!, 0) /
+    10 ** invoice.totalAmount.fractionDigits!;
+  return totalGross - paidSum;
 };
