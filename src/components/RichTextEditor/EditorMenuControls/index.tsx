@@ -23,6 +23,7 @@ interface Props {
   onOpenFileUpload?: () => void;
   hasAttachFileButton?: boolean;
   hasSignatureButton?: boolean;
+  showTextBlock?: boolean;
   onSignatureSelect?: (signature?: EmailSignature) => void;
   updateHtml?: (value: string) => void;
   onChange: (value: string) => void;
@@ -32,6 +33,7 @@ const EditorMenuControls = ({
   onOpenFileUpload,
   hasAttachFileButton = true,
   hasSignatureButton = false,
+  showTextBlock = true,
   onSignatureSelect,
   updateHtml,
   onChange,
@@ -120,56 +122,60 @@ const EditorMenuControls = ({
 
           <LinkButton editor={editor} />
 
-          <TextBlockButton onClick={handleTextBlockClick} />
+          {showTextBlock && (
+            <>
+              <TextBlockButton onClick={handleTextBlockClick} />
 
-          <Popover
-            id={popoverId}
-            open={open}
-            anchorEl={anchorEl}
-            onClose={handlePopoverClose}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            PaperProps={{
-              style: {
-                width: '480px',
-                maxHeight: '400px',
-                padding: '1rem',
-                boxShadow: '0 3px 6px rgba(0, 0, 0, 0.16)',
-              },
-            }}
-            sx={{
-              zIndex: 1300,
-              top: '-3px !important',
-              left: '5px !important',
-            }}>
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                {t('Click to apply your block')}
-              </Typography>
-              <TextBlockSelect
-                textBlockCategories={[
-                  TextBlockCategory.QUOTATION,
-                  TextBlockCategory.ARTICLE_ORDER,
-                  TextBlockCategory.INVOICE,
-                  TextBlockCategory.SERVICE_ORDER,
-                  TextBlockCategory.SERVICE_ORDER_REPORT,
-                  TextBlockCategory.EMAIL,
-                ]}
-                setActiveSubDialog={setActiveSubDialog}
-                setActiveTextBlock={setActiveTextBlock}
-                handleCellClick={(params) =>
-                  handleCellClick(cleanHtmlContent(params.row.text))
-                }
-                showNewBlockButton={false}
-              />
-            </Box>
-          </Popover>
+              <Popover
+                id={popoverId}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handlePopoverClose}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}
+                transformOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+                PaperProps={{
+                  style: {
+                    width: '480px',
+                    maxHeight: '400px',
+                    padding: '1rem',
+                    boxShadow: '0 3px 6px rgba(0, 0, 0, 0.16)',
+                  },
+                }}
+                sx={{
+                  zIndex: 1300,
+                  top: '-3px !important',
+                  left: '5px !important',
+                }}>
+                <Box>
+                  <Typography variant="h6" gutterBottom>
+                    {t('Click to apply your block')}
+                  </Typography>
+                  <TextBlockSelect
+                    textBlockCategories={[
+                      TextBlockCategory.QUOTATION,
+                      TextBlockCategory.ARTICLE_ORDER,
+                      TextBlockCategory.INVOICE,
+                      TextBlockCategory.SERVICE_ORDER,
+                      TextBlockCategory.SERVICE_ORDER_REPORT,
+                      TextBlockCategory.EMAIL,
+                    ]}
+                    setActiveSubDialog={setActiveSubDialog}
+                    setActiveTextBlock={setActiveTextBlock}
+                    handleCellClick={(params) =>
+                      handleCellClick(cleanHtmlContent(params.row.text))
+                    }
+                    showNewBlockButton={false}
+                  />
+                </Box>
+              </Popover>
+            </>
+          )}
 
           {activeSubDialog && (
             <TextBlockActions
