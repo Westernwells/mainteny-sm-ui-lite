@@ -503,7 +503,7 @@ export const generatePdfInvoice = (
   customer?: PropertyOwnerView | null,
   existingInvoice?: InvoiceView,
 ): InvoiceView => ({
-  id: '',
+  id: formikValues?.id ?? '',
   number: formikValues.externalId ?? '',
   externalId: formikValues.externalId ?? '',
   description: formikValues.description ?? '',
