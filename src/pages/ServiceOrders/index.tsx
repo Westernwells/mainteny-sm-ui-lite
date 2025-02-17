@@ -102,7 +102,8 @@ export const ServiceOrders = () => {
           serviceOrderTypeToString(jobType?.givenName!) === '-'
             ? jobType.givenName!
             : t(serviceOrderTypeToString(jobType?.givenName!)),
-        action: () => navigate(`/orders/new?type=${jobType.name}`),
+        action: () =>
+          navigate(`/orders/new?type=${encodeURIComponent(jobType.name)}`),
         icon: <IconComponent />,
       };
     }) || [];
