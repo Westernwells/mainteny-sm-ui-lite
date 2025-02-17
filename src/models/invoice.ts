@@ -372,6 +372,7 @@ export const InvoiceTypeMap = {
 };
 
 export interface InvoiceFormData {
+  id?: string;
   subject: string;
   description: string;
   dueDate?: Date;

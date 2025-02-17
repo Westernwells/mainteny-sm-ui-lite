@@ -160,6 +160,7 @@ import {generatePdfInvoice} from 'utils/invoice';
 import {SwissQRBill} from 'swissqrbill/svg';
 import {calculateArticlesAmount} from 'utils/calculate-total';
 import {VatView} from 'models/vat';
+import PdfPartialUpfrontPreview from 'components/pdf-templates/invoice-previews/PdfPartialUpfrontPreview';
 
 interface Props {
   invoice?: InvoiceView;
@@ -473,6 +474,7 @@ export const InvoiceForm = ({
 
   const initialValues: InvoiceFormData = useMemo(
     () => ({
+      id: !isNewInvoice && invoice ? invoice?.id : '',
       alternativeServiceCompanyInfo: {
         name: user?.userAccount.serviceCompany.name || '',
         address: user?.userAccount.serviceCompany.billingAddress,
@@ -1612,7 +1614,7 @@ export const InvoiceForm = ({
       formik.values?.type === InvoiceType.PARTIAL ||
       formik.values?.type === InvoiceType.UPFRONT
     ) {
-      PdfTemplate = PartialInvoicePdfTemplate;
+      PdfTemplate = PdfPartialUpfrontPreview;
     } else {
       PdfTemplate = FinalInvoicePdfTemplate;
     }
@@ -1623,15 +1625,6 @@ export const InvoiceForm = ({
       formik.values?.type === InvoiceType.AGGREGATE
     );
 
-    const previousInvoicesProp = shouldIncludePreviousInvoices
-      ? correctCreditNoteInvoicesPercentages(
-          sortedPreviousInvoices.slice(
-            0,
-            sortedPreviousInvoices.findIndex((i) => i.id === invoice?.id) + 1,
-          ),
-        )
-      : [];
-
     const blob = await pdf(
       <PdfTemplate
         userInfo={user?.userAccount}
@@ -1641,7 +1634,7 @@ export const InvoiceForm = ({
         invoiceAmountDetail={invoiceAmountDetail}
         selectedLng={company?.language}
         translate={translate}
-        previousInvoices={previousInvoicesProp}
+        previousInvoices={sortedPreviousInvoices}
         headerPath={headerUrl[headerInfo?.path]}
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
@@ -1687,7 +1680,6 @@ export const InvoiceForm = ({
       customer,
       invoice,
     );
-
     await checkValidQrCode(pdfInvoice);
 
     await generateBlobUrl({
@@ -1762,7 +1754,6 @@ export const InvoiceForm = ({
     setSearchParams(formatSearchParams({customerId}, searchParams));
     setIsAddNewCustomerDialogOpen(false);
   };
-
   const {data: allInvoiceResource = createEmptyResource<InvoiceView>(10)} =
     useInvoices(
       {
