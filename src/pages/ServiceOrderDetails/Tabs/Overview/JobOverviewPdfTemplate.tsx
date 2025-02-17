@@ -24,6 +24,7 @@ import {
 import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
+import {toSentenceCase} from 'utils/string';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -191,7 +192,8 @@ const JobOverviewPdfTemplate = React.memo(
       );
     };
 
-    const elevatorAddress = serviceOrder?.elevator?.address;
+    const elevatorAddress =
+      quotation?.elevator.address ?? serviceOrder?.elevator?.address;
 
     const globalDiscount = getDiscoutObj(quotation?.additionalInfo?.discount);
     const discountAmount = globalDiscount?.amount;
@@ -274,6 +276,7 @@ const JobOverviewPdfTemplate = React.memo(
                 serviceCompanyInfo={serviceCompanyInfo}
                 receiverName={serviceOrder?.elevator?.propertyOwner?.name}
                 addressComponent={
+                  quotation?.additionalInfo.billingAddress?.component ??
                   serviceOrder?.elevator.propertyOwner.billingAddress?.component
                 }
                 selectedLng={selectedLng}
@@ -400,7 +403,8 @@ const JobOverviewPdfTemplate = React.memo(
 
             <View>
               <PdfPageTitle>
-                {translate('Job Confirmation:')} {serviceOrderType}
+                {translate('Job Confirmation:')}{' '}
+                {toSentenceCase(serviceOrderType)}
               </PdfPageTitle>
 
               {serviceOrder?.description.trim() !== '' && (

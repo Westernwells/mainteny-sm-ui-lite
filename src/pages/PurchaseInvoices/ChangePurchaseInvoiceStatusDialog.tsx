@@ -32,7 +32,9 @@ const ChangePurchaseInvoiceStatusDialog = ({open, id, onClose}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
 
-  const {data: purchaseInvoiceDetail} = usePurchaseInvoiceDetail(id);
+  const {data: purchaseInvoiceDetail} = usePurchaseInvoiceDetail(id, {
+    enabled: open,
+  });
 
   const {mutateAsync: updatePurchaseInvoiceAsync} = useUpdatePurchaseInvoice();
 

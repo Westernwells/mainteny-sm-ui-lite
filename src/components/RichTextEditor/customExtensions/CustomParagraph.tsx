@@ -11,6 +11,16 @@ const CustomParagraph = Paragraph.extend({
           style: attributes.style,
         }),
       },
+      textAlign: {
+        default: null,
+        parseHTML: (element) => element.style.textAlign || null,
+        renderHTML: (attributes) => {
+          if (attributes.textAlign) {
+            return {style: `text-align: ${attributes.textAlign};`};
+          }
+          return {};
+        },
+      },
     };
   },
   renderHTML({HTMLAttributes}) {

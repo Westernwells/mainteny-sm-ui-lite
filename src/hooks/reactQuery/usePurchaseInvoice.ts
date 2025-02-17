@@ -106,13 +106,22 @@ export const fetchPurchaseInvoiceDetail = async (invoiceId: string) => {
   return response.data;
 };
 
-export function usePurchaseInvoiceDetail(invoiceId?: string) {
-  return useQuery(
+export function usePurchaseInvoiceDetail(
+  invoiceId?: string,
+  options?: UseQueryOptions<
+    PurchaseInvoiceView,
+    RestError,
+    PurchaseInvoiceView
+  >,
+) {
+  const {enabled = !!invoiceId, ...restOptions} = options || {};
+
+  return useQuery<PurchaseInvoiceView, RestError, PurchaseInvoiceView>(
     [qk.purchaseInvoiceById, invoiceId],
     () => fetchPurchaseInvoiceDetail(invoiceId!),
     {
-      enabled: !!invoiceId,
-      ...{},
+      enabled,
+      ...restOptions,
     },
   );
 }
