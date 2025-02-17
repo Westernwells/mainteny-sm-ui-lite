@@ -731,6 +731,7 @@ export const ArticleItemRowNEW = ({
       <TableCell sx={{width: '7%', display: 'inline-block'}}>
         <FormControl
           fullWidth
+          data-testid="vat-dropdown"
           required={false}
           error={!taxRates.some((item) => item.id === vatValue)}
           sx={{
