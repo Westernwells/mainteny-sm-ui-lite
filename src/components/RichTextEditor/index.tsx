@@ -1,9 +1,9 @@
 import {
   Box,
-  InputLabel,
   FormControl,
-  Typography,
   IconButton,
+  InputLabel,
+  Typography,
 } from '@mui/material';
 import {EditorProvider} from '@tiptap/react';
 import {useEffect, useRef, useState} from 'react';
@@ -42,6 +42,7 @@ interface AttachedFilesProps {
   isLoadingFiles?: boolean;
   hasAttachFileButton?: boolean;
 }
+
 const AttachedFiles = ({
   files = [],
   removeFile,
@@ -148,12 +149,14 @@ interface Props {
   name?: string;
   control?: Control<any>;
   existingFiles?: FileWithPreview[];
-  updateFiles?: (files: FileWithPreview[]) => void;
   isLoadingFiles?: boolean;
   hasAttachFileButton?: boolean;
   hasSignatureButton?: boolean;
+  showTextBlock?: boolean;
+  updateFiles?: (files: FileWithPreview[]) => void;
   onSignatureSelect?: (signature?: EmailSignature) => void;
 }
+
 const RichTextEditor = ({
   required = false,
   label,
@@ -167,6 +170,7 @@ const RichTextEditor = ({
   updateFiles,
   hasAttachFileButton,
   hasSignatureButton = false,
+  showTextBlock,
   onSignatureSelect,
 }: Props) => {
   const {t} = useTranslation();
@@ -199,8 +203,9 @@ const RichTextEditor = ({
             onOpenFileUpload={() => dropzoneRef?.current?.open()}
             hasAttachFileButton={hasAttachFileButton}
             hasSignatureButton={hasSignatureButton}
-            onSignatureSelect={onSignatureSelect}
             updateHtml={updateHtml}
+            showTextBlock={showTextBlock}
+            onSignatureSelect={onSignatureSelect}
             onChange={onChange}
           />
         </>
