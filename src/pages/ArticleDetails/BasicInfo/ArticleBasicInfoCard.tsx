@@ -146,6 +146,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     initialValues: {
       ...initialValues,
     },
+    enableReinitialize: true,
     onSubmit: () => {},
     validationSchema,
   });
