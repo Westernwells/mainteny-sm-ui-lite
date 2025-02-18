@@ -1,5 +1,10 @@
-import {TextBlockCategory, TextBlockView} from 'models/text-block';
+import {
+  TEXT_BLOCK_MEMORY_SIZE_UPPER_LIMIT,
+  TextBlockCategory,
+  TextBlockView,
+} from 'models/text-block';
 import {getPlainStringFromHtml} from 'utils/rich-field-string';
+import {getByteSize} from 'utils/string';
 
 export const mapJsonToTextBlockView = (json: any): TextBlockView => ({
   id: json.id,
@@ -164,4 +169,10 @@ export const getUpdatedTextBlockValue = (
   return cleanHtmlContent(
     `${isCurrentEmpty ? '' : currentValue} ${valueToAdd}`.trim(),
   );
+};
+
+export const isFileSizeValid = (text?: string) => {
+  if (!text) return true;
+
+  return getByteSize(text) <= TEXT_BLOCK_MEMORY_SIZE_UPPER_LIMIT;
 };
