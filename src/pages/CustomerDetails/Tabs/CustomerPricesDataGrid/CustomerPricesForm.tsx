@@ -6,7 +6,7 @@ import {FormInput} from 'components/form/FormInput';
 import {Dialog} from 'components/Dialog';
 import {ReactComponent as AlertInfoIcon} from 'assets/icons/AlertInfo.svg';
 import Tooltip from '@mui/material/Tooltip';
-import {ArticleView, articleTypeOptions} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {
   centsToMoney,
   getCurrencySymbol,
@@ -24,6 +24,7 @@ import {
 } from 'models/service-company';
 import {ServiceOrderType} from 'models/service-order';
 import {useState} from 'react';
+import {getFilteredArticleTypeOptions} from 'utils/article-utils';
 
 const validationSchema = Yup.object().shape({
   articleId: Yup.string()
@@ -135,7 +136,9 @@ export const CustomerPricesForm = ({
           <FormSelect
             labelId="select-type-label"
             label="Type"
-            options={articleTypeOptions}
+            options={getFilteredArticleTypeOptions({
+              excludeTypes: [ArticleType.MIX],
+            })}
             selectProps={{
               id: 'select-type',
               value: selectedArticle?.type ?? '',

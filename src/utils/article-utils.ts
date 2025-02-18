@@ -15,6 +15,7 @@ import {InvoiceItemRecord} from 'models/invoice';
 import {VatView} from 'models/vat';
 import {cleanHtmlContent, replaceTextInHtml, stripHtmlTags} from './text-block';
 import {Currencies, formatCurrency} from './currency';
+import {convertToText} from './utils';
 
 export const handleCostPackageValidation = (
   value: number | undefined,
@@ -261,3 +262,15 @@ export const getBackButtonTitle = (value: number): string => {
       return 'New Supplier';
   }
 };
+
+export const getFilteredArticleTypeOptions = ({
+  excludeTypes = [],
+}: {
+  excludeTypes?: ArticleType[];
+}) =>
+  Object.values(ArticleType)
+    .filter((type) => !excludeTypes.includes(type))
+    .map((value) => ({
+      value,
+      label: convertToText(value),
+    }));

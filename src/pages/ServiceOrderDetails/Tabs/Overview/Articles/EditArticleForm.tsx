@@ -38,7 +38,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import {ArticleType, articleTypeOptions} from 'models/article';
+import {ArticleType} from 'models/article';
 import {NumericFormat} from 'react-number-format';
 import {theme} from 'theme';
 import {getAmountFromPercentage} from 'utils/utils';
@@ -50,6 +50,7 @@ import {Dialog} from 'components/Dialog';
 import {GridCellParams} from '@mui/x-data-grid';
 import {useVats} from 'hooks/reactQuery/useVats';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
+import {getFilteredArticleTypeOptions} from 'utils/article-utils';
 import {EditArticleFormModel} from './models';
 
 const validationSchema = Yup.object().shape({
@@ -344,7 +345,9 @@ export const EditArticleForm = ({
           <FormSelect
             containerStyles={{width: '100%'}}
             label="Type"
-            options={articleTypeOptions}
+            options={getFilteredArticleTypeOptions({
+              excludeTypes: [ArticleType.MIX],
+            })}
             selectProps={{
               value: formik.values.type,
               onChange: (e) =>

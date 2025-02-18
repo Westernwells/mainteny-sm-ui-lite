@@ -24,12 +24,13 @@ import {
   useCompanyAutoNumberConfig,
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
-import {ArticleType, CostPackage, articleTypeOptions} from 'models/article';
+import {ArticleType, CostPackage} from 'models/article';
 import {LanguageContext} from 'context/LanguageProvider';
 import {Grid, TextField, Typography} from '@mui/material';
 import {theme} from 'theme';
 import {getAmountFromPercentage} from 'utils/utils';
 import {NumericFormat} from 'react-number-format';
+import {getFilteredArticleTypeOptions} from 'utils/article-utils';
 import RichTextField from '../../../components/RichTextField';
 
 export const EditBasicInfoForm = ({
@@ -338,7 +339,9 @@ export const EditBasicInfoForm = ({
           <FormSelect
             containerStyles={{width: '87%'}}
             label="Type"
-            options={articleTypeOptions}
+            options={getFilteredArticleTypeOptions({
+              excludeTypes: [ArticleType.MIX],
+            })}
             selectProps={{
               value: formik.values.type,
               onChange: (e) => handleTypeChange(e.target.value as ArticleType),
