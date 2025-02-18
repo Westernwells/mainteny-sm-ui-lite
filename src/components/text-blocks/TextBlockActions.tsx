@@ -5,22 +5,24 @@ import {UserCompanyContext} from 'context/UserCompanyProvider';
 import {useFormik} from 'formik';
 import {
   useCreateTextBlock,
-  useUpdateTextBlock,
   useDeleteTextBlock,
+  useUpdateTextBlock,
 } from 'hooks/reactQuery/useTextBlock';
 import {
-  TextBlockFormModel,
+  CUSTOM_ERROR_TEXT,
   TextBlockCategory,
+  TextBlockFormModel,
   TextBlockView,
 } from 'models/text-block';
 import {TextBlockForm} from 'pages/Settings/TextBlocks/TextBlockForm';
-import React, {useContext, Dispatch, SetStateAction} from 'react';
+import React, {Dispatch, SetStateAction, useContext} from 'react';
 import {useTranslation} from 'react-i18next';
 import {theme} from 'theme';
 import {
   cleanHtmlContent,
   convertCategoryToMacro,
   convertCategoryToText,
+  isFileSizeValid,
 } from 'utils/text-block';
 import * as Yup from 'yup';
 
@@ -40,7 +42,11 @@ type Props = {
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
   category: Yup.string().required('Category is required'),
-  text: Yup.string().required('Text is required'),
+  text: Yup.string()
+    .required('Text is required')
+    .test('checkTextSize', CUSTOM_ERROR_TEXT.text, async (value) =>
+      isFileSizeValid(value),
+    ),
 });
 
 const TextBlockActions = ({

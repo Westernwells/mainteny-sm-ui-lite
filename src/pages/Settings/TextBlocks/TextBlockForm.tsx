@@ -1,25 +1,39 @@
 import {FormikProps} from 'formik';
-import {FormControl, Grid} from '@mui/material';
+import {FormControl, FormHelperText, Grid} from '@mui/material';
 import Box from '@mui/material/Box';
 import {FormInput} from 'components/form/FormInput';
 import {MultipleSelectCheckmarks} from 'components/MultipleSelectCheckmarks';
 import RichTextEditor from 'components/RichTextEditor';
-import {TextBlockFormModel} from 'models/text-block';
 import {
-  textBlockCategoryOptions,
+  CUSTOM_ERROR_TEXT,
+  TEXT_BLOCK_MEMORY_SIZE_UPPER_LIMIT,
+  TextBlockFormModel,
+} from 'models/text-block';
+import {
   convertCategoryToText,
+  textBlockCategoryOptions,
 } from 'utils/text-block';
+import React, {useMemo} from 'react';
+import {useTranslation} from 'react-i18next';
+import {getByteSize} from 'utils/string';
 
 interface Props {
   formik: FormikProps<TextBlockFormModel>;
 }
 
 export const TextBlockForm = ({formik}: Props) => {
+  const {t} = useTranslation();
+
   const defaultProps = {
     InputLabelProps: {shrink: true},
     onChange: formik.handleChange,
     onBlur: formik.handleBlur,
   };
+
+  const currentTextSize = useMemo(
+    () => getByteSize(formik.values.text),
+    [t, formik],
+  );
 
   return (
     <Box sx={{mt: '0.5em'}}>
@@ -73,6 +87,17 @@ export const TextBlockForm = ({formik}: Props) => {
             html={formik.values.text || ''}
             updateHtml={(html) => formik.setFieldValue('text', html)}
           />
+          {formik.errors.text === CUSTOM_ERROR_TEXT.text && (
+            <FormHelperText error>
+              {t(
+                'Text block is too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes',
+                {
+                  sizeLimit: TEXT_BLOCK_MEMORY_SIZE_UPPER_LIMIT,
+                  currentSize: currentTextSize,
+                },
+              )}
+            </FormHelperText>
+          )}
         </Grid>
       </Grid>
     </Box>

@@ -404,7 +404,7 @@ const JobOverviewPdfTemplate = React.memo(
             <View>
               <PdfPageTitle>
                 {translate('Job Confirmation:')}{' '}
-                {toSentenceCase(serviceOrderType)}
+                {translate(toSentenceCase(serviceOrderType))}
               </PdfPageTitle>
 
               {serviceOrder?.description.trim() !== '' && (

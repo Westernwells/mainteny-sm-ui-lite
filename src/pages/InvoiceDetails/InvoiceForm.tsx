@@ -1164,7 +1164,7 @@ export const InvoiceForm = ({
       dueDate: undefined,
       paymentTerm: {term: ''},
       purchaseOrderNumber: '',
-      moreInfo: '',
+      moreInfo: DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT,
     });
     if (isNewInvoice) {
       setInitialLocalStorageData(null);
