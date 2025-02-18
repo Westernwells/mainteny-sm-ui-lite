@@ -3094,5 +3094,6 @@
   "Additional names will be added underneath the main name on pdf documents.": "Zusätzliche Namen werden unter dem Hauptnamen in PDFs hinzugefügt.",
   "Additional Name": "Zusätzlicher Name",
   "Select contact": "Kontakt wählen",
-  "Text block is too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes": "Textblock ist zu groß. Unterstützte Größe: {{sizeLimit}} Bytes, aktuelle Größe: {{currentSize}} Bytes."
+  "Text block is too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes": "Textblock ist zu groß. Unterstützte Größe: {{sizeLimit}} Bytes, aktuelle Größe: {{currentSize}} Bytes.",
+  "Email files are too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes": "E-Mail-Dateien sind zu groß. Unterstützte Größe: {{sizeLimit}} Bytes, aktuelle Größe: {{currentSize}} Bytes."
 }
