@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {Box, Typography} from '@mui/material';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {useTranslation} from 'react-i18next';
@@ -8,12 +8,15 @@ import {TabContentContainer} from 'components/TabContentContainer';
 import {Widget} from 'components/Widget';
 import {DatePicker} from 'components/DatePicker';
 import TotalTime from 'components/TotalTime';
-import {useWorkHoursActivities} from 'hooks/reactQuery/useWorkHours';
+import {
+  useWorkHoursActivities,
+  useWorkHoursActivityStatistics,
+} from 'hooks/reactQuery/useWorkHours';
 import {WorkHourActivitiesOrderField} from 'models/workHours';
 import {UserActivityView} from 'models/user';
 import {Order, OrderByParams} from 'models/pagination';
 import {createEmptyResource, makePage} from 'utils/paging';
-import {calculateTotalTime} from 'utils/work-hours-utils';
+import {calculateTotalTimeStatistics} from 'utils/work-hours-utils';
 import {endOfDay, startOfDay} from 'date-fns';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
@@ -38,7 +41,6 @@ const WorkHoursTab = ({employeeId}: Props) => {
   const [endDate, setEndDate] = useState<Date>(new Date());
   const [search, setSearch] = useQueryState('searchWorkHours');
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const [totalTime, setTotalTime] = useState<string>('00:00');
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(makePage(0, 25));
   const textInput = useRef<HTMLInputElement>(null);
@@ -64,6 +66,12 @@ const WorkHoursTab = ({employeeId}: Props) => {
       ? WorkHourActivitiesOrderField.START_TIME
       : orderByField,
   );
+  const {data: workHoursStatistics} = useWorkHoursActivityStatistics({
+    query: search,
+    startDate,
+    endDate,
+    employeeId,
+  });
 
   const {user} = useUserSession();
   const {data: jobTypes = []} = useCompanyJobTypes(
@@ -81,13 +89,16 @@ const WorkHoursTab = ({employeeId}: Props) => {
     ),
   ];
 
+  const totalTime = useMemo(
+    () => calculateTotalTimeStatistics(workHoursStatistics),
+    [workHoursStatistics],
+  );
+
   useEffect(() => {
     if (workHours.data) {
       setRows(makeRows(workHours, formatDate, allJobTypes));
-      setTotalTime(calculateTotalTime(workHours.data));
     } else {
       setRows([]);
-      setTotalTime('00:00');
     }
   }, [workHours, formatDate, user, jobTypes]);
 
