@@ -1,10 +1,9 @@
 import {useEffect, useState} from 'react';
-import {Typography} from '@mui/material';
+import {LinearProgress, Typography} from '@mui/material';
 import Box from '@mui/material/Box';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {SearchInput} from 'components/SearchInput';
-import {Progress} from 'components/Progress';
 import {
   useAllElevators,
   useQueryCustomerElevator,
@@ -87,7 +86,7 @@ export const makeRows = (
       }))
     : [];
 
-const pageSize = 25;
+const pageSize = 10;
 
 export const QuotationUnitsDataGrid = ({
   setRowItem,
@@ -107,11 +106,10 @@ export const QuotationUnitsDataGrid = ({
     isLoading: isCustomerLoading,
   } = useQueryCustomerElevator(
     {
-      query: encodeURIComponent(search!!),
+      query: search,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
-    {},
     propertyOwnerId,
     {keepPreviousData: true},
   );
@@ -123,11 +121,11 @@ export const QuotationUnitsDataGrid = ({
     refetch: refetchElevatorResource,
   } = useAllElevators(
     {
-      query: encodeURIComponent(search!!),
+      query: search,
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
-    {keepPreviousData: true, enabled: false},
+    {keepPreviousData: true, enabled: !propertyOwnerId},
   );
 
   useEffect(() => {
@@ -165,18 +163,16 @@ export const QuotationUnitsDataGrid = ({
     }
   }, [search]);
 
-  if (isCustomerFetching || isElevatorFetching) {
-    if (isCustomerLoading || isElevatorLoading) {
-      return (
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          flexGrow={1}>
-          <Progress height="100%" />
-        </Box>
-      );
-    }
+  if (isCustomerLoading || isElevatorLoading) {
+    return (
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        flexGrow={1}>
+        <LinearProgress />
+      </Box>
+    );
   }
 
   return (
@@ -187,7 +183,7 @@ export const QuotationUnitsDataGrid = ({
         placeholder="Search by number, model, customer, address etc."
         onValueChanged={(value) => setSearch(value)}
       />
-      <PageListingLayout containerStyle={{height: '40vh'}}>
+      <PageListingLayout containerStyle={{height: '48vh'}}>
         <DataGridLayout
           height="100%"
           fullHeight={false}
@@ -202,6 +198,7 @@ export const QuotationUnitsDataGrid = ({
           pageSize={page.pageSize}
           pageIndex={page.pageIndex + 1}
           pageCount={pageCount}
+          totalRows={customerResource.total || elevatorResource.total}
           handlePageChange={(value) =>
             setPage((prev) => ({
               ...prev,
