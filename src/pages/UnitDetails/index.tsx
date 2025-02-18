@@ -108,7 +108,7 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
             : t(serviceOrderTypeToString(jobType?.givenName!)),
         action: () =>
           track(() => {
-            navigate(`/orders/new?type=${jobType.name}`);
+            navigate(`/orders/new?type=${encodeURIComponent(jobType.name)}`);
           }),
         icon: <IconComponent fontSize="small" />,
       };

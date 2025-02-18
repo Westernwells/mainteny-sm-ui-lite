@@ -85,7 +85,6 @@ export const UnitsDataGrid = ({
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
-    {},
     propertyOwnerId,
     {keepPreviousData: true},
   );
@@ -101,7 +100,7 @@ export const UnitsDataGrid = ({
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
-    {keepPreviousData: true, enabled: false},
+    {keepPreviousData: true, enabled: !propertyOwnerId},
   );
 
   useEffect(() => {

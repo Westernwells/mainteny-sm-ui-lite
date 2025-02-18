@@ -43,7 +43,6 @@ export const UnitsWidget = ({customerId, getTotalUnits, openTab}: Props) => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
     },
-    {},
     customerId,
   );
 
