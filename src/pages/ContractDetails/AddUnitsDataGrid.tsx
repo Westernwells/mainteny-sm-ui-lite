@@ -82,7 +82,6 @@ export const AddUnitsDataGrid = ({
     isFetching,
   } = useQueryCustomerElevator(
     {query: search, pageIndex: 0, pageSize: 500},
-    {},
     propertyOwnerId,
     {keepPreviousData: true},
   );

@@ -137,7 +137,7 @@ export function useAllElevators(
     () => fetchElevators(params, user!.userAccount.serviceCompany.id),
     {
       ...options,
-      enabled: !!user,
+      enabled: !!user && options?.enabled !== false,
       onError: (err: any) => {
         showError(err);
       },
@@ -158,7 +158,6 @@ export const queryCustomerElevator = async (
 
 export const useQueryCustomerElevator = (
   params: CustomerElevatorParams,
-  filter: any,
   id?: string,
   options?: any,
 ) =>

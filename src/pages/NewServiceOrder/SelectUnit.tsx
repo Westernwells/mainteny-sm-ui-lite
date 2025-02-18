@@ -13,6 +13,7 @@ import {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {Progress} from 'components/Progress';
 import {useFormatDate} from 'hooks/useFormatDate';
+import {t} from 'i18next';
 import {columns, makeRows} from './UnitDataGridProps';
 
 interface Props {
@@ -82,7 +83,7 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
         customHeader={
           <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
             <Typography variant="h6" component="div">
-              Choose unit
+              {t('Choose unit')}
             </Typography>
             <SearchInput
               variant="outlined"

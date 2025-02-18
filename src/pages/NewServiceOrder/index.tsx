@@ -13,7 +13,7 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   const [queryParams] = useSearchParams();
   const currentParams = Object.fromEntries([...queryParams]);
 
-  const {type} = currentParams;
+  const type = decodeURIComponent(currentParams.type || '');
 
   const {
     data: elevator,
