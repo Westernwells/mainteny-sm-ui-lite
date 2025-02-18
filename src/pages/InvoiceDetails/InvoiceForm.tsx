@@ -142,7 +142,6 @@ import {pdf} from '@react-pdf/renderer';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
 import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
-import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {
