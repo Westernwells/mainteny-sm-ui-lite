@@ -331,227 +331,112 @@ export const PdfPreviewPartialPaymentSection = ({
           />
         )}
 
-      {invoice?.additionalInfo.payment?.type !== PaymentType.PER_ITEM &&
-        previousInvoices.length && (
-          <View>
-            <View
+      {invoice?.additionalInfo.payment?.type !== PaymentType.PER_ITEM && (
+        <View>
+          <View
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexDirection: 'row',
+              width: '100%',
+              marginTop: 20,
+            }}>
+            <Text
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexDirection: 'row',
-                width: '100%',
-                marginTop: 20,
+                ...styles.tableHeading,
+                textAlign: 'left',
+                width: '60%',
               }}>
-              <Text
-                style={{
-                  ...styles.tableHeading,
-                  textAlign: 'left',
-                  width: '60%',
-                }}>
-                {translate('Partial Invoices')}
-              </Text>
+              {translate('Partial Invoices')}
+            </Text>
 
-              {invoice?.additionalInfo.payment?.type ===
-                PaymentType.PERCENTAGE && (
-                <Text
-                  style={{
-                    ...styles.tableHeading,
-                    textAlign: 'right',
-                    width: '15%',
-                  }}>
-                  {translate('Percentage')}
-                </Text>
-              )}
-
+            {invoice?.additionalInfo.payment?.type ===
+              PaymentType.PERCENTAGE && (
               <Text
                 style={{
                   ...styles.tableHeading,
                   textAlign: 'right',
-                  width:
-                    invoice?.additionalInfo.payment?.type ===
-                    PaymentType.PERCENTAGE
-                      ? '25%'
-                      : '40%',
+                  width: '15%',
                 }}>
-                {translate('Total')}
-                {` (${getCurrencySymbol[currentCurrency?.code!]})`}
+                {translate('Percentage')}
               </Text>
-            </View>
+            )}
 
-            {previousInvoices
-              .filter((prevInvoice) => prevInvoice.id !== invoice?.id)
-              .map((previousInvoice) => (
-                <View
+            <Text
+              style={{
+                ...styles.tableHeading,
+                textAlign: 'right',
+                width:
+                  invoice?.additionalInfo.payment?.type ===
+                  PaymentType.PERCENTAGE
+                    ? '25%'
+                    : '40%',
+              }}>
+              {translate('Total')}
+              {` (${getCurrencySymbol[currentCurrency?.code!]})`}
+            </Text>
+          </View>
+
+          {previousInvoices
+            ?.filter((prevInvoice) => prevInvoice.id !== invoice?.id)
+            ?.map((previousInvoice) => (
+              <View
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                  flexDirection: 'row',
+                  marginVertical: 4,
+                  borderBottomWidth: 0,
+                  borderBottomColor: '#212121',
+                }}
+                wrap={false}
+                key={previousInvoice.id}>
+                <Text
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    flexDirection: 'row',
-                    marginVertical: 4,
-                    borderBottomWidth: 0,
-                    borderBottomColor: '#212121',
-                  }}
-                  wrap={false}
-                  key={previousInvoice.id}>
-                  <Text
-                    style={{
-                      textAlign: 'left',
-                      color: '#212121',
-                      width: '60%',
-                    }}>
-                    {previousInvoice.type === InvoiceType.CREDIT_NOTE
-                      ? translate('Credit Note invoice')
-                      : previousInvoice.additionalInfo.payment?.description}
-                  </Text>
-                  {invoice?.additionalInfo.payment?.type ===
-                    PaymentType.PERCENTAGE && (
-                    <Text
-                      style={{
-                        textAlign: 'right',
-                        color: '#212121',
-                        width: '15%',
-                      }}>
-                      {fixRounding(
-                        previousInvoice.additionalInfo.payment?.percentage ?? 0,
-                        2,
-                      )}
-                      %
-                    </Text>
-                  )}
-
+                    textAlign: 'left',
+                    color: '#212121',
+                    width: '60%',
+                  }}>
+                  {previousInvoice.type === InvoiceType.CREDIT_NOTE
+                    ? translate('Credit Note invoice')
+                    : previousInvoice.additionalInfo.payment?.description}
+                </Text>
+                {invoice?.additionalInfo.payment?.type ===
+                  PaymentType.PERCENTAGE && (
                   <Text
                     style={{
                       textAlign: 'right',
                       color: '#212121',
-                      width:
-                        previousInvoice.additionalInfo.payment?.type ===
-                        PaymentType.PERCENTAGE
-                          ? '25%'
-                          : '40%',
+                      width: '15%',
                     }}>
-                    {formatCurrency(
-                      centsToMoney(
-                        currentCurrency?.code!,
-                        aggregatedAmountToMoney(
-                          previousInvoice?.additionalInfo.payment?.amount,
-                        ).value ?? 0,
-                      ),
-                      {
-                        currency: currentCurrency?.code,
-                        excludeCurrencySymbol: true,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      },
+                    {fixRounding(
+                      previousInvoice.additionalInfo.payment?.percentage ?? 0,
+                      2,
                     )}
+                    %
                   </Text>
-                </View>
-              ))}
+                )}
 
-            <View
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '100%',
-                flexDirection: 'row',
-                marginVertical: 4,
-                borderBottomWidth: 1,
-                borderBottomColor: '#212121',
-              }}
-              wrap={false}>
-              <Text
-                style={{
-                  textAlign: 'left',
-                  color: '#212121',
-                  width: '60%',
-                }}>
-                {invoice?.type === InvoiceType.CREDIT_NOTE
-                  ? translate('Credit Note invoice')
-                  : invoice?.additionalInfo.payment?.description}
-              </Text>
-              {invoice?.additionalInfo.payment?.type ===
-                PaymentType.PERCENTAGE && (
                 <Text
                   style={{
                     textAlign: 'right',
                     color: '#212121',
-                    width: '15%',
-                  }}>
-                  {fixRounding(
-                    invoice?.additionalInfo.payment?.percentage ?? 0,
-                    2,
-                  )}
-                  %
-                </Text>
-              )}
-
-              <Text
-                style={{
-                  textAlign: 'right',
-                  color: '#212121',
-                  width:
-                    invoice?.additionalInfo.payment?.type ===
-                    PaymentType.PERCENTAGE
-                      ? '25%'
-                      : '40%',
-                }}>
-                {formatCurrency(amount, {
-                  currency: currentCurrency?.code,
-                  excludeCurrencySymbol: true,
-                  currencySymbol: currentCurrency?.symbol,
-                  companyLang: selectedLng,
-                })}
-              </Text>
-            </View>
-          </View>
-        )}
-
-      {previousInvoices.length && (
-        <View wrap={false}>
-          <View style={styles.tableRow}>
-            <Text style={{width: '44%'}} />
-            <Text
-              style={{
-                width: '32%',
-                color: '#616161',
-                fontSize: 10,
-                textAlign: 'right',
-              }}>
-              {translate('Subtotal excl. VAT')}
-            </Text>
-            <Text
-              style={{
-                width: '24%',
-                textAlign: 'right',
-                fontSize: 10,
-              }}>
-              {totalAmountExclVatFormatted}
-            </Text>
-          </View>
-
-          <View>
-            {allItemsHasSameVAT ? (
-              <View style={styles.tableRow}>
-                <Text style={{width: '44%'}} />
-                <Text
-                  style={{
-                    width: '32%',
-                    color: '#616161',
-                    fontSize: 10,
-                    textAlign: 'right',
-                  }}>
-                  {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
-                </Text>
-                <Text
-                  style={{
-                    width: '24%',
-                    textAlign: 'right',
-                    fontSize: 10,
+                    width:
+                      previousInvoice.additionalInfo.payment?.type ===
+                      PaymentType.PERCENTAGE
+                        ? '25%'
+                        : '40%',
                   }}>
                   {formatCurrency(
-                    fixRounding(percentageVats?.[0]?.vat ?? 0, 2),
+                    centsToMoney(
+                      currentCurrency?.code!,
+                      aggregatedAmountToMoney(
+                        previousInvoice?.additionalInfo.payment?.amount,
+                      ).value ?? 0,
+                    ),
                     {
                       currency: currentCurrency?.code,
                       excludeCurrencySymbol: true,
@@ -561,70 +446,177 @@ export const PdfPreviewPartialPaymentSection = ({
                   )}
                 </Text>
               </View>
-            ) : (
-              percentageVats.map((v, index) => (
-                <View
-                  style={styles.tableRow}
-                  key={`${index}-${v.percentageVat}`}>
-                  <Text style={{width: '44%'}} />
-                  <Text
-                    style={{
-                      width: '32%',
-                      color: '#616161',
-                      fontSize: 10,
-                      textAlign: 'right',
-                    }}>
-                    {translate('VAT')} {v.percentageVat}%
-                  </Text>
-                  <Text
-                    style={{
-                      width: '24%',
-                      textAlign: 'right',
-                      fontSize: 10,
-                    }}>
-                    {formatCurrency(fixRounding(v.vat, 2), {
-                      currency: currentCurrency?.code,
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                      roundingMode: 'floor',
-                      excludeCurrencySymbol: true,
-                      companyLang: selectedLng,
-                      currencySymbol: currentCurrency?.symbol,
-                    })}
-                  </Text>
-                </View>
-              ))
-            )}
-          </View>
+            ))}
 
-          <View style={styles.tableRow}>
-            <Text style={{width: '44%'}} />
+          <View
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              flexDirection: 'row',
+              marginVertical: 4,
+              borderBottomWidth: 1,
+              borderBottomColor: '#212121',
+            }}
+            wrap={false}>
             <Text
               style={{
-                width: '32%',
+                textAlign: 'left',
                 color: '#212121',
-                ...boldFontStyle,
-                textAlign: 'right',
-                fontSize: 10,
-                paddingLeft: 25,
+                width: '60%',
               }}>
-              {`${translate('Total incl. VAT')} (${
-                getCurrencySymbol[currentCurrency?.code!]
-              })`}
+              {invoice?.type === InvoiceType.CREDIT_NOTE
+                ? translate('Credit Note invoice')
+                : invoice?.additionalInfo.payment?.description}
             </Text>
+            {invoice?.additionalInfo.payment?.type ===
+              PaymentType.PERCENTAGE && (
+              <Text
+                style={{
+                  textAlign: 'right',
+                  color: '#212121',
+                  width: '15%',
+                }}>
+                {fixRounding(
+                  invoice?.additionalInfo.payment?.percentage ?? 0,
+                  2,
+                )}
+                %
+              </Text>
+            )}
+
             <Text
               style={{
-                width: '24%',
                 textAlign: 'right',
                 color: '#212121',
-                ...boldFontStyle,
-                fontSize: 10,
+                width:
+                  invoice?.additionalInfo.payment?.type ===
+                  PaymentType.PERCENTAGE
+                    ? '25%'
+                    : '40%',
               }}>
-              {totalAmountInclVatsFormatted}
+              {formatCurrency(amount, {
+                currency: currentCurrency?.code,
+                excludeCurrencySymbol: true,
+                currencySymbol: currentCurrency?.symbol,
+                companyLang: selectedLng,
+              })}
             </Text>
           </View>
         </View>
       )}
+
+      <View wrap={false}>
+        <View style={styles.tableRow}>
+          <Text style={{width: '44%'}} />
+          <Text
+            style={{
+              width: '32%',
+              color: '#616161',
+              fontSize: 10,
+              textAlign: 'right',
+            }}>
+            {translate('Subtotal excl. VAT')}
+          </Text>
+          <Text
+            style={{
+              width: '24%',
+              textAlign: 'right',
+              fontSize: 10,
+            }}>
+            {totalAmountExclVatFormatted}
+          </Text>
+        </View>
+
+        <View>
+          {allItemsHasSameVAT ? (
+            <View style={styles.tableRow}>
+              <Text style={{width: '44%'}} />
+              <Text
+                style={{
+                  width: '32%',
+                  color: '#616161',
+                  fontSize: 10,
+                  textAlign: 'right',
+                }}>
+                {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
+              </Text>
+              <Text
+                style={{
+                  width: '24%',
+                  textAlign: 'right',
+                  fontSize: 10,
+                }}>
+                {formatCurrency(fixRounding(percentageVats?.[0]?.vat ?? 0, 2), {
+                  currency: currentCurrency?.code,
+                  excludeCurrencySymbol: true,
+                  currencySymbol: currentCurrency?.symbol,
+                  companyLang: selectedLng,
+                })}
+              </Text>
+            </View>
+          ) : (
+            percentageVats.map((v, index) => (
+              <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
+                <Text style={{width: '44%'}} />
+                <Text
+                  style={{
+                    width: '32%',
+                    color: '#616161',
+                    fontSize: 10,
+                    textAlign: 'right',
+                  }}>
+                  {translate('VAT')} {v.percentageVat}%
+                </Text>
+                <Text
+                  style={{
+                    width: '24%',
+                    textAlign: 'right',
+                    fontSize: 10,
+                  }}>
+                  {formatCurrency(fixRounding(v.vat, 2), {
+                    currency: currentCurrency?.code,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    roundingMode: 'floor',
+                    excludeCurrencySymbol: true,
+                    companyLang: selectedLng,
+                    currencySymbol: currentCurrency?.symbol,
+                  })}
+                </Text>
+              </View>
+            ))
+          )}
+        </View>
+
+        <View style={styles.tableRow}>
+          <Text style={{width: '44%'}} />
+          <Text
+            style={{
+              width: '32%',
+              color: '#212121',
+              ...boldFontStyle,
+              textAlign: 'right',
+              fontSize: 10,
+              paddingLeft: 25,
+            }}>
+            {`${translate('Total incl. VAT')} (${
+              getCurrencySymbol[currentCurrency?.code!]
+            })`}
+          </Text>
+          <Text
+            style={{
+              width: '24%',
+              textAlign: 'right',
+              color: '#212121',
+              ...boldFontStyle,
+              fontSize: 10,
+            }}>
+            {totalAmountInclVatsFormatted}
+          </Text>
+        </View>
+      </View>
 
       {previousInvoices.length === 1 && (
         <View
