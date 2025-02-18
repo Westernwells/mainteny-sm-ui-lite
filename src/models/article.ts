@@ -37,11 +37,6 @@ export enum ARTICLE_TYPE_FILTER {
   OTHER = 'OTHER',
 }
 
-export const articleTypeOptions = Object.values(ArticleType).map((value) => ({
-  value,
-  label: convertToText(value),
-}));
-
 export enum ArticleOrderField {
   NAME = 'NAME',
   CREATED_DATE = 'CREATED_DATE',
