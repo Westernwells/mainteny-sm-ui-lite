@@ -156,3 +156,8 @@ export interface UserActivityView {
   search: string;
   createdAt: string;
 }
+
+export interface UserActivityStatistics {
+  totalMinutesPerType: {[key: string]: number};
+  totalBillableMinutesPerType: {[key: string]: number};
+}
