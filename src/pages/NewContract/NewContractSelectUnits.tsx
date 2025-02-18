@@ -60,7 +60,6 @@ const NewContractSelectUnits: FC<Props> = ({formik, customerId}) => {
       orderBy: orderByField || ElevatorOrderField.CREATED_TIME,
       order: sortOrder || Order.DESC,
     },
-    {status: []},
     customerId,
     {keepPreviousData: true},
   );

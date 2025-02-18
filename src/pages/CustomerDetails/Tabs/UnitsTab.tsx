@@ -60,7 +60,6 @@ export const UnitsTab = ({customerId}: Props) => {
         nextVisitDateEnd: formatDate(nextVisitEnd, 'yyyy-MM-dd'),
       }),
     },
-    {},
     customerId,
     {keepPreviousData: true},
   );
