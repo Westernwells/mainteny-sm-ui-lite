@@ -1,10 +1,10 @@
 import {
   Document,
-  Text,
-  View,
-  StyleSheet,
   Font,
   Image,
+  StyleSheet,
+  Text,
+  View,
 } from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
@@ -17,13 +17,14 @@ import {HeaderFooterInfoData} from 'models/misc';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {MinToStep} from 'models/service-company';
 import {ClientReportForPDFConfig} from 'models/client-storage';
+import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
+import {getAddressComponentFromServiceOrder} from 'utils/pdfTemplates';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import PdfTemplateFooter from './PdfTemplateFooter';
 import PdfTemplateHeader from './PdfTemplateHeader';
-import PdfTemplateLeftAddress from './PdfTemplateLeftAddress';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageContainer from './containers/PdfPageContainer';
 import PdfPageTitle from './containers/PdfPageTitle';
@@ -353,11 +354,12 @@ const WorkReportTemplate = React.memo(
             <TopSectionContainer>
               <PdfTemplateLeftAddress
                 serviceCompanyInfo={serviceCompanyInfo}
-                receiverName={serviceOrder?.elevator?.propertyOwner?.name}
-                addressComponent={
-                  serviceOrder?.elevator?.propertyOwner.billingAddress
-                    ?.component
+                fallbackReceiverName={
+                  serviceOrder?.elevator?.propertyOwner?.name
                 }
+                addressComponent={getAddressComponentFromServiceOrder(
+                  serviceOrder,
+                )}
                 selectedLng={selectedLng}
                 translate={translate}
                 customerVATId={customerVATId}

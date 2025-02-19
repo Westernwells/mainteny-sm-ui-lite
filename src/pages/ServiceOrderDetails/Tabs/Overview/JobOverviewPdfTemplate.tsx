@@ -1,4 +1,4 @@
-import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React, {useMemo} from 'react';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
@@ -27,6 +27,10 @@ import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {toSentenceCase} from 'utils/string';
+import {
+  getAddressComponentFromQuotation,
+  getAddressComponentFromServiceOrder,
+} from 'utils/pdfTemplates';
 import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -271,10 +275,12 @@ const JobOverviewPdfTemplate = React.memo(
             <TopSectionContainer>
               <PdfTemplateLeftAddress
                 serviceCompanyInfo={serviceCompanyInfo}
-                receiverName={serviceOrder?.elevator?.propertyOwner?.name}
+                fallbackReceiverName={
+                  serviceOrder?.elevator?.propertyOwner?.name
+                }
                 addressComponent={
-                  quotation?.additionalInfo.billingAddress?.component ??
-                  serviceOrder?.elevator.propertyOwner.billingAddress?.component
+                  getAddressComponentFromQuotation(quotation) ??
+                  getAddressComponentFromServiceOrder(serviceOrder)
                 }
                 selectedLng={selectedLng}
                 translate={translate}

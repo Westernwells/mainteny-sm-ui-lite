@@ -3,14 +3,14 @@ import {Card} from 'components/Card';
 import {CardDataListItem} from 'components/CardDataListItem';
 import React, {useState} from 'react';
 import {
-  LocationOnOutlined,
-  EmailOutlined,
-  RequestPageOutlined,
-  InfoOutlined,
-  AttachMoneyOutlined,
   AccountBalanceOutlined,
+  AttachMoneyOutlined,
   DocumentScannerOutlined,
+  EmailOutlined,
+  InfoOutlined,
   LocalAtmOutlined,
+  LocationOnOutlined,
+  RequestPageOutlined,
 } from '@mui/icons-material';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {Dialog} from 'components/Dialog';

@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {FormikProps} from 'formik';
 import Typography from '@mui/material/Typography';
@@ -11,6 +11,7 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {Button} from 'components/Button';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
+import NameFields from 'components/BillingAddress/NameFields';
 import {CustomerAddressFormModel} from './model';
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
 
 export const CustomerAddressForm = ({formik}: Props) => {
   const {t} = useTranslation();
+
   const [showBeneficiaryAddress, setShowBeneficiaryAddress] = useState(
     !!formik.values.beneficiaryAddress || false,
   );
@@ -54,108 +56,157 @@ export const CustomerAddressForm = ({formik}: Props) => {
   return (
     <PageCard
       headerLabel="Billing Address"
-      containerStyles={{flexGrow: 1, p: '0.5rem', overflowY: 'scroll'}}
+      containerStyles={{flexGrow: 1}}
       headerStyles={{m: 0, p: '1.5rem', pb: 0}}>
-      <Grid container spacing={3}>
-        <Grid item md={2.5}>
-          <FormInput
-            fieldProps={{
-              size: 'small',
-              label: 'Name',
-              name: 'billingAddress.component.name',
-              value: formik.values.billingAddress?.component?.name ?? '',
-              ...defaultProps,
-            }}
-          />
-        </Grid>
-        <Grid item md={2.5}>
-          <FormInput
-            fieldProps={{
-              size: 'small',
-              label: 'Address line 1',
-              name: 'billingAddress.component.street',
-              value: formik.values.billingAddress?.component?.street ?? '',
-              ...defaultProps,
-            }}
-          />
-        </Grid>
-        <Grid item md={2.5}>
-          <FormInput
-            fieldProps={{
-              size: 'small',
-              label: 'Address line 2',
-              name: 'billingAddress.component.street2',
-              value: formik.values.billingAddress?.component?.street2 ?? '',
-              ...defaultProps,
-            }}
-          />
-        </Grid>
-        <Grid item md={2.5}>
-          <FormInput
-            fieldProps={{
-              size: 'small',
-              label: 'City',
-              name: 'billingAddress.component.city',
-              value: formik.values.billingAddress?.component?.city ?? '',
-              ...defaultProps,
-            }}
-          />
-        </Grid>
-        <Grid item md={1.5}>
-          <FormInput
-            fieldProps={{
-              size: 'small',
-              label: 'ZIP/Postal Code',
-              name: 'billingAddress.component.postalCode',
-              value: formik.values.billingAddress?.component?.postalCode ?? '',
-              ...defaultProps,
-            }}
-          />
-        </Grid>
-        <Grid item md={2.5}>
-          <FormSelect
-            labelId="billingAddress.component.country"
-            label="Country"
-            options={countriesOptions}
-            selectProps={{
-              id: 'billingAddress.component.country',
-              name: 'billingAddress.component.country',
-              value: formik.values.billingAddress?.component?.country ?? '',
-              multiple: false,
-              onChange: formik.handleChange,
-            }}
-            isCompanyTranslation
-          />
-        </Grid>
-        <Grid item md={2.5}>
-          <FormSelect
-            labelId="billingAddress.component.state"
-            label="State/Province/Region"
-            options={statesByCountry(
-              formik.values.billingAddress?.component?.country,
-            )}
-            selectProps={{
-              id: 'billingAddress.component.state',
-              name: 'billingAddress.component.state',
-              value: formik.values.billingAddress?.component?.state ?? '',
-              multiple: false,
-              onChange: formik.handleChange,
-            }}
-            isCompanyTranslation
-          />
-        </Grid>
-        <Grid item md={2.5}>
-          <FormInput
-            fieldProps={{
-              size: 'small',
-              label: 'Additional Information',
-              name: 'billingAddress.component.moreInfo',
-              value: formik.values.billingAddress?.component?.moreInfo ?? '',
-              ...defaultProps,
-            }}
-          />
-        </Grid>
-      </Grid>
+      <Box
+        sx={{display: 'flex', flexDirection: 'column', marginBottom: '1.5rem'}}
+        gap={3}>
+        <NameFields
+          name={formik.values.billingAddress?.component?.name}
+          name2={formik.values.billingAddress?.component?.name2}
+          name3={formik.values.billingAddress?.component?.name3}
+          setName={(name: string | null) =>
+            formik.setFieldValue('billingAddress.component.name', name)
+          }
+          setName2={(name2: string | null) =>
+            formik.setFieldValue('billingAddress.component.name2', name2)
+          }
+          setName3={(name3: string | null) =>
+            formik.setFieldValue('billingAddress.component.name3', name3)
+          }
+          onBlur={formik.handleBlur}
+        />
+
+        <Box
+          sx={{
+            display: 'flex',
+          }}
+          gap={3}>
+          <Box
+            sx={{
+              display: 'flex',
+              width: '20%',
+            }}>
+            <FormInput
+              fieldProps={{
+                size: 'small',
+                label: 'Address line 1',
+                name: 'billingAddress.component.street',
+                value: formik.values.billingAddress?.component?.street ?? '',
+                ...defaultProps,
+              }}
+            />
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              width: '20%',
+            }}>
+            <FormInput
+              fieldProps={{
+                size: 'small',
+                label: 'Address line 2',
+                name: 'billingAddress.component.street2',
+                value: formik.values.billingAddress?.component?.street2 ?? '',
+                ...defaultProps,
+              }}
+            />
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              width: '20%',
+            }}>
+            <FormInput
+              fieldProps={{
+                size: 'small',
+                label: 'City',
+                name: 'billingAddress.component.city',
+                value: formik.values.billingAddress?.component?.city ?? '',
+                ...defaultProps,
+              }}
+            />
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              width: '20%',
+            }}>
+            <FormInput
+              fieldProps={{
+                size: 'small',
+                label: 'ZIP/Postal Code',
+                name: 'billingAddress.component.postalCode',
+                value:
+                  formik.values.billingAddress?.component?.postalCode ?? '',
+                ...defaultProps,
+              }}
+            />
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+          }}
+          gap={3}>
+          <Box
+            sx={{
+              display: 'flex',
+              width: '20%',
+            }}>
+            <FormSelect
+              labelId="billingAddress.component.state"
+              label="State/Province/Region"
+              options={statesByCountry(
+                formik.values.billingAddress?.component?.country,
+              )}
+              selectProps={{
+                id: 'billingAddress.component.state',
+                name: 'billingAddress.component.state',
+                value: formik.values.billingAddress?.component?.state ?? '',
+                multiple: false,
+                onChange: formik.handleChange,
+              }}
+              isCompanyTranslation
+            />
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              width: '20%',
+            }}>
+            <FormSelect
+              labelId="billingAddress.component.country"
+              label="Country"
+              options={countriesOptions}
+              selectProps={{
+                id: 'billingAddress.component.country',
+                name: 'billingAddress.component.country',
+                value: formik.values.billingAddress?.component?.country ?? '',
+                multiple: false,
+                onChange: formik.handleChange,
+              }}
+              isCompanyTranslation
+            />
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              width: '20%',
+            }}>
+            <FormInput
+              fieldProps={{
+                size: 'small',
+                label: 'Additional Information',
+                name: 'billingAddress.component.moreInfo',
+                value: formik.values.billingAddress?.component?.moreInfo ?? '',
+                ...defaultProps,
+              }}
+            />
+          </Box>
+        </Box>
+      </Box>
 
       <Box
         pt={4}
