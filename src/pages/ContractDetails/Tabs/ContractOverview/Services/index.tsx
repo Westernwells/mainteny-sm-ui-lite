@@ -114,12 +114,48 @@ export const Services: FC<Props> = ({contractDetails}) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [currentService, setCurrentService] = useState<ContractComponentView>();
 
+  const {data: elevatorResource = createEmptyResource<ElevatorView>(500)} =
+    useContractElevators(
+      contractDetails?.id ?? '',
+      {
+        query: search,
+        orderBy: ElevatorOrderField.CREATED_TIME,
+        order: Order.DESC,
+        pageIndex: 0,
+        pageSize: 500,
+      },
+      {keepPreviousData: true},
+    );
+
   useEffect(() => {
     refetchUniqueId();
   }, [isDialogOpen]);
 
-  const formikContractServiceInitialValues = useMemo(
-    () => ({
+  const formikContractServiceInitialValues = useMemo(() => {
+    const defaultCostPackage = {
+      laborPercentage: 50,
+      materialPercentage: 50,
+    };
+
+    if (isEditForm && currentService) {
+      return {
+        isChecked: false,
+        id: uuid,
+        name: currentService?.name || '',
+        group: currentService?.group || '',
+        firstInvoiceDate:
+          currentService?.additionalInfo?.firstInvoiceDate || null,
+        firstOrderDate: currentService?.additionalInfo?.firstOrderDate || null,
+        costType: currentService?.additionalInfo?.costType || ArticleType.LABOR,
+        costPackage:
+          currentService?.additionalInfo?.costPackage || defaultCostPackage,
+        isAutomaticJobCycle: !!currentService?.additionalInfo?.firstOrderDate,
+        elevators: mergeElevators(elevatorResource?.data || [], currentService),
+        orderType: currentService?.additionalInfo?.orderType || '',
+      };
+    }
+
+    return {
       isChecked: false,
       id: uuid,
       name: '',
@@ -127,15 +163,11 @@ export const Services: FC<Props> = ({contractDetails}) => {
       firstInvoiceDate: null,
       firstOrderDate: null,
       costType: ArticleType.LABOR,
-      costPackage: {
-        laborPercentage: 50,
-        materialPercentage: 50,
-      },
+      costPackage: defaultCostPackage,
       isAutomaticJobCycle: false,
       elevators: [],
-    }),
-    [],
-  );
+    };
+  }, [isEditForm, currentService, uuid, elevatorResource.data]);
 
   const formikContractServiceComponent = useFormik<ContractServiceForm>({
     initialValues: formikContractServiceInitialValues,
@@ -156,19 +188,6 @@ export const Services: FC<Props> = ({contractDetails}) => {
       contractId: contractDetails?.id,
     });
   };
-
-  const {data: elevatorResource = createEmptyResource<ElevatorView>(500)} =
-    useContractElevators(
-      contractDetails?.id ?? '',
-      {
-        query: search,
-        orderBy: ElevatorOrderField.CREATED_TIME,
-        order: Order.DESC,
-        pageIndex: 0,
-        pageSize: 500,
-      },
-      {keepPreviousData: true},
-    );
 
   const setAddFormData = () => {
     formikContractServiceComponent.setValues({
