@@ -1,8 +1,14 @@
 import {Text, View, Font, StyleSheet} from '@react-pdf/renderer';
-import {AggregatedInvoiceItem, InvoiceView, DiscountType} from 'models/invoice';
+import {
+  AggregatedInvoiceItem,
+  InvoiceView,
+  DiscountType,
+  InvoiceType,
+} from 'models/invoice';
 import {formatCurrency, centsToMoney, getCurrencySymbol} from 'utils/currency';
 import {Currency} from 'models/misc';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
+import {HtmlPDF} from 'components/HtmlPDF';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -119,6 +125,19 @@ const PdfPerItemSection = ({
       </View>
 
       <View>
+        <View style={{paddingVertical: 3}}>
+          {hasPreviousInvoices &&
+            previousInvoices?.map((prevInvoice) => (
+              <View key={prevInvoice.id}>
+                <Text>
+                  {prevInvoice.type === InvoiceType.CREDIT_NOTE
+                    ? translate('Credit Note invoice')
+                    : prevInvoice.additionalInfo.payment?.description}
+                </Text>
+              </View>
+            ))}
+        </View>
+
         {hasPreviousInvoices &&
           previousInvoices &&
           (() => {
@@ -231,7 +250,7 @@ const PdfPerItemSection = ({
                             style={{
                               display: 'flex',
                               justifyContent: 'space-between',
-                              alignItems: 'center',
+                              alignItems: 'flex-start',
                               width: '100%',
                               flexDirection: 'row',
                               marginVertical: 4,
@@ -248,13 +267,10 @@ const PdfPerItemSection = ({
                               }}>
                               {index + 1}
                             </Text>
-                            <Text
-                              style={{
-                                textAlign: 'left',
-                                width: '36%',
-                              }}>
-                              {item.name}
-                            </Text>
+                            <View style={{width: '36%', textAlign: 'left'}}>
+                              <HtmlPDF html={item.name || ''} />
+                            </View>
+
                             <Text
                               style={{
                                 textAlign: 'right',

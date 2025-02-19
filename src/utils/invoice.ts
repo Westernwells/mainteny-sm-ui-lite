@@ -17,6 +17,7 @@ import {
   MyInvoiceActivityView,
   Payment,
   SearchParameters,
+  PaymentType,
 } from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
@@ -554,17 +555,24 @@ export const generatePdfInvoice = (
     includeCheckList: formikValues.includeCheckList ?? false,
     payment: {
       ...formikValues.payment,
-      amount: {
-        currency:
-          formikValues.payment?.amount?.currency || currentCurrency.code,
-        fractionDigits:
-          formikValues.payment?.amount?.fractionDigits ||
-          currentCurrency.fractionDigits,
-        netAmount: convertNumberToAmountNumber(
-          formikValues.payment?.amount?.value ?? 0,
-          currentCurrency,
-        ),
-      },
+      amount:
+        formikValues.payment?.type === PaymentType.PER_ITEM
+          ? undefined
+          : {
+              currency:
+                formikValues.payment?.amount?.currency || currentCurrency.code,
+              fractionDigits:
+                formikValues.payment?.amount?.fractionDigits ||
+                currentCurrency.fractionDigits,
+              netAmount: convertNumberToAmountNumber(
+                formikValues.payment?.amount?.value ?? 0,
+                currentCurrency,
+              ),
+            },
+      percentage:
+        formikValues.payment?.type === PaymentType.PER_ITEM
+          ? formikValues.payment?.percentage ?? 0
+          : undefined,
     } as Payment<AggregatedAmount>,
     deliveryStartDate: formikValues.deliveryStartDate
       ? dateToString(formikValues.deliveryStartDate)
