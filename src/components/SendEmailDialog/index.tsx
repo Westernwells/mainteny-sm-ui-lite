@@ -12,7 +12,7 @@ import {usePublishInvoice} from 'hooks/reactQuery/useInvoice';
 import {Button} from 'components/Button';
 import {FormInput} from 'components/form/FormInput';
 import {usePublishQuotation} from 'hooks/reactQuery/useQuotation';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import MultipleAsyncSelect from 'components/MultipleAsyncSelect';
 import {
   ServiceCompanyContactPersonOrderField,
@@ -20,13 +20,14 @@ import {
 } from 'models/contacts';
 import {fetchServiceCompanyContactPersons} from 'hooks/reactQuery/useContacts';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {IconButton, InputAdornment} from '@mui/material';
+import {FormHelperText, IconButton, InputAdornment} from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import RichTextEditor from 'components/RichTextEditor';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useFetchCompanyEmailConfig} from 'hooks/reactQuery/useEmail';
 import {useCurrentEditor} from '@tiptap/react';
 import {EmailSignature} from 'models/employee';
+import {EMAIL_ATTACHMENT_SIZE_UPPER_LIMIT} from 'models/email';
 import {Order} from '../../models/pagination';
 
 interface Props {
@@ -115,6 +116,8 @@ export const SendEmailDialog = ({
     },
   });
 
+  const watchAttachments = watch('attachments');
+
   const handleResetForm = () => {
     reset();
     setIsCcShown(false);
@@ -171,6 +174,16 @@ export const SendEmailDialog = ({
     }
   };
   const bccEmails = getValues('bccEmails');
+
+  const {fileSize, isFileSizeFormValid} = useMemo(() => {
+    const attachmentSize =
+      watchAttachments?.reduce((acc, current) => acc + current.size, 0) || 0;
+
+    return {
+      fileSize: attachmentSize,
+      isFileSizeFormValid: attachmentSize <= EMAIL_ATTACHMENT_SIZE_UPPER_LIMIT,
+    };
+  }, [watchAttachments]);
 
   // on entry
   useEffect(() => {
@@ -480,19 +493,33 @@ export const SendEmailDialog = ({
               />
             )}
           />
-          <RichTextEditor
-            required
-            isLoadingFiles={isLoadingFiles}
-            label="Text"
-            name="content"
-            control={control}
-            existingFiles={existingFiles}
-            updateFiles={(files) => setValue('attachments', files)}
-            hasSignatureButton
-            onSignatureSelect={(signature?: EmailSignature) => {
-              onSignatureSelect?.(signature);
-            }}
-          />
+
+          <Box sx={{display: 'flex', flexDirection: 'column'}}>
+            <RichTextEditor
+              required
+              isLoadingFiles={isLoadingFiles}
+              label="Text"
+              name="content"
+              control={control}
+              existingFiles={existingFiles}
+              updateFiles={(files) => setValue('attachments', files)}
+              hasSignatureButton
+              onSignatureSelect={(signature?: EmailSignature) => {
+                onSignatureSelect?.(signature);
+              }}
+            />
+            {!isFileSizeFormValid && (
+              <FormHelperText error>
+                {t(
+                  'Email files are too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes',
+                  {
+                    sizeLimit: EMAIL_ATTACHMENT_SIZE_UPPER_LIMIT,
+                    currentSize: fileSize,
+                  },
+                )}
+              </FormHelperText>
+            )}
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions
@@ -529,6 +556,7 @@ export const SendEmailDialog = ({
                   confirmBtnDisabled ||
                   isSending ||
                   isLoadingFiles ||
+                  !isFileSizeFormValid ||
                   (!watch('emails')?.length && emailInputValue === '') ||
                   !watch('subject') ||
                   watch('content') === '<p></p>',
