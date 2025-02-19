@@ -182,7 +182,6 @@ export const QuotationUnitsDataGrid = ({
         label="Search"
         placeholder="Search by number, model, customer, address etc."
         onValueChanged={(value) => setSearch(value)}
-        defaultValue={searchCustomer}
       />
       <PageListingLayout containerStyle={{height: '48vh'}}>
         <DataGridLayout
