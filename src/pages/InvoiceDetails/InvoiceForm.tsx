@@ -1633,7 +1633,9 @@ export const InvoiceForm = ({
         invoiceAmountDetail={invoiceAmountDetail}
         selectedLng={company?.language}
         translate={translate}
-        previousInvoices={sortedPreviousInvoices}
+        previousInvoices={
+          shouldIncludePreviousInvoices ? sortedPreviousInvoices : []
+        }
         headerPath={headerUrl[headerInfo?.path]}
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}

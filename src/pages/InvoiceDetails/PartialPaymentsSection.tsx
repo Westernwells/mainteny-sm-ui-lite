@@ -55,6 +55,7 @@ import {
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import InvoiceShowOnPDFSwitch from 'components/Switch/InvoiceShowOnPDFSwitch';
+import {stripHtmlTags} from 'utils/text-block';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -608,7 +609,7 @@ export const PartialPaymentsSection = ({
                               <TableCell sx={{width: '45%'}}>
                                 <FormInput
                                   fieldProps={{
-                                    value: item.name,
+                                    value: stripHtmlTags(item.name || ''),
                                     disabled: true,
                                   }}
                                 />
