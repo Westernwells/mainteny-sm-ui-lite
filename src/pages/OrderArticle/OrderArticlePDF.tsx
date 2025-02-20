@@ -202,7 +202,7 @@ const OrderArticlePDF = React.memo(
             <TopSectionContainer>
               <PdfTemplateLeftAddress
                 serviceCompanyInfo={serviceCompanyInfo}
-                receiverName={articleOrder?.articleSupplier?.name}
+                fallbackReceiverName={articleOrder?.articleSupplier?.name}
                 addressComponent={
                   articleOrder?.articleSupplier?.address?.component
                 }

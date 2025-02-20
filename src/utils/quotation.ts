@@ -1,4 +1,4 @@
-import {DiscountType} from 'models/invoice';
+import {DiscountType, InvoiceItemRecord} from 'models/invoice';
 import {
   QUOTATION_STATUS_FILTER,
   QuotationActivityType,
@@ -136,10 +136,10 @@ export const mapStatusToFilterOptions = (
 };
 
 export const transformFormikItems = (
-  items: QuotationItemRecord[],
+  items: QuotationItemRecord[] | InvoiceItemRecord[],
 ): QuotationItemView[] | InvoiceItemView[] =>
   items.map((item) => ({
-    id: item.id || item.articleId || item.article?.id!,
+    id: item.id || item.article?.id || '',
     name: item.name,
     description: item.description || '',
     quantity: item.quantity,
@@ -159,6 +159,7 @@ export const transformFormikItems = (
     },
     additionalInfo: {
       discount: item.discount,
+      payment: (item as InvoiceItemRecord).payment,
     },
     article: item.article as ArticleView,
   }));

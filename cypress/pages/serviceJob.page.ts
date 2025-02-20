@@ -1,3 +1,4 @@
+import { addDays } from 'date-fns';
 import {navigateCy} from '../utils/utils';
 import OrdersPage from './orders.page';
 
@@ -81,9 +82,25 @@ export default class ServiceJobPage {
 
       // select start and end date
       cy.contains('label', 'Start and end date').click();
+      // Click the start date (current selected date)
+      cy.get('button[aria-current="date"]').first().click({ force: true });
+
+      // Select the next available date as the end date
       cy.get('button[aria-current="date"]')
-        .should('be.visible')
-        .click({force: true});
+        .invoke('attr', 'data-timestamp')
+        .then((timestamp) => {
+          // Convert timestamp to a Date object
+          const currentDate = new Date(parseInt(timestamp, 10));
+      
+          // Add 10 days to the current date
+          const newDate = addDays(currentDate, 10);
+      
+          // Convert back to timestamp
+          const newTimestamp = newDate.getTime();
+      
+          // Click the next day's date
+          cy.get(`button[data-timestamp="${newTimestamp}"]`).click({ force: true });
+        });
       cy.contains('button', 'Confirm').click({waitForAnimations: false});
 
       // select start time

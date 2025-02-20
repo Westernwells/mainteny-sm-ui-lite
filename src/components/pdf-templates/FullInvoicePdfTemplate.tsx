@@ -1,4 +1,4 @@
-import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {useMemo} from 'react';
 import {centsToMoney, formatCurrency} from 'utils/currency';
@@ -32,6 +32,7 @@ import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
+import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
@@ -333,14 +334,8 @@ const FullInvoicePdfTemplate = ({
           <TopSectionContainer>
             <PdfTemplateLeftAddress
               serviceCompanyInfo={serviceCompanyInfo}
-              receiverName={
-                invoice?.additionalInfo?.billingAddress?.component?.name ||
-                invoice?.propertyOwner?.name
-              }
-              addressComponent={
-                invoice?.additionalInfo?.billingAddress?.component ||
-                invoice?.propertyOwner.billingAddress?.component
-              }
+              fallbackReceiverName={invoice?.propertyOwner?.name}
+              addressComponent={getAddressComponentFromInvoice(invoice)}
               beneficiaryInfo={
                 invoice?.additionalInfo.beneficiaryAddress?.component
               }

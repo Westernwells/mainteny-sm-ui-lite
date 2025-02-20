@@ -1,4 +1,4 @@
-import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React, {useMemo} from 'react';
 import {formatDate} from 'utils/datetime';
@@ -17,11 +17,12 @@ import {
 } from 'utils/calculate-total';
 import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import {
-  shouldDisplayDiscountDash,
   allItemsHaveZeroDiscount,
+  shouldDisplayDiscountDash,
 } from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
+import {getAddressComponentFromQuotation} from 'utils/pdfTemplates';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
@@ -316,13 +317,8 @@ const QuotationPdfTemplate = React.memo(
             <TopSectionContainer>
               <PdfTemplateLeftAddress
                 serviceCompanyInfo={serviceCompanyInfo}
-                receiverName={
-                  quotation?.additionalInfo?.billingAddress?.component?.name ||
-                  quotation?.propertyOwner?.name
-                }
-                addressComponent={
-                  quotation?.additionalInfo?.billingAddress?.component
-                }
+                fallbackReceiverName={quotation?.propertyOwner?.name}
+                addressComponent={getAddressComponentFromQuotation(quotation)}
                 selectedLng={selectedLng}
                 translate={translate}
                 beneficiaryInfo={

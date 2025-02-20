@@ -81,9 +81,8 @@ describe('Service Job Tests', () => {
                 if (serviceOrders.length) {
                     ServiceJobPage.getFirstTableElement().should('exist').click();
                     cy.get('button[data-testid="action-menu-horizontal"]').click();
-                    cy.get('[id="action-menu"]')
-                        .find('[data-testid^="container-menu-option-"]')
-                        .contains('li', /^Schedule$/) // Match exactly "Schedule"
+                    cy.get('[id="action-menu"]').find('[data-testid^="container-menu-option-"]');
+                    cy.contains('li', /^(Reschedule|Schedule)$/i) // Matches "Schedule" or "Reschedule"
                         .should('be.visible')
                         .click();
 

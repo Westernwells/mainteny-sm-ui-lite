@@ -320,16 +320,15 @@ export const PdfPreviewPartialPaymentSection = ({
 
   return (
     <View>
-      {invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM &&
-        previousInvoices.length && (
-          <PdfPerItemSection
-            translate={translate}
-            selectedLng={selectedLng}
-            currentCurrency={currentCurrency}
-            invoice={invoice}
-            previousInvoices={previousInvoices}
-          />
-        )}
+      {invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM && (
+        <PdfPerItemSection
+          translate={translate}
+          selectedLng={selectedLng}
+          currentCurrency={currentCurrency}
+          invoice={invoice}
+          previousInvoices={previousInvoices}
+        />
+      )}
 
       {invoice?.additionalInfo.payment?.type !== PaymentType.PER_ITEM && (
         <View>

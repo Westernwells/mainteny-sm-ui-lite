@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import * as Yup from 'yup';
@@ -23,7 +23,6 @@ import {
   useCreateInvoiceOverdueNotice,
   useInvoiceDetail,
 } from 'hooks/reactQuery/useInvoice';
-// import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   currencyFactor,
   formatCurrency,
@@ -84,9 +83,10 @@ export const InvoiceOverdueNotice = () => {
 
   const currentCurrency = useCurrentCurrency();
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
-  const [blobFile, setBlobFile] = useState<Blob>();
 
-  const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+  const {data: company, isLoading: isLoadingCompany} = useCompanyById(
+    user?.userAccount.serviceCompany.id,
+  );
   const {t: translateCompanyLanguage} = useTranslation('translation', {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
@@ -102,33 +102,41 @@ export const InvoiceOverdueNotice = () => {
     [company?.language],
   );
 
-  const {data: clientStorageData} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: 'pdf-template'},
-  });
+  const {data: clientStorageData, isLoading: isLoadingClientStorageData} =
+    useQueryClientStorageData({
+      serviceCompanyId: company?.id!,
+      params: {key: 'pdf-template'},
+    });
 
   const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
   const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
 
-  const {data: headerUrl = {}} = useDownloadUrl(
+  const {data: headerUrl = {}, isLoading: isLoadingHeaderUrl} = useDownloadUrl(
     headerInfo?.path ? [headerInfo.path] : [],
     undefined,
     company?.id,
   );
 
-  const {data: footerUrl = {}} = useDownloadUrl(
+  const {data: footerUrl = {}, isLoading: isLoadingFooterUrl} = useDownloadUrl(
     footerInfo?.path ? [footerInfo.path] : [],
     undefined,
     company?.id,
   );
 
-  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
+  const {
+    data: clientStorageDataPdfConfig,
+    isLoading: isLoadingClientStorageDataPdfConfig,
+  } = useQueryClientStorageData({
     serviceCompanyId: company?.id!,
     params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
   });
-  const pdfConfig = clientStorageDataPdfConfig?.value
-    ? JSON.parse(clientStorageDataPdfConfig?.value)
-    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
+  const pdfConfig = useMemo(
+    () =>
+      clientStorageDataPdfConfig?.value
+        ? JSON.parse(clientStorageDataPdfConfig.value)
+        : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+    [clientStorageDataPdfConfig],
+  );
 
   const initialValues = {
     customerAddress: invoice?.propertyOwner?.billingAddress?.fullName ?? '',
@@ -175,8 +183,8 @@ export const InvoiceOverdueNotice = () => {
     currency: invoice?.totalAmount.currency ?? '',
   });
 
-  const handlePreview = async () => {
-    const blob = await pdf(
+  const generatePdfBlob = async () =>
+    pdf(
       <InvoiceOverduePdfPreview
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
@@ -191,7 +199,9 @@ export const InvoiceOverdueNotice = () => {
         footerInfo={footerInfo}
       />,
     ).toBlob();
-    setBlobFile(blob);
+
+  const handlePreview = async () => {
+    const blob = await generatePdfBlob();
     const blobURL = URL.createObjectURL(blob);
     setPreviewPdfBlobUrl(blobURL);
   };
@@ -211,7 +221,8 @@ export const InvoiceOverdueNotice = () => {
 
     const fileNames: string[] = [`${overdueNoticeId}.pdf`];
 
-    const files = await createFilesFromBlobArray([blobFile!], fileNames);
+    const blob = await generatePdfBlob();
+    const files = await createFilesFromBlobArray([blob], fileNames);
 
     await uploadFiles({files, uploadPath});
 
@@ -257,50 +268,43 @@ export const InvoiceOverdueNotice = () => {
     navigate(`/invoices/details/${invoice?.id}`, {replace: true});
   };
 
-  const [isPrinting, setIsPrinting] = useState(false);
-
   const handlePrint = async () => {
-    setIsPrinting(true);
-  };
+    const blob = await generatePdfBlob();
+    const blobURL = URL.createObjectURL(blob);
 
-  useEffect(() => {
-    handlePreview();
-  }, [invoice]);
-
-  useEffect(() => {
-    if (isPrinting && previewPdfBlobUrl) {
-      printJS({
-        printable: previewPdfBlobUrl,
-        type: 'pdf',
-        showModal: true,
-        onPrintDialogClose: () => {
-          setIsPrinting(false);
-        },
-      });
-      setIsPrinting(false);
-    }
-    handlePreview();
-  }, [isPrinting]);
-
-  const actions = useMemo(() => {
-    const items = [
-      {
-        label: t('Cancel'),
-        icon: <Cancel />,
-        onClick: () => navigate(-1),
-      },
-    ];
-    items.unshift({
-      label: t('Print'),
-      icon: <Print />,
-      onClick: () => {
-        handlePrint();
+    printJS({
+      printable: blobURL,
+      type: 'pdf',
+      showModal: true,
+      onPrintDialogClose: () => {
+        URL.revokeObjectURL(blobURL);
+        setPreviewPdfBlobUrl('');
       },
     });
-    return items;
-  }, []);
+  };
 
-  if (isLoading) {
+  const actions = [
+    {
+      label: t('Cancel'),
+      icon: <Cancel />,
+      onClick: () => navigate(-1),
+    },
+    {
+      label: t('Print'),
+      icon: <Print />,
+      onClick: handlePrint,
+    },
+  ];
+
+  if (
+    isLoading ||
+    isLoadingClientStorageDataPdfConfig ||
+    !user ||
+    isLoadingCompany ||
+    isLoadingClientStorageData ||
+    isLoadingHeaderUrl ||
+    isLoadingFooterUrl
+  ) {
     return <Progress />;
   }
 
@@ -594,7 +598,6 @@ export const InvoiceOverdueNotice = () => {
         subject={formik.values.subject}
         content={formik.values.description || sendEmailDescription}
         callback={(values) => onSubmitHandler(values)}
-        loadingProgress={isEditing ? 1 : 0}
       />
     </>
   );

@@ -95,7 +95,7 @@ export const ContractTerm = ({
       query: '',
       priceStart: -9999999,
       priceEnd: 9999999,
-      paymentTermId: encodeURI(termId),
+      ...(termId ? {paymentTermId: encodeURI(termId)} : {}),
     },
     {
       enabled:

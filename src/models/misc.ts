@@ -98,6 +98,8 @@ export interface Location {
 
 export interface AddressComponent {
   name?: string;
+  name2?: string;
+  name3?: string;
   street?: string;
   street2?: string;
   city?: string;
@@ -214,6 +216,7 @@ export interface VatInfo {
   vatId?: string;
   vatName?: string;
 }
+
 export interface AmountRecord {
   currency: string;
   netAmount?: number;

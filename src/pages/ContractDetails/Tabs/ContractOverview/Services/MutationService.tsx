@@ -174,23 +174,40 @@ export const MutationService = ({
     [];
 
   useEffect(() => {
-    const defaultPackageValues = {
-      laborPercentage:
-        formikContractServiceComponent.values.costType === ArticleType.PACKAGE
-          ? formikContractServiceComponent.values.costPackage
-              ?.laborPercentage || 50
-          : 0,
-      materialPercentage:
-        formikContractServiceComponent.values.costType === ArticleType.PACKAGE
-          ? formikContractServiceComponent.values?.costPackage
-              ?.materialPercentage || 50
-          : 0,
-    };
-    formikContractServiceComponent.setFieldValue('costPackage', {
-      ...formikContractServiceComponent.values.costPackage,
-      ...defaultPackageValues,
-    });
-  }, [formikContractServiceComponent.values.costType]);
+    if (components.length > 0) {
+      // Find the matching component if editing
+      const currentComponent = components.find(
+        (c) => c.id === formikContractServiceComponent.values.id,
+      );
+
+      const defaultLaborPercentage =
+        currentComponent?.additionalInfo?.costPackage?.laborPercentage ?? 0;
+
+      const defaultMaterialPercentage =
+        currentComponent?.additionalInfo?.costPackage?.materialPercentage ??
+        100;
+
+      const updatedCostPackage = {
+        laborPercentage:
+          formikContractServiceComponent.values.costType === ArticleType.PACKAGE
+            ? defaultLaborPercentage
+            : 0,
+        materialPercentage:
+          formikContractServiceComponent.values.costType === ArticleType.PACKAGE
+            ? defaultMaterialPercentage
+            : 0,
+      };
+
+      formikContractServiceComponent.setFieldValue(
+        'costPackage',
+        updatedCostPackage,
+      );
+    }
+  }, [
+    formikContractServiceComponent.values.costType,
+    components,
+    formikContractServiceComponent.values.id,
+  ]);
 
   const updateServiceMutation = async () => {
     const index = components.findIndex(
@@ -578,13 +595,16 @@ export const MutationService = ({
                                       return true;
                                     }
 
-                                    if (floatValue < 0) {
+                                    if (floatValue < 0 || floatValue > 100) {
                                       return false;
                                     }
 
-                                    const maxValue = 100;
-
-                                    return floatValue <= maxValue;
+                                    const newMaterialPercentage =
+                                      100 - floatValue;
+                                    return (
+                                      newMaterialPercentage >= 0 &&
+                                      newMaterialPercentage <= 100
+                                    );
                                   }}
                                   InputProps={{
                                     name: 'costPackage.laborPercentage',
@@ -606,10 +626,25 @@ export const MutationService = ({
                                   }}
                                   label={t('Labor')}
                                   onValueChange={(values) => {
-                                    formikContractServiceComponent.setFieldValue(
-                                      'costPackage.laborPercentage',
-                                      Number(values.value),
+                                    const laborPercentage = Number(
+                                      values.value,
                                     );
+                                    const materialPercentage =
+                                      100 - laborPercentage;
+
+                                    if (
+                                      laborPercentage + materialPercentage <=
+                                      100
+                                    ) {
+                                      formikContractServiceComponent.setFieldValue(
+                                        'costPackage.laborPercentage',
+                                        laborPercentage,
+                                      );
+                                      formikContractServiceComponent.setFieldValue(
+                                        'costPackage.materialPercentage',
+                                        materialPercentage,
+                                      );
+                                    }
                                   }}
                                   size="small"
                                 />
@@ -619,13 +654,7 @@ export const MutationService = ({
                                 <NumericFormat
                                   value={
                                     formikContractServiceComponent.values
-                                      .costType === ArticleType.PACKAGE
-                                      ? 100 -
-                                        Number(
-                                          formikContractServiceComponent.values
-                                            .costPackage?.laborPercentage,
-                                        )
-                                      : 0
+                                      .costPackage?.materialPercentage
                                   }
                                   customInput={TextField}
                                   suffix="%"
@@ -652,27 +681,12 @@ export const MutationService = ({
                                       background: '#FFFFFF',
                                     },
                                   }}
-                                  isAllowed={(values) => {
-                                    const {floatValue} = values;
-                                    if (!floatValue) {
-                                      return true;
-                                    }
-
-                                    if (floatValue < 0) {
-                                      return false;
-                                    }
-
-                                    const maxValue = 100;
-
-                                    return floatValue <= maxValue;
-                                  }}
                                   InputProps={{
                                     name: 'costPackage.materialPercentage',
-                                    placeholder: t(`e.g. 20%`),
+                                    placeholder: t(`e.g. 50%`),
                                     id: `costPackage.materialPercentage`,
                                     inputMode: 'numeric',
                                     disabled: true,
-                                    required: false,
                                     onBlur:
                                       formikContractServiceComponent.handleBlur,
                                   }}
@@ -680,12 +694,6 @@ export const MutationService = ({
                                     shrink: true,
                                   }}
                                   label={t('Material')}
-                                  onValueChange={(values) => {
-                                    formikContractServiceComponent.setFieldValue(
-                                      'costPackage.materialPercentage',
-                                      Number(values.value),
-                                    );
-                                  }}
                                   size="small"
                                 />
                               </Box>

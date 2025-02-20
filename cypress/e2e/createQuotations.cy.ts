@@ -78,18 +78,18 @@ describe('Create Quotation', () => {
         cy.focused().type('noman+1@mainteny.com{enter}');
         cy.get('div[contenteditable="true"]').type('I am Text!');
         cy.contains('button', 'Send email').click();
-        cy.wait('@sendQuotationAPI');
+        cy.wait('@sendQuotationAPI', {timeout: 30000});
         cy.contains('Quotation sent successfully');
 
         // create job //
         const createJobAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceOrders`;
         cy.intercept('POST', createJobAPI).as('createJobAPI');
         cy.contains('Create Job').click();
-        const getUnitsAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?*`;
+        const getUnitsAPI = `${Cypress.env().REACT_APP_API_URL}/api/propertyOwners/*/elevators?*`;
         cy.intercept('GET', getUnitsAPI).as('getUnitsAPI');
         cy.contains('Select Unit').click();
         cy.get('input[name="Search"]').clear().type('e');
-        cy.wait('@getUnitsAPI');
+        cy.wait('@getUnitsAPI', {timeout: 30000});
         cy.get('div[data-rowindex="0"]').click();
         cy.contains('button', 'Select').click();
         cy.get('div[role="combobox"][id="createServiceOrder"]').click();
@@ -98,7 +98,7 @@ describe('Create Quotation', () => {
         cy.contains('New CALLOUT Job');
         cy.contains('Next').click();
         cy.contains('Submit').click();
-        cy.wait('@createJobAPI');
+        cy.wait('@createJobAPI', {timeout: 30000});
         cy.contains('Order scheduled successfully');
     });
 

@@ -2,12 +2,12 @@ import {AddressRecord, HeaderFooterInfoData} from 'models/misc';
 import {UserAccount} from 'models/user';
 import {AlternativeServiceCompanyInfo} from 'models/invoice';
 import {getServiceCompanyInfo} from 'utils/company-utils';
+import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import PdfTemplateFooter from './PdfTemplateFooter';
 import PdfTemplateHeader from './PdfTemplateHeader';
 import PdfPageContainer from './containers/PdfPageContainer';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
-import PdfTemplateLeftAddress from './PdfTemplateLeftAddress';
 
 type Props = {
   translate: (key: string) => string;
@@ -45,7 +45,7 @@ const AlternativeAddressTemplate = ({
         <TopSectionContainer>
           <PdfTemplateLeftAddress
             serviceCompanyInfo={serviceCompanyInfo}
-            receiverName={alternativeAddress?.component?.name}
+            fallbackReceiverName={alternativeAddress?.component?.name}
             addressComponent={alternativeAddress?.component}
             selectedLng={selectedLng}
             translate={translate}
