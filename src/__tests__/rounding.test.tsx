@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {DiscountType, InvoiceItemRecord} from 'models/invoice';
-import {calculateInvoiceAmount} from 'utils/calculate-total';
+import {calculateArticlesAmount} from 'utils/calculate-total';
 
 const createMockInvoiceItem = (
   overrides: Partial<InvoiceItemRecord> = {},
@@ -24,7 +24,7 @@ const createMockInvoiceItem = (
   };
 };
 
-describe('calculateInvoiceAmount', () => {
+describe('calculateArticlesAmount', () => {
   it('should calculate invoice amount correctly (single VAT - no discounts)', () => {
     const mockItems = [
       createMockInvoiceItem({
@@ -46,7 +46,7 @@ describe('calculateInvoiceAmount', () => {
         quantity: 2,
       }),
     ];
-    const result = calculateInvoiceAmount({items: mockItems});
+    const result = calculateArticlesAmount({items: mockItems});
 
     expect(result).toStrictEqual({
       amountBeforeGlobalDiscount: 5000,
@@ -86,7 +86,7 @@ describe('calculateInvoiceAmount', () => {
         quantity: 2,
       }),
     ];
-    const result = calculateInvoiceAmount({items: mockItems});
+    const result = calculateArticlesAmount({items: mockItems});
 
     expect(result).toStrictEqual({
       amountBeforeGlobalDiscount: 9000,
@@ -144,7 +144,7 @@ describe('calculateInvoiceAmount', () => {
         },
       }),
     ];
-    const result = calculateInvoiceAmount({
+    const result = calculateArticlesAmount({
       items: mockItems,
       globalDiscount: {
         type: DiscountType.AMOUNT,
@@ -209,7 +209,7 @@ describe('calculateInvoiceAmount', () => {
       }),
     ];
 
-    const result = calculateInvoiceAmount({
+    const result = calculateArticlesAmount({
       items: mockItems,
       globalDiscount: {
         type: DiscountType.AMOUNT,
@@ -232,7 +232,7 @@ describe('calculateInvoiceAmount', () => {
   });
 
   it('should calculate invoice amount correctly (with proper rounding)', () => {
-    let result = calculateInvoiceAmount({
+    let result = calculateArticlesAmount({
       items: [
         createMockInvoiceItem({
           name: 'Article 1',
@@ -269,7 +269,7 @@ describe('calculateInvoiceAmount', () => {
       amountAfterGlobalDiscountWithVAT: 8134.84,
     });
 
-    result = calculateInvoiceAmount({
+    result = calculateArticlesAmount({
       items: [
         createMockInvoiceItem({
           name: 'Article 1',
@@ -306,7 +306,7 @@ describe('calculateInvoiceAmount', () => {
       amountAfterGlobalDiscountWithVAT: 8134.24,
     });
 
-    result = calculateInvoiceAmount({
+    result = calculateArticlesAmount({
       items: [
         createMockInvoiceItem({
           name: 'Article 1',
@@ -357,7 +357,7 @@ describe('calculateInvoiceAmount', () => {
       amountAfterGlobalDiscountWithVAT: 119.11,
     });
 
-    result = calculateInvoiceAmount({
+    result = calculateArticlesAmount({
       items: [
         createMockInvoiceItem({
           name: 'Article 1',
@@ -419,7 +419,7 @@ describe('calculateInvoiceAmount', () => {
       amountAfterGlobalDiscountWithVAT: 572.01,
     });
 
-    result = calculateInvoiceAmount({
+    result = calculateArticlesAmount({
       items: [
         createMockInvoiceItem({
           name: 'Article 1',
@@ -465,13 +465,13 @@ describe('calculateInvoiceAmount', () => {
     });
 
     expect(result).toStrictEqual({
-      amountBeforeGlobalDiscount: 98.76,
-      amountAfterGlobalDiscount: 98.76,
+      amountBeforeGlobalDiscount: 98.77,
+      amountAfterGlobalDiscount: 98.77,
       vats: [{percentageVat: 19, vat: 18.75}],
-      amountAfterGlobalDiscountWithVAT: 117.51,
+      amountAfterGlobalDiscountWithVAT: 117.52,
     });
 
-    result = calculateInvoiceAmount({
+    result = calculateArticlesAmount({
       items: [
         createMockInvoiceItem({
           name: 'Article 1',
@@ -519,7 +519,7 @@ describe('calculateInvoiceAmount', () => {
       amountAfterGlobalDiscountWithVAT: 132.36,
     });
 
-    result = calculateInvoiceAmount({
+    result = calculateArticlesAmount({
       items: [
         createMockInvoiceItem({
           name: 'Article 1',

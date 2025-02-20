@@ -49,8 +49,8 @@ import {
   calculatePackageMaterialLaborPercentages,
   getArticleTypeText,
 } from 'utils/article-utils';
+import {getItemTotalAfterPerItemDiscount} from 'utils/calculate-total';
 import {QuotationItemRecord} from 'models/quotation';
-import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
 import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
@@ -196,11 +196,14 @@ export const ArticleItemRowQuotation = ({
     10 ** Currencies[formik.values.unitAmount.currency];
 
   const totalPriceExclVat = price * formik.values.quantity;
-  const totalPriceExclVatAfterDiscount = applyQuotationDiscount({
-    actualValue: price * formik.values.quantity,
-    ...(formik.values.discount?.type === DiscountType.AMOUNT
-      ? {amount: formik.values.discount?.amount?.value ?? 0}
-      : {percentage: formik.values.discount?.percentage ?? 0}),
+  const totalPriceExclVatAfterDiscount = getItemTotalAfterPerItemDiscount({
+    item: {
+      unitAmount: {
+        netAmount: price,
+      },
+      quantity: formik.values.quantity,
+      discount: formik.values.discount,
+    },
   });
 
   useEffect(() => {

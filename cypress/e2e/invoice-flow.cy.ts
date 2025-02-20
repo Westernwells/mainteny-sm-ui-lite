@@ -8,7 +8,7 @@ import {getPlainStringFromHtml, isPlainString} from 'utils/rich-field-string';
 import {formatDate} from 'utils/datetime';
 import {getDisplayDeliveryDate, getFormattedPaymentValues, netTotal, replacePaymentTermsPlaceholders} from 'utils/invoice';
 import {centsToMoney, formatCurrency, formatGrossAmount} from 'utils/currency';
-import {calculateInvoiceAmount} from 'utils/calculate-total';
+import {calculateArticlesAmount} from 'utils/calculate-total';
 import {calculateLaborMaterialCost} from 'hooks/useCalculateLaborMaterialCost';
 import {applyGlobalDiscountOnItems, applyPerItemDiscountOnItems} from 'pages/InvoiceDetails/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
@@ -310,7 +310,7 @@ describe('Invoice flow', () => {
                             cy.contains(formatCurrencyWithOptions(netTotal(a, currency)));
                         });
                         const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
-                        const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} = calculateInvoiceAmount({
+                        const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} = calculateArticlesAmount({
                             items: invoice.items,
                             globalDiscount: discount,
                         });
