@@ -40,6 +40,23 @@ const BillingAddress = ({
     [],
   );
 
+  const handleAddressChange = (componentAddress: AddressRecord | undefined) => {
+    const currentValues = watch('billingAddress');
+
+    setValue('billingAddress', {
+      ...componentAddress,
+      component: {
+        ...componentAddress?.component,
+        // to not overwrite name fields
+        name: currentValues?.component?.name,
+        name2: currentValues?.component?.name2,
+        name3: currentValues?.component?.name3,
+      },
+      id: currentValues?.id!,
+      fullName: componentAddress?.fullName || '',
+    });
+  };
+
   useEffect(() => {
     if (watchName) {
       setValue(`billingAddress.component.name`, watchName);
@@ -98,15 +115,7 @@ const BillingAddress = ({
               error: !!errors?.billingAddress?.fullName,
             }}
             allowMap
-            getAddress={(componentAddress) => {
-              const currentValues = watch('billingAddress');
-
-              setValue('billingAddress', {
-                ...componentAddress,
-                id: currentValues?.id!,
-                fullName: componentAddress?.fullName || '',
-              });
-            }}
+            getAddress={handleAddressChange}
             shortAddress
           />
         </Grid>
