@@ -1,5 +1,5 @@
 import React from 'react';
-import {Grid, Typography, Box, Tooltip, Divider} from '@mui/material';
+import {Box, Divider, Grid, Tooltip, Typography} from '@mui/material';
 import {ReactComponent as ReceiptDollar} from 'assets/icons/ReceiptDollar.svg';
 import {ReactComponent as PerformanceMoneyDecrease} from 'assets/icons/PerformanceMoneyDecrease.svg';
 import {ReactComponent as TimeClockHand} from 'assets/icons/TimeClockHand.svg';
@@ -11,11 +11,10 @@ import {
   useCurrentCurrency,
 } from 'utils/currency';
 import {DateRange} from '@mui/x-date-pickers-pro';
-import {formatDate} from 'utils/datetime';
+import {formatDate, toRestDate} from 'utils/datetime';
 import {t} from 'i18next';
 import {Progress} from 'components/Progress';
 import {QueryPurchaseInvoiceParams} from 'models/purchaseInvoice';
-import {endOfDay, startOfDay} from 'date-fns';
 
 type MetricProps = {
   title: string;
@@ -71,13 +70,9 @@ const DashboardMetrics = ({selectedDateRange, filters}: Props) => {
   const [sentDateFrom, sentDateTo] = selectedDateRange;
   const currentCurrency = useCurrentCurrency();
 
-  const formattedSentDateFrom = sentDateFrom
-    ? startOfDay(sentDateFrom).toISOString().split('T')[0]
-    : null;
+  const formattedSentDateFrom = sentDateFrom ? toRestDate(sentDateFrom) : null;
 
-  const formattedSentDateTo = sentDateTo
-    ? endOfDay(sentDateTo).toISOString().split('T')[0]
-    : null;
+  const formattedSentDateTo = sentDateTo ? toRestDate(sentDateTo) : null;
 
   const {data: purchaseInvoiceStatistics, isLoading} =
     usePurchaseInvoiceStatistics({
