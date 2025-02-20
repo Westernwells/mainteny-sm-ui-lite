@@ -379,13 +379,6 @@ export const DraftQuotation = ({
     }
 
     formik.setFieldValue('propertyOwnerId', row.id);
-    const customerLegalNote = row?.additionalInfo?.vat?.legalNote;
-    if (customerLegalNote) {
-      const newNotes = `${formik.values.notes} ${cleanHtmlContent(
-        `<p>${customerLegalNote}</p>`,
-      )}`;
-      formik.setFieldValue('notes', newNotes);
-    }
 
     const quotationCustomer = quotation?.elevator?.propertyOwner;
 
@@ -797,6 +790,14 @@ export const DraftQuotation = ({
         'alternativeAddress',
         customer.otherAddress || emptyAddressState,
       );
+
+      const customerLegalNote = customer?.additionalInfo?.vat?.legalNote;
+      if (customerLegalNote) {
+        const newNotes = `${formik.values.notes} ${cleanHtmlContent(
+          `<p>${customerLegalNote}</p>`,
+        )}`;
+        formik.setFieldValue('notes', newNotes);
+      }
     }
   }, [customer, pageState, unit]);
 

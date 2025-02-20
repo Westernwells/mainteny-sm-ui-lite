@@ -8,7 +8,7 @@ import {queryKeys} from 'reactQuery/constants';
 
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {toRestDateTime} from 'utils/datetime';
-import {UserActivityView} from 'models/user';
+import {UserActivityStatistics, UserActivityView} from 'models/user';
 import {Resource, RestError} from '../../models/misc';
 import {Order, Page} from '../../models/pagination';
 
@@ -127,5 +127,41 @@ export function useWorkHoursActivities(
         order,
         orderByField,
       ),
+  );
+}
+
+export const getWorkHoursActivityStatistics = async (payload: {
+  query: string;
+  startDate: Date;
+  endDate: Date;
+  employeeId: string;
+}) => {
+  const {employeeId, startDate, endDate, query} = payload;
+
+  const response = await axiosClient.get<UserActivityStatistics>(
+    `/api/users/${employeeId}/activity/statistics`,
+    {
+      params: {
+        query,
+        start: toRestDateTime(startDate),
+        end: toRestDateTime(endDate),
+      },
+      paramsSerializer,
+    },
+  );
+  return response.data;
+};
+
+export function useWorkHoursActivityStatistics(payload: {
+  query: string;
+  startDate: Date;
+  endDate: Date;
+  employeeId: string;
+}) {
+  const {query, startDate, endDate, employeeId} = payload;
+
+  return useQuery<UserActivityStatistics, RestError>(
+    [queryKeys.fetchWorkHours, query, startDate, endDate, employeeId],
+    () => getWorkHoursActivityStatistics(payload),
   );
 }
