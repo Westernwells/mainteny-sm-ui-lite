@@ -29,7 +29,7 @@ import {PropertyOwnerView} from 'models/propertyManager';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
-  calculateInvoiceAmount,
+  calculateArticlesAmount,
   calculateTotalWithPerItemDiscount,
 } from 'utils/calculate-total';
 import {getUniqueId} from 'utils/utils';
@@ -226,7 +226,7 @@ export const ArticleItemsTableNEW = ({
     amountAfterGlobalDiscountWithVAT,
   } = useMemo(
     () =>
-      calculateInvoiceAmount({
+      calculateArticlesAmount({
         items: formik.values.items,
         globalDiscount: formik.values.discount,
       }),

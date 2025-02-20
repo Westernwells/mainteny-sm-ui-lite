@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo, useRef, useState} from 'react';
+import {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
 import {isEqual} from 'lodash';
@@ -41,7 +41,7 @@ import {
   useCurrentCurrency,
 } from 'utils/currency';
 import {createHighlightedText, filterArrayBySearchText} from 'utils/utils';
-import {applyDiscount} from 'pages/InvoiceDetails/utils';
+import {getItemTotalAfterPerItemDiscount} from 'utils/calculate-total';
 import {ArticleType, ArticleView} from 'models/article';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
 import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
@@ -201,11 +201,14 @@ export const ArticleItemRowNEW = ({
     10 ** Currencies[formik.values.unitAmount.currency];
 
   const totalPriceExclVat = price * formik.values.quantity;
-  const totalPriceExclVatAfterDiscount = applyDiscount({
-    actualValue: price * formik.values.quantity,
-    ...(formik.values.discount?.type === DiscountType.AMOUNT
-      ? {amount: formik.values.discount?.amount?.value ?? 0}
-      : {percentage: formik.values.discount?.percentage ?? 0}),
+  const totalPriceExclVatAfterDiscount = getItemTotalAfterPerItemDiscount({
+    item: {
+      unitAmount: {
+        netAmount: price,
+      },
+      quantity: formik.values.quantity,
+      discount: formik.values.discount,
+    },
   });
 
   useEffect(() => {

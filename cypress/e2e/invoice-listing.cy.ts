@@ -4,7 +4,7 @@ import InvoiceListingPage from '../pages/invoice-listing.page';
 import AppTopBarPage from '../pages/appTopBar.page';
 import {InvoiceStatusView, InvoiceType} from '../../src/models/invoice';
 import {getPlainStringFromHtml} from '../../src/utils/rich-field-string';
-import {calculateInvoiceAmount} from '../../src/utils/calculate-total';
+import {calculateArticlesAmount} from '../../src/utils/calculate-total';
 import {formatCurrency} from '../../src/utils/currency';
 import {ServiceCompany} from '../../src/models/service-company';
 import Table from '../utils/table';
@@ -184,7 +184,7 @@ describe('Invoice listing page', () => {
                 .should('eq', (-originalInvoiceItems[0].unitAmount.netAmount / 100).toLocaleString());
 
             // validate credit note invoice total amount is same as original invoice but in negative
-            const {amountAfterGlobalDiscountWithVAT} = calculateInvoiceAmount({
+            const {amountAfterGlobalDiscountWithVAT} = calculateArticlesAmount({
                 items: originalInvoiceItems,
                 globalDiscount: firstFullSentInvoice.additionalInfo.discount,
             });

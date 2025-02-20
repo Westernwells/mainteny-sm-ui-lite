@@ -14,7 +14,10 @@ import {
   applyPerItemDiscountOnQuotationItems,
   getDiscoutObj,
 } from 'pages/QuotationDetails/utils';
-import {calculateInvoiceAmount} from 'utils/calculate-total';
+import {
+  calculateArticlesAmount,
+  getItemTotalAfterPerItemDiscount,
+} from 'utils/calculate-total';
 import {
   getFormattedPaymentValues,
   replacePaymentTermsPlaceholders,
@@ -161,12 +164,17 @@ const CreditNotePdfTemplate = ({
   }))!;
 
   const netTotal = (articleItem: InvoiceItem) => {
-    const grossTotal =
-      (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
-    const discountValue =
-      articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
-
-    return centsToMoney(currentCurrency?.code!, grossTotal - discountValue);
+    const total = getItemTotalAfterPerItemDiscount({
+      item: {
+        unitAmount: {
+          netAmount: articleItem?.unitAmount?.netAmount,
+        },
+        quantity: articleItem.quantity,
+        discount: articleItem?.additionalInfo?.discount,
+      },
+      precision: 0,
+    });
+    return centsToMoney(currentCurrency?.code!, total);
   };
 
   const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
@@ -184,7 +192,7 @@ const CreditNotePdfTemplate = ({
   const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} =
     useMemo(
       () =>
-        calculateInvoiceAmount({
+        calculateArticlesAmount({
           items: articleItems,
           globalDiscount: discount,
         }),

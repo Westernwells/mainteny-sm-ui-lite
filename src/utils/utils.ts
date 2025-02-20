@@ -297,7 +297,7 @@ export const fixRounding = (value: number, precision: number) => {
   const power = new BigNumber(10).pow(precision || 0);
   return new BigNumber(value)
     .times(power)
-    .integerValue(BigNumber.ROUND_DOWN)
+    .integerValue(BigNumber.ROUND_HALF_UP)
     .dividedBy(power)
     .decimalPlaces(2)
     .toNumber();

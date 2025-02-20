@@ -27,10 +27,9 @@ import {QuotationFormData, QuotationItemRecord} from 'models/quotation';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useTheme} from '@mui/material/styles';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
-import {applyQuotationDiscount} from 'pages/QuotationDetails/utils';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useVats} from 'hooks/reactQuery/useVats';
-import {calculateInvoiceAmount} from 'utils/calculate-total';
+import {calculateArticlesAmount} from 'utils/calculate-total';
 import {Button} from './Button';
 import {SelectButton} from './SelectButton';
 import {FormSelect} from './form/FormSelect';
@@ -61,17 +60,28 @@ export const ArticleItemsTableQuotation = ({
   const subtotalExclVat = calculateQuotationTotalWithPerItemDiscount(
     formik.values.items,
   );
-  const subtotalExclVatFormatted = formatCurrency(subtotalExclVat, {
-    currency: currentCurrency.code,
-  });
-  const subtotalExclVatAfterDiscount = applyQuotationDiscount({
-    actualValue: subtotalExclVat,
-    ...(formik.values.discount?.type === DiscountType.AMOUNT
-      ? {amount: formik.values.discount?.amount?.value ?? 0}
-      : {percentage: formik.values.discount?.percentage ?? 0}),
-  });
-  const subtotalExclVatAfterDiscountFormatted = formatCurrency(
-    subtotalExclVatAfterDiscount,
+
+  const {
+    vats,
+    amountBeforeGlobalDiscount,
+    amountAfterGlobalDiscountWithVAT,
+    amountAfterGlobalDiscount,
+  } = useMemo(
+    () =>
+      calculateArticlesAmount({
+        items: formik.values.items,
+        globalDiscount: formik.values.discount,
+      }),
+    [formik.values.items, formik.values.discount],
+  );
+
+  const amountBeforeGlobalDiscountFormatted = formatCurrency(
+    amountBeforeGlobalDiscount,
+    {currency: currentCurrency.code},
+  );
+
+  const amountAfterGlobalDiscountFormatted = formatCurrency(
+    amountAfterGlobalDiscount,
     {currency: currentCurrency.code},
   );
 
@@ -223,15 +233,6 @@ export const ArticleItemsTableQuotation = ({
     setItems(items);
   };
 
-  const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
-    () =>
-      calculateInvoiceAmount({
-        items: formik.values.items,
-        globalDiscount: formik.values.discount,
-      }),
-    [formik.values.items, formik.values.discount],
-  );
-
   const vatsFormatted = vats.map((vat) => ({
     ...vat,
     vat: formatCurrency(vat.vat, {currency: currentCurrency.code}),
@@ -381,7 +382,7 @@ export const ArticleItemsTableQuotation = ({
                       {t('Sum')}
                     </Typography>
                     <Typography variant="subtitle2" color="primary.dark">
-                      {subtotalExclVatFormatted}
+                      {amountBeforeGlobalDiscountFormatted}
                     </Typography>
                     <Typography variant="subtitle2" color="text.secondary">
                       {discountText}
@@ -492,7 +493,7 @@ export const ArticleItemsTableQuotation = ({
                   {t('Subtotal (excl. VAT)')}
                 </Typography>
                 <Typography variant="subtitle2" color="primary.dark">
-                  {subtotalExclVatAfterDiscountFormatted}
+                  {amountAfterGlobalDiscountFormatted}
                 </Typography>
                 {vatsFormatted.map((v, index) => (
                   <React.Fragment key={`${index}-${v.percentageVat}`}>

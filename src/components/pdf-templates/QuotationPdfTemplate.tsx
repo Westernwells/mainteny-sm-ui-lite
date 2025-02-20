@@ -10,9 +10,11 @@ import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {DiscountType} from 'models/invoice';
-import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {calculateInvoiceAmount} from 'utils/calculate-total';
+import {
+  calculateArticlesAmount,
+  getItemTotalAfterPerItemDiscount,
+} from 'utils/calculate-total';
 import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import {
   shouldDisplayDiscountDash,
@@ -203,42 +205,39 @@ const QuotationPdfTemplate = React.memo(
     }))!;
 
     const netTotal = (articleItem: QuotationItem) => {
-      const grossTotal =
-        (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
-      const discountValue =
-        articleItem?.additionalInfo?.discount?.amount?.value ?? 0;
+      const total = getItemTotalAfterPerItemDiscount({
+        item: {
+          unitAmount: {
+            netAmount: articleItem?.unitAmount?.netAmount,
+          },
+          quantity: articleItem.quantity,
+          discount: articleItem?.additionalInfo?.discount,
+        },
+      });
 
-      return !articleItem.quantity || !articleItem.unitAmount.netAmount
-        ? 0
-        : (grossTotal - discountValue) /
-            10 ** (articleItem.unitAmount.fractionDigits || 2);
+      return centsToMoney(currentCurrency?.code!, total);
     };
 
     const discount = getDiscoutObj(quotation?.additionalInfo?.discount);
     const discountAmount = discount?.amount;
     const discountValue = discountAmount?.value ?? 0;
 
-    const subtotalExclVat =
-      calculateQuotationTotalWithPerItemDiscount(articleItems);
+    const {vats, amountAfterGlobalDiscountWithVAT, amountAfterGlobalDiscount} =
+      useMemo(
+        () =>
+          calculateArticlesAmount({
+            items: articleItems,
+            globalDiscount: discount,
+          }),
+        [articleItems, discount],
+      );
 
-    const subtotalExclVatFormatted = formatCurrency(
-      subtotalExclVat - discountValue,
-      {
-        currency: currentCurrency?.code,
-        excludeCurrencySymbol: true,
-        currencySymbol: currentCurrency?.symbol,
-        companyLang: selectedLng,
-      },
-    );
-
-    const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
-      () =>
-        calculateInvoiceAmount({
-          items: articleItems,
-          globalDiscount: discount,
-        }),
-      [articleItems, discount],
-    );
+    const subtotalExclVatFormatted = formatCurrency(amountAfterGlobalDiscount, {
+      currency: currentCurrency?.code,
+      excludeCurrencySymbol: true,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
+    });
 
     const vatsFormatted = vats.map((vat) => ({
       ...vat,
