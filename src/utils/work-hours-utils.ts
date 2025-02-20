@@ -1,5 +1,5 @@
 import {ServiceOrderType} from 'models/service-order';
-import {Role, UserActivityView} from 'models/user';
+import {Role, UserActivityStatistics, UserActivityView} from 'models/user';
 import {WorkHoursType} from 'models/workHours';
 import {EmployeeStatus} from 'models/employee';
 import {MinToStep} from 'models/service-company';
@@ -11,6 +11,23 @@ export const calculateTotalTime = (workHours: UserActivityView[]) => {
 
     return accumulator + (item.billableMinutes || 0);
   }, 0);
+
+  return `${convertDigitalMinsToHM(total)} h`;
+};
+
+export const calculateTotalTimeStatistics = (
+  workHours?: UserActivityStatistics,
+) => {
+  if (!workHours) {
+    return `${convertDigitalMinsToHM(0)} h`;
+  }
+
+  const billableHours = workHours.totalBillableMinutesPerType ?? {};
+
+  const total = Object.keys(billableHours).reduce(
+    (sum, key) => (key !== 'BREAK' ? sum + billableHours[key] : sum),
+    0,
+  );
 
   return `${convertDigitalMinsToHM(total)} h`;
 };
