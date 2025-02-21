@@ -53,7 +53,7 @@ import DatePickerRange from 'components/DatePickerRange';
 import {DateRange} from '@mui/x-date-pickers-pro';
 import {endOfDay, startOfDay, subYears} from 'date-fns';
 import {StatusChip} from 'components/StatusChip';
-import {formatDate} from 'utils/datetime';
+import {formatDate, fromDateStringToDate, toRestDate} from 'utils/datetime';
 import Filters from 'components/Filters';
 import {Controller, SubmitHandler, useForm} from 'react-hook-form';
 import TextInput from 'components/TextInput';
@@ -106,10 +106,6 @@ export const PurchaseInvoices = ({
 
   const navigate = useNavigate();
   const currentDate = new Date();
-
-  const [selectedDateRange, setSelectedDateRange] = useState<
-    DateRange<Date | null>
-  >([null, null]);
 
   const [searchQuery, setSearchQuery] = useQueryState('searchPurchaseInvoices');
   const [selectedPurchaseInvoiceStatus, setSelectedPurchaseInvoiceStatus] =
@@ -211,6 +207,26 @@ export const PurchaseInvoices = ({
     defaultValue: undefined,
   });
 
+  const [sentDateFrom, setSentDateFrom] = useQueryState<string | undefined>(
+    'sentDateFrom',
+    {
+      defaultValue: toRestDate(subYears(new Date(), 1)),
+    },
+  );
+
+  const [sentDateTo, setSentDateTo] = useQueryState<string | undefined>(
+    'sentDateTo',
+    {
+      defaultValue: toRestDate(new Date()),
+    },
+  );
+
+  const selectedDateRange: DateRange<Date | null> = useMemo(() => {
+    const start = sentDateFrom ? fromDateStringToDate(sentDateFrom) : null;
+    const end = sentDateTo ? fromDateStringToDate(sentDateTo) : null;
+    return [start, end];
+  }, [sentDateFrom, sentDateTo]);
+
   const [localDueDateFrom, setLocalDueDateFrom] = useState<Date | null>(null);
   const [localDueDateTo, setLocalDueDateTo] = useState<Date | null>(null);
 
@@ -237,10 +253,14 @@ export const PurchaseInvoices = ({
   });
 
   const filters: QueryPurchaseInvoiceParams = {
-    sentDateTo: endOfDay(currentDate).toISOString().split('T')[0],
-    sentDateFrom: startOfDay(subYears(currentDate, 1))
-      .toISOString()
-      .split('T')[0],
+    sentDateFrom: toRestDate(
+      sentDateFrom
+        ? fromDateStringToDate(sentDateFrom)
+        : subYears(currentDate, 1),
+    ),
+    sentDateTo: toRestDate(
+      sentDateTo ? fromDateStringToDate(sentDateTo) : currentDate,
+    ),
     pageIndex: page.pageIndex,
     pageSize: page.pageSize,
     query: createPurchaseInvoiceSearchQuery({
@@ -343,7 +363,8 @@ export const PurchaseInvoices = ({
   const watchNetMax = watch('netAmountMax');
 
   const handleDateSelection = (dateValues: DateRange<Date>) => {
-    setSelectedDateRange(dateValues);
+    setSentDateFrom(dateValues[0] ? toRestDate(dateValues[0]) : undefined);
+    setSentDateTo(dateValues[1] ? toRestDate(dateValues[1]) : undefined);
   };
 
   const handleSupplierCellClick = (id: string) => () => {
@@ -719,14 +740,6 @@ export const PurchaseInvoices = ({
   };
 
   useEffect(() => {
-    if (!selectedDateRange[0] || !selectedDateRange[1]) {
-      const today = new Date();
-      const oneYearAgo = subYears(today, 1);
-      setSelectedDateRange([oneYearAgo, today]);
-    }
-  }, []);
-
-  useEffect(() => {
     if (!isFetched) return;
     if (purchaseInvoiceResource.total === 0 && initialLoadNoEntries !== false) {
       setInitialLoadNoEntries(true);
@@ -843,7 +856,10 @@ export const PurchaseInvoices = ({
                 width: '100%',
               },
             }}
-            onClear={() => setSelectedDateRange([null, null])}
+            onClear={() => {
+              setSentDateFrom(undefined);
+              setSentDateTo(undefined);
+            }}
             sx={{width: '300px', paddingTop: 0}}
             inputTestId="start-end-date"
             popupTestId="start-end-date-popup"

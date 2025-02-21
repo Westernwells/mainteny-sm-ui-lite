@@ -213,6 +213,8 @@ export const InvoiceDetails = ({getCurrentPageTitle}: Props) => {
         sortedChecklistComponents,
         checklistImagesDownloadUrl,
       }}
+      isLoadingHeaderUrl={isLoadingHeaderUrl}
+      isLoadingFooterUrl={isLoadingFooterUrl}
     />
   ) : (
     <EmptySection label="Sorry, we couldn't find the invoice." />

@@ -155,6 +155,8 @@ interface Props {
       [key: string]: string;
     };
   };
+  isLoadingHeaderUrl?: boolean;
+  isLoadingFooterUrl?: boolean;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -178,6 +180,8 @@ export const ViewInvoice = ({
     sortedChecklistComponents,
     checklistImagesDownloadUrl,
   },
+  isLoadingHeaderUrl,
+  isLoadingFooterUrl,
 }: Props) => {
   const {t} = useTranslation();
   const {enqueueSnackbar} = useSnackbar();
@@ -884,18 +888,18 @@ export const ViewInvoice = ({
     let allFiles: FileWithPreview[] = [];
 
     // Base file operations
-    const baseFileOperations = getBaseFileOperations(invoiceData, {
+    const baseFileOperations = await getBaseFileOperations(invoiceData, {
       nextNumber,
       invoiceDownloadUrl,
     });
 
     // // Work report operations
-    const workReportOperations = getWorkReportOperations(
+    const workReportOperations = await getWorkReportOperations(
       invoiceData,
       workReportDownloadUrlArg,
     );
 
-    const xInvoiceOperation = getXInvoiceOperation(invoiceData);
+    const xInvoiceOperation = await getXInvoiceOperation(invoiceData);
 
     // Checklist operations
     const checklistOperations = invoiceData?.additionalInfo.includeCheckList
@@ -1643,7 +1647,9 @@ export const ViewInvoice = ({
           ...item,
           showBorder: filteredActions[filteredActions.length - 1] !== item,
         }))}
-        isValid
+        isValid={
+          !isLoadingDownloadUrl && !isLoadingHeaderUrl && !isLoadingFooterUrl
+        }
       />
 
       <SendEmailDialog

@@ -733,6 +733,13 @@ export const Actions = ({
   };
 
   const getChecklistData = async () => {
+    if (!invoice?.serviceOrder?.id)
+      return {
+        checklists: [],
+        selectedChecklist: undefined,
+        sortedChecklistComponents: [],
+      };
+
     const {data: checklists} = await refetchChecklists();
 
     const labels =
@@ -791,7 +798,7 @@ export const Actions = ({
     } = await getChecklistData();
 
     const checklistImagesDownloadUrl = await fetchDownloadUrlsUtil(
-      checklistImagesPath,
+      checklistImagesPath as string[],
       user?.userAccount.serviceCompany.id!,
     );
 
