@@ -77,7 +77,7 @@ export default class QuotationPage {
     cy.contains('Address not found. Please check and try again').should(
       'not.exist',
     );
-    cy.contains('33 Kehinde').first().click();
+    cy.contains('33 Kehinde Owolabi').first().click();
     cy.wait(300);
 
     cy.get('input[name="address.component.city"]').should(
