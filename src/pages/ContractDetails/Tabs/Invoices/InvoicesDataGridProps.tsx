@@ -8,55 +8,14 @@ import {
 import Typography from '@mui/material/Typography';
 import {StatusChip} from 'components/StatusChip';
 import {getColumnProps} from 'components/DataGridLayout';
-import {
-  InvoiceOrderField,
-  InvoiceStatus,
-  InvoiceStatusView,
-  InvoiceTypeMap,
-  InvoiceView,
-} from 'models/invoice';
+import {InvoiceOrderField, InvoiceTypeMap, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {FormatDate} from 'models/misc';
 import {toDate} from 'utils/datetime';
+import {getInvoiceStatusStyles} from 'utils/invoice';
 import {Actions} from './Actions';
 import {NotesIndicator} from './NotesIndicator';
 import {NavigateToDetails} from '../utils/utils';
-
-export const getInvoiceStatusStyles = (
-  status: string,
-): {
-  label: string;
-  color:
-    | 'default'
-    | 'primary'
-    | 'secondary'
-    | 'error'
-    | 'error.light'
-    | 'info'
-    | 'success'
-    | 'warning'
-    | 'warning.light'
-    | 'action.active'
-    | 'primary.mainLight'
-    | 'warning.dark';
-} => {
-  switch (status) {
-    case InvoiceStatus.PAID:
-      return {label: InvoiceStatusView.PAID, color: 'success'};
-    case InvoiceStatus.DRAFT:
-      return {label: InvoiceStatusView.DRAFT, color: 'action.active'};
-    case InvoiceStatus.EXPIRED:
-      return {label: InvoiceStatusView.EXPIRED, color: 'error.light'};
-    case InvoiceStatus.NOT_PAID:
-      return {label: InvoiceStatusView.NOT_PAID, color: 'primary.mainLight'};
-    case InvoiceStatus.PARTIALLY_PAID:
-      return {label: InvoiceStatusView.PARTIALLY_PAID, color: 'warning.light'};
-    case InvoiceStatus.CANCELLED:
-      return {label: InvoiceStatusView.CANCELLED, color: 'warning.dark'};
-    default:
-      return {label: '-', color: 'default'};
-  }
-};
 
 export const columns: GridColDef[] = [
   getColumnProps({
