@@ -96,23 +96,22 @@ const BillingAddress = ({
       <Grid container rowSpacing={3} columnSpacing={2}>
         <Grid size={{md: 6}}>
           <AddressAutoComplete
-            initialValue={
-              watch(`billingAddress.component.street`) ||
-              watch(`billingAddress.fullName`) ||
-              ''
-            }
+            initialValue={watch(`billingAddress.component.street`) || ''}
             initialAddress={
               watch(`billingAddress`) as AddressRecord | undefined
             }
-            inputError={errors?.billingAddress?.fullName?.message || ''}
+            inputError={
+              errors?.billingAddress?.component?.street?.message || ''
+            }
             textFieldProps={{
-              id: `billingAddress.fullName`,
+              id: `billingAddress.component.street`,
               placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
-              name: `billingAddress.fullName`,
+              name: `billingAddress.component.street`,
               label: 'Address line 1',
               required: true,
-              helperText: errors?.billingAddress?.fullName?.message || '',
-              error: !!errors?.billingAddress?.fullName,
+              helperText:
+                errors?.billingAddress?.component?.street?.message || '',
+              error: !!errors?.billingAddress?.component?.street,
             }}
             allowMap
             getAddress={handleAddressChange}
