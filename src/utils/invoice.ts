@@ -6,8 +6,8 @@ import {
   InvoiceActivityView,
   InvoiceAmountDetail,
   InvoiceFormData,
-  InvoiceItemView,
   InvoiceItemRecord,
+  InvoiceItemView,
   InvoicePaymentTermRecord,
   InvoiceStatus,
   InvoiceStatusView,
@@ -16,8 +16,8 @@ import {
   InvoiceView,
   MyInvoiceActivityView,
   Payment,
-  SearchParameters,
   PaymentType,
+  SearchParameters,
 } from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
@@ -26,6 +26,7 @@ import {Currency, PdfGenerationStatus, State} from 'models/misc';
 import {ArticleType} from 'models/article';
 import {ServiceOrderTypeRecord, ServiceOrderView} from 'models/service-order';
 import {
+  InvoiceFormat,
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
@@ -601,4 +602,48 @@ export const getBalanceAmount = (invoice: InvoiceView) => {
       .reduce((sum, p) => sum + p.amount.value!, 0) /
     10 ** invoice.totalAmount.fractionDigits!;
   return totalGross - paidSum;
+};
+
+export const getInvoiceStatusStyles = (
+  status: string,
+): {
+  label: string;
+  color:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'error'
+    | 'error.light'
+    | 'info'
+    | 'success'
+    | 'warning'
+    | 'warning.light'
+    | 'action.active'
+    | 'primary.mainLight'
+    | 'warning.dark';
+} => {
+  switch (status) {
+    case InvoiceStatus.PAID:
+      return {label: InvoiceStatusView.PAID, color: 'success'};
+    case InvoiceStatus.DRAFT:
+      return {label: InvoiceStatusView.DRAFT, color: 'action.active'};
+    case InvoiceStatus.EXPIRED:
+      return {label: InvoiceStatusView.EXPIRED, color: 'error.light'};
+    case InvoiceStatus.NOT_PAID:
+      return {label: InvoiceStatusView.NOT_PAID, color: 'primary.mainLight'};
+    case InvoiceStatus.PARTIALLY_PAID:
+      return {label: InvoiceStatusView.PARTIALLY_PAID, color: 'warning.light'};
+    case InvoiceStatus.CANCELLED:
+      return {label: InvoiceStatusView.CANCELLED, color: 'warning.dark'};
+    default:
+      return {label: '-', color: 'default'};
+  }
+};
+
+export const isXMLNeeded = (invoice: InvoiceView) => {
+  const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
+  return (
+    invoiceFormat === InvoiceFormat.PDF_AND_XML ||
+    invoiceFormat === InvoiceFormat.XML
+  );
 };

@@ -1,5 +1,5 @@
 import {useTranslation} from 'react-i18next';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {GridRowsProp} from '@mui/x-data-grid';
 import {DataGridLayout} from 'components/DataGridLayout';
 import Typography from '@mui/material/Typography';
@@ -20,15 +20,15 @@ import {InvoiceStatus, InvoiceType} from 'models/invoice';
 import {calculateGrossInvoiceTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import {getServiceOrderPaymentStatusStyles} from 'utils/service-order-utils';
 import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
-  CLIENT_STORAGE_PDF_TEMPLATE_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
+import XMLViewer from 'react-xml-viewer';
+import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPreparation';
 import CreateNewInvoiceModal from './CreateNewInvoiceModal';
 import {columns, makeRows} from './InvoicesDataGridProps';
 
@@ -45,12 +45,15 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
   const formatDate = useFormatDate();
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [xmlHtmlContent, setXmlHtmlContent] = useState(''); // to insure that the xml container element will not disappear when entry is update on print
   const memorizedRows = useMemo(
     () => rows.filter((item) => item.status !== InvoiceStatus.CANCELLED),
     [rows],
   );
 
   let totalInvoiceRef = useRef(0).current;
+
+  const {fetchInvoiceInfo} = useInvoiceDownloadPreparation(); // make fetching info singleton to remove multiple calls
 
   const paymentStatusStyles = getServiceOrderPaymentStatusStyles(
     paymentStatus!,
@@ -88,34 +91,6 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
         ? JSON.parse(clientStorageDataPdfConfig.value)
         : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
     [clientStorageDataPdfConfig?.value],
-  );
-
-  const {
-    data: clientStorageDataTemplate,
-    isLoading: isLoadingClientStorageDataTemplate,
-  } = useQueryClientStorageData({
-    serviceCompanyId: user?.userAccount.serviceCompany.id!,
-    params: {key: CLIENT_STORAGE_PDF_TEMPLATE_KEY},
-  });
-
-  const {headerInfo, footerInfo} = useMemo(() => {
-    const parsedData = JSON.parse(clientStorageDataTemplate?.value || '{}');
-    return {
-      headerInfo: parsedData.header,
-      footerInfo: parsedData.footer,
-    };
-  }, [clientStorageDataTemplate?.value]);
-
-  const {data: headerUrl = {}, isLoading: isHeaderUrlLoading} = useDownloadUrl(
-    headerInfo?.path ? [headerInfo?.path] : [],
-    undefined,
-    user?.userAccount.serviceCompany.id,
-  );
-
-  const {data: footerUrl = {}, isLoading: isFooterUrlLoading} = useDownloadUrl(
-    footerInfo?.path ? [footerInfo?.path] : [],
-    undefined,
-    user?.userAccount.serviceCompany.id,
   );
 
   const invoiceTypesToShow = useMemo(() => {
@@ -185,14 +160,7 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
     </Box>
   );
 
-  if (
-    isIdle ||
-    isLoading ||
-    isHeaderUrlLoading ||
-    isFooterUrlLoading ||
-    isLoadingClientStorageDataPdfConfig ||
-    isLoadingClientStorageDataTemplate
-  ) {
+  if (isIdle || isLoading || isLoadingClientStorageDataPdfConfig) {
     return <Progress />;
   }
 
@@ -247,13 +215,11 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
             70,
           )}
           columns={columns(
-            headerInfo,
-            footerInfo,
-            headerUrl,
-            footerUrl,
             companyNextNumber,
             refetchCompanyNextNumber,
             pdfConfig,
+            setXmlHtmlContent,
+            fetchInvoiceInfo,
           )}
           fullHeight={false}
           containerStyle={{
@@ -270,6 +236,14 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
         orderId={serviceOrderId}
         invoiceTypesToShow={invoiceTypesToShow}
       />
+      {/* Hidden container for XML content to be printed */}
+      <div id="xml-content">
+        <XMLViewer
+          indentSize={4}
+          theme={{fontFamily: 'Montserrat'}}
+          xml={xmlHtmlContent}
+        />
+      </div>
     </InfoCard>
   );
 };

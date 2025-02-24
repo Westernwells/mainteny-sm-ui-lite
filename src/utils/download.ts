@@ -57,3 +57,53 @@ export const downloadExcel = ({
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 };
+
+type DownloadFileWithCustomNameProps = {
+  downloadUrl: string;
+  fileName?: string | undefined | number;
+  extension?: 'pdf' | 'xml';
+};
+
+/**
+ * Asynchronous function to download file from given source
+ *
+ * @param {string} fileName - The file name.
+ * @param {string} downloadUrl - The URL to download the file from.
+ * @param {string} [extension='pdf'] - The file extension (default is 'pdf')
+ */
+export const downloadFile = async ({
+  fileName,
+  downloadUrl,
+  extension,
+}: DownloadFileWithCustomNameProps) => {
+  const fileExtension = extension || 'pdf';
+  let finalFileName = fileName || 'Unassigned';
+  try {
+    const response = await fetch(downloadUrl);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+
+    // Set the file name
+    const date = new Date();
+    const formattedDate = `${date.getFullYear().toString().substr(-2)}${(
+      date.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+
+    const ext = fileExtension;
+
+    finalFileName = fileName
+      ? `${fileName}_${formattedDate}.${ext}`
+      : `Unassigned_${formattedDate}.${ext}`;
+
+    link.download = finalFileName;
+
+    link.target = '_blank';
+    link.click();
+  } catch (error) {
+    console.error('Failed to download file:', error);
+  }
+};

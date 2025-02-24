@@ -5,11 +5,7 @@ import {getColumnProps} from 'components/DataGridLayout';
 import {InvoiceStatus, InvoiceView} from 'models/invoice';
 import {formatCurrency} from 'utils/currency';
 import {toDate} from 'utils/datetime';
-import {
-  FormatDate,
-  HeaderFooterInfoData,
-  StringValueResponse,
-} from 'models/misc';
+import {FormatDate, StringValueResponse} from 'models/misc';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {Actions} from 'pages/Invoices/Actions';
 import i18next from 'i18next';
@@ -51,19 +47,20 @@ export const getInvoiceStatusStyles = (
 };
 
 export const columns = (
-  headerInfo: HeaderFooterInfoData,
-  footerInfo: HeaderFooterInfoData,
-  headerUrl: {
-    [key: string]: string;
-  },
-  footerUrl: {
-    [key: string]: string;
-  },
   companyNextNumber: StringValueResponse | undefined,
   refetchCompanyNextNumber: () => Promise<
     QueryObserverResult<StringValueResponse>
   >,
   pdfConfig: ClientReportForPDFConfig,
+  onXmlHtmlContentChange: (value: string) => void,
+  onFetchInvoiceInfo: () => Promise<{
+    headerUrl: {[p: string]: string};
+    headerInfo: any;
+    isHeaderUrlLoading: boolean;
+    footerUrl: {[p: string]: string};
+    footerInfo: any;
+    isFooterUrlLoading: boolean;
+  }>,
 ): GridColDef[] => [
   getColumnProps({
     field: 'date',
@@ -126,13 +123,11 @@ export const columns = (
     renderCell: (params) => (
       <Actions
         invoice={params.row.invoice}
-        headerInfo={headerInfo}
-        footerInfo={footerInfo}
-        headerUrl={headerUrl}
-        footerUrl={footerUrl}
         companyNextNumber={companyNextNumber}
-        refetchCompanyNextNumber={refetchCompanyNextNumber}
         pdfConfig={pdfConfig}
+        refetchCompanyNextNumber={refetchCompanyNextNumber}
+        onXmlHtmlContentChange={onXmlHtmlContentChange}
+        onFetchInvoiceInfo={onFetchInvoiceInfo}
       />
     ),
     flex: 1,

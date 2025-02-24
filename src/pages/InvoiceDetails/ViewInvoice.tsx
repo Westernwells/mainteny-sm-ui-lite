@@ -29,7 +29,6 @@ import {
   InvoiceTypeMap,
   InvoiceView,
 } from 'models/invoice';
-import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {
   HeaderFooterInfoData,
   PdfGenerationStatus,
@@ -127,6 +126,7 @@ import {FileResourceRecord} from 'models/media';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {CANCEL_ACTION} from 'models/status';
 import {useVats} from 'hooks/reactQuery/useVats';
+import {getInvoiceStatusStyles} from 'utils/invoice';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
