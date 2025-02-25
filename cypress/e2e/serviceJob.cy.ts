@@ -4,10 +4,12 @@ import OrderPage from '../pages/orders.page';
 
 const technicianApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/employees?*`;
 const serviceOrdersApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceOrders*`;
+const imageDownloadUrlsApi = `${Cypress.env().REACT_APP_API_URL}/api/media/signedUrl/download*`;
 
 const interceptRequests = () => {
     cy.intercept('GET', serviceOrdersApi).as('serviceOrdersApi');
     cy.intercept('GET', technicianApi).as('technicianApi');
+    cy.intercept('GET', imageDownloadUrlsApi).as('imageDownloadUrlsApi');
 };
 
 const setupTest = () => {
@@ -111,6 +113,51 @@ describe('Service Job Tests', () => {
                 } else {
                     cy.get('tbody').children().should('not.exist');
                     throw new Error('No Unscheduled jobs found');
+                }
+            });
+    });
+
+    it('should download work report', () => {
+        ServiceJobPage.changeTab(0);
+        OrderPage.changeStatusFilter('Completed');
+
+        cy.wait('@serviceOrdersApi')
+            .its('response.body.data')
+            .then((serviceOrders) => {
+                if (serviceOrders.length) {
+                    ServiceJobPage.getFirstTableElement().should('exist').click();
+                    ServiceJobPage.changeTab(1);
+
+                    cy.get('body').then(($body) => {
+                        if ($body.find('[data-testid="report-images"] div div img').length) {
+                            cy.wait('@imageDownloadUrlsApi').its('response.statusCode').should('eq', 200);
+
+                            cy.get('[data-testid="report-images"] div div img').should('have.length.at.least', 1).and('be.visible');
+                        }
+                    });
+
+                    const downloadsFolder = Cypress.config('downloadsFolder');
+
+                    // Delete existing files before download
+                    cy.task('deleteFilesStartingWith', {folder: downloadsFolder, prefix: 'WR'});
+
+                    // Click download button
+                    cy.contains('button', 'Download', {timeout: 5000}).should('not.be.disabled').click();
+
+                    // Wait for file download
+                    cy.task('findFileStartingWith', {folder: downloadsFolder, prefix: 'WR'}, {timeout: 15000}).then((filePath) => {
+                        // Ensure filePath is a string before using it
+                        if (typeof filePath !== 'string') {
+                            throw new Error('No downloaded file found with prefix "WR"');
+                        }
+
+                        cy.log(`Found downloaded file: ${filePath}`);
+
+                        cy.readFile(filePath).should('exist');
+                    });
+                } else {
+                    cy.get('tbody').children().should('not.exist');
+                    throw new Error('No completed jobs found');
                 }
             });
     });

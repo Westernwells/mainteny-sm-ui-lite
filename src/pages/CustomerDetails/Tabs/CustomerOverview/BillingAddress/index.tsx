@@ -40,6 +40,23 @@ const BillingAddress = ({
     [],
   );
 
+  const handleAddressChange = (componentAddress: AddressRecord | undefined) => {
+    const currentValues = watch('billingAddress');
+
+    setValue('billingAddress', {
+      ...componentAddress,
+      component: {
+        ...componentAddress?.component,
+        // to not overwrite name fields
+        name: currentValues?.component?.name,
+        name2: currentValues?.component?.name2,
+        name3: currentValues?.component?.name3,
+      },
+      id: currentValues?.id!,
+      fullName: componentAddress?.fullName || '',
+    });
+  };
+
   useEffect(() => {
     if (watchName) {
       setValue(`billingAddress.component.name`, watchName);
@@ -79,34 +96,25 @@ const BillingAddress = ({
       <Grid container rowSpacing={3} columnSpacing={2}>
         <Grid size={{md: 6}}>
           <AddressAutoComplete
-            initialValue={
-              watch(`billingAddress.component.street`) ||
-              watch(`billingAddress.fullName`) ||
-              ''
-            }
+            initialValue={watch(`billingAddress.component.street`) || ''}
             initialAddress={
               watch(`billingAddress`) as AddressRecord | undefined
             }
-            inputError={errors?.billingAddress?.fullName?.message || ''}
+            inputError={
+              errors?.billingAddress?.component?.street?.message || ''
+            }
             textFieldProps={{
-              id: `billingAddress.fullName`,
+              id: `billingAddress.component.street`,
               placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
-              name: `billingAddress.fullName`,
+              name: `billingAddress.component.street`,
               label: 'Address line 1',
               required: true,
-              helperText: errors?.billingAddress?.fullName?.message || '',
-              error: !!errors?.billingAddress?.fullName,
+              helperText:
+                errors?.billingAddress?.component?.street?.message || '',
+              error: !!errors?.billingAddress?.component?.street,
             }}
             allowMap
-            getAddress={(componentAddress) => {
-              const currentValues = watch('billingAddress');
-
-              setValue('billingAddress', {
-                ...componentAddress,
-                id: currentValues?.id!,
-                fullName: componentAddress?.fullName || '',
-              });
-            }}
+            getAddress={handleAddressChange}
             shortAddress
           />
         </Grid>

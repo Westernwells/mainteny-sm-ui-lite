@@ -108,7 +108,7 @@ import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
-import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
+import {getInvoiceStatusStyles} from 'utils/invoice';
 import {StatusChip} from 'components/StatusChip';
 import {EditFrom} from './EditFrom';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
