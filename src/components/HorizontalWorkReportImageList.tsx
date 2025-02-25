@@ -37,7 +37,11 @@ export const HorizontalWorkReportImageList = ({
   if (!pictures.length && !isEditing) return null;
 
   return (
-    <Box display="flex" flexWrap="nowrap" sx={{overflowX: 'auto', mb: 2}}>
+    <Box
+      display="flex"
+      flexWrap="nowrap"
+      sx={{overflowX: 'auto', mb: 2}}
+      data-testid="report-images">
       {pictures.map((picture, i) => (
         <Grid display="flex" flexDirection="column" width="fit-content">
           <Image
@@ -53,6 +57,7 @@ export const HorizontalWorkReportImageList = ({
             isEditing={isEditing}
             key={picture.uri === 'loading' ? i : picture.uri}
             data={picture}
+            data-testid="report-pictures"
           />
 
           <Typography
