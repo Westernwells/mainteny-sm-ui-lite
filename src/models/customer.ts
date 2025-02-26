@@ -2,6 +2,7 @@ import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {Address, AddressRecord, Priority} from './misc';
 import {InvoiceFormat} from './propertyManager';
 import {ContactsView} from './contacts';
+import {UserAccountView} from 'models/user';
 
 export interface CreateCustomerNote {
   content: string;
@@ -45,7 +46,7 @@ export interface CustomerPortalTableRow {
   contactResourceData: ContactsView;
   id: string;
   customerId: string;
-  name: string;
+  userAccount: UserAccountView;
   emailAddress: string;
   role: string[];
   access: string;

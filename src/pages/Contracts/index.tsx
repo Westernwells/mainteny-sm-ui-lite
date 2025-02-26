@@ -79,6 +79,7 @@ import PropertyInput from 'components/Inputs/PropertyInput';
 import {PropertyType} from 'models/valueProperty';
 import MonthInput from 'components/Inputs/MonthInput';
 import TableCellTextWithTooltip from 'components/Table/TableCellTextWithTooltip';
+import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
 
 const pageSize = 25;
 
@@ -304,7 +305,9 @@ export const Contracts = () => {
                 color: theme.palette.primary.light,
               }}
               key={`company-avatar-${contract.propertyOwner.id}`}
-              userAccount={{firstName: contract.propertyOwner?.name || '-'}}
+              userAccount={convertPropertyOwnerObjectToAvatar(
+                contract.propertyOwner,
+              )}
             />
           </Cell>
         ),
