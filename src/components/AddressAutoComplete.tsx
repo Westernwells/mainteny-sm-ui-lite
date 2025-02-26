@@ -122,6 +122,18 @@ export const AddressAutoComplete = ({
     setIsMapOpen(false);
   };
 
+  const initialAddressForMap = (() => {
+    const addressObj = address || initialAddress;
+    return {
+      ...addressObj,
+      location:
+        addressObj?.location?.latitude === 0 &&
+        addressObj?.location?.longitude === 0
+          ? null
+          : addressObj?.location || null,
+    };
+  })();
+
   return (
     <>
       <AddressAutocomplete
@@ -205,7 +217,7 @@ export const AddressAutoComplete = ({
       <MapLocationPicker
         isOpen={isMapOpen}
         onSave={onLocationSave}
-        initialAddress={address || initialAddress}
+        initialAddress={initialAddressForMap}
         onClose={() => {
           setIsMapOpen(false);
         }}
