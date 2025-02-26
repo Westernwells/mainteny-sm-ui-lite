@@ -24,6 +24,7 @@ import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useTranslation} from 'react-i18next';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {companyLanguageContextMap} from 'utils/language';
+import {CUSTOMER_ALL_INVOICE_FORMATS} from 'utils/constants';
 import {EditFinanceInformation} from './EditFinanceInformation';
 
 type Props = {
@@ -145,6 +146,10 @@ const FinanceWidget = ({customer}: Props) => {
     });
   };
 
+  const invoiceFormat = CUSTOMER_ALL_INVOICE_FORMATS.find(
+    (format) => format.value === customer.additionalInfo.invoiceFormat,
+  );
+
   return (
     <>
       <Card
@@ -212,7 +217,7 @@ const FinanceWidget = ({customer}: Props) => {
 
           <CardDataListItem
             label="Invoice format"
-            value={customer.additionalInfo.invoiceFormat || '-'}
+            value={invoiceFormat?.label ? t(invoiceFormat?.label) : '-'}
             Icon={DocumentScannerOutlined}
           />
 
