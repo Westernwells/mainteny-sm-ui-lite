@@ -41,6 +41,8 @@ const BillingAddress = ({
   );
 
   const handleAddressChange = (componentAddress: AddressRecord | undefined) => {
+    if (!componentAddress) return;
+
     const currentValues = watch('billingAddress');
 
     setValue('billingAddress', {
@@ -97,9 +99,7 @@ const BillingAddress = ({
         <Grid size={{md: 6}}>
           <AddressAutoComplete
             initialValue={watch(`billingAddress.component.street`) || ''}
-            initialAddress={
-              watch(`billingAddress`) as AddressRecord | undefined
-            }
+            initialAddress={watch(`billingAddress`) || undefined}
             inputError={
               errors?.billingAddress?.component?.street?.message || ''
             }

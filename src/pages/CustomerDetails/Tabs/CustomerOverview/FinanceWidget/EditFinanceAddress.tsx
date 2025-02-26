@@ -63,21 +63,19 @@ export const EditFinanceAddress = ({
       </Grid>
       <Grid size={{md: 6}}>
         <AddressAutoComplete
-          initialValue={
-            watch(`${address}.component.street`) ||
-            watch(`${address}.fullName`) ||
-            ''
-          }
+          initialValue={watch(`${address}.component.street`) || ''}
           initialAddress={watch(`${address}`) as AddressRecord | undefined}
           inputError={errors?.[address]?.fullName?.message || ''}
           textFieldProps={{
-            id: `${address}.fullName`,
+            id: `${address}.component.street`,
             placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
-            name: `${address}.fullName`,
+            name: `${address}.component.street`,
             label: 'Address line 1',
           }}
           allowMap
           getAddress={(componentAddress) => {
+            if (!componentAddress) return;
+
             const currentValues = watch(address);
             setValue(address, {
               ...componentAddress,
