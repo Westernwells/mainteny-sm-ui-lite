@@ -187,9 +187,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
     {enabled: shouldFetchImages},
   );
 
-  const isReportDisabled =
-    report?.additionalInfo.status !== ReportStatus.COMPLETED;
-
   const [actionType, setActionType] = useState('');
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
 
@@ -886,7 +883,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'outlined',
-              disabled: isImageLoading || isReportDisabled,
+              disabled: isImageLoading,
               sx: {
                 background: 'transparent',
               },
@@ -899,7 +896,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
             buttonProps={{
               size: 'large',
               variant: 'contained',
-              disabled: isImageLoading || isReportDisabled,
+              disabled: isImageLoading,
               startIcon: <SendIcon />,
               onClick: handleOpenSendEmail,
             }}>
