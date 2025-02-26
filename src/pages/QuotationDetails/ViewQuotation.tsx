@@ -347,15 +347,7 @@ export const ViewQuotation = ({
   };
 
   const handleDownload = async () => {
-    setIsLoadingFiles(true);
-    // using then to wait for refetch and get download url
-    try {
-      await refetchDownloadUrl().then(async (res) => {
-        await getExistingFiles(res.data);
-      });
-    } finally {
-      setIsLoadingFiles(false);
-    }
+    downloadFile();
   };
 
   const shouldShowDownloadAsPrimaryAction = [
@@ -365,7 +357,7 @@ export const ViewQuotation = ({
 
   const {actions} = useQuotationMenuActions({
     quotation,
-    onDownload: !shouldShowDownloadAsPrimaryAction ? downloadFile : undefined,
+    onDownload: !shouldShowDownloadAsPrimaryAction ? handleDownload : undefined,
     onDelete: () => setIsDeleteDialogOpen(true),
     onResend: handleOpenSendEmail,
     onMarkAccepted: () => setIsDialogOpen(true),
@@ -376,14 +368,17 @@ export const ViewQuotation = ({
   const {
     bottomDrawerPrimaryLabel,
     bottomDrawerPrimaryAction,
+    disabled: disablePrimaryAction,
   }: {
     bottomDrawerPrimaryLabel: string;
     bottomDrawerPrimaryAction?: () => void;
+    disabled?: boolean;
   } = useMemo(() => {
     if (shouldShowDownloadAsPrimaryAction)
       return {
         bottomDrawerPrimaryLabel: 'Download',
         bottomDrawerPrimaryAction: handleDownload,
+        disabled: !filePathToDownload,
       };
     if (quotation.status === QuotationStatus.DRAFT)
       return {
@@ -394,7 +389,7 @@ export const ViewQuotation = ({
       bottomDrawerPrimaryLabel: 'Mark Accepted',
       bottomDrawerPrimaryAction: () => setIsDialogOpen(true),
     };
-  }, [quotation]);
+  }, [quotation, filePathToDownload]);
 
   return (
     <Box>
@@ -430,7 +425,7 @@ export const ViewQuotation = ({
                     sx: {
                       background: 'transparent',
                     },
-                    onClick: () => downloadFile(),
+                    onClick: handleDownload,
                     disabled: !filePathToDownload,
                     startIcon: <FileDownloadIcon />,
                   }}
@@ -445,7 +440,10 @@ export const ViewQuotation = ({
             contentContainerStyles={{display: 'flex', gap: '1.5em'}}>
             <Box>
               <FormLabel text="Quotation Number" sx={{color: 'text.main'}} />
-              <Typography variant="subtitle1" fontWeight="600">
+              <Typography
+                data-testid="quotation-number"
+                variant="subtitle1"
+                fontWeight="600">
                 {quotation.externalId || t('Unassigned')}
               </Typography>
             </Box>
@@ -756,7 +754,7 @@ export const ViewQuotation = ({
         primaryButtonLabel={bottomDrawerPrimaryLabel}
         primaryButtonAction={bottomDrawerPrimaryAction}
         listItems={actions}
-        isValid
+        isValid={!disablePrimaryAction}
       />
       <SendEmailDialog
         open={isSendEmailDialogOpen}
