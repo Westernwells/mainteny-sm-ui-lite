@@ -147,13 +147,14 @@ const CustomerPortalWidget = ({customerId, customerPortalEnabled}: Props) => {
             {...cellProps}
             onClick={handleRowClick(customerPortal.contactResourceData)}>
             <Avatar
+              onlyFirstInitial
               labelStyles={{
                 color: isWidgetActive
                   ? theme.palette.primary.light
                   : theme.palette.text.disabled,
               }}
               key={`company-avatar-${customerPortal.customerId}`}
-              userAccount={{firstName: customerPortal.name}}
+              userAccount={customerPortal.userAccount}
             />
           </Cell>
         ),

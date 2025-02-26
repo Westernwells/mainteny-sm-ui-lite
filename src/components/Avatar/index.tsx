@@ -10,16 +10,16 @@ import {getUserFullName} from 'utils/utils';
 import {useMemo} from 'react';
 import {getInitials} from 'utils/account-utils';
 import useTheme from '@mui/material/styles/useTheme';
+import {AvatarView} from 'models/avatar';
 
 interface Props {
-  userAccount: {
-    firstName?: string;
-    lastName?: string;
-    photoUrl?: string;
-  };
+  userAccount: AvatarView;
   sx?: SxProps<Theme>;
   labelStyles?: SxProps<Theme>;
   removeNameText?: boolean;
+  /**
+   * Show only one initial depending on if first name is present fallback last name
+   */
   onlyFirstInitial?: boolean;
   key?: string;
 }
@@ -61,7 +61,7 @@ export const Avatar = ({
         </Typography>
       ),
     };
-  }, [userAccount]);
+  }, [userAccount, url]);
 
   return (
     <Box sx={{width: '100%'}} display="flex" alignItems="center" gap={1}>

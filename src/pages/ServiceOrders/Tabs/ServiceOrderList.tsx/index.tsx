@@ -103,6 +103,7 @@ import {
   filterOutQuickFilterOptions,
 } from 'utils/filter';
 import TableCellTextWithTooltip from 'components/Table/TableCellTextWithTooltip';
+import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
 import Actions from './Actions';
 
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] =
@@ -672,7 +673,9 @@ export const ServiceOrderList = ({menu}: Props) => {
                 color: theme.palette.primary.light,
               }}
               key={`company-avatar-${serviceOrder.id}`}
-              userAccount={{firstName: serviceOrder.propertyOwner.name}}
+              userAccount={convertPropertyOwnerObjectToAvatar(
+                serviceOrder.propertyOwner,
+              )}
             />
           </Cell>
         ),

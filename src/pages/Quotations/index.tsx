@@ -81,6 +81,7 @@ import {
 } from 'utils/filter';
 import {convertNumberToAmountNumber, useCurrentCurrency} from 'utils/currency';
 import NoteIcon from 'components/NoteIcon';
+import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
 
 const pageSize = 25;
 
@@ -313,7 +314,9 @@ export const Quotations = () => {
                 color: theme.palette.primary.light,
               }}
               key={`company-avatar-${quotation.propertyOwner.id}`}
-              userAccount={{firstName: quotation.propertyOwner?.name || '-'}}
+              userAccount={convertPropertyOwnerObjectToAvatar(
+                quotation.propertyOwner,
+              )}
             />
           </Cell>
         ),

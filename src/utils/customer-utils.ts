@@ -87,7 +87,7 @@ export const aggregateCustomerPortalRow = (
     contactResourceData: contactResource,
     id: contactResource.id,
     customerId: contactResource.userAccount.id,
-    name: `${contactResource.userAccount.firstName} ${contactResource.userAccount.lastName}`,
+    userAccount: contactResource.userAccount,
     emailAddress: contactResource.userAccount.contact.email || '-',
     role: contactResource.userAccount.roles.map((role) => convertToText(role)),
     access: contactResource.userAccount.status,
