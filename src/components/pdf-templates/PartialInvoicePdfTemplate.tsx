@@ -299,8 +299,8 @@ const PartialInvoicePdfTemplate = ({
   return (
     <Document>
       {invoice?.additionalInfo.alternativeAddress &&
-        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !==
-          0 && (
+        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
+        !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
             userInfo={userInfo}
             selectedLng={selectedLng}
@@ -357,22 +357,23 @@ const PartialInvoicePdfTemplate = ({
               />
             )}
 
-            {invoice?.additionalInfo.showArticleSection && (
-              <ArticleSection
-                invoice={invoice}
-                currentCurrency={currentCurrency}
-                translate={translate}
-                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
-                  articleItems,
-                )}
-                discountValue={discountValue}
-                subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
-                percentageVats={vats}
-                total={amountAfterGlobalDiscountWithVAT}
-                selectedLng={selectedLng}
-                netTotal={netTotal}
-              />
-            )}
+            {invoice?.additionalInfo.showArticleSection &&
+              invoice.items.length > 0 && (
+                <ArticleSection
+                  invoice={invoice}
+                  currentCurrency={currentCurrency}
+                  translate={translate}
+                  allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
+                    articleItems,
+                  )}
+                  discountValue={discountValue}
+                  subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
+                  percentageVats={vats}
+                  total={amountAfterGlobalDiscountWithVAT}
+                  selectedLng={selectedLng}
+                  netTotal={netTotal}
+                />
+              )}
 
             {isPartialInvoice && (
               <PdfPartialPaymentSection

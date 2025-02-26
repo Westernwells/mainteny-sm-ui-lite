@@ -307,7 +307,6 @@ const PdfPerItemSection = ({
                       })
                   : [],
             );
-
             return <View>{currentInvoiceItems}</View>;
           })()}
       </View>

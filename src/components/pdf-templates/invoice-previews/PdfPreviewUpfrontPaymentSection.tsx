@@ -33,9 +33,9 @@ import MontserratRegular from '../../../assets/fonts/Montserrat/Montserrat-Regul
 import MontserratBold from '../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
-import PdfPerItemSection from '../PdfPerItemSection';
 import PdfPaymentHistorySection from '../PdfPaymentHistorySection';
 import PdfPreviewInvoicedSection from './PdfPreviewInvoicedSection';
+import PdfPreviewPerItemSection from './PdfPreviewPerItemSection';
 
 type PartialProps = {
   translate: (key: string) => string;
@@ -291,7 +291,7 @@ const PdfPreviewUpfrontPaymentSection = ({
     <View>
       {invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM &&
         previousInvoices.length && (
-          <PdfPerItemSection
+          <PdfPreviewPerItemSection
             translate={translate}
             selectedLng={selectedLng}
             currentCurrency={currentCurrency}
@@ -507,7 +507,7 @@ const PdfPreviewUpfrontPaymentSection = ({
                   fontSize: 10,
                   textAlign: 'right',
                 }}>
-                {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
+                {translate('VAT')} {percentageVats[0]?.percentageVat ?? 0}%
               </Text>
               <Text
                 style={{

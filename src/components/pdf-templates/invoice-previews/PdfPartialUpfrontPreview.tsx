@@ -1,7 +1,7 @@
 import {useMemo} from 'react';
 import {Document, Font, StyleSheet, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import {centsToMoney, formatCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, moneyToCents} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
@@ -223,9 +223,27 @@ const PdfPartialUpfrontPreview = ({
         firstInvoiceType === InvoiceType.UPFRONT &&
         isFinalInvoice));
 
-  const articleItems = invoice?.items.map((item) => ({
+  const articleItems = invoice?.items.map((item, index) => ({
     ...item,
-    discount: getDiscoutObj(item?.additionalInfo?.discount),
+    additionalInfo: {
+      discount: getDiscoutObj(invoiceAmountDetail?.items[index]?.discount),
+      payment: {
+        ...invoiceAmountDetail?.items[index]?.payment,
+        type: invoiceAmountDetail?.items[index]?.payment.type!,
+        amount: {
+          ...invoiceAmountDetail?.items[index]?.payment.amount,
+          netAmount: moneyToCents(
+            currentCurrency?.code!,
+            invoiceAmountDetail?.items[index]?.payment.amount?.netAmount,
+          ),
+          currency:
+            invoiceAmountDetail?.items[index]?.payment.amount?.currency ||
+            currentCurrency?.code!,
+          vats: invoiceAmountDetail?.items[index]?.payment.amount?.vats || [],
+        },
+      },
+    },
+    discount: getDiscoutObj(invoiceAmountDetail?.items[index]?.discount),
   }))!;
 
   const netTotal = (articleItem: InvoiceItemView) => {
@@ -311,8 +329,8 @@ const PdfPartialUpfrontPreview = ({
   return (
     <Document>
       {invoice?.additionalInfo.alternativeAddress &&
-        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !==
-          0 && (
+        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
+        !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
             userInfo={userInfo}
             selectedLng={selectedLng}
@@ -369,22 +387,23 @@ const PdfPartialUpfrontPreview = ({
               />
             )}
 
-            {invoice?.additionalInfo.showArticleSection && (
-              <ArticleSection
-                invoice={invoice}
-                currentCurrency={currentCurrency}
-                translate={translate}
-                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
-                  articleItems,
-                )}
-                discountValue={discountValue}
-                subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
-                percentageVats={vats}
-                total={amountAfterGlobalDiscountWithVAT}
-                selectedLng={selectedLng}
-                netTotal={netTotal}
-              />
-            )}
+            {invoice?.additionalInfo.showArticleSection &&
+              invoice.items.length > 0 && (
+                <ArticleSection
+                  invoice={invoice}
+                  currentCurrency={currentCurrency}
+                  translate={translate}
+                  allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
+                    articleItems,
+                  )}
+                  discountValue={discountValue}
+                  subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
+                  percentageVats={vats}
+                  total={amountAfterGlobalDiscountWithVAT}
+                  selectedLng={selectedLng}
+                  netTotal={netTotal}
+                />
+              )}
 
             {isPartialInvoice && (
               <PdfPreviewPartialPaymentSection

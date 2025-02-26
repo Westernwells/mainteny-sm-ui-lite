@@ -30,12 +30,12 @@ import {
 import {HtmlPDF} from 'components/HtmlPDF';
 import {useMemo} from 'react';
 import PdfPaymentHistorySection from '../PdfPaymentHistorySection';
-import PdfPerItemSection from '../PdfPerItemSection';
 import MontserratRegular from '../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import NotoSansGeorgianRegular from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import NotoSansGeorgianBold from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import PdfPreviewInvoicedSection from './PdfPreviewInvoicedSection';
+import PdfPreviewPerItemSection from './PdfPreviewPerItemSection';
 
 type PartialProps = {
   translate: (key: string) => string;
@@ -321,12 +321,12 @@ export const PdfPreviewPartialPaymentSection = ({
   return (
     <View>
       {invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM && (
-        <PdfPerItemSection
+        <PdfPreviewPerItemSection
           translate={translate}
           selectedLng={selectedLng}
           currentCurrency={currentCurrency}
           invoice={invoice}
-          previousInvoices={previousInvoices}
+          previousInvoices={invoicesToRender}
         />
       )}
 
@@ -539,7 +539,7 @@ export const PdfPreviewPartialPaymentSection = ({
                   fontSize: 10,
                   textAlign: 'right',
                 }}>
-                {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
+                {translate('VAT')} {percentageVats[0]?.percentageVat ?? 0}%
               </Text>
               <Text
                 style={{
