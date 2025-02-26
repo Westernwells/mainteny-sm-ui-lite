@@ -86,10 +86,14 @@ describe('Create Article', () => {
         ArticlesPageDetails.navigateToDetailsPage();
         cy.contains('button', 'Order Article').click();
 
+        cy.contains('Select Supplier').click();
+        cy.contains('Select Supplier');
+        cy.contains('SUP00002').click();
+
         cy.fillRichTextField('Description', 'Test Description');
 
         const supplierArticleNumber = getUniqueId();
-        cy.get('div[data-testid="supplier-article-number"]').type(supplierArticleNumber);
+        cy.get('div[data-testid="supplier-article-number"]').clear().type(supplierArticleNumber);
         const createArticleOrderAPI = `${Cypress.env().REACT_APP_API_URL}/api/articleOrders`;
         cy.intercept('POST', createArticleOrderAPI).as('createArticleOrderAPI');
         const articleOrderAPI = `${Cypress.env().REACT_APP_API_URL}/api/articleOrders/*`;

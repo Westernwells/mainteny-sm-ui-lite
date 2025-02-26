@@ -5,10 +5,9 @@ import QuotationsPage from '../pages/quotations.page';
 describe('Quotation Details', () => {
     beforeEach(() => {
         cy.login();
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
-
         AppTopBarPage.selectLanguage('English');
 
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
         QuotationPage.visit();
         cy.get('span[role="progressbar"]').should('not.exist');
     });

@@ -37,16 +37,17 @@ import {UserCompanyContext} from 'context/UserCompanyProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {
+  useCalculateInvoiceAmount,
   useCreateInvoice,
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
-  useInvoiceAmountDetail,
   useInvoices,
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
 import {
   CreateInvoice,
   InvoiceFormData,
+  InvoiceItemPaymentType,
   InvoiceItemRecord,
   InvoiceStatus,
   InvoiceType,
@@ -307,6 +308,10 @@ export const InvoiceForm = ({
     useCreateInvoice();
   const {mutateAsync: updateInvoiceAsync, isLoading: isUpdating} =
     useUpdateInvoice();
+  const {
+    mutateAsync: calculateInvoiceAmount,
+    isLoading: isCalculatingInvoiceAmount,
+  } = useCalculateInvoiceAmount();
 
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
 
@@ -345,9 +350,6 @@ export const InvoiceForm = ({
 
   const [qrImageSrc, setQrImageSrc] = useState<string>('');
   const [qrError, setQrError] = useState<string | null>(null);
-
-  const {data: invoiceAmountDetail, isLoading: isLoadingInvoiceAmountDetail} =
-    useInvoiceAmountDetail(invoice?.id);
 
   const {
     data: clientStorageDataPdfConfig,
@@ -1624,6 +1626,15 @@ export const InvoiceForm = ({
       formik.values?.type === InvoiceType.AGGREGATE
     );
 
+    const invoiceAmountDetail = await calculateInvoiceAmount({
+      data: {
+        currency: currentCurrency.code,
+        items: formik.values.items,
+        globalDiscount: formik.values.discount,
+        paymentRecord: formik.values.payment,
+      },
+    });
+
     const blob = await pdf(
       <PdfTemplate
         userInfo={user?.userAccount}
@@ -1795,6 +1806,41 @@ export const InvoiceForm = ({
       taxRates,
     });
     formik.setFieldValue('moreInfo', newNotes);
+  };
+
+  const handlePaymentTypeChange = (key: string) => {
+    if (key === PaymentType.LUMP_SUM) {
+      formik.setFieldValue('payment', {
+        type: PaymentType.LUMP_SUM,
+        amount: {
+          value: 0,
+          currency: currentCurrency.code,
+          fractionDigits: currentCurrency.fractionDigits,
+        },
+        percentage: undefined,
+        description: formik.values.payment?.description || '',
+      });
+    } else if (key === PaymentType.PERCENTAGE) {
+      formik.setFieldValue('payment', {
+        type: PaymentType.PERCENTAGE,
+        percentage: 0,
+        amount: undefined,
+        description: formik.values.payment?.description || '',
+      });
+    } else {
+      formik.setFieldValue('payment', {
+        ...formik.values.payment,
+        type: key,
+      });
+      const updatedItems = formik.values.items?.map((item) => ({
+        ...item,
+        payment: {
+          type: InvoiceItemPaymentType.PERCENTAGE,
+          percentage: 0,
+        },
+      }));
+      formik.setFieldValue('items', updatedItems);
+    }
   };
 
   const isEditAndNoCreator = !isNewInvoice && !invoice?.meta.creator;
@@ -2606,9 +2652,7 @@ export const InvoiceForm = ({
                         control={<Radio size="small" />}
                         label={T(value)}
                         componentsProps={{typography: {variant: 'body2'}}}
-                        onChange={() =>
-                          formik.setFieldValue('payment.type', key)
-                        }
+                        onChange={() => handlePaymentTypeChange(key)}
                         checked={formik.values.payment?.type === key}
                         disabled={
                           (!previousInvoices.filter(
@@ -2714,7 +2758,7 @@ export const InvoiceForm = ({
                 isLoadingFooterUrl ||
                 isLoadingClientStorageDataTemplate ||
                 isLoadingClientStorageDataPdfConfig ||
-                isLoadingInvoiceAmountDetail,
+                isCalculatingInvoiceAmount,
               sx: {
                 color: theme.palette.primary.dark,
                 padding: '0.3em 1.5em',

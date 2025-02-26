@@ -25,11 +25,13 @@ import {
   StringValue,
 } from 'models/misc';
 import {
+  CalculateInvoiceAmountRecord,
   CreateInvoice,
   CreateInvoiceComment,
   CreateInvoiceOverdueNoticeRecord,
   FetchXInvoiceByInvoiceIdParams,
   InvoiceActivityView,
+  InvoiceAmountDetail,
   InvoiceFilters,
   InvoicePaymentRecord,
   InvoiceStatistics,
@@ -889,3 +891,16 @@ export function useAllInvoices(
     },
   });
 }
+
+export const postInvoiceAmount = async (body: CalculateInvoiceAmountRecord) => {
+  const {data} = await axiosClient.post<InvoiceAmountDetail>(
+    '/api/invoices/amount',
+    body,
+  );
+  return data;
+};
+
+export const useCalculateInvoiceAmount = () =>
+  useMutation(({data}: {data: CalculateInvoiceAmountRecord}) =>
+    postInvoiceAmount(data),
+  );

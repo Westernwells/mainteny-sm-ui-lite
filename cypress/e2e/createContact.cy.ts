@@ -24,7 +24,7 @@ describe('Create Contact', () => {
         const contactPersonsAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/contactPersons?*`;
         cy.intercept('GET', contactPersonsAPI).as('contactPersonsAPI');
         cy.contains('button', 'Confirm').click();
-        cy.wait('@contactPersonsAPI');
+        cy.wait('@contactPersonsAPI', {timeout: 120000}).its('response').should('have.property', 'statusCode').and('eq', 200);
         cy.contains('Contact person created successfully');
 
         // open contact person details

@@ -321,7 +321,7 @@ export enum InvoiceItemPaymentType {
 
 export interface InvoiceItemPaymentRecord {
   type: InvoiceItemPaymentType;
-  amount?: Amount;
+  amount?: AggregatedAmount;
   percentage?: number;
 }
 
@@ -664,3 +664,10 @@ export type QueryCancelInvoiceParams = {
   action: CANCEL_ACTION;
   disableNavigate?: boolean;
 };
+
+export interface CalculateInvoiceAmountRecord {
+  currency: string;
+  items: InvoiceItemRecord[];
+  globalDiscount?: Discount;
+  paymentRecord?: Payment;
+}

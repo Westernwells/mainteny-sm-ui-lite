@@ -542,7 +542,19 @@ export const generatePdfInvoice = (
   },
   additionalInfo: {
     pdfGenerationStatus: PdfGenerationStatus.GENERATION_REQUIRED,
-    discount: formikValues.discount,
+    discount: {
+      ...formikValues.discount,
+      type: formikValues.discount?.type!,
+      amount: {
+        ...formikValues.discount?.amount,
+        value: moneyToCents(
+          currentCurrency.code,
+          formikValues.discount?.amount?.value,
+        ),
+        currency:
+          formikValues.discount?.amount?.currency || currentCurrency.code,
+      },
+    },
     billingAddress: formikValues.billingAddress,
     beneficiaryAddress: formikValues.beneficiaryAddress,
     alternativeAddress: formikValues.alternativeAddress,
@@ -620,7 +632,8 @@ export const getInvoiceStatusStyles = (
     | 'warning.light'
     | 'action.active'
     | 'primary.mainLight'
-    | 'warning.dark';
+    | 'warning.dark'
+    | 'info.main';
 } => {
   switch (status) {
     case InvoiceStatus.PAID:
@@ -635,6 +648,8 @@ export const getInvoiceStatusStyles = (
       return {label: InvoiceStatusView.PARTIALLY_PAID, color: 'warning.light'};
     case InvoiceStatus.CANCELLED:
       return {label: InvoiceStatusView.CANCELLED, color: 'warning.dark'};
+    case InvoiceStatus.CREDITED:
+      return {label: InvoiceStatusView.CREDITED, color: 'info.main'};
     default:
       return {label: '-', color: 'default'};
   }
