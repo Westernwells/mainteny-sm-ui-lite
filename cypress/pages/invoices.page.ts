@@ -1,3 +1,4 @@
+import {addDays} from 'date-fns';
 import {InvoiceStatusView} from '../../src/models/invoice';
 import {navigateCy} from '../utils/utils';
 
@@ -90,13 +91,13 @@ export default class InvoicesPage {
     cy.get('div[role="textbox"][name="paymentTerms"]').clear();
 
     cy.get('[data-testid=payment-due-date]').click();
-    cy.wait(1000);
+    cy.wait(500);
 
     cy.get('[data-testid=payment-due-date-popup]').should('be.visible');
 
     cy.contains('button', 'Clear').should('exist').click();
 
-    cy.wait(1000);
+    cy.wait(500);
     cy.get('[data-testid=payment-due-date]').click({force: true});
 
     if (hasDueDate) {
@@ -104,14 +105,18 @@ export default class InvoicesPage {
         cy.get('button[aria-current="date"]')
           .invoke('attr', 'data-timestamp')
           .then((timestamp) => {
-            const previousDayTimestamp = parseInt(timestamp, 10) - 86400000;
+            const currentDate = new Date(parseInt(timestamp, 10));
+            const previousDate = addDays(currentDate, -1);
+            const previousDayTimestamp = previousDate.getTime();
             cy.get(`button[data-timestamp="${previousDayTimestamp}"]`).click(); // Click the button for the previous day
           });
       } else {
         cy.get('button[aria-current="date"]')
           .invoke('attr', 'data-timestamp')
           .then((timestamp) => {
-            const nextDayTimestamp = parseInt(timestamp, 10) + 86400000;
+            const currentDate = new Date(parseInt(timestamp, 10));
+            const nextDate = addDays(currentDate, 1);
+            const nextDayTimestamp = nextDate.getTime();
             cy.get(`button[data-timestamp="${nextDayTimestamp}"]`).click(); // Click the button for the next day
           });
       }

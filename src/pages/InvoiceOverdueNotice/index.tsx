@@ -10,20 +10,20 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Cancel from '@mui/icons-material/Cancel';
 import Print from '@mui/icons-material/Print';
 import RemoveRedEye from '@mui/icons-material/RemoveRedEye';
-import Edit from '@mui/icons-material/Edit';
 import {PageCard} from 'components/PageCard';
 import {FormLabel} from 'components/form/FormLabel';
 import {FormInput} from 'components/form/FormInput';
 import {BottomDrawer} from 'components/BottomDrawer';
 import {Button} from 'components/Button';
 import {Progress} from 'components/Progress';
-import {SendEmailDialog} from 'components/SendEmailDialog';
+import {SendEmailDialog} from 'components/SendEmailDialog/index';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   useCreateInvoiceOverdueNotice,
   useInvoiceDetail,
 } from 'hooks/reactQuery/useInvoice';
 import {
+  centsToMoney,
   currencyFactor,
   formatCurrency,
   formatGrossAmount,
@@ -32,22 +32,27 @@ import {
 } from 'utils/currency';
 import {formatDate} from 'utils/datetime';
 import {pdf} from '@react-pdf/renderer';
-import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {createFilesFromBlobArray, dateToString} from 'utils/utils';
 import printJS from 'print-js';
 import {useUuid} from 'hooks/reactQuery/useUuid';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
-import {SimpleEmailRecord} from 'models/misc';
+import {EmailRecord} from 'models/misc';
 import {CreateInvoiceOverdueNoticeRecord} from 'models/invoice';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {companyLanguageContextMap} from 'utils/language';
+import RichTextField from 'components/RichTextField';
+import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
+import {Dialog} from 'components/Dialog';
 import InvoiceOverduePdfPreview from './InvoiceOverduePdfPreview';
 
 const validationSchema = Yup.object().shape({
@@ -71,8 +76,8 @@ export const InvoiceOverdueNotice = () => {
   const {id: invoiceId} = useParams();
   const {data: uuid} = useUuid();
   const overdueNoticeId = uuid;
+  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
   const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(true);
   const {data: invoice, isLoading} = useInvoiceDetail(invoiceId);
   const {mutateAsync: createInvoiceOverdueNotice} =
     useCreateInvoiceOverdueNotice();
@@ -82,7 +87,15 @@ export const InvoiceOverdueNotice = () => {
   );
 
   const currentCurrency = useCurrentCurrency();
-  const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
+
+  const [existingFiles, setExistingFiles] = useState<FileWithPreview[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+  const [previewOverdueBlobUrl, setPreviewOverdueBlobUrl] = useState('');
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    `OV_INV_${invoice?.externalId}.pdf`,
+    previewOverdueBlobUrl,
+  );
 
   const {data: company, isLoading: isLoadingCompany} = useCompanyById(
     user?.userAccount.serviceCompany.id,
@@ -100,6 +113,12 @@ export const InvoiceOverdueNotice = () => {
       return t(key, options);
     },
     [company?.language],
+  );
+
+  const {data: invoiceDownloadUrl} = useDownloadUrl(
+    invoice?.additionalInfo?.pdfPath ? [invoice.additionalInfo.pdfPath] : [],
+    undefined,
+    company?.id,
   );
 
   const {data: clientStorageData, isLoading: isLoadingClientStorageData} =
@@ -138,26 +157,49 @@ export const InvoiceOverdueNotice = () => {
     [clientStorageDataPdfConfig],
   );
 
+  const overdueNoticeDescription = useMemo(() => {
+    if (!invoice || !user) return '';
+
+    const paragraphs = [
+      t('Hello {{customerName}},', {
+        customerName: invoice?.serviceOrder?.elevator.propertyOwner.name ?? '',
+      }),
+      t(
+        'Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.',
+        {
+          invoiceNumber: invoice?.externalId ?? '',
+          dueDate: formatDate(invoice?.dueDate ?? ''),
+        },
+      ),
+      t('Amount Due: {{amountDue}}', {
+        amountDue: formatGrossAmount(invoice?.totalAmount),
+      }),
+      t(
+        "If you've paid, please let us know. If not, please do so soon to avoid extra fees.",
+        {},
+      ),
+      t('Questions? Contact us at {{contactEmail}}', {
+        contactEmail: user?.userAccount.serviceCompany.contact.email ?? '',
+      }),
+      t('Thanks, {{companyName}}', {
+        companyName: user?.userAccount.serviceCompany.name ?? '',
+      }),
+    ];
+
+    return paragraphs.map((line) => `<p>${line}</p>`).join('<p></p>');
+  }, [invoice, user, t]);
+
   const initialValues = {
     customerAddress: invoice?.propertyOwner?.billingAddress?.fullName ?? '',
     invoiceNumber: invoice?.externalId ?? '',
     subject: t('Overdue notice for invoice {{invoiceNumber}}', {
       invoiceNumber: invoice?.externalId ?? '',
     }),
-    description: t(
-      "Hello {{customerName}},\n\nYour payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.\nAmount Due: {{amountDue}}\n\nIf you've paid, please let us know. If not, please do so soon to avoid extra fees.\n\nQuestions? Contact us at {{contactEmail}}.\nThanks, {{companyName}}",
-      {
-        customerName: invoice?.serviceOrder?.elevator.propertyOwner.name ?? '',
-        invoiceNumber: invoice?.externalId ?? '',
-        dueDate: formatDate(invoice?.dueDate ?? ''),
-        amountDue: formatGrossAmount(invoice?.totalAmount),
-        contactEmail: user?.userAccount.serviceCompany.contact.email ?? '',
-        companyName: user?.userAccount.serviceCompany.name ?? '',
-      },
+    description: overdueNoticeDescription,
+    initialAmount: centsToMoney(
+      currentCurrency.code,
+      invoice?.totalAmount.grossAmount,
     ),
-    initialAmount:
-      (invoice?.totalAmount.grossAmount ?? 0) /
-      10 ** (invoice?.totalAmount.fractionDigits ?? 0),
     handlingFee: 0,
   };
 
@@ -169,21 +211,16 @@ export const InvoiceOverdueNotice = () => {
     onSubmit: () => {},
   });
 
-  const sendEmailDescription = t(
-    'Hello,\n\nWe hope this message finds you well. Please find attached the invoice for the services we provided in [Month].\n\nInvoice Details:\n- Invoice Number: {{invoiceNumber}}\n- Due Date: {{dueDate}}\n- Amount: {{amountDue}}\n\nPlease process the payment by the due date to ensure uninterrupted service.\n\nFor any questions or clarifications, feel free to reach out to our accounts department.\n\nKind regards,\n{{companyName}}',
-    {
-      invoiceNumber: invoice?.externalId ?? '',
-      dueDate: formatDate(invoice?.dueDate ?? ''),
-      amountDue: formatGrossAmount(invoice?.totalAmount),
-      companyName: user?.userAccount.serviceCompany.name ?? '',
-    },
-  );
-
   const factor = currencyFactor({
     currency: invoice?.totalAmount.currency ?? '',
   });
 
-  const generatePdfBlob = async () =>
+  const handlePreviewClose = () => {
+    setOpenPreviewDialog(false);
+    setPreviewOverdueBlobUrl('');
+  };
+
+  const generateOverduePdfBlob = async () =>
     pdf(
       <InvoiceOverduePdfPreview
         pdfConfigClientStorage={pdfConfig}
@@ -199,32 +236,87 @@ export const InvoiceOverdueNotice = () => {
         footerInfo={footerInfo}
       />,
     ).toBlob();
-
-  const handlePreview = async () => {
-    const blob = await generatePdfBlob();
+  const handlePreviewInvoiceOverdueNotice = async () => {
+    const blob = await generateOverduePdfBlob();
     const blobURL = URL.createObjectURL(blob);
-    setPreviewPdfBlobUrl(blobURL);
+    setPreviewOverdueBlobUrl(blobURL);
+    setOpenPreviewDialog(true);
   };
 
-  const handlePreviewInvoiceOverdueNotice = () => {
-    if (isEditing) {
-      setIsEditing(false);
-      handlePreview();
-    } else {
-      setIsEditing(true);
+  const prepareAttachments = async () => {
+    setIsLoadingFiles(true);
+
+    try {
+      const attachments: FileWithPreview[] = [];
+
+      const overdueBlob = await generateOverduePdfBlob();
+      const overdueFiles = await createFilesFromBlobArray(
+        [overdueBlob],
+        [`${overdueNoticeId}.pdf`],
+        [`OV_INV_${invoice?.externalId}.pdf`],
+      );
+      attachments.push(...overdueFiles);
+
+      if (invoice?.additionalInfo?.pdfPath && invoiceDownloadUrl) {
+        const invoiceUrl = invoiceDownloadUrl[invoice.additionalInfo.pdfPath];
+        const response = await fetch(invoiceUrl);
+        const invoiceBlob = await response.blob();
+        const invoiceFiles = await createFilesFromBlobArray(
+          [invoiceBlob],
+          [`${invoice?.id}.pdf`],
+          [`${invoice.externalId}.pdf`],
+        );
+        attachments.push(...invoiceFiles);
+      }
+
+      setExistingFiles(attachments);
+    } catch (error) {
+      console.error('Error preparing attachments:', error);
+    } finally {
+      setIsLoadingFiles(false);
     }
   };
 
-  const onSubmitHandler = async (values: SimpleEmailRecord) => {
+  const handleSendEmail = async () => {
+    setIsSendEmailDialogOpen(true);
+    await prepareAttachments();
+  };
+
+  const onSubmitHandler = async (values: EmailRecord) => {
     const serviceCompanyId = user?.userAccount.serviceCompany.id;
     const uploadPath = `${serviceCompanyId}/invoices/${invoice?.id}/overdueNotices`;
-
     const fileNames: string[] = [`${overdueNoticeId}.pdf`];
 
-    const blob = await generatePdfBlob();
-    const files = await createFilesFromBlobArray([blob], fileNames);
+    const overdueBlob = await generateOverduePdfBlob();
+    const overdueFiles = await createFilesFromBlobArray(
+      [overdueBlob],
+      fileNames,
+      [`OV_INV_${invoice?.externalId}.pdf`],
+    );
 
-    await uploadFiles({files, uploadPath});
+    let invoiceAttachment: FileWithPreview | null = null;
+
+    if (invoice?.additionalInfo?.pdfPath) {
+      const response = await fetch(
+        invoiceDownloadUrl![invoice.additionalInfo.pdfPath],
+      );
+      const blob = await response.blob();
+
+      invoiceAttachment = new File([blob], `${invoice?.externalId}.pdf`, {
+        type: 'application/pdf',
+      }) as FileWithPreview;
+
+      invoiceAttachment.preview = URL.createObjectURL(blob);
+      invoiceAttachment.uri = invoice.additionalInfo.pdfPath;
+      invoiceAttachment.description = `${invoice?.externalId}.pdf`;
+    }
+
+    const allFiles = invoiceAttachment
+      ? [...overdueFiles, invoiceAttachment]
+      : overdueFiles;
+
+    // Upload only the overdue notice file(s) since the invoice file is already hosted
+    await uploadFiles({files: overdueFiles, uploadPath});
 
     const createInvoiceOverdueNoticeBody: CreateInvoiceOverdueNoticeRecord = {
       externalId: formik.values.invoiceNumber,
@@ -242,34 +334,29 @@ export const InvoiceOverdueNotice = () => {
       sentDate: dateToString(new Date()),
       emailRecord: {
         email: '',
-        emails: values.email ? [values.email] : [],
+        emails: values.emails,
+        ccEmails: values.ccEmails,
+        bccEmails: values.bccEmails,
         subject: values.subject,
-        content: values.content || sendEmailDescription,
-        attachments: files.reduce<FileWithPreview[]>(
-          (newArr: FileWithPreview[], obj) => [
-            ...newArr,
-            {
-              ...obj,
-              type: obj.type,
-              uri: `${uploadPath}/${obj.name}`,
-              description: `${obj.name}`,
-            },
-          ],
-          [],
-        ),
+        content: values.content,
+        attachments: allFiles.map((file) => ({
+          ...file,
+          type: file.type,
+          uri: file.uri || `${uploadPath}/${file.name}`,
+          description: file.description || file.name,
+        })),
       },
     };
 
-    createInvoiceOverdueNotice({
+    await createInvoiceOverdueNotice({
       invoiceId: invoice?.id ?? '',
       body: createInvoiceOverdueNoticeBody,
     });
-
     navigate(`/invoices/details/${invoice?.id}`, {replace: true});
   };
 
   const handlePrint = async () => {
-    const blob = await generatePdfBlob();
+    const blob = await generateOverduePdfBlob();
     const blobURL = URL.createObjectURL(blob);
 
     printJS({
@@ -278,7 +365,7 @@ export const InvoiceOverdueNotice = () => {
       showModal: true,
       onPrintDialogClose: () => {
         URL.revokeObjectURL(blobURL);
-        setPreviewPdfBlobUrl('');
+        setPreviewOverdueBlobUrl('');
       },
     });
   };
@@ -310,273 +397,286 @@ export const InvoiceOverdueNotice = () => {
 
   return (
     <>
-      {isEditing ? (
-        <>
-          <PageCard
-            containerStyles={{
-              mb: '1rem',
-              mt: '1.5rem',
-              width: '100%',
-              maxWidth: '50rem',
-              alignSelf: 'center',
-            }}
-            contentContainerStyles={{display: 'flex', gap: '3.7rem'}}>
-            <Box>
-              <FormLabel text="Invoice Number" sx={{color: 'text.main'}} />
-              <Typography variant="subtitle1">{invoice?.externalId}</Typography>
-            </Box>
+      <>
+        <PageCard
+          containerStyles={{
+            mb: '1rem',
+            mt: '1.5rem',
+            width: '100%',
+            maxWidth: '50rem',
+            alignSelf: 'center',
+          }}
+          contentContainerStyles={{display: 'flex', gap: '3.7rem'}}>
+          <Box>
+            <FormLabel text="Invoice Number" sx={{color: 'text.main'}} />
+            <Typography variant="subtitle1">{invoice?.externalId}</Typography>
+          </Box>
 
-            <Box>
-              <FormLabel
-                text="Total"
-                sx={{color: 'text.main', textTransform: 'initial'}}
-              />
-              <Typography variant="subtitle1">
-                {formatGrossAmount(invoice?.totalAmount)}
-              </Typography>
-            </Box>
-          </PageCard>
-          <PageCard
-            containerStyles={{
-              mb: '5rem',
-              width: '100%',
-              maxWidth: '50rem',
-              alignSelf: 'center',
-            }}
-            contentContainerStyles={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.5rem',
-            }}>
-            <Typography variant="h6">{t('Overdue Notice')}</Typography>
-            <Box>
-              <FormLabel text={t('From')} />
-              <Box
-                display="flex"
-                bgcolor="grey.200"
-                alignItems="start"
-                justifyContent="space-between"
-                mt="0.5rem"
-                px="0.75rem"
-                py=".5rem"
-                border="1px solid"
-                borderColor="inputBackground.main"
-                borderRadius="4px">
+          <Box>
+            <FormLabel
+              text="Total"
+              sx={{color: 'text.main', textTransform: 'initial'}}
+            />
+            <Typography variant="subtitle1">
+              {formatGrossAmount(invoice?.totalAmount)}
+            </Typography>
+          </Box>
+        </PageCard>
+        <PageCard
+          containerStyles={{
+            mb: '5rem',
+            width: '100%',
+            maxWidth: '50rem',
+            alignSelf: 'center',
+          }}
+          contentContainerStyles={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem',
+          }}>
+          <Typography variant="h6">{t('Overdue Notice')}</Typography>
+          <Box>
+            <FormLabel text={t('From')} />
+            <Box
+              display="flex"
+              bgcolor="grey.200"
+              alignItems="start"
+              justifyContent="space-between"
+              mt="0.5rem"
+              px="0.75rem"
+              py=".5rem"
+              border="1px solid"
+              borderColor="inputBackground.main"
+              borderRadius="4px">
+              <Box>
+                <Typography variant="h6">
+                  {user?.userAccount.serviceCompany.name || ''}
+                </Typography>
                 <Box>
-                  <Typography variant="h6">
-                    {user?.userAccount.serviceCompany.name || ''}
-                  </Typography>
-                  <Box>
-                    {user &&
-                    'businessAddress' in user.userAccount.serviceCompany &&
-                    user.userAccount.serviceCompany.billingAddress?.fullName ? (
-                      <Typography variant="caption">
-                        {
-                          user.userAccount.serviceCompany.billingAddress
-                            ?.fullName
-                        }
-                      </Typography>
-                    ) : (
-                      ''
-                    )}
-                  </Box>
+                  {user &&
+                  'businessAddress' in user.userAccount.serviceCompany &&
+                  user.userAccount.serviceCompany.billingAddress?.fullName ? (
+                    <Typography variant="caption">
+                      {user.userAccount.serviceCompany.billingAddress?.fullName}
+                    </Typography>
+                  ) : (
+                    ''
+                  )}
                 </Box>
               </Box>
             </Box>
-            <FormInput
-              fieldProps={{
-                name: 'customerAddress',
-                label: t('Customer Address'),
-                placeholder: t(
-                  'e.g. 2118 Thornridge Cir. Syracuse, Connecticut 35624',
-                ),
-                variant: 'outlined',
-                value: formik.values.customerAddress,
-                error: !!(
-                  formik.touched.customerAddress &&
-                  formik.errors.customerAddress
-                ),
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-                required: true,
-              }}
-            />
-            <FormInput
-              fieldProps={{
-                name: 'invoiceNumber',
-                label: t('Invoice Number'),
-                variant: 'outlined',
-                value: formik.values.invoiceNumber,
-                error: !!(
-                  formik.touched.invoiceNumber && formik.errors.invoiceNumber
-                ),
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-                required: true,
-              }}
-            />
-            <FormInput
-              fieldProps={{
-                name: 'subject',
-                label: t('Subject'),
-                placeholder: t('e.g. Late payment'),
-                variant: 'outlined',
-                value: formik.values.subject,
-                error: !!(formik.touched.subject && formik.errors.subject),
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-                required: true,
-              }}
-            />
-            <FormInput
-              fieldProps={{
-                name: 'description',
-                label: t('Description'),
-                placeholder: t(
-                  'e.g. The invoice is overdue [XX] days. Hearby we remind you to please pay the outstanding amount.',
-                ),
-                variant: 'outlined',
-                value: formik.values.description,
-                error: !!(
-                  formik.touched.description && formik.errors.description
-                ),
-                onBlur: formik.handleBlur,
-                onChange: formik.handleChange,
-                required: true,
-                multiline: true,
-                rows: 10,
-              }}
-            />
+          </Box>
+          <FormInput
+            fieldProps={{
+              name: 'customerAddress',
+              label: t('Customer Address'),
+              placeholder: t(
+                'e.g. 2118 Thornridge Cir. Syracuse, Connecticut 35624',
+              ),
+              variant: 'outlined',
+              value: formik.values.customerAddress,
+              error: !!(
+                formik.touched.customerAddress && formik.errors.customerAddress
+              ),
+              onBlur: formik.handleBlur,
+              onChange: formik.handleChange,
+              required: true,
+            }}
+          />
+          <FormInput
+            fieldProps={{
+              name: 'invoiceNumber',
+              label: t('Invoice Number'),
+              variant: 'outlined',
+              value: formik.values.invoiceNumber,
+              error: !!(
+                formik.touched.invoiceNumber && formik.errors.invoiceNumber
+              ),
+              onBlur: formik.handleBlur,
+              onChange: formik.handleChange,
+              required: true,
+            }}
+          />
+          <FormInput
+            fieldProps={{
+              name: 'subject',
+              label: t('Subject'),
+              placeholder: t('e.g. Late payment'),
+              variant: 'outlined',
+              value: formik.values.subject,
+              error: !!(formik.touched.subject && formik.errors.subject),
+              onBlur: formik.handleBlur,
+              onChange: formik.handleChange,
+              required: true,
+            }}
+          />
 
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center">
-              <Typography flex={1} variant="body2">
-                {t('Initial amount')}
-              </Typography>
-              <FormInput
-                fullWidth={false}
-                onValueChange={(values) => {
-                  formik.setFieldValue(values.name as string, values.value);
-                }}
-                inputType="currency"
-                fieldProps={{
-                  name: 'initialAmount',
-                  size: 'small',
-                  value: formik.values.initialAmount,
-                  onBlur: formik.handleBlur,
-                  error: !!(
-                    formik.touched.initialAmount && formik.errors.initialAmount
-                  ),
+          <RichTextField
+            name="description"
+            label={t('Description')}
+            html={formik.values.description || ''}
+            updateHtml={(h) => formik.setFieldValue('description', h)}
+            minRows={10}
+            onBlur={formik.handleBlur}
+            required
+            error={!!(formik.touched.description && formik.errors.description)}
+          />
 
-                  sx: {width: '120px'},
-                  InputProps: {
-                    inputProps: {
-                      min: 0,
-                    },
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        {
-                          getCurrencySymbol[
-                            invoice?.totalAmount.currency ?? 'EUR'
-                          ]
-                        }
-                      </InputAdornment>
-                    ),
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center">
+            <Typography flex={1} variant="body2">
+              {t('Initial amount')}
+            </Typography>
+            <FormInput
+              fullWidth={false}
+              onValueChange={(values) => {
+                formik.setFieldValue(values.name as string, values.value);
+              }}
+              inputType="currency"
+              fieldProps={{
+                name: 'initialAmount',
+                size: 'small',
+                value: formik.values.initialAmount,
+                onBlur: formik.handleBlur,
+                error: !!(
+                  formik.touched.initialAmount && formik.errors.initialAmount
+                ),
+
+                sx: {width: '120px'},
+                InputProps: {
+                  inputProps: {
+                    min: 0,
                   },
-                  required: true,
-                }}
-              />
-            </Box>
-
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center">
-              <Typography variant="body2">{t('Handling fee')}</Typography>
-              <FormInput
-                fullWidth={false}
-                onValueChange={(values) => {
-                  formik.setFieldValue(values.name as string, values.value);
-                }}
-                inputType="currency"
-                fieldProps={{
-                  name: 'handlingFee',
-                  size: 'small',
-                  value: formik.values.handlingFee,
-                  onBlur: formik.handleBlur,
-                  error: !!(
-                    formik.touched.handlingFee && formik.errors.handlingFee
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      {
+                        getCurrencySymbol[
+                          invoice?.totalAmount.currency ?? 'EUR'
+                        ]
+                      }
+                    </InputAdornment>
                   ),
-                  sx: {width: '120px'},
-                  InputProps: {
-                    inputProps: {
-                      min: 0,
-                    },
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        {
-                          getCurrencySymbol[
-                            invoice?.totalAmount.currency ?? 'EUR'
-                          ]
-                        }
-                      </InputAdornment>
-                    ),
-                  },
-                  required: true,
-                }}
-              />
-            </Box>
+                },
+                required: true,
+              }}
+            />
+          </Box>
 
-            <Box
-              bgcolor="grey.700"
-              borderRadius="4px"
-              p="0.75rem"
-              display="flex"
-              justifyContent="space-between">
-              <Typography sx={{color: 'primary.contrastText'}}>
-                {t('Total Amount')}
-                <Typography variant="caption" component="span" ml="1ch">
-                  {t('(incl VAT)')}
-                </Typography>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center">
+            <Typography variant="body2">{t('Handling fee')}</Typography>
+            <FormInput
+              fullWidth={false}
+              onValueChange={(values) => {
+                formik.setFieldValue(values.name as string, values.value);
+              }}
+              inputType="currency"
+              fieldProps={{
+                name: 'handlingFee',
+                size: 'small',
+                value: formik.values.handlingFee,
+                onBlur: formik.handleBlur,
+                error: !!(
+                  formik.touched.handlingFee && formik.errors.handlingFee
+                ),
+                sx: {width: '120px'},
+                InputProps: {
+                  inputProps: {
+                    min: 0,
+                  },
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      {
+                        getCurrencySymbol[
+                          invoice?.totalAmount.currency ?? 'EUR'
+                        ]
+                      }
+                    </InputAdornment>
+                  ),
+                },
+                required: true,
+              }}
+            />
+          </Box>
+
+          <Box
+            bgcolor="grey.700"
+            borderRadius="4px"
+            p="0.75rem"
+            display="flex"
+            justifyContent="space-between">
+            <Typography sx={{color: 'primary.contrastText'}}>
+              {t('Total Amount')}
+              <Typography variant="caption" component="span" ml="1ch">
+                {t('(incl VAT)')}
               </Typography>
-              <Typography sx={{color: 'primary.contrastText'}}>
-                {formatCurrency(
-                  formik.values.initialAmount + formik.values.handlingFee,
-                  {currency: invoice?.totalAmount.currency ?? 'EUR'},
-                )}
-              </Typography>
-            </Box>
-          </PageCard>
-        </>
-      ) : (
-        <Box
-          sx={{
-            margin: '1em auto 5em auto',
-            display: 'flex',
-            justifyContent: 'center',
-          }}>
-          {previewPdfBlobUrl && <PdfPreview blobUrl={previewPdfBlobUrl} />}
-        </Box>
-      )}
+            </Typography>
+            <Typography sx={{color: 'primary.contrastText'}}>
+              {formatCurrency(
+                formik.values.initialAmount + formik.values.handlingFee,
+                {currency: invoice?.totalAmount.currency ?? 'EUR'},
+              )}
+            </Typography>
+          </Box>
+        </PageCard>
+      </>
+      <Dialog
+        title={t('Invoice Overdue preview')}
+        onClose={handlePreviewClose}
+        onCancel={() => downloadFile()}
+        dialogProps={{
+          open: openPreviewDialog || false,
+        }}
+        sx={{
+          '& .MuiDialog-paper': {
+            width: '750px',
+            maxWidth: 'none',
+            maxHeight: '844px',
+          },
+        }}
+        leftButton={
+          <Button
+            label="Close"
+            buttonProps={{
+              onClick: handlePreviewClose,
+              variant: 'text',
+              size: 'medium',
+              sx: {background: 'white'},
+            }}
+          />
+        }
+        cancelButtonText={t('Download')}
+        cancelButtonVariant="outlined"
+        cancelButtonStyles={{marginRight: '1em', border: '1px solid #000034'}}
+        cancelButtonTextColor="text.primary"
+        saveButtonText={t('Continue editing')}
+        onSave={handlePreviewClose}
+        showSaveButton
+        showCancelButton>
+        <DialogPdfPreview filePathToDownload={previewOverdueBlobUrl} />
+      </Dialog>
 
       <BottomDrawer
         isOpen
         primaryButtonLabel={t('Send')}
-        primaryButtonAction={() => setIsSendEmailDialogOpen(true)}
+        primaryButtonAction={handleSendEmail}
         listItems={actions.map((item) => ({
           ...item,
           showBorder: actions[actions.length - 1] !== item,
         }))}
         isValid={formik.isValid || formik.isSubmitting}
+        isSaving={isLoadingFiles || isUploadLoading}
         secondaryButton={
           <Button
-            label={isEditing ? 'Preview' : 'Continue editing'}
+            label="Preview"
             buttonProps={{
               variant: 'outlined',
               sx: {bgcolor: theme.palette.inputBackground.main},
-              startIcon: isEditing ? <RemoveRedEye /> : <Edit />,
+              startIcon: <RemoveRedEye />,
               size: 'medium',
               onClick: () => handlePreviewInvoiceOverdueNotice(),
             }}
@@ -586,18 +686,25 @@ export const InvoiceOverdueNotice = () => {
 
       <SendEmailDialog
         open={isSendEmailDialogOpen}
-        onConfirm={() => setIsSendEmailDialogOpen(false)}
-        onClose={() => setIsSendEmailDialogOpen(false)}
+        onConfirm={() => {
+          setIsSendEmailDialogOpen(false);
+          setExistingFiles([]);
+        }}
+        onClose={() => {
+          setIsSendEmailDialogOpen(false);
+          setExistingFiles([]);
+        }}
         id={invoice?.id ?? ''}
         confirmBtnDisabled={isUploadLoading}
-        inProgressTooltipTitle=""
         email={
           invoice?.propertyOwner?.additionalInfo.billingEmail ||
           invoice?.propertyOwner?.contact.email
         }
         subject={formik.values.subject}
-        content={formik.values.description || sendEmailDescription}
+        content={formik.values.description}
         callback={(values) => onSubmitHandler(values)}
+        existingFiles={existingFiles}
+        isLoadingFiles={isLoadingFiles}
       />
     </>
   );
