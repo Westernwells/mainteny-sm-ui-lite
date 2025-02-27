@@ -2783,5 +2783,11 @@
   "Email address": "ელ.ფოსტის მისამართი",
   "Number of People": "ადამიანების რაოდენობა",
   "Can't be less than 0": "არ შეიძლება იყოს 0 -ზე ნაკლები",
-  "Add New": "ᲐᲮᲚᲘᲡ ᲓᲐᲛᲐᲢᲔᲑᲐ"
+  "Add New": "ᲐᲮᲚᲘᲡ ᲓᲐᲛᲐᲢᲔᲑᲐ",
+  "Hello {{customerName}},": "გამარჯობა {{customername}},",
+  "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "გადახდა ინვოისისთვის #{{invoiceNumber}}, რომელიც განსახორციებელი იყო {{duedate}}-მდე, ვადაგადაცილებულია.",
+  "Amount Due: {{amountDue}}": "გადასახდელი თანხა: {{amountDue}}",
+  "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "თუ თანხა უკვე გადაიხადეთ, გთხოვთ, შეგვატყობინოთ. თუ არა, გთხოვთ, მალე გადაიხადოთ, რომ თავიდან აიცილოთ დამატებითი გადასახადი.",
+  "Questions? Contact us at {{contactEmail}}.": "გაქვთ კითხვები? დაგვიკავშირდით {{contactEmail}}.",
+  "Thanks, {{companyName}}": "მადლობა, {{companyName}}"
 }

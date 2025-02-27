@@ -2001,5 +2001,11 @@
   "Auto Dialer": "Automatinis rinkiklis",
   "Email address": "Elektroninio pašto adresas",
   "Can't be less than 0": "Negali būti mažesnis nei 0",
-  "Add New": "Pridėti Naują"
+  "Add New": "Pridėti Naują",
+  "Hello {{customerName}},": "Sveiki {{Customername}},",
+  "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "Jūsų mokėjimas už sąskaitą faktūrą #{{invoiceNumber}}, turėjo būti sumokėta {{{duedate}}, yra pradinėta.",
+  "Amount Due: {{amountDue}}": "Suma Tinka: {{SoumDue}}",
+  "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Jei sumokėjote, praneškite mums. Jei ne, padarykite tai greitai, kad išvengtumėte papildomų mokesčių.",
+  "Questions? Contact us at {{contactEmail}}.": "Klausimai? Susisiekite su mumis {{Contactemail}}.",
+  "Thanks, {{companyName}}": "Ačiū, {{CompanyName}}"
 }
