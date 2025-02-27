@@ -222,6 +222,7 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
           <CardProps
             icon={<ManageAccountsIcon sx={{color: theme.palette.info.main}} />}
             label="TECHNICIAN"
+            testId="technician-card"
             bodyText={
               schedule.length
                 ? schedule

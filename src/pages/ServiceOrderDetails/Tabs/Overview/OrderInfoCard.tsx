@@ -66,6 +66,7 @@ const OrderInfoItem = ({
 }: OrderInfoProps) => {
   const {t} = useTranslation();
   const theme = useTheme();
+
   return (
     <Grid
       item
@@ -289,6 +290,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
             </Typography>
 
             <StatusChip
+              testId="job-details-status-chip"
               color={getServiceOrderStatusColor(serviceOrderDetails.status)}
               label={serviceOrderStatusToString(serviceOrderDetails.status)}
               style={{
