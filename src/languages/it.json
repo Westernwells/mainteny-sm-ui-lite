@@ -1887,5 +1887,11 @@
   "Payment data included": "Dati di pagamento inclusi",
   "Auto Dialer": "Dialer automatico",
   "Email address": "Indirizzo e-mail",
-  "Can't be less than 0": "Non può essere inferiore a 0"
+  "Can't be less than 0": "Non può essere inferiore a 0",
+  "Hello {{customerName}},": "Ciao {{CustomerName}},",
+  "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "Il tuo pagamento per la fattura #{{Invoicenumber}}, era dovuto su {{duedate}}, è in ritardo.",
+  "Amount Due: {{amountDue}}": "Importo dovuto: {{quantitàdue}}",
+  "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Se hai pagato, faccelo sapere. In caso contrario, fai così presto per evitare commissioni extra.",
+  "Questions? Contact us at {{contactEmail}}.": "Domande? Contattaci a {{contactEmail}}.",
+  "Thanks, {{companyName}}": "Grazie, {{CompanyName}}"
 }

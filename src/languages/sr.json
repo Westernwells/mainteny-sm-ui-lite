@@ -3116,5 +3116,11 @@
   "Additional Name": "Dodatno ime",
   "Select contact": "Izaberite kontakt",
   "Text block is too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes": "Blok teksta je prevelik. Podržana veličina {{sizeLimit}} bajtova, trenutna veličina {{currentSize}} bajtova",
-  "Email files are too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes": "Datoteke e-pošte su prevelike. Podržana veličina {{sizeLimit}} bajtova, trenutna veličina {{currentSize}} bajtova"
+  "Email files are too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes": "Datoteke e-pošte su prevelike. Podržana veličina {{sizeLimit}} bajtova, trenutna veličina {{currentSize}} bajtova",
+  "Hello {{customerName}},": "Zdravo {{customerName}},",
+  "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "Vaša uplata za fakturu broj #{{invoiceNumber}}, koja je dospela na {{dueDate}}, je dospela.",
+  "Amount Due: {{amountDue}}": "Iznos duga: {{amountDue}}",
+  "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Ako ste platili, obavestite nas. Ako ne, učinite to uskoro da biste izbegli dodatne naknade.",
+  "Questions? Contact us at {{contactEmail}}.": "Pitanja? Kontaktirajte nas na {{contactEmail}}.",
+  "Thanks, {{companyName}}": "Hvala, {{companyName}}"
 }
