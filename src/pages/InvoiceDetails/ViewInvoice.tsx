@@ -1173,6 +1173,18 @@ export const ViewInvoice = ({
   const onPrintInvoice = async () => {
     setIsConfirmPrintDialogOpen(false);
 
+    if (isLoadingHeaderUrl || isLoadingFooterUrl) {
+      enqueueSnackbar(
+        t(
+          'The PDF generation is in progress, please try again after sometime. We apologize for the inconvenience.',
+        ),
+        {
+          variant: 'info',
+        },
+      );
+      return;
+    }
+
     const errorMessage = validateDueDate(invoice);
 
     if (errorMessage && !hasPaymentTerm) {
