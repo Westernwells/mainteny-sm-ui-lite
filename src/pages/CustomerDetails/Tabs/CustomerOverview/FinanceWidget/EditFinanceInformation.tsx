@@ -117,7 +117,11 @@ export const EditFinanceInformation = ({
             (address) => {
               if (address === 'billingAddress') {
                 return (
-                  <TabPanel key={address} value={address} sx={{px: 0}}>
+                  <TabPanel
+                    key={address}
+                    value={address}
+                    sx={{px: 0}}
+                    keepMounted>
                     <BillingAddress
                       control={control}
                       errors={errors}
@@ -131,7 +135,11 @@ export const EditFinanceInformation = ({
               }
 
               return (
-                <TabPanel key={address} value={address} sx={{px: 0}}>
+                <TabPanel
+                  key={address}
+                  value={address}
+                  sx={{px: 0}}
+                  keepMounted>
                   <EditFinanceAddress
                     address={address as 'otherAddress' | 'beneficiaryAddress'}
                     control={control}

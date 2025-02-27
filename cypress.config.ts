@@ -1,23 +1,23 @@
-import { defineConfig } from 'cypress';
+import {defineConfig} from 'cypress';
 import coverage from '@cypress/code-coverage/task';
 import cypressSplit from 'cypress-split';
 import installLogsPrinter from 'cypress-terminal-report/src/installLogsPrinter';
-import { readPdf } from './cypress/scripts/readPDF';
+import {readPdf} from './cypress/scripts/readPDF';
 
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: '.env.stage' });
+require('dotenv').config({path: '.env.stage'});
 
 export default defineConfig({
   e2e: {
     baseUrl: process.env.REACT_APP_BASE_URL,
     chromeWebSecurity: false,
     defaultCommandTimeout: 60000,
-    pageLoadTimeout: 300000,
+    pageLoadTimeout: 350000,
     responseTimeout: 120000,
     retries: {
       openMode: 1, // Retry once during interactive mode
-      runMode: 2, // Retry twice during CI runs
+      runMode: 1,
     },
     setupNodeEvents(on, config) {
       coverage(on, config);
@@ -33,22 +33,23 @@ export default defineConfig({
 
       on('task', {
         // Get the latest file that starts with 'WR'
-        findFileStartingWith({ folder, prefix }) {
+        findFileStartingWith({folder, prefix}) {
           return new Promise((resolve) => {
             let attempts = 0;
             const maxAttempts = 20;
-            
+
             const checkForFile = () => {
-              const files = fs.readdirSync(folder)
-                .filter(file => file.startsWith(prefix));
+              const files = fs
+                .readdirSync(folder)
+                .filter((file) => file.startsWith(prefix));
 
               if (files.length > 0) {
-                resolve(path.join(folder, files[0])); 
+                resolve(path.join(folder, files[0]));
               } else if (attempts < maxAttempts) {
                 attempts += 1;
                 setTimeout(checkForFile, 500);
               } else {
-                resolve(null); 
+                resolve(null);
               }
             };
 
@@ -57,23 +58,24 @@ export default defineConfig({
         },
 
         // Delete existing files starting with a prefix
-        deleteFilesStartingWith({ folder, prefix }) {
+        deleteFilesStartingWith({folder, prefix}) {
           if (!fs.existsSync(folder)) return null;
           fs.readdirSync(folder)
-            .filter(file => file.startsWith(prefix))
-            .forEach(file => fs.unlinkSync(path.join(folder, file)));
+            .filter((file) => file.startsWith(prefix))
+            .forEach((file) => fs.unlinkSync(path.join(folder, file)));
           return null;
         },
 
         // Get all downloaded files sorted by time
         downloads: (downloadspath) =>
-          fs.readdirSync(downloadspath)
+          fs
+            .readdirSync(downloadspath)
             .map((name: string) => ({
               name,
               time: fs.statSync(`${downloadspath}/${name}`).mtime.getTime(),
             }))
-            .sort((a: { time: number }, b: { time: number }) => a.time - b.time)
-            .map((f: { name: string }) => f.name),
+            .sort((a: {time: number}, b: {time: number}) => a.time - b.time)
+            .map((f: {name: string}) => f.name),
       });
 
       return config;

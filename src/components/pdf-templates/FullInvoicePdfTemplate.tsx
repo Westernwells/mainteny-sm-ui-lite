@@ -310,8 +310,8 @@ const FullInvoicePdfTemplate = ({
   return (
     <Document>
       {invoice?.additionalInfo.alternativeAddress &&
-        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !==
-          0 && (
+        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
+        !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
             userInfo={userInfo}
             selectedLng={selectedLng}

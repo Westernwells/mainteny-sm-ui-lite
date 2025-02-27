@@ -478,7 +478,7 @@ export const PdfPartialPaymentSection = ({
                     fontSize: 10,
                     textAlign: 'right',
                   }}>
-                  {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
+                  {translate('VAT')} {percentageVats[0]?.percentageVat ?? 0}%
                 </Text>
                 <Text
                   style={{

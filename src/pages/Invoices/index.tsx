@@ -108,6 +108,7 @@ import NoteIcon from 'components/NoteIcon';
 import XMLViewer from 'react-xml-viewer';
 import printJS from 'print-js';
 import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPreparation';
+import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
 
 const pageSize = 25;
 
@@ -454,7 +455,9 @@ const Invoices = ({elevatorId}: Props) => {
                 color: theme.palette.primary.light,
               }}
               key={`company-avatar-${invoice.propertyOwner.id}`}
-              userAccount={{firstName: invoice.propertyOwner.name}}
+              userAccount={convertPropertyOwnerObjectToAvatar(
+                invoice.propertyOwner,
+              )}
             />
           </Cell>
         ),

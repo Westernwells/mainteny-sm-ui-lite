@@ -414,7 +414,7 @@ export const PartialPaymentsSection = ({
     } else {
       const description = `${invoiceIndex}. ${t('Partial invoice')}`;
       if (formik.values.payment?.description !== description) {
-        formik.setFieldValue('payment', {
+        let newPayment = {
           ...formik.values.payment,
           type:
             firstInvoicePaymentType === PaymentType.PERCENTAGE &&
@@ -424,7 +424,32 @@ export const PartialPaymentsSection = ({
               ? PaymentType.PER_ITEM
               : PaymentType.LUMP_SUM,
           description,
-        });
+        };
+
+        if (newPayment.type === PaymentType.LUMP_SUM) {
+          newPayment.amount = {
+            value: 0,
+            currency: currentCurrency.code,
+            fractionDigits: currentCurrency.fractionDigits,
+          };
+        }
+
+        if (newPayment.type === PaymentType.PERCENTAGE) {
+          newPayment.percentage = 0;
+        }
+
+        if (newPayment.type === PaymentType.PER_ITEM) {
+          const updatedItems = formik.values.items?.map((item) => ({
+            ...item,
+            payment: {
+              type: InvoiceItemPaymentType.PERCENTAGE,
+              percentage: 0,
+            },
+          }));
+          formik.setFieldValue('items', updatedItems);
+        }
+
+        formik.setFieldValue('payment', newPayment);
       }
     }
   }, [previousInvoices, formik]);

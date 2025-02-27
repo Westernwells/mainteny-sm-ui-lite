@@ -252,7 +252,7 @@ export interface RefContactTableRow {
   contactResourceData: RefContactPersonView;
   id: string;
   contactId: string;
-  name: string;
+  userAccount: UserAccountView;
   company: string;
   phone: string;
   secondaryPhoneNumber: string;

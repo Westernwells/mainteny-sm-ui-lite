@@ -150,4 +150,25 @@ export default class QuotationPage {
   static saveQuotation = () => {
     cy.get('button').contains('Save').click();
   };
+
+  static checkForGeneratingPDFBlob = () => {
+    cy.window().then((win) => {
+      cy.spy(win.URL, 'createObjectURL').as('createObjectURLSpy');
+    });
+    cy.get('@createObjectURLSpy').should('have.been.called');
+    cy.wait(5000);
+  };
+
+  static checkForDownloadedPDF = (quotationNumber: string) => {
+    /* assert Download PDF */
+    cy.task('downloads', 'cypress/downloads').then((d: string[]) => {
+      const lastDownloadedFile = d[d.length - 1];
+      cy.task('readPdf', `cypress/downloads/${lastDownloadedFile}`)
+        .its('text')
+        .should('contain', quotationNumber);
+    });
+  };
+
+  static getQuotationNumberElement = () =>
+    cy.get('h6[data-testid="quotation-number"]');
 }

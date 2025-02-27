@@ -90,11 +90,13 @@ export default class InvoicesPage {
     cy.get('div[role="textbox"][name="paymentTerms"]').clear();
 
     cy.get('[data-testid=payment-due-date]').click();
+    cy.wait(1000);
+
     cy.get('[data-testid=payment-due-date-popup]').should('be.visible');
 
     cy.contains('button', 'Clear').should('exist').click();
-    cy.wait(1000);
 
+    cy.wait(1000);
     cy.get('[data-testid=payment-due-date]').click({force: true});
 
     if (hasDueDate) {

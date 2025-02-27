@@ -4,8 +4,8 @@ import AppTopBarPage from '../pages/appTopBar.page';
 describe('Settings page', () => {
     beforeEach(() => {
         cy.login();
-        SettingsPage.visit();
         AppTopBarPage.selectLanguage('English');
+        SettingsPage.visit();
         cy.get('span[role="progressbar"]').should('not.exist');
     });
 

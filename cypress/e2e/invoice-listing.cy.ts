@@ -12,9 +12,10 @@ import Table from '../utils/table';
 describe('Invoice listing page', () => {
     beforeEach(() => {
         cy.login();
+        AppTopBarPage.selectLanguage('English');
+
         cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
         cy.waitForSpinnerToDisappear();
-        AppTopBarPage.selectLanguage('English');
         InvoiceListingPage.visit();
     });
 

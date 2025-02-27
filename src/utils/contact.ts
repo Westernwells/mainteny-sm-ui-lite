@@ -1,7 +1,7 @@
 import {
   ContactTableRow,
-  RefContactTableRow,
   RefContactPersonView,
+  RefContactTableRow,
   ServiceCompanyContactPersonView,
 } from 'models/contacts';
 import {convertToText} from './utils';
@@ -29,7 +29,7 @@ export const aggregateCustomerContactsRow = (
     contactResourceData: contactResource,
     id: contactResource.id,
     contactId: contactResource.userAccount.id,
-    name: `${contactResource.userAccount.firstName} ${contactResource.userAccount.lastName}`,
+    userAccount: contactResource.userAccount,
     company: contactResource.companyName || '-',
     phone: contactResource.userAccount.contact.phone || '-',
     secondaryPhoneNumber: contactResource.additionalInfo.secondaryPhone || '-',
