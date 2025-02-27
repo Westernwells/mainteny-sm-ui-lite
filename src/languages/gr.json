@@ -2586,5 +2586,11 @@
   "Email address": "ηλεκτρονική διεύθυνση (email)",
   "Number of People": "Αριθμός των ανθρώπων",
   "Can't be less than 0": "Δεν μπορεί να είναι λιγότερο από 1",
-  "Add New": "Προσθεσε Νεο"
+  "Add New": "Προσθεσε Νεο",
+  "Hello {{customerName}},": "Γεια σας {{customerName}},",
+  "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "Η πληρωμή σας για το τιμολόγιο #{{invoiceNumber}}, που έληγε στις {{dueDate}}, είναι ληξιπρόθεσμη.",
+  "Amount Due: {{amountDue}}": "Οφειλόμενο ποσό: {{amountDue}}",
+  "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Εάν έχετε πληρώσει, ενημερώστε μας. Εάν όχι, κάντε το σύντομα για να αποφύγετε επιπλέον χρεώσεις.",
+  "Questions? Contact us at {{contactEmail}}.": "Ερωτήσεις; Επικοινωνήστε μαζί μας στο {{contactEmail}}.",
+  "Thanks, {{companyName}}": "Ευχαριστώ, {{companyName}}"
 }
