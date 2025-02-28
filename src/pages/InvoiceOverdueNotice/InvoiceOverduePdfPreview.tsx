@@ -1,4 +1,4 @@
-import {Document, Text, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -16,6 +16,7 @@ import {HtmlPDF} from 'components/HtmlPDF';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {useMemo} from 'react';
+import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
@@ -199,13 +200,8 @@ const InvoiceOverduePdfPreview = ({
           <TopSectionContainer>
             <PdfTemplateLeftAddress
               serviceCompanyInfo={serviceCompanyInfo}
-              receiverName={
-                invoice?.additionalInfo?.billingAddress?.component?.name ||
-                invoice?.propertyOwner?.name
-              }
-              addressComponent={
-                invoice?.propertyOwner.billingAddress?.component
-              }
+              fallbackReceiverName={invoice?.propertyOwner?.name}
+              addressComponent={getAddressComponentFromInvoice(invoice)}
               selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}

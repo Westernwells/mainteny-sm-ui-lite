@@ -72,6 +72,7 @@ export const BottomDrawer = ({
         <ButtonGroup variant="contained">
           {primaryButtonLabel && (
             <MuiButton
+              data-testid="primary-button"
               type="submit"
               disabled={!isValid || isSaving}
               onClick={primaryButtonAction}>

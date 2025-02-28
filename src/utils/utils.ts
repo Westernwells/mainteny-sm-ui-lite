@@ -201,6 +201,8 @@ export const formatAddressFullname = (
   if (!address) return address;
 
   const name = address?.component?.name ? address?.component?.name : '';
+  const name2 = address?.component?.name2;
+  const name3 = address?.component?.name3;
   const address1 = address?.component?.street ? address?.component?.street : '';
   const address2 = address?.component?.street2 || '';
   const zip = address?.component?.postalCode || '';
@@ -225,6 +227,8 @@ export const formatAddressFullname = (
 
   const fullName = [
     name,
+    name2,
+    name3,
     address1,
     address2,
     zip,
@@ -233,7 +237,7 @@ export const formatAddressFullname = (
     country,
     moreInfo,
   ]
-    .filter((x) => x !== '')
+    .filter((x) => !!x && x !== '')
     .join(', ');
 
   const fullCityNameParts = [address1, address2];
@@ -250,6 +254,8 @@ export const formatAddressFullname = (
     ...address,
     component: {
       name,
+      name2,
+      name3,
       street: address1,
       street2: address2,
       postalCode: zip,

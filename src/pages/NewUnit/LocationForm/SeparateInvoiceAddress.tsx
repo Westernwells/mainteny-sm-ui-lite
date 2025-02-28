@@ -4,6 +4,7 @@ import {FormikProps} from 'formik';
 import {SeparateAddressFormModal} from 'models/unitForm';
 import {useTranslation} from 'react-i18next';
 import {Checkbox, Typography} from '@mui/material';
+import BillingAddress from 'pages/NewUnit/BillingAddress';
 import {AddressForm} from './AddressForm';
 
 interface Props {
@@ -56,12 +57,7 @@ export const SeparateInvoiceAddress = ({
       </Box>
       {isSeparateAddressEnabled && (
         <Box>
-          <AddressForm
-            title="Billing address"
-            type="billingAddress"
-            columnSettings={columnSettings}
-            formik={formik}
-          />
+          <BillingAddress formik={formik} />
           <AddressForm
             title="Beneficiary address"
             type="beneficiaryAddress"

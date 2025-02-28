@@ -3,17 +3,17 @@ import {t} from 'i18next';
 import {Controller, UseFormSetValue} from 'react-hook-form';
 import {theme} from 'theme';
 import {
-  Grid2 as Grid,
   Box,
-  Tab,
   FormControl,
+  Grid2 as Grid,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
-  Typography,
-  IconButton,
-  InputAdornment,
+  Tab,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import {FormInput} from 'components/form/FormInput';
 import {CUSTOMER_ALL_INVOICE_FORMATS} from 'utils/constants';
@@ -31,6 +31,7 @@ import {createEmptyResource} from 'utils/paging';
 import {convertToText} from 'utils/utils';
 import {useVats} from 'hooks/reactQuery/useVats';
 import {useCompanyTerms} from 'hooks/reactQuery/useCompanies';
+import BillingAddress from 'pages/CustomerDetails/Tabs/CustomerOverview/BillingAddress';
 import {EditFinanceAddress} from './EditFinanceAddress';
 
 interface Props {
@@ -113,24 +114,44 @@ export const EditFinanceInformation = ({
           </Box>
 
           {['billingAddress', 'otherAddress', 'beneficiaryAddress'].map(
-            (address) => (
-              <TabPanel key={address} value={address} sx={{px: 0}}>
-                <EditFinanceAddress
-                  address={
-                    address as
-                      | 'billingAddress'
-                      | 'otherAddress'
-                      | 'beneficiaryAddress'
-                  }
-                  control={control}
-                  errors={errors}
-                  setValue={
-                    setValue as unknown as UseFormSetValue<CustomerFinanceFormModel>
-                  }
-                  watch={watch}
-                />
-              </TabPanel>
-            ),
+            (address) => {
+              if (address === 'billingAddress') {
+                return (
+                  <TabPanel
+                    key={address}
+                    value={address}
+                    sx={{px: 0}}
+                    keepMounted>
+                    <BillingAddress
+                      control={control}
+                      errors={errors}
+                      setValue={
+                        setValue as unknown as UseFormSetValue<CustomerFinanceFormModel>
+                      }
+                      watch={watch}
+                    />
+                  </TabPanel>
+                );
+              }
+
+              return (
+                <TabPanel
+                  key={address}
+                  value={address}
+                  sx={{px: 0}}
+                  keepMounted>
+                  <EditFinanceAddress
+                    address={address as 'otherAddress' | 'beneficiaryAddress'}
+                    control={control}
+                    errors={errors}
+                    setValue={
+                      setValue as unknown as UseFormSetValue<CustomerFinanceFormModel>
+                    }
+                    watch={watch}
+                  />
+                </TabPanel>
+              );
+            },
           )}
         </TabContext>
       </Grid>

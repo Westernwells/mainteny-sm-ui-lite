@@ -201,7 +201,7 @@ const OrderArticlePDFPreview = React.memo(
             <TopSectionContainer>
               <PdfTemplateLeftAddress
                 serviceCompanyInfo={serviceCompanyInfo}
-                receiverName={supplier?.name}
+                fallbackReceiverName={supplier?.name}
                 addressComponent={supplier?.address?.component}
                 selectedLng={selectedLng}
                 translate={translate}

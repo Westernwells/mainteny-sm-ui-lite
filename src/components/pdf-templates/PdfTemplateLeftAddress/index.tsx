@@ -1,10 +1,12 @@
 import {AddressComponent} from 'models/misc';
-import {Text, View, StyleSheet} from '@react-pdf/renderer';
-import PdfTemplateBeneficiaryAddress from './PdfTemplateBeneficiaryAddress';
+import {Text, View} from '@react-pdf/renderer';
+import PdfTemplateBeneficiaryAddress from 'components/pdf-templates/PdfTemplateBeneficiaryAddress';
+import {getStyles} from 'components/pdf-templates/PdfTemplateLeftAddress/PdfTemplateLeftAddress.styles';
+import {useMemo} from 'react';
 
 type Props = {
   serviceCompanyInfo?: string;
-  receiverName?: string;
+  fallbackReceiverName?: string;
   addressComponent?: AddressComponent | null;
   selectedLng?: string;
   translate: (key: string) => string;
@@ -13,43 +15,9 @@ type Props = {
   eanValue?: string;
 };
 
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
-  StyleSheet.create({
-    leftAddress: {
-      flex: '0 0 53%',
-      display: 'flex',
-      flexDirection: 'column',
-      ...boldFontStyle,
-    },
-    addressTextWrapper: {
-      marginBottom: 13,
-    },
-    addressText: {
-      fontSize: 7,
-      ...regularFontStyle,
-      flexWrap: 'wrap',
-      marginBottom: 2,
-      color: '#212121',
-      maxWidth: 250,
-      marginTop: 2,
-    },
-    partialAddressText: {
-      fontSize: 9,
-      marginBottom: 1,
-      ...boldFontStyle,
-    },
-    partAddress: {
-      fontSize: 9,
-      marginBottom: 4,
-    },
-  });
-
 const PdfTemplateLeftAddress = ({
   serviceCompanyInfo,
-  receiverName,
+  fallbackReceiverName,
   addressComponent,
   selectedLng,
   translate,
@@ -68,6 +36,33 @@ const PdfTemplateLeftAddress = ({
 
   const styles = getStyles(boldFontStyle, regularFontStyle);
 
+  const displayName = useMemo(() => {
+    if (!addressComponent && !fallbackReceiverName) return;
+
+    if (!addressComponent || !addressComponent?.name)
+      return (
+        <Text style={styles.partialAddressText}>{fallbackReceiverName}</Text>
+      );
+
+    if (!addressComponent?.name) return;
+
+    return (
+      <>
+        <Text style={styles.partialAddressText}>{addressComponent.name}</Text>
+        {addressComponent.name2 && (
+          <Text style={styles.partialAddressText}>
+            {addressComponent.name2}
+          </Text>
+        )}
+        {addressComponent.name3 && (
+          <Text style={styles.partialAddressText}>
+            {addressComponent.name3}
+          </Text>
+        )}
+      </>
+    );
+  }, [fallbackReceiverName, addressComponent]);
+
   return (
     <View style={styles.leftAddress}>
       <View style={styles.addressTextWrapper}>
@@ -75,9 +70,7 @@ const PdfTemplateLeftAddress = ({
       </View>
 
       <View style={styles.partAddress}>
-        {!!receiverName && (
-          <Text style={styles.partialAddressText}>{receiverName}</Text>
-        )}
+        {!!displayName && displayName}
 
         {!!addressComponent?.street && (
           <Text style={styles.partialAddressText}>
