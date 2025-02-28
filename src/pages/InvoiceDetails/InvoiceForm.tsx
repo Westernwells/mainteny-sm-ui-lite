@@ -161,6 +161,7 @@ import {SwissQRBill} from 'swissqrbill/svg';
 import {calculateArticlesAmount} from 'utils/calculate-total';
 import {VatView} from 'models/vat';
 import PdfPartialUpfrontPreview from 'components/pdf-templates/invoice-previews/PdfPartialUpfrontPreview';
+import PdfPreviewFinalInvoiceTermplate from 'components/pdf-templates/invoice-previews/PdfPreviewFinalInvoiceTermplate';
 
 interface Props {
   invoice?: InvoiceView;
@@ -1617,7 +1618,7 @@ export const InvoiceForm = ({
     ) {
       PdfTemplate = PdfPartialUpfrontPreview;
     } else {
-      PdfTemplate = FinalInvoicePdfTemplate;
+      PdfTemplate = PdfPreviewFinalInvoiceTermplate;
     }
 
     const shouldIncludePreviousInvoices = !(
