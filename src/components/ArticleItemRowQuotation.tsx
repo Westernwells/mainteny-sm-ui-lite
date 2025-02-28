@@ -54,6 +54,7 @@ import useHighlightText from 'hooks/useHighlightText';
 import {
   calculatePackageMaterialLaborPercentages,
   getArticleTypeText,
+  getArticleTypes,
 } from 'utils/article-utils';
 import {getItemTotalAfterPerItemDiscount} from 'utils/calculate-total';
 import {QuotationItemRecord} from 'models/quotation';
@@ -320,6 +321,7 @@ export const ArticleItemRowQuotation = ({
       pageIndex: 0,
       pageSize: 30,
       query: debouncedText,
+      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
     },
     {keepPreviousData: true, enabled: popperOpen && tabValue === 0},
   );

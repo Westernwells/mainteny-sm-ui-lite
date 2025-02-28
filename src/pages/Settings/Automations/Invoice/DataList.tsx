@@ -43,7 +43,7 @@ import {TabItems, Tabs} from 'components/Tab';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import {getPlainStringFromHtml, isPlainString} from 'utils/rich-field-string';
 import {EmptySection} from 'components/EmptySection';
-import {ArticleView} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {useDebounce} from 'hooks/useDebounce';
 import {createEmptyResource} from 'utils/paging';
 import {useArticles} from 'hooks/reactQuery/useArticle';
@@ -54,6 +54,7 @@ import TruncatedTooltip from 'components/TruncatedTooltip';
 import {Dialog} from 'components/Dialog';
 import {useNavigate} from 'react-router-dom';
 import useTheme from '@mui/material/styles/useTheme';
+import {getArticleTypes} from 'utils/article-utils';
 import {Actions} from './Actions';
 import {
   StyledDataListCell,
@@ -365,6 +366,7 @@ const DataList = ({
       pageIndex: 0,
       pageSize: 30,
       query: debouncedSearchText,
+      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
     },
     {keepPreviousData: true, enabled: searchState.popperOpen && tabValue === 0},
   );
