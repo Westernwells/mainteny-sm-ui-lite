@@ -274,3 +274,12 @@ export const getFilteredArticleTypeOptions = ({
       value,
       label: convertToText(value),
     }));
+
+export const getArticleTypes = ({
+  excludeTypes = [],
+}: {
+  excludeTypes?: ArticleType[];
+}): ArticleType[] => {
+  const excludedSet = new Set(excludeTypes);
+  return Object.values(ArticleType).filter((type) => !excludedSet.has(type));
+};

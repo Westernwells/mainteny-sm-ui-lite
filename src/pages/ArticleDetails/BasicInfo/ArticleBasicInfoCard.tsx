@@ -15,7 +15,7 @@ import Tag from '@mui/icons-material/Tag';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
-import {ArticleView, UpdateArticleRecord} from 'models/article';
+import {ArticleType, ArticleView, UpdateArticleRecord} from 'models/article';
 import {ArticleBasicFormModel} from 'models/articleForm';
 import {Dialog} from 'components/Dialog';
 import {useArticles, useUpdateArticle} from 'hooks/reactQuery/useArticle';
@@ -31,6 +31,7 @@ import {convertToText} from 'utils/utils';
 import {createEmptyResource} from 'utils/paging';
 import {getPlainStringFromHtml, isPlainString} from 'utils/rich-field-string';
 import DOMPurify from 'dompurify';
+import {getArticleTypes} from 'utils/article-utils';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const isExternalIdUnique = async (resource: ArticleView[], value?: string) => {
@@ -62,7 +63,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
         pageIndex: 0,
         pageSize: 50,
         query: updatedValue,
-        type: [],
+        type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
       },
       {keepPreviousData: true},
       true,

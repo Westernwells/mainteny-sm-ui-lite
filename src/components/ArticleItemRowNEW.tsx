@@ -55,6 +55,7 @@ import {createEmptyResource} from 'utils/paging';
 import {
   calculatePackageMaterialLaborPercentages,
   getArticleTypeText,
+  getArticleTypes,
 } from 'utils/article-utils';
 import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
@@ -313,6 +314,7 @@ export const ArticleItemRowNEW = ({
       pageIndex: 0,
       pageSize: 30,
       query: debouncedSearchText,
+      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
     },
     {keepPreviousData: true, enabled: popperOpen && tabValue === 0},
   );
