@@ -1886,5 +1886,11 @@
   "Payment data included": "Ödeme verileri dahil",
   "Auto Dialer": "Otomatik çevirici",
   "Email address": "E -posta adresi",
-  "Can't be less than 0": "0'den az olamaz"
+  "Can't be less than 0": "0'den az olamaz",
+  "Hello {{customerName}},": "Merhaba {{customerName}},",
+  "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "#{{İnvoicenumber}} faturası için ödemeniz, {{Dudeate}} adresinden ötürü gecikmiş.",
+  "Amount Due: {{amountDue}}": "Beklenmesi gereken miktar: {{miktarDue}}",
+  "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Ödediyseniz, lütfen bize bildirin. Değilse, ekstra ücretlerden kaçınmak için lütfen yakında yapın.",
+  "Questions? Contact us at {{contactEmail}}.": "Sorular? {{Contactemail}} adresinden bize ulaşın.",
+  "Thanks, {{companyName}}": "Teşekkürler, {{companyName}}"
 }

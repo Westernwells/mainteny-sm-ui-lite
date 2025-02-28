@@ -97,6 +97,8 @@ export interface Location {
 
 export interface AddressComponent {
   name?: string;
+  name2?: string;
+  name3?: string;
   street?: string;
   street2?: string;
   city?: string;

@@ -25,7 +25,7 @@ export const EditFinanceAddress = ({
   control: Control<CustomerFinanceFormModel>;
   setValue: UseFormSetValue<CustomerFinanceFormModel>;
   errors: FieldErrors<CustomerFinanceFormModel>;
-  address: 'billingAddress' | 'otherAddress' | 'beneficiaryAddress';
+  address: 'otherAddress' | 'beneficiaryAddress';
   watch: UseFormWatch<CustomerFinanceFormModel>;
 }) => {
   const {t} = useTranslation();
@@ -63,26 +63,19 @@ export const EditFinanceAddress = ({
       </Grid>
       <Grid size={{md: 6}}>
         <AddressAutoComplete
-          initialValue={
-            watch(`${address}.component.street`) ||
-            watch(`${address}.fullName`) ||
-            ''
-          }
+          initialValue={watch(`${address}.component.street`) || ''}
           initialAddress={watch(`${address}`) as AddressRecord | undefined}
           inputError={errors?.[address]?.fullName?.message || ''}
           textFieldProps={{
-            id: `${address}.fullName`,
+            id: `${address}.component.street`,
             placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
-            name: `${address}.fullName`,
+            name: `${address}.component.street`,
             label: 'Address line 1',
-            ...(address === 'billingAddress' && {
-              required: true,
-              helperText: errors?.[address]?.fullName?.message || '',
-              error: !!errors?.[address]?.fullName,
-            }),
           }}
           allowMap
           getAddress={(componentAddress) => {
+            if (!componentAddress) return;
+
             const currentValues = watch(address);
 
             setValue(address, {
@@ -120,11 +113,6 @@ export const EditFinanceAddress = ({
                 id: 'city',
                 size: 'small',
                 label: 'City',
-                ...(address === 'billingAddress' && {
-                  required: true,
-                  helperText: errors?.[address]?.component?.city?.message || '',
-                  error: !!errors?.[address]?.component?.city,
-                }),
               }}
             />
           )}
@@ -141,12 +129,6 @@ export const EditFinanceAddress = ({
                 id: 'postalCode',
                 size: 'small',
                 label: 'ZIP/Postal Code',
-                ...(address === 'billingAddress' && {
-                  required: true,
-                  helperText:
-                    errors?.[address]?.component?.postalCode?.message || '',
-                  error: !!errors?.[address]?.component?.postalCode,
-                }),
               }}
             />
           )}
@@ -165,12 +147,7 @@ export const EditFinanceAddress = ({
               selectProps={{
                 ...field,
                 multiple: false,
-                ...(address === 'billingAddress' && {
-                  required: true,
-                  error: !!errors?.[address]?.component?.country,
-                }),
               }}
-              required={address === 'billingAddress'}
               isCompanyTranslation
             />
           )}
@@ -194,50 +171,6 @@ export const EditFinanceAddress = ({
           )}
         />
       </Grid>
-
-      {address === 'billingAddress' && (
-        <Grid size={{md: 6}}>
-          <Controller
-            name={`${address}.component.moreInfo`}
-            control={control}
-            render={({field}) => (
-              <FormInput
-                fieldProps={{
-                  ...field,
-                  size: 'small',
-                  label: 'Additional Information',
-                }}
-              />
-            )}
-          />
-        </Grid>
-      )}
-
-      {address === 'billingAddress' && (
-        <Grid size={{xs: 6}}>
-          <Controller
-            name="billingEmail"
-            control={control}
-            rules={{
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: t('Please enter a valid email address'),
-              },
-            }}
-            render={({field}) => (
-              <FormInput
-                fieldProps={{
-                  size: 'small',
-                  label: t('Billing email address'),
-                  ...field,
-                  error: !!errors?.billingEmail,
-                  helperText: errors?.billingEmail?.message || '',
-                }}
-              />
-            )}
-          />
-        </Grid>
-      )}
     </Grid>
   );
 };

@@ -3086,5 +3086,11 @@
   "Mixed Position created successfully": "Posición Mixta creada con éxito",
   "Sub-position created successfully": "Subpuesto creado exitosamente",
   "Qty": "Cantidad",
-  "Invoice restored by {{name}}": "Factura restaurada por {{name}}"
+  "Invoice restored by {{name}}": "Factura restaurada por {{name}}",
+  "Hello {{customerName}},": "Hola {{Customername}},",
+  "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "Su pago por la factura #{{InnoCeiceNumber}}, se debió en {{Duedate}}, está atrasado.",
+  "Amount Due: {{amountDue}}": "Cantidad adeudada: {{montiondue}}",
+  "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Si ha pagado, háganoslo saber. Si no, hágalo pronto para evitar tarifas adicionales.",
+  "Questions? Contact us at {{contactEmail}}.": "¿Preguntas? Contáctenos en {{ContactEmail}}.",
+  "Thanks, {{companyName}}": "Gracias, {{CompanyName}}"
 }

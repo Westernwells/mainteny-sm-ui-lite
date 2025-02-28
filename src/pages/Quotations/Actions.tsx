@@ -39,6 +39,7 @@ import {
 import TableActionButton from 'components/Table/TableActionButton';
 import useQuotationMenuActions from 'hooks/useQuotationMenuActions';
 import {companyLanguageContextMap} from 'utils/language';
+import {downloadFile as utilDownloadFile} from 'utils/download';
 
 interface Props {
   quotation: QuotationView;
@@ -216,16 +217,30 @@ const Actions = ({quotation}: Props) => {
     }
   };
 
+  const handleDownloadDraftQuotation = async (filePath: string) => {
+    const fileName = `${quotation.number}`;
+
+    utilDownloadFile({fileName, downloadUrl: filePath});
+  };
+
   useEffect(() => {
     if (filePathToDownload && actionType === 'PRINT') {
       onPrintQuotation(filePathToDownload);
       setFilePathToDownload('');
       setActionType('');
     }
+
+    if (filePathToDownload && actionType === 'DOWNLOAD') {
+      handleDownloadDraftQuotation(filePathToDownload);
+      setFilePathToDownload('');
+      setActionType('');
+    }
   }, [filePathToDownload, actionType]);
 
   useEffect(() => {
-    if (downloadUrl?.[filePathToDownload] && actionType === 'DOWNLOAD') {
+    if (quotation.status === 'DRAFT' && actionType === 'DOWNLOAD') {
+      generateBlobUrl();
+    } else if (downloadUrl?.[filePathToDownload] && actionType === 'DOWNLOAD') {
       downloadFile();
       setFilePathToDownload('');
     }
@@ -303,8 +318,10 @@ const Actions = ({quotation}: Props) => {
     onSend: handleOpenSendEmail,
     onDownload: async () => {
       setActionType('DOWNLOAD');
-      refetchDownloadUrl();
-      setFilePathToDownload(quotation.additionalInfo.pdfPath!);
+      if (quotation.status !== 'DRAFT') {
+        refetchDownloadUrl();
+        setFilePathToDownload(quotation.additionalInfo.pdfPath!);
+      }
     },
     onDelete: () => setIsDeleteDialogOpen(true),
     onResend: handleOpenSendEmail,

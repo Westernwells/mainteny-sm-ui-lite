@@ -1,4 +1,4 @@
-import {AddressRecord, Contact} from 'models/misc';
+import {Address, AddressRecord, Contact} from 'models/misc';
 import {Priority} from 'models/service-order';
 import {convertToText} from 'utils/utils';
 
@@ -21,9 +21,9 @@ export type CustomerBasicInfoFormModel = {
 };
 
 export type CustomerAddressFormModel = {
-  billingAddress: AddressRecord | null;
-  beneficiaryAddress: AddressRecord | null;
-  otherAddress: AddressRecord | null;
+  billingAddress: Address | null;
+  beneficiaryAddress: Address | null;
+  otherAddress: Address | null;
 };
 
 export enum PropertyContactPersonRole {

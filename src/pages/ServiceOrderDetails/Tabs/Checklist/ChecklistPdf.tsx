@@ -17,6 +17,7 @@ import {HeaderFooterInfoData} from 'models/misc';
 import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
+import {getAddressComponentFromServiceOrder} from 'utils/pdfTemplates';
 import {PdfChecklistComponent} from './PdfChecklistComponent';
 
 const getStyles = (
@@ -184,10 +185,10 @@ const ChecklistPdf = ({
           <TopSectionContainer>
             <PdfTemplateLeftAddress
               serviceCompanyInfo={serviceCompanyInfo}
-              receiverName={serviceOrder?.elevator?.propertyOwner?.name}
-              addressComponent={
-                serviceOrder?.elevator.propertyOwner.billingAddress?.component
-              }
+              fallbackReceiverName={serviceOrder?.elevator?.propertyOwner?.name}
+              addressComponent={getAddressComponentFromServiceOrder(
+                serviceOrder,
+              )}
               selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}

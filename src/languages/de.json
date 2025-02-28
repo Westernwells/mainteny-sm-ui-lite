@@ -3093,5 +3093,13 @@
   "Invoice restored by {{name}}": "Rechnung wurde von {{name}} wiederhergestellt",
   "Additional names will be added underneath the main name on pdf documents.": "Zusätzliche Namen werden unter dem Hauptnamen in PDFs hinzugefügt.",
   "Additional Name": "Zusätzlicher Name",
-  "Select contact": "Kontakt wählen"
+  "Select contact": "Kontakt wählen",
+  "Text block is too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes": "Textblock ist zu groß. Unterstützte Größe: {{sizeLimit}} Bytes, aktuelle Größe: {{currentSize}} Bytes.",
+  "Email files are too big. Supported size {{sizeLimit}} bytes, current size {{currentSize}} bytes": "E-Mail-Dateien sind zu groß. Unterstützte Größe: {{sizeLimit}} Bytes, aktuelle Größe: {{currentSize}} Bytes.",
+  "Hello {{customerName}},": "Hallo {{customerName}},",
+  "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "Ihre Zahlung für Rechnung #{{invoiceNumber}}, war am {{dueDate}}, fällig.",
+  "Amount Due: {{amountDue}}": "Fälliger Betrag: {{amountDue}}",
+  "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Sollte die Rechnung schon beglichen sein, teilen Sie uns dies bitte mit. Wenn nicht, bitten wir Sie um die Überweisung des fälligen Betrages, um zusätzliche Gebühren zu vermeiden.",
+  "Questions? Contact us at {{contactEmail}}.": "Sollten Sie Fragen haben, kontaktieren Sie uns unter {{contactEmail}}.",
+  "Thanks, {{companyName}}": "Vielen Dank, {{companyName}}"
 }
