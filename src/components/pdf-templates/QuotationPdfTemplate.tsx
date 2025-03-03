@@ -290,25 +290,24 @@ const QuotationPdfTemplate = React.memo(
 
     return (
       <Document>
-        {!!(
-          quotation?.additionalInfo.alternativeAddress &&
+        {quotation?.additionalInfo.alternativeAddress &&
           Object.keys(quotation?.additionalInfo.alternativeAddress!).length !==
-            0
-        ) && (
-          <AlternativeAddressTemplate
-            userInfo={userInfo}
-            selectedLng={selectedLng}
-            translate={translate}
-            headerInfo={headerInfo}
-            headerPath={headerPath}
-            footerInfo={footerInfo}
-            footerPath={footerPath}
-            alternativeServiceCompanyInfo={
-              quotation?.additionalInfo.alternativeServiceCompanyInfo
-            }
-            alternativeAddress={quotation?.additionalInfo.alternativeAddress}
-          />
-        )}
+            0 &&
+          !!quotation?.additionalInfo.alternativeAddress.component?.name && (
+            <AlternativeAddressTemplate
+              userInfo={userInfo}
+              selectedLng={selectedLng}
+              translate={translate}
+              headerInfo={headerInfo}
+              headerPath={headerPath}
+              footerInfo={footerInfo}
+              footerPath={footerPath}
+              alternativeServiceCompanyInfo={
+                quotation?.additionalInfo.alternativeServiceCompanyInfo
+              }
+              alternativeAddress={quotation?.additionalInfo.alternativeAddress}
+            />
+          )}
 
         <PdfPageContainer selectedLng={selectedLng}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
