@@ -733,7 +733,7 @@ export const Actions = ({
   };
 
   const getChecklistData = async () => {
-    if (!invoice?.serviceOrder?.id)
+    if (!selectedInvoice?.serviceOrder?.id)
       return {
         checklists: [],
         selectedChecklist: undefined,
