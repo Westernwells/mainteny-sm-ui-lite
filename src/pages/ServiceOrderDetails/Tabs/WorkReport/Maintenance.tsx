@@ -9,7 +9,7 @@ import {FormCheckbox} from 'components/form/FormCheckbox';
 import useTheme from '@mui/material/styles/useTheme';
 import {
   calculateSlotTotalWithoutSurcharge,
-  calculateTotalBillableHours,
+  roundTimeWithSurcharge,
 } from 'utils/service-order-utils';
 import {convertMinutesWithRounding} from 'utils/work-hours-utils';
 import {NumericFormat} from 'react-number-format';
@@ -32,16 +32,32 @@ export const Maintenance = ({formik, isEdit}: Props) => {
   const theme = useTheme();
   const {language: selectedLng} = useContext(LanguageContext);
 
-  const totalBillableHours = calculateTotalBillableHours([
-    formik.values.workTimeRecord!,
-    formik.values.travelTimeRecord!,
+  const totalBillableHours = useMemo(() => {
+    const roundingStep = company?.settings.minToHourStep || MinToStep.STEP_0;
+
+    // Round and add surcharges for each type separately
+    const totalWorkMinutes = roundTimeWithSurcharge(
+      formik.values.workTimeRecord,
+      roundingStep,
+    );
+
+    const totalTravelMinutes = roundTimeWithSurcharge(
+      formik.values.travelTimeRecord,
+      roundingStep,
+    );
+
+    return totalWorkMinutes + totalTravelMinutes;
+  }, [
+    formik.values.workTimeRecord,
+    formik.values.travelTimeRecord,
+    company?.settings.minToHourStep,
   ]);
 
   const totalBillableHoursFormatted = convertMinutesWithRounding(
     totalBillableHours,
     {hourUnit: 'h'},
     1,
-    company?.settings.minToHourStep || MinToStep.STEP_0,
+    MinToStep.STEP_0, // No additional rounding needed since we already rounded totalBillableHours
   );
 
   const totalTravelFormatted = useMemo(() => {
