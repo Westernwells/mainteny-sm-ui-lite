@@ -750,6 +750,7 @@ const JobOverviewPdfTemplate = React.memo(
             translate={translate}
             footerInfo={footerInfo}
             footerPath={footerPath}
+            isQuotationJobConfirmation={!!quotation?.externalId}
           />
         </PdfPageContainer>
       </Document>
