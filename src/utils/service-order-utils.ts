@@ -502,3 +502,20 @@ export const filterServiceOrderTypes = ({
     jobTypesInStatistics.includes(job.name),
   );
 };
+
+export const roundTimeWithSurcharge = (
+  timeRecord: ServiceOrderReportTimeRecord | undefined,
+  roundingStep: number,
+): number => {
+  const minutes = calculateSlotTotalWithoutSurcharge(timeRecord);
+
+  // Round the base minutes according to company settings
+  const roundedMinutes = Math.ceil(minutes / roundingStep) * roundingStep;
+
+  // Calculate surcharge on rounded minutes
+  const surchargeMinutes = Math.floor(
+    (roundedMinutes * (timeRecord?.percentageSurcharge ?? 0)) / 100,
+  );
+
+  return roundedMinutes + surchargeMinutes;
+};
