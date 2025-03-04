@@ -11,6 +11,7 @@ type Props = {
   selectedLng?: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
+  isQuotationJobConfirmation?: boolean;
 };
 
 Font.register({
@@ -127,6 +128,7 @@ const PdfTemplateFooter = ({
   translate,
   footerInfo,
   footerPath,
+  isQuotationJobConfirmation,
 }: Props) => {
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
@@ -151,70 +153,74 @@ const PdfTemplateFooter = ({
     <View fixed style={styles.footerContainer}>
       <View style={styles.footerWrapper}>
         <View style={styles.leftFooter}>
-          <View style={styles.footerContent}>
-            {!!userInfo?.serviceCompany.name && (
-              <Text style={styles.footerHeading}>
-                {userInfo?.serviceCompany?.name}
-              </Text>
-            )}
-            {!!userInfo?.serviceCompany?.billingAddress?.fullName && (
-              <Text style={styles.footerSectionBody}>
-                {userInfo?.serviceCompany?.billingAddress?.fullName}
-              </Text>
-            )}
-            {!!userInfo?.serviceCompany?.contact?.phone && (
-              <Text style={styles.footerSectionBody}>
-                {translate('Tel.')}: {userInfo?.serviceCompany?.contact?.phone}
-              </Text>
-            )}
-          </View>
-
-          {!!userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
+          {!isQuotationJobConfirmation && (
             <View style={styles.footerContent}>
-              {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
+              {!!userInfo?.serviceCompany.name && (
                 <Text style={styles.footerHeading}>
-                  {translate('Bank')}:{' '}
-                  {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName}
+                  {userInfo?.serviceCompany?.name}
                 </Text>
               )}
-
-              {!!userInfo?.serviceCompany?.settings?.paymentInfo
-                ?.accountNumber && (
+              {!!userInfo?.serviceCompany?.billingAddress?.fullName && (
                 <Text style={styles.footerSectionBody}>
-                  {translate('Acc. nr.')}:{' '}
-                  {
-                    userInfo?.serviceCompany?.settings?.paymentInfo
-                      ?.accountNumber
-                  }
+                  {userInfo?.serviceCompany?.billingAddress?.fullName}
                 </Text>
               )}
-              {!!userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap:
-                      userInfo?.serviceCompany?.settings?.paymentInfo?.iban
-                        .length < 23
-                        ? 'nowrap'
-                        : 'wrap',
-                  }}>
-                  <Text style={styles.footerSectionBody}>
-                    {translate('IBAN')}:{' '}
-                  </Text>
-                  <Text style={{...styles.footerSectionBody, flexShrink: 1}}>
-                    {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
-                  </Text>
-                </View>
-              )}
-              {!!userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
+              {!!userInfo?.serviceCompany?.contact?.phone && (
                 <Text style={styles.footerSectionBody}>
-                  {translate('BIC')}:{' '}
-                  {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
+                  {translate('Tel.')}:{' '}
+                  {userInfo?.serviceCompany?.contact?.phone}
                 </Text>
               )}
             </View>
           )}
+
+          {!isQuotationJobConfirmation &&
+            !!userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
+              <View style={styles.footerContent}>
+                {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName && (
+                  <Text style={styles.footerHeading}>
+                    {translate('Bank')}:{' '}
+                    {userInfo?.serviceCompany?.settings?.paymentInfo?.bankName}
+                  </Text>
+                )}
+
+                {!!userInfo?.serviceCompany?.settings?.paymentInfo
+                  ?.accountNumber && (
+                  <Text style={styles.footerSectionBody}>
+                    {translate('Acc. nr.')}:{' '}
+                    {
+                      userInfo?.serviceCompany?.settings?.paymentInfo
+                        ?.accountNumber
+                    }
+                  </Text>
+                )}
+                {!!userInfo?.serviceCompany?.settings?.paymentInfo?.iban && (
+                  <View
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      flexWrap:
+                        userInfo?.serviceCompany?.settings?.paymentInfo?.iban
+                          .length < 23
+                          ? 'nowrap'
+                          : 'wrap',
+                    }}>
+                    <Text style={styles.footerSectionBody}>
+                      {translate('IBAN')}:{' '}
+                    </Text>
+                    <Text style={{...styles.footerSectionBody, flexShrink: 1}}>
+                      {userInfo?.serviceCompany?.settings?.paymentInfo?.iban}
+                    </Text>
+                  </View>
+                )}
+                {!!userInfo?.serviceCompany?.settings?.paymentInfo?.bic && (
+                  <Text style={styles.footerSectionBody}>
+                    {translate('BIC')}:{' '}
+                    {userInfo?.serviceCompany?.settings?.paymentInfo?.bic}
+                  </Text>
+                )}
+              </View>
+            )}
 
           {!!userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName && (
             <View style={styles.footerContent}>
@@ -264,39 +270,40 @@ const PdfTemplateFooter = ({
               )}
             </View>
           )}
+          {!isQuotationJobConfirmation && (
+            <View style={styles.footerContent}>
+              {representationText && (
+                <Text style={styles.footerHeading}>{representationText}</Text>
+              )}
 
-          <View style={styles.footerContent}>
-            {representationText && (
-              <Text style={styles.footerHeading}>{representationText}</Text>
-            )}
+              {!!userInfo?.serviceCompany?.settings?.arbitrationCourt && (
+                <Text style={styles.footerSectionBody}>
+                  {translate('Registration court')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.arbitrationCourt}
+                </Text>
+              )}
+              {!!userInfo?.serviceCompany?.settings?.vatId && (
+                <Text style={styles.footerSectionBody}>
+                  {translate('VAT ID')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.vatId}{' '}
+                </Text>
+              )}
 
-            {!!userInfo?.serviceCompany?.settings?.arbitrationCourt && (
-              <Text style={styles.footerSectionBody}>
-                {translate('Registration court')}:{' '}
-                {userInfo?.serviceCompany?.settings?.arbitrationCourt}
-              </Text>
-            )}
-            {!!userInfo?.serviceCompany?.settings?.vatId && (
-              <Text style={styles.footerSectionBody}>
-                {translate('VAT ID')}:{' '}
-                {userInfo?.serviceCompany?.settings?.vatId}{' '}
-              </Text>
-            )}
+              {!!userInfo?.serviceCompany?.settings?.taxNumber && (
+                <Text style={styles.footerSectionBody}>
+                  {translate('Tax ID')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.taxNumber}
+                </Text>
+              )}
 
-            {!!userInfo?.serviceCompany?.settings?.taxNumber && (
-              <Text style={styles.footerSectionBody}>
-                {translate('Tax ID')}:{' '}
-                {userInfo?.serviceCompany?.settings?.taxNumber}
-              </Text>
-            )}
-
-            {!!userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
-              <Text style={styles.footerSectionBody}>
-                {translate('Certified')}:{' '}
-                {userInfo?.serviceCompany?.settings?.tradeRegisterNumber}
-              </Text>
-            )}
-          </View>
+              {!!userInfo?.serviceCompany?.settings?.tradeRegisterNumber && (
+                <Text style={styles.footerSectionBody}>
+                  {translate('Certified')}:{' '}
+                  {userInfo?.serviceCompany?.settings?.tradeRegisterNumber}
+                </Text>
+              )}
+            </View>
+          )}
         </View>
       </View>
 

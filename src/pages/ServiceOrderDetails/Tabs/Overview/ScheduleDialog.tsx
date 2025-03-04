@@ -273,6 +273,11 @@ export const ScheduleDialog = ({
     setValue('endDate', null);
   };
 
+  // to update value on mount
+  useEffect(() => {
+    setValue('technicianIds', defaultValues.technicianIds);
+  }, [defaultValues.technicianIds]);
+
   return (
     <Box component="form" onSubmit={onFormSubmit}>
       <Dialog
@@ -345,6 +350,7 @@ export const ScheduleDialog = ({
             <Box sx={{mt: '1.5em'}}>
               <Switch
                 value={watchSwitchActive}
+                testId="schedule-dialog-fixed-date-switch"
                 getValue={(value) => setValue('switchActive', value)}
                 label="Choose a fixed date and time"
               />
