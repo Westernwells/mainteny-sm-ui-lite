@@ -126,7 +126,7 @@ export const OrderDetails = ({serviceOrder, ...rest}: Props) => {
 
       <ScheduleDialog
         serviceOrderId={serviceOrder.id}
-        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
+        serviceOrderType={serviceOrder?.type}
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         defaultStartDate={

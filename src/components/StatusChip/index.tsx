@@ -30,6 +30,7 @@ export const statusColor: {[key: string]: string} = {
   'primary.dark': 'primary.dark',
   'grey.300': 'grey.300',
 };
+
 interface Props {
   label: string | ReactNode;
   style?: {[key: string]: any};
@@ -40,6 +41,7 @@ interface Props {
   borderColor?: string;
   color?: string;
   maxChars?: number;
+  testId?: string;
 }
 
 export const StatusChip = ({
@@ -52,10 +54,12 @@ export const StatusChip = ({
   color = 'default',
   variant = 'filled',
   length = 'auto',
+  testId = 'status-chip',
 }: Props) => {
   const {t} = useTranslation();
   return (
     <Chip
+      data-testid={testId}
       sx={{
         bgcolor:
           bgColor || (variant === 'filled' ? statusColor[color] : undefined),
