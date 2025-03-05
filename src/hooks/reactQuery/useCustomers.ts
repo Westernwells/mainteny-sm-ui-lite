@@ -13,7 +13,7 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
-import {queryKeys as qks, queryKeys} from 'reactQuery/constants';
+import {queryKeys} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {formatUpdateCustomer} from 'utils/customer-utils';
 import {
@@ -42,7 +42,7 @@ export const useQueryCustomers = (
 ) => {
   const {user} = useUserSession();
   return useQuery(
-    [qks.queryCustomers, params],
+    [queryKeys.queryCustomers, params],
     () =>
       queryCustomers({
         ...params,
@@ -257,7 +257,10 @@ export const useCustomer = (partiallyUpdate?: boolean) => {
       console.error(error);
       showError(error);
     } finally {
-      queryClient.invalidateQueries(queryKeys.queryCustomers);
+      queryClient.invalidateQueries([
+        queryKeys.queryCustomers,
+        queryKeys.fetchInvoices,
+      ]);
       isLoading = false;
     }
   };
