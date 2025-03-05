@@ -331,40 +331,36 @@ const MixedPositionPdf = ({
                 <View style={styles.footerRow}>
                   <Text style={{width: '44%'}} />
                   <View style={{width: '56%'}}>
-                    {mixedPosition?.data.unitSellingAmount.vats.map(
-                      (v, index) => (
-                        <View
-                          key={`${index}-${v.percentageVat}`}
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            paddingVertical: 4,
-                          }}>
-                          <Text
-                            style={{
-                              color: '#616161',
-                              fontSize: 10,
-                              textAlign: 'right',
-                              width: '57%',
-                            }}>
-                            {translate('VAT')} {v.percentageVat}%
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 10,
-                              textAlign: 'right',
-                              width: '43%',
-                            }}>
-                            {currencyFormatting(
-                              v.vat,
-                              currentCurrency!,
-                              selectedLng,
-                            )}
-                          </Text>
-                        </View>
-                      ),
-                    )}
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingVertical: 4,
+                      }}>
+                      <Text
+                        style={{
+                          color: '#616161',
+                          fontSize: 10,
+                          textAlign: 'right',
+                          width: '57%',
+                        }}>
+                        {translate('VAT')}{' '}
+                        {mixedPosition?.data.unitSellingAmount.percentageVat}%
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          textAlign: 'right',
+                          width: '43%',
+                        }}>
+                        {currencyFormatting(
+                          mixedPosition?.data.unitSellingAmount?.vat ?? 0,
+                          currentCurrency!,
+                          selectedLng,
+                        )}
+                      </Text>
+                    </View>
                   </View>
                 </View>
 
