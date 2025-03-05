@@ -12,10 +12,12 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import {ServiceOrderView} from 'models/service-order';
 import {InfoCard} from 'components/InfoCard';
 import {useTranslation} from 'react-i18next';
-import {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import ContactsWidget from 'pages/Contacts/ContactsWidget';
 import {ContactPersonAssociationType} from 'models/contacts';
 import {JobOverviewBottomDrawer} from 'components/JobOverviewBottomDrawer';
+import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
+import {getDefaultTechnician, getDialogTitle} from 'utils/service-order-utils';
 import {OrderInfoCard} from './OrderInfoCard';
 import {Quotation} from './Quotations';
 import {Invoices} from './Invoices';
@@ -28,14 +30,10 @@ interface Props {
   serviceOrder: ServiceOrderView;
 }
 
-export const serviceOrderActivitiesLang: {[key: string]: string} = {
-  EN: 'EN_US',
-  DE: 'DE_DE',
-};
-
 export const Overview = ({serviceOrder}: Props) => {
   const theme = useTheme();
   const {t} = useTranslation();
+  const [openDialog, setOpenDialog] = useState(false);
 
   const formatDate = useFormatDate();
   const {data: serviceOrderActivities = [], refetch} =
@@ -74,7 +72,10 @@ export const Overview = ({serviceOrder}: Props) => {
             flexDirection: 'column',
           }}>
           <Box>
-            <OrderInfoCard serviceOrderDetails={serviceOrder!} />
+            <OrderInfoCard
+              serviceOrderDetails={serviceOrder!}
+              onOpenRescheduleDialog={setOpenDialog}
+            />
           </Box>
 
           <Box mt="1em" flexGrow={1}>
@@ -159,7 +160,46 @@ export const Overview = ({serviceOrder}: Props) => {
         </InfoCard>
       </Grid>
 
-      <JobOverviewBottomDrawer serviceOrderDetails={serviceOrder} />
+      <JobOverviewBottomDrawer
+        serviceOrderDetails={serviceOrder}
+        onOpenRescheduleDialog={setOpenDialog}
+      />
+
+      {openDialog && (
+        <ScheduleDialog
+          serviceOrderId={serviceOrder.id}
+          serviceOrderType={serviceOrder.type}
+          title={t(getDialogTitle(serviceOrder))}
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          defaultTechnicians={getDefaultTechnician(serviceOrder)}
+          defaultStartDate={
+            serviceOrder.schedules.length
+              ? new Date(serviceOrder.schedules[0].startTime)
+              : null
+          }
+          defaultEndDate={
+            serviceOrder.schedules.length
+              ? new Date(serviceOrder.schedules[0].endTime)
+              : null
+          }
+          defaultDueDate={
+            serviceOrder.dueDate ? new Date(serviceOrder.dueDate) : null
+          }
+          defaultCallTime={
+            serviceOrder.additionalInfo?.callerInfo?.calledAt
+              ? new Date(serviceOrder.additionalInfo.callerInfo.calledAt)
+              : null
+          }
+          defaultCallerName={serviceOrder.additionalInfo?.callerInfo?.name}
+          defaultPurchaseOrderNumber={
+            serviceOrder.additionalInfo.purchaseOrderNumber
+          }
+          defaultCallerPhoneNumber={
+            serviceOrder.additionalInfo?.callerInfo?.phoneNumber
+          }
+        />
+      )}
     </Grid>
   );
 };

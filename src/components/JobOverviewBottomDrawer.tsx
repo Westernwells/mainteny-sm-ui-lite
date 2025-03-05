@@ -5,25 +5,15 @@ import {useTheme} from '@mui/material/styles';
 import JobNotes from 'pages/ServiceOrderDetails/JobNotes';
 import {ServiceOrderView} from 'models/service-order';
 import {useServiceOrderActions} from 'hooks/useServiceOrderActions';
-import {ScheduleDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/ScheduleDialog';
 import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {
-  useCompanyById,
-  useCompanyJobTypes,
-  useOldCompanyJobTypes,
-} from 'hooks/reactQuery/useCompanies';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {useCurrentCurrency} from 'utils/currency';
 import {MarkCompletedDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/MarkCompletedDialog';
-import {
-  getDefaultTechnician,
-  getDialogTitle,
-  getJobTypeGivenName,
-} from 'utils/service-order-utils';
 import useServiceOrderMenuActions from 'hooks/useServiceOrderMenuActions';
 import {ARCHIVE_ACTION, CANCEL_ACTION} from 'models/status';
 import {
@@ -37,31 +27,17 @@ import {Confirm} from './Confirm';
 
 interface BottomDrawerProps {
   serviceOrderDetails: ServiceOrderView;
+  onOpenRescheduleDialog: (value: boolean) => void;
 }
 
 export const JobOverviewBottomDrawer = ({
   serviceOrderDetails,
+  onOpenRescheduleDialog,
 }: BottomDrawerProps) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
-  const {data: jobTypes} = useCompanyJobTypes(
-    user?.userAccount.serviceCompany.id!,
-  );
-
-  const {data: oldJobTypes} = useOldCompanyJobTypes(
-    user?.userAccount.serviceCompany.id!,
-  );
-
-  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
-  const filteredOldJobTypes = oldJobTypes?.filter(
-    (oldJobType) =>
-      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
-  );
-
-  // Combine jobTypes and the filtered oldJobTypes
-  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
   const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
@@ -148,7 +124,6 @@ export const JobOverviewBottomDrawer = ({
   const {
     openCancelConfirm,
     openUnscheduleConfirm,
-    openDialog: openScheduleDialog,
     handleUncompleteServiceOrder,
     handleCancel,
     handleSchedule,
@@ -156,8 +131,10 @@ export const JobOverviewBottomDrawer = ({
     confirmUnschedule,
     setOpenCancelConfirm,
     setOpenUnscheduleConfirm,
-    setOpenDialog: setOpenScheduleDialog,
-  } = useServiceOrderActions(serviceOrderDetails.id);
+  } = useServiceOrderActions({
+    id: serviceOrderDetails.id,
+    externalSetOpenDialog: onOpenRescheduleDialog,
+  });
 
   const handleArchiveClick = (action: ARCHIVE_ACTION) => async () => {
     if (action === ARCHIVE_ACTION.ARCHIVE) {
@@ -296,45 +273,6 @@ export const JobOverviewBottomDrawer = ({
         open={openPaymentStatusChange}
         id={serviceOrderDetails.id}
         onClose={handleDeleteDialogClose}
-      />
-
-      <ScheduleDialog
-        serviceOrderId={serviceOrderDetails.id}
-        serviceOrderType={getJobTypeGivenName(
-          serviceOrderDetails.type,
-          allJobTypes,
-        )}
-        title={t(getDialogTitle(serviceOrderDetails))}
-        open={openScheduleDialog}
-        onClose={() => setOpenScheduleDialog(false)}
-        defaultTechnicians={getDefaultTechnician(serviceOrderDetails)}
-        defaultStartDate={
-          serviceOrderDetails.schedules.length
-            ? new Date(serviceOrderDetails.schedules[0].startTime)
-            : null
-        }
-        defaultEndDate={
-          serviceOrderDetails.schedules.length
-            ? new Date(serviceOrderDetails.schedules[0].endTime)
-            : null
-        }
-        defaultDueDate={
-          serviceOrderDetails.dueDate
-            ? new Date(serviceOrderDetails.dueDate)
-            : null
-        }
-        defaultCallTime={
-          serviceOrderDetails.additionalInfo?.callerInfo?.calledAt
-            ? new Date(serviceOrderDetails.additionalInfo.callerInfo.calledAt)
-            : null
-        }
-        defaultCallerName={serviceOrderDetails.additionalInfo?.callerInfo?.name}
-        defaultPurchaseOrderNumber={
-          serviceOrderDetails.additionalInfo.purchaseOrderNumber
-        }
-        defaultCallerPhoneNumber={
-          serviceOrderDetails.additionalInfo?.callerInfo?.phoneNumber
-        }
       />
     </>
   );

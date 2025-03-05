@@ -276,7 +276,7 @@ export const ScheduleDialog = ({
   // to update value on mount
   useEffect(() => {
     setValue('technicianIds', defaultValues.technicianIds);
-  }, [defaultValues.technicianIds]);
+  }, []);
 
   return (
     <Box component="form" onSubmit={onFormSubmit}>
