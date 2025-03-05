@@ -1,9 +1,9 @@
 import {
   Box,
-  InputLabel,
   FormControl,
-  Typography,
   IconButton,
+  InputLabel,
+  Typography,
 } from '@mui/material';
 import {EditorProvider} from '@tiptap/react';
 import {useEffect, useRef, useState} from 'react';
@@ -42,6 +42,7 @@ interface AttachedFilesProps {
   isLoadingFiles?: boolean;
   hasAttachFileButton?: boolean;
 }
+
 const AttachedFiles = ({
   files = [],
   removeFile,
@@ -148,12 +149,14 @@ interface Props {
   name?: string;
   control?: Control<any>;
   existingFiles?: FileWithPreview[];
-  updateFiles?: (files: FileWithPreview[]) => void;
   isLoadingFiles?: boolean;
   hasAttachFileButton?: boolean;
   hasSignatureButton?: boolean;
+  showTextBlock?: boolean;
+  updateFiles?: (files: FileWithPreview[]) => void;
   onSignatureSelect?: (signature?: EmailSignature) => void;
 }
+
 const RichTextEditor = ({
   required = false,
   label,
@@ -167,6 +170,7 @@ const RichTextEditor = ({
   updateFiles,
   hasAttachFileButton,
   hasSignatureButton = false,
+  showTextBlock,
   onSignatureSelect,
 }: Props) => {
   const {t} = useTranslation();
@@ -199,8 +203,9 @@ const RichTextEditor = ({
             onOpenFileUpload={() => dropzoneRef?.current?.open()}
             hasAttachFileButton={hasAttachFileButton}
             hasSignatureButton={hasSignatureButton}
-            onSignatureSelect={onSignatureSelect}
             updateHtml={updateHtml}
+            showTextBlock={showTextBlock}
+            onSignatureSelect={onSignatureSelect}
             onChange={onChange}
           />
         </>
@@ -208,7 +213,7 @@ const RichTextEditor = ({
       extensions={extensions}
       content={value}
       onUpdate={({editor}) => {
-        const cleanedHtml = cleanHtmlContent(editor.getHTML());
+        const cleanedHtml = cleanHtmlContent(editor.getHTML(), true);
         updateHtml?.(cleanedHtml);
         onChange(cleanedHtml);
       }}
@@ -295,21 +300,31 @@ const RichTextEditor = ({
           '& .ProseMirror table tbody tr': {
             width: '100%',
           },
-          '& .ProseMirror table tbody tr td:nth-child(1)': {
+          '& .ProseMirror table tbody tr td:nth-of-type(1)': {
             width: '100%',
             verticalAlign: 'top',
             paddingRight: '1em',
           },
-          '& .ProseMirror table tbody tr td:nth-child(1):has(p:empty), & .ProseMirror table tbody tr td:nth-child(1):has(p br)':
-            {
-              width: '0px', // Collapse width for an "empty" first <td>
-            },
-          '& .ProseMirror table tbody tr td:nth-child(1):has(p:empty) + td, & .ProseMirror table tbody tr td:nth-child(1):has(p br) + td':
+          '& .ProseMirror table tbody tr td:nth-of-type(1):has(p:empty)': {
+            width: '0px', // Collapse width for an "empty" first <td>
+          },
+          '& .ProseMirror table tbody tr td:nth-of-type(1):has(p:empty) + td, & .ProseMirror table tbody tr td:nth-of-type(1):has(p br) + td':
             {
               width: '100%', // Make the second <td> take the full width when the first <td> is "empty"
             },
-          '& .ProseMirror table tbody tr td:nth-child(2)': {
+          '& .ProseMirror table tbody tr td:nth-of-type(2)': {
             width: '93%', // When the first <td> contains meaningful content (like an image)
+          },
+          '& .ProseMirror table tbody tr td:nth-of-type(1):has(img)': {
+            width: '100px', // If the first td contains an image, set it to 100px
+          },
+
+          '& .ProseMirror table tbody tr td:nth-of-type(1):has(img) + td': {
+            width: 'calc(100% - 100px)', // The second td takes the remaining space
+          },
+
+          '& .ProseMirror table tbody tr td:nth-of-type(1):not(:has(img))': {
+            width: '100%', // When there is only text, let it take full width
           },
 
           background: '#F7F9FC',

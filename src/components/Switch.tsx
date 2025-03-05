@@ -7,11 +7,18 @@ import {useTranslation} from 'react-i18next';
 interface Props {
   label?: string | JSX.Element;
   value?: boolean;
+  testId?: string;
   getValue?: (val: boolean) => void;
   onChanged?: (val: boolean) => void;
 }
 
-export const Switch = ({label = '', value, getValue, onChanged}: Props) => {
+export const Switch = ({
+  label = '',
+  value,
+  testId = 'switch',
+  getValue,
+  onChanged,
+}: Props) => {
   const {t} = useTranslation();
 
   const getInitialValue = () => {
@@ -40,7 +47,13 @@ export const Switch = ({label = '', value, getValue, onChanged}: Props) => {
   return (
     <FormGroup>
       <FormControlLabel
-        control={<MuiSwitch checked={checked} onChange={handleChange} />}
+        control={
+          <MuiSwitch
+            data-testid={testId}
+            checked={checked}
+            onChange={handleChange}
+          />
+        }
         label={t(`${label}`)}
       />
     </FormGroup>

@@ -82,7 +82,10 @@ export const stripHtmlTags = (html: string): string => {
   return textContent.replace(/\s+/g, ' ').trim();
 };
 
-export const cleanHtmlContent = (html: string): string => {
+export const cleanHtmlContent = (
+  html: string,
+  customAdjustments: boolean = false,
+): string => {
   // Clean up list HTML
   html = html.replaceAll(
     /<li><p>(.*?)<\/p><(\/?)(ol|li|ul)>/gi,
@@ -103,7 +106,6 @@ export const cleanHtmlContent = (html: string): string => {
     (match, trAttributes, trContent) => {
       const tdMatches = trContent.match(/<td(.*?)>(.*?)<\/td>/gis) || [];
 
-      // Process each <td> dynamically
       return `<tr${trAttributes}>${tdMatches
         .map((tdMatch: string, index: number) => {
           const tdContent = tdMatch
@@ -128,6 +130,20 @@ export const cleanHtmlContent = (html: string): string => {
 
   // Replace empty <p> tags with a non-breaking space
   html = html.replace(/<p([^>]*)>\s*<\/p>/gi, '<p$1>&nbsp;</p>');
+
+  // Conditionally replace <p style="text-align: left">
+  if (customAdjustments) {
+    html = html.replace(
+      /<p style="text-align:\s?left">/gi,
+      '<p style="text-align: left; line-height:0.5">',
+    );
+
+    // Replace <td colspan="1" rowspan="1"> with additional style
+    html = html.replace(
+      /<td colspan="1" rowspan="1">/gi,
+      '<td colspan="1" rowspan="1" style="vertical-align: top">',
+    );
+  }
 
   return html;
 };

@@ -15,8 +15,6 @@ import {ServiceOrderView} from 'models/service-order';
 import {ServiceOrderIcons} from 'components/ServiceOrderIcons';
 import {StatusChip} from 'components/StatusChip';
 import {
-  getDefaultTechnician,
-  getDialogTitle,
   getJobTypeGivenName,
   getServiceOrderStatusColor,
   serviceOrderStatusToString,
@@ -42,10 +40,10 @@ import {useCurrentCurrency} from 'utils/currency';
 import {companyLanguageContextMap} from 'utils/language';
 import {OrderInfo} from './schema';
 import {MarkCompletedDialog} from './MarkCompletedDialog';
-import {ScheduleDialog} from './ScheduleDialog';
 
 interface Props {
   serviceOrderDetails: ServiceOrderView;
+  onOpenRescheduleDialog: (value: boolean) => void;
 }
 
 interface OrderInfoProps {
@@ -66,6 +64,7 @@ const OrderInfoItem = ({
 }: OrderInfoProps) => {
   const {t} = useTranslation();
   const theme = useTheme();
+
   return (
     <Grid
       item
@@ -93,7 +92,10 @@ const OrderInfoItem = ({
   );
 };
 
-export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
+export const OrderInfoCard = ({
+  serviceOrderDetails,
+  onOpenRescheduleDialog,
+}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
@@ -117,7 +119,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
   const [openCancelConfirm, setOpenCancelConfirm] = useState(false);
   const [openUnscheduleConfirm, setOpenUnscheduleConfirm] = useState(false);
   const [openPaymentStatusChange, setOpenPaymentStatusChange] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
   const [openMarkCompletedDialog, setOpenMarkCompletedDialog] = useState(false);
   const [open, setOpen] = useState<boolean>(false);
 
@@ -243,8 +244,8 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
     onUndoCancel: handleCancelClick(CANCEL_ACTION.UNCANCEL),
     onArchive: handleArchiveClick(ARCHIVE_ACTION.ARCHIVE),
     onUnarchive: handleArchiveClick(ARCHIVE_ACTION.UNARCHIVE),
-    onSchedule: () => setOpenDialog(true),
-    onReschedule: () => setOpenDialog(true),
+    onSchedule: () => onOpenRescheduleDialog(true),
+    onReschedule: () => onOpenRescheduleDialog(true),
     onUnschedule: () => setOpenUnscheduleConfirm(true),
     onMarkCompleted: () => setOpenMarkCompletedDialog(true),
     onDownload: handleMenuItemClick,
@@ -289,6 +290,7 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
             </Typography>
 
             <StatusChip
+              testId="job-details-status-chip"
               color={getServiceOrderStatusColor(serviceOrderDetails.status)}
               label={serviceOrderStatusToString(serviceOrderDetails.status)}
               style={{
@@ -350,42 +352,6 @@ export const OrderInfoCard = ({serviceOrderDetails}: Props) => {
         onClose={() => setOpenUnscheduleConfirm(false)}
         title="Confirm"
         content="Do you want to unschedule the service job?"
-      />
-
-      <ScheduleDialog
-        serviceOrderId={serviceOrderDetails.id}
-        serviceOrderType={serviceOrderDetails.type}
-        title={t(getDialogTitle(serviceOrderDetails))}
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        defaultTechnicians={getDefaultTechnician(serviceOrderDetails)}
-        defaultStartDate={
-          serviceOrderDetails.schedules.length
-            ? new Date(serviceOrderDetails.schedules[0].startTime)
-            : null
-        }
-        defaultEndDate={
-          serviceOrderDetails.schedules.length
-            ? new Date(serviceOrderDetails.schedules[0].endTime)
-            : null
-        }
-        defaultDueDate={
-          serviceOrderDetails.dueDate
-            ? new Date(serviceOrderDetails.dueDate)
-            : null
-        }
-        defaultCallTime={
-          serviceOrderDetails.additionalInfo?.callerInfo?.calledAt
-            ? new Date(serviceOrderDetails.additionalInfo.callerInfo.calledAt)
-            : null
-        }
-        defaultCallerName={serviceOrderDetails.additionalInfo?.callerInfo?.name}
-        defaultPurchaseOrderNumber={
-          serviceOrderDetails.additionalInfo.purchaseOrderNumber
-        }
-        defaultCallerPhoneNumber={
-          serviceOrderDetails.additionalInfo?.callerInfo?.phoneNumber
-        }
       />
 
       <MarkCompletedDialog

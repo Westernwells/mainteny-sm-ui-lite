@@ -85,6 +85,7 @@ export const TextBlockForm = ({formik}: Props) => {
             name="text"
             hasAttachFileButton={false}
             html={formik.values.text || ''}
+            showTextBlock={false}
             updateHtml={(html) => formik.setFieldValue('text', html)}
           />
           {formik.errors.text === CUSTOM_ERROR_TEXT.text && (
