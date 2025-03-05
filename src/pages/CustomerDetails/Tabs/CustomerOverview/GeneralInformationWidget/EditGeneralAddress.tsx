@@ -9,6 +9,7 @@ import {
   Control,
   Controller,
   FieldErrors,
+  UseFormGetValues,
   UseFormSetValue,
   UseFormWatch,
 } from 'react-hook-form';
@@ -21,12 +22,14 @@ export const EditGeneralAddress = ({
   errors,
   address,
   watch,
+  getValues,
 }: {
   control: Control<CustomerGeneralInformationFormModel>;
   setValue: UseFormSetValue<CustomerGeneralInformationFormModel>;
   errors: FieldErrors<CustomerGeneralInformationFormModel>;
   address: 'postalAddress' | 'businessAddress' | 'billingAddress';
   watch: UseFormWatch<CustomerGeneralInformationFormModel>;
+  getValues: UseFormGetValues<CustomerGeneralInformationFormModel>;
 }) => {
   const {t} = useTranslation();
   const addressValue = watch(`${address}.component.name`);
@@ -42,6 +45,28 @@ export const EditGeneralAddress = ({
       setValue(`${address}.component.name`, addressValue);
     }
   }, [address, addressValue]);
+
+  const handleAddressChange = (
+    componentAddress: AddressRecord | undefined,
+    type: 'postalAddress' | 'businessAddress' | 'billingAddress',
+  ) => {
+    if (!componentAddress) return;
+
+    const currentValues = getValues(type);
+
+    setValue(type, {
+      ...componentAddress,
+      component: {
+        ...componentAddress?.component,
+        // to not overwrite name fields
+        name: currentValues?.component?.name,
+        name2: currentValues?.component?.name2,
+        name3: currentValues?.component?.name3,
+      },
+      id: currentValues?.id!,
+      fullName: componentAddress?.fullName || '',
+    });
+  };
 
   return (
     <Grid container rowSpacing={3} columnSpacing={2}>
@@ -82,15 +107,7 @@ export const EditGeneralAddress = ({
             }),
           }}
           allowMap
-          getAddress={(componentAddress) => {
-            const currentValues = watch(address);
-
-            setValue(address, {
-              ...componentAddress,
-              id: currentValues?.id!,
-              fullName: componentAddress?.fullName || '',
-            });
-          }}
+          getAddress={(ad) => handleAddressChange(ad, address)}
           shortAddress
         />
       </Grid>

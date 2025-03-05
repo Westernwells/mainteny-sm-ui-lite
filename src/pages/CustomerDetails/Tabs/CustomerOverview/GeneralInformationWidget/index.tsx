@@ -61,23 +61,25 @@ const GeneralInformationWidget = ({customer}: Props) => {
 
   const uploadPath = `${serviceCompanyId}/customers/${uuid}`;
 
-  const {handleSubmit, control, setValue, watch, reset, formState} = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      name: customer.name || '',
-      externalId: customer.externalId || '',
-      priority: customer.additionalInfo.priority || '',
-      url: customer.contact.url || '',
-      customerImagePath: customer.additionalInfo?.customerImagePath || '',
-      logoFile: null as FileWithPreview | null,
-      phone: customer.contact.phone || '',
-      email: customer.contact.email || '',
-      secondaryPhoneNumber: customer.additionalInfo?.secondaryPhoneNumber || '',
-      vatId: customer.additionalInfo.vatId || '',
-      postalAddress: customer.postalAddress || null,
-      businessAddress: customer.businessAddress || null,
-    },
-  });
+  const {handleSubmit, control, setValue, watch, reset, formState, getValues} =
+    useForm({
+      mode: 'onChange',
+      defaultValues: {
+        name: customer.name || '',
+        externalId: customer.externalId || '',
+        priority: customer.additionalInfo.priority || '',
+        url: customer.contact.url || '',
+        customerImagePath: customer.additionalInfo?.customerImagePath || '',
+        logoFile: null as FileWithPreview | null,
+        phone: customer.contact.phone || '',
+        email: customer.contact.email || '',
+        secondaryPhoneNumber:
+          customer.additionalInfo?.secondaryPhoneNumber || '',
+        vatId: customer.additionalInfo.vatId || '',
+        postalAddress: customer.postalAddress || null,
+        businessAddress: customer.businessAddress || null,
+      },
+    });
 
   const {errors} = formState;
 
@@ -279,6 +281,7 @@ const GeneralInformationWidget = ({customer}: Props) => {
           errors={errors}
           setValue={setValue}
           watch={watch}
+          getValues={getValues}
         />
       </Dialog>
     </>

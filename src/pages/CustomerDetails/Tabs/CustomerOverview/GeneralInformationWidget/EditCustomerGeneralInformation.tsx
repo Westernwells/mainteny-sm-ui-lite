@@ -16,7 +16,7 @@ import {
 import {FormInput} from 'components/form/FormInput';
 import {t} from 'i18next';
 import {useRef, useState} from 'react';
-import {Controller, UseFormSetValue} from 'react-hook-form';
+import {Controller, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {theme} from 'theme';
 import {CustomerGeneralInformationFormModel} from 'models/customer';
 import {ImageOutlined} from '@mui/icons-material';
@@ -33,6 +33,7 @@ type Props = {
   errors: any;
   setValue: UseFormSetValue<CustomerGeneralInformationFormModel>;
   watch: any;
+  getValues: UseFormGetValues<CustomerGeneralInformationFormModel>;
 };
 
 const EditCustomerGeneralInformation = ({
@@ -41,6 +42,7 @@ const EditCustomerGeneralInformation = ({
   errors,
   setValue,
   watch,
+  getValues,
 }: Props) => {
   const {user} = useUserSession();
   const serviceCompanyId = user?.userAccount.serviceCompany.id || '';
@@ -234,6 +236,7 @@ const EditCustomerGeneralInformation = ({
                   setValue as unknown as UseFormSetValue<CustomerGeneralInformationFormModel>
                 }
                 watch={watch}
+                getValues={getValues}
               />
             </TabPanel>
           ))}
