@@ -253,6 +253,13 @@ const PdfPreviewPerItemSection = ({
         {invoice?.items && (
           <View>
             {renderRowsFromItems(invoice.items, currentCurrency, selectedLng)}
+            <View
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: '#212121',
+                marginTop: 4,
+              }}
+            />
           </View>
         )}
       </View>

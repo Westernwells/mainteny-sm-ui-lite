@@ -1687,7 +1687,7 @@ export const InvoiceForm = ({
       vat: moneyToCents(currentCurrency.code, vat.vat),
     }));
 
-    const pdfInvoice = generatePdfInvoice(
+    const pdfInvoice = await generatePdfInvoice(
       formik.values,
       currentCurrency,
       subtotalExclVat,
