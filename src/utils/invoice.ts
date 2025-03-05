@@ -491,7 +491,7 @@ export function transformPropertyOwnerViewToSimpleView(
   };
 }
 
-export const generatePdfInvoice = (
+export const generatePdfInvoice = async (
   formikValues: InvoiceFormData,
   currentCurrency: Currency,
   subtotalExclVat: number,
@@ -504,7 +504,7 @@ export const generatePdfInvoice = (
   serviceOrder?: ServiceOrderView,
   customer?: PropertyOwnerView | null,
   existingInvoice?: InvoiceView,
-): InvoiceView => ({
+): Promise<InvoiceView> => ({
   id: formikValues?.id ?? '',
   number: formikValues.externalId ?? '',
   externalId: formikValues.externalId ?? '',
@@ -583,8 +583,8 @@ export const generatePdfInvoice = (
               ),
             },
       percentage:
-        formikValues.payment?.type === PaymentType.PER_ITEM
-          ? formikValues.payment?.percentage ?? 0
+        formikValues.payment?.type !== PaymentType.LUMP_SUM
+          ? formikValues.payment?.percentage
           : undefined,
     } as Payment<AggregatedAmount>,
     deliveryStartDate: formikValues.deliveryStartDate
