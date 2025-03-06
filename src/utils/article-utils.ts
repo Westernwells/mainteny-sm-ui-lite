@@ -2,16 +2,20 @@ import * as Yup from 'yup';
 import {AnyObject} from 'yup/lib/types';
 import {TestContextExtended} from 'models/articleForm';
 import {
+  ArticleSubAssociationView,
   ArticleTableRow,
   ArticleType,
   ArticleView,
+  MixedPositionRow,
   SearchParameters,
+  SubPositionRow,
 } from 'models/article';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {VatView} from 'models/vat';
 import {Currencies, formatCurrency} from './currency';
 import {cleanHtmlContent, replaceTextInHtml, stripHtmlTags} from './text-block';
+import {convertToText} from './utils';
 
 export const handleCostPackageValidation = (
   value: number | undefined,
@@ -42,7 +46,8 @@ export const getItemRecord = (
 ) => {
   const {netAmount} = record.unitAmount;
   const vat =
-    (percentageVat * netAmount) / 10 ** Currencies[record.unitAmount.currency];
+    (percentageVat * (netAmount ?? 0)) /
+    10 ** Currencies[record.unitAmount.currency];
   return {
     ...record,
     unitAmount: {
@@ -50,7 +55,7 @@ export const getItemRecord = (
       netAmount,
       percentageVat,
       vat,
-      grossAmount: netAmount + vat,
+      grossAmount: (netAmount ?? 0) + vat,
     },
   };
 };
@@ -85,7 +90,7 @@ export const aggregateArticleRow = (
     unit: article.unit,
     price: formatCurrency(
       (article.unitSellingAmount.netAmount ?? 0) /
-        (10 ** article.unitSellingAmount.fractionDigits || 0),
+        10 ** (article.unitSellingAmount.fractionDigits || 0),
       {
         currency: article.unitSellingAmount.currency,
       },
@@ -189,4 +194,92 @@ export const calculatePackageMaterialLaborPercentages = (costPackage?: {
   }
 
   return {laborPercentage, materialPercentage};
+};
+
+export const getSubPositionById = (
+  subPositionId: string,
+  subRows: Record<string, SubPositionRow[]>,
+) => {
+  const subPosition = Object.values(subRows)
+    .flat()
+    .find((sub) => sub?.id === subPositionId);
+
+  return subPosition || null;
+};
+
+export const calculateMargin = (
+  sellingAmount: number,
+  purchaseAmount: number,
+) => {
+  const margin =
+    purchaseAmount === 0 || sellingAmount === 0
+      ? 0
+      : ((sellingAmount - purchaseAmount) / purchaseAmount) * 100;
+
+  return Number.isFinite(margin) ? margin : 0;
+};
+
+export const aggregateMixedPositionRow = (
+  articles: ArticleView[],
+): MixedPositionRow[] =>
+  articles.map((article) => ({
+    data: article,
+    id: article.id,
+    externalId: article.externalId,
+    name: article.name,
+    description: article.description,
+    type: article.type,
+    unit: article.unit,
+    unitPurchaseAmount: article.unitPurchaseAmount,
+    unitSellingAmount: article.unitSellingAmount,
+  }));
+
+export const transformToSubPositionRow = (
+  subAssociation: ArticleSubAssociationView,
+): SubPositionRow => ({
+  id: subAssociation.id,
+  article: subAssociation.article,
+  quantity: subAssociation.quantity,
+  seqNumber: subAssociation.seqNumber,
+  externalId: subAssociation.article.externalId,
+  name: subAssociation.article.name,
+  description: subAssociation.article.description,
+  type: subAssociation.article.type,
+  unit: subAssociation.article.unit,
+  unitPurchaseAmount: subAssociation.article.unitPurchaseAmount,
+  unitSellingAmount: subAssociation.article.unitSellingAmount,
+  createdAt: subAssociation.createdAt,
+  lastUpdatedAt: subAssociation.lastUpdatedAt,
+});
+
+export const getBackButtonTitle = (value: number): string => {
+  switch (value) {
+    case 0:
+      return 'New Article';
+    case 1:
+      return 'New Mixed Position';
+    default:
+      return 'New Supplier';
+  }
+};
+
+export const getFilteredArticleTypeOptions = ({
+  excludeTypes = [],
+}: {
+  excludeTypes?: ArticleType[];
+}) =>
+  Object.values(ArticleType)
+    .filter((type) => !excludeTypes.includes(type))
+    .map((value) => ({
+      value,
+      label: convertToText(value),
+    }));
+
+export const getArticleTypes = ({
+  excludeTypes = [],
+}: {
+  excludeTypes?: ArticleType[];
+}): ArticleType[] => {
+  const excludedSet = new Set(excludeTypes);
+  return Object.values(ArticleType).filter((type) => !excludedSet.has(type));
 };

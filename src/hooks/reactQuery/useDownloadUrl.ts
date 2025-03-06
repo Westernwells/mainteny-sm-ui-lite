@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {UseQueryOptions, UseQueryResult, useQuery} from 'react-query';
+import {useQuery, UseQueryOptions, UseQueryResult} from 'react-query';
 import heic2any from 'heic2any';
 import {queryKeys as qk} from 'reactQuery/constants';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -158,4 +158,13 @@ export const useDownloadFileWithCustomName = (
   );
 
   return {downloadFile, fileName: finalFileName};
+};
+
+export const useFetchFromUrl = (companyId?: string) => {
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
+  const fetchId = companyId ?? serviceCompanyId ?? '';
+
+  return (url: string) => fetchDownloadUrls([url], fetchId);
 };

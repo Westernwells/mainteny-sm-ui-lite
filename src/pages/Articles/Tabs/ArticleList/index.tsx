@@ -46,7 +46,11 @@ import {
   useArticles,
   useArticleStatistics,
 } from 'hooks/reactQuery/useArticle';
-import {aggregateArticleRow, createSearchQuery} from 'utils/article-utils';
+import {
+  aggregateArticleRow,
+  createSearchQuery,
+  getArticleTypes,
+} from 'utils/article-utils';
 import {useExportTableSheet} from 'hooks/useExport';
 import {getPlainStringFromHtml} from 'utils/rich-field-string';
 import {stringToTitleCase} from 'utils/utils';
@@ -154,8 +158,11 @@ const ArticleList = () => {
     order: sortOrder || Order.DESC,
     orderByField: orderByField || ArticleOrderField.CREATED_DATE,
     type: selectedType.includes(ARTICLE_TYPE_FILTER.ALL)
-      ? []
-      : (selectedType as unknown as ArticleType[]),
+      ? getArticleTypes({excludeTypes: [ArticleType.MIX]})
+      : selectedType.length > 0
+      ? (selectedType as unknown as ArticleType[])
+      : getArticleTypes({excludeTypes: [ArticleType.MIX]}),
+
     ...(selectedUnit && {unit: [selectedUnit]}),
     ...(vat && {sellingVatPercent: vat}),
 
@@ -545,6 +552,7 @@ const ArticleList = () => {
         bottom: 0,
         left: 0,
         right: 0,
+        padding: '24px',
       }}>
       <PageHeaderContainer>
         <Box
@@ -794,8 +802,8 @@ const ArticleList = () => {
           {rows.map((entry, index) => (
             <TableRow
               rowIndex={index}
-              key={`quotation-row-${entry.id}`}
-              testId={`quotation-row-${entry.id}`}>
+              key={`article-row-${entry.id}`}
+              testId={`article-row-${entry.id}`}>
               {COLUMNS.map(({renderCell, ...rest}) =>
                 renderCell(entry, {
                   onClick: handleRowClick(entry.id),

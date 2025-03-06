@@ -1,7 +1,7 @@
 import {View, Font, StyleSheet, Text} from '@react-pdf/renderer';
 import {
   InvoiceView,
-  InvoiceItem,
+  InvoiceItemView,
   DiscountType,
   PaymentType,
   InvoiceAmountDetail,
@@ -44,7 +44,7 @@ type PartialProps = {
   invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
-  articleItems: InvoiceItem[];
+  articleItems: InvoiceItemView[];
 };
 
 Font.register({
@@ -155,7 +155,7 @@ export const PdfPartialPaymentSection = ({
       ? articleItems!
           .map((item) => {
             // Calculate base amount from unit price and quantity
-            const baseAmount = item.unitAmount.netAmount * item.quantity;
+            const baseAmount = (item.unitAmount.netAmount ?? 0) * item.quantity;
 
             // Get discount from additionalInfo
             const discount = item.additionalInfo?.discount;
@@ -209,10 +209,10 @@ export const PdfPartialPaymentSection = ({
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: articleItems[0].unitAmount.percentageVat,
+            percentageVat: articleItems[0].unitAmount.percentageVat ?? 0,
             vat:
               totalAmountExclVat *
-              (articleItems[0].unitAmount.percentageVat / 100),
+              ((articleItems[0].unitAmount.percentageVat ?? 0) / 100),
           },
         ]
       : getAggregatedPartialPaymentsVats(articleItems, totalAmountExclVat)
@@ -222,7 +222,7 @@ export const PdfPartialPaymentSection = ({
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: articleItems![0].unitAmount.percentageVat,
+            percentageVat: articleItems![0].unitAmount.percentageVat ?? 0,
             vat:
               amount *
               centsToMoney(
@@ -486,7 +486,7 @@ export const PdfPartialPaymentSection = ({
                     fontSize: 10,
                     textAlign: 'right',
                   }}>
-                  {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
+                  {translate('VAT')} {percentageVats[0]?.percentageVat ?? 0}%
                 </Text>
                 <Text
                   style={{

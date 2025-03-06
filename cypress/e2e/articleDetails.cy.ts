@@ -4,16 +4,18 @@ import ArticlesPage from '../pages/articles-details.page';
 describe('Edit Article', () => {
     beforeEach(() => {
         cy.login();
+        AppTopBarPage.selectLanguage('English');
 
-        const articleApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles?query=&pageIndex=0&pageSize=50`;
-
+        const articleApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles*`;
         const articleInfoURL = `${Cypress.env().REACT_APP_API_URL}/api/articles/*`;
 
         cy.intercept('GET', articleApi).as('articleApi');
         cy.intercept('GET', articleInfoURL).as('articleInfoApi');
 
         ArticlesPage.visit();
-        AppTopBarPage.selectLanguage('English');
+
+        cy.wait('@articleApi', {timeout: 120000}).its('response').should('have.property', 'statusCode').and('eq', 200);
+
         ArticlesPage.navigateToDetailsPage();
     });
 

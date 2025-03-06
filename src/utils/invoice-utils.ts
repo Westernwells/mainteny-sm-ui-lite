@@ -1,6 +1,6 @@
 import {addDays, addWeeks, isBefore, parseISO, startOfDay} from 'date-fns';
 import {
-  InvoiceItem,
+  InvoiceItemView,
   InvoiceStatus,
   InvoiceType,
   InvoiceView,
@@ -151,7 +151,7 @@ export const transformInvoiceForCreditNote = (
       : {}),
   },
   items: invoice.items.map(
-    (item): InvoiceItem => ({
+    (item): InvoiceItemView => ({
       ...item,
       additionalInfo: {
         ...item.additionalInfo,

@@ -25,7 +25,7 @@ export const Carousel = ({
 }) => {
   const theme = useTheme();
   const {t} = useTranslation();
-  const maxSteps = images.length;
+  const maxSteps = images.length ?? 0;
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -78,7 +78,7 @@ export const Carousel = ({
         onChangeIndex={handleStepChange}
         enableMouseEvents
         containerStyle={{alignItems: 'start'}}>
-        {images.map((step, index) => (
+        {images?.map((step, index) => (
           <Box
             sx={{
               display: 'flex',

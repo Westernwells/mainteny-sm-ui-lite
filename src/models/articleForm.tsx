@@ -4,11 +4,11 @@ import {ExtendedSupplierRecord} from './supplier';
 
 export interface ArticleBasicFormModel {
   category: string;
-  manufacturer?: string;
+  manufacturer: string;
   model?: string;
   name: string;
   externalId: string;
-  storageLocation?: string;
+  storageLocation: string;
   type: ArticleType;
   unit: string;
   unitPurchaseVat: number;

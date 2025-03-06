@@ -4,12 +4,13 @@ import InfoIcon from '@mui/icons-material/Info';
 import {GridColDef, GridRenderCellParams, GridRowsProp} from '@mui/x-data-grid';
 import {getColumnProps} from 'components/DataGridLayout';
 import {formatNetAmount} from 'utils/currency';
-import {convertToText, removeHtmlTags} from 'utils/utils';
+import {convertToText} from 'utils/utils';
 import {
   TravelWorkCalculationTypeLabels,
   TravelWorkView,
 } from 'models/service-company';
 import {t} from 'i18next';
+import {removeHtmlTags} from 'utils/rich-field-string';
 import {Actions} from './Action';
 
 export const columns: GridColDef[] = [

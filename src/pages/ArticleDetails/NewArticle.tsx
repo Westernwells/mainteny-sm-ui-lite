@@ -24,6 +24,7 @@ import {
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging';
 import {getUniqueId} from 'utils/utils';
+import {getArticleTypes} from 'utils/article-utils';
 import {SupplierItem} from './Suppliers/SupplierItem';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
@@ -84,7 +85,7 @@ export const NewArticle = () => {
         pageIndex: 0,
         pageSize: 500,
         query: externalIdValue,
-        type: [],
+        type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
       },
       {keepPreviousData: true},
       true,

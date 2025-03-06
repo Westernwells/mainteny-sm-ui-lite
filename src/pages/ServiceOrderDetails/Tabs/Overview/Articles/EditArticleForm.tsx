@@ -10,7 +10,12 @@ import {
   createMeasurementOptions,
   MeasurementUnit,
 } from 'models/articleForm';
-import {formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {
+  formatCurrency,
+  getCurrencySymbol,
+  getDecimalSeparator,
+  getThousandsSeparator,
+} from 'utils/currency';
 import * as Yup from 'yup';
 import {
   ChangeEvent,
@@ -33,7 +38,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import {ArticleType, articleTypeOptions} from 'models/article';
+import {ArticleType} from 'models/article';
 import {NumericFormat} from 'react-number-format';
 import {theme} from 'theme';
 import {getAmountFromPercentage} from 'utils/utils';
@@ -45,6 +50,7 @@ import {Dialog} from 'components/Dialog';
 import {GridCellParams} from '@mui/x-data-grid';
 import {useVats} from 'hooks/reactQuery/useVats';
 import TextBlockActions from 'components/text-blocks/TextBlockActions';
+import {getFilteredArticleTypeOptions} from 'utils/article-utils';
 import {EditArticleFormModel} from './models';
 
 const validationSchema = Yup.object().shape({
@@ -94,7 +100,7 @@ export const EditArticleForm = ({
       externalId: serviceOrderArticle.article.externalId,
       unit: serviceOrderArticle.article.unit,
       unitSellingAmount:
-        serviceOrderArticle.unitAmount.netAmount /
+        (serviceOrderArticle.unitAmount.netAmount ?? 0) /
         10 ** serviceOrderArticle.unitAmount.fractionDigits!,
       quantity: serviceOrderArticle.quantity,
       type: serviceOrderArticle.article.type,
@@ -340,7 +346,9 @@ export const EditArticleForm = ({
           <FormSelect
             containerStyles={{width: '100%'}}
             label="Type"
-            options={articleTypeOptions}
+            options={getFilteredArticleTypeOptions({
+              excludeTypes: [ArticleType.MIX],
+            })}
             selectProps={{
               value: formik.values.type,
               onChange: (e) =>
@@ -362,12 +370,8 @@ export const EditArticleForm = ({
                 suffix="%"
                 allowLeadingZeros={false}
                 decimalScale={2}
-                decimalSeparator={
-                  selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                }
-                thousandSeparator={
-                  selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                }
+                decimalSeparator={getDecimalSeparator(selectedLng)}
+                thousandSeparator={getThousandsSeparator(selectedLng)}
                 sx={{
                   width: '100%',
                   bgcolor: 'white',
@@ -440,12 +444,8 @@ export const EditArticleForm = ({
                 suffix="%"
                 allowLeadingZeros={false}
                 decimalScale={2}
-                decimalSeparator={
-                  selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                }
-                thousandSeparator={
-                  selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                }
+                decimalSeparator={getDecimalSeparator(selectedLng)}
+                thousandSeparator={getThousandsSeparator(selectedLng)}
                 sx={{
                   width: '100%',
                   bgcolor: 'white',

@@ -132,8 +132,8 @@ export const Actions = ({serviceOrder, serviceOrderArticleId}: Props) => {
             Number(formikValues!.unitSellingAmount),
             currentArticle!.unitAmount.currency,
             typeof formikValues!.percentageVat === 'number'
-              ? formikValues!.percentageVat
-              : currentArticle!.unitAmount.percentageVat,
+              ? formikValues!.percentageVat ?? 0
+              : currentArticle!.unitAmount.percentageVat ?? 0,
           ),
         ),
       }))[0];

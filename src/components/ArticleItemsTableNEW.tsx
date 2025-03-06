@@ -177,13 +177,10 @@ export const ArticleItemsTableNEW = ({
       quantity: 0,
       unitAmount: {
         netAmount: 0,
-        fractionDigits: currentCurrency.fractionDigits,
-        currency: currentCurrency.code,
-        grossAmount: 0,
         percentageVat: defaultPercentageVat,
+        currency: currentCurrency.code,
         vatId: defaultVat?.id || '',
         vatName: defaultVat?.name || '',
-        vat: 0,
       },
       discount: {
         type: DiscountType.PERCENTAGE,

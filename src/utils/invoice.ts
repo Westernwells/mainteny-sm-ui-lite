@@ -1,11 +1,13 @@
 import useTheme from '@mui/material/styles/useTheme';
 import {t} from 'i18next';
 import {
+  AggregatedAmount,
   InvoiceActivityType,
   InvoiceActivityView,
   InvoiceAmountDetail,
-  InvoiceItem,
+  InvoiceFormData,
   InvoiceItemRecord,
+  InvoiceItemView,
   InvoicePaymentTermRecord,
   InvoiceStatus,
   InvoiceStatusView,
@@ -13,18 +15,33 @@ import {
   InvoiceTypeMap,
   InvoiceView,
   MyInvoiceActivityView,
+  Payment,
+  PaymentType,
   SearchParameters,
 } from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
 import {PaymentTermArticleType, PaymentTermData} from 'models/contract';
-import {Currency, State} from 'models/misc';
+import {Currency, PdfGenerationStatus, State} from 'models/misc';
 import {ArticleType} from 'models/article';
-import {ServiceOrderTypeRecord} from 'models/service-order';
-import {centsToMoney, Currencies, formatCurrency} from './currency';
-import {getAmountFromPercentage} from './utils';
+import {ServiceOrderTypeRecord, ServiceOrderView} from 'models/service-order';
+import {
+  InvoiceFormat,
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
+import {ServiceCompanyItem} from 'models/service-company';
+import {
+  centsToMoney,
+  convertNumberToAmountNumber,
+  Currencies,
+  formatCurrency,
+  moneyToCents,
+} from './currency';
+import {dateToString, getAmountFromPercentage} from './utils';
 import {formatDate} from './datetime';
 import {getJobTypeGivenName} from './service-order-utils';
+import {transformFormikItems} from './quotation';
 
 export const getTotalFromArticles = (
   items: QuotationItemRecord[] | InvoiceItemRecord[],
@@ -33,7 +50,7 @@ export const getTotalFromArticles = (
     .map(
       (item) =>
         item.quantity *
-        (item.unitAmount.netAmount /
+        ((item.unitAmount.netAmount ?? 0) /
           10 ** Currencies[item.unitAmount.currency]),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
@@ -46,8 +63,8 @@ export const getTotalWithVatFromArticles = (
       (item) =>
         item.quantity *
         (getAmountFromPercentage(
-          item.unitAmount.percentageVat,
-          item.unitAmount.netAmount,
+          item.unitAmount.percentageVat ?? 0,
+          item.unitAmount.netAmount ?? 0,
         ) /
           10 ** Currencies[item.unitAmount.currency]),
     )
@@ -248,7 +265,7 @@ export const getFormattedPaymentValues = (
     );
     const formattedDueDate = formatDate(dueDate);
 
-    let filteredItems: InvoiceItem[] = [];
+    let filteredItems: InvoiceItemView[] = [];
     if (d.articleType === PaymentTermArticleType.LABOR) {
       filteredItems = invoice?.items?.filter(
         (item) =>
@@ -388,7 +405,10 @@ export const replacePaymentTermsPlaceholders = (
   return result.trim();
 };
 
-export const netTotal = (articleItem: InvoiceItem, currencyCode: string) => {
+export const netTotal = (
+  articleItem: InvoiceItemView,
+  currencyCode: string,
+) => {
   const grossTotal =
     (articleItem.unitAmount?.netAmount ?? 0) * articleItem.quantity;
   const discountValue =
@@ -462,4 +482,179 @@ export const getBalanceAmount = (invoice: InvoiceView) => {
       .reduce((sum, p) => sum + p.amount.value!, 0) /
     10 ** invoice.totalAmount.fractionDigits!;
   return totalGross - paidSum;
+};
+export function transformPropertyOwnerViewToSimpleView(
+  propertyOwner?: PropertyOwnerView,
+): PropertyOwnerSimpleView {
+  return {
+    additionalInfo: propertyOwner?.additionalInfo!,
+    billingAddress: propertyOwner?.billingAddress,
+    beneficiaryAddress: propertyOwner?.beneficiaryAddress,
+    otherAddress: propertyOwner?.otherAddress,
+    contact: propertyOwner?.contact!,
+    id: propertyOwner?.id!,
+    labels: propertyOwner?.labels || [],
+    meta: propertyOwner?.meta!,
+    name: propertyOwner?.name || '',
+    serviceCompanyId: propertyOwner?.serviceCompany?.id ?? '',
+    externalId: propertyOwner?.externalId || '',
+    number: propertyOwner?.number,
+  };
+}
+
+export const generatePdfInvoice = async (
+  formikValues: InvoiceFormData,
+  currentCurrency: Currency,
+  subtotalExclVat: number,
+  amountAfterGlobalDiscountWithVAT: number,
+  mappedVats: {
+    vat: number;
+    percentageVat: number;
+  }[],
+  company?: ServiceCompanyItem,
+  serviceOrder?: ServiceOrderView,
+  customer?: PropertyOwnerView | null,
+  existingInvoice?: InvoiceView,
+): Promise<InvoiceView> => ({
+  id: formikValues?.id ?? '',
+  number: formikValues.externalId ?? '',
+  externalId: formikValues.externalId ?? '',
+  description: formikValues.description ?? '',
+  subject: formikValues.subject ?? '',
+  type: formikValues.type,
+  totalAmount: existingInvoice
+    ? existingInvoice.totalAmount
+    : {
+        currency: currentCurrency.code,
+        fractionDigits: currentCurrency.fractionDigits,
+        netAmount: moneyToCents(currentCurrency.code, subtotalExclVat),
+        grossAmount: moneyToCents(
+          currentCurrency.code,
+          amountAfterGlobalDiscountWithVAT,
+        ),
+        vats: mappedVats,
+      },
+  sentDate: formikValues.sentDate ? dateToString(formikValues.sentDate) : '',
+  dueDate: formikValues.dueDate ? dateToString(formikValues.dueDate) : '',
+  status: InvoiceStatus.DRAFT,
+  serviceOrder,
+  propertyOwner: transformPropertyOwnerViewToSimpleView(customer!),
+  serviceCompany: {
+    id: company?.id ?? '',
+    name: company?.name ?? '',
+    meta: company?.meta!,
+  },
+  items: transformFormikItems(formikValues.items) as InvoiceItemView[],
+  search: '',
+  meta: {
+    createdAt: Date.now().toString(),
+    lastUpdatedAt: Date.now().toString(),
+    state: State.ACTIVE,
+  },
+  additionalInfo: {
+    pdfGenerationStatus: PdfGenerationStatus.GENERATION_REQUIRED,
+    discount: {
+      ...formikValues.discount,
+      type: formikValues.discount?.type!,
+      amount: {
+        ...formikValues.discount?.amount,
+        value: moneyToCents(
+          currentCurrency.code,
+          formikValues.discount?.amount?.value,
+        ),
+        currency:
+          formikValues.discount?.amount?.currency || currentCurrency.code,
+      },
+    },
+    billingAddress: formikValues.billingAddress,
+    beneficiaryAddress: formikValues.beneficiaryAddress,
+    alternativeAddress: formikValues.alternativeAddress,
+    alternativeServiceCompanyInfo: formikValues.alternativeServiceCompanyInfo,
+    paymentInfo: formikValues.paymentInfo,
+    laborMaterialCostText: formikValues.laborMaterialCostText,
+    moreInfo: formikValues.moreInfo,
+    purchaseOrderNumber: formikValues.purchaseOrderNumber ?? '',
+    costCenter: formikValues.costCenter ?? '',
+    includeWorkReport: formikValues.includeWorkReport ?? false,
+    includeCheckList: formikValues.includeCheckList ?? false,
+    payment: {
+      ...formikValues.payment,
+      amount:
+        formikValues.payment?.type === PaymentType.PER_ITEM
+          ? undefined
+          : {
+              currency:
+                formikValues.payment?.amount?.currency || currentCurrency.code,
+              fractionDigits:
+                formikValues.payment?.amount?.fractionDigits ||
+                currentCurrency.fractionDigits,
+              netAmount: convertNumberToAmountNumber(
+                formikValues.payment?.amount?.value ?? 0,
+                currentCurrency,
+              ),
+            },
+      percentage:
+        formikValues.payment?.type !== PaymentType.LUMP_SUM
+          ? formikValues.payment?.percentage
+          : undefined,
+    } as Payment<AggregatedAmount>,
+    deliveryStartDate: formikValues.deliveryStartDate
+      ? dateToString(formikValues.deliveryStartDate)
+      : '',
+    deliveryEndDate: formikValues.deliveryEndDate
+      ? dateToString(formikValues.deliveryEndDate)
+      : '',
+    showArticleSection: formikValues.showArticleSection ?? false,
+    showInvoicedSection: formikValues.showInvoicedSection ?? false,
+    showPaymentSection: formikValues.showPaymentSection ?? false,
+    paymentTerm: formikValues.paymentTerm,
+    elevatorExternalId: formikValues.elevatorExternalId,
+  },
+  overdueNotices: [],
+  commentCount: 0,
+  payments: [],
+});
+
+export const getInvoiceStatusStyles = (
+  status: string,
+): {
+  label: string;
+  color:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'error'
+    | 'error.light'
+    | 'info'
+    | 'success'
+    | 'warning'
+    | 'warning.light'
+    | 'action.active'
+    | 'primary.mainLight'
+    | 'warning.dark';
+} => {
+  switch (status) {
+    case InvoiceStatus.PAID:
+      return {label: InvoiceStatusView.PAID, color: 'success'};
+    case InvoiceStatus.DRAFT:
+      return {label: InvoiceStatusView.DRAFT, color: 'action.active'};
+    case InvoiceStatus.EXPIRED:
+      return {label: InvoiceStatusView.EXPIRED, color: 'error.light'};
+    case InvoiceStatus.NOT_PAID:
+      return {label: InvoiceStatusView.NOT_PAID, color: 'primary.mainLight'};
+    case InvoiceStatus.PARTIALLY_PAID:
+      return {label: InvoiceStatusView.PARTIALLY_PAID, color: 'warning.light'};
+    case InvoiceStatus.CANCELLED:
+      return {label: InvoiceStatusView.CANCELLED, color: 'warning.dark'};
+    default:
+      return {label: '-', color: 'default'};
+  }
+};
+
+export const isXMLNeeded = (invoice: InvoiceView) => {
+  const {invoiceFormat} = invoice.propertyOwner.additionalInfo;
+  return (
+    invoiceFormat === InvoiceFormat.PDF_AND_XML ||
+    invoiceFormat === InvoiceFormat.XML
+  );
 };

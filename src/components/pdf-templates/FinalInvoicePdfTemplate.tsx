@@ -7,7 +7,11 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {InvoiceAmountDetail, InvoiceItem, InvoiceView} from 'models/invoice';
+import {
+  InvoiceAmountDetail,
+  InvoiceItemView,
+  InvoiceView,
+} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {
   calculateArticlesAmount,
@@ -131,7 +135,7 @@ const FinalInvoicePdfTemplate = ({
   const discountAmount = discount?.amount;
   const discountValue = discountAmount?.value ?? 0;
 
-  const netTotal = (articleItem: InvoiceItem) => {
+  const netTotal = (articleItem: InvoiceItemView) => {
     const total = getItemTotalAfterPerItemDiscount({
       item: {
         unitAmount: {
@@ -192,13 +196,13 @@ const FinalInvoicePdfTemplate = ({
       invoice?.propertyOwner?.additionalInfo?.vatId) ||
     '';
 
-  const eanValue = invoice?.propertyOwner.additionalInfo.ean || '';
+  const eanValue = invoice?.propertyOwner.additionalInfo?.ean || '';
 
   return (
     <Document>
       {invoice?.additionalInfo.alternativeAddress &&
-        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !==
-          0 && (
+        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
+        !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
             userInfo={userInfo}
             selectedLng={selectedLng}
@@ -255,22 +259,23 @@ const FinalInvoicePdfTemplate = ({
               />
             )}
 
-            {invoice?.additionalInfo.showArticleSection && (
-              <ArticleSection
-                invoice={invoice}
-                currentCurrency={currentCurrency}
-                translate={translate}
-                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
-                  articleItems,
-                )}
-                discountValue={discountValue}
-                subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
-                percentageVats={vats}
-                total={amountAfterGlobalDiscountWithVAT}
-                selectedLng={selectedLng}
-                netTotal={netTotal}
-              />
-            )}
+            {invoice?.additionalInfo.showArticleSection &&
+              invoice.items.length > 0 && (
+                <ArticleSection
+                  invoice={invoice}
+                  currentCurrency={currentCurrency}
+                  translate={translate}
+                  allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
+                    articleItems,
+                  )}
+                  discountValue={discountValue}
+                  subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
+                  percentageVats={vats}
+                  total={amountAfterGlobalDiscountWithVAT}
+                  selectedLng={selectedLng}
+                  netTotal={netTotal}
+                />
+              )}
 
             <PdfPartialPaymentSection
               translate={translate}

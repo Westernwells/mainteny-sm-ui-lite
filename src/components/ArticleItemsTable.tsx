@@ -17,7 +17,7 @@ import {TabsBody} from 'components/TabsBody';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord, InvoiceType, InvoiceView} from 'models/invoice';
 import {Amount} from 'models/misc';
-import {ArticleView} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {
   useArticles,
   useCreatePartialArticle,
@@ -25,13 +25,15 @@ import {
 import {
   formatCurrency,
   getCurrencySymbol,
+  getDecimalSeparator,
+  getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {LanguageContext} from 'context/LanguageProvider';
 import {calculateInvoiceTotal, calculateTotal} from 'utils/calculate-total';
-import {getItemRecord} from 'utils/article-utils';
+import {getArticleTypes, getItemRecord} from 'utils/article-utils';
 import {fixRounding} from 'utils/utils';
 import {NumericFormat} from 'react-number-format';
 import {TextField} from '@mui/material';
@@ -91,6 +93,7 @@ export const ArticleItemsTable = ({
       pageIndex: 0,
       pageSize: 1,
       query: '[internallabel:partial]',
+      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
     },
     {},
     true,
@@ -103,6 +106,7 @@ export const ArticleItemsTable = ({
       pageIndex: 0,
       pageSize: 1,
       query: '[internallabel:credit_note]',
+      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
     },
     {},
     true,
@@ -546,12 +550,8 @@ export const ArticleItemsTable = ({
                       suffix="%"
                       allowLeadingZeros={false}
                       decimalScale={2}
-                      decimalSeparator={
-                        selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                      }
-                      thousandSeparator={
-                        selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                      }
+                      decimalSeparator={getDecimalSeparator(selectedLng)}
+                      thousandSeparator={getThousandsSeparator(selectedLng)}
                       inputProps={{
                         inputMode: 'numeric',
                         pattern: '[0-9]*',

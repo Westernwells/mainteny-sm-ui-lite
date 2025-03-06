@@ -4,12 +4,14 @@ import {TableRow as MuiTableRow, TableRowProps} from '@mui/material';
 interface Props extends TableRowProps {
   testId: string;
   rowIndex?: number;
+  disableHover?: boolean;
 }
 
 const TableRow = ({
   children,
   testId,
   rowIndex,
+  disableHover = false,
   ...props
 }: PropsWithChildren<Props>) => (
   <MuiTableRow
@@ -20,10 +22,9 @@ const TableRow = ({
       alignItems: 'center',
       height: '44px',
       cursor: 'pointer',
-
-      '&:hover td': {
-        background: '#F7F9FC',
-      },
+      ...(!disableHover && {
+        '&:hover td': {background: '#F7F9FC'},
+      }),
     }}
     {...props}>
     {children}

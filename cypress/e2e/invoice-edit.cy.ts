@@ -54,9 +54,9 @@ describe('Invoice Edit Flow with Payment Terms', () => {
 
     beforeEach(() => {
         cy.login();
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
-
         AppTopBarPage.selectLanguage('English');
+
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
 
         mockInvoiceDetails(INVOICE_ID);
         mockInvoiceAmountDetails(INVOICE_ID);

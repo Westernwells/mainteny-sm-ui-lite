@@ -74,6 +74,59 @@ describe('Service Job Tests', () => {
         });
     });
 
+    it('should assign multiple Engineers with schedule in jobs page', () => {
+        cy.wait(2000);
+
+    it('should validate Assign Engineer dialog', () => {
+        cy.get('body').then(($body) => {
+            if ($body.find('[data-testid="assign-engineer"]:visible').length > 0) {
+                ServiceJobPage.openAssignEngineerDialog();
+                ServiceJobPage.assignEngineer();
+            } else {
+                ServiceJobPage.changeTab(0);
+                ServiceJobPage.unscheduleFirstJob();
+                ServiceJobPage.changeTab(1);
+                ServiceJobPage.openAssignEngineerDialog();
+                ServiceJobPage.assignEngineer();
+            }
+        });
+    });
+
+    it('should assign Engineer without schedule', () => {
+        cy.get('body').then(($body) => {
+            if ($body.find('[data-testid="assign-engineer"]:visible').length > 0) {
+                ServiceJobPage.openAssignEngineerDialog();
+                ServiceJobPage.assignEngineer();
+            } else {
+                ServiceJobPage.changeTab(0);
+                ServiceJobPage.unscheduleFirstJob();
+                ServiceJobPage.changeTab(1);
+                ServiceJobPage.openAssignEngineerDialog();
+                ServiceJobPage.assignEngineer();
+            }
+        });
+    });
+
+    it('should assign Engineer with schedule', () => {
+        cy.contains('button', 'Assign Engineer').eq(0).click({waitForAnimations: false});
+        ServiceJobPage.assignEngineer();
+    });
+
+    it('should assign multiple Engineers with schedule', () => {
+        cy.get('body').then(($body) => {
+            if ($body.find('[data-testid="assign-engineer"]:visible').length > 0) {
+                ServiceJobPage.openAssignEngineerDialog();
+                ServiceJobPage.assignEngineer();
+            } else {
+                ServiceJobPage.changeTab(0);
+                ServiceJobPage.unscheduleFirstJob();
+                ServiceJobPage.changeTab(1);
+                ServiceJobPage.openAssignEngineerDialog();
+                ServiceJobPage.assignEngineer();
+            }
+        });
+    });
+
     it('should assign Technician in order details page', () => {
         ServiceJobPage.changeTab(0);
         OrderPage.changeStatusFilter('Overdue');
@@ -88,7 +141,16 @@ describe('Service Job Tests', () => {
                         .should('be.visible')
                         .click();
 
-                    ServiceJobPage.assignEngineer();
+                    cy.get('li[role="menuitem"]').contains('Schedule').click();
+
+                    ServiceJobPage.selectTechnicianWithIndex(2);
+
+                    cy.get('[data-testid="due-date"]').click();
+                    cy.get('button[aria-current="date"]').click({force: true});
+                    cy.contains('button', 'Confirm').click({waitForAnimations: false});
+
+                    cy.contains('button', 'Save').should('not.be.disabled').click();
+
                     cy.contains('Service job scheduled successfully');
                 } else {
                     cy.get('tbody').children().should('not.exist');
@@ -208,3 +270,4 @@ describe('Service Job Tests', () => {
             });
     });
 });
+})

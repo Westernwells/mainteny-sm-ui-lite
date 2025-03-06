@@ -15,6 +15,7 @@ interface Props {
   title: string | JSX.Element;
   children: ReactNode;
   onSave?: () => void;
+  onClose?: () => void;
   onCancel?: (forceClose?: boolean) => void;
   showSaveButton?: boolean;
   showCancelButton?: boolean;
@@ -45,6 +46,7 @@ export const Dialog = ({
   title,
   children,
   onSave = () => {},
+  onClose,
   onCancel = () => {},
   showCancelButton = true,
   showSaveButton = true,
@@ -72,6 +74,14 @@ export const Dialog = ({
 }: Props) => {
   const {t} = useTranslation();
 
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    } else {
+      onCancel(true);
+    }
+  };
+
   return (
     <MuiDialog
       fullWidth
@@ -80,7 +90,7 @@ export const Dialog = ({
         margin: 'auto 0',
         ...sx,
       }}
-      onClose={() => onCancel(true)}
+      onClose={handleClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       {...dialogProps}
@@ -95,7 +105,7 @@ export const Dialog = ({
           ...dialogTitleStyles,
         }}>
         {typeof title === 'string' ? t(title) : title}
-        <IconButton onClick={() => onCancel(true)}>
+        <IconButton onClick={handleClose}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>

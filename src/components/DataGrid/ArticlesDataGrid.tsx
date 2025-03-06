@@ -4,13 +4,14 @@ import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
-import {ArticleView} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {formatCurrency} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {useTranslation} from 'react-i18next';
 import {stringToTitleCase} from 'utils/utils';
 import Typography from '@mui/material/Typography';
 import DOMPurify from 'dompurify';
+import {getArticleTypes} from 'utils/article-utils';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
 import {
@@ -135,6 +136,7 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
+      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
     },
     {keepPreviousData: true},
     true,

@@ -34,7 +34,13 @@ import {DiscountType} from 'models/invoice';
 import {MeasurementUnit} from 'models/articleForm';
 import {Button} from 'components/Button';
 import {LanguageContext} from 'context/LanguageProvider';
-import {Currencies, formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {
+  Currencies,
+  formatCurrency,
+  getDecimalSeparator,
+  getThousandsSeparator,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {fixRounding} from 'utils/utils';
 import {ArticleType, ArticleView} from 'models/article';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
@@ -48,6 +54,7 @@ import useHighlightText from 'hooks/useHighlightText';
 import {
   calculatePackageMaterialLaborPercentages,
   getArticleTypeText,
+  getArticleTypes,
 } from 'utils/article-utils';
 import {getItemTotalAfterPerItemDiscount} from 'utils/calculate-total';
 import {QuotationItemRecord} from 'models/quotation';
@@ -57,6 +64,7 @@ import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
 import {VatView} from 'models/vat';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {stripHtmlTags} from 'models/text-block';
 import {FormSelect} from './form/FormSelect';
 import {TabItems, Tabs} from './Tab';
 import {TabsBody} from './TabsBody';
@@ -150,7 +158,13 @@ const TableRowComponent = ({
 };
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required('Article cannot be empty'),
+  name: Yup.string()
+    .test(
+      'is-not-empty',
+      'Article cannot be empty',
+      (value) => !!stripHtmlTags(value || ''),
+    )
+    .required('Article cannot be empty'),
   article: Yup.object().shape({
     type: Yup.string().required('Article type is required'),
   }),
@@ -192,7 +206,7 @@ export const ArticleItemRowQuotation = ({
   });
 
   const price =
-    formik.values.unitAmount.netAmount /
+    (formik.values.unitAmount.netAmount ?? 0) /
     10 ** Currencies[formik.values.unitAmount.currency];
 
   const totalPriceExclVat = price * formik.values.quantity;
@@ -307,6 +321,7 @@ export const ArticleItemRowQuotation = ({
       pageIndex: 0,
       pageSize: 30,
       query: debouncedText,
+      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
     },
     {keepPreviousData: true, enabled: popperOpen && tabValue === 0},
   );
@@ -498,21 +513,27 @@ export const ArticleItemRowQuotation = ({
           <Box ref={articleAnchorEl}>
             <RichTextField
               test-id={`name-${index}`}
-              html={formik.values.name}
-              updateHtml={handleTextFieldChange('name')}
-              onBlur={formik.handleBlur}
+              html={formik.values.name || ''}
+              updateHtml={handleTextFieldChange(`name`)}
+              onBlur={(event) => {
+                formik.setFieldTouched(`name`, true, false);
+                formik.handleBlur(event);
+              }}
               helperText={
-                (!isHovered && formik.errors.name) ||
-                (formik.errors.name && formik.touched.name)
-                  ? formik.errors.name
+                !isHovered &&
+                getIn(formik.touched, `name`) &&
+                getIn(formik.errors, `name`)
+                  ? getIn(formik.errors, `name`)
                   : ''
               }
               error={
-                !!(!isHovered && formik.errors.name) ||
-                !!(formik.errors.name && formik.touched.name)
+                !isHovered &&
+                !!getIn(formik.touched, `name`) &&
+                !!getIn(formik.errors, `name`)
               }
               onClick={handleArticleTextFieldClick}
             />
+
             <Box>
               <Popper
                 open={showArticleSearch}
@@ -634,12 +655,8 @@ export const ArticleItemRowQuotation = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           sx={{
             '& .MuiOutlinedInput-input': {
@@ -677,12 +694,8 @@ export const ArticleItemRowQuotation = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           onValueChange={(values) => {
             const {floatValue} = values;
@@ -848,12 +861,8 @@ export const ArticleItemRowQuotation = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           sx={{
             width: '100%',
@@ -897,12 +906,8 @@ export const ArticleItemRowQuotation = ({
           customInput={TextField}
           decimalScale={2}
           fixedDecimalScale
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           disabled
           sx={{

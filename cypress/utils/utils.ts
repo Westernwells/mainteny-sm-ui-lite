@@ -3,10 +3,10 @@ import {
   InvoiceStatus,
   AggregatedAmount,
   InvoiceAdditionalInfo,
-  InvoiceItem,
   InvoiceOverdueNoticeSimpleView,
   InvoicePaymentView,
   InvoiceType,
+  InvoiceItemView,
 } from '../../src/models/invoice';
 import {Meta} from '../../src/models/misc';
 import {PropertyOwnerSimpleView} from '../../src/models/propertyManager';
@@ -39,6 +39,8 @@ export const mapInvoiceStatus = (invoiceStatus: InvoiceStatusView) => {
       return InvoiceStatus.PARTIALLY_PAID;
     case InvoiceStatusView.CANCELLED:
       return InvoiceStatus.CANCELLED;
+    case InvoiceStatusView.CREDITED:
+      return InvoiceStatus.CREDITED;
     default:
       return InvoiceStatus.DRAFT;
   }
@@ -59,7 +61,7 @@ export interface InvoiceView {
   serviceOrder?: ServiceOrderView;
   propertyOwner: PropertyOwnerSimpleView;
   serviceCompany: ServiceCompanySimpleView;
-  items: InvoiceItem[];
+  items: InvoiceItemView[];
   search: string;
   meta: Meta;
   additionalInfo: InvoiceAdditionalInfo;

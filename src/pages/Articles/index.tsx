@@ -1,60 +1,81 @@
+import React from 'react';
+import {Box} from '@mui/material';
 import {useTranslation} from 'react-i18next';
-import {TabsBody} from 'components/TabsBody';
-import Tabs from 'components/Tabs';
 import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import FolderIcon from '@mui/icons-material/Folder';
+import {Tabs} from 'components/Tab';
+import {TabsBody} from 'components/TabsBody';
 import {useQueryState} from 'hooks/useQueryState';
-import {useNavigate} from 'react-router-dom';
-import TabsWrapper from 'components/TabsWrapper';
 import ArticleList from 'pages/Articles/Tabs/ArticleList';
-import PageContainer from '../../components/PageContainer';
+import {getBackButtonTitle} from 'utils/article-utils';
 import Suppliers from './Tabs/Suppliers';
+import MixedPositions from './Tabs/MixedPositions';
 
 export const Articles = () => {
   const {t} = useTranslation();
-  const navigate = useNavigate();
   const [tabValue, setTabValue] = useQueryState('tab', {
     defaultValue: 0,
     reset: true,
     parserOptions: {parseNumbers: true},
   });
 
-  const tabItems = [
+  const tabConfig = [
     {
       label: t('Articles'),
       icon: <HomeRepairServiceIcon />,
+      component: <ArticleList />,
+    },
+    {
+      label: t('Mixed Positions'),
+      icon: <FolderIcon />,
+      component: <MixedPositions />,
     },
     {
       label: t('Suppliers'),
       icon: <LocalShippingIcon />,
+      component: <Suppliers />,
     },
   ];
 
+  const handleTabChange = (index: number) => {
+    setTabValue(index);
+  };
+
   return (
-    <PageContainer gap={3}>
-      <TabsWrapper
+    <Box
+      display="flex"
+      flex={1}
+      justifyContent="space-between"
+      sx={{background: 'inherit'}}>
+      <Tabs
+        tabItems={tabConfig.map(({label, icon}) => ({label, icon}))}
         currentIndex={tabValue}
-        tabItems={tabItems}
-        showActionBtn
-        btnLabel={tabValue === 0 ? t('New Article') : t('New Supplier')}
-        onChange={(index) => setTabValue(index)}
-        btnOnClick={() =>
-          tabValue === 0 ? navigate('new') : navigate('newSupplier')
-        }
-        shouldWrap={false}>
-        <Tabs
-          tabItems={tabItems}
-          currentIndex={tabValue}
-          onChange={(index) => setTabValue(index)}
-        />
-        <TabsBody value={tabValue} index={0}>
-          <ArticleList />
-        </TabsBody>
-        <TabsBody value={tabValue} index={1}>
-          <Suppliers />
-        </TabsBody>
-      </TabsWrapper>
-    </PageContainer>
+        onChange={handleTabChange}
+        showMenuActionBtn
+        backBtnLabel={t(getBackButtonTitle(tabValue))}
+        tabStyle={{
+          background: 'white',
+          mb: '20px',
+          px: '48px',
+        }}
+        hideDivider>
+        {tabConfig.map((tab, index) => (
+          <TabsBody
+            key={tab.label}
+            value={tabValue}
+            index={index}
+            containerStyle={{
+              margin: '0 auto',
+              width: '95%',
+              background: index === 1 ? 'inherit' : 'white',
+              padding: '24px',
+            }}>
+            {tab.component}
+          </TabsBody>
+        ))}
+      </Tabs>
+    </Box>
   );
 };
 

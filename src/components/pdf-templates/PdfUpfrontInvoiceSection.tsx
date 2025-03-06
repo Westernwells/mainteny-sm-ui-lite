@@ -1,7 +1,7 @@
 import {Text, View, StyleSheet, Font} from '@react-pdf/renderer';
 import {
   InvoiceView,
-  InvoiceItem,
+  InvoiceItemView,
   DiscountType,
   PaymentType,
   InvoiceAmountDetail,
@@ -44,7 +44,7 @@ type PartialProps = {
   invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
-  articleItems: InvoiceItem[];
+  articleItems: InvoiceItemView[];
 };
 
 Font.register({
@@ -178,10 +178,10 @@ const PdfUpfrontInvoiceSection = ({
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: articleItems[0].unitAmount.percentageVat,
+            percentageVat: articleItems[0].unitAmount.percentageVat ?? 0,
             vat:
               totalAmountExclVat *
-              (articleItems[0].unitAmount.percentageVat / 100),
+              ((articleItems[0].unitAmount.percentageVat ?? 0) / 100),
           },
         ]
       : getAggregatedPartialPaymentsVats(articleItems, totalAmountExclVat)
@@ -191,7 +191,7 @@ const PdfUpfrontInvoiceSection = ({
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: articleItems![0].unitAmount.percentageVat,
+            percentageVat: articleItems![0].unitAmount.percentageVat ?? 0,
             vat:
               amount *
               centsToMoney(
@@ -455,7 +455,7 @@ const PdfUpfrontInvoiceSection = ({
                     fontSize: 10,
                     textAlign: 'right',
                   }}>
-                  {translate('VAT')} {percentageVats[0].percentageVat ?? 0}%
+                  {translate('VAT')} {percentageVats[0]?.percentageVat ?? 0}%
                 </Text>
                 <Text
                   style={{
