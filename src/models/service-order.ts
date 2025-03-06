@@ -24,6 +24,7 @@ import {Discount} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {CommentRecord} from './comment';
 
 export enum Priority {
   A = 'A',
@@ -659,6 +660,7 @@ export interface CreateServiceOrderRecord {
   callerInfo?: CallerInfo;
   confirmationChannels?: ContactChannel[];
   notificationChannels?: ContactChannel[];
+  comments?: CommentRecord[];
 }
 
 export interface ServiceOrderArticleView {
