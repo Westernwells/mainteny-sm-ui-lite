@@ -973,6 +973,11 @@ export const ArticleItemRowNEW = ({
               html={formik.values.description || ''}
               containerMinHeight={40}
               updateHtml={(h) => formik.setFieldValue('description', h)}
+              fieldsetStyles={{
+                maxWidth: '63.5%',
+                wordBreak: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
             />
           </TableCell>
 

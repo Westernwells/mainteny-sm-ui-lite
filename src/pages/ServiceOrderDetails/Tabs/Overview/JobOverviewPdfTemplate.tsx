@@ -143,14 +143,16 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       marginVertical: 4,
     },
     descriptionText: {
-      width: '45%',
+      width: '100%',
       display: 'flex',
-      fontSize: 8,
+      fontSize: 8.5,
       color: '#212121',
       paddingLeft: 20,
       letterSpacing: -0.15,
       marginTop: 2,
       lineHeight: 1.3,
+      whiteSpace: 'pre-wrap',
+      wordWrap: 'break-word',
     },
   });
 
@@ -518,6 +520,11 @@ const JobOverviewPdfTemplate = React.memo(
                               textAlign: 'left',
                               color: '#212121',
                             }}
+                            stylesheet={{
+                              p: {
+                                marginBottom: '2px',
+                              },
+                            }}
                           />
 
                           <Text
@@ -617,7 +624,13 @@ const JobOverviewPdfTemplate = React.memo(
                         {articleOrderItem?.description.trim() !== '' && (
                           <HtmlPDF
                             html={articleOrderItem?.description || '-'}
-                            rootStyle={styles.descriptionText}
+                            rootStyle={{
+                              ...styles.descriptionText,
+                              marginBottom:
+                                index === serviceOrder.articles.length - 1
+                                  ? 0
+                                  : 10,
+                            }}
                           />
                         )}
                       </View>
