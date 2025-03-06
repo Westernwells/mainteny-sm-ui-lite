@@ -16,6 +16,7 @@ interface Props {
   userAccount: AvatarView;
   sx?: SxProps<Theme>;
   labelStyles?: SxProps<Theme>;
+  initialsTextStyles?: SxProps<Theme>;
   removeNameText?: boolean;
   /**
    * Show only one initial depending on if first name is present fallback last name
@@ -28,6 +29,7 @@ export const Avatar = ({
   userAccount,
   sx = {},
   labelStyles = {},
+  initialsTextStyles = {},
   removeNameText = false,
   onlyFirstInitial = false,
 }: Props) => {
@@ -56,6 +58,7 @@ export const Avatar = ({
             lineHeight: '10px',
             letterSpacing: '0.1px',
             textTransform: 'uppercase',
+            ...initialsTextStyles,
           }}>
           {initialsToShow && initialsToShow}
         </Typography>
