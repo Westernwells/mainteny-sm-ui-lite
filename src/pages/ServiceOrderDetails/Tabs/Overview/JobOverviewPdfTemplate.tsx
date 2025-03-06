@@ -266,7 +266,6 @@ const JobOverviewPdfTemplate = React.memo(
       (pdfConfigClientStorage.includeUnitBuilding &&
         serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
       '';
-
     return (
       <Document>
         <PdfPageContainer selectedLng={selectedLng}>
@@ -547,7 +546,8 @@ const JobOverviewPdfTemplate = React.memo(
                             {formatCurrency(
                               (articleOrderItem.unitAmount?.netAmount ?? 0) /
                                 10 **
-                                  articleOrderItem.unitAmount.fractionDigits,
+                                  (articleOrderItem.unitAmount.fractionDigits ??
+                                    2),
                               {
                                 currency: currentCurrency?.code,
                                 excludeCurrencySymbol: true,

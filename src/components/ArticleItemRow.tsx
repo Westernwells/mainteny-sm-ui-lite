@@ -16,7 +16,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {Button} from 'components/Button';
-import {Currencies, useCurrentCurrency} from 'utils/currency';
+import {
+  Currencies,
+  getDecimalSeparator,
+  getThousandsSeparator,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {LanguageContext} from 'context/LanguageProvider';
 import {fixRounding} from 'utils/utils';
 
@@ -64,7 +69,7 @@ export const ArticleItemRow = ({
   );
   const [quantity, setQuantity] = useState<number>(articleItem.quantity);
   const [price, setPrice] = useState(
-    articleItem.unitAmount.netAmount /
+    (articleItem.unitAmount.netAmount ?? 0) /
       10 ** Currencies[articleItem.unitAmount.currency],
   );
 
@@ -205,18 +210,14 @@ export const ArticleItemRow = ({
             <NumericFormat
               value={
                 (isPartial ? newPartialTotal : totalPrice) *
-                (1 + articleItem.unitAmount.percentageVat / 100)
+                (1 + (articleItem.unitAmount.percentageVat ?? 0) / 100)
               }
               disabled
               customInput={TextField}
               decimalScale={2}
               fixedDecimalScale
-              decimalSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-              }
-              thousandSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-              }
+              decimalSeparator={getDecimalSeparator(selectedLng)}
+              thousandSeparator={getThousandsSeparator(selectedLng)}
               size="small"
               InputProps={{
                 startAdornment: (
@@ -237,12 +238,8 @@ export const ArticleItemRow = ({
               }
               customInput={TextField}
               decimalScale={2}
-              decimalSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-              }
-              thousandSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-              }
+              decimalSeparator={getDecimalSeparator(selectedLng)}
+              thousandSeparator={getThousandsSeparator(selectedLng)}
               size="small"
               InputProps={{
                 startAdornment: (
@@ -275,12 +272,8 @@ export const ArticleItemRow = ({
               customInput={TextField}
               decimalScale={2}
               fixedDecimalScale
-              decimalSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-              }
-              thousandSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-              }
+              decimalSeparator={getDecimalSeparator(selectedLng)}
+              thousandSeparator={getThousandsSeparator(selectedLng)}
               size="small"
               disabled
               InputProps={{
@@ -305,12 +298,8 @@ export const ArticleItemRow = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           InputProps={{
             startAdornment: (
@@ -341,12 +330,8 @@ export const ArticleItemRow = ({
               customInput={TextField}
               allowLeadingZeros={false}
               decimalScale={2}
-              decimalSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-              }
-              thousandSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-              }
+              decimalSeparator={getDecimalSeparator(selectedLng)}
+              thousandSeparator={getThousandsSeparator(selectedLng)}
               inputProps={{
                 inputMode: 'numeric',
                 pattern: '[0-9]*',
@@ -376,12 +361,8 @@ export const ArticleItemRow = ({
               customInput={TextField}
               decimalScale={2}
               fixedDecimalScale
-              decimalSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-              }
-              thousandSeparator={
-                selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-              }
+              decimalSeparator={getDecimalSeparator(selectedLng)}
+              thousandSeparator={getThousandsSeparator(selectedLng)}
               size="small"
               disabled
             />

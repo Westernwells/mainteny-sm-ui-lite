@@ -6,12 +6,13 @@ import {SearchInput} from 'components/SearchInput';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
-import {ArticleView} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {ServiceOrderType} from 'models/service-order';
 import {formatNetAmount} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging';
 import DOMPurify from 'dompurify';
 import Typography from '@mui/material/Typography';
+import {getArticleTypes} from 'utils/article-utils';
 import {NoRowsEmptySection} from './DataGrid/NoRowsEmptySection';
 import {
   hasMultipleParagraphs,
@@ -100,6 +101,7 @@ export const ArticlesModalDataGrid = ({setRowItem, customerId}: Props) => {
       pageIndex: page.pageIndex,
       pageSize: page.pageSize,
       query: search,
+      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
     },
     {keepPreviousData: true},
     true,

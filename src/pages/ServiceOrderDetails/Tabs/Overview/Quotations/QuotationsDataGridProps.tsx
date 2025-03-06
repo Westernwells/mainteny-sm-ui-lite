@@ -90,7 +90,8 @@ export const makeRows = (
     quotationDate: formatDate(item.meta.createdAt),
     totalAmount: `${formatCurrency(
       item
-        ? item.totalAmount.netAmount / 10 ** item.totalAmount.fractionDigits!
+        ? (item.totalAmount.netAmount ?? 0) /
+            10 ** item.totalAmount.fractionDigits!
         : 0,
       {
         currency: item.totalAmount.currency,

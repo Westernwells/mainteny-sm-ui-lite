@@ -38,6 +38,8 @@ import {
   convertNumberToAmountNumber,
   Currencies,
   formatCurrency,
+  getDecimalSeparator,
+  getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
 import {createHighlightedText, filterArrayBySearchText} from 'utils/utils';
@@ -53,6 +55,7 @@ import {createEmptyResource} from 'utils/paging';
 import {
   calculatePackageMaterialLaborPercentages,
   getArticleTypeText,
+  getArticleTypes,
 } from 'utils/article-utils';
 import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
@@ -197,7 +200,7 @@ export const ArticleItemRowNEW = ({
   });
 
   const price =
-    formik.values.unitAmount.netAmount /
+    (formik.values.unitAmount.netAmount ?? 0) /
     10 ** Currencies[formik.values.unitAmount.currency];
 
   const totalPriceExclVat = price * formik.values.quantity;
@@ -311,6 +314,7 @@ export const ArticleItemRowNEW = ({
       pageIndex: 0,
       pageSize: 30,
       query: debouncedSearchText,
+      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
     },
     {keepPreviousData: true, enabled: popperOpen && tabValue === 0},
   );
@@ -359,24 +363,35 @@ export const ArticleItemRowNEW = ({
 
   const onChangePercentageVat = (event: SelectChangeEvent<string>) => {
     const vatId = event.target.value;
-    const taxRate = taxRates.find((rate) => rate.id === vatId);
+    const taxRate = taxRates?.find((rate) => rate.id === vatId);
+
     formik.setFieldValue('unitAmount', {
-      ...formik.values.unitAmount,
+      netAmount: formik.values.unitAmount.netAmount || 0,
+      percentageVat: taxRate?.percentage || 0,
+      currency: formik.values.unitAmount.currency || currentCurrency.code,
       vatId: taxRate?.id || '',
       vatName: taxRate?.name || '',
-      percentageVat: taxRate?.percentage || 0,
     });
   };
 
   const vatValue = (() => {
-    const {vatId} = formik.values.unitAmount;
-    return vatId && taxRates?.find((item) => item.id === vatId)
-      ? vatId
-      : String(
-          formik.values.unitAmount.percentageVat !== 0
-            ? formik.values.unitAmount.percentageVat
-            : 0,
-        ) || '';
+    const {vatId, percentageVat} = formik.values.unitAmount;
+
+    // If vatId exists and matches a valid tax rate, use it
+    if (vatId && taxRates?.some((item) => item.id === vatId)) {
+      return vatId;
+    }
+
+    // If percentageVat exists, try to find a taxRate with that percentage
+    const matchingTaxRate = taxRates?.find(
+      (item) => item.percentage === percentageVat,
+    );
+
+    if (matchingTaxRate) {
+      return matchingTaxRate.id;
+    }
+
+    return '';
   })();
 
   const tabItems: TabItems[] = useMemo(() => {
@@ -652,12 +667,8 @@ export const ArticleItemRowNEW = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           sx={{
             '& .MuiOutlinedInput-input': {
@@ -693,12 +704,8 @@ export const ArticleItemRowNEW = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           onValueChange={(values) => {
             const {floatValue} = values;
@@ -723,60 +730,73 @@ export const ArticleItemRowNEW = ({
         />
       </TableCell>
 
-      <TableCell sx={{width: '6%', display: 'inline-block'}}>
-        <FormControl fullWidth required={false}>
+      <TableCell sx={{width: '7%', display: 'inline-block'}}>
+        <FormControl
+          fullWidth
+          data-testid="vat-dropdown"
+          required={false}
+          error={!taxRates.some((item) => item.id === vatValue)}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                border: !taxRates.some((item) => item.id === vatValue)
+                  ? '2px solid red'
+                  : 'inherit',
+              },
+              '&:hover fieldset': {
+                border: !taxRates.some((item) => item.id === vatValue)
+                  ? '2px solid red'
+                  : 'inherit',
+              },
+              '&.Mui-focused fieldset': {
+                border: !taxRates.some((item) => item.id === vatValue)
+                  ? '2px solid red'
+                  : 'inherit',
+              },
+            },
+          }}>
           <Select
             labelId={`select-tax-label-${index}`}
             size="small"
             value={vatValue}
             renderValue={(value) => {
-              const taxRatePercentage = taxRates?.find(
-                (item) => item.id === value,
-              )?.percentage;
+              let taxRate = taxRates?.find((item) => item.id === value);
 
-              return `${
-                typeof taxRatePercentage === 'number'
-                  ? taxRatePercentage
-                  : value || 0
-              }%`;
+              // Convert value to a number before checking for percentage match
+              const numericValue = Number(value);
+
+              if (!taxRate && !Number.isNaN(numericValue)) {
+                taxRate = taxRates?.find(
+                  (item) => item.percentage === numericValue,
+                );
+              }
+
+              // Ensure 0 is displayed as "0%", but an empty or undefined value remains empty
+              return taxRate?.percentage !== undefined
+                ? `${taxRate.percentage}%`
+                : numericValue === 0
+                ? '0%'
+                : '';
             }}
             name="unitAmount.vatId"
             id={`unitAmount.vatId-${index}`}
             notched
             onChange={onChangePercentageVat}
             onBlur={formik.handleBlur}
-            IconComponent={() => null}
             MenuProps={{
-              anchorOrigin: {
-                vertical: 'bottom',
-                horizontal: 'right',
-              },
-              transformOrigin: {
-                vertical: 'top',
-                horizontal: 'right',
-              },
+              anchorOrigin: {vertical: 'bottom', horizontal: 'right'},
+              transformOrigin: {vertical: 'top', horizontal: 'right'},
               slotProps: {
                 paper: {
-                  sx: {
-                    maxWidth: '20rem',
-                  },
+                  sx: {maxWidth: '20rem'},
                 },
-              },
-            }}
-            sx={{
-              '& .MuiSelect-select': {
-                textAlign: 'right',
-                px: '5px !important',
               },
             }}>
             {taxRates?.map((taxRate) => (
               <MenuItem
                 value={taxRate.id}
                 key={taxRate.id}
-                sx={{
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                }}>
+                sx={{flexDirection: 'column', alignItems: 'flex-start'}}>
                 <Box display="flex" maxWidth="100%" gap={1}>
                   <Typography variant="body1" noWrap color="primary.dark">
                     {taxRate.name}
@@ -798,7 +818,7 @@ export const ArticleItemRowNEW = ({
         </FormControl>
       </TableCell>
 
-      <TableCell sx={{width: '10%', display: 'inline-block'}}>
+      <TableCell sx={{width: '9%', display: 'inline-block'}}>
         <FormSelect
           labelId={`select-unit-label-${index}`}
           label=""
@@ -866,12 +886,8 @@ export const ArticleItemRowNEW = ({
           customInput={TextField}
           allowLeadingZeros={false}
           decimalScale={2}
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           sx={{
             width: '100%',
@@ -915,12 +931,8 @@ export const ArticleItemRowNEW = ({
           customInput={TextField}
           decimalScale={2}
           fixedDecimalScale
-          decimalSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-          }
-          thousandSeparator={
-            selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-          }
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
           size="small"
           disabled
           sx={{

@@ -27,6 +27,7 @@ export const queryKeys = {
   fetchQuotationActivities: 'fetchQuotationActivities',
   fetchArticles: 'fetchArticles',
   fetchArticleDetail: 'fetchArticleDetail',
+  fetchArticleSubAssociations: 'fetchArticleSubAssociations',
   fetchArticleComments: 'fetchArticleComments',
   fetchArticleOrder: 'fetchArticleOrder',
   fetchArticleSuppliers: 'fetchArticleSuppliers',

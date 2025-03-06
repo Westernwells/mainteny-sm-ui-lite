@@ -61,6 +61,8 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {
   convertNumberToAmountNumber,
   formatCurrency,
+  getDecimalSeparator,
+  getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
 import ExpandIcon from '@mui/icons-material/Expand';
@@ -1022,12 +1024,8 @@ export const MutationService = ({
                     prefix={currentCurrency.symbol}
                     allowLeadingZeros={false}
                     decimalScale={2}
-                    decimalSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? ',' : '.'
-                    }
-                    thousandSeparator={
-                      selectedLng === 'DE' || selectedLng === 'SR' ? '.' : ','
-                    }
+                    decimalSeparator={getDecimalSeparator(selectedLng)}
+                    thousandSeparator={getThousandsSeparator(selectedLng)}
                     sx={{
                       width: '100%',
                       bgcolor: 'white',

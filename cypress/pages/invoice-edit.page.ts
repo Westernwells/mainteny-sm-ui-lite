@@ -19,6 +19,8 @@ export default class InvoiceEditPage {
   };
 
   static saveInvoice = () => {
+    InvoiceEditPage.selectValidVatForAllItems();
+
     cy.get('button[type="submit"]').click();
 
     cy.intercept('PUT', `${Cypress.env().REACT_APP_API_URL}/api/invoices/*`).as(
@@ -52,5 +54,22 @@ export default class InvoiceEditPage {
             });
           });
       });
+  };
+
+  static selectValidVatForAllItems = () => {
+    cy.get(`[data-testid="vat-dropdown"]`).each(($row) => {
+      cy.wrap($row)
+        .click()
+        .then(() => {
+
+          cy.get('ul[role="listbox"]', { timeout: 3000 })
+            .should('be.visible')
+            .find('li')
+            .first()
+            .click();
+          
+          cy.get('ul[role="listbox"]').should('not.exist');
+        });
+    });
   };
 }

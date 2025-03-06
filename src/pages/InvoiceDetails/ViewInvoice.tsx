@@ -29,7 +29,6 @@ import {
   InvoiceTypeMap,
   InvoiceView,
 } from 'models/invoice';
-import {getInvoiceStatusStyles} from 'pages/Invoices/InvoicesDataGridProps';
 import {
   HeaderFooterInfoData,
   PdfGenerationStatus,
@@ -126,6 +125,8 @@ import {EmailSignature, EmployeesView} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {CANCEL_ACTION} from 'models/status';
+import {useVats} from 'hooks/reactQuery/useVats';
+import {getInvoiceStatusStyles} from 'utils/invoice';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -190,7 +191,7 @@ export const ViewInvoice = ({
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const formatDate = useFormatDate();
-
+  const {data: taxRates} = useVats();
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
@@ -289,7 +290,7 @@ export const ViewInvoice = ({
   const {downloadFile} = useDownloadFileWithCustomName(
     invoice.externalId || invoice.number,
     filePathToDownload ||
-      (downloadUrl ? downloadUrl[invoice?.additionalInfo.pdfPath] : ''),
+      (downloadUrl ? downloadUrl[invoice?.additionalInfo?.pdfPath ?? ''] : ''),
   );
 
   const {mutateAsync: getXInvoiceByInvoiceId} = useFetchXInvoiceByInvoiceId();
@@ -729,7 +730,9 @@ export const ViewInvoice = ({
         refetchXMLDownloadUrl(),
       ]);
 
-      downloadFile(downloadUrlData.data?.[invoice.additionalInfo.pdfPath]); // pdf
+      downloadFile(
+        downloadUrlData.data?.[invoice.additionalInfo?.pdfPath ?? ''],
+      ); // pdf
 
       if (shouldDownloadXML && invoice.additionalInfo.xmlPath) {
         downloadFile(
@@ -1102,7 +1105,7 @@ export const ViewInvoice = ({
     const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
 
     const PDFDownloadURL =
-      PDFDownloadURLResponse.data?.[invoice.additionalInfo.pdfPath];
+      PDFDownloadURLResponse.data?.[invoice.additionalInfo?.pdfPath ?? ''];
     const XMLDownloadURL =
       XMLDownloadURLResponse.data?.[invoice.additionalInfo.xmlPath!];
 
@@ -1204,11 +1207,15 @@ export const ViewInvoice = ({
       if (invoice.externalId.trim() === '') {
         await updateInvoiceAsync(
           {
-            data: formatInvoiceViewToUpdateInvoice({
-              ...invoice,
-              externalId: companyNextNumber?.value!,
-              dueDate,
-            }),
+            data: formatInvoiceViewToUpdateInvoice(
+              {
+                ...invoice,
+                externalId: companyNextNumber?.value!,
+                dueDate,
+              },
+              currentCurrency,
+              taxRates,
+            ),
             invoiceId: invoice.id,
           },
           {
@@ -1315,7 +1322,7 @@ export const ViewInvoice = ({
         {
           id: invoice.id!,
           body: {
-            pdfPath: invoice.additionalInfo.pdfPath,
+            pdfPath: invoice.additionalInfo?.pdfPath ?? '',
             xmlPath: invoice.additionalInfo.xmlPath,
             externalId: invoice.externalId!,
             dueDate: invoice.dueDate || dateToString(new Date()),

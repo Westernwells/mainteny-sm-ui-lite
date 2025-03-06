@@ -12,9 +12,10 @@ import Table from '../utils/table';
 describe('Invoice listing page', () => {
     beforeEach(() => {
         cy.login();
+        AppTopBarPage.selectLanguage('English');
+
         cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
         cy.waitForSpinnerToDisappear();
-        AppTopBarPage.selectLanguage('English');
         InvoiceListingPage.visit();
     });
 
@@ -28,10 +29,11 @@ describe('Invoice listing page', () => {
         const statusExclusions = {
             [InvoiceStatusView.PAID]: [
                 InvoiceStatusView.DRAFT,
-                InvoiceStatusView.CANCELLED,
-                InvoiceStatusView.EXPIRED,
                 InvoiceStatusView.NOT_PAID,
                 InvoiceStatusView.PARTIALLY_PAID,
+                InvoiceStatusView.EXPIRED,
+                InvoiceStatusView.CREDITED,
+                InvoiceStatusView.CANCELLED,
             ],
             [InvoiceStatusView.NOT_PAID]: [
                 InvoiceStatusView.PAID,
@@ -39,6 +41,7 @@ describe('Invoice listing page', () => {
                 InvoiceStatusView.CANCELLED,
                 InvoiceStatusView.EXPIRED,
                 InvoiceStatusView.PARTIALLY_PAID,
+                InvoiceStatusView.CREDITED,
             ],
             [InvoiceStatusView.DRAFT]: [
                 InvoiceStatusView.PAID,
@@ -46,6 +49,7 @@ describe('Invoice listing page', () => {
                 InvoiceStatusView.EXPIRED,
                 InvoiceStatusView.NOT_PAID,
                 InvoiceStatusView.PARTIALLY_PAID,
+                InvoiceStatusView.CREDITED,
             ],
             [InvoiceStatusView.CANCELLED]: [
                 InvoiceStatusView.PAID,
@@ -53,6 +57,7 @@ describe('Invoice listing page', () => {
                 InvoiceStatusView.EXPIRED,
                 InvoiceStatusView.NOT_PAID,
                 InvoiceStatusView.PARTIALLY_PAID,
+                InvoiceStatusView.CREDITED,
             ],
             [InvoiceStatusView.EXPIRED]: [
                 InvoiceStatusView.PAID,
@@ -60,6 +65,7 @@ describe('Invoice listing page', () => {
                 InvoiceStatusView.CANCELLED,
                 InvoiceStatusView.NOT_PAID,
                 InvoiceStatusView.PARTIALLY_PAID,
+                InvoiceStatusView.CREDITED,
             ],
             [InvoiceStatusView.PARTIALLY_PAID]: [
                 InvoiceStatusView.PAID,
@@ -67,6 +73,15 @@ describe('Invoice listing page', () => {
                 InvoiceStatusView.CANCELLED,
                 InvoiceStatusView.EXPIRED,
                 InvoiceStatusView.NOT_PAID,
+                InvoiceStatusView.CREDITED,
+            ],
+            [InvoiceStatusView.CREDITED]: [
+                InvoiceStatusView.PAID,
+                InvoiceStatusView.DRAFT,
+                InvoiceStatusView.CANCELLED,
+                InvoiceStatusView.EXPIRED,
+                InvoiceStatusView.NOT_PAID,
+                InvoiceStatusView.PARTIALLY_PAID,
             ],
         };
 

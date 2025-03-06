@@ -109,7 +109,7 @@ export const ArticleItemsTableQuotation = ({
         vatName: defaultVat?.name || '',
       },
     };
-    return getItemRecord(record, record.unitAmount.percentageVat);
+    return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
   };
 
   const deleteItem = (indexPos: number) => {

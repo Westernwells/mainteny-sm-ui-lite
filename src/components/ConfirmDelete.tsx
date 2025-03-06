@@ -56,7 +56,7 @@ export const ConfirmDelete = ({
             <DialogContentText
               key={index}
               id="alert-dialog-description"
-              sx={{color: 'text.primary'}}>
+              sx={{color: 'text.primary', padding: '0.75em 0em'}}>
               {t(text)}
             </DialogContentText>
           ))}

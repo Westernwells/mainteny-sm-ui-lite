@@ -27,7 +27,7 @@ export default class CustomerPage {
       force: true,
     });
     cy.get('ul > li:nth-of-type(1)').click();
-    cy.get('div[role="combobox"]').eq(0).click({
+    cy.get('div[role="combobox"]').eq(1).click({
       force: true,
     });
     cy.contains('li[role="option"]', 'Baden-Württemberg').click();

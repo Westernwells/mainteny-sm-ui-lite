@@ -25,6 +25,7 @@ interface Props {
   primaryButtonAction?: () => void;
   primaryButtonLabel?: string | React.ReactNode;
   secondaryButton?: React.ReactNode;
+  previewButton?: React.ReactNode;
 }
 
 export const BottomDrawer = ({
@@ -34,6 +35,7 @@ export const BottomDrawer = ({
   primaryButtonAction,
   listItems = [],
   secondaryButton,
+  previewButton,
   isSaving,
   buttonWrapperStyles,
 }: Props) => {
@@ -69,6 +71,7 @@ export const BottomDrawer = ({
         gap={2}
         sx={{my: 'auto', px: '4em', ...buttonWrapperStyles}}>
         {secondaryButton}
+        {previewButton && previewButton}
         <ButtonGroup variant="contained">
           {primaryButtonLabel && (
             <MuiButton

@@ -18,7 +18,7 @@ import {
 import {
   CreateQuotation,
   QuotationFormData,
-  QuotationItem,
+  QuotationItemView,
   QuotationItemRecord,
   QuotationStatus,
   QuotationView,
@@ -90,6 +90,26 @@ import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {addDays} from 'date-fns';
 import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
+import {pdf} from '@react-pdf/renderer';
+import {moneyToCents, useCurrentCurrency} from 'utils/currency';
+import {useQueryClientStorageData} from 'hooks/useClientStorage';
+import {
+  CLIENT_STORAGE_PDF_CONFIG_KEY,
+  CLIENT_STORAGE_PDF_TEMPLATE_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+} from 'utils/constants';
+import {
+  useDownloadFileWithCustomName,
+  useDownloadUrl,
+} from 'hooks/reactQuery/useDownloadUrl';
+import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
+import {
+  calculateQuotationTotalWithPerItemDiscount,
+  generatePdfQuotation,
+} from 'utils/quotation';
+import {calculateArticlesAmount} from 'utils/calculate-total';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord, getDiscoutObj} from './utils';
 import {Notes} from './Notes';
@@ -101,7 +121,7 @@ interface Props {
 }
 
 const quotationItemToQuotationItemRecord = (
-  quotationItem: QuotationItem,
+  quotationItem: QuotationItemView,
 ): QuotationItemRecord => {
   const record: QuotationItemRecord = {
     id: quotationItem.id,
@@ -112,7 +132,7 @@ const quotationItemToQuotationItemRecord = (
     unitAmount: quotationItem.unitAmount,
     discount: getDiscoutObj(quotationItem.additionalInfo?.discount),
   };
-  return getItemRecord(record, record.unitAmount.percentageVat);
+  return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
 };
 
 const localStorageFormikQuotationDataKey = 'QUOTATION_DATA';
@@ -133,6 +153,7 @@ export const DraftQuotation = ({
   const [isHovered, setIsHovered] = useState<boolean>(true);
   const [openResumeProgressDialog, setOpenResumeProgressDialog] =
     useState(false);
+  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
   const [initialLocalStorage, setInitialLocalStorage] = useState<
     Partial<QuotationFormData | null>
   >({});
@@ -145,6 +166,7 @@ export const DraftQuotation = ({
 
   const {user} = useUserSession();
   const {language: selectedLng} = useContext(LanguageContext);
+  const currentCurrency = useCurrentCurrency();
   const {company} = useContext(UserCompanyContext);
   const companyLanguage =
     companyLanguageContextMap[company?.language || Language.EN_US];
@@ -165,6 +187,10 @@ export const DraftQuotation = ({
     useUpdateQuotation();
   const {mutateAsync: createNewQuotation, isLoading: isCreating} =
     useCreateQuotation();
+
+  const serviceCompanyId = user?.userAccount.serviceCompany.id || '';
+
+  const [filePathToDownload, setFilePathToDownload] = useState('');
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [expiryDateError, setExpiryDateError] = useState('');
@@ -191,6 +217,66 @@ export const DraftQuotation = ({
   const [unit, setUnit] = useState<ElevatorView | null>(elevator || null);
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
     [],
+  );
+
+  const {downloadFile} = useDownloadFileWithCustomName(
+    quotation?.number,
+    filePathToDownload,
+  );
+
+  const translate = useMemo(
+    () => (key: string, options?: {context: string}) => {
+      if (company?.language) {
+        return translateCompanyLanguage(key, options);
+      }
+
+      return t(key, options);
+    },
+    [company?.language],
+  );
+
+  const {
+    data: clientStorageDataPdfConfig,
+    isLoading: isLoadingClientStorageDataPdfConfig,
+  } = useQueryClientStorageData({
+    serviceCompanyId,
+    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
+  });
+
+  const pdfConfig = useMemo(
+    () =>
+      clientStorageDataPdfConfig?.value
+        ? JSON.parse(clientStorageDataPdfConfig.value)
+        : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
+    [clientStorageDataPdfConfig?.value],
+  );
+
+  const {
+    data: clientStorageDataTemplate,
+    isLoading: isLoadingClientStorageDataTemplate,
+  } = useQueryClientStorageData({
+    serviceCompanyId,
+    params: {key: CLIENT_STORAGE_PDF_TEMPLATE_KEY},
+  });
+
+  const {headerInfo, footerInfo} = useMemo(() => {
+    const parsedData = JSON.parse(clientStorageDataTemplate?.value || '{}');
+    return {
+      headerInfo: parsedData.header,
+      footerInfo: parsedData.footer,
+    };
+  }, [clientStorageDataTemplate?.value]);
+
+  const {data: headerUrl = {}, isLoading: isLoadingHeaderUrl} = useDownloadUrl(
+    headerInfo?.path ? [headerInfo.path] : [],
+    undefined,
+    serviceCompanyId,
+  );
+
+  const {data: footerUrl = {}, isLoading: isLoadingFooterUrl} = useDownloadUrl(
+    footerInfo?.path ? [footerInfo.path] : [],
+    undefined,
+    serviceCompanyId,
   );
 
   const isExternalIdUnique = async (
@@ -275,6 +361,15 @@ export const DraftQuotation = ({
     },
   });
 
+  const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
+    () =>
+      calculateArticlesAmount({
+        items: formik.values.items,
+        globalDiscount: formik.values.discount,
+      }),
+    [formik.values.items, formik.values.discount],
+  );
+
   async function save(values: QuotationFormData) {
     if (!values.description.trim().length) values.description = '';
     if (!values.notes?.trim().length) values.notes = '';
@@ -358,8 +453,8 @@ export const DraftQuotation = ({
         (i): QuotationItemRecord => ({
           id: i.id,
           article: i.article,
-          description: i.description || i.article.description,
-          name: i.name || i.article.name,
+          description: i.description || '',
+          name: i.name || i.article?.name || '',
           quantity: i.quantity,
           unitAmount: i.unitAmount,
           discount: getDiscoutObj(i.additionalInfo?.discount),
@@ -553,6 +648,50 @@ export const DraftQuotation = ({
     formik.setFieldValue(fieldName, newValue || undefined);
   };
 
+  const handlePreview = async () => {
+    const subtotalExclVat = calculateQuotationTotalWithPerItemDiscount(
+      formik.values.items,
+    );
+
+    const mappedVats = vats.map((vat) => ({
+      ...vat,
+      vat: moneyToCents(currentCurrency.code, vat.vat),
+    }));
+
+    const pdfQuotation = generatePdfQuotation(
+      formik.values,
+      currentCurrency,
+      subtotalExclVat,
+      amountAfterGlobalDiscountWithVAT,
+      mappedVats,
+      customer,
+      unit,
+      company,
+    );
+
+    const generateBlobUrl = async () => {
+      const blob = await pdf(
+        <QuotationPdfTemplate
+          pdfConfigClientStorage={pdfConfig}
+          userInfo={user?.userAccount}
+          currentCurrency={currentCurrency}
+          quotation={pdfQuotation}
+          selectedLng={company?.language}
+          translate={translate}
+          headerPath={headerUrl[headerInfo?.path]}
+          headerInfo={headerInfo}
+          footerPath={footerUrl[footerInfo?.path]}
+          footerInfo={footerInfo}
+        />,
+      ).toBlob();
+      const blobURL = URL.createObjectURL(blob);
+      setFilePathToDownload(blobURL);
+      return blob;
+    };
+
+    await generateBlobUrl();
+  };
+
   const isValid = () => {
     const valid =
       formik.values.subject &&
@@ -655,6 +794,11 @@ export const DraftQuotation = ({
 
   const onCancel = () => {
     resetLocalStorage();
+  };
+
+  const handlePreviewClose = () => {
+    setOpenPreviewDialog(false);
+    setFilePathToDownload('');
   };
 
   useEffectAfterMount(() => {
@@ -1453,6 +1597,29 @@ export const DraftQuotation = ({
           },
         ]}
         isValid={isValid()}
+        previewButton={
+          <Button
+            label="Preview"
+            buttonProps={{
+              variant: 'outlined',
+              size: 'small',
+              startIcon: <RemoveRedEyeOutlinedIcon />,
+              onClick: async () => {
+                await handlePreview();
+                setOpenPreviewDialog(true);
+              },
+              disabled:
+                isLoadingHeaderUrl ||
+                isLoadingFooterUrl ||
+                isLoadingClientStorageDataTemplate ||
+                isLoadingClientStorageDataPdfConfig,
+              sx: {
+                color: theme.palette.primary.dark,
+                padding: '0.3em 1.5em',
+              },
+            }}
+          />
+        }
       />
 
       {isAddNewCustomerDialogOpen && (
@@ -1541,6 +1708,42 @@ export const DraftQuotation = ({
           setActiveTextBlock={setActiveTextBlock}
           handleCellClick={handleCellClick}
         />
+      </Dialog>
+
+      <Dialog
+        title={t('Quotation preview')}
+        onClose={handlePreviewClose}
+        onCancel={() => downloadFile()}
+        dialogProps={{
+          open: openPreviewDialog || false,
+        }}
+        sx={{
+          '& .MuiDialog-paper': {
+            width: '750px',
+            maxWidth: 'none',
+            maxHeight: '844px',
+          },
+        }}
+        leftButton={
+          <Button
+            label="Close"
+            buttonProps={{
+              onClick: handlePreviewClose,
+              variant: 'text',
+              size: 'medium',
+              sx: {background: 'white'},
+            }}
+          />
+        }
+        cancelButtonText={t('Download')}
+        cancelButtonVariant="outlined"
+        cancelButtonStyles={{marginRight: '1em', border: '1px solid #000034'}}
+        cancelButtonTextColor="text.primary"
+        saveButtonText={t('Continue editing')}
+        onSave={handlePreviewClose}
+        showSaveButton
+        showCancelButton>
+        <DialogPdfPreview filePathToDownload={filePathToDownload} />
       </Dialog>
 
       {activeSubDialog && (

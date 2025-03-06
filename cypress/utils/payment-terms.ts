@@ -4,7 +4,7 @@ import {PaymentTermData, PaymentTermArticleType} from 'models/contract';
 import {
   InvoicePaymentTermRecord,
   InvoiceAmountDetail,
-  InvoiceItem,
+  InvoiceItemView,
 } from 'models/invoice';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import {formatDate} from 'utils/datetime';
@@ -27,7 +27,7 @@ export const getFormattedPaymentValues = (
     );
     const formattedDueDate = formatDate(dueDate);
 
-    let filteredItems: InvoiceItem[] = [];
+    let filteredItems: InvoiceItemView[] = [];
     if (d.articleType === PaymentTermArticleType.LABOR) {
       filteredItems = invoice?.items?.filter(
         (item) =>
@@ -54,14 +54,17 @@ export const getFormattedPaymentValues = (
     const totalAmountAfterGlobalDiscount = filteredItemDetails?.reduce(
       (sum, itemDetail, index) => {
         const item = filteredItems[index];
-    
-        if (item?.article?.type === ArticleType.PACKAGE && d.articleType !== PaymentTermArticleType.ALL) {
+
+        if (
+          item?.article?.type === ArticleType.PACKAGE &&
+          d.articleType !== PaymentTermArticleType.ALL
+        ) {
           // Apply percentage split only for LABOR or MATERIAL, not for ALL
           const percentage =
             d.articleType === PaymentTermArticleType.LABOR
               ? item.article?.costPackage?.laborPercentage
               : item.article?.costPackage?.materialPercentage;
-    
+
           return (
             sum +
             ((itemDetail?.amountAfterGlobalDiscount?.grossAmount || 0) *
@@ -69,7 +72,7 @@ export const getFormattedPaymentValues = (
               100
           );
         }
-    
+
         return sum + (itemDetail?.amountAfterGlobalDiscount?.grossAmount || 0);
       },
       0,
@@ -123,9 +126,7 @@ export const replacePaymentTermsPlaceholders = (
   let result = `${sections[0]}\n`;
 
   replacements.forEach((replacement, index) => {
-
     if (sections[index + 1] && replacement) {
-
       if (replacement.discountAmount && replacement.discountAmount > 0) {
         let sectionToReplace = sections[index + 1];
 

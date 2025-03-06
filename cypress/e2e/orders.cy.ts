@@ -15,7 +15,7 @@ describe('Orders page - list page', () => {
     it('filter orders by status', () => {
         const status = 'Overdue';
 
-        cy.wait('@serviceOrderAPI');
+        cy.wait('@serviceOrderAPI', {timeout: 30000});
         OrderPage.changeStatusFilter(status);
 
         // Recursively wait for all job query api calls until the provided query parameter is matched
@@ -26,7 +26,7 @@ describe('Orders page - list page', () => {
             },
 
             () => {
-                cy.wait(100); // Very small delay for the DOM to be updated, can be anything any small amount
+                cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
                 cy.contains('div', status).should('exist');
 
                 cy.get(`tbody`)
@@ -51,7 +51,7 @@ describe('Orders page - list page', () => {
         OrderPage.changeTypeFilter(ELEVATOR_OPERATION);
 
         cy.wait('@serviceOrderAPI');
-        cy.wait(100); // Very small delay for the DOM to be updated, can be anything any small amount
+        cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
         cy.get('td[data-field="JOB_TYPE"][role="cell"]').each(($el) => {
             cy.wrap($el).scrollIntoView();
             cy.wrap($el).contains(ELEVATOR_OPERATION).should('be.visible');

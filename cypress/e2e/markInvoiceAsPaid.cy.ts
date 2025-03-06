@@ -6,9 +6,9 @@ import {ServiceCompany} from '../../src/models/service-company';
 describe('Mark invoice as paid', () => {
     beforeEach(() => {
         cy.login();
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
-
         AppTopBarPage.selectLanguage('English');
+
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
 
         const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
         cy.intercept('GET', invoicesURL).as('invoicesApi');

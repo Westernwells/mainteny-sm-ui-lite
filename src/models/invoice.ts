@@ -13,6 +13,7 @@ import {
   EmailRecord,
   Meta,
   Money,
+  MultiVatsAmount,
   PaymentInfo,
   PdfGenerationStatus,
 } from './misc';
@@ -55,11 +56,26 @@ export enum InvoiceStatusView {
 
 export interface InvoiceItem {
   id: string;
-  invoiceId: string;
+  invoiceId?: string;
   articleId?: string;
   article?: ArticleView;
   name: string;
-  unitAmount: Amount;
+  unitAmount: MultiVatsAmount;
+  quantity: number;
+  description: string;
+  additionalInfo?: {
+    discount?: Discount;
+    payment?: InvoiceItemPaymentRecord;
+  };
+}
+
+export interface InvoiceItemView {
+  id: string;
+  invoiceId?: string;
+  articleId?: string;
+  article?: ArticleView;
+  name: string;
+  unitAmount: MultiVatsAmount;
   quantity: number;
   description: string;
   additionalInfo?: {
@@ -94,28 +110,33 @@ export interface InvoicePaymentTermRecord {
 }
 
 export interface InvoiceAdditionalInfo {
-  dueDate: string;
-  pdfGenerationStatus: PdfGenerationStatus;
-  pdfPath: string;
-  xmlPath?: string;
-  includeWorkReport: boolean;
-  includeCheckList?: boolean;
-  paymentInfo: PaymentInfo;
+  pdfPath?: string;
+  pdfGenerationStatus?: PdfGenerationStatus;
+  paymentInfo?: PaymentInfo;
+  generationInfo?: {
+    contractId: string;
+    invoiceDate: string;
+    contractExternalId?: string;
+    elevatorIds?: string[];
+    group?: string;
+    componentId?: string;
+  };
+  includeWorkReport?: boolean;
   costCenter?: string;
   customerSpecificOrderNumber?: string;
-  beneficialDetails?: BeneficialDetails;
+  includeCheckList?: boolean;
+  xero?: {
+    xeroEntityId: string;
+    lastSyncedTime: string;
+  };
   moreInfo?: string;
   billingAddress?: AddressRecord;
   beneficiaryAddress?: AddressRecord;
   alternativeAddress?: AddressRecord;
-  laborMaterialCosts: {
-    LABOR: string;
-    MATERIAL: string;
-  };
   laborMaterialCostText?: string;
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
-  discount?: Discount;
   payment?: Payment<AggregatedAmount>;
+  discount?: Discount;
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
@@ -127,6 +148,7 @@ export interface InvoiceAdditionalInfo {
   };
   purchaseOrderNumber?: string;
   elevatorExternalId?: string;
+  xmlPath?: string;
 }
 
 export enum InvoiceOverdueNoticeStatus {
@@ -175,28 +197,24 @@ export interface InvoiceOverdueNoticeSimpleView {
 export interface InvoiceView {
   id: string;
   number: string;
-  externalId: string;
-  description: string;
   subject: string;
+  description: string;
   type: InvoiceType;
-  totalAmount: AggregatedAmount;
-  sentDate?: string;
-  dueDate?: string;
-  issuedDate?: string;
-  status: InvoiceStatus;
-  serviceOrder?: ServiceOrderView;
   propertyOwner: PropertyOwnerSimpleView;
   serviceCompany: ServiceCompanySimpleView;
-  items: InvoiceItem[];
-  search: string;
-  meta: Meta;
+  externalId: string;
+  sentDate?: string;
+  dueDate?: string;
+  status: InvoiceStatus;
+  serviceOrder?: ServiceOrderView;
+  items: InvoiceItemView[];
+  totalAmount: AggregatedAmount;
   additionalInfo: InvoiceAdditionalInfo;
+  payments: InvoicePaymentView[];
   overdueNotices: InvoiceOverdueNoticeSimpleView[];
   commentCount?: number;
-  payments: InvoicePaymentView[];
-  refInvoiceId?: string;
-  paymentTerms?: string;
-  discount: Discount;
+  search: string;
+  meta: Meta;
 }
 
 export interface InvoicePaymentAdditionalInfo {
@@ -303,7 +321,7 @@ export enum InvoiceItemPaymentType {
 
 export interface InvoiceItemPaymentRecord {
   type: InvoiceItemPaymentType;
-  amount?: Amount;
+  amount?: AggregatedAmount;
   percentage?: number;
 }
 
@@ -354,6 +372,7 @@ export const InvoiceTypeMap = {
 };
 
 export interface InvoiceFormData {
+  id?: string;
   subject: string;
   description: string;
   dueDate?: Date;
@@ -370,7 +389,6 @@ export interface InvoiceFormData {
   includeCheckList?: boolean;
   costCenter?: string;
   purchaseOrderNumber?: string;
-  beneficialName?: string;
   moreInfo?: string;
   billingAddress?: AddressRecord;
   beneficiaryAddress?: AddressRecord;
@@ -646,3 +664,10 @@ export type QueryCancelInvoiceParams = {
   action: CANCEL_ACTION;
   disableNavigate?: boolean;
 };
+
+export interface CalculateInvoiceAmountRecord {
+  currency: string;
+  items: InvoiceItemRecord[];
+  globalDiscount?: Discount;
+  paymentRecord?: Payment;
+}

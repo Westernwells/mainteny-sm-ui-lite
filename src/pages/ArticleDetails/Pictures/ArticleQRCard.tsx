@@ -20,7 +20,7 @@ export const ArticleQRCard = ({article}: {article: ArticleView}) => {
     t('Article updated successfully.'),
   );
   const {data: qrUrls = {}} = useDownloadUrl(
-    article.additionalInfo.qrCode ? [article.additionalInfo.qrCode.uri] : [],
+    article.additionalInfo?.qrCode ? [article.additionalInfo.qrCode.uri] : [],
   );
 
   const saveArticle = async (files: FileResourceRecord[]) => {

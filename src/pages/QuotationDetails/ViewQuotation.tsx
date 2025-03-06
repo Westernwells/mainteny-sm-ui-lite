@@ -455,7 +455,7 @@ export const ViewQuotation = ({
               />
               <Typography variant="subtitle1" fontWeight="600">
                 {formatCurrency(
-                  quotation.totalAmount.netAmount /
+                  (quotation.totalAmount.netAmount ?? 0) /
                     10 ** quotation.totalAmount.fractionDigits!,
                   {currency: quotation.totalAmount.currency},
                 )}

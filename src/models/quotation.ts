@@ -5,17 +5,22 @@ import {
   CostPackage,
 } from './article';
 import {ElevatorView} from './elevator';
-import {AlternativeServiceCompanyInfo, Discount} from './invoice';
+import {
+  AggregatedAmount,
+  AlternativeServiceCompanyInfo,
+  Discount,
+} from './invoice';
 import {
   AddressRecord,
   Amount,
   AmountRecord,
   EmailRecord,
   Meta,
+  MultiVatsAmount,
   PdfGenerationStatus,
 } from './misc';
 import {PropertyOwnerView} from './propertyManager';
-import {ServiceCompanySimpleView} from './service-company';
+import {ServiceCompanyItem, ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
 import {theme} from 'theme';
 
@@ -69,15 +74,34 @@ export type QuotationAdditionalInfo = {
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
 };
 
-export interface QuotationItem {
-  additionalInfo: QuotationAdditionalInfo;
-  article: ArticleView;
+export interface QuotationItemView {
   id: string;
-  description: string;
-  name: string;
-  quantity: number;
   quotationId: string;
-  unitAmount: Amount;
+  articleId?: string;
+  article?: QuotationItemArticleView;
+  name: string;
+  unitPurchaseAmount?: MultiVatsAmount;
+  unitAmount: MultiVatsAmount;
+  quantity: number;
+  description: string;
+  additionalInfo: QuotationAdditionalInfo;
+}
+
+export interface QuotationItemArticleView {
+  id?: string;
+  name: string;
+  externalId?: string;
+  type: ArticleType;
+  unit?: string;
+  unitSellingAmount: Amount;
+  unitPurchaseAmount?: Amount;
+  costPackage?: CostPackage;
+  generationInfo?: {
+    contractId: string;
+    componentId: string;
+    elevatorId: string;
+    generationDate: Date;
+  };
 }
 
 export interface ArticleRecord {
@@ -94,7 +118,7 @@ export interface ArticleRecord {
 export interface QuotationItemRecord {
   id?: string;
   articleId?: string;
-  article?: ArticleRecord;
+  article?: ArticleRecord | ArticleView;
   name: string;
   unitAmount: AmountRecord;
   quantity: number;
@@ -113,11 +137,11 @@ export interface QuotationView {
   subject: string;
   moreInfo: string;
   status: QuotationStatus;
-  totalAmount: Amount;
+  totalAmount: AggregatedAmount;
   additionalInfo: QuotationAdditionalInfo;
   search: string;
   meta: Meta;
-  items: QuotationItem[];
+  items: QuotationItemView[];
   commentCount?: number;
 }
 

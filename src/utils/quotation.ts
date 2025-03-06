@@ -1,9 +1,11 @@
-import {DiscountType} from 'models/invoice';
+import {DiscountType, InvoiceItemRecord} from 'models/invoice';
 import {
   QUOTATION_STATUS_FILTER,
   QuotationActivityType,
   QuotationActivityView,
+  QuotationFormData,
   QuotationItemRecord,
+  QuotationItemView,
   QuotationStatus,
   QuotationTableRow,
   QuotationView,
@@ -12,7 +14,14 @@ import {
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {TFunction} from 'i18next';
 import capitalize from 'lodash/capitalize';
-import {Currencies, formatCurrency} from './currency';
+import {ArticleView} from 'models/article';
+import {Currency, PdfGenerationStatus, State} from 'models/misc';
+import {ServiceCompanyItem} from 'models/service-company';
+import {ElevatorView} from 'models/elevator';
+import {PropertyOwnerView} from 'models/propertyManager';
+import {InvoiceItemView} from '../models/invoice';
+import {dateToString} from './utils';
+import {Currencies, formatCurrency, moneyToCents} from './currency';
 
 export const getQuotationActivityTitle = (
   activity: QuotationActivityView,
@@ -52,10 +61,10 @@ export const calculateQuotationTotalWithPerItemDiscount = (
   quotationItems: QuotationItemRecord[],
 ) => {
   const sum = quotationItems
-    .map((item: QuotationItemRecord) =>
+    ?.map((item: QuotationItemRecord) =>
       applyDiscount({
         actualValue:
-          (item.unitAmount.netAmount /
+          ((item.unitAmount.netAmount ?? 0) /
             10 ** Currencies[item.unitAmount.currency]) *
           item.quantity,
         ...(item.discount?.type === DiscountType.AMOUNT
@@ -87,7 +96,7 @@ export const aggregateQuotationRow = (
     status: quotation.status,
     amount: `${formatCurrency(
       quotation
-        ? quotation.totalAmount.netAmount /
+        ? (quotation.totalAmount.netAmount ?? 0) /
             10 ** quotation.totalAmount.fractionDigits!
         : 0,
       {
@@ -125,3 +134,97 @@ export const mapStatusToFilterOptions = (
 
   return status as unknown as QUOTATION_STATUS_FILTER;
 };
+
+export const transformFormikItems = (
+  items: QuotationItemRecord[] | InvoiceItemRecord[],
+): QuotationItemView[] | InvoiceItemView[] =>
+  items.map((item) => ({
+    id: item.id || item.article?.id || '',
+    name: item.name,
+    description: item.description || '',
+    quantity: item.quantity,
+    quotationId: '',
+    unitAmount: {
+      currency: item.unitAmount.currency,
+      netAmount: item.unitAmount.netAmount,
+      percentageVat: item.unitAmount.percentageVat,
+      vats: [
+        {
+          percentageVat: item.unitAmount.percentageVat || 0,
+          vat:
+            (item.unitAmount.percentageVat ?? 0 / 100) *
+            (item.unitAmount.netAmount ?? 0),
+        },
+      ],
+    },
+    additionalInfo: {
+      discount: item.discount,
+      payment: (item as InvoiceItemRecord).payment,
+    },
+    article: item.article as ArticleView,
+  }));
+
+export const generatePdfQuotation = (
+  formikValues: QuotationFormData,
+  currentCurrency: Currency,
+  subtotalExclVat: number,
+  amountAfterGlobalDiscountWithVAT: number,
+  mappedVats: {
+    vat: number;
+    percentageVat: number;
+  }[],
+  customer: PropertyOwnerView | null,
+  unit: ElevatorView | null,
+  company?: ServiceCompanyItem,
+): QuotationView => ({
+  id: '',
+  serviceCompany: {
+    id: company?.id ?? '',
+    name: company?.name ?? '',
+    meta: company?.meta!,
+  },
+  elevator: unit!,
+  number: formikValues.externalId ?? '',
+  externalId: formikValues.externalId ?? '',
+  description: formikValues.description ?? '',
+  propertyOwner: customer!,
+  subject: formikValues.subject ?? '',
+  moreInfo: formikValues.moreInfo ?? '',
+  status: QuotationStatus.DRAFT,
+  totalAmount: {
+    currency: currentCurrency.code,
+    fractionDigits: currentCurrency.fractionDigits,
+    netAmount: moneyToCents(currentCurrency.code, subtotalExclVat),
+    grossAmount: moneyToCents(
+      currentCurrency.code,
+      amountAfterGlobalDiscountWithVAT,
+    ),
+    vats: mappedVats,
+  },
+  additionalInfo: {
+    pdfGenerationStatus: PdfGenerationStatus.GENERATION_REQUIRED,
+    discount: formikValues.discount,
+    billingAddress: formikValues.billingAddress,
+    beneficiaryAddress: formikValues.beneficiaryAddress,
+    alternativeAddress: formikValues.alternativeAddress,
+    paymentTerms: formikValues.paymentTerms,
+    notes: formikValues.notes ?? '',
+    sentDate: formikValues.sentDate ? dateToString(formikValues.sentDate) : '',
+    expiryDate: formikValues.expiryDate
+      ? dateToString(formikValues.expiryDate)
+      : '',
+    referenceNumber: formikValues.referenceNumber ?? '',
+    alternativeServiceCompanyInfo: {
+      name: formikValues.alternativeServiceCompanyInfo?.name ?? '',
+      address: formikValues.alternativeServiceCompanyInfo?.address,
+    },
+  },
+  search: '',
+  meta: {
+    createdAt: Date.now().toString(),
+    lastUpdatedAt: Date.now().toString(),
+    state: State.ACTIVE,
+  },
+  items: transformFormikItems(formikValues.items) as QuotationItemView[],
+  commentCount: 0,
+});

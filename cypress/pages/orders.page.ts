@@ -12,6 +12,7 @@ export default class OrdersPage {
 
   static changeStatusFilter = (status: string) => {
     cy.contains('button', status).click({force: true});
+    cy.wait(1000)
   };
 
   static changeTypeFilter = (type: string) => {

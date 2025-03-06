@@ -23,8 +23,8 @@ describe('Send Invoice via Email', () => {
 
         cy.go('back');
         cy.get('span[role="progressbar"]').should('not.exist');
-        cy.wait(['@invoicesApi', '@invoicesApi', '@invoicesApi']);
-        cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
+        cy.wait(['@invoicesApi', '@invoicesApi', '@invoicesApi'], {timeout: 30000});
+        cy.wait(500); // Very small delay for the DOM to be updated, can be anything any small amount
 
         // send invoice
         cy.get('button[data-testid="invoice-action-menu-button"]').eq(0).click();

@@ -15,7 +15,11 @@ import {
   useInvoiceStatistics,
 } from 'hooks/reactQuery/useInvoice';
 import {useNavigate} from 'react-router-dom';
-import {aggregateInvoiceRow, createSearchQuery} from 'utils/invoice';
+import {
+  aggregateInvoiceRow,
+  createSearchQuery,
+  getInvoiceStatusStyles,
+} from 'utils/invoice';
 import {Progress} from 'components/Progress';
 import {useQueryState} from 'hooks/useQueryState';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -83,7 +87,6 @@ import {createExcelContent} from 'utils/utils';
 import {downloadExcel} from 'utils/download';
 import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
-  CLIENT_STORAGE_PDF_TEMPLATE_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
@@ -96,14 +99,15 @@ import {DateRange} from '@mui/x-date-pickers-pro';
 import DatePickerRange from 'components/DatePickerRange';
 import EmptyTable from 'components/Table/EmptyTable';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   convertNumberToAmountNumber,
   formatCurrency,
   useCurrentCurrency,
 } from 'utils/currency';
 import NoteIcon from 'components/NoteIcon';
-import {getInvoiceStatusStyles} from './InvoicesDataGridProps';
+import XMLViewer from 'react-xml-viewer';
+import printJS from 'print-js';
+import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPreparation';
 
 const pageSize = 25;
 
@@ -144,6 +148,8 @@ const Invoices = ({elevatorId}: Props) => {
   const [status, setStatus] = useQueryState<InvoiceStatusFilter[]>('status', {
     defaultValue: [],
   });
+
+  const {fetchInvoiceInfo} = useInvoiceDownloadPreparation(); // make fetching info singleton to remove multiple calls
 
   const [selectedInvoiceNumber, setSelectedInvoiceNumber] = useQueryState<
     string | undefined
@@ -227,6 +233,8 @@ const Invoices = ({elevatorId}: Props) => {
   const [hoverNoteServiceId, setHoverNoteServiceId] = useState<
     string | undefined
   >();
+
+  const [xmlHtmlContent, setXmlHtmlContent] = useState(''); // to insure that the xml container element will not disappear when entry is update on print
 
   const query = useMemo(
     () =>
@@ -414,34 +422,6 @@ const Invoices = ({elevatorId}: Props) => {
         ? JSON.parse(clientStorageDataPdfConfig.value)
         : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
     [clientStorageDataPdfConfig?.value],
-  );
-
-  const {
-    data: clientStorageDataTemplate,
-    isLoading: isLoadingClientStorageDataTemplate,
-  } = useQueryClientStorageData({
-    serviceCompanyId: user?.userAccount.serviceCompany.id!,
-    params: {key: CLIENT_STORAGE_PDF_TEMPLATE_KEY},
-  });
-
-  const {headerInfo, footerInfo} = useMemo(() => {
-    const parsedData = JSON.parse(clientStorageDataTemplate?.value || '{}');
-    return {
-      headerInfo: parsedData.header,
-      footerInfo: parsedData.footer,
-    };
-  }, [clientStorageDataTemplate?.value]);
-
-  const {data: headerUrl = {}, isLoading: isHeaderUrlLoading} = useDownloadUrl(
-    headerInfo?.path ? [headerInfo?.path] : [],
-    undefined,
-    user?.userAccount.serviceCompany.id,
-  );
-
-  const {data: footerUrl = {}, isLoading: isFooterUrlLoading} = useDownloadUrl(
-    footerInfo?.path ? [footerInfo?.path] : [],
-    undefined,
-    user?.userAccount.serviceCompany.id,
   );
 
   const COLUMNS = useMemo<TableColumnWithRender<InvoiceTableRow>[]>(
@@ -633,14 +613,12 @@ const Invoices = ({elevatorId}: Props) => {
           <Cell {...cellProps} onClick={undefined}>
             <Actions
               invoice={invoice.data}
-              headerInfo={headerInfo}
-              footerInfo={footerInfo}
-              headerUrl={headerUrl}
-              footerUrl={footerUrl}
               companyNextNumber={companyNextNumber}
-              refetchCompanyNextNumber={refetchCompanyNextNumber}
               removePadding
               pdfConfig={pdfConfig}
+              refetchCompanyNextNumber={refetchCompanyNextNumber}
+              onXmlHtmlContentChange={setXmlHtmlContent}
+              onFetchInvoiceInfo={fetchInvoiceInfo}
             />
           </Cell>
         ),
@@ -650,14 +628,12 @@ const Invoices = ({elevatorId}: Props) => {
       fetchedNote,
       companyNextNumber,
       refetchCompanyNextNumber,
-      headerInfo,
-      footerInfo,
-      headerUrl,
-      footerUrl,
       companyNextNumber,
       showLeftShadow,
       showRightShadow,
       pdfConfig,
+      xmlHtmlContent,
+      setXmlHtmlContent,
     ],
   );
 
@@ -972,14 +948,24 @@ const Invoices = ({elevatorId}: Props) => {
     <Box>{xeroInfoData?.enabled ? lastSyncedText : ''}</Box>
   );
 
-  if (
-    isIdle ||
-    isLoading ||
-    isHeaderUrlLoading ||
-    isFooterUrlLoading ||
-    isLoadingClientStorageDataPdfConfig ||
-    isLoadingClientStorageDataTemplate
-  ) {
+  useEffect(() => {
+    if (xmlHtmlContent) {
+      printJS({
+        printable: `xml-content`,
+        type: 'html',
+        showModal: true,
+        style: `
+          #xml-content {
+            white-space: break-spaces;
+          }
+        `,
+      });
+
+      setXmlHtmlContent('');
+    }
+  }, [xmlHtmlContent]);
+
+  if (isIdle || isLoading || isLoadingClientStorageDataPdfConfig) {
     return <Progress />;
   }
 
@@ -1286,6 +1272,15 @@ const Invoices = ({elevatorId}: Props) => {
           onChange={invoiceRefetch}
         />
       )}
+
+      {/* Hidden container for XML content to be printed */}
+      <div id="xml-content">
+        <XMLViewer
+          indentSize={4}
+          theme={{fontFamily: 'Montserrat'}}
+          xml={xmlHtmlContent}
+        />
+      </div>
     </>
   );
 };

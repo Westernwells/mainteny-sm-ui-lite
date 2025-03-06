@@ -7,7 +7,11 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {InvoiceAmountDetail, InvoiceItem, InvoiceView} from 'models/invoice';
+import {
+  InvoiceAmountDetail,
+  InvoiceItemView,
+  InvoiceView,
+} from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {
   applyGlobalDiscountOnQuotationItems,
@@ -164,7 +168,7 @@ const CreditNotePdfTemplate = ({
     discount: getDiscoutObj(item?.additionalInfo?.discount),
   }))!;
 
-  const netTotal = (articleItem: InvoiceItem) => {
+  const netTotal = (articleItem: InvoiceItemView) => {
     const total = getItemTotalAfterPerItemDiscount({
       item: {
         unitAmount: {
@@ -267,13 +271,13 @@ const CreditNotePdfTemplate = ({
       invoice?.propertyOwner?.additionalInfo?.vatId) ||
     '';
 
-  const eanValue = invoice?.propertyOwner.additionalInfo.ean || '';
+  const eanValue = invoice?.propertyOwner.additionalInfo?.ean || '';
 
   return (
     <Document>
       {invoice?.additionalInfo.alternativeAddress &&
-        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !==
-          0 && (
+        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
+        !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
             userInfo={userInfo}
             selectedLng={selectedLng}
