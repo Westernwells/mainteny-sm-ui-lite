@@ -1,19 +1,37 @@
 import Notes from 'components/Notes';
 import {CreateNoteVars, DeleteNoteVars, UpdateNoteVars} from 'models/note';
-import {MutateOptions} from 'react-query';
+import {MutateOptions, UseInfiniteQueryResult} from 'react-query';
 import {
   useCreateCustomerNote,
   useDeleteCustomerNote,
   useInfiniteCustomerNotes,
   useUpdateCustomerNote,
 } from 'hooks/reactQuery/useCustomers';
+import {Resource, RestError} from 'models/misc';
+import {Comment} from 'models/comment';
 
 interface Props {
+  customerNotes?: UseInfiniteQueryResult<Resource<Comment>, RestError>;
   propertyOwnerId: string;
   onChange?: () => void;
 }
 
-export const CustomerNotes = ({propertyOwnerId, onChange}: Props) => {
+export const CustomerNotes = ({
+  customerNotes: explicitCustomerNotes,
+  propertyOwnerId,
+  onChange,
+}: Props) => {
+  const implicitCustomerNotes = useInfiniteCustomerNotes(
+    propertyOwnerId,
+    {
+      pageIndex: 0,
+      pageSize: 10,
+    },
+    {
+      enabled: !explicitCustomerNotes, // do not call if explicit notes have been passed
+    },
+  );
+
   const {
     data: notes = {
       pages: [],
@@ -23,10 +41,8 @@ export const CustomerNotes = ({propertyOwnerId, onChange}: Props) => {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteCustomerNotes(propertyOwnerId, {
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  } = explicitCustomerNotes || implicitCustomerNotes;
+
   const {mutate: createCustomerNote, isLoading: isCreating} =
     useCreateCustomerNote(onChange);
   const {mutate: deleteCustomerNote, isLoading: isDeleting} =

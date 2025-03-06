@@ -7,6 +7,7 @@ import {Button} from 'components/Button';
 import CustomerNotes from 'components/CustomerNotes';
 import {useInfiniteCustomerNotes} from 'hooks/reactQuery/useCustomers';
 import useTotalNotesData from 'hooks/useTotalNotesData';
+import Skeleton from '@mui/material/Skeleton';
 
 interface Props {
   customerId: string;
@@ -15,6 +16,11 @@ interface Props {
 const Notes = ({customerId}: Props) => {
   const {t} = useTranslation();
   const [showSideDrawer, setShowSideDrawer] = useState(false);
+
+  const infiniteCustomerNotes = useInfiniteCustomerNotes(customerId, {
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const totalCustomerNotes = useTotalNotesData(
     useInfiniteCustomerNotes,
@@ -28,6 +34,16 @@ const Notes = ({customerId}: Props) => {
   const handleCloseSideDrawer = () => {
     setShowSideDrawer(false);
   };
+
+  if (infiniteCustomerNotes.isLoading) {
+    return (
+      <Skeleton
+        data-testid="noteButton"
+        variant="text"
+        sx={{width: '5rem', height: '3rem'}}
+      />
+    );
+  }
 
   return (
     <>
@@ -87,7 +103,10 @@ const Notes = ({customerId}: Props) => {
             }}
           />
         </Box>
-        <CustomerNotes propertyOwnerId={customerId} />
+        <CustomerNotes
+          customerNotes={infiniteCustomerNotes}
+          propertyOwnerId={customerId}
+        />
       </Drawer>
     </>
   );
