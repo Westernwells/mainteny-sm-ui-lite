@@ -140,14 +140,16 @@ const getStyles = (
       marginVertical: 4,
     },
     descriptionText: {
-      width: '85%',
+      width: '100%',
       display: 'flex',
-      fontSize: 8,
+      fontSize: 8.5,
       color: '#212121',
       paddingLeft: 20,
       letterSpacing: -0.15,
-      marginTop: 2,
-      lineHeight: 1.3,
+      marginVertical: 4,
+      lineHeight: 1.5,
+      whiteSpace: 'pre-wrap',
+      wordWrap: 'break-word',
     },
     signatureBoxWrap: {
       marginTop: 30,
@@ -657,16 +659,14 @@ const QuotationPdfTemplate = React.memo(
                           </Text>
                         </View>
                         {!!articleItem?.description?.trim() && (
-                          <View>
-                            <HtmlPDF
-                              html={articleItem.description || '-'}
-                              rootStyle={{
-                                ...styles.descriptionText,
-                                marginBottom:
-                                  index === quotation.items.length - 1 ? 0 : 20,
-                              }}
-                            />
-                          </View>
+                          <HtmlPDF
+                            html={articleItem.description || '-'}
+                            rootStyle={{
+                              ...styles.descriptionText,
+                              marginBottom:
+                                index === quotation.items.length - 1 ? 0 : 10,
+                            }}
+                          />
                         )}
                       </View>
                     ))}

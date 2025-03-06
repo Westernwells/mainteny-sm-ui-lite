@@ -491,7 +491,7 @@ export function transformPropertyOwnerViewToSimpleView(
   };
 }
 
-export const generatePdfInvoice = async (
+export const generatePdfInvoice = (
   formikValues: InvoiceFormData,
   currentCurrency: Currency,
   subtotalExclVat: number,
@@ -504,7 +504,7 @@ export const generatePdfInvoice = async (
   serviceOrder?: ServiceOrderView,
   customer?: PropertyOwnerView | null,
   existingInvoice?: InvoiceView,
-): Promise<InvoiceView> => ({
+): InvoiceView => ({
   id: formikValues?.id ?? '',
   number: formikValues.externalId ?? '',
   externalId: formikValues.externalId ?? '',

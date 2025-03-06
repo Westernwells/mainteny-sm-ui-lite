@@ -938,9 +938,7 @@ export const ArticleItemRowQuotation = ({
 
       {showDescription ? (
         <>
-          <TableCell
-            colSpan={12}
-            sx={{width: '98%', display: 'inline-block', ml: '2%'}}>
+          <TableCell colSpan={12} sx={{display: 'inline-block', ml: '2%'}}>
             <RichTextField
               label="Description"
               test-id={`description-${index}`}
@@ -948,6 +946,11 @@ export const ArticleItemRowQuotation = ({
               html={formik.values.description || ''}
               minRows={1}
               updateHtml={(h) => formik.setFieldValue('description', h)}
+              fieldsetStyles={{
+                maxWidth: '63.5%',
+                wordBreak: 'break-word',
+                whiteSpace: 'pre-wrap',
+              }}
             />
           </TableCell>
 

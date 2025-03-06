@@ -151,16 +151,6 @@ const getStyles = (
       flexDirection: 'column',
       paddingVertical: 1.5,
     },
-    descriptionText: {
-      width: '45%',
-      display: 'flex',
-      fontSize: 8.5,
-      color: '#212121',
-      paddingLeft: 20,
-      letterSpacing: -0.15,
-      marginTop: 2,
-      lineHeight: 1.5,
-    },
   });
 
 type Props = {
