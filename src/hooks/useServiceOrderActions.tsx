@@ -6,7 +6,15 @@ import {
 } from 'hooks/reactQuery/useServiceOrder';
 import {CANCEL_ACTION} from 'models/status';
 
-export const useServiceOrderActions = (id: string) => {
+type UseServiceOrderActionsProps = {
+  id: string;
+  externalSetOpenDialog?: (value: boolean) => void;
+};
+
+export const useServiceOrderActions = ({
+  id,
+  externalSetOpenDialog,
+}: UseServiceOrderActionsProps) => {
   const {mutate: cancelServiceOrder} = useCancelServiceOrders({
     serviceOrderId: id,
     action: CANCEL_ACTION.CANCEL,
@@ -35,6 +43,12 @@ export const useServiceOrderActions = (id: string) => {
 
   const handleSchedule = () => {
     setOpenDialog(true);
+    externalSetOpenDialog?.(true);
+  };
+
+  const handleChangeOpenDialog = (value: boolean) => {
+    setOpenDialog(value);
+    externalSetOpenDialog?.(value);
   };
 
   const confirmCancel = () => {
@@ -54,7 +68,7 @@ export const useServiceOrderActions = (id: string) => {
     handleUncompleteServiceOrder,
     setOpenCancelConfirm,
     setOpenUnscheduleConfirm,
-    setOpenDialog,
+    setOpenDialog: handleChangeOpenDialog,
     handleCancel,
     handleUnschedule,
     handleSchedule,
