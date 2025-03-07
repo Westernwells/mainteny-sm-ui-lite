@@ -192,6 +192,7 @@ const Notes: FC<Props> = ({
               minRows: 5,
               maxRows: 5,
               inputRef: formInputRef,
+              sx: {paddingTop: 0.5},
             }}
           />
           <span

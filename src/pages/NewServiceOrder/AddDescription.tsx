@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import {FormInput} from 'components/form/FormInput';
 import {ElevatorView} from 'models/elevator';
 import {EmployeesView} from 'models/employee';
-import {useEffect, useState} from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {AssignmentDescriptionOrderModel} from 'models/service-order';
 import {TimePicker} from 'components/TimePicker';
@@ -30,12 +30,16 @@ interface Props {
   selectedUnit: ElevatorView;
   selectedTechnicians?: EmployeesView[];
   selectedDateTimeString?: string;
+  setNotes: Dispatch<SetStateAction<string>>;
+  notes: string;
 }
 
 export const AddDescription = ({
   getDescriptionValues,
   initialValues,
   getDescription,
+  setNotes,
+  notes,
   initialDescription = '',
   selectedUnit,
   selectedTechnicians = [],
@@ -55,6 +59,9 @@ export const AddDescription = ({
 
   const [openTextBlockDialog, setOpenTextBlockDialog] =
     useState<boolean>(false);
+  const [textBlockDialogField, setTextBlockDialogField] = useState<
+    'description' | 'note'
+  >();
   const [activeSubDialog, setActiveSubDialog] = useState<
     'edit' | 'preview' | 'delete' | 'create' | undefined
   >(undefined);
@@ -68,7 +75,13 @@ export const AddDescription = ({
   };
 
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
-    setDescription(cleanHtmlContent(rowParams.row.text));
+    if (textBlockDialogField === 'description') {
+      setDescription(cleanHtmlContent(rowParams.row.text));
+    }
+    if (textBlockDialogField === 'note') {
+      setNotes(cleanHtmlContent(rowParams.row.text));
+    }
+
     setOpenTextBlockDialog(false);
   };
 
@@ -193,12 +206,39 @@ export const AddDescription = ({
               }}
               onClick={() => {
                 setOpenTextBlockDialog(true);
+                setTextBlockDialogField('description');
               }}
               size="small">
               <TextSnippetIcon />
             </InputAdornment>
           }
         />
+        <Box mt={2}>
+          <RichTextField
+            label="Note"
+            html={notes || ''}
+            updateHtml={setNotes}
+            minRows={4}
+            endAdornment={
+              <InputAdornment
+                component={IconButton}
+                disableRipple
+                position="end"
+                sx={{
+                  mt: 1,
+                  mr: -1,
+                  alignSelf: 'flex-start',
+                }}
+                onClick={() => {
+                  setOpenTextBlockDialog(true);
+                  setTextBlockDialogField('note');
+                }}
+                size="small">
+                <TextSnippetIcon />
+              </InputAdornment>
+            }
+          />
+        </Box>
       </Box>
 
       <Dialog
@@ -206,6 +246,7 @@ export const AddDescription = ({
         disableSaveBtn={!!Object.keys(formik.errors).length}
         onCancel={() => {
           setOpenTextBlockDialog(false);
+          setTextBlockDialogField(undefined);
         }}
         dialogProps={{
           maxWidth: 'sm',

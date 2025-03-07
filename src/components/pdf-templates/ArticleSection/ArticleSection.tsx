@@ -214,7 +214,7 @@ export const ArticleSection = ({
                   })}
                 </Text>
               </View>
-              {articleItem?.description.trim() && (
+              {!!articleItem?.description.trim() && (
                 <HtmlPDF
                   rootStyle={styles.descriptionText}
                   html={articleItem.description || '-'}
@@ -225,7 +225,7 @@ export const ArticleSection = ({
         </View>
       )}
 
-      <View wrap={false}>
+      <View>
         {discountValue && (
           <View style={styles.tableRow}>
             <Text style={{width: '44%'}} />

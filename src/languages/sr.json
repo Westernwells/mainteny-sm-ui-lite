@@ -3122,5 +3122,8 @@
   "Amount Due: {{amountDue}}": "Iznos duga: {{amountDue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Ako ste platili, obavestite nas. Ako ne, učinite to uskoro da biste izbegli dodatne naknade.",
   "Questions? Contact us at {{contactEmail}}.": "Pitanja? Kontaktirajte nas na {{contactEmail}}.",
-  "Thanks, {{companyName}}": "Hvala, {{companyName}}"
+  "Thanks, {{companyName}}": "Hvala, {{companyName}}",
+  "Office": "Kancelarija",
+  "The notes below will be visible to office only.": "Napomene u nastavku će biti vidljive samo kancelariji.",
+  "Quotation preview": "Pregled citata"
 }

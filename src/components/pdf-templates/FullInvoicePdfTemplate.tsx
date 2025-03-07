@@ -151,16 +151,6 @@ const getStyles = (
       flexDirection: 'column',
       paddingVertical: 1.5,
     },
-    descriptionText: {
-      width: '45%',
-      display: 'flex',
-      fontSize: 8.5,
-      color: '#212121',
-      paddingLeft: 20,
-      letterSpacing: -0.15,
-      marginTop: 2,
-      lineHeight: 1.5,
-    },
   });
 
 type Props = {
@@ -386,17 +376,23 @@ const FullInvoicePdfTemplate = ({
             )}
 
             {invoice?.additionalInfo.paymentTerm?.term?.trim() && (
-              <View style={styles.paymentTermsSection} wrap={false}>
+              <View style={styles.paymentTermsSection}>
                 <Text style={styles.sectionHeading}>
                   {translate('Payment terms')}
                 </Text>
-                <HtmlPDF html={replacedPaymentTerms} />
+                <HtmlPDF
+                  html={replacedPaymentTerms}
+                  rootStyle={{
+                    marginTop: 6,
+                    marginBottom: 16,
+                  }}
+                />
               </View>
             )}
 
             {invoice?.additionalInfo?.moreInfo &&
               stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
-                <View wrap={false} style={styles.notesSection}>
+                <View style={styles.notesSection}>
                   <HtmlPDF
                     html={formatCostText(
                       invoice?.additionalInfo?.moreInfo,
@@ -411,6 +407,10 @@ const FullInvoicePdfTemplate = ({
                         companyLang: selectedLng,
                       })}`,
                     )}
+                    rootStyle={{
+                      marginTop: 6,
+                      marginBottom: 16,
+                    }}
                   />
                 </View>
               )}

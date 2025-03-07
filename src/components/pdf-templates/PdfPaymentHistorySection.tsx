@@ -63,16 +63,6 @@ const getStyles = () =>
       fontSize: 10,
       marginVertical: 4,
     },
-    descriptionText: {
-      width: '45%',
-      display: 'flex',
-      fontSize: 8.5,
-      color: '#212121',
-      paddingLeft: 20,
-      letterSpacing: -0.15,
-      marginTop: 2,
-      lineHeight: 1.5,
-    },
   });
 
 export const PdfPaymentHistorySection = ({
@@ -104,7 +94,7 @@ export const PdfPaymentHistorySection = ({
   const styles = getStyles();
 
   return (
-    <View wrap={false}>
+    <View>
       <View>
         <View
           style={{

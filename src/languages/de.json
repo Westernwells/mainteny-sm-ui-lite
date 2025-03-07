@@ -3101,5 +3101,9 @@
   "Amount Due: {{amountDue}}": "Fälliger Betrag: {{amountDue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Sollte die Rechnung schon beglichen sein, teilen Sie uns dies bitte mit. Wenn nicht, bitten wir Sie um die Überweisung des fälligen Betrages, um zusätzliche Gebühren zu vermeiden.",
   "Questions? Contact us at {{contactEmail}}.": "Sollten Sie Fragen haben, kontaktieren Sie uns unter {{contactEmail}}.",
-  "Thanks, {{companyName}}": "Vielen Dank, {{companyName}}"
+  "Thanks, {{companyName}}": "Vielen Dank, {{companyName}}",
+  "Office": "Büro",
+  "The notes below will be visible to office only.": "Die unten stehenden Notizen, sind nur in der Büroversion sichtbar.",
+  "Quotation preview": "Angebotsvorschau",
+  "Invoice preview": "Rechnungsvorschau"
 }

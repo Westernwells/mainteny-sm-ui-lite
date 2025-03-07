@@ -23,7 +23,7 @@ export const getStyles = () =>
       marginVertical: 4,
     },
     descriptionText: {
-      width: '37%',
+      width: '100%',
       display: 'flex',
       fontSize: 8.5,
       color: '#212121',
@@ -31,5 +31,7 @@ export const getStyles = () =>
       letterSpacing: -0.15,
       marginVertical: 4,
       lineHeight: 1.5,
+      whiteSpace: 'pre-wrap',
+      wordWrap: 'break-word',
     },
   });

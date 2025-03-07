@@ -24,6 +24,7 @@ interface Props {
   submitting?: boolean;
   disableNavigateBack?: boolean;
   submitLabel?: string;
+  footerComponent?: ReactNode;
 }
 
 export const Stepper = ({
@@ -41,6 +42,7 @@ export const Stepper = ({
   submitting,
   disableNavigateBack = false,
   submitLabel,
+  footerComponent,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -129,6 +131,8 @@ export const Stepper = ({
           </Button>
 
           <Box sx={{flex: '1 1 auto'}} />
+
+          {footerComponent && footerComponent}
 
           {activeStep > 0 && (
             <Button
