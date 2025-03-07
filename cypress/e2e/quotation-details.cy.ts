@@ -6,9 +6,9 @@ describe('Quotation Details', () => {
     beforeEach(() => {
         cy.login();
         AppTopBarPage.selectLanguage('English');
-
         cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
         QuotationPage.visit();
+        cy.wait('@serviceCompanyApi');
         cy.get('span[role="progressbar"]').should('not.exist');
     });
 
@@ -18,52 +18,45 @@ describe('Quotation Details', () => {
         });
 
         it('from primary action', () => {
+            cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('getAcceptedQuotations');
             QuotationsPage.filterQuotationTableByStatus('Accepted');
-            QuotationsPage.navigateToDetailsPage(0);
-            cy.wait('@downloadedPDF'); // wait to load the pdf file
-            cy.wait(5000); // wait for rerender to update the button
-            cy.get('button[data-testid="primary-button"]').should('contain', 'Download');
-            cy.get('button[data-testid="primary-button"]').click();
+            QuotationPage.navigateToFirstQuotation('@getAcceptedQuotations');
 
-            QuotationPage.getQuotationNumberElement()
-                .invoke('text')
-                .then((text) => {
-                    cy.log(text);
-                    QuotationPage.checkForDownloadedPDF(text);
-                });
+            cy.get('button[data-testid="primary-button"]')
+              .contains('Download')
+              .should('not.be.disabled')
+              .click();
+
+            QuotationPage.verifyDownloadedPDF();
         });
 
         it('from top right download quotation action', () => {
+            cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('getAcceptedQuotations');
             QuotationsPage.filterQuotationTableByStatus('Accepted');
-            QuotationsPage.navigateToDetailsPage(0);
-            cy.wait('@downloadedPDF'); // wait to load the pdf file
-            cy.wait(5000); // wait for rerender to update the button
-            cy.contains('Download Quotation').should('exist');
-            cy.contains('Download Quotation').click();
+            QuotationPage.navigateToFirstQuotation('@getAcceptedQuotations');
 
-            QuotationPage.getQuotationNumberElement()
-                .invoke('text')
-                .then((text) => {
-                    cy.log(text);
-                    QuotationPage.checkForDownloadedPDF(text);
-                });
+            cy.contains('Download Quotation').should('be.visible').click();
+            QuotationPage.verifyDownloadedPDF();
         });
 
         it('from action menu', () => {
+            cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('getDraftQuotations');
             QuotationsPage.filterQuotationTableByStatus('Draft');
-            QuotationsPage.navigateToDetailsPage(0);
-            cy.wait('@downloadedPDF'); // wait to load the pdf file
-            cy.wait(5000); // wait for rerender to update the button
-            cy.get('svg[data-testid="MoreVertIcon"]').eq(0).click();
-            cy.contains('Download').should('exist');
-            cy.contains('Download').click({force: true});
+            QuotationPage.navigateToFirstQuotation('@getDraftQuotations');
 
-            QuotationPage.getQuotationNumberElement()
-                .invoke('text')
-                .then((text) => {
-                    cy.log(text);
-                    QuotationPage.checkForDownloadedPDF(text);
-                });
+            cy.get('div[class^="react-pdf__Page__textContent"]')
+              .should('exist')
+              .then(() => {
+                  cy.get('svg[data-testid="MoreVertIcon"]').eq(0).click();
+                  cy.get('ul[role="menu"]', {timeout: 3000})
+                    .should('be.visible')
+                    .find('li[role="menuitem"]')
+                    .contains('Download')
+                    .should('not.be.disabled')
+                    .click({force: true});
+
+                  QuotationPage.verifyDownloadedPDF();
+              });
         });
     });
 });

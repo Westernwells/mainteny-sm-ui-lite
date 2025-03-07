@@ -4,6 +4,7 @@ import {navigateCy} from '../utils/utils';
 export default class OrdersPage {
   static visit = () => {
     navigateCy('jobs', 'list');
+    cy.waitForSpinnerToDisappear();
   };
 
   static changeTab = (index: number) => {
@@ -12,7 +13,7 @@ export default class OrdersPage {
 
   static changeStatusFilter = (status: string) => {
     cy.contains('button', status).click({force: true});
-    cy.wait(1000)
+    cy.get('span[role="progressbar"]', {timeout: 30000}).should('not.exist');
   };
 
   static changeTypeFilter = (type: string) => {

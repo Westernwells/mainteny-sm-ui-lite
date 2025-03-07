@@ -33,16 +33,27 @@ export default class LoginPage {
   };
 
   static selectLanguage(languageText) {
-    cy.get('#selectLanguageMenuList').should('not.exist');
+    cy.get('[data-testid="spinner"]', {timeout: 10000}).should('not.exist');
 
     // Click the button to reveal the list
-    cy.get('#selectLanguageButton').click();
+    cy.get('#selectLanguageButton').should('exist')
+    .should('be.visible')
+    .click({force: true});
 
-    // Ensure the list is visible
-    cy.get('#selectLanguageMenuList').should('be.visible');
+    cy.get('body').then(($body) => {
+      if ($body.find('#selectLanguageMenuList').length === 0) {
+        cy.wait(700);
+        cy.get('#selectLanguageButton').click({force: true});
+      }
+    });
 
+       cy.get('#selectLanguageMenuList')
+       .should('exist')
+       .should('be.visible')
+       .as('languageMenu');
+
+       
     // Find and click on the li containing the word 'English'
     cy.get('#selectLanguageMenuList li').contains(languageText).click();
   }
-  // Other methods as needed...
 }

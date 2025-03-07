@@ -1,9 +1,11 @@
+import {addDays} from 'date-fns';
 import {formatDate} from '../../src/utils/datetime';
 import {navigateCy} from '../utils/utils';
 
 export default class EmployeesPage {
   static visit = () => {
     navigateCy('my-company', 'employees');
+    cy.waitForSpinnerToDisappear();
   };
 
   static getAvailableEmployeeRowIndex() {
@@ -53,21 +55,31 @@ export default class EmployeesPage {
   ): Cypress.Chainable<number> {
     if (attempts <= 0) {
       throw new Error(
-        'Could not find an enabled (non-weekend) day within 14 days.',
+        'Could not find an enabled (non-weekend) day within 14 attempts.',
       );
     }
 
-    const nextDayTimestamp = timestamp + 86400000;
+    const nextDayTimestamp = addDays(new Date(timestamp), 1).getTime(); // Move to the next day
+    const dayOfWeek = new Date(nextDayTimestamp).getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // Sunday (0) or Saturday (6)
+
+    // Debugging: Log the day being checked
+    cy.log(
+      `Checking date: ${new Date(
+        nextDayTimestamp,
+      ).toLocaleDateString()} - isWeekend: ${isWeekend}`,
+    );
+
     return cy
       .get(`button[data-timestamp="${nextDayTimestamp}"]`)
       .then(($btn) => {
-        const isWeekend = [0, 6].includes(new Date(nextDayTimestamp).getDay());
         if (!$btn.length || $btn.is(':disabled') || isWeekend) {
           return EmployeesPage.pickNextEnabledDay(
             nextDayTimestamp,
             attempts - 1,
           );
         }
+
         cy.wrap($btn).click({force: true});
         return cy.wrap(nextDayTimestamp);
       });
