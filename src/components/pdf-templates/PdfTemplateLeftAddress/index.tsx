@@ -44,8 +44,6 @@ const PdfTemplateLeftAddress = ({
         <Text style={styles.partialAddressText}>{fallbackReceiverName}</Text>
       );
 
-    if (!addressComponent?.name) return;
-
     return (
       <>
         <Text style={styles.partialAddressText}>{addressComponent.name}</Text>
