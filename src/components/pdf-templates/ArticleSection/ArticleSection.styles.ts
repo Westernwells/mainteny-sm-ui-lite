@@ -23,7 +23,7 @@ export const getStyles = () =>
       marginVertical: 4,
     },
     descriptionText: {
-      width: '100%',
+      width: '86%',
       display: 'flex',
       fontSize: 8.5,
       color: '#212121',
