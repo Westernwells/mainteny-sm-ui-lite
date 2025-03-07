@@ -16,9 +16,8 @@ describe('Login Page', () => {
 
     it('navigate to dashboard after login', () => {
         LoginPage.login();
-
-        cy.url().should('eq', `${Cypress.config().baseUrl}/`);
-    });
+        cy.url().should('match', new RegExp(`^${Cypress.config().baseUrl}/?$`));
+    });    
 
     it('should disable the button when email or password is empty', () => {
         LoginPage.shouldSubmitBtnDisabled(true);

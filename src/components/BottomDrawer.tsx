@@ -87,6 +87,7 @@ export const BottomDrawer = ({
 
           {listItems.length! > 0 && (
             <IconButton
+              data-testid="more-button"
               disabled={!isValid || isSaving}
               onClick={handleClick}
               style={{

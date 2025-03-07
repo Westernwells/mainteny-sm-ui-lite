@@ -54,7 +54,7 @@ describe('Edit Unit', () => {
 
         cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/contactPersons?*`).as('searchContactPersonApi');
 
-        cy.get('input[placeholder="Select contact"]').type(searchText);
+        cy.get('input[placeholder="Select contact"]').clear().type(searchText).should('have.value', searchText);
 
         cy.wait('@searchContactPersonApi').then((interception) => {
             const url = new URL(interception.request.url);

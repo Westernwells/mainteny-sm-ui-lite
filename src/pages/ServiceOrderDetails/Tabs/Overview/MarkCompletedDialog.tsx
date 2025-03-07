@@ -47,7 +47,6 @@ export const MarkCompletedDialog = ({
           ? serviceOrderDetails.serviceTime
           : 1,
       description: removeHtmlTags(serviceOrderDetails?.description),
-      externalId: serviceOrderDetails?.externalId,
     },
     onSubmit: async (values: CompleteServiceOrder) => {
       await completeServiceOrder({

@@ -13,8 +13,8 @@ export default class InvoiceListingPage {
 
     navigateCy('finance', 'invoices');
 
-    cy.get('span[role="progressbar"]').should('not.exist');
     cy.wait('@getInvoices');
+    cy.get('span[role="progressbar"]').should('not.exist');
   };
 
   static clearFilter = () => {

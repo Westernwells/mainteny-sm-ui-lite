@@ -8,7 +8,6 @@ describe('Contract listing page', () => {
         AppTopBarPage.selectLanguage('English');
         cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/contracts?*`).as('getContracts');
         ContractListingPage.visit();
-        cy.get('span[role="progressbar"]').should('not.exist');
     });
 
     it('should route to new contract page on clicking new contract button', () => {

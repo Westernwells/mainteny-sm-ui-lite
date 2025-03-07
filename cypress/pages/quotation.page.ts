@@ -1,8 +1,10 @@
 import {navigateCy} from '../utils/utils';
+import QuotationsPage from './quotations.page';
 
 export default class QuotationPage {
   static visit = () => {
     navigateCy('finance', 'quotations');
+    cy.waitForSpinnerToDisappear();
   };
 
   static navigateTo = (path: string) => {
@@ -170,5 +172,57 @@ export default class QuotationPage {
   };
 
   static getQuotationNumberElement = () =>
-    cy.get('h6[data-testid="quotation-number"]');
+    cy.get('h6[data-testid="quotation-number"]').should('exist');
+
+  static waitForSpinnerToDisappear = () => {
+    cy.get('span[role="progressbar"]', {timeout: 10000}).should('not.exist');
+  };
+
+  static verifyDownloadedPDF = () => {
+    QuotationPage.getQuotationNumberElement()
+      .invoke('text')
+      .then((quotationNumber) => {
+        cy.log(`Verifying downloaded PDF contains: ${quotationNumber}`);
+        cy.task('downloads', 'cypress/downloads').then((downloads: unknown) => {
+          if (Array.isArray(downloads) && downloads.length > 0) {
+            const lastDownloadedFile = downloads[downloads.length - 1];
+            cy.task('readPdf', `cypress/downloads/${lastDownloadedFile}`)
+              .its('text')
+              .should('contain', quotationNumber);
+          } else {
+            throw new Error('No downloaded files found');
+          }
+        });
+      });
+  };
+
+  static navigateToFirstQuotation = (statusAlias) => {
+    cy.wait(statusAlias);
+    cy.get('table tbody tr').should('have.length.greaterThan', 0);
+    QuotationsPage.navigateToDetailsPage(0);
+    cy.wait('@downloadedPDF');
+  };
+
+  static filterQuotationTableByStatus = (status) => {
+    cy.get('[data-testid="status-filter"]').click();
+    cy.contains(status).click();
+    cy.wait(1000);
+    cy.get('table tbody tr').should('have.length.greaterThan', 0);
+  };
+
+  static waitForDownload = () => {
+    cy.waitUntil(
+      () =>
+        cy
+          .task('downloads', 'cypress/downloads')
+          .then(
+            (downloads: unknown) =>
+              Array.isArray(downloads) && downloads.length > 0,
+          ),
+      {
+        timeout: 15000,
+        interval: 500,
+      },
+    );
+  };
 }

@@ -14,12 +14,12 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-import { mount } from 'cypress/react'
+import {mount} from 'cypress/react';
 import '@cypress/code-coverage/support';
 // Ensure global app styles are loaded:
 // import '../../src/index.css';
@@ -31,14 +31,18 @@ import '@cypress/code-coverage/support';
 declare global {
   namespace Cypress {
     interface Chainable {
-      mount: typeof mount
+      mount: typeof mount;
     }
   }
 }
 
-Cypress.Commands.add('mount', mount)
+Cypress.Commands.add('mount', mount);
 // Alternatively, if you want to ignore all uncaught exceptions:
-Cypress.on('uncaught:exception', () => false)
+Cypress.on('uncaught:exception', (err) => {
+  if (err.message.includes('Failed to fetch')) {
+    return false; // Prevent Cypress from failing the test
+  }
+});
 // suppress AssertionError
 Cypress.on('fail', () => false);
 // Example use:

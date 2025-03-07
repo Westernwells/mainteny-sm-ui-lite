@@ -3125,5 +3125,6 @@
   "Thanks, {{companyName}}": "Hvala, {{companyName}}",
   "Office": "Kancelarija",
   "The notes below will be visible to office only.": "Napomene u nastavku će biti vidljive samo kancelariji.",
-  "Quotation preview": "Pregled citata"
+  "Quotation preview": "Pregled citata",
+  "Invoice preview": "Pregled fakture"
 }

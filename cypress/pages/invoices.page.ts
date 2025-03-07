@@ -1,15 +1,10 @@
 import {addDays} from 'date-fns';
-import {InvoiceStatusView} from '../../src/models/invoice';
-import {navigateCy} from '../utils/utils';
+import {extractNumbersFromCurrencyString, navigateCy} from '../utils/utils';
 
 export default class InvoicesPage {
   static visit = () => {
     navigateCy('finance', 'invoices');
-  };
-
-  static filterInvoicesListByStatus = (status: InvoiceStatusView) => {
-    cy.get('div[role="combobox"][aria-labelledby="Status"]').click();
-    cy.get('li[role="option"]').contains(status).click();
+    cy.waitForSpinnerToDisappear();
   };
 
   static openSendInvoiceModal = () => {
@@ -20,6 +15,7 @@ export default class InvoicesPage {
     InvoicesPage.getRowByIndex(0)
       .find('button[data-testid="invoice-action-menu-button"]')
       .click();
+    cy.get('li').should('be.visible');
     cy.contains('li', 'Payment').click();
   };
 
@@ -64,65 +60,122 @@ export default class InvoicesPage {
         cy.get(`input[id="${id}"]`);
       });
 
-  static createInvoice = (options?: {
+  static createInvoice = ({
+    setExpiredDueDate = false,
+    hasDueDate = true,
+  }: {
     setExpiredDueDate?: boolean;
     hasDueDate?: boolean;
   }) => {
-    const {setExpiredDueDate = false, hasDueDate = true} = options || {};
-
     cy.contains('button', 'New Invoice').click();
     cy.get('span[role="progressbar"]').should('not.exist');
 
-    // select customer
+    // Select customer
     cy.get('input[role="combobox"][name="propertyOwnerId"]').parent().click();
     cy.get(`li[role="option"][id="combo-box-demo-option-0"]`).click();
 
-    // add article
+    // Add article
     cy.contains('button', 'Add Article').click();
     cy.get('div[test-id="name-0"]').click();
-    const articlesTable = cy.get('table[aria-label="articles table"]');
-    // clicking second row because first row is table header
-    const secondRow = articlesTable.find('tr').eq(2);
-    secondRow.click();
+    cy.get('table[aria-label="articles table"]').find('tr').eq(2).click();
 
     cy.get('input[name="quantity"]').clear().type('1');
     cy.get('input[name="unitAmount.netAmount"]').clear().type('100');
 
-    cy.get('div[role="textbox"][name="paymentTerms"]').clear();
+    if (!hasDueDate) {
+      cy.get('div[role="textbox"][name="paymentTerms"]')
+        .invoke('text')
+        .then(() => {
+          cy.get('div[role="textbox"][name="paymentTerms"]').clear();
 
-    cy.get('[data-testid=payment-due-date]').click();
-    cy.wait(500);
+          cy.get('[data-testid="payment-due-date"]')
+            .should('not.be.disabled')
+            .click({force: true});
 
-    cy.get('[data-testid=payment-due-date-popup]').should('be.visible');
+          cy.get('[data-testid="payment-due-date-popup"]')
+            .should('be.visible')
+            .within(() => {
+              cy.contains('button', 'Clear').click({force: true});
 
-    cy.contains('button', 'Clear').should('exist').click();
+              cy.contains('button', 'Confirm').click({
+                waitForAnimations: false,
+              });
+            });
+        });
+    } else {
+      cy.get('div[role="textbox"][name="paymentTerms"]')
+        .invoke('text')
+        .then((paymentTermsText) => {
+          const storedPaymentTerms = paymentTermsText;
 
-    cy.wait(500);
-    cy.get('[data-testid=payment-due-date]').click({force: true});
+          cy.get('[data-testid="payment-due-date"]').then(($dateInput) => {
+            if ($dateInput.prop('disabled')) {
+              cy.get('div[role="textbox"][name="paymentTerms"]').clear();
 
-    if (hasDueDate) {
-      if (setExpiredDueDate) {
-        cy.get('button[aria-current="date"]')
-          .invoke('attr', 'data-timestamp')
-          .then((timestamp) => {
-            const currentDate = new Date(parseInt(timestamp, 10));
-            const previousDate = addDays(currentDate, -1);
-            const previousDayTimestamp = previousDate.getTime();
-            cy.get(`button[data-timestamp="${previousDayTimestamp}"]`).click(); // Click the button for the previous day
+              cy.wrap($dateInput)
+                .invoke('val')
+                .then((currentValue) => {
+                  const valueStr = String(currentValue);
+                  const [day, month, year] = valueStr.split('.');
+                  const dateObj = new Date(+year, +month - 1, +day);
+
+                  if (dateObj < new Date()) {
+                    cy.get('[data-testid="payment-due-date"]')
+                      .should('not.be.disabled')
+                      .click({force: true});
+
+                    cy.get('[data-testid="payment-due-date-popup"]')
+                      .should('be.visible')
+                      .within(() => {
+                        cy.contains('button', 'Clear').click({force: true});
+                      });
+
+                    cy.wait(500);
+                    cy.get('[data-testid="payment-due-date"]').click({
+                      force: true,
+                    });
+                    cy.get('[data-testid="payment-due-date-popup"]').should(
+                      'be.visible',
+                    );
+
+                    if (setExpiredDueDate) {
+                      cy.get('button[aria-current="date"]')
+                        .invoke('attr', 'data-timestamp')
+                        .then((timestamp) => {
+                          const currentDate = new Date(parseInt(timestamp, 10));
+                          const nextDate = addDays(currentDate, 3);
+                          const nextDayTimestamp = nextDate.getTime();
+                          cy.get(
+                            `button[data-timestamp="${nextDayTimestamp}"]`,
+                          ).click();
+                        });
+                    } else {
+                      cy.get('button[aria-current="date"]')
+                        .invoke('attr', 'data-timestamp')
+                        .then((timestamp) => {
+                          const currentDate = new Date(parseInt(timestamp, 10));
+                          const previousDate = addDays(currentDate, -3);
+                          const previousDayTimestamp = previousDate.getTime();
+                          cy.get(
+                            `button[data-timestamp="${previousDayTimestamp}"]`,
+                          ).click();
+                        });
+                    }
+
+                    cy.contains('button', 'Confirm').click({
+                      waitForAnimations: false,
+                    });
+                    cy.get('div[role="textbox"][name="paymentTerms"]').type(
+                      storedPaymentTerms,
+                      {force: true},
+                    );
+                  }
+                });
+            }
           });
-      } else {
-        cy.get('button[aria-current="date"]')
-          .invoke('attr', 'data-timestamp')
-          .then((timestamp) => {
-            const currentDate = new Date(parseInt(timestamp, 10));
-            const nextDate = addDays(currentDate, 1);
-            const nextDayTimestamp = nextDate.getTime();
-            cy.get(`button[data-timestamp="${nextDayTimestamp}"]`).click(); // Click the button for the next day
-          });
-      }
+        });
     }
 
-    cy.contains('button', 'Confirm').click();
     cy.contains('button', 'Save').click();
     cy.contains('Invoice created successfully');
   };
@@ -157,4 +210,61 @@ export default class InvoicesPage {
       ).should('exist');
     }
   };
+
+  static waitUntilTableLoaded = () => {
+    cy.get('table[aria-label="invoices table"]', {timeout: 60000}).should(
+      'be.visible',
+    );
+    cy.get('tr[role="row"][data-rowindex="0"]', {timeout: 60000}).should(
+      'exist',
+    );
+  };
+
+  static verifyPaidAmountMatchesRow(rowIndex, currency, fractionDigits) {
+    InvoicesPage.getRowByIndex(rowIndex)
+      .find('td[role="cell"][data-field="TOTAL_NET_AMOUNT"]')
+      .invoke('text')
+      .then((amount) => {
+        const numericAmount = extractNumbersFromCurrencyString(amount);
+        const formattedAmount = numericAmount.toLocaleString(currency, {
+          maximumFractionDigits: fractionDigits,
+        });
+
+        // Open action menu and wait for it
+        InvoicesPage.getRowByIndex(rowIndex)
+          .find('button[data-testid="invoice-action-menu-button"]')
+          .should('be.visible')
+          .click();
+
+        // Ensure the action menu is visible before interacting with it
+        cy.get('[data-testid="invoice-action-menu"]', {timeout: 5000})
+          .should('be.visible')
+          .within(() => {
+            cy.get('[data-testid="invoice-action-menu-item-Payment"]')
+              .should('be.visible')
+              .click({force: true});
+          });
+
+        InvoicesPage.getInputByLabel('Paid amount (incl. VAT)')
+          .should('be.visible')
+          .should('have.value', formattedAmount, {timeout: 15000});
+      });
+  }
+
+  static createAndSendInvoice({
+    setExpiredDueDate,
+    hasDueDate,
+  }: {
+    setExpiredDueDate?: boolean;
+    hasDueDate?: boolean;
+  }) {
+    InvoicesPage.createInvoice({setExpiredDueDate, hasDueDate});
+    cy.get('span[role="progressbar"]').should('not.exist');
+    cy.wait(['@invoicesApi', '@invoicesApi']); // Wait for invoice calls
+    cy.get('div[class^="react-pdf__Page__textContent"]')
+      .should('exist')
+      .then(() => {
+        InvoicesPage.sendInvoices();
+      });
+  }
 }

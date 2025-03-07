@@ -3,6 +3,7 @@ import {navigateCy} from '../utils/utils';
 export default class ContractsPage {
   static visit = () => {
     navigateCy('customer-center', 'contracts');
+    cy.waitForSpinnerToDisappear();
   };
 
   static navigateToDetailsPage = () => {
