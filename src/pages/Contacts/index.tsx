@@ -278,10 +278,7 @@ const Contacts = () => {
                 color: theme.palette.primary.light,
               }}
               key={`contact-user-avatar-${contact.id}`}
-              userAccount={{
-                firstName: contact.userAccount.firstName,
-                lastName: contact.userAccount.lastName,
-              }}
+              userAccount={contact.userAccount}
             />
           </Cell>
         ),

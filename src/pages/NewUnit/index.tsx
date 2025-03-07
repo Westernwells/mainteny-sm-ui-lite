@@ -24,6 +24,9 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 import {convertToMacro, formatAddressFullname} from 'utils/utils';
 import {createEmptyResource} from 'utils/paging';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
+import {Progress} from 'components/Progress';
+import Notes from 'pages/CustomerDetails/Notes';
+import {Box} from '@mui/material';
 import {AppointmentPreferenceForm} from './AppointmentPreferenceForm';
 import {CustomerForm} from './CustomerForm';
 import {LocationForm} from './LocationForm/index';
@@ -51,7 +54,14 @@ export const NewUnit = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [queryParams] = useSearchParams();
-  const {data} = useGetCustomer(queryParams.get('customer') || undefined);
+  const customerIdFromQueryString = queryParams.get('customer') || undefined;
+  const {data: prefilledCustomer, isLoading: isLoadingPrefillCustomer} =
+    customerIdFromQueryString
+      ? useGetCustomer(customerIdFromQueryString)
+      : {
+          data: undefined,
+          isLoading: false,
+        };
   const [isSeparateAddressEnabled, setIsSeparateAddressEnabled] =
     useState(false);
   const [customerFormError, setCustomerFormError] = useState<
@@ -59,13 +69,9 @@ export const NewUnit = () => {
   >({});
   const [customerFormValues, setCustomerFormValues] =
     useState<CustomerFormModel>({
-      propertyOwnerId: queryParams.get('customer') || '',
+      propertyOwnerId: customerIdFromQueryString || '',
     });
   const [customer, setCustomer] = useState<PropertyOwnerView>();
-
-  useEffect(() => {
-    setCustomer(data);
-  }, [data]);
 
   const {mutateAsync: addNewUnit, isLoading: isSubmitting} = useAddElevator(
     'Unit created successfully',
@@ -261,8 +267,21 @@ export const NewUnit = () => {
       {keepPreviousData: true},
     );
 
+  // when customer id is passed to be prefilled
+  useEffect(() => {
+    if (prefilledCustomer) {
+      setCustomer(prefilledCustomer);
+      setActiveStep(1);
+    }
+  }, [prefilledCustomer]);
+
+  if (isLoadingPrefillCustomer) {
+    return <Progress />;
+  }
+
   return (
     <Stepper
+      initialActiveStep={activeStep}
       handleCancel={() => {}}
       handleSubmit={() => createNewUnit()}
       stepperWidth="100%"
@@ -275,7 +294,14 @@ export const NewUnit = () => {
         ml: '0',
         display: 'flex',
         flexDirection: 'column',
-      }}>
+      }}
+      footerComponent={
+        customer ? (
+          <Box sx={{marginRight: '1em'}}>
+            <Notes customerId={customer.id} />
+          </Box>
+        ) : undefined
+      }>
       <FlexContainer
         containerStyle={{mt: '1em', overflowY: 'scroll', height: 0}}>
         {activeStep === 0 ? (
@@ -285,6 +311,7 @@ export const NewUnit = () => {
             initialValues={customerFormValues}
             getCustomer={(item) => setCustomer(item)}
             initialCustomer={customer}
+            shouldSetEmpty
           />
         ) : null}
         {activeStep === 1 ? (

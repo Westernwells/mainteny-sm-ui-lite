@@ -1,13 +1,13 @@
-import {useState, useMemo, useRef} from 'react';
+import {useMemo, useRef, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import {InfoCard} from 'components/InfoCard';
 import {ReactComponent as HeadphonesHumanIcon} from 'assets/icons/HeadphonesHumanIcon.svg';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import {useTranslation} from 'react-i18next';
 import {
-  RefContactPersonView,
-  ContactPersonAssociationType,
   ConnectionTypeLabels,
+  ContactPersonAssociationType,
+  RefContactPersonView,
   RefContactTableRow,
 } from 'models/contacts';
 import {
@@ -135,11 +135,12 @@ const ContactsWidget = ({refId, refType}: Props) => {
             {...cellProps}
             onClick={handleEmployeeCellClick(refContact.contactId)}>
             <Avatar
+              onlyFirstInitial
               labelStyles={{
                 color: theme.palette.primary.light,
               }}
               key={`company-avatar-${refContact.contactId}`}
-              userAccount={{firstName: refContact.name}}
+              userAccount={refContact.userAccount}
             />
           </Cell>
         ),

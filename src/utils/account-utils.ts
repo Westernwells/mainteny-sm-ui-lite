@@ -1,6 +1,11 @@
 import {EmployeeAccountData} from 'pages/NewEmployee/model';
 
 import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
+import {
+  PropertyOwnerSimpleView,
+  PropertyOwnerView,
+} from 'models/propertyManager';
+import {AvatarView} from 'models/avatar';
 
 export const formatEmployeeAccountData = (data: EmployeeAccountData) => {
   const userAccount = {
@@ -78,3 +83,10 @@ export const getInitials = (
 
   if (firstName && lastName) return `${firstName[0]}${lastName[0]}`;
 };
+
+export const convertPropertyOwnerObjectToAvatar = (
+  propertyOwner: PropertyOwnerView | PropertyOwnerSimpleView,
+): AvatarView => ({
+  firstName: propertyOwner?.name,
+  photoUrl: propertyOwner.additionalInfo.customerImagePath,
+});

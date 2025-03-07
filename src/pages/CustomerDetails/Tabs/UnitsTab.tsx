@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {useNavigate} from 'react-router-dom';
 import {GridRowsProp} from '@mui/x-data-grid';
@@ -15,6 +15,7 @@ import {Widget} from 'components/Widget';
 import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {useQueryState} from 'hooks/useQueryState';
+import AddButton from 'components/AddButton';
 import {columns, makeRows} from './CustomerUnitDataGrid/CustomerUnitDataGrid';
 
 interface Props {
@@ -183,16 +184,9 @@ export const UnitsTab = ({customerId}: Props) => {
     </FilterFields>
   );
 
-  const renderWidget = () => (
-    <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-      <Widget
-        searchPlaceholder="Search by no, customer, type..."
-        getSearchValue={(search) => setSearchQuery(search)}
-        filterItems={renderFilterItems()}
-        refInput={textInput}
-      />
-    </Box>
-  );
+  if (isLoading) {
+    return <Progress />;
+  }
 
   if (isFetched && !totalUnitsRef.current) {
     return (
@@ -211,27 +205,32 @@ export const UnitsTab = ({customerId}: Props) => {
 
   return (
     <TabContentContainer>
-      {renderWidget()}
-      {isLoading ? (
-        <Progress />
-      ) : (
-        <DataGridLayout
-          rows={rows || []}
-          columns={columns}
-          loading={isFetching}
-          scrollToTop={searchQuery}
-          pageSize={page.pageSize}
-          handlePageSizeChange={(newPageSize: number) =>
-            setPage({...page, pageSize: newPageSize})
-          }
-          handlePageChange={(newPage: number) => {
-            setPage({...page, pageIndex: newPage - 1});
-          }}
-          pageCount={pageCount}
-          totalRows={elevatorResource.total}
-          pageIndex={page.pageIndex + 1}
+      <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+        <Widget
+          searchPlaceholder="Search by no, customer, type..."
+          getSearchValue={(search) => setSearchQuery(search)}
+          filterItems={renderFilterItems()}
+          refInput={textInput}
         />
-      )}
+
+        <AddButton label="New Unit" onClick={addNewUnit} />
+      </Box>
+      <DataGridLayout
+        rows={rows || []}
+        columns={columns}
+        loading={isFetching}
+        scrollToTop={searchQuery}
+        pageSize={page.pageSize}
+        handlePageSizeChange={(newPageSize: number) =>
+          setPage({...page, pageSize: newPageSize})
+        }
+        handlePageChange={(newPage: number) => {
+          setPage({...page, pageIndex: newPage - 1});
+        }}
+        pageCount={pageCount}
+        totalRows={elevatorResource.total}
+        pageIndex={page.pageIndex + 1}
+      />
     </TabContentContainer>
   );
 };

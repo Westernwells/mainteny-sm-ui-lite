@@ -15,6 +15,7 @@ interface Props {
   initialValues?: CustomerFormModel;
   initialCustomer?: PropertyOwnerView;
   getCustomer?: (val?: PropertyOwnerView) => void;
+  shouldSetEmpty?: boolean;
 }
 
 const validationSchema = Yup.object().shape({
@@ -30,6 +31,7 @@ export const CustomerForm = ({
   getCustomerFormValues,
   initialValues,
   initialCustomer,
+  shouldSetEmpty = false,
   getCustomer,
 }: Props) => {
   const {t} = useTranslation();
@@ -73,8 +75,8 @@ export const CustomerForm = ({
                   ...formik.values,
                   propertyOwnerId: value ? value.id : '',
                 });
-                if (value) {
-                  setCustomer(value);
+                if (shouldSetEmpty || value) {
+                  setCustomer(value || undefined);
                 }
               }}
               initialValue={initialCustomer || null}

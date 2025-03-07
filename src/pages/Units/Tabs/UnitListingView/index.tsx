@@ -106,6 +106,7 @@ import CustomizeTable from 'components/Table/CustomizeTable';
 import useCustomizableColumns from 'hooks/useCustomizableColumns';
 import {useExportTableSheet} from 'hooks/useExport';
 import TableCellTextWithTooltip from 'components/Table/TableCellTextWithTooltip';
+import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
 
 const pageInfo = makePage(0, 50);
 
@@ -377,7 +378,11 @@ export const UnitListingView = () => {
                 color: theme.palette.primary.light,
               }}
               key={`company-avatar-${unit.id}`}
-              userAccount={{firstName: unit.propertyOwner?.name || '-'}}
+              userAccount={
+                unit.propertyOwner
+                  ? convertPropertyOwnerObjectToAvatar(unit.propertyOwner)
+                  : {}
+              }
             />
           </Cell>
         ),
