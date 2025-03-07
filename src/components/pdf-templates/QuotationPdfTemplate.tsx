@@ -804,7 +804,13 @@ const QuotationPdfTemplate = React.memo(
                 stripHtmlTags(quotation?.additionalInfo?.notes)
               ) && (
                 <View style={styles.notesSection}>
-                  <HtmlPDF html={quotation?.additionalInfo?.notes || ''} />
+                  <HtmlPDF
+                    html={quotation?.additionalInfo?.notes || ''}
+                    rootStyle={{
+                      marginTop: 6,
+                      marginBottom: 16,
+                    }}
+                  />
                 </View>
               )}
 

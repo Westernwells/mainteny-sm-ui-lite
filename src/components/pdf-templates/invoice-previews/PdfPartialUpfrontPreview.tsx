@@ -431,7 +431,7 @@ const PdfPartialUpfrontPreview = ({
 
             {invoice?.additionalInfo?.moreInfo &&
               stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
-                <View wrap={false} style={styles.notesSection}>
+                <View style={styles.notesSection}>
                   <HtmlPDF
                     html={formatCostText(
                       invoice?.additionalInfo?.moreInfo,
@@ -446,6 +446,10 @@ const PdfPartialUpfrontPreview = ({
                         companyLang: selectedLng,
                       })}`,
                     )}
+                    rootStyle={{
+                      marginTop: 6,
+                      marginBottom: 16,
+                    }}
                   />
                 </View>
               )}

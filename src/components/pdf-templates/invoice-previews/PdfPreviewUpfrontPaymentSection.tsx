@@ -301,7 +301,7 @@ const PdfPreviewUpfrontPaymentSection = ({
         )}
 
       {invoice?.additionalInfo.payment?.type !== PaymentType.PER_ITEM && (
-        <View wrap={false}>
+        <View>
           <View
             style={{
               display: 'flex',
@@ -359,7 +359,6 @@ const PdfPreviewUpfrontPaymentSection = ({
                   flexDirection: 'row',
                   marginVertical: 4,
                 }}
-                wrap={false}
                 key={previousInvoice.id}>
                 <Text
                   style={{
@@ -425,8 +424,7 @@ const PdfPreviewUpfrontPaymentSection = ({
               marginVertical: 4,
               borderBottomWidth: 1,
               borderBottomColor: '#212121',
-            }}
-            wrap={false}>
+            }}>
             <Text
               style={{
                 textAlign: 'left',
@@ -474,7 +472,7 @@ const PdfPreviewUpfrontPaymentSection = ({
         </View>
       )}
 
-      <View wrap={false}>
+      <View>
         <View style={styles.tableRow}>
           <Text style={{width: '44%'}} />
           <Text
@@ -611,11 +609,17 @@ const PdfPreviewUpfrontPaymentSection = ({
       )}
 
       {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
-        <View style={styles.notesSection} wrap={false}>
+        <View style={styles.notesSection}>
           <Text style={styles.sectionHeading}>
             {translate('Payment terms')}
           </Text>
-          <HtmlPDF html={replacedPaymentTerms} />
+          <HtmlPDF
+            html={replacedPaymentTerms}
+            rootStyle={{
+              marginTop: 6,
+              marginBottom: 16,
+            }}
+          />
         </View>
       )}
     </View>
