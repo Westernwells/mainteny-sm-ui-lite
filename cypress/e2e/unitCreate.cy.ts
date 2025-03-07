@@ -1,6 +1,14 @@
 import AppTopBarPage from '../pages/appTopBar.page';
 import UnitsPage from '../pages/unit.page';
 
+interface CustomerCall {
+    request: {
+        query: {
+            query: string;
+        };
+    };
+}
+
 describe('Create Unit', () => {
     beforeEach(() => {
         cy.login();
@@ -51,8 +59,10 @@ describe('Create Unit', () => {
             cy.get('input[placeholder="Select Customer"]').type(char);
         });
         cy.wait('@customerApi', {timeout: 30000});
-        cy.get('@customerApi.all').then((call) => {
-            cy.wrap(Cypress._.last(call)).its('request.query.query').should('include', expectedSearchTerm);
+        cy.get('@customerApi.all').then((calls) => {
+            const typedCalls = calls as unknown as CustomerCall[];
+            const lastCall = typedCalls[typedCalls.length - 1];
+            cy.wrap(lastCall.request.query.query).should('include', expectedSearchTerm);
         });
     });
 });

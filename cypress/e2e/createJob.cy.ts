@@ -26,7 +26,7 @@ describe('Create Job', () => {
         cy.get("span[role='progressbar']").should('exist');
         cy.get("span[role='progressbar']").should('not.exist');
         cy.wait('@unitsApi');
-        ServiceJobPage.getFirstTableElement().click();
+        ServiceJobPage.getUnitFirstTableElement().click();
         ServiceJobPage.goNext();
 
         // Execute the steps for the selected job type

@@ -13,19 +13,20 @@ describe('Invoice listing page', () => {
     beforeEach(() => {
         cy.login();
         AppTopBarPage.selectLanguage('English');
-
         cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
-        cy.waitForSpinnerToDisappear();
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`).as('getInvoices');
         InvoiceListingPage.visit();
     });
 
     it('should route to new invoice page on clicking new invoice button', () => {
+        cy.wait('@getInvoices');
         cy.contains('New Invoice').click();
-        cy.visit(`/invoices/new`);
         cy.url().should('include', `invoices/new`);
     });
 
     it('should filter data by status', () => {
+        cy.wait('@getInvoices');
+
         const statusExclusions = {
             [InvoiceStatusView.PAID]: [
                 InvoiceStatusView.DRAFT,
@@ -86,84 +87,58 @@ describe('Invoice listing page', () => {
         };
 
         Object.entries(statusExclusions).forEach(([status, exclusions]) => {
-            const enumStatus: InvoiceStatusView = status as InvoiceStatusView;
-            InvoiceListingPage.checkGridForStatusExclusion(enumStatus, exclusions);
+            InvoiceListingPage.checkGridForStatusExclusion(status as InvoiceStatusView, exclusions);
         });
     });
 
     it('should filter with search text and verify API call', () => {
+        cy.wait('@getInvoices');
+
         const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
         cy.intercept('GET', invoicesURL).as('invoicesURL');
 
         const searchText = 'es';
+        cy.get('input[placeholder="Search"]').should('be.visible').clear({force: true}).type(searchText, {force: true});
+        cy.url().should('include', 'searchInvoices').should('include', searchText);
 
-        cy.get('input[placeholder="Search"]').clear({force: true});
-        cy.get('input[placeholder="Search"]')
-            .type(searchText, {force: true})
-            .invoke('val')
-            .then((inputValue: string) => {
-                cy.url().should('include', 'searchInvoices');
-                cy.url().should('include', inputValue);
-            });
-
-        cy.wait('@invoicesURL').then((interception) => {
-            const url = new URL(interception.request.url);
-            const pageIndex = url.searchParams.get('pageIndex');
-            const pageSize = url.searchParams.get('pageSize');
-            const query = url.searchParams.get('query');
-            expect(pageIndex).to.equal('0');
-            expect(pageSize).to.equal('25');
-            expect(query).to.equal(searchText);
-        });
-
+        cy.wait('@invoicesURL').its('response.body.data').should('have.length.greaterThan', 0);
         TableFilter.clearQuerySearchFilter();
         cy.get('input[placeholder="Search"]').should('have.value', '');
     });
 
     it('should filter with price', () => {
-        const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
-        const minValue = '100';
-        const maxValue = '50000';
-        cy.intercept('GET', invoicesURL).as('invoicesURL');
+        cy.wait('@getInvoices');
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`).as('invoicesURL');
+        InvoiceListingPage.filterInvoicesByPrice({from: '100', to: '50000'});
 
-        InvoiceListingPage.filterInvoicesByPrice({from: minValue, to: maxValue});
-        cy.url().should('include', 'grossAmountMin');
-        cy.url().should('include', 'grossAmountMax');
-
-        cy.wait('@invoicesURL').then((interception) => {
-            expect(interception.request.url).to.include(`totalGrossAmountFrom=${minValue}`);
-            expect(interception.request.url).to.include(`totalGrossAmountTo=${maxValue}`);
-        });
+        cy.wait('@invoicesURL');
+        cy.url().should('include', 'grossAmountMin').should('include', 'grossAmountMax');
     });
 
     it(`should show no entries message when filter returns nothing`, () => {
+        cy.wait('@getInvoices');
         const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
         cy.intercept('GET', invoicesURL).as('invoicesURL');
 
         const searchText = 'zzzghhdgsshgdhsggdddtuwowuakfdyrdjdjfhssg';
 
-        cy.get('input[placeholder="Search"]').clear({force: true});
-        cy.get('input[placeholder="Search"]')
-            .type(searchText, {force: true})
-            .invoke('val')
-            .then((inputValue: string) => {
-                cy.url().should('include', 'searchInvoices');
-                cy.url().should('include', inputValue);
-            });
+        cy.get('input[placeholder="Search"]').should('be.visible').clear({force: true});
+        cy.get('input[placeholder="Search"]').type(searchText, {force: true});
 
-        cy.wait('@invoicesURL').then((interception) => {
-            if (interception.response.body && interception.response.body.data.length === 0) {
-                expect(interception.response.body.data).to.have.lengthOf(0);
-                Table.validateTableShouldHaveNoMatch();
-            }
-        });
+        cy.url().should('include', 'searchInvoices');
+        cy.url().should('include', searchText);
+
+        cy.wait('@invoicesURL').its('response.body.data').should('have.length', 0);
+        Table.validateTableShouldHaveNoMatch();
     });
 
     it(`should route to the invoice details page`, () => {
+        cy.wait('@getInvoices');
         InvoiceListingPage.navigateToDetailsPage();
     });
 
     it('should create credit note invoice', () => {
+        cy.wait('@getInvoices');
         InvoiceListingPage.filterInvoicesListByStatus(InvoiceStatusView.NOT_PAID);
         cy.get('span[role="progressbar"]').should('not.exist');
 

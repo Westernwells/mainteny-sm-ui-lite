@@ -117,7 +117,6 @@ describe('Invoice flow', () => {
         cy.wait('@getJobAPI').then((interception) => {
             const job = interception.response.body as ServiceOrderView;
             cy.contains(job.externalId);
-
             // assert articles section
             // validate articles are filled from job
             if (!job.articles.length) {
@@ -473,24 +472,29 @@ describe('Invoice flow', () => {
         // assert calculations
         const sumBeforeGlobalDiscount = '7,800.00';
         const sumAfterGlobalDiscount = '7,300.00';
-        const vats = ['VAT 7%', '288.25', 'VAT 19%', '604.59'];
-        const total = '8,192.84';
+        // Vat test needs to be updated since logic for handling has changed
+        const vats = ['VAT 10%', '730.00'];
+        const total = '8,030.00';
         [sumBeforeGlobalDiscount, sumAfterGlobalDiscount, ...vats, total].forEach((value) => cy.contains(value));
         cy.contains('button', 'Save').click();
-        cy.waitForSpinnerToDisappear();
-        cy.contains('Loading PDF').should('exist');
-        cy.contains('Loading PDF').should('not.exist');
-        cy.contains(total);
-        // assert calculations in PDF
-        cy.get('div[class^="react-pdf__Document"]')
+
+        
+        cy.get('div[class^="react-pdf__Page__textContent"]')
+        .should('exist')
+        .then(() => {
+            cy.get('div[class^="react-pdf__Document"]')
             .first()
             .within(() => {
                 [sumAfterGlobalDiscount, ...vats, total].forEach((value) => cy.contains(value));
             });
+        });
+        
+        cy.contains(total);
 
         /* assert Download PDF */
         cy.go('back');
-        cy.contains('€8,192.84').parents('div[role="row"]').find('svg[data-testid="MoreVertIcon"]').click();
+        // Also needs to be updated later due to VAT logic change
+        cy.contains('€8,030.00').parents('div[role="row"]').find('svg[data-testid="MoreVertIcon"]').click();
         cy.contains('li', 'Download').click();
         cy.window().then((win) => {
             cy.spy(win.URL, 'createObjectURL').as('createObjectURLSpy');
@@ -499,7 +503,7 @@ describe('Invoice flow', () => {
         cy.wait(5000);
         cy.task('downloads', 'cypress/downloads').then((d: string[]) => {
             const lastDownlodedFile = d[d.length - 1];
-            cy.task('readPdf', `cypress/downloads/${lastDownlodedFile}`).its('text').should('contain', '8,192.84');
+            cy.task('readPdf', `cypress/downloads/${lastDownlodedFile}`).its('text').should('contain', '8,030.00');
         });
     });
 });
