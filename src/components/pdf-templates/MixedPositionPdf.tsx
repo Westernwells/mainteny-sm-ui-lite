@@ -83,7 +83,7 @@ const getStyles = (regularFontStyle: {fontFamily: string}) =>
       fontSize: 10,
     },
     descriptionText: {
-      width: '85%',
+      width: '86%',
       fontSize: 8,
       color: '#212121',
       marginVertical: 5,
