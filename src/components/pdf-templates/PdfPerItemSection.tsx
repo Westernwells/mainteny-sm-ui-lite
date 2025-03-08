@@ -258,8 +258,7 @@ const PdfPerItemSection = ({
                                 index === prevInvoice.items.length - 1 ? 1 : 0,
                               borderBottomColor: '#212121',
                               paddingBottom: 3,
-                            }}
-                            wrap={false}>
+                            }}>
                             <Text
                               style={{
                                 textAlign: 'left',

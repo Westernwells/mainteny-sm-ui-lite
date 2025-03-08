@@ -352,17 +352,23 @@ const CreditNotePdfTemplate = ({
             )}
 
             {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
-              <View style={styles.paymentTermsSection} wrap={false}>
+              <View style={styles.paymentTermsSection}>
                 <Text style={styles.sectionHeading}>
                   {translate('Payment terms')}
                 </Text>
-                <HtmlPDF html={replacedPaymentTerms} />
+                <HtmlPDF
+                  html={replacedPaymentTerms}
+                  rootStyle={{
+                    marginTop: 6,
+                    marginBottom: 16,
+                  }}
+                />
               </View>
             )}
 
             {invoice?.additionalInfo?.moreInfo &&
               stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
-                <View wrap={false} style={styles.notesSection}>
+                <View style={styles.notesSection}>
                   <HtmlPDF
                     html={formatCostText(
                       invoice?.additionalInfo?.moreInfo,
@@ -377,6 +383,10 @@ const CreditNotePdfTemplate = ({
                         companyLang: selectedLng,
                       })}`,
                     )}
+                    rootStyle={{
+                      marginTop: 6,
+                      marginBottom: 16,
+                    }}
                   />
                 </View>
               )}

@@ -1,7 +1,6 @@
-import {SyntheticEvent, useCallback, useEffect, useMemo, useState} from 'react';
+import {SyntheticEvent, useEffect, useMemo, useState} from 'react';
 import {TextFieldProps} from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import * as _ from 'lodash';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {useQueryCustomers} from 'hooks/reactQuery/useCustomers';
 import {createEmptyResource} from 'utils/paging';
@@ -50,19 +49,12 @@ export const CustomerAutoComplete = ({
     }
   }, [initialValue]);
 
-  const debouncedChangeHandler = useCallback(
-    _.debounce((newValue: string) => {
-      setQuery(newValue);
-    }, 50),
-    [],
-  );
-
   const onInputChange = (
     e: SyntheticEvent,
     newValue: string,
     reason: string,
   ) => {
-    debouncedChangeHandler(newValue);
+    setQuery(newValue);
 
     if (reason === 'clear') {
       setQuery('');

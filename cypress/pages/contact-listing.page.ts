@@ -7,6 +7,7 @@ import TableFilter from '../utils/tableFilter';
 export default class ContractListingPage {
   static visit = () => {
     navigateCy('customer-center', 'contracts');
+    cy.waitForSpinnerToDisappear();
   };
 
   static clearFilter = () => {

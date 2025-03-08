@@ -391,7 +391,6 @@ export const PdfPreviewPartialPaymentSection = ({
                   borderBottomWidth: 0,
                   borderBottomColor: '#212121',
                 }}
-                wrap={false}
                 key={previousInvoice.id}>
                 <Text
                   style={{
@@ -506,7 +505,7 @@ export const PdfPreviewPartialPaymentSection = ({
         </View>
       )}
 
-      <View wrap={false}>
+      <View>
         <View style={styles.tableRow}>
           <Text style={{width: '44%'}} />
           <Text
@@ -662,11 +661,17 @@ export const PdfPreviewPartialPaymentSection = ({
       )}
 
       {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
-        <View style={styles.notesSection} wrap={false}>
+        <View style={styles.notesSection}>
           <Text style={styles.sectionHeading}>
             {translate('Payment terms')}
           </Text>
-          <HtmlPDF html={replacedPaymentTerms} />
+          <HtmlPDF
+            html={replacedPaymentTerms}
+            rootStyle={{
+              marginTop: 6,
+              marginBottom: 16,
+            }}
+          />
         </View>
       )}
     </View>

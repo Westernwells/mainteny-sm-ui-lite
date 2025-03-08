@@ -256,7 +256,7 @@ const OrderArticlePDFPreview = React.memo(
                 />
               </View>
 
-              <View style={styles.table} wrap={false}>
+              <View style={styles.table}>
                 <View style={styles.tableHead}>
                   <View style={styles.tableRow}>
                     <Text
@@ -418,7 +418,7 @@ const OrderArticlePDFPreview = React.memo(
                   ))}
                 </View>
 
-                <View wrap={false}>
+                <View>
                   <View style={styles.tableRow}>
                     <Text style={{width: '44%'}} />
                     <Text

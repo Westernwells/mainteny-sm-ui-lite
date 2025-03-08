@@ -394,7 +394,6 @@ export const PdfPartialPaymentSection = ({
                     index === previousInvoices.length - 1 ? 1 : 0,
                   borderBottomColor: '#212121',
                 }}
-                wrap={false}
                 key={previousInvoice.id}>
                 <Text
                   style={{
@@ -453,7 +452,7 @@ export const PdfPartialPaymentSection = ({
         )}
 
       {previousInvoices.length && (
-        <View wrap={false}>
+        <View>
           <View style={styles.tableRow}>
             <Text style={{width: '44%'}} />
             <Text
@@ -615,11 +614,17 @@ export const PdfPartialPaymentSection = ({
       )}
 
       {invoice?.additionalInfo?.paymentTerm?.term?.trim() && (
-        <View style={styles.notesSection} wrap={false}>
+        <View style={styles.notesSection}>
           <Text style={styles.sectionHeading}>
             {translate('Payment terms')}
           </Text>
-          <HtmlPDF html={replacedPaymentTerms} />
+          <HtmlPDF
+            html={replacedPaymentTerms}
+            rootStyle={{
+              marginTop: 6,
+              marginBottom: 16,
+            }}
+          />
         </View>
       )}
     </View>

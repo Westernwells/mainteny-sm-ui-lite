@@ -12,6 +12,7 @@ type ScheduleModal = {
 export default class ServiceJobPage {
   static visit = () => {
     navigateCy('jobs', 'list');
+    cy.waitForSpinnerToDisappear();
   };
 
   static openAssignEngineerDialog = () => {
@@ -22,13 +23,8 @@ export default class ServiceJobPage {
   };
 
   static assignEngineer = (props: ScheduleModal = {}) => {
-    cy.wait('@technicianApi')
-      .its('response.body.data')
-      .then((technicians) => {
-        if (technicians.length) {
-          ServiceJobPage.submitData(props);
-        }
-      });
+    cy.wait('@technicianApi');
+    ServiceJobPage.submitData(props);
   };
 
   static unscheduleFirstJob = () => {
@@ -59,8 +55,21 @@ export default class ServiceJobPage {
 
   static selectTechnicianWithIndex = (index: number) => {
     cy.get('input[role="combobox"]').parent().click();
-    cy.get(`li[role="option"][id="combo-box-demo-option-${index}"]`).click();
-  };
+  
+    cy.get(`li[role="option"][id="combo-box-demo-option-${index}"]`)
+      .should('exist')
+      .then(($option) => {
+        // Only select if it's NOT already checked
+        const checkbox = $option.find('input[type="checkbox"]');
+        if (!checkbox.prop('checked')) {
+          cy.wrap($option).click({force: true});
+        } else {
+          // Click on the dialog itself to close the dropdown
+          cy.get('[role="dialog"]').click({force: true});
+        }
+      });
+  };  
+  
 
   static submitData = ({
     changeDueDate = true,
@@ -69,91 +78,90 @@ export default class ServiceJobPage {
     assignEngineersCount = 1,
   }: ScheduleModal = {}) => {
     for (let i = 0; i < assignEngineersCount; i += 1) {
-      this.selectTechnicianWithIndex(i);
+      ServiceJobPage.selectTechnicianWithIndex(i);
     }
 
     if (changeDueDate) {
-      cy.log('Selecting or changing  due date for the job');
-      cy.get('[data-testid=due-date]').click();
-      cy.get('[data-testid=due-date-popup]').should('be.visible');
+      cy.get('[data-testid=due-date]', {timeout: 10000})
+        .should('be.visible')
+        .click();
+
+      cy.get('[data-testid=due-date-popup]', {timeout: 10000}).should(
+        'be.visible',
+      );
 
       cy.get('[data-testid=due-date-popup]').within(() => {
-        cy.get('button[aria-current="date"]')
-          .should('be.visible')
-          .click({force: true});
-        cy.contains('button', 'Confirm').click({waitForAnimations: false});
+        cy.contains('button', 'Clear').should('exist').click({force: true});
       });
-    }
 
-    if (withSchedule) {
-      cy.log('Scheduling time for the job');
-      // enable choose a fixed date and time checkbox
-      cy.get('[type="checkbox"]').check();
+      cy.wait(2000);
 
-      // select start and end date
-      cy.contains('label', 'Start and end date').click();
-      // Click the start date (current selected date)
-      cy.get('button[aria-current="date"]').first().click({ force: true });
+      cy.get('[data-testid=due-date]').click({force: true});
 
-      // Select the next available date as the end date
+      cy.get('[data-testid=due-date-popup]').should('be.visible');
+
       cy.get('button[aria-current="date"]')
         .invoke('attr', 'data-timestamp')
         .then((timestamp) => {
-          // Convert timestamp to a Date object
           const currentDate = new Date(parseInt(timestamp, 10));
-      
-          // Add 10 days to the current date
-          const newDate = addDays(currentDate, 10);
-      
-          // Convert back to timestamp
-          const newTimestamp = newDate.getTime();
-      
-          // Click the next day's date
-          cy.get(`button[data-timestamp="${newTimestamp}"]`).click({ force: true });
+          const futureDate = addDays(currentDate, 3);
+          const newTimestamp = futureDate.getTime();
+
+          cy.get(`button[data-timestamp="${newTimestamp}"]`).click({
+            force: true,
+          });
+          cy.contains('button', 'Confirm').click({waitForAnimations: false});
         });
+    }
+
+    if (withSchedule) {
+      cy.get('input[type="checkbox"][class*="MuiSwitch-input"]')
+        .should('exist')
+        .check({force: true});
+      cy.contains('label', 'Start and end date').click();
+      cy.get('button[aria-current="date"]').first().click({force: true});
+
+      cy.get('button[aria-current="date"]')
+        .invoke('attr', 'data-timestamp')
+        .then((timestamp) => {
+          const currentDate = new Date(parseInt(timestamp, 10));
+          const newDate = addDays(currentDate, 10);
+          const newTimestamp = newDate.getTime();
+
+          cy.get(`button[data-timestamp="${newTimestamp}"]`).click({
+            force: true,
+          });
+        });
+
       cy.contains('button', 'Confirm').click({waitForAnimations: false});
 
-      // select start time
       cy.get('[data-testid=start-time]').click();
       cy.get('[data-testid=start-time-popup]').should('be.visible');
-
       cy.get('[data-testid=start-time-popup]').within(() => {
         cy.get('ul[aria-label="Select hours"]').should('be.visible');
         cy.get('li[aria-label="2 hours"]').click();
-
         cy.get('ul[aria-label="Select minutes"]').should('be.visible');
         cy.get('li[aria-label="30 minutes"]').click();
-
         cy.contains('button', 'Confirm').click();
       });
 
-      cy.get('[data-testid=start-time-popup]').should('not.exist');
-
-      // select end time
       cy.get('[data-testid=end-time]').click();
       cy.get('[data-testid=end-time-popup]').should('be.visible');
-
       cy.get('[data-testid=end-time-popup]').within(() => {
         cy.get('ul[aria-label="Select hours"]').should('be.visible');
         cy.get('li[aria-label="4 hours"]').click();
-
         cy.get('ul[aria-label="Select minutes"]').should('be.visible');
         cy.get('li[aria-label="45 minutes"]').click();
-
         cy.contains('button', 'Confirm').click();
       });
-
-      cy.get('[data-testid=end-time-popup]').should('not.exist');
     }
 
     if (removeSchedule) {
-      cy.log('Removing scheduled time for the job');
-      // disable choose a fixed date and time checkbox
-      cy.get('span[data-testid="schedule-dialog-fixed-date-switch"]')
-        .invoke('hasClass', 'Mui-checked')
-        .then((checkedClassPresent) => {
-          if (checkedClassPresent) {
-            cy.get('input[type="checkbox"]').check({force: true});
+      cy.get('input[type="checkbox"][class*="MuiSwitch-input"]')
+        .should('exist')
+        .then(($checkbox) => {
+          if ($checkbox.prop('checked')) {
+            cy.wrap($checkbox).uncheck({force: true});
           }
         });
     }
@@ -161,9 +169,10 @@ export default class ServiceJobPage {
     cy.get('[aria-describedby="alert-dialog-description"]').click({
       force: true,
     });
-    cy.get('[data-testid=saveButton]').should('not.be.disabled').click({
-      force: true,
-    });
+    cy.wait(1000);
+    cy.get('[data-testid=saveButton]')
+      .should('not.be.disabled')
+      .click({force: true});
     cy.contains('Service job scheduled successfully');
   };
 
@@ -173,4 +182,6 @@ export default class ServiceJobPage {
   };
 
   static getFirstTableElement = () => cy.get('[role="cell"]').first();
+
+  static getUnitFirstTableElement = () => cy.get('.MuiDataGrid-row').first();
 }

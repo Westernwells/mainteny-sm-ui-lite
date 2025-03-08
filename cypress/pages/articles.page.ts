@@ -8,6 +8,7 @@ import {navigateCy} from '../utils/utils';
 export default class ArticlesPage {
   static visit = () => {
     navigateCy('inventory', 'articles-&-suppliers');
+    cy.waitForSpinnerToDisappear();
   };
 
   static fillBasicDetails = (article: ArticleBasicFormModel) => {
