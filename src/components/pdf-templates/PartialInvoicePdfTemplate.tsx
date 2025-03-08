@@ -401,7 +401,7 @@ const PartialInvoicePdfTemplate = ({
 
             {invoice?.additionalInfo?.moreInfo &&
               stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
-                <View wrap={false} style={styles.notesSection}>
+                <View style={styles.notesSection}>
                   <HtmlPDF
                     html={formatCostText(
                       invoice?.additionalInfo?.moreInfo,
@@ -416,6 +416,10 @@ const PartialInvoicePdfTemplate = ({
                         companyLang: selectedLng,
                       })}`,
                     )}
+                    rootStyle={{
+                      marginTop: 6,
+                      marginBottom: 16,
+                    }}
                   />
                 </View>
               )}

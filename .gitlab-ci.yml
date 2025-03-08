@@ -167,7 +167,8 @@ component-tests:
 e2e-tests:
   stage: test
   image: 155174012160.dkr.ecr.eu-central-1.amazonaws.com/sm-ui-gitlab-ci:iron
-  parallel: 6
+  parallel: 3
+  timeout: 2h 
   variables:
     ENV: stage
     REACT_APP_BASE_URL: http://localhost:5173

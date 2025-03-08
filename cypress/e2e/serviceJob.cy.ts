@@ -25,52 +25,66 @@ describe('Service Job Tests', () => {
     beforeEach(setupTest);
 
     it('should validate Assign Engineer dialog', () => {
+        cy.wait('@serviceOrdersApi');
+
+        cy.get('body').find('[data-testid="assign-engineer"]').should('exist').should('contain.text', 'Assign Engineer');
+
         cy.get('body').then(($body) => {
-            if ($body.find('[data-testid="assign-engineer"]:visible').length > 0) {
-                ServiceJobPage.openAssignEngineerDialog();
-                ServiceJobPage.assignEngineer();
-            } else {
+            const isVisible = $body.find('[data-testid="assign-engineer"]:visible').length > 0;
+
+            if (!isVisible) {
                 ServiceJobPage.changeTab(0);
                 ServiceJobPage.unscheduleFirstJob();
                 ServiceJobPage.changeTab(1);
-                ServiceJobPage.openAssignEngineerDialog();
-                ServiceJobPage.assignEngineer();
             }
+            ServiceJobPage.openAssignEngineerDialog();
+            ServiceJobPage.assignEngineer();
         });
     });
 
     it('should assign Engineer without schedule', () => {
+        cy.wait('@serviceOrdersApi');
+
+        cy.get('body').find('[data-testid="assign-engineer"]').should('exist').should('contain.text', 'Assign Engineer');
+
         cy.get('body').then(($body) => {
-            if ($body.find('[data-testid="assign-engineer"]:visible').length > 0) {
-                ServiceJobPage.openAssignEngineerDialog();
-                ServiceJobPage.assignEngineer({withSchedule: false});
-            } else {
+            const isVisible = $body.find('[data-testid="assign-engineer"]:visible').length > 0;
+
+            if (!isVisible) {
                 ServiceJobPage.changeTab(0);
                 ServiceJobPage.unscheduleFirstJob();
                 ServiceJobPage.changeTab(1);
-                ServiceJobPage.openAssignEngineerDialog();
-                ServiceJobPage.assignEngineer({withSchedule: false});
             }
+            ServiceJobPage.openAssignEngineerDialog();
+            ServiceJobPage.assignEngineer({withSchedule: false});
         });
     });
 
     it('should assign Engineer with schedule', () => {
+        cy.wait('@serviceOrdersApi');
+
+        cy.get('body').find('[data-testid="assign-engineer"]').should('exist').should('contain.text', 'Assign Engineer');
+
         cy.contains('button', 'Assign Engineer').eq(0).click({waitForAnimations: false});
         ServiceJobPage.assignEngineer();
     });
 
     it('should assign multiple Engineers with schedule', () => {
+        cy.wait('@serviceOrdersApi');
+
+        cy.get('body').find('[data-testid="assign-engineer"]').should('exist').should('contain.text', 'Assign Engineer');
+
         cy.get('body').then(($body) => {
-            if ($body.find('[data-testid="assign-engineer"]:visible').length > 0) {
-                ServiceJobPage.openAssignEngineerDialog();
-                ServiceJobPage.assignEngineer({assignEngineersCount: 2});
-            } else {
+            const isVisible = $body.find('[data-testid="assign-engineer"]:visible').length > 0;
+
+            if (!isVisible) {
                 ServiceJobPage.changeTab(0);
                 ServiceJobPage.unscheduleFirstJob();
                 ServiceJobPage.changeTab(1);
-                ServiceJobPage.openAssignEngineerDialog();
-                ServiceJobPage.assignEngineer({assignEngineersCount: 2});
             }
+
+            ServiceJobPage.openAssignEngineerDialog();
+            ServiceJobPage.assignEngineer({assignEngineersCount: 2});
         });
     });
 
@@ -130,143 +144,117 @@ describe('Service Job Tests', () => {
     it('should assign Technician in order details page', () => {
         ServiceJobPage.changeTab(0);
         OrderPage.changeStatusFilter('Overdue');
-        cy.wait('@serviceOrdersApi')
-            .its('response.body.data')
-            .then((serviceOrders) => {
-                if (serviceOrders.length) {
-                    ServiceJobPage.getFirstTableElement().should('exist').click();
-                    cy.get('button[data-testid="action-menu-horizontal"]').click();
-                    cy.get('[id="action-menu"]').find('[data-testid^="container-menu-option-"]');
-                    cy.contains('li', /^(Reschedule|Schedule)$/i) // Matches "Schedule" or "Reschedule"
-                        .should('be.visible')
-                        .click();
 
-                    cy.get('li[role="menuitem"]').contains('Schedule').click();
+        cy.wait('@serviceOrdersApi');
 
-                    ServiceJobPage.selectTechnicianWithIndex(2);
+        cy.get('tbody tr', {timeout: 10000}).should('have.length.greaterThan', 0);
 
-                    cy.get('[data-testid="due-date"]').click();
-                    cy.get('button[aria-current="date"]').click({force: true});
-                    cy.contains('button', 'Confirm').click({waitForAnimations: false});
+        // Confirm that the first row is now "Overdue"
+        cy.get('tbody tr').first().find('[data-testid="status-chip"]').should('exist').should('contain.text', 'Overdue');
 
-                    cy.contains('button', 'Save').should('not.be.disabled').click();
+        cy.get('tr[data-testid^="service-order-row"] td[data-field="EXTERNAL_ID"]').should('be.visible').first().click();
 
-                    cy.contains('Service job scheduled successfully');
-                } else {
-                    cy.get('tbody').children().should('not.exist');
-                    throw new Error('No Unscheduled jobs found');
-                }
-            });
+        cy.get('button[data-testid="action-menu-horizontal"]').click();
+        cy.get('[id="action-menu"]').find('[data-testid^="container-menu-option-"]');
+        cy.contains('li', /^(Reschedule|Schedule)$/i) // Matches "Schedule" or "Reschedule"
+            .should('be.visible')
+            .click();
+
+        ServiceJobPage.assignEngineer();
+        cy.contains('Service job scheduled successfully');
     });
 
     it('should not reset Technician when rescheduling without changing technicians field', () => {
         ServiceJobPage.changeTab(0);
         OrderPage.changeStatusFilter('Overdue');
-        cy.wait('@serviceOrdersApi')
-            .its('response.body.data')
-            .then((serviceOrders) => {
-                if (serviceOrders.length) {
-                    ServiceJobPage.getFirstTableElement().should('exist').click();
-                    cy.get('button[data-testid="action-menu-horizontal"]').click();
-                    cy.get('[id="action-menu"]').find('[data-testid^="container-menu-option-"]');
-                    cy.contains('li', /^(Reschedule|Schedule)$/i) // Matches "Schedule" or "Reschedule"
-                        .should('be.visible')
-                        .click();
 
-                    ServiceJobPage.assignEngineer({
-                        withSchedule: false,
-                        removeSchedule: true,
-                        changeDueDate: false,
-                    });
-                    cy.get('button[data-testid="action-menu-horizontal"]').click();
-                    cy.contains('li', 'Reschedule').should('be.visible').click();
-                    ServiceJobPage.submitData({
-                        withSchedule: false,
-                        removeSchedule: true,
-                        changeDueDate: false,
-                        assignEngineersCount: 0,
-                    });
-                    cy.get('div[data-testid="technician-card"]').should('not.have', '-');
-                    cy.get('div[data-testid="job-details-status-chip"]').contains('Assigned');
-                } else {
-                    cy.get('tbody').children().should('not.exist');
-                    throw new Error('No Unscheduled jobs found');
-                }
-            });
+        cy.wait('@serviceOrdersApi');
+
+        cy.get('tbody tr', {timeout: 10000}).should('have.length.greaterThan', 0);
+
+        // Confirm that the first row is now "Overdue"
+        cy.get('tbody tr').first().find('[data-testid="status-chip"]').should('exist').should('contain.text', 'Overdue');
+
+        ServiceJobPage.getFirstTableElement().should('exist').click();
+        cy.get('button[data-testid="action-menu-horizontal"]').click();
+        cy.get('[id="action-menu"]').find('[data-testid^="container-menu-option-"]');
+        cy.contains('li', /^(Reschedule|Schedule)$/i) // Matches "Schedule" or "Reschedule"
+            .should('be.visible')
+            .click();
+        ServiceJobPage.assignEngineer({
+            withSchedule: true,
+            removeSchedule: false,
+            changeDueDate: false,
+        });
+        cy.wait(2000);
+        cy.get('button[data-testid="action-menu-horizontal"]').click();
+        cy.contains('li', 'Reschedule').should('be.visible').click();
+        ServiceJobPage.submitData({
+            withSchedule: false,
+            removeSchedule: true,
+            changeDueDate: false,
+            assignEngineersCount: 0,
+        });
+        cy.get('div[data-testid="technician-card"]').should('not.have', '-');
+        cy.get('div[data-testid="job-details-status-chip"]').contains('Assigned');
     });
 
     it('should verify overdue jobs have the Unschedule menu item', () => {
         ServiceJobPage.changeTab(0);
         OrderPage.changeStatusFilter('Overdue');
-        cy.wait('@serviceOrdersApi')
-            .its('response.body.data')
-            .then((serviceOrders) => {
-                if (serviceOrders.length) {
-                    ServiceJobPage.getFirstTableElement().should('exist').click();
-                    cy.get('button[data-testid="action-menu-horizontal"]').click();
-                    cy.get('[id="action-menu"]')
-                        .find('[data-testid^="container-menu-option-"]')
-                        .contains('li', /^Unschedule$/) // Match exactly "Unschedule"
-                        .should('exist');
-                } else {
-                    cy.get('tbody').children().should('not.exist');
-                    throw new Error('No Unscheduled jobs found');
-                }
-            });
+        cy.wait('@serviceOrdersApi');
+
+        cy.get('tbody tr', {timeout: 10000}).should('have.length.greaterThan', 0);
+
+        // Confirm that the first row is now "Overdue"
+        cy.get('tbody tr').first().find('[data-testid="status-chip"]').should('exist').should('contain.text', 'Overdue');
+
+        cy.get('tr[data-testid^="service-order-row"] td[data-field="EXTERNAL_ID"]').should('be.visible').first().click();
+
+        cy.get('button[data-testid="action-menu-horizontal"]').click();
+        cy.get('[id="action-menu"]')
+            .find('[data-testid^="container-menu-option-"]')
+            .contains('li', /^Unschedule$/) // Match exactly "Unschedule"
+            .should('exist');
     });
 
     it('should download work report', () => {
         ServiceJobPage.changeTab(0);
         OrderPage.changeStatusFilter('Completed');
 
-        cy.wait('@serviceOrdersApi')
-            .its('response.body.data')
-            .then((serviceOrders) => {
-                if (serviceOrders.length) {
-                    ServiceJobPage.getFirstTableElement().should('exist').click();
-                    ServiceJobPage.changeTab(1);
+        // Wait for the service orders to load
+        cy.wait('@serviceOrdersApi');
+        cy.get('tbody tr', {timeout: 10000}).should('have.length.greaterThan', 0);
 
-                    cy.get('body').then(($body) => {
-                        if ($body.find('[data-testid="report-images"] div div img').length) {
-                            cy.wait('@imageDownloadUrlsApi').its('response.statusCode').should('eq', 200);
+        // Confirm that the first row is now "Completed"
+        cy.get('tbody tr').first().find('[data-testid="status-chip"]').should('exist').should('contain.text', 'Completed');
 
-                            cy.get('[data-testid="report-images"] div div img').should('have.length.at.least', 1).and('be.visible');
-                        }
+        cy.get('tr[data-testid^="service-order-row"] td[data-field="EXTERNAL_ID"]').should('be.visible').first().click();
+
+        cy.contains('Work Report').should('exist').should('be.visible').click();
+
+        cy.get('body').then(($body) => {
+            if ($body.find('[data-testid="report-images"] div div img').length) {
+                cy.wait('@imageDownloadUrlsApi').its('response.statusCode').should('eq', 200);
+
+                cy.get('[data-testid="report-images"] div div img').should('have.length.at.least', 1).and('be.visible');
+            }
+        });
+
+        cy.contains('button', 'Download', {timeout: 5000}).should('not.be.disabled').click();
+        cy.wait(1000);
+        cy.get('p[data-testid="reportId"]')
+            .invoke('text')
+            .then((text) => {
+                cy.waitUntil(() => cy.task('downloads', 'cypress/downloads').then((d: string[]) => d && d.length > 0), {
+                    timeout: 15000,
+                    interval: 500,
+                }).then(() => {
+                    cy.task('downloads', 'cypress/downloads').then((d: string[]) => {
+                        const lastDownloadedFile = d[d.length - 1];
+                        cy.task('readPdf', `cypress/downloads/${lastDownloadedFile}`).its('text').should('contain', text);
                     });
-
-                    const downloadsFolder = Cypress.config('downloadsFolder');
-
-                    // Delete existing files before download
-                    cy.task('deleteFilesStartingWith', {
-                        folder: downloadsFolder,
-                        prefix: 'WR',
-                    });
-
-                    // Click download button
-                    cy.contains('button', 'Download', {timeout: 5000}).should('not.be.disabled').click();
-
-                    // Wait for file download
-                    cy.task(
-                        'findFileStartingWith',
-                        {
-                            folder: downloadsFolder,
-                            prefix: 'WR',
-                        },
-                        {timeout: 15000},
-                    ).then((filePath) => {
-                        // Ensure filePath is a string before using it
-                        if (typeof filePath !== 'string') {
-                            throw new Error('No downloaded file found with prefix "WR"');
-                        }
-
-                        cy.log(`Found downloaded file: ${filePath}`);
-
-                        cy.readFile(filePath).should('exist');
-                    });
-                } else {
-                    cy.get('tbody').children().should('not.exist');
-                    throw new Error('No completed jobs found');
-                }
+                });
             });
     });
 });

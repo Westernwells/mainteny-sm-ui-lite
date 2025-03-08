@@ -159,8 +159,8 @@ export const AppTopBar = ({
                   alt="globe"
                 />
               }
-              menuListProps={{id: 'selectLanguageMenuList'}}
-              id="selectLanguageButton"
+              menuListProps={{id: 'topBarSelectLanguageMenuList'}}
+              id="topBarSelectLanguageButton"
               label={convertLanguageIfNeeded(selectedLng)}
               menu={[
                 {

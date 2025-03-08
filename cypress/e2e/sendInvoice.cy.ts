@@ -13,18 +13,17 @@ describe('Send Invoice via Email', () => {
         cy.intercept('POST', sendInvoiceAPI).as('sendInvoiceAPI');
 
         InvoicesPage.visit();
-        cy.get('span[role="progressbar"]').should('not.exist');
         cy.wait('@invoicesApi');
     });
 
     it('should send invoice and all form inputs are required', () => {
         // create invoice
-        InvoicesPage.createInvoice();
+        InvoicesPage.createInvoice({setExpiredDueDate: false, hasDueDate: true});
 
         cy.go('back');
         cy.get('span[role="progressbar"]').should('not.exist');
         cy.wait(['@invoicesApi', '@invoicesApi', '@invoicesApi'], {timeout: 30000});
-        cy.wait(500); // Very small delay for the DOM to be updated, can be anything any small amount
+        cy.wait(500);
 
         // send invoice
         cy.get('button[data-testid="invoice-action-menu-button"]').eq(0).click();

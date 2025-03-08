@@ -147,7 +147,7 @@ const renderRow = (
     companyLang: selectedLng,
   });
   return (
-    <View key={`${item.article?.id}-${index}`} style={styles.row} wrap={false}>
+    <View key={`${item.article?.id}-${index}`} style={styles.row}>
       <Text style={styles.colIndex}>{index + 1}</Text>
       <View style={styles.colName}>
         <HtmlPDF html={item.name || ''} />
@@ -219,7 +219,7 @@ const PdfPreviewPerItemSection = ({
   };
 
   return (
-    <View wrap={false}>
+    <View>
       {renderTableHeader()}
 
       <View>

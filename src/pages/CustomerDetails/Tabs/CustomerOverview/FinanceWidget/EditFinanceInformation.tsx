@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import {FormInput} from 'components/form/FormInput';
 import {CUSTOMER_ALL_INVOICE_FORMATS} from 'utils/constants';
+import {useVats} from 'hooks/reactQuery/useVats';
 import {TabContext, TabList, TabPanel} from '@mui/lab';
 import {CustomerFinanceFormModel} from 'models/customer';
 import RichTextField from 'components/RichTextField';
@@ -29,7 +30,6 @@ import {ContractTermView} from 'models/contract';
 import {ServiceCompanyType} from 'models/service-company';
 import {createEmptyResource} from 'utils/paging';
 import {convertToText} from 'utils/utils';
-import {useVats} from 'hooks/reactQuery/useVats';
 import {useCompanyTerms} from 'hooks/reactQuery/useCompanies';
 import BillingAddress from 'pages/CustomerDetails/Tabs/CustomerOverview/BillingAddress';
 import {EditFinanceAddress} from './EditFinanceAddress';

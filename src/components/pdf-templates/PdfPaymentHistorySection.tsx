@@ -104,7 +104,7 @@ export const PdfPaymentHistorySection = ({
   const styles = getStyles();
 
   return (
-    <View wrap={false}>
+    <View>
       <View>
         <View
           style={{

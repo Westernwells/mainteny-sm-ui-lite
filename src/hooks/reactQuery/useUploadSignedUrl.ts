@@ -32,18 +32,31 @@ const uploadAndSave = async (
   serviceCompanyId: string,
   uploadPath: string,
 ) => {
-  const [signedUrl, arrayBuffer] = await Promise.all([
-    getUploadSignedUrl([`${uploadPath}/${file.name}`], serviceCompanyId),
-    getArrayBuffer(file) as unknown as ArrayBuffer,
-  ]);
+  try {
+    const [signedUrl, arrayBuffer] = await Promise.all([
+      getUploadSignedUrl([`${uploadPath}/${file.name}`], serviceCompanyId),
+      getArrayBuffer(file) as unknown as ArrayBuffer,
+    ]);
 
-  await fetch(signedUrl[`${uploadPath}/${file.name}`], {
-    method: 'PUT',
-    headers: {
-      'Content-Type': file.type,
-    },
-    body: arrayBuffer,
-  });
+    if (!signedUrl[`${uploadPath}/${file.name}`]) {
+      throw new Error('Signed URL is undefined or invalid');
+    }
+
+    const response = await fetch(signedUrl[`${uploadPath}/${file.name}`], {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: arrayBuffer,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
 };
 
 export const uploadImages = async (

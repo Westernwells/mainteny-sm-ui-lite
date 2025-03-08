@@ -335,6 +335,8 @@ const RichTextField = ({
                 ...styles.editable,
                 marginTop: label ? '-10px' : '0px',
                 minHeight: `${minRows * 24}px`,
+                fontSize: '16px',
+                lineHeight: '1.5',
               }}
               onKeyDown={onKeyDown}
               onBlur={onBlur}

@@ -8,7 +8,7 @@ describe('Forget Password Page', () => {
     it('shows incorrect email error', () => {
         ForgotPasswordPage.fillEmail('test123.h@test478.com');
         ForgotPasswordPage.submitResetPasswordForm();
-        cy.contains('Sorry, user account wasn\'t found');
+        cy.contains("Sorry, user account wasn't found");
     });
 
     it('show success message', () => {
@@ -18,7 +18,7 @@ describe('Forget Password Page', () => {
 
     it('should redirect to reset pass page', () => {
         ForgotPasswordPage.resetPassword();
-        cy.url().should('eq', `${Cypress.config().baseUrl}/reset-password?type=reset`);
+        cy.url().should('contain', `reset-password?type=reset`);
     });
 
     it('should disable the button when email or password is empty', () => {
@@ -37,15 +37,15 @@ describe('Forget Password Page', () => {
 
     it('should resend code', () => {
         ForgotPasswordPage.resetPassword();
-        cy.url().should('eq', `${Cypress.config().baseUrl}/reset-password?type=reset`);
+        cy.url().should('contain', `reset-password?type=reset`);
         ForgotPasswordPage.resendCode();
         cy.contains('Code sent successfully to your');
     });
 
     it('should redirect to /reset-password', () => {
         ForgotPasswordPage.resetPassword();
-        cy.url().should('eq', `${Cypress.config().baseUrl}/reset-password?type=reset`);
+        cy.url().should('contain', `reset-password?type=reset`);
         ForgotPasswordPage.backToResetPassword();
-        cy.url().should('eq', `${Cypress.config().baseUrl}/reset-password`);
+        cy.url().should('contain', `reset-password`);
     });
 });

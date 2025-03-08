@@ -1,77 +1,84 @@
-const DE_LANG = {
-  English: 'Englisch',
-  Deutsche: 'Deutsche',
-  Serbian: 'Serbian',
-  Italian: 'Italian',
-  Russian: 'Russisch',
+export const LANGUAGE_MAP = {
+  EN: {
+    English: 'English',
+    Deutsche: 'Deutsche',
+    Serbian: 'Serbian',
+    Italian: 'Italian',
+    Russian: 'Russian',
+  },
+  DE: {
+    English: 'Englisch',
+    Deutsche: 'Deutsche',
+    Serbian: 'Serbian',
+    Italian: 'Italian',
+    Russian: 'Russisch',
+  },
+  SR: {
+    English: 'Engleski jezik',
+    Deutsche: 'Deutsche',
+    Serbian: 'Serbian',
+    Italian: 'Italian',
+    Russian: 'Russian',
+  },
+  IT: {
+    English: 'Inglese',
+    Deutsche: 'Deutsche',
+    Serbian: 'Serbian',
+    Italian: 'Italian',
+    Russian: 'Ruski',
+  },
+  RU: {
+    English: 'Английский',
+    Deutsche: 'Немецкий',
+    Serbian: 'Сербия',
+    Italian: 'Италия',
+    Russian: 'Русский',
+  },
 };
-
-const SR_LANG = {
-  English: 'Engleski jezik',
-  Deutsche: 'Deutsche',
-  Serbian: 'Serbian',
-  Italian: 'Italian',
-  Russian: 'Russian',
-};
-
-const IT_LANG = {
-  English: 'Inglese',
-  Deutsche: 'Deutsche',
-  Serbian: 'Serbian',
-  Italian: 'Italian',
-  Russian: 'Ruski',
-};
-
-const RU_LANG = {
-  English: 'Английский',
-  Deutsche: 'Немецкий',
-  Serbian: 'Сербия',
-  Italian: 'Италия',
-  Russian: 'Русский',
-};
-
 export default class AppTopBarPage {
   static selectLanguage(languageText) {
-    cy.contains('button', 'Login').should('not.exist');
-    cy.get('#selectLanguageMenuList').should('not.exist');
+    // Ensure spinners or overlays are gone before proceeding
+    cy.get('[data-testid="spinner"]', {timeout: 10000}).should('not.exist');
 
-    // Click the button to reveal the list
-    cy.get('#selectLanguageButton').click({force: true});
+    cy.get('#topBarSelectLanguageButton', {timeout: 10000})
+      .should('exist')
+      .should('be.visible')
+      .click({force: true});
 
-    // Ensure the list is visible
-    cy.get('#selectLanguageMenuList').should('be.visible');
+    cy.get('body').then(($body) => {
+      if ($body.find('#topBarSelectLanguageMenuList').length === 0) {
+        cy.wait(700);
+        cy.get('#topBarSelectLanguageButton').click({force: true});
+      }
+    });
 
-    cy.get('#selectLanguageButton')
+    // Ensure the dropdown menu is visible
+    cy.get('#topBarSelectLanguageMenuList')
+      .should('exist')
+      .should('be.visible')
+      .as('languageMenu');
+
+    cy.get('#topBarSelectLanguageButton')
       .invoke('text')
-      .then((text) => {
-        if (text === 'EN') {
-          cy.get('#selectLanguageMenuList li').contains(languageText).click();
+      .then((currentLang) => {
+        if (!LANGUAGE_MAP[currentLang]) {
+          throw new Error(`Unsupported language code detected: ${currentLang}`);
         }
 
-        if (text === 'DE') {
-          cy.get('#selectLanguageMenuList li')
-            .contains(DE_LANG[languageText])
-            .click();
+        const translatedText = LANGUAGE_MAP[currentLang][languageText];
+
+        if (!translatedText) {
+          throw new Error(
+            `Language option "${languageText}" is missing in the "${currentLang}" map.`,
+          );
         }
 
-        if (text === 'SR') {
-          cy.get('#selectLanguageMenuList li')
-            .contains(SR_LANG[languageText])
-            .click();
-        }
-
-        if (text === 'IT') {
-          cy.get('#selectLanguageMenuList li')
-            .contains(IT_LANG[languageText])
-            .click();
-        }
-
-        if (text === 'RU') {
-          cy.get('#selectLanguageMenuList li')
-            .contains(RU_LANG[languageText])
-            .click();
-        }
+        cy.get('@languageMenu')
+          .find('li')
+          .contains(translatedText)
+          .should('exist')
+          .should('be.visible')
+          .click({force: true});
       });
   }
-  // Other methods as needed...
 }

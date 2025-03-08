@@ -10,20 +10,20 @@ describe('Invoice flow', () => {
         AppTopBarPage.selectLanguage('English');
     });
 
-    const visitAndCreateInvoice = (hasDueDate: boolean) => {
+    const visitAndCreateInvoice = ({setExpiredDueDate, hasDueDate}: {hasDueDate?: boolean; setExpiredDueDate?: boolean}) => {
         navigateCy('finance', 'invoices');
-        InvoicesPage.createInvoice({setExpiredDueDate: false, hasDueDate});
+        InvoicesPage.createInvoice({setExpiredDueDate, hasDueDate});
         cy.get('span[role="progressbar"]').should('not.exist');
     };
 
     describe('Invoice printing flow', () => {
         it('should not print if there is no due date', () => {
-            visitAndCreateInvoice(false);
+            visitAndCreateInvoice({hasDueDate: false});
             InvoicesPage.printInvoices({hasDueDate: false});
         });
 
         it('should print invoice if there is a valid due date', () => {
-            visitAndCreateInvoice(true);
+            visitAndCreateInvoice({hasDueDate: true});
             InvoicesPage.printInvoices({hasDueDate: true});
         });
     });

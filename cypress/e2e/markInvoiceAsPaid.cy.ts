@@ -1,7 +1,8 @@
+import {InvoiceStatusView} from 'models/invoice';
 import AppTopBarPage from '../pages/appTopBar.page';
 import InvoicesPage from '../pages/invoices.page';
-import {extractNumbersFromCurrencyString} from '../utils/utils';
 import {ServiceCompany} from '../../src/models/service-company';
+import InvoiceListingPage from '../pages/invoice-listing.page';
 
 describe('Mark invoice as paid', () => {
     beforeEach(() => {
@@ -9,47 +10,34 @@ describe('Mark invoice as paid', () => {
         AppTopBarPage.selectLanguage('English');
 
         cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
-
-        const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
-        cy.intercept('GET', invoicesURL).as('invoicesApi');
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`).as('invoicesApi');
 
         InvoicesPage.visit();
-        cy.get('span[role="progressbar"]').should('not.exist');
         cy.wait('@invoicesApi');
     });
 
     it('should open modal and mark invoice as paid successfully', () => {
-        InvoicesPage.createInvoice({setExpiredDueDate: false});
-        cy.get('span[role="progressbar"]').should('not.exist');
-        cy.wait(['@invoicesApi', '@invoicesApi']);
-        cy.wait(5000);
-        InvoicesPage.sendInvoices();
-        cy.go('back');
-        cy.get('span[role="progressbar"]').should('not.exist');
-        cy.wait('@invoicesApi')
-            .its('response')
-            .then((response) => {
-                const {
-                    body: {data},
-                } = response;
-                if (!data.length) return;
-                InvoicesPage.openPaymentModal();
-                InvoicesPage.markInvoiceAsPaid();
-                cy.contains('button', 'Okay').click();
-                cy.contains('Invoice marked as paid!');
-            });
+        InvoiceListingPage.filterInvoicesListByStatus(InvoiceStatusView.NOT_PAID);
+
+        cy.wait('@invoicesApi');
+
+        cy.get('tbody tr', {timeout: 10000}).should('have.length.greaterThan', 0);
+
+        // Confirm that the first row is now "Sent"
+        cy.get('tbody tr').first().find('[data-testid="status-chip"]').should('exist').should('contain.text', 'Sent');
+
+        InvoicesPage.openPaymentModal();
+        InvoicesPage.markInvoiceAsPaid();
+        cy.contains('button', 'Okay').click();
+        cy.contains('Invoice marked as paid!');
     });
 
-    it('should show correct amount when user open mark invoice as paid modal (even after search)', () => {
-        InvoicesPage.createInvoice({setExpiredDueDate: false, hasDueDate: true});
-        cy.get('span[role="progressbar"]').should('not.exist');
-        cy.wait(['@invoicesApi', '@invoicesApi']);
-        cy.wait(5000);
-        InvoicesPage.sendInvoices();
-        cy.go('back');
-        cy.get('span[role="progressbar"]').should('not.exist');
+    it('should show correct amount when user opens mark invoice as paid modal (even after search)', () => {
+        InvoiceListingPage.filterInvoicesListByStatus(InvoiceStatusView.NOT_PAID);
+
         cy.wait('@invoicesApi');
-        cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
+
+        cy.get('tbody tr', {timeout: 10000}).should('have.length.greaterThan', 0);
 
         cy.wait('@serviceCompanyApi').then((interception) => {
             const serviceCompany = interception.response?.body as ServiceCompany;
@@ -57,41 +45,23 @@ describe('Mark invoice as paid', () => {
                 currencies: [firstCurrency],
             } = serviceCompany.settings;
             const {fractionDigits, code: currency} = firstCurrency;
-            InvoicesPage.getRowByIndex(0)
-                .find('td[role="cell"][data-field="TOTAL_NET_AMOUNT"]')
-                .invoke('text')
-                .then((amount) => {
-                    const amountWithoutCurrency = extractNumbersFromCurrencyString(amount);
-                    const formattedAmountWithoutCurrency = amountWithoutCurrency.toLocaleString(currency, {maximumFractionDigits: fractionDigits});
-                    InvoicesPage.getRowByIndex(0).find('button[data-testid="invoice-action-menu-button"]').click();
-                    cy.contains('li', 'Payment').click();
-                    InvoicesPage.getInputByLabel('Paid amount (incl. VAT)').should('have.value', formattedAmountWithoutCurrency);
-                });
 
-            // click outside to close modal
+            // Check paid amount for row 0
+            InvoicesPage.verifyPaidAmountMatchesRow(0, currency, fractionDigits);
+
+            // Click outside to close modal
             cy.get('body').click(0, 0);
 
             InvoicesPage.getRowByIndex(0)
                 .find('td[role="cell"][data-field="NUMBER"]')
                 .invoke('text')
                 .then((invoiceId) => {
-                    // search for invoice
                     cy.get('input[placeholder^="Search"]').type(invoiceId);
                     cy.wait('@invoicesApi');
-                    cy.get("span[role='progressbar']").should('not.exist');
-                    cy.wait(300); // Very small delay for the DOM to be updated, can be anything any small amount
-                    InvoicesPage.getRowByIndex(0)
-                        .find('td[role="cell"][data-field="TOTAL_NET_AMOUNT"]')
-                        .invoke('text')
-                        .then((amount) => {
-                            const amountWithoutCurrency = extractNumbersFromCurrencyString(amount);
-                            const formattedAmountWithoutCurrency = amountWithoutCurrency.toLocaleString(currency, {
-                                maximumFractionDigits: fractionDigits,
-                            });
-                            InvoicesPage.getRowByIndex(0).find('button[data-testid="invoice-action-menu-button"]').click();
-                            cy.contains('li', 'Payment').click();
-                            InvoicesPage.getInputByLabel('Paid amount (incl. VAT)').should('have.value', formattedAmountWithoutCurrency);
-                        });
+                    cy.get('span[role="progressbar"]').should('not.exist');
+                    cy.wait(300);
+
+                    InvoicesPage.verifyPaidAmountMatchesRow(0, currency, fractionDigits);
                 });
         });
     });

@@ -791,25 +791,31 @@ export const WorkReport = ({serviceOrder}: Props) => {
                 {
                   label: 'Report ID',
                   value: report.number,
+                  dataTestId: 'reportId',
                 },
                 {
                   label: 'Job ID',
                   value: serviceOrder.number,
+                  dataTestId: 'jobId',
                 },
                 {
                   label: 'Technician',
                   value: technicianName,
+                  dataTestId: 'technicianName',
                 },
                 {
                   label: 'Unit Status',
                   value: `${t(
                     titleCase(convertToText(serviceOrder.elevator.status)),
                   )}`,
+                  dataTestId: 'unitStatus',
                 },
               ].map((i) => (
                 <Box key={i.label}>
                   <FormLabel text={i.label} />
-                  <Typography>{i.value || '-'}</Typography>
+                  <Typography data-testid={i.dataTestId}>
+                    {i.value || '-'}
+                  </Typography>
                 </Box>
               ))}
           </Box>

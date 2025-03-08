@@ -10,7 +10,6 @@ describe('Create Quotation', () => {
 
         QuotationPage.visit();
         QuotationPage.openNewQuotation();
-        cy.get('span[role="progressbar"]').should('not.exist');
     });
 
     it('should add new customer on quotation page', () => {
