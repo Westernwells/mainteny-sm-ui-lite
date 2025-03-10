@@ -472,6 +472,17 @@ export const createSearchQuery = ({
   return elements.length ? elements.join(' ') : undefined;
 };
 
+export const getBalanceAmount = (invoice: InvoiceView) => {
+  const totalGross =
+    (invoice.totalAmount?.grossAmount ?? 0) /
+    10 ** invoice.totalAmount.fractionDigits!;
+  const paidSum =
+    invoice.payments
+      .filter((p) => p.meta?.state === State.ACTIVE)
+      .reduce((sum, p) => sum + p.amount.value!, 0) /
+    10 ** invoice.totalAmount.fractionDigits!;
+  return totalGross - paidSum;
+};
 export function transformPropertyOwnerViewToSimpleView(
   propertyOwner?: PropertyOwnerView,
 ): PropertyOwnerSimpleView {
@@ -603,18 +614,6 @@ export const generatePdfInvoice = (
   commentCount: 0,
   payments: [],
 });
-
-export const getBalanceAmount = (invoice: InvoiceView) => {
-  const totalGross =
-    (invoice.totalAmount?.grossAmount ?? 0) /
-    10 ** invoice.totalAmount.fractionDigits!;
-  const paidSum =
-    invoice.payments
-      .filter((p) => p.meta?.state === State.ACTIVE)
-      .reduce((sum, p) => sum + p.amount.value!, 0) /
-    10 ** invoice.totalAmount.fractionDigits!;
-  return totalGross - paidSum;
-};
 
 export const getInvoiceStatusStyles = (
   status: string,

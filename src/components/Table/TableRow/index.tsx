@@ -20,7 +20,7 @@ const TableRow = ({
     role="row"
     sx={{
       alignItems: 'center',
-      minHeight: '44px',
+      height: '44px',
       cursor: 'pointer',
       ...(!disableHover && {
         '&:hover td': {background: '#F7F9FC'},
