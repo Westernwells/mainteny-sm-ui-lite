@@ -13,8 +13,8 @@ import {
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {VatView} from 'models/vat';
-import {cleanHtmlContent, replaceTextInHtml, stripHtmlTags} from './text-block';
 import {Currencies, formatCurrency} from './currency';
+import {cleanHtmlContent, replaceTextInHtml, stripHtmlTags} from './text-block';
 import {convertToText} from './utils';
 
 export const handleCostPackageValidation = (
@@ -75,6 +75,43 @@ export const getArticleTypeText = (type: ArticleType): string => {
   }
 };
 
+export const aggregateArticleRow = (
+  articles: ArticleView[],
+): ArticleTableRow[] =>
+  articles.map((article) => ({
+    data: article,
+    id: article.id,
+    number: article.externalId,
+    name: article.name,
+    description: article.description,
+    manufacturer: article.manufacturer,
+    category: article.category,
+    type: article.type,
+    unit: article.unit,
+    price: formatCurrency(
+      (article.unitSellingAmount.netAmount ?? 0) /
+        10 ** (article.unitSellingAmount.fractionDigits || 0),
+      {
+        currency: article.unitSellingAmount.currency,
+      },
+    ),
+  }));
+
+export const createSearchQuery = ({
+  search,
+  storageLocation,
+  category,
+  manufacturer,
+}: SearchParameters) => {
+  const elements: string[] = [];
+  if (search) elements.push(search);
+  if (storageLocation) elements.push(`[storagelocation:*${storageLocation}*]`);
+  if (category) elements.push(`[category:*${category}*]`);
+  if (manufacturer) elements.push(`[manufacture:*${manufacturer}*]`);
+
+  return elements.length ? elements.join(' ') : undefined;
+};
+
 export const syncVatLegalNotesWithNotes = ({
   oldArticles,
   newArticles,
@@ -124,43 +161,6 @@ export const syncVatLegalNotesWithNotes = ({
   });
 
   return notes;
-};
-
-export const aggregateArticleRow = (
-  articles: ArticleView[],
-): ArticleTableRow[] =>
-  articles.map((article) => ({
-    data: article,
-    id: article.id,
-    number: article.externalId,
-    name: article.name,
-    description: article.description,
-    manufacturer: article.manufacturer,
-    category: article.category,
-    type: article.type,
-    unit: article.unit,
-    price: formatCurrency(
-      (article.unitSellingAmount.netAmount ?? 0) /
-        10 ** (article.unitSellingAmount.fractionDigits || 0),
-      {
-        currency: article.unitSellingAmount.currency,
-      },
-    ),
-  }));
-
-export const createSearchQuery = ({
-  search,
-  storageLocation,
-  category,
-  manufacturer,
-}: SearchParameters) => {
-  const elements: string[] = [];
-  if (search) elements.push(search);
-  if (storageLocation) elements.push(`[storagelocation:*${storageLocation}*]`);
-  if (category) elements.push(`[category:*${category}*]`);
-  if (manufacturer) elements.push(`[manufacture:*${manufacturer}*]`);
-
-  return elements.length ? elements.join(' ') : undefined;
 };
 
 export const calculatePackageMaterialLaborPercentages = (costPackage?: {

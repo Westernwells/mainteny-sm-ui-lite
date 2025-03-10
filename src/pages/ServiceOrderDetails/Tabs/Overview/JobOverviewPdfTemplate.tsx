@@ -145,7 +145,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     descriptionText: {
       width: '87%',
       display: 'flex',
-      fontSize: 8.5,
+      fontSize: 8,
       color: '#212121',
       paddingLeft: 20,
       paddingRight: 10,

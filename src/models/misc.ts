@@ -217,6 +217,15 @@ export interface VatInfo {
   vatName?: string;
 }
 
+export interface MultiVatsAmount extends Amount {
+  vats: VatAmount[];
+  vatInfos?: VatInfo[];
+}
+
+export interface VatInfo {
+  vatId?: string;
+  vatName?: string;
+}
 export interface AmountRecord {
   currency: string;
   netAmount?: number;

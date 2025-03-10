@@ -56,6 +56,7 @@ export const TimePicker = ({
   };
 
   const handleClose = () => {
+    setValue(resetValue || null);
     setOpen(false);
   };
 

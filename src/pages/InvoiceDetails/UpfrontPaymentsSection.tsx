@@ -47,6 +47,7 @@ import {
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import {formatDate, toDate} from 'utils/datetime';
+import {State} from 'models/misc';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -525,11 +526,14 @@ export const UpfrontPaymentsSection = ({
 
   const paidAmountInclVats = previousInvoices
     ?.map((i) =>
-      i.payments.reduce(
-        (acc, p) =>
-          acc + (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
-        0,
-      ),
+      i.payments
+        ?.filter((payment) => payment.meta.state === State.ACTIVE)
+        .reduce(
+          (acc, p) =>
+            acc +
+            (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
+          0,
+        ),
     )
     ?.reduce((acc, a) => acc + a, 0);
   const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
@@ -565,7 +569,11 @@ export const UpfrontPaymentsSection = ({
               </TableCell>
             </TableRow>
             {previousInvoices?.map((i, index) => {
-              if (!i.payments.length) {
+              if (
+                !i.payments?.filter(
+                  (payment) => payment.meta.state === State.ACTIVE,
+                ).length
+              ) {
                 return null;
               }
 
@@ -576,6 +584,7 @@ export const UpfrontPaymentsSection = ({
 
               const paidAmountExclVat = Math.abs(
                 i.payments
+                  ?.filter((payment) => payment.meta.state === State.ACTIVE)
                   ?.map(
                     (p) =>
                       (p.additionalInfo.paymentDetails?.netAmount ?? 0) /
@@ -597,12 +606,14 @@ export const UpfrontPaymentsSection = ({
 
               const percentageVats = uniq(
                 i.payments
+                  ?.filter((payment) => payment.meta.state === State.ACTIVE)
                   ?.map((p) => p.additionalInfo.paymentDetails?.vats)
                   ?.flat(),
               );
 
               const totalPriceInclVat = Math.abs(
                 i.payments
+                  ?.filter((payment) => payment.meta.state === State.ACTIVE)
                   ?.map(
                     (p) =>
                       (p.amount?.value ?? 0) /
@@ -678,7 +689,11 @@ export const UpfrontPaymentsSection = ({
   );
 
   const hasPayments =
-    previousInvoices?.map((i) => i.payments).flat().length > 0;
+    previousInvoices
+      ?.map((i) =>
+        i.payments?.filter((payment) => payment.meta.state === State.ACTIVE),
+      )
+      .flat().length > 0;
 
   return (
     <Grid item xs={12} bgcolor="white" p={3}>

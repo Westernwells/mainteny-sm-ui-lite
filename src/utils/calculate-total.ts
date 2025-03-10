@@ -341,7 +341,7 @@ export const calculateVAT = (
   }[],
 ) =>
   items?.reduce((acc, item) => {
-    const {percentageVat} = item.unitAmount;
+    const {percentageVat = 0} = item.unitAmount;
 
     const vat = new BigNumber(item.total)
       .multipliedBy((percentageVat ?? 0) / PERCENTAGE_FACTOR)
