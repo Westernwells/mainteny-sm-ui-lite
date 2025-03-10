@@ -97,8 +97,8 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
 const validationSchema = Yup.object().shape({
   serviceTimeHM: Yup.string()
     .required()
-    .matches(/^[0-9]{2}:[0-9]{2}$/, {
-      message: 'Total time must be in 00:00 format',
+    .matches(/^[0-9]{2,3}:[0-9]{2}$/, {
+      message: 'Total time must be in 00:00 or 000:00 format',
     }),
 });
 
