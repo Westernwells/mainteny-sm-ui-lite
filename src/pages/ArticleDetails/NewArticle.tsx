@@ -1,35 +1,36 @@
-import {useEffect, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
-import {useTranslation} from 'react-i18next';
+import AddIcon from '@mui/icons-material/Add';
+import LocalShipping from '@mui/icons-material/LocalShipping';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import useTheme from '@mui/material/styles/useTheme';
-import AddIcon from '@mui/icons-material/Add';
-import LocalShipping from '@mui/icons-material/LocalShipping';
-import cloneDeep from 'lodash/cloneDeep';
-import {useFormik} from 'formik';
-import * as Yup from 'yup';
-import {FlexContainer} from 'components/FlexContainer';
-import {useArticles, useCreateArticle} from 'hooks/reactQuery/useArticle';
-import {Stepper} from 'components/Stepper';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {PageCard} from 'components/PageCard';
 import {Button} from 'components/Button';
+import {FlexContainer} from 'components/FlexContainer';
+import {PageCard} from 'components/PageCard';
+import {Stepper} from 'components/Stepper';
+import {useFormik} from 'formik';
+import {useArticles, useCreateArticle} from 'hooks/reactQuery/useArticle';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useVats} from 'hooks/reactQuery/useVats';
+import cloneDeep from 'lodash/cloneDeep';
 import {ArticleType, ArticleView} from 'models/article';
 import {ArticleBasicFormModel, ArticleStockFormModel} from 'models/articleForm';
+import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useLocation, useNavigate} from 'react-router-dom';
+import {getArticleTypes} from 'utils/article-utils';
 import {
-  amountRecordForBackend,
-  makeAmountRecord,
+  amountRecordForBackendWithVatId,
+  makeAmountRecordWithVatId,
   useCurrentCurrency,
 } from 'utils/currency';
 import {createEmptyResource} from 'utils/paging';
 import {getUniqueId} from 'utils/utils';
-import {getArticleTypes} from 'utils/article-utils';
-import {SupplierItem} from './Suppliers/SupplierItem';
-import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
-import {AddStockForm} from './Stock/AddStockForm';
+import * as Yup from 'yup';
 import RichTextField from '../../components/RichTextField';
 import {ExtendedSupplierRecord} from '../../models/supplier';
+import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
+import {AddStockForm} from './Stock/AddStockForm';
+import {SupplierItem} from './Suppliers/SupplierItem';
 
 const isExternalIdUnique = async (resource: ArticleView[], value?: string) => {
   if (!value) {
@@ -69,15 +70,13 @@ export const NewArticle = () => {
     },
   ]);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
+  const {data: taxRates} = useVats();
 
   const steps = [
     t('Add basic info'),
     t('Add description'),
     t('Add stock & suppliers'),
   ];
-
-  const percentageVat =
-    user?.userAccount?.serviceCompany?.settings?.percentageVat ?? 0;
 
   const {data: articleResource = createEmptyResource<ArticleView>(10)} =
     useArticles(
@@ -108,14 +107,8 @@ export const NewArticle = () => {
     ),
     type: Yup.string().nullable().required('Type is required'),
     unit: Yup.string().nullable().required('Unit is required'),
-    unitPurchaseVat: Yup.number()
-      .required('Purchase VAT is required')
-      .min(0)
-      .max(100),
-    unitSellingVat: Yup.number()
-      .required('Selling VAT is required')
-      .min(0)
-      .max(100),
+    unitPurchaseVat: Yup.string().required('Purchase VAT is required'),
+    unitSellingVat: Yup.string().required('Selling VAT is required'),
     unitSellingAmount: Yup.number()
       .nullable()
       .required('Selling price is required'),
@@ -132,10 +125,10 @@ export const NewArticle = () => {
       storageLocation: '',
       type: ArticleType.LABOR,
       unit: '',
-      unitPurchaseVat: percentageVat,
+      unitPurchaseVat: '',
       unitPurchaseAmount: 0,
       unitPurchaseAmountCurrency: currentCurrency.code,
-      unitSellingVat: percentageVat,
+      unitSellingVat: '',
       unitSellingAmount: 0,
       unitSellingAmountCurrency: currentCurrency.code,
       costPackage: {
@@ -166,8 +159,8 @@ export const NewArticle = () => {
       return setDisableNextBtn(
         !!Object.keys(formik.errors).length ||
           !formik.values.type ||
-          formik.values.unitSellingVat > 100 ||
-          formik.values.unitPurchaseVat > 100,
+          formik.values.unitSellingVat === '' ||
+          formik.values.unitPurchaseVat === '',
       );
     }
     if (activeStep === 2) {
@@ -189,6 +182,14 @@ export const NewArticle = () => {
   };
 
   const createNewArticle = async () => {
+    const unitPurchaseVat = taxRates?.find(
+      (rate) => rate.id === formik.values.unitPurchaseVat,
+    );
+
+    const unitSellingVat = taxRates?.find(
+      (rate) => rate.id === formik.values.unitSellingVat,
+    );
+
     const article = {
       category: formik.values.category,
       description,
@@ -209,18 +210,22 @@ export const NewArticle = () => {
       suppliers: suppliers.filter((s) => !!s.supplierId),
       type: formik.values.type.toUpperCase(),
       unit: formik.values.unit,
-      unitPurchaseAmount: amountRecordForBackend(
-        makeAmountRecord(
+      unitPurchaseAmount: amountRecordForBackendWithVatId(
+        makeAmountRecordWithVatId(
           Number(formik.values.unitPurchaseAmount),
           formik.values.unitPurchaseAmountCurrency,
-          formik.values.unitPurchaseVat,
+          unitPurchaseVat?.percentage ?? 0,
+          unitPurchaseVat?.id ?? '',
+          unitPurchaseVat?.name ?? '',
         ),
       ),
-      unitSellingAmount: amountRecordForBackend(
-        makeAmountRecord(
+      unitSellingAmount: amountRecordForBackendWithVatId(
+        makeAmountRecordWithVatId(
           Number(formik.values.unitSellingAmount),
           formik.values.unitSellingAmountCurrency,
-          formik.values.unitSellingVat,
+          unitSellingVat?.percentage ?? 0,
+          unitSellingVat?.id ?? '',
+          unitSellingVat?.name ?? '',
         ),
       ),
       costPackage: {
