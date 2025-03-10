@@ -20,50 +20,39 @@ describe('Edit Article', () => {
     });
 
     it('should validate article details', () => {
+        // Open the dialog
         ArticlesPage.openArticleDialog('Edit Basic Information', 0);
         const outside = cy.get('#alert-dialog-title');
 
-        // Validate article name is filled
+        // Validate that the Name field is filled
         cy.clearRichTextField('Name');
         outside.click();
         cy.get('div[data-test-id="name"]').contains('Name is required');
         cy.get('button[type="button"]').should('be.disabled');
 
-        // Validate purchase VAT is filled
-        cy.get('input[name="unitPurchaseVat"]').clear();
-        outside.click();
-        cy.get('input[name="unitPurchaseVat"]').parent().siblings('p').should('have.text', 'Purchase VAT is required');
-        cy.get('button[type="button"]').should('be.disabled');
+        cy.fillRichTextField('Name', 'Test Article');
 
-        // Validate selling VAT is filled
-        cy.get('input[name="unitSellingVat"]').clear();
-        outside.click();
-        cy.get('input[name="unitSellingVat"]').parent().siblings('p').should('have.text', 'Selling VAT is required');
-        cy.get('button[type="button"]').should('be.disabled');
+        const pickRandomVat = () => {
+            cy.get('li').then(($options) => {
+                const vatOptions = $options
+                    .toArray()
+                    .map((option) => option.textContent?.trim())
+                    .filter(Boolean);
+                const randomVat = vatOptions[Math.floor(Math.random() * vatOptions.length)];
+                cy.contains('li', randomVat).click();
+            });
+        };
 
-        // Validate purchase VAT is at least 0
-        cy.get('input[name="unitPurchaseVat"]').clear().type('-1', {force: true}).blur();
-        outside.click();
-        cy.get('input[name="unitPurchaseVat"]').parent().siblings('p').should('have.text', 'unitPurchaseVat must be greater than or equal to 0');
-        cy.get('button[type="button"]').should('be.disabled');
+        // Select a random Purchase VAT option
+        cy.get('#mui-component-select-unitPurchaseVat').click();
+        pickRandomVat();
 
-        // Validate selling VAT is at least 0
-        cy.get('input[name="unitSellingVat"]').clear().type('-1', {force: true}).blur();
-        outside.click();
-        cy.get('input[name="unitSellingVat"]').parent().siblings('p').should('have.text', 'unitSellingVat must be greater than or equal to 0');
-        cy.get('button[type="button"]').should('be.disabled');
+        // Select a random Selling VAT option
+        cy.get('#mui-component-select-unitSellingVat').click();
+        pickRandomVat();
 
-        // Validate purchase VAT is not more than 100
-        cy.get('input[name="unitPurchaseVat"]').clear().type('101', {force: true}).blur();
-        outside.click();
-        cy.get('input[name="unitPurchaseVat"]').parent().siblings('p').should('have.text', 'unitPurchaseVat must be less than or equal to 100');
-        cy.get('button[type="button"]').should('be.disabled');
-
-        // Validate selling VAT is not more than 100
-        cy.get('input[name="unitSellingVat"]').clear().type('101', {force: true}).blur();
-        outside.click();
-        cy.get('input[name="unitSellingVat"]').parent().siblings('p').should('have.text', 'unitSellingVat must be less than or equal to 100');
-        cy.get('button[type="button"]').should('be.disabled');
+        // Ensure the Save button is now enabled
+        cy.get('button[type="button"]').should('not.be.disabled');
     });
 
     it('should show delete article modal with its content and delete article', () => {

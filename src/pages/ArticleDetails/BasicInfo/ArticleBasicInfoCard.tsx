@@ -1,37 +1,38 @@
-import {useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import useTheme from '@mui/material/styles/useTheme';
-import EditIcon from '@mui/icons-material/Create';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
-import DocumentScannerRoundedIcon from '@mui/icons-material/DocumentScannerRounded';
 import AssignmentIndRoundedIcon from '@mui/icons-material/AssignmentIndRounded';
+import EditIcon from '@mui/icons-material/Create';
+import DocumentScannerRoundedIcon from '@mui/icons-material/DocumentScannerRounded';
 import ExpandRoundedIcon from '@mui/icons-material/ExpandRounded';
-import LocalOfferRoundedIcon from '@mui/icons-material/LocalOfferRounded';
 import FmdGoodRoundedIcon from '@mui/icons-material/FmdGoodRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LocalOfferRoundedIcon from '@mui/icons-material/LocalOfferRounded';
+import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
 import Tag from '@mui/icons-material/Tag';
-import _ from 'lodash';
-import * as Yup from 'yup';
+import Box from '@mui/material/Box';
+import useTheme from '@mui/material/styles/useTheme';
+import Typography from '@mui/material/Typography';
+import {CardProps} from 'components/CardProps';
+import {Dialog} from 'components/Dialog';
+import {InfoCard} from 'components/InfoCard';
+import DOMPurify from 'dompurify';
 import {useFormik} from 'formik';
+import {useArticles, useUpdateArticle} from 'hooks/reactQuery/useArticle';
+import {useVats} from 'hooks/reactQuery/useVats';
+import _ from 'lodash';
 import {ArticleType, ArticleView, UpdateArticleRecord} from 'models/article';
 import {ArticleBasicFormModel} from 'models/articleForm';
-import {Dialog} from 'components/Dialog';
-import {useArticles, useUpdateArticle} from 'hooks/reactQuery/useArticle';
-import {CardProps} from 'components/CardProps';
-import {InfoCard} from 'components/InfoCard';
+import {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {getArticleTypes} from 'utils/article-utils';
 import {
-  amountRecordForBackend,
+  amountRecordForBackendWithVatId,
   currencyFactor,
   formatCurrency,
-  makeAmountRecord,
+  makeAmountRecordWithVatId,
 } from 'utils/currency';
-import {convertToText} from 'utils/utils';
 import {createEmptyResource} from 'utils/paging';
 import {getPlainStringFromHtml, isPlainString} from 'utils/rich-field-string';
-import DOMPurify from 'dompurify';
-import {getArticleTypes} from 'utils/article-utils';
+import {convertToText} from 'utils/utils';
+import * as Yup from 'yup';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const isExternalIdUnique = async (resource: ArticleView[], value?: string) => {
@@ -53,6 +54,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   const {mutateAsync: updateArticle, isLoading} = useUpdateArticle(
     t('Article updated successfully.'),
   );
+  const {data: taxRates} = useVats();
 
   const [initValue, setInitValue] = useState('');
   const [updatedValue, setUpdatedValue] = useState('');
@@ -94,14 +96,8 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       ),
     type: Yup.string().nullable().required('Type is required'),
     unit: Yup.string().nullable(),
-    unitPurchaseVat: Yup.number()
-      .required('Purchase VAT is required')
-      .min(0)
-      .max(100),
-    unitSellingVat: Yup.number()
-      .required('Selling VAT is required')
-      .min(0)
-      .max(100),
+    unitPurchaseVat: Yup.string().required('Purchase VAT is required'),
+    unitSellingVat: Yup.string().required('Selling VAT is required'),
     unitSellingAmount: Yup.number()
       .nullable()
       .required('Selling price is required'),
@@ -120,7 +116,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     storageLocation: article.storageLocation,
     type: article.type,
     unit: article.unit,
-    unitPurchaseVat: article.unitPurchaseAmount?.percentageVat ?? 0,
+    unitPurchaseVat: article.unitPurchaseAmount?.vatId ?? '',
     unitPurchaseAmount: (article.unitPurchaseAmount
       ? (article.unitPurchaseAmount.netAmount ?? 0) /
         currencyFactor(article.unitPurchaseAmount)
@@ -129,7 +125,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     unitPurchaseAmountCurrency: article.unitPurchaseAmount
       ? article.unitPurchaseAmount.currency
       : article.unitSellingAmount.currency,
-    unitSellingVat: article.unitSellingAmount.percentageVat ?? 0,
+    unitSellingVat: article.unitSellingAmount.vatId ?? '',
     unitSellingAmount: (article.unitSellingAmount
       ? (article.unitSellingAmount.netAmount ?? 0) /
         currencyFactor(article.unitSellingAmount)
@@ -176,6 +172,8 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
           article.additionalInfo?.costPackage?.materialPercentage,
       },
       externalId: article.externalId,
+      unitPurchaseVat: article.unitPurchaseAmount?.vatId ?? '',
+      unitSellingVat: article.unitSellingAmount?.vatId ?? '',
     });
     setInitValue(article.externalId);
   }, [article]);
@@ -186,6 +184,13 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
   };
 
   const saveArticle = async () => {
+    const unitPurchaseVat = taxRates?.find(
+      (rate) => rate.id === formik.values.unitPurchaseVat,
+    );
+
+    const unitSellingVat = taxRates?.find(
+      (rate) => rate.id === formik.values.unitSellingVat,
+    );
     const temp: UpdateArticleRecord = {
       category: formik.values.category,
       manufacturer: formik.values.manufacturer,
@@ -195,20 +200,24 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       storageLocation: formik.values.storageLocation,
       type: formik.values.type.toUpperCase(),
       unit: formik.values.unit,
-      unitPurchaseAmount: amountRecordForBackend(
-        makeAmountRecord(
+      unitPurchaseAmount: amountRecordForBackendWithVatId(
+        makeAmountRecordWithVatId(
           formik.values.unitPurchaseAmount as number,
           article.unitPurchaseAmount
             ? article.unitPurchaseAmount.currency
             : article.unitSellingAmount.currency,
-          formik.values.unitPurchaseVat,
+          unitPurchaseVat?.percentage ?? 0,
+          unitPurchaseVat?.id ?? '',
+          unitPurchaseVat?.name ?? '',
         ),
       ),
-      unitSellingAmount: amountRecordForBackend(
-        makeAmountRecord(
+      unitSellingAmount: amountRecordForBackendWithVatId(
+        makeAmountRecordWithVatId(
           formik.values.unitSellingAmount as number,
           article.unitSellingAmount.currency,
-          formik.values.unitSellingVat,
+          unitSellingVat?.percentage ?? 0,
+          unitSellingVat?.id ?? '',
+          unitSellingVat?.name ?? '',
         ),
       ),
       costPackage: {

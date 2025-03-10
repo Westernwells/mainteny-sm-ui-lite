@@ -12,33 +12,45 @@ export default class ArticlesPage {
   };
 
   static fillBasicDetails = (article: ArticleBasicFormModel) => {
+    // Fill in text fields
     cy.fillRichTextField('Name', article.name);
     cy.get('input[name="externalId"]').type(article.externalId);
     cy.get('input[name="category"]').type(article.category);
     cy.get('input[name="manufacturer"]').type(article.manufacturer);
     cy.get('input[name="model"]').type(article.model);
-    cy.get('input[name="unitPurchaseVat"]')
-      .clear()
-      .type(article.unitPurchaseVat.toString());
-    cy.get('input[name="unitSellingVat"]')
-      .clear()
-      .type(article.unitSellingVat.toString());
+  
+    // Select Purchase VAT from MUI Select
+    cy.get('#mui-component-select-unitPurchaseVat').click(); 
+    cy.contains(`${article.unitPurchaseVat}%`).click();    
+    
+    // Select Selling VAT from MUI Select
+    cy.get('#mui-component-select-unitSellingVat').click();
+    cy.contains(`${article.unitSellingVat}%`).click();      
+  
+    // Select Unit (assuming this is also a MUI Select with ID="select-unit")
     cy.get('div[id="select-unit"]').click();
     cy.get('li[role="option"]').contains(article.unit).click();
+  
+    // Fill the storage location
     cy.get('input[name="storageLocation"]').type(article.storageLocation);
+  
+    // Fill numeric fields for purchase/selling price
     cy.get('div[inputmode="numeric"]')
       .contains('Purchase Price')
       .parent()
       .find('input')
       .type(article.unitPurchaseAmount.toString());
+  
     cy.get('div[inputmode="numeric"]')
       .contains('Selling Price')
       .parent()
       .find('input')
       .type(article.unitSellingAmount.toString());
+  
+    // Select Article Type
     cy.get('div[data-testid="article-type-selector"]').click();
     cy.get('li[role="option"]')
-      .contains(article.type, {matchCase: false})
+      .contains(article.type, { matchCase: false })
       .click();
   };
 

@@ -169,6 +169,35 @@ export function makeAmountRecord(
   };
 }
 
+export function amountRecordForBackendWithVatId(
+  amount: AmountRecord,
+): AmountRecord {
+  const factor = currencyFactor(amount);
+  return {
+    netAmount: Math.round((amount.netAmount ?? 0) * factor),
+    currency: amount.currency,
+    percentageVat: amount.percentageVat,
+    vatId: amount.vatId,
+    vatName: amount.vatName,
+  };
+}
+
+export function makeAmountRecordWithVatId(
+  netAmount: number,
+  currency: string,
+  percentageVat: number,
+  vatId: string,
+  vatName: string,
+): AmountRecord {
+  return {
+    netAmount,
+    currency,
+    percentageVat,
+    vatId,
+    vatName,
+  };
+}
+
 // transform the amount from backend to frontend for calculation (e.g. amount value in editing form)
 export function amountForView(amount: Amount): Amount {
   const factor = currencyFactor(amount);
