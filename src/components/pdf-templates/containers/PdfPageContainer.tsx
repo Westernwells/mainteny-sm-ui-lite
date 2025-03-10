@@ -1,4 +1,4 @@
-import {Page, StyleSheet} from '@react-pdf/renderer';
+import {Page, StyleSheet, Font} from '@react-pdf/renderer';
 import React, {ReactNode} from 'react';
 
 type Props = {
@@ -22,6 +22,8 @@ const getStyles = (regularFontStyle?: {fontFamily: string}) =>
       paddingTop: 46,
     },
   });
+
+Font.registerHyphenationCallback((word) => ['', word, '']);
 
 const PdfPageContainer = ({children, selectedLng}: Props) => {
   const regularFontStyle = {
