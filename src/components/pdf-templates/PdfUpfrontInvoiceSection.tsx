@@ -22,7 +22,7 @@ import {
   getCurrencySymbol,
 } from 'utils/currency';
 import {fixRounding} from 'utils/utils';
-import {Currency} from 'models/misc';
+import {Currency, State} from 'models/misc';
 import {
   getFormattedPaymentValues,
   replacePaymentTermsPlaceholders,
@@ -225,11 +225,14 @@ const PdfUpfrontInvoiceSection = ({
 
   const paidAmountInclVats = previousInvoices
     .map((i) =>
-      i.payments.reduce(
-        (acc, p) =>
-          acc + (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
-        0,
-      ),
+      i.payments
+        ?.filter((payment) => payment.meta.state === State.ACTIVE)
+        .reduce(
+          (acc, p) =>
+            acc +
+            (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
+          0,
+        ),
     )
     .reduce((acc, a) => acc + a, 0);
   const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
@@ -244,7 +247,12 @@ const PdfUpfrontInvoiceSection = ({
     companyLang: selectedLng,
   });
 
-  const hasPayments = previousInvoices.map((i) => i.payments).flat().length > 0;
+  const hasPayments =
+    previousInvoices
+      .map((i) =>
+        i.payments?.filter((payment) => payment.meta.state === State.ACTIVE),
+      )
+      .flat().length > 0;
 
   const boldFontStyle = {
     fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',

@@ -1,5 +1,5 @@
-import {MinToStep} from 'models/service-company';
 import {t} from 'i18next';
+import {MinToStep} from 'models/service-company';
 import {Settings} from 'models/misc';
 
 export const generateOptions = () =>
