@@ -2600,6 +2600,6 @@
   "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.",
   "Amount Due: {{amountDue}}": "Amount Due: {{amountDue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "If you've paid, please let us know. If not, please do so soon to avoid extra fees.",
-  "Questions? Contact us at {{contactEmail}}.": "Questions? Contact us at {{contactEmail}}.",
+  "Questions? Contact us at {{contactEmail}}": "Questions? Contact us at {{contactEmail}}",
   "Thanks, {{companyName}}": "Thanks, {{companyName}}"
 }

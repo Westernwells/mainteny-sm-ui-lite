@@ -11,10 +11,10 @@ export interface ArticleBasicFormModel {
   storageLocation: string;
   type: ArticleType;
   unit: string;
-  unitPurchaseVat: number;
+  unitPurchaseVat: string;
   unitPurchaseAmount: number | string;
   unitPurchaseAmountCurrency: string;
-  unitSellingVat: number;
+  unitSellingVat: string;
   unitSellingAmount: number | string;
   unitSellingAmountCurrency: string;
   costPackage?: {
