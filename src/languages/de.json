@@ -2607,7 +2607,7 @@
   "ARTICLE #": "ARTIKEL NR",
   "They will appear here once the article is added": "Die Artikel werden hier erscheinen, sobald sie hinzugefügt wurden.",
   "Elevator operation": "Aufzugswärter",
-  "New Elevator Operation Job": "Neuer Aufzugswärter Auftrag",
+  "New Elevator Operation Job": "Neuer Aufzugswärterauftrag",
   "Date of credit note": "Gutschriftsdatum",
   "Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Sende Rechnung {{invoiceNumber}} an {{receiverEmail}} von {{senderName}}",
   "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Sende Mahnung zu Rechnung {{invoiceNumber}} an {{receiverEmail}} von {{senderName}}",
@@ -3105,5 +3105,14 @@
   "Office": "Büro",
   "The notes below will be visible to office only.": "Die unten stehenden Notizen, sind nur in der Büroversion sichtbar.",
   "Quotation preview": "Angebotsvorschau",
-  "Invoice preview": "Rechnungsvorschau"
+  "Invoice preview": "Rechnungsvorschau",
+  "Employees must work their scheduled shifts, otherwise they have to take absence leave. Public holidays are off by default.": "Mitarbeiter müssen ihre geplanten Schichten arbeiten, andernfalls müssen sie eine Abwesenheit nehmen. Gesetzliche Feiertage sind standardmäßig frei.",
+  "New Maintenance Job": "Neuer Wartungsauftrag",
+  "New Emergency Job": "Neuer Notrufauftrag",
+  "New Repair Job": "Neuer Reparaturauftrag",
+  "New Callout Job": "Neuer Personeneinschlussauftrag",
+  "New Inspection Job": "Neuer Inspektionsauftrag",
+  "New Installation Job": "Neuer Installationsauftrag",
+  "New Modernization Job": "Neuer Modernisierungsauftrag",
+  "New General Job": "Neuer Anderer Auftrag"
 }
