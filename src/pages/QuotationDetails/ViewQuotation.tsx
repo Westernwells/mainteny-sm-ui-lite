@@ -65,6 +65,7 @@ import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {HeaderFooterInfoData} from 'models/misc';
 import {ClientReportForPDFConfig} from 'models/client-storage';
+import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -820,6 +821,11 @@ export const ViewQuotation = ({
             };
           }
 
+          const processedContent = handleSignatureSmartly(
+            emailRecord.content,
+            activeSignature?.content.images[0] || '',
+          );
+
           await sendQuotation({
             id: quotation.id,
             body: {
@@ -828,7 +834,7 @@ export const ViewQuotation = ({
               email: {
                 email: '',
                 subject: stripHtmlTags(emailRecord.subject),
-                content: emailRecord.content,
+                content: processedContent,
                 emails: emailRecord.emails,
                 ccEmails: emailRecord.ccEmails,
                 bccEmails: emailRecord.bccEmails,

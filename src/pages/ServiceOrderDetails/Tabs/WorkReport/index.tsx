@@ -80,6 +80,7 @@ import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
 import {Confirm} from 'components/Confirm';
+import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -460,9 +461,14 @@ export const WorkReport = ({serviceOrder}: Props) => {
       };
     }
 
+    const processedContent = handleSignatureSmartly(
+      values.content,
+      activeSignature?.content.images[0] || '',
+    );
+
     await sendEmailReport(
       serviceOrder,
-      values,
+      {...values, content: processedContent},
       allAttachments,
       isPDFGenerated
         ? report?.additionalInfo.pdfPath!

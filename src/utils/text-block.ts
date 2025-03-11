@@ -131,14 +131,36 @@ export const cleanHtmlContent = (
   // Replace empty <p> tags with a non-breaking space
   html = html.replace(/<p([^>]*)>\s*<\/p>/gi, '<p$1>&nbsp;</p>');
 
-  // Conditionally replace <p style="text-align: left">
+  // Conditionally adjust paragraph line-heights
   if (customAdjustments) {
     html = html.replace(
-      /<p style="text-align:\s?left">/gi,
-      '<p style="text-align: left; line-height:0.5">',
+      /<p style="([^"]*text-align:\s?left[^"]*)">([\s\S]*?)<\/p>/gi,
+      (match, existingStyles, content) => {
+        const trimmedContent = content.trim();
+
+        // Check if line-height already exists
+        const hasLineHeight = /line-height\s*:\s*\d+(\.\d+)?/i.test(
+          existingStyles,
+        );
+
+        // Detect if it's a span with only &nbsp;
+        const isEmptySpan = /^<span[^>]*>(&nbsp;|\s*)<\/span>$/i.test(
+          trimmedContent,
+        );
+
+        // ⚠️ If line-height already present, do not touch
+        if (hasLineHeight) {
+          return `<p style="${existingStyles}">${content}</p>`;
+        }
+
+        // If no line-height, decide based on content
+        const lineHeight = isEmptySpan ? '0' : '1';
+
+        return `<p style="line-height: ${lineHeight}; ${existingStyles}">${content}</p>`;
+      },
     );
 
-    // Replace <td colspan="1" rowspan="1"> with additional style
+    // Add vertical-align: top if not present in td
     html = html.replace(
       /<td colspan="1" rowspan="1">/gi,
       '<td colspan="1" rowspan="1" style="vertical-align: top">',
@@ -191,4 +213,60 @@ export const isFileSizeValid = (text?: string) => {
   if (!text) return true;
 
   return getByteSize(text) <= TEXT_BLOCK_MEMORY_SIZE_UPPER_LIMIT;
+};
+
+export const rebuildSignatureKeepingUserContent = (
+  emailContent: string,
+  cleanedSignatureImageCid: string,
+): string => {
+  // Detect LAST table in content assuming it's the signature
+  const lastTableRegex = /<table[\s\S]*?<\/table>/gi;
+  const tables = [...emailContent.matchAll(lastTableRegex)];
+  const lastTableMatch = tables.length ? tables[tables.length - 1][0] : null;
+
+  if (!lastTableMatch) {
+    // No table found, return content as-is
+    return emailContent.trim();
+  }
+
+  // Extract content of the last <td> (user's content)
+  const tdContentRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+  const tdMatches = [...lastTableMatch.matchAll(tdContentRegex)];
+  const userContentMatch = tdMatches.length
+    ? tdMatches[tdMatches.length - 1][1].trim()
+    : null;
+
+  if (!userContentMatch || userContentMatch === '&nbsp;') {
+    // User cleared signature content, remove entire table
+    return emailContent.replace(lastTableMatch, '').trim();
+  }
+
+  // ---- Build Standard Signature Layout using extracted user content ----
+  const rebuiltSignature = `
+    <table data-signature="true" style="border-collapse: separate; width: 100%; table-layout: fixed; border-spacing: 0 50px">
+      <tr style="width: 100%; padding-right: 1em;">
+        <td style="width: 88px; vertical-align: top; padding-right: 16px;">
+          <!--[if mso]>
+          <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+            style="height:88px; width:88px; v-text-anchor:middle;" arcsize="50%" strokecolor="none" fill="t">
+            <v:fill src="${cleanedSignatureImageCid}" type="frame" />
+            <w:wrap type="none" />
+          </v:roundrect>
+          <![endif]-->
+          <!--[if !mso]><!-- -->
+          <img src="${cleanedSignatureImageCid}" 
+            alt="Signature Image"
+            style="width: 88px; height: 88px; max-height: 88px; border-radius: 50%; object-fit: cover; display: block;" />
+          <!--<![endif]-->
+        </td>
+        <td class="html-content" style="vertical-align: top; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #000; width: 100%;">
+          ${userContentMatch}
+        </td>
+      </tr>
+    </table>`.trim();
+
+  // Replace original table with cleaned one
+  return emailContent
+    .replace(lastTableMatch, `<br />${rebuiltSignature}`)
+    .trim();
 };
