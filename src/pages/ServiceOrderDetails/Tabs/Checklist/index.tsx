@@ -78,6 +78,7 @@ import {UserAccount} from 'models/user';
 import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature} from 'models/employee';
+import {handleSignatureSmartly} from 'utils/rich-field-string';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';
@@ -940,6 +941,11 @@ export const CheckList = ({serviceOrder}: Props) => {
                           };
                         }
 
+                        const processedContent = handleSignatureSmartly(
+                          emailRecord.content,
+                          activeSignature?.content.images[0] || '',
+                        );
+
                         await sendCheckList({
                           id: serviceOrder!.id,
                           body: {
@@ -951,7 +957,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                             email: {
                               email: '',
                               subject: emailRecord.subject,
-                              content: emailRecord.content,
+                              content: processedContent,
                               emails: emailRecord.emails,
                               ccEmails: emailRecord.ccEmails,
                               bccEmails: emailRecord.bccEmails,

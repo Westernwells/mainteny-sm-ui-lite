@@ -127,6 +127,7 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {CANCEL_ACTION} from 'models/status';
 import {useVats} from 'hooks/reactQuery/useVats';
 import {getInvoiceStatusStyles} from 'utils/invoice';
+import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -1804,6 +1805,11 @@ export const ViewInvoice = ({
               };
             }
 
+            const processedContent = handleSignatureSmartly(
+              emailRecord.content,
+              activeSignature?.content.images[0] || '',
+            );
+
             const sendEmail = async (invoiceData: InvoiceView) => {
               await sendInvoice({
                 id: invoiceData?.id!,
@@ -1821,7 +1827,7 @@ export const ViewInvoice = ({
                   email: {
                     email: '',
                     subject: emailRecord.subject,
-                    content: emailRecord.content,
+                    content: processedContent,
                     emails: emailRecord.emails,
                     ccEmails: emailRecord.ccEmails,
                     bccEmails: emailRecord.bccEmails,

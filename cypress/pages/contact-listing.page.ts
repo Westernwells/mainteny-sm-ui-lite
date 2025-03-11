@@ -128,7 +128,7 @@ export default class ContractListingPage {
                 });
               });
           } else {
-            cy.contains('There are no entries for the applied filters.').should(
+            cy.contains('No matching search results').should(
               'exist',
             );
           }

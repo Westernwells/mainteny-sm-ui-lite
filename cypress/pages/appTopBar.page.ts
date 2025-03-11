@@ -40,15 +40,13 @@ export default class AppTopBarPage {
     // Ensure spinners or overlays are gone before proceeding
     cy.get('[data-testid="spinner"]', {timeout: 10000}).should('not.exist');
 
-    cy.get('#topBarSelectLanguageButton', {timeout: 10000})
-      .should('exist')
-      .should('be.visible')
-      .click({force: true});
-
     cy.get('body').then(($body) => {
       if ($body.find('#topBarSelectLanguageMenuList').length === 0) {
         cy.wait(700);
-        cy.get('#topBarSelectLanguageButton').click({force: true});
+        cy.get('#topBarSelectLanguageButton', {timeout: 10000})
+          .should('exist')
+          .should('be.visible')
+          .click({force: true});
       }
     });
 
