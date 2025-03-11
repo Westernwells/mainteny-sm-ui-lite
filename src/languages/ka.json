@@ -2788,6 +2788,6 @@
   "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "გადახდა ინვოისისთვის #{{invoiceNumber}}, რომელიც განსახორციებელი იყო {{duedate}}-მდე, ვადაგადაცილებულია.",
   "Amount Due: {{amountDue}}": "გადასახდელი თანხა: {{amountDue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "თუ თანხა უკვე გადაიხადეთ, გთხოვთ, შეგვატყობინოთ. თუ არა, გთხოვთ, მალე გადაიხადოთ, რომ თავიდან აიცილოთ დამატებითი გადასახადი.",
-  "Questions? Contact us at {{contactEmail}}.": "გაქვთ კითხვები? დაგვიკავშირდით {{contactEmail}}.",
+  "Questions? Contact us at {{contactEmail}}": "გაქვთ კითხვები? დაგვიკავშირდით {{contactEmail}}",
   "Thanks, {{companyName}}": "მადლობა, {{companyName}}"
 }
