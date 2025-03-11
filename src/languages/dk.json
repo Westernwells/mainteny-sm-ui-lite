@@ -2669,7 +2669,7 @@
   "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "Din betaling for faktura nr. {{invoiceNumber}}, som skulle betales den {{dueDate}}, er forsinket.",
   "Amount Due: {{amountDue}}": "Forfaldent beløb: {{amountDue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Hvis du har betalt, så lad os det vide. Hvis ikke, bedes du gøre det snarest for at undgå ekstra gebyrer.",
-  "Questions? Contact us at {{contactEmail}}.": "Spørgsmål? Kontakt os på {{contactEmail}}.",
+  "Questions? Contact us at {{contactEmail}}": "Spørgsmål? Kontakt os på {{contactEmail}}",
   "Thanks, {{companyName}}": "Tak, {{companyName}}",
   "New Callout Job": "Nyt udkaldsjob"
 }

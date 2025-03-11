@@ -2718,6 +2718,6 @@
   "Your payment for Invoice #{{invoiceNumber}}, was due on {{dueDate}}, is overdue.": "Ваш платеж по счету #{{invoiceNumber}} был просрочен {{dudate}}.",
   "Amount Due: {{amountDue}}": "Сумма задолженности: {{outddue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Если вы оплатили счет, пожалуйста, сообщите нам об этом. Если нет, пожалуйста, оплатите счет, чтобы избежать дополнительных сборов.",
-  "Questions? Contact us at {{contactEmail}}.": "У вас есть вопросы? Свяжитесь с нами по адресу {{contactemail}}.",
+  "Questions? Contact us at {{contactEmail}}": "У вас есть вопросы? Свяжитесь с нами по адресу {{contactemail}}",
   "Thanks, {{companyName}}": "Благодарим за понимание, {{companyName}}"
 }
