@@ -48,14 +48,13 @@ export default class ServiceJobPage {
   };
 
   static selectTechnician = () => {
-    cy.get('input[role="combobox"]').parent().click();
+    cy.get('button[aria-label="Open"]').click({ force: true });
     cy.wait(300);
     cy.get('li[role="option"]').first().click();
   };
 
   static selectTechnicianWithIndex = (index: number) => {
-    cy.get('input[role="combobox"]').parent().click();
-  
+    cy.get('button[aria-label="Open"]').click({ force: true });
     cy.get(`li[role="option"][id="combo-box-demo-option-${index}"]`)
       .should('exist')
       .then(($option) => {

@@ -80,6 +80,7 @@ import {FileResourceRecord} from 'models/media';
 import {companyLanguageContextMap} from 'utils/language';
 import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
 import {Confirm} from 'components/Confirm';
+import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -97,8 +98,8 @@ type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
 const validationSchema = Yup.object().shape({
   serviceTimeHM: Yup.string()
     .required()
-    .matches(/^[0-9]{2}:[0-9]{2}$/, {
-      message: 'Total time must be in 00:00 format',
+    .matches(/^[0-9]{2,3}:[0-9]{2}$/, {
+      message: 'Total time must be in 00:00 or 000:00 format',
     }),
 });
 
@@ -460,9 +461,14 @@ export const WorkReport = ({serviceOrder}: Props) => {
       };
     }
 
+    const processedContent = handleSignatureSmartly(
+      values.content,
+      activeSignature?.content.images[0] || '',
+    );
+
     await sendEmailReport(
       serviceOrder,
-      values,
+      {...values, content: processedContent},
       allAttachments,
       isPDFGenerated
         ? report?.additionalInfo.pdfPath!

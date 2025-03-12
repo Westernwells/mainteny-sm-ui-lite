@@ -23,6 +23,7 @@ import {
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromQuotation} from 'utils/pdfTemplates';
+import {toSentenceCase} from 'utils/string';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
@@ -35,6 +36,7 @@ import TopSectionContainer from './containers/TopSectionContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import PdfUnitAddress from './containers/PdfUnitAddress';
 import AlternativeAddressTemplate from './AlternativeAddressTemplate';
+import PdfPageTitle from './containers/PdfPageTitle';
 
 Font.register({
   family: 'Montserrat-Regular',
@@ -174,9 +176,9 @@ const getStyles = (
     },
   });
 
-type Props = {
+type BaseProps = {
   translate: (key: string, options?: {context: string}) => string;
-  userInfo?: UserAccount | undefined;
+  userInfo?: UserAccount;
   currentCurrency?: Currency;
   quotation?: QuotationView;
   selectedLng?: string;
@@ -187,6 +189,16 @@ type Props = {
   pdfConfigClientStorage: ClientReportForPDFConfig;
 };
 
+type JobOverviewProps = BaseProps & {
+  isJobOverview: true;
+  serviceOrderType: string;
+};
+
+type NonJobOverviewProps = BaseProps & {
+  isJobOverview?: false;
+  serviceOrderType?: string;
+};
+type Props = JobOverviewProps | NonJobOverviewProps;
 const QuotationPdfTemplate = React.memo(
   ({
     translate,
@@ -199,6 +211,8 @@ const QuotationPdfTemplate = React.memo(
     footerInfo,
     footerPath,
     pdfConfigClientStorage,
+    isJobOverview,
+    serviceOrderType,
   }: Props) => {
     const articleItems = quotation?.items?.map((item) => ({
       ...item,
@@ -439,12 +453,19 @@ const QuotationPdfTemplate = React.memo(
             </TopSectionContainer>
 
             <View>
-              <View>
-                <PdfPageTitleHtml
-                  value={quotation?.subject}
-                  selectedLng={selectedLng}
-                />
-              </View>
+              {isJobOverview ? (
+                <PdfPageTitle>
+                  {translate('Job Confirmation:')}{' '}
+                  {translate(toSentenceCase(serviceOrderType))}
+                </PdfPageTitle>
+              ) : (
+                <View>
+                  <PdfPageTitleHtml
+                    value={quotation?.subject}
+                    selectedLng={selectedLng}
+                  />
+                </View>
+              )}
 
               {quotation?.description.trim() !== '' && (
                 <View>
@@ -814,17 +835,18 @@ const QuotationPdfTemplate = React.memo(
                 </View>
               )}
 
-              <View wrap={false} style={styles.signatureBoxWrap}>
-                <Text style={styles.sectionHeading}>
-                  {translate('Hereby I confirm the quotation.')}{' '}
-                </Text>
-
-                <View style={styles.signatureBox}>
-                  <View style={styles.signatureText}>
-                    <Text>{translate('Date, place, signature, stamp')}</Text>
+              {!isJobOverview && (
+                <View wrap={false} style={styles.signatureBoxWrap}>
+                  <Text style={styles.sectionHeading}>
+                    {translate('Hereby I confirm the quotation.')}{' '}
+                  </Text>
+                  <View style={styles.signatureBox}>
+                    <View style={styles.signatureText}>
+                      <Text>{translate('Date, place, signature, stamp')}</Text>
+                    </View>
                   </View>
                 </View>
-              </View>
+              )}
             </View>
           </PdfBodyContainer>
 

@@ -38,6 +38,7 @@ import {
 } from 'utils/constants';
 import {companyLanguageContextMap} from 'utils/language';
 import {getJobTypeGivenName} from 'utils/service-order-utils';
+import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -163,22 +164,46 @@ export const ServiceOrderDetails = () => {
   );
 
   const generatePreviewPdfBlobUrl = async () => {
-    const blob = await pdf(
-      <JobOverviewPdfTemplate
-        pdfConfigClientStorage={pdfConfig}
-        userInfo={user?.userAccount}
-        currentCurrency={currentCurrency}
-        serviceOrder={serviceOrder}
-        quotation={quotation}
-        selectedLng={company?.language}
-        translate={translate}
-        headerPath={headerUrl[headerInfo?.path]}
-        headerInfo={headerInfo}
-        footerPath={footerUrl[footerInfo?.path]}
-        footerInfo={footerInfo}
-        serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
-      />,
-    ).toBlob();
+    const blob =
+      serviceOrder?.additionalInfo.quotationId && quotation
+        ? await pdf(
+            <QuotationPdfTemplate
+              pdfConfigClientStorage={pdfConfig}
+              userInfo={user?.userAccount}
+              currentCurrency={currentCurrency}
+              quotation={quotation}
+              selectedLng={company?.language}
+              translate={translate}
+              headerPath={headerUrl[headerInfo?.path]}
+              headerInfo={headerInfo}
+              footerPath={footerUrl[footerInfo?.path]}
+              footerInfo={footerInfo}
+              isJobOverview
+              serviceOrderType={getJobTypeGivenName(
+                serviceOrder?.type,
+                allJobTypes,
+              )}
+            />,
+          ).toBlob()
+        : await pdf(
+            <JobOverviewPdfTemplate
+              pdfConfigClientStorage={pdfConfig}
+              userInfo={user?.userAccount}
+              currentCurrency={currentCurrency}
+              serviceOrder={serviceOrder}
+              quotation={quotation}
+              selectedLng={company?.language}
+              translate={translate}
+              headerPath={headerUrl[headerInfo?.path]}
+              headerInfo={headerInfo}
+              footerPath={footerUrl[footerInfo?.path]}
+              footerInfo={footerInfo}
+              serviceOrderType={getJobTypeGivenName(
+                serviceOrder?.type,
+                allJobTypes,
+              )}
+            />,
+          ).toBlob();
     const blobURL = URL.createObjectURL(blob);
     setFilePathToDownload(blobURL);
   };

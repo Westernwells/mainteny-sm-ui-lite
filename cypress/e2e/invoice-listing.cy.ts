@@ -18,6 +18,23 @@ describe('Invoice listing page', () => {
         InvoiceListingPage.visit();
     });
 
+    it(`should show no entries message when filter returns nothing`, () => {
+        cy.wait('@getInvoices');
+        const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
+        cy.intercept('GET', invoicesURL).as('invoicesURL');
+
+        const searchText = 'zzzghhdgsshgdhsggdddtuwowuakfdyrdjdjfhssg';
+
+        cy.get('input[placeholder="Search"]').should('be.visible').clear({force: true});
+        cy.get('input[placeholder="Search"]').type(searchText, {force: true});
+
+        cy.url().should('include', 'searchInvoices');
+        cy.url().should('include', searchText);
+
+        cy.wait('@invoicesURL').its('response.body.data').should('have.length', 0);
+        Table.validateTableShouldHaveNoMatch();
+    });
+
     it('should route to new invoice page on clicking new invoice button', () => {
         cy.wait('@getInvoices');
         cy.contains('New Invoice').click();
@@ -113,23 +130,6 @@ describe('Invoice listing page', () => {
 
         cy.wait('@invoicesURL');
         cy.url().should('include', 'grossAmountMin').should('include', 'grossAmountMax');
-    });
-
-    it(`should show no entries message when filter returns nothing`, () => {
-        cy.wait('@getInvoices');
-        const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
-        cy.intercept('GET', invoicesURL).as('invoicesURL');
-
-        const searchText = 'zzzghhdgsshgdhsggdddtuwowuakfdyrdjdjfhssg';
-
-        cy.get('input[placeholder="Search"]').should('be.visible').clear({force: true});
-        cy.get('input[placeholder="Search"]').type(searchText, {force: true});
-
-        cy.url().should('include', 'searchInvoices');
-        cy.url().should('include', searchText);
-
-        cy.wait('@invoicesURL').its('response.body.data').should('have.length', 0);
-        Table.validateTableShouldHaveNoMatch();
     });
 
     it(`should route to the invoice details page`, () => {
