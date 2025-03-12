@@ -78,7 +78,7 @@ export const JobNotes = ({order}: Props) => {
                 sx={{
                   color: theme.palette.primary.light,
                 }}>
-                Show {totalNotes - 2} more
+                {t('Show {{totalCount}} more', {totalCount: totalNotes - 2})}
               </Button>
             </Box>
           ) : null
