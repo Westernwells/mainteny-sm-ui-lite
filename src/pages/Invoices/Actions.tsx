@@ -102,6 +102,7 @@ import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPr
 import {downloadFile} from 'utils/download';
 import printJS from 'print-js';
 import {isXMLNeeded} from 'utils/invoice';
+import {handleSignatureSmartly} from 'utils/rich-field-string';
 
 interface Props {
   invoice: InvoiceView;
@@ -1428,6 +1429,11 @@ export const Actions = ({
         };
       }
 
+      const processedContent = handleSignatureSmartly(
+        emailRecord.content,
+        activeSignature?.content.images[0] || '',
+      );
+
       const sendEmail = async (invoiceData: InvoiceView) => {
         await sendInvoice({
           id: invoiceData?.id!,
@@ -1444,7 +1450,7 @@ export const Actions = ({
             email: {
               email: '',
               subject: emailRecord.subject,
-              content: emailRecord.content,
+              content: processedContent,
               emails: emailRecord.emails,
               ccEmails: emailRecord.ccEmails,
               bccEmails: emailRecord.bccEmails,

@@ -50,6 +50,7 @@ import {
 } from 'utils/constants';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
+import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {companyLanguageContextMap} from 'utils/language';
 
 interface Props {
@@ -583,6 +584,11 @@ const OldTableActions = ({quotation}: Props) => {
             };
           }
 
+          const processedContent = handleSignatureSmartly(
+            emailRecord.content,
+            activeSignature?.content.images[0] || '',
+          );
+
           await sendQuotation({
             id: quotation.id,
             body: {
@@ -591,7 +597,7 @@ const OldTableActions = ({quotation}: Props) => {
               email: {
                 email: '',
                 subject: emailRecord.subject,
-                content: emailRecord.content,
+                content: processedContent,
                 emails: emailRecord.emails,
                 ccEmails: emailRecord.ccEmails,
                 bccEmails: emailRecord.bccEmails,
