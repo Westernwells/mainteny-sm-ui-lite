@@ -3114,5 +3114,7 @@
   "New Inspection Job": "Neuer Inspektionsauftrag",
   "New Installation Job": "Neuer Installationsauftrag",
   "New Modernization Job": "Neuer Modernisierungsauftrag",
-  "New General Job": "Neuer Anderer Auftrag"
+  "New General Job": "Neuer Anderer Auftrag",
+  "Please enter valid shift times.": "Bitte geben Sie gültige Schichtzeiten ein.",
+  "Show {{totalCount}} more": "{{totalCount}} weitere anzeigen"
 }
