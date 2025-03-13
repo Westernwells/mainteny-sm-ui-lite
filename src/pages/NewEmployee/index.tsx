@@ -11,6 +11,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   AdditionalInformationEmployeeFormModel,
   BasicEmployeeFormModel,
+  CreateEmployeeAccountData,
   CredentialEmployeeFormModel,
   RoleEmployeeFormModel,
 } from 'models/employee';
@@ -19,7 +20,6 @@ import {Role, UserView} from 'models/user';
 import {createEmptyResource} from 'utils/paging';
 import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {Progress} from 'components/Progress';
-import {EmployeeAccountData} from './model';
 import {AdditionalInformationEmployeeForm} from './AdditionalInformationEmployeeForm';
 import {BasicEmployeeForm} from './BasicEmployeeForm';
 import {CredentialEmployeeForm} from './CredentialEmployeeForm';
@@ -74,7 +74,6 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     setAdditionalInformationEmployeeFormValues,
   ] = useState<AdditionalInformationEmployeeFormModel>({
     serviceOrderTypes: jobTypes?.map((jobType) => jobType.name) || [],
-    shifts: [],
   });
 
   const [credentialEmployeeFormError, setCredentialEmployeeFormError] =
@@ -126,13 +125,11 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
 
     if (
       activeStep === 3 &&
-      (additionalInformationEmployeeFormValues.shifts.length === 0 ||
-        ((roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) ||
-          roleEmployeeFormValues.roles.includes(Role.CONTRACTOR) ||
-          (roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) &&
-            roleEmployeeFormValues.roles.includes(Role.SERVICE_MANAGER))) &&
-          additionalInformationEmployeeFormValues.serviceOrderTypes.length ===
-            0))
+      (roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) ||
+        roleEmployeeFormValues.roles.includes(Role.CONTRACTOR) ||
+        (roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) &&
+          roleEmployeeFormValues.roles.includes(Role.SERVICE_MANAGER))) &&
+      additionalInformationEmployeeFormValues.serviceOrderTypes.length === 0
     ) {
       return setDisableNextBtn(true);
     }
@@ -155,12 +152,11 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
   };
 
   const addNewEmployee = async () => {
-    const body: EmployeeAccountData = {
+    const body: CreateEmployeeAccountData = {
       phone: basicEmployeeFormValues.phone,
       roles: getRoles(roleEmployeeFormValues.roles[0]),
       serviceOrderTypes:
         additionalInformationEmployeeFormValues.serviceOrderTypes,
-      shifts: additionalInformationEmployeeFormValues.shifts,
       address: basicEmployeeFormValues.address,
       lastName: basicEmployeeFormValues.lastName,
       firstName: basicEmployeeFormValues.firstName,
@@ -175,6 +171,7 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
       totalYearlyVacationDaysAllowed:
         basicEmployeeFormValues.totalYearlyVacationDaysAllowed,
     };
+
     addEmployeeAccount(body, () => {
       navigate('/employees?pageIndex=1&pageSize=25');
     });
