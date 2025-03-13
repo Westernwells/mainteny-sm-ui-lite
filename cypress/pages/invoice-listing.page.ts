@@ -5,16 +5,8 @@ import {mapInvoiceStatus, navigateCy} from '../utils/utils';
 
 export default class InvoiceListingPage {
   static visit = () => {
-    const apiEndpoint = `${
-      Cypress.env().REACT_APP_API_URL
-    }/api/serviceCompanies/*/invoices?*`;
-
-    cy.intercept('GET', apiEndpoint).as('getInvoices');
-
     navigateCy('finance', 'invoices');
-
-    cy.wait('@getInvoices');
-    cy.get('span[role="progressbar"]').should('not.exist');
+    cy.waitForSpinnerToDisappear();
   };
 
   static clearFilter = () => {
@@ -97,7 +89,7 @@ export default class InvoiceListingPage {
         cy.get("td[data-field='STATUS'][role='cell']")
           .should('have.length.greaterThan', 0)
           .each(($row) => {
-            cy.wrap($row).invoke('text').should('equal', statusToCheck)
+            cy.wrap($row).invoke('text').should('equal', statusToCheck);
 
             statusesToExclude.forEach((status) => {
               cy.wrap($row).invoke('text').should('not.equal', status);

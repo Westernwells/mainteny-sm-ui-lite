@@ -42,17 +42,17 @@ const validArticle: ICreateArticleForm = {
 
 describe('Create Article', () => {
     beforeEach(() => {
-        cy.login();
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
 
-        AppTopBarPage.selectLanguage('English');
+            const articlesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles?*`;
+            cy.intercept('GET', articlesURL).as('articlesAPI');
+            const articleSuppliersURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articleSuppliers?*`;
+            cy.intercept('GET', articleSuppliersURL).as('articleSuppliersAPI');
 
-        const articlesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles?*`;
-        cy.intercept('GET', articlesURL).as('articlesAPI');
-        const articleSuppliersURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articleSuppliers?*`;
-        cy.intercept('GET', articleSuppliersURL).as('articleSuppliersAPI');
-
-        ArticlesPage.visit();
-        cy.wait('@articlesAPI');
+            ArticlesPage.visit();
+            cy.wait('@articlesAPI');
+        });
     });
 
     it('should create article', () => {

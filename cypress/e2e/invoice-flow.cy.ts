@@ -137,7 +137,7 @@ describe('Invoice flow', () => {
                     .type(`{selectAll}${getRandomIntInRange(10, 100)}`);
             } else {
                 job.articles.forEach((a, index) => {
-                    cy.get(`tr[data-rbd-draggable-id="${index}${a.article.id}"]`).within(() => {
+                    cy.get(`tr[data-rbd-draggable-id="${index} - ${a.id}"]`).within(() => {
                         cy.get(`div[test-id^="name-"]`).should(($el) => {
                             const elementText = removeControlCharsAndSpaces($el.text());
                             const expectedText = removeControlCharsAndSpaces(isPlainString(a.name) ? a.name : getPlainStringFromHtml(a.name));
@@ -333,7 +333,7 @@ describe('Invoice flow', () => {
                                 );
                                 if (replacedPaymentTerms) {
                                     cy.root().should(($el) =>
-                                        expect(removeControlCharsAndSpaces($el.text())).to.contain(
+                                        expect(removeControlCharsAndSpaces($el.text())).to.include(
                                             removeControlCharsAndSpaces(
                                                 isPlainString(replacedPaymentTerms)
                                                     ? replacedPaymentTerms
@@ -365,7 +365,7 @@ describe('Invoice flow', () => {
                                 })}`,
                             );
                             cy.root().should(($el) =>
-                                expect(removeControlCharsAndSpaces($el.text())).to.contain(
+                                expect(removeControlCharsAndSpaces($el.text())).to.include(
                                     removeControlCharsAndSpaces(isPlainString(notesText) ? notesText : getPlainStringFromHtml(notesText)),
                                 ),
                             );
@@ -429,7 +429,7 @@ describe('Invoice flow', () => {
         ];
         mockArticles.forEach((a, index) => {
             cy.contains('button', 'Add Article').click();
-            cy.get(`tr[data-rbd-draggable-id^="${index}"]`).within(() => {
+            cy.get(`tr[data-rbd-draggable-id^="${index} -"]`).within(() => {
                 cy.get(`div[test-id^="name-"]`).click();
                 // select article - clicking second row because first row is table header
                 cy.document().its('body').find('table[aria-label="articles table"] tr').eq(2).click();
@@ -478,17 +478,16 @@ describe('Invoice flow', () => {
         [sumBeforeGlobalDiscount, sumAfterGlobalDiscount, ...vats, total].forEach((value) => cy.contains(value));
         cy.contains('button', 'Save').click();
 
-        
         cy.get('div[class^="react-pdf__Page__textContent"]')
-        .should('exist')
-        .then(() => {
-            cy.get('div[class^="react-pdf__Document"]')
-            .first()
-            .within(() => {
-                [sumAfterGlobalDiscount, ...vats, total].forEach((value) => cy.contains(value));
+            .should('exist')
+            .then(() => {
+                cy.get('div[class^="react-pdf__Document"]')
+                    .first()
+                    .within(() => {
+                        [sumAfterGlobalDiscount, ...vats, total].forEach((value) => cy.contains(value));
+                    });
             });
-        });
-        
+
         cy.contains(total);
 
         /* assert Download PDF */

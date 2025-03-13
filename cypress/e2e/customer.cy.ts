@@ -3,13 +3,13 @@ import CustomerPage from '../pages/customer.page';
 
 describe('Customer', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            const propertyOwners = `${Cypress.env().REACT_APP_API_URL}/api/propertyOwners?*`;
 
-        const propertyOwners = `${Cypress.env().REACT_APP_API_URL}/api/propertyOwners?*`;
-
-        cy.intercept('GET', propertyOwners).as('propertyOwnersApi');
-        CustomerPage.visit();
+            cy.intercept('GET', propertyOwners).as('propertyOwnersApi');
+            CustomerPage.visit();
+        });
     });
 
     it('should create new customer', () => {

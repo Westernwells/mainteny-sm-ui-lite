@@ -3,15 +3,15 @@ import CustomerPage from '../pages/customer.page';
 
 describe('Edit Customer Address', () => {
     beforeEach(() => {
-        cy.login();
+        cy.login().then(() => {
+            const propertyOwners = `${Cypress.env().REACT_APP_API_URL}/api/propertyOwners?*`;
+            cy.intercept('GET', propertyOwners).as('propertyOwnersApi');
 
-        const propertyOwners = `${Cypress.env().REACT_APP_API_URL}/api/propertyOwners?*`;
-        cy.intercept('GET', propertyOwners).as('propertyOwnersApi');
+            AppTopBarPage.selectLanguage('English');
+            CustomerPage.visit();
 
-        AppTopBarPage.selectLanguage('English');
-        CustomerPage.visit();
-
-        cy.wait('@propertyOwnersApi');
+            cy.wait('@propertyOwnersApi');
+        });
     });
 
     const editAddress = (type: 'billingAddress' | 'otherAddress' | 'beneficiaryAddress', address: Record<string, string>) => {

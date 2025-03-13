@@ -3,20 +3,20 @@ import AppTopBarPage from '../pages/appTopBar.page';
 
 describe('Employees page - list page', () => {
     beforeEach(() => {
-        cy.login();
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
 
-        AppTopBarPage.selectLanguage('English');
+            const employeesAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/users?*`;
+            cy.intercept('GET', employeesAPI).as('employeesAPI');
 
-        const employeesAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/users?*`;
-        cy.intercept('GET', employeesAPI).as('employeesAPI');
+            const technicianEventsAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/technicianEvents?*`;
+            cy.intercept('GET', technicianEventsAPI).as('technicianEventsAPI');
 
-        const technicianEventsAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/technicianEvents?*`;
-        cy.intercept('GET', technicianEventsAPI).as('technicianEventsAPI');
-
-        EmployeesPage.visit();
-        cy.get('span[role="progressbar"]').should('not.exist');
-        cy.wait('@employeesAPI');
-        cy.wait('@technicianEventsAPI');
+            EmployeesPage.visit();
+            cy.get('span[role="progressbar"]').should('not.exist');
+            cy.wait('@employeesAPI');
+            cy.wait('@technicianEventsAPI');
+        });
     });
 
     it('employee availability status is showing correctly', () => {

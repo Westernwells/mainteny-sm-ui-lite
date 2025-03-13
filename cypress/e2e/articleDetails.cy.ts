@@ -3,20 +3,21 @@ import ArticlesPage from '../pages/articles-details.page';
 
 describe('Edit Article', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
 
-        const articleApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles*`;
-        const articleInfoURL = `${Cypress.env().REACT_APP_API_URL}/api/articles/*`;
+            const articleApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/articles*`;
+            const articleInfoURL = `${Cypress.env().REACT_APP_API_URL}/api/articles/*`;
 
-        cy.intercept('GET', articleApi).as('articleApi');
-        cy.intercept('GET', articleInfoURL).as('articleInfoApi');
+            cy.intercept('GET', articleApi).as('articleApi');
+            cy.intercept('GET', articleInfoURL).as('articleInfoApi');
 
-        ArticlesPage.visit();
+            ArticlesPage.visit();
 
-        cy.wait('@articleApi', {timeout: 120000}).its('response').should('have.property', 'statusCode').and('eq', 200);
+            cy.wait('@articleApi', {timeout: 120000}).its('response').should('have.property', 'statusCode').and('eq', 200);
 
-        ArticlesPage.navigateToDetailsPage();
+            ArticlesPage.navigateToDetailsPage();
+        });
     });
 
     it('should validate article details', () => {
