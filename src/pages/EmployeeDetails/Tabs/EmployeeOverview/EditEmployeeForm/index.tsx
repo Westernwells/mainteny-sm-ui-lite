@@ -1,4 +1,4 @@
-import {useEffect, useState, Dispatch, SetStateAction} from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {useFormikContext} from 'formik';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
@@ -20,8 +20,10 @@ import {
   useCompanyNextNumber,
 } from 'hooks/reactQuery/useCompanies';
 import {Progress} from 'components/Progress';
+import {EmployeeAccountData} from 'models/employee';
+import FormInputWrapper from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/FormInputWrapper';
+import Alert from '@mui/material/Alert';
 import {SelectShift} from './SelectShift';
-import {EmployeeAccountData} from './model';
 import {SelectAddress} from './SelectAddress';
 import {SelectEmployeeRole} from './SelectEmployeeRole';
 import {SelectServiceOrderTypes} from './SelectServiceOrderTypes';
@@ -54,6 +56,7 @@ export const EditEmployeeForm = ({
     dirty,
     resetForm,
     setFieldValue,
+    setErrors,
     validateForm,
     setTouched,
   } = useFormikContext<EmployeeAccountData>();
@@ -115,100 +118,201 @@ export const EditEmployeeForm = ({
       onCancel={handleClose}
       onSave={handleSubmit}
       disableSaveBtn={
-        !!Object.keys(errors).length || !dirty || !formikValues?.shifts?.length
+        !!Object.keys(errors).length ||
+        !dirty ||
+        !!Object.values(!formikValues?.shifts)?.length
       }
       dialogProps={{
-        maxWidth: 'md',
+        maxWidth: 'lg',
         open: openDialog || false,
       }}>
       <Box
         component="form"
         height="100%"
         display="flex"
-        flexDirection="column"
         justifyContent="space-between">
-        <Box flexGrow={1}>
-          <Box display="flex" gap="1em" justifyContent="space-between">
-            <Box>
-              <Box
-                display="flex"
-                gap="1em"
-                sx={{
-                  marginBlock: '0.5em',
-                  marginBottom: '1.5em',
-                }}>
-                {[
-                  {
-                    id: 'firstName',
-                    label: t('First Name'),
-                    placeholder: 'Blake',
-                    value: formikValues.firstName,
-                    helperText: touched.firstName && errors.firstName,
-                    error: !!errors.firstName && touched.firstName,
-                    required: true,
-                    ...defaultProps,
-                  },
-                  {
-                    id: 'lastName',
-                    label: t('Last Name'),
-                    placeholder: 'Norton',
-                    value: formikValues.lastName,
-                    helperText: touched.lastName && errors.lastName,
-                    error: !!errors.lastName && touched.lastName,
-                    required: true,
-                    ...defaultProps,
-                  },
-                ].map((item, index) => (
-                  <FormInput
-                    key={index}
-                    fieldProps={{
-                      ...item,
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+          gap={6}>
+          {/* Left section */}
+          <Box
+            sx={{display: 'flex', flexDirection: 'column', width: '50%'}}
+            gap={4}>
+            {/* Basic Info section */}
+            <Box sx={{display: 'flex', flexDirection: 'column'}} gap={2}>
+              <Typography
+                variant="subtitle2"
+                sx={{color: theme.palette.text.primary}}>
+                {t('Basic info')}
+              </Typography>
+
+              <Box sx={{display: 'flex', flexDirection: 'column'}} gap={3}>
+                {/* Name section */}
+                <Box
+                  gap={2}
+                  sx={{
+                    display: 'flex',
+                  }}>
+                  {[
+                    {
+                      id: 'firstName',
+                      label: t('First Name'),
+                      placeholder: 'Blake',
+                      value: formikValues.firstName,
+                      helperText: touched.firstName && errors.firstName,
+                      error: !!errors.firstName && touched.firstName,
+                      required: true,
+                      ...defaultProps,
+                    },
+                    {
+                      id: 'lastName',
+                      label: t('Last Name'),
+                      placeholder: 'Norton',
+                      value: formikValues.lastName,
+                      helperText: touched.lastName && errors.lastName,
+                      error: !!errors.lastName && touched.lastName,
+                      required: true,
+                      ...defaultProps,
+                    },
+                  ].map((item, index) => (
+                    <FormInput
+                      key={index}
+                      fieldProps={{
+                        ...item,
+                        ...defaultProps,
+                      }}
+                    />
+                  ))}
+                </Box>
+
+                {/* Phone and ID section */}
+                <Box
+                  gap={2}
+                  sx={{
+                    display: 'flex',
+                  }}>
+                  <FormInputWrapper
+                    item={{
+                      id: 'phone',
+                      label: t('Phone'),
+                      placeholder: '49 17163 995801',
+                      value: formikValues.phone,
+                      InputProps: {
+                        startAdornment: (
+                          <InputAdornment position="start"> + </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <PhoneIcon />
+                          </InputAdornment>
+                        ),
+                      },
+                      helperText: touched.phone && errors.phone,
+                      error: !!errors.phone && touched.phone,
                       ...defaultProps,
                     }}
                   />
-                ))}
-              </Box>
-              <Box display="flex" flexDirection="column" gap="1em">
-                {[
-                  {
-                    id: 'phone',
-                    label: t('Phone'),
-                    placeholder: '49 17163 995801',
-                    value: formikValues.phone,
+
+                  <ComboBox
+                    options={[]}
+                    initialValue={
+                      formikValues.employeeId
+                        ? {
+                            label: 'Employee Id',
+                            value: formikValues.employeeId,
+                          }
+                        : null
+                    }
+                    initialQuery={formikValues.employeeId}
+                    getValue={(item) => {
+                      setFieldValue('employeeId', item?.value);
+                    }}
+                    autoIdProps={{
+                      handleAction: companyAutoNumberConfig?.configRecords.find(
+                        (item: any) =>
+                          item.type === ServiceCompanyNumberType.EMPLOYEE,
+                      )?.enabled
+                        ? () => {
+                            generateNextNumber();
+                          }
+                        : () => {
+                            setOpenNewDialog(true);
+                          },
+                      isEnabled: companyAutoNumberConfig?.configRecords.find(
+                        (item: any) =>
+                          item.type === ServiceCompanyNumberType.EMPLOYEE,
+                      )?.enabled,
+                    }}
+                    textFieldProps={{
+                      id: 'employeeId',
+                      name: 'employeeId',
+                      label: t('Employee ID'),
+                      placeholder: '12345678',
+                      value: formikValues.employeeId,
+                      helperText: touched.employeeId && errors.employeeId,
+                      error: !!errors.employeeId && touched.employeeId,
+                      ...defaultProps,
+                    }}
+                  />
+                </Box>
+
+                {/* Address section */}
+                <SelectAddress />
+
+                {/* Email section */}
+                <FormInputWrapper
+                  item={{
+                    id: 'email',
+                    label: t('Email'),
+                    placeholder: 'john@astralift.com',
                     InputProps: {
-                      startAdornment: (
-                        <InputAdornment position="start"> + </InputAdornment>
-                      ),
                       endAdornment: (
                         <InputAdornment position="end">
-                          <PhoneIcon />
+                          <Email />
                         </InputAdornment>
                       ),
                     },
-                    helperText: touched.phone && errors.phone,
-                    error: !!errors.phone && touched.phone,
+                    value: formikValues.email,
+                    helperText: touched.email && errors.email,
+                    error: !!errors.email && touched.email,
+                    required: true,
                     ...defaultProps,
-                  },
-                ].map((item, index) => (
-                  <FormInput
-                    key={index}
-                    fieldProps={{
-                      ...item,
-                      ...defaultProps,
-                    }}
-                  />
-                ))}
-                <SelectAddress />
+                  }}
+                />
 
-                <Box>
-                  {[
-                    {
+                {/* Role and Team section */}
+                <Box sx={{display: 'flex', alignItems: 'center'}} gap={3}>
+                  <SelectEmployeeRole />
+
+                  <FormInputWrapper
+                    item={{
                       id: 'team',
                       label: t('Team'),
                       placeholder: '100',
                       value: formikValues.team,
                       helperText: touched.team && errors.team,
                       error: !!errors.team && touched.team,
+                      ...defaultProps,
+                    }}
+                  />
+                </Box>
+
+                <Box sx={{width: '50%'}}>
+                  {[
+                    {
+                      id: 'totalYearlyVacationDaysAllowed',
+                      label: t('Yearly Vacation Days'),
+                      placeholder: '28',
+                      value: formikValues.totalYearlyVacationDaysAllowed,
+                      helperText:
+                        touched.totalYearlyVacationDaysAllowed &&
+                        errors.totalYearlyVacationDaysAllowed,
+                      error:
+                        !!errors.totalYearlyVacationDaysAllowed &&
+                        touched.totalYearlyVacationDaysAllowed,
                       ...defaultProps,
                     },
                   ].map((item, index) => (
@@ -222,157 +326,69 @@ export const EditEmployeeForm = ({
                   ))}
                 </Box>
               </Box>
-              <Box>
-                {(formikValues.roles.includes(Role.TECHNICIAN) ||
-                  formikValues.roles.includes(Role.CONTRACTOR) ||
-                  (formikValues.roles.includes(Role.TECHNICIAN) &&
-                    formikValues.roles.includes(Role.SERVICE_MANAGER))) && (
-                  <>
-                    <Typography
-                      variant="h6"
-                      mt="1.5em"
-                      mb="0.4em"
-                      sx={{color: theme.palette.text.primary}}>
-                      {t('Order Types')}
-                    </Typography>
-                    <SelectServiceOrderTypes
-                      values={formikValues}
-                      setFieldValue={setFieldValue}
-                      jobTypes={jobTypes}
-                    />
-                  </>
-                )}
-              </Box>
             </Box>
 
-            <Box
-              display="flex"
-              flexDirection="column"
-              sx={{minWidth: '28.125em'}}
-              gap="1em">
-              <SelectEmployeeRole />
-              {[
-                {
-                  id: 'email',
-                  label: t('Email'),
-                  placeholder: 'john@astralift.com',
-                  InputProps: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Email />
-                      </InputAdornment>
-                    ),
-                  },
-                  value: formikValues.email,
-                  helperText: touched.email && errors.email,
-                  error: !!errors.email && touched.email,
-                  required: true,
-                  ...defaultProps,
-                },
-              ].map((item, index) => (
-                <FormInput
-                  key={index}
-                  fieldProps={{
-                    ...item,
-                    ...defaultProps,
-                  }}
-                />
-              ))}
-
-              <Box
-                display="flex"
-                flexDirection="column"
-                sx={{minWidth: '28.125em'}}
-                gap="0em">
-                <ComboBox
-                  options={[]}
-                  initialValue={
-                    formikValues.employeeId
-                      ? {
-                          label: 'Employee Id',
-                          value: formikValues.employeeId,
-                        }
-                      : null
-                  }
-                  initialQuery={formikValues.employeeId}
-                  getValue={(item) => {
-                    setFieldValue('employeeId', item?.value);
-                  }}
-                  autoIdProps={{
-                    handleAction: companyAutoNumberConfig?.configRecords.find(
-                      (item: any) =>
-                        item.type === ServiceCompanyNumberType.EMPLOYEE,
-                    )?.enabled
-                      ? () => {
-                          generateNextNumber();
-                        }
-                      : () => {
-                          setOpenNewDialog(true);
-                        },
-                    isEnabled: companyAutoNumberConfig?.configRecords.find(
-                      (item: any) =>
-                        item.type === ServiceCompanyNumberType.EMPLOYEE,
-                    )?.enabled,
-                  }}
-                  textFieldProps={{
-                    id: 'employeeId',
-                    name: 'employeeId',
-                    label: t('Employee ID'),
-                    placeholder: '12345678',
-                    value: formikValues.employeeId,
-                    helperText: touched.employeeId && errors.employeeId,
-                    error: !!errors.employeeId && touched.employeeId,
-                    ...defaultProps,
-                  }}
-                />
-              </Box>
-
-              <Box sx={{width: '50%'}}>
-                {[
-                  {
-                    id: 'totalYearlyVacationDaysAllowed',
-                    label: t('Yearly Vacation Days'),
-                    placeholder: '28',
-                    value: formikValues.totalYearlyVacationDaysAllowed,
-                    helperText:
-                      touched.totalYearlyVacationDaysAllowed &&
-                      errors.totalYearlyVacationDaysAllowed,
-                    error:
-                      !!errors.totalYearlyVacationDaysAllowed &&
-                      touched.totalYearlyVacationDaysAllowed,
-                    ...defaultProps,
-                  },
-                ].map((item, index) => (
-                  <FormInput
-                    key={index}
-                    fieldProps={{
-                      ...item,
-                      ...defaultProps,
-                    }}
-                  />
-                ))}
-              </Box>
-
-              <Box>
+            {/* Order Type section */}
+            {(formikValues.roles.includes(Role.TECHNICIAN) ||
+              formikValues.roles.includes(Role.CONTRACTOR) ||
+              (formikValues.roles.includes(Role.TECHNICIAN) &&
+                formikValues.roles.includes(Role.SERVICE_MANAGER))) && (
+              <Box sx={{display: 'flex', flexDirection: 'column'}} gap={2}>
                 <Typography
-                  variant="h6"
-                  my=".75em"
+                  variant="subtitle2"
                   sx={{color: theme.palette.text.primary}}>
-                  {t('Shift Time')}
-                  <Typography component="span" sx={{color: 'red'}}>
-                    *
-                  </Typography>
+                  {t('Order Types')}
                 </Typography>
-                <SelectShift
-                  values={formikValues}
-                  setFieldValue={setFieldValue}
-                />
+                <Box>
+                  <SelectServiceOrderTypes
+                    values={formikValues}
+                    setFieldValue={setFieldValue}
+                    jobTypes={jobTypes}
+                  />
+                </Box>
               </Box>
-            </Box>
+            )}
+          </Box>
+
+          {/* Right section */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: '50%',
+            }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                display: 'flex',
+                color: theme.palette.text.primary,
+                marginBottom: theme.spacing(2),
+              }}>
+              {t('Shift Time')}
+              <Typography component="span" sx={{color: 'red'}}>
+                *
+              </Typography>
+            </Typography>
+            <Alert
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: theme.spacing(2),
+              }}
+              severity="info">
+              {t(
+                'Employees must work their scheduled shifts, otherwise they have to take absence leave. Public holidays are off by default.',
+              )}
+            </Alert>
+            <SelectShift
+              values={formikValues.shifts}
+              errors={errors}
+              setFieldValue={setFieldValue}
+              setErrors={setErrors}
+            />
           </Box>
         </Box>
       </Box>
-
       <AutoGeneratedIdDialog
         openDialog={openNewDialog}
         setOpenDialog={setOpenNewDialog}

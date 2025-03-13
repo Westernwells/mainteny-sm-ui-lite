@@ -9,7 +9,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 
-import {EmployeeAccountData} from './model';
+import {EmployeeAccountData} from 'models/employee';
 
 export type EmployeeRolesType = {
   id: string;
