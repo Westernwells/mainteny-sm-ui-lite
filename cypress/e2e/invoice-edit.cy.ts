@@ -53,14 +53,14 @@ describe('Invoice Edit Flow with Payment Terms', () => {
     const INVOICE_ID = '58191ee4-5e63-4fc1-9b61-dead56321fc9';
 
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
 
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
-
-        mockInvoiceDetails(INVOICE_ID);
-        mockInvoiceAmountDetails(INVOICE_ID);
-        mockInvoiceUpdate(INVOICE_ID);
+            mockInvoiceDetails(INVOICE_ID);
+            mockInvoiceAmountDetails(INVOICE_ID);
+            mockInvoiceUpdate(INVOICE_ID);
+        });
     });
 
     it('should validate Payment Terms text with correct placeholders replaced', () => {

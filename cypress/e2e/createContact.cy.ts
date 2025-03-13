@@ -4,9 +4,10 @@ import {getUniqueId} from '../../src/utils/utils';
 
 describe('Create Contact', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
-        ContactPage.visit();
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            ContactPage.visit();
+        });
     });
 
     it('should create contact and assign it to a unit and a customer', () => {

@@ -1,213 +1,81 @@
-import {useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
+import {WEEK_DAYS_ARRAY, WEEK_DAYS_WITHOUT_WEEKENDS} from 'utils/datetime';
+import Shift from 'components/Shift';
+import {
+  EmployeeAccountData,
+  ShiftEntry,
+  ShiftForm,
+  TimeWindowType,
+} from 'models/employee';
 import Box from '@mui/material/Box';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select, {SelectChangeEvent} from '@mui/material/Select';
-import {TimePicker} from 'components/TimePicker';
-import {TimeWindowType} from 'models/misc';
-import {Button} from 'components/Button';
-import {convertToMacro, convertToText} from 'utils/utils';
-import {Shift} from './model';
+import {Divider} from '@mui/material';
+import React from 'react';
+import useTheme from '@mui/material/styles/useTheme';
+import {FormikErrors} from 'formik';
 
 type Props = {
-  values: any;
+  values: ShiftForm;
+  errors: FormikErrors<EmployeeAccountData>;
   setFieldValue: any;
+  setErrors: (errors: FormikErrors<EmployeeAccountData>) => void;
 };
 
-export const SelectShift = ({values, setFieldValue}: Props) => {
-  const {t} = useTranslation();
-  const workDays = Object.values(TimeWindowType).map((item) =>
-    convertToText(item),
-  );
+export const SelectShift = ({
+  values,
+  errors,
+  setFieldValue,
+  setErrors,
+}: Props) => {
+  const theme = useTheme();
 
-  const defaultTime = {
-    fromTime: new Date(0, 0, 0, 8, 0),
-    toTime: new Date(0, 0, 0, 16, 0),
+  const handleRemoveShift = (type: TimeWindowType) => () => {
+    setFieldValue(`shifts.${type}`, undefined);
   };
 
-  const convertToLocaleTimeString = (date: Date) =>
-    date.toLocaleTimeString('de-DE', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const handleChangeShift =
+    (type: TimeWindowType) => (value: Partial<ShiftEntry> | undefined) => {
+      if (!value) {
+        const removedEmptyEntry = Object.fromEntries(
+          Object.entries(values).filter(([key]) => key !== type),
+        );
+        setFieldValue(`shifts`, removedEmptyEntry);
+      }
+      setFieldValue(`shifts.${type}`, value);
+    };
 
-  const [shifts, setShifts] = useState<Shift<Date | null>[]>(
-    values.shifts && values.shifts.length
-      ? values?.shifts.map((item: any) => ({
-          fromTime: new Date(
-            0,
-            0,
-            0,
-            (item?.fromTime?.split(':')[0] as unknown as number) ?? 0,
-            (item?.fromTime?.split(':')[1] as unknown as number) ?? 0,
-          ),
-          toTime: new Date(
-            0,
-            0,
-            0,
-            (item?.toTime?.split(':')[0] as unknown as number) ?? 0,
-            (item?.toTime?.split(':')[1] as unknown as number) ?? 0,
-          ),
-          type: convertToText(item.type),
-        }))
-      : [
-          {
-            ...defaultTime,
-            type: convertToText(TimeWindowType.WEEKDAY),
-          },
-        ],
-  );
+  const handleShiftCopyDown = (type: TimeWindowType) => (value: ShiftEntry) => {
+    const index = WEEK_DAYS_WITHOUT_WEEKENDS.indexOf(type);
+    const daysToChange = WEEK_DAYS_WITHOUT_WEEKENDS.slice(index);
 
-  const handleAddShift = () => {
-    const selectedWorkDays = shifts.map((shift) => shift.type);
-    setShifts((prev) => [
-      ...prev,
-      {
-        ...defaultTime,
-        type: workDays.filter((item) => !selectedWorkDays.includes(item))[0],
-      },
-    ]);
-  };
-
-  const handleRemoveShift = () => {
-    setShifts((prev) => prev.slice(0, -1));
-  };
-
-  useEffect(() => {
-    setFieldValue(
-      'shifts',
-      shifts.map((item) => ({
-        fromTime: item.fromTime && convertToLocaleTimeString(item.fromTime),
-        toTime: item.toTime && convertToLocaleTimeString(item.toTime),
-        type: convertToMacro(item.type),
-      })),
+    const newValues = daysToChange.reduce(
+      (acc, entry) => ({
+        ...acc,
+        [entry]: value,
+      }),
+      values,
     );
-  }, [shifts]);
+
+    setFieldValue(`shifts`, newValues);
+  };
 
   return (
     <>
-      {shifts.map((shift, index) => (
-        <Box
-          key={shift.type}
-          display="flex"
-          gap="1em"
-          alignItems="flex-end"
-          mt="1em">
-          <TimePicker
-            required
-            defaultTime={shift.fromTime}
-            containerStyles={{mr: '1em'}}
-            maxTime={shift.toTime ?? undefined}
-            getSelectedTime={(newValue) => {
-              if (!newValue || Number.isNaN(newValue.getTime())) return;
-              const oldShifts = shifts.filter((item) => item !== shift);
-              const newShift = shift;
-              newShift.fromTime = newValue;
-              setShifts([...oldShifts, newShift]);
-            }}
-            textFieldProps={{
-              label: t('Shift start time'),
-              disabled: index < shifts.length - 1,
-              onKeyDown: (e) => e.preventDefault(),
-            }}
+      {WEEK_DAYS_ARRAY.map((day) => (
+        <Box sx={{display: 'flex', flexDirection: 'column'}}>
+          <Shift
+            testId={`shift-for-${day}`}
+            values={values[day]}
+            type={day}
+            labelKey={day}
+            errors={errors}
+            onChange={handleChangeShift(day)}
+            onCopyDown={handleShiftCopyDown(day)}
+            onRemove={handleRemoveShift(day)}
+            onError={setErrors}
           />
 
-          <TimePicker
-            required
-            defaultTime={shift.toTime}
-            containerStyles={{mr: '1em'}}
-            getSelectedTime={(newValue) => {
-              if (!newValue || Number.isNaN(newValue.getTime())) return;
-              const oldShifts = shifts.filter((item) => item !== shift);
-              const newShift = shift;
-              newShift.toTime = newValue;
-              setShifts([...oldShifts, newShift]);
-            }}
-            textFieldProps={{
-              label: t('Shift end time'),
-              onKeyDown: (e) => e.preventDefault(),
-              disabled: index < shifts.length - 1,
-            }}
-          />
-
-          <FormControl sx={{width: '14em'}}>
-            <InputLabel
-              id="shiftDaySelect-label"
-              sx={{
-                color: 'text.primary',
-                paddingInline: '.5em',
-              }}
-              disabled={index < shifts.length - 1}>
-              {t('Type')}
-            </InputLabel>
-            <Select
-              labelId="shiftDaySelect-label"
-              id="shiftDaySelect"
-              value={shift.type}
-              label="Type"
-              size="small"
-              disabled={index < shifts.length - 1}
-              onChange={(event: SelectChangeEvent) => {
-                const oldShifts = shifts.filter((item) => item !== shift);
-                const newShift = shift;
-                newShift.type = event.target.value;
-                setShifts([...oldShifts, newShift]);
-              }}>
-              {workDays.map((item) => (
-                <MenuItem
-                  value={item}
-                  key={item}
-                  disabled={shifts
-                    .map((s, i) => {
-                      if (i === shifts.length - 1) {
-                        return false;
-                      }
-                      return s.type;
-                    })
-                    .includes(item)}>
-                  {t(item)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Divider sx={{display: 'flex', margin: `${theme.spacing(1.5)} 0`}} />
         </Box>
       ))}
-
-      <Box mt="1em">
-        <Button
-          label={`+ ${t('Add')}`}
-          buttonProps={{
-            variant: 'outlined',
-            color: 'info',
-
-            onClick: handleAddShift,
-            disabled: shifts.length === workDays.length,
-            sx: {
-              mr: '1em',
-              borderColor: 'info.main',
-              bgcolor: 'transparent',
-            },
-          }}
-        />
-        {shifts.length > 1 && (
-          <Button
-            label="Remove"
-            buttonProps={{
-              variant: 'outlined',
-              color: 'error',
-              onClick: handleRemoveShift,
-              disabled: shifts.length === 1,
-              sx: {
-                mr: '1em',
-                borderColor: 'error.main',
-                bgcolor: 'transparent',
-              },
-            }}
-          />
-        )}
-      </Box>
     </>
   );
 };

@@ -9,7 +9,6 @@ import {AdditionalInformationEmployeeFormModel} from 'models/employee';
 import {SelectServiceOrderTypes} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/SelectServiceOrderTypes';
 import {Typography} from '@mui/material';
 import {Role} from 'models/user';
-import {SelectShift} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/SelectShift';
 import {convertToMacro} from 'utils/utils';
 import {ServiceOrderTypeRecord} from 'models/service-order';
 
@@ -34,7 +33,6 @@ export const AdditionalInformationEmployeeForm = ({
   const formik = useFormik<AdditionalInformationEmployeeFormModel>({
     initialValues: {
       serviceOrderTypes: initialValues?.serviceOrderTypes || [],
-      shifts: initialValues?.shifts || [],
     },
     onSubmit: () => {},
   });
@@ -72,18 +70,6 @@ export const AdditionalInformationEmployeeForm = ({
                 />
               </Box>
             )}
-
-            <Typography
-              sx={{color: theme.palette.text.primary, marginBottom: '0.313em'}}>
-              {t('Shift Time')}
-              <Typography component="span" sx={{color: 'red'}}>
-                *
-              </Typography>
-            </Typography>
-            <SelectShift
-              values={formik.values}
-              setFieldValue={formik.setFieldValue}
-            />
           </Grid>
         </Grid>
       </Box>

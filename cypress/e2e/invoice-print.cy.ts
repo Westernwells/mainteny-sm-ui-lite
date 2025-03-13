@@ -6,8 +6,9 @@ describe('Invoice flow', () => {
     beforeEach(() => {
         const getServiceCompany = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`;
         cy.intercept('GET', getServiceCompany).as('getServiceCompany');
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+        });
     });
 
     const visitAndCreateInvoice = ({setExpiredDueDate, hasDueDate}: {hasDueDate?: boolean; setExpiredDueDate?: boolean}) => {

@@ -3106,6 +3106,7 @@
   "The notes below will be visible to office only.": "Die unten stehenden Notizen, sind nur in der Büroversion sichtbar.",
   "Quotation preview": "Angebotsvorschau",
   "Invoice preview": "Rechnungsvorschau",
+  "Not working this day": "Keine Schicht an diesem Tag",
   "Employees must work their scheduled shifts, otherwise they have to take absence leave. Public holidays are off by default.": "Mitarbeiter müssen ihre geplanten Schichten arbeiten, andernfalls müssen sie eine Abwesenheit nehmen. Gesetzliche Feiertage sind standardmäßig frei.",
   "New Maintenance Job": "Neuer Wartungsauftrag",
   "New Emergency Job": "Neuer Notrufauftrag",
@@ -3114,5 +3115,7 @@
   "New Inspection Job": "Neuer Inspektionsauftrag",
   "New Installation Job": "Neuer Installationsauftrag",
   "New Modernization Job": "Neuer Modernisierungsauftrag",
-  "New General Job": "Neuer Anderer Auftrag"
+  "New General Job": "Neuer Anderer Auftrag",
+  "Please enter valid shift times.": "Bitte geben Sie gültige Schichtzeiten ein.",
+  "Show {{totalCount}} more": "{{totalCount}} weitere anzeigen"
 }

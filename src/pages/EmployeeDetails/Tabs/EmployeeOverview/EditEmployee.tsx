@@ -10,7 +10,8 @@ import {Role, UserView} from 'models/user';
 import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
 import {createEmptyResource} from 'utils/paging';
 import {getRoles} from 'utils/work-hours-utils';
-import {EmployeeAccountData} from './EditEmployeeForm/model';
+import {EmployeeAccountData, ShiftForm} from 'models/employee';
+import {aggregateWeekShifts} from 'utils/shift';
 import {EditEmployeeForm} from './EditEmployeeForm';
 
 interface Props {
@@ -70,12 +71,8 @@ export const EditEmployee = ({employee, openDialog, onClose}: Props) => {
         ? employee.userData.additionalInfo.assignedServiceOrderTypes || []
         : [],
     shifts: employee.userData.workingHours
-      ? employee.userData.workingHours.map((item) => ({
-          fromTime: item.fromTime,
-          toTime: item.toTime,
-          type: item.type,
-        }))
-      : [],
+      ? aggregateWeekShifts(employee.userData.workingHours)
+      : ({} as ShiftForm),
     serviceCompanyId: user?.userAccount.serviceCompany.id,
     employeeId: employee.userData.externalId,
     team: employee.userData.team,

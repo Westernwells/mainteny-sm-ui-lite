@@ -4,10 +4,11 @@ import ContractListingPage from '../pages/contact-listing.page';
 
 describe('Contract listing page', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/contracts?*`).as('getContracts');
-        ContractListingPage.visit();
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/contracts?*`).as('getContracts');
+            ContractListingPage.visit();
+        });
     });
 
     it('should route to new contract page on clicking new contract button', () => {
@@ -64,7 +65,7 @@ describe('Contract listing page', () => {
         cy.wait('@getContracts').then((interception) => {
             if (interception.response.body && interception.response.body.data.length === 0) {
                 expect(interception.response.body.data).to.have.lengthOf(0);
-                cy.contains('There are no entries for the applied filters.').should('exist');
+                cy.contains('No matching search results').should('exist');
             }
         });
     });

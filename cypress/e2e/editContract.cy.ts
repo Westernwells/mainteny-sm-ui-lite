@@ -3,14 +3,13 @@ import ContractsPage from '../pages/contracts.page';
 
 describe('Edit Contracts', () => {
     beforeEach(() => {
-        cy.login();
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            const contractInfoURL = `${Cypress.env().REACT_APP_API_URL}/api/contracts/*`;
+            cy.intercept('GET', contractInfoURL).as('contractInfoApi');
 
-        AppTopBarPage.selectLanguage('English');
-
-        const contractInfoURL = `${Cypress.env().REACT_APP_API_URL}/api/contracts/*`;
-        cy.intercept('GET', contractInfoURL).as('contractInfoApi');
-
-        ContractsPage.visit();
+            ContractsPage.visit();
+        });
     });
 
     it('validate data', () => {

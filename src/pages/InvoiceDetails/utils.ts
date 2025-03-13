@@ -328,6 +328,7 @@ export const articleViewToInvoiceItemRecord = (
   },
 ): InvoiceItemRecord => {
   const record: InvoiceItemRecord = {
+    id: article.id,
     article,
     name: article.name,
     description: article.description,
@@ -351,8 +352,8 @@ export const invoiceItemToInvoiceItemRecord = (
     taxRates?.find(
       (rate) => rate.percentage === invoiceItem.unitAmount.percentageVat,
     );
-
   const record: InvoiceItemRecord = {
+    id: invoiceItem.id,
     article: invoiceItem.article,
     name: invoiceItem.name,
     description: invoiceItem.description,
