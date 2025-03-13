@@ -60,7 +60,7 @@ import {
 import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {useDebounce} from 'hooks/useDebounce';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
-import {ServiceOrderType} from 'models/service-order';
+import {ServiceOrderArticleView, ServiceOrderType} from 'models/service-order';
 import {VatView} from 'models/vat';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {FormSelect} from './form/FormSelect';
@@ -82,10 +82,10 @@ interface Props {
   propertyOwner?: PropertyOwnerView;
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
   isHovered?: boolean;
-  defaultPercentageVat?: number;
+  defaultVat?: VatView;
   taxRates: VatView[];
   invoiceType: InvoiceType;
-  jobArticleVat?: number;
+  jobArticleVat?: ServiceOrderArticleView;
 }
 
 interface TableRowProps {
@@ -168,7 +168,7 @@ export const ArticleItemRowNEW = ({
   propertyOwner,
   handleSelectItem,
   isHovered,
-  defaultPercentageVat,
+  defaultVat,
   invoiceType,
   taxRates,
   jobArticleVat,
@@ -188,11 +188,23 @@ export const ArticleItemRowNEW = ({
       unitAmount: {
         ...articleItem.unitAmount,
         percentageVat:
-          jobArticleVat !== undefined
-            ? jobArticleVat
-            : defaultPercentageVat !== undefined
-            ? defaultPercentageVat
-            : articleItem.unitAmount.percentageVat,
+          articleItem.unitAmount.percentageVat !== undefined
+            ? articleItem.unitAmount.percentageVat
+            : jobArticleVat !== undefined
+            ? jobArticleVat.unitAmount.percentageVat
+            : defaultVat !== undefined
+            ? defaultVat.percentage
+            : 0,
+        vatId:
+          articleItem.unitAmount.vatId ??
+          jobArticleVat?.unitAmount.vatId ??
+          defaultVat?.id ??
+          '',
+        vatName:
+          articleItem.unitAmount.vatName ??
+          jobArticleVat?.unitAmount.vatName ??
+          defaultVat?.name ??
+          '',
       },
     },
     onSubmit: () => {},
@@ -363,14 +375,16 @@ export const ArticleItemRowNEW = ({
 
   const onChangePercentageVat = (event: SelectChangeEvent<string>) => {
     const vatId = event.target.value;
+
     const taxRate = taxRates?.find((rate) => rate.id === vatId);
 
+    if (!taxRate) return;
+
     formik.setFieldValue('unitAmount', {
-      netAmount: formik.values.unitAmount.netAmount || 0,
-      percentageVat: taxRate?.percentage || 0,
-      currency: formik.values.unitAmount.currency || currentCurrency.code,
-      vatId: taxRate?.id || '',
-      vatName: taxRate?.name || '',
+      ...formik.values.unitAmount,
+      percentageVat: taxRate.percentage,
+      vatId: taxRate.id,
+      vatName: taxRate.name,
     });
   };
 
@@ -533,6 +547,7 @@ export const ArticleItemRowNEW = ({
         <ClickAwayListener onClickAway={handlePopperClose}>
           <Box ref={articleAnchorEl}>
             <RichTextField
+              name={`name-${index}`}
               test-id={`name-${index}`}
               html={formik.values.name || ''}
               updateHtml={handleTextFieldChange('name')}

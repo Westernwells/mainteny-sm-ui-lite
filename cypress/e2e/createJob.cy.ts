@@ -6,15 +6,14 @@ import {randomEnumKey} from '../utils/utils';
 
 describe('Create Job', () => {
     beforeEach(() => {
-        cy.login();
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            const unitsURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?*`;
+            cy.intercept('GET', unitsURL).as('unitsApi');
 
-        AppTopBarPage.selectLanguage('English');
-
-        const unitsURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?*`;
-        cy.intercept('GET', unitsURL).as('unitsApi');
-
-        ServiceJobPage.visit();
-        cy.get('span[role="progressbar"]').should('not.exist');
+            ServiceJobPage.visit();
+            cy.get('span[role="progressbar"]').should('not.exist');
+        });
     });
 
     it('should create a job', () => {

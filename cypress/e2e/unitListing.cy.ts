@@ -3,15 +3,15 @@ import UnitsPage from '../pages/unit.page';
 
 describe('Unit Listing', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            // Intercept the units API call
+            const unitsApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?*`;
+            cy.intercept('GET', unitsApi).as('unitsApi');
 
-        // Intercept the units API call
-        const unitsApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?*`;
-        cy.intercept('GET', unitsApi).as('unitsApi');
-
-        UnitsPage.visit();
-        cy.waitForSpinnerToDisappear();
+            UnitsPage.visit();
+            cy.waitForSpinnerToDisappear();
+        });
     });
 
     it('should handle all search scenarios', () => {

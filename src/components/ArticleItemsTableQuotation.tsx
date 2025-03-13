@@ -186,6 +186,7 @@ export const ArticleItemsTableQuotation = ({
           vat: 0,
         },
       },
+      id: getUniqueId(),
       name: '',
       description: '',
       quantity: 0,
@@ -301,7 +302,7 @@ export const ArticleItemsTableQuotation = ({
                   ref={providedDrop.innerRef}
                   {...providedDrop.droppableProps}>
                   {items.map((item, index) => {
-                    const key = index + (item.article?.id || item.id || '');
+                    const key = `${index} - ${item.id}`;
                     return (
                       <Draggable key={key} draggableId={key} index={index}>
                         {(provided) => (
@@ -330,7 +331,7 @@ export const ArticleItemsTableQuotation = ({
                               propertyOwner={propertyOwner}
                               handleSelectItem={handleSelectItem}
                               isHovered={isHovered}
-                              defaultPercentageVat={defaultPercentageVat}
+                              defaultVat={defaultVat}
                               taxRates={taxRates!}
                             />
                           </TableRow>
