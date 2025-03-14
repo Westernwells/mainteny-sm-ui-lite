@@ -173,8 +173,8 @@ export const generatePdfQuotation = (
     vat: number;
     percentageVat: number;
   }[],
-  customer: PropertyOwnerView | null,
   unit: ElevatorView | null,
+  customer?: PropertyOwnerView,
   company?: ServiceCompanyItem,
 ): QuotationView => ({
   id: '',

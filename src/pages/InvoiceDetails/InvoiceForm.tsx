@@ -1719,10 +1719,15 @@ export const InvoiceForm = ({
       );
     });
 
+    const hasEmptyItemName = formik.values.items.some(
+      (item) => !item.name?.trim(),
+    );
+
     const valid =
       formik.values.subject &&
       formik.values.type.length &&
       formik.values.items.length &&
+      !hasEmptyItemName &&
       !!customer &&
       hasValidVat &&
       Object.keys(formik.errors).length === 0;

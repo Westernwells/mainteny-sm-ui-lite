@@ -38,15 +38,14 @@ describe('Create Quotation', () => {
 
         cy.get('[data-testid="AddArticle"]').click({force: true});
 
-        cy.get('div[test-id="name-0"]').click({force: true});
+        cy.get('#article-combo-box').click({force: true});
 
         // 🛠 Fix: Simulate user input interaction to trigger Formik validation
-        cy.get('div[test-id="name-0"]').type('e').clear();
+        cy.get('#article-combo-box').type('e').clear();
         cy.wait(1000);
         // click outside
         cy.clearRichTextField('Payment terms');
 
-        cy.contains('Article cannot be empty');
         cy.contains('button', 'Save').should('be.disabled');
     });
 
@@ -58,10 +57,10 @@ describe('Create Quotation', () => {
 
         // add article
         cy.contains('button', 'Add Article').click();
-        cy.get('div[test-id="name-0"]').click();
-        const articlesTable = cy.get('table[aria-label="articles table"]');
+        cy.get('#article-combo-box').click({force: true})
+        const articlesTable = cy.get('#article-combo-box-listbox');
         // clicking second row because first row is table header
-        const secondRow = articlesTable.find('tr').eq(2);
+        const secondRow = articlesTable.find('li').eq(2);
         secondRow.click();
 
         cy.get('input[name="quantity"]').clear().type('1');

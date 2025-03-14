@@ -123,10 +123,10 @@ describe('Invoice flow', () => {
                 cy.contains('button', 'Save').should('be.disabled');
                 // add article
                 cy.contains('button', 'Add Article').click();
-                cy.get('div[test-id="name-0"]').click();
-                const articlesTable = cy.get('table[aria-label="articles table"]');
+                cy.get('#article-combo-box').click({force: true});
+                const articlesTable = cy.get('#article-combo-box-listbox');
                 // clicking second row because first row is table header
-                const secondRow = articlesTable.find('tr').eq(2);
+                const secondRow = articlesTable.find('li').eq(2);
                 secondRow.click();
 
                 cy.get('input[name="quantity"]')
@@ -138,11 +138,14 @@ describe('Invoice flow', () => {
             } else {
                 job.articles.forEach((a, index) => {
                     cy.get(`tr[data-rbd-draggable-id="${index} - ${a.id}"]`).within(() => {
-                        cy.get(`div[test-id^="name-"]`).should(($el) => {
-                            const elementText = removeControlCharsAndSpaces($el.text());
-                            const expectedText = removeControlCharsAndSpaces(isPlainString(a.name) ? a.name : getPlainStringFromHtml(a.name));
-                            expect(elementText).to.contain(expectedText);
-                        });
+                        cy.get('#article-combo-box')
+                            .invoke('val')
+                            .then((value) => {
+                                const elementText = removeControlCharsAndSpaces(value as string);
+                                const expectedText = removeControlCharsAndSpaces(isPlainString(a.name) ? a.name : getPlainStringFromHtml(a.name));
+                                expect(elementText).to.contain(expectedText);
+                            });
+
                         const capitalizedArticleType = a.article.type.charAt(0).toUpperCase() + a.article.type.slice(1).toLowerCase();
                         cy.get(`div[aria-label="${capitalizedArticleType}"]`);
                         cy.get('input[name="unitAmount.netAmount"]')
@@ -429,37 +432,56 @@ describe('Invoice flow', () => {
         ];
         mockArticles.forEach((a, index) => {
             cy.contains('button', 'Add Article').click();
+          
+            // Access the correct row and combo box
             cy.get(`tr[data-rbd-draggable-id^="${index} -"]`).within(() => {
-                cy.get(`div[test-id^="name-"]`).click();
-                // select article - clicking second row because first row is table header
-                cy.document().its('body').find('table[aria-label="articles table"] tr').eq(2).click();
-                const isMac = Cypress.platform === 'darwin';
-                cy.get('div[contenteditable="true"]')
-                    .first()
-                    .focus()
-                    .click()
-                    .wait(1000)
-                    .realPress(isMac ? ['Meta', 'A'] : ['Control', 'A'])
-                    // .realType('{del}')
-                    .realPress('Delete')
-                    .realType(`${a.name}`);
-                cy.get('input[name="quantity"]').clear().type(`{selectAll}${a.quantity}`);
-                cy.get('input[name="unitAmount.netAmount"]')
-                    .clear()
-                    .type(`{selectAll}${a.unitAmount.netAmount / 100}`);
-
-                // This Test for tax needs to be updated
-                cy.get('div[aria-labelledby^="select-tax-label"]').click();
-                cy.document().its('body').find('li[role="option"]').contains(`%`).click();
-
-                if (a.discount.type === DiscountType.AMOUNT) {
-                    cy.get('input[name="discount"').parent().find('button').click();
-                    cy.get('input[name="discount"]').clear().type(`{selectAll}${a.discount.amount.value}`);
-                } else {
-                    cy.get('input[name="discount"]').clear().type(`{selectAll}${a.discount.percentage}`);
-                }
+              cy.get('#article-combo-box').click({ force: true }); // Click combo box inside row
             });
-        });
+          
+            // Now outside of within - access global dropdown
+            cy.get('ul[role="listbox"]').should('be.visible'); // Wait for dropdown
+          
+            // Select item from dropdown
+            cy.get('ul[role="listbox"] li').eq(2).click({ force: true }); // Click 3rd option (index 2)
+          
+            // Continue filling fields inside the row
+            cy.get(`tr[data-rbd-draggable-id^="${index} -"]`).within(() => {
+              const isMac = Cypress.platform === 'darwin';
+          
+              cy.get('#article-combo-box')
+              .focus()
+              .click()
+              .wait(500)
+              .realPress(isMac ? ['Meta', 'A'] : ['Control', 'A'])
+              .realPress('Delete')
+              .realType(`${a.name}`);
+          
+              // Quantity input
+              cy.get('input[name="quantity"]').clear().type(`{selectAll}${a.quantity}`);
+          
+              // Unit amount input
+              cy.get('input[name="unitAmount.netAmount"]')
+                .clear()
+                .type(`{selectAll}${a.unitAmount.netAmount / 100}`);
+          
+              // Tax selection
+              cy.get('div[aria-labelledby^="select-tax-label"]').click();
+            });
+          
+            // Tax options are global too, so outside again
+            cy.document().its('body').find('li[role="option"]').contains('%').click();
+          
+            // Back inside row to apply discount
+            cy.get(`tr[data-rbd-draggable-id^="${index} -"]`).within(() => {
+              if (a.discount.type === DiscountType.AMOUNT) {
+                cy.get('input[name="discount"]').parent().find('button').click();
+                cy.get('input[name="discount"]').clear().type(`{selectAll}${a.discount.amount.value}`);
+              } else {
+                cy.get('input[name="discount"]').clear().type(`{selectAll}${a.discount.percentage}`);
+              }
+            });
+          });
+          
         // add global discount
         const globalDiscount = {
             type: DiscountType.AMOUNT,
