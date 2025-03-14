@@ -3,13 +3,14 @@ import UnitsPage from '../pages/unit.page';
 
 describe('Edit Unit', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
 
-        const elevatorApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?query=&pageIndex=0&pageSize=50`;
-        cy.intercept('GET', elevatorApi).as('elevatorApi');
+            const elevatorApi = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/elevators?query=&pageIndex=0&pageSize=50`;
+            cy.intercept('GET', elevatorApi).as('elevatorApi');
 
-        UnitsPage.visit();
+            UnitsPage.visit();
+        });
     });
 
     it('should validate unit', () => {

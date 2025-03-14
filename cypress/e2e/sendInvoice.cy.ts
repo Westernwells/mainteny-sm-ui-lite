@@ -3,17 +3,16 @@ import AppTopBarPage from '../pages/appTopBar.page';
 
 describe('Send Invoice via Email', () => {
     beforeEach(() => {
-        cy.login();
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
+            cy.intercept('GET', invoicesURL).as('invoicesApi');
+            const sendInvoiceAPI = `${Cypress.env().REACT_APP_API_URL}/api/invoices/*/send`;
+            cy.intercept('POST', sendInvoiceAPI).as('sendInvoiceAPI');
 
-        AppTopBarPage.selectLanguage('English');
-
-        const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
-        cy.intercept('GET', invoicesURL).as('invoicesApi');
-        const sendInvoiceAPI = `${Cypress.env().REACT_APP_API_URL}/api/invoices/*/send`;
-        cy.intercept('POST', sendInvoiceAPI).as('sendInvoiceAPI');
-
-        InvoicesPage.visit();
-        cy.wait('@invoicesApi');
+            InvoicesPage.visit();
+            cy.wait('@invoicesApi');
+        });
     });
 
     it('should send invoice and all form inputs are required', () => {

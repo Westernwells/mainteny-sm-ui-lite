@@ -3,13 +3,14 @@ import QuotationPage from '../pages/quotation.page';
 
 describe('Create Quotation', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
 
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
+            cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
 
-        QuotationPage.visit();
-        QuotationPage.openNewQuotation();
+            QuotationPage.visit();
+            QuotationPage.openNewQuotation();
+        });
     });
 
     it('should add new customer on quotation page', () => {
@@ -41,7 +42,7 @@ describe('Create Quotation', () => {
 
         // 🛠 Fix: Simulate user input interaction to trigger Formik validation
         cy.get('div[test-id="name-0"]').type('e').clear();
-
+        cy.wait(1000);
         // click outside
         cy.clearRichTextField('Payment terms');
 

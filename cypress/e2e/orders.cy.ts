@@ -3,13 +3,13 @@ import AppTopBarPage from '../pages/appTopBar.page';
 
 describe('Orders page - list page', () => {
     beforeEach(() => {
-        cy.login();
-
-        AppTopBarPage.selectLanguage('English');
-        const serviceOrderAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceOrders?*`;
-        cy.intercept('GET', serviceOrderAPI).as('serviceOrderAPI');
-        OrderPage.visit();
-        cy.get('span[role="progressbar"]').should('not.exist');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            const serviceOrderAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceOrders?*`;
+            cy.intercept('GET', serviceOrderAPI).as('serviceOrderAPI');
+            OrderPage.visit();
+            cy.get('span[role="progressbar"]').should('not.exist');
+        });
     });
 
     it('filter orders by status', () => {

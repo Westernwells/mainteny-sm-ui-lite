@@ -13,12 +13,13 @@ const interceptRequests = () => {
 };
 
 const setupTest = () => {
-    cy.login();
-    AppTopBarPage.selectLanguage('English');
-    interceptRequests();
-    ServiceJobPage.visit();
-    ServiceJobPage.changeTab(1);
-    cy.get('span[role="progressbar"]').should('not.exist');
+    cy.login().then(() => {
+        AppTopBarPage.selectLanguage('English');
+        interceptRequests();
+        ServiceJobPage.visit();
+        ServiceJobPage.changeTab(1);
+        cy.get('span[role="progressbar"]').should('not.exist');
+    });
 };
 
 describe('Service Job Tests', () => {

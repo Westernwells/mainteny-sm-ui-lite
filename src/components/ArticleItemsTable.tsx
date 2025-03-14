@@ -135,6 +135,7 @@ export const ArticleItemsTable = ({
       quantity: 1,
       unitAmount: article.unitSellingAmount,
       type: article.type,
+      id: article.id || '',
     };
     return getItemRecord(record, percentageVat);
   };

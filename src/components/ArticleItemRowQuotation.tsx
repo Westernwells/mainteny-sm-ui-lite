@@ -84,7 +84,7 @@ interface Props {
   propertyOwner?: PropertyOwnerView | null;
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
   isHovered?: boolean;
-  defaultPercentageVat?: number;
+  defaultVat?: VatView;
   taxRates: VatView[];
 }
 
@@ -178,7 +178,7 @@ export const ArticleItemRowQuotation = ({
   propertyOwner,
   handleSelectItem,
   isHovered,
-  defaultPercentageVat,
+  defaultVat,
   taxRates,
 }: Props) => {
   const {t} = useTranslation();
@@ -196,9 +196,13 @@ export const ArticleItemRowQuotation = ({
       unitAmount: {
         ...articleItem.unitAmount,
         percentageVat:
-          defaultPercentageVat !== undefined
-            ? defaultPercentageVat
-            : articleItem.unitAmount.percentageVat,
+          articleItem.unitAmount.percentageVat !== undefined
+            ? articleItem.unitAmount.percentageVat
+            : defaultVat !== undefined
+            ? defaultVat.percentage
+            : 0,
+        vatId: articleItem.unitAmount.vatId ?? defaultVat?.id ?? '',
+        vatName: articleItem.unitAmount.vatName ?? defaultVat?.name ?? '',
       },
     },
     onSubmit: () => {},
@@ -512,6 +516,7 @@ export const ArticleItemRowQuotation = ({
         <ClickAwayListener onClickAway={handlePopperClose}>
           <Box ref={articleAnchorEl}>
             <RichTextField
+              name={`name-${index}`}
               test-id={`name-${index}`}
               html={formik.values.name || ''}
               updateHtml={handleTextFieldChange(`name`)}

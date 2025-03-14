@@ -3,10 +3,11 @@ import AppTopBarPage from '../pages/appTopBar.page';
 
 describe('Settings page', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
-        SettingsPage.visit();
-        cy.get('span[role="progressbar"]').should('not.exist');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            SettingsPage.visit();
+            cy.get('span[role="progressbar"]').should('not.exist');
+        });
     });
 
     it('navigate to checklist and render new checklist page', () => {

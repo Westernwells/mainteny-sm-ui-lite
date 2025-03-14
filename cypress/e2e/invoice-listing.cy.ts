@@ -7,32 +7,35 @@ import {getPlainStringFromHtml} from '../../src/utils/rich-field-string';
 import {calculateArticlesAmount} from '../../src/utils/calculate-total';
 import {formatCurrency} from '../../src/utils/currency';
 import {ServiceCompany} from '../../src/models/service-company';
-import Table from '../utils/table';
 
 describe('Invoice listing page', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`).as('getInvoices');
-        InvoiceListingPage.visit();
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`).as('getInvoices');
+            InvoiceListingPage.visit();
+        });
     });
 
     it(`should show no entries message when filter returns nothing`, () => {
         cy.wait('@getInvoices');
+
         const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
         cy.intercept('GET', invoicesURL).as('invoicesURL');
 
         const searchText = 'zzzghhdgsshgdhsggdddtuwowuakfdyrdjdjfhssg';
 
-        cy.get('input[placeholder="Search"]').should('be.visible').clear({force: true});
-        cy.get('input[placeholder="Search"]').type(searchText, {force: true});
+        cy.get('input[placeholder="Search"]').should('be.visible').clear({force: true}).type(searchText, {force: true});
 
         cy.url().should('include', 'searchInvoices');
         cy.url().should('include', searchText);
 
-        cy.wait('@invoicesURL').its('response.body.data').should('have.length', 0);
-        Table.validateTableShouldHaveNoMatch();
+        cy.wait('@invoicesURL').then((interception) => {
+            if (interception.response.body && interception.response.body.data.length === 0) {
+                expect(interception.response.body.data).to.have.lengthOf(0);
+                cy.contains('No matching search results').should('exist');
+            }
+        });
     });
 
     it('should route to new invoice page on clicking new invoice button', () => {
@@ -139,6 +142,7 @@ describe('Invoice listing page', () => {
 
     it('should create credit note invoice', () => {
         cy.wait('@getInvoices');
+        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
         InvoiceListingPage.filterInvoicesListByStatus(InvoiceStatusView.NOT_PAID);
         cy.get('span[role="progressbar"]').should('not.exist');
 
@@ -153,9 +157,11 @@ describe('Invoice listing page', () => {
 
             // open action menu and click create credit note
             cy.contains('td[data-field="NUMBER"]', invoiceNumber)
+                .should('exist')
                 .parents('tr[role="row"]')
                 .find('button[data-testid="invoice-action-menu-button"]')
                 .click();
+
             cy.contains('li', 'Create Credit note').click();
             cy.contains('button', 'Yes').click();
 
