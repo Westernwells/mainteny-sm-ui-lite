@@ -1,33 +1,33 @@
-import {useContext, useLayoutEffect, useMemo, useState} from 'react';
-import {useNavigate, useParams} from 'react-router';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
-import PaymentsIcon from '@mui/icons-material/Payments';
-import GraphicEqIcon from '@mui/icons-material/GraphicEq';
-import ListIcon from '@mui/icons-material/ListAlt';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import SettingsIcon from '@mui/icons-material/Settings';
-import Invoices from 'pages/Invoices';
-import {TabsBody} from 'components/TabsBody';
-import {Tabs} from 'components/Tab';
-import {Confirm} from 'components/Confirm';
-import {LanguageContext} from 'context/LanguageProvider';
-import {useTranslation} from 'react-i18next';
-import {useDeleteElevator} from 'hooks/reactQuery/useElevator';
-import {theme} from 'theme';
-import Box from '@mui/material/Box';
-import {Button} from '@mui/material';
-import {serviceOrderTypeToString} from 'utils/service-order-utils';
-import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import EngineeringOutlinedIcon from '@mui/icons-material/EngineeringOutlined';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import ListIcon from '@mui/icons-material/ListAlt';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import PaymentsIcon from '@mui/icons-material/Payments';
+import SettingsIcon from '@mui/icons-material/Settings';
+import {Button} from '@mui/material';
+import Box from '@mui/material/Box';
+import {Confirm} from 'components/Confirm';
+import {Tabs} from 'components/Tab';
+import {TabsBody} from 'components/TabsBody';
+import {LanguageContext} from 'context/LanguageProvider';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useDeleteElevator} from 'hooks/reactQuery/useElevator';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import Invoices from 'pages/Invoices';
 import {iconMapping} from 'pages/ServiceOrders';
-import {OverviewTab} from './Tabs/OverviewTab';
-import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
-import {TodosTab} from './Tabs/TodosTab';
-import {PerformanceTab} from './Tabs/PerformanceTab';
+import {useContext, useLayoutEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useNavigate, useParams} from 'react-router';
+import {theme} from 'theme';
+import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import UnitNotes from './Notes';
+import {OverviewTab} from './Tabs/OverviewTab';
+import {PerformanceTab} from './Tabs/PerformanceTab';
+import {ServiceHistoryTab} from './Tabs/ServiceHistoryTab';
 import TechnicalDataTab from './Tabs/TechnicalDataTab';
+import {TodosTab} from './Tabs/TodosTab';
 
 interface Props {
   getCurrentPageTitle?: (title: string) => void;
@@ -108,7 +108,11 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
             : t(serviceOrderTypeToString(jobType?.givenName!)),
         action: () =>
           track(() => {
-            navigate(`/orders/new?type=${encodeURIComponent(jobType.name)}`);
+            navigate(
+              `/orders/new?type=${encodeURIComponent(
+                jobType.name,
+              )}&elevatorId=${elevatorId}`,
+            );
           }),
         icon: <IconComponent fontSize="small" />,
       };
