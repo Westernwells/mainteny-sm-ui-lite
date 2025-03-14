@@ -3,6 +3,9 @@ import {Progress} from 'components/Progress';
 import {useLayoutEffect} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {capitalize} from 'utils/utils';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
 interface Props {
@@ -12,8 +15,12 @@ interface Props {
 export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
   const [queryParams] = useSearchParams();
   const currentParams = Object.fromEntries([...queryParams]);
+  const {user} = useUserSession();
 
   const type = decodeURIComponent(currentParams.type || '');
+  const {data: jobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+  );
 
   const {
     data: elevator,
@@ -25,7 +32,9 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle && currentParams) {
-      getCurrentPageTitle(`New ${type} Job`);
+      const givenName =
+        jobTypes?.find((jobType) => jobType.name === type)?.givenName || type;
+      getCurrentPageTitle(`New ${capitalize([givenName])} Job`);
     }
   }, []);
 

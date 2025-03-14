@@ -15,6 +15,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import IconButton from '@mui/material/IconButton';
 import {FormikErrors} from 'formik';
+import {convertToText} from 'utils/utils';
 
 type Props = {
   type: TimeWindowType;
@@ -141,7 +142,7 @@ const Shift = ({
         }}
         gap={1}>
         <Switch value={shiftActive} onChange={handleToggle} />
-        <Typography>{t(labelKey)}</Typography>
+        <Typography>{t(convertToText(labelKey))}</Typography>
       </Box>
       {!shiftActive && (
         <Typography sx={{paddingTop: '8px'}}>

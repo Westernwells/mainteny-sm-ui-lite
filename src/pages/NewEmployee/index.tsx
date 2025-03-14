@@ -9,7 +9,6 @@ import {
 } from 'hooks/reactQuery/useUserAccount';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
-  AdditionalInformationEmployeeFormModel,
   BasicEmployeeFormModel,
   CreateEmployeeAccountData,
   CredentialEmployeeFormModel,
@@ -18,9 +17,6 @@ import {
 import {getRoles} from 'utils/work-hours-utils';
 import {Role, UserView} from 'models/user';
 import {createEmptyResource} from 'utils/paging';
-import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
-import {Progress} from 'components/Progress';
-import {AdditionalInformationEmployeeForm} from './AdditionalInformationEmployeeForm';
 import {BasicEmployeeForm} from './BasicEmployeeForm';
 import {CredentialEmployeeForm} from './CredentialEmployeeForm';
 import {SelectRoleEmployeeForm} from './SelectRoleEmployeeForm';
@@ -29,22 +25,13 @@ interface Props {
   getCurrentPageTitle?: (title: string) => void;
 }
 
-const steps = [
-  'Add basic info',
-  'Select role',
-  'Add password',
-  'Add work preferences',
-];
+const steps = ['Add basic info', 'Select role', 'Add password'];
 
 export const NewEmployee = ({getCurrentPageTitle}: Props) => {
   const navigate = useNavigate();
   const {addEmployeeAccount} = useEmployeeAccount();
 
   const {user} = useUserSession();
-
-  const {data: jobTypes, isLoading: loading} = useCompanyJobTypes(
-    user?.userAccount.serviceCompany.id!,
-  );
 
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -68,13 +55,6 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     useState<RoleEmployeeFormModel>({
       roles: [],
     });
-
-  const [
-    additionalInformationEmployeeFormValues,
-    setAdditionalInformationEmployeeFormValues,
-  ] = useState<AdditionalInformationEmployeeFormModel>({
-    serviceOrderTypes: jobTypes?.map((jobType) => jobType.name) || [],
-  });
 
   const [credentialEmployeeFormError, setCredentialEmployeeFormError] =
     useState<FormikErrors<CredentialEmployeeFormModel>>({});
@@ -123,23 +103,11 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
       return setDisableNextBtn(true);
     }
 
-    if (
-      activeStep === 3 &&
-      (roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) ||
-        roleEmployeeFormValues.roles.includes(Role.CONTRACTOR) ||
-        (roleEmployeeFormValues.roles.includes(Role.TECHNICIAN) &&
-          roleEmployeeFormValues.roles.includes(Role.SERVICE_MANAGER))) &&
-      additionalInformationEmployeeFormValues.serviceOrderTypes.length === 0
-    ) {
-      return setDisableNextBtn(true);
-    }
-
     return setDisableNextBtn(false);
   }, [
     activeStep,
     basicEmployeeFormError,
     roleEmployeeFormValues,
-    additionalInformationEmployeeFormValues,
     credentialEmployeeFormError,
   ]);
 
@@ -155,8 +123,6 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
     const body: CreateEmployeeAccountData = {
       phone: basicEmployeeFormValues.phone,
       roles: getRoles(roleEmployeeFormValues.roles[0]),
-      serviceOrderTypes:
-        additionalInformationEmployeeFormValues.serviceOrderTypes,
       address: basicEmployeeFormValues.address,
       lastName: basicEmployeeFormValues.lastName,
       firstName: basicEmployeeFormValues.firstName,
@@ -176,10 +142,6 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
       navigate('/employees?pageIndex=1&pageSize=25');
     });
   };
-
-  if (loading) {
-    return <Progress />;
-  }
 
   return (
     <Stepper
@@ -233,19 +195,6 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
                 setCredentialInformationEmployeeFormValues(values)
               }
               initialValues={credentialEmployeeFormValues}
-            />
-          </FlexContainer>
-        ) : null}
-
-        {activeStep === 3 ? (
-          <FlexContainer containerStyle={{mt: '2em'}}>
-            <AdditionalInformationEmployeeForm
-              getAdditionalInformationEmployeeFormValues={(values) =>
-                setAdditionalInformationEmployeeFormValues(values)
-              }
-              initialValues={additionalInformationEmployeeFormValues}
-              roles={roleEmployeeFormValues.roles}
-              jobTypes={jobTypes}
             />
           </FlexContainer>
         ) : null}

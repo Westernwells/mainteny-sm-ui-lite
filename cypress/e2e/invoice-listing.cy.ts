@@ -25,15 +25,10 @@ describe('Invoice listing page', () => {
 
         const searchText = 'zzzghhdgsshgdhsggdddtuwowuakfdyrdjdjfhssg';
 
-        cy.get('input[placeholder="Search"]').should('be.visible').clear({force: true});
+        cy.get('input[placeholder="Search"]').should('be.visible').clear({force: true}).type(searchText, {force: true});
 
-        cy.get('input[placeholder="Search"]')
-            .type(searchText, {force: true})
-            .invoke('val')
-            .then((inputValue: string) => {
-                cy.url().should('include', 'searchInvoices');
-                cy.url().should('include', inputValue);
-            });
+        cy.url().should('include', 'searchInvoices');
+        cy.url().should('include', searchText);
 
         cy.wait('@invoicesURL').then((interception) => {
             if (interception.response.body && interception.response.body.data.length === 0) {

@@ -1,4 +1,8 @@
-import {WEEK_DAYS_ARRAY, WEEK_DAYS_WITHOUT_WEEKENDS} from 'utils/datetime';
+import {
+  WEEK_DAYS_ARRAY,
+  WEEK_DAYS_WITHOUT_WEEKENDS,
+  WEEKEND_DAYS,
+} from 'utils/datetime';
 import Shift from 'components/Shift';
 import {
   EmployeeAccountData,
@@ -43,18 +47,24 @@ export const SelectShift = ({
     };
 
   const handleShiftCopyDown = (type: TimeWindowType) => (value: ShiftEntry) => {
-    const index = WEEK_DAYS_WITHOUT_WEEKENDS.indexOf(type);
-    const daysToChange = WEEK_DAYS_WITHOUT_WEEKENDS.slice(index);
+    if (WEEKEND_DAYS.includes(type)) {
+      const dayToChange = WEEKEND_DAYS.filter((entry) => entry !== type)[0];
 
-    const newValues = daysToChange.reduce(
-      (acc, entry) => ({
-        ...acc,
-        [entry]: value,
-      }),
-      values,
-    );
+      setFieldValue(`shifts.${dayToChange}`, value);
+    } else {
+      const index = WEEK_DAYS_WITHOUT_WEEKENDS.indexOf(type);
+      const daysToChange = WEEK_DAYS_WITHOUT_WEEKENDS.slice(index);
 
-    setFieldValue(`shifts`, newValues);
+      const newValues = daysToChange.reduce(
+        (acc, entry) => ({
+          ...acc,
+          [entry]: value,
+        }),
+        values,
+      );
+
+      setFieldValue(`shifts`, newValues);
+    }
   };
 
   return (
