@@ -3133,6 +3133,8 @@
   "Emergency Job": "Hitan posao",
   "Repair Job": "Posao popravljanja",
   "Inspection Job": "Inspekcijski posao",
+  "Installation Job": "Posao instalacije",
+  "Modernization Job": "Posao modernizacije",
   "Please enter valid shift times.": "Unesite važeća vremena smene.",
   "Show {{totalCount}} more": "Prikaži još {{totalCount}}"
 }
