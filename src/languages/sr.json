@@ -3129,6 +3129,10 @@
   "Invoice preview": "Pregled fakture",
   "Not working this day": "Ne radi ovaj dan",
   "Employees must work their scheduled shifts, otherwise they have to take absence leave. Public holidays are off by default.": "Zaposleni moraju da rade svoje zakazane smene, inače moraju da koriste odsustvo. Državni praznici su podrazumevano isključeni.",
+  "Maintenance Job": "Posao održavanja",
+  "Emergency Job": "Hitan posao",
+  "Repair Job": "Posao popravljanja",
+  "Inspection Job": "Inspekcijski posao",
   "Please enter valid shift times.": "Unesite važeća vremena smene.",
   "Show {{totalCount}} more": "Prikaži još {{totalCount}}"
 }
