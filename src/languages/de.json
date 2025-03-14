@@ -3109,5 +3109,6 @@
   "Not working this day": "Keine Schicht an diesem Tag",
   "Employees must work their scheduled shifts, otherwise they have to take absence leave. Public holidays are off by default.": "Mitarbeiter müssen ihre geplanten Schichten arbeiten, andernfalls müssen sie eine Abwesenheit nehmen. Gesetzliche Feiertage sind standardmäßig frei.",
   "Please enter valid shift times.": "Bitte geben Sie gültige Schichtzeiten ein.",
-  "Show {{totalCount}} more": "{{totalCount}} weitere anzeigen"
+  "Show {{totalCount}} more": "{{totalCount}} weitere anzeigen",
+  "Custom Price (Net)": "Benutzerdefinierter Preis (Netto)"
 }
