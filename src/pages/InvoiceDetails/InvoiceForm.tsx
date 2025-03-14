@@ -211,6 +211,7 @@ const articleViewToItem = (
     );
 
   const record: InvoiceItemRecord = {
+    id: articleView.id,
     article: articleView.article,
     name: articleView.name,
     description: articleView.description,

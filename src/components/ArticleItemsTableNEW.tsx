@@ -172,6 +172,7 @@ export const ArticleItemsTableNEW = ({
           vat: 0,
         },
       },
+      id: getUniqueId(),
       name: '',
       description: '',
       quantity: 0,
@@ -308,7 +309,7 @@ export const ArticleItemsTableNEW = ({
                   ref={providedDrop.innerRef}
                   {...providedDrop.droppableProps}>
                   {items.map((item, index) => {
-                    const key = index + (item.article?.id || item.id || '');
+                    const key = `${index} - ${item.id}`;
                     return (
                       <Draggable key={key} draggableId={key} index={index}>
                         {(provided) => (
@@ -337,14 +338,12 @@ export const ArticleItemsTableNEW = ({
                               propertyOwner={propertyOwner}
                               handleSelectItem={handleSelectItem}
                               isHovered={isHovered}
-                              defaultPercentageVat={defaultPercentageVat}
+                              defaultVat={defaultVat}
                               taxRates={taxRates!}
                               invoiceType={formik.values.type}
-                              jobArticleVat={
-                                jobArticles?.find(
-                                  (ja) => ja.article.id === item.article?.id,
-                                )?.unitAmount.percentageVat
-                              }
+                              jobArticleVat={jobArticles?.find(
+                                (ja) => ja.article.id === item.article?.id,
+                              )}
                             />
                           </TableRow>
                         )}

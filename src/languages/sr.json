@@ -3137,5 +3137,7 @@
   "New Inspection Job": "Novi inspekcijski posao",
   "New Installation Job": "Novi posao instalacije",
   "New Modernization Job": "Novi posao modernizacije",
-  "New General Job": "Novi opšti posao"
+  "New General Job": "Novi opšti posao",
+  "Please enter valid shift times.": "Unesite važeća vremena smene.",
+  "Show {{totalCount}} more": "Prikaži još {{totalCount}}"
 }

@@ -4,10 +4,11 @@ import UnitsPage from '../pages/unit.page';
 
 describe('Create Unit', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
-        UnitsPage.visit();
-        cy.get('span[role="progressbar"]').should('not.exist');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            UnitsPage.visit();
+            cy.get('span[role="progressbar"]').should('not.exist');
+        });
     });
 
     it('add unit technician and validate priority', () => {

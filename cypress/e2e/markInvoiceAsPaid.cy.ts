@@ -6,14 +6,14 @@ import InvoiceListingPage from '../pages/invoice-listing.page';
 
 describe('Mark invoice as paid', () => {
     beforeEach(() => {
-        cy.login();
-        AppTopBarPage.selectLanguage('English');
+        cy.login().then(() => {
+            AppTopBarPage.selectLanguage('English');
+            cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
+            cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`).as('invoicesApi');
 
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*`).as('serviceCompanyApi');
-        cy.intercept('GET', `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`).as('invoicesApi');
-
-        InvoicesPage.visit();
-        cy.wait('@invoicesApi');
+            InvoicesPage.visit();
+            cy.wait('@invoicesApi');
+        });
     });
 
     it('should open modal and mark invoice as paid successfully', () => {
