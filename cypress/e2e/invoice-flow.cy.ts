@@ -16,6 +16,7 @@ import AppTopBarPage from '../pages/appTopBar.page';
 import OrdersPage from '../pages/orders.page';
 import NewServiceJobPage from '../pages/new-service.page';
 import {randomEnumKey} from '../utils/utils';
+import InvoiceEditPage from '../pages/invoice-edit.page';
 
 describe('Invoice flow', () => {
     beforeEach(() => {
@@ -63,20 +64,19 @@ describe('Invoice flow', () => {
             cy.contains('Material costs without VAT: {MATERIAL_COST}');
 
             // assert Payment terms
-            const getPaymentTermsField = () => cy.get('div[data-testid="payment-terms-rich-text-field"]');
-            const openPaymentTermsDialog = () => getPaymentTermsField().find('svg[data-testid="TextSnippetIcon"]').click();
+            
             // check payment terms without discount
-            openPaymentTermsDialog();
+            InvoiceEditPage.openPaymentTermsDialog();
             cy.get('div[role="presentation"] label:has(p:only-child)')
                 .first()
                 .click()
                 .then(($label) => {
                     const paymentTerm = $label.text();
                     cy.contains('button', 'Confirm').click();
-                    getPaymentTermsField().find('div[role="textbox"]').invoke('text').should('contain', paymentTerm);
+                    InvoiceEditPage.getPaymentTermsField().find('div[role="textbox"]').invoke('text').should('contain', paymentTerm);
                 });
             // check payment terms with discount
-            openPaymentTermsDialog();
+            InvoiceEditPage.openPaymentTermsDialog();
             cy.get('div[role="presentation"] label:has(p:nth-of-type(3))')
                 .first()
                 .click()
@@ -98,7 +98,7 @@ describe('Invoice flow', () => {
                         )
                         .join('\n');
 
-                    getPaymentTermsField().find('div[role="textbox"]').invoke('text').should('contain', `${paymentTermName}\n${discountsText}`);
+                    InvoiceEditPage.getPaymentTermsField().find('div[role="textbox"]').invoke('text').should('contain', `${paymentTermName}\n${discountsText}`);
                 });
         });
         cy.wait('@getCustomerAPI').then((interception) => {
