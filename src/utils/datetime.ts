@@ -50,6 +50,8 @@ export const WEEK_DAYS_WITHOUT_WEEKENDS = [
   TimeWindowType.FRIDAY,
 ];
 
+export const WEEKEND_DAYS = [TimeWindowType.SATURDAY, TimeWindowType.SUNDAY];
+
 export function getDateObject(input: any): Date {
   const type = typeof input;
   if (type === 'string') {

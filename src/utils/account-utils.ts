@@ -27,7 +27,6 @@ export const formatCreateEmployeeAccountData = (
 
   const employee = {
     address: data.address,
-    serviceOrderTypes: data.serviceOrderTypes,
     team: data.team,
     roles: data?.roles || [],
     externalId: data.employeeId || '',
