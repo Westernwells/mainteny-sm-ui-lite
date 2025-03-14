@@ -1,4 +1,4 @@
-import {SyntheticEvent, useEffect, useRef, useState} from 'react';
+import React, {SyntheticEvent, useEffect, useRef, useState} from 'react';
 import {
   TextField,
   Autocomplete,
@@ -13,7 +13,7 @@ import {
   TextFieldProps,
 } from '@mui/material';
 import {t} from 'i18next';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {createHighlightedText} from 'utils/utils';
 import {createEmptyResource} from 'utils/paging';
 import {
@@ -35,8 +35,13 @@ import NoteAlt from '@mui/icons-material/NoteAlt';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
-import {Currency} from 'models/misc';
+import {Currency, MultiVatsAmount} from 'models/misc';
 import {removeHtmlTags} from 'utils/rich-field-string';
+import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
+import {ServiceOrderType} from 'models/service-order';
+import {PropertyOwnerView} from 'models/propertyManager';
+import keyBy from 'lodash/keyBy';
+import {getArticleTypes} from 'utils/article-utils';
 import {
   headerCellStyle,
   footerTableStyle,
@@ -58,11 +63,18 @@ interface Props {
   ) => void;
   rowId: string;
   serviceCompanyId: string;
-  onBlur: () => void;
+  onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
+  openOnFocus?: boolean;
+  propertyOwner?: PropertyOwnerView;
+  excludeTypes?: ArticleType[];
 }
 
+interface ExtendedArticleView extends ArticleView {
+  isCustom?: boolean;
+  customSellingAmount?: MultiVatsAmount;
+}
 interface ArticleRowProps {
-  option: ArticleView;
+  option: ExtendedArticleView;
   queryView: string;
   currentCurrency: Currency;
 }
@@ -220,10 +232,18 @@ const TableRowComponent = ({
     </td>
     <td style={{width: '72px', textAlign: 'right'}}>
       {formatCurrency(
-        (option.unitSellingAmount?.netAmount ?? 0) /
-          10 ** currentCurrency.fractionDigits,
-        {currency: currentCurrency.code},
+        centsToMoney(currentCurrency.code, option.unitSellingAmount?.netAmount),
       )}
+    </td>
+    <td style={{width: '116px', textAlign: 'right'}}>
+      {option.isCustom
+        ? formatCurrency(
+            centsToMoney(
+              currentCurrency.code,
+              option.customSellingAmount?.netAmount,
+            ),
+          )
+        : '-'}
     </td>
   </tr>
 );
@@ -236,6 +256,9 @@ export const NewArticleAutoComplete = ({
   rowId,
   serviceCompanyId,
   onBlur,
+  openOnFocus = true,
+  propertyOwner,
+  excludeTypes,
 }: Props) => {
   const currentCurrency = useCurrentCurrency();
   const [query, setQuery] = useState(
@@ -261,11 +284,46 @@ export const NewArticleAutoComplete = ({
         pageIndex: 0,
         pageSize: 5,
         query,
-        type: Object.values(ArticleType),
+        type: getArticleTypes({excludeTypes}),
       },
       {keepPreviousData: true},
       true,
     );
+
+  const {data: customPrices = []} = usePropertyOwnerQueryTravelWorks(
+    propertyOwner?.id || '',
+    {serviceOrderType: ServiceOrderType.GENERAL},
+    {enabled: !!propertyOwner?.id},
+  );
+
+  const customPricesMap = keyBy(customPrices, (item) => item.article.id);
+
+  const mergedArticles: ExtendedArticleView[] = (
+    articlesResource.data ?? []
+  ).map((article) => {
+    const customItem = customPricesMap[article.id];
+
+    if (customItem?.article) {
+      const customArticle = customItem.article;
+
+      return {
+        ...article,
+        name: removeHtmlTags(customArticle.name || article.name || ''),
+        description: removeHtmlTags(
+          customArticle.description || article.description || '',
+        ),
+        customSellingAmount: customArticle.unitSellingAmount,
+        isCustom: true,
+      };
+    }
+
+    return {
+      ...article,
+      name: removeHtmlTags(article.name || ''),
+      description: removeHtmlTags(article.description || ''),
+      isCustom: false,
+    };
+  });
 
   useEffect(() => {
     if (inputRef.current) {
@@ -309,14 +367,24 @@ export const NewArticleAutoComplete = ({
         serviceCompanyId: serviceCompanyId || '',
         externalId: companyNextNumber?.value || '',
         unitPurchaseAmount: {
-          currency: currentCurrency.code || 'EUR',
-          netAmount: 0,
-          percentageVat: 0,
+          currency:
+            (articleBody as ArticleView).unitPurchaseAmount?.currency ||
+            currentCurrency.code ||
+            'EUR',
+          netAmount:
+            (articleBody as ArticleView).unitPurchaseAmount?.netAmount ?? 0,
+          percentageVat:
+            (articleBody as ArticleView).unitPurchaseAmount?.percentageVat ?? 0,
         },
         unitSellingAmount: {
-          currency: currentCurrency.code || 'EUR',
-          netAmount: 0,
-          percentageVat: 0,
+          currency:
+            (articleBody as ArticleView).unitSellingAmount?.currency ||
+            currentCurrency.code ||
+            'EUR',
+          netAmount:
+            (articleBody as ArticleView).unitSellingAmount?.netAmount ?? 0,
+          percentageVat:
+            (articleBody as ArticleView).unitSellingAmount?.percentageVat ?? 0,
         },
         stock: {
           currentStock: 1,
@@ -368,19 +436,15 @@ export const NewArticleAutoComplete = ({
     setSelectedArticle(article as ArticleView);
   };
 
-  const articles = articlesResource.data || [];
-
   return (
     <Autocomplete
       freeSolo
       size="small"
       id="article-combo-box"
       disableClearable
-      clearOnBlur
       disablePortal
       clearOnEscape
-      openOnFocus
-      blurOnSelect
+      openOnFocus={openOnFocus}
       sx={{
         width: '100%',
         '& .MuiAutocomplete-popper': {zIndex: 101},
@@ -390,11 +454,7 @@ export const NewArticleAutoComplete = ({
           },
       }}
       inputValue={queryView}
-      options={articles.map((article) => ({
-        ...article,
-        name: removeHtmlTags(article.name || ''),
-        description: removeHtmlTags(article.description || ''),
-      }))}
+      options={mergedArticles}
       renderOption={(params, option) => (
         <li {...params} key={option.id}>
           <table style={{width: '100%', tableLayout: 'fixed'}}>
@@ -434,11 +494,9 @@ export const NewArticleAutoComplete = ({
           />
         );
       }}
-      isOptionEqualToValue={(option, value) =>
-        option.externalId === value.externalId
-      }
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       getOptionLabel={(option) =>
-        typeof option !== 'string' ? removeHtmlTags(option.name || '') : ''
+        typeof option === 'string' ? option : removeHtmlTags(option.name || '')
       }
       PopperComponent={CustomPopper}
     />

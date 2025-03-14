@@ -208,7 +208,7 @@ export const NewArticle = () => {
       storageLocation: formik.values.storageLocation,
       subCategory: '',
       suppliers: suppliers.filter((s) => !!s.supplierId),
-      type: formik.values.type.toUpperCase(),
+      type: formik.values.type,
       unit: formik.values.unit,
       unitPurchaseAmount: amountRecordForBackendWithVatId(
         makeAmountRecordWithVatId(

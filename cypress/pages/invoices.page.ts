@@ -76,8 +76,19 @@ export default class InvoicesPage {
 
     // Add article
     cy.contains('button', 'Add Article').click();
-    cy.get('div[test-id="name-0"]').click();
-    cy.get('table[aria-label="articles table"]').find('tr').eq(2).click();
+    cy.get('#article-combo-box').click({force: true});
+
+    cy.get('#article-combo-box-listbox')
+      .should('exist')
+      .and('be.visible')
+      .find('li')
+      .should('have.length.greaterThan', 1);
+
+    cy.get('#article-combo-box-listbox')
+      .find('li')
+      .eq(2)
+      .should('be.visible')
+      .click({waitForAnimations: false, force: true});
 
     cy.get('input[name="quantity"]').clear().type('1');
     cy.get('input[name="unitAmount.netAmount"]').clear().type('100');
