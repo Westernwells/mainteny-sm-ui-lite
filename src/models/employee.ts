@@ -230,7 +230,6 @@ export type ShiftForm = Record<TimeWindowType, ShiftEntry>;
 export type CreateEmployeeAccountData = Partial<CreateUserAccountData> & {
   phone: string;
   roles: string[];
-  serviceOrderTypes: string[];
   address: AddressRecord | null;
   employeeId: string;
   team?: string;
