@@ -338,6 +338,40 @@ export const getFormattedPaymentValues = (
   return discountValues;
 };
 
+export const getFormattedPaymentValuesForPartialUpfrontAndFinal = (
+  paymentTerm: InvoicePaymentTermRecord & {
+    data?: PaymentTermData;
+  },
+  invoice: InvoiceView,
+  totalAmount: number,
+  currentCurrency?: Currency,
+) => {
+  const discountValues = paymentTerm?.data?.discountOptions?.map((d) => {
+    const dueDate = addDays(
+      invoice.sentDate ? new Date(invoice.sentDate) : new Date(),
+      d.discountDays || 0,
+    );
+    const formattedDueDate = formatDate(dueDate);
+
+    const invoiceAmount = centsToMoney(currentCurrency?.code!, totalAmount);
+
+    // Apply the discount percentage to the total amount
+    const discountPercentage = d.discountPercent || 0;
+    const discountAmount = invoiceAmount * (discountPercentage / 100);
+
+    const paymentAmount = invoiceAmount - discountAmount;
+
+    return {
+      formattedDueDate,
+      discountAmount,
+      invoiceAmount,
+      paymentAmount,
+    };
+  });
+
+  return discountValues;
+};
+
 export const replacePaymentTermsPlaceholders = (
   template: string,
   replacements: {

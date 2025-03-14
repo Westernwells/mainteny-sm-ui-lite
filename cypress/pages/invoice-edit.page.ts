@@ -72,4 +72,12 @@ export default class InvoiceEditPage {
         });
     });
   };
+
+  static getPaymentTermsField = () =>
+    cy.get('div[data-testid="payment-terms-rich-text-field"]');
+
+  static openPaymentTermsDialog = () =>
+    InvoiceEditPage.getPaymentTermsField()
+      .find('svg[data-testid="TextSnippetIcon"]')
+      .click();
 }
