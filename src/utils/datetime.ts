@@ -18,6 +18,7 @@ import {useTranslation} from 'react-i18next';
 import {de, enUS, srLatn} from 'date-fns/locale';
 import * as datePickerLocales from '@mui/x-date-pickers/locales';
 import {companyLanguageToUppercaseMap} from 'utils/language';
+import {TimeWindowType} from 'models/employee';
 import {Language} from '../models/misc';
 
 export const DEFAULT_DATE_FORMAT = 'dd.MM.yyyy';
@@ -30,6 +31,26 @@ interface DateFormatOptions {
   useAdditionalWeekYearTokens?: boolean | undefined;
   useAdditionalDayOfYearTokens?: boolean | undefined;
 }
+
+export const WEEK_DAYS_ARRAY = [
+  TimeWindowType.MONDAY,
+  TimeWindowType.TUESDAY,
+  TimeWindowType.WEDNESDAY,
+  TimeWindowType.THURSDAY,
+  TimeWindowType.FRIDAY,
+  TimeWindowType.SATURDAY,
+  TimeWindowType.SUNDAY,
+];
+
+export const WEEK_DAYS_WITHOUT_WEEKENDS = [
+  TimeWindowType.MONDAY,
+  TimeWindowType.TUESDAY,
+  TimeWindowType.WEDNESDAY,
+  TimeWindowType.THURSDAY,
+  TimeWindowType.FRIDAY,
+];
+
+export const WEEKEND_DAYS = [TimeWindowType.SATURDAY, TimeWindowType.SUNDAY];
 
 export function getDateObject(input: any): Date {
   const type = typeof input;
@@ -309,3 +330,17 @@ export const fromDateStringToDate = (
 
 export const toRestDateTimeFormat = (date: Date) =>
   format(date, "yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+/**
+ * Converts a time representation to the starting Date object with the given time
+ * @param value A string time stamp in the format HH:mm
+ * @return The corresponding Date object with the default date and updated time fields
+ */
+export const parseTimeFromHoursMinutesToDate = (value: string) =>
+  new Date(
+    0,
+    0,
+    0,
+    parseInt(value.split(':')[0] ?? '0', 10),
+    parseInt(value.split(':')[1] ?? '0', 10),
+  );

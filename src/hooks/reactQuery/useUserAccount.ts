@@ -3,13 +3,15 @@ import {useTranslation} from 'react-i18next';
 import {queryKeys as qks} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 
-import {UserQueryParams} from 'models/employee';
+import {
+  CreateEmployeeAccountData,
+  EmployeeAccountData as EditEmployeeAccountData,
+  UserQueryParams,
+} from 'models/employee';
 import {Resource, WithOptional} from 'models/misc';
 import {UserView} from 'models/user';
-import {EmployeeAccountData} from 'pages/NewEmployee/model';
-import {EmployeeAccountData as EditEmployeeAccountData} from 'pages/EmployeeDetails/Tabs/EmployeeOverview/EditEmployeeForm/model';
 import {
-  formatEmployeeAccountData,
+  formatCreateEmployeeAccountData,
   formatUpdateEmployeeAccountData,
 } from 'utils/account-utils';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
@@ -68,10 +70,10 @@ export const useEmployeeAccount = () => {
   const {t} = useTranslation();
 
   const addEmployeeAccount = async (
-    accountData: EmployeeAccountData,
+    accountData: CreateEmployeeAccountData,
     onSuccess?: () => void,
   ): Promise<void> => {
-    const requestBody = formatEmployeeAccountData(accountData);
+    const requestBody = formatCreateEmployeeAccountData(accountData);
 
     try {
       const {status} = await axiosClient.post(

@@ -18,6 +18,8 @@ import {useServiceManager} from 'hooks/reactQuery/useServiceManager';
 import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
 import {Role, UserView} from 'models/user';
 import {createEmptyResource, makePage} from 'utils/paging';
+import {aggregateWeekShifts} from 'utils/shift';
+import {ShiftForm} from 'models/employee';
 import {columns, makeRows} from './UserDataGridProps';
 import {UserFormTypes} from './model';
 import {UserForm} from './UserForm';
@@ -84,7 +86,7 @@ export const UserTable = ({companyId}: Props) => {
       phone: '',
       email: '',
       employeeId: '',
-      shifts: [],
+      shifts: {} as ShiftForm,
       password: '',
       address: null,
     },
@@ -119,12 +121,8 @@ export const UserTable = ({companyId}: Props) => {
       email: item?.userAccount.contact.email || '',
       employeeId: item?.userData?.externalId,
       shifts: item.userData.workingHours
-        ? item.userData.workingHours.map((shift) => ({
-            fromTime: shift.fromTime,
-            toTime: shift.toTime,
-            type: shift.type,
-          }))
-        : [],
+        ? aggregateWeekShifts(item.userData.workingHours)
+        : ({} as ShiftForm),
       address: item.userData.address ? item.userData.address : null,
     });
     setTypeAction('edit');
@@ -139,7 +137,7 @@ export const UserTable = ({companyId}: Props) => {
       lastName: '',
       email: '',
       employeeId: '',
-      shifts: [],
+      shifts: {} as ShiftForm,
       password: '',
       address: null,
     });

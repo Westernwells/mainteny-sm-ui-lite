@@ -194,8 +194,10 @@ export const UserForm = ({formik, typeForm}: Props) => {
 
         <Grid item xs={12}>
           <SelectShift
-            values={formik.values}
+            values={formik.values.shifts}
+            errors={formik.errors}
             setFieldValue={formik.setFieldValue}
+            setErrors={formik.setErrors}
           />
         </Grid>
       </Grid>
