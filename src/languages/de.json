@@ -3120,5 +3120,6 @@
   "Please enter valid shift times.": "Bitte geben Sie gültige Schichtzeiten ein.",
   "Show {{totalCount}} more": "{{totalCount}} weitere anzeigen",
   "Custom Price (Net)": "Benutzerdefinierter Preis (Netto)",
-  "Select VAT": "Steuersatz wählen"
+  "Select VAT": "Steuersatz wählen",
+  "Purchase invoices": "Eingangsrechnungen"
 }
