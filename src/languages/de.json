@@ -3108,7 +3108,17 @@
   "Invoice preview": "Rechnungsvorschau",
   "Not working this day": "Keine Schicht an diesem Tag",
   "Employees must work their scheduled shifts, otherwise they have to take absence leave. Public holidays are off by default.": "Mitarbeiter müssen ihre geplanten Schichten arbeiten, andernfalls müssen sie eine Abwesenheit nehmen. Gesetzliche Feiertage sind standardmäßig frei.",
+  "Maintenance Job": "Wartungsauftrag",
+  "Emergency Job": "Notfallauftrag",
+  "Repair Job": "Reparaturauftrag",
+  "Callout Job": "Personeneinschlussauftrag",
+  "Inspection Job": "Inspektionsauftrag",
+  "Installation Job": "Installationsauftrag",
+  "Modernization Job": "Modernisierungsauftrag",
+  "General Job": "Anderer Auftrag",
+  "Elevator Operation Job": "Aufzugswärterauftrag",
   "Please enter valid shift times.": "Bitte geben Sie gültige Schichtzeiten ein.",
   "Show {{totalCount}} more": "{{totalCount}} weitere anzeigen",
-  "Custom Price (Net)": "Benutzerdefinierter Preis (Netto)"
+  "Custom Price (Net)": "Benutzerdefinierter Preis (Netto)",
+  "Select VAT": "Steuersatz wählen"
 }
