@@ -1,12 +1,19 @@
-import {Switch as MuiSwitch} from '@mui/material';
+import {Switch as MuiSwitch, SwitchProps} from '@mui/material';
 import styled from '@mui/system/styled';
+import {ChangeEvent} from 'react';
 
-type Props = {
+type Props = SwitchProps & {
   value: boolean;
-  onChange: () => void;
+  testId?: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
-const Switch = ({value, onChange}: Props) => {
+const Switch = ({
+  value,
+  testId,
+  onChange,
+  ...switchPassthroughProps
+}: Props) => {
   const AntSwitch = styled(MuiSwitch)(({theme}) => ({
     width: 28,
     height: 16,
@@ -36,7 +43,14 @@ const Switch = ({value, onChange}: Props) => {
     },
   }));
 
-  return <AntSwitch checked={value} onChange={onChange} />;
+  return (
+    <AntSwitch
+      data-testid={testId}
+      checked={value}
+      onChange={onChange}
+      {...switchPassthroughProps}
+    />
+  );
 };
 
 export default Switch;
