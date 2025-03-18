@@ -3135,5 +3135,9 @@
   "Show {{totalCount}} more": "Prikaži još {{totalCount}}",
   "Custom Price (Net)": "Prilagođena cena (neto)",
   "Select VAT": "Izaberite PDV",
-  "You are about to remove this position permanently from this quotation. This action can't be undone. Do you want to proceed?": "Spremate se da trajno uklonite ovu poziciju iz ove ponude. Ova radnja se ne može opozvati. Da li želite da nastavite?"
+  "You are about to remove this position permanently from this quotation. This action can't be undone. Do you want to proceed?": "Spremate se da trajno uklonite ovu poziciju iz ove ponude. Ova radnja se ne može opozvati. Da li želite da nastavite?",
+  "Delete position": "Obriši poziciju",
+  "Purchase invoices": "Kupovina faktura",
+  "Typography and color": "Tipografija i boja",
+  "Typeface": "Tip slova"
 }
