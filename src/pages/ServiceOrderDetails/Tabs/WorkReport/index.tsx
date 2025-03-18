@@ -505,6 +505,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
       },
       showTime: report?.additionalInfo.showTime ?? true,
       showHours: report?.additionalInfo.showHours ?? true,
+      customerName: report?.additionalInfo.customerName ?? '',
     },
     onSubmit: (values) => {
       const body = {
@@ -522,6 +523,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
         ),
         showHours: values.showHours,
         showTime: values.showTime,
+        customerName: values.customerName,
       };
 
       const updatedReport: CompleteServiceOrder = {
@@ -880,6 +882,8 @@ export const WorkReport = ({serviceOrder}: Props) => {
             <Signature
               name={serviceOrder.elevator.propertyOwner.name}
               designation="Customer"
+              formik={formik}
+              disabled={!isEditMode}
               url={downloadUrls[signatureKeys.CUSTOMER]}
             />
             <Signature
