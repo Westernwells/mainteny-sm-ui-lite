@@ -1,8 +1,9 @@
-import {UseQueryOptions, useQuery} from 'react-query';
+import {useQuery, UseQueryOptions} from 'react-query';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {
   FormatType,
+  QueryDatevFinancials,
   QueryFinancials,
   QueryWorkingHours,
   ReportType,
@@ -117,7 +118,7 @@ export const fetchInvoicesDatev = async (
 
 export const useInvoicesDatev = (
   serviceCompanyId: string,
-  params: QueryFinancials,
+  params: QueryDatevFinancials,
 ) => {
   const {enqueueSnackbar, showError} = useSnackbar();
   return useQuery(
