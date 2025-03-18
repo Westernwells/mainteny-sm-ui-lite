@@ -576,14 +576,16 @@ export const InvoiceForm = ({
           : // eslint-disable-next-line @typescript-eslint/no-use-before-define
             isExternalIdUnique(allInvoiceResource.data, value),
     ),
+    type: Yup.string().optional(),
     payment: Yup.object().when('type', {
       is: (v: string) =>
         v === InvoiceType.PARTIAL ||
         v === InvoiceType.UPFRONT ||
         v === InvoiceType.FINAL,
-      then: Yup.object().shape({
-        description: Yup.string().required('Name is required'),
-      }),
+      then: () =>
+        Yup.object().shape({
+          description: Yup.string().required('Name is required'),
+        }),
     }),
   });
 
@@ -1719,10 +1721,15 @@ export const InvoiceForm = ({
       );
     });
 
+    const hasEmptyItemName = formik.values.items.some(
+      (item) => !item.name?.trim(),
+    );
+
     const valid =
       formik.values.subject &&
       formik.values.type.length &&
       formik.values.items.length &&
+      !hasEmptyItemName &&
       !!customer &&
       hasValidVat &&
       Object.keys(formik.errors).length === 0;

@@ -1,34 +1,22 @@
-import {useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {useTranslation} from 'react-i18next';
 import {isEqual} from 'lodash';
 import {
   Box,
-  ClickAwayListener,
   FormControl,
   IconButton,
   InputAdornment,
   MenuItem,
-  Paper,
   Popover,
-  Popper,
   Select,
   SelectChangeEvent,
-  Table,
-  TableBody,
   TableCell,
-  tableCellClasses,
-  TableCellProps,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import {getIn, useFormik} from 'formik';
 import {DiscountType, InvoiceItemRecord, InvoiceType} from 'models/invoice';
 import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
@@ -37,123 +25,44 @@ import {LanguageContext} from 'context/LanguageProvider';
 import {
   convertNumberToAmountNumber,
   Currencies,
-  formatCurrency,
   getDecimalSeparator,
   getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
-import {createHighlightedText, filterArrayBySearchText} from 'utils/utils';
 import {getItemTotalAfterPerItemDiscount} from 'utils/calculate-total';
 import {ArticleType, ArticleView} from 'models/article';
-import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
-import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
-import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
 import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import * as Yup from 'yup';
-import {useArticles} from 'hooks/reactQuery/useArticle';
-import {createEmptyResource} from 'utils/paging';
 import {
   calculatePackageMaterialLaborPercentages,
   getArticleTypeText,
-  getArticleTypes,
+  mapUpdatedBodyToArticleView,
 } from 'utils/article-utils';
 import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
-import {useDebounce} from 'hooks/useDebounce';
-import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
-import {ServiceOrderArticleView, ServiceOrderType} from 'models/service-order';
 import {VatView} from 'models/vat';
+import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {ServiceOrderArticleView} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {FormSelect} from './form/FormSelect';
-import {TabItems, Tabs} from './Tab';
-import {TabsBody} from './TabsBody';
-import {EmptySection} from './EmptySection';
 import ArticleTypeCard from './ArticleTypeCard';
 import RichTextField from './RichTextField';
-import {
-  getPlainStringFromHtml,
-  isPlainString,
-} from '../utils/rich-field-string';
+import NewArticleAutoComplete from './NewArticleAutocomplete';
 
 interface Props {
   articleItem: InvoiceItemRecord;
   index: number;
   deleteItem: (indexPos: number) => void;
   setItemAtIndex: (indexPos: number, item: InvoiceItemRecord) => void;
-  propertyOwner?: PropertyOwnerView;
   handleSelectItem: (row: ArticleView, indexPosition: number) => void;
-  isHovered?: boolean;
   defaultVat?: VatView;
   taxRates: VatView[];
   invoiceType: InvoiceType;
   jobArticleVat?: ServiceOrderArticleView;
+  propertyOwner?: PropertyOwnerView;
 }
-
-interface TableRowProps {
-  index: number;
-  item: ArticleView;
-  searchText: string;
-  handleSelectItem: (row: ArticleView, index: number) => void;
-}
-
-enum TabValues {
-  ARTICLES = 0,
-  CUSTOM_ARTICLES = 1,
-}
-
-const TableRowComponent = ({
-  index,
-  item,
-  searchText,
-  handleSelectItem,
-}: TableRowProps) => {
-  // detect html tags in string and remove them if needed
-  const itemName = useMemo(
-    () =>
-      isPlainString(item.name) ? item.name : getPlainStringFromHtml(item.name),
-    [item],
-  );
-
-  return (
-    <TableRow
-      key={item.id}
-      sx={{width: '100%', cursor: 'pointer'}}
-      onClick={() => {
-        handleSelectItem(item, index);
-      }}>
-      <TableCell sx={{padding: '0.8em 0em !important', width: '30%'}}>
-        <Typography variant="subtitle1">
-          {createHighlightedText(itemName, searchText)}
-        </Typography>
-      </TableCell>
-      <TableCell sx={{width: '25%'}}>
-        <Typography variant="subtitle1">
-          {createHighlightedText(item.externalId, searchText)}
-        </Typography>
-      </TableCell>
-      <TableCell sx={{width: '15%'}}>
-        <Typography variant="subtitle1">
-          {createHighlightedText(item.category, searchText)}
-        </Typography>
-      </TableCell>
-      <TableCell
-        sx={{
-          textAlign: 'right',
-          padding: '2em 0em',
-          width: '35%',
-        }}>
-        <Typography variant="subtitle1">
-          {formatCurrency(
-            (item.unitSellingAmount.netAmount ?? 0) /
-              10 ** (item.unitSellingAmount.fractionDigits ?? 0),
-            {
-              currency: item.unitSellingAmount.currency,
-            },
-          )}
-        </Typography>
-      </TableCell>
-    </TableRow>
-  );
-};
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Article cannot be empty'),
@@ -165,19 +74,23 @@ export const ArticleItemRowNEW = ({
   index,
   deleteItem,
   setItemAtIndex,
-  propertyOwner,
   handleSelectItem,
-  isHovered,
   defaultVat,
   invoiceType,
   taxRates,
   jobArticleVat,
+  propertyOwner,
 }: Props) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
+  const {user} = useUserSession();
+  const serviceCompanyId = user?.userAccount.serviceCompany.id;
+
   const [showDescription, setShowDescription] = useState<boolean>(
     !!articleItem.description,
   );
+  const [manuallyToggledDescription, setManuallyToggledDescription] =
+    useState<boolean>(false);
 
   const {language: selectedLng} = useContext(LanguageContext);
 
@@ -209,6 +122,7 @@ export const ArticleItemRowNEW = ({
     },
     onSubmit: () => {},
     validationSchema,
+    enableReinitialize: true,
   });
 
   const price =
@@ -225,25 +139,6 @@ export const ArticleItemRowNEW = ({
       discount: formik.values.discount,
     },
   });
-
-  useEffect(() => {
-    if (!isEqual(articleItem, formik.values)) {
-      setItemAtIndex(index, {
-        ...formik.values,
-        article: {
-          ...formik.values.article,
-          name: formik.values.name,
-          type: formik.values.article?.type,
-          unit: formik.values.article?.unit,
-          unitSellingAmount: formik.values.unitAmount,
-        },
-        unitAmount: {
-          ...formik.values.unitAmount,
-          netAmount: convertNumberToAmountNumber(price, currentCurrency),
-        },
-      });
-    }
-  }, [formik.values]);
 
   const handleDiscountTypeChange = () => {
     formik.setFieldValue('discount', {
@@ -285,15 +180,7 @@ export const ArticleItemRowNEW = ({
     }
   };
 
-  const [popperOpen, setPopperOpen] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const debouncedSearchText = useDebounce(searchText);
-
-  const [tabValue, setTabValue] = useState(TabValues.ARTICLES);
-
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [showArticleSearch, setShowArticleSearch] = useState<boolean>(false);
-  const articleAnchorEl = useRef<HTMLDivElement>();
   const open = Boolean(anchorEl);
 
   const handleClick = (event: any) => {
@@ -303,74 +190,6 @@ export const ArticleItemRowNEW = ({
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleTextFieldChange = (fieldName: string) => (value: string) => {
-    formik.setFieldValue(fieldName, value);
-    formik.setFieldTouched(fieldName, true, false);
-    // create plain test search value without html tags
-    const plainText = getPlainStringFromHtml(value);
-    if (isPlainString(plainText)) setSearchText(plainText);
-  };
-
-  const handleArticleTextFieldClick = () => {
-    setShowArticleSearch(true);
-    setPopperOpen(true);
-  };
-
-  const {
-    data: articleResource = createEmptyResource<ArticleView>(30),
-    isLoading: isArticleLoading,
-  } = useArticles(
-    {
-      pageIndex: 0,
-      pageSize: 30,
-      query: debouncedSearchText,
-      type: getArticleTypes({excludeTypes: [ArticleType.MIX]}),
-    },
-    {keepPreviousData: true, enabled: popperOpen && tabValue === 0},
-  );
-
-  const {data: customArticleResource = [], isLoading: isCustomPriceLoading} =
-    usePropertyOwnerQueryTravelWorks(
-      propertyOwner?.id || '',
-      {
-        serviceOrderType: ServiceOrderType.GENERAL,
-      },
-      {
-        keepPreviousData: true,
-        enabled: popperOpen && tabValue === 1 && !!propertyOwner?.id,
-      },
-    );
-
-  const filteredCustomArticles = useMemo(
-    () =>
-      filterArrayBySearchText(customArticleResource, debouncedSearchText, [
-        'article.name',
-        'article.externalId',
-        'article.category',
-      ]),
-    [customArticleResource, debouncedSearchText],
-  );
-
-  useEffect(() => {
-    if (formik.values.article?.type === ArticleType.PACKAGE) {
-      const {laborPercentage, materialPercentage} =
-        calculatePackageMaterialLaborPercentages(
-          articleItem.article?.costPackage ||
-            articleItem.article?.additionalInfo?.costPackage,
-        );
-
-      formik.setFieldValue('article.costPackage', {
-        ...formik.values.article?.costPackage,
-        laborPercentage,
-        materialPercentage,
-      });
-    }
-  }, [formik.values.article?.type]);
-
-  const handlePopperClose = () => {
-    setShowArticleSearch(false);
   };
 
   const onChangePercentageVat = (event: SelectChangeEvent<string>) => {
@@ -408,121 +227,46 @@ export const ArticleItemRowNEW = ({
     return '';
   })();
 
-  const tabItems: TabItems[] = useMemo(() => {
-    const tItems = [
-      {
-        label: 'Articles & Spare parts',
-        icon: <HomeRepairServiceIcon />,
-      },
-    ];
-    if (propertyOwner?.id) {
-      tItems.push({
-        label: 'Custom prices',
-        icon: <ReceiptLongIcon />,
+  useEffect(() => {
+    if (!isEqual(articleItem, formik.values)) {
+      setItemAtIndex(index, {
+        ...formik.values,
+        article: {
+          ...formik.values.article,
+          name: formik.values.name,
+          type: formik.values.article?.type,
+          unit: formik.values.article?.unit,
+          unitSellingAmount: formik.values.unitAmount,
+        },
+        unitAmount: {
+          ...formik.values.unitAmount,
+          netAmount: convertNumberToAmountNumber(price, currentCurrency),
+        },
       });
     }
-    return tItems;
-  }, [propertyOwner]);
+  }, [formik.values]);
 
-  const columns: {name: string; align?: TableCellProps['align']}[] = [
-    {name: 'Name'},
-    {name: 'Article #'},
-    {name: 'Category'},
-    {name: 'Selling Price (excl. VAT)', align: 'right'},
-  ];
-
-  const renderTable = (data: ArticleView[], isDataLoading: boolean) => {
-    if (data.length <= 0 || isDataLoading) {
-      return (
-        <EmptySection
-          label="We couldn't find any articles & spare parts."
-          containerStyle={{height: '100%', my: '2em'}}
-          illustration="articles"
-          labelStyle={{fontSize: '1.2rem', fontWeight: 400, color: '#8F9BB3'}}
-        />
-      );
+  useEffect(() => {
+    if (!manuallyToggledDescription) {
+      setShowDescription(!!formik.values.description);
     }
+  }, [formik.values.description, manuallyToggledDescription]);
 
-    return (
-      <TableContainer
-        sx={{
-          overflowY: 'scroll',
-          maxHeight: '290px',
-          '&::-webkit-scrollbar': {
-            width: '6px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#8F9BB380',
-            borderRadius: '10px',
-          },
-        }}>
-        <Table
-          sx={{
-            width: '100%',
-            [`& .${tableCellClasses.root}`]: {
-              p: 0,
-              px: 0.5,
-              borderBottom: 'none',
-              borderSpacing: '0 1rem',
-            },
-            [`& .${tableCellClasses.head}`]: {
-              p: 0,
-              px: 0.5,
-              color: 'text.secondary',
-              typography: 'caption',
-            },
-            [`& .${tableCellClasses.body}`]: {
-              p: 0,
-              px: 0.5,
-            },
-            '& .MuiOutlinedInput-root': {
-              fieldset: {
-                borderColor: '#E4E9F2',
-              },
-            },
-          }}
-          aria-label="articles table">
-          <TableHead sx={{position: 'sticky', top: 0, background: '#FFFFFF'}}>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.name}
-                  align={column.align || 'left'}
-                  sx={{padding: '0.5em 0em!important'}}>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    fontSize="0.8rem"
-                    py={1}>
-                    {t(column.name)}
-                  </Typography>
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((item) => (
-              <TableRowComponent
-                index={index}
-                item={item}
-                searchText={searchText}
-                key={item.id}
-                handleSelectItem={() => {
-                  // if articleItem is the same as item it will not trigger a rerender and we need to set the fields manually
-                  if (articleItem.article?.id === item.id) {
-                    formik.setFieldValue('name', item.name);
-                    formik.setFieldValue('description', item.description);
-                  }
-                  handleSelectItem(item, index);
-                  setShowArticleSearch(false);
-                }}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  };
+  useEffect(() => {
+    if (formik.values.article?.type === ArticleType.PACKAGE) {
+      const {laborPercentage, materialPercentage} =
+        calculatePackageMaterialLaborPercentages(
+          articleItem.article?.costPackage ||
+            articleItem.article?.additionalInfo?.costPackage,
+        );
+
+      formik.setFieldValue('article.costPackage', {
+        ...formik.values.article?.costPackage,
+        laborPercentage,
+        materialPercentage,
+      });
+    }
+  }, [formik.values.article?.type]);
 
   return (
     <>
@@ -544,69 +288,26 @@ export const ArticleItemRowNEW = ({
       </TableCell>
 
       <TableCell sx={{width: '32%', display: 'inline-block'}}>
-        <ClickAwayListener onClickAway={handlePopperClose}>
-          <Box ref={articleAnchorEl}>
-            <RichTextField
-              name={`name-${index}`}
-              test-id={`name-${index}`}
-              html={formik.values.name || ''}
-              updateHtml={handleTextFieldChange('name')}
-              onBlur={formik.handleBlur}
-              minRows={0}
-              containerMinHeight={40}
-              helperText={
-                (!isHovered && formik.errors.name) ||
-                (formik.errors.name && formik.touched.name)
-                  ? formik.errors.name
-                  : ''
-              }
-              error={
-                !!(!isHovered && formik.errors.name) ||
-                !!(formik.errors.name && formik.touched.name)
-              }
-              onClick={handleArticleTextFieldClick}
-            />
-            <Box>
-              <Popper
-                open={showArticleSearch}
-                placement="bottom-start"
-                anchorEl={articleAnchorEl.current}
-                sx={{
-                  zIndex: 1,
-                }}>
-                <Paper
-                  sx={{
-                    maxHeight: '380px',
-                    pl: 2,
-                    pr: 0.7,
-                    py: 2,
-                    boxShadow: '0px 4px 15px 0px #90909033',
-                  }}>
-                  <div>
-                    <Tabs
-                      hideDivider
-                      tabItems={tabItems}
-                      currentIndex={tabValue}
-                      onChange={(indexValue) => setTabValue(indexValue)}
-                      isTextCap>
-                      <TabsBody value={tabValue} index={TabValues.ARTICLES}>
-                        {renderTable(articleResource.data, isArticleLoading)}
-                      </TabsBody>
-                      <TabsBody
-                        value={tabValue}
-                        index={TabValues.CUSTOM_ARTICLES}>
-                        {renderTable(
-                          filteredCustomArticles.map((item) => item.article),
-                          isCustomPriceLoading,
-                        )}
-                      </TabsBody>
-                    </Tabs>
-                  </div>
-                </Paper>
-              </Popper>
-            </Box>
-          </Box>
-        </ClickAwayListener>
+        <NewArticleAutoComplete
+          onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
+            formik.setFieldTouched(`name`, true, false);
+            formik.setFieldValue(`name`, event.target.value || '');
+          }}
+          initialValue={articleItem.article as ArticleView}
+          onArticleSelect={(_rowId, updatedBody) => {
+            const transformedArticle = mapUpdatedBodyToArticleView(
+              updatedBody,
+              {id: articleItem.id},
+            );
+            handleSelectItem(transformedArticle, index);
+          }}
+          rowId={articleItem.id || articleItem.article?.id || ''}
+          serviceCompanyId={serviceCompanyId!}
+          openOnFocus={false}
+          propertyOwner={propertyOwner}
+          excludeTypes={[ArticleType.MIX]}
+          showCustomPriceColumn
+        />
       </TableCell>
 
       <TableCell sx={{width: '4%', display: 'inline-block'}}>
@@ -630,11 +331,11 @@ export const ArticleItemRowNEW = ({
               }}
               tabIndex={0}>
               {formik.values.article?.type === ArticleType.PACKAGE ? (
-                <PackageIcon fontSize="2rem" />
+                <DashboardOutlinedIcon fontSize="medium" />
               ) : formik.values.article?.type === ArticleType.MATERIAL ? (
-                <MaterialIcon fontSize="2rem" />
+                <SettingsOutlinedIcon fontSize="medium" />
               ) : formik.values.article?.type === ArticleType.LABOR ? (
-                <LaborIcon fontSize="2rem" />
+                <TimerOutlinedIcon fontSize="medium" />
               ) : (
                 <OtherIcon fontSize="2rem" />
               )}
@@ -1021,7 +722,10 @@ export const ArticleItemRowNEW = ({
             buttonProps={{
               variant: 'text',
               size: 'small',
-              onClick: () => setShowDescription(true),
+              onClick: () => {
+                setShowDescription(true);
+                setManuallyToggledDescription(true);
+              },
               sx: {
                 color: 'text.secondary',
                 fontWeight: 300,

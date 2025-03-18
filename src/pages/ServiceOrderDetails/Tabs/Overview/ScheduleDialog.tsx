@@ -137,7 +137,6 @@ export const ScheduleDialog = ({
     watchEndDate,
     watchEndTime,
     watchDueDate,
-    watchCallTime,
   ] = watch([
     'technicianIds',
     'switchActive',
@@ -146,7 +145,6 @@ export const ScheduleDialog = ({
     'endDate',
     'endTime',
     'dueDate',
-    'callTime',
   ]);
 
   const validStartDate =
@@ -485,7 +483,7 @@ export const ScheduleDialog = ({
               </Box>
 
               <TimePicker
-                defaultTime={watchCallTime}
+                defaultTime={defaultCallTime}
                 getSelectedTime={(date) => {
                   setValue('callTime', date);
                 }}

@@ -72,7 +72,7 @@ import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import queryString from 'query-string';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {Progress} from 'components/Progress';
-import {debounce, isEqual, omit} from 'lodash';
+import {isEqual, omit} from 'lodash';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
 import RichTextField from 'components/RichTextField';
@@ -150,7 +150,6 @@ export const DraftQuotation = ({
     ContractTermView | undefined
   >(undefined);
 
-  const [isHovered, setIsHovered] = useState<boolean>(true);
   const [openResumeProgressDialog, setOpenResumeProgressDialog] =
     useState(false);
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
@@ -158,8 +157,6 @@ export const DraftQuotation = ({
     Partial<QuotationFormData | null>
   >({});
   const [pageState, setPageState] = useState('FRESH_NEW');
-
-  const debouncedSetIsHovered = debounce((value) => setIsHovered(value), 300);
 
   const [queryParams, setQueryParams] = useSearchParams();
   const {elevatorId = '', customerId = '', id = ''} = queryString.parse(search);
@@ -211,8 +208,8 @@ export const DraftQuotation = ({
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [openCancelDialog, setOpenCancelDialog] = useState<boolean>(false);
 
-  const [customer, setCustomer] = useState<PropertyOwnerView | null>(
-    customerData || null,
+  const [customer, setCustomer] = useState<PropertyOwnerView | undefined>(
+    customerData || undefined,
   );
   const [unit, setUnit] = useState<ElevatorView | null>(elevator || null);
   const [quotationItems, setQuotationItems] = useState<QuotationItemRecord[]>(
@@ -543,7 +540,7 @@ export const DraftQuotation = ({
     if (value) {
       handleSelectCustomer(value);
     } else {
-      setCustomer(null);
+      setCustomer(undefined);
       setUnit(null);
       formik.setFieldValue('elevatorId', '');
       formik.setFieldValue('propertyOwnerId', '');
@@ -664,8 +661,8 @@ export const DraftQuotation = ({
       subtotalExclVat,
       amountAfterGlobalDiscountWithVAT,
       mappedVats,
-      customer,
       unit,
+      customer,
       company,
     );
 
@@ -693,9 +690,14 @@ export const DraftQuotation = ({
   };
 
   const isValid = () => {
+    const hasEmptyItemName = formik.values.items.some(
+      (item) => !item.name?.trim(),
+    );
+
     const valid =
       formik.values.subject &&
       formik.values.items.length &&
+      !hasEmptyItemName &&
       !!customer &&
       Object.keys(formik.errors).length === 0;
 
@@ -1368,13 +1370,7 @@ export const DraftQuotation = ({
           </Grid>
 
           {/* ARTICLES */}
-          <Grid
-            item
-            xs={12}
-            bgcolor="white"
-            p={3}
-            onMouseEnter={() => debouncedSetIsHovered(true)}
-            onMouseLeave={() => debouncedSetIsHovered(false)}>
+          <Grid item xs={12} bgcolor="white" p={3}>
             <Box pb={2}>
               <SectionTitle
                 Icon={WrenchScrewdriverIllustration}
@@ -1385,7 +1381,6 @@ export const DraftQuotation = ({
                 setItems={setQuotationItems}
                 formik={formik}
                 propertyOwner={customer}
-                isHovered={isHovered}
               />
             </Box>
           </Grid>

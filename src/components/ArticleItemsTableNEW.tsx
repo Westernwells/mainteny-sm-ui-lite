@@ -49,7 +49,6 @@ interface Props {
   setItems: (items: InvoiceItemRecord[]) => void;
   propertyOwner?: PropertyOwnerView;
   formik: FormikProps<InvoiceFormData>;
-  isHovered?: boolean;
   jobArticles?: ServiceOrderArticleView[];
 }
 
@@ -58,7 +57,6 @@ export const ArticleItemsTableNEW = ({
   setItems,
   propertyOwner,
   formik,
-  isHovered,
   jobArticles,
 }: Props) => {
   const {t} = useTranslation();
@@ -335,9 +333,8 @@ export const ArticleItemsTableNEW = ({
                               index={index}
                               deleteItem={deleteItem}
                               setItemAtIndex={setItemAtIndex}
-                              propertyOwner={propertyOwner}
                               handleSelectItem={handleSelectItem}
-                              isHovered={isHovered}
+                              propertyOwner={propertyOwner}
                               defaultVat={defaultVat}
                               taxRates={taxRates!}
                               invoiceType={formik.values.type}

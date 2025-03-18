@@ -9,13 +9,16 @@ import {
   MixedPositionRow,
   SearchParameters,
   SubPositionRow,
+  UpdateArticleRecord,
 } from 'models/article';
 import {QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {VatView} from 'models/vat';
+import {MultiVatsAmount} from 'models/misc';
 import {Currencies, formatCurrency} from './currency';
 import {cleanHtmlContent, replaceTextInHtml, stripHtmlTags} from './text-block';
 import {convertToText} from './utils';
+import {CreateArticleRecord} from '../models/article';
 
 export const handleCostPackageValidation = (
   value: number | undefined,
@@ -283,3 +286,42 @@ export const getArticleTypes = ({
   const excludedSet = new Set(excludeTypes);
   return Object.values(ArticleType).filter((type) => !excludedSet.has(type));
 };
+
+export const mapUpdatedBodyToArticleView = (
+  updatedBody: UpdateArticleRecord | CreateArticleRecord,
+  defaultValues?: Partial<ArticleView>,
+): ArticleView => ({
+  id: defaultValues?.id || '',
+  externalId: updatedBody.externalId || '',
+  serviceCompanyId: (updatedBody as CreateArticleRecord).serviceCompanyId || '',
+  name: updatedBody.name || '',
+  description: updatedBody.description || '',
+  model: updatedBody.model || '',
+  type: updatedBody.type || ArticleType.OTHER,
+  category: updatedBody.category || '',
+  subCategory: updatedBody.subCategory || '',
+  manufacturer: updatedBody.manufacturer || '',
+  unit: updatedBody.unit || '',
+  unitPurchaseAmount: updatedBody.unitPurchaseAmount as MultiVatsAmount,
+  unitSellingAmount: updatedBody.unitSellingAmount as MultiVatsAmount,
+  storageLocation: updatedBody.storageLocation || '',
+  stock: updatedBody.stock || {
+    currentStock: 0,
+    minStock: 0,
+    maxStock: 0,
+    minOrderQuantity: 0,
+  },
+  costPackage: updatedBody.costPackage || undefined,
+  additionalInfo: {
+    contractName: updatedBody.contractName || '',
+    costPackage: updatedBody.costPackage || undefined,
+    items: [],
+    pictureUrls: [],
+  },
+  meta: defaultValues?.meta!,
+  number: defaultValues?.number || '',
+  search: `${updatedBody.name || ''} ${updatedBody.description || ''}`.trim(),
+  canDelete: defaultValues?.canDelete || false,
+  suppliers: defaultValues?.suppliers || [],
+  propertyOwnerId: defaultValues?.propertyOwnerId || '',
+});

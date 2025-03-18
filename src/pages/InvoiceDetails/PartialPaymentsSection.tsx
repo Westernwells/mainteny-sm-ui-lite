@@ -1352,6 +1352,7 @@ export const PartialPaymentsSection = ({
                           style: {textAlign: 'right'},
                         },
                       }}
+                      id="partial-amount"
                     />
                   </Grid>
                 </Fragment>
@@ -1417,6 +1418,7 @@ export const PartialPaymentsSection = ({
                           onValueChange: handlePartialPaymentChange,
                         }
                       : {})}
+                    id="partial-amount"
                   />
                 </Grid>
               </>
