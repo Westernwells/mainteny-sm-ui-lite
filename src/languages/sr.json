@@ -2624,7 +2624,7 @@
   "ARTICLE #": "# ARTIKLA",
   "They will appear here once the article is added": "Oni će se pojaviti ovde kada se članak doda",
   "Elevator operation": "Rad lifta",
-  "New Elevator Operation Job": "Novi posao o radu lifta",
+  "New Elevator Operation Job": "Novi posao rukovođenja liftom",
   "Date of credit note": "Datum kreditne note",
   "Sending invoice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Slanje fakture {{invoiceNumber}} na {{receiverEmail}} od strane {{senderName}}",
   "Sending overdue notice {{invoiceNumber}} to {{receiverEmail}} by {{senderName}}": "Slanje opomene o kašnjenju {{invoiceNumber}} na {{receiverEmail}} od strane {{senderName}}",
@@ -3126,8 +3126,14 @@
   "New Maintenance Job": "Novi posao održavanja",
   "New Emergency Job": "Novi hitni posao",
   "New Repair Job": "Novi posao popravke",
-  "New Callout Job": "Novi hitni posao",
+  "New Callout Job": "Novi pozivni posao",
+  "New Inspection Job": "Novi inspekcijski posao",
+  "New Installation Job": "Novi posao instalacije",
+  "New Modernization Job": "Novi posao modernizacije",
+  "New General Job": "Novi opšti posao",
   "Please enter valid shift times.": "Unesite važeća vremena smene.",
   "Show {{totalCount}} more": "Prikaži još {{totalCount}}",
-  "Custom Price (Net)": "Prilagođena cena (neto)"
+  "Custom Price (Net)": "Prilagođena cena (neto)",
+  "Select VAT": "Izaberite PDV",
+  "You are about to remove this position permanently from this quotation. This action can't be undone. Do you want to proceed?": "Spremate se da trajno uklonite ovu poziciju iz ove ponude. Ova radnja se ne može opozvati. Da li želite da nastavite?"
 }
