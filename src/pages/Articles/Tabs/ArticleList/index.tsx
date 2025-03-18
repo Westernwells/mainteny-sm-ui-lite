@@ -69,7 +69,7 @@ const ArticleList = () => {
   const currentCurrency = useCurrentCurrency();
   const {language: selectedLng} = useContext(LanguageContext);
 
-  const [search, setSearch] = useQueryState('searchQuotations');
+  const [search, setSearch] = useQueryState('searchArticles');
 
   const [selectedType, setSelectedType] = useQueryState<ARTICLE_TYPE_FILTER[]>(
     'selectedType',

@@ -17,6 +17,8 @@ export default defineConfig({
     defaultCommandTimeout: 60000,
     pageLoadTimeout: 350000,
     responseTimeout: 120000,
+    experimentalMemoryManagement: true,
+    numTestsKeptInMemory: 1,
     retries: {
       openMode: 1,
       runMode: 1,

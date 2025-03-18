@@ -30,12 +30,13 @@ describe('Invoice listing page', () => {
         cy.url().should('include', 'searchInvoices');
         cy.url().should('include', searchText);
 
-        cy.wait('@invoicesURL').then((interception) => {
-            if (interception.response.body && interception.response.body.data.length === 0) {
-                expect(interception.response.body.data).to.have.lengthOf(0);
-                cy.contains('No matching search results').should('exist');
-            }
-        });
+        cy.wait('@invoicesURL')
+            .its('response.body.data')
+            .then((data) => {
+                expect(data).to.have.lengthOf(0);
+            });
+
+        cy.contains('No matching search results').should('exist');
     });
 
     it('should route to new invoice page on clicking new invoice button', () => {
@@ -170,11 +171,13 @@ describe('Invoice listing page', () => {
 
             // validate credit note invoice items are same as original invoice items but with negative net amount
             const originalInvoiceItems = firstFullSentInvoice.items;
-            cy.get('div[test-id="name-0"]').should(($el) =>
-                expect(removeControlCharsAndSpaces($el.text())).to.contain(
-                    removeControlCharsAndSpaces(getPlainStringFromHtml(originalInvoiceItems[0].name)),
-                ),
-            );
+            cy.get('#article-combo-box').invoke('val')
+            .then((value) => {
+              expect(removeControlCharsAndSpaces(value as string)).to.contain(
+                removeControlCharsAndSpaces(getPlainStringFromHtml(originalInvoiceItems[0].name))
+              );
+            });
+
             cy.get('input[name="unitAmount.netAmount"]')
                 .invoke('attr', 'value')
                 .should('eq', (-originalInvoiceItems[0].unitAmount.netAmount / 100).toLocaleString());

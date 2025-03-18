@@ -1,21 +1,19 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
-import {MonetizationOn, Download, AccessTimeFilled} from '@mui/icons-material';
+import {AccessTimeFilled, Download, MonetizationOn} from '@mui/icons-material';
 import {
-  FormControlLabel,
-  Radio,
+  Box,
   Card,
   CardContent,
-  Box,
+  FormControlLabel,
   Grid,
+  Radio,
 } from '@mui/material';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import {InfoCard} from 'components/InfoCard';
-import {FormSelect} from 'components/form/FormSelect';
-import {DatePicker} from 'components/DatePicker';
 import {Button} from 'components/Button';
 import {FormatType, ReportType} from 'models/analytics';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -23,17 +21,20 @@ import {
   useEmployeeWorkingHoursCSV,
   useEmployeeWorkingHoursXLSX,
   useInvoicesDatev,
-  useInvoicesXLSX,
-  useInvoicesXero,
-  useInvoicesSage50,
   useInvoicesDf2,
   useInvoicesPdfUrls,
+  useInvoicesSage50,
+  useInvoicesXero,
+  useInvoicesXLSX,
 } from 'hooks/reactQuery/useAnalytics';
 import {convertToText} from 'utils/utils';
 import {toRestDate} from 'utils/datetime';
-import {FormCheckbox} from 'components/form/FormCheckbox';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {downloadAndZipFiles} from 'utils/download';
+import {GenericReportForm} from 'pages/Analytics/GenericReport';
+import {FinantialsReportForm} from 'pages/Analytics/FinancialsReport';
+import {ReportsForm} from 'models/reports';
+import IncludesSection from 'pages/Analytics/IncludesSection';
 
 const validationSchema = Yup.object().shape({
   reportType: Yup.string()
@@ -57,6 +58,11 @@ const validationSchema = Yup.object().shape({
       return schema;
     })
     .required('End date is required'),
+  includePDFDocuments: Yup.boolean().default(false),
+  includePreviouslyDownloadedData: Yup.boolean().default(false),
+  includePaymentsData: Yup.boolean().default(false),
+  includeInvoicesData: Yup.boolean().default(false),
+  includePurchaseInvoicesData: Yup.boolean().default(false),
 });
 
 interface Option {
@@ -66,20 +72,23 @@ interface Option {
 }
 
 export const Reports = () => {
-  const {t, i18n} = useTranslation();
+  const {t} = useTranslation();
   const theme = useTheme();
   const {user} = useUserSession();
   const serviceCompanyId = user!.userAccount.serviceCompany.id;
 
-  const formik = useFormik({
+  const formik = useFormik<ReportsForm>({
     validateOnMount: true,
     initialValues: {
       reportType: ReportType.FINANCIALS,
       formatType: FormatType.XERO,
       startDate: null,
       endDate: null,
-      excludePreviouslyDownloadedData: false,
-      includePaymentData: true,
+      includeInvoicesData: false,
+      includePaymentsData: false,
+      includePurchaseInvoicesData: false,
+      includePreviouslyDownloadedData: false,
+      includePDFDocuments: false,
     },
     onSubmit: () => {},
     validationSchema,
@@ -100,8 +109,10 @@ export const Reports = () => {
   });
   const getInvoicesDatev = useInvoicesDatev(serviceCompanyId, {
     ...reportParams,
-    full: !formik.values.excludePreviouslyDownloadedData,
-    includePayments: formik.values.includePaymentData,
+    full: formik.values.includePreviouslyDownloadedData,
+    includeInvoices: formik.values.includeInvoicesData,
+    includePayments: formik.values.includePaymentsData,
+    includePurchaseInvoices: formik.values.includePurchaseInvoicesData,
   });
   const getInvoicesXero = useInvoicesXero(serviceCompanyId, reportParams);
   const getInvoicesXLSX = useInvoicesXLSX(serviceCompanyId, {
@@ -134,11 +145,7 @@ export const Reports = () => {
       }
     };
 
-    if (
-      (formik.values.formatType === FormatType.DATEV_WITH_PDF ||
-        formik.values.formatType === FormatType.EXCEL_WITH_PDF) &&
-      pdfPaths.length
-    ) {
+    if (formik.values.includePDFDocuments && pdfPaths.length) {
       downloadFiles();
     }
   }, [pdfPaths]);
@@ -146,7 +153,7 @@ export const Reports = () => {
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const {formatType, reportType} = formik.values;
+    const {formatType, reportType, includePDFDocuments} = formik.values;
 
     if (reportType === ReportType.WORK_HOURS) {
       if (formatType === FormatType.CSV)
@@ -154,18 +161,15 @@ export const Reports = () => {
       if (formatType === FormatType.EXCEL)
         return getEmployeeWorkingHoursXLSX.refetch();
     } else if (reportType === ReportType.FINANCIALS) {
-      if (formatType === FormatType.DATEV) return getInvoicesDatev.refetch();
-      if (formatType === FormatType.XERO) return getInvoicesXero.refetch();
-      if (formatType === FormatType.EXCEL) return getInvoicesXLSX.refetch();
-      if (formatType === FormatType.SAGE50) return getInvoicesSage50.refetch();
-      if (formatType === FormatType.DF2) return getInvoicesDf2.refetch();
-      if (
-        formatType === FormatType.DATEV_WITH_PDF ||
-        formatType === FormatType.EXCEL_WITH_PDF
-      ) {
-        if (formatType === FormatType.EXCEL_WITH_PDF) {
+      if (formatType === FormatType.DATEV) getInvoicesDatev.refetch();
+      if (formatType === FormatType.XERO) getInvoicesXero.refetch();
+      if (formatType === FormatType.EXCEL) getInvoicesXLSX.refetch();
+      if (formatType === FormatType.SAGE50) getInvoicesSage50.refetch();
+      if (formatType === FormatType.DF2) getInvoicesDf2.refetch();
+      if (includePDFDocuments) {
+        if (formatType === FormatType.EXCEL) {
           await getInvoicesXLSX.refetch();
-        } else if (formatType === FormatType.DATEV_WITH_PDF) {
+        } else if (formatType === FormatType.DATEV) {
           await getInvoicesDatev.refetch();
         }
 
@@ -248,56 +252,16 @@ export const Reports = () => {
     },
   ];
 
-  const formatOptions = useMemo(() => {
-    if (formik.values.reportType === ReportType.FINANCIALS) {
-      return [
-        {
-          label: FormatType.XERO,
-          value: FormatType.XERO,
-        },
-        {
-          label: FormatType.DATEV,
-          value: FormatType.DATEV,
-        },
-        {
-          label: FormatType.EXCEL,
-          value: FormatType.EXCEL,
-        },
-        {
-          label: FormatType.DATEV_WITH_PDF,
-          value: FormatType.DATEV_WITH_PDF,
-        },
-        {
-          label: FormatType.EXCEL_WITH_PDF,
-          value: FormatType.EXCEL_WITH_PDF,
-        },
-        {
-          label: FormatType.SAGE50,
-          value: FormatType.SAGE50,
-        },
-        {
-          label: FormatType.DF2,
-          value: FormatType.DF2,
-        },
-      ];
-    }
-    return [
-      {
-        label: FormatType.EXCEL,
-        value: FormatType.EXCEL,
-      },
-      {
-        label: FormatType.CSV,
-        value: FormatType.CSV,
-      },
-    ];
-  }, [formik.values.reportType]);
-
   useEffect(() => {
     if (formik.values.reportType === ReportType.FINANCIALS) {
       formik.setFieldValue('formatType', FormatType.XERO);
     } else {
       formik.setFieldValue('formatType', FormatType.EXCEL);
+      formik.setFieldValue('includePaymentsData', false);
+      formik.setFieldValue('includeInvoicesData', false);
+      formik.setFieldValue('includePurchaseInvoicesData', false);
+      formik.setFieldValue('includePDFDocuments', false);
+      formik.setFieldValue('includePreviouslyDownloadedData', false);
     }
   }, [formik.values.reportType]);
 
@@ -321,99 +285,18 @@ export const Reports = () => {
             </Box>
           </Grid>
 
-          <Grid container item gap={2}>
-            <Grid item xs={12}>
-              <Typography
-                variant="subtitle2"
-                color={theme.palette.text.secondary}>
-                {t('Format type')}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={3} xl={2}>
-              <FormSelect
-                labelId="format-label"
-                label="Choose format"
-                required
-                options={formatOptions}
-                selectProps={{
-                  id: 'formatType',
-                  value: formik.values.formatType,
-                  onChange: formik.handleChange,
-                  name: 'formatType',
-                  multiple: false,
-                }}
-              />
-            </Grid>
-          </Grid>
-
-          <Grid container item gap={2}>
-            <Grid item xs={12}>
-              <Typography
-                variant="subtitle2"
-                color={theme.palette.text.secondary}>
-                {t('Period')}
-              </Typography>
-            </Grid>
-            <Grid container item gap={2}>
-              <Grid item xs={12} md={3} xl={2}>
-                <DatePicker
-                  defaultDate={formik.values.startDate}
-                  getSelectedDate={(newValue) => {
-                    if (newValue) formik.setFieldValue('startDate', newValue);
-                  }}
-                  textFieldProps={{
-                    label: 'From',
-                    InputLabelProps: {shrink: true},
-                  }}
-                  required
-                />
-              </Grid>
-              <Grid item xs={12} md={3} xl={2}>
-                <DatePicker
-                  defaultDate={formik.values.endDate}
-                  getSelectedDate={(newValue) => {
-                    if (newValue) formik.setFieldValue('endDate', newValue);
-                  }}
-                  textFieldProps={{
-                    label: i18n.language === 'de-de' ? 'Bis' : 'To',
-                    InputLabelProps: {shrink: true},
-                    helperText:
-                      formik.initialValues.endDate !== formik.values.endDate
-                        ? formik.errors.endDate
-                        : '',
-                    error:
-                      formik.initialValues.endDate !== formik.values.endDate &&
-                      !!formik.errors.endDate,
-                  }}
-                  required
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-
-          {formik?.values?.reportType === ReportType.FINANCIALS &&
-            formik?.values?.formatType === FormatType.DATEV && (
-              <Grid item xs={12}>
-                <FormCheckbox
-                  value={formik.values.excludePreviouslyDownloadedData.toString()}
-                  name="excludePreviouslyDownloadedData"
-                  handleChange={formik.handleChange}
-                  label={t('Exclude previously downloaded data')}
-                />
-              </Grid>
-            )}
-
-          {(formik?.values?.formatType === FormatType.DATEV ||
-            formik?.values?.formatType === FormatType.DATEV_WITH_PDF) && (
-            <Grid item xs={12}>
-              <FormCheckbox
-                name="includePaymentData"
-                checked={formik.values.includePaymentData}
-                handleChange={formik.handleChange}
-                label={t('Payment data included')}
-              />
-            </Grid>
+          {formik.values.reportType === ReportType.FINANCIALS && (
+            <FinantialsReportForm formik={formik} />
           )}
+
+          {formik.values.reportType !== ReportType.FINANCIALS && (
+            <GenericReportForm formik={formik} />
+          )}
+
+          <IncludesSection
+            disabled={formik.values.reportType !== ReportType.FINANCIALS}
+            formik={formik}
+          />
 
           <Grid item xs={12} textAlign="end">
             <Button

@@ -156,7 +156,7 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
     } else {
       setRows([]);
     }
-  }, [articleResource.total]);
+  }, [articleResource.data]);
 
   if (isIdle || isLoading) {
     return (

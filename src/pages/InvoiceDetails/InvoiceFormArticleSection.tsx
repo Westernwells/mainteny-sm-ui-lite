@@ -6,7 +6,6 @@ import {ServiceOrderArticleView} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {FormikProps} from 'formik';
 import {useEffect, useState} from 'react';
-import {debounce} from 'lodash';
 import InvoiceShowOnPDFSwitch from 'components/Switch/InvoiceShowOnPDFSwitch';
 import {SectionTitle} from './SectionTitle';
 
@@ -29,10 +28,6 @@ const InvoiceFormArticleSection = ({
 }: Props) => {
   const [shouldShow, setShouldShow] = useState(showArticleSection);
 
-  const [isHovered, setIsHovered] = useState<boolean>(true);
-
-  const debouncedSetIsHovered = debounce((value) => setIsHovered(value), 300);
-
   useEffect(() => {
     setShouldShow(showArticleSection);
   }, [showArticleSection]);
@@ -43,13 +38,7 @@ const InvoiceFormArticleSection = ({
   };
 
   return (
-    <Grid
-      item
-      xs={12}
-      bgcolor="white"
-      p={3}
-      onMouseEnter={() => debouncedSetIsHovered(true)}
-      onMouseLeave={() => debouncedSetIsHovered(false)}>
+    <Grid item xs={12} bgcolor="white" p={3}>
       <SectionTitle
         actionComponent={
           <InvoiceShowOnPDFSwitch
@@ -68,7 +57,6 @@ const InvoiceFormArticleSection = ({
         setItems={setItems}
         formik={formik}
         propertyOwner={propertyOwner}
-        isHovered={isHovered}
         jobArticles={jobArticles}
       />
     </Grid>

@@ -56,6 +56,15 @@ export const OrderInfo = ({serviceOrderDetails, label}: OrderInfoProps) => {
                 <Typography variant="body2">
                   {serviceOrderDetails.additionalInfo.callerInfo?.name || '-'}
                 </Typography>
+                {!!serviceOrderDetails.additionalInfo.callerInfo
+                  ?.phoneNumber && (
+                  <Typography
+                    variant="body2"
+                    sx={{paddingTop: '0.2em'}}
+                    color={theme.palette.text.secondary}>
+                    {serviceOrderDetails.additionalInfo.callerInfo?.phoneNumber}
+                  </Typography>
+                )}
                 {!!serviceOrderDetails.additionalInfo.callerInfo?.calledAt && (
                   <Typography
                     variant="body2"
