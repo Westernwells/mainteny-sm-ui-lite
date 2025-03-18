@@ -111,7 +111,7 @@ export interface CreateArticleRecord {
   description: string;
   externalId: string;
   model?: string;
-  type: string;
+  type: ArticleType;
   category: string;
   subCategory?: string;
   manufacturer: string;
@@ -148,7 +148,7 @@ export interface UpdateArticleRecord {
   storageLocation?: string;
   subCategory?: string;
   suppliers?: SupplierRecord[];
-  type?: string;
+  type?: ArticleType;
   unit?: string;
   unitPurchaseAmount?: AmountRecord;
   unitSellingAmount?: AmountRecord;
@@ -515,6 +515,7 @@ export const COLUMN_DATA: ArticleColumnData[] = [
   {title: '#', alignment: 'left', width: '75px'},
   {title: 'Stock', alignment: 'right', width: '56px'},
   {title: 'Type', alignment: 'center', width: '70px'},
-  {title: 'Description', alignment: 'center', width: '80px'},
+  {title: 'Description', alignment: 'center', width: '70px'},
   {title: 'Price (Net)', alignment: 'right', width: '72px'},
+  {title: 'Custom Price (Net)', alignment: 'right', width: '116px'},
 ];

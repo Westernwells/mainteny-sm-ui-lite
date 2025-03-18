@@ -198,7 +198,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       name: formik.values.name,
       externalId: formik.values.externalId,
       storageLocation: formik.values.storageLocation,
-      type: formik.values.type.toUpperCase(),
+      type: formik.values.type,
       unit: formik.values.unit,
       unitPurchaseAmount: amountRecordForBackendWithVatId(
         makeAmountRecordWithVatId(

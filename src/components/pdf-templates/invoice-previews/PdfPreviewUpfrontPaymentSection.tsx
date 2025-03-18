@@ -24,7 +24,7 @@ import {
 import {fixRounding} from 'utils/utils';
 import {Currency} from 'models/misc';
 import {
-  getFormattedPaymentValues,
+  getFormattedPaymentValuesForPartialUpfrontAndFinal,
   replacePaymentTermsPlaceholders,
 } from 'utils/invoice';
 import {HtmlPDF} from 'components/HtmlPDF';
@@ -254,22 +254,16 @@ const PdfPreviewUpfrontPaymentSection = ({
 
   const styles = getStyles(boldFontStyle);
 
-  const grossInvoiceAmount = centsToMoney(
-    currentCurrency?.code!,
-    invoiceAmountDetail?.amountAfterGlobalDiscount.grossAmount,
-  );
-
   const formattedPaymentValues = useMemo(() => {
     if (
       invoice?.additionalInfo.paymentTerm?.term &&
       invoice &&
       invoiceAmountDetail
     ) {
-      return getFormattedPaymentValues(
+      return getFormattedPaymentValuesForPartialUpfrontAndFinal(
         invoice.additionalInfo.paymentTerm,
         invoice,
-        invoiceAmountDetail,
-        grossInvoiceAmount,
+        invoice.totalAmount.grossAmount || 0,
         currentCurrency,
       );
     }

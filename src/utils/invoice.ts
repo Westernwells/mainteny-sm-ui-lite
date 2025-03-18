@@ -338,6 +338,88 @@ export const getFormattedPaymentValues = (
   return discountValues;
 };
 
+export const getFormattedPaymentValuesForPartialUpfrontAndFinal = (
+  paymentTerm: InvoicePaymentTermRecord & {
+    data?: PaymentTermData;
+  },
+  invoice: InvoiceView,
+  totalAmount: number,
+  currentCurrency?: Currency,
+) => {
+  const discountValues = paymentTerm?.data?.discountOptions?.map((d) => {
+    const dueDate = addDays(
+      invoice.sentDate ? new Date(invoice.sentDate) : new Date(),
+      d.discountDays || 0,
+    );
+    const formattedDueDate = formatDate(dueDate);
+
+    let filteredItems: InvoiceItemView[] = [];
+    let applicableAmount = totalAmount;
+
+    if (d.articleType !== PaymentTermArticleType.ALL) {
+      // Calculate the total sum of all items
+      const totalSum = invoice.items?.reduce(
+        (sum, item) => sum + (item.unitAmount?.netAmount ?? 0) * item.quantity,
+        0,
+      );
+
+      if (d.articleType === PaymentTermArticleType.LABOR) {
+        filteredItems = invoice?.items?.filter(
+          (item) =>
+            item.article?.type === ArticleType.LABOR ||
+            item.article?.type === ArticleType.PACKAGE,
+        );
+      } else if (d.articleType === PaymentTermArticleType.MATERIAL) {
+        filteredItems = invoice?.items?.filter(
+          (item) =>
+            item.article?.type === ArticleType.MATERIAL ||
+            item.article?.type === ArticleType.PACKAGE,
+        );
+      }
+
+      // Calculate the proportion of filtered items
+      const filteredSum = filteredItems?.reduce((sum, item) => {
+        const itemAmount = (item.unitAmount?.netAmount ?? 0) * item.quantity;
+
+        if (item?.article?.type === ArticleType.PACKAGE) {
+          const percentage =
+            d.articleType === PaymentTermArticleType.LABOR
+              ? item.article?.costPackage?.laborPercentage
+              : item.article?.costPackage?.materialPercentage;
+
+          return sum + (itemAmount * (percentage || 0)) / 100;
+        }
+
+        return sum + itemAmount;
+      }, 0);
+
+      // Apply the same proportion to totalAmount
+      applicableAmount =
+        totalSum > 0 ? totalAmount * (filteredSum / totalSum) : 0;
+    }
+
+    const invoiceAmount = centsToMoney(
+      currentCurrency?.code!,
+      applicableAmount,
+    );
+
+    // Apply the discount percentage to the filtered total amount
+    const discountPercentage = d.discountPercent || 0;
+    const discountAmount = invoiceAmount * (discountPercentage / 100);
+
+    const paymentAmount = invoiceAmount - discountAmount;
+
+    return {
+      formattedDueDate,
+      discountAmount,
+      invoiceAmount,
+      paymentAmount,
+    };
+  });
+
+  return discountValues;
+};
+
 export const replacePaymentTermsPlaceholders = (
   template: string,
   replacements: {

@@ -39,9 +39,8 @@ import {Progress} from './Progress';
 interface Props {
   items: QuotationItemRecord[];
   setItems: (items: QuotationItemRecord[]) => void;
-  propertyOwner?: PropertyOwnerView | null;
+  propertyOwner?: PropertyOwnerView;
   formik: FormikProps<QuotationFormData>;
-  isHovered?: boolean;
 }
 
 export const ArticleItemsTableQuotation = ({
@@ -49,7 +48,6 @@ export const ArticleItemsTableQuotation = ({
   setItems,
   propertyOwner,
   formik,
-  isHovered,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -60,7 +58,6 @@ export const ArticleItemsTableQuotation = ({
   const subtotalExclVat = calculateQuotationTotalWithPerItemDiscount(
     formik.values.items,
   );
-
   const {
     vats,
     amountBeforeGlobalDiscount,
@@ -328,11 +325,10 @@ export const ArticleItemsTableQuotation = ({
                               index={index}
                               deleteItem={deleteItem}
                               setItemAtIndex={setItemAtIndex}
-                              propertyOwner={propertyOwner}
                               handleSelectItem={handleSelectItem}
-                              isHovered={isHovered}
                               defaultVat={defaultVat}
                               taxRates={taxRates!}
+                              propertyOwner={propertyOwner}
                             />
                           </TableRow>
                         )}

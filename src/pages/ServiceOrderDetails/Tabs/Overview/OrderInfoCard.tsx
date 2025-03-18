@@ -52,7 +52,7 @@ interface OrderInfoProps {
   details: string[];
 }
 
-const customerDetailCells = ['customer', 'calledBy', 'purchaseOrderNumber'];
+const customerDetailCells = ['customer', 'purchaseOrderNumber', 'calledBy'];
 const unitDetailCells = ['unitAddress', 'unitNumber'];
 const contractDetailCells = ['contractNumber', 'contractName', 'contractType'];
 const jobDetailCells = ['technicians', 'dueDate', 'dateScheduled'];
