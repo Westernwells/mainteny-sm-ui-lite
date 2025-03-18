@@ -36,10 +36,9 @@ describe('Payment Terms Calculation', () => {
 
     const addArticleAndSetAmount = ({index = 0, amount, quantity, vat}: {index: number; amount: number; quantity: number; vat: number}) => {
         cy.contains('button', 'Add Article').click();
-        cy.get(`tr[data-rbd-draggable-id^="${index}"]`).within(() => {
-            cy.get(`div[test-id="name-${index}"]`).within(() => {
-                cy.get('div[contenteditable="true"]').focus().click().wait(1000).realType('Test Article');
-            });
+        cy.get(`tr[data-rbd-draggable-id^="${index} -"]`).within(() => {
+            cy.get('#article-combo-box').click().wait(500).realType('Test Article').wait(500).realType('{esc}');
+
             cy.get('input[name="quantity"]').clear().type(`${quantity}`);
             cy.get('input[name="unitAmount.netAmount"]').clear().type(`{selectAll}${amount}`);
 
@@ -57,7 +56,19 @@ describe('Payment Terms Calculation', () => {
     it('should calculate correct payment terms for Partial Invoice', () => {
         createJobAndOpenInvoice('Partial Invoice');
 
-        cy.get('table[aria-label="articles section table"] [data-testid="DeleteIcon"]').then((rows) => deleteAllFoundArticles(rows.length));
+        // Check if the "Add Article" button exists.
+        cy.get('body').then(($body) => {
+            if (!$body.find('button:contains("Add Article")').length) {
+                // If the button is not found, delete all pre-existing articles.
+                cy.get('table[aria-label="articles section table"] [data-testid="DeleteIcon"]').then((rows) => {
+                    if (rows.length) {
+                        deleteAllFoundArticles(rows.length);
+                    }
+                });
+                // After deletion, wait for the "Add Article" button to appear.
+                cy.contains('button', 'Add Article').should('be.visible');
+            }
+        });
 
         addArticleAndSetAmount({index: 0, amount: 1000, quantity: 1, vat: 19});
 
@@ -66,6 +77,7 @@ describe('Payment Terms Calculation', () => {
         InvoiceEditPage.openPaymentTermsDialog();
         cy.contains('e2e test payment term').click();
         cy.contains('button', 'Confirm').click();
+        
         const paymentTerm = InvoiceEditPage.getPaymentTermsField().find('div[role="textbox"]').invoke('text');
         paymentTerm.should('contain', 'e2e test payment term');
 

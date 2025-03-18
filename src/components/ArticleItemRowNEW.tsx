@@ -306,6 +306,7 @@ export const ArticleItemRowNEW = ({
           openOnFocus={false}
           propertyOwner={propertyOwner}
           excludeTypes={[ArticleType.MIX]}
+          showCustomPriceColumn
         />
       </TableCell>
 
