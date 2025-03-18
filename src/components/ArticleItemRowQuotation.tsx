@@ -282,6 +282,7 @@ export const ArticleItemRowQuotation = ({
           openOnFocus={false}
           propertyOwner={propertyOwner}
           excludeTypes={[ArticleType.MIX]}
+          showCustomPriceColumn
         />
       </TableCell>
 

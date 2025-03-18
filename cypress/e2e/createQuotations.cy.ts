@@ -94,7 +94,7 @@ describe('Create Quotation', () => {
         cy.get('div[role="combobox"][id="createServiceOrder"]').click();
         cy.get('li[data-value="CALLOUT"]').click();
         cy.contains('Create').click();
-        cy.contains('New CALLOUT Job');
+        cy.contains('New Callout Job');
         cy.contains('Next').click();
         cy.contains('Submit').click();
         cy.wait('@createJobAPI', {timeout: 30000});

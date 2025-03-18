@@ -1,4 +1,10 @@
-import React, {SyntheticEvent, useEffect, useRef, useState} from 'react';
+import React, {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   TextField,
   Autocomplete,
@@ -67,6 +73,7 @@ interface Props {
   openOnFocus?: boolean;
   propertyOwner?: PropertyOwnerView;
   excludeTypes?: ArticleType[];
+  showCustomPriceColumn?: boolean;
 }
 
 interface ExtendedArticleView extends ArticleView {
@@ -77,6 +84,11 @@ interface ArticleRowProps {
   option: ExtendedArticleView;
   queryView: string;
   currentCurrency: Currency;
+  showCustomPriceColumn?: boolean;
+}
+
+export interface CustomPopperProps extends PopperProps {
+  showCustomPriceColumn?: boolean;
 }
 
 const getIconByType = (type: ArticleType) => {
@@ -94,7 +106,12 @@ const getIconByType = (type: ArticleType) => {
   }
 };
 
-const CustomPopper = ({children, anchorEl, open}: PopperProps) => {
+export const CustomPopper = ({
+  children,
+  anchorEl,
+  open,
+  showCustomPriceColumn,
+}: CustomPopperProps): JSX.Element => {
   const [openUpwards, setOpenUpwards] = useState(false);
   const popperRef = useRef<HTMLDivElement>(null);
 
@@ -106,7 +123,6 @@ const CustomPopper = ({children, anchorEl, open}: PopperProps) => {
     if (popperPosition) {
       const spaceBelow = window.innerHeight - popperPosition.bottom;
       const spaceAbove = popperPosition.top;
-
       setOpenUpwards(spaceAbove > spaceBelow);
     }
   }, [anchorEl, open]);
@@ -115,6 +131,10 @@ const CustomPopper = ({children, anchorEl, open}: PopperProps) => {
     const el = typeof anchorEl === 'function' ? anchorEl() : anchorEl;
     return el instanceof HTMLElement ? el : null;
   })();
+
+  const visibleColumns = showCustomPriceColumn
+    ? COLUMN_DATA
+    : COLUMN_DATA.filter((col) => col.title !== 'Custom Price (Net)');
 
   return (
     <Popper
@@ -135,7 +155,7 @@ const CustomPopper = ({children, anchorEl, open}: PopperProps) => {
         <table style={{width: '100%', tableLayout: 'fixed'}}>
           <thead>
             <tr>
-              {COLUMN_DATA.map((col, index) => (
+              {visibleColumns.map((col, index) => (
                 <th
                   key={index}
                   style={{
@@ -152,9 +172,7 @@ const CustomPopper = ({children, anchorEl, open}: PopperProps) => {
           </thead>
         </table>
         {typeof children === 'function'
-          ? children({
-              placement: 'auto',
-            })
+          ? children({placement: 'auto'})
           : children}
         <Table style={footerTableStyle}>
           <TableHead>
@@ -203,6 +221,7 @@ const TableRowComponent = ({
   option,
   queryView,
   currentCurrency,
+  showCustomPriceColumn,
 }: ArticleRowProps) => (
   <tr style={{width: '100%'}}>
     <td style={{width: '180px', textAlign: 'left', paddingRight: '1.5em'}}>
@@ -235,16 +254,18 @@ const TableRowComponent = ({
         centsToMoney(currentCurrency.code, option.unitSellingAmount?.netAmount),
       )}
     </td>
-    <td style={{width: '116px', textAlign: 'right'}}>
-      {option.isCustom
-        ? formatCurrency(
-            centsToMoney(
-              currentCurrency.code,
-              option.customSellingAmount?.netAmount,
-            ),
-          )
-        : '-'}
-    </td>
+    {showCustomPriceColumn && (
+      <td style={{width: '116px', textAlign: 'right'}}>
+        {option.isCustom
+          ? formatCurrency(
+              centsToMoney(
+                currentCurrency.code,
+                option.customSellingAmount?.netAmount,
+              ),
+            )
+          : '-'}
+      </td>
+    )}
   </tr>
 );
 
@@ -259,6 +280,7 @@ export const NewArticleAutoComplete = ({
   openOnFocus = true,
   propertyOwner,
   excludeTypes,
+  showCustomPriceColumn = false,
 }: Props) => {
   const currentCurrency = useCurrentCurrency();
   const [query, setQuery] = useState(
@@ -293,37 +315,38 @@ export const NewArticleAutoComplete = ({
   const {data: customPrices = []} = usePropertyOwnerQueryTravelWorks(
     propertyOwner?.id || '',
     {serviceOrderType: ServiceOrderType.GENERAL},
-    {enabled: !!propertyOwner?.id},
+    {enabled: showCustomPriceColumn && !!propertyOwner?.id},
   );
 
-  const customPricesMap = keyBy(customPrices, (item) => item.article.id);
-
-  const mergedArticles: ExtendedArticleView[] = (
-    articlesResource.data ?? []
-  ).map((article) => {
-    const customItem = customPricesMap[article.id];
-
-    if (customItem?.article) {
-      const customArticle = customItem.article;
-
-      return {
+  const mergedArticles: ExtendedArticleView[] = showCustomPriceColumn
+    ? (articlesResource.data ?? []).map((article) => {
+        const customPricesMap = keyBy(customPrices, (item) => item.article.id);
+        const customItem = customPricesMap[article.id];
+        if (customItem?.article) {
+          const customArticle = customItem.article;
+          return {
+            ...article,
+            name: removeHtmlTags(customArticle.name || article.name || ''),
+            description: removeHtmlTags(
+              customArticle.description || article.description || '',
+            ),
+            customSellingAmount: customArticle.unitSellingAmount,
+            isCustom: true,
+          };
+        }
+        return {
+          ...article,
+          name: removeHtmlTags(article.name || ''),
+          description: removeHtmlTags(article.description || ''),
+          isCustom: false,
+        };
+      })
+    : (articlesResource.data ?? []).map((article) => ({
         ...article,
-        name: removeHtmlTags(customArticle.name || article.name || ''),
-        description: removeHtmlTags(
-          customArticle.description || article.description || '',
-        ),
-        customSellingAmount: customArticle.unitSellingAmount,
-        isCustom: true,
-      };
-    }
-
-    return {
-      ...article,
-      name: removeHtmlTags(article.name || ''),
-      description: removeHtmlTags(article.description || ''),
-      isCustom: false,
-    };
-  });
+        name: removeHtmlTags(article.name || ''),
+        description: removeHtmlTags(article.description || ''),
+        isCustom: false,
+      }));
 
   useEffect(() => {
     if (inputRef.current) {
@@ -378,13 +401,21 @@ export const NewArticleAutoComplete = ({
         },
         unitSellingAmount: {
           currency:
+            (articleBody as ExtendedArticleView).customSellingAmount
+              ?.currency ||
             (articleBody as ArticleView).unitSellingAmount?.currency ||
             currentCurrency.code ||
             'EUR',
           netAmount:
-            (articleBody as ArticleView).unitSellingAmount?.netAmount ?? 0,
+            (articleBody as ExtendedArticleView).customSellingAmount
+              ?.netAmount ??
+            (articleBody as ArticleView).unitSellingAmount?.netAmount ??
+            0,
           percentageVat:
-            (articleBody as ArticleView).unitSellingAmount?.percentageVat ?? 0,
+            (articleBody as ExtendedArticleView).customSellingAmount
+              ?.percentageVat ??
+            (articleBody as ArticleView).unitSellingAmount?.percentageVat ??
+            0,
         },
         stock: {
           currentStock: 1,
@@ -432,9 +463,20 @@ export const NewArticleAutoComplete = ({
     const articleData = article
       ? createOrUpdateArticleBody(article)
       : createOrUpdateArticleBody(queryView);
+
     onArticleSelect(rowId, articleData);
     setSelectedArticle(article as ArticleView);
   };
+
+  const MemoizedPopper = useCallback(
+    (popperProps: PopperProps) => (
+      <CustomPopper
+        {...popperProps}
+        showCustomPriceColumn={showCustomPriceColumn}
+      />
+    ),
+    [showCustomPriceColumn],
+  );
 
   return (
     <Autocomplete
@@ -463,6 +505,7 @@ export const NewArticleAutoComplete = ({
                 option={option}
                 queryView={queryView}
                 currentCurrency={currentCurrency}
+                showCustomPriceColumn={showCustomPriceColumn}
               />
             </tbody>
           </table>
@@ -498,7 +541,7 @@ export const NewArticleAutoComplete = ({
       getOptionLabel={(option) =>
         typeof option === 'string' ? option : removeHtmlTags(option.name || '')
       }
-      PopperComponent={CustomPopper}
+      PopperComponent={MemoizedPopper}
     />
   );
 };
