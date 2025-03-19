@@ -1503,4 +1503,124 @@ export const de = {
   'Automatically assigned': 'Automatisch erstellt',
   'Some required information is missing. Please check the highlighted fields.':
     'Einige erforderliche Informationen fehlen. Bitte überprüfen Sie die hervorgehobenen Felder.',
+  'Every year': 'Jedes Jahr',
+  'Every 2 years': 'Alle 2 Jahre',
+  'Contract Description': 'Vertragsbeschreibung',
+  'You are about to delete the {{serviceName}} service.':
+    'Sie sind dabei, die Vertragsposition {{serviceName}} zu löschen.',
+  'First job creation': 'Erste Auftragserstellung.',
+  'Upload documents associated with the contract to ensure comprehensive and well-documented record.':
+    'Laden Sie mit dem Vertrag verbundene Dokumente hoch, um eine umfassende und gut dokumentierte Dokumentation sicherzustellen.',
+  'Notice Period': 'Kündigungsfrist',
+  'Status will indicate that a contract action is needed':
+    'Der Status zeigt an, dass eine Vertragsaktion erforderlich ist',
+  'You are about to disband the invoice group.':
+    'Sie sind dabei, die Rechnungsgruppe aufzulösen.',
+  Disband: 'Auflösen',
+  'Disband invoice group': 'Rechnungsgruppe auflösen',
+  'Add to group': 'Zur Gruppe hinzufügen',
+  'Add to invoice group': 'Zur Rechnungsgruppe hinzufügen',
+  'Invoice group {{groupNumber}}': 'Rechnungsgruppe {{groupNumber}}',
+  'Select and group services to be invoiced together':
+    'Wählen und gruppieren Sie Vertragspositionen, die gemeinsam in Rechnung gestellt werden sollen',
+  'Invoice Setup': 'Rechnungseinrichtung',
+  'Select units for which this contract service will apply.':
+    'Wählen Sie Anlagen aus, für die diese Vertragsposition gilt.',
+  Credited: 'Gutgeschrieben',
+  'No attachments yet': 'Noch kein Anhang.',
+  'Attachment upload': 'Anhang hochladen',
+  'Documents updated successfully': 'Dokumente erfolgreich aktualisiert',
+  'Upload attachment': 'Anhang hochladen',
+  'Start and end date': 'Start- und Enddatum',
+  'Show Unassigned Jobs ({{count}})':
+    'Nicht zugewiesene Jobs anzeigen ({{count}})',
+  'BILLABLE HOURS': 'ABRECHENBARE STUNDEN',
+  'No attachment yet.': 'Noch kein Anhang.',
+  'Add Attachment': 'Anhang hinzufügen',
+  Services: 'Services',
+  'You are about to cancel scheduled removal of unit {{externalId}} and restore it':
+    'Sie sind dabei, die geplante Entfernung der Anlage {{externalId}} abzubrechen und sie wiederherzustellen',
+  'Revert unit removal': 'Entfernen der Anlage rückgängig machen',
+  'Schedule removal date': 'Plane Entfernungsdatum',
+  'You are about to remove the {{externalId}} unit from the contract. Are you sure about it?':
+    'Sie sind dabei, die Anlage {{externalId}} aus dem Vertrag zu entfernen. Sind Sie sich sicher?',
+  'Removal date': 'Entfernungsdatum',
+  'Remove unit': 'Anlage entfernen',
+  Image: 'Bilder',
+  'Attached Documents': 'Angehangene Dokumente',
+  Signed: 'Unterschrieben',
+  Ends: 'Endet',
+  'Cancellation Date': 'Kündigungsdatum',
+  'You are about to cancel this contract. This action is permanent.':
+    'Sie sind dabei, diesen Vertrag zu kündigen. Diese Aktion ist dauerhaft.',
+  'Units under the Contract': 'Anlagen im Vertrag',
+  'Invoice Schedule': 'Rechnungsplan',
+  'Cancel contract': 'Vertrag beenden',
+  'PARTY TYPE': 'PARTEI TYP',
+  'CONTRACT PARTY': 'VERTRAGSPARTEIEN',
+  'Enter value/year (in {{currencySymbol}})':
+    'Wert/Jahr eingeben (in {{currencySymbol}})',
+  'Contract value/Year': 'Vertragspreis/Jahr',
+  'Price Adjustment/Year': 'Preisanpassung/Jahr',
+  'Auto-renewal': 'Autom. Verlängerung',
+  'Service job rescheduled successfully': 'Auftrag erfolgreich neu geplant',
+  'After job completion': 'Nach dem Auftrag',
+  'Every 4 years': 'Alle 4 Jahre',
+  'Every 3 years': 'Alle 3 Jahre',
+  'Pick yearly frequency': 'Wählen Sie eine jährliche Häufigkeit',
+  'Bi-weekly': 'Zweiwöchentlich',
+  Weekly: 'Wöchentlich',
+  'Yearly Price Adjustment': 'Jährliche Preisanpassung',
+  'Applies on contract renewal': 'Gilt bei Vertragsverlängerung',
+  'If selected by unit, then it will be set per unit. If the spent amount is met, then indication on the contract will appear.':
+    'Bei Auswahl nach Einheit erfolgt die Einstellung pro Einheit. Wenn der ausgegebene Betrag erreicht ist, erscheint eine entsprechende Angabe im Vertrag.',
+  'Number or %': 'Zahl oder %',
+  'After the end date a new contract will be extended for indicated amount of months':
+    'Nach dem Enddatum wird ein neuer Vertrag um die angegebene Anzahl von Monaten verlängert',
+  'Automatic renewal': 'Autom. Verlängerung',
+  'Contract Setup': 'Vertragseinrichtung',
+  'Select and configure specific contractual data, tailoring the contract setup to meet your unique requirements.':
+    'Wählen und konfigurieren Sie spezifische Vertragsdaten und passen Sie die Vertragskonfiguration an Ihre individuellen Anforderungen an.',
+  'You can change it later in the contract settings.':
+    'Sie können es später in den Vertragseinstellungen ändern.',
+  'Are you sure about it?': 'Sind Sie sich sicher?',
+  'You are about to delete the service.':
+    'Sie sind dabei, die Vertragsposition zu löschen.',
+  'Total contract value per year (excl. VAT)':
+    'Vertragspreis pro Jahr (exkl. MwSt.)',
+  'Auto Job Creation': 'Autom. Auftragserstellung',
+  'Service Price': 'Vertragspositions Preis',
+  'Job Frequency': 'Auftragszyklus',
+  'Total service price (excl. VAT)':
+    'Vertragsposition Gesamtpreis (exkl. MwSt.)',
+  'Invoice Price (Excl. VAT)': 'Rechnungspreis (exkl. MwSt.)',
+  'Select units within the contract service':
+    'Wählen Sie Anlagen innerhalb der Vertragsposition aus',
+  'With this setting there will be no jobs created from this service':
+    'Mit dieser Einstellung werden keine Aufträge aus dieser Vertragsposition erstellt',
+  'Automatic job cycle': 'Autom. Auftragserzeugung',
+  'Invoice Frequency': 'Rechnungszyklus',
+  'Unit Settings': 'Anlagen Einstellungen',
+  'First Invoice Date': 'First Invoice Date',
+  'Service Name': 'Vertragsposition Name',
+  'Add Service': 'Vertragsposition hinzufügen',
+  'Tailor each service according to the specific services included in your contract':
+    'Passen Sie jede Vertragsposition individuell an die in Ihrem Vertrag enthaltenen Positionen an',
+  '2. Customize Job Creation:': '2. Passen Sie die Auftragserstellung an:',
+  'Easily add services that will automatically be included in your invoices.':
+    'Fügen Sie ganz einfach die Vertragspositionen hinzu, die automatisch in Ihren Rechnungen enthalten sein sollen.',
+  '1. Add Contract Services:': '1. Vertragsposition hinzufügen:',
+  'All added service will be added to the invoice.':
+    'All added service will be added to the invoice.',
+  'Define the contract services that you want to provide for your customers.':
+    'Definieren Sie die Vertragspositionen.',
+  'Include Units in the Contract': 'Anlagen zum Vertrag hinzufügen',
+  'Assign engineers': 'Weise Techniker zu',
+  'Date range': 'Zeitraum',
+  'DUE IN': 'FÄLLIG IN',
+  'Select customer to add new contract':
+    'Wählen Sie den Kunden aus, um einen neuen Vertrag hinzuzufügen',
+  'Include Units': 'Anlagen hinzufügen',
+  'Add Services': 'Füge Services hinzu',
+  'Contract Name': 'Vertragsname',
 };

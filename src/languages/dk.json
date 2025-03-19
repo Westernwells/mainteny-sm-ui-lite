@@ -1071,12 +1071,6 @@
   "Service Jobs": "Servicejob",
   "Create Job": "Opret job",
   "Search job type, customer, address etc.": "Søg jobtype, kunde, adresse mm.",
-  "New EMERGENCY Job": "Nyt akutjob",
-  "New CALLOUT Job": "Nyt udkaldsjob",
-  "New REPAIR Job": "Nyt reparationsjob",
-  "New MAINTENANCE Job": "Nyt servicejob",
-  "New INSPECTION Job": "Nyt inspektionsjob",
-  "New INSTALLATION Job": "Nyt installationsjob",
   "New Job": "Nyt job",
   "Regular": "Fast",
   "REGULAR": "FAST",
@@ -2670,6 +2664,5 @@
   "Amount Due: {{amountDue}}": "Forfaldent beløb: {{amountDue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "Hvis du har betalt, så lad os det vide. Hvis ikke, bedes du gøre det snarest for at undgå ekstra gebyrer.",
   "Questions? Contact us at {{contactEmail}}": "Spørgsmål? Kontakt os på {{contactEmail}}",
-  "Thanks, {{companyName}}": "Tak, {{companyName}}",
-  "New Callout Job": "Nyt udkaldsjob"
+  "Thanks, {{companyName}}": "Tak, {{companyName}}"
 }
