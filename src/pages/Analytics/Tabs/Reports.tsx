@@ -275,28 +275,47 @@ export const Reports = () => {
       <form onSubmit={onSubmit}>
         <Grid container spacing={2} direction="column">
           <Grid item xs={12} pb={2}>
-            <Typography
-              variant="subtitle2"
-              color={theme.palette.text.secondary}>
-              {t('Report types')}
-            </Typography>
-            <Box display="flex" flexDirection="row" gap={2} pt={2}>
-              {reportTypes.map(renderReportType)}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'left',
+                flexDirection: 'column',
+                gap: 3,
+              }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.5,
+                }}>
+                <Typography
+                  variant="subtitle2"
+                  color={theme.palette.text.secondary}>
+                  {t('Report types')}
+                </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 2,
+                  }}>
+                  {reportTypes.map(renderReportType)}
+                </Box>
+              </Box>
+
+              {formik.values.reportType === ReportType.FINANCIALS && (
+                <FinantialsReportForm formik={formik} />
+              )}
+
+              {formik.values.reportType !== ReportType.FINANCIALS && (
+                <GenericReportForm formik={formik} />
+              )}
+
+              <IncludesSection
+                disabled={formik.values.reportType !== ReportType.FINANCIALS}
+                formik={formik}
+              />
             </Box>
           </Grid>
-
-          {formik.values.reportType === ReportType.FINANCIALS && (
-            <FinantialsReportForm formik={formik} />
-          )}
-
-          {formik.values.reportType !== ReportType.FINANCIALS && (
-            <GenericReportForm formik={formik} />
-          )}
-
-          <IncludesSection
-            disabled={formik.values.reportType !== ReportType.FINANCIALS}
-            formik={formik}
-          />
 
           <Grid item xs={12} textAlign="end">
             <Button
