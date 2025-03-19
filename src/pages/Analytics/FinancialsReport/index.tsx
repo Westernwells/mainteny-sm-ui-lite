@@ -1,12 +1,12 @@
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
-import {Grid} from '@mui/material';
 import {FormSelect} from 'components/form/FormSelect';
 import {DatePicker} from 'components/DatePicker';
 import {FormatType} from 'models/analytics';
 import {FormikProps} from 'formik';
 import {ReportsForm} from 'models/reports';
+import {Box} from '@mui/system';
 
 const FORMAT_OPTIONS = [
   {
@@ -40,57 +40,73 @@ export const FinantialsReportForm = ({formik}: Props) => {
   const theme = useTheme();
 
   return (
-    <>
-      <Grid container item gap={2}>
-        <Grid item xs={12}>
-          <Typography variant="subtitle2" color={theme.palette.text.secondary}>
-            {t('Period')}
-          </Typography>
-        </Grid>
-        <Grid container item gap={2}>
-          <Grid item xs={12} md={3} xl={2}>
-            <DatePicker
-              defaultDate={formik.values.startDate}
-              getSelectedDate={(newValue) => {
-                if (newValue) formik.setFieldValue('startDate', newValue);
-              }}
-              textFieldProps={{
-                label: 'From',
-                InputLabelProps: {shrink: true},
-              }}
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={3} xl={2}>
-            <DatePicker
-              defaultDate={formik.values.endDate}
-              getSelectedDate={(newValue) => {
-                if (newValue) formik.setFieldValue('endDate', newValue);
-              }}
-              textFieldProps={{
-                label: 'To',
-                InputLabelProps: {shrink: true},
-                helperText:
-                  formik.initialValues.endDate !== formik.values.endDate
-                    ? formik.errors.endDate
-                    : '',
-                error:
-                  formik.initialValues.endDate !== formik.values.endDate &&
-                  !!formik.errors.endDate,
-              }}
-              required
-            />
-          </Grid>
-        </Grid>
-      </Grid>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'left',
+        flexDirection: 'column',
+        gap: 3,
+      }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1.5,
+        }}>
+        <Typography variant="subtitle2" color={theme.palette.text.secondary}>
+          {t('Period')}
+        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+          }}>
+          <DatePicker
+            defaultDate={formik.values.startDate}
+            getSelectedDate={(newValue) => {
+              if (newValue) formik.setFieldValue('startDate', newValue);
+            }}
+            textFieldProps={{
+              label: 'From',
+              InputLabelProps: {shrink: true},
+            }}
+            required
+          />
+          <DatePicker
+            defaultDate={formik.values.endDate}
+            getSelectedDate={(newValue) => {
+              if (newValue) formik.setFieldValue('endDate', newValue);
+            }}
+            textFieldProps={{
+              label: 'To',
+              InputLabelProps: {shrink: true},
+              helperText:
+                formik.initialValues.endDate !== formik.values.endDate
+                  ? formik.errors.endDate
+                  : '',
+              error:
+                formik.initialValues.endDate !== formik.values.endDate &&
+                !!formik.errors.endDate,
+            }}
+            required
+          />
+        </Box>
+      </Box>
 
-      <Grid container item gap={2}>
-        <Grid item xs={12}>
-          <Typography variant="subtitle2" color={theme.palette.text.secondary}>
-            {t('Format type')}
-          </Typography>
-        </Grid>
-        <Grid item xs={12} md={3} xl={2}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1.5,
+        }}>
+        <Typography variant="subtitle2" color={theme.palette.text.secondary}>
+          {t('Format type')}
+        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            width: '360px',
+          }}>
           <FormSelect
             labelId="format-label"
             label="Choose format"
@@ -104,8 +120,8 @@ export const FinantialsReportForm = ({formik}: Props) => {
               multiple: false,
             }}
           />
-        </Grid>
-      </Grid>
-    </>
+        </Box>
+      </Box>
+    </Box>
   );
 };
