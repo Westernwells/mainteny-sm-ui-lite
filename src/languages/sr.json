@@ -3139,5 +3139,9 @@
   "Delete position": "Obriši poziciju",
   "Purchase invoices": "Kupovina faktura",
   "Typography and color": "Tipografija i boja",
-  "Typeface": "Tip slova"
+  "Typeface": "Tip slova",
+  "External description": "Spoljašnji opis",
+  "Include": "Uključi",
+  "Include previously downloaded data": "Uključite prethodno preuzete podatke",
+  "Include PDF documents": "Uključite PDF dokumente"
 }

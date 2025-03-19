@@ -3112,11 +3112,15 @@
   "New General Job": "Neuer Anderer Auftrag",
   "Please enter valid shift times.": "Bitte geben Sie gültige Schichtzeiten ein.",
   "Show {{totalCount}} more": "{{totalCount}} weitere anzeigen",
-  "Custom Price (Net)": "Benutzerdefinierter Preis (Netto)",
+  "Custom Price (Net)": "Kundenspezifischer Preis (Netto)",
   "Select VAT": "Steuersatz wählen",
   "You are about to remove this position permanently from this quotation. This action can't be undone. Do you want to proceed?": "Sie sind dabei, diese Position dauerhaft aus diesem Angebot zu entfernen. Diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie fortfahren?",
   "Delete position": "Position löschen",
   "Purchase invoices": "Eingangsrechnung",
   "Typography and color": "Typografie und Farbe",
-  "Typeface": "Schriftart"
+  "Typeface": "Schriftart",
+  "External description": "Externe Beschreibung",
+  "Include": "Inkludieren",
+  "Include previously downloaded data": "Zuvor heruntergeladene Daten inkludieren",
+  "Include PDF documents": "PDF-Dokumente inkludieren"
 }
