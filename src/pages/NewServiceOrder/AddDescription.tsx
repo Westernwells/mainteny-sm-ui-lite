@@ -190,7 +190,7 @@ export const AddDescription = ({
         </Grid>
 
         <RichTextField
-          label="Description to the engineer"
+          label="External description"
           html={description || ''}
           updateHtml={setDescription}
           minRows={4}
