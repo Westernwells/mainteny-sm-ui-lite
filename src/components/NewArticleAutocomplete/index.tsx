@@ -55,6 +55,7 @@ import {
   iconButtonStyle,
   dismissButtonStyle,
   customPopperStyle,
+  footerTableContentStyle,
 } from './NewArticleAutoComplete.styles';
 
 interface Props {
@@ -149,6 +150,7 @@ export const CustomPopper = ({
             ? `${resolvedAnchorEl.offsetTop - 320}px`
             : `${resolvedAnchorEl.offsetTop + 40}px`
           : 0,
+        maxHeight: '450px',
       }}
       placement={openUpwards ? 'top-start' : 'bottom-start'}>
       <div>
@@ -174,9 +176,9 @@ export const CustomPopper = ({
         {typeof children === 'function'
           ? children({placement: 'auto'})
           : children}
-        <Table style={footerTableStyle}>
+        <Table sx={footerTableStyle}>
           <TableHead>
-            <TableRow style={{display: 'flex'}}>
+            <TableRow sx={footerTableContentStyle}>
               <TableHead style={footerCellStyle}>
                 <IconButton sx={iconButtonStyle}>
                   <ArrowDropDownIcon sx={{fontSize: '1rem'}} />
@@ -304,7 +306,7 @@ export const NewArticleAutoComplete = ({
     useArticles(
       {
         pageIndex: 0,
-        pageSize: 5,
+        pageSize: 25,
         query,
         type: getArticleTypes({excludeTypes}),
       },
@@ -327,9 +329,7 @@ export const NewArticleAutoComplete = ({
           return {
             ...article,
             name: removeHtmlTags(customArticle.name || article.name || ''),
-            description: removeHtmlTags(
-              customArticle.description || article.description || '',
-            ),
+            description: customArticle.description || article.description || '',
             customSellingAmount: customArticle.unitSellingAmount,
             isCustom: true,
           };
@@ -337,14 +337,14 @@ export const NewArticleAutoComplete = ({
         return {
           ...article,
           name: removeHtmlTags(article.name || ''),
-          description: removeHtmlTags(article.description || ''),
+          description: article.description || '',
           isCustom: false,
         };
       })
     : (articlesResource.data ?? []).map((article) => ({
         ...article,
         name: removeHtmlTags(article.name || ''),
-        description: removeHtmlTags(article.description || ''),
+        description: article.description || '',
         isCustom: false,
       }));
 
@@ -485,6 +485,7 @@ export const NewArticleAutoComplete = ({
       id="article-combo-box"
       disableClearable
       disablePortal
+      filterOptions={(options) => options}
       clearOnEscape
       openOnFocus={openOnFocus}
       sx={{
