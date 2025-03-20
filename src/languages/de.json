@@ -3122,5 +3122,7 @@
   "External description": "Externe Beschreibung",
   "Include": "Inkludieren",
   "Include previously downloaded data": "Zuvor heruntergeladene Daten inkludieren",
-  "Include PDF documents": "PDF-Dokumente inkludieren"
+  "Include PDF documents": "PDF-Dokumente inkludieren",
+  "Delete note": "Notiz löschen",
+  "You are about to delete a note, are you sure about this?": "Sie sind dabei, eine Notiz zu löschen. Sind Sie sicher?"
 }

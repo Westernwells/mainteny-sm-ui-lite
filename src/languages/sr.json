@@ -3143,5 +3143,9 @@
   "External description": "Spoljašnji opis",
   "Include": "Uključi",
   "Include previously downloaded data": "Uključite prethodno preuzete podatke",
-  "Include PDF documents": "Uključite PDF dokumente"
+  "Include PDF documents": "Uključite PDF dokumente",
+  "New Regular Job": "Novi redovni posao",
+  "New Operation Job": "Нова операција посао",
+  "Delete note": "Izbriši belešku",
+  "You are about to delete a note, are you sure about this?": "Spremate se da izbrišete belešku, jeste li sigurni u ovo?"
 }
