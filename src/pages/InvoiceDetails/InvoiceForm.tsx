@@ -1638,7 +1638,13 @@ export const InvoiceForm = ({
     const invoiceAmountDetail = await calculateInvoiceAmount({
       data: {
         currency: currentCurrency.code,
-        items: formik.values.items,
+        items: formik.values.items.map((item) => ({
+          ...item,
+          article: {
+            ...item.article,
+            id: undefined,
+          },
+        })),
         globalDiscount: formik.values.discount,
         paymentRecord: formik.values.payment,
       },
