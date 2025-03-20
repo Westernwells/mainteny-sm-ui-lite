@@ -27,6 +27,17 @@ export const footerTableStyle = {
   padding: '0.1em 0em',
   zIndex: 1000,
   background: '#F7F9FC',
+  bottom: 0,
+  position: 'sticky',
+};
+
+export const footerTableContentStyle = {
+  display: 'flex',
+  background: 'white',
+  width: '100%',
+  padding: '0.25em',
+  borderTop: '1px solid #dfe3e6',
+  boxShadow: '0 -2px 5px rgba(0, 0, 0, 0.1)',
 };
 
 export const footerCellStyle = {
