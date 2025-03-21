@@ -47,7 +47,7 @@ export const ArticleAutocomplete = ({
       {
         pageIndex: 0,
         pageSize: 3,
-        query: encodeURIComponent(query),
+        query,
       },
       {keepPreviousData: true},
       true,
@@ -125,7 +125,9 @@ export const ArticleAutocomplete = ({
         />
       )}
       renderOption={(props, option) => (
-        <li {...(option.name !== 'autocomplete-table-title' ? props : {})}>
+        <li
+          {...(option.name !== 'autocomplete-table-title' ? props : {})}
+          key={option.id || 'table-header'}>
           <table style={{width: '100%'}}>
             {option.name === 'autocomplete-table-title' ? (
               <thead>

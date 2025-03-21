@@ -8,58 +8,46 @@ import {format} from 'date-fns';
 import {Comment} from 'models/comment';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {SxProps} from '@mui/system/styleFunctionSx/styleFunctionSx';
-import {Chip} from '@mui/material';
+import {getUserFullName} from 'utils/utils';
+import DOMPurify from 'dompurify';
+import {Avatar} from './Avatar';
 
 interface Props extends BoxProps {
   note: Comment;
   onDelete: () => void;
   onEdit: () => void;
   styles?: SxProps;
-  isEditing?: boolean;
 }
 
-export const NoteCard = ({
-  note,
-  onDelete,
-  onEdit,
-  isEditing = false,
-  styles,
-  ...rest
-}: Props) => {
+export const NoteCard = ({note, onDelete, onEdit, styles}: Props) => {
   const theme = useTheme();
   const {user} = useUserSession();
-  return (
-    <Box>
-      <Box
-        sx={{
-          py: '1.5em',
-          px: '1em',
-          '&:hover': {
-            backgroundColor: theme.palette.action.hover,
-          },
-          ...styles,
-        }}
-        {...rest}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-          }}>
-          <Typography variant="caption" color={theme.palette.text.secondary}>
-            {`${note.meta.creator?.firstName} ${note.meta.creator?.lastName} - `}
-            {isEditing ? (
-              <span>
-                <Chip label="Editing" size="small" variant="outlined" />
-              </span>
-            ) : (
-              format(new Date(note.meta.createdAt), 'dd.MM.yyyy, HH:mm')
-            )}
-          </Typography>
 
+  return (
+    <Box
+      sx={{
+        '&:hover': {
+          backgroundColor: theme.palette.action.hover,
+        },
+        ...styles,
+      }}
+      py={2}
+      px="1.5rem">
+      <Box flexDirection="row" display="flex" justifyContent="space-between">
+        <Box alignItems="center" flexDirection="row" display="flex">
+          <Box>
+            <Avatar removeNameText userAccount={note.meta.creator!} />
+          </Box>
+          <Typography fontWeight="bold" variant="body2" ml={1}>
+            {getUserFullName(note.meta.creator!)}
+          </Typography>
+        </Box>
+        <Box display="flex" flexDirection="row" alignItems="center">
+          <Typography color={theme.palette.text.secondary} variant="body2">
+            {format(new Date(note.meta.createdAt), 'dd.MM.yyyy, HH:mm')}
+          </Typography>
           {note.meta.creator?.id === user?.userAccount.id && (
-            <Box display="flex" alignItems="center">
+            <Box ml={2} display="flex" alignItems="center">
               <IconButton size="small" onClick={onEdit}>
                 <Edit fontSize="small" />
               </IconButton>
@@ -69,10 +57,14 @@ export const NoteCard = ({
             </Box>
           )}
         </Box>
-
-        <Typography variant="h6" pt="1rem" sx={{whiteSpace: 'pre-line'}}>
-          {note.content}
-        </Typography>
+      </Box>
+      <Box mt={2}>
+        <Typography
+          variant="body2"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(note.content),
+          }}
+        />
       </Box>
     </Box>
   );

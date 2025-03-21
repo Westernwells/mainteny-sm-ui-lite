@@ -81,9 +81,6 @@ const NoteList: React.FC<Props> = ({
                       if (activeNote.id === note.id) return;
                       formik.setValues({note: note.content});
                     }}
-                    isEditing={
-                      activeNote.id === note.id && activeNote.action === 'edit'
-                    }
                     styles={{
                       backgroundColor:
                         activeNote.id === note.id

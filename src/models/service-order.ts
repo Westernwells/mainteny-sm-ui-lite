@@ -24,6 +24,7 @@ import {Discount} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {CommentRecord} from './comment';
 
 export enum Priority {
   A = 'A',
@@ -457,6 +458,7 @@ export interface CompleteServiceOrder {
   travelTimeRecord?: ServiceOrderReportTimeRecord;
   showTime?: boolean;
   showHours?: boolean;
+  customerName?: string;
 }
 
 export interface CheckListAnswerRecord {
@@ -502,6 +504,7 @@ export interface ServiceOrderReportAdditionalInfo {
     endTime: string;
   };
   status?: ReportStatus;
+  customerName?: string;
 }
 
 export interface ServiceOrderReportArticleView {
@@ -659,6 +662,7 @@ export interface CreateServiceOrderRecord {
   callerInfo?: CallerInfo;
   confirmationChannels?: ContactChannel[];
   notificationChannels?: ContactChannel[];
+  comments?: CommentRecord[];
 }
 
 export interface ServiceOrderArticleView {
