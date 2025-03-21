@@ -215,14 +215,12 @@ const MixedPositionRowComponent = ({
         }
 
         await createArticleMix({article: newArticleData, subAssociations: []});
+      } else if (isFreeText) {
+        await updateArticle({
+          articleId: rowId,
+          article: {name: selectedArticle as string},
+        });
       } else {
-        if (isFreeText) {
-          await updateArticle({
-            articleId: rowId,
-            article: {name: selectedArticle as string},
-          });
-        }
-
         const selectedArticleView = selectedArticle as ArticleView;
         const updateData: UpdateArticleRecord = {
           name: selectedArticleView.name || '',
@@ -385,7 +383,7 @@ const MixedPositionRowComponent = ({
       <TableCell noPadding onDoubleClick={() => handleEditStart(row, 'name')}>
         {editState.field === 'name' && editState.id === row.data.id ? (
           <NewArticleAutoComplete
-            initialValue={row.data}
+            initialValue={row}
             onArticleSelect={(selectedArticle) => {
               if (typeof selectedArticle === 'string') {
                 handleMixedPositionArticle(row.data.id, selectedArticle, true);
@@ -401,7 +399,7 @@ const MixedPositionRowComponent = ({
               alignItems: 'center',
               justifyContent: 'space-between',
               width: '100%',
-              border: row.data.name ? 'none' : '2px solid red',
+              border: row.name ? 'none' : '2px solid red',
             }}>
             <Box
               sx={{
@@ -429,7 +427,7 @@ const MixedPositionRowComponent = ({
                 </IconButton>
 
                 <Typography sx={{fontSize: '14px', fontWeight: '600'}}>
-                  {row.data.name}
+                  {row.name}
                 </Typography>
               </Box>
 
@@ -487,30 +485,30 @@ const MixedPositionRowComponent = ({
       <TableCell align="right">
         <Typography sx={{fontSize: '14px', fontWeight: '600'}}>
           {Number.isFinite(
-            (((row.data.unitSellingAmount?.netAmount ?? 0) -
+            (((row.unitAmount?.netAmount ?? 0) -
               (row.data.unitPurchaseAmount?.netAmount ?? 0)) /
               (row.data.unitPurchaseAmount?.netAmount ?? 0)) *
               100,
           ) &&
-          (((row.data.unitSellingAmount?.netAmount ?? 0) -
+          (((row.unitAmount?.netAmount ?? 0) -
             (row.data.unitPurchaseAmount?.netAmount ?? 0)) /
             (row.data.unitPurchaseAmount?.netAmount ?? 0)) *
             100 !==
             0
             ? (
-                (((row.data.unitSellingAmount?.netAmount ?? 0) -
+                (((row.unitAmount?.netAmount ?? 0) -
                   (row.data.unitPurchaseAmount?.netAmount ?? 0)) /
                   (row.data.unitPurchaseAmount?.netAmount ?? 0)) *
                 100
               ).toFixed(2)
             : '-'}
           {Number.isFinite(
-            (((row.data.unitSellingAmount?.netAmount ?? 0) -
+            (((row.unitAmount?.netAmount ?? 0) -
               (row.data.unitPurchaseAmount?.netAmount ?? 0)) /
               (row.data.unitPurchaseAmount?.netAmount ?? 0)) *
               100,
           ) &&
-          (((row.data.unitSellingAmount?.netAmount ?? 0) -
+          (((row.unitAmount?.netAmount ?? 0) -
             (row.data.unitPurchaseAmount?.netAmount ?? 0)) /
             (row.data.unitPurchaseAmount?.netAmount ?? 0)) *
             100 !==
@@ -522,7 +520,7 @@ const MixedPositionRowComponent = ({
       <TableCell align="right">
         <Typography sx={{fontSize: '14px', fontWeight: '600'}}>
           {formatCurrency(
-            (row.data.unitSellingAmount?.netAmount ?? 0) /
+            (row.unitAmount?.netAmount ?? 0) /
               10 ** currentCurrency.fractionDigits,
             {
               currency: currentCurrency.code,
@@ -535,7 +533,7 @@ const MixedPositionRowComponent = ({
       </TableCell>
       <TableCell align="right">
         <Typography sx={{fontSize: '14px', fontWeight: '600'}}>
-          {`${row.data.unitSellingAmount?.percentageVat}%`}
+          {`${row.unitAmount?.percentageVat}%`}
         </Typography>
       </TableCell>
       <TableCell
@@ -588,7 +586,7 @@ const MixedPositionRowComponent = ({
       <TableCell align="right">
         <Typography sx={{fontSize: '14px', fontWeight: '600'}}>
           {formatCurrency(
-            ((row.data.unitSellingAmount?.netAmount ?? 0) * 1) /
+            ((row.unitAmount?.netAmount ?? 0) * 1) /
               10 ** currentCurrency.fractionDigits,
             {
               currency: currentCurrency.code,

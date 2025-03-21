@@ -372,8 +372,8 @@ export interface MixedPositionRow {
   type: ArticleType;
   unit: string;
   unitPurchaseAmount?: AmountRecord;
-  unitSellingAmount?: AmountRecord;
-  quantity?: number;
+  unitAmount: AmountRecord;
+  quantity: number;
 }
 
 export interface SubPositionRow {
@@ -387,7 +387,7 @@ export interface SubPositionRow {
   type: ArticleType;
   unit: string;
   unitPurchaseAmount?: AmountRecord;
-  unitSellingAmount?: AmountRecord;
+  unitAmount: AmountRecord;
   createdAt?: string;
   lastUpdatedAt?: string;
 }

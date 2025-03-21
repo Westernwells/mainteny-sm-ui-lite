@@ -348,42 +348,39 @@ const SubPositionRowComponent = ({
         });
         resetEditState();
         await resetAndUpdateSubRows(parentId);
+      } else {
+        const selectedArticleView = selectedArticle as ArticleView;
+        const updateData: UpdateArticleSubAssociationBody = {
+          name: selectedArticleView.name || '',
+          unitPurchaseAmount: selectedArticleView.unitPurchaseAmount,
+          unitSellingAmount: selectedArticleView.unitSellingAmount,
+          stock: selectedArticleView.stock || {
+            currentStock: 1,
+            maxStock: 1,
+            minOrderQuantity: 1,
+            minStock: 1,
+          },
+          description: selectedArticleView.description || '',
+          model: selectedArticleView.model || '',
+          category: selectedArticleView.category || '',
+          subCategory: selectedArticleView.subCategory || '',
+          manufacturer: selectedArticleView.manufacturer || '',
+          unit: selectedArticleView.unit || '',
+          storageLocation: selectedArticleView.storageLocation || '',
+          contractName: selectedArticleView.additionalInfo?.contractName || '',
+          costPackage:
+            selectedArticleView.additionalInfo?.costPackage || undefined,
+        };
 
-        return;
+        await updateArticleSubPosition({
+          articleId: parentId,
+          associationId: subPositionId,
+          article: updateData,
+        });
+
+        resetEditState();
+        await resetAndUpdateSubRows(parentId);
       }
-
-      //  **Updating an existing sub-position with a new article selection**
-      const selectedArticleView = selectedArticle as ArticleView;
-      const updateData: UpdateArticleSubAssociationBody = {
-        name: selectedArticleView.name || '',
-        unitPurchaseAmount: selectedArticleView.unitPurchaseAmount,
-        unitSellingAmount: selectedArticleView.unitSellingAmount,
-        stock: selectedArticleView.stock || {
-          currentStock: 1,
-          maxStock: 1,
-          minOrderQuantity: 1,
-          minStock: 1,
-        },
-        description: selectedArticleView.description || '',
-        model: selectedArticleView.model || '',
-        category: selectedArticleView.category || '',
-        subCategory: selectedArticleView.subCategory || '',
-        manufacturer: selectedArticleView.manufacturer || '',
-        unit: selectedArticleView.unit || '',
-        storageLocation: selectedArticleView.storageLocation || '',
-        contractName: selectedArticleView.additionalInfo?.contractName || '',
-        costPackage:
-          selectedArticleView.additionalInfo?.costPackage || undefined,
-      };
-
-      await updateArticleSubPosition({
-        articleId: parentId,
-        associationId: subPositionId,
-        article: updateData,
-      });
-
-      resetEditState();
-      await resetAndUpdateSubRows(parentId);
     } catch (error) {
       showError(error);
     }
@@ -408,7 +405,7 @@ const SubPositionRowComponent = ({
     );
 
     const updatedUnitSellingAmount: AmountRecord = {
-      netAmount: subPosition.article.unitSellingAmount.netAmount,
+      netAmount: subPosition.unitAmount.netAmount,
       currency: currentCurrency.code || 'EUR',
       vatId: selectedVatId,
       vatName: taxRate?.name || '',
@@ -467,8 +464,8 @@ const SubPositionRowComponent = ({
         margin: newMargin,
         unitSellingAmount: {
           netAmount: Number(newSellingPrice) ?? 0,
-          percentageVat: subPosition?.article.unitSellingAmount?.percentageVat,
-          currency: subPosition?.article.unitSellingAmount?.currency || 'EUR',
+          percentageVat: subPosition?.unitAmount?.percentageVat,
+          currency: subPosition?.unitAmount?.currency || 'EUR',
         },
       },
     });
@@ -488,8 +485,8 @@ const SubPositionRowComponent = ({
         margin: newMargin,
         unitSellingAmount: {
           netAmount: Number(newSellingPrice) ?? 0,
-          percentageVat: subPosition?.article.unitSellingAmount?.percentageVat,
-          currency: subPosition?.article.unitSellingAmount?.currency || 'EUR',
+          percentageVat: subPosition?.unitAmount?.percentageVat,
+          currency: subPosition?.unitAmount?.currency || 'EUR',
         },
       },
     });
@@ -564,8 +561,8 @@ const SubPositionRowComponent = ({
             newSellingPrice ?? 0,
             currentCurrency,
           ),
-          percentageVat: subPosition?.article.unitSellingAmount?.percentageVat,
-          currency: subPosition?.article.unitSellingAmount?.currency || 'EUR',
+          percentageVat: subPosition?.unitAmount?.percentageVat,
+          currency: subPosition?.unitAmount?.currency || 'EUR',
         };
       } else if (field === 'margin') {
         const newSellingPrice =
@@ -576,8 +573,8 @@ const SubPositionRowComponent = ({
             newSellingPrice ?? 0,
             currentCurrency,
           ),
-          percentageVat: subPosition?.article.unitSellingAmount?.percentageVat,
-          currency: subPosition?.article.unitSellingAmount?.currency || 'EUR',
+          percentageVat: subPosition?.unitAmount?.percentageVat,
+          currency: subPosition?.unitAmount?.currency || 'EUR',
         };
       }
 
@@ -675,7 +672,7 @@ const SubPositionRowComponent = ({
         {subPositionEditState.field === 'name' &&
         subPositionEditState.id === subPosition.id ? (
           <NewArticleAutoComplete
-            initialValue={activeSubPosition?.article || null}
+            initialValue={activeSubPosition}
             onArticleSelect={(selectedArticle) => {
               if (typeof selectedArticle === 'string') {
                 handleSubPositionArticle(subPosition.id, selectedArticle, true);
@@ -944,30 +941,30 @@ const SubPositionRowComponent = ({
         ) : (
           <Typography sx={{paddingRight: '12px'}} variant="body2">
             {Number.isFinite(
-              (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+              (((subPosition.unitAmount?.netAmount ?? 0) -
                 (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
                 (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
                 100,
             ) &&
-            (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+            (((subPosition.unitAmount?.netAmount ?? 0) -
               (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
               (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
               100 !==
               0
               ? (
-                  (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+                  (((subPosition.unitAmount?.netAmount ?? 0) -
                     (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
                     (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
                   100
                 ).toFixed(2)
               : '-'}
             {Number.isFinite(
-              (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+              (((subPosition.unitAmount?.netAmount ?? 0) -
                 (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
                 (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
                 100,
             ) &&
-            (((subPosition.article.unitSellingAmount?.netAmount ?? 0) -
+            (((subPosition.unitAmount?.netAmount ?? 0) -
               (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) /
               (subPosition.article.unitPurchaseAmount?.netAmount ?? 0)) *
               100 !==
@@ -1029,7 +1026,7 @@ const SubPositionRowComponent = ({
         ) : (
           <Typography sx={{paddingRight: '12px'}} variant="body2">
             {formatCurrency(
-              (subPosition?.article.unitSellingAmount?.netAmount ?? 0) /
+              (subPosition?.unitAmount?.netAmount ?? 0) /
                 10 ** currentCurrency.fractionDigits,
               {
                 currency: currentCurrency.code,
@@ -1180,7 +1177,7 @@ const SubPositionRowComponent = ({
         ) : (
           // Show VAT from mixedPosition (not from subPosition)
           <Typography sx={{paddingRight: '12px'}} variant="body2">
-            {`${row.data.unitSellingAmount?.percentageVat}%`}
+            {`${row.unitAmount?.percentageVat}%`}
           </Typography>
         )}
       </TableCell>
@@ -1237,7 +1234,7 @@ const SubPositionRowComponent = ({
         <Typography sx={{paddingRight: '12px'}} variant="body2">
           {formatCurrency(
             (subPosition.quantity ?? 0) *
-              ((subPosition.article.unitSellingAmount?.netAmount ?? 0) /
+              ((subPosition.unitAmount?.netAmount ?? 0) /
                 10 ** currentCurrency.fractionDigits),
             {
               currency: currentCurrency.code,
