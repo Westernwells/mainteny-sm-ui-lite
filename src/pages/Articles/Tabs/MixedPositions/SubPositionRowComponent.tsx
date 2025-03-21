@@ -24,7 +24,6 @@ import {
   MixedPositionRow,
   SubPositionFormValues,
   SubPositionRow,
-  UpdateArticleRecord,
   UpdateArticleSubAssociationBody,
   UpdateArticleSubAssociationRecord,
 } from 'models/article';
@@ -62,6 +61,8 @@ import {useTheme} from '@mui/material/styles';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {removeHtmlTags} from 'utils/rich-field-string';
 import {ACTION_CELL_WIDTH} from 'models/table';
+import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
+import {ServiceCompanyNumberType} from 'models/service-company';
 import {DeleteEventState, getIconByType} from '.';
 import {Actions} from './Actions';
 
@@ -143,6 +144,11 @@ const SubPositionRowComponent = ({
   const [openPopover, setOpenPopover] = useState(false);
 
   const {data: taxRates} = useVats();
+
+  const {data: companyNextNumber} = useCompanyNextNumber(
+    {type: ServiceCompanyNumberType.ARTICLE},
+    serviceCompanyId,
+  );
 
   const {mutateAsync: createArticleSubPosition} =
     useCreateArticleSubAssociation('Sub-position created successfully');
@@ -240,72 +246,146 @@ const SubPositionRowComponent = ({
 
   const handleSubPositionArticle = async (
     subPositionId: string,
-    updatedBody: CreateArticleRecord | UpdateArticleRecord,
+    selectedArticle: ArticleView | string,
+    isFreeText: boolean,
   ) => {
-    const parentId = Object.keys(subRows).find((key) =>
-      subRows[key]?.some((sub) => sub.id === subPositionId),
-    );
+    try {
+      const parentId = Object.keys(subRows).find((key) =>
+        subRows[key]?.some((sub) => sub.id === subPositionId),
+      );
 
-    if (!parentId) return;
+      if (!parentId) return;
 
-    if (
-      subPositionEditState.id === subPositionId &&
-      !subPositionId.includes('sub')
-    ) {
-      const articleToUpdate =
-        subPositionEditState.values.name !== updatedBody.name && !updatedBody.id
-          ? ({name: updatedBody.name} as UpdateArticleSubAssociationBody)
-          : (updatedBody as UpdateArticleSubAssociationBody);
+      if (subPositionId.includes('sub')) {
+        let newArticleData: CreateArticleRecord = {
+          serviceCompanyId,
+          externalId: companyNextNumber?.value || '',
+          name:
+            typeof selectedArticle === 'string'
+              ? selectedArticle
+              : selectedArticle.name || '',
+          type: ArticleType.MATERIAL,
+          unitPurchaseAmount: {
+            currency: currentCurrency.code || 'EUR',
+            netAmount: 0,
+            percentageVat: 0,
+          },
+          unitSellingAmount: {
+            currency: currentCurrency.code || 'EUR',
+            netAmount: 0,
+            percentageVat: 0,
+          },
+          stock: {
+            currentStock: 1,
+            maxStock: 1,
+            minOrderQuantity: 1,
+            minStock: 1,
+          },
+          description: '',
+          model: '',
+          category: '',
+          subCategory: '',
+          manufacturer: '',
+          unit: '',
+          storageLocation: '',
+          contractName: '',
+        };
 
-      try {
+        if (!isFreeText) {
+          const selectedArticleView = selectedArticle as ArticleView;
+          newArticleData = {
+            ...newArticleData,
+            id: selectedArticleView.id || '',
+            name: selectedArticleView.name || '',
+            type: selectedArticleView.type,
+            unitPurchaseAmount: selectedArticleView.unitPurchaseAmount,
+            unitSellingAmount: selectedArticleView.unitSellingAmount,
+            stock: selectedArticleView.stock || newArticleData.stock,
+            description: selectedArticleView.description || '',
+            model: selectedArticleView.model!,
+            category: selectedArticleView.category || '',
+            subCategory: selectedArticleView.subCategory!,
+            manufacturer: selectedArticleView.manufacturer || '',
+            unit: selectedArticleView.unit || '',
+            storageLocation: selectedArticleView.storageLocation || '',
+            contractName:
+              selectedArticleView.additionalInfo?.contractName || '',
+            costPackage:
+              selectedArticleView.additionalInfo?.costPackage || undefined,
+          };
+        }
+
+        const currentSubAssociations = await fetchArticleSubAssociations(
+          parentId,
+        );
+
+        await createArticleSubPosition({
+          articleId: parentId,
+          body: {
+            articleId: newArticleData.id,
+            article: {
+              ...newArticleData,
+              model: newArticleData.model || '',
+              subCategory: newArticleData.subCategory || '',
+              unitSellingAmount: newArticleData.unitSellingAmount!,
+              documents: [],
+              pictures: [],
+            },
+            quantity: 1,
+            seqNumber: currentSubAssociations.length || 0,
+          },
+        });
+
+        await resetAndUpdateSubRows(parentId);
+        return;
+      }
+
+      if (isFreeText) {
         await updateArticleSubPosition({
           articleId: parentId,
           associationId: subPositionId,
-          article: articleToUpdate,
+          article: {name: selectedArticle as string},
         });
-        await resetAndUpdateSubRows(parentId);
-      } catch (error) {
-        showError(error);
-      }
-    } else {
-      const isCreateArticleRecord = (
-        body: CreateArticleRecord | UpdateArticleRecord,
-      ): body is CreateArticleRecord => 'serviceCompanyId' in body;
-
-      // Make a deep copy of updatedBody for creation and remove the id property.
-      const articleBody = JSON.parse(JSON.stringify(updatedBody));
-      delete articleBody.id;
-
-      if (isCreateArticleRecord(updatedBody)) {
-        try {
-          const currentSubAssociations = await fetchArticleSubAssociations(
-            parentId,
-          );
-          await createArticleSubPosition({
-            articleId: parentId,
-            body: {
-              articleId: updatedBody.id!,
-              article: articleBody,
-              quantity: 1,
-              seqNumber: currentSubAssociations.length || 0,
-            },
-          });
-        } catch (error) {
-          showError(error);
-        }
-        await resetAndUpdateSubRows(parentId);
-      } else {
-        try {
-          await updateArticleSubPosition({
-            articleId: parentId,
-            associationId: subPositionId,
-            article: updatedBody as UpdateArticleSubAssociationBody,
-          });
-        } catch (error) {
-          showError(error);
-        }
         resetEditState();
+        await resetAndUpdateSubRows(parentId);
+
+        return;
       }
+
+      //  **Updating an existing sub-position with a new article selection**
+      const selectedArticleView = selectedArticle as ArticleView;
+      const updateData: UpdateArticleSubAssociationBody = {
+        name: selectedArticleView.name || '',
+        unitPurchaseAmount: selectedArticleView.unitPurchaseAmount,
+        unitSellingAmount: selectedArticleView.unitSellingAmount,
+        stock: selectedArticleView.stock || {
+          currentStock: 1,
+          maxStock: 1,
+          minOrderQuantity: 1,
+          minStock: 1,
+        },
+        description: selectedArticleView.description || '',
+        model: selectedArticleView.model || '',
+        category: selectedArticleView.category || '',
+        subCategory: selectedArticleView.subCategory || '',
+        manufacturer: selectedArticleView.manufacturer || '',
+        unit: selectedArticleView.unit || '',
+        storageLocation: selectedArticleView.storageLocation || '',
+        contractName: selectedArticleView.additionalInfo?.contractName || '',
+        costPackage:
+          selectedArticleView.additionalInfo?.costPackage || undefined,
+      };
+
+      await updateArticleSubPosition({
+        articleId: parentId,
+        associationId: subPositionId,
+        article: updateData,
+      });
+
+      resetEditState();
+      await resetAndUpdateSubRows(parentId);
+    } catch (error) {
+      showError(error);
     }
   };
 
@@ -532,6 +612,11 @@ const SubPositionRowComponent = ({
     }
   };
 
+  const subPositions = subRows[row.id] || [];
+  const activeSubPosition = subPositions?.find(
+    (sub) => sub?.id === subPosition?.id,
+  );
+
   return (
     <TableRow
       key={`${row.data.id}-sub-${index}`}
@@ -590,13 +675,19 @@ const SubPositionRowComponent = ({
         {subPositionEditState.field === 'name' &&
         subPositionEditState.id === subPosition.id ? (
           <NewArticleAutoComplete
-            onBlur={() =>
-              handleSaveSubPosition(subPosition.id, subPositionEditState.field!)
-            }
-            initialValue={subPosition.article}
-            onArticleSelect={handleSubPositionArticle}
-            rowId={subPosition.id!}
-            serviceCompanyId={serviceCompanyId}
+            initialValue={activeSubPosition?.article || null}
+            onArticleSelect={(selectedArticle) => {
+              if (typeof selectedArticle === 'string') {
+                handleSubPositionArticle(subPosition.id, selectedArticle, true);
+              } else if (selectedArticle) {
+                handleSubPositionArticle(
+                  subPosition.id,
+                  selectedArticle,
+                  false,
+                );
+              }
+            }}
+            excludeTypes={[ArticleType.MIX]}
           />
         ) : (
           <Box

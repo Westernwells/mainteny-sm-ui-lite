@@ -15,6 +15,7 @@ import {
   UpdateArticleRecord,
   SubPositionRow,
   ArticleType,
+  ArticleView,
 } from 'models/article';
 import {FormInput} from 'components/form/FormInput';
 import TableCell from 'components/Table/TableCell';
@@ -31,6 +32,8 @@ import {transformToSubPositionRow} from 'utils/article-utils';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {removeHtmlTags} from 'utils/rich-field-string';
 import {ACTION_CELL_WIDTH} from 'models/table';
+import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
+import {ServiceCompanyNumberType} from 'models/service-company';
 import {Actions} from './Actions';
 import {DeleteEventState, getIconByType} from '.';
 
@@ -111,6 +114,11 @@ const MixedPositionRowComponent = ({
   const currentCurrency = useCurrentCurrency();
   const {language: selectedLng} = useContext(LanguageContext);
 
+  const {data: companyNextNumber} = useCompanyNextNumber(
+    {type: ServiceCompanyNumberType.ARTICLE},
+    serviceCompanyId,
+  );
+
   const {mutateAsync: updateArticle} = useUpdateArticle('');
 
   const {mutateAsync: createArticleMix} = useCreateArticleMix(
@@ -139,53 +147,112 @@ const MixedPositionRowComponent = ({
 
   const handleMixedPositionArticle = async (
     rowId: string,
-    updatedBody: CreateArticleRecord | UpdateArticleRecord,
+    selectedArticle: ArticleView | string,
+    isFreeText: boolean,
   ) => {
-    const isCreateArticleRecord = (
-      body: CreateArticleRecord | UpdateArticleRecord,
-    ): body is CreateArticleRecord => 'serviceCompanyId' in body;
+    try {
+      if (rowId.includes('mixed')) {
+        let newArticleData: CreateArticleRecord;
 
-    if (editState.id === rowId && !rowId.includes('mixed')) {
-      const articleToUpdate =
-        editState.values.name !== updatedBody.name && !updatedBody.id
-          ? ({
-              name: updatedBody.name,
-              type: ArticleType.MIX,
-            } as UpdateArticleRecord)
-          : ({...updatedBody, type: ArticleType.MIX} as UpdateArticleRecord);
+        if (isFreeText) {
+          newArticleData = {
+            serviceCompanyId,
+            externalId: companyNextNumber?.value || '',
+            name: selectedArticle as string,
+            type: ArticleType.MIX,
+            unitPurchaseAmount: {
+              currency: currentCurrency.code || 'EUR',
+              netAmount: 0,
+              percentageVat: 0,
+            },
+            unitSellingAmount: {
+              currency: currentCurrency.code || 'EUR',
+              netAmount: 0,
+              percentageVat: 0,
+            },
+            stock: {
+              currentStock: 1,
+              maxStock: 1,
+              minOrderQuantity: 1,
+              minStock: 1,
+            },
+            description: '',
+            model: '',
+            category: '',
+            subCategory: '',
+            manufacturer: '',
+            unit: '',
+            storageLocation: '',
+            contractName: '',
+          };
+        } else {
+          const selectedArticleView = selectedArticle as ArticleView;
+          newArticleData = {
+            serviceCompanyId,
+            externalId: companyNextNumber?.value || '',
+            name: selectedArticleView.name || '',
+            type: ArticleType.MIX,
+            unitPurchaseAmount: selectedArticleView.unitPurchaseAmount,
+            unitSellingAmount: selectedArticleView.unitSellingAmount,
+            stock: selectedArticleView.stock || {
+              currentStock: 1,
+              maxStock: 1,
+              minOrderQuantity: 1,
+              minStock: 1,
+            },
+            description: selectedArticleView.description || '',
+            model: selectedArticleView.model || '',
+            category: selectedArticleView.category || '',
+            subCategory: selectedArticleView.subCategory || '',
+            manufacturer: selectedArticleView.manufacturer || '',
+            unit: selectedArticleView.unit || '',
+            storageLocation: selectedArticleView.storageLocation || '',
+            contractName:
+              selectedArticleView.additionalInfo?.contractName || '',
+            costPackage:
+              selectedArticleView.additionalInfo?.costPackage || undefined,
+          };
+        }
 
-      try {
-        await updateArticle({
-          articleId: rowId,
-          article: articleToUpdate,
-        });
-      } catch (error) {
-        showError(error);
+        await createArticleMix({article: newArticleData, subAssociations: []});
+      } else {
+        if (isFreeText) {
+          await updateArticle({
+            articleId: rowId,
+            article: {name: selectedArticle as string},
+          });
+        }
+
+        const selectedArticleView = selectedArticle as ArticleView;
+        const updateData: UpdateArticleRecord = {
+          name: selectedArticleView.name || '',
+          unitPurchaseAmount: selectedArticleView.unitPurchaseAmount,
+          unitSellingAmount: selectedArticleView.unitSellingAmount,
+          stock: selectedArticleView.stock || {
+            currentStock: 1,
+            maxStock: 1,
+            minOrderQuantity: 1,
+            minStock: 1,
+          },
+          description: selectedArticleView.description || '',
+          model: selectedArticleView.model || '',
+          category: selectedArticleView.category || '',
+          subCategory: selectedArticleView.subCategory || '',
+          manufacturer: selectedArticleView.manufacturer || '',
+          unit: selectedArticleView.unit || '',
+          storageLocation: selectedArticleView.storageLocation || '',
+          contractName: selectedArticleView.additionalInfo?.contractName || '',
+          costPackage:
+            selectedArticleView.additionalInfo?.costPackage || undefined,
+        };
+
+        await updateArticle({articleId: rowId, article: updateData});
       }
-      resetEditState();
+    } catch (error) {
+      showError(error);
     }
 
-    if (isCreateArticleRecord(updatedBody)) {
-      try {
-        await createArticleMix({
-          article: updatedBody,
-          subAssociations: [],
-        });
-      } catch (error) {
-        showError(error);
-      }
-      resetEditState();
-    } else {
-      try {
-        await updateArticle({
-          articleId: rowId,
-          article: updatedBody,
-        });
-      } catch (error) {
-        showError(error);
-      }
-      resetEditState();
-    }
+    resetEditState();
   };
 
   const handleSaveMixedPosition = async (rowId: string, field: string) => {
@@ -318,13 +385,14 @@ const MixedPositionRowComponent = ({
       <TableCell noPadding onDoubleClick={() => handleEditStart(row, 'name')}>
         {editState.field === 'name' && editState.id === row.data.id ? (
           <NewArticleAutoComplete
-            onBlur={() =>
-              handleSaveMixedPosition(row.data.id, editState.field!)
-            }
             initialValue={row.data}
-            onArticleSelect={handleMixedPositionArticle}
-            rowId={row.data.id}
-            serviceCompanyId={serviceCompanyId}
+            onArticleSelect={(selectedArticle) => {
+              if (typeof selectedArticle === 'string') {
+                handleMixedPositionArticle(row.data.id, selectedArticle, true);
+              } else if (selectedArticle) {
+                handleMixedPositionArticle(row.data.id, selectedArticle, false);
+              }
+            }}
           />
         ) : (
           <Box
