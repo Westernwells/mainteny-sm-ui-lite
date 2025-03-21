@@ -235,7 +235,8 @@ export const aggregateMixedPositionRow = (
     type: article.type,
     unit: article.unit,
     unitPurchaseAmount: article.unitPurchaseAmount,
-    unitSellingAmount: article.unitSellingAmount,
+    unitAmount: article.unitSellingAmount,
+    quantity: 1,
   }));
 
 export const transformToSubPositionRow = (
@@ -251,7 +252,7 @@ export const transformToSubPositionRow = (
   type: subAssociation.article.type,
   unit: subAssociation.article.unit,
   unitPurchaseAmount: subAssociation.article.unitPurchaseAmount,
-  unitSellingAmount: subAssociation.article.unitSellingAmount,
+  unitAmount: subAssociation.article.unitSellingAmount,
   createdAt: subAssociation.createdAt,
   lastUpdatedAt: subAssociation.lastUpdatedAt,
 });

@@ -262,7 +262,7 @@ export const ArticleItemRowQuotation = ({
 
       <TableCell sx={{width: '32%', display: 'inline-block'}}>
         <NewArticleAutoComplete
-          initialValue={articleItem.article as ArticleView}
+          initialValue={articleItem}
           onArticleSelect={(selectedArticle) => {
             if (typeof selectedArticle === 'string') {
               formik.setFieldValue('name', selectedArticle);

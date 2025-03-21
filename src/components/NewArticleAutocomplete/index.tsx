@@ -39,6 +39,8 @@ import {ServiceOrderType} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
 import keyBy from 'lodash/keyBy';
 import {getArticleTypes} from 'utils/article-utils';
+import {InvoiceItemRecord} from 'models/invoice';
+import {QuotationItemRecord} from 'models/quotation';
 import {
   headerCellStyle,
   footerTableStyle,
@@ -240,7 +242,7 @@ const TableRowComponent = ({
 );
 
 interface Props {
-  initialValue?: ArticleView | null;
+  initialValue?: InvoiceItemRecord | QuotationItemRecord | null;
   textFieldProps?: TextFieldProps;
   openOnFocus?: boolean;
   propertyOwner?: PropertyOwnerView;
@@ -335,6 +337,12 @@ export const NewArticleAutoComplete = ({
     setQuery(newValue || '');
   };
 
+  const handleBlur = () => {
+    if (queryView.trim() !== '') {
+      onArticleSelect(queryView);
+    }
+  };
+
   const MemoizedPopper = useCallback(
     (popperProps: PopperProps) => (
       <CustomPopper
@@ -388,6 +396,7 @@ export const NewArticleAutoComplete = ({
             {...params}
             inputRef={inputRef}
             error={inputValue === ''}
+            onBlur={handleBlur}
             sx={{
               '& .MuiOutlinedInput-root': {
                 '& fieldset': {
