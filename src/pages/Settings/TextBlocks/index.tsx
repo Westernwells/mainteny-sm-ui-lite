@@ -243,7 +243,7 @@ const TextBlocks = ({company}: Props) => {
       gap={3}
       sx={{background: theme.palette.background.paper, padding: '1.5em'}}>
       <PageListingLayout
-        containerStyle={{height: '670px'}}
+        containerStyle={{height: '83vh'}}
         renderWidget={
           <Widget
             searchPlaceholder="Search"
@@ -260,7 +260,7 @@ const TextBlocks = ({company}: Props) => {
           columns={columnsMemo()}
           fullHeight={false}
           isCellClickable
-          height={600}
+          height="78vh"
           noRowsEmptySection={
             <EmptySection
               illustration="articles"
