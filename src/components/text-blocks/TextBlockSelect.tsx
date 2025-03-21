@@ -99,7 +99,7 @@ const TextBlockSelect = ({
 
   useEffect(() => {
     setPageCount(Math.ceil(textBlocks.total / page.pageSize));
-  }, [page.pageSize]);
+  }, [textBlocks, page.pageSize]);
 
   useEffect(() => {
     if (!isIdle && !isLoading) {

@@ -1466,7 +1466,7 @@
   "Initial amount": "Rechnungssumme",
   "Handling fee": "Mahngebühr",
   "The invoice is overdue [XX] days. We remind you to please pay the outstanding amount.": "Die Rechnung ist seit [XX] Tagen überfällig. Wir erinnern Sie daran, den ausstehenden Betrag zu begleichen.",
-  "©2023 Mainteny. All rights reserved.": "©2023 Mainteny. Alle Rechte vorbehalten.",
+  "Mainteny. All rights reserved.": "Mainteny. Alle Rechte vorbehalten.",
   "Mainteny® is a registered trademark.": "Mainteny® ist eine registrierte Marke.",
   "This ID is already taken. Please enter a different one.": "Diese ID ist bereits vergeben. Bitte geben Sie eine Alternative ein.",
   "CONTRACT NAME": "VERTRAGSNAME",
@@ -3112,11 +3112,17 @@
   "New General Job": "Neuer Anderer Auftrag",
   "Please enter valid shift times.": "Bitte geben Sie gültige Schichtzeiten ein.",
   "Show {{totalCount}} more": "{{totalCount}} weitere anzeigen",
-  "Custom Price (Net)": "Benutzerdefinierter Preis (Netto)",
+  "Custom Price (Net)": "Kundenspezifischer Preis (Netto)",
   "Select VAT": "Steuersatz wählen",
   "You are about to remove this position permanently from this quotation. This action can't be undone. Do you want to proceed?": "Sie sind dabei, diese Position dauerhaft aus diesem Angebot zu entfernen. Diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie fortfahren?",
   "Delete position": "Position löschen",
   "Purchase invoices": "Eingangsrechnung",
   "Typography and color": "Typografie und Farbe",
-  "Typeface": "Schriftart"
+  "Typeface": "Schriftart",
+  "External description": "Externe Beschreibung",
+  "Include": "Inkludieren",
+  "Include previously downloaded data": "Zuvor heruntergeladene Daten inkludieren",
+  "Include PDF documents": "PDF-Dokumente inkludieren",
+  "Delete note": "Notiz löschen",
+  "You are about to delete a note, are you sure about this?": "Sie sind dabei, eine Notiz zu löschen. Sind Sie sicher?"
 }

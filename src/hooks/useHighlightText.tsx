@@ -1,3 +1,4 @@
+import {escapeRegExp} from 'lodash';
 import React from 'react';
 
 interface HighlightTextOptions {
@@ -13,7 +14,14 @@ const useHighlightText = (options: HighlightTextOptions): React.ReactNode => {
     return text;
   }
 
-  const parts = text?.split(new RegExp(`(${highlight})`, 'gi'));
+  const escapedHighlight = escapeRegExp(highlight);
+  const parts = text?.split(new RegExp(`(${escapedHighlight})`, 'gi'));
+
+  const defaultStyle = {
+    backgroundColor: '#222B451F',
+    color: 'black',
+    fontWeight: '600',
+  };
 
   return (
     <span>
@@ -22,10 +30,8 @@ const useHighlightText = (options: HighlightTextOptions): React.ReactNode => {
           <span
             key={index}
             style={{
+              ...defaultStyle,
               ...highlightStyle,
-              backgroundColor: '#222B451F',
-              color: 'black',
-              fontWeight: '600',
             }}>
             {part}
           </span>

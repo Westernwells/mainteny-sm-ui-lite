@@ -104,6 +104,7 @@ export const queryKeys = {
   fetchTextBlockDetail: 'fetchTextBlockDetail',
   getWorkingTechnicians: 'getWorkingTechnicians',
   fetchServiceOrderComments: 'fetchServiceOrderComments',
+  fetchComments: 'fetchComments',
   fetchCompanyEventTypes: 'fetchCompanyEventTypes',
   fetchLatestVersion: 'fetchLatestVersion',
   fetchSystemSettings: 'fetchSystemSettings',
