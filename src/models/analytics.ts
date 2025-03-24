@@ -10,8 +10,6 @@ export enum FormatType {
   DATEV = 'DATEV',
   SAGE50 = 'Sage50 (csv)',
   DF2 = 'DF2 (df2)',
-  DATEV_WITH_PDF = 'DATEV with PDFs',
-  EXCEL_WITH_PDF = 'Excel with PDFs',
 }
 
 export interface QueryWorkingHours {
@@ -25,4 +23,13 @@ export interface QueryFinancials {
   endDate: string;
   full?: boolean;
   includePayments?: boolean;
+}
+
+export interface QueryDatevFinancials {
+  startDate: string;
+  endDate: string;
+  full?: boolean;
+  includeInvoices?: boolean;
+  includePayments?: boolean;
+  includePurchaseInvoices?: boolean;
 }
