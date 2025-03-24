@@ -107,9 +107,9 @@ export const Invoices = ({serviceOrderId, paymentStatus}: Props) => {
       return defaultTypes;
     }
 
-    const jobHasFullInvoice = jobInvoices.find(
-      (i) => i.type === InvoiceType.FULL,
-    );
+    const jobHasFullInvoice = jobInvoices
+      .filter((item) => item.status !== InvoiceStatus.CANCELLED)
+      .find((i) => i.type === InvoiceType.FULL);
     if (jobHasFullInvoice) {
       return [InvoiceType.FULL];
     }

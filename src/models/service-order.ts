@@ -458,6 +458,7 @@ export interface CompleteServiceOrder {
   travelTimeRecord?: ServiceOrderReportTimeRecord;
   showTime?: boolean;
   showHours?: boolean;
+  customerName?: string;
 }
 
 export interface CheckListAnswerRecord {
@@ -503,6 +504,7 @@ export interface ServiceOrderReportAdditionalInfo {
     endTime: string;
   };
   status?: ReportStatus;
+  customerName?: string;
 }
 
 export interface ServiceOrderReportArticleView {

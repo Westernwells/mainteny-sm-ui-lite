@@ -6,6 +6,7 @@ import {
   ArticleTableRow,
   ArticleType,
   ArticleView,
+  ExtendedArticleView,
   MixedPositionRow,
   SearchParameters,
   SubPositionRow,
@@ -234,7 +235,8 @@ export const aggregateMixedPositionRow = (
     type: article.type,
     unit: article.unit,
     unitPurchaseAmount: article.unitPurchaseAmount,
-    unitSellingAmount: article.unitSellingAmount,
+    unitAmount: article.unitSellingAmount,
+    quantity: 1,
   }));
 
 export const transformToSubPositionRow = (
@@ -250,7 +252,7 @@ export const transformToSubPositionRow = (
   type: subAssociation.article.type,
   unit: subAssociation.article.unit,
   unitPurchaseAmount: subAssociation.article.unitPurchaseAmount,
-  unitSellingAmount: subAssociation.article.unitSellingAmount,
+  unitAmount: subAssociation.article.unitSellingAmount,
   createdAt: subAssociation.createdAt,
   lastUpdatedAt: subAssociation.lastUpdatedAt,
 });
@@ -288,7 +290,7 @@ export const getArticleTypes = ({
 };
 
 export const mapUpdatedBodyToArticleView = (
-  updatedBody: UpdateArticleRecord | CreateArticleRecord,
+  updatedBody: ExtendedArticleView,
   defaultValues?: Partial<ArticleView>,
 ): ArticleView => ({
   id: defaultValues?.id || '',
@@ -303,7 +305,9 @@ export const mapUpdatedBodyToArticleView = (
   manufacturer: updatedBody.manufacturer || '',
   unit: updatedBody.unit || '',
   unitPurchaseAmount: updatedBody.unitPurchaseAmount as MultiVatsAmount,
-  unitSellingAmount: updatedBody.unitSellingAmount as MultiVatsAmount,
+  unitSellingAmount:
+    (updatedBody as ExtendedArticleView)?.customSellingAmount ||
+    (updatedBody.unitSellingAmount as MultiVatsAmount),
   storageLocation: updatedBody.storageLocation || '',
   stock: updatedBody.stock || {
     currentStock: 0,
@@ -313,7 +317,9 @@ export const mapUpdatedBodyToArticleView = (
   },
   costPackage: updatedBody.costPackage || undefined,
   additionalInfo: {
-    contractName: updatedBody.contractName || '',
+    contractName:
+      (updatedBody as UpdateArticleRecord | CreateArticleRecord)
+        ?.contractName || '',
     costPackage: updatedBody.costPackage || undefined,
     items: [],
     pictureUrls: [],

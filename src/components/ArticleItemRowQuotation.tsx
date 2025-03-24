@@ -45,7 +45,6 @@ import {QuotationItemRecord} from 'models/quotation';
 import {DragIndicator, Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {VatView} from 'models/vat';
 import {stripHtmlTags} from 'models/text-block';
-import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {FormSelect} from './form/FormSelect';
 import ArticleTypeCard from './ArticleTypeCard';
@@ -87,8 +86,6 @@ export const ArticleItemRowQuotation = ({
   propertyOwner,
 }: Props) => {
   const {t} = useTranslation();
-  const {user} = useUserSession();
-  const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
   const currentCurrency = useCurrentCurrency();
   const [showDescription, setShowDescription] = useState<boolean>(
@@ -265,20 +262,18 @@ export const ArticleItemRowQuotation = ({
 
       <TableCell sx={{width: '32%', display: 'inline-block'}}>
         <NewArticleAutoComplete
-          onBlur={(event: React.FocusEvent<HTMLInputElement>) => {
-            formik.setFieldTouched(`name`, true, false);
-            formik.setFieldValue(`name`, event.target.value || '');
+          initialValue={articleItem}
+          onArticleSelect={(selectedArticle) => {
+            if (typeof selectedArticle === 'string') {
+              formik.setFieldValue('name', selectedArticle);
+            } else if (selectedArticle) {
+              const transformedArticle = mapUpdatedBodyToArticleView(
+                selectedArticle,
+                {id: articleItem.id},
+              );
+              handleSelectItem(transformedArticle, index);
+            }
           }}
-          initialValue={articleItem.article as ArticleView}
-          onArticleSelect={(_rowId, updatedBody) => {
-            const transformedArticle = mapUpdatedBodyToArticleView(
-              updatedBody,
-              {id: articleItem.id},
-            );
-            handleSelectItem(transformedArticle, index);
-          }}
-          rowId={articleItem.id || articleItem.article?.id || ''}
-          serviceCompanyId={serviceCompanyId!}
           openOnFocus={false}
           propertyOwner={propertyOwner}
           excludeTypes={[ArticleType.MIX]}

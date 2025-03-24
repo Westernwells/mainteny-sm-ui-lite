@@ -28,8 +28,19 @@ export const JobNotes = ({order}: Props) => {
     pageIndex: 0,
     pageSize: 2,
   });
+  // Only used to get all number of office notes
+  const {data: officeNotes} = useComments({
+    type: CommentType.SERVICE_ORDER_COMMENT,
+    category: CommentCategory.OFFICE,
+    refId: order.id,
+    pageIndex: 0,
+    pageSize: 1,
+  });
 
-  const totalNotes = notes?.total ?? 0;
+  const totalAllNotes = notes?.total ?? 0;
+  const totalOfficeNotes = officeNotes?.total ?? 0;
+
+  const totalNotes = totalAllNotes + totalOfficeNotes;
 
   return (
     <>

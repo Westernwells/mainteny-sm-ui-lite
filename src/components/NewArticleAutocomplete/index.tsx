@@ -1,10 +1,4 @@
-import React, {
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import {SyntheticEvent, useCallback, useEffect, useRef, useState} from 'react';
 import {
   TextField,
   Autocomplete,
@@ -26,12 +20,9 @@ import {
   ArticleType,
   ArticleView,
   COLUMN_DATA,
-  CreateArticleRecord,
-  UpdateArticleRecord,
+  ExtendedArticleView,
 } from 'models/article';
 import {useArticles} from 'hooks/reactQuery/useArticle';
-import {useCompanyNextNumber} from 'hooks/reactQuery/useCompanies';
-import {ServiceCompanyNumberType} from 'models/service-company';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
@@ -41,13 +32,15 @@ import NoteAlt from '@mui/icons-material/NoteAlt';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
-import {Currency, MultiVatsAmount} from 'models/misc';
+import {Currency} from 'models/misc';
 import {removeHtmlTags} from 'utils/rich-field-string';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
 import keyBy from 'lodash/keyBy';
 import {getArticleTypes} from 'utils/article-utils';
+import {InvoiceItemRecord} from 'models/invoice';
+import {QuotationItemRecord} from 'models/quotation';
 import {
   headerCellStyle,
   footerTableStyle,
@@ -55,31 +48,9 @@ import {
   iconButtonStyle,
   dismissButtonStyle,
   customPopperStyle,
+  footerTableContentStyle,
 } from './NewArticleAutoComplete.styles';
 
-interface Props {
-  setArticle?: (val: ArticleView | null) => void;
-  setArticleQuery?: (val: string) => void;
-  initialValue?: ArticleView | null;
-  textFieldProps?: TextFieldProps;
-  disabled?: boolean;
-  onArticleSelect: (
-    rowId: string,
-    updatedBody: UpdateArticleRecord | CreateArticleRecord,
-  ) => void;
-  rowId: string;
-  serviceCompanyId: string;
-  onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
-  openOnFocus?: boolean;
-  propertyOwner?: PropertyOwnerView;
-  excludeTypes?: ArticleType[];
-  showCustomPriceColumn?: boolean;
-}
-
-interface ExtendedArticleView extends ArticleView {
-  isCustom?: boolean;
-  customSellingAmount?: MultiVatsAmount;
-}
 interface ArticleRowProps {
   option: ExtendedArticleView;
   queryView: string;
@@ -149,6 +120,7 @@ export const CustomPopper = ({
             ? `${resolvedAnchorEl.offsetTop - 320}px`
             : `${resolvedAnchorEl.offsetTop + 40}px`
           : 0,
+        maxHeight: '450px',
       }}
       placement={openUpwards ? 'top-start' : 'bottom-start'}>
       <div>
@@ -174,9 +146,9 @@ export const CustomPopper = ({
         {typeof children === 'function'
           ? children({placement: 'auto'})
           : children}
-        <Table style={footerTableStyle}>
+        <Table sx={footerTableStyle}>
           <TableHead>
-            <TableRow style={{display: 'flex'}}>
+            <TableRow sx={footerTableContentStyle}>
               <TableHead style={footerCellStyle}>
                 <IconButton sx={iconButtonStyle}>
                   <ArrowDropDownIcon sx={{fontSize: '1rem'}} />
@@ -269,18 +241,23 @@ const TableRowComponent = ({
   </tr>
 );
 
+interface Props {
+  initialValue?: InvoiceItemRecord | QuotationItemRecord | null;
+  textFieldProps?: TextFieldProps;
+  openOnFocus?: boolean;
+  propertyOwner?: PropertyOwnerView;
+  excludeTypes?: ArticleType[];
+  showCustomPriceColumn?: boolean;
+  onArticleSelect: (selectedArticle: ArticleView | string) => void;
+}
+
 export const NewArticleAutoComplete = ({
-  setArticle,
-  setArticleQuery = () => {},
   initialValue = null,
-  onArticleSelect,
-  rowId,
-  serviceCompanyId,
-  onBlur,
   openOnFocus = true,
   propertyOwner,
   excludeTypes,
   showCustomPriceColumn = false,
+  onArticleSelect,
 }: Props) => {
   const currentCurrency = useCurrentCurrency();
   const [query, setQuery] = useState(
@@ -289,22 +266,14 @@ export const NewArticleAutoComplete = ({
   const [queryView, setQueryView] = useState(
     removeHtmlTags(initialValue?.name || ''),
   );
-  const [selectedArticle, setSelectedArticle] = useState<ArticleView | null>(
-    initialValue,
-  );
 
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const {data: companyNextNumber} = useCompanyNextNumber(
-    {type: ServiceCompanyNumberType.ARTICLE},
-    serviceCompanyId,
-  );
 
   const {data: articlesResource = createEmptyResource<ArticleView>(10)} =
     useArticles(
       {
         pageIndex: 0,
-        pageSize: 5,
+        pageSize: 25,
         query,
         type: getArticleTypes({excludeTypes}),
       },
@@ -327,9 +296,7 @@ export const NewArticleAutoComplete = ({
           return {
             ...article,
             name: removeHtmlTags(customArticle.name || article.name || ''),
-            description: removeHtmlTags(
-              customArticle.description || article.description || '',
-            ),
+            description: customArticle.description || article.description || '',
             customSellingAmount: customArticle.unitSellingAmount,
             isCustom: true,
           };
@@ -337,14 +304,14 @@ export const NewArticleAutoComplete = ({
         return {
           ...article,
           name: removeHtmlTags(article.name || ''),
-          description: removeHtmlTags(article.description || ''),
+          description: article.description || '',
           isCustom: false,
         };
       })
     : (articlesResource.data ?? []).map((article) => ({
         ...article,
         name: removeHtmlTags(article.name || ''),
-        description: removeHtmlTags(article.description || ''),
+        description: article.description || '',
         isCustom: false,
       }));
 
@@ -353,18 +320,6 @@ export const NewArticleAutoComplete = ({
       inputRef.current.focus();
     }
   }, []);
-
-  useEffect(() => {
-    if (setArticle) {
-      setArticle(selectedArticle);
-    }
-  }, [selectedArticle]);
-
-  useEffect(() => {
-    if (setArticleQuery) {
-      setArticleQuery(queryView);
-    }
-  }, [queryView]);
 
   useEffect(() => {
     if (initialValue && initialValue.name) {
@@ -382,90 +337,10 @@ export const NewArticleAutoComplete = ({
     setQuery(newValue || '');
   };
 
-  const onArticleSelectHandler = (article: ArticleView | string | null) => {
-    if (!article) return;
-
-    const createOrUpdateArticleBody = (articleBody: ArticleView | string) => {
-      const baseArticleData = {
-        serviceCompanyId: serviceCompanyId || '',
-        externalId: companyNextNumber?.value || '',
-        unitPurchaseAmount: {
-          currency:
-            (articleBody as ArticleView).unitPurchaseAmount?.currency ||
-            currentCurrency.code ||
-            'EUR',
-          netAmount:
-            (articleBody as ArticleView).unitPurchaseAmount?.netAmount ?? 0,
-          percentageVat:
-            (articleBody as ArticleView).unitPurchaseAmount?.percentageVat ?? 0,
-        },
-        unitSellingAmount: {
-          currency:
-            (articleBody as ExtendedArticleView).customSellingAmount
-              ?.currency ||
-            (articleBody as ArticleView).unitSellingAmount?.currency ||
-            currentCurrency.code ||
-            'EUR',
-          netAmount:
-            (articleBody as ExtendedArticleView).customSellingAmount
-              ?.netAmount ??
-            (articleBody as ArticleView).unitSellingAmount?.netAmount ??
-            0,
-          percentageVat:
-            (articleBody as ExtendedArticleView).customSellingAmount
-              ?.percentageVat ??
-            (articleBody as ArticleView).unitSellingAmount?.percentageVat ??
-            0,
-        },
-        stock: {
-          currentStock: 1,
-          maxStock: 1,
-          minOrderQuantity: 1,
-          minStock: 1,
-        },
-        description: '',
-        model: '',
-        category: '',
-        subCategory: '',
-        manufacturer: '',
-        unit: '',
-        storageLocation: '',
-        contractName: '',
-      };
-
-      if (typeof articleBody === 'string') {
-        return {
-          ...baseArticleData,
-          name: articleBody,
-          type: rowId.includes('mixed') ? ArticleType.MIX : ArticleType.LABOR,
-        };
-      }
-
-      return {
-        ...baseArticleData,
-        name: articleBody.name || '',
-        description: articleBody.description || '',
-        model: articleBody.model || '',
-        type: rowId.includes('mixed')
-          ? ArticleType.MIX
-          : articleBody.type || ArticleType.OTHER,
-        category: articleBody.category || '',
-        subCategory: articleBody.subCategory || '',
-        manufacturer: articleBody.manufacturer || '',
-        unit: articleBody.unit || '',
-        storageLocation: articleBody.storageLocation || '',
-        contractName: articleBody.additionalInfo?.contractName || '',
-        stock: articleBody.stock || undefined,
-        costPackage: articleBody.additionalInfo?.costPackage || undefined,
-      };
-    };
-
-    const articleData = article
-      ? createOrUpdateArticleBody(article)
-      : createOrUpdateArticleBody(queryView);
-
-    onArticleSelect(rowId, articleData);
-    setSelectedArticle(article as ArticleView);
+  const handleBlur = () => {
+    if (queryView.trim() !== '') {
+      onArticleSelect(queryView);
+    }
   };
 
   const MemoizedPopper = useCallback(
@@ -485,6 +360,7 @@ export const NewArticleAutoComplete = ({
       id="article-combo-box"
       disableClearable
       disablePortal
+      filterOptions={(options) => options}
       clearOnEscape
       openOnFocus={openOnFocus}
       sx={{
@@ -512,15 +388,15 @@ export const NewArticleAutoComplete = ({
         </li>
       )}
       onInputChange={onInputChange}
-      onChange={(_event, value) => onArticleSelectHandler(value)}
+      onChange={(_event, value) => onArticleSelect(value)}
       renderInput={(params) => {
         const inputValue = params.inputProps.value || '';
         return (
           <TextField
             {...params}
-            onBlur={onBlur}
             inputRef={inputRef}
             error={inputValue === ''}
+            onBlur={handleBlur}
             sx={{
               '& .MuiOutlinedInput-root': {
                 '& fieldset': {
