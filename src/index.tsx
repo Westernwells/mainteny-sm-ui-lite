@@ -49,13 +49,14 @@ if (!window.Cypress) {
       }),
     ],
   });
+  // PostHog Initialization
+  if (window.location.hostname !== 'localhost') {
+    posthog.init('phc_MaZLYyraIgdIfMqEZf4zYpTEJ78zpUQWTnMedonMvrv', {
+      api_host: 'https://eu.i.posthog.com',
+      person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+    });
+  }
 }
-
-// PostHog Initialization
-posthog.init('phc_MaZLYyraIgdIfMqEZf4zYpTEJ78zpUQWTnMedonMvrv', {
-  api_host: 'https://eu.i.posthog.com',
-  person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
-});
 
 // Add Kalasar script dynamically
 const script = document.createElement('script');
