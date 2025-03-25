@@ -3103,13 +3103,13 @@
   "Not working this day": "Keine Schicht an diesem Tag",
   "Employees must work their scheduled shifts, otherwise they have to take absence leave. Public holidays are off by default.": "Mitarbeiter müssen ihre geplanten Schichten arbeiten, andernfalls müssen sie eine Abwesenheit nehmen. Gesetzliche Feiertage sind standardmäßig frei.",
   "New Maintenance Job": "Neuer Wartungsauftrag",
-  "New Emergency Job": "Neuer Notfallauftrag",
+  "New Emergency Job": "Neuer Personeneinschluss Auftrag",
   "New Repair Job": "Neuer Reparaturauftrag",
-  "New Callout Job": "Neuer Personeneinschluss Auftrag",
-  "New Inspection Job": "Neuer Inspektionsauftrag",
+  "New Callout Job": "Neuer Störungs Auftrag",
+  "New Inspection Job": "Neuer ZÜS-Prüfungsauftrag",
   "New Installation Job": "Neuer Installationsauftrag",
   "New Modernization Job": "Neuer Modernisierungsauftrag",
-  "New General Job": "Neuer Anderer Auftrag",
+  "New General Job": "Neuer Sonstiger Auftrag",
   "Please enter valid shift times.": "Bitte geben Sie gültige Schichtzeiten ein.",
   "Show {{totalCount}} more": "{{totalCount}} weitere anzeigen",
   "Custom Price (Net)": "Kundenspezifischer Preis (Netto)",
@@ -3123,6 +3123,9 @@
   "Include": "Inkludieren",
   "Include previously downloaded data": "Zuvor heruntergeladene Daten inkludieren",
   "Include PDF documents": "PDF-Dokumente inkludieren",
+  "New Regular Job": "Neuer Wartungsauftrag",
+  "New Operation Job": "Neuer Aufzugswärter Auftrag",
   "Delete note": "Notiz löschen",
-  "You are about to delete a note, are you sure about this?": "Sie sind dabei, eine Notiz zu löschen. Sind Sie sicher?"
+  "You are about to delete a note, are you sure about this?": "Sie sind dabei, eine Notiz zu löschen. Sind Sie sicher?",
+  "Units are being added to the contract. They will appear shortly.": "Anlagen werden dem Vertrag hinzugefügt, dies kann einen Moment dauern. "
 }

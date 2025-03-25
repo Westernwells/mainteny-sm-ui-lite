@@ -194,7 +194,7 @@ export const NewArticle = () => {
       category: formik.values.category,
       description,
       manufacturer: formik.values.manufacturer,
-      model: formik.values.model,
+      model: formik.values.model || '',
       name: formik.values.name,
       externalId: formik.values.externalId,
       pictureUrls: [],

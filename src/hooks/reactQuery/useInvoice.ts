@@ -229,6 +229,7 @@ export const useSendInvoice = ({
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         enqueueSnackbar(`Invoice sent successfully`, {
           variant: 'success',
         });
@@ -346,6 +347,8 @@ export const useAddInvoicePayment = (disableNavigate = false) => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        queryClient.invalidateQueries([qk.getServiceOrderDetails]);
+        queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         enqueueSnackbar(`Invoice marked as paid!`, {
           variant: 'success',
         });
@@ -404,6 +407,8 @@ export const useUpdateInvoice = () => {
         queryClient.invalidateQueries([qk.fetchInvoices]);
         queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
+        queryClient.invalidateQueries([qk.getServiceOrderDetails]);
+        queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         enqueueSnackbar(`Invoice updated successfully`, {
           variant: 'success',
         });
@@ -778,6 +783,8 @@ export const useCancelInvoice = ({
         queryClient.invalidateQueries([qk.invoiceById]);
         queryClient.invalidateQueries([qk.fetchInvoiceActivities]);
         queryClient.invalidateQueries([qk.fetchInvoiceStatistics]);
+        queryClient.invalidateQueries([qk.getServiceOrderDetails]);
+        queryClient.invalidateQueries([qk.fetchServiceOrderInvoices]);
         if (!disableNavigate) navigate(`/invoices/`);
       },
       onError: (err) => {

@@ -110,7 +110,7 @@ export interface CreateArticleRecord {
   name: string;
   description: string;
   externalId: string;
-  model?: string;
+  model: string;
   type: ArticleType;
   category: string;
   subCategory?: string;
@@ -372,8 +372,8 @@ export interface MixedPositionRow {
   type: ArticleType;
   unit: string;
   unitPurchaseAmount?: AmountRecord;
-  unitSellingAmount?: AmountRecord;
-  quantity?: number;
+  unitAmount: AmountRecord;
+  quantity: number;
 }
 
 export interface SubPositionRow {
@@ -387,7 +387,7 @@ export interface SubPositionRow {
   type: ArticleType;
   unit: string;
   unitPurchaseAmount?: AmountRecord;
-  unitSellingAmount?: AmountRecord;
+  unitAmount: AmountRecord;
   createdAt?: string;
   lastUpdatedAt?: string;
 }
@@ -519,3 +519,8 @@ export const COLUMN_DATA: ArticleColumnData[] = [
   {title: 'Price (Net)', alignment: 'right', width: '72px'},
   {title: 'Custom Price (Net)', alignment: 'right', width: '116px'},
 ];
+
+export interface ExtendedArticleView extends ArticleView {
+  isCustom?: boolean;
+  customSellingAmount?: MultiVatsAmount;
+}

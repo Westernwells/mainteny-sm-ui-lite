@@ -499,7 +499,7 @@ const MixedPositions = () => {
         netAmount: 0,
         percentageVat: 0,
       },
-      unitSellingAmount: {
+      unitAmount: {
         currency: 'EUR',
         netAmount: 0,
         percentageVat: 0,
@@ -601,7 +601,7 @@ const MixedPositions = () => {
         netAmount: 0,
         percentageVat: 0,
       },
-      unitSellingAmount: {
+      unitAmount: {
         currency: 'EUR',
         netAmount: 0,
         percentageVat: 0,
