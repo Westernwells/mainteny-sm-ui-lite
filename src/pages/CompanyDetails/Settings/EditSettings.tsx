@@ -22,7 +22,7 @@ export const languages = [
   },
   {
     label: 'Serbian',
-    value: 'sr-rs',
+    value: 'sr-sp',
   },
   {
     label: 'Italian',

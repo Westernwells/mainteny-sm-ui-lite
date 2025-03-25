@@ -53,7 +53,7 @@ export const languageContextMap: {[key: string]: Language} = {
 export const companyLanguageContextMap: {[key: string]: string} = {
   'de-de': 'de',
   'en-us': 'en',
-  'sr-rs': 'sr',
+  'sr-sp': 'sr',
   'it-it': 'it',
   'it-lt': 'lt',
   'ru-ru': 'ru',
@@ -67,7 +67,7 @@ export const companyLanguageContextMap: {[key: string]: string} = {
 export const companyLanguageToUppercaseMap: {[key: string]: string} = {
   'de-de': Language.DE_DE,
   'en-us': Language.EN_US,
-  'sr-rs': Language.SR_RS,
+  'sr-sp': Language.SR_RS,
   'it-it': Language.IT_IT,
   'it-lt': Language.IT_LT,
   'ru-ru': Language.RU_RU,
