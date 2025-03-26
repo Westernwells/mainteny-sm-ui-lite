@@ -15,7 +15,7 @@ import {useQueryCustomerElevator} from 'hooks/reactQuery/useElevator';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {ElevatorView} from 'models/elevator';
 import {FormatDate} from 'models/misc';
-import {createEmptyResource} from 'utils/paging';
+import {createEmptyResource, makePage} from 'utils/paging';
 import {useAttachElevatorsToContract} from 'hooks/reactQuery/useContract';
 
 export const columns: GridColDef[] = [
@@ -59,6 +59,8 @@ export const makeRows = (
       }))
     : [];
 
+const pageSize = 100;
+
 export const AddUnitsDataGrid = ({
   propertyOwnerId,
   onConfirm,
@@ -74,19 +76,26 @@ export const AddUnitsDataGrid = ({
   const formatDate = useFormatDate();
   const [search, setSearch] = useState('');
   const [rows, setRows] = useState<GridRowsProp>([]);
+  const [page, setPage] = useState(makePage(0, pageSize));
 
   const {
-    data: elevatorResource = createEmptyResource<ElevatorView>(500),
+    data: elevatorResource = createEmptyResource<ElevatorView>(pageSize),
     isIdle,
     isLoading,
     isFetching,
   } = useQueryCustomerElevator(
-    {query: search, pageIndex: 0, pageSize: 500},
+    {
+      query: search,
+      pageIndex: page.pageIndex,
+      pageSize: page.pageSize,
+    },
     propertyOwnerId,
     {keepPreviousData: true},
   );
-  const {mutateAsync: updateContract} =
-    useAttachElevatorsToContract('Contract updated');
+
+  const {mutateAsync: updateContract} = useAttachElevatorsToContract(
+    'Units are being added to the contract. They will appear shortly.',
+  );
 
   const formik = useFormik<{elevators: string[]}>({
     initialValues: {
@@ -111,6 +120,14 @@ export const AddUnitsDataGrid = ({
       setRows([]);
     }
   }, [elevatorResource.data]);
+
+  const pageCount = Math.ceil(elevatorResource.total / page.pageSize);
+
+  useEffect(() => {
+    if (page.pageIndex) {
+      setPage({...page, pageIndex: 0});
+    }
+  }, [search]);
 
   if (isIdle || isLoading) {
     return (
@@ -167,6 +184,22 @@ export const AddUnitsDataGrid = ({
               action={() => window.open('/units/new', '_blank')}
             />
           }
+          pageSize={page.pageSize}
+          pageIndex={page.pageIndex + 1}
+          handlePageSizeChange={(newPageSize: number) =>
+            setPage({
+              ...page,
+              pageSize: newPageSize,
+            })
+          }
+          handlePageChange={(newPage: number) =>
+            setPage({
+              ...page,
+              pageIndex: newPage - 1,
+            })
+          }
+          pageCount={pageCount}
+          totalRows={elevatorResource?.total}
         />
       </Box>
       <Button

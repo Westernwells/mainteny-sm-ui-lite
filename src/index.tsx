@@ -51,7 +51,7 @@ if (!window.Cypress) {
   });
 }
 
-// Add the script tag dynamically
+// Add Kalasar script dynamically
 const script = document.createElement('script');
 script.src = 'https://design.kalasar.com/static/mainteny@prod/kalasar.js';
 script.async = true;

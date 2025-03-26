@@ -286,6 +286,7 @@ export const useAttachElevatorsToContract = (successMsg?: string) => {
           });
         }
         queryClient.invalidateQueries(queryKeys.contractDetails);
+        queryClient.invalidateQueries(queryKeys.fetchContractElevators);
       },
       onError: (err: any) => {
         showError(err);
