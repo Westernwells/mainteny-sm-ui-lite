@@ -337,7 +337,7 @@ export interface ArticleRecord {
 }
 
 export interface InvoiceItemRecord {
-  id?: string;
+  id?: string; // only for frontend key - we don't send it to backend
   article?: ArticleRecord;
   name: string;
   description?: string;

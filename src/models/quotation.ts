@@ -116,7 +116,7 @@ export interface ArticleRecord {
 }
 
 export interface QuotationItemRecord {
-  id?: string;
+  id?: string; // only for frontend key - we don't send it to backend
   articleId?: string;
   article?: ArticleRecord | ArticleView;
   name: string;
