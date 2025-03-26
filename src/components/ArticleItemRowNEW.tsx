@@ -293,7 +293,7 @@ export const ArticleItemRowNEW = ({
             } else if (selectedArticle) {
               const transformedArticle = mapUpdatedBodyToArticleView(
                 selectedArticle,
-                {id: articleItem.id},
+                {id: selectedArticle.id},
               );
               handleSelectItem(transformedArticle, index);
             }
