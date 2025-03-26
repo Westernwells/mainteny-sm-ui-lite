@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
@@ -19,10 +19,7 @@ import {
 } from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {QuotationStatus, QuotationView} from 'models/quotation';
-import {
-  useDownloadFileWithCustomName,
-  useDownloadUrl,
-} from 'hooks/reactQuery/useDownloadUrl';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
@@ -61,17 +58,14 @@ const Actions = ({quotation}: Props) => {
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const [actionType, setActionType] = useState('');
   const [isConfirmPrintDialogOpen, setIsConfirmPrintDialogOpen] =
     useState(false);
-  const [blobFile, setBlobFile] = useState<Blob>();
+
   const {mutate: markAsAccepted} = useReplyQuotation(true);
   const {mutate: deleteQuotation} = useDeleteQuotation();
   const {mutateAsync: uploadFiles} = useUploadFiles('');
   const {mutateAsync: printQuotation} = usePrintQuotation();
   const {mutateAsync: sendQuotation} = useSendQuotation();
-  const [creatingPdf, setCreatingPdf] = useState(false);
-  const [filePathToDownload, setFilePathToDownload] = useState('');
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
 
@@ -118,7 +112,7 @@ const Actions = ({quotation}: Props) => {
     company?.id,
   );
 
-  const {data: downloadUrl, refetch: refetchDownloadUrl} = useDownloadUrl(
+  const {refetch: refetchDownloadUrl} = useDownloadUrl(
     quotation && quotation?.additionalInfo.pdfPath
       ? [quotation.additionalInfo.pdfPath]
       : [],
@@ -129,7 +123,6 @@ const Actions = ({quotation}: Props) => {
   const uploadPath = `${serviceCompanyId}/quotations`;
 
   const generateBlobUrl = async () => {
-    setCreatingPdf(true);
     const blob = await pdf(
       <QuotationPdfTemplate
         pdfConfigClientStorage={pdfConfig}
@@ -144,16 +137,8 @@ const Actions = ({quotation}: Props) => {
         footerInfo={footerInfo}
       />,
     ).toBlob();
-    setBlobFile(blob);
-    const blobURL = URL.createObjectURL(blob);
-    setFilePathToDownload(blobURL);
     return blob;
   };
-
-  const {downloadFile} = useDownloadFileWithCustomName(
-    quotation.number,
-    downloadUrl?.[quotation.additionalInfo.pdfPath!] || '',
-  );
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -163,33 +148,40 @@ const Actions = ({quotation}: Props) => {
     setAnchorEl(null);
   };
 
-  const onPrintQuotation = async (url: string) => {
-    const handlePrintSuccess = () => {
-      setIsConfirmPrintDialogOpen(false);
-      if (url) {
-        printJS({
-          printable: url,
-          type: 'pdf',
-          showModal: true,
-        });
+  const handleDownloadDraftQuotation = async (filePath: string) => {
+    const fileName = `${quotation.number}`;
+    utilDownloadFile({fileName, downloadUrl: filePath});
+  };
+
+  const handleDownloadAction = async () => {
+    if (quotation.status === QuotationStatus.DRAFT) {
+      const blob = await generateBlobUrl();
+      const blobURL = URL.createObjectURL(blob);
+      await handleDownloadDraftQuotation(blobURL);
+    } else {
+      const {pdfPath} = quotation.additionalInfo;
+      if (pdfPath) {
+        const downloadUrlData = await refetchDownloadUrl();
+        if (downloadUrlData.data?.[pdfPath]) {
+          await handleDownloadDraftQuotation(downloadUrlData.data[pdfPath]);
+        }
       }
+    }
+  };
+
+  const handlePrintAction = async () => {
+    const handlePrintSuccess = (url: string) => {
+      printJS({
+        printable: url,
+        type: 'pdf',
+        showModal: true,
+      });
     };
 
-    if (quotation.status !== QuotationStatus.DRAFT) {
-      await printQuotation(
-        {
-          id: quotation.id,
-          body: {
-            pdfPath: quotation.additionalInfo.pdfPath ?? '',
-            sentDate: '',
-          },
-        },
-        {onSuccess: handlePrintSuccess},
-      );
-    } else {
+    if (quotation.status === QuotationStatus.DRAFT) {
+      const blob = await generateBlobUrl();
       const fileNames = [`${quotation.id}.pdf`];
-      const files = await createFilesFromBlobArray([blobFile!], fileNames);
-
+      const files = await createFilesFromBlobArray([blob], fileNames);
       await uploadFiles({files, uploadPath});
 
       await printQuotation(
@@ -202,56 +194,33 @@ const Actions = ({quotation}: Props) => {
         },
         {
           onSuccess: () => {
-            setCreatingPdf(false);
-            handlePrintSuccess();
+            const blobUrl = URL.createObjectURL(blob);
+            handlePrintSuccess(blobUrl);
           },
         },
       );
+    } else {
+      const downloadUrlData = await refetchDownloadUrl();
+      const {pdfPath} = quotation.additionalInfo;
+      if (pdfPath && downloadUrlData.data?.[pdfPath]) {
+        const printUrl = downloadUrlData.data[pdfPath];
+        await printQuotation(
+          {
+            id: quotation.id,
+            body: {
+              pdfPath,
+              sentDate: '',
+            },
+          },
+          {
+            onSuccess: () => handlePrintSuccess(printUrl),
+          },
+        );
+      }
     }
+
+    setIsConfirmPrintDialogOpen(false);
   };
-
-  const handlePrintAction = () => {
-    setActionType('PRINT');
-    if (quotation.status !== QuotationStatus.DRAFT) {
-      refetchDownloadUrl();
-    }
-  };
-
-  const handleDownloadDraftQuotation = async (filePath: string) => {
-    const fileName = `${quotation.number}`;
-
-    utilDownloadFile({fileName, downloadUrl: filePath});
-  };
-
-  useEffect(() => {
-    if (filePathToDownload && actionType === 'PRINT') {
-      onPrintQuotation(filePathToDownload);
-      setFilePathToDownload('');
-      setActionType('');
-    }
-
-    if (filePathToDownload && actionType === 'DOWNLOAD') {
-      handleDownloadDraftQuotation(filePathToDownload);
-      setFilePathToDownload('');
-      setActionType('');
-    }
-  }, [filePathToDownload, actionType]);
-
-  useEffect(() => {
-    if (quotation.status === 'DRAFT' && actionType === 'DOWNLOAD') {
-      generateBlobUrl();
-    } else if (downloadUrl?.[filePathToDownload] && actionType === 'DOWNLOAD') {
-      downloadFile();
-      setFilePathToDownload('');
-    }
-
-    if (quotation.status !== QuotationStatus.DRAFT && actionType === 'PRINT') {
-      setFilePathToDownload(downloadUrl?.[quotation.additionalInfo.pdfPath!]!);
-    }
-    if (quotation.status === QuotationStatus.DRAFT && actionType === 'PRINT') {
-      generateBlobUrl();
-    }
-  }, [downloadUrl, actionType]);
 
   const getExistingFiles = async (
     fileDownloadUrl:
@@ -316,13 +285,7 @@ const Actions = ({quotation}: Props) => {
   const {actions} = useQuotationMenuActions({
     quotation,
     onSend: handleOpenSendEmail,
-    onDownload: async () => {
-      setActionType('DOWNLOAD');
-      if (quotation.status !== 'DRAFT') {
-        refetchDownloadUrl();
-        setFilePathToDownload(quotation.additionalInfo.pdfPath!);
-      }
-    },
+    onDownload: handleDownloadAction,
     onDelete: () => setIsDeleteDialogOpen(true),
     onResend: handleOpenSendEmail,
     onMarkAccepted: () => setIsDialogOpen(true),
@@ -433,7 +396,7 @@ const Actions = ({quotation}: Props) => {
               const blob = await generateBlobUrl();
 
               const files = await createFilesFromBlobArray(
-                [blob!],
+                [blob],
                 fileNames,
                 fileDescriptions,
               );
@@ -558,10 +521,7 @@ const Actions = ({quotation}: Props) => {
       />
       <ConfirmPrintQuotation
         open={isConfirmPrintDialogOpen}
-        onConfirm={() => {
-          setActionType('PRINT');
-        }}
-        isLoading={creatingPdf}
+        onConfirm={handlePrintAction}
         onClose={() => setIsConfirmPrintDialogOpen(false)}
       />
     </Box>
