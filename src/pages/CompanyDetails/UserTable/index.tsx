@@ -19,7 +19,7 @@ import {phoneValidationRE} from 'pages/NewEmployee/BasicEmployeeForm';
 import {Role, UserView} from 'models/user';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {aggregateWeekShifts} from 'utils/shift';
-import {ShiftForm} from 'models/employee';
+import {ShiftForm, TimeWindowType} from 'models/employee';
 import {columns, makeRows} from './UserDataGridProps';
 import {UserFormTypes} from './model';
 import {UserForm} from './UserForm';
@@ -65,16 +65,38 @@ export const UserTable = ({companyId}: Props) => {
             .matches(/\d/, t('Must contain 1 digit'))
             .matches(/.*[\W_]/, t('Must contain 1 special character')),
         }),
-    shifts: Yup.array()
-      .of(
-        Yup.object().shape({
-          fromTime: Yup.string().required(),
-          toTime: Yup.string().required(),
-          type: Yup.string().required(),
-        }),
+    shifts: Yup.object()
+      .shape(
+        Object.values(TimeWindowType).reduce(
+          (acc, day) => ({
+            ...acc,
+            [day]: Yup.object().shape({
+              firstShift: Yup.object().shape({
+                fromTime: Yup.string(),
+                toTime: Yup.string(),
+              }),
+              secondShift: Yup.object()
+                .shape({
+                  fromTime: Yup.string(),
+                  toTime: Yup.string(),
+                })
+                .nullable(),
+            }),
+          }),
+          {},
+        ),
       )
-      .min(1)
-      .required(),
+      .test(
+        'at-least-one-day',
+        'At least one day must have shifts',
+        (value) => {
+          if (!value) return false;
+          return Object.values(value).some((day) => {
+            const d = day as any;
+            return d.firstShift?.fromTime && d.firstShift?.toTime;
+          });
+        },
+      ),
   });
 
   const [rows, setRows] = useState<GridRowsProp>([]);
