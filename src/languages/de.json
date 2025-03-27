@@ -3129,5 +3129,14 @@
   "You are about to delete a note, are you sure about this?": "Sie sind dabei, eine Notiz zu löschen. Sind Sie sicher?",
   "Units are being added to the contract. They will appear shortly.": "Anlagen werden dem Vertrag hinzugefügt, dies kann einen Moment dauern. ",
   "Positions": "Positions",
+  "Add Position": "Position hinzufügen",
+  "Prices": "Preise",
+  "The margin(s) won't be visible to the customers.": "Die Marge(n) sind für die Kunden nicht sichtbar.",
+  "Total margin": "Gesamtmarge",
+  "Material margin": "Materialspanne",
+  "Labor margin": "Arbeitsmarge",
+  "Other margin": "Andere Marge",
+  "Create mixed position": "Mischposition erstellen",
+  "Save to catalogue": "Im Katalog speichern",
   "Mixed Position": "Mischpositions"
 }
