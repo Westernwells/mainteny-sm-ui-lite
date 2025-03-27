@@ -82,6 +82,7 @@ export const formatInvoiceRecord = (
 
     return {
       ...rest,
+      id: undefined,
       article: articleToSend,
 
       unitAmount: cleanedUnitAmount,

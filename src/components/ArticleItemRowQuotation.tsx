@@ -269,7 +269,7 @@ export const ArticleItemRowQuotation = ({
             } else if (selectedArticle) {
               const transformedArticle = mapUpdatedBodyToArticleView(
                 selectedArticle,
-                {id: articleItem.id},
+                {id: selectedArticle.id},
               );
               handleSelectItem(transformedArticle, index);
             }
