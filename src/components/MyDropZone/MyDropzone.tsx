@@ -100,6 +100,7 @@ export const MyDropZone = forwardRef(
       accept: acceptedFileTypes
         ? formatAcceptedFileType(acceptedFileTypes)
         : {'*': []},
+      noClick: true,
       onDrop: () => {
         setErrors({type: false, size: false});
         setIsDragActive(false);

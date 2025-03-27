@@ -157,7 +157,7 @@ export const AuthLayout = ({children}: Props) => {
               },
               {
                 label: 'Serbian',
-                action: () => changeLanguage('sr-rs', 'SR'),
+                action: () => changeLanguage('sr-sp', 'SR'),
               },
               {
                 label: 'Italian',
