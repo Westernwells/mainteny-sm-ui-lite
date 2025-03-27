@@ -1069,8 +1069,8 @@
   "Create Job": "Stvori servisni nalog",
   "Search job type, customer, address etc.": "Претражите врсту поруџбине, клијента, адресу итд.",
   "New Job": "Novi posao",
-  "Regular": "Redovno",
-  "REGULAR": "REDOVNO",
+  "Regular": "Održavanje",
+  "REGULAR": "ODRŽAVANJE",
   "Ongoing": "U toku",
   "All": "Sve",
   "Init": "U tome",
@@ -3148,5 +3148,16 @@
   "New Operation Job": "Нова операција посао",
   "Delete note": "Izbriši belešku",
   "You are about to delete a note, are you sure about this?": "Spremate se da izbrišete belešku, jeste li sigurni u ovo?",
-  "Units are being added to the contract. They will appear shortly.": "Jedinice se dodaju ugovoru. Oni će se uskoro pojaviti."
+  "Units are being added to the contract. They will appear shortly.": "Jedinice se dodaju ugovoru. Oni će se uskoro pojaviti.",
+  "Positions": "Pozicije",
+  "Add Position": "Dodaj poziciju",
+  "Prices": "Cene",
+  "The margin(s) won't be visible to the customers.": "Marže neće biti vidljive kupcima.",
+  "Sub-positions": "Podpozicije",
+  "Total margin": "Ukupna marža",
+  "Material margin": "Marža materijala",
+  "Labor margin": "Marža rada",
+  "Other margin": "Ostale margine",
+  "Create mixed position": "Napravite mešovitu poziciju",
+  "Save to catalogue": "Sačuvaj u katalog"
 }

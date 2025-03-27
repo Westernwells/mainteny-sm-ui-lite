@@ -42,6 +42,7 @@ export const formatQuotationRecord = (
 
     return {
       ...rest,
+      id: undefined,
       article: articleToSend,
       discount: rest.discount
         ? {
