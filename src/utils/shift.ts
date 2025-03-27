@@ -16,6 +16,12 @@ type GenerateTimeWindowRecordFromShiftProps = {
   type: TimeWindowType;
 };
 
+// Helper: Pad time values to HH:mm format
+const padTime = (time: string): string => {
+  const [h, m] = time.split(':');
+  return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+};
+
 export const generateTimeWindowRecordFromShift = ({
   shifts,
   type,
@@ -24,16 +30,16 @@ export const generateTimeWindowRecordFromShift = ({
 
   if (!secondShift)
     return {
-      fromTime: firstShift.fromTime,
-      toTime: firstShift.toTime,
+      fromTime: padTime(firstShift.fromTime),
+      toTime: padTime(firstShift.toTime),
       type,
     };
 
   return {
-    fromTime: firstShift.fromTime,
-    toTime: secondShift.toTime,
-    breakFromTime: firstShift.toTime,
-    breakToTime: secondShift.fromTime,
+    fromTime: padTime(firstShift.fromTime),
+    toTime: padTime(secondShift.toTime),
+    breakFromTime: padTime(firstShift.toTime),
+    breakToTime: padTime(secondShift.fromTime),
     type,
   };
 };
@@ -92,9 +98,7 @@ export const getShiftStringFromDate = (date: Date) => format(date, 'HH:mm');
 export const aggregateWeekShifts = (
   workingHours: TimeWindowRecord[],
 ): ShiftForm =>
-  // TODO Remove old data mapping then BE migrates data
   workingHours.reduce((acc, workingHour) => {
-    // Map weekdays
     if (workingHour.type === TimeWindowType.WEEKDAY) {
       const mappedDate = WEEK_DAYS_WITHOUT_WEEKENDS.map(
         (dayType): ShiftForm =>
@@ -105,7 +109,6 @@ export const aggregateWeekShifts = (
       return {...acc, ...mappedDate};
     }
 
-    // map weekends
     if (workingHour.type === TimeWindowType.WEEKEND) {
       const mappedDate = [TimeWindowType.SATURDAY, TimeWindowType.SUNDAY].map(
         (dayType): ShiftForm =>
@@ -116,7 +119,6 @@ export const aggregateWeekShifts = (
       return {...acc, ...mappedDate};
     }
 
-    // remove public holiday
     if (workingHour.type === TimeWindowType.PUBLIC_HOLIDAY) {
       return acc;
     }
