@@ -26,6 +26,8 @@ import {
   TEXT_TAGS,
 } from 'models/richTextField';
 
+export const DEFAULT_RICH_TEXT_HTML = '<p></p>'; // fallback for empty Slate values
+
 export const isMarkActive = (editor: CustomEditor, format: string) => {
   const marks: Marks = Editor.marks(editor) || {};
   return marks ? marks[format] === true : false;
@@ -75,7 +77,6 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
   const isGroup = GROUP_TYPES.includes(format);
   const isAlignment = ALIGNMENT_TYPES.includes(format);
 
-  // Unwrap existing alignment blocks
   if (isAlignment) {
     Transforms.unwrapNodes(editor, {
       match: (n) =>
@@ -86,7 +87,6 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
     });
   }
 
-  // Unwrap group types (like lists) if applicable
   if (isGroup) {
     Transforms.unwrapNodes(editor, {
       match: (n) =>
@@ -97,30 +97,22 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
     });
   }
 
-  // Set block type for non-alignment types
   if (!isAlignment) {
     const newProperties = {
       type: isActive ? 'paragraph' : isGroup ? 'list-item' : format,
     };
-
-    // Set the node type for the selected block
     Transforms.setNodes(editor, newProperties);
   }
 
-  // If the block type is an alignment or group type and is not active, wrap nodes
   if ((!isActive && isGroup) || isAlignment) {
     const block = {type: format, children: [{text: ''}]};
-
-    // Wrap the current selection with the alignment or group block
     Transforms.wrapNodes(editor, block, {split: true});
 
-    // Ensure the block has at least one text node
     const selectedNodes = Array.from(
       Editor.nodes(editor, {match: (n) => SlateElement.isElement(n)}),
     );
 
     if (selectedNodes.length === 0) {
-      // Insert an empty text node inside the block if no valid text node exists
       Transforms.insertNodes(editor, {
         type: 'paragraph',
         children: [{text: ''}],
@@ -128,7 +120,6 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
     }
   }
 
-  // Ensure there's always a valid text node after transformations
   if (editor.children.length === 0 || Editor.string(editor, []) === '') {
     Transforms.insertNodes(editor, {
       type: 'paragraph',
