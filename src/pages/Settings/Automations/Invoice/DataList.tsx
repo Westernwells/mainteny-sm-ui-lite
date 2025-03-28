@@ -27,6 +27,7 @@ import {useTranslation} from 'react-i18next';
 import {
   hasMultipleParagraphs,
   returnFirstParagraph,
+  DEFAULT_RICH_TEXT_HTML,
 } from 'utils/rich-text-field';
 import {
   TravelWorkCalculationType,
@@ -580,7 +581,9 @@ const DataList = ({
                       ref={articleAnchorEl}
                       sx={{width: '100%', border: 'none'}}>
                       <RichTextField
-                        html={form.name || ''}
+                        html={
+                          form.name?.trim() ? form.name : DEFAULT_RICH_TEXT_HTML
+                        }
                         updateHtml={handleTextFieldChange()}
                         minRows={0}
                         containerMinHeight={40}
@@ -588,6 +591,7 @@ const DataList = ({
                         fieldsetStyles={{border: 'none'}}
                         placeholder="Pick article"
                       />
+
                       <Box>
                         <Popper
                           open={searchState.showArticleSearch}
