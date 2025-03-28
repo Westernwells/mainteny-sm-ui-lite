@@ -1,5 +1,4 @@
 import * as Yup from 'yup';
-import {AnyObject} from 'yup/lib/types';
 import {TestContextExtended} from 'models/articleForm';
 import {
   ArticleSubAssociationView,
@@ -23,7 +22,7 @@ import {CreateArticleRecord} from '../models/article';
 
 export const handleCostPackageValidation = (
   value: number | undefined,
-  context: AnyObject,
+  context: Yup.AnyObject,
 ) => {
   const {from} = context as Yup.TestContext & TestContextExtended;
   const main = from[2];
@@ -48,14 +47,15 @@ export const getItemRecord = (
   record: QuotationItemRecord | InvoiceItemRecord,
   percentageVat: number,
 ) => {
-  const {netAmount} = record.unitAmount;
+  const {netAmount} = record.unitAmount!;
   const vat =
     (percentageVat * (netAmount ?? 0)) /
-    10 ** Currencies[record.unitAmount.currency];
+    10 ** Currencies[record.unitAmount!.currency];
   return {
     ...record,
     unitAmount: {
       ...record.unitAmount,
+      currency: record.unitAmount!.currency,
       netAmount,
       percentageVat,
       vat,
@@ -140,7 +140,7 @@ export const syncVatLegalNotesWithNotes = ({
 
   // Add new legal notes
   newArticles.forEach((item) => {
-    const {vatId} = item.unitAmount;
+    const {vatId} = item.unitAmount!;
     const legalNote = getLegalNoteForVatId(vatId);
     if (!legalNote) {
       return;
@@ -154,12 +154,12 @@ export const syncVatLegalNotesWithNotes = ({
 
   // Remove obsolete legal notes
   oldArticles.forEach((item) => {
-    const {vatId} = item.unitAmount;
+    const {vatId} = item.unitAmount!;
     const legalNote = getLegalNoteForVatId(vatId);
     if (!legalNote) {
       return;
     }
-    if (newArticles.every((newItem) => newItem.unitAmount.vatId !== vatId)) {
+    if (newArticles.every((newItem) => newItem.unitAmount!.vatId !== vatId)) {
       notes = replaceTextInHtml(notes, `<p>${legalNote}</p>`, '');
     }
   });
@@ -331,3 +331,26 @@ export const mapUpdatedBodyToArticleView = (
   suppliers: defaultValues?.suppliers || [],
   propertyOwnerId: defaultValues?.propertyOwnerId || '',
 });
+
+export const getArticleTypesWithLabels = ({
+  excludeTypes = [],
+}: {
+  excludeTypes?: ArticleType[];
+}): {value: ArticleType; label: string}[] => {
+  const excludedSet = new Set(excludeTypes);
+
+  const typeLabels: Record<ArticleType, string> = {
+    [ArticleType.LABOR]: 'Labor',
+    [ArticleType.MATERIAL]: 'Material',
+    [ArticleType.PACKAGE]: 'Package',
+    [ArticleType.MIX]: 'Mixed Position',
+    [ArticleType.OTHER]: 'Other',
+  };
+
+  return Object.values(ArticleType)
+    .filter((type) => !excludedSet.has(type))
+    .map((type) => ({
+      value: type,
+      label: typeLabels[type] ?? type,
+    }));
+};

@@ -80,6 +80,7 @@ import {pdf} from '@react-pdf/renderer';
 import {UseTranslationOptions, useTranslation} from 'react-i18next';
 import {companyLanguageContextMap} from 'utils/language';
 import {EmptySection} from 'components/EmptySection';
+import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
 import PositionPreview from './PositionPreview';
 import SubPositionRowComponent from './SubPositionRowComponent';
 import MixedPositionRowComponent from './MixedPositionRowComponent';
@@ -110,6 +111,8 @@ export const getIconByType = (type: ArticleType) => {
       return <SettingsOutlinedIcon fontSize="medium" />;
     case ArticleType.MIX:
       return <FolderOpenOutlinedIcon fontSize="medium" />;
+    case ArticleType.PACKAGE:
+      return <PackageIcon fontSize="1.5rem" color="#828DA3" />;
     default:
       return <DashboardOutlinedIcon fontSize="medium" />;
   }
@@ -1029,7 +1032,7 @@ const MixedPositions = () => {
                     />
                   </TableRow>
 
-                  {expandedRows.includes(row.data.id) &&
+                  {expandedRows?.includes(row.data.id) &&
                     subRows[row.data.id]?.map((subPosition, index) => (
                       <SubPositionRowComponent
                         key={subPosition.id}

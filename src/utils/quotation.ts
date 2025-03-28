@@ -1,5 +1,6 @@
-import {DiscountType, InvoiceItemRecord} from 'models/invoice';
+import {Discount, DiscountType, InvoiceItemRecord} from 'models/invoice';
 import {
+  EditableQuotationItem,
   QUOTATION_STATUS_FILTER,
   QuotationActivityType,
   QuotationActivityView,
@@ -7,6 +8,7 @@ import {
   QuotationItemRecord,
   QuotationItemView,
   QuotationStatus,
+  QuotationSubItemRecord,
   QuotationTableRow,
   QuotationView,
   SearchParameters,
@@ -14,12 +16,12 @@ import {
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {TFunction} from 'i18next';
 import capitalize from 'lodash/capitalize';
-import {ArticleView} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {Currency, PdfGenerationStatus, State} from 'models/misc';
 import {ServiceCompanyItem} from 'models/service-company';
 import {ElevatorView} from 'models/elevator';
 import {PropertyOwnerView} from 'models/propertyManager';
-import {InvoiceItemView} from '../models/invoice';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {dateToString} from './utils';
 import {Currencies, formatCurrency, moneyToCents} from './currency';
 
@@ -64,8 +66,8 @@ export const calculateQuotationTotalWithPerItemDiscount = (
     ?.map((item: QuotationItemRecord) =>
       applyDiscount({
         actualValue:
-          ((item.unitAmount.netAmount ?? 0) /
-            10 ** Currencies[item.unitAmount.currency]) *
+          ((item.unitAmount?.netAmount ?? 0) /
+            10 ** Currencies[item.unitAmount!.currency]) *
           item.quantity,
         ...(item.discount?.type === DiscountType.AMOUNT
           ? {amount: item.discount?.amount?.value ?? 0}
@@ -135,30 +137,41 @@ export const mapStatusToFilterOptions = (
   return status as unknown as QUOTATION_STATUS_FILTER;
 };
 
-export const transformFormikItems = (
-  items: QuotationItemRecord[] | InvoiceItemRecord[],
-): QuotationItemView[] | InvoiceItemView[] =>
+export const transformQuotationFormItems = (
+  items: EditableQuotationItem[],
+): QuotationItemView[] =>
   items.map((item) => ({
-    id: item.id || item.article?.id || '',
+    id: item?.id || item.article?.id || '',
     name: item.name,
     description: item.description || '',
     quantity: item.quantity,
     quotationId: '',
     unitAmount: {
-      currency: item.unitAmount.currency,
-      netAmount: item.unitAmount.netAmount,
-      percentageVat: item.unitAmount.percentageVat,
+      currency: item.unitAmount!.currency,
+      netAmount: item.unitAmount?.netAmount,
+      percentageVat: item.unitAmount?.percentageVat,
       vats: [
         {
-          percentageVat: item.unitAmount.percentageVat || 0,
+          percentageVat: item.unitAmount?.percentageVat || 0,
           vat:
-            (item.unitAmount.percentageVat ?? 0 / 100) *
-            (item.unitAmount.netAmount ?? 0),
+            (item.unitAmount?.percentageVat ?? 0 / 100) *
+            ((item.unitAmount?.netAmount ?? 0) / 100),
         },
       ],
     },
     additionalInfo: {
-      discount: item.discount,
+      discount: {
+        ...item.discount,
+        type: item.discount?.type!,
+        amount: {
+          ...item.discount?.amount,
+          value: moneyToCents(
+            item.unitAmount!.currency,
+            item.discount?.amount?.value,
+          ),
+          currency: item.discount?.amount?.currency!,
+        },
+      },
       payment: (item as InvoiceItemRecord).payment,
     },
     article: item.article as ArticleView,
@@ -167,7 +180,7 @@ export const transformFormikItems = (
 export const generatePdfQuotation = (
   formikValues: QuotationFormData,
   currentCurrency: Currency,
-  subtotalExclVat: number,
+  amountAfterGlobalDiscount: number,
   amountAfterGlobalDiscountWithVAT: number,
   mappedVats: {
     vat: number;
@@ -194,7 +207,7 @@ export const generatePdfQuotation = (
   totalAmount: {
     currency: currentCurrency.code,
     fractionDigits: currentCurrency.fractionDigits,
-    netAmount: moneyToCents(currentCurrency.code, subtotalExclVat),
+    netAmount: moneyToCents(currentCurrency.code, amountAfterGlobalDiscount),
     grossAmount: moneyToCents(
       currentCurrency.code,
       amountAfterGlobalDiscountWithVAT,
@@ -203,7 +216,18 @@ export const generatePdfQuotation = (
   },
   additionalInfo: {
     pdfGenerationStatus: PdfGenerationStatus.GENERATION_REQUIRED,
-    discount: formikValues.discount,
+    discount: {
+      ...formikValues.discount,
+      type: formikValues.discount?.type!,
+      amount: {
+        ...formikValues.discount?.amount,
+        value: moneyToCents(
+          formikValues.discount?.amount?.currency!,
+          formikValues.discount?.amount?.value,
+        ),
+        currency: formikValues.discount?.amount?.currency!,
+      },
+    },
     billingAddress: formikValues.billingAddress,
     beneficiaryAddress: formikValues.beneficiaryAddress,
     alternativeAddress: formikValues.alternativeAddress,
@@ -225,6 +249,96 @@ export const generatePdfQuotation = (
     lastUpdatedAt: Date.now().toString(),
     state: State.ACTIVE,
   },
-  items: transformFormikItems(formikValues.items) as QuotationItemView[],
+  items: transformQuotationFormItems(formikValues.items) as QuotationItemView[],
   commentCount: 0,
 });
+
+export const quotationItemToQuotationItemRecord = (
+  quotationItem: QuotationItemView,
+  subItemsMap: Record<string, QuotationSubItemRecord[]> = {},
+): EditableQuotationItem => {
+  const record: EditableQuotationItem = {
+    id: quotationItem.id,
+    article: quotationItem.article,
+    name: quotationItem.name,
+    description: quotationItem.description,
+    quantity: quotationItem.quantity,
+    unitAmount: quotationItem.unitAmount,
+    unitPurchaseAmount: quotationItem.unitPurchaseAmount,
+    discount: getDiscoutObj(quotationItem.additionalInfo?.discount),
+    userSeqNumber: quotationItem?.additionalInfo?.userSeqNumber,
+  };
+
+  if (quotationItem.article?.type === ArticleType.MIX) {
+    const subItems = subItemsMap[quotationItem.id] || [];
+
+    return {
+      ...record,
+      subItems: subItems.map((subItem) => ({
+        parentId: quotationItem.id,
+        id: subItem?.id || '',
+        article: subItem.article,
+        name: subItem.name,
+        description: subItem.description,
+        quantity: subItem.quantity,
+        unitAmount: subItem.unitAmount,
+        unitPurchaseAmount: subItem.unitPurchaseAmount,
+        userSeqNumber: subItem.userSeqNumber,
+      })),
+      subItemsConfig: {
+        subItemsVisible:
+          quotationItem.additionalInfo.subItemsConfig?.subItemsVisible || false,
+        priceVisible:
+          quotationItem.additionalInfo.subItemsConfig?.priceVisible || false,
+      },
+    };
+  }
+
+  return record;
+};
+
+export const getQuotationItemTotalAfterPerItemDiscount = ({
+  positionItem,
+}: {
+  positionItem: EditableQuotationItem;
+}): number => {
+  const quantity = positionItem.quantity || 0;
+  const netAmount = positionItem.unitAmount?.netAmount || 0;
+
+  const {discount} = positionItem;
+
+  let total = (netAmount * quantity) / 100;
+
+  if (discount?.type === DiscountType.PERCENTAGE) {
+    total -= (total * (discount.percentage || 0)) / 100;
+  } else if (discount?.type === DiscountType.AMOUNT) {
+    total -= discount.amount?.value || 0;
+  }
+
+  return Math.max(total, 0);
+};
+
+export const getDiscountDisplay = (
+  discount?: Discount,
+  currentCurrency?: Currency,
+  selectedLng?: string,
+) => {
+  if (!discount) {
+    return '-';
+  }
+
+  if (discount.type === DiscountType.AMOUNT) {
+    return formatCurrency(discount.amount?.value || 0, {
+      currency: currentCurrency?.code,
+      excludeCurrencySymbol: true,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
+    });
+  }
+
+  if (discount.percentage && discount.percentage > 0) {
+    return `${discount.percentage}%`;
+  }
+
+  return '-';
+};

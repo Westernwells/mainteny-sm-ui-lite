@@ -13,11 +13,7 @@ import {
   InvoiceView,
 } from 'models/invoice';
 import {formatCostText} from 'utils/utils';
-import {
-  applyGlobalDiscountOnQuotationItems,
-  applyPerItemDiscountOnQuotationItems,
-  getDiscoutObj,
-} from 'pages/QuotationDetails/utils';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
   calculateArticlesAmount,
   getItemTotalAfterPerItemDiscount,
@@ -28,7 +24,11 @@ import {
 } from 'utils/invoice';
 import {ArticleType} from 'models/article';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
-import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
+import {
+  applyGlobalDiscountOnItems,
+  applyPerItemDiscountOnItems,
+  stripHtmlTags,
+} from 'pages/InvoiceDetails/utils';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
@@ -176,10 +176,9 @@ const CreditNotePdfTemplate = ({
   const discountAmount = discount?.amount;
   const discountValue = discountAmount?.value ?? 0;
 
-  const itemsAfterPerItemDiscount =
-    applyPerItemDiscountOnQuotationItems(articleItems);
+  const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
 
-  const itemsAfterGlobalDiscount = applyGlobalDiscountOnQuotationItems(
+  const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
     itemsAfterPerItemDiscount,
     discount,
   );

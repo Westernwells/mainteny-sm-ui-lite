@@ -46,7 +46,7 @@ const validationSchema = Yup.object().shape({
   startDate: Yup.date().nullable().required('Start date is required'),
   endDate: Yup.date()
     .nullable()
-    .when('startDate', (startDate, schema) => {
+    .when(['startDate'], ([startDate], schema) => {
       if (startDate) {
         const dayAfter = new Date(startDate);
         dayAfter.setDate(dayAfter.getDate() + 182);

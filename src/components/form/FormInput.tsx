@@ -84,7 +84,7 @@ export const FormInput = forwardRef(
         {inputType === 'currency' ? (
           <NumericFormat
             value={Number(
-              fieldProps?.inputProps?.defaultValue || fieldProps!.value,
+              fieldProps?.inputProps?.defaultValue || fieldProps?.value || '',
             )}
             onValueChange={(values) => {
               if (onValueChange) {

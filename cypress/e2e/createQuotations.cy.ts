@@ -33,15 +33,8 @@ describe('Create Quotation', () => {
 
         cy.contains('button', 'Save').should('be.disabled');
 
-        cy.get('[data-testid="AddArticle"]').should('exist');
-        cy.contains('button', 'Save').should('be.disabled');
-
-        cy.get('[data-testid="AddArticle"]').click({force: true});
-
-        cy.get('#article-combo-box').click({force: true});
-
-        // 🛠 Fix: Simulate user input interaction to trigger Formik validation
-        cy.get('#article-combo-box').type('e').clear();
+        cy.get('[data-testid="article-name-0"]').should('exist').dblclick({force: true});
+        cy.get('#article-combo-box').should('be.visible').clear().type('ar').clear()
         cy.wait(1000);
         // click outside
         cy.clearRichTextField('Payment terms');
@@ -50,21 +43,24 @@ describe('Create Quotation', () => {
     });
 
     it('should create job from quotation page', () => {
-        // create quotation //
+        // create quotation 
+
         // select customer
         cy.get('input[role="combobox"][name="propertyOwnerId"]').parent().click();
         cy.get(`li[role="option"][id="combo-box-demo-option-0"]`).click();
 
         // add article
-        cy.contains('button', 'Add Article').click();
-        cy.get('#article-combo-box').click({force: true})
+        cy.get('[data-testid="article-name-0"]').should('exist').dblclick({force: true});
+        cy.get('#article-combo-box').should('be.visible').clear().type('article');
+        cy.wait(2000)
         const articlesTable = cy.get('#article-combo-box-listbox');
         // clicking second row because first row is table header
-        const secondRow = articlesTable.find('li').eq(2);
+        const secondRow = articlesTable.should('be.visible').find('li').eq(2);
         secondRow.click();
 
-        cy.get('input[name="quantity"]').clear().type('1');
-        cy.get('input[name="unitAmount.netAmount"]').clear().type('100');
+
+        cy.get('[data-testid="position-unitAmount-0"]').should('exist').dblclick({force: true});
+        cy.get('input[name="items.0.unitAmount.netAmount"]').type('{selectall}{backspace}').type('100').blur()
 
         cy.contains('button', 'Save').click();
         cy.contains('Quotation created successfully');

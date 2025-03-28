@@ -14,11 +14,16 @@ import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {
   useDeleteQuotation,
   usePrintQuotation,
+  useQuotationSubItems,
   useReplyQuotation,
   useSendQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {QuotationStatus, QuotationView} from 'models/quotation';
+import {
+  QuotationStatus,
+  QuotationSubItemRecord,
+  QuotationView,
+} from 'models/quotation';
 import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
@@ -37,6 +42,7 @@ import TableActionButton from 'components/Table/TableActionButton';
 import useQuotationMenuActions from 'hooks/useQuotationMenuActions';
 import {companyLanguageContextMap} from 'utils/language';
 import {downloadFile as utilDownloadFile} from 'utils/download';
+import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 
 interface Props {
   quotation: QuotationView;
@@ -68,6 +74,18 @@ const Actions = ({quotation}: Props) => {
   const {mutateAsync: sendQuotation} = useSendQuotation();
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+
+  const {data: quotationSubItems} = useQuotationSubItems(quotation.id);
+
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = Object.entries(
+    quotationSubItems ?? {},
+  ).reduce((acc, [parentId, subItems]) => {
+    acc[parentId] = subItems.map((subItem) => ({
+      ...subItem,
+      parentId,
+    }));
+    return acc;
+  }, {} as Record<string, QuotationSubItemRecord[]>);
 
   const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
     serviceCompanyId: company?.id!,
@@ -123,6 +141,11 @@ const Actions = ({quotation}: Props) => {
   const uploadPath = `${serviceCompanyId}/quotations`;
 
   const generateBlobUrl = async () => {
+    const transformedQuotationItems =
+      quotation?.items.map((item) =>
+        quotationItemToQuotationItemRecord(item, subItemsMap),
+      ) || [];
+
     const blob = await pdf(
       <QuotationPdfTemplate
         pdfConfigClientStorage={pdfConfig}
@@ -135,6 +158,7 @@ const Actions = ({quotation}: Props) => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        quotationItems={transformedQuotationItems}
       />,
     ).toBlob();
     return blob;

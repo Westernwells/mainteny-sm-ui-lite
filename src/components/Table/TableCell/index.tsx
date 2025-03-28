@@ -18,6 +18,8 @@ type Props = CellProps & {
   onMouseLeave?: () => void;
   fullWidth?: boolean;
   sx?: SxProps<Theme>;
+  colSpan?: number;
+  testId?: string;
 };
 
 const Cell = ({
@@ -26,6 +28,8 @@ const Cell = ({
   children,
   onClick,
   onDoubleClick,
+  onMouseEnter,
+  onMouseLeave,
   align = 'left',
   justifyContent,
   firstSticky = true,
@@ -33,6 +37,8 @@ const Cell = ({
   noWidthLimit = false,
   noPadding = false,
   fullWidth = false,
+  colSpan,
+  testId,
   ...cellProps
 }: PropsWithChildren<Props>) => {
   const defaultSx: SystemStyleObject<Theme> = {
@@ -90,10 +96,14 @@ const Cell = ({
   return (
     <TableCell
       role="cell"
+      colSpan={colSpan}
       {...(cellProps.fieldName && {'data-field': cellProps.fieldName})}
       sx={combinedSx}
       onClick={onClick}
-      onDoubleClick={onDoubleClick}>
+      onDoubleClick={onDoubleClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      data-testid={testId}>
       <Box
         gap={gap ?? 2}
         sx={{

@@ -1,20 +1,50 @@
-import {useCallback} from 'react';
+import React, {useCallback} from 'react';
 import {FormikProps} from 'formik';
 import Grid from '@mui/material/Grid';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {QuotationFormData} from 'models/quotation';
+import {SelectChangeEvent} from '@mui/material';
+import {FieldPath, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 
 export const EditCustomerForm = ({
   formik,
+  setValue,
+  getValues,
   address,
 }: {
-  formik: FormikProps<QuotationFormData>;
+  formik?: FormikProps<QuotationFormData>;
+  setValue?: UseFormSetValue<QuotationFormData>;
+  getValues?: UseFormGetValues<QuotationFormData>;
   address: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
 }) => {
-  const {values, handleChange, handleBlur} = formik;
-  const value = values[address];
+  const value = formik ? formik.values[address] : getValues?.()[address];
+  const handleChange = formik
+    ? formik.handleChange
+    : (
+        e: React.ChangeEvent<
+          HTMLInputElement | HTMLTextAreaElement | {name?: string; value: any}
+        >,
+      ) => {
+        if (e.target.name)
+          setValue?.(
+            e.target.name as FieldPath<QuotationFormData>,
+            e.target.value,
+          );
+      };
+
+  const handleSelectChange = formik
+    ? formik.handleChange
+    : (e: SelectChangeEvent<string | string[]>) => {
+        if (e.target.name)
+          setValue?.(
+            e.target.name as FieldPath<QuotationFormData>,
+            e.target.value as string,
+          );
+      };
+
+  const handleBlur = formik ? formik.handleBlur : () => {};
 
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
@@ -93,7 +123,7 @@ export const EditCustomerForm = ({
             name: `${address}.component.country`,
             value: value?.component?.country ?? '',
             multiple: false,
-            onChange: handleChange,
+            onChange: handleSelectChange,
           }}
           isCompanyTranslation
         />
@@ -108,7 +138,7 @@ export const EditCustomerForm = ({
             name: `${address}.component.state`,
             value: value?.component?.state ?? '',
             multiple: false,
-            onChange: handleChange,
+            onChange: handleSelectChange,
           }}
           isCompanyTranslation
         />
