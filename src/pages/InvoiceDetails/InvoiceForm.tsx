@@ -1178,18 +1178,20 @@ export const InvoiceForm = ({
       setResetDueDatePicker(true);
     }
 
-    if (serviceOrderArg.additionalInfo.purchaseOrderNumber) {
-      formik.setFieldValue(
-        'purchaseOrderNumber',
-        serviceOrderArg.additionalInfo.purchaseOrderNumber,
-      );
-    } else if (serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber) {
-      formik.setFieldValue(
-        'purchaseOrderNumber',
-        serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber,
-      );
-    } else {
-      formik.setFieldValue('purchaseOrderNumber', '');
+    if (pageState !== PageState.DUPLICATE) {
+      if (serviceOrderArg.additionalInfo.purchaseOrderNumber) {
+        formik.setFieldValue(
+          'purchaseOrderNumber',
+          serviceOrderArg.additionalInfo.purchaseOrderNumber,
+        );
+      } else if (serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber) {
+        formik.setFieldValue(
+          'purchaseOrderNumber',
+          serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber,
+        );
+      } else {
+        formik.setFieldValue('purchaseOrderNumber', '');
+      }
     }
   };
 
