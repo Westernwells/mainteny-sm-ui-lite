@@ -31,6 +31,7 @@ export const HtmlPDF = ({
       stylesheet={{
         '*': {
           color: grey[700],
+          fontSize: DEFAULT_HTML_PDF_FONT_SIZE,
         },
         '*:not(div:empty)': {
           margin: '0px',

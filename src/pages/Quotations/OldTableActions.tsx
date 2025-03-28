@@ -26,11 +26,16 @@ import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {
   useDeleteQuotation,
   usePrintQuotation,
+  useQuotationSubItems,
   useReplyQuotation,
   useSendQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {QuotationStatus, QuotationView} from 'models/quotation';
+import {
+  QuotationStatus,
+  QuotationSubItemRecord,
+  QuotationView,
+} from 'models/quotation';
 import {
   useDownloadFileWithCustomName,
   useDownloadUrl,
@@ -52,6 +57,7 @@ import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 
 interface Props {
   quotation: QuotationView;
@@ -88,6 +94,18 @@ const OldTableActions = ({quotation}: Props) => {
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
+
+  const {data: quotationSubItems} = useQuotationSubItems(quotation?.id);
+
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = Object.entries(
+    quotationSubItems ?? {},
+  ).reduce((acc, [parentId, subItems]) => {
+    acc[parentId] = subItems.map((subItem) => ({
+      ...subItem,
+      parentId,
+    }));
+    return acc;
+  }, {} as Record<string, QuotationSubItemRecord[]>);
 
   const [activeSignature, setActiveSignature] = useState<
     EmailSignature | undefined
@@ -150,6 +168,11 @@ const OldTableActions = ({quotation}: Props) => {
   const uploadPath = `${serviceCompanyId}/quotations`;
 
   const generateBlobUrl = async () => {
+    const transformedQuotationItems =
+      quotation?.items.map((item) =>
+        quotationItemToQuotationItemRecord(item, subItemsMap),
+      ) || [];
+
     setCreatingPdf(true);
     const blob = await pdf(
       <QuotationPdfTemplate
@@ -163,6 +186,7 @@ const OldTableActions = ({quotation}: Props) => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        quotationItems={transformedQuotationItems}
       />,
     ).toBlob();
     setBlobFile(blob);

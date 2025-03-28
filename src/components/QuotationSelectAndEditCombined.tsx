@@ -11,6 +11,7 @@ import {QuotationFormData} from 'models/quotation';
 import {EditCustomerForm} from 'pages/QuotationDetails/EditCustomerForm';
 import AddIcon from '@mui/icons-material/Add';
 import {TFunction} from 'i18next';
+import {UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
 import {SelectButton} from './SelectButton';
@@ -26,9 +27,11 @@ interface Props {
   editButtonText: string;
   modalHeader: string;
   addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
-  formik: FormikProps<QuotationFormData>;
+  formik?: FormikProps<QuotationFormData>;
   address?: AddressRecord;
   translate?: TFunction<'translation', 'translation'>;
+  setValue?: UseFormSetValue<QuotationFormData>;
+  getValues?: UseFormGetValues<QuotationFormData>;
 }
 
 export const QuotationSelectAndEditCombined = ({
@@ -43,46 +46,58 @@ export const QuotationSelectAndEditCombined = ({
   formik,
   address,
   translate,
+  setValue,
+  getValues,
 }: Props) => {
   const {t} = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useTheme();
 
-  const initialValues: AddressRecord | undefined = useMemo(
-    () => formik.values[addressType],
-    [isModalOpen],
-  );
+  const initialValues: AddressRecord | undefined = useMemo(() => {
+    if (formik) return formik.values[addressType];
+    return getValues?.()[addressType];
+  }, [isModalOpen]);
 
   const onCloseDialog = () => {
     setIsModalOpen(false);
-    formik.setValues({
-      ...formik.values,
-      [addressType]: initialValues,
-    });
+    if (formik) {
+      formik.setValues({
+        ...formik.values,
+        [addressType]: initialValues,
+      });
+    } else if (setValue) {
+      setValue(addressType, initialValues);
+    }
   };
 
   const onSaveAddress = () => {
-    formik.setValues({
-      ...formik.values,
-      [addressType]: {
-        ...formik.values[addressType],
-        component: {
-          ...formik.values[addressType]?.component,
-          country: formik.values[addressType]?.component?.country
-            ? translate
-              ? translate(
-                  formik.values[addressType]?.component
-                    ?.country as unknown as string,
-                )
-              : formik.values[addressType]?.component?.country
-            : '',
-        },
-        fullName: formatAddressFullname(
-          formik.values?.[addressType] ?? null,
-          translate,
-        )?.fullName,
+    const currentAddress = formik
+      ? formik.values[addressType]
+      : getValues?.()[addressType];
+    const updatedAddress = {
+      ...currentAddress,
+      component: {
+        ...currentAddress?.component,
+        country: currentAddress?.component?.country
+          ? translate
+            ? translate(currentAddress?.component?.country as unknown as string)
+            : currentAddress?.component?.country
+          : '',
       },
-    });
+      fullName:
+        formatAddressFullname(currentAddress ?? null, translate)?.fullName ??
+        null,
+    };
+
+    if (formik) {
+      formik.setValues({
+        ...formik.values,
+        [addressType]: updatedAddress,
+      });
+    } else if (setValue) {
+      setValue(addressType, updatedAddress);
+    }
+
     setIsModalOpen(false);
   };
 
@@ -163,12 +178,20 @@ export const QuotationSelectAndEditCombined = ({
         title={modalHeader}
         onCancel={onCloseDialog}
         onSave={onSaveAddress}
-        disableSaveBtn={!formik.values?.[addressType]?.component?.name}
+        disableSaveBtn={
+          !getValues?.()[addressType]?.component?.name &&
+          !formik?.values?.[addressType]?.component?.name
+        }
         dialogProps={{
           maxWidth: 'md',
           open: isModalOpen || false,
         }}>
-        <EditCustomerForm formik={formik} address={addressType} />
+        <EditCustomerForm
+          formik={formik}
+          setValue={setValue}
+          getValues={getValues}
+          address={addressType}
+        />
       </Dialog>
     </Box>
   );

@@ -44,33 +44,9 @@ export const ComboBox = forwardRef<HTMLInputElement, Props>(
     const [open, setOpen] = useState<boolean>(false);
     const [isFocused, setIsFocused] = useState<boolean>(false);
 
-    useEffect(() => {
-      if (textFieldProps?.value) {
-        setOpen(false);
-      } else {
-        setOpen(true);
-      }
-    }, [textFieldProps?.value]);
-
-    useEffect(() => {
-      if (getValue) {
-        getValue(item);
-      }
-      if (item) {
-        setQuery(item.label);
-        setOpen(false);
-      }
-    }, [item]);
-
-    useEffect(() => {
-      if (getQuery) {
-        getQuery(query);
-      }
-
-      if (!query && getValue) {
-        getValue(null);
-      }
-    }, [query]);
+    const shouldDropdownStayOpen =
+      textFieldProps?.name === 'externalId' ||
+      textFieldProps?.name === 'employeeId';
 
     const onInputChange = (
       event: SyntheticEvent,
@@ -105,6 +81,38 @@ export const ComboBox = forwardRef<HTMLInputElement, Props>(
       }
     };
 
+    const handleFocus = () => {
+      setIsFocused(true);
+      if (!query.trim()) {
+        setOpen(true);
+      }
+    };
+
+    const handleBlur = () => {
+      setIsFocused(false);
+      setOpen(false);
+    };
+
+    useEffect(() => {
+      if (getValue) {
+        getValue(item);
+      }
+      if (item) {
+        setQuery(item.label);
+        setOpen(false);
+      }
+    }, [item]);
+
+    useEffect(() => {
+      if (getQuery) {
+        getQuery(query);
+      }
+
+      if (!query && getValue) {
+        getValue(null);
+      }
+    }, [query]);
+
     useEffect(() => {
       if (textFieldProps?.value) {
         setItem({
@@ -114,20 +122,21 @@ export const ComboBox = forwardRef<HTMLInputElement, Props>(
       }
     }, [textFieldProps?.value]);
 
-    const handleFocus = () => {
-      setIsFocused(true);
-      setOpen(true);
-    };
-
-    const handleBlur = () => {
-      setOpen(false);
-      setIsFocused(false);
-    };
+    useEffect(() => {
+      if (shouldDropdownStayOpen && isFocused && !query.trim()) {
+        setOpen(true);
+      }
+    }, [query, isFocused, shouldDropdownStayOpen]);
 
     const renderCustomPopper = (popperProps: PopperProps) => (
       <CustomPopper
         {...popperProps}
-        sx={{width: 'max-content !important'}}
+        placement="bottom-start"
+        sx={{
+          width: textFieldProps?.fullWidth ? '100%' : 'auto',
+          zIndex: 1300,
+          mt: 1,
+        }}
         isEnabled={autoIdProps.isEnabled || false}
         handleAction={handleClick}
         query={query}
@@ -149,8 +158,7 @@ export const ComboBox = forwardRef<HTMLInputElement, Props>(
         {...(textFieldProps?.name === 'externalId' ||
         textFieldProps?.name === 'employeeId'
           ? {
-              open: open && isFocused,
-              freeSolo: true,
+              open,
               PopperComponent: renderCustomPopper,
             }
           : {})}

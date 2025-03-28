@@ -39,6 +39,7 @@ export const queryKeys = {
   invoiceById: 'invoiceById',
   invoiceAmountById: 'invoiceAmountById',
   quotationById: 'quotationById',
+  quotationSubItem: 'quotationSubItem',
   invoiceDownloadUrl: 'invoiceDownloadUrl',
   queryServiceManager: 'queryServiceManager',
   queryCustomers: 'queryCustomers',

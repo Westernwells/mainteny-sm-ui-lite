@@ -27,6 +27,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   QuotationActivityView,
   QuotationStatus,
+  QuotationSubItemRecord,
   QuotationView,
 } from 'models/quotation';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
@@ -66,6 +67,7 @@ import {FileResourceRecord} from 'models/media';
 import {HeaderFooterInfoData} from 'models/misc';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -92,6 +94,7 @@ interface Props {
   footerInfo: HeaderFooterInfoData;
   headerUrl: string;
   footerUrl: string;
+  quotationSubItems?: Record<string, QuotationSubItemRecord[]>;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -109,6 +112,7 @@ export const ViewQuotation = ({
   footerInfo,
   headerUrl,
   footerUrl,
+  quotationSubItems,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -130,6 +134,16 @@ export const ViewQuotation = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const {mutate: deleteQuotation} = useDeleteQuotation();
+
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = Object.entries(
+    quotationSubItems ?? {},
+  ).reduce((acc, [parentId, subItems]) => {
+    acc[parentId] = subItems.map((subItem) => ({
+      ...subItem,
+      parentId,
+    }));
+    return acc;
+  }, {} as Record<string, QuotationSubItemRecord[]>);
 
   const {data: elevator} =
     typeof elevatorId === 'string'
@@ -257,6 +271,11 @@ export const ViewQuotation = ({
   }, [quotation]);
 
   const generateBlobUrl = async () => {
+    const transformedQuotationItems =
+      quotation?.items.map((item) =>
+        quotationItemToQuotationItemRecord(item, subItemsMap),
+      ) || [];
+
     const blob = await pdf(
       <QuotationPdfTemplate
         pdfConfigClientStorage={pdfConfig}
@@ -269,6 +288,7 @@ export const ViewQuotation = ({
         headerInfo={headerInfo}
         footerPath={footerUrl}
         footerInfo={footerInfo}
+        quotationItems={transformedQuotationItems}
       />,
     ).toBlob();
     setBlobFile(blob);
@@ -279,7 +299,7 @@ export const ViewQuotation = ({
 
   useEffect(() => {
     generateBlobUrl();
-  }, [quotation, headerUrl, footerUrl]);
+  }, [quotation, headerUrl, footerUrl, quotationSubItems]);
 
   const getExistingFiles = async (
     fileDownloadUrl:

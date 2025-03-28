@@ -25,7 +25,10 @@ import {SnackbarKey} from 'notistack';
 import {useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
-import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
+import {
+  useQuotationDetails,
+  useQuotationSubItems,
+} from 'hooks/reactQuery/useQuotation';
 import {
   useCompanyById,
   useCompanyJobTypes,
@@ -39,6 +42,8 @@ import {
 import {companyLanguageContextMap} from 'utils/language';
 import {getJobTypeGivenName} from 'utils/service-order-utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
+import {QuotationSubItemRecord} from 'models/quotation';
+import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -80,6 +85,19 @@ export const ServiceOrderDetails = () => {
 
   const currentCurrency = useCurrentCurrency();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+
+  const {data: quotationSubItems, isLoading: isQuotationSubItemsLoading} =
+    useQuotationSubItems(serviceOrder?.additionalInfo?.quotationId);
+
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = Object.entries(
+    quotationSubItems ?? {},
+  ).reduce((acc, [parentId, subItems]) => {
+    acc[parentId] = subItems.map((subItem) => ({
+      ...subItem,
+      parentId,
+    }));
+    return acc;
+  }, {} as Record<string, QuotationSubItemRecord[]>);
 
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -164,6 +182,11 @@ export const ServiceOrderDetails = () => {
   );
 
   const generatePreviewPdfBlobUrl = async () => {
+    const transformedQuotationItems =
+      quotation?.items.map((item) =>
+        quotationItemToQuotationItemRecord(item, subItemsMap),
+      ) || [];
+
     const blob =
       serviceOrder?.additionalInfo.quotationId && quotation
         ? await pdf(
@@ -183,6 +206,7 @@ export const ServiceOrderDetails = () => {
                 serviceOrder?.type,
                 allJobTypes,
               )}
+              quotationItems={transformedQuotationItems}
             />,
           ).toBlob()
         : await pdf(
@@ -269,7 +293,7 @@ export const ServiceOrderDetails = () => {
     }
   }, [filePathToDownload]);
 
-  if (isLoading) {
+  if (isLoading || isQuotationSubItemsLoading) {
     return <Progress />;
   }
 

@@ -23,7 +23,7 @@ import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
 import {PaymentTermArticleType, PaymentTermData} from 'models/contract';
 import {Currency, PdfGenerationStatus, State} from 'models/misc';
-import {ArticleType} from 'models/article';
+import {ArticleType, ArticleView} from 'models/article';
 import {ServiceOrderTypeRecord, ServiceOrderView} from 'models/service-order';
 import {
   InvoiceFormat,
@@ -41,7 +41,6 @@ import {
 import {dateToString, getAmountFromPercentage} from './utils';
 import {formatDate} from './datetime';
 import {getJobTypeGivenName} from './service-order-utils';
-import {transformFormikItems} from './quotation';
 
 export const getTotalFromArticles = (
   items: QuotationItemRecord[] | InvoiceItemRecord[],
@@ -50,8 +49,8 @@ export const getTotalFromArticles = (
     .map(
       (item) =>
         item.quantity *
-        ((item.unitAmount.netAmount ?? 0) /
-          10 ** Currencies[item.unitAmount.currency]),
+        ((item.unitAmount?.netAmount ?? 0) /
+          10 ** Currencies[item.unitAmount?.currency!]),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
 
@@ -63,10 +62,10 @@ export const getTotalWithVatFromArticles = (
       (item) =>
         item.quantity *
         (getAmountFromPercentage(
-          item.unitAmount.percentageVat ?? 0,
-          item.unitAmount.netAmount ?? 0,
+          item.unitAmount?.percentageVat ?? 0,
+          item.unitAmount?.netAmount ?? 0,
         ) /
-          10 ** Currencies[item.unitAmount.currency]),
+          10 ** Currencies[item.unitAmount?.currency!]),
     )
     .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
 
@@ -583,6 +582,35 @@ export function transformPropertyOwnerViewToSimpleView(
     number: propertyOwner?.number,
   };
 }
+
+export const transformFormikItems = (
+  items: InvoiceItemRecord[],
+): InvoiceItemView[] =>
+  items.map((item) => ({
+    id: item?.id || item.article?.id || '',
+    name: item.name,
+    description: item.description || '',
+    quantity: item.quantity,
+    quotationId: '',
+    unitAmount: {
+      currency: item.unitAmount!.currency,
+      netAmount: item.unitAmount?.netAmount,
+      percentageVat: item.unitAmount?.percentageVat,
+      vats: [
+        {
+          percentageVat: item.unitAmount?.percentageVat || 0,
+          vat:
+            (item.unitAmount?.percentageVat ?? 0 / 100) *
+            (item.unitAmount?.netAmount ?? 0),
+        },
+      ],
+    },
+    additionalInfo: {
+      discount: item.discount,
+      payment: (item as InvoiceItemRecord).payment,
+    },
+    article: item.article as ArticleView,
+  }));
 
 export const generatePdfInvoice = (
   formikValues: InvoiceFormData,

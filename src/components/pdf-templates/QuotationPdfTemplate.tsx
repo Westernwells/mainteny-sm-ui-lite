@@ -3,27 +3,23 @@ import {UserAccount} from 'models/user';
 import React, {useMemo} from 'react';
 import {formatDate} from 'utils/datetime';
 import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
-import {QuotationItemView, QuotationView} from 'models/quotation';
+import {EditableQuotationItem, QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {DiscountType} from 'models/invoice';
-import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {
-  calculateArticlesAmount,
-  getItemTotalAfterPerItemDiscount,
-} from 'utils/calculate-total';
+import {calculateArticlesAmount} from 'utils/calculate-total';
 import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
-import {
-  allItemsHaveZeroDiscount,
-  shouldDisplayDiscountDash,
-} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromQuotation} from 'utils/pdfTemplates';
 import {toSentenceCase} from 'utils/string';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
+import {
+  getDiscountDisplay,
+  getQuotationItemTotalAfterPerItemDiscount,
+} from 'utils/quotation';
 import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
 import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
 import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
@@ -93,6 +89,13 @@ const getStyles = (
       textAlign: 'right',
       ...regularFontStyle,
     },
+    subPositionRow: {
+      display: 'flex',
+      flexDirection: 'row',
+      fontSize: 10,
+      marginVertical: 4,
+      alignItems: 'flex-start',
+    },
     dataBody: {
       borderBottom: '1px solid #212121',
       paddingBottom: 10,
@@ -135,24 +138,17 @@ const getStyles = (
       textTransform: 'uppercase',
     },
     tableRow: {
-      display: 'flex',
       flexDirection: 'row',
-      alignItems: 'flex-start',
       fontSize: 10,
-      marginVertical: 5,
+      marginVertical: 3,
     },
     descriptionText: {
-      width: '87%',
       display: 'flex',
       fontSize: 8.5,
       color: '#212121',
-      paddingLeft: 20,
-      paddingRight: 10,
+      paddingLeft: 23,
       letterSpacing: -0.15,
       marginVertical: 4,
-      lineHeight: 1.55,
-      whiteSpace: 'pre-wrap',
-      wordWrap: 'break-word',
     },
     signatureBoxWrap: {
       marginTop: 30,
@@ -177,6 +173,58 @@ const getStyles = (
       padding: 1,
       ...boldFontStyle,
     },
+    col2Left: {
+      width: '5%',
+      textAlign: 'left',
+      color: '#212121',
+    },
+    col40Left: {
+      width: '37%',
+      textAlign: 'left',
+      color: '#212121',
+      display: 'flex',
+      flexDirection: 'row',
+    },
+    col10Right: {
+      width: '10%',
+      textAlign: 'right',
+      color: '#212121',
+    },
+    col8Center: {
+      width: '8%',
+      textAlign: 'center',
+      marginLeft: 10,
+      color: '#212121',
+    },
+    col15Right: {
+      width: '15%',
+      textAlign: 'right',
+      color: '#212121',
+    },
+    footerRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      fontSize: 10,
+      marginVertical: 3,
+      color: '#616161',
+    },
+    subPositionCol2Left: {
+      width: '5%',
+      textAlign: 'left',
+      color: '#212121',
+    },
+    subPositionNameContainer: {
+      width: '37%',
+      display: 'flex',
+      flexDirection: 'row',
+      color: '#212121',
+    },
+    subPositionText: {
+      fontSize: 10,
+      color: '#212121',
+      display: 'flex',
+      flexDirection: 'row',
+    },
   });
 
 type BaseProps = {
@@ -190,6 +238,7 @@ type BaseProps = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
+  quotationItems: EditableQuotationItem[];
 };
 
 type JobOverviewProps = BaseProps & {
@@ -216,56 +265,37 @@ const QuotationPdfTemplate = React.memo(
     pdfConfigClientStorage,
     isJobOverview,
     serviceOrderType,
+    quotationItems,
   }: Props) => {
-    const articleItems = quotation?.items?.map((item) => ({
-      ...item,
-      discount: getDiscoutObj(item.additionalInfo.discount),
-    }))!;
-
-    const netTotal = (articleItem: QuotationItemView) => {
-      const total = getItemTotalAfterPerItemDiscount({
-        item: {
-          unitAmount: {
-            netAmount: articleItem?.unitAmount?.netAmount,
-          },
-          quantity: articleItem.quantity,
-          discount: articleItem?.additionalInfo?.discount,
-        },
-      });
-
-      return centsToMoney(currentCurrency?.code!, total);
-    };
-
-    const discount = getDiscoutObj(quotation?.additionalInfo?.discount);
+    const discount = quotation?.additionalInfo?.discount;
     const discountAmount = discount?.amount;
-    const discountValue = discountAmount?.value ?? 0;
+    const discountValue = centsToMoney(
+      currentCurrency?.code!,
+      discountAmount?.value ?? 0,
+    );
 
-    const {vats, amountAfterGlobalDiscountWithVAT, amountAfterGlobalDiscount} =
+    const {amountAfterGlobalDiscount, amountAfterGlobalDiscountWithVAT, vats} =
       useMemo(
         () =>
           calculateArticlesAmount({
-            items: articleItems,
-            globalDiscount: discount,
+            items: quotationItems,
+            globalDiscount: getDiscoutObj(
+              quotation?.additionalInfo.discount,
+              true,
+            ),
           }),
-        [articleItems, discount],
+        [quotationItems, quotation?.additionalInfo.discount],
       );
 
-    const subtotalExclVatFormatted = formatCurrency(amountAfterGlobalDiscount, {
-      currency: currentCurrency?.code,
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    });
-
-    const vatsFormatted = vats?.map((vat) => ({
-      ...vat,
-      vat: formatCurrency(vat.vat, {
+    const amountAfterGlobalDiscountFormatted = formatCurrency(
+      amountAfterGlobalDiscount,
+      {
         currency: currentCurrency?.code,
         excludeCurrencySymbol: true,
         currencySymbol: currentCurrency?.symbol,
         companyLang: selectedLng,
-      }),
-    }));
+      },
+    );
 
     const amountAfterGlobalDiscountWithVATFormatted = formatCurrency(
       amountAfterGlobalDiscountWithVAT,
@@ -471,341 +501,325 @@ const QuotationPdfTemplate = React.memo(
               )}
 
               {quotation?.description.trim() !== '' && (
-                <View>
-                  <HtmlPDF
-                    html={quotation?.description || ''}
-                    selectedLng={selectedLng}
-                    rootStyle={{
-                      marginTop: 6,
-                      marginBottom: 16,
-                    }}
-                  />
-                </View>
+                <HtmlPDF
+                  html={quotation?.description || ''}
+                  selectedLng={selectedLng}
+                  rootStyle={{
+                    marginTop: 6,
+                    marginBottom: 16,
+                  }}
+                />
               )}
 
-              <View style={styles.table}>
-                <View style={styles.tableHead}>
-                  <View style={styles.tableRow}>
-                    <Text
-                      style={{
-                        width: '2%',
-                        textAlign: 'left',
-                        marginRight: 10,
-                        ...styles.tableHeading,
-                      }}>
-                      #
-                    </Text>
-                    <Text
-                      style={{
-                        width: '40%',
-                        textAlign: 'left',
-                        ...styles.tableHeading,
-                      }}>
-                      {translate('Article Name')}
-                    </Text>
-
-                    <Text
-                      style={{
-                        width: '10%',
-                        textAlign: 'right',
-                        ...styles.tableHeading,
-                      }}>
-                      {translate('Quantity')}
-                    </Text>
-                    <Text
-                      style={{
-                        width: '8%',
-                        textAlign: 'center',
-                        marginLeft: 10,
-                        ...styles.tableHeading,
-                      }}>
-                      {translate('Unit')}
-                    </Text>
-                    <Text
-                      style={{
-                        width: '15%',
-                        textAlign: 'right',
-                        ...styles.tableHeading,
-                      }}>
-                      {`${translate('Price')} (${
-                        getCurrencySymbol[currentCurrency?.code!]
-                      })`}
-                    </Text>
-                    {!allItemsHaveZeroDiscount(articleItems) && (
-                      <Text
-                        style={{
-                          width: '10%',
-                          textAlign: 'right',
-                          ...styles.tableHeading,
-                        }}>
-                        {translate('Discount')}
-                      </Text>
-                    )}
-
-                    <Text
-                      style={{
-                        width: allItemsHaveZeroDiscount(articleItems)
-                          ? '25%'
-                          : '15%',
-                        textAlign: 'right',
-                        ...styles.tableHeading,
-                      }}>
-                      {`${translate('Total')} (${
-                        getCurrencySymbol[currentCurrency?.code!]
-                      })`}
-                    </Text>
-                  </View>
-                </View>
-
-                {!!quotation?.items?.length && (
-                  <View style={styles.dataBody}>
-                    {quotation?.items?.map((articleItem, index) => (
-                      <View key={`${articleItem.id} - ${index}`}>
-                        <View style={styles.tableRow}>
-                          <Text
-                            style={{
-                              width: '2%',
-                              textAlign: 'left',
-                              marginRight: 10,
-                              color: '#212121',
-                            }}>
-                            {index + 1}
-                          </Text>
-                          <HtmlPDF
-                            html={articleItem.name || '-'}
-                            rootStyle={{
-                              width: '40%',
-                              textAlign: 'left',
-                              color: '#212121',
-                            }}
-                            stylesheet={{
-                              p: {
-                                marginBottom: '2px',
-                              },
-                            }}
-                          />
-
-                          <Text
-                            style={{
-                              width: '10%',
-                              textAlign: 'right',
-                              color: '#212121',
-                            }}>
-                            {articleItem.quantity || '0'}
-                          </Text>
-                          <Text
-                            style={{
-                              width: '8%',
-                              textAlign: 'center',
-                              marginLeft: 10,
-                              color: '#212121',
-                            }}>
-                            {translate(articleItem.article?.unit || '') || '-'}
-                          </Text>
-                          <Text
-                            style={{
-                              width: '15%',
-                              textAlign: 'right',
-                              color: '#212121',
-                            }}>
-                            {formatCurrency(
-                              (articleItem?.unitAmount?.netAmount ?? 0) /
-                                10 **
-                                  (articleItem.unitAmount.fractionDigits ??
-                                    2) || 0,
-                              {
-                                currency: currentCurrency?.code,
-                                excludeCurrencySymbol: true,
-                                currencySymbol: currentCurrency?.symbol,
-                                companyLang: selectedLng,
-                              },
-                            )}
-                          </Text>
-
-                          {!allItemsHaveZeroDiscount(articleItems) && (
-                            <Text
-                              style={{
-                                width: '10%',
-                                textAlign: 'right',
-                                color: '#212121',
-                              }}>
-                              {shouldDisplayDiscountDash(articleItem)}
-                              {articleItem?.additionalInfo?.discount?.type ===
-                              DiscountType.PERCENTAGE
-                                ? articleItem?.additionalInfo?.discount
-                                    .percentage
-                                : formatCurrency(
-                                    centsToMoney(
-                                      currentCurrency?.code!,
-                                      articleItem?.additionalInfo?.discount
-                                        ?.amount?.value,
-                                    ),
-                                    {
-                                      currency: currentCurrency?.code,
-                                      excludeCurrencySymbol: true,
-                                      currencySymbol: currentCurrency?.symbol,
-                                      companyLang: selectedLng,
-                                      minimumFractionDigits:
-                                        articleItem?.additionalInfo?.discount
-                                          ?.amount?.value === 0
-                                          ? 0
-                                          : 2,
-                                      maximumFractionDigits:
-                                        articleItem?.additionalInfo?.discount
-                                          ?.amount?.value === 0
-                                          ? 0
-                                          : 2,
-                                    },
-                                  )}
-                              {articleItem?.additionalInfo?.discount?.type ===
-                              DiscountType.AMOUNT
-                                ? getCurrencySymbol[currentCurrency?.code!]
-                                : '%'}
-                            </Text>
-                          )}
-
-                          <Text
-                            style={{
-                              width: allItemsHaveZeroDiscount(articleItems)
-                                ? '25%'
-                                : '15%',
-                              textAlign: 'right',
-                              color: '#212121',
-                            }}>
-                            {formatCurrency(netTotal(articleItem), {
-                              currency: currentCurrency?.code,
-                              excludeCurrencySymbol: true,
-                              currencySymbol: currentCurrency?.symbol,
-                              companyLang: selectedLng,
-                            })}
-                          </Text>
-                        </View>
-                        {!!articleItem?.description?.trim() && (
-                          <HtmlPDF
-                            html={articleItem.description || '-'}
-                            rootStyle={{
-                              ...styles.descriptionText,
-                              marginBottom:
-                                index === quotation.items.length - 1 ? 0 : 10,
-                            }}
-                          />
-                        )}
-                      </View>
-                    ))}
-                  </View>
-                )}
-
+              <View
+                style={{
+                  marginBottom: 16,
+                  paddingRight: 5,
+                }}>
                 <View>
-                  {!!discountValue && (
-                    <View style={styles.tableRow}>
-                      <Text style={{width: '44%'}} />
-                      <Text
-                        style={{
-                          width: '32%',
-                          color: '#616161',
-                          fontSize: 10,
-                          textAlign: 'right',
-                        }}>
-                        {`${translate('Discount')} (${
-                          getCurrencySymbol[currentCurrency?.code!]
-                        })`}
-                      </Text>
-                      <Text
-                        style={{
-                          width: '24%',
-                          textAlign: 'right',
-                          fontSize: 10,
-                        }}>
-                        -
-                        {formatCurrency(discountValue, {
-                          currency: currentCurrency?.code,
-                          excludeCurrencySymbol: true,
-                          currencySymbol: currentCurrency?.symbol,
-                          companyLang: selectedLng,
-                        })}
-                      </Text>
+                  <View style={styles.table}>
+                    <View style={styles.tableHead}>
+                      <View style={styles.tableRow}>
+                        <Text style={[styles.col2Left, styles.tableHeading]}>
+                          #
+                        </Text>
+                        <Text style={[styles.col40Left, styles.tableHeading]}>
+                          {translate('Name')}
+                        </Text>
+                        <Text style={[styles.col10Right, styles.tableHeading]}>
+                          {translate('Quantity')}
+                        </Text>
+                        <Text style={[styles.col8Center, styles.tableHeading]}>
+                          {translate('Unit')}
+                        </Text>
+                        <Text style={[styles.col15Right, styles.tableHeading]}>
+                          {`${translate('Price')} (${
+                            getCurrencySymbol[currentCurrency?.code!]
+                          })`}
+                        </Text>
+                        <Text style={[styles.col10Right, styles.tableHeading]}>
+                          {translate('Discount')}
+                        </Text>
+                        <Text style={[styles.col15Right, styles.tableHeading]}>
+                          {`${translate('Total')} (${
+                            getCurrencySymbol[currentCurrency?.code!]
+                          })`}
+                        </Text>
+                      </View>
                     </View>
-                  )}
 
-                  <View style={styles.tableRow}>
-                    <Text style={{width: '44%'}} />
-                    <Text
-                      style={{
-                        width: '32%',
-                        color: '#616161',
-                        fontSize: 10,
-                        textAlign: 'right',
-                      }}>
-                      {translate('Subtotal excl. VAT')}
-                    </Text>
-                    <Text
-                      style={{
-                        width: '24%',
-                        textAlign: 'right',
-                        fontSize: 10,
-                      }}>
-                      {subtotalExclVatFormatted}
-                    </Text>
-                  </View>
+                    <View style={styles.dataBody}>
+                      {quotationItems?.map((mainPosition, index) => {
+                        const totalPriceExclVatAfterDiscount =
+                          getQuotationItemTotalAfterPerItemDiscount({
+                            positionItem: mainPosition,
+                          });
 
-                  <View style={styles.tableRow}>
-                    <Text style={{width: '44%'}} />
-                    <View style={{width: '56%'}}>
-                      {vatsFormatted?.map((v, index) => (
-                        <View
-                          key={`${index}-${v.percentageVat}`}
+                        return (
+                          <View key={`${mainPosition.id}-${index}`}>
+                            <View style={styles.tableRow}>
+                              <Text style={styles.col2Left}>
+                                {mainPosition.userSeqNumber || index + 1}
+                              </Text>
+                              <HtmlPDF
+                                html={mainPosition.name || '-'}
+                                rootStyle={styles.col40Left}
+                              />
+                              <Text style={styles.col10Right}>
+                                {mainPosition?.quantity || '-'}
+                              </Text>
+                              <Text style={styles.col8Center}>
+                                {translate(mainPosition?.article?.unit || '-')}
+                              </Text>
+                              <Text style={styles.col15Right}>
+                                {formatCurrency(
+                                  centsToMoney(
+                                    currentCurrency?.code!,
+                                    mainPosition?.unitAmount?.netAmount || 0,
+                                  ),
+                                  {
+                                    currency: currentCurrency?.code,
+                                    excludeCurrencySymbol: true,
+                                    currencySymbol: currentCurrency?.symbol,
+                                    companyLang: selectedLng,
+                                  },
+                                )}
+                              </Text>
+                              <Text style={styles.col10Right}>
+                                {getDiscountDisplay(
+                                  mainPosition.discount,
+                                  currentCurrency,
+                                  selectedLng,
+                                )}
+                              </Text>
+                              <Text style={styles.col15Right}>
+                                {formatCurrency(
+                                  totalPriceExclVatAfterDiscount || 0,
+                                  {
+                                    currency: currentCurrency?.code,
+                                    excludeCurrencySymbol: true,
+                                    currencySymbol: currentCurrency?.symbol,
+                                    companyLang: selectedLng,
+                                  },
+                                )}
+                              </Text>
+                            </View>
+                            <View>
+                              {!!mainPosition.description?.trim() && (
+                                <HtmlPDF
+                                  html={mainPosition.description || '-'}
+                                  rootStyle={{
+                                    ...styles.descriptionText,
+                                  }}
+                                />
+                              )}
+                            </View>
+
+                            {mainPosition.subItemsConfig?.subItemsVisible &&
+                              mainPosition?.subItems?.map(
+                                (subItem, subIndex) => (
+                                  <View
+                                    key={`${subItem?.id}-${index}-${subIndex}`}>
+                                    <View style={styles.subPositionRow}>
+                                      <Text style={styles.subPositionCol2Left}>
+                                        {subItem.userSeqNumber ||
+                                          `${index + 1}.${subIndex + 1}`}
+                                      </Text>
+                                      <HtmlPDF
+                                        html={
+                                          subItem?.name ||
+                                          subItem?.article?.name ||
+                                          '-'
+                                        }
+                                        rootStyle={{
+                                          ...styles.subPositionNameContainer,
+                                        }}
+                                      />
+                                      <Text style={styles.col10Right}>
+                                        {subItem?.quantity || '-'}
+                                      </Text>
+                                      <Text style={styles.col8Center}>
+                                        {translate(
+                                          subItem?.article?.unit || '-',
+                                        )}
+                                      </Text>
+
+                                      {mainPosition.subItemsConfig
+                                        ?.priceVisible ? (
+                                        <Text style={styles.col15Right}>
+                                          {formatCurrency(
+                                            centsToMoney(
+                                              currentCurrency?.code!,
+                                              subItem?.unitAmount?.netAmount ||
+                                                0,
+                                            ),
+                                            {
+                                              currency: currentCurrency?.code,
+                                              excludeCurrencySymbol: true,
+                                              currencySymbol:
+                                                currentCurrency?.symbol,
+                                              companyLang: selectedLng,
+                                            },
+                                          )}
+                                        </Text>
+                                      ) : (
+                                        <Text style={styles.col15Right} />
+                                      )}
+
+                                      <Text style={styles.col10Right} />
+
+                                      {mainPosition.subItemsConfig
+                                        ?.priceVisible ? (
+                                        <Text style={styles.col15Right}>
+                                          {formatCurrency(
+                                            centsToMoney(
+                                              currentCurrency?.code!,
+                                              (subItem.unitAmount?.netAmount ??
+                                                0) * (subItem.quantity ?? 1) ||
+                                                0,
+                                            ),
+                                            {
+                                              currency: currentCurrency?.code,
+                                              excludeCurrencySymbol: true,
+                                              currencySymbol:
+                                                currentCurrency?.symbol,
+                                              companyLang: selectedLng,
+                                            },
+                                          )}
+                                        </Text>
+                                      ) : (
+                                        <Text style={styles.col15Right} />
+                                      )}
+                                    </View>
+
+                                    {!!subItem?.description?.trim() && (
+                                      <HtmlPDF
+                                        html={subItem?.description || '-'}
+                                        rootStyle={{
+                                          ...styles.descriptionText,
+                                        }}
+                                      />
+                                    )}
+                                  </View>
+                                ),
+                              )}
+                          </View>
+                        );
+                      })}
+                    </View>
+
+                    <View
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end',
+                      }}>
+                      <View style={styles.footerRow}>
+                        <Text style={{width: '44%'}} />
+                        <Text
                           style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            paddingVertical: 4,
+                            width: '32%',
+                            color: '#616161',
+                            fontSize: 10,
+                            textAlign: 'right',
                           }}>
-                          <Text
-                            style={{
-                              color: '#616161',
-                              fontSize: 10,
-                              textAlign: 'right',
-                              width: '57%',
-                            }}>
-                            {translate('VAT')} {v.percentageVat}%
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 10,
-                              textAlign: 'right',
-                              width: '43%',
-                            }}>
-                            {v.vat}
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
-                  </View>
+                          {translate('Discount')}({currentCurrency?.symbol})
+                        </Text>
+                        <Text
+                          style={{
+                            width: '24%',
+                            textAlign: 'right',
+                            fontSize: 10,
+                          }}>
+                          {formatCurrency(discountValue || 0, {
+                            currency: currentCurrency?.code,
+                            excludeCurrencySymbol: true,
+                            currencySymbol: currentCurrency?.symbol,
+                            companyLang: selectedLng,
+                          })}
+                        </Text>
+                      </View>
 
-                  <View style={styles.tableRow}>
-                    <Text style={{width: '44%'}} />
-                    <Text
-                      style={{
-                        width: '32%',
-                        color: '#212121',
-                        ...boldFontStyle,
-                        textAlign: 'right',
-                        fontSize: 10,
-                      }}>
-                      {`${translate('Total incl. VAT')} (${
-                        getCurrencySymbol[currentCurrency?.code!]
-                      })`}
-                    </Text>
-                    <Text
-                      style={{
-                        width: '24%',
-                        textAlign: 'right',
-                        color: '#212121',
-                        ...boldFontStyle,
-                        fontSize: 10,
-                      }}>
-                      {amountAfterGlobalDiscountWithVATFormatted}
-                    </Text>
+                      <View style={styles.footerRow}>
+                        <Text style={{width: '44%'}} />
+                        <Text
+                          style={{
+                            width: '32%',
+                            color: '#616161',
+                            fontSize: 10,
+                            textAlign: 'right',
+                          }}>
+                          {translate('Subtotal excl. VAT')}
+                        </Text>
+                        <Text
+                          style={{
+                            width: '24%',
+                            textAlign: 'right',
+                            fontSize: 10,
+                          }}>
+                          {amountAfterGlobalDiscountFormatted}
+                        </Text>
+                      </View>
+
+                      {vats.length > 0 && (
+                        <View style={styles.footerRow}>
+                          <Text style={{width: '44%'}} />
+                          <View style={{width: '56%'}}>
+                            {vats?.map((vat, index) => (
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  paddingVertical: 4,
+                                }}
+                                key={`${vat.vat}-${index}`}>
+                                <Text
+                                  style={{
+                                    color: '#616161',
+                                    fontSize: 10,
+                                    textAlign: 'right',
+                                    width: '57%',
+                                  }}>
+                                  {translate('VAT')} {vat.percentageVat}%
+                                </Text>
+                                <Text
+                                  style={{
+                                    fontSize: 10,
+                                    textAlign: 'right',
+                                    width: '43%',
+                                  }}>
+                                  {vat.vat}
+                                </Text>
+                              </View>
+                            ))}
+                          </View>
+                        </View>
+                      )}
+
+                      <View style={styles.footerRow}>
+                        <Text style={{width: '44%'}} />
+                        <Text
+                          style={{
+                            width: '32%',
+                            color: '#212121',
+                            fontSize: 10,
+                            textAlign: 'right',
+                          }}>
+                          {translate('Total incl. VAT')}(
+                          {`${currentCurrency?.symbol}`})
+                        </Text>
+                        <Text
+                          style={{
+                            width: '24%',
+                            textAlign: 'right',
+                            fontSize: 10,
+                            color: '#212121',
+                          }}>
+                          {amountAfterGlobalDiscountWithVATFormatted}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
               </View>

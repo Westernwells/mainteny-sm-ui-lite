@@ -19,13 +19,14 @@ import {
 } from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
-  CreateQuotation,
   CreateQuotationComment,
+  CreateQuotationRecord,
   PrintQuotationRecord,
   QueryQuotationCommentsParams,
   QueryQuotationParams,
   QuotationActivityView,
   QuotationStatistics,
+  QuotationSubItemRecord,
   QuotationView,
   ReplyQuotation,
   SendQuotationRecord,
@@ -218,7 +219,7 @@ export const useReplyQuotation = (disableNavigate = false) => {
   );
 };
 
-export const postQuotation = async (body: CreateQuotation) => {
+export const postQuotation = async (body: CreateQuotationRecord) => {
   const {data} = await axiosClient.post<{value: string}>(
     'api/quotations',
     body,
@@ -231,20 +232,23 @@ export const useCreateQuotation = () => {
   const {enqueueSnackbar, showError} = useSnackbar();
   const navigate = useNavigate();
 
-  return useMutation(({data}: {data: CreateQuotation}) => postQuotation(data), {
-    onSuccess: (data) => {
-      queryClient.invalidateQueries([qk.fetchQuotations]);
-      queryClient.invalidateQueries([qk.quotationById]);
-      queryClient.invalidateQueries([qk.fetchQuotationActivities]);
-      enqueueSnackbar(`Quotation created successfully`, {
-        variant: 'success',
-      });
-      navigate(`/quotations/details/${data.value}`);
+  return useMutation(
+    ({data}: {data: CreateQuotationRecord}) => postQuotation(data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries([qk.fetchQuotations]);
+        queryClient.invalidateQueries([qk.quotationById]);
+        queryClient.invalidateQueries([qk.fetchQuotationActivities]);
+        enqueueSnackbar(`Quotation created successfully`, {
+          variant: 'success',
+        });
+        navigate(`/quotations/details/${data.value}`);
+      },
+      onError: (err) => {
+        showError(err);
+      },
     },
-    onError: (err) => {
-      showError(err);
-    },
-  });
+  );
 };
 
 export const putQuotation = async (body: UpdateQuotation, id: string) => {
@@ -549,4 +553,29 @@ export function useAllQuotations(
       ...options,
     },
   });
+}
+
+export const fetchQuotationSubItems = async (quotationId: string) => {
+  const response = await axiosClient.get<
+    Record<string, QuotationSubItemRecord[]>
+  >(`/api/quotations/${quotationId}/subItems`);
+  return response.data;
+};
+
+export function useQuotationSubItems(
+  quotationId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<
+    Record<string, QuotationSubItemRecord[]>,
+    RestError,
+    Record<string, QuotationSubItemRecord[]>
+  >(
+    [qk.quotationSubItem, quotationId],
+    () => fetchQuotationSubItems(quotationId!),
+    {
+      enabled: !!quotationId,
+      ...options,
+    },
+  );
 }

@@ -29,6 +29,9 @@
     "vitest:run": "vitest run --coverage --reporter junit --output-file results/vitest-[hash].xml"
   },
   "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.5.2",
+    "@atlaskit/pragmatic-drag-and-drop-auto-scroll": "^2.1.0",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
     "@emotion/css": "^11.11.2",
     "@emotion/styled": "latest",
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
@@ -133,7 +136,7 @@
     "use-supercluster": "^0.4.0",
     "vite-plugin-env-compatible": "^2.0.1",
     "xlsx": "^0.18.5",
-    "yup": "^0.32.11"
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.13.2",
