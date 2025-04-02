@@ -1,4 +1,4 @@
-import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
+import {Document, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React, {useMemo} from 'react';
 import {formatDate} from 'utils/datetime';
@@ -20,49 +20,22 @@ import {
   getDiscountDisplay,
   getQuotationItemTotalAfterPerItemDiscount,
 } from 'utils/quotation';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
-import MontserratBoldItalic from '../../assets/fonts/Montserrat/Montserrat-BoldItalic.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
-import PdfBodyContainer from './containers/PdfBodyContainer';
-import PdfPageContainer from './containers/PdfPageContainer';
-import TopSectionContainer from './containers/TopSectionContainer';
-import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
-import PdfUnitAddress from './containers/PdfUnitAddress';
-import AlternativeAddressTemplate from './AlternativeAddressTemplate';
-import PdfPageTitle from './containers/PdfPageTitle';
+import {ContextProps} from 'context/PdfStylesProvider';
+import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContainer';
+import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
+import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
+import PdfPageTitleHtml from 'components/pdf-templates/containers/PdfPageTitleHtml';
+import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
+import AlternativeAddressTemplate from 'components/pdf-templates/AlternativeAddressTemplate';
+import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
-Font.register({
-  family: 'Montserrat-Regular',
-  fonts: [
-    {src: MontserratRegular},
-    {src: MontserratBold, fontWeight: 'bold'},
-    {src: MontserratItalic, fontStyle: 'italic'},
-    {
-      src: MontserratBoldItalic,
-      fontWeight: 'bold',
-      fontStyle: 'italic',
-    },
-  ],
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
@@ -79,12 +52,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       flex: '0 0 43%',
     },
     tagContent: {
       fontSize: 8.5,
-      color: '#616161',
+      color: secondaryColor,
       flex: '0 0 57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -111,13 +84,13 @@ const getStyles = (
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       ...boldFontStyle,
       marginTop: 15,
     },
     sectionBody: {
       fontSize: 10,
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -132,7 +105,7 @@ const getStyles = (
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: primaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -145,7 +118,7 @@ const getStyles = (
     descriptionText: {
       display: 'flex',
       fontSize: 8.5,
-      color: '#212121',
+      color: secondaryColor,
       paddingLeft: 23,
       letterSpacing: -0.15,
       marginVertical: 4,
@@ -176,52 +149,52 @@ const getStyles = (
     col2Left: {
       width: '5%',
       textAlign: 'left',
-      color: '#212121',
+      color: secondaryColor,
     },
     col40Left: {
       width: '37%',
       textAlign: 'left',
-      color: '#212121',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'row',
     },
     col10Right: {
       width: '10%',
       textAlign: 'right',
-      color: '#212121',
+      color: secondaryColor,
     },
     col8Center: {
       width: '8%',
       textAlign: 'center',
       marginLeft: 10,
-      color: '#212121',
+      color: secondaryColor,
     },
     col15Right: {
       width: '15%',
       textAlign: 'right',
-      color: '#212121',
+      color: secondaryColor,
     },
     footerRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
       fontSize: 10,
       marginVertical: 3,
-      color: '#616161',
+      color: primaryColor,
     },
     subPositionCol2Left: {
       width: '5%',
       textAlign: 'left',
-      color: '#212121',
+      color: secondaryColor,
     },
     subPositionNameContainer: {
       width: '37%',
       display: 'flex',
       flexDirection: 'row',
-      color: '#212121',
+      color: secondaryColor,
     },
     subPositionText: {
       fontSize: 10,
-      color: '#212121',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'row',
     },
@@ -239,7 +212,7 @@ type BaseProps = {
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
   quotationItems: EditableQuotationItem[];
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 type JobOverviewProps = BaseProps & {
   isJobOverview: true;
@@ -250,7 +223,7 @@ type NonJobOverviewProps = BaseProps & {
   isJobOverview?: false;
   serviceOrderType?: string;
 };
-type Props = JobOverviewProps | NonJobOverviewProps;
+export type Props = JobOverviewProps | NonJobOverviewProps;
 const QuotationPdfTemplate = React.memo(
   ({
     translate,
@@ -266,6 +239,9 @@ const QuotationPdfTemplate = React.memo(
     isJobOverview,
     serviceOrderType,
     quotationItems,
+    fontStyles,
+    primaryColor,
+    secondaryColor,
   }: Props) => {
     const discount = quotation?.additionalInfo?.discount;
     const discountAmount = discount?.amount;
@@ -312,16 +288,12 @@ const QuotationPdfTemplate = React.memo(
       quotation?.additionalInfo?.alternativeServiceCompanyInfo,
     );
 
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
+    const styles = getStyles({
+      boldFontStyle: fontStyles.bold,
+      regularFontStyle: fontStyles.regular,
+      primaryColor,
+      secondaryColor,
+    });
 
     const customerVATId =
       (pdfConfigClientStorage.includeCustomerVAT &&
@@ -343,7 +315,6 @@ const QuotationPdfTemplate = React.memo(
           !!quotation?.additionalInfo.alternativeAddress.component?.name && (
             <AlternativeAddressTemplate
               userInfo={userInfo}
-              selectedLng={selectedLng}
               translate={translate}
               headerInfo={headerInfo}
               headerPath={headerPath}
@@ -353,10 +324,13 @@ const QuotationPdfTemplate = React.memo(
                 quotation?.additionalInfo.alternativeServiceCompanyInfo
               }
               alternativeAddress={quotation?.additionalInfo.alternativeAddress}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
           )}
 
-        <PdfPageContainer selectedLng={selectedLng}>
+        <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
           <PdfBodyContainer>
@@ -365,13 +339,15 @@ const QuotationPdfTemplate = React.memo(
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={quotation?.propertyOwner?.name}
                 addressComponent={getAddressComponentFromQuotation(quotation)}
-                selectedLng={selectedLng}
                 translate={translate}
                 beneficiaryInfo={
                   quotation?.additionalInfo.beneficiaryAddress?.component
                 }
                 customerVATId={customerVATId}
                 eanValue={eanValue}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
 
               <View style={styles.rightAddress}>
@@ -478,8 +454,10 @@ const QuotationPdfTemplate = React.memo(
                   <PdfUnitAddress
                     address={quotation?.elevator?.address}
                     translate={translate}
-                    selectedLng={selectedLng}
                     building={unitBuilding}
+                    fontStyles={fontStyles}
+                    primaryColor={primaryColor}
+                    secondaryColor={secondaryColor}
                   />
                 </View>
               </View>
@@ -487,7 +465,9 @@ const QuotationPdfTemplate = React.memo(
 
             <View>
               {isJobOverview ? (
-                <PdfPageTitle>
+                <PdfPageTitle
+                  fontStyles={fontStyles}
+                  primaryColor={primaryColor}>
                   {translate('Job Confirmation:')}{' '}
                   {translate(toSentenceCase(serviceOrderType))}
                 </PdfPageTitle>
@@ -495,7 +475,8 @@ const QuotationPdfTemplate = React.memo(
                 <View>
                   <PdfPageTitleHtml
                     value={quotation?.subject}
-                    selectedLng={selectedLng}
+                    fontStyles={fontStyles}
+                    primaryColor={primaryColor}
                   />
                 </View>
               )}
@@ -719,7 +700,7 @@ const QuotationPdfTemplate = React.memo(
                         <Text
                           style={{
                             width: '32%',
-                            color: '#616161',
+                            color: primaryColor,
                             fontSize: 10,
                             textAlign: 'right',
                           }}>
@@ -745,7 +726,7 @@ const QuotationPdfTemplate = React.memo(
                         <Text
                           style={{
                             width: '32%',
-                            color: '#616161',
+                            color: primaryColor,
                             fontSize: 10,
                             textAlign: 'right',
                           }}>
@@ -776,7 +757,7 @@ const QuotationPdfTemplate = React.memo(
                                 key={`${vat.vat}-${index}`}>
                                 <Text
                                   style={{
-                                    color: '#616161',
+                                    color: primaryColor,
                                     fontSize: 10,
                                     textAlign: 'right',
                                     width: '57%',
@@ -802,7 +783,7 @@ const QuotationPdfTemplate = React.memo(
                         <Text
                           style={{
                             width: '32%',
-                            color: '#212121',
+                            color: secondaryColor,
                             fontSize: 10,
                             textAlign: 'right',
                           }}>
@@ -814,7 +795,7 @@ const QuotationPdfTemplate = React.memo(
                             width: '24%',
                             textAlign: 'right',
                             fontSize: 10,
-                            color: '#212121',
+                            color: secondaryColor,
                           }}>
                           {amountAfterGlobalDiscountWithVATFormatted}
                         </Text>
@@ -867,10 +848,12 @@ const QuotationPdfTemplate = React.memo(
 
           <PdfTemplateFooter
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             footerInfo={footerInfo}
             footerPath={footerPath}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         </PdfPageContainer>
       </Document>

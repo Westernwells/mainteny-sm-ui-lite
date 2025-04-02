@@ -1,5 +1,6 @@
 import {Text, View} from '@react-pdf/renderer';
 import {shouldDisplayDiscountDash} from 'utils/discount';
+import {ContextProps} from 'context/PdfStylesProvider';
 import {
   centsToMoney,
   formatCurrency,
@@ -30,7 +31,7 @@ type Props = {
   total: number;
   selectedLng?: string;
   netTotal: (articleItem: InvoiceItemView) => number;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 export const ArticleSection = ({
   invoice,
@@ -43,12 +44,11 @@ export const ArticleSection = ({
   total,
   selectedLng,
   netTotal,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const styles = getStyles();
+  const styles = getStyles({primaryColor});
   return (
     <View style={styles.table}>
       <View style={styles.tableHead}>
@@ -105,7 +105,7 @@ export const ArticleSection = ({
                     width: '2%',
                     textAlign: 'left',
                     marginRight: 10,
-                    color: '#212121',
+                    color: primaryColor,
                   }}>
                   {index + 1}
                 </Text>
@@ -115,7 +115,7 @@ export const ArticleSection = ({
                     width: '37%',
                     textAlign: 'left',
                     alignItems: 'flex-start',
-                    color: '#212121',
+                    color: primaryColor,
                   }}
                   html={articleItem.name || '-'}
                   stylesheet={{
@@ -129,7 +129,7 @@ export const ArticleSection = ({
                   style={{
                     width: '10%',
                     textAlign: 'center',
-                    color: '#212121',
+                    color: primaryColor,
                   }}>
                   {articleItem.quantity || '-'}
                 </Text>
@@ -137,7 +137,7 @@ export const ArticleSection = ({
                   style={{
                     width: '8%',
                     textAlign: 'center',
-                    color: '#212121',
+                    color: primaryColor,
                   }}>
                   {translate(articleItem?.article?.unit!) || '-'}
                 </Text>
@@ -145,7 +145,7 @@ export const ArticleSection = ({
                   style={{
                     width: '15%',
                     textAlign: 'right',
-                    color: '#212121',
+                    color: primaryColor,
                   }}>
                   {formatCurrency(
                     centsToMoney(
@@ -165,7 +165,7 @@ export const ArticleSection = ({
                     style={{
                       width: '13%',
                       textAlign: 'right',
-                      color: '#212121',
+                      color: primaryColor,
                     }}>
                     {shouldDisplayDiscountDash(articleItem)}
                     {articleItem?.additionalInfo?.discount?.type ===
@@ -204,7 +204,7 @@ export const ArticleSection = ({
                   style={{
                     width: allItemsHaveZeroDiscount ? '28%' : '15%',
                     textAlign: 'right',
-                    color: '#212121',
+                    color: primaryColor,
                   }}>
                   {formatCurrency(netTotal(articleItem), {
                     currency: currentCurrency?.code,
@@ -232,7 +232,7 @@ export const ArticleSection = ({
             <Text
               style={{
                 width: '32%',
-                color: '#616161',
+                color: secondaryColor,
                 fontSize: 10,
                 textAlign: 'right',
               }}>{`${translate('Discount')} (${
@@ -254,7 +254,7 @@ export const ArticleSection = ({
           <Text
             style={{
               width: '32%',
-              color: '#616161',
+              color: secondaryColor,
               fontSize: 10,
               textAlign: 'right',
             }}>
@@ -271,7 +271,7 @@ export const ArticleSection = ({
               <Text
                 style={{
                   width: '32%',
-                  color: '#616161',
+                  color: secondaryColor,
                   fontSize: 10,
                   textAlign: 'right',
                 }}>{`${translate('VAT')} ${v.percentageVat}%`}</Text>
@@ -294,8 +294,8 @@ export const ArticleSection = ({
           <Text
             style={{
               width: '32%',
-              color: '#212121',
-              ...boldFontStyle,
+              color: primaryColor,
+              ...fontStyles.bold,
               textAlign: 'right',
               fontSize: 10,
             }}>{`${translate('Total incl. VAT')} (${
@@ -305,8 +305,8 @@ export const ArticleSection = ({
             style={{
               width: '24%',
               textAlign: 'right',
-              color: '#212121',
-              ...boldFontStyle,
+              color: primaryColor,
+              ...fontStyles.bold,
               fontSize: 10,
             }}>
             {formatCurrency(total, {

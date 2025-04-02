@@ -1,11 +1,4 @@
-import {
-  Document,
-  Font,
-  Image,
-  StyleSheet,
-  Text,
-  View,
-} from '@react-pdf/renderer';
+import {Document, Image, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React from 'react';
 import {ServiceOrderReportView, ServiceOrderView} from 'models/service-order';
@@ -19,10 +12,8 @@ import {MinToStep} from 'models/service-company';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {getAddressComponentFromServiceOrder} from 'utils/pdfTemplates';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import PdfTemplateFooter from './PdfTemplateFooter';
 import PdfTemplateHeader from './PdfTemplateHeader';
 import PdfBodyContainer from './containers/PdfBodyContainer';
@@ -31,34 +22,12 @@ import PdfPageTitle from './containers/PdfPageTitle';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfUnitAddress from './containers/PdfUnitAddress';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddress: {
       minWidth: 200,
@@ -76,12 +45,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       flex: '0 0 43%',
     },
     tagContent: {
       fontSize: 8.5,
-      color: '#616161',
+      color: secondaryColor,
       flex: '0 0 57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -96,7 +65,7 @@ const getStyles = (
       ...boldFontStyle,
     },
     contentBody: {
-      color: '#212121',
+      color: primaryColor,
       fontSize: 10,
       marginBottom: 10,
       lineHeight: 1.3,
@@ -115,13 +84,13 @@ const getStyles = (
       padding: 0,
       lineHeight: 0,
       marginTop: 20,
-      color: '#212121',
+      color: primaryColor,
       ...boldFontStyle,
     },
     sectionBody: {
       fontSize: 10,
       ...regularFontStyle,
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -139,14 +108,14 @@ const getStyles = (
       width: '100%',
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
       marginRight: -4,
     },
     tableBodyContent: {
-      color: '#212121',
+      color: primaryColor,
       fontSize: 10,
     },
     tableRow: {
@@ -160,7 +129,7 @@ const getStyles = (
       width: '45%',
       display: 'flex',
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       paddingLeft: 20,
       letterSpacing: -0.15,
       marginTop: 2,
@@ -179,7 +148,7 @@ const getStyles = (
       marginHorizontal: 5,
     },
     imageDescription: {
-      color: '#616161',
+      color: secondaryColor,
       marginTop: 10,
     },
     signatureWrapper: {
@@ -196,11 +165,10 @@ type BookedHoursProps = {
   percentageSurcharge?: number;
   type: string;
   technicianName?: string;
-  selectedLng?: string;
   translate: (key: string) => string;
   showTime: boolean;
   showHours: boolean;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const BookedHoursRow = ({
   startTime,
@@ -208,21 +176,19 @@ const BookedHoursRow = ({
   percentageSurcharge,
   type,
   technicianName,
-  selectedLng,
   translate,
   showTime,
   showHours,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: BookedHoursProps) => {
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   return (
     <View style={styles.tableRow}>
@@ -293,7 +259,7 @@ type Props = {
   pdfConfigClientStorage: ClientReportForPDFConfig;
   technicianName: string;
   serviceOrderType: string;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const WorkReportTemplate = React.memo(
   ({
@@ -312,6 +278,9 @@ const WorkReportTemplate = React.memo(
     pdfConfigClientStorage,
     technicianName,
     serviceOrderType,
+    fontStyles,
+    primaryColor,
+    secondaryColor,
   }: Props) => {
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
     const company = userInfo?.serviceCompany;
@@ -320,16 +289,12 @@ const WorkReportTemplate = React.memo(
         (item) => !!workReportPictures[item.fileResource.uri],
       ) ?? [];
 
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
+    const styles = getStyles({
+      boldFontStyle: fontStyles.bold,
+      regularFontStyle: fontStyles.regular,
+      primaryColor,
+      secondaryColor,
+    });
 
     const elevatorAddress = serviceOrder?.elevator?.address;
 
@@ -348,7 +313,7 @@ const WorkReportTemplate = React.memo(
 
     return (
       <Document>
-        <PdfPageContainer selectedLng={selectedLng}>
+        <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
           <PdfBodyContainer>
@@ -361,10 +326,12 @@ const WorkReportTemplate = React.memo(
                 addressComponent={getAddressComponentFromServiceOrder(
                   serviceOrder,
                 )}
-                selectedLng={selectedLng}
                 translate={translate}
                 customerVATId={customerVATId}
                 eanValue={eanValue}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
 
               <View style={styles.rightAddress}>
@@ -470,8 +437,10 @@ const WorkReportTemplate = React.memo(
                   <PdfUnitAddress
                     address={elevatorAddress}
                     translate={translate}
-                    selectedLng={selectedLng}
                     building={unitBuilding}
+                    fontStyles={fontStyles}
+                    primaryColor={primaryColor}
+                    secondaryColor={secondaryColor}
                   />
                 </View>
               </View>
@@ -495,7 +464,7 @@ const WorkReportTemplate = React.memo(
                 </Text>
               </View>
 
-              <PdfPageTitle selectedLng={selectedLng}>
+              <PdfPageTitle fontStyles={fontStyles} primaryColor={primaryColor}>
                 {translate('Work Report')} {report?.number}
               </PdfPageTitle>
 
@@ -591,8 +560,10 @@ const WorkReportTemplate = React.memo(
                         }
                         type="Work"
                         technicianName={technicianName}
-                        selectedLng={selectedLng}
                         translate={translate}
+                        fontStyles={fontStyles}
+                        primaryColor={primaryColor}
+                        secondaryColor={secondaryColor}
                       />
                     ),
                   )}
@@ -618,8 +589,10 @@ const WorkReportTemplate = React.memo(
                         }
                         type="Travel"
                         technicianName={technicianName}
-                        selectedLng={selectedLng}
                         translate={translate}
+                        fontStyles={fontStyles}
+                        primaryColor={primaryColor}
+                        secondaryColor={secondaryColor}
                       />
                     ),
                   )}
@@ -865,10 +838,12 @@ const WorkReportTemplate = React.memo(
 
           <PdfTemplateFooter
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             footerInfo={footerInfo}
             footerPath={footerPath}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         </PdfPageContainer>
       </Document>

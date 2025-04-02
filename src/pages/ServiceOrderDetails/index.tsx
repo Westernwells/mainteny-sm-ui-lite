@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import GradingIcon from '@mui/icons-material/Grading';
 import FactCheck from '@mui/icons-material/FactCheck';
@@ -18,7 +18,7 @@ import {
 import {useParams, useSearchParams} from 'react-router-dom';
 import {formatSearchParams} from 'utils/utils';
 import {Box, Typography} from '@mui/material';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useSnackbar} from 'hooks/useSnackbar';
 import PathImage from 'assets/images/Path.svg';
 import {SnackbarKey} from 'notistack';
@@ -44,6 +44,7 @@ import {getJobTypeGivenName} from 'utils/service-order-utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {QuotationSubItemRecord} from 'models/quotation';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -82,6 +83,9 @@ export const ServiceOrderDetails = () => {
   const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
   const {t} = useTranslation();
   const {user} = useUserSession();
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const currentCurrency = useCurrentCurrency();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
@@ -207,6 +211,9 @@ export const ServiceOrderDetails = () => {
                 allJobTypes,
               )}
               quotationItems={transformedQuotationItems}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />,
           ).toBlob()
         : await pdf(
@@ -226,6 +233,9 @@ export const ServiceOrderDetails = () => {
                 serviceOrder?.type,
                 allJobTypes,
               )}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />,
           ).toBlob();
     const blobURL = URL.createObjectURL(blob);

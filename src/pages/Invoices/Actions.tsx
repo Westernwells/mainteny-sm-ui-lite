@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import Box from '@mui/material/Box';
@@ -103,6 +103,7 @@ import {downloadFile} from 'utils/download';
 import printJS from 'print-js';
 import {isXMLNeeded} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 
 interface Props {
   invoice: InvoiceView;
@@ -171,6 +172,9 @@ export const Actions = ({
   const {data: oldJobTypes} = useOldCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
   );
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
   const filteredOldJobTypes = oldJobTypes?.filter(
@@ -390,6 +394,9 @@ export const Actions = ({
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -509,6 +516,9 @@ export const Actions = ({
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
         serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -581,6 +591,9 @@ export const Actions = ({
         nextCompanyExternalId={
           invoiceNumber || translate('Automatically assigned')
         }
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

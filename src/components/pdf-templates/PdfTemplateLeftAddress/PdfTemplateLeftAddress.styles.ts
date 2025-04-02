@@ -1,14 +1,19 @@
 import {StyleSheet} from '@react-pdf/renderer';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
-export const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+export const getStyles = ({
+  primaryColor,
+  secondaryColor,
+  boldFontStyle,
+  regularFontStyle,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     leftAddress: {
+      paddingTop: '20px',
       flex: '0 0 53%',
       display: 'flex',
       flexDirection: 'column',
+      color: primaryColor,
       ...boldFontStyle,
     },
     addressTextWrapper: {
@@ -19,7 +24,7 @@ export const getStyles = (
       ...regularFontStyle,
       flexWrap: 'wrap',
       marginBottom: 2,
-      color: '#212121',
+      color: secondaryColor,
       maxWidth: 250,
       marginTop: 2,
     },
@@ -27,6 +32,7 @@ export const getStyles = (
       fontSize: 9,
       marginBottom: 1,
       ...boldFontStyle,
+      color: primaryColor,
     },
     partAddress: {
       fontSize: 9,

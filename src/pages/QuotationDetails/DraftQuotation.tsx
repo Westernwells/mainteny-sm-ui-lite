@@ -13,11 +13,11 @@ import {
   useUpdateQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {
+  CreateQuotationRecord,
   QuotationFormData,
   QuotationStatus,
-  QuotationView,
-  CreateQuotationRecord,
   QuotationSubItemRecord,
+  QuotationView,
 } from 'models/quotation';
 import {ElevatorView} from 'models/elevator';
 import {PropertyOwnerView} from 'models/propertyManager';
@@ -105,10 +105,11 @@ import {
   quotationItemToQuotationItemRecord,
 } from 'utils/quotation';
 import {calculateArticlesAmount} from 'utils/calculate-total';
-import {useForm, Controller} from 'react-hook-form';
+import {Controller, useForm} from 'react-hook-form';
 import PositionTable from 'components/MixedPositions/PositionTable';
 import {DiscountType} from 'models/invoice';
 import {ArticleType} from 'models/article';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord} from './utils';
 import {Notes} from './Notes';
@@ -136,6 +137,9 @@ export const DraftQuotation = ({
   const [paymentTermToEdit, setPaymentTermToEdit] = useState<
     ContractTermView | undefined
   >(undefined);
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const [openResumeProgressDialog, setOpenResumeProgressDialog] =
     useState(false);
@@ -753,6 +757,9 @@ export const DraftQuotation = ({
           footerPath={footerUrl[footerInfo?.path]}
           footerInfo={footerInfo}
           quotationItems={watch('items')}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -1097,6 +1104,7 @@ export const DraftQuotation = ({
         setExternalIdUnique(unique);
       }
     }
+
     if (watchedExternalId) {
       checkExternalId();
     }

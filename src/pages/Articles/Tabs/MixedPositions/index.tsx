@@ -10,6 +10,7 @@ import {t} from 'i18next';
 import React, {
   ChangeEvent,
   Fragment,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -77,15 +78,17 @@ import {useCurrentCurrency} from 'utils/currency';
 import {removeHtmlTags} from 'utils/rich-field-string';
 import MixedPositionPdf from 'components/pdf-templates/MixedPositionPdf';
 import {pdf} from '@react-pdf/renderer';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {companyLanguageContextMap} from 'utils/language';
 import {EmptySection} from 'components/EmptySection';
 import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import PositionPreview from './PositionPreview';
 import SubPositionRowComponent from './SubPositionRowComponent';
 import MixedPositionRowComponent from './MixedPositionRowComponent';
 
 const pageSize = 25;
+
 export interface DeleteEventState {
   userTypedName: string;
   isOpen?: boolean;
@@ -122,6 +125,9 @@ const MixedPositions = () => {
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const theme = useTheme();
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const {enqueueSnackbar, showError} = useSnackbar();
   const serviceCompanyId = user?.userAccount.serviceCompany.id || '';
@@ -763,6 +769,9 @@ const MixedPositions = () => {
         translate={translate}
         mixedPosition={mixedPos}
         subPositions={subPos}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

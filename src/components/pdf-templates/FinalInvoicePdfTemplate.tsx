@@ -1,5 +1,5 @@
 import {useMemo} from 'react';
-import {Document, Font, StyleSheet, View} from '@react-pdf/renderer';
+import {Document, StyleSheet, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
@@ -29,10 +29,8 @@ import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import PdfPartialPaymentSection from './PdfPartialPaymentSection';
 import PdfPageContainer from './containers/PdfPageContainer';
@@ -43,34 +41,16 @@ import {ArticleSection} from './ArticleSection/ArticleSection';
 import SwissPageTemplate from './SwissPageTemplate';
 import AlternativeAddressTemplate from './AlternativeAddressTemplate';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (boldFontStyle?: {fontFamily: string}) =>
+const getStyles = ({
+  boldFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     contentBody: {
       marginTop: 6,
       marginBottom: 16,
+      color: secondaryColor,
     },
     notesSection: {
       marginTop: 30,
@@ -80,7 +60,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       ...boldFontStyle,
       marginTop: 15,
     },
@@ -101,7 +81,7 @@ type Props = {
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const FinalInvoicePdfTemplate = ({
   translate,
@@ -118,6 +98,9 @@ const FinalInvoicePdfTemplate = ({
   nextCompanyExternalId,
   qrImageSrc,
   pdfConfigClientStorage,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -185,11 +168,11 @@ const FinalInvoicePdfTemplate = ({
     invoice?.additionalInfo?.alternativeServiceCompanyInfo,
   );
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const styles = getStyles(boldFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    primaryColor,
+    secondaryColor,
+  });
 
   const customerVATId =
     (pdfConfigClientStorage.includeCustomerVAT &&
@@ -205,7 +188,6 @@ const FinalInvoicePdfTemplate = ({
         !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             headerInfo={headerInfo}
             headerPath={headerPath}
@@ -215,10 +197,13 @@ const FinalInvoicePdfTemplate = ({
               invoice?.additionalInfo.alternativeServiceCompanyInfo
             }
             alternativeAddress={invoice?.additionalInfo.alternativeAddress}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         )}
 
-      <PdfPageContainer selectedLng={selectedLng}>
+      <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
         <PdfBodyContainer>
@@ -230,26 +215,31 @@ const FinalInvoicePdfTemplate = ({
               beneficiaryInfo={
                 invoice?.additionalInfo.beneficiaryAddress?.component
               }
-              selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
               eanValue={eanValue}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
 
             <PdfTemplateInvoiceDetails
               userInfo={userInfo}
               translate={translate}
               invoice={invoice}
-              selectedLng={selectedLng}
               nextCompanyExternalId={nextCompanyExternalId}
               pdfConfigClientStorage={pdfConfigClientStorage}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
           </TopSectionContainer>
 
           <View>
             <PdfPageTitleHtml
               value={invoice?.subject}
-              selectedLng={selectedLng}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
             />
 
             {invoice?.description.trim() !== '' && (
@@ -274,6 +264,9 @@ const FinalInvoicePdfTemplate = ({
                   total={amountAfterGlobalDiscountWithVAT}
                   selectedLng={selectedLng}
                   netTotal={netTotal}
+                  fontStyles={fontStyles}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
                 />
               )}
 
@@ -285,6 +278,9 @@ const FinalInvoicePdfTemplate = ({
               currentCurrency={currentCurrency}
               previousInvoices={previousInvoices}
               articleItems={articleItems}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
 
             {invoice?.additionalInfo?.moreInfo &&
@@ -316,15 +312,20 @@ const FinalInvoicePdfTemplate = ({
 
         <PdfTemplateFooter
           userInfo={userInfo}
-          selectedLng={selectedLng}
           translate={translate}
           footerInfo={footerInfo}
           footerPath={footerPath}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       </PdfPageContainer>
 
       {userInfo?.serviceCompany.settings.invoiceQRCodeEnabled && (
-        <SwissPageTemplate qrImageSrc={qrImageSrc} />
+        <SwissPageTemplate
+          qrImageSrc={qrImageSrc}
+          primaryColor={primaryColor}
+        />
       )}
     </Document>
   );

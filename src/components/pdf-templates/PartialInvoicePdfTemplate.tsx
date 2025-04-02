@@ -1,5 +1,5 @@
 import {useMemo} from 'react';
-import {Document, Font, StyleSheet, View} from '@react-pdf/renderer';
+import {Document, StyleSheet, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
@@ -30,10 +30,8 @@ import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import {ArticleSection} from './ArticleSection/ArticleSection';
 import PdfPartialPaymentSection from './PdfPartialPaymentSection';
@@ -60,35 +58,14 @@ type Props = {
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
@@ -105,12 +82,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 9,
-      color: '#212121',
+      color: primaryColor,
       flex: '0 0 43%',
     },
     tagContent: {
       fontSize: 9,
-      color: '#616161',
+      color: secondaryColor,
       flex: '0 0 57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -130,13 +107,13 @@ const getStyles = (
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       ...boldFontStyle,
       marginTop: 15,
     },
     sectionBody: {
       fontSize: 10,
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -151,7 +128,7 @@ const getStyles = (
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -179,6 +156,9 @@ const PartialInvoicePdfTemplate = ({
   nextCompanyExternalId,
   qrImageSrc,
   pdfConfigClientStorage,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
   const hasPreviousInvoices = previousInvoices!.length > 0;
   const firstInvoiceType = previousInvoices?.[0]?.type ?? null;
@@ -268,16 +248,12 @@ const PartialInvoicePdfTemplate = ({
     invoice?.additionalInfo?.alternativeServiceCompanyInfo,
   );
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   const customerVATId =
     (pdfConfigClientStorage.includeCustomerVAT &&
@@ -293,7 +269,6 @@ const PartialInvoicePdfTemplate = ({
         !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             headerInfo={headerInfo}
             headerPath={headerPath}
@@ -303,10 +278,13 @@ const PartialInvoicePdfTemplate = ({
               invoice?.additionalInfo.alternativeServiceCompanyInfo
             }
             alternativeAddress={invoice?.additionalInfo.alternativeAddress}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         )}
 
-      <PdfPageContainer selectedLng={selectedLng}>
+      <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
         <PdfBodyContainer>
@@ -318,10 +296,12 @@ const PartialInvoicePdfTemplate = ({
               beneficiaryInfo={
                 invoice?.additionalInfo.beneficiaryAddress?.component
               }
-              selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
               eanValue={eanValue}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
 
             <PdfTemplateInvoiceDetails
@@ -329,15 +309,18 @@ const PartialInvoicePdfTemplate = ({
               pdfConfigClientStorage={pdfConfigClientStorage}
               translate={translate}
               invoice={invoice}
-              selectedLng={selectedLng}
               nextCompanyExternalId={nextCompanyExternalId}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
           </TopSectionContainer>
 
           <View>
             <PdfPageTitleHtml
-              selectedLng={selectedLng}
               value={invoice?.subject}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
             />
 
             {invoice?.description.trim() !== '' && (
@@ -362,6 +345,9 @@ const PartialInvoicePdfTemplate = ({
                   total={amountAfterGlobalDiscountWithVAT}
                   selectedLng={selectedLng}
                   netTotal={netTotal}
+                  fontStyles={fontStyles}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
                 />
               )}
 
@@ -374,6 +360,9 @@ const PartialInvoicePdfTemplate = ({
                 currentCurrency={currentCurrency}
                 previousInvoices={previousInvoices!}
                 articleItems={articleItems}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
             )}
 
@@ -386,6 +375,9 @@ const PartialInvoicePdfTemplate = ({
                 previousInvoices={previousInvoices!}
                 articleItems={articleItems}
                 invoiceAmountDetail={invoiceAmountDetail}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
             )}
 
@@ -418,15 +410,20 @@ const PartialInvoicePdfTemplate = ({
 
         <PdfTemplateFooter
           userInfo={userInfo}
-          selectedLng={selectedLng}
           translate={translate}
           footerInfo={footerInfo}
           footerPath={footerPath}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       </PdfPageContainer>
 
       {userInfo?.serviceCompany.settings.invoiceQRCodeEnabled && (
-        <SwissPageTemplate qrImageSrc={qrImageSrc} />
+        <SwissPageTemplate
+          qrImageSrc={qrImageSrc}
+          primaryColor={primaryColor}
+        />
       )}
     </Document>
   );

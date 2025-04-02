@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useContext, useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
@@ -43,6 +43,7 @@ import useQuotationMenuActions from 'hooks/useQuotationMenuActions';
 import {companyLanguageContextMap} from 'utils/language';
 import {downloadFile as utilDownloadFile} from 'utils/download';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 
 interface Props {
   quotation: QuotationView;
@@ -72,6 +73,9 @@ const Actions = ({quotation}: Props) => {
   const {mutateAsync: uploadFiles} = useUploadFiles('');
   const {mutateAsync: printQuotation} = usePrintQuotation();
   const {mutateAsync: sendQuotation} = useSendQuotation();
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
 
@@ -159,6 +163,9 @@ const Actions = ({quotation}: Props) => {
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         quotationItems={transformedQuotationItems}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     return blob;

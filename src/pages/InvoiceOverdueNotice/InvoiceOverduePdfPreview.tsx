@@ -1,4 +1,4 @@
-import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
+import {Document, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -17,39 +17,15 @@ import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {useMemo} from 'react';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
@@ -66,12 +42,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 9,
-      color: '#212121',
+      color: primaryColor,
       width: '43%',
     },
     tagContent: {
       fontSize: 9,
-      color: '#616161',
+      color: secondaryColor,
       width: '57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -81,7 +57,7 @@ const getStyles = (
       paddingBottom: 1,
     },
     contentBody: {
-      color: '#212121',
+      color: primaryColor,
       fontSize: 10,
       marginBottom: 10,
       lineHeight: 1.3,
@@ -98,7 +74,7 @@ const getStyles = (
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 7,
       textTransform: 'uppercase',
@@ -112,7 +88,7 @@ const getStyles = (
     amountText: {
       ...boldFontStyle,
       fontSize: 10,
-      color: '#212121',
+      color: primaryColor,
     },
   });
 
@@ -135,7 +111,7 @@ type Props = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const InvoiceOverduePdfPreview = ({
   translate,
@@ -149,22 +125,21 @@ const InvoiceOverduePdfPreview = ({
   footerInfo,
   footerPath,
   pdfConfigClientStorage,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
   const serviceCompanyInfo = getServiceCompanyInfo(
     userInfo,
     invoice?.additionalInfo?.alternativeServiceCompanyInfo,
   );
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   const overdueTotal = (initialAmount: number, handlingAmount: number) =>
     formatCurrency(handlingAmount + initialAmount, {
@@ -193,7 +168,7 @@ const InvoiceOverduePdfPreview = ({
 
   return (
     <Document>
-      <PdfPageContainer selectedLng={selectedLng}>
+      <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
         <PdfBodyContainer>
@@ -202,10 +177,12 @@ const InvoiceOverduePdfPreview = ({
               serviceCompanyInfo={serviceCompanyInfo}
               fallbackReceiverName={invoice?.propertyOwner?.name}
               addressComponent={getAddressComponentFromInvoice(invoice)}
-              selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
               eanValue={eanValue}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
 
             <View style={styles.rightAddress}>
@@ -300,7 +277,7 @@ const InvoiceOverduePdfPreview = ({
           </TopSectionContainer>
 
           <View>
-            <PdfPageTitle selectedLng={selectedLng}>
+            <PdfPageTitle fontStyles={fontStyles} primaryColor={primaryColor}>
               {formik?.values.subject}
             </PdfPageTitle>
 
@@ -446,10 +423,12 @@ const InvoiceOverduePdfPreview = ({
 
         <PdfTemplateFooter
           userInfo={userInfo}
-          selectedLng={selectedLng}
           translate={translate}
           footerInfo={footerInfo}
           footerPath={footerPath}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       </PdfPageContainer>
     </Document>

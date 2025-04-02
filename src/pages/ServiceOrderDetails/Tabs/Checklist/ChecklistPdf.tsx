@@ -18,12 +18,16 @@ import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromServiceOrder} from 'utils/pdfTemplates';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import {PdfChecklistComponent} from './PdfChecklistComponent';
 
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
@@ -40,12 +44,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       flex: '0 0 43%',
     },
     tagContent: {
       fontSize: 8.5,
-      color: '#616161',
+      color: secondaryColor,
       width: '57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -55,7 +59,7 @@ const getStyles = (
       paddingBottom: 1,
     },
     contentBody: {
-      color: '#212121',
+      color: primaryColor,
       fontSize: 10,
       marginBottom: 10,
       lineHeight: 1.3,
@@ -66,13 +70,13 @@ const getStyles = (
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       fontWeight: 'extrabold',
     },
     sectionBody: {
       fontSize: 10,
       fontWeight: 'light',
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -109,7 +113,7 @@ const getStyles = (
       width: '45%',
       display: 'flex',
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       paddingLeft: 20,
       letterSpacing: -0.15,
       marginTop: 2,
@@ -131,7 +135,7 @@ type Props = {
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const ChecklistPdf = ({
   userInfo,
@@ -147,19 +151,18 @@ const ChecklistPdf = ({
   footerInfo,
   footerPath,
   pdfConfigClientStorage,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
   const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   const elevatorAddress = serviceOrder?.elevator?.address;
 
@@ -178,7 +181,7 @@ const ChecklistPdf = ({
 
   return (
     <Document>
-      <PdfPageContainer selectedLng={selectedLng}>
+      <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
         <PdfBodyContainer>
@@ -189,10 +192,12 @@ const ChecklistPdf = ({
               addressComponent={getAddressComponentFromServiceOrder(
                 serviceOrder,
               )}
-              selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
               eanValue={eanValue}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
 
             <View style={styles.rightAddress}>
@@ -285,15 +290,17 @@ const ChecklistPdf = ({
                 <PdfUnitAddress
                   address={elevatorAddress}
                   translate={translate}
-                  selectedLng={selectedLng}
                   building={unitBuilding}
+                  fontStyles={fontStyles}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
                 />
               </View>
             </View>
           </TopSectionContainer>
 
           <View>
-            <PdfPageTitle selectedLng={selectedLng}>
+            <PdfPageTitle fontStyles={fontStyles} primaryColor={primaryColor}>
               {selectedChecklist?.checkList.name}
             </PdfPageTitle>
 
@@ -354,10 +361,12 @@ const ChecklistPdf = ({
 
         <PdfTemplateFooter
           userInfo={userInfo}
-          selectedLng={selectedLng}
           translate={translate}
           footerInfo={footerInfo}
           footerPath={footerPath}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       </PdfPageContainer>
     </Document>

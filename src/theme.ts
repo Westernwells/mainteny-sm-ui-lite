@@ -486,6 +486,16 @@ export const theme = createTheme({
             lineHeight: 0.875,
           },
         },
+        {
+          props: {variant: 'secondary'},
+          style: {
+            fontSize: '12px',
+            fontWeight: 400,
+            lineHeight: '160%' /* 19.2px */,
+            letterSpacing: '0.96px',
+            textTransform: 'uppercase',
+          },
+        },
       ],
     },
     MuiToggleButton: {

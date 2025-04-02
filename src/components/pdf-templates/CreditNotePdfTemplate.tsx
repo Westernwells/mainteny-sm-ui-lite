@@ -1,4 +1,4 @@
-import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
+import {Document, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {useMemo} from 'react';
 import {centsToMoney, formatCurrency} from 'utils/currency';
@@ -33,10 +33,7 @@ import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import {ArticleSection} from './ArticleSection/ArticleSection';
 import PdfPageContainer from './containers/PdfPageContainer';
@@ -45,29 +42,6 @@ import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import SwissPageTemplate from './SwissPageTemplate';
 import AlternativeAddressTemplate from './AlternativeAddressTemplate';
-
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
 
 const getStyles = (boldFontStyle?: {fontFamily: string}) =>
   StyleSheet.create({
@@ -136,7 +110,7 @@ type Props = {
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const CreditNotePdfTemplate = ({
   translate,
@@ -152,6 +126,9 @@ const CreditNotePdfTemplate = ({
   nextCompanyExternalId,
   qrImageSrc,
   pdfConfigClientStorage,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
   const articleItems = invoice?.items.map((item) => ({
     ...item,
@@ -249,11 +226,7 @@ const CreditNotePdfTemplate = ({
     invoice?.additionalInfo?.alternativeServiceCompanyInfo,
   );
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const styles = getStyles(boldFontStyle);
+  const styles = getStyles(fontStyles.bold);
 
   const customerVATId =
     (pdfConfigClientStorage.includeCustomerVAT &&
@@ -269,7 +242,6 @@ const CreditNotePdfTemplate = ({
         !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             headerInfo={headerInfo}
             headerPath={headerPath}
@@ -279,10 +251,13 @@ const CreditNotePdfTemplate = ({
               invoice?.additionalInfo.alternativeServiceCompanyInfo
             }
             alternativeAddress={invoice?.additionalInfo.alternativeAddress}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         )}
 
-      <PdfPageContainer selectedLng={selectedLng}>
+      <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
         <PdfBodyContainer>
@@ -294,10 +269,12 @@ const CreditNotePdfTemplate = ({
               beneficiaryInfo={
                 invoice?.additionalInfo.beneficiaryAddress?.component
               }
-              selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
               eanValue={eanValue}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
 
             <PdfTemplateInvoiceDetails
@@ -305,15 +282,18 @@ const CreditNotePdfTemplate = ({
               pdfConfigClientStorage={pdfConfigClientStorage}
               translate={translate}
               invoice={invoice}
-              selectedLng={selectedLng}
               nextCompanyExternalId={nextCompanyExternalId}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
           </TopSectionContainer>
 
           <View>
             <PdfPageTitleHtml
               value={invoice?.subject}
-              selectedLng={selectedLng}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
             />
 
             {invoice?.description.trim() !== '' && (
@@ -337,6 +317,9 @@ const CreditNotePdfTemplate = ({
                 total={amountAfterGlobalDiscountWithVAT}
                 selectedLng={selectedLng}
                 netTotal={netTotal}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
             )}
 
@@ -384,15 +367,20 @@ const CreditNotePdfTemplate = ({
 
         <PdfTemplateFooter
           userInfo={userInfo}
-          selectedLng={selectedLng}
           translate={translate}
           footerInfo={footerInfo}
           footerPath={footerPath}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       </PdfPageContainer>
 
       {userInfo?.serviceCompany.settings.invoiceQRCodeEnabled && (
-        <SwissPageTemplate qrImageSrc={qrImageSrc} />
+        <SwissPageTemplate
+          qrImageSrc={qrImageSrc}
+          primaryColor={primaryColor}
+        />
       )}
     </Document>
   );

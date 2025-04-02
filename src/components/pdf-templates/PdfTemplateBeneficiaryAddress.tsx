@@ -1,16 +1,19 @@
 import {AddressComponent} from 'models/misc';
-import {Text, View, StyleSheet} from '@react-pdf/renderer';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
 type Props = {
-  selectedLng?: string;
   translate: (key: string) => string;
   beneficiaryInfo?: AddressComponent | null;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  regularFontStyle,
+  boldFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     leftAddress: {
       display: 'flex',
@@ -22,12 +25,12 @@ const getStyles = (
       ...boldFontStyle,
       flexWrap: 'wrap',
       marginTop: 20,
-      color: '#212121',
+      color: primaryColor,
       maxWidth: 250,
     },
     partialAddressText: {
       fontSize: 9,
-      color: '#616161',
+      color: secondaryColor,
       textAlign: 'left',
       ...regularFontStyle,
       marginTop: 2,
@@ -35,20 +38,18 @@ const getStyles = (
   });
 
 const PdfTemplateBeneficiaryAddress = ({
-  selectedLng,
   translate,
   beneficiaryInfo,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   return (
     <View style={styles.leftAddress}>

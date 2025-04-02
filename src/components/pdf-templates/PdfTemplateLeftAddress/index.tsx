@@ -3,38 +3,36 @@ import {Text, View} from '@react-pdf/renderer';
 import PdfTemplateBeneficiaryAddress from 'components/pdf-templates/PdfTemplateBeneficiaryAddress';
 import {getStyles} from 'components/pdf-templates/PdfTemplateLeftAddress/PdfTemplateLeftAddress.styles';
 import {useMemo} from 'react';
+import {ContextProps} from 'context/PdfStylesProvider';
 
 type Props = {
   serviceCompanyInfo?: string;
   fallbackReceiverName?: string;
   addressComponent?: AddressComponent | null;
-  selectedLng?: string;
   translate: (key: string) => string;
   beneficiaryInfo?: AddressComponent | null;
   customerVATId?: string;
   eanValue?: string;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const PdfTemplateLeftAddress = ({
   serviceCompanyInfo,
   fallbackReceiverName,
   addressComponent,
-  selectedLng,
   translate,
   beneficiaryInfo,
   customerVATId,
   eanValue,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   const displayName = useMemo(() => {
     if (!addressComponent && !fallbackReceiverName) return;
@@ -117,9 +115,11 @@ const PdfTemplateLeftAddress = ({
         beneficiaryInfo?.street
       ) && (
         <PdfTemplateBeneficiaryAddress
-          selectedLng={selectedLng}
           translate={translate}
           beneficiaryInfo={beneficiaryInfo}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       )}
     </View>
