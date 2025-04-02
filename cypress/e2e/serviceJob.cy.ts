@@ -26,6 +26,8 @@ describe('Service Job Tests', () => {
     beforeEach(setupTest);
 
     it('should validate Assign Engineer dialog', () => {
+        ServiceJobPage.createJob();
+        cy.go('back');
         cy.wait('@serviceOrdersApi');
 
         cy.get('body').find('[data-testid="assign-engineer"]').should('exist').should('contain.text', 'Assign Engineer');
@@ -44,6 +46,8 @@ describe('Service Job Tests', () => {
     });
 
     it('should assign Engineer without schedule', () => {
+        ServiceJobPage.createJob();
+        cy.go('back');
         cy.wait('@serviceOrdersApi');
 
         cy.get('body').find('[data-testid="assign-engineer"]').should('exist').should('contain.text', 'Assign Engineer');
@@ -62,6 +66,8 @@ describe('Service Job Tests', () => {
     });
 
     it('should assign Engineer with schedule', () => {
+        ServiceJobPage.createJob();
+        cy.go('back');
         cy.wait('@serviceOrdersApi');
 
         cy.get('body').find('[data-testid="assign-engineer"]').should('exist').should('contain.text', 'Assign Engineer');
@@ -71,6 +77,8 @@ describe('Service Job Tests', () => {
     });
 
     it('should assign multiple Engineers with schedule', () => {
+        ServiceJobPage.createJob();
+        cy.go('back');
         cy.wait('@serviceOrdersApi');
 
         cy.get('body').find('[data-testid="assign-engineer"]').should('exist').should('contain.text', 'Assign Engineer');
@@ -90,17 +98,16 @@ describe('Service Job Tests', () => {
     });
 
     it('should assign Technician in order details page', () => {
+        ServiceJobPage.createJob();
+        cy.go('back');
         ServiceJobPage.changeTab(0);
-        OrderPage.changeStatusFilter('Overdue');
+        OrderPage.changeStatusFilter('Pending');
 
         cy.wait('@serviceOrdersApi');
 
         cy.get('tbody tr', {timeout: 10000}).should('have.length.greaterThan', 0);
 
-        // Confirm that the first row is now "Overdue"
-        cy.get('tbody tr').first().find('[data-testid="status-chip"]').should('exist').should('contain.text', 'Overdue');
-
-        cy.get('tr[data-testid^="service-order-row"] td[data-field="EXTERNAL_ID"]').should('be.visible').first().click();
+        cy.contains('Unscheduled').should('exist').parents('tr').find('td[data-field="EXTERNAL_ID"]').click();
 
         cy.get('button[data-testid="action-menu-horizontal"]').click();
         cy.get('[id="action-menu"]').find('[data-testid^="container-menu-option-"]');
@@ -113,28 +120,30 @@ describe('Service Job Tests', () => {
     });
 
     it('should not reset Technician when rescheduling without changing technicians field', () => {
+        ServiceJobPage.createJob();
+        cy.go('back');
         ServiceJobPage.changeTab(0);
-        OrderPage.changeStatusFilter('Overdue');
+        OrderPage.changeStatusFilter('Pending');
 
         cy.wait('@serviceOrdersApi');
 
         cy.get('tbody tr', {timeout: 10000}).should('have.length.greaterThan', 0);
 
-        // Confirm that the first row is now "Overdue"
-        cy.get('tbody tr').first().find('[data-testid="status-chip"]').should('exist').should('contain.text', 'Overdue');
+        cy.contains('Unscheduled').should('exist').parents('tr').find('td[data-field="EXTERNAL_ID"]').click();
 
-        ServiceJobPage.getFirstTableElement().should('exist').click();
         cy.get('button[data-testid="action-menu-horizontal"]').click();
         cy.get('[id="action-menu"]').find('[data-testid^="container-menu-option-"]');
         cy.contains('li', /^(Reschedule|Schedule)$/i) // Matches "Schedule" or "Reschedule"
             .should('be.visible')
             .click();
+        const putJobAPI = `${Cypress.env().REACT_APP_API_URL}/api/serviceOrders/*`;
+        cy.intercept('PUT', putJobAPI).as('putJobAPI');
         ServiceJobPage.assignEngineer({
             withSchedule: true,
             removeSchedule: false,
             changeDueDate: false,
         });
-        cy.wait(2000);
+        cy.wait('@putJobAPI');
         cy.get('button[data-testid="action-menu-horizontal"]').click();
         cy.contains('li', 'Reschedule').should('be.visible').click();
         ServiceJobPage.submitData({
@@ -143,6 +152,7 @@ describe('Service Job Tests', () => {
             changeDueDate: false,
             assignEngineersCount: 0,
         });
+        cy.wait('@putJobAPI');
         cy.get('div[data-testid="technician-card"]').should('not.have', '-');
         cy.get('div[data-testid="job-details-status-chip"]').contains('Assigned');
     });
@@ -154,10 +164,14 @@ describe('Service Job Tests', () => {
 
         cy.get('tbody tr', {timeout: 10000}).should('have.length.greaterThan', 0);
 
-        // Confirm that the first row is now "Overdue"
-        cy.get('tbody tr').first().find('[data-testid="status-chip"]').should('exist').should('contain.text', 'Overdue');
-
-        cy.get('tr[data-testid^="service-order-row"] td[data-field="EXTERNAL_ID"]').should('be.visible').first().click();
+        cy.get('tbody tr')
+            .find('[data-testid="status-chip"]')
+            .should('exist')
+            .should('contain.text', 'Overdue')
+            .first()
+            .parents('tr')
+            .find('td[data-field="EXTERNAL_ID"]')
+            .click();
 
         cy.get('button[data-testid="action-menu-horizontal"]').click();
         cy.get('[id="action-menu"]')

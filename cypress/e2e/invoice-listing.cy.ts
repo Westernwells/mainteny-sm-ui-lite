@@ -17,7 +17,7 @@ describe('Invoice listing page', () => {
         });
     });
 
-    it(`should show no entries message when filter returns nothing`, () => {
+    it('should show no entries message when filter returns nothing', () => {
         cy.wait('@getInvoices');
 
         const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;

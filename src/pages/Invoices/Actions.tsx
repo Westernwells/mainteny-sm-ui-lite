@@ -892,12 +892,12 @@ export const Actions = ({
     });
 
     // // Work report operations
-    const workReportOperations = getWorkReportOperations(
+    const workReportOperations = await getWorkReportOperations(
       invoiceData,
       workReportDownloadUrlArg,
     );
 
-    const xInvoiceOperation = getXInvoiceOperation(invoiceData);
+    const xInvoiceOperation = await getXInvoiceOperation(invoiceData);
 
     const checklistOperations = await getChecklistOperations(invoiceData);
 

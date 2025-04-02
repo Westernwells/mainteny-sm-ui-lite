@@ -90,6 +90,12 @@ export default class InvoicesPage {
       .should('be.visible')
       .click({waitForAnimations: false, force: true});
 
+    cy.get('#article-combo-box')
+      .click()
+      .wait(500)
+      .clear()
+      .realType('Test Article')
+      .realType('{esc}');
     cy.get('input[name="quantity"]').clear().type('1');
     cy.get('input[name="unitAmount.netAmount"]').clear().type('100');
 
