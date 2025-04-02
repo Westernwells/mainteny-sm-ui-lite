@@ -1,6 +1,7 @@
 import {StyleSheet} from '@react-pdf/renderer';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
-export const getStyles = () =>
+export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     dataBody: {
       borderBottom: '1px solid #212121',
@@ -26,7 +27,7 @@ export const getStyles = () =>
       width: '87%',
       display: 'flex',
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       paddingLeft: 20,
       paddingRight: 10,
       letterSpacing: -0.15,

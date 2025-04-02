@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import {pdf} from '@react-pdf/renderer';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {SnackbarKey} from 'notistack';
@@ -15,6 +15,7 @@ import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {getJobTypeGivenName} from 'utils/service-order-utils';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {useQueryClientStorageData} from './useClientStorage';
 import {
   useCompanyJobTypes,
@@ -57,6 +58,9 @@ export const useCreateAndSetPdfBlobUrl = ({
     user?.userAccount.serviceCompany.id!,
   );
 
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
+
   // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
   const filteredOldJobTypes = oldJobTypes?.filter(
     (oldJobType) =>
@@ -96,6 +100,9 @@ export const useCreateAndSetPdfBlobUrl = ({
         footerInfo={footerInfo}
         footerPath={footerPath}
         serviceOrderType={getJobTypeGivenName(serviceOrder.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 

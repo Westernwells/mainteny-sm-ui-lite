@@ -1,43 +1,20 @@
-import {Text, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import {formatDate} from 'utils/datetime';
 import {getDisplayDeliveryDate} from 'utils/invoice';
 import {InvoiceType, InvoiceView} from 'models/invoice';
 import {useMemo} from 'react';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {UserAccount} from 'models/user';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import PdfUnitAddress from './containers/PdfUnitAddress';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
@@ -54,12 +31,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       flex: '0 0 43%',
     },
     tagContent: {
       fontSize: 8.5,
-      color: '#616161',
+      color: secondaryColor,
       flex: '0 0 57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -69,35 +46,32 @@ const getStyles = (
 type Props = {
   translate: (key: string, options?: {context: string}) => string;
   invoice?: InvoiceView;
-  selectedLng?: string;
   nextCompanyExternalId?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
   userInfo?: UserAccount;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const PdfTemplateInvoiceDetails = ({
   translate,
   invoice,
-  selectedLng,
   nextCompanyExternalId,
   pdfConfigClientStorage,
   userInfo,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
   const startDate = invoice?.additionalInfo.deliveryStartDate;
   const endDate = invoice?.additionalInfo.deliveryEndDate;
 
   const displayDeliveryDate = getDisplayDeliveryDate(startDate, endDate);
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   const getInvoiceDate = () =>
     invoice?.sentDate ? formatDate(invoice?.sentDate) : formatDate(new Date());
@@ -262,8 +236,10 @@ const PdfTemplateInvoiceDetails = ({
         <PdfUnitAddress
           address={invoice?.serviceOrder?.elevator?.address}
           translate={translate}
-          selectedLng={selectedLng}
           building={unitBuilding}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       </View>
     </View>

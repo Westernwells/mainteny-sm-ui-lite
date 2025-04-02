@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
@@ -58,6 +58,7 @@ import {EmailSignature} from 'models/employee';
 import {FileResourceRecord} from 'models/media';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 
 interface Props {
   quotation: QuotationView;
@@ -92,6 +93,9 @@ const OldTableActions = ({quotation}: Props) => {
   const {mutateAsync: sendQuotation} = useSendQuotation();
   const [creatingPdf, setCreatingPdf] = useState(false);
   const [filePathToDownload, setFilePathToDownload] = useState('');
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
 
@@ -187,6 +191,9 @@ const OldTableActions = ({quotation}: Props) => {
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         quotationItems={transformedQuotationItems}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     setBlobFile(blob);

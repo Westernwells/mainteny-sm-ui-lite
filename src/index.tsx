@@ -6,6 +6,7 @@ import {ThemeProvider} from '@mui/material/styles';
 import {MutationErrorHandler, queryErrorHandler} from 'reactQuery/handlers';
 import {SnackbarProvider} from 'notistack';
 import {LanguageProvider} from 'context/LanguageProvider';
+import {PdfStylesProvider} from 'context/PdfStylesProvider';
 import * as Sentry from '@sentry/react';
 import {UserCompanyProvider} from 'context/UserCompanyProvider';
 import {App} from './App';
@@ -72,7 +73,6 @@ LicenseInfo.setLicenseKey(import.meta.env.REACT_APP_MUI_PRO_LICENSE);
 
 root.render(
   <ThemeProvider theme={theme}>
-    <CssBaseline />
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
         <SnackbarProvider
@@ -84,12 +84,16 @@ root.render(
           hideIconVariant
           maxSnack={3}>
           <UserCompanyProvider>
-            <App />
+            <PdfStylesProvider>
+              <App />
+            </PdfStylesProvider>
           </UserCompanyProvider>
         </SnackbarProvider>
 
         {window.Cypress ? null : <ReactQueryDevtools />}
       </QueryClientProvider>
+
+      <CssBaseline />
     </LanguageProvider>
   </ThemeProvider>,
 );

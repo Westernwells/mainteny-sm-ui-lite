@@ -4,7 +4,7 @@ import {useLocation} from 'react-router-dom';
 
 import {pdf} from '@react-pdf/renderer';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {axiosClient} from 'utils/axios-utils';
 import {useGetUserAccount} from 'hooks/reactQuery/useUserAccount';
 
@@ -24,6 +24,7 @@ import {
   useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 
 interface RNWindow extends Window {
   ReactNativeWebView?: {
@@ -97,6 +98,9 @@ export const MobileWorkReportDownload = () => {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
 
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
+
   const translate = useMemo(
     () => (key: string, options?: {context: string}) => {
       if (company?.language) {
@@ -131,6 +135,9 @@ export const MobileWorkReportDownload = () => {
         footerInfo={footerInfo}
         technicianName={technicianName}
         serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 

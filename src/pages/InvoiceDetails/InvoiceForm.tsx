@@ -113,7 +113,7 @@ import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
-import {getInvoiceStatusStyles} from 'utils/invoice';
+import {generatePdfInvoice, getInvoiceStatusStyles} from 'utils/invoice';
 import {StatusChip} from 'components/StatusChip';
 import {EditFrom} from './EditFrom';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
@@ -125,7 +125,6 @@ import {SectionTitle} from './SectionTitle';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
 import {
   articleViewToInvoiceItemRecord,
-  correctCreditNoteInvoicesPercentages,
   formatInvoiceRecord,
   invoiceItemToInvoiceItemRecord,
 } from './utils';
@@ -145,27 +144,26 @@ import {
 import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
 import {pdf} from '@react-pdf/renderer';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
-import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
-  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
   CLIENT_STORAGE_PDF_TEMPLATE_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {
-  QRCurrencyCode,
   createQrData,
   moneyToCents,
+  QRCurrencyCode,
   useCurrentCurrency,
 } from 'utils/currency';
-import {generatePdfInvoice} from 'utils/invoice';
 import {SwissQRBill} from 'swissqrbill/svg';
 import {calculateArticlesAmount} from 'utils/calculate-total';
 import {VatView} from 'models/vat';
 import PdfPartialUpfrontPreview from 'components/pdf-templates/invoice-previews/PdfPartialUpfrontPreview';
-import PdfPreviewFinalInvoiceTermplate from 'components/pdf-templates/invoice-previews/PdfPreviewFinalInvoiceTermplate';
+import PdfPreviewFinalInvoiceTemplate from 'components/pdf-templates/invoice-previews/PdfPreviewFinalInvoiceTemplate';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 
 interface Props {
   invoice?: InvoiceView;
@@ -268,6 +266,9 @@ export const InvoiceForm = ({
   const navigate = useNavigate();
   const {search} = useLocation();
   const {data: taxRates, isLoading: isLoadingTaxRates} = useVats();
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -1628,7 +1629,7 @@ export const InvoiceForm = ({
     ) {
       PdfTemplate = PdfPartialUpfrontPreview;
     } else {
-      PdfTemplate = PdfPreviewFinalInvoiceTermplate;
+      PdfTemplate = PdfPreviewFinalInvoiceTemplate;
     }
 
     const shouldIncludePreviousInvoices = !(
@@ -1672,6 +1673,9 @@ export const InvoiceForm = ({
           invoiceNumber || translate('Automatically assigned')
         }
         qrImageSrc={qrImageSrc}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

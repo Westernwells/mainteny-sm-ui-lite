@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
   QueryObserverResult,
@@ -128,6 +128,7 @@ import {CANCEL_ACTION} from 'models/status';
 import {useVats} from 'hooks/reactQuery/useVats';
 import {getInvoiceStatusStyles} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -262,6 +263,9 @@ export const ViewInvoice = ({
   const {refetch: refetchXMLDownloadUrl} = useDownloadUrl(
     invoice?.additionalInfo.xmlPath ? [invoice?.additionalInfo.xmlPath] : [],
   );
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
@@ -440,6 +444,9 @@ export const ViewInvoice = ({
         headerInfo={headerInfo}
         footerPath={footerUrl}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -556,6 +563,9 @@ export const ViewInvoice = ({
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
         serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -636,6 +646,9 @@ export const ViewInvoice = ({
           invoiceNumber || translate('Automatically assigned')
         }
         qrImageSrc={qrImageSrc}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

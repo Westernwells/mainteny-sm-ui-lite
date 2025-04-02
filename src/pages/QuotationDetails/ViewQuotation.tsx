@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
 import printJS from 'print-js';
@@ -68,6 +68,7 @@ import {HeaderFooterInfoData} from 'models/misc';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -120,6 +121,9 @@ export const ViewQuotation = ({
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const {search} = useLocation();
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -289,6 +293,9 @@ export const ViewQuotation = ({
         footerPath={footerUrl}
         footerInfo={footerInfo}
         quotationItems={transformedQuotationItems}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     setBlobFile(blob);
@@ -299,7 +306,15 @@ export const ViewQuotation = ({
 
   useEffect(() => {
     generateBlobUrl();
-  }, [quotation, headerUrl, footerUrl, quotationSubItems]);
+  }, [
+    quotation,
+    headerUrl,
+    footerUrl,
+    quotationSubItems,
+    fontStyles,
+    primaryColor,
+    secondaryColor,
+  ]);
 
   const getExistingFiles = async (
     fileDownloadUrl:
