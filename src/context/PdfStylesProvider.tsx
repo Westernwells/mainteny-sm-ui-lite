@@ -154,7 +154,7 @@ const LANGUAGE_TO_FONTS: Record<string, string> = {
   Ubuntu: 'Ubuntu',
   Arial: 'Arial',
   Lato: 'Lato',
-  'Times New Roman': 'Times New Roman',
+  'Times New Roman': 'TimesNewRoman',
 };
 
 const initialValue: ContextProps = {
