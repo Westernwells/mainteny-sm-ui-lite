@@ -3131,13 +3131,18 @@
   "Positions": "Positionen",
   "Add Position": "Position hinzufügen",
   "Prices": "Preise",
-  "The margin(s) won't be visible to the customers.": "Die Marge(n) sind für die Kunden nicht sichtbar.",
+  "The margin(s) won't be visible to the customers.": "Die Marge(n) sind für die Kunden nicht auf dem PDF sichtbar.",
   "Sub-positions": "Subposition ",
   "Total margin": "Gesamtmarge",
-  "Material margin": "Materialspanne",
-  "Labor margin": "Arbeitsmarge",
+  "Material margin": "Marge Material",
+  "Labor margin": "Marge Arbeit",
   "Other margin": "Andere Marge",
   "Create mixed position": "Mischposition erstellen",
   "Save to catalogue": "Im Katalog speichern",
-  "Mixed Position": "Mischpositions"
+  "Mixed Position": "Mischpositionen",
+  "Apply": "Anwenden",
+  "Primary text color": "Haupttextfarbe",
+  "Secondary text color": "Sekundärtextfarbe",
+  "Custom color": "Benutzerdefinierte Farbe ",
+  "Select custom color": "Benutzerdefinierte Farbe auswählen"
 }
