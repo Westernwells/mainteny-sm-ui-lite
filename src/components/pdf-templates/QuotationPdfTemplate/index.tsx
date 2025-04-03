@@ -394,6 +394,17 @@ const QuotationPdfTemplate = React.memo(
                     </Text>
                   </View>
                 )}
+
+                {!!quotation?.additionalInfo.referenceNumber && (
+                  <View style={styles.rightAddressContent}>
+                    <Text style={styles.tag}>
+                      {translate('Reference Number')}
+                    </Text>
+                    <Text style={styles.tagContent}>
+                      {quotation?.additionalInfo.referenceNumber}
+                    </Text>
+                  </View>
+                )}
                 {!!(
                   userInfo?.contact?.email &&
                   pdfConfigClientStorage.includeUserEmail
