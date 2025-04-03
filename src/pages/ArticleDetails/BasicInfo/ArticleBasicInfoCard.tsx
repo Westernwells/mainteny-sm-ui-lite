@@ -13,7 +13,6 @@ import Typography from '@mui/material/Typography';
 import {CardProps} from 'components/CardProps';
 import {Dialog} from 'components/Dialog';
 import {InfoCard} from 'components/InfoCard';
-import DOMPurify from 'dompurify';
 import {useFormik} from 'formik';
 import {useArticles, useUpdateArticle} from 'hooks/reactQuery/useArticle';
 import {useVats} from 'hooks/reactQuery/useVats';
@@ -33,6 +32,7 @@ import {createEmptyResource} from 'utils/paging';
 import {getPlainStringFromHtml, isPlainString} from 'utils/rich-field-string';
 import {convertToText} from 'utils/utils';
 import * as Yup from 'yup';
+import {stripHtmlTags} from 'models/text-block';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const isExternalIdUnique = async (resource: ArticleView[], value?: string) => {
@@ -111,7 +111,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     category: article.category,
     manufacturer: article.manufacturer,
     model: article.model,
-    name: article.name,
+    name: stripHtmlTags(article.name || ''),
     externalId: article.externalId,
     storageLocation: article.storageLocation,
     type: article.type,
@@ -307,12 +307,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       headerActionIcon={<EditIcon />}
       handleAction={() => setOpenDialog(true)}
       showHeaderBackground
-      header={
-        <Typography
-          variant="subtitle1"
-          dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(article?.name)}}
-        />
-      }>
+      header={<Typography>{stripHtmlTags(article?.name || '')}</Typography>}>
       <Box display="flex" flexWrap="wrap">
         {_.map(basicInfoItems, (item, key) => (
           <CardProps
