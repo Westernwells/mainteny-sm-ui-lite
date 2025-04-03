@@ -1,16 +1,6 @@
 import {Box} from '@mui/system';
 import PredefinedColorButton from 'components/ColorPicker/PredefinedColorButton';
-
-const CUSTOM_COLORS = [
-  '#000034',
-  '#828DA3',
-  '#0092B2',
-  '#0B79D0',
-  '#4CAF50',
-  '#FFB547',
-  '#ED6C02',
-  '#FF605A',
-];
+import {CUSTOM_COLORS} from 'models/pdfs';
 
 type Props = {
   selectedColor: string;

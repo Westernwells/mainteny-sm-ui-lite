@@ -1,10 +1,11 @@
 import {useTranslation} from 'react-i18next';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Box, Popover, Typography} from '@mui/material';
 import {Button} from 'components/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import InvertColorsOutlinedIcon from '@mui/icons-material/InvertColorsOutlined';
 import {useTheme} from '@mui/material/styles';
+import {CUSTOM_COLORS} from 'models/pdfs';
 import ColorPicker from './index';
 
 type Props = {
@@ -35,6 +36,11 @@ const ColorPickerPopup = ({initialValue, labelKey, onChange}: Props) => {
     setOpen(false);
   };
 
+  const isActive = useMemo(
+    () => !CUSTOM_COLORS.includes(initialValue),
+    [initialValue],
+  );
+
   useEffect(() => {
     setInternalColor(initialValue);
   }, [initialValue]);
@@ -45,7 +51,14 @@ const ColorPickerPopup = ({initialValue, labelKey, onChange}: Props) => {
         buttonProps={{
           variant: 'text',
           onClick: handleOpen,
-          sx: {padding: 0, alignSelf: 'start'},
+          sx: {
+            padding: '0 6px 0 2px',
+            border: '2px solid transparent',
+            alignSelf: 'start',
+            ...(isActive && {
+              border: '2px solid #000034',
+            }),
+          },
         }}>
         <Box sx={{display: 'flex', gap: 0.5, alignItems: 'center'}}>
           <InvertColorsOutlinedIcon sx={{color: theme.palette.primary.light}} />
