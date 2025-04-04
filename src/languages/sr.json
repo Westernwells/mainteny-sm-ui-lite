@@ -3160,5 +3160,10 @@
   "Other margin": "Ostale margine",
   "Create mixed position": "Napravite mešovitu poziciju",
   "Save to catalogue": "Sačuvaj u katalog",
-  "Mixed Position": "Mešovita pozicija"
+  "Mixed Position": "Mešovita pozicija",
+  "Apply": "Primeni",
+  "Primary text color": "Primarna boja teksta",
+  "Secondary text color": "Boja sekundarnog teksta",
+  "Custom color": "Prilagođena boja",
+  "Select custom color": "Izaberite boju po želji"
 }
