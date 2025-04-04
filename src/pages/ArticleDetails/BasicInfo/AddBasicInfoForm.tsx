@@ -38,9 +38,7 @@ import {
   getCurrencySymbol,
   useCurrentCurrency,
 } from 'utils/currency';
-
 import {Receipt, ReceiptOutlined} from '@mui/icons-material';
-import RichTextField from 'components/RichTextField';
 import {useVats} from 'hooks/reactQuery/useVats';
 
 export const AddBasicInfoForm = ({
@@ -126,16 +124,20 @@ export const AddBasicInfoForm = ({
     <Box display="flex" flexWrap="wrap" component="form">
       <Grid container>
         <Grid item xs={6} sm={4} pr={3}>
-          <RichTextField
-            html={formik.values.name || ''}
-            label={t('Name')}
-            placeholder={t('e.g. Flat cable, 16G0.75+2x(2x0.5)')}
-            required
-            updateHtml={(h) => formik.setFieldValue('name', h)}
-            error={!!(formik.touched.name && formik.errors.name)}
-            helperText={formik.errors.name}
-            onBlur={formik.handleBlur}
-            containerMinHeight={40}
+          <FormInput
+            containerStyles={{...containerStyles, width: '100%'}}
+            fieldProps={{
+              label: t('Name'),
+              name: 'name',
+              placeholder: t('e.g. Flat cable, 16G0.75+2x(2x0.5)'),
+              type: 'text',
+              required: true,
+              value: formik.values.name,
+              error: !!(formik.touched.name && formik.errors.name),
+              helperText: formik.errors.name,
+              onBlur: formik.handleBlur,
+              onChange: formik.handleChange,
+            }}
           />
         </Grid>
 
