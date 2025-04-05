@@ -3144,5 +3144,6 @@
   "Primary text color": "Haupttextfarbe",
   "Secondary text color": "Sekundärtextfarbe",
   "Custom color": "Benutzerdefinierte Farbe ",
-  "Select custom color": "Benutzerdefinierte Farbe auswählen"
+  "Select custom color": "Benutzerdefinierte Farbe auswählen",
+  "Remove sub-position": "Subposition entfernen"
 }
