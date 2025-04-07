@@ -3166,5 +3166,8 @@
   "Secondary text color": "Boja sekundarnog teksta",
   "Custom color": "Prilagođena boja",
   "Select custom color": "Izaberite boju po želji",
-  "Remove sub-position": "Uklonite podpoziciju"
+  "Remove sub-position": "Uklonite podpoziciju",
+  "Dunning 1": "1. Podsetnik",
+  "Dunning 2": "2. Podsetnik",
+  "Dunning 3": "3. Podsetnik"
 }
