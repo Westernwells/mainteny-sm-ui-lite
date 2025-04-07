@@ -286,18 +286,19 @@ export const mergeElevators = (
   elevatorResource: ContractElevatorView[] | ElevatorView[],
   elevatorsFromRow: ContractComponentView,
 ) => {
-  const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
-    (map, elevator) => {
-      map[elevator.elevatorId] = elevator;
-      return map;
-    },
-    {} as Record<string, ContractServiceFormElevator>,
-  );
+  const existingElevators = elevatorsFromRow.additionalInfo?.elevators || [];
+
+  const infoMap = existingElevators.reduce((map, elevator) => {
+    map[elevator.elevatorId] = elevator;
+    return map;
+  }, {} as Record<string, ContractServiceFormElevator>);
+
+  const hasExisting = existingElevators.length > 0;
 
   return parsElevatorRecourses(elevatorResource || []).map((elevator) => ({
     ...elevator,
     ...(infoMap[elevator.elevatorId] || {}),
-    isChecked: Boolean(infoMap[elevator.elevatorId]),
+    isChecked: hasExisting ? Boolean(infoMap[elevator.elevatorId]) : true,
   }));
 };
 
