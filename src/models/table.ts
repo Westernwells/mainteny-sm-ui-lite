@@ -11,6 +11,8 @@ export type HeaderCellProps = {
   headerName: string;
   fieldName?: string;
   onSort?: () => void;
+  headerIconTooltip?: string;
+  headerIcon?: React.ReactNode;
 };
 
 export type CellProps = {

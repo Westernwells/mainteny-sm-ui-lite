@@ -404,6 +404,9 @@ export const NewArticleAutoComplete = ({
             inputRef={inputRef}
             error={inputValue === ''}
             onBlur={handleBlur}
+            onFocus={(e) => {
+              e.target.setSelectionRange(0, 0);
+            }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 '& fieldset': {

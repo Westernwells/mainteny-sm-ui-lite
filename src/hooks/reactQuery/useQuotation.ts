@@ -19,12 +19,14 @@ import {
 } from 'models/misc';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
 import {
+  CalculateQuotationAmountRecord,
   CreateQuotationComment,
   CreateQuotationRecord,
   PrintQuotationRecord,
   QueryQuotationCommentsParams,
   QueryQuotationParams,
   QuotationActivityView,
+  QuotationAmountDetail,
   QuotationStatistics,
   QuotationSubItemRecord,
   QuotationView,
@@ -579,3 +581,18 @@ export function useQuotationSubItems(
     },
   );
 }
+
+export const postQuotationAmount = async (
+  body: CalculateQuotationAmountRecord,
+) => {
+  const {data} = await axiosClient.post<QuotationAmountDetail>(
+    '/api/quotations/amount',
+    body,
+  );
+  return data;
+};
+
+export const useCalculateQuotationAmount = () =>
+  useMutation(({data}: {data: CalculateQuotationAmountRecord}) =>
+    postQuotationAmount(data),
+  );

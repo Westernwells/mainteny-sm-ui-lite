@@ -4,7 +4,7 @@ import TableRow from 'components/Table/TableRow';
 import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined';
 import {Box, IconButton, Switch, Tooltip, Typography} from '@mui/material';
 import {t} from 'i18next';
-import {Control, Controller} from 'react-hook-form';
+import {Control, Controller, UseFormSetValue} from 'react-hook-form';
 import {useTheme} from '@mui/material/styles';
 import SubdirectoryArrowRightOutlinedIcon from '@mui/icons-material/SubdirectoryArrowRightOutlined';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
@@ -13,6 +13,7 @@ import {QuotationFormData} from 'models/quotation';
 type Props = {
   index: number;
   control: Control<QuotationFormData, any>;
+  setValue: UseFormSetValue<QuotationFormData>;
   onAddSubPosition: () => void;
   isSubPositionVisible?: boolean;
   isPriceVisible?: boolean;
@@ -21,6 +22,7 @@ type Props = {
 const SubPositionFooter = ({
   index,
   control,
+  setValue,
   onAddSubPosition,
   isSubPositionVisible = true,
   isPriceVisible = true,
@@ -70,7 +72,8 @@ const SubPositionFooter = ({
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <Box sx={{marginRight: '1.5em'}}>
+          <Box
+            sx={{marginRight: '1.5em', display: 'flex', alignItems: 'center'}}>
             <Typography
               variant="body2"
               sx={{
@@ -84,7 +87,7 @@ const SubPositionFooter = ({
               {t('Sub-positions')}
             </Typography>
             <Tooltip title={t('Sub-positions')} placement="top">
-              <IconButton sx={{display: {xs: 'inline-flex', xl: 'none'}}}>
+              <IconButton sx={{display: {xs: 'inline-flex', lg: 'none'}}}>
                 <SubdirectoryArrowRightOutlinedIcon
                   sx={{
                     color: isSubPositionVisible ? '#000034' : 'inherit',
@@ -100,13 +103,22 @@ const SubPositionFooter = ({
                 <Switch
                   {...field}
                   checked={field.value || false}
-                  onChange={(e) => field.onChange(e.target.checked)}
+                  onChange={(e) => {
+                    const newVal = e.target.checked;
+                    field.onChange(newVal);
+                    if (!newVal) {
+                      setValue(
+                        `items.${index}.subItemsConfig.priceVisible`,
+                        false,
+                      );
+                    }
+                  }}
                 />
               )}
             />
           </Box>
 
-          <Box>
+          <Box sx={{display: 'flex', alignItems: 'center'}}>
             <Typography
               variant="body2"
               sx={{
@@ -120,7 +132,7 @@ const SubPositionFooter = ({
               {t('Prices')}
             </Typography>
             <Tooltip title={t('Prices')} placement="top">
-              <IconButton sx={{display: {xs: 'inline-flex', xl: 'none'}}}>
+              <IconButton sx={{display: {xs: 'inline-flex', lg: 'none'}}}>
                 <MonetizationOnOutlinedIcon
                   sx={{
                     color: isPriceVisible ? '#000034' : 'inherit',
@@ -135,6 +147,7 @@ const SubPositionFooter = ({
               render={({field}) => (
                 <Switch
                   {...field}
+                  disabled={!isSubPositionVisible}
                   checked={field.value || false}
                   onChange={(e) => field.onChange(e.target.checked)}
                 />

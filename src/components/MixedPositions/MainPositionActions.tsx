@@ -13,6 +13,7 @@ interface Props {
   onAddSubPosition: () => void;
   onSaveToCatalogue: () => void;
   onDelete: () => void;
+  isOpen?: boolean;
 }
 
 const MainPositionActions = ({
@@ -21,6 +22,7 @@ const MainPositionActions = ({
   onAddSubPosition,
   onSaveToCatalogue,
   onDelete,
+  isOpen,
 }: Props) => {
   const {t} = useTranslation();
 
@@ -65,7 +67,7 @@ const MainPositionActions = ({
     onDelete,
   ]);
 
-  return <TableActionMenu options={options} />;
+  return <TableActionMenu options={options} isOpen={isOpen} />;
 };
 
 export default MainPositionActions;

@@ -1130,7 +1130,7 @@ export const DraftQuotation = ({
   return (
     <Box>
       {/* GENERAL INFORMATION */}
-      <Grid py={3} borderRadius={1}>
+      <Grid pb={3} borderRadius={1}>
         <Grid
           container
           item
@@ -1138,7 +1138,7 @@ export const DraftQuotation = ({
           bgcolor="white"
           rowGap={4}
           px={3}
-          py={5}
+          py={3}
           borderRadius={1}>
           <Box pb={0.5}>
             <SectionTitle Icon={PinIllustration} title="General Information" />
@@ -1258,7 +1258,7 @@ export const DraftQuotation = ({
         alignItems="flex-start"
         wrap="nowrap"
         mb={12}>
-        <Grid container item xs={12} xl={12} rowGap={2} borderRadius={1}>
+        <Grid container item xs={12} xl={12} rowGap={3} borderRadius={1}>
           {/* ADDRESS INFORMATION */}
           <Grid
             container

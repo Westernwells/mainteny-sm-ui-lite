@@ -19,7 +19,7 @@ import TableBody from 'components/Table/TableBody';
 import TableRow from 'components/Table/TableRow';
 import TableHeader from 'components/Table/TableHeader';
 import TableCell from 'components/Table/TableCell';
-import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
+import {TableColumnWithRender} from 'models/table';
 import {useTranslation} from 'react-i18next';
 import {Button} from 'components/Button';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
@@ -35,6 +35,7 @@ import {
   dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import {extractClosestEdge} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SubPositionRow from './SubPositionRow';
 import MainPositionRow from './MainPositionRow';
 import MarginDetails from './MarginDetails';
@@ -130,6 +131,7 @@ const PositionTable = ({formMethods}: Props) => {
       },
       {
         headerName: '#',
+        width: '58px',
         key: 'position-cell-number',
         renderCell: (cellProps) => <TableCell {...cellProps} />,
       },
@@ -160,6 +162,10 @@ const PositionTable = ({formMethods}: Props) => {
         key: 'position-cell-margin',
         width: '80px',
         align: 'right',
+        noPadding: true,
+        headerIcon: <InfoOutlinedIcon fontSize="small" />,
+        headerIconTooltip:
+          'Margin calculates the buying price against the unit price. Discount is currently not factored into the margin.',
         renderCell: (cellProps) => <TableCell {...cellProps} />,
       },
       {
@@ -204,15 +210,6 @@ const PositionTable = ({formMethods}: Props) => {
         align: 'right',
         isLast: true,
         showShadows: showLeftShadow ? 'left' : undefined,
-        renderCell: (cellProps) => <TableCell {...cellProps} />,
-      },
-      {
-        headerName: 'Actions',
-        key: 'position-cell-actions',
-        width: ACTION_CELL_WIDTH,
-        isHeaderNameHidden: true,
-        noPadding: true,
-        align: 'center',
         renderCell: (cellProps) => <TableCell {...cellProps} />,
       },
     ],
@@ -511,10 +508,9 @@ const PositionTable = ({formMethods}: Props) => {
 
           <TableBody>
             {fields.map((item, index) => (
-              <Fragment key={item.id}>
+              <Fragment key={`${item.id}-${index}`}>
                 <TableRow
                   testId={`main-row-${index}`}
-                  key={`${item.id}-${index}`}
                   sx={{
                     padding: '0px',
                     background: '#f7f9fc',
@@ -546,7 +542,7 @@ const PositionTable = ({formMethods}: Props) => {
                       {watchedItems[index]?.subItems?.map(
                         (subItem, subIndex) => (
                           <TableRow
-                            key={subItem.id}
+                            key={`${item.id}-${index}-${subIndex}`}
                             testId={`sub-row-${index}-${subIndex}`}>
                             <SubPositionRow
                               parentIndex={index}
@@ -573,6 +569,7 @@ const PositionTable = ({formMethods}: Props) => {
                       <SubPositionFooter
                         index={index}
                         control={control}
+                        setValue={setValue}
                         onAddSubPosition={() => handleAddSubPosition(index)}
                         isSubPositionVisible={watch(
                           `items.${index}.subItemsConfig.subItemsVisible`,
@@ -648,7 +645,6 @@ const PositionTable = ({formMethods}: Props) => {
         }
         showCancelButton={false}>
         <RichTextEditor
-          required
           label={t('Description')}
           name="description"
           control={descriptionControl}

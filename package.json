@@ -43,7 +43,7 @@
     "@mui/x-data-grid": "5.5.1",
     "@mui/x-date-pickers": "6.18.2",
     "@mui/x-date-pickers-pro": "^6.19.2",
-    "@react-pdf/renderer": "^3.4.4",
+    "@react-pdf/renderer": "^4.3.0",
     "@sentry/browser": "^8.41.0",
     "@sentry/react": "^8.41.0",
     "@tiptap/core": "^2.4.0",
