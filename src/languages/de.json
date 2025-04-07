@@ -3145,5 +3145,8 @@
   "Secondary text color": "Sekundärtextfarbe",
   "Custom color": "Benutzerdefinierte Farbe ",
   "Select custom color": "Benutzerdefinierte Farbe auswählen",
-  "Remove sub-position": "Subposition entfernen"
+  "Remove sub-position": "Subposition entfernen",
+  "Dunning 1": "1. Mahnung",
+  "Dunning 2": "2. Mahnung",
+  "Dunning 3": "3. Mahnung"
 }
