@@ -17,6 +17,8 @@ interface Props {
   order: ServiceOrderView;
 }
 
+const NO_OF_NOTES_FOR_PREVIEW = 2;
+
 export const JobNotes = ({order}: Props) => {
   const [showSideDrawer, setShowSideDrawer] = useState(false);
   const {t} = useTranslation();
@@ -26,7 +28,7 @@ export const JobNotes = ({order}: Props) => {
     category: CommentCategory.ALL,
     refId: order.id,
     pageIndex: 0,
-    pageSize: 2,
+    pageSize: NO_OF_NOTES_FOR_PREVIEW,
   });
   // Only used to get all number of office notes
   const {data: officeNotes} = useComments({
@@ -34,13 +36,14 @@ export const JobNotes = ({order}: Props) => {
     category: CommentCategory.OFFICE,
     refId: order.id,
     pageIndex: 0,
-    pageSize: 1,
+    pageSize: NO_OF_NOTES_FOR_PREVIEW,
   });
 
   const totalAllNotes = notes?.total ?? 0;
   const totalOfficeNotes = officeNotes?.total ?? 0;
 
   const totalNotes = totalAllNotes + totalOfficeNotes;
+  const allNotes = [...(notes?.data ?? []), ...(officeNotes?.data ?? [])];
 
   return (
     <>
@@ -75,7 +78,7 @@ export const JobNotes = ({order}: Props) => {
           />
         }
         footer={
-          totalNotes > 2 ? (
+          totalNotes > NO_OF_NOTES_FOR_PREVIEW ? (
             <Box
               width="100%"
               display="flex"
@@ -89,7 +92,9 @@ export const JobNotes = ({order}: Props) => {
                 sx={{
                   color: theme.palette.primary.light,
                 }}>
-                {t('Show {{totalCount}} more', {totalCount: totalNotes - 2})}
+                {t('Show {{totalCount}} more', {
+                  totalCount: totalNotes - NO_OF_NOTES_FOR_PREVIEW,
+                })}
               </Button>
             </Box>
           ) : null
@@ -100,7 +105,7 @@ export const JobNotes = ({order}: Props) => {
           </Typography>
         }>
         <Grid rowSpacing={1.5} container mt={1}>
-          {(notes?.data.length ?? 0) === 0 ? (
+          {allNotes.length === 0 ? (
             <Grid item xs={12}>
               <EmptySection
                 btnAction={() => {
@@ -118,7 +123,7 @@ export const JobNotes = ({order}: Props) => {
               />
             </Grid>
           ) : (
-            notes?.data.map((note) => (
+            allNotes.slice(0, NO_OF_NOTES_FOR_PREVIEW).map((note) => (
               <Grid item xs={12}>
                 <Note data={note} />
               </Grid>
