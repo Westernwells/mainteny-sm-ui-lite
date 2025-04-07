@@ -27,7 +27,6 @@ import {UserCompanyContext} from 'context/UserCompanyProvider';
 
 Font.register({
   family: 'Montserrat-Bold',
-  format: 'truetype',
   src: MontserratBold,
 });
 
@@ -47,85 +46,71 @@ Font.register({
 
 Font.register({
   family: 'NotoSans-Regular',
-  format: 'truetype',
   src: NotoSansGeorgianRegular,
 });
 
 Font.register({
   family: 'NotoSans-Bold',
-  format: 'truetype',
   src: NotoSansGeorgianBold,
 });
 
 Font.register({
   family: 'Aventa-Regular',
-  format: 'truetype',
   src: AventaRegular,
 });
 
 Font.register({
   family: 'Aventa-Bold',
-  format: 'truetype',
   src: AventaBold,
 });
 
 Font.register({
   family: 'Inter-Regular',
-  format: 'truetype',
   src: InterRegular,
 });
 
 Font.register({
   family: 'Inter-Bold',
-  format: 'truetype',
   src: InterBold,
 });
 
 Font.register({
   family: 'Ubuntu-Regular',
-  format: 'truetype',
   src: UbuntuRegular,
 });
 
 Font.register({
   family: 'Ubuntu-Bold',
-  format: 'truetype',
   src: UbuntuBold,
 });
 
 Font.register({
   family: 'Arial-Regular',
-  format: 'truetype',
   src: ArialRegular,
 });
 
 Font.register({
   family: 'Arial-Bold',
-  format: 'truetype',
   src: ArialBold,
 });
 
 Font.register({
   family: 'Lato-Regular',
-  format: 'truetype',
   src: LatoRegular,
 });
 
 Font.register({
   family: 'Lato-Bold',
-  format: 'truetype',
   src: LatoBold,
 });
 
 Font.register({
   family: 'TimesNewRoman-Regular',
-  format: 'truetype',
   src: TimesNewRomanRegular,
 });
 
 Font.register({
   family: 'TimesNewRoman-Bold',
-  format: 'truetype',
   src: TimesNewRomanBold,
 });
 

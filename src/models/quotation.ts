@@ -9,6 +9,7 @@ import {
   AggregatedAmount,
   AlternativeServiceCompanyInfo,
   Discount,
+  Payment,
 } from './invoice';
 import {
   AddressRecord,
@@ -395,4 +396,48 @@ export interface PositionRowQuotation {
   unitSellingAmount?: AmountRecord;
   quantity?: number;
   discount: number;
+}
+export interface CalculateQuotationAmountRecord {
+  currency: string;
+  items: QuotationItemRecord[];
+  globalDiscount?: Discount;
+  paymentRecord?: Payment;
+}
+
+export interface QuotationAmountDetail {
+  discount: Discount;
+  payment: Payment;
+  amountBeforeGlobalDiscount: AggregatedAmount;
+  amountAfterGlobalDiscount: AggregatedAmount;
+  items: QuotationItemAmount[];
+}
+
+export interface QuotationItemAmount {
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount?: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount?: Amount;
+  payment: QuotationItemPaymentRecord;
+  subItems: QuotationSubItemAmount[];
+}
+
+export interface QuotationItemPaymentRecord {
+  type: QuotationItemPaymentType;
+  amount?: AggregatedAmount;
+  percentage?: number;
+}
+
+export interface QuotationSubItemAmount {
+  payment: QuotationItemPaymentType;
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount: Amount;
+}
+
+export enum QuotationItemPaymentType {
+  AMOUNT = 'AMOUNT',
+  PERCENTAGE = 'PERCENTAGE',
 }

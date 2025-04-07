@@ -24,8 +24,11 @@ import {FormSelect} from 'components/form/FormSelect';
 import NewArticleAutoComplete from 'components/NewArticleAutocomplete';
 import {MeasurementUnit, createMeasurementOptions} from 'models/articleForm';
 import {t} from 'i18next';
-import {QuotationFormData, EditableQuotationItem} from 'models/quotation';
-import {ACTION_CELL_WIDTH} from 'models/table';
+import {
+  QuotationFormData,
+  EditableQuotationItem,
+  EditableQuotationSubItemRecord,
+} from 'models/quotation';
 import {LanguageContext} from 'context/LanguageProvider';
 import TableCell from 'components/Table/TableCell';
 import {Receipt, ReceiptOutlined, NoteAltOutlined} from '@mui/icons-material';
@@ -106,8 +109,16 @@ const MainPositionRow = ({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
+  const [isActionOpen, setIsActionOpen] = useState(false);
 
   const inputRef = useRef(null);
+  const unitPurchaseInputRef = useRef<HTMLInputElement>(null);
+  const marginInputRef = useRef<HTMLInputElement>(null);
+  const unitAmountInputRef = useRef<HTMLInputElement>(null);
+  const quantityInputRef = useRef<HTMLInputElement>(null);
+  const vatRef = useRef<HTMLInputElement>(null);
+  const unitRef = useRef<HTMLInputElement>(null);
+  const discountRef = useRef<HTMLInputElement>(null);
 
   const {control, setValue, getValues, watch} = formMethods;
 
@@ -132,7 +143,7 @@ const MainPositionRow = ({
     excludeTypes: [],
   });
 
-  const handleDoubleClick = ({
+  const handleCellClick = ({
     indexPos,
     fieldName,
     row,
@@ -157,8 +168,11 @@ const MainPositionRow = ({
   };
 
   const handleEditStart = (row: EditableQuotationItem, field: string) => {
-    const purchaseNetAmountCents = row?.unitPurchaseAmount?.netAmount ?? 0;
-    const sellingNetAmountCents = row?.unitAmount?.netAmount ?? 0;
+    const purchaseNetAmountCents =
+      watch(`items.${index}.unitPurchaseAmount.netAmount`) ?? 0;
+
+    const sellingNetAmountCents =
+      watch(`items.${index}.unitAmount.netAmount`) ?? 0;
 
     if (field === `items.${index}.userSeqNumber`) {
       setEditableRow({
@@ -169,7 +183,7 @@ const MainPositionRow = ({
           userSeqNumber: row.userSeqNumber,
         },
       });
-    } else if (field === 'discount') {
+    } else if (field === `items.${index}.discount`) {
       setEditableRow({
         index,
         field,
@@ -185,7 +199,7 @@ const MainPositionRow = ({
           },
         },
       });
-    } else if (field === 'margin') {
+    } else if (field === `items.${index}.margin`) {
       const margin = calculateMargin(
         sellingNetAmountCents,
         purchaseNetAmountCents,
@@ -309,7 +323,7 @@ const MainPositionRow = ({
         netAmount: Math.round(amount * 100),
         currency: currentCurrency.code,
       });
-    } else if (field === 'margin') {
+    } else if (field === `items.${index}.margin`) {
       const newMargin =
         (editableRow.values as EditableQuotationItem)?.margin ?? 0;
       const currentMargin = currentItem.margin ?? 0;
@@ -318,7 +332,7 @@ const MainPositionRow = ({
       const newSequenceNumber = editableRow.values?.userSeqNumber ?? '';
       const currentSequenceNumber = currentItem?.userSeqNumber ?? '';
       isDifferent = newSequenceNumber !== currentSequenceNumber;
-    } else if (field === 'quantity') {
+    } else if (field === `items.${index}.quantity`) {
       const newQuantity = editableRow.values?.quantity ?? 0;
       const currentQuantity = currentItem.quantity ?? 0;
       isDifferent = newQuantity !== currentQuantity;
@@ -329,13 +343,13 @@ const MainPositionRow = ({
       return;
     }
 
-    if (field === `items.${index}.article.unitPurchaseAmount`) {
+    if (field === `items.${index}.unitPurchaseAmount`) {
       const amount = editableRow.values?.unitPurchaseAmount?.netAmount ?? 0;
       setValue(`items.${index}.unitPurchaseAmount` as Path<QuotationFormData>, {
         netAmount: Math.round(amount),
         currency: currentCurrency.code,
       });
-    } else if (field === 'margin') {
+    } else if (field === `items.${index}.margin`) {
       const marginValue =
         (editableRow.values as EditableQuotationItem)?.margin ?? 0;
 
@@ -365,9 +379,12 @@ const MainPositionRow = ({
     } else {
       setValue(`items.${index}.name`, selectedArticle.name);
 
-      setValue(`items.${index}.article`, selectedArticle);
+      setValue(`items.${index}.article`, {
+        ...selectedArticle,
+        costPackage: selectedArticle.additionalInfo?.costPackage,
+      });
       setValue(
-        `items.${index}.article.unitPurchaseAmount`,
+        `items.${index}.unitPurchaseAmount`,
         selectedArticle.unitPurchaseAmount,
       );
       setValue(`items.${index}.unitAmount`, selectedArticle.unitSellingAmount);
@@ -424,6 +441,40 @@ const MainPositionRow = ({
     );
   };
 
+  const handleVatChangeForMainRow = (selectedVatId: string) => {
+    const selectedTaxRate = taxRates?.find((tax) => tax.id === selectedVatId);
+    const percentage = selectedTaxRate?.percentage || 0;
+    const parentPath = `items.${index}`;
+
+    // Update main position's VAT fields
+    setValue(
+      `${parentPath}.unitAmount.vatId` as Path<QuotationFormData>,
+      selectedVatId,
+    );
+    setValue(
+      `${parentPath}.unitAmount.percentageVat` as Path<QuotationFormData>,
+      percentage,
+    );
+
+    // Get the current subItems for this main row
+    const subItemsPath = `${parentPath}.subItems` as Path<QuotationFormData>;
+
+    const subItems =
+      (getValues(subItemsPath) as EditableQuotationSubItemRecord[]) || [];
+
+    // Update VAT for each sub item
+    subItems.forEach((_, subIdx) => {
+      setValue(
+        `${subItemsPath}.${subIdx}.unitAmount.vatId` as Path<QuotationFormData>,
+        selectedVatId,
+      );
+      setValue(
+        `${subItemsPath}.${subIdx}.unitAmount.percentageVat` as Path<QuotationFormData>,
+        percentage,
+      );
+    });
+  };
+
   const renderDragCell = useCallback(
     () => (
       <TableCell
@@ -441,16 +492,19 @@ const MainPositionRow = ({
     () => (
       <TableCell
         noPadding
-        onDoubleClick={() =>
+        onClick={() =>
           handleEditStart(watchedItem, `items.${index}.userSeqNumber`)
         }
-        sx={{background: '#f7f9fc', width: '48px'}}>
+        sx={{background: '#f7f9fc', maxWidth: '58px'}}>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.userSeqNumber` ? (
           <FormInput
             containerStyles={{width: '100%'}}
             fieldProps={{
               autoFocus: true,
+              onFocus: (e) => {
+                e.target.setSelectionRange(0, 0);
+              },
               ref: inputRef,
               name: `items.${index}.userSeqNumber`,
               value: editableRow?.values?.userSeqNumber || '',
@@ -466,6 +520,20 @@ const MainPositionRow = ({
                 );
                 setEditableRow(null);
               },
+              onKeyDown: (e) => {
+                if (e.key === 'Tab' && !e.shiftKey) {
+                  e.preventDefault();
+                  setValue(
+                    `items.${index}.userSeqNumber`,
+                    editableRow.values?.userSeqNumber,
+                  );
+                  handleCellClick({
+                    indexPos: index,
+                    fieldName: `items.${index}.name`,
+                    row: item,
+                  });
+                }
+              },
               sx: {
                 '& .Mui-focused': {
                   border: '2px solid #000034',
@@ -475,10 +543,22 @@ const MainPositionRow = ({
             }}
           />
         ) : (
-          <Typography
-            sx={{fontSize: '14px', fontWeight: '600', padding: '0px 12px'}}>
-            {watchedItem.userSeqNumber || index + 1}
-          </Typography>
+          <Tooltip
+            title={watchedItem.userSeqNumber || index + 1}
+            arrow
+            placement="top">
+            <Typography
+              sx={{
+                fontSize: '14px',
+                fontWeight: '600',
+                padding: '0px 12px',
+                textWrap: 'wrap',
+                textOverflow: 'ellipsis',
+                overflow: 'auto',
+              }}>
+              {watchedItem.userSeqNumber || index + 1}
+            </Typography>
+          </Tooltip>
         )}
       </TableCell>
     ),
@@ -489,8 +569,8 @@ const MainPositionRow = ({
     () => (
       <TableCell
         noPadding
-        onDoubleClick={() =>
-          handleDoubleClick({
+        onClick={() =>
+          handleCellClick({
             indexPos: index,
             fieldName: `items.${index}.name`,
             row: item,
@@ -528,7 +608,11 @@ const MainPositionRow = ({
                 padding: '0em 1em',
               }}>
               {watchedItem.article?.type === ArticleType.MIX && (
-                <IconButton onClick={() => handleToggleExpand(index)}>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleExpand(index);
+                  }}>
                   {expandedRows.includes(index) ? (
                     <ArrowDropDownIcon sx={{color: '#000034'}} />
                   ) : (
@@ -544,7 +628,10 @@ const MainPositionRow = ({
               />
             </Box>
             <IconButton
-              onClick={() => onDescriptionClick(item.description || '', index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDescriptionClick(item.description || '', index);
+              }}
               sx={{
                 color: removeHtmlTags(watchedItem.description || '')
                   ? '#000034'
@@ -592,9 +679,18 @@ const MainPositionRow = ({
       <TableCell
         align="center"
         noPadding
-        onDoubleClick={(e) => {
-          handleEditType();
-          setAnchorEl(e.currentTarget);
+        onClick={(e) => {
+          e.stopPropagation();
+          if (
+            editableRow?.index === index &&
+            editableRow?.field === `items.${index}.article.type`
+          ) {
+            setEditableRow(null);
+            setAnchorEl(null);
+          } else {
+            handleEditType();
+            setAnchorEl(e.currentTarget);
+          }
         }}>
         <Box
           sx={{
@@ -612,7 +708,14 @@ const MainPositionRow = ({
                 ? `2px solid ${theme.palette.primary.main}`
                 : 'none',
           }}
-          tabIndex={0}>
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Tab' && !e.shiftKey) {
+              e.preventDefault();
+              handleEditStart(watchedItem, `items.${index}.unitPurchaseAmount`);
+              unitPurchaseInputRef.current?.focus();
+            }
+          }}>
           {getIconByType(watchedItem.article?.type!)}
         </Box>
         {editableRow?.index === index &&
@@ -620,7 +723,8 @@ const MainPositionRow = ({
             <Popover
               open={Boolean(anchorEl)}
               anchorEl={anchorEl}
-              onClose={() => {
+              onClose={(e) => {
+                (e as React.SyntheticEvent).stopPropagation();
                 setEditableRow(null);
                 setAnchorEl(null);
               }}
@@ -635,23 +739,25 @@ const MainPositionRow = ({
                   px: 3,
                 },
               }}>
-              <NewArticleTypeCard
-                onClose={() => {
-                  setEditableRow(null);
-                  setAnchorEl(null);
-                }}
-                onSave={handleSaveArticleType}
-                initialValue={editableRow.values?.article?.type}
-                articleTypes={articleTypes}
-                unitPrice={centsToMoney(
-                  currentCurrency.code,
-                  getValues(`items.${index}.unitAmount.netAmount`),
-                )}
-                packageCost={watchedItem.article?.costPackage}
-                onPackageCostChange={(costPackage) => {
-                  setValue(`items.${index}.article.costPackage`, costPackage);
-                }}
-              />
+              <Box onClick={(e) => e.stopPropagation()}>
+                <NewArticleTypeCard
+                  onClose={() => {
+                    setEditableRow(null);
+                    setAnchorEl(null);
+                  }}
+                  onSave={handleSaveArticleType}
+                  initialValue={editableRow.values?.article?.type}
+                  articleTypes={articleTypes}
+                  unitPrice={centsToMoney(
+                    currentCurrency.code,
+                    getValues(`items.${index}.unitAmount.netAmount`),
+                  )}
+                  packageCost={watchedItem.article?.costPackage}
+                  onPackageCostChange={(costPackage) => {
+                    setValue(`items.${index}.article.costPackage`, costPackage);
+                  }}
+                />
+              </Box>
             </Popover>
           )}
       </TableCell>
@@ -677,7 +783,7 @@ const MainPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() =>
+        onClick={() =>
           handleEditStart(watchedItem, `items.${index}.unitPurchaseAmount`)
         }>
         {editableRow?.index === index &&
@@ -691,6 +797,10 @@ const MainPositionRow = ({
               <NumericFormat
                 {...field}
                 autoFocus
+                getInputRef={unitPurchaseInputRef}
+                onFocus={(e) => {
+                  e.target.setSelectionRange(0, 0);
+                }}
                 value={editableRow?.values?.unitPurchaseAmount?.netAmount || ''}
                 onValueChange={({floatValue}) =>
                   setEditableRow((prev) => ({
@@ -720,10 +830,24 @@ const MainPositionRow = ({
                     </InputAdornment>
                   ),
                   onBlur: () => {
+                    setEditableRow(null);
                     handleSaveMixedPosition(
                       `items.${index}.unitPurchaseAmount`,
                     );
-                    setEditableRow(null);
+                  },
+                  onKeyDown: (
+                    e: React.KeyboardEvent<
+                      HTMLInputElement | HTMLTextAreaElement
+                    >,
+                  ) => {
+                    if (e.key === 'Tab' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSaveMixedPosition(
+                        `items.${index}.unitPurchaseAmount`,
+                      );
+                      handleEditStart(watchedItem, `items.${index}.margin`);
+                      marginInputRef.current?.focus();
+                    }
                   },
                 }}
                 sx={{
@@ -755,20 +879,7 @@ const MainPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      control,
-      currentCurrency,
-      editableRow,
-      getDecimalSeparator,
-      getThousandsSeparator,
-      handleEditStart,
-      handleSaveMixedPosition,
-      index,
-      selectedLng,
-      setEditableRow,
-      formatCurrency,
-      watchedItem,
-    ],
+    [editableRow, index, watchedItem],
   );
 
   const renderMarginCell = useCallback(
@@ -776,25 +887,65 @@ const MainPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() => handleEditStart(watchedItem, 'margin')}>
-        {editableRow?.index === index && editableRow?.field === 'margin' ? (
+        onClick={() => handleEditStart(watchedItem, `items.${index}.margin`)}>
+        {editableRow?.index === index &&
+        editableRow?.field === `items.${index}.margin` ? (
           <NumericFormat
             autoFocus
+            getInputRef={marginInputRef}
+            onFocus={(e) => {
+              setTimeout(() => {
+                e.target.setSelectionRange(0, 0);
+              }, 0);
+            }}
             value={editableRow.values?.margin || ''}
-            onValueChange={({floatValue}) =>
+            onValueChange={({floatValue}) => {
+              const marginValue = floatValue ?? 0;
+
+              const purchaseCents =
+                watchedItem?.unitPurchaseAmount?.netAmount || 0;
+
+              const newSellingPriceCents = Math.round(
+                purchaseCents * (1 + marginValue / 100),
+              );
+
               setEditableRow((prev) => ({
                 ...prev!,
-                values: {...prev!.values, margin: floatValue},
-              }))
-            }
+                values: {
+                  ...prev!.values,
+                  margin: marginValue,
+                  unitAmount: {
+                    ...prev!.values?.unitAmount,
+                    netAmount: newSellingPriceCents,
+                    currency: currentCurrency.code,
+                  },
+                },
+              }));
+
+              setValue(
+                `items.${index}.unitAmount.netAmount`,
+                newSellingPriceCents,
+              );
+              setValue(`items.${index}.margin`, marginValue);
+            }}
             customInput={TextField}
             suffix="%"
             decimalScale={2}
             fixedDecimalScale
             InputProps={{
               onBlur: () => {
-                handleSaveMixedPosition('margin');
                 setEditableRow(null);
+                handleSaveMixedPosition(`items.${index}.margin`);
+              },
+              onKeyDown: (
+                e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+              ) => {
+                if (e.key === 'Tab' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSaveMixedPosition(`items.${index}.margin`);
+                  handleEditStart(watchedItem, `items.${index}.unitAmount`);
+                  unitAmountInputRef.current?.focus();
+                }
               },
             }}
             size="small"
@@ -838,7 +989,7 @@ const MainPositionRow = ({
         )}
       </TableCell>
     ),
-    [editableRow, handleEditStart, handleSaveMixedPosition, index, watchedItem],
+    [editableRow, index, watchedItem],
   );
 
   const renderUnitAmountCell = useCallback(
@@ -846,7 +997,7 @@ const MainPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() =>
+        onClick={() =>
           handleEditStart(watchedItem, `items.${index}.unitAmount`)
         }
         testId={`position-unitAmount-${index}`}>
@@ -859,6 +1010,10 @@ const MainPositionRow = ({
               <NumericFormat
                 {...field}
                 autoFocus
+                getInputRef={unitAmountInputRef}
+                onFocus={(e) => {
+                  e.target.setSelectionRange(0, 0);
+                }}
                 value={editableRow?.values?.unitAmount?.netAmount || ''}
                 onValueChange={({floatValue}) =>
                   setEditableRow((prev) => ({
@@ -887,6 +1042,18 @@ const MainPositionRow = ({
                   onBlur: () => {
                     handleSaveMixedPosition(`items.${index}.unitAmount`);
                     setEditableRow(null);
+                  },
+                  onKeyDown: (
+                    e: React.KeyboardEvent<
+                      HTMLInputElement | HTMLTextAreaElement
+                    >,
+                  ) => {
+                    if (e.key === 'Tab' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSaveMixedPosition(`items.${index}.unitAmount`);
+                      handleEditStart(watchedItem, `items.${index}.quantity`);
+                      quantityInputRef.current?.focus();
+                    }
                   },
                 }}
                 sx={{
@@ -918,16 +1085,7 @@ const MainPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      control,
-      currentCurrency,
-      editableRow,
-      formatCurrency,
-      handleEditStart,
-      handleSaveMixedPosition,
-      index,
-      watchedItem,
-    ],
+    [editableRow, index, watchedItem],
   );
 
   const renderQuantityCell = useCallback(
@@ -935,8 +1093,9 @@ const MainPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() => handleEditStart(watchedItem, 'quantity')}>
-        {editableRow?.index === index && editableRow?.field === 'quantity' ? (
+        onClick={() => handleEditStart(watchedItem, `items.${index}.quantity`)}>
+        {editableRow?.index === index &&
+        editableRow?.field === `items.${index}.quantity` ? (
           <Controller
             name={`items.${index}.quantity`}
             control={control}
@@ -944,6 +1103,10 @@ const MainPositionRow = ({
               <NumericFormat
                 {...field}
                 autoFocus
+                getInputRef={quantityInputRef}
+                onFocus={(e) => {
+                  e.target.setSelectionRange(0, 0);
+                }}
                 value={field.value || 0}
                 onValueChange={({floatValue}) => {
                   setValue(`items.${index}.quantity`, floatValue || 0);
@@ -953,7 +1116,24 @@ const MainPositionRow = ({
                 decimalScale={2}
                 fixedDecimalScale
                 size="small"
-                InputProps={{onBlur: () => setEditableRow(null)}}
+                InputProps={{
+                  onBlur: () => setEditableRow(null),
+                  onKeyDown: (
+                    e: React.KeyboardEvent<
+                      HTMLInputElement | HTMLTextAreaElement
+                    >,
+                  ) => {
+                    if (e.key === 'Tab' && !e.shiftKey) {
+                      e.preventDefault();
+                      setEditableRow({
+                        index,
+                        field: `items.${index}.unitAmount.vatId`,
+                        values: item,
+                      });
+                      vatRef.current?.focus();
+                    }
+                  },
+                }}
                 sx={{
                   width: '100%',
                   '& .MuiInputBase-root': {pr: 0},
@@ -977,15 +1157,7 @@ const MainPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      editableRow,
-      handleEditStart,
-      index,
-      setEditableRow,
-      setValue,
-      watchedItem,
-      control,
-    ],
+    [editableRow, index, watchedItem],
   );
 
   const renderVatIdCell = useCallback(
@@ -993,10 +1165,34 @@ const MainPositionRow = ({
       <TableCell
         noPadding
         align="right"
-        onDoubleClick={() =>
-          setEditableRow({index, field: 'vatId', values: item})
-        }>
-        {editableRow?.index === index && editableRow?.field === 'vatId' ? (
+        onClick={() => {
+          if (
+            !(
+              editableRow?.index === index &&
+              editableRow?.field === `items.${index}.unitAmount.vatId`
+            )
+          ) {
+            setEditableRow({
+              index,
+              field: `items.${index}.unitAmount.vatId`,
+              values: item,
+            });
+            vatRef.current?.focus();
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && !e.shiftKey) {
+            e.preventDefault();
+            handleCellClick({
+              indexPos: index,
+              fieldName: `items.${index}.article.unit`,
+              row: item,
+            });
+            unitRef.current?.focus();
+          }
+        }}>
+        {editableRow?.index === index &&
+        editableRow?.field === `items.${index}.unitAmount.vatId` ? (
           <Controller
             name={`items.${index}.unitAmount.vatId`}
             control={control}
@@ -1008,34 +1204,22 @@ const MainPositionRow = ({
                   size="small"
                   displayEmpty
                   value={field.value || ''}
+                  open={
+                    editableRow?.index === index &&
+                    editableRow?.field === `items.${index}.unitAmount.vatId`
+                  }
+                  onClose={() => setEditableRow(null)}
                   onChange={(event) => {
                     const selectedVatId = event.target.value;
-                    field.onChange(selectedVatId);
-                    const selectedTaxRate = taxRates?.find(
-                      (tax) => tax.id === selectedVatId,
-                    );
-                    const percentage = selectedTaxRate?.percentage || 0;
-                    setValue(
-                      `items.${index}.unitAmount.percentageVat`,
-                      percentage,
-                    );
-                    setValue(`items.${index}.unitAmount.vatId`, selectedVatId);
+                    handleVatChangeForMainRow(selectedVatId);
                     setEditableRow(null);
                   }}
                   onBlur={(event) => {
                     const selectedVatId = event.target.value;
-                    field.onChange(selectedVatId);
-                    const selectedTaxRate = taxRates?.find(
-                      (tax) => tax.id === selectedVatId,
-                    );
-                    const percentage = selectedTaxRate?.percentage || 0;
-                    setValue(
-                      `items.${index}.unitAmount.percentageVat`,
-                      percentage,
-                    );
-                    setValue(`items.${index}.unitAmount.vatId`, selectedVatId);
+                    handleVatChangeForMainRow(selectedVatId);
                     setEditableRow(null);
                   }}
+                  ref={vatRef}
                   renderValue={(value) => {
                     const taxRate = taxRates?.find((tax) => tax.id === value);
                     return taxRate ? `${taxRate.percentage}%` : t('Select VAT');
@@ -1087,16 +1271,7 @@ const MainPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      editableRow,
-      index,
-      control,
-      setEditableRow,
-      setValue,
-      taxRates,
-      t,
-      watchedItem,
-    ],
+    [editableRow, index, taxRates, watchedItem],
   );
 
   const renderUnitCell = useCallback(
@@ -1104,10 +1279,30 @@ const MainPositionRow = ({
       <TableCell
         noPadding
         align="right"
-        onDoubleClick={() =>
-          handleDoubleClick({indexPos: index, fieldName: 'unit', row: item})
-        }>
-        {editableRow?.index === index && editableRow?.field === 'unit' ? (
+        onClick={() => {
+          if (
+            !(
+              editableRow?.index === index &&
+              editableRow?.field === `items.${index}.article.unit`
+            )
+          ) {
+            handleCellClick({
+              indexPos: index,
+              fieldName: `items.${index}.article.unit`,
+              row: item,
+            });
+            unitRef.current?.focus();
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && !e.shiftKey) {
+            e.preventDefault();
+            handleEditStart(watchedItem, `items.${index}.discount`);
+            discountRef.current?.focus();
+          }
+        }}>
+        {editableRow?.index === index &&
+        editableRow?.field === `items.${index}.article.unit` ? (
           <Controller
             name={`items.${index}.article.unit`}
             control={control}
@@ -1122,6 +1317,9 @@ const MainPositionRow = ({
                 selectProps={{
                   ...field,
                   placeholder: t('Select Unit'),
+                  open:
+                    editableRow?.index === index &&
+                    editableRow?.field === `items.${index}.article.unit`,
                   sx: {
                     width: '100%',
                     border: '2px solid #000034',
@@ -1133,29 +1331,27 @@ const MainPositionRow = ({
                     setEditableRow(null);
                   },
                   onBlur: () => setEditableRow(null),
+                  onClose: () => {
+                    setEditableRow(null);
+                  },
                 }}
-                labelId="mixed-position"
+                labelId="unit-field"
               />
             )}
           />
         ) : (
           <Typography
-            sx={{fontSize: '14px', fontWeight: '600', paddingRight: '12px'}}>
+            sx={{
+              fontSize: '14px',
+              fontWeight: '600',
+              paddingRight: '12px',
+            }}>
             {watchedItem.article?.unit ? t(watchedItem.article.unit) : '-'}
           </Typography>
         )}
       </TableCell>
     ),
-    [
-      control,
-      index,
-      editableRow,
-      selectedLng,
-      setEditableRow,
-      setValue,
-      t,
-      watchedItem,
-    ],
+    [index, editableRow, watchedItem, item],
   );
 
   const renderDiscountCell = useCallback(
@@ -1163,8 +1359,9 @@ const MainPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() => handleEditStart(watchedItem, 'discount')}>
-        {editableRow?.index === index && editableRow?.field === 'discount' ? (
+        onClick={() => handleEditStart(watchedItem, `items.${index}.discount`)}>
+        {editableRow?.index === index &&
+        editableRow?.field === `items.${index}.discount` ? (
           <NumericFormat
             value={
               (editableRow.values as EditableQuotationItem)?.discount?.type ===
@@ -1174,7 +1371,11 @@ const MainPositionRow = ({
                 : (editableRow.values as EditableQuotationItem)?.discount
                     ?.percentage
             }
+            getInputRef={discountRef}
             autoFocus
+            onFocus={(e) => {
+              e.target.setSelectionRange(0, 0);
+            }}
             isAllowed={(values) => {
               const {floatValue} = values;
               if (!floatValue) return true;
@@ -1183,7 +1384,7 @@ const MainPositionRow = ({
                 (editableRow.values as EditableQuotationItem).discount?.type ===
                 DiscountType.AMOUNT
                   ? ((watchedItem?.unitAmount?.netAmount ?? 0) *
-                      (watchedItem.quantity || 1)) /
+                      watchedItem.quantity) /
                     100
                   : 100;
               return floatValue <= maxDiscount;
@@ -1209,39 +1410,52 @@ const MainPositionRow = ({
                 <InputAdornment
                   component={IconButton}
                   position="end"
-                  sx={{
-                    py: 2,
-                    mr: 1,
-                    ml: 1,
-                    height: '100%',
-                    bgcolor: 'action.hover',
-                    borderRadius: 0,
-                    '&:hover': {bgcolor: 'action.hover'},
-                    width: '20%',
-                  }}
                   onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const currentDiscount = (
+                      editableRow?.values as EditableQuotationItem
+                    )?.discount;
+                    const newType =
+                      currentDiscount?.type === DiscountType.AMOUNT
+                        ? DiscountType.PERCENTAGE
+                        : DiscountType.AMOUNT;
+
+                    const newDiscount =
+                      newType === DiscountType.AMOUNT
+                        ? {
+                            type: DiscountType.AMOUNT,
+                            amount: currentDiscount?.amount || {
+                              value: 0,
+                              currency: currentCurrency.code,
+                              fractionDigits: currentCurrency.fractionDigits,
+                            },
+                            percentage: 0,
+                          }
+                        : {
+                            type: DiscountType.PERCENTAGE,
+                            percentage: currentDiscount?.percentage || 0,
+                            amount: {
+                              value: 0,
+                              currency: currentCurrency.code,
+                              fractionDigits: currentCurrency.fractionDigits,
+                            },
+                          };
+
+                    setValue(`items.${index}.discount`, newDiscount);
                     setEditableRow((prev) => ({
                       ...prev!,
-                      values: {
-                        ...prev!.values,
-                        discount: {
-                          ...(prev!.values as EditableQuotationItem)?.discount!,
-                          type:
-                            (prev!.values as EditableQuotationItem)?.discount
-                              ?.type === DiscountType.AMOUNT
-                              ? DiscountType.PERCENTAGE
-                              : DiscountType.AMOUNT,
-                        },
-                      },
+                      values: {...prev!.values, discount: newDiscount},
                     }));
                   }}
                   size="small">
-                  {(editableRow.values as EditableQuotationItem)?.discount
-                    ?.type === DiscountType.AMOUNT ? (
+                  {watch(`items.${index}.discount.type`) ===
+                  DiscountType.AMOUNT ? (
                     <PaymentsOutlinedIcon />
                   ) : (
-                    <DiscountPercentIcon />
+                    <DiscountPercentIcon
+                      style={{width: '20px', height: '20px'}}
+                    />
                   )}
                 </InputAdornment>
               ),
@@ -1268,6 +1482,14 @@ const MainPositionRow = ({
                       };
                 setValue(`items.${index}.discount`, sanitizedDiscount);
                 setEditableRow(null);
+              },
+              onKeyDown: (
+                e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+              ) => {
+                if (e.key === 'Tab' && !e.shiftKey) {
+                  e.preventDefault();
+                  setIsActionOpen(true);
+                }
               },
             }}
             onValueChange={(values) => {
@@ -1305,19 +1527,8 @@ const MainPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      editableRow,
-      getDecimalSeparator,
-      getThousandsSeparator,
-      index,
-      setEditableRow,
-      setValue,
-      selectedLng,
-      watchedItem,
-      currentCurrency,
-    ],
+    [editableRow, index, watchedItem, currentCurrency],
   );
-
   const renderTotalPriceCell = useCallback(
     () => (
       <TableCell
@@ -1326,68 +1537,66 @@ const MainPositionRow = ({
         isLast
         lastSticky
         showShadows={showLeftShadow ? 'left' : undefined}
-        sx={{background: '#f7f9fc'}}>
-        <Typography sx={{fontWeight: 600, paddingRight: '12px'}}>
+        sx={{
+          background: '#f7f9fc',
+          paddingLeft: '12px',
+          '& > div': {
+            alignItems: 'center',
+          },
+        }}>
+        <Typography sx={{fontWeight: 600, padding: '0px 12px'}}>
           {formatCurrency(totalPriceExclVatAfterDiscount, {
             currency: currentCurrency.code,
           })}
         </Typography>
+        <Box
+          sx={{borderLeft: '1px solid #e4e5e8'}}
+          onClick={() => {
+            setIsActionOpen(!isActionOpen);
+          }}>
+          <MainPositionActions
+            isMixedType={watchedItem.article?.type === ArticleType.MIX}
+            onCreateMixedPosition={() => {
+              setValue(`items.${index}.article.type`, ArticleType.MIX);
+              const currentConfig =
+                getValues(`items.${index}.subItemsConfig`) || {};
+              setValue(`items.${index}.subItemsConfig`, {
+                ...currentConfig,
+                subItemsVisible: true,
+                priceVisible: true,
+              });
+              setExpandedRows((prev) =>
+                prev.includes(index) ? prev : [...prev, index],
+              );
+              setEditableRow(null);
+              setAnchorEl(null);
+              setIsActionOpen(false);
+            }}
+            onAddSubPosition={() => {
+              onAddSubPosition(index);
+              setIsActionOpen(false);
+            }}
+            onSaveToCatalogue={() => {
+              const itemData = getValues(`items.${index}`);
+              handleSaveToCatalogue(itemData);
+              setIsActionOpen(false);
+            }}
+            onDelete={() => {
+              setOpenDeleteConfirm(true);
+              setIsActionOpen(false);
+            }}
+            isOpen={isActionOpen}
+          />
+        </Box>
       </TableCell>
     ),
     [
-      currentCurrency,
-      formatCurrency,
+      editableRow,
+      expandedRows,
+      index,
       showLeftShadow,
       totalPriceExclVatAfterDiscount,
-    ],
-  );
-
-  const renderActionsCell = useCallback(
-    () => (
-      <TableCell
-        noPadding
-        align="right"
-        width={ACTION_CELL_WIDTH}
-        isLast
-        sx={{background: '#f7f9fc', position: 'sticky'}}>
-        <MainPositionActions
-          isMixedType={watchedItem.article?.type === ArticleType.MIX}
-          onCreateMixedPosition={() => {
-            setValue(`items.${index}.article.type`, ArticleType.MIX);
-            const currentConfig =
-              getValues(`items.${index}.subItemsConfig`) || {};
-            setValue(`items.${index}.subItemsConfig`, {
-              ...currentConfig,
-              subItemsVisible: true,
-              priceVisible: true,
-            });
-            setExpandedRows((prev) =>
-              prev.includes(index) ? prev : [...prev, index],
-            );
-            setEditableRow(null);
-            setAnchorEl(null);
-          }}
-          onAddSubPosition={() => onAddSubPosition(index)}
-          onSaveToCatalogue={() => {
-            const itemData = getValues(`items.${index}`);
-            handleSaveToCatalogue(itemData);
-          }}
-          onDelete={() => setOpenDeleteConfirm(true)}
-        />
-      </TableCell>
-    ),
-    [
-      ACTION_CELL_WIDTH,
-      getValues,
-      index,
-      onAddSubPosition,
-      setEditableRow,
-      setExpandedRows,
-      setAnchorEl,
-      setOpenDeleteConfirm,
-      setValue,
-      watchedItem,
-      handleSaveToCatalogue,
+      isActionOpen,
     ],
   );
 
@@ -1405,7 +1614,6 @@ const MainPositionRow = ({
       {renderUnitCell()}
       {renderDiscountCell()}
       {renderTotalPriceCell()}
-      {renderActionsCell()}
 
       <Confirm
         maxWidth={400}

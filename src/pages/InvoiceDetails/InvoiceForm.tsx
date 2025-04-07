@@ -129,6 +129,7 @@ import {
   invoiceItemToInvoiceItemRecord,
 } from './utils';
 import {Notes} from './Notes/EditNotes';
+import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
 import {
@@ -1971,16 +1972,15 @@ export const InvoiceForm = ({
         alignItems="flex-start"
         wrap="nowrap"
         mb={12}>
-        <Grid container item xs={8} xl={9} rowGap={2} borderRadius={1}>
+        <Grid container item xs={12} rowGap={4} borderRadius={1}>
           {/* ADDRESS INFORMATION */}
           <Grid
-            container
-            item
             xs={12}
             bgcolor="white"
-            p={3}
-            rowGap={2}
-            flexWrap="wrap">
+            rowGap={4}
+            px={3}
+            py={5}
+            borderRadius={1}>
             <Grid item xs={12} display="flex" justifyContent="space-between">
               <Box pb={0.5}>
                 <SectionTitle
@@ -2758,6 +2758,7 @@ export const InvoiceForm = ({
           </Grid>
         </Grid>
       </Grid>
+
       <BottomDrawer
         isOpen={isDrawerOpen}
         isSaving={isCreating || isUpdating}
@@ -2791,6 +2792,15 @@ export const InvoiceForm = ({
               },
             }}
           />
+        }
+        notesSection={
+          <Box>
+            {/* {!isNewInvoice ? (
+              <Notes invoice={invoice!} />
+            ) : (
+              <CreateNotes formik={{...watchedValues, setFieldValue: setValue}} customer={customer} />
+            )} */}
+          </Box>
         }
       />
       {isAddNewCustomerDialogOpen && (

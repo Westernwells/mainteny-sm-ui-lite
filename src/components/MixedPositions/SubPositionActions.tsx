@@ -6,9 +6,10 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 
 interface Props {
   onDelete: () => void;
+  isOpen?: boolean;
 }
 
-const SubPositionActions = ({onDelete}: Props) => {
+const SubPositionActions = ({onDelete, isOpen}: Props) => {
   const {t} = useTranslation();
 
   const options = useMemo<MenuAction[]>(
@@ -22,7 +23,7 @@ const SubPositionActions = ({onDelete}: Props) => {
     [t, onDelete],
   );
 
-  return <TableActionMenu options={options} />;
+  return <TableActionMenu options={options} isOpen={isOpen} />;
 };
 
 export default SubPositionActions;

@@ -22,6 +22,10 @@ import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderType, ServiceOrderView} from './service-order';
 import {Order} from './pagination';
 import {CANCEL_ACTION} from 'models/status';
+import {
+  EditableQuotationSubItemRecord,
+  QuotationSubItemsConfig,
+} from './quotation';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT',
@@ -341,10 +345,14 @@ export interface InvoiceItemRecord {
   article?: ArticleRecord;
   name: string;
   description?: string;
+  unitPurchaseAmount?: AmountRecord;
   unitAmount: AmountRecord;
   quantity: number;
   discount?: Discount;
   payment?: InvoiceItemPaymentRecord;
+  subItemsConfig?: QuotationSubItemsConfig;
+  subItems?: EditableQuotationSubItemRecord[];
+  userSeqNumber?: string;
   additionalInfo?:
     | {
         discount?: Discount;
@@ -591,10 +599,20 @@ export interface InvoiceGeneration {
 export interface InvoiceItemAmount {
   discount: Discount;
   percentageVat?: number;
-  amountBeforeGlobalDiscount: Amount;
+  amountBeforeItemDiscount?: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount?: Amount;
+  payment: InvoiceItemPaymentRecord;
+  subItems: InvoiceSubItemAmount[];
+}
+
+export interface InvoiceSubItemAmount {
+  payment: InvoiceItemPaymentType;
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount: Amount;
   amountAfterItemDiscount: Amount;
   amountAfterGlobalDiscount: Amount;
-  payment: InvoiceItemPaymentRecord;
 }
 
 export interface InvoiceAmountDetail {

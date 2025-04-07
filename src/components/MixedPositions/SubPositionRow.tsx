@@ -28,6 +28,7 @@ import {
   formatCurrency,
   getDecimalSeparator,
   getThousandsSeparator,
+  moneyToCents,
   useCurrentCurrency,
 } from 'utils/currency';
 import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
@@ -38,6 +39,7 @@ import React, {
   SetStateAction,
   useCallback,
   useContext,
+  useRef,
   useState,
 } from 'react';
 import TableCell from 'components/Table/TableCell';
@@ -46,7 +48,6 @@ import NewArticleAutoComplete, {
   getIconByType,
 } from 'components/NewArticleAutocomplete';
 import {calculateMargin, getArticleTypesWithLabels} from 'utils/article-utils';
-import {ACTION_CELL_WIDTH} from 'models/table';
 import {VatView} from 'models/vat';
 import {
   Receipt,
@@ -61,6 +62,10 @@ import {FormInput} from 'components/form/FormInput';
 import {useTheme} from '@mui/material/styles';
 import {sanitizedTextStyles} from 'pages/Articles/Tabs/MixedPositions/MixedPosition.styles';
 import DragHandle from 'components/DragHandle';
+import {DiscountType} from 'models/invoice';
+import {debounce, isEqual} from 'lodash';
+import {getQuotationItemTotalAfterPerItemDiscount} from 'utils/quotation';
+import {useCalculateQuotationAmount} from 'hooks/reactQuery/useQuotation';
 import {EditableRowType} from './PositionTable';
 import SubPositionActions from './SubPositionActions';
 
@@ -103,10 +108,23 @@ const SubPositionRow = ({
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
-  const {getValues} = formMethods;
+  const {getValues, watch} = formMethods;
+
   const {language: selectedLng} = useContext(LanguageContext);
   const currentCurrency = useCurrentCurrency();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const [isActionOpen, setIsActionOpen] = useState(false);
+
+  const {mutateAsync: calculateQuotationAmount} = useCalculateQuotationAmount();
+
+  const inputRef = useRef(null);
+  const unitPurchaseInputRef = useRef<HTMLInputElement>(null);
+  const marginInputRef = useRef<HTMLInputElement>(null);
+  const unitAmountInputRef = useRef<HTMLInputElement>(null);
+  const quantityInputRef = useRef<HTMLInputElement>(null);
+  const vatRef = useRef<HTMLInputElement>(null);
+  const unitRef = useRef<HTMLInputElement>(null);
 
   const pathBase = `items.${parentIndex}.subItems.${subIndex}`;
 
@@ -130,8 +148,13 @@ const SubPositionRow = ({
     pIndex: number,
     sIndex: number,
   ) => {
-    const purchaseNetAmountCents = row.unitPurchaseAmount?.netAmount ?? 0;
-    const sellingNetAmountCents = row.unitAmount?.netAmount ?? 0;
+    const purchaseNetAmountCents =
+      watch(
+        `items.${pIndex}.subItems.${sIndex}.unitPurchaseAmount.netAmount`,
+      ) ?? 0;
+
+    const sellingNetAmountCents =
+      watch(`items.${pIndex}.subItems.${sIndex}.unitAmount.netAmount`) ?? 0;
 
     if (field === 'margin') {
       const margin = calculateMargin(
@@ -149,7 +172,7 @@ const SubPositionRow = ({
           margin,
         },
       });
-    } else if (field === 'unitPurchaseAmount') {
+    } else if (field === `${pathBase}.unitPurchaseAmount.netAmount`) {
       const displayValue = {
         ...row.unitPurchaseAmount,
         netAmount: (purchaseNetAmountCents ?? 0) / 100,
@@ -171,7 +194,7 @@ const SubPositionRow = ({
           },
         },
       });
-    } else if (field === 'unitSellingAmount') {
+    } else if (field === `${pathBase}.unitAmount.netAmount`) {
       const displayValue = {
         ...row.unitAmount,
         netAmount: sellingNetAmountCents / 100,
@@ -192,6 +215,133 @@ const SubPositionRow = ({
         },
       });
     }
+  };
+
+  const totalPriceExclVatAfterDiscount =
+    getQuotationItemTotalAfterPerItemDiscount({
+      positionItem: {
+        ...subItem,
+        discount:
+          getValues(`items.${parentIndex}.discount.type`) ===
+          DiscountType.PERCENTAGE
+            ? watch(`items.${parentIndex}.discount`)
+            : {
+                type: DiscountType.PERCENTAGE,
+                percentage:
+                  (moneyToCents(
+                    currentCurrency.code,
+                    watch(`items.${parentIndex}.discount.amount.value`),
+                  ) /
+                    (watch(`items.${parentIndex}.unitAmount.netAmount`) ?? 0)) *
+                  100,
+              },
+      },
+    });
+
+  const recalcInvoice = useCallback(
+    debounce(async () => {
+      try {
+        const invoiceDetail = await calculateQuotationAmount({
+          data: {
+            currency: currentCurrency.code,
+            items: watch('items').map((item) => ({
+              id: undefined,
+              article: {
+                id: undefined,
+                name: item.article?.name,
+                externalId: item.article?.externalId,
+                type: item.article?.type,
+                unit: item.article?.unit,
+                unitSellingAmount: item.article?.unitSellingAmount,
+                unitPurchaseAmount: item.article?.unitPurchaseAmount,
+                costPackage: item.article?.costPackage,
+              },
+              name: item.name,
+              description: item.description,
+              unitAmount: {
+                currency: item.unitAmount?.currency || currentCurrency.code,
+                netAmount: item.unitAmount?.netAmount || 0,
+                percentageVat: item.unitAmount?.percentageVat || 0,
+                vatId: item.unitAmount?.vatId || '',
+                vatName: item.unitAmount?.vatName || '',
+              },
+              quantity: item.quantity || 0,
+              discount: {
+                ...item.discount,
+                type: item.discount?.type!,
+                amount: {
+                  ...item.discount?.amount,
+                  value: (item.discount?.amount?.value ?? 0) * 100,
+                  currency:
+                    item.discount?.amount?.currency || currentCurrency.code,
+                },
+              },
+              payment: undefined,
+              subItemsConfig: item.subItemsConfig,
+              subItems: item?.subItems?.map((sub) => ({
+                article: {
+                  id: undefined,
+                  name: sub.article?.name,
+                  externalId: sub.article?.externalId,
+                  type: sub.article?.type,
+                  unit: sub.article?.unit,
+                  unitSellingAmount: sub.article?.unitSellingAmount,
+                  unitPurchaseAmount: sub.article?.unitPurchaseAmount,
+                  costPackage: sub.article?.costPackage,
+                },
+                id: undefined,
+                name: sub.name,
+                unitPurchaseAmount: sub.unitPurchaseAmount,
+                unitAmount: sub.unitAmount,
+                quantity: sub.quantity,
+                description: sub.description,
+                userSeqNumber: sub.userSeqNumber,
+              })),
+              userSeqNumber: item.userSeqNumber,
+            })),
+            globalDiscount: watch('discount') || {
+              type: DiscountType.AMOUNT,
+              amount: {
+                value: 0,
+                currency: currentCurrency.code,
+                fractionDigits: currentCurrency.fractionDigits,
+              },
+              percentage: 0,
+            },
+          },
+        });
+
+        invoiceDetail.items.forEach((itemDetail, index) => {
+          const newAmount = itemDetail.amountBeforeItemDiscount;
+          const currentAmount = watch(`items.${index}.unitAmount`);
+          if (!isEqual(newAmount, currentAmount)) {
+            setValue(`items.${index}.unitAmount`, newAmount);
+          }
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }, 300),
+    [calculateQuotationAmount, currentCurrency, setValue, watch],
+  );
+
+  const updateMainUnitPurchaseAmount = () => {
+    const parentPath = `items.${parentIndex}`;
+
+    const subItemsPath = `${parentPath}.subItems` as Path<QuotationFormData>;
+
+    const subItems =
+      (getValues(subItemsPath) as EditableQuotationSubItemRecord[]) || [];
+
+    const totalNetAmount = subItems.reduce(
+      (sum, sub) => sum + (sub.unitPurchaseAmount?.netAmount || 0),
+      0,
+    );
+
+    setValue(
+      `${parentPath}.unitPurchaseAmount.netAmount` as Path<QuotationFormData>,
+      totalNetAmount,
+    );
   };
 
   const handleSubPositionMarginChange = (
@@ -238,19 +388,23 @@ const SubPositionRow = ({
     const path =
       `items.${pIndex}.subItems.${sIndex}` as Path<QuotationFormData>;
 
-    if (field === 'unitPurchaseAmount') {
+    if (field === `${path}.unitPurchaseAmount.netAmount`) {
       const newAmount =
         editableSubRow.values?.unitPurchaseAmount?.netAmount ?? 0;
       setValue(
         `${path}.unitPurchaseAmount.netAmount` as Path<QuotationFormData>,
         Math.round(newAmount * 100),
       );
-    } else if (field === 'unitSellingAmount') {
+      recalcInvoice();
+      updateMainUnitPurchaseAmount();
+    } else if (field === `${path}.unitAmount.netAmount`) {
       const newAmount = editableSubRow.values?.unitAmount?.netAmount ?? 0;
       setValue(
         `${path}.unitAmount.netAmount` as Path<QuotationFormData>,
         Math.round(newAmount * 100),
       );
+
+      recalcInvoice();
     } else if (field === 'margin') {
       const marginValue = editableSubRow.values?.margin ?? 0;
       const purchaseNetAmount = Number(
@@ -267,6 +421,13 @@ const SubPositionRow = ({
         `${path}.unitAmount.netAmount` as Path<QuotationFormData>,
         Math.round(newSellingPrice),
       );
+      recalcInvoice();
+    } else if (field === `${path}.quantity`) {
+      setValue(
+        `${pathBase}.quantity` as Path<QuotationFormData>,
+        editableSubRow.values?.quantity || 0,
+      );
+      recalcInvoice();
     }
 
     setEditableSubRow(null);
@@ -281,18 +442,27 @@ const SubPositionRow = ({
     if (isFreeText) {
       setValue(`${pathBase}.article.name` as Path<QuotationFormData>, name);
     } else {
-      setValue(
-        `${pathBase}.article` as Path<QuotationFormData>,
-        selectedArticle,
+      // Override the VAT fields so that the new sub position inherits the main position's VAT
+
+      const selectedUnitAmount = selectedArticle.unitSellingAmount;
+      const mainVatId = getValues(`items.${parentIndex}.unitAmount.vatId`);
+      const mainVatPercentage = getValues(
+        `items.${parentIndex}.unitAmount.percentageVat`,
       );
+
+      setValue(`${pathBase}.article` as Path<QuotationFormData>, {
+        ...selectedArticle,
+        costPackage: selectedArticle.additionalInfo?.costPackage,
+      });
       setValue(
         `${pathBase}.unitPurchaseAmount` as Path<QuotationFormData>,
         selectedArticle.unitPurchaseAmount,
       );
-      setValue(
-        `${pathBase}.unitAmount` as Path<QuotationFormData>,
-        selectedArticle.unitSellingAmount,
-      );
+      setValue(`${pathBase}.unitAmount` as Path<QuotationFormData>, {
+        ...selectedUnitAmount,
+        vatId: mainVatId,
+        percentageVat: mainVatPercentage,
+      });
       setValue(`${pathBase}.quantity` as Path<QuotationFormData>, 1);
       setValue(
         `${pathBase}.description` as Path<QuotationFormData>,
@@ -301,6 +471,8 @@ const SubPositionRow = ({
     }
 
     setEditableSubRow(null);
+    updateMainUnitPurchaseAmount();
+    recalcInvoice();
   };
 
   const updateVatForAllRelatedRows = useCallback(
@@ -348,6 +520,21 @@ const SubPositionRow = ({
     });
   };
 
+  const handleArticleTypeClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    if (
+      editableSubRow?.parentIndex === parentIndex &&
+      editableSubRow?.subIndex === subIndex &&
+      editableSubRow?.field === `${pathBase}.article.type`
+    ) {
+      setEditableSubRow(null);
+      setAnchorEl(null);
+    } else {
+      handleEditStart(`${pathBase}.article.type`);
+      setAnchorEl(e.currentTarget);
+    }
+  };
+
   const renderDragCell = useCallback(
     () => (
       <TableCell
@@ -366,8 +553,8 @@ const SubPositionRow = ({
       <TableCell
         align="left"
         noPadding
-        onDoubleClick={() => handleEditStart('userSeqNumber')}
-        sx={{width: '48px'}}>
+        onClick={() => handleEditStart('userSeqNumber')}
+        sx={{maxWidth: '58px'}}>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
         editableSubRow?.field === 'userSeqNumber' ? (
@@ -375,6 +562,10 @@ const SubPositionRow = ({
             containerStyles={{width: '100%'}}
             fieldProps={{
               autoFocus: true,
+              onFocus: (e) => {
+                e.target.setSelectionRange(0, 0);
+              },
+              ref: inputRef,
               value: editableSubRow?.values?.userSeqNumber || '',
               onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
                 setEditableSubRow((prev) => ({
@@ -382,11 +573,17 @@ const SubPositionRow = ({
                   values: {...prev!.values, userSeqNumber: e.target.value},
                 })),
               onBlur: () => {
-                setValue(
-                  `${pathBase}.userSeqNumber` as Path<QuotationFormData>,
-                  editableSubRow.values?.userSeqNumber,
-                );
                 setEditableSubRow(null);
+              },
+              onKeyDown: (e) => {
+                if (e.key === 'Tab' && !e.shiftKey) {
+                  e.preventDefault();
+                  setValue(
+                    `${pathBase}.userSeqNumber` as Path<QuotationFormData>,
+                    editableSubRow.values?.userSeqNumber,
+                  );
+                  handleEditStart(`${pathBase}.name`);
+                }
               },
               sx: {
                 '& .Mui-focused': {
@@ -397,9 +594,23 @@ const SubPositionRow = ({
             }}
           />
         ) : (
-          <Typography sx={{paddingLeft: '12px', fontSize: '14px'}}>
-            {subItem?.userSeqNumber || `${parentIndex + 1}.${subIndex + 1}`}
-          </Typography>
+          <Tooltip
+            title={
+              subItem?.userSeqNumber || `${parentIndex + 1}.${subIndex + 1}`
+            }
+            arrow
+            placement="top">
+            <Typography
+              sx={{
+                paddingLeft: '12px',
+                fontSize: '14px',
+                textWrap: 'wrap',
+                textOverflow: 'ellipsis',
+                overflow: 'auto',
+              }}>
+              {subItem?.userSeqNumber || `${parentIndex + 1}.${subIndex + 1}`}
+            </Typography>
+          </Tooltip>
         )}
       </TableCell>
     ),
@@ -418,7 +629,7 @@ const SubPositionRow = ({
     () => (
       <TableCell
         noPadding
-        onDoubleClick={() => handleEditStart(`${pathBase}.name`)}
+        onClick={() => handleEditStart(`${pathBase}.name`)}
         showShadows={showRightShadow ? 'right' : undefined}
         isFirst
         sx={{width: '328px', marginLeft: '-10em'}}>
@@ -496,28 +707,12 @@ const SubPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      editableSubRow,
-      handleArticleSelection,
-      handleEditStart,
-      onDescriptionClick,
-      parentIndex,
-      showRightShadow,
-      subIndex,
-      subItem,
-      pathBase,
-    ],
+    [editableSubRow, parentIndex, showRightShadow, subIndex, subItem, pathBase],
   );
 
   const renderArticleTypeCell = useCallback(
     () => (
-      <TableCell
-        align="center"
-        noPadding
-        onDoubleClick={(e) => {
-          handleEditStart(`${pathBase}.article.type`);
-          setAnchorEl(e.currentTarget);
-        }}>
+      <TableCell align="center" noPadding onClick={handleArticleTypeClick}>
         <Box
           sx={{
             width: '100%',
@@ -533,7 +728,19 @@ const SubPositionRow = ({
                 ? `2px solid ${theme.palette.primary.main}`
                 : 'none',
           }}
-          tabIndex={0}>
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Tab' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubPositionEditStart(
+                subItem,
+                'unitPurchaseAmount',
+                parentIndex,
+                subIndex,
+              );
+              unitPurchaseInputRef.current?.focus();
+            }
+          }}>
           {getIconByType(subItem?.article?.type!)}
         </Box>
         {editableSubRow?.parentIndex === parentIndex &&
@@ -542,7 +749,8 @@ const SubPositionRow = ({
             <Popover
               open={Boolean(anchorEl)}
               anchorEl={anchorEl}
-              onClose={() => {
+              onClose={(e) => {
+                (e as React.SyntheticEvent).stopPropagation();
                 setEditableSubRow(null);
                 setAnchorEl(null);
               }}
@@ -557,25 +765,28 @@ const SubPositionRow = ({
                   px: 3,
                 },
               }}>
-              <NewArticleTypeCard
-                onClose={() => {
-                  setEditableSubRow(null);
-                  setAnchorEl(null);
-                }}
-                onSave={(newType) => {
-                  setValue(
-                    `${pathBase}.article.type` as Path<QuotationFormData>,
-                    newType,
-                    {shouldValidate: true, shouldDirty: true},
-                  );
-                  setEditableSubRow(null);
-                  setAnchorEl(null);
-                }}
-                initialValue={
-                  editableSubRow?.values?.article?.type || ArticleType.LABOR
-                }
-                articleTypes={articleTypes}
-              />
+              {/* Wrap popover content to stop propagation */}
+              <Box onClick={(e) => e.stopPropagation()}>
+                <NewArticleTypeCard
+                  onClose={() => {
+                    setEditableSubRow(null);
+                    setAnchorEl(null);
+                  }}
+                  onSave={(newType) => {
+                    setValue(
+                      `${pathBase}.article.type` as Path<QuotationFormData>,
+                      newType,
+                      {shouldValidate: true, shouldDirty: true},
+                    );
+                    setEditableSubRow(null);
+                    setAnchorEl(null);
+                  }}
+                  initialValue={
+                    editableSubRow?.values?.article?.type || ArticleType.LABOR
+                  }
+                  articleTypes={articleTypes}
+                />
+              </Box>
             </Popover>
           )}
       </TableCell>
@@ -585,10 +796,7 @@ const SubPositionRow = ({
       articleTypes,
       editableSubRow,
       parentIndex,
-      setEditableSubRow,
-      setValue,
       subItem,
-      theme.palette.primary.main,
       pathBase,
       subIndex,
     ],
@@ -599,17 +807,17 @@ const SubPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() =>
+        onClick={() =>
           handleSubPositionEditStart(
             subItem,
-            'unitPurchaseAmount',
+            `${pathBase}.unitPurchaseAmount.netAmount`,
             parentIndex,
             subIndex,
           )
         }>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
-        editableSubRow?.field === 'unitPurchaseAmount' ? (
+        editableSubRow?.field === `${pathBase}.unitPurchaseAmount.netAmount` ? (
           <Controller
             name={
               `${pathBase}.unitPurchaseAmount.netAmount` as Path<QuotationFormData>
@@ -619,6 +827,10 @@ const SubPositionRow = ({
               <NumericFormat
                 {...field}
                 autoFocus
+                getInputRef={unitPurchaseInputRef}
+                onFocus={(e) => {
+                  e.target.setSelectionRange(0, 0);
+                }}
                 value={
                   editableSubRow?.values?.unitPurchaseAmount?.netAmount || 0
                 }
@@ -648,8 +860,29 @@ const SubPositionRow = ({
                     </InputAdornment>
                   ),
                   onBlur: () => {
-                    handleSubPositionSave('unitPurchaseAmount');
+                    handleSubPositionSave(
+                      `${pathBase}.unitPurchaseAmount.netAmount`,
+                    );
                     setEditableSubRow(null);
+                  },
+                  onKeyDown: (
+                    e: React.KeyboardEvent<
+                      HTMLInputElement | HTMLTextAreaElement
+                    >,
+                  ) => {
+                    if (e.key === 'Tab' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubPositionSave(
+                        `${pathBase}.unitPurchaseAmount.netAmount`,
+                      );
+                      handleSubPositionEditStart(
+                        subItem,
+                        `margin`,
+                        parentIndex,
+                        subIndex,
+                      );
+                      marginInputRef.current?.focus();
+                    }
                   },
                 }}
                 sx={{
@@ -668,8 +901,7 @@ const SubPositionRow = ({
             )}
           />
         ) : (
-          <Typography
-            sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
+          <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>
             {formatCurrency(
               centsToMoney(
                 currentCurrency.code,
@@ -681,20 +913,7 @@ const SubPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      control,
-      currentCurrency,
-      editableSubRow,
-      getDecimalSeparator,
-      getThousandsSeparator,
-      handleSubPositionEditStart,
-      handleSubPositionSave,
-      selectedLng,
-      setEditableSubRow,
-      subItem,
-      formatCurrency,
-      pathBase,
-    ],
+    [control, currentCurrency, editableSubRow, selectedLng, subItem, pathBase],
   );
 
   const renderMarginCell = useCallback(
@@ -702,7 +921,7 @@ const SubPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() =>
+        onClick={() =>
           handleSubPositionEditStart(subItem, 'margin', parentIndex, subIndex)
         }>
         {editableSubRow?.parentIndex === parentIndex &&
@@ -710,6 +929,12 @@ const SubPositionRow = ({
         editableSubRow?.field === 'margin' ? (
           <NumericFormat
             autoFocus
+            getInputRef={marginInputRef}
+            onFocus={(e) => {
+              setTimeout(() => {
+                e.target.setSelectionRange(0, 0);
+              }, 0);
+            }}
             value={editableSubRow.values?.margin || 0}
             onValueChange={({floatValue}) =>
               handleSubPositionMarginChange(
@@ -726,6 +951,21 @@ const SubPositionRow = ({
               onBlur: () => {
                 handleSubPositionSave('margin');
                 setEditableSubRow(null);
+              },
+              onKeyDown: (
+                e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+              ) => {
+                if (e.key === 'Tab' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubPositionSave('margin');
+                  handleSubPositionEditStart(
+                    subItem,
+                    `${pathBase}.unitAmount.netAmount`,
+                    parentIndex,
+                    subIndex,
+                  );
+                  unitAmountInputRef.current?.focus();
+                }
               },
             }}
             size="small"
@@ -748,8 +988,9 @@ const SubPositionRow = ({
               const isEditing =
                 editableSubRow?.parentIndex === parentIndex &&
                 editableSubRow?.subIndex === subIndex &&
-                (editableSubRow?.field === 'unitPurchaseAmount' ||
-                  editableSubRow?.field === 'unitSellingAmount');
+                (editableSubRow?.field ===
+                  `${pathBase}.unitPurchaseAmount.netAmount` ||
+                  editableSubRow?.field === `${pathBase}.unitAmount.netAmount`);
               const purchaseAmount = isEditing
                 ? editableSubRow?.values?.unitPurchaseAmount?.netAmount || 0
                 : purchaseNetAmountCents / 100;
@@ -765,16 +1006,7 @@ const SubPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      editableSubRow,
-      currentCurrency,
-      handleSubPositionEditStart,
-      handleSubPositionMarginChange,
-      handleSubPositionSave,
-      parentIndex,
-      subIndex,
-      subItem,
-    ],
+    [editableSubRow, currentCurrency, parentIndex, subIndex, subItem],
   );
 
   const renderUnitSellingAmountCell = useCallback(
@@ -782,17 +1014,17 @@ const SubPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() =>
+        onClick={() =>
           handleSubPositionEditStart(
             subItem,
-            'unitSellingAmount',
+            `${pathBase}.unitAmount.netAmount`,
             parentIndex,
             subIndex,
           )
         }>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
-        editableSubRow?.field === 'unitSellingAmount' ? (
+        editableSubRow?.field === `${pathBase}.unitAmount.netAmount` ? (
           <Controller
             name={`${pathBase}.unitAmount.netAmount` as Path<QuotationFormData>}
             control={control}
@@ -800,6 +1032,10 @@ const SubPositionRow = ({
               <NumericFormat
                 {...field}
                 autoFocus
+                getInputRef={unitAmountInputRef}
+                onFocus={(e) => {
+                  e.target.setSelectionRange(0, 0);
+                }}
                 value={editableSubRow?.values?.unitAmount?.netAmount || 0}
                 onValueChange={({floatValue}) =>
                   setEditableSubRow((prev) => ({
@@ -827,8 +1063,20 @@ const SubPositionRow = ({
                     </InputAdornment>
                   ),
                   onBlur: () => {
-                    handleSubPositionSave('unitSellingAmount');
+                    handleSubPositionSave(`${pathBase}.unitAmount.netAmount`);
                     setEditableSubRow(null);
+                  },
+                  onKeyDown: (
+                    e: React.KeyboardEvent<
+                      HTMLInputElement | HTMLTextAreaElement
+                    >,
+                  ) => {
+                    if (e.key === 'Tab' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubPositionSave(`${pathBase}.unitAmount.netAmount`);
+                      handleEditStart('quantity');
+                      quantityInputRef.current?.focus();
+                    }
                   },
                 }}
                 sx={{
@@ -859,16 +1107,7 @@ const SubPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      control,
-      currentCurrency,
-      editableSubRow,
-      formatCurrency,
-      handleSubPositionEditStart,
-      handleSubPositionSave,
-      pathBase,
-      subItem,
-    ],
+    [editableSubRow, pathBase, subItem],
   );
 
   const renderQuantityCell = useCallback(
@@ -876,12 +1115,16 @@ const SubPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() => handleEditStart('quantity')}>
+        onClick={() => handleEditStart('quantity')}>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
         editableSubRow?.field === 'quantity' ? (
           <NumericFormat
             autoFocus
+            getInputRef={quantityInputRef}
+            onFocus={(e) => {
+              e.target.setSelectionRange(0, 0);
+            }}
             value={editableSubRow.values?.quantity || 0}
             onValueChange={({floatValue}) =>
               setEditableSubRow((prev) => ({
@@ -896,12 +1139,18 @@ const SubPositionRow = ({
             size="small"
             InputProps={{
               onBlur: () => {
-                setValue(
-                  `${pathBase}.quantity` as Path<QuotationFormData>,
-                  editableSubRow.values?.quantity || 0,
-                );
-                handleSubPositionSave('quantity');
+                handleSubPositionSave(`${pathBase}.quantity`);
                 setEditableSubRow(null);
+              },
+              onKeyDown: (
+                e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+              ) => {
+                if (e.key === 'Tab' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubPositionSave(`${pathBase}.quantity`);
+                  handleEditStart('vatId');
+                  vatRef.current?.focus();
+                }
               },
             }}
             sx={{
@@ -921,16 +1170,7 @@ const SubPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      editableSubRow,
-      handleEditStart,
-      handleSubPositionSave,
-      parentIndex,
-      setValue,
-      subItem,
-      pathBase,
-      subIndex,
-    ],
+    [editableSubRow, parentIndex, subItem, pathBase, subIndex],
   );
 
   const renderVatIdCell = useCallback(
@@ -938,7 +1178,25 @@ const SubPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() => handleEditStart('vatId')}>
+        onClick={() => {
+          if (
+            !(
+              editableSubRow?.parentIndex === parentIndex &&
+              editableSubRow?.subIndex === subIndex &&
+              editableSubRow?.field === 'vatId'
+            )
+          ) {
+            handleEditStart('vatId');
+            vatRef.current?.focus();
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && !e.shiftKey) {
+            e.preventDefault();
+            handleEditStart('unit');
+            unitRef.current?.focus();
+          }
+        }}>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
         editableSubRow?.field === 'vatId' ? (
@@ -953,6 +1211,12 @@ const SubPositionRow = ({
                   size="small"
                   displayEmpty
                   value={field.value || ''}
+                  open={
+                    editableSubRow?.parentIndex === parentIndex &&
+                    editableSubRow?.subIndex === subIndex &&
+                    editableSubRow?.field === 'vatId'
+                  }
+                  onClose={() => setEditableSubRow(null)}
                   onChange={(event) => {
                     const selectedVatId = event.target.value;
                     field.onChange(selectedVatId);
@@ -967,6 +1231,7 @@ const SubPositionRow = ({
                     setEditableSubRow(null);
                   }}
                   onBlur={() => setEditableSubRow(null)}
+                  ref={vatRef}
                   renderValue={(value) => {
                     const taxRate = taxRates?.find((tax) => tax.id === value);
                     return taxRate ? `${taxRate.percentage}%` : t('Select VAT');
@@ -1018,11 +1283,8 @@ const SubPositionRow = ({
       </TableCell>
     ),
     [
-      control,
       parentIndex,
       subIndex,
-      setEditableSubRow,
-      t,
       taxRates,
       updateVatForAllRelatedRows,
       editableSubRow,
@@ -1036,7 +1298,23 @@ const SubPositionRow = ({
       <TableCell
         align="right"
         noPadding
-        onDoubleClick={() => handleEditStart('unit')}>
+        onClick={() => {
+          if (
+            !(
+              editableSubRow?.parentIndex === parentIndex &&
+              editableSubRow?.subIndex === subIndex &&
+              editableSubRow?.field === 'unit'
+            )
+          ) {
+            handleEditStart('unit');
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Tab' && !e.shiftKey) {
+            e.preventDefault();
+            setIsActionOpen(true);
+          }
+        }}>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
         editableSubRow?.field === 'unit' ? (
@@ -1061,6 +1339,10 @@ const SubPositionRow = ({
                     ? field.value
                     : '',
                   placeholder: t('Select Unit'),
+                  open:
+                    editableSubRow?.parentIndex === parentIndex &&
+                    editableSubRow?.subIndex === subIndex &&
+                    editableSubRow?.field === 'unit',
                   sx: {
                     width: '100%',
                     border: '2px solid #000034',
@@ -1075,6 +1357,7 @@ const SubPositionRow = ({
                     setEditableSubRow(null);
                   },
                   onBlur: () => setEditableSubRow(null),
+                  onClose: () => setEditableSubRow(null),
                 }}
                 labelId={`subposition-unit-${parentIndex}-${subIndex}`}
               />
@@ -1087,18 +1370,7 @@ const SubPositionRow = ({
         )}
       </TableCell>
     ),
-    [
-      control,
-      parentIndex,
-      selectedLng,
-      setEditableSubRow,
-      setValue,
-      subItem,
-      t,
-      pathBase,
-      subIndex,
-      editableSubRow,
-    ],
+    [parentIndex, subItem, pathBase, subIndex, editableSubRow],
   );
 
   const renderTotalPriceCell = useCallback(
@@ -1107,38 +1379,52 @@ const SubPositionRow = ({
         align="right"
         noPadding
         isLast
+        lastSticky
+        sx={{
+          paddingLeft: '12px',
+          '& > div': {
+            alignItems: 'center',
+          },
+        }}
         showShadows={showLeftShadow ? 'left' : undefined}>
-        <Typography sx={{paddingRight: '12px', position: 'sticky'}}>
+        <Typography sx={{padding: '0px 12px', position: 'sticky'}}>
           {formatCurrency(
-            centsToMoney(
-              currentCurrency.code,
-              (Number(subItem?.unitAmount?.netAmount) || 0) *
-                (Number(subItem?.quantity) || 1),
-            ),
-            {currency: currentCurrency.code},
+            editableSubRow?.parentIndex === parentIndex &&
+              editableSubRow?.subIndex === subIndex &&
+              editableSubRow.field === `${pathBase}.unitAmount.netAmount`
+              ? totalPriceExclVatAfterDiscount * 100
+              : totalPriceExclVatAfterDiscount,
+            {
+              currency: currentCurrency.code,
+            },
           )}
         </Typography>
+        <Box
+          sx={{borderLeft: '1px solid #e4e5e8'}}
+          onClick={() => {
+            setIsActionOpen(!isActionOpen);
+          }}>
+          <SubPositionActions
+            onDelete={() => {
+              onRemoveSubPosition(parentIndex, subIndex);
+              setIsActionOpen(false);
+              recalcInvoice();
+              updateMainUnitPurchaseAmount();
+            }}
+            isOpen={isActionOpen}
+          />
+        </Box>
       </TableCell>
     ),
-    [currentCurrency, formatCurrency, subItem, showLeftShadow],
-  );
-
-  const renderActionsCell = useCallback(
-    () => (
-      <TableCell
-        noPadding
-        align="right"
-        width={ACTION_CELL_WIDTH}
-        isLast
-        sx={{position: 'sticky'}}>
-        <SubPositionActions
-          onDelete={() => {
-            onRemoveSubPosition(parentIndex, subIndex);
-          }}
-        />
-      </TableCell>
-    ),
-    [onRemoveSubPosition],
+    [
+      currentCurrency,
+      formatCurrency,
+      subItem,
+      showLeftShadow,
+      watch,
+      onRemoveSubPosition,
+      isActionOpen,
+    ],
   );
 
   return (
@@ -1157,7 +1443,6 @@ const SubPositionRow = ({
         <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>-</Typography>
       </TableCell>
       {renderTotalPriceCell()}
-      {renderActionsCell()}
     </>
   );
 };
