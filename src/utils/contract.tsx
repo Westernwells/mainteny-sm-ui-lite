@@ -24,7 +24,7 @@ import {
   UpdateContractComponents,
 } from 'models/contract';
 import {toDate, toRestDate} from 'utils/datetime';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {OptionsObject, SnackbarKey, SnackbarMessage} from 'notistack';
 import {formatCurrency} from 'utils/currency';
 import {Currency} from 'models/misc';
@@ -262,7 +262,10 @@ export const convertExtendedRecordsToContractComponentRecords = (
   });
 
 export const parsElevatorRecourses = (
-  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
 ) =>
   elevatorResource?.map((elevator) => ({
     elevatorId: elevator.id,
@@ -282,26 +285,33 @@ export const parsElevatorRecourses = (
   }));
 
 export const mergeElevators = (
-  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
   elevatorsFromRow: ContractComponentView,
 ) => {
-  const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
-    (map, elevator) => {
-      map[elevator.elevatorId] = elevator;
-      return map;
-    },
-    {} as Record<string, ContractServiceFormElevator>,
-  );
+  const existingElevators = elevatorsFromRow.additionalInfo?.elevators || [];
+
+  const infoMap = existingElevators.reduce((map, elevator) => {
+    map[elevator.elevatorId] = elevator;
+    return map;
+  }, {} as Record<string, ContractServiceFormElevator>);
+
+  const hasExisting = existingElevators.length > 0;
 
   return parsElevatorRecourses(elevatorResource || []).map((elevator) => ({
     ...elevator,
     ...(infoMap[elevator.elevatorId] || {}),
-    isChecked: Boolean(infoMap[elevator.elevatorId]),
+    isChecked: hasExisting ? Boolean(infoMap[elevator.elevatorId]) : true,
   }));
 };
 
 export const getElevatorDataByElevator = (
-  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
   elevatorsFromRow: ContractComponentView,
 ) => {
   const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
