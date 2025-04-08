@@ -85,6 +85,12 @@ export const mapInvoiceStatus = (invoiceStatus: InvoiceStatusView) => {
       return InvoiceStatus.CANCELLED;
     case InvoiceStatusView.CREDITED:
       return InvoiceStatus.CREDITED;
+    case InvoiceStatusView.OVERDUE_NOTICE_1:
+      return InvoiceStatus.OVERDUE_NOTICE_1;
+    case InvoiceStatusView.OVERDUE_NOTICE_2:
+      return InvoiceStatus.OVERDUE_NOTICE_2;
+    case InvoiceStatusView.OVERDUE_NOTICE_3:
+      return InvoiceStatus.OVERDUE_NOTICE_3;
     default:
       return InvoiceStatus.DRAFT;
   }
@@ -564,6 +570,7 @@ export const getBalanceAmount = (invoice: InvoiceView) => {
     10 ** invoice.totalAmount.fractionDigits!;
   return totalGross - paidSum;
 };
+
 export function transformPropertyOwnerViewToSimpleView(
   propertyOwner?: PropertyOwnerView,
 ): PropertyOwnerSimpleView {
@@ -742,7 +749,8 @@ export const getInvoiceStatusStyles = (
     | 'action.active'
     | 'primary.mainLight'
     | 'warning.dark'
-    | 'info.main';
+    | 'info.main'
+    | 'purple.main';
 } => {
   switch (status) {
     case InvoiceStatus.PAID:
@@ -759,6 +767,12 @@ export const getInvoiceStatusStyles = (
       return {label: InvoiceStatusView.CANCELLED, color: 'warning.dark'};
     case InvoiceStatus.CREDITED:
       return {label: InvoiceStatusView.CREDITED, color: 'info.main'};
+    case InvoiceStatus.OVERDUE_NOTICE_1:
+      return {label: InvoiceStatusView.OVERDUE_NOTICE_1, color: 'purple.main'};
+    case InvoiceStatus.OVERDUE_NOTICE_2:
+      return {label: InvoiceStatusView.OVERDUE_NOTICE_2, color: 'purple.main'};
+    case InvoiceStatus.OVERDUE_NOTICE_3:
+      return {label: InvoiceStatusView.OVERDUE_NOTICE_3, color: 'purple.main'};
     default:
       return {label: '-', color: 'default'};
   }
