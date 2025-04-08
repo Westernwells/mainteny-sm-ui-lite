@@ -106,7 +106,8 @@ interface Props {
   updateContract: (obj: any) => void;
   components: ContractComponentView[];
   contractId: string;
-  search: (value: string) => void;
+  setSearch: (value: string) => void;
+  search: string;
 }
 
 export const MutationService = ({
@@ -120,6 +121,7 @@ export const MutationService = ({
   components,
   contractId,
   loading,
+  setSearch,
   search,
 }: Props) => {
   const {t} = useTranslation();
@@ -138,9 +140,28 @@ export const MutationService = ({
     user?.userAccount.serviceCompany.id!,
   );
 
+  const filteredElevators =
+    formikContractServiceComponent.values.elevators?.filter((elevator) => {
+      const searchTerm = search.toLowerCase();
+
+      const serialMatch = elevator.externalId
+        ? elevator.externalId.toLowerCase().includes(searchTerm)
+        : false;
+      const buildingMatch = elevator.buildingLocation
+        ? elevator.buildingLocation.toLowerCase().includes(searchTerm)
+        : false;
+      const addressMatch = elevator.address
+        ? elevator.address.toLowerCase().includes(searchTerm)
+        : false;
+
+      return searchTerm === '' || serialMatch || buildingMatch || addressMatch;
+    }) || [];
+
+  const filteredElevatorIds = filteredElevators.map((e) => e.elevatorId);
+
   const handleCancel = () => {
     setIsDialogOpen(false);
-    search('');
+    setSearch('');
   };
 
   const handleClick = (event: any) => {
@@ -157,9 +178,7 @@ export const MutationService = ({
       setVisibleItems(5);
       setShowAll(false);
     } else {
-      setVisibleItems(
-        formikContractServiceComponent.values.elevators?.length || 0,
-      );
+      setVisibleItems(filteredElevators?.length || 0);
       setShowAll(true);
     }
   };
@@ -169,13 +188,10 @@ export const MutationService = ({
     setVisibleItems(5);
   }, [isDialogOpen]);
 
-  const visibleElevators =
-    formikContractServiceComponent.values.elevators?.slice(0, visibleItems) ||
-    [];
+  const visibleElevators = filteredElevators?.slice(0, visibleItems) || [];
 
   useEffect(() => {
     if (components.length > 0) {
-      // Find the matching component if editing
       const currentComponent = components.find(
         (c) => c.id === formikContractServiceComponent.values.id,
       );
@@ -354,13 +370,11 @@ export const MutationService = ({
     (key: string) => (value: ContractComponentElevator[]) =>
       formikContractServiceComponent.setFieldValue(key, value);
 
-  const lengthOfElevators =
-    formikContractServiceComponent.values?.elevators?.length;
+  const lengthOfElevators = filteredElevators?.length;
 
   const selectedElevators = useMemo(
-    () =>
-      formikContractServiceComponent.values.elevators.filter(isUnitSelected),
-    [formikContractServiceComponent.values.elevators],
+    () => filteredElevators.filter(isUnitSelected),
+    [filteredElevators],
   );
 
   return (
@@ -795,7 +809,7 @@ export const MutationService = ({
         <SearchInput
           placeholder={t('Search by number, name, address etc.')}
           onValueChanged={(val) => {
-            search(val);
+            setSearch(val);
           }}
           variant="outlined"
         />
@@ -913,7 +927,7 @@ export const MutationService = ({
           }}>
           {visibleElevators?.map((item, index) => {
             const price =
-              formikContractServiceComponent.values.elevators[index].price /
+              filteredElevators[index].price /
               10 ** currentCurrency.fractionDigits;
             return (
               <TableRow
@@ -989,6 +1003,9 @@ export const MutationService = ({
                     <JobFrequencyPicker
                       componentId={item.elevatorId}
                       units={formikContractServiceComponent.values.elevators}
+                      filteredUnitIds={filteredElevators.map(
+                        (e) => e.elevatorId,
+                      )}
                       onChange={handleJobFrequencyChange('elevators')}
                       mode={isEditForm ? 'edit' : 'new'}
                     />
@@ -1005,6 +1022,7 @@ export const MutationService = ({
                   }}>
                   <InvoiceFrequencyPicker
                     formik={formikContractServiceComponent}
+                    filteredUnitIds={filteredElevators.map((e) => e.elevatorId)}
                     componentId={item.elevatorId}
                     mode={isEditForm ? 'edit' : 'new'}
                   />
@@ -1068,33 +1086,47 @@ export const MutationService = ({
                     onValueChange={(values) => {
                       const {floatValue} = values;
 
+                      const fullElevators =
+                        formikContractServiceComponent.values.elevators;
+
                       if (floatValue) {
                         const newPrice = convertNumberToAmountNumber(
                           floatValue,
                           currentCurrency,
                         );
 
-                        if (index === 0 && !isEditForm) {
+                        if (
+                          filteredElevatorIds.length > 0 &&
+                          filteredElevatorIds[0] === item.elevatorId &&
+                          !isEditForm
+                        ) {
                           formikContractServiceComponent.setFieldValue(
                             `elevators[${index}].price`,
                             newPrice,
                           );
 
-                          const updatedElevators =
-                            formikContractServiceComponent.values.elevators.map(
-                              (elevator) => ({
-                                ...elevator,
-                                price: newPrice,
-                              }),
-                            );
+                          const updatedElevators = fullElevators.map(
+                            (elevator) =>
+                              filteredElevatorIds.includes(elevator.elevatorId)
+                                ? {...elevator, price: newPrice}
+                                : elevator,
+                          );
+
                           formikContractServiceComponent.setFieldValue(
                             'elevators',
                             updatedElevators,
                           );
                         } else {
+                          const updatedElevators = fullElevators.map(
+                            (elevator) =>
+                              elevator.elevatorId === item.elevatorId
+                                ? {...elevator, price: newPrice}
+                                : elevator,
+                          );
+
                           formikContractServiceComponent.setFieldValue(
-                            `elevators[${index}].price`,
-                            newPrice,
+                            'elevators',
+                            updatedElevators,
                           );
                         }
                       }
@@ -1117,7 +1149,7 @@ export const MutationService = ({
       </TableContainer>
       <TableContainer>
         <TableBody sx={{display: 'block'}}>
-          {formikContractServiceComponent.values.elevators?.length > 2 && (
+          {filteredElevators?.length > 2 && (
             <TableRow
               sx={{
                 width: '100%',

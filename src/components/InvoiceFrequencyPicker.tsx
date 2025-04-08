@@ -31,6 +31,7 @@ type Props = {
   componentId: string;
   formik: FormikProps<ContractServiceForm>;
   mode?: 'edit' | 'new';
+  filteredUnitIds?: string[];
 };
 
 const monthsData: MonthData[] = [
@@ -48,11 +49,12 @@ const monthsData: MonthData[] = [
   {month: 'December', isSelected: false, number: 12},
 ];
 
-const InvoiceFrequencyPicker: React.FC<Props> = ({
+const InvoiceFrequencyPicker = ({
   componentId,
   formik,
   mode = 'new',
-}) => {
+  filteredUnitIds = [],
+}: Props) => {
   const {t} = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedMonths, setSelectedMonths] = useState<MonthData[]>(monthsData);
@@ -175,38 +177,36 @@ const InvoiceFrequencyPicker: React.FC<Props> = ({
         : ContractTimeUnit.MONTHLY;
 
     if (
-      formik.values.elevators.findIndex(
-        (elevator) => elevator.elevatorId === componentId,
-      ) === 0 &&
+      filteredUnitIds.length > 0 &&
+      filteredUnitIds[0] === componentId &&
       mode === 'new'
     ) {
-      const updatedElevators = formik.values.elevators.map((elevator) => ({
-        ...elevator,
-        invoiceJob: {
-          ...elevator.invoiceJob,
-          timeNumbers: formattedNumbers,
-          timeUnit,
-        },
-      }));
-
-      updatedElevators.slice(1).forEach((_, index) => {
-        updatedElevators[index + 1].invoiceJob.timeNumbers = formattedNumbers;
-      });
+      const updatedElevators = formik.values.elevators.map((elevator) =>
+        filteredUnitIds.includes(elevator.elevatorId)
+          ? {
+              ...elevator,
+              invoiceJob: {
+                ...elevator.invoiceJob,
+                timeNumbers: formattedNumbers,
+                timeUnit,
+              },
+            }
+          : elevator,
+      );
       formik.setFieldValue('elevators', updatedElevators);
     } else {
-      const updatedElevators = formik.values.elevators.map((elevator) => {
-        if (componentId === elevator.elevatorId) {
-          return {
-            ...elevator,
-            invoiceJob: {
-              ...elevator.invoiceJob,
-              timeNumbers: formattedNumbers,
-              timeUnit,
-            },
-          };
-        }
-        return elevator;
-      });
+      const updatedElevators = formik.values.elevators.map((elevator) =>
+        elevator.elevatorId === componentId
+          ? {
+              ...elevator,
+              invoiceJob: {
+                ...elevator.invoiceJob,
+                timeNumbers: formattedNumbers,
+                timeUnit,
+              },
+            }
+          : elevator,
+      );
       formik.setFieldValue('elevators', updatedElevators);
     }
 
