@@ -334,7 +334,8 @@ const SubPositionRow = ({
       (getValues(subItemsPath) as EditableQuotationSubItemRecord[]) || [];
 
     const totalNetAmount = subItems.reduce(
-      (sum, sub) => sum + (sub.unitPurchaseAmount?.netAmount || 0),
+      (sum, sub) =>
+        sum + (sub.unitPurchaseAmount?.netAmount ?? 0) * sub.quantity,
       0,
     );
 
@@ -424,9 +425,10 @@ const SubPositionRow = ({
       recalcInvoice();
     } else if (field === `${path}.quantity`) {
       setValue(
-        `${pathBase}.quantity` as Path<QuotationFormData>,
+        `${path}.quantity` as Path<QuotationFormData>,
         editableSubRow.values?.quantity || 0,
       );
+      updateMainUnitPurchaseAmount();
       recalcInvoice();
     }
 
@@ -727,6 +729,10 @@ const SubPositionRow = ({
               editableSubRow?.field === `${pathBase}.article.type`
                 ? `2px solid ${theme.palette.primary.main}`
                 : 'none',
+            '&:focus-visible': {
+              outline: 'none',
+              border: `2px solid ${theme.palette.primary.main}`,
+            },
           }}
           tabIndex={0}
           onKeyDown={(e) => {
@@ -734,7 +740,7 @@ const SubPositionRow = ({
               e.preventDefault();
               handleSubPositionEditStart(
                 subItem,
-                'unitPurchaseAmount',
+                `${pathBase}.unitPurchaseAmount.netAmount`,
                 parentIndex,
                 subIndex,
               );
@@ -832,7 +838,7 @@ const SubPositionRow = ({
                   e.target.setSelectionRange(0, 0);
                 }}
                 value={
-                  editableSubRow?.values?.unitPurchaseAmount?.netAmount || 0
+                  editableSubRow?.values?.unitPurchaseAmount?.netAmount || ''
                 }
                 onValueChange={({floatValue}) =>
                   setEditableSubRow((prev) => ({
@@ -935,7 +941,7 @@ const SubPositionRow = ({
                 e.target.setSelectionRange(0, 0);
               }, 0);
             }}
-            value={editableSubRow.values?.margin || 0}
+            value={editableSubRow.values?.margin || ''}
             onValueChange={({floatValue}) =>
               handleSubPositionMarginChange(
                 floatValue ?? 0,
@@ -945,7 +951,7 @@ const SubPositionRow = ({
             }
             customInput={TextField}
             suffix="%"
-            decimalScale={2}
+            decimalScale={0}
             fixedDecimalScale
             InputProps={{
               onBlur: () => {
@@ -1000,7 +1006,7 @@ const SubPositionRow = ({
               if (purchaseAmount === 0) return '-';
               const margin =
                 ((sellingAmount - purchaseAmount) / purchaseAmount) * 100;
-              return `${margin.toFixed(2)}%`;
+              return `${margin.toFixed(0)}%`;
             })()}
           </Typography>
         )}
@@ -1036,7 +1042,7 @@ const SubPositionRow = ({
                 onFocus={(e) => {
                   e.target.setSelectionRange(0, 0);
                 }}
-                value={editableSubRow?.values?.unitAmount?.netAmount || 0}
+                value={editableSubRow?.values?.unitAmount?.netAmount || ''}
                 onValueChange={({floatValue}) =>
                   setEditableSubRow((prev) => ({
                     ...prev!,

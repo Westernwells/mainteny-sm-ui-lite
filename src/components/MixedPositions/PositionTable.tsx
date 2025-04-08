@@ -70,6 +70,8 @@ const PositionTable = ({formMethods}: Props) => {
 
   const {data: taxRates} = useVats();
 
+  const defaultVat = taxRates?.find((tR) => tR.isDefault);
+
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
   const {control, setValue, watch} = formMethods;
   const {fields, append, update, move} = useFieldArray({
@@ -256,22 +258,27 @@ const PositionTable = ({formMethods}: Props) => {
     const newIndex = fields.length;
     const defaultSeqNumber = (newIndex + 1).toString();
 
+    const defaultProps = {
+      netAmount: 0,
+      currency: currentCurrency.code,
+      percentageVat: defaultVat?.percentage,
+      vatId: defaultVat?.id,
+      vatName: defaultVat?.name,
+    };
+
     const newItem: EditableQuotationItem = {
       id: getUniqueId(),
       userSeqNumber: defaultSeqNumber,
       name: '',
       quantity: 1,
-      unitAmount: {
-        netAmount: 0,
-        percentageVat: 0,
-        currency: currentCurrency.code,
+      unitAmount: defaultProps,
+      unitPurchaseAmount: defaultProps,
+      article: {
+        type: ArticleType.OTHER,
+        unit: 'kg',
+        unitSellingAmount: defaultProps,
+        unitPurchaseAmount: defaultProps,
       },
-      unitPurchaseAmount: {
-        netAmount: 0,
-        percentageVat: 0,
-        currency: currentCurrency.code,
-      },
-      article: undefined,
       subItems: [],
       description: '',
       discount: undefined,
@@ -299,17 +306,25 @@ const PositionTable = ({formMethods}: Props) => {
     const subIndex = parentItem.subItems.length;
     const defaultSubSeq = `${parentSeq}.${subIndex + 1}`;
 
+    const defaultProps = {
+      netAmount: 0,
+      currency: currentCurrency.code,
+      percentageVat: defaultVat?.percentage,
+      vatId: defaultVat?.id,
+      vatName: defaultVat?.name,
+    };
+
     const newSub: EditableQuotationSubItemRecord = {
       id: getUniqueId(),
       userSeqNumber: defaultSubSeq,
       name: '',
       quantity: 1,
-      unitAmount: {
-        netAmount: 0,
-        percentageVat: 0,
-        currency: currentCurrency.code,
+      unitAmount: defaultProps,
+      unitPurchaseAmount: defaultProps,
+      article: {
+        type: ArticleType.OTHER,
+        unit: 'kg',
       },
-      article: {},
     };
 
     parentItem.subItems.push(newSub);

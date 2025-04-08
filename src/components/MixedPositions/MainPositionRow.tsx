@@ -108,6 +108,8 @@ const MainPositionRow = ({
   const {enqueueSnackbar} = useSnackbar();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
+  const defaultVat = taxRates?.find((tR) => tR.isDefault);
+
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
   const [isActionOpen, setIsActionOpen] = useState(false);
 
@@ -174,6 +176,8 @@ const MainPositionRow = ({
     const sellingNetAmountCents =
       watch(`items.${index}.unitAmount.netAmount`) ?? 0;
 
+    const defaultVatProps = {vatId: defaultVat?.id, vatName: defaultVat?.name};
+
     if (field === `items.${index}.userSeqNumber`) {
       setEditableRow({
         index,
@@ -221,12 +225,14 @@ const MainPositionRow = ({
           unitPurchaseAmount: {
             ...row?.unitPurchaseAmount,
             netAmount: purchaseNetAmountCents / 100,
-            currency: currentCurrency.code,
+            currency: row?.unitPurchaseAmount?.currency || currentCurrency.code,
+            ...defaultVatProps,
           },
           unitAmount: {
             ...row.unitAmount,
             netAmount: (row.unitAmount?.netAmount ?? 0) / 100,
-            currency: currentCurrency.code,
+            currency: row?.unitAmount?.currency || currentCurrency.code,
+            ...defaultVatProps,
           },
         },
       });
@@ -239,12 +245,14 @@ const MainPositionRow = ({
           unitPurchaseAmount: {
             ...row?.unitPurchaseAmount,
             netAmount: (row?.unitPurchaseAmount?.netAmount ?? 0) / 100,
-            currency: currentCurrency.code,
+            currency: row?.unitPurchaseAmount?.currency || currentCurrency.code,
+            ...defaultVatProps,
           },
           unitAmount: {
             ...row.unitAmount,
             netAmount: sellingNetAmountCents / 100,
-            currency: currentCurrency.code,
+            currency: row?.unitAmount?.currency || currentCurrency.code,
+            ...defaultVatProps,
           },
         },
       });
@@ -278,11 +286,11 @@ const MainPositionRow = ({
       type: itemData.article?.type!,
       unit: itemData.article?.unit!,
       unitPurchaseAmount: {
-        netAmount: Number(itemData.article?.unitPurchaseAmount?.netAmount),
-        currency: itemData.article?.unitPurchaseAmount?.currency!,
-        percentageVat: itemData.article?.unitPurchaseAmount?.percentageVat ?? 0,
-        vatId: itemData.article?.unitPurchaseAmount?.vatId,
-        vatName: itemData.article?.unitPurchaseAmount?.vatName,
+        netAmount: Number(itemData?.unitPurchaseAmount?.netAmount),
+        currency: itemData?.unitPurchaseAmount?.currency!,
+        percentageVat: itemData?.unitPurchaseAmount?.percentageVat ?? 0,
+        vatId: itemData?.unitPurchaseAmount?.vatId,
+        vatName: itemData?.unitPurchaseAmount?.vatName,
       },
       unitSellingAmount: {
         netAmount: Number(itemData.unitAmount?.netAmount),
@@ -315,13 +323,22 @@ const MainPositionRow = ({
       const amount = editableRow.values?.unitPurchaseAmount?.netAmount ?? 0;
       setValue(`items.${index}.unitPurchaseAmount` as Path<QuotationFormData>, {
         netAmount: Math.round(amount * 100),
-        currency: currentCurrency.code,
+        currency:
+          editableRow.values?.unitPurchaseAmount?.currency ||
+          currentCurrency.code,
+        vatId: editableRow.values?.unitPurchaseAmount?.vatId,
+        vatName: editableRow.values?.unitPurchaseAmount?.vatName,
+        percentageVat: editableRow.values?.unitPurchaseAmount?.percentageVat,
       });
     } else if (field === `items.${index}.unitAmount`) {
       const amount = editableRow.values?.unitAmount?.netAmount ?? 0;
       setValue(`items.${indexPos}.unitAmount`, {
         netAmount: Math.round(amount * 100),
-        currency: currentCurrency.code,
+        currency:
+          editableRow.values?.unitAmount?.currency || currentCurrency.code,
+        vatId: editableRow.values?.unitAmount?.vatId,
+        vatName: editableRow.values?.unitAmount?.vatName,
+        percentageVat: editableRow.values?.unitAmount?.percentageVat,
       });
     } else if (field === `items.${index}.margin`) {
       const newMargin =
@@ -347,7 +364,12 @@ const MainPositionRow = ({
       const amount = editableRow.values?.unitPurchaseAmount?.netAmount ?? 0;
       setValue(`items.${index}.unitPurchaseAmount` as Path<QuotationFormData>, {
         netAmount: Math.round(amount),
-        currency: currentCurrency.code,
+        currency:
+          editableRow.values?.unitPurchaseAmount?.currency ||
+          currentCurrency.code,
+        vatId: editableRow.values?.unitPurchaseAmount?.vatId,
+        vatName: editableRow.values?.unitPurchaseAmount?.vatName,
+        percentageVat: editableRow.values?.unitPurchaseAmount?.percentageVat,
       });
     } else if (field === `items.${index}.margin`) {
       const marginValue =
@@ -361,13 +383,21 @@ const MainPositionRow = ({
       setValue(`items.${indexPos}.margin`, marginValue);
       setValue(`items.${indexPos}.unitAmount`, {
         netAmount: Math.round(newSellingPrice),
-        currency: currentCurrency.code,
+        currency:
+          editableRow.values?.unitAmount?.currency || currentCurrency.code,
+        vatId: editableRow.values?.unitAmount?.vatId,
+        vatName: editableRow.values?.unitAmount?.vatName,
+        percentageVat: editableRow.values?.unitAmount?.percentageVat,
       });
     } else if (field === `items.${index}.unitAmount`) {
       const amount = editableRow.values?.unitAmount?.netAmount ?? 0;
       setValue(`items.${indexPos}.unitAmount`, {
         netAmount: Math.round(amount),
-        currency: currentCurrency.code,
+        currency:
+          editableRow.values?.unitAmount?.currency || currentCurrency.code,
+        vatId: editableRow.values?.unitAmount?.vatId,
+        vatName: editableRow.values?.unitAmount?.vatName,
+        percentageVat: editableRow.values?.unitAmount?.percentageVat,
       });
     }
   };
@@ -707,6 +737,10 @@ const MainPositionRow = ({
               editableRow?.index === index
                 ? `2px solid ${theme.palette.primary.main}`
                 : 'none',
+            '&:focus-visible': {
+              outline: 'none',
+              border: `2px solid ${theme.palette.primary.main}`,
+            },
           }}
           tabIndex={0}
           onKeyDown={(e) => {
@@ -930,7 +964,7 @@ const MainPositionRow = ({
             }}
             customInput={TextField}
             suffix="%"
-            decimalScale={2}
+            decimalScale={0}
             fixedDecimalScale
             InputProps={{
               onBlur: () => {
@@ -983,7 +1017,7 @@ const MainPositionRow = ({
               if (purchaseAmount === 0) return '-';
               const margin =
                 ((sellingAmount - purchaseAmount) / purchaseAmount) * 100;
-              return `${margin.toFixed(2)}%`;
+              return `${margin.toFixed(0)}%`;
             })()}
           </Typography>
         )}

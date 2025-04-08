@@ -37,8 +37,10 @@ const MarginDetails = ({
           // For a mixed position, calculate margins from its sub-items
           if (item.subItems && item.subItems.length > 0) {
             item.subItems.forEach((sub) => {
-              const subNetAmount = sub.unitAmount?.netAmount ?? 0;
-              const subPurchaseAmount = sub.unitPurchaseAmount?.netAmount ?? 0;
+              const subNetAmount =
+                (sub.unitAmount?.netAmount ?? 0) * sub.quantity;
+              const subPurchaseAmount =
+                (sub.unitPurchaseAmount?.netAmount ?? 0) * sub.quantity;
               const subMargin = subNetAmount - subPurchaseAmount;
               totalPurchase += subPurchaseAmount;
               if (sub.article?.type === ArticleType.MATERIAL) {
@@ -51,8 +53,9 @@ const MarginDetails = ({
             });
           }
         } else {
-          const netAmount = item.unitAmount?.netAmount ?? 0;
-          const purchaseAmount = item.unitPurchaseAmount?.netAmount ?? 0;
+          const netAmount = (item.unitAmount?.netAmount ?? 0) * item.quantity;
+          const purchaseAmount =
+            (item.unitPurchaseAmount?.netAmount ?? 0) * item.quantity;
           const margin = netAmount - purchaseAmount;
           totalPurchase += purchaseAmount;
           if (item.article?.type === ArticleType.PACKAGE) {
@@ -131,7 +134,7 @@ const MarginDetails = ({
                 fontWeight={400}
                 color="text.secondary"
                 pr={1}>
-                ({`${totalMarginPercentage.toFixed(2)}%`})
+                ({`${totalMarginPercentage.toFixed(0)}%`})
               </Typography>
 
               <Typography
