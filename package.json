@@ -225,8 +225,5 @@
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "prettier --write"
     ]
-  },
-  "resolutions": {
-    "@react-pdf/layout": "3.11.5"
   }
 }
