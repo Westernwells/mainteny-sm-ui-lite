@@ -36,12 +36,14 @@ type Props = {
   componentId: string;
   units: ContractServiceFormElevator[];
   onChange: (value: ContractComponentElevator[]) => void;
+  filteredUnitIds?: string[];
   mode?: 'edit' | 'new';
 };
 
 const JobFrequencyPicker = ({
   componentId,
   units,
+  filteredUnitIds = [],
   onChange,
   mode = 'new',
 }: Props) => {
@@ -112,38 +114,36 @@ const JobFrequencyPicker = ({
 
     // Business logic: if changing first entry save to all other entries as well
     if (
-      units.findIndex((elevator) => elevator.elevatorId === componentId) ===
-        0 &&
+      filteredUnitIds.length > 0 &&
+      filteredUnitIds[0] === componentId &&
       mode === 'new'
     ) {
-      const updatedElevators = units.map((elevator) => ({
-        ...elevator,
-        orderGenerationJob: {
-          ...elevator.orderGenerationJob,
-          timeNumbers: monthsInNumbers,
-          timeUnit,
-        },
-      }));
-
-      updatedElevators.slice(1).forEach((_, index) => {
-        updatedElevators[index + 1].orderGenerationJob.timeNumbers =
-          monthsInNumbers;
-      });
+      const updatedElevators = units.map((elevator) =>
+        filteredUnitIds.includes(elevator.elevatorId)
+          ? {
+              ...elevator,
+              orderGenerationJob: {
+                ...elevator.orderGenerationJob,
+                timeNumbers: monthsInNumbers,
+                timeUnit,
+              },
+            }
+          : elevator,
+      );
       onChange(updatedElevators);
     } else {
-      const updatedElevators = units.map((elevator) => {
-        if (componentId === elevator.elevatorId) {
-          return {
-            ...elevator,
-            orderGenerationJob: {
-              ...elevator.orderGenerationJob,
-              timeNumbers: monthsInNumbers,
-              timeUnit,
-            },
-          };
-        }
-        return elevator;
-      });
+      const updatedElevators = units.map((elevator) =>
+        elevator.elevatorId === componentId
+          ? {
+              ...elevator,
+              orderGenerationJob: {
+                ...elevator.orderGenerationJob,
+                timeNumbers: monthsInNumbers,
+                timeUnit,
+              },
+            }
+          : elevator,
+      );
       onChange(updatedElevators);
     }
 

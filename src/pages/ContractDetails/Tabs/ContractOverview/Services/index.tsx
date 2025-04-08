@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useMemo, useState} from 'react';
+import {FC, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -40,16 +40,11 @@ import {useFormik} from 'formik';
 import {Dialog} from 'components/Dialog';
 import {ArticleType, CostPackage} from 'models/article';
 import {useUuid} from 'hooks/reactQuery/useUuid';
-import {createEmptyResource} from 'utils/paging';
-import {ElevatorOrderField, ElevatorView} from 'models/elevator';
-import {useContractElevators} from 'hooks/reactQuery/useContacts';
-import {useQueryState} from 'hooks/useQueryState';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {ContractCard} from '../ContractCard';
 import {SectionTitle} from '../../../../InvoiceDetails/SectionTitle';
 import ServiceInformationReview from './ServiceInfo';
 import {MutationService} from './MutationService';
-import {Order} from '../../../../../models/pagination';
 
 interface Props {
   contractDetails: ContractView;
@@ -105,7 +100,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
   const {mutateAsync: updateContract, isLoading: isUpdateLoading} =
     useUpdateContract('Contract updated');
 
-  const [search, setSearch] = useQueryState('UnitsSearch');
+  const [search, setSearch] = useState('');
   const [isEditForm, setIsEditForm] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
@@ -114,18 +109,9 @@ export const Services: FC<Props> = ({contractDetails}) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [currentService, setCurrentService] = useState<ContractComponentView>();
 
-  const {data: elevatorResource = createEmptyResource<ElevatorView>(500)} =
-    useContractElevators(
-      contractDetails?.id ?? '',
-      {
-        query: search,
-        orderBy: ElevatorOrderField.CREATED_TIME,
-        order: Order.DESC,
-        pageIndex: 0,
-        pageSize: 500,
-      },
-      {keepPreviousData: true},
-    );
+  const elevatorResource = contractDetails.elevators.map(
+    (elevator) => elevator.elevator,
+  );
 
   useEffect(() => {
     refetchUniqueId();
@@ -150,7 +136,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
         costPackage:
           currentService?.additionalInfo?.costPackage || defaultCostPackage,
         isAutomaticJobCycle: !!currentService?.additionalInfo?.firstOrderDate,
-        elevators: mergeElevators(elevatorResource?.data || [], currentService),
+        elevators: mergeElevators(elevatorResource || [], currentService),
         orderType: currentService?.additionalInfo?.orderType || '',
       };
     }
@@ -167,7 +153,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
       isAutomaticJobCycle: false,
       elevators: [],
     };
-  }, [isEditForm, currentService, uuid, elevatorResource.data]);
+  }, [isEditForm, currentService, uuid, elevatorResource]);
 
   const formikContractServiceComponent = useFormik<ContractServiceForm>({
     initialValues: formikContractServiceInitialValues,
@@ -192,12 +178,12 @@ export const Services: FC<Props> = ({contractDetails}) => {
   const setAddFormData = () => {
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
-      elevators: parsElevatorRecourses(elevatorResource?.data || []),
+      elevators: parsElevatorRecourses(elevatorResource || []),
     });
   };
 
   const setEditFormData = (row: ContractComponentView) => {
-    const allItems = mergeElevators(elevatorResource?.data || [], row);
+    const allItems = mergeElevators(elevatorResource || [], row);
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
       id: row.id,
@@ -219,7 +205,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
     } else {
       setAddFormData();
     }
-  }, [elevatorResource.data.length]);
+  }, [elevatorResource.length]);
 
   const openViewDialog = (row: ContractComponentView) => {
     setCurrentService(row);
@@ -539,7 +525,8 @@ export const Services: FC<Props> = ({contractDetails}) => {
         isEditForm={isEditForm}
         contractId={contractDetails.id}
         loading={isUpdateLoading}
-        search={setSearch}
+        setSearch={setSearch}
+        search={search}
       />
 
       <Dialog
@@ -575,7 +562,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
         showCancelButton={false}>
         <ServiceInformationReview
           service={currentService}
-          elevators={elevatorResource.data}
+          elevators={elevatorResource}
         />
       </Dialog>
     </Grid>

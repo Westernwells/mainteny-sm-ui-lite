@@ -24,7 +24,7 @@ import {
   UpdateContractComponents,
 } from 'models/contract';
 import {toDate, toRestDate} from 'utils/datetime';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {OptionsObject, SnackbarKey, SnackbarMessage} from 'notistack';
 import {formatCurrency} from 'utils/currency';
 import {Currency} from 'models/misc';
@@ -263,7 +263,10 @@ export const convertExtendedRecordsToContractComponentRecords = (
   });
 
 export const parsElevatorRecourses = (
-  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
 ) =>
   elevatorResource?.map((elevator) => ({
     elevatorId: elevator.id,
@@ -283,7 +286,10 @@ export const parsElevatorRecourses = (
   }));
 
 export const mergeElevators = (
-  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
   elevatorsFromRow: ContractComponentView,
 ) => {
   const existingElevators = elevatorsFromRow.additionalInfo?.elevators || [];
@@ -303,7 +309,10 @@ export const mergeElevators = (
 };
 
 export const getElevatorDataByElevator = (
-  elevatorResource: ContractElevatorView[] | ElevatorView[],
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
   elevatorsFromRow: ContractComponentView,
 ) => {
   const infoMap = (elevatorsFromRow.additionalInfo?.elevators || []).reduce(
