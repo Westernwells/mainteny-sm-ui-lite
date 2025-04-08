@@ -276,6 +276,7 @@ export interface ElevatorSimpleView {
   labels: string[];
   additionalInfo: ElevatorAdditionalInfo;
   meta: Meta;
+  externalId?: string;
 }
 
 export interface ElevatorAssignmentSimpleView {
