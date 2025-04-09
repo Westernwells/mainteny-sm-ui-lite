@@ -196,6 +196,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
       isAutomaticJobCycle: !!row?.additionalInfo?.firstOrderDate,
       elevators: allItems,
       orderType: row?.additionalInfo?.orderType,
+      serviceDeliveryType: row?.additionalInfo.serviceDeliveryType,
     });
   };
 

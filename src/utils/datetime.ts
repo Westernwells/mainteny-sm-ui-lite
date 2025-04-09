@@ -11,6 +11,8 @@ import {
   isYesterday,
   Locale,
   parseISO,
+  set,
+  startOfMonth,
   startOfWeek,
   subWeeks,
 } from 'date-fns';
@@ -344,3 +346,34 @@ export const parseTimeFromHoursMinutesToDate = (value: string) =>
     parseInt(value.split(':')[0] ?? '0', 10),
     parseInt(value.split(':')[1] ?? '0', 10),
   );
+
+export const getFirstDayOfMonthInFuture = (monthNumber: number): Date => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+
+  // Adjust to 0-based index for JavaScript Date
+  const targetMonth = monthNumber - 1;
+
+  const targetDateThisYear = set(new Date(), {
+    year: currentYear,
+    month: targetMonth,
+    date: 1,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    milliseconds: 0,
+  });
+
+  const finalDate =
+    targetDateThisYear > now
+      ? targetDateThisYear
+      : set(targetDateThisYear, {year: currentYear + 1});
+
+  return startOfMonth(finalDate);
+};
+
+export const getMonthNumberFromDate = (date?: Date | null) => {
+  if (!date) return undefined;
+
+  return date.getMonth() + 1;
+};
