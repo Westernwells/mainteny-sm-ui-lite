@@ -35,6 +35,9 @@ export enum InvoiceStatus {
   EXPIRED = 'EXPIRED',
   CREDITED = 'CREDITED',
   CANCELLED = 'CANCELLED',
+  OVERDUE_NOTICE_1 = 'OVERDUE_NOTICE_1',
+  OVERDUE_NOTICE_2 = 'OVERDUE_NOTICE_2',
+  OVERDUE_NOTICE_3 = 'OVERDUE_NOTICE_3',
 }
 
 export enum InvoiceStatusFilter {
@@ -46,6 +49,9 @@ export enum InvoiceStatusFilter {
   EXPIRED = 'EXPIRED',
   CREDITED = 'CREDITED',
   CANCELLED = 'CANCELLED',
+  OVERDUE_NOTICE_1 = 'OVERDUE_NOTICE_1',
+  OVERDUE_NOTICE_2 = 'OVERDUE_NOTICE_2',
+  OVERDUE_NOTICE_3 = 'OVERDUE_NOTICE_3',
 }
 
 export enum InvoiceStatusView {
@@ -56,6 +62,9 @@ export enum InvoiceStatusView {
   PARTIALLY_PAID = 'Partially Paid',
   CANCELLED = 'Cancelled',
   CREDITED = 'Credited',
+  OVERDUE_NOTICE_1 = 'Dunning 1',
+  OVERDUE_NOTICE_2 = 'Dunning 2',
+  OVERDUE_NOTICE_3 = 'Dunning 3',
 }
 
 export interface InvoiceItem {

@@ -1,12 +1,12 @@
 import {
-  InvoiceStatusView,
-  InvoiceStatus,
   AggregatedAmount,
   InvoiceAdditionalInfo,
+  InvoiceItemView,
   InvoiceOverdueNoticeSimpleView,
   InvoicePaymentView,
+  InvoiceStatus,
+  InvoiceStatusView,
   InvoiceType,
-  InvoiceItemView,
 } from '../../src/models/invoice';
 import {Meta} from '../../src/models/misc';
 import {PropertyOwnerSimpleView} from '../../src/models/propertyManager';
@@ -41,6 +41,12 @@ export const mapInvoiceStatus = (invoiceStatus: InvoiceStatusView) => {
       return InvoiceStatus.CANCELLED;
     case InvoiceStatusView.CREDITED:
       return InvoiceStatus.CREDITED;
+    case InvoiceStatusView.OVERDUE_NOTICE_1:
+      return InvoiceStatus.OVERDUE_NOTICE_1;
+    case InvoiceStatusView.OVERDUE_NOTICE_2:
+      return InvoiceStatus.OVERDUE_NOTICE_2;
+    case InvoiceStatusView.OVERDUE_NOTICE_3:
+      return InvoiceStatus.OVERDUE_NOTICE_3;
     default:
       return InvoiceStatus.DRAFT;
   }

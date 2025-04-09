@@ -52,7 +52,6 @@ import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {StatusChip} from 'components/StatusChip';
 import Box from '@mui/material/Box';
-import {theme} from 'theme';
 import {Checkbox, CircularProgress, Typography} from '@mui/material';
 import {Order, OrderByParams} from 'models/pagination';
 import {Actions} from 'pages/Invoices/Actions';
@@ -109,6 +108,7 @@ import XMLViewer from 'react-xml-viewer';
 import printJS from 'print-js';
 import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPreparation';
 import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
+import {useTheme} from '@mui/system';
 
 const pageSize = 25;
 
@@ -122,6 +122,9 @@ const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
   {value: InvoiceStatusFilter.EXPIRED, labelKey: 'Overdue'},
   {value: InvoiceStatusFilter.CREDITED, labelKey: 'Credited'},
   {value: InvoiceStatusFilter.CANCELLED, labelKey: 'Cancelled'},
+  {value: InvoiceStatusFilter.OVERDUE_NOTICE_1, labelKey: 'Dunning 1'},
+  {value: InvoiceStatusFilter.OVERDUE_NOTICE_2, labelKey: 'Dunning 2'},
+  {value: InvoiceStatusFilter.OVERDUE_NOTICE_3, labelKey: 'Dunning 3'},
 ];
 
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
@@ -135,6 +138,7 @@ const Invoices = ({elevatorId}: Props) => {
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
   const currentCurrency = useCurrentCurrency();
+  const theme = useTheme();
 
   const {
     values: {sortOrder, orderByField},
