@@ -3,6 +3,7 @@ import {
   Box,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Popover,
@@ -29,6 +30,7 @@ import {
   calculateContractInvoicePriceTotal,
   ContractComponentElevator,
   ContractServiceForm,
+  SERVICE_DELIVERY_TYPES,
 } from 'models/contract';
 import {Switch} from 'components/Switch';
 import {FormikProps, getIn} from 'formik';
@@ -57,6 +59,12 @@ import {FormCheckbox} from 'components/form/FormCheckbox';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
 import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {generateMonthDropdownFromElevatorJobFrequency} from 'utils/utils';
+import {
+  getFirstDayOfMonthInFuture,
+  getMonthNumberFromDate,
+} from 'utils/datetime';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {isUnitSelected} from '../../../utils/contract';
 
 const articleTypes = [
@@ -177,6 +185,11 @@ const ServicesForm = ({
       formikContractServiceComponent.values.elevators.filter(isUnitSelected),
     [formikContractServiceComponent.values.elevators],
   );
+
+  const jobCreationMonthDropdowns =
+    generateMonthDropdownFromElevatorJobFrequency(
+      formikContractServiceComponent.values.elevators ?? [],
+    );
 
   return (
     <>
@@ -652,22 +665,75 @@ const ServicesForm = ({
             </FormControl>
           </Grid>
           <Grid item xs={3}>
-            <DatePicker
-              defaultDate={formikContractServiceComponent.values.firstOrderDate}
-              getSelectedDate={(newValue) => {
-                if (newValue)
+            <FormControl fullWidth required>
+              <InputLabel size="small" shrink variant="outlined">
+                {t('First job creation')}
+                <Tooltip
+                  title={t(
+                    'Please add job generation months to each unit and afterwards chose from which month onwards the generation should start',
+                  )}
+                  placement="top">
+                  <IconButton sx={{marginLeft: '3px', padding: 0}}>
+                    <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0}} />
+                  </IconButton>
+                </Tooltip>
+              </InputLabel>
+              <Select
+                label={`${t('First job creation')}*`}
+                size="small"
+                value={getMonthNumberFromDate(
+                  formikContractServiceComponent.values.firstOrderDate,
+                )}
+                required
+                notched
+                name="firstOrderDate"
+                onBlur={formikContractServiceComponent.handleBlur}
+                onChange={(event) => {
                   formikContractServiceComponent.setFieldValue(
                     'firstOrderDate',
-                    newValue,
+                    getFirstDayOfMonthInFuture(Number(event.target.value)),
                   );
-              }}
-              textFieldProps={{
-                label: 'First job creation date',
-                required:
-                  !!formikContractServiceComponent.values.isAutomaticJobCycle,
-              }}
-              disableLeapDay
-            />
+                }}>
+                {jobCreationMonthDropdowns.map((month) => (
+                  <MenuItem value={month.value} key={month.value}>
+                    {t(month.label)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <FormControl fullWidth required>
+              <InputLabel size="small" shrink variant="outlined">
+                {t('Service delivery period')}
+                <Tooltip
+                  title={t(
+                    'Configure the service delivery period for the automatically generated invoices from this service',
+                  )}
+                  placement="top">
+                  <IconButton sx={{marginLeft: '3px', padding: 0}}>
+                    <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0}} />
+                  </IconButton>
+                </Tooltip>
+              </InputLabel>
+              <Select
+                label={`${t('Service delivery period')}*`}
+                size="small"
+                value={
+                  formikContractServiceComponent.values.serviceDeliveryType
+                }
+                required
+                notched
+                name="serviceDeliveryType"
+                onBlur={formikContractServiceComponent.handleBlur}
+                onChange={formikContractServiceComponent.handleChange}>
+                {SERVICE_DELIVERY_TYPES.map((deliveryType) => (
+                  <MenuItem value={deliveryType.value} key={deliveryType.value}>
+                    {t(deliveryType.label)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
         </Grid>
       )}

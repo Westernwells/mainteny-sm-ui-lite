@@ -12,6 +12,7 @@ import {
   Divider,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Popover,
@@ -38,6 +39,7 @@ import {
   ContractComponentElevator,
   ContractServiceForm,
   ContractServiceFormElevator,
+  SERVICE_DELIVERY_TYPES,
   UpdateContractComponents,
 } from 'models/contract';
 import {componentsToMutate, isUnitSelected} from 'utils/contract';
@@ -64,13 +66,19 @@ import {
   useCurrentCurrency,
 } from 'utils/currency';
 import ExpandIcon from '@mui/icons-material/Expand';
-import {toDate} from 'utils/datetime';
+import {
+  getFirstDayOfMonthInFuture,
+  getMonthNumberFromDate,
+  toDate,
+} from 'utils/datetime';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {EmptySection} from 'components/EmptySection';
 import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {generateMonthDropdownFromElevatorJobFrequency} from 'utils/utils';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {Service} from '.';
 
 const articleTypes = [
@@ -216,6 +224,7 @@ export const MutationService = ({
       elevators: elevatorsToSave,
       orderType: values?.orderType,
       componentId: values.id,
+      serviceDeliveryType: values.serviceDeliveryType,
     } as UpdateContractComponents;
 
     existingData.splice(index, 0, itemToMutate);
@@ -322,6 +331,11 @@ export const MutationService = ({
       formikContractServiceComponent.values.elevators.filter(isUnitSelected),
     [formikContractServiceComponent.values.elevators],
   );
+
+  const jobCreationMonthDropdowns =
+    generateMonthDropdownFromElevatorJobFrequency(
+      formikContractServiceComponent.values.elevators ?? [],
+    );
 
   return (
     <Dialog
@@ -819,25 +833,81 @@ export const MutationService = ({
             </FormControl>
           </Grid>
           <Grid item xs={3}>
-            <DatePicker
-              defaultDate={
-                formikContractServiceComponent.values.firstOrderDate
-                  ? toDate(formikContractServiceComponent.values.firstOrderDate)
-                  : null
-              }
-              getSelectedDate={(newValue) => {
-                if (newValue)
+            <FormControl fullWidth required>
+              <InputLabel size="small" shrink variant="outlined">
+                {t('First job creation')}
+                <Tooltip
+                  title={t(
+                    'Please add job generation months to each unit and afterwards chose from which month onwards the generation should start',
+                  )}
+                  placement="top">
+                  <IconButton sx={{marginLeft: '3px', padding: 0}}>
+                    <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0}} />
+                  </IconButton>
+                </Tooltip>
+              </InputLabel>
+              <Select
+                label={`${t('First job creation')}*`}
+                size="small"
+                value={
+                  formikContractServiceComponent.values.firstOrderDate
+                    ? getMonthNumberFromDate(
+                        new Date(
+                          formikContractServiceComponent.values.firstOrderDate,
+                        ),
+                      )
+                    : undefined
+                }
+                required
+                notched
+                name="firstOrderDate"
+                onBlur={formikContractServiceComponent.handleBlur}
+                onChange={(event) => {
                   formikContractServiceComponent.setFieldValue(
                     'firstOrderDate',
-                    newValue,
+                    getFirstDayOfMonthInFuture(Number(event.target.value)),
                   );
-              }}
-              textFieldProps={{
-                label: t('First job creation date'),
-                required: true,
-              }}
-              disableLeapDay
-            />
+                }}>
+                {jobCreationMonthDropdowns.map((month) => (
+                  <MenuItem value={month.value} key={month.value}>
+                    {t(month.label)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <FormControl fullWidth required>
+              <InputLabel size="small" shrink variant="outlined">
+                {t('Service delivery period')}
+                <Tooltip
+                  title={t(
+                    'Configure the service delivery period for the automatically generated invoices from this service',
+                  )}
+                  placement="top">
+                  <IconButton sx={{marginLeft: '3px', padding: 0}}>
+                    <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0}} />
+                  </IconButton>
+                </Tooltip>
+              </InputLabel>
+              <Select
+                label={`${t('Service delivery period')}*`}
+                size="small"
+                value={
+                  formikContractServiceComponent.values.serviceDeliveryType
+                }
+                required
+                notched
+                name="serviceDeliveryType"
+                onBlur={formikContractServiceComponent.handleBlur}
+                onChange={formikContractServiceComponent.handleChange}>
+                {SERVICE_DELIVERY_TYPES.map((deliveryType) => (
+                  <MenuItem value={deliveryType.value} key={deliveryType.value}>
+                    {t(deliveryType.label)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
         </Grid>
       )}

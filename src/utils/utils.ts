@@ -12,6 +12,8 @@ import {
 } from 'models/invoice';
 
 import {ElevatorDataSchemaItem} from 'models/elevator';
+import {MONTH_NUMBER_TO_NAME} from 'models/jobFrequency';
+import {ContractServiceFormElevator} from 'models/contract';
 import {Address, AddressRecord, Coord, GeocodeAddress} from '../models/misc';
 import useHighlightText from '../hooks/useHighlightText';
 import {getCountryCode} from './countries';
@@ -750,4 +752,23 @@ export const getTechnicalFieldCategory = (
   }
 
   return name;
+};
+
+export const generateMonthDropdownFromElevatorJobFrequency = (
+  elevators: ContractServiceFormElevator[],
+) => {
+  const allMonthsSet = new Set<number>();
+
+  elevators.forEach((elevator) => {
+    elevator.orderGenerationJob?.timeNumbers.forEach((month) => {
+      allMonthsSet.add(month);
+    });
+  });
+
+  return [...allMonthsSet]
+    .sort((a, b) => a - b)
+    .map((month) => ({
+      label: MONTH_NUMBER_TO_NAME[month],
+      value: month,
+    }));
 };
