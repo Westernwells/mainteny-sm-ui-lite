@@ -1,5 +1,12 @@
-import {useEffect, Fragment, useMemo, useRef, useState} from 'react';
-import {Box} from '@mui/material';
+import {
+  useEffect,
+  Fragment,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
+import {Box, debounce} from '@mui/material';
 import {
   Path,
   useFieldArray,
@@ -12,6 +19,7 @@ import {
   QuotationFormData,
   EditableQuotationItem,
   EditableQuotationSubItemRecord,
+  QuotationAmountDetail,
 } from 'models/quotation';
 import {Add} from '@mui/icons-material';
 import TableContainer from 'components/Table/TableContainer';
@@ -22,12 +30,11 @@ import TableCell from 'components/Table/TableCell';
 import {TableColumnWithRender} from 'models/table';
 import {useTranslation} from 'react-i18next';
 import {Button} from 'components/Button';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useVats} from 'hooks/reactQuery/useVats';
 import RichTextEditor from 'components/RichTextEditor';
 import {Dialog} from 'components/Dialog';
-import {calculateArticlesAmount} from 'utils/calculate-total';
 import {ArticleType} from 'models/article';
 import {getUniqueId} from 'utils/utils';
 import {
@@ -36,6 +43,9 @@ import {
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import {extractClosestEdge} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import {useCalculateQuotationAmount} from 'hooks/reactQuery/useQuotation';
+import {DiscountType} from 'models/invoice';
+import {buildQuotationPayload} from 'utils/quotation';
 import SubPositionRow from './SubPositionRow';
 import MainPositionRow from './MainPositionRow';
 import MarginDetails from './MarginDetails';
@@ -79,7 +89,10 @@ const PositionTable = ({formMethods}: Props) => {
     name: 'items',
   });
 
+  const {mutateAsync: calculateQuotationAmount} = useCalculateQuotationAmount();
+
   const watchedItems = useWatch({control, name: 'items'});
+  const watchedDiscount = watch('discount');
 
   const currentCurrency = useCurrentCurrency();
 
@@ -91,6 +104,9 @@ const PositionTable = ({formMethods}: Props) => {
   const [hoveredSubRowIndex, setHoveredSubRowIndex] = useState<number | null>(
     null,
   );
+
+  const [quotationDetail, setQuotationDetail] =
+    useState<QuotationAmountDetail | null>(null);
 
   const [editableMixedRow, setEditableMixedRow] =
     useState<EditableRowType | null>(null);
@@ -281,7 +297,10 @@ const PositionTable = ({formMethods}: Props) => {
       },
       subItems: [],
       description: '',
-      discount: undefined,
+      discount: {
+        type: DiscountType.PERCENTAGE,
+        percentage: 0,
+      },
       subItemsConfig: {subItemsVisible: false, priceVisible: false},
     };
 
@@ -345,31 +364,71 @@ const PositionTable = ({formMethods}: Props) => {
     });
   };
 
-  const {
-    amountBeforeGlobalDiscount,
-    amountAfterGlobalDiscount,
-    amountAfterGlobalDiscountWithVAT,
-  } = useMemo(
-    () =>
-      calculateArticlesAmount({
-        items: watchedItems,
-        globalDiscount: watch('discount'),
-      }),
-    [watchedItems, watch('discount')],
+  const recalcQuotation = useCallback(
+    debounce(async () => {
+      const invalidData = watchedItems?.some(
+        (item) => !item.name || item.name.trim() === '',
+      );
+
+      const mixItemWithoutSubItems = watchedItems.some(
+        (item) =>
+          item.article?.type === ArticleType.MIX &&
+          (!item.subItems || item.subItems.length === 0),
+      );
+
+      if (invalidData || mixItemWithoutSubItems) {
+        return;
+      }
+
+      try {
+        const payload = buildQuotationPayload(
+          watchedItems,
+          currentCurrency,
+          watchedDiscount,
+        );
+
+        const detail = await calculateQuotationAmount({
+          data: payload,
+        });
+
+        setQuotationDetail(detail);
+      } catch (error) {
+        console.error('Error while recalculating quotation:', error);
+      }
+    }, 300),
+    [calculateQuotationAmount, currentCurrency, watchedItems, watchedDiscount],
   );
 
+  useEffect(() => {
+    recalcQuotation();
+  }, [watchedItems, watchedDiscount]);
+
+  const amountBeforeGlobalDiscount =
+    quotationDetail?.amountBeforeGlobalDiscount;
+
+  const amountAfterGlobalDiscount = quotationDetail?.amountAfterGlobalDiscount;
+
   const amountBeforeGlobalDiscountFormatted = formatCurrency(
-    amountBeforeGlobalDiscount,
+    centsToMoney(
+      currentCurrency.code,
+      amountBeforeGlobalDiscount?.netAmount ?? 0,
+    ),
     {currency: currentCurrency.code},
   );
 
   const amountAfterGlobalDiscountFormatted = formatCurrency(
-    amountAfterGlobalDiscount,
+    centsToMoney(
+      currentCurrency.code,
+      amountAfterGlobalDiscount?.netAmount ?? 0,
+    ),
     {currency: currentCurrency.code},
   );
 
   const amountAfterGlobalDiscountWithVATFormatted = formatCurrency(
-    amountAfterGlobalDiscountWithVAT,
+    centsToMoney(
+      currentCurrency.code,
+      amountAfterGlobalDiscount?.grossAmount ?? 0,
+    ),
     {currency: currentCurrency.code},
   );
 
@@ -482,10 +541,10 @@ const PositionTable = ({formMethods}: Props) => {
     });
 
     return () => cleanup.forEach((fn) => fn());
-  }, [fields, expandedRows, watch('items')]);
+  }, [fields, expandedRows, watchedItems]);
 
   useEffect(() => {
-    watch('items')?.forEach(
+    watchedItems?.forEach(
       (mainItem: EditableQuotationItem, mainIndex: number) => {
         const prevSeq = prevSeqNumbersRef.current[mainIndex];
 
@@ -504,7 +563,7 @@ const PositionTable = ({formMethods}: Props) => {
         prevSeqNumbersRef.current[mainIndex] = mainItem.userSeqNumber ?? '';
       },
     );
-  }, [watch('items'), setValue]);
+  }, [watchedItems, setValue]);
 
   return (
     <>
@@ -622,7 +681,10 @@ const PositionTable = ({formMethods}: Props) => {
         amountBeforeGlobalDiscountFormatted={
           amountBeforeGlobalDiscountFormatted
         }
-        amountBeforeGlobalDiscount={amountBeforeGlobalDiscount}
+        amountBeforeGlobalDiscount={centsToMoney(
+          currentCurrency.code,
+          amountBeforeGlobalDiscount?.netAmount ?? 0,
+        )}
       />
 
       <MarginDetails
@@ -639,6 +701,13 @@ const PositionTable = ({formMethods}: Props) => {
         onSave={handleSaveDescription}
         dialogProps={{
           open: !!descriptionDialog,
+          disableEscapeKeyDown: true,
+          onClose: (event, reason) => {
+            if (reason === 'backdropClick') {
+              return;
+            }
+            setDescriptionDialog(null);
+          },
         }}
         sx={{
           '& .MuiDialog-paper': {

@@ -342,3 +342,88 @@ export const getDiscountDisplay = (
 
   return '-';
 };
+
+export const buildQuotationPayload = (
+  items: EditableQuotationItem[],
+  currentCurrency: Currency,
+  discount?: Discount,
+): any => ({
+  currency: currentCurrency.code,
+  items: items.map((item) => ({
+    id: undefined,
+    article: {
+      id: undefined,
+      name: item.article?.name,
+      externalId: item.article?.externalId,
+      type: item.article?.type,
+      unit: item.article?.unit,
+      unitSellingAmount: item.article?.unitSellingAmount,
+      unitPurchaseAmount: item.article?.unitPurchaseAmount,
+      costPackage: item.article?.costPackage,
+    },
+    name: item.name,
+    description: item.description,
+    unitAmount: {
+      currency: item.unitAmount?.currency || currentCurrency.code,
+      netAmount: item.unitAmount?.netAmount || 0,
+      percentageVat: item.unitAmount?.percentageVat || 0,
+      vatId: item.unitAmount?.vatId || '',
+      vatName: item.unitAmount?.vatName || '',
+    },
+    quantity: item.quantity || 0,
+    discount:
+      item.discount?.type === DiscountType.AMOUNT
+        ? {
+            type: DiscountType.AMOUNT,
+            amount: {
+              ...item.discount?.amount,
+              value: (item.discount?.amount?.value ?? 0) * 100,
+              currency: item.discount?.amount?.currency || currentCurrency.code,
+            },
+          }
+        : {
+            type: DiscountType.PERCENTAGE,
+            percentage: item.discount?.percentage || 0,
+          },
+    payment: undefined,
+    subItemsConfig: item.subItemsConfig,
+    subItems: item?.subItems?.map((sub) => ({
+      article: {
+        id: undefined,
+        name: sub.article?.name,
+        externalId: sub.article?.externalId,
+        type: sub.article?.type,
+        unit: sub.article?.unit,
+        unitSellingAmount: sub.article?.unitSellingAmount,
+        unitPurchaseAmount: sub.article?.unitPurchaseAmount,
+        costPackage: sub.article?.costPackage,
+      },
+      id: undefined,
+      name: sub.name,
+      unitPurchaseAmount: sub.unitPurchaseAmount,
+      unitAmount: sub.unitAmount,
+      quantity: sub.quantity,
+      description: sub.description,
+      userSeqNumber: sub.userSeqNumber,
+    })),
+    userSeqNumber: item.userSeqNumber,
+  })),
+  globalDiscount:
+    discount?.type === DiscountType.AMOUNT
+      ? {
+          type: DiscountType.AMOUNT,
+          amount: {
+            value: moneyToCents(
+              currentCurrency?.code,
+              discount.amount?.value ?? 0,
+            ),
+            currency: discount.amount?.currency || currentCurrency.code,
+            fractionDigits:
+              discount.amount?.fractionDigits || currentCurrency.fractionDigits,
+          },
+        }
+      : {
+          type: DiscountType.PERCENTAGE,
+          percentage: discount?.percentage || 0,
+        },
+});

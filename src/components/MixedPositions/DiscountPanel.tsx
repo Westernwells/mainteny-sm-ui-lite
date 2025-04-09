@@ -29,6 +29,8 @@ const DiscountPanel = ({
 
   const {control, setValue, watch} = formMethods;
 
+  const watchedDiscount = watch('discount');
+
   const handleAddDiscount = () => {
     setValue('discount', {
       type: DiscountType.AMOUNT,
@@ -48,9 +50,9 @@ const DiscountPanel = ({
 
   const handleDiscountValueChange = (values: NumberFormatValues) => {
     const {floatValue} = values;
-    const discountProperty = watch('discount');
+    const discountProperty = {type: watchedDiscount?.type!};
 
-    if (watch('discount.type') === DiscountType.AMOUNT) {
+    if (watchedDiscount?.type === DiscountType.AMOUNT) {
       setValue('discount', {
         ...discountProperty!,
         amount: {
@@ -71,8 +73,8 @@ const DiscountPanel = ({
 
   return (
     <Box display="flex" justifyContent="flex-end" mb={2} pr={6}>
-      {watch('discount.type') === DiscountType.AMOUNT ||
-      watch('discount.type') === DiscountType.PERCENTAGE ? (
+      {watchedDiscount?.type === DiscountType.AMOUNT ||
+      watchedDiscount?.type === DiscountType.PERCENTAGE ? (
         <Box width={448} display="flex" flexDirection="column" gap={1}>
           <Box
             display="flex"
@@ -124,16 +126,16 @@ const DiscountPanel = ({
               />
               <NumericFormat
                 value={
-                  watch('discount.type') === DiscountType.AMOUNT
-                    ? watch('discount.amount.value')
-                    : watch('discount.percentage')
+                  watchedDiscount?.type === DiscountType.AMOUNT
+                    ? watchedDiscount.amount?.value
+                    : watchedDiscount.percentage
                 }
                 isAllowed={(values) => {
                   const {floatValue} = values;
                   if (!floatValue) return true;
                   if (floatValue < 0) return false;
                   const maxDiscount =
-                    watch('discount.type') === DiscountType.AMOUNT
+                    watchedDiscount?.type === DiscountType.AMOUNT
                       ? amountBeforeGlobalDiscount
                       : 100;
                   return floatValue <= maxDiscount;

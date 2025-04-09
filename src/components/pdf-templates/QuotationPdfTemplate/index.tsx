@@ -1,6 +1,6 @@
 import {Document, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import React, {useMemo} from 'react';
+import React from 'react';
 import {formatDate} from 'utils/datetime';
 import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {EditableQuotationItem, QuotationView} from 'models/quotation';
@@ -9,7 +9,6 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {calculateArticlesAmount} from 'utils/calculate-total';
 import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
@@ -18,7 +17,6 @@ import {
   insertNewlines,
 } from 'utils/pdfTemplates';
 import {toSentenceCase} from 'utils/string';
-import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
   getDiscountDisplay,
   getQuotationItemTotalAfterPerItemDiscount,
@@ -231,18 +229,15 @@ const QuotationPdfTemplate = React.memo(
       discountAmount?.value ?? 0,
     );
 
-    const {amountAfterGlobalDiscount, amountAfterGlobalDiscountWithVAT, vats} =
-      useMemo(
-        () =>
-          calculateArticlesAmount({
-            items: quotationItems,
-            globalDiscount: getDiscoutObj(
-              quotation?.additionalInfo.discount,
-              true,
-            ),
-          }),
-        [quotationItems, quotation?.additionalInfo.discount],
-      );
+    const amountAfterGlobalDiscount = centsToMoney(
+      currentCurrency?.code!,
+      quotation?.totalAmount.netAmount ?? 0,
+    );
+    const amountAfterGlobalDiscountWithVAT = centsToMoney(
+      currentCurrency?.code!,
+      quotation?.totalAmount.grossAmount ?? 0,
+    );
+    const vats = quotation?.totalAmount.vats || [];
 
     const amountAfterGlobalDiscountFormatted = formatCurrency(
       amountAfterGlobalDiscount,
@@ -810,7 +805,10 @@ const QuotationPdfTemplate = React.memo(
                                     textAlign: 'right',
                                     width: '43%',
                                   }}>
-                                  {vat.vat}
+                                  {centsToMoney(
+                                    currentCurrency?.code!,
+                                    vat.vat,
+                                  ).toFixed(2)}
                                 </Text>
                               </View>
                             ))}

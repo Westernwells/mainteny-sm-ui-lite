@@ -8,12 +8,15 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {FormInput} from 'components/form/FormInput';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
+  useCalculateQuotationAmount,
   useCreateQuotation,
   useQuotations,
   useUpdateQuotation,
 } from 'hooks/reactQuery/useQuotation';
 import {
   CreateQuotationRecord,
+  EditableQuotationItem,
+  QuotationAmountDetail,
   QuotationFormData,
   QuotationStatus,
   QuotationSubItemRecord,
@@ -68,7 +71,7 @@ import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import queryString from 'query-string';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {Progress} from 'components/Progress';
-import {isEqual, omit} from 'lodash';
+import {debounce, isEqual, omit} from 'lodash';
 import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTerm} from 'components/ContractTerm';
 import RichTextField from 'components/RichTextField';
@@ -88,7 +91,7 @@ import {companyLanguageContextMap} from 'utils/language';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {pdf} from '@react-pdf/renderer';
-import {moneyToCents, useCurrentCurrency} from 'utils/currency';
+import {centsToMoney, useCurrentCurrency} from 'utils/currency';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
@@ -104,12 +107,11 @@ import {
   generatePdfQuotation,
   quotationItemToQuotationItemRecord,
 } from 'utils/quotation';
-import {calculateArticlesAmount} from 'utils/calculate-total';
 import {Controller, useForm} from 'react-hook-form';
 import PositionTable from 'components/MixedPositions/PositionTable';
-import {DiscountType} from 'models/invoice';
 import {ArticleType} from 'models/article';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {DiscountType} from 'models/invoice';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord} from './utils';
 import {Notes} from './Notes';
@@ -134,6 +136,9 @@ export const DraftQuotation = ({
   const navigate = useNavigate();
   const {search} = useLocation();
   const {data: taxRates} = useVats();
+
+  const defaultVat = taxRates?.find((tR) => tR.isDefault);
+
   const [paymentTermToEdit, setPaymentTermToEdit] = useState<
     ContractTermView | undefined
   >(undefined);
@@ -364,23 +369,127 @@ export const DraftQuotation = ({
   const watchedSentDate = watch('sentDate');
   const watchedExpiryDate = watch('expiryDate');
 
-  const {vats, amountAfterGlobalDiscount, amountAfterGlobalDiscountWithVAT} =
-    useMemo(
-      () =>
-        calculateArticlesAmount({
-          items: watchedItems.map((item) => ({
-            unitAmount: {
-              netAmount: item.unitAmount?.netAmount ?? 0,
-              currency: item.unitAmount?.currency || currentCurrency.code,
-              percentageVat: item.unitAmount?.percentageVat,
-            },
-            quantity: item.quantity,
-            discount: item.discount,
-          })),
-          globalDiscount: watchedDiscount,
-        }),
-      [watchedItems, watchedDiscount],
-    );
+  const {mutateAsync: calculateQuotationAmount} = useCalculateQuotationAmount();
+
+  const [quotationDetail, setQuotationDetail] =
+    useState<QuotationAmountDetail | null>(null);
+
+  const recalcQuotation = useCallback(
+    debounce(async () => {
+      const invalidData = watchedItems?.some(
+        (item) => !item.name || item.name.trim() === '',
+      );
+
+      const mixItemWithoutSubItems = watchedItems.some(
+        (item) =>
+          item.article?.type === ArticleType.MIX &&
+          (!item.subItems || item.subItems.length === 0),
+      );
+
+      if (invalidData || mixItemWithoutSubItems) {
+        return;
+      }
+
+      try {
+        const detail = await calculateQuotationAmount({
+          data: {
+            currency: currentCurrency.code,
+            items: watchedItems?.map((item) => ({
+              id: undefined,
+              article: {
+                id: undefined,
+                name: item.article?.name,
+                externalId: item.article?.externalId,
+                type: item.article?.type,
+                unit: item.article?.unit,
+                unitSellingAmount: item.article?.unitSellingAmount,
+                unitPurchaseAmount: item.article?.unitPurchaseAmount,
+                costPackage: item.article?.costPackage,
+              },
+              name: item.name,
+              description: item.description,
+              unitAmount: {
+                currency: item.unitAmount?.currency || currentCurrency.code,
+                netAmount: item.unitAmount?.netAmount || 0,
+                percentageVat: item.unitAmount?.percentageVat || 0,
+                vatId: item.unitAmount?.vatId || '',
+                vatName: item.unitAmount?.vatName || '',
+              },
+              quantity: item.quantity || 0,
+              discount:
+                item.discount?.type === DiscountType.AMOUNT
+                  ? {
+                      type: DiscountType.AMOUNT,
+                      amount: {
+                        ...item.discount?.amount,
+                        value: (item.discount?.amount?.value ?? 0) * 100,
+                        currency:
+                          item.discount?.amount?.currency ||
+                          currentCurrency.code,
+                      },
+                    }
+                  : {
+                      type: DiscountType.PERCENTAGE,
+                      percentage: item.discount?.percentage || 0,
+                    },
+              payment: undefined,
+              subItemsConfig: item.subItemsConfig,
+              subItems: item?.subItems?.map((sub) => ({
+                article: {
+                  id: undefined,
+                  name: sub.article?.name,
+                  externalId: sub.article?.externalId,
+                  type: sub.article?.type,
+                  unit: sub.article?.unit,
+                  unitSellingAmount: sub.article?.unitSellingAmount,
+                  unitPurchaseAmount: sub.article?.unitPurchaseAmount,
+                  costPackage: sub.article?.costPackage,
+                },
+                id: undefined,
+                name: sub.name,
+                unitPurchaseAmount: sub.unitPurchaseAmount,
+                unitAmount: sub.unitAmount,
+                quantity: sub.quantity,
+                description: sub.description,
+                userSeqNumber: sub.userSeqNumber,
+              })),
+              userSeqNumber: item.userSeqNumber,
+            })),
+            globalDiscount:
+              watchedDiscount?.type === DiscountType.AMOUNT
+                ? {
+                    type: DiscountType.AMOUNT,
+                    amount: {
+                      value: (watchedDiscount.amount?.value ?? 0) * 100,
+                      currency:
+                        watchedDiscount.amount?.currency ||
+                        currentCurrency.code,
+                      fractionDigits:
+                        watchedDiscount.amount?.fractionDigits ||
+                        currentCurrency.fractionDigits,
+                    },
+                  }
+                : {
+                    type: DiscountType.PERCENTAGE,
+                    percentage: watchedDiscount?.percentage || 0,
+                  },
+          },
+        });
+        setQuotationDetail(detail);
+      } catch (error) {
+        console.error('Error while recalculating quotation:', error);
+      }
+    }, 300),
+    [calculateQuotationAmount, currentCurrency, watchedItems, watchedDiscount],
+  );
+
+  useEffect(() => {
+    recalcQuotation();
+  }, [watchedItems, watchedDiscount]);
+
+  const amountAfterGlobalDiscount = quotationDetail?.amountAfterGlobalDiscount;
+
+  const vats = quotationDetail?.amountAfterGlobalDiscount.vats || [];
 
   async function save(values: QuotationFormData) {
     if (!values?.description?.trim().length) values.description = '';
@@ -727,17 +836,15 @@ export const DraftQuotation = ({
   const handlePreview = async () => {
     const formValues = getValues();
 
-    const mappedVats = vats.map((vat) => ({
-      ...vat,
-      vat: moneyToCents(currentCurrency.code, vat.vat),
-    }));
-
     const pdfQuotation = generatePdfQuotation(
       formValues,
       currentCurrency,
-      amountAfterGlobalDiscount,
-      amountAfterGlobalDiscountWithVAT,
-      mappedVats,
+      centsToMoney(currentCurrency?.code, amountAfterGlobalDiscount?.netAmount),
+      centsToMoney(
+        currentCurrency?.code,
+        amountAfterGlobalDiscount?.grossAmount,
+      ),
+      vats,
       unit,
       customer,
       company,
@@ -1053,42 +1160,43 @@ export const DraftQuotation = ({
     const newIndex = getValues('items').length;
     const defaultSeqNumber = (newIndex + 1).toString();
 
+    const defaultProps = {
+      netAmount: 0,
+      currency: currentCurrency.code,
+      percentageVat: defaultVat?.percentage,
+      vatId: defaultVat?.id,
+      vatName: defaultVat?.name,
+    };
+
+    const newItem: EditableQuotationItem = {
+      id: getUniqueId(),
+      userSeqNumber: defaultSeqNumber,
+      name: '',
+      quantity: 1,
+      unitAmount: defaultProps,
+      unitPurchaseAmount: defaultProps,
+      article: {
+        type: ArticleType.OTHER,
+        unit: 'kg',
+        unitSellingAmount: defaultProps,
+        unitPurchaseAmount: defaultProps,
+      },
+      subItems: [],
+      description: '',
+      discount: {
+        type: DiscountType.PERCENTAGE,
+        percentage: 0,
+      },
+      subItemsConfig: {subItemsVisible: false, priceVisible: false},
+    };
+
     if (
       formType === 'new' &&
       pageState === 'FRESH_NEW' &&
       !quotation &&
       (!getValues('items') || getValues('items').length === 0)
     ) {
-      setValue('items', [
-        {
-          id: getUniqueId(),
-          userSeqNumber: defaultSeqNumber,
-          name: '',
-          quantity: 1,
-          unitAmount: {
-            netAmount: 0,
-            percentageVat: 0,
-            currency: currentCurrency.code,
-          },
-          unitPurchaseAmount: {
-            netAmount: 0,
-            percentageVat: 0,
-            currency: currentCurrency.code,
-          },
-          subItems: [],
-          description: '',
-          discount: {
-            type: DiscountType.NONE,
-            amount: {
-              value: 0,
-              currency: currentCurrency.code,
-              fractionDigits: currentCurrency.fractionDigits,
-            },
-            percentage: 0,
-          },
-          subItemsConfig: undefined,
-        },
-      ]);
+      setValue('items', [newItem]);
     }
   }, [formType, pageState]);
 
