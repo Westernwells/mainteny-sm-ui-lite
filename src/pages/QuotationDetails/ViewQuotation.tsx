@@ -30,7 +30,7 @@ import {
   QuotationSubItemRecord,
   QuotationView,
 } from 'models/quotation';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
@@ -491,8 +491,10 @@ export const ViewQuotation = ({
               />
               <Typography variant="subtitle1" fontWeight="600">
                 {formatCurrency(
-                  (quotation.totalAmount.netAmount ?? 0) /
-                    10 ** quotation.totalAmount.fractionDigits!,
+                  centsToMoney(
+                    currentCurrency.code,
+                    quotation.totalAmount.netAmount,
+                  ),
                   {currency: quotation.totalAmount.currency},
                 )}
               </Typography>

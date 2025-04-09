@@ -420,15 +420,6 @@ const MainPositionRow = ({
       setValue(`items.${index}.unitAmount`, selectedArticle.unitSellingAmount);
       setValue(`items.${index}.quantity`, 1);
       setValue(`items.${index}.description`, selectedArticle.description ?? '');
-      setValue(`items.${index}.discount`, {
-        type: DiscountType.PERCENTAGE,
-        percentage: 0,
-        amount: {
-          value: 0,
-          currency: currentCurrency.code,
-          fractionDigits: 2,
-        },
-      });
     }
     setEditableRow(null);
   };
@@ -1469,11 +1460,6 @@ const MainPositionRow = ({
                         : {
                             type: DiscountType.PERCENTAGE,
                             percentage: currentDiscount?.percentage || 0,
-                            amount: {
-                              value: 0,
-                              currency: currentCurrency.code,
-                              fractionDigits: currentCurrency.fractionDigits,
-                            },
                           };
 
                     setValue(`items.${index}.discount`, newDiscount);
@@ -1508,11 +1494,6 @@ const MainPositionRow = ({
                         percentage: (
                           editableRow.values as EditableQuotationItem
                         )?.discount?.percentage,
-                        amount: {
-                          value: 0,
-                          currency: currentCurrency.code,
-                          fractionDigits: currentCurrency.fractionDigits,
-                        },
                       };
                 setValue(`items.${index}.discount`, sanitizedDiscount);
                 setEditableRow(null);
@@ -1537,13 +1518,17 @@ const MainPositionRow = ({
                     ...((prev!.values as EditableQuotationItem)?.discount
                       ?.type === DiscountType.AMOUNT
                       ? {
+                          type: DiscountType.AMOUNT,
                           amount: {
                             value: floatValue || 0,
                             currency: currentCurrency.code,
                             fractionDigits: currentCurrency.fractionDigits,
                           },
                         }
-                      : {percentage: floatValue || 0}),
+                      : {
+                          type: DiscountType.PERCENTAGE,
+                          percentage: floatValue || 0,
+                        }),
                   },
                 },
               }));

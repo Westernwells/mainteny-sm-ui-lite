@@ -64,7 +64,10 @@ import {sanitizedTextStyles} from 'pages/Articles/Tabs/MixedPositions/MixedPosit
 import DragHandle from 'components/DragHandle';
 import {DiscountType} from 'models/invoice';
 import {debounce, isEqual} from 'lodash';
-import {getQuotationItemTotalAfterPerItemDiscount} from 'utils/quotation';
+import {
+  buildQuotationPayload,
+  getQuotationItemTotalAfterPerItemDiscount,
+} from 'utils/quotation';
 import {useCalculateQuotationAmount} from 'hooks/reactQuery/useQuotation';
 import {EditableRowType} from './PositionTable';
 import SubPositionActions from './SubPositionActions';
@@ -109,6 +112,9 @@ const SubPositionRow = ({
   const {t} = useTranslation();
   const theme = useTheme();
   const {getValues, watch} = formMethods;
+
+  const watchedItems = watch('items');
+  const watchedDiscount = watch('discount');
 
   const {language: selectedLng} = useContext(LanguageContext);
   const currentCurrency = useCurrentCurrency();
@@ -238,80 +244,20 @@ const SubPositionRow = ({
       },
     });
 
-  const recalcInvoice = useCallback(
+  const recalcQuotation = useCallback(
     debounce(async () => {
       try {
-        const invoiceDetail = await calculateQuotationAmount({
-          data: {
-            currency: currentCurrency.code,
-            items: watch('items').map((item) => ({
-              id: undefined,
-              article: {
-                id: undefined,
-                name: item.article?.name,
-                externalId: item.article?.externalId,
-                type: item.article?.type,
-                unit: item.article?.unit,
-                unitSellingAmount: item.article?.unitSellingAmount,
-                unitPurchaseAmount: item.article?.unitPurchaseAmount,
-                costPackage: item.article?.costPackage,
-              },
-              name: item.name,
-              description: item.description,
-              unitAmount: {
-                currency: item.unitAmount?.currency || currentCurrency.code,
-                netAmount: item.unitAmount?.netAmount || 0,
-                percentageVat: item.unitAmount?.percentageVat || 0,
-                vatId: item.unitAmount?.vatId || '',
-                vatName: item.unitAmount?.vatName || '',
-              },
-              quantity: item.quantity || 0,
-              discount: {
-                ...item.discount,
-                type: item.discount?.type!,
-                amount: {
-                  ...item.discount?.amount,
-                  value: (item.discount?.amount?.value ?? 0) * 100,
-                  currency:
-                    item.discount?.amount?.currency || currentCurrency.code,
-                },
-              },
-              payment: undefined,
-              subItemsConfig: item.subItemsConfig,
-              subItems: item?.subItems?.map((sub) => ({
-                article: {
-                  id: undefined,
-                  name: sub.article?.name,
-                  externalId: sub.article?.externalId,
-                  type: sub.article?.type,
-                  unit: sub.article?.unit,
-                  unitSellingAmount: sub.article?.unitSellingAmount,
-                  unitPurchaseAmount: sub.article?.unitPurchaseAmount,
-                  costPackage: sub.article?.costPackage,
-                },
-                id: undefined,
-                name: sub.name,
-                unitPurchaseAmount: sub.unitPurchaseAmount,
-                unitAmount: sub.unitAmount,
-                quantity: sub.quantity,
-                description: sub.description,
-                userSeqNumber: sub.userSeqNumber,
-              })),
-              userSeqNumber: item.userSeqNumber,
-            })),
-            globalDiscount: watch('discount') || {
-              type: DiscountType.AMOUNT,
-              amount: {
-                value: 0,
-                currency: currentCurrency.code,
-                fractionDigits: currentCurrency.fractionDigits,
-              },
-              percentage: 0,
-            },
-          },
+        const payload = buildQuotationPayload(
+          watchedItems,
+          currentCurrency,
+          watchedDiscount,
+        );
+
+        const quotationDetail = await calculateQuotationAmount({
+          data: payload,
         });
 
-        invoiceDetail.items.forEach((itemDetail, index) => {
+        quotationDetail?.items?.forEach((itemDetail, index) => {
           const newAmount = itemDetail.amountBeforeItemDiscount;
           const currentAmount = watch(`items.${index}.unitAmount`);
           if (!isEqual(newAmount, currentAmount)) {
@@ -396,7 +342,7 @@ const SubPositionRow = ({
         `${path}.unitPurchaseAmount.netAmount` as Path<QuotationFormData>,
         Math.round(newAmount * 100),
       );
-      recalcInvoice();
+      recalcQuotation();
       updateMainUnitPurchaseAmount();
     } else if (field === `${path}.unitAmount.netAmount`) {
       const newAmount = editableSubRow.values?.unitAmount?.netAmount ?? 0;
@@ -405,7 +351,7 @@ const SubPositionRow = ({
         Math.round(newAmount * 100),
       );
 
-      recalcInvoice();
+      recalcQuotation();
     } else if (field === 'margin') {
       const marginValue = editableSubRow.values?.margin ?? 0;
       const purchaseNetAmount = Number(
@@ -422,14 +368,14 @@ const SubPositionRow = ({
         `${path}.unitAmount.netAmount` as Path<QuotationFormData>,
         Math.round(newSellingPrice),
       );
-      recalcInvoice();
+      recalcQuotation();
     } else if (field === `${path}.quantity`) {
       setValue(
         `${path}.quantity` as Path<QuotationFormData>,
         editableSubRow.values?.quantity || 0,
       );
       updateMainUnitPurchaseAmount();
-      recalcInvoice();
+      recalcQuotation();
     }
 
     setEditableSubRow(null);
@@ -474,7 +420,7 @@ const SubPositionRow = ({
 
     setEditableSubRow(null);
     updateMainUnitPurchaseAmount();
-    recalcInvoice();
+    recalcQuotation();
   };
 
   const updateVatForAllRelatedRows = useCallback(
@@ -1414,7 +1360,7 @@ const SubPositionRow = ({
             onDelete={() => {
               onRemoveSubPosition(parentIndex, subIndex);
               setIsActionOpen(false);
-              recalcInvoice();
+              recalcQuotation();
               updateMainUnitPurchaseAmount();
             }}
             isOpen={isActionOpen}
