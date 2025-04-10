@@ -3148,5 +3148,12 @@
   "Remove sub-position": "Subposition entfernen",
   "Dunning 1": "1. Mahnung",
   "Dunning 2": "2. Mahnung",
-  "Dunning 3": "3. Mahnung"
+  "Dunning 3": "3. Mahnung",
+  "Clear formatting": "Formatierung löschen",
+  "Configure the service delivery period for the automatically generated invoices from this service": "Legen Sie den Leistungszeitraum für die automatisch generierten Rechnungen aus diesem Service fest",
+  "Please add job generation months to each unit and afterwards chose from which month onwards the generation should start": "Bitte fügen Sie bei jeder Anlage Monate zur Auftragserzeugung hinzu und wählen Sie anschließend, ab welchem Monat die Erzeugung starten soll",
+  "Service delivery period": "Leistungszeitraum",
+  "Before invoice generation": "Vor der Rechnungserstellung",
+  "During invoice generation": "Innerhalb der Rechnungserstellung",
+  "After invoice generation": "Nach der Rechnungserstellung"
 }
