@@ -28,6 +28,7 @@ import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {OptionsObject, SnackbarKey, SnackbarMessage} from 'notistack';
 import {formatCurrency} from 'utils/currency';
 import {Currency} from 'models/misc';
+import {Service} from 'pages/UnitDetails/Tabs/OverviewTab/ContractServices';
 
 export const costRangeConvertor = (
   selectedItems: string[],
@@ -290,7 +291,7 @@ export const mergeElevators = (
     | ContractElevatorView[]
     | ElevatorView[]
     | ElevatorSimpleView[],
-  elevatorsFromRow: ContractComponentView,
+  elevatorsFromRow: Service,
 ) => {
   const existingElevators = elevatorsFromRow.additionalInfo?.elevators || [];
 
@@ -480,3 +481,15 @@ export const transformContractViewComponentToContractRecord = (
     costPackage: component.additionalInfo.costPackage,
     orderType: component.additionalInfo.orderType ?? undefined,
   }));
+
+export const getAutoJobStatus = (
+  firstInvoiceDate: Date | null,
+): {
+  label: string;
+  color: 'default' | 'darkSuccess';
+} => {
+  if (firstInvoiceDate) {
+    return {label: 'Yes', color: 'darkSuccess'};
+  }
+  return {label: 'No', color: 'default'};
+};

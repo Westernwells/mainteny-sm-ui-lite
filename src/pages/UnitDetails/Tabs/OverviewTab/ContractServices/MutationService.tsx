@@ -176,6 +176,9 @@ export const MutationService = ({
     formikContractServiceComponent.values.elevators?.slice(0, visibleItems) ||
     [];
 
+  const filteredElevatorIds =
+    formikContractServiceComponent.values.elevators.map((e) => e.elevatorId);
+
   useEffect(() => {
     const defaultPackageValues = {
       laborPercentage:
@@ -1018,6 +1021,7 @@ export const MutationService = ({
                       componentId={item.elevatorId}
                       units={formikContractServiceComponent.values.elevators}
                       onChange={handleJobFrequencyChange('elevators')}
+                      filteredUnitIds={filteredElevatorIds}
                       mode="edit"
                     />
                   </TableCell>
@@ -1034,6 +1038,7 @@ export const MutationService = ({
                   <InvoiceFrequencyPicker
                     formik={formikContractServiceComponent}
                     componentId={item.elevatorId}
+                    filteredUnitIds={filteredElevatorIds}
                     mode="edit"
                   />
                 </TableCell>

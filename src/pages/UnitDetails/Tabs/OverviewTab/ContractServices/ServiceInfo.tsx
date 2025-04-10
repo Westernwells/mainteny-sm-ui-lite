@@ -31,7 +31,7 @@ import {getArticleTypeText} from 'utils/article-utils';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {getViewFrequency} from 'utils/elevator-utils';
 import {ArticleType} from 'models/article';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {
   getJobTypeGivenName,
   serviceOrderTypeToString,
@@ -45,7 +45,7 @@ import {Service} from '.';
 
 type Props = {
   service?: Service;
-  elevators: ContractElevatorView[] | ElevatorView[];
+  elevators: ContractElevatorView[] | ElevatorView[] | ElevatorSimpleView[];
 };
 
 const ServiceInformationReview = ({service, elevators}: Props) => {
