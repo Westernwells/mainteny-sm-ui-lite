@@ -3174,5 +3174,7 @@
   "Configure the service delivery period for the automatically generated invoices from this service": "Konfigurišite period isporuke usluge za automatski generisane fakture iz ove usluge",
   "Please add job generation months to each unit and afterwards chose from which month onwards the generation should start": "Dodajte mesece generisanja poslova svakoj jedinici i nakon toga izaberite od kog meseca nadalje generacija treba da počne",
   "Service delivery period": "Period isporuke usluge",
-  "Before invoice generation": "Pre generisanja fakture"
+  "Before invoice generation": "Pre generisanja fakture",
+  "During invoice generation": "Tokom generisanja fakture",
+  "After invoice generation": "Nakon generisanja fakture"
 }
