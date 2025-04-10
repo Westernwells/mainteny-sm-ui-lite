@@ -970,7 +970,7 @@ export const MutationService = ({
                     handleChange={() =>
                       handleCheckboxChange(item, !item.isChecked)
                     }
-                    label={item.externalId}
+                    label={item.externalId || t('Unassigned')}
                     typographyProps={{
                       variant: 'body2',
                     }}

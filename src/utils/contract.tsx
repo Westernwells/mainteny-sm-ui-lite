@@ -309,6 +309,32 @@ export const mergeElevators = (
   }));
 };
 
+export const mergeElevatorsByExisting = (
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
+  elevatorsFromRow: Service,
+) => {
+  const existingElevators = elevatorsFromRow.additionalInfo?.elevators || [];
+
+  const parsedElevators = parsElevatorRecourses(elevatorResource || []);
+
+  const resourceMap = parsedElevators.reduce((map, elevator) => {
+    map[elevator.elevatorId] = elevator;
+    return map;
+  }, {} as Record<string, (typeof parsedElevators)[0]>);
+
+  return existingElevators.map((existingElevator) => {
+    const merged = {
+      ...resourceMap[existingElevator.elevatorId],
+      ...existingElevator,
+      isChecked: true,
+    };
+    return merged;
+  });
+};
+
 export const getElevatorDataByElevator = (
   elevatorResource:
     | ContractElevatorView[]
