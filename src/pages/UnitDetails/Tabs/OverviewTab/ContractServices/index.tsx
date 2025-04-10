@@ -13,6 +13,7 @@ import {
   ContractServiceForm,
   ContractSimpleView,
   ContractStatus,
+  ContractView,
 } from 'models/contract';
 import {EmptySection} from 'components/EmptySection';
 import Divider from '@mui/material/Divider';
@@ -34,6 +35,7 @@ import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {
   calculateContractInvoicePriceGrandTotal,
   componentsToMutate,
+  getAutoJobStatus,
   mergeElevators,
   parsElevatorRecourses,
 } from 'utils/contract';
@@ -52,12 +54,13 @@ import {MutationService} from './MutationService';
 
 interface Props {
   elevator: ElevatorView;
+  contractDetails?: ContractView;
   containerStyles?: SxProps;
 }
 
 export interface Service extends ContractComponentView {
-  contractNumber: string;
-  contractId: string;
+  contractNumber?: string;
+  contractId?: string;
 }
 
 const serviceListingColumns: {
@@ -75,18 +78,6 @@ const serviceListingColumns: {
   {name: '', align: 'right', width: '5%'},
 ];
 
-export const getAutoJobStatus = (
-  firstInvoiceDate: Date | null,
-): {
-  label: string;
-  color: 'default' | 'darkSuccess';
-} => {
-  if (firstInvoiceDate) {
-    return {label: 'Yes', color: 'darkSuccess'};
-  }
-  return {label: 'No', color: 'default'};
-};
-
 const validationSchemaContractServices = Yup.object().shape({
   name: Yup.string().required('Service name cannot be empty'),
   firstInvoiceDate: Yup.date()
@@ -95,7 +86,11 @@ const validationSchemaContractServices = Yup.object().shape({
     .required('First invoice date is required'),
 });
 
-const ContractServices = ({elevator, containerStyles}: Props) => {
+const ContractServices = ({
+  elevator,
+  contractDetails,
+  containerStyles,
+}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const formatDate = useFormatDate();
@@ -116,12 +111,40 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [currentService, setCurrentService] = useState<Service>();
 
+  const elevatorResource =
+    contractDetails?.elevators.map(
+      (contractElevator) => contractElevator.elevator,
+    ) || [];
+
   useEffect(() => {
     refetchUniqueId();
   }, [isDialogOpen]);
 
-  const formikContractServiceInitialValues = useMemo(
-    () => ({
+  const formikContractServiceInitialValues = useMemo(() => {
+    const defaultCostPackage = {
+      laborPercentage: 50,
+      materialPercentage: 50,
+    };
+
+    if (isEditForm && currentService) {
+      return {
+        isChecked: false,
+        id: uuid,
+        name: currentService?.name || '',
+        group: currentService?.group || '',
+        firstInvoiceDate:
+          currentService?.additionalInfo?.firstInvoiceDate || null,
+        firstOrderDate: currentService?.additionalInfo?.firstOrderDate || null,
+        costType: currentService?.additionalInfo?.costType || ArticleType.LABOR,
+        costPackage:
+          currentService?.additionalInfo?.costPackage || defaultCostPackage,
+        isAutomaticJobCycle: !!currentService?.additionalInfo?.firstOrderDate,
+        elevators: mergeElevators(elevatorResource, currentService),
+        orderType: currentService?.additionalInfo?.orderType || '',
+      };
+    }
+
+    return {
       isChecked: false,
       id: uuid,
       name: '',
@@ -135,9 +158,8 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
       },
       isAutomaticJobCycle: false,
       elevators: [],
-    }),
-    [],
-  );
+    };
+  }, [isEditForm, currentService, uuid, elevatorResource]);
 
   const formikContractServiceComponent = useFormik<ContractServiceForm>({
     initialValues: formikContractServiceInitialValues,
@@ -202,12 +224,12 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
   const setAddFormData = () => {
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
-      elevators: parsElevatorRecourses([elevator]),
+      elevators: parsElevatorRecourses(elevatorResource),
     });
   };
 
   const setEditFormData = (row: ContractComponentView) => {
-    const allItems = mergeElevators([elevator], row);
+    const allItems = mergeElevators(elevatorResource, row);
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
       id: row.id,
@@ -230,7 +252,7 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
     } else {
       setAddFormData();
     }
-  }, [elevator]);
+  }, [elevatorResource?.length]);
 
   const openViewDialog = (row: Service) => {
     setCurrentService(row);
@@ -576,7 +598,7 @@ const ContractServices = ({elevator, containerStyles}: Props) => {
         showCancelButton={false}>
         <ServiceInformationReview
           service={currentService}
-          elevators={[elevator]}
+          elevators={elevatorResource}
         />
       </Dialog>
     </Grid>

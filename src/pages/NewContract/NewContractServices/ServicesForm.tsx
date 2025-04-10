@@ -137,6 +137,9 @@ const ServicesForm = ({
     formikContractServiceComponent.values.elevators?.slice(0, visibleItems) ||
     [];
 
+  const filteredElevatorIds =
+    formikContractServiceComponent.values.elevators.map((e) => e.elevatorId);
+
   const columns: {
     name: string;
     align?: TableCellProps['align'];
@@ -849,6 +852,7 @@ const ServicesForm = ({
                       <JobFrequencyPicker
                         componentId={item.elevatorId}
                         units={formikContractServiceComponent.values.elevators}
+                        filteredUnitIds={filteredElevatorIds}
                         onChange={handleJobFrequencyChange('elevators')}
                         mode="new"
                       />
@@ -867,6 +871,7 @@ const ServicesForm = ({
                       formik={formikContractServiceComponent}
                       componentId={item.elevatorId}
                       mode="new"
+                      filteredUnitIds={filteredElevatorIds}
                     />
                   </TableCell>
 

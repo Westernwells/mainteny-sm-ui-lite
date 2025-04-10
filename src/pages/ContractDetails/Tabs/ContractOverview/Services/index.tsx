@@ -1,4 +1,4 @@
-import {FC, useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -89,7 +89,7 @@ const validationSchemaContractServices = Yup.object().shape({
     .required('First invoice date is required'),
 });
 
-export const Services: FC<Props> = ({contractDetails}) => {
+export const Services = ({contractDetails}: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
   const formatDate = useFormatDate();
@@ -109,9 +109,8 @@ export const Services: FC<Props> = ({contractDetails}) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [currentService, setCurrentService] = useState<ContractComponentView>();
 
-  const elevatorResource = contractDetails.elevators.map(
-    (elevator) => elevator.elevator,
-  );
+  const elevatorResource =
+    contractDetails?.elevators.map((elevator) => elevator.elevator) || [];
 
   useEffect(() => {
     refetchUniqueId();
@@ -136,7 +135,7 @@ export const Services: FC<Props> = ({contractDetails}) => {
         costPackage:
           currentService?.additionalInfo?.costPackage || defaultCostPackage,
         isAutomaticJobCycle: !!currentService?.additionalInfo?.firstOrderDate,
-        elevators: mergeElevators(elevatorResource || [], currentService),
+        elevators: mergeElevators(elevatorResource, currentService),
         orderType: currentService?.additionalInfo?.orderType || '',
       };
     }
@@ -178,12 +177,12 @@ export const Services: FC<Props> = ({contractDetails}) => {
   const setAddFormData = () => {
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
-      elevators: parsElevatorRecourses(elevatorResource || []),
+      elevators: parsElevatorRecourses(elevatorResource),
     });
   };
 
   const setEditFormData = (row: ContractComponentView) => {
-    const allItems = mergeElevators(elevatorResource || [], row);
+    const allItems = mergeElevators(elevatorResource, row);
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
       id: row.id,

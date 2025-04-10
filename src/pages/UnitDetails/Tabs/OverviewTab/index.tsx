@@ -6,6 +6,7 @@ import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {Progress} from 'components/Progress';
 import ContactsWidget from 'pages/Contacts/ContactsWidget';
 import {ContactPersonAssociationType} from 'models/contacts';
+import {useContractDetails} from 'hooks/reactQuery/useContract';
 import {Location} from './Location';
 import General from './General';
 import {Service} from './Service';
@@ -26,6 +27,9 @@ export const OverviewTab = ({getUnitName}: Props) => {
   const {data: elevator, isLoading: isLoadingElevator} =
     useElevatorById(elevatorId);
 
+  const {data: contractDetails, isLoading: isLoadingContractDetails} =
+    useContractDetails(validContract?.id!);
+
   useEffect(() => {
     if (getUnitName && elevator) {
       getUnitName(elevator?.address?.fullName ?? '');
@@ -41,7 +45,7 @@ export const OverviewTab = ({getUnitName}: Props) => {
     }
   }, [elevator]);
 
-  if (isLoadingElevator) {
+  if (isLoadingElevator || isLoadingContractDetails) {
     return <Progress />;
   }
 
@@ -84,7 +88,11 @@ export const OverviewTab = ({getUnitName}: Props) => {
         </Grid>
       </Grid>
 
-      <ContractServices elevator={elevator!} containerStyles={{mt: '1.2em'}} />
+      <ContractServices
+        elevator={elevator!}
+        contractDetails={contractDetails}
+        containerStyles={{mt: '1.2em'}}
+      />
 
       <Grid item xs={12} sx={{mt: '1.2em'}}>
         <ContactsWidget
