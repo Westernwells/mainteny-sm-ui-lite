@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -36,7 +36,7 @@ import {
   calculateContractInvoicePriceGrandTotal,
   componentsToMutate,
   getAutoJobStatus,
-  mergeElevators,
+  mergeElevatorsByExisting,
   parsElevatorRecourses,
 } from 'utils/contract';
 import * as Yup from 'yup';
@@ -112,9 +112,12 @@ const ContractServices = ({
   const [currentService, setCurrentService] = useState<Service>();
 
   const elevatorResource =
-    contractDetails?.elevators.map(
-      (contractElevator) => contractElevator.elevator,
-    ) || [];
+    contractDetails?.elevators
+      .filter(
+        (contractElevator) =>
+          contractElevator.contractId === contractDetails.id,
+      )
+      .map((contractElevator) => contractElevator.elevator) || [];
 
   useEffect(() => {
     refetchUniqueId();
@@ -139,7 +142,7 @@ const ContractServices = ({
         costPackage:
           currentService?.additionalInfo?.costPackage || defaultCostPackage,
         isAutomaticJobCycle: !!currentService?.additionalInfo?.firstOrderDate,
-        elevators: mergeElevators(elevatorResource, currentService),
+        elevators: mergeElevatorsByExisting(elevatorResource, currentService),
         orderType: currentService?.additionalInfo?.orderType || '',
       };
     }
@@ -229,7 +232,7 @@ const ContractServices = ({
   };
 
   const setEditFormData = (row: ContractComponentView) => {
-    const allItems = mergeElevators(elevatorResource, row);
+    const allItems = mergeElevatorsByExisting(elevatorResource, row);
     formikContractServiceComponent.setValues({
       ...formikContractServiceComponent.values,
       id: row.id,
