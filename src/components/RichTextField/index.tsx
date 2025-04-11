@@ -1,22 +1,22 @@
 import React, {
+  CSSProperties,
+  PropsWithChildren,
+  Ref,
+  useCallback,
+  useEffect,
   useMemo,
   useRef,
-  useEffect,
-  useCallback,
-  Ref,
-  CSSProperties,
   useState,
-  PropsWithChildren,
 } from 'react';
 import {useTranslation} from 'react-i18next';
 import {
-  Slate,
-  Editable,
-  withReact,
-  ReactEditor,
   DefaultElement,
+  Editable,
+  ReactEditor,
+  Slate,
+  withReact,
 } from 'slate-react';
-import {createEditor, BaseEditor, Descendant, Editor, Transforms} from 'slate';
+import {BaseEditor, createEditor, Descendant, Editor, Transforms} from 'slate';
 import {HistoryEditor, withHistory} from 'slate-history';
 import {theme} from 'theme';
 import {FormControl, FormHelperText} from '@mui/material';
@@ -35,7 +35,7 @@ const CustomElements = ({
   attributes,
   children,
 }: RenderElementProps) => {
-  const style = {fontSize: element.fontSize};
+  const style = {fontSize: element.fontSize, color: element.color};
 
   switch (element.type) {
     case 'paragraph':

@@ -318,7 +318,6 @@ const PDFSettingLayout = ({company}: Props) => {
                   />
 
                   <ColorPickerPopup
-                    labelKey="Custom color"
                     initialValue={primaryColor}
                     onChange={onColorChange('primaryColor')}
                   />
@@ -337,7 +336,6 @@ const PDFSettingLayout = ({company}: Props) => {
                   />
 
                   <ColorPickerPopup
-                    labelKey="Custom color"
                     initialValue={secondaryColor}
                     onChange={onColorChange('secondaryColor')}
                   />

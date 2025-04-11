@@ -1,19 +1,28 @@
-import {ReactNode, useRef, useEffect, MouseEvent, useState} from 'react';
+import {
+  MouseEvent,
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import ReactDOM from 'react-dom';
 import {useTranslation} from 'react-i18next';
-import {useSlate, useFocused} from 'slate-react';
+import {useFocused, useSlate} from 'slate-react';
 import {Editor, Range} from 'slate';
 import {css} from '@emotion/css';
 import {
   Box,
+  Button,
   Divider,
   MenuItem,
   Select,
+  styled,
   ToggleButton,
   ToggleButtonGroup,
-  Typography,
-  styled,
   toggleButtonGroupClasses,
+  Typography,
+  useTheme,
 } from '@mui/material';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
@@ -24,12 +33,18 @@ import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import TextFields from '@mui/icons-material/TextFields';
+import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
 import {
   getActiveFontSize,
+  removeBlocks,
+  removeMarks,
   toggleBlock,
   toggleMark,
 } from 'utils/rich-text-field';
 import {FONT_SIZE, FORMAT} from 'models/richTextField';
+import ColorPickerPredefined from 'components/ColorPicker/ColorPickerPredefined';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import ColorPickerPopup from 'components/ColorPicker/ColorPickerPopover';
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({theme: t}) => ({
   [`& .${toggleButtonGroupClasses.grouped}`]: {
@@ -53,10 +68,15 @@ const Portal = ({children}: {children?: ReactNode}) =>
 
 export const HoveringToolbar = () => {
   const {t} = useTranslation();
+  const theme = useTheme();
   const ref = useRef<HTMLDivElement>(null);
   const editor = useSlate();
   const inFocus = useFocused();
   const [openSelectFontSize, setOpenSelectFontSize] = useState(false);
+
+  const {secondaryColor} = useContext(PdfStylesContext);
+
+  const [color, setColor] = useState(secondaryColor);
 
   useEffect(() => {
     try {
@@ -112,16 +132,21 @@ export const HoveringToolbar = () => {
 
   const handleOpen = () => setOpenSelectFontSize(true);
 
+  const handleColorChange = (value: string) => {
+    setColor(value);
+    toggleBlock(editor, FORMAT.color, value);
+  };
+
+  const handleClearStyle = () => {
+    removeMarks(editor, ['bold', 'italic', 'underline', 'fontSize']);
+    removeBlocks(editor, [FORMAT.color]);
+  };
+
   const fontSizeOptions = [
     {value: FONT_SIZE.SMALL, label: 'Small'},
     {value: FONT_SIZE.NORMAL, label: 'Normal'},
     {value: FONT_SIZE.LARGE, label: 'Large'},
   ];
-
-  const renderLabel = (value: string) => {
-    const option = fontSizeOptions.find((opt) => opt.value === value);
-    return option ? option.label : value;
-  };
 
   const activeFontSize = getActiveFontSize(editor);
   const textSize =
@@ -182,21 +207,67 @@ export const HoveringToolbar = () => {
             },
           }}
           displayEmpty
-          renderValue={(value: string) => (
+          renderValue={() => (
             <Box display="flex" alignItems="center" gap={1}>
               <TextFields sx={{color: 'white'}} />
-              <Typography>{t(renderLabel(value))}</Typography>
             </Box>
           )}>
-          {[
-            {value: FONT_SIZE.SMALL, label: 'Small'},
-            {value: FONT_SIZE.NORMAL, label: 'Normal'},
-            {value: FONT_SIZE.LARGE, label: 'Large'},
-          ].map((i) => (
+          {fontSizeOptions.map((i) => (
             <MenuItem value={i.value} key={i.value}>
-              {t(i.label)}
+              <Box
+                sx={{
+                  padding: '0px 12px',
+                  ...(activeFontSize === i.value && {
+                    border: `2px solid #fff`,
+                  }),
+                }}>
+                {t(i.label)}
+              </Box>
             </MenuItem>
           ))}
+          <Box
+            sx={{
+              width: '228px',
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '8px 12px',
+              borderTop: '1px solid #222B45',
+              gap: theme.spacing(1),
+            }}>
+            <ColorPickerPredefined
+              selectedColor={color}
+              onClick={handleColorChange}
+              size="small"
+            />
+
+            <ColorPickerPopup
+              initialValue={color}
+              onChange={handleColorChange}
+              backgroundTheme="dark"
+            />
+          </Box>
+          <Box
+            sx={{
+              width: '228px',
+              display: 'flex',
+              padding: '8px 12px 4px',
+              borderTop: '1px solid #222B45',
+            }}>
+            <Button
+              variant="text"
+              sx={{
+                display: 'flex',
+                gap: theme.spacing(0.5),
+                color: '#fff',
+              }}
+              startIcon={<EditOffOutlinedIcon />}
+              disableRipple
+              onClick={handleClearStyle}>
+              <Typography variant="body2" component="div">
+                {t('Clear formatting')}
+              </Typography>
+            </Button>
+          </Box>
         </Select>
         <StyledToggleButtonGroup
           size="small"

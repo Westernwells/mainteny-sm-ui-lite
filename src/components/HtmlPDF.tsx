@@ -1,5 +1,4 @@
 import {Html, HtmlStyle, HtmlStyles} from 'react-pdf-html';
-import {grey} from '@mui/material/colors';
 import {
   DEFAULT_HTML_PDF_FONT_SIZE,
   HTML_PDF_FONT_SIZE,
@@ -30,7 +29,6 @@ export const HtmlPDF = ({
       }}
       stylesheet={{
         '*': {
-          color: grey[700],
           fontSize: DEFAULT_HTML_PDF_FONT_SIZE,
         },
         '*:not(div:empty)': {
