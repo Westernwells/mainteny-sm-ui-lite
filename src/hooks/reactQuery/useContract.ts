@@ -116,10 +116,16 @@ const fetchContractDetails = async (contractId: string) => {
   );
   return response.data;
 };
-export const useContractDetails = (contractId: string) =>
-  useQuery([qk.contractDetails, contractId], () =>
-    fetchContractDetails(contractId),
+export const useContractDetails = (contractId: string) => {
+  const {user} = useUserSession();
+  return useQuery(
+    [qk.contractDetails, contractId],
+    () => fetchContractDetails(contractId),
+    {
+      enabled: !!contractId && !!user,
+    },
   );
+};
 
 export const queryCustomerContract = async (
   params: WithOptional<CustomerContractParams, 'serviceCompanyId'>,
