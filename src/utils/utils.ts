@@ -13,7 +13,7 @@ import {
 
 import {ElevatorDataSchemaItem} from 'models/elevator';
 import {MONTH_NUMBER_TO_NAME} from 'models/jobFrequency';
-import {ContractServiceFormElevator} from 'models/contract';
+import {ContractServiceFormElevator, ContractTimeUnit} from 'models/contract';
 import {Address, AddressRecord, Coord, GeocodeAddress} from '../models/misc';
 import useHighlightText from '../hooks/useHighlightText';
 import {getCountryCode} from './countries';
@@ -757,18 +757,34 @@ export const getTechnicalFieldCategory = (
 export const generateMonthDropdownFromElevatorJobFrequency = (
   elevators: ContractServiceFormElevator[],
 ) => {
-  const allMonthsSet = new Set<number>();
+  let allMonthsSet = new Set<number>();
+  let isNonMonthly = false;
 
   elevators.forEach((elevator) => {
+    if (elevator.orderGenerationJob?.timeUnit !== ContractTimeUnit.MONTHLY) {
+      isNonMonthly = true;
+      allMonthsSet = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      return;
+    }
+
     elevator.orderGenerationJob?.timeNumbers.forEach((month) => {
       allMonthsSet.add(month);
     });
   });
 
-  return [...allMonthsSet]
-    .sort((a, b) => a - b)
-    .map((month) => ({
-      label: MONTH_NUMBER_TO_NAME[month],
-      value: month,
-    }));
+  const months = [...allMonthsSet];
+
+  const sorted = isNonMonthly
+    ? months.sort((a, b) => {
+        const nextMonth = new Date().getMonth() + 2;
+        const aAdjusted = (a - nextMonth + 12) % 12;
+        const bAdjusted = (b - nextMonth + 12) % 12;
+        return aAdjusted - bAdjusted;
+      })
+    : months.sort((a, b) => a - b);
+
+  return sorted.map((month) => ({
+    label: MONTH_NUMBER_TO_NAME[month],
+    value: month,
+  }));
 };
