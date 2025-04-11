@@ -28,6 +28,7 @@ import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {OptionsObject, SnackbarKey, SnackbarMessage} from 'notistack';
 import {formatCurrency} from 'utils/currency';
 import {Currency} from 'models/misc';
+import {Service} from 'pages/UnitDetails/Tabs/OverviewTab/ContractServices';
 
 export const costRangeConvertor = (
   selectedItems: string[],
@@ -289,7 +290,7 @@ export const mergeElevators = (
     | ContractElevatorView[]
     | ElevatorView[]
     | ElevatorSimpleView[],
-  elevatorsFromRow: ContractComponentView,
+  elevatorsFromRow: Service,
 ) => {
   const existingElevators = elevatorsFromRow.additionalInfo?.elevators || [];
 
@@ -305,6 +306,32 @@ export const mergeElevators = (
     ...(infoMap[elevator.elevatorId] || {}),
     isChecked: hasExisting ? Boolean(infoMap[elevator.elevatorId]) : true,
   }));
+};
+
+export const mergeElevatorsByExisting = (
+  elevatorResource:
+    | ContractElevatorView[]
+    | ElevatorView[]
+    | ElevatorSimpleView[],
+  elevatorsFromRow: Service,
+) => {
+  const existingElevators = elevatorsFromRow.additionalInfo?.elevators || [];
+
+  const parsedElevators = parsElevatorRecourses(elevatorResource || []);
+
+  const resourceMap = parsedElevators.reduce((map, elevator) => {
+    map[elevator.elevatorId] = elevator;
+    return map;
+  }, {} as Record<string, (typeof parsedElevators)[0]>);
+
+  return existingElevators.map((existingElevator) => {
+    const merged = {
+      ...resourceMap[existingElevator.elevatorId],
+      ...existingElevator,
+      isChecked: true,
+    };
+    return merged;
+  });
 };
 
 export const getElevatorDataByElevator = (
@@ -479,3 +506,15 @@ export const transformContractViewComponentToContractRecord = (
     costPackage: component.additionalInfo.costPackage,
     orderType: component.additionalInfo.orderType ?? undefined,
   }));
+
+export const getAutoJobStatus = (
+  firstInvoiceDate: Date | null,
+): {
+  label: string;
+  color: 'default' | 'darkSuccess';
+} => {
+  if (firstInvoiceDate) {
+    return {label: 'Yes', color: 'darkSuccess'};
+  }
+  return {label: 'No', color: 'default'};
+};
