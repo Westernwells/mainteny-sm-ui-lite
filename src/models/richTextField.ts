@@ -3,6 +3,8 @@ import {BaseEditor} from 'slate';
 import {HistoryEditor} from 'slate-history';
 import {ReactEditor} from 'slate-react';
 
+export const INDENTATION_PIXEL_SIZE = 41;
+
 export enum FONT_SIZE {
   SMALL = '12px',
   NORMAL = '16px',
@@ -25,30 +27,44 @@ export enum FORMAT {
   'right' = 'right',
   'numbered-list' = 'numbered-list',
   'bulleted-list' = 'bulleted-list',
+  'color' = 'color',
 }
+
+export const FORMAT_TO_ATTRIBUTE: Record<string, string> = {
+  'increase-indent': 'text-indent',
+  'decrease-indent': 'text-indent',
+};
+
+// Some properties need to go to the wrapper component (node), other to the selected component (leaf)
+export const ELEMENT_TO_CHANGE: Record<string, 'node' | 'leaf'> = {
+  'text-indent': 'node',
+};
+
 export const GROUP_TYPES = [FORMAT['numbered-list'], FORMAT['bulleted-list']];
 export const ALIGNMENT_TYPES = [FORMAT.left, FORMAT.center, FORMAT.right];
 export const BLOCK_TYPES = [...GROUP_TYPES, ...ALIGNMENT_TYPES];
+export const PROPERTY_WITH_VALUE = [FORMAT.color];
 
 export const ELEMENT_TAGS: Record<
   string,
-  (el: HTMLElement | HTMLDivElement) => {type: string} | undefined
+  (el: HTMLElement | HTMLDivElement) =>
+    | {
+        type: string;
+        ['text-indent']?: string;
+        color?: string;
+      }
+    | undefined
 > = {
   P: (el: HTMLElement) => {
-    const style = el.style?.textAlign;
-    if (style) {
-      switch (style) {
-        case 'left':
-          return {type: 'left'};
-        case 'center':
-          return {type: 'center'};
-        case 'right':
-          return {type: 'right'};
-        default:
-          return {type: 'paragraph'};
-      }
-    }
-    return {type: 'paragraph'};
+    const style = ['left', 'right', 'center'].includes(el.style?.textAlign)
+      ? el.style?.textAlign
+      : 'paragraph'; // make 'paragraph' default for anything except align type
+    const color = el.style?.color;
+
+    return {
+      type: style,
+      ...(color ? {color} : {}),
+    };
   },
   OL: () => ({type: 'numbered-list'}),
   UL: () => ({type: 'bulleted-list'}),
@@ -107,6 +123,8 @@ export interface BaseText {
   right?: boolean;
   bullet?: boolean;
   ordered?: boolean;
+  color?: string;
+  textIndent?: number;
 }
 
 export type BaseElement = {
@@ -114,10 +132,12 @@ export type BaseElement = {
   type: string;
   align?: 'left' | 'center' | 'right';
   fontSize?: FONT_SIZE;
+  color?: string;
+  textIndent?: number;
 };
 
 export type Marks = Omit<BaseText, 'text'> & {
-  [key: string]: boolean | undefined | string;
+  [key: string]: boolean | undefined | string | number;
 };
 
 export interface RenderElementProps {

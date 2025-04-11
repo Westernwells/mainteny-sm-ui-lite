@@ -3,10 +3,10 @@ import {
   Descendant,
   Editor,
   Element as SlateElement,
-  Text,
-  Transforms,
   Path,
   Range,
+  Text,
+  Transforms,
 } from 'slate';
 import escapeHtml from 'escape-html';
 import {jsx} from 'slate-hyperscript';
@@ -17,16 +17,25 @@ import {
   CustomEditor,
   DEFAULT_FONT_SIZE,
   ELEMENT_TAGS,
+  ELEMENT_TO_CHANGE,
   FONT_SIZE,
   FORMAT,
+  FORMAT_TO_ATTRIBUTE,
   GROUP_TYPES,
   HTML_PDF_FONT_SIZE,
+  INDENTATION_PIXEL_SIZE,
   Marks,
   NodeType,
+  PROPERTY_WITH_VALUE,
   TEXT_TAGS,
 } from 'models/richTextField';
 
 export const DEFAULT_RICH_TEXT_HTML = '<p></p>'; // fallback for empty Slate values
+
+const getNodeType = (isActive: boolean, isGroup: boolean) => {
+  if (isActive) return 'paragraph';
+  if (isGroup) return 'list-item';
+};
 
 export const isMarkActive = (editor: CustomEditor, format: string) => {
   const marks: Marks = Editor.marks(editor) || {};
@@ -72,10 +81,59 @@ export const toggleMark = (
   }
 };
 
-export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
-  const isActive = isBlockActive(editor, format);
+export const removeMarks = (editor: CustomEditor, formats: string[]) => {
+  formats.forEach((format) => {
+    Editor.removeMark(editor, format);
+  });
+};
+
+const removeBlock = (editor: CustomEditor, format: FORMAT) => {
+  const isAlignment = ALIGNMENT_TYPES.includes(format);
+  const isGroup = GROUP_TYPES.includes(format);
+
+  if (isAlignment) {
+    Transforms.unwrapNodes(editor, {
+      match: (n) =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        ALIGNMENT_TYPES.includes(n.type as FORMAT),
+      split: true,
+    });
+  }
+
+  if (isGroup) {
+    Transforms.unwrapNodes(editor, {
+      match: (n) =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        GROUP_TYPES.includes(n.type as FORMAT),
+      split: true,
+    });
+  }
+
+  // keep node but remove format property
+  Transforms.unsetNodes(editor, format);
+};
+
+export const removeBlocks = (editor: CustomEditor, formats: FORMAT[]) => {
+  formats.forEach((format) => removeBlock(editor, format));
+};
+
+export const toggleBlock = (
+  editor: CustomEditor,
+  format: FORMAT,
+  value?: string,
+) => {
+  const isActive = format !== FORMAT.color && isBlockActive(editor, format);
   const isGroup = GROUP_TYPES.includes(format);
   const isAlignment = ALIGNMENT_TYPES.includes(format);
+  const isProperty = PROPERTY_WITH_VALUE.includes(format);
+
+  if (isProperty && value === undefined) return;
+
+  const propertiesToAdd = {
+    [format]: value,
+  };
 
   if (isAlignment) {
     Transforms.unwrapNodes(editor, {
@@ -98,10 +156,9 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
   }
 
   if (!isAlignment) {
-    const newProperties = {
-      type: isActive ? 'paragraph' : isGroup ? 'list-item' : format,
-    };
-    Transforms.setNodes(editor, newProperties);
+    const type = getNodeType(isActive || isProperty, isGroup) ?? format;
+
+    Transforms.setNodes(editor, {type, ...propertiesToAdd});
   }
 
   if ((!isActive && isGroup) || isAlignment) {
@@ -128,6 +185,80 @@ export const toggleBlock = (editor: CustomEditor, format: FORMAT) => {
   }
 };
 
+const convertNumberToPixelStringValue = (value: number) => `${value}px`;
+
+const convertPixelStringToNumber = (value: string) =>
+  Number(value.slice(0, -2));
+
+export const addAttributeToBlock = (editor: CustomEditor, format: FORMAT) => {
+  const markToUpdate = FORMAT_TO_ATTRIBUTE[format];
+
+  if (!markToUpdate) return;
+
+  const shouldChangeNode = ELEMENT_TO_CHANGE[markToUpdate] === 'node' || false;
+
+  const foundMarks: Marks = Editor.marks(editor) || {};
+  const currentMarkValue = foundMarks[markToUpdate];
+
+  // currently uses only indentation logic
+  const newMarkValue = currentMarkValue
+    ? convertPixelStringToNumber(currentMarkValue as string) +
+      INDENTATION_PIXEL_SIZE
+    : INDENTATION_PIXEL_SIZE;
+
+  if (shouldChangeNode) {
+    Transforms.setNodes(editor, {
+      [markToUpdate]: convertNumberToPixelStringValue(newMarkValue),
+    });
+  } else {
+    Editor.addMark(
+      editor,
+      markToUpdate,
+      convertNumberToPixelStringValue(newMarkValue),
+    );
+  }
+};
+
+export const removeAttributeToBlock = (
+  editor: CustomEditor,
+  format: FORMAT,
+) => {
+  const markToUpdate = FORMAT_TO_ATTRIBUTE[format];
+
+  if (!markToUpdate) return;
+
+  const shouldChangeNode = ELEMENT_TO_CHANGE[markToUpdate] === 'node' || false;
+
+  const foundMarks: Marks = Editor.marks(editor) || {};
+  const currentMarkValue = shouldChangeNode
+    ? undefined
+    : foundMarks[markToUpdate];
+
+  // currently uses only indentation logic
+  const newMarkValue = currentMarkValue
+    ? convertPixelStringToNumber(currentMarkValue as string) -
+      INDENTATION_PIXEL_SIZE
+    : 0;
+
+  const isMarkValid = newMarkValue > 0;
+
+  if (shouldChangeNode) {
+    Transforms.setNodes(editor, {
+      [markToUpdate]: isMarkValid
+        ? convertNumberToPixelStringValue(newMarkValue)
+        : convertNumberToPixelStringValue(0),
+    });
+  } else if (isMarkValid) {
+    Editor.addMark(
+      editor,
+      markToUpdate,
+      convertNumberToPixelStringValue(newMarkValue),
+    );
+  } else {
+    Editor.removeMark(editor, markToUpdate);
+  }
+};
+
 const getStyleString = (style: Record<string, string> | {}) =>
   Object.entries(style).reduce((s, [key, value]) => {
     let newValue = value;
@@ -143,6 +274,10 @@ export const serialize = (node: Descendant): string => {
         'font-size': node.fontSize,
       }
     : {};
+
+  const pStyle = {
+    ...(node.color ? {color: node.color} : undefined),
+  };
 
   if (Text.isText(node)) {
     let string = escapeHtml(node.text);
@@ -166,14 +301,18 @@ export const serialize = (node: Descendant): string => {
 
   switch (node.type) {
     case 'paragraph':
-      return `<p>${children}</p>`;
+      return pStyle
+        ? `<p style="${getStyleString(pStyle)}">${children}</p>`
+        : `<p>${children}</p>`;
     case 'numbered-list':
       return `<ol>${children}</ol>`;
     case 'bulleted-list':
       return `<ul>${children}</ul>`;
     case 'list-item': {
       return node.fontSize
-        ? `<li style="${getStyleString(style)}">${children}</li>`
+        ? `<li style="${
+            Object.entries(style).length ? getStyleString(style) : undefined
+          }">${children}</li>`
         : `<li>${children}</li>`;
     }
     case 'left':

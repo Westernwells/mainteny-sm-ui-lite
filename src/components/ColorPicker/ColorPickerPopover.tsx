@@ -6,15 +6,27 @@ import CloseIcon from '@mui/icons-material/Close';
 import InvertColorsOutlinedIcon from '@mui/icons-material/InvertColorsOutlined';
 import {useTheme} from '@mui/material/styles';
 import {CUSTOM_COLORS} from 'models/pdfs';
+import {convertRGBtoHex} from 'utils/color';
 import ColorPicker from './index';
+
+const COLOR_THEME = {
+  light: '#000034',
+  dark: '#fff',
+};
 
 type Props = {
   initialValue: string;
-  labelKey: string;
+  labelKey?: string;
+  backgroundTheme?: 'light' | 'dark';
   onChange: (value: string) => void;
 };
 
-const ColorPickerPopup = ({initialValue, labelKey, onChange}: Props) => {
+const ColorPickerPopup = ({
+  initialValue,
+  labelKey = 'Custom color',
+  backgroundTheme = 'light',
+  onChange,
+}: Props) => {
   const {t} = useTranslation();
   const [isOpen, setOpen] = useState(false);
   const theme = useTheme();
@@ -36,10 +48,11 @@ const ColorPickerPopup = ({initialValue, labelKey, onChange}: Props) => {
     setOpen(false);
   };
 
-  const isActive = useMemo(
-    () => !CUSTOM_COLORS.includes(initialValue),
-    [initialValue],
-  );
+  const isActive = useMemo(() => {
+    const colorToCheck = convertRGBtoHex(initialValue) ?? initialValue;
+
+    return !CUSTOM_COLORS.includes(colorToCheck);
+  }, [initialValue]);
 
   useEffect(() => {
     setInternalColor(initialValue);
@@ -56,7 +69,7 @@ const ColorPickerPopup = ({initialValue, labelKey, onChange}: Props) => {
             border: '2px solid transparent',
             alignSelf: 'start',
             ...(isActive && {
-              border: '2px solid #000034',
+              border: `2px solid ${COLOR_THEME[backgroundTheme]}`,
             }),
           },
         }}>
