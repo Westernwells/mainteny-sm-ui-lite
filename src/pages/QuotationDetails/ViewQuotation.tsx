@@ -282,6 +282,7 @@ export const ViewQuotation = ({
 
     const blob = await pdf(
       <QuotationPdfTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
@@ -314,6 +315,7 @@ export const ViewQuotation = ({
     fontStyles,
     primaryColor,
     secondaryColor,
+    company,
   ]);
 
   const getExistingFiles = async (

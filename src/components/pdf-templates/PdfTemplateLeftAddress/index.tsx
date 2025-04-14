@@ -4,8 +4,11 @@ import PdfTemplateBeneficiaryAddress from 'components/pdf-templates/PdfTemplateB
 import {getStyles} from 'components/pdf-templates/PdfTemplateLeftAddress/PdfTemplateLeftAddress.styles';
 import {useMemo} from 'react';
 import {ContextProps} from 'context/PdfStylesProvider';
+import {isSwissAddress} from 'utils/address';
+import {ServiceCompanyItem} from 'models/service-company';
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   serviceCompanyInfo?: string;
   fallbackReceiverName?: string;
   addressComponent?: AddressComponent | null;
@@ -16,6 +19,7 @@ type Props = {
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const PdfTemplateLeftAddress = ({
+  serviceCompany,
   serviceCompanyInfo,
   fallbackReceiverName,
   addressComponent,
@@ -28,6 +32,7 @@ const PdfTemplateLeftAddress = ({
   secondaryColor,
 }: Props) => {
   const styles = getStyles({
+    isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
     boldFontStyle: fontStyles.bold,
     regularFontStyle: fontStyles.regular,
     primaryColor,

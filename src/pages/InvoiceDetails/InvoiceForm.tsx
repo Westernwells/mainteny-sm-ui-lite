@@ -129,7 +129,6 @@ import {
   invoiceItemToInvoiceItemRecord,
 } from './utils';
 import {Notes} from './Notes/EditNotes';
-import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
 import {
@@ -1656,6 +1655,7 @@ export const InvoiceForm = ({
 
     const blob = await pdf(
       <PdfTemplate
+        serviceCompany={company}
         userInfo={user?.userAccount}
         pdfConfigClientStorage={pdfConfig}
         currentCurrency={currentCurrency}

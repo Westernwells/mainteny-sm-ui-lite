@@ -152,6 +152,7 @@ const Actions = ({quotation}: Props) => {
 
     const blob = await pdf(
       <QuotationPdfTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}

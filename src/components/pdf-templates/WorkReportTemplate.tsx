@@ -8,7 +8,7 @@ import {convertMinutesWithRounding} from 'utils/work-hours-utils';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {HeaderFooterInfoData} from 'models/misc';
 import {getServiceCompanyInfo} from 'utils/company-utils';
-import {MinToStep} from 'models/service-company';
+import {MinToStep, ServiceCompanyItem} from 'models/service-company';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {getAddressComponentFromServiceOrder} from 'utils/pdfTemplates';
@@ -242,6 +242,7 @@ const BookedHoursRow = ({
 };
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount | undefined;
   serviceOrder?: ServiceOrderView;
@@ -263,6 +264,7 @@ type Props = {
 
 const WorkReportTemplate = React.memo(
   ({
+    serviceCompany,
     userInfo,
     serviceOrder,
     report,
@@ -319,6 +321,7 @@ const WorkReportTemplate = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
+                serviceCompany={serviceCompany}
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={
                   serviceOrder?.elevator?.propertyOwner?.name

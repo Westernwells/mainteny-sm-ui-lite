@@ -19,6 +19,7 @@ import {useMemo} from 'react';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
 
 const getStyles = ({
   boldFontStyle,
@@ -93,6 +94,7 @@ const getStyles = ({
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
@@ -114,6 +116,7 @@ type Props = {
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const InvoiceOverduePdfPreview = ({
+  serviceCompany,
   translate,
   userInfo,
   currentCurrency,
@@ -174,6 +177,7 @@ const InvoiceOverduePdfPreview = ({
         <PdfBodyContainer>
           <TopSectionContainer>
             <PdfTemplateLeftAddress
+              serviceCompany={serviceCompany}
               serviceCompanyInfo={serviceCompanyInfo}
               fallbackReceiverName={invoice?.propertyOwner?.name}
               addressComponent={getAddressComponentFromInvoice(invoice)}

@@ -4,6 +4,7 @@ import {AlternativeServiceCompanyInfo} from 'models/invoice';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {ContextProps} from 'context/PdfStylesProvider';
+import {ServiceCompanyItem} from 'models/service-company';
 import PdfTemplateFooter from './PdfTemplateFooter';
 import PdfTemplateHeader from './PdfTemplateHeader';
 import PdfPageContainer from './containers/PdfPageContainer';
@@ -11,6 +12,7 @@ import PdfBodyContainer from './containers/PdfBodyContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   headerInfo: HeaderFooterInfoData;
@@ -22,6 +24,7 @@ type Props = {
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const AlternativeAddressTemplate = ({
+  serviceCompany,
   userInfo,
   translate,
   headerInfo,
@@ -46,6 +49,7 @@ const AlternativeAddressTemplate = ({
       <PdfBodyContainer>
         <TopSectionContainer>
           <PdfTemplateLeftAddress
+            serviceCompany={serviceCompany}
             serviceCompanyInfo={serviceCompanyInfo}
             fallbackReceiverName={alternativeAddress?.component?.name}
             addressComponent={alternativeAddress?.component}

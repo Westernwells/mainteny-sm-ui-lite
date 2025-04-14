@@ -431,6 +431,7 @@ export const ViewInvoice = ({
 
     const blob = await pdf(
       <ChecklistPdf
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
@@ -548,6 +549,7 @@ export const ViewInvoice = ({
 
     const blob = await pdf(
       <WorkReportTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
@@ -630,6 +632,7 @@ export const ViewInvoice = ({
 
     const blob = await pdf(
       <PdfTemplate
+        serviceCompany={company}
         userInfo={user?.userAccount}
         pdfConfigClientStorage={pdfConfig}
         currentCurrency={currentCurrency}
@@ -1112,6 +1115,7 @@ export const ViewInvoice = ({
     qrError,
     qrImageSrc,
     isLoadingInvoiceAmountDetail,
+    company,
   ]);
 
   const doPrint = async () => {

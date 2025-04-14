@@ -131,3 +131,11 @@ export const getAddressRecordFromGoogleAddress = (address: {
   };
   return data;
 };
+
+export const isSwissAddress = (address?: Address) => {
+  if (!address) return false;
+
+  return (
+    address.component?.country === 'Switzerland' || address.countryCode === 'CH'
+  );
+};

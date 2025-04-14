@@ -20,6 +20,7 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromServiceOrder} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
 import {PdfChecklistComponent} from './PdfChecklistComponent';
 
 const getStyles = ({
@@ -122,6 +123,7 @@ const getStyles = ({
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount | undefined;
   selectedLng?: string;
@@ -138,6 +140,7 @@ type Props = {
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const ChecklistPdf = ({
+  serviceCompany,
   userInfo,
   selectedLng,
   translate,
@@ -187,6 +190,7 @@ const ChecklistPdf = ({
         <PdfBodyContainer>
           <TopSectionContainer>
             <PdfTemplateLeftAddress
+              serviceCompany={serviceCompany}
               serviceCompanyInfo={serviceCompanyInfo}
               fallbackReceiverName={serviceOrder?.elevator?.propertyOwner?.name}
               addressComponent={getAddressComponentFromServiceOrder(

@@ -32,6 +32,7 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import {ArticleSection} from './ArticleSection/ArticleSection';
 import PdfPartialPaymentSection from './PdfPartialPaymentSection';
@@ -44,6 +45,7 @@ import SwissPageTemplate from './SwissPageTemplate';
 import AlternativeAddressTemplate from './AlternativeAddressTemplate';
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
@@ -142,6 +144,7 @@ const getStyles = ({
   });
 
 const PartialInvoicePdfTemplate = ({
+  serviceCompany,
   translate,
   userInfo,
   currentCurrency,
@@ -268,6 +271,7 @@ const PartialInvoicePdfTemplate = ({
         Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
         !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
+            serviceCompany={serviceCompany}
             userInfo={userInfo}
             translate={translate}
             headerInfo={headerInfo}
