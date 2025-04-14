@@ -85,6 +85,9 @@ const useInvoiceMenuActions = ({
         InvoiceStatus.PARTIALLY_PAID,
         InvoiceStatus.EXPIRED,
         InvoiceStatus.CREDITED,
+        InvoiceStatus.OVERDUE_NOTICE_1,
+        InvoiceStatus.OVERDUE_NOTICE_2,
+        InvoiceStatus.OVERDUE_NOTICE_3,
       ].includes(invoice.status)
     ) {
       items.push({
@@ -102,6 +105,9 @@ const useInvoiceMenuActions = ({
         InvoiceStatus.PARTIALLY_PAID,
         InvoiceStatus.EXPIRED,
         InvoiceStatus.PAID,
+        InvoiceStatus.OVERDUE_NOTICE_1,
+        InvoiceStatus.OVERDUE_NOTICE_2,
+        InvoiceStatus.OVERDUE_NOTICE_3,
       ].includes(invoice.status)
     ) {
       items.push({
@@ -157,6 +163,9 @@ const useInvoiceMenuActions = ({
         InvoiceStatus.NOT_PAID,
         InvoiceStatus.EXPIRED,
         InvoiceStatus.CREDITED,
+        InvoiceStatus.OVERDUE_NOTICE_1,
+        InvoiceStatus.OVERDUE_NOTICE_2,
+        InvoiceStatus.OVERDUE_NOTICE_3,
       ].includes(invoice.status)
     ) {
       items.push({
@@ -175,9 +184,13 @@ const useInvoiceMenuActions = ({
     }
 
     if (
-      [InvoiceStatus.EXPIRED, InvoiceStatus.PARTIALLY_PAID].includes(
-        invoice.status,
-      )
+      [
+        InvoiceStatus.EXPIRED,
+        InvoiceStatus.PARTIALLY_PAID,
+        InvoiceStatus.OVERDUE_NOTICE_1,
+        InvoiceStatus.OVERDUE_NOTICE_2,
+        InvoiceStatus.OVERDUE_NOTICE_3,
+      ].includes(invoice.status)
     ) {
       items.push({
         label: t('Send Overdue Notice'),
