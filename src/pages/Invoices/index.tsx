@@ -120,11 +120,11 @@ const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
   {value: InvoiceStatusFilter.PARTIALLY_PAID, labelKey: 'Partially Paid'},
   {value: InvoiceStatusFilter.PAID, labelKey: 'Paid'},
   {value: InvoiceStatusFilter.EXPIRED, labelKey: 'Overdue'},
-  {value: InvoiceStatusFilter.CREDITED, labelKey: 'Credited'},
-  {value: InvoiceStatusFilter.CANCELLED, labelKey: 'Cancelled'},
   {value: InvoiceStatusFilter.OVERDUE_NOTICE_1, labelKey: 'Dunning 1'},
   {value: InvoiceStatusFilter.OVERDUE_NOTICE_2, labelKey: 'Dunning 2'},
   {value: InvoiceStatusFilter.OVERDUE_NOTICE_3, labelKey: 'Dunning 3'},
+  {value: InvoiceStatusFilter.CREDITED, labelKey: 'Credited'},
+  {value: InvoiceStatusFilter.CANCELLED, labelKey: 'Cancelled'},
 ];
 
 const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
