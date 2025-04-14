@@ -105,9 +105,7 @@ const GeneralInformationWidget = ({customer}: Props) => {
         email: data.email,
         url: data.url,
       },
-      customerImagePath: watch('logoFile')
-        ? photoUrl
-        : customer.additionalInfo.customerImagePath,
+      customerImagePath: watch('logoFile') ? photoUrl : data.customerImagePath,
       businessAddress: data.businessAddress
         ? {
             ...data.businessAddress,
