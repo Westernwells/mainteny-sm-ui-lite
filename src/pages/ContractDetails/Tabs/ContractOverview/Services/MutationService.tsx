@@ -906,6 +906,13 @@ export const MutationService = ({
               </InputLabel>
               <Select
                 label={`${t('First job creation')}*`}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    '& legend': {
+                      paddingRight: '13px',
+                    },
+                  },
+                }}
                 size="small"
                 value={
                   formikContractServiceComponent.values.firstOrderDate
@@ -954,6 +961,13 @@ export const MutationService = ({
                 value={
                   formikContractServiceComponent.values.serviceDeliveryType
                 }
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    '& legend': {
+                      paddingRight: '13px',
+                    },
+                  },
+                }}
                 required
                 notched
                 name="serviceDeliveryType"
