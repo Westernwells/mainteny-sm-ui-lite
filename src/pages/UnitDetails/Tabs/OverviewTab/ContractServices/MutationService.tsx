@@ -861,6 +861,13 @@ export const MutationService = ({
                       )
                     : undefined
                 }
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    '& legend': {
+                      paddingRight: '13px',
+                    },
+                  },
+                }}
                 required
                 notched
                 name="firstOrderDate"
@@ -899,6 +906,13 @@ export const MutationService = ({
                 value={
                   formikContractServiceComponent.values.serviceDeliveryType
                 }
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    '& legend': {
+                      paddingRight: '13px',
+                    },
+                  },
+                }}
                 required
                 notched
                 name="serviceDeliveryType"

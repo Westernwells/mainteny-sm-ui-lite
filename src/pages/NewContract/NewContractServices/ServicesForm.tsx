@@ -687,6 +687,13 @@ const ServicesForm = ({
                 value={getMonthNumberFromDate(
                   formikContractServiceComponent.values.firstOrderDate,
                 )}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    '& legend': {
+                      paddingRight: '13px',
+                    },
+                  },
+                }}
                 required
                 notched
                 name="firstOrderDate"
@@ -725,6 +732,13 @@ const ServicesForm = ({
                 value={
                   formikContractServiceComponent.values.serviceDeliveryType
                 }
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    '& legend': {
+                      paddingRight: '13px',
+                    },
+                  },
+                }}
                 required
                 notched
                 name="serviceDeliveryType"
