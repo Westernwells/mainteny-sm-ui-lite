@@ -1724,6 +1724,13 @@ export const InvoiceForm = ({
   };
 
   const isValid = () => {
+    if (
+      formik.values.type === InvoiceType.UPFRONT &&
+      !formik.values.serviceOrderId
+    ) {
+      return false;
+    }
+
     const hasValidVat = formik.values.items.every((item) => {
       const {vatId, percentageVat} = item.unitAmount;
 
