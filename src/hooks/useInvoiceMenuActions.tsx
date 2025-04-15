@@ -148,6 +148,9 @@ const useInvoiceMenuActions = ({
         InvoiceStatus.NOT_PAID,
         InvoiceStatus.EXPIRED,
         InvoiceStatus.CANCELLED,
+        InvoiceStatus.OVERDUE_NOTICE_1,
+        InvoiceStatus.OVERDUE_NOTICE_2,
+        InvoiceStatus.OVERDUE_NOTICE_3,
       ].includes(invoice.status) ||
       !invoice.sentDate
     ) {
