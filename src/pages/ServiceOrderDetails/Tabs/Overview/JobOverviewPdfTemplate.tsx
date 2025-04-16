@@ -34,6 +34,7 @@ import {
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
 import {HtmlPDF} from 'components/HtmlPDF';
+import {ServiceCompanyItem} from 'models/service-company';
 
 const getStyles = ({
   boldFontStyle,
@@ -137,6 +138,7 @@ const getStyles = ({
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
@@ -153,6 +155,7 @@ type Props = {
 
 const JobOverviewPdfTemplate = React.memo(
   ({
+    serviceCompany,
     translate,
     userInfo,
     currentCurrency,
@@ -259,6 +262,7 @@ const JobOverviewPdfTemplate = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
+                serviceCompany={serviceCompany}
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={
                   serviceOrder?.elevator?.propertyOwner?.name

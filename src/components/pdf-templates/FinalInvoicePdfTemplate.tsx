@@ -31,6 +31,7 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import PdfPartialPaymentSection from './PdfPartialPaymentSection';
 import PdfPageContainer from './containers/PdfPageContainer';
@@ -67,6 +68,7 @@ const getStyles = ({
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
@@ -84,6 +86,7 @@ type Props = {
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const FinalInvoicePdfTemplate = ({
+  serviceCompany,
   translate,
   userInfo,
   currentCurrency,
@@ -187,6 +190,7 @@ const FinalInvoicePdfTemplate = ({
         Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
         !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
+            serviceCompany={serviceCompany}
             userInfo={userInfo}
             translate={translate}
             headerInfo={headerInfo}
@@ -209,6 +213,7 @@ const FinalInvoicePdfTemplate = ({
         <PdfBodyContainer>
           <TopSectionContainer>
             <PdfTemplateLeftAddress
+              serviceCompany={serviceCompany}
               serviceCompanyInfo={serviceCompanyInfo}
               fallbackReceiverName={invoice?.propertyOwner?.name}
               addressComponent={getAddressComponentFromInvoice(invoice)}

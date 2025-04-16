@@ -30,8 +30,10 @@ import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import AlternativeAddressTemplate from 'components/pdf-templates/AlternativeAddressTemplate';
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {getStyles} from 'components/pdf-templates/QuotationPdfTemplate/QuotationPdfTemplete.styles';
+import {ServiceCompanyItem} from 'models/service-company';
 
 type BaseProps = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount;
   currentCurrency?: Currency;
@@ -57,6 +59,7 @@ type NonJobOverviewProps = BaseProps & {
 export type Props = JobOverviewProps | NonJobOverviewProps;
 const QuotationPdfTemplate = React.memo(
   ({
+    serviceCompany,
     translate,
     userInfo,
     currentCurrency,
@@ -164,6 +167,7 @@ const QuotationPdfTemplate = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
+                serviceCompany={serviceCompany}
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={quotation?.propertyOwner?.name}
                 addressComponent={getAddressComponentFromQuotation(quotation)}

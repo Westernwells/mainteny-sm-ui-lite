@@ -16,6 +16,7 @@ import TopSectionContainer from 'components/pdf-templates/containers/TopSectionC
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
 import {
   calculateTotal,
   calculateTotalVAT,
@@ -123,6 +124,7 @@ const getStyles = ({
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string) => string;
   articleOrder?: ArticleOrderView | undefined;
   currentCurrency?: Currency;
@@ -136,6 +138,7 @@ type Props = {
 
 const OrderArticlePDF = React.memo(
   ({
+    serviceCompany,
     articleOrder,
     userInfo,
     currentCurrency,
@@ -176,6 +179,7 @@ const OrderArticlePDF = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
+                serviceCompany={serviceCompany}
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={articleOrder?.articleSupplier?.name}
                 addressComponent={

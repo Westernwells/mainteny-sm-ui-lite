@@ -33,6 +33,7 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
 import PdfTemplateInvoiceDetails from '../PdfTemplateInvoiceDetails';
 import {ArticleSection} from '../ArticleSection/ArticleSection';
 import PdfBodyContainer from '../containers/PdfBodyContainer';
@@ -45,6 +46,7 @@ import PdfPreviewUpfrontPaymentSection from './PdfPreviewUpfrontPaymentSection';
 import PdfPreviewPartialPaymentSection from './PdfPreviewPartialPaymentSection';
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
@@ -143,6 +145,7 @@ const getStyles = ({
   });
 
 const PdfPartialUpfrontPreview = ({
+  serviceCompany,
   translate,
   userInfo,
   currentCurrency,
@@ -320,6 +323,7 @@ const PdfPartialUpfrontPreview = ({
         <PdfBodyContainer>
           <TopSectionContainer>
             <PdfTemplateLeftAddress
+              serviceCompany={serviceCompany}
               serviceCompanyInfo={serviceCompanyInfo}
               fallbackReceiverName={invoice?.propertyOwner?.name}
               addressComponent={getAddressComponentFromInvoice(invoice)}

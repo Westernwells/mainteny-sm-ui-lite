@@ -1,20 +1,30 @@
 import {StyleSheet} from '@react-pdf/renderer';
 import {PdfConfigurationStyles} from 'models/pdfs';
 
+type Props = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
+
 export const getStyles = ({
+  isSwissOffset = false,
   primaryColor,
   secondaryColor,
   boldFontStyle,
   regularFontStyle,
-}: PdfConfigurationStyles) =>
+}: Props) =>
   StyleSheet.create({
     leftAddress: {
-      paddingTop: '20px',
+      paddingTop: '20px', // make offset be about 45mm
       flex: '0 0 53%',
       display: 'flex',
       flexDirection: 'column',
       color: primaryColor,
       ...boldFontStyle,
+
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     addressTextWrapper: {
       marginBottom: 13,

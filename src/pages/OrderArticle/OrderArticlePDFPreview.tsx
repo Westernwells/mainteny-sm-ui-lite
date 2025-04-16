@@ -17,6 +17,7 @@ import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContain
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
 import {calculateTotal, calculateTotalVAT} from './utils';
 import {ArticleSupplierView} from '../../models/supplier';
 
@@ -121,6 +122,7 @@ const getStyles = ({
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   supplier: ArticleSupplierView;
   formik: FormikProps<CreateArticleOrderRecord>;
   translate: (key: string) => string;
@@ -135,6 +137,7 @@ type Props = {
 
 const OrderArticlePDFPreview = React.memo(
   ({
+    serviceCompany,
     supplier,
     formik,
     userInfo,
@@ -175,6 +178,7 @@ const OrderArticlePDFPreview = React.memo(
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
+                serviceCompany={serviceCompany}
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={supplier?.name}
                 addressComponent={supplier?.address?.component}
