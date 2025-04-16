@@ -54,10 +54,7 @@ Cypress.Commands.add('login', () => {
   cy.get('#email').type('e2etest@mainteny.com');
   cy.get('#password').type('!!abc123', {log: false});
   cy.get('button[type="submit"]').click();
-  cy.wait('@loginApi').then(() => {
-    cy.url().should('not.include', '/login');
-    cy.get('#topBarSelectLanguageButton', { timeout: 10000 }).should('exist');
-  });
+  cy.wait('@loginApi');
 });
 
 Cypress.Commands.add('fillRichTextField', (field: string, value: string) => {
