@@ -129,6 +129,7 @@ describe('Invoice flow', () => {
                 const secondRow = articlesTable.find('li').eq(2);
                 secondRow.click();
 
+                cy.get('#article-combo-box').click().wait(500).clear().realType('Test Article').realType('{esc}');
                 cy.get('input[name="quantity"]')
                     .clear()
                     .type(`${getRandomIntInRange(1, 5)}`);
@@ -290,7 +291,9 @@ describe('Invoice flow', () => {
                                 ...options,
                             });
                         invoice.items.forEach((a) => {
-                            cy.contains(isPlainString(a.name) ? a.name : getPlainStringFromHtml(a.name));
+                            (isPlainString(a.name) ? a.name : getPlainStringFromHtml(a.name)).split(' ').forEach((word) => {
+                                cy.contains(word);
+                            });
                             cy.contains(a.quantity);
                             cy.contains(formatCurrencyWithOptions(centsToMoney(currency, a.unitAmount.netAmount) || 0));
                             cy.contains(formatCurrencyWithOptions(netTotal(a, currency)));

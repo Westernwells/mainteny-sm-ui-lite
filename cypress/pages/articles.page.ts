@@ -13,7 +13,7 @@ export default class ArticlesPage {
 
   static fillBasicDetails = (article: ArticleBasicFormModel) => {
     // Fill in text fields
-    cy.fillRichTextField('Name', article.name);
+    cy.get('input[name="name"]').type(article.name);
     cy.get('input[name="externalId"]').type(article.externalId);
     cy.get('input[name="category"]').type(article.category);
     cy.get('input[name="manufacturer"]').type(article.manufacturer);
