@@ -211,7 +211,7 @@ export const EditBasicInfoForm = ({
         display="flex"
         justifyContent="space-between"
         sx={{...containerStyles}}>
-        <FormControl fullWidth required={false}>
+        <FormControl fullWidth required={false} sx={{pr: '1rem'}}>
           <InputLabel size="small" shrink variant="outlined">
             {t('Purchase VAT')}
           </InputLabel>
@@ -271,7 +271,7 @@ export const EditBasicInfoForm = ({
           </Select>
         </FormControl>
 
-        <FormControl fullWidth required={false}>
+        <FormControl fullWidth required>
           <InputLabel size="small" shrink variant="outlined">
             {t('Selling VAT')}
           </InputLabel>
@@ -285,7 +285,7 @@ export const EditBasicInfoForm = ({
             name="unitSellingVat"
             notched
             {...defaultProps}
-            required={false}
+            required
             MenuProps={{
               anchorOrigin: {
                 vertical: 'bottom',
