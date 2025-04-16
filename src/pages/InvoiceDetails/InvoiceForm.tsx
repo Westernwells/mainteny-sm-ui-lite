@@ -1724,8 +1724,14 @@ export const InvoiceForm = ({
   };
 
   const isValid = () => {
+    const invoiceTypeRequiresOrder = [
+      InvoiceType.UPFRONT,
+      InvoiceType.FINAL,
+      InvoiceType.PARTIAL,
+    ];
+
     if (
-      formik.values.type === InvoiceType.UPFRONT &&
+      invoiceTypeRequiresOrder.includes(formik.values.type) &&
       !formik.values.serviceOrderId
     ) {
       return false;
