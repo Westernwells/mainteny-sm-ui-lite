@@ -2787,5 +2787,13 @@
   "Amount Due: {{amountDue}}": "გადასახდელი თანხა: {{amountDue}}",
   "If you've paid, please let us know. If not, please do so soon to avoid extra fees.": "თუ თანხა უკვე გადაიხადეთ, გთხოვთ, შეგვატყობინოთ. თუ არა, გთხოვთ, მალე გადაიხადოთ, რომ თავიდან აიცილოთ დამატებითი გადასახადი.",
   "Questions? Contact us at {{contactEmail}}": "გაქვთ კითხვები? დაგვიკავშირდით {{contactEmail}}",
-  "Thanks, {{companyName}}": "მადლობა, {{companyName}}"
+  "Thanks, {{companyName}}": "მადლობა, {{companyName}}",
+  "Service delivery period": "მომსახურების მიწოდების პერიოდი",
+  "Before invoice generation": "ინვოისის გენერირებამდე",
+  "During invoice generation": "ინვოისის გენერირების დროს",
+  "After invoice generation": "ინვოისის გენერირების შემდეგ",
+  "Every 2 year": "ყოველ 2 წელიწადში",
+  "Every 3 year": "ყოველ 3 წელიწადში",
+  "Every 4 year": "ყოველ 4 წელიწადში",
+  "New {{jobType}} Job": "ახალი {{jobType}} სამუშაო"
 }
