@@ -29,8 +29,15 @@ const JobNotes: FC<Props> = ({serviceOrder}) => {
     pageIndex: 0,
     pageSize: 1,
   });
+  const {data: officeNotes} = useComments({
+    refId: serviceOrder.id,
+    category: CommentCategory.OFFICE,
+    type: CommentType.SERVICE_ORDER_COMMENT,
+    pageIndex: 0,
+    pageSize: 1,
+  });
 
-  const totalComments = commentsData?.total ?? 0;
+  const totalComments = (commentsData?.total ?? 0) + (officeNotes?.total ?? 0);
 
   return (
     <>
