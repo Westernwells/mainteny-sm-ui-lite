@@ -102,7 +102,7 @@ const PdfTemplateInvoiceDetails = ({
         <View style={styles.rightAddressContent}>
           <Text style={styles.tag}>
             {invoice?.type === InvoiceType.CREDIT_NOTE
-              ? translate('Credit no.')
+              ? translate('Credit No.')
               : translate('Invoice no.')}
           </Text>
           <Text style={styles.tagContent}>

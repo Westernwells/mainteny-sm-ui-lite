@@ -2,10 +2,11 @@ import {FlexContainer} from 'components/FlexContainer';
 import {Progress} from 'components/Progress';
 import {useLayoutEffect} from 'react';
 import {useSearchParams} from 'react-router-dom';
+import {t} from 'i18next';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {capitalize} from 'utils/utils';
+import {getJobTypeGivenName} from 'utils/service-order-utils';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
 interface Props {
@@ -32,9 +33,8 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle && currentParams) {
-      const givenName =
-        jobTypes?.find((jobType) => jobType.name === type)?.givenName || type;
-      getCurrentPageTitle(`New ${capitalize([givenName])} Job`);
+      const givenName = getJobTypeGivenName(type, jobTypes);
+      getCurrentPageTitle(t(`New {{jobType}} Job`, {jobType: givenName}));
     }
   }, []);
 
