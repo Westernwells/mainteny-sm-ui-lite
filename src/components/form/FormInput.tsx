@@ -96,7 +96,14 @@ export const FormInput = forwardRef(
             }}
             onBlur={fieldProps?.onBlur}
             label={
-              fieldProps?.label ? t(fieldProps.label as string) : undefined
+              fieldProps?.label ? (
+                <>
+                  {t(fieldProps.label as string)}
+                  {fieldProps?.required ? (
+                    <span style={{color: 'red'}}> *</span>
+                  ) : null}
+                </>
+              ) : undefined
             } // MUI label field has a complex type (react component, string) TODO extract to new prop for keys ex keys: {label: string, placeholder: string, helperText: string}
             helperText={fieldProps?.helperText}
             placeholder={
