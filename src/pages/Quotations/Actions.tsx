@@ -1,4 +1,4 @@
-import {useContext, useMemo, useState} from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import printJS from 'print-js';
 import Box from '@mui/material/Box';
@@ -14,6 +14,7 @@ import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {
   useDeleteQuotation,
   usePrintQuotation,
+  useQuotationAmountDetailQuery,
   useQuotationSubItems,
   useReplyQuotation,
   useSendQuotation,
@@ -44,7 +45,6 @@ import {companyLanguageContextMap} from 'utils/language';
 import {downloadFile as utilDownloadFile} from 'utils/download';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
-import useQuotationAmountDetail from 'hooks/useQuotationAmountDetail';
 
 interface Props {
   quotation: QuotationView;
@@ -80,22 +80,31 @@ const Actions = ({quotation}: Props) => {
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
 
-  const {data: quotationSubItems} = useQuotationSubItems(quotation.id);
+  const {data: quotationSubItems, refetch: fetchSubItems} =
+    useQuotationSubItems(quotation.id, {
+      enabled: false,
+    });
 
-  const subItemsMap: Record<string, QuotationSubItemRecord[]> = Object.entries(
-    quotationSubItems ?? {},
-  ).reduce((acc, [parentId, subItems]) => {
-    acc[parentId] = subItems.map((subItem) => ({
-      ...subItem,
-      parentId,
-    }));
-    return acc;
-  }, {} as Record<string, QuotationSubItemRecord[]>);
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(quotationSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, QuotationSubItemRecord[]>,
+      ),
+    [quotationSubItems],
+  );
 
   const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
     serviceCompanyId: company?.id!,
     params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
   });
+
   const pdfConfig = clientStorageDataPdfConfig?.value
     ? JSON.parse(clientStorageDataPdfConfig?.value)
     : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
@@ -115,23 +124,25 @@ const Actions = ({quotation}: Props) => {
     [company?.language],
   );
 
-  const {data: clientStorageData} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: 'pdf-template'},
-  });
+  const {data: clientStorageData, refetch: fetchPdfTemplateConfig} =
+    useQueryClientStorageData({
+      serviceCompanyId: company?.id!,
+      params: {key: 'pdf-template'},
+      options: {enabled: false},
+    });
 
   const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
   const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
 
-  const {data: headerUrl = {}} = useDownloadUrl(
+  const {data: headerUrl = {}, refetch: fetchHeaderUrl} = useDownloadUrl(
     headerInfo?.path ? [headerInfo.path] : [],
-    undefined,
+    {enabled: false},
     company?.id,
   );
 
-  const {data: footerUrl = {}} = useDownloadUrl(
+  const {data: footerUrl = {}, refetch: fetchFooterUrl} = useDownloadUrl(
     footerInfo?.path ? [footerInfo.path] : [],
-    undefined,
+    {enabled: false},
     company?.id,
   );
 
@@ -153,10 +164,8 @@ const Actions = ({quotation}: Props) => {
     [quotation?.items, subItemsMap],
   );
 
-  const quotationAmountDetail = useQuotationAmountDetail({
-    quotationItems: transformedQuotationItems,
-    quotationDiscount: quotation.additionalInfo.discount,
-  });
+  const {data: quotationAmountDetail, refetch: fetchQuotationAmountDetail} =
+    useQuotationAmountDetailQuery(quotation.id, {enabled: false});
 
   const generateBlobUrl = async () => {
     const blob = await pdf(
@@ -182,8 +191,15 @@ const Actions = ({quotation}: Props) => {
     return blob;
   };
 
-  const handleClick = (event: any) => {
+  const handleOpenMenu = async (event: any) => {
     setAnchorEl(event.currentTarget);
+    await Promise.all([
+      fetchQuotationAmountDetail(),
+      fetchSubItems(),
+      fetchPdfTemplateConfig(),
+      fetchHeaderUrl(),
+      fetchFooterUrl(),
+    ]);
   };
 
   const handleClose = () => {
@@ -350,7 +366,7 @@ const Actions = ({quotation}: Props) => {
       <TableActionButton
         testId="quotation-action-menu-button"
         removePadding
-        onClick={handleClick}
+        onClick={handleOpenMenu}
       />
       <Menu
         id="actions-menu"

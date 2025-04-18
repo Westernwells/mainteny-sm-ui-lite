@@ -21,7 +21,7 @@ import {
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
   useFetchXInvoiceByInvoiceId,
-  useInvoiceAmountDetail,
+  useInvoiceAmountDetailQuery,
   useInvoiceDetail,
   useInvoiceSubItems,
   usePrintInvoice,
@@ -245,9 +245,8 @@ export const Actions = ({
     selectedInvoice?.id!,
   );
 
-  const {data: invoiceAmountDetail} = useInvoiceAmountDetail(
-    selectedInvoice?.id,
-  );
+  const {data: invoiceAmountDetail, refetch: fetchInvoiceAmountDetail} =
+    useInvoiceAmountDetailQuery(invoice?.id, {enabled: false});
 
   const {refetch: refetchDownloadUrl} = useDownloadUrl(
     invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
@@ -259,17 +258,27 @@ export const Actions = ({
     {enabled: false},
   );
 
-  const {data: invoiceSubItems} = useInvoiceSubItems(selectedInvoice?.id);
+  const {data: invoiceSubItems, refetch: fetchSubItems} = useInvoiceSubItems(
+    invoice?.id,
+    {
+      enabled: false,
+    },
+  );
 
-  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = Object.entries(
-    invoiceSubItems ?? {},
-  ).reduce((acc, [parentId, subItems]) => {
-    acc[parentId] = subItems.map((subItem) => ({
-      ...subItem,
-      parentId,
-    }));
-    return acc;
-  }, {} as Record<string, InvoiceSubItemRecord[]>);
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(invoiceSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, InvoiceSubItemRecord[]>,
+      ),
+    [invoiceSubItems],
+  );
 
   const fetchUpdatedPdfDownloadUrl = useFetchFromUrl();
 
@@ -638,9 +647,10 @@ export const Actions = ({
     }
   }, [reportToUpdate]);
 
-  const handleClick = (event: any) => {
+  const handleClick = async (event: any) => {
     setAnchorEl(event.currentTarget);
     setSelectedInvoice(invoice);
+    await Promise.all([fetchSubItems(), fetchInvoiceAmountDetail()]);
   };
 
   const handleClose = () => {

@@ -132,6 +132,7 @@ export const queryKeys = {
   fetchEmployeeEmailSignatureById: 'fetchEmployeeEmailSignatureById',
   queryAllContracts: 'queryAllContracts',
   fetchContractStatistics: 'fetchContractStatistics',
+  quotationAmountById: 'quotationAmountById',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

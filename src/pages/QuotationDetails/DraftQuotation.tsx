@@ -8,7 +8,7 @@ import {BottomDrawer} from 'components/BottomDrawer';
 import {FormInput} from 'components/form/FormInput';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
-  useCalculateQuotationAmount,
+  useRecalculateQuotationAmount,
   useCreateQuotation,
   useQuotations,
   useUpdateQuotation,
@@ -301,15 +301,20 @@ export const DraftQuotation = ({
     user?.userAccount.serviceCompany.id,
   );
 
-  const subItemsMap: Record<string, QuotationSubItemRecord[]> = Object.entries(
-    quotationSubItems ?? {},
-  ).reduce((acc, [parentId, subItems]) => {
-    acc[parentId] = subItems.map((subItem) => ({
-      ...subItem,
-      parentId,
-    }));
-    return acc;
-  }, {} as Record<string, QuotationSubItemRecord[]>);
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(quotationSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, QuotationSubItemRecord[]>,
+      ),
+    [quotationSubItems],
+  );
 
   const {data: contractPaymentTerms = createEmptyResource(500)} =
     useCompanyTerms({
@@ -373,7 +378,8 @@ export const DraftQuotation = ({
   const watchedSentDate = watch('sentDate');
   const watchedExpiryDate = watch('expiryDate');
 
-  const {mutateAsync: calculateQuotationAmount} = useCalculateQuotationAmount();
+  const {mutateAsync: calculateQuotationAmount} =
+    useRecalculateQuotationAmount();
 
   const [quotationAmountDetail, setQuotationAmountDetail] = useState<
     QuotationAmountDetail | undefined
