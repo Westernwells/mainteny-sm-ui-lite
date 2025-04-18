@@ -288,7 +288,7 @@ const MixedPositionPdf = ({
                   <Text
                     style={{
                       width: '32%',
-                      color: '#616161',
+                      color: secondaryColor,
                       fontSize: 10,
                       textAlign: 'right',
                     }}>
@@ -320,7 +320,7 @@ const MixedPositionPdf = ({
                       }}>
                       <Text
                         style={{
-                          color: '#616161',
+                          color: secondaryColor,
                           fontSize: 10,
                           textAlign: 'right',
                           width: '57%',
@@ -349,7 +349,7 @@ const MixedPositionPdf = ({
                   <Text
                     style={{
                       width: '32%',
-                      color: '#212121',
+                      color: primaryColor,
                       fontSize: 10,
                       textAlign: 'right',
                     }}>
@@ -360,7 +360,7 @@ const MixedPositionPdf = ({
                       width: '24%',
                       textAlign: 'right',
                       fontSize: 10,
-                      color: '#212121',
+                      color: primaryColor,
                     }}>
                     {currencyFormatting(
                       mixedPosition?.data.unitSellingAmount?.grossAmount || 0,

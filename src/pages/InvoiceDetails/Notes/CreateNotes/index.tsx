@@ -7,17 +7,17 @@ import {TabsBody} from 'components/TabsBody';
 import {useTranslation} from 'react-i18next';
 import {Button} from 'components/Button';
 import {InvoiceFormData} from 'models/invoice';
-import {FormikProps} from 'formik';
 import {
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
 import NotesToForm from 'components/NotesToForm';
+import {UseFormReturn} from 'react-hook-form';
 import CustomerNotes from './CustomerNotes';
 import {useInfiniteCustomerNotes} from '../../../../hooks/reactQuery/useCustomers';
 
 interface Props {
-  formik: FormikProps<InvoiceFormData>;
+  formMethods: UseFormReturn<InvoiceFormData>;
   customer?: PropertyOwnerView | PropertyOwnerSimpleView;
 }
 
@@ -26,11 +26,16 @@ enum TabIndex {
   Customer = 1,
 }
 
-export const CreateNotes = ({formik, customer}: Props) => {
+export const CreateNotes = ({formMethods, customer}: Props) => {
   const {t} = useTranslation();
   const customerId = customer?.id;
   const [showSideDrawer, setShowSideDrawer] = useState(false);
   const [tabValue, setTabValue] = useState(TabIndex.Invoice);
+
+  const {watch} = formMethods;
+
+  const watchedNotes = watch('notes');
+
   const {
     data: customerNotes = {
       pages: [],
@@ -76,7 +81,7 @@ export const CreateNotes = ({formik, customer}: Props) => {
       iconPosition: 'end',
       icon: (
         <Chip
-          label={formik.values.notes?.length || 0}
+          label={watchedNotes?.length || 0}
           color="primary"
           size="small"
           sx={{
@@ -124,7 +129,7 @@ export const CreateNotes = ({formik, customer}: Props) => {
         <NoteAlt fontSize="small" />
         <Typography variant="subtitle2">{t('Notes')}</Typography>
         <Chip
-          label={(formik.values.notes?.length || 0) + totalCustomerNotes}
+          label={(watchedNotes?.length || 0) + totalCustomerNotes}
           color="primary"
           size="small"
           sx={{
@@ -200,7 +205,7 @@ export const CreateNotes = ({formik, customer}: Props) => {
             },
           }}>
           <TabsBody value={tabValue} index={TabIndex.Invoice}>
-            <NotesToForm form={formik} />
+            <NotesToForm form={formMethods} />
           </TabsBody>
           {customerId && (
             <TabsBody value={tabValue} index={TabIndex.Customer}>

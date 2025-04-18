@@ -112,39 +112,4 @@ export const getStyles = ({
       padding: 1,
       ...boldFontStyle,
     },
-    col2Left: {
-      width: '6%',
-      wordBreak: 'break-all',
-      whiteSpace: 'pre-wrap',
-      textAlign: 'left',
-      color: secondaryColor,
-    },
-    col40Left: {
-      width: '37%',
-      textAlign: 'left',
-      color: secondaryColor,
-    },
-    col10Right: {
-      width: '10%',
-      textAlign: 'right',
-      color: secondaryColor,
-    },
-    col8Center: {
-      width: '8%',
-      textAlign: 'center',
-      marginLeft: 10,
-      color: secondaryColor,
-    },
-    col15Right: {
-      width: '13%',
-      textAlign: 'right',
-      color: secondaryColor,
-    },
-    footerRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      fontSize: 10,
-      marginVertical: 3,
-      color: primaryColor,
-    },
   });

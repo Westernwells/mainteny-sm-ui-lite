@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {Typography, FormControl, RadioGroup, TextField} from '@mui/material';
 import {Box} from '@mui/system';
 import {Button} from 'components/Button';
@@ -54,6 +54,16 @@ const NewArticleTypeCard = ({
       onPackageCostChange(newPackageCost);
     }
   };
+
+  useEffect(() => {
+    if (
+      tempType === ArticleType.PACKAGE &&
+      !packageCost &&
+      onPackageCostChange
+    ) {
+      onPackageCostChange({laborPercentage: 50, materialPercentage: 50});
+    }
+  }, [tempType, packageCost]);
 
   return (
     <>

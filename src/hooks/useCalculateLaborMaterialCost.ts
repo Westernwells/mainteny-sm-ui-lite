@@ -20,10 +20,7 @@ const getPackageAmount = (
 };
 
 const getNetAmount = (item: InvoiceItemRecord, currencyCode: string): number =>
-  centsToMoney(
-    currencyCode,
-    item?.additionalInfo?.payment?.amount?.netAmount ?? 0,
-  );
+  centsToMoney(currencyCode, item?.payment?.amount?.netAmount ?? 0);
 
 export const calculateLaborMaterialCost = (
   articleItems: InvoiceItemRecord[],

@@ -1,24 +1,19 @@
-import {useMemo} from 'react';
 import {Document, StyleSheet, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import {centsToMoney, formatCurrency, moneyToCents} from 'utils/currency';
+import {formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {
+  EditableInvoiceItem,
   InvoiceAmountDetail,
-  InvoiceItemView,
   InvoiceType,
   InvoiceView,
 } from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {
-  calculateArticlesAmount,
-  getItemTotalAfterPerItemDiscount,
-} from 'utils/calculate-total';
 import {ArticleType} from 'models/article';
 import {
   applyGlobalDiscountOnItems,
@@ -27,7 +22,6 @@ import {
   stripHtmlTags,
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
-import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
@@ -61,6 +55,7 @@ type Props = {
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
+  invoiceItems: EditableInvoiceItem[];
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const getStyles = ({
@@ -160,6 +155,7 @@ const PdfPartialUpfrontPreview = ({
   nextCompanyExternalId,
   qrImageSrc,
   pdfConfigClientStorage,
+  invoiceItems,
   fontStyles,
   primaryColor,
   secondaryColor,
@@ -198,70 +194,29 @@ const PdfPartialUpfrontPreview = ({
 
   const articleItems = invoice?.items.map((item, index) => ({
     ...item,
-    additionalInfo: {
-      discount: getDiscoutObj(invoiceAmountDetail?.items[index]?.discount),
-      payment: {
-        ...invoiceAmountDetail?.items[index]?.payment,
-        type: invoiceAmountDetail?.items[index]?.payment.type!,
-        amount: {
-          ...invoiceAmountDetail?.items[index]?.payment.amount,
-          netAmount: moneyToCents(
-            currentCurrency?.code!,
-            invoiceAmountDetail?.items[index]?.payment.amount?.netAmount,
-          ),
-          currency:
-            invoiceAmountDetail?.items[index]?.payment.amount?.currency ||
-            currentCurrency?.code!,
-          vats: invoiceAmountDetail?.items[index]?.payment.amount?.vats || [],
-        },
+    payment: {
+      ...invoiceAmountDetail?.items[index]?.payment,
+      type: invoiceAmountDetail?.items[index]?.payment.type!,
+      amount: {
+        ...invoiceAmountDetail?.items[index]?.payment.amount,
+        netAmount:
+          invoiceAmountDetail?.items[index]?.payment.amount?.netAmount ?? 0,
+        currency:
+          invoiceAmountDetail?.items[index]?.payment.amount?.currency ||
+          currentCurrency?.code!,
+        vats: invoiceAmountDetail?.items[index]?.payment.amount?.vats || [],
       },
     },
     discount: getDiscoutObj(invoiceAmountDetail?.items[index]?.discount),
   }))!;
 
-  const netTotal = (articleItem: InvoiceItemView) => {
-    const total = getItemTotalAfterPerItemDiscount({
-      item: {
-        unitAmount: {
-          netAmount: articleItem?.unitAmount?.netAmount,
-        },
-        quantity: articleItem.quantity,
-        discount: articleItem?.additionalInfo?.discount,
-      },
-      precision: 0,
-    });
-    return centsToMoney(currentCurrency?.code!, total);
-  };
-
   const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
-  const discountAmount = discount?.amount;
-  const discountValue = discountAmount?.value ?? 0;
 
   const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
 
   const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
     itemsAfterPerItemDiscount,
     discount,
-  );
-
-  const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} =
-    useMemo(
-      () =>
-        calculateArticlesAmount({
-          items: articleItems,
-          globalDiscount: discount,
-        }),
-      [articleItems, discount],
-    );
-
-  const amountAfterGlobalDiscountFormatted = formatCurrency(
-    amountAfterGlobalDiscount,
-    {
-      currency: currentCurrency?.code,
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    },
   );
 
   const laborCost = useCalculateLaborMaterialCost(
@@ -365,20 +320,14 @@ const PdfPartialUpfrontPreview = ({
             )}
 
             {invoice?.additionalInfo.showArticleSection &&
-              invoice.items.length > 0 && (
+              invoiceItems.length > 0 && (
                 <ArticleSection
                   invoice={invoice}
+                  invoiceItems={invoiceItems}
+                  invoiceAmountDetail={invoiceAmountDetail}
                   currentCurrency={currentCurrency}
                   translate={translate}
-                  allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
-                    articleItems,
-                  )}
-                  discountValue={discountValue}
-                  subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
-                  percentageVats={vats}
-                  total={amountAfterGlobalDiscountWithVAT}
                   selectedLng={selectedLng}
-                  netTotal={netTotal}
                   fontStyles={fontStyles}
                   primaryColor={primaryColor}
                   secondaryColor={secondaryColor}

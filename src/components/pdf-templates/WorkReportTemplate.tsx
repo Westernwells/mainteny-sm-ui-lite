@@ -696,7 +696,7 @@ const WorkReportTemplate = React.memo(
                               marginLeft: 10,
                               ...styles.tableBodyContent,
                             }}>
-                            {translate(articleItem.article?.unit) || '-'}
+                            {translate(articleItem.article?.unit!) || '-'}
                           </Text>
                         </View>
                       ))}

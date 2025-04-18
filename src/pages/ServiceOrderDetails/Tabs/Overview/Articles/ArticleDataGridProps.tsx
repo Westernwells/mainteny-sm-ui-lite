@@ -32,5 +32,4 @@ export const makeRows = (
     article: item,
     ownerName: item.additionalInfo?.owner?.name || '',
     ownerType: item?.ownerType!,
-    contractNumber: item.article?.generationInfo?.contractId || '-',
   }));

@@ -16,12 +16,14 @@ type Props = {
   formMethods: UseFormReturn<QuotationFormData>;
   amountBeforeGlobalDiscountFormatted: string;
   amountBeforeGlobalDiscount: number;
+  onRecalcQuotation: () => void;
 };
 
 const DiscountPanel = ({
   formMethods,
   amountBeforeGlobalDiscountFormatted,
   amountBeforeGlobalDiscount,
+  onRecalcQuotation,
 }: Props) => {
   const {t} = useTranslation();
   const {language: selectedLng} = useContext(LanguageContext);
@@ -67,6 +69,8 @@ const DiscountPanel = ({
         percentage: floatValue || 0,
       });
     }
+
+    onRecalcQuotation();
   };
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');

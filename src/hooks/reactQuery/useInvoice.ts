@@ -36,6 +36,7 @@ import {
   InvoicePaymentRecord,
   InvoiceStatistics,
   InvoiceStatus,
+  InvoiceSubItemRecord,
   InvoiceView,
   PrintInvoiceRecord,
   QueryCancelInvoiceParams,
@@ -911,3 +912,24 @@ export const useCalculateInvoiceAmount = () =>
   useMutation(({data}: {data: CalculateInvoiceAmountRecord}) =>
     postInvoiceAmount(data),
   );
+
+export const fetchInvoiceSubItems = async (invoiceId: string) => {
+  const response = await axiosClient.get<
+    Record<string, InvoiceSubItemRecord[]>
+  >(`/api/invoices/${invoiceId}/subItems`);
+  return response.data;
+};
+
+export function useInvoiceSubItems(
+  invoiceId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<
+    Record<string, InvoiceSubItemRecord[]>,
+    RestError,
+    Record<string, InvoiceSubItemRecord[]>
+  >([qk.invoiceSubItem, invoiceId], () => fetchInvoiceSubItems(invoiceId!), {
+    enabled: !!invoiceId,
+    ...options,
+  });
+}

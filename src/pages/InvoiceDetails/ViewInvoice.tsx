@@ -25,6 +25,7 @@ import {
   FILE_DESCRIPTION_PREFIXES,
   InvoiceActivityView,
   InvoiceStatus,
+  InvoiceSubItemRecord,
   InvoiceType,
   InvoiceTypeMap,
   InvoiceView,
@@ -126,7 +127,10 @@ import {FileResourceRecord} from 'models/media';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {CANCEL_ACTION} from 'models/status';
 import {useVats} from 'hooks/reactQuery/useVats';
-import {getInvoiceStatusStyles} from 'utils/invoice';
+import {
+  getInvoiceStatusStyles,
+  invoiceItemToInvoiceItemRecord,
+} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {Notes} from './Notes/EditNotes';
@@ -160,6 +164,7 @@ interface Props {
   };
   isLoadingHeaderUrl?: boolean;
   isLoadingFooterUrl?: boolean;
+  invoiceSubItems?: Record<string, InvoiceSubItemRecord[]>;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -185,6 +190,7 @@ export const ViewInvoice = ({
   },
   isLoadingHeaderUrl,
   isLoadingFooterUrl,
+  invoiceSubItems,
 }: Props) => {
   const {t} = useTranslation();
   const {enqueueSnackbar} = useSnackbar();
@@ -221,6 +227,16 @@ export const ViewInvoice = ({
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
   );
+
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = Object.entries(
+    invoiceSubItems ?? {},
+  ).reduce((acc, [parentId, subItems]) => {
+    acc[parentId] = subItems.map((subItem) => ({
+      ...subItem,
+      parentId,
+    }));
+    return acc;
+  }, {} as Record<string, InvoiceSubItemRecord[]>);
 
   const [activeSignature, setActiveSignature] = useState<
     EmailSignature | undefined
@@ -630,6 +646,17 @@ export const ViewInvoice = ({
         )
       : [];
 
+    const transformedInvoiceItems =
+      invoice?.items.map((item) =>
+        invoiceItemToInvoiceItemRecord(
+          item,
+          invoice.type,
+          currentCurrency,
+          taxRates,
+          subItemsMap,
+        ),
+      ) || [];
+
     const blob = await pdf(
       <PdfTemplate
         serviceCompany={company}
@@ -649,6 +676,7 @@ export const ViewInvoice = ({
           invoiceNumber || translate('Automatically assigned')
         }
         qrImageSrc={qrImageSrc}
+        invoiceItems={transformedInvoiceItems}
         fontStyles={fontStyles}
         primaryColor={primaryColor}
         secondaryColor={secondaryColor}
@@ -1233,6 +1261,7 @@ export const ViewInvoice = ({
               },
               currentCurrency,
               taxRates,
+              subItemsMap,
             ),
             invoiceId: invoice.id,
           },

@@ -45,6 +45,7 @@ import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate'
 import {QuotationSubItemRecord} from 'models/quotation';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import useQuotationAmountDetail from 'hooks/useQuotationAmountDetail';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -185,12 +186,17 @@ export const ServiceOrderDetails = () => {
     company?.id,
   );
 
-  const generatePreviewPdfBlobUrl = async () => {
-    const transformedQuotationItems =
-      quotation?.items.map((item) =>
-        quotationItemToQuotationItemRecord(item, subItemsMap),
-      ) || [];
+  const transformedQuotationItems =
+    quotation?.items.map((item) =>
+      quotationItemToQuotationItemRecord(item, subItemsMap),
+    ) || [];
 
+  const quotationAmountDetail = useQuotationAmountDetail({
+    quotationItems: transformedQuotationItems,
+    quotationDiscount: quotation?.additionalInfo.discount,
+  });
+
+  const generatePreviewPdfBlobUrl = async () => {
     const blob =
       serviceOrder?.additionalInfo.quotationId && quotation
         ? await pdf(
@@ -211,6 +217,7 @@ export const ServiceOrderDetails = () => {
                 allJobTypes,
               )}
               quotationItems={transformedQuotationItems}
+              quotationAmountDetail={quotationAmountDetail}
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}

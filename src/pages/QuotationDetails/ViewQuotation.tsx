@@ -69,6 +69,7 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import useQuotationAmountDetail from 'hooks/useQuotationAmountDetail';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -274,12 +275,20 @@ export const ViewQuotation = ({
     }
   }, [quotation]);
 
-  const generateBlobUrl = async () => {
-    const transformedQuotationItems =
+  const transformedQuotationItems = useMemo(
+    () =>
       quotation?.items.map((item) =>
         quotationItemToQuotationItemRecord(item, subItemsMap),
-      ) || [];
+      ) || [],
+    [quotation?.items, subItemsMap],
+  );
 
+  const quotationAmountDetail = useQuotationAmountDetail({
+    quotationItems: transformedQuotationItems,
+    quotationDiscount: quotation.additionalInfo.discount,
+  });
+
+  const generateBlobUrl = async () => {
     const blob = await pdf(
       <QuotationPdfTemplate
         serviceCompany={company}
@@ -294,6 +303,7 @@ export const ViewQuotation = ({
         footerPath={footerUrl}
         footerInfo={footerInfo}
         quotationItems={transformedQuotationItems}
+        quotationAmountDetail={quotationAmountDetail}
         fontStyles={fontStyles}
         primaryColor={primaryColor}
         secondaryColor={secondaryColor}
@@ -312,6 +322,7 @@ export const ViewQuotation = ({
     headerUrl,
     footerUrl,
     quotationSubItems,
+    quotationAmountDetail,
     fontStyles,
     primaryColor,
     secondaryColor,

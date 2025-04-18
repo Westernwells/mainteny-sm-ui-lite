@@ -345,7 +345,7 @@ const PdfUpfrontInvoiceSection = ({
                 <Text
                   style={{
                     textAlign: 'left',
-                    color: '#212121',
+                    color: primaryColor,
                     width: '60%',
                   }}>
                   {previousInvoice.type === InvoiceType.CREDIT_NOTE
@@ -357,7 +357,7 @@ const PdfUpfrontInvoiceSection = ({
                   <Text
                     style={{
                       textAlign: 'right',
-                      color: '#212121',
+                      color: primaryColor,
                       width: '15%',
                     }}>
                     {fixRounding(
@@ -371,7 +371,7 @@ const PdfUpfrontInvoiceSection = ({
                 <Text
                   style={{
                     textAlign: 'right',
-                    color: '#212121',
+                    color: primaryColor,
                     width:
                       previousInvoice.additionalInfo.payment?.type ===
                       PaymentType.PERCENTAGE
@@ -405,7 +405,7 @@ const PdfUpfrontInvoiceSection = ({
             <Text
               style={{
                 width: '32%',
-                color: '#616161',
+                color: secondaryColor,
                 fontSize: 10,
                 textAlign: 'right',
               }}>
@@ -428,7 +428,7 @@ const PdfUpfrontInvoiceSection = ({
                 <Text
                   style={{
                     width: '32%',
-                    color: '#616161',
+                    color: secondaryColor,
                     fontSize: 10,
                     textAlign: 'right',
                   }}>
@@ -460,7 +460,7 @@ const PdfUpfrontInvoiceSection = ({
                   <Text
                     style={{
                       width: '32%',
-                      color: '#616161',
+                      color: secondaryColor,
                       fontSize: 10,
                       textAlign: 'right',
                     }}>
@@ -492,7 +492,7 @@ const PdfUpfrontInvoiceSection = ({
             <Text
               style={{
                 width: '32%',
-                color: '#212121',
+                color: primaryColor,
                 ...fontStyles.bold,
                 textAlign: 'right',
                 fontSize: 10,
@@ -506,7 +506,7 @@ const PdfUpfrontInvoiceSection = ({
               style={{
                 width: '24%',
                 textAlign: 'right',
-                color: '#212121',
+                color: primaryColor,
                 ...fontStyles.bold,
                 fontSize: 10,
               }}>
