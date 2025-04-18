@@ -6,7 +6,11 @@ import {t} from 'i18next';
 import {useElevatorById} from 'hooks/reactQuery/useElevator';
 import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {getJobTypeGivenName} from 'utils/service-order-utils';
+import {
+  getJobTypeGivenName,
+  isCustomJobType,
+  serviceOrderTypeToString,
+} from 'utils/service-order-utils';
 import {ScheduleServiceOrder} from './ScheduleServiceOrder';
 
 interface Props {
@@ -33,8 +37,12 @@ export const NewServiceOrder = ({getCurrentPageTitle}: Props) => {
 
   useLayoutEffect(() => {
     if (getCurrentPageTitle && currentParams) {
-      const givenName = getJobTypeGivenName(type, jobTypes);
-      getCurrentPageTitle(t(`New {{jobType}} Job`, {jobType: givenName}));
+      if (isCustomJobType(type)) {
+        const givenName = getJobTypeGivenName(type, jobTypes);
+        getCurrentPageTitle(t(`New {{jobType}} Job`, {jobType: givenName}));
+      } else {
+        getCurrentPageTitle(`New ${serviceOrderTypeToString(type)} Job`);
+      }
     }
   }, []);
 
