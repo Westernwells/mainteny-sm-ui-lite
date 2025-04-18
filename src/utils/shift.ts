@@ -100,22 +100,22 @@ export const aggregateWeekShifts = (
 ): ShiftForm =>
   workingHours.reduce((acc, workingHour) => {
     if (workingHour.type === TimeWindowType.WEEKDAY) {
-      const mappedDate = WEEK_DAYS_WITHOUT_WEEKENDS.map(
-        (dayType): ShiftForm =>
-          <ShiftForm>{
-            [dayType]: mapShiftRestDataToShift(workingHour),
-          },
-      );
+      const mappedDate = Object.fromEntries(
+        WEEK_DAYS_WITHOUT_WEEKENDS.map((dayType) => [
+          dayType,
+          mapShiftRestDataToShift(workingHour),
+        ]),
+      ) as ShiftForm;
       return {...acc, ...mappedDate};
     }
 
     if (workingHour.type === TimeWindowType.WEEKEND) {
-      const mappedDate = [TimeWindowType.SATURDAY, TimeWindowType.SUNDAY].map(
-        (dayType): ShiftForm =>
-          <ShiftForm>{
-            [dayType]: mapShiftRestDataToShift(workingHour),
-          },
-      );
+      const mappedDate = Object.fromEntries(
+        [TimeWindowType.SATURDAY, TimeWindowType.SUNDAY].map((dayType) => [
+          dayType,
+          mapShiftRestDataToShift(workingHour),
+        ]),
+      ) as ShiftForm;
       return {...acc, ...mappedDate};
     }
 
