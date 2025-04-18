@@ -559,12 +559,12 @@ export const UnitListingView = () => {
         ),
       },
       {
-        id: TABLE_COLUMNS_ID.REQUIRED_TIME,
+        id: TABLE_COLUMNS_ID.SERVICE_TIME,
         headerName: 'Required time',
         textTransform: false,
         key: 'unit-cell-required-time',
         width: '84px',
-        fieldName: ElevatorOrderField.REQUIRED_TIME,
+        fieldName: ElevatorOrderField.SERVICE_TIME,
         getExportValue: (unit) => `${unit.requiredTime}`,
         renderCell: (unit, cellProps) => (
           <Cell {...cellProps}>

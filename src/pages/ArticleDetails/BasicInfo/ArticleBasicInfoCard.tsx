@@ -96,7 +96,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       ),
     type: Yup.string().nullable().required('Type is required'),
     unit: Yup.string().nullable(),
-    unitPurchaseVat: Yup.string().required('Purchase VAT is required'),
+    unitPurchaseVat: Yup.string().nullable(),
     unitSellingVat: Yup.string().required('Selling VAT is required'),
     unitSellingAmount: Yup.number()
       .nullable()
