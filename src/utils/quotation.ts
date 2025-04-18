@@ -269,6 +269,19 @@ export const quotationItemToQuotationItemRecord = (
     userSeqNumber: quotationItem?.additionalInfo?.userSeqNumber,
   };
 
+  // If the article's type is PACKAGE, add a default costPackage if it doesn't exist.
+  if (quotationItem.article?.type === ArticleType.PACKAGE) {
+    if (!quotationItem.article.costPackage) {
+      record.article = {
+        ...record.article,
+        costPackage: {
+          laborPercentage: 50,
+          materialPercentage: 50,
+        },
+      };
+    }
+  }
+
   if (quotationItem.article?.type === ArticleType.MIX) {
     const subItems = subItemsMap[quotationItem.id] || [];
 
@@ -295,27 +308,6 @@ export const quotationItemToQuotationItemRecord = (
   }
 
   return record;
-};
-
-export const getQuotationItemTotalAfterPerItemDiscount = ({
-  positionItem,
-}: {
-  positionItem: EditableQuotationItem;
-}): number => {
-  const quantity = positionItem.quantity || 0;
-  const netAmount = positionItem.unitAmount?.netAmount || 0;
-
-  const {discount} = positionItem;
-
-  let total = (netAmount * quantity) / 100;
-
-  if (discount?.type === DiscountType.PERCENTAGE) {
-    total -= (total * (discount.percentage || 0)) / 100;
-  } else if (discount?.type === DiscountType.AMOUNT) {
-    total -= discount.amount?.value || 0;
-  }
-
-  return Math.max(total, 0);
 };
 
 export const getDiscountDisplay = (
@@ -347,7 +339,8 @@ export const buildQuotationPayload = (
   items: EditableQuotationItem[],
   currentCurrency: Currency,
   discount?: Discount,
-): any => ({
+  mode: 'view' | 'edit' = 'view',
+) => ({
   currency: currentCurrency.code,
   items: items.map((item) => ({
     id: undefined,
@@ -365,12 +358,12 @@ export const buildQuotationPayload = (
     description: item.description,
     unitAmount: {
       currency: item.unitAmount?.currency || currentCurrency.code,
-      netAmount: item.unitAmount?.netAmount || 0,
+      netAmount: Number(item.unitAmount?.netAmount) || 0,
       percentageVat: item.unitAmount?.percentageVat || 0,
       vatId: item.unitAmount?.vatId || '',
       vatName: item.unitAmount?.vatName || '',
     },
-    quantity: item.quantity || 0,
+    quantity: Number(item.quantity) || 0,
     discount:
       item.discount?.type === DiscountType.AMOUNT
         ? {
@@ -402,7 +395,7 @@ export const buildQuotationPayload = (
       name: sub.name,
       unitPurchaseAmount: sub.unitPurchaseAmount,
       unitAmount: sub.unitAmount,
-      quantity: sub.quantity,
+      quantity: Number(sub.quantity) || 0,
       description: sub.description,
       userSeqNumber: sub.userSeqNumber,
     })),
@@ -413,10 +406,13 @@ export const buildQuotationPayload = (
       ? {
           type: DiscountType.AMOUNT,
           amount: {
-            value: moneyToCents(
-              currentCurrency?.code,
-              discount.amount?.value ?? 0,
-            ),
+            value:
+              mode === 'view'
+                ? discount.amount?.value ?? 0
+                : moneyToCents(
+                    currentCurrency?.code,
+                    discount.amount?.value ?? 0,
+                  ),
             currency: discount.amount?.currency || currentCurrency.code,
             fractionDigits:
               discount.amount?.fractionDigits || currentCurrency.fractionDigits,

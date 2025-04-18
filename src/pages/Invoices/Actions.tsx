@@ -23,11 +23,17 @@ import {
   useFetchXInvoiceByInvoiceId,
   useInvoiceAmountDetail,
   useInvoiceDetail,
+  useInvoiceSubItems,
   usePrintInvoice,
   useSendInvoice,
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
-import {InvoiceStatus, InvoiceType, InvoiceView} from 'models/invoice';
+import {
+  InvoiceStatus,
+  InvoiceSubItemRecord,
+  InvoiceType,
+  InvoiceView,
+} from 'models/invoice';
 import {
   fetchDownloadUrls as fetchDownloadUrlsUtil,
   useDownloadUrl,
@@ -101,7 +107,7 @@ import {useVats} from 'hooks/reactQuery/useVats';
 import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPreparation';
 import {downloadFile} from 'utils/download';
 import printJS from 'print-js';
-import {isXMLNeeded} from 'utils/invoice';
+import {invoiceItemToInvoiceItemRecord, isXMLNeeded} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 
@@ -252,6 +258,18 @@ export const Actions = ({
     invoice?.additionalInfo.xmlPath ? [invoice?.additionalInfo.xmlPath] : [],
     {enabled: false},
   );
+
+  const {data: invoiceSubItems} = useInvoiceSubItems(selectedInvoice?.id);
+
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = Object.entries(
+    invoiceSubItems ?? {},
+  ).reduce((acc, [parentId, subItems]) => {
+    acc[parentId] = subItems.map((subItem) => ({
+      ...subItem,
+      parentId,
+    }));
+    return acc;
+  }, {} as Record<string, InvoiceSubItemRecord[]>);
 
   const fetchUpdatedPdfDownloadUrl = useFetchFromUrl();
 
@@ -574,6 +592,17 @@ export const Actions = ({
 
     const {headerInfo, footerInfo} = await onFetchInvoiceInfo();
 
+    const transformedInvoiceItems =
+      invoice?.items.map((item) =>
+        invoiceItemToInvoiceItemRecord(
+          item,
+          invoice.type,
+          currentCurrency,
+          taxRates,
+          subItemsMap,
+        ),
+      ) || [];
+
     const blob = await pdf(
       <PdfTemplate
         serviceCompany={company}
@@ -582,6 +611,7 @@ export const Actions = ({
         currentCurrency={currentCurrency}
         invoice={invoiceData}
         invoiceAmountDetail={invoiceAmountDetail}
+        invoiceItems={transformedInvoiceItems}
         selectedLng={company?.language}
         translate={translate}
         previousInvoices={previousInvoicesProp}

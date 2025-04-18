@@ -20,11 +20,16 @@ import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
-import {Discount} from './invoice';
+import {
+  Discount,
+  InvoiceSubItemsConfig,
+  InvoiceUnitAmountSource,
+} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {CommentRecord} from './comment';
+import {ArticleInfoRecord} from './quotation';
 
 export enum Priority {
   A = 'A',
@@ -670,7 +675,8 @@ export interface ServiceOrderArticleView {
   name: string;
   description: string;
   serviceOrderId: string;
-  article: ArticleRecord;
+  article: ArticleInfoRecord;
+  unitPurchaseAmount?: MultiVatsAmount;
   unitAmount: MultiVatsAmount;
   quantity: number;
   ownerType?: ServiceOrderArticleOwnerType;
@@ -681,6 +687,9 @@ export interface ServiceOrderArticleView {
           id: string;
           name: string;
         };
+        unitAmountSource?: InvoiceUnitAmountSource;
+        subArticlesConfig?: InvoiceSubItemsConfig;
+        userSeqNumber?: string;
       }
     | undefined;
 }

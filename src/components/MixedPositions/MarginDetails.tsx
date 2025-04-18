@@ -8,17 +8,20 @@ import {useCurrentCurrency, formatCurrency, centsToMoney} from 'utils/currency';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import {VatAmount} from 'models/invoice';
 
 type MarginProps = {
   mixedPositionItems: EditableQuotationItem[];
   amountAfterGlobalDiscountFormatted: string;
   amountAfterGlobalDiscountWithVATFormatted: string;
+  vats?: VatAmount[];
 };
 
 const MarginDetails = ({
   mixedPositionItems,
   amountAfterGlobalDiscountFormatted,
   amountAfterGlobalDiscountWithVATFormatted,
+  vats = [],
 }: MarginProps) => {
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
@@ -34,13 +37,14 @@ const MarginDetails = ({
 
       mixedPositionItems?.forEach((item) => {
         if (item.article?.type === ArticleType.MIX) {
-          // For a mixed position, calculate margins from its sub-items
           if (item.subItems && item.subItems.length > 0) {
             item.subItems.forEach((sub) => {
               const subNetAmount =
-                (sub.unitAmount?.netAmount ?? 0) * sub.quantity;
+                Number(sub.unitAmount?.netAmount ?? 0) *
+                Number(sub.quantity ?? 0);
               const subPurchaseAmount =
-                (sub.unitPurchaseAmount?.netAmount ?? 0) * sub.quantity;
+                Number(sub.unitPurchaseAmount?.netAmount ?? 0) *
+                Number(sub.quantity ?? 0);
               const subMargin = subNetAmount - subPurchaseAmount;
               totalPurchase += subPurchaseAmount;
               if (sub.article?.type === ArticleType.MATERIAL) {
@@ -53,16 +57,21 @@ const MarginDetails = ({
             });
           }
         } else {
-          const netAmount = (item.unitAmount?.netAmount ?? 0) * item.quantity;
+          const netAmount =
+            Number(item.unitAmount?.netAmount ?? 0) *
+            Number(item.quantity ?? 0);
           const purchaseAmount =
-            (item.unitPurchaseAmount?.netAmount ?? 0) * item.quantity;
+            Number(item.unitPurchaseAmount?.netAmount ?? 0) *
+            Number(item.quantity ?? 0);
           const margin = netAmount - purchaseAmount;
           totalPurchase += purchaseAmount;
           if (item.article?.type === ArticleType.PACKAGE) {
-            const laborPercentage =
-              item.article?.costPackage?.laborPercentage ?? 0;
-            const materialPercentage =
-              item.article?.costPackage?.materialPercentage ?? 0;
+            const laborPercentage = Number(
+              item.article?.costPackage?.laborPercentage ?? 0,
+            );
+            const materialPercentage = Number(
+              item.article?.costPackage?.materialPercentage ?? 0,
+            );
             labMargin += margin * (laborPercentage / 100);
             matMargin += margin * (materialPercentage / 100);
           } else if (item.article?.type === ArticleType.MATERIAL) {
@@ -195,6 +204,29 @@ const MarginDetails = ({
               {amountAfterGlobalDiscountFormatted}
             </Typography>
           </Box>
+
+          {vats?.map((vat) => (
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center">
+              <Typography
+                variant="subtitle2"
+                fontWeight={600}
+                color="text.primary">
+                {`${t('VAT')} ${vat.percentageVat}%`}
+              </Typography>
+              <Typography
+                variant="subtitle2"
+                fontWeight={600}
+                color="text.primary">
+                {formatCurrency(
+                  centsToMoney(currentCurrency.code, vat.vat ?? 0),
+                  {currency: currentCurrency.code},
+                )}
+              </Typography>
+            </Box>
+          ))}
 
           <Box
             display="flex"

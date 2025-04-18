@@ -104,6 +104,7 @@ import {
 } from 'hooks/reactQuery/useDownloadUrl';
 import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
 import {
+  buildQuotationPayload,
   generatePdfQuotation,
   quotationItemToQuotationItemRecord,
 } from 'utils/quotation';
@@ -112,6 +113,7 @@ import PositionTable from 'components/MixedPositions/PositionTable';
 import {ArticleType} from 'models/article';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {DiscountType} from 'models/invoice';
+import {useSnackbar} from 'hooks/useSnackbar';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord} from './utils';
 import {Notes} from './Notes';
@@ -135,6 +137,8 @@ export const DraftQuotation = ({
   const theme = useTheme();
   const navigate = useNavigate();
   const {search} = useLocation();
+  const {showError} = useSnackbar();
+
   const {data: taxRates} = useVats();
 
   const defaultVat = taxRates?.find((tR) => tR.isDefault);
@@ -281,7 +285,7 @@ export const DraftQuotation = ({
     try {
       return !(resource && resource.some((item) => item.externalId === value));
     } catch (error) {
-      console.error('Error checking externalId uniqueness:', error);
+      showError(error);
       return true;
     }
   };
@@ -353,8 +357,8 @@ export const DraftQuotation = ({
     reset,
     formState: {errors},
   } = formMethods;
+
   const watchedItems = watch('items');
-  const watchedDiscount = watch('discount');
   const watchedSubject = watch('subject');
   const watchedDescription = watch('description');
   const watchedNotes = watch('notes');
@@ -364,132 +368,61 @@ export const DraftQuotation = ({
   );
   const watchedBillingAddress = watch('billingAddress');
   const watchedBeneficiaryAddress = watch('beneficiaryAddress');
-  const watchedAlternativeAddress = watch('billingAddress');
+  const watchedAlternativeAddress = watch('alternativeAddress');
   const watchedPaymentTerms = watch('paymentTerms');
   const watchedSentDate = watch('sentDate');
   const watchedExpiryDate = watch('expiryDate');
 
   const {mutateAsync: calculateQuotationAmount} = useCalculateQuotationAmount();
 
-  const [quotationDetail, setQuotationDetail] =
-    useState<QuotationAmountDetail | null>(null);
+  const [quotationAmountDetail, setQuotationAmountDetail] = useState<
+    QuotationAmountDetail | undefined
+  >(undefined);
 
   const recalcQuotation = useCallback(
     debounce(async () => {
-      const invalidData = watchedItems?.some(
-        (item) => !item.name || item.name.trim() === '',
-      );
+      const currentValues = getValues();
+      const currentItems = currentValues.items;
 
-      const mixItemWithoutSubItems = watchedItems.some(
+      const hasEmptyItemName = currentItems.some((item) => !item.name?.trim());
+      const hasMixItemWithoutSubItems = currentItems.some(
         (item) =>
           item.article?.type === ArticleType.MIX &&
           (!item.subItems || item.subItems.length === 0),
       );
 
-      if (invalidData || mixItemWithoutSubItems) {
+      if (hasEmptyItemName || hasMixItemWithoutSubItems) {
         return;
       }
 
       try {
+        const payload = buildQuotationPayload(
+          currentItems,
+          currentCurrency,
+          currentValues.discount,
+          'edit',
+        );
+
         const detail = await calculateQuotationAmount({
-          data: {
-            currency: currentCurrency.code,
-            items: watchedItems?.map((item) => ({
-              id: undefined,
-              article: {
-                id: undefined,
-                name: item.article?.name,
-                externalId: item.article?.externalId,
-                type: item.article?.type,
-                unit: item.article?.unit,
-                unitSellingAmount: item.article?.unitSellingAmount,
-                unitPurchaseAmount: item.article?.unitPurchaseAmount,
-                costPackage: item.article?.costPackage,
-              },
-              name: item.name,
-              description: item.description,
-              unitAmount: {
-                currency: item.unitAmount?.currency || currentCurrency.code,
-                netAmount: item.unitAmount?.netAmount || 0,
-                percentageVat: item.unitAmount?.percentageVat || 0,
-                vatId: item.unitAmount?.vatId || '',
-                vatName: item.unitAmount?.vatName || '',
-              },
-              quantity: item.quantity || 0,
-              discount:
-                item.discount?.type === DiscountType.AMOUNT
-                  ? {
-                      type: DiscountType.AMOUNT,
-                      amount: {
-                        ...item.discount?.amount,
-                        value: (item.discount?.amount?.value ?? 0) * 100,
-                        currency:
-                          item.discount?.amount?.currency ||
-                          currentCurrency.code,
-                      },
-                    }
-                  : {
-                      type: DiscountType.PERCENTAGE,
-                      percentage: item.discount?.percentage || 0,
-                    },
-              payment: undefined,
-              subItemsConfig: item.subItemsConfig,
-              subItems: item?.subItems?.map((sub) => ({
-                article: {
-                  id: undefined,
-                  name: sub.article?.name,
-                  externalId: sub.article?.externalId,
-                  type: sub.article?.type,
-                  unit: sub.article?.unit,
-                  unitSellingAmount: sub.article?.unitSellingAmount,
-                  unitPurchaseAmount: sub.article?.unitPurchaseAmount,
-                  costPackage: sub.article?.costPackage,
-                },
-                id: undefined,
-                name: sub.name,
-                unitPurchaseAmount: sub.unitPurchaseAmount,
-                unitAmount: sub.unitAmount,
-                quantity: sub.quantity,
-                description: sub.description,
-                userSeqNumber: sub.userSeqNumber,
-              })),
-              userSeqNumber: item.userSeqNumber,
-            })),
-            globalDiscount:
-              watchedDiscount?.type === DiscountType.AMOUNT
-                ? {
-                    type: DiscountType.AMOUNT,
-                    amount: {
-                      value: (watchedDiscount.amount?.value ?? 0) * 100,
-                      currency:
-                        watchedDiscount.amount?.currency ||
-                        currentCurrency.code,
-                      fractionDigits:
-                        watchedDiscount.amount?.fractionDigits ||
-                        currentCurrency.fractionDigits,
-                    },
-                  }
-                : {
-                    type: DiscountType.PERCENTAGE,
-                    percentage: watchedDiscount?.percentage || 0,
-                  },
-          },
+          data: payload,
         });
-        setQuotationDetail(detail);
+
+        setQuotationAmountDetail(detail);
       } catch (error) {
-        console.error('Error while recalculating quotation:', error);
+        showError(error);
       }
     }, 300),
-    [calculateQuotationAmount, currentCurrency, watchedItems, watchedDiscount],
+    [calculateQuotationAmount, currentCurrency, setValue, getValues, pageState],
   );
 
   useEffect(() => {
     recalcQuotation();
-  }, [watchedItems, watchedDiscount]);
+  }, [recalcQuotation]);
 
-  const amountAfterGlobalDiscount = quotationDetail?.amountAfterGlobalDiscount;
+  const amountAfterGlobalDiscount =
+    quotationAmountDetail?.amountAfterGlobalDiscount;
 
-  const vats = quotationDetail?.amountAfterGlobalDiscount.vats || [];
+  const vats = quotationAmountDetail?.amountAfterGlobalDiscount.vats || [];
 
   async function save(values: QuotationFormData) {
     if (!values?.description?.trim().length) values.description = '';
@@ -497,17 +430,25 @@ export const DraftQuotation = ({
 
     if (formType === 'edit' && quotation) {
       return updateQuotationAsync({
-        data: formatQuotationRecord({
-          ...values,
-          ...(quotation.status === QuotationStatus.SENT_TO_CLIENT
-            ? {status: QuotationStatus.DRAFT}
-            : {}),
-        }),
+        data: formatQuotationRecord(
+          {
+            ...values,
+            ...(quotation.status === QuotationStatus.SENT_TO_CLIENT
+              ? {status: QuotationStatus.DRAFT}
+              : {}),
+          },
+          currentCurrency,
+          taxRates,
+        ),
         quotationId: quotation.id,
       });
     }
     return createNewQuotation({
-      data: formatQuotationRecord({...values}) as CreateQuotationRecord,
+      data: formatQuotationRecord(
+        {...values},
+        currentCurrency,
+        taxRates,
+      ) as CreateQuotationRecord,
     });
   }
 
@@ -868,6 +809,7 @@ export const DraftQuotation = ({
           fontStyles={fontStyles}
           primaryColor={primaryColor}
           secondaryColor={secondaryColor}
+          quotationAmountDetail={quotationAmountDetail}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -878,22 +820,34 @@ export const DraftQuotation = ({
     await generateBlobUrl();
   };
 
-  const isValid = () => {
-    const hasEmptyItemName = watchedItems.some((item) => !item.name?.trim());
+  const hasEmptyItemName = watchedItems?.some((item) => !item.name?.trim());
 
-    const mixItemWithoutSubItems = watchedItems.some(
+  const hasMixItemWithoutSubItems = watchedItems?.some(
+    (item) =>
+      item.article?.type === ArticleType.MIX &&
+      (!item.subItems || item.subItems.length === 0),
+  );
+
+  const isValid = () => {
+    const currentValues = getValues();
+    const currentItems = currentValues.items || [];
+
+    const localHasEmptyItemName = currentItems.some(
+      (item) => !item.name?.trim(),
+    );
+    const localHasMixItemWithoutSubItems = currentItems.some(
       (item) =>
         item.article?.type === ArticleType.MIX &&
         (!item.subItems || item.subItems.length === 0),
     );
 
     const valid =
-      watchedSubject &&
-      !hasEmptyItemName &&
-      watchedItems.length &&
+      currentValues.subject &&
+      currentItems.length > 0 &&
+      !localHasEmptyItemName &&
       !!customer &&
       externalIdUnique &&
-      !mixItemWithoutSubItems &&
+      !localHasMixItemWithoutSubItems &&
       Object.keys(errors).length === 0;
 
     return !!valid;
@@ -979,6 +933,7 @@ export const DraftQuotation = ({
     }
     setOpenResumeProgressDialog(false);
     setPageState('CONTINUE_NEW');
+    recalcQuotation();
   };
 
   const resetLocalStorage = () => {
@@ -996,6 +951,17 @@ export const DraftQuotation = ({
   const handlePreviewClose = () => {
     setOpenPreviewDialog(false);
     setFilePathToDownload('');
+  };
+
+  const onSubmit = async (values: QuotationFormData) => {
+    try {
+      const response = await save(values);
+      const quotationId = formType === 'new' ? response.value : quotation?.id;
+      resetLocalStorage();
+      navigate(`/quotations/details/${quotationId}`);
+    } catch (error) {
+      showError(error);
+    }
   };
 
   useEffect(() => {
@@ -1181,6 +1147,8 @@ export const DraftQuotation = ({
         unit: 'kg',
         unitSellingAmount: defaultProps,
         unitPurchaseAmount: defaultProps,
+        name: '',
+        externalId: '',
       },
       subItems: [],
       description: '',
@@ -1491,7 +1459,7 @@ export const DraftQuotation = ({
                     )}
                     label="Beneficiary Address"
                     buttonText="Add Beneficiary Address"
-                    address={watchedBillingAddress}
+                    address={watchedBeneficiaryAddress}
                     cardOnClose={() => removeAddress('beneficiaryAddress')}
                     editButtonText="Edit Beneficiary Address"
                     modalHeader="Edit Beneficiary Address"
@@ -1657,14 +1625,18 @@ export const DraftQuotation = ({
             />
           </Grid>
 
-          {/* ARTICLES */}
+          {/* MIXED POSITIONS */}
           <Grid item xs={12} bgcolor="white" p={3}>
             <Box pb={2}>
               <SectionTitle
                 Icon={WrenchScrewdriverIllustration}
                 title="Positions"
               />
-              <PositionTable formMethods={formMethods} />
+              <PositionTable
+                formMethods={formMethods}
+                quotationAmountDetail={quotationAmountDetail}
+                onRecalcQuotation={recalcQuotation}
+              />
             </Box>
           </Grid>
 
@@ -1744,13 +1716,7 @@ export const DraftQuotation = ({
         isOpen={isDrawerOpen}
         isSaving={isUpdating || isCreating}
         primaryButtonLabel={t('Save')}
-        primaryButtonAction={handleSubmit(async (values) => {
-          const response = await save(values);
-          const quotationId =
-            formType === 'new' ? response.value : quotation?.id;
-          resetLocalStorage();
-          navigate(`/quotations/details/${quotationId}`);
-        })}
+        primaryButtonAction={handleSubmit(onSubmit)}
         listItems={[
           {
             label: t('Discard'),
@@ -1776,7 +1742,9 @@ export const DraftQuotation = ({
                 isLoadingHeaderUrl ||
                 isLoadingFooterUrl ||
                 isLoadingClientStorageDataTemplate ||
-                isLoadingClientStorageDataPdfConfig,
+                isLoadingClientStorageDataPdfConfig ||
+                hasEmptyItemName ||
+                hasMixItemWithoutSubItems,
               sx: {
                 color: theme.palette.primary.dark,
                 padding: '0.3em 1.5em',

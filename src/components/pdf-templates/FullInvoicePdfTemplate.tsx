@@ -8,17 +8,14 @@ import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {
+  EditableInvoiceItem,
   InvoiceAmountDetail,
-  InvoiceItemView,
   InvoiceView,
 } from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
-  calculateArticlesAmount,
-  getItemTotalAfterPerItemDiscount,
-} from 'utils/calculate-total';
-import {
+  buildInvoicePayment,
   getFormattedPaymentValues,
   replacePaymentTermsPlaceholders,
 } from 'utils/invoice';
@@ -29,7 +26,6 @@ import {
   stripHtmlTags,
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
-import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
@@ -146,6 +142,7 @@ type Props = {
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
+  invoiceItems: EditableInvoiceItem[];
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const FullInvoicePdfTemplate = ({
@@ -163,58 +160,24 @@ const FullInvoicePdfTemplate = ({
   nextCompanyExternalId,
   qrImageSrc,
   pdfConfigClientStorage,
+  invoiceItems,
   fontStyles,
   primaryColor,
   secondaryColor,
 }: Props) => {
-  const articleItems = invoice?.items.map((item) => ({
+  const discount = invoice?.additionalInfo?.discount;
+
+  const articleItems = invoice?.items.map((item, index) => ({
     ...item,
+    payment: buildInvoicePayment(invoiceAmountDetail, index, currentCurrency),
     discount: getDiscoutObj(item?.additionalInfo?.discount),
   }))!;
-
-  const netTotal = (articleItem: InvoiceItemView) => {
-    const total = getItemTotalAfterPerItemDiscount({
-      item: {
-        unitAmount: {
-          netAmount: articleItem?.unitAmount?.netAmount,
-        },
-        quantity: articleItem.quantity,
-        discount: articleItem?.additionalInfo?.discount,
-      },
-      precision: 0,
-    });
-    return centsToMoney(currentCurrency?.code!, total);
-  };
-
-  const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
-  const discountAmount = discount?.amount;
-  const discountValue = discountAmount?.value ?? 0;
 
   const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
 
   const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
     itemsAfterPerItemDiscount,
     discount,
-  );
-
-  const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} =
-    useMemo(
-      () =>
-        calculateArticlesAmount({
-          items: articleItems,
-          globalDiscount: discount,
-        }),
-      [articleItems, discount],
-    );
-
-  const amountAfterGlobalDiscountFormatted = formatCurrency(
-    amountAfterGlobalDiscount,
-    {
-      currency: currentCurrency?.code,
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    },
   );
 
   const grossInvoiceAmount = centsToMoney(
@@ -345,20 +308,14 @@ const FullInvoicePdfTemplate = ({
               />
             )}
 
-            {invoice?.items && (
+            {invoiceItems.length > 0 && (
               <ArticleSection
                 invoice={invoice}
+                invoiceItems={invoiceItems}
+                invoiceAmountDetail={invoiceAmountDetail}
                 currentCurrency={currentCurrency}
                 translate={translate}
-                allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
-                  articleItems,
-                )}
-                discountValue={discountValue}
-                subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
-                percentageVats={vats}
-                total={amountAfterGlobalDiscountWithVAT}
                 selectedLng={selectedLng}
-                netTotal={netTotal}
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}

@@ -1,12 +1,5 @@
-import {
-  useEffect,
-  Fragment,
-  useMemo,
-  useRef,
-  useState,
-  useCallback,
-} from 'react';
-import {Box, debounce} from '@mui/material';
+import {useEffect, Fragment, useMemo, useRef, useState} from 'react';
+import {Box} from '@mui/material';
 import {
   Path,
   useFieldArray,
@@ -27,7 +20,7 @@ import TableBody from 'components/Table/TableBody';
 import TableRow from 'components/Table/TableRow';
 import TableHeader from 'components/Table/TableHeader';
 import TableCell from 'components/Table/TableCell';
-import {TableColumnWithRender} from 'models/table';
+import {DragData, TableColumnWithRender} from 'models/table';
 import {useTranslation} from 'react-i18next';
 import {Button} from 'components/Button';
 import {centsToMoney, formatCurrency, useCurrentCurrency} from 'utils/currency';
@@ -43,9 +36,7 @@ import {
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import {extractClosestEdge} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import {useCalculateQuotationAmount} from 'hooks/reactQuery/useQuotation';
 import {DiscountType} from 'models/invoice';
-import {buildQuotationPayload} from 'utils/quotation';
 import SubPositionRow from './SubPositionRow';
 import MainPositionRow from './MainPositionRow';
 import MarginDetails from './MarginDetails';
@@ -65,16 +56,15 @@ export interface EditableRowType {
 
 interface Props {
   formMethods: UseFormReturn<QuotationFormData>;
+  onRecalcQuotation: () => void;
+  quotationAmountDetail?: QuotationAmountDetail;
 }
 
-type DragData = {
-  id: string;
-  index: number;
-  type: 'main' | 'sub';
-  parentIndex?: number;
-};
-
-const PositionTable = ({formMethods}: Props) => {
+const PositionTable = ({
+  formMethods,
+  onRecalcQuotation,
+  quotationAmountDetail,
+}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
 
@@ -89,10 +79,7 @@ const PositionTable = ({formMethods}: Props) => {
     name: 'items',
   });
 
-  const {mutateAsync: calculateQuotationAmount} = useCalculateQuotationAmount();
-
   const watchedItems = useWatch({control, name: 'items'});
-  const watchedDiscount = watch('discount');
 
   const currentCurrency = useCurrentCurrency();
 
@@ -104,9 +91,6 @@ const PositionTable = ({formMethods}: Props) => {
   const [hoveredSubRowIndex, setHoveredSubRowIndex] = useState<number | null>(
     null,
   );
-
-  const [quotationDetail, setQuotationDetail] =
-    useState<QuotationAmountDetail | null>(null);
 
   const [editableMixedRow, setEditableMixedRow] =
     useState<EditableRowType | null>(null);
@@ -294,6 +278,8 @@ const PositionTable = ({formMethods}: Props) => {
         unit: 'kg',
         unitSellingAmount: defaultProps,
         unitPurchaseAmount: defaultProps,
+        name: '',
+        externalId: '',
       },
       subItems: [],
       description: '',
@@ -364,73 +350,37 @@ const PositionTable = ({formMethods}: Props) => {
     });
   };
 
-  const recalcQuotation = useCallback(
-    debounce(async () => {
-      const invalidData = watchedItems?.some(
-        (item) => !item.name || item.name.trim() === '',
-      );
+  const {
+    amountBeforeGlobalDiscountFormatted,
+    amountBeforeGlobalDiscountInMoney,
+    amountAfterGlobalDiscountFormatted,
+    amountAfterGlobalDiscountWithVATFormatted,
+    vats,
+  } = useMemo(() => {
+    const before = quotationAmountDetail?.amountBeforeGlobalDiscount;
+    const after = quotationAmountDetail?.amountAfterGlobalDiscount;
+    const afterVats = quotationAmountDetail?.amountAfterGlobalDiscount.vats;
 
-      const mixItemWithoutSubItems = watchedItems.some(
-        (item) =>
-          item.article?.type === ArticleType.MIX &&
-          (!item.subItems || item.subItems.length === 0),
-      );
-
-      if (invalidData || mixItemWithoutSubItems) {
-        return;
-      }
-
-      try {
-        const payload = buildQuotationPayload(
-          watchedItems,
-          currentCurrency,
-          watchedDiscount,
-        );
-
-        const detail = await calculateQuotationAmount({
-          data: payload,
-        });
-
-        setQuotationDetail(detail);
-      } catch (error) {
-        console.error('Error while recalculating quotation:', error);
-      }
-    }, 300),
-    [calculateQuotationAmount, currentCurrency, watchedItems, watchedDiscount],
-  );
-
-  useEffect(() => {
-    recalcQuotation();
-  }, [watchedItems, watchedDiscount]);
-
-  const amountBeforeGlobalDiscount =
-    quotationDetail?.amountBeforeGlobalDiscount;
-
-  const amountAfterGlobalDiscount = quotationDetail?.amountAfterGlobalDiscount;
-
-  const amountBeforeGlobalDiscountFormatted = formatCurrency(
-    centsToMoney(
-      currentCurrency.code,
-      amountBeforeGlobalDiscount?.netAmount ?? 0,
-    ),
-    {currency: currentCurrency.code},
-  );
-
-  const amountAfterGlobalDiscountFormatted = formatCurrency(
-    centsToMoney(
-      currentCurrency.code,
-      amountAfterGlobalDiscount?.netAmount ?? 0,
-    ),
-    {currency: currentCurrency.code},
-  );
-
-  const amountAfterGlobalDiscountWithVATFormatted = formatCurrency(
-    centsToMoney(
-      currentCurrency.code,
-      amountAfterGlobalDiscount?.grossAmount ?? 0,
-    ),
-    {currency: currentCurrency.code},
-  );
+    return {
+      amountBeforeGlobalDiscountFormatted: formatCurrency(
+        centsToMoney(currentCurrency.code, before?.netAmount ?? 0),
+        {currency: currentCurrency.code},
+      ),
+      amountBeforeGlobalDiscountInMoney: centsToMoney(
+        currentCurrency.code,
+        before?.netAmount ?? 0,
+      ),
+      amountAfterGlobalDiscountFormatted: formatCurrency(
+        centsToMoney(currentCurrency.code, after?.netAmount ?? 0),
+        {currency: currentCurrency.code},
+      ),
+      amountAfterGlobalDiscountWithVATFormatted: formatCurrency(
+        centsToMoney(currentCurrency.code, after?.grossAmount ?? 0),
+        {currency: currentCurrency.code},
+      ),
+      vats: afterVats,
+    };
+  }, [quotationAmountDetail, currentCurrency]);
 
   useEffect(() => {
     const cleanup: Array<() => void> = [];
@@ -581,7 +531,7 @@ const PositionTable = ({formMethods}: Props) => {
           <TableHeader columns={COLUMNS} />
 
           <TableBody>
-            {fields.map((item, index) => (
+            {watchedItems?.map((item, index) => (
               <Fragment key={`${item.id}-${index}`}>
                 <TableRow
                   testId={`main-row-${index}`}
@@ -593,7 +543,9 @@ const PositionTable = ({formMethods}: Props) => {
                     item={item}
                     index={index}
                     formMethods={formMethods}
-                    onAddSubPosition={() => handleAddSubPosition(index)}
+                    onAddSubPosition={() => {
+                      handleAddSubPosition(index);
+                    }}
                     setExpandedRows={setExpandedRows}
                     expandedRows={expandedRows}
                     editableRow={editableMixedRow}
@@ -607,6 +559,8 @@ const PositionTable = ({formMethods}: Props) => {
                     }
                     hoveredMainRowIndex={hoveredMainRowIndex}
                     setHoveredMainRowIndex={setHoveredMainRowIndex}
+                    onRecalcQuotation={onRecalcQuotation}
+                    quotationAmountDetail={quotationAmountDetail}
                   />
                 </TableRow>
 
@@ -622,8 +576,6 @@ const PositionTable = ({formMethods}: Props) => {
                               parentIndex={index}
                               subIndex={subIndex}
                               subItem={subItem}
-                              control={control}
-                              setValue={setValue}
                               formMethods={formMethods}
                               editableSubRow={editableSubRow}
                               setEditableSubRow={setEditableSubRow}
@@ -635,12 +587,14 @@ const PositionTable = ({formMethods}: Props) => {
                               showLeftShadow={showLeftShadow}
                               hoveredSubRowIndex={hoveredSubRowIndex}
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
+                              onRecalcQuotation={onRecalcQuotation}
+                              quotationAmountDetail={quotationAmountDetail}
                             />
                           </TableRow>
                         ),
                       )}
 
-                      <SubPositionFooter
+                      <SubPositionFooter<QuotationFormData>
                         index={index}
                         control={control}
                         setValue={setValue}
@@ -681,10 +635,8 @@ const PositionTable = ({formMethods}: Props) => {
         amountBeforeGlobalDiscountFormatted={
           amountBeforeGlobalDiscountFormatted
         }
-        amountBeforeGlobalDiscount={centsToMoney(
-          currentCurrency.code,
-          amountBeforeGlobalDiscount?.netAmount ?? 0,
-        )}
+        amountBeforeGlobalDiscount={amountBeforeGlobalDiscountInMoney}
+        onRecalcQuotation={onRecalcQuotation}
       />
 
       <MarginDetails
@@ -693,6 +645,7 @@ const PositionTable = ({formMethods}: Props) => {
         amountAfterGlobalDiscountWithVATFormatted={
           amountAfterGlobalDiscountWithVATFormatted
         }
+        vats={vats}
       />
 
       <Dialog

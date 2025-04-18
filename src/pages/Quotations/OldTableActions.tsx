@@ -59,6 +59,7 @@ import {FileResourceRecord} from 'models/media';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import useQuotationAmountDetail from 'hooks/useQuotationAmountDetail';
 
 interface Props {
   quotation: QuotationView;
@@ -171,12 +172,20 @@ const OldTableActions = ({quotation}: Props) => {
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
   const uploadPath = `${serviceCompanyId}/quotations`;
 
-  const generateBlobUrl = async () => {
-    const transformedQuotationItems =
+  const transformedQuotationItems = useMemo(
+    () =>
       quotation?.items.map((item) =>
         quotationItemToQuotationItemRecord(item, subItemsMap),
-      ) || [];
+      ) || [],
+    [quotation?.items, subItemsMap],
+  );
 
+  const quotationAmountDetail = useQuotationAmountDetail({
+    quotationItems: transformedQuotationItems,
+    quotationDiscount: quotation.additionalInfo.discount,
+  });
+
+  const generateBlobUrl = async () => {
     setCreatingPdf(true);
     const blob = await pdf(
       <QuotationPdfTemplate
@@ -191,6 +200,7 @@ const OldTableActions = ({quotation}: Props) => {
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         quotationItems={transformedQuotationItems}
+        quotationAmountDetail={quotationAmountDetail}
         fontStyles={fontStyles}
         primaryColor={primaryColor}
         secondaryColor={secondaryColor}

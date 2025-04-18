@@ -44,6 +44,7 @@ import {companyLanguageContextMap} from 'utils/language';
 import {downloadFile as utilDownloadFile} from 'utils/download';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import useQuotationAmountDetail from 'hooks/useQuotationAmountDetail';
 
 interface Props {
   quotation: QuotationView;
@@ -144,12 +145,20 @@ const Actions = ({quotation}: Props) => {
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
   const uploadPath = `${serviceCompanyId}/quotations`;
 
-  const generateBlobUrl = async () => {
-    const transformedQuotationItems =
+  const transformedQuotationItems = useMemo(
+    () =>
       quotation?.items.map((item) =>
         quotationItemToQuotationItemRecord(item, subItemsMap),
-      ) || [];
+      ) || [],
+    [quotation?.items, subItemsMap],
+  );
 
+  const quotationAmountDetail = useQuotationAmountDetail({
+    quotationItems: transformedQuotationItems,
+    quotationDiscount: quotation.additionalInfo.discount,
+  });
+
+  const generateBlobUrl = async () => {
     const blob = await pdf(
       <QuotationPdfTemplate
         serviceCompany={company}
@@ -164,6 +173,7 @@ const Actions = ({quotation}: Props) => {
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
         quotationItems={transformedQuotationItems}
+        quotationAmountDetail={quotationAmountDetail}
         fontStyles={fontStyles}
         primaryColor={primaryColor}
         secondaryColor={secondaryColor}

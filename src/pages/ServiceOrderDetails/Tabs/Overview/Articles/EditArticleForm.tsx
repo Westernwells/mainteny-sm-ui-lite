@@ -97,12 +97,12 @@ export const EditArticleForm = ({
       name: serviceOrderArticle.name,
       description: serviceOrderArticle.description,
       externalId: serviceOrderArticle.article.externalId,
-      unit: serviceOrderArticle.article.unit,
+      unit: serviceOrderArticle.article.unit!,
       unitSellingAmount:
         (serviceOrderArticle.unitAmount.netAmount ?? 0) /
         10 ** serviceOrderArticle.unitAmount.fractionDigits!,
       quantity: serviceOrderArticle.quantity,
-      type: serviceOrderArticle.article.type,
+      type: serviceOrderArticle.article.type!,
       costPackage: serviceOrderArticle.article.costPackage || {
         laborPercentage: 50,
         materialPercentage: 50,

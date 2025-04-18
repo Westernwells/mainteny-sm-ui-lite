@@ -1,4 +1,7 @@
-import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
+import {
+  useInvoiceDetail,
+  useInvoiceSubItems,
+} from 'hooks/reactQuery/useInvoice';
 import {useLocation, useParams} from 'react-router-dom';
 import {Progress} from 'components/Progress';
 import {EmptySection} from 'components/EmptySection';
@@ -20,16 +23,23 @@ export const EditInvoicePage = () => {
       ? useGetCustomer(customerId)
       : {data: undefined, isLoading: false};
 
-  if (isLoading || isLoadingCustomer) {
+  const {
+    data: invoiceSubItems,
+    isLoading: isLoadingSubItems,
+    isFetched: isFetchedSubItems,
+  } = useInvoiceSubItems(invoiceId);
+
+  if (isLoading || isLoadingSubItems || isLoadingCustomer) {
     return <Progress />;
   }
 
-  return isFetched && invoice ? (
+  return isFetched && isFetchedSubItems && invoice ? (
     <InvoiceForm
       serviceCompanyType={ServiceCompanyType.PROPERTY_OWNER_PAYMENT_TERM}
       invoice={invoice}
       isNewInvoice={false}
       customerResource={customer}
+      invoiceSubItems={invoiceSubItems}
     />
   ) : (
     <EmptySection label="Sorry, we couldn't find the invoice." />

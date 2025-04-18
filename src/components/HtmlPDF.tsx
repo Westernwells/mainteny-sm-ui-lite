@@ -42,7 +42,7 @@ export const HtmlPDF = ({
           margin: '-0.3px 0px',
         },
         'ul, ol': {
-          lineHeight: '1.6px',
+          lineHeight: '1.6',
           padding: '10px 0px',
         },
         li: {

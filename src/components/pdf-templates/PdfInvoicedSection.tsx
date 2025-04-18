@@ -3,7 +3,6 @@ import {InvoiceType, InvoiceView} from 'models/invoice';
 import {Currency} from 'models/misc';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import {formatDate, toDate} from 'utils/datetime';
-import {fixRounding} from 'utils/utils';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
 
@@ -46,7 +45,7 @@ export const PdfInvoicedSection = ({
   primaryColor,
   secondaryColor,
 }: InvoicedSectionProps) => {
-  const amountFormatted = formatCurrency(fixRounding(amount, 2), {
+  const amountFormatted = formatCurrency(amount, {
     currency: currentCurrency?.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

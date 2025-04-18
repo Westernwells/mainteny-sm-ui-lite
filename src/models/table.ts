@@ -66,3 +66,10 @@ export type CustomizableColumn = {
 export enum CustomizableTable {
   UNIT = 'UNIT',
 }
+
+export type DragData = {
+  id: string;
+  index: number;
+  type: 'main' | 'sub';
+  parentIndex?: number;
+};

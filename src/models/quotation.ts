@@ -153,7 +153,7 @@ export interface QuotationItemRecord {
   quantity: number;
   description?: string;
   discount?: Discount;
-  subItemsConfig?: QuotationSubItemsConfig;
+  subItemsConfig?: SubItemsConfig;
   subItems?: EditableQuotationSubItemRecord[];
   userSeqNumber?: string;
 }
@@ -169,7 +169,7 @@ export type EditableQuotationSubItemRecord = QuotationSubItemRecord & {
   parentId?: string;
 };
 
-export interface QuotationSubItemsConfig {
+export interface SubItemsConfig {
   subItemsVisible?: boolean;
   priceVisible?: boolean;
 }
@@ -188,7 +188,7 @@ export interface QuotationSubItemRecord {
 export interface QuotationFormData {
   serviceCompanyId: string;
   elevatorId?: string | null;
-  externalId?: string | null;
+  externalId?: string;
   subject?: string;
   description?: string;
   moreInfo?: string;

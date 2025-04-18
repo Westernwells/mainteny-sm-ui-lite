@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import {ArticleType} from 'models/article';
 import {DiscountType, Discount} from 'models/invoice';
+import {Currency} from 'models/misc';
 import {
   ArticleInfoRecord,
   CreateQuotationRecord,
@@ -9,6 +10,7 @@ import {
   QuotationItemRecord,
   UpdateQuotation,
 } from 'models/quotation';
+import {VatView} from 'models/vat';
 import {Currencies} from 'utils/currency';
 import {dateToString} from 'utils/utils';
 
@@ -112,37 +114,180 @@ export const formatQuotationItems = (
 
 export const formatQuotationRecord = (
   value: QuotationFormData,
-): UpdateQuotation | CreateQuotationRecord => ({
+  currentCurrency: Currency,
+  taxRates?: VatView[],
+): CreateQuotationRecord | UpdateQuotation => ({
   ...value,
   subject: value?.subject || '',
   description: value?.description || '',
-  items: formatQuotationItems(value.items),
-  ...(value.discount && {
-    discount: {
-      ...value.discount,
-      amount:
-        value.discount?.type === 'AMOUNT'
-          ? {
-              ...value.discount?.amount,
-              currency: value.discount?.amount?.currency!,
-              value:
-                (value.discount?.amount?.value ?? 0) *
-                10 ** (value.discount?.amount?.fractionDigits ?? 2),
-            }
-          : undefined,
-    },
+  sentDate: value.sentDate ? dateToString(value.sentDate) : '',
+  expiryDate: value.expiryDate ? dateToString(value.expiryDate) : '',
+  items: value.items.map((item, index) => {
+    const {
+      article,
+      unitAmount,
+      discount,
+      subItems,
+      subItemsConfig,
+      unitPurchaseAmount,
+      ...rest
+    } = item;
+    const vatRate = taxRates?.find(
+      (r) =>
+        r.id === unitAmount?.vatId ||
+        r.percentage === unitAmount?.percentageVat,
+    );
+
+    const formattedUnitAmount = {
+      netAmount: unitAmount?.netAmount ?? 0,
+      percentageVat: unitAmount?.percentageVat ?? vatRate?.percentage ?? 0,
+      currency: unitAmount?.currency ?? currentCurrency.code,
+      vatId: unitAmount?.vatId || vatRate?.id || '',
+      vatName: unitAmount?.vatName || vatRate?.name || '',
+    };
+
+    const formattedDiscount = discount
+      ? {
+          ...discount,
+          type:
+            discount.type === DiscountType.NONE
+              ? DiscountType.PERCENTAGE
+              : discount.type,
+          amount:
+            discount.type === DiscountType.AMOUNT && discount.amount
+              ? {
+                  ...discount.amount,
+                  currency: discount.amount.currency,
+                  value:
+                    (discount.amount.value ?? 0) *
+                    10 ** (discount.amount.fractionDigits ?? 2),
+                }
+              : undefined,
+          percentage:
+            discount.type === DiscountType.PERCENTAGE ||
+            discount.type === DiscountType.NONE
+              ? discount.percentage ?? 0
+              : undefined,
+        }
+      : undefined;
+
+    const formattedArticle: ArticleInfoRecord = {
+      ...(article?.id && article.id.length > 8 ? {id: article.id} : {}),
+      name: article?.name,
+      externalId: article?.externalId,
+      type: article?.type,
+      unit: article?.unit,
+      costPackage: article?.costPackage,
+      unitSellingAmount: {
+        netAmount: article?.unitSellingAmount?.netAmount ?? 0,
+        percentageVat: article?.unitSellingAmount?.percentageVat ?? 0,
+        currency: article?.unitSellingAmount?.currency ?? currentCurrency.code,
+        vatId: article?.unitSellingAmount?.vatId || '',
+        vatName: article?.unitSellingAmount?.vatName || '',
+      },
+      ...(article?.unitPurchaseAmount && {
+        unitPurchaseAmount: {
+          netAmount: article.unitPurchaseAmount.netAmount ?? 0,
+          percentageVat: article.unitPurchaseAmount.percentageVat ?? 0,
+          vatId: article.unitPurchaseAmount.vatId || '',
+          vatName: article.unitPurchaseAmount.vatName || '',
+          currency: article.unitPurchaseAmount.currency ?? currentCurrency.code,
+        },
+      }),
+    };
+
+    const baseItem = {
+      ...rest,
+      id: undefined,
+      userSeqNumber: rest.userSeqNumber ?? `${index + 1}`,
+      article: formattedArticle,
+      unitAmount: formattedUnitAmount,
+      unitPurchaseAmount: {
+        ...unitPurchaseAmount,
+        vatId: formattedUnitAmount.vatId,
+        vatName: formattedUnitAmount.vatName,
+        percentageVat: formattedUnitAmount.percentageVat,
+        currency: formattedUnitAmount.currency,
+      },
+      discount: formattedDiscount,
+    };
+
+    if (article?.type === ArticleType.MIX && subItems?.length) {
+      return {
+        ...baseItem,
+        subItems: subItems.map((sub) => {
+          const formattedSubUnitAmount = {
+            netAmount: sub.unitAmount?.netAmount ?? 0,
+            percentageVat:
+              sub.unitAmount?.percentageVat ?? vatRate?.percentage ?? 0,
+            currency: sub.unitAmount?.currency,
+            vatId: sub.unitAmount?.vatId,
+            vatName: sub.unitAmount?.vatName,
+          };
+
+          const formattedSubPurchaseAmount = {
+            netAmount: sub.unitPurchaseAmount?.netAmount ?? 0,
+            percentageVat: sub.unitPurchaseAmount?.percentageVat ?? 0,
+            currency:
+              sub.unitPurchaseAmount?.currency ?? sub.unitAmount?.currency,
+            vatId: sub.unitPurchaseAmount?.vatId || sub.unitAmount?.vatId,
+            vatName: sub.unitPurchaseAmount?.vatName || sub.unitAmount?.vatName,
+          };
+
+          return {
+            ...(sub.id && sub.id.length > 8 ? {id: sub.id} : undefined),
+            name: sub.name,
+            quantity: sub.quantity,
+            unitAmount: formattedSubUnitAmount,
+            unitPurchaseAmount: formattedSubPurchaseAmount,
+            description: sub.description,
+            userSeqNumber: sub.userSeqNumber,
+            article: sub.article
+              ? {
+                  ...(sub.article.id && sub.article.id.length > 8
+                    ? {id: sub.article.id}
+                    : undefined),
+                  name: sub.article.name,
+                  externalId: sub.article.externalId,
+                  type: sub.article.type,
+                  unit: sub.article.unit,
+                  costPackage: sub.article.costPackage,
+                  unitSellingAmount: {
+                    netAmount: sub.article.unitSellingAmount?.netAmount ?? 0,
+                    percentageVat:
+                      sub.article.unitSellingAmount?.percentageVat ?? 0,
+                    currency:
+                      sub.article.unitSellingAmount?.currency ??
+                      currentCurrency.code,
+                    vatId: sub.article.unitSellingAmount?.vatId || '',
+                    vatName: sub.article.unitSellingAmount?.vatName || '',
+                  },
+                  unitPurchaseAmount: {
+                    netAmount: sub.article.unitPurchaseAmount?.netAmount ?? 0,
+                    percentageVat:
+                      sub.article.unitPurchaseAmount?.percentageVat ?? 0,
+                    currency:
+                      sub.article.unitPurchaseAmount?.currency ??
+                      currentCurrency.code,
+                    vatId: sub.article.unitPurchaseAmount?.vatId || '',
+                    vatName: sub.article.unitPurchaseAmount?.vatName || '',
+                  },
+                }
+              : undefined,
+          };
+        }),
+        subItemsConfig,
+      };
+    }
+    return baseItem;
   }),
   serviceCompanyId: value.serviceCompanyId,
-  paymentTerms: value.paymentTerms,
   moreInfo: value.moreInfo,
   billingAddress: value.billingAddress,
   beneficiaryAddress: value.beneficiaryAddress,
   alternativeAddress: value.alternativeAddress,
   externalId: value?.externalId || '',
   notes: value.notes,
-  sentDate: value.sentDate ? dateToString(value.sentDate) : '',
-  expiryDate: value.expiryDate ? dateToString(value.expiryDate) : '',
-  elevatorId: value.elevatorId ?? null,
 });
 
 export const applyQuotationDiscount = ({

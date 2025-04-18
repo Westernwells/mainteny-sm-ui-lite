@@ -1,32 +1,39 @@
-import {Button} from 'components/Button';
+import React from 'react';
+import {
+  Control,
+  FieldValues,
+  UseFormSetValue,
+  Controller,
+  Path,
+  PathValue,
+} from 'react-hook-form';
 import TableCell from 'components/Table/TableCell';
 import TableRow from 'components/Table/TableRow';
 import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined';
-import {Box, IconButton, Switch, Tooltip, Typography} from '@mui/material';
-import {t} from 'i18next';
-import {Control, Controller, UseFormSetValue} from 'react-hook-form';
-import {useTheme} from '@mui/material/styles';
 import SubdirectoryArrowRightOutlinedIcon from '@mui/icons-material/SubdirectoryArrowRightOutlined';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
-import {QuotationFormData} from 'models/quotation';
+import {Box, IconButton, Switch, Tooltip, Typography} from '@mui/material';
+import {useTheme} from '@mui/material/styles';
+import {t} from 'i18next';
+import {Button} from 'components/Button';
 
-type Props = {
+export interface SubPositionFooterProps<TForm extends FieldValues> {
   index: number;
-  control: Control<QuotationFormData, any>;
-  setValue: UseFormSetValue<QuotationFormData>;
-  onAddSubPosition: () => void;
+  control: Control<TForm, any>;
+  setValue: UseFormSetValue<TForm>;
+  onAddSubPosition: (parentIndex: number) => void;
   isSubPositionVisible?: boolean;
   isPriceVisible?: boolean;
-};
+}
 
-const SubPositionFooter = ({
+const SubPositionFooter = <TForm extends FieldValues>({
   index,
   control,
   setValue,
   onAddSubPosition,
   isSubPositionVisible = true,
   isPriceVisible = true,
-}: Props) => {
+}: SubPositionFooterProps<TForm>) => {
   const theme = useTheme();
   return (
     <TableRow
@@ -45,25 +52,17 @@ const SubPositionFooter = ({
           buttonProps={{
             variant: 'text',
             size: 'small',
-            onClick: onAddSubPosition,
-            sx: {
-              fontWeight: 600,
-              p: 1,
-              color: theme.palette.primary.light,
-            },
+            onClick: () => onAddSubPosition(index),
+            sx: {fontWeight: 600, p: 1, color: theme.palette.primary.light},
             startIcon: <PlaylistAddOutlinedIcon />,
           }}
         />
       </TableCell>
       <TableCell sx={{border: 'none'}} colSpan={7} noPadding />
-
       <TableCell
         colSpan={3}
         noPadding
-        sx={{
-          border: 'none',
-          '& > div': {justifyContent: 'flex-end'},
-        }}
+        sx={{border: 'none', '& > div': {justifyContent: 'flex-end'}}}
         isLast
         lastSticky>
         <Box
@@ -77,27 +76,22 @@ const SubPositionFooter = ({
             <Typography
               variant="body2"
               sx={{
-                fontWeight: '600',
-                display: {
-                  xs: 'none',
-                  sm: 'none',
-                  xl: 'inline',
-                },
+                fontWeight: 600,
+                display: {xs: 'none', sm: 'none', xl: 'inline'},
               }}>
               {t('Sub-positions')}
             </Typography>
             <Tooltip title={t('Sub-positions')} placement="top">
               <IconButton sx={{display: {xs: 'inline-flex', lg: 'none'}}}>
                 <SubdirectoryArrowRightOutlinedIcon
-                  sx={{
-                    color: isSubPositionVisible ? '#000034' : 'inherit',
-                  }}
+                  sx={{color: isSubPositionVisible ? '#000034' : 'inherit'}}
                 />
               </IconButton>
             </Tooltip>
-
             <Controller
-              name={`items.${index}.subItemsConfig.subItemsVisible`}
+              name={
+                `items.${index}.subItemsConfig.subItemsVisible` as Path<TForm>
+              }
               control={control}
               render={({field}) => (
                 <Switch
@@ -108,8 +102,8 @@ const SubPositionFooter = ({
                     field.onChange(newVal);
                     if (!newVal) {
                       setValue(
-                        `items.${index}.subItemsConfig.priceVisible`,
-                        false,
+                        `items.${index}.subItemsConfig.priceVisible` as Path<TForm>,
+                        false as PathValue<TForm, Path<TForm>>,
                       );
                     }
                   }}
@@ -117,32 +111,24 @@ const SubPositionFooter = ({
               )}
             />
           </Box>
-
           <Box sx={{display: 'flex', alignItems: 'center'}}>
             <Typography
               variant="body2"
               sx={{
-                fontWeight: '600',
-                display: {
-                  xs: 'none',
-                  sm: 'none',
-                  xl: 'inline',
-                },
+                fontWeight: 600,
+                display: {xs: 'none', sm: 'none', xl: 'inline'},
               }}>
               {t('Prices')}
             </Typography>
             <Tooltip title={t('Prices')} placement="top">
               <IconButton sx={{display: {xs: 'inline-flex', lg: 'none'}}}>
                 <MonetizationOnOutlinedIcon
-                  sx={{
-                    color: isPriceVisible ? '#000034' : 'inherit',
-                  }}
+                  sx={{color: isPriceVisible ? '#000034' : 'inherit'}}
                 />
               </IconButton>
             </Tooltip>
-
             <Controller
-              name={`items.${index}.subItemsConfig.priceVisible`}
+              name={`items.${index}.subItemsConfig.priceVisible` as Path<TForm>}
               control={control}
               render={({field}) => (
                 <Switch

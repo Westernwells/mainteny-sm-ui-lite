@@ -2,16 +2,22 @@ import useTheme from '@mui/material/styles/useTheme';
 import {t} from 'i18next';
 import {
   AggregatedAmount,
+  Discount,
+  DiscountType,
+  EditableInvoiceItem,
   InvoiceActivityType,
   InvoiceActivityView,
   InvoiceAmountDetail,
   InvoiceFormData,
+  InvoiceItemPaymentRecord,
   InvoiceItemRecord,
   InvoiceItemView,
   InvoicePaymentTermRecord,
   InvoiceStatus,
   InvoiceStatusView,
+  InvoiceSubItemRecord,
   InvoiceTableRow,
+  InvoiceType,
   InvoiceTypeMap,
   InvoiceView,
   MyInvoiceActivityView,
@@ -22,15 +28,21 @@ import {
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
 import {PaymentTermArticleType, PaymentTermData} from 'models/contract';
-import {Currency, PdfGenerationStatus, State} from 'models/misc';
+import {Currency, Money, PdfGenerationStatus, State} from 'models/misc';
 import {ArticleType, ArticleView} from 'models/article';
-import {ServiceOrderTypeRecord, ServiceOrderView} from 'models/service-order';
+import {
+  ServiceOrderArticleView,
+  ServiceOrderTypeRecord,
+  ServiceOrderView,
+} from 'models/service-order';
 import {
   InvoiceFormat,
   PropertyOwnerSimpleView,
   PropertyOwnerView,
 } from 'models/propertyManager';
 import {ServiceCompanyItem} from 'models/service-company';
+import {VatView} from 'models/vat';
+import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
   centsToMoney,
   convertNumberToAmountNumber,
@@ -598,7 +610,6 @@ export const transformFormikItems = (
     name: item.name,
     description: item.description || '',
     quantity: item.quantity,
-    quotationId: '',
     unitAmount: {
       currency: item.unitAmount!.currency,
       netAmount: item.unitAmount?.netAmount,
@@ -614,7 +625,16 @@ export const transformFormikItems = (
     },
     additionalInfo: {
       discount: item.discount,
-      payment: (item as InvoiceItemRecord).payment,
+      payment: item.payment
+        ? {
+            ...item.payment,
+            amount: item.payment.amount ?? {
+              currency: item.unitAmount.currency,
+              vats: [],
+              netAmount: 0,
+            },
+          }
+        : undefined,
     },
     article: item.article as ArticleView,
   }));
@@ -785,3 +805,301 @@ export const isXMLNeeded = (invoice: InvoiceView) => {
     invoiceFormat === InvoiceFormat.XML
   );
 };
+
+export const buildInvoicePayload = (
+  items: EditableInvoiceItem[],
+  currentCurrency: Currency,
+  discount?: Discount,
+  payment?: Payment<Money>,
+) => ({
+  currency: currentCurrency.code,
+  items: items.map((item) => ({
+    id: undefined,
+    article: {
+      id: undefined,
+      name: item.article?.name,
+      externalId: item.article?.externalId,
+      type: item.article?.type,
+      unit: item.article?.unit,
+      unitSellingAmount: item.article?.unitSellingAmount,
+      unitPurchaseAmount: item.article?.unitPurchaseAmount,
+      costPackage: item.article?.costPackage,
+    },
+    name: item.name,
+    description: item.description,
+    unitAmount: {
+      currency: item.unitAmount?.currency || currentCurrency.code,
+      netAmount: Number(item.unitAmount?.netAmount) || 0,
+      percentageVat: item.unitAmount?.percentageVat || 0,
+      vatId: item.unitAmount?.vatId || '',
+      vatName: item.unitAmount?.vatName || '',
+    },
+    quantity: Number(item.quantity) || 0,
+    discount:
+      item.discount?.type === DiscountType.AMOUNT
+        ? {
+            type: DiscountType.AMOUNT,
+            amount: {
+              ...item.discount?.amount,
+              value: (item.discount?.amount?.value ?? 0) * 100,
+              currency: item.discount?.amount?.currency || currentCurrency.code,
+            },
+          }
+        : {
+            type: DiscountType.PERCENTAGE,
+            percentage: item.discount?.percentage || 0,
+          },
+    subItemsConfig: item.subItemsConfig,
+    subItems: item?.subItems?.map((sub) => ({
+      article: {
+        id: undefined,
+        name: sub.article?.name,
+        externalId: sub.article?.externalId,
+        type: sub.article?.type,
+        unit: sub.article?.unit,
+        unitSellingAmount: sub.article?.unitSellingAmount,
+        unitPurchaseAmount: sub.article?.unitPurchaseAmount,
+        costPackage: sub.article?.costPackage,
+      },
+      id: undefined,
+      name: sub.name,
+      unitPurchaseAmount: sub.unitPurchaseAmount,
+      unitAmount: sub.unitAmount,
+      quantity: sub.quantity,
+      description: sub.description,
+      userSeqNumber: sub.userSeqNumber,
+    })),
+    userSeqNumber: item.userSeqNumber,
+  })),
+  globalDiscount:
+    discount?.type === DiscountType.AMOUNT
+      ? {
+          type: DiscountType.AMOUNT,
+          amount: {
+            value: moneyToCents(
+              currentCurrency?.code,
+              discount.amount?.value ?? 0,
+            ),
+            currency: discount.amount?.currency || currentCurrency.code,
+            fractionDigits:
+              discount.amount?.fractionDigits || currentCurrency.fractionDigits,
+          },
+        }
+      : {
+          type: DiscountType.PERCENTAGE,
+          percentage: discount?.percentage || 0,
+        },
+  paymentRecord:
+    payment?.type === PaymentType.LUMP_SUM
+      ? {
+          ...payment,
+          amount: payment?.amount
+            ? {
+                ...payment.amount,
+                value: moneyToCents(currentCurrency.code, payment.amount.value),
+                currency: payment.amount.currency || currentCurrency.code,
+              }
+            : {
+                value: 0,
+                currency: currentCurrency.code,
+                fractionDigits: currentCurrency.fractionDigits,
+              },
+        }
+      : payment,
+});
+
+export const invoiceItemToInvoiceItemRecord = (
+  invoiceItem: InvoiceItemView,
+  invoiceType: InvoiceType,
+  currentCurrency: Currency,
+  taxRates?: VatView[],
+  subItemsMap: Record<string, InvoiceSubItemRecord[]> = {},
+): InvoiceItemRecord => {
+  const taxRate =
+    taxRates?.find((rate) => rate.id === invoiceItem.unitAmount.vatId) ||
+    taxRates?.find(
+      (rate) => rate.percentage === invoiceItem.unitAmount.percentageVat,
+    );
+
+  const record: EditableInvoiceItem = {
+    id: invoiceItem.id,
+    article: invoiceItem.article,
+    name: invoiceItem.name,
+    description: invoiceItem.description,
+    quantity: invoiceItem.quantity,
+    unitAmount:
+      invoiceType === InvoiceType.CREDIT_NOTE
+        ? {
+            ...invoiceItem.unitAmount,
+            netAmount: -Math.abs(invoiceItem.unitAmount.netAmount ?? 0),
+          }
+        : {
+            netAmount: invoiceItem.unitAmount.netAmount || 0,
+            percentageVat:
+              invoiceItem.unitAmount.percentageVat || taxRate?.percentage || 0,
+            currency: invoiceItem.unitAmount.currency || currentCurrency.code,
+            vatId: invoiceItem.unitAmount.vatId || taxRate?.id || '',
+            vatName: invoiceItem.unitAmount.vatName || taxRate?.name || '',
+          },
+    unitPurchaseAmount: invoiceItem.unitPurchaseAmount,
+    discount: invoiceItem.additionalInfo?.discount
+      ? {
+          ...invoiceItem.additionalInfo.discount,
+          type:
+            !invoiceItem.additionalInfo.discount.type ||
+            invoiceItem.additionalInfo.discount.type === DiscountType.NONE
+              ? DiscountType.PERCENTAGE
+              : invoiceItem.additionalInfo.discount.type,
+          amount: invoiceItem.additionalInfo.discount.amount
+            ? {
+                ...invoiceItem.additionalInfo.discount.amount,
+                value:
+                  (invoiceItem.additionalInfo.discount.amount.value ?? 0) /
+                  10 **
+                    (invoiceItem.additionalInfo.discount.amount
+                      .fractionDigits ?? 2),
+              }
+            : undefined,
+        }
+      : undefined,
+    userSeqNumber: invoiceItem?.additionalInfo?.userSeqNumber,
+    payment: invoiceItem.additionalInfo?.payment,
+  };
+
+  // If the article's type is PACKAGE, add a default costPackage if it doesn't exist.
+  if (invoiceItem.article?.type === ArticleType.PACKAGE) {
+    if (!invoiceItem.article.costPackage) {
+      record.article = {
+        ...record.article,
+        costPackage: {
+          laborPercentage: 50,
+          materialPercentage: 50,
+        },
+      };
+    }
+  }
+
+  if (invoiceItem.article?.type === ArticleType.MIX) {
+    const subItems = subItemsMap[invoiceItem.id] || [];
+
+    return {
+      ...record,
+      subItems: subItems.map((subItem) => ({
+        parentId: invoiceItem.id,
+        id: subItem?.id || '',
+        article: subItem.article,
+        name: subItem.name,
+        description: subItem.description,
+        quantity: subItem.quantity,
+        unitAmount: subItem.unitAmount,
+        unitPurchaseAmount: subItem.unitPurchaseAmount,
+        userSeqNumber: subItem.userSeqNumber,
+      })),
+      subItemsConfig: {
+        subItemsVisible:
+          invoiceItem.additionalInfo?.subItemsConfig?.subItemsVisible || false,
+        priceVisible:
+          invoiceItem.additionalInfo?.subItemsConfig?.priceVisible || false,
+      },
+    };
+  }
+
+  return record;
+};
+
+export const articleViewToItem = (
+  articleView: ServiceOrderArticleView,
+  currentCurrency: Currency,
+  taxRates?: VatView[],
+  subItemsMap: Record<string, InvoiceSubItemRecord[]> = {},
+): InvoiceItemRecord => {
+  const taxRate =
+    taxRates?.find((rate) => rate.id === articleView.unitAmount.vatId) ||
+    taxRates?.find(
+      (rate) => rate.percentage === articleView.unitAmount.percentageVat,
+    );
+
+  const record: InvoiceItemRecord = {
+    id: articleView.id,
+    article: articleView.article,
+    name: articleView.name,
+    description: articleView.description,
+    quantity: articleView.quantity,
+    unitAmount: {
+      netAmount: articleView.unitAmount.netAmount || 0,
+      percentageVat:
+        articleView.unitAmount.percentageVat || taxRate?.percentage || 0,
+      currency: articleView.unitAmount.currency || currentCurrency.code,
+      vatId: articleView.unitAmount.vatId || taxRate?.id || '',
+      vatName: articleView.unitAmount.vatName || taxRate?.name || '',
+    },
+    unitPurchaseAmount: articleView.unitPurchaseAmount,
+    discount: getDiscoutObj(articleView.additionalInfo?.discount),
+    userSeqNumber: articleView?.additionalInfo?.userSeqNumber,
+  };
+
+  // If the article's type is PACKAGE, add a default costPackage if it doesn't exist.
+  if (articleView.article?.type === ArticleType.PACKAGE) {
+    if (!articleView.article.costPackage) {
+      record.article = {
+        ...record.article,
+        costPackage: {
+          laborPercentage: 50,
+          materialPercentage: 50,
+        },
+      };
+    }
+  }
+
+  if (articleView.article?.type === ArticleType.MIX) {
+    const subItems = subItemsMap[articleView.id] || [];
+
+    return {
+      ...record,
+      subItems: subItems.map((subItem) => ({
+        parentId: articleView.id,
+        id: subItem?.id || '',
+        article: subItem.article,
+        name: subItem.name,
+        description: subItem.description,
+        quantity: subItem.quantity,
+        unitAmount: subItem.unitAmount,
+        unitPurchaseAmount: subItem.unitPurchaseAmount,
+        userSeqNumber: subItem.userSeqNumber,
+      })),
+      subItemsConfig: {
+        subItemsVisible:
+          articleView.additionalInfo?.subArticlesConfig?.subItemsVisible ||
+          false,
+        priceVisible:
+          articleView.additionalInfo?.subArticlesConfig?.priceVisible || false,
+      },
+    };
+  }
+
+  return record;
+};
+
+export function buildInvoicePayment(
+  invoiceDetail: InvoiceAmountDetail | undefined,
+  index: number,
+  currentCurrency?: Currency,
+): InvoiceItemPaymentRecord | undefined {
+  const paymentData: InvoiceItemPaymentRecord | undefined =
+    invoiceDetail?.items[index]?.payment;
+
+  if (!paymentData) {
+    return undefined;
+  }
+
+  return {
+    ...paymentData,
+    type: paymentData.type!,
+    amount: {
+      ...paymentData.amount,
+      netAmount: paymentData.amount?.netAmount,
+      currency: paymentData.amount?.currency || currentCurrency?.code!,
+      vats: paymentData.amount?.vats || [],
+    },
+  };
+}

@@ -1,5 +1,4 @@
 import React, {useCallback} from 'react';
-import {FormikProps} from 'formik';
 import Grid from '@mui/material/Grid';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
 import {FormInput} from 'components/form/FormInput';
@@ -9,42 +8,33 @@ import {SelectChangeEvent} from '@mui/material';
 import {FieldPath, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 
 export const EditCustomerForm = ({
-  formik,
   setValue,
   getValues,
   address,
 }: {
-  formik?: FormikProps<QuotationFormData>;
   setValue?: UseFormSetValue<QuotationFormData>;
   getValues?: UseFormGetValues<QuotationFormData>;
   address: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
 }) => {
-  const value = formik ? formik.values[address] : getValues?.()[address];
-  const handleChange = formik
-    ? formik.handleChange
-    : (
-        e: React.ChangeEvent<
-          HTMLInputElement | HTMLTextAreaElement | {name?: string; value: any}
-        >,
-      ) => {
-        if (e.target.name)
-          setValue?.(
-            e.target.name as FieldPath<QuotationFormData>,
-            e.target.value,
-          );
-      };
+  const value = getValues?.()[address];
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | {name?: string; value: any}
+    >,
+  ) => {
+    if (e.target.name)
+      setValue?.(e.target.name as FieldPath<QuotationFormData>, e.target.value);
+  };
 
-  const handleSelectChange = formik
-    ? formik.handleChange
-    : (e: SelectChangeEvent<string | string[]>) => {
-        if (e.target.name)
-          setValue?.(
-            e.target.name as FieldPath<QuotationFormData>,
-            e.target.value as string,
-          );
-      };
+  const handleSelectChange = (e: SelectChangeEvent<string | string[]>) => {
+    if (e.target.name)
+      setValue?.(
+        e.target.name as FieldPath<QuotationFormData>,
+        e.target.value as string,
+      );
+  };
 
-  const handleBlur = formik ? formik.handleBlur : () => {};
+  const handleBlur = () => {};
 
   const statesByCountry = useCallback(
     (country?: string) => getStatesByCountry(country ?? ''),
