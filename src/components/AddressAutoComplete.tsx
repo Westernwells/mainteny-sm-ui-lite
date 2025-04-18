@@ -119,6 +119,7 @@ export const AddressAutoComplete = ({
 
   const onLocationSave = (savedAddress: GeocodeAddress) => {
     setAddress(savedAddress);
+    setQueryView(savedAddress.formatted_address);
     setIsMapOpen(false);
   };
 
