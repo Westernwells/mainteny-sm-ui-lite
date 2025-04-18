@@ -491,6 +491,11 @@ export const getJobTypeGivenName = (
   return matchingJobType?.givenName || '-';
 };
 
+export const isCustomJobType = (jobType: string) => {
+  const orderTypeString = serviceOrderTypeToString(jobType);
+  return orderTypeString === '-';
+};
+
 type FilterServiceOrderTypeProps = {
   statistic?: Record<string, number>;
   allServiceOrderTypes: ServiceOrderTypeRecord[];
