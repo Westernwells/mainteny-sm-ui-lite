@@ -30,7 +30,6 @@ import {
   calculateContractInvoicePriceTotal,
   ContractComponentElevator,
   ContractServiceForm,
-  SERVICE_DELIVERY_TYPES,
 } from 'models/contract';
 import {Switch} from 'components/Switch';
 import {FormikProps, getIn} from 'formik';
@@ -65,6 +64,7 @@ import {
   getMonthNumberFromDate,
 } from 'utils/datetime';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ServiceDeliveryPeriodInput from 'components/ServiceDeliveryPeriodInput';
 import {isUnitSelected} from '../../../utils/contract';
 
 const articleTypes = [
@@ -625,13 +625,26 @@ const ServicesForm = ({
       </Box>
 
       {!formikContractServiceComponent.values.isAutomaticJobCycle && (
-        <Typography
-          variant="body1"
-          sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
-          {t(
-            'With this setting there will be no jobs created from this service',
-          )}
-        </Typography>
+        <Box>
+          <Typography
+            variant="body1"
+            sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
+            {t(
+              'With this setting there will be no jobs created from this service',
+            )}
+          </Typography>
+          <Grid container mb={2}>
+            <Grid item xs={3}>
+              <ServiceDeliveryPeriodInput
+                value={
+                  formikContractServiceComponent.values.serviceDeliveryType
+                }
+                onChange={formikContractServiceComponent.handleChange}
+                onBlur={formikContractServiceComponent.handleBlur}
+              />
+            </Grid>
+          </Grid>
+        </Box>
       )}
 
       {formikContractServiceComponent.values.isAutomaticJobCycle && (
@@ -713,44 +726,11 @@ const ServicesForm = ({
             </FormControl>
           </Grid>
           <Grid item xs={3}>
-            <FormControl fullWidth required>
-              <InputLabel size="small" shrink variant="outlined">
-                {t('Service delivery period')}
-                <Tooltip
-                  title={t(
-                    'Configure the service delivery period for the automatically generated invoices from this service',
-                  )}
-                  placement="top">
-                  <IconButton sx={{marginLeft: '3px', padding: 0}}>
-                    <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0}} />
-                  </IconButton>
-                </Tooltip>
-              </InputLabel>
-              <Select
-                label={`${t('Service delivery period')}*`}
-                size="small"
-                value={
-                  formikContractServiceComponent.values.serviceDeliveryType
-                }
-                sx={{
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    '& legend': {
-                      paddingRight: '13px',
-                    },
-                  },
-                }}
-                required
-                notched
-                name="serviceDeliveryType"
-                onBlur={formikContractServiceComponent.handleBlur}
-                onChange={formikContractServiceComponent.handleChange}>
-                {SERVICE_DELIVERY_TYPES.map((deliveryType) => (
-                  <MenuItem value={deliveryType.value} key={deliveryType.value}>
-                    {t(deliveryType.label)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <ServiceDeliveryPeriodInput
+              value={formikContractServiceComponent.values.serviceDeliveryType}
+              onChange={formikContractServiceComponent.handleChange}
+              onBlur={formikContractServiceComponent.handleBlur}
+            />
           </Grid>
         </Grid>
       )}
