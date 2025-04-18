@@ -26,6 +26,7 @@ import {useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
 import {
+  useQuotationAmountDetailQuery,
   useQuotationDetails,
   useQuotationSubItems,
 } from 'hooks/reactQuery/useQuotation';
@@ -45,7 +46,6 @@ import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate'
 import {QuotationSubItemRecord} from 'models/quotation';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
-import useQuotationAmountDetail from 'hooks/useQuotationAmountDetail';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -94,15 +94,20 @@ export const ServiceOrderDetails = () => {
   const {data: quotationSubItems, isLoading: isQuotationSubItemsLoading} =
     useQuotationSubItems(serviceOrder?.additionalInfo?.quotationId);
 
-  const subItemsMap: Record<string, QuotationSubItemRecord[]> = Object.entries(
-    quotationSubItems ?? {},
-  ).reduce((acc, [parentId, subItems]) => {
-    acc[parentId] = subItems.map((subItem) => ({
-      ...subItem,
-      parentId,
-    }));
-    return acc;
-  }, {} as Record<string, QuotationSubItemRecord[]>);
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(quotationSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, QuotationSubItemRecord[]>,
+      ),
+    [quotationSubItems],
+  );
 
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -123,6 +128,7 @@ export const ServiceOrderDetails = () => {
   const {data: quotation} = useQuotationDetails(
     serviceOrder?.additionalInfo.quotationId,
   );
+
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
   const filePaths = useMemo(
@@ -191,10 +197,9 @@ export const ServiceOrderDetails = () => {
       quotationItemToQuotationItemRecord(item, subItemsMap),
     ) || [];
 
-  const quotationAmountDetail = useQuotationAmountDetail({
-    quotationItems: transformedQuotationItems,
-    quotationDiscount: quotation?.additionalInfo.discount,
-  });
+  const {data: quotationAmountDetail} = useQuotationAmountDetailQuery(
+    quotation?.id,
+  );
 
   const generatePreviewPdfBlobUrl = async () => {
     const blob =

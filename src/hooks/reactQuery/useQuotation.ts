@@ -592,7 +592,31 @@ export const postQuotationAmount = async (
   return data;
 };
 
-export const useCalculateQuotationAmount = () =>
+export const useRecalculateQuotationAmount = () =>
   useMutation(({data}: {data: CalculateQuotationAmountRecord}) =>
     postQuotationAmount(data),
   );
+
+export const fetchQuotationAmountDetail = async (quotationId: string) => {
+  const response = await axiosClient.get(
+    `/api/quotations/${quotationId}/amount/`,
+  );
+  return response.data;
+};
+
+export function useQuotationAmountDetailQuery(
+  quotationId?: string,
+  options: UseQueryOptions<any, any, any> = {},
+) {
+  const {enabled: userEnabled, ...restOptions} = options;
+  const enabled = (userEnabled ?? true) && Boolean(quotationId);
+
+  return useQuery<QuotationAmountDetail, RestError, QuotationAmountDetail>(
+    [qk.quotationAmountById, quotationId],
+    () => fetchQuotationAmountDetail(quotationId!),
+    {
+      enabled,
+      ...restOptions,
+    },
+  );
+}

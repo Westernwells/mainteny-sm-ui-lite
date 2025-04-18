@@ -20,6 +20,7 @@ import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps
 import {
   useDeleteQuotation,
   usePrintQuotation,
+  useQuotationAmountDetailQuery,
   useReplyQuotation,
   useSendQuotation,
 } from 'hooks/reactQuery/useQuotation';
@@ -69,7 +70,6 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
-import useQuotationAmountDetail from 'hooks/useQuotationAmountDetail';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -140,15 +140,20 @@ export const ViewQuotation = ({
 
   const {mutate: deleteQuotation} = useDeleteQuotation();
 
-  const subItemsMap: Record<string, QuotationSubItemRecord[]> = Object.entries(
-    quotationSubItems ?? {},
-  ).reduce((acc, [parentId, subItems]) => {
-    acc[parentId] = subItems.map((subItem) => ({
-      ...subItem,
-      parentId,
-    }));
-    return acc;
-  }, {} as Record<string, QuotationSubItemRecord[]>);
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(quotationSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, QuotationSubItemRecord[]>,
+      ),
+    [quotationSubItems],
+  );
 
   const {data: elevator} =
     typeof elevatorId === 'string'
@@ -283,10 +288,9 @@ export const ViewQuotation = ({
     [quotation?.items, subItemsMap],
   );
 
-  const quotationAmountDetail = useQuotationAmountDetail({
-    quotationItems: transformedQuotationItems,
-    quotationDiscount: quotation.additionalInfo.discount,
-  });
+  const {data: quotationAmountDetail} = useQuotationAmountDetailQuery(
+    quotation.id,
+  );
 
   const generateBlobUrl = async () => {
     const blob = await pdf(

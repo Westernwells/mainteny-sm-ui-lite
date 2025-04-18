@@ -27,20 +27,24 @@ export const fetchClientStorageData = async (
 export const useQueryClientStorageData = ({
   serviceCompanyId,
   params,
-  options,
+  options = {},
 }: {
   serviceCompanyId: string;
   params?: {key: string};
   options?: UseQueryOptions<any, any, any>;
-}) =>
-  useQuery<ClientDataRecord, RestError>(
+}) => {
+  const {enabled: userEnabled, ...restOptions} = options;
+  const enabled = (userEnabled ?? true) && Boolean(serviceCompanyId);
+
+  return useQuery<ClientDataRecord, RestError>(
     [queryKeys.fetchClientStorageData, serviceCompanyId, params?.key],
     () => fetchClientStorageData(serviceCompanyId, params),
     {
-      ...options,
-      enabled: !!serviceCompanyId,
+      enabled,
+      ...restOptions,
     },
   );
+};
 
 const updateServiceCompanyClientStorage = async (
   body: ClientDataRecord,

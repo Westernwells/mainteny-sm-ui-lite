@@ -35,7 +35,7 @@ import {UserCompanyContext} from 'context/UserCompanyProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {
-  useCalculateInvoiceAmount,
+  useRecalculateInvoiceAmount,
   useCreateInvoice,
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
@@ -305,7 +305,7 @@ export const InvoiceForm = ({
   const {
     mutateAsync: calculateInvoiceAmount,
     isLoading: isCalculatingInvoiceAmount,
-  } = useCalculateInvoiceAmount();
+  } = useRecalculateInvoiceAmount();
 
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
 
@@ -390,15 +390,20 @@ export const InvoiceForm = ({
     serviceCompanyId,
   );
 
-  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = Object.entries(
-    invoiceSubItems ?? {},
-  ).reduce((acc, [parentId, subItems]) => {
-    acc[parentId] = subItems.map((subItem) => ({
-      ...subItem,
-      parentId,
-    }));
-    return acc;
-  }, {} as Record<string, InvoiceSubItemRecord[]>);
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(invoiceSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, InvoiceSubItemRecord[]>,
+      ),
+    [invoiceSubItems],
+  );
 
   const [pageState, setPageState] = useState(
     invoiceId && isNewInvoice

@@ -49,7 +49,7 @@ import {
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
   useFetchXInvoiceByInvoiceId,
-  useInvoiceAmountDetail,
+  useInvoiceAmountDetailQuery,
   useInvoiceDetail,
   useInvoicePaymentStatus,
   usePrintInvoice,
@@ -228,15 +228,20 @@ export const ViewInvoice = ({
     invoice.id,
   );
 
-  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = Object.entries(
-    invoiceSubItems ?? {},
-  ).reduce((acc, [parentId, subItems]) => {
-    acc[parentId] = subItems.map((subItem) => ({
-      ...subItem,
-      parentId,
-    }));
-    return acc;
-  }, {} as Record<string, InvoiceSubItemRecord[]>);
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(invoiceSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, InvoiceSubItemRecord[]>,
+      ),
+    [invoiceSubItems],
+  );
 
   const [activeSignature, setActiveSignature] = useState<
     EmailSignature | undefined
@@ -337,7 +342,7 @@ export const ViewInvoice = ({
     invoice.serviceOrder?.id,
   );
   const {data: invoiceAmountDetail, isLoading: isLoadingInvoiceAmountDetail} =
-    useInvoiceAmountDetail(invoice?.id);
+    useInvoiceAmountDetailQuery(invoice?.id);
 
   const sortedPreviousInvoices = useMemo(
     () =>

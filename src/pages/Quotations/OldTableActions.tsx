@@ -26,6 +26,7 @@ import {ConfirmPrintQuotation} from 'components/ConfirmPrintQuotation';
 import {
   useDeleteQuotation,
   usePrintQuotation,
+  useQuotationAmountDetailQuery,
   useQuotationSubItems,
   useReplyQuotation,
   useSendQuotation,
@@ -59,7 +60,6 @@ import {FileResourceRecord} from 'models/media';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
-import useQuotationAmountDetail from 'hooks/useQuotationAmountDetail';
 
 interface Props {
   quotation: QuotationView;
@@ -100,17 +100,25 @@ const OldTableActions = ({quotation}: Props) => {
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
 
-  const {data: quotationSubItems} = useQuotationSubItems(quotation?.id);
+  const {data: quotationSubItems, refetch: fetchSubItems} =
+    useQuotationSubItems(quotation.id, {
+      enabled: false,
+    });
 
-  const subItemsMap: Record<string, QuotationSubItemRecord[]> = Object.entries(
-    quotationSubItems ?? {},
-  ).reduce((acc, [parentId, subItems]) => {
-    acc[parentId] = subItems.map((subItem) => ({
-      ...subItem,
-      parentId,
-    }));
-    return acc;
-  }, {} as Record<string, QuotationSubItemRecord[]>);
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(quotationSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, QuotationSubItemRecord[]>,
+      ),
+    [quotationSubItems],
+  );
 
   const [activeSignature, setActiveSignature] = useState<
     EmailSignature | undefined
@@ -142,23 +150,25 @@ const OldTableActions = ({quotation}: Props) => {
     [company?.language],
   );
 
-  const {data: clientStorageData} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: 'pdf-template'},
-  });
+  const {data: clientStorageData, refetch: fetchPdfTemplateConfig} =
+    useQueryClientStorageData({
+      serviceCompanyId: company?.id!,
+      params: {key: 'pdf-template'},
+      options: {enabled: false},
+    });
 
   const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
   const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
 
-  const {data: headerUrl = {}} = useDownloadUrl(
+  const {data: headerUrl = {}, refetch: fetchHeaderUrl} = useDownloadUrl(
     headerInfo?.path ? [headerInfo.path] : [],
-    undefined,
+    {enabled: false},
     company?.id,
   );
 
-  const {data: footerUrl = {}} = useDownloadUrl(
+  const {data: footerUrl = {}, refetch: fetchFooterUrl} = useDownloadUrl(
     footerInfo?.path ? [footerInfo.path] : [],
-    undefined,
+    {enabled: false},
     company?.id,
   );
 
@@ -180,10 +190,8 @@ const OldTableActions = ({quotation}: Props) => {
     [quotation?.items, subItemsMap],
   );
 
-  const quotationAmountDetail = useQuotationAmountDetail({
-    quotationItems: transformedQuotationItems,
-    quotationDiscount: quotation.additionalInfo.discount,
-  });
+  const {data: quotationAmountDetail, refetch: fetchQuotationAmountDetail} =
+    useQuotationAmountDetailQuery(quotation.id, {enabled: false});
 
   const generateBlobUrl = async () => {
     setCreatingPdf(true);
@@ -217,8 +225,15 @@ const OldTableActions = ({quotation}: Props) => {
     downloadUrl?.[quotation.additionalInfo.pdfPath!] || '',
   );
 
-  const handleClick = (event: any) => {
+  const handleOpenMenu = async (event: any) => {
     setAnchorEl(event.currentTarget);
+    await Promise.all([
+      fetchQuotationAmountDetail(),
+      fetchSubItems(),
+      fetchPdfTemplateConfig(),
+      fetchHeaderUrl(),
+      fetchFooterUrl(),
+    ]);
   };
 
   const handleClose = () => {
@@ -447,7 +462,7 @@ const OldTableActions = ({quotation}: Props) => {
         </IconButton>
       )}
 
-      <IconButton onClick={handleClick}>
+      <IconButton onClick={handleOpenMenu}>
         <MoreIcon fontSize="small" sx={{color: 'action.active'}} />
       </IconButton>
       <Menu
