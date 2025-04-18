@@ -6,9 +6,7 @@ import {ThemeProvider} from '@mui/material/styles';
 import {MutationErrorHandler, queryErrorHandler} from 'reactQuery/handlers';
 import {SnackbarProvider} from 'notistack';
 import {LanguageProvider} from 'context/LanguageProvider';
-import {PdfStylesProvider} from 'context/PdfStylesProvider';
 import * as Sentry from '@sentry/react';
-import {UserCompanyProvider} from 'context/UserCompanyProvider';
 import {App} from './App';
 import {theme} from './theme';
 import './assets/fonts/Aventa/Aventa-Regular.ttf';
@@ -17,13 +15,21 @@ import {LicenseInfo} from '@mui/x-license-pro';
 import BigNumber from 'bignumber.js';
 import './utils/withResolversPolyfill';
 import posthog from 'posthog-js';
+import {AxiosError} from 'axios';
 
 BigNumber.config({DECIMAL_PLACES: 2});
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      useErrorBoundary: false,
+      useErrorBoundary: (error) => {
+        const axiosError = error as AxiosError;
+        const method = axiosError?.config?.method?.toLowerCase();
+        if (method !== 'get') {
+          return false;
+        }
+        return (axiosError?.response?.status || 0) >= 500;
+      },
       onError: queryErrorHandler,
       // refetchOnWindowFocus: false,
     },
@@ -83,11 +89,7 @@ root.render(
           }}
           hideIconVariant
           maxSnack={3}>
-          <UserCompanyProvider>
-            <PdfStylesProvider>
-              <App />
-            </PdfStylesProvider>
-          </UserCompanyProvider>
+          <App />
         </SnackbarProvider>
 
         {window.Cypress ? null : <ReactQueryDevtools />}
