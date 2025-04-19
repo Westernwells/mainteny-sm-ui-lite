@@ -146,3 +146,5 @@ export const PDF_FONTS = [
   'Lato',
   'Times New Roman',
 ];
+
+export const ESCAPE_DOT_STRING = '_DOT_';

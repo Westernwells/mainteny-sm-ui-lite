@@ -20,6 +20,7 @@ import {getCountryCode} from './countries';
 import {
   DEFAULT_ELEVATOR_TECHNICAL_FIELD_CATEGORIES,
   DEFAULT_ELEVATOR_TECHNICAL_FIELD_NAMES,
+  ESCAPE_DOT_STRING,
 } from './constants';
 
 export const capitalize = (role: any[]) => {
@@ -788,3 +789,9 @@ export const generateMonthDropdownFromElevatorJobFrequency = (
     value: month,
   }));
 };
+
+export const escapeDotInString = (str: string): string =>
+  str.replace(/\./g, ESCAPE_DOT_STRING); // Escape all dots
+
+export const restoreDotInString = (str: string): string =>
+  str.replace(new RegExp(ESCAPE_DOT_STRING, 'g'), '.'); // Restore dots
