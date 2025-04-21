@@ -78,15 +78,10 @@ export const EditFinanceAddress = ({
 
             const newValue = {
               ...(componentAddress ?? {}),
-              ...(componentAddress?.component && {
-                component: {
-                  ...(componentAddress.component ?? {}),
-                  name:
-                    componentAddress?.component?.name?.trim() ||
-                    currentValues?.component?.name ||
-                    '',
-                },
-              }),
+              component: {
+                ...(currentValues?.component ?? {}),
+                ...(componentAddress?.component ?? {}),
+              },
               id: currentValues?.id!,
               fullName: componentAddress?.fullName || '',
             };
