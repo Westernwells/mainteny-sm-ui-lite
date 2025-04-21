@@ -506,6 +506,7 @@ export const transformContractViewComponentToContractRecord = (
     costType: component.additionalInfo.costType,
     costPackage: component.additionalInfo.costPackage,
     orderType: component.additionalInfo.orderType ?? undefined,
+    serviceDeliveryType: component.additionalInfo.serviceDeliveryType,
   }));
 
 export const getAutoJobStatus = (
