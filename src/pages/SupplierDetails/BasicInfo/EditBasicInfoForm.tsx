@@ -11,6 +11,8 @@ import {
 } from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {ComboBox} from 'components/ComboBox';
+import {InputAdornment} from '@mui/material';
+import PhoneIcon from '@mui/icons-material/Phone';
 import {UpdateArticleSupplierRecord} from '../../../models/supplier';
 
 export const EditBasicInfoForm = ({
@@ -122,15 +124,26 @@ export const EditBasicInfoForm = ({
       <Grid item xs={6}>
         <FormInput
           fieldProps={{
-            label: 'Phone',
+            id: 'phone',
             name: 'phone',
+            label: 'Phone',
             placeholder: 'e.g. 49 173 12345678',
-            type: 'text',
             required: true,
             value: formik.values.phone,
             helperText: formik.touched.phone && formik.errors.phone,
             error: !!(formik.touched.phone && formik.errors.phone),
             ...defaultProps,
+            InputLabelProps: {shrink: true},
+            InputProps: {
+              startAdornment: (
+                <InputAdornment position="start">+</InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <PhoneIcon />
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Grid>
