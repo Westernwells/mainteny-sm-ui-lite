@@ -46,11 +46,8 @@ const BillingAddress = ({
     const newValues = {
       ...(componentAddress ?? {}),
       component: {
+        ...(currentValues?.component ?? {}),
         ...(componentAddress?.component ?? {}),
-        // to not overwrite name fields
-        name: currentValues?.component?.name,
-        name2: currentValues?.component?.name2,
-        name3: currentValues?.component?.name3,
       },
       id: currentValues?.id!,
       fullName: componentAddress?.fullName || '',
