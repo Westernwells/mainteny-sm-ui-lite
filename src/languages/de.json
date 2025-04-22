@@ -3159,5 +3159,11 @@
   "Every 2 year": "Alle 2 Jahre",
   "Every 3 year": "Alle 3 Jahre",
   "Every 4 year": "Alle 4 Jahre",
-  "New {{jobType}} Job": "Neuer {{jobType}} Auftrag"
+  "New {{jobType}} Job": "Neuer {{jobType}} Auftrag",
+  "Remove Tag": "Tag entfernen",
+  "You are about to remove Materials tag.": "Sie sind dabei, den Tag zu entfernen.",
+  "Tag": "Tag",
+  "Canceled on": "Storniert am",
+  "Completed on": "Abgeschlossen am",
+  "Started on": "Gestartet am"
 }
