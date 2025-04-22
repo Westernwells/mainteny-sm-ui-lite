@@ -3180,5 +3180,8 @@
   "Every 2 year": "Svake 2 godine",
   "Every 3 year": "Svake 3 godine",
   "Every 4 year": "Svake 4 godine",
-  "New {{jobType}} Job": "Novi {{jobType}} posao"
+  "New {{jobType}} Job": "Novi {{jobType}} posao",
+  "Remove Tag": "Ukloni oznaku",
+  "You are about to remove Materials tag.": "Spremate se da uklonite oznaku Materijali.",
+  "Tag": "Oznaka"
 }
