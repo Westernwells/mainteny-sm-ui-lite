@@ -3183,5 +3183,8 @@
   "New {{jobType}} Job": "Novi {{jobType}} posao",
   "Remove Tag": "Ukloni oznaku",
   "You are about to remove Materials tag.": "Spremate se da uklonite oznaku Materijali.",
-  "Tag": "Oznaka"
+  "Tag": "Oznaka",
+  "Canceled on": "Otkazano",
+  "Completed on": "Završeno na",
+  "Started on": "Počelo na"
 }
