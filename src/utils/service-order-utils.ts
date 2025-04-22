@@ -477,12 +477,23 @@ export const getJobTypeGivenName = (
   orderType: string | undefined,
   jobTypes?: ServiceOrderTypeRecord[],
 ): string => {
-  if (!orderType || !jobTypes) return '-';
+  if (!orderType || !jobTypes || !jobTypes.length) return '-';
+
+  const orderTypeString = serviceOrderTypeToString(orderType);
+
+  if (orderTypeString !== '-') {
+    return orderTypeString;
+  }
 
   const matchingJobType = jobTypes.find(
     (jobType) => jobType.name === orderType,
   );
   return matchingJobType?.givenName || '-';
+};
+
+export const isCustomJobType = (jobType: string) => {
+  const orderTypeString = serviceOrderTypeToString(jobType);
+  return orderTypeString === '-';
 };
 
 type FilterServiceOrderTypeProps = {
