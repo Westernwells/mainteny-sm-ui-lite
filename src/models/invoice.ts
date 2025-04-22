@@ -550,6 +550,8 @@ export interface InvoiceActivityView {
   text: string;
   additionalInfo: string;
   meta: Meta;
+  overdueNoticePdfPath?: string;
+  count?: number;
 }
 
 export interface MyInvoiceActivityView {
@@ -567,6 +569,7 @@ export interface MyInvoiceActivityView {
 export interface InvoiceActivityOverdueNoticeSentData {
   email: string;
   overdueNoticeId: string;
+  pdfPath: string;
 }
 
 export const ALL_MANUAL_INVOICE_TYPES = [
