@@ -212,6 +212,7 @@ export enum ServiceOrderOrderField {
   JOB_TYPE = 'JOB_TYPE',
   PAYMENT_STATUS = 'PAYMENT_STATUS',
   JOB_STATUS = 'JOB_STATUS',
+  LAST_ACTIVITY_AT = 'LAST_ACTIVITY_AT',
 }
 
 export enum DispatchPlanStatus {
@@ -308,6 +309,7 @@ export interface ServiceOrderAdditionalInfo {
   discount?: Discount;
   commentCount?: number;
   totalAmount?: Amount;
+  lastActivityAt?: string;
 }
 
 export interface ServiceOrderConfirmationInfo {
@@ -750,6 +752,7 @@ export type ServiceOrderTableRow = {
     | ServiceOrderPaymentStatus
     | ServiceOrderPaymentWithIndicationStatus;
   hasNotes: boolean;
+  lastActivityAt: string;
 };
 
 // used to indicate fields for the search parameter of service order endpoint
@@ -795,4 +798,9 @@ export type ServiceOrderStatistics = {
 export interface ServiceOrderNameChangedRecord {
   fromName: string;
   toName: string;
+}
+
+export interface DateCellParts {
+  label: string;
+  date?: string | null;
 }
