@@ -1,5 +1,4 @@
 import {useMemo} from 'react';
-import {Link as RouterLink, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {format} from 'date-fns';
 import {theme} from 'theme';
@@ -26,6 +25,7 @@ import {
 } from 'utils/invoice';
 import {PageCard} from 'components/PageCard';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 
 export const InvoiceActivities = ({
   activities,
@@ -34,8 +34,18 @@ export const InvoiceActivities = ({
   activities: InvoiceActivityView[];
   invoice: InvoiceView;
 }) => {
-  const {id: invoiceId} = useParams();
   const {t} = useTranslation();
+
+  const overdueNotices = invoice?.overdueNotices || [];
+
+  const pdfPathById = useMemo(
+    () =>
+      overdueNotices?.reduce<Record<string, string>>((acc, notice) => {
+        acc[notice.id] = notice.additionalInfo.pdfPath;
+        return acc;
+      }, {}),
+    [overdueNotices],
+  );
 
   const activitiesWithOverdueNoticeCount = useMemo(() => {
     let overdueNoticeCount = 0;
@@ -49,6 +59,7 @@ export const InvoiceActivities = ({
         return {
           ...item,
           overdueNoticeId: data.overdueNoticeId,
+          overdueNoticePdfPath: pdfPathById[data.overdueNoticeId],
           count: overdueNoticeCount,
         };
       }
@@ -61,7 +72,17 @@ export const InvoiceActivities = ({
       }
       return item;
     });
-  }, [activities]);
+  }, [activities, pdfPathById]);
+
+  const allPaths = activitiesWithOverdueNoticeCount
+    .map((a) => a.overdueNoticePdfPath)
+    .filter(Boolean) as string[];
+
+  const {data: pdfBlobUrls = {}} = useDownloadUrl(
+    allPaths,
+    undefined,
+    invoice.serviceCompany.id,
+  );
 
   return (
     <PageCard
@@ -92,15 +113,16 @@ export const InvoiceActivities = ({
             </TimelineSeparator>
             <TimelineContent sx={{marginTop: '-0.5em'}}>
               {activity.type === InvoiceActivityType.OVERDUE_NOTICE_SENT &&
-              (activity as MyInvoiceActivityView).overdueNoticeId ? (
+              (activity as MyInvoiceActivityView).overdueNoticeId &&
+              activity.overdueNoticePdfPath ? (
                 <Link
-                  component={RouterLink}
-                  to={`/invoices/${invoiceId}/overdue-notice?overdueNoticeId=${
-                    (activity as MyInvoiceActivityView).overdueNoticeId
-                  }`}
+                  component="a"
+                  key={activity.id}
+                  href={pdfBlobUrls?.[activity?.overdueNoticePdfPath]}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   underline="always"
                   variant="subtitle1"
-                  target="_blank"
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
