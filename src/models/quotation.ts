@@ -9,6 +9,7 @@ import {
   AggregatedAmount,
   AlternativeServiceCompanyInfo,
   Discount,
+  Payment,
 } from './invoice';
 import {
   AddressRecord,
@@ -20,7 +21,7 @@ import {
   PdfGenerationStatus,
 } from './misc';
 import {PropertyOwnerView} from './propertyManager';
-import {ServiceCompanyItem, ServiceCompanySimpleView} from './service-company';
+import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
 import {theme} from 'theme';
 
@@ -84,9 +85,25 @@ export interface QuotationItemView {
   unitAmount: MultiVatsAmount;
   quantity: number;
   description: string;
-  additionalInfo: QuotationAdditionalInfo;
+  additionalInfo: QuotationItemAdditionalInfo;
+  userSeqNumber?: string;
 }
 
+export enum QuotationUnitAmountSource {
+  DEFAULT = 'DEFAULT',
+  MIX_ARTICLE = 'MIX_ARTICLE',
+  MIX_SUB_ITEMS = 'MIX_SUB_ITEMS',
+}
+
+export interface QuotationItemAdditionalInfo {
+  discount?: Discount;
+  unitAmountSource?: QuotationUnitAmountSource;
+  subItemsConfig?: {
+    subItemsVisible?: boolean;
+    priceVisible?: boolean;
+  };
+  userSeqNumber?: string;
+}
 export interface QuotationItemArticleView {
   id?: string;
   name: string;
@@ -115,15 +132,105 @@ export interface ArticleRecord {
   additionalInfo?: ArticleAdditionalInfo;
 }
 
+export interface ArticleInfoRecord {
+  id?: string;
+  name?: string;
+  externalId?: string;
+  type?: ArticleType;
+  unit?: string;
+  unitPurchaseAmount?: AmountRecord;
+  unitSellingAmount?: AmountRecord;
+  costPackage?: CostPackage;
+}
+
 export interface QuotationItemRecord {
   id?: string; // only for frontend key - we don't send it to backend
   articleId?: string;
-  article?: ArticleRecord | ArticleView;
+  article?: ArticleInfoRecord;
   name: string;
-  unitAmount: AmountRecord;
+  unitPurchaseAmount?: Amount;
+  unitAmount?: Amount;
   quantity: number;
   description?: string;
   discount?: Discount;
+  subItemsConfig?: SubItemsConfig;
+  subItems?: EditableQuotationSubItemRecord[];
+  userSeqNumber?: string;
+}
+
+export type EditableQuotationItem = QuotationItemRecord & {
+  id?: string;
+  margin?: number;
+};
+
+export type EditableQuotationSubItemRecord = QuotationSubItemRecord & {
+  margin?: number;
+  id?: string;
+  parentId?: string;
+};
+
+export interface SubItemsConfig {
+  subItemsVisible?: boolean;
+  priceVisible?: boolean;
+}
+
+export interface QuotationSubItemRecord {
+  article?: ArticleInfoRecord;
+  id?: string;
+  name: string;
+  unitPurchaseAmount?: Amount;
+  unitAmount: Amount;
+  quantity: number;
+  description?: string;
+  userSeqNumber?: string;
+}
+
+export interface QuotationFormData {
+  serviceCompanyId: string;
+  elevatorId?: string | null;
+  externalId?: string;
+  subject?: string;
+  description?: string;
+  moreInfo?: string;
+  items: EditableQuotationItem[];
+  integration?: {
+    xeroEntityId?: string;
+  };
+  discount?: Discount;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  paymentTerms?: string;
+  notes?: string;
+  sentDate?: Date;
+  expiryDate?: Date;
+  referenceNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
+  propertyOwnerId?: string;
+}
+
+export interface CreateQuotationRecord {
+  serviceCompanyId: string;
+  elevatorId?: string | null;
+  propertyOwnerId: string;
+  externalId?: string;
+  subject?: string;
+  description?: string;
+  moreInfo?: string;
+  items: QuotationItemRecord[];
+  integration?: {
+    xeroEntityId?: string;
+  };
+  discount?: Discount;
+  billingAddress?: AddressRecord;
+  beneficiaryAddress?: AddressRecord;
+  alternativeAddress?: AddressRecord;
+  paymentTerms?: string;
+  notes?: string;
+  sentDate?: string;
+  expiryDate?: string;
+  referenceNumber?: string;
+  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
 }
 
 export interface QuotationView {
@@ -164,57 +271,9 @@ export interface QueryQuotationParams {
   hasComments?: boolean;
 }
 
-export interface QuotationFormData {
-  serviceCompanyId: string;
-  elevatorId?: string | null;
-  externalId?: string;
-  subject: string;
-  description: string;
-  moreInfo?: string;
-  items: QuotationItemRecord[];
-  integration?: {
-    xeroEntityId?: string;
-  };
-  discount?: Discount;
-  billingAddress?: AddressRecord;
-  beneficiaryAddress?: AddressRecord;
-  alternativeAddress?: AddressRecord;
-  paymentTerms?: string;
-  notes?: string;
-  sentDate?: Date;
-  expiryDate?: Date;
-  referenceNumber?: string;
-  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
-  propertyOwnerId?: string;
-}
-
-export interface CreateQuotation {
-  serviceCompanyId: string;
-  elevatorId?: string | null;
-  externalId?: string;
-  subject: string;
-  description: string;
-  moreInfo?: string;
-  items: QuotationItemRecord[];
-  integration?: {
-    xeroEntityId?: string;
-  };
-  discount?: Discount;
-  billingAddress?: AddressRecord;
-  beneficiaryAddress?: AddressRecord;
-  alternativeAddress?: AddressRecord;
-  paymentTerms?: string;
-  notes?: string;
-  sentDate?: string;
-  expiryDate?: string;
-  referenceNumber?: string;
-  alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
-  propertyOwnerId?: string;
-}
-
 export interface UpdateQuotation {
-  subject: string;
-  description: string;
+  subject?: string;
+  description?: string;
   moreInfo?: string;
   elevatorId?: string | null;
   items: QuotationItemRecord[];
@@ -324,3 +383,61 @@ export const STATUS_COLOR = {
   [QuotationStatus.REJECTED]: theme.palette.error.main,
   [QuotationStatus.SENT_TO_CLIENT]: theme.palette.primary.mainLight,
 };
+
+export interface PositionRowQuotation {
+  data: ArticleView;
+  id: string;
+  externalId: string;
+  name: string;
+  description: string;
+  type: ArticleType;
+  unit: string;
+  unitPurchaseAmount?: AmountRecord;
+  unitSellingAmount?: AmountRecord;
+  quantity?: number;
+  discount: number;
+}
+export interface CalculateQuotationAmountRecord {
+  currency: string;
+  items: QuotationItemRecord[];
+  globalDiscount?: Discount;
+  paymentRecord?: Payment;
+}
+
+export interface QuotationAmountDetail {
+  discount: Discount;
+  payment: Payment;
+  amountBeforeGlobalDiscount: AggregatedAmount;
+  amountAfterGlobalDiscount: AggregatedAmount;
+  items: QuotationItemAmount[];
+}
+
+export interface QuotationItemAmount {
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount?: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount?: Amount;
+  payment: QuotationItemPaymentRecord;
+  subItems: QuotationSubItemAmount[];
+}
+
+export interface QuotationItemPaymentRecord {
+  type: QuotationItemPaymentType;
+  amount?: AggregatedAmount;
+  percentage?: number;
+}
+
+export interface QuotationSubItemAmount {
+  payment: QuotationItemPaymentType;
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount: Amount;
+}
+
+export enum QuotationItemPaymentType {
+  AMOUNT = 'AMOUNT',
+  PERCENTAGE = 'PERCENTAGE',
+}

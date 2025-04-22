@@ -91,7 +91,7 @@ export enum ElevatorOrderField {
   STATUS = 'STATUS',
   MANUFACTURER = 'MANUFACTURER',
   SERIAL_NUMBER = 'SERIAL_NUMBER',
-  REQUIRED_TIME = 'REQUIRED_TIME',
+  SERVICE_TIME = 'SERVICE_TIME',
   DISTANCE = 'DISTANCE',
 }
 
@@ -276,6 +276,7 @@ export interface ElevatorSimpleView {
   labels: string[];
   additionalInfo: ElevatorAdditionalInfo;
   meta: Meta;
+  externalId?: string;
 }
 
 export interface ElevatorAssignmentSimpleView {
@@ -674,7 +675,7 @@ export enum TABLE_COLUMNS_ID {
   MANUFACTURER = 'MANUFACTURER',
   MODEL = 'MODEL',
   LAST_INSPECTION = 'LAST_INSPECTION',
-  REQUIRED_TIME = 'REQUIRED_TIME',
+  SERVICE_TIME = 'SERVICE_TIME',
   APPOINTMENT_PREFERENCE = 'APPOINTMENT_PREFERENCE',
   DISTANCE = 'DISTANCE',
 }
@@ -765,7 +766,7 @@ export const UNIT_TABLE_COLUMNS: CustomizableColumn[] = [
     default: false,
   },
   {
-    id: TABLE_COLUMNS_ID.REQUIRED_TIME,
+    id: TABLE_COLUMNS_ID.SERVICE_TIME,
     columnName: 'Required time',
     orderIndex: 12,
     fixed: false,

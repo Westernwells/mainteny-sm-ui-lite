@@ -74,23 +74,19 @@ export const EditFinanceAddress = ({
           }}
           allowMap
           getAddress={(componentAddress) => {
-            if (!componentAddress) return;
-
             const currentValues = watch(address);
-            setValue(address, {
-              ...componentAddress,
-              ...(componentAddress?.component && {
-                component: {
-                  ...componentAddress.component,
-                  name:
-                    componentAddress.component.name?.trim() ||
-                    currentValues?.component?.name ||
-                    '',
-                },
-              }),
+
+            const newValue = {
+              ...(componentAddress ?? {}),
+              component: {
+                ...(currentValues?.component ?? {}),
+                ...(componentAddress?.component ?? {}),
+              },
               id: currentValues?.id!,
               fullName: componentAddress?.fullName || '',
-            });
+            };
+
+            setValue(address, newValue);
           }}
           shortAddress
         />

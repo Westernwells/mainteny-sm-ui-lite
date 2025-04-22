@@ -1,7 +1,5 @@
 import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
-import * as Yup from 'yup';
-import {useFormik} from 'formik';
 import {theme} from 'theme';
 import {
   Avatar,
@@ -37,7 +35,7 @@ import {UserCompanyContext} from 'context/UserCompanyProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useArticles} from 'hooks/reactQuery/useArticle';
 import {
-  useCalculateInvoiceAmount,
+  useRecalculateInvoiceAmount,
   useCreateInvoice,
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
@@ -46,22 +44,26 @@ import {
 } from 'hooks/reactQuery/useInvoice';
 import {
   CreateInvoice,
+  DiscountType,
+  EditableInvoiceItem,
+  InvoiceAmountDetail,
   InvoiceFormData,
   InvoiceItemPaymentType,
-  InvoiceItemRecord,
   InvoiceStatus,
+  InvoiceSubItemRecord,
   InvoiceType,
   InvoiceTypeMap,
   InvoiceView,
   PaymentType,
   PaymentTypeOptions,
 } from 'models/invoice';
-import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
+import {ServiceOrderView} from 'models/service-order';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {AddressComponent, AddressRecord, Currency, Language} from 'models/misc';
 import {
   formatAddressFullname,
   formatSearchParams,
+  getUniqueId,
   getUserFullName,
   isNumber,
 } from 'utils/utils';
@@ -113,23 +115,24 @@ import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
-import {getInvoiceStatusStyles} from 'utils/invoice';
+import {
+  articleViewToItem,
+  buildInvoicePayload,
+  generatePdfInvoice,
+  getInvoiceStatusStyles,
+  invoiceItemToInvoiceItemRecord,
+} from 'utils/invoice';
 import {StatusChip} from 'components/StatusChip';
 import {EditFrom} from './EditFrom';
 import {InvoiceCheckboxNEW} from './InvoiceCheckboxNEW';
-import InvoiceFormArticleSection from './InvoiceFormArticleSection';
 import NewCustomer from './NewCustomer';
 import {CreateNotes} from './Notes/CreateNotes';
 import {PartialPaymentsSection} from './PartialPaymentsSection';
 import {SectionTitle} from './SectionTitle';
 import {UpfrontPaymentsSection} from './UpfrontPaymentsSection';
-import {
-  articleViewToInvoiceItemRecord,
-  correctCreditNoteInvoicesPercentages,
-  formatInvoiceRecord,
-  invoiceItemToInvoiceItemRecord,
-} from './utils';
+import {articleViewToInvoiceItemRecord, formatInvoiceRecord} from './utils';
 import {Notes} from './Notes/EditNotes';
+import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
 import {cleanHtmlContent, getUpdatedTextBlockValue} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
 import {
@@ -145,27 +148,28 @@ import {
 import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
 import {pdf} from '@react-pdf/renderer';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
-import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import {calculateQuotationTotalWithPerItemDiscount} from 'utils/quotation';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
-  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
   CLIENT_STORAGE_PDF_TEMPLATE_KEY,
+  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {
-  QRCurrencyCode,
   createQrData,
   moneyToCents,
+  QRCurrencyCode,
   useCurrentCurrency,
 } from 'utils/currency';
-import {generatePdfInvoice} from 'utils/invoice';
 import {SwissQRBill} from 'swissqrbill/svg';
 import {calculateArticlesAmount} from 'utils/calculate-total';
 import {VatView} from 'models/vat';
 import PdfPartialUpfrontPreview from 'components/pdf-templates/invoice-previews/PdfPartialUpfrontPreview';
-import PdfPreviewFinalInvoiceTermplate from 'components/pdf-templates/invoice-previews/PdfPreviewFinalInvoiceTermplate';
+import PdfPreviewFinalInvoiceTemplate from 'components/pdf-templates/invoice-previews/PdfPreviewFinalInvoiceTemplate';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {Controller, useForm} from 'react-hook-form';
+import InvoicePositionTable from './InvoicePositions/InvoicePositionTable';
 
 interface Props {
   invoice?: InvoiceView;
@@ -174,6 +178,7 @@ interface Props {
   serviceOrderResource?: ServiceOrderView;
   customerResource?: PropertyOwnerView;
   isNewInvoice: boolean;
+  invoiceSubItems?: Record<string, InvoiceSubItemRecord[]>;
 }
 
 const payment = {
@@ -199,36 +204,6 @@ const isExternalIdUnique = async (resource: InvoiceView[], value?: string) => {
   }
 };
 
-const articleViewToItem = (
-  articleView: ServiceOrderArticleView,
-  currentCurrency: Currency,
-  taxRates?: VatView[],
-): InvoiceItemRecord => {
-  const taxRate =
-    taxRates?.find((rate) => rate.id === articleView.unitAmount.vatId) ||
-    taxRates?.find(
-      (rate) => rate.percentage === articleView.unitAmount.percentageVat,
-    );
-
-  const record: InvoiceItemRecord = {
-    id: articleView.id,
-    article: articleView.article,
-    name: articleView.name,
-    description: articleView.description,
-    quantity: articleView.quantity,
-    unitAmount: {
-      netAmount: articleView.unitAmount.netAmount || 0,
-      percentageVat:
-        articleView.unitAmount.percentageVat || taxRate?.percentage || 0,
-      currency: articleView.unitAmount.currency || currentCurrency.code,
-      vatId: articleView.unitAmount.vatId || taxRate?.id || '',
-      vatName: articleView.unitAmount.vatName || taxRate?.name || '',
-    },
-    discount: getDiscoutObj(articleView.additionalInfo?.discount),
-  };
-  return getItemRecord(record, record.unitAmount.percentageVat ?? 0);
-};
-
 const localStorageFormikInvoiceDataKey = 'INVOICE_DATA';
 
 enum PageState {
@@ -248,6 +223,7 @@ export const InvoiceForm = ({
   serviceOrderResource,
   customerResource,
   isNewInvoice,
+  invoiceSubItems,
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -267,7 +243,18 @@ export const InvoiceForm = ({
   );
   const navigate = useNavigate();
   const {search} = useLocation();
+
   const {data: taxRates, isLoading: isLoadingTaxRates} = useVats();
+
+  const defaultVat = taxRates?.find((tR) => tR.isDefault);
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
+
+  const qrCurrency: QRCurrencyCode =
+    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
+      ? currentCurrency.code
+      : 'EUR';
 
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -292,7 +279,7 @@ export const InvoiceForm = ({
     companyLanguageContextMap[company?.language || Language.EN_US];
   const [searchParams, setSearchParams] = useSearchParams();
   const [resetDueDatePicker, setResetDueDatePicker] = useState(false);
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const {t: translateCompanyLanguage} = useTranslation('translation', {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
@@ -318,7 +305,7 @@ export const InvoiceForm = ({
   const {
     mutateAsync: calculateInvoiceAmount,
     isLoading: isCalculatingInvoiceAmount,
-  } = useCalculateInvoiceAmount();
+  } = useRecalculateInvoiceAmount();
 
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
 
@@ -331,6 +318,7 @@ export const InvoiceForm = ({
 
   const isDrawerOpen = true;
 
+  const [isPreviewing, setIsPreviewing] = useState(false);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [initialNewLoadComplete, setInitialNewLoadComplete] = useState(false);
 
@@ -400,6 +388,21 @@ export const InvoiceForm = ({
     footerInfo?.path ? [footerInfo.path] : [],
     undefined,
     serviceCompanyId,
+  );
+
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(invoiceSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, InvoiceSubItemRecord[]>,
+      ),
+    [invoiceSubItems],
   );
 
   const [pageState, setPageState] = useState(
@@ -504,6 +507,7 @@ export const InvoiceForm = ({
                 invoice.type,
                 currentCurrency,
                 taxRates,
+                subItemsMap,
               ),
             )
           : [],
@@ -563,31 +567,43 @@ export const InvoiceForm = ({
     [invoice, invoiceType],
   );
 
-  const validationSchema = Yup.object().shape({
-    serviceCompanyId: Yup.string().required('Company is required'),
-    propertyOwnerId: Yup.string().required('Customer is required'),
-    items: Yup.array().min(1, 'At least one article is required'),
-    externalId: Yup.string().test(
-      'checkExternalId',
-      'This ID is already taken. Please enter a different one.',
-      async (value) =>
-        !isNewInvoice && value === invoice?.externalId
-          ? true
-          : // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            isExternalIdUnique(allInvoiceResource.data, value),
-    ),
-    type: Yup.string().optional(),
-    payment: Yup.object().when('type', {
-      is: (v: string) =>
-        v === InvoiceType.PARTIAL ||
-        v === InvoiceType.UPFRONT ||
-        v === InvoiceType.FINAL,
-      then: () =>
-        Yup.object().shape({
-          description: Yup.string().required('Name is required'),
-        }),
-    }),
+  const formMethods = useForm<InvoiceFormData>({
+    defaultValues: initialValues,
+    mode: 'onChange',
   });
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    getValues,
+    watch,
+    reset,
+    formState: {errors},
+  } = formMethods;
+
+  const watchedItems = watch('items');
+  const watchedType = watch('type');
+  const watchedPropertyOwnerId = watch('propertyOwnerId');
+  const watchedDiscount = watch('discount');
+  const watchedSubject = watch('subject');
+  const watchedDescription = watch('description');
+  const watchedMoreInfo = watch('moreInfo');
+  const watchedExternalId = watch('externalId');
+  const watchedAlternativeServiceCompanyInfo = watch(
+    'alternativeServiceCompanyInfo',
+  );
+  const watchedBillingAddress = watch('billingAddress');
+  const watchedBeneficiaryAddress = watch('beneficiaryAddress');
+  const watchedAlternativeAddress = watch('alternativeAddress');
+  const watchedPaymentTerm = watch('paymentTerm');
+  const watchedPayment = watch('payment');
+  const watchedPaymentDescription = watch('payment.description');
+
+  const [invoiceAmountDetail, setInvoiceAmountDetail] = useState<
+    InvoiceAmountDetail | undefined
+  >(undefined);
 
   async function onSave(values: InvoiceFormData) {
     if (!values.description.length) values.description = '';
@@ -641,34 +657,22 @@ export const InvoiceForm = ({
     setFilePathToDownload('');
   };
 
-  const formik = useFormik<InvoiceFormData>({
-    initialValues,
-    validationSchema,
-    onSubmit: async (values) => {
-      const response = await onSave(values);
-      resetLocalStorage();
-      if (isNewInvoice) {
-        navigate(`/invoices/details/${response.value}`, {
-          replace: true,
-        });
-      } else {
-        navigate(-1);
-      }
-    },
-  });
-
   const handleDueDateChange = useCallback(
     (props: Omit<GetInvoiceDueDateProps, 'invoiceType' | 'isNewInvoice'>) =>
       getInvoiceDueDate({
-        invoiceType: formik.values.type,
+        invoiceType: watchedType,
         isNewInvoice,
         ...props,
       }),
-    [formik.values.type, isNewInvoice],
+    [watchedType, isNewInvoice],
   );
+
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
-    const updateFieldValue = (fieldName: string, currentValue: string) => {
-      formik.setFieldValue(
+    const updateFieldValue = (
+      fieldName: 'subject' | 'description' | 'notes',
+      currentValue: string,
+    ) => {
+      setValue(
         fieldName,
         getUpdatedTextBlockValue(currentValue, rowParams.row.text),
       );
@@ -676,22 +680,16 @@ export const InvoiceForm = ({
 
     switch (textBlockField) {
       case 'SUBJECT':
-        updateFieldValue(
-          'subject',
-          cleanHtmlContent(formik.values.subject || ''),
-        );
+        updateFieldValue('subject', cleanHtmlContent(watchedSubject || ''));
         break;
       case 'DESCRIPTION':
         updateFieldValue(
           'description',
-          cleanHtmlContent(formik.values.description || ''),
+          cleanHtmlContent(watchedDescription || ''),
         );
         break;
       case 'NOTES':
-        updateFieldValue(
-          'moreInfo',
-          cleanHtmlContent(formik.values.moreInfo || ''),
-        );
+        updateFieldValue('notes', cleanHtmlContent(watchedMoreInfo || ''));
         break;
       default:
         break;
@@ -700,18 +698,18 @@ export const InvoiceForm = ({
     setOpenTextBlockDialog(false);
   };
 
-  const alternativeAddress = formik.values.alternativeAddress?.component;
-  const beneficiaryAddress = formik.values.beneficiaryAddress?.component;
-  const billingAddress = formik.values.billingAddress?.component;
+  const alternativeAddress = watchedAlternativeAddress?.component;
+  const beneficiaryAddress = watchedBeneficiaryAddress?.component;
+  const billingAddress = watchedBillingAddress?.component;
 
   const {data: propertyOwnerData} =
-    typeof formik.values.propertyOwnerId === 'string'
-      ? useGetCustomer(formik.values.propertyOwnerId)
+    typeof getValues('propertyOwnerId') === 'string'
+      ? useGetCustomer(getValues('propertyOwnerId'))
       : {data: undefined};
 
   const {data: serviceOrderData} =
-    typeof formik.values.serviceOrderId === 'string'
-      ? useServiceOrderDetails(formik.values.serviceOrderId)
+    typeof getValues('serviceOrderId') === 'string'
+      ? useServiceOrderDetails(getValues('serviceOrderId'))
       : {data: undefined};
 
   const {data: previousInvoices = [], isLoading: isLoadingPreviousInvoices} =
@@ -777,7 +775,7 @@ export const InvoiceForm = ({
       )
     ) {
       // for partial, upfront and final invoices, show 1 credit note article with negative net amount
-      formik.setFieldValue('items', [
+      setValue('items', [
         {
           ...creditNoteArticle,
           unitAmount: {
@@ -789,7 +787,7 @@ export const InvoiceForm = ({
       ]);
     } else {
       // for full invoices, show all articles with negative net amount
-      formik.setFieldValue(
+      setValue(
         'items',
         invoice?.items?.map((item) => {
           return invoiceItemToInvoiceItemRecord(
@@ -797,8 +795,9 @@ export const InvoiceForm = ({
             InvoiceType.CREDIT_NOTE,
             currentCurrency,
             taxRates,
+            subItemsMap,
           );
-        }),
+        }) || [],
       );
     }
   };
@@ -812,14 +811,15 @@ export const InvoiceForm = ({
       ) {
         setCreditNoteArticles();
       } else {
-        formik.setFieldValue(
+        setValue(
           'items',
           invoice.items?.map((invoiceItem) =>
             invoiceItemToInvoiceItemRecord(
               invoiceItem,
-              formik.values.type,
+              watchedType,
               currentCurrency,
               taxRates,
+              subItemsMap,
             ),
           ),
         );
@@ -834,69 +834,63 @@ export const InvoiceForm = ({
     const invoicePropertyOwner = invoiceData.propertyOwner;
 
     if (invoicePropertyOwner) {
-      formik.setFieldValue('propertyOwnerId', invoicePropertyOwner?.id || '');
+      setValue('propertyOwnerId', invoicePropertyOwner?.id || '');
     }
 
     if (invoiceServiceOrder) {
-      formik.setFieldValue('serviceOrderId', invoiceServiceOrder?.id ?? '');
+      setValue('serviceOrderId', invoiceServiceOrder?.id ?? '');
     }
 
-    formik.setFieldValue(
+    setValue(
       'elevatorExternalId',
       invoiceData?.additionalInfo.elevatorExternalId ?? '',
     );
 
-    formik.setFieldValue(
+    setValue(
       'serviceCompanyId',
-      invoice?.serviceCompany.id || user?.userAccount.serviceCompany.id,
+      invoice?.serviceCompany.id || user?.userAccount.serviceCompany.id!,
     );
 
-    formik.setFieldValue('subject', invoiceData?.subject ?? '');
+    setValue('subject', invoiceData?.subject ?? '');
 
-    formik.setFieldValue('description', invoiceData?.description ?? '');
+    setValue('description', invoiceData?.description ?? '');
 
-    formik.setFieldValue(
+    setValue(
       'includeWorkReport',
       invoiceData?.additionalInfo.includeWorkReport || false,
     );
 
-    formik.setFieldValue(
+    setValue(
       'includeCheckList',
       invoiceData?.additionalInfo.includeCheckList || false,
     );
 
-    formik.setFieldValue(
-      'costCenter',
-      invoiceData?.additionalInfo?.costCenter || '',
-    );
+    setValue('costCenter', invoiceData?.additionalInfo?.costCenter || '');
 
-    formik.setFieldValue(
+    setValue(
       'purchaseOrderNumber',
       invoiceData?.additionalInfo?.purchaseOrderNumber ||
         invoice?.additionalInfo?.customerSpecificOrderNumber ||
         '',
     );
-    formik.setFieldValue(
-      'moreInfo',
-      invoiceData?.additionalInfo?.moreInfo ?? '',
-    );
+    setValue('moreInfo', invoiceData?.additionalInfo?.moreInfo ?? '');
 
-    formik.setFieldValue(
+    setValue(
       'billingAddress',
       invoiceData?.additionalInfo?.billingAddress || emptyAddressState,
     );
 
-    formik.setFieldValue(
+    setValue(
       'beneficiaryAddress',
       invoiceData?.additionalInfo?.beneficiaryAddress || emptyAddressState,
     );
 
-    formik.setFieldValue(
+    setValue(
       'alternativeAddress',
       invoiceData?.additionalInfo.alternativeAddress || emptyAddressState,
     );
 
-    formik.setFieldValue(
+    setValue(
       'dueDate',
       handleDueDateChange({
         numberOfDaysToAdd: invoice?.additionalInfo?.paymentTerm?.data?.dueDays,
@@ -907,34 +901,31 @@ export const InvoiceForm = ({
     );
 
     if (invoiceData?.additionalInfo?.deliveryStartDate) {
-      formik.setFieldValue(
+      setValue(
         'deliveryStartDate',
         new Date(invoiceData.additionalInfo.deliveryStartDate),
       );
     }
 
     if (invoiceData?.additionalInfo?.deliveryEndDate) {
-      formik.setFieldValue(
+      setValue(
         'deliveryEndDate',
         new Date(invoiceData.additionalInfo.deliveryEndDate),
       );
     }
 
     if (invoiceData?.additionalInfo.paymentTerm) {
-      formik.setFieldValue(
-        'paymentTerm',
-        invoiceData.additionalInfo.paymentTerm,
-      );
+      setValue('paymentTerm', invoiceData.additionalInfo.paymentTerm);
     }
 
-    formik.setFieldValue(
+    setValue(
       'type',
-      formik.values.type === InvoiceType.CREDIT_NOTE
+      watchedType === InvoiceType.CREDIT_NOTE
         ? InvoiceType.CREDIT_NOTE
-        : invoiceData?.type || formik.values.type,
+        : invoiceData?.type || watchedType,
     );
 
-    formik.setFieldValue(
+    setValue(
       'discount',
       invoiceData?.additionalInfo?.discount
         ? {
@@ -954,22 +945,22 @@ export const InvoiceForm = ({
         : undefined,
     );
 
-    formik.setFieldValue(
+    setValue(
       'showArticleSection',
       invoiceData?.additionalInfo?.showArticleSection ?? true,
     );
 
-    formik.setFieldValue(
+    setValue(
       'showInvoicedSection',
       invoiceData?.additionalInfo?.showInvoicedSection ?? true,
     );
 
-    formik.setFieldValue(
+    setValue(
       'showPaymentSection',
       invoiceData?.additionalInfo?.showPaymentSection ?? true,
     );
 
-    formik.setFieldValue(
+    setValue(
       'items',
       invoiceData?.items?.map((item) =>
         invoiceItemToInvoiceItemRecord(
@@ -977,11 +968,12 @@ export const InvoiceForm = ({
           invoiceType || invoiceData.type,
           currentCurrency,
           taxRates,
+          subItemsMap,
         ),
       ),
     );
 
-    formik.setFieldValue(
+    setValue(
       'alternativeServiceCompanyInfo',
       invoiceData?.additionalInfo.alternativeServiceCompanyInfo || {
         name: user?.userAccount.serviceCompany.name || '',
@@ -990,12 +982,12 @@ export const InvoiceForm = ({
     );
 
     if (isNewInvoice) {
-      formik.setFieldValue('externalId', '');
-      formik.setFieldValue('sentDate', undefined);
+      setValue('externalId', '');
+      setValue('sentDate', undefined);
     } else {
-      formik.setFieldValue('externalId', invoiceData.externalId);
+      setValue('externalId', invoiceData.externalId);
       if (invoiceData?.sentDate) {
-        formik.setFieldValue('sentDate', new Date(invoiceData?.sentDate));
+        setValue('sentDate', new Date(invoiceData?.sentDate));
       }
     }
   };
@@ -1004,52 +996,49 @@ export const InvoiceForm = ({
     const invoicePropertyOwner = invoice?.propertyOwner;
 
     if (invoice && invoicePropertyOwner && pageState === PageState.DUPLICATE) {
-      formik.setFieldValue(
+      setValue(
         'billingAddress',
         invoice.additionalInfo?.billingAddress || emptyAddressState,
       );
-      formik.setFieldValue(
+      setValue(
         'beneficiaryAddress',
         invoice.additionalInfo?.beneficiaryAddress || emptyAddressState,
       );
-      formik.setFieldValue(
+      setValue(
         'alternativeAddress',
         invoice.additionalInfo?.alternativeAddress || emptyAddressState,
       );
     } else {
       if (!serviceOrder?.elevator.additionalInfo.billingAddress) {
-        formik.setFieldValue(
+        setValue(
           'billingAddress',
-          customerData.billingAddress || emptyAddressState,
+          customerData?.billingAddress || emptyAddressState,
         );
       }
 
       if (!serviceOrder?.elevator.additionalInfo.beneficiaryAddress) {
-        formik.setFieldValue(
+        setValue(
           'beneficiaryAddress',
-          customerData.beneficiaryAddress || emptyAddressState,
+          customerData?.beneficiaryAddress || emptyAddressState,
         );
       }
 
-      formik.setFieldValue(
+      setValue(
         'alternativeAddress',
-        customerData.otherAddress || emptyAddressState,
+        customerData?.otherAddress || emptyAddressState,
       );
 
-      formik.setFieldValue(
-        'costCenter',
-        customerData.additionalInfo.costCenter,
-      );
+      setValue('costCenter', customerData.additionalInfo?.costCenter);
 
       if (customerData?.paymentTerm) {
-        formik.setFieldValue(
+        setValue(
           'paymentTerm',
           getFormattedPaymentTerms(customerData?.paymentTerm),
         );
       }
 
       if (customerData.paymentTerm?.id) {
-        formik.setFieldValue(
+        setValue(
           'dueDate',
           handleDueDateChange({
             numberOfDaysToAdd: customerData?.paymentTerm?.data?.dueDays || 0,
@@ -1063,15 +1052,12 @@ export const InvoiceForm = ({
 
   const setAddressFromLocalStorage = () => {
     if (initialLocalStorageData && initialLocalStorageData.propertyOwnerId) {
-      formik.setFieldValue(
-        'billingAddress',
-        initialLocalStorageData?.billingAddress,
-      );
-      formik.setFieldValue(
+      setValue('billingAddress', initialLocalStorageData?.billingAddress);
+      setValue(
         'beneficiaryAddress',
         initialLocalStorageData?.beneficiaryAddress,
       );
-      formik.setFieldValue(
+      setValue(
         'alternativeAddress',
         initialLocalStorageData?.alternativeAddress,
       );
@@ -1088,7 +1074,7 @@ export const InvoiceForm = ({
       serviceOrderArg.elevator.additionalInfo.billingAddress &&
       !invoice?.additionalInfo?.billingAddress?.fullName
     ) {
-      formik.setFieldValue(
+      setValue(
         'billingAddress',
         serviceOrderArg.elevator.additionalInfo.billingAddress,
       );
@@ -1098,44 +1084,35 @@ export const InvoiceForm = ({
       serviceOrderArg.elevator.additionalInfo.beneficiaryAddress &&
       !invoice?.additionalInfo?.beneficiaryAddress?.fullName
     ) {
-      formik.setFieldValue(
+      setValue(
         'beneficiaryAddress',
         serviceOrderArg.elevator.additionalInfo.beneficiaryAddress,
       );
     }
 
-    if (!formik.values.propertyOwnerId) {
-      formik.setFieldValue(
+    if (!watchedPropertyOwnerId) {
+      setValue(
         'propertyOwnerId',
         serviceOrderArg?.elevator.propertyOwner.id || '',
       );
     }
 
-    if (
-      !formik.values.description &&
-      serviceOrderArg?.reports?.[0]?.description
-    ) {
-      formik.setFieldValue(
+    if (!watchedDescription && serviceOrderArg?.reports?.[0]?.description) {
+      setValue(
         'description',
         stripHtmlTags(serviceOrderArg?.reports[0].description),
       );
     }
 
-    formik.setFieldValue(
-      'unitNumber',
-      serviceOrderArg?.elevator.externalId || '-',
-    );
+    setValue('unitNumber', serviceOrderArg?.elevator.externalId || '-');
 
-    formik.setFieldValue(
-      'elevatorExternalId',
-      serviceOrderArg?.elevator.externalId || '-',
-    );
+    setValue('elevatorExternalId', serviceOrderArg?.elevator.externalId || '-');
 
     if (
       !invoice?.additionalInfo?.deliveryStartDate &&
       serviceOrderArg?.schedules?.[0]?.startTime
     ) {
-      formik.setFieldValue(
+      setValue(
         'deliveryStartDate',
         new Date(serviceOrderArg.schedules[0].startTime),
       );
@@ -1145,31 +1122,40 @@ export const InvoiceForm = ({
       !invoice?.additionalInfo?.deliveryEndDate &&
       serviceOrderArg?.schedules?.[0]?.endTime
     ) {
-      formik.setFieldValue(
+      setValue(
         'deliveryEndDate',
         new Date(serviceOrderArg.schedules[0].endTime),
       );
     }
 
     if (serviceOrderArg?.additionalInfo.discount) {
-      formik.setFieldValue(
+      setValue(
         'discount',
         getDiscoutObj(serviceOrderArg?.additionalInfo.discount, true),
       );
     }
 
-    if (!formik.values.items.length) {
-      formik.setFieldValue(
-        'items',
-        serviceOrderArg?.articles?.map((articleItem) =>
-          articleViewToItem(articleItem, currentCurrency, taxRates),
-        ),
+    if (!watchedItems.length) {
+      const articleItems = serviceOrderArg?.articles?.map((articleItem) =>
+        articleViewToItem(articleItem, currentCurrency, taxRates, subItemsMap),
       );
+
+      setValue('items', articleItems);
+
+      const newNotes = syncVatLegalNotesWithNotes({
+        oldArticles: watchedItems,
+        newArticles: articleItems,
+        currentNotes: watchedMoreInfo || '',
+        taxRates,
+      });
+
+      setValue('moreInfo', newNotes);
     }
+
     const dueDays = serviceOrderArg?.contract?.additionalInfo?.invoiceDueDays;
 
     if (typeof dueDays === 'number' && isNewInvoice) {
-      formik.setFieldValue(
+      setValue(
         'dueDate',
         handleDueDateChange({
           numberOfDaysToAdd: dueDays,
@@ -1178,18 +1164,20 @@ export const InvoiceForm = ({
       setResetDueDatePicker(true);
     }
 
-    if (serviceOrderArg.additionalInfo.purchaseOrderNumber) {
-      formik.setFieldValue(
-        'purchaseOrderNumber',
-        serviceOrderArg.additionalInfo.purchaseOrderNumber,
-      );
-    } else if (serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber) {
-      formik.setFieldValue(
-        'purchaseOrderNumber',
-        serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber,
-      );
-    } else {
-      formik.setFieldValue('purchaseOrderNumber', '');
+    if (pageState !== PageState.DUPLICATE) {
+      if (serviceOrderArg.additionalInfo.purchaseOrderNumber) {
+        setValue(
+          'purchaseOrderNumber',
+          serviceOrderArg.additionalInfo.purchaseOrderNumber,
+        );
+      } else if (serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber) {
+        setValue(
+          'purchaseOrderNumber',
+          serviceOrderArg.contract?.additionalInfo.purchaseOrderNumber,
+        );
+      } else {
+        setValue('purchaseOrderNumber', '');
+      }
     }
   };
 
@@ -1214,17 +1202,17 @@ export const InvoiceForm = ({
           ),
         );
       const normalizedParsedData = normalizeData(parsedData);
-      const normalizedFormikValues = normalizeData(formik.values);
+      const normalizedFormikValues = normalizeData(watch());
 
       const isDataEqual = isEqual(normalizedParsedData, normalizedFormikValues);
 
       if (!isDataEqual && !(customerId || orderId)) {
         setOpenResumeProgressDialog(true);
       } else {
-        formik.setValues(parsedData);
+        reset(parsedData);
       }
     } catch (error) {
-      console.error('Failed to parse localStorage data:', error);
+      showError(error);
     }
   };
 
@@ -1232,7 +1220,7 @@ export const InvoiceForm = ({
     if (initialLocalStorageData && !(customerId || orderId)) {
       try {
         if (Object.keys(initialLocalStorageData).length !== 0) {
-          formik.setValues({
+          reset({
             ...initialLocalStorageData,
             deliveryEndDate: initialLocalStorageData?.deliveryEndDate
               ? new Date(initialLocalStorageData.deliveryEndDate)
@@ -1263,7 +1251,7 @@ export const InvoiceForm = ({
           setPageState(PageState.CONTINUE_FROM_LOCAL_STORAGE);
         }
       } catch (error) {
-        console.error('Error restoring form data from localStorage:', error);
+        showError(error);
       }
     }
   };
@@ -1271,8 +1259,8 @@ export const InvoiceForm = ({
   const handleRemoveCustomer = useCallback(() => {
     setCustomer(undefined);
     setServiceOrder(undefined);
-    formik.setValues({
-      ...formik.values,
+    reset({
+      ...getValues(),
       billingAddress: emptyAddressState,
       beneficiaryAddress: emptyAddressState,
       alternativeAddress: emptyAddressState,
@@ -1290,19 +1278,19 @@ export const InvoiceForm = ({
     } else if (!isNewInvoice) {
       setPageState(PageState.CONTINUE_EDIT);
     }
-  }, [formik]);
+  }, [getValues()]);
 
   const handleCustomerChange = (newCustomer?: PropertyOwnerView | null) => {
     if (newCustomer) {
-      if (newCustomer.id !== formik.values.propertyOwnerId) {
-        handleRemoveCustomer(); // Remove previous customer and related data
-        formik.setFieldValue('propertyOwnerId', newCustomer.id); // Set new customer
+      if (newCustomer.id !== watchedPropertyOwnerId) {
+        handleRemoveCustomer();
+        setValue('propertyOwnerId', newCustomer.id);
         const customerLegalNote = newCustomer?.additionalInfo?.vat?.legalNote;
         if (customerLegalNote) {
-          const newNotes = `${formik.values.moreInfo} ${cleanHtmlContent(
+          const newNotes = `${watchedMoreInfo} ${cleanHtmlContent(
             `<p>${customerLegalNote}</p>`,
           )}`;
-          formik.setFieldValue('moreInfo', newNotes);
+          setValue('moreInfo', newNotes);
         }
       }
     } else {
@@ -1311,27 +1299,446 @@ export const InvoiceForm = ({
   };
 
   const handleSelectServiceOrder = (selectedServiceOrder: ServiceOrderView) => {
-    formik.setFieldValue('serviceOrderId', selectedServiceOrder.id);
+    setValue('serviceOrderId', selectedServiceOrder.id);
     const serviceOrderCustomer = selectedServiceOrder.elevator.propertyOwner;
     handleCustomerChange(serviceOrderCustomer);
   };
 
   const onRemoveServiceOrder = useCallback(() => {
     setServiceOrder(undefined);
-    formik.setFieldValue('serviceOrderId', '');
+    setValue('serviceOrderId', '');
 
-    formik.setFieldValue(
-      'billingAddress',
-      customer?.billingAddress || emptyAddressState,
-    );
-    formik.setFieldValue(
+    setValue('billingAddress', customer?.billingAddress || emptyAddressState);
+    setValue(
       'beneficiaryAddress',
       customer?.beneficiaryAddress || emptyAddressState,
     );
-    formik.setFieldValue('purchaseOrderNumber', '');
-  }, [formik, customer]);
+    setValue('purchaseOrderNumber', '');
+  }, [getValues(), customer]);
 
-  // Handle updates from duplicated invoice and edit mode
+  const actions = useMemo(() => {
+    const items = [];
+    if (
+      invoice &&
+      ![
+        InvoiceStatus.NOT_PAID,
+        InvoiceStatus.EXPIRED,
+        InvoiceStatus.PARTIALLY_PAID,
+      ].includes(invoice.status)
+    ) {
+      items.push({
+        label: t('Delete'),
+        icon: <DeleteIcon />,
+        onClick: () => {
+          setIsDeleteDialogOpen(true);
+        },
+      });
+    }
+    return items;
+  }, [getValues('dueDate')]);
+
+  const handleDateFieldChange = (
+    fieldName: 'sentDate' | 'dueDate' | 'deliveryStartDate' | 'deliveryEndDate',
+    newValue?: Date | null,
+  ) => {
+    setValue(fieldName, newValue || undefined);
+  };
+
+  const checkValidQrCode = useCallback(
+    debounce(async (qrInvoice: InvoiceView) => {
+      if (user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
+        try {
+          const qrBillData = createQrData(
+            qrCurrency,
+            qrInvoice,
+            currentCurrency,
+            user?.userAccount,
+          );
+
+          const qrBillSvg = new SwissQRBill(qrBillData);
+
+          svgToJpegPng(
+            qrBillSvg.element as unknown as SVGSVGElement,
+            (result) => {
+              setQrImageSrc(result);
+            },
+            {format: 'jpeg', quality: 1},
+          );
+          setQrError(null);
+          return '';
+        } catch (error) {
+          if (error instanceof Error) {
+            setQrError(error.message);
+            return error.message;
+          }
+        }
+      }
+    }, 500),
+    [user, currentCurrency, qrCurrency],
+  );
+
+  const generateBlobUrl = async ({
+    invoiceData,
+    invoiceNumber,
+    setInState = true,
+  }: {
+    invoiceData: InvoiceView;
+    invoiceNumber?: string;
+    setInState?: boolean;
+  }) => {
+    if (
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+      !qrImageSrc
+    ) {
+      enqueueSnackbar(qrError!, {
+        variant: 'error',
+      });
+      return;
+    }
+
+    let PdfTemplate;
+
+    if (
+      getValues('type') === InvoiceType.FULL ||
+      getValues('type') === InvoiceType.AGGREGATE
+    ) {
+      PdfTemplate = FullInvoicePdfTemplate;
+    } else if (getValues('type') === InvoiceType.CREDIT_NOTE) {
+      PdfTemplate = CreditNotePdfTemplate;
+    } else if (
+      getValues('type') === InvoiceType.PARTIAL ||
+      getValues('type') === InvoiceType.UPFRONT
+    ) {
+      PdfTemplate = PdfPartialUpfrontPreview;
+    } else {
+      PdfTemplate = PdfPreviewFinalInvoiceTemplate;
+    }
+
+    const shouldIncludePreviousInvoices = !(
+      getValues('type') === InvoiceType.CREDIT_NOTE ||
+      getValues('type') === InvoiceType.FULL ||
+      getValues('type') === InvoiceType.AGGREGATE
+    );
+
+    const payload = buildInvoicePayload(
+      watchedItems,
+      currentCurrency,
+      watchedDiscount,
+      watchedPayment,
+    );
+
+    const invoiceAmountDetail = await calculateInvoiceAmount({
+      data: payload,
+    });
+
+    const blob = await pdf(
+      <PdfTemplate
+        serviceCompany={company}
+        userInfo={user?.userAccount}
+        pdfConfigClientStorage={pdfConfig}
+        currentCurrency={currentCurrency}
+        invoice={invoiceData}
+        invoiceItems={watchedItems}
+        invoiceAmountDetail={invoiceAmountDetail}
+        selectedLng={company?.language}
+        translate={translate}
+        previousInvoices={
+          shouldIncludePreviousInvoices ? sortedPreviousInvoices : []
+        }
+        headerPath={headerUrl[headerInfo?.path]}
+        headerInfo={headerInfo}
+        footerPath={footerUrl[footerInfo?.path]}
+        footerInfo={footerInfo}
+        nextCompanyExternalId={
+          invoiceNumber || translate('Automatically assigned')
+        }
+        qrImageSrc={qrImageSrc}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
+      />,
+    ).toBlob();
+    const blobURL = URL.createObjectURL(blob);
+    if (setInState) setFilePathToDownload(blobURL);
+    return blob;
+  };
+
+  const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
+    () =>
+      calculateArticlesAmount({
+        items: watchedItems,
+        globalDiscount: watchedDiscount,
+      }),
+    [watchedItems, watchedDiscount],
+  );
+
+  const handlePreview = async () => {
+    setIsPreviewing(true);
+
+    const subtotalExclVat =
+      calculateQuotationTotalWithPerItemDiscount(watchedItems);
+
+    const mappedVats = vats.map((vat) => ({
+      ...vat,
+      vat: moneyToCents(currentCurrency.code, vat.vat),
+    }));
+
+    const pdfInvoice = generatePdfInvoice(
+      getValues(),
+      currentCurrency,
+      subtotalExclVat,
+      amountAfterGlobalDiscountWithVAT,
+      mappedVats,
+      company,
+      serviceOrder,
+      customer,
+      invoice,
+    );
+
+    await checkValidQrCode(pdfInvoice);
+
+    await generateBlobUrl({
+      invoiceData: pdfInvoice,
+      invoiceNumber: translate('Automatically assigned'),
+      setInState: true,
+    });
+
+    setOpenPreviewDialog(true);
+    setIsPreviewing(false);
+  };
+
+  const hasEmptyItemName = watchedItems?.some((item) => !item.name?.trim());
+
+  const hasMixItemWithoutSubItems = watchedItems?.some(
+    (item) =>
+      item.article?.type === ArticleType.MIX &&
+      (!item.subItems || item.subItems.length === 0),
+  );
+
+  const isValid = () => {
+    const currentValues = getValues();
+    const currentItems = currentValues.items || [];
+
+    const localHasEmptyItemName = currentItems.some(
+      (item) => !item.name?.trim(),
+    );
+    const localHasMixItemWithoutSubItems = currentItems.some(
+      (item) =>
+        item.article?.type === ArticleType.MIX &&
+        (!item.subItems || item.subItems.length === 0),
+    );
+
+    const invoiceTypeRequiresOrder = [
+      InvoiceType.UPFRONT,
+      InvoiceType.FINAL,
+      InvoiceType.PARTIAL,
+    ];
+
+    if (
+      invoiceTypeRequiresOrder.includes(currentValues.type) &&
+      !currentValues.serviceOrderId
+    ) {
+      return false;
+    }
+
+    const valid =
+      currentValues.subject &&
+      currentItems.length > 0 &&
+      currentValues.type &&
+      !localHasEmptyItemName &&
+      !localHasMixItemWithoutSubItems &&
+      !!customer &&
+      Object.keys(errors).length === 0;
+
+    if (currentValues.type !== InvoiceType.CREDIT_NOTE) {
+      return !!valid;
+    }
+    return !!valid;
+  };
+
+  const handleContractPaymentTermsModal = (paymentTermId: string) => {
+    const paymentTermObj = contractPaymentTerms?.data.find(
+      ({id}) => id === paymentTermId,
+    );
+
+    if (paymentTermObj) {
+      setValue('paymentTerm', getFormattedPaymentTerms(paymentTermObj));
+    }
+
+    setValue(
+      'dueDate',
+      handleDueDateChange({
+        numberOfDaysToAdd: paymentTermObj?.data?.dueDays || 0,
+        hasPaymentTerm: true,
+      }),
+    );
+    setResetDueDatePicker(true);
+
+    if (paymentTermId) {
+      setOpenContractPaymentTermsDialog(false);
+    }
+  };
+
+  const handleClearContractPaymentTermsModal = () => {
+    setValue('paymentTerm', undefined);
+  };
+
+  const removeAddress = (
+    addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress',
+  ) => {
+    setValue(addressType, {fullName: null});
+  };
+
+  const setNewlyCreatedCustomer = (customerId: string) => {
+    setSearchParams(formatSearchParams({customerId}, searchParams));
+    setIsAddNewCustomerDialogOpen(false);
+  };
+  const {data: allInvoiceResource = createEmptyResource<InvoiceView>(10)} =
+    useInvoices(
+      {
+        pageIndex: 0,
+        pageSize: 4,
+        query:
+          watchedExternalId && watchedExternalId !== ''
+            ? encodeURIComponent(watchedExternalId)
+            : '',
+        status: [],
+        totalAmountFrom,
+        totalAmountTo,
+      },
+      {keepPreviousData: true},
+    );
+
+  const handleEditFrom = ({
+    name,
+    address,
+  }: {
+    name?: string;
+    address?: AddressRecord;
+  }) => {
+    setValue('alternativeServiceCompanyInfo', {
+      name,
+      address,
+    });
+    setIsEditFromDialogOpen(false);
+  };
+
+  const handlePaymentTypeChange = (key: PaymentType) => {
+    if (key === PaymentType.LUMP_SUM) {
+      setValue('payment', {
+        type: PaymentType.LUMP_SUM,
+        amount: {
+          value: 0,
+          currency: currentCurrency.code,
+          fractionDigits: currentCurrency.fractionDigits,
+        },
+        percentage: undefined,
+        description: watchedPaymentDescription || '',
+      });
+    } else if (key === PaymentType.PERCENTAGE) {
+      setValue('payment', {
+        type: PaymentType.PERCENTAGE,
+        percentage: 0,
+        amount: undefined,
+        description: watchedPaymentDescription || '',
+      });
+    } else {
+      setValue('payment', {
+        ...getValues('payment'),
+        type: key,
+      });
+      const updatedItems = watch('items')?.map((item) => ({
+        ...item,
+        payment: {
+          type: InvoiceItemPaymentType.PERCENTAGE,
+          percentage: 0,
+        },
+      }));
+      setValue('items', updatedItems);
+    }
+  };
+
+  const onSubmit = async (values: InvoiceFormData) => {
+    try {
+      const response = await onSave(values);
+      resetLocalStorage();
+      if (isNewInvoice) {
+        navigate(`/invoices/details/${response.value}`, {
+          replace: true,
+        });
+      } else {
+        navigate(-1);
+      }
+    } catch (error) {
+      showError(error);
+    }
+  };
+
+  const isEditAndNoCreator = !isNewInvoice && !invoice?.meta.creator;
+  const hasInvoiceCreator = invoice?.meta?.creator ?? false;
+
+  const createdByName = isEditAndNoCreator
+    ? t('Auto-generated')
+    : getUserFullName(
+        hasInvoiceCreator
+          ? {
+              firstName: invoice?.meta?.creator?.firstName,
+              lastName: invoice?.meta?.creator?.lastName,
+            }
+          : {
+              firstName: user?.userAccount.firstName,
+              lastName: user?.userAccount.lastName,
+            },
+      );
+
+  const createdByPhotoUrl = isEditAndNoCreator
+    ? undefined
+    : invoice?.meta?.creator?.photoUrl ?? user?.userAccount.photoUrl;
+
+  const createdBy = useMemo(
+    () => ({
+      name: createdByName,
+      photoUrl: createdByPhotoUrl,
+    }),
+    [createdByName, createdByPhotoUrl],
+  );
+
+  const notesText = selectedLng === 'DE' ? 'Schlussbemerkungen' : t('Notes');
+
+  const getInvoiceTypeText = () => {
+    const invoiceLabel =
+      watchedType !== InvoiceType.CREDIT_NOTE ? 'invoice' : '';
+    const text = `${InvoiceTypeMap[watchedType]} ${invoiceLabel}`.trim();
+
+    return t(text);
+  };
+
+  const hasAddressValues = (addressComponent?: AddressComponent) =>
+    Object.values(addressComponent ?? {}).some((value) => !!value);
+
+  const hasPreviousInvoices = previousInvoices.length > 0;
+  const firstInvoiceType = sortedPreviousInvoices?.[0]?.type ?? null;
+  const isFinalInvoice = watchedType === InvoiceType.FINAL;
+  const isCreditNoteInvoice = watchedType === InvoiceType.CREDIT_NOTE;
+  const havePartialInvoices = previousInvoices.some(
+    (i) => i.type === InvoiceType.PARTIAL,
+  );
+  const isPartialInvoice =
+    watchedType === InvoiceType.PARTIAL ||
+    (hasPreviousInvoices &&
+      !isCreditNoteInvoice &&
+      ((firstInvoiceType === InvoiceType.PARTIAL && isFinalInvoice) ||
+        (firstInvoiceType === InvoiceType.UPFRONT && havePartialInvoices)));
+  const isUpfrontInvoice =
+    !isPartialInvoice &&
+    (watchedType === InvoiceType.UPFRONT ||
+      (hasPreviousInvoices &&
+        firstInvoiceType === InvoiceType.UPFRONT &&
+        isFinalInvoice));
+  const paymentTypeTooltip = isPartialInvoice
+    ? 'Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article, You can’t change your selection later.'
+    : 'Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.';
+
   useEffect(() => {
     if (isNewInvoice && !initialNewLoadComplete) {
       if (invoice && invoiceId && pageState === PageState.DUPLICATE) {
@@ -1339,7 +1746,7 @@ export const InvoiceForm = ({
       } else if (initialLocalStorageData && !(customerId || orderId)) {
         initializeFormDataFromLocalStorage();
       } else {
-        formik.resetForm();
+        reset();
       }
       setInitialNewLoadComplete(true);
     } else if (!isNewInvoice && !initialLoadComplete) {
@@ -1352,12 +1759,10 @@ export const InvoiceForm = ({
 
   useEffect(() => {
     if (serviceOrder) {
-      formik.setFieldValue('serviceOrderId', serviceOrder.id);
+      setValue('serviceOrderId', serviceOrder.id);
       setFormFieldsFromServiceOrder(serviceOrder);
     }
   }, [serviceOrder]);
-
-  // Handle customer changes in edit mode
 
   useEffect(() => {
     if (customer && pageState === PageState.EDIT && !isNewInvoice) {
@@ -1467,7 +1872,7 @@ export const InvoiceForm = ({
 
   useEffect(() => {
     if (sortedPreviousInvoices.length > 0) {
-      formik.setFieldValue(
+      setValue(
         'discount',
         getDiscoutObj(
           sortedPreviousInvoices[sortedPreviousInvoices.length - 1]
@@ -1479,16 +1884,13 @@ export const InvoiceForm = ({
   }, [previousInvoices]);
 
   useEffect(() => {
-    formik.setFieldValue('subject', generateSubject());
-  }, [formik.values.type]);
+    setValue('subject', generateSubject());
+  }, [watchedType]);
 
   useEffect(() => {
     if (user) {
-      formik.setFieldValue(
-        'serviceCompanyId',
-        user?.userAccount.serviceCompany.id || '',
-      );
-      formik.setFieldValue('alternativeServiceCompanyInfo', {
+      setValue('serviceCompanyId', user?.userAccount.serviceCompany.id || '');
+      setValue('alternativeServiceCompanyInfo', {
         name: user?.userAccount?.serviceCompany?.name || '',
         address: user?.userAccount?.serviceCompany?.billingAddress,
       });
@@ -1499,10 +1901,10 @@ export const InvoiceForm = ({
     if (isNewInvoice) {
       localStorage.setItem(
         localStorageFormikInvoiceDataKey,
-        JSON.stringify(formik.values),
+        JSON.stringify(getValues()),
       );
     }
-  }, [formik.values]);
+  }, [getValues()]);
 
   useEffect(() => {
     if (isNewInvoice) {
@@ -1520,7 +1922,7 @@ export const InvoiceForm = ({
             setInitialLocalStorageData(null);
           }
         } catch (error) {
-          console.error('Error parsing localStorage data:', error);
+          showError(error);
           setInitialLocalStorageData(null);
         }
       } else {
@@ -1529,404 +1931,91 @@ export const InvoiceForm = ({
     }
   }, []);
 
-  const actions = useMemo(() => {
-    const items = [];
-    if (
-      invoice &&
-      ![
-        InvoiceStatus.NOT_PAID,
-        InvoiceStatus.EXPIRED,
-        InvoiceStatus.PARTIALLY_PAID,
-      ].includes(invoice.status)
-    ) {
-      items.push({
-        label: t('Delete'),
-        icon: <DeleteIcon />,
-        onClick: () => {
-          setIsDeleteDialogOpen(true);
-        },
-      });
-    }
-    return items;
-  }, [formik.values.dueDate]);
+  useEffect(() => {
+    // Check if we are creating a new quotation and we're starting fresh
+    const newIndex = getValues('items').length;
+    const defaultSeqNumber = (newIndex + 1).toString();
 
-  const handleDateFieldChange = (fieldName: string, newValue?: Date | null) => {
-    formik.setFieldValue(fieldName, newValue || undefined);
-  };
+    const defaultProps = {
+      netAmount: 0,
+      currency: currentCurrency.code,
+      percentageVat: defaultVat?.percentage,
+      vatId: defaultVat?.id,
+      vatName: defaultVat?.name,
+    };
 
-  const qrCurrency: QRCurrencyCode =
-    currentCurrency?.code === 'EUR' || currentCurrency?.code === 'CHF'
-      ? currentCurrency.code
-      : 'EUR';
-
-  const checkValidQrCode = useCallback(
-    debounce(async (qrInvoice: InvoiceView) => {
-      if (user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled) {
-        try {
-          const qrBillData = createQrData(
-            qrCurrency,
-            qrInvoice,
-            currentCurrency,
-            user?.userAccount,
-          );
-
-          const qrBillSvg = new SwissQRBill(qrBillData);
-
-          svgToJpegPng(
-            qrBillSvg.element as unknown as SVGSVGElement,
-            (result) => {
-              setQrImageSrc(result);
-            },
-            {format: 'jpeg', quality: 1},
-          );
-          setQrError(null);
-          return '';
-        } catch (error) {
-          if (error instanceof Error) {
-            setQrError(error.message);
-            return error.message;
-          }
-        }
-      }
-    }, 500),
-    [user, currentCurrency, qrCurrency],
-  );
-
-  const generateBlobUrl = async ({
-    invoiceData,
-    invoiceNumber,
-    setInState = true,
-  }: {
-    invoiceData: InvoiceView;
-    invoiceNumber?: string;
-    setInState?: boolean;
-  }) => {
-    if (
-      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
-      !qrImageSrc
-    ) {
-      enqueueSnackbar(qrError!, {
-        variant: 'error',
-      });
-      return;
-    }
-
-    let PdfTemplate;
-
-    if (
-      formik.values.type === InvoiceType.FULL ||
-      formik.values.type === InvoiceType.AGGREGATE
-    ) {
-      PdfTemplate = FullInvoicePdfTemplate;
-    } else if (formik.values.type === InvoiceType.CREDIT_NOTE) {
-      PdfTemplate = CreditNotePdfTemplate;
-    } else if (
-      formik.values?.type === InvoiceType.PARTIAL ||
-      formik.values?.type === InvoiceType.UPFRONT
-    ) {
-      PdfTemplate = PdfPartialUpfrontPreview;
-    } else {
-      PdfTemplate = PdfPreviewFinalInvoiceTermplate;
-    }
-
-    const shouldIncludePreviousInvoices = !(
-      formik.values?.type === InvoiceType.CREDIT_NOTE ||
-      formik.values?.type === InvoiceType.FULL ||
-      formik.values?.type === InvoiceType.AGGREGATE
-    );
-
-    const invoiceAmountDetail = await calculateInvoiceAmount({
-      data: {
-        currency: currentCurrency.code,
-        items: formik.values.items.map((item) => ({
-          ...item,
-          article: {
-            ...item.article,
-            id: undefined,
-          },
-        })),
-        globalDiscount: formik.values.discount,
-        paymentRecord: formik.values.payment,
+    const newItem: EditableInvoiceItem = {
+      id: getUniqueId(),
+      userSeqNumber: defaultSeqNumber,
+      name: '',
+      quantity: 1,
+      unitAmount: defaultProps,
+      unitPurchaseAmount: defaultProps,
+      article: {
+        type: ArticleType.OTHER,
+        unit: 'kg',
+        unitSellingAmount: defaultProps,
+        unitPurchaseAmount: defaultProps,
+        name: '',
+        externalId: '',
       },
-    });
-
-    const blob = await pdf(
-      <PdfTemplate
-        userInfo={user?.userAccount}
-        pdfConfigClientStorage={pdfConfig}
-        currentCurrency={currentCurrency}
-        invoice={invoiceData}
-        invoiceAmountDetail={invoiceAmountDetail}
-        selectedLng={company?.language}
-        translate={translate}
-        previousInvoices={
-          shouldIncludePreviousInvoices ? sortedPreviousInvoices : []
-        }
-        headerPath={headerUrl[headerInfo?.path]}
-        headerInfo={headerInfo}
-        footerPath={footerUrl[footerInfo?.path]}
-        footerInfo={footerInfo}
-        nextCompanyExternalId={
-          invoiceNumber || translate('Automatically assigned')
-        }
-        qrImageSrc={qrImageSrc}
-      />,
-    ).toBlob();
-    const blobURL = URL.createObjectURL(blob);
-    if (setInState) setFilePathToDownload(blobURL);
-    return blob;
-  };
-
-  const {vats, amountAfterGlobalDiscountWithVAT} = useMemo(
-    () =>
-      calculateArticlesAmount({
-        items: formik.values.items,
-        globalDiscount: formik.values.discount,
-      }),
-    [formik.values.items, formik.values.discount],
-  );
-
-  const handlePreview = async () => {
-    const subtotalExclVat = calculateQuotationTotalWithPerItemDiscount(
-      formik.values.items,
-    );
-
-    const mappedVats = vats.map((vat) => ({
-      ...vat,
-      vat: moneyToCents(currentCurrency.code, vat.vat),
-    }));
-
-    const pdfInvoice = generatePdfInvoice(
-      formik.values,
-      currentCurrency,
-      subtotalExclVat,
-      amountAfterGlobalDiscountWithVAT,
-      mappedVats,
-      company,
-      serviceOrder,
-      customer,
-      invoice,
-    );
-    await checkValidQrCode(pdfInvoice);
-
-    await generateBlobUrl({
-      invoiceData: pdfInvoice,
-      invoiceNumber: translate('Automatically assigned'),
-      setInState: true,
-    });
-  };
-
-  const isValid = () => {
-    const hasValidVat = formik.values.items.every((item) => {
-      const {vatId, percentageVat} = item.unitAmount;
-
-      return taxRates?.some(
-        (rate) =>
-          rate.id === vatId ||
-          (percentageVat !== undefined && rate.percentage === percentageVat),
-      );
-    });
-
-    const hasEmptyItemName = formik.values.items.some(
-      (item) => !item.name?.trim(),
-    );
-
-    const valid =
-      formik.values.subject &&
-      formik.values.type.length &&
-      formik.values.items.length &&
-      !hasEmptyItemName &&
-      !!customer &&
-      hasValidVat &&
-      Object.keys(formik.errors).length === 0;
-
-    if (formik.values.type !== InvoiceType.CREDIT_NOTE) {
-      return !!valid;
-    }
-    return !!valid;
-  };
-
-  const handleContractPaymentTermsModal = (paymentTermId: string) => {
-    const paymentTermObj = contractPaymentTerms?.data.find(
-      ({id}) => id === paymentTermId,
-    );
-
-    if (paymentTermObj) {
-      formik.setFieldValue(
-        'paymentTerm',
-        getFormattedPaymentTerms(paymentTermObj),
-      );
-    }
-
-    formik.setFieldValue(
-      'dueDate',
-      handleDueDateChange({
-        numberOfDaysToAdd: paymentTermObj?.data?.dueDays || 0,
-        hasPaymentTerm: true,
-      }),
-    );
-    setResetDueDatePicker(true);
-
-    if (paymentTermId) {
-      setOpenContractPaymentTermsDialog(false);
-    }
-  };
-
-  const handleClearContractPaymentTermsModal = () => {
-    formik.setFieldValue('paymentTerm', undefined);
-  };
-
-  const removeAddress = (
-    addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress',
-  ) => {
-    formik.setFieldValue(addressType, {fullName: null});
-  };
-
-  const setNewlyCreatedCustomer = (customerId: string) => {
-    setSearchParams(formatSearchParams({customerId}, searchParams));
-    setIsAddNewCustomerDialogOpen(false);
-  };
-  const {data: allInvoiceResource = createEmptyResource<InvoiceView>(10)} =
-    useInvoices(
-      {
-        pageIndex: 0,
-        pageSize: 4,
-        query:
-          formik.values.externalId && formik.values.externalId !== ''
-            ? encodeURIComponent(formik.values.externalId)
-            : '',
-        status: [],
-        totalAmountFrom,
-        totalAmountTo,
-      },
-      {keepPreviousData: true},
-    );
-
-  const handleEditFrom = ({
-    name,
-    address,
-  }: {
-    name?: string;
-    address?: AddressRecord;
-  }) => {
-    formik.setFieldValue('alternativeServiceCompanyInfo', {
-      name,
-      address,
-    });
-    setIsEditFromDialogOpen(false);
-  };
-
-  const setInvoiceItems = (invoiceItems: InvoiceItemRecord[]) => {
-    formik.setFieldValue('items', invoiceItems);
-
-    const newNotes = syncVatLegalNotesWithNotes({
-      oldArticles: formik.values.items,
-      newArticles: invoiceItems,
-      currentNotes: formik.values.moreInfo || '',
-      taxRates,
-    });
-    formik.setFieldValue('moreInfo', newNotes);
-  };
-
-  const handlePaymentTypeChange = (key: string) => {
-    if (key === PaymentType.LUMP_SUM) {
-      formik.setFieldValue('payment', {
-        type: PaymentType.LUMP_SUM,
-        amount: {
-          value: 0,
-          currency: currentCurrency.code,
-          fractionDigits: currentCurrency.fractionDigits,
-        },
-        percentage: undefined,
-        description: formik.values.payment?.description || '',
-      });
-    } else if (key === PaymentType.PERCENTAGE) {
-      formik.setFieldValue('payment', {
-        type: PaymentType.PERCENTAGE,
+      subItems: [],
+      description: '',
+      discount: {
+        type: DiscountType.PERCENTAGE,
         percentage: 0,
-        amount: undefined,
-        description: formik.values.payment?.description || '',
-      });
-    } else {
-      formik.setFieldValue('payment', {
-        ...formik.values.payment,
-        type: key,
-      });
-      const updatedItems = formik.values.items?.map((item) => ({
-        ...item,
-        payment: {
-          type: InvoiceItemPaymentType.PERCENTAGE,
-          percentage: 0,
-        },
-      }));
-      formik.setFieldValue('items', updatedItems);
+      },
+      subItemsConfig: {subItemsVisible: false, priceVisible: false},
+    };
+
+    if (
+      isNewInvoice &&
+      pageState === 'FRESH_NEW' &&
+      !invoice &&
+      (!getValues('items') || getValues('items').length === 0)
+    ) {
+      setValue('items', [newItem]);
     }
-  };
+  }, [isNewInvoice, pageState]);
 
-  const isEditAndNoCreator = !isNewInvoice && !invoice?.meta.creator;
-  const hasInvoiceCreator = invoice?.meta?.creator ?? false;
+  const recalcInvoice = useCallback(
+    debounce(async () => {
+      const currentValues = getValues();
+      const currentItems = currentValues.items;
 
-  const createdByName = isEditAndNoCreator
-    ? t('Auto-generated')
-    : getUserFullName(
-        hasInvoiceCreator
-          ? {
-              firstName: invoice?.meta?.creator?.firstName,
-              lastName: invoice?.meta?.creator?.lastName,
-            }
-          : {
-              firstName: user?.userAccount.firstName,
-              lastName: user?.userAccount.lastName,
-            },
+      const hasEmptyItemName = currentItems.some((item) => !item.name?.trim());
+      const hasMixItemWithoutSubItems = currentItems.some(
+        (item) =>
+          item.article?.type === ArticleType.MIX &&
+          (!item.subItems || item.subItems.length === 0),
       );
 
-  const createdByPhotoUrl = isEditAndNoCreator
-    ? undefined
-    : invoice?.meta?.creator?.photoUrl ?? user?.userAccount.photoUrl;
+      if (hasEmptyItemName || hasMixItemWithoutSubItems) {
+        return;
+      }
 
-  const createdBy = useMemo(
-    () => ({
-      name: createdByName,
-      photoUrl: createdByPhotoUrl,
-    }),
-    [createdByName, createdByPhotoUrl],
+      try {
+        const payload = buildInvoicePayload(
+          currentItems,
+          currentCurrency,
+          currentValues.discount,
+        );
+
+        const detail = await calculateInvoiceAmount({
+          data: payload,
+        });
+
+        setInvoiceAmountDetail(detail);
+      } catch (error) {
+        showError(error);
+      }
+    }, 300),
+    [calculateInvoiceAmount, currentCurrency, getValues, setValue, pageState],
   );
 
-  const notesText = selectedLng === 'DE' ? 'Schlussbemerkungen' : t('Notes');
-
-  const getInvoiceTypeText = () => {
-    const invoiceLabel =
-      formik.values.type !== InvoiceType.CREDIT_NOTE ? 'invoice' : '';
-    const text = `${InvoiceTypeMap[formik.values.type]} ${invoiceLabel}`.trim();
-
-    return t(text);
-  };
-
-  const hasAddressValues = (addressComponent?: AddressComponent) =>
-    Object.values(addressComponent ?? {}).some((value) => !!value);
-
-  const hasPreviousInvoices = previousInvoices.length > 0;
-  const firstInvoiceType = sortedPreviousInvoices?.[0]?.type ?? null;
-  const isFinalInvoice = formik.values.type === InvoiceType.FINAL;
-  const isCreditNoteInvoice = formik.values.type === InvoiceType.CREDIT_NOTE;
-  const havePartialInvoices = previousInvoices.some(
-    (i) => i.type === InvoiceType.PARTIAL,
-  );
-  const isPartialInvoice =
-    formik.values.type === InvoiceType.PARTIAL ||
-    (hasPreviousInvoices &&
-      !isCreditNoteInvoice &&
-      ((firstInvoiceType === InvoiceType.PARTIAL && isFinalInvoice) ||
-        (firstInvoiceType === InvoiceType.UPFRONT && havePartialInvoices)));
-  const isUpfrontInvoice =
-    !isPartialInvoice &&
-    (formik.values.type === InvoiceType.UPFRONT ||
-      (hasPreviousInvoices &&
-        firstInvoiceType === InvoiceType.UPFRONT &&
-        isFinalInvoice));
-  const paymentTypeTooltip = isPartialInvoice
-    ? 'Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article, You can’t change your selection later.'
-    : 'Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.';
+  useEffect(() => {
+    recalcInvoice();
+  }, [recalcInvoice]);
 
   if (isLoadingTaxRates || isLoadingCreditNoteArticles) {
     return (
@@ -1958,6 +2047,379 @@ export const InvoiceForm = ({
         </Box>
       )}
 
+      <Grid pb={3} borderRadius={1}>
+        <Grid
+          container
+          item
+          xs={12}
+          bgcolor="white"
+          rowGap={4}
+          px={3}
+          py={3}
+          borderRadius={1}>
+          <Box pb={0.5}>
+            <SectionTitle Icon={PinIllustration} title="General Information" />
+          </Box>
+
+          <Grid container spacing={2}>
+            <Grid item xs={6} md={3}>
+              <Box>
+                <Typography variant="body2" color="grey.700">
+                  {t('Created By')}
+                </Typography>
+                <Box display="flex" alignItems="center" gap={1} pt={1} pb={0.5}>
+                  <Avatar
+                    src={createdBy.photoUrl}
+                    sx={{width: 24, height: 24}}
+                  />
+                  <Typography variant="subtitle2" color="primary.dark">
+                    {createdBy.name}
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+
+            <Grid item xs={6} md={3}>
+              <Box>
+                <Typography variant="body2" color="grey.700">
+                  {T('Invoice type')}
+                </Typography>
+                <Typography variant="subtitle2" color="primary.dark" pt={0.5}>
+                  {getInvoiceTypeText()}
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={6} md={3}>
+              {/* PAYMENT TYPE */}
+              {/* don't show payment type for FULL, FINAL and CREDIT_NOTE invoices */}{' '}
+              {[InvoiceType.PARTIAL, InvoiceType.UPFRONT].includes(
+                getValues('type'),
+              ) ? (
+                <Box>
+                  <Typography variant="body2" color="grey.700">
+                    {T('Payment type')}
+                    <Tooltip title={T(paymentTypeTooltip)} placement="top">
+                      <IconButton sx={{p: 0, ml: 0.5}}>
+                        <InfoOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Typography>
+                  <RadioGroup
+                    defaultValue={PaymentType.LUMP_SUM}
+                    name="radio-buttons-group">
+                    {Object.entries(PaymentTypeOptions).map(([key, value]) =>
+                      getValues('type') === InvoiceType.UPFRONT &&
+                      key === PaymentType.PER_ITEM ? null : (
+                        <FormControlLabel
+                          key={key}
+                          value={key}
+                          control={<Radio size="small" />}
+                          label={T(value)}
+                          onChange={() =>
+                            handlePaymentTypeChange(key as PaymentType)
+                          }
+                          checked={getValues('payment')?.type === key}
+                          disabled={
+                            (!previousInvoices.filter(
+                              (item) => item.status !== InvoiceStatus.CANCELLED,
+                            ).length &&
+                              isNewInvoice) ||
+                            (previousInvoices.filter(
+                              (item) => item.status !== InvoiceStatus.CANCELLED,
+                            ).length === 1 &&
+                              !isNewInvoice) ||
+                            (!previousInvoices.filter(
+                              (item) => item.status !== InvoiceStatus.CANCELLED,
+                            ).length &&
+                              !isNewInvoice)
+                              ? false
+                              : key !==
+                                sortedPreviousInvoices?.[0]?.additionalInfo
+                                  ?.payment?.type
+                          }
+                        />
+                      ),
+                    )}
+                  </RadioGroup>
+                </Box>
+              ) : null}
+            </Grid>
+          </Grid>
+
+          <Grid container rowGap={2} spacing={2}>
+            <Grid item xs={6} md={3}>
+              <DatePicker
+                defaultDate={
+                  getValues('sentDate')
+                    ? new Date(getValues('sentDate') as Date)
+                    : undefined
+                }
+                getSelectedDate={(newValue) =>
+                  handleDateFieldChange('sentDate', newValue)
+                }
+                textFieldProps={{
+                  label: (
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      {t('Invoice Date')}
+                      <Tooltip
+                        title={t(
+                          "The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.",
+                        )}
+                        placement="top">
+                        <IconButton sx={{p: 0}}>
+                          <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0.5}} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ),
+                  ...register('sentDate'),
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={6} md={3}>
+              <DatePicker
+                defaultDate={
+                  getValues('dueDate')
+                    ? new Date(getValues('dueDate') as Date)
+                    : undefined
+                }
+                reset={resetDueDatePicker}
+                getReset={(_reset) => {
+                  if (_reset) setResetDueDatePicker(false);
+                }}
+                errorMessage={dueDateError}
+                getSelectedDate={(newValue) => {
+                  setDueDateError('');
+                  handleDateFieldChange('dueDate', newValue);
+                }}
+                textFieldProps={{
+                  label: (
+                    <Box display="flex" alignItems="center" gap={0.5}>
+                      {t('Payment Due Date')}
+                      <Tooltip
+                        title={t(
+                          getValues('paymentTerm')?.id
+                            ? 'The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.'
+                            : 'The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.',
+                        )}
+                        placement="top">
+                        <IconButton sx={{p: 0}}>
+                          <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0.5}} />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ),
+                  ...register('dueDate'),
+                }}
+                disabled={!!getValues('paymentTerm')?.id}
+                inputTestId="payment-due-date"
+                popupTestId="payment-due-date-popup"
+              />
+            </Grid>
+
+            <Grid item xs={6} md={3}></Grid>
+
+            <Grid item xs={6} md={3}></Grid>
+          </Grid>
+
+          <Grid container rowGap={2}>
+            <Typography variant="body2" color="grey.700" pb={1.5}>
+              {T('Delivery date')}
+            </Typography>
+
+            <Grid container rowGap={2} spacing={2}>
+              <Grid item xs={6} md={3}>
+                <DatePicker
+                  defaultDate={
+                    getValues('deliveryStartDate')
+                      ? new Date(getValues('deliveryStartDate') as Date)
+                      : undefined
+                  }
+                  getSelectedDate={(newValue) => {
+                    handleDateFieldChange('deliveryStartDate', newValue);
+                  }}
+                  textFieldProps={{
+                    label: 'Start Date',
+                    ...register('deliveryStartDate'),
+                    ...(serviceOrder &&
+                      !getValues('deliveryStartDate') && {
+                        placeholder: t('No Start Date set'),
+                        sx: {
+                          input: {
+                            '&::placeholder': {
+                              typography: 'caption',
+                            },
+                          },
+                        },
+                      }),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={6} md={3}>
+                <DatePicker
+                  defaultDate={
+                    getValues('deliveryEndDate')
+                      ? new Date(getValues('deliveryEndDate') as Date)
+                      : undefined
+                  }
+                  getSelectedDate={(newValue) => {
+                    handleDateFieldChange('deliveryEndDate', newValue);
+                  }}
+                  textFieldProps={{
+                    label: 'End Date',
+                    ...register('deliveryEndDate'),
+                    ...(serviceOrder &&
+                      !getValues('deliveryEndDate') && {
+                        placeholder: t('No End Date set'),
+                        sx: {
+                          input: {
+                            '&::placeholder': {
+                              typography: 'caption',
+                            },
+                          },
+                        },
+                      }),
+                  }}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid container rowGap={2} spacing={2}>
+            <Grid item xs={6} md={3}>
+              <FormInput
+                fieldProps={{
+                  id: 'externalId',
+                  placeholder: t('Automatically assigned'),
+                  label: 'Invoice Number',
+                  value: getValues('externalId'),
+                  onChange: (e) => setValue('externalId', e.target.value),
+                  error: !!errors.externalId,
+                  helperText: errors.externalId?.message,
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={6} md={3}>
+              <Controller
+                name="elevatorExternalId"
+                control={control}
+                render={({field, fieldState: {error}}) => (
+                  <FormInput
+                    fieldProps={{
+                      ...field,
+                      id: 'elevatorExternalId',
+                      label: 'Unit Number',
+                      error: !!error,
+                      helperText: error ? error.message : '',
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={6} md={3}>
+              <Controller
+                name="purchaseOrderNumber"
+                control={control}
+                render={({field, fieldState: {error}}) => (
+                  <FormInput
+                    fieldProps={{
+                      ...field,
+                      id: 'purchaseOrderNumber',
+                      label: 'Purchase order no.',
+                      error: !!error,
+                      helperText: error ? error.message : '',
+                      placeholder: 'e.g 000 000 000',
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={6} md={3}>
+              <Controller
+                name="costCenter"
+                control={control}
+                render={({field, fieldState: {error}}) => (
+                  <FormInput
+                    fieldProps={{
+                      ...field,
+                      id: 'costCenter',
+                      label: 'Cost Center',
+                      error: !!error,
+                      helperText: error ? error.message : '',
+                      placeholder: 'e.g 000 000 000',
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid container item xs={12} flexDirection="column">
+            <Box pb={0.5}>
+              <SectionTitle
+                Icon={TaskListPenIllustration}
+                title="Additional documents"
+              />
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                width: 'max-content',
+              }}>
+              <InvoiceCheckboxNEW
+                disabled={!isWorkReportPDFGenerated}
+                handleChange={() =>
+                  setValue('includeWorkReport', !getValues('includeWorkReport'))
+                }
+                tooltipTitle="No work report for the selected service job"
+                checkboxLabel="Add work report to invoice"
+                checked={
+                  !!(isWorkReportPDFGenerated && getValues('includeWorkReport'))
+                }
+                handleAction={() =>
+                  window.open(
+                    `/orders/details/${serviceOrder?.id}?tab=1`,
+                    '_blank',
+                  )
+                }
+              />
+            </Box>
+
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                width: 'max-content',
+              }}>
+              <InvoiceCheckboxNEW
+                disabled={!isCheckListPDFGenerated}
+                handleChange={() =>
+                  setValue('includeCheckList', !getValues('includeCheckList'))
+                }
+                tooltipTitle="No checklist for selected service job"
+                checkboxLabel="Add checklist to invoice"
+                checked={
+                  !!(isCheckListPDFGenerated && getValues('includeCheckList'))
+                }
+                handleAction={() =>
+                  window.open(
+                    `/orders/details/${serviceOrder?.id}?tab=2`,
+                    '_blank',
+                  )
+                }
+              />
+            </Box>
+          </Grid>
+        </Grid>
+      </Grid>
+
       <Grid
         container
         columnGap={3}
@@ -1965,29 +2427,21 @@ export const InvoiceForm = ({
         alignItems="flex-start"
         wrap="nowrap"
         mb={12}>
-        <Grid container item xs={8} xl={9} rowGap={2} borderRadius={1}>
+        <Grid container item xs={12} rowGap={3} borderRadius={1}>
           {/* ADDRESS INFORMATION */}
           <Grid
-            container
-            item
             xs={12}
             bgcolor="white"
-            p={3}
-            rowGap={2}
-            flexWrap="wrap">
+            rowGap={4}
+            px={3}
+            py={5}
+            borderRadius={1}>
             <Grid item xs={12} display="flex" justifyContent="space-between">
               <Box pb={0.5}>
                 <SectionTitle
                   Icon={MapPinIllustration}
                   title="Address information"
                 />
-              </Box>
-              <Box pb={0.5}>
-                {!isNewInvoice ? (
-                  <Notes invoice={invoice!} />
-                ) : (
-                  <CreateNotes formik={formik} customer={customer} />
-                )}
               </Box>
             </Grid>
 
@@ -2007,17 +2461,15 @@ export const InvoiceForm = ({
                     borderRadius={1}>
                     <Box position="relative" width="100%">
                       <Typography variant="body2">
-                        {formik.values.alternativeServiceCompanyInfo?.name ??
-                          ''}
+                        {watchedAlternativeServiceCompanyInfo?.name ?? ''}
                       </Typography>
                       <Box color="text.secondary">
-                        {formik.values.alternativeServiceCompanyInfo?.address
+                        {watchedAlternativeServiceCompanyInfo?.address
                           ?.fullName ? (
                           <Typography variant="caption">
                             {
                               formatAddressFullname(
-                                formik.values.alternativeServiceCompanyInfo
-                                  .address,
+                                watchedAlternativeServiceCompanyInfo.address,
                                 t,
                               )?.fullName
                             }
@@ -2060,17 +2512,7 @@ export const InvoiceForm = ({
                     getCustomer={handleCustomerChange}
                     initialValue={(customer as PropertyOwnerView) || null}
                     textFieldProps={{
-                      error: !!(
-                        formik.errors.propertyOwnerId &&
-                        formik.touched.propertyOwnerId
-                      ),
-                      helperText:
-                        formik.errors.propertyOwnerId &&
-                        formik.touched.propertyOwnerId
-                          ? T(formik.errors.propertyOwnerId)
-                          : '',
                       name: 'propertyOwnerId',
-                      onBlur: formik.handleBlur,
                     }}
                   />
                 </Box>
@@ -2078,106 +2520,112 @@ export const InvoiceForm = ({
             </Grid>
 
             {customer && (
-              <>
-                <Grid item xs={6}>
-                  <SelectAndEditCombined
-                    selected={hasAddressValues(billingAddress!)}
-                    label="Billing Address"
-                    buttonText="Add Billing Address"
-                    address={formik.values.billingAddress}
-                    cardOnClose={() => removeAddress('billingAddress')}
-                    editButtonText={
-                      !billingAddress
-                        ? 'Add Billing Address'
-                        : 'Edit Billing Address'
-                    }
-                    modalHeader={
-                      !billingAddress
-                        ? 'Add Billing Address'
-                        : 'Edit Billing Address'
-                    }
-                    addressType="billingAddress"
-                    formik={formik}
-                    customerName={customer?.name}
-                    translate={translateCompanyLanguage}
-                  />
-                </Grid>
-                <Grid item xs={6} pl={2}>
-                  <SelectAndEditCombined
-                    selected={hasAddressValues(beneficiaryAddress!)}
-                    label="Beneficiary Address"
-                    buttonText="Add Beneficiary Address"
-                    address={formik.values.beneficiaryAddress}
-                    cardOnClose={() => removeAddress('beneficiaryAddress')}
-                    editButtonText={
-                      !beneficiaryAddress
-                        ? 'Add Beneficiary Address'
-                        : 'Edit Beneficiary Address'
-                    }
-                    modalHeader={
-                      !beneficiaryAddress
-                        ? 'Add Beneficiary Address'
-                        : 'Edit Beneficiary Address'
-                    }
-                    addressType="beneficiaryAddress"
-                    formik={formik}
-                    customerName={customer?.name}
-                    translate={translateCompanyLanguage}
-                  />
+              <Grid container spacing={2} my={2}>
+                <Grid container item xs={12} spacing={2}>
+                  <Grid item xs={6}>
+                    <SelectAndEditCombined
+                      selected={hasAddressValues(billingAddress!)}
+                      label="Billing Address"
+                      buttonText="Add Billing Address"
+                      address={watchedBillingAddress}
+                      cardOnClose={() => removeAddress('billingAddress')}
+                      editButtonText={
+                        !billingAddress
+                          ? 'Add Billing Address'
+                          : 'Edit Billing Address'
+                      }
+                      modalHeader={
+                        !billingAddress
+                          ? 'Add Billing Address'
+                          : 'Edit Billing Address'
+                      }
+                      addressType="billingAddress"
+                      formMethods={formMethods}
+                      customerName={customer?.name}
+                      translate={translateCompanyLanguage}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <SelectAndEditCombined
+                      selected={hasAddressValues(beneficiaryAddress!)}
+                      label="Beneficiary Address"
+                      buttonText="Add Beneficiary Address"
+                      address={watchedBeneficiaryAddress}
+                      cardOnClose={() => removeAddress('beneficiaryAddress')}
+                      editButtonText={
+                        !beneficiaryAddress
+                          ? 'Add Beneficiary Address'
+                          : 'Edit Beneficiary Address'
+                      }
+                      modalHeader={
+                        !beneficiaryAddress
+                          ? 'Add Beneficiary Address'
+                          : 'Edit Beneficiary Address'
+                      }
+                      addressType="beneficiaryAddress"
+                      formMethods={formMethods}
+                      customerName={customer?.name}
+                      translate={translateCompanyLanguage}
+                    />
+                  </Grid>
                 </Grid>
 
-                <Grid item xs={6} display="flex" flexDirection="column" gap={3}>
-                  <SelectAndEditCombined
-                    selected={hasAddressValues(alternativeAddress!)}
-                    label={
-                      <Box>
-                        <FormLabel
-                          text={t('Alternative Invoice Destination')}
-                        />
-                        <Tooltip
-                          title={T(alternativeInvoiceDestinationTooltip) ?? ''}
-                          placement="top"
-                          componentsProps={{
-                            tooltip: {
-                              sx: {
-                                bgcolor: 'common.gray',
-                                maxWidth: 500,
-                                padding: '1em',
-                                fontSize: '0.85rem',
+                <Grid container item xs={12} spacing={2}>
+                  <Grid item xs={6}>
+                    <SelectAndEditCombined
+                      selected={hasAddressValues(alternativeAddress!)}
+                      label={
+                        <Box>
+                          <FormLabel
+                            text={t('Alternative Invoice Destination')}
+                          />
+                          <Tooltip
+                            title={
+                              T(alternativeInvoiceDestinationTooltip) ?? ''
+                            }
+                            placement="top"
+                            componentsProps={{
+                              tooltip: {
+                                sx: {
+                                  bgcolor: 'common.gray',
+                                  maxWidth: 500,
+                                  padding: '1em',
+                                  fontSize: '0.85rem',
+                                },
                               },
-                            },
-                          }}>
-                          <IconButton
-                            sx={{
-                              fontSize: '1.375rem',
-                              paddingTop: 0,
-                              paddingBottom: 0,
                             }}>
-                            <InfoOutlinedIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    }
-                    buttonText="Add Alternative Address"
-                    address={formik.values.alternativeAddress}
-                    cardOnClose={() => removeAddress('alternativeAddress')}
-                    editButtonText={
-                      !alternativeAddress
-                        ? 'Add Alternative Address'
-                        : 'Edit Alternative Address'
-                    }
-                    modalHeader={
-                      !alternativeAddress
-                        ? 'Add Alternative Address'
-                        : 'Edit Alternative Address'
-                    }
-                    addressType="alternativeAddress"
-                    formik={formik}
-                    customerName={customer?.name}
-                    translate={translateCompanyLanguage}
-                  />
+                            <IconButton
+                              sx={{
+                                fontSize: '1.375rem',
+                                paddingTop: 0,
+                                paddingBottom: 0,
+                              }}>
+                              <InfoOutlinedIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      }
+                      buttonText="Add Alternative Address"
+                      address={watchedAlternativeAddress}
+                      cardOnClose={() => removeAddress('alternativeAddress')}
+                      editButtonText={
+                        !alternativeAddress
+                          ? 'Add Alternative Address'
+                          : 'Edit Alternative Address'
+                      }
+                      modalHeader={
+                        !alternativeAddress
+                          ? 'Add Alternative Address'
+                          : 'Edit Alternative Address'
+                      }
+                      addressType="alternativeAddress"
+                      formMethods={formMethods}
+                      customerName={customer?.name}
+                      translate={translateCompanyLanguage}
+                    />
+                  </Grid>
                 </Grid>
-              </>
+              </Grid>
             )}
 
             <Grid item xs={12}>
@@ -2233,72 +2681,84 @@ export const InvoiceForm = ({
             <Box pb={0.5}>
               <SectionTitle Icon={HeaderIllustration} title="Header" />
             </Box>
-            <RichTextField
+            <Controller
               name="subject"
-              label="Subject"
-              html={formik.values.subject || ''}
-              updateHtml={(h) => formik.setFieldValue('subject', h)}
-              onBlur={formik.handleBlur}
-              helperText={
-                formik.touched.subject ? formik.errors.subject : undefined
-              }
-              error={!!(formik.touched.subject && formik.errors.subject)}
-              endAdornment={
-                <InputAdornment
-                  component={IconButton}
-                  disableRipple
-                  position="end"
-                  sx={{
-                    mr: -1,
-                    alignSelf: 'center',
-                  }}
-                  onClick={() => {
-                    setOpenTextBlockDialog(true);
-                    setTextBlockField('SUBJECT');
-                  }}
-                  size="small">
-                  <TextSnippetIcon />
-                </InputAdornment>
-              }
+              control={control}
+              render={({field}) => (
+                <RichTextField
+                  label="Subject"
+                  html={field.value || ''}
+                  updateHtml={field.onChange}
+                  onBlur={field.onBlur}
+                  helperText={errors.subject?.message}
+                  error={!!errors.subject}
+                  endAdornment={
+                    <InputAdornment
+                      component={IconButton}
+                      disableRipple
+                      position="end"
+                      sx={{
+                        mr: -1,
+                        alignSelf: 'center',
+                      }}
+                      onClick={() => {
+                        setOpenTextBlockDialog(true);
+                        setTextBlockField('SUBJECT');
+                      }}
+                      size="small">
+                      <TextSnippetIcon />
+                    </InputAdornment>
+                  }
+                />
+              )}
             />
 
-            <RichTextField
+            <Controller
               name="description"
-              label="Description"
-              html={formik.values.description || ''}
-              updateHtml={(h) => formik.setFieldValue('description', h)}
-              minRows={2}
-              onBlur={formik.handleBlur}
-              endAdornment={
-                <InputAdornment
-                  component={IconButton}
-                  disableRipple
-                  position="end"
-                  sx={{
-                    mt: 1,
-                    mr: -1,
-                    alignSelf: 'flex-start',
-                  }}
-                  onClick={() => {
-                    setOpenTextBlockDialog(true);
-                    setTextBlockField('DESCRIPTION');
-                  }}
-                  size="small">
-                  <TextSnippetIcon />
-                </InputAdornment>
-              }
+              control={control}
+              render={({field}) => (
+                <RichTextField
+                  label="Description"
+                  html={field?.value || ''}
+                  updateHtml={field.onChange}
+                  onBlur={field.onBlur}
+                  helperText={errors.description?.message}
+                  error={!!errors.description}
+                  endAdornment={
+                    <InputAdornment
+                      component={IconButton}
+                      disableRipple
+                      position="end"
+                      sx={{
+                        mr: -1,
+                        alignSelf: 'center',
+                      }}
+                      onClick={() => {
+                        setOpenTextBlockDialog(true);
+                        setTextBlockField('DESCRIPTION');
+                      }}
+                      size="small">
+                      <TextSnippetIcon />
+                    </InputAdornment>
+                  }
+                />
+              )}
             />
           </Grid>
 
-          {/* ARTICLES */}
-          <InvoiceFormArticleSection
-            setItems={setInvoiceItems}
-            formik={formik}
-            showArticleSection={formik.values.showArticleSection}
-            propertyOwner={customer}
-            enableCollapse={formik.values.type !== InvoiceType.FULL}
-            jobArticles={serviceOrder?.articles}
-          />
+          <Grid item xs={12} bgcolor="white" p={3}>
+            <Box pb={2}>
+              <SectionTitle
+                Icon={WrenchScrewdriverIllustration}
+                title="Positions"
+              />
+              <InvoicePositionTable
+                formMethods={formMethods}
+                invoiceAmountDetail={invoiceAmountDetail}
+                onRecalcInvoice={recalcInvoice}
+              />
+            </Box>
+          </Grid>
 
           {/* PARTIAL PAYMENTS */}
           {isPartialInvoice ? (
@@ -2306,7 +2766,7 @@ export const InvoiceForm = ({
               <Progress />
             ) : (
               <PartialPaymentsSection
-                formik={formik}
+                formMethods={formMethods}
                 previousInvoices={sortedPreviousInvoices}
                 invoice={invoice}
               />
@@ -2319,7 +2779,7 @@ export const InvoiceForm = ({
               <Progress />
             ) : (
               <UpfrontPaymentsSection
-                formik={formik}
+                formMethods={formMethods}
                 previousInvoices={sortedPreviousInvoices}
                 invoice={invoice}
               />
@@ -2332,431 +2792,84 @@ export const InvoiceForm = ({
               <SectionTitle Icon={FooterIllustration} title="Footer" />
             </Box>
 
-            <RichTextField
+            <Controller
               name="moreInfo"
-              label={notesText}
-              html={formik.values.moreInfo || ''}
-              updateHtml={(h) => formik.setFieldValue('moreInfo', h)}
-              minRows={2}
-              onBlur={formik.handleBlur}
-              endAdornment={
-                <InputAdornment
-                  component={IconButton}
-                  disableRipple
-                  position="end"
-                  sx={{
-                    mt: 1,
-                    mr: -1,
-                    alignSelf: 'flex-start',
-                  }}
-                  onClick={() => {
-                    setOpenTextBlockDialog(true);
-                    setTextBlockField('NOTES');
-                  }}
-                  size="small">
-                  <TextSnippetIcon />
-                </InputAdornment>
-              }
-            />
-
-            <RichTextField
-              data-testid="payment-terms-rich-text-field"
-              name="paymentTerms"
-              label="Payment terms"
-              html={formik.values.paymentTerm?.term || ''}
-              updateHtml={(term) =>
-                stripHtmlTags(term)
-                  ? formik.setFieldValue('paymentTerm', {
-                      ...formik.values.paymentTerm,
-                      term,
-                    })
-                  : formik.setFieldValue('paymentTerm', undefined)
-              }
-              minRows={2}
-              onBlur={formik.handleBlur}
-              endAdornment={
-                <InputAdornment
-                  component={IconButton}
-                  disableRipple
-                  position="end"
-                  sx={{
-                    mt: 1,
-                    mr: -1,
-                    alignSelf: 'flex-start',
-                  }}
-                  onClick={() => setOpenContractPaymentTermsDialog(true)}
-                  size="small">
-                  <TextSnippetIcon />
-                </InputAdornment>
-              }
-            />
-          </Grid>
-        </Grid>
-
-        {/* GENERAL INFORMATION */}
-        <Grid
-          container
-          item
-          xs={4}
-          xl={3}
-          rowGap={4}
-          bgcolor="white"
-          p={3}
-          borderRadius={1}>
-          <Grid container item xs={12} rowGap={2.5}>
-            <Box pb={0.5}>
-              <SectionTitle
-                Icon={PinIllustration}
-                title="General Information"
-              />
-            </Box>
-            <Box display="flex" justifyContent="space-between" width="100%">
-              <Box>
-                <Typography variant="body2" color="grey.700">
-                  {T('Invoice type')}
-                </Typography>
-                <Typography variant="subtitle2" color="primary.dark" pt={0.5}>
-                  {getInvoiceTypeText()}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" color="grey.700">
-                  {T('Created By')}
-                </Typography>
-                <Box display="flex" alignItems="center" gap={1} pt={0.5}>
-                  <Avatar
-                    src={createdBy.photoUrl}
-                    sx={{width: 24, height: 24}}
-                  />
-                  <Typography variant="subtitle2" color="primary.dark">
-                    {createdBy.name}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              gap={1}
-              width="100%">
-              <DatePicker
-                defaultDate={
-                  formik.values.sentDate
-                    ? new Date(formik.values.sentDate)
-                    : undefined
-                }
-                getSelectedDate={(newValue) => {
-                  handleDateFieldChange('sentDate', newValue);
-                }}
-                textFieldProps={{
-                  label: (
-                    <Box display="flex" alignItems="center" gap={0.5}>
-                      {t('Invoice Date')}
-                      <Tooltip
-                        title={t(
-                          `The invoice date is set automatically when you send the invoice. If you prefer to enter a date yourself, remember that you'll also need to set the payment due date manually.`,
-                        )}
-                        placement="top">
-                        <IconButton sx={{padding: 0}}>
-                          <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0.5}} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  ),
-                  ...formik.getFieldProps('sentDate'),
-                }}
-              />
-              <DatePicker
-                defaultDate={
-                  formik.values.dueDate
-                    ? new Date(formik.values.dueDate)
-                    : undefined
-                }
-                reset={resetDueDatePicker}
-                getReset={(_reset) => {
-                  if (_reset) {
-                    setResetDueDatePicker(false);
-                  }
-                }}
-                errorMessage={dueDateError}
-                getSelectedDate={(newValue) => {
-                  setDueDateError('');
-                  handleDateFieldChange('dueDate', newValue);
-                }}
-                textFieldProps={{
-                  label: (
-                    <Box display="flex" alignItems="center" gap={0.5}>
-                      {t('Payment Due Date')}
-                      <Tooltip
-                        title={t(
-                          formik.values.paymentTerm?.id
-                            ? 'The payment due date of this invoice is controlled by your payment terms. It will update itself automatically upon editing and sending. If you want to manually control the payment due date, please remove the payment terms.'
-                            : 'The payment due date updates automatically if you’ve added payment terms to the invoice. These terms adjust the due date whenever you edit or send the invoice. If you don’t use payment terms, you can set the due date manually.',
-                        )}
-                        placement="top">
-                        <IconButton sx={{padding: 0}}>
-                          <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0.5}} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  ),
-                  ...formik.getFieldProps('dueDate'),
-                }}
-                disabled={!!formik.values.paymentTerm?.id}
-                inputTestId="payment-due-date"
-                popupTestId="payment-due-date-popup"
-              />
-            </Box>
-            {/* DELIVERY DATE */}
-            <Box width="100%">
-              <Typography variant="body2" color="grey.700" pb={1.5}>
-                {T('Delivery date')}
-              </Typography>
-              <Box display="flex" justifyContent="space-between" gap={1}>
-                <DatePicker
-                  defaultDate={formik.values.deliveryStartDate}
-                  getSelectedDate={(newValue) => {
-                    handleDateFieldChange('deliveryStartDate', newValue);
-                  }}
-                  textFieldProps={{
-                    label: 'Start Date',
-                    ...formik.getFieldProps('deliveryStartDate'),
-                    ...(serviceOrder &&
-                      !formik.values.deliveryStartDate && {
-                        placeholder: t('No Start Date set'),
-                        sx: {
-                          input: {
-                            '&::placeholder': {
-                              typography: 'caption',
-                            },
-                          },
-                        },
-                      }),
-                  }}
-                />
-                <DatePicker
-                  defaultDate={formik.values.deliveryEndDate}
-                  getSelectedDate={(newValue) => {
-                    handleDateFieldChange('deliveryEndDate', newValue);
-                  }}
-                  textFieldProps={{
-                    label: 'End Date',
-                    ...formik.getFieldProps('deliveryEndDate'),
-                    ...(serviceOrder &&
-                      !formik.values.deliveryEndDate && {
-                        placeholder: t('No End Date set'),
-                        sx: {
-                          input: {
-                            '&::placeholder': {
-                              typography: 'caption',
-                            },
-                          },
-                        },
-                      }),
-                  }}
-                />
-              </Box>
-            </Box>
-            <Box width="100%">
-              <FormInput
-                fieldProps={{
-                  id: 'externalId',
-                  placeholder: t('Automatically assigned'),
-                  label: 'Invoice Number',
-                  value: formik.values.externalId,
-                  onChange: formik.handleChange,
-                  onBlur: formik.handleBlur,
-                  error: !!(
-                    formik.touched.externalId && formik.errors.externalId
-                  ),
-                  helperText: formik.errors.externalId,
-                }}
-              />
-            </Box>
-            <FormInput
-              fieldProps={{
-                id: 'elevatorExternalId',
-                name: 'elevatorExternalId',
-                label: 'Unit Number',
-                value: formik.values.elevatorExternalId,
-                onChange: formik.handleChange,
-                onBlur: formik.handleBlur,
-                error: !!(
-                  formik.touched.elevatorExternalId &&
-                  formik.errors.elevatorExternalId
-                ),
-                helperText:
-                  formik.touched.elevatorExternalId &&
-                  formik.errors.elevatorExternalId,
-                disabled: false,
-              }}
-            />
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              gap={1}
-              width="100%">
-              <FormInput
-                fieldProps={{
-                  id: 'purchaseOrderNumber',
-                  name: 'purchaseOrderNumber',
-                  placeholder: 'e.g 000 000 000',
-                  label: 'Purchase order no.',
-                  value: formik.values.purchaseOrderNumber,
-                  onChange: formik.handleChange,
-                  onBlur: formik.handleBlur,
-                  error: !!(
-                    formik.touched.purchaseOrderNumber &&
-                    formik.errors.purchaseOrderNumber
-                  ),
-                  helperText:
-                    formik.touched.purchaseOrderNumber &&
-                    formik.errors.purchaseOrderNumber,
-                }}
-              />
-              <FormInput
-                fieldProps={{
-                  id: 'costCenter',
-                  name: 'costCenter',
-                  placeholder: 'e.g 000 000 000',
-                  label: 'Cost Center',
-                  value: formik.values.costCenter,
-                  onChange: formik.handleChange,
-                  onBlur: formik.handleBlur,
-                  error: !!(
-                    formik.touched.costCenter && formik.errors.costCenter
-                  ),
-                  helperText:
-                    formik.touched.costCenter && formik.errors.costCenter,
-                }}
-              />
-            </Box>
-
-            {/* PAYMENT TYPE */}
-            {/* don't show payment type for FULL, FINAL and CREDIT_NOTE invoices */}
-            {[InvoiceType.PARTIAL, InvoiceType.UPFRONT].includes(
-              formik.values.type,
-            ) ? (
-              <Box>
-                <Typography variant="body2" color="grey.700">
-                  {T('Payment type')}
-                  <Tooltip
-                    title={T(paymentTypeTooltip)}
-                    placement="top"
-                    slotProps={{
-                      tooltip: {
-                        sx: {
-                          bgcolor: 'common.gray',
-                        },
-                      },
-                    }}>
-                    <IconButton
+              control={control}
+              render={({field}) => (
+                <RichTextField
+                  label={notesText}
+                  html={watchedMoreInfo || ''}
+                  updateHtml={field.onChange}
+                  onBlur={field.onBlur}
+                  helperText={errors.moreInfo?.message}
+                  error={!!errors.moreInfo}
+                  endAdornment={
+                    <InputAdornment
+                      component={IconButton}
+                      disableRipple
+                      position="end"
                       sx={{
-                        p: 0,
-                        ml: 0.5,
-                      }}>
-                      <InfoOutlinedIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Typography>
-                <RadioGroup
-                  defaultValue={PaymentType.LUMP_SUM}
-                  name="radio-buttons-group">
-                  {Object.entries(PaymentTypeOptions).map(([key, value]) =>
-                    // don't show per-item for upfront invoices
-                    formik.values.type === InvoiceType.UPFRONT &&
-                    key === PaymentType.PER_ITEM ? null : (
-                      <FormControlLabel
-                        key={key}
-                        value={key}
-                        control={<Radio size="small" />}
-                        label={T(value)}
-                        componentsProps={{typography: {variant: 'body2'}}}
-                        onChange={() => handlePaymentTypeChange(key)}
-                        checked={formik.values.payment?.type === key}
-                        disabled={
-                          (!previousInvoices.filter(
-                            (item) => item.status !== InvoiceStatus.CANCELLED,
-                          ).length &&
-                            isNewInvoice) ||
-                          (previousInvoices.filter(
-                            (item) => item.status !== InvoiceStatus.CANCELLED,
-                          ).length === 1 &&
-                            !isNewInvoice) ||
-                          (!previousInvoices.filter(
-                            (item) => item.status !== InvoiceStatus.CANCELLED,
-                          ).length &&
-                            !isNewInvoice)
-                            ? false
-                            : key !==
-                              sortedPreviousInvoices?.[0]?.additionalInfo
-                                ?.payment?.type
-                        }
-                      />
-                    ),
-                  )}
-                </RadioGroup>
-              </Box>
-            ) : null}
-          </Grid>
-
-          {/* ADDITIONAL DOCUMENTS */}
-          <Grid container item xs={12}>
-            <Box pb={0.5}>
-              <SectionTitle
-                Icon={TaskListPenIllustration}
-                title="Additional documents"
-              />
-            </Box>
-            <InvoiceCheckboxNEW
-              disabled={!isWorkReportPDFGenerated}
-              handleChange={() => {
-                formik.setFieldValue(
-                  'includeWorkReport',
-                  !formik.values.includeWorkReport,
-                );
-              }}
-              tooltipTitle="No work report for the selected service job"
-              checkboxLabel="Add work report to invoice"
-              checked={
-                !!(isWorkReportPDFGenerated && formik.values.includeWorkReport)
-              }
-              handleAction={() =>
-                window.open(
-                  `/orders/details/${serviceOrder?.id}?tab=1`,
-                  '_blank',
-                )
-              }
+                        mr: -1,
+                        alignSelf: 'center',
+                      }}
+                      onClick={() => {
+                        setOpenTextBlockDialog(true);
+                        setTextBlockField('NOTES');
+                      }}
+                      size="small">
+                      <TextSnippetIcon />
+                    </InputAdornment>
+                  }
+                />
+              )}
             />
 
-            <InvoiceCheckboxNEW
-              disabled={!isCheckListPDFGenerated}
-              handleChange={() => {
-                formik.setFieldValue(
-                  'includeCheckList',
-                  !formik.values.includeCheckList,
-                );
-              }}
-              tooltipTitle="No checklist for selected service job"
-              checkboxLabel="Add checklist to invoice"
-              checked={
-                !!(isCheckListPDFGenerated && formik.values.includeCheckList)
-              }
-              handleAction={() =>
-                window.open(
-                  `/orders/details/${serviceOrder?.id}?tab=2`,
-                  '_blank',
-                )
-              }
+            <Controller
+              name="paymentTerm"
+              control={control}
+              render={({field}) => (
+                <RichTextField
+                  label="Payment terms"
+                  html={watchedPaymentTerm?.term || ''}
+                  updateHtml={(term) =>
+                    stripHtmlTags(term)
+                      ? setValue('paymentTerm', {
+                          ...getValues('paymentTerm'),
+                          term,
+                        })
+                      : setValue('paymentTerm', undefined)
+                  }
+                  onBlur={field.onBlur}
+                  helperText={errors.paymentTerm?.message}
+                  error={!!errors.paymentTerm}
+                  data-testid="payment-terms-rich-text-field"
+                  minRows={1}
+                  endAdornment={
+                    <InputAdornment
+                      component={IconButton}
+                      disableRipple
+                      position="end"
+                      sx={{
+                        mr: -1,
+                        alignSelf: 'flex-start',
+                      }}
+                      onClick={() => setOpenContractPaymentTermsDialog(true)}
+                      size="small">
+                      <TextSnippetIcon />
+                    </InputAdornment>
+                  }
+                />
+              )}
             />
           </Grid>
         </Grid>
       </Grid>
+
       <BottomDrawer
         isOpen={isDrawerOpen}
         isSaving={isCreating || isUpdating}
         primaryButtonLabel={t('Save')}
-        primaryButtonAction={formik.handleSubmit}
+        primaryButtonAction={handleSubmit(onSubmit)}
         listItems={actions.map((item) => ({
           ...item,
           showBorder: actions[actions.length - 1] !== item,
@@ -2771,20 +2884,31 @@ export const InvoiceForm = ({
               startIcon: <RemoveRedEyeOutlinedIcon />,
               onClick: async () => {
                 await handlePreview();
-                setOpenPreviewDialog(true);
               },
               disabled:
                 isLoadingHeaderUrl ||
                 isLoadingFooterUrl ||
                 isLoadingClientStorageDataTemplate ||
                 isLoadingClientStorageDataPdfConfig ||
-                isCalculatingInvoiceAmount,
+                isCalculatingInvoiceAmount ||
+                hasMixItemWithoutSubItems ||
+                hasEmptyItemName ||
+                isPreviewing,
               sx: {
                 color: theme.palette.primary.dark,
                 padding: '0.3em 1.5em',
               },
             }}
           />
+        }
+        notesSection={
+          <Box>
+            {!isNewInvoice ? (
+              <Notes invoice={invoice!} />
+            ) : (
+              <CreateNotes formMethods={formMethods} customer={customer} />
+            )}
+          </Box>
         }
       />
       {isAddNewCustomerDialogOpen && (
@@ -2798,9 +2922,7 @@ export const InvoiceForm = ({
         isDialogOpen={isEditFromDialogOpen}
         onClose={() => setIsEditFromDialogOpen(false)}
         onSave={handleEditFrom}
-        alternativeServiceCompanyInfo={
-          formik.values.alternativeServiceCompanyInfo
-        }
+        alternativeServiceCompanyInfo={watchedAlternativeServiceCompanyInfo}
       />
 
       <Confirm
@@ -2851,7 +2973,7 @@ export const InvoiceForm = ({
           onClear={handleClearContractPaymentTermsModal}
           defaultValue={
             contractPaymentTerms?.data.find(
-              (c) => c.id === formik.values.paymentTerm?.id,
+              (c) => c.id === watchedPaymentTerm?.id,
             )?.id || ''
           }
           onClick={() => setOpenContractPaymentTermSelectDialog(true)}
@@ -2867,7 +2989,7 @@ export const InvoiceForm = ({
 
       <Dialog
         title="Click to apply your block"
-        disableSaveBtn={!!Object.keys(formik.errors).length}
+        disableSaveBtn={!!Object.keys(errors).length}
         onCancel={() => {
           setOpenTextBlockDialog(false);
         }}

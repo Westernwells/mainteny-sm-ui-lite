@@ -5,6 +5,7 @@ import {StatusColor} from 'models/status';
 import {getAddressString} from 'utils/address';
 import {
   AUTO_GENERATED_TO_PAYMENT_STATUS,
+  DateCellParts,
   SearchParameters,
   SERVICE_ORDER_PAYMENT_STATUS_VIEW,
   ServiceOrderArticleView,
@@ -18,7 +19,7 @@ import {
   ServiceOrderTypeRecord,
   ServiceOrderView,
 } from '../models/service-order';
-import {toDate, toRestDateTime} from './datetime';
+import {formatDate, toDate, toRestDateTime} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
@@ -388,6 +389,7 @@ export const aggregateServiceOrderRow = (
       order.additionalInfo.paymentStatus ??
       ServiceOrderPaymentStatus.NO_INVOICE,
     hasNotes: Boolean(order.additionalInfo.commentCount),
+    lastActivityAt: order.additionalInfo.lastActivityAt ?? '',
   }));
 
 export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
@@ -477,12 +479,23 @@ export const getJobTypeGivenName = (
   orderType: string | undefined,
   jobTypes?: ServiceOrderTypeRecord[],
 ): string => {
-  if (!orderType || !jobTypes) return '-';
+  if (!orderType || !jobTypes || !jobTypes.length) return '-';
+
+  const orderTypeString = serviceOrderTypeToString(orderType);
+
+  if (orderTypeString !== '-') {
+    return orderTypeString;
+  }
 
   const matchingJobType = jobTypes.find(
     (jobType) => jobType.name === orderType,
   );
   return matchingJobType?.givenName || '-';
+};
+
+export const isCustomJobType = (jobType: string) => {
+  const orderTypeString = serviceOrderTypeToString(jobType);
+  return orderTypeString === '-';
 };
 
 type FilterServiceOrderTypeProps = {
@@ -519,3 +532,27 @@ export const roundTimeWithSurcharge = (
 
   return roundedMinutes + surchargeMinutes;
 };
+
+export function getServiceOrderDateParts(
+  row: ServiceOrderTableRow,
+): DateCellParts {
+  switch (row.jobStatus) {
+    case ServiceOrderStatus.CANCELLED:
+      return {
+        label: 'Canceled on',
+        date: row.lastActivityAt ? formatDate(row.lastActivityAt) : null,
+      };
+    case ServiceOrderStatus.COMPLETED:
+      return {
+        label: 'Completed on',
+        date: row.lastActivityAt ? formatDate(row.lastActivityAt) : null,
+      };
+    case ServiceOrderStatus.IN_PROGRESS:
+      return {
+        label: 'Started on',
+        date: row.lastActivityAt ? formatDate(row.lastActivityAt) : null,
+      };
+    default:
+      return {label: '-', date: null};
+  }
+}

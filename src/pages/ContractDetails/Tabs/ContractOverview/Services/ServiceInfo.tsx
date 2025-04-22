@@ -31,7 +31,7 @@ import {getArticleTypeText} from 'utils/article-utils';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {getViewFrequency} from 'utils/elevator-utils';
 import {ArticleType} from 'models/article';
-import {ElevatorView} from 'models/elevator';
+import {ElevatorSimpleView, ElevatorView} from 'models/elevator';
 import {
   getJobTypeGivenName,
   serviceOrderTypeToString,
@@ -44,7 +44,7 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 
 type Props = {
   service?: ContractComponentView;
-  elevators: ContractElevatorView[] | ElevatorView[];
+  elevators: ContractElevatorView[] | ElevatorView[] | ElevatorSimpleView[];
 };
 
 const ServiceInformationReview = ({service, elevators}: Props) => {
@@ -156,7 +156,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
           <CalendarTodayIcon fontSize="1.6rem" />
           <Box sx={{paddingLeft: '1em'}}>
             <Typography variant="body1" color={theme.palette.text.secondary}>
-              First invoice
+              {t('First invoice')}
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
               {service?.additionalInfo?.firstInvoiceDate !== null
@@ -219,7 +219,7 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
                   borderBottom: 'none',
                 }}>
                 <Typography color={theme.palette.text.primary} variant="body2">
-                  {item.externalId || 'Unassigned'}
+                  {item.externalId || t('Unassigned')}
                 </Typography>
               </TableCell>
 

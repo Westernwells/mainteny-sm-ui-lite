@@ -19,6 +19,8 @@ import {
   ServiceOrderArticleOwnerType,
   ServiceOrderArticleView,
 } from './service-order';
+import {ArticleInfoRecord, SubItemsConfig} from './quotation';
+import {Discount} from './invoice';
 
 export enum ArticleType {
   LABOR = 'LABOR',
@@ -195,14 +197,34 @@ export interface ArticleSupplierItemView {
 }
 
 export interface ServiceOrderArticleRecord {
-  articleId: string;
-  description: string;
+  articleId?: string;
   name: string;
+  description?: string;
   quantity: number;
   unitAmount: AmountRecord;
-  article: ArticleRecord;
+  unitPurchaseAmount?: AmountRecord;
+  article?: ArticleInfoRecord;
+  ownerType?: ServiceOrderArticleOwnerType;
+  discount?: Discount;
+  owner?: {
+    id: string;
+    name: string;
+  };
+  subArticlesConfig?: SubItemsConfig;
+  subArticles?: ServiceOrderSubArticleRecord[];
+  userSeqNumber?: string;
 }
 
+export interface ServiceOrderSubArticleRecord {
+  articleId?: string;
+  article?: ArticleInfoRecord;
+  name: string;
+  description?: string;
+  quantity: number;
+  unitAmount: AmountRecord;
+  unitPurchaseAmount?: AmountRecord;
+  userSeqNumber?: string;
+}
 export interface ArticleOrderItemRecord {
   articleId: string;
   articleName: string;
@@ -314,7 +336,7 @@ export type ArticleSectionTableRow = {
   article: ServiceOrderArticleView;
   ownerName: string;
   ownerType: ServiceOrderArticleOwnerType;
-  contractNumber: string;
+  contractNumber?: string;
 };
 
 export type ArticleTableRow = {

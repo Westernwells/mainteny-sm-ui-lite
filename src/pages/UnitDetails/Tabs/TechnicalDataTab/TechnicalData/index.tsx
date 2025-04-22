@@ -14,7 +14,12 @@ import {
 } from 'hooks/reactQuery/useElevator';
 import {Box} from '@mui/system';
 import {Button} from 'components/Button';
-import {getTechnicalFieldCategory, getTechnicalFieldName} from 'utils/utils';
+import {
+  escapeDotInString,
+  getTechnicalFieldCategory,
+  getTechnicalFieldName,
+  restoreDotInString,
+} from 'utils/utils';
 import EditTechnicalDataForm from './EditTechnicalDataForm';
 import TechnicalDataView from './TechnicalDataView';
 
@@ -76,7 +81,12 @@ const TechnicalData = ({elevator, schema}: Props) => {
   }, [elevator, openDialog]);
 
   const onSubmit = async () => {
-    const values = getValues();
+    // Restore dot character in the names. It was escaped before
+    const values = Object.keys(getValues()).reduce((acc, item) => {
+      acc[restoreDotInString(item)] = getValues()[item];
+      return acc;
+    }, {} as {[key: string]: string});
+
     const items = elevatorDataItems.map((item) => ({
       name: item.name,
       value: values[item.name] || '',
@@ -101,7 +111,8 @@ const TechnicalData = ({elevator, schema}: Props) => {
     setDialogState({...dialogState, open: true, mode: 'edit'});
     reset(
       elevatorDataItems.reduce((acc, dataItem) => {
-        acc[dataItem.name] = dataItem.value;
+        // Escaping dot is important otherwise react-hook-form won't work
+        acc[escapeDotInString(dataItem.name)] = dataItem.value;
         return acc;
       }, {} as {[key: string]: string}),
     );

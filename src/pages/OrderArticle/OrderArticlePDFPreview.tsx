@@ -1,4 +1,4 @@
-import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
+import {Document, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {FormikProps} from 'formik';
 import {CreateArticleOrderRecord} from 'models/article';
 import {UserAccount} from 'models/user';
@@ -15,41 +15,18 @@ import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
 import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
 import {getServiceCompanyInfo} from 'utils/company-utils';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
 import {calculateTotal, calculateTotalVAT} from './utils';
 import {ArticleSupplierView} from '../../models/supplier';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
@@ -67,12 +44,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 10,
-      color: '#212121',
+      color: primaryColor,
       width: '43%',
     },
     tagContent: {
       fontSize: 10,
-      color: '#616161',
+      color: secondaryColor,
       width: '57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -99,13 +76,13 @@ const getStyles = (
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       fontWeight: 'extrabold',
     },
     sectionBody: {
       fontSize: 10,
       fontWeight: 'light',
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -121,7 +98,7 @@ const getStyles = (
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
     },
@@ -136,7 +113,7 @@ const getStyles = (
       width: '45%',
       display: 'flex',
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       paddingLeft: 20,
       letterSpacing: -0.15,
       marginTop: 2,
@@ -145,6 +122,7 @@ const getStyles = (
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   supplier: ArticleSupplierView;
   formik: FormikProps<CreateArticleOrderRecord>;
   translate: (key: string) => string;
@@ -155,10 +133,11 @@ type Props = {
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const OrderArticlePDFPreview = React.memo(
   ({
+    serviceCompany,
     supplier,
     formik,
     userInfo,
@@ -169,6 +148,9 @@ const OrderArticlePDFPreview = React.memo(
     headerPath,
     footerInfo,
     footerPath,
+    fontStyles,
+    primaryColor,
+    secondaryColor,
   }: Props) => {
     const uniqueVATPercentages = [
       ...new Set(
@@ -182,29 +164,28 @@ const OrderArticlePDFPreview = React.memo(
 
     const serviceCompanyInfo = getServiceCompanyInfo(userInfo);
 
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const regularFontStyle = {
-      fontFamily:
-        selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-    };
-
-    const styles = getStyles(boldFontStyle, regularFontStyle);
+    const styles = getStyles({
+      boldFontStyle: fontStyles.bold,
+      regularFontStyle: fontStyles.regular,
+      primaryColor,
+      secondaryColor,
+    });
     return (
       <Document>
-        <PdfPageContainer selectedLng={selectedLng}>
+        <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
+                serviceCompany={serviceCompany}
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={supplier?.name}
                 addressComponent={supplier?.address?.component}
-                selectedLng={selectedLng}
                 translate={translate}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
 
               <View style={styles.rightAddress}>
@@ -245,7 +226,7 @@ const OrderArticlePDFPreview = React.memo(
             </TopSectionContainer>
 
             <View>
-              <PdfPageTitle selectedLng={selectedLng}>
+              <PdfPageTitle fontStyles={fontStyles} primaryColor={primaryColor}>
                 {translate('Article Order for')} {formik?.values?.externalId}
               </PdfPageTitle>
 
@@ -486,7 +467,7 @@ const OrderArticlePDFPreview = React.memo(
                         color: '#212121',
                         fontSize: 10,
                         textAlign: 'right',
-                        ...boldFontStyle,
+                        ...fontStyles.bold,
                       }}>
                       {`${translate('Total incl. VAT')} (${
                         currentCurrency?.symbol
@@ -498,7 +479,7 @@ const OrderArticlePDFPreview = React.memo(
                         textAlign: 'right',
                         color: '#212121',
                         fontSize: 10,
-                        ...boldFontStyle,
+                        ...fontStyles.bold,
                       }}>
                       {formatCurrency(
                         calculateTotal(formik.values.items) +
@@ -522,10 +503,12 @@ const OrderArticlePDFPreview = React.memo(
 
           <PdfTemplateFooter
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             footerInfo={footerInfo}
             footerPath={footerPath}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         </PdfPageContainer>
       </Document>

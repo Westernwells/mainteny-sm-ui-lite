@@ -23,3 +23,8 @@ export const getAddressComponentFromQuotation = (quotation?: QuotationView) => {
   if (!quotation) return;
   return quotation?.additionalInfo.billingAddress?.component;
 };
+
+export const insertNewlines = (str: string = '', chunkSize = 3): string => {
+  const regex = new RegExp(`(.{${chunkSize}})`, 'g');
+  return str.replace(regex, '$1\n');
+};

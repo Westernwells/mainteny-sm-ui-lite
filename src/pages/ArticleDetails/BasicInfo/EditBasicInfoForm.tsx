@@ -42,7 +42,6 @@ import {
 } from 'utils/currency';
 import {getAmountFromPercentage} from 'utils/utils';
 import {Receipt, ReceiptOutlined} from '@mui/icons-material';
-import RichTextField from '../../../components/RichTextField';
 
 export const EditBasicInfoForm = ({
   containerStyles,
@@ -102,17 +101,19 @@ export const EditBasicInfoForm = ({
       component="form"
       sx={{alignItems: 'end'}}>
       <Box sx={{...containerStyles}}>
-        <RichTextField
-          label="Name"
-          name="name"
-          placeholder="e.g. Flat cable, 16G0.75+2x(2x0.5)"
-          html={formik.values.name || ''}
-          updateHtml={(h) => formik.setFieldValue('name', h)}
-          helperText={formik.touched.name ? formik.errors.name : ''}
-          error={!!(formik.touched.name && formik.errors.name)}
-          onBlur={formik.handleBlur}
-          required
-          data-test-id="name"
+        <FormInput
+          fieldProps={{
+            label: t('Name'),
+            name: 'name',
+            placeholder: t('e.g. Flat cable, 16G0.75+2x(2x0.5)'),
+            type: 'text',
+            required: true,
+            value: formik.values.name,
+            error: !!(formik.touched.name && formik.errors.name),
+            helperText: formik.errors.name,
+            onBlur: formik.handleBlur,
+            onChange: formik.handleChange,
+          }}
         />
       </Box>
 
@@ -210,7 +211,7 @@ export const EditBasicInfoForm = ({
         display="flex"
         justifyContent="space-between"
         sx={{...containerStyles}}>
-        <FormControl fullWidth required={false}>
+        <FormControl fullWidth required={false} sx={{pr: '1rem'}}>
           <InputLabel size="small" shrink variant="outlined">
             {t('Purchase VAT')}
           </InputLabel>
@@ -270,7 +271,7 @@ export const EditBasicInfoForm = ({
           </Select>
         </FormControl>
 
-        <FormControl fullWidth required={false}>
+        <FormControl fullWidth required>
           <InputLabel size="small" shrink variant="outlined">
             {t('Selling VAT')}
           </InputLabel>
@@ -284,7 +285,7 @@ export const EditBasicInfoForm = ({
             name="unitSellingVat"
             notched
             {...defaultProps}
-            required={false}
+            required
             MenuProps={{
               anchorOrigin: {
                 vertical: 'bottom',

@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useLocation} from 'react-router-dom';
 import * as Yup from 'yup';
@@ -47,6 +47,7 @@ import TextBlockActions from 'components/text-blocks/TextBlockActions';
 import TextBlockSelect from 'components/text-blocks/TextBlockSelect';
 import {cleanHtmlContent} from 'utils/text-block';
 import {companyLanguageContextMap} from 'utils/language';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import PdfPreview from './PDFPreview';
 import OrderArticlePDFPreview from './OrderArticlePDFPreview';
 import OrderArticlePDF from './OrderArticlePDF';
@@ -112,6 +113,9 @@ export const OrderArticle = () => {
   const [newArticleOrder, setNewArticleOrder] = useState<
     ArticleOrderView | null | undefined
   >(null);
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const [mode, setMode] = useState(DocumentMode.EDIT);
   const [previewPdfBlobUrl, setPreviewPdfBlobUrl] = useState('');
@@ -214,6 +218,9 @@ export const OrderArticle = () => {
           footerInfo={footerInfo}
           selectedLng={company?.language}
           translate={translate}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />,
       ).toBlob();
       const blobURL = URL.createObjectURL(blob);
@@ -263,6 +270,9 @@ export const OrderArticle = () => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

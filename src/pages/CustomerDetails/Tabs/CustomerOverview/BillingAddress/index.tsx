@@ -41,22 +41,19 @@ const BillingAddress = ({
   );
 
   const handleAddressChange = (componentAddress: AddressRecord | undefined) => {
-    if (!componentAddress) return;
-
     const currentValues = watch('billingAddress');
 
-    setValue('billingAddress', {
-      ...componentAddress,
+    const newValues = {
+      ...(componentAddress ?? {}),
       component: {
-        ...componentAddress?.component,
-        // to not overwrite name fields
-        name: currentValues?.component?.name,
-        name2: currentValues?.component?.name2,
-        name3: currentValues?.component?.name3,
+        ...(currentValues?.component ?? {}),
+        ...(componentAddress?.component ?? {}),
       },
       id: currentValues?.id!,
       fullName: componentAddress?.fullName || '',
-    });
+    };
+
+    setValue('billingAddress', newValues);
   };
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import {Document, Font, StyleSheet, Text, View} from '@react-pdf/renderer';
+import {Document, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import React, {useMemo} from 'react';
 import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
@@ -31,36 +31,16 @@ import {
   getAddressComponentFromQuotation,
   getAddressComponentFromServiceOrder,
 } from 'utils/pdfTemplates';
-import MontserratRegular from '../../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
-import {HtmlPDF} from '../../../../components/HtmlPDF';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
+import {HtmlPDF} from 'components/HtmlPDF';
+import {ServiceCompanyItem} from 'models/service-company';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (boldFontStyle?: {fontFamily: string}) =>
+const getStyles = ({
+  boldFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
@@ -77,12 +57,12 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     tag: {
       ...boldFontStyle,
       fontSize: 8.5,
-      color: '#212121',
+      color: primaryColor,
       width: '43%',
     },
     tagContent: {
       fontSize: 8.5,
-      color: '#616161',
+      color: secondaryColor,
       width: '57%',
       textAlign: 'right',
     },
@@ -91,7 +71,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       paddingBottom: 1,
     },
     contentBody: {
-      color: '#212121',
+      color: primaryColor,
       fontSize: 10,
       marginBottom: 10,
       lineHeight: 1.3,
@@ -110,13 +90,13 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       fontWeight: 'extrabold',
     },
     sectionBody: {
       fontSize: 10,
       fontWeight: 'light',
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -132,7 +112,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: primaryColor,
       display: 'flex',
       fontSize: 6,
     },
@@ -146,7 +126,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       width: '87%',
       display: 'flex',
       fontSize: 8,
-      color: '#212121',
+      color: secondaryColor,
       paddingLeft: 20,
       paddingRight: 10,
       letterSpacing: -0.15,
@@ -158,6 +138,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
   });
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string, options?: {context: string}) => string;
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
@@ -170,10 +151,11 @@ type Props = {
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
   serviceOrderType: string;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const JobOverviewPdfTemplate = React.memo(
   ({
+    serviceCompany,
     translate,
     userInfo,
     currentCurrency,
@@ -186,6 +168,9 @@ const JobOverviewPdfTemplate = React.memo(
     footerPath,
     pdfConfigClientStorage,
     serviceOrderType,
+    fontStyles,
+    primaryColor,
+    secondaryColor,
   }: Props) => {
     const articleItems = serviceOrder?.articles!;
 
@@ -251,11 +236,11 @@ const JobOverviewPdfTemplate = React.memo(
       quotation?.additionalInfo.alternativeServiceCompanyInfo,
     );
 
-    const boldFontStyle = {
-      fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-    };
-
-    const styles = getStyles(boldFontStyle);
+    const styles = getStyles({
+      primaryColor,
+      secondaryColor,
+      boldFontStyle: fontStyles.bold,
+    });
 
     const customerVATId =
       (pdfConfigClientStorage.includeCustomerVAT &&
@@ -271,12 +256,13 @@ const JobOverviewPdfTemplate = React.memo(
       '';
     return (
       <Document>
-        <PdfPageContainer selectedLng={selectedLng}>
+        <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
           <PdfBodyContainer>
             <TopSectionContainer>
               <PdfTemplateLeftAddress
+                serviceCompany={serviceCompany}
                 serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={
                   serviceOrder?.elevator?.propertyOwner?.name
@@ -285,10 +271,12 @@ const JobOverviewPdfTemplate = React.memo(
                   getAddressComponentFromQuotation(quotation) ??
                   getAddressComponentFromServiceOrder(serviceOrder)
                 }
-                selectedLng={selectedLng}
                 translate={translate}
                 customerVATId={customerVATId}
                 eanValue={eanValue}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
 
               <View style={styles.rightAddress}>
@@ -400,15 +388,17 @@ const JobOverviewPdfTemplate = React.memo(
                   <PdfUnitAddress
                     address={elevatorAddress}
                     translate={translate}
-                    selectedLng={selectedLng}
                     building={unitBuilding}
+                    fontStyles={fontStyles}
+                    primaryColor={primaryColor}
+                    secondaryColor={secondaryColor}
                   />
                 </View>
               </View>
             </TopSectionContainer>
 
             <View>
-              <PdfPageTitle>
+              <PdfPageTitle fontStyles={fontStyles} primaryColor={primaryColor}>
                 {translate('Job Confirmation:')}{' '}
                 {toSentenceCase(serviceOrderType)}
               </PdfPageTitle>
@@ -543,7 +533,7 @@ const JobOverviewPdfTemplate = React.memo(
                               marginLeft: 10,
                               color: '#212121',
                             }}>
-                            {translate(articleOrderItem.article?.unit) || '-'}
+                            {translate(articleOrderItem.article?.unit!) || '-'}
                           </Text>
                           <Text
                             style={{
@@ -733,7 +723,7 @@ const JobOverviewPdfTemplate = React.memo(
                         style={{
                           width: '32%',
                           color: '#212121',
-                          ...boldFontStyle,
+                          ...fontStyles.bold,
                           textAlign: 'right',
                           fontSize: 10,
                         }}>
@@ -746,7 +736,7 @@ const JobOverviewPdfTemplate = React.memo(
                           width: '24%',
                           textAlign: 'right',
                           color: '#212121',
-                          ...boldFontStyle,
+                          ...fontStyles.bold,
                           fontSize: 10,
                         }}>
                         {amountAfterGlobalDiscountWithVATFormatted}
@@ -760,11 +750,13 @@ const JobOverviewPdfTemplate = React.memo(
 
           <PdfTemplateFooter
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             footerInfo={footerInfo}
             footerPath={footerPath}
             isQuotationJobConfirmation={!!quotation?.externalId}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         </PdfPageContainer>
       </Document>

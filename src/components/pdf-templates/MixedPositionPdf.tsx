@@ -1,49 +1,27 @@
 import {
   Document,
-  Text,
-  View,
-  StyleSheet,
-  Font,
   Image,
   Page,
+  StyleSheet,
+  Text,
+  View,
 } from '@react-pdf/renderer';
 import {Currency} from 'models/misc';
 import {ArticleSubAssociationView, MixedPositionRow} from 'models/article';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {getCurrencySymbol, currencyFormatting} from 'utils/currency';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import MontserratItalic from '../../assets/fonts/Montserrat/Montserrat-Italic.ttf';
-import MontserratBoldItalic from '../../assets/fonts/Montserrat/Montserrat-BoldItalic.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {currencyFormatting, getCurrencySymbol} from 'utils/currency';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import PreviewFrame from '../../assets/images/PreviewFrame.jpg';
 import PreviewFrameTwo from '../../assets/images/PreviewFrame2.jpg';
 import PreviewFrameThree from '../../assets/images/PreviewFrame3.jpg';
 import PreviewFrameFour from '../../assets/images/PreviewFrame4.jpg';
 
-// Register fonts
-Font.register({
-  family: 'Montserrat-Regular',
-  fonts: [
-    {src: MontserratRegular},
-    {src: MontserratBold, fontWeight: 'bold'},
-    {src: MontserratItalic, fontStyle: 'italic'},
-    {src: MontserratBoldItalic, fontWeight: 'bold', fontStyle: 'italic'},
-  ],
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (regularFontStyle: {fontFamily: string}) =>
+const getStyles = ({
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     page: {
       ...regularFontStyle,
@@ -53,7 +31,7 @@ const getStyles = (regularFontStyle: {fontFamily: string}) =>
       flexDirection: 'column',
       position: 'relative',
       paddingBottom: 25,
-      color: '#212121',
+      color: primaryColor,
       paddingTop: 46,
     },
     table: {
@@ -66,7 +44,7 @@ const getStyles = (regularFontStyle: {fontFamily: string}) =>
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -85,7 +63,7 @@ const getStyles = (regularFontStyle: {fontFamily: string}) =>
     descriptionText: {
       width: '86%',
       fontSize: 8,
-      color: '#212121',
+      color: primaryColor,
       marginVertical: 5,
       letterSpacing: -0.15,
       lineHeight: 1.4,
@@ -109,35 +87,35 @@ const getStyles = (regularFontStyle: {fontFamily: string}) =>
       width: '2%',
       textAlign: 'left',
       marginRight: 10,
-      color: '#212121',
+      color: primaryColor,
     },
     col40Left: {
       width: '40%',
       textAlign: 'left',
-      color: '#212121',
+      color: primaryColor,
     },
     col10Right: {
       width: '10%',
       textAlign: 'right',
-      color: '#212121',
+      color: primaryColor,
     },
     col8Center: {
       width: '8%',
       textAlign: 'center',
       marginLeft: 10,
-      color: '#212121',
+      color: primaryColor,
     },
     col15Right: {
       width: '15%',
       textAlign: 'right',
-      color: '#212121',
+      color: primaryColor,
     },
     footerRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
       fontSize: 10,
       marginVertical: 3,
-      color: '#616161',
+      color: secondaryColor,
     },
   });
 
@@ -147,7 +125,7 @@ type Props = {
   selectedLng?: string;
   mixedPosition: MixedPositionRow | null;
   subPositions: ArticleSubAssociationView[] | null;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const MixedPositionPdf = ({
   currentCurrency,
@@ -155,13 +133,15 @@ const MixedPositionPdf = ({
   selectedLng,
   mixedPosition,
   subPositions,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(regularFontStyle);
+  const styles = getStyles({
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   return (
     <Document>
@@ -308,7 +288,7 @@ const MixedPositionPdf = ({
                   <Text
                     style={{
                       width: '32%',
-                      color: '#616161',
+                      color: secondaryColor,
                       fontSize: 10,
                       textAlign: 'right',
                     }}>
@@ -340,7 +320,7 @@ const MixedPositionPdf = ({
                       }}>
                       <Text
                         style={{
-                          color: '#616161',
+                          color: secondaryColor,
                           fontSize: 10,
                           textAlign: 'right',
                           width: '57%',
@@ -369,7 +349,7 @@ const MixedPositionPdf = ({
                   <Text
                     style={{
                       width: '32%',
-                      color: '#212121',
+                      color: primaryColor,
                       fontSize: 10,
                       textAlign: 'right',
                     }}>
@@ -380,7 +360,7 @@ const MixedPositionPdf = ({
                       width: '24%',
                       textAlign: 'right',
                       fontSize: 10,
-                      color: '#212121',
+                      color: primaryColor,
                     }}>
                     {currencyFormatting(
                       mixedPosition?.data.unitSellingAmount?.grossAmount || 0,

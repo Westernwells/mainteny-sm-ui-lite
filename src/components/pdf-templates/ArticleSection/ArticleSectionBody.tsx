@@ -1,0 +1,203 @@
+import {View, Text} from '@react-pdf/renderer';
+import {HtmlPDF} from 'components/HtmlPDF';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {EditableInvoiceItem, InvoiceAmountDetail} from 'models/invoice';
+import {EditableQuotationItem, QuotationAmountDetail} from 'models/quotation';
+import {centsToMoney, formatCurrency} from 'utils/currency';
+import {insertNewlines} from 'utils/pdfTemplates';
+import {getDiscountDisplay} from 'utils/quotation';
+import {Currency} from 'models/misc';
+import {getStyles} from './ArticleSection.styles';
+
+type ArticleSectionBodyProps = {
+  items: EditableInvoiceItem[] | EditableQuotationItem[];
+  amountDetail?: InvoiceAmountDetail | QuotationAmountDetail;
+  currentCurrency?: Currency;
+  selectedLng?: string;
+  translate: (key: string) => string;
+} & Pick<ContextProps, 'primaryColor'>;
+
+export const ArticleSectionBody = ({
+  items,
+  amountDetail,
+  currentCurrency,
+  selectedLng,
+  translate,
+  primaryColor,
+}: ArticleSectionBodyProps) => {
+  const styles = getStyles({primaryColor});
+
+  return (
+    <View style={styles.dataBody}>
+      {items?.map((mainPosition, index) => {
+        const totalPriceExclVatAfterDiscount = centsToMoney(
+          currentCurrency?.code!,
+          amountDetail?.items?.[index]?.amountAfterItemDiscount?.netAmount || 0,
+        );
+
+        return (
+          <View key={`${mainPosition.id}-${index}`}>
+            <View style={styles.tableRow}>
+              <View style={styles.col2Left}>
+                <Text>
+                  {insertNewlines(mainPosition.userSeqNumber || '') ||
+                    index + 1}
+                </Text>
+              </View>
+
+              <View style={styles.col40Left}>
+                <Text>{mainPosition.name || '-'}</Text>
+              </View>
+
+              <View style={styles.col10Right}>
+                <Text>{mainPosition.quantity || '-'}</Text>
+              </View>
+
+              <View style={styles.col8Center}>
+                <Text>{translate(mainPosition.article?.unit || '-')}</Text>
+              </View>
+
+              <View style={styles.col15Right}>
+                <Text>
+                  {formatCurrency(
+                    centsToMoney(
+                      currentCurrency?.code!,
+                      mainPosition?.unitAmount?.netAmount || 0,
+                    ),
+                    {
+                      currency: currentCurrency?.code,
+                      excludeCurrencySymbol: true,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    },
+                  )}
+                </Text>
+              </View>
+
+              <View style={styles.col10Right}>
+                <Text>
+                  {getDiscountDisplay(
+                    mainPosition.discount,
+                    currentCurrency,
+                    selectedLng,
+                  )}
+                </Text>
+              </View>
+
+              <View style={styles.col15Right}>
+                <Text>
+                  {formatCurrency(totalPriceExclVatAfterDiscount || 0, {
+                    currency: currentCurrency?.code!,
+                    excludeCurrencySymbol: true,
+                    currencySymbol: currentCurrency?.symbol,
+                    companyLang: selectedLng,
+                  })}
+                </Text>
+              </View>
+            </View>
+
+            <View>
+              {!!mainPosition.description?.trim() && (
+                <HtmlPDF
+                  html={mainPosition.description || '-'}
+                  rootStyle={{
+                    ...styles.descriptionText,
+                  }}
+                />
+              )}
+            </View>
+
+            {mainPosition?.subItemsConfig?.subItemsVisible &&
+              mainPosition?.subItems?.map((subItem, subIndex) => {
+                const totalSubItemPriceExclVatAfterDiscount = centsToMoney(
+                  currentCurrency?.code!,
+                  amountDetail?.items?.[index]?.subItems?.[subIndex]
+                    .amountAfterItemDiscount?.netAmount || 0,
+                );
+                return (
+                  <View key={`${subItem.id}-${index}-${subIndex}`}>
+                    <View style={styles.tableRow}>
+                      <View style={styles.col2Left}>
+                        <Text>
+                          {insertNewlines(subItem.userSeqNumber || '') ||
+                            `${index + 1}.${subIndex + 1}`}
+                        </Text>
+                      </View>
+
+                      <View style={styles.col40Left}>
+                        <Text>
+                          {subItem.name || subItem.article?.name || '-'}
+                        </Text>
+                      </View>
+
+                      <View style={styles.col10Right}>
+                        <Text>{subItem.quantity || '-'}</Text>
+                      </View>
+
+                      <View style={styles.col8Center}>
+                        <Text>{translate(subItem.article?.unit || '-')}</Text>
+                      </View>
+
+                      <View style={styles.col15Right}>
+                        {mainPosition.subItemsConfig?.priceVisible ? (
+                          <Text>
+                            {formatCurrency(
+                              centsToMoney(
+                                currentCurrency?.code!,
+                                subItem?.unitAmount?.netAmount || 0,
+                              ),
+                              {
+                                currency: currentCurrency?.code,
+                                excludeCurrencySymbol: true,
+                                currencySymbol: currentCurrency?.symbol,
+                                companyLang: selectedLng,
+                              },
+                            )}
+                          </Text>
+                        ) : (
+                          <Text />
+                        )}
+                      </View>
+
+                      <View style={styles.col10Right}>
+                        <Text />
+                      </View>
+
+                      <View style={styles.col15Right}>
+                        <Text>
+                          {mainPosition.subItemsConfig?.priceVisible ? (
+                            <Text>
+                              {formatCurrency(
+                                totalSubItemPriceExclVatAfterDiscount || 0,
+                                {
+                                  currency: currentCurrency?.code!,
+                                  excludeCurrencySymbol: true,
+                                  currencySymbol: currentCurrency?.symbol,
+                                  companyLang: selectedLng,
+                                },
+                              )}
+                            </Text>
+                          ) : (
+                            <Text />
+                          )}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {subItem.description?.trim() && (
+                      <View>
+                        <HtmlPDF
+                          html={subItem.description || '-'}
+                          rootStyle={{...styles.descriptionText}}
+                        />
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
+          </View>
+        );
+      })}
+    </View>
+  );
+};

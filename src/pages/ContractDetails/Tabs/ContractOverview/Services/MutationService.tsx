@@ -12,6 +12,7 @@ import {
   Divider,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Popover,
@@ -66,7 +67,11 @@ import {
   useCurrentCurrency,
 } from 'utils/currency';
 import ExpandIcon from '@mui/icons-material/Expand';
-import {toDate} from 'utils/datetime';
+import {
+  getFirstDayOfMonthInFuture,
+  getMonthNumberFromDate,
+  toDate,
+} from 'utils/datetime';
 import {useFormatDate} from 'hooks/useFormatDate';
 import {FormCheckbox} from 'components/form/FormCheckbox';
 import {SearchInput} from 'components/SearchInput';
@@ -74,6 +79,9 @@ import {EmptySection} from 'components/EmptySection';
 import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {serviceOrderTypeToString} from 'utils/service-order-utils';
+import {generateMonthDropdownFromElevatorJobFrequency} from 'utils/utils';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ServiceDeliveryPeriodInput from 'components/ServiceDeliveryPeriodInput';
 
 const articleTypes = [
   {
@@ -106,7 +114,8 @@ interface Props {
   updateContract: (obj: any) => void;
   components: ContractComponentView[];
   contractId: string;
-  search: (value: string) => void;
+  setSearch: (value: string) => void;
+  search: string;
 }
 
 export const MutationService = ({
@@ -120,6 +129,7 @@ export const MutationService = ({
   components,
   contractId,
   loading,
+  setSearch,
   search,
 }: Props) => {
   const {t} = useTranslation();
@@ -138,9 +148,28 @@ export const MutationService = ({
     user?.userAccount.serviceCompany.id!,
   );
 
+  const filteredElevators =
+    formikContractServiceComponent.values.elevators?.filter((elevator) => {
+      const searchTerm = search.toLowerCase();
+
+      const serialMatch = elevator.externalId
+        ? elevator.externalId.toLowerCase().includes(searchTerm)
+        : false;
+      const buildingMatch = elevator.buildingLocation
+        ? elevator.buildingLocation.toLowerCase().includes(searchTerm)
+        : false;
+      const addressMatch = elevator.address
+        ? elevator.address.toLowerCase().includes(searchTerm)
+        : false;
+
+      return searchTerm === '' || serialMatch || buildingMatch || addressMatch;
+    }) || [];
+
+  const filteredElevatorIds = filteredElevators.map((e) => e.elevatorId);
+
   const handleCancel = () => {
     setIsDialogOpen(false);
-    search('');
+    setSearch('');
   };
 
   const handleClick = (event: any) => {
@@ -157,9 +186,7 @@ export const MutationService = ({
       setVisibleItems(5);
       setShowAll(false);
     } else {
-      setVisibleItems(
-        formikContractServiceComponent.values.elevators?.length || 0,
-      );
+      setVisibleItems(filteredElevators?.length || 0);
       setShowAll(true);
     }
   };
@@ -169,13 +196,10 @@ export const MutationService = ({
     setVisibleItems(5);
   }, [isDialogOpen]);
 
-  const visibleElevators =
-    formikContractServiceComponent.values.elevators?.slice(0, visibleItems) ||
-    [];
+  const visibleElevators = filteredElevators?.slice(0, visibleItems) || [];
 
   useEffect(() => {
     if (components.length > 0) {
-      // Find the matching component if editing
       const currentComponent = components.find(
         (c) => c.id === formikContractServiceComponent.values.id,
       );
@@ -258,6 +282,7 @@ export const MutationService = ({
       elevators: elevatorsToSave,
       orderType: values?.orderType,
       componentId: values?.id,
+      serviceDeliveryType: values?.serviceDeliveryType,
     } as UpdateContractComponents;
 
     existingData.splice(index, 0, itemToMutate);
@@ -356,14 +381,17 @@ export const MutationService = ({
     (key: string) => (value: ContractComponentElevator[]) =>
       formikContractServiceComponent.setFieldValue(key, value);
 
-  const lengthOfElevators =
-    formikContractServiceComponent.values?.elevators?.length;
+  const lengthOfElevators = filteredElevators?.length;
 
   const selectedElevators = useMemo(
-    () =>
-      formikContractServiceComponent.values.elevators.filter(isUnitSelected),
-    [formikContractServiceComponent.values.elevators],
+    () => filteredElevators.filter(isUnitSelected),
+    [filteredElevators],
   );
+
+  const jobCreationMonthDropdowns =
+    generateMonthDropdownFromElevatorJobFrequency(
+      formikContractServiceComponent.values.elevators ?? [],
+    );
 
   return (
     <Dialog
@@ -797,7 +825,7 @@ export const MutationService = ({
         <SearchInput
           placeholder={t('Search by number, name, address etc.')}
           onValueChanged={(val) => {
-            search(val);
+            setSearch(val);
           }}
           variant="outlined"
         />
@@ -820,13 +848,26 @@ export const MutationService = ({
       </Box>
 
       {!formikContractServiceComponent.values.isAutomaticJobCycle && (
-        <Typography
-          variant="body1"
-          sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
-          {t(
-            'With this setting there will be no jobs created from this service',
-          )}
-        </Typography>
+        <Box>
+          <Typography
+            variant="body1"
+            sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
+            {t(
+              'With this setting there will be no jobs created from this service',
+            )}
+          </Typography>
+          <Grid container mb={2}>
+            <Grid item xs={3}>
+              <ServiceDeliveryPeriodInput
+                value={
+                  formikContractServiceComponent.values.serviceDeliveryType
+                }
+                onChange={formikContractServiceComponent.handleChange}
+                onBlur={formikContractServiceComponent.handleBlur}
+              />
+            </Grid>
+          </Grid>
+        </Box>
       )}
 
       {formikContractServiceComponent.values.isAutomaticJobCycle && (
@@ -863,24 +904,61 @@ export const MutationService = ({
             </FormControl>
           </Grid>
           <Grid item xs={3}>
-            <DatePicker
-              defaultDate={
-                formikContractServiceComponent.values.firstOrderDate
-                  ? toDate(formikContractServiceComponent.values.firstOrderDate)
-                  : null
-              }
-              getSelectedDate={(newValue) => {
-                if (newValue)
+            <FormControl fullWidth required>
+              <InputLabel size="small" shrink variant="outlined">
+                {t('First job creation')}
+                <Tooltip
+                  title={t(
+                    'Please add job generation months to each unit and afterwards chose from which month onwards the generation should start',
+                  )}
+                  placement="top">
+                  <IconButton sx={{marginLeft: '3px', padding: 0}}>
+                    <InfoOutlinedIcon sx={{fontSize: '16px', mb: 0}} />
+                  </IconButton>
+                </Tooltip>
+              </InputLabel>
+              <Select
+                label={`${t('First job creation')}*`}
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    '& legend': {
+                      paddingRight: '13px',
+                    },
+                  },
+                }}
+                size="small"
+                value={
+                  formikContractServiceComponent.values.firstOrderDate
+                    ? getMonthNumberFromDate(
+                        new Date(
+                          formikContractServiceComponent.values.firstOrderDate,
+                        ),
+                      )
+                    : undefined
+                }
+                required
+                notched
+                name="firstOrderDate"
+                onBlur={formikContractServiceComponent.handleBlur}
+                onChange={(event) => {
                   formikContractServiceComponent.setFieldValue(
                     'firstOrderDate',
-                    newValue,
+                    getFirstDayOfMonthInFuture(Number(event.target.value)),
                   );
-              }}
-              textFieldProps={{
-                label: t('First job creation date'),
-                required: true,
-              }}
-              disableLeapDay
+                }}>
+                {jobCreationMonthDropdowns.map((month) => (
+                  <MenuItem value={month.value} key={month.value}>
+                    {t(month.label)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <ServiceDeliveryPeriodInput
+              value={formikContractServiceComponent.values.serviceDeliveryType}
+              onChange={formikContractServiceComponent.handleChange}
+              onBlur={formikContractServiceComponent.handleBlur}
             />
           </Grid>
         </Grid>
@@ -915,7 +993,7 @@ export const MutationService = ({
           }}>
           {visibleElevators?.map((item, index) => {
             const price =
-              formikContractServiceComponent.values.elevators[index].price /
+              filteredElevators[index].price /
               10 ** currentCurrency.fractionDigits;
             return (
               <TableRow
@@ -991,6 +1069,9 @@ export const MutationService = ({
                     <JobFrequencyPicker
                       componentId={item.elevatorId}
                       units={formikContractServiceComponent.values.elevators}
+                      filteredUnitIds={filteredElevators.map(
+                        (e) => e.elevatorId,
+                      )}
                       onChange={handleJobFrequencyChange('elevators')}
                       mode={isEditForm ? 'edit' : 'new'}
                     />
@@ -1007,6 +1088,7 @@ export const MutationService = ({
                   }}>
                   <InvoiceFrequencyPicker
                     formik={formikContractServiceComponent}
+                    filteredUnitIds={filteredElevators.map((e) => e.elevatorId)}
                     componentId={item.elevatorId}
                     mode={isEditForm ? 'edit' : 'new'}
                   />
@@ -1070,33 +1152,47 @@ export const MutationService = ({
                     onValueChange={(values) => {
                       const {floatValue} = values;
 
+                      const fullElevators =
+                        formikContractServiceComponent.values.elevators;
+
                       if (floatValue) {
                         const newPrice = convertNumberToAmountNumber(
                           floatValue,
                           currentCurrency,
                         );
 
-                        if (index === 0 && !isEditForm) {
+                        if (
+                          filteredElevatorIds.length > 0 &&
+                          filteredElevatorIds[0] === item.elevatorId &&
+                          !isEditForm
+                        ) {
                           formikContractServiceComponent.setFieldValue(
                             `elevators[${index}].price`,
                             newPrice,
                           );
 
-                          const updatedElevators =
-                            formikContractServiceComponent.values.elevators.map(
-                              (elevator) => ({
-                                ...elevator,
-                                price: newPrice,
-                              }),
-                            );
+                          const updatedElevators = fullElevators.map(
+                            (elevator) =>
+                              filteredElevatorIds.includes(elevator.elevatorId)
+                                ? {...elevator, price: newPrice}
+                                : elevator,
+                          );
+
                           formikContractServiceComponent.setFieldValue(
                             'elevators',
                             updatedElevators,
                           );
                         } else {
+                          const updatedElevators = fullElevators.map(
+                            (elevator) =>
+                              elevator.elevatorId === item.elevatorId
+                                ? {...elevator, price: newPrice}
+                                : elevator,
+                          );
+
                           formikContractServiceComponent.setFieldValue(
-                            `elevators[${index}].price`,
-                            newPrice,
+                            'elevators',
+                            updatedElevators,
                           );
                         }
                       }
@@ -1119,7 +1215,7 @@ export const MutationService = ({
       </TableContainer>
       <TableContainer>
         <TableBody sx={{display: 'block'}}>
-          {formikContractServiceComponent.values.elevators?.length > 2 && (
+          {filteredElevators?.length > 2 && (
             <TableRow
               sx={{
                 width: '100%',

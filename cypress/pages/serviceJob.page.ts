@@ -1,5 +1,6 @@
 import {addDays} from 'date-fns';
-import {navigateCy} from '../utils/utils';
+import {ServiceOrderTypeKeys} from 'models/service-order';
+import {navigateCy, randomEnumKey} from '../utils/utils';
 import OrdersPage from './orders.page';
 
 type ScheduleModal = {
@@ -48,13 +49,13 @@ export default class ServiceJobPage {
   };
 
   static selectTechnician = () => {
-    cy.get('button[aria-label="Open"]').click({ force: true });
+    cy.get('button[aria-label="Open"]').click({force: true});
     cy.wait(300);
     cy.get('li[role="option"]').first().click();
   };
 
   static selectTechnicianWithIndex = (index: number) => {
-    cy.get('button[aria-label="Open"]').click({ force: true });
+    cy.get('button[aria-label="Open"]').click({force: true});
     cy.get(`li[role="option"][id="combo-box-demo-option-${index}"]`)
       .should('exist')
       .then(($option) => {
@@ -67,8 +68,7 @@ export default class ServiceJobPage {
           cy.get('[role="dialog"]').click({force: true});
         }
       });
-  };  
-  
+  };
 
   static submitData = ({
     changeDueDate = true,
@@ -183,4 +183,26 @@ export default class ServiceJobPage {
   static getFirstTableElement = () => cy.get('[role="cell"]').first();
 
   static getUnitFirstTableElement = () => cy.get('.MuiDataGrid-row').first();
+
+  static createJob = () => {
+    const unitsURL = `${
+      Cypress.env().REACT_APP_API_URL
+    }/api/serviceCompanies/*/elevators?*`;
+    cy.intercept('GET', unitsURL).as('unitsApi');
+    cy.contains('button', 'New Job').should('not.be.disabled').click();
+
+    const randomJobType = randomEnumKey(ServiceOrderTypeKeys);
+    cy.contains('li', randomJobType).click();
+
+    cy.get("span[role='progressbar']").should('exist');
+    cy.get("span[role='progressbar']").should('not.exist');
+    cy.wait('@unitsApi');
+    ServiceJobPage.getUnitFirstTableElement().click();
+    ServiceJobPage.goNext();
+
+    ServiceJobPage.goNext();
+
+    cy.contains('button', 'Submit').should('not.be.disabled').click();
+    cy.contains('Order scheduled successfully');
+  };
 }

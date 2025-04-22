@@ -253,8 +253,7 @@ export const ArticleItemRowNEW = ({
     if (formik.values.article?.type === ArticleType.PACKAGE) {
       const {laborPercentage, materialPercentage} =
         calculatePackageMaterialLaborPercentages(
-          articleItem.article?.costPackage ||
-            articleItem.article?.additionalInfo?.costPackage,
+          articleItem.article?.costPackage,
         );
 
       formik.setFieldValue('article.costPackage', {

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import Box from '@mui/material/Box';
@@ -21,13 +21,19 @@ import {
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
   useFetchXInvoiceByInvoiceId,
-  useInvoiceAmountDetail,
+  useInvoiceAmountDetailQuery,
   useInvoiceDetail,
+  useInvoiceSubItems,
   usePrintInvoice,
   useSendInvoice,
   useUpdateInvoice,
 } from 'hooks/reactQuery/useInvoice';
-import {InvoiceStatus, InvoiceType, InvoiceView} from 'models/invoice';
+import {
+  InvoiceStatus,
+  InvoiceSubItemRecord,
+  InvoiceType,
+  InvoiceView,
+} from 'models/invoice';
 import {
   fetchDownloadUrls as fetchDownloadUrlsUtil,
   useDownloadUrl,
@@ -101,8 +107,9 @@ import {useVats} from 'hooks/reactQuery/useVats';
 import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPreparation';
 import {downloadFile} from 'utils/download';
 import printJS from 'print-js';
-import {isXMLNeeded} from 'utils/invoice';
+import {invoiceItemToInvoiceItemRecord, isXMLNeeded} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 
 interface Props {
   invoice: InvoiceView;
@@ -172,6 +179,9 @@ export const Actions = ({
     user?.userAccount.serviceCompany.id!,
   );
 
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
+
   // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
   const filteredOldJobTypes = oldJobTypes?.filter(
     (oldJobType) =>
@@ -235,9 +245,8 @@ export const Actions = ({
     selectedInvoice?.id!,
   );
 
-  const {data: invoiceAmountDetail} = useInvoiceAmountDetail(
-    selectedInvoice?.id,
-  );
+  const {data: invoiceAmountDetail, refetch: fetchInvoiceAmountDetail} =
+    useInvoiceAmountDetailQuery(invoice?.id, {enabled: false});
 
   const {refetch: refetchDownloadUrl} = useDownloadUrl(
     invoice?.additionalInfo.pdfPath ? [invoice?.additionalInfo.pdfPath] : [],
@@ -247,6 +256,28 @@ export const Actions = ({
   const {refetch: refetchXMLDownloadUrl} = useDownloadUrl(
     invoice?.additionalInfo.xmlPath ? [invoice?.additionalInfo.xmlPath] : [],
     {enabled: false},
+  );
+
+  const {data: invoiceSubItems, refetch: fetchSubItems} = useInvoiceSubItems(
+    invoice?.id,
+    {
+      enabled: false,
+    },
+  );
+
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(invoiceSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, InvoiceSubItemRecord[]>,
+      ),
+    [invoiceSubItems],
   );
 
   const fetchUpdatedPdfDownloadUrl = useFetchFromUrl();
@@ -390,6 +421,9 @@ export const Actions = ({
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -494,6 +528,7 @@ export const Actions = ({
 
     const blob = await pdf(
       <WorkReportTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
@@ -509,6 +544,9 @@ export const Actions = ({
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
         serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -563,13 +601,26 @@ export const Actions = ({
 
     const {headerInfo, footerInfo} = await onFetchInvoiceInfo();
 
+    const transformedInvoiceItems =
+      invoice?.items.map((item) =>
+        invoiceItemToInvoiceItemRecord(
+          item,
+          invoice.type,
+          currentCurrency,
+          taxRates,
+          subItemsMap,
+        ),
+      ) || [];
+
     const blob = await pdf(
       <PdfTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
         invoice={invoiceData}
         invoiceAmountDetail={invoiceAmountDetail}
+        invoiceItems={transformedInvoiceItems}
         selectedLng={company?.language}
         translate={translate}
         previousInvoices={previousInvoicesProp}
@@ -581,6 +632,9 @@ export const Actions = ({
         nextCompanyExternalId={
           invoiceNumber || translate('Automatically assigned')
         }
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -593,9 +647,10 @@ export const Actions = ({
     }
   }, [reportToUpdate]);
 
-  const handleClick = (event: any) => {
+  const handleClick = async (event: any) => {
     setAnchorEl(event.currentTarget);
     setSelectedInvoice(invoice);
+    await Promise.all([fetchSubItems(), fetchInvoiceAmountDetail()]);
   };
 
   const handleClose = () => {
@@ -892,12 +947,12 @@ export const Actions = ({
     });
 
     // // Work report operations
-    const workReportOperations = getWorkReportOperations(
+    const workReportOperations = await getWorkReportOperations(
       invoiceData,
       workReportDownloadUrlArg,
     );
 
-    const xInvoiceOperation = getXInvoiceOperation(invoiceData);
+    const xInvoiceOperation = await getXInvoiceOperation(invoiceData);
 
     const checklistOperations = await getChecklistOperations(invoiceData);
 

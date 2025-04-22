@@ -1,5 +1,9 @@
 import {Box, SxProps, SystemStyleObject} from '@mui/system';
-import {MouseEventHandler, PropsWithChildren} from 'react';
+import {
+  KeyboardEventHandler,
+  MouseEventHandler,
+  PropsWithChildren,
+} from 'react';
 import {CellProps} from 'models/table';
 import {TableCell} from '@mui/material';
 import {Theme} from '@mui/material/styles';
@@ -12,12 +16,15 @@ type Props = CellProps & {
   justifyContent?: string;
   maxWidth?: string;
   fieldName?: string;
-  onClick?: () => void;
+  onClick?: MouseEventHandler<HTMLTableCellElement>;
   onDoubleClick?: MouseEventHandler<HTMLTableCellElement>;
+  onKeyDown?: KeyboardEventHandler<HTMLTableCellElement>;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   fullWidth?: boolean;
   sx?: SxProps<Theme>;
+  colSpan?: number;
+  testId?: string;
 };
 
 const Cell = ({
@@ -26,6 +33,9 @@ const Cell = ({
   children,
   onClick,
   onDoubleClick,
+  onKeyDown,
+  onMouseEnter,
+  onMouseLeave,
   align = 'left',
   justifyContent,
   firstSticky = true,
@@ -33,6 +43,8 @@ const Cell = ({
   noWidthLimit = false,
   noPadding = false,
   fullWidth = false,
+  colSpan,
+  testId,
   ...cellProps
 }: PropsWithChildren<Props>) => {
   const defaultSx: SystemStyleObject<Theme> = {
@@ -90,10 +102,15 @@ const Cell = ({
   return (
     <TableCell
       role="cell"
+      colSpan={colSpan}
       {...(cellProps.fieldName && {'data-field': cellProps.fieldName})}
       sx={combinedSx}
       onClick={onClick}
-      onDoubleClick={onDoubleClick}>
+      onDoubleClick={onDoubleClick}
+      onKeyDown={onKeyDown}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      data-testid={testId}>
       <Box
         gap={gap ?? 2}
         sx={{

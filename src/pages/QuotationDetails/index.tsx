@@ -3,6 +3,7 @@ import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
 import {
   useQuotationActivities,
   useQuotationDetails,
+  useQuotationSubItems,
 } from 'hooks/reactQuery/useQuotation';
 import {useQueryClientStorageData} from 'hooks/useClientStorage';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -33,6 +34,13 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
     isFetched,
     refetch,
   } = useQuotationDetails(quotationId);
+
+  const {
+    data: quotationSubItems,
+    isIdle: isQuotationSubItemsIdle,
+    isLoading: isQuotationSubItemsLoading,
+  } = useQuotationSubItems(quotationId);
+
   const {t} = useTranslation();
   const {data: quotationActivities, isLoading: isLoadingQuotationActivities} =
     useQuotationActivities({quotationId: quotationId ?? ''});
@@ -119,6 +127,8 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
   if (
     isIdle ||
     isLoading ||
+    isQuotationSubItemsLoading ||
+    isQuotationSubItemsIdle ||
     isLoadingQuotationActivities ||
     isLoadingClientStorageDataPdfConfig ||
     isLoadingClientStorageDataTemplate ||
@@ -144,6 +154,7 @@ export const QuotationDetails = ({getCurrentPageTitle}: Props) => {
       footerUrl={
         footerUrl && footerInfo?.path ? footerUrl[footerInfo.path] : ''
       }
+      quotationSubItems={quotationSubItems}
     />
   ) : (
     <EmptySection label="Sorry, we couldn't find the quotation." />

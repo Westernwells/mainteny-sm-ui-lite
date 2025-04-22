@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import GradingIcon from '@mui/icons-material/Grading';
 import FactCheck from '@mui/icons-material/FactCheck';
@@ -18,14 +18,18 @@ import {
 import {useParams, useSearchParams} from 'react-router-dom';
 import {formatSearchParams} from 'utils/utils';
 import {Box, Typography} from '@mui/material';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useSnackbar} from 'hooks/useSnackbar';
 import PathImage from 'assets/images/Path.svg';
 import {SnackbarKey} from 'notistack';
 import {useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {pdf} from '@react-pdf/renderer';
-import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
+import {
+  useQuotationAmountDetailQuery,
+  useQuotationDetails,
+  useQuotationSubItems,
+} from 'hooks/reactQuery/useQuotation';
 import {
   useCompanyById,
   useCompanyJobTypes,
@@ -39,6 +43,9 @@ import {
 import {companyLanguageContextMap} from 'utils/language';
 import {getJobTypeGivenName} from 'utils/service-order-utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
+import {QuotationSubItemRecord} from 'models/quotation';
+import {quotationItemToQuotationItemRecord} from 'utils/quotation';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -78,8 +85,29 @@ export const ServiceOrderDetails = () => {
   const {t} = useTranslation();
   const {user} = useUserSession();
 
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
+
   const currentCurrency = useCurrentCurrency();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+
+  const {data: quotationSubItems, isLoading: isQuotationSubItemsLoading} =
+    useQuotationSubItems(serviceOrder?.additionalInfo?.quotationId);
+
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(quotationSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, QuotationSubItemRecord[]>,
+      ),
+    [quotationSubItems],
+  );
 
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -100,6 +128,7 @@ export const ServiceOrderDetails = () => {
   const {data: quotation} = useQuotationDetails(
     serviceOrder?.additionalInfo.quotationId,
   );
+
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
   const filePaths = useMemo(
@@ -163,6 +192,15 @@ export const ServiceOrderDetails = () => {
     company?.id,
   );
 
+  const transformedQuotationItems =
+    quotation?.items.map((item) =>
+      quotationItemToQuotationItemRecord(item, subItemsMap),
+    ) || [];
+
+  const {data: quotationAmountDetail} = useQuotationAmountDetailQuery(
+    quotation?.id,
+  );
+
   const generatePreviewPdfBlobUrl = async () => {
     const blob =
       serviceOrder?.additionalInfo.quotationId && quotation
@@ -183,6 +221,11 @@ export const ServiceOrderDetails = () => {
                 serviceOrder?.type,
                 allJobTypes,
               )}
+              quotationItems={transformedQuotationItems}
+              quotationAmountDetail={quotationAmountDetail}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />,
           ).toBlob()
         : await pdf(
@@ -202,6 +245,9 @@ export const ServiceOrderDetails = () => {
                 serviceOrder?.type,
                 allJobTypes,
               )}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />,
           ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -269,7 +315,7 @@ export const ServiceOrderDetails = () => {
     }
   }, [filePathToDownload]);
 
-  if (isLoading) {
+  if (isLoading || isQuotationSubItemsLoading) {
     return <Progress />;
   }
 

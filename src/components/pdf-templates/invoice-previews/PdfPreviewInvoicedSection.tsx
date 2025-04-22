@@ -1,13 +1,11 @@
-import {View, Text, Font, StyleSheet} from '@react-pdf/renderer';
-import {InvoiceView, InvoiceType} from 'models/invoice';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
+import {InvoiceType, InvoiceView} from 'models/invoice';
 import {Currency} from 'models/misc';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import {formatDate, toDate} from 'utils/datetime';
 import {fixRounding} from 'utils/utils';
-import MontserratRegular from '../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
 type InvoicedSectionProps = {
   translate: (key: string) => string;
@@ -19,35 +17,12 @@ type InvoicedSectionProps = {
     percentageVat: number;
     vat: number;
   }[];
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = () =>
+const getStyles = ({secondaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -67,6 +42,9 @@ export const PdfPreviewInvoicedSection = ({
   previousInvoices,
   amount,
   currentInvoiceAmountPercentageVats,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: InvoicedSectionProps) => {
   const amountFormatted = formatCurrency(fixRounding(amount, 2), {
     currency: currentCurrency?.code,
@@ -99,11 +77,7 @@ export const PdfPreviewInvoicedSection = ({
     },
   ];
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const styles = getStyles();
+  const styles = getStyles({secondaryColor});
 
   return (
     <View>
@@ -259,19 +233,19 @@ export const PdfPreviewInvoicedSection = ({
             width: '100%',
             flexDirection: 'row',
             borderTopWidth: 1,
-            borderTopColor: '#212121',
+            borderTopColor: primaryColor,
             paddingTop: 3,
           }}>
-          <Text style={{width: '30%', ...boldFontStyle}}>
+          <Text style={{width: '30%', ...fontStyles.bold}}>
             {`${translate('Invoice amount')} (${currentCurrency?.symbol})`}
           </Text>
           <Text style={{width: '15%', textAlign: 'right'}} />
-          <Text style={{width: '18%', textAlign: 'right', ...boldFontStyle}}>
+          <Text style={{width: '18%', textAlign: 'right', ...fontStyles.bold}}>
             {amountFormatted}
           </Text>
           <View
             style={{
-              ...boldFontStyle,
+              ...fontStyles.bold,
               width: '7%',
               textAlign: 'right',
               alignItems: 'flex-end',
@@ -299,13 +273,13 @@ export const PdfPreviewInvoicedSection = ({
                 companyLang: selectedLng,
               });
               return (
-                <Text key={idx} style={{marginBottom: 3, ...boldFontStyle}}>
+                <Text key={idx} style={{marginBottom: 3, ...fontStyles.bold}}>
                   {vatAmountFormatted}
                 </Text>
               );
             })}
           </View>
-          <Text style={{width: '20%', textAlign: 'right', ...boldFontStyle}}>
+          <Text style={{width: '20%', textAlign: 'right', ...fontStyles.bold}}>
             {formatCurrency(
               amount +
                 currentInvoiceAmountPercentageVats

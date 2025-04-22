@@ -20,11 +20,16 @@ import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
 import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
 import {FileResource, FileResourceRecord} from './media';
-import {Discount} from './invoice';
+import {
+  Discount,
+  InvoiceSubItemsConfig,
+  InvoiceUnitAmountSource,
+} from './invoice';
 import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {CommentRecord} from './comment';
+import {ArticleInfoRecord} from './quotation';
 
 export enum Priority {
   A = 'A',
@@ -207,6 +212,7 @@ export enum ServiceOrderOrderField {
   JOB_TYPE = 'JOB_TYPE',
   PAYMENT_STATUS = 'PAYMENT_STATUS',
   JOB_STATUS = 'JOB_STATUS',
+  LAST_ACTIVITY_AT = 'LAST_ACTIVITY_AT',
 }
 
 export enum DispatchPlanStatus {
@@ -303,6 +309,7 @@ export interface ServiceOrderAdditionalInfo {
   discount?: Discount;
   commentCount?: number;
   totalAmount?: Amount;
+  lastActivityAt?: string;
 }
 
 export interface ServiceOrderConfirmationInfo {
@@ -670,7 +677,8 @@ export interface ServiceOrderArticleView {
   name: string;
   description: string;
   serviceOrderId: string;
-  article: ArticleRecord;
+  article: ArticleInfoRecord;
+  unitPurchaseAmount?: MultiVatsAmount;
   unitAmount: MultiVatsAmount;
   quantity: number;
   ownerType?: ServiceOrderArticleOwnerType;
@@ -681,6 +689,9 @@ export interface ServiceOrderArticleView {
           id: string;
           name: string;
         };
+        unitAmountSource?: InvoiceUnitAmountSource;
+        subArticlesConfig?: InvoiceSubItemsConfig;
+        userSeqNumber?: string;
       }
     | undefined;
 }
@@ -741,6 +752,7 @@ export type ServiceOrderTableRow = {
     | ServiceOrderPaymentStatus
     | ServiceOrderPaymentWithIndicationStatus;
   hasNotes: boolean;
+  lastActivityAt: string;
 };
 
 // used to indicate fields for the search parameter of service order endpoint
@@ -786,4 +798,9 @@ export type ServiceOrderStatistics = {
 export interface ServiceOrderNameChangedRecord {
   fromName: string;
   toName: string;
+}
+
+export interface DateCellParts {
+  label: string;
+  date?: string | null;
 }

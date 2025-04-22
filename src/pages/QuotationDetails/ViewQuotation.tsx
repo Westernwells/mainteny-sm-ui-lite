@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useFormik} from 'formik';
 import printJS from 'print-js';
@@ -20,6 +20,7 @@ import {getQuotationStatusStyles} from 'pages/Quotations/QuotationsDataGridProps
 import {
   useDeleteQuotation,
   usePrintQuotation,
+  useQuotationAmountDetailQuery,
   useReplyQuotation,
   useSendQuotation,
 } from 'hooks/reactQuery/useQuotation';
@@ -27,9 +28,10 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {
   QuotationActivityView,
   QuotationStatus,
+  QuotationSubItemRecord,
   QuotationView,
 } from 'models/quotation';
-import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, useCurrentCurrency} from 'utils/currency';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {createFilesFromBlobArray, fetchFile} from 'utils/utils';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
@@ -66,6 +68,8 @@ import {FileResourceRecord} from 'models/media';
 import {HeaderFooterInfoData} from 'models/misc';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {quotationItemToQuotationItemRecord} from 'utils/quotation';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {CreateServiceOrder} from './CreateServiceOrder';
 import {ServiceOrderDetails} from './ServiceOrderDetails';
 import {Notes} from './Notes';
@@ -92,6 +96,7 @@ interface Props {
   footerInfo: HeaderFooterInfoData;
   headerUrl: string;
   footerUrl: string;
+  quotationSubItems?: Record<string, QuotationSubItemRecord[]>;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -109,6 +114,7 @@ export const ViewQuotation = ({
   footerInfo,
   headerUrl,
   footerUrl,
+  quotationSubItems,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -116,6 +122,9 @@ export const ViewQuotation = ({
   const currentCurrency = useCurrentCurrency();
   const navigate = useNavigate();
   const {search} = useLocation();
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -130,6 +139,21 @@ export const ViewQuotation = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const {mutate: deleteQuotation} = useDeleteQuotation();
+
+  const subItemsMap: Record<string, QuotationSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(quotationSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, QuotationSubItemRecord[]>,
+      ),
+    [quotationSubItems],
+  );
 
   const {data: elevator} =
     typeof elevatorId === 'string'
@@ -256,9 +280,22 @@ export const ViewQuotation = ({
     }
   }, [quotation]);
 
+  const transformedQuotationItems = useMemo(
+    () =>
+      quotation?.items.map((item) =>
+        quotationItemToQuotationItemRecord(item, subItemsMap),
+      ) || [],
+    [quotation?.items, subItemsMap],
+  );
+
+  const {data: quotationAmountDetail} = useQuotationAmountDetailQuery(
+    quotation.id,
+  );
+
   const generateBlobUrl = async () => {
     const blob = await pdf(
       <QuotationPdfTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         currentCurrency={currentCurrency}
@@ -269,6 +306,11 @@ export const ViewQuotation = ({
         headerInfo={headerInfo}
         footerPath={footerUrl}
         footerInfo={footerInfo}
+        quotationItems={transformedQuotationItems}
+        quotationAmountDetail={quotationAmountDetail}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     setBlobFile(blob);
@@ -279,7 +321,17 @@ export const ViewQuotation = ({
 
   useEffect(() => {
     generateBlobUrl();
-  }, [quotation, headerUrl, footerUrl]);
+  }, [
+    quotation,
+    headerUrl,
+    footerUrl,
+    quotationSubItems,
+    quotationAmountDetail,
+    fontStyles,
+    primaryColor,
+    secondaryColor,
+    company,
+  ]);
 
   const getExistingFiles = async (
     fileDownloadUrl:
@@ -456,8 +508,10 @@ export const ViewQuotation = ({
               />
               <Typography variant="subtitle1" fontWeight="600">
                 {formatCurrency(
-                  (quotation.totalAmount.netAmount ?? 0) /
-                    10 ** quotation.totalAmount.fractionDigits!,
+                  centsToMoney(
+                    currentCurrency.code,
+                    quotation.totalAmount.netAmount,
+                  ),
                   {currency: quotation.totalAmount.currency},
                 )}
               </Typography>

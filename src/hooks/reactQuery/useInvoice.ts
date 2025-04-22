@@ -36,6 +36,7 @@ import {
   InvoicePaymentRecord,
   InvoiceStatistics,
   InvoiceStatus,
+  InvoiceSubItemRecord,
   InvoiceView,
   PrintInvoiceRecord,
   QueryCancelInvoiceParams,
@@ -799,12 +800,19 @@ export const fetchInvoiceAmountDetail = async (invoiceId: string) => {
   return response.data;
 };
 
-export function useInvoiceAmountDetail(invoiceId?: string) {
-  return useQuery(
+export function useInvoiceAmountDetailQuery(
+  invoiceId?: string,
+  options: UseQueryOptions<any, any, any> = {},
+) {
+  const {enabled: userEnabled, ...restOptions} = options;
+  const enabled = (userEnabled ?? true) && Boolean(invoiceId);
+
+  return useQuery<InvoiceAmountDetail, RestError, InvoiceAmountDetail>(
     [qk.invoiceAmountById, invoiceId],
     () => fetchInvoiceAmountDetail(invoiceId!),
     {
-      enabled: !!invoiceId,
+      enabled,
+      ...restOptions,
     },
   );
 }
@@ -907,7 +915,28 @@ export const postInvoiceAmount = async (body: CalculateInvoiceAmountRecord) => {
   return data;
 };
 
-export const useCalculateInvoiceAmount = () =>
+export const useRecalculateInvoiceAmount = () =>
   useMutation(({data}: {data: CalculateInvoiceAmountRecord}) =>
     postInvoiceAmount(data),
   );
+
+export const fetchInvoiceSubItems = async (invoiceId: string) => {
+  const response = await axiosClient.get<
+    Record<string, InvoiceSubItemRecord[]>
+  >(`/api/invoices/${invoiceId}/subItems`);
+  return response.data;
+};
+
+export function useInvoiceSubItems(
+  invoiceId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<
+    Record<string, InvoiceSubItemRecord[]>,
+    RestError,
+    Record<string, InvoiceSubItemRecord[]>
+  >([qk.invoiceSubItem, invoiceId], () => fetchInvoiceSubItems(invoiceId!), {
+    enabled: !!invoiceId,
+    ...options,
+  });
+}

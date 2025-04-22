@@ -11,6 +11,8 @@ export type HeaderCellProps = {
   headerName: string;
   fieldName?: string;
   onSort?: () => void;
+  headerIconTooltip?: string;
+  headerIcon?: React.ReactNode;
 };
 
 export type CellProps = {
@@ -64,3 +66,10 @@ export type CustomizableColumn = {
 export enum CustomizableTable {
   UNIT = 'UNIT',
 }
+
+export type DragData = {
+  id: string;
+  index: number;
+  type: 'main' | 'sub';
+  parentIndex?: number;
+};

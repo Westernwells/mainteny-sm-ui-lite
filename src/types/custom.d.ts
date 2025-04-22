@@ -33,7 +33,9 @@ declare module '@mui/material/styles' {
     mainLight?: string;
     darkSuccess?: string;
   }
+
   interface PaletteColor extends CustomPalleteColor {}
+
   interface SimplePaletteColorOptions extends CustomPalleteColor {}
 
   interface CustomPalette {
@@ -43,7 +45,9 @@ declare module '@mui/material/styles' {
     eden: SimplePaletteColorOptions;
     suvaGrey: SimplePaletteColorOptions;
   }
+
   interface Palette extends CustomPalette {}
+
   interface PaletteOptions extends CustomPalette {}
 
   interface CustomTheme {
@@ -56,6 +60,7 @@ declare module '@mui/material/styles' {
   }
 
   interface Theme extends CustomTheme {}
+
   interface ThemeOptions extends CustomTheme {}
 }
 
@@ -70,6 +75,7 @@ declare module '@mui/material/Typography' {
     chip: true;
     inputLabel: true;
     tooltip: true;
+    secondary: true;
   }
 }
 

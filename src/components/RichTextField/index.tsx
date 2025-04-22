@@ -1,22 +1,22 @@
 import React, {
+  CSSProperties,
+  PropsWithChildren,
+  Ref,
+  useCallback,
+  useEffect,
   useMemo,
   useRef,
-  useEffect,
-  useCallback,
-  Ref,
-  CSSProperties,
   useState,
-  PropsWithChildren,
 } from 'react';
 import {useTranslation} from 'react-i18next';
 import {
-  Slate,
-  Editable,
-  withReact,
-  ReactEditor,
   DefaultElement,
+  Editable,
+  ReactEditor,
+  Slate,
+  withReact,
 } from 'slate-react';
-import {createEditor, BaseEditor, Descendant, Editor, Transforms} from 'slate';
+import {BaseEditor, createEditor, Descendant, Editor, Transforms} from 'slate';
 import {HistoryEditor, withHistory} from 'slate-history';
 import {theme} from 'theme';
 import {FormControl, FormHelperText} from '@mui/material';
@@ -35,7 +35,7 @@ const CustomElements = ({
   attributes,
   children,
 }: RenderElementProps) => {
-  const style = {fontSize: element.fontSize};
+  const style = {fontSize: element.fontSize, color: element.color};
 
   switch (element.type) {
     case 'paragraph':
@@ -249,32 +249,31 @@ const RichTextField = ({
   const renderLeaf = useCallback((p: RenderLeafProps) => <Leaf {...p} />, []);
 
   useEffect(() => {
+    if (!editor || !html) return;
+
     const newValue = getValue(html) as Descendant[];
     const {selection} = editor;
 
     if (JSON.stringify(value) !== JSON.stringify(newValue)) {
+      Editor.withoutNormalizing(editor, () => {
+        // Clear existing content safely
+        Transforms.delete(editor, {
+          at: {
+            anchor: Editor.start(editor, []),
+            focus: Editor.end(editor, []),
+          },
+        });
+
+        // Remove all nodes and insert new ones
+        Transforms.removeNodes(editor, {at: [0], voids: true});
+        Transforms.insertNodes(editor, newValue, {at: [0]});
+
+        if (selection && Editor.hasPath(editor, selection.anchor.path)) {
+          Transforms.select(editor, selection);
+        }
+      });
+
       setValue(newValue);
-      // Delete all entries leaving 1 empty node
-      Transforms.delete(editor, {
-        at: {
-          anchor: Editor.start(editor, []),
-          focus: Editor.end(editor, []),
-        },
-      });
-
-      // Removes empty node
-      Transforms.removeNodes(editor, {
-        at: [0],
-      });
-
-      // Insert array of children nodes
-      Transforms.insertNodes(editor, newValue, {
-        at: [editor.children.length],
-      });
-
-      if (selection) {
-        Transforms.select(editor, selection);
-      }
     }
   }, [html]);
 

@@ -208,7 +208,9 @@ export const NewContractServices = ({
           (formikContractServiceComponent.values.isAutomaticJobCycle &&
             !formikContractServiceComponent.values.firstOrderDate) ||
           (formikContractServiceComponent.values.isAutomaticJobCycle &&
-            !formikContractServiceComponent.values.orderType)
+            !formikContractServiceComponent.values.orderType) ||
+          (formikContractServiceComponent.values.isAutomaticJobCycle &&
+            !formikContractServiceComponent.values.serviceDeliveryType)
         }
         saveButtonText={isEditForm ? t('Save') : t('Add Service')}
         onSave={() => {

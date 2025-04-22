@@ -1,11 +1,13 @@
-import {Page, View, Image, StyleSheet} from '@react-pdf/renderer';
+import {Image, Page, StyleSheet, View} from '@react-pdf/renderer';
 import React from 'react';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
 type Props = {
   qrImageSrc?: string;
-};
+} & Pick<ContextProps, 'primaryColor'>;
 
-const getStyles = () =>
+const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     page: {
       fontSize: 10,
@@ -20,7 +22,7 @@ const getStyles = () =>
       position: 'relative',
       justifyContent: 'space-between',
       paddingBottom: 95,
-      color: '#212121',
+      color: primaryColor,
     },
     qrCodePage: {
       marginTop: 50,
@@ -30,8 +32,8 @@ const getStyles = () =>
     },
   });
 
-const SwissPageTemplate = ({qrImageSrc}: Props) => {
-  const styles = getStyles();
+const SwissPageTemplate = ({qrImageSrc, primaryColor}: Props) => {
+  const styles = getStyles({primaryColor});
   return (
     <Page style={[styles.page, styles.qrCodePage]}>
       <View style={styles.qrBorder}>

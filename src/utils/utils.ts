@@ -12,12 +12,15 @@ import {
 } from 'models/invoice';
 
 import {ElevatorDataSchemaItem} from 'models/elevator';
+import {MONTH_NUMBER_TO_NAME} from 'models/jobFrequency';
+import {ContractServiceFormElevator, ContractTimeUnit} from 'models/contract';
 import {Address, AddressRecord, Coord, GeocodeAddress} from '../models/misc';
 import useHighlightText from '../hooks/useHighlightText';
 import {getCountryCode} from './countries';
 import {
   DEFAULT_ELEVATOR_TECHNICAL_FIELD_CATEGORIES,
   DEFAULT_ELEVATOR_TECHNICAL_FIELD_NAMES,
+  ESCAPE_DOT_STRING,
 } from './constants';
 
 export const capitalize = (role: any[]) => {
@@ -551,7 +554,8 @@ export const yupValidations = {
     Yup.mixed().test(
       'checkRichTextField',
       message,
-      (value: string) => !!value && !isEmptyHTML(value),
+      (value: unknown): boolean =>
+        typeof value === 'string' && !!value && !isEmptyHTML(value),
     ),
 };
 
@@ -750,3 +754,44 @@ export const getTechnicalFieldCategory = (
 
   return name;
 };
+
+export const generateMonthDropdownFromElevatorJobFrequency = (
+  elevators: ContractServiceFormElevator[],
+) => {
+  let allMonthsSet = new Set<number>();
+  let isNonMonthly = false;
+
+  elevators.forEach((elevator) => {
+    if (elevator.orderGenerationJob?.timeUnit !== ContractTimeUnit.MONTHLY) {
+      isNonMonthly = true;
+      allMonthsSet = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      return;
+    }
+
+    elevator.orderGenerationJob?.timeNumbers.forEach((month) => {
+      allMonthsSet.add(month);
+    });
+  });
+
+  const months = [...allMonthsSet];
+
+  const sorted = isNonMonthly
+    ? months.sort((a, b) => {
+        const nextMonth = new Date().getMonth() + 2;
+        const aAdjusted = (a - nextMonth + 12) % 12;
+        const bAdjusted = (b - nextMonth + 12) % 12;
+        return aAdjusted - bAdjusted;
+      })
+    : months.sort((a, b) => a - b);
+
+  return sorted.map((month) => ({
+    label: MONTH_NUMBER_TO_NAME[month],
+    value: month,
+  }));
+};
+
+export const escapeDotInString = (str: string): string =>
+  str.replace(/\./g, ESCAPE_DOT_STRING); // Escape all dots
+
+export const restoreDotInString = (str: string): string =>
+  str.replace(new RegExp(ESCAPE_DOT_STRING, 'g'), '.'); // Restore dots

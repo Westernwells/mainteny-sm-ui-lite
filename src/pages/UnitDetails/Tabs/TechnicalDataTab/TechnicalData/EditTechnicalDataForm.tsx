@@ -4,6 +4,7 @@ import {FormInput} from 'components/form/FormInput';
 import {ElevatorDataItemView} from 'models/elevator';
 import {UseFormRegister} from 'react-hook-form';
 import {useTranslation} from 'react-i18next';
+import {escapeDotInString} from 'utils/utils';
 
 interface Props {
   register: UseFormRegister<{
@@ -33,7 +34,8 @@ const EditTechnicalDataForm = ({elevatorDataItems, register}: Props) => {
               placeholder: '',
               type: 'text',
               label: item.name,
-              ...register(item.name),
+              // Escaping dot is important otherwise react-hook-form won't work
+              ...register(escapeDotInString(item.name)),
             }}
           />
         </Grid>
