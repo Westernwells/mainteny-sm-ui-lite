@@ -753,6 +753,7 @@ export type ServiceOrderTableRow = {
     | ServiceOrderPaymentWithIndicationStatus;
   hasNotes: boolean;
   lastActivityAt: string;
+  hasSchedule: boolean;
 };
 
 // used to indicate fields for the search parameter of service order endpoint

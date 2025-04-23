@@ -391,6 +391,7 @@ export const aggregateServiceOrderRow = (
       ServiceOrderPaymentStatus.NO_INVOICE,
     hasNotes: Boolean(order.additionalInfo.commentCount),
     lastActivityAt: order.additionalInfo.lastActivityAt ?? '',
+    hasSchedule: order.schedules.length > 0,
   }));
 
 export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
@@ -537,8 +538,16 @@ export const roundTimeWithSurcharge = (
 export function getServiceOrderDateParts(
   row: ServiceOrderTableRow,
 ): DateCellParts {
-  const label = statusLabelMap[row.jobStatus] ?? '-';
-  const date = row.lastActivityAt ? formatDate(row.lastActivityAt) : null;
+  let label: string;
 
+  if (row.jobStatus === ServiceOrderStatus.OVERDUE) {
+    label = row.hasSchedule
+      ? statusLabelMap[ServiceOrderStatus.SCHEDULED]
+      : statusLabelMap[ServiceOrderStatus.OVERDUE];
+  } else {
+    label = statusLabelMap[row.jobStatus] ?? '-';
+  }
+
+  const date = row.lastActivityAt ? formatDate(row.lastActivityAt) : null;
   return {label, date};
 }
