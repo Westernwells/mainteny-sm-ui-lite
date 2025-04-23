@@ -795,3 +795,34 @@ export const escapeDotInString = (str: string): string =>
 
 export const restoreDotInString = (str: string): string =>
   str.replace(new RegExp(ESCAPE_DOT_STRING, 'g'), '.'); // Restore dots
+
+export const formatAutocompleteAddress = (
+  currentValues: Address | null,
+  componentAddress?: AddressRecord,
+) => {
+  if (!componentAddress) {
+    const newValues = {
+      ...(currentValues ?? {}),
+      component: {
+        ...(currentValues?.component ?? {}),
+        street: '',
+      },
+      id: currentValues?.id!,
+      fullName: '',
+    };
+
+    return newValues;
+  }
+
+  const newValues = {
+    ...(componentAddress ?? {}),
+    component: {
+      ...(currentValues?.component ?? {}),
+      ...(componentAddress?.component ?? {}),
+    },
+    id: currentValues?.id!,
+    fullName: componentAddress?.fullName || '',
+  };
+
+  return newValues;
+};
