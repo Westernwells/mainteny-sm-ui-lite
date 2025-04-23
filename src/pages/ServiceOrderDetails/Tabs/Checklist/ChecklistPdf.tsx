@@ -196,11 +196,11 @@ const ChecklistPdf = ({
             />
 
             <View style={styles.rightAddress}>
-              {selectedChecklist?.checkList?.externalId && (
+              {selectedChecklist?.externalId && (
                 <View style={styles.rightAddressContent}>
                   <Text style={styles.tag}>{translate('Checklist no.')}</Text>
                   <Text style={styles.tagContent}>
-                    {selectedChecklist?.checkList?.externalId || '-'}
+                    {selectedChecklist?.externalId || '-'}
                   </Text>
                 </View>
               )}

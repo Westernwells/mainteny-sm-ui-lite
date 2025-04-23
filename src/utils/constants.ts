@@ -134,3 +134,5 @@ export const DEFAULT_ELEVATOR_TECHNICAL_FIELD_CATEGORIES = [
   'technical data',
   'auto dialer',
 ];
+
+export const ESCAPE_DOT_STRING = '_DOT_';
