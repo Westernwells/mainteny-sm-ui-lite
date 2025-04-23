@@ -15,6 +15,7 @@ import {
 import {AddressRecord} from 'models/misc';
 import {CustomerFinanceFormModel} from 'models/customer';
 import NameFields from 'components/BillingAddress/NameFields';
+import {formatAutocompleteAddress} from 'utils/utils';
 
 const BillingAddress = ({
   control,
@@ -43,17 +44,10 @@ const BillingAddress = ({
   const handleAddressChange = (componentAddress: AddressRecord | undefined) => {
     const currentValues = watch('billingAddress');
 
-    const newValues = {
-      ...(componentAddress ?? {}),
-      component: {
-        ...(currentValues?.component ?? {}),
-        ...(componentAddress?.component ?? {}),
-      },
-      id: currentValues?.id!,
-      fullName: componentAddress?.fullName || '',
-    };
-
-    setValue('billingAddress', newValues);
+    setValue(
+      'billingAddress',
+      formatAutocompleteAddress(currentValues, componentAddress),
+    );
   };
 
   useEffect(() => {
@@ -179,6 +173,7 @@ const BillingAddress = ({
               <FormSelect
                 labelId="billingAddress.component.country"
                 label="Country"
+                resetOption={{label: t('Select country')}}
                 options={countriesOptions}
                 errorText={
                   errors?.billingAddress?.component?.country?.message || ''
@@ -203,6 +198,7 @@ const BillingAddress = ({
               <FormSelect
                 labelId="billingAddress.component.state"
                 label="State/Province/Region"
+                resetOption={{label: t('Select country')}}
                 options={statesByCountry(countryValue)}
                 selectProps={{
                   ...field,
