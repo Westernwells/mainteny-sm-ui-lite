@@ -65,11 +65,13 @@ if (!window.Cypress) {
   }
 }
 
-// Add Kalasar script dynamically
-const script = document.createElement('script');
-script.src = 'https://design.kalasar.com/static/mainteny@staging/kalasar.js';
-script.async = true;
-document.head.appendChild(script);
+if (!document.querySelector('script[data-kalasar]')) {
+  const script = document.createElement('script');
+  script.src = 'https://design.kalasar.com/static/traideAI@1.0.0/kalasar.js';
+  script.defer = true;
+  script.dataset.kalasar = 'true';
+  document.head.appendChild(script);
+}
 
 // Updated part for React 18
 const container = document.querySelector('#root') as Element;
