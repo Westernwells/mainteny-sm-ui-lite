@@ -18,6 +18,7 @@ import {
   ServiceOrderType,
   ServiceOrderTypeRecord,
   ServiceOrderView,
+  statusLabelMap,
 } from '../models/service-order';
 import {formatDate, toDate, toRestDateTime} from './datetime';
 
@@ -536,23 +537,8 @@ export const roundTimeWithSurcharge = (
 export function getServiceOrderDateParts(
   row: ServiceOrderTableRow,
 ): DateCellParts {
-  switch (row.jobStatus) {
-    case ServiceOrderStatus.CANCELLED:
-      return {
-        label: 'Canceled on',
-        date: row.lastActivityAt ? formatDate(row.lastActivityAt) : null,
-      };
-    case ServiceOrderStatus.COMPLETED:
-      return {
-        label: 'Completed on',
-        date: row.lastActivityAt ? formatDate(row.lastActivityAt) : null,
-      };
-    case ServiceOrderStatus.IN_PROGRESS:
-      return {
-        label: 'Started on',
-        date: row.lastActivityAt ? formatDate(row.lastActivityAt) : null,
-      };
-    default:
-      return {label: '-', date: null};
-  }
+  const label = statusLabelMap[row.jobStatus] ?? '-';
+  const date = row.lastActivityAt ? formatDate(row.lastActivityAt) : null;
+
+  return {label, date};
 }
