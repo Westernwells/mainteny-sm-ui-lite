@@ -3186,5 +3186,9 @@
   "Tag": "Oznaka",
   "Canceled on": "Otkazano",
   "Completed on": "Završeno na",
-  "Started on": "Počelo na"
+  "Started on": "Počelo na",
+  "Archived on": "Arhivirano na",
+  "Scheduled on": "Zakazano na",
+  "Select country": "Izaberite zemlju",
+  "Select state": "Izaberite državu"
 }
