@@ -115,7 +115,10 @@ export const AddUnitsDataGrid = ({
 
   useEffect(() => {
     if (elevatorResource.data.length) {
-      setRows(makeRows(elevatorResource.data, formatDate));
+      const filteredElevators = elevatorResource.data.filter(
+        (elevator) => !selectedElevators?.includes(elevator.id),
+      );
+      setRows(makeRows(filteredElevators, formatDate));
     } else {
       setRows([]);
     }
@@ -165,42 +168,44 @@ export const AddUnitsDataGrid = ({
         />
       </Box>
       <Box display="flex" flexGrow={1} sx={styles.scrollBar}>
-        <DataGridLayout
-          selectionModel={formik.values.elevators}
-          disableSelectionOnClick={false}
-          isCellClickable={false}
-          rows={rows}
-          columns={columns}
-          scrollToTop={search}
-          loading={isFetching}
-          checkboxSelection
-          onSelectionModelChange={(newSelection) =>
-            formik.setFieldValue('elevators', newSelection)
-          }
-          isRowSelectable={() => true}
-          noRowsEmptySection={
-            <NoRowsEmptySection
-              placeholder="unit"
-              action={() => window.open('/units/new', '_blank')}
-            />
-          }
-          pageSize={page.pageSize}
-          pageIndex={page.pageIndex + 1}
-          handlePageSizeChange={(newPageSize: number) =>
-            setPage({
-              ...page,
-              pageSize: newPageSize,
-            })
-          }
-          handlePageChange={(newPage: number) =>
-            setPage({
-              ...page,
-              pageIndex: newPage - 1,
-            })
-          }
-          pageCount={pageCount}
-          totalRows={elevatorResource?.total}
-        />
+        {rows.length > 0 && (
+          <DataGridLayout
+            selectionModel={formik.values.elevators}
+            disableSelectionOnClick={false}
+            isCellClickable={false}
+            rows={rows}
+            columns={columns}
+            scrollToTop={search}
+            loading={isFetching}
+            checkboxSelection
+            onSelectionModelChange={(newSelection) => {
+              formik.setFieldValue('elevators', newSelection);
+            }}
+            isRowSelectable={() => true}
+            noRowsEmptySection={
+              <NoRowsEmptySection
+                placeholder="unit"
+                action={() => window.open('/units/new', '_blank')}
+              />
+            }
+            pageSize={page.pageSize}
+            pageIndex={page.pageIndex + 1}
+            handlePageSizeChange={(newPageSize: number) =>
+              setPage({
+                ...page,
+                pageSize: newPageSize,
+              })
+            }
+            handlePageChange={(newPage: number) =>
+              setPage({
+                ...page,
+                pageIndex: newPage - 1,
+              })
+            }
+            pageCount={pageCount}
+            totalRows={elevatorResource?.total}
+          />
+        )}
       </Box>
       <Button
         label="Add units"
