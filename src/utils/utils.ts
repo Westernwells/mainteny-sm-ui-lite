@@ -18,6 +18,7 @@ import {getCountryCode} from './countries';
 import {
   DEFAULT_ELEVATOR_TECHNICAL_FIELD_CATEGORIES,
   DEFAULT_ELEVATOR_TECHNICAL_FIELD_NAMES,
+  ESCAPE_DOT_STRING,
 } from './constants';
 
 export const capitalize = (role: any[]) => {
@@ -748,4 +749,41 @@ export const getTechnicalFieldCategory = (
   }
 
   return name;
+};
+
+export const escapeDotInString = (str: string): string =>
+  str.replace(/\./g, ESCAPE_DOT_STRING); // Escape all dots
+
+export const restoreDotInString = (str: string): string =>
+  str.replace(new RegExp(ESCAPE_DOT_STRING, 'g'), '.'); // Restore dots
+
+export const formatAutocompleteAddress = (
+  currentValues: Address | null,
+  componentAddress?: AddressRecord,
+) => {
+  if (!componentAddress) {
+    const newValues = {
+      ...(currentValues ?? {}),
+      component: {
+        ...(currentValues?.component ?? {}),
+        street: '',
+      },
+      id: currentValues?.id!,
+      fullName: '',
+    };
+
+    return newValues;
+  }
+
+  const newValues = {
+    ...(componentAddress ?? {}),
+    component: {
+      ...(currentValues?.component ?? {}),
+      ...(componentAddress?.component ?? {}),
+    },
+    id: currentValues?.id!,
+    fullName: componentAddress?.fullName || '',
+  };
+
+  return newValues;
 };
