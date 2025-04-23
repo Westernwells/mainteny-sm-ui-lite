@@ -117,6 +117,7 @@ export interface ServiceOrderCheckListView {
   technicianId: string;
   checkListId: string;
   checkList: CheckList;
+  externalId: string;
   additionalInfo: ServiceOrderCheckListAdditionalInfo;
 }
 
