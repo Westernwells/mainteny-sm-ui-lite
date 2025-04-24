@@ -9,8 +9,20 @@ import {useUpdateArticle} from 'hooks/reactQuery/useArticle';
 import {ArticleView} from 'models/article';
 import {ArticleDescriptionFormModel} from 'models/articleForm';
 import DOMPurify from 'dompurify';
-import {NoItemSection} from '../NoItemSection';
+import {CUSTOM_ERROR_TEXT, stripHtmlTags} from 'models/text-block';
+import * as Yup from 'yup';
 import RichTextField from '../../../components/RichTextField';
+import {NoItemSection} from '../NoItemSection';
+
+const validationSchema = Yup.object().shape({
+  description: Yup.string()
+    .required('Description is required')
+    .test(
+      'checkDescriptionSize',
+      CUSTOM_ERROR_TEXT.description,
+      (value) => value.length <= 20000,
+    ),
+});
 
 export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -23,7 +35,18 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
     initialValues: {
       description: article.description,
     },
-    onSubmit: () => {},
+    validationSchema,
+    onSubmit: async (values, {setSubmitting}) => {
+      try {
+        await updateArticle({
+          articleId: article.id,
+          article: {description: values.description},
+        });
+        setOpenDialog(false);
+      } finally {
+        setSubmitting(false);
+      }
+    },
   });
 
   const saveArticle = async () => {
@@ -49,7 +72,7 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
           }}
         />
       )}
-      {!article.description && (
+      {!stripHtmlTags(article.description) && (
         <NoItemSection
           label={t('No description yet. Please click the button below to add!')}
           illustration="clipboard"
@@ -62,10 +85,12 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
         isSaving={isLoading}
         onCancel={() => setOpenDialog(false)}
         onSave={saveArticle}
+        disableSaveBtn={!formik.isValid || formik.isSubmitting}
         dialogProps={{
           open: openDialog || false,
         }}>
         <RichTextField
+          name="description"
           label={t('Description')}
           placeholder={t(
             'e.g. Flat cable used for door engines from the following suppliers.....',
@@ -74,6 +99,12 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
           html={formik.values.description || ''}
           onBlur={formik.handleBlur}
           updateHtml={(h) => formik.setFieldValue('description', h)}
+          error={Boolean(
+            formik.touched.description && formik.errors.description,
+          )}
+          helperText={
+            formik.touched.description ? formik.errors.description : undefined
+          }
         />
       </Dialog>
     </InfoCard>
