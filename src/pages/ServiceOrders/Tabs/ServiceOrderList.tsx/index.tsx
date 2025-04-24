@@ -566,7 +566,7 @@ export const ServiceOrderList = ({menu}: Props) => {
           serviceOrderTypeToString(
             getJobTypeGivenName(serviceOrder?.type, jobTypes),
           ) === '-'
-            ? getJobTypeGivenName(serviceOrder?.type, jobTypes)
+            ? t(getJobTypeGivenName(serviceOrder?.type, jobTypes))
             : t(
                 serviceOrderTypeToString(
                   getJobTypeGivenName(serviceOrder?.type, jobTypes),
@@ -582,7 +582,7 @@ export const ServiceOrderList = ({menu}: Props) => {
               {serviceOrderTypeToString(
                 getJobTypeGivenName(serviceOrder.type, allJobTypes),
               ) === '-'
-                ? getJobTypeGivenName(serviceOrder.type, allJobTypes)
+                ? t(getJobTypeGivenName(serviceOrder.type, allJobTypes))
                 : t(
                     serviceOrderTypeToString(
                       getJobTypeGivenName(serviceOrder.type, allJobTypes),

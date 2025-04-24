@@ -753,6 +753,7 @@ export type ServiceOrderTableRow = {
     | ServiceOrderPaymentWithIndicationStatus;
   hasNotes: boolean;
   lastActivityAt: string;
+  hasSchedule: boolean;
 };
 
 // used to indicate fields for the search parameter of service order endpoint
@@ -804,3 +805,25 @@ export interface DateCellParts {
   label: string;
   date?: string | null;
 }
+
+export const statusLabelMap: Record<ServiceOrderStatus, string> = {
+  [ServiceOrderStatus.READY_TO_SCHEDULE]: 'Created on',
+  [ServiceOrderStatus.TECHNICIAN_ASSIGNED]: 'Created on',
+  [ServiceOrderStatus.OVERDUE]: 'Created on',
+
+  [ServiceOrderStatus.PLANNED]: 'Scheduled on',
+  [ServiceOrderStatus.SCHEDULED]: 'Scheduled on',
+
+  [ServiceOrderStatus.PAUSED]: 'Started on',
+  [ServiceOrderStatus.TRAVEL]: 'Started on',
+  [ServiceOrderStatus.IN_PROGRESS]: 'Started on',
+
+  [ServiceOrderStatus.ARCHIVED]: 'Archived on',
+  [ServiceOrderStatus.CANCELLED]: 'Canceled on',
+  [ServiceOrderStatus.COMPLETED]: 'Completed on',
+  [ServiceOrderStatus.ALL]: '',
+  [ServiceOrderStatus.INIT]: '',
+  [ServiceOrderStatus.SCHEDULING]: '',
+  [ServiceOrderStatus.INVOICE_ISSUED]: '',
+  [ServiceOrderStatus.ARTICLES_ORDERED]: '',
+};

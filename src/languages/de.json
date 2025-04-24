@@ -3165,5 +3165,11 @@
   "Tag": "Tag",
   "Canceled on": "Storniert am",
   "Completed on": "Abgeschlossen am",
-  "Started on": "Gestartet am"
+  "Started on": "Gestartet am",
+  "Archived on": "Archiviert am",
+  "Scheduled on": "Geplant für ",
+  "Select country": "Land wählen",
+  "Select state": "Bundesland wählen",
+  "Created on": "Erstellt am",
+  "Description exceeds the maximum allowed size": "Die Beschreibung überschreitet die maximal zulässige Größe"
 }

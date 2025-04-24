@@ -244,7 +244,7 @@ export const CheckList = ({serviceOrder}: Props) => {
   } = useMultiImagesURLToBase64(checklistImagesDownloadUrl ?? {});
 
   const {downloadFile} = useDownloadFileWithCustomName(
-    selectedChecklist?.checkList.number,
+    selectedChecklist?.externalId,
     pdfPathToDownload,
   );
 

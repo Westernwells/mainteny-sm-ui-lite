@@ -25,7 +25,7 @@ import {
 } from 'utils/language';
 import {MenuBtn} from './MenuBtn';
 import {BackAction} from './BackAction';
-import KalasarSearchComponent from './KalasarSearchComponent';
+import KalasarWidget from './KalasarWidget';
 
 interface Props {
   pageTitle?: string;
@@ -148,7 +148,7 @@ export const AppTopBar = ({
                   user?.userAccount.serviceCompany.id,
                 )) && (
                 <Box mr={2} display="flex" alignItems="center">
-                  <KalasarSearchComponent />
+                  <KalasarWidget />
                 </Box>
               )}
             <MenuBtn
