@@ -2782,6 +2782,8 @@
   "Number of People": "ადამიანების რაოდენობა",
   "Can't be less than 0": "არ შეიძლება იყოს 0 -ზე ნაკლები",
   "Add New": "ᲐᲮᲚᲘᲡ ᲓᲐᲛᲐᲢᲔᲑᲐ",
+  "Contact deleted successfully": "კონტაქტი წარმატებით წაიშალა",
+  "Mixed position PDF preview": "შერეული პოზიციის PDF გადახედვა",
   "Click to show this section on the invoice. Visible sections will appear in the final document and all exported versions.": "დააწკაპუნეთ ამ განყოფილების ინვოისზე საჩვენებლად. ხილული სექციები გამოჩნდება საბოლოო დოკუმენტში და ყველა ექსპორტირებულ ვერსიაში.",
   "Mixed Positions": "შერეული პოზიციები",
   "Complete creation of mixed position before adding a new one.": "დაასრულეთ შერეული პოზიციის შექმნა ახლის დამატებამდე.",
