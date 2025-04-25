@@ -1,6 +1,6 @@
 import {useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {FormikProps} from 'formik';
+import {FormikProps, getIn} from 'formik';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -10,6 +10,8 @@ import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import {Button} from 'components/Button';
 import {countriesOptions, getStatesByCountry} from 'utils/countries';
+import {AddressAutoComplete} from 'components/AddressAutoComplete';
+import {AddressRecord} from 'models/misc';
 import {CustomerAddressFormModel} from '../../NewCustomer/model';
 
 interface Props {
@@ -49,7 +51,27 @@ export const CustomerAddressForm = ({formik}: Props) => {
     onChange: formik.handleChange,
     onBlur: formik.handleBlur,
   };
+  const handleAddressChange = (
+    componentAddress: AddressRecord | undefined,
+    type: 'billingAddress' | 'beneficiaryAddress' | 'otherAddress',
+  ) => {
+    if (!componentAddress) return;
 
+    const currentValues = formik.values[type];
+
+    formik.setFieldValue(type, {
+      ...componentAddress,
+      component: {
+        ...componentAddress?.component,
+        // to not overwrite name fields
+        name: currentValues?.component?.name,
+        name2: currentValues?.component?.name2,
+        name3: currentValues?.component?.name3,
+      },
+      id: currentValues?.id!,
+      fullName: componentAddress?.fullName || '',
+    });
+  };
   return (
     <Box pt="0.5rem">
       <Typography variant="h6" color="text.secondary" pb={2}>
@@ -68,14 +90,27 @@ export const CustomerAddressForm = ({formik}: Props) => {
           />
         </Grid>
         <Grid item md={4.5}>
-          <FormInput
-            fieldProps={{
-              size: 'small',
-              label: 'Address line 1',
+          <AddressAutoComplete
+            initialValue={formik.values.billingAddress?.component?.street || ''}
+            initialAddress={formik.values.billingAddress || undefined}
+            textFieldProps={{
+              id: 'billingAddress.component.street',
+              placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
               name: 'billingAddress.component.street',
-              value: formik.values.billingAddress?.component?.street ?? '',
-              ...defaultProps,
+              label: 'Address line 1',
             }}
+            inputError={
+              getIn(formik.touched, 'billingAddress.component.street') &&
+              getIn(formik.errors, 'billingAddress.component.street')
+                ? (getIn(
+                    formik.errors,
+                    'billingAddress.component.street',
+                  ) as string)
+                : ''
+            }
+            allowMap
+            getAddress={(val) => handleAddressChange(val, 'billingAddress')}
+            shortAddress
           />
         </Grid>
         <Grid item md={4.5}>
@@ -174,15 +209,31 @@ export const CustomerAddressForm = ({formik}: Props) => {
             />
           </Grid>
           <Grid item md={4.5}>
-            <FormInput
-              fieldProps={{
-                size: 'small',
-                label: 'Address line 1',
+            <AddressAutoComplete
+              initialValue={
+                formik.values.beneficiaryAddress?.component?.street || ''
+              }
+              initialAddress={formik.values.beneficiaryAddress || undefined}
+              textFieldProps={{
+                id: 'beneficiaryAddress.component.street',
+                placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
                 name: 'beneficiaryAddress.component.street',
-                value:
-                  formik.values.beneficiaryAddress?.component?.street ?? '',
-                ...defaultProps,
+                label: 'Address line 1',
               }}
+              inputError={
+                getIn(formik.touched, 'beneficiaryAddress.component.street') &&
+                getIn(formik.errors, 'beneficiaryAddress.component.street')
+                  ? (getIn(
+                      formik.errors,
+                      'beneficiaryAddress.component.street',
+                    ) as string)
+                  : ''
+              }
+              allowMap
+              getAddress={(val) =>
+                handleAddressChange(val, 'beneficiaryAddress')
+              }
+              shortAddress
             />
           </Grid>
           <Grid item md={4.5}>
@@ -297,14 +348,27 @@ export const CustomerAddressForm = ({formik}: Props) => {
             />
           </Grid>
           <Grid item md={4.5}>
-            <FormInput
-              fieldProps={{
-                size: 'small',
-                label: 'Address line 1',
+            <AddressAutoComplete
+              initialValue={formik.values.otherAddress?.component?.street || ''}
+              initialAddress={formik.values.otherAddress || undefined}
+              textFieldProps={{
+                id: 'otherAddress.component.street',
+                placeholder: t('e.g. 34-36 Exmouth Market, London EC1R 4QE'),
                 name: 'otherAddress.component.street',
-                value: formik.values.otherAddress?.component?.street ?? '',
-                ...defaultProps,
+                label: 'Address line 1',
               }}
+              inputError={
+                getIn(formik.touched, 'otherAddress.component.street') &&
+                getIn(formik.errors, 'otherAddress.component.street')
+                  ? (getIn(
+                      formik.errors,
+                      'otherAddress.component.street',
+                    ) as string)
+                  : ''
+              }
+              allowMap
+              getAddress={(val) => handleAddressChange(val, 'otherAddress')}
+              shortAddress
             />
           </Grid>
           <Grid item md={4.5}>
