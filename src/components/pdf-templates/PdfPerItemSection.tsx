@@ -244,7 +244,10 @@ const PdfPerItemSection = ({
                               {index + 1}
                             </Text>
                             <View style={{width: '36%', textAlign: 'left'}}>
-                              <HtmlPDF html={item.name || ''} />
+                              <HtmlPDF
+                                html={item.name || ''}
+                                selectedLng={selectedLng}
+                              />
                             </View>
 
                             <Text

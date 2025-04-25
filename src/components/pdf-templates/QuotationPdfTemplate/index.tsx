@@ -315,6 +315,7 @@ const QuotationPdfTemplate = React.memo(
                     value={quotation?.subject}
                     fontStyles={fontStyles}
                     primaryColor={primaryColor}
+                    selectedLng={selectedLng}
                   />
                 </View>
               )}
@@ -381,6 +382,7 @@ const QuotationPdfTemplate = React.memo(
                   </Text>
                   <HtmlPDF
                     html={quotation?.additionalInfo?.paymentTerms || ''}
+                    selectedLng={selectedLng}
                   />
                 </View>
               )}
@@ -396,6 +398,7 @@ const QuotationPdfTemplate = React.memo(
                       marginTop: 6,
                       marginBottom: 16,
                     }}
+                    selectedLng={selectedLng}
                   />
                 </View>
               )}

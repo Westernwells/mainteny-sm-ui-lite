@@ -287,12 +287,14 @@ const PartialInvoicePdfTemplate = ({
               value={invoice?.subject}
               fontStyles={fontStyles}
               primaryColor={primaryColor}
+              selectedLng={selectedLng}
             />
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF
                 html={invoice?.description || ''}
                 rootStyle={styles.contentBody}
+                selectedLng={selectedLng}
               />
             )}
 
@@ -362,6 +364,7 @@ const PartialInvoicePdfTemplate = ({
                       marginTop: 6,
                       marginBottom: 16,
                     }}
+                    selectedLng={selectedLng}
                   />
                 </View>
               )}

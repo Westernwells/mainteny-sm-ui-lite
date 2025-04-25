@@ -672,6 +672,7 @@ const WorkReportTemplate = React.memo(
                               ...styles.tableBodyContent,
                             }}
                             html={articleItem.name || '-'}
+                            selectedLng={selectedLng}
                           />
                           <Text
                             style={{
