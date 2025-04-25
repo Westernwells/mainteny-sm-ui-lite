@@ -103,6 +103,7 @@ export const ArticleSectionBody = ({
                   rootStyle={{
                     ...styles.descriptionText,
                   }}
+                  selectedLng={selectedLng}
                 />
               )}
             </View>
@@ -189,6 +190,7 @@ export const ArticleSectionBody = ({
                         <HtmlPDF
                           html={subItem.description || '-'}
                           rootStyle={{...styles.descriptionText}}
+                          selectedLng={selectedLng}
                         />
                       </View>
                     )}

@@ -603,6 +603,7 @@ const PdfPreviewUpfrontPaymentSection = ({
               marginTop: 6,
               marginBottom: 16,
             }}
+            selectedLng={selectedLng}
           />
         </View>
       )}

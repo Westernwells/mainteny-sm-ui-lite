@@ -655,6 +655,7 @@ export const PdfPreviewPartialPaymentSection = ({
               marginTop: 6,
               marginBottom: 16,
             }}
+            selectedLng={selectedLng}
           />
         </View>
       )}

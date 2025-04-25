@@ -516,6 +516,7 @@ const JobOverviewPdfTemplate = React.memo(
                                 marginBottom: '2px',
                               },
                             }}
+                            selectedLng={selectedLng}
                           />
 
                           <Text
@@ -622,6 +623,7 @@ const JobOverviewPdfTemplate = React.memo(
                                   ? 0
                                   : 10,
                             }}
+                            selectedLng={selectedLng}
                           />
                         )}
                       </View>
