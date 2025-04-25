@@ -5,6 +5,7 @@ export const TEXT_BLOCK_MEMORY_SIZE_UPPER_LIMIT = 50000; // 50 KB, this is only 
 
 export const CUSTOM_ERROR_TEXT = {
   text: 'Text block size is too big',
+  description: 'Description exceeds the maximum allowed size',
 };
 
 export interface CreateTextBlockRecord {
