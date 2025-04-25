@@ -392,6 +392,8 @@ export const aggregateServiceOrderRow = (
     hasNotes: Boolean(order.additionalInfo.commentCount),
     lastActivityAt: order.additionalInfo.lastActivityAt ?? '',
     hasSchedule: order.schedules.length > 0,
+    scheduleDate:
+      order.schedules.length > 0 ? order.schedules[0]?.startTime : '',
   }));
 
 export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
@@ -538,16 +540,26 @@ export const roundTimeWithSurcharge = (
 export function getServiceOrderDateParts(
   row: ServiceOrderTableRow,
 ): DateCellParts {
-  let label: string;
+  const {jobStatus, hasSchedule, scheduleDate, lastActivityAt} = row;
 
-  if (row.jobStatus === ServiceOrderStatus.OVERDUE) {
-    label = row.hasSchedule
-      ? statusLabelMap[ServiceOrderStatus.SCHEDULED]
-      : statusLabelMap[ServiceOrderStatus.OVERDUE];
-  } else {
-    label = statusLabelMap[row.jobStatus] ?? '-';
+  let label = statusLabelMap[jobStatus] ?? '-';
+
+  if (jobStatus === ServiceOrderStatus.OVERDUE && hasSchedule) {
+    label = statusLabelMap[ServiceOrderStatus.SCHEDULED];
   }
 
-  const date = row.lastActivityAt ? formatDate(row.lastActivityAt) : null;
+  const isScheduled =
+    jobStatus === ServiceOrderStatus.PLANNED ||
+    jobStatus === ServiceOrderStatus.SCHEDULED ||
+    (jobStatus === ServiceOrderStatus.OVERDUE && hasSchedule);
+
+  const date = isScheduled
+    ? scheduleDate
+      ? formatDate(scheduleDate)
+      : null
+    : lastActivityAt
+    ? formatDate(lastActivityAt)
+    : null;
+
   return {label, date};
 }
