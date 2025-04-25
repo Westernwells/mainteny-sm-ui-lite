@@ -754,6 +754,7 @@ export type ServiceOrderTableRow = {
   hasNotes: boolean;
   lastActivityAt: string;
   hasSchedule: boolean;
+  scheduleDate: string;
 };
 
 // used to indicate fields for the search parameter of service order endpoint
@@ -811,8 +812,8 @@ export const statusLabelMap: Record<ServiceOrderStatus, string> = {
   [ServiceOrderStatus.TECHNICIAN_ASSIGNED]: 'Created on',
   [ServiceOrderStatus.OVERDUE]: 'Created on',
 
-  [ServiceOrderStatus.PLANNED]: 'Scheduled on',
-  [ServiceOrderStatus.SCHEDULED]: 'Scheduled on',
+  [ServiceOrderStatus.PLANNED]: 'Scheduled for',
+  [ServiceOrderStatus.SCHEDULED]: 'Scheduled for',
 
   [ServiceOrderStatus.PAUSED]: 'Started on',
   [ServiceOrderStatus.TRAVEL]: 'Started on',
