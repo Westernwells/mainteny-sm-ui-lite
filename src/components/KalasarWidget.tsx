@@ -32,8 +32,8 @@ const KalasarWidget: React.FC = () => {
   const {user} = useUserSession();
 
   const config: WidgetOptions = {
-    app_id: import.meta.env.VITE_KALASAR_APP_ID!,
-    version_id: import.meta.env.VITE_KALASAR_VERSION_ID!,
+    app_id: import.meta.env.REACT_APP_KALASAR_APP_ID!,
+    version_id: import.meta.env.REACT_APP_KALASAR_VERSION_ID!,
     lang: language?.toLowerCase().startsWith('de') ? 'de' : 'en',
     user: {id: user?.userAccount.id ?? 'anonymous'},
   };

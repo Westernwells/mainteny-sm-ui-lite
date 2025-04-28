@@ -168,7 +168,7 @@ import {VatView} from 'models/vat';
 import PdfPartialUpfrontPreview from 'components/pdf-templates/invoice-previews/PdfPartialUpfrontPreview';
 import PdfPreviewFinalInvoiceTemplate from 'components/pdf-templates/invoice-previews/PdfPreviewFinalInvoiceTemplate';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
-import {Controller, useForm} from 'react-hook-form';
+import {Controller, useForm, useWatch} from 'react-hook-form';
 import InvoicePositionTable from './InvoicePositions/InvoicePositionTable';
 
 interface Props {
@@ -584,6 +584,7 @@ export const InvoiceForm = ({
   } = formMethods;
 
   const watchedItems = watch('items');
+  const watchedItemsHookValue = useWatch({control, name: 'items'});
   const watchedType = watch('type');
   const watchedPropertyOwnerId = watch('propertyOwnerId');
   const watchedDiscount = watch('discount');
@@ -1739,6 +1740,19 @@ export const InvoiceForm = ({
     ? 'Choose a payment type for the partial invoice from Lump-Sum, Percentage or per Article, You can’t change your selection later.'
     : 'Choose a payment type for the upfront invoice from Lump-Sum or Percentage. You can’t change your selection later for the subsequent invoices.';
 
+  const checkIfLaborOrMaterialIsSelected = (items: EditableInvoiceItem[]) => {
+    const isLaborOrMaterial = items.some((item) => {
+      return (
+        item.article?.type === ArticleType.LABOR ||
+        item.article?.type === ArticleType.MATERIAL
+      );
+    });
+
+    if (!stripHtmlTags(watchedMoreInfo ?? '') && isLaborOrMaterial) {
+      setValue('moreInfo', DEFAULT_INVOICE_MATERIAL_LABOR_COST_TEXT);
+    }
+  };
+
   useEffect(() => {
     if (isNewInvoice && !initialNewLoadComplete) {
       if (invoice && invoiceId && pageState === PageState.DUPLICATE) {
@@ -2016,6 +2030,10 @@ export const InvoiceForm = ({
   useEffect(() => {
     recalcInvoice();
   }, [recalcInvoice]);
+
+  useEffect(() => {
+    checkIfLaborOrMaterialIsSelected(watchedItems);
+  }, [watchedItemsHookValue]);
 
   if (isLoadingTaxRates || isLoadingCreditNoteArticles) {
     return (

@@ -290,6 +290,7 @@ const InvoiceOverduePdfPreview = ({
                 <HtmlPDF
                   html={formik?.values?.description || ''}
                   rootStyle={styles.contentBody}
+                  selectedLng={selectedLng}
                 />
               </View>
             )}

@@ -3171,5 +3171,6 @@
   "Select country": "Land wählen",
   "Select state": "Bundesland wählen",
   "Created on": "Erstellt am",
-  "Description exceeds the maximum allowed size": "Die Beschreibung überschreitet die maximal zulässige Größe"
+  "Description exceeds the maximum allowed size": "Die Beschreibung überschreitet die maximal zulässige Größe",
+  "Scheduled for": "Geplant für"
 }

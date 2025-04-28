@@ -238,6 +238,7 @@ const OrderArticlePDF = React.memo(
               <HtmlPDF
                 html={articleOrder?.description || ''}
                 rootStyle={styles.contentBody}
+                selectedLng={selectedLng}
               />
 
               <View style={styles.table}>
@@ -325,6 +326,7 @@ const OrderArticlePDF = React.memo(
                             textAlign: 'left',
                             color: '#212121',
                           }}
+                          selectedLng={selectedLng}
                         />
                         <Text
                           style={{
@@ -397,6 +399,7 @@ const OrderArticlePDF = React.memo(
                         <HtmlPDF
                           html={articleOrderItem?.description}
                           rootStyle={styles.descriptionText}
+                          selectedLng={selectedLng}
                         />
                       )}
                     </View>

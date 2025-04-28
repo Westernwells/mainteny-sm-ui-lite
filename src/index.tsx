@@ -67,7 +67,9 @@ if (!window.Cypress) {
 
 if (!document.querySelector('script[data-kalasar]')) {
   const script = document.createElement('script');
-  script.src = 'https://design.kalasar.com/static/mainteny@staging/kalasar.js';
+  script.src =
+    import.meta.env.REACT_APP_KALASAR_SCRIPT_URL ||
+    'https://design.kalasar.com/static/traideAI@1.0.0/kalasar.js';
   script.defer = true;
   script.dataset.kalasar = 'true';
   document.head.appendChild(script);
