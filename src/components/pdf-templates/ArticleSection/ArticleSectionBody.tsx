@@ -46,7 +46,7 @@ export const ArticleSectionBody = ({
               </View>
 
               <View style={styles.col40Left}>
-                <Text>{mainPosition.name || '-'}</Text>
+                <Text orphans={1}>{mainPosition.name || '-'}</Text>
               </View>
 
               <View style={styles.col10Right}>
