@@ -143,17 +143,7 @@ const useInvoiceMenuActions = ({
       });
     }
 
-    if (
-      ![
-        InvoiceStatus.NOT_PAID,
-        InvoiceStatus.EXPIRED,
-        InvoiceStatus.CANCELLED,
-        InvoiceStatus.OVERDUE_NOTICE_1,
-        InvoiceStatus.OVERDUE_NOTICE_2,
-        InvoiceStatus.OVERDUE_NOTICE_3,
-      ].includes(invoice.status) ||
-      !invoice.sentDate
-    ) {
+    if (invoice.status === InvoiceStatus.DRAFT) {
       items.push({
         label: t('Delete'),
         icon: <DeleteIcon />,
@@ -172,7 +162,7 @@ const useInvoiceMenuActions = ({
       ].includes(invoice.status)
     ) {
       items.push({
-        label: t('table_action_option.cancel'), // Cancel
+        label: t('table_action_option.cancel'),
         icon: <CancelIcon />,
         onClick: onCancel,
       });
