@@ -18,6 +18,7 @@ import {
   TableCell,
   TableBody,
 } from '@mui/material';
+import BigNumber from 'bignumber.js';
 import {NumberFormatValues} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
@@ -540,7 +541,9 @@ export const UpfrontPaymentsSection = ({
         ),
     )
     ?.reduce((acc, a) => acc + a, 0);
-  const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
+  const outstandingPayments = BigNumber(totalAmountInclVats)
+    .minus(paidAmountInclVats)
+    .toNumber();
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,

@@ -1,4 +1,5 @@
 import {StyleSheet, Text, View} from '@react-pdf/renderer';
+import BigNumber from 'bignumber.js';
 import {
   DiscountType,
   InvoiceAmountDetail,
@@ -217,8 +218,9 @@ const PdfUpfrontInvoiceSection = ({
         ),
     )
     .reduce((acc, a) => acc + a, 0);
-  const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
-
+  const outstandingPayments = BigNumber(totalAmountInclVats)
+    .minus(paidAmountInclVats)
+    .toNumber();
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency?.code,
     minimumFractionDigits: 2,
