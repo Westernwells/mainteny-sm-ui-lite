@@ -2705,7 +2705,7 @@ export const InvoiceForm = ({
               render={({field}) => (
                 <RichTextField
                   label="Subject"
-                  html={field.value || ''}
+                  html={typeof field.value === 'string' ? field.value : ''}
                   updateHtml={field.onChange}
                   onBlur={field.onBlur}
                   helperText={errors.subject?.message}
@@ -2737,7 +2737,7 @@ export const InvoiceForm = ({
               render={({field}) => (
                 <RichTextField
                   label="Description"
-                  html={field?.value || ''}
+                  html={typeof field.value === 'string' ? field.value : ''}
                   updateHtml={field.onChange}
                   onBlur={field.onBlur}
                   helperText={errors.description?.message}
@@ -2816,7 +2816,7 @@ export const InvoiceForm = ({
               render={({field}) => (
                 <RichTextField
                   label={notesText}
-                  html={watchedMoreInfo || ''}
+                  html={typeof field.value === 'string' ? field.value : ''}
                   updateHtml={field.onChange}
                   onBlur={field.onBlur}
                   helperText={errors.moreInfo?.message}
@@ -2848,7 +2848,11 @@ export const InvoiceForm = ({
               render={({field}) => (
                 <RichTextField
                   label="Payment terms"
-                  html={watchedPaymentTerm?.term || ''}
+                  html={
+                    typeof field.value?.term === 'string'
+                      ? field.value.term
+                      : ''
+                  }
                   updateHtml={(term) =>
                     stripHtmlTags(term)
                       ? setValue('paymentTerm', {

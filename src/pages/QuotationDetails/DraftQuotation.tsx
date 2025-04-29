@@ -1572,8 +1572,10 @@ export const DraftQuotation = ({
               render={({field}) => (
                 <RichTextField
                   label="Subject"
-                  html={field.value || ''}
-                  updateHtml={field.onChange}
+                  html={typeof field.value === 'string' ? field.value : ''}
+                  updateHtml={(value) =>
+                    field.onChange(typeof value === 'string' ? value : '')
+                  }
                   onBlur={field.onBlur}
                   helperText={errors.subject?.message}
                   error={!!errors.subject}
@@ -1604,8 +1606,10 @@ export const DraftQuotation = ({
               render={({field}) => (
                 <RichTextField
                   label="Description"
-                  html={field?.value || ''}
-                  updateHtml={field.onChange}
+                  html={typeof field.value === 'string' ? field.value : ''}
+                  updateHtml={(value) =>
+                    field.onChange(typeof value === 'string' ? value : '')
+                  }
                   onBlur={field.onBlur}
                   helperText={errors.description?.message}
                   error={!!errors.description}
@@ -1658,8 +1662,10 @@ export const DraftQuotation = ({
               render={({field}) => (
                 <RichTextField
                   label={notesText}
-                  html={watchedNotes || ''}
-                  updateHtml={field.onChange}
+                  html={typeof field.value === 'string' ? field.value : ''}
+                  updateHtml={(value) =>
+                    field.onChange(typeof value === 'string' ? value : '')
+                  }
                   onBlur={field.onBlur}
                   helperText={errors.notes?.message}
                   error={!!errors.notes}
@@ -1690,8 +1696,10 @@ export const DraftQuotation = ({
               render={({field}) => (
                 <RichTextField
                   label="Payment terms"
-                  html={watchedPaymentTerms || ''}
-                  updateHtml={field.onChange}
+                  html={typeof field.value === 'string' ? field.value : ''}
+                  updateHtml={(value) =>
+                    field.onChange(typeof value === 'string' ? value : '')
+                  }
                   onBlur={field.onBlur}
                   helperText={errors.paymentTerms?.message}
                   error={!!errors.paymentTerms}
