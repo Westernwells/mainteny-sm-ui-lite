@@ -2845,6 +2845,7 @@
   "You are about to delete \"{{serviceOrderTypeName}}\"": "თქვენ აპირებთ წაშალოთ „{{serviceOrderTypeName}}“",
   "No Suppliers": "არ არის მომმარაგებლები",
   "Add suppliers to process fast article purchases and keep track of your orders": "დაამატეთ მომმარაგებლები ნაწილების სწრაფი შესყიდვებისთვის და თვალყური ადევნეთ თქვენს შეკვეთებს",
+  "Delete job type": "სამუშაოს ტიპის წაშლა",
   "Do you want to mark this quotation as rejected?": "გსურთ მონიშნოთ ეს შეთავაზება უარყოფილად?",
   "Mark as rejected": "უარყოფილად მონიშვნა",
   "Selling price": "გასაყიდი ფასი",
@@ -2959,5 +2960,7 @@
   "Every 2 year": "ყოველ 2 წელიწადში",
   "Every 3 year": "ყოველ 3 წელიწადში",
   "Every 4 year": "ყოველ 4 წელიწადში",
-  "New {{jobType}} Job": "ახალი {{jobType}} სამუშაო"
+  "New {{jobType}} Job": "ახალი {{jobType}} სამუშაო",
+  "Select country": "აირჩიეთ ქვეყანა",
+  "Select state": "აირჩიეთ სახელმწიფო"
 }
