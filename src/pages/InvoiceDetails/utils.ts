@@ -239,7 +239,7 @@ export const formatInvoiceRecord = (
     discount: {
       ...value.discount,
       amount:
-        value.discount?.type === 'AMOUNT'
+        value.discount?.type === DiscountType.AMOUNT
           ? {
               ...value.discount?.amount,
               currency: value.discount?.amount?.currency!,

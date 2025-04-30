@@ -15,10 +15,7 @@ import {
   ArticleSupplierView,
   SupplierRecord,
 } from './supplier';
-import {
-  ServiceOrderArticleOwnerType,
-  ServiceOrderArticleView,
-} from './service-order';
+import {ServiceOrderArticleOwnerType} from './service-order';
 import {ArticleInfoRecord, SubItemsConfig} from './quotation';
 import {Discount} from './invoice';
 
@@ -195,36 +192,6 @@ export interface ArticleSupplierItemView {
   isPreferred?: boolean;
   additionalInfo: string;
 }
-
-export interface ServiceOrderArticleRecord {
-  articleId?: string;
-  name: string;
-  description?: string;
-  quantity: number;
-  unitAmount: AmountRecord;
-  unitPurchaseAmount?: AmountRecord;
-  article?: ArticleInfoRecord;
-  ownerType?: ServiceOrderArticleOwnerType;
-  discount?: Discount;
-  owner?: {
-    id: string;
-    name: string;
-  };
-  subArticlesConfig?: SubItemsConfig;
-  subArticles?: ServiceOrderSubArticleRecord[];
-  userSeqNumber?: string;
-}
-
-export interface ServiceOrderSubArticleRecord {
-  articleId?: string;
-  article?: ArticleInfoRecord;
-  name: string;
-  description?: string;
-  quantity: number;
-  unitAmount: AmountRecord;
-  unitPurchaseAmount?: AmountRecord;
-  userSeqNumber?: string;
-}
 export interface ArticleOrderItemRecord {
   articleId: string;
   articleName: string;
@@ -323,17 +290,17 @@ export interface ArticleRecord {
 // used in job details section
 export type ArticleSectionTableRow = {
   id: string;
-  no: number;
+  userSeqNumber: string;
   number: string;
   name: string;
-  description: string;
-  unit: string;
-  total: string;
-  unitPrice: string;
+  description?: string;
+  type: ArticleType;
+  unit?: string;
+  total?: string;
+  unitAmount: string;
+  unitPurchaseAmount: string;
   quantity: number;
-  percent: string;
-  navigateTo: string;
-  article: ServiceOrderArticleView;
+  article?: ArticleInfoRecord;
   ownerName: string;
   ownerType: ServiceOrderArticleOwnerType;
   contractNumber?: string;

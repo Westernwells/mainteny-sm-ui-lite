@@ -9,13 +9,13 @@ import {
 } from 'react-query';
 import {AxiosResponse} from 'axios';
 import {axiosClient, paramsSerializer} from 'utils/axios-utils';
-import {queryKeys} from 'reactQuery/constants';
+import {queryKeys, queryKeys as qk} from 'reactQuery/constants';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {SendServiceOrderCheckListRecord} from 'models/checklist';
 import {LanguageContext} from 'context/LanguageProvider';
-import {ServiceOrderArticleRecord} from 'models/article';
 import {
   AppointmentConfirmationRequiredOrdersQueryParams,
+  CalculateServiceOrderAmountRecord,
   CompleteServiceOrder,
   CreateServiceOrderComment,
   CreateServiceOrderRecord,
@@ -23,6 +23,8 @@ import {
   QueryServiceOrderCommentsParams,
   SendServiceOrderReportRecord,
   ServiceOrderActivityView,
+  ServiceOrderAmountDetail,
+  ServiceOrderArticleRecord,
   ServiceOrderArticleView,
   ServiceOrderConfirmationPublishBody,
   ServiceOrderPaymentStatus,
@@ -30,7 +32,9 @@ import {
   ServiceOrderQueryParams,
   ServiceOrderScheduleParams,
   ServiceOrderStatistics,
+  ServiceOrderSubArticleRecord,
   ServiceOrderView,
+  UpdateServiceOrderAmountRecord,
   UpdateServiceOrderBody,
   UpdateServiceOrderScheduleBody,
 } from 'models/service-order';
@@ -269,6 +273,69 @@ export const updateServiceOrderArticles = async (
   body: ServiceOrderArticleRecord[],
 ) => {
   await axiosClient.put(`api/serviceOrders/${serviceOrderId}/articles/`, body);
+};
+
+export const useUpdateServiceOrderArticles = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      serviceOrder,
+      data,
+    }: {
+      serviceOrder: string;
+      data: ServiceOrderArticleRecord[];
+    }) => updateServiceOrderArticles(serviceOrder, data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        enqueueSnackbar(`Service Job updated successfully.`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
+};
+
+export const updateServiceOrderArticlesAmount = async (
+  serviceOrderId: string,
+  body: UpdateServiceOrderAmountRecord,
+) => {
+  await axiosClient.put(`api/serviceOrders/${serviceOrderId}/amount`, body);
+};
+
+export const useUpdateServiceOrderArticlesAmount = () => {
+  const queryClient = useQueryClient();
+  const {enqueueSnackbar, showError} = useSnackbar();
+
+  return useMutation(
+    ({
+      serviceOrder,
+      data,
+    }: {
+      serviceOrder: string;
+      data: UpdateServiceOrderAmountRecord;
+    }) => updateServiceOrderArticlesAmount(serviceOrder, data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
+        queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderSubItem]);
+
+        enqueueSnackbar(`Service Job updated successfully.`, {
+          variant: 'success',
+        });
+      },
+      onError: (err) => {
+        showError(err);
+      },
+    },
+  );
 };
 
 const getServiceOrderActivities = async (
@@ -1062,3 +1129,50 @@ export const useArchiveServiceOrder = ({
     },
   );
 };
+
+export const fetchServiceOrderSubItems = async (serviceOrderId: string) => {
+  const response = await axiosClient.get<
+    Record<string, ServiceOrderSubArticleRecord[]>
+  >(`/api/serviceOrders/${serviceOrderId}/subArticles`);
+  return response.data;
+};
+
+export function useServiceOrderSubItems(
+  serviceOrderId?: string,
+  options?: UseQueryOptions<any, any, any>,
+) {
+  return useQuery<
+    Record<string, ServiceOrderSubArticleRecord[]>,
+    RestError,
+    Record<string, ServiceOrderSubArticleRecord[]>
+  >(
+    [qk.serviceOrderSubItem, serviceOrderId],
+    () => fetchServiceOrderSubItems(serviceOrderId!),
+    {
+      enabled: !!serviceOrderId,
+      ...options,
+    },
+  );
+}
+
+export const postServiceOrderAmount = async (
+  serviceOrderId: string,
+  body: CalculateServiceOrderAmountRecord,
+) => {
+  const {data} = await axiosClient.post<ServiceOrderAmountDetail>(
+    `/api/serviceOrders/${serviceOrderId}/amount`,
+    body,
+  );
+  return data;
+};
+
+export const useCalculateServiceOrderAmount = () =>
+  useMutation(
+    ({
+      serviceOrderId,
+      data,
+    }: {
+      serviceOrderId: string;
+      data: CalculateServiceOrderAmountRecord;
+    }) => postServiceOrderAmount(serviceOrderId, data),
+  );

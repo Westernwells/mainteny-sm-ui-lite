@@ -37,11 +37,11 @@ import {
 import {extractClosestEdge} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {DiscountType} from 'models/invoice';
-import SubPositionRow from './SubPositionRow';
-import MainPositionRow from './MainPositionRow';
 import MarginDetails from './MarginDetails';
 import SubPositionFooter from './SubPositionFooter';
 import DiscountPanel from './DiscountPanel';
+import NewSubPositionRow from './NewSubPositionRow';
+import NewMainPositionRow from './NewMainPosition';
 
 export interface EditableRowType {
   index: number;
@@ -350,6 +350,18 @@ const PositionTable = ({
     });
   };
 
+  const bumpSequenceNumbers = () => {
+    watchedItems?.forEach((_, i) => {
+      setValue(`items.${i}.userSeqNumber`, (i + 1).toString() as any);
+      watchedItems[i]?.subItems?.forEach((__, j) => {
+        setValue(
+          `items.${i}.subItems.${j}.userSeqNumber`,
+          `${i + 1}.${j + 1}` as any,
+        );
+      });
+    });
+  };
+
   const {
     amountBeforeGlobalDiscountFormatted,
     amountBeforeGlobalDiscountInMoney,
@@ -426,6 +438,7 @@ const PositionTable = ({
             const dragData = args.source.data as DragData;
             if (dragData?.type === 'main') {
               move(dragData.index, index);
+              bumpSequenceNumbers();
             }
           },
         }),
@@ -482,6 +495,12 @@ const PositionTable = ({
                   subItems.splice(subIndex, 0, movedItem);
                   itemsCopy[index].subItems = subItems;
                   update(index, itemsCopy[index]);
+                  itemsCopy[index].subItems?.forEach((_, j) => {
+                    setValue(
+                      `items.${index}.subItems.${j}.userSeqNumber`,
+                      `${index + 1}.${j + 1}` as any,
+                    );
+                  });
                 }
               },
             }),
@@ -539,7 +558,7 @@ const PositionTable = ({
                     padding: '0px',
                     background: '#f7f9fc',
                   }}>
-                  <MainPositionRow
+                  <NewMainPositionRow<QuotationFormData>
                     item={item}
                     index={index}
                     formMethods={formMethods}
@@ -559,8 +578,8 @@ const PositionTable = ({
                     }
                     hoveredMainRowIndex={hoveredMainRowIndex}
                     setHoveredMainRowIndex={setHoveredMainRowIndex}
-                    onRecalcQuotation={onRecalcQuotation}
-                    quotationAmountDetail={quotationAmountDetail}
+                    onRecalc={onRecalcQuotation}
+                    amountDetail={quotationAmountDetail}
                   />
                 </TableRow>
 
@@ -572,7 +591,7 @@ const PositionTable = ({
                           <TableRow
                             key={`${item.id}-${index}-${subIndex}`}
                             testId={`sub-row-${index}-${subIndex}`}>
-                            <SubPositionRow
+                            <NewSubPositionRow<QuotationFormData>
                               parentIndex={index}
                               subIndex={subIndex}
                               subItem={subItem}
@@ -587,8 +606,8 @@ const PositionTable = ({
                               showLeftShadow={showLeftShadow}
                               hoveredSubRowIndex={hoveredSubRowIndex}
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
-                              onRecalcQuotation={onRecalcQuotation}
-                              quotationAmountDetail={quotationAmountDetail}
+                              onRecalc={onRecalcQuotation}
+                              amountDetail={quotationAmountDetail}
                             />
                           </TableRow>
                         ),
@@ -636,7 +655,7 @@ const PositionTable = ({
           amountBeforeGlobalDiscountFormatted
         }
         amountBeforeGlobalDiscount={amountBeforeGlobalDiscountInMoney}
-        onRecalcQuotation={onRecalcQuotation}
+        onRecalc={onRecalcQuotation}
       />
 
       <MarginDetails

@@ -114,6 +114,7 @@ import {ArticleType} from 'models/article';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {DiscountType} from 'models/invoice';
 import {useSnackbar} from 'hooks/useSnackbar';
+import * as Sentry from '@sentry/react';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord} from './utils';
 import {Notes} from './Notes';
@@ -364,6 +365,7 @@ export const DraftQuotation = ({
   } = formMethods;
 
   const watchedItems = watch('items');
+  const watchedDiscount = watch('discount');
   const watchedSubject = watch('subject');
   const watchedDescription = watch('description');
   const watchedNotes = watch('notes');
@@ -415,7 +417,7 @@ export const DraftQuotation = ({
 
         setQuotationAmountDetail(detail);
       } catch (error) {
-        showError(error);
+        Sentry.captureException(error);
       }
     }, 300),
     [calculateQuotationAmount, currentCurrency, setValue, getValues, pageState],
@@ -423,7 +425,7 @@ export const DraftQuotation = ({
 
   useEffect(() => {
     recalcQuotation();
-  }, [recalcQuotation]);
+  }, [recalcQuotation, watchedItems, watchedDiscount]);
 
   const amountAfterGlobalDiscount =
     quotationAmountDetail?.amountAfterGlobalDiscount;

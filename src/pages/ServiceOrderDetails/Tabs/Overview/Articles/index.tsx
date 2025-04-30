@@ -1,36 +1,34 @@
 import Typography from '@mui/material/Typography';
 import {useTranslation} from 'react-i18next';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {InfoCard} from 'components/InfoCard';
 import {
   ServiceOrderArticleOwnerType,
+  ServiceOrderArticleRecord,
   ServiceOrderArticleView,
+  ServiceOrderSubArticleRecord,
   ServiceOrderView,
 } from 'models/service-order';
 import {EmptySection} from 'components/EmptySection';
 import Box from '@mui/material/Box';
 import {SelectModal} from 'components/SelectModal';
 import {ArticlesModalDataGrid} from 'components/ArticleModalDataGrid';
-import {
-  ArticleSectionTableRow,
-  ArticleView,
-  ServiceOrderArticleRecord,
-} from 'models/article';
+import {ArticleSectionTableRow, ArticleView} from 'models/article';
 import {Progress} from 'components/Progress';
 import {
   useCreateServiceOrderArticle,
   useNewUpdateServiceOrderArticles,
+  useServiceOrderSubItems,
 } from 'hooks/reactQuery/useServiceOrder';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {calculateOrderArticlesTotal} from 'utils/calculate-total';
 import {InfoCardTotalSumFooter} from 'components/InfoCardTotalSumFooter';
 import {useCurrentCurrency} from 'utils/currency';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import {theme} from 'theme';
 import {IconButton, Tooltip} from '@mui/material';
-import {ACTION_CELL_WIDTH, TableColumnWithRender} from 'models/table';
-import Cell from 'components/Table/TableCell';
+import {TableColumnWithRender} from 'models/table';
 import TableCellText from 'components/Table/TableCellText';
 import TableHeader from 'components/Table/TableHeader';
 import TableRow from 'components/Table/TableRow';
@@ -49,8 +47,10 @@ import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import TableBody from 'components/Table/TableBody';
 import TableContainer from 'components/Table/TableContainer';
 import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
+import TableCell from 'components/Table/TableCell';
+import {getIconByType} from 'pages/Articles/Tabs/MixedPositions';
+import {serviceOrderItemToServiceOrderItemRecord} from 'utils/service-order-utils';
 import {makeRows} from './ArticleDataGridProps';
-import {Actions} from './Actions';
 
 interface Props {
   serviceOrderArticles: ServiceOrderArticleView[] | undefined;
@@ -80,157 +80,204 @@ export const Articles = ({
     ArticleView | undefined
   >();
 
-  const COLUMNS = useRef<TableColumnWithRender<ArticleSectionTableRow>[]>([
-    {
-      headerName: 'Name',
-      key: 'articles-cell-name',
-      justifyContent: 'justify-content',
-      isFirst: true,
-      renderCell: (article, cellProps) => {
-        const valueToShow = hasMultipleParagraphs(article.name)
-          ? returnFirstParagraph(article.name)
-          : article.name;
-        return (
-          <Cell {...cellProps}>
-            <TableCellText tableCellTextStyles={{width: '95%'}}>
-              {article?.description ? (
-                <TruncatedTooltip
-                  textContent={article.description}
-                  valueToShow={valueToShow}
-                  onButtonClick={() => {
-                    setActiveArticle(article);
-                    setIsDialogOpen(true);
-                  }}
-                />
-              ) : (
-                <Typography
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(valueToShow),
-                  }}
-                />
-              )}
-            </TableCellText>
-            <IconButton sx={{py: 0}}>
-              {article.ownerType === ServiceOrderArticleOwnerType.USER ||
-              article.ownerType === ServiceOrderArticleOwnerType.CONTRACT ||
-              article.ownerType === ServiceOrderArticleOwnerType.TRAVEL_WORK ? (
-                <Tooltip
-                  title={
-                    article.ownerType === ServiceOrderArticleOwnerType.USER &&
-                    article.ownerName.trim()
-                      ? `${t('Added by')} ${article.ownerName}`
-                      : article.ownerType ===
-                          ServiceOrderArticleOwnerType.CONTRACT &&
-                        article.ownerName.trim()
-                      ? `${t('Added by contract')} ${article.ownerName}`
-                      : `${t('Added by Automation')}`
-                  }
-                  arrow
-                  placement="top">
-                  {article.ownerType === ServiceOrderArticleOwnerType.USER ? (
-                    <PersonOutlinedIcon />
-                  ) : article.ownerType ===
-                    ServiceOrderArticleOwnerType.CONTRACT ? (
-                    <TextSnippetOutlinedIcon />
-                  ) : (
-                    <HdrAutoOutlinedIcon />
-                  )}
-                </Tooltip>
-              ) : null}
-            </IconButton>
-          </Cell>
-        );
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [showLeftShadow, setShowLeftShadow] = useState(false);
+  const [showRightShadow, setShowRightShadow] = useState(false);
+
+  const COLUMNS = useMemo<TableColumnWithRender<ArticleSectionTableRow>[]>(
+    () => [
+      {
+        headerName: '',
+        key: 'position-cell-seq-number',
+        renderCell: (cellProps) => <TableCell {...cellProps} />,
       },
-    },
-    {
-      headerName: 'Number',
-      key: 'articles-cell-number',
-      align: 'right',
-      renderCell: (article, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText capitalize>{article.number}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'Price',
-      key: 'articles-cell-price',
-      align: 'right',
-      renderCell: (article, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText>{article.unitPrice}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'Quantity',
-      key: 'articles-cell-quantity',
-      align: 'right',
-      renderCell: (article, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText>{article.quantity}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'Unit',
-      key: 'articles-cell-unit',
-      align: 'right',
-      renderCell: (article, cellProps) => (
-        <Cell
-          {...cellProps}
-          isFirst
-          onClick={cellProps.onClick}
-          align="right"
-          justifyContent="right">
-          <TableCellText>{t(article.unit)}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: '%',
-      key: 'articles-cell-percent',
-      align: 'right',
-      renderCell: (article, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText>{article.percent}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'Total',
-      key: 'articles-cell-total',
-      align: 'right',
-      renderCell: (article, cellProps) => (
-        <Cell {...cellProps}>
-          <TableCellText capitalize>{article.total}</TableCellText>
-        </Cell>
-      ),
-    },
-    {
-      headerName: 'action',
-      key: 'articles-cell-action',
-      isHeaderNameHidden: true,
-      width: ACTION_CELL_WIDTH,
-      isLast: true,
-      renderCell: (article, cellProps) => (
-        <Cell {...cellProps} onClick={undefined}>
-          <Actions
-            serviceOrder={serviceOrder}
-            serviceOrderArticleId={article.id}
-          />
-        </Cell>
-      ),
-    },
-  ]);
+      {
+        headerName: 'Name',
+        key: 'position-cell-name',
+        showShadows: showRightShadow ? 'right' : undefined,
+        isFirst: true,
+        isSticky: true,
+        renderCell: (article, cellProps) => {
+          const valueToShow = hasMultipleParagraphs(article.name)
+            ? returnFirstParagraph(article.name)
+            : article.name;
+          return (
+            <TableCell {...cellProps}>
+              <TableCellText tableCellTextStyles={{width: '95%'}}>
+                {article?.description ? (
+                  <TruncatedTooltip
+                    textContent={article.description}
+                    valueToShow={valueToShow}
+                    onButtonClick={() => {
+                      setActiveArticle(article);
+                      setIsDialogOpen(true);
+                    }}
+                  />
+                ) : (
+                  <Typography
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(valueToShow),
+                    }}
+                  />
+                )}
+              </TableCellText>
+              <IconButton sx={{py: 0}}>
+                {article.ownerType === ServiceOrderArticleOwnerType.USER ||
+                article.ownerType === ServiceOrderArticleOwnerType.CONTRACT ||
+                article.ownerType ===
+                  ServiceOrderArticleOwnerType.TRAVEL_WORK ? (
+                  <Tooltip
+                    title={
+                      article.ownerType === ServiceOrderArticleOwnerType.USER &&
+                      article.ownerName.trim()
+                        ? `${t('Added by')} ${article.ownerName}`
+                        : article.ownerType ===
+                            ServiceOrderArticleOwnerType.CONTRACT &&
+                          article.ownerName.trim()
+                        ? `${t('Added by contract')} ${article.ownerName}`
+                        : `${t('Added by Automation')}`
+                    }
+                    arrow
+                    placement="top">
+                    {article.ownerType === ServiceOrderArticleOwnerType.USER ? (
+                      <PersonOutlinedIcon />
+                    ) : article.ownerType ===
+                      ServiceOrderArticleOwnerType.CONTRACT ? (
+                      <TextSnippetOutlinedIcon />
+                    ) : (
+                      <HdrAutoOutlinedIcon />
+                    )}
+                  </Tooltip>
+                ) : null}
+              </IconButton>
+            </TableCell>
+          );
+        },
+      },
+      {
+        headerName: 'Type',
+        key: 'position-cell-type',
+        align: 'center',
+        renderCell: (article, cellProps) => (
+          <TableCell {...cellProps}>{getIconByType(article.type!)}</TableCell>
+        ),
+      },
+      {
+        headerName: 'Buying price',
+        key: 'position-cell-buying-price',
+        align: 'right',
+        renderCell: (article, cellProps) => (
+          <TableCell {...cellProps}>
+            <TableCellText>buying price</TableCellText>
+          </TableCell>
+        ),
+      },
+      {
+        headerName: 'Margin',
+        key: 'position-cell-margin',
+        align: 'right',
+        renderCell: (article, cellProps) => (
+          <TableCell {...cellProps}>
+            <TableCellText>margin</TableCellText>
+          </TableCell>
+        ),
+      },
+      {
+        headerName: 'Unit price',
+        key: 'position-cell-unit-price',
+        align: 'right',
+        renderCell: (article, cellProps) => (
+          <TableCell {...cellProps}>
+            <TableCellText>unit price</TableCellText>
+          </TableCell>
+        ),
+      },
+      {
+        headerName: 'Qty',
+        key: 'position-cell-quantity',
+        align: 'right',
+        renderCell: (article, cellProps) => (
+          <TableCell {...cellProps}>
+            <TableCellText>quantity</TableCellText>
+          </TableCell>
+        ),
+      },
+      {
+        headerName: 'VAT (%)',
+        key: 'position-cell-vat',
+        align: 'right',
+        renderCell: (article, cellProps) => (
+          <TableCell {...cellProps}>
+            <TableCellText>vatId</TableCellText>
+          </TableCell>
+        ),
+      },
+      {
+        headerName: 'Unit',
+        key: 'position-cell-unit',
+        align: 'right',
+        renderCell: (article, cellProps) => (
+          <TableCell {...cellProps}>
+            <TableCellText>unit</TableCellText>
+          </TableCell>
+        ),
+      },
+      {
+        headerName: 'Discount',
+        key: 'position-cell-net-price',
+        width: '108px',
+        align: 'right',
+        renderCell: (article, cellProps) => (
+          <TableCell {...cellProps}>
+            <TableCellText>discount</TableCellText>
+          </TableCell>
+        ),
+      },
+      {
+        headerName: 'Total Price',
+        key: 'position-cell-net-price',
+        width: '108px',
+        align: 'right',
+        showShadows: showLeftShadow ? 'left' : undefined,
+        isLast: true,
+        noPadding: true,
+        renderCell: (article, cellProps) => (
+          <TableCell {...cellProps}>
+            <TableCellText>totalPrice</TableCellText>
+          </TableCell>
+        ),
+      },
+    ],
+    [showLeftShadow, showRightShadow],
+  );
 
   const {mutateAsync: createServiceOrderArticle} =
     useCreateServiceOrderArticle();
 
   const {isLoading} = useNewUpdateServiceOrderArticles();
 
+  const {data: serviceOrderSubItems} = useServiceOrderSubItems(serviceOrder.id);
+
+  const subItemsMap: Record<string, ServiceOrderSubArticleRecord[]> =
+    Object.entries(serviceOrderSubItems ?? {}).reduce(
+      (acc, [parentId, subItems]) => {
+        acc[parentId] = subItems.map((subItem) => ({
+          ...subItem,
+          parentId,
+        }));
+        return acc;
+      },
+      {} as Record<string, ServiceOrderSubArticleRecord[]>,
+    );
+
   useEffect(() => {
-    setRows(makeRows(serviceOrderArticles || []));
+    setRows(
+      makeRows(
+        serviceOrderArticles?.map((item) =>
+          serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+        ) || [],
+      ),
+    );
   }, [serviceOrderArticles]);
 
   const handleSaveArticle = async (article: ArticleView) => {
@@ -328,21 +375,20 @@ export const Articles = ({
             />
           )
         }
-        header={
-          <Typography variant="subtitle1">
-            {t('Articles & Spare parts')}
-          </Typography>
-        }
+        header={<Typography variant="subtitle1">{t('Positions')}</Typography>}
         showHeaderBackground={false}
         handleAction={() => setOpenSelectModal(true)}
         headerActionIcon={
-          <AddOutlinedIcon sx={{color: theme.palette.text.primary}} />
+          <EditOutlinedIcon sx={{color: theme.palette.text.primary}} />
         }>
         {!serviceOrderArticles?.length ? (
           renderNoRowsSection()
         ) : (
-          <TableContainer>
-            <TableHeader columns={COLUMNS.current} />
+          <TableContainer
+            containerRef={containerRef}
+            setShowLeftShadow={setShowLeftShadow}
+            setShowRightShadow={setShowRightShadow}>
+            <TableHeader columns={COLUMNS} />
 
             <TableBody>
               {rows?.map((entry, idx) => (
@@ -350,12 +396,10 @@ export const Articles = ({
                   data-rowindex={idx}
                   key={`article-row-${entry.id}`}
                   testId="article-row-container">
-                  {COLUMNS.current.map(({renderCell, ...rest}) =>
+                  {COLUMNS.map(({renderCell, ...rest}) =>
                     renderCell(entry, {
                       onClick: handleRowClick(
-                        entry.article?.article?.id ||
-                          entry.article?.id ||
-                          entry.id,
+                        entry.article?.id || entry.article?.id || entry.id,
                       ),
                       ...rest,
                     }),
@@ -384,9 +428,9 @@ export const Articles = ({
       <Dialog
         title={stripHtmlTags(activeArticle?.name || '')}
         onCancel={() => setIsDialogOpen(false)}
-        onSave={() => {
-          navigate(activeArticle?.navigateTo!);
-        }}
+        // onSave={() => {
+        //   navigate(activeArticle?.navigateTo!);
+        // }}
         dialogProps={{
           maxWidth: 'sm',
           open: isOpenDialog || false,

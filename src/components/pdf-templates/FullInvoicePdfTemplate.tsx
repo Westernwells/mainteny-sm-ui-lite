@@ -305,8 +305,8 @@ const FullInvoicePdfTemplate = ({
             {invoice?.description.trim() !== '' && (
               <HtmlPDF
                 html={invoice?.description || ''}
-                rootStyle={styles.contentBody}
                 selectedLng={selectedLng}
+                rootStyle={styles.contentBody}
               />
             )}
 

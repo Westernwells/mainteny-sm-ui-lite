@@ -401,7 +401,6 @@ export interface CalculateQuotationAmountRecord {
   currency: string;
   items: QuotationItemRecord[];
   globalDiscount?: Discount;
-  paymentRecord?: Payment;
 }
 
 export interface QuotationAmountDetail {
