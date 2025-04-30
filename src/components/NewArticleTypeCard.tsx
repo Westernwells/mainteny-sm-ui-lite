@@ -244,6 +244,7 @@ const NewArticleTypeCard = ({
 
         <Button
           label={t('Save')}
+          testId="save-article-type-card"
           buttonProps={{
             onClick: () =>
               onSave(

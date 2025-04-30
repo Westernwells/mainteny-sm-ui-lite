@@ -886,6 +886,7 @@ const useMainPosition = <
       <TableCell
         align="center"
         noPadding
+        testId={`article-type-${index}`}
         onClick={(e) => {
           e.stopPropagation();
           if (
@@ -1299,6 +1300,7 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
+        testId={`position-quantity-${index}`}
         onClick={() => handleEditStart(watchedItem, `items.${index}.quantity`)}>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.quantity` ? (
@@ -1378,6 +1380,7 @@ const useMainPosition = <
       <TableCell
         noPadding
         align="right"
+        testId={`vat-dropdown-table-cell-${index}`}
         onClick={() => {
           if (
             !(
@@ -1398,11 +1401,11 @@ const useMainPosition = <
             e.preventDefault();
             handleCellClick({
               indexPos: index,
-              fieldName: `items.${index}.article.unit`,
+              fieldName: `items.${index}.unitAmount.vatId`,
               row: item,
             });
             onRecalc();
-            unitRef.current?.focus();
+            vatRef.current?.focus();
           }
         }}>
         {editableRow?.index === index &&
@@ -1577,10 +1580,12 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
+        testId={`discount-${index}`}
         onClick={() => handleEditStart(watchedItem, `items.${index}.discount`)}>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.discount` ? (
           <NumericFormat
+            name={`items.${index}.discount`}
             value={
               (
                 editableRow.values as
@@ -1673,10 +1678,14 @@ const useMainPosition = <
                       `items.${index}.discount` as Path<TForm>,
                       newDiscount as PathValue<TForm, Path<TForm>>,
                     );
-                    setEditableRow((prev) => ({
-                      ...prev!,
-                      values: {...prev!.values, discount: newDiscount},
-                    }));
+                    setEditableRow((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            values: {...prev.values, discount: newDiscount},
+                          }
+                        : null,
+                    );
                   }}
                   size="small">
                   {watch(`items.${index}.discount.type` as Path<TForm>) ===

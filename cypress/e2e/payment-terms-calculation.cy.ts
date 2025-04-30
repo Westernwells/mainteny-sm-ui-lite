@@ -28,6 +28,9 @@ describe('Payment Terms Calculation', () => {
         cy.contains('button', 'Submit').click();
         cy.contains('Order scheduled successfully');
 
+        // wait for 20 seconds because articles are not loaded immediately from backend
+        cy.wait(20000);
+
         // Create invoice
         cy.get('[data-testid="add-invoice"]').click();
         cy.contains('label', invoiceType).click();
@@ -35,38 +38,44 @@ describe('Payment Terms Calculation', () => {
     };
 
     const addArticleAndSetAmount = ({index = 0, amount, quantity, vat}: {index: number; amount: number; quantity: number; vat: number}) => {
-        cy.contains('button', 'Add Article').click();
-        cy.get(`tr[data-rbd-draggable-id^="${index} -"]`).within(() => {
+        cy.contains('button', 'Add Position').click();
+        cy.get(`tr[data-testid="main-row-${index}"]`).within(() => {
+            cy.get(`td[data-testid="article-name-${index}"]`).click();
             cy.get('#article-combo-box').click().wait(500).realType('Test Article').wait(500).realType('{esc}');
 
-            cy.get('input[name="quantity"]').clear().type(`${quantity}`);
-            cy.get('input[name="unitAmount.netAmount"]').clear().type(`{selectAll}${amount}`);
+            cy.get(`td[data-testid="position-quantity-${index}"]`).click({force: true});
+            cy.get(`input[name="items.${index}.quantity"]`).clear().type(`${quantity}`);
+            cy.get(`td[data-testid="position-unitAmount-${index}"]`).click({force: true});
+            cy.get(`input[name="items.${index}.unitAmount.netAmount"]`).clear().type(`{selectAll}${amount}`);
 
-            cy.get(`div[id="unitAmount.vatId-${index}"]`).click();
-            cy.document().its('body').find(`ul[aria-labelledby="select-tax-label-${index}"] li[role="option"]`).contains(`${vat}%`).click();
+            cy.get(`td[data-testid="vat-dropdown-table-cell-${index}"]`).click({force: true});
+            cy.document()
+                .its('body')
+                .find(`ul[aria-labelledby="select-tax-label-${index}"] li[role="option"]`)
+                .contains(`${vat}%`)
+                .click({force: true});
         });
     };
 
     const deleteAllFoundArticles = (rowCount: number) => {
         if (rowCount < 1) return;
-        cy.get('table[aria-label="articles section table"] [data-testid="DeleteIcon"]').first().click();
+        cy.get('table[data-testid="table-container"] [data-testid="MoreVertOutlinedIcon"]').first().click();
+        cy.get('[data-testid="DeleteOutlineOutlinedIcon"]').first().click();
+        cy.contains('button', 'Yes').click();
         deleteAllFoundArticles(rowCount - 1);
     };
 
     it('should calculate correct payment terms for Partial Invoice', () => {
         createJobAndOpenInvoice('Partial Invoice');
 
-        // Check if the "Add Article" button exists.
-        cy.get('body').then(($body) => {
-            if (!$body.find('button:contains("Add Article")').length) {
-                // If the button is not found, delete all pre-existing articles.
-                cy.get('table[aria-label="articles section table"] [data-testid="DeleteIcon"]').then((rows) => {
-                    if (rows.length) {
-                        deleteAllFoundArticles(rows.length);
-                    }
+        cy.get('table[data-testid="table-container"] tbody').then(($tbody) => {
+            if ($tbody.find('tr').length > 0) {
+                // If tbody is not empty, delete all pre-existing articles.
+                cy.get('table[data-testid="table-container"] [data-testid="MoreVertOutlinedIcon"]').then((rows) => {
+                    deleteAllFoundArticles(rows.length);
                 });
-                // After deletion, wait for the "Add Article" button to appear.
-                cy.contains('button', 'Add Article').should('be.visible');
+                // After potential deletion, ensure the tbody is empty
+                cy.get('table[data-testid="table-container"] tbody').should('be.empty');
             }
         });
 
@@ -77,7 +86,7 @@ describe('Payment Terms Calculation', () => {
         InvoiceEditPage.openPaymentTermsDialog();
         cy.contains('e2e test payment term').click();
         cy.contains('button', 'Confirm').click();
-        
+
         const paymentTerm = InvoiceEditPage.getPaymentTermsField().find('div[role="textbox"]').invoke('text');
         paymentTerm.should('contain', 'e2e test payment term');
 

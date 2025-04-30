@@ -42,6 +42,8 @@ describe('Invoice flow', () => {
         cy.contains('button', 'Submit').click();
         cy.contains('Order scheduled successfully');
 
+        // wait for 20 seconds because articles are not loaded immediately from backend
+        cy.wait(20000);
         // create invoice
         cy.get('[data-testid="add-invoice"]').click();
         cy.contains('label', 'Full Invoice').click();
@@ -52,7 +54,7 @@ describe('Invoice flow', () => {
         cy.contains('button', 'Create').click();
 
         // assert Header section
-        cy.get('div[role="textbox"][id="subject"]').contains('Full Invoice');
+        cy.getRichTextField('Subject').contains('Full Invoice');
 
         // assert Address information section
         cy.wait('@getServiceCompany').then((interception) => {
@@ -64,7 +66,7 @@ describe('Invoice flow', () => {
             cy.contains('Material costs without VAT: {MATERIAL_COST}');
 
             // assert Payment terms
-            
+
             // check payment terms without discount
             InvoiceEditPage.openPaymentTermsDialog();
             cy.get('div[role="presentation"] label:has(p:only-child)')
@@ -98,7 +100,10 @@ describe('Invoice flow', () => {
                         )
                         .join('\n');
 
-                    InvoiceEditPage.getPaymentTermsField().find('div[role="textbox"]').invoke('text').should('contain', `${paymentTermName}\n${discountsText}`);
+                    InvoiceEditPage.getPaymentTermsField()
+                        .find('div[role="textbox"]')
+                        .invoke('text')
+                        .should('contain', `${paymentTermName}\n${discountsText}`);
                 });
         });
         cy.wait('@getCustomerAPI').then((interception) => {
@@ -121,24 +126,25 @@ describe('Invoice flow', () => {
             // validate articles are filled from job
             if (!job.articles.length) {
                 cy.contains('button', 'Save').should('be.disabled');
-                // add article
-                cy.contains('button', 'Add Article').click();
-                cy.get('#article-combo-box').click({force: true});
-                const articlesTable = cy.get('#article-combo-box-listbox');
+                cy.get('td[data-testid="article-name-0"]').click();
+                const positionsTable = cy.get('#article-combo-box-listbox');
                 // clicking second row because first row is table header
-                const secondRow = articlesTable.find('li').eq(2);
+                const secondRow = positionsTable.find('li').eq(2);
                 secondRow.click();
 
                 cy.get('#article-combo-box').click().wait(500).clear().realType('Test Article').realType('{esc}');
-                cy.get('input[name="quantity"]')
+                cy.get(`td[data-testid="position-quantity-0"]`).click({force: true});
+                cy.get(`input[name="items.0.quantity"]`)
                     .clear()
                     .type(`${getRandomIntInRange(1, 5)}`);
-                cy.get('input[name="unitAmount.netAmount"]')
+                cy.get(`td[data-testid="position-unitAmount-0"]`).click({force: true});
+                cy.get(`input[name="items.0.unitAmount.netAmount"]`)
                     .clear()
                     .type(`{selectAll}${getRandomIntInRange(10, 100)}`);
             } else {
                 job.articles.forEach((a, index) => {
-                    cy.get(`tr[data-rbd-draggable-id="${index} - ${a.id}"]`).within(() => {
+                    cy.get(`tr[data-testid="main-row-${index}"]`).within(() => {
+                        cy.get(`td[data-testid="article-name-${index}"]`).click();
                         cy.get('#article-combo-box')
                             .invoke('val')
                             .then((value) => {
@@ -147,22 +153,34 @@ describe('Invoice flow', () => {
                                 expect(elementText).to.contain(expectedText);
                             });
 
-                        const capitalizedArticleType = a.article.type.charAt(0).toUpperCase() + a.article.type.slice(1).toLowerCase();
-                        cy.get(`div[aria-label="${capitalizedArticleType}"]`);
-                        cy.get('input[name="unitAmount.netAmount"]')
+                        cy.get(`td[data-testid="article-type-${index}"]`).click();
+                        cy.document().its('body').find(`input[name="article-type-group"][value="${a.article.type}"]`).should('be.checked');
+                        cy.document().its('body').find('button[data-testid="save-article-type-card"]').click();
+                        cy.get(`td[data-testid="position-unitAmount-${index}"]`).click({force: true});
+                        cy.get(`input[name="items.${index}.unitAmount.netAmount"]`)
                             .invoke('attr', 'value')
-                            .should('eq', (a.unitAmount.netAmount / 100).toLocaleString());
-                        cy.get('input[name="quantity"]').invoke('attr', 'value').should('eq', `${a.quantity}`);
+                            .should(
+                                'eq',
+                                a.unitAmount.netAmount
+                                    ? (a.unitAmount.netAmount / 100).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+                                    : '',
+                            );
+                        cy.get(`td[data-testid="position-quantity-${index}"]`).click({force: true});
+                        cy.get(`input[name="items.${index}.quantity"]`)
+                            .invoke('attr', 'value')
+                            .should('eq', a.quantity.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 
                         // This Test for tax needs to be updated
-                        cy.get('div[aria-labelledby^="select-tax-label"]').click();
+                        cy.get(`td[data-testid="vat-dropdown-table-cell-${index}"]`).click();
                         cy.document().its('body').find('li[role="option"]').contains(`%`).click();
 
                         // input some values to assert later on
-                        cy.get('input[name="quantity"]')
+                        cy.get(`td[data-testid="position-quantity-${index}"]`).click({force: true});
+                        cy.get(`input[name="items.${index}.quantity"]`)
                             .clear()
                             .type(`${getRandomIntInRange(1, 5)}`);
-                        cy.get('input[name="unitAmount.netAmount"]')
+                        cy.get(`td[data-testid="position-unitAmount-${index}"]`).click({force: true});
+                        cy.get(`input[name="items.${index}.unitAmount.netAmount"]`)
                             .clear()
                             .type(`{selectAll}${getRandomIntInRange(10, 100)}`);
                     });
@@ -353,7 +371,12 @@ describe('Invoice flow', () => {
 
                         // assert Notes section
                         if (invoice?.additionalInfo?.moreInfo) {
-                            const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(invoice.items);
+                            const invoiceItems = invoice.items.map((item) => ({
+                                ...item,
+                                payment: item.additionalInfo.payment,
+                                discount: getDiscoutObj(item?.additionalInfo?.discount),
+                            }));
+                            const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(invoiceItems);
                             const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(itemsAfterPerItemDiscount, discount);
                             const laborCost = calculateLaborMaterialCost(itemsAfterGlobalDiscount, ArticleType.LABOR, currency);
                             const materialCost = calculateLaborMaterialCost(itemsAfterGlobalDiscount, ArticleType.MATERIAL, currency);
@@ -388,11 +411,13 @@ describe('Invoice flow', () => {
         cy.wait(5000);
         const deleteAllFoundArticles = (rowCount: number) => {
             if (rowCount < 1) return;
-            cy.get('table[aria-label="articles section table"] [data-testid="DeleteIcon"]').first().click();
+            cy.get('table[data-testid="table-container"] [data-testid="MoreVertOutlinedIcon"]').first().click();
+            cy.get('[data-testid="DeleteOutlineOutlinedIcon"]').first().click();
+            cy.contains('button', 'Yes').click();
             deleteAllFoundArticles(rowCount - 1);
         };
-        cy.get('table[aria-label="articles section table"] [data-testid="DeleteIcon"]').then((rows) => deleteAllFoundArticles(rows.length));
-        // add articles
+        cy.get('table[data-testid="table-container"] [data-testid="MoreVertOutlinedIcon"]').then((rows) => deleteAllFoundArticles(rows.length));
+        // add positions
         const mockArticles = [
             {
                 name: 'Article 1',
@@ -434,57 +459,62 @@ describe('Invoice flow', () => {
             },
         ];
         mockArticles.forEach((a, index) => {
-            cy.contains('button', 'Add Article').click();
-          
+            cy.contains('button', 'Add Position').click();
+
             // Access the correct row and combo box
-            cy.get(`tr[data-rbd-draggable-id^="${index} -"]`).within(() => {
-              cy.get('#article-combo-box').click({ force: true }); // Click combo box inside row
+            cy.get(`tr[data-testid="main-row-${index}"]`).within(() => {
+                cy.get(`td[data-testid="article-name-${index}"]`).click();
+                cy.get('#article-combo-box').click({force: true}); // Click combo box inside row
             });
-          
+
             // Now outside of within - access global dropdown
             cy.get('ul[role="listbox"]').should('be.visible'); // Wait for dropdown
-          
+
             // Select item from dropdown
-            cy.get('ul[role="listbox"] li').eq(2).click({ force: true }); // Click 3rd option (index 2)
-          
+            cy.get('ul[role="listbox"] li').eq(2).click({force: true}); // Click 3rd option (index 2)
+
             // Continue filling fields inside the row
-            cy.get(`tr[data-rbd-draggable-id^="${index} -"]`).within(() => {
-              const isMac = Cypress.platform === 'darwin';
-          
-              cy.get('#article-combo-box')
-              .focus()
-              .click()
-              .wait(500)
-              .realPress(isMac ? ['Meta', 'A'] : ['Control', 'A'])
-              .realPress('Delete')
-              .realType(`${a.name}`);
-          
-              // Quantity input
-              cy.get('input[name="quantity"]').clear().type(`{selectAll}${a.quantity}`);
-          
-              // Unit amount input
-              cy.get('input[name="unitAmount.netAmount"]')
-                .clear()
-                .type(`{selectAll}${a.unitAmount.netAmount / 100}`);
-          
-              // Tax selection
-              cy.get('div[aria-labelledby^="select-tax-label"]').click();
+            cy.get(`tr[data-testid="main-row-${index}"]`).within(() => {
+                const isMac = Cypress.platform === 'darwin';
+
+                cy.get(`td[data-testid="article-name-${index}"]`).click();
+                cy.get('#article-combo-box')
+                    .focus()
+                    .click()
+                    .wait(500)
+                    .realPress(isMac ? ['Meta', 'A'] : ['Control', 'A'])
+                    .realPress('Delete')
+                    .realType(`${a.name}`);
+
+                // Quantity input
+                cy.get(`td[data-testid="position-quantity-${index}"]`).click({force: true});
+                cy.get(`input[name="items.${index}.quantity"]`).clear().type(`{selectAll}${a.quantity}`);
+
+                // Unit amount input
+                cy.get(`td[data-testid="position-unitAmount-${index}"]`).click({force: true});
+                cy.get(`input[name="items.${index}.unitAmount.netAmount"]`)
+                    .clear()
+                    .type(`{selectAll}${a.unitAmount.netAmount / 100}`);
+
+                // set vat
+                cy.get(`td[data-testid="vat-dropdown-table-cell-${index}"]`).click({force: true});
+                cy.document()
+                    .its('body')
+                    .find(`ul[aria-labelledby="select-tax-label-${index}"] li[role="option"]`)
+                    .contains(`${a.unitAmount.percentageVat}%`)
+                    .click({force: true});
+
+                cy.get(`td[data-testid="discount-${index}"]`).click({force: true});
+                if (a.discount.type === DiscountType.AMOUNT) {
+                    cy.get(`input[name="items.${index}.discount"]`).parent().find('button').click({force: true});
+                    cy.get(`td[data-testid="discount-${index}"]`).click({force: true});
+                    cy.get(`input[name="items.${index}.discount"]`).clear().type(`{selectAll}${a.discount.amount.value}`);
+                } else {
+                    cy.get(`input[name="items.${index}.discount"]`).clear().type(`{selectAll}${a.discount.percentage}`);
+                }
             });
-          
-            // Tax options are global too, so outside again
-            cy.document().its('body').find('li[role="option"]').contains('%').click();
-          
-            // Back inside row to apply discount
-            cy.get(`tr[data-rbd-draggable-id^="${index} -"]`).within(() => {
-              if (a.discount.type === DiscountType.AMOUNT) {
-                cy.get('input[name="discount"]').parent().find('button').click();
-                cy.get('input[name="discount"]').clear().type(`{selectAll}${a.discount.amount.value}`);
-              } else {
-                cy.get('input[name="discount"]').clear().type(`{selectAll}${a.discount.percentage}`);
-              }
-            });
-          });
-          
+        });
+
         // add global discount
         const globalDiscount = {
             type: DiscountType.AMOUNT,
@@ -497,9 +527,8 @@ describe('Invoice flow', () => {
         // assert calculations
         const sumBeforeGlobalDiscount = '7,800.00';
         const sumAfterGlobalDiscount = '7,300.00';
-        // Vat test needs to be updated since logic for handling has changed
-        const vats = ['VAT 10%', '730.00'];
-        const total = '8,030.00';
+        const vats = ['VAT 7%', '288.25', 'VAT 19%', '604.59'];
+        const total = '8,192.84';
         [sumBeforeGlobalDiscount, sumAfterGlobalDiscount, ...vats, total].forEach((value) => cy.contains(value));
         cy.contains('button', 'Save').click();
 
@@ -513,12 +542,10 @@ describe('Invoice flow', () => {
                     });
             });
 
-        cy.contains(total);
-
         /* assert Download PDF */
         cy.go('back');
         // Also needs to be updated later due to VAT logic change
-        cy.contains('€8,030.00').parents('div[role="row"]').find('svg[data-testid="MoreVertIcon"]').click();
+        cy.contains('€8,192.84').parents('div[role="row"]').find('svg[data-testid="MoreVertIcon"]').click();
         cy.contains('li', 'Download').click();
         cy.window().then((win) => {
             cy.spy(win.URL, 'createObjectURL').as('createObjectURLSpy');
@@ -527,7 +554,7 @@ describe('Invoice flow', () => {
         cy.wait(5000);
         cy.task('downloads', 'cypress/downloads').then((d: string[]) => {
             const lastDownlodedFile = d[d.length - 1];
-            cy.task('readPdf', `cypress/downloads/${lastDownlodedFile}`).its('text').should('contain', '8,030.00');
+            cy.task('readPdf', `cypress/downloads/${lastDownlodedFile}`).its('text').should('contain', '8,192.84');
         });
     });
 });
