@@ -12,7 +12,6 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Confirm} from 'components/Confirm';
-import {ServiceOrderArticleRecord} from 'models/article';
 import {
   useDeleteServiceOrderArticle,
   useNewUpdateServiceOrderArticles,
@@ -21,7 +20,11 @@ import {
 import {Dialog} from 'components/Dialog';
 import {ArticleBasicFormModel} from 'models/articleForm';
 import {amountRecordForBackend, makeAmountRecord} from 'utils/currency';
-import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
+import {
+  ServiceOrderArticleRecord,
+  ServiceOrderArticleView,
+  ServiceOrderView,
+} from 'models/service-order';
 import {FormikErrors} from 'formik';
 import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
 import {EditArticleFormModel} from './models';

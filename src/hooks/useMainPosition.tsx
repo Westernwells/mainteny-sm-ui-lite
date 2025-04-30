@@ -36,7 +36,11 @@ import {
   Controller,
   Control,
 } from 'react-hook-form';
-import {calculateMargin, getArticleTypesWithLabels} from 'utils/article-utils';
+import {
+  calculateMargin,
+  getArticleTypesWithLabels,
+  transformToSubPositionRow,
+} from 'utils/article-utils';
 import {VatView} from 'models/vat';
 import TableCell from 'components/Table/TableCell';
 import DragHandle from 'components/DragHandle';
@@ -72,23 +76,38 @@ import {MeasurementUnit, createMeasurementOptions} from 'models/articleForm';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import MainPositionActions from 'components/MixedPositions/MainPositionActions';
 import {EditableRowType} from 'components/MixedPositions/PositionTable';
-import {useCreateArticle, useCreateArticleMix} from './reactQuery/useArticle';
+import {
+  EditableServiceOrderItem,
+  ServiceOrderAmountDetail,
+} from 'models/service-order';
+import {
+  fetchArticleSubAssociations,
+  useCreateArticle,
+  useCreateArticleMix,
+} from './reactQuery/useArticle';
 import {useCompanyNextNumber} from './reactQuery/useCompanies';
 import {useSnackbar} from './useSnackbar';
 
 interface MainPositionProps<
   TForm extends {
-    items: (EditableInvoiceItem | EditableQuotationItem)[];
+    items: (
+      | EditableInvoiceItem
+      | EditableQuotationItem
+      | EditableServiceOrderItem
+    )[];
   } & FieldValues,
 > {
   index: number;
-  item: EditableQuotationItem | EditableInvoiceItem;
+  item: EditableQuotationItem | EditableInvoiceItem | EditableServiceOrderItem;
   serviceCompanyId: string;
   onRecalc: () => void;
   watch: UseFormWatch<TForm>;
   setValue: UseFormSetValue<TForm>;
   getValues: UseFormGetValues<TForm>;
-  watchedItem: EditableQuotationItem | EditableInvoiceItem;
+  watchedItem:
+    | EditableQuotationItem
+    | EditableInvoiceItem
+    | EditableServiceOrderItem;
   control: Control<TForm | any>;
   showRightShadow: boolean;
   showLeftShadow: boolean;
@@ -104,15 +123,23 @@ interface MainPositionProps<
   onAddSubPosition: (parentIndex: number) => void;
   setOpenDeleteConfirm: React.Dispatch<React.SetStateAction<boolean>>;
   dirtyFields: FormState<TForm>['dirtyFields'];
-  amountDetail?: InvoiceAmountDetail | QuotationAmountDetail;
+  amountDetail?:
+    | InvoiceAmountDetail
+    | QuotationAmountDetail
+    | ServiceOrderAmountDetail;
   taxRates?: VatView[];
   setHoveredMainRowIndex: React.Dispatch<React.SetStateAction<number | null>>;
   setExpandedRows?: React.Dispatch<React.SetStateAction<number[]>>;
+  disableInlineEditing?: boolean;
 }
 
 const useMainPosition = <
   TForm extends {
-    items: (EditableInvoiceItem | EditableQuotationItem)[];
+    items: (
+      | EditableInvoiceItem
+      | EditableQuotationItem
+      | EditableServiceOrderItem
+    )[];
   } & FieldValues,
 >({
   index,
@@ -138,11 +165,12 @@ const useMainPosition = <
   amountDetail,
   setHoveredMainRowIndex,
   setExpandedRows,
+  disableInlineEditing,
 }: MainPositionProps<TForm>) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   const {language: selectedLng} = useContext(LanguageContext);
 
@@ -159,6 +187,8 @@ const useMainPosition = <
   const vatRef = useRef<HTMLInputElement>(null);
   const unitRef = useRef<HTMLInputElement>(null);
   const discountRef = useRef<HTMLInputElement>(null);
+
+  const isMixed = watchedItem.article?.type === ArticleType.MIX;
 
   const articleTypes = getArticleTypesWithLabels({
     excludeTypes: [],
@@ -186,7 +216,7 @@ const useMainPosition = <
   };
 
   const handleEditStart = (
-    row: EditableQuotationItem | EditableInvoiceItem,
+    row: EditableQuotationItem | EditableInvoiceItem | EditableServiceOrderItem,
     field: string,
   ) => {
     const purchaseNetAmountCents =
@@ -282,7 +312,13 @@ const useMainPosition = <
         values: {
           ...row,
           [field]:
-            row[field as keyof (EditableQuotationItem | EditableInvoiceItem)],
+            row[
+              field as keyof (
+                | EditableQuotationItem
+                | EditableInvoiceItem
+                | EditableServiceOrderItem
+              )
+            ],
         },
       });
     }
@@ -295,7 +331,7 @@ const useMainPosition = <
   }: {
     indexPos: number;
     fieldName: string;
-    row: EditableQuotationItem | EditableInvoiceItem;
+    row: EditableQuotationItem | EditableInvoiceItem | EditableServiceOrderItem;
   }) => {
     setEditableRow({
       index: indexPos,
@@ -323,23 +359,25 @@ const useMainPosition = <
     enqueueSnackbar(t('Position was deleted'), {variant: 'error'});
   };
 
-  const handleArticleSelection = (selectedArticle: ArticleView | string) => {
-    if (typeof selectedArticle === 'string') {
-      setValue(
-        `items.${index}.name` as Path<TForm>,
-        selectedArticle as PathValue<TForm, Path<TForm>>,
-      );
+  const handleArticleSelection = async (
+    selectedArticle: ArticleView | string,
+  ) => {
+    const isFreeText = typeof selectedArticle === 'string';
+    const articleType = isFreeText ? null : selectedArticle.type;
 
-      setValue(
-        `items.${index}.article.name` as Path<TForm>,
-        selectedArticle as PathValue<TForm, Path<TForm>>,
-      );
-    } else {
-      setValue(
-        `items.${index}.name` as Path<TForm>,
-        selectedArticle.name as PathValue<TForm, Path<TForm>>,
-      );
+    const name = isFreeText
+      ? (selectedArticle as string)
+      : selectedArticle.name;
+    setValue(
+      `items.${index}.name` as Path<TForm>,
+      name as PathValue<TForm, Path<TForm>>,
+    );
+    setValue(
+      `items.${index}.article.name` as Path<TForm>,
+      name as PathValue<TForm, Path<TForm>>,
+    );
 
+    if (!isFreeText) {
       setValue(
         `items.${index}.article` as Path<TForm>,
         {
@@ -347,23 +385,58 @@ const useMainPosition = <
           costPackage: selectedArticle.additionalInfo?.costPackage,
         } as PathValue<TForm, Path<TForm>>,
       );
-
       setValue(
         `items.${index}.unitPurchaseAmount` as Path<TForm>,
         selectedArticle.unitPurchaseAmount as PathValue<TForm, Path<TForm>>,
       );
-
       setValue(
         `items.${index}.unitAmount` as Path<TForm>,
         selectedArticle.unitSellingAmount as PathValue<TForm, Path<TForm>>,
       );
-
       setValue(
         `items.${index}.description` as Path<TForm>,
         selectedArticle.description as PathValue<TForm, Path<TForm>>,
       );
-      onRecalc();
     }
+
+    if (articleType === ArticleType.MIX && !isFreeText) {
+      try {
+        const subs = await fetchArticleSubAssociations(selectedArticle.id);
+        const subRows = subs.map(transformToSubPositionRow);
+        setValue(
+          `items.${index}.subItems` as Path<TForm>,
+          subRows as PathValue<TForm, Path<TForm>>,
+          {
+            shouldValidate: true,
+            shouldDirty: true,
+          },
+        );
+
+        setValue(
+          `items.${index}.subItemsConfig.subItemsVisible` as Path<TForm>,
+          true as PathValue<TForm, Path<TForm>>,
+        );
+        setValue(
+          `items.${index}.subItemsConfig.priceVisible` as Path<TForm>,
+          true as PathValue<TForm, Path<TForm>>,
+        );
+
+        if (setExpandedRows) {
+          setExpandedRows((prev) =>
+            prev.includes(index) ? prev : [...prev, index],
+          );
+        }
+      } catch (err) {
+        showError(err);
+      }
+    } else {
+      setValue(
+        `items.${index}.subItems` as Path<TForm>,
+        [] as PathValue<TForm, Path<TForm>>,
+      );
+    }
+
+    onRecalc();
     setEditableRow(null);
   };
 
@@ -410,7 +483,10 @@ const useMainPosition = <
   };
 
   const handleSaveToCatalogue = async (
-    itemData: EditableQuotationItem | EditableInvoiceItem,
+    itemData:
+      | EditableQuotationItem
+      | EditableInvoiceItem
+      | EditableServiceOrderItem,
   ) => {
     const baseStock = {
       currentStock: 1,
@@ -490,7 +566,8 @@ const useMainPosition = <
     const currentItem = getValues(`items.${indexPos}` as Path<TForm>);
     const values = editableRow.values as
       | EditableQuotationItem
-      | EditableQuotationItem;
+      | EditableInvoiceItem
+      | EditableServiceOrderItem;
     let isDifferent = false;
 
     const updateAndMarkRecalc = () => {
@@ -693,8 +770,10 @@ const useMainPosition = <
     () => (
       <TableCell
         noPadding
-        onClick={() =>
-          handleEditStart(watchedItem, `items.${index}.userSeqNumber`)
+        onClick={
+          !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.userSeqNumber`)
+            : undefined
         }
         sx={{background: '#f7f9fc', maxWidth: '58px'}}>
         {editableRow?.index === index &&
@@ -776,12 +855,15 @@ const useMainPosition = <
     () => (
       <TableCell
         noPadding
-        onClick={() =>
-          handleCellClick({
-            indexPos: index,
-            fieldName: `items.${index}.name`,
-            row: item,
-          })
+        onClick={
+          !disableInlineEditing
+            ? () =>
+                handleCellClick({
+                  indexPos: index,
+                  fieldName: `items.${index}.name`,
+                  row: item,
+                })
+            : undefined
         }
         showShadows={showRightShadow ? 'right' : undefined}
         isFirst
@@ -793,7 +875,6 @@ const useMainPosition = <
           <NewArticleAutoComplete
             onArticleSelect={handleArticleSelection}
             initialValue={watch('items' as Path<TForm>)?.[index]}
-            excludeTypes={[ArticleType.MIX]}
             showCustomPriceColumn
             openOnFocus={editableRow.index === index}
           />
@@ -835,10 +916,14 @@ const useMainPosition = <
               />
             </Box>
             <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                onDescriptionClick(item.description || '', index);
-              }}
+              onClick={
+                !disableInlineEditing
+                  ? (e) => {
+                      e.stopPropagation();
+                      onDescriptionClick(item.description || '', index);
+                    }
+                  : undefined
+              }
               sx={{
                 color: removeHtmlTags(watchedItem.description || '')
                   ? '#000034'
@@ -878,6 +963,7 @@ const useMainPosition = <
       showRightShadow,
       item,
       watchedItem,
+      disableInlineEditing,
     ],
   );
 
@@ -886,20 +972,23 @@ const useMainPosition = <
       <TableCell
         align="center"
         noPadding
-        testId={`article-type-${index}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (
-            editableRow?.index === index &&
-            editableRow?.field === `items.${index}.article.type`
-          ) {
-            setEditableRow(null);
-            setAnchorEl(null);
-          } else {
-            handleEditType();
-            setAnchorEl(e.currentTarget);
-          }
-        }}>
+        onClick={
+          !disableInlineEditing
+            ? (e) => {
+                e.stopPropagation();
+                if (
+                  editableRow?.index === index &&
+                  editableRow?.field === `items.${index}.article.type`
+                ) {
+                  setEditableRow(null);
+                  setAnchorEl(null);
+                } else {
+                  handleEditType();
+                  setAnchorEl(e.currentTarget);
+                }
+              }
+            : undefined
+        }>
         <Box
           sx={{
             width: '100%',
@@ -989,8 +1078,14 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() =>
-          handleEditStart(watchedItem, `items.${index}.unitPurchaseAmount`)
+        onClick={
+          !isMixed && !disableInlineEditing
+            ? () =>
+                handleEditStart(
+                  watchedItem,
+                  `items.${index}.unitPurchaseAmount`,
+                )
+            : undefined
         }>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.unitPurchaseAmount` ? (
@@ -1083,7 +1178,7 @@ const useMainPosition = <
         )}
       </TableCell>
     ),
-    [editableRow, index, watchedItem],
+    [editableRow, index, watchedItem, isMixed],
   );
 
   const renderMarginCell = useCallback(
@@ -1091,7 +1186,11 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() => handleEditStart(watchedItem, `items.${index}.margin`)}>
+        onClick={
+          !isMixed && !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.margin`)
+            : undefined
+        }>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.margin` ? (
           <NumericFormat
@@ -1196,7 +1295,7 @@ const useMainPosition = <
         )}
       </TableCell>
     ),
-    [editableRow, index, watchedItem],
+    [editableRow, index, watchedItem, isMixed],
   );
 
   const renderUnitAmountCell = useCallback(
@@ -1204,8 +1303,10 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() =>
-          handleEditStart(watchedItem, `items.${index}.unitAmount`)
+        onClick={
+          !isMixed && !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.unitAmount`)
+            : undefined
         }
         testId={`position-unitAmount-${index}`}>
         {editableRow?.index === index &&
@@ -1292,7 +1393,7 @@ const useMainPosition = <
         )}
       </TableCell>
     ),
-    [editableRow, index, watchedItem],
+    [editableRow, index, watchedItem, isMixed],
   );
 
   const renderQuantityCell = useCallback(
@@ -1300,8 +1401,11 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        testId={`position-quantity-${index}`}
-        onClick={() => handleEditStart(watchedItem, `items.${index}.quantity`)}>
+        onClick={
+          !isMixed && !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.quantity`)
+            : undefined
+        }>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.quantity` ? (
           <Controller
@@ -1372,7 +1476,7 @@ const useMainPosition = <
         )}
       </TableCell>
     ),
-    [editableRow, index, watchedItem],
+    [editableRow, index, watchedItem, isMixed],
   );
 
   const renderVatIdCell = useCallback(
@@ -1388,12 +1492,14 @@ const useMainPosition = <
               editableRow?.field === `items.${index}.unitAmount.vatId`
             )
           ) {
-            setEditableRow({
-              index,
-              field: `items.${index}.unitAmount.vatId`,
-              values: item,
-            });
-            vatRef.current?.focus();
+            if (!disableInlineEditing) {
+              setEditableRow({
+                index,
+                field: `items.${index}.unitAmount.vatId`,
+                values: item,
+              });
+              vatRef.current?.focus();
+            }
           }
         }}
         onKeyDown={(e) => {
@@ -1504,12 +1610,14 @@ const useMainPosition = <
               editableRow?.field === `items.${index}.article.unit`
             )
           ) {
-            handleCellClick({
-              indexPos: index,
-              fieldName: `items.${index}.article.unit`,
-              row: item,
-            });
-            unitRef.current?.focus();
+            if (!disableInlineEditing) {
+              handleCellClick({
+                indexPos: index,
+                fieldName: `items.${index}.article.unit`,
+                row: item,
+              });
+              unitRef.current?.focus();
+            }
           }
         }}
         onKeyDown={(e) => {
@@ -1580,8 +1688,11 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        testId={`discount-${index}`}
-        onClick={() => handleEditStart(watchedItem, `items.${index}.discount`)}>
+        onClick={
+          !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.discount`)
+            : undefined
+        }>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.discount` ? (
           <NumericFormat
@@ -1591,16 +1702,19 @@ const useMainPosition = <
                 editableRow.values as
                   | EditableQuotationItem
                   | EditableInvoiceItem
+                  | EditableServiceOrderItem
               )?.discount?.type === DiscountType.AMOUNT
                 ? (
                     editableRow.values as
                       | EditableQuotationItem
                       | EditableInvoiceItem
+                      | EditableServiceOrderItem
                   )?.discount?.amount?.value
                 : (
                     editableRow.values as
                       | EditableQuotationItem
                       | EditableInvoiceItem
+                      | EditableServiceOrderItem
                   )?.discount?.percentage
             }
             getInputRef={discountRef}
@@ -1617,6 +1731,7 @@ const useMainPosition = <
                   editableRow.values as
                     | EditableQuotationItem
                     | EditableInvoiceItem
+                    | EditableServiceOrderItem
                 ).discount?.type === DiscountType.AMOUNT
                   ? ((watchedItem?.unitAmount?.netAmount ?? 0) *
                       Number(watchedItem.quantity)) /
@@ -1652,6 +1767,7 @@ const useMainPosition = <
                       editableRow?.values as
                         | EditableQuotationItem
                         | EditableInvoiceItem
+                        | EditableServiceOrderItem
                     )?.discount;
                     const newType =
                       currentDiscount?.type === DiscountType.AMOUNT
@@ -1704,6 +1820,7 @@ const useMainPosition = <
                     editableRow.values as
                       | EditableQuotationItem
                       | EditableInvoiceItem
+                      | EditableServiceOrderItem
                   ).discount?.type === DiscountType.AMOUNT
                     ? {
                         type: DiscountType.AMOUNT,
@@ -1711,6 +1828,7 @@ const useMainPosition = <
                           editableRow.values as
                             | EditableQuotationItem
                             | EditableInvoiceItem
+                            | EditableServiceOrderItem
                         )?.discount?.amount,
                         percentage: 0,
                       }
@@ -1720,6 +1838,7 @@ const useMainPosition = <
                           editableRow.values as
                             | EditableQuotationItem
                             | EditableInvoiceItem
+                            | EditableServiceOrderItem
                         )?.discount?.percentage,
                       };
                 setValue(
@@ -1749,11 +1868,13 @@ const useMainPosition = <
                       prev!.values as
                         | EditableQuotationItem
                         | EditableInvoiceItem
+                        | EditableServiceOrderItem
                     )?.discount!,
                     ...((
                       prev!.values as
                         | EditableQuotationItem
                         | EditableInvoiceItem
+                        | EditableServiceOrderItem
                     )?.discount?.type === DiscountType.AMOUNT
                       ? {
                           type: DiscountType.AMOUNT,
@@ -1806,54 +1927,57 @@ const useMainPosition = <
         <Typography sx={{fontWeight: 600, padding: '0px 12px'}}>
           {netPriceDisplay}
         </Typography>
-        <Box
-          sx={{borderLeft: '1px solid #e4e5e8'}}
-          onClick={() => {
-            setIsActionOpen(!isActionOpen);
-          }}>
-          <MainPositionActions
-            isMixedType={watchedItem.article?.type === ArticleType.MIX}
-            onCreateMixedPosition={() => {
-              setValue(
-                `items.${index}.article.type` as Path<TForm>,
-                ArticleType.MIX as PathValue<TForm, Path<TForm>>,
-              );
-              const currentConfig =
-                getValues(`items.${index}.subItemsConfig` as Path<TForm>) || {};
-              setValue(
-                `items.${index}.subItemsConfig` as Path<TForm>,
-                {
-                  ...currentConfig,
-                  subItemsVisible: true,
-                  priceVisible: true,
-                } as PathValue<TForm, Path<TForm>>,
-              );
-              if (setExpandedRows) {
-                setExpandedRows((prev) =>
-                  prev.includes(index) ? prev : [...prev, index],
+        {!disableInlineEditing && (
+          <Box
+            sx={{borderLeft: '1px solid #e4e5e8'}}
+            onClick={() => {
+              setIsActionOpen(!isActionOpen);
+            }}>
+            <MainPositionActions
+              isMixedType={watchedItem.article?.type === ArticleType.MIX}
+              onCreateMixedPosition={() => {
+                setValue(
+                  `items.${index}.article.type` as Path<TForm>,
+                  ArticleType.MIX as PathValue<TForm, Path<TForm>>,
                 );
-              }
-              onRecalc();
-              setEditableRow(null);
-              setAnchorEl(null);
-              setIsActionOpen(false);
-            }}
-            onAddSubPosition={() => {
-              onAddSubPosition(index);
-              setIsActionOpen(false);
-            }}
-            onSaveToCatalogue={() => {
-              const itemData = getValues(`items.${index}` as Path<TForm>);
-              handleSaveToCatalogue(itemData);
-              setIsActionOpen(false);
-            }}
-            onDelete={() => {
-              setOpenDeleteConfirm(true);
-              setIsActionOpen(false);
-            }}
-            isOpen={isActionOpen}
-          />
-        </Box>
+                const currentConfig =
+                  getValues(`items.${index}.subItemsConfig` as Path<TForm>) ||
+                  {};
+                setValue(
+                  `items.${index}.subItemsConfig` as Path<TForm>,
+                  {
+                    ...currentConfig,
+                    subItemsVisible: true,
+                    priceVisible: true,
+                  } as PathValue<TForm, Path<TForm>>,
+                );
+                if (setExpandedRows) {
+                  setExpandedRows((prev) =>
+                    prev.includes(index) ? prev : [...prev, index],
+                  );
+                }
+                onRecalc();
+                setEditableRow(null);
+                setAnchorEl(null);
+                setIsActionOpen(false);
+              }}
+              onAddSubPosition={() => {
+                onAddSubPosition(index);
+                setIsActionOpen(false);
+              }}
+              onSaveToCatalogue={() => {
+                const itemData = getValues(`items.${index}` as Path<TForm>);
+                handleSaveToCatalogue(itemData);
+                setIsActionOpen(false);
+              }}
+              onDelete={() => {
+                setOpenDeleteConfirm(true);
+                setIsActionOpen(false);
+              }}
+              isOpen={isActionOpen}
+            />
+          </Box>
+        )}
       </TableCell>
     ),
     [

@@ -163,7 +163,7 @@ const MarginDetails = ({
           {showMargins &&
             marginItems.map((item, idx) => (
               <Box
-                key={idx}
+                key={`${item.label} - ${idx}`}
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center">

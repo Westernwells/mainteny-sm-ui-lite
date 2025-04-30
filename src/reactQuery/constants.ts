@@ -133,6 +133,8 @@ export const queryKeys = {
   queryAllContracts: 'queryAllContracts',
   fetchContractStatistics: 'fetchContractStatistics',
   quotationAmountById: 'quotationAmountById',
+  serviceOrderSubItem: 'serviceOrderSubItem',
+  serviceOrderAmountById: 'serviceOrderAmountById',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

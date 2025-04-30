@@ -1,23 +1,34 @@
-import {UseFormReturn} from 'react-hook-form';
-import {Typography} from '@mui/material';
-import {
-  QuotationFormData,
-  EditableQuotationSubItemRecord,
-  QuotationAmountDetail,
-} from 'models/quotation';
+import {FieldValues, UseFormReturn} from 'react-hook-form';
 import {Dispatch, SetStateAction} from 'react';
-import TableCell from 'components/Table/TableCell';
 import {VatView} from 'models/vat';
+import {
+  EditableInvoiceItem,
+  EditableInvoiceSubItemRecord,
+  InvoiceAmountDetail,
+} from 'models/invoice';
 import useSubPosition from 'hooks/useSubPosition';
-import {EditableRowType} from './PositionTable';
+import {EditableRowType} from 'components/MixedPositions/PositionTable';
+import {
+  EditableServiceOrderItem,
+  ServiceOrderAmountDetail,
+} from 'models/service-order';
+import {EditableQuotationItem, QuotationAmountDetail} from 'models/quotation';
 
-interface Props {
-  subItem: EditableQuotationSubItemRecord;
+interface Props<
+  TForm extends {
+    items: (
+      | EditableQuotationItem
+      | EditableInvoiceItem
+      | EditableServiceOrderItem
+    )[];
+  } & FieldValues,
+> {
+  subItem: EditableInvoiceSubItemRecord;
   editableSubRow: EditableRowType | null;
   setEditableSubRow: Dispatch<SetStateAction<EditableRowType | null>>;
   parentIndex: number;
   subIndex: number;
-  formMethods: UseFormReturn<QuotationFormData>;
+  formMethods: UseFormReturn<TForm>;
   hoveredSubRowIndex: number | null;
   setHoveredSubRowIndex: Dispatch<SetStateAction<number | null>>;
   showRightShadow: boolean;
@@ -28,11 +39,23 @@ interface Props {
     parentIndex: number,
     subIndex?: number,
   ) => void;
-  onRecalcQuotation: () => void;
-  quotationAmountDetail?: QuotationAmountDetail;
+  onRecalc: () => void;
+  amountDetail?:
+    | InvoiceAmountDetail
+    | ServiceOrderAmountDetail
+    | QuotationAmountDetail;
+  disableInlineEditing?: boolean;
 }
 
-const SubPositionRow = ({
+const NewSubPositionRow = <
+  TForm extends {
+    items: (
+      | EditableQuotationItem
+      | EditableInvoiceItem
+      | EditableServiceOrderItem
+    )[];
+  } & FieldValues,
+>({
   parentIndex,
   subIndex,
   subItem,
@@ -45,9 +68,10 @@ const SubPositionRow = ({
   onDescriptionClick,
   showRightShadow,
   showLeftShadow,
-  onRecalcQuotation,
-  quotationAmountDetail,
-}: Props) => {
+  onRecalc,
+  amountDetail,
+  disableInlineEditing = false,
+}: Props<TForm>) => {
   const {control, setValue, getValues, watch} = formMethods;
 
   const {
@@ -61,6 +85,7 @@ const SubPositionRow = ({
     renderQuantityCell,
     renderVatIdCell,
     renderUnitCell,
+    renderDiscountCell,
     renderTotalPriceCell,
   } = useSubPosition({
     parentIndex,
@@ -77,9 +102,10 @@ const SubPositionRow = ({
     editableSubRow,
     setEditableSubRow,
     onDescriptionClick,
-    onRecalc: onRecalcQuotation,
+    onRecalc,
     taxRates,
-    amountDetail: quotationAmountDetail,
+    amountDetail,
+    disableInlineEditing,
   });
 
   return (
@@ -94,12 +120,10 @@ const SubPositionRow = ({
       {renderQuantityCell()}
       {renderVatIdCell()}
       {renderUnitCell()}
-      <TableCell align="right" noPadding>
-        <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>-</Typography>
-      </TableCell>
+      {renderDiscountCell()}
       {renderTotalPriceCell()}
     </>
   );
 };
 
-export default SubPositionRow;
+export default NewSubPositionRow;

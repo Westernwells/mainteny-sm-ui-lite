@@ -7,6 +7,7 @@ import {
 import {ContractSimpleView} from './contract';
 import {
   Amount,
+  AmountRecord,
   EmailRecord,
   Fee,
   JobStatus,
@@ -18,9 +19,10 @@ import {
 import {Technician, TechnicianSimpleView} from './technician';
 import {UserAccount, UserAccountSimpleView} from './user';
 import {EmployeesSimpleView, EmployeesView} from './employee';
-import {ArticleRecord, ArticleView, ServiceOrderArticleRecord} from './article';
+import {ArticleRecord, ArticleView} from './article';
 import {FileResource, FileResourceRecord} from './media';
 import {
+  AggregatedAmount,
   Discount,
   InvoiceSubItemsConfig,
   InvoiceUnitAmountSource,
@@ -29,7 +31,11 @@ import {ServiceCompanySimpleView} from './service-company';
 import {Order} from './pagination';
 import {PropertyOwnerView} from 'models/propertyManager';
 import {CommentRecord} from './comment';
-import {ArticleInfoRecord} from './quotation';
+import {
+  ArticleInfoRecord,
+  EditableQuotationSubItemRecord,
+  SubItemsConfig,
+} from './quotation';
 
 export enum Priority {
   A = 'A',
@@ -672,6 +678,26 @@ export interface CreateServiceOrderRecord {
   comments?: CommentRecord[];
 }
 
+export enum UnitAmountSource {
+  DEFAULT = 'DEFAULT',
+  MIX_ARTICLE = 'MIX_ARTICLE',
+  MIX_SUB_ITEMS = 'MIX_SUB_ITEMS',
+}
+
+export interface ServiceOrderSubArticlesConfig {
+  subItemsVisible?: boolean;
+  priceVisible?: boolean;
+}
+export interface ServiceOrderArticleAdditionalInfo {
+  discount?: Discount;
+  owner?: {
+    id: string;
+    name: string;
+  };
+  unitAmountSource?: UnitAmountSource;
+  subArticlesConfig?: ServiceOrderSubArticlesConfig;
+  userSeqNumber?: string;
+}
 export interface ServiceOrderArticleView {
   id: string;
   name: string;
@@ -682,24 +708,13 @@ export interface ServiceOrderArticleView {
   unitAmount: MultiVatsAmount;
   quantity: number;
   ownerType?: ServiceOrderArticleOwnerType;
-  additionalInfo?:
-    | {
-        discount?: Discount;
-        owner?: {
-          id: string;
-          name: string;
-        };
-        unitAmountSource?: InvoiceUnitAmountSource;
-        subArticlesConfig?: InvoiceSubItemsConfig;
-        userSeqNumber?: string;
-      }
-    | undefined;
+  additionalInfo?: ServiceOrderArticleAdditionalInfo;
 }
 
 export interface ServiceOrderItemRecord {
   articleId: string;
   articleUnit: string;
-  description: string;
+  description?: string;
   name: string;
   quantity: number;
   unitAmount: Amount;
@@ -805,6 +820,109 @@ export interface ServiceOrderNameChangedRecord {
 export interface DateCellParts {
   label: string;
   date?: string | null;
+}
+export interface ServiceOrderSubItemRecord {
+  article?: ArticleInfoRecord;
+  id?: string;
+  name: string;
+  unitPurchaseAmount?: Amount;
+  unitAmount: Amount;
+  quantity: number;
+  description?: string;
+  userSeqNumber?: string;
+}
+
+export type EditableServiceOrderSubArticleRecord = ServiceOrderSubItemRecord & {
+  margin?: number;
+  id?: string;
+  parentId?: string;
+};
+
+export interface NewServiceOrderItemRecord {
+  id?: string; // only for frontend key - we don't send it to backend
+  article?: ArticleInfoRecord;
+  name: string;
+  description?: string;
+  unitPurchaseAmount?: AmountRecord;
+  unitAmount: AmountRecord;
+  quantity: number;
+  discount?: Discount;
+  subItemsConfig?: ServiceOrderSubArticlesConfig;
+  subArticles?: EditableServiceOrderSubArticleRecord[];
+  userSeqNumber?: string;
+  ownerType?: ServiceOrderArticleOwnerType;
+  ownerName?: string;
+  serviceOrderId?: string;
+  subItems?: EditableServiceOrderSubArticleRecord[];
+}
+
+export type EditableServiceOrderItem = NewServiceOrderItemRecord & {
+  id?: string;
+  margin?: number;
+};
+
+export interface UpdateServiceOrderAmountRecord {
+  articles: ServiceOrderArticleRecord[];
+  globalDiscount?: Discount;
+}
+export interface ServiceOrderArticleRecord {
+  articleId?: string;
+  article?: ArticleInfoRecord;
+  name: string;
+  description?: string;
+  quantity: number;
+  unitPurchaseAmount?: AmountRecord;
+  unitAmount: AmountRecord;
+  ownerType?: ServiceOrderArticleOwnerType;
+  discount?: Discount;
+  owner?: {
+    id: string;
+    name: string;
+  };
+  subArticlesConfig?: SubItemsConfig;
+  subArticles?: ServiceOrderSubArticleRecord[];
+  userSeqNumber?: string;
+}
+
+export interface ServiceOrderSubArticleRecord {
+  articleId?: string;
+  id?: string;
+  article?: ArticleInfoRecord;
+  name: string;
+  description?: string;
+  quantity: number;
+  unitAmount: AmountRecord;
+  unitPurchaseAmount?: AmountRecord;
+  userSeqNumber?: string;
+}
+
+export interface ServiceOrderSubArticleAmount {
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount: Amount;
+}
+
+export interface ServiceOrderArticleAmount {
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount?: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount?: Amount;
+  subItems: ServiceOrderSubArticleAmount[];
+}
+
+export interface ServiceOrderAmountDetail {
+  discount: Discount;
+  amountBeforeGlobalDiscount: AggregatedAmount;
+  amountAfterGlobalDiscount: AggregatedAmount;
+  items: ServiceOrderArticleAmount[];
+}
+
+export interface CalculateServiceOrderAmountRecord {
+  articles: ServiceOrderArticleRecord[];
+  globalDiscount?: Discount;
 }
 
 export const statusLabelMap: Record<ServiceOrderStatus, string> = {

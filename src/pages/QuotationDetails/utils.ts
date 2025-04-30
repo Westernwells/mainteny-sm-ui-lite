@@ -11,7 +11,7 @@ import {
   UpdateQuotation,
 } from 'models/quotation';
 import {VatView} from 'models/vat';
-import {Currencies} from 'utils/currency';
+import {Currencies, moneyToCents} from 'utils/currency';
 import {dateToString} from 'utils/utils';
 
 export const formatQuotationItems = (
@@ -118,6 +118,32 @@ export const formatQuotationRecord = (
   taxRates?: VatView[],
 ): CreateQuotationRecord | UpdateQuotation => ({
   ...value,
+  discount: value.discount
+    ? {
+        ...value.discount,
+        type:
+          value.discount.type === DiscountType.NONE
+            ? DiscountType.PERCENTAGE
+            : value.discount.type,
+        amount:
+          value.discount.type === DiscountType.AMOUNT && value.discount.amount
+            ? {
+                ...value.discount.amount,
+                // turn into cents
+                value: moneyToCents(
+                  currentCurrency.code,
+                  value.discount.amount.value ?? 0,
+                ),
+                currency: value.discount.amount.currency,
+              }
+            : undefined,
+        percentage:
+          value.discount.type === DiscountType.PERCENTAGE ||
+          value.discount.type === DiscountType.NONE
+            ? value.discount.percentage ?? 0
+            : undefined,
+      }
+    : undefined,
   subject: value?.subject || '',
   description: value?.description || '',
   sentDate: value.sentDate ? dateToString(value.sentDate) : '',

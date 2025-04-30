@@ -16,12 +16,11 @@ import {NoItemSection} from '../NoItemSection';
 
 const validationSchema = Yup.object().shape({
   description: Yup.string()
-    .required('Description is required')
-    .test(
-      'checkDescriptionSize',
-      CUSTOM_ERROR_TEXT.description,
-      (value) => value.length <= 20000,
-    ),
+    .notRequired()
+    .test('checkDescriptionSize', CUSTOM_ERROR_TEXT.description, (value) => {
+      if (!value) return true;
+      return value.length <= 20000;
+    }),
 });
 
 export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {

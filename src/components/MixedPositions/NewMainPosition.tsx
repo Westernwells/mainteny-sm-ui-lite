@@ -1,20 +1,26 @@
 import React, {Dispatch, SetStateAction, useState} from 'react';
-import {UseFormReturn, useWatch} from 'react-hook-form';
-import {
-  QuotationFormData,
-  EditableQuotationItem,
-  QuotationAmountDetail,
-} from 'models/quotation';
+import {FieldValues, Path, UseFormReturn, useWatch} from 'react-hook-form';
+import {EditableInvoiceItem, InvoiceAmountDetail} from 'models/invoice';
 import {Confirm} from 'components/Confirm';
 import {VatView} from 'models/vat';
 import useMainPosition from 'hooks/useMainPosition';
-import {EditableRowType} from './PositionTable';
+import {EditableRowType} from 'components/MixedPositions/PositionTable';
+import {EditableQuotationItem, QuotationAmountDetail} from 'models/quotation';
+import {
+  EditableServiceOrderItem,
+  ServiceOrderAmountDetail,
+} from 'models/service-order';
 
-interface Props {
-  item: EditableQuotationItem;
+type AnyItem =
+  | EditableInvoiceItem
+  | EditableQuotationItem
+  | EditableServiceOrderItem;
+
+interface Props<TForm extends {items: AnyItem[]} & FieldValues> {
   index: number;
-  formMethods: UseFormReturn<QuotationFormData>;
-  setExpandedRows: React.Dispatch<React.SetStateAction<number[]>>;
+  item: TForm['items'][number];
+  formMethods: UseFormReturn<TForm>;
+  setExpandedRows: Dispatch<SetStateAction<number[]>>;
   expandedRows: number[];
   onAddSubPosition: (parentIndex: number) => void;
   showRightShadow: boolean;
@@ -23,18 +29,30 @@ interface Props {
   hoveredMainRowIndex: number | null;
   setHoveredMainRowIndex: Dispatch<SetStateAction<number | null>>;
   editableRow: EditableRowType | null;
-  setEditableRow: React.Dispatch<React.SetStateAction<EditableRowType | null>>;
+  setEditableRow: Dispatch<SetStateAction<EditableRowType | null>>;
   taxRates?: VatView[];
   onDescriptionClick: (
     description: string,
     parentIndex: number,
     subIndex?: number,
   ) => void;
-  onRecalcQuotation: () => void;
-  quotationAmountDetail?: QuotationAmountDetail;
+  onRecalc: () => void;
+  amountDetail?:
+    | InvoiceAmountDetail
+    | QuotationAmountDetail
+    | ServiceOrderAmountDetail;
+  disableInlineEditing?: boolean;
 }
 
-const MainPositionRow = ({
+const NewMainPositionRow = <
+  TForm extends {
+    items: (
+      | EditableInvoiceItem
+      | EditableQuotationItem
+      | EditableServiceOrderItem
+    )[];
+  } & FieldValues,
+>({
   item,
   index,
   formMethods,
@@ -43,16 +61,17 @@ const MainPositionRow = ({
   serviceCompanyId,
   hoveredMainRowIndex,
   setHoveredMainRowIndex,
-  editableRow,
-  setEditableRow,
   expandedRows,
   setExpandedRows,
   onAddSubPosition,
+  editableRow,
+  setEditableRow,
   taxRates,
   onDescriptionClick,
-  onRecalcQuotation,
-  quotationAmountDetail,
-}: Props) => {
+  onRecalc,
+  amountDetail,
+  disableInlineEditing = false,
+}: Props<TForm>) => {
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
 
   const {
@@ -65,7 +84,7 @@ const MainPositionRow = ({
 
   const watchedItem = useWatch({
     control,
-    name: `items.${index}`,
+    name: `items.${index}` as Path<TForm>,
   });
 
   const {
@@ -86,7 +105,7 @@ const MainPositionRow = ({
     index,
     item,
     serviceCompanyId,
-    onRecalc: onRecalcQuotation,
+    onRecalc,
     watch,
     setValue,
     getValues,
@@ -96,16 +115,17 @@ const MainPositionRow = ({
     showLeftShadow,
     expandedRows,
     hoveredMainRowIndex,
+    onDescriptionClick,
     editableRow,
     setEditableRow,
-    onDescriptionClick,
     setOpenDeleteConfirm,
     onAddSubPosition,
     dirtyFields,
     taxRates,
-    amountDetail: quotationAmountDetail,
+    amountDetail,
     setHoveredMainRowIndex,
     setExpandedRows,
+    disableInlineEditing,
   });
 
   return (
@@ -128,14 +148,14 @@ const MainPositionRow = ({
         open={openDeleteConfirm}
         onConfirm={() => {
           handleDeleteConfirm();
-          onRecalcQuotation();
+          onRecalc();
         }}
         onClose={() => setOpenDeleteConfirm(false)}
         title="Delete position"
-        content="You are about to remove this position permanently from this quotation. This action can't be undone. Do you want to proceed?"
+        content="You are about to remove this position permanently from this invoice. This action can't be undone. Do you want to proceed?"
       />
     </>
   );
 };
 
-export default MainPositionRow;
+export default NewMainPositionRow;

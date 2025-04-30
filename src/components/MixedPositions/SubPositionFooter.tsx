@@ -24,6 +24,7 @@ export interface SubPositionFooterProps<TForm extends FieldValues> {
   onAddSubPosition: (parentIndex: number) => void;
   isSubPositionVisible?: boolean;
   isPriceVisible?: boolean;
+  disableInlineEditing?: boolean;
 }
 
 const SubPositionFooter = <TForm extends FieldValues>({
@@ -33,6 +34,7 @@ const SubPositionFooter = <TForm extends FieldValues>({
   onAddSubPosition,
   isSubPositionVisible = true,
   isPriceVisible = true,
+  disableInlineEditing = false,
 }: SubPositionFooterProps<TForm>) => {
   const theme = useTheme();
   return (
@@ -47,16 +49,18 @@ const SubPositionFooter = <TForm extends FieldValues>({
         fullWidth
         noWidthLimit
         sx={{border: 'none', width: '328px'}}>
-        <Button
-          label="Add sub-position"
-          buttonProps={{
-            variant: 'text',
-            size: 'small',
-            onClick: () => onAddSubPosition(index),
-            sx: {fontWeight: 600, p: 1, color: theme.palette.primary.light},
-            startIcon: <PlaylistAddOutlinedIcon />,
-          }}
-        />
+        {!disableInlineEditing && (
+          <Button
+            label="Add sub-position"
+            buttonProps={{
+              variant: 'text',
+              size: 'small',
+              onClick: () => onAddSubPosition(index),
+              sx: {fontWeight: 600, p: 1, color: theme.palette.primary.light},
+              startIcon: <PlaylistAddOutlinedIcon />,
+            }}
+          />
+        )}
       </TableCell>
       <TableCell sx={{border: 'none'}} colSpan={7} noPadding />
       <TableCell
@@ -97,16 +101,20 @@ const SubPositionFooter = <TForm extends FieldValues>({
                 <Switch
                   {...field}
                   checked={field.value || false}
-                  onChange={(e) => {
-                    const newVal = e.target.checked;
-                    field.onChange(newVal);
-                    if (!newVal) {
-                      setValue(
-                        `items.${index}.subItemsConfig.priceVisible` as Path<TForm>,
-                        false as PathValue<TForm, Path<TForm>>,
-                      );
-                    }
-                  }}
+                  onChange={
+                    !disableInlineEditing
+                      ? (e) => {
+                          const newVal = e.target.checked;
+                          field.onChange(newVal);
+                          if (!newVal) {
+                            setValue(
+                              `items.${index}.subItemsConfig.priceVisible` as Path<TForm>,
+                              false as PathValue<TForm, Path<TForm>>,
+                            );
+                          }
+                        }
+                      : undefined
+                  }
                 />
               )}
             />
@@ -135,7 +143,11 @@ const SubPositionFooter = <TForm extends FieldValues>({
                   {...field}
                   disabled={!isSubPositionVisible}
                   checked={field.value || false}
-                  onChange={(e) => field.onChange(e.target.checked)}
+                  onChange={
+                    !disableInlineEditing
+                      ? (e) => field.onChange(e.target.checked)
+                      : undefined
+                  }
                 />
               )}
             />
