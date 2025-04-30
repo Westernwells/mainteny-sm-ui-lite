@@ -40,6 +40,7 @@ declare global {
   namespace Cypress {
     interface Chainable {
       login(): Chainable<void>;
+      getRichTextField(field: string): Chainable<void>;
       fillRichTextField(field: string, value: string): Chainable<void>;
       clearRichTextField(field: string): Chainable<void>;
       waitForSpinnerToDisappear(): Chainable<void>;
@@ -55,6 +56,14 @@ Cypress.Commands.add('login', () => {
   cy.get('#password').type('!!abc123', {log: false});
   cy.get('button[type="submit"]').click();
   cy.wait('@loginApi');
+});
+
+Cypress.Commands.add('getRichTextField', (field: string) => {
+  cy.contains('legend', field)
+    .parents('fieldset')
+    .within(() => {
+      cy.get('div[contenteditable="true"]');
+    });
 });
 
 Cypress.Commands.add('fillRichTextField', (field: string, value: string) => {
