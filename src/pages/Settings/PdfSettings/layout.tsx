@@ -20,7 +20,7 @@ import {
 import {FormSelect} from 'components/form/FormSelect';
 import useTheme from '@mui/material/styles/useTheme';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
-import ColorPickerPopup from 'components/ColorPicker/ColorPickerPopover';
+import ColorPickerPopup from 'components/ColorPicker/CustomColorPicker';
 import ColorPickerPredefined from 'components/ColorPicker/ColorPickerPredefined';
 import PdfSettings from '.';
 

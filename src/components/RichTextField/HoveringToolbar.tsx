@@ -44,7 +44,7 @@ import {
 import {FONT_SIZE, FORMAT} from 'models/richTextField';
 import ColorPickerPredefined from 'components/ColorPicker/ColorPickerPredefined';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
-import ColorPickerPopup from 'components/ColorPicker/ColorPickerPopover';
+import CustomColorPicker from 'components/ColorPicker/CustomColorPicker';
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({theme: t}) => ({
   [`& .${toggleButtonGroupClasses.grouped}`]: {
@@ -240,7 +240,7 @@ export const HoveringToolbar = () => {
               size="small"
             />
 
-            <ColorPickerPopup
+            <CustomColorPicker
               initialValue={color}
               onChange={handleColorChange}
               backgroundTheme="dark"
