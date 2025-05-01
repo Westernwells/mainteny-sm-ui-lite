@@ -39,7 +39,19 @@ export const getColumns = ({
     field: 'noOfLicense',
     headerName: '# of licences',
     align: 'left',
-    flex: 1.5,
+    flex: 1,
+  }),
+  getColumnProps({
+    field: 'noOfSubLicense',
+    headerName: '# of sub licences',
+    align: 'left',
+    flex: 1,
+  }),
+  getColumnProps({
+    field: 'noOfSubUsers',
+    headerName: '# of sub users',
+    align: 'left',
+    flex: 1,
   }),
   getColumnProps({
     field: 'created',
@@ -105,8 +117,10 @@ export const makeRows = (companies: ServiceCompanyItem[]) =>
         country: item?.businessAddress
           ? item?.businessAddress.component?.country
           : '-',
-        noOfUsers: item.statistics?.numberOfUsers,
-        noOfLicense: item.settings.userLimits.maxMainUserCount || '-',
+        noOfUsers: item.statistics?.numberOfMainUsers ?? '-',
+        noOfLicense: item.settings?.userLimits?.maxMainUserCount ?? '-',
+        noOfSubLicense: item.settings?.userLimits?.maxContractorCount ?? '-',
+        noOfSubUsers: item.statistics?.numberOfContractors ?? '-',
         navigateTo: `details/${item.id}`,
       }))
     : [];
