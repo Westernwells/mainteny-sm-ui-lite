@@ -1,4 +1,4 @@
-import React, {useContext, useRef} from 'react';
+import React, {useContext, useEffect, useRef} from 'react';
 import {t} from 'i18next';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -8,6 +8,7 @@ type KalasarInstance = {
   destroy(): void;
   isVisible(): boolean;
   toggle(): void;
+  setLanguage?(lang: string): void;
 };
 
 export type WidgetOptions = {
@@ -46,6 +47,15 @@ const KalasarWidget: React.FC = () => {
       instanceRef.current = window.Kalasar.startTour(config);
     }
   };
+
+  useEffect(() => {
+    if (instanceRef.current?.setLanguage) {
+      const kalasarLang = language?.toLowerCase().startsWith('de')
+        ? 'de'
+        : 'en';
+      instanceRef.current.setLanguage(kalasarLang);
+    }
+  }, [language]);
 
   return (
     <button
