@@ -1,17 +1,39 @@
-import {DiscountType, InvoiceItemView} from 'models/invoice';
-import {QuotationItemView} from 'models/quotation';
+import {
+  DiscountType,
+  EditableInvoiceItem,
+  InvoiceItemView,
+} from 'models/invoice';
+import {EditableQuotationItem, QuotationItemView} from 'models/quotation';
 import {ServiceOrderArticleView} from 'models/service-order';
 
-export const allItemsHaveZeroDiscount = (articleItems?: any) =>
-  articleItems?.every((item: any) => {
-    const discount = item?.additionalInfo?.discount;
-    return (
-      discount?.amount?.value === 0 ||
-      discount?.percentage === 0 ||
-      discount?.type === DiscountType.NONE ||
-      !discount
-    );
-  });
+export const allItemsHaveZeroDiscount = (
+  articleItems?: (
+    | EditableInvoiceItem
+    | EditableQuotationItem
+    | QuotationItemView
+    | InvoiceItemView
+  )[],
+) =>
+  articleItems?.every(
+    (
+      item:
+        | EditableInvoiceItem
+        | EditableQuotationItem
+        | QuotationItemView
+        | InvoiceItemView,
+    ) => {
+      const discount =
+        (item as QuotationItemView | InvoiceItemView)?.additionalInfo
+          ?.discount ||
+        (item as EditableInvoiceItem | EditableQuotationItem)?.discount;
+      return (
+        discount?.amount?.value === 0 ||
+        discount?.percentage === 0 ||
+        discount?.type === DiscountType.NONE ||
+        !discount
+      );
+    },
+  );
 
 export const shouldDisplayDiscountDash = (
   articleOrderItem:

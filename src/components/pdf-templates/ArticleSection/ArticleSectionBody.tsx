@@ -14,6 +14,7 @@ type ArticleSectionBodyProps = {
   amountDetail?: InvoiceAmountDetail | QuotationAmountDetail;
   currentCurrency?: Currency;
   selectedLng?: string;
+  showDiscountCol?: boolean;
   translate: (key: string) => string;
 } & Pick<ContextProps, 'primaryColor'>;
 
@@ -22,10 +23,13 @@ export const ArticleSectionBody = ({
   amountDetail,
   currentCurrency,
   selectedLng,
+  showDiscountCol,
   translate,
   primaryColor,
 }: ArticleSectionBodyProps) => {
   const styles = getStyles({primaryColor});
+
+  const priceWidth = showDiscountCol ? styles.col15Right.width : '18%';
 
   return (
     <View style={styles.dataBody}>
@@ -57,7 +61,7 @@ export const ArticleSectionBody = ({
                 <Text>{translate(mainPosition.article?.unit || '-')}</Text>
               </View>
 
-              <View style={styles.col15Right}>
+              <View style={[styles.col15Right, {width: priceWidth}]}>
                 <Text>
                   {formatCurrency(
                     centsToMoney(
@@ -74,17 +78,19 @@ export const ArticleSectionBody = ({
                 </Text>
               </View>
 
-              <View style={styles.col10Right}>
-                <Text>
-                  {getDiscountDisplay(
-                    mainPosition.discount,
-                    currentCurrency,
-                    selectedLng,
-                  )}
-                </Text>
-              </View>
+              {showDiscountCol && (
+                <View style={styles.col10Right}>
+                  <Text>
+                    {getDiscountDisplay(
+                      mainPosition.discount,
+                      currentCurrency,
+                      selectedLng,
+                    )}
+                  </Text>
+                </View>
+              )}
 
-              <View style={styles.col15Right}>
+              <View style={[styles.col15Right, {width: priceWidth}]}>
                 <Text>
                   {formatCurrency(totalPriceExclVatAfterDiscount || 0, {
                     currency: currentCurrency?.code!,
@@ -139,7 +145,7 @@ export const ArticleSectionBody = ({
                         <Text>{translate(subItem.article?.unit || '-')}</Text>
                       </View>
 
-                      <View style={styles.col15Right}>
+                      <View style={[styles.col15Right, {width: priceWidth}]}>
                         {mainPosition.subItemsConfig?.priceVisible ? (
                           <Text>
                             {formatCurrency(
@@ -160,11 +166,13 @@ export const ArticleSectionBody = ({
                         )}
                       </View>
 
-                      <View style={styles.col10Right}>
-                        <Text />
-                      </View>
+                      {showDiscountCol && (
+                        <View style={styles.col10Right}>
+                          <Text />
+                        </View>
+                      )}
 
-                      <View style={styles.col15Right}>
+                      <View style={[styles.col15Right, {width: priceWidth}]}>
                         <Text>
                           {mainPosition.subItemsConfig?.priceVisible ? (
                             <Text>

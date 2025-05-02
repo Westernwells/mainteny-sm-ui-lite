@@ -27,6 +27,7 @@ import AlternativeAddressTemplate from 'components/pdf-templates/AlternativeAddr
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {getStyles} from 'components/pdf-templates/QuotationPdfTemplate/QuotationPdfTemplete.styles';
 import {ServiceCompanyItem} from 'models/service-company';
+import {allItemsHaveZeroDiscount} from 'utils/discount';
 import ArticleTableHeader from '../ArticleSection/ArticleTableHeader';
 import ArticleSectionFooter from '../ArticleSection/ArticleSectionFooter';
 import {ArticleSectionBody} from '../ArticleSection/ArticleSectionBody';
@@ -133,6 +134,8 @@ const QuotationPdfTemplate = React.memo(
       (pdfConfigClientStorage.includeUnitBuilding &&
         quotation?.elevator?.additionalInfo?.buildingLocation) ||
       '';
+
+    const showDiscountCol = !allItemsHaveZeroDiscount(quotationItems);
 
     return (
       <Document>
@@ -344,6 +347,7 @@ const QuotationPdfTemplate = React.memo(
                         currentCurrency={currentCurrency}
                         primaryColor={primaryColor}
                         secondaryColor={secondaryColor}
+                        showDiscountCol={showDiscountCol}
                       />
 
                       <ArticleSectionBody
@@ -353,6 +357,7 @@ const QuotationPdfTemplate = React.memo(
                         selectedLng={selectedLng}
                         translate={translate}
                         primaryColor={primaryColor}
+                        showDiscountCol={showDiscountCol}
                       />
 
                       <ArticleSectionFooter

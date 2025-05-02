@@ -13,7 +13,7 @@ import {Tabs} from 'components/Tab';
 import {TabsBody} from 'components/TabsBody';
 import {LanguageContext} from 'context/LanguageProvider';
 import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
-import {useDeleteElevator} from 'hooks/reactQuery/useElevator';
+import {useDeleteElevator, useElevatorById} from 'hooks/reactQuery/useElevator';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import Invoices from 'pages/Invoices';
 import {iconMapping} from 'pages/ServiceOrders';
@@ -72,6 +72,8 @@ enum TabIndex {
 export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
   const [value, setValue] = useState<TabIndex>(TabIndex.OVERVIEW);
   const {id: elevatorId} = useParams();
+
+  const {data: elevator} = useElevatorById(elevatorId);
   const {t} = useTranslation();
   const {user} = useUserSession();
   const {data: jobTypes, isLoading: loading} = useCompanyJobTypes(
@@ -147,7 +149,11 @@ export const UnitsDetail = ({getCurrentPageTitle}: Props) => {
         </TabsBody>
 
         <TabsBody value={value} index={TabIndex.INVOICE_HISTORY}>
-          <Invoices elevatorId={elevatorId} />
+          <Invoices
+            elevatorId={elevatorId}
+            customerId={elevator?.propertyOwner.id}
+            elevatorExternalId={elevator?.externalId}
+          />
         </TabsBody>
 
         <TabsBody value={value} index={TabIndex.PERFORMANCE}>

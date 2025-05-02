@@ -1,5 +1,6 @@
 import {View} from '@react-pdf/renderer';
 import {ContextProps} from 'context/PdfStylesProvider';
+import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {centsToMoney, formatCurrency} from '../../../utils/currency';
 import {
   EditableInvoiceItem,
@@ -72,6 +73,8 @@ export const ArticleSection = ({
     },
   );
 
+  const showDiscountCol = !allItemsHaveZeroDiscount(invoiceItems);
+
   return (
     <View
       style={{
@@ -85,6 +88,7 @@ export const ArticleSection = ({
             currentCurrency={currentCurrency}
             primaryColor={primaryColor}
             secondaryColor={secondaryColor}
+            showDiscountCol={showDiscountCol}
           />
 
           <ArticleSectionBody
@@ -94,6 +98,7 @@ export const ArticleSection = ({
             selectedLng={selectedLng}
             translate={translate}
             primaryColor={primaryColor}
+            showDiscountCol={showDiscountCol}
           />
 
           <ArticleSectionFooter

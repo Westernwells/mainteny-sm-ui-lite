@@ -197,19 +197,6 @@ const payment = {
 const alternativeInvoiceDestinationTooltip =
   'Enter address to receive invoice if different from billing or shipping address. Ensure accuracy to prevent misdelivery.';
 
-const isExternalIdUnique = async (resource: InvoiceView[], value?: string) => {
-  if (!value) {
-    return true;
-  }
-
-  try {
-    return !(resource && resource.some((item) => item.externalId === value));
-  } catch (error) {
-    console.error('Error checking externalId uniqueness:', error);
-    return true;
-  }
-};
-
 const localStorageFormikInvoiceDataKey = 'INVOICE_DATA';
 
 enum PageState {
@@ -279,6 +266,16 @@ export const InvoiceForm = ({
   // Combine jobTypes and the filtered oldJobTypes
   const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
+  const isExternalIdUnique = (
+    resource: InvoiceView[],
+    value?: string,
+  ): boolean => {
+    if (!value) return true;
+
+    if (!isNewInvoice && invoice?.externalId === value) return true;
+    return !resource.some((item) => item.externalId === value);
+  };
+
   const {language: selectedLng} = useContext(LanguageContext);
   const {company} = useContext(UserCompanyContext);
   const companyLanguage =
@@ -320,7 +317,14 @@ export const InvoiceForm = ({
     orderId = '',
     invoiceId = '',
     isDuplicate = false,
-  } = queryString.parse(search);
+    elevatorExternalId: rawElevatorExternalId,
+  } = queryString.parse(search) as Record<string, string | string[]>;
+
+  const elevatorExternalIdParam: string | undefined = Array.isArray(
+    rawElevatorExternalId,
+  )
+    ? rawElevatorExternalId[0]
+    : rawElevatorExternalId;
 
   const isDrawerOpen = true;
 
@@ -562,8 +566,9 @@ export const InvoiceForm = ({
           invoice.additionalInfo?.billingAddress ||
           invoice?.propertyOwner?.billingAddress,
       }),
-      elevatorExternalId:
-        (!isNewInvoice && invoice?.additionalInfo.elevatorExternalId) || '',
+      elevatorExternalId: isNewInvoice
+        ? elevatorExternalIdParam
+        : invoice?.additionalInfo.elevatorExternalId ?? '',
       deliveryStartDate:
         !isNewInvoice && invoice?.additionalInfo.deliveryStartDate!
           ? new Date(invoice?.additionalInfo.deliveryStartDate)
@@ -576,7 +581,7 @@ export const InvoiceForm = ({
         ? getDiscoutObj(invoice?.additionalInfo?.discount)
         : undefined,
     }),
-    [invoice, invoiceType],
+    [invoice, invoiceType, isNewInvoice, elevatorExternalIdParam],
   );
 
   const formMethods = useForm<InvoiceFormData>({
@@ -1534,6 +1539,11 @@ export const InvoiceForm = ({
     const currentValues = getValues();
     const currentItems = currentValues.items || [];
 
+    const isUnique = isExternalIdUnique(
+      allInvoiceResource?.data || [],
+      currentValues?.externalId,
+    );
+
     const localHasEmptyItemName = currentItems.some(
       (item) => !item.name?.trim(),
     );
@@ -1555,6 +1565,8 @@ export const InvoiceForm = ({
     ) {
       return false;
     }
+
+    if (!isUnique) return false;
 
     const valid =
       currentValues.subject &&
@@ -2356,16 +2368,28 @@ export const InvoiceForm = ({
 
           <Grid container rowGap={2} spacing={2}>
             <Grid item xs={6} md={3}>
-              <FormInput
-                fieldProps={{
-                  id: 'externalId',
-                  placeholder: t('Automatically assigned'),
-                  label: 'Invoice Number',
-                  value: getValues('externalId'),
-                  onChange: (e) => setValue('externalId', e.target.value),
-                  error: !!errors.externalId,
-                  helperText: errors.externalId?.message,
+              <Controller
+                name="externalId"
+                control={control}
+                rules={{
+                  validate: (value?: string) =>
+                    isExternalIdUnique(allInvoiceResource.data || [], value) ||
+                    t('This invoice number is already assigned.'),
                 }}
+                render={({field}) => (
+                  <FormInput
+                    fieldProps={{
+                      id: 'externalId',
+                      label: 'Invoice Number',
+                      placeholder: t('Automatically assigned'),
+                      value: field.value,
+                      onChange: field.onChange,
+                      onBlur: field.onBlur,
+                      error: !!errors.externalId,
+                      helperText: errors.externalId?.message,
+                    }}
+                  />
+                )}
               />
             </Grid>
 
