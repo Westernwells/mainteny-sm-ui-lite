@@ -7,11 +7,22 @@ import {centsToMoney, formatCurrency} from 'utils/currency';
 import {insertNewlines} from 'utils/pdfTemplates';
 import {getDiscountDisplay} from 'utils/quotation';
 import {Currency} from 'models/misc';
+import {
+  EditableServiceOrderItem,
+  ServiceOrderAmountDetail,
+} from 'models/service-order';
 import {getStyles} from './ArticleSection.styles';
 
 type ArticleSectionBodyProps = {
-  items: EditableInvoiceItem[] | EditableQuotationItem[];
-  amountDetail?: InvoiceAmountDetail | QuotationAmountDetail;
+  items: (
+    | EditableInvoiceItem
+    | EditableQuotationItem
+    | EditableServiceOrderItem
+  )[];
+  amountDetail?:
+    | InvoiceAmountDetail
+    | QuotationAmountDetail
+    | ServiceOrderAmountDetail;
   currentCurrency?: Currency;
   selectedLng?: string;
   showDiscountCol?: boolean;

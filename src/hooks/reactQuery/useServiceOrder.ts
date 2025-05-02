@@ -326,6 +326,7 @@ export const useUpdateServiceOrderArticlesAmount = () => {
         queryClient.invalidateQueries([queryKeys.fetchServiceJobArticles]);
         queryClient.invalidateQueries([queryKeys.getServiceOrderDetails]);
         queryClient.invalidateQueries([queryKeys.serviceOrderSubItem]);
+        queryClient.invalidateQueries([queryKeys.serviceOrderAmountById]);
 
         enqueueSnackbar(`Service Job updated successfully.`, {
           variant: 'success',
@@ -1176,3 +1177,31 @@ export const useCalculateServiceOrderAmount = () =>
       data: CalculateServiceOrderAmountRecord;
     }) => postServiceOrderAmount(serviceOrderId, data),
   );
+
+export const fetchServiceOrderAmountDetail = async (serviceOrder: string) => {
+  const response = await axiosClient.get(
+    `/api/serviceOrders/${serviceOrder}/amount/`,
+  );
+  return response.data;
+};
+
+export function useServiceOrderAmountDetailQuery(
+  serviceOrderId?: string,
+  options: UseQueryOptions<any, any, any> = {},
+) {
+  const {enabled: userEnabled, ...restOptions} = options;
+  const enabled = (userEnabled ?? true) && Boolean(serviceOrderId);
+
+  return useQuery<
+    ServiceOrderAmountDetail,
+    RestError,
+    ServiceOrderAmountDetail
+  >(
+    [qk.serviceOrderAmountById, serviceOrderId],
+    () => fetchServiceOrderAmountDetail(serviceOrderId!),
+    {
+      enabled,
+      ...restOptions,
+    },
+  );
+}
