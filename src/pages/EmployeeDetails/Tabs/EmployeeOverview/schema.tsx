@@ -1,5 +1,4 @@
 import {t} from 'i18next';
-import Box from '@mui/material/Box';
 import HomeIcon from '@mui/icons-material/Home';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
@@ -38,7 +37,6 @@ export const employeeDetailSchema = (employee: UserView) => {
     return capitalize(formatShiftTime);
   };
 
-  formatOrderNames();
   return {
     phone: {
       label: 'PHONE',
@@ -53,15 +51,9 @@ export const employeeDetailSchema = (employee: UserView) => {
     assignedOrderTypes: {
       label: 'ASSIGNED ORDER TYPES',
       value:
-        employee && employee.userData.additionalInfo && orderTypes?.length ? (
-          <Box display="flex">
-            <Typography sx={{fontSize: '14px', lineHeight: '20px'}}>
-              {formatOrderNames()}
-            </Typography>
-          </Box>
-        ) : (
-          '-'
-        ),
+        employee && employee.userData.additionalInfo && orderTypes?.length
+          ? formatOrderNames()
+          : '-',
       icon: <CalendarTodayIcon sx={{color: theme.palette.info.dark}} />,
     },
     email: {
