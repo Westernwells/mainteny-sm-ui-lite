@@ -322,7 +322,7 @@ const ArticleList = () => {
         width: '142px',
         align: 'right',
         isLast: true,
-        lastSticky: false,
+        showShadows: showLeftShadow ? 'left' : undefined,
         fieldName: ArticleOrderField.SELLING_NET_AMOUNT,
         getExportValue: (article) => article.price,
         renderCell: (article, cellProps) => (
