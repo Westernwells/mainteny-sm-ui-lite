@@ -972,6 +972,7 @@ const useMainPosition = <
       <TableCell
         align="center"
         noPadding
+        testId={`article-type-${index}`}
         onClick={
           !disableInlineEditing
             ? (e) => {
@@ -1401,6 +1402,7 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
+        testId={`position-quantity-${index}`}
         onClick={
           !isMixed && !disableInlineEditing
             ? () => handleEditStart(watchedItem, `items.${index}.quantity`)
@@ -1688,6 +1690,7 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
+        testId={`discount-${index}`}
         onClick={
           !disableInlineEditing
             ? () => handleEditStart(watchedItem, `items.${index}.discount`)
