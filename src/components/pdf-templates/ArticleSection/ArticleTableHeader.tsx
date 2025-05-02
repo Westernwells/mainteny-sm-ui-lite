@@ -62,11 +62,13 @@ const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
 type Props = {
   translate: (key: string, options?: {context: string}) => string;
   currentCurrency?: Currency;
+  showDiscountCol?: boolean;
 } & Pick<ContextProps, 'primaryColor' | 'secondaryColor'>;
 
 const ArticleTableHeader = ({
   translate,
   currentCurrency,
+  showDiscountCol,
   primaryColor,
   secondaryColor,
 }: Props) => {
@@ -74,6 +76,8 @@ const ArticleTableHeader = ({
     primaryColor,
     secondaryColor,
   });
+
+  const priceWidth = showDiscountCol ? styles.col15Right.width : '18%';
 
   return (
     <View style={styles.tableHead}>
@@ -90,18 +94,20 @@ const ArticleTableHeader = ({
         <View style={[styles.col8Center]}>
           <Text style={[styles.tableHeading]}>{translate('Unit')}</Text>
         </View>
-        <View style={[styles.col15Right]}>
+        <View style={[styles.col15Right, {width: priceWidth}]}>
           <Text style={[styles.tableHeading]}>
             {`${translate('Price')} (${
               getCurrencySymbol[currentCurrency?.code!]
             })`}
           </Text>
         </View>
-        <View style={[styles.col10Right]}>
-          <Text style={[styles.tableHeading]}>{translate('Discount')}</Text>
-        </View>
+        {showDiscountCol && (
+          <View style={[styles.col10Right]}>
+            <Text style={[styles.tableHeading]}>{translate('Discount')}</Text>
+          </View>
+        )}
 
-        <View style={[styles.col15Right]}>
+        <View style={[styles.col15Right, {width: priceWidth}]}>
           <Text style={[styles.tableHeading]}>
             {`${translate('Total')} (${
               getCurrencySymbol[currentCurrency?.code!]

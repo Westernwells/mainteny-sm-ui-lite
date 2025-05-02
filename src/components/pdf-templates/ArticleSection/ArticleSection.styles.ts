@@ -68,7 +68,7 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
       flexDirection: 'row',
       alignItems: 'flex-start',
       fontSize: 10,
-      marginVertical: 3,
+      marginVertical: 4,
       color: primaryColor,
     },
     emptyColumn: {
@@ -85,6 +85,7 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
     },
     vatContainer: {
       width: '56%',
+      paddingBottom: 2,
     },
     vatRow: {
       flexDirection: 'row',
