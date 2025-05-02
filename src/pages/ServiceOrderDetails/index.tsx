@@ -9,7 +9,9 @@ import {Tabs} from 'components/Tab';
 import {Progress} from 'components/Progress';
 import {
   usePostServiceOrderConfirmationPublish,
+  useServiceOrderAmountDetailQuery,
   useServiceOrderDetails,
+  useServiceOrderSubItems,
 } from 'hooks/reactQuery/useServiceOrder';
 import {
   useDownloadFileWithCustomName,
@@ -41,11 +43,15 @@ import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {companyLanguageContextMap} from 'utils/language';
-import {getJobTypeGivenName} from 'utils/service-order-utils';
+import {
+  getJobTypeGivenName,
+  serviceOrderItemToServiceOrderItemRecord,
+} from 'utils/service-order-utils';
 import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
 import {QuotationSubItemRecord} from 'models/quotation';
 import {quotationItemToQuotationItemRecord} from 'utils/quotation';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {ServiceOrderSubArticleRecord} from 'models/service-order';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
@@ -91,8 +97,11 @@ export const ServiceOrderDetails = () => {
   const currentCurrency = useCurrentCurrency();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
 
-  const {data: quotationSubItems, isLoading: isQuotationSubItemsLoading} =
+  const {data: quotationSubItems, isLoading: isLoadingQuotationSubItems} =
     useQuotationSubItems(serviceOrder?.additionalInfo?.quotationId);
+
+  const {data: serviceOrderSubItems, isLoading: isLoadingServiceOrderSubItems} =
+    useServiceOrderSubItems(serviceOrder?.id);
 
   const subItemsMap: Record<string, QuotationSubItemRecord[]> = useMemo(
     () =>
@@ -130,15 +139,6 @@ export const ServiceOrderDetails = () => {
   );
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
-
-  const filePaths = useMemo(
-    () => (filePathToDownload ? [filePathToDownload] : []),
-    [filePathToDownload],
-  );
-
-  const {data: fileDownloadURLs = {}} = useDownloadUrl(filePaths, {
-    refetchOnWindowFocus: false,
-  });
 
   const {downloadFile} = useDownloadFileWithCustomName(
     serviceOrder?.number,
@@ -201,6 +201,33 @@ export const ServiceOrderDetails = () => {
     quotation?.id,
   );
 
+  const serviceOrderSubItemsMap = useMemo(
+    () =>
+      Object.entries(serviceOrderSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, ServiceOrderSubArticleRecord[]>,
+      ),
+    [serviceOrderSubItems],
+  );
+
+  const transformedServiceOrderItems = useMemo(
+    () =>
+      serviceOrder?.articles.map((item) =>
+        serviceOrderItemToServiceOrderItemRecord(item, serviceOrderSubItemsMap),
+      ) || [],
+    [serviceOrder?.articles, serviceOrderSubItemsMap],
+  );
+
+  const {data: serviceOrderAmountDetail} = useServiceOrderAmountDetailQuery(
+    serviceOrder?.id,
+  );
+
   const generatePreviewPdfBlobUrl = async () => {
     const blob =
       serviceOrder?.additionalInfo.quotationId && quotation
@@ -248,6 +275,8 @@ export const ServiceOrderDetails = () => {
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
+              serviceOrderAmountDetail={serviceOrderAmountDetail}
+              serviceOrderItems={transformedServiceOrderItems}
             />,
           ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -255,6 +284,11 @@ export const ServiceOrderDetails = () => {
   };
 
   const generateWorkOverview = async () => {
+    if (overviewPdfSnackBarRef.current) {
+      closeSnackbar(overviewPdfSnackBarRef.current);
+      overviewPdfSnackBarRef.current = null;
+    }
+
     try {
       overviewPdfSnackBarRef.current = enqueueSnackbar(
         <Box display="flex" padding="0em" margin="0em" alignItems="center">
@@ -282,30 +316,17 @@ export const ServiceOrderDetails = () => {
       });
     } catch (e) {
       showError(e);
-    }
-  };
-
-  useEffect(() => {
-    if (!Object.keys(fileDownloadURLs || {}).length) {
-      return;
-    }
-
-    if (overviewPdfSnackBarRef.current) {
-      closeSnackbar(overviewPdfSnackBarRef.current);
-      overviewPdfSnackBarRef.current = null;
-    }
-  }, [fileDownloadURLs]);
-
-  useEffect(() => {
-    const currentParams = Object.fromEntries([...queryParams]);
-    if (currentParams.tab) setTabValue(Number(currentParams.tab));
-
-    return () => {
+    } finally {
       if (overviewPdfSnackBarRef.current) {
         closeSnackbar(overviewPdfSnackBarRef.current);
         overviewPdfSnackBarRef.current = null;
       }
-    };
+    }
+  };
+
+  useEffect(() => {
+    const currentParams = Object.fromEntries([...queryParams]);
+    if (currentParams.tab) setTabValue(Number(currentParams.tab));
   }, []);
 
   useEffect(() => {
@@ -315,7 +336,11 @@ export const ServiceOrderDetails = () => {
     }
   }, [filePathToDownload]);
 
-  if (isLoading || isQuotationSubItemsLoading) {
+  if (
+    isLoading ||
+    isLoadingQuotationSubItems ||
+    isLoadingServiceOrderSubItems
+  ) {
     return <Progress />;
   }
 

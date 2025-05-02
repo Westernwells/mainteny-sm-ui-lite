@@ -665,7 +665,7 @@ const ServiceOrderPositionTable = ({
         buttonProps={{
           variant: 'contained',
           size: 'small',
-          onClick: onAddPosition,
+          onClick: disableInlineEditing ? onAddPosition : handleAddNewPosition,
           sx: {
             fontWeight: 600,
             p: 1,

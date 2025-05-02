@@ -1,4 +1,4 @@
-import {useContext, useEffect, useRef, useState} from 'react';
+import {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {pdf} from '@react-pdf/renderer';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {SnackbarKey} from 'notistack';
@@ -7,14 +7,20 @@ import PathImage from 'assets/images/Path.svg';
 import {Box, Typography} from '@mui/material';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import {QuotationView} from 'models/quotation';
-import {ServiceOrderView} from 'models/service-order';
+import {
+  ServiceOrderSubArticleRecord,
+  ServiceOrderView,
+} from 'models/service-order';
 import {UserAccount} from 'models/user';
 import JobOverviewPdfTemplate from 'pages/ServiceOrderDetails/Tabs/Overview/JobOverviewPdfTemplate';
 import {
   CLIENT_STORAGE_PDF_CONFIG_KEY,
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
-import {getJobTypeGivenName} from 'utils/service-order-utils';
+import {
+  getJobTypeGivenName,
+  serviceOrderItemToServiceOrderItemRecord,
+} from 'utils/service-order-utils';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {useQueryClientStorageData} from './useClientStorage';
 import {
@@ -22,6 +28,10 @@ import {
   useOldCompanyJobTypes,
 } from './reactQuery/useCompanies';
 import {useUserSession} from './reactQuery/useUserSession';
+import {
+  useServiceOrderAmountDetailQuery,
+  useServiceOrderSubItems,
+} from './reactQuery/useServiceOrder';
 
 type UseCreateAndSetPdfBlobUrlProps = {
   serviceOrder: ServiceOrderView;
@@ -56,6 +66,36 @@ export const useCreateAndSetPdfBlobUrl = ({
   );
   const {data: oldJobTypes} = useOldCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
+  );
+  const {data: serviceOrderSubItems} = useServiceOrderSubItems(
+    serviceOrder?.id,
+  );
+
+  const serviceOrderSubItemsMap = useMemo(
+    () =>
+      Object.entries(serviceOrderSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, ServiceOrderSubArticleRecord[]>,
+      ),
+    [serviceOrderSubItems],
+  );
+
+  const transformedServiceOrderItems = useMemo(
+    () =>
+      serviceOrder?.articles.map((item) =>
+        serviceOrderItemToServiceOrderItemRecord(item, serviceOrderSubItemsMap),
+      ) || [],
+    [serviceOrder?.articles, serviceOrderSubItemsMap],
+  );
+
+  const {data: serviceOrderAmountDetail} = useServiceOrderAmountDetailQuery(
+    serviceOrder?.id,
   );
 
   const {fontStyles, primaryColor, secondaryColor} =
@@ -103,6 +143,8 @@ export const useCreateAndSetPdfBlobUrl = ({
         fontStyles={fontStyles}
         primaryColor={primaryColor}
         secondaryColor={secondaryColor}
+        serviceOrderAmountDetail={serviceOrderAmountDetail}
+        serviceOrderItems={transformedServiceOrderItems}
       />,
     ).toBlob();
 

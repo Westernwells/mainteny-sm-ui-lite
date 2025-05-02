@@ -1,9 +1,13 @@
 import {Document, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import React, {useMemo} from 'react';
-import {ServiceOrderArticleView, ServiceOrderView} from 'models/service-order';
+import React from 'react';
+import {
+  EditableServiceOrderItem,
+  ServiceOrderAmountDetail,
+  ServiceOrderView,
+} from 'models/service-order';
 import {formatDate} from 'utils/datetime';
-import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {centsToMoney, formatCurrency} from 'utils/currency';
 import {QuotationView} from 'models/quotation';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
@@ -13,16 +17,7 @@ import PdfBodyContainer from 'components/pdf-templates/containers/PdfBodyContain
 import PdfPageContainer from 'components/pdf-templates/containers/PdfPageContainer';
 import TopSectionContainer from 'components/pdf-templates/containers/TopSectionContainer';
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
-import {DiscountType} from 'models/invoice';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {
-  calculateArticlesAmount,
-  getItemTotalAfterPerItemDiscount,
-} from 'utils/calculate-total';
-import {
-  allItemsHaveZeroDiscount,
-  shouldDisplayDiscountDash,
-} from 'utils/discount';
 import PdfUnitAddress from 'components/pdf-templates/containers/PdfUnitAddress';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
@@ -35,6 +30,10 @@ import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {ServiceCompanyItem} from 'models/service-company';
+import ArticleTableHeader from 'components/pdf-templates/ArticleSection/ArticleTableHeader';
+import {ArticleSectionBody} from 'components/pdf-templates/ArticleSection/ArticleSectionBody';
+import ArticleSectionFooter from 'components/pdf-templates/ArticleSection/ArticleSectionFooter';
+import {allItemsHaveZeroDiscount} from 'utils/discount';
 
 const getStyles = ({
   boldFontStyle,
@@ -151,6 +150,8 @@ type Props = {
   footerPath: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
   serviceOrderType: string;
+  serviceOrderItems: EditableServiceOrderItem[];
+  serviceOrderAmountDetail?: ServiceOrderAmountDetail;
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const JobOverviewPdfTemplate = React.memo(
@@ -168,58 +169,40 @@ const JobOverviewPdfTemplate = React.memo(
     footerPath,
     pdfConfigClientStorage,
     serviceOrderType,
+    serviceOrderItems,
+    serviceOrderAmountDetail,
     fontStyles,
     primaryColor,
     secondaryColor,
   }: Props) => {
-    const articleItems = serviceOrder?.articles!;
-
-    const netTotal = (articleItem: ServiceOrderArticleView) => {
-      const total = getItemTotalAfterPerItemDiscount({
-        item: {
-          unitAmount: {
-            netAmount: articleItem?.unitAmount?.netAmount,
-          },
-          quantity: articleItem.quantity,
-          discount: articleItem?.additionalInfo?.discount,
-        },
-        precision: 0,
-      });
-
-      return centsToMoney(currentCurrency?.code!, total);
-    };
-
     const elevatorAddress =
       quotation?.elevator.address ?? serviceOrder?.elevator?.address;
 
-    const globalDiscount = getDiscoutObj(quotation?.additionalInfo?.discount);
+    const globalDiscount = getDiscoutObj(
+      serviceOrder?.additionalInfo?.discount,
+    );
     const discountAmount = globalDiscount?.amount;
     const discountValue = discountAmount?.value ?? 0;
 
-    const {vats, amountAfterGlobalDiscountWithVAT, amountAfterGlobalDiscount} =
-      useMemo(
-        () =>
-          calculateArticlesAmount({
-            items: articleItems,
-            globalDiscount,
-          }),
-        [articleItems, globalDiscount],
-      );
+    const amountAfterGlobalDiscount = centsToMoney(
+      currentCurrency?.code!,
+      serviceOrderAmountDetail?.amountAfterGlobalDiscount.netAmount ?? 0,
+    );
+    const amountAfterGlobalDiscountWithVAT = centsToMoney(
+      currentCurrency?.code!,
+      serviceOrderAmountDetail?.amountAfterGlobalDiscount.grossAmount ?? 0,
+    );
+    const vats = serviceOrderAmountDetail?.amountAfterGlobalDiscount.vats || [];
 
     const amountAfterGlobalDiscountFormatted = formatCurrency(
       amountAfterGlobalDiscount,
-      {currency: currentCurrency?.code},
-    );
-
-    const vatsFormatted = vats.map((vat) => ({
-      ...vat,
-      vat: formatCurrency(vat.vat, {
+      {
         currency: currentCurrency?.code,
         excludeCurrencySymbol: true,
         currencySymbol: currentCurrency?.symbol,
         companyLang: selectedLng,
-      }),
-    }));
+      },
+    );
 
     const amountAfterGlobalDiscountWithVATFormatted = formatCurrency(
       amountAfterGlobalDiscountWithVAT,
@@ -254,6 +237,8 @@ const JobOverviewPdfTemplate = React.memo(
       (pdfConfigClientStorage.includeUnitBuilding &&
         serviceOrder?.elevator?.additionalInfo?.buildingLocation) ||
       '';
+
+    const showDiscountCol = !allItemsHaveZeroDiscount(serviceOrderItems);
     return (
       <Document>
         <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
@@ -414,339 +399,51 @@ const JobOverviewPdfTemplate = React.memo(
                 />
               )}
 
-              <View style={styles.table}>
-                <View style={styles.tableHead}>
-                  <View style={styles.tableRow}>
-                    <Text
-                      style={{
-                        width: '2%',
-                        textAlign: 'left',
-                        marginRight: 10,
-                        ...styles.tableHeading,
-                      }}>
-                      #
-                    </Text>
-                    <Text
-                      style={{
-                        width: '40%',
-                        textAlign: 'left',
-                        ...styles.tableHeading,
-                      }}>
-                      {translate('Article Name')}
-                    </Text>
+              {serviceOrderItems.length && (
+                <View
+                  style={{
+                    marginVertical: 16,
+                    paddingRight: 5,
+                  }}>
+                  <View>
+                    <View style={styles.table}>
+                      <ArticleTableHeader
+                        translate={translate}
+                        currentCurrency={currentCurrency}
+                        primaryColor={primaryColor}
+                        secondaryColor={secondaryColor}
+                        showDiscountCol={showDiscountCol}
+                      />
 
-                    <Text
-                      style={{
-                        width: '10%',
-                        textAlign: 'right',
-                        ...styles.tableHeading,
-                      }}>
-                      {translate('Quantity')}
-                    </Text>
-                    <Text
-                      style={{
-                        width: '8%',
-                        textAlign: 'center',
-                        marginLeft: 10,
-                        ...styles.tableHeading,
-                      }}>
-                      {translate('Unit')}
-                    </Text>
-                    <Text
-                      style={{
-                        width: '15%',
-                        textAlign: 'right',
-                        ...styles.tableHeading,
-                      }}>
-                      {`${translate('Price')} (${
-                        getCurrencySymbol[currentCurrency?.code!]
-                      })`}
-                    </Text>
-                    {!allItemsHaveZeroDiscount(articleItems) && (
-                      <Text
-                        style={{
-                          width: '10%',
-                          textAlign: 'right',
-                          ...styles.tableHeading,
-                        }}>
-                        {translate('Discount')}
-                      </Text>
-                    )}
+                      <ArticleSectionBody
+                        items={serviceOrderItems}
+                        amountDetail={serviceOrderAmountDetail}
+                        currentCurrency={currentCurrency}
+                        selectedLng={selectedLng}
+                        translate={translate}
+                        primaryColor={primaryColor}
+                        showDiscountCol={showDiscountCol}
+                      />
 
-                    <Text
-                      style={{
-                        width: allItemsHaveZeroDiscount(articleItems)
-                          ? '25%'
-                          : '15%',
-                        textAlign: 'right',
-                        ...styles.tableHeading,
-                      }}>
-                      {' '}
-                      {`${translate('Total')} (${
-                        getCurrencySymbol[currentCurrency?.code!]
-                      })`}
-                    </Text>
+                      <ArticleSectionFooter
+                        translate={translate}
+                        discountValue={discountValue}
+                        currentCurrency={currentCurrency}
+                        selectedLng={selectedLng}
+                        amountAfterGlobalDiscountFormatted={
+                          amountAfterGlobalDiscountFormatted
+                        }
+                        vats={vats}
+                        amountAfterGlobalDiscountWithVATFormatted={
+                          amountAfterGlobalDiscountWithVATFormatted
+                        }
+                        primaryColor={primaryColor}
+                        fontStyles={fontStyles}
+                      />
+                    </View>
                   </View>
                 </View>
-
-                {serviceOrder?.articles.length! > 0 && (
-                  <View style={styles.dataBody}>
-                    {serviceOrder?.articles.map((articleOrderItem, index) => (
-                      <View key={`${articleOrderItem.id} - ${index}`}>
-                        <View style={styles.tableRow}>
-                          <Text
-                            style={{
-                              width: '2%',
-                              textAlign: 'left',
-                              marginRight: 10,
-                              color: '#212121',
-                            }}>
-                            {index + 1}
-                          </Text>
-
-                          <HtmlPDF
-                            html={articleOrderItem.name || '-'}
-                            rootStyle={{
-                              width: '40%',
-                              textAlign: 'left',
-                              color: '#212121',
-                            }}
-                            stylesheet={{
-                              p: {
-                                marginBottom: '2px',
-                              },
-                            }}
-                            selectedLng={selectedLng}
-                          />
-
-                          <Text
-                            style={{
-                              width: '10%',
-                              textAlign: 'right',
-                              color: '#212121',
-                            }}>
-                            {articleOrderItem.quantity || '-'}
-                          </Text>
-                          <Text
-                            style={{
-                              width: '8%',
-                              textAlign: 'center',
-                              marginLeft: 10,
-                              color: '#212121',
-                            }}>
-                            {translate(articleOrderItem.article?.unit!) || '-'}
-                          </Text>
-                          <Text
-                            style={{
-                              width: '15%',
-                              textAlign: 'right',
-                              color: '#212121',
-                            }}>
-                            {formatCurrency(
-                              (articleOrderItem.unitAmount?.netAmount ?? 0) /
-                                10 **
-                                  (articleOrderItem.unitAmount.fractionDigits ??
-                                    2),
-                              {
-                                currency: currentCurrency?.code,
-                                excludeCurrencySymbol: true,
-                                currencySymbol: currentCurrency?.symbol,
-                                companyLang: selectedLng,
-                              },
-                            )}
-                          </Text>
-                          {!allItemsHaveZeroDiscount(articleItems) && (
-                            <Text
-                              style={{
-                                width: '10%',
-                                textAlign: 'right',
-                                color: '#212121',
-                              }}>
-                              {shouldDisplayDiscountDash(articleOrderItem)}
-                              {articleOrderItem?.additionalInfo?.discount
-                                ?.type === DiscountType.PERCENTAGE
-                                ? articleOrderItem?.additionalInfo?.discount
-                                    .percentage
-                                : formatCurrency(
-                                    centsToMoney(
-                                      currentCurrency?.code!,
-                                      articleOrderItem?.additionalInfo?.discount
-                                        ?.amount?.value,
-                                    ),
-                                    {
-                                      currency: currentCurrency?.code,
-                                      excludeCurrencySymbol: true,
-                                      currencySymbol: currentCurrency?.symbol,
-                                      companyLang: selectedLng,
-                                      minimumFractionDigits:
-                                        articleOrderItem?.additionalInfo
-                                          ?.discount?.amount?.value === 0
-                                          ? 0
-                                          : 2,
-                                      maximumFractionDigits:
-                                        articleOrderItem?.additionalInfo
-                                          ?.discount?.amount?.value === 0
-                                          ? 0
-                                          : 2,
-                                    },
-                                  )}
-                              {articleOrderItem?.additionalInfo?.discount
-                                ?.type === DiscountType.AMOUNT
-                                ? getCurrencySymbol[currentCurrency?.code!]
-                                : '%'}
-                            </Text>
-                          )}
-
-                          <Text
-                            style={{
-                              width: allItemsHaveZeroDiscount(articleItems)
-                                ? '25%'
-                                : '15%',
-                              textAlign: 'right',
-                              color: '#212121',
-                            }}>
-                            {formatCurrency(netTotal(articleOrderItem), {
-                              currency: currentCurrency?.code,
-                              excludeCurrencySymbol: true,
-                              currencySymbol: currentCurrency?.symbol,
-                              companyLang: selectedLng,
-                            })}
-                          </Text>
-                        </View>
-                        {articleOrderItem?.description.trim() !== '' && (
-                          <HtmlPDF
-                            html={articleOrderItem?.description || '-'}
-                            rootStyle={{
-                              ...styles.descriptionText,
-                              marginBottom:
-                                index === serviceOrder.articles.length - 1
-                                  ? 0
-                                  : 10,
-                            }}
-                            selectedLng={selectedLng}
-                          />
-                        )}
-                      </View>
-                    ))}
-                  </View>
-                )}
-
-                {serviceOrder?.articles.length! > 0 && (
-                  <View>
-                    {discountValue && (
-                      <View style={styles.tableRow}>
-                        <Text style={{width: '44%'}} />
-                        <Text
-                          style={{
-                            width: '32%',
-                            color: '#616161',
-                            fontSize: 10,
-                            textAlign: 'right',
-                          }}>
-                          {`${translate('Discount')} (${
-                            getCurrencySymbol[currentCurrency?.code!]
-                          })`}
-                        </Text>
-                        <Text
-                          style={{
-                            width: '24%',
-                            textAlign: 'right',
-                            fontSize: 10,
-                          }}>
-                          -
-                          {formatCurrency(discountValue, {
-                            currency: currentCurrency?.code,
-                            excludeCurrencySymbol: true,
-                            currencySymbol: currentCurrency?.symbol,
-                            companyLang: selectedLng,
-                          })}
-                        </Text>
-                      </View>
-                    )}
-
-                    <View style={styles.tableRow}>
-                      <Text style={{width: '44%'}} />
-                      <Text
-                        style={{
-                          width: '32%',
-                          color: '#616161',
-                          fontSize: 10,
-                          textAlign: 'right',
-                        }}>
-                        {translate('Subtotal excl. VAT')}
-                      </Text>
-                      <Text
-                        style={{
-                          width: '24%',
-                          textAlign: 'right',
-                          fontSize: 10,
-                        }}>
-                        {amountAfterGlobalDiscountFormatted}
-                      </Text>
-                    </View>
-
-                    <View style={styles.tableRow}>
-                      <Text style={{width: '44%'}} />
-                      <View style={{width: '56%'}}>
-                        {vatsFormatted.map((v, index) => (
-                          <View
-                            key={`${index}-${v.percentageVat}`}
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              paddingVertical: 4,
-                            }}>
-                            <Text
-                              style={{
-                                color: '#616161',
-                                fontSize: 10,
-                                textAlign: 'right',
-                                width: '57%',
-                              }}>
-                              {translate('VAT')} {v.percentageVat}%
-                            </Text>
-                            <Text
-                              style={{
-                                fontSize: 10,
-                                textAlign: 'right',
-                                width: '43%',
-                              }}>
-                              {v.vat}
-                            </Text>
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-
-                    <View style={styles.tableRow}>
-                      <Text style={{width: '44%'}} />
-                      <Text
-                        style={{
-                          width: '32%',
-                          color: '#212121',
-                          ...fontStyles.bold,
-                          textAlign: 'right',
-                          fontSize: 10,
-                        }}>
-                        {`${translate('Total incl. VAT')} (${
-                          getCurrencySymbol[currentCurrency?.code!]
-                        })`}
-                      </Text>
-                      <Text
-                        style={{
-                          width: '24%',
-                          textAlign: 'right',
-                          color: '#212121',
-                          ...fontStyles.bold,
-                          fontSize: 10,
-                        }}>
-                        {amountAfterGlobalDiscountWithVATFormatted}
-                      </Text>
-                    </View>
-                  </View>
-                )}
-              </View>
+              )}
             </View>
           </PdfBodyContainer>
 

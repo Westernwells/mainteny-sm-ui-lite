@@ -232,11 +232,11 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
         size="tiny"
         containerStyle={{m: 'auto', width: '60%'}}
         showActionBtn
-        btnLabel="Add Articles"
+        btnLabel="Add Position"
         buttonVariant="outlined"
         label="No Position"
         labelVariant="h6"
-        btnAction={() => setIsOpen(true)}
+        btnAction={handleAddPositionClick}
         subLabel="Start adding your positions and mixed positions"
         subLabelProps={{
           pt: 1.5,
