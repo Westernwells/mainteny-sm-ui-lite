@@ -225,6 +225,7 @@ const MixedPositionPdf = ({
                     <HtmlPDF
                       html={mixedPosition?.data.name || '-'}
                       rootStyle={styles.col40Left}
+                      selectedLng={selectedLng}
                     />
                     <Text style={styles.col10Right}>
                       {mixedPosition?.quantity || '0'}
@@ -254,6 +255,7 @@ const MixedPositionPdf = ({
                       rootStyle={{
                         ...styles.descriptionText,
                       }}
+                      selectedLng={selectedLng}
                     />
                   )}
                 </View>
@@ -267,6 +269,7 @@ const MixedPositionPdf = ({
                       <HtmlPDF
                         html={subPosition.article.name || '-'}
                         rootStyle={styles.col40Left}
+                        selectedLng={selectedLng}
                       />
                       <Text style={styles.col10Right}>
                         {subPosition?.quantity || '0'}
@@ -296,6 +299,7 @@ const MixedPositionPdf = ({
                         rootStyle={{
                           ...styles.descriptionText,
                         }}
+                        selectedLng={selectedLng}
                       />
                     )}
                   </View>

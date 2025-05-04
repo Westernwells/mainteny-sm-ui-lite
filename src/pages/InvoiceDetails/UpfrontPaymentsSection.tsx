@@ -18,7 +18,7 @@ import {
   TableCell,
   TableBody,
 } from '@mui/material';
-import {FormikProps, getIn} from 'formik';
+import BigNumber from 'bignumber.js';
 import {NumberFormatValues} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
@@ -48,6 +48,7 @@ import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {State} from 'models/misc';
+import {FormikProps, getIn} from 'formik';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -536,7 +537,9 @@ export const UpfrontPaymentsSection = ({
         ),
     )
     ?.reduce((acc, a) => acc + a, 0);
-  const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
+  const outstandingPayments = BigNumber(totalAmountInclVats)
+    .minus(paidAmountInclVats)
+    .toNumber();
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,

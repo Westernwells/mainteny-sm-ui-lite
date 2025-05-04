@@ -518,6 +518,12 @@ const JobOverviewPdfTemplate = React.memo(
                               textAlign: 'left',
                               color: '#212121',
                             }}
+                            stylesheet={{
+                              p: {
+                                marginBottom: '2px',
+                              },
+                            }}
+                            selectedLng={selectedLng}
                           />
 
                           <Text
@@ -617,7 +623,14 @@ const JobOverviewPdfTemplate = React.memo(
                         {articleOrderItem?.description.trim() !== '' && (
                           <HtmlPDF
                             html={articleOrderItem?.description || '-'}
-                            rootStyle={styles.descriptionText}
+                            rootStyle={{
+                              ...styles.descriptionText,
+                              marginBottom:
+                                index === serviceOrder.articles.length - 1
+                                  ? 0
+                                  : 10,
+                            }}
+                            selectedLng={selectedLng}
                           />
                         )}
                       </View>

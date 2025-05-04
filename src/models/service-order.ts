@@ -207,6 +207,7 @@ export enum ServiceOrderOrderField {
   JOB_TYPE = 'JOB_TYPE',
   PAYMENT_STATUS = 'PAYMENT_STATUS',
   JOB_STATUS = 'JOB_STATUS',
+  LAST_ACTIVITY_AT = 'LAST_ACTIVITY_AT',
 }
 
 export enum DispatchPlanStatus {
@@ -303,6 +304,7 @@ export interface ServiceOrderAdditionalInfo {
   discount?: Discount;
   commentCount?: number;
   totalAmount?: Amount;
+  lastActivityAt?: string;
 }
 
 export interface ServiceOrderConfirmationInfo {
@@ -741,6 +743,9 @@ export type ServiceOrderTableRow = {
     | ServiceOrderPaymentStatus
     | ServiceOrderPaymentWithIndicationStatus;
   hasNotes: boolean;
+  lastActivityAt: string;
+  hasSchedule: boolean;
+  scheduleDate: string;
 };
 
 // used to indicate fields for the search parameter of service order endpoint
@@ -787,3 +792,30 @@ export interface ServiceOrderNameChangedRecord {
   fromName: string;
   toName: string;
 }
+
+export interface DateCellParts {
+  label: string;
+  date?: string | null;
+}
+
+export const statusLabelMap: Record<ServiceOrderStatus, string> = {
+  [ServiceOrderStatus.READY_TO_SCHEDULE]: 'Created on',
+  [ServiceOrderStatus.TECHNICIAN_ASSIGNED]: 'Created on',
+  [ServiceOrderStatus.OVERDUE]: 'Created on',
+
+  [ServiceOrderStatus.PLANNED]: 'Scheduled for',
+  [ServiceOrderStatus.SCHEDULED]: 'Scheduled for',
+
+  [ServiceOrderStatus.PAUSED]: 'Started on',
+  [ServiceOrderStatus.TRAVEL]: 'Started on',
+  [ServiceOrderStatus.IN_PROGRESS]: 'Started on',
+
+  [ServiceOrderStatus.ARCHIVED]: 'Archived on',
+  [ServiceOrderStatus.CANCELLED]: 'Canceled on',
+  [ServiceOrderStatus.COMPLETED]: 'Completed on',
+  [ServiceOrderStatus.ALL]: '',
+  [ServiceOrderStatus.INIT]: '',
+  [ServiceOrderStatus.SCHEDULING]: '',
+  [ServiceOrderStatus.INVOICE_ISSUED]: '',
+  [ServiceOrderStatus.ARTICLES_ORDERED]: '',
+};

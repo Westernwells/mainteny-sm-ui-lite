@@ -366,6 +366,7 @@ const FullInvoicePdfTemplate = ({
               <HtmlPDF
                 html={invoice?.description || ''}
                 rootStyle={styles.contentBody}
+                selectedLng={selectedLng}
               />
             )}
 
@@ -397,6 +398,7 @@ const FullInvoicePdfTemplate = ({
                     marginTop: 6,
                     marginBottom: 16,
                   }}
+                  selectedLng={selectedLng}
                 />
               </View>
             )}
@@ -422,6 +424,7 @@ const FullInvoicePdfTemplate = ({
                       marginTop: 6,
                       marginBottom: 16,
                     }}
+                    selectedLng={selectedLng}
                   />
                 </View>
               )}

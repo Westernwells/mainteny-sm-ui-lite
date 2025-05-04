@@ -150,7 +150,7 @@ const renderRow = (
     <View key={`${item.article?.id}-${index}`} style={styles.row}>
       <Text style={styles.colIndex}>{index + 1}</Text>
       <View style={styles.colName}>
-        <HtmlPDF html={item.name || ''} />
+        <HtmlPDF html={item.name || ''} selectedLng={selectedLng} />
       </View>
       <Text style={styles.colPrice}>{itemTotalPriceExclVat}</Text>
       <Text style={styles.colPortion}>{aggregatedItem.totalPercentage}%</Text>

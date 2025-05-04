@@ -56,6 +56,7 @@ import {
   createSearchQuery,
   filterServiceOrderTypes,
   getJobTypeGivenName,
+  getServiceOrderDateParts,
   getServiceOrderStatusColor,
   serviceOrderPaymentStatusToString,
   serviceOrderStatusToString,
@@ -721,6 +722,29 @@ export const ServiceOrderList = ({menu}: Props) => {
           </Cell>
         ),
       },
+      {
+        headerName: 'Date',
+        key: 'service-order-cell-date',
+        width: '132px',
+        align: 'center',
+        getExportValue: (serviceOrder) =>
+          formatDate(serviceOrder.lastActivityAt) || '',
+        fieldName: ServiceOrderOrderField.LAST_ACTIVITY_AT,
+        renderCell: (serviceOrder, cellProps) => {
+          const {label, date} = getServiceOrderDateParts(serviceOrder);
+          return (
+            <Cell {...cellProps} align="right" noPadding>
+              <Box display="flex" flexDirection="column" textAlign="right">
+                <Typography variant="body2" color="textSecondary">
+                  {date && label !== '-' ? t(label) : '-'}
+                </Typography>
+                {date && <Typography variant="body2">{date}</Typography>}
+              </Box>
+            </Cell>
+          );
+        },
+      },
+
       {
         headerName: 'Payment',
         key: 'service-order-cell-payment',

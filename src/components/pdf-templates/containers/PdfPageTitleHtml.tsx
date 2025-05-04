@@ -40,7 +40,13 @@ const PdfPageTitleHtml = ({value, selectedLng}: Props) => {
   const styles = getStyles(boldFontStyle);
 
   if (value && value.trim() !== '')
-    return <HtmlPDF html={value || ''} rootStyle={styles} />;
+    return (
+      <HtmlPDF
+        html={value || ''}
+        rootStyle={styles}
+        selectedLng={selectedLng}
+      />
+    );
 };
 
 export default PdfPageTitleHtml;

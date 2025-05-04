@@ -286,6 +286,7 @@ const PdfPreviewFinalInvoiceTermplate = ({
               <HtmlPDF
                 html={invoice?.description || ''}
                 rootStyle={styles.contentBody}
+                selectedLng={selectedLng}
               />
             )}
 
@@ -338,6 +339,7 @@ const PdfPreviewFinalInvoiceTermplate = ({
                       marginTop: 6,
                       marginBottom: 16,
                     }}
+                    selectedLng={selectedLng}
                   />
                 </View>
               )}
