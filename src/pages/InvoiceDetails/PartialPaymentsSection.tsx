@@ -19,7 +19,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {FormikProps, getIn} from 'formik';
+import BigNumber from 'bignumber.js';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
@@ -57,6 +57,7 @@ import {T} from 'utils/i18n-utils';
 import {State} from 'models/misc';
 import InvoiceShowOnPDFSwitch from 'components/Switch/InvoiceShowOnPDFSwitch';
 import {stripHtmlTags} from 'utils/text-block';
+import {FormikProps, getIn} from 'formik';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -1073,7 +1074,9 @@ export const PartialPaymentsSection = ({
         ),
     )
     ?.reduce((acc, a) => acc + a, 0);
-  const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
+  const outstandingPayments = BigNumber(totalAmountInclVats)
+    .minus(paidAmountInclVats)
+    .toNumber();
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,

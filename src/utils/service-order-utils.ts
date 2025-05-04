@@ -5,6 +5,7 @@ import {StatusColor} from 'models/status';
 import {getAddressString} from 'utils/address';
 import {
   AUTO_GENERATED_TO_PAYMENT_STATUS,
+  DateCellParts,
   SearchParameters,
   SERVICE_ORDER_PAYMENT_STATUS_VIEW,
   ServiceOrderArticleView,
@@ -17,8 +18,9 @@ import {
   ServiceOrderType,
   ServiceOrderTypeRecord,
   ServiceOrderView,
+  statusLabelMap,
 } from '../models/service-order';
-import {toDate, toRestDateTime} from './datetime';
+import {formatDate, toDate, toRestDateTime} from './datetime';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
@@ -388,6 +390,10 @@ export const aggregateServiceOrderRow = (
       order.additionalInfo.paymentStatus ??
       ServiceOrderPaymentStatus.NO_INVOICE,
     hasNotes: Boolean(order.additionalInfo.commentCount),
+    lastActivityAt: order.additionalInfo.lastActivityAt ?? '',
+    hasSchedule: order.schedules.length > 0,
+    scheduleDate:
+      order.schedules.length > 0 ? order.schedules[0]?.startTime : '',
   }));
 
 export const createSearchQuery = ({search, orderNumber}: SearchParameters) => {
@@ -530,3 +536,30 @@ export const roundTimeWithSurcharge = (
 
   return roundedMinutes + surchargeMinutes;
 };
+
+export function getServiceOrderDateParts(
+  row: ServiceOrderTableRow,
+): DateCellParts {
+  const {jobStatus, hasSchedule, scheduleDate, lastActivityAt} = row;
+
+  let label = statusLabelMap[jobStatus] ?? '-';
+
+  if (jobStatus === ServiceOrderStatus.OVERDUE && hasSchedule) {
+    label = statusLabelMap[ServiceOrderStatus.SCHEDULED];
+  }
+
+  const isScheduled =
+    jobStatus === ServiceOrderStatus.PLANNED ||
+    jobStatus === ServiceOrderStatus.SCHEDULED ||
+    (jobStatus === ServiceOrderStatus.OVERDUE && hasSchedule);
+
+  const date = isScheduled
+    ? scheduleDate
+      ? formatDate(scheduleDate)
+      : null
+    : lastActivityAt
+    ? formatDate(lastActivityAt)
+    : null;
+
+  return {label, date};
+}

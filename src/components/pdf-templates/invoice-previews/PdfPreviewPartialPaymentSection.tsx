@@ -1,4 +1,5 @@
-import {View, Font, StyleSheet, Text} from '@react-pdf/renderer';
+import {Font, StyleSheet, Text, View} from '@react-pdf/renderer';
+import BigNumber from 'bignumber.js';
 import {
   InvoiceView,
   InvoiceItemView,
@@ -265,7 +266,9 @@ export const PdfPreviewPartialPaymentSection = ({
       ),
     )
     .reduce((acc, a) => acc + a, 0);
-  const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
+  const outstandingPayments = BigNumber(totalAmountInclVats)
+    .minus(paidAmountInclVats)
+    .toNumber();
 
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency?.code,
@@ -665,6 +668,7 @@ export const PdfPreviewPartialPaymentSection = ({
               marginTop: 6,
               marginBottom: 16,
             }}
+            selectedLng={selectedLng}
           />
         </View>
       )}

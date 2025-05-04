@@ -3172,5 +3172,6 @@
   "Select state": "Bundesland wählen",
   "Created on": "Erstellt am",
   "Description exceeds the maximum allowed size": "Die Beschreibung überschreitet die maximal zulässige Größe",
-  "Scheduled for": "Geplant für"
+  "Scheduled for": "Geplant für",
+  "This invoice number is already assigned.": "Diese Rechnungsnummer ist bereits vergeben."
 }

@@ -3190,5 +3190,11 @@
   "Archived on": "Arhivirano na",
   "Scheduled on": "Zakazano na",
   "Select country": "Izaberite zemlju",
-  "Select state": "Izaberite državu"
+  "Select state": "Izaberite državu",
+  "Created on": "Napravljeno na",
+  "Description exceeds the maximum allowed size": "Opis prelazi maksimalno dozvoljenu veličinu",
+  "Scheduled for": "Zakazano za",
+  "Select tag(s)": "Izaberite oznaku(e)",
+  "# OF SUB LICENCES": "# PODLICENCI",
+  "# OF SUB USERS": "# PODKORISNIKA"
 }
