@@ -179,7 +179,13 @@ export const ArticleSectionBody = ({
 
                       {showDiscountCol && (
                         <View style={styles.col10Right}>
-                          <Text />
+                          <Text>
+                            {getDiscountDisplay(
+                              mainPosition.discount,
+                              currentCurrency,
+                              selectedLng,
+                            )}
+                          </Text>
                         </View>
                       )}
 

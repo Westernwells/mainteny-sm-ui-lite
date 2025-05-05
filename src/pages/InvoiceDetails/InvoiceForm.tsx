@@ -313,12 +313,16 @@ export const InvoiceForm = ({
   const {mutateAsync: deleteInvoice} = useDeleteInvoice();
 
   const {
-    customerId = '',
+    customerId: rawCustomerId,
     orderId = '',
     invoiceId = '',
     isDuplicate = false,
     elevatorExternalId: rawElevatorExternalId,
   } = queryString.parse(search) as Record<string, string | string[]>;
+
+  const rawCustomerIdParam: string | undefined = Array.isArray(rawCustomerId)
+    ? rawCustomerId[0]
+    : rawCustomerId;
 
   const elevatorExternalIdParam: string | undefined = Array.isArray(
     rawElevatorExternalId,
@@ -1226,7 +1230,7 @@ export const InvoiceForm = ({
 
       const isDataEqual = isEqual(normalizedParsedData, normalizedFormikValues);
 
-      if (!isDataEqual && !(customerId || orderId)) {
+      if (!isDataEqual && !(rawCustomerIdParam || orderId)) {
         setOpenResumeProgressDialog(true);
       } else {
         reset(parsedData);
@@ -1237,7 +1241,7 @@ export const InvoiceForm = ({
   };
 
   const restoreFormikFromLocalStorage = () => {
-    if (initialLocalStorageData && !(customerId || orderId)) {
+    if (initialLocalStorageData && !(rawCustomerIdParam || orderId)) {
       try {
         if (Object.keys(initialLocalStorageData).length !== 0) {
           reset({
@@ -1693,6 +1697,8 @@ export const InvoiceForm = ({
         navigate(`/invoices/details/${response.value}`, {
           replace: true,
         });
+      } else if (!isNewInvoice && rawCustomerIdParam) {
+        navigate(`/invoices/details/${invoice!.id}`, {replace: true});
       } else {
         navigate(-1);
       }
@@ -1783,7 +1789,7 @@ export const InvoiceForm = ({
     if (isNewInvoice && !initialNewLoadComplete) {
       if (invoice && invoiceId && pageState === PageState.DUPLICATE) {
         prefillFormWithInvoiceData(invoice);
-      } else if (initialLocalStorageData && !(customerId || orderId)) {
+      } else if (initialLocalStorageData && !(rawCustomerIdParam || orderId)) {
         initializeFormDataFromLocalStorage();
       } else {
         reset();
@@ -1851,10 +1857,10 @@ export const InvoiceForm = ({
   }, [serviceOrderData]);
 
   useEffect(() => {
-    if (customerResource && customerId) {
+    if (customerResource && rawCustomerIdParam) {
       setCustomer(customerResource);
     }
-  }, [customerResource, customerId]);
+  }, [customerResource, rawCustomerIdParam]);
 
   useEffect(() => {
     if (serviceOrderResource && orderId) {
@@ -2041,6 +2047,12 @@ export const InvoiceForm = ({
     }
   }, [isNewInvoice, pageState]);
 
+  useEffect(() => {
+    if (isNewInvoice && rawCustomerIdParam && !watchedPropertyOwnerId) {
+      setValue('propertyOwnerId', rawCustomerIdParam);
+    }
+  }, [isNewInvoice, rawCustomerIdParam, watchedPropertyOwnerId]);
+
   const recalcInvoice = useCallback(
     debounce(async () => {
       const currentValues = getValues();
@@ -2109,22 +2121,6 @@ export const InvoiceForm = ({
 
   return (
     <Box>
-      {invoice && !isNewInvoice && invoiceType !== InvoiceType.CREDIT_NOTE && (
-        <Box
-          display="flex"
-          alignItems="flex-end"
-          mb={3}
-          mt={1}
-          justifyContent="space-between">
-          <StatusChip
-            label={getInvoiceStatusStyles(invoice?.status ?? '').label}
-            color={getInvoiceStatusStyles(invoice?.status ?? '').color}
-            size="small"
-            variant="filled"
-          />
-        </Box>
-      )}
-
       <Grid pb={3} borderRadius={1}>
         <Grid
           container
@@ -2135,8 +2131,25 @@ export const InvoiceForm = ({
           px={3}
           py={3}
           borderRadius={1}>
-          <Box pb={0.5}>
+          <Box pb={0.5} display="flex" alignItems="center">
             <SectionTitle Icon={PinIllustration} title="General Information" />
+            {invoice &&
+              !isNewInvoice &&
+              invoiceType !== InvoiceType.CREDIT_NOTE && (
+                <Box
+                  display="flex"
+                  alignItems="flex-end"
+                  ml={3}
+                  mt={-1}
+                  justifyContent="space-between">
+                  <StatusChip
+                    label={getInvoiceStatusStyles(invoice?.status ?? '').label}
+                    color={getInvoiceStatusStyles(invoice?.status ?? '').color}
+                    size="small"
+                    variant="filled"
+                  />
+                </Box>
+              )}
           </Box>
 
           <Grid container spacing={2}>
@@ -2157,7 +2170,12 @@ export const InvoiceForm = ({
               </Box>
             </Grid>
 
-            <Grid item xs={6} md={3}>
+            <Grid
+              item
+              xs={6}
+              md={3}
+              display="flex"
+              justifyContent="space-between">
               <Box>
                 <Typography variant="body2" color="grey.700">
                   {T('Invoice type')}
@@ -2166,66 +2184,67 @@ export const InvoiceForm = ({
                   {getInvoiceTypeText()}
                 </Typography>
               </Box>
+
+              <Box sx={{mr: 3}}>
+                {/* PAYMENT TYPE */}
+                {/* don't show payment type for FULL, FINAL and CREDIT_NOTE invoices */}{' '}
+                {[InvoiceType.PARTIAL, InvoiceType.UPFRONT].includes(
+                  getValues('type'),
+                ) ? (
+                  <Box>
+                    <Typography variant="body2" color="grey.700">
+                      {T('Payment type')}
+                      <Tooltip title={T(paymentTypeTooltip)} placement="top">
+                        <IconButton sx={{p: 0, ml: 0.5}}>
+                          <InfoOutlinedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Typography>
+                    <RadioGroup
+                      defaultValue={PaymentType.LUMP_SUM}
+                      name="radio-buttons-group">
+                      {Object.entries(PaymentTypeOptions).map(([key, value]) =>
+                        getValues('type') === InvoiceType.UPFRONT &&
+                        key === PaymentType.PER_ITEM ? null : (
+                          <FormControlLabel
+                            key={key}
+                            value={key}
+                            control={<Radio size="small" />}
+                            label={T(value)}
+                            onChange={() =>
+                              handlePaymentTypeChange(key as PaymentType)
+                            }
+                            checked={getValues('payment')?.type === key}
+                            disabled={
+                              (!previousInvoices.filter(
+                                (item) =>
+                                  item.status !== InvoiceStatus.CANCELLED,
+                              ).length &&
+                                isNewInvoice) ||
+                              (previousInvoices.filter(
+                                (item) =>
+                                  item.status !== InvoiceStatus.CANCELLED,
+                              ).length === 1 &&
+                                !isNewInvoice) ||
+                              (!previousInvoices.filter(
+                                (item) =>
+                                  item.status !== InvoiceStatus.CANCELLED,
+                              ).length &&
+                                !isNewInvoice)
+                                ? false
+                                : key !==
+                                  sortedPreviousInvoices?.[0]?.additionalInfo
+                                    ?.payment?.type
+                            }
+                          />
+                        ),
+                      )}
+                    </RadioGroup>
+                  </Box>
+                ) : null}
+              </Box>
             </Grid>
 
-            <Grid item xs={6} md={3}>
-              {/* PAYMENT TYPE */}
-              {/* don't show payment type for FULL, FINAL and CREDIT_NOTE invoices */}{' '}
-              {[InvoiceType.PARTIAL, InvoiceType.UPFRONT].includes(
-                getValues('type'),
-              ) ? (
-                <Box>
-                  <Typography variant="body2" color="grey.700">
-                    {T('Payment type')}
-                    <Tooltip title={T(paymentTypeTooltip)} placement="top">
-                      <IconButton sx={{p: 0, ml: 0.5}}>
-                        <InfoOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </Typography>
-                  <RadioGroup
-                    defaultValue={PaymentType.LUMP_SUM}
-                    name="radio-buttons-group">
-                    {Object.entries(PaymentTypeOptions).map(([key, value]) =>
-                      getValues('type') === InvoiceType.UPFRONT &&
-                      key === PaymentType.PER_ITEM ? null : (
-                        <FormControlLabel
-                          key={key}
-                          value={key}
-                          control={<Radio size="small" />}
-                          label={T(value)}
-                          onChange={() =>
-                            handlePaymentTypeChange(key as PaymentType)
-                          }
-                          checked={getValues('payment')?.type === key}
-                          disabled={
-                            (!previousInvoices.filter(
-                              (item) => item.status !== InvoiceStatus.CANCELLED,
-                            ).length &&
-                              isNewInvoice) ||
-                            (previousInvoices.filter(
-                              (item) => item.status !== InvoiceStatus.CANCELLED,
-                            ).length === 1 &&
-                              !isNewInvoice) ||
-                            (!previousInvoices.filter(
-                              (item) => item.status !== InvoiceStatus.CANCELLED,
-                            ).length &&
-                              !isNewInvoice)
-                              ? false
-                              : key !==
-                                sortedPreviousInvoices?.[0]?.additionalInfo
-                                  ?.payment?.type
-                          }
-                        />
-                      ),
-                    )}
-                  </RadioGroup>
-                </Box>
-              ) : null}
-            </Grid>
-          </Grid>
-
-          <Grid container rowGap={2} spacing={2}>
             <Grid item xs={6} md={3}>
               <DatePicker
                 defaultDate={
@@ -2296,14 +2315,10 @@ export const InvoiceForm = ({
                 popupTestId="payment-due-date-popup"
               />
             </Grid>
-
-            <Grid item xs={6} md={3}></Grid>
-
-            <Grid item xs={6} md={3}></Grid>
           </Grid>
 
           <Grid container rowGap={2}>
-            <Typography variant="body2" color="grey.700" pb={1.5}>
+            <Typography variant="body2" color="grey.700">
               {T('Delivery date')}
             </Typography>
 
@@ -2320,6 +2335,7 @@ export const InvoiceForm = ({
                   }}
                   textFieldProps={{
                     label: 'Start Date',
+                    fullWidth: true,
                     ...register('deliveryStartDate'),
                     ...(serviceOrder &&
                       !getValues('deliveryStartDate') && {
@@ -2348,6 +2364,7 @@ export const InvoiceForm = ({
                   }}
                   textFieldProps={{
                     label: 'End Date',
+                    fullWidth: true,
                     ...register('deliveryEndDate'),
                     ...(serviceOrder &&
                       !getValues('deliveryEndDate') && {

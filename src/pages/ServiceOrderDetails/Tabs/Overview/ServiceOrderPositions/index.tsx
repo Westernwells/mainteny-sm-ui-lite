@@ -111,6 +111,27 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
   const watchedItems = watch('items');
   const watchedDiscount = watch('discount');
 
+  const isValid = () => {
+    const currentValues = getValues();
+    const currentItems = currentValues.items || [];
+
+    const localHasEmptyItemName = currentItems.some(
+      (item) => !item.name?.trim(),
+    );
+    const localHasMixItemWithoutSubItems = currentItems.some(
+      (item) =>
+        item.article?.type === ArticleType.MIX &&
+        (!item.subItems || item.subItems.length === 0),
+    );
+
+    const valid =
+      currentItems.length > 0 &&
+      !localHasEmptyItemName &&
+      !localHasMixItemWithoutSubItems;
+
+    return !!valid;
+  };
+
   const handleAddPositionClick = () => {
     setOpenMode('add');
     setIsOpen(true);
@@ -248,6 +269,12 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
     </Box>
   );
 
+  useEffect(() => {
+    if (watchedItems.length === 0) {
+      handleAddPositionClick();
+    }
+  }, [watchedItems.length]);
+
   if (isLoadingSubItems || isLoadingServiceOrderArticles) return <Progress />;
 
   return (
@@ -295,7 +322,7 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
         onSave={() => {
           setIsConfirmDialogOpen(true);
         }}
-        disableSaveBtn={isLoadingUpdate}
+        disableSaveBtn={isLoadingUpdate || !isValid()}
         dialogProps={{
           maxWidth: 'xl',
           open: isOpen || false,
