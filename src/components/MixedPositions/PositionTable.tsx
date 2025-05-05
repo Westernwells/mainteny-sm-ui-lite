@@ -255,7 +255,7 @@ const PositionTable = ({
   };
 
   const handleAddNewPosition = () => {
-    const newIndex = fields.length;
+    const newIndex = watchedItems.length;
     const defaultSeqNumber = (newIndex + 1).toString();
 
     const defaultProps = {
@@ -533,6 +533,12 @@ const PositionTable = ({
       },
     );
   }, [watchedItems, setValue]);
+
+  useEffect(() => {
+    if (watchedItems.length === 0) {
+      handleAddNewPosition();
+    }
+  }, [watchedItems.length]);
 
   return (
     <>

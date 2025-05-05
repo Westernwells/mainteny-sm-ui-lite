@@ -480,6 +480,8 @@ export interface CreateInvoice {
   showArticleSection?: boolean;
   refInvoiceId?: string;
   notes?: CreateInvoiceComment[];
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
 }
 
 export interface UpdateInvoice {
@@ -515,6 +517,8 @@ export interface UpdateInvoice {
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
   elevatorExternalId?: string;
 }
 

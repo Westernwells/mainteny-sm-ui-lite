@@ -322,7 +322,6 @@ export const getDiscountDisplay = (
   if (discount.type === DiscountType.AMOUNT) {
     return formatCurrency(discount.amount?.value || 0, {
       currency: currentCurrency?.code,
-      excludeCurrencySymbol: true,
       currencySymbol: currentCurrency?.symbol,
       companyLang: selectedLng,
     });
