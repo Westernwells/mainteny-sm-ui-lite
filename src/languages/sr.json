@@ -3195,5 +3195,8 @@
   "Scheduled for": "Zakazano za",
   "Select tag(s)": "Izaberite oznaku(e)",
   "# OF SUB LICENCES": "# PODLICENCI",
-  "# OF SUB USERS": "# PODKORISNIKA"
+  "# OF SUB USERS": "# PODKORISNIKA",
+  "This invoice number is already assigned.": "Ovaj broj fakture je već dodeljen.",
+  "Hide main key performance indicators": "Sakrijte glavne ključne pokazatelje učinka",
+  "Show main key performance indicators": "Show main key performance indicators"
 }
