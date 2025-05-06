@@ -720,13 +720,6 @@ export interface ServiceOrderItemRecord {
   unitAmount: Amount;
 }
 
-export interface ServiceOrderConfirmationPublishBody {
-  email: string;
-  emails: string[];
-  subject: string;
-  content: string;
-}
-
 export interface AppointmentConfirmationRequiredOrdersQueryParams {
   pageIndex: number;
   pageSize: number;

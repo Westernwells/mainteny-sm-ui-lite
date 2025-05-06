@@ -26,7 +26,6 @@ import {
   ServiceOrderAmountDetail,
   ServiceOrderArticleRecord,
   ServiceOrderArticleView,
-  ServiceOrderConfirmationPublishBody,
   ServiceOrderPaymentStatus,
   ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderQueryParams,
@@ -932,27 +931,6 @@ export const useNewUpdateServiceOrderArticles = () => {
     },
   );
 };
-
-export const postServiceOrderConfirmationPublish = async (
-  serviceOrder: string,
-  body: ServiceOrderConfirmationPublishBody,
-) => {
-  await axiosClient.post(
-    `/api/serviceOrders/${serviceOrder}/confirmation/publish`,
-    body || {},
-  );
-};
-
-export const usePostServiceOrderConfirmationPublish = () =>
-  useMutation(
-    ({
-      data,
-      serviceOrder,
-    }: {
-      data: ServiceOrderConfirmationPublishBody;
-      serviceOrder: string;
-    }) => postServiceOrderConfirmationPublish(serviceOrder, data),
-  );
 
 export const fetchServiceOrderComments = async (
   serviceOrderId: string,
