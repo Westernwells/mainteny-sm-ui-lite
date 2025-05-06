@@ -37,6 +37,7 @@ import {
   EditableInvoiceSubItemRecord,
   DiscountType,
   InvoiceAmountDetail,
+  InvoiceView,
 } from 'models/invoice';
 import SubPositionFooter from 'components/MixedPositions/SubPositionFooter';
 import NewSubPositionRow from 'components/MixedPositions/NewSubPositionRow';
@@ -55,12 +56,20 @@ interface Props {
   formMethods: UseFormReturn<InvoiceFormData>;
   onRecalcInvoice: () => void;
   invoiceAmountDetail?: InvoiceAmountDetail;
+  isNewInvoice?: boolean;
+  resumeDialogOpen?: boolean;
+  resumeCheckDone?: boolean;
+  invoice?: InvoiceView;
 }
 
 const InvoicePositionTable = ({
   formMethods,
   onRecalcInvoice,
   invoiceAmountDetail,
+  isNewInvoice,
+  resumeDialogOpen,
+  resumeCheckDone,
+  invoice,
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -288,11 +297,6 @@ const InvoicePositionTable = ({
     };
 
     append(newItem);
-    setEditableMixedRow({
-      index: newIndex,
-      field: `items.${newIndex}.name`,
-      values: newItem,
-    });
   };
 
   const handleAddSubPosition = (parentIndex: number) => {
@@ -544,10 +548,22 @@ const InvoicePositionTable = ({
   }, [watchedItems, setValue]);
 
   useEffect(() => {
+    if (!resumeCheckDone) return;
+
+    if (resumeDialogOpen) return;
+    // only for brand-new invoices — skip if editing
+    if (!isNewInvoice || invoice) return;
+
     if (watchedItems.length === 0) {
       handleAddNewPosition();
     }
-  }, [watchedItems.length]);
+  }, [
+    resumeCheckDone,
+    resumeDialogOpen,
+    isNewInvoice,
+    invoice,
+    watchedItems.length,
+  ]);
 
   return (
     <>

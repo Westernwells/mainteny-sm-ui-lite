@@ -432,6 +432,7 @@ export const InvoiceForm = ({
 
   const [openResumeProgressDialog, setOpenResumeProgressDialog] =
     useState(false);
+  const [resumeCheckDone, setResumeCheckDone] = useState(false);
   const [openCancelDialog, setOpenCancelDialog] = useState<boolean>(false);
 
   const [initialLocalStorageData, setInitialLocalStorageData] = useState<
@@ -1801,6 +1802,7 @@ export const InvoiceForm = ({
       }
       setInitialLoadComplete(true);
     }
+    setResumeCheckDone(true);
   }, [initialNewLoadComplete, initialLoadComplete, invoice]);
 
   useEffect(() => {
@@ -1999,53 +2001,6 @@ export const InvoiceForm = ({
       }
     }
   }, []);
-
-  useEffect(() => {
-    // Check if we are creating a new quotation and we're starting fresh
-    const newIndex = getValues('items').length;
-    const defaultSeqNumber = (newIndex + 1).toString();
-
-    const defaultProps = {
-      netAmount: 0,
-      currency: currentCurrency.code,
-      percentageVat: defaultVat?.percentage,
-      vatId: defaultVat?.id,
-      vatName: defaultVat?.name,
-    };
-
-    const newItem: EditableInvoiceItem = {
-      id: getUniqueId(),
-      userSeqNumber: defaultSeqNumber,
-      name: '',
-      quantity: 1,
-      unitAmount: defaultProps,
-      unitPurchaseAmount: defaultProps,
-      article: {
-        type: ArticleType.OTHER,
-        unit: 'kg',
-        unitSellingAmount: defaultProps,
-        unitPurchaseAmount: defaultProps,
-        name: '',
-        externalId: '',
-      },
-      subItems: [],
-      description: '',
-      discount: {
-        type: DiscountType.PERCENTAGE,
-        percentage: 0,
-      },
-      subItemsConfig: {subItemsVisible: false, priceVisible: false},
-    };
-
-    if (
-      isNewInvoice &&
-      pageState === 'FRESH_NEW' &&
-      !invoice &&
-      (!getValues('items') || getValues('items').length === 0)
-    ) {
-      setValue('items', [newItem]);
-    }
-  }, [isNewInvoice, pageState]);
 
   useEffect(() => {
     if (isNewInvoice && rawCustomerIdParam && !watchedPropertyOwnerId) {
@@ -2870,6 +2825,10 @@ export const InvoiceForm = ({
                 formMethods={formMethods}
                 invoiceAmountDetail={invoiceAmountDetail}
                 onRecalcInvoice={recalcInvoice}
+                isNewInvoice={isNewInvoice}
+                resumeDialogOpen={openResumeProgressDialog}
+                resumeCheckDone={resumeCheckDone}
+                invoice={invoice}
               />
             </Box>
           </Grid>
