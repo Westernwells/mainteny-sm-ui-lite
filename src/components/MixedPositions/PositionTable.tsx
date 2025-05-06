@@ -13,6 +13,7 @@ import {
   EditableQuotationItem,
   EditableQuotationSubItemRecord,
   QuotationAmountDetail,
+  QuotationView,
 } from 'models/quotation';
 import {Add} from '@mui/icons-material';
 import TableContainer from 'components/Table/TableContainer';
@@ -58,12 +59,20 @@ interface Props {
   formMethods: UseFormReturn<QuotationFormData>;
   onRecalcQuotation: () => void;
   quotationAmountDetail?: QuotationAmountDetail;
+  formType?: string;
+  resumeDialogOpen?: boolean;
+  resumeCheckDone?: boolean;
+  quotation?: QuotationView;
 }
 
 const PositionTable = ({
   formMethods,
   onRecalcQuotation,
   quotationAmountDetail,
+  formType,
+  resumeDialogOpen,
+  resumeCheckDone,
+  quotation,
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -291,11 +300,6 @@ const PositionTable = ({
     };
 
     append(newItem);
-    setEditableMixedRow({
-      index: newIndex,
-      field: `items.${newIndex}.name`,
-      values: newItem,
-    });
   };
 
   const handleAddSubPosition = (parentIndex: number) => {
@@ -535,10 +539,18 @@ const PositionTable = ({
   }, [watchedItems, setValue]);
 
   useEffect(() => {
-    if (watchedItems.length === 0) {
+    if (!resumeCheckDone) return;
+    if (resumeDialogOpen) return;
+    if (formType !== 'new' || quotation) return;
+    if (
+      resumeCheckDone &&
+      !resumeDialogOpen &&
+      !quotation &&
+      watchedItems.length === 0
+    ) {
       handleAddNewPosition();
     }
-  }, [watchedItems.length]);
+  }, [resumeCheckDone, resumeDialogOpen, quotation, watchedItems.length]);
 
   return (
     <>
