@@ -8,7 +8,6 @@ import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {Progress} from 'components/Progress';
 import {
-  usePostServiceOrderConfirmationPublish,
   useServiceOrderAmountDetailQuery,
   useServiceOrderDetails,
   useServiceOrderSubItems,
@@ -144,9 +143,6 @@ export const ServiceOrderDetails = () => {
     serviceOrder?.number,
     filePathToDownload,
   );
-
-  const {mutateAsync: postServiceOrderConfirmationPublish} =
-    usePostServiceOrderConfirmationPublish();
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
@@ -304,16 +300,6 @@ export const ServiceOrderDetails = () => {
       );
 
       await generatePreviewPdfBlobUrl();
-
-      await postServiceOrderConfirmationPublish({
-        serviceOrder: serviceOrderId as string,
-        data: {
-          email: '',
-          emails: [],
-          subject: '',
-          content: '',
-        },
-      });
     } catch (e) {
       showError(e);
     } finally {
