@@ -2301,7 +2301,7 @@
   "Sim pin": "Sim pin",
   "Call center": "Callcenter",
   "Place of installation": "Installationssted",
-  "JPEG, PNG, BMP, GIF, PDF, DOC, DOCX, TXT or SVG": "JPEG, PNG, BMP, GIF, PDF, DOC, DOCX, TXT eller SVG",
+  "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG or SVG": "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG eller SVG",
   "No units found": "Ingen enheder fundet",
   "If you like to add a new unit, please click the button below.": "Hvis du gerne vil tilføje en ny enhed, skal du klikke på knappen nedenfor.",
   "Select due date": "Vælg forfaldsdato",
