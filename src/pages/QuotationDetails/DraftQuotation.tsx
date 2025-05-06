@@ -15,7 +15,6 @@ import {
 } from 'hooks/reactQuery/useQuotation';
 import {
   CreateQuotationRecord,
-  EditableQuotationItem,
   QuotationAmountDetail,
   QuotationFormData,
   QuotationStatus,
@@ -40,7 +39,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import {
   formatAddressFullname,
   formatSearchParams,
-  getUniqueId,
   getUserFullName,
 } from 'utils/utils';
 import {EditFrom} from 'pages/InvoiceDetails/EditFrom';
@@ -112,7 +110,6 @@ import {Controller, useForm} from 'react-hook-form';
 import PositionTable from 'components/MixedPositions/PositionTable';
 import {ArticleType} from 'models/article';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
-import {DiscountType} from 'models/invoice';
 import {useSnackbar} from 'hooks/useSnackbar';
 import * as Sentry from '@sentry/react';
 import NewUnit from './NewUnit';
@@ -129,7 +126,7 @@ interface Props {
 const localStorageQuotationDataKey = 'QUOTATION_DATA';
 
 export const DraftQuotation = ({
-  formType,
+  formType = 'new',
   quotation,
   serviceCompanyType,
   quotationSubItems,
@@ -142,8 +139,6 @@ export const DraftQuotation = ({
 
   const {data: taxRates} = useVats();
 
-  const defaultVat = taxRates?.find((tR) => tR.isDefault);
-
   const [paymentTermToEdit, setPaymentTermToEdit] = useState<
     ContractTermView | undefined
   >(undefined);
@@ -153,6 +148,7 @@ export const DraftQuotation = ({
 
   const [openResumeProgressDialog, setOpenResumeProgressDialog] =
     useState(false);
+  const [resumeCheckDone, setResumeCheckDone] = useState(false);
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
   const [initialLocalStorage, setInitialLocalStorage] = useState<
     Partial<QuotationFormData | null>
@@ -976,6 +972,7 @@ export const DraftQuotation = ({
     if (!quotation && !id) {
       initializeFormDataFromLocalStorage();
     }
+    setResumeCheckDone(true);
   }, []);
 
   useEffect(() => {
@@ -1129,53 +1126,6 @@ export const DraftQuotation = ({
     });
     setValue('notes', newNotes);
   }, [watch('items')]);
-
-  useEffect(() => {
-    // Check if we are creating a new quotation and we're starting fresh
-    const newIndex = getValues('items').length;
-    const defaultSeqNumber = (newIndex + 1).toString();
-
-    const defaultProps = {
-      netAmount: 0,
-      currency: currentCurrency.code,
-      percentageVat: defaultVat?.percentage,
-      vatId: defaultVat?.id,
-      vatName: defaultVat?.name,
-    };
-
-    const newItem: EditableQuotationItem = {
-      id: getUniqueId(),
-      userSeqNumber: defaultSeqNumber,
-      name: '',
-      quantity: 1,
-      unitAmount: defaultProps,
-      unitPurchaseAmount: defaultProps,
-      article: {
-        type: ArticleType.OTHER,
-        unit: 'kg',
-        unitSellingAmount: defaultProps,
-        unitPurchaseAmount: defaultProps,
-        name: '',
-        externalId: '',
-      },
-      subItems: [],
-      description: '',
-      discount: {
-        type: DiscountType.PERCENTAGE,
-        percentage: 0,
-      },
-      subItemsConfig: {subItemsVisible: false, priceVisible: false},
-    };
-
-    if (
-      formType === 'new' &&
-      pageState === 'FRESH_NEW' &&
-      !quotation &&
-      (!getValues('items') || getValues('items').length === 0)
-    ) {
-      setValue('items', [newItem]);
-    }
-  }, [formType, pageState]);
 
   useEffect(() => {
     async function checkExternalId() {
@@ -1648,6 +1598,10 @@ export const DraftQuotation = ({
                 formMethods={formMethods}
                 quotationAmountDetail={quotationAmountDetail}
                 onRecalcQuotation={recalcQuotation}
+                formType={formType}
+                resumeDialogOpen={openResumeProgressDialog}
+                resumeCheckDone={resumeCheckDone}
+                quotation={quotation}
               />
             </Box>
           </Grid>
