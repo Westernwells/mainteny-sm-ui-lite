@@ -3198,5 +3198,13 @@
   "# OF SUB USERS": "# PODKORISNIKA",
   "This invoice number is already assigned.": "Ovaj broj fakture je već dodeljen.",
   "Hide main key performance indicators": "Sakrijte glavne ključne pokazatelje učinka",
-  "Show main key performance indicators": "Show main key performance indicators"
+  "Show main key performance indicators": "Prikažite glavne ključne pokazatelje učinka",
+  "Overdue invoices": "Dospele fakture",
+  "Total number of overdue invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan broj dospelih faktura od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
+  "Total value": "Ukupna vrednost",
+  "Total amount of invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan iznos faktura od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
+  "Paid value": "Plaćena vrednost",
+  "Total amount of paid invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan iznos plaćenih faktura od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
+  "Pending value": "Vrednost na čekanju",
+  "Total amount of pending invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan iznos faktura na čekanju od {{createdDateTimeFrom}} do {{createdDateTimeTo}}"
 }
