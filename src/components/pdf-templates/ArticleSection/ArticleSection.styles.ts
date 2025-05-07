@@ -29,7 +29,8 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
       color: primaryColor,
       paddingLeft: 30,
       paddingRight: 5,
-      marginVertical: 2,
+      marginVertical: 3,
+      width: '94%',
     },
     col2Left: {
       width: '6%',
