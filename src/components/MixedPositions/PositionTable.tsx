@@ -43,6 +43,7 @@ import SubPositionFooter from './SubPositionFooter';
 import DiscountPanel from './DiscountPanel';
 import NewSubPositionRow from './NewSubPositionRow';
 import NewMainPositionRow from './NewMainPosition';
+import {dialogPaperStyles} from './MixedPositions.styles';
 
 export interface EditableRowType {
   index: number;
@@ -660,9 +661,7 @@ const PositionTable = ({
         }}
         sx={{
           '& .MuiDialog-paper': {
-            width: '750px',
-            maxWidth: 'none',
-            padding: '0em',
+            ...dialogPaperStyles,
           },
         }}
         leftButton={

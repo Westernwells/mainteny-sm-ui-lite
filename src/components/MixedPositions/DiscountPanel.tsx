@@ -16,6 +16,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {formatCurrency, useCurrentCurrency} from 'utils/currency';
+import {calculateSwitchedDiscount} from 'utils/mixed-position';
 
 type DiscountFormShape = {
   discount?: Discount;
@@ -71,7 +72,7 @@ const DiscountPanel = <TForm extends DiscountFormShape & FieldValues>({
 
   const handleDiscountValueChange = (values: NumberFormatValues) => {
     const {floatValue} = values;
-    const discountProperty = {type: watchedDiscount?.type!};
+    const discountProperty = {...watchedDiscount};
 
     if (watchedDiscount?.type === DiscountType.AMOUNT) {
       setValue(
@@ -99,6 +100,8 @@ const DiscountPanel = <TForm extends DiscountFormShape & FieldValues>({
   };
 
   const discountText = selectedLng === 'DE' ? 'Rabatt' : t('Discount');
+
+  const oldDiscount = watch('discount' as Path<TForm>);
 
   return (
     <Box display="flex" justifyContent="flex-end" mb={2} pr={6}>
@@ -145,18 +148,17 @@ const DiscountPanel = <TForm extends DiscountFormShape & FieldValues>({
                         value: field.value,
                         onChange: (e) => {
                           const newType = e.target.value as DiscountType;
+
+                          const newDiscount = calculateSwitchedDiscount(
+                            newType,
+                            oldDiscount,
+                            amountBeforeGlobalDiscount,
+                            currentCurrency,
+                          );
                           field.onChange(e);
                           setValue(
                             'discount' as Path<TForm>,
-                            {
-                              type: newType,
-                              amount: {
-                                value: 0,
-                                currency: currentCurrency.code,
-                                fractionDigits: currentCurrency.fractionDigits,
-                              },
-                              percentage: 0,
-                            } as PathValue<TForm, Path<TForm>>,
+                            newDiscount as PathValue<TForm, Path<TForm>>,
                           );
                           onRecalc();
                         },

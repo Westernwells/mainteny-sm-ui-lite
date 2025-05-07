@@ -39,6 +39,7 @@ import TableContainer from 'components/Table/TableContainer';
 import TableBody from 'components/Table/TableBody';
 import TableRow from 'components/Table/TableRow';
 import SubPositionFooter from 'components/MixedPositions/SubPositionFooter';
+import {dialogPaperStyles} from 'components/MixedPositions/MixedPositions.styles';
 import NewSubPositionRow from '../../../../../components/MixedPositions/NewSubPositionRow';
 import NewMainPositionRow from '../../../../../components/MixedPositions/NewMainPosition';
 
@@ -661,9 +662,7 @@ const ServiceOrderPositionTable = ({
         }}
         sx={{
           '& .MuiDialog-paper': {
-            width: '750px',
-            maxWidth: 'none',
-            padding: '0em',
+            ...dialogPaperStyles,
           },
         }}
         leftButton={
