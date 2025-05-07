@@ -3206,5 +3206,7 @@
   "Paid value": "Plaćena vrednost",
   "Total amount of paid invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan iznos plaćenih faktura od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
   "Pending value": "Vrednost na čekanju",
-  "Total amount of pending invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan iznos faktura na čekanju od {{createdDateTimeFrom}} do {{createdDateTimeTo}}"
+  "Total amount of pending invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan iznos faktura na čekanju od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
+  "Edit Mixed Position": "Uredi mešovitu poziciju",
+  "Margin calculates the buying price against the unit price. Discount is currently not factored into the margin.": "Marža izračunava kupovnu cenu u odnosu na jediničnu cenu. Popust se trenutno ne uračunava u maržu."
 }
