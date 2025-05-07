@@ -3,6 +3,7 @@ import {
   ArticleType,
   CreateArticleSubAssociationRecord,
   ArticleView,
+  CostPackage,
 } from 'models/article';
 import {
   DiscountType,
@@ -78,8 +79,13 @@ import MainPositionActions from 'components/MixedPositions/MainPositionActions';
 import {EditableRowType} from 'components/MixedPositions/PositionTable';
 import {
   EditableServiceOrderItem,
+  EditableServiceOrderSubArticleRecord,
   ServiceOrderAmountDetail,
+  ServiceOrderArticleOwnerType,
 } from 'models/service-order';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
+import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
 import {
   fetchArticleSubAssociations,
   useCreateArticle,
@@ -378,13 +384,22 @@ const useMainPosition = <
     );
 
     if (!isFreeText) {
+      const defaultCostPackage: CostPackage | undefined =
+        articleType === ArticleType.PACKAGE
+          ? selectedArticle?.additionalInfo?.costPackage ?? {
+              laborPercentage: 50,
+              materialPercentage: 50,
+            }
+          : undefined;
+
       setValue(
         `items.${index}.article` as Path<TForm>,
         {
           ...selectedArticle,
-          costPackage: selectedArticle.additionalInfo?.costPackage,
+          costPackage: defaultCostPackage,
         } as PathValue<TForm, Path<TForm>>,
       );
+
       setValue(
         `items.${index}.unitPurchaseAmount` as Path<TForm>,
         selectedArticle.unitPurchaseAmount as PathValue<TForm, Path<TForm>>,
@@ -723,6 +738,7 @@ const useMainPosition = <
       (getValues(subItemsPath) as (
         | EditableQuotationSubItemRecord
         | EditableInvoiceSubItemRecord
+        | EditableServiceOrderSubArticleRecord
       )[]) || [];
 
     // Update VAT for each sub item
@@ -757,10 +773,19 @@ const useMainPosition = <
     () => (
       <TableCell
         noPadding
-        sx={{width: '2px', cursor: 'grab', borderLeft: 'none'}}
+        sx={{
+          width: '2px',
+          cursor: !disableInlineEditing ? 'grab' : 'inherit',
+          borderLeft: 'none',
+        }}
         onMouseEnter={() => setHoveredMainRowIndex(index)}
         onMouseLeave={() => setHoveredMainRowIndex(null)}>
-        <DragHandle isVisible={hoveredMainRowIndex === index} />
+        {!disableInlineEditing && (
+          <DragHandle
+            isVisible={hoveredMainRowIndex === index}
+            disableInlineEditing={disableInlineEditing}
+          />
+        )}
       </TableCell>
     ),
     [index, hoveredMainRowIndex, setHoveredMainRowIndex],
@@ -915,42 +940,83 @@ const useMainPosition = <
                 }}
               />
             </Box>
-            <IconButton
-              onClick={
-                !disableInlineEditing
-                  ? (e) => {
-                      e.stopPropagation();
-                      onDescriptionClick(item.description || '', index);
-                    }
-                  : undefined
-              }
-              sx={{
-                color: removeHtmlTags(watchedItem.description || '')
-                  ? '#000034'
-                  : '#828DA3',
-              }}>
-              {removeHtmlTags(watchedItem.description || '') !== '' ? (
-                <Tooltip
-                  title={
-                    <div>
-                      <Typography
-                        sx={sanitizedTextStyles}
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(
-                            watchedItem.description || '',
-                          ),
-                        }}
-                      />
-                    </div>
-                  }
-                  arrow
-                  placement="top">
-                  <NoteAlt fontSize="small" />
-                </Tooltip>
-              ) : (
-                <NoteAltOutlined fontSize="small" />
+
+            <Box sx={{display: 'flex'}}>
+              {'ownerType' in watchedItem && (
+                <IconButton sx={{py: 0}}>
+                  {watchedItem?.ownerType ===
+                    ServiceOrderArticleOwnerType.USER ||
+                  watchedItem?.ownerType ===
+                    ServiceOrderArticleOwnerType.CONTRACT ||
+                  watchedItem?.ownerType ===
+                    ServiceOrderArticleOwnerType.TRAVEL_WORK ? (
+                    <Tooltip
+                      title={
+                        watchedItem?.ownerType ===
+                          ServiceOrderArticleOwnerType.USER &&
+                        watchedItem.ownerName?.trim()
+                          ? `${t('Added by')} ${watchedItem.ownerName}`
+                          : watchedItem?.ownerType ===
+                              ServiceOrderArticleOwnerType.CONTRACT &&
+                            watchedItem?.ownerName?.trim()
+                          ? `${t('Added by contract')} ${
+                              watchedItem?.ownerName
+                            }`
+                          : `${t('Added by Automation')}`
+                      }
+                      arrow
+                      placement="top">
+                      {watchedItem?.ownerType ===
+                      ServiceOrderArticleOwnerType.USER ? (
+                        <PersonOutlinedIcon />
+                      ) : watchedItem?.ownerType ===
+                        ServiceOrderArticleOwnerType.CONTRACT ? (
+                        <TextSnippetOutlinedIcon />
+                      ) : (
+                        <HdrAutoOutlinedIcon />
+                      )}
+                    </Tooltip>
+                  ) : null}
+                </IconButton>
               )}
-            </IconButton>
+
+              <IconButton
+                onClick={
+                  !disableInlineEditing
+                    ? (e) => {
+                        e.stopPropagation();
+                        onDescriptionClick(item.description || '', index);
+                      }
+                    : undefined
+                }
+                sx={{
+                  color: removeHtmlTags(watchedItem.description || '')
+                    ? '#000034'
+                    : '#828DA3',
+                }}>
+                {removeHtmlTags(watchedItem.description || '') !== '' ? (
+                  <Tooltip
+                    title={
+                      <div>
+                        <Typography
+                          sx={sanitizedTextStyles}
+                          dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(
+                              watchedItem.description || '',
+                            ),
+                          }}
+                        />
+                      </div>
+                    }
+                    arrow
+                    placement="top">
+                    <NoteAlt fontSize="small" />
+                  </Tooltip>
+                ) : (
+                  <NoteAltOutlined fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
           </Box>
         )}
       </TableCell>

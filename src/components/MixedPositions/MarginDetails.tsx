@@ -205,11 +205,12 @@ const MarginDetails = ({
             </Typography>
           </Box>
 
-          {vats?.map((vat) => (
+          {vats?.map((vat, index) => (
             <Box
               display="flex"
               justifyContent="space-between"
-              alignItems="center">
+              alignItems="center"
+              key={`${vat.vat} - ${vat.percentageVat} - ${index}`}>
               <Typography
                 variant="subtitle2"
                 fontWeight={600}

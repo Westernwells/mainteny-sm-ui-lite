@@ -122,8 +122,6 @@ const InvoicePositionTable = ({
     name: 'description',
   });
 
-  const prevSeqNumbersRef = useRef<Record<number, string>>({});
-
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
   const [showLeftShadow, setShowLeftShadow] = useState(false);
@@ -261,9 +259,6 @@ const InvoicePositionTable = ({
   };
 
   const handleAddNewPosition = () => {
-    const newIndex = watchedItems.length;
-    const defaultSeqNumber = (newIndex + 1).toString();
-
     const defaultProps = {
       netAmount: 0,
       currency: currentCurrency.code,
@@ -274,7 +269,6 @@ const InvoicePositionTable = ({
 
     const newItem: EditableInvoiceItem = {
       id: getUniqueId(),
-      userSeqNumber: defaultSeqNumber,
       name: '',
       quantity: 1,
       unitAmount: defaultProps,
@@ -348,18 +342,6 @@ const InvoicePositionTable = ({
       subIndex: newSubIndex,
       field: `items.${parentIndex}.subItems.${newSubIndex}.name`,
       values: newSub,
-    });
-  };
-
-  const bumpSequenceNumbers = () => {
-    watchedItems?.forEach((_, i) => {
-      setValue(`items.${i}.userSeqNumber`, (i + 1).toString() as any);
-      watchedItems[i]?.subItems?.forEach((__, j) => {
-        setValue(
-          `items.${i}.subItems.${j}.userSeqNumber`,
-          `${i + 1}.${j + 1}` as any,
-        );
-      });
     });
   };
 
@@ -457,7 +439,6 @@ const InvoicePositionTable = ({
             const dragData = args.source.data as DragData;
             if (dragData?.type === 'main') {
               move(dragData.index, index);
-              bumpSequenceNumbers();
             }
             removeDropIndicator(mainRow);
           },
@@ -524,28 +505,6 @@ const InvoicePositionTable = ({
 
     return () => cleanup.forEach((fn) => fn());
   }, [fields, expandedRows, watchedItems]);
-
-  useEffect(() => {
-    watchedItems?.forEach(
-      (mainItem: EditableInvoiceItem, mainIndex: number) => {
-        const prevSeq = prevSeqNumbersRef.current[mainIndex];
-
-        if (prevSeq && prevSeq !== mainItem.userSeqNumber) {
-          mainItem.subItems?.forEach((subItem, subIndex) => {
-            const defaultOldSubSeq = `${prevSeq}.${subIndex + 1}`;
-            if (subItem.userSeqNumber === defaultOldSubSeq) {
-              const newSubSeq = `${mainItem.userSeqNumber}.${subIndex + 1}`;
-              setValue(
-                `items.${mainIndex}.subItems.${subIndex}.userSeqNumber`,
-                newSubSeq,
-              );
-            }
-          });
-        }
-        prevSeqNumbersRef.current[mainIndex] = mainItem.userSeqNumber ?? '';
-      },
-    );
-  }, [watchedItems, setValue]);
 
   useEffect(() => {
     if (!resumeCheckDone) return;

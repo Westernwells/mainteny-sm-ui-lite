@@ -115,7 +115,7 @@ export const getIconByType = (type: ArticleType) => {
     case ArticleType.MIX:
       return <FolderOpenOutlinedIcon fontSize="medium" />;
     case ArticleType.PACKAGE:
-      return <PackageIcon fontSize="1.5rem" color="#828DA3" />;
+      return <PackageIcon fontSize="1.3rem" color="#828DA3" />;
     default:
       return <DashboardOutlinedIcon fontSize="medium" />;
   }

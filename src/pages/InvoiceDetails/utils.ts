@@ -42,7 +42,7 @@ export const formatInvoiceRecord = (
   dueDate: value.dueDate ? dateToString(value.dueDate) : '',
   sentDate: value.sentDate ? dateToString(value.sentDate) : '',
   type: value.type,
-  items: value.items.map((item, index) => {
+  items: value.items.map((item) => {
     const {
       article,
       unitAmount,
@@ -123,7 +123,7 @@ export const formatInvoiceRecord = (
       ...rest,
       id: undefined,
       margin: undefined,
-      userSeqNumber: rest.userSeqNumber ?? `${index + 1}`,
+      userSeqNumber: rest.userSeqNumber ?? undefined,
       article: formattedArticle,
       unitAmount: formattedUnitAmount,
       unitPurchaseAmount: {
@@ -170,7 +170,7 @@ export const formatInvoiceRecord = (
             unitAmount: formattedSubUnitAmount,
             unitPurchaseAmount: formattedSubPurchaseAmount,
             description: sub.description,
-            userSeqNumber: sub.userSeqNumber,
+            userSeqNumber: sub.userSeqNumber || undefined,
             article: sub.article
               ? {
                   ...(sub.article.id && sub.article.id.length > 8

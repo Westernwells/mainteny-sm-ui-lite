@@ -823,6 +823,8 @@ export interface ServiceOrderSubItemRecord {
   quantity: number;
   description?: string;
   userSeqNumber?: string;
+  ownerType?: ServiceOrderArticleOwnerType;
+  ownerName?: string;
 }
 
 export type EditableServiceOrderSubArticleRecord = ServiceOrderSubItemRecord & {
