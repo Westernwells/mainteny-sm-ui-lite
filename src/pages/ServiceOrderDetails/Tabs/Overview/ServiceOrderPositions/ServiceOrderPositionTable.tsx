@@ -115,8 +115,6 @@ const ServiceOrderPositionTable = ({
     name: 'description',
   });
 
-  const prevSeqNumbersRef = useRef<Record<number, string>>({});
-
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
   const [showLeftShadow, setShowLeftShadow] = useState(false);
@@ -266,9 +264,6 @@ const ServiceOrderPositionTable = ({
   };
 
   const handleAddNewPosition = () => {
-    const newIndex = fields.length;
-    const defaultSeqNumber = (newIndex + 1).toString();
-
     const defaultProps = {
       netAmount: 0,
       currency: currentCurrency.code,
@@ -279,7 +274,6 @@ const ServiceOrderPositionTable = ({
 
     const newItem: EditableServiceOrderItem = {
       id: getUniqueId(),
-      userSeqNumber: defaultSeqNumber,
       name: '',
       quantity: 1,
       unitAmount: defaultProps,
@@ -302,11 +296,6 @@ const ServiceOrderPositionTable = ({
     };
 
     append(newItem);
-    setEditableMixedRow({
-      index: newIndex,
-      field: `items.${newIndex}.name`,
-      values: newItem,
-    });
   };
 
   const handleAddSubPosition = (parentIndex: number) => {
@@ -393,23 +382,16 @@ const ServiceOrderPositionTable = ({
     };
   }, [serviceOrderAmountDetail, currentCurrency]);
 
-  const bumpSequenceNumbers = () => {
-    watchedItems?.forEach((_, i) => {
-      setValue(`items.${i}.userSeqNumber`, (i + 1).toString() as any);
-      watchedItems[i]?.subItems?.forEach((__, j) => {
-        setValue(
-          `items.${i}.subItems.${j}.userSeqNumber`,
-          `${i + 1}.${j + 1}` as any,
-        );
-      });
-    });
-  };
-
   useEffect(() => {
+    if (disableInlineEditing) return;
+
+    const root = containerRef.current;
+    if (!root) return;
+
     const cleanup: Array<() => void> = [];
 
     fields.forEach((item, index) => {
-      const mainRow = document.querySelector(
+      const mainRow = root.querySelector(
         `[data-testid="main-row-${index}"]`,
       ) as HTMLElement;
       if (!mainRow) return;
@@ -449,7 +431,6 @@ const ServiceOrderPositionTable = ({
             const dragData = args.source.data as DragData;
             if (dragData?.type === 'main') {
               move(dragData.index, index);
-              bumpSequenceNumbers();
             }
           },
         }),
@@ -457,7 +438,7 @@ const ServiceOrderPositionTable = ({
 
       if (expandedRows.includes(index) && item.subItems?.length) {
         item.subItems.forEach((subItem, subIndex) => {
-          const subRow = document.querySelector(
+          const subRow = root.querySelector(
             `[data-testid="sub-row-${index}-${subIndex}"]`,
           ) as HTMLElement;
           if (!subRow) return;
@@ -521,29 +502,7 @@ const ServiceOrderPositionTable = ({
     });
 
     return () => cleanup.forEach((fn) => fn());
-  }, [fields, expandedRows, watchedItems]);
-
-  useEffect(() => {
-    watchedItems?.forEach(
-      (mainItem: EditableServiceOrderItem, mainIndex: number) => {
-        const prevSeq = prevSeqNumbersRef.current[mainIndex];
-
-        if (prevSeq && prevSeq !== mainItem.userSeqNumber) {
-          mainItem.subItems?.forEach((subItem, subIndex) => {
-            const defaultOldSubSeq = `${prevSeq}.${subIndex + 1}`;
-            if (subItem.userSeqNumber === defaultOldSubSeq) {
-              const newSubSeq = `${mainItem.userSeqNumber}.${subIndex + 1}`;
-              setValue(
-                `items.${mainIndex}.subItems.${subIndex}.userSeqNumber`,
-                newSubSeq,
-              );
-            }
-          });
-        }
-        prevSeqNumbersRef.current[mainIndex] = mainItem.userSeqNumber ?? '';
-      },
-    );
-  }, [watchedItems, setValue]);
+  }, [fields, expandedRows, watchedItems, disableInlineEditing, autoOpenAdd]);
 
   useEffect(() => {
     if (autoOpenAdd) {

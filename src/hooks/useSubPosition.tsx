@@ -68,7 +68,7 @@ import NewArticleTypeCard from 'components/NewArticleTypeCard';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import DOMPurify from 'dompurify';
-import {ArticleType, ArticleView} from 'models/article';
+import {ArticleType, ArticleView, CostPackage} from 'models/article';
 import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
 import {sanitizedTextStyles} from 'pages/Articles/Tabs/MixedPositions/MixedPosition.styles';
 import {NumericFormat} from 'react-number-format';
@@ -499,6 +499,7 @@ const useSubPosition = <
   const handleArticleSelection = (selectedArticle: ArticleView | string) => {
     const isFreeText = typeof selectedArticle === 'string';
     const name = isFreeText ? selectedArticle : selectedArticle.name;
+    const articleType = isFreeText ? null : selectedArticle.type;
 
     setValue(
       `${pathBase}.name` as Path<TForm>,
@@ -511,6 +512,14 @@ const useSubPosition = <
         name as PathValue<TForm, Path<TForm>>,
       );
     } else {
+      const defaultCostPackage: CostPackage | undefined =
+        articleType === ArticleType.PACKAGE
+          ? selectedArticle?.additionalInfo?.costPackage ?? {
+              laborPercentage: 50,
+              materialPercentage: 50,
+            }
+          : undefined;
+
       // Override the VAT fields so that the new sub position inherits the main position's VAT
 
       const selectedUnitAmount = selectedArticle.unitSellingAmount;
@@ -525,7 +534,7 @@ const useSubPosition = <
         `${pathBase}.article` as Path<TForm>,
         {
           ...selectedArticle,
-          costPackage: selectedArticle.additionalInfo?.costPackage,
+          costPackage: defaultCostPackage,
         } as PathValue<TForm, Path<TForm>>,
       );
       setValue(
@@ -573,10 +582,19 @@ const useSubPosition = <
     () => (
       <TableCell
         noPadding
-        sx={{width: '2px', cursor: 'grab', borderLeft: 'none'}}
+        sx={{
+          width: '2px',
+          cursor: !disableInlineEditing ? 'grab' : 'inherit',
+          borderLeft: 'none',
+        }}
         onMouseEnter={() => setHoveredSubRowIndex(subIndex)}
         onMouseLeave={() => setHoveredSubRowIndex(null)}>
-        <DragHandle isVisible={hoveredSubRowIndex === subIndex} />
+        {!disableInlineEditing && (
+          <DragHandle
+            isVisible={hoveredSubRowIndex === subIndex}
+            disableInlineEditing={disableInlineEditing}
+          />
+        )}
       </TableCell>
     ),
     [hoveredSubRowIndex, setHoveredSubRowIndex, subIndex],
@@ -612,6 +630,13 @@ const useSubPosition = <
                 })),
               onBlur: () => {
                 setEditableSubRow(null);
+                setValue(
+                  `${pathBase}.userSeqNumber` as Path<TForm>,
+                  editableSubRow.values?.userSeqNumber as PathValue<
+                    TForm,
+                    Path<TForm>
+                  >,
+                );
               },
               onKeyDown: (e) => {
                 if (e.key === 'Tab' && !e.shiftKey) {

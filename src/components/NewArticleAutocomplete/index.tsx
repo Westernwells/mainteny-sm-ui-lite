@@ -27,7 +27,7 @@ import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
-import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
+import {ReactComponent as PackageIcon} from 'assets/icons/PackageLightIcon.svg';
 import {NoteAltOutlined} from '@mui/icons-material';
 import NoteAlt from '@mui/icons-material/NoteAlt';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -74,7 +74,7 @@ export const getIconByType = (type: ArticleType) => {
         <FolderOpenOutlinedIcon fontSize="small" sx={{color: '#828DA3'}} />
       );
     case ArticleType.PACKAGE:
-      return <PackageIcon fontSize="1.5rem" color="#828DA3" />;
+      return <PackageIcon fontSize="1.1rem" color="#828DA3" />;
     default:
       return <DashboardOutlinedIcon fontSize="small" sx={{color: '#828DA3'}} />;
   }

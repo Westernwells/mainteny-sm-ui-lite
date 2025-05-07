@@ -76,7 +76,12 @@ const SubPositionFooter = <TForm extends FieldValues>({
             justifyContent: 'space-between',
           }}>
           <Box
-            sx={{marginRight: '1.5em', display: 'flex', alignItems: 'center'}}>
+            sx={{
+              marginRight: '1.5em',
+              display: 'flex',
+              alignItems: 'center',
+              cursor: disableInlineEditing ? 'not-allowed' : 'auto',
+            }}>
             <Typography
               variant="body2"
               sx={{
@@ -86,7 +91,7 @@ const SubPositionFooter = <TForm extends FieldValues>({
               {t('Sub-positions')}
             </Typography>
             <Tooltip title={t('Sub-positions')} placement="top">
-              <IconButton sx={{display: {xs: 'inline-flex', lg: 'none'}}}>
+              <IconButton sx={{display: {xs: 'inline-flex', xl: 'none'}}}>
                 <SubdirectoryArrowRightOutlinedIcon
                   sx={{color: isSubPositionVisible ? '#000034' : 'inherit'}}
                 />
@@ -115,11 +120,27 @@ const SubPositionFooter = <TForm extends FieldValues>({
                         }
                       : undefined
                   }
+                  sx={{
+                    cursor: disableInlineEditing ? 'not-allowed' : undefined,
+                    pointerEvents: disableInlineEditing ? 'none' : 'auto',
+                    // and make sure the inner track & thumb also show the same
+                    '& .MuiSwitch-switchBase, & .MuiSwitch-track, & .MuiSwitch-thumb':
+                      {
+                        cursor: disableInlineEditing
+                          ? 'not-allowed'
+                          : undefined,
+                      },
+                  }}
                 />
               )}
             />
           </Box>
-          <Box sx={{display: 'flex', alignItems: 'center'}}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: disableInlineEditing ? 'not-allowed' : 'auto',
+            }}>
             <Typography
               variant="body2"
               sx={{
@@ -129,7 +150,7 @@ const SubPositionFooter = <TForm extends FieldValues>({
               {t('Prices')}
             </Typography>
             <Tooltip title={t('Prices')} placement="top">
-              <IconButton sx={{display: {xs: 'inline-flex', lg: 'none'}}}>
+              <IconButton sx={{display: {xs: 'inline-flex', xl: 'none'}}}>
                 <MonetizationOnOutlinedIcon
                   sx={{color: isPriceVisible ? '#000034' : 'inherit'}}
                 />
@@ -148,6 +169,17 @@ const SubPositionFooter = <TForm extends FieldValues>({
                       ? (e) => field.onChange(e.target.checked)
                       : undefined
                   }
+                  sx={{
+                    cursor: disableInlineEditing ? 'not-allowed' : undefined,
+                    pointerEvents: disableInlineEditing ? 'none' : 'auto',
+                    // and make sure the inner track & thumb also show the same
+                    '& .MuiSwitch-switchBase, & .MuiSwitch-track, & .MuiSwitch-thumb':
+                      {
+                        cursor: disableInlineEditing
+                          ? 'not-allowed'
+                          : undefined,
+                      },
+                  }}
                 />
               )}
             />

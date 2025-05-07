@@ -270,7 +270,7 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
   );
 
   useEffect(() => {
-    if (watchedItems.length === 0) {
+    if (watchedItems.length === 0 && openMode) {
       handleAddPositionClick();
     }
   }, [watchedItems.length]);

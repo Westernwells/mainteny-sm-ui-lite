@@ -583,27 +583,31 @@ export const serviceOrderItemToServiceOrderItemRecord = (
     quantity: serviceOrderItem.quantity,
     unitAmount: serviceOrderItem.unitAmount,
     unitPurchaseAmount: serviceOrderItem.unitPurchaseAmount,
-    discount: serviceOrderItem.additionalInfo?.discount
+    discount: serviceOrderItem?.additionalInfo?.discount
       ? {
           ...serviceOrderItem.additionalInfo.discount,
           type:
-            !serviceOrderItem.additionalInfo.discount.type ||
-            serviceOrderItem.additionalInfo.discount.type === DiscountType.NONE
-              ? DiscountType.PERCENTAGE
-              : serviceOrderItem.additionalInfo.discount.type,
-          amount: serviceOrderItem.additionalInfo.discount.amount
-            ? {
-                ...serviceOrderItem.additionalInfo.discount.amount,
-                value:
-                  (serviceOrderItem.additionalInfo.discount.amount.value ?? 0) /
-                  10 **
-                    (serviceOrderItem.additionalInfo.discount.amount
-                      .fractionDigits ?? 2),
-              }
-            : undefined,
+            serviceOrderItem.additionalInfo?.discount?.type ||
+            DiscountType.NONE,
+          amount:
+            serviceOrderItem.additionalInfo?.discount?.amount &&
+            serviceOrderItem.additionalInfo?.discount?.type ===
+              DiscountType.AMOUNT
+              ? {
+                  ...serviceOrderItem.additionalInfo.discount.amount,
+                  value:
+                    (serviceOrderItem.additionalInfo.discount.amount.value ??
+                      0) /
+                    10 **
+                      (serviceOrderItem.additionalInfo.discount.amount
+                        .fractionDigits ?? 2),
+                }
+              : undefined,
         }
       : undefined,
-    userSeqNumber: serviceOrderItem?.additionalInfo?.userSeqNumber,
+    userSeqNumber: serviceOrderItem?.additionalInfo?.userSeqNumber || undefined,
+    ownerName: serviceOrderItem.additionalInfo?.owner?.name || '',
+    ownerType: serviceOrderItem.ownerType!,
   };
 
   // If the article's type is PACKAGE, add a default costPackage if it doesn't exist.
@@ -633,7 +637,7 @@ export const serviceOrderItemToServiceOrderItemRecord = (
         quantity: subItem.quantity,
         unitAmount: subItem.unitAmount,
         unitPurchaseAmount: subItem.unitPurchaseAmount,
-        userSeqNumber: subItem.userSeqNumber,
+        userSeqNumber: subItem.userSeqNumber || undefined,
         serviceOrderId: serviceOrderItem.id,
       })),
       subItemsConfig: {
@@ -709,9 +713,9 @@ export const buildServiceOrderPayload = (
       unitAmount: sub.unitAmount,
       quantity: sub.quantity,
       description: sub.description,
-      userSeqNumber: sub.userSeqNumber,
+      userSeqNumber: sub.userSeqNumber || undefined,
     })),
-    userSeqNumber: item.userSeqNumber,
+    userSeqNumber: item.userSeqNumber || undefined,
   })),
   globalDiscount:
     discount?.type === DiscountType.AMOUNT
@@ -737,7 +741,7 @@ export function formatServiceOrderArticles(
   items: EditableServiceOrderItem[],
   currentCurrency: Currency,
 ): ServiceOrderArticleRecord[] {
-  return items.map((item, idx) => {
+  return items.map((item) => {
     const makeAmount = (amt?: AmountRecord) => ({
       netAmount: amt?.netAmount ?? 0,
       percentageVat: amt?.percentageVat ?? 0,
@@ -798,7 +802,7 @@ export function formatServiceOrderArticles(
       unitAmount: makeAmount(item.unitAmount),
       discount: formattedDiscount,
       subArticlesConfig: item.subItemsConfig,
-      userSeqNumber: item.userSeqNumber ?? `${idx + 1}`,
+      userSeqNumber: item.userSeqNumber ?? undefined,
     };
 
     // if there are sub‑items, format those too
@@ -825,7 +829,7 @@ export function formatServiceOrderArticles(
             unitPurchaseAmount:
               sub.unitPurchaseAmount && makeAmount(sub.unitPurchaseAmount),
             unitAmount: makeAmount(sub.unitAmount),
-            userSeqNumber: sub.userSeqNumber,
+            userSeqNumber: sub.userSeqNumber || undefined,
           } as ServiceOrderSubArticleRecord),
       );
     }

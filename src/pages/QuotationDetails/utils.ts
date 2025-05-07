@@ -51,7 +51,7 @@ export const formatQuotationItems = (
             ? parseFloat(subItem?.quantity)
             : subItem?.quantity ?? 0,
         description: subItem?.description || '',
-        userSeqNumber: subItem.userSeqNumber || '',
+        userSeqNumber: subItem.userSeqNumber || undefined,
       })) || [];
 
     const subItemsConfig = {
@@ -91,7 +91,7 @@ export const formatQuotationItems = (
       unitAmount: rest.unitAmount || undefined,
       quantity: rest.quantity || 0,
       description: rest.description || '',
-      userSeqNumber: rest.userSeqNumber || '',
+      userSeqNumber: rest.userSeqNumber || undefined,
       subItems,
       subItemsConfig,
       discount: rest.discount
@@ -148,7 +148,7 @@ export const formatQuotationRecord = (
   description: value?.description || '',
   sentDate: value.sentDate ? dateToString(value.sentDate) : '',
   expiryDate: value.expiryDate ? dateToString(value.expiryDate) : '',
-  items: value.items.map((item, index) => {
+  items: value.items.map((item) => {
     const {
       article,
       unitAmount,
@@ -225,7 +225,7 @@ export const formatQuotationRecord = (
     const baseItem = {
       ...rest,
       id: undefined,
-      userSeqNumber: rest.userSeqNumber ?? `${index + 1}`,
+      userSeqNumber: rest.userSeqNumber ?? undefined,
       article: formattedArticle,
       unitAmount: formattedUnitAmount,
       unitPurchaseAmount: {
@@ -267,7 +267,7 @@ export const formatQuotationRecord = (
             unitAmount: formattedSubUnitAmount,
             unitPurchaseAmount: formattedSubPurchaseAmount,
             description: sub.description,
-            userSeqNumber: sub.userSeqNumber,
+            userSeqNumber: sub.userSeqNumber || undefined,
             article: sub.article
               ? {
                   ...(sub.article.id && sub.article.id.length > 8
@@ -460,21 +460,20 @@ export const getDiscoutObj = (discount?: Discount, isGlobalDiscount = false) =>
           // but global discount can be either percentage or amount or none
           // so we should not set type manually to percentage if we are creating discount object for global discount
           type:
-            discount?.type === DiscountType.NONE ||
             discount.type === DiscountType.PERCENTAGE
               ? DiscountType.PERCENTAGE
-              : discount?.type,
+              : discount?.type || DiscountType.NONE,
         }),
-        amount: discount?.amount
-          ? {
-              ...discount?.amount,
-              value:
-                (discount?.amount?.value ?? 0) /
-                10 ** (discount.amount.fractionDigits ?? 2),
-            }
-          : undefined,
+        amount:
+          discount?.amount && discount?.type === DiscountType.AMOUNT
+            ? {
+                ...discount?.amount,
+                value:
+                  (discount?.amount?.value ?? 0) /
+                  10 ** (discount.amount.fractionDigits ?? 2),
+              }
+            : undefined,
         percentage:
-          discount?.type === DiscountType.NONE ||
           discount.type === DiscountType.PERCENTAGE
             ? discount?.percentage || 0
             : undefined,
