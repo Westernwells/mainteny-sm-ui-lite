@@ -39,7 +39,7 @@ interface Props {
   refType: ContactPersonAssociationType;
 }
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 500;
 
 const ContactsWidget = ({refId, refType}: Props) => {
   const {t} = useTranslation();
