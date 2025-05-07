@@ -43,6 +43,20 @@ export const Thumb = ({
   onDeleteFile,
 }: Props) => {
   const theme = useTheme();
+
+  const isSupportedImage = (type: string) => {
+    const supportedTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/gif',
+      'image/webp',
+      'image/svg+xml',
+      'image/bmp',
+    ];
+    return supportedTypes.includes(type.toLowerCase());
+  };
+
   return (
     <Box
       sx={{
@@ -51,8 +65,16 @@ export const Thumb = ({
         justifyContent: 'space-between',
       }}>
       <Grid container wrap="nowrap">
-        {file.type.split('/')[0] === 'image' ? (
-          <img alt="" width={36} height={46} src={file.preview} />
+        {isSupportedImage(file.type) ? (
+          <img
+            alt=""
+            width={36}
+            height={46}
+            src={file.preview}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
         ) : (
           <FileCopyIcon
             sx={{fontSize: '3rem', color: theme.palette.text.secondary}}
