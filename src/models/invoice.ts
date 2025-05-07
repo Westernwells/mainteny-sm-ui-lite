@@ -267,15 +267,15 @@ export interface InvoicePaymentView {
 }
 
 export interface QueryInvoiceParams {
-  pageIndex: number;
-  pageSize: number;
+  pageIndex?: number;
+  pageSize?: number;
   order?: Order;
   orderByField?: InvoiceOrderField;
   query?: string;
   contractId?: string[];
   sentDateFrom?: string;
   sentDateTo?: string;
-  status: InvoiceStatus[];
+  status?: InvoiceStatus[];
   propertyOwnerId?: string[];
   totalAmountFrom?: number;
   totalAmountTo?: number;
@@ -704,6 +704,14 @@ export type SearchParameters = {
 
 export type InvoiceStatistics = {
   numOfInvoicesPerStatus: Record<string, number>;
+  amountsPerStatus: Record<
+    string,
+    {
+      value: number;
+      currency: string;
+      fractionDigits: number;
+    }[]
+  >;
 };
 
 export type QueryCancelInvoiceParams = {
