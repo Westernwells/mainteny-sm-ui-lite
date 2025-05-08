@@ -401,7 +401,7 @@
   "e.g. Flat cable used for door engines from the following suppliers.....": "na primjer. Ravni kabal koji se koristi za motore vrata od sljedećih dobavljača…",
   "Too many files": "Previše datoteka",
   "File is larger than 5mb": "Datoteka je veća od 5MB",
-  "e.g. Flat cable, 16G0.75+2x(2x0.5)": "na primjer. Ravni kabel, 16G0.75+2x(2x0.5)",
+  "e.g. Flat cable, 16G0.75+2x(2x0.5)": "npr. ravni kabl, 16G0.75+2x(2x0.5)",
   "e.g. Cable": "Kabel",
   "e.g. 16G0.75+2x(2x0.5)": "na primjer. 16G0.75+2x(2x0.5)",
   "e.g. Rack 20, Box 4": "na primjer. Stalak 20, Kutija 4",
@@ -3208,5 +3208,11 @@
   "Pending value": "Vrednost na čekanju",
   "Total amount of pending invoices from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan iznos faktura na čekanju od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
   "Edit Mixed Position": "Uredi mešovitu poziciju",
-  "Margin calculates the buying price against the unit price. Discount is currently not factored into the margin.": "Marža izračunava kupovnu cenu u odnosu na jediničnu cenu. Popust se trenutno ne uračunava u maržu."
+  "Margin calculates the buying price against the unit price. Discount is currently not factored into the margin.": "Marža izračunava kupovnu cenu u odnosu na jediničnu cenu. Popust se trenutno ne uračunava u maržu.",
+  "Create a new contract to automate services and streamline job creation.": "Napravite novi ugovor za automatizaciju usluga i pojednostavljenje kreiranja poslova.",
+  "No working technicians.": "Nema radnih tehničara.",
+  "e.g. 50%": "npr. 50%",
+  "e.g johndoe@example.com": "npr. johndoe@example.com",
+  "e.g. 200": "npr. 200",
+  "e.g 1234": "npr. 1234"
 }
