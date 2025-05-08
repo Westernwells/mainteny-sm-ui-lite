@@ -3187,5 +3187,9 @@
   "e.g. 50%": "z.B. 50%",
   "e.g johndoe@example.com": "z. B. johndoe@example.com",
   "e.g. 200": "z.B. 200",
-  "e.g 1234": "z.B. 1234"
+  "e.g 1234": "z.B. 1234",
+  "e.g. 50": "z.B. 50",
+  "e.g. 100": "z.B. 100",
+  "e.g. Cable xyz": "zB Kabel xyz",
+  "e.g. www.yourcompany.com": "z.B. www.IhreFirma.com"
 }
