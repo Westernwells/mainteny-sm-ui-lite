@@ -3199,5 +3199,8 @@
   "e.g. John": "z.B. John",
   "e.g. Karl-Liebknecht-Str. 32, 10178 Berlin": "z.B. Karl-Liebknecht-Str. 32, 10178 Berlin",
   "e.g. 13ofOhy65": "z.B. 13ofOhy65",
-  "e.g. 000 000 000": "z.B. 000 000 000"
+  "e.g. 000 000 000": "z.B. 000 000 000",
+  "e.g. Mainteny GmbH": "z.B. Mainteny GmbH",
+  "e.g. +34 12345678": "z.B. +34 12345678",
+  "e.g. mainteny.com": "z.B. www.mainteny.com"
 }
