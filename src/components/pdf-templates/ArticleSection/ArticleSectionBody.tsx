@@ -11,6 +11,7 @@ import {
   EditableServiceOrderItem,
   ServiceOrderAmountDetail,
 } from 'models/service-order';
+import {stripHtmlTags} from 'utils/text-block';
 import {getStyles} from './ArticleSection.styles';
 
 type ArticleSectionBodyProps = {
@@ -61,7 +62,9 @@ export const ArticleSectionBody = ({
               </View>
 
               <View style={styles.col40Left}>
-                <Text orphans={1}>{mainPosition.name || '-'}</Text>
+                <Text orphans={1}>
+                  {stripHtmlTags(mainPosition.name || '-')}
+                </Text>
               </View>
 
               <View style={styles.col10Right}>
@@ -144,7 +147,9 @@ export const ArticleSectionBody = ({
 
                       <View style={styles.col40Left}>
                         <Text>
-                          {subItem.name || subItem.article?.name || '-'}
+                          {stripHtmlTags(
+                            subItem.name || subItem.article?.name || '-',
+                          )}
                         </Text>
                       </View>
 
