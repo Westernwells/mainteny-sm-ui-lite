@@ -17,6 +17,7 @@ import {
   AmountRecord,
   EmailRecord,
   Meta,
+  Money,
   MultiVatsAmount,
   PdfGenerationStatus,
 } from './misc';
@@ -253,10 +254,10 @@ export interface QuotationView {
 }
 
 export interface QueryQuotationParams {
-  pageIndex: number;
-  pageSize: number;
+  pageIndex?: number;
+  pageSize?: number;
   query?: string;
-  status: QuotationStatus[];
+  status?: QuotationStatus[];
   createdDateStart?: Date;
   createdDateEnd?: Date;
   totalNetAmountFrom?: string;
@@ -375,6 +376,7 @@ export type SearchParameters = {
 
 export type QuotationStatistics = {
   numOfQuotationsPerStatus: Record<string, number>;
+  amountsPerStatus: Record<string, Money[]>;
 };
 
 export const STATUS_COLOR = {
