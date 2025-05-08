@@ -178,6 +178,7 @@ export const BillingAddress = ({formik}: Props) => {
                 label: 'Additional Information',
                 name: 'billingAddress.component.moreInfo',
                 value: formik.values.billingAddress?.component?.moreInfo ?? '',
+                ...defaultProps,
               }}
             />
           </Box>
