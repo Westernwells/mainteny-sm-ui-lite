@@ -1,4 +1,4 @@
-import {FC, useEffect, useState} from 'react';
+import {FC, useContext, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@mui/material/Grid';
@@ -14,11 +14,16 @@ import {
 } from 'models/service-company';
 import {FormikProps} from 'formik';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {getCurrencySymbol} from 'utils/currency';
+import {
+  getCurrencySymbol,
+  getDecimalSeparator,
+  getThousandsSeparator,
+  useCurrentCurrency,
+} from 'utils/currency';
 import {DatePicker} from 'components/DatePicker';
 import {format} from 'date-fns';
 import {toDate} from 'utils/datetime';
-import {Box, IconButton, Typography} from '@mui/material';
+import {Box, IconButton, TextField, Typography} from '@mui/material';
 import {Switch} from 'components/Switch';
 import Alert from '@mui/material/Alert';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -37,6 +42,8 @@ import {createEmptyResource} from 'utils/paging';
 import RichTextField from 'components/RichTextField';
 import {convertToText} from 'utils/utils';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import {NumericFormat} from 'react-number-format';
+import {LanguageContext} from 'context/LanguageProvider';
 
 interface Props {
   formik: FormikProps<ContractUpdateRequest>;
@@ -46,7 +53,10 @@ interface Props {
 
 const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const {user} = useUserSession();
+  const {language: selectedLng} = useContext(LanguageContext);
+
   const formatDate = useFormatDate();
   const [openNewDialog, setOpenNewDialog] = useState<boolean>(false);
 
@@ -337,34 +347,6 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
         />
       </Grid>
 
-      <Grid item md={3} mt={-1.4}>
-        <RichTextField
-          data-testid="payment-terms-rich-text-field"
-          name="paymentTerms"
-          label="Payment terms"
-          html={paymentTermDetails || ''}
-          updateHtml={() => {
-            formik.setFieldValue('paymentTermId', selectedTerm?.id);
-          }}
-          minRows={2}
-          onBlur={formik.handleBlur}
-          endAdornment={
-            <InputAdornment
-              component={IconButton}
-              disableRipple
-              position="end"
-              sx={{
-                mr: -1,
-                alignSelf: 'flex-start',
-              }}
-              onClick={() => setOpenContractPaymentTermsDialog(true)}
-              size="small">
-              <TextSnippetIcon />
-            </InputAdornment>
-          }
-        />
-      </Grid>
-
       <Grid item md={3}>
         <FormInput
           labelTooltip="Enter a purchase order number here to include it on invoices from this contract. This will override any purchase order number saved at the customer level."
@@ -397,6 +379,89 @@ const EditContractForm: FC<Props> = ({formik, currency, initialValues}) => {
           }}
         />
       </Grid>
+
+      <Grid item md={3}>
+        <NumericFormat
+          value={formik.values.spendingLimit}
+          customInput={TextField}
+          prefix={currentCurrency.symbol}
+          allowLeadingZeros={false}
+          decimalScale={2}
+          decimalSeparator={getDecimalSeparator(selectedLng)}
+          thousandSeparator={getThousandsSeparator(selectedLng)}
+          sx={{
+            width: '100%',
+            bgcolor: 'white',
+            '& .MuiInputBase-root': {
+              pr: 0,
+            },
+            '& .MuiOutlinedInput-input': {
+              textAlign: 'right',
+              background: '#FFFFFF',
+            },
+          }}
+          isAllowed={(values) => {
+            const {floatValue} = values;
+            if (!floatValue) {
+              return true;
+            }
+
+            if (floatValue < 0) {
+              return false;
+            }
+
+            const maxValue = 1000000000000;
+
+            return floatValue <= maxValue;
+          }}
+          InputProps={{
+            name: 'spendingLimit',
+            id: `spendingLimit`,
+            inputMode: 'numeric',
+            error: !!(
+              formik.touched.spendingLimit && formik.errors.spendingLimit
+            ),
+            onBlur: formik.handleBlur,
+          }}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          label={t('Spending Limit')}
+          onValueChange={(values) => {
+            formik.setFieldValue('spendingLimit', Number(values.value));
+          }}
+          size="small"
+        />
+      </Grid>
+
+      <Grid item md={3} mt={-1.4}>
+        <RichTextField
+          data-testid="payment-terms-rich-text-field"
+          name="paymentTerms"
+          label="Payment terms"
+          html={paymentTermDetails || ''}
+          updateHtml={() => {
+            formik.setFieldValue('paymentTermId', selectedTerm?.id);
+          }}
+          minRows={2}
+          onBlur={formik.handleBlur}
+          endAdornment={
+            <InputAdornment
+              component={IconButton}
+              disableRipple
+              position="end"
+              sx={{
+                mr: -1,
+                alignSelf: 'flex-start',
+              }}
+              onClick={() => setOpenContractPaymentTermsDialog(true)}
+              size="small">
+              <TextSnippetIcon />
+            </InputAdornment>
+          }
+        />
+      </Grid>
+
       <AutoGeneratedIdDialog
         openDialog={openNewDialog}
         setOpenDialog={setOpenNewDialog}

@@ -16,6 +16,7 @@ import {useFormatDate} from 'hooks/useFormatDate';
 import TagIcon from '@mui/icons-material/Tag';
 import {ContractView} from 'models/contract';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import {formatCurrency, useCurrentCurrency} from 'utils/currency';
 
 interface Props {
   name?: string;
@@ -45,6 +46,7 @@ export const ContractBasic = ({
   contractDetails,
 }: Props) => {
   const {t} = useTranslation();
+  const currentCurrency = useCurrentCurrency();
   const theme = useTheme();
   const formatDate = useFormatDate();
 
@@ -229,7 +231,7 @@ export const ContractBasic = ({
           icon={<TagIcon sx={{fontSize: '1.5rem'}} />}
           containerStyles={{mr: '0.5em'}}
           iconMaxHeight="3rem"
-          bodyText={contractDetails.additionalInfo.purchaseOrderNumber ?? '-'}
+          bodyText={contractDetails.additionalInfo.purchaseOrderNumber || '-'}
           bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
@@ -251,6 +253,24 @@ export const ContractBasic = ({
               ? t('{{hours}} month', {hours: noticePeriod})
               : !noticePeriod && '-'
           }
+          bodyStyle={{fontWeight: '600'}}
+          iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
+          labelStyle={{
+            textTransform: 'none',
+          }}
+        />
+      </Grid>
+
+      <Grid item xs={6} sm={4} md={3}>
+        <CardProps
+          label="Spending Limit"
+          bodyTextVariant="subtitle1"
+          icon={<AttachMoneyIcon />}
+          containerStyles={{mr: '0.5em'}}
+          iconMaxHeight="3rem"
+          bodyText={formatCurrency(contractDetails?.spendingLimit, {
+            currency: currentCurrency.code,
+          })}
           bodyStyle={{fontWeight: '600'}}
           iconContainerStyles={{'& path': {fill: theme.palette.primary.light}}}
           labelStyle={{
