@@ -433,8 +433,10 @@ export const MutationService = ({
                   <OtherIcon />
                 )}
                 <Typography variant="body1" fontSize="1.2rem" pl={2}>
-                  {getArticleTypeText(
-                    formikContractServiceComponent.values.costType!,
+                  {t(
+                    getArticleTypeText(
+                      formikContractServiceComponent.values.costType!,
+                    ),
                   )}
                 </Typography>
               </Box>
@@ -657,7 +659,7 @@ export const MutationService = ({
                                   }}
                                   InputProps={{
                                     name: 'costPackage.materialPercentage',
-                                    placeholder: t(`e.g. 20%`),
+                                    placeholder: t(`e.g. 50%`),
                                     id: `costPackage.materialPercentage`,
                                     inputMode: 'numeric',
                                     disabled: true,

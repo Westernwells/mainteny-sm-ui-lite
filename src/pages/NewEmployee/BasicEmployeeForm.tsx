@@ -211,7 +211,7 @@ export const BasicEmployeeForm = ({
                   id: 'email',
                   name: 'email',
                   label: 'Email',
-                  placeholder: 'e.g johndoe@example.com',
+                  placeholder: 'e.g. johndoe@example.com',
                   InputProps: {
                     endAdornment: (
                       <InputAdornment position="end">
@@ -267,7 +267,7 @@ export const BasicEmployeeForm = ({
                   id: 'team',
                   name: 'team',
                   label: 'Team',
-                  placeholder: 'e.g 2',
+                  placeholder: 'e.g. 2',
                   value: formik.values.team,
                   helperText: formik.touched.team && formik.errors.team,
                   error: !!formik.errors.team && formik.touched.team,

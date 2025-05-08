@@ -2395,7 +2395,7 @@ export const InvoiceForm = ({
                       label: 'Purchase order no.',
                       error: !!error,
                       helperText: error ? error.message : '',
-                      placeholder: 'e.g 000 000 000',
+                      placeholder: 'e.g. 000 000 000',
                     }}
                   />
                 )}
@@ -2414,7 +2414,7 @@ export const InvoiceForm = ({
                       label: 'Cost Center',
                       error: !!error,
                       helperText: error ? error.message : '',
-                      placeholder: 'e.g 000 000 000',
+                      placeholder: 'e.g. 000 000 000',
                     }}
                   />
                 )}
