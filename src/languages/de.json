@@ -3190,6 +3190,14 @@
   "e.g 1234": "z.B. 1234",
   "e.g. 50": "z.B. 50",
   "e.g. 100": "z.B. 100",
-  "e.g. Cable xyz": "zB Kabel xyz",
-  "e.g. www.yourcompany.com": "z.B. www.IhreFirma.com"
+  "e.g. Cable xyz": "z.B. Kabel xyz",
+  "e.g. www.yourcompany.com": "z.B. www.IhreFirma.com",
+  "e.g. +49 173 12345678": "z.B. +49 173 12345678",
+  "e.g. Berlin": "z.B. Berlin",
+  "e.g. HRB 151080 B, Charlottenburg": "z.B. HRB 151080 B, Charlottenburg",
+  "e.g. 30": "z.B. 30",
+  "e.g. John": "z.B. John",
+  "e.g. Karl-Liebknecht-Str. 32, 10178 Berlin": "z.B. Karl-Liebknecht-Str. 32, 10178 Berlin",
+  "e.g. 13ofOhy65": "z.B. 13ofOhy65",
+  "e.g. 000 000 000": "z.B. 000 000 000"
 }
