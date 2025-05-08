@@ -1084,24 +1084,36 @@ export const DraftQuotation = ({
     if (customer && pageState === 'FRESH_NEW') {
       const emptyAddressState = {fullName: null};
 
-      setValue(
-        'beneficiaryAddress',
-        hasAddressValues(unit?.additionalInfo.beneficiaryAddress?.component!)
-          ? unit?.additionalInfo.beneficiaryAddress
-          : customer.beneficiaryAddress || emptyAddressState,
-      );
+      if (
+        !watchedBeneficiaryAddress ||
+        watchedBeneficiaryAddress.fullName === null
+      ) {
+        setValue(
+          'beneficiaryAddress',
+          hasAddressValues(unit?.additionalInfo.beneficiaryAddress?.component!)
+            ? unit?.additionalInfo.beneficiaryAddress
+            : customer.beneficiaryAddress || emptyAddressState,
+        );
+      }
 
-      setValue(
-        'billingAddress',
-        hasAddressValues(unit?.additionalInfo.billingAddress?.component!)
-          ? unit?.additionalInfo.billingAddress
-          : customer.billingAddress || emptyAddressState,
-      );
+      if (!watchedBillingAddress || watchedBillingAddress.fullName === null) {
+        setValue(
+          'billingAddress',
+          hasAddressValues(unit?.additionalInfo.billingAddress?.component!)
+            ? unit?.additionalInfo.billingAddress
+            : customer.billingAddress || emptyAddressState,
+        );
+      }
 
-      setValue(
-        'alternativeAddress',
-        customer.otherAddress || emptyAddressState,
-      );
+      if (
+        !watchedAlternativeAddress ||
+        watchedAlternativeAddress.fullName === null
+      ) {
+        setValue(
+          'alternativeAddress',
+          customer.otherAddress || emptyAddressState,
+        );
+      }
 
       const customerLegalNote = customer?.additionalInfo?.vat?.legalNote;
       if (customerLegalNote) {
