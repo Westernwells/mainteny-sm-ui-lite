@@ -78,6 +78,18 @@ const DashboardMetrics = ({invoiceStatistics, filters}: Props) => {
     pastStatisticsCounts?.statusesCount.overdue,
     currentStatisticsCounts.statusesCount.overdue,
   );
+  const totalAmountInvoiceChange = calculatePercentChange(
+    pastStatisticsCounts?.statusesAmount.total,
+    currentStatisticsCounts.statusesAmount.total,
+  );
+  const paidAmountInvoiceChange = calculatePercentChange(
+    pastStatisticsCounts?.statusesAmount.paid,
+    currentStatisticsCounts.statusesAmount.paid,
+  );
+  const pendingAmountInvoiceChange = calculatePercentChange(
+    pastStatisticsCounts?.statusesAmount.pending,
+    currentStatisticsCounts.statusesAmount.pending,
+  );
 
   return (
     <Box>
@@ -125,6 +137,7 @@ const DashboardMetrics = ({invoiceStatistics, filters}: Props) => {
         <RowItem>
           <Metric
             title="Total value"
+            changeValue={totalAmountInvoiceChange}
             value={formatCurrency(
               currentStatisticsCounts.statusesAmount.total /
                 10 ** currentCurrency.fractionDigits,
@@ -150,6 +163,7 @@ const DashboardMetrics = ({invoiceStatistics, filters}: Props) => {
         <RowItem>
           <Metric
             title="Paid value"
+            changeValue={paidAmountInvoiceChange}
             value={formatCurrency(
               currentStatisticsCounts.statusesAmount.paid /
                 10 ** currentCurrency.fractionDigits,
@@ -175,6 +189,7 @@ const DashboardMetrics = ({invoiceStatistics, filters}: Props) => {
         <RowItem>
           <Metric
             title="Pending value"
+            changeValue={pendingAmountInvoiceChange}
             value={formatCurrency(
               currentStatisticsCounts.statusesAmount.pending /
                 10 ** currentCurrency.fractionDigits,
