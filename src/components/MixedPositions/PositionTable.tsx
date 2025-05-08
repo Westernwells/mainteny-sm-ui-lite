@@ -650,6 +650,7 @@ const PositionTable = ({
         onCancel={() => setDescriptionDialog(null)}
         onSave={handleSaveDescription}
         dialogProps={{
+          maxWidth: 'lg',
           open: !!descriptionDialog,
           disableEscapeKeyDown: true,
           onClose: (event, reason) => {

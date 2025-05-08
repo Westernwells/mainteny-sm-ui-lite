@@ -247,7 +247,6 @@ type Props = {
   userInfo?: UserAccount | undefined;
   serviceOrder?: ServiceOrderView;
   report?: ServiceOrderReportView;
-  selectedLng?: string;
   technicianSignatureImage?: string;
   customerSignatureImage?: string;
   workReportPictures: {
@@ -268,7 +267,6 @@ const WorkReportTemplate = React.memo(
     userInfo,
     serviceOrder,
     report,
-    selectedLng,
     translate,
     customerSignatureImage,
     technicianSignatureImage,
@@ -474,10 +472,10 @@ const WorkReportTemplate = React.memo(
               {report?.description.trim() !== '' && (
                 <HtmlPDF
                   html={report?.description || ''}
-                  selectedLng={selectedLng}
                   rootStyle={{
                     ...styles.contentBody,
                   }}
+                  fontStyles={fontStyles}
                 />
               )}
 
@@ -672,7 +670,7 @@ const WorkReportTemplate = React.memo(
                               ...styles.tableBodyContent,
                             }}
                             html={articleItem.name || '-'}
-                            selectedLng={selectedLng}
+                            fontStyles={fontStyles}
                           />
                           <Text
                             style={{

@@ -661,7 +661,15 @@ const InvoicePositionTable = ({
         onCancel={() => setDescriptionDialog(null)}
         onSave={handleSaveDescription}
         dialogProps={{
+          maxWidth: 'lg',
           open: !!descriptionDialog,
+          disableEscapeKeyDown: true,
+          onClose: (event, reason) => {
+            if (reason === 'backdropClick') {
+              return;
+            }
+            setDescriptionDialog(null);
+          },
         }}
         sx={{
           '& .MuiDialog-paper': {

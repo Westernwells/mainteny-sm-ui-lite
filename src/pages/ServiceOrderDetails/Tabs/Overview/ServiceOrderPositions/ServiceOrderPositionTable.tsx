@@ -659,6 +659,14 @@ const ServiceOrderPositionTable = ({
         onSave={handleSaveDescription}
         dialogProps={{
           open: !!descriptionDialog,
+          maxWidth: 'lg',
+          disableEscapeKeyDown: true,
+          onClose: (event, reason) => {
+            if (reason === 'backdropClick') {
+              return;
+            }
+            setDescriptionDialog(null);
+          },
         }}
         sx={{
           '& .MuiDialog-paper': {

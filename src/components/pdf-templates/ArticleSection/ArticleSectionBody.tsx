@@ -1,4 +1,4 @@
-import {View, Text} from '@react-pdf/renderer';
+import {Text, View} from '@react-pdf/renderer';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {
@@ -15,6 +15,7 @@ import {
   EditableServiceOrderItem,
   ServiceOrderAmountDetail,
 } from 'models/service-order';
+import {HTML_PDF_FONT_SIZE_DESCRIPTION} from 'models/richTextField';
 import {stripHtmlTags} from 'utils/text-block';
 import {getStyles} from './ArticleSection.styles';
 
@@ -32,7 +33,7 @@ type ArticleSectionBodyProps = {
   selectedLng?: string;
   showDiscountCol?: boolean;
   translate: (key: string) => string;
-} & Pick<ContextProps, 'primaryColor'>;
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor'>;
 
 export const ArticleSectionBody = ({
   items,
@@ -42,6 +43,7 @@ export const ArticleSectionBody = ({
   showDiscountCol,
   translate,
   primaryColor,
+  fontStyles,
 }: ArticleSectionBodyProps) => {
   const styles = getStyles({primaryColor});
 
@@ -127,7 +129,8 @@ export const ArticleSectionBody = ({
                   rootStyle={{
                     ...styles.descriptionText,
                   }}
-                  selectedLng={selectedLng}
+                  fontStyles={fontStyles}
+                  fontSize={HTML_PDF_FONT_SIZE_DESCRIPTION}
                 />
               )}
             </View>
@@ -230,7 +233,8 @@ export const ArticleSectionBody = ({
                         <HtmlPDF
                           html={subItem.description || '-'}
                           rootStyle={{...styles.descriptionText}}
-                          selectedLng={selectedLng}
+                          fontStyles={fontStyles}
+                          fontSize={HTML_PDF_FONT_SIZE_DESCRIPTION}
                         />
                       </View>
                     )}
