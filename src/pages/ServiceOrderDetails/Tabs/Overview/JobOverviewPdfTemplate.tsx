@@ -391,11 +391,11 @@ const JobOverviewPdfTemplate = React.memo(
               {serviceOrder?.description.trim() !== '' && (
                 <HtmlPDF
                   html={serviceOrder?.description || ''}
-                  selectedLng={selectedLng}
                   rootStyle={{
                     marginTop: 6,
                     marginBottom: 16,
                   }}
+                  fontStyles={fontStyles}
                 />
               )}
 
@@ -423,6 +423,7 @@ const JobOverviewPdfTemplate = React.memo(
                         translate={translate}
                         primaryColor={primaryColor}
                         showDiscountCol={showDiscountCol}
+                        fontStyles={fontStyles}
                       />
 
                       <ArticleSectionFooter

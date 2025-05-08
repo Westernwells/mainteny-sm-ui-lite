@@ -225,7 +225,7 @@ const MixedPositionPdf = ({
                         rootStyle={{
                           ...styles.descriptionText,
                         }}
-                        selectedLng={selectedLng}
+                        fontStyles={fontStyles}
                       />
                     )}
                   </View>
@@ -288,6 +288,7 @@ const MixedPositionPdf = ({
                           rootStyle={{
                             ...styles.descriptionText,
                           }}
+                          fontStyles={fontStyles}
                         />
                       </View>
                     )}

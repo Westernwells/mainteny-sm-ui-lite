@@ -262,14 +262,13 @@ const CreditNotePdfTemplate = ({
               value={invoice?.subject}
               fontStyles={fontStyles}
               primaryColor={primaryColor}
-              selectedLng={selectedLng}
             />
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF
                 html={invoice?.description || ''}
                 rootStyle={styles.contentBody}
-                selectedLng={selectedLng}
+                fontStyles={fontStyles}
               />
             )}
 
@@ -298,7 +297,7 @@ const CreditNotePdfTemplate = ({
                     marginTop: 6,
                     marginBottom: 16,
                   }}
-                  selectedLng={selectedLng}
+                  fontStyles={fontStyles}
                 />
               </View>
             )}
@@ -324,7 +323,7 @@ const CreditNotePdfTemplate = ({
                       marginTop: 6,
                       marginBottom: 16,
                     }}
-                    selectedLng={selectedLng}
+                    fontStyles={fontStyles}
                   />
                 </View>
               )}

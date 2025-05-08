@@ -318,7 +318,6 @@ const QuotationPdfTemplate = React.memo(
                     value={quotation?.subject}
                     fontStyles={fontStyles}
                     primaryColor={primaryColor}
-                    selectedLng={selectedLng}
                   />
                 </View>
               )}
@@ -326,11 +325,12 @@ const QuotationPdfTemplate = React.memo(
               {quotation?.description.trim() !== '' && (
                 <HtmlPDF
                   html={quotation?.description || ''}
-                  selectedLng={selectedLng}
                   rootStyle={{
                     marginTop: 6,
                     marginBottom: 16,
+                    body: fontStyles.regular,
                   }}
+                  fontStyles={fontStyles}
                 />
               )}
 
@@ -358,6 +358,7 @@ const QuotationPdfTemplate = React.memo(
                         translate={translate}
                         primaryColor={primaryColor}
                         showDiscountCol={showDiscountCol}
+                        fontStyles={fontStyles}
                       />
 
                       <ArticleSectionFooter
@@ -387,7 +388,7 @@ const QuotationPdfTemplate = React.memo(
                   </Text>
                   <HtmlPDF
                     html={quotation?.additionalInfo?.paymentTerms || ''}
-                    selectedLng={selectedLng}
+                    fontStyles={fontStyles}
                   />
                 </View>
               )}
@@ -402,8 +403,9 @@ const QuotationPdfTemplate = React.memo(
                     rootStyle={{
                       marginTop: 6,
                       marginBottom: 16,
+                      body: fontStyles.regular,
                     }}
-                    selectedLng={selectedLng}
+                    fontStyles={fontStyles}
                   />
                 </View>
               )}

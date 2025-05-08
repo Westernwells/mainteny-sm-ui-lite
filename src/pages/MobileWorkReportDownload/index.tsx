@@ -122,7 +122,6 @@ export const MobileWorkReportDownload = () => {
       <WorkReportTemplate
         pdfConfigClientStorage={pdfConfig}
         userInfo={userResponse?.userAccount}
-        selectedLng={company?.language}
         translate={translate}
         serviceOrder={serviceOrder}
         report={report}

@@ -293,6 +293,7 @@ export const PdfPreviewPartialPaymentSection = ({
           previousInvoices={invoicesToRender}
           primaryColor={primaryColor}
           secondaryColor={secondaryColor}
+          fontStyles={fontStyles}
         />
       )}
 
@@ -643,7 +644,7 @@ export const PdfPreviewPartialPaymentSection = ({
               marginTop: 6,
               marginBottom: 16,
             }}
-            selectedLng={selectedLng}
+            fontStyles={fontStyles}
           />
         </View>
       )}

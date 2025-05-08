@@ -99,6 +99,7 @@ export const ArticleSection = ({
             translate={translate}
             primaryColor={primaryColor}
             showDiscountCol={showDiscountCol}
+            fontStyles={fontStyles}
           />
 
           <ArticleSectionFooter

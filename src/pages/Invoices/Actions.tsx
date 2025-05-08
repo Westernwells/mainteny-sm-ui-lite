@@ -531,7 +531,6 @@ export const Actions = ({
         serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
-        selectedLng={company?.language}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
         report={workReport}

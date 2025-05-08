@@ -266,6 +266,7 @@ const PdfUpfrontInvoiceSection = ({
             previousInvoices={previousInvoices}
             primaryColor={primaryColor}
             secondaryColor={secondaryColor}
+            fontStyles={fontStyles}
           />
         )}
 
@@ -547,7 +548,7 @@ const PdfUpfrontInvoiceSection = ({
               marginTop: 6,
               marginBottom: 16,
             }}
-            selectedLng={selectedLng}
+            fontStyles={fontStyles}
           />
         </View>
       )}

@@ -18,7 +18,7 @@ type PerItemPaymentProps = {
   selectedLng?: string;
   invoice?: InvoiceView;
   previousInvoices: InvoiceView[];
-} & Pick<ContextProps, 'primaryColor' | 'secondaryColor'>;
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const getStyles = ({secondaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
@@ -38,6 +38,7 @@ const PdfPerItemSection = ({
   previousInvoices,
   primaryColor,
   secondaryColor,
+  fontStyles,
 }: PerItemPaymentProps) => {
   const styles = getStyles({secondaryColor});
 
@@ -246,7 +247,7 @@ const PdfPerItemSection = ({
                             <View style={{width: '36%', textAlign: 'left'}}>
                               <HtmlPDF
                                 html={item.name || ''}
-                                selectedLng={selectedLng}
+                                fontStyles={fontStyles}
                               />
                             </View>
 

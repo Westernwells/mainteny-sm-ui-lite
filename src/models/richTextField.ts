@@ -19,7 +19,11 @@ export enum HTML_PDF_FONT_SIZE {
   LARGE = '13px',
 }
 
-export const DEFAULT_HTML_PDF_FONT_SIZE = HTML_PDF_FONT_SIZE.NORMAL;
+export enum HTML_PDF_FONT_SIZE_DESCRIPTION {
+  SMALL = '7px',
+  NORMAL = '9px',
+  LARGE = '11px',
+}
 
 export enum FORMAT {
   'left' = 'left',

@@ -65,7 +65,7 @@ type PerItemPaymentProps = {
   selectedLng?: string;
   invoice?: InvoiceView;
   previousInvoices: InvoiceView[];
-} & Pick<ContextProps, 'primaryColor' | 'secondaryColor'>;
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const aggregateItems = (items: InvoiceView['items']) =>
   items.reduce<Record<string, AggregatedInvoiceItem>>((acc, item) => {
@@ -107,6 +107,14 @@ const renderRow = (
   currentCurrency: Currency,
   primaryColor: string,
   secondaryColor: string,
+  fontStyles: {
+    regular: {
+      fontFamily: string;
+    };
+    bold: {
+      fontFamily: string;
+    };
+  },
   selectedLng?: string,
 ) => {
   const styles = getStyles({primaryColor, secondaryColor});
@@ -132,7 +140,7 @@ const renderRow = (
     <View key={`${item.article?.id}-${index}`} style={styles.row}>
       <Text style={styles.colIndex}>{index + 1}</Text>
       <View style={styles.colName}>
-        <HtmlPDF html={item.name || ''} selectedLng={selectedLng} />
+        <HtmlPDF html={item.name || ''} fontStyles={fontStyles} />
       </View>
       <Text style={styles.colPrice}>{itemTotalPriceExclVat}</Text>
       <Text style={styles.colPortion}>{aggregatedItem.totalPercentage}%</Text>
@@ -153,6 +161,14 @@ const renderRowsFromItems = (
   currentCurrency: Currency,
   primaryColor: string,
   secondaryColor: string,
+  fontStyles: {
+    regular: {
+      fontFamily: string;
+    };
+    bold: {
+      fontFamily: string;
+    };
+  },
   selectedLng?: string,
 ) => {
   const aggregated = aggregateItems(items);
@@ -169,6 +185,7 @@ const renderRowsFromItems = (
       currentCurrency,
       primaryColor,
       secondaryColor,
+      fontStyles,
       selectedLng,
     );
   });
@@ -182,6 +199,7 @@ const PdfPreviewPerItemSection = ({
   previousInvoices,
   primaryColor,
   secondaryColor,
+  fontStyles,
 }: PerItemPaymentProps) => {
   if (!currentCurrency) return null;
 
@@ -216,6 +234,7 @@ const PdfPreviewPerItemSection = ({
       currentCurrency,
       primaryColor,
       secondaryColor,
+      fontStyles,
       selectedLng,
     );
   };
@@ -259,6 +278,7 @@ const PdfPreviewPerItemSection = ({
               currentCurrency,
               primaryColor,
               secondaryColor,
+              fontStyles,
               selectedLng,
             )}
             <View
