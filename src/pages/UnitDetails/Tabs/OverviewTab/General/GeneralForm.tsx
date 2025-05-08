@@ -101,7 +101,7 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
           getValue={(item) => setValue('category', item?.value)}
           textFieldProps={{
             label: 'Unit Category',
-            placeholder: t('e.g Escalator'),
+            placeholder: t('e.g. Escalator'),
             required: true,
             defaultValue: watch('category'),
             ...register('category'),

@@ -495,7 +495,7 @@ const ServicesForm = ({
                                   }}
                                   InputProps={{
                                     name: 'costPackage.materialPercentage',
-                                    placeholder: t(`e.g. 20%`),
+                                    placeholder: t(`e.g. 50%`),
                                     id: `costPackage.materialPercentage`,
                                     inputMode: 'numeric',
                                     disabled: true,
