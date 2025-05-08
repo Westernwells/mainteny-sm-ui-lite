@@ -399,6 +399,11 @@
   "e.g 150": "z.B. 150",
   "e.g 200": "z.B. 200",
   "e.g. Flat cable used for door engines from the following suppliers.....": "z.B. Flachkabel für Türmotoren von folgenden Anbietern.....",
+  "Too many files": "Zu viele Dateien",
+  "File is larger than 5mb": "Die Datei ist größer als 5 MB",
+  "e.g. Flat cable, 16G0.75+2x(2x0.5)": "z.B. Flachkabel, 16G0,75+2x(2x0,5)",
+  "e.g. Cable": "z.B. Kabel",
+  "e.g. Meier": "zB Meier",
   "e.g. Hydronic": "z.B. Hydronic",
   "e.g. 00000001": "z.B. 00000001",
   "Select articles from the list": "Artikel aus der Liste auswählen",
@@ -3179,6 +3184,5 @@
   "No working technicians.": "Keine arbeitenden Techniker.",
   "e.g. 50%": "z.B. 50%",
   "e.g johndoe@example.com": "z. B. johndoe@example.com",
-  "e.g. 200": "z.B. 200",
-  "e.g. Flat cable, 16G0.75+2x(2x0.5)": "z.B. Flachkabel, 16G0,75+2x(2x0,5)"
+  "e.g. 200": "z.B. 200"
 }
