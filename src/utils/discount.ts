@@ -27,8 +27,7 @@ export const allItemsHaveZeroDiscount = (
           ?.discount ||
         (item as EditableInvoiceItem | EditableQuotationItem)?.discount;
       return (
-        discount?.amount?.value === 0 ||
-        discount?.percentage === 0 ||
+        (discount?.amount?.value === 0 && discount?.percentage === 0) ||
         discount?.type === DiscountType.NONE ||
         !discount
       );
