@@ -264,6 +264,18 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
       </Grid>
 
       <Grid item md={6}>
+        <FormInput
+          fieldProps={{
+            size: 'small',
+            placeholder: 'e.g. 10',
+            label: 'Number of Stops',
+            type: 'number',
+            ...register('numberOfStops'),
+          }}
+        />
+      </Grid>
+
+      <Grid item md={6}>
         <FormControl fullWidth>
           <InputLabel
             size="small"

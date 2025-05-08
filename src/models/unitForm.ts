@@ -54,6 +54,7 @@ export interface GeneralFormModel {
   number?: string;
   status?: ElevatorStatus;
   unitType?: string;
+  numberOfStops?: number;
 }
 
 export interface TechnicalDataFormModel {
