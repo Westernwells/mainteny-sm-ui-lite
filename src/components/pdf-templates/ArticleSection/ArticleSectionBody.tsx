@@ -1,7 +1,11 @@
 import {View, Text} from '@react-pdf/renderer';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {ContextProps} from 'context/PdfStylesProvider';
-import {EditableInvoiceItem, InvoiceAmountDetail} from 'models/invoice';
+import {
+  DiscountType,
+  EditableInvoiceItem,
+  InvoiceAmountDetail,
+} from 'models/invoice';
 import {EditableQuotationItem, QuotationAmountDetail} from 'models/quotation';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import {insertNewlines} from 'utils/pdfTemplates';
@@ -182,7 +186,9 @@ export const ArticleSectionBody = ({
                         )}
                       </View>
 
-                      {showDiscountCol && (
+                      {showDiscountCol &&
+                      mainPosition.discount?.type ===
+                        DiscountType.PERCENTAGE ? (
                         <View style={styles.col10Right}>
                           <Text>
                             {getDiscountDisplay(
@@ -192,9 +198,13 @@ export const ArticleSectionBody = ({
                             )}
                           </Text>
                         </View>
+                      ) : (
+                        <View style={styles.col10Right}>
+                          <Text />
+                        </View>
                       )}
 
-                      <View style={[styles.col15Right, {width: priceWidth}]}>
+                      <View style={[styles.col15Right]}>
                         <Text>
                           {mainPosition.subItemsConfig?.priceVisible ? (
                             <Text>

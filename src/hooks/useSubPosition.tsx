@@ -1478,11 +1478,9 @@ const useSubPosition = <
       <TableCell align="right" noPadding>
         <Typography
           sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-          {parentDiscount?.type === DiscountType.AMOUNT
-            ? `${(parentDiscount?.amount?.value || 0).toFixed(2)} ${
-                currentCurrency.symbol
-              }`
-            : `${(parentDiscount?.percentage || 0).toFixed(2)}%`}
+          {parentDiscount?.type === DiscountType.PERCENTAGE
+            ? `${(parentDiscount?.percentage || 0).toFixed(2)}%`
+            : ``}
         </Typography>
       </TableCell>
     ),
