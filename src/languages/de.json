@@ -3175,5 +3175,6 @@
   "Scheduled for": "Geplant für",
   "This invoice number is already assigned.": "Diese Rechnungsnummer ist bereits vergeben.",
   "Edit Mixed Position": "Mischposition bearbeiten",
-  "Margin calculates the buying price against the unit price. Discount is currently not factored into the margin.": "Die Marge berechnet den Einkaufspreis im Verhältnis zum Stückpreis. Rabatte werden derzeit nicht in die Marge eingerechnet."
+  "Margin calculates the buying price against the unit price. Discount is currently not factored into the margin.": "Die Marge berechnet den Einkaufspreis im Verhältnis zum Stückpreis. Rabatte werden derzeit nicht in die Marge eingerechnet.",
+  "No working technicians.": "Keine arbeitenden Techniker."
 }
