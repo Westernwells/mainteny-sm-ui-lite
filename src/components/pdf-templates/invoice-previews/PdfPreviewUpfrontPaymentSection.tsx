@@ -1,21 +1,14 @@
 import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import BigNumber from 'bignumber.js';
 import {
-  DiscountType,
   InvoiceAmountDetail,
   InvoiceItemView,
   InvoiceType,
   InvoiceView,
   PaymentType,
 } from 'models/invoice';
-import {
-  applyDiscount,
-  getAggregatedPartialPaymentsVats,
-} from 'pages/InvoiceDetails/utils';
-import {
-  calculateTotalAmountInclVats,
-  calculateTotalWithPerItemDiscount,
-} from 'utils/calculate-total';
+import {getAggregatedPartialPaymentsVats} from 'pages/InvoiceDetails/utils';
+import {calculateTotalAmountInclVats} from 'utils/calculate-total';
 import {
   aggregatedAmountToMoney,
   centsToMoney,
@@ -104,16 +97,10 @@ const PdfPreviewUpfrontPaymentSection = ({
 }: PartialProps) => {
   const isEditing = !!invoice?.id;
 
-  const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
-    articleItems!,
+  const subtotalExclVat = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount.netAmount ?? 0,
   );
-
-  const subtotalExclVat = applyDiscount({
-    actualValue: subtotalExclVatAfterPerItemDiscount,
-    ...(invoice?.additionalInfo.discount?.type === DiscountType.AMOUNT
-      ? {amount: invoice?.additionalInfo.discount?.amount?.value ?? 0}
-      : {percentage: invoice?.additionalInfo.discount?.percentage ?? 0}),
-  });
 
   const previousInvoicesTotalExclVat = previousInvoices
     ?.map(

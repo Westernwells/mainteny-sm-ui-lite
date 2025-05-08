@@ -12,10 +12,7 @@ import {
   applyDiscount,
   getAggregatedPartialPaymentsVats,
 } from 'pages/InvoiceDetails/utils';
-import {
-  calculateTotalAmountInclVats,
-  calculateTotalWithPerItemDiscount,
-} from 'utils/calculate-total';
+import {calculateTotalAmountInclVats} from 'utils/calculate-total';
 import {
   aggregatedAmountToMoney,
   centsToMoney,
@@ -103,22 +100,10 @@ export const PdfPreviewPartialPaymentSection = ({
 }: PartialProps) => {
   const isEditing = !!invoice?.id;
 
-  const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
-    articleItems!,
+  const subtotalExclVat = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount.netAmount ?? 0,
   );
-
-  const subtotalExclVat = applyDiscount({
-    actualValue: subtotalExclVatAfterPerItemDiscount,
-    ...(invoice?.additionalInfo.discount?.type === DiscountType.AMOUNT
-      ? {
-          amount:
-            centsToMoney(
-              currentCurrency?.code!,
-              invoice?.additionalInfo.discount?.amount?.value ?? 0,
-            ) ?? 0,
-        }
-      : {percentage: invoice?.additionalInfo.discount?.percentage ?? 0}),
-  });
 
   const previousInvoicesTotalExclVat = centsToMoney(
     currentCurrency?.code!,

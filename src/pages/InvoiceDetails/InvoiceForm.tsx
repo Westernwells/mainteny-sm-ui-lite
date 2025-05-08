@@ -162,6 +162,7 @@ import {
   DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
 } from 'utils/constants';
 import {
+  centsToMoney,
   createQrData,
   moneyToCents,
   QRCurrencyCode,
@@ -2029,6 +2030,7 @@ export const InvoiceForm = ({
           currentItems,
           currentCurrency,
           currentValues.discount,
+          currentValues?.payment,
         );
 
         const detail = await calculateInvoiceAmount({
