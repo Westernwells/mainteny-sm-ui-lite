@@ -46,7 +46,7 @@ export const ArticleAutocomplete = ({
     useArticles(
       {
         pageIndex: 0,
-        pageSize: 3,
+        pageSize: 50,
         query,
       },
       {keepPreviousData: true},
