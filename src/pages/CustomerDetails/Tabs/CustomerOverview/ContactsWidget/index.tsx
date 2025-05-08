@@ -250,10 +250,10 @@ const ContactsWidget = ({refId, refType}: Props) => {
           setShowRightShadow={setShowRightShadow}>
           <TableHeader columns={COLUMNS} capitalize />
           <TableBody>
-            {rows.map((entry) => (
+            {rows.map((entry, index) => (
               <TableRow
-                key={`customer-contact-portal-row-${entry.id}`}
-                testId={`customer-contact-portal-row-${entry.id}`}>
+                key={`customer-contact-portal-row-${entry.id}-${index}`}
+                testId={`customer-contact-portal-row-${entry.id}-${index}`}>
                 {COLUMNS.map(({renderCell, ...rest}) =>
                   renderCell(entry, {
                     onClick: handleRowClick(entry.contactResourceData),
