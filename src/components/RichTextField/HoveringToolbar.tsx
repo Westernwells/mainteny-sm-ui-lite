@@ -9,7 +9,7 @@ import {
 import ReactDOM from 'react-dom';
 import {useTranslation} from 'react-i18next';
 import {useFocused, useSlate} from 'slate-react';
-import {Editor, Range} from 'slate';
+import {Editor, Range, Transforms} from 'slate';
 import {css} from '@emotion/css';
 import {
   Box,
@@ -24,6 +24,7 @@ import {
   toggleButtonGroupClasses,
   Typography,
   useTheme,
+  CircularProgress,
 } from '@mui/material';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
@@ -37,6 +38,7 @@ import TextFields from '@mui/icons-material/TextFields';
 import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
 import FormatIndentIncreaseIcon from '@mui/icons-material/FormatIndentIncrease';
 import FormatIndentDecreaseIcon from '@mui/icons-material/FormatIndentDecrease';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import {
   addAttributeToBlock,
   getActiveFontSize,
@@ -96,53 +98,39 @@ export const HoveringToolbar = () => {
   const editor = useSlate();
   const inFocus = useFocused();
   const [openSelectFontSize, setOpenSelectFontSize] = useState(false);
-
   const {secondaryColor} = useContext(PdfStylesContext);
-
   const [color, setColor] = useState(secondaryColor);
+  const [usedAI, setUsedAI] = useState(false);
+  const [loadingAI, setLoadingAI] = useState(false);
 
   useEffect(() => {
-    try {
-      const el = ref.current;
-      const {selection} = editor;
-      if (!el) {
-        return;
-      }
+    const el = ref.current;
+    const {selection} = editor;
+    if (!el) return;
 
-      if (
-        !selection ||
-        (!inFocus && !openSelectFontSize) ||
-        Range.isCollapsed(selection) ||
-        Editor.string(editor, selection) === ''
-      ) {
-        el.removeAttribute('style');
-        return;
-      }
-
-      const domSelection = window.getSelection();
-      if (!domSelection || domSelection.rangeCount === 0) {
-        el.removeAttribute('style');
-        return;
-      }
-
-      const domRange = domSelection.getRangeAt(0);
-      const rect = domRange.getBoundingClientRect() || {
-        top: 0,
-        left: 0,
-        width: 0,
-      };
-      el.style.opacity = '1';
-      el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`;
-      el.style.left = `${
-        rect.left +
-        window.pageXOffset -
-        el.offsetWidth / 2 +
-        rect.width / 2 +
-        90
-      }px`;
-    } catch (error) {
-      console.error('Error updating hovering toolbar position:', error);
+    if (
+      !selection ||
+      (!inFocus && !openSelectFontSize) ||
+      Range.isCollapsed(selection) ||
+      Editor.string(editor, selection) === ''
+    ) {
+      el.removeAttribute('style');
+      return;
     }
+
+    const domSelection = window.getSelection();
+    if (!domSelection || domSelection.rangeCount === 0) {
+      el.removeAttribute('style');
+      return;
+    }
+
+    const domRange = domSelection.getRangeAt(0);
+    const rect = domRange.getBoundingClientRect();
+    el.style.opacity = '1';
+    el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`;
+    el.style.left = `${
+      rect.left + window.pageXOffset - el.offsetWidth / 2 + rect.width / 2 + 90
+    }px`;
   }, [inFocus, editor.selection, openSelectFontSize]);
 
   const handleMark = (_event: MouseEvent<HTMLElement>, format: string) =>
@@ -158,7 +146,6 @@ export const HoveringToolbar = () => {
     removeAttributeToBlock(editor, format);
 
   const handleClose = () => setOpenSelectFontSize(false);
-
   const handleOpen = () => setOpenSelectFontSize(true);
 
   const handleColorChange = (value: string) => {
@@ -169,6 +156,38 @@ export const HoveringToolbar = () => {
   const handleClearStyle = () => {
     removeMarks(editor, ['bold', 'italic', 'underline', 'fontSize']);
     removeBlocks(editor, [FORMAT.color]);
+  };
+
+  const handleRewriteWithAI = async () => {
+    const {selection} = editor;
+    if (!selection || Range.isCollapsed(selection)) return;
+
+    const text = Editor.string(editor, selection);
+    if (!text.trim()) return;
+
+    setLoadingAI(true);
+    try {
+      const response = await fetch(
+        'https://applications-mainteny-openai-api.vercel.app/api/rewrite-description',
+        {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({text}),
+        },
+      );
+
+      const data = await response.json();
+      if (response.ok && data.rewritten) {
+        Transforms.insertText(editor, data.rewritten, {at: selection});
+        setUsedAI(true);
+      } else {
+        console.error('Rewrite failed', data.error);
+      }
+    } catch (error) {
+      console.error('Error calling rewrite API:', error);
+    } finally {
+      setLoadingAI(false);
+    }
   };
 
   const fontSizeOptions = [
@@ -202,12 +221,8 @@ export const HoveringToolbar = () => {
           border-radius: 4px;
           transition: opacity 0.75s;
         `}
-        onMouseDown={
-          (e) => e.preventDefault() // prevent toolbar from taking focus away from editor
-        }>
+        onMouseDown={(e) => e.preventDefault()}>
         <Select
-          labelId="select-font-size-label"
-          id="select-font-size"
           open={openSelectFontSize}
           onClose={handleClose}
           onOpen={handleOpen}
@@ -235,7 +250,6 @@ export const HoveringToolbar = () => {
               },
             },
           }}
-          displayEmpty
           renderValue={() => (
             <Box display="flex" alignItems="center" gap={1}>
               <TextFields sx={{color: 'white'}} />
@@ -268,7 +282,6 @@ export const HoveringToolbar = () => {
               onClick={handleColorChange}
               size="small"
             />
-
             <CustomColorPicker
               initialValue={color}
               onChange={handleColorChange}
@@ -284,11 +297,7 @@ export const HoveringToolbar = () => {
             }}>
             <Button
               variant="text"
-              sx={{
-                display: 'flex',
-                gap: theme.spacing(0.5),
-                color: '#fff',
-              }}
+              sx={{display: 'flex', gap: theme.spacing(0.5), color: '#fff'}}
               startIcon={<EditOffOutlinedIcon />}
               disableRipple
               onClick={handleClearStyle}>
@@ -298,18 +307,15 @@ export const HoveringToolbar = () => {
             </Button>
           </Box>
         </Select>
-        <StyledToggleButtonGroup
-          size="small"
-          exclusive
-          onChange={handleMark}
-          aria-label="text formatting">
-          <ToggleButton value="bold" aria-label="bold">
+
+        <StyledToggleButtonGroup size="small" exclusive onChange={handleMark}>
+          <ToggleButton value="bold">
             <FormatBoldIcon />
           </ToggleButton>
-          <ToggleButton value="italic" aria-label="italic">
+          <ToggleButton value="italic">
             <FormatItalicIcon />
           </ToggleButton>
-          <ToggleButton value="underlined" aria-label="underlined">
+          <ToggleButton value="underlined">
             <FormatUnderlinedIcon />
           </ToggleButton>
         </StyledToggleButtonGroup>
@@ -325,43 +331,48 @@ export const HoveringToolbar = () => {
             <FormatIndentDecreaseIcon />
           </IconButton>
         </StyledButtonContainer>
-        <Divider
-          flexItem
-          orientation="vertical"
-          sx={{mx: 0.5, my: 1, border: '1px solid #8F9BB380'}}
-        />
-        <StyledToggleButtonGroup
-          size="small"
-          exclusive
-          onChange={handleBlock}
-          aria-label="text alignment">
-          <ToggleButton value="left" aria-label="left aligned">
+
+        <Divider flexItem orientation="vertical" sx={{mx: 0.5, my: 1}} />
+
+        <StyledToggleButtonGroup size="small" exclusive onChange={handleBlock}>
+          <ToggleButton value="left">
             <FormatAlignLeftIcon />
           </ToggleButton>
-          <ToggleButton value="center" aria-label="centered">
+          <ToggleButton value="center">
             <FormatAlignCenterIcon />
           </ToggleButton>
-          <ToggleButton value="right" aria-label="right aligned">
+          <ToggleButton value="right">
             <FormatAlignRightIcon />
           </ToggleButton>
         </StyledToggleButtonGroup>
-        <Divider
-          flexItem
-          orientation="vertical"
-          sx={{mx: 0.5, my: 1, border: '1px solid #8F9BB380'}}
-        />
-        <StyledToggleButtonGroup
-          size="small"
-          exclusive
-          onChange={handleBlock}
-          aria-label="text formatting">
-          <ToggleButton value="bulleted-list" aria-label="bulleted">
+
+        <Divider flexItem orientation="vertical" sx={{mx: 0.5, my: 1}} />
+
+        <StyledToggleButtonGroup size="small" exclusive onChange={handleBlock}>
+          <ToggleButton value="bulleted-list">
             <FormatListBulletedIcon />
           </ToggleButton>
-          <ToggleButton value="numbered-list" aria-label="numbered">
+          <ToggleButton value="numbered-list">
             <FormatListNumberedIcon />
           </ToggleButton>
         </StyledToggleButtonGroup>
+
+        <Divider flexItem orientation="vertical" sx={{mx: 0.5, my: 1}} />
+
+        <Button
+          variant="text"
+          sx={{color: 'white', display: 'flex', gap: 1, ml: 1}}
+          disabled={loadingAI}
+          onClick={handleRewriteWithAI}
+          startIcon={
+            loadingAI ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <AutoAwesomeIcon />
+            )
+          }>
+          {usedAI ? t('Rewrite with AI') : t('Write with AI')}
+        </Button>
       </Box>
     </Portal>
   );
