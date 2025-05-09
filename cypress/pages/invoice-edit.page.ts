@@ -57,19 +57,16 @@ export default class InvoiceEditPage {
   };
 
   static selectValidVatForAllItems = () => {
-    cy.get(`[data-testid="vat-dropdown"]`).each(($row) => {
-      cy.wrap($row)
-        .click()
-        .then(() => {
+    cy.get(`[data-testid^="vat-dropdown-table-cell"]`).each(($cell) => {
+      cy.wrap($cell).click({force: true});
 
-          cy.get('ul[role="listbox"]', { timeout: 3000 })
-            .should('be.visible')
-            .find('li')
-            .first()
-            .click();
-          
-          cy.get('ul[role="listbox"]').should('not.exist');
-        });
+      cy.get('ul[role="listbox"]', {timeout: 3000})
+        .should('be.visible')
+        .find('li')
+        .first()
+        .click();
+
+      cy.get('ul[role="listbox"]').should('not.exist');
     });
   };
 

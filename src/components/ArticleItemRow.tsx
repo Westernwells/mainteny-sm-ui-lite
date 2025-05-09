@@ -69,8 +69,9 @@ export const ArticleItemRow = ({
   );
   const [quantity, setQuantity] = useState<number>(articleItem.quantity);
   const [price, setPrice] = useState(
-    (articleItem.unitAmount.netAmount ?? 0) /
-      10 ** Currencies[articleItem.unitAmount.currency],
+    (articleItem.unitAmount?.netAmount ?? 0) /
+      10 **
+        Currencies[articleItem.unitAmount?.currency || currentCurrency.code],
   );
 
   const {language: selectedLng} = useContext(LanguageContext);
@@ -151,10 +152,19 @@ export const ArticleItemRow = ({
             ...item,
             unitAmount: {
               ...item.unitAmount,
+              currency: item.unitAmount?.currency || currentCurrency.code,
               netAmount: fixRounding(
                 isPartial
-                  ? partialPrice * 10 ** Currencies[item.unitAmount.currency]
-                  : price * 10 ** Currencies[item.unitAmount.currency],
+                  ? partialPrice *
+                      10 **
+                        Currencies[
+                          item.unitAmount?.currency || currentCurrency.code
+                        ]
+                  : price *
+                      10 **
+                        Currencies[
+                          item.unitAmount?.currency || currentCurrency.code
+                        ],
                 2,
               ),
             },
@@ -210,7 +220,7 @@ export const ArticleItemRow = ({
             <NumericFormat
               value={
                 (isPartial ? newPartialTotal : totalPrice) *
-                (1 + (articleItem.unitAmount.percentageVat ?? 0) / 100)
+                (1 + (articleItem.unitAmount?.percentageVat ?? 0) / 100)
               }
               disabled
               customInput={TextField}

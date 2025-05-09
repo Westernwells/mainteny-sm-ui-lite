@@ -1,6 +1,6 @@
-import {useMemo, useState} from 'react';
+import {useContext, useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import * as Yup from 'yup';
 import {useFormik} from 'formik';
 import useTheme from '@mui/material/styles/useTheme';
@@ -53,6 +53,7 @@ import {companyLanguageContextMap} from 'utils/language';
 import RichTextField from 'components/RichTextField';
 import DialogPdfPreview from 'components/pdf-templates/DialogPdfPreview';
 import {Dialog} from 'components/Dialog';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import InvoiceOverduePdfPreview from './InvoiceOverduePdfPreview';
 
 const validationSchema = Yup.object().shape({
@@ -85,6 +86,9 @@ export const InvoiceOverdueNotice = () => {
   const {mutateAsync: uploadFiles, isLoading: isUploadLoading} = useUploadFiles(
     'The document was sent successfully.',
   );
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const currentCurrency = useCurrentCurrency();
 
@@ -234,6 +238,9 @@ export const InvoiceOverdueNotice = () => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
   const handlePreviewInvoiceOverdueNotice = async () => {

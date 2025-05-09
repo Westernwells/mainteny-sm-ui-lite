@@ -26,12 +26,12 @@ describe('Edit Article', () => {
         const outside = cy.get('#alert-dialog-title');
 
         // Validate that the Name field is filled
-        cy.clearRichTextField('Name');
+        cy.get('input[name="name"]').clear();
         outside.click();
-        cy.get('div[data-test-id="name"]').contains('Name is required');
+        cy.contains('Name is required');
         cy.get('button[type="button"]').should('be.disabled');
 
-        cy.fillRichTextField('Name', 'Test Article');
+        cy.get('input[name="name"]').type('Test Article');
 
         const pickRandomVat = () => {
             cy.get('li').then(($options) => {

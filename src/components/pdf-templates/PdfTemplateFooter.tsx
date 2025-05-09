@@ -1,34 +1,28 @@
-import {View, StyleSheet, Text, Font, Image} from '@react-pdf/renderer';
+import {Image, StyleSheet, Text, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
 import {HeaderFooterInfoData} from 'models/misc';
 import {getRepresentationText} from 'utils/settings';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
 type Props = {
   translate: (key: string) => string;
   userInfo?: UserAccount;
-  selectedLng?: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   isQuotationJobConfirmation?: boolean;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  flexBasisValue?: string,
-  itemCount?: number,
-) =>
+const getStyles = ({
+  flexBasisValue,
+  itemCount,
+  boldFontStyle,
+  primaryColor,
+  secondaryColor,
+}: {
+  flexBasisValue?: string;
+  itemCount?: number;
+} & PdfConfigurationStyles) =>
   StyleSheet.create({
     footerEmail: {
       display: 'flex',
@@ -37,7 +31,7 @@ const getStyles = (
     footerSectionBody: {
       fontSize: 6,
       fontWeight: 'light',
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 0.5,
@@ -76,12 +70,12 @@ const getStyles = (
     },
     emailText: {
       fontSize: 5,
-      color: '#616161',
+      color: secondaryColor,
       fontWeight: 'light',
     },
     pageNumberText: {
       fontSize: 7,
-      color: '#000000',
+      color: primaryColor,
       marginLeft: 4,
       textAlign: 'right',
       ...boldFontStyle,
@@ -90,7 +84,7 @@ const getStyles = (
       backgroundColor: 'white',
     },
     numberText: {
-      color: '#212121',
+      color: primaryColor,
     },
     footerContainer: {
       flexDirection: 'column',
@@ -107,11 +101,13 @@ const getStyles = (
       maxWidth: '100%',
       flex: `0 0 ${flexBasisValue}`,
       paddingRight: 10,
+      color: secondaryColor,
     },
     footerHeading: {
       paddingVertical: 0.5,
       fontSize: 6,
       ...boldFontStyle,
+      color: primaryColor,
     },
     imageContainer: {
       position: 'absolute',
@@ -124,16 +120,14 @@ const getStyles = (
   });
 const PdfTemplateFooter = ({
   userInfo,
-  selectedLng,
   translate,
   footerInfo,
   footerPath,
   isQuotationJobConfirmation,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
   const visibleBankSections = [
     userInfo?.serviceCompany?.settings?.paymentInfo?.bankName,
     userInfo?.serviceCompany?.settings?.paymentInfo2?.bankName,
@@ -142,7 +136,13 @@ const PdfTemplateFooter = ({
   const itemCount = visibleBankSections.length < 2 ? 3 : 4;
   const flexBasisValue = `${100 / itemCount}%`;
 
-  const styles = getStyles(boldFontStyle, flexBasisValue, itemCount);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    primaryColor,
+    secondaryColor,
+    flexBasisValue,
+    itemCount,
+  });
 
   const representationText = getRepresentationText(
     translate,

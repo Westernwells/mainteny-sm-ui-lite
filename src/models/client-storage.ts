@@ -12,3 +12,11 @@ export interface ClientReportForPDFConfig {
   includeCustomerVAT?: boolean;
   includeUnitBuilding?: boolean;
 }
+
+export enum ClientStorageKeys {
+  PDF_CONFIG = 'pdf-configurations',
+  PDF_TEMPLATE = 'pdf-template',
+  PDF_FONT = 'pdf-font',
+  PDF_COLORS = 'pdf-colors',
+  PDF_TEXT_COLOR = 'pdf-text-color',
+}

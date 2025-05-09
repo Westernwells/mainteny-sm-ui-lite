@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useContext, useEffect, useMemo, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useFormik} from 'formik';
 import * as Yup from 'yup';
@@ -81,6 +81,7 @@ import {companyLanguageContextMap} from 'utils/language';
 import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmationModal';
 import {Confirm} from 'components/Confirm';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -108,6 +109,9 @@ export const WorkReport = ({serviceOrder}: Props) => {
   const {user} = useUserSession();
   const [queryParams, setQueryParams] = useSearchParams();
   const isEditMode = queryParams.get('edit') === '1';
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const {data: jobTypes = []} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -256,7 +260,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
       <WorkReportTemplate
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
-        selectedLng={company?.language}
         translate={translate}
         serviceOrder={serviceOrder}
         report={report}
@@ -269,6 +272,9 @@ export const WorkReport = ({serviceOrder}: Props) => {
         footerInfo={footerInfo}
         technicianName={technicianName}
         serviceOrderType={getJobTypeGivenName(serviceOrder.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

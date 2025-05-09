@@ -74,9 +74,8 @@ export default class InvoicesPage {
     cy.get('input[role="combobox"][name="propertyOwnerId"]').parent().click();
     cy.get(`li[role="option"][id="combo-box-demo-option-0"]`).click();
 
-    // Add article
-    cy.contains('button', 'Add Article').click();
-    cy.get('#article-combo-box').click({force: true});
+    // Add position
+    cy.get('td[data-testid="article-name-0"]').click();
 
     cy.get('#article-combo-box-listbox')
       .should('exist')
@@ -90,38 +89,43 @@ export default class InvoicesPage {
       .should('be.visible')
       .click({waitForAnimations: false, force: true});
 
-    cy.get('input[name="quantity"]').clear().type('1');
-    cy.get('input[name="unitAmount.netAmount"]').clear().type('100');
+    cy.get('#article-combo-box')
+      .click()
+      .wait(500)
+      .clear()
+      .realType('Test Article')
+      .realType('{esc}');
+
+    cy.get(`td[data-testid="position-quantity-0"]`).click({force: true});
+    cy.get('input[name="items.0.quantity"]').clear().type('1');
+    cy.get(`td[data-testid="position-unitAmount-0"]`).click({force: true});
+    cy.get('input[name="items.0.unitAmount.netAmount"]').clear().type('100');
 
     if (!hasDueDate) {
-      cy.get('div[role="textbox"][name="paymentTerms"]')
-        .invoke('text')
-        .then(() => {
-          cy.get('div[role="textbox"][name="paymentTerms"]').clear();
+      cy.clearRichTextField('Payment terms');
 
-          cy.get('[data-testid="payment-due-date"]')
-            .should('not.be.disabled')
-            .click({force: true});
+      cy.get('[data-testid="payment-due-date"]')
+        .should('not.be.disabled')
+        .click({force: true});
 
-          cy.get('[data-testid="payment-due-date-popup"]')
-            .should('be.visible')
-            .within(() => {
-              cy.contains('button', 'Clear').click({force: true});
+      cy.get('[data-testid="payment-due-date-popup"]')
+        .should('be.visible')
+        .within(() => {
+          cy.contains('button', 'Clear').click({force: true});
 
-              cy.contains('button', 'Confirm').click({
-                waitForAnimations: false,
-              });
-            });
+          cy.contains('button', 'Confirm').click({
+            waitForAnimations: false,
+          });
         });
     } else {
-      cy.get('div[role="textbox"][name="paymentTerms"]')
+      cy.getRichTextField('Payment terms')
         .invoke('text')
         .then((paymentTermsText) => {
           const storedPaymentTerms = paymentTermsText;
 
           cy.get('[data-testid="payment-due-date"]').then(($dateInput) => {
             if ($dateInput.prop('disabled')) {
-              cy.get('div[role="textbox"][name="paymentTerms"]').clear();
+              cy.clearRichTextField('Payment terms');
 
               cy.wrap($dateInput)
                 .invoke('val')
@@ -176,10 +180,7 @@ export default class InvoicesPage {
                     cy.contains('button', 'Confirm').click({
                       waitForAnimations: false,
                     });
-                    cy.get('div[role="textbox"][name="paymentTerms"]').type(
-                      storedPaymentTerms,
-                      {force: true},
-                    );
+                    cy.fillRichTextField('Payment terms', storedPaymentTerms);
                   }
                 });
             }

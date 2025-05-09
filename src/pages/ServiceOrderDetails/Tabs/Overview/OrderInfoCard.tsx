@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -31,9 +31,6 @@ import {
   useOldCompanyJobTypes,
 } from 'hooks/reactQuery/useCompanies';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
-import {useQueryClientStorageData} from 'hooks/useClientStorage';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
 import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useCurrentCurrency} from 'utils/currency';
@@ -194,39 +191,10 @@ export const OrderInfoCard = ({
     [company?.language],
   );
 
-  const {data: clientStorageData} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: 'pdf-template'},
-  });
-
-  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
-  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
-
-  const {data: headerUrl = {}} = useDownloadUrl(
-    headerInfo?.path ? [headerInfo.path] : [],
-    undefined,
-    company?.id,
-  );
-
-  const {data: footerUrl = {}} = useDownloadUrl(
-    footerInfo?.path ? [footerInfo.path] : [],
-    undefined,
-    company?.id,
-  );
-
-  const {data: quotation} = useQuotationDetails(
-    serviceOrderDetails?.additionalInfo.quotationId,
-  );
-
   const {createAndSetPdfBlobUrl} = useCreateAndSetPdfBlobUrl({
     serviceOrder: serviceOrderDetails,
-    quotation,
     userInfo: user?.userAccount,
     currentCurrency,
-    headerInfo,
-    headerPath: headerUrl[headerInfo?.path],
-    footerInfo,
-    footerPath: footerUrl[footerInfo?.path],
     translate,
     fileName: serviceOrderDetails?.number,
     selectedLng: company?.language,

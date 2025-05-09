@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {
   Alert,
@@ -79,6 +79,7 @@ import {useGetTechniciansByEmployeeId} from 'hooks/reactQuery/useTechnician';
 import {companyLanguageContextMap} from 'utils/language';
 import {EmailSignature} from 'models/employee';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import ChecklistPdf from './ChecklistPdf';
 import {AddChecklistCard} from './AddChecklistCard';
 import AddChecklistDialog from './AddChecklistDialog';
@@ -104,6 +105,9 @@ export const CheckList = ({serviceOrder}: Props) => {
   const {t} = useTranslation();
   const {enqueueSnackbar, showError} = useSnackbar();
   const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const {data: jobTypes} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
@@ -393,6 +397,9 @@ export const CheckList = ({serviceOrder}: Props) => {
         headerInfo={headerInfo}
         footerPath={footerUrl[footerInfo?.path]}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);

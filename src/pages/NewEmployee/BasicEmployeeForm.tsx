@@ -11,7 +11,10 @@ import {BasicEmployeeFormModel} from 'models/employee';
 import {FormInput} from 'components/form/FormInput';
 import {AddressAutoComplete} from 'components/AddressAutoComplete';
 import {t} from 'i18next';
-import {ServiceCompanyNumberType} from 'models/service-company';
+import {
+  AutoNumberConfigRecord,
+  ServiceCompanyNumberType,
+} from 'models/service-company';
 import {
   useCompanyAutoNumberConfig,
   useCompanyNextNumber,
@@ -119,11 +122,24 @@ export const BasicEmployeeForm = ({
     if (!companyNextNumber?.value) {
       const {data: refetchedCompanyNextNumber} = await refetch();
       return formik.setFieldValue(
-        'externalId',
+        'employeeId',
         refetchedCompanyNextNumber?.value,
       );
     }
-    formik.setFieldValue('externalId', companyNextNumber?.value);
+    formik.setFieldValue('employeeId', companyNextNumber?.value);
+  };
+
+  const handleAction = () => {
+    const configRecord = companyAutoNumberConfig?.configRecords?.find(
+      (item: AutoNumberConfigRecord) =>
+        item.type === ServiceCompanyNumberType.EMPLOYEE,
+    );
+
+    if (configRecord?.enabled) {
+      generateNextNumber();
+    } else {
+      setOpenDialog(true);
+    }
   };
   return (
     <PageCard
@@ -281,16 +297,7 @@ export const BasicEmployeeForm = ({
                     formik.setFieldValue('employeeId', item?.value);
                   }}
                   autoIdProps={{
-                    handleAction: companyAutoNumberConfig?.configRecords.find(
-                      (item: any) =>
-                        item.type === ServiceCompanyNumberType.EMPLOYEE,
-                    )?.enabled
-                      ? () => {
-                          generateNextNumber();
-                        }
-                      : () => {
-                          setOpenDialog(true);
-                        },
+                    handleAction,
                     isEnabled: companyAutoNumberConfig?.configRecords.find(
                       (item: any) =>
                         item.type === ServiceCompanyNumberType.EMPLOYEE,

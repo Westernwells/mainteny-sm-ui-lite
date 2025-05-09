@@ -3,7 +3,7 @@ import {TableBody as MuiTableBody} from '@mui/material';
 
 const TableBody = ({children}: PropsWithChildren<unknown>) => (
   <MuiTableBody
-    date-testid="table-body-container"
+    data-testid="table-body-container"
     sx={{
       overflow: 'auto',
     }}>

@@ -24,6 +24,10 @@ export const fetchDownloadUrls = async (
   batch: string[],
   serviceCompanyId: string,
 ) => {
+  if (!batch?.length) {
+    return {};
+  }
+
   const downloadUrls = await fetchDownloadUrl(batch, serviceCompanyId);
 
   const conversionPromises = Object.keys(downloadUrls).map(async (file) => {

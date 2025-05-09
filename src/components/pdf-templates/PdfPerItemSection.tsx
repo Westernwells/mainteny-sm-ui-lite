@@ -1,18 +1,16 @@
-import {Text, View, Font, StyleSheet} from '@react-pdf/renderer';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import {
   AggregatedInvoiceItem,
-  InvoiceView,
   DiscountType,
   InvoiceType,
+  InvoiceView,
 } from 'models/invoice';
-import {formatCurrency, centsToMoney, getCurrencySymbol} from 'utils/currency';
+import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {Currency} from 'models/misc';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {HtmlPDF} from 'components/HtmlPDF';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
 type PerItemPaymentProps = {
   translate: (key: string) => string;
@@ -20,35 +18,12 @@ type PerItemPaymentProps = {
   selectedLng?: string;
   invoice?: InvoiceView;
   previousInvoices: InvoiceView[];
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = () =>
+const getStyles = ({secondaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -61,8 +36,11 @@ const PdfPerItemSection = ({
   selectedLng,
   invoice,
   previousInvoices,
+  primaryColor,
+  secondaryColor,
+  fontStyles,
 }: PerItemPaymentProps) => {
-  const styles = getStyles();
+  const styles = getStyles({secondaryColor});
 
   const hasPreviousInvoices = previousInvoices.length > 0;
 
@@ -269,7 +247,7 @@ const PdfPerItemSection = ({
                             <View style={{width: '36%', textAlign: 'left'}}>
                               <HtmlPDF
                                 html={item.name || ''}
-                                selectedLng={selectedLng}
+                                fontStyles={fontStyles}
                               />
                             </View>
 
@@ -283,7 +261,7 @@ const PdfPerItemSection = ({
                             <Text
                               style={{
                                 textAlign: 'right',
-                                color: '#212121',
+                                color: primaryColor,
                                 width: '15%',
                               }}>
                               {aggregatedItem.totalPercentage}%
@@ -291,7 +269,7 @@ const PdfPerItemSection = ({
                             <Text
                               style={{
                                 textAlign: 'right',
-                                color: '#212121',
+                                color: primaryColor,
                                 width: '25%',
                               }}>
                               {formatCurrency(

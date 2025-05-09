@@ -26,6 +26,7 @@ interface Props {
   primaryButtonLabel?: string | React.ReactNode;
   secondaryButton?: React.ReactNode;
   previewButton?: React.ReactNode;
+  notesSection?: React.ReactNode;
 }
 
 export const BottomDrawer = ({
@@ -38,6 +39,7 @@ export const BottomDrawer = ({
   previewButton,
   isSaving,
   buttonWrapperStyles,
+  notesSection,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -71,6 +73,7 @@ export const BottomDrawer = ({
         gap={2}
         sx={{my: 'auto', px: '4em', ...buttonWrapperStyles}}>
         {secondaryButton}
+        {notesSection && <Box sx={{marginTop: '0.3em'}}>{notesSection}</Box>}
         {previewButton && previewButton}
         <ButtonGroup variant="contained">
           {primaryButtonLabel && (

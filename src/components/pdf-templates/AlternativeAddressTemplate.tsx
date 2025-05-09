@@ -3,6 +3,8 @@ import {UserAccount} from 'models/user';
 import {AlternativeServiceCompanyInfo} from 'models/invoice';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {ServiceCompanyItem} from 'models/service-company';
 import PdfTemplateFooter from './PdfTemplateFooter';
 import PdfTemplateHeader from './PdfTemplateHeader';
 import PdfPageContainer from './containers/PdfPageContainer';
@@ -10,20 +12,20 @@ import PdfBodyContainer from './containers/PdfBodyContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
-  selectedLng?: string;
   headerInfo: HeaderFooterInfoData;
   headerPath: string;
   footerInfo: HeaderFooterInfoData;
   footerPath: string;
   alternativeServiceCompanyInfo?: AlternativeServiceCompanyInfo;
   alternativeAddress?: AddressRecord;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const AlternativeAddressTemplate = ({
+  serviceCompany,
   userInfo,
-  selectedLng,
   translate,
   headerInfo,
   headerPath,
@@ -31,6 +33,9 @@ const AlternativeAddressTemplate = ({
   footerPath,
   alternativeServiceCompanyInfo,
   alternativeAddress,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
   const serviceCompanyInfo = getServiceCompanyInfo(
     userInfo,
@@ -38,16 +43,19 @@ const AlternativeAddressTemplate = ({
   );
 
   return (
-    <PdfPageContainer selectedLng={selectedLng}>
+    <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
       <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
       <PdfBodyContainer>
         <TopSectionContainer>
           <PdfTemplateLeftAddress
+            serviceCompany={serviceCompany}
             serviceCompanyInfo={serviceCompanyInfo}
             fallbackReceiverName={alternativeAddress?.component?.name}
             addressComponent={alternativeAddress?.component}
-            selectedLng={selectedLng}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
             translate={translate}
           />
         </TopSectionContainer>
@@ -55,10 +63,12 @@ const AlternativeAddressTemplate = ({
 
       <PdfTemplateFooter
         userInfo={userInfo}
-        selectedLng={selectedLng}
         translate={translate}
         footerInfo={footerInfo}
         footerPath={footerPath}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />
     </PdfPageContainer>
   );

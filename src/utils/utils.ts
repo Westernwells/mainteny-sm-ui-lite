@@ -551,7 +551,8 @@ export const yupValidations = {
     Yup.mixed().test(
       'checkRichTextField',
       message,
-      (value: string) => !!value && !isEmptyHTML(value),
+      (value: unknown): boolean =>
+        typeof value === 'string' && !!value && !isEmptyHTML(value),
     ),
 };
 

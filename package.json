@@ -28,6 +28,9 @@
     "cypress:split-e2e": "cypress run --config video=false --e2e --env split=true"
   },
   "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.5.2",
+    "@atlaskit/pragmatic-drag-and-drop-auto-scroll": "^2.1.0",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
     "@emotion/css": "^11.11.2",
     "@emotion/styled": "latest",
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
@@ -39,7 +42,7 @@
     "@mui/x-data-grid": "5.5.1",
     "@mui/x-date-pickers": "6.18.2",
     "@mui/x-date-pickers-pro": "^6.19.2",
-    "@react-pdf/renderer": "^3.4.4",
+    "@react-pdf/renderer": "^4.3.0",
     "@sentry/browser": "^8.41.0",
     "@sentry/react": "^8.41.0",
     "@tiptap/core": "^2.4.0",
@@ -75,6 +78,7 @@
     "bignumber.js": "^9.1.2",
     "browser-image-compression": "^2.0.2",
     "chart.js": "^4.4.1",
+    "color-convert": "^3.0.1",
     "cypress-split": "^1.20.1",
     "date-fns": "2.28.0",
     "dinero.js": "^1.9.1",
@@ -101,6 +105,7 @@
     "react": "18.3.1",
     "react-beautiful-dnd": "^13.1.1",
     "react-chartjs-2": "^4.0.1",
+    "react-colorful": "^5.6.1",
     "react-cropper": "^2.1.8",
     "react-dom": "18.3.1",
     "react-draggable": "^4.4.6",
@@ -130,7 +135,7 @@
     "use-supercluster": "^0.4.0",
     "vite-plugin-env-compatible": "^2.0.1",
     "xlsx": "^0.18.5",
-    "yup": "^0.32.11"
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.13.2",
@@ -217,8 +222,5 @@
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "prettier --write"
     ]
-  },
-  "resolutions": {
-    "@react-pdf/layout": "3.11.5"
   }
 }

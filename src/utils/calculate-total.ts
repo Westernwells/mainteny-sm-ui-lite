@@ -238,13 +238,13 @@ export const getItemTotalAfterPerItemDiscount = ({
   };
   precision?: number;
 }) => {
-  const total = new BigNumber(item.unitAmount.netAmount ?? 0)
-    .multipliedBy(item.quantity)
+  const total = new BigNumber(item?.unitAmount?.netAmount ?? 0)
+    .multipliedBy(item?.quantity)
     .decimalPlaces(2);
 
   if (
-    !item.discount ||
-    (!item.discount.amount?.value && !item.discount.percentage)
+    !item?.discount ||
+    (!item?.discount?.amount?.value && !item?.discount.percentage)
   ) {
     return fixRounding(total.toNumber(), precision);
   }
@@ -252,9 +252,9 @@ export const getItemTotalAfterPerItemDiscount = ({
   const {discount} = item;
 
   const discountAmount =
-    discount.type === DiscountType.AMOUNT && discount.amount?.value
-      ? discount.amount.value
-      : discount.type === DiscountType.PERCENTAGE && discount.percentage
+    discount?.type === DiscountType.AMOUNT && discount.amount?.value
+      ? discount?.amount.value
+      : discount?.type === DiscountType.PERCENTAGE && discount.percentage
       ? total.multipliedBy(discount.percentage / PERCENTAGE_FACTOR).toNumber()
       : 0;
 
@@ -376,14 +376,21 @@ export const calculateArticlesAmount = ({
   globalDiscount,
 }: {
   items: {
-    unitAmount: {netAmount?: number; currency: string; percentageVat?: number};
+    unitAmount?: {netAmount?: number; currency: string; percentageVat?: number};
     quantity: number;
     discount?: Discount;
   }[];
   globalDiscount?: Discount;
 }) => {
+  const validItems = items
+    .filter((item) => item.unitAmount !== undefined)
+    .map((item) => ({
+      ...item,
+      unitAmount: item.unitAmount!,
+    }));
+
   const itemsConvertedFromCentsToActualAmount =
-    convertCentsToActualAmount(items);
+    convertCentsToActualAmount(validItems);
   const itemsAfterPerItemDiscount = applyPerItemDiscount(
     itemsConvertedFromCentsToActualAmount,
   );

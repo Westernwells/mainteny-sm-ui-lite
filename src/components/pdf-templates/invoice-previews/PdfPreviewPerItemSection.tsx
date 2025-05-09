@@ -1,85 +1,63 @@
-import {Text, View, Font, StyleSheet} from '@react-pdf/renderer';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import {
   AggregatedInvoiceItem,
-  InvoiceView,
   DiscountType,
   InvoiceType,
+  InvoiceView,
 } from 'models/invoice';
-import {formatCurrency, centsToMoney, getCurrencySymbol} from 'utils/currency';
+import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {Currency} from 'models/misc';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {HtmlPDF} from 'components/HtmlPDF';
-import MontserratRegular from '../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {PdfConfigurationStyles} from 'models/pdfs';
+import {ContextProps} from 'context/PdfStylesProvider';
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const styles = StyleSheet.create({
-  tableHeading: {
-    color: '#616161',
-    fontSize: 6,
-    textTransform: 'uppercase',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    marginTop: 20,
-    paddingBottom: 3,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    width: '100%',
-    marginVertical: 4,
-    paddingBottom: 3,
-  },
-  colIndex: {
-    textAlign: 'left',
-    width: '4%',
-  },
-  colName: {
-    width: '36%',
-    textAlign: 'left',
-  },
-  colPrice: {
-    textAlign: 'right',
-    width: '18%',
-  },
-  colPortion: {
-    textAlign: 'right',
-    color: '#212121',
-    width: '15%',
-  },
-  colAmount: {
-    textAlign: 'right',
-    color: '#212121',
-    width: '25%',
-  },
-});
+const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
+  StyleSheet.create({
+    tableHeading: {
+      color: secondaryColor,
+      fontSize: 6,
+      textTransform: 'uppercase',
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      width: '100%',
+      marginTop: 20,
+      paddingBottom: 3,
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      width: '100%',
+      marginVertical: 4,
+      paddingBottom: 3,
+    },
+    colIndex: {
+      textAlign: 'left',
+      width: '4%',
+    },
+    colName: {
+      width: '36%',
+      textAlign: 'left',
+    },
+    colPrice: {
+      textAlign: 'right',
+      width: '18%',
+    },
+    colPortion: {
+      textAlign: 'right',
+      color: primaryColor,
+      width: '15%',
+    },
+    colAmount: {
+      textAlign: 'right',
+      color: primaryColor,
+      width: '25%',
+    },
+  });
 
 type PerItemPaymentProps = {
   translate: (key: string) => string;
@@ -87,7 +65,7 @@ type PerItemPaymentProps = {
   selectedLng?: string;
   invoice?: InvoiceView;
   previousInvoices: InvoiceView[];
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const aggregateItems = (items: InvoiceView['items']) =>
   items.reduce<Record<string, AggregatedInvoiceItem>>((acc, item) => {
@@ -127,8 +105,20 @@ const renderRow = (
   index: number,
   aggregatedItem: AggregatedInvoiceItem,
   currentCurrency: Currency,
+  primaryColor: string,
+  secondaryColor: string,
+  fontStyles: {
+    regular: {
+      fontFamily: string;
+    };
+    bold: {
+      fontFamily: string;
+    };
+  },
   selectedLng?: string,
 ) => {
+  const styles = getStyles({primaryColor, secondaryColor});
+
   const baseAmount = (item.unitAmount.netAmount ?? 0) * item.quantity;
   const discount = item.additionalInfo?.discount;
   const discountParams =
@@ -150,7 +140,7 @@ const renderRow = (
     <View key={`${item.article?.id}-${index}`} style={styles.row}>
       <Text style={styles.colIndex}>{index + 1}</Text>
       <View style={styles.colName}>
-        <HtmlPDF html={item.name || ''} selectedLng={selectedLng} />
+        <HtmlPDF html={item.name || ''} fontStyles={fontStyles} />
       </View>
       <Text style={styles.colPrice}>{itemTotalPriceExclVat}</Text>
       <Text style={styles.colPortion}>{aggregatedItem.totalPercentage}%</Text>
@@ -169,6 +159,16 @@ const renderRow = (
 const renderRowsFromItems = (
   items: InvoiceView['items'],
   currentCurrency: Currency,
+  primaryColor: string,
+  secondaryColor: string,
+  fontStyles: {
+    regular: {
+      fontFamily: string;
+    };
+    bold: {
+      fontFamily: string;
+    };
+  },
   selectedLng?: string,
 ) => {
   const aggregated = aggregateItems(items);
@@ -178,7 +178,16 @@ const renderRowsFromItems = (
       totalAmountToBePaid: 0,
       totalPercentage: 0,
     };
-    return renderRow(item, index, aggregatedItem, currentCurrency, selectedLng);
+    return renderRow(
+      item,
+      index,
+      aggregatedItem,
+      currentCurrency,
+      primaryColor,
+      secondaryColor,
+      fontStyles,
+      selectedLng,
+    );
   });
 };
 
@@ -188,8 +197,13 @@ const PdfPreviewPerItemSection = ({
   selectedLng,
   invoice,
   previousInvoices,
+  primaryColor,
+  secondaryColor,
+  fontStyles,
 }: PerItemPaymentProps) => {
   if (!currentCurrency) return null;
+
+  const styles = getStyles({primaryColor, secondaryColor});
 
   const renderTableHeader = () => (
     <View style={styles.headerRow}>
@@ -215,7 +229,14 @@ const PdfPreviewPerItemSection = ({
     const allItems = previousInvoices.flatMap(
       (prevInvoice) => prevInvoice.items,
     );
-    return renderRowsFromItems(allItems, currentCurrency, selectedLng);
+    return renderRowsFromItems(
+      allItems,
+      currentCurrency,
+      primaryColor,
+      secondaryColor,
+      fontStyles,
+      selectedLng,
+    );
   };
 
   return (
@@ -252,7 +273,14 @@ const PdfPreviewPerItemSection = ({
         </View>
         {invoice?.items && (
           <View>
-            {renderRowsFromItems(invoice.items, currentCurrency, selectedLng)}
+            {renderRowsFromItems(
+              invoice.items,
+              currentCurrency,
+              primaryColor,
+              secondaryColor,
+              fontStyles,
+              selectedLng,
+            )}
             <View
               style={{
                 borderBottomWidth: 1,

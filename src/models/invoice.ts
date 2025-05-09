@@ -22,6 +22,11 @@ import {ServiceCompanySimpleView} from './service-company';
 import {ServiceOrderType, ServiceOrderView} from './service-order';
 import {Order} from './pagination';
 import {CANCEL_ACTION} from 'models/status';
+import {
+  ArticleInfoRecord,
+  EditableQuotationSubItemRecord,
+  SubItemsConfig,
+} from './quotation';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT',
@@ -78,6 +83,26 @@ export interface InvoiceItem {
   };
 }
 
+export enum InvoiceUnitAmountSource {
+  DEFAULT = 'DEFAULT',
+  MIX_ARTICLE = 'MIX_ARTICLE',
+  MIX_SUB_ITEMS = 'MIX_SUB_ITEMS',
+}
+export interface InvoiceItemAdditionalInfo {
+  discount?: Discount;
+  unitAmountSource?: InvoiceUnitAmountSource;
+  subItemsConfig?: {
+    subItemsVisible?: boolean;
+    priceVisible?: boolean;
+  };
+  userSeqNumber?: string;
+  payment?: {
+    type: InvoiceItemPaymentType;
+    amount: AggregatedAmount;
+    percentage?: number;
+  };
+}
+
 export interface InvoiceItemView {
   id: string;
   invoiceId?: string;
@@ -85,12 +110,10 @@ export interface InvoiceItemView {
   article?: ArticleView;
   name: string;
   unitAmount: MultiVatsAmount;
+  unitPurchaseAmount?: MultiVatsAmount;
   quantity: number;
   description: string;
-  additionalInfo?: {
-    discount?: Discount;
-    payment?: InvoiceItemPaymentRecord;
-  };
+  additionalInfo?: InvoiceItemAdditionalInfo;
 }
 
 export interface AggregatedInvoiceItem extends InvoiceItem {
@@ -347,19 +370,17 @@ export interface ArticleRecord {
 
 export interface InvoiceItemRecord {
   id?: string; // only for frontend key - we don't send it to backend
-  article?: ArticleRecord;
+  article?: ArticleInfoRecord;
   name: string;
   description?: string;
+  unitPurchaseAmount?: AmountRecord;
   unitAmount: AmountRecord;
   quantity: number;
   discount?: Discount;
   payment?: InvoiceItemPaymentRecord;
-  additionalInfo?:
-    | {
-        discount?: Discount;
-        payment?: InvoiceItemPaymentRecord;
-      }
-    | undefined;
+  subItemsConfig?: SubItemsConfig;
+  subItems?: EditableQuotationSubItemRecord[];
+  userSeqNumber?: string;
 }
 
 export enum InvoiceType {
@@ -386,7 +407,7 @@ export interface InvoiceFormData {
   description: string;
   dueDate?: Date;
   sentDate?: Date;
-  items: InvoiceItemRecord[];
+  items: EditableInvoiceItem[];
   paymentInfo: PaymentInfo;
   paymentTerm?: InvoicePaymentTermRecord;
   propertyOwnerId: string;
@@ -459,6 +480,8 @@ export interface CreateInvoice {
   showArticleSection?: boolean;
   refInvoiceId?: string;
   notes?: CreateInvoiceComment[];
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
 }
 
 export interface UpdateInvoice {
@@ -494,6 +517,8 @@ export interface UpdateInvoice {
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
   elevatorExternalId?: string;
 }
 
@@ -603,10 +628,20 @@ export interface InvoiceGeneration {
 export interface InvoiceItemAmount {
   discount: Discount;
   percentageVat?: number;
-  amountBeforeGlobalDiscount: Amount;
+  amountBeforeItemDiscount?: Amount;
+  amountAfterItemDiscount: Amount;
+  amountAfterGlobalDiscount?: Amount;
+  payment: InvoiceItemPaymentRecord;
+  subItems: InvoiceSubItemAmount[];
+}
+
+export interface InvoiceSubItemAmount {
+  payment: InvoiceItemPaymentType;
+  discount: Discount;
+  percentageVat?: number;
+  amountBeforeItemDiscount: Amount;
   amountAfterItemDiscount: Amount;
   amountAfterGlobalDiscount: Amount;
-  payment: InvoiceItemPaymentRecord;
 }
 
 export interface InvoiceAmountDetail {
@@ -682,4 +717,45 @@ export interface CalculateInvoiceAmountRecord {
   items: InvoiceItemRecord[];
   globalDiscount?: Discount;
   paymentRecord?: Payment;
+}
+
+export type EditableInvoiceItem = InvoiceItemRecord & {
+  id?: string;
+  margin?: number;
+};
+
+export type EditableInvoiceSubItemRecord = InvoiceSubItemRecord & {
+  margin?: number;
+  id?: string;
+  parentId?: string;
+};
+
+export interface InvoiceSubItemsConfig {
+  subItemsVisible?: boolean;
+  priceVisible?: boolean;
+}
+
+export interface InvoiceSubItemRecord {
+  article?: ArticleInfoRecord;
+  id?: string;
+  name: string;
+  unitPurchaseAmount?: Amount;
+  unitAmount: Amount;
+  quantity: number;
+  description?: string;
+  userSeqNumber?: string;
+}
+
+export interface PositionRowInvoice {
+  data: ArticleView;
+  id: string;
+  externalId: string;
+  name: string;
+  description: string;
+  type: ArticleType;
+  unit: string;
+  unitPurchaseAmount?: AmountRecord;
+  unitSellingAmount?: AmountRecord;
+  quantity?: number;
+  discount: number;
 }

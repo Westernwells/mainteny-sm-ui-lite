@@ -48,7 +48,7 @@ import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {State} from 'models/misc';
-import {FormikProps, getIn} from 'formik';
+import {UseFormReturn} from 'react-hook-form';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -93,13 +93,13 @@ const Table = ({children, headStyles, bodyStyles, ...props}: TableProps) => (
 );
 
 interface Props {
-  formik: FormikProps<InvoiceFormData>;
+  formMethods: UseFormReturn<InvoiceFormData>;
   previousInvoices: InvoiceView[];
   invoice?: InvoiceView;
 }
 
 export const UpfrontPaymentsSection = ({
-  formik,
+  formMethods,
   previousInvoices: allPreviousInvoices,
   invoice,
 }: Props) => {
@@ -107,6 +107,14 @@ export const UpfrontPaymentsSection = ({
   const isEditing = !!invoice;
   // if editing, we need to show only past invoices till this one (editing invoice included)
   // if creating, we need to show all invoices
+
+  const {setValue, watch, getValues, formState} = formMethods;
+
+  const watchedPayment = watch('payment');
+  const watchedItems = watch('items');
+  const watchedDiscount = watch('discount');
+  const watchedInvoiceType = watch('type');
+
   const previousInvoices = correctCreditNoteInvoicesPercentages(
     isEditing
       ? allPreviousInvoices.slice(
@@ -116,14 +124,14 @@ export const UpfrontPaymentsSection = ({
       : allPreviousInvoices,
   );
 
-  const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
-    formik.values.items,
-  );
+  const subtotalExclVatAfterPerItemDiscount =
+    calculateTotalWithPerItemDiscount(watchedItems);
+
   const subtotalExclVat = applyDiscount({
     actualValue: subtotalExclVatAfterPerItemDiscount,
-    ...(formik.values.discount?.type === DiscountType.AMOUNT
-      ? {amount: formik.values.discount?.amount?.value ?? 0}
-      : {percentage: formik.values.discount?.percentage ?? 0}),
+    ...(watchedDiscount?.type === DiscountType.AMOUNT
+      ? {amount: watchedDiscount?.amount?.value ?? 0}
+      : {percentage: watchedDiscount?.percentage ?? 0}),
   });
 
   const handleUpfrontPaymentChange = (values: {
@@ -131,18 +139,18 @@ export const UpfrontPaymentsSection = ({
     value?: number;
   }) => {
     const {value} = values;
-    if (formik.values.payment?.type === PaymentType.LUMP_SUM) {
-      formik.setFieldValue('payment', {
-        ...formik.values.payment,
+    if (watchedPayment?.type === PaymentType.LUMP_SUM) {
+      setValue('payment', {
+        ...watchedPayment,
         amount: {
           value: value || 0,
           currency: currentCurrency.code,
           fractionDigits: currentCurrency.fractionDigits,
         },
       });
-    } else if (formik.values.payment?.type === PaymentType.PERCENTAGE) {
-      formik.setFieldValue('payment', {
-        ...formik.values.payment,
+    } else if (watchedPayment?.type === PaymentType.PERCENTAGE) {
+      setValue('payment', {
+        ...watchedPayment,
         percentage: value || 0,
       });
     }
@@ -162,10 +170,7 @@ export const UpfrontPaymentsSection = ({
       return true;
     }
 
-    if (
-      floatValue < 0 ||
-      formik.values.payment?.type === PaymentType.PERCENTAGE
-    ) {
+    if (floatValue < 0 || watchedPayment?.type === PaymentType.PERCENTAGE) {
       return false;
     }
 
@@ -204,10 +209,10 @@ export const UpfrontPaymentsSection = ({
   };
 
   const amount =
-    formik.values.payment?.type === PaymentType.LUMP_SUM
-      ? formik.values.payment?.amount?.value ?? 0
-      : formik.values.payment?.type === PaymentType.PERCENTAGE
-      ? (subtotalExclVat * (formik.values.payment?.percentage ?? 0)) / 100
+    watchedPayment?.type === PaymentType.LUMP_SUM
+      ? watchedPayment?.amount?.value ?? 0
+      : watchedPayment?.type === PaymentType.PERCENTAGE
+      ? (subtotalExclVat * (watchedPayment?.percentage ?? 0)) / 100
       : 0;
 
   const amountFormatted = formatCurrency(fixRounding(amount, 2), {
@@ -233,38 +238,34 @@ export const UpfrontPaymentsSection = ({
     },
   );
 
-  const allItemsHasSameVAT = formik.values.items.every(
+  const allItemsHasSameVAT = watchedItems.every(
     (item) =>
       item.unitAmount.percentageVat ===
-      formik.values.items[0].unitAmount.percentageVat,
+      watchedItems[0].unitAmount.percentageVat,
   );
 
-  const percentageVats = formik.values.items.length
+  const percentageVats = watchedItems.length
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: formik.values.items[0].unitAmount.percentageVat ?? 0,
+            percentageVat: watchedItems[0].unitAmount.percentageVat ?? 0,
             vat:
               totalAmountExclVat *
-              ((formik.values.items[0].unitAmount.percentageVat ?? 0) / 100),
+              ((watchedItems[0].unitAmount.percentageVat ?? 0) / 100),
           },
         ]
-      : getAggregatedPartialPaymentsVats(
-          formik.values.items,
-          totalAmountExclVat,
-        )
+      : getAggregatedPartialPaymentsVats(watchedItems, totalAmountExclVat)
     : [];
-  const currentInvoiceAmountPercentageVats = formik.values.items.length
+  const currentInvoiceAmountPercentageVats = watchedItems.length
     ? allItemsHasSameVAT
       ? [
           {
-            percentageVat: formik.values.items[0].unitAmount.percentageVat,
+            percentageVat: watchedItems[0].unitAmount.percentageVat,
             vat:
-              amount *
-              ((formik.values.items[0].unitAmount.percentageVat ?? 0) / 100),
+              amount * ((watchedItems[0].unitAmount.percentageVat ?? 0) / 100),
           },
         ]
-      : getAggregatedPartialPaymentsVats(formik.values.items, amount)
+      : getAggregatedPartialPaymentsVats(watchedItems, amount)
     : [];
 
   const totalAmountInclVats = calculateTotalAmountInclVats({
@@ -289,7 +290,7 @@ export const UpfrontPaymentsSection = ({
     const firstInvoicePayment = firstInvoice?.additionalInfo.payment;
     const firstInvoicePaymentType = firstInvoicePayment?.type;
     const isFinalAfterPreviousInvoices =
-      hasPreviousInvoices && formik.values.type === InvoiceType.FINAL;
+      hasPreviousInvoices && watchedInvoiceType === InvoiceType.FINAL;
     const invoiceIndex = previousInvoices?.length + 1;
     const articlesAreSame =
       ((firstInvoicePayment?.amount?.netAmount || 0) /
@@ -302,9 +303,9 @@ export const UpfrontPaymentsSection = ({
     } else if (isFinalAfterPreviousInvoices) {
       const description = `${invoiceIndex}. ${t('Final invoice')}`;
       // prefill percentage/amount if it's a final invoice after previous invoices
-      if (formik.values.payment?.description !== description) {
-        formik.setFieldValue('payment', {
-          ...formik.values.payment,
+      if (watchedPayment?.description !== description) {
+        setValue('payment', {
+          ...watchedPayment,
           ...(firstInvoicePaymentType === PaymentType.PERCENTAGE &&
           articlesAreSame
             ? {
@@ -316,8 +317,10 @@ export const UpfrontPaymentsSection = ({
                 type: PaymentType.LUMP_SUM,
                 description,
                 amount: {
-                  ...formik.values.payment?.amount,
+                  ...watchedPayment?.amount,
                   value: subtotalExclVat - previousInvoicesTotalExclVat,
+                  currency:
+                    watchedPayment?.amount?.currency || currentCurrency.code,
                 },
               }),
         });
@@ -325,9 +328,9 @@ export const UpfrontPaymentsSection = ({
     } else {
       // change payment type according to first invoice
       const description = `${invoiceIndex}. ${t('Upfront invoice')}`;
-      if (formik.values.payment?.description !== description) {
-        formik.setFieldValue('payment', {
-          ...formik.values.payment,
+      if (watchedPayment?.description !== description) {
+        setValue('payment', {
+          ...watchedPayment,
           type:
             firstInvoicePaymentType === PaymentType.PERCENTAGE &&
             articlesAreSame
@@ -342,22 +345,23 @@ export const UpfrontPaymentsSection = ({
   useEffect(() => {
     if (!invoice) return;
     // initialize payment object if it's not set
-    if (invoice?.additionalInfo?.payment && !formik.values.payment) {
+    if (invoice?.additionalInfo?.payment && !watchedPayment) {
       const amountMoney = aggregatedAmountToMoney(
         invoice.additionalInfo.payment.amount,
       );
       amountMoney.value =
         (amountMoney?.value ?? 0) / 10 ** (amountMoney?.fractionDigits ?? 2);
-      formik.setFieldValue('payment', {
+      setValue('payment', {
         ...invoice.additionalInfo.payment,
         amount: amountMoney,
       });
     }
   }, [invoice]);
 
-  const paymentDescriptionError =
-    getIn(formik.touched, 'payment.description') &&
-    getIn(formik.errors, 'payment.description');
+  const paymentDescriptionError: string | undefined = formState.touchedFields
+    ?.payment?.description
+    ? formState.errors?.payment?.description?.message
+    : undefined;
 
   const invoicedSectionColumns: {
     name: string;
@@ -723,9 +727,15 @@ export const UpfrontPaymentsSection = ({
                       ...(prevInvoice.id === invoice?.id
                         ? {
                             name: 'payment.description',
-                            value: formik.values.payment?.description,
-                            onChange: formik.handleChange,
-                            onBlur: formik.handleBlur,
+                            value: watchedPayment?.description,
+                            onChange: (
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) =>
+                              setValue('payment', {
+                                ...getValues('payment'),
+                                type: getValues('payment')?.type!,
+                                description: e.target.value,
+                              }),
                             required: true,
                             error: !!paymentDescriptionError,
                             helperText: paymentDescriptionError,
@@ -747,7 +757,7 @@ export const UpfrontPaymentsSection = ({
                   display="flex"
                   justifyContent="flex-end"
                   gap={2}>
-                  {formik.values.payment?.type === PaymentType.PERCENTAGE && (
+                  {watchedPayment?.type === PaymentType.PERCENTAGE && (
                     <FormInput
                       inputType="currency"
                       {...(prevInvoice.id === invoice?.id && {
@@ -756,7 +766,7 @@ export const UpfrontPaymentsSection = ({
                       fieldProps={{
                         value:
                           prevInvoice.id === invoice?.id
-                            ? formik.values.payment?.percentage
+                            ? watchedPayment?.percentage
                             : prevInvoice.additionalInfo.payment?.percentage ??
                               0,
                         size: 'small',
@@ -780,7 +790,7 @@ export const UpfrontPaymentsSection = ({
                   )}
                   <FormInput
                     inputType="currency"
-                    {...(formik.values.payment?.type === PaymentType.LUMP_SUM
+                    {...(watchedPayment?.type === PaymentType.LUMP_SUM
                       ? {
                           onValueChange: handleUpfrontPaymentChange,
                         }
@@ -808,8 +818,7 @@ export const UpfrontPaymentsSection = ({
                       ...(prevInvoice.id === invoice?.id
                         ? {
                             disabled:
-                              formik.values.payment?.type ===
-                              PaymentType.PERCENTAGE,
+                              watchedPayment?.type === PaymentType.PERCENTAGE,
                           }
                         : {
                             disabled: true,
@@ -829,9 +838,13 @@ export const UpfrontPaymentsSection = ({
                     size: 'small',
                     label: 'Name',
                     name: 'payment.description',
-                    value: formik.values.payment?.description,
-                    onChange: formik.handleChange,
-                    onBlur: formik.handleBlur,
+                    value: watchedPayment?.description,
+                    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                      setValue('payment', {
+                        ...getValues('payment'),
+                        type: getValues('payment')?.type!,
+                        description: e.target.value,
+                      }),
                     required: true,
                     error: !!paymentDescriptionError,
                     helperText: paymentDescriptionError,
@@ -844,12 +857,12 @@ export const UpfrontPaymentsSection = ({
                 display="flex"
                 justifyContent="flex-end"
                 gap={2}>
-                {formik.values.payment?.type === PaymentType.PERCENTAGE && (
+                {watchedPayment?.type === PaymentType.PERCENTAGE && (
                   <FormInput
                     inputType="currency"
                     onValueChange={handleUpfrontPaymentChange}
                     fieldProps={{
-                      value: formik.values.payment?.percentage,
+                      value: watchedPayment?.percentage,
                       label: 'Percentage',
                       InputProps: {
                         endAdornment: (
@@ -869,7 +882,7 @@ export const UpfrontPaymentsSection = ({
                 )}
                 <FormInput
                   inputType="currency"
-                  {...(formik.values.payment?.type === PaymentType.LUMP_SUM
+                  {...(watchedPayment?.type === PaymentType.LUMP_SUM
                     ? {
                         onValueChange: handleUpfrontPaymentChange,
                       }
@@ -889,8 +902,7 @@ export const UpfrontPaymentsSection = ({
                     },
                   }}
                   numericFormatProps={{
-                    disabled:
-                      formik.values.payment?.type === PaymentType.PERCENTAGE,
+                    disabled: watchedPayment?.type === PaymentType.PERCENTAGE,
                     isAllowed: isAllowedAmountField,
                     allowLeadingZeros: false,
                   }}

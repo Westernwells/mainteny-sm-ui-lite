@@ -49,17 +49,23 @@ const initialValues: AbsenceForm = {
 
 const validationSchema = Yup.object().shape({
   duration: Yup.string().nullable(),
-  date: Yup.string().when('duration', {
-    is: (duration: string) => duration === '1 day',
-    then: Yup.string().required('Date is required'),
+  date: Yup.string().when(['duration'], ([duration], schema) => {
+    if (duration === '1 day') {
+      return schema.required('Date is required');
+    }
+    return schema.nullable();
   }),
-  dateStart: Yup.string().when('duration', {
-    is: (duration: string) => duration === 'Multiple days',
-    then: Yup.string().required('Date start is required'),
+  dateStart: Yup.string().when(['duration'], ([duration], schema) => {
+    if (duration === 'Multiple days') {
+      return schema.required('Date start is required');
+    }
+    return schema.nullable();
   }),
-  dateEnd: Yup.string().when('duration', {
-    is: (duration: string) => duration === 'Multiple days',
-    then: Yup.string().required('Date end is required'),
+  dateEnd: Yup.string().when(['duration'], ([duration], schema) => {
+    if (duration === 'Multiple days') {
+      return schema.required('Date end is required');
+    }
+    return schema.nullable();
   }),
 });
 
