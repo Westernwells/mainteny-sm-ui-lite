@@ -3256,5 +3256,9 @@
   "Total amount of quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan iznos ponuda od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
   "Accepted value": "Prihvaćena vrednost",
   "Total amount of accepted quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan broj prihvaćenih ponuda od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
-  "Total amount of pending quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan broj ponuda na čekanju od {{createdDateTimeFrom}} do {{createdDateTimeTo}}"
+  "Total amount of pending quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan broj ponuda na čekanju od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
+  "Send to": "Pošalji",
+  "Write with AI": "Pišite sa AI",
+  "Rewrite with AI": "Ponovo napišite pomoću AI",
+  "Add attachments to enhance article clarity.": "Dodajte priloge kako biste poboljšali jasnoću članka."
 }
