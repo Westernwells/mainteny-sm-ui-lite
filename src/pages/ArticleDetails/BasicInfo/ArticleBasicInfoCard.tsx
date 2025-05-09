@@ -310,7 +310,10 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
 
   const [firstTag, secondTag, ...groupTags] =
     article.additionalInfo?.tags || [];
-  const showTags = [firstTag, secondTag];
+  const showTags = [
+    ...(firstTag ? [firstTag] : []),
+    ...(secondTag ? [secondTag] : []),
+  ];
 
   return (
     <InfoCard
