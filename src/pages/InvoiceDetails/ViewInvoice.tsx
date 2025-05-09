@@ -594,12 +594,6 @@ export const ViewInvoice = ({
     return blob;
   };
 
-  useEffect(() => {
-    if (reportToUpdate) {
-      setReport(reportToUpdate);
-    }
-  }, [reportToUpdate]);
-
   const generateBlobUrl = async ({
     invoiceData,
     invoiceNumber,
@@ -1004,28 +998,6 @@ export const ViewInvoice = ({
     setExistingFiles(allFiles);
   };
 
-  useEffect(() => {
-    if (
-      invoice &&
-      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
-      invoice.status === InvoiceStatus.DRAFT
-    ) {
-      checkValidQrCode(invoice);
-    }
-  }, [invoice]);
-
-  useEffect(() => {
-    if (qrError) {
-      const errorMessage = getQrErrorMessage(qrError);
-      if (errorMessage) {
-        enqueueSnackbar(t(`${errorMessage}`), {
-          variant: 'error',
-        });
-        setQrError(null);
-      }
-    }
-  }, [qrError]);
-
   const paymentTerm = invoice?.additionalInfo?.paymentTerm;
   const hasPaymentTerm = typeof paymentTerm?.id === 'string';
   const paymentTermDueDays = paymentTerm?.data?.dueDays || 0;
@@ -1125,31 +1097,6 @@ export const ViewInvoice = ({
     (action) => action.label !== primaryLabel,
   );
 
-  useEffect(() => {
-    if (
-      memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT &&
-      !qrError &&
-      !isLoadingInvoiceAmountDetail
-    ) {
-      generateBlobUrl({
-        invoiceData: memorizedUpdateInvoiceData,
-      });
-    }
-  }, [
-    memorizedUpdateInvoiceData,
-    headerUrl,
-    footerUrl,
-    memorizedUpdateInvoiceData?.type === InvoiceType.CREDIT_NOTE ||
-    memorizedUpdateInvoiceData?.type === InvoiceType.FULL ||
-    memorizedUpdateInvoiceData?.type === InvoiceType.AGGREGATE
-      ? null
-      : previousInvoices,
-    qrError,
-    qrImageSrc,
-    isLoadingInvoiceAmountDetail,
-    company,
-  ]);
-
   const doPrint = async () => {
     const PDFDownloadURLResponse = await refetchDownloadUrl();
     const XMLDownloadURLResponse = await refetchXMLDownloadUrl();
@@ -1181,44 +1128,6 @@ export const ViewInvoice = ({
     setActionType('');
     setFilePathToDownload('');
   };
-
-  useEffect(() => {
-    if (xmlHtmlContent) {
-      printJS({
-        printable: 'xml-content',
-        type: 'html',
-        showModal: true,
-        style: `
-          #xml-content {
-            white-space: break-spaces;
-          }
-        `,
-      });
-
-      setXmlHtmlContent('');
-    }
-  }, [xmlHtmlContent]);
-
-  useEffect(() => {
-    const isSent = invoice.status === InvoiceStatus.NOT_PAID;
-
-    if (actionType === 'PRINT' && isSent) {
-      doPrint();
-    }
-  }, [actionType, invoice]);
-
-  useEffectAfterMount(() => {
-    (async () => {
-      if (companyNextNumber?.value) {
-        try {
-          setIsLoadingFiles(true);
-          await refetchPDFs(companyNextNumber.value);
-        } finally {
-          setIsLoadingFiles(false);
-        }
-      }
-    })();
-  }, [companyNextNumber?.value]);
 
   const onPrintInvoice = async () => {
     setIsConfirmPrintDialogOpen(false);
@@ -1405,6 +1314,98 @@ export const ViewInvoice = ({
       invoiceNumber: invoice?.number ?? '',
     });
   };
+
+  useEffect(() => {
+    if (
+      invoice &&
+      user?.userAccount.serviceCompany.settings.invoiceQRCodeEnabled &&
+      invoice.status === InvoiceStatus.DRAFT
+    ) {
+      checkValidQrCode(invoice);
+    }
+  }, [invoice]);
+
+  useEffect(() => {
+    if (qrError) {
+      const errorMessage = getQrErrorMessage(qrError);
+      if (errorMessage) {
+        enqueueSnackbar(t(`${errorMessage}`), {
+          variant: 'error',
+        });
+        setQrError(null);
+      }
+    }
+  }, [qrError]);
+
+  useEffect(() => {
+    if (
+      memorizedUpdateInvoiceData?.status === InvoiceStatus.DRAFT &&
+      !qrError &&
+      !isLoadingInvoiceAmountDetail
+    ) {
+      generateBlobUrl({
+        invoiceData: memorizedUpdateInvoiceData,
+      });
+    }
+  }, [
+    memorizedUpdateInvoiceData,
+    headerUrl,
+    footerUrl,
+    memorizedUpdateInvoiceData?.type === InvoiceType.CREDIT_NOTE ||
+    memorizedUpdateInvoiceData?.type === InvoiceType.FULL ||
+    memorizedUpdateInvoiceData?.type === InvoiceType.AGGREGATE
+      ? null
+      : previousInvoices,
+    qrError,
+    qrImageSrc,
+    isLoadingInvoiceAmountDetail,
+    company,
+    fontStyles,
+  ]);
+
+  useEffect(() => {
+    if (reportToUpdate) {
+      setReport(reportToUpdate);
+    }
+  }, [reportToUpdate]);
+
+  useEffect(() => {
+    if (xmlHtmlContent) {
+      printJS({
+        printable: 'xml-content',
+        type: 'html',
+        showModal: true,
+        style: `
+          #xml-content {
+            white-space: break-spaces;
+          }
+        `,
+      });
+
+      setXmlHtmlContent('');
+    }
+  }, [xmlHtmlContent]);
+
+  useEffect(() => {
+    const isSent = invoice.status === InvoiceStatus.NOT_PAID;
+
+    if (actionType === 'PRINT' && isSent) {
+      doPrint();
+    }
+  }, [actionType, invoice]);
+
+  useEffectAfterMount(() => {
+    (async () => {
+      if (companyNextNumber?.value) {
+        try {
+          setIsLoadingFiles(true);
+          await refetchPDFs(companyNextNumber.value);
+        } finally {
+          setIsLoadingFiles(false);
+        }
+      }
+    })();
+  }, [companyNextNumber?.value, fontStyles]);
 
   return (
     <Box>

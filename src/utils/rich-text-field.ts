@@ -191,26 +191,58 @@ const convertPixelStringToNumber = (value: string) =>
   Number(value.slice(0, -2));
 
 export const addAttributeToBlock = (editor: CustomEditor, format: FORMAT) => {
-  const markToUpdate = FORMAT_TO_ATTRIBUTE[format];
+  const {selection} = editor;
+  if (!selection) return false;
 
+  const markToUpdate = FORMAT_TO_ATTRIBUTE[format];
   if (!markToUpdate) return;
 
-  const shouldChangeNode = ELEMENT_TO_CHANGE[markToUpdate] === 'node' || false;
-
-  const foundMarks: Marks = Editor.marks(editor) || {};
-  const currentMarkValue = foundMarks[markToUpdate];
-
-  // currently uses only indentation logic
-  const newMarkValue = currentMarkValue
-    ? convertPixelStringToNumber(currentMarkValue as string) +
-      INDENTATION_PIXEL_SIZE
-    : INDENTATION_PIXEL_SIZE;
+  const shouldChangeNode =
+    ELEMENT_TO_CHANGE[markToUpdate].type === 'node' || false;
 
   if (shouldChangeNode) {
-    Transforms.setNodes(editor, {
-      [markToUpdate]: convertNumberToPixelStringValue(newMarkValue),
+    // Get all nodes in the selection as an array and iterate
+    const nodes = Array.from(
+      Editor.nodes(editor, {
+        at: selection,
+        match: (n) =>
+          !Editor.isEditor(n) &&
+          SlateElement.isElement(n) &&
+          n.type === ELEMENT_TO_CHANGE[markToUpdate].target,
+      }),
+    );
+
+    // update each node
+    nodes.forEach((nodeEntry) => {
+      const [node, path] = nodeEntry;
+
+      // @ts-ignore
+      const currentMarkValue = node[markToUpdate];
+      // currently uses only indentation logic
+      const newMarkValue = currentMarkValue
+        ? convertPixelStringToNumber(currentMarkValue as string) +
+          INDENTATION_PIXEL_SIZE
+        : INDENTATION_PIXEL_SIZE;
+
+      Transforms.setNodes(
+        editor,
+        {
+          [markToUpdate]: convertNumberToPixelStringValue(newMarkValue),
+        },
+        {at: path}, // This location of the current node to update
+      );
     });
   } else {
+    // implemented without use case. MAY NEED WORK before its production ready
+    const foundMarks: Marks = Editor.marks(editor) || {};
+    const currentMarkValue = foundMarks[markToUpdate];
+
+    // currently uses only indentation logic
+    const newMarkValue = currentMarkValue
+      ? convertPixelStringToNumber(currentMarkValue as string) +
+        INDENTATION_PIXEL_SIZE
+      : INDENTATION_PIXEL_SIZE;
+
     Editor.addMark(
       editor,
       markToUpdate,
@@ -223,39 +255,78 @@ export const removeAttributeToBlock = (
   editor: CustomEditor,
   format: FORMAT,
 ) => {
-  const markToUpdate = FORMAT_TO_ATTRIBUTE[format];
+  const {selection} = editor;
+  if (!selection) return false;
 
+  const markToUpdate = FORMAT_TO_ATTRIBUTE[format];
   if (!markToUpdate) return;
 
-  const shouldChangeNode = ELEMENT_TO_CHANGE[markToUpdate] === 'node' || false;
-
-  const foundMarks: Marks = Editor.marks(editor) || {};
-  const currentMarkValue = shouldChangeNode
-    ? undefined
-    : foundMarks[markToUpdate];
-
-  // currently uses only indentation logic
-  const newMarkValue = currentMarkValue
-    ? convertPixelStringToNumber(currentMarkValue as string) -
-      INDENTATION_PIXEL_SIZE
-    : 0;
-
-  const isMarkValid = newMarkValue > 0;
+  const shouldChangeNode =
+    ELEMENT_TO_CHANGE[markToUpdate].type === 'node' || false;
 
   if (shouldChangeNode) {
-    Transforms.setNodes(editor, {
-      [markToUpdate]: isMarkValid
-        ? convertNumberToPixelStringValue(newMarkValue)
-        : convertNumberToPixelStringValue(0),
-    });
-  } else if (isMarkValid) {
-    Editor.addMark(
-      editor,
-      markToUpdate,
-      convertNumberToPixelStringValue(newMarkValue),
+    // Get all nodes in the selection as an array and iterate
+    const nodes = Array.from(
+      Editor.nodes(editor, {
+        at: selection,
+        match: (n) =>
+          !Editor.isEditor(n) &&
+          SlateElement.isElement(n) &&
+          n.type === ELEMENT_TO_CHANGE[markToUpdate].target,
+      }),
     );
+
+    // update each node
+    nodes.forEach((nodeEntry) => {
+      const [node, path] = nodeEntry;
+
+      // @ts-ignore
+      const {[markToUpdate]: currentMarkValue, ...rest} = node;
+
+      // currently uses only indentation logic
+      const newMarkValue = currentMarkValue
+        ? convertPixelStringToNumber(currentMarkValue as string) -
+          INDENTATION_PIXEL_SIZE
+        : 0;
+
+      const isMarkValid = newMarkValue && newMarkValue > 0;
+
+      const updatedProps = {
+        ...rest, // keep not related fields
+        ...(isMarkValid
+          ? {[markToUpdate]: convertNumberToPixelStringValue(newMarkValue)}
+          : {[markToUpdate]: undefined}), // reset field needs to be passed with undefined
+      };
+
+      Transforms.setNodes(
+        editor,
+        updatedProps,
+        {at: path}, // This location of the current node to update
+      );
+    });
+
+    // currently uses only indentation logic
   } else {
-    Editor.removeMark(editor, markToUpdate);
+    const foundMarks: Marks = Editor.marks(editor) || {};
+    const currentMarkValue = foundMarks[markToUpdate];
+
+    // currently uses only indentation logic
+    const newMarkValue = currentMarkValue
+      ? convertPixelStringToNumber(currentMarkValue as string) -
+        INDENTATION_PIXEL_SIZE
+      : INDENTATION_PIXEL_SIZE;
+
+    const isMarkValid = newMarkValue > 0;
+
+    if (isMarkValid) {
+      Editor.addMark(
+        editor,
+        markToUpdate,
+        convertNumberToPixelStringValue(newMarkValue),
+      );
+    } else {
+      Editor.removeMark(editor, markToUpdate);
+    }
   }
 };
 
@@ -277,6 +348,7 @@ export const serialize = (node: Descendant): string => {
 
   const pStyle = {
     ...(node.color ? {color: node.color} : undefined),
+    ...(node.textIndent ? {'text-indent': node.textIndent} : undefined),
   };
 
   if (Text.isText(node)) {
@@ -359,6 +431,7 @@ export const deserialize = (el: HTMLElement) => {
 
   if (TEXT_TAGS[nodeName]) {
     const attrs = TEXT_TAGS[nodeName](el);
+
     return children.map((child) =>
       jsx('text', attrs, typeof child === 'string' ? {text: child} : child),
     );
@@ -476,6 +549,24 @@ export const modifyHTMLFontSizeForPDFRendering = (html: string) => {
         : currentFontSize === FONT_SIZE.LARGE
         ? HTML_PDF_FONT_SIZE.LARGE
         : HTML_PDF_FONT_SIZE.NORMAL;
+  });
+
+  // Serialize the modified DOM back to HTML string
+  return doc.documentElement.outerHTML;
+};
+
+export const generateTextIndent = (html: string) => {
+  // Parse the HTML string
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // Select all elements with inline style containing text-indent
+  const elements = doc.querySelectorAll('[style*="text-indent"]');
+
+  // Loop through each element and set standard font sizes
+  elements.forEach((element) => {
+    const htmlElement = element as HTMLElement;
+    htmlElement.style.marginLeft = htmlElement.style.textIndent;
   });
 
   // Serialize the modified DOM back to HTML string

@@ -36,7 +36,11 @@ const CustomElements = ({
   attributes,
   children,
 }: RenderElementProps) => {
-  const style = {fontSize: element.fontSize, color: element.color};
+  const style = {
+    fontSize: element.fontSize,
+    color: element.color,
+    textIndent: element.textIndent,
+  };
 
   switch (element.type) {
     case 'paragraph':
