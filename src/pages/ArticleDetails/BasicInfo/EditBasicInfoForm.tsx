@@ -42,6 +42,8 @@ import {
 } from 'utils/currency';
 import {getAmountFromPercentage} from 'utils/utils';
 import {Receipt, ReceiptOutlined} from '@mui/icons-material';
+import TagFormField from 'components/Tag/TagFormField';
+import {TagEntityType} from 'models/tag';
 
 export const EditBasicInfoForm = ({
   containerStyles,
@@ -423,6 +425,23 @@ export const EditBasicInfoForm = ({
           onChange: formik.handleChange,
         }}
       />
+
+      <Box
+        sx={{
+          width: '320px',
+          display: 'flex',
+          alignItems: 'center',
+          margin: '8px 4px 8px 0', // align with other fields
+        }}>
+        <TagFormField
+          tags={formik.values.tags || []}
+          entity={TagEntityType.ARTICLE}
+          onChange={(values) => {
+            formik.setFieldValue('tags', values);
+          }}
+          height="43px"
+        />
+      </Box>
 
       <Grid container sx={{pt: 2}}>
         <Grid item xs={12} sm={2} gap={2}>
