@@ -5,7 +5,7 @@ const CustomParagraph = Paragraph.extend({
   addAttributes() {
     return {
       style: {
-        default: 'margin: 0; padding: 0; line-height: 1.5;', // Default inline styles
+        default: 'margin: 0; padding: 0; line-height: 1.5;white-space:normal', // Default inline styles
         parseHTML: (element) => element.style.cssText || '',
         renderHTML: (attributes) => ({
           style: attributes.style,

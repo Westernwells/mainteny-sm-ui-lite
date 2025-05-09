@@ -112,7 +112,11 @@ import {useTheme} from '@mui/system';
 
 const pageSize = 25;
 
-type Props = {elevatorId?: string};
+type Props = {
+  elevatorId?: string;
+  customerId?: string;
+  elevatorExternalId?: string;
+};
 
 const QUICK_FILTER_OPTIONS_WITHOUT_ALL: OptionWithTranslationKey[] = [
   {value: InvoiceStatusFilter.DRAFT, labelKey: 'Draft'},
@@ -132,7 +136,7 @@ const QUICK_FILTER_OPTIONS: OptionWithTranslationKey[] = [
   ...QUICK_FILTER_OPTIONS_WITHOUT_ALL,
 ];
 
-const Invoices = ({elevatorId}: Props) => {
+const Invoices = ({elevatorId, customerId, elevatorExternalId}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
   const navigate = useNavigate();
@@ -711,9 +715,17 @@ const Invoices = ({elevatorId}: Props) => {
     [invoiceResource],
   );
 
-  const navigateToNewInvoice = () => {
-    navigate('/invoices/new');
-  };
+  const navigateToNewInvoice = useCallback(() => {
+    const params = new URLSearchParams();
+    if (customerId) {
+      params.set('customerId', customerId);
+    }
+
+    if (elevatorExternalId)
+      params.set('elevatorExternalId', elevatorExternalId);
+    const qs = params.toString();
+    navigate(`/invoices/new${qs ? `?${qs}` : ''}`);
+  }, [navigate, customerId, elevatorExternalId]);
 
   const handleQuickFilterChange = (value: string) => {
     // when selecting ALL values remove all other selections

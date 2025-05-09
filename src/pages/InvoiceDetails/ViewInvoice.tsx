@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {
   QueryObserverResult,
@@ -25,6 +25,7 @@ import {
   FILE_DESCRIPTION_PREFIXES,
   InvoiceActivityView,
   InvoiceStatus,
+  InvoiceSubItemRecord,
   InvoiceType,
   InvoiceTypeMap,
   InvoiceView,
@@ -48,7 +49,7 @@ import {
   useDeleteInvoice,
   useFetchServiceOrderInvoices,
   useFetchXInvoiceByInvoiceId,
-  useInvoiceAmountDetail,
+  useInvoiceAmountDetailQuery,
   useInvoiceDetail,
   useInvoicePaymentStatus,
   usePrintInvoice,
@@ -126,8 +127,12 @@ import {FileResourceRecord} from 'models/media';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {CANCEL_ACTION} from 'models/status';
 import {useVats} from 'hooks/reactQuery/useVats';
-import {getInvoiceStatusStyles} from 'utils/invoice';
+import {
+  getInvoiceStatusStyles,
+  invoiceItemToInvoiceItemRecord,
+} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
+import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {
@@ -159,6 +164,7 @@ interface Props {
   };
   isLoadingHeaderUrl?: boolean;
   isLoadingFooterUrl?: boolean;
+  invoiceSubItems?: Record<string, InvoiceSubItemRecord[]>;
 }
 
 type CustomTranslationOptions = UseTranslationOptions<'translation'> & {
@@ -184,6 +190,7 @@ export const ViewInvoice = ({
   },
   isLoadingHeaderUrl,
   isLoadingFooterUrl,
+  invoiceSubItems,
 }: Props) => {
   const {t} = useTranslation();
   const {enqueueSnackbar} = useSnackbar();
@@ -219,6 +226,21 @@ export const ViewInvoice = ({
 
   const {data: updatedInvoice, refetch: refetchInvoiceData} = useInvoiceDetail(
     invoice.id,
+  );
+
+  const subItemsMap: Record<string, InvoiceSubItemRecord[]> = useMemo(
+    () =>
+      Object.entries(invoiceSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, InvoiceSubItemRecord[]>,
+      ),
+    [invoiceSubItems],
   );
 
   const [activeSignature, setActiveSignature] = useState<
@@ -262,6 +284,9 @@ export const ViewInvoice = ({
   const {refetch: refetchXMLDownloadUrl} = useDownloadUrl(
     invoice?.additionalInfo.xmlPath ? [invoice?.additionalInfo.xmlPath] : [],
   );
+
+  const {fontStyles, primaryColor, secondaryColor} =
+    useContext(PdfStylesContext);
 
   const [filePathToDownload, setFilePathToDownload] = useState('');
 
@@ -317,7 +342,7 @@ export const ViewInvoice = ({
     invoice.serviceOrder?.id,
   );
   const {data: invoiceAmountDetail, isLoading: isLoadingInvoiceAmountDetail} =
-    useInvoiceAmountDetail(invoice?.id);
+    useInvoiceAmountDetailQuery(invoice?.id);
 
   const sortedPreviousInvoices = useMemo(
     () =>
@@ -427,6 +452,7 @@ export const ViewInvoice = ({
 
     const blob = await pdf(
       <ChecklistPdf
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
         selectedLng={company?.language}
@@ -440,6 +466,9 @@ export const ViewInvoice = ({
         headerInfo={headerInfo}
         footerPath={footerUrl}
         footerInfo={footerInfo}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -541,9 +570,9 @@ export const ViewInvoice = ({
 
     const blob = await pdf(
       <WorkReportTemplate
+        serviceCompany={company}
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
-        selectedLng={company?.language}
         translate={translate}
         serviceOrder={invoice?.serviceOrder}
         report={workReport}
@@ -556,6 +585,9 @@ export const ViewInvoice = ({
         footerInfo={footerInfo}
         technicianName={technicianNameForReport}
         serviceOrderType={getJobTypeGivenName(serviceOrder?.type, allJobTypes)}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
 
@@ -618,8 +650,20 @@ export const ViewInvoice = ({
         )
       : [];
 
+    const transformedInvoiceItems =
+      invoice?.items.map((item) =>
+        invoiceItemToInvoiceItemRecord(
+          item,
+          invoice.type,
+          currentCurrency,
+          taxRates,
+          subItemsMap,
+        ),
+      ) || [];
+
     const blob = await pdf(
       <PdfTemplate
+        serviceCompany={company}
         userInfo={user?.userAccount}
         pdfConfigClientStorage={pdfConfig}
         currentCurrency={currentCurrency}
@@ -636,6 +680,10 @@ export const ViewInvoice = ({
           invoiceNumber || translate('Automatically assigned')
         }
         qrImageSrc={qrImageSrc}
+        invoiceItems={transformedInvoiceItems}
+        fontStyles={fontStyles}
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
@@ -1099,6 +1147,7 @@ export const ViewInvoice = ({
     qrError,
     qrImageSrc,
     isLoadingInvoiceAmountDetail,
+    company,
   ]);
 
   const doPrint = async () => {
@@ -1216,6 +1265,7 @@ export const ViewInvoice = ({
               },
               currentCurrency,
               taxRates,
+              subItemsMap,
             ),
             invoiceId: invoice.id,
           },

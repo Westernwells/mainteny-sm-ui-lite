@@ -1,24 +1,17 @@
-import {Font, StyleSheet, Text, View} from '@react-pdf/renderer';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import BigNumber from 'bignumber.js';
 import {
-  InvoiceView,
-  InvoiceItemView,
-  DiscountType,
-  PaymentType,
   InvoiceAmountDetail,
+  InvoiceItemView,
   InvoiceType,
+  InvoiceView,
+  PaymentType,
 } from 'models/invoice';
+import {getAggregatedPartialPaymentsVats} from 'pages/InvoiceDetails/utils';
+import {calculateTotalAmountInclVats} from 'utils/calculate-total';
 import {
-  applyDiscount,
-  getAggregatedPartialPaymentsVats,
-} from 'pages/InvoiceDetails/utils';
-import {
-  calculateTotalWithPerItemDiscount,
-  calculateTotalAmountInclVats,
-} from 'utils/calculate-total';
-import {
-  centsToMoney,
   aggregatedAmountToMoney,
+  centsToMoney,
   formatCurrency,
   getCurrencySymbol,
 } from 'utils/currency';
@@ -30,10 +23,8 @@ import {
 } from 'utils/invoice';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {useMemo} from 'react';
-import MontserratRegular from '../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import PdfPaymentHistorySection from '../PdfPaymentHistorySection';
 import PdfPreviewInvoicedSection from './PdfPreviewInvoicedSection';
 import PdfPreviewPerItemSection from './PdfPreviewPerItemSection';
@@ -46,32 +37,13 @@ type PartialProps = {
   selectedLng?: string;
   previousInvoices: InvoiceView[];
   articleItems: InvoiceItemView[];
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (boldFontStyle?: {fontFamily: string}) =>
+const getStyles = ({
+  boldFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     tableHead: {
       display: 'flex',
@@ -79,7 +51,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -98,13 +70,13 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       ...boldFontStyle,
       marginTop: 15,
     },
     sectionBody: {
       fontSize: 10,
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -119,19 +91,16 @@ const PdfPreviewUpfrontPaymentSection = ({
   selectedLng,
   previousInvoices,
   articleItems,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: PartialProps) => {
   const isEditing = !!invoice?.id;
 
-  const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
-    articleItems!,
+  const subtotalExclVat = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount.netAmount ?? 0,
   );
-
-  const subtotalExclVat = applyDiscount({
-    actualValue: subtotalExclVatAfterPerItemDiscount,
-    ...(invoice?.additionalInfo.discount?.type === DiscountType.AMOUNT
-      ? {amount: invoice?.additionalInfo.discount?.amount?.value ?? 0}
-      : {percentage: invoice?.additionalInfo.discount?.percentage ?? 0}),
-  });
 
   const previousInvoicesTotalExclVat = previousInvoices
     ?.map(
@@ -250,11 +219,11 @@ const PdfPreviewUpfrontPaymentSection = ({
 
   const hasPayments = previousInvoices.map((i) => i.payments).flat().length > 0;
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const styles = getStyles(boldFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    primaryColor,
+    secondaryColor,
+  });
 
   const formattedPaymentValues = useMemo(() => {
     if (
@@ -293,6 +262,9 @@ const PdfPreviewUpfrontPaymentSection = ({
             currentCurrency={currentCurrency}
             invoice={invoice}
             previousInvoices={previousInvoices}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
+            fontStyles={fontStyles}
           />
         )}
 
@@ -359,7 +331,7 @@ const PdfPreviewUpfrontPaymentSection = ({
                 <Text
                   style={{
                     textAlign: 'left',
-                    color: '#212121',
+                    color: primaryColor,
                     width: '60%',
                   }}>
                   {previousInvoice.type === InvoiceType.CREDIT_NOTE
@@ -371,7 +343,7 @@ const PdfPreviewUpfrontPaymentSection = ({
                   <Text
                     style={{
                       textAlign: 'right',
-                      color: '#212121',
+                      color: primaryColor,
                       width: '15%',
                     }}>
                     {fixRounding(
@@ -385,7 +357,7 @@ const PdfPreviewUpfrontPaymentSection = ({
                 <Text
                   style={{
                     textAlign: 'right',
-                    color: '#212121',
+                    color: primaryColor,
                     width:
                       previousInvoice.additionalInfo.payment?.type ===
                       PaymentType.PERCENTAGE
@@ -424,7 +396,7 @@ const PdfPreviewUpfrontPaymentSection = ({
             <Text
               style={{
                 textAlign: 'left',
-                color: '#212121',
+                color: primaryColor,
                 width: '60%',
               }}>
               {invoice?.type === InvoiceType.CREDIT_NOTE
@@ -436,7 +408,7 @@ const PdfPreviewUpfrontPaymentSection = ({
               <Text
                 style={{
                   textAlign: 'right',
-                  color: '#212121',
+                  color: primaryColor,
                   width: '15%',
                 }}>
                 {fixRounding(
@@ -450,7 +422,7 @@ const PdfPreviewUpfrontPaymentSection = ({
             <Text
               style={{
                 textAlign: 'right',
-                color: '#212121',
+                color: primaryColor,
                 width:
                   invoice?.additionalInfo.payment?.type ===
                   PaymentType.PERCENTAGE
@@ -474,7 +446,7 @@ const PdfPreviewUpfrontPaymentSection = ({
           <Text
             style={{
               width: '32%',
-              color: '#616161',
+              color: secondaryColor,
               fontSize: 10,
               textAlign: 'right',
             }}>
@@ -497,7 +469,7 @@ const PdfPreviewUpfrontPaymentSection = ({
               <Text
                 style={{
                   width: '32%',
-                  color: '#616161',
+                  color: secondaryColor,
                   fontSize: 10,
                   textAlign: 'right',
                 }}>
@@ -524,7 +496,7 @@ const PdfPreviewUpfrontPaymentSection = ({
                 <Text
                   style={{
                     width: '32%',
-                    color: '#616161',
+                    color: secondaryColor,
                     fontSize: 10,
                     textAlign: 'right',
                   }}>
@@ -556,8 +528,8 @@ const PdfPreviewUpfrontPaymentSection = ({
           <Text
             style={{
               width: '32%',
-              color: '#212121',
-              ...boldFontStyle,
+              color: primaryColor,
+              ...fontStyles.bold,
               textAlign: 'right',
               fontSize: 10,
               paddingLeft: 25,
@@ -570,8 +542,8 @@ const PdfPreviewUpfrontPaymentSection = ({
             style={{
               width: '24%',
               textAlign: 'right',
-              color: '#212121',
-              ...boldFontStyle,
+              color: primaryColor,
+              ...fontStyles.bold,
               fontSize: 10,
             }}>
             {totalAmountInclVatsFormatted}
@@ -590,6 +562,9 @@ const PdfPreviewUpfrontPaymentSection = ({
             currentInvoiceAmountPercentageVats={
               currentInvoiceAmountPercentageVats
             }
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         )}
 
@@ -601,6 +576,9 @@ const PdfPreviewUpfrontPaymentSection = ({
           totalAmountInclVatsFormatted={totalAmountInclVatsFormatted}
           outstandingAmountFormatted={outstandingAmountFormatted}
           selectedLng={selectedLng}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       )}
 
@@ -615,7 +593,7 @@ const PdfPreviewUpfrontPaymentSection = ({
               marginTop: 6,
               marginBottom: 16,
             }}
-            selectedLng={selectedLng}
+            fontStyles={fontStyles}
           />
         </View>
       )}

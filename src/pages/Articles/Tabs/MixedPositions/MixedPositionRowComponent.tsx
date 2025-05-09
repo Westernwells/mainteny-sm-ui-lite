@@ -37,7 +37,7 @@ import {ServiceCompanyNumberType} from 'models/service-company';
 import {Actions} from './Actions';
 import {DeleteEventState, getIconByType} from '.';
 
-const sanitizedTextStyles = {
+export const sanitizedTextStyles = {
   maxWidth: 250,
   overflow: 'hidden',
   textOverflow: 'ellipsis',

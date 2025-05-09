@@ -100,6 +100,8 @@ export interface ServiceCompany {
   businessAddress?: Address;
   statistics?: {
     numberOfUsers: number;
+    numberOfMainUsers?: number;
+    numberOfContractors?: number;
     lastActivity?: Date;
   };
   language: Language;

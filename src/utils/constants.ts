@@ -74,7 +74,9 @@ export const DEFAULT_EMPLOYEE_EVENT_TYPES = [
   'SICK_LEAVE',
 ];
 
+// DEPRECATED! use the ClientStorageKeys enum
 export const CLIENT_STORAGE_PDF_CONFIG_KEY = 'pdf-configurations';
+// DEPRECATED! use the ClientStorageKeys enum
 export const CLIENT_STORAGE_PDF_TEMPLATE_KEY = 'pdf-template';
 
 export const DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE: ClientReportForPDFConfig =
@@ -136,3 +138,12 @@ export const DEFAULT_ELEVATOR_TECHNICAL_FIELD_CATEGORIES = [
 ];
 
 export const ESCAPE_DOT_STRING = '_DOT_';
+export const PDF_FONTS = [
+  'Montserrat',
+  'Aventa',
+  'Inter',
+  'Ubuntu',
+  'Arial',
+  'Lato',
+  'Times New Roman',
+];

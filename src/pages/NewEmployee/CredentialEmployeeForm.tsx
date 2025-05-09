@@ -34,7 +34,7 @@ export const CredentialEmployeeForm = ({
       .matches(/.*[\W_]/, t('Must contain 1 special character')),
     confirmPassword: Yup.string()
       .required(t('This field is required'))
-      .oneOf([Yup.ref('password'), null], t('Passwords must match')),
+      .oneOf([Yup.ref('password')], t('Passwords must match')),
   });
 
   const formik = useFormik<CredentialEmployeeFormModel>({

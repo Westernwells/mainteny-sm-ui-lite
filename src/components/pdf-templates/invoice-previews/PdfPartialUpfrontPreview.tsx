@@ -1,24 +1,19 @@
-import {useMemo} from 'react';
-import {Document, View, StyleSheet, Font} from '@react-pdf/renderer';
+import {Document, StyleSheet, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import {centsToMoney, formatCurrency, moneyToCents} from 'utils/currency';
+import {formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {
+  EditableInvoiceItem,
   InvoiceAmountDetail,
-  InvoiceItemView,
   InvoiceType,
   InvoiceView,
 } from 'models/invoice';
 import {formatCostText} from 'utils/utils';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {
-  calculateArticlesAmount,
-  getItemTotalAfterPerItemDiscount,
-} from 'utils/calculate-total';
 import {ArticleType} from 'models/article';
 import {
   applyGlobalDiscountOnItems,
@@ -27,14 +22,12 @@ import {
   stripHtmlTags,
 } from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
-import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
-import MontserratRegular from '../../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
+import {ServiceCompanyItem} from 'models/service-company';
 import PdfTemplateInvoiceDetails from '../PdfTemplateInvoiceDetails';
 import {ArticleSection} from '../ArticleSection/ArticleSection';
 import PdfBodyContainer from '../containers/PdfBodyContainer';
@@ -47,6 +40,7 @@ import PdfPreviewUpfrontPaymentSection from './PdfPreviewUpfrontPaymentSection';
 import PdfPreviewPartialPaymentSection from './PdfPreviewPartialPaymentSection';
 
 type Props = {
+  serviceCompany?: ServiceCompanyItem;
   translate: (key: string) => string;
   userInfo?: UserAccount | undefined;
   currentCurrency?: Currency;
@@ -61,35 +55,15 @@ type Props = {
   nextCompanyExternalId?: string;
   qrImageSrc?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
-};
+  invoiceItems: EditableInvoiceItem[];
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (
-  boldFontStyle?: {fontFamily: string},
-  regularFontStyle?: {fontFamily: string},
-) =>
+const getStyles = ({
+  boldFontStyle,
+  regularFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
@@ -106,12 +80,12 @@ const getStyles = (
     tag: {
       ...boldFontStyle,
       fontSize: 9,
-      color: '#212121',
+      color: primaryColor,
       flex: '0 0 43%',
     },
     tagContent: {
       fontSize: 9,
-      color: '#616161',
+      color: secondaryColor,
       flex: '0 0 57%',
       textAlign: 'right',
       ...regularFontStyle,
@@ -131,13 +105,13 @@ const getStyles = (
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       ...boldFontStyle,
       marginTop: 15,
     },
     sectionBody: {
       fontSize: 10,
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -152,7 +126,7 @@ const getStyles = (
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -176,6 +150,7 @@ const getStyles = (
   });
 
 const PdfPartialUpfrontPreview = ({
+  serviceCompany,
   translate,
   userInfo,
   currentCurrency,
@@ -190,6 +165,10 @@ const PdfPartialUpfrontPreview = ({
   nextCompanyExternalId,
   qrImageSrc,
   pdfConfigClientStorage,
+  invoiceItems,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: Props) => {
   const isEditing = !!invoice?.id;
 
@@ -225,70 +204,29 @@ const PdfPartialUpfrontPreview = ({
 
   const articleItems = invoice?.items.map((item, index) => ({
     ...item,
-    additionalInfo: {
-      discount: getDiscoutObj(invoiceAmountDetail?.items[index]?.discount),
-      payment: {
-        ...invoiceAmountDetail?.items[index]?.payment,
-        type: invoiceAmountDetail?.items[index]?.payment.type!,
-        amount: {
-          ...invoiceAmountDetail?.items[index]?.payment.amount,
-          netAmount: moneyToCents(
-            currentCurrency?.code!,
-            invoiceAmountDetail?.items[index]?.payment.amount?.netAmount,
-          ),
-          currency:
-            invoiceAmountDetail?.items[index]?.payment.amount?.currency ||
-            currentCurrency?.code!,
-          vats: invoiceAmountDetail?.items[index]?.payment.amount?.vats || [],
-        },
+    payment: {
+      ...invoiceAmountDetail?.items[index]?.payment,
+      type: invoiceAmountDetail?.items[index]?.payment.type!,
+      amount: {
+        ...invoiceAmountDetail?.items[index]?.payment.amount,
+        netAmount:
+          invoiceAmountDetail?.items[index]?.payment.amount?.netAmount ?? 0,
+        currency:
+          invoiceAmountDetail?.items[index]?.payment.amount?.currency ||
+          currentCurrency?.code!,
+        vats: invoiceAmountDetail?.items[index]?.payment.amount?.vats || [],
       },
     },
     discount: getDiscoutObj(invoiceAmountDetail?.items[index]?.discount),
   }))!;
 
-  const netTotal = (articleItem: InvoiceItemView) => {
-    const total = getItemTotalAfterPerItemDiscount({
-      item: {
-        unitAmount: {
-          netAmount: articleItem?.unitAmount?.netAmount,
-        },
-        quantity: articleItem.quantity,
-        discount: articleItem?.additionalInfo?.discount,
-      },
-      precision: 0,
-    });
-    return centsToMoney(currentCurrency?.code!, total);
-  };
-
   const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
-  const discountAmount = discount?.amount;
-  const discountValue = discountAmount?.value ?? 0;
 
   const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
 
   const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
     itemsAfterPerItemDiscount,
     discount,
-  );
-
-  const {amountAfterGlobalDiscount, vats, amountAfterGlobalDiscountWithVAT} =
-    useMemo(
-      () =>
-        calculateArticlesAmount({
-          items: articleItems,
-          globalDiscount: discount,
-        }),
-      [articleItems, discount],
-    );
-
-  const amountAfterGlobalDiscountFormatted = formatCurrency(
-    amountAfterGlobalDiscount,
-    {
-      currency: currentCurrency?.code,
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    },
   );
 
   const laborCost = useCalculateLaborMaterialCost(
@@ -308,16 +246,12 @@ const PdfPartialUpfrontPreview = ({
     invoice?.additionalInfo?.alternativeServiceCompanyInfo,
   );
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const regularFontStyle = {
-    fontFamily:
-      selectedLng === 'ka-ge' ? 'NotoSans-Regular' : 'Montserrat-Regular',
-  };
-
-  const styles = getStyles(boldFontStyle, regularFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   const customerVATId =
     (pdfConfigClientStorage.includeCustomerVAT &&
@@ -333,7 +267,6 @@ const PdfPartialUpfrontPreview = ({
         !!invoice?.additionalInfo.alternativeAddress.component?.name && (
           <AlternativeAddressTemplate
             userInfo={userInfo}
-            selectedLng={selectedLng}
             translate={translate}
             headerInfo={headerInfo}
             headerPath={headerPath}
@@ -343,25 +276,31 @@ const PdfPartialUpfrontPreview = ({
               invoice?.additionalInfo.alternativeServiceCompanyInfo
             }
             alternativeAddress={invoice?.additionalInfo.alternativeAddress}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         )}
 
-      <PdfPageContainer selectedLng={selectedLng}>
+      <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
 
         <PdfBodyContainer>
           <TopSectionContainer>
             <PdfTemplateLeftAddress
+              serviceCompany={serviceCompany}
               serviceCompanyInfo={serviceCompanyInfo}
               fallbackReceiverName={invoice?.propertyOwner?.name}
               addressComponent={getAddressComponentFromInvoice(invoice)}
               beneficiaryInfo={
                 invoice?.additionalInfo.beneficiaryAddress?.component
               }
-              selectedLng={selectedLng}
               translate={translate}
               customerVATId={customerVATId}
               eanValue={eanValue}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
 
             <PdfTemplateInvoiceDetails
@@ -369,40 +308,40 @@ const PdfPartialUpfrontPreview = ({
               pdfConfigClientStorage={pdfConfigClientStorage}
               translate={translate}
               invoice={invoice}
-              selectedLng={selectedLng}
               nextCompanyExternalId={nextCompanyExternalId}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
+              secondaryColor={secondaryColor}
             />
           </TopSectionContainer>
 
           <View>
             <PdfPageTitleHtml
-              selectedLng={selectedLng}
               value={invoice?.subject}
+              fontStyles={fontStyles}
+              primaryColor={primaryColor}
             />
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF
                 html={invoice?.description || ''}
                 rootStyle={styles.contentBody}
-                selectedLng={selectedLng}
+                fontStyles={fontStyles}
               />
             )}
 
             {invoice?.additionalInfo.showArticleSection &&
-              invoice.items.length > 0 && (
+              invoiceItems.length > 0 && (
                 <ArticleSection
                   invoice={invoice}
+                  invoiceItems={invoiceItems}
+                  invoiceAmountDetail={invoiceAmountDetail}
                   currentCurrency={currentCurrency}
                   translate={translate}
-                  allItemsHaveZeroDiscount={allItemsHaveZeroDiscount(
-                    articleItems,
-                  )}
-                  discountValue={discountValue}
-                  subtotalExclVatFormatted={amountAfterGlobalDiscountFormatted}
-                  percentageVats={vats}
-                  total={amountAfterGlobalDiscountWithVAT}
                   selectedLng={selectedLng}
-                  netTotal={netTotal}
+                  fontStyles={fontStyles}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
                 />
               )}
 
@@ -415,6 +354,9 @@ const PdfPartialUpfrontPreview = ({
                 currentCurrency={currentCurrency}
                 previousInvoices={finalPreviousInvoices!}
                 articleItems={articleItems}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
             )}
 
@@ -427,6 +369,9 @@ const PdfPartialUpfrontPreview = ({
                 previousInvoices={finalPreviousInvoices!}
                 articleItems={articleItems}
                 invoiceAmountDetail={invoiceAmountDetail}
+                fontStyles={fontStyles}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
               />
             )}
 
@@ -451,7 +396,7 @@ const PdfPartialUpfrontPreview = ({
                       marginTop: 6,
                       marginBottom: 16,
                     }}
-                    selectedLng={selectedLng}
+                    fontStyles={fontStyles}
                   />
                 </View>
               )}
@@ -460,15 +405,20 @@ const PdfPartialUpfrontPreview = ({
 
         <PdfTemplateFooter
           userInfo={userInfo}
-          selectedLng={selectedLng}
           translate={translate}
           footerInfo={footerInfo}
           footerPath={footerPath}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       </PdfPageContainer>
 
       {userInfo?.serviceCompany.settings.invoiceQRCodeEnabled && (
-        <SwissPageTemplate qrImageSrc={qrImageSrc} />
+        <SwissPageTemplate
+          qrImageSrc={qrImageSrc}
+          primaryColor={primaryColor}
+        />
       )}
     </Document>
   );

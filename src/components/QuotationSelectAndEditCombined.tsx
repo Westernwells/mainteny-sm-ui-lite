@@ -1,7 +1,6 @@
-import {ReactNode, useMemo, useState} from 'react';
+import {ReactNode, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import useTheme from '@mui/material/styles/useTheme';
-import {FormikProps} from 'formik';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
@@ -11,6 +10,8 @@ import {QuotationFormData} from 'models/quotation';
 import {EditCustomerForm} from 'pages/QuotationDetails/EditCustomerForm';
 import AddIcon from '@mui/icons-material/Add';
 import {TFunction} from 'i18next';
+import {UseFormGetValues, UseFormSetValue} from 'react-hook-form';
+import cloneDeep from 'lodash/cloneDeep';
 import {FormLabel} from './form/FormLabel';
 import {SelectCard} from './SelectCard';
 import {SelectButton} from './SelectButton';
@@ -26,9 +27,10 @@ interface Props {
   editButtonText: string;
   modalHeader: string;
   addressType: 'billingAddress' | 'beneficiaryAddress' | 'alternativeAddress';
-  formik: FormikProps<QuotationFormData>;
   address?: AddressRecord;
   translate?: TFunction<'translation', 'translation'>;
+  setValue?: UseFormSetValue<QuotationFormData>;
+  getValues?: UseFormGetValues<QuotationFormData>;
 }
 
 export const QuotationSelectAndEditCombined = ({
@@ -40,49 +42,55 @@ export const QuotationSelectAndEditCombined = ({
   editButtonText,
   modalHeader,
   addressType,
-  formik,
   address,
   translate,
+  setValue,
+  getValues,
 }: Props) => {
   const {t} = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useTheme();
 
-  const initialValues: AddressRecord | undefined = useMemo(
-    () => formik.values[addressType],
-    [isModalOpen],
-  );
+  const [savedInitialAddress, setSavedInitialAddress] = useState<
+    AddressRecord | undefined
+  >(undefined);
+
+  const openModal = () => {
+    if (getValues) {
+      setSavedInitialAddress(cloneDeep(getValues()[addressType]));
+    }
+    setIsModalOpen(true);
+  };
 
   const onCloseDialog = () => {
     setIsModalOpen(false);
-    formik.setValues({
-      ...formik.values,
-      [addressType]: initialValues,
-    });
+    if (setValue) {
+      setValue(addressType, savedInitialAddress);
+    }
+    setSavedInitialAddress(undefined);
   };
 
   const onSaveAddress = () => {
-    formik.setValues({
-      ...formik.values,
-      [addressType]: {
-        ...formik.values[addressType],
-        component: {
-          ...formik.values[addressType]?.component,
-          country: formik.values[addressType]?.component?.country
-            ? translate
-              ? translate(
-                  formik.values[addressType]?.component
-                    ?.country as unknown as string,
-                )
-              : formik.values[addressType]?.component?.country
-            : '',
-        },
-        fullName: formatAddressFullname(
-          formik.values?.[addressType] ?? null,
-          translate,
-        )?.fullName,
+    const currentAddress = getValues?.()[addressType];
+    const updatedAddress = {
+      ...currentAddress,
+      component: {
+        ...currentAddress?.component,
+        country: currentAddress?.component?.country
+          ? translate
+            ? translate(currentAddress?.component?.country as unknown as string)
+            : currentAddress?.component?.country
+          : '',
       },
-    });
+      fullName:
+        formatAddressFullname(currentAddress ?? null, translate)?.fullName ??
+        null,
+    };
+
+    if (setValue) {
+      setValue(addressType, updatedAddress);
+    }
+
     setIsModalOpen(false);
   };
 
@@ -100,7 +108,7 @@ export const QuotationSelectAndEditCombined = ({
             buttonProps={{
               size: 'small',
               startIcon: <AddIcon />,
-              onClick: () => setIsModalOpen(true),
+              onClick: openModal,
             }}
           />
         </Box>
@@ -110,7 +118,7 @@ export const QuotationSelectAndEditCombined = ({
     return (
       <SelectButton
         text={t(buttonText)}
-        onClick={() => setIsModalOpen(true)}
+        onClick={openModal}
         buttonProps={{size: 'small'}}
       />
     );
@@ -144,7 +152,7 @@ export const QuotationSelectAndEditCombined = ({
               buttonProps={{
                 size: 'small',
                 startIcon: <EditIcon />,
-                onClick: () => setIsModalOpen(true),
+                onClick: openModal,
                 sx: {
                   display: 'inline-flex',
                   mt: '10px',
@@ -163,12 +171,16 @@ export const QuotationSelectAndEditCombined = ({
         title={modalHeader}
         onCancel={onCloseDialog}
         onSave={onSaveAddress}
-        disableSaveBtn={!formik.values?.[addressType]?.component?.name}
+        disableSaveBtn={!getValues?.()[addressType]?.component?.name}
         dialogProps={{
           maxWidth: 'md',
           open: isModalOpen || false,
         }}>
-        <EditCustomerForm formik={formik} address={addressType} />
+        <EditCustomerForm
+          setValue={setValue}
+          getValues={getValues}
+          address={addressType}
+        />
       </Dialog>
     </Box>
   );

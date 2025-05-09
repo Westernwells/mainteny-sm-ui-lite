@@ -38,7 +38,9 @@ export const queryKeys = {
   fetchCustomerNotes: 'fetchCustomerNotes',
   invoiceById: 'invoiceById',
   invoiceAmountById: 'invoiceAmountById',
+  invoiceSubItem: 'invoiceSubItem',
   quotationById: 'quotationById',
+  quotationSubItem: 'quotationSubItem',
   invoiceDownloadUrl: 'invoiceDownloadUrl',
   queryServiceManager: 'queryServiceManager',
   queryCustomers: 'queryCustomers',
@@ -130,6 +132,9 @@ export const queryKeys = {
   fetchEmployeeEmailSignatureById: 'fetchEmployeeEmailSignatureById',
   queryAllContracts: 'queryAllContracts',
   fetchContractStatistics: 'fetchContractStatistics',
+  quotationAmountById: 'quotationAmountById',
+  serviceOrderSubItem: 'serviceOrderSubItem',
+  serviceOrderAmountById: 'serviceOrderAmountById',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

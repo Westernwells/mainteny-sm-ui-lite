@@ -26,6 +26,7 @@ import {ReactComponent as InvoiceIcon} from 'assets/icons/Invoice.svg';
 import {ReactComponent as BasicInfoIcon} from 'assets/icons/BasicInfoIcon.svg';
 import {ReactComponent as HierarchyIcon} from 'assets/icons/Hierarchy.svg';
 import {ReactComponent as WrenchScrewdriverIllustration} from 'assets/illustrations/invoice/wrench-screwdriver.svg';
+import {ButtonProps} from '@mui/material';
 import {Button} from './Button';
 
 export interface Props extends BoxProps {
@@ -62,6 +63,7 @@ export interface Props extends BoxProps {
   showActionBtn?: boolean;
   btnLabel?: string;
   btnAction?: () => void;
+  buttonVariant?: ButtonProps['variant'];
   actionButtonIcon?: JSX.Element;
   actionButtonEndIcon?: JSX.Element;
   subLabel?: string;
@@ -81,6 +83,7 @@ export const EmptySection = ({
   btnLabel = '',
   showActionBtn = false,
   btnAction,
+  buttonVariant,
   actionButtonIcon,
   actionButtonEndIcon,
   subLabel = '',
@@ -221,12 +224,14 @@ export const EmptySection = ({
           buttonProps={{
             disabled: disableActionBtn,
             onClick: btnAction,
-            variant: 'contained',
+            variant: buttonVariant || 'contained',
             size: btnSize || 'small',
             startIcon: actionButtonIcon || <AddIcon />,
             endIcon: actionButtonEndIcon || null,
             style: {
-              backgroundColor: theme.palette.primary.dark,
+              backgroundColor: buttonVariant
+                ? 'inherit'
+                : theme.palette.primary.dark,
             },
             sx: {
               '& .MuiButton-startIcon': {

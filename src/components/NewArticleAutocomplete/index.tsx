@@ -27,6 +27,7 @@ import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
+import {ReactComponent as PackageIcon} from 'assets/icons/PackageLightIcon.svg';
 import {NoteAltOutlined} from '@mui/icons-material';
 import NoteAlt from '@mui/icons-material/NoteAlt';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -62,7 +63,7 @@ export interface CustomPopperProps extends PopperProps {
   showCustomPriceColumn?: boolean;
 }
 
-const getIconByType = (type: ArticleType) => {
+export const getIconByType = (type: ArticleType) => {
   switch (type) {
     case ArticleType.LABOR:
       return <TimerOutlinedIcon fontSize="small" sx={{color: '#828DA3'}} />;
@@ -72,6 +73,8 @@ const getIconByType = (type: ArticleType) => {
       return (
         <FolderOpenOutlinedIcon fontSize="small" sx={{color: '#828DA3'}} />
       );
+    case ArticleType.PACKAGE:
+      return <PackageIcon fontSize="1.1rem" color="#828DA3" />;
     default:
       return <DashboardOutlinedIcon fontSize="small" sx={{color: '#828DA3'}} />;
   }
@@ -121,11 +124,15 @@ export const CustomPopper = ({
             : `${resolvedAnchorEl.offsetTop + 40}px`
           : 0,
         maxHeight: '450px',
+        overflow: 'hidden',
       }}
       placement={openUpwards ? 'top-start' : 'bottom-start'}>
       <div>
         <table style={{width: '100%', tableLayout: 'fixed'}}>
-          <thead>
+          <thead
+            style={{
+              height: 40,
+            }}>
             <tr>
               {visibleColumns.map((col, index) => (
                 <th
@@ -397,6 +404,9 @@ export const NewArticleAutoComplete = ({
             inputRef={inputRef}
             error={inputValue === ''}
             onBlur={handleBlur}
+            onFocus={(e) => {
+              e.target.setSelectionRange(0, 0);
+            }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 '& fieldset': {

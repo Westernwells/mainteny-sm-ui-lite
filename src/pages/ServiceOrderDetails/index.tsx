@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import GradingIcon from '@mui/icons-material/Grading';
 import FactCheck from '@mui/icons-material/FactCheck';
@@ -7,42 +7,19 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import {TabsBody} from 'components/TabsBody';
 import {Tabs} from 'components/Tab';
 import {Progress} from 'components/Progress';
-import {
-  usePostServiceOrderConfirmationPublish,
-  useServiceOrderDetails,
-} from 'hooks/reactQuery/useServiceOrder';
-import {
-  useDownloadFileWithCustomName,
-  useDownloadUrl,
-} from 'hooks/reactQuery/useDownloadUrl';
+import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
 import {useParams, useSearchParams} from 'react-router-dom';
 import {formatSearchParams} from 'utils/utils';
-import {Box, Typography} from '@mui/material';
-import {UseTranslationOptions, useTranslation} from 'react-i18next';
-import {useSnackbar} from 'hooks/useSnackbar';
-import PathImage from 'assets/images/Path.svg';
-import {SnackbarKey} from 'notistack';
+import {useTranslation, UseTranslationOptions} from 'react-i18next';
 import {useCurrentCurrency} from 'utils/currency';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
-import {pdf} from '@react-pdf/renderer';
-import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
-import {
-  useCompanyById,
-  useCompanyJobTypes,
-  useOldCompanyJobTypes,
-} from 'hooks/reactQuery/useCompanies';
-import {useQueryClientStorageData} from 'hooks/useClientStorage';
-import {
-  CLIENT_STORAGE_PDF_CONFIG_KEY,
-  DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE,
-} from 'utils/constants';
+import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {companyLanguageContextMap} from 'utils/language';
-import {getJobTypeGivenName} from 'utils/service-order-utils';
-import QuotationPdfTemplate from 'components/pdf-templates/QuotationPdfTemplate';
+import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
+import {useSnackbar} from 'hooks/useSnackbar';
 import {CheckList} from './Tabs/Checklist';
 import {WorkReport} from './Tabs/WorkReport';
 import {Overview} from './Tabs/Overview';
-import JobOverviewPdfTemplate from './Tabs/Overview/JobOverviewPdfTemplate';
 import SupplierInvoices from './Tabs/SupplierInvoices';
 
 const tabItems = [
@@ -74,63 +51,16 @@ export const ServiceOrderDetails = () => {
   const [queryParams, setQueryParams] = useSearchParams();
   const {data: serviceOrder, isLoading} =
     useServiceOrderDetails(serviceOrderId);
-  const {enqueueSnackbar, showError, closeSnackbar} = useSnackbar();
+  const {showError} = useSnackbar();
   const {t} = useTranslation();
   const {user} = useUserSession();
 
   const currentCurrency = useCurrentCurrency();
-  const overviewPdfSnackBarRef = useRef<SnackbarKey | null>(null);
-
-  const {data: jobTypes = []} = useCompanyJobTypes(
-    user?.userAccount.serviceCompany.id!,
-  );
-  const {data: oldJobTypes} = useOldCompanyJobTypes(
-    user?.userAccount.serviceCompany.id!,
-  );
-
-  // Filter out oldJobTypes that already exist in jobTypes based on the 'name' property
-  const filteredOldJobTypes = oldJobTypes?.filter(
-    (oldJobType) =>
-      !jobTypes?.some((jobType) => jobType.name === oldJobType.name),
-  );
-
-  // Combine jobTypes and the filtered oldJobTypes
-  const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
-
-  const {data: quotation} = useQuotationDetails(
-    serviceOrder?.additionalInfo.quotationId,
-  );
-  const [filePathToDownload, setFilePathToDownload] = useState('');
-
-  const filePaths = useMemo(
-    () => (filePathToDownload ? [filePathToDownload] : []),
-    [filePathToDownload],
-  );
-
-  const {data: fileDownloadURLs = {}} = useDownloadUrl(filePaths, {
-    refetchOnWindowFocus: false,
-  });
-
-  const {downloadFile} = useDownloadFileWithCustomName(
-    serviceOrder?.number,
-    filePathToDownload,
-  );
-
-  const {mutateAsync: postServiceOrderConfirmationPublish} =
-    usePostServiceOrderConfirmationPublish();
 
   const {data: company} = useCompanyById(user?.userAccount.serviceCompany.id);
   const {t: translateCompanyLanguage} = useTranslation('translation', {
     lng: companyLanguageContextMap[company?.language as string],
   } as CustomTranslationOptions);
-
-  const {data: clientStorageDataPdfConfig} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: CLIENT_STORAGE_PDF_CONFIG_KEY},
-  });
-  const pdfConfig = clientStorageDataPdfConfig?.value
-    ? JSON.parse(clientStorageDataPdfConfig?.value)
-    : DEFAULT_CLIENT_STORAGE_PDF_CONFIG_STATE;
 
   const translate = useMemo(
     () => (key: string, options?: {context: string}) => {
@@ -143,131 +73,31 @@ export const ServiceOrderDetails = () => {
     [company?.language],
   );
 
-  const {data: clientStorageData} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: 'pdf-template'},
+  const {createAndSetPdfBlobUrl} = useCreateAndSetPdfBlobUrl({
+    serviceOrder: serviceOrder!,
+    userInfo: user?.userAccount,
+    currentCurrency,
+    translate,
+    fileName: serviceOrder?.number || '',
+    selectedLng: company?.language,
   });
 
-  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
-  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
-
-  const {data: headerUrl = {}} = useDownloadUrl(
-    headerInfo?.path ? [headerInfo.path] : [],
-    undefined,
-    company?.id,
-  );
-
-  const {data: footerUrl = {}} = useDownloadUrl(
-    footerInfo?.path ? [footerInfo.path] : [],
-    undefined,
-    company?.id,
-  );
-
   const generatePreviewPdfBlobUrl = async () => {
-    const blob =
-      serviceOrder?.additionalInfo.quotationId && quotation
-        ? await pdf(
-            <QuotationPdfTemplate
-              pdfConfigClientStorage={pdfConfig}
-              userInfo={user?.userAccount}
-              currentCurrency={currentCurrency}
-              quotation={quotation}
-              selectedLng={company?.language}
-              translate={translate}
-              headerPath={headerUrl[headerInfo?.path]}
-              headerInfo={headerInfo}
-              footerPath={footerUrl[footerInfo?.path]}
-              footerInfo={footerInfo}
-              isJobOverview
-              serviceOrderType={getJobTypeGivenName(
-                serviceOrder?.type,
-                allJobTypes,
-              )}
-            />,
-          ).toBlob()
-        : await pdf(
-            <JobOverviewPdfTemplate
-              pdfConfigClientStorage={pdfConfig}
-              userInfo={user?.userAccount}
-              currentCurrency={currentCurrency}
-              serviceOrder={serviceOrder}
-              quotation={quotation}
-              selectedLng={company?.language}
-              translate={translate}
-              headerPath={headerUrl[headerInfo?.path]}
-              headerInfo={headerInfo}
-              footerPath={footerUrl[footerInfo?.path]}
-              footerInfo={footerInfo}
-              serviceOrderType={getJobTypeGivenName(
-                serviceOrder?.type,
-                allJobTypes,
-              )}
-            />,
-          ).toBlob();
-    const blobURL = URL.createObjectURL(blob);
-    setFilePathToDownload(blobURL);
+    createAndSetPdfBlobUrl();
   };
 
   const generateWorkOverview = async () => {
     try {
-      overviewPdfSnackBarRef.current = enqueueSnackbar(
-        <Box display="flex" padding="0em" margin="0em" alignItems="center">
-          <img alt={t('Path Image')} src={PathImage} />{' '}
-          <Typography margin="0em" paddingLeft="0.5em" variant="body2">
-            {t('PDF generation is in progress. Please wait...')}
-          </Typography>
-        </Box>,
-        {
-          variant: 'info',
-          autoHideDuration: null,
-        },
-      );
-
       await generatePreviewPdfBlobUrl();
-
-      await postServiceOrderConfirmationPublish({
-        serviceOrder: serviceOrderId as string,
-        data: {
-          email: '',
-          emails: [],
-          subject: '',
-          content: '',
-        },
-      });
     } catch (e) {
       showError(e);
     }
   };
 
   useEffect(() => {
-    if (!Object.keys(fileDownloadURLs || {}).length) {
-      return;
-    }
-
-    if (overviewPdfSnackBarRef.current) {
-      closeSnackbar(overviewPdfSnackBarRef.current);
-      overviewPdfSnackBarRef.current = null;
-    }
-  }, [fileDownloadURLs]);
-
-  useEffect(() => {
     const currentParams = Object.fromEntries([...queryParams]);
     if (currentParams.tab) setTabValue(Number(currentParams.tab));
-
-    return () => {
-      if (overviewPdfSnackBarRef.current) {
-        closeSnackbar(overviewPdfSnackBarRef.current);
-        overviewPdfSnackBarRef.current = null;
-      }
-    };
   }, []);
-
-  useEffect(() => {
-    if (filePathToDownload) {
-      downloadFile();
-      setFilePathToDownload('');
-    }
-  }, [filePathToDownload]);
 
   if (isLoading) {
     return <Progress />;

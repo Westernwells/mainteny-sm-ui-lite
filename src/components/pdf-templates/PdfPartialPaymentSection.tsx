@@ -1,24 +1,21 @@
-import {Font, StyleSheet, Text, View} from '@react-pdf/renderer';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import BigNumber from 'bignumber.js';
 import {
-  InvoiceView,
-  InvoiceItemView,
   DiscountType,
-  PaymentType,
   InvoiceAmountDetail,
+  InvoiceItemView,
   InvoiceType,
+  InvoiceView,
+  PaymentType,
 } from 'models/invoice';
 import {
   applyDiscount,
   getAggregatedPartialPaymentsVats,
 } from 'pages/InvoiceDetails/utils';
+import {calculateTotalAmountInclVats} from 'utils/calculate-total';
 import {
-  calculateTotalWithPerItemDiscount,
-  calculateTotalAmountInclVats,
-} from 'utils/calculate-total';
-import {
-  centsToMoney,
   aggregatedAmountToMoney,
+  centsToMoney,
   formatCurrency,
   getCurrencySymbol,
 } from 'utils/currency';
@@ -30,13 +27,11 @@ import {
 } from 'utils/invoice';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {useMemo} from 'react';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import PdfInvoicedSection from './PdfInvoicedSection';
 import PdfPaymentHistorySection from './PdfPaymentHistorySection';
 import PdfPerItemSection from './PdfPerItemSection';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
 
 type PartialProps = {
   translate: (key: string) => string;
@@ -46,39 +41,20 @@ type PartialProps = {
   selectedLng?: string;
   previousInvoices: InvoiceView[];
   articleItems: InvoiceItemView[];
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = (boldFontStyle?: {fontFamily: string}) =>
+const getStyles = ({
+  boldFontStyle,
+  primaryColor,
+  secondaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     table: {
       width: '100%',
       display: 'flex',
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -97,13 +73,13 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
       padding: 0,
       lineHeight: 0,
       marginBottom: 6,
-      color: '#212121',
+      color: primaryColor,
       ...boldFontStyle,
       marginTop: 15,
     },
     sectionBody: {
       fontSize: 10,
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       flexDirection: 'column',
       paddingVertical: 1.5,
@@ -118,23 +94,14 @@ export const PdfPartialPaymentSection = ({
   selectedLng,
   previousInvoices,
   articleItems,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: PartialProps) => {
-  const subtotalExclVatAfterPerItemDiscount = calculateTotalWithPerItemDiscount(
-    articleItems!,
+  const subtotalExclVat = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount.netAmount ?? 0,
   );
-
-  const subtotalExclVat = applyDiscount({
-    actualValue: subtotalExclVatAfterPerItemDiscount,
-    ...(invoice?.additionalInfo.discount?.type === DiscountType.AMOUNT
-      ? {
-          amount:
-            centsToMoney(
-              currentCurrency?.code!,
-              invoice?.additionalInfo.discount?.amount?.value ?? 0,
-            ) ?? 0,
-        }
-      : {percentage: invoice?.additionalInfo.discount?.percentage ?? 0}),
-  });
 
   const previousInvoicesTotalExclVat = centsToMoney(
     currentCurrency?.code!,
@@ -287,11 +254,11 @@ export const PdfPartialPaymentSection = ({
       )
       .flat().length > 0;
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const styles = getStyles(boldFontStyle);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    primaryColor,
+    secondaryColor,
+  });
 
   const formattedPaymentValues = useMemo(() => {
     if (
@@ -326,6 +293,9 @@ export const PdfPartialPaymentSection = ({
             currentCurrency={currentCurrency}
             invoice={invoice}
             previousInvoices={previousInvoices}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
+            fontStyles={fontStyles}
           />
         )}
 
@@ -542,7 +512,7 @@ export const PdfPartialPaymentSection = ({
               style={{
                 width: '32%',
                 color: '#212121',
-                ...boldFontStyle,
+                ...fontStyles.bold,
                 textAlign: 'right',
                 fontSize: 10,
                 paddingLeft: 25,
@@ -556,7 +526,7 @@ export const PdfPartialPaymentSection = ({
                 width: '24%',
                 textAlign: 'right',
                 color: '#212121',
-                ...boldFontStyle,
+                ...fontStyles.bold,
                 fontSize: 10,
               }}>
               {totalAmountInclVatsFormatted}
@@ -595,6 +565,9 @@ export const PdfPartialPaymentSection = ({
             currentInvoiceAmountPercentageVats={
               currentInvoiceAmountPercentageVats
             }
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
           />
         )}
 
@@ -606,6 +579,9 @@ export const PdfPartialPaymentSection = ({
           totalAmountInclVatsFormatted={totalAmountInclVatsFormatted}
           outstandingAmountFormatted={outstandingAmountFormatted}
           selectedLng={selectedLng}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
         />
       )}
 
@@ -620,7 +596,7 @@ export const PdfPartialPaymentSection = ({
               marginTop: 6,
               marginBottom: 16,
             }}
-            selectedLng={selectedLng}
+            fontStyles={fontStyles}
           />
         </View>
       )}

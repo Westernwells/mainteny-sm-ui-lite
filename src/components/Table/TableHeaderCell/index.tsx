@@ -123,6 +123,21 @@ const TableHeaderCell = ({
                 : t(column.headerName)}
             </Typography>
           </Tooltip>
+
+          {column.headerIcon && column.headerIconTooltip && (
+            <Tooltip title={t(column.headerIconTooltip)} arrow placement="top">
+              <IconButton
+                sx={{
+                  width: '16px',
+                  height: '16px',
+                  padding: '2px',
+                  borderRadius: '4px',
+                }}
+                size="small">
+                {column.headerIcon}
+              </IconButton>
+            </Tooltip>
+          )}
           {onSort && (
             <IconButton
               sx={{

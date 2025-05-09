@@ -7,6 +7,7 @@ import {ThemeProvider} from '@mui/material/styles';
 import {MutationErrorHandler, queryErrorHandler} from 'reactQuery/handlers';
 import {SnackbarProvider} from 'notistack';
 import {LanguageProvider} from 'context/LanguageProvider';
+import {PdfStylesProvider} from 'context/PdfStylesProvider';
 import * as Sentry from '@sentry/react';
 import {App} from './App';
 import {theme} from './theme';
@@ -16,6 +17,7 @@ import {LicenseInfo} from '@mui/x-license-pro';
 import BigNumber from 'bignumber.js';
 import './utils/withResolversPolyfill';
 import {AxiosError} from 'axios';
+import {UserCompanyProvider} from 'context/UserCompanyProvider';
 
 BigNumber.config({DECIMAL_PLACES: 2});
 
@@ -72,7 +74,6 @@ LicenseInfo.setLicenseKey(import.meta.env.REACT_APP_MUI_PRO_LICENSE);
 
 root.render(
   <ThemeProvider theme={theme}>
-    <CssBaseline />
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
         <SnackbarProvider
@@ -83,11 +84,17 @@ root.render(
           }}
           hideIconVariant
           maxSnack={3}>
-          <App />
+          <UserCompanyProvider>
+            <PdfStylesProvider>
+              <App />
+            </PdfStylesProvider>
+          </UserCompanyProvider>
         </SnackbarProvider>
 
         {window.Cypress ? null : <ReactQueryDevtools />}
       </QueryClientProvider>
+
+      <CssBaseline />
     </LanguageProvider>
   </ThemeProvider>,
 );

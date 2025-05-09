@@ -52,7 +52,7 @@ import {getArticleTypeText} from 'utils/article-utils';
 import {FormRadio} from 'components/form/FormRadio';
 import CloseIcon from '@mui/icons-material/Close';
 import {useTranslation} from 'react-i18next';
-import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
+import {ReactComponent as PackageIcon} from 'assets/icons/PackageLightIcon.svg';
 import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
 import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
 import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';

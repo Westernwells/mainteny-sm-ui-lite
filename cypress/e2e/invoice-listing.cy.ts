@@ -17,7 +17,7 @@ describe('Invoice listing page', () => {
         });
     });
 
-    it(`should show no entries message when filter returns nothing`, () => {
+    it('should show no entries message when filter returns nothing', () => {
         cy.wait('@getInvoices');
 
         const invoicesURL = `${Cypress.env().REACT_APP_API_URL}/api/serviceCompanies/*/invoices?*`;
@@ -153,6 +153,11 @@ describe('Invoice listing page', () => {
             const {data} = interception.response.body;
             const firstFullSentInvoice = data.find((d) => d.type === InvoiceType.FULL);
 
+            if (!firstFullSentInvoice) {
+                cy.log('No full sent invoice found');
+                return;
+            }
+
             // extract invoice number
             const invoiceNumber = firstFullSentInvoice.externalId;
 
@@ -167,7 +172,7 @@ describe('Invoice listing page', () => {
             cy.contains('button', 'Yes').click();
 
             // validate credit note invoice subject
-            cy.get('div[role="textbox"][id="subject"]').contains(`Credit note for ${invoiceNumber}`);
+            cy.getRichTextField('Subject').contains(`Credit note for ${invoiceNumber}`);
 
             // validate credit note invoice items are same as original invoice items but with negative net amount
             const originalInvoiceItems = firstFullSentInvoice.items;

@@ -1,12 +1,10 @@
-import {View, Font, Text, StyleSheet} from '@react-pdf/renderer';
-import {InvoiceView, InvoiceType} from 'models/invoice';
+import {StyleSheet, Text, View} from '@react-pdf/renderer';
+import {InvoiceType, InvoiceView} from 'models/invoice';
 import {formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {formatDate, toDate} from 'utils/datetime';
 import {Currency, State} from 'models/misc';
-import MontserratRegular from '../../assets/fonts/Montserrat/Montserrat-Regular.ttf';
-import MontserratBold from '../../assets/fonts/Montserrat/Montserrat-SemiBold.ttf';
-import NotoSansGeorgianRegular from '../../assets/fonts/NotoSans/NotoSansGeorgian-Regular.ttf';
-import NotoSansGeorgianBold from '../../assets/fonts/NotoSans/NotoSansGeorgian-Bold.ttf';
+import {ContextProps} from 'context/PdfStylesProvider';
+import {PdfConfigurationStyles} from 'models/pdfs';
 
 type PaymentHistorySectionProps = {
   translate: (key: string) => string;
@@ -15,32 +13,9 @@ type PaymentHistorySectionProps = {
   totalAmountInclVatsFormatted: string;
   outstandingAmountFormatted: string;
   selectedLng?: string;
-};
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-Font.register({
-  family: 'Montserrat-Bold',
-  format: 'truetype',
-  src: MontserratBold,
-});
-
-Font.register({
-  family: 'Montserrat-Regular',
-  format: 'truetype',
-  src: MontserratRegular,
-});
-Font.register({
-  family: 'NotoSans-Regular',
-  format: 'truetype',
-  src: NotoSansGeorgianRegular,
-});
-
-Font.register({
-  family: 'NotoSans-Bold',
-  format: 'truetype',
-  src: NotoSansGeorgianBold,
-});
-
-const getStyles = () =>
+const getStyles = ({secondaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     table: {
       width: '100%',
@@ -52,7 +27,7 @@ const getStyles = () =>
       paddingVertical: 4,
     },
     tableHeading: {
-      color: '#616161',
+      color: secondaryColor,
       display: 'flex',
       fontSize: 6,
       textTransform: 'uppercase',
@@ -82,6 +57,9 @@ export const PdfPaymentHistorySection = ({
   totalAmountInclVatsFormatted,
   outstandingAmountFormatted,
   selectedLng,
+  fontStyles,
+  primaryColor,
+  secondaryColor,
 }: PaymentHistorySectionProps) => {
   const paymentHistorySectionColumns: {
     name: string;
@@ -97,11 +75,10 @@ export const PdfPaymentHistorySection = ({
     },
   ];
 
-  const boldFontStyle = {
-    fontFamily: selectedLng === 'ka-ge' ? 'NotoSans-Bold' : 'Montserrat-Bold',
-  };
-
-  const styles = getStyles();
+  const styles = getStyles({
+    primaryColor,
+    secondaryColor,
+  });
 
   return (
     <View>
@@ -237,13 +214,25 @@ export const PdfPaymentHistorySection = ({
               borderTopColor: '#212121',
               paddingTop: 8,
             }}>
-            <Text style={{width: '60%', textAlign: 'left', ...boldFontStyle}}>
+            <Text
+              style={{
+                width: '60%',
+                textAlign: 'left',
+                ...fontStyles.bold,
+                color: primaryColor,
+              }}>
               {`${translate('Outstanding payments')} (${
                 getCurrencySymbol[currentCurrency?.code!]
               })`}
             </Text>
             <Text style={{width: '10%', textAlign: 'right'}} />
-            <Text style={{width: '40%', textAlign: 'right', ...boldFontStyle}}>
+            <Text
+              style={{
+                width: '40%',
+                textAlign: 'right',
+                ...fontStyles.bold,
+                color: primaryColor,
+              }}>
               {outstandingAmountFormatted}
             </Text>
           </View>

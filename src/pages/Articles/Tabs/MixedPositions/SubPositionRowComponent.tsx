@@ -28,6 +28,7 @@ import {
   UpdateArticleSubAssociationRecord,
 } from 'models/article';
 import {
+  centsToMoney,
   convertNumberToAmountNumber,
   formatCurrency,
   getDecimalSeparator,
@@ -156,11 +157,9 @@ const SubPositionRowComponent = ({
   const {mutateAsync: updateArticleSubPosition, isLoading: isUpdating} =
     useUpdateArticleSubAssociation('');
 
-  const {
-    control: subPositionControl,
-    setValue: setSubPositionValue,
-    watch: watchSubPositionValues,
-  } = useForm<Record<string, Partial<SubPositionFormValues>>>({
+  const {control: subPositionControl} = useForm<
+    Record<string, Partial<SubPositionFormValues>>
+  >({
     shouldUnregister: false,
     defaultValues: {},
   });
@@ -199,7 +198,7 @@ const SubPositionRowComponent = ({
   };
 
   const handleSaveType = async (
-    newType: ArticleType,
+    newType?: ArticleType,
     subPositionId?: string,
   ) => {
     if (!subPositionId) return;
@@ -810,14 +809,11 @@ const SubPositionRowComponent = ({
                 },
               }}>
               <NewArticleTypeCard
-                control={subPositionControl}
-                setValue={setSubPositionValue}
                 onClose={handleClosePopover}
-                onSave={handleSaveType}
-                subPositionId={subPositionEditState.id!}
-                selectedType={
-                  (watchSubPositionValues('type') as unknown as ArticleType) ||
-                  subPosition.article.type
+                onSave={(newType) => handleSaveType(newType, subPosition.id)}
+                initialValue={
+                  subPositionEditState.values?.article?.type ||
+                  ArticleType.LABOR
                 }
               />
             </Popover>
@@ -1234,8 +1230,10 @@ const SubPositionRowComponent = ({
         <Typography sx={{paddingRight: '12px'}} variant="body2">
           {formatCurrency(
             (subPosition.quantity ?? 0) *
-              ((subPosition.unitAmount?.netAmount ?? 0) /
-                10 ** currentCurrency.fractionDigits),
+              centsToMoney(
+                currentCurrency.code,
+                subPosition.unitAmount?.netAmount,
+              ),
             {
               currency: currentCurrency.code,
             },

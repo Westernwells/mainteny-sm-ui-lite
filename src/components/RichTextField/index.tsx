@@ -1,22 +1,22 @@
 import React, {
+  CSSProperties,
+  PropsWithChildren,
+  Ref,
+  useCallback,
+  useEffect,
   useMemo,
   useRef,
-  useEffect,
-  useCallback,
-  Ref,
-  CSSProperties,
   useState,
-  PropsWithChildren,
 } from 'react';
 import {useTranslation} from 'react-i18next';
 import {
-  Slate,
-  Editable,
-  withReact,
-  ReactEditor,
   DefaultElement,
+  Editable,
+  ReactEditor,
+  Slate,
+  withReact,
 } from 'slate-react';
-import {createEditor, BaseEditor, Descendant, Editor, Transforms} from 'slate';
+import {BaseEditor, createEditor, Descendant, Editor, Transforms} from 'slate';
 import {HistoryEditor, withHistory} from 'slate-history';
 import {theme} from 'theme';
 import {FormControl, FormHelperText} from '@mui/material';
@@ -27,6 +27,7 @@ import {
   RenderLeafProps,
 } from 'models/richTextField';
 import {deserialize, handleKeyDown, serialize} from 'utils/rich-text-field';
+import {RTFErrorBoundary} from 'components/ErrorBoundaries/RTFErrorBoundary';
 import {HoveringToolbar} from './HoveringToolbar';
 import {isPlainString} from '../../utils/rich-field-string';
 
@@ -35,7 +36,7 @@ const CustomElements = ({
   attributes,
   children,
 }: RenderElementProps) => {
-  const style = {fontSize: element.fontSize};
+  const style = {fontSize: element.fontSize, color: element.color};
 
   switch (element.type) {
     case 'paragraph':
@@ -112,7 +113,6 @@ const CustomElements = ({
         </div>
       );
     default:
-      // For the default case, we delegate to Slate's default rendering.
       return <DefaultElement {...{element, children, attributes}} />;
   }
 };
@@ -121,15 +121,12 @@ const Leaf = ({attributes, children, leaf}: RenderLeafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }
-
   if (leaf.italic) {
     children = <em>{children}</em>;
   }
-
   if (leaf.underlined) {
     children = <u>{children}</u>;
   }
-
   if (leaf.fontSize) {
     const style = {
       fontSize: String(leaf.fontSize).endsWith('px')
@@ -142,7 +139,6 @@ const Leaf = ({attributes, children, leaf}: RenderLeafProps) => {
       </span>
     );
   }
-
   return <span {...attributes}>{children}</span>;
 };
 
@@ -225,14 +221,9 @@ const RichTextField = ({
 
   const getValue = (htmlString: string) => {
     const initialValue: Descendant[] = [
-      {
-        type: 'paragraph',
-        children: [{text: ''}],
-      },
+      {type: 'paragraph', children: [{text: ''}]},
     ];
-
     if (!htmlString) return initialValue;
-    // check if htmlString is plain string
     const parsed = new DOMParser().parseFromString(
       isPlainString(htmlString) ? `<p>${htmlString}</p>` : htmlString,
       'text/html',
@@ -245,45 +236,29 @@ const RichTextField = ({
     (p: RenderElementProps) => <CustomElements {...p} />,
     [],
   );
-
   const renderLeaf = useCallback((p: RenderLeafProps) => <Leaf {...p} />, []);
 
   useEffect(() => {
+    if (!editor || !html) return;
     const newValue = getValue(html) as Descendant[];
     const {selection} = editor;
-
     if (JSON.stringify(value) !== JSON.stringify(newValue)) {
+      Editor.withoutNormalizing(editor, () => {
+        Transforms.delete(editor, {
+          at: {anchor: Editor.start(editor, []), focus: Editor.end(editor, [])},
+        });
+        Transforms.removeNodes(editor, {at: [0], voids: true});
+        Transforms.insertNodes(editor, newValue, {at: [0]});
+        if (selection && Editor.hasPath(editor, selection.anchor.path)) {
+          Transforms.select(editor, selection);
+        }
+      });
       setValue(newValue);
-      // Delete all entries leaving 1 empty node
-      Transforms.delete(editor, {
-        at: {
-          anchor: Editor.start(editor, []),
-          focus: Editor.end(editor, []),
-        },
-      });
-
-      // Removes empty node
-      Transforms.removeNodes(editor, {
-        at: [0],
-      });
-
-      // Insert array of children nodes
-      Transforms.insertNodes(editor, newValue, {
-        at: [editor.children.length],
-      });
-
-      if (selection) {
-        Transforms.select(editor, selection);
-      }
     }
   }, [html]);
 
   const debouncedUpdateHtml = useMemo(
-    () =>
-      debounce((e) => {
-        const newHTML = serialize(e);
-        updateHtml(newHTML);
-      }, 700),
+    () => debounce((e) => updateHtml(serialize(e)), 700),
     [updateHtml],
   );
 
@@ -299,60 +274,66 @@ const RichTextField = ({
   );
 
   return (
-    <Slate editor={editor} initialValue={value} onChange={handleChange}>
-      {disabled ? null : <HoveringToolbar />}
-      <FormControl fullWidth disabled={disabled} {...props}>
-        <fieldset
-          style={{
-            ...styles.fieldset,
-            ...(error && styles.errorFieldset),
-            ...(containerMinHeight && {minHeight: `${containerMinHeight}px`}),
-            ...(fieldsetStyles ?? {}),
-          }}>
-          <legend
+    <RTFErrorBoundary>
+      <Slate editor={editor} initialValue={value} onChange={handleChange}>
+        {disabled ? null : <HoveringToolbar />}
+        <FormControl fullWidth disabled={disabled} {...props}>
+          <fieldset
             style={{
-              ...styles.legend,
-              padding: label ? '2px' : '0',
-              ...(error && styles.redText),
+              ...styles.fieldset,
+              ...(error && styles.errorFieldset),
+              ...(containerMinHeight && {minHeight: `${containerMinHeight}px`}),
+              ...(fieldsetStyles ?? {}),
             }}>
-            {t(label)} {required && <span style={styles.redText}>*</span>}
-          </legend>
-          <div style={styles.inputWrapper}>
-            <Editable
-              id={name}
-              name={name}
-              renderElement={renderElement}
-              renderLeaf={renderLeaf}
-              placeholder={t(placeholder)}
-              renderPlaceholder={({attributes, children}) => (
-                <span
-                  {...attributes}
-                  style={{...attributes.style, top: 'auto', fontSize: '16px'}}>
-                  {children}
-                </span>
-              )}
+            <legend
               style={{
-                ...styles.editable,
-                marginTop: label ? '-10px' : '0px',
-                minHeight: `${minRows * 24}px`,
-                fontSize: '16px',
-                lineHeight: '1.5',
-              }}
-              onKeyDown={onKeyDown}
-              onBlur={onBlur}
-              onClick={onClick}
-              readOnly={disabled}
-            />
-            {endAdornment && (
-              <div style={styles.endAdornment}>{endAdornment}</div>
-            )}
-          </div>
-        </fieldset>
-        {helperText && (
-          <FormHelperText error={error}>{t(helperText)}</FormHelperText>
-        )}
-      </FormControl>
-    </Slate>
+                ...styles.legend,
+                padding: label ? '2px' : '0',
+                ...(error && styles.redText),
+              }}>
+              {t(label)} {required && <span style={styles.redText}>*</span>}
+            </legend>
+            <div style={styles.inputWrapper}>
+              <Editable
+                id={name}
+                name={name}
+                renderElement={renderElement}
+                renderLeaf={renderLeaf}
+                placeholder={t(placeholder)}
+                renderPlaceholder={({attributes, children}) => (
+                  <span
+                    {...attributes}
+                    style={{
+                      ...attributes.style,
+                      top: 'auto',
+                      fontSize: '16px',
+                    }}>
+                    {children}
+                  </span>
+                )}
+                style={{
+                  ...styles.editable,
+                  marginTop: label ? '-10px' : '0px',
+                  minHeight: `${minRows * 24}px`,
+                  fontSize: '16px',
+                  lineHeight: '1.5',
+                }}
+                onKeyDown={onKeyDown}
+                onBlur={onBlur}
+                onClick={onClick}
+                readOnly={disabled}
+              />
+              {endAdornment && (
+                <div style={styles.endAdornment}>{endAdornment}</div>
+              )}
+            </div>
+          </fieldset>
+          {helperText && (
+            <FormHelperText error={error}>{t(helperText)}</FormHelperText>
+          )}
+        </FormControl>
+      </Slate>
+    </RTFErrorBoundary>
   );
 };
 

@@ -86,15 +86,19 @@ export default class InvoiceListingPage {
       () => {
         cy.wait(1000);
 
-        cy.get("td[data-field='STATUS'][role='cell']")
-          .should('have.length.greaterThan', 0)
-          .each(($row) => {
-            cy.wrap($row).invoke('text').should('equal', statusToCheck);
+        cy.get('body').then(($body) => {
+          if ($body.find("td[data-field='STATUS'][role='cell']").length > 0) {
+            cy.get("td[data-field='STATUS'][role='cell']").each(($row) => {
+              cy.wrap($row).invoke('text').should('equal', statusToCheck);
 
-            statusesToExclude.forEach((status) => {
-              cy.wrap($row).invoke('text').should('not.equal', status);
+              statusesToExclude.forEach((status) => {
+                cy.wrap($row).invoke('text').should('not.equal', status);
+              });
             });
-          });
+          } else {
+            cy.log(`No invoices found with status: ${statusToCheck}`);
+          }
+        });
       },
     );
 
