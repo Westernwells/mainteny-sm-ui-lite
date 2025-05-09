@@ -1,3 +1,4 @@
+import {TagRecord} from 'models/tag';
 import {ArticleType} from './article';
 import {Money} from './misc';
 import {ExtendedSupplierRecord} from './supplier';
@@ -26,6 +27,7 @@ export interface ArticleBasicFormModel {
   quantity?: number;
   description?: string;
   percentageVat?: number;
+  tags?: TagRecord[];
 }
 
 export interface ArticleDescriptionFormModel {

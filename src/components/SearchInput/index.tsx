@@ -1,4 +1,11 @@
-import {RefObject, useEffect, useMemo, useState} from 'react';
+import {
+  KeyboardEventHandler,
+  RefObject,
+  SyntheticEvent,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -15,7 +22,10 @@ type Props = {
   label?: string;
   refInput?: RefObject<HTMLInputElement>;
   defaultValue?: string;
+  maxLength?: number;
   onChange?: (value: string) => void;
+  onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
+  onClick?: (e: SyntheticEvent) => void;
 };
 
 // New Search Input Component
@@ -26,7 +36,10 @@ const SearchInput = ({
   label,
   refInput,
   defaultValue = '',
+  maxLength,
   onChange,
+  onKeyDown,
+  onClick,
 }: Props) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -79,7 +92,10 @@ const SearchInput = ({
       label={label && t(label)}
       inputRef={refInput}
       onChange={handleChange}
+      onKeyDown={onKeyDown}
+      onClick={onClick}
       slotProps={{
+        htmlInput: {maxLength},
         input: {
           id: label,
           name: label,
