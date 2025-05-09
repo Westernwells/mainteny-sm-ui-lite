@@ -403,7 +403,6 @@ const QuotationPdfTemplate = React.memo(
                     rootStyle={{
                       marginTop: 6,
                       marginBottom: 16,
-                      body: fontStyles.regular,
                     }}
                     fontStyles={fontStyles}
                   />
