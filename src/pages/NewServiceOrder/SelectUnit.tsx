@@ -126,7 +126,13 @@ export const SelectUnit = ({getSelectedUnit, initialSelectedUnit}: Props) => {
           variant="outlined"
           label="Search"
           placeholder="Search by number, model, customer, address etc."
-          onValueChanged={(val) => setSearch(val)}
+          onValueChanged={(val) => {
+            setPage({
+              ...page,
+              pageIndex: 0,
+            });
+            setSearch(val);
+          }}
         />
       </Box>
       <DataGridLayout

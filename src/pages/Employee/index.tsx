@@ -176,16 +176,10 @@ export const Employees = () => {
     totalEmployeeRef.current || userAccountResource.total;
 
   useEffect(() => {
-    if (
-      userAccountResource.total > 0 &&
-      userAccountResource.data.length === 0
-    ) {
-      setPage({...page, pageIndex: 0});
-    }
-    if (textInput.current) {
+    if (textInput.current && !textInput.current.value) {
       textInput.current.value = search;
     }
-  }, [search]);
+  }, []);
 
   const rows = useMemo(() => {
     if (isLoading) return [];
@@ -251,7 +245,13 @@ export const Employees = () => {
         <SearchInput
           refInput={textInput}
           defaultValue={search}
-          onChange={(val: string) => setSearch(val)}
+          onChange={(val: string) => {
+            setPage({
+              ...page,
+              pageIndex: 0,
+            });
+            setSearch(val);
+          }}
         />
 
         <AddButton label="New Employee" onClick={handleNewEmployeeClick} />

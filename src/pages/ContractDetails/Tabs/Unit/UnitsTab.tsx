@@ -150,15 +150,6 @@ export const UnitsTab: FC<Props> = ({
     }
   }, [isFetching]);
 
-  useEffect(() => {
-    if (page.pageIndex) {
-      setPage({
-        ...page,
-        pageIndex: 0,
-      });
-    }
-  }, [search]);
-
   const pageCount = Math.ceil(elevatorResponse.total / page.pageSize);
 
   useEffect(() => {
@@ -278,7 +269,13 @@ export const UnitsTab: FC<Props> = ({
         <Widget
           containerStyles={{mt: 2}}
           searchPlaceholder="Search by number, customer, service type etc."
-          getSearchValue={(val: string) => setSearch(val)}
+          getSearchValue={(val: string) => {
+            setPage({
+              ...page,
+              pageIndex: 0,
+            });
+            setSearch(val);
+          }}
           refInput={textInput}
           btnLabel="New Invoice"
           filterItems={renderFilterItems()}
