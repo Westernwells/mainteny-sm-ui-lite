@@ -3255,5 +3255,6 @@
   "Total number of quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan broj ponuda od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
   "Total amount of quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan iznos ponuda od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
   "Accepted value": "Prihvaćena vrednost",
-  "Total amount of accepted quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan broj prihvaćenih ponuda od {{createdDateTimeFrom}} do {{createdDateTimeTo}}"
+  "Total amount of accepted quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan broj prihvaćenih ponuda od {{createdDateTimeFrom}} do {{createdDateTimeTo}}",
+  "Total amount of pending quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Ukupan broj ponuda na čekanju od {{createdDateTimeFrom}} do {{createdDateTimeTo}}"
 }
