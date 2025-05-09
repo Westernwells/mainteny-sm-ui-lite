@@ -94,7 +94,7 @@ export const Companies = () => {
         pageIndex: 0,
       });
     }
-  }, [search, status]);
+  }, [status]);
 
   useEffect(() => {
     if (textInput.current && !textInput.current.value) {
@@ -192,7 +192,13 @@ export const Companies = () => {
       renderWidget={
         <Widget
           searchPlaceholder="Search"
-          getSearchValue={(val: string) => setSearch(val)}
+          getSearchValue={(val: string) => {
+            setPage({
+              ...page,
+              pageIndex: 0,
+            });
+            setSearch(val);
+          }}
           btnOnClick={() => navigate('/admin/companies/new')}
           showActionBtn
           btnLabel="New Company"

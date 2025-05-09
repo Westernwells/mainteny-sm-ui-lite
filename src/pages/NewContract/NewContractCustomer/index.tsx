@@ -76,13 +76,10 @@ export const NewContractCustomer = ({
   });
 
   useEffect(() => {
-    if (page.pageIndex) {
-      setPage({...page, pageIndex: 0});
-    }
-    if (textInput.current) {
+    if (textInput.current && !textInput.current.value) {
       textInput.current.value = search;
     }
-  }, [search]);
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -119,7 +116,13 @@ export const NewContractCustomer = ({
       renderWidget={
         <Widget
           searchPlaceholder="Search by number, name, address etc."
-          getSearchValue={(val: string) => setSearch(val)}
+          getSearchValue={(val: string) => {
+            setPage({
+              ...page,
+              pageIndex: 0,
+            });
+            setSearch(val);
+          }}
           showActionBtn={false}
           refInput={textInput}
           defaultSearchValue={search}
