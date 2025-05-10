@@ -1,4 +1,4 @@
-import {Fragment, useEffect} from 'react';
+import {Fragment, useContext, useEffect} from 'react';
 import {t} from 'i18next';
 import {uniq} from 'lodash';
 import {theme} from 'theme';
@@ -22,7 +22,9 @@ import BigNumber from 'bignumber.js';
 import {NumberFormatValues} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
+  AggregatedAmount,
   DiscountType,
+  InvoiceAmountDetail,
   InvoiceFormData,
   InvoiceType,
   InvoiceView,
@@ -30,25 +32,20 @@ import {
 } from 'models/invoice';
 import {
   aggregatedAmountToMoney,
+  centsToMoney,
   formatCurrency,
   useCurrentCurrency,
 } from 'utils/currency';
-import {
-  calculateTotalAmountInclVats,
-  calculateTotalWithPerItemDiscount,
-} from 'utils/calculate-total';
+import {calculateTotalWithPerItemDiscount} from 'utils/calculate-total';
 import {fixRounding} from 'utils/utils';
 import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
-import {
-  applyDiscount,
-  correctCreditNoteInvoicesPercentages,
-  getAggregatedPartialPaymentsVats,
-} from './utils';
+import {applyDiscount, correctCreditNoteInvoicesPercentages} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {State} from 'models/misc';
 import {UseFormReturn} from 'react-hook-form';
+import {LanguageContext} from 'context/LanguageProvider';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -95,19 +92,24 @@ const Table = ({children, headStyles, bodyStyles, ...props}: TableProps) => (
 interface Props {
   formMethods: UseFormReturn<InvoiceFormData>;
   previousInvoices: InvoiceView[];
+  onRecalcInvoice: () => void;
   invoice?: InvoiceView;
+  invoiceAmountDetail?: InvoiceAmountDetail;
 }
 
 export const UpfrontPaymentsSection = ({
   formMethods,
   previousInvoices: allPreviousInvoices,
+  onRecalcInvoice,
   invoice,
+  invoiceAmountDetail,
 }: Props) => {
   const currentCurrency = useCurrentCurrency();
   const isEditing = !!invoice;
   // if editing, we need to show only past invoices till this one (editing invoice included)
   // if creating, we need to show all invoices
 
+  const {language: selectedLng} = useContext(LanguageContext);
   const {setValue, watch, getValues, formState} = formMethods;
 
   const watchedPayment = watch('payment');
@@ -154,6 +156,7 @@ export const UpfrontPaymentsSection = ({
         percentage: value || 0,
       });
     }
+    onRecalcInvoice();
   };
 
   const previousInvoicesTotalExclVat = previousInvoices
@@ -228,6 +231,7 @@ export const UpfrontPaymentsSection = ({
       (invoice.totalAmount?.netAmount ?? 0) /
         10 ** (invoice.totalAmount?.fractionDigits ?? 2)
     : amount + previousInvoicesTotalExclVat;
+
   const totalAmountExclVatFormatted = formatCurrency(
     fixRounding(totalAmountExclVat, 2),
     {
@@ -238,48 +242,23 @@ export const UpfrontPaymentsSection = ({
     },
   );
 
-  const allItemsHasSameVAT = watchedItems.every(
-    (item) =>
-      item.unitAmount.percentageVat ===
-      watchedItems[0].unitAmount.percentageVat,
-  );
+  const percentageVats =
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
 
-  const percentageVats = watchedItems.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: watchedItems[0].unitAmount.percentageVat ?? 0,
-            vat:
-              totalAmountExclVat *
-              ((watchedItems[0].unitAmount.percentageVat ?? 0) / 100),
-          },
-        ]
-      : getAggregatedPartialPaymentsVats(watchedItems, totalAmountExclVat)
-    : [];
-  const currentInvoiceAmountPercentageVats = watchedItems.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: watchedItems[0].unitAmount.percentageVat,
-            vat:
-              amount * ((watchedItems[0].unitAmount.percentageVat ?? 0) / 100),
-          },
-        ]
-      : getAggregatedPartialPaymentsVats(watchedItems, amount)
-    : [];
-
-  const totalAmountInclVats = calculateTotalAmountInclVats({
-    subtotalExclVatAfterDiscount: totalAmountExclVat,
-    percentageVats,
-  });
+  const totalAmountInclVats =
+    (percentageVats
+      ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
+      ?.reduce((a, b) => a + b, 0) ?? 0) + totalAmountExclVat;
 
   const totalAmountInclVatsFormatted = formatCurrency(
     fixRounding(totalAmountInclVats, 2),
     {
-      currency: currentCurrency.code,
+      currency: currentCurrency?.code,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-      roundingMode: 'floor',
+      excludeCurrencySymbol: true,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
     },
   );
 
@@ -480,32 +459,35 @@ export const UpfrontPaymentsSection = ({
                 {amountFormatted}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats?.map((v, idx) => (
+                {percentageVats?.map((v, idx) => (
                   <p key={idx}>{v.percentageVat}%</p>
                 ))}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats?.map((v, idx) => {
-                  const vatAmountFormatted = formatCurrency(v.vat, {
-                    currency: currentCurrency.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                  });
+                {percentageVats?.map((v, idx) => {
+                  const vatAmountFormatted = formatCurrency(
+                    centsToMoney(currentCurrency?.code!, v.vat),
+                    {
+                      currency: currentCurrency?.code,
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                      companyLang: selectedLng,
+                      currencySymbol: currentCurrency?.symbol,
+                    },
+                  );
                   return <p key={idx}>{vatAmountFormatted}</p>;
                 })}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {formatCurrency(
                   amount +
-                    currentInvoiceAmountPercentageVats
-                      ?.map((v) => v.vat)
+                    percentageVats
+                      ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
                       ?.reduce((a, b) => a + b, 0),
                   {
                     currency: currentCurrency.code,
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                    roundingMode: 'floor',
                   },
                 )}
               </TableCell>
@@ -931,37 +913,23 @@ export const UpfrontPaymentsSection = ({
             {totalAmountExclVatFormatted}
           </Typography>
 
-          {allItemsHasSameVAT ? (
-            <>
+          {percentageVats?.map((v) => (
+            <Fragment key={v.percentageVat}>
               <Typography variant="body1" color="primary.dark">
-                {T('VAT')} {percentageVats?.[0]?.percentageVat ?? 0}%
+                {T('VAT')} {v.percentageVat}%
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                {formatCurrency(fixRounding(percentageVats?.[0]?.vat ?? 0, 2), {
-                  currency: currentCurrency.code,
+                {formatCurrency(centsToMoney(currentCurrency?.code!, v.vat), {
+                  currency: currentCurrency?.code,
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  roundingMode: 'floor',
+                  excludeCurrencySymbol: true,
+                  companyLang: selectedLng,
+                  currencySymbol: currentCurrency?.symbol,
                 })}
               </Typography>
-            </>
-          ) : (
-            percentageVats?.map((v) => (
-              <Fragment key={v.percentageVat}>
-                <Typography variant="body1" color="primary.dark">
-                  {T('VAT')} {v.percentageVat}%
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {formatCurrency(fixRounding(v.vat, 2), {
-                    currency: currentCurrency.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                  })}
-                </Typography>
-              </Fragment>
-            ))
-          )}
+            </Fragment>
+          ))}
           <Typography variant="subtitle1" color="primary.dark" fontWeight={600}>
             {T('Total amount (incl. VAT)')}
           </Typography>

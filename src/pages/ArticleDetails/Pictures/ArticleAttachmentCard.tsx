@@ -4,7 +4,6 @@ import EditIcon from '@mui/icons-material/Create';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import useTheme from '@mui/material/styles/useTheme';
-import _ from 'lodash';
 import {InfoCard} from 'components/InfoCard';
 import {ArticleView} from 'models/article';
 import {FileResource} from 'models/media';
