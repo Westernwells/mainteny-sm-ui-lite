@@ -189,41 +189,38 @@ export const ArticleSectionBody = ({
                         )}
                       </View>
 
-                      {showDiscountCol &&
-                      mainPosition.discount?.type ===
-                        DiscountType.PERCENTAGE ? (
+                      {showDiscountCol && (
                         <View style={styles.col10Right}>
-                          <Text>
-                            {getDiscountDisplay(
-                              mainPosition.discount,
-                              currentCurrency,
-                              selectedLng,
-                            )}
-                          </Text>
-                        </View>
-                      ) : (
-                        <View style={styles.col10Right}>
-                          <Text />
-                        </View>
-                      )}
-
-                      <View style={[styles.col15Right]}>
-                        <Text>
-                          {mainPosition.subItemsConfig?.priceVisible ? (
+                          {mainPosition.discount?.type ===
+                          DiscountType.PERCENTAGE ? (
                             <Text>
-                              {formatCurrency(
-                                totalSubItemPriceExclVatAfterDiscount || 0,
-                                {
-                                  currency: currentCurrency?.code!,
-                                  excludeCurrencySymbol: true,
-                                  currencySymbol: currentCurrency?.symbol,
-                                  companyLang: selectedLng,
-                                },
+                              {getDiscountDisplay(
+                                mainPosition.discount,
+                                currentCurrency,
+                                selectedLng,
                               )}
                             </Text>
                           ) : (
-                            <Text />
+                            ''
                           )}
+                        </View>
+                      )}
+
+                      <View style={[styles.col15Right, {width: priceWidth}]}>
+                        <Text>
+                          <Text>
+                            {mainPosition.subItemsConfig?.priceVisible
+                              ? formatCurrency(
+                                  totalSubItemPriceExclVatAfterDiscount,
+                                  {
+                                    currency: currentCurrency!.code,
+                                    excludeCurrencySymbol: true,
+                                    currencySymbol: currentCurrency!.symbol,
+                                    companyLang: selectedLng,
+                                  },
+                                )
+                              : ' '}
+                          </Text>
                         </Text>
                       </View>
                     </View>

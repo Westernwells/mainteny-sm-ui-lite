@@ -60,7 +60,7 @@ const ArticleSectionFooter = ({
       </View>
 
       {vats.length > 0 && (
-        <View style={styles.footerRow}>
+        <View>
           <Text style={styles.emptyColumn} />
           <View style={styles.vatContainer}>
             {vats.map((vat, index) => (
@@ -87,10 +87,12 @@ const ArticleSectionFooter = ({
 
       <View style={styles.footerRow}>
         <Text style={styles.emptyColumn} />
-        <Text style={[styles.label, {color: primaryColor}]}>
+        <Text
+          style={[styles.label, {color: primaryColor}, styles.totalInclValue]}>
           {translate('Total incl. VAT')}({currentCurrency?.symbol})
         </Text>
-        <Text style={[styles.value, {color: primaryColor}]}>
+        <Text
+          style={[styles.value, {color: primaryColor}, styles.totalInclValue]}>
           {amountAfterGlobalDiscountWithVATFormatted}
         </Text>
       </View>

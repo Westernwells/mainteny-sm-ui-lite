@@ -1804,7 +1804,7 @@ export const InvoiceForm = ({
       setInitialLoadComplete(true);
     }
     setResumeCheckDone(true);
-  }, [initialNewLoadComplete, initialLoadComplete, invoice]);
+  }, [initialNewLoadComplete, initialLoadComplete, invoice, isNewInvoice]);
 
   useEffect(() => {
     if (!serviceOrder) return;
@@ -2844,6 +2844,8 @@ export const InvoiceForm = ({
                 formMethods={formMethods}
                 previousInvoices={sortedPreviousInvoices}
                 invoice={invoice}
+                invoiceAmountDetail={invoiceAmountDetail}
+                onRecalcInvoice={recalcInvoice}
               />
             )
           ) : null}
@@ -2857,6 +2859,8 @@ export const InvoiceForm = ({
                 formMethods={formMethods}
                 previousInvoices={sortedPreviousInvoices}
                 invoice={invoice}
+                invoiceAmountDetail={invoiceAmountDetail}
+                onRecalcInvoice={recalcInvoice}
               />
             )
           ) : null}

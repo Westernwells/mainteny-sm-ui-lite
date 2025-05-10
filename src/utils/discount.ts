@@ -27,9 +27,11 @@ export const allItemsHaveZeroDiscount = (
           ?.discount ||
         (item as EditableInvoiceItem | EditableQuotationItem)?.discount;
       return (
-        (discount?.amount?.value === 0 && discount?.percentage === 0) ||
-        discount?.type === DiscountType.NONE ||
-        !discount
+        !discount ||
+        discount.type === DiscountType.NONE ||
+        (discount.type === DiscountType.PERCENTAGE &&
+          discount.percentage === 0) ||
+        (discount.type === DiscountType.AMOUNT && discount.amount?.value === 0)
       );
     },
   );
