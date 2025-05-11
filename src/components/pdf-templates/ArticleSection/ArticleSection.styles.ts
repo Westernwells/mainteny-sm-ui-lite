@@ -1,7 +1,10 @@
 import {StyleSheet} from '@react-pdf/renderer';
 import {PdfConfigurationStyles} from 'models/pdfs';
 
-export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
+export const getStyles = ({
+  boldFontStyle,
+  primaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     dataBody: {
       borderBottom: '1px solid #212121',
@@ -69,7 +72,7 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
       flexDirection: 'row',
       alignItems: 'flex-start',
       fontSize: 10,
-      marginVertical: 4,
+      marginVertical: 3,
       color: primaryColor,
     },
     emptyColumn: {
@@ -86,13 +89,12 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
     },
     vatContainer: {
       width: '56%',
-      paddingBottom: 2,
     },
     vatRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: 4,
+      paddingVertical: 1,
     },
     vatLabel: {
       width: '57%',
@@ -104,5 +106,8 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
       fontSize: 10,
       textAlign: 'right',
       paddingRight: 5,
+    },
+    totalInclValue: {
+      ...boldFontStyle,
     },
   });

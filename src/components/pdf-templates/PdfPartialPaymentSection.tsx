@@ -1,6 +1,7 @@
 import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import BigNumber from 'bignumber.js';
 import {
+  AggregatedAmount,
   DiscountType,
   InvoiceAmountDetail,
   InvoiceItemView,
@@ -8,11 +9,7 @@ import {
   InvoiceView,
   PaymentType,
 } from 'models/invoice';
-import {
-  applyDiscount,
-  getAggregatedPartialPaymentsVats,
-} from 'pages/InvoiceDetails/utils';
-import {calculateTotalAmountInclVats} from 'utils/calculate-total';
+import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {
   aggregatedAmountToMoney,
   centsToMoney,
@@ -63,7 +60,7 @@ const getStyles = ({
       display: 'flex',
       flexDirection: 'row',
       fontSize: 10,
-      marginVertical: 4,
+      marginVertical: 2,
     },
     notesSection: {
       marginTop: 5,
@@ -167,58 +164,22 @@ export const PdfPartialPaymentSection = ({
     },
   );
 
-  const allItemsHasSameVAT = articleItems?.every(
-    (item) =>
-      item.unitAmount.percentageVat ===
-      articleItems[0].unitAmount.percentageVat,
-  );
+  const percentageVats =
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
 
-  const percentageVats = articleItems?.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: articleItems[0].unitAmount.percentageVat ?? 0,
-            vat:
-              totalAmountExclVat *
-              ((articleItems[0].unitAmount.percentageVat ?? 0) / 100),
-          },
-        ]
-      : getAggregatedPartialPaymentsVats(articleItems, totalAmountExclVat)
-    : [];
+  const totalAmountInclVats =
+    (percentageVats
+      ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
+      ?.reduce((a, b) => a + b, 0) ?? 0) + totalAmountExclVat;
 
-  const currentInvoiceAmountPercentageVats = articleItems!.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: articleItems![0].unitAmount.percentageVat ?? 0,
-            vat:
-              amount *
-              centsToMoney(
-                currentCurrency?.code!,
-                articleItems![0].unitAmount.percentageVat ?? 0,
-              ),
-          },
-        ]
-      : getAggregatedPartialPaymentsVats(articleItems!, amount)
-    : [];
-
-  const totalAmountInclVats = calculateTotalAmountInclVats({
-    subtotalExclVatAfterDiscount: totalAmountExclVat,
-    percentageVats,
+  const totalAmountInclVatsFormatted = formatCurrency(totalAmountInclVats, {
+    currency: currentCurrency?.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    excludeCurrencySymbol: true,
+    currencySymbol: currentCurrency?.symbol,
+    companyLang: selectedLng,
   });
-
-  const totalAmountInclVatsFormatted = formatCurrency(
-    fixRounding(totalAmountInclVats, 2),
-    {
-      currency: currentCurrency?.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    },
-  );
 
   const hasPreviousInvoices = previousInvoices.length > 0;
 
@@ -441,8 +402,8 @@ export const PdfPartialPaymentSection = ({
           </View>
 
           <View>
-            {allItemsHasSameVAT ? (
-              <View style={styles.tableRow}>
+            {percentageVats?.map((v, index) => (
+              <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
                 <Text style={{width: '44%'}} />
                 <Text
                   style={{
@@ -451,7 +412,7 @@ export const PdfPartialPaymentSection = ({
                     fontSize: 10,
                     textAlign: 'right',
                   }}>
-                  {translate('VAT')} {percentageVats[0]?.percentageVat ?? 0}%
+                  {translate('VAT')} {v.percentageVat}%
                 </Text>
                 <Text
                   style={{
@@ -459,51 +420,17 @@ export const PdfPartialPaymentSection = ({
                     textAlign: 'right',
                     fontSize: 10,
                   }}>
-                  {formatCurrency(
-                    fixRounding(percentageVats?.[0]?.vat ?? 0, 2),
-                    {
-                      currency: currentCurrency?.code,
-                      excludeCurrencySymbol: true,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    },
-                  )}
+                  {formatCurrency(centsToMoney(currentCurrency?.code!, v.vat), {
+                    currency: currentCurrency?.code,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    excludeCurrencySymbol: true,
+                    companyLang: selectedLng,
+                    currencySymbol: currentCurrency?.symbol,
+                  })}
                 </Text>
               </View>
-            ) : (
-              percentageVats.map((v, index) => (
-                <View
-                  style={styles.tableRow}
-                  key={`${index}-${v.percentageVat}`}>
-                  <Text style={{width: '44%'}} />
-                  <Text
-                    style={{
-                      width: '32%',
-                      color: '#616161',
-                      fontSize: 10,
-                      textAlign: 'right',
-                    }}>
-                    {translate('VAT')} {v.percentageVat}%
-                  </Text>
-                  <Text
-                    style={{
-                      width: '24%',
-                      textAlign: 'right',
-                      fontSize: 10,
-                    }}>
-                    {formatCurrency(fixRounding(v.vat, 2), {
-                      currency: currentCurrency?.code,
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                      roundingMode: 'floor',
-                      excludeCurrencySymbol: true,
-                      companyLang: selectedLng,
-                      currencySymbol: currentCurrency?.symbol,
-                    })}
-                  </Text>
-                </View>
-              ))
-            )}
+            ))}
           </View>
 
           <View style={styles.tableRow}>
@@ -562,9 +489,7 @@ export const PdfPartialPaymentSection = ({
             currentCurrency={currentCurrency}
             previousInvoices={previousInvoices}
             amount={amount}
-            currentInvoiceAmountPercentageVats={
-              currentInvoiceAmountPercentageVats
-            }
+            percentageVats={percentageVats}
             fontStyles={fontStyles}
             primaryColor={primaryColor}
             secondaryColor={secondaryColor}
