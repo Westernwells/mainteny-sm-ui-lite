@@ -10,6 +10,7 @@ import {
   InvoiceAmountDetail,
   InvoiceFormData,
   InvoiceItemPaymentRecord,
+  InvoiceItemPaymentType,
   InvoiceItemRecord,
   InvoiceItemView,
   InvoicePaymentTermRecord,
@@ -28,7 +29,13 @@ import {
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
 import {PaymentTermArticleType, PaymentTermData} from 'models/contract';
-import {Currency, Money, PdfGenerationStatus, State} from 'models/misc';
+import {
+  AddressRecord,
+  Currency,
+  Money,
+  PdfGenerationStatus,
+  State,
+} from 'models/misc';
 import {ArticleType, ArticleView} from 'models/article';
 import {
   ServiceOrderArticleView,
@@ -870,6 +877,10 @@ export const buildInvoicePayload = (
       userSeqNumber: sub.userSeqNumber,
     })),
     userSeqNumber: item.userSeqNumber,
+    payment: item.payment ?? {
+      type: InvoiceItemPaymentType.PERCENTAGE,
+      percentage: 0,
+    },
   })),
   globalDiscount:
     discount?.type === DiscountType.AMOUNT
@@ -1102,4 +1113,12 @@ export function buildInvoicePayment(
       vats: paymentData.amount?.vats || [],
     },
   };
+}
+
+export function hasAlternativeAddress(address?: AddressRecord) {
+  if (!address || Object.keys(address).length === 0) return false;
+
+  const name = address.component?.name?.trim() || '';
+  const fullName = address.fullName?.trim() || '';
+  return Boolean(name || fullName);
 }

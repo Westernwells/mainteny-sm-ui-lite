@@ -28,6 +28,7 @@ import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {getStyles} from 'components/pdf-templates/QuotationPdfTemplate/QuotationPdfTemplete.styles';
 import {ServiceCompanyItem} from 'models/service-company';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
+import {hasAlternativeAddress} from 'utils/invoice';
 import ArticleTableHeader from '../ArticleSection/ArticleTableHeader';
 import ArticleSectionFooter from '../ArticleSection/ArticleSectionFooter';
 import {ArticleSectionBody} from '../ArticleSection/ArticleSectionBody';
@@ -139,26 +140,25 @@ const QuotationPdfTemplate = React.memo(
 
     return (
       <Document>
-        {quotation?.additionalInfo.alternativeAddress &&
-          Object.keys(quotation?.additionalInfo.alternativeAddress!).length !==
-            0 &&
-          !!quotation?.additionalInfo.alternativeAddress.component?.name && (
-            <AlternativeAddressTemplate
-              userInfo={userInfo}
-              translate={translate}
-              headerInfo={headerInfo}
-              headerPath={headerPath}
-              footerInfo={footerInfo}
-              footerPath={footerPath}
-              alternativeServiceCompanyInfo={
-                quotation?.additionalInfo.alternativeServiceCompanyInfo
-              }
-              alternativeAddress={quotation?.additionalInfo.alternativeAddress}
-              fontStyles={fontStyles}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor}
-            />
-          )}
+        {hasAlternativeAddress(
+          quotation?.additionalInfo?.alternativeAddress,
+        ) && (
+          <AlternativeAddressTemplate
+            userInfo={userInfo}
+            translate={translate}
+            headerInfo={headerInfo}
+            headerPath={headerPath}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
+            alternativeServiceCompanyInfo={
+              quotation?.additionalInfo.alternativeServiceCompanyInfo
+            }
+            alternativeAddress={quotation?.additionalInfo.alternativeAddress}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
+          />
+        )}
 
         <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />

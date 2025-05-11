@@ -26,6 +26,7 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {hasAlternativeAddress} from 'utils/invoice';
 import AlternativeAddressTemplate from '../AlternativeAddressTemplate';
 import {ArticleSection} from '../ArticleSection/ArticleSection';
 import PdfTemplateInvoiceDetails from '../PdfTemplateInvoiceDetails';
@@ -160,25 +161,23 @@ const PdfPreviewFinalInvoiceTemplate = ({
 
   return (
     <Document>
-      {invoice?.additionalInfo.alternativeAddress &&
-        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
-        !!invoice?.additionalInfo.alternativeAddress.component?.name && (
-          <AlternativeAddressTemplate
-            userInfo={userInfo}
-            translate={translate}
-            headerInfo={headerInfo}
-            headerPath={headerPath}
-            footerInfo={footerInfo}
-            footerPath={footerPath}
-            alternativeServiceCompanyInfo={
-              invoice?.additionalInfo.alternativeServiceCompanyInfo
-            }
-            alternativeAddress={invoice?.additionalInfo.alternativeAddress}
-            fontStyles={fontStyles}
-            primaryColor={primaryColor}
-            secondaryColor={secondaryColor}
-          />
-        )}
+      {hasAlternativeAddress(invoice?.additionalInfo?.alternativeAddress) && (
+        <AlternativeAddressTemplate
+          userInfo={userInfo}
+          translate={translate}
+          headerInfo={headerInfo}
+          headerPath={headerPath}
+          footerInfo={footerInfo}
+          footerPath={footerPath}
+          alternativeServiceCompanyInfo={
+            invoice?.additionalInfo.alternativeServiceCompanyInfo
+          }
+          alternativeAddress={invoice?.additionalInfo.alternativeAddress}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
+        />
+      )}
 
       <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
