@@ -2,7 +2,6 @@ import {Box, Divider, Popover} from '@mui/material';
 import {Tag as TagType, TagEntityType, TagRecord} from 'models/tag';
 import React, {
   KeyboardEventHandler,
-  MouseEventHandler,
   RefObject,
   SyntheticEvent,
   useCallback,
@@ -17,7 +16,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import TagSearchMenuItem from 'components/Tag/TagSearchMenuItem';
 import Tag from '.';
 
-const TAGS_PER_REQUEST = 10;
+const TAGS_PER_REQUEST = 200;
 
 type Props = {
   open: boolean;
@@ -65,14 +64,12 @@ const TagSearch = ({
 
   const {mutateAsync: handleQueryCreateTag} = useCreateTag();
 
-  const handleSelectTag =
-    (tag: TagType): MouseEventHandler<HTMLDivElement> =>
-    (e) => {
-      e.stopPropagation();
-      if (!renameTagId || renameTagId !== tag.id) {
-        onChange([...selectedTags, tag]);
-      }
-    };
+  const handleSelectTag = (tag: TagType, e: SyntheticEvent) => {
+    e.stopPropagation();
+    if (!renameTagId || renameTagId !== tag.id) {
+      onChange([...selectedTags, tag]);
+    }
+  };
 
   const handleCreateTag = (tagName: string) => {
     handleQueryCreateTag(
@@ -140,6 +137,7 @@ const TagSearch = ({
         '& .MuiPaper-root': {
           width: '380px',
           minHeight: '228px',
+          maxHeight: '580px',
           padding: '16px',
         },
       }}
