@@ -1,7 +1,7 @@
 import {View, Text} from '@react-pdf/renderer';
 import {VatAmount} from 'models/invoice';
 import {ContextProps} from 'context/PdfStylesProvider';
-import {centsToMoney, formatCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {getStyles} from './ArticleSection.styles';
 
 type ArticleSectionFooterProps = {
@@ -31,14 +31,14 @@ const ArticleSectionFooter = ({
     regularFontStyle: fontStyles.regular,
     primaryColor,
   });
-
+  console.log(currentCurrency?.symbol, 'currnetSymleo');
   return (
     <View style={styles.container}>
       {discountValue && (
         <View style={styles.footerRow}>
           <Text style={styles.emptyColumn} />
           <Text style={[styles.label, {color: primaryColor}]}>
-            {translate('Discount')}({currentCurrency?.symbol})
+            {translate('Discount')}({getCurrencySymbol[currentCurrency?.code!]})
           </Text>
           <Text style={styles.value}>
             {formatCurrency(discountValue || 0, {
@@ -89,7 +89,8 @@ const ArticleSectionFooter = ({
         <Text style={styles.emptyColumn} />
         <Text
           style={[styles.label, {color: primaryColor}, styles.totalInclValue]}>
-          {translate('Total incl. VAT')}({currentCurrency?.symbol})
+          {translate('Total incl. VAT')}(
+          {getCurrencySymbol[currentCurrency?.code!]})
         </Text>
         <Text
           style={[styles.value, {color: primaryColor}, styles.totalInclValue]}>

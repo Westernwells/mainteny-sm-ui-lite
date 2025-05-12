@@ -29,27 +29,38 @@ const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
       display: 'flex',
       flexWrap: 'wrap',
     },
-    col2Left: {
+    col6Left: {
       width: '6%',
       wordBreak: 'break-all',
       whiteSpace: 'pre-wrap',
       textAlign: 'left',
       color: secondaryColor,
     },
-    col40Left: {
+    col37Left: {
       width: '37%',
       textAlign: 'left',
       color: secondaryColor,
     },
-    col10Right: {
-      width: '10%',
+    col12Right: {
+      width: '12%',
+      textAlign: 'right',
+      color: secondaryColor,
+    },
+    col8Right: {
+      width: '8%',
       textAlign: 'right',
       color: secondaryColor,
     },
     col8Center: {
       width: '8%',
       textAlign: 'center',
-      marginLeft: 10,
+      paddingLeft: 8,
+      color: secondaryColor,
+    },
+    col10Center: {
+      width: '10%',
+      textAlign: 'center',
+      paddingLeft: 8,
       color: secondaryColor,
     },
     col15Right: {
@@ -77,21 +88,21 @@ const ArticleTableHeader = ({
     secondaryColor,
   });
 
-  const priceWidth = showDiscountCol ? styles.col15Right.width : '18%';
+  const priceWidth = showDiscountCol ? styles.col15Right.width : '19%';
 
   return (
     <View style={styles.tableHead}>
       <View style={styles.tableRow}>
-        <View style={[styles.col2Left]}>
+        <View style={[styles.col6Left]}>
           <Text style={[styles.tableHeading]}>#</Text>
         </View>
-        <View style={[styles.col40Left]}>
+        <View style={[styles.col37Left]}>
           <Text style={[styles.tableHeading]}>{translate('Name')}</Text>
         </View>
-        <View style={[styles.col10Right]}>
+        <View style={[styles.col8Right]}>
           <Text style={[styles.tableHeading]}>{translate('Quantity')}</Text>
         </View>
-        <View style={[styles.col8Center]}>
+        <View style={[styles.col10Center]}>
           <Text style={[styles.tableHeading]}>{translate('Unit')}</Text>
         </View>
         <View style={[styles.col15Right, {width: priceWidth}]}>
@@ -102,7 +113,7 @@ const ArticleTableHeader = ({
           </Text>
         </View>
         {showDiscountCol && (
-          <View style={[styles.col10Right]}>
+          <View style={[styles.col12Right]}>
             <Text style={[styles.tableHeading]}>{translate('Discount')}</Text>
           </View>
         )}

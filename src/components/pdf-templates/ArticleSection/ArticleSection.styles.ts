@@ -35,14 +35,14 @@ export const getStyles = ({
       marginVertical: 3,
       width: '94%',
     },
-    col2Left: {
+    col6Left: {
       width: '6%',
       wordBreak: 'break-all',
       whiteSpace: 'pre-wrap',
       textAlign: 'left',
       color: primaryColor,
     },
-    col40Left: {
+    col37Left: {
       width: '37%',
       textAlign: 'left',
       color: primaryColor,
@@ -52,13 +52,29 @@ export const getStyles = ({
       textAlign: 'right',
       color: primaryColor,
     },
+    col12Right: {
+      width: '12%',
+      textAlign: 'right',
+      color: primaryColor,
+    },
+    col10Center: {
+      width: '10%',
+      textAlign: 'center',
+      color: primaryColor,
+      paddingLeft: 8,
+    },
     col8Center: {
       width: '8%',
       textAlign: 'center',
-      marginLeft: 10,
+      paddingLeft: 8,
       color: primaryColor,
     },
-    col15Right: {
+    col8Right: {
+      width: '8%',
+      textAlign: 'right',
+      color: primaryColor,
+    },
+    col13Right: {
       width: '13%',
       textAlign: 'right',
       color: primaryColor,
