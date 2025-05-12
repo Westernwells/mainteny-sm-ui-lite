@@ -694,7 +694,7 @@ export const InvoiceForm = ({
 
   const handleCellClick = (rowParams: GridCellParams<any, any, any>) => {
     const updateFieldValue = (
-      fieldName: 'subject' | 'description' | 'notes',
+      fieldName: 'subject' | 'description' | 'moreInfo',
       currentValue: string,
     ) => {
       setValue(
@@ -714,7 +714,7 @@ export const InvoiceForm = ({
         );
         break;
       case 'NOTES':
-        updateFieldValue('notes', cleanHtmlContent(watchedMoreInfo || ''));
+        updateFieldValue('moreInfo', cleanHtmlContent(watchedMoreInfo || ''));
         break;
       default:
         break;
@@ -2047,7 +2047,7 @@ export const InvoiceForm = ({
 
   useEffect(() => {
     recalcInvoice();
-  }, [recalcInvoice, watchedItems, watchedDiscount]);
+  }, [recalcInvoice, watchedItems, watchedDiscount, watchedPayment]);
 
   useEffect(() => {
     checkIfLaborOrMaterialIsSelected(watchedItems);

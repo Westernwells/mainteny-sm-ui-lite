@@ -2,14 +2,11 @@ import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import BigNumber from 'bignumber.js';
 import {
   AggregatedAmount,
-  DiscountType,
   InvoiceAmountDetail,
-  InvoiceItemView,
   InvoiceType,
   InvoiceView,
   PaymentType,
 } from 'models/invoice';
-import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {
   aggregatedAmountToMoney,
   centsToMoney,
@@ -37,7 +34,6 @@ type PartialProps = {
   invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
-  articleItems: InvoiceItemView[];
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const getStyles = ({
@@ -90,17 +86,11 @@ export const PdfPreviewPartialPaymentSection = ({
   invoiceAmountDetail,
   selectedLng,
   previousInvoices,
-  articleItems,
   fontStyles,
   primaryColor,
   secondaryColor,
 }: PartialProps) => {
   const isEditing = !!invoice?.id;
-
-  const subtotalExclVat = centsToMoney(
-    currentCurrency?.code!,
-    invoiceAmountDetail?.amountAfterGlobalDiscount.netAmount ?? 0,
-  );
 
   const previousInvoicesTotalExclVat = centsToMoney(
     currentCurrency?.code!,
@@ -109,43 +99,10 @@ export const PdfPreviewPartialPaymentSection = ({
       .reduce((a, b) => a + b, 0),
   );
 
-  const amount =
-    invoice?.additionalInfo.payment?.type === PaymentType.LUMP_SUM
-      ? centsToMoney(
-          currentCurrency?.code!,
-          aggregatedAmountToMoney(invoice.additionalInfo.payment?.amount).value,
-        ) ?? 0
-      : invoice?.additionalInfo.payment?.type === PaymentType.PERCENTAGE
-      ? (subtotalExclVat * (invoice?.additionalInfo.payment?.percentage ?? 0)) /
-        100
-      : invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM
-      ? articleItems!
-          .map((item) => {
-            // Calculate base amount from unit price and quantity
-            const baseAmount = (item.unitAmount.netAmount ?? 0) * item.quantity;
-
-            // Get discount from additionalInfo
-            const discount = item.additionalInfo?.discount;
-            const discountParams =
-              discount?.type === DiscountType.AMOUNT
-                ? {amount: discount?.amount?.value ?? 0}
-                : {percentage: discount?.percentage ?? 0};
-
-            // Calculate discounted price based on discount type
-            const itemTotalPriceExclVat = applyDiscount({
-              actualValue: baseAmount,
-              ...discountParams,
-            });
-            // Calculate and convert final amount based on payment percentage
-            const paymentPercentage =
-              item.additionalInfo?.payment?.percentage ?? 0;
-            return centsToMoney(
-              item.unitAmount.currency,
-              (itemTotalPriceExclVat / 100) * paymentPercentage,
-            );
-          })
-          .reduce((a, b) => a + b, 0)
-      : 0;
+  const amount = centsToMoney(
+    currentCurrency?.code!,
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
+  );
 
   const totalAmountExclVat = isEditing
     ? amount +
@@ -162,7 +119,6 @@ export const PdfPreviewPartialPaymentSection = ({
       companyLang: selectedLng,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-      roundingMode: 'floor',
     },
   );
 
@@ -174,17 +130,14 @@ export const PdfPreviewPartialPaymentSection = ({
       ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
       ?.reduce((a, b) => a + b, 0) ?? 0) + totalAmountExclVat;
 
-  const totalAmountInclVatsFormatted = formatCurrency(
-    fixRounding(totalAmountInclVats, 2),
-    {
-      currency: currentCurrency?.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    },
-  );
+  const totalAmountInclVatsFormatted = formatCurrency(totalAmountInclVats, {
+    currency: currentCurrency?.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    excludeCurrencySymbol: true,
+    currencySymbol: currentCurrency?.symbol,
+    companyLang: selectedLng,
+  });
 
   const hasPreviousInvoices = previousInvoices.length > 0;
 

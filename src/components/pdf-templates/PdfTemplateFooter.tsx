@@ -350,12 +350,12 @@ const PdfTemplateFooter = ({
           <Image
             source={footerPath}
             style={{
-              width: footerInfo.width,
-              height: footerInfo.height,
+              width: footerInfo?.width,
+              height: footerInfo?.height,
               objectFit: 'contain',
               position: 'absolute',
-              top: footerInfo.posY,
-              left: footerInfo.posX,
+              top: footerInfo?.posY,
+              left: footerInfo?.posX,
               zIndex: 0,
             }}
           />

@@ -91,11 +91,6 @@ const PdfUpfrontInvoiceSection = ({
   primaryColor,
   secondaryColor,
 }: PartialProps) => {
-  const subtotalExclVat = centsToMoney(
-    currentCurrency?.code!,
-    invoiceAmountDetail?.amountAfterGlobalDiscount.netAmount ?? 0,
-  );
-
   const previousInvoicesTotalExclVat = previousInvoices
     ?.map(
       (i) =>
@@ -104,16 +99,10 @@ const PdfUpfrontInvoiceSection = ({
     )
     .reduce((a, b) => a + b, 0);
 
-  const amount =
-    invoice?.additionalInfo.payment?.type === PaymentType.LUMP_SUM
-      ? centsToMoney(
-          currentCurrency?.code!,
-          aggregatedAmountToMoney(invoice.additionalInfo.payment?.amount).value,
-        ) ?? 0
-      : invoice?.additionalInfo.payment?.type === PaymentType.PERCENTAGE
-      ? (subtotalExclVat * (invoice?.additionalInfo.payment?.percentage ?? 0)) /
-        100
-      : 0;
+  const amount = centsToMoney(
+    currentCurrency?.code!,
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
+  );
 
   const totalAmountExclVat =
     amount +
@@ -121,18 +110,14 @@ const PdfUpfrontInvoiceSection = ({
     (invoice?.totalAmount?.netAmount ?? 0) /
       10 ** (invoice?.totalAmount?.fractionDigits ?? 2);
 
-  const totalAmountExclVatFormatted = formatCurrency(
-    fixRounding(totalAmountExclVat, 2),
-    {
-      currency: currentCurrency?.code,
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-    },
-  );
+  const totalAmountExclVatFormatted = formatCurrency(totalAmountExclVat, {
+    currency: currentCurrency?.code,
+    excludeCurrencySymbol: true,
+    currencySymbol: currentCurrency?.symbol,
+    companyLang: selectedLng,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   const percentageVats =
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];

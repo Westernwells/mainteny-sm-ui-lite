@@ -211,18 +211,15 @@ export const UpfrontPaymentsSection = ({
     return floatValue <= maxPercentage;
   };
 
-  const amount =
-    watchedPayment?.type === PaymentType.LUMP_SUM
-      ? watchedPayment?.amount?.value ?? 0
-      : watchedPayment?.type === PaymentType.PERCENTAGE
-      ? (subtotalExclVat * (watchedPayment?.percentage ?? 0)) / 100
-      : 0;
+  const amount = centsToMoney(
+    currentCurrency.code,
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
+  );
 
-  const amountFormatted = formatCurrency(fixRounding(amount, 2), {
+  const amountFormatted = formatCurrency(amount, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-    roundingMode: 'floor',
   });
 
   const totalAmountExclVat = isEditing
@@ -232,15 +229,11 @@ export const UpfrontPaymentsSection = ({
         10 ** (invoice.totalAmount?.fractionDigits ?? 2)
     : amount + previousInvoicesTotalExclVat;
 
-  const totalAmountExclVatFormatted = formatCurrency(
-    fixRounding(totalAmountExclVat, 2),
-    {
-      currency: currentCurrency.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-    },
-  );
+  const totalAmountExclVatFormatted = formatCurrency(totalAmountExclVat, {
+    currency: currentCurrency.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   const percentageVats =
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
@@ -250,17 +243,14 @@ export const UpfrontPaymentsSection = ({
       ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
       ?.reduce((a, b) => a + b, 0) ?? 0) + totalAmountExclVat;
 
-  const totalAmountInclVatsFormatted = formatCurrency(
-    fixRounding(totalAmountInclVats, 2),
-    {
-      currency: currentCurrency?.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      excludeCurrencySymbol: true,
-      currencySymbol: currentCurrency?.symbol,
-      companyLang: selectedLng,
-    },
-  );
+  const totalAmountInclVatsFormatted = formatCurrency(totalAmountInclVats, {
+    currency: currentCurrency?.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    excludeCurrencySymbol: true,
+    currencySymbol: currentCurrency?.symbol,
+    companyLang: selectedLng,
+  });
 
   const hasPreviousInvoices = previousInvoices.length > 0;
 
@@ -780,7 +770,7 @@ export const UpfrontPaymentsSection = ({
                     fieldProps={{
                       value:
                         prevInvoice.id === invoice?.id
-                          ? amount
+                          ? totalAmountExclVat
                           : (prevInvoice.totalAmount?.netAmount ?? 0) /
                             10 **
                               (prevInvoice.totalAmount?.fractionDigits ?? 2),
