@@ -1,6 +1,6 @@
 import {Tag as TagType, TagEntityType} from 'models/tag';
 import {Box} from '@mui/material';
-import React from 'react';
+import React, {SyntheticEvent} from 'react';
 import Tag from 'components/Tag/index';
 import TagActions from 'components/Tag/TagActions';
 import useTheme from '@mui/material/styles/useTheme';
@@ -9,7 +9,7 @@ type Props = {
   tag: TagType;
   entity: TagEntityType;
   isRenaming?: boolean;
-  onClick: (tag: TagType) => void;
+  onClick: (tag: TagType, e: SyntheticEvent) => void;
   onRename: (tagId: string | null) => void;
 };
 const TagSearchMenuItem = ({
@@ -45,7 +45,7 @@ const TagSearchMenuItem = ({
           display: 'flex',
           maxWidth: '240px',
         }}
-        onClick={() => onClick(tag)}>
+        onClick={(e) => onClick(tag, e)}>
         <Tag
           key={`search-option-tag-${tag.id}`}
           {...tag}
