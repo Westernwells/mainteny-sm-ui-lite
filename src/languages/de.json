@@ -3240,10 +3240,10 @@
   "Total number of quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Gesamtanzahl der Angebote von {{createdDateTimeFrom}} - {{createdDateTimeTo}}",
   "Total amount of quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Gesamtbetrag aller Angebote von {{createdDateTimeFrom}} - {{createdDateTimeTo}}",
   "Accepted value": "Akzeptierter Betrag",
-  "Total amount of accepted quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Hier ist die Übersetzung im gewohnten Excel-kompatiblen Format:",
-  "Total amount of pending quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Gesamtbetrag aller akzeptierten Angebote von {{createdDateTimeFrom}} - {{createdDateTimeTo}}",
-  "Send to": "Offener Betrag",
-  "Write with AI": "Gesamtbetrag aller offenen Angebote von {{createdDateTimeFrom}} - {{createdDateTimeTo}}",
-  "Rewrite with AI": "Senden an",
-  "Add attachments to enhance article clarity.": "Mit KI schreiben"
+  "Total amount of accepted quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Gesamtbetrag aller akzeptierten Angebote von {{createdDateTimeFrom}} - {{createdDateTimeTo}}",
+  "Total amount of pending quotations from {{createdDateTimeFrom}} - {{createdDateTimeTo}}": "Gesamtbetrag aller offenen Angebote von {{createdDateTimeFrom}} - {{createdDateTimeTo}}",
+  "Send to": "Senden an",
+  "Write with AI": "Mit KI schreiben",
+  "Rewrite with AI": "Mit KI umschreiben",
+  "Add attachments to enhance article clarity.": "Fügen Sie Anhänge hinzu, um die Verständlichkeit des Artikels zu verbessern."
 }
