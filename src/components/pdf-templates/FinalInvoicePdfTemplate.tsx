@@ -235,7 +235,6 @@ const FinalInvoicePdfTemplate = ({
               invoiceAmountDetail={invoiceAmountDetail}
               currentCurrency={currentCurrency}
               previousInvoices={previousInvoices}
-              articleItems={articleItems}
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}

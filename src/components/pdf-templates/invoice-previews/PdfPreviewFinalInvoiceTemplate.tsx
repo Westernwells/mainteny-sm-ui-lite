@@ -248,7 +248,6 @@ const PdfPreviewFinalInvoiceTemplate = ({
               invoiceAmountDetail={invoiceAmountDetail}
               currentCurrency={currentCurrency}
               previousInvoices={finalPreviousInvoices}
-              articleItems={articleItems}
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
