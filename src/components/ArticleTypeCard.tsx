@@ -255,7 +255,7 @@ const ArticleTypeCard = ({formik, unitPrice, handleClose}: Props) => {
                         }}
                         InputProps={{
                           name: 'article.costPackage.materialPercentage',
-                          placeholder: t(`e.g. 20%`),
+                          placeholder: t(`e.g. 50%`),
                           id: `article.costPackage.materialPercentage`,
                           inputMode: 'numeric',
                           disabled: true,

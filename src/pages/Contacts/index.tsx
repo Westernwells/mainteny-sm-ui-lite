@@ -465,7 +465,13 @@ const Contacts = () => {
               <SearchInput
                 refInput={textInput}
                 defaultValue={search}
-                onChange={(val: string) => setSearch(val)}
+                onChange={(val: string) => {
+                  setPage({
+                    ...page,
+                    pageIndex: 0,
+                  });
+                  setSearch(val);
+                }}
               />
             </Box>
             <Box display="flex" gap={2}>

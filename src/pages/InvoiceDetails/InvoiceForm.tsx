@@ -625,6 +625,8 @@ export const InvoiceForm = ({
   const watchedPayment = watch('payment');
   const watchedPaymentDescription = watch('payment.description');
   const watchedShowArticleSection = watch('showArticleSection');
+  const watchedIncludeWorkReport = watch('includeWorkReport');
+  const watchedIncludeChecklist = watch('includeCheckList');
 
   const [invoiceAmountDetail, setInvoiceAmountDetail] = useState<
     InvoiceAmountDetail | undefined
@@ -2397,7 +2399,7 @@ export const InvoiceForm = ({
                       label: 'Purchase order no.',
                       error: !!error,
                       helperText: error ? error.message : '',
-                      placeholder: 'e.g 000 000 000',
+                      placeholder: 'e.g. 000 000 000',
                     }}
                   />
                 )}
@@ -2416,7 +2418,7 @@ export const InvoiceForm = ({
                       label: 'Cost Center',
                       error: !!error,
                       helperText: error ? error.message : '',
-                      placeholder: 'e.g 000 000 000',
+                      placeholder: 'e.g. 000 000 000',
                     }}
                   />
                 )}
@@ -2439,13 +2441,13 @@ export const InvoiceForm = ({
               }}>
               <InvoiceCheckboxNEW
                 disabled={!isWorkReportPDFGenerated}
-                handleChange={() =>
-                  setValue('includeWorkReport', !getValues('includeWorkReport'))
+                handleChange={(e) =>
+                  setValue('includeWorkReport', e.target.checked)
                 }
                 tooltipTitle="No work report for the selected service job"
                 checkboxLabel="Add work report to invoice"
                 checked={
-                  !!(isWorkReportPDFGenerated && getValues('includeWorkReport'))
+                  !!(isWorkReportPDFGenerated && watchedIncludeWorkReport)
                 }
                 handleAction={() =>
                   window.open(
@@ -2464,14 +2466,12 @@ export const InvoiceForm = ({
               }}>
               <InvoiceCheckboxNEW
                 disabled={!isCheckListPDFGenerated}
-                handleChange={() =>
-                  setValue('includeCheckList', !getValues('includeCheckList'))
+                handleChange={(e) =>
+                  setValue('includeCheckList', e.target.checked)
                 }
                 tooltipTitle="No checklist for selected service job"
                 checkboxLabel="Add checklist to invoice"
-                checked={
-                  !!(isCheckListPDFGenerated && getValues('includeCheckList'))
-                }
+                checked={!!(isCheckListPDFGenerated && watchedIncludeChecklist)}
                 handleAction={() =>
                   window.open(
                     `/orders/details/${serviceOrder?.id}?tab=2`,

@@ -943,7 +943,13 @@ export const UnitListingView = () => {
           <SearchInput
             refInput={textInput}
             defaultValue={search}
-            onChange={(val: string) => setSearch(val)}
+            onChange={(val: string) => {
+              setPage({
+                ...page,
+                pageIndex: 0,
+              });
+              setSearch(val);
+            }}
           />
           <Filters
             activeFilters={appliedFilterNumber}
