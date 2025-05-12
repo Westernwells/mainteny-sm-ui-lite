@@ -477,9 +477,8 @@ export const InvoiceOverdueNotice = () => {
             fieldProps={{
               name: 'customerAddress',
               label: t('Customer Address'),
-              placeholder: t(
+              placeholder:
                 'e.g. 2118 Thornridge Cir. Syracuse, Connecticut 35624',
-              ),
               variant: 'outlined',
               value: formik.values.customerAddress,
               error: !!(
@@ -508,7 +507,7 @@ export const InvoiceOverdueNotice = () => {
             fieldProps={{
               name: 'subject',
               label: t('Subject'),
-              placeholder: t('e.g. Late payment'),
+              placeholder: 'e.g. Late payment',
               variant: 'outlined',
               value: formik.values.subject,
               error: !!(formik.touched.subject && formik.errors.subject),

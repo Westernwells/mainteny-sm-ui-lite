@@ -83,13 +83,10 @@ export const Customer = () => {
   });
 
   useEffect(() => {
-    if (customerResource.total > 0 && customerResource.data.length === 0) {
-      setPage({...page, pageIndex: 0});
-    }
-    if (textInput.current) {
+    if (textInput.current && !textInput.current.value) {
       textInput.current.value = search;
     }
-  }, [search, `${numberOfUnits}`]); // hack to not re-render when number of units array reference changes
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -161,7 +158,13 @@ export const Customer = () => {
       renderWidget={
         <Widget
           searchPlaceholder="Search by number, name, address etc."
-          getSearchValue={(val: string) => setSearch(val)}
+          getSearchValue={(val: string) => {
+            setPage({
+              ...page,
+              pageIndex: 0,
+            });
+            setSearch(val);
+          }}
           showActionBtn
           refInput={textInput}
           btnOnClick={() => navigate('/customers/new')}

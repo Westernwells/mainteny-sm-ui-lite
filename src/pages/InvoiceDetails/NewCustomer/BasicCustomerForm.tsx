@@ -69,7 +69,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
           <FormInput
             fieldProps={{
               size: 'small',
-              placeholder: 'e.g Mainteny GmbH',
+              placeholder: 'e.g. Mainteny GmbH',
               label: 'Customer Name',
               name: 'name',
               value: formik.values.name,
@@ -85,7 +85,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
           <FormInput
             fieldProps={{
               size: 'small',
-              placeholder: 'e.g johndoe@example.com',
+              placeholder: 'e.g. johndoe@example.com',
               label: 'Email',
               name: 'email',
               value: formik.values.email,
@@ -107,7 +107,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
           <FormInput
             fieldProps={{
               size: 'small',
-              placeholder: 'e.g johndoe@example.com',
+              placeholder: 'e.g. johndoe@example.com',
               label: 'Billing Email Address',
               name: 'billingEmail',
               value: formik.values.billingEmail,
@@ -131,7 +131,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
           <FormInput
             fieldProps={{
               size: 'small',
-              placeholder: 'e.g +34 12345678',
+              placeholder: 'e.g. +34 12345678',
               label: 'Phone',
               name: 'phone',
               value: formik.values.phone,
@@ -156,7 +156,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
           <FormInput
             fieldProps={{
               size: 'small',
-              placeholder: 'e.g +34 12345678',
+              placeholder: 'e.g. +34 12345678',
               label: '2nd Phone',
               name: 'secondaryPhoneNumber',
               value: formik.values.secondaryPhoneNumber,
@@ -181,7 +181,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
           <FormInput
             fieldProps={{
               size: 'small',
-              placeholder: 'e.g mainteny.com',
+              placeholder: 'e.g. mainteny.com',
               label: 'Website/URL',
               name: 'url',
               value: formik.values.url,
@@ -196,7 +196,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
           <FormInput
             fieldProps={{
               size: 'small',
-              placeholder: 'e.g 1234',
+              placeholder: 'e.g. 1234',
               label: 'Customer Number',
               name: 'externalId',
               value: formik.values.externalId || '',
@@ -326,7 +326,7 @@ export const BasicCustomerForm = ({formik, customerResource}: Props) => {
           <FormInput
             fieldProps={{
               size: 'small',
-              placeholder: 'e.g 000 000 000',
+              placeholder: 'e.g. 000 000 000',
               label: 'Cost Center',
               name: 'costCenter',
               value: formik.values.costCenter,

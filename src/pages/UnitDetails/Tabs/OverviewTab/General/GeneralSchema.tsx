@@ -113,6 +113,16 @@ export const GeneralSchema = ({label, elevator, currency}: Props) => {
             containerStyles={{alignItems: 'center'}}
           />
         );
+      case 'numberOfStops':
+        return (
+          <CardProps
+            icon={<TagIcon sx={{color: theme.palette.primary.light}} />}
+            label="Number of Stops"
+            bodyText={elevator.additionalInfo?.numberOfStops || '-'}
+            iconMaxHeight="3em"
+            containerStyles={{alignItems: 'center'}}
+          />
+        );
       default:
         return null;
     }

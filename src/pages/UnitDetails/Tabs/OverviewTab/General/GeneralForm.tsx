@@ -101,7 +101,7 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
           getValue={(item) => setValue('category', item?.value)}
           textFieldProps={{
             label: 'Unit Category',
-            placeholder: t('e.g Escalator'),
+            placeholder: t('e.g. Escalator'),
             required: true,
             defaultValue: watch('category'),
             ...register('category'),
@@ -259,6 +259,18 @@ export const EditUnitDetailsForm = ({register, watch, setValue}: Props) => {
             label: 'Unit Type',
             required: false,
             ...register('unitType'),
+          }}
+        />
+      </Grid>
+
+      <Grid item md={6}>
+        <FormInput
+          fieldProps={{
+            size: 'small',
+            placeholder: 'e.g. 10',
+            label: 'Number of Stops',
+            type: 'number',
+            ...register('numberOfStops'),
           }}
         />
       </Grid>

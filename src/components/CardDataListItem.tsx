@@ -2,6 +2,7 @@ import {PropsWithChildren, useMemo} from 'react';
 import {t} from 'i18next';
 import {Box, SvgIconProps, Typography, TypographyProps} from '@mui/material';
 import {SvgIconComponent} from '@mui/icons-material';
+import {checkIsEmail, checkIsWebsite} from 'utils/string';
 
 export interface Props extends PropsWithChildren {
   label: string;
@@ -30,16 +31,11 @@ export const CardDataListItem = ({
     return value;
   }, [value, translateValue]);
 
-  const isEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-
-  const isWebsite = (val: string) =>
-    /^(https?:\/\/)?(www\.)?[\w-]+(\.[\w-]+)+[/#?]?.*$/.test(val);
-
   const handleLink = (val: string) => {
-    if (isEmail(val)) {
+    if (checkIsEmail(val)) {
       return `mailto:${val}`;
     }
-    if (isWebsite(val)) {
+    if (checkIsWebsite(val)) {
       return val.startsWith('http') ? val : `https://${val}`;
     }
     return null;
