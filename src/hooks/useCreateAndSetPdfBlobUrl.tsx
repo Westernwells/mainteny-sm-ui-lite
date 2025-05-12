@@ -125,11 +125,11 @@ export const useCreateAndSetPdfBlobUrl = ({
     const {header: headerInfo, footer: footerInfo} = tpl;
 
     const urls = await fetchDownloadUrls(
-      [headerInfo.path, footerInfo.path],
+      [headerInfo?.path, footerInfo?.path],
       serviceOrder.serviceCompany.id,
     );
-    const headerPath = urls[headerInfo.path]!;
-    const footerPath = urls[footerInfo.path]!;
+    const headerPath = urls[headerInfo?.path]!;
+    const footerPath = urls[footerInfo?.path]!;
 
     const [subItemsResult, amountResult, serviceOrderResult] =
       await Promise.all([

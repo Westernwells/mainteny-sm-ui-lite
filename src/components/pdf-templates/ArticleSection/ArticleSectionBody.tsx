@@ -47,7 +47,7 @@ export const ArticleSectionBody = ({
 }: ArticleSectionBodyProps) => {
   const styles = getStyles({primaryColor});
 
-  const priceWidth = showDiscountCol ? styles.col15Right.width : '18%';
+  const priceWidth = showDiscountCol ? styles.col13Right.width : '19%';
 
   return (
     <View style={styles.dataBody}>
@@ -60,28 +60,28 @@ export const ArticleSectionBody = ({
         return (
           <View key={`${mainPosition.id}-${index}`}>
             <View style={styles.tableRow}>
-              <View style={styles.col2Left}>
+              <View style={styles.col6Left}>
                 <Text>
                   {insertNewlines(mainPosition.userSeqNumber || '') ||
                     index + 1}
                 </Text>
               </View>
 
-              <View style={styles.col40Left}>
+              <View style={styles.col37Left}>
                 <Text orphans={1}>
                   {stripHtmlTags(mainPosition.name || '-')}
                 </Text>
               </View>
 
-              <View style={styles.col10Right}>
+              <View style={styles.col8Right}>
                 <Text>{mainPosition.quantity || '-'}</Text>
               </View>
 
-              <View style={styles.col8Center}>
+              <View style={styles.col10Center}>
                 <Text>{translate(mainPosition.article?.unit || '-')}</Text>
               </View>
 
-              <View style={[styles.col15Right, {width: priceWidth}]}>
+              <View style={[styles.col13Right, {width: priceWidth}]}>
                 <Text>
                   {formatCurrency(
                     centsToMoney(
@@ -99,7 +99,7 @@ export const ArticleSectionBody = ({
               </View>
 
               {showDiscountCol && (
-                <View style={styles.col10Right}>
+                <View style={styles.col12Right}>
                   <Text>
                     {getDiscountDisplay(
                       mainPosition.discount,
@@ -110,7 +110,7 @@ export const ArticleSectionBody = ({
                 </View>
               )}
 
-              <View style={[styles.col15Right, {width: priceWidth}]}>
+              <View style={[styles.col13Right, {width: priceWidth}]}>
                 <Text>
                   {formatCurrency(totalPriceExclVatAfterDiscount || 0, {
                     currency: currentCurrency?.code!,
@@ -145,14 +145,14 @@ export const ArticleSectionBody = ({
                 return (
                   <View key={`${subItem.id}-${index}-${subIndex}`}>
                     <View style={styles.tableRow}>
-                      <View style={styles.col2Left}>
+                      <View style={styles.col6Left}>
                         <Text>
                           {insertNewlines(subItem.userSeqNumber || '') ||
                             `${index + 1}.${subIndex + 1}`}
                         </Text>
                       </View>
 
-                      <View style={styles.col40Left}>
+                      <View style={styles.col37Left}>
                         <Text>
                           {stripHtmlTags(
                             subItem.name || subItem.article?.name || '-',
@@ -160,15 +160,15 @@ export const ArticleSectionBody = ({
                         </Text>
                       </View>
 
-                      <View style={styles.col10Right}>
+                      <View style={styles.col8Right}>
                         <Text>{subItem.quantity || '-'}</Text>
                       </View>
 
-                      <View style={styles.col8Center}>
+                      <View style={styles.col10Center}>
                         <Text>{translate(subItem.article?.unit || '-')}</Text>
                       </View>
 
-                      <View style={[styles.col15Right, {width: priceWidth}]}>
+                      <View style={[styles.col13Right, {width: priceWidth}]}>
                         {mainPosition.subItemsConfig?.priceVisible ? (
                           <Text>
                             {formatCurrency(
@@ -190,7 +190,7 @@ export const ArticleSectionBody = ({
                       </View>
 
                       {showDiscountCol && (
-                        <View style={styles.col10Right}>
+                        <View style={styles.col12Right}>
                           {mainPosition.discount?.type ===
                           DiscountType.PERCENTAGE ? (
                             <Text>
@@ -206,7 +206,7 @@ export const ArticleSectionBody = ({
                         </View>
                       )}
 
-                      <View style={[styles.col15Right, {width: priceWidth}]}>
+                      <View style={[styles.col13Right, {width: priceWidth}]}>
                         <Text>
                           <Text>
                             {mainPosition.subItemsConfig?.priceVisible

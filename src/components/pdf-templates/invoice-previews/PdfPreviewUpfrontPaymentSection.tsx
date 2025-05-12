@@ -93,11 +93,6 @@ const PdfPreviewUpfrontPaymentSection = ({
 }: PartialProps) => {
   const isEditing = !!invoice?.id;
 
-  const subtotalExclVat = centsToMoney(
-    currentCurrency?.code!,
-    invoiceAmountDetail?.amountAfterGlobalDiscount.netAmount ?? 0,
-  );
-
   const previousInvoicesTotalExclVat = previousInvoices
     ?.map(
       (i) =>
@@ -106,16 +101,10 @@ const PdfPreviewUpfrontPaymentSection = ({
     )
     .reduce((a, b) => a + b, 0);
 
-  const amount =
-    invoice?.additionalInfo.payment?.type === PaymentType.LUMP_SUM
-      ? centsToMoney(
-          currentCurrency?.code!,
-          aggregatedAmountToMoney(invoice.additionalInfo.payment?.amount).value,
-        ) ?? 0
-      : invoice?.additionalInfo.payment?.type === PaymentType.PERCENTAGE
-      ? (subtotalExclVat * (invoice?.additionalInfo.payment?.percentage ?? 0)) /
-        100
-      : 0;
+  const amount = centsToMoney(
+    currentCurrency?.code!,
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
+  );
 
   const totalAmountExclVat = isEditing
     ? amount +

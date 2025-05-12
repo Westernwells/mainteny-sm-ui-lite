@@ -256,60 +256,28 @@ export const PartialPaymentsSection = ({
     return floatValue <= maxPercentage;
   };
 
-  const amount =
-    watchedPayment?.type === PaymentType.LUMP_SUM
-      ? watchedPayment?.amount?.value ?? 0
-      : watchedPayment?.type === PaymentType.PERCENTAGE
-      ? (subtotalExclVat * (watchedPayment?.percentage ?? 0)) / 100
-      : watchedPayment?.type === PaymentType.PER_ITEM
-      ? watchedItems
-          ?.map((item) => {
-            // Calculate base amount from unit price and quantity
-            const baseAmount = centsToMoney(
-              item.unitAmount.currency,
-              (item.unitAmount.netAmount ?? 0) * item.quantity,
-            );
+  const amount = centsToMoney(
+    currentCurrency.code,
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
+  );
 
-            // Get discount from either additionalInfo or direct discount field
-            const discount = item?.discount;
-
-            // Calculate discounted price
-            const itemTotalPriceExclVat = applyDiscount({
-              actualValue: baseAmount,
-              ...(discount?.type === DiscountType.AMOUNT
-                ? {amount: discount?.amount?.value ?? 0}
-                : {percentage: discount?.percentage ?? 0}),
-            });
-
-            // Calculate final amount based on payment percentage
-            const paymentPercentage = item.payment?.percentage ?? 0;
-            return (itemTotalPriceExclVat / 100) * paymentPercentage;
-          })
-          ?.reduce((a, b) => a + b, 0)
-      : 0;
-
-  const amountFormatted = formatCurrency(fixRounding(amount, 2), {
+  const amountFormatted = formatCurrency(amount, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-    roundingMode: 'floor',
   });
+
   const totalAmountExclVat = isEditing
     ? amount +
       previousInvoicesTotalExclVat -
-      (invoice?.totalAmount?.netAmount ?? 0) /
-        10 ** (invoice?.totalAmount?.fractionDigits ?? 2)
+      centsToMoney(currentCurrency?.code!, invoice?.totalAmount?.netAmount)
     : amount + previousInvoicesTotalExclVat;
 
-  const totalAmountExclVatFormatted = formatCurrency(
-    fixRounding(totalAmountExclVat, 2),
-    {
-      currency: currentCurrency.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-    },
-  );
+  const totalAmountExclVatFormatted = formatCurrency(totalAmountExclVat, {
+    currency: currentCurrency.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   const percentageVats =
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
