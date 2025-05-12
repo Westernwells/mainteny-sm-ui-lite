@@ -37,6 +37,31 @@ const getNodeType = (isActive: boolean, isGroup: boolean) => {
   if (isGroup) return 'list-item';
 };
 
+const recursiveNodeHasText = (node: BaseElement | BaseText): boolean => {
+  // If it's a direct text node
+  if (Text.isText(node)) {
+    return node.text !== undefined && node.text.trim() !== '';
+  }
+
+  // If it's an element without children
+  if (
+    SlateElement.isElement(node) &&
+    (!node.children || node.children.length === 0)
+  ) {
+    return false;
+  }
+
+  // Recursive case for node children
+  if (node.children && Array.isArray(node.children)) {
+    return node.children.some((child) =>
+      // Recursively check each child
+      recursiveNodeHasText(child),
+    );
+  }
+
+  return false;
+};
+
 export const isMarkActive = (editor: CustomEditor, format: string) => {
   const marks: Marks = Editor.marks(editor) || {};
   return marks ? marks[format] === true : false;
@@ -500,6 +525,25 @@ export const handleKeyDown = (
         node.type === FORMAT['bulleted-list']
       ) {
         return handleEnterOnListItem(editor, event, node);
+      }
+      break;
+    case 'Tab':
+      {
+        const format = FORMAT['text-indent'];
+        const attribute = FORMAT_TO_ATTRIBUTE[format];
+        if (node.type === ELEMENT_TO_CHANGE[attribute].target) {
+          event.preventDefault();
+          return addAttributeToBlock(editor, format);
+        }
+      }
+      break;
+    case 'Backspace':
+      {
+        const format = FORMAT['text-indent'];
+        const hasText = recursiveNodeHasText(node);
+        if (!hasText) {
+          return removeAttributeToBlock(editor, format);
+        }
       }
       break;
     case ' ': {
