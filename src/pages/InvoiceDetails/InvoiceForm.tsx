@@ -2047,7 +2047,7 @@ export const InvoiceForm = ({
 
   useEffect(() => {
     recalcInvoice();
-  }, [recalcInvoice, watchedItems, watchedDiscount]);
+  }, [recalcInvoice, watchedItems, watchedDiscount, watchedPayment]);
 
   useEffect(() => {
     checkIfLaborOrMaterialIsSelected(watchedItems);

@@ -36,6 +36,7 @@ import MUIDialog from '@mui/material/Dialog';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {Dialog} from 'components/Dialog';
+import _ from 'lodash';
 import {NoItemSection} from '../NoItemSection';
 
 const isPreviewableImage = (file: FileResource) => {

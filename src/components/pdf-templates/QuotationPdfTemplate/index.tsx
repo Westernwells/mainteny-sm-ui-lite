@@ -29,6 +29,7 @@ import {getStyles} from 'components/pdf-templates/QuotationPdfTemplate/Quotation
 import {ServiceCompanyItem} from 'models/service-company';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {hasAlternativeAddress} from 'utils/invoice';
+import {getServiceCompanyInfo} from 'utils/company-utils';
 import ArticleTableHeader from '../ArticleSection/ArticleTableHeader';
 import ArticleSectionFooter from '../ArticleSection/ArticleSectionFooter';
 import {ArticleSectionBody} from '../ArticleSection/ArticleSectionBody';
@@ -138,6 +139,11 @@ const QuotationPdfTemplate = React.memo(
 
     const showDiscountCol = !allItemsHaveZeroDiscount(quotationItems);
 
+    const serviceCompanyInfo = getServiceCompanyInfo(
+      userInfo,
+      quotation?.additionalInfo?.alternativeServiceCompanyInfo,
+    );
+
     return (
       <Document>
         {hasAlternativeAddress(
@@ -167,6 +173,7 @@ const QuotationPdfTemplate = React.memo(
             <TopSectionContainer>
               <PdfTemplateLeftAddress
                 serviceCompany={serviceCompany}
+                serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={quotation?.propertyOwner?.name}
                 addressComponent={getAddressComponentFromQuotation(quotation)}
                 translate={translate}
