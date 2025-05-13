@@ -8,7 +8,7 @@ export const getStyles = ({
   StyleSheet.create({
     dataBody: {
       borderBottom: '1px solid #212121',
-      paddingBottom: 10,
+      paddingBottom: 5,
     },
     table: {
       width: '100%',
@@ -57,9 +57,20 @@ export const getStyles = ({
       textAlign: 'right',
       color: primaryColor,
     },
-    col10Center: {
+    col11Right: {
+      width: '11.5%',
+      textAlign: 'right',
+      color: primaryColor,
+    },
+    col10Left: {
       width: '10%',
-      textAlign: 'center',
+      textAlign: 'left',
+      color: primaryColor,
+      paddingLeft: 8,
+    },
+    col12Left: {
+      width: '12%',
+      textAlign: 'left',
       color: primaryColor,
       paddingLeft: 8,
     },
@@ -73,6 +84,7 @@ export const getStyles = ({
       width: '8%',
       textAlign: 'right',
       color: primaryColor,
+      paddingRight: 3,
     },
     col13Right: {
       width: '13%',
@@ -101,7 +113,6 @@ export const getStyles = ({
     value: {
       width: '24%',
       textAlign: 'right',
-      paddingRight: 5,
     },
     vatContainer: {
       width: '56%',
@@ -109,7 +120,7 @@ export const getStyles = ({
     vatRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       paddingVertical: 1,
     },
     vatLabel: {
@@ -121,7 +132,6 @@ export const getStyles = ({
       width: '43%',
       fontSize: 10,
       textAlign: 'right',
-      paddingRight: 5,
     },
     totalInclValue: {
       ...boldFontStyle,
