@@ -26,7 +26,7 @@ import {
 import {createEmptyResource} from 'utils/paging';
 import {getUniqueId} from 'utils/utils';
 import * as Yup from 'yup';
-import RichTextField from '../../components/RichTextField';
+import RichTextEditor from 'components/RichTextEditor';
 import {ExtendedSupplierRecord} from '../../models/supplier';
 import {AddBasicInfoForm} from './BasicInfo/AddBasicInfoForm';
 import {AddStockForm} from './Stock/AddStockForm';
@@ -317,15 +317,18 @@ export const NewArticle = () => {
         {activeStep === 1 && (
           <FlexContainer containerStyle={{mt: '2em'}}>
             <PageCard headerLabel={t('Description')} minHeight="100%">
-              <RichTextField
-                label={t('Description')}
-                html={description}
-                minRows={5}
-                placeholder={t(
-                  'e.g. Flat cable used for door engines from the following suppliers.....',
-                )}
-                updateHtml={(h) => setDescription(h)}
-              />
+              <Box sx={{width: '830px'}}>
+                <RichTextEditor
+                  label={t('Description')}
+                  placeholder={t(
+                    'e.g. Flat cable used for door engines from the following suppliers.....',
+                  )}
+                  html={description || ''}
+                  updateHtml={(h) => setDescription(h)}
+                  hasSignatureButton={false}
+                  hasAttachFileButton={false}
+                />
+              </Box>
             </PageCard>
           </FlexContainer>
         )}
