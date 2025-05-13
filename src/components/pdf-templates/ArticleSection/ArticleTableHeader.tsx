@@ -50,6 +50,7 @@ const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
       width: '8%',
       textAlign: 'right',
       color: secondaryColor,
+      paddingRight: 3,
     },
     col8Center: {
       width: '8%',
@@ -57,14 +58,14 @@ const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
       paddingLeft: 8,
       color: secondaryColor,
     },
-    col10Center: {
-      width: '10%',
-      textAlign: 'center',
+    col12Left: {
+      width: '12%',
+      textAlign: 'left',
       paddingLeft: 8,
       color: secondaryColor,
     },
-    col15Right: {
-      width: '13%',
+    col11Right: {
+      width: '11%',
       textAlign: 'right',
       color: secondaryColor,
     },
@@ -88,7 +89,7 @@ const ArticleTableHeader = ({
     secondaryColor,
   });
 
-  const priceWidth = showDiscountCol ? styles.col15Right.width : '19%';
+  const priceWidth = showDiscountCol ? styles.col12Right.width : '18.5%';
 
   return (
     <View style={styles.tableHead}>
@@ -102,10 +103,10 @@ const ArticleTableHeader = ({
         <View style={[styles.col8Right]}>
           <Text style={[styles.tableHeading]}>{translate('Quantity')}</Text>
         </View>
-        <View style={[styles.col10Center]}>
+        <View style={[styles.col12Left]}>
           <Text style={[styles.tableHeading]}>{translate('Unit')}</Text>
         </View>
-        <View style={[styles.col15Right, {width: priceWidth}]}>
+        <View style={[styles.col11Right, {width: priceWidth}]}>
           <Text style={[styles.tableHeading]}>
             {`${translate('Price')} (${
               getCurrencySymbol[currentCurrency?.code!]
@@ -118,7 +119,7 @@ const ArticleTableHeader = ({
           </View>
         )}
 
-        <View style={[styles.col15Right, {width: priceWidth}]}>
+        <View style={[styles.col12Right, {width: priceWidth}]}>
           <Text style={[styles.tableHeading]}>
             {`${translate('Total')} (${
               getCurrencySymbol[currentCurrency?.code!]
