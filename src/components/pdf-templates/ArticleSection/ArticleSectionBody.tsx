@@ -47,7 +47,7 @@ export const ArticleSectionBody = ({
 }: ArticleSectionBodyProps) => {
   const styles = getStyles({primaryColor});
 
-  const priceWidth = showDiscountCol ? styles.col13Right.width : '19%';
+  const priceWidth = showDiscountCol ? styles.col12Right.width : '18.5%';
 
   return (
     <View style={styles.dataBody}>
@@ -63,7 +63,7 @@ export const ArticleSectionBody = ({
               <View style={styles.col6Left}>
                 <Text>
                   {insertNewlines(mainPosition.userSeqNumber || '') ||
-                    index + 1}
+                    insertNewlines(String(index + 1) || '')}
                 </Text>
               </View>
 
@@ -75,20 +75,20 @@ export const ArticleSectionBody = ({
 
               <View style={styles.col8Right}>
                 <Text>
-                  {insertNewlines(String(mainPosition.quantity) || '-', 5)}
+                  {insertNewlines(String(mainPosition.quantity) || '-', 4)}
                 </Text>
               </View>
 
-              <View style={styles.col10Center}>
+              <View style={styles.col12Left}>
                 <Text>
                   {insertNewlines(
                     translate(mainPosition.article?.unit || '-'),
-                    6,
+                    9,
                   )}
                 </Text>
               </View>
 
-              <View style={[styles.col13Right, {width: priceWidth}]}>
+              <View style={[styles.col12Right, {width: priceWidth}]}>
                 <Text>
                   {insertNewlines(
                     formatCurrency(
@@ -103,7 +103,7 @@ export const ArticleSectionBody = ({
                         companyLang: selectedLng,
                       },
                     ),
-                    12,
+                    11,
                   )}
                 </Text>
               </View>
@@ -123,7 +123,7 @@ export const ArticleSectionBody = ({
                 </View>
               )}
 
-              <View style={[styles.col13Right, {width: priceWidth}]}>
+              <View style={[styles.col12Right, {width: priceWidth}]}>
                 <Text>
                   {insertNewlines(
                     formatCurrency(totalPriceExclVatAfterDiscount || 0, {
@@ -132,7 +132,7 @@ export const ArticleSectionBody = ({
                       currencySymbol: currentCurrency?.symbol,
                       companyLang: selectedLng,
                     }),
-                    12,
+                    11,
                   )}
                 </Text>
               </View>
@@ -164,7 +164,7 @@ export const ArticleSectionBody = ({
                       <View style={styles.col6Left}>
                         <Text>
                           {insertNewlines(subItem.userSeqNumber || '') ||
-                            `${index + 1}.${subIndex + 1}`}
+                            insertNewlines(`${index + 1}.${subIndex + 1}`)}
                         </Text>
                       </View>
 
@@ -178,20 +178,20 @@ export const ArticleSectionBody = ({
 
                       <View style={styles.col8Right}>
                         <Text>
-                          {insertNewlines(String(subItem.quantity) || '-', 5)}
+                          {insertNewlines(String(subItem.quantity) || '-')}
                         </Text>
                       </View>
 
-                      <View style={styles.col10Center}>
+                      <View style={styles.col12Left}>
                         <Text>
                           {insertNewlines(
                             translate(subItem.article?.unit || '-'),
-                            6,
+                            9,
                           )}
                         </Text>
                       </View>
 
-                      <View style={[styles.col13Right, {width: priceWidth}]}>
+                      <View style={[styles.col12Right, {width: priceWidth}]}>
                         {mainPosition.subItemsConfig?.priceVisible ? (
                           <Text>
                             {insertNewlines(
@@ -207,7 +207,7 @@ export const ArticleSectionBody = ({
                                   companyLang: selectedLng,
                                 },
                               ),
-                              12,
+                              11,
                             )}
                           </Text>
                         ) : (
@@ -226,7 +226,7 @@ export const ArticleSectionBody = ({
                                   currentCurrency,
                                   selectedLng,
                                 ),
-                                8,
+                                6,
                               )}
                             </Text>
                           ) : (
@@ -235,7 +235,7 @@ export const ArticleSectionBody = ({
                         </View>
                       )}
 
-                      <View style={[styles.col13Right, {width: priceWidth}]}>
+                      <View style={[styles.col12Right, {width: priceWidth}]}>
                         <Text>
                           <Text>
                             {mainPosition.subItemsConfig?.priceVisible
@@ -249,7 +249,7 @@ export const ArticleSectionBody = ({
                                       companyLang: selectedLng,
                                     },
                                   ),
-                                  12,
+                                  11,
                                 )
                               : ' '}
                           </Text>
