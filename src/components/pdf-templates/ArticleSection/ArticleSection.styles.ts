@@ -8,7 +8,7 @@ export const getStyles = ({
   StyleSheet.create({
     dataBody: {
       borderBottom: '1px solid #212121',
-      paddingBottom: 10,
+      paddingBottom: 5,
     },
     table: {
       width: '100%',
@@ -109,7 +109,7 @@ export const getStyles = ({
     vatRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       paddingVertical: 1,
     },
     vatLabel: {
