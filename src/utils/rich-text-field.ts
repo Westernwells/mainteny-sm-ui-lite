@@ -62,6 +62,25 @@ const recursiveNodeHasText = (node: BaseElement | BaseText): boolean => {
   return false;
 };
 
+const isAtFirstLineStart = (editor: Editor) => {
+  const {selection} = editor;
+
+  if (!selection || !Range.isCollapsed(selection)) return false; // isCollapsed means no text selected
+
+  const [_, path] = Editor.node(editor, selection);
+
+  const isFirstBlock = path[0] === 0;
+
+  if (!isFirstBlock) return false;
+
+  const start = Editor.start(editor, path);
+
+  return (
+    selection.anchor.offset === start.offset &&
+    Path.equals(selection.anchor.path, start.path)
+  );
+};
+
 export const isMarkActive = (editor: CustomEditor, format: string) => {
   const marks: Marks = Editor.marks(editor) || {};
   return marks ? marks[format] === true : false;
@@ -541,7 +560,7 @@ export const handleKeyDown = (
       {
         const format = FORMAT['text-indent'];
         const hasText = recursiveNodeHasText(node);
-        if (!hasText) {
+        if (!hasText || isAtFirstLineStart(editor)) {
           return removeAttributeToBlock(editor, format);
         }
       }
