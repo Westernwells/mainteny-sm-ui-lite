@@ -11,7 +11,8 @@ import {ArticleDescriptionFormModel} from 'models/articleForm';
 import DOMPurify from 'dompurify';
 import {CUSTOM_ERROR_TEXT, stripHtmlTags} from 'models/text-block';
 import * as Yup from 'yup';
-import RichTextField from '../../../components/RichTextField';
+import RichTextEditor from 'components/RichTextEditor';
+import {dialogPaperStyles} from 'components/MixedPositions/MixedPositions.styles';
 import {NoItemSection} from '../NoItemSection';
 
 const validationSchema = Yup.object().shape({
@@ -86,24 +87,25 @@ export const ArticleDescriptionCard = ({article}: {article: ArticleView}) => {
         onSave={saveArticle}
         disableSaveBtn={!formik.isValid || formik.isSubmitting}
         dialogProps={{
+          maxWidth: 'lg',
           open: openDialog || false,
+        }}
+        sx={{
+          '& .MuiDialog-paper': {
+            ...dialogPaperStyles,
+          },
         }}>
-        <RichTextField
+        <RichTextEditor
           name="description"
           label={t('Description')}
           placeholder={t(
             'e.g. Flat cable used for door engines from the following suppliers.....',
           )}
-          minRows={5}
           html={formik.values.description || ''}
-          onBlur={formik.handleBlur}
           updateHtml={(h) => formik.setFieldValue('description', h)}
-          error={Boolean(
-            formik.touched.description && formik.errors.description,
-          )}
-          helperText={
-            formik.touched.description ? formik.errors.description : undefined
-          }
+          hasSignatureButton={false}
+          hasAttachFileButton={false}
+          required
         />
       </Dialog>
     </InfoCard>

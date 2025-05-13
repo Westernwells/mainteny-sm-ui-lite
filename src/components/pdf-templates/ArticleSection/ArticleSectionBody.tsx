@@ -47,7 +47,7 @@ export const ArticleSectionBody = ({
 }: ArticleSectionBodyProps) => {
   const styles = getStyles({primaryColor});
 
-  const priceWidth = showDiscountCol ? styles.col13Right.width : '19%';
+  const priceWidth = showDiscountCol ? styles.col12Right.width : '18.5%';
 
   return (
     <View style={styles.dataBody}>
@@ -63,7 +63,7 @@ export const ArticleSectionBody = ({
               <View style={styles.col6Left}>
                 <Text>
                   {insertNewlines(mainPosition.userSeqNumber || '') ||
-                    index + 1}
+                    insertNewlines(String(index + 1) || '')}
                 </Text>
               </View>
 
@@ -74,26 +74,36 @@ export const ArticleSectionBody = ({
               </View>
 
               <View style={styles.col8Right}>
-                <Text>{mainPosition.quantity || '-'}</Text>
-              </View>
-
-              <View style={styles.col10Center}>
-                <Text>{translate(mainPosition.article?.unit || '-')}</Text>
-              </View>
-
-              <View style={[styles.col13Right, {width: priceWidth}]}>
                 <Text>
-                  {formatCurrency(
-                    centsToMoney(
-                      currentCurrency?.code!,
-                      mainPosition?.unitAmount?.netAmount || 0,
+                  {insertNewlines(String(mainPosition.quantity) || '-', 4)}
+                </Text>
+              </View>
+
+              <View style={styles.col12Left}>
+                <Text>
+                  {insertNewlines(
+                    translate(mainPosition.article?.unit || '-'),
+                    9,
+                  )}
+                </Text>
+              </View>
+
+              <View style={[styles.col12Right, {width: priceWidth}]}>
+                <Text>
+                  {insertNewlines(
+                    formatCurrency(
+                      centsToMoney(
+                        currentCurrency?.code!,
+                        mainPosition?.unitAmount?.netAmount || 0,
+                      ),
+                      {
+                        currency: currentCurrency?.code,
+                        excludeCurrencySymbol: true,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      },
                     ),
-                    {
-                      currency: currentCurrency?.code,
-                      excludeCurrencySymbol: true,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    },
+                    11,
                   )}
                 </Text>
               </View>
@@ -101,23 +111,29 @@ export const ArticleSectionBody = ({
               {showDiscountCol && (
                 <View style={styles.col12Right}>
                   <Text>
-                    {getDiscountDisplay(
-                      mainPosition.discount,
-                      currentCurrency,
-                      selectedLng,
+                    {insertNewlines(
+                      getDiscountDisplay(
+                        mainPosition.discount,
+                        currentCurrency,
+                        selectedLng,
+                      ),
+                      8,
                     )}
                   </Text>
                 </View>
               )}
 
-              <View style={[styles.col13Right, {width: priceWidth}]}>
+              <View style={[styles.col12Right, {width: priceWidth}]}>
                 <Text>
-                  {formatCurrency(totalPriceExclVatAfterDiscount || 0, {
-                    currency: currentCurrency?.code!,
-                    excludeCurrencySymbol: true,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  })}
+                  {insertNewlines(
+                    formatCurrency(totalPriceExclVatAfterDiscount || 0, {
+                      currency: currentCurrency?.code!,
+                      excludeCurrencySymbol: true,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    }),
+                    11,
+                  )}
                 </Text>
               </View>
             </View>
@@ -148,7 +164,7 @@ export const ArticleSectionBody = ({
                       <View style={styles.col6Left}>
                         <Text>
                           {insertNewlines(subItem.userSeqNumber || '') ||
-                            `${index + 1}.${subIndex + 1}`}
+                            insertNewlines(`${index + 1}.${subIndex + 1}`)}
                         </Text>
                       </View>
 
@@ -161,27 +177,37 @@ export const ArticleSectionBody = ({
                       </View>
 
                       <View style={styles.col8Right}>
-                        <Text>{subItem.quantity || '-'}</Text>
+                        <Text>
+                          {insertNewlines(String(subItem.quantity) || '-')}
+                        </Text>
                       </View>
 
-                      <View style={styles.col10Center}>
-                        <Text>{translate(subItem.article?.unit || '-')}</Text>
+                      <View style={styles.col12Left}>
+                        <Text>
+                          {insertNewlines(
+                            translate(subItem.article?.unit || '-'),
+                            9,
+                          )}
+                        </Text>
                       </View>
 
-                      <View style={[styles.col13Right, {width: priceWidth}]}>
+                      <View style={[styles.col12Right, {width: priceWidth}]}>
                         {mainPosition.subItemsConfig?.priceVisible ? (
                           <Text>
-                            {formatCurrency(
-                              centsToMoney(
-                                currentCurrency?.code!,
-                                subItem?.unitAmount?.netAmount || 0,
+                            {insertNewlines(
+                              formatCurrency(
+                                centsToMoney(
+                                  currentCurrency?.code!,
+                                  subItem?.unitAmount?.netAmount || 0,
+                                ),
+                                {
+                                  currency: currentCurrency?.code,
+                                  excludeCurrencySymbol: true,
+                                  currencySymbol: currentCurrency?.symbol,
+                                  companyLang: selectedLng,
+                                },
                               ),
-                              {
-                                currency: currentCurrency?.code,
-                                excludeCurrencySymbol: true,
-                                currencySymbol: currentCurrency?.symbol,
-                                companyLang: selectedLng,
-                              },
+                              11,
                             )}
                           </Text>
                         ) : (
@@ -194,10 +220,13 @@ export const ArticleSectionBody = ({
                           {mainPosition.discount?.type ===
                           DiscountType.PERCENTAGE ? (
                             <Text>
-                              {getDiscountDisplay(
-                                mainPosition.discount,
-                                currentCurrency,
-                                selectedLng,
+                              {insertNewlines(
+                                getDiscountDisplay(
+                                  mainPosition.discount,
+                                  currentCurrency,
+                                  selectedLng,
+                                ),
+                                6,
                               )}
                             </Text>
                           ) : (
@@ -206,18 +235,21 @@ export const ArticleSectionBody = ({
                         </View>
                       )}
 
-                      <View style={[styles.col13Right, {width: priceWidth}]}>
+                      <View style={[styles.col12Right, {width: priceWidth}]}>
                         <Text>
                           <Text>
                             {mainPosition.subItemsConfig?.priceVisible
-                              ? formatCurrency(
-                                  totalSubItemPriceExclVatAfterDiscount,
-                                  {
-                                    currency: currentCurrency!.code,
-                                    excludeCurrencySymbol: true,
-                                    currencySymbol: currentCurrency!.symbol,
-                                    companyLang: selectedLng,
-                                  },
+                              ? insertNewlines(
+                                  formatCurrency(
+                                    totalSubItemPriceExclVatAfterDiscount,
+                                    {
+                                      currency: currentCurrency!.code,
+                                      excludeCurrencySymbol: true,
+                                      currencySymbol: currentCurrency!.symbol,
+                                      companyLang: selectedLng,
+                                    },
+                                  ),
+                                  11,
                                 )
                               : ' '}
                           </Text>

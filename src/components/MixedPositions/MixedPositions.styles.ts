@@ -1,7 +1,6 @@
 export const dialogPaperStyles = {
   background: 'white',
   zIndex: 1300,
-  maxHeight: '380px',
   overflowY: 'auto',
   paddingTop: '0.6em',
   marginTop: '3.1em',
