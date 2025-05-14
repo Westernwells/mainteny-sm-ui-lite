@@ -37,7 +37,7 @@ const getNodeType = (isActive: boolean, isGroup: boolean) => {
   if (isGroup) return 'list-item';
 };
 
-const recursiveNodeHasText = (node: BaseElement | BaseText): boolean => {
+export const recursiveNodeHasText = (node: BaseElement | BaseText): boolean => {
   // If it's a direct text node
   if (Text.isText(node)) {
     return node.text !== undefined && node.text.trim() !== '';
