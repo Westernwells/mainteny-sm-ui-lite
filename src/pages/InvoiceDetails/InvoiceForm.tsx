@@ -2052,7 +2052,9 @@ export const InvoiceForm = ({
   }, [recalcInvoice, watchedItems, watchedDiscount, watchedPayment]);
 
   useEffect(() => {
-    checkIfLaborOrMaterialIsSelected(watchedItems);
+    if (!invoice?.id) {
+      checkIfLaborOrMaterialIsSelected(watchedItems);
+    }
   }, [watchedItemsHookValue]);
 
   const [shouldShow, setShouldShow] = useState(watchedShowArticleSection);
@@ -2917,7 +2919,7 @@ export const InvoiceForm = ({
                   updateHtml={(term) =>
                     stripHtmlTags(term)
                       ? setValue('paymentTerm', {
-                          ...getValues('paymentTerm'),
+                          ...watchedPaymentTerm,
                           term,
                         })
                       : setValue('paymentTerm', undefined)

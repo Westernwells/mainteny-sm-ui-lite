@@ -453,7 +453,7 @@ export interface CreateInvoice {
   sentDate?: string;
   type?: InvoiceType;
   items: InvoiceItemRecord[];
-  paymentTerm?: InvoicePaymentTermRecord;
+  paymentTerm?: InvoicePaymentTermRecord | null;
   paymentInfo?: PaymentInfo;
   shouldSendOut?: boolean;
   includeWorkReport?: boolean;
@@ -493,7 +493,7 @@ export interface UpdateInvoice {
   dueDate?: string;
   sentDate?: string;
   items?: InvoiceItemRecord[];
-  paymentTerm?: InvoicePaymentTermRecord;
+  paymentTerm?: InvoicePaymentTermRecord | null;
   paymentInfo?: PaymentInfo;
   includeWorkReport?: boolean;
   includeCheckList?: boolean;
