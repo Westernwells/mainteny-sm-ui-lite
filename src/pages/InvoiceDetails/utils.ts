@@ -212,7 +212,7 @@ export const formatInvoiceRecord = (
     return baseItem;
   }),
 
-  paymentTerm: value.paymentTerm,
+  paymentTerm: value.paymentTerm ?? null,
   propertyOwnerId: value.propertyOwnerId,
   serviceCompanyId: value.serviceCompanyId,
   serviceOrderId: value.serviceOrderId || null,
