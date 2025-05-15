@@ -597,7 +597,6 @@ const InvoicePositionTable = ({
                               hoveredSubRowIndex={hoveredSubRowIndex}
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
                               onRecalc={onRecalcInvoice}
-                              amountDetail={invoiceAmountDetail}
                             />
                           </TableRow>
                         ),
