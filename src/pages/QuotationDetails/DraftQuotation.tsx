@@ -1,4 +1,11 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import Typography from '@mui/material/Typography';
@@ -153,6 +160,7 @@ export const DraftQuotation = ({
   const [initialLocalStorage, setInitialLocalStorage] = useState<
     Partial<QuotationFormData | null>
   >({});
+  const skipInitialCustomerSelect = useRef(true);
   const [pageState, setPageState] = useState('FRESH_NEW');
 
   const [queryParams, setQueryParams] = useSearchParams();
@@ -588,8 +596,29 @@ export const DraftQuotation = ({
     );
   };
 
+  const appendCustomerLegalNote = (customerInfo: PropertyOwnerView) => {
+    const customerLegalNote = customerInfo?.additionalInfo?.vat?.legalNote;
+
+    if (!customerLegalNote) return;
+
+    const currentNotes = getValues('notes');
+
+    if (currentNotes?.includes(customerLegalNote)) return;
+
+    const newNotes = `${currentNotes} ${cleanHtmlContent(
+      `<p>${customerLegalNote}</p>`,
+    )}`;
+    setValue('notes', newNotes);
+  };
+
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
+
+    if (skipInitialCustomerSelect.current) {
+      skipInitialCustomerSelect.current = false;
+    } else {
+      appendCustomerLegalNote(row);
+    }
 
     if (formType === 'new' && row.paymentTerm && pageState === 'FRESH_NEW') {
       setValue(
@@ -1113,15 +1142,6 @@ export const DraftQuotation = ({
           'alternativeAddress',
           customer.otherAddress || emptyAddressState,
         );
-      }
-
-      const customerLegalNote = customer?.additionalInfo?.vat?.legalNote;
-      if (customerLegalNote) {
-        const currentNotes = getValues('notes');
-        const newNotes = `${currentNotes} ${cleanHtmlContent(
-          `<p>${customerLegalNote}</p>`,
-        )}`;
-        setValue('notes', newNotes);
       }
     }
   }, [customer, pageState, unit]);
