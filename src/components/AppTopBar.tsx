@@ -173,7 +173,7 @@ export const AppTopBar = ({
                 },
                 {
                   label: 'Serbian',
-                  action: () => changeLanguage('sr-SP'),
+                  action: () => changeLanguage('sr-RS'),
                 },
                 {
                   label: 'Italian',
