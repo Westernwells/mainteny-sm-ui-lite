@@ -75,7 +75,15 @@ export const ArticleSectionBody = ({
 
               <View style={styles.col8Right}>
                 <Text>
-                  {insertNewlines(String(mainPosition.quantity) || '-', 4)}
+                  {insertNewlines(
+                    formatCurrency(Number(mainPosition.quantity), {
+                      currency: currentCurrency?.code,
+                      excludeCurrencySymbol: true,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    }) || '-',
+                    5,
+                  )}
                 </Text>
               </View>
 
@@ -178,7 +186,15 @@ export const ArticleSectionBody = ({
 
                       <View style={styles.col8Right}>
                         <Text>
-                          {insertNewlines(String(subItem.quantity) || '-')}
+                          {insertNewlines(
+                            formatCurrency(Number(subItem.quantity), {
+                              currency: currentCurrency?.code,
+                              excludeCurrencySymbol: true,
+                              currencySymbol: currentCurrency?.symbol,
+                              companyLang: selectedLng,
+                            }) || '-',
+                            5,
+                          )}
                         </Text>
                       </View>
 

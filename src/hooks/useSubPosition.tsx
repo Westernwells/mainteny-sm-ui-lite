@@ -4,12 +4,10 @@ import {
   DiscountType,
   EditableInvoiceItem,
   EditableInvoiceSubItemRecord,
-  InvoiceAmountDetail,
 } from 'models/invoice';
 import {
   EditableQuotationItem,
   EditableQuotationSubItemRecord,
-  QuotationAmountDetail,
 } from 'models/quotation';
 import {VatView} from 'models/vat';
 import React, {
@@ -77,7 +75,6 @@ import DragHandle from 'components/DragHandle';
 import {
   EditableServiceOrderItem,
   EditableServiceOrderSubArticleRecord,
-  ServiceOrderAmountDetail,
 } from 'models/service-order';
 
 interface SubPositionProps<
@@ -112,10 +109,6 @@ interface SubPositionProps<
   ) => void;
   onRecalc: () => void;
   taxRates?: VatView[];
-  amountDetail?:
-    | InvoiceAmountDetail
-    | QuotationAmountDetail
-    | ServiceOrderAmountDetail;
   disableInlineEditing?: boolean;
 }
 
@@ -144,7 +137,6 @@ const useSubPosition = <
   onDescriptionClick,
   onRecalc,
   taxRates,
-  amountDetail,
   disableInlineEditing = false,
 }: SubPositionProps<TForm>) => {
   const {t} = useTranslation();
@@ -562,19 +554,25 @@ const useSubPosition = <
   };
 
   const netPriceDisplay = useMemo(() => {
-    const itemDetail = amountDetail?.items?.[parentIndex]?.subItems?.[subIndex];
+    const watchedQty =
+      Number(watch(`${pathBase}.quantity` as Path<TForm>)) ?? subItem.quantity;
+    const watchedUnitCents =
+      watch(`${pathBase}.unitAmount.netAmount` as Path<TForm>) ??
+      subItem.unitAmount?.netAmount ??
+      0;
 
-    if (!itemDetail) {
-      return formatCurrency(centsToMoney(currentCurrency.code, 0), {
-        currency: currentCurrency.code,
-      });
-    }
+    const totalCents = watchedQty * watchedUnitCents;
 
-    const totalCents = itemDetail.amountAfterItemDiscount?.netAmount ?? 0;
     return formatCurrency(centsToMoney(currentCurrency.code, totalCents), {
       currency: currentCurrency.code,
     });
-  }, [amountDetail, parentIndex, subIndex, currentCurrency]);
+  }, [
+    watch,
+    pathBase,
+    subItem.quantity,
+    subItem.unitAmount?.netAmount,
+    currentCurrency,
+  ]);
 
   const parentDiscount = watch(`items.${parentIndex}.discount` as Path<TForm>);
 

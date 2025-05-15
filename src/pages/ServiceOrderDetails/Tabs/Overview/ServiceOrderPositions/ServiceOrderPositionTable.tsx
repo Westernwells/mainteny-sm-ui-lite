@@ -590,7 +590,6 @@ const ServiceOrderPositionTable = ({
                               hoveredSubRowIndex={hoveredSubRowIndex}
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
                               onRecalc={onRecalcServiceOrder}
-                              amountDetail={serviceOrderAmountDetail}
                               disableInlineEditing={disableInlineEditing}
                             />
                           </TableRow>
