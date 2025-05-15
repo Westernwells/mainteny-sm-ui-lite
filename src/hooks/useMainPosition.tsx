@@ -369,7 +369,9 @@ const useMainPosition = <
     selectedArticle: ArticleView | string,
   ) => {
     const isFreeText = typeof selectedArticle === 'string';
-    const articleType = isFreeText ? null : selectedArticle.type;
+    const previousArticleId = getValues(
+      `items.${index}.article.id` as Path<TForm>,
+    );
 
     const name = isFreeText
       ? (selectedArticle as string)
@@ -384,9 +386,10 @@ const useMainPosition = <
     );
 
     if (!isFreeText) {
+      const articleObj = selectedArticle as ArticleView;
       const defaultCostPackage: CostPackage | undefined =
-        articleType === ArticleType.PACKAGE
-          ? selectedArticle?.additionalInfo?.costPackage ?? {
+        articleObj.type === ArticleType.PACKAGE
+          ? articleObj.additionalInfo?.costPackage ?? {
               laborPercentage: 50,
               materialPercentage: 50,
             }
@@ -394,61 +397,66 @@ const useMainPosition = <
 
       setValue(
         `items.${index}.article` as Path<TForm>,
-        {
-          ...selectedArticle,
-          costPackage: defaultCostPackage,
-        } as PathValue<TForm, Path<TForm>>,
+        {...articleObj, costPackage: defaultCostPackage} as PathValue<
+          TForm,
+          Path<TForm>
+        >,
       );
-
       setValue(
         `items.${index}.unitPurchaseAmount` as Path<TForm>,
-        selectedArticle.unitPurchaseAmount as PathValue<TForm, Path<TForm>>,
+        articleObj.unitPurchaseAmount as PathValue<TForm, Path<TForm>>,
       );
       setValue(
         `items.${index}.unitAmount` as Path<TForm>,
-        selectedArticle.unitSellingAmount as PathValue<TForm, Path<TForm>>,
+        articleObj.unitSellingAmount as PathValue<TForm, Path<TForm>>,
       );
       setValue(
         `items.${index}.description` as Path<TForm>,
-        selectedArticle.description as PathValue<TForm, Path<TForm>>,
+        articleObj.description as PathValue<TForm, Path<TForm>>,
       );
     }
 
-    if (articleType === ArticleType.MIX && !isFreeText) {
-      try {
-        const subs = await fetchArticleSubAssociations(selectedArticle.id);
-        const subRows = subs.map(transformToSubPositionRow);
+    if (!isFreeText && selectedArticle.id !== previousArticleId) {
+      const articleType = selectedArticle.type;
+
+      if (articleType === ArticleType.MIX) {
+        try {
+          const subs = await fetchArticleSubAssociations(selectedArticle.id);
+          const subRows = subs.map(transformToSubPositionRow);
+          setValue(
+            `items.${index}.subItems` as Path<TForm>,
+            subRows as PathValue<TForm, Path<TForm>>,
+            {shouldValidate: true, shouldDirty: true},
+          );
+          setValue(
+            `items.${index}.subItemsConfig.subItemsVisible` as Path<TForm>,
+            true as PathValue<TForm, Path<TForm>>,
+          );
+          setValue(
+            `items.${index}.subItemsConfig.priceVisible` as Path<TForm>,
+            true as PathValue<TForm, Path<TForm>>,
+          );
+          if (setExpandedRows) {
+            setExpandedRows((prev) =>
+              prev.includes(index) ? prev : [...prev, index],
+            );
+          }
+        } catch (err) {
+          showError(err);
+        }
+      } else {
         setValue(
           `items.${index}.subItems` as Path<TForm>,
-          subRows as PathValue<TForm, Path<TForm>>,
-          {
-            shouldValidate: true,
-            shouldDirty: true,
-          },
-        );
-
-        setValue(
-          `items.${index}.subItemsConfig.subItemsVisible` as Path<TForm>,
-          true as PathValue<TForm, Path<TForm>>,
+          [] as PathValue<TForm, Path<TForm>>,
         );
         setValue(
-          `items.${index}.subItemsConfig.priceVisible` as Path<TForm>,
-          true as PathValue<TForm, Path<TForm>>,
+          `items.${index}.subItemsConfig` as Path<TForm>,
+          {subItemsVisible: false, priceVisible: false} as PathValue<
+            TForm,
+            Path<TForm>
+          >,
         );
-
-        if (setExpandedRows) {
-          setExpandedRows((prev) =>
-            prev.includes(index) ? prev : [...prev, index],
-          );
-        }
-      } catch (err) {
-        showError(err);
       }
-    } else {
-      setValue(
-        `items.${index}.subItems` as Path<TForm>,
-        [] as PathValue<TForm, Path<TForm>>,
-      );
     }
 
     onRecalc();
