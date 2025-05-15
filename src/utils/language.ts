@@ -8,7 +8,7 @@ export const mapExceptionLanguage = (language: string) => {
 export const languageMap: {[key: string]: string} = {
   'en-US': 'en-us',
   'de-DE': 'de-de',
-  'sr-SP': 'sr-sp',
+  'sr-RS': 'sr-rs',
   'it-IT': 'it-it',
   'it-LT': 'it-lt',
   'ru-RU': 'ru-ru',
@@ -22,7 +22,7 @@ export const languageMap: {[key: string]: string} = {
 export const mapLanguageToLocale: {[key: string]: string} = {
   'en-us': 'enUS',
   'de-de': 'de',
-  'sr-SP': 'sr',
+  'sr-RS': 'sr',
   'it-it': 'it',
   'it-lt': 'lt',
   'ru-ru': 'ru',
@@ -53,7 +53,7 @@ export const languageContextMap: {[key: string]: Language} = {
 export const companyLanguageContextMap: {[key: string]: string} = {
   'de-de': 'de',
   'en-us': 'en',
-  'sr-sp': 'sr',
+  'sr-rs': 'sr',
   'it-it': 'it',
   'it-lt': 'lt',
   'ru-ru': 'ru',
@@ -67,7 +67,7 @@ export const companyLanguageContextMap: {[key: string]: string} = {
 export const companyLanguageToUppercaseMap: {[key: string]: string} = {
   'de-de': Language.DE_DE,
   'en-us': Language.EN_US,
-  'sr-sp': Language.SR_RS,
+  'sr-rs': Language.SR_RS,
   'it-it': Language.IT_IT,
   'it-lt': Language.IT_LT,
   'ru-ru': Language.RU_RU,
