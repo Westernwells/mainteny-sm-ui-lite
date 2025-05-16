@@ -570,6 +570,7 @@ const InvoicePositionTable = ({
                     setHoveredMainRowIndex={setHoveredMainRowIndex}
                     onRecalc={onRecalcInvoice}
                     amountDetail={invoiceAmountDetail}
+                    propertyOwnerId={watch('propertyOwnerId')}
                   />
                 </TableRow>
 
@@ -597,6 +598,7 @@ const InvoicePositionTable = ({
                               hoveredSubRowIndex={hoveredSubRowIndex}
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
                               onRecalc={onRecalcInvoice}
+                              propertyOwnerId={watch('propertyOwnerId')}
                             />
                           </TableRow>
                         ),

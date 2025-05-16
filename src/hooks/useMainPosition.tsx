@@ -4,6 +4,7 @@ import {
   CreateArticleSubAssociationRecord,
   ArticleView,
   CostPackage,
+  ExtendedArticleView,
 } from 'models/article';
 import {
   DiscountType,
@@ -137,6 +138,7 @@ interface MainPositionProps<
   setHoveredMainRowIndex: React.Dispatch<React.SetStateAction<number | null>>;
   setExpandedRows?: React.Dispatch<React.SetStateAction<number[]>>;
   disableInlineEditing?: boolean;
+  propertyOwnerId?: string;
 }
 
 const useMainPosition = <
@@ -172,6 +174,7 @@ const useMainPosition = <
   setHoveredMainRowIndex,
   setExpandedRows,
   disableInlineEditing,
+  propertyOwnerId,
 }: MainPositionProps<TForm>) => {
   const theme = useTheme();
   const {t} = useTranslation();
@@ -386,7 +389,11 @@ const useMainPosition = <
     );
 
     if (!isFreeText) {
-      const articleObj = selectedArticle as ArticleView;
+      const articleObj = selectedArticle as ExtendedArticleView;
+      const sellingAmountObj = articleObj?.isCustom
+        ? articleObj.customSellingAmount
+        : articleObj.unitSellingAmount;
+
       const defaultCostPackage: CostPackage | undefined =
         articleObj.type === ArticleType.PACKAGE
           ? articleObj.additionalInfo?.costPackage ?? {
@@ -408,7 +415,7 @@ const useMainPosition = <
       );
       setValue(
         `items.${index}.unitAmount` as Path<TForm>,
-        articleObj.unitSellingAmount as PathValue<TForm, Path<TForm>>,
+        sellingAmountObj as PathValue<TForm, Path<TForm>>,
       );
       setValue(
         `items.${index}.description` as Path<TForm>,
@@ -910,6 +917,7 @@ const useMainPosition = <
             initialValue={watch('items' as Path<TForm>)?.[index]}
             showCustomPriceColumn
             openOnFocus={editableRow.index === index}
+            propertyOwnerId={propertyOwnerId}
           />
         ) : (
           <Box

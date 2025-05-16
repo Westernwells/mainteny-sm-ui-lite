@@ -37,6 +37,7 @@ interface Props<
   ) => void;
   onRecalc: () => void;
   disableInlineEditing?: boolean;
+  propertyOwnerId?: string;
 }
 
 const NewSubPositionRow = <
@@ -62,6 +63,7 @@ const NewSubPositionRow = <
   showLeftShadow,
   onRecalc,
   disableInlineEditing = false,
+  propertyOwnerId,
 }: Props<TForm>) => {
   const {control, setValue, getValues, watch} = formMethods;
 
@@ -96,6 +98,7 @@ const NewSubPositionRow = <
     onRecalc,
     taxRates,
     disableInlineEditing,
+    propertyOwnerId,
   });
 
   return (

@@ -42,6 +42,7 @@ interface Props<TForm extends {items: AnyItem[]} & FieldValues> {
     | QuotationAmountDetail
     | ServiceOrderAmountDetail;
   disableInlineEditing?: boolean;
+  propertyOwnerId?: string;
 }
 
 const NewMainPositionRow = <
@@ -71,6 +72,7 @@ const NewMainPositionRow = <
   onRecalc,
   amountDetail,
   disableInlineEditing = false,
+  propertyOwnerId,
 }: Props<TForm>) => {
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
 
@@ -126,6 +128,7 @@ const NewMainPositionRow = <
     setHoveredMainRowIndex,
     setExpandedRows,
     disableInlineEditing,
+    propertyOwnerId,
   });
 
   return (

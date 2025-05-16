@@ -67,7 +67,7 @@ import NewArticleTypeCard from 'components/NewArticleTypeCard';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import DOMPurify from 'dompurify';
-import {ArticleType, ArticleView, CostPackage} from 'models/article';
+import {ArticleType, CostPackage, ExtendedArticleView} from 'models/article';
 import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
 import {sanitizedTextStyles} from 'pages/Articles/Tabs/MixedPositions/MixedPosition.styles';
 import {NumericFormat} from 'react-number-format';
@@ -111,6 +111,7 @@ interface SubPositionProps<
   onRecalc: () => void;
   taxRates?: VatView[];
   disableInlineEditing?: boolean;
+  propertyOwnerId?: string;
 }
 
 const useSubPosition = <
@@ -139,6 +140,7 @@ const useSubPosition = <
   onRecalc,
   taxRates,
   disableInlineEditing = false,
+  propertyOwnerId,
 }: SubPositionProps<TForm>) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -489,7 +491,9 @@ const useSubPosition = <
     }
   };
 
-  const handleArticleSelection = (selectedArticle: ArticleView | string) => {
+  const handleArticleSelection = (
+    selectedArticle: ExtendedArticleView | string,
+  ) => {
     const isFreeText = typeof selectedArticle === 'string';
     const name = isFreeText ? selectedArticle : selectedArticle.name;
     const articleType = isFreeText ? null : selectedArticle.type;
@@ -515,7 +519,10 @@ const useSubPosition = <
 
       // Override the VAT fields so that the new sub position inherits the main position's VAT
 
-      const selectedUnitAmount = selectedArticle.unitSellingAmount;
+      const selectedUnitAmount = selectedArticle?.isCustom
+        ? selectedArticle.customSellingAmount
+        : selectedArticle.unitSellingAmount;
+
       const mainVatId = getValues(
         `items.${parentIndex}.unitAmount.vatId` as Path<TForm>,
       );
@@ -744,6 +751,7 @@ const useSubPosition = <
             excludeTypes={[ArticleType.MIX, ArticleType.PACKAGE]}
             showCustomPriceColumn
             openOnFocus={editableSubRow.subIndex === subIndex}
+            propertyOwnerId={propertyOwnerId}
           />
         ) : (
           <Box

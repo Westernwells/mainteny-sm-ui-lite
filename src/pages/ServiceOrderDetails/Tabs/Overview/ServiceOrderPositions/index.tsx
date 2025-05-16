@@ -309,6 +309,7 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
           onRecalcServiceOrder={recalcServiceOrder}
           onAddPosition={handleAddPositionClick}
           onEditDiscount={handleOpenEditor}
+          serviceOrder={serviceOrder}
         />
       )}
 
@@ -343,6 +344,7 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
           autoOpenAdd={openMode === 'add'}
           onAddPosition={handleAddPositionClick}
           onEditDiscount={handleOpenEditor}
+          serviceOrder={serviceOrder}
         />
       </Dialog>
 
