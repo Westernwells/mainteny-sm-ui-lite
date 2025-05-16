@@ -1660,9 +1660,7 @@ const useMainPosition = <
         ) : (
           <Typography
             sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-            {watchedItem?.unitAmount?.percentageVat
-              ? `${watchedItem.unitAmount.percentageVat}%`
-              : '-'}
+            {`${watchedItem?.unitAmount?.percentageVat ?? 0}%`}
           </Typography>
         )}
       </TableCell>

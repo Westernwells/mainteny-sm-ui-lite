@@ -11,12 +11,11 @@ import {
   SubPositionRow,
   UpdateArticleRecord,
 } from 'models/article';
-import {QuotationItemRecord} from 'models/quotation';
+import {EditableQuotationItem, QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {VatView} from 'models/vat';
 import {MultiVatsAmount} from 'models/misc';
 import {Currencies, formatCurrency} from './currency';
-import {cleanHtmlContent, replaceTextInHtml, stripHtmlTags} from './text-block';
 import {convertToText} from './utils';
 import {CreateArticleRecord} from '../models/article';
 
@@ -119,56 +118,34 @@ export const createSearchQuery = ({
   return elements.length ? elements.join(' ') : undefined;
 };
 
-export const syncVatLegalNotesWithNotes = ({
+export function syncVatLegalNotesWithNotes({
   oldArticles,
   newArticles,
   currentNotes,
   taxRates,
 }: {
-  oldArticles: QuotationItemRecord[];
-  newArticles: QuotationItemRecord[];
+  oldArticles: EditableQuotationItem[];
+  newArticles: EditableQuotationItem[];
   currentNotes: string;
   taxRates?: VatView[];
-}) => {
-  let notes = currentNotes || '';
+}) {
+  let notes = currentNotes;
 
-  if (!taxRates) {
-    return notes;
-  }
+  newArticles.forEach((newArt) => {
+    const oldArt = oldArticles.find((o) => o.id === newArt.id);
+    const oldVat = oldArt?.unitAmount?.percentageVat;
+    const newVat = newArt.unitAmount?.percentageVat;
 
-  const getLegalNoteForVatId = (vatId?: string) => {
-    if (!vatId) return '';
-    return taxRates.find((rate) => rate.id === vatId)?.legalNote || '';
-  };
-
-  // Add new legal notes
-  newArticles.forEach((item) => {
-    const {vatId} = item.unitAmount!;
-    const legalNote = getLegalNoteForVatId(vatId);
-    if (!legalNote) {
-      return;
-    }
-    if (stripHtmlTags(notes).includes(legalNote)) {
-      return;
-    }
-    const newValue = cleanHtmlContent(`<p>${legalNote}</p>`);
-    notes += ` ${newValue}`;
-  });
-
-  // Remove obsolete legal notes
-  oldArticles.forEach((item) => {
-    const {vatId} = item.unitAmount!;
-    const legalNote = getLegalNoteForVatId(vatId);
-    if (!legalNote) {
-      return;
-    }
-    if (newArticles.every((newItem) => newItem.unitAmount!.vatId !== vatId)) {
-      notes = replaceTextInHtml(notes, `<p>${legalNote}</p>`, '');
+    if (oldVat !== newVat) {
+      const vatInfo = taxRates?.find((v) => v.id === newArt.unitAmount?.vatId);
+      if (vatInfo?.legalNote && !notes.includes(vatInfo.legalNote)) {
+        notes += `\n<p>${vatInfo.legalNote}</p>`;
+      }
     }
   });
 
   return notes;
-};
+}
 
 export const calculatePackageMaterialLaborPercentages = (costPackage?: {
   laborPercentage?: number;
