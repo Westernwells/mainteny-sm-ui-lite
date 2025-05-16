@@ -379,6 +379,9 @@ export const EditFinanceInformation = ({
             setValue('paymentTermId', selectedPaymentTermId);
             setOpenContractPaymentTermsDialog(false);
           }}
+          onClear={() => {
+            setValue('paymentTermId', '');
+          }}
           defaultValue={watch('paymentTermId') || ''}
           onClick={() => setOpenContractPaymentTermSelectDialog(true)}
           setEdit={setPaymentTermToEdit}
