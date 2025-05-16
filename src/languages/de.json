@@ -3142,7 +3142,7 @@
   "Sub-positions": "Subposition ",
   "Total margin": "Gesamtmarge",
   "Material margin": "Marge Material",
-  "Labor margin": "Marge Arbeit",
+  "Labor margin": "Marge Lohn",
   "Other margin": "Andere Marge",
   "Create mixed position": "Mischposition erstellen",
   "Save to catalogue": "Im Katalog speichern",
@@ -3248,5 +3248,6 @@
   "Send to": "Senden an",
   "Write with AI": "Mit KI schreiben",
   "Rewrite with AI": "Mit KI umschreiben",
-  "Add attachments to enhance article clarity.": "Fügen Sie Anhänge hinzu, um die Verständlichkeit des Artikels zu verbessern."
+  "Add attachments to enhance article clarity.": "Fügen Sie Anhänge hinzu, um die Verständlichkeit des Artikels zu verbessern.",
+  "press_enter_to_create_tag": "Drücke <Image></Image> Enter um Tag anzulegen. "
 }

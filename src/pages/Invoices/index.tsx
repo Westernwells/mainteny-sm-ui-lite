@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   InvoiceFilterForm,
   InvoiceOrderField,
@@ -52,7 +52,7 @@ import Cell from 'components/Table/TableCell';
 import TableCellText from 'components/Table/TableCellText';
 import {StatusChip} from 'components/StatusChip';
 import Box from '@mui/material/Box';
-import {Checkbox, CircularProgress, Typography} from '@mui/material';
+import {Checkbox, CircularProgress, Collapse, Typography} from '@mui/material';
 import {Order, OrderByParams} from 'models/pagination';
 import {Actions} from 'pages/Invoices/Actions';
 import Filters from 'components/Filters';
@@ -109,6 +109,8 @@ import printJS from 'print-js';
 import useInvoiceDownloadPreparation from 'hooks/reactQuery/useInvoiceDownloadPreparation';
 import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
 import {useTheme} from '@mui/system';
+import StatsToggle from 'components/StatsToggle';
+import DashboardMetrics from './DashboardMetrics';
 
 const pageSize = 25;
 
@@ -143,6 +145,7 @@ const Invoices = ({elevatorId, customerId, elevatorExternalId}: Props) => {
   const {enqueueSnackbar} = useSnackbar();
   const currentCurrency = useCurrentCurrency();
   const theme = useTheme();
+  const [showStats, setShowStats] = useState(false);
 
   const {
     values: {sortOrder, orderByField},
@@ -334,9 +337,7 @@ const Invoices = ({elevatorId, customerId, elevatorExternalId}: Props) => {
     refetchOnWindowFocus: true,
   });
 
-  const {data: invoiceStatistics} = useInvoiceStatistics(filters, {
-    keepPreviousData: true,
-  });
+  const {data: invoiceStatistics} = useInvoiceStatistics(filters);
 
   const {refetch: refetchAllInvoices, isFetching: isFetchingAllInvoices} =
     useAllInvoices(filters, {
@@ -967,6 +968,10 @@ const Invoices = ({elevatorId, customerId, elevatorExternalId}: Props) => {
     <Box>{xeroInfoData?.enabled ? lastSyncedText : ''}</Box>
   );
 
+  const toggleStats = () => {
+    setShowStats(!showStats);
+  };
+
   useEffect(() => {
     if (xmlHtmlContent) {
       printJS({
@@ -1216,6 +1221,7 @@ const Invoices = ({elevatorId, customerId, elevatorExternalId}: Props) => {
             </Filters>
           </Box>
           <Box display="flex" gap={2}>
+            <StatsToggle onClick={toggleStats} show={showStats} />
             {rows.length > 0 && (
               <Button
                 buttonProps={{
@@ -1246,6 +1252,15 @@ const Invoices = ({elevatorId, customerId, elevatorExternalId}: Props) => {
             onChange={handleQuickFilterChange}
           />
         </Box>
+        {/* sx={{mb: showStats ? 5 : 0}} */}
+        <Collapse in={showStats} timeout="auto">
+          <Box mt={2} mb={15}>
+            <DashboardMetrics
+              filters={filters}
+              invoiceStatistics={invoiceStatistics}
+            />
+          </Box>
+        </Collapse>
         <TableContainer
           showNoMatchWarning={noMatchingData}
           containerRef={containerRef}
