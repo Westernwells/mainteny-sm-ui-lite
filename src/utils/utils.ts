@@ -829,7 +829,7 @@ export const aggregateInvoiceStatistics = (
       (item) => item.currency === CURRENCY,
     )?.value ?? 0;
   const overdueInvoiceAmount =
-    amountsPerStatus[InvoiceStatus.OVERDUE_NOTICE_1]?.find(
+    amountsPerStatus[InvoiceStatus.EXPIRED]?.find(
       (item) => item.currency === CURRENCY,
     )?.value ?? 0;
   const overdue1InvoiceAmount =
