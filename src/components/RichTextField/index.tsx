@@ -26,7 +26,12 @@ import {
   RenderElementProps,
   RenderLeafProps,
 } from 'models/richTextField';
-import {deserialize, handleKeyDown, serialize} from 'utils/rich-text-field';
+import {
+  deserialize,
+  handleKeyDown,
+  recursiveNodeHasText,
+  serialize,
+} from 'utils/rich-text-field';
 import {RTFErrorBoundary} from 'components/ErrorBoundaries/RTFErrorBoundary';
 import {HoveringToolbar} from './HoveringToolbar';
 import {isPlainString} from '../../utils/rich-field-string';
@@ -36,7 +41,11 @@ const CustomElements = ({
   attributes,
   children,
 }: RenderElementProps) => {
-  const style = {fontSize: element.fontSize, color: element.color};
+  const style = {
+    fontSize: element.fontSize,
+    color: element.color,
+    textIndent: element.textIndent,
+  };
 
   switch (element.type) {
     case 'paragraph':
@@ -219,17 +228,27 @@ const RichTextField = ({
     editorRef.current = withHistory(withReact(createEditor()));
   const editor = editorRef.current;
 
-  const getValue = (htmlString: string) => {
+  const getValue = (htmlString = ''): Descendant[] => {
     const initialValue: Descendant[] = [
       {type: 'paragraph', children: [{text: ''}]},
     ];
+
     if (!htmlString) return initialValue;
-    const parsed = new DOMParser().parseFromString(
+
+    const doc = new DOMParser().parseFromString(
       isPlainString(htmlString) ? `<p>${htmlString}</p>` : htmlString,
       'text/html',
     );
-    return deserialize(parsed.body);
+
+    const raw = deserialize(doc.body);
+    const all = Array.isArray(raw)
+      ? (raw as Descendant[])
+      : [raw as Descendant];
+    const nonEmpty = all.filter(recursiveNodeHasText);
+
+    return nonEmpty.length ? nonEmpty : initialValue;
   };
+
   const [value, setValue] = useState(() => getValue(html) as Descendant[]);
 
   const renderElement = useCallback(

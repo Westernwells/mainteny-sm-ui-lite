@@ -203,7 +203,7 @@ export const SendEmailDialog = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       fullWidth
-      maxWidth="md"
+      maxWidth="lg"
       PaperProps={{
         sx: {
           padding: '1.5rem',

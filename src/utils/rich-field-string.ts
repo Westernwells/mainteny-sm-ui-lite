@@ -1,4 +1,5 @@
 import {EmailSignature} from 'models/employee';
+import {stripHtmlTags} from './text-block';
 
 export const isPlainString = (value: string) => !/<[^>]+>/.test(value);
 
@@ -185,4 +186,10 @@ export const handleSignatureSmartly = (
 
   // Fallback - leave as is
   return emailContent;
+};
+
+export const cleanHtml = (html?: string) => {
+  const raw = html ?? '';
+  const plain = stripHtmlTags(raw).trim();
+  return {raw, plain};
 };

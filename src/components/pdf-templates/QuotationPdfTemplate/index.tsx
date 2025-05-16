@@ -13,7 +13,6 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromQuotation} from 'utils/pdfTemplates';
 import {toSentenceCase} from 'utils/string';
@@ -30,6 +29,7 @@ import {ServiceCompanyItem} from 'models/service-company';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {hasAlternativeAddress} from 'utils/invoice';
 import {getServiceCompanyInfo} from 'utils/company-utils';
+import {cleanHtml} from 'utils/rich-field-string';
 import ArticleTableHeader from '../ArticleSection/ArticleTableHeader';
 import ArticleSectionFooter from '../ArticleSection/ArticleSectionFooter';
 import {ArticleSectionBody} from '../ArticleSection/ArticleSectionBody';
@@ -142,6 +142,13 @@ const QuotationPdfTemplate = React.memo(
     const serviceCompanyInfo = getServiceCompanyInfo(
       userInfo,
       quotation?.additionalInfo?.alternativeServiceCompanyInfo,
+    );
+
+    const {raw: rawPaymentTerm, plain: plainPaymentTerm} = cleanHtml(
+      quotation?.additionalInfo?.paymentTerms,
+    );
+    const {raw: rawNotes, plain: plainNotes} = cleanHtml(
+      quotation?.additionalInfo?.notes,
     );
 
     return (
@@ -388,29 +395,22 @@ const QuotationPdfTemplate = React.memo(
                 </View>
               )}
 
-              {!!quotation?.additionalInfo?.paymentTerms?.trim() && (
+              {plainPaymentTerm && (
                 <View style={styles.paymentTermsSection}>
                   <Text style={styles.sectionHeading}>
-                    {translate('Payment terms')}{' '}
+                    {translate('Payment terms')}
                   </Text>
-                  <HtmlPDF
-                    html={quotation?.additionalInfo?.paymentTerms || ''}
-                    fontStyles={fontStyles}
-                  />
+                  <HtmlPDF html={rawPaymentTerm} fontStyles={fontStyles} />
                 </View>
               )}
 
-              {!!(
-                quotation?.additionalInfo?.notes &&
-                stripHtmlTags(quotation?.additionalInfo?.notes)
-              ) && (
+              {plainNotes && (
                 <View style={styles.notesSection}>
                   <HtmlPDF
-                    html={quotation?.additionalInfo?.notes || ''}
+                    html={rawNotes}
                     rootStyle={{
                       marginTop: 6,
                       marginBottom: 16,
-                      body: fontStyles.regular,
                     }}
                     fontStyles={fontStyles}
                   />

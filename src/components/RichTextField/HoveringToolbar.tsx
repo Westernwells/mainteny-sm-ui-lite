@@ -15,6 +15,7 @@ import {
   Box,
   Button,
   Divider,
+  IconButton,
   MenuItem,
   Select,
   styled,
@@ -34,8 +35,12 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import TextFields from '@mui/icons-material/TextFields';
 import EditOffOutlinedIcon from '@mui/icons-material/EditOffOutlined';
+import FormatIndentIncreaseIcon from '@mui/icons-material/FormatIndentIncrease';
+import FormatIndentDecreaseIcon from '@mui/icons-material/FormatIndentDecrease';
 import {
+  addAttributeToBlock,
   getActiveFontSize,
+  removeAttributeToBlock,
   removeBlocks,
   removeMarks,
   toggleBlock,
@@ -49,6 +54,24 @@ import CustomColorPicker from 'components/ColorPicker/CustomColorPicker';
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({theme: t}) => ({
   [`& .${toggleButtonGroupClasses.grouped}`]: {
     border: 0,
+    borderRadius: t.shape.borderRadius,
+    color: 'white',
+    padding: `${t.spacing(0.5)} ${t.spacing(1)}`,
+    [`&.${toggleButtonGroupClasses.disabled}`]: {
+      border: 0,
+    },
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.20)',
+    },
+  },
+}));
+
+const StyledButtonContainer = styled('div')(({theme: t}) => ({
+  display: 'inline-flex',
+
+  [`& .MuiIconButton-root`]: {
+    border: 0,
+    height: '41px',
     borderRadius: t.shape.borderRadius,
     color: 'white',
     padding: `${t.spacing(0.5)} ${t.spacing(1)}`,
@@ -127,6 +150,12 @@ export const HoveringToolbar = () => {
 
   const handleBlock = (_event: MouseEvent<HTMLElement>, format: FORMAT) =>
     toggleBlock(editor, format);
+
+  const handleAddAttribute = (format: FORMAT) => () =>
+    addAttributeToBlock(editor, format);
+
+  const handleRemoveAttribute = (format: FORMAT) => () =>
+    removeAttributeToBlock(editor, format);
 
   const handleClose = () => setOpenSelectFontSize(false);
 
@@ -284,6 +313,18 @@ export const HoveringToolbar = () => {
             <FormatUnderlinedIcon />
           </ToggleButton>
         </StyledToggleButtonGroup>
+        <StyledButtonContainer>
+          <IconButton
+            onClick={handleAddAttribute(FORMAT['text-indent'])}
+            aria-label="increase indent">
+            <FormatIndentIncreaseIcon />
+          </IconButton>
+          <IconButton
+            onClick={handleRemoveAttribute(FORMAT['text-indent'])}
+            aria-label="decrease indent">
+            <FormatIndentDecreaseIcon />
+          </IconButton>
+        </StyledButtonContainer>
         <Divider
           flexItem
           orientation="vertical"

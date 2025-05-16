@@ -88,6 +88,7 @@ type Props = {
   setLocalRows: React.Dispatch<React.SetStateAction<MixedPositionRow[]>>;
   showRightShadow?: boolean;
   showLeftShadow?: boolean;
+  onCreated?: (id: string) => void;
 };
 
 const MixedPositionRowComponent = ({
@@ -109,6 +110,7 @@ const MixedPositionRowComponent = ({
   setLocalRows,
   showRightShadow,
   showLeftShadow,
+  onCreated,
 }: Props) => {
   const {showError} = useSnackbar();
   const currentCurrency = useCurrentCurrency();
@@ -214,7 +216,14 @@ const MixedPositionRowComponent = ({
           };
         }
 
-        await createArticleMix({article: newArticleData, subAssociations: []});
+        const createdArticle = await createArticleMix({
+          article: newArticleData,
+          subAssociations: [],
+        });
+
+        if (onCreated && createdArticle?.value) {
+          onCreated(createdArticle.value);
+        }
       } else if (isFreeText) {
         await updateArticle({
           articleId: rowId,
