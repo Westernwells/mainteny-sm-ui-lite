@@ -1267,6 +1267,8 @@ const useSubPosition = <
               }))
             }
             customInput={TextField}
+            decimalSeparator={getDecimalSeparator(selectedLng)}
+            thousandSeparator={getThousandsSeparator(selectedLng)}
             allowLeadingZeros={false}
             decimalScale={2}
             fixedDecimalScale
@@ -1299,7 +1301,12 @@ const useSubPosition = <
           />
         ) : (
           <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>
-            {subItem?.quantity || 0}
+            {formatCurrency(Number(subItem.quantity), {
+              currency: currentCurrency?.code,
+              excludeCurrencySymbol: true,
+              currencySymbol: currentCurrency?.symbol,
+              companyLang: selectedLng,
+            })}
           </Typography>
         )}
       </TableCell>
