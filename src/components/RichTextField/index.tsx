@@ -26,12 +26,7 @@ import {
   RenderElementProps,
   RenderLeafProps,
 } from 'models/richTextField';
-import {
-  deserialize,
-  handleKeyDown,
-  recursiveNodeHasText,
-  serialize,
-} from 'utils/rich-text-field';
+import {deserialize, handleKeyDown, serialize} from 'utils/rich-text-field';
 import {RTFErrorBoundary} from 'components/ErrorBoundaries/RTFErrorBoundary';
 import {HoveringToolbar} from './HoveringToolbar';
 import {isPlainString} from '../../utils/rich-field-string';
@@ -228,7 +223,7 @@ const RichTextField = ({
     editorRef.current = withHistory(withReact(createEditor()));
   const editor = editorRef.current;
 
-  const getValue = (htmlString = ''): Descendant[] => {
+  const getValue = (htmlString: string) => {
     const initialValue: Descendant[] = [
       {type: 'paragraph', children: [{text: ''}]},
     ];
@@ -244,9 +239,8 @@ const RichTextField = ({
     const all = Array.isArray(raw)
       ? (raw as Descendant[])
       : [raw as Descendant];
-    const nonEmpty = all.filter(recursiveNodeHasText);
 
-    return nonEmpty.length ? nonEmpty : initialValue;
+    return all.length ? all : initialValue;
   };
 
   const [value, setValue] = useState(() => getValue(html) as Descendant[]);
