@@ -22,6 +22,7 @@ import {
 } from 'hooks/reactQuery/useQuotation';
 import {
   CreateQuotationRecord,
+  EditableQuotationItem,
   QuotationAmountDetail,
   QuotationFormData,
   QuotationStatus,
@@ -113,7 +114,7 @@ import {
   generatePdfQuotation,
   quotationItemToQuotationItemRecord,
 } from 'utils/quotation';
-import {Controller, useForm} from 'react-hook-form';
+import {Controller, useForm, useWatch} from 'react-hook-form';
 import PositionTable from 'components/MixedPositions/PositionTable';
 import {ArticleType} from 'models/article';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
@@ -368,7 +369,12 @@ export const DraftQuotation = ({
     formState: {errors},
   } = formMethods;
 
-  const watchedItems = watch('items');
+  const watchedAllItems = useWatch({control, name: 'items', defaultValue: []});
+
+  const prevItemsRef = useRef<EditableQuotationItem[]>(watchedAllItems);
+  const prevVatMapRef = useRef<Record<string, number>>({});
+
+  const watchedItems = watch('items') || [];
   const watchedDiscount = watch('discount');
   const watchedSubject = watch('subject');
   const watchedDescription = watch('description');
@@ -1147,17 +1153,40 @@ export const DraftQuotation = ({
   }, [customer, pageState, unit]);
 
   useEffect(() => {
-    const oldItems = getValues('items');
-    const currentNotes = getValues('notes');
+    const currentVatMap = watchedAllItems.reduce<Record<string, number>>(
+      (map, item) => {
+        const itemId = item.id!;
+        map[itemId] = item.unitAmount?.percentageVat ?? 0;
+        return map;
+      },
+      {},
+    );
+
+    const vatChanged = watchedAllItems.some((item) => {
+      const newVatId = item.id!;
+      return (prevVatMapRef.current[newVatId] ?? 0) !== currentVatMap[newVatId];
+    });
+
+    if (!vatChanged) return;
+
+    const oldItems = prevItemsRef.current;
+    const newItems = watchedAllItems;
+    const currentNotes = getValues('notes') ?? '';
 
     const newNotes = syncVatLegalNotesWithNotes({
       oldArticles: oldItems,
-      newArticles: watch('items'),
-      currentNotes: currentNotes || '',
+      newArticles: newItems,
+      currentNotes,
       taxRates,
     });
-    setValue('notes', newNotes);
-  }, [watch('items')]);
+
+    if (newNotes && newNotes !== currentNotes) {
+      setValue('notes', newNotes);
+    }
+
+    prevVatMapRef.current = currentVatMap;
+    prevItemsRef.current = newItems;
+  }, [watchedAllItems, taxRates]);
 
   useEffect(() => {
     async function checkExternalId() {
