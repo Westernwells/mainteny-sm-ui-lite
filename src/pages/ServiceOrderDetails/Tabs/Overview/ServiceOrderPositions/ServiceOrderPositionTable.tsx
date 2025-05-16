@@ -7,6 +7,7 @@ import {
   EditableServiceOrderItem,
   EditableServiceOrderSubArticleRecord,
   ServiceOrderAmountDetail,
+  ServiceOrderView,
 } from 'models/service-order';
 import {DragData, TableColumnWithRender} from 'models/table';
 import {Fragment, useEffect, useMemo, useRef, useState} from 'react';
@@ -54,6 +55,7 @@ type Props = {
   disableInlineEditing?: boolean;
   autoOpenAdd?: boolean;
   onEditDiscount?: () => void;
+  serviceOrder?: ServiceOrderView;
 };
 
 const ServiceOrderPositionTable = ({
@@ -64,6 +66,7 @@ const ServiceOrderPositionTable = ({
   onAddPosition,
   autoOpenAdd = false,
   onEditDiscount,
+  serviceOrder,
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -560,6 +563,7 @@ const ServiceOrderPositionTable = ({
                     onRecalc={onRecalcServiceOrder}
                     amountDetail={serviceOrderAmountDetail}
                     disableInlineEditing={disableInlineEditing}
+                    propertyOwnerId={serviceOrder?.elevator?.propertyOwner?.id}
                   />
                 </TableRow>
 
@@ -591,6 +595,9 @@ const ServiceOrderPositionTable = ({
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
                               onRecalc={onRecalcServiceOrder}
                               disableInlineEditing={disableInlineEditing}
+                              propertyOwnerId={
+                                serviceOrder?.elevator?.propertyOwner?.id
+                              }
                             />
                           </TableRow>
                         ),

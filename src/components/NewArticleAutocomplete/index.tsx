@@ -37,7 +37,6 @@ import {Currency} from 'models/misc';
 import {removeHtmlTags} from 'utils/rich-field-string';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
-import {PropertyOwnerView} from 'models/propertyManager';
 import keyBy from 'lodash/keyBy';
 import {createSearchQuery, getArticleTypes} from 'utils/article-utils';
 import {InvoiceItemRecord} from 'models/invoice';
@@ -252,7 +251,7 @@ interface Props {
   initialValue?: InvoiceItemRecord | QuotationItemRecord | null;
   textFieldProps?: TextFieldProps;
   openOnFocus?: boolean;
-  propertyOwner?: PropertyOwnerView;
+  propertyOwnerId?: string;
   excludeTypes?: ArticleType[];
   showCustomPriceColumn?: boolean;
   onArticleSelect: (selectedArticle: ArticleView | string) => void;
@@ -261,7 +260,7 @@ interface Props {
 export const NewArticleAutoComplete = ({
   initialValue = null,
   openOnFocus = true,
-  propertyOwner,
+  propertyOwnerId,
   excludeTypes,
   showCustomPriceColumn = false,
   onArticleSelect,
@@ -289,9 +288,9 @@ export const NewArticleAutoComplete = ({
     );
 
   const {data: customPrices = []} = usePropertyOwnerQueryTravelWorks(
-    propertyOwner?.id || '',
+    propertyOwnerId || '',
     {serviceOrderType: ServiceOrderType.GENERAL},
-    {enabled: showCustomPriceColumn && !!propertyOwner?.id},
+    {enabled: showCustomPriceColumn && !!propertyOwnerId},
   );
 
   const mergedArticles: ExtendedArticleView[] = showCustomPriceColumn
