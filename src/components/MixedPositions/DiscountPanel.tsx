@@ -174,6 +174,7 @@ const DiscountPanel = <TForm extends DiscountFormShape & FieldValues>({
                   )}
                 />
                 <NumericFormat
+                  name="globalDiscount"
                   value={
                     watchedDiscount?.type === DiscountType.AMOUNT
                       ? watchedDiscount.amount?.value
