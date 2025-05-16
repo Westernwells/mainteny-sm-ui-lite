@@ -336,7 +336,7 @@ export const Actions = ({
     [previousInvoices],
   );
 
-  const serviceOrder = selectedInvoice?.serviceOrder;
+  const serviceOrder = invoice?.serviceOrder;
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
 
   const {refetch: refetchChecklists} = useQueryServiceOrderChecklists({
@@ -790,7 +790,7 @@ export const Actions = ({
   };
 
   const getChecklistData = async () => {
-    if (!selectedInvoice?.serviceOrder?.id)
+    if (!invoice?.serviceOrder?.id)
       return {
         checklists: [],
         selectedChecklist: undefined,
@@ -885,7 +885,7 @@ export const Actions = ({
           [selectedChecklist?.additionalInfo.pdfPath],
           user?.userAccount.serviceCompany.id!,
         );
-        checklistOperations = fetchAndCreateFiles(
+        checklistOperations = await fetchAndCreateFiles(
           checklistDownloadUrl ? Object.values(checklistDownloadUrl)[0] : '',
           [`${selectedChecklist?.checkListId}.pdf`],
           [
@@ -896,24 +896,23 @@ export const Actions = ({
           ],
         );
       } else {
-        checklistOperations = generateChecklistBlob({
+        const checklistBlob = await generateChecklistBlob({
           checklistData: {
             sortedChecklistComponents,
             selectedChecklist,
             signatureImageUrl,
             checklistImagesDownloadUrl,
           },
-        }).then((checklistBlob) =>
-          createFilesFromBlobArray(
-            [checklistBlob],
-            [`${selectedChecklist?.checkListId}.pdf`],
-            [
-              `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
-                selectedChecklist?.checkList.externalId ||
-                invoiceData?.serviceOrder?.externalId
-              }.pdf`,
-            ],
-          ),
+        });
+        checklistOperations = await createFilesFromBlobArray(
+          [checklistBlob],
+          [`${selectedChecklist?.checkListId}.pdf`],
+          [
+            `${FILE_DESCRIPTION_PREFIXES.CHECKLIST}-${
+              selectedChecklist?.checkList.externalId ||
+              invoiceData?.serviceOrder?.externalId
+            }.pdf`,
+          ],
         );
       }
     }
