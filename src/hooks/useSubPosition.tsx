@@ -34,6 +34,7 @@ import {
   formatCurrency,
   getDecimalSeparator,
   getThousandsSeparator,
+  moneyToCents,
   useCurrentCurrency,
 } from 'utils/currency';
 import {useTheme} from '@mui/material/styles';
@@ -554,24 +555,57 @@ const useSubPosition = <
   };
 
   const netPriceDisplay = useMemo(() => {
-    const watchedQty =
-      Number(watch(`${pathBase}.quantity` as Path<TForm>)) ?? subItem.quantity;
-    const watchedUnitCents =
-      watch(`${pathBase}.unitAmount.netAmount` as Path<TForm>) ??
-      subItem.unitAmount?.netAmount ??
-      0;
+    const [watchedQty, watchedUnitCents] = watch([
+      `${pathBase}.quantity` as Path<TForm>,
+      `${pathBase}.unitAmount.netAmount` as Path<TForm>,
+    ]);
 
-    const totalCents = watchedQty * watchedUnitCents;
+    let qty: number;
+    let unitCents: number;
+
+    const editingThisRow =
+      editableSubRow?.parentIndex === parentIndex &&
+      editableSubRow?.subIndex === subIndex;
+
+    if (editingThisRow && editableSubRow.field === 'quantity') {
+      qty = editableSubRow.values?.quantity ?? 0;
+    } else {
+      qty = Number.isFinite(watchedQty!) ? watchedQty! : subItem.quantity;
+    }
+
+    if (
+      editingThisRow &&
+      editableSubRow.field === `${pathBase}.unitAmount.netAmount`
+    ) {
+      unitCents = Math.round(
+        moneyToCents(
+          currentCurrency.code,
+          editableSubRow.values?.unitAmount?.netAmount ?? 0,
+        ),
+      );
+    } else {
+      unitCents = Number.isFinite(watchedUnitCents!)
+        ? watchedUnitCents!
+        : subItem.unitAmount?.netAmount ?? 0;
+    }
+
+    const totalCents = Math.round(
+      moneyToCents(
+        currentCurrency.code,
+        qty * centsToMoney(currentCurrency.code, unitCents),
+      ),
+    );
 
     return formatCurrency(centsToMoney(currentCurrency.code, totalCents), {
       currency: currentCurrency.code,
     });
   }, [
     watch,
+    editableSubRow,
     pathBase,
-    subItem.quantity,
-    subItem.unitAmount?.netAmount,
-    currentCurrency,
+    parentIndex,
+    subItem,
+    currentCurrency.code,
   ]);
 
   const parentDiscount = watch(`items.${parentIndex}.discount` as Path<TForm>);
@@ -1233,6 +1267,8 @@ const useSubPosition = <
               }))
             }
             customInput={TextField}
+            decimalSeparator={getDecimalSeparator(selectedLng)}
+            thousandSeparator={getThousandsSeparator(selectedLng)}
             allowLeadingZeros={false}
             decimalScale={2}
             fixedDecimalScale
@@ -1265,7 +1301,12 @@ const useSubPosition = <
           />
         ) : (
           <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>
-            {subItem?.quantity || 0}
+            {formatCurrency(Number(subItem.quantity), {
+              currency: currentCurrency?.code,
+              excludeCurrencySymbol: true,
+              currencySymbol: currentCurrency?.symbol,
+              companyLang: selectedLng,
+            })}
           </Typography>
         )}
       </TableCell>
@@ -1377,9 +1418,7 @@ const useSubPosition = <
           />
         ) : (
           <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>
-            {subItem?.unitAmount?.percentageVat
-              ? `${subItem.unitAmount.percentageVat}%`
-              : '-'}
+            {`${subItem.unitAmount.percentageVat ?? 0}%`}
           </Typography>
         )}
       </TableCell>
