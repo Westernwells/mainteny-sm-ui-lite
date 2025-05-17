@@ -585,7 +585,6 @@ const PositionTable = ({
                               hoveredSubRowIndex={hoveredSubRowIndex}
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
                               onRecalc={onRecalcQuotation}
-                              amountDetail={quotationAmountDetail}
                             />
                           </TableRow>
                         ),

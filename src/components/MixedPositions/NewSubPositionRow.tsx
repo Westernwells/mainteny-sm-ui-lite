@@ -4,15 +4,11 @@ import {VatView} from 'models/vat';
 import {
   EditableInvoiceItem,
   EditableInvoiceSubItemRecord,
-  InvoiceAmountDetail,
 } from 'models/invoice';
 import useSubPosition from 'hooks/useSubPosition';
 import {EditableRowType} from 'components/MixedPositions/PositionTable';
-import {
-  EditableServiceOrderItem,
-  ServiceOrderAmountDetail,
-} from 'models/service-order';
-import {EditableQuotationItem, QuotationAmountDetail} from 'models/quotation';
+import {EditableServiceOrderItem} from 'models/service-order';
+import {EditableQuotationItem} from 'models/quotation';
 
 interface Props<
   TForm extends {
@@ -40,10 +36,6 @@ interface Props<
     subIndex?: number,
   ) => void;
   onRecalc: () => void;
-  amountDetail?:
-    | InvoiceAmountDetail
-    | ServiceOrderAmountDetail
-    | QuotationAmountDetail;
   disableInlineEditing?: boolean;
 }
 
@@ -69,7 +61,6 @@ const NewSubPositionRow = <
   showRightShadow,
   showLeftShadow,
   onRecalc,
-  amountDetail,
   disableInlineEditing = false,
 }: Props<TForm>) => {
   const {control, setValue, getValues, watch} = formMethods;
@@ -104,7 +95,6 @@ const NewSubPositionRow = <
     onDescriptionClick,
     onRecalc,
     taxRates,
-    amountDetail,
     disableInlineEditing,
   });
 
