@@ -1476,78 +1476,73 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        testId={`position-quantity-${index}`}
-        onClick={
-          !isMixed && !disableInlineEditing
-            ? () => handleEditStart(watchedItem, `items.${index}.quantity`)
-            : undefined
-        }>
+        onClick={() => handleEditStart(watchedItem, `items.${index}.quantity`)}
+        testId={`position-quantity-${index}`}>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.quantity` ? (
-          <Controller
-            name={`items.${index}.quantity`}
-            control={control}
-            render={({field}) => (
-              <NumericFormat
-                {...field}
-                autoFocus
-                getInputRef={quantityInputRef}
-                onFocus={(e) => {
-                  e.target.setSelectionRange(0, 0);
-                }}
-                value={field.value || 0}
-                onValueChange={({floatValue}) => {
-                  setValue(
-                    `items.${index}.quantity` as Path<TForm>,
-                    (floatValue || 0) as PathValue<TForm, Path<TForm>>,
-                  );
-                }}
-                customInput={TextField}
-                allowLeadingZeros={false}
-                decimalScale={2}
-                fixedDecimalScale
-                size="small"
-                InputProps={{
-                  onBlur: () => {
-                    setEditableRow(null);
-                    onRecalc();
-                  },
-                  onKeyDown: (
-                    e: React.KeyboardEvent<
-                      HTMLInputElement | HTMLTextAreaElement
-                    >,
-                  ) => {
-                    if (e.key === 'Tab' && !e.shiftKey) {
-                      e.preventDefault();
-                      onRecalc();
-                      setEditableRow({
-                        index,
-                        field: `items.${index}.unitAmount.vatId`,
-                        values: item,
-                      });
-                      vatRef.current?.focus();
-                    }
-                  },
-                }}
-                sx={{
-                  width: '100%',
-                  '& .MuiInputBase-root': {pr: 0},
-                  '& .MuiOutlinedInput-input': {
-                    textAlign: 'right',
-                    width: '100%',
-                  },
-                  '& .Mui-focused': {
-                    border: '2px solid #000034',
-                    borderRadius: '4px',
-                  },
-                }}
-              />
-            )}
+          <NumericFormat
+            autoFocus
+            getInputRef={quantityInputRef}
+            onFocus={(e) => {
+              e.target.setSelectionRange(0, 0);
+            }}
+            value={editableRow.values?.quantity || 0}
+            onValueChange={({floatValue}) => {
+              setValue(
+                `items.${index}.quantity` as Path<TForm>,
+                (floatValue || 0) as PathValue<TForm, Path<TForm>>,
+              );
+            }}
+            customInput={TextField}
+            allowLeadingZeros={false}
+            decimalScale={2}
+            decimalSeparator={getDecimalSeparator(selectedLng)}
+            thousandSeparator={getThousandsSeparator(selectedLng)}
+            fixedDecimalScale
+            size="small"
+            InputProps={{
+              name: `items.${index}.quantity`,
+              onBlur: () => {
+                setEditableRow(null);
+                onRecalc();
+              },
+              onKeyDown: (
+                e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+              ) => {
+                if (e.key === 'Tab' && !e.shiftKey) {
+                  e.preventDefault();
+                  onRecalc();
+                  setEditableRow({
+                    index,
+                    field: `items.${index}.unitAmount.vatId`,
+                    values: item,
+                  });
+                  vatRef.current?.focus();
+                }
+              },
+            }}
+            sx={{
+              width: '100%',
+              '& .MuiInputBase-root': {pr: 0},
+              '& .MuiOutlinedInput-input': {
+                textAlign: 'right',
+                width: '100%',
+              },
+              '& .Mui-focused': {
+                border: '2px solid #000034',
+                borderRadius: '4px',
+              },
+            }}
           />
         ) : (
           <Typography
             sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-            {watchedItem.quantity || 0}
+            {formatCurrency(Number(watchedItem.quantity), {
+              currency: currentCurrency?.code,
+              excludeCurrencySymbol: true,
+              currencySymbol: currentCurrency?.symbol,
+              companyLang: selectedLng,
+            })}
           </Typography>
         )}
       </TableCell>
@@ -1664,9 +1659,7 @@ const useMainPosition = <
         ) : (
           <Typography
             sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-            {watchedItem?.unitAmount?.percentageVat
-              ? `${watchedItem.unitAmount.percentageVat}%`
-              : '-'}
+            {`${watchedItem?.unitAmount?.percentageVat ?? 0}%`}
           </Typography>
         )}
       </TableCell>
