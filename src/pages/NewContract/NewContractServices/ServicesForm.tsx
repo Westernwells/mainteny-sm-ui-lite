@@ -38,7 +38,7 @@ import {Button} from 'components/Button';
 import {getArticleTypeText} from 'utils/article-utils';
 import {FormRadio} from 'components/form/FormRadio';
 import CloseIcon from '@mui/icons-material/Close';
-import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
+import {ReactComponent as PackageIcon} from 'assets/icons/PackageLightIcon.svg';
 import {ReactComponent as MaterialIcon} from 'assets/icons/MaterialIcon.svg';
 import {ReactComponent as LaborIcon} from 'assets/icons/LaborIcon.svg';
 import {ReactComponent as OtherIcon} from 'assets/icons/OtherIcon.svg';
@@ -495,7 +495,7 @@ const ServicesForm = ({
                                   }}
                                   InputProps={{
                                     name: 'costPackage.materialPercentage',
-                                    placeholder: t(`e.g. 20%`),
+                                    placeholder: t(`e.g. 50%`),
                                     id: `costPackage.materialPercentage`,
                                     inputMode: 'numeric',
                                     disabled: true,

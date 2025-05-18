@@ -7,6 +7,7 @@ import {get} from 'lodash';
 import {TFunction} from 'i18next';
 import {
   FILE_DESCRIPTION_PREFIXES,
+  InvoiceStatistics,
   InvoiceStatus,
   InvoiceView,
 } from 'models/invoice';
@@ -14,7 +15,13 @@ import {
 import {ElevatorDataSchemaItem} from 'models/elevator';
 import {MONTH_NUMBER_TO_NAME} from 'models/jobFrequency';
 import {ContractServiceFormElevator, ContractTimeUnit} from 'models/contract';
-import {Address, AddressRecord, Coord, GeocodeAddress} from '../models/misc';
+import {
+  Address,
+  AddressRecord,
+  Coord,
+  Currency,
+  GeocodeAddress,
+} from '../models/misc';
 import useHighlightText from '../hooks/useHighlightText';
 import {getCountryCode} from './countries';
 import {
@@ -825,4 +832,98 @@ export const formatAutocompleteAddress = (
   };
 
   return newValues;
+};
+
+export const aggregateInvoiceStatistics = (
+  currency: Currency,
+  invoiceStatistics?: InvoiceStatistics,
+) => {
+  const CURRENCY = currency.code;
+  const numOfInvoicesPerStatus =
+    invoiceStatistics?.numOfInvoicesPerStatus ?? {};
+  const noOfPaidStatus = numOfInvoicesPerStatus[InvoiceStatus.PAID] ?? 0;
+  const noOfUnPaidStatus = numOfInvoicesPerStatus[InvoiceStatus.NOT_PAID] ?? 0;
+  const noOfOverdueStatus = numOfInvoicesPerStatus[InvoiceStatus.EXPIRED] ?? 0;
+  const noOfOverdueNotice1Status =
+    numOfInvoicesPerStatus[InvoiceStatus.OVERDUE_NOTICE_1] ?? 0;
+  const noOfOverdueNotice2Status =
+    numOfInvoicesPerStatus[InvoiceStatus.OVERDUE_NOTICE_2] ?? 0;
+  const noOfOverdueNotice3Status =
+    numOfInvoicesPerStatus[InvoiceStatus.OVERDUE_NOTICE_3] ?? 0;
+  const noOfPartiallyPaidStatus =
+    numOfInvoicesPerStatus[InvoiceStatus.PARTIALLY_PAID] ?? 0;
+  const amountsPerStatus = invoiceStatistics?.amountsPerStatus ?? {};
+
+  const sentInvoiceAmount =
+    amountsPerStatus[InvoiceStatus.NOT_PAID]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const paidInvoiceAmount =
+    amountsPerStatus[InvoiceStatus.PAID]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const partiallyPaidInvoiceAmount =
+    amountsPerStatus[InvoiceStatus.PARTIALLY_PAID]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const overdueInvoiceAmount =
+    amountsPerStatus[InvoiceStatus.EXPIRED]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const overdue1InvoiceAmount =
+    amountsPerStatus[InvoiceStatus.OVERDUE_NOTICE_1]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const overdue2InvoiceAmount =
+    amountsPerStatus[InvoiceStatus.OVERDUE_NOTICE_2]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const overdue3InvoiceAmount =
+    amountsPerStatus[InvoiceStatus.OVERDUE_NOTICE_3]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+
+  const statusesCount = {
+    total:
+      noOfUnPaidStatus +
+      noOfOverdueStatus +
+      noOfOverdueNotice1Status +
+      noOfOverdueNotice2Status +
+      noOfOverdueNotice3Status +
+      noOfPaidStatus +
+      noOfPartiallyPaidStatus,
+    overdue:
+      noOfOverdueStatus +
+      noOfOverdueNotice1Status +
+      noOfOverdueNotice2Status +
+      noOfOverdueNotice3Status,
+  };
+  const statusesAmount = {
+    total:
+      sentInvoiceAmount +
+      paidInvoiceAmount +
+      partiallyPaidInvoiceAmount +
+      overdueInvoiceAmount +
+      overdue1InvoiceAmount +
+      overdue2InvoiceAmount +
+      overdue3InvoiceAmount,
+    paid: paidInvoiceAmount + partiallyPaidInvoiceAmount,
+    pending:
+      sentInvoiceAmount +
+      overdueInvoiceAmount +
+      overdue1InvoiceAmount +
+      overdue2InvoiceAmount +
+      overdue3InvoiceAmount,
+  };
+
+  return {statusesCount, statusesAmount};
+};
+
+export const calculatePercentChange = (
+  oldValue?: number,
+  newValue?: number,
+) => {
+  if (!oldValue || !newValue) return 0;
+  const change = ((newValue - oldValue) / oldValue) * 100;
+  return parseFloat(change.toFixed(2));
 };

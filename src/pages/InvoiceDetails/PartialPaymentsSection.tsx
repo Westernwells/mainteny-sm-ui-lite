@@ -19,11 +19,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import {FormikProps, getIn} from 'formik';
+import BigNumber from 'bignumber.js';
 import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
+  AggregatedAmount,
   DiscountType,
+  InvoiceAmountDetail,
   InvoiceFormData,
   InvoiceItemPaymentType,
   InvoiceType,
@@ -138,13 +140,17 @@ const NameInput = ({
 interface Props {
   formMethods: UseFormReturn<InvoiceFormData>;
   previousInvoices: InvoiceView[];
+  onRecalcInvoice: () => void;
   invoice?: InvoiceView;
+  invoiceAmountDetail?: InvoiceAmountDetail;
 }
 
 export const PartialPaymentsSection = ({
   formMethods,
   previousInvoices: allPreviousInvoices,
+  onRecalcInvoice,
   invoice,
+  invoiceAmountDetail,
 }: Props) => {
   const currentCurrency = useCurrentCurrency();
   const {language: selectedLng} = useContext(LanguageContext);
@@ -197,6 +203,7 @@ export const PartialPaymentsSection = ({
         percentage: floatValue || 0,
       });
     }
+    onRecalcInvoice();
   };
 
   const previousInvoicesTotalExclVat = centsToMoney(
@@ -249,102 +256,46 @@ export const PartialPaymentsSection = ({
     return floatValue <= maxPercentage;
   };
 
-  const amount =
-    watchedPayment?.type === PaymentType.LUMP_SUM
-      ? watchedPayment?.amount?.value ?? 0
-      : watchedPayment?.type === PaymentType.PERCENTAGE
-      ? (subtotalExclVat * (watchedPayment?.percentage ?? 0)) / 100
-      : watchedPayment?.type === PaymentType.PER_ITEM
-      ? watchedItems
-          ?.map((item) => {
-            // Calculate base amount from unit price and quantity
-            const baseAmount = centsToMoney(
-              item.unitAmount.currency,
-              (item.unitAmount.netAmount ?? 0) * item.quantity,
-            );
+  const amount = centsToMoney(
+    currentCurrency.code,
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
+  );
 
-            // Get discount from either additionalInfo or direct discount field
-            const discount = item?.discount;
-
-            // Calculate discounted price
-            const itemTotalPriceExclVat = applyDiscount({
-              actualValue: baseAmount,
-              ...(discount?.type === DiscountType.AMOUNT
-                ? {amount: discount?.amount?.value ?? 0}
-                : {percentage: discount?.percentage ?? 0}),
-            });
-
-            // Calculate final amount based on payment percentage
-            const paymentPercentage = item.payment?.percentage ?? 0;
-            return (itemTotalPriceExclVat / 100) * paymentPercentage;
-          })
-          ?.reduce((a, b) => a + b, 0)
-      : 0;
-
-  const amountFormatted = formatCurrency(fixRounding(amount, 2), {
+  const amountFormatted = formatCurrency(amount, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-    roundingMode: 'floor',
   });
+
   const totalAmountExclVat = isEditing
     ? amount +
       previousInvoicesTotalExclVat -
-      (invoice?.totalAmount?.netAmount ?? 0) /
-        10 ** (invoice?.totalAmount?.fractionDigits ?? 2)
+      centsToMoney(currentCurrency?.code!, invoice?.totalAmount?.netAmount)
     : amount + previousInvoicesTotalExclVat;
-  const totalAmountExclVatFormatted = formatCurrency(
-    fixRounding(totalAmountExclVat, 2),
-    {
-      currency: currentCurrency.code,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      roundingMode: 'floor',
-    },
-  );
 
-  const allItemsHasSameVAT = watchedItems.every(
-    (item) =>
-      item.unitAmount.percentageVat ===
-      watchedItems[0].unitAmount.percentageVat,
-  );
-
-  const percentageVats = watchedItems.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: watchedItems[0].unitAmount.percentageVat ?? 0,
-            vat:
-              totalAmountExclVat *
-              ((watchedItems[0].unitAmount.percentageVat ?? 0) / 100),
-          },
-        ]
-      : getAggregatedPartialPaymentsVats(watchedItems, totalAmountExclVat)
-    : [];
-  const currentInvoiceAmountPercentageVats = watchedItems.length
-    ? allItemsHasSameVAT
-      ? [
-          {
-            percentageVat: watchedItems[0].unitAmount.percentageVat,
-            vat:
-              amount * ((watchedItems[0].unitAmount.percentageVat ?? 0) / 100),
-          },
-        ]
-      : getAggregatedPartialPaymentsVats(watchedItems, amount)
-    : [];
-
-  const totalAmountInclVats = calculateTotalAmountInclVats({
-    subtotalExclVatAfterDiscount: totalAmountExclVat,
-    percentageVats,
+  const totalAmountExclVatFormatted = formatCurrency(totalAmountExclVat, {
+    currency: currentCurrency.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
+
+  const percentageVats =
+    (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
+
+  const totalAmountInclVats =
+    (percentageVats
+      ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
+      ?.reduce((a, b) => a + b, 0) ?? 0) + totalAmountExclVat;
 
   const totalAmountInclVatsFormatted = formatCurrency(
     fixRounding(totalAmountInclVats, 2),
     {
-      currency: currentCurrency.code,
+      currency: currentCurrency?.code,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-      roundingMode: 'floor',
+      excludeCurrencySymbol: true,
+      currencySymbol: currentCurrency?.symbol,
+      companyLang: selectedLng,
     },
   );
 
@@ -679,6 +630,7 @@ export const PartialPaymentsSection = ({
                                       type: InvoiceItemPaymentType.PERCENTAGE,
                                       percentage: value,
                                     });
+                                    onRecalcInvoice();
                                   }}
                                   fieldProps={{
                                     value:
@@ -834,6 +786,7 @@ export const PartialPaymentsSection = ({
                                     type: InvoiceItemPaymentType.PERCENTAGE,
                                     percentage: value,
                                   });
+                                  onRecalcInvoice();
                                 }}
                                 fieldProps={{
                                   value: item.payment?.percentage ?? 0,
@@ -1017,32 +970,35 @@ export const PartialPaymentsSection = ({
                 {amountFormatted}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats?.map((v, idx) => (
+                {percentageVats?.map((v, idx) => (
                   <p key={idx}>{v.percentageVat}%</p>
                 ))}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {currentInvoiceAmountPercentageVats?.map((v, idx) => {
-                  const vatAmountFormatted = formatCurrency(v.vat, {
-                    currency: currentCurrency.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                  });
+                {percentageVats?.map((v, idx) => {
+                  const vatAmountFormatted = formatCurrency(
+                    centsToMoney(currentCurrency?.code!, v.vat),
+                    {
+                      currency: currentCurrency?.code,
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                      companyLang: selectedLng,
+                      currencySymbol: currentCurrency?.symbol,
+                    },
+                  );
                   return <p key={idx}>{vatAmountFormatted}</p>;
                 })}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {formatCurrency(
                   amount +
-                    currentInvoiceAmountPercentageVats
-                      ?.map((v) => v.vat)
+                    percentageVats
+                      ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
                       ?.reduce((a, b) => a + b, 0),
                   {
                     currency: currentCurrency.code,
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                    roundingMode: 'floor',
                   },
                 )}
               </TableCell>
@@ -1078,7 +1034,9 @@ export const PartialPaymentsSection = ({
         ),
     )
     ?.reduce((acc, a) => acc + a, 0);
-  const outstandingPayments = totalAmountInclVats - paidAmountInclVats;
+  const outstandingPayments = BigNumber(totalAmountInclVats)
+    .minus(paidAmountInclVats)
+    .toNumber();
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
@@ -1446,37 +1404,23 @@ export const PartialPaymentsSection = ({
             {totalAmountExclVatFormatted}
           </Typography>
 
-          {allItemsHasSameVAT ? (
-            <>
+          {percentageVats?.map((v) => (
+            <Fragment key={v.percentageVat}>
               <Typography variant="body1" color="primary.dark">
-                {T('VAT')} {percentageVats?.[0]?.percentageVat ?? 0}%
+                {T('VAT')} {v.percentageVat}%
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                {formatCurrency(fixRounding(percentageVats?.[0]?.vat ?? 0, 2), {
-                  currency: currentCurrency.code,
+                {formatCurrency(centsToMoney(currentCurrency?.code!, v.vat), {
+                  currency: currentCurrency?.code,
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  roundingMode: 'floor',
+                  excludeCurrencySymbol: true,
+                  companyLang: selectedLng,
+                  currencySymbol: currentCurrency?.symbol,
                 })}
               </Typography>
-            </>
-          ) : (
-            percentageVats?.map((v) => (
-              <Fragment key={v.percentageVat}>
-                <Typography variant="body1" color="primary.dark">
-                  {T('VAT')} {v.percentageVat}%
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  {formatCurrency(fixRounding(v.vat, 2), {
-                    currency: currentCurrency.code,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    roundingMode: 'floor',
-                  })}
-                </Typography>
-              </Fragment>
-            ))
-          )}
+            </Fragment>
+          ))}
           <Typography variant="subtitle1" color="primary.dark" fontWeight={600}>
             {T('Total amount (incl. VAT)')}
           </Typography>

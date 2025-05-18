@@ -40,9 +40,11 @@ declare global {
   namespace Cypress {
     interface Chainable {
       login(): Chainable<void>;
+      getRichTextField(field: string): Chainable<void>;
       fillRichTextField(field: string, value: string): Chainable<void>;
       clearRichTextField(field: string): Chainable<void>;
       waitForSpinnerToDisappear(): Chainable<void>;
+      fillTiptapRichTextField(field: string, value: string): Chainable<void>;
     }
   }
 }
@@ -55,6 +57,14 @@ Cypress.Commands.add('login', () => {
   cy.get('#password').type('!!abc123', {log: false});
   cy.get('button[type="submit"]').click();
   cy.wait('@loginApi');
+});
+
+Cypress.Commands.add('getRichTextField', (field: string) => {
+  cy.contains('legend', field)
+    .parents('fieldset')
+    .within(() => {
+      cy.get('div[contenteditable="true"]');
+    });
 });
 
 Cypress.Commands.add('fillRichTextField', (field: string, value: string) => {
@@ -85,6 +95,21 @@ Cypress.Commands.add('clearRichTextField', (field: string) => {
 Cypress.Commands.add('waitForSpinnerToDisappear', () => {
   cy.get('span[role="progressbar"]').should('not.exist');
 });
+
+Cypress.Commands.add(
+  'fillTiptapRichTextField',
+  (field: string, value: string) => {
+    cy.contains('label', field)
+      .parent('div')
+      .within(() => {
+        cy.get('div[contenteditable="true"]')
+          .focus()
+          .click()
+          .wait(1000)
+          .realType(value);
+      });
+  },
+);
 
 // hack for cypress typescript issues
 export {};

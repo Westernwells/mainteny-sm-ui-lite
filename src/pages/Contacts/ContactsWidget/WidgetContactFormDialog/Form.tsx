@@ -31,6 +31,7 @@ interface Props {
 }
 
 const titles = Object.values(ContactTitle);
+
 const Form = ({form}: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -75,7 +76,7 @@ const Form = ({form}: Props) => {
             value={watch('userAccount.title')}
             notched
             {...register('userAccount.title')}
-            renderValue={() => watch('userAccount.title')}>
+            renderValue={(selected) => t(selected as string)}>
             {titles.map((title: ContactTitle, index: number) => (
               <MenuItem value={title} key={index}>
                 {t(title)}

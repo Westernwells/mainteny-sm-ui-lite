@@ -19,7 +19,11 @@ export enum HTML_PDF_FONT_SIZE {
   LARGE = '13px',
 }
 
-export const DEFAULT_HTML_PDF_FONT_SIZE = HTML_PDF_FONT_SIZE.NORMAL;
+export enum HTML_PDF_FONT_SIZE_DESCRIPTION {
+  SMALL = '7px',
+  NORMAL = '9px',
+  LARGE = '11px',
+}
 
 export enum FORMAT {
   'left' = 'left',
@@ -28,16 +32,19 @@ export enum FORMAT {
   'numbered-list' = 'numbered-list',
   'bulleted-list' = 'bulleted-list',
   'color' = 'color',
+  'text-indent' = 'text-indent',
 }
 
 export const FORMAT_TO_ATTRIBUTE: Record<string, string> = {
-  'increase-indent': 'text-indent',
-  'decrease-indent': 'text-indent',
+  'text-indent': 'textIndent',
 };
 
 // Some properties need to go to the wrapper component (node), other to the selected component (leaf)
-export const ELEMENT_TO_CHANGE: Record<string, 'node' | 'leaf'> = {
-  'text-indent': 'node',
+export const ELEMENT_TO_CHANGE: Record<
+  string,
+  {type: 'node' | 'leaf'; target: 'paragraph' | 'text'}
+> = {
+  textIndent: {type: 'node', target: 'paragraph'},
 };
 
 export const GROUP_TYPES = [FORMAT['numbered-list'], FORMAT['bulleted-list']];
@@ -50,7 +57,7 @@ export const ELEMENT_TAGS: Record<
   (el: HTMLElement | HTMLDivElement) =>
     | {
         type: string;
-        ['text-indent']?: string;
+        textIndent?: string;
         color?: string;
       }
     | undefined
@@ -60,10 +67,12 @@ export const ELEMENT_TAGS: Record<
       ? el.style?.textAlign
       : 'paragraph'; // make 'paragraph' default for anything except align type
     const color = el.style?.color;
+    const textIndent = el.style?.textIndent;
 
     return {
       type: style,
       ...(color ? {color} : {}),
+      ...(textIndent ? {textIndent} : {}),
     };
   },
   OL: () => ({type: 'numbered-list'}),

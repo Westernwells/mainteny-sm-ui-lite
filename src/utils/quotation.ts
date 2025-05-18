@@ -7,6 +7,7 @@ import {
   QuotationFormData,
   QuotationItemRecord,
   QuotationItemView,
+  QuotationStatistics,
   QuotationStatus,
   QuotationSubItemRecord,
   QuotationTableRow,
@@ -322,7 +323,6 @@ export const getDiscountDisplay = (
   if (discount.type === DiscountType.AMOUNT) {
     return formatCurrency(discount.amount?.value || 0, {
       currency: currentCurrency?.code,
-      excludeCurrencySymbol: true,
       currencySymbol: currentCurrency?.symbol,
       companyLang: selectedLng,
     });
@@ -423,3 +423,41 @@ export const buildQuotationPayload = (
           percentage: discount?.percentage || 0,
         },
 });
+
+export const aggregateQuotationStatistics = (
+  currency: Currency,
+  quotationStatistics?: QuotationStatistics,
+) => {
+  const CURRENCY = currency.code;
+  const numOfQuotationsPerStatus =
+    quotationStatistics?.numOfQuotationsPerStatus ?? {};
+  const noOfSentStatus =
+    numOfQuotationsPerStatus[QuotationStatus.SENT_TO_CLIENT] ?? 0;
+
+  const amountsPerStatus = quotationStatistics?.amountsPerStatus ?? {};
+
+  const sentQuotationAmount =
+    amountsPerStatus[QuotationStatus.SENT_TO_CLIENT]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const acceptedQuotationAmount =
+    amountsPerStatus[QuotationStatus.ACCEPTED]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+  const rejectedQuotationAmount =
+    amountsPerStatus[QuotationStatus.REJECTED]?.find(
+      (item) => item.currency === CURRENCY,
+    )?.value ?? 0;
+
+  const statusesCount = {
+    total: noOfSentStatus,
+  };
+  const statusesAmount = {
+    total:
+      sentQuotationAmount + acceptedQuotationAmount + rejectedQuotationAmount,
+    accepted: acceptedQuotationAmount,
+    pending: sentQuotationAmount,
+  };
+
+  return {statusesCount, statusesAmount};
+};

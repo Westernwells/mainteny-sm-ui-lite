@@ -52,7 +52,8 @@ const Form = ({form, initialValues}: Props) => {
             size="small"
             defaultValue={watch('userAccount.title')}
             notched
-            {...register('userAccount.title')}>
+            {...register('userAccount.title')}
+            renderValue={(selected) => t(selected as string)}>
             {titles.map((title: ContactTitle, index: number) => (
               <MenuItem value={title} key={index}>
                 {t(title)}

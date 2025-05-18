@@ -58,7 +58,7 @@ import CustomerInput from 'components/Inputs/CustomerInput';
 import CustomerIdInput from 'components/Inputs/CustomerInput/CustomerIdInput';
 import UnitIdInput from 'components/Inputs/UnitInput/UnitIdInput';
 import ServiceOrderIdInput from 'components/Inputs/ServiceOrderInput/ServiceOrderIdInput';
-import {Checkbox, CircularProgress, Typography} from '@mui/material';
+import {Checkbox, CircularProgress, Collapse, Typography} from '@mui/material';
 import {Button} from 'components/Button';
 import AddButton from 'components/AddButton';
 import QuickFilter from 'components/QuickFilter';
@@ -82,6 +82,8 @@ import {
 import {convertNumberToAmountNumber, useCurrentCurrency} from 'utils/currency';
 import NoteIcon from 'components/NoteIcon';
 import {convertPropertyOwnerObjectToAvatar} from 'utils/account-utils';
+import StatsToggle from 'components/StatsToggle';
+import DashboardMetrics from './DashboardMetrics';
 
 const pageSize = 25;
 
@@ -93,6 +95,7 @@ export const Quotations = () => {
   const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
   const currentCurrency = useCurrentCurrency();
+  const [showStats, setShowStats] = useState(false);
 
   const [search, setSearch] = useQueryState('searchQuotations');
 
@@ -665,6 +668,10 @@ export const Quotations = () => {
     }
   };
 
+  const toggleStats = () => {
+    setShowStats(!showStats);
+  };
+
   useEffect(() => {
     if (textInput.current && !textInput.current.value) {
       textInput.current.value = search;
@@ -699,7 +706,13 @@ export const Quotations = () => {
             <SearchInput
               refInput={textInput}
               defaultValue={search}
-              onChange={(val: string) => setSearch(val)}
+              onChange={(val: string) => {
+                setPage({
+                  ...page,
+                  pageIndex: 0,
+                });
+                setSearch(val);
+              }}
             />
             <DatePickerRange
               defaultDate={tempDateRange}
@@ -854,6 +867,7 @@ export const Quotations = () => {
             </Filters>
           </Box>
           <Box display="flex" gap={2}>
+            <StatsToggle onClick={toggleStats} show={showStats} />
             {rows.length > 0 && (
               <Button
                 buttonProps={{
@@ -885,6 +899,14 @@ export const Quotations = () => {
             onChange={handleQuickFilterChange}
           />
         </Box>
+        <Collapse in={showStats} timeout="auto">
+          <Box mt={2} mb={15}>
+            <DashboardMetrics
+              filters={filters}
+              quotationStatistics={quotationStatistics}
+            />
+          </Box>
+        </Collapse>
         <TableContainer
           showNoMatchWarning={noMatchingData}
           containerRef={containerRef}

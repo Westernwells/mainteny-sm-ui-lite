@@ -28,6 +28,7 @@ import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
 import {ServiceCompanyItem} from 'models/service-company';
+import {hasAlternativeAddress} from 'utils/invoice';
 import PdfTemplateInvoiceDetails from '../PdfTemplateInvoiceDetails';
 import {ArticleSection} from '../ArticleSection/ArticleSection';
 import PdfBodyContainer from '../containers/PdfBodyContainer';
@@ -252,25 +253,23 @@ const PdfPartialUpfrontPreview = ({
 
   return (
     <Document>
-      {invoice?.additionalInfo.alternativeAddress &&
-        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
-        !!invoice?.additionalInfo.alternativeAddress.component?.name && (
-          <AlternativeAddressTemplate
-            userInfo={userInfo}
-            translate={translate}
-            headerInfo={headerInfo}
-            headerPath={headerPath}
-            footerInfo={footerInfo}
-            footerPath={footerPath}
-            alternativeServiceCompanyInfo={
-              invoice?.additionalInfo.alternativeServiceCompanyInfo
-            }
-            alternativeAddress={invoice?.additionalInfo.alternativeAddress}
-            fontStyles={fontStyles}
-            primaryColor={primaryColor}
-            secondaryColor={secondaryColor}
-          />
-        )}
+      {hasAlternativeAddress(invoice?.additionalInfo?.alternativeAddress) && (
+        <AlternativeAddressTemplate
+          userInfo={userInfo}
+          translate={translate}
+          headerInfo={headerInfo}
+          headerPath={headerPath}
+          footerInfo={footerInfo}
+          footerPath={footerPath}
+          alternativeServiceCompanyInfo={
+            invoice?.additionalInfo.alternativeServiceCompanyInfo
+          }
+          alternativeAddress={invoice?.additionalInfo.alternativeAddress}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
+        />
+      )}
 
       <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
@@ -310,14 +309,13 @@ const PdfPartialUpfrontPreview = ({
               value={invoice?.subject}
               fontStyles={fontStyles}
               primaryColor={primaryColor}
-              selectedLng={selectedLng}
             />
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF
                 html={invoice?.description || ''}
                 rootStyle={styles.contentBody}
-                selectedLng={selectedLng}
+                fontStyles={fontStyles}
               />
             )}
 
@@ -344,7 +342,6 @@ const PdfPartialUpfrontPreview = ({
                 invoiceAmountDetail={invoiceAmountDetail}
                 currentCurrency={currentCurrency}
                 previousInvoices={finalPreviousInvoices!}
-                articleItems={articleItems}
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
@@ -358,7 +355,6 @@ const PdfPartialUpfrontPreview = ({
                 invoice={invoice}
                 currentCurrency={currentCurrency}
                 previousInvoices={finalPreviousInvoices!}
-                articleItems={articleItems}
                 invoiceAmountDetail={invoiceAmountDetail}
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
@@ -387,7 +383,7 @@ const PdfPartialUpfrontPreview = ({
                       marginTop: 6,
                       marginBottom: 16,
                     }}
-                    selectedLng={selectedLng}
+                    fontStyles={fontStyles}
                   />
                 </View>
               )}

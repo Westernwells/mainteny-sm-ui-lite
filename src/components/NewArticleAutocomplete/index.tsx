@@ -1,16 +1,16 @@
 import {SyntheticEvent, useCallback, useEffect, useRef, useState} from 'react';
 import {
-  TextField,
   Autocomplete,
   IconButton,
-  Tooltip,
-  Typography,
   Popper,
   PopperProps,
+  Table,
   TableHead,
   TableRow,
-  Table,
+  TextField,
   TextFieldProps,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import {t} from 'i18next';
 import {centsToMoney, formatCurrency, useCurrentCurrency} from 'utils/currency';
@@ -27,7 +27,7 @@ import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
-import {ReactComponent as PackageIcon} from 'assets/icons/PackageIcon.svg';
+import {ReactComponent as PackageIcon} from 'assets/icons/PackageLightIcon.svg';
 import {NoteAltOutlined} from '@mui/icons-material';
 import NoteAlt from '@mui/icons-material/NoteAlt';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -37,19 +37,18 @@ import {Currency} from 'models/misc';
 import {removeHtmlTags} from 'utils/rich-field-string';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
-import {PropertyOwnerView} from 'models/propertyManager';
 import keyBy from 'lodash/keyBy';
-import {getArticleTypes} from 'utils/article-utils';
+import {createSearchQuery, getArticleTypes} from 'utils/article-utils';
 import {InvoiceItemRecord} from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
 import {
-  headerCellStyle,
-  footerTableStyle,
-  footerCellStyle,
-  iconButtonStyle,
-  dismissButtonStyle,
   customPopperStyle,
+  dismissButtonStyle,
+  footerCellStyle,
   footerTableContentStyle,
+  footerTableStyle,
+  headerCellStyle,
+  iconButtonStyle,
 } from './NewArticleAutoComplete.styles';
 
 interface ArticleRowProps {
@@ -74,7 +73,7 @@ export const getIconByType = (type: ArticleType) => {
         <FolderOpenOutlinedIcon fontSize="small" sx={{color: '#828DA3'}} />
       );
     case ArticleType.PACKAGE:
-      return <PackageIcon fontSize="1.5rem" color="#828DA3" />;
+      return <PackageIcon fontSize="1.1rem" color="#828DA3" />;
     default:
       return <DashboardOutlinedIcon fontSize="small" sx={{color: '#828DA3'}} />;
   }
@@ -252,7 +251,7 @@ interface Props {
   initialValue?: InvoiceItemRecord | QuotationItemRecord | null;
   textFieldProps?: TextFieldProps;
   openOnFocus?: boolean;
-  propertyOwner?: PropertyOwnerView;
+  propertyOwnerId?: string;
   excludeTypes?: ArticleType[];
   showCustomPriceColumn?: boolean;
   onArticleSelect: (selectedArticle: ArticleView | string) => void;
@@ -261,7 +260,7 @@ interface Props {
 export const NewArticleAutoComplete = ({
   initialValue = null,
   openOnFocus = true,
-  propertyOwner,
+  propertyOwnerId,
   excludeTypes,
   showCustomPriceColumn = false,
   onArticleSelect,
@@ -281,7 +280,7 @@ export const NewArticleAutoComplete = ({
       {
         pageIndex: 0,
         pageSize: 25,
-        query,
+        query: createSearchQuery({search: query}),
         type: getArticleTypes({excludeTypes}),
       },
       {keepPreviousData: true},
@@ -289,9 +288,9 @@ export const NewArticleAutoComplete = ({
     );
 
   const {data: customPrices = []} = usePropertyOwnerQueryTravelWorks(
-    propertyOwner?.id || '',
+    propertyOwnerId || '',
     {serviceOrderType: ServiceOrderType.GENERAL},
-    {enabled: showCustomPriceColumn && !!propertyOwner?.id},
+    {enabled: showCustomPriceColumn && !!propertyOwnerId},
   );
 
   const mergedArticles: ExtendedArticleView[] = showCustomPriceColumn

@@ -1,31 +1,53 @@
-import {View, Text} from '@react-pdf/renderer';
+import {Text, View} from '@react-pdf/renderer';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {ContextProps} from 'context/PdfStylesProvider';
-import {EditableInvoiceItem, InvoiceAmountDetail} from 'models/invoice';
+import {
+  DiscountType,
+  EditableInvoiceItem,
+  InvoiceAmountDetail,
+} from 'models/invoice';
 import {EditableQuotationItem, QuotationAmountDetail} from 'models/quotation';
 import {centsToMoney, formatCurrency} from 'utils/currency';
 import {insertNewlines} from 'utils/pdfTemplates';
 import {getDiscountDisplay} from 'utils/quotation';
 import {Currency} from 'models/misc';
+import {
+  EditableServiceOrderItem,
+  ServiceOrderAmountDetail,
+} from 'models/service-order';
+import {HTML_PDF_FONT_SIZE_DESCRIPTION} from 'models/richTextField';
+import {stripHtmlTags} from 'utils/text-block';
 import {getStyles} from './ArticleSection.styles';
 
 type ArticleSectionBodyProps = {
-  items: EditableInvoiceItem[] | EditableQuotationItem[];
-  amountDetail?: InvoiceAmountDetail | QuotationAmountDetail;
+  items: (
+    | EditableInvoiceItem
+    | EditableQuotationItem
+    | EditableServiceOrderItem
+  )[];
+  amountDetail?:
+    | InvoiceAmountDetail
+    | QuotationAmountDetail
+    | ServiceOrderAmountDetail;
   currentCurrency?: Currency;
   selectedLng?: string;
+  showDiscountCol?: boolean;
   translate: (key: string) => string;
-} & Pick<ContextProps, 'primaryColor'>;
+} & Pick<ContextProps, 'fontStyles' | 'primaryColor'>;
 
 export const ArticleSectionBody = ({
   items,
   amountDetail,
   currentCurrency,
   selectedLng,
+  showDiscountCol,
   translate,
   primaryColor,
+  fontStyles,
 }: ArticleSectionBodyProps) => {
   const styles = getStyles({primaryColor});
+
+  const priceWidth = showDiscountCol ? styles.col12Right.width : '18.5%';
 
   return (
     <View style={styles.dataBody}>
@@ -38,60 +60,88 @@ export const ArticleSectionBody = ({
         return (
           <View key={`${mainPosition.id}-${index}`}>
             <View style={styles.tableRow}>
-              <View style={styles.col2Left}>
+              <View style={styles.col6Left}>
                 <Text>
                   {insertNewlines(mainPosition.userSeqNumber || '') ||
-                    index + 1}
+                    insertNewlines(String(index + 1) || '')}
                 </Text>
               </View>
 
-              <View style={styles.col40Left}>
-                <Text>{mainPosition.name || '-'}</Text>
+              <View style={styles.col37Left}>
+                <Text orphans={1}>
+                  {stripHtmlTags(mainPosition.name || '-')}
+                </Text>
               </View>
 
-              <View style={styles.col10Right}>
-                <Text>{mainPosition.quantity || '-'}</Text>
-              </View>
-
-              <View style={styles.col8Center}>
-                <Text>{translate(mainPosition.article?.unit || '-')}</Text>
-              </View>
-
-              <View style={styles.col15Right}>
+              <View style={styles.col8Right}>
                 <Text>
-                  {formatCurrency(
-                    centsToMoney(
-                      currentCurrency?.code!,
-                      mainPosition?.unitAmount?.netAmount || 0,
-                    ),
-                    {
+                  {insertNewlines(
+                    formatCurrency(Number(mainPosition.quantity), {
                       currency: currentCurrency?.code,
                       excludeCurrencySymbol: true,
                       currencySymbol: currentCurrency?.symbol,
                       companyLang: selectedLng,
-                    },
+                    }) || '-',
+                    5,
                   )}
                 </Text>
               </View>
 
-              <View style={styles.col10Right}>
+              <View style={styles.col12Left}>
                 <Text>
-                  {getDiscountDisplay(
-                    mainPosition.discount,
-                    currentCurrency,
-                    selectedLng,
+                  {insertNewlines(
+                    translate(mainPosition.article?.unit || '-'),
+                    9,
                   )}
                 </Text>
               </View>
 
-              <View style={styles.col15Right}>
+              <View style={[styles.col12Right, {width: priceWidth}]}>
                 <Text>
-                  {formatCurrency(totalPriceExclVatAfterDiscount || 0, {
-                    currency: currentCurrency?.code!,
-                    excludeCurrencySymbol: true,
-                    currencySymbol: currentCurrency?.symbol,
-                    companyLang: selectedLng,
-                  })}
+                  {insertNewlines(
+                    formatCurrency(
+                      centsToMoney(
+                        currentCurrency?.code!,
+                        mainPosition?.unitAmount?.netAmount || 0,
+                      ),
+                      {
+                        currency: currentCurrency?.code,
+                        excludeCurrencySymbol: true,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      },
+                    ),
+                    11,
+                  )}
+                </Text>
+              </View>
+
+              {showDiscountCol && (
+                <View style={styles.col12Right}>
+                  <Text>
+                    {insertNewlines(
+                      getDiscountDisplay(
+                        mainPosition.discount,
+                        currentCurrency,
+                        selectedLng,
+                      ),
+                      8,
+                    )}
+                  </Text>
+                </View>
+              )}
+
+              <View style={[styles.col12Right, {width: priceWidth}]}>
+                <Text>
+                  {insertNewlines(
+                    formatCurrency(totalPriceExclVatAfterDiscount || 0, {
+                      currency: currentCurrency?.code!,
+                      excludeCurrencySymbol: true,
+                      currencySymbol: currentCurrency?.symbol,
+                      companyLang: selectedLng,
+                    }),
+                    11,
+                  )}
                 </Text>
               </View>
             </View>
@@ -103,56 +153,78 @@ export const ArticleSectionBody = ({
                   rootStyle={{
                     ...styles.descriptionText,
                   }}
-                  selectedLng={selectedLng}
+                  fontStyles={fontStyles}
+                  fontSize={HTML_PDF_FONT_SIZE_DESCRIPTION}
                 />
               )}
             </View>
 
             {mainPosition?.subItemsConfig?.subItemsVisible &&
               mainPosition?.subItems?.map((subItem, subIndex) => {
-                const totalSubItemPriceExclVatAfterDiscount = centsToMoney(
-                  currentCurrency?.code!,
-                  amountDetail?.items?.[index]?.subItems?.[subIndex]
-                    .amountAfterItemDiscount?.netAmount || 0,
-                );
+                const totalSubItemPriceExclVatAfterDiscount =
+                  Number(subItem.quantity) *
+                  centsToMoney(
+                    currentCurrency?.code!,
+                    subItem.unitAmount.netAmount ?? 0,
+                  );
                 return (
                   <View key={`${subItem.id}-${index}-${subIndex}`}>
                     <View style={styles.tableRow}>
-                      <View style={styles.col2Left}>
+                      <View style={styles.col6Left}>
                         <Text>
                           {insertNewlines(subItem.userSeqNumber || '') ||
-                            `${index + 1}.${subIndex + 1}`}
+                            insertNewlines(`${index + 1}.${subIndex + 1}`)}
                         </Text>
                       </View>
 
-                      <View style={styles.col40Left}>
+                      <View style={styles.col37Left}>
                         <Text>
-                          {subItem.name || subItem.article?.name || '-'}
+                          {stripHtmlTags(
+                            subItem.name || subItem.article?.name || '-',
+                          )}
                         </Text>
                       </View>
 
-                      <View style={styles.col10Right}>
-                        <Text>{subItem.quantity || '-'}</Text>
+                      <View style={styles.col8Right}>
+                        <Text>
+                          {insertNewlines(
+                            formatCurrency(Number(subItem.quantity), {
+                              currency: currentCurrency?.code,
+                              excludeCurrencySymbol: true,
+                              currencySymbol: currentCurrency?.symbol,
+                              companyLang: selectedLng,
+                            }) || '-',
+                            5,
+                          )}
+                        </Text>
                       </View>
 
-                      <View style={styles.col8Center}>
-                        <Text>{translate(subItem.article?.unit || '-')}</Text>
+                      <View style={styles.col12Left}>
+                        <Text>
+                          {insertNewlines(
+                            translate(subItem.article?.unit || '-'),
+                            9,
+                          )}
+                        </Text>
                       </View>
 
-                      <View style={styles.col15Right}>
+                      <View style={[styles.col12Right, {width: priceWidth}]}>
                         {mainPosition.subItemsConfig?.priceVisible ? (
                           <Text>
-                            {formatCurrency(
-                              centsToMoney(
-                                currentCurrency?.code!,
-                                subItem?.unitAmount?.netAmount || 0,
+                            {insertNewlines(
+                              formatCurrency(
+                                centsToMoney(
+                                  currentCurrency?.code!,
+                                  subItem?.unitAmount?.netAmount || 0,
+                                ),
+                                {
+                                  currency: currentCurrency?.code,
+                                  excludeCurrencySymbol: true,
+                                  currencySymbol: currentCurrency?.symbol,
+                                  companyLang: selectedLng,
+                                },
                               ),
-                              {
-                                currency: currentCurrency?.code,
-                                excludeCurrencySymbol: true,
-                                currencySymbol: currentCurrency?.symbol,
-                                companyLang: selectedLng,
-                              },
+                              11,
                             )}
                           </Text>
                         ) : (
@@ -160,27 +232,44 @@ export const ArticleSectionBody = ({
                         )}
                       </View>
 
-                      <View style={styles.col10Right}>
-                        <Text />
-                      </View>
-
-                      <View style={styles.col15Right}>
-                        <Text>
-                          {mainPosition.subItemsConfig?.priceVisible ? (
+                      {showDiscountCol && (
+                        <View style={styles.col12Right}>
+                          {mainPosition.discount?.type ===
+                          DiscountType.PERCENTAGE ? (
                             <Text>
-                              {formatCurrency(
-                                totalSubItemPriceExclVatAfterDiscount || 0,
-                                {
-                                  currency: currentCurrency?.code!,
-                                  excludeCurrencySymbol: true,
-                                  currencySymbol: currentCurrency?.symbol,
-                                  companyLang: selectedLng,
-                                },
+                              {insertNewlines(
+                                getDiscountDisplay(
+                                  mainPosition.discount,
+                                  currentCurrency,
+                                  selectedLng,
+                                ),
+                                6,
                               )}
                             </Text>
                           ) : (
-                            <Text />
+                            ''
                           )}
+                        </View>
+                      )}
+
+                      <View style={[styles.col12Right, {width: priceWidth}]}>
+                        <Text>
+                          <Text>
+                            {mainPosition.subItemsConfig?.priceVisible
+                              ? insertNewlines(
+                                  formatCurrency(
+                                    totalSubItemPriceExclVatAfterDiscount,
+                                    {
+                                      currency: currentCurrency!.code,
+                                      excludeCurrencySymbol: true,
+                                      currencySymbol: currentCurrency!.symbol,
+                                      companyLang: selectedLng,
+                                    },
+                                  ),
+                                  11,
+                                )
+                              : ' '}
+                          </Text>
                         </Text>
                       </View>
                     </View>
@@ -190,7 +279,8 @@ export const ArticleSectionBody = ({
                         <HtmlPDF
                           html={subItem.description || '-'}
                           rootStyle={{...styles.descriptionText}}
-                          selectedLng={selectedLng}
+                          fontStyles={fontStyles}
+                          fontSize={HTML_PDF_FONT_SIZE_DESCRIPTION}
                         />
                       </View>
                     )}

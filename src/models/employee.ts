@@ -234,6 +234,7 @@ export type CreateEmployeeAccountData = Partial<CreateUserAccountData> & {
   employeeId: string;
   team?: string;
   totalYearlyVacationDaysAllowed?: number;
+  serviceOrderTypes?: string[];
 };
 
 export type EmployeeAccountData = Partial<CreateUserAccountData> & {

@@ -163,7 +163,7 @@ const MarginDetails = ({
           {showMargins &&
             marginItems.map((item, idx) => (
               <Box
-                key={idx}
+                key={`${item.label} - ${idx}`}
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center">
@@ -205,11 +205,12 @@ const MarginDetails = ({
             </Typography>
           </Box>
 
-          {vats?.map((vat) => (
+          {vats?.map((vat, index) => (
             <Box
               display="flex"
               justifyContent="space-between"
-              alignItems="center">
+              alignItems="center"
+              key={`${vat.vat} - ${vat.percentageVat} - ${index}`}>
               <Typography
                 variant="subtitle2"
                 fontWeight={600}

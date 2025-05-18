@@ -115,7 +115,7 @@ export const getIconByType = (type: ArticleType) => {
     case ArticleType.MIX:
       return <FolderOpenOutlinedIcon fontSize="medium" />;
     case ArticleType.PACKAGE:
-      return <PackageIcon fontSize="1.5rem" color="#828DA3" />;
+      return <PackageIcon fontSize="1.3rem" color="#828DA3" />;
     default:
       return <DashboardOutlinedIcon fontSize="medium" />;
   }
@@ -125,6 +125,7 @@ const MixedPositions = () => {
   const {user} = useUserSession();
   const currentCurrency = useCurrentCurrency();
   const theme = useTheme();
+  const [createdMixId, setCreatedMixId] = useState<string | null>(null);
 
   const {fontStyles, primaryColor, secondaryColor} =
     useContext(PdfStylesContext);
@@ -322,20 +323,6 @@ const MixedPositions = () => {
 
     return {emptyTable: false, noMatchingData: false};
   }, [isFetched, articleResource]);
-
-  useEffect(() => {
-    // Focus on the name input for the mixed position when it's editable
-    if (editState.field && inputRefs[editState.id!]) {
-      inputRefs[editState.id!].current?.focus();
-    }
-  }, [editState]);
-
-  useEffect(() => {
-    // Focus on the name input for the sub-position when it's editable
-    if (subPositionEditState.field && inputRefs[subPositionEditState.id!]) {
-      inputRefs[subPositionEditState.id!].current?.focus();
-    }
-  }, [subPositionEditState]);
 
   const renderAlert = (isCustom: boolean = false) => (
     <Alert
@@ -806,6 +793,37 @@ const MixedPositions = () => {
     setLocalRows(fetchedRows);
   }, [articleResource.data]);
 
+  useEffect(() => {
+    if (!createdMixId) return;
+
+    const justCreated = localRows.find((r) => r.data.id === createdMixId);
+    if (!justCreated) return;
+
+    const rowEl = document.querySelector(
+      `[data-testid="mixed-row-${createdMixId}"]`,
+    );
+    if (rowEl) {
+      rowEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+      (rowEl.querySelector('input') as HTMLElement | null)?.focus();
+    }
+
+    setCreatedMixId(null);
+  }, [localRows, createdMixId]);
+
+  useEffect(() => {
+    // Focus on the name input for the mixed position when it's editable
+    if (editState.field && inputRefs[editState.id!]) {
+      inputRefs[editState.id!].current?.focus();
+    }
+  }, [editState]);
+
+  useEffect(() => {
+    // Focus on the name input for the sub-position when it's editable
+    if (subPositionEditState.field && inputRefs[subPositionEditState.id!]) {
+      inputRefs[subPositionEditState.id!].current?.focus();
+    }
+  }, [subPositionEditState]);
+
   const COLUMNS = useMemo<TableColumnWithRender<MixedPositionRow>[]>(
     () => [
       {
@@ -989,7 +1007,13 @@ const MixedPositions = () => {
           <SearchInput
             refInput={textInput}
             defaultValue={search}
-            onChange={(val: string) => setSearch(val)}
+            onChange={(val: string) => {
+              setPage({
+                ...page,
+                pageIndex: 0,
+              });
+              setSearch(val);
+            }}
           />
 
           <AddButton
@@ -1009,7 +1033,7 @@ const MixedPositions = () => {
               rows.map((row) => (
                 <Fragment key={row.data.id}>
                   <TableRow
-                    testId="row-test-id"
+                    testId={`mixed-row-${row.data.id}`}
                     disableHover
                     sx={{
                       pointerEvents:
@@ -1038,6 +1062,7 @@ const MixedPositions = () => {
                       setDeleteEventState={setDeleteEventState}
                       showLeftShadow={showLeftShadow}
                       showRightShadow={showRightShadow}
+                      onCreated={(newId: string) => setCreatedMixId(newId)}
                     />
                   </TableRow>
 

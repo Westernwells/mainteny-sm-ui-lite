@@ -1,4 +1,11 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import Typography from '@mui/material/Typography';
@@ -40,7 +47,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import {
   formatAddressFullname,
   formatSearchParams,
-  getUniqueId,
   getUserFullName,
 } from 'utils/utils';
 import {EditFrom} from 'pages/InvoiceDetails/EditFrom';
@@ -108,12 +114,12 @@ import {
   generatePdfQuotation,
   quotationItemToQuotationItemRecord,
 } from 'utils/quotation';
-import {Controller, useForm} from 'react-hook-form';
+import {Controller, useForm, useWatch} from 'react-hook-form';
 import PositionTable from 'components/MixedPositions/PositionTable';
 import {ArticleType} from 'models/article';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
-import {DiscountType} from 'models/invoice';
 import {useSnackbar} from 'hooks/useSnackbar';
+import * as Sentry from '@sentry/react';
 import NewUnit from './NewUnit';
 import {formatQuotationRecord} from './utils';
 import {Notes} from './Notes';
@@ -128,7 +134,7 @@ interface Props {
 const localStorageQuotationDataKey = 'QUOTATION_DATA';
 
 export const DraftQuotation = ({
-  formType,
+  formType = 'new',
   quotation,
   serviceCompanyType,
   quotationSubItems,
@@ -141,8 +147,6 @@ export const DraftQuotation = ({
 
   const {data: taxRates} = useVats();
 
-  const defaultVat = taxRates?.find((tR) => tR.isDefault);
-
   const [paymentTermToEdit, setPaymentTermToEdit] = useState<
     ContractTermView | undefined
   >(undefined);
@@ -152,10 +156,12 @@ export const DraftQuotation = ({
 
   const [openResumeProgressDialog, setOpenResumeProgressDialog] =
     useState(false);
+  const [resumeCheckDone, setResumeCheckDone] = useState(false);
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
   const [initialLocalStorage, setInitialLocalStorage] = useState<
     Partial<QuotationFormData | null>
   >({});
+  const skipInitialCustomerSelect = useRef(true);
   const [pageState, setPageState] = useState('FRESH_NEW');
 
   const [queryParams, setQueryParams] = useSearchParams();
@@ -363,7 +369,13 @@ export const DraftQuotation = ({
     formState: {errors},
   } = formMethods;
 
-  const watchedItems = watch('items');
+  const watchedAllItems = useWatch({control, name: 'items', defaultValue: []});
+
+  const prevItemsRef = useRef<EditableQuotationItem[]>(watchedAllItems);
+  const prevVatMapRef = useRef<Record<string, number>>({});
+
+  const watchedItems = watch('items') || [];
+  const watchedDiscount = watch('discount');
   const watchedSubject = watch('subject');
   const watchedDescription = watch('description');
   const watchedNotes = watch('notes');
@@ -415,7 +427,7 @@ export const DraftQuotation = ({
 
         setQuotationAmountDetail(detail);
       } catch (error) {
-        showError(error);
+        Sentry.captureException(error);
       }
     }, 300),
     [calculateQuotationAmount, currentCurrency, setValue, getValues, pageState],
@@ -423,7 +435,7 @@ export const DraftQuotation = ({
 
   useEffect(() => {
     recalcQuotation();
-  }, [recalcQuotation]);
+  }, [recalcQuotation, watchedItems, watchedDiscount]);
 
   const amountAfterGlobalDiscount =
     quotationAmountDetail?.amountAfterGlobalDiscount;
@@ -590,8 +602,29 @@ export const DraftQuotation = ({
     );
   };
 
+  const appendCustomerLegalNote = (customerInfo: PropertyOwnerView) => {
+    const customerLegalNote = customerInfo?.additionalInfo?.vat?.legalNote;
+
+    if (!customerLegalNote) return;
+
+    const currentNotes = getValues('notes');
+
+    if (currentNotes?.includes(customerLegalNote)) return;
+
+    const newNotes = `${currentNotes} ${cleanHtmlContent(
+      `<p>${customerLegalNote}</p>`,
+    )}`;
+    setValue('notes', newNotes);
+  };
+
   const handleSelectCustomer = (row: PropertyOwnerView) => {
     setCustomer(row);
+
+    if (skipInitialCustomerSelect.current) {
+      skipInitialCustomerSelect.current = false;
+    } else {
+      appendCustomerLegalNote(row);
+    }
 
     if (formType === 'new' && row.paymentTerm && pageState === 'FRESH_NEW') {
       setValue(
@@ -974,6 +1007,7 @@ export const DraftQuotation = ({
     if (!quotation && !id) {
       initializeFormDataFromLocalStorage();
     }
+    setResumeCheckDone(true);
   }, []);
 
   useEffect(() => {
@@ -1085,95 +1119,74 @@ export const DraftQuotation = ({
     if (customer && pageState === 'FRESH_NEW') {
       const emptyAddressState = {fullName: null};
 
-      setValue(
-        'beneficiaryAddress',
-        hasAddressValues(unit?.additionalInfo.beneficiaryAddress?.component!)
-          ? unit?.additionalInfo.beneficiaryAddress
-          : customer.beneficiaryAddress || emptyAddressState,
-      );
+      if (
+        !watchedBeneficiaryAddress ||
+        watchedBeneficiaryAddress.fullName === null
+      ) {
+        setValue(
+          'beneficiaryAddress',
+          hasAddressValues(unit?.additionalInfo.beneficiaryAddress?.component!)
+            ? unit?.additionalInfo.beneficiaryAddress
+            : customer.beneficiaryAddress || emptyAddressState,
+        );
+      }
 
-      setValue(
-        'billingAddress',
-        hasAddressValues(unit?.additionalInfo.billingAddress?.component!)
-          ? unit?.additionalInfo.billingAddress
-          : customer.billingAddress || emptyAddressState,
-      );
+      if (!watchedBillingAddress || watchedBillingAddress.fullName === null) {
+        setValue(
+          'billingAddress',
+          hasAddressValues(unit?.additionalInfo.billingAddress?.component!)
+            ? unit?.additionalInfo.billingAddress
+            : customer.billingAddress || emptyAddressState,
+        );
+      }
 
-      setValue(
-        'alternativeAddress',
-        customer.otherAddress || emptyAddressState,
-      );
-
-      const customerLegalNote = customer?.additionalInfo?.vat?.legalNote;
-      if (customerLegalNote) {
-        const currentNotes = getValues('notes');
-        const newNotes = `${currentNotes} ${cleanHtmlContent(
-          `<p>${customerLegalNote}</p>`,
-        )}`;
-        setValue('notes', newNotes);
+      if (
+        !watchedAlternativeAddress ||
+        watchedAlternativeAddress.fullName === null
+      ) {
+        setValue(
+          'alternativeAddress',
+          customer.otherAddress || emptyAddressState,
+        );
       }
     }
   }, [customer, pageState, unit]);
 
   useEffect(() => {
-    const oldItems = getValues('items');
-    const currentNotes = getValues('notes');
+    const currentVatMap = watchedAllItems.reduce<Record<string, number>>(
+      (map, item) => {
+        const itemId = item.id!;
+        map[itemId] = item.unitAmount?.percentageVat ?? 0;
+        return map;
+      },
+      {},
+    );
+
+    const vatChanged = watchedAllItems.some((item) => {
+      const newVatId = item.id!;
+      return (prevVatMapRef.current[newVatId] ?? 0) !== currentVatMap[newVatId];
+    });
+
+    if (!vatChanged) return;
+
+    const oldItems = prevItemsRef.current;
+    const newItems = watchedAllItems;
+    const currentNotes = getValues('notes') ?? '';
 
     const newNotes = syncVatLegalNotesWithNotes({
       oldArticles: oldItems,
-      newArticles: watch('items'),
-      currentNotes: currentNotes || '',
+      newArticles: newItems,
+      currentNotes,
       taxRates,
     });
-    setValue('notes', newNotes);
-  }, [watch('items')]);
 
-  useEffect(() => {
-    // Check if we are creating a new quotation and we're starting fresh
-    const newIndex = getValues('items').length;
-    const defaultSeqNumber = (newIndex + 1).toString();
-
-    const defaultProps = {
-      netAmount: 0,
-      currency: currentCurrency.code,
-      percentageVat: defaultVat?.percentage,
-      vatId: defaultVat?.id,
-      vatName: defaultVat?.name,
-    };
-
-    const newItem: EditableQuotationItem = {
-      id: getUniqueId(),
-      userSeqNumber: defaultSeqNumber,
-      name: '',
-      quantity: 1,
-      unitAmount: defaultProps,
-      unitPurchaseAmount: defaultProps,
-      article: {
-        type: ArticleType.OTHER,
-        unit: 'kg',
-        unitSellingAmount: defaultProps,
-        unitPurchaseAmount: defaultProps,
-        name: '',
-        externalId: '',
-      },
-      subItems: [],
-      description: '',
-      discount: {
-        type: DiscountType.PERCENTAGE,
-        percentage: 0,
-      },
-      subItemsConfig: {subItemsVisible: false, priceVisible: false},
-    };
-
-    if (
-      formType === 'new' &&
-      pageState === 'FRESH_NEW' &&
-      !quotation &&
-      (!getValues('items') || getValues('items').length === 0)
-    ) {
-      setValue('items', [newItem]);
+    if (newNotes && newNotes !== currentNotes) {
+      setValue('notes', newNotes);
     }
-  }, [formType, pageState]);
+
+    prevVatMapRef.current = currentVatMap;
+    prevItemsRef.current = newItems;
+  }, [watchedAllItems, taxRates]);
 
   useEffect(() => {
     async function checkExternalId() {
@@ -1572,8 +1585,10 @@ export const DraftQuotation = ({
               render={({field}) => (
                 <RichTextField
                   label="Subject"
-                  html={field.value || ''}
-                  updateHtml={field.onChange}
+                  html={typeof field.value === 'string' ? field.value : ''}
+                  updateHtml={(value) =>
+                    field.onChange(typeof value === 'string' ? value : '')
+                  }
                   onBlur={field.onBlur}
                   helperText={errors.subject?.message}
                   error={!!errors.subject}
@@ -1604,8 +1619,10 @@ export const DraftQuotation = ({
               render={({field}) => (
                 <RichTextField
                   label="Description"
-                  html={field?.value || ''}
-                  updateHtml={field.onChange}
+                  html={typeof field.value === 'string' ? field.value : ''}
+                  updateHtml={(value) =>
+                    field.onChange(typeof value === 'string' ? value : '')
+                  }
                   onBlur={field.onBlur}
                   helperText={errors.description?.message}
                   error={!!errors.description}
@@ -1642,6 +1659,10 @@ export const DraftQuotation = ({
                 formMethods={formMethods}
                 quotationAmountDetail={quotationAmountDetail}
                 onRecalcQuotation={recalcQuotation}
+                formType={formType}
+                resumeDialogOpen={openResumeProgressDialog}
+                resumeCheckDone={resumeCheckDone}
+                quotation={quotation}
               />
             </Box>
           </Grid>
@@ -1658,8 +1679,10 @@ export const DraftQuotation = ({
               render={({field}) => (
                 <RichTextField
                   label={notesText}
-                  html={watchedNotes || ''}
-                  updateHtml={field.onChange}
+                  html={typeof field.value === 'string' ? field.value : ''}
+                  updateHtml={(value) =>
+                    field.onChange(typeof value === 'string' ? value : '')
+                  }
                   onBlur={field.onBlur}
                   helperText={errors.notes?.message}
                   error={!!errors.notes}
@@ -1690,8 +1713,10 @@ export const DraftQuotation = ({
               render={({field}) => (
                 <RichTextField
                   label="Payment terms"
-                  html={watchedPaymentTerms || ''}
-                  updateHtml={field.onChange}
+                  html={typeof field.value === 'string' ? field.value : ''}
+                  updateHtml={(value) =>
+                    field.onChange(typeof value === 'string' ? value : '')
+                  }
                   onBlur={field.onBlur}
                   helperText={errors.paymentTerms?.message}
                   error={!!errors.paymentTerms}

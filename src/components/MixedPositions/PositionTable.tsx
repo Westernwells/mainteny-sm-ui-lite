@@ -13,6 +13,7 @@ import {
   EditableQuotationItem,
   EditableQuotationSubItemRecord,
   QuotationAmountDetail,
+  QuotationView,
 } from 'models/quotation';
 import {Add} from '@mui/icons-material';
 import TableContainer from 'components/Table/TableContainer';
@@ -37,11 +38,12 @@ import {
 import {extractClosestEdge} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {DiscountType} from 'models/invoice';
-import SubPositionRow from './SubPositionRow';
-import MainPositionRow from './MainPositionRow';
 import MarginDetails from './MarginDetails';
 import SubPositionFooter from './SubPositionFooter';
 import DiscountPanel from './DiscountPanel';
+import NewSubPositionRow from './NewSubPositionRow';
+import NewMainPositionRow from './NewMainPosition';
+import {dialogPaperStyles} from './MixedPositions.styles';
 
 export interface EditableRowType {
   index: number;
@@ -58,12 +60,20 @@ interface Props {
   formMethods: UseFormReturn<QuotationFormData>;
   onRecalcQuotation: () => void;
   quotationAmountDetail?: QuotationAmountDetail;
+  formType?: string;
+  resumeDialogOpen?: boolean;
+  resumeCheckDone?: boolean;
+  quotation?: QuotationView;
 }
 
 const PositionTable = ({
   formMethods,
   onRecalcQuotation,
   quotationAmountDetail,
+  formType,
+  resumeDialogOpen,
+  resumeCheckDone,
+  quotation,
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -115,8 +125,6 @@ const PositionTable = ({
     control: descriptionControl,
     name: 'description',
   });
-
-  const prevSeqNumbersRef = useRef<Record<number, string>>({});
 
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
@@ -255,9 +263,6 @@ const PositionTable = ({
   };
 
   const handleAddNewPosition = () => {
-    const newIndex = fields.length;
-    const defaultSeqNumber = (newIndex + 1).toString();
-
     const defaultProps = {
       netAmount: 0,
       currency: currentCurrency.code,
@@ -268,7 +273,6 @@ const PositionTable = ({
 
     const newItem: EditableQuotationItem = {
       id: getUniqueId(),
-      userSeqNumber: defaultSeqNumber,
       name: '',
       quantity: 1,
       unitAmount: defaultProps,
@@ -291,11 +295,6 @@ const PositionTable = ({
     };
 
     append(newItem);
-    setEditableMixedRow({
-      index: newIndex,
-      field: `items.${newIndex}.name`,
-      values: newItem,
-    });
   };
 
   const handleAddSubPosition = (parentIndex: number) => {
@@ -482,6 +481,12 @@ const PositionTable = ({
                   subItems.splice(subIndex, 0, movedItem);
                   itemsCopy[index].subItems = subItems;
                   update(index, itemsCopy[index]);
+                  itemsCopy[index].subItems?.forEach((_, j) => {
+                    setValue(
+                      `items.${index}.subItems.${j}.userSeqNumber`,
+                      `${index + 1}.${j + 1}` as any,
+                    );
+                  });
                 }
               },
             }),
@@ -494,26 +499,18 @@ const PositionTable = ({
   }, [fields, expandedRows, watchedItems]);
 
   useEffect(() => {
-    watchedItems?.forEach(
-      (mainItem: EditableQuotationItem, mainIndex: number) => {
-        const prevSeq = prevSeqNumbersRef.current[mainIndex];
-
-        if (prevSeq && prevSeq !== mainItem.userSeqNumber) {
-          mainItem.subItems?.forEach((subItem, subIndex) => {
-            const defaultOldSubSeq = `${prevSeq}.${subIndex + 1}`;
-            if (subItem.userSeqNumber === defaultOldSubSeq) {
-              const newSubSeq = `${mainItem.userSeqNumber}.${subIndex + 1}`;
-              setValue(
-                `items.${mainIndex}.subItems.${subIndex}.userSeqNumber`,
-                newSubSeq,
-              );
-            }
-          });
-        }
-        prevSeqNumbersRef.current[mainIndex] = mainItem.userSeqNumber ?? '';
-      },
-    );
-  }, [watchedItems, setValue]);
+    if (!resumeCheckDone) return;
+    if (resumeDialogOpen) return;
+    if (formType !== 'new' || quotation) return;
+    if (
+      resumeCheckDone &&
+      !resumeDialogOpen &&
+      !quotation &&
+      watchedItems.length === 0
+    ) {
+      handleAddNewPosition();
+    }
+  }, [resumeCheckDone, resumeDialogOpen, quotation, watchedItems.length]);
 
   return (
     <>
@@ -539,7 +536,7 @@ const PositionTable = ({
                     padding: '0px',
                     background: '#f7f9fc',
                   }}>
-                  <MainPositionRow
+                  <NewMainPositionRow<QuotationFormData>
                     item={item}
                     index={index}
                     formMethods={formMethods}
@@ -559,8 +556,9 @@ const PositionTable = ({
                     }
                     hoveredMainRowIndex={hoveredMainRowIndex}
                     setHoveredMainRowIndex={setHoveredMainRowIndex}
-                    onRecalcQuotation={onRecalcQuotation}
-                    quotationAmountDetail={quotationAmountDetail}
+                    onRecalc={onRecalcQuotation}
+                    amountDetail={quotationAmountDetail}
+                    propertyOwnerId={watch('propertyOwnerId')}
                   />
                 </TableRow>
 
@@ -572,7 +570,7 @@ const PositionTable = ({
                           <TableRow
                             key={`${item.id}-${index}-${subIndex}`}
                             testId={`sub-row-${index}-${subIndex}`}>
-                            <SubPositionRow
+                            <NewSubPositionRow<QuotationFormData>
                               parentIndex={index}
                               subIndex={subIndex}
                               subItem={subItem}
@@ -587,8 +585,8 @@ const PositionTable = ({
                               showLeftShadow={showLeftShadow}
                               hoveredSubRowIndex={hoveredSubRowIndex}
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
-                              onRecalcQuotation={onRecalcQuotation}
-                              quotationAmountDetail={quotationAmountDetail}
+                              onRecalc={onRecalcQuotation}
+                              propertyOwnerId={watch('propertyOwnerId')}
                             />
                           </TableRow>
                         ),
@@ -636,7 +634,7 @@ const PositionTable = ({
           amountBeforeGlobalDiscountFormatted
         }
         amountBeforeGlobalDiscount={amountBeforeGlobalDiscountInMoney}
-        onRecalcQuotation={onRecalcQuotation}
+        onRecalc={onRecalcQuotation}
       />
 
       <MarginDetails
@@ -653,6 +651,7 @@ const PositionTable = ({
         onCancel={() => setDescriptionDialog(null)}
         onSave={handleSaveDescription}
         dialogProps={{
+          maxWidth: 'lg',
           open: !!descriptionDialog,
           disableEscapeKeyDown: true,
           onClose: (event, reason) => {
@@ -664,9 +663,7 @@ const PositionTable = ({
         }}
         sx={{
           '& .MuiDialog-paper': {
-            width: '750px',
-            maxWidth: 'none',
-            padding: '0em',
+            ...dialogPaperStyles,
           },
         }}
         leftButton={

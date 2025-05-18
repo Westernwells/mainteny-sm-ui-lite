@@ -131,8 +131,10 @@ const ServiceInformationReview = ({formikContractServiceComponent}: Props) => {
               {t('Type')}
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
-              {getArticleTypeText(
-                formikContractServiceComponent.values.costType,
+              {t(
+                getArticleTypeText(
+                  formikContractServiceComponent.values.costType,
+                ),
               ) || '-'}
             </Typography>
           </Box>

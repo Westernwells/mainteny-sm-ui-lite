@@ -260,7 +260,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
       <WorkReportTemplate
         pdfConfigClientStorage={pdfConfig}
         userInfo={user?.userAccount}
-        selectedLng={company?.language}
         translate={translate}
         serviceOrder={serviceOrder}
         report={report}

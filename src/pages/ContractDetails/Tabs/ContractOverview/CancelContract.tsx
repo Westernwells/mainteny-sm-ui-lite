@@ -28,7 +28,7 @@ export const CancelContract: FC<Props> = ({
 
   return (
     <Dialog
-      title="Cancel Contract"
+      title="Cancel contract"
       isSaving={isLoading}
       onCancel={() => setCancelContract(false)}
       saveButtonText="Confirm"

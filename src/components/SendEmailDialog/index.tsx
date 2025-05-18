@@ -203,7 +203,7 @@ export const SendEmailDialog = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
       fullWidth
-      maxWidth="md"
+      maxWidth="lg"
       PaperProps={{
         sx: {
           padding: '1.5rem',
@@ -227,6 +227,13 @@ export const SendEmailDialog = ({
             freeSolo
             onKeyDown={handleKeyDown}
             disableClearable
+            filterOptions={(options, {inputValue}) =>
+              options.filter((o) => {
+                const text =
+                  `${o.userAccount?.firstName} ${o.userAccount?.lastName} ${o.userAccount?.contact?.email}`.toLowerCase();
+                return text.includes(inputValue?.toLowerCase());
+              })
+            }
             queryFn={(params) =>
               fetchServiceCompanyContactPersons(serviceCompanyId, {
                 ...params,

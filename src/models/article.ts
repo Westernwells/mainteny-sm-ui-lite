@@ -1,4 +1,3 @@
-import {convertToText} from '../utils/utils';
 import {FileResource, FileResourceRecord} from './media';
 import {
   Amount,
@@ -15,12 +14,10 @@ import {
   ArticleSupplierView,
   SupplierRecord,
 } from './supplier';
-import {
-  ServiceOrderArticleOwnerType,
-  ServiceOrderArticleView,
-} from './service-order';
+import {ServiceOrderArticleOwnerType} from './service-order';
 import {ArticleInfoRecord, SubItemsConfig} from './quotation';
 import {Discount} from './invoice';
+import {TagRecord} from 'models/tag';
 
 export enum ArticleType {
   LABOR = 'LABOR',
@@ -73,6 +70,7 @@ export interface ArticleAdditionalInfo {
   pictures?: FileResource[];
   documents?: FileResource[];
   contractName?: string;
+  tags?: TagRecord[];
 }
 
 export interface ArticleView {
@@ -157,6 +155,7 @@ export interface UpdateArticleRecord {
   costPackage?: CostPackage;
   pictures?: {description: string; type: string; uri: string}[];
   contractName?: string;
+  tags?: string[];
 }
 
 export interface QueryArticleParams {
@@ -194,36 +193,6 @@ export interface ArticleSupplierItemView {
   number: string;
   isPreferred?: boolean;
   additionalInfo: string;
-}
-
-export interface ServiceOrderArticleRecord {
-  articleId?: string;
-  name: string;
-  description?: string;
-  quantity: number;
-  unitAmount: AmountRecord;
-  unitPurchaseAmount?: AmountRecord;
-  article?: ArticleInfoRecord;
-  ownerType?: ServiceOrderArticleOwnerType;
-  discount?: Discount;
-  owner?: {
-    id: string;
-    name: string;
-  };
-  subArticlesConfig?: SubItemsConfig;
-  subArticles?: ServiceOrderSubArticleRecord[];
-  userSeqNumber?: string;
-}
-
-export interface ServiceOrderSubArticleRecord {
-  articleId?: string;
-  article?: ArticleInfoRecord;
-  name: string;
-  description?: string;
-  quantity: number;
-  unitAmount: AmountRecord;
-  unitPurchaseAmount?: AmountRecord;
-  userSeqNumber?: string;
 }
 export interface ArticleOrderItemRecord {
   articleId: string;
@@ -323,17 +292,17 @@ export interface ArticleRecord {
 // used in job details section
 export type ArticleSectionTableRow = {
   id: string;
-  no: number;
+  userSeqNumber: string;
   number: string;
   name: string;
-  description: string;
-  unit: string;
-  total: string;
-  unitPrice: string;
+  description?: string;
+  type: ArticleType;
+  unit?: string;
+  total?: string;
+  unitAmount: string;
+  unitPurchaseAmount: string;
   quantity: number;
-  percent: string;
-  navigateTo: string;
-  article: ServiceOrderArticleView;
+  article?: ArticleInfoRecord;
   ownerName: string;
   ownerType: ServiceOrderArticleOwnerType;
   contractNumber?: string;
@@ -350,6 +319,7 @@ export type ArticleTableRow = {
   type: ArticleType;
   unit: string;
   price: string;
+  tags: TagRecord[];
 };
 
 export type ArticleStatistics = {
@@ -420,6 +390,7 @@ export interface MixedPositionFormValues {
   description: string;
   unit: string;
 }
+
 export interface SubPositionFormValues extends MixedPositionFormValues {
   id: string;
   type: ArticleType;
@@ -520,6 +491,7 @@ export interface UpdateArticleSubAssociationBody {
   costPackage?: CostPackage;
   contractName?: string;
 }
+
 export interface UpdateArticleSubAssociationRecord {
   article: UpdateArticleSubAssociationBody;
   quantity?: number;

@@ -29,31 +29,43 @@ const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
       display: 'flex',
       flexWrap: 'wrap',
     },
-    col2Left: {
+    col6Left: {
       width: '6%',
       wordBreak: 'break-all',
       whiteSpace: 'pre-wrap',
       textAlign: 'left',
       color: secondaryColor,
     },
-    col40Left: {
+    col37Left: {
       width: '37%',
       textAlign: 'left',
       color: secondaryColor,
     },
-    col10Right: {
-      width: '10%',
+    col12Right: {
+      width: '12%',
       textAlign: 'right',
       color: secondaryColor,
+    },
+    col8Right: {
+      width: '8%',
+      textAlign: 'right',
+      color: secondaryColor,
+      paddingRight: 3,
     },
     col8Center: {
       width: '8%',
       textAlign: 'center',
-      marginLeft: 10,
+      paddingLeft: 8,
       color: secondaryColor,
     },
-    col15Right: {
-      width: '13%',
+    col12Left: {
+      width: '12%',
+      textAlign: 'left',
+      paddingLeft: 8,
+      color: secondaryColor,
+    },
+    col11Right: {
+      width: '11%',
       textAlign: 'right',
       color: secondaryColor,
     },
@@ -62,11 +74,13 @@ const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
 type Props = {
   translate: (key: string, options?: {context: string}) => string;
   currentCurrency?: Currency;
+  showDiscountCol?: boolean;
 } & Pick<ContextProps, 'primaryColor' | 'secondaryColor'>;
 
 const ArticleTableHeader = ({
   translate,
   currentCurrency,
+  showDiscountCol,
   primaryColor,
   secondaryColor,
 }: Props) => {
@@ -75,33 +89,37 @@ const ArticleTableHeader = ({
     secondaryColor,
   });
 
+  const priceWidth = showDiscountCol ? styles.col12Right.width : '18.5%';
+
   return (
     <View style={styles.tableHead}>
       <View style={styles.tableRow}>
-        <View style={[styles.col2Left]}>
+        <View style={[styles.col6Left]}>
           <Text style={[styles.tableHeading]}>#</Text>
         </View>
-        <View style={[styles.col40Left]}>
+        <View style={[styles.col37Left]}>
           <Text style={[styles.tableHeading]}>{translate('Name')}</Text>
         </View>
-        <View style={[styles.col10Right]}>
+        <View style={[styles.col8Right]}>
           <Text style={[styles.tableHeading]}>{translate('Quantity')}</Text>
         </View>
-        <View style={[styles.col8Center]}>
+        <View style={[styles.col12Left]}>
           <Text style={[styles.tableHeading]}>{translate('Unit')}</Text>
         </View>
-        <View style={[styles.col15Right]}>
+        <View style={[styles.col11Right, {width: priceWidth}]}>
           <Text style={[styles.tableHeading]}>
             {`${translate('Price')} (${
               getCurrencySymbol[currentCurrency?.code!]
             })`}
           </Text>
         </View>
-        <View style={[styles.col10Right]}>
-          <Text style={[styles.tableHeading]}>{translate('Discount')}</Text>
-        </View>
+        {showDiscountCol && (
+          <View style={[styles.col12Right]}>
+            <Text style={[styles.tableHeading]}>{translate('Discount')}</Text>
+          </View>
+        )}
 
-        <View style={[styles.col15Right]}>
+        <View style={[styles.col12Right, {width: priceWidth}]}>
           <Text style={[styles.tableHeading]}>
             {`${translate('Total')} (${
               getCurrencySymbol[currentCurrency?.code!]

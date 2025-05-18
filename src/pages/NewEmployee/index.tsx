@@ -8,6 +8,7 @@ import {
   useQueryUserAccounts,
 } from 'hooks/reactQuery/useUserAccount';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
+import {useCompanyJobTypes} from 'hooks/reactQuery/useCompanies';
 import {
   BasicEmployeeFormModel,
   CreateEmployeeAccountData,
@@ -32,6 +33,10 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
   const {addEmployeeAccount} = useEmployeeAccount();
 
   const {user} = useUserSession();
+  const {refetch: fetchJobTypes} = useCompanyJobTypes(
+    user?.userAccount.serviceCompany.id!,
+    false,
+  );
 
   const [activeStep, setActiveStep] = useState(0);
   const [disableNextBtn, setDisableNextBtn] = useState(false);
@@ -120,9 +125,20 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
   };
 
   const addNewEmployee = async () => {
+    setDisableNextBtn(true);
+    const roles = getRoles(roleEmployeeFormValues.roles[0]);
+    const allServiceOrderTypes = await fetchJobTypes();
+
+    // enable all service order types for technicians and contractors
+    const serviceOrderTypes = roles.some(
+      (role) => role === Role.TECHNICIAN || role === Role.CONTRACTOR,
+    )
+      ? allServiceOrderTypes.data?.map((jobType) => jobType.name)
+      : undefined;
+
     const body: CreateEmployeeAccountData = {
       phone: basicEmployeeFormValues.phone,
-      roles: getRoles(roleEmployeeFormValues.roles[0]),
+      roles,
       address: basicEmployeeFormValues.address,
       lastName: basicEmployeeFormValues.lastName,
       firstName: basicEmployeeFormValues.firstName,
@@ -136,9 +152,11 @@ export const NewEmployee = ({getCurrentPageTitle}: Props) => {
       serviceCompanyId: user!.userAccount.serviceCompany.id,
       totalYearlyVacationDaysAllowed:
         basicEmployeeFormValues.totalYearlyVacationDaysAllowed,
+      serviceOrderTypes,
     };
 
     addEmployeeAccount(body, () => {
+      setDisableNextBtn(false);
       navigate('/employees?pageIndex=1&pageSize=25');
     });
   };

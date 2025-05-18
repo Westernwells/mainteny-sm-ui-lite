@@ -114,7 +114,7 @@ export const ServiceForm = ({
               fieldProps={{
                 label: 'Required time',
                 name: 'serviceTime',
-                placeholder: t('e.g. 45 (in minutes)'),
+                placeholder: 'e.g. 45 (in minutes)',
                 type: 'number',
                 inputProps: {min: 0},
                 value: formik.values.serviceTime,

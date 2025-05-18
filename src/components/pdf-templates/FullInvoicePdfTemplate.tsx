@@ -17,6 +17,7 @@ import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
   buildInvoicePayment,
   getFormattedPaymentValues,
+  hasAlternativeAddress,
   replacePaymentTermsPlaceholders,
 } from 'utils/invoice';
 import {ArticleType} from 'models/article';
@@ -241,25 +242,23 @@ const FullInvoicePdfTemplate = ({
 
   return (
     <Document>
-      {invoice?.additionalInfo.alternativeAddress &&
-        Object.keys(invoice?.additionalInfo.alternativeAddress!).length !== 0 &&
-        !!invoice?.additionalInfo.alternativeAddress.component?.name && (
-          <AlternativeAddressTemplate
-            userInfo={userInfo}
-            translate={translate}
-            headerInfo={headerInfo}
-            headerPath={headerPath}
-            footerInfo={footerInfo}
-            footerPath={footerPath}
-            alternativeServiceCompanyInfo={
-              invoice?.additionalInfo.alternativeServiceCompanyInfo
-            }
-            alternativeAddress={invoice?.additionalInfo.alternativeAddress}
-            fontStyles={fontStyles}
-            primaryColor={primaryColor}
-            secondaryColor={secondaryColor}
-          />
-        )}
+      {hasAlternativeAddress(invoice?.additionalInfo?.alternativeAddress) && (
+        <AlternativeAddressTemplate
+          userInfo={userInfo}
+          translate={translate}
+          headerInfo={headerInfo}
+          headerPath={headerPath}
+          footerInfo={footerInfo}
+          footerPath={footerPath}
+          alternativeServiceCompanyInfo={
+            invoice?.additionalInfo.alternativeServiceCompanyInfo
+          }
+          alternativeAddress={invoice?.additionalInfo.alternativeAddress}
+          fontStyles={fontStyles}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
+        />
+      )}
 
       <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
         <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
@@ -299,14 +298,13 @@ const FullInvoicePdfTemplate = ({
               value={invoice?.subject}
               fontStyles={fontStyles}
               primaryColor={primaryColor}
-              selectedLng={selectedLng}
             />
 
             {invoice?.description.trim() !== '' && (
               <HtmlPDF
                 html={invoice?.description || ''}
                 rootStyle={styles.contentBody}
-                selectedLng={selectedLng}
+                fontStyles={fontStyles}
               />
             )}
 
@@ -335,7 +333,7 @@ const FullInvoicePdfTemplate = ({
                     marginTop: 6,
                     marginBottom: 16,
                   }}
-                  selectedLng={selectedLng}
+                  fontStyles={fontStyles}
                 />
               </View>
             )}
@@ -361,7 +359,7 @@ const FullInvoicePdfTemplate = ({
                       marginTop: 6,
                       marginBottom: 16,
                     }}
-                    selectedLng={selectedLng}
+                    fontStyles={fontStyles}
                   />
                 </View>
               )}

@@ -6,7 +6,6 @@ import {HtmlPDF} from '../../HtmlPDF';
 
 type Props = {
   value?: string;
-  selectedLng?: string;
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor'>;
 
 const getStyles = ({boldFontStyle, primaryColor}: PdfConfigurationStyles) =>
@@ -20,21 +19,12 @@ const getStyles = ({boldFontStyle, primaryColor}: PdfConfigurationStyles) =>
     },
   });
 
-const PdfPageTitleHtml = ({
-  value,
-  fontStyles,
-  primaryColor,
-  selectedLng,
-}: Props) => {
+const PdfPageTitleHtml = ({value, fontStyles, primaryColor}: Props) => {
   const styles = getStyles({boldFontStyle: fontStyles.bold, primaryColor});
 
   if (value && value.trim() !== '')
     return (
-      <HtmlPDF
-        html={value || ''}
-        rootStyle={styles}
-        selectedLng={selectedLng}
-      />
+      <HtmlPDF html={value || ''} rootStyle={styles} fontStyles={fontStyles} />
     );
 };
 

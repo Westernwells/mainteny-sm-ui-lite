@@ -120,7 +120,7 @@ export const EditContactForm = ({formik}: Props) => {
             id: 'email',
             name: 'userAccount.contact.email',
             label: 'Email',
-            placeholder: 'e.g johndoe@example.com',
+            placeholder: 'e.g. johndoe@example.com',
             value: email,
             helperText: emailHelperText,
             error: !!emailHelperText,

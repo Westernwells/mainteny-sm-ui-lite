@@ -32,6 +32,7 @@ export const formatCreateEmployeeAccountData = (
     externalId: data.employeeId || '',
     workingHours: [], // pass additional data to BE not included in the form
     totalYearlyVacationDaysAllowed: data?.totalYearlyVacationDaysAllowed,
+    serviceOrderTypes: data?.serviceOrderTypes || [],
   };
 
   if (employee.team === '') {

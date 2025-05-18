@@ -41,10 +41,10 @@ const TableContainer = ({
         overflow: showNoMatchWarning ? undefined : 'auto',
         height: 'fill-available',
       }}
-      date-testid="table-scroll-div-container">
+      data-testid="table-scroll-div-container">
       <Table
         stickyHeader
-        date-testid="table-container"
+        data-testid="table-container"
         sx={{...tableLayoutStyles}}>
         {children}
       </Table>

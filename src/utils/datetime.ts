@@ -1,5 +1,6 @@
 import {
   addDays,
+  differenceInDays,
   endOfWeek,
   format,
   formatDistance,
@@ -8,12 +9,14 @@ import {
   isAfter,
   isToday,
   isTomorrow,
+  isValid,
   isYesterday,
   Locale,
   parseISO,
   set,
   startOfMonth,
   startOfWeek,
+  subDays,
   subWeeks,
 } from 'date-fns';
 import {useTranslation} from 'react-i18next';
@@ -376,4 +379,23 @@ export const getMonthNumberFromDate = (date?: Date | null) => {
   if (!date) return undefined;
 
   return date.getMonth() + 1;
+};
+
+export const getPastDateRange = (dateFrom?: string, dateTo?: string) => {
+  if (!dateFrom || !dateTo) return {pastFrom: undefined, pastTo: undefined};
+
+  const from = parseISO(dateFrom);
+  const to = parseISO(dateTo);
+
+  if (!isValid(from) || !isValid(to))
+    return {pastFrom: undefined, pastTo: undefined};
+
+  const diff = differenceInDays(to, from);
+  const pastTo = subDays(from, 1);
+  const pastFrom = subDays(pastTo, diff);
+
+  return {
+    pastFrom: format(pastFrom, 'yyyy-MM-dd'),
+    pastTo: format(pastTo, 'yyyy-MM-dd'),
+  };
 };

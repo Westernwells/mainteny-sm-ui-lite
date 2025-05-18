@@ -3,17 +3,24 @@ import _ from 'lodash';
 import {EmployeesSimpleView} from 'models/employee';
 import {StatusColor} from 'models/status';
 import {getAddressString} from 'utils/address';
+import {ArticleType} from 'models/article';
+import {Discount, DiscountType} from 'models/invoice';
+import {AmountRecord, Currency} from 'models/misc';
 import {
   AUTO_GENERATED_TO_PAYMENT_STATUS,
   DateCellParts,
+  EditableServiceOrderItem,
+  NewServiceOrderItemRecord,
   SearchParameters,
   SERVICE_ORDER_PAYMENT_STATUS_VIEW,
+  ServiceOrderArticleRecord,
   ServiceOrderArticleView,
   ServiceOrderPaymentStatus,
   ServiceOrderPaymentWithIndicationStatus,
   ServiceOrderReportTimeRecord,
   ServiceOrderReportView,
   ServiceOrderStatus,
+  ServiceOrderSubArticleRecord,
   ServiceOrderTableRow,
   ServiceOrderType,
   ServiceOrderTypeRecord,
@@ -21,6 +28,7 @@ import {
   statusLabelMap,
 } from '../models/service-order';
 import {formatDate, toDate, toRestDateTime} from './datetime';
+import {moneyToCents} from './currency';
 
 export const getServiceOrderStatusColor = (status: ServiceOrderStatus) => {
   switch (status) {
@@ -562,4 +570,270 @@ export function getServiceOrderDateParts(
     : null;
 
   return {label, date};
+}
+export const serviceOrderItemToServiceOrderItemRecord = (
+  serviceOrderItem: ServiceOrderArticleView,
+  subItemsMap: Record<string, ServiceOrderSubArticleRecord[]> = {},
+): NewServiceOrderItemRecord => {
+  const record: EditableServiceOrderItem = {
+    id: serviceOrderItem.id,
+    article: {...serviceOrderItem.article, id: serviceOrderItem.article.id!},
+    name: serviceOrderItem.name,
+    description: serviceOrderItem.description,
+    quantity: serviceOrderItem.quantity,
+    unitAmount: serviceOrderItem.unitAmount,
+    unitPurchaseAmount: serviceOrderItem.unitPurchaseAmount,
+    discount: serviceOrderItem?.additionalInfo?.discount
+      ? {
+          ...serviceOrderItem.additionalInfo.discount,
+          type:
+            serviceOrderItem.additionalInfo?.discount?.type ||
+            DiscountType.NONE,
+          amount:
+            serviceOrderItem.additionalInfo?.discount?.amount &&
+            serviceOrderItem.additionalInfo?.discount?.type ===
+              DiscountType.AMOUNT
+              ? {
+                  ...serviceOrderItem.additionalInfo.discount.amount,
+                  value:
+                    (serviceOrderItem.additionalInfo.discount.amount.value ??
+                      0) /
+                    10 **
+                      (serviceOrderItem.additionalInfo.discount.amount
+                        .fractionDigits ?? 2),
+                }
+              : undefined,
+        }
+      : undefined,
+    userSeqNumber: serviceOrderItem?.additionalInfo?.userSeqNumber || undefined,
+    ownerName: serviceOrderItem.additionalInfo?.owner?.name || '',
+    ownerType: serviceOrderItem.ownerType!,
+  };
+
+  // If the article's type is PACKAGE, add a default costPackage if it doesn't exist.
+  if (serviceOrderItem.article?.type === ArticleType.PACKAGE) {
+    if (!serviceOrderItem.article.costPackage) {
+      record.article = {
+        ...record.article,
+        costPackage: {
+          laborPercentage: 50,
+          materialPercentage: 50,
+        },
+      };
+    }
+  }
+
+  if (serviceOrderItem.article?.type === ArticleType.MIX) {
+    const subItems = subItemsMap[serviceOrderItem.id] || [];
+
+    return {
+      ...record,
+      subItems: subItems.map((subItem) => ({
+        parentId: serviceOrderItem.id,
+        id: subItem?.id || '',
+        article: subItem.article,
+        name: subItem.name,
+        description: subItem.description,
+        quantity: subItem.quantity,
+        unitAmount: subItem.unitAmount,
+        unitPurchaseAmount: subItem.unitPurchaseAmount,
+        userSeqNumber: subItem.userSeqNumber || undefined,
+        serviceOrderId: serviceOrderItem.id,
+      })),
+      subItemsConfig: {
+        subItemsVisible:
+          serviceOrderItem.additionalInfo?.subArticlesConfig?.subItemsVisible ||
+          false,
+        priceVisible:
+          serviceOrderItem.additionalInfo?.subArticlesConfig?.priceVisible ||
+          false,
+      },
+    };
+  }
+
+  return record;
+};
+
+export const buildServiceOrderPayload = (
+  items: NewServiceOrderItemRecord[],
+  currentCurrency: Currency,
+  discount?: Discount,
+) => ({
+  articles: items.map((item) => ({
+    id: undefined,
+    article: {
+      id: undefined,
+      name: item.article?.name,
+      externalId: item.article?.externalId,
+      type: item.article?.type,
+      unit: item.article?.unit,
+      unitSellingAmount: item.article?.unitSellingAmount,
+      unitPurchaseAmount: item.article?.unitPurchaseAmount,
+      costPackage: item.article?.costPackage,
+    },
+    name: item.name,
+    description: item.description,
+    unitAmount: {
+      currency: item.unitAmount?.currency || currentCurrency.code,
+      netAmount: Number(item.unitAmount?.netAmount) || 0,
+      percentageVat: item.unitAmount?.percentageVat || 0,
+      vatId: item.unitAmount?.vatId || '',
+      vatName: item.unitAmount?.vatName || '',
+    },
+    quantity: Number(item.quantity) || 0,
+    discount:
+      item.discount?.type === DiscountType.AMOUNT
+        ? {
+            type: DiscountType.AMOUNT,
+            amount: {
+              ...item.discount?.amount,
+              value: (item.discount?.amount?.value ?? 0) * 100,
+              currency: item.discount?.amount?.currency || currentCurrency.code,
+            },
+          }
+        : {
+            type: DiscountType.PERCENTAGE,
+            percentage: item.discount?.percentage || 0,
+          },
+    subItemsConfig: item.subItemsConfig,
+    subArticles: item?.subItems?.map((sub) => ({
+      article: {
+        id: undefined,
+        name: sub.article?.name,
+        externalId: sub.article?.externalId,
+        type: sub.article?.type,
+        unit: sub.article?.unit,
+        unitSellingAmount: sub.article?.unitSellingAmount,
+        unitPurchaseAmount: sub.article?.unitPurchaseAmount,
+        costPackage: sub.article?.costPackage,
+      },
+      id: undefined,
+      name: sub.name,
+      unitPurchaseAmount: sub.unitPurchaseAmount,
+      unitAmount: sub.unitAmount,
+      quantity: sub.quantity,
+      description: sub.description,
+      userSeqNumber: sub.userSeqNumber || undefined,
+    })),
+    userSeqNumber: item.userSeqNumber || undefined,
+  })),
+  globalDiscount:
+    discount?.type === DiscountType.AMOUNT
+      ? {
+          type: DiscountType.AMOUNT,
+          amount: {
+            value: moneyToCents(
+              currentCurrency?.code,
+              discount.amount?.value ?? 0,
+            ),
+            currency: discount.amount?.currency || currentCurrency.code,
+            fractionDigits:
+              discount.amount?.fractionDigits || currentCurrency.fractionDigits,
+          },
+        }
+      : {
+          type: DiscountType.PERCENTAGE,
+          percentage: discount?.percentage || 0,
+        },
+});
+
+export function formatServiceOrderArticles(
+  items: EditableServiceOrderItem[],
+  currentCurrency: Currency,
+): ServiceOrderArticleRecord[] {
+  return items.map((item) => {
+    const makeAmount = (amt?: AmountRecord) => ({
+      netAmount: amt?.netAmount ?? 0,
+      percentageVat: amt?.percentageVat ?? 0,
+      currency: amt?.currency ?? currentCurrency.code,
+      vatId: amt?.vatId || '',
+      vatName: amt?.vatName || '',
+    });
+
+    // normalize any discount you might have
+    const formattedDiscount: Discount | undefined = item.discount
+      ? {
+          ...item.discount,
+          type:
+            item.discount.type === DiscountType.NONE
+              ? DiscountType.PERCENTAGE
+              : item.discount.type,
+          amount:
+            item.discount.type === DiscountType.AMOUNT && item.discount.amount
+              ? {
+                  ...item.discount.amount,
+                  // turn into cents
+                  value:
+                    (item.discount.amount.value ?? 0) *
+                    10 ** (item.discount.amount.fractionDigits ?? 2),
+                  currency: item.discount.amount.currency,
+                }
+              : undefined,
+          percentage:
+            item.discount.type === DiscountType.PERCENTAGE ||
+            item.discount.type === DiscountType.NONE
+              ? item.discount.percentage ?? 0
+              : undefined,
+        }
+      : undefined;
+
+    // build the core record
+    const base: ServiceOrderArticleRecord = {
+      article: item.article && {
+        id:
+          item.article.id && item.article.id.length > 8
+            ? item.article.id
+            : undefined,
+        name: item.article.name,
+        externalId: item.article.externalId,
+        type: item.article.type,
+        unit: item.article.unit,
+        costPackage: item.article.costPackage,
+        unitSellingAmount: makeAmount(item.article.unitSellingAmount),
+        unitPurchaseAmount:
+          item.article.unitPurchaseAmount &&
+          makeAmount(item.article.unitPurchaseAmount),
+      },
+      name: item.name,
+      description: item.description,
+      quantity: item.quantity,
+      unitPurchaseAmount:
+        item.unitPurchaseAmount && makeAmount(item.unitPurchaseAmount),
+      unitAmount: makeAmount(item.unitAmount),
+      discount: formattedDiscount,
+      subArticlesConfig: item.subItemsConfig,
+      userSeqNumber: item.userSeqNumber ?? undefined,
+    };
+
+    // if there are sub‑items, format those too
+    if (Array.isArray(item.subItems) && item.subItems.length) {
+      base.subArticles = item?.subItems?.map(
+        (sub) =>
+          ({
+            article: sub.article && {
+              id:
+                sub.article.id && sub.article.id.length > 8
+                  ? sub.article.id
+                  : undefined,
+              name: sub.article.name,
+              externalId: sub.article.externalId,
+              type: sub.article.type,
+              unit: sub.article.unit,
+              costPackage: sub.article.costPackage,
+              unitSellingAmount: makeAmount(sub.article.unitSellingAmount),
+              unitPurchaseAmount: makeAmount(sub.article.unitPurchaseAmount),
+            },
+            name: sub.name,
+            description: sub.description,
+            quantity: sub.quantity,
+            unitPurchaseAmount:
+              sub.unitPurchaseAmount && makeAmount(sub.unitPurchaseAmount),
+            unitAmount: makeAmount(sub.unitAmount),
+            userSeqNumber: sub.userSeqNumber || undefined,
+          } as ServiceOrderSubArticleRecord),
+      );
+    }
+
+    return base;
+  });
 }

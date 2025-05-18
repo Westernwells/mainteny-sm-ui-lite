@@ -1,11 +1,14 @@
 import {StyleSheet} from '@react-pdf/renderer';
 import {PdfConfigurationStyles} from 'models/pdfs';
 
-export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
+export const getStyles = ({
+  boldFontStyle,
+  primaryColor,
+}: PdfConfigurationStyles) =>
   StyleSheet.create({
     dataBody: {
       borderBottom: '1px solid #212121',
-      paddingBottom: 10,
+      paddingBottom: 5,
     },
     table: {
       width: '100%',
@@ -29,16 +32,17 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
       color: primaryColor,
       paddingLeft: 30,
       paddingRight: 5,
-      marginVertical: 2,
+      marginVertical: 3,
+      width: '94%',
     },
-    col2Left: {
+    col6Left: {
       width: '6%',
       wordBreak: 'break-all',
       whiteSpace: 'pre-wrap',
       textAlign: 'left',
       color: primaryColor,
     },
-    col40Left: {
+    col37Left: {
       width: '37%',
       textAlign: 'left',
       color: primaryColor,
@@ -48,13 +52,41 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
       textAlign: 'right',
       color: primaryColor,
     },
+    col12Right: {
+      width: '12%',
+      textAlign: 'right',
+      color: primaryColor,
+    },
+    col11Right: {
+      width: '11.5%',
+      textAlign: 'right',
+      color: primaryColor,
+    },
+    col10Left: {
+      width: '10%',
+      textAlign: 'left',
+      color: primaryColor,
+      paddingLeft: 8,
+    },
+    col12Left: {
+      width: '12%',
+      textAlign: 'left',
+      color: primaryColor,
+      paddingLeft: 8,
+    },
     col8Center: {
       width: '8%',
       textAlign: 'center',
-      marginLeft: 10,
+      paddingLeft: 8,
       color: primaryColor,
     },
-    col15Right: {
+    col8Right: {
+      width: '8%',
+      textAlign: 'right',
+      color: primaryColor,
+      paddingRight: 3,
+    },
+    col13Right: {
       width: '13%',
       textAlign: 'right',
       color: primaryColor,
@@ -81,7 +113,6 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
     value: {
       width: '24%',
       textAlign: 'right',
-      paddingRight: 5,
     },
     vatContainer: {
       width: '56%',
@@ -89,8 +120,8 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
     vatRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: 4,
+      alignItems: 'flex-start',
+      paddingVertical: 1,
     },
     vatLabel: {
       width: '57%',
@@ -101,6 +132,8 @@ export const getStyles = ({primaryColor}: PdfConfigurationStyles) =>
       width: '43%',
       fontSize: 10,
       textAlign: 'right',
-      paddingRight: 5,
+    },
+    totalInclValue: {
+      ...boldFontStyle,
     },
   });

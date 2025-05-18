@@ -13,7 +13,6 @@ import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
 import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddress';
 import {HtmlPDF} from 'components/HtmlPDF';
-import {stripHtmlTags} from 'pages/InvoiceDetails/utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromQuotation} from 'utils/pdfTemplates';
 import {toSentenceCase} from 'utils/string';
@@ -27,6 +26,10 @@ import AlternativeAddressTemplate from 'components/pdf-templates/AlternativeAddr
 import PdfPageTitle from 'components/pdf-templates/containers/PdfPageTitle';
 import {getStyles} from 'components/pdf-templates/QuotationPdfTemplate/QuotationPdfTemplete.styles';
 import {ServiceCompanyItem} from 'models/service-company';
+import {allItemsHaveZeroDiscount} from 'utils/discount';
+import {hasAlternativeAddress} from 'utils/invoice';
+import {getServiceCompanyInfo} from 'utils/company-utils';
+import {cleanHtml} from 'utils/rich-field-string';
 import ArticleTableHeader from '../ArticleSection/ArticleTableHeader';
 import ArticleSectionFooter from '../ArticleSection/ArticleSectionFooter';
 import {ArticleSectionBody} from '../ArticleSection/ArticleSectionBody';
@@ -134,28 +137,41 @@ const QuotationPdfTemplate = React.memo(
         quotation?.elevator?.additionalInfo?.buildingLocation) ||
       '';
 
+    const showDiscountCol = !allItemsHaveZeroDiscount(quotationItems);
+
+    const serviceCompanyInfo = getServiceCompanyInfo(
+      userInfo,
+      quotation?.additionalInfo?.alternativeServiceCompanyInfo,
+    );
+
+    const {raw: rawPaymentTerm, plain: plainPaymentTerm} = cleanHtml(
+      quotation?.additionalInfo?.paymentTerms,
+    );
+    const {raw: rawNotes, plain: plainNotes} = cleanHtml(
+      quotation?.additionalInfo?.notes,
+    );
+
     return (
       <Document>
-        {quotation?.additionalInfo.alternativeAddress &&
-          Object.keys(quotation?.additionalInfo.alternativeAddress!).length !==
-            0 &&
-          !!quotation?.additionalInfo.alternativeAddress.component?.name && (
-            <AlternativeAddressTemplate
-              userInfo={userInfo}
-              translate={translate}
-              headerInfo={headerInfo}
-              headerPath={headerPath}
-              footerInfo={footerInfo}
-              footerPath={footerPath}
-              alternativeServiceCompanyInfo={
-                quotation?.additionalInfo.alternativeServiceCompanyInfo
-              }
-              alternativeAddress={quotation?.additionalInfo.alternativeAddress}
-              fontStyles={fontStyles}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor}
-            />
-          )}
+        {hasAlternativeAddress(
+          quotation?.additionalInfo?.alternativeAddress,
+        ) && (
+          <AlternativeAddressTemplate
+            userInfo={userInfo}
+            translate={translate}
+            headerInfo={headerInfo}
+            headerPath={headerPath}
+            footerInfo={footerInfo}
+            footerPath={footerPath}
+            alternativeServiceCompanyInfo={
+              quotation?.additionalInfo.alternativeServiceCompanyInfo
+            }
+            alternativeAddress={quotation?.additionalInfo.alternativeAddress}
+            fontStyles={fontStyles}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
+          />
+        )}
 
         <PdfPageContainer fontStyles={fontStyles} primaryColor={primaryColor}>
           <PdfTemplateHeader headerInfo={headerInfo} headerPath={headerPath} />
@@ -164,6 +180,7 @@ const QuotationPdfTemplate = React.memo(
             <TopSectionContainer>
               <PdfTemplateLeftAddress
                 serviceCompany={serviceCompany}
+                serviceCompanyInfo={serviceCompanyInfo}
                 fallbackReceiverName={quotation?.propertyOwner?.name}
                 addressComponent={getAddressComponentFromQuotation(quotation)}
                 translate={translate}
@@ -315,7 +332,6 @@ const QuotationPdfTemplate = React.memo(
                     value={quotation?.subject}
                     fontStyles={fontStyles}
                     primaryColor={primaryColor}
-                    selectedLng={selectedLng}
                   />
                 </View>
               )}
@@ -323,11 +339,12 @@ const QuotationPdfTemplate = React.memo(
               {quotation?.description.trim() !== '' && (
                 <HtmlPDF
                   html={quotation?.description || ''}
-                  selectedLng={selectedLng}
                   rootStyle={{
                     marginTop: 6,
                     marginBottom: 16,
+                    body: fontStyles.regular,
                   }}
+                  fontStyles={fontStyles}
                 />
               )}
 
@@ -344,6 +361,7 @@ const QuotationPdfTemplate = React.memo(
                         currentCurrency={currentCurrency}
                         primaryColor={primaryColor}
                         secondaryColor={secondaryColor}
+                        showDiscountCol={showDiscountCol}
                       />
 
                       <ArticleSectionBody
@@ -353,6 +371,8 @@ const QuotationPdfTemplate = React.memo(
                         selectedLng={selectedLng}
                         translate={translate}
                         primaryColor={primaryColor}
+                        showDiscountCol={showDiscountCol}
+                        fontStyles={fontStyles}
                       />
 
                       <ArticleSectionFooter
@@ -375,30 +395,24 @@ const QuotationPdfTemplate = React.memo(
                 </View>
               )}
 
-              {!!quotation?.additionalInfo?.paymentTerms?.trim() && (
+              {plainPaymentTerm && (
                 <View style={styles.paymentTermsSection}>
                   <Text style={styles.sectionHeading}>
-                    {translate('Payment terms')}{' '}
+                    {translate('Payment terms')}
                   </Text>
-                  <HtmlPDF
-                    html={quotation?.additionalInfo?.paymentTerms || ''}
-                    selectedLng={selectedLng}
-                  />
+                  <HtmlPDF html={rawPaymentTerm} fontStyles={fontStyles} />
                 </View>
               )}
 
-              {!!(
-                quotation?.additionalInfo?.notes &&
-                stripHtmlTags(quotation?.additionalInfo?.notes)
-              ) && (
+              {plainNotes && (
                 <View style={styles.notesSection}>
                   <HtmlPDF
-                    html={quotation?.additionalInfo?.notes || ''}
+                    html={rawNotes}
                     rootStyle={{
                       marginTop: 6,
                       marginBottom: 16,
                     }}
-                    selectedLng={selectedLng}
+                    fontStyles={fontStyles}
                   />
                 </View>
               )}

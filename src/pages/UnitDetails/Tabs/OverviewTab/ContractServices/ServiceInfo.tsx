@@ -172,11 +172,13 @@ const ServiceInformationReview = ({service, elevators}: Props) => {
           <ServicePackageIcon fontSize="1.6rem" />
           <Box sx={{paddingLeft: '1em'}}>
             <Typography variant="body1" color={theme.palette.text.secondary}>
-              Type
+              {t('Type')}
             </Typography>
             <Typography variant="h6" color={theme.palette.text.primary}>
-              {getArticleTypeText(
-                service?.additionalInfo?.costType as ArticleType,
+              {t(
+                getArticleTypeText(
+                  service?.additionalInfo?.costType as ArticleType,
+                ),
               ) || '-'}
             </Typography>
           </Box>

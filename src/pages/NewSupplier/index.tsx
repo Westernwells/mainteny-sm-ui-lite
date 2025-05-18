@@ -240,7 +240,7 @@ const NewSupplier = () => {
               fieldProps={{
                 label: 'Email',
                 name: 'email',
-                placeholder: 'e.g johndoe@example.com',
+                placeholder: 'e.g. johndoe@example.com',
                 required: true,
                 value: formik.values.email,
                 helperText: formik.touched.email && formik.errors.email,

@@ -234,7 +234,7 @@ const OrderArticlePDFPreview = React.memo(
                 <HtmlPDF
                   html={formik?.values?.description || ''}
                   rootStyle={styles.contentBody}
-                  selectedLng={selectedLng}
+                  fontStyles={fontStyles}
                 />
               </View>
 
@@ -322,7 +322,7 @@ const OrderArticlePDFPreview = React.memo(
                             width: '43%',
                             color: '#212121',
                           }}
-                          selectedLng={selectedLng}
+                          fontStyles={fontStyles}
                         />
                         <Text
                           style={{
@@ -395,7 +395,7 @@ const OrderArticlePDFPreview = React.memo(
                         <HtmlPDF
                           html={articleOrderItem?.description || ''}
                           rootStyle={styles.descriptionText}
-                          selectedLng={selectedLng}
+                          fontStyles={fontStyles}
                         />
                       )}
                     </View>

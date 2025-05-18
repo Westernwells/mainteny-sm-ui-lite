@@ -1,7 +1,8 @@
 import {View, Text} from '@react-pdf/renderer';
 import {VatAmount} from 'models/invoice';
 import {ContextProps} from 'context/PdfStylesProvider';
-import {centsToMoney, formatCurrency} from 'utils/currency';
+import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
+import {insertNewlines} from 'utils/pdfTemplates';
 import {getStyles} from './ArticleSection.styles';
 
 type ArticleSectionFooterProps = {
@@ -38,15 +39,18 @@ const ArticleSectionFooter = ({
         <View style={styles.footerRow}>
           <Text style={styles.emptyColumn} />
           <Text style={[styles.label, {color: primaryColor}]}>
-            {translate('Discount')}({currentCurrency?.symbol})
+            {translate('Discount')}({getCurrencySymbol[currentCurrency?.code!]})
           </Text>
           <Text style={styles.value}>
-            {formatCurrency(discountValue || 0, {
-              currency: currentCurrency?.code!,
-              excludeCurrencySymbol: true,
-              currencySymbol: currentCurrency?.symbol,
-              companyLang: selectedLng,
-            })}
+            {insertNewlines(
+              formatCurrency(discountValue || 0, {
+                currency: currentCurrency?.code!,
+                excludeCurrencySymbol: true,
+                currencySymbol: currentCurrency?.symbol,
+                companyLang: selectedLng,
+              }),
+              19,
+            )}
           </Text>
         </View>
       )}
@@ -56,11 +60,13 @@ const ArticleSectionFooter = ({
         <Text style={[styles.label, {color: primaryColor}]}>
           {translate('Subtotal excl. VAT')}
         </Text>
-        <Text style={styles.value}>{amountAfterGlobalDiscountFormatted}</Text>
+        <Text style={styles.value}>
+          {insertNewlines(amountAfterGlobalDiscountFormatted, 19)}
+        </Text>
       </View>
 
       {vats.length > 0 && (
-        <View style={styles.footerRow}>
+        <View>
           <Text style={styles.emptyColumn} />
           <View style={styles.vatContainer}>
             {vats.map((vat, index) => (
@@ -69,14 +75,17 @@ const ArticleSectionFooter = ({
                   {translate('VAT')} {vat.percentageVat}%
                 </Text>
                 <Text style={styles.vatValue}>
-                  {formatCurrency(
-                    centsToMoney(currentCurrency?.code!, vat.vat),
-                    {
-                      currency: currentCurrency?.code!,
-                      excludeCurrencySymbol: true,
-                      currencySymbol: currentCurrency?.symbol,
-                      companyLang: selectedLng,
-                    },
+                  {insertNewlines(
+                    formatCurrency(
+                      centsToMoney(currentCurrency?.code!, vat.vat),
+                      {
+                        currency: currentCurrency?.code!,
+                        excludeCurrencySymbol: true,
+                        currencySymbol: currentCurrency?.symbol,
+                        companyLang: selectedLng,
+                      },
+                    ),
+                    19,
                   )}
                 </Text>
               </View>
@@ -87,11 +96,14 @@ const ArticleSectionFooter = ({
 
       <View style={styles.footerRow}>
         <Text style={styles.emptyColumn} />
-        <Text style={[styles.label, {color: primaryColor}]}>
-          {translate('Total incl. VAT')}({currentCurrency?.symbol})
+        <Text
+          style={[styles.label, {color: primaryColor}, styles.totalInclValue]}>
+          {translate('Total incl. VAT')}(
+          {getCurrencySymbol[currentCurrency?.code!]})
         </Text>
-        <Text style={[styles.value, {color: primaryColor}]}>
-          {amountAfterGlobalDiscountWithVATFormatted}
+        <Text
+          style={[styles.value, {color: primaryColor}, styles.totalInclValue]}>
+          {insertNewlines(amountAfterGlobalDiscountWithVATFormatted, 19)}
         </Text>
       </View>
     </View>

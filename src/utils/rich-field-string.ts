@@ -1,17 +1,13 @@
 import {EmailSignature} from 'models/employee';
+import {stripHtmlTags} from './text-block';
 
 export const isPlainString = (value: string) => !/<[^>]+>/.test(value);
 
 // Remove all html tags and return single line string
-export const getPlainStringFromHtml = (value: string) => {
-  // check if value start with a tag
-  if (value[0] !== '<') return value;
-  return value
-    .split('>') // Split on closing tag
-    .slice(0, -1) // remove last entry from the closing tag
-    .filter((element) => element[0] !== '<' && element !== '') // remove all tag element and
-    .map((element) => element.split('<')[0])
-    .join('');
+export const getPlainStringFromHtml = (value: string): string => {
+  if (!value.startsWith('<')) return value;
+  const doc = new DOMParser().parseFromString(value, 'text/html');
+  return doc.body.textContent?.trim() ?? '';
 };
 
 export const generateSignatureHtml = (
@@ -190,4 +186,10 @@ export const handleSignatureSmartly = (
 
   // Fallback - leave as is
   return emailContent;
+};
+
+export const cleanHtml = (html?: string) => {
+  const raw = html ?? '';
+  const plain = stripHtmlTags(raw).trim();
+  return {raw, plain};
 };

@@ -3,6 +3,8 @@ import {
   ArticleType,
   CreateArticleSubAssociationRecord,
   ArticleView,
+  CostPackage,
+  ExtendedArticleView,
 } from 'models/article';
 import {
   DiscountType,
@@ -36,7 +38,11 @@ import {
   Controller,
   Control,
 } from 'react-hook-form';
-import {calculateMargin, getArticleTypesWithLabels} from 'utils/article-utils';
+import {
+  calculateMargin,
+  getArticleTypesWithLabels,
+  transformToSubPositionRow,
+} from 'utils/article-utils';
 import {VatView} from 'models/vat';
 import TableCell from 'components/Table/TableCell';
 import DragHandle from 'components/DragHandle';
@@ -72,23 +78,43 @@ import {MeasurementUnit, createMeasurementOptions} from 'models/articleForm';
 import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import MainPositionActions from 'components/MixedPositions/MainPositionActions';
 import {EditableRowType} from 'components/MixedPositions/PositionTable';
-import {useCreateArticle, useCreateArticleMix} from './reactQuery/useArticle';
+import {
+  EditableServiceOrderItem,
+  EditableServiceOrderSubArticleRecord,
+  ServiceOrderAmountDetail,
+  ServiceOrderArticleOwnerType,
+} from 'models/service-order';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
+import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
+import {
+  fetchArticleSubAssociations,
+  useCreateArticle,
+  useCreateArticleMix,
+} from './reactQuery/useArticle';
 import {useCompanyNextNumber} from './reactQuery/useCompanies';
 import {useSnackbar} from './useSnackbar';
 
 interface MainPositionProps<
   TForm extends {
-    items: (EditableInvoiceItem | EditableQuotationItem)[];
+    items: (
+      | EditableInvoiceItem
+      | EditableQuotationItem
+      | EditableServiceOrderItem
+    )[];
   } & FieldValues,
 > {
   index: number;
-  item: EditableQuotationItem | EditableInvoiceItem;
+  item: EditableQuotationItem | EditableInvoiceItem | EditableServiceOrderItem;
   serviceCompanyId: string;
   onRecalc: () => void;
   watch: UseFormWatch<TForm>;
   setValue: UseFormSetValue<TForm>;
   getValues: UseFormGetValues<TForm>;
-  watchedItem: EditableQuotationItem | EditableInvoiceItem;
+  watchedItem:
+    | EditableQuotationItem
+    | EditableInvoiceItem
+    | EditableServiceOrderItem;
   control: Control<TForm | any>;
   showRightShadow: boolean;
   showLeftShadow: boolean;
@@ -104,15 +130,24 @@ interface MainPositionProps<
   onAddSubPosition: (parentIndex: number) => void;
   setOpenDeleteConfirm: React.Dispatch<React.SetStateAction<boolean>>;
   dirtyFields: FormState<TForm>['dirtyFields'];
-  amountDetail?: InvoiceAmountDetail | QuotationAmountDetail;
+  amountDetail?:
+    | InvoiceAmountDetail
+    | QuotationAmountDetail
+    | ServiceOrderAmountDetail;
   taxRates?: VatView[];
   setHoveredMainRowIndex: React.Dispatch<React.SetStateAction<number | null>>;
   setExpandedRows?: React.Dispatch<React.SetStateAction<number[]>>;
+  disableInlineEditing?: boolean;
+  propertyOwnerId?: string;
 }
 
 const useMainPosition = <
   TForm extends {
-    items: (EditableInvoiceItem | EditableQuotationItem)[];
+    items: (
+      | EditableInvoiceItem
+      | EditableQuotationItem
+      | EditableServiceOrderItem
+    )[];
   } & FieldValues,
 >({
   index,
@@ -138,11 +173,13 @@ const useMainPosition = <
   amountDetail,
   setHoveredMainRowIndex,
   setExpandedRows,
+  disableInlineEditing,
+  propertyOwnerId,
 }: MainPositionProps<TForm>) => {
   const theme = useTheme();
   const {t} = useTranslation();
   const currentCurrency = useCurrentCurrency();
-  const {enqueueSnackbar} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   const {language: selectedLng} = useContext(LanguageContext);
 
@@ -159,6 +196,8 @@ const useMainPosition = <
   const vatRef = useRef<HTMLInputElement>(null);
   const unitRef = useRef<HTMLInputElement>(null);
   const discountRef = useRef<HTMLInputElement>(null);
+
+  const isMixed = watchedItem.article?.type === ArticleType.MIX;
 
   const articleTypes = getArticleTypesWithLabels({
     excludeTypes: [],
@@ -186,7 +225,7 @@ const useMainPosition = <
   };
 
   const handleEditStart = (
-    row: EditableQuotationItem | EditableInvoiceItem,
+    row: EditableQuotationItem | EditableInvoiceItem | EditableServiceOrderItem,
     field: string,
   ) => {
     const purchaseNetAmountCents =
@@ -282,7 +321,13 @@ const useMainPosition = <
         values: {
           ...row,
           [field]:
-            row[field as keyof (EditableQuotationItem | EditableInvoiceItem)],
+            row[
+              field as keyof (
+                | EditableQuotationItem
+                | EditableInvoiceItem
+                | EditableServiceOrderItem
+              )
+            ],
         },
       });
     }
@@ -295,7 +340,7 @@ const useMainPosition = <
   }: {
     indexPos: number;
     fieldName: string;
-    row: EditableQuotationItem | EditableInvoiceItem;
+    row: EditableQuotationItem | EditableInvoiceItem | EditableServiceOrderItem;
   }) => {
     setEditableRow({
       index: indexPos,
@@ -323,47 +368,105 @@ const useMainPosition = <
     enqueueSnackbar(t('Position was deleted'), {variant: 'error'});
   };
 
-  const handleArticleSelection = (selectedArticle: ArticleView | string) => {
-    if (typeof selectedArticle === 'string') {
-      setValue(
-        `items.${index}.name` as Path<TForm>,
-        selectedArticle as PathValue<TForm, Path<TForm>>,
-      );
+  const handleArticleSelection = async (
+    selectedArticle: ArticleView | string,
+  ) => {
+    const isFreeText = typeof selectedArticle === 'string';
+    const previousArticleId = getValues(
+      `items.${index}.article.id` as Path<TForm>,
+    );
 
-      setValue(
-        `items.${index}.article.name` as Path<TForm>,
-        selectedArticle as PathValue<TForm, Path<TForm>>,
-      );
-    } else {
-      setValue(
-        `items.${index}.name` as Path<TForm>,
-        selectedArticle.name as PathValue<TForm, Path<TForm>>,
-      );
+    const name = isFreeText
+      ? (selectedArticle as string)
+      : selectedArticle.name;
+    setValue(
+      `items.${index}.name` as Path<TForm>,
+      name as PathValue<TForm, Path<TForm>>,
+    );
+    setValue(
+      `items.${index}.article.name` as Path<TForm>,
+      name as PathValue<TForm, Path<TForm>>,
+    );
+
+    if (!isFreeText) {
+      const articleObj = selectedArticle as ExtendedArticleView;
+      const sellingAmountObj = articleObj?.isCustom
+        ? articleObj.customSellingAmount
+        : articleObj.unitSellingAmount;
+
+      const defaultCostPackage: CostPackage | undefined =
+        articleObj.type === ArticleType.PACKAGE
+          ? articleObj.additionalInfo?.costPackage ?? {
+              laborPercentage: 50,
+              materialPercentage: 50,
+            }
+          : undefined;
 
       setValue(
         `items.${index}.article` as Path<TForm>,
-        {
-          ...selectedArticle,
-          costPackage: selectedArticle.additionalInfo?.costPackage,
-        } as PathValue<TForm, Path<TForm>>,
+        {...articleObj, costPackage: defaultCostPackage} as PathValue<
+          TForm,
+          Path<TForm>
+        >,
       );
-
       setValue(
         `items.${index}.unitPurchaseAmount` as Path<TForm>,
-        selectedArticle.unitPurchaseAmount as PathValue<TForm, Path<TForm>>,
+        articleObj.unitPurchaseAmount as PathValue<TForm, Path<TForm>>,
       );
-
       setValue(
         `items.${index}.unitAmount` as Path<TForm>,
-        selectedArticle.unitSellingAmount as PathValue<TForm, Path<TForm>>,
+        sellingAmountObj as PathValue<TForm, Path<TForm>>,
       );
-
       setValue(
         `items.${index}.description` as Path<TForm>,
-        selectedArticle.description as PathValue<TForm, Path<TForm>>,
+        articleObj.description as PathValue<TForm, Path<TForm>>,
       );
-      onRecalc();
     }
+
+    if (!isFreeText && selectedArticle.id !== previousArticleId) {
+      const articleType = selectedArticle.type;
+
+      if (articleType === ArticleType.MIX) {
+        try {
+          const subs = await fetchArticleSubAssociations(selectedArticle.id);
+          const subRows = subs.map(transformToSubPositionRow);
+          setValue(
+            `items.${index}.subItems` as Path<TForm>,
+            subRows as PathValue<TForm, Path<TForm>>,
+            {shouldValidate: true, shouldDirty: true},
+          );
+          setValue(
+            `items.${index}.subItemsConfig.subItemsVisible` as Path<TForm>,
+            true as PathValue<TForm, Path<TForm>>,
+          );
+          setValue(
+            `items.${index}.subItemsConfig.priceVisible` as Path<TForm>,
+            true as PathValue<TForm, Path<TForm>>,
+          );
+          if (setExpandedRows) {
+            setExpandedRows((prev) =>
+              prev.includes(index) ? prev : [...prev, index],
+            );
+          }
+        } catch (err) {
+          showError(err);
+        }
+      } else {
+        setValue(
+          `items.${index}.subItems` as Path<TForm>,
+          [] as PathValue<TForm, Path<TForm>>,
+        );
+        setValue(
+          `items.${index}.subItemsConfig` as Path<TForm>,
+          {subItemsVisible: false, priceVisible: false} as PathValue<
+            TForm,
+            Path<TForm>
+          >,
+        );
+      }
+    }
+
+    onRecalc();
     setEditableRow(null);
   };
 
@@ -410,7 +513,10 @@ const useMainPosition = <
   };
 
   const handleSaveToCatalogue = async (
-    itemData: EditableQuotationItem | EditableInvoiceItem,
+    itemData:
+      | EditableQuotationItem
+      | EditableInvoiceItem
+      | EditableServiceOrderItem,
   ) => {
     const baseStock = {
       currentStock: 1,
@@ -490,7 +596,8 @@ const useMainPosition = <
     const currentItem = getValues(`items.${indexPos}` as Path<TForm>);
     const values = editableRow.values as
       | EditableQuotationItem
-      | EditableQuotationItem;
+      | EditableInvoiceItem
+      | EditableServiceOrderItem;
     let isDifferent = false;
 
     const updateAndMarkRecalc = () => {
@@ -646,6 +753,7 @@ const useMainPosition = <
       (getValues(subItemsPath) as (
         | EditableQuotationSubItemRecord
         | EditableInvoiceSubItemRecord
+        | EditableServiceOrderSubArticleRecord
       )[]) || [];
 
     // Update VAT for each sub item
@@ -680,10 +788,19 @@ const useMainPosition = <
     () => (
       <TableCell
         noPadding
-        sx={{width: '2px', cursor: 'grab', borderLeft: 'none'}}
+        sx={{
+          width: '2px',
+          cursor: !disableInlineEditing ? 'grab' : 'inherit',
+          borderLeft: 'none',
+        }}
         onMouseEnter={() => setHoveredMainRowIndex(index)}
         onMouseLeave={() => setHoveredMainRowIndex(null)}>
-        <DragHandle isVisible={hoveredMainRowIndex === index} />
+        {!disableInlineEditing && (
+          <DragHandle
+            isVisible={hoveredMainRowIndex === index}
+            disableInlineEditing={disableInlineEditing}
+          />
+        )}
       </TableCell>
     ),
     [index, hoveredMainRowIndex, setHoveredMainRowIndex],
@@ -693,8 +810,10 @@ const useMainPosition = <
     () => (
       <TableCell
         noPadding
-        onClick={() =>
-          handleEditStart(watchedItem, `items.${index}.userSeqNumber`)
+        onClick={
+          !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.userSeqNumber`)
+            : undefined
         }
         sx={{background: '#f7f9fc', maxWidth: '58px'}}>
         {editableRow?.index === index &&
@@ -776,12 +895,15 @@ const useMainPosition = <
     () => (
       <TableCell
         noPadding
-        onClick={() =>
-          handleCellClick({
-            indexPos: index,
-            fieldName: `items.${index}.name`,
-            row: item,
-          })
+        onClick={
+          !disableInlineEditing
+            ? () =>
+                handleCellClick({
+                  indexPos: index,
+                  fieldName: `items.${index}.name`,
+                  row: item,
+                })
+            : undefined
         }
         showShadows={showRightShadow ? 'right' : undefined}
         isFirst
@@ -793,9 +915,9 @@ const useMainPosition = <
           <NewArticleAutoComplete
             onArticleSelect={handleArticleSelection}
             initialValue={watch('items' as Path<TForm>)?.[index]}
-            excludeTypes={[ArticleType.MIX]}
             showCustomPriceColumn
             openOnFocus={editableRow.index === index}
+            propertyOwnerId={propertyOwnerId}
           />
         ) : (
           <Box
@@ -834,38 +956,83 @@ const useMainPosition = <
                 }}
               />
             </Box>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                onDescriptionClick(item.description || '', index);
-              }}
-              sx={{
-                color: removeHtmlTags(watchedItem.description || '')
-                  ? '#000034'
-                  : '#828DA3',
-              }}>
-              {removeHtmlTags(watchedItem.description || '') !== '' ? (
-                <Tooltip
-                  title={
-                    <div>
-                      <Typography
-                        sx={sanitizedTextStyles}
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(
-                            watchedItem.description || '',
-                          ),
-                        }}
-                      />
-                    </div>
-                  }
-                  arrow
-                  placement="top">
-                  <NoteAlt fontSize="small" />
-                </Tooltip>
-              ) : (
-                <NoteAltOutlined fontSize="small" />
+
+            <Box sx={{display: 'flex'}}>
+              {'ownerType' in watchedItem && (
+                <IconButton sx={{py: 0}}>
+                  {watchedItem?.ownerType ===
+                    ServiceOrderArticleOwnerType.USER ||
+                  watchedItem?.ownerType ===
+                    ServiceOrderArticleOwnerType.CONTRACT ||
+                  watchedItem?.ownerType ===
+                    ServiceOrderArticleOwnerType.TRAVEL_WORK ? (
+                    <Tooltip
+                      title={
+                        watchedItem?.ownerType ===
+                          ServiceOrderArticleOwnerType.USER &&
+                        watchedItem.ownerName?.trim()
+                          ? `${t('Added by')} ${watchedItem.ownerName}`
+                          : watchedItem?.ownerType ===
+                              ServiceOrderArticleOwnerType.CONTRACT &&
+                            watchedItem?.ownerName?.trim()
+                          ? `${t('Added by contract')} ${
+                              watchedItem?.ownerName
+                            }`
+                          : `${t('Added by Automation')}`
+                      }
+                      arrow
+                      placement="top">
+                      {watchedItem?.ownerType ===
+                      ServiceOrderArticleOwnerType.USER ? (
+                        <PersonOutlinedIcon />
+                      ) : watchedItem?.ownerType ===
+                        ServiceOrderArticleOwnerType.CONTRACT ? (
+                        <TextSnippetOutlinedIcon />
+                      ) : (
+                        <HdrAutoOutlinedIcon />
+                      )}
+                    </Tooltip>
+                  ) : null}
+                </IconButton>
               )}
-            </IconButton>
+
+              <IconButton
+                onClick={
+                  !disableInlineEditing
+                    ? (e) => {
+                        e.stopPropagation();
+                        onDescriptionClick(item.description || '', index);
+                      }
+                    : undefined
+                }
+                sx={{
+                  color: removeHtmlTags(watchedItem.description || '')
+                    ? '#000034'
+                    : '#828DA3',
+                }}>
+                {removeHtmlTags(watchedItem.description || '') !== '' ? (
+                  <Tooltip
+                    title={
+                      <div>
+                        <Typography
+                          sx={sanitizedTextStyles}
+                          dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(
+                              watchedItem.description || '',
+                            ),
+                          }}
+                        />
+                      </div>
+                    }
+                    arrow
+                    placement="top">
+                    <NoteAlt fontSize="small" />
+                  </Tooltip>
+                ) : (
+                  <NoteAltOutlined fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
           </Box>
         )}
       </TableCell>
@@ -878,6 +1045,7 @@ const useMainPosition = <
       showRightShadow,
       item,
       watchedItem,
+      disableInlineEditing,
     ],
   );
 
@@ -886,19 +1054,24 @@ const useMainPosition = <
       <TableCell
         align="center"
         noPadding
-        onClick={(e) => {
-          e.stopPropagation();
-          if (
-            editableRow?.index === index &&
-            editableRow?.field === `items.${index}.article.type`
-          ) {
-            setEditableRow(null);
-            setAnchorEl(null);
-          } else {
-            handleEditType();
-            setAnchorEl(e.currentTarget);
-          }
-        }}>
+        testId={`article-type-${index}`}
+        onClick={
+          !disableInlineEditing
+            ? (e) => {
+                e.stopPropagation();
+                if (
+                  editableRow?.index === index &&
+                  editableRow?.field === `items.${index}.article.type`
+                ) {
+                  setEditableRow(null);
+                  setAnchorEl(null);
+                } else {
+                  handleEditType();
+                  setAnchorEl(e.currentTarget);
+                }
+              }
+            : undefined
+        }>
         <Box
           sx={{
             width: '100%',
@@ -988,8 +1161,14 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() =>
-          handleEditStart(watchedItem, `items.${index}.unitPurchaseAmount`)
+        onClick={
+          !isMixed && !disableInlineEditing
+            ? () =>
+                handleEditStart(
+                  watchedItem,
+                  `items.${index}.unitPurchaseAmount`,
+                )
+            : undefined
         }>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.unitPurchaseAmount` ? (
@@ -1082,7 +1261,7 @@ const useMainPosition = <
         )}
       </TableCell>
     ),
-    [editableRow, index, watchedItem],
+    [editableRow, index, watchedItem, isMixed],
   );
 
   const renderMarginCell = useCallback(
@@ -1090,7 +1269,11 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() => handleEditStart(watchedItem, `items.${index}.margin`)}>
+        onClick={
+          !isMixed && !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.margin`)
+            : undefined
+        }>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.margin` ? (
           <NumericFormat
@@ -1195,7 +1378,7 @@ const useMainPosition = <
         )}
       </TableCell>
     ),
-    [editableRow, index, watchedItem],
+    [editableRow, index, watchedItem, isMixed],
   );
 
   const renderUnitAmountCell = useCallback(
@@ -1203,8 +1386,10 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() =>
-          handleEditStart(watchedItem, `items.${index}.unitAmount`)
+        onClick={
+          !isMixed && !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.unitAmount`)
+            : undefined
         }
         testId={`position-unitAmount-${index}`}>
         {editableRow?.index === index &&
@@ -1291,7 +1476,7 @@ const useMainPosition = <
         )}
       </TableCell>
     ),
-    [editableRow, index, watchedItem],
+    [editableRow, index, watchedItem, isMixed],
   );
 
   const renderQuantityCell = useCallback(
@@ -1299,78 +1484,78 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() => handleEditStart(watchedItem, `items.${index}.quantity`)}>
+        onClick={() => handleEditStart(watchedItem, `items.${index}.quantity`)}
+        testId={`position-quantity-${index}`}>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.quantity` ? (
-          <Controller
-            name={`items.${index}.quantity`}
-            control={control}
-            render={({field}) => (
-              <NumericFormat
-                {...field}
-                autoFocus
-                getInputRef={quantityInputRef}
-                onFocus={(e) => {
-                  e.target.setSelectionRange(0, 0);
-                }}
-                value={field.value || 0}
-                onValueChange={({floatValue}) => {
-                  setValue(
-                    `items.${index}.quantity` as Path<TForm>,
-                    (floatValue || 0) as PathValue<TForm, Path<TForm>>,
-                  );
-                }}
-                customInput={TextField}
-                allowLeadingZeros={false}
-                decimalScale={2}
-                fixedDecimalScale
-                size="small"
-                InputProps={{
-                  onBlur: () => {
-                    setEditableRow(null);
-                    onRecalc();
-                  },
-                  onKeyDown: (
-                    e: React.KeyboardEvent<
-                      HTMLInputElement | HTMLTextAreaElement
-                    >,
-                  ) => {
-                    if (e.key === 'Tab' && !e.shiftKey) {
-                      e.preventDefault();
-                      onRecalc();
-                      setEditableRow({
-                        index,
-                        field: `items.${index}.unitAmount.vatId`,
-                        values: item,
-                      });
-                      vatRef.current?.focus();
-                    }
-                  },
-                }}
-                sx={{
-                  width: '100%',
-                  '& .MuiInputBase-root': {pr: 0},
-                  '& .MuiOutlinedInput-input': {
-                    textAlign: 'right',
-                    width: '100%',
-                  },
-                  '& .Mui-focused': {
-                    border: '2px solid #000034',
-                    borderRadius: '4px',
-                  },
-                }}
-              />
-            )}
+          <NumericFormat
+            autoFocus
+            getInputRef={quantityInputRef}
+            onFocus={(e) => {
+              e.target.setSelectionRange(0, 0);
+            }}
+            value={editableRow.values?.quantity || 0}
+            onValueChange={({floatValue}) => {
+              setValue(
+                `items.${index}.quantity` as Path<TForm>,
+                (floatValue || 0) as PathValue<TForm, Path<TForm>>,
+              );
+            }}
+            customInput={TextField}
+            allowLeadingZeros={false}
+            decimalScale={2}
+            decimalSeparator={getDecimalSeparator(selectedLng)}
+            thousandSeparator={getThousandsSeparator(selectedLng)}
+            fixedDecimalScale
+            size="small"
+            InputProps={{
+              name: `items.${index}.quantity`,
+              onBlur: () => {
+                setEditableRow(null);
+                onRecalc();
+              },
+              onKeyDown: (
+                e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+              ) => {
+                if (e.key === 'Tab' && !e.shiftKey) {
+                  e.preventDefault();
+                  onRecalc();
+                  setEditableRow({
+                    index,
+                    field: `items.${index}.unitAmount.vatId`,
+                    values: item,
+                  });
+                  vatRef.current?.focus();
+                }
+              },
+            }}
+            sx={{
+              width: '100%',
+              '& .MuiInputBase-root': {pr: 0},
+              '& .MuiOutlinedInput-input': {
+                textAlign: 'right',
+                width: '100%',
+              },
+              '& .Mui-focused': {
+                border: '2px solid #000034',
+                borderRadius: '4px',
+              },
+            }}
           />
         ) : (
           <Typography
             sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-            {watchedItem.quantity || 0}
+            {formatCurrency(Number(watchedItem.quantity), {
+              currency: currentCurrency?.code,
+              excludeCurrencySymbol: true,
+              currencySymbol: currentCurrency?.symbol,
+              companyLang: selectedLng,
+            })}
           </Typography>
         )}
       </TableCell>
     ),
-    [editableRow, index, watchedItem],
+    [editableRow, index, watchedItem, isMixed],
   );
 
   const renderVatIdCell = useCallback(
@@ -1378,6 +1563,7 @@ const useMainPosition = <
       <TableCell
         noPadding
         align="right"
+        testId={`vat-dropdown-table-cell-${index}`}
         onClick={() => {
           if (
             !(
@@ -1385,12 +1571,14 @@ const useMainPosition = <
               editableRow?.field === `items.${index}.unitAmount.vatId`
             )
           ) {
-            setEditableRow({
-              index,
-              field: `items.${index}.unitAmount.vatId`,
-              values: item,
-            });
-            vatRef.current?.focus();
+            if (!disableInlineEditing) {
+              setEditableRow({
+                index,
+                field: `items.${index}.unitAmount.vatId`,
+                values: item,
+              });
+              vatRef.current?.focus();
+            }
           }
         }}
         onKeyDown={(e) => {
@@ -1398,11 +1586,11 @@ const useMainPosition = <
             e.preventDefault();
             handleCellClick({
               indexPos: index,
-              fieldName: `items.${index}.article.unit`,
+              fieldName: `items.${index}.unitAmount.vatId`,
               row: item,
             });
             onRecalc();
-            unitRef.current?.focus();
+            vatRef.current?.focus();
           }
         }}>
         {editableRow?.index === index &&
@@ -1479,9 +1667,7 @@ const useMainPosition = <
         ) : (
           <Typography
             sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-            {watchedItem?.unitAmount?.percentageVat
-              ? `${watchedItem.unitAmount.percentageVat}%`
-              : '-'}
+            {`${watchedItem?.unitAmount?.percentageVat ?? 0}%`}
           </Typography>
         )}
       </TableCell>
@@ -1501,12 +1687,14 @@ const useMainPosition = <
               editableRow?.field === `items.${index}.article.unit`
             )
           ) {
-            handleCellClick({
-              indexPos: index,
-              fieldName: `items.${index}.article.unit`,
-              row: item,
-            });
-            unitRef.current?.focus();
+            if (!disableInlineEditing) {
+              handleCellClick({
+                indexPos: index,
+                fieldName: `items.${index}.article.unit`,
+                row: item,
+              });
+              unitRef.current?.focus();
+            }
           }
         }}
         onKeyDown={(e) => {
@@ -1577,25 +1765,34 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() => handleEditStart(watchedItem, `items.${index}.discount`)}>
+        testId={`discount-${index}`}
+        onClick={
+          !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.discount`)
+            : undefined
+        }>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.discount` ? (
           <NumericFormat
+            name={`items.${index}.discount`}
             value={
               (
                 editableRow.values as
                   | EditableQuotationItem
                   | EditableInvoiceItem
+                  | EditableServiceOrderItem
               )?.discount?.type === DiscountType.AMOUNT
                 ? (
                     editableRow.values as
                       | EditableQuotationItem
                       | EditableInvoiceItem
+                      | EditableServiceOrderItem
                   )?.discount?.amount?.value
                 : (
                     editableRow.values as
                       | EditableQuotationItem
                       | EditableInvoiceItem
+                      | EditableServiceOrderItem
                   )?.discount?.percentage
             }
             getInputRef={discountRef}
@@ -1612,6 +1809,7 @@ const useMainPosition = <
                   editableRow.values as
                     | EditableQuotationItem
                     | EditableInvoiceItem
+                    | EditableServiceOrderItem
                 ).discount?.type === DiscountType.AMOUNT
                   ? ((watchedItem?.unitAmount?.netAmount ?? 0) *
                       Number(watchedItem.quantity)) /
@@ -1647,6 +1845,7 @@ const useMainPosition = <
                       editableRow?.values as
                         | EditableQuotationItem
                         | EditableInvoiceItem
+                        | EditableServiceOrderItem
                     )?.discount;
                     const newType =
                       currentDiscount?.type === DiscountType.AMOUNT
@@ -1673,10 +1872,14 @@ const useMainPosition = <
                       `items.${index}.discount` as Path<TForm>,
                       newDiscount as PathValue<TForm, Path<TForm>>,
                     );
-                    setEditableRow((prev) => ({
-                      ...prev!,
-                      values: {...prev!.values, discount: newDiscount},
-                    }));
+                    setEditableRow((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            values: {...prev.values, discount: newDiscount},
+                          }
+                        : null,
+                    );
                   }}
                   size="small">
                   {watch(`items.${index}.discount.type` as Path<TForm>) ===
@@ -1695,6 +1898,7 @@ const useMainPosition = <
                     editableRow.values as
                       | EditableQuotationItem
                       | EditableInvoiceItem
+                      | EditableServiceOrderItem
                   ).discount?.type === DiscountType.AMOUNT
                     ? {
                         type: DiscountType.AMOUNT,
@@ -1702,6 +1906,7 @@ const useMainPosition = <
                           editableRow.values as
                             | EditableQuotationItem
                             | EditableInvoiceItem
+                            | EditableServiceOrderItem
                         )?.discount?.amount,
                         percentage: 0,
                       }
@@ -1711,6 +1916,7 @@ const useMainPosition = <
                           editableRow.values as
                             | EditableQuotationItem
                             | EditableInvoiceItem
+                            | EditableServiceOrderItem
                         )?.discount?.percentage,
                       };
                 setValue(
@@ -1740,11 +1946,13 @@ const useMainPosition = <
                       prev!.values as
                         | EditableQuotationItem
                         | EditableInvoiceItem
+                        | EditableServiceOrderItem
                     )?.discount!,
                     ...((
                       prev!.values as
                         | EditableQuotationItem
                         | EditableInvoiceItem
+                        | EditableServiceOrderItem
                     )?.discount?.type === DiscountType.AMOUNT
                       ? {
                           type: DiscountType.AMOUNT,
@@ -1797,54 +2005,57 @@ const useMainPosition = <
         <Typography sx={{fontWeight: 600, padding: '0px 12px'}}>
           {netPriceDisplay}
         </Typography>
-        <Box
-          sx={{borderLeft: '1px solid #e4e5e8'}}
-          onClick={() => {
-            setIsActionOpen(!isActionOpen);
-          }}>
-          <MainPositionActions
-            isMixedType={watchedItem.article?.type === ArticleType.MIX}
-            onCreateMixedPosition={() => {
-              setValue(
-                `items.${index}.article.type` as Path<TForm>,
-                ArticleType.MIX as PathValue<TForm, Path<TForm>>,
-              );
-              const currentConfig =
-                getValues(`items.${index}.subItemsConfig` as Path<TForm>) || {};
-              setValue(
-                `items.${index}.subItemsConfig` as Path<TForm>,
-                {
-                  ...currentConfig,
-                  subItemsVisible: true,
-                  priceVisible: true,
-                } as PathValue<TForm, Path<TForm>>,
-              );
-              if (setExpandedRows) {
-                setExpandedRows((prev) =>
-                  prev.includes(index) ? prev : [...prev, index],
+        {!disableInlineEditing && (
+          <Box
+            sx={{borderLeft: '1px solid #e4e5e8'}}
+            onClick={() => {
+              setIsActionOpen(!isActionOpen);
+            }}>
+            <MainPositionActions
+              isMixedType={watchedItem.article?.type === ArticleType.MIX}
+              onCreateMixedPosition={() => {
+                setValue(
+                  `items.${index}.article.type` as Path<TForm>,
+                  ArticleType.MIX as PathValue<TForm, Path<TForm>>,
                 );
-              }
-              onRecalc();
-              setEditableRow(null);
-              setAnchorEl(null);
-              setIsActionOpen(false);
-            }}
-            onAddSubPosition={() => {
-              onAddSubPosition(index);
-              setIsActionOpen(false);
-            }}
-            onSaveToCatalogue={() => {
-              const itemData = getValues(`items.${index}` as Path<TForm>);
-              handleSaveToCatalogue(itemData);
-              setIsActionOpen(false);
-            }}
-            onDelete={() => {
-              setOpenDeleteConfirm(true);
-              setIsActionOpen(false);
-            }}
-            isOpen={isActionOpen}
-          />
-        </Box>
+                const currentConfig =
+                  getValues(`items.${index}.subItemsConfig` as Path<TForm>) ||
+                  {};
+                setValue(
+                  `items.${index}.subItemsConfig` as Path<TForm>,
+                  {
+                    ...currentConfig,
+                    subItemsVisible: true,
+                    priceVisible: true,
+                  } as PathValue<TForm, Path<TForm>>,
+                );
+                if (setExpandedRows) {
+                  setExpandedRows((prev) =>
+                    prev.includes(index) ? prev : [...prev, index],
+                  );
+                }
+                onRecalc();
+                setEditableRow(null);
+                setAnchorEl(null);
+                setIsActionOpen(false);
+              }}
+              onAddSubPosition={() => {
+                onAddSubPosition(index);
+                setIsActionOpen(false);
+              }}
+              onSaveToCatalogue={() => {
+                const itemData = getValues(`items.${index}` as Path<TForm>);
+                handleSaveToCatalogue(itemData);
+                setIsActionOpen(false);
+              }}
+              onDelete={() => {
+                setOpenDeleteConfirm(true);
+                setIsActionOpen(false);
+              }}
+              isOpen={isActionOpen}
+            />
+          </Box>
+        )}
       </TableCell>
     ),
     [

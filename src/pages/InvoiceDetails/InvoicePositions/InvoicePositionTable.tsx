@@ -37,11 +37,13 @@ import {
   EditableInvoiceSubItemRecord,
   DiscountType,
   InvoiceAmountDetail,
+  InvoiceView,
 } from 'models/invoice';
 import SubPositionFooter from 'components/MixedPositions/SubPositionFooter';
-import InvoiceMainPositionRow from './InvoiceMainPositionRow';
-import DiscountPanel from './DiscountPanel';
-import InvoiceSubPositionRow from './InvoiceSubPositionRow';
+import NewSubPositionRow from 'components/MixedPositions/NewSubPositionRow';
+import NewMainPositionRow from 'components/MixedPositions/NewMainPosition';
+import DiscountPanel from 'components/MixedPositions/DiscountPanel';
+import {dialogPaperStyles} from 'components/MixedPositions/MixedPositions.styles';
 
 export interface EditableRowType {
   index: number;
@@ -55,12 +57,20 @@ interface Props {
   formMethods: UseFormReturn<InvoiceFormData>;
   onRecalcInvoice: () => void;
   invoiceAmountDetail?: InvoiceAmountDetail;
+  isNewInvoice?: boolean;
+  resumeDialogOpen?: boolean;
+  resumeCheckDone?: boolean;
+  invoice?: InvoiceView;
 }
 
 const InvoicePositionTable = ({
   formMethods,
   onRecalcInvoice,
   invoiceAmountDetail,
+  isNewInvoice,
+  resumeDialogOpen,
+  resumeCheckDone,
+  invoice,
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
@@ -112,8 +122,6 @@ const InvoicePositionTable = ({
     control: descriptionControl,
     name: 'description',
   });
-
-  const prevSeqNumbersRef = useRef<Record<number, string>>({});
 
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
@@ -252,9 +260,6 @@ const InvoicePositionTable = ({
   };
 
   const handleAddNewPosition = () => {
-    const newIndex = fields.length;
-    const defaultSeqNumber = (newIndex + 1).toString();
-
     const defaultProps = {
       netAmount: 0,
       currency: currentCurrency.code,
@@ -265,7 +270,6 @@ const InvoicePositionTable = ({
 
     const newItem: EditableInvoiceItem = {
       id: getUniqueId(),
-      userSeqNumber: defaultSeqNumber,
       name: '',
       quantity: 1,
       unitAmount: defaultProps,
@@ -288,11 +292,6 @@ const InvoicePositionTable = ({
     };
 
     append(newItem);
-    setEditableMixedRow({
-      index: newIndex,
-      field: `items.${newIndex}.name`,
-      values: newItem,
-    });
   };
 
   const handleAddSubPosition = (parentIndex: number) => {
@@ -345,6 +344,32 @@ const InvoicePositionTable = ({
       field: `items.${parentIndex}.subItems.${newSubIndex}.name`,
       values: newSub,
     });
+  };
+
+  const removeDropIndicator = (row: HTMLElement) => {
+    row
+      .querySelectorAll<HTMLDivElement>('.drop-indicator')
+      .forEach((el) => el.remove());
+  };
+
+  const applyDropIndicator = (
+    row: HTMLElement,
+    edge: 'top' | 'bottom' | 'right' | 'left',
+  ) => {
+    removeDropIndicator(row);
+    const div = document.createElement('div');
+    div.className = 'drop-indicator';
+    Object.assign(div.style, {
+      position: 'absolute',
+      left: '0',
+      right: '0',
+      height: '2px',
+      background: '#0052CC',
+      [edge]: '0',
+      pointerEvents: 'none',
+      zIndex: '10',
+    });
+    row.appendChild(div);
   };
 
   const {
@@ -406,24 +431,17 @@ const InvoicePositionTable = ({
           element: mainRow,
           onDragEnter: (args) => {
             const edge = extractClosestEdge(args);
-            if (edge) {
-              mainRow.setAttribute('data-edge', edge);
-              mainRow.style.borderTop =
-                edge === 'top' ? '2px solid #0052CC' : '';
-              mainRow.style.borderBottom =
-                edge === 'bottom' ? '2px solid #0052CC' : '';
-            }
+            if (edge) applyDropIndicator(mainRow, edge);
           },
           onDragLeave: () => {
-            mainRow.removeAttribute('data-edge');
-            mainRow.style.borderTop = '';
-            mainRow.style.borderBottom = '';
+            removeDropIndicator(mainRow);
           },
           onDrop: (args) => {
             const dragData = args.source.data as DragData;
             if (dragData?.type === 'main') {
               move(dragData.index, index);
             }
+            removeDropIndicator(mainRow);
           },
         }),
       );
@@ -454,18 +472,10 @@ const InvoicePositionTable = ({
               element: subRow,
               onDragEnter: (args) => {
                 const edge = extractClosestEdge(args);
-                if (edge) {
-                  subRow.setAttribute('data-edge', edge);
-                  subRow.style.borderTop =
-                    edge === 'top' ? '2px solid #0052CC' : '';
-                  subRow.style.borderBottom =
-                    edge === 'bottom' ? '2px solid #0052CC' : '';
-                }
+                if (edge) applyDropIndicator(subRow, edge);
               },
               onDragLeave: () => {
-                subRow.removeAttribute('data-edge');
-                subRow.style.borderTop = '';
-                subRow.style.borderBottom = '';
+                removeDropIndicator(subRow);
               },
               onDrop: (args) => {
                 const dragData = args.source.data as DragData;
@@ -479,6 +489,13 @@ const InvoicePositionTable = ({
                   subItems.splice(subIndex, 0, movedItem);
                   itemsCopy[index].subItems = subItems;
                   update(index, itemsCopy[index]);
+                  itemsCopy[index].subItems?.forEach((_, j) => {
+                    setValue(
+                      `items.${index}.subItems.${j}.userSeqNumber`,
+                      `${index + 1}.${j + 1}` as any,
+                    );
+                  });
+                  removeDropIndicator(subRow);
                 }
               },
             }),
@@ -491,26 +508,22 @@ const InvoicePositionTable = ({
   }, [fields, expandedRows, watchedItems]);
 
   useEffect(() => {
-    watchedItems?.forEach(
-      (mainItem: EditableInvoiceItem, mainIndex: number) => {
-        const prevSeq = prevSeqNumbersRef.current[mainIndex];
+    if (!resumeCheckDone) return;
 
-        if (prevSeq && prevSeq !== mainItem.userSeqNumber) {
-          mainItem.subItems?.forEach((subItem, subIndex) => {
-            const defaultOldSubSeq = `${prevSeq}.${subIndex + 1}`;
-            if (subItem.userSeqNumber === defaultOldSubSeq) {
-              const newSubSeq = `${mainItem.userSeqNumber}.${subIndex + 1}`;
-              setValue(
-                `items.${mainIndex}.subItems.${subIndex}.userSeqNumber`,
-                newSubSeq,
-              );
-            }
-          });
-        }
-        prevSeqNumbersRef.current[mainIndex] = mainItem.userSeqNumber ?? '';
-      },
-    );
-  }, [watchedItems, setValue]);
+    if (resumeDialogOpen) return;
+    // only for brand-new invoices — skip if editing
+    if (!isNewInvoice || invoice) return;
+
+    if (watchedItems.length === 0) {
+      handleAddNewPosition();
+    }
+  }, [
+    resumeCheckDone,
+    resumeDialogOpen,
+    isNewInvoice,
+    invoice,
+    watchedItems.length,
+  ]);
 
   return (
     <>
@@ -535,8 +548,9 @@ const InvoicePositionTable = ({
                   sx={{
                     padding: '0px',
                     background: '#f7f9fc',
+                    position: 'relative',
                   }}>
-                  <InvoiceMainPositionRow
+                  <NewMainPositionRow<InvoiceFormData>
                     item={item}
                     index={index}
                     formMethods={formMethods}
@@ -554,8 +568,9 @@ const InvoicePositionTable = ({
                     }
                     hoveredMainRowIndex={hoveredMainRowIndex}
                     setHoveredMainRowIndex={setHoveredMainRowIndex}
-                    onRecalcInvoice={onRecalcInvoice}
-                    invoiceAmountDetail={invoiceAmountDetail}
+                    onRecalc={onRecalcInvoice}
+                    amountDetail={invoiceAmountDetail}
+                    propertyOwnerId={watch('propertyOwnerId')}
                   />
                 </TableRow>
 
@@ -567,7 +582,7 @@ const InvoicePositionTable = ({
                           <TableRow
                             key={`${item.id}-${index}-${subIndex}`}
                             testId={`sub-row-${index}-${subIndex}`}>
-                            <InvoiceSubPositionRow
+                            <NewSubPositionRow<InvoiceFormData>
                               parentIndex={index}
                               subIndex={subIndex}
                               subItem={subItem}
@@ -582,8 +597,8 @@ const InvoicePositionTable = ({
                               showLeftShadow={showLeftShadow}
                               hoveredSubRowIndex={hoveredSubRowIndex}
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
-                              onRecalcInvoice={onRecalcInvoice}
-                              invoiceAmountDetail={invoiceAmountDetail}
+                              onRecalc={onRecalcInvoice}
+                              propertyOwnerId={watch('propertyOwnerId')}
                             />
                           </TableRow>
                         ),
@@ -600,7 +615,6 @@ const InvoicePositionTable = ({
                           `items.${index}.subItemsConfig.priceVisible`,
                         )}
                       />
-                      ;
                     </>
                   )}
               </Fragment>
@@ -631,7 +645,7 @@ const InvoicePositionTable = ({
           amountBeforeGlobalDiscountFormatted
         }
         amountBeforeGlobalDiscount={amountBeforeGlobalDiscountInMoney}
-        onRecalcInvoice={onRecalcInvoice}
+        onRecalc={onRecalcInvoice}
       />
 
       <MarginDetails
@@ -648,13 +662,19 @@ const InvoicePositionTable = ({
         onCancel={() => setDescriptionDialog(null)}
         onSave={handleSaveDescription}
         dialogProps={{
+          maxWidth: 'lg',
           open: !!descriptionDialog,
+          disableEscapeKeyDown: true,
+          onClose: (event, reason) => {
+            if (reason === 'backdropClick') {
+              return;
+            }
+            setDescriptionDialog(null);
+          },
         }}
         sx={{
           '& .MuiDialog-paper': {
-            width: '750px',
-            maxWidth: 'none',
-            padding: '0em',
+            ...dialogPaperStyles,
           },
         }}
         leftButton={

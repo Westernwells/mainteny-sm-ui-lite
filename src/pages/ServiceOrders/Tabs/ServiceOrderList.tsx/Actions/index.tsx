@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import TableActionMenu from 'components/Table/TableActionMenu';
 import ChangePaymentStatusDialog from 'pages/ServiceOrders/Tabs/ServiceOrderList.tsx/ChangePaymentStatusDialog';
 import {
@@ -17,13 +17,10 @@ import {Confirm} from 'components/Confirm';
 import {MarkCompletedDialog} from 'pages/ServiceOrderDetails/Tabs/Overview/MarkCompletedDialog';
 import {useCompanyById} from 'hooks/reactQuery/useCompanies';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
-import {useQueryClientStorageData} from 'hooks/useClientStorage';
-import {useDownloadUrl} from 'hooks/reactQuery/useDownloadUrl';
-import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
-import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useCurrentCurrency} from 'utils/currency';
 import {companyLanguageContextMap} from 'utils/language';
+import {useCreateAndSetPdfBlobUrl} from 'hooks/useCreateAndSetPdfBlobUrl';
 
 type Props = {
   serviceOrder: ServiceOrderView;
@@ -113,46 +110,17 @@ const Actions = ({serviceOrder}: Props) => {
     [company?.language],
   );
 
-  const {data: clientStorageData} = useQueryClientStorageData({
-    serviceCompanyId: company?.id!,
-    params: {key: 'pdf-template'},
-  });
-
-  const headerInfo = JSON.parse(clientStorageData?.value || '{}').header;
-  const footerInfo = JSON.parse(clientStorageData?.value || '{}').footer;
-
-  const {data: headerUrl = {}} = useDownloadUrl(
-    headerInfo?.path ? [headerInfo.path] : [],
-    undefined,
-    company?.id,
-  );
-
-  const {data: footerUrl = {}} = useDownloadUrl(
-    footerInfo?.path ? [footerInfo.path] : [],
-    undefined,
-    company?.id,
-  );
-
-  const {data: quotation} = useQuotationDetails(
-    serviceOrder?.additionalInfo.quotationId,
-  );
-
   const {createAndSetPdfBlobUrl} = useCreateAndSetPdfBlobUrl({
     serviceOrder,
-    quotation,
     userInfo: user?.userAccount,
     currentCurrency,
-    headerInfo,
-    headerPath: headerUrl[headerInfo?.path],
-    footerInfo,
-    footerPath: footerUrl[footerInfo?.path],
     translate,
-    fileName: serviceOrder?.number,
+    fileName: serviceOrder?.number || '',
     selectedLng: company?.language,
   });
 
-  const handleMenuItemClick = () => {
-    createAndSetPdfBlobUrl();
+  const handleMenuItemClick = async () => {
+    await createAndSetPdfBlobUrl();
   };
 
   const {actions} = useServiceOrderMenuActions({

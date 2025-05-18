@@ -1,14 +1,13 @@
 import {EditableRowType} from 'components/MixedPositions/PositionTable';
 import {LanguageContext} from 'context/LanguageProvider';
 import {
+  DiscountType,
   EditableInvoiceItem,
   EditableInvoiceSubItemRecord,
-  InvoiceAmountDetail,
 } from 'models/invoice';
 import {
   EditableQuotationItem,
   EditableQuotationSubItemRecord,
-  QuotationAmountDetail,
 } from 'models/quotation';
 import {VatView} from 'models/vat';
 import React, {
@@ -35,6 +34,7 @@ import {
   formatCurrency,
   getDecimalSeparator,
   getThousandsSeparator,
+  moneyToCents,
   useCurrentCurrency,
 } from 'utils/currency';
 import {useTheme} from '@mui/material/styles';
@@ -67,19 +67,30 @@ import NewArticleTypeCard from 'components/NewArticleTypeCard';
 import {FormInput} from 'components/form/FormInput';
 import {FormSelect} from 'components/form/FormSelect';
 import DOMPurify from 'dompurify';
-import {ArticleType, ArticleView} from 'models/article';
+import {ArticleType, CostPackage, ExtendedArticleView} from 'models/article';
 import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
 import {sanitizedTextStyles} from 'pages/Articles/Tabs/MixedPositions/MixedPosition.styles';
 import {NumericFormat} from 'react-number-format';
 import {removeHtmlTags} from 'utils/rich-field-string';
 import DragHandle from 'components/DragHandle';
+import {
+  EditableServiceOrderItem,
+  EditableServiceOrderSubArticleRecord,
+} from 'models/service-order';
 
 interface SubPositionProps<
   TForm extends {
-    items: (EditableQuotationItem | EditableInvoiceItem)[];
+    items: (
+      | EditableQuotationItem
+      | EditableInvoiceItem
+      | EditableServiceOrderItem
+    )[];
   } & FieldValues,
 > {
-  subItem: EditableInvoiceSubItemRecord | EditableQuotationSubItemRecord;
+  subItem:
+    | EditableInvoiceSubItemRecord
+    | EditableQuotationSubItemRecord
+    | EditableServiceOrderSubArticleRecord;
   control: Control<TForm | any>;
   watch: UseFormWatch<TForm>;
   setValue: UseFormSetValue<TForm>;
@@ -99,12 +110,17 @@ interface SubPositionProps<
   ) => void;
   onRecalc: () => void;
   taxRates?: VatView[];
-  amountDetail?: InvoiceAmountDetail | QuotationAmountDetail;
+  disableInlineEditing?: boolean;
+  propertyOwnerId?: string;
 }
 
 const useSubPosition = <
   TForm extends {
-    items: (EditableQuotationItem | EditableInvoiceItem)[];
+    items: (
+      | EditableQuotationItem
+      | EditableInvoiceItem
+      | EditableServiceOrderItem
+    )[];
   } & FieldValues,
 >({
   parentIndex,
@@ -123,7 +139,8 @@ const useSubPosition = <
   onDescriptionClick,
   onRecalc,
   taxRates,
-  amountDetail,
+  disableInlineEditing = false,
+  propertyOwnerId,
 }: SubPositionProps<TForm>) => {
   const {t} = useTranslation();
   const theme = useTheme();
@@ -155,7 +172,11 @@ const useSubPosition = <
     const subItemsPath = `${parentPath}.subItems` as Path<TForm>;
 
     const subItems =
-      (getValues(subItemsPath) as EditableInvoiceSubItemRecord[]) || [];
+      (getValues(subItemsPath) as (
+        | EditableInvoiceSubItemRecord
+        | EditableQuotationSubItemRecord
+        | EditableServiceOrderSubArticleRecord
+      )[]) || [];
 
     const totalNetAmount = subItems.reduce(
       (sum, sub) =>
@@ -165,6 +186,29 @@ const useSubPosition = <
 
     setValue(
       `${parentPath}.unitPurchaseAmount.netAmount` as Path<TForm>,
+      totalNetAmount as PathValue<TForm, Path<TForm>>,
+    );
+  };
+
+  const updateMainUnitAmount = () => {
+    const parentPath = `items.${parentIndex}`;
+
+    const subItemsPath = `${parentPath}.subItems` as Path<TForm>;
+
+    const subItems =
+      (getValues(subItemsPath) as (
+        | EditableInvoiceSubItemRecord
+        | EditableQuotationSubItemRecord
+        | EditableServiceOrderSubArticleRecord
+      )[]) || [];
+
+    const totalNetAmount = subItems.reduce(
+      (sum, sub) => sum + (sub.unitAmount?.netAmount ?? 0) * sub.quantity,
+      0,
+    );
+
+    setValue(
+      `${parentPath}.unitAmount.netAmount` as Path<TForm>,
       totalNetAmount as PathValue<TForm, Path<TForm>>,
     );
   };
@@ -184,19 +228,19 @@ const useSubPosition = <
 
   const handleSubPositionEditStart = useCallback(
     (
-      row: EditableInvoiceSubItemRecord | EditableQuotationSubItemRecord,
+      row:
+        | EditableInvoiceSubItemRecord
+        | EditableQuotationSubItemRecord
+        | EditableServiceOrderSubArticleRecord,
       field: string,
       pIndex: number,
       sIndex: number,
     ) => {
       const purchaseNetAmountCents =
-        watch(
-          `${pIndex}.subItems.${sIndex}.unitPurchaseAmount.netAmount` as Path<TForm>,
-        ) ?? 0;
+        watch(`${pathBase}.unitPurchaseAmount.netAmount` as Path<TForm>) ?? 0;
+
       const sellingNetAmountCents =
-        watch(
-          `${pIndex}.subItems.${sIndex}.unitAmount.netAmount` as Path<TForm>,
-        ) ?? 0;
+        watch(`${pathBase}.unitAmount.netAmount` as Path<TForm>) ?? 0;
 
       if (field === 'margin') {
         const margin = calculateMargin(
@@ -237,6 +281,7 @@ const useSubPosition = <
           ...row.unitAmount,
           netAmount: sellingNetAmountCents / 100,
         };
+
         setEditableSubRow({
           index: sIndex,
           parentIndex: pIndex,
@@ -308,18 +353,35 @@ const useSubPosition = <
       const newAmount =
         editableSubRow.values?.unitPurchaseAmount?.netAmount ?? 0;
       setValue(
-        `${path}.unitPurchaseAmount.netAmount` as Path<TForm>,
-        Math.round(newAmount * 100) as PathValue<TForm, Path<TForm>>,
+        `${path}.unitPurchaseAmount` as Path<TForm>,
+        {
+          netAmount: Math.round(newAmount * 100),
+          currency:
+            editableSubRow.values?.unitPurchaseAmount?.currency ||
+            currentCurrency.code,
+          vatId: editableSubRow.values?.unitPurchaseAmount?.vatId || '',
+          vatName: editableSubRow.values?.unitPurchaseAmount?.vatName || '',
+          percentageVat:
+            editableSubRow.values?.unitPurchaseAmount?.percentageVat || 0,
+        } as PathValue<TForm, Path<TForm>>,
       );
       onRecalc();
       updateMainUnitPurchaseAmount();
     } else if (field === `${path}.unitAmount.netAmount`) {
       const newAmount = editableSubRow.values?.unitAmount?.netAmount ?? 0;
       setValue(
-        `${path}.unitAmount.netAmount` as Path<TForm>,
-        Math.round(newAmount * 100) as PathValue<TForm, Path<TForm>>,
+        `${path}.unitAmount` as Path<TForm>,
+        {
+          netAmount: Math.round(newAmount * 100),
+          currency:
+            editableSubRow.values?.unitAmount?.currency || currentCurrency.code,
+          vatId: editableSubRow.values?.unitAmount?.vatId || '',
+          vatName: editableSubRow.values?.unitAmount?.vatName || '',
+          percentageVat: editableSubRow.values?.unitAmount?.percentageVat || 0,
+        } as PathValue<TForm, Path<TForm>>,
       );
       onRecalc();
+      updateMainUnitAmount();
     } else if (field === 'margin') {
       const marginValue = editableSubRow.values?.margin ?? 0;
       const purchaseNetAmount = Number(
@@ -343,6 +405,7 @@ const useSubPosition = <
         (editableSubRow.values?.quantity || 0) as PathValue<TForm, Path<TForm>>,
       );
       updateMainUnitPurchaseAmount();
+      updateMainUnitAmount();
       onRecalc();
     }
     setEditableSubRow(null);
@@ -361,7 +424,11 @@ const useSubPosition = <
         percentage as PathValue<TForm, Path<TForm>>,
       );
       const subItems =
-        (getValues(subItemsPath) as EditableInvoiceSubItemRecord[]) || [];
+        (getValues(subItemsPath) as (
+          | EditableInvoiceSubItemRecord
+          | EditableQuotationSubItemRecord
+          | EditableServiceOrderSubArticleRecord
+        )[]) || [];
       subItems.forEach((_, idx) => {
         setValue(
           `${subItemsPath}.${idx}.unitAmount.vatId` as Path<TForm>,
@@ -384,6 +451,7 @@ const useSubPosition = <
       (getValues(subItemsPath) as (
         | EditableInvoiceSubItemRecord
         | EditableQuotationSubItemRecord
+        | EditableServiceOrderSubArticleRecord
       )[]) || [];
 
     const updatedSubPositions = currentSubItems.filter(
@@ -423,9 +491,12 @@ const useSubPosition = <
     }
   };
 
-  const handleArticleSelection = (selectedArticle: ArticleView | string) => {
+  const handleArticleSelection = (
+    selectedArticle: ExtendedArticleView | string,
+  ) => {
     const isFreeText = typeof selectedArticle === 'string';
     const name = isFreeText ? selectedArticle : selectedArticle.name;
+    const articleType = isFreeText ? null : selectedArticle.type;
 
     setValue(
       `${pathBase}.name` as Path<TForm>,
@@ -438,9 +509,20 @@ const useSubPosition = <
         name as PathValue<TForm, Path<TForm>>,
       );
     } else {
+      const defaultCostPackage: CostPackage | undefined =
+        articleType === ArticleType.PACKAGE
+          ? selectedArticle?.additionalInfo?.costPackage ?? {
+              laborPercentage: 50,
+              materialPercentage: 50,
+            }
+          : undefined;
+
       // Override the VAT fields so that the new sub position inherits the main position's VAT
 
-      const selectedUnitAmount = selectedArticle.unitSellingAmount;
+      const selectedUnitAmount = selectedArticle?.isCustom
+        ? selectedArticle.customSellingAmount
+        : selectedArticle.unitSellingAmount;
+
       const mainVatId = getValues(
         `items.${parentIndex}.unitAmount.vatId` as Path<TForm>,
       );
@@ -452,7 +534,7 @@ const useSubPosition = <
         `${pathBase}.article` as Path<TForm>,
         {
           ...selectedArticle,
-          costPackage: selectedArticle.additionalInfo?.costPackage,
+          costPackage: defaultCostPackage,
         } as PathValue<TForm, Path<TForm>>,
       );
       setValue(
@@ -475,32 +557,83 @@ const useSubPosition = <
 
     setEditableSubRow(null);
     updateMainUnitPurchaseAmount();
+    updateMainUnitAmount();
     onRecalc();
   };
 
   const netPriceDisplay = useMemo(() => {
-    const itemDetail = amountDetail?.items?.[parentIndex]?.subItems?.[subIndex];
+    const [watchedQty, watchedUnitCents] = watch([
+      `${pathBase}.quantity` as Path<TForm>,
+      `${pathBase}.unitAmount.netAmount` as Path<TForm>,
+    ]);
 
-    if (!itemDetail) {
-      return formatCurrency(centsToMoney(currentCurrency.code, 0), {
-        currency: currentCurrency.code,
-      });
+    let qty: number;
+    let unitCents: number;
+
+    const editingThisRow =
+      editableSubRow?.parentIndex === parentIndex &&
+      editableSubRow?.subIndex === subIndex;
+
+    if (editingThisRow && editableSubRow.field === 'quantity') {
+      qty = editableSubRow.values?.quantity ?? 0;
+    } else {
+      qty = Number.isFinite(watchedQty!) ? watchedQty! : subItem.quantity;
     }
 
-    const totalCents = itemDetail.amountAfterItemDiscount?.netAmount ?? 0;
+    if (
+      editingThisRow &&
+      editableSubRow.field === `${pathBase}.unitAmount.netAmount`
+    ) {
+      unitCents = Math.round(
+        moneyToCents(
+          currentCurrency.code,
+          editableSubRow.values?.unitAmount?.netAmount ?? 0,
+        ),
+      );
+    } else {
+      unitCents = Number.isFinite(watchedUnitCents!)
+        ? watchedUnitCents!
+        : subItem.unitAmount?.netAmount ?? 0;
+    }
+
+    const totalCents = Math.round(
+      moneyToCents(
+        currentCurrency.code,
+        qty * centsToMoney(currentCurrency.code, unitCents),
+      ),
+    );
+
     return formatCurrency(centsToMoney(currentCurrency.code, totalCents), {
       currency: currentCurrency.code,
     });
-  }, [amountDetail, parentIndex, subIndex, currentCurrency]);
+  }, [
+    watch,
+    editableSubRow,
+    pathBase,
+    parentIndex,
+    subItem,
+    currentCurrency.code,
+  ]);
+
+  const parentDiscount = watch(`items.${parentIndex}.discount` as Path<TForm>);
 
   const renderDragCell = useCallback(
     () => (
       <TableCell
         noPadding
-        sx={{width: '2px', cursor: 'grab', borderLeft: 'none'}}
+        sx={{
+          width: '2px',
+          cursor: !disableInlineEditing ? 'grab' : 'inherit',
+          borderLeft: 'none',
+        }}
         onMouseEnter={() => setHoveredSubRowIndex(subIndex)}
         onMouseLeave={() => setHoveredSubRowIndex(null)}>
-        <DragHandle isVisible={hoveredSubRowIndex === subIndex} />
+        {!disableInlineEditing && (
+          <DragHandle
+            isVisible={hoveredSubRowIndex === subIndex}
+            disableInlineEditing={disableInlineEditing}
+          />
+        )}
       </TableCell>
     ),
     [hoveredSubRowIndex, setHoveredSubRowIndex, subIndex],
@@ -511,7 +644,11 @@ const useSubPosition = <
       <TableCell
         align="left"
         noPadding
-        onClick={() => handleEditStart('userSeqNumber')}
+        onClick={
+          !disableInlineEditing
+            ? () => handleEditStart('userSeqNumber')
+            : undefined
+        }
         sx={{maxWidth: '58px'}}>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
@@ -532,6 +669,13 @@ const useSubPosition = <
                 })),
               onBlur: () => {
                 setEditableSubRow(null);
+                setValue(
+                  `${pathBase}.userSeqNumber` as Path<TForm>,
+                  editableSubRow.values?.userSeqNumber as PathValue<
+                    TForm,
+                    Path<TForm>
+                  >,
+                );
               },
               onKeyDown: (e) => {
                 if (e.key === 'Tab' && !e.shiftKey) {
@@ -590,7 +734,11 @@ const useSubPosition = <
     () => (
       <TableCell
         noPadding
-        onClick={() => handleEditStart(`${pathBase}.name`)}
+        onClick={
+          !disableInlineEditing
+            ? () => handleEditStart(`${pathBase}.name`)
+            : undefined
+        }
         showShadows={showRightShadow ? 'right' : undefined}
         isFirst
         sx={{width: '328px', marginLeft: '-10em'}}>
@@ -603,6 +751,7 @@ const useSubPosition = <
             excludeTypes={[ArticleType.MIX, ArticleType.PACKAGE]}
             showCustomPriceColumn
             openOnFocus={editableSubRow.subIndex === subIndex}
+            propertyOwnerId={propertyOwnerId}
           />
         ) : (
           <Box
@@ -630,12 +779,15 @@ const useSubPosition = <
               />
             </Box>
             <IconButton
-              onClick={() =>
-                onDescriptionClick(
-                  subItem?.description || '',
-                  parentIndex,
-                  subIndex,
-                )
+              onClick={
+                !disableInlineEditing
+                  ? () =>
+                      onDescriptionClick(
+                        subItem?.description || '',
+                        parentIndex,
+                        subIndex,
+                      )
+                  : undefined
               }
               sx={{
                 color: removeHtmlTags(subItem?.description || '')
@@ -668,12 +820,23 @@ const useSubPosition = <
         )}
       </TableCell>
     ),
-    [editableSubRow, parentIndex, showRightShadow, subIndex, subItem, pathBase],
+    [
+      editableSubRow,
+      parentIndex,
+      showRightShadow,
+      subIndex,
+      subItem,
+      pathBase,
+      disableInlineEditing,
+    ],
   );
 
   const renderArticleTypeCell = useCallback(
     () => (
-      <TableCell align="center" noPadding onClick={handleArticleTypeClick}>
+      <TableCell
+        align="center"
+        noPadding
+        onClick={!disableInlineEditing ? handleArticleTypeClick : undefined}>
         <Box
           sx={{
             width: '100%',
@@ -772,13 +935,16 @@ const useSubPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() =>
-          handleSubPositionEditStart(
-            subItem,
-            `${pathBase}.unitPurchaseAmount.netAmount`,
-            parentIndex,
-            subIndex,
-          )
+        onClick={
+          !disableInlineEditing
+            ? () =>
+                handleSubPositionEditStart(
+                  subItem,
+                  `${pathBase}.unitPurchaseAmount.netAmount`,
+                  parentIndex,
+                  subIndex,
+                )
+            : undefined
         }>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
@@ -884,8 +1050,16 @@ const useSubPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() =>
-          handleSubPositionEditStart(subItem, 'margin', parentIndex, subIndex)
+        onClick={
+          !disableInlineEditing
+            ? () =>
+                handleSubPositionEditStart(
+                  subItem,
+                  'margin',
+                  parentIndex,
+                  subIndex,
+                )
+            : undefined
         }>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
@@ -977,13 +1151,16 @@ const useSubPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() =>
-          handleSubPositionEditStart(
-            subItem,
-            `${pathBase}.unitAmount.netAmount`,
-            parentIndex,
-            subIndex,
-          )
+        onClick={
+          !disableInlineEditing
+            ? () =>
+                handleSubPositionEditStart(
+                  subItem,
+                  `${pathBase}.unitAmount.netAmount`,
+                  parentIndex,
+                  subIndex,
+                )
+            : undefined
         }>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
@@ -1078,7 +1255,9 @@ const useSubPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() => handleEditStart('quantity')}>
+        onClick={
+          !disableInlineEditing ? () => handleEditStart('quantity') : undefined
+        }>
         {editableSubRow?.parentIndex === parentIndex &&
         editableSubRow?.subIndex === subIndex &&
         editableSubRow?.field === 'quantity' ? (
@@ -1096,6 +1275,8 @@ const useSubPosition = <
               }))
             }
             customInput={TextField}
+            decimalSeparator={getDecimalSeparator(selectedLng)}
+            thousandSeparator={getThousandsSeparator(selectedLng)}
             allowLeadingZeros={false}
             decimalScale={2}
             fixedDecimalScale
@@ -1128,7 +1309,12 @@ const useSubPosition = <
           />
         ) : (
           <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>
-            {subItem?.quantity || 0}
+            {formatCurrency(Number(subItem.quantity), {
+              currency: currentCurrency?.code,
+              excludeCurrencySymbol: true,
+              currencySymbol: currentCurrency?.symbol,
+              companyLang: selectedLng,
+            })}
           </Typography>
         )}
       </TableCell>
@@ -1149,8 +1335,10 @@ const useSubPosition = <
               editableSubRow?.field === 'vatId'
             )
           ) {
-            handleEditStart('vatId');
-            vatRef.current?.focus();
+            if (!disableInlineEditing) {
+              handleEditStart('vatId');
+              vatRef.current?.focus();
+            }
           }
         }}
         onKeyDown={(e) => {
@@ -1238,9 +1426,7 @@ const useSubPosition = <
           />
         ) : (
           <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>
-            {subItem?.unitAmount?.percentageVat
-              ? `${subItem.unitAmount.percentageVat}%`
-              : '-'}
+            {`${subItem.unitAmount.percentageVat ?? 0}%`}
           </Typography>
         )}
       </TableCell>
@@ -1269,7 +1455,9 @@ const useSubPosition = <
               editableSubRow?.field === 'unit'
             )
           ) {
-            handleEditStart('unit');
+            if (!disableInlineEditing) {
+              handleEditStart('unit');
+            }
           }
         }}
         onKeyDown={(e) => {
@@ -1330,6 +1518,30 @@ const useSubPosition = <
     [parentIndex, subItem, pathBase, subIndex, editableSubRow],
   );
 
+  const renderDiscountCell = useCallback(
+    () => (
+      <TableCell align="right" noPadding>
+        <Typography
+          sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
+          {parentDiscount?.type === DiscountType.PERCENTAGE
+            ? `${(parentDiscount?.percentage || 0).toFixed(2)}%`
+            : ``}
+        </Typography>
+      </TableCell>
+    ),
+    [
+      currentCurrency,
+      formatCurrency,
+      subItem,
+      showLeftShadow,
+      watch,
+      onRemoveSubPosition,
+      isActionOpen,
+      netPriceDisplay,
+      setValue,
+    ],
+  );
+
   const renderTotalPriceCell = useCallback(
     () => (
       <TableCell
@@ -1347,21 +1559,23 @@ const useSubPosition = <
         <Typography sx={{padding: '0px 12px', position: 'sticky'}}>
           {netPriceDisplay}
         </Typography>
-        <Box
-          sx={{borderLeft: '1px solid #e4e5e8'}}
-          onClick={() => {
-            setIsActionOpen(!isActionOpen);
-          }}>
-          <SubPositionActions
-            onDelete={() => {
-              onRemoveSubPosition(parentIndex, subIndex);
-              setIsActionOpen(false);
-              onRecalc();
-              updateMainUnitPurchaseAmount();
-            }}
-            isOpen={isActionOpen}
-          />
-        </Box>
+        {!disableInlineEditing ? (
+          <Box
+            sx={{borderLeft: '1px solid #e4e5e8'}}
+            onClick={() => {
+              setIsActionOpen(!isActionOpen);
+            }}>
+            <SubPositionActions
+              onDelete={() => {
+                onRemoveSubPosition(parentIndex, subIndex);
+                setIsActionOpen(false);
+                onRecalc();
+                updateMainUnitPurchaseAmount();
+              }}
+              isOpen={isActionOpen}
+            />
+          </Box>
+        ) : undefined}
       </TableCell>
     ),
     [
@@ -1373,6 +1587,7 @@ const useSubPosition = <
       onRemoveSubPosition,
       isActionOpen,
       netPriceDisplay,
+      setValue,
     ],
   );
 
@@ -1389,6 +1604,7 @@ const useSubPosition = <
     renderQuantityCell,
     renderVatIdCell,
     renderUnitCell,
+    renderDiscountCell,
     renderTotalPriceCell,
   };
 };

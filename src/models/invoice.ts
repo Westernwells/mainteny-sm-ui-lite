@@ -267,15 +267,15 @@ export interface InvoicePaymentView {
 }
 
 export interface QueryInvoiceParams {
-  pageIndex: number;
-  pageSize: number;
+  pageIndex?: number;
+  pageSize?: number;
   order?: Order;
   orderByField?: InvoiceOrderField;
   query?: string;
   contractId?: string[];
   sentDateFrom?: string;
   sentDateTo?: string;
-  status: InvoiceStatus[];
+  status?: InvoiceStatus[];
   propertyOwnerId?: string[];
   totalAmountFrom?: number;
   totalAmountTo?: number;
@@ -453,7 +453,7 @@ export interface CreateInvoice {
   sentDate?: string;
   type?: InvoiceType;
   items: InvoiceItemRecord[];
-  paymentTerm?: InvoicePaymentTermRecord;
+  paymentTerm?: InvoicePaymentTermRecord | null;
   paymentInfo?: PaymentInfo;
   shouldSendOut?: boolean;
   includeWorkReport?: boolean;
@@ -480,6 +480,8 @@ export interface CreateInvoice {
   showArticleSection?: boolean;
   refInvoiceId?: string;
   notes?: CreateInvoiceComment[];
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
 }
 
 export interface UpdateInvoice {
@@ -491,7 +493,7 @@ export interface UpdateInvoice {
   dueDate?: string;
   sentDate?: string;
   items?: InvoiceItemRecord[];
-  paymentTerm?: InvoicePaymentTermRecord;
+  paymentTerm?: InvoicePaymentTermRecord | null;
   paymentInfo?: PaymentInfo;
   includeWorkReport?: boolean;
   includeCheckList?: boolean;
@@ -515,6 +517,8 @@ export interface UpdateInvoice {
   deliveryStartDate?: string;
   deliveryEndDate?: string;
   showArticleSection?: boolean;
+  showInvoicedSection?: boolean;
+  showPaymentSection?: boolean;
   elevatorExternalId?: string;
 }
 
@@ -700,6 +704,14 @@ export type SearchParameters = {
 
 export type InvoiceStatistics = {
   numOfInvoicesPerStatus: Record<string, number>;
+  amountsPerStatus: Record<
+    string,
+    {
+      value: number;
+      currency: string;
+      fractionDigits: number;
+    }[]
+  >;
 };
 
 export type QueryCancelInvoiceParams = {

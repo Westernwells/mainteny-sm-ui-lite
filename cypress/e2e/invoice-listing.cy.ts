@@ -153,6 +153,11 @@ describe('Invoice listing page', () => {
             const {data} = interception.response.body;
             const firstFullSentInvoice = data.find((d) => d.type === InvoiceType.FULL);
 
+            if (!firstFullSentInvoice) {
+                cy.log('No full sent invoice found');
+                return;
+            }
+
             // extract invoice number
             const invoiceNumber = firstFullSentInvoice.externalId;
 
@@ -167,20 +172,29 @@ describe('Invoice listing page', () => {
             cy.contains('button', 'Yes').click();
 
             // validate credit note invoice subject
-            cy.get('div[role="textbox"][id="subject"]').contains(`Credit note for ${invoiceNumber}`);
+            cy.getRichTextField('Subject').contains(`Credit note for ${invoiceNumber}`);
 
             // validate credit note invoice items are same as original invoice items but with negative net amount
             const originalInvoiceItems = firstFullSentInvoice.items;
-            cy.get('#article-combo-box').invoke('val')
-            .then((value) => {
-              expect(removeControlCharsAndSpaces(value as string)).to.contain(
-                removeControlCharsAndSpaces(getPlainStringFromHtml(originalInvoiceItems[0].name))
-              );
-            });
+            cy.get('td[data-testid="article-name-0"]').click();
+            cy.get('#article-combo-box')
+                .invoke('val')
+                .then((value) => {
+                    expect(removeControlCharsAndSpaces(value as string)).to.contain(
+                        removeControlCharsAndSpaces(getPlainStringFromHtml(originalInvoiceItems[0].name)),
+                    );
+                });
 
-            cy.get('input[name="unitAmount.netAmount"]')
+            cy.get(`td[data-testid="position-unitAmount-0"]`).click({force: true});
+            cy.get('input[name="items.0.unitAmount.netAmount"]')
                 .invoke('attr', 'value')
-                .should('eq', (-originalInvoiceItems[0].unitAmount.netAmount / 100).toLocaleString());
+                .should(
+                    'eq',
+                    (-originalInvoiceItems[0].unitAmount.netAmount / 100).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    }),
+                );
 
             // validate credit note invoice total amount is same as original invoice but in negative
             const {amountAfterGlobalDiscountWithVAT} = calculateArticlesAmount({

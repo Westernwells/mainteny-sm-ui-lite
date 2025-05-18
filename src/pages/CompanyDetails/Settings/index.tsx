@@ -3,7 +3,6 @@ import {
   AccessTimeOutlined,
   DateRangeOutlined,
   PublicOutlined,
-  RequestPageOutlined,
   TranslateOutlined,
 } from '@mui/icons-material';
 import {useFormik} from 'formik';
@@ -99,15 +98,6 @@ export const Settings = ({company}: Props) => {
           label="Time zone"
           value={company.settings.timezone}
           Icon={PublicOutlined}
-        />
-        <CardDataListItem
-          label="VAT"
-          value={
-            company.settings.percentageVat
-              ? `${company.settings.percentageVat}%`
-              : '-'
-          }
-          Icon={RequestPageOutlined}
         />
       </Card>
       <Dialog

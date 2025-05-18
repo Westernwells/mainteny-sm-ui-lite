@@ -168,7 +168,7 @@ export const CardProps = ({
                   whiteSpace: 'normal',
                   wordWrap: 'break-word',
                   display: '-webkit-box',
-                  wordBreak: 'break-all',
+                  wordBreak: 'break-word',
                   overflow: 'hidden',
                   ...(hasMaxWidth && {maxWidth: '300px'}),
                   textWrap: 'wrap',
