@@ -34,7 +34,7 @@ const ArticleSectionFooter = ({
   });
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} wrap={false}>
       {discountValue && (
         <View style={styles.footerRow}>
           <Text style={styles.emptyColumn} />
