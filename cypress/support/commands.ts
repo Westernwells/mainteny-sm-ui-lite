@@ -44,6 +44,7 @@ declare global {
       fillRichTextField(field: string, value: string): Chainable<void>;
       clearRichTextField(field: string): Chainable<void>;
       waitForSpinnerToDisappear(): Chainable<void>;
+      fillTiptapRichTextField(field: string, value: string): Chainable<void>;
     }
   }
 }
@@ -94,6 +95,21 @@ Cypress.Commands.add('clearRichTextField', (field: string) => {
 Cypress.Commands.add('waitForSpinnerToDisappear', () => {
   cy.get('span[role="progressbar"]').should('not.exist');
 });
+
+Cypress.Commands.add(
+  'fillTiptapRichTextField',
+  (field: string, value: string) => {
+    cy.contains('label', field)
+      .parent('div')
+      .within(() => {
+        cy.get('div[contenteditable="true"]')
+          .focus()
+          .click()
+          .wait(1000)
+          .realType(value);
+      });
+  },
+);
 
 // hack for cypress typescript issues
 export {};

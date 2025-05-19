@@ -55,7 +55,7 @@ export default class ArticlesPage {
   };
 
   static fillDescription = (article: ArticleDescriptionFormModel) => {
-    cy.fillRichTextField('Description', article.description);
+    cy.fillTiptapRichTextField('Description', article.description);
   };
 
   static fillStockDetails = (article: ArticleStockFormModel) => {

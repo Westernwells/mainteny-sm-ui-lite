@@ -78,46 +78,44 @@ export const ArticleSection = ({
   return (
     <View
       style={{
-        marginVertical: 16,
+        marginTop: 16,
         paddingRight: 5,
       }}>
-      <View>
-        <View style={styles.table}>
-          <ArticleTableHeader
-            translate={translate}
-            currentCurrency={currentCurrency}
-            primaryColor={primaryColor}
-            secondaryColor={secondaryColor}
-            showDiscountCol={showDiscountCol}
-          />
+      <View style={styles.table}>
+        <ArticleTableHeader
+          translate={translate}
+          currentCurrency={currentCurrency}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
+          showDiscountCol={showDiscountCol}
+        />
 
-          <ArticleSectionBody
-            items={invoiceItems}
-            amountDetail={invoiceAmountDetail}
-            currentCurrency={currentCurrency}
-            selectedLng={selectedLng}
-            translate={translate}
-            primaryColor={primaryColor}
-            showDiscountCol={showDiscountCol}
-            fontStyles={fontStyles}
-          />
+        <ArticleSectionBody
+          items={invoiceItems}
+          amountDetail={invoiceAmountDetail}
+          currentCurrency={currentCurrency}
+          selectedLng={selectedLng}
+          translate={translate}
+          primaryColor={primaryColor}
+          showDiscountCol={showDiscountCol}
+          fontStyles={fontStyles}
+        />
 
-          <ArticleSectionFooter
-            translate={translate}
-            discountValue={discountValue}
-            currentCurrency={currentCurrency}
-            selectedLng={selectedLng}
-            amountAfterGlobalDiscountFormatted={
-              amountAfterGlobalDiscountFormatted
-            }
-            vats={vats}
-            amountAfterGlobalDiscountWithVATFormatted={
-              amountAfterGlobalDiscountWithVATFormatted
-            }
-            primaryColor={primaryColor}
-            fontStyles={fontStyles}
-          />
-        </View>
+        <ArticleSectionFooter
+          translate={translate}
+          discountValue={discountValue}
+          currentCurrency={currentCurrency}
+          selectedLng={selectedLng}
+          amountAfterGlobalDiscountFormatted={
+            amountAfterGlobalDiscountFormatted
+          }
+          vats={vats}
+          amountAfterGlobalDiscountWithVATFormatted={
+            amountAfterGlobalDiscountWithVATFormatted
+          }
+          primaryColor={primaryColor}
+          fontStyles={fontStyles}
+        />
       </View>
     </View>
   );
