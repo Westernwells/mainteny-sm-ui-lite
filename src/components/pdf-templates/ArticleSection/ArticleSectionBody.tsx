@@ -59,7 +59,7 @@ export const ArticleSectionBody = ({
 
         return (
           <View key={`${mainPosition.id}-${index}`}>
-            <View style={styles.tableRow}>
+            <View style={styles.tableRow} wrap={false}>
               <View style={styles.col6Left}>
                 <Text>
                   {insertNewlines(mainPosition.userSeqNumber || '') ||
@@ -167,8 +167,11 @@ export const ArticleSectionBody = ({
                     .amountAfterItemDiscount?.netAmount || 0,
                 );
                 return (
-                  <View key={`${subItem.id}-${index}-${subIndex}`}>
-                    <View style={styles.tableRow}>
+                  <>
+                    <View
+                      style={styles.tableRow}
+                      key={`${subItem.id}-${index}-${subIndex}`}
+                      wrap={false}>
                       <View style={styles.col6Left}>
                         <Text>
                           {insertNewlines(subItem.userSeqNumber || '') ||
@@ -283,7 +286,7 @@ export const ArticleSectionBody = ({
                         />
                       </View>
                     )}
-                  </View>
+                  </>
                 );
               })}
           </View>

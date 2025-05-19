@@ -92,7 +92,7 @@ const ArticleTableHeader = ({
   const priceWidth = showDiscountCol ? styles.col12Right.width : '18.5%';
 
   return (
-    <View style={styles.tableHead}>
+    <View style={styles.tableHead} wrap={false}>
       <View style={styles.tableRow}>
         <View style={[styles.col6Left]}>
           <Text style={[styles.tableHeading]}>#</Text>

@@ -126,6 +126,7 @@ describe('Invoice flow', () => {
             // validate articles are filled from job
             if (!job.articles.length) {
                 cy.contains('button', 'Save').should('be.disabled');
+                cy.contains('button', 'Add Position').click();
                 cy.get('td[data-testid="article-name-0"]').click();
                 const positionsTable = cy.get('#article-combo-box-listbox');
                 // clicking second row because first row is table header
@@ -309,9 +310,12 @@ describe('Invoice flow', () => {
                                 ...options,
                             });
                         invoice.items.forEach((a) => {
-                            (isPlainString(a.name) ? a.name : getPlainStringFromHtml(a.name)).split(' ').forEach((word) => {
-                                cy.contains(word);
-                            });
+                            (isPlainString(a.name) ? a.name : getPlainStringFromHtml(a.name))
+                                .split(' ')
+                                .filter((word) => !!word.length)
+                                .forEach((word) => {
+                                    cy.contains(word);
+                                });
                             cy.contains(a.quantity);
                             cy.contains(formatCurrencyWithOptions(centsToMoney(currency, a.unitAmount.netAmount) || 0));
                             cy.contains(formatCurrencyWithOptions(netTotal(a, currency)));
@@ -464,7 +468,6 @@ describe('Invoice flow', () => {
             // Access the correct row and combo box
             cy.get(`tr[data-testid="main-row-${index}"]`).within(() => {
                 cy.get(`td[data-testid="article-name-${index}"]`).click();
-                cy.get('#article-combo-box').click({force: true}); // Click combo box inside row
             });
 
             // Now outside of within - access global dropdown

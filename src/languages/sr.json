@@ -3262,5 +3262,12 @@
   "Write with AI": "Pišite sa AI",
   "Rewrite with AI": "Ponovo napišite pomoću AI",
   "Add attachments to enhance article clarity.": "Dodajte priloge kako biste poboljšali jasnoću članka.",
-  "press_enter_to_create_tag": "Pritisnite <Image></Image> Enter da biste kreirali novu oznaku"
+  "press_enter_to_create_tag": "Pritisnite <Image></Image> Enter da biste kreirali novu oznaku",
+  "But it is optional when setting up the account.": "Ali to je opciono prilikom podešavanja naloga.",
+  "Position was deleted": "Pozicija je obrisana",
+  "You are about to remove this position permanently from this invoice. This action can't be undone. Do you want to proceed?": "Upravo ćete trajno ukloniti ovu poziciju sa ove fakture. Ova radnja se ne može poništiti. Da li želite da nastavite?",
+  "You are about to remove {{tagName}} tag.": "Upravo ćete ukloniti oznaku {{tagName}}.",
+  "Tag created successfully": "Oznaka je uspešno kreirana",
+  "Tag was deleted": "Oznaka je obrisana",
+  "Tag renamed": "Oznaka je preimenovana"
 }

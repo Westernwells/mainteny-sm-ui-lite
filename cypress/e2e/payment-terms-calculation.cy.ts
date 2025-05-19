@@ -37,8 +37,22 @@ describe('Payment Terms Calculation', () => {
         cy.contains('button', 'Create').click();
     };
 
-    const addArticleAndSetAmount = ({index = 0, amount, quantity, vat}: {index: number; amount: number; quantity: number; vat: number}) => {
-        cy.contains('button', 'Add Position').click();
+    const addArticleAndSetAmount = ({
+        index = 0,
+        amount,
+        quantity,
+        vat,
+        addNew = false,
+    }: {
+        index: number;
+        amount: number;
+        quantity: number;
+        vat: number;
+        addNew?: boolean;
+    }) => {
+        if (addNew) {
+            cy.contains('button', 'Add Position').click();
+        }
         cy.get(`tr[data-testid="main-row-${index}"]`).within(() => {
             cy.get(`td[data-testid="article-name-${index}"]`).click();
             cy.get('#article-combo-box').click().wait(500).realType('Test Article').wait(500).realType('{esc}');
@@ -74,8 +88,6 @@ describe('Payment Terms Calculation', () => {
                 cy.get('table[data-testid="table-container"] [data-testid="MoreVertOutlinedIcon"]').then((rows) => {
                     deleteAllFoundArticles(rows.length);
                 });
-                // After potential deletion, ensure the tbody is empty
-                cy.get('table[data-testid="table-container"] tbody').should('be.empty');
             }
         });
 
