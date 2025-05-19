@@ -369,10 +369,11 @@ export const DraftQuotation = ({
     formState: {errors},
   } = formMethods;
 
-  const watchedAllItems = useWatch({control, name: 'items', defaultValue: []});
+  const watchedAllItems = useWatch({control, name: 'items'});
 
   const prevItemsRef = useRef<EditableQuotationItem[]>(watchedAllItems);
   const prevVatMapRef = useRef<Record<string, number>>({});
+  const vatSyncInitialized = useRef(false);
 
   const watchedItems = watch('items') || [];
   const watchedDiscount = watch('discount');
@@ -1161,6 +1162,12 @@ export const DraftQuotation = ({
       },
       {},
     );
+
+    if (!vatSyncInitialized.current) {
+      prevVatMapRef.current = currentVatMap;
+      vatSyncInitialized.current = true;
+      return;
+    }
 
     const vatChanged = watchedAllItems.some((item) => {
       const newVatId = item.id!;

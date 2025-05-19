@@ -15,6 +15,7 @@ import {EditableQuotationItem, QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {VatView} from 'models/vat';
 import {MultiVatsAmount} from 'models/misc';
+import {stripHtmlTags} from '../pages/InvoiceDetails/utils';
 import {Currencies, formatCurrency} from './currency';
 import {convertToText} from './utils';
 import {CreateArticleRecord} from '../models/article';
@@ -139,7 +140,11 @@ export function syncVatLegalNotesWithNotes({
     if (oldVat !== newVat) {
       const vatInfo = taxRates?.find((v) => v.id === newArt.unitAmount?.vatId);
       if (vatInfo?.legalNote && !notes.includes(vatInfo.legalNote)) {
-        notes += `\n<p>${vatInfo.legalNote}</p>`;
+        if (stripHtmlTags(notes).trim().length > 0) {
+          notes += `\n<p>${vatInfo.legalNote}</p>`;
+        } else {
+          notes = `<p>${vatInfo.legalNote}</p>`;
+        }
       }
     }
   });
