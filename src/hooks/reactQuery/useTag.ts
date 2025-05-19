@@ -58,11 +58,15 @@ export const deleteTag = async (id: string) =>
 
 export const useDeleteTag = () => {
   const queryClient = useQueryClient();
-  const {showError} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation(({tagId}: {tagId: string}) => deleteTag(tagId), {
     onSuccess: () => {
       queryClient.invalidateQueries([queryKeys.fetchTags]);
+
+      enqueueSnackbar('Tag was deleted', {
+        variant: 'success',
+      });
     },
     onError: (err) => {
       showError(err);
@@ -77,14 +81,18 @@ type UpdateTagQueryPrams = {
 export const updateTag = async ({tagId, ...body}: UpdateTagQueryPrams) =>
   axiosClient.put<StringValue>(`api/tags/${tagId}`, body);
 
-export const useUpdateTag = () => {
+export const useUpdateTag = (message: string) => {
   const queryClient = useQueryClient();
-  const {showError} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
 
   return useMutation((params: UpdateTagQueryPrams) => updateTag(params), {
     onSuccess: () => {
       queryClient.invalidateQueries([queryKeys.fetchTags]);
       queryClient.invalidateQueries([queryKeys.fetchArticles]);
+
+      enqueueSnackbar(message, {
+        variant: 'success',
+      });
     },
     onError: (err) => {
       showError(err);
@@ -101,7 +109,7 @@ export const createTag = async (body: CreateTagQueryPrams) =>
 
 export const useCreateTag = () => {
   const queryClient = useQueryClient();
-  const {showError} = useSnackbar();
+  const {enqueueSnackbar, showError} = useSnackbar();
   const {user} = useUserSession();
 
   return useMutation(
@@ -114,6 +122,10 @@ export const useCreateTag = () => {
       onSuccess: () => {
         queryClient.invalidateQueries([queryKeys.fetchTags]);
         queryClient.invalidateQueries([queryKeys.fetchTagStatistics]);
+
+        enqueueSnackbar('Tag created successfully', {
+          variant: 'success',
+        });
       },
       onError: (err) => {
         showError(err);

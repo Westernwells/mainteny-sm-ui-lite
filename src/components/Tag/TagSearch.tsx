@@ -14,6 +14,9 @@ import {useCreateTag, useTags, useTagStatistics} from 'hooks/reactQuery/useTag';
 import {generateTag} from 'utils/tag';
 import useTheme from '@mui/material/styles/useTheme';
 import TagSearchMenuItem from 'components/Tag/TagSearchMenuItem';
+import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
+import {Trans} from 'react-i18next';
+import useKeyboardNavigationControls from 'hooks/useKeyboardNavigationControls';
 import Tag from '.';
 
 const TAGS_PER_REQUEST = 200;
@@ -38,6 +41,7 @@ const TagSearch = ({
 }: Props) => {
   const theme = useTheme();
   const ref = useRef<HTMLInputElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState<string | undefined>();
   const [renameTagId, setRenameTagId] = useState<string | null>(null);
 
@@ -64,12 +68,34 @@ const TagSearch = ({
 
   const {mutateAsync: handleQueryCreateTag} = useCreateTag();
 
-  const handleSelectTag = (tag: TagType, e: SyntheticEvent) => {
+  const isActionCreateTag =
+    !foundTagsResource || foundTagsResource.data.length === 0;
+
+  const handleSelectTag = (tag: TagType, e: SyntheticEvent | KeyboardEvent) => {
     e.stopPropagation();
     if (!renameTagId || renameTagId !== tag.id) {
       onChange([...selectedTags, tag]);
     }
   };
+
+  const handleEnterSelectTag = useCallback(
+    (index: number, e: KeyboardEvent) => {
+      const foundTag = foundTagsResource?.data[index];
+      if (!foundTag) return;
+
+      handleSelectTag(foundTag, e);
+    },
+    [foundTagsResource],
+  );
+
+  const {itemRefs} = useKeyboardNavigationControls<HTMLDivElement>({
+    elementRef: popupRef.current,
+    itemCount: foundTagsResource?.data.length || 0,
+    isOpen: open,
+    initialIndex: 0,
+    onSelect: handleEnterSelectTag,
+    onClose,
+  });
 
   const handleCreateTag = (tagName: string) => {
     handleQueryCreateTag(
@@ -86,11 +112,7 @@ const TagSearch = ({
   const handleKeyDownControl: KeyboardEventHandler<HTMLDivElement> =
     useCallback(
       (e) => {
-        if (
-          e.key === 'Enter' &&
-          search &&
-          (!foundTagsResource || foundTagsResource.data.length === 0)
-        ) {
+        if (e.key === 'Enter' && search && isActionCreateTag) {
           handleCreateTag(search);
         }
       },
@@ -135,10 +157,10 @@ const TagSearch = ({
       onClose={handleClose}
       sx={{
         '& .MuiPaper-root': {
-          width: '380px',
-          minHeight: '228px',
-          maxHeight: '580px',
-          padding: '16px',
+          position: 'relative',
+          width: 'fit-content',
+          height: 'fit-content',
+          overflow: 'hidden',
         },
       }}
       anchorOrigin={{
@@ -151,62 +173,119 @@ const TagSearch = ({
       }}>
       <Box
         sx={{
+          padding: '16px 16px 0px 16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: theme.spacing(1, 5),
+          width: '380px',
+          minHeight: '228px',
+          maxHeight: '580px',
+          overflowY: 'auto',
         }}>
-        <SearchInput
-          refInput={ref}
-          defaultValue={search}
-          maxLength={50}
-          onChange={(val: string) => setSearch(val)}
-          onKeyDown={handleKeyDownControl}
-          onClick={(event: SyntheticEvent) => {
-            // prevent any bubbling
-            // tables have a onClick event on roll that is triggered every time popover outside click is triggered
-            event.stopPropagation();
-            event.preventDefault();
-          }}
-        />
-
-        <Box
-          sx={{
-            display: 'flex',
-            padding: '8px 0 12px 0',
-            gap: theme.spacing(0.5),
-            flexWrap: 'wrap',
-          }}>
-          {selectedTags.map((tag) => (
-            <Tag
-              key={`search-selected-tag-${tag.id}`}
-              {...tag}
-              entity={entity}
-              withAction
-              onDelete={handleRemoveTag(tag.id)}
-            />
-          ))}
-        </Box>
-
-        <Divider sx={{borderColor: theme.palette.grey[300]}} />
-
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            padding: '0 0 8px 0',
-            gap: theme.spacing(1),
+            gap: theme.spacing(1, 5),
           }}>
-          {showSearchedTags.map((tag) => (
-            <TagSearchMenuItem
-              data-testid={`${!!renameTagId}-${tag.id}`}
-              tag={tag}
-              entity={entity}
-              isRenaming={!!renameTagId && tag.id === renameTagId}
-              onClick={handleSelectTag}
-              onRename={handleRenameTag}
-            />
-          ))}
+          <SearchInput
+            refInput={ref}
+            defaultValue={search}
+            maxLength={50}
+            onChange={(val: string) => setSearch(val)}
+            onKeyDown={handleKeyDownControl}
+            onClick={(event: SyntheticEvent) => {
+              // prevent any bubbling
+              // tables have a onClick event on roll that is triggered every time popover outside click is triggered
+              event.stopPropagation();
+              event.preventDefault();
+            }}
+          />
+
+          <Box
+            sx={{
+              display: 'flex',
+              padding: '8px 0 12px 0',
+              gap: theme.spacing(0.5),
+              flexWrap: 'wrap',
+            }}>
+            {selectedTags.map((tag) => (
+              <Tag
+                key={`search-selected-tag-${tag.id}`}
+                {...tag}
+                entity={entity}
+                withAction
+                onDelete={handleRemoveTag(tag.id)}
+              />
+            ))}
+          </Box>
+
+          <Divider sx={{borderColor: theme.palette.grey[300]}} />
+
+          <Box
+            ref={popupRef}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '0 0 8px 0',
+              gap: theme.spacing(1),
+            }}>
+            {showSearchedTags.map((tag, index) => (
+              <TagSearchMenuItem
+                ref={(el) => {
+                  if (itemRefs.current) {
+                    itemRefs.current[index] = el;
+                  }
+                }}
+                data-testid={`${!!renameTagId}-${tag.id}`}
+                tag={tag}
+                entity={entity}
+                index={index}
+                isRenaming={!!renameTagId && tag.id === renameTagId}
+                onClick={handleSelectTag}
+                onRename={handleRenameTag}
+              />
+            ))}
+          </Box>
         </Box>
+
+        {isActionCreateTag && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: theme.spacing(3),
+              marginTop: theme.spacing(1.5),
+            }}>
+            <Trans
+              i18nKey="press_enter_to_create_tag"
+              style={{fontSize: '14px', color: theme.palette.text.secondary}}
+              components={{
+                Image: (
+                  <SubdirectoryArrowLeftIcon
+                    sx={{
+                      background: '#0F4C6414',
+                      color: theme.palette.primary.main,
+                      borderRadius: '2px',
+                      width: '20px',
+                      height: '20px',
+                      display: 'flex',
+                      margin: '0 6px',
+                    }}
+                  />
+                ),
+              }}
+            />
+          </Box>
+        )}
+      </Box>
+      <Box
+        sx={{
+          position: 'sticky',
+          bottom: 0,
+          left: 0,
+        }}>
+        {/* <Footer /> */}
       </Box>
     </Popover>
   );
