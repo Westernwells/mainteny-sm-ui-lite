@@ -3252,5 +3252,8 @@
   "press_enter_to_create_tag": "Drücke <Image></Image> Enter um Tag anzulegen. ",
   "But it is optional when setting up account.": "Bei der Kontoeinrichtung ist dies jedoch optional.",
   "Position was deleted": "Position wurde gelöscht",
-  "You are about to remove this position permanently from this invoice. This action can't be undone. Do you want to proceed?": "Sie sind dabei, diese Position dauerhaft aus dieser Rechnung zu entfernen. Diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie fortfahren?"
+  "You are about to remove this position permanently from this invoice. This action can't be undone. Do you want to proceed?": "Sie sind dabei, diese Position dauerhaft aus dieser Rechnung zu entfernen. Diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie fortfahren?",
+  "You are about to remove {{tagName}} tag.": "Du bist im Begriff den Tag {{tagName}} zu entfernen.",
+  "Tag created successfully": "Tag erfolgreich hinzugefügt ",
+  "Tag was deleted": "Tag wurde entfernt"
 }
