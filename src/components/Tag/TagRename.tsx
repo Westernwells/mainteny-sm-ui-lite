@@ -19,7 +19,7 @@ const TagRename = ({id, name, color, entity, onClose}: Props) => {
   const {t} = useTranslation();
   const {enqueueSnackbar} = useSnackbar();
   const [chipName, setChipName] = useState<string>(name);
-  const {mutateAsync: handleUpdate} = useUpdateTag();
+  const {mutateAsync: handleUpdate} = useUpdateTag('Tag renamed');
   const anchorEl = useRef<HTMLInputElement>(null);
 
   const handleRenameConfirm = async (newName: string) => {
