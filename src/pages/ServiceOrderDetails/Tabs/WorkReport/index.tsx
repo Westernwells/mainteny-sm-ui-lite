@@ -840,6 +840,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
           items={articles}
           setItems={setArticles}
           isEdit={isEditMode || false}
+          propertyOwnerId={serviceOrder?.elevator?.propertyOwner?.id}
         />
 
         <Box mt="1em">

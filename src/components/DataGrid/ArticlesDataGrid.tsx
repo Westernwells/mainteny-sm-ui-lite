@@ -1,10 +1,10 @@
-import {Dispatch, SetStateAction, useEffect, useState} from 'react';
+import {Dispatch, SetStateAction, useEffect, useMemo, useState} from 'react';
 import {GridCellParams, GridColDef, GridRowsProp} from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import {DataGridLayout, getColumnProps} from 'components/DataGridLayout';
 import {Progress} from 'components/Progress';
 import {useArticles} from 'hooks/reactQuery/useArticle';
-import {ArticleType, ArticleView} from 'models/article';
+import {ArticleType, ArticleView, ExtendedArticleView} from 'models/article';
 import {formatCurrency} from 'utils/currency';
 import {createEmptyResource, makePage} from 'utils/paging';
 import {useTranslation} from 'react-i18next';
@@ -12,6 +12,9 @@ import {stringToTitleCase} from 'utils/utils';
 import Typography from '@mui/material/Typography';
 import DOMPurify from 'dompurify';
 import {getArticleTypes} from 'utils/article-utils';
+import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
+import {ServiceOrderType} from 'models/service-order';
+import {keyBy} from 'lodash';
 import {NoRowsEmptySection} from './NoRowsEmptySection';
 import {styles} from './style';
 import {
@@ -23,6 +26,7 @@ interface Props {
   setRowItem: (row: ArticleView) => void;
   search: string;
   setSearch?: Dispatch<SetStateAction<''>>;
+  propertyOwnerId?: string;
 }
 
 export const columns: GridColDef[] = [
@@ -96,10 +100,15 @@ export const columns: GridColDef[] = [
 
 const pageSize = 25;
 
-export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
+export const ArticlesDataGrid = ({
+  setRowItem,
+  search,
+  setSearch,
+  propertyOwnerId,
+}: Props) => {
   const {t} = useTranslation();
 
-  const makeRows = (articles: ArticleView[]): GridRowsProp =>
+  const makeRows = (articles: ExtendedArticleView[]): GridRowsProp =>
     articles
       ? articles.map((item, index) => ({
           id: index,
@@ -142,6 +151,30 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
     true,
   );
 
+  const {data: customPrices = []} = usePropertyOwnerQueryTravelWorks(
+    propertyOwnerId || '',
+    {serviceOrderType: ServiceOrderType.GENERAL},
+    {enabled: !!propertyOwnerId},
+  );
+
+  const mergedArticles: ExtendedArticleView[] = useMemo(() => {
+    const byId = keyBy(customPrices, (item) => item.article.id);
+    return (articleResource.data || []).map((article) => {
+      const custom = byId[article.id];
+      if (custom?.article) {
+        const c = custom.article;
+        return {
+          ...article,
+          name: c.name || article.name,
+          description: c.description || article.description,
+          unitPurchaseAmount: c.unitSellingAmount,
+          isCustom: true,
+        };
+      }
+      return {...article, isCustom: false};
+    });
+  }, [articleResource.data, customPrices]);
+
   useEffect(() => {
     setSearch?.('');
   }, []);
@@ -151,12 +184,12 @@ export const ArticlesDataGrid = ({setRowItem, search, setSearch}: Props) => {
   }, [articleResource.total, page.pageSize]);
 
   useEffect(() => {
-    if (articleResource.data.length) {
-      setRows(makeRows(articleResource.data));
+    if (mergedArticles.length) {
+      setRows(makeRows(mergedArticles));
     } else {
       setRows([]);
     }
-  }, [articleResource.data]);
+  }, [mergedArticles]);
 
   if (isIdle || isLoading) {
     return (
