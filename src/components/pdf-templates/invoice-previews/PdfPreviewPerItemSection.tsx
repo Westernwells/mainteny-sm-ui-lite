@@ -10,7 +10,7 @@ import {Currency} from 'models/misc';
 import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {PdfConfigurationStyles} from 'models/pdfs';
-import {ContextProps} from 'context/PdfStylesProvider';
+import {ContextProps, FontStyle} from 'context/PdfStylesProvider';
 
 const getStyles = ({primaryColor, secondaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
@@ -107,14 +107,7 @@ const renderRow = (
   currentCurrency: Currency,
   primaryColor: string,
   secondaryColor: string,
-  fontStyles: {
-    regular: {
-      fontFamily: string;
-    };
-    bold: {
-      fontFamily: string;
-    };
-  },
+  fontStyles: FontStyle,
   selectedLng?: string,
 ) => {
   const styles = getStyles({primaryColor, secondaryColor});
@@ -161,14 +154,7 @@ const renderRowsFromItems = (
   currentCurrency: Currency,
   primaryColor: string,
   secondaryColor: string,
-  fontStyles: {
-    regular: {
-      fontFamily: string;
-    };
-    bold: {
-      fontFamily: string;
-    };
-  },
+  fontStyles: FontStyle,
   selectedLng?: string,
 ) => {
   const aggregated = aggregateItems(items);

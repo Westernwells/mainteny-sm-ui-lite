@@ -53,12 +53,40 @@ Font.register({
 });
 
 Font.register({
+  family: 'Montserrat',
+  fonts: [
+    {src: MontserratRegular},
+    {src: MontserratBold, fontWeight: 'bold'},
+    {src: MontserratItalic, fontStyle: 'italic'},
+    {
+      src: MontserratBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+
+Font.register({
   family: 'Montserrat-Bold',
   src: MontserratBold,
 });
 
 Font.register({
   family: 'NotoSans-Regular',
+  fonts: [
+    {src: NotoSansGeorgianRegular},
+    {src: NotoSansGeorgianBold, fontWeight: 'bold'},
+    {src: NotoSansGeorgianItalic, fontStyle: 'italic'},
+    {
+      src: MontserratBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+
+Font.register({
+  family: 'NotoSans',
   fonts: [
     {src: NotoSansGeorgianRegular},
     {src: NotoSansGeorgianBold, fontWeight: 'bold'},
@@ -91,12 +119,39 @@ Font.register({
 });
 
 Font.register({
+  family: 'Aventa',
+  fonts: [
+    {src: AventaRegular},
+    {src: AventaBold, fontWeight: 'bold'},
+    {src: AventaItalic, fontStyle: 'italic'},
+    {
+      src: AventaBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+
+Font.register({
   family: 'Aventa-Bold',
   src: AventaBold,
 });
 
 Font.register({
   family: 'Inter-Regular',
+  fonts: [
+    {src: InterRegular},
+    {src: InterBold, fontWeight: 'bold'},
+    {src: InterItalic, fontStyle: 'italic'},
+    {
+      src: InterBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+Font.register({
+  family: 'Inter',
   fonts: [
     {src: InterRegular},
     {src: InterBold, fontWeight: 'bold'},
@@ -129,6 +184,20 @@ Font.register({
 });
 
 Font.register({
+  family: 'Ubuntu',
+  fonts: [
+    {src: UbuntuRegular},
+    {src: UbuntuBold, fontWeight: 'bold'},
+    {src: UbuntuItalic, fontStyle: 'italic'},
+    {
+      src: UbuntuBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+
+Font.register({
   family: 'Ubuntu-Bold',
   src: UbuntuBold,
 });
@@ -148,12 +217,40 @@ Font.register({
 });
 
 Font.register({
+  family: 'Arial',
+  fonts: [
+    {src: ArialRegular},
+    {src: ArialBold, fontWeight: 'bold'},
+    {src: ArialItalic, fontStyle: 'italic'},
+    {
+      src: ArialBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+
+Font.register({
   family: 'Arial-Bold',
   src: ArialBold,
 });
 
 Font.register({
-  family: 'Lato-Regularr',
+  family: 'Lato-Regular',
+  fonts: [
+    {src: LatoRegular},
+    {src: LatoBold, fontWeight: 'bold'},
+    {src: LatoItalic, fontStyle: 'italic'},
+    {
+      src: LatoBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+
+Font.register({
+  family: 'Lato',
   fonts: [
     {src: LatoRegular},
     {src: LatoBold, fontWeight: 'bold'},
@@ -172,7 +269,21 @@ Font.register({
 });
 
 Font.register({
-  family: 'TimesNewRoman-Regularr',
+  family: 'TimesNewRoman-Regular',
+  fonts: [
+    {src: TimesNewRomanRegular},
+    {src: TimesNewRomanBold, fontWeight: 'bold'},
+    {src: TimesNewRomanItalic, fontStyle: 'italic'},
+    {
+      src: TimesNewRomanBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+
+Font.register({
+  family: 'Times New Roman',
   fonts: [
     {src: TimesNewRomanRegular},
     {src: TimesNewRomanBold, fontWeight: 'bold'},
@@ -190,16 +301,19 @@ Font.register({
   src: TimesNewRomanBold,
 });
 
+export type FontStyle = {
+  name: string;
+  regular: {
+    fontFamily: string;
+  };
+  bold: {
+    fontFamily: string;
+  };
+};
+
 export type ContextProps = {
   currentPdfFont: string;
-  fontStyles: {
-    regular: {
-      fontFamily: string;
-    };
-    bold: {
-      fontFamily: string;
-    };
-  };
+  fontStyles: FontStyle;
   disableFontSelection: boolean;
   primaryColor: string;
   secondaryColor: string;
@@ -221,6 +335,7 @@ const LANGUAGE_TO_FONTS: Record<string, string> = {
 const initialValue: ContextProps = {
   currentPdfFont: 'Montserrat',
   fontStyles: {
+    name: 'Montserrat',
     regular: {
       fontFamily: 'Montserrat-Regular',
     },
@@ -312,6 +427,7 @@ export const PdfStylesProvider = ({children}: PropsWithChildren<unknown>) => {
       : LANGUAGE_TO_FONTS[selectedClientFont];
 
     const fontStyles = {
+      name: selectedFontStyleName,
       regular: {
         fontFamily: `${selectedFontStyleName}-Regular`,
       },
