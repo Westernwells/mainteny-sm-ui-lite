@@ -86,7 +86,13 @@ const Tag = ({
           maxWidth,
         }),
       }}>
-      <Typography noWrap variant="subtitle2">
+      <Typography
+        noWrap
+        variant="subtitle2"
+        sx={{
+          fontSize: '14px',
+          letterSpacing: '0.1px',
+        }}>
         {name}
       </Typography>
       {isHovered && (
