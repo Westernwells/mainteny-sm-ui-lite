@@ -120,11 +120,11 @@ export const ArticlesDataGrid = ({
           description: item.description,
           price: `${formatCurrency(
             item
-              ? (item.unitPurchaseAmount?.netAmount ?? 0) /
-                  10 ** (item.unitPurchaseAmount?.fractionDigits ?? 2)
+              ? (item.unitSellingAmount?.netAmount ?? 0) /
+                  10 ** (item.unitSellingAmount?.fractionDigits ?? 2)
               : 0,
             {
-              currency: item.unitPurchaseAmount?.currency,
+              currency: item.unitSellingAmount?.currency,
             },
           )}`,
           article: item,
@@ -167,7 +167,7 @@ export const ArticlesDataGrid = ({
           ...article,
           name: c.name || article.name,
           description: c.description || article.description,
-          unitPurchaseAmount: c.unitSellingAmount,
+          unitSellingAmount: c.unitSellingAmount,
           isCustom: true,
         };
       }

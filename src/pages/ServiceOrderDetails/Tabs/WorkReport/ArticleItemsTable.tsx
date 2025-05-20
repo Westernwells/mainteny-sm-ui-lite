@@ -46,6 +46,7 @@ export const ArticleItemsTable = ({
   const handleSelectItem = (row: ArticleView) => {
     setItems([...items, articleViewToItem(row)]);
     setIsArticleModalOpen(false);
+    setSearch('');
   };
 
   return (
@@ -113,13 +114,17 @@ export const ArticleItemsTable = ({
         </Box>
         <SelectModal
           isOpen={isArticleModalOpen}
-          onClose={() => setIsArticleModalOpen(false)}
+          onClose={() => {
+            setIsArticleModalOpen(false);
+            setSearch('');
+          }}
           header="Select Article">
           <Box sx={{py: 2}}>
             <SearchInput
               variant="outlined"
               label="Search"
               onValueChanged={(value) => setSearch(value)}
+              defaultValue={search}
             />
           </Box>
           <ArticlesDataGrid
