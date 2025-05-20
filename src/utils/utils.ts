@@ -542,7 +542,7 @@ export const removeUndefinedAndEmptyValues = (
     return acc;
   }, {} as Record<string, any>);
 
-const isEmptyHTML = (htmlString: string) => {
+export const isEmptyHTML = (htmlString: string) => {
   // Create a temporary div element
   const tempDiv = document.createElement('div');
 

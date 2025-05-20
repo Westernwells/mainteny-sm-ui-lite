@@ -29,7 +29,7 @@ import {ContractTermInput} from 'components/ContractTermInput';
 import {ContractTermView} from 'models/contract';
 import {ServiceCompanyType} from 'models/service-company';
 import {createEmptyResource} from 'utils/paging';
-import {convertToText} from 'utils/utils';
+import {convertToText, isEmptyHTML} from 'utils/utils';
 import {useCompanyTerms} from 'hooks/reactQuery/useCompanies';
 import BillingAddress from 'pages/CustomerDetails/Tabs/CustomerOverview/BillingAddress';
 import {EditFinanceAddress} from './EditFinanceAddress';
@@ -337,7 +337,12 @@ export const EditFinanceInformation = ({
                 data-testid="payment-terms-rich-text-field"
                 label="Payment terms"
                 html={paymentTermDetails}
-                updateHtml={() => {}}
+                updateHtml={(newHtml) => {
+                  const isEmpty = isEmptyHTML(newHtml);
+                  if (isEmpty) {
+                    setValue('paymentTermId', '');
+                  }
+                }}
                 minRows={1}
                 onBlur={field.onBlur}
                 endAdornment={
