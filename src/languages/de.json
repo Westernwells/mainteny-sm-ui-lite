@@ -3256,5 +3256,8 @@
   "You are about to remove {{tagName}} tag.": "Du bist im Begriff den Tag {{tagName}} zu entfernen.",
   "Tag created successfully": "Tag erfolgreich hinzugefügt ",
   "Tag was deleted": "Tag wurde entfernt",
-  "Tag renamed": "Tag umbenannt"
+  "Tag renamed": "Tag umbenannt",
+  "Yes, Change Type": "Ja, Typ ändern",
+  "Are you sure you want to remove all sub-positions by changing the article type? This change cannot be undone.": "Möchten Sie durch die Änderung des Artikeltyps wirklich alle Unterpositionen entfernen? Diese Änderung kann nicht rückgängig gemacht werden.",
+  "Change Article Type": "Artikeltyp ändern"
 }
