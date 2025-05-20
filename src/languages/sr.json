@@ -3271,5 +3271,6 @@
   "Tag was deleted": "Oznaka je obrisana",
   "Tag renamed": "Oznaka je preimenovana",
   "Yes, Change Type": "Da, promeni tip",
-  "Are you sure you want to remove all sub-positions by changing the article type? This change cannot be undone.": "Da li ste sigurni da želite da uklonite sve podpozicije promenom tipa članka? Ova promena se ne može poništiti."
+  "Are you sure you want to remove all sub-positions by changing the article type? This change cannot be undone.": "Da li ste sigurni da želite da uklonite sve podpozicije promenom tipa artikla? Ova promena se ne može poništiti.",
+  "Change Article Type": "Promeni tip artikla"
 }
