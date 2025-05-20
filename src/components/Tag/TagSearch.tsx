@@ -227,7 +227,7 @@ const TagSearch = ({
               display: 'flex',
               flexDirection: 'column',
               padding: '0 0 8px 0',
-              gap: theme.spacing(1),
+              gap: theme.spacing(0.5),
             }}>
             {showSearchedTags.map((tag, index) => (
               <TagSearchMenuItem
@@ -256,6 +256,7 @@ const TagSearch = ({
               justifyContent: 'center',
               marginBottom: theme.spacing(3),
               marginTop: theme.spacing(1.5),
+              color: theme.palette.text.secondary,
             }}>
             <Trans
               i18nKey="press_enter_to_create_tag"

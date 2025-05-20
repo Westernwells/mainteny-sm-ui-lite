@@ -2,8 +2,8 @@ import {Tag as TagType, TagEntityType} from 'models/tag';
 import {Box, MenuItem} from '@mui/material';
 import React, {ForwardedRef, forwardRef, SyntheticEvent} from 'react';
 import Tag from 'components/Tag/index';
-import TagActions from 'components/Tag/TagActions';
 import useTheme from '@mui/material/styles/useTheme';
+import TagActions from 'components/Tag/TagActions';
 
 type Props = {
   tag: TagType;
@@ -33,14 +33,26 @@ const TagSearchMenuItem = forwardRef(
           alignItems: 'center',
           justifyContent: 'space-between',
           borderRadius: '4px',
-          padding: '6px',
+          padding: '4px',
+
+          '& button': {
+            visibility: 'hidden',
+          },
 
           '&:hover': {
             backgroundColor: theme.palette.inputBackground.main,
+
+            '& button': {
+              visibility: 'visible',
+            },
           },
 
           '&:focus': {
             backgroundColor: theme.palette.inputBackground.main,
+
+            '& button': {
+              visibility: 'visible',
+            },
           },
         }}
         onClick={(e) => {
