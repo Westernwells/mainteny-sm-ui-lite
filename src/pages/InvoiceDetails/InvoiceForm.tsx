@@ -118,7 +118,6 @@ import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {
-  articleViewToItem,
   buildInvoicePayload,
   generatePdfInvoice,
   getInvoiceStatusStyles,
@@ -1005,18 +1004,20 @@ export const InvoiceForm = ({
       invoiceData?.additionalInfo?.showPaymentSection ?? true,
     );
 
-    setValue(
-      'items',
-      invoiceData?.items?.map((item) =>
-        invoiceItemToInvoiceItemRecord(
-          item,
-          invoiceType || invoiceData.type,
-          currentCurrency,
-          taxRates,
-          subItemsMap,
+    if (invoiceType !== InvoiceType.CREDIT_NOTE && !isDuplicate) {
+      setValue(
+        'items',
+        invoiceData?.items?.map((item) =>
+          invoiceItemToInvoiceItemRecord(
+            item,
+            invoiceType || invoiceData.type,
+            currentCurrency,
+            taxRates,
+            subItemsMap,
+          ),
         ),
-      ),
-    );
+      );
+    }
 
     setValue(
       'alternativeServiceCompanyInfo',
@@ -1793,7 +1794,11 @@ export const InvoiceForm = ({
     if (isNewInvoice && !initialNewLoadComplete) {
       if (invoice && invoiceId && pageState === PageState.DUPLICATE) {
         prefillFormWithInvoiceData(invoice);
-      } else if (initialLocalStorageData && !(rawCustomerIdParam || orderId)) {
+      } else if (
+        initialLocalStorageData &&
+        !(rawCustomerIdParam || orderId) &&
+        !isDuplicate
+      ) {
         initializeFormDataFromLocalStorage();
       } else {
         reset();
@@ -1818,25 +1823,35 @@ export const InvoiceForm = ({
   }, [serviceOrder]);
 
   useEffect(() => {
-    if (!serviceOrder) return;
+    if (!serviceOrder || invoiceType === InvoiceType.CREDIT_NOTE || isDuplicate)
+      return;
 
-    const rows = serviceOrder.articles.map((article) =>
-      serviceOrderItemToServiceOrderItemRecord(
-        article,
-        serviceOrderSubItemsMap,
-      ),
-    );
+    if (!watchedItems.length) {
+      const rows = serviceOrder.articles.map((article) =>
+        serviceOrderItemToServiceOrderItemRecord(
+          article,
+          serviceOrderSubItemsMap,
+        ),
+      );
 
-    setValue('items', rows);
+      setValue('items', rows);
 
-    const updatedNotes = syncVatLegalNotesWithNotes({
-      oldArticles: watch('items'),
-      newArticles: rows,
-      currentNotes: watch('moreInfo') || '',
-      taxRates,
-    });
-    setValue('moreInfo', updatedNotes);
-  }, [serviceOrder, serviceOrderSubItemsMap, watch, taxRates]);
+      const updatedNotes = syncVatLegalNotesWithNotes({
+        oldArticles: watch('items'),
+        newArticles: rows,
+        currentNotes: watch('moreInfo') || '',
+        taxRates,
+      });
+      setValue('moreInfo', updatedNotes);
+    }
+  }, [
+    serviceOrder,
+    serviceOrderSubItemsMap,
+    watch,
+    taxRates,
+    invoiceType,
+    isDuplicate,
+  ]);
 
   useEffect(() => {
     if (customer && pageState === PageState.EDIT && !isNewInvoice) {
