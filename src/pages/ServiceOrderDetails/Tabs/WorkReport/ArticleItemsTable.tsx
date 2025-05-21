@@ -36,6 +36,7 @@ export const ArticleItemsTable = ({
     quantity: 1,
     serviceOrderId: '',
     unitAmount: article.unitSellingAmount,
+    unitPurchaseAmount: article.unitPurchaseAmount,
   });
 
   const deleteItem = (indexPos: number) => {
