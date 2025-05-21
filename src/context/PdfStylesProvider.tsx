@@ -283,6 +283,20 @@ Font.register({
 });
 
 Font.register({
+  family: 'TimesNewRoman',
+  fonts: [
+    {src: TimesNewRomanRegular},
+    {src: TimesNewRomanBold, fontWeight: 'bold'},
+    {src: TimesNewRomanItalic, fontStyle: 'italic'},
+    {
+      src: TimesNewRomanBoldItalic,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+  ],
+});
+
+Font.register({
   family: 'Times New Roman',
   fonts: [
     {src: TimesNewRomanRegular},
