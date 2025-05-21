@@ -2277,7 +2277,7 @@
   "Sim pin": "SIM-Pin",
   "Call center": "Call Center",
   "Place of installation": "Installationsort",
-  "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG or SVG": "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG oder SVG",
+  "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG, SVG, XLSX or MP4": "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG oder SVG",
   "No units found": "Keine Anlagen gefunden",
   "If you like to add a new unit, please click the button below.": "Wenn Sie eine neue Anlage hinzufügen möchten, klicken Sie bitte auf die Schaltfläche unten.",
   "Select due date": "Fälligkeitsdatum auswählen",
@@ -3261,5 +3261,6 @@
   "Are you sure you want to remove all sub-positions by changing the article type? This change cannot be undone.": "Möchten Sie durch die Änderung des Artikeltyps wirklich alle Unterpositionen entfernen? Diese Änderung kann nicht rückgängig gemacht werden.",
   "Change Article Type": "Artikeltyp ändern",
   "Start adding your positions and mixed positions": "Beginnen Sie mit dem Hinzufügen Ihrer Positionen und gemischten Positionen",
-  "No Position": "Keine Position"
+  "No Position": "Keine Position",
+  "Rename": "Umbenennen"
 }
