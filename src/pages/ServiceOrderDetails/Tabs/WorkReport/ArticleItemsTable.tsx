@@ -16,12 +16,14 @@ interface Props<T> {
   items: T[];
   setItems: Dispatch<SetStateAction<T[]>>;
   isEdit: boolean;
+  propertyOwnerId?: string;
 }
 
 export const ArticleItemsTable = ({
   items,
   setItems,
   isEdit,
+  propertyOwnerId,
 }: Props<ServiceOrderArticleView>) => {
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -44,6 +46,7 @@ export const ArticleItemsTable = ({
   const handleSelectItem = (row: ArticleView) => {
     setItems([...items, articleViewToItem(row)]);
     setIsArticleModalOpen(false);
+    setSearch('');
   };
 
   return (
@@ -111,16 +114,24 @@ export const ArticleItemsTable = ({
         </Box>
         <SelectModal
           isOpen={isArticleModalOpen}
-          onClose={() => setIsArticleModalOpen(false)}
+          onClose={() => {
+            setIsArticleModalOpen(false);
+            setSearch('');
+          }}
           header="Select Article">
           <Box sx={{py: 2}}>
             <SearchInput
               variant="outlined"
               label="Search"
               onValueChanged={(value) => setSearch(value)}
+              defaultValue={search}
             />
           </Box>
-          <ArticlesDataGrid setRowItem={handleSelectItem} search={search} />
+          <ArticlesDataGrid
+            setRowItem={handleSelectItem}
+            search={search}
+            propertyOwnerId={propertyOwnerId}
+          />
         </SelectModal>
       </Box>
     </Box>

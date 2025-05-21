@@ -4,6 +4,7 @@ import {
   CreateArticleSubAssociationRecord,
   ArticleView,
   CostPackage,
+  ExtendedArticleView,
 } from 'models/article';
 import {
   DiscountType,
@@ -86,6 +87,7 @@ import {
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
+import ConfirmRemoveSubItemsDialog from 'components/MixedPositions/ConfirmRemoveSubItemsDialog';
 import {
   fetchArticleSubAssociations,
   useCreateArticle,
@@ -137,6 +139,7 @@ interface MainPositionProps<
   setHoveredMainRowIndex: React.Dispatch<React.SetStateAction<number | null>>;
   setExpandedRows?: React.Dispatch<React.SetStateAction<number[]>>;
   disableInlineEditing?: boolean;
+  propertyOwnerId?: string;
 }
 
 const useMainPosition = <
@@ -172,6 +175,7 @@ const useMainPosition = <
   setHoveredMainRowIndex,
   setExpandedRows,
   disableInlineEditing,
+  propertyOwnerId,
 }: MainPositionProps<TForm>) => {
   const theme = useTheme();
   const {t} = useTranslation();
@@ -199,6 +203,9 @@ const useMainPosition = <
   const articleTypes = getArticleTypesWithLabels({
     excludeTypes: [],
   });
+
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const pendingArticleTypeRef = useRef<ArticleType | undefined>();
 
   const {data: nextCompanyNumber} = useCompanyNextNumber(
     {type: ServiceCompanyNumberType.ARTICLE},
@@ -386,7 +393,11 @@ const useMainPosition = <
     );
 
     if (!isFreeText) {
-      const articleObj = selectedArticle as ArticleView;
+      const articleObj = selectedArticle as ExtendedArticleView;
+      const sellingAmountObj = articleObj?.isCustom
+        ? articleObj.customSellingAmount
+        : articleObj.unitSellingAmount;
+
       const defaultCostPackage: CostPackage | undefined =
         articleObj.type === ArticleType.PACKAGE
           ? articleObj.additionalInfo?.costPackage ?? {
@@ -408,7 +419,7 @@ const useMainPosition = <
       );
       setValue(
         `items.${index}.unitAmount` as Path<TForm>,
-        articleObj.unitSellingAmount as PathValue<TForm, Path<TForm>>,
+        sellingAmountObj as PathValue<TForm, Path<TForm>>,
       );
       setValue(
         `items.${index}.description` as Path<TForm>,
@@ -463,7 +474,7 @@ const useMainPosition = <
     setEditableRow(null);
   };
 
-  const handleSaveArticleType = (newType?: ArticleType) => {
+  const applyArticleTypeChange = (newType?: ArticleType) => {
     setValue(
       `items.${index}.article.type` as Path<TForm>,
       newType as PathValue<TForm, Path<TForm>>,
@@ -498,11 +509,30 @@ const useMainPosition = <
         `items.${index}.subItems` as Path<TForm>,
         [] as PathValue<TForm, Path<TForm>>,
       );
+      setValue(
+        `items.${index}.subItemsConfig` as Path<TForm>,
+        {subItemsVisible: false, priceVisible: false} as PathValue<
+          TForm,
+          Path<TForm>
+        >,
+      );
     }
 
     setEditableRow(null);
-
     setAnchorEl(null);
+  };
+
+  const handleSaveArticleType = (newType?: ArticleType) => {
+    const currentType = getValues(`items.${index}.article.type` as Path<TForm>);
+
+    // If currently MIX and switching to something else, show confirmation
+    if (currentType === ArticleType.MIX && newType !== ArticleType.MIX) {
+      pendingArticleTypeRef.current = newType;
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    applyArticleTypeChange(newType);
   };
 
   const handleSaveToCatalogue = async (
@@ -910,6 +940,7 @@ const useMainPosition = <
             initialValue={watch('items' as Path<TForm>)?.[index]}
             showCustomPriceColumn
             openOnFocus={editableRow.index === index}
+            propertyOwnerId={propertyOwnerId}
           />
         ) : (
           <Box
@@ -2075,6 +2106,20 @@ const useMainPosition = <
     renderUnitCell,
     renderDiscountCell,
     renderTotalPriceCell,
+    confirmDialog: (
+      <ConfirmRemoveSubItemsDialog
+        open={showConfirmDialog}
+        onConfirm={() => {
+          applyArticleTypeChange(pendingArticleTypeRef.current);
+          setShowConfirmDialog(false);
+          pendingArticleTypeRef.current = undefined;
+        }}
+        onCancel={() => {
+          setShowConfirmDialog(false);
+          pendingArticleTypeRef.current = undefined;
+        }}
+      />
+    ),
   };
 };
 
