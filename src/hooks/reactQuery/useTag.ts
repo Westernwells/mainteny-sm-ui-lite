@@ -63,6 +63,9 @@ export const useDeleteTag = () => {
   return useMutation(({tagId}: {tagId: string}) => deleteTag(tagId), {
     onSuccess: () => {
       queryClient.invalidateQueries([queryKeys.fetchTags]);
+      queryClient.invalidateQueries([queryKeys.fetchTagStatistics]);
+      queryClient.invalidateQueries([queryKeys.fetchArticles]);
+      queryClient.invalidateQueries([queryKeys.fetchArticleDetail]);
 
       enqueueSnackbar('Tag was deleted', {
         variant: 'success',

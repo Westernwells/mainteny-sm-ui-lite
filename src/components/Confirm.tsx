@@ -1,4 +1,4 @@
-import {ReactNode} from 'react';
+import {ReactNode, SyntheticEvent} from 'react';
 import Dialog from '@mui/material/Dialog';
 import {useTranslation} from 'react-i18next';
 import DialogActions from '@mui/material/DialogActions';
@@ -12,8 +12,8 @@ import {Button} from './Button';
 
 interface Props {
   open?: boolean;
-  onConfirm: () => void;
-  onClose: () => void;
+  onConfirm: (e: SyntheticEvent) => void;
+  onClose: (e: SyntheticEvent) => void;
   title?: string;
   content?: string | ReactNode[] | ReactNode;
   secondContent?: string | ReactNode[];
