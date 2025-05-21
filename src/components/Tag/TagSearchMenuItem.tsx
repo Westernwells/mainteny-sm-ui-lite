@@ -33,7 +33,7 @@ const TagSearchMenuItem = forwardRef(
           alignItems: 'center',
           justifyContent: 'space-between',
           borderRadius: '4px',
-          padding: '4px',
+          padding: '6px',
 
           '& button': {
             visibility: 'hidden',
@@ -62,7 +62,6 @@ const TagSearchMenuItem = forwardRef(
         <Box
           sx={{
             display: 'flex',
-            maxWidth: '240px',
           }}
           onClick={(e) => onClick(tag, e)}>
           <Tag
@@ -70,7 +69,7 @@ const TagSearchMenuItem = forwardRef(
             {...tag}
             entity={entity}
             outsideRenaming={isRenaming}
-            maxWidth="260px"
+            maxWidth="224px"
             onRenaming={() => onRename(null)}
           />
         </Box>

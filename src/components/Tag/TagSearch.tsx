@@ -24,7 +24,6 @@ const TAGS_PER_REQUEST = 200;
 type Props = {
   open: boolean;
   selectedTags: TagType[] | TagRecord[];
-
   anchorRef: RefObject<HTMLDivElement>;
   entity: TagEntityType;
   onClose: () => void;
@@ -185,26 +184,31 @@ const TagSearch = ({
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: theme.spacing(1, 5),
           }}>
-          <SearchInput
-            refInput={ref}
-            defaultValue={search}
-            maxLength={50}
-            onChange={(val: string) => setSearch(val)}
-            onKeyDown={handleKeyDownControl}
-            onClick={(event: SyntheticEvent) => {
-              // prevent any bubbling
-              // tables have a onClick event on roll that is triggered every time popover outside click is triggered
-              event.stopPropagation();
-              event.preventDefault();
-            }}
-          />
+          <Box
+            sx={{
+              display: 'flex',
+              marginBottom: theme.spacing(1.5),
+            }}>
+            <SearchInput
+              refInput={ref}
+              defaultValue={search}
+              maxLength={50}
+              onChange={(val: string) => setSearch(val)}
+              onKeyDown={handleKeyDownControl}
+              onClick={(event: SyntheticEvent) => {
+                // prevent any bubbling
+                // tables have a onClick event on roll that is triggered every time popover outside click is triggered
+                event.stopPropagation();
+                event.preventDefault();
+              }}
+            />
+          </Box>
 
           <Box
             sx={{
               display: 'flex',
-              padding: '8px 0 12px 0',
+              padding: '8px 0',
               gap: theme.spacing(0.5),
               flexWrap: 'wrap',
             }}>
@@ -226,8 +230,7 @@ const TagSearch = ({
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              padding: '0 0 8px 0',
-              gap: theme.spacing(0.5),
+              padding: '6px 0',
             }}>
             {showSearchedTags.map((tag, index) => (
               <TagSearchMenuItem

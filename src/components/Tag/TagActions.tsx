@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import Edit from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Trans, useTranslation} from 'react-i18next';
-import {MouseEventHandler, useRef, useState} from 'react';
+import {MouseEventHandler, SyntheticEvent, useRef, useState} from 'react';
 import {useDeleteTag} from 'hooks/reactQuery/useTag';
 import {Confirm} from 'components/Confirm';
 
@@ -36,7 +36,8 @@ const TagActions = ({id, name, iconPadding, onRename}: Props) => {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = (e: SyntheticEvent) => {
+    e.stopPropagation();
     handleDelete({tagId: id});
     setIsDeleteDialogOpen(false);
   };
@@ -58,6 +59,8 @@ const TagActions = ({id, name, iconPadding, onRename}: Props) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          width: '20px',
+          height: '20px',
 
           ...(iconPadding && {
             padding: iconPadding,
