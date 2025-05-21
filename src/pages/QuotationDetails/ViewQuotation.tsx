@@ -201,7 +201,7 @@ export const ViewQuotation = ({
 
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutateAsync: printQuotation} = usePrintQuotation();
-  const {mutateAsync: sendQuotation, isLoading: sendingQuotation} =
+  const {mutateAsync: sendQuotation, isLoading: isSendingQuotation} =
     useSendQuotation({
       shouldNavigate: false,
     });
@@ -824,7 +824,7 @@ export const ViewQuotation = ({
           setActiveSignature(undefined);
         }}
         id={quotation.id}
-        confirmBtnDisabled={sendingQuotation}
+        confirmBtnDisabled={isSendingQuotation}
         email={
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
           quotation?.elevator?.propertyOwner?.contact.email
