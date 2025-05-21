@@ -680,7 +680,7 @@ export const buildServiceOrderPayload = (
       vatId: item.unitAmount?.vatId || '',
       vatName: item.unitAmount?.vatName || '',
     },
-    quantity: Number(item.quantity) || 0,
+    quantity: Number.isNaN(Number(item.quantity)) ? 0 : Number(item.quantity),
     discount:
       item.discount?.type === DiscountType.AMOUNT
         ? {
@@ -711,7 +711,7 @@ export const buildServiceOrderPayload = (
       name: sub.name,
       unitPurchaseAmount: sub.unitPurchaseAmount,
       unitAmount: sub.unitAmount,
-      quantity: sub.quantity,
+      quantity: Number.isNaN(Number(sub.quantity)) ? 0 : Number(sub.quantity),
       description: sub.description,
       userSeqNumber: sub.userSeqNumber || undefined,
     })),
@@ -825,7 +825,9 @@ export function formatServiceOrderArticles(
             },
             name: sub.name,
             description: sub.description,
-            quantity: sub.quantity,
+            quantity: Number.isNaN(Number(sub.quantity))
+              ? 0
+              : Number(sub.quantity),
             unitPurchaseAmount:
               sub.unitPurchaseAmount && makeAmount(sub.unitPurchaseAmount),
             unitAmount: makeAmount(sub.unitAmount),
