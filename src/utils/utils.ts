@@ -828,10 +828,13 @@ export const formatAutocompleteAddress = (
   }
 
   const newValues = {
-    ...(componentAddress ?? {}),
+    ...componentAddress,
     component: {
       ...(currentValues?.component ?? {}),
       ...(componentAddress?.component ?? {}),
+      name: currentValues?.component?.name,
+      name2: currentValues?.component?.name2,
+      name3: currentValues?.component?.name3,
     },
     id: currentValues?.id!,
     fullName: componentAddress?.fullName || '',
