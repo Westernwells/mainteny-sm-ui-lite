@@ -841,7 +841,7 @@ export const buildInvoicePayload = (
       vatId: item.unitAmount?.vatId || '',
       vatName: item.unitAmount?.vatName || '',
     },
-    quantity: Number(item.quantity) || 0,
+    quantity: Number.isNaN(Number(item.quantity)) ? 0 : Number(item.quantity),
     discount:
       item.discount?.type === DiscountType.AMOUNT
         ? {
@@ -872,7 +872,7 @@ export const buildInvoicePayload = (
       name: sub.name,
       unitPurchaseAmount: sub.unitPurchaseAmount,
       unitAmount: sub.unitAmount,
-      quantity: sub.quantity,
+      quantity: Number.isNaN(Number(sub.quantity)) ? 0 : Number(sub.quantity),
       description: sub.description,
       userSeqNumber: sub.userSeqNumber,
     })),
