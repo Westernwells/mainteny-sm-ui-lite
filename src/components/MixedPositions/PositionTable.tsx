@@ -558,6 +558,7 @@ const PositionTable = ({
                     setHoveredMainRowIndex={setHoveredMainRowIndex}
                     onRecalc={onRecalcQuotation}
                     amountDetail={quotationAmountDetail}
+                    propertyOwnerId={watch('propertyOwnerId')}
                   />
                 </TableRow>
 
@@ -585,6 +586,7 @@ const PositionTable = ({
                               hoveredSubRowIndex={hoveredSubRowIndex}
                               setHoveredSubRowIndex={setHoveredSubRowIndex}
                               onRecalc={onRecalcQuotation}
+                              propertyOwnerId={watch('propertyOwnerId')}
                             />
                           </TableRow>
                         ),
