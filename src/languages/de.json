@@ -3261,5 +3261,6 @@
   "Are you sure you want to remove all sub-positions by changing the article type? This change cannot be undone.": "Möchten Sie durch die Änderung des Artikeltyps wirklich alle Unterpositionen entfernen? Diese Änderung kann nicht rückgängig gemacht werden.",
   "Change Article Type": "Artikeltyp ändern",
   "Start adding your positions and mixed positions": "Beginnen Sie mit dem Hinzufügen Ihrer Positionen und gemischten Positionen",
-  "No Position": "Keine Position"
+  "No Position": "Keine Position",
+  "Rename": "Umbenennen"
 }
