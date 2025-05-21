@@ -31,6 +31,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {ReactComponent as DriveFileIcon} from 'assets/icons/DriveFileIcon.svg';
 import ImageIcon from '@mui/icons-material/Image';
+import VideoFileIcon from '@mui/icons-material/VideoFile';
 import Divider from '@mui/material/Divider';
 import CustomSortLabel, {sortByName} from 'components/CustomSortLabel';
 import {useFormatDate} from 'hooks/useFormatDate';
@@ -277,7 +278,17 @@ const AttachmentsCard = ({
                       wrap="nowrap"
                       justifyContent="space-between">
                       <Grid container wrap="nowrap" alignItems="center">
-                        {file?.type.startsWith('image/') ? (
+                        {file.type === 'video/mp4' ? (
+                          <VideoFileIcon
+                            sx={{
+                              backgroundColor: theme.palette.info.main,
+                              color: theme.palette.primary.contrastText,
+                              borderRadius: 1,
+                              width: 17,
+                              height: 17,
+                            }}
+                          />
+                        ) : file.type.startsWith('image/') ? (
                           <ImageIcon
                             sx={{
                               backgroundColor: theme.palette.info.main,
@@ -296,11 +307,15 @@ const AttachmentsCard = ({
                           sx={{
                             wordBreak: 'break-word',
                             overflowWrap: 'anywhere',
-                            color: file?.type.startsWith('image/')
-                              ? theme.palette.info.main
-                              : theme.palette.success.darkSuccess,
+                            color:
+                              file.type === 'video/mp4' ||
+                              file.type.startsWith('image/')
+                                ? theme.palette.info.main
+                                : theme.palette.success.darkSuccess,
                           }}>
-                          {file?.type.startsWith('image/')
+                          {file.type === 'video/mp4'
+                            ? t('Video')
+                            : file.type.startsWith('image/')
                             ? t('Image')
                             : t('Document')}
                         </Typography>
@@ -465,8 +480,9 @@ const AttachmentsCard = ({
             'image/svg+xml',
             'application/vnd.ms-outlook',
             'image/tiff',
+            'video/mp4',
           ]}
-          hint="JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG or SVG"
+          hint="JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG, SVG, XLSX or MP4"
           getAcceptedFiles={(filesList) => {
             setAcceptedFiles(filesList);
           }}
