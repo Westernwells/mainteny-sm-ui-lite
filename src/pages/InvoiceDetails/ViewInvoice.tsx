@@ -110,7 +110,6 @@ import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
 import WorkReportTemplate from 'components/pdf-templates/WorkReportTemplate';
-import {useEffectAfterMount} from 'hooks/useEffectAfterMount';
 import DOMPurify from 'dompurify';
 // eslint-disable-next-line import/no-unresolved
 import {SwissQRBill} from 'swissqrbill/svg';
@@ -332,9 +331,10 @@ export const ViewInvoice = ({
   const {mutateAsync: printInvoice} = usePrintInvoice({
     shouldNavigate: false,
   });
-  const {mutateAsync: sendInvoice} = useSendInvoice({
-    shouldNavigate: false,
-  });
+  const {mutateAsync: sendInvoice, isLoading: isSendingInvoice} =
+    useSendInvoice({
+      shouldNavigate: false,
+    });
 
   const {mutateAsync: updateInvoiceAsync} = useUpdateInvoice();
 
@@ -681,7 +681,9 @@ export const ViewInvoice = ({
       />,
     ).toBlob();
     const blobURL = URL.createObjectURL(blob);
-    if (setInState) setFilePathToDownload(blobURL);
+    if (setInState && !filePathToDownload) {
+      setFilePathToDownload(blobURL);
+    }
     return blob;
   };
 
@@ -1394,19 +1396,6 @@ export const ViewInvoice = ({
     }
   }, [actionType, invoice]);
 
-  useEffectAfterMount(() => {
-    (async () => {
-      if (companyNextNumber?.value) {
-        try {
-          setIsLoadingFiles(true);
-          await refetchPDFs(companyNextNumber.value);
-        } finally {
-          setIsLoadingFiles(false);
-        }
-      }
-    })();
-  }, [companyNextNumber?.value, fontStyles]);
-
   return (
     <Box>
       <Grid container width="100%" mt="2.5em" mb="2em" gap={2}>
@@ -1719,21 +1708,15 @@ export const ViewInvoice = ({
           showBorder: filteredActions[filteredActions.length - 1] !== item,
         }))}
         isValid={
-          !isLoadingDownloadUrl && !isLoadingHeaderUrl && !isLoadingFooterUrl
+          !isLoadingDownloadUrl &&
+          !isLoadingHeaderUrl &&
+          !isLoadingFooterUrl &&
+          !isLoadingInvoiceAmountDetail
         }
       />
 
       <SendEmailDialog
         open={isSendEmailDialogOpen}
-        onOpen={() => {
-          if (
-            invoice.propertyOwner.additionalInfo.invoiceFormat ===
-            InvoiceFormat.POST
-          )
-            enqueueSnackbar(t('Customer wants to receive invoice via post'), {
-              variant: 'warning',
-            });
-        }}
         onConfirm={() => {
           setIsSendEmailDialogOpen(false);
           setExistingFiles([]);
@@ -1744,6 +1727,22 @@ export const ViewInvoice = ({
           setActiveSignature(undefined);
         }}
         id={invoice.id}
+        onOpen={() => {
+          if (
+            invoice.propertyOwner.additionalInfo.invoiceFormat ===
+            InvoiceFormat.POST
+          )
+            enqueueSnackbar(t('Customer wants to receive invoice via post'), {
+              variant: 'warning',
+            });
+        }}
+        confirmBtnDisabled={isSendingEmail || isSendingInvoice}
+        email={
+          invoice.propertyOwner?.additionalInfo.billingEmail ||
+          invoice.propertyOwner?.contact.email
+        }
+        subject={generateEmailSubject()}
+        content={invoice.description}
         existingFiles={existingFiles}
         isLoadingFiles={isLoadingFiles}
         callback={async (emailRecord) => {
@@ -1933,12 +1932,6 @@ export const ViewInvoice = ({
           }
         }}
         isSending={isSendingEmail}
-        email={
-          invoice.propertyOwner?.additionalInfo.billingEmail ||
-          invoice.propertyOwner?.contact.email
-        }
-        subject={generateEmailSubject()}
-        content={invoice.description}
         activeSignature={activeSignature}
         onSignatureSelect={(signature) => setActiveSignature(signature)}
       />
