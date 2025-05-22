@@ -841,7 +841,7 @@ export const buildInvoicePayload = (
       vatId: item.unitAmount?.vatId || '',
       vatName: item.unitAmount?.vatName || '',
     },
-    quantity: Number(item.quantity) || 0,
+    quantity: Number.isNaN(Number(item.quantity)) ? 0 : Number(item.quantity),
     discount:
       item.discount?.type === DiscountType.AMOUNT
         ? {
@@ -872,7 +872,7 @@ export const buildInvoicePayload = (
       name: sub.name,
       unitPurchaseAmount: sub.unitPurchaseAmount,
       unitAmount: sub.unitAmount,
-      quantity: sub.quantity,
+      quantity: Number.isNaN(Number(sub.quantity)) ? 0 : Number(sub.quantity),
       description: sub.description,
       userSeqNumber: sub.userSeqNumber,
     })),
@@ -932,47 +932,56 @@ export const invoiceItemToInvoiceItemRecord = (
       (rate) => rate.percentage === invoiceItem.unitAmount.percentageVat,
     );
 
+  const isCreditNote = invoiceType === InvoiceType.CREDIT_NOTE;
+  const negate = (v?: number) => (isCreditNote ? -Math.abs(v ?? 0) : v ?? 0);
+
+  const unitAmount = {
+    netAmount: negate(invoiceItem.unitAmount.netAmount),
+    percentageVat:
+      invoiceItem.unitAmount.percentageVat || taxRate?.percentage || 0,
+    currency: invoiceItem.unitAmount.currency || currentCurrency.code,
+    vatId: invoiceItem.unitAmount.vatId || taxRate?.id || '',
+    vatName: invoiceItem.unitAmount.vatName || taxRate?.name || '',
+  };
+
+  const unitPurchaseAmount = invoiceItem.unitPurchaseAmount
+    ? {
+        ...invoiceItem.unitPurchaseAmount,
+        netAmount: negate(invoiceItem.unitPurchaseAmount.netAmount),
+      }
+    : undefined;
+
+  const discount = invoiceItem.additionalInfo?.discount
+    ? {
+        ...invoiceItem.additionalInfo.discount,
+        type:
+          !invoiceItem.additionalInfo.discount.type ||
+          invoiceItem.additionalInfo.discount.type === DiscountType.NONE
+            ? DiscountType.PERCENTAGE
+            : invoiceItem.additionalInfo.discount.type,
+        amount: invoiceItem.additionalInfo.discount.amount
+          ? {
+              ...invoiceItem.additionalInfo.discount.amount,
+              value: negate(
+                (invoiceItem.additionalInfo.discount.amount.value ?? 0) /
+                  10 **
+                    (invoiceItem.additionalInfo.discount.amount
+                      .fractionDigits ?? 2),
+              ),
+            }
+          : undefined,
+      }
+    : undefined;
+
   const record: EditableInvoiceItem = {
     id: invoiceItem.id,
     article: invoiceItem.article,
     name: invoiceItem.name,
     description: invoiceItem.description,
     quantity: invoiceItem.quantity,
-    unitAmount:
-      invoiceType === InvoiceType.CREDIT_NOTE
-        ? {
-            ...invoiceItem.unitAmount,
-            netAmount: -Math.abs(invoiceItem.unitAmount.netAmount ?? 0),
-          }
-        : {
-            netAmount: invoiceItem.unitAmount.netAmount || 0,
-            percentageVat:
-              invoiceItem.unitAmount.percentageVat || taxRate?.percentage || 0,
-            currency: invoiceItem.unitAmount.currency || currentCurrency.code,
-            vatId: invoiceItem.unitAmount.vatId || taxRate?.id || '',
-            vatName: invoiceItem.unitAmount.vatName || taxRate?.name || '',
-          },
-    unitPurchaseAmount: invoiceItem.unitPurchaseAmount,
-    discount: invoiceItem.additionalInfo?.discount
-      ? {
-          ...invoiceItem.additionalInfo.discount,
-          type:
-            !invoiceItem.additionalInfo.discount.type ||
-            invoiceItem.additionalInfo.discount.type === DiscountType.NONE
-              ? DiscountType.PERCENTAGE
-              : invoiceItem.additionalInfo.discount.type,
-          amount: invoiceItem.additionalInfo.discount.amount
-            ? {
-                ...invoiceItem.additionalInfo.discount.amount,
-                value:
-                  (invoiceItem.additionalInfo.discount.amount.value ?? 0) /
-                  10 **
-                    (invoiceItem.additionalInfo.discount.amount
-                      .fractionDigits ?? 2),
-              }
-            : undefined,
-        }
-      : undefined,
+    unitAmount,
+    unitPurchaseAmount,
+    discount,
     userSeqNumber: invoiceItem?.additionalInfo?.userSeqNumber,
     payment: invoiceItem.additionalInfo?.payment,
   };
@@ -1002,8 +1011,16 @@ export const invoiceItemToInvoiceItemRecord = (
         name: subItem.name,
         description: subItem.description,
         quantity: subItem.quantity,
-        unitAmount: subItem.unitAmount,
-        unitPurchaseAmount: subItem.unitPurchaseAmount,
+        unitAmount: {
+          ...subItem.unitAmount,
+          netAmount: negate(subItem.unitAmount?.netAmount),
+        },
+        unitPurchaseAmount: subItem.unitPurchaseAmount
+          ? {
+              ...subItem.unitPurchaseAmount,
+              netAmount: negate(subItem.unitPurchaseAmount?.netAmount),
+            }
+          : undefined,
         userSeqNumber: subItem.userSeqNumber,
       })),
       subItemsConfig: {

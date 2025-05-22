@@ -2293,7 +2293,7 @@
   "Sim pin": "SIM pin",
   "Call center": "Kol-centar",
   "Place of installation": "Mesto ugradnje",
-  "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG or SVG": "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG ili SVG",
+  "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG, SVG, XLSX or MP4": "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG, SVG, XLSX ili MP4",
   "No units found": "Nije pronađena nijedna jedinica",
   "If you like to add a new unit, please click the button below.": "Ako želite da dodate novu jedinicu, kliknite na dugme ispod.",
   "Select due date": "Izaberite rok",
@@ -3272,5 +3272,8 @@
   "Tag renamed": "Oznaka je preimenovana",
   "Yes, Change Type": "Da, promeni tip",
   "Are you sure you want to remove all sub-positions by changing the article type? This change cannot be undone.": "Da li ste sigurni da želite da uklonite sve podpozicije promenom tipa artikla? Ova promena se ne može poništiti.",
-  "Change Article Type": "Promeni tip artikla"
+  "Change Article Type": "Promeni tip artikla",
+  "Start adding your positions and mixed positions": "Počnite da dodajete svoje pozicije i mešovite pozicije",
+  "No Position": "Bez pozicije",
+  "Rename": "Preimenuj"
 }

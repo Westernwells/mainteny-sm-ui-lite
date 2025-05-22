@@ -1309,12 +1309,17 @@ const useSubPosition = <
           />
         ) : (
           <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>
-            {formatCurrency(Number(subItem.quantity), {
-              currency: currentCurrency?.code,
-              excludeCurrencySymbol: true,
-              currencySymbol: currentCurrency?.symbol,
-              companyLang: selectedLng,
-            })}
+            {formatCurrency(
+              Number.isNaN(Number(subItem?.quantity))
+                ? 0
+                : Number(subItem?.quantity),
+              {
+                currency: currentCurrency?.code,
+                excludeCurrencySymbol: true,
+                currencySymbol: currentCurrency?.symbol,
+                companyLang: selectedLng,
+              },
+            )}
           </Typography>
         )}
       </TableCell>
