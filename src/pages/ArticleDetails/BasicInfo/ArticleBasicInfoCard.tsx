@@ -6,7 +6,8 @@ import FmdGoodRoundedIcon from '@mui/icons-material/FmdGoodRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LocalOfferRoundedIcon from '@mui/icons-material/LocalOfferRounded';
 import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
-import Tag from '@mui/icons-material/Tag';
+import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import TagIcon from '@mui/icons-material/Tag';
 import Box from '@mui/material/Box';
 import useTheme from '@mui/material/styles/useTheme';
 import Typography from '@mui/material/Typography';
@@ -19,7 +20,7 @@ import {useVats} from 'hooks/reactQuery/useVats';
 import _ from 'lodash';
 import {ArticleType, ArticleView, UpdateArticleRecord} from 'models/article';
 import {ArticleBasicFormModel} from 'models/articleForm';
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {getArticleTypes} from 'utils/article-utils';
 import {
@@ -33,6 +34,9 @@ import {getPlainStringFromHtml, isPlainString} from 'utils/rich-field-string';
 import {convertToText} from 'utils/utils';
 import * as Yup from 'yup';
 import {stripHtmlTags} from 'models/text-block';
+import TagGroup from 'components/Tag/TagGroup';
+import {TagEntityType} from 'models/tag';
+import Tag from 'components/Tag';
 import {EditBasicInfoForm} from './EditBasicInfoForm';
 
 const isExternalIdUnique = async (resource: ArticleView[], value?: string) => {
@@ -104,6 +108,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     costPackage: Yup.object().shape({
       laborPercentage: Yup.number(),
       materialPercentage: Yup.number(),
+      tags: Yup.array(),
     }),
   });
 
@@ -137,6 +142,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
       materialPercentage:
         article.additionalInfo?.costPackage?.materialPercentage,
     },
+    tags: article.additionalInfo?.tags,
   };
 
   const formik = useFormik<ArticleBasicFormModel>({
@@ -224,6 +230,7 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
         laborPercentage: formik.values.costPackage?.laborPercentage,
         materialPercentage: formik.values.costPackage?.materialPercentage,
       },
+      tags: (formik.values.tags || []).map((tag) => tag.id),
     };
     await updateArticle({articleId: article!.id, article: temp});
     setOpenDialog(false);
@@ -296,9 +303,16 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
     },
     {
       label: t('Article ID'),
-      icon: <Tag sx={{color: theme.palette.info.dark}} />,
+      icon: <TagIcon sx={{color: theme.palette.info.dark}} />,
       body: article.externalId ? article.externalId : '-',
     },
+  ];
+
+  const [firstTag, secondTag, ...groupTags] =
+    article.additionalInfo?.tags || [];
+  const showTags = [
+    ...(firstTag ? [firstTag] : []),
+    ...(secondTag ? [secondTag] : []),
   ];
 
   return (
@@ -321,6 +335,45 @@ export const ArticleBasicInfoCard = ({article}: {article: ArticleView}) => {
             bodyText={item.body}
           />
         ))}
+        <Box sx={{display: 'flex', alignItems: 'center'}}>
+          <Box
+            sx={{
+              backgroundColor: theme.palette.info.outlinedHoverBg,
+              p: '0.7em',
+              display: 'flex',
+              justifyContent: 'center',
+              mr: '0.8em',
+            }}>
+            <LabelOutlinedIcon sx={{color: theme.palette.info.dark}} />
+          </Box>
+
+          <Box>
+            <Typography
+              component="div"
+              variant="caption"
+              color={theme.palette.text.secondary}>
+              {t('Tags')}
+            </Typography>
+
+            <Box
+              sx={{
+                display: 'flex',
+                gap: theme.spacing(0.5),
+                alignItems: 'center',
+              }}>
+              {showTags.map((tag) => (
+                <Tag
+                  key={`article-tag-${tag.id}`}
+                  {...tag}
+                  entity={TagEntityType.ARTICLE}
+                />
+              ))}
+              {groupTags.length > 0 && (
+                <TagGroup tags={groupTags} showGroupTagsPopover />
+              )}
+            </Box>
+          </Box>
+        </Box>
       </Box>
       <Dialog
         title={t('Edit Basic Information')}

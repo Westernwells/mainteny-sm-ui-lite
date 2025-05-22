@@ -135,6 +135,8 @@ export const queryKeys = {
   quotationAmountById: 'quotationAmountById',
   serviceOrderSubItem: 'serviceOrderSubItem',
   serviceOrderAmountById: 'serviceOrderAmountById',
+  fetchTags: 'fetchTags',
+  fetchTagStatistics: 'fetchTagStatistics',
 
   // GOOGLE GEOCODE API
   coordsToAddress: 'coordsToAddress',

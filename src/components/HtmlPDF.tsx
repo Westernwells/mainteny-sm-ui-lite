@@ -1,6 +1,9 @@
 import {Html, HtmlStyle, HtmlStyles} from 'react-pdf-html';
 import {HTML_PDF_FONT_SIZE} from 'models/richTextField';
-import {modifyHTMLFontSizeForPDFRendering} from 'utils/rich-text-field';
+import {
+  generateTextIndent,
+  modifyHTMLFontSizeForPDFRendering,
+} from 'utils/rich-text-field';
 import {ContextProps} from 'context/PdfStylesProvider';
 
 type Props = {
@@ -17,7 +20,9 @@ export const HtmlPDF = ({
   fontStyles,
   fontSize: explicitFontSize,
 }: Props) => {
-  const modifiedHtmlString = modifyHTMLFontSizeForPDFRendering(html)
+  const modifiedHtmlString = modifyHTMLFontSizeForPDFRendering(
+    generateTextIndent(html),
+  )
     // Replace tabs with spaces (4 times &nbsp;) because tabs are rendering as square boxes
     .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
 

@@ -45,6 +45,7 @@ import {
   useAllArticles,
   useArticles,
   useArticleStatistics,
+  useUpdateArticle,
 } from 'hooks/reactQuery/useArticle';
 import {
   aggregateArticleRow,
@@ -57,6 +58,8 @@ import {stringToTitleCase} from 'utils/utils';
 import {FormSelect} from 'components/form/FormSelect';
 import {createMeasurementOptions, MeasurementUnit} from 'models/articleForm';
 import {LanguageContext} from 'context/LanguageProvider';
+import TagCell from 'components/Tag/TagCell';
+import {TagEntityType, TagRecord} from 'models/tag';
 
 const pageSize = 25;
 
@@ -214,6 +217,20 @@ const ArticleList = () => {
       refetchOnWindowFocus: false,
     });
 
+  const {mutateAsync: updateArticle} = useUpdateArticle(
+    t('Article updated successfully.'),
+  );
+
+  const handleUpdateArticleTags =
+    (articleId: string) => (tags: TagRecord[]) => {
+      updateArticle({
+        articleId,
+        article: {
+          tags: tags.map((tag) => tag.id),
+        },
+      });
+    };
+
   const navigateToNew = () => {
     navigate('new');
   };
@@ -275,6 +292,20 @@ const ArticleList = () => {
                 ? getPlainStringFromHtml(article.description)
                 : '-'}
             </TableCellText>
+          </Cell>
+        ),
+      },
+      {
+        headerName: 'Tag',
+        key: 'article-cell-tag',
+        width: '212px',
+        renderCell: (article, cellProps) => (
+          <Cell {...cellProps}>
+            <TagCell
+              tags={article.tags || []}
+              entity={TagEntityType.ARTICLE}
+              onChange={handleUpdateArticleTags(article.id)}
+            />
           </Cell>
         ),
       },
@@ -513,6 +544,7 @@ const ArticleList = () => {
 
   const handleExport = useExportTableSheet<ArticleTableRow, ArticleView>({
     refetchCallback: refetchAllArticles,
+    excludedFields: ['article-cell-tag'],
     columns: COLUMNS,
     aggregateCallback: aggregateArticleRow,
     fileName: 'Articles',
@@ -812,7 +844,10 @@ const ArticleList = () => {
               testId={`article-row-${entry.id}`}>
               {COLUMNS.map(({renderCell, ...rest}) =>
                 renderCell(entry, {
-                  onClick: handleRowClick(entry.id),
+                  onClick:
+                    renderCell.name !== 'TAG'
+                      ? handleRowClick(entry.id)
+                      : undefined,
                   ...rest,
                 }),
               )}

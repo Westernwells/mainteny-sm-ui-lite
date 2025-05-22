@@ -1507,7 +1507,11 @@ const useMainPosition = <
       <TableCell
         align="right"
         noPadding
-        onClick={() => handleEditStart(watchedItem, `items.${index}.quantity`)}
+        onClick={
+          !isMixed && !disableInlineEditing
+            ? () => handleEditStart(watchedItem, `items.${index}.quantity`)
+            : undefined
+        }
         testId={`position-quantity-${index}`}>
         {editableRow?.index === index &&
         editableRow?.field === `items.${index}.quantity` ? (
