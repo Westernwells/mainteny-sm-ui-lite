@@ -13,12 +13,14 @@ import {FormLabel} from 'components/form/FormLabel';
 import {
   useCompleteServiceOrder,
   useSendWorkReport,
+  useServiceOrderSubItems,
   useUpdateServiceOrderReport,
 } from 'hooks/reactQuery/useServiceOrder';
 import {
   CompleteServiceOrder,
   ServiceOrderArticleView,
   ServiceOrderReportView,
+  ServiceOrderSubArticleRecord,
   ServiceOrderView,
 } from 'models/service-order';
 import {PageCard} from 'components/PageCard';
@@ -31,11 +33,12 @@ import {
   useDownloadUrl,
 } from 'hooks/reactQuery/useDownloadUrl';
 import {
-  articleViewToArticleRecord,
   calculateTotalBillableHours,
   convertTimeSlotDatesToRestDateTime,
+  formatServiceOrderArticles,
   getJobTypeGivenName,
   getSignatureKeys,
+  serviceOrderItemToServiceOrderItemRecord,
 } from 'utils/service-order-utils';
 import {convertDigitalMinsToHM} from 'utils/datetime';
 import {useUserSession} from 'hooks/reactQuery/useUserSession';
@@ -82,6 +85,7 @@ import UpdateConfirmationModal from 'pages/ServiceOrderDetails/UpdateConfirmatio
 import {Confirm} from 'components/Confirm';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import {useCurrentCurrency} from 'utils/currency';
 import {Maintenance} from './Maintenance';
 import {Signature} from './Signature';
 import {ReportCard} from './ReportCard';
@@ -105,6 +109,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export const WorkReport = ({serviceOrder}: Props) => {
+  const currentCurrency = useCurrentCurrency();
   const {t} = useTranslation();
   const {user} = useUserSession();
   const [queryParams, setQueryParams] = useSearchParams();
@@ -129,6 +134,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
   // Combine jobTypes and the filtered oldJobTypes
   const allJobTypes = [...(jobTypes || []), ...(filteredOldJobTypes || [])];
 
+  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const [articles, setArticles] = useState<ServiceOrderArticleView[]>([]);
   const [report, setReport] = useState<ServiceOrderReportView | undefined>(
     serviceOrder?.reports?.[0],
@@ -145,6 +151,23 @@ export const WorkReport = ({serviceOrder}: Props) => {
     .filter((item) => !!item.technician)
     .find((s) => s.technician!.id === report?.technicianId);
 
+  const {data: serviceOrderSubItems} = useServiceOrderSubItems(serviceOrder.id);
+
+  const subItemsMap = useMemo(
+    () =>
+      Object.entries(serviceOrderSubItems ?? {}).reduce(
+        (acc, [parentId, subItems]) => {
+          acc[parentId] = subItems.map((subItem) => ({
+            ...subItem,
+            parentId,
+          }));
+          return acc;
+        },
+        {} as Record<string, ServiceOrderSubArticleRecord[]>,
+      ),
+    [serviceOrderSubItems],
+  );
+
   const {data: fetchedTechnician} = useGetTechniciansByEmployeeId(
     report?.technicianId || '',
   );
@@ -158,7 +181,6 @@ export const WorkReport = ({serviceOrder}: Props) => {
     (r) => r.externalId === report?.externalId,
   );
 
-  const [isSendEmailDialogOpen, setIsSendEmailDialogOpen] = useState(false);
   const {mutate: sendWorkReport, isLoading: sendingWorkReport} =
     useSendWorkReport();
   const serviceCompanyId = user?.userAccount.serviceCompany.id;
@@ -493,7 +515,10 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
   const formik = useFormik<CompleteServiceOrder & {serviceTimeHM: string}>({
     initialValues: {
-      articles: articleViewToArticleRecord(articles),
+      articles:
+        articles?.map((item) =>
+          serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+        ) ?? [],
       description: report?.description ?? '',
       startTime: serviceOrder?.actualStartTime,
       endTime: serviceOrder?.actualEndTime,
@@ -517,7 +542,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
       const body = {
         technicianId: report?.technicianId,
         description: values.description,
-        articles: articleViewToArticleRecord(articles),
+        articles: formatServiceOrderArticles(articles, currentCurrency),
         serviceTime: calculateTotalBillableHours([values.workTimeRecord!]),
         travelTime: calculateTotalBillableHours([values.travelTimeRecord!]),
         onlyShowTotalTime: values.onlyShowTotalTime,
@@ -596,12 +621,15 @@ export const WorkReport = ({serviceOrder}: Props) => {
     if (report) {
       let temp: ServiceOrderArticleView[] = [];
       if ('articles' in serviceOrder) {
-        temp = serviceOrder.articles;
+        temp = serviceOrder.articles ?? [];
       }
       setArticles(temp);
       formik.resetForm({
         values: {
-          articles: articleViewToArticleRecord(temp),
+          articles:
+            articles?.map((item) =>
+              serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+            ) ?? [],
           description: report?.description ?? '',
           startTime: serviceOrder?.actualStartTime,
           endTime: serviceOrder?.actualEndTime,
@@ -696,7 +724,12 @@ export const WorkReport = ({serviceOrder}: Props) => {
 
   useEffect(() => {
     if (articles.length) {
-      formik.setFieldValue('articles', articleViewToArticleRecord(articles));
+      formik.setFieldValue(
+        'articles',
+        articles?.map((item) =>
+          serviceOrderItemToServiceOrderItemRecord(item, subItemsMap),
+        ) ?? [],
+      );
     }
   }, [articles]);
 
@@ -840,6 +873,7 @@ export const WorkReport = ({serviceOrder}: Props) => {
           items={articles}
           setItems={setArticles}
           isEdit={isEditMode || false}
+          propertyOwnerId={serviceOrder?.elevator?.propertyOwner?.id}
         />
 
         <Box mt="1em">

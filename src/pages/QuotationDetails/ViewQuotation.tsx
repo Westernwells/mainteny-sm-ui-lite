@@ -201,7 +201,7 @@ export const ViewQuotation = ({
 
   const {mutate: markAsAccepted} = useReplyQuotation();
   const {mutateAsync: printQuotation} = usePrintQuotation();
-  const {mutateAsync: sendQuotation, isLoading: sendingQuotation} =
+  const {mutateAsync: sendQuotation, isLoading: isSendingQuotation} =
     useSendQuotation({
       shouldNavigate: false,
     });
@@ -288,9 +288,10 @@ export const ViewQuotation = ({
     [quotation?.items, subItemsMap],
   );
 
-  const {data: quotationAmountDetail} = useQuotationAmountDetailQuery(
-    quotation.id,
-  );
+  const {
+    data: quotationAmountDetail,
+    isLoading: isLoadingQuotationAmountDetail,
+  } = useQuotationAmountDetailQuery(quotation.id);
 
   const generateBlobUrl = async () => {
     const blob = await pdf(
@@ -331,6 +332,7 @@ export const ViewQuotation = ({
     primaryColor,
     secondaryColor,
     company,
+    isLoadingQuotationAmountDetail,
   ]);
 
   const getExistingFiles = async (
@@ -431,18 +433,20 @@ export const ViewQuotation = ({
       return {
         bottomDrawerPrimaryLabel: 'Download',
         bottomDrawerPrimaryAction: handleDownload,
-        disabled: !filePathToDownload,
+        disabled: !filePathToDownload || isLoadingQuotationAmountDetail,
       };
     if (quotation.status === QuotationStatus.DRAFT)
       return {
         bottomDrawerPrimaryLabel: 'Send',
         bottomDrawerPrimaryAction: handleOpenSendEmail,
+        disabled: isLoadingQuotationAmountDetail,
       };
     return {
       bottomDrawerPrimaryLabel: 'Mark Accepted',
       bottomDrawerPrimaryAction: () => setIsDialogOpen(true),
+      disabled: isLoadingQuotationAmountDetail,
     };
-  }, [quotation, filePathToDownload]);
+  }, [quotation, filePathToDownload, isLoadingQuotationAmountDetail]);
 
   return (
     <Box>
@@ -479,7 +483,8 @@ export const ViewQuotation = ({
                       background: 'transparent',
                     },
                     onClick: handleDownload,
-                    disabled: !filePathToDownload,
+                    disabled:
+                      !filePathToDownload || isLoadingQuotationAmountDetail,
                     startIcon: <FileDownloadIcon />,
                   }}
                 />
@@ -819,7 +824,7 @@ export const ViewQuotation = ({
           setActiveSignature(undefined);
         }}
         id={quotation.id}
-        confirmBtnDisabled={sendingQuotation}
+        confirmBtnDisabled={isSendingQuotation}
         email={
           quotation?.elevator?.propertyOwner?.additionalInfo.billingEmail ||
           quotation?.elevator?.propertyOwner?.contact.email

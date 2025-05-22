@@ -30,6 +30,7 @@ import {
   calculateContractInvoicePriceTotal,
   ContractComponentElevator,
   ContractServiceForm,
+  ContractTimeUnit,
 } from 'models/contract';
 import {Switch} from 'components/Switch';
 import {FormikProps, getIn} from 'formik';
@@ -110,6 +111,14 @@ const ServicesForm = ({
 
   const {data: jobTypes, isLoading: isJobTypeLoading} = useCompanyJobTypes(
     user?.userAccount.serviceCompany.id!,
+  );
+
+  const isAllElevatorsInvoiceFrequencyAfterJob = useMemo(
+    () =>
+      formikContractServiceComponent.values.elevators.every(
+        (elevator) => elevator.invoiceJob?.timeUnit === ContractTimeUnit.NONE,
+      ),
+    [formikContractServiceComponent.values.elevators],
   );
 
   const handleClick = (event: any) => {
@@ -624,28 +633,29 @@ const ServicesForm = ({
         </Typography>
       </Box>
 
-      {!formikContractServiceComponent.values.isAutomaticJobCycle && (
-        <Box>
-          <Typography
-            variant="body1"
-            sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
-            {t(
-              'With this setting there will be no jobs created from this service',
-            )}
-          </Typography>
-          <Grid container mb={2}>
-            <Grid item xs={3}>
-              <ServiceDeliveryPeriodInput
-                value={
-                  formikContractServiceComponent.values.serviceDeliveryType
-                }
-                onChange={formikContractServiceComponent.handleChange}
-                onBlur={formikContractServiceComponent.handleBlur}
-              />
+      {!formikContractServiceComponent.values.isAutomaticJobCycle &&
+        !isAllElevatorsInvoiceFrequencyAfterJob && (
+          <Box>
+            <Typography
+              variant="body1"
+              sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
+              {t(
+                'With this setting there will be no jobs created from this service',
+              )}
+            </Typography>
+            <Grid container mb={2}>
+              <Grid item xs={3}>
+                <ServiceDeliveryPeriodInput
+                  value={
+                    formikContractServiceComponent.values.serviceDeliveryType
+                  }
+                  onChange={formikContractServiceComponent.handleChange}
+                  onBlur={formikContractServiceComponent.handleBlur}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
-      )}
+          </Box>
+        )}
 
       {formikContractServiceComponent.values.isAutomaticJobCycle && (
         <Grid container spacing={2}>
@@ -710,6 +720,13 @@ const ServicesForm = ({
                 required
                 notched
                 name="firstOrderDate"
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 250,
+                    },
+                  },
+                }}
                 onBlur={formikContractServiceComponent.handleBlur}
                 onChange={(event) => {
                   formikContractServiceComponent.setFieldValue(
@@ -725,13 +742,17 @@ const ServicesForm = ({
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={3}>
-            <ServiceDeliveryPeriodInput
-              value={formikContractServiceComponent.values.serviceDeliveryType}
-              onChange={formikContractServiceComponent.handleChange}
-              onBlur={formikContractServiceComponent.handleBlur}
-            />
-          </Grid>
+          {!isAllElevatorsInvoiceFrequencyAfterJob && (
+            <Grid item xs={3}>
+              <ServiceDeliveryPeriodInput
+                value={
+                  formikContractServiceComponent.values.serviceDeliveryType
+                }
+                onChange={formikContractServiceComponent.handleChange}
+                onBlur={formikContractServiceComponent.handleBlur}
+              />
+            </Grid>
+          )}
         </Grid>
       )}
 

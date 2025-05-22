@@ -2293,7 +2293,7 @@
   "Sim pin": "SIM pin",
   "Call center": "Kol-centar",
   "Place of installation": "Mesto ugradnje",
-  "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG or SVG": "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG ili SVG",
+  "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG, SVG, XLSX or MP4": "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG, SVG, XLSX ili MP4",
   "No units found": "Nije pronađena nijedna jedinica",
   "If you like to add a new unit, please click the button below.": "Ako želite da dodate novu jedinicu, kliknite na dugme ispod.",
   "Select due date": "Izaberite rok",
@@ -3262,5 +3262,18 @@
   "Write with AI": "Pišite sa AI",
   "Rewrite with AI": "Ponovo napišite pomoću AI",
   "Add attachments to enhance article clarity.": "Dodajte priloge kako biste poboljšali jasnoću članka.",
-  "press_enter_to_create_tag": "Pritisnite <Image></Image> Enter da biste kreirali novu oznaku"
+  "press_enter_to_create_tag": "Pritisnite <Image></Image> Enter da biste kreirali novu oznaku",
+  "But it is optional when setting up the account.": "Ali to je opciono prilikom podešavanja naloga.",
+  "Position was deleted": "Pozicija je obrisana",
+  "You are about to remove this position permanently from this invoice. This action can't be undone. Do you want to proceed?": "Upravo ćete trajno ukloniti ovu poziciju sa ove fakture. Ova radnja se ne može poništiti. Da li želite da nastavite?",
+  "You are about to remove {{tagName}} tag.": "Upravo ćete ukloniti oznaku {{tagName}}.",
+  "Tag created successfully": "Oznaka je uspešno kreirana",
+  "Tag was deleted": "Oznaka je obrisana",
+  "Tag renamed": "Oznaka je preimenovana",
+  "Yes, Change Type": "Da, promeni tip",
+  "Are you sure you want to remove all sub-positions by changing the article type? This change cannot be undone.": "Da li ste sigurni da želite da uklonite sve podpozicije promenom tipa artikla? Ova promena se ne može poništiti.",
+  "Change Article Type": "Promeni tip artikla",
+  "Start adding your positions and mixed positions": "Počnite da dodajete svoje pozicije i mešovite pozicije",
+  "No Position": "Bez pozicije",
+  "Rename": "Preimenuj"
 }

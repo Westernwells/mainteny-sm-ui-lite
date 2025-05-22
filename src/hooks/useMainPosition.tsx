@@ -87,6 +87,7 @@ import {
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
+import ConfirmRemoveSubItemsDialog from 'components/MixedPositions/ConfirmRemoveSubItemsDialog';
 import {
   fetchArticleSubAssociations,
   useCreateArticle,
@@ -202,6 +203,9 @@ const useMainPosition = <
   const articleTypes = getArticleTypesWithLabels({
     excludeTypes: [],
   });
+
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const pendingArticleTypeRef = useRef<ArticleType | undefined>();
 
   const {data: nextCompanyNumber} = useCompanyNextNumber(
     {type: ServiceCompanyNumberType.ARTICLE},
@@ -470,7 +474,7 @@ const useMainPosition = <
     setEditableRow(null);
   };
 
-  const handleSaveArticleType = (newType?: ArticleType) => {
+  const applyArticleTypeChange = (newType?: ArticleType) => {
     setValue(
       `items.${index}.article.type` as Path<TForm>,
       newType as PathValue<TForm, Path<TForm>>,
@@ -505,11 +509,30 @@ const useMainPosition = <
         `items.${index}.subItems` as Path<TForm>,
         [] as PathValue<TForm, Path<TForm>>,
       );
+      setValue(
+        `items.${index}.subItemsConfig` as Path<TForm>,
+        {subItemsVisible: false, priceVisible: false} as PathValue<
+          TForm,
+          Path<TForm>
+        >,
+      );
     }
 
     setEditableRow(null);
-
     setAnchorEl(null);
+  };
+
+  const handleSaveArticleType = (newType?: ArticleType) => {
+    const currentType = getValues(`items.${index}.article.type` as Path<TForm>);
+
+    // If currently MIX and switching to something else, show confirmation
+    if (currentType === ArticleType.MIX && newType !== ArticleType.MIX) {
+      pendingArticleTypeRef.current = newType;
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    applyArticleTypeChange(newType);
   };
 
   const handleSaveToCatalogue = async (
@@ -1545,12 +1568,17 @@ const useMainPosition = <
         ) : (
           <Typography
             sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-            {formatCurrency(Number(watchedItem.quantity), {
-              currency: currentCurrency?.code,
-              excludeCurrencySymbol: true,
-              currencySymbol: currentCurrency?.symbol,
-              companyLang: selectedLng,
-            })}
+            {formatCurrency(
+              Number.isNaN(Number(watchedItem?.quantity))
+                ? 0
+                : Number(watchedItem?.quantity),
+              {
+                currency: currentCurrency?.code,
+                excludeCurrencySymbol: true,
+                currencySymbol: currentCurrency?.symbol,
+                companyLang: selectedLng,
+              },
+            )}
           </Typography>
         )}
       </TableCell>
@@ -2083,6 +2111,20 @@ const useMainPosition = <
     renderUnitCell,
     renderDiscountCell,
     renderTotalPriceCell,
+    confirmDialog: (
+      <ConfirmRemoveSubItemsDialog
+        open={showConfirmDialog}
+        onConfirm={() => {
+          applyArticleTypeChange(pendingArticleTypeRef.current);
+          setShowConfirmDialog(false);
+          pendingArticleTypeRef.current = undefined;
+        }}
+        onCancel={() => {
+          setShowConfirmDialog(false);
+          pendingArticleTypeRef.current = undefined;
+        }}
+      />
+    ),
   };
 };
 

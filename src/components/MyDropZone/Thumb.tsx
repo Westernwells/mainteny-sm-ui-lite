@@ -57,6 +57,8 @@ export const Thumb = ({
     return supportedTypes.includes(type.toLowerCase());
   };
 
+  const isVideo = file.type === 'video/mp4';
+
   return (
     <Box
       sx={{
@@ -75,6 +77,17 @@ export const Thumb = ({
               (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
+        ) : isVideo ? (
+          <>
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+            <video
+              src={file.preview}
+              controls
+              width={36}
+              height={46}
+              style={{objectFit: 'cover'}}
+            />
+          </>
         ) : (
           <FileCopyIcon
             sx={{fontSize: '3rem', color: theme.palette.text.secondary}}

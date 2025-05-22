@@ -542,7 +542,7 @@ export const removeUndefinedAndEmptyValues = (
     return acc;
   }, {} as Record<string, any>);
 
-const isEmptyHTML = (htmlString: string) => {
+export const isEmptyHTML = (htmlString: string) => {
   // Create a temporary div element
   const tempDiv = document.createElement('div');
 
@@ -782,19 +782,25 @@ export const generateMonthDropdownFromElevatorJobFrequency = (
 
   const months = [...allMonthsSet];
 
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1; // 1-based
+  const currentYear = now.getFullYear();
+
   const sorted = isNonMonthly
     ? months.sort((a, b) => {
-        const nextMonth = new Date().getMonth() + 2;
-        const aAdjusted = (a - nextMonth + 12) % 12;
-        const bAdjusted = (b - nextMonth + 12) % 12;
+        const aAdjusted = (a - currentMonth + 12) % 12;
+        const bAdjusted = (b - currentMonth + 12) % 12;
         return aAdjusted - bAdjusted;
       })
     : months.sort((a, b) => a - b);
 
-  return sorted.map((month) => ({
-    label: MONTH_NUMBER_TO_NAME[month],
-    value: month,
-  }));
+  return sorted.map((month) => {
+    const year = month < currentMonth ? currentYear + 1 : currentYear;
+    return {
+      label: `${MONTH_NUMBER_TO_NAME[month]} ${year}`,
+      value: month,
+    };
+  });
 };
 
 export const escapeDotInString = (str: string): string =>
@@ -822,10 +828,13 @@ export const formatAutocompleteAddress = (
   }
 
   const newValues = {
-    ...(componentAddress ?? {}),
+    ...componentAddress,
     component: {
       ...(currentValues?.component ?? {}),
       ...(componentAddress?.component ?? {}),
+      name: currentValues?.component?.name,
+      name2: currentValues?.component?.name2,
+      name3: currentValues?.component?.name3,
     },
     id: currentValues?.id!,
     fullName: componentAddress?.fullName || '',

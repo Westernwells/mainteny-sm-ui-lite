@@ -10,17 +10,17 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import Edit from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {useTranslation} from 'react-i18next';
-import {MouseEventHandler, useRef, useState} from 'react';
+import {Trans, useTranslation} from 'react-i18next';
+import {MouseEventHandler, SyntheticEvent, useRef, useState} from 'react';
 import {useDeleteTag} from 'hooks/reactQuery/useTag';
 import {Confirm} from 'components/Confirm';
 
-type Props = Pick<TagRecord, 'id'> & {
+type Props = Pick<TagRecord, 'id' | 'name'> & {
   iconPadding?: string;
   onRename: () => void;
 };
 
-const TagActions = ({id, iconPadding, onRename}: Props) => {
+const TagActions = ({id, name, iconPadding, onRename}: Props) => {
   const {t} = useTranslation();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +36,8 @@ const TagActions = ({id, iconPadding, onRename}: Props) => {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = (e: SyntheticEvent) => {
+    e.stopPropagation();
     handleDelete({tagId: id});
     setIsDeleteDialogOpen(false);
   };
@@ -58,6 +59,8 @@ const TagActions = ({id, iconPadding, onRename}: Props) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          width: '20px',
+          height: '20px',
 
           ...(iconPadding && {
             padding: iconPadding,
@@ -131,7 +134,13 @@ const TagActions = ({id, iconPadding, onRename}: Props) => {
           onConfirm={handleDeleteConfirm}
           onClose={() => setIsDeleteDialogOpen(false)}
           title="Remove Tag"
-          content="You are about to remove Materials tag."
+          content={
+            <Trans
+              defaults="You are about to remove <bold>{{tagName}}</bold> tag."
+              values={{tagName: name}}
+              components={{bold: <strong />}}
+            />
+          }
           helperText="Are you sure about it?"
         />
       )}

@@ -148,6 +148,14 @@ export const MutationService = ({
     user?.userAccount.serviceCompany.id!,
   );
 
+  const isAllElevatorsInvoiceFrequencyAfterJob = useMemo(
+    () =>
+      formikContractServiceComponent.values.elevators.every(
+        (elevator) => elevator.invoiceJob?.timeUnit === ContractTimeUnit.NONE,
+      ),
+    [formikContractServiceComponent.values.elevators],
+  );
+
   const filteredElevators =
     formikContractServiceComponent.values.elevators?.filter((elevator) => {
       const searchTerm = search.toLowerCase();
@@ -393,6 +401,33 @@ export const MutationService = ({
       formikContractServiceComponent.values.elevators ?? [],
     );
 
+  const shouldDisableSaveBtn = () => {
+    const {
+      isAutomaticJobCycle,
+      orderType,
+      firstOrderDate,
+      serviceDeliveryType,
+    } = formikContractServiceComponent.values;
+
+    if (isUpdateLoading) return true;
+
+    if (Object.keys(formikContractServiceComponent.errors).length > 0) {
+      return true;
+    }
+
+    if (!isAllElevatorsInvoiceFrequencyAfterJob && !serviceDeliveryType) {
+      return true;
+    }
+
+    if (isAutomaticJobCycle) {
+      if (!firstOrderDate) return true;
+
+      if (!orderType) return true;
+    }
+
+    return false;
+  };
+
   return (
     <Dialog
       title={isEditForm ? t('Edit Service') : t('Add Service')}
@@ -404,14 +439,7 @@ export const MutationService = ({
         open: isDialogOpen || false,
         maxWidth: 'lg',
       }}
-      disableSaveBtn={
-        isUpdateLoading ||
-        !!Object.keys(formikContractServiceComponent.errors).length ||
-        (formikContractServiceComponent.values.isAutomaticJobCycle &&
-          !formikContractServiceComponent.values.firstOrderDate) ||
-        (formikContractServiceComponent.values.isAutomaticJobCycle &&
-          !formikContractServiceComponent.values.orderType)
-      }
+      disableSaveBtn={shouldDisableSaveBtn()}
       saveButtonText={isEditForm ? t('Save') : t('Add Service')}
       isSaving={loading || isUpdateLoading}
       onSave={handleSave}>
@@ -847,28 +875,29 @@ export const MutationService = ({
         </Typography>
       </Box>
 
-      {!formikContractServiceComponent.values.isAutomaticJobCycle && (
-        <Box>
-          <Typography
-            variant="body1"
-            sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
-            {t(
-              'With this setting there will be no jobs created from this service',
-            )}
-          </Typography>
-          <Grid container mb={2}>
-            <Grid item xs={3}>
-              <ServiceDeliveryPeriodInput
-                value={
-                  formikContractServiceComponent.values.serviceDeliveryType
-                }
-                onChange={formikContractServiceComponent.handleChange}
-                onBlur={formikContractServiceComponent.handleBlur}
-              />
+      {!formikContractServiceComponent.values.isAutomaticJobCycle &&
+        !isAllElevatorsInvoiceFrequencyAfterJob && (
+          <Box>
+            <Typography
+              variant="body1"
+              sx={{color: 'text.primary', padding: '0.5em 0em 1em 0em'}}>
+              {t(
+                'With this setting there will be no jobs created from this service',
+              )}
+            </Typography>
+            <Grid container mb={2}>
+              <Grid item xs={3}>
+                <ServiceDeliveryPeriodInput
+                  value={
+                    formikContractServiceComponent.values.serviceDeliveryType
+                  }
+                  onChange={formikContractServiceComponent.handleChange}
+                  onBlur={formikContractServiceComponent.handleBlur}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
-      )}
+          </Box>
+        )}
 
       {formikContractServiceComponent.values.isAutomaticJobCycle && (
         <Grid container spacing={2}>
@@ -939,6 +968,13 @@ export const MutationService = ({
                 required
                 notched
                 name="firstOrderDate"
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 250,
+                    },
+                  },
+                }}
                 onBlur={formikContractServiceComponent.handleBlur}
                 onChange={(event) => {
                   formikContractServiceComponent.setFieldValue(
@@ -954,13 +990,17 @@ export const MutationService = ({
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={3}>
-            <ServiceDeliveryPeriodInput
-              value={formikContractServiceComponent.values.serviceDeliveryType}
-              onChange={formikContractServiceComponent.handleChange}
-              onBlur={formikContractServiceComponent.handleBlur}
-            />
-          </Grid>
+          {!isAllElevatorsInvoiceFrequencyAfterJob && (
+            <Grid item xs={3}>
+              <ServiceDeliveryPeriodInput
+                value={
+                  formikContractServiceComponent.values.serviceDeliveryType
+                }
+                onChange={formikContractServiceComponent.handleChange}
+                onBlur={formikContractServiceComponent.handleBlur}
+              />
+            </Grid>
+          )}
         </Grid>
       )}
 

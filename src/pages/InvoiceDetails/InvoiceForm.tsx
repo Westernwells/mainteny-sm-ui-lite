@@ -1,4 +1,11 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {theme} from 'theme';
 import {
@@ -118,7 +125,6 @@ import {ConfirmCancel} from 'pages/NewCustomer/ConfirmCancel';
 import {ResumeProgress} from 'pages/NewCustomer/ResumeProgress';
 import {CustomTranslationOptions} from 'pages/CompanyDetails/BasicInformation';
 import {
-  articleViewToItem,
   buildInvoicePayload,
   generatePdfInvoice,
   getInvoiceStatusStyles,
@@ -606,6 +612,11 @@ export const InvoiceForm = ({
     formState: {errors},
   } = formMethods;
 
+  const watchedAllItems = useWatch({control, name: 'items'});
+  const prevItemsRef = useRef<EditableInvoiceItem[]>(watchedAllItems);
+  const prevVatMapRef = useRef<Record<string, number>>({});
+  const vatSyncInitialized = useRef(false);
+
   const watchedItems = watch('items');
   const watchedItemsHookValue = useWatch({control, name: 'items'});
   const watchedType = watch('type');
@@ -1005,18 +1016,20 @@ export const InvoiceForm = ({
       invoiceData?.additionalInfo?.showPaymentSection ?? true,
     );
 
-    setValue(
-      'items',
-      invoiceData?.items?.map((item) =>
-        invoiceItemToInvoiceItemRecord(
-          item,
-          invoiceType || invoiceData.type,
-          currentCurrency,
-          taxRates,
-          subItemsMap,
+    if (invoiceType !== InvoiceType.CREDIT_NOTE && !isDuplicate) {
+      setValue(
+        'items',
+        invoiceData?.items?.map((item) =>
+          invoiceItemToInvoiceItemRecord(
+            item,
+            invoiceType || invoiceData.type,
+            currentCurrency,
+            taxRates,
+            subItemsMap,
+          ),
         ),
-      ),
-    );
+      );
+    }
 
     setValue(
       'alternativeServiceCompanyInfo',
@@ -1793,7 +1806,11 @@ export const InvoiceForm = ({
     if (isNewInvoice && !initialNewLoadComplete) {
       if (invoice && invoiceId && pageState === PageState.DUPLICATE) {
         prefillFormWithInvoiceData(invoice);
-      } else if (initialLocalStorageData && !(rawCustomerIdParam || orderId)) {
+      } else if (
+        initialLocalStorageData &&
+        !(rawCustomerIdParam || orderId) &&
+        !isDuplicate
+      ) {
         initializeFormDataFromLocalStorage();
       } else {
         reset();
@@ -1818,25 +1835,78 @@ export const InvoiceForm = ({
   }, [serviceOrder]);
 
   useEffect(() => {
-    if (!serviceOrder) return;
+    if (!serviceOrder || invoiceType === InvoiceType.CREDIT_NOTE || isDuplicate)
+      return;
 
-    const rows = serviceOrder.articles.map((article) =>
-      serviceOrderItemToServiceOrderItemRecord(
-        article,
-        serviceOrderSubItemsMap,
-      ),
+    if (!watchedItems.length) {
+      const rows = serviceOrder.articles.map((article) =>
+        serviceOrderItemToServiceOrderItemRecord(
+          article,
+          serviceOrderSubItemsMap,
+        ),
+      );
+
+      setValue('items', rows);
+
+      const updatedNotes = syncVatLegalNotesWithNotes({
+        oldArticles: watch('items'),
+        newArticles: rows,
+        currentNotes: watch('moreInfo') || '',
+        taxRates,
+      });
+      setValue('moreInfo', updatedNotes);
+    }
+  }, [
+    serviceOrder,
+    serviceOrderSubItemsMap,
+    watch,
+    taxRates,
+    invoiceType,
+    isDuplicate,
+  ]);
+
+  // Handles changes to notes(moreInfo) when the vat of any item changes
+  useEffect(() => {
+    const currentVatMap = watchedAllItems.reduce<Record<string, number>>(
+      (map, item) => {
+        const itemId = item.id!;
+        map[itemId] = item.unitAmount?.percentageVat ?? 0;
+        return map;
+      },
+      {},
     );
 
-    setValue('items', rows);
+    if (!vatSyncInitialized.current) {
+      prevVatMapRef.current = currentVatMap;
+      vatSyncInitialized.current = true;
+      return;
+    }
 
-    const updatedNotes = syncVatLegalNotesWithNotes({
-      oldArticles: watch('items'),
-      newArticles: rows,
-      currentNotes: watch('moreInfo') || '',
+    const vatChanged = watchedAllItems.some((item) => {
+      const newVatId = item.id!;
+      return (prevVatMapRef.current[newVatId] ?? 0) !== currentVatMap[newVatId];
+    });
+
+    if (!vatChanged) return;
+
+    const oldItems = prevItemsRef.current;
+    const newItems = watchedAllItems;
+    const currentNotes = getValues('moreInfo') ?? '';
+
+    const newNotes = syncVatLegalNotesWithNotes({
+      oldArticles: oldItems,
+      newArticles: newItems,
+      currentNotes,
       taxRates,
     });
-    setValue('moreInfo', updatedNotes);
-  }, [serviceOrder, serviceOrderSubItemsMap, watch, taxRates]);
+
+    if (newNotes && newNotes !== currentNotes) {
+      setValue('moreInfo', newNotes);
+    }
+
+    prevVatMapRef.current = currentVatMap;
+    prevItemsRef.current = newItems;
+  }, [watchedAllItems, taxRates]);
 
   useEffect(() => {
     if (customer && pageState === PageState.EDIT && !isNewInvoice) {

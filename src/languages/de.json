@@ -2277,7 +2277,7 @@
   "Sim pin": "SIM-Pin",
   "Call center": "Call Center",
   "Place of installation": "Installationsort",
-  "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG or SVG": "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG oder SVG",
+  "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG, SVG, XLSX or MP4": "JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG oder SVG",
   "No units found": "Keine Anlagen gefunden",
   "If you like to add a new unit, please click the button below.": "Wenn Sie eine neue Anlage hinzufügen möchten, klicken Sie bitte auf die Schaltfläche unten.",
   "Select due date": "Fälligkeitsdatum auswählen",
@@ -3249,5 +3249,18 @@
   "Write with AI": "Mit KI schreiben",
   "Rewrite with AI": "Mit KI umschreiben",
   "Add attachments to enhance article clarity.": "Fügen Sie Anhänge hinzu, um die Verständlichkeit des Artikels zu verbessern.",
-  "press_enter_to_create_tag": "Drücke <Image></Image> Enter um Tag anzulegen. "
+  "press_enter_to_create_tag": "Drücke <Image></Image> Enter um einen neuen Tag anzulegen. ",
+  "But it is optional when setting up the account.": "Bei der Kontoeinrichtung ist dies optional.",
+  "Position was deleted": "Position wurde gelöscht",
+  "You are about to remove this position permanently from this invoice. This action can't be undone. Do you want to proceed?": "Sie sind dabei, diese Position dauerhaft aus dieser Rechnung zu entfernen. Diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie fortfahren?",
+  "You are about to remove {{tagName}} tag.": "Du bist im Begriff den Tag {{tagName}} zu entfernen.",
+  "Tag created successfully": "Tag erfolgreich hinzugefügt ",
+  "Tag was deleted": "Tag wurde entfernt",
+  "Tag renamed": "Tag umbenannt",
+  "Yes, Change Type": "Ja, Artikeltyp ändern",
+  "Are you sure you want to remove all sub-positions by changing the article type? This change cannot be undone.": "Möchten Sie durch die Änderung des Artikeltyps wirklich alle Unterpositionen entfernen? Diese Änderung kann nicht rückgängig gemacht werden.",
+  "Change Article Type": "Artikeltyp ändern",
+  "Start adding your positions and mixed positions": "Beginnen Sie mit dem Hinzufügen Ihrer Positionen und gemischten Positionen",
+  "No Position": "Keine Position",
+  "Rename": "Umbenennen"
 }

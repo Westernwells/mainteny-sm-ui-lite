@@ -103,6 +103,7 @@ const NewMainPositionRow = <
     renderUnitCell,
     renderDiscountCell,
     renderTotalPriceCell,
+    confirmDialog,
   } = useMainPosition({
     index,
     item,
@@ -145,6 +146,7 @@ const NewMainPositionRow = <
       {renderUnitCell()}
       {renderDiscountCell()}
       {renderTotalPriceCell()}
+      {confirmDialog}
 
       <Confirm
         maxWidth={400}

@@ -108,7 +108,8 @@ const useInvoiceMenuActions = ({
         InvoiceStatus.OVERDUE_NOTICE_1,
         InvoiceStatus.OVERDUE_NOTICE_2,
         InvoiceStatus.OVERDUE_NOTICE_3,
-      ].includes(invoice.status)
+      ].includes(invoice.status) &&
+      invoice.type !== InvoiceType.CREDIT_NOTE
     ) {
       items.push({
         label: t('Create Credit note'),

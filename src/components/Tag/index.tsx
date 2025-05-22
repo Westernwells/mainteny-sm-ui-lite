@@ -86,7 +86,13 @@ const Tag = ({
           maxWidth,
         }),
       }}>
-      <Typography noWrap variant="subtitle2">
+      <Typography
+        noWrap
+        variant="subtitle2"
+        sx={{
+          fontSize: '14px',
+          letterSpacing: '0.1px',
+        }}>
         {name}
       </Typography>
       {isHovered && (
@@ -99,7 +105,12 @@ const Tag = ({
             borderRadius: '16px',
             zIndex: 10,
           }}>
-          <TagActions id={id} onRename={handleRename} iconPadding="0" />
+          <TagActions
+            id={id}
+            name={name}
+            onRename={handleRename}
+            iconPadding="0"
+          />
           {!!onDelete && (
             <IconButton
               sx={{color: theme.palette.primary.dark, padding: 0}}
