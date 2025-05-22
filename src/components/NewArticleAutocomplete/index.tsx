@@ -1,16 +1,16 @@
 import {SyntheticEvent, useCallback, useEffect, useRef, useState} from 'react';
 import {
-  TextField,
   Autocomplete,
   IconButton,
-  Tooltip,
-  Typography,
   Popper,
   PopperProps,
+  Table,
   TableHead,
   TableRow,
-  Table,
+  TextField,
   TextFieldProps,
+  Tooltip,
+  Typography,
 } from '@mui/material';
 import {t} from 'i18next';
 import {centsToMoney, formatCurrency, useCurrentCurrency} from 'utils/currency';
@@ -38,17 +38,17 @@ import {removeHtmlTags} from 'utils/rich-field-string';
 import {usePropertyOwnerQueryTravelWorks} from 'hooks/reactQuery/useTravelWork';
 import {ServiceOrderType} from 'models/service-order';
 import keyBy from 'lodash/keyBy';
-import {getArticleTypes} from 'utils/article-utils';
+import {createSearchQuery, getArticleTypes} from 'utils/article-utils';
 import {InvoiceItemRecord} from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
 import {
-  headerCellStyle,
-  footerTableStyle,
-  footerCellStyle,
-  iconButtonStyle,
-  dismissButtonStyle,
   customPopperStyle,
+  dismissButtonStyle,
+  footerCellStyle,
   footerTableContentStyle,
+  footerTableStyle,
+  headerCellStyle,
+  iconButtonStyle,
 } from './NewArticleAutoComplete.styles';
 
 interface ArticleRowProps {
@@ -280,7 +280,7 @@ export const NewArticleAutoComplete = ({
       {
         pageIndex: 0,
         pageSize: 25,
-        query,
+        query: createSearchQuery({search: query}),
         type: getArticleTypes({excludeTypes}),
       },
       {keepPreviousData: true},

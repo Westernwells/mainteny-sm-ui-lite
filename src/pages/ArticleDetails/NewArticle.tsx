@@ -113,6 +113,7 @@ export const NewArticle = () => {
       .nullable()
       .required('Selling price is required'),
     laborPercentage: Yup.number(),
+    tags: Yup.array(),
   });
 
   const formik = useFormik<ArticleBasicFormModel>({
@@ -135,6 +136,7 @@ export const NewArticle = () => {
         laborPercentage: 0,
         materialPercentage: 0,
       },
+      tags: [],
     },
     onSubmit: () => {},
     validationSchema,
@@ -233,6 +235,7 @@ export const NewArticle = () => {
         laborPercentage: formik.values.costPackage?.laborPercentage,
         materialPercentage: formik.values.costPackage?.materialPercentage,
       },
+      tags: (formik.values.tags || []).map((tag) => tag.id),
     };
     const result = await createArticle(article);
     navigate(`/articles/details/${result.value}`);

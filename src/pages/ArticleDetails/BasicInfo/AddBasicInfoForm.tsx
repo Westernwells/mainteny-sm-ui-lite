@@ -40,6 +40,8 @@ import {
 } from 'utils/currency';
 import {Receipt, ReceiptOutlined} from '@mui/icons-material';
 import {useVats} from 'hooks/reactQuery/useVats';
+import TagFormField from 'components/Tag/TagFormField';
+import {TagEntityType} from 'models/tag';
 
 export const AddBasicInfoForm = ({
   containerStyles,
@@ -120,6 +122,7 @@ export const AddBasicInfoForm = ({
     onChange: formik.handleChange,
     onBlur: formik.handleBlur,
   };
+
   return (
     <Box display="flex" flexWrap="wrap" component="form">
       <Grid container>
@@ -449,6 +452,17 @@ export const AddBasicInfoForm = ({
               ),
             },
           }}
+        />
+      </Box>
+
+      <Box sx={{width: '320px', padding: '16px 0'}}>
+        <TagFormField
+          tags={formik.values.tags || []}
+          entity={TagEntityType.ARTICLE}
+          onChange={(values) => {
+            formik.setFieldValue('tags', values);
+          }}
+          height="40px"
         />
       </Box>
 

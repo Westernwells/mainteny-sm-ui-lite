@@ -99,6 +99,7 @@ export const aggregateArticleRow = (
         currency: article.unitSellingAmount.currency,
       },
     ),
+    tags: article.additionalInfo?.tags ?? [],
   }));
 
 export const createSearchQuery = ({
@@ -108,7 +109,9 @@ export const createSearchQuery = ({
   manufacturer,
 }: SearchParameters) => {
   const elements: string[] = [];
-  if (search) elements.push(search);
+  const [firstSearch, ...tags] = (search || '').split('#');
+  if (tags.length > 0) tags.forEach((tag) => elements.push(`[tag:*${tag}*]`));
+  if (firstSearch) elements.push(firstSearch);
   if (storageLocation) elements.push(`[storagelocation:*${storageLocation}*]`);
   if (category) elements.push(`[category:*${category}*]`);
   if (manufacturer) elements.push(`[manufacture:*${manufacturer}*]`);

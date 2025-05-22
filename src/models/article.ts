@@ -1,4 +1,3 @@
-import {convertToText} from '../utils/utils';
 import {FileResource, FileResourceRecord} from './media';
 import {
   Amount,
@@ -18,6 +17,7 @@ import {
 import {ServiceOrderArticleOwnerType} from './service-order';
 import {ArticleInfoRecord, SubItemsConfig} from './quotation';
 import {Discount} from './invoice';
+import {TagRecord} from 'models/tag';
 
 export enum ArticleType {
   LABOR = 'LABOR',
@@ -70,6 +70,7 @@ export interface ArticleAdditionalInfo {
   pictures?: FileResource[];
   documents?: FileResource[];
   contractName?: string;
+  tags?: TagRecord[];
 }
 
 export interface ArticleView {
@@ -154,6 +155,7 @@ export interface UpdateArticleRecord {
   costPackage?: CostPackage;
   pictures?: {description: string; type: string; uri: string}[];
   contractName?: string;
+  tags?: string[];
 }
 
 export interface QueryArticleParams {
@@ -317,6 +319,7 @@ export type ArticleTableRow = {
   type: ArticleType;
   unit: string;
   price: string;
+  tags: TagRecord[];
 };
 
 export type ArticleStatistics = {
@@ -387,6 +390,7 @@ export interface MixedPositionFormValues {
   description: string;
   unit: string;
 }
+
 export interface SubPositionFormValues extends MixedPositionFormValues {
   id: string;
   type: ArticleType;
@@ -487,6 +491,7 @@ export interface UpdateArticleSubAssociationBody {
   costPackage?: CostPackage;
   contractName?: string;
 }
+
 export interface UpdateArticleSubAssociationRecord {
   article: UpdateArticleSubAssociationBody;
   quantity?: number;
