@@ -1,4 +1,11 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {theme} from 'theme';
 import {
@@ -604,6 +611,11 @@ export const InvoiceForm = ({
     reset,
     formState: {errors},
   } = formMethods;
+
+  const watchedAllItems = useWatch({control, name: 'items'});
+  const prevItemsRef = useRef<EditableInvoiceItem[]>(watchedAllItems);
+  const prevVatMapRef = useRef<Record<string, number>>({});
+  const vatSyncInitialized = useRef(false);
 
   const watchedItems = watch('items');
   const watchedItemsHookValue = useWatch({control, name: 'items'});
@@ -1852,6 +1864,49 @@ export const InvoiceForm = ({
     invoiceType,
     isDuplicate,
   ]);
+
+  // Handles changes to notes(moreInfo) when the vat of any item changes
+  useEffect(() => {
+    const currentVatMap = watchedAllItems.reduce<Record<string, number>>(
+      (map, item) => {
+        const itemId = item.id!;
+        map[itemId] = item.unitAmount?.percentageVat ?? 0;
+        return map;
+      },
+      {},
+    );
+
+    if (!vatSyncInitialized.current) {
+      prevVatMapRef.current = currentVatMap;
+      vatSyncInitialized.current = true;
+      return;
+    }
+
+    const vatChanged = watchedAllItems.some((item) => {
+      const newVatId = item.id!;
+      return (prevVatMapRef.current[newVatId] ?? 0) !== currentVatMap[newVatId];
+    });
+
+    if (!vatChanged) return;
+
+    const oldItems = prevItemsRef.current;
+    const newItems = watchedAllItems;
+    const currentNotes = getValues('moreInfo') ?? '';
+
+    const newNotes = syncVatLegalNotesWithNotes({
+      oldArticles: oldItems,
+      newArticles: newItems,
+      currentNotes,
+      taxRates,
+    });
+
+    if (newNotes && newNotes !== currentNotes) {
+      setValue('moreInfo', newNotes);
+    }
+
+    prevVatMapRef.current = currentVatMap;
+    prevItemsRef.current = newItems;
+  }, [watchedAllItems, taxRates]);
 
   useEffect(() => {
     if (customer && pageState === PageState.EDIT && !isNewInvoice) {
