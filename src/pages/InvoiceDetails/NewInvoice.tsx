@@ -3,7 +3,10 @@ import queryString from 'query-string';
 import Box from '@mui/material/Box';
 import {Progress} from 'components/Progress';
 import {useServiceOrderDetails} from 'hooks/reactQuery/useServiceOrder';
-import {useInvoiceDetail} from 'hooks/reactQuery/useInvoice';
+import {
+  useInvoiceDetail,
+  useInvoiceSubItems,
+} from 'hooks/reactQuery/useInvoice';
 import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import {InvoiceType} from 'models/invoice';
 import {ServiceCompanyType} from 'models/service-company';
@@ -34,7 +37,12 @@ export const NewInvoice = () => {
       ? useGetCustomer(customerId)
       : {data: undefined, isLoading: false};
 
-  if (isLoading || isLoadingInvoice || isLoadingCustomer) {
+  const {data: invoiceSubItems, isLoading: isLoadingSubItems} =
+    typeof invoiceId === 'string'
+      ? useInvoiceSubItems(invoiceId)
+      : {data: undefined, isLoading: false};
+
+  if (isLoading || isLoadingInvoice || isLoadingCustomer || isLoadingSubItems) {
     return (
       <Box
         display="flex"
@@ -53,6 +61,7 @@ export const NewInvoice = () => {
       invoiceType={invoiceType as InvoiceType}
       customerResource={customer}
       isNewInvoice
+      invoiceSubItems={invoiceSubItems}
     />
   );
 };

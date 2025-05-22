@@ -539,7 +539,7 @@ export const removeUndefinedAndEmptyValues = (
     return acc;
   }, {} as Record<string, any>);
 
-const isEmptyHTML = (htmlString: string) => {
+export const isEmptyHTML = (htmlString: string) => {
   // Create a temporary div element
   const tempDiv = document.createElement('div');
 
@@ -784,10 +784,13 @@ export const formatAutocompleteAddress = (
   }
 
   const newValues = {
-    ...(componentAddress ?? {}),
+    ...componentAddress,
     component: {
       ...(currentValues?.component ?? {}),
       ...(componentAddress?.component ?? {}),
+      name: currentValues?.component?.name,
+      name2: currentValues?.component?.name2,
+      name3: currentValues?.component?.name3,
     },
     id: currentValues?.id!,
     fullName: componentAddress?.fullName || '',

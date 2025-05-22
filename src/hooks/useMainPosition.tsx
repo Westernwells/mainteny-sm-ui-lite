@@ -1568,12 +1568,17 @@ const useMainPosition = <
         ) : (
           <Typography
             sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-            {formatCurrency(Number(watchedItem.quantity), {
-              currency: currentCurrency?.code,
-              excludeCurrencySymbol: true,
-              currencySymbol: currentCurrency?.symbol,
-              companyLang: selectedLng,
-            })}
+            {formatCurrency(
+              Number.isNaN(Number(watchedItem?.quantity))
+                ? 0
+                : Number(watchedItem?.quantity),
+              {
+                currency: currentCurrency?.code,
+                excludeCurrencySymbol: true,
+                currencySymbol: currentCurrency?.symbol,
+                companyLang: selectedLng,
+              },
+            )}
           </Typography>
         )}
       </TableCell>
