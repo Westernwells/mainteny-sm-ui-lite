@@ -18,20 +18,31 @@ import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
 import {ServiceCompanyItem} from 'models/service-company';
+import {isSwissAddress} from 'utils/address';
 import {calculateTotal, calculateTotalVAT} from './utils';
 import {ArticleSupplierView} from '../../models/supplier';
+
+type StyleProps = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
 
 const getStyles = ({
   boldFontStyle,
   regularFontStyle,
   primaryColor,
   secondaryColor,
-}: PdfConfigurationStyles) =>
+  isSwissOffset = false,
+}: StyleProps) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
+      paddingTop: '20px',
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     rightAddressContent: {
       display: 'flex',
@@ -169,6 +180,7 @@ const OrderArticlePDFPreview = React.memo(
       regularFontStyle: fontStyles.regular,
       primaryColor,
       secondaryColor,
+      isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
     });
     return (
       <Document>

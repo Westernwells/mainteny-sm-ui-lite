@@ -37,9 +37,12 @@ import {
   useCurrentCurrency,
 } from 'utils/currency';
 import {calculateTotalWithPerItemDiscount} from 'utils/calculate-total';
-import {fixRounding} from 'utils/utils';
 import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
-import {applyDiscount, correctCreditNoteInvoicesPercentages} from './utils';
+import {
+  applyDiscount,
+  correctCreditNoteInvoicesPercentages,
+  getAggregatedPartialPaymentsVats,
+} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import {formatDate, toDate} from 'utils/datetime';
@@ -235,7 +238,12 @@ export const UpfrontPaymentsSection = ({
     maximumFractionDigits: 2,
   });
 
-  const percentageVats =
+  const percentageVats = getAggregatedPartialPaymentsVats(
+    watchedItems,
+    totalAmountExclVat,
+  );
+
+  const currentPercentageVats =
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
 
   const totalAmountInclVats =
@@ -449,12 +457,12 @@ export const UpfrontPaymentsSection = ({
                 {amountFormatted}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {percentageVats?.map((v, idx) => (
+                {currentPercentageVats?.map((v, idx) => (
                   <p key={idx}>{v.percentageVat}%</p>
                 ))}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {percentageVats?.map((v, idx) => {
+                {currentPercentageVats?.map((v, idx) => {
                   const vatAmountFormatted = formatCurrency(
                     centsToMoney(currentCurrency?.code!, v.vat),
                     {
@@ -471,7 +479,7 @@ export const UpfrontPaymentsSection = ({
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {formatCurrency(
                   amount +
-                    percentageVats
+                    currentPercentageVats
                       ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
                       ?.reduce((a, b) => a + b, 0),
                   {

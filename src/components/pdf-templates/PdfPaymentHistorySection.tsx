@@ -67,11 +67,11 @@ export const PdfPaymentHistorySection = ({
     width: string;
   }[] = [
     {name: 'Payment History', align: 'left', width: '60%'},
-    {name: 'Date', align: 'right', width: '10%'},
+    {name: 'Date', align: 'right', width: '15%'},
     {
       name: `Total (${currentCurrency?.symbol})`,
       align: 'right',
-      width: '30%',
+      width: '25%',
     },
   ];
 
@@ -117,9 +117,9 @@ export const PdfPaymentHistorySection = ({
             <Text style={{width: '60%', textAlign: 'left'}}>
               {translate('Total amount (incl. VAT)')}
             </Text>
-            <Text style={{width: '10%', textAlign: 'right'}} />
+            <Text style={{width: '15%', textAlign: 'right'}} />
 
-            <Text style={{width: '30%', textAlign: 'right'}}>
+            <Text style={{width: '25%', textAlign: 'right'}}>
               {totalAmountInclVatsFormatted}
             </Text>
           </View>
@@ -173,6 +173,7 @@ export const PdfPaymentHistorySection = ({
                   justifyContent: 'space-between',
                   flexDirection: 'row',
                   width: '100%',
+                  alignItems: 'center',
                 }}>
                 <Text
                   style={{
@@ -185,7 +186,7 @@ export const PdfPaymentHistorySection = ({
                 <Text
                   style={{
                     ...styles.tableRow,
-                    width: '10%',
+                    width: '15%',
                     textAlign: 'right',
                   }}>
                   {i.sentDate ? formatDate(toDate(i.sentDate)) : '-'}
@@ -193,7 +194,7 @@ export const PdfPaymentHistorySection = ({
                 <Text
                   style={{
                     ...styles.tableRow,
-                    width: '30%',
+                    width: '25%',
                     textAlign: 'right',
                   }}>
                   {signBeforeNumber}
@@ -225,10 +226,10 @@ export const PdfPaymentHistorySection = ({
                 getCurrencySymbol[currentCurrency?.code!]
               })`}
             </Text>
-            <Text style={{width: '10%', textAlign: 'right'}} />
+            <Text style={{width: '15%', textAlign: 'right'}} />
             <Text
               style={{
-                width: '40%',
+                width: '25%',
                 textAlign: 'right',
                 ...fontStyles.bold,
                 color: primaryColor,

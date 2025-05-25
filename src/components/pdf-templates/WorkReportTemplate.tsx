@@ -14,6 +14,7 @@ import PdfTemplateLeftAddress from 'components/pdf-templates/PdfTemplateLeftAddr
 import {getAddressComponentFromServiceOrder} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {isSwissAddress} from 'utils/address';
 import PdfTemplateFooter from './PdfTemplateFooter';
 import PdfTemplateHeader from './PdfTemplateHeader';
 import PdfBodyContainer from './containers/PdfBodyContainer';
@@ -22,18 +23,28 @@ import PdfPageTitle from './containers/PdfPageTitle';
 import TopSectionContainer from './containers/TopSectionContainer';
 import PdfUnitAddress from './containers/PdfUnitAddress';
 
+type StyleProps = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
+
 const getStyles = ({
   boldFontStyle,
   regularFontStyle,
   primaryColor,
   secondaryColor,
-}: PdfConfigurationStyles) =>
+  isSwissOffset = false,
+}: StyleProps) =>
   StyleSheet.create({
     rightAddress: {
       minWidth: 200,
       flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
+      paddingTop: '20px',
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     rightAddressContent: {
       display: 'flex',
@@ -294,6 +305,7 @@ const WorkReportTemplate = React.memo(
       regularFontStyle: fontStyles.regular,
       primaryColor,
       secondaryColor,
+      isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
     });
 
     const elevatorAddress = serviceOrder?.elevator?.address;

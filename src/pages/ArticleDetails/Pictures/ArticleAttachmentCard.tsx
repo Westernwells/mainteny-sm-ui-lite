@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/media-has-caption */
 import {useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import EditIcon from '@mui/icons-material/Create';
@@ -37,6 +38,7 @@ import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview, MyDropZone} from 'components/MyDropZone/MyDropzone';
 import {Dialog} from 'components/Dialog';
 import _ from 'lodash';
+import VideoFileIcon from '@mui/icons-material/VideoFile';
 import {NoItemSection} from '../NoItemSection';
 
 const isPreviewableImage = (file: FileResource) => {
@@ -268,9 +270,17 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
                               <img
                                 loading="lazy"
                                 alt=""
-                                width="48px"
-                                height="48px"
+                                width={48}
+                                height={48}
                                 src={pictureUrls[file.uri]}
+                                style={{objectFit: 'cover'}}
+                              />
+                            ) : file.type === 'video/mp4' ? (
+                              <video
+                                src={pictureUrls[file.uri]}
+                                controls
+                                width={48}
+                                height={48}
                                 style={{objectFit: 'cover'}}
                               />
                             ) : (
@@ -330,7 +340,17 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
                           wrap="nowrap"
                           justifyContent="space-between">
                           <Grid container wrap="nowrap" alignItems="center">
-                            {file?.type.startsWith('image/') ? (
+                            {file.type === 'video/mp4' ? (
+                              <VideoFileIcon
+                                sx={{
+                                  backgroundColor: theme.palette.info.main,
+                                  color: theme.palette.primary.contrastText,
+                                  borderRadius: 1,
+                                  width: 17,
+                                  height: 17,
+                                }}
+                              />
+                            ) : file?.type.startsWith('image/') ? (
                               <ImageIcon
                                 sx={{
                                   backgroundColor: theme.palette.info.main,
@@ -353,7 +373,9 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
                                   ? theme.palette.info.main
                                   : theme.palette.success.darkSuccess,
                               }}>
-                              {file?.type.startsWith('image/')
+                              {file.type === 'video/mp4'
+                                ? t('Video')
+                                : file.type.startsWith('image/')
                                 ? t('Image')
                                 : t('Document')}
                             </Typography>
@@ -480,6 +502,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
           <MyDropZone
             acceptedFileTypes={[
               'application/pdf',
+              'video/mp4',
               'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
               'application/vnd.ms-excel',
@@ -494,7 +517,7 @@ export const ArticleAttachmentCard = ({article}: {article: ArticleView}) => {
               'application/vnd.ms-outlook',
               'image/tiff',
             ]}
-            hint="JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG or SVG"
+            hint="JPEG, PNG, BMP, GIF, TIFF, PDF, DOC, DOCX, TXT, MSG, SVG, XLSX or MP4"
             getAcceptedFiles={(filesList) => {
               setAcceptedFiles(filesList);
             }}

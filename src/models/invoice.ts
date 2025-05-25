@@ -767,3 +767,9 @@ export interface PositionRowInvoice {
   quantity?: number;
   discount: number;
 }
+
+export type InvoicedColumn = {
+  name: string;
+  align: 'left' | 'right' | 'center' | 'justify' | undefined;
+  width: string;
+};

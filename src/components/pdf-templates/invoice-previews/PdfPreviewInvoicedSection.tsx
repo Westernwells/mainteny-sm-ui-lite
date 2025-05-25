@@ -6,6 +6,7 @@ import {formatDate, toDate} from 'utils/datetime';
 import {fixRounding} from 'utils/utils';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {getInvoicedSectionColumns} from 'utils/pdfTemplates';
 
 type InvoicedSectionProps = {
   translate: (key: string) => string;
@@ -13,7 +14,7 @@ type InvoicedSectionProps = {
   selectedLng?: string;
   previousInvoices: InvoiceView[];
   amount: number;
-  percentageVats: {
+  currentPercentageVats: {
     percentageVat: number;
     vat: number;
   }[];
@@ -41,7 +42,7 @@ export const PdfPreviewInvoicedSection = ({
   selectedLng,
   previousInvoices,
   amount,
-  percentageVats = [],
+  currentPercentageVats = [],
   fontStyles,
   primaryColor,
   secondaryColor,
@@ -56,28 +57,9 @@ export const PdfPreviewInvoicedSection = ({
     companyLang: selectedLng,
   });
 
-  const invoicedSectionColumns: {
-    name: string;
-    align: 'left' | 'right' | 'center' | 'justify' | undefined;
-    width: string;
-  }[] = [
-    {name: 'Invoiced', align: 'left', width: '30%'},
-    {name: 'Date', align: 'right', width: '15%'},
-    {
-      name: `Total (${currentCurrency?.symbol})`,
-      align: 'right',
-      width: '18%',
-    },
-    {name: 'VAT (%)', align: 'right', width: '7%'},
-    {name: 'VAT', align: 'right', width: '12%'},
-    {
-      name: `Total incl. VAT (${currentCurrency?.symbol})`,
-      align: 'right',
-      width: '20%',
-    },
-  ];
-
   const styles = getStyles({secondaryColor});
+
+  const columns = getInvoicedSectionColumns(translate, currentCurrency);
 
   return (
     <View>
@@ -90,7 +72,7 @@ export const PdfPreviewInvoicedSection = ({
           marginTop: 15,
           marginBottom: 10,
         }}>
-        {invoicedSectionColumns.map((column) => (
+        {columns.map((column) => (
           <Text
             style={{
               ...styles.tableHeading,
@@ -151,6 +133,7 @@ export const PdfPreviewInvoicedSection = ({
                 justifyContent: 'space-between',
                 flexDirection: 'row',
                 width: '100%',
+                alignItems: 'center',
               }}>
               <Text style={{...styles.tableRow, width: '30%'}}>
                 {description}
@@ -181,9 +164,7 @@ export const PdfPreviewInvoicedSection = ({
                   display: 'flex',
                 }}>
                 {invoiceTotalAmount.vats.map((v, idx) => (
-                  <Text key={idx} style={{marginBottom: 3}}>
-                    {v.percentageVat}%
-                  </Text>
+                  <Text key={idx}>{v.percentageVat}%</Text>
                 ))}
               </View>
               <View
@@ -207,11 +188,7 @@ export const PdfPreviewInvoicedSection = ({
                     currencySymbol: currentCurrency?.symbol,
                     companyLang: selectedLng,
                   });
-                  return (
-                    <Text key={idx} style={{marginBottom: 3}}>
-                      -{vatAmountFormatted}
-                    </Text>
-                  );
+                  return <Text key={idx}>-{vatAmountFormatted}</Text>;
                 })}
               </View>
               <Text
@@ -250,10 +227,8 @@ export const PdfPreviewInvoicedSection = ({
               textAlign: 'right',
               alignItems: 'flex-end',
             }}>
-            {percentageVats?.map((v, idx) => (
-              <Text key={idx} style={{marginBottom: 3}}>
-                {v.percentageVat}%
-              </Text>
+            {currentPercentageVats?.map((v, idx) => (
+              <Text key={idx}>{v.percentageVat}%</Text>
             ))}
           </View>
           <View
@@ -262,7 +237,7 @@ export const PdfPreviewInvoicedSection = ({
               textAlign: 'right',
               alignItems: 'flex-end',
             }}>
-            {percentageVats?.map((v, idx) => {
+            {currentPercentageVats?.map((v, idx) => {
               const vatAmountFormatted = formatCurrency(
                 centsToMoney(currentCurrency?.code!, v.vat),
                 {
@@ -275,7 +250,7 @@ export const PdfPreviewInvoicedSection = ({
                 },
               );
               return (
-                <Text key={idx} style={{marginBottom: 3, ...fontStyles.bold}}>
+                <Text key={idx} style={{...fontStyles.bold}}>
                   {vatAmountFormatted}
                 </Text>
               );
@@ -284,7 +259,7 @@ export const PdfPreviewInvoicedSection = ({
           <Text style={{width: '20%', textAlign: 'right', ...fontStyles.bold}}>
             {formatCurrency(
               amount +
-                percentageVats
+                currentPercentageVats
                   .map((v) => centsToMoney(currentCurrency?.code!, v.vat))
                   .reduce((a, b) => a + b, 0),
               {

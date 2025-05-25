@@ -30,6 +30,7 @@ import {allItemsHaveZeroDiscount} from 'utils/discount';
 import {hasAlternativeAddress} from 'utils/invoice';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {cleanHtml} from 'utils/rich-field-string';
+import {isSwissAddress} from 'utils/address';
 import ArticleTableHeader from '../ArticleSection/ArticleTableHeader';
 import ArticleSectionFooter from '../ArticleSection/ArticleSectionFooter';
 import {ArticleSectionBody} from '../ArticleSection/ArticleSectionBody';
@@ -123,6 +124,7 @@ const QuotationPdfTemplate = React.memo(
       regularFontStyle: fontStyles.regular,
       primaryColor,
       secondaryColor,
+      isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
     });
 
     const customerVATId =

@@ -263,6 +263,7 @@ const CreditNotePdfTemplate = ({
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
+              serviceCompany={serviceCompany}
             />
           </TopSectionContainer>
 

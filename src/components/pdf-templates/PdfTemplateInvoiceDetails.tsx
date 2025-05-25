@@ -7,19 +7,31 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {UserAccount} from 'models/user';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {isSwissAddress} from 'utils/address';
+import {ServiceCompanyItem} from 'models/service-company';
 import PdfUnitAddress from './containers/PdfUnitAddress';
+
+type StyleProps = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
 
 const getStyles = ({
   boldFontStyle,
   regularFontStyle,
   primaryColor,
   secondaryColor,
-}: PdfConfigurationStyles) =>
+  isSwissOffset = false,
+}: StyleProps) =>
   StyleSheet.create({
     rightAddress: {
+      paddingTop: '20px',
       flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     rightAddressContent: {
       display: 'flex',
@@ -49,6 +61,7 @@ type Props = {
   nextCompanyExternalId?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
   userInfo?: UserAccount;
+  serviceCompany?: ServiceCompanyItem;
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const PdfTemplateInvoiceDetails = ({
@@ -60,6 +73,7 @@ const PdfTemplateInvoiceDetails = ({
   fontStyles,
   primaryColor,
   secondaryColor,
+  serviceCompany,
 }: Props) => {
   const startDate = invoice?.additionalInfo.deliveryStartDate;
   const endDate = invoice?.additionalInfo.deliveryEndDate;
@@ -71,6 +85,7 @@ const PdfTemplateInvoiceDetails = ({
     regularFontStyle: fontStyles.regular,
     primaryColor,
     secondaryColor,
+    isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
   });
 
   const getInvoiceDate = () =>

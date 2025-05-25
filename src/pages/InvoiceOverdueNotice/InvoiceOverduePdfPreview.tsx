@@ -20,18 +20,29 @@ import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
 import {ServiceCompanyItem} from 'models/service-company';
+import {isSwissAddress} from 'utils/address';
+
+type StyleProps = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
 
 const getStyles = ({
   boldFontStyle,
   regularFontStyle,
   primaryColor,
   secondaryColor,
-}: PdfConfigurationStyles) =>
+  isSwissOffset = false,
+}: StyleProps) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
+      paddingTop: '20px',
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     rightAddressContent: {
       display: 'flex',
@@ -142,6 +153,7 @@ const InvoiceOverduePdfPreview = ({
     regularFontStyle: fontStyles.regular,
     primaryColor,
     secondaryColor,
+    isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
   });
 
   const overdueTotal = (initialAmount: number, handlingAmount: number) =>

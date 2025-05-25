@@ -287,6 +287,7 @@ const PartialInvoicePdfTemplate = ({
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
+              serviceCompany={serviceCompany}
             />
           </TopSectionContainer>
 
@@ -331,6 +332,7 @@ const PartialInvoicePdfTemplate = ({
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
+                invoiceItems={invoiceItems}
               />
             )}
 
@@ -345,6 +347,7 @@ const PartialInvoicePdfTemplate = ({
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
+                invoiceItems={invoiceItems}
               />
             )}
 

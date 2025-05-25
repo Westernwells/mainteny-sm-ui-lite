@@ -396,13 +396,16 @@ export const getAggregatedPartialPaymentsVats = (
   items: InvoiceItemRecord[],
   totalAmountExclVat: number,
 ) => {
-  const total = items.reduce((sum, item) => sum + getDiscountedAmount(item), 0);
+  const total = items?.reduce(
+    (sum, item) => sum + getDiscountedAmount(item),
+    0,
+  );
 
-  return items.reduce((acc, item) => {
+  return items?.reduce((acc, item) => {
     const {percentageVat} = item.unitAmount;
     const discountedAmount = getDiscountedAmount(item);
     const portion = discountedAmount === total ? 1 : discountedAmount / total;
-    const vat = totalAmountExclVat * ((percentageVat ?? 0) / 100) * portion;
+    const vat = totalAmountExclVat * (percentageVat ?? 0) * portion;
 
     const existing = acc.find((i) => i.percentageVat === percentageVat);
     if (existing) {

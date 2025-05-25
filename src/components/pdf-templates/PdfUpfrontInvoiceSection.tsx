@@ -2,6 +2,7 @@ import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import BigNumber from 'bignumber.js';
 import {
   AggregatedAmount,
+  EditableInvoiceItem,
   InvoiceAmountDetail,
   InvoiceType,
   InvoiceView,
@@ -23,6 +24,7 @@ import {HtmlPDF} from 'components/HtmlPDF';
 import {useMemo} from 'react';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
+import {getAggregatedPartialPaymentsVats} from 'pages/InvoiceDetails/utils';
 import PdfInvoicedSection from './PdfInvoicedSection';
 import PdfPaymentHistorySection from './PdfPaymentHistorySection';
 import PdfPerItemSection from './PdfPerItemSection';
@@ -34,6 +36,7 @@ type PartialProps = {
   invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
+  invoiceItems: EditableInvoiceItem[];
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const getStyles = ({
@@ -90,6 +93,7 @@ const PdfUpfrontInvoiceSection = ({
   fontStyles,
   primaryColor,
   secondaryColor,
+  invoiceItems,
 }: PartialProps) => {
   const previousInvoicesTotalExclVat = previousInvoices
     ?.map(
@@ -119,7 +123,12 @@ const PdfUpfrontInvoiceSection = ({
     maximumFractionDigits: 2,
   });
 
-  const percentageVats =
+  const percentageVats = getAggregatedPartialPaymentsVats(
+    invoiceItems,
+    totalAmountExclVat,
+  );
+
+  const currentPercentageVats =
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
 
   const totalAmountInclVats =
@@ -425,7 +434,7 @@ const PdfUpfrontInvoiceSection = ({
             currentCurrency={currentCurrency}
             previousInvoices={previousInvoices}
             amount={amount}
-            percentageVats={percentageVats}
+            currentPercentageVats={currentPercentageVats}
             fontStyles={fontStyles}
             primaryColor={primaryColor}
             secondaryColor={secondaryColor}

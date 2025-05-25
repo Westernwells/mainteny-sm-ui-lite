@@ -27,6 +27,7 @@ import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
 import {hasAlternativeAddress} from 'utils/invoice';
+import {ServiceCompanyItem} from 'models/service-company';
 import AlternativeAddressTemplate from '../AlternativeAddressTemplate';
 import {ArticleSection} from '../ArticleSection/ArticleSection';
 import PdfTemplateInvoiceDetails from '../PdfTemplateInvoiceDetails';
@@ -73,6 +74,7 @@ type Props = {
   qrImageSrc?: string;
   pdfConfigClientStorage: ClientReportForPDFConfig;
   invoiceItems: EditableInvoiceItem[];
+  serviceCompany?: ServiceCompanyItem;
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const PdfPreviewFinalInvoiceTemplate = ({
@@ -94,6 +96,7 @@ const PdfPreviewFinalInvoiceTemplate = ({
   fontStyles,
   primaryColor,
   secondaryColor,
+  serviceCompany,
 }: Props) => {
   const isEditing = !!invoice?.id;
 
@@ -208,6 +211,7 @@ const PdfPreviewFinalInvoiceTemplate = ({
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
+              serviceCompany={serviceCompany}
             />
           </TopSectionContainer>
 
@@ -251,6 +255,7 @@ const PdfPreviewFinalInvoiceTemplate = ({
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
+              invoiceItems={invoiceItems}
             />
 
             {invoice?.additionalInfo?.moreInfo &&
