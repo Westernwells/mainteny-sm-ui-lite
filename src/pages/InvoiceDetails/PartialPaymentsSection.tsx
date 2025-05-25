@@ -42,10 +42,7 @@ import {
   getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
-import {
-  calculateTotalAmountInclVats,
-  calculateTotalWithPerItemDiscount,
-} from 'utils/calculate-total';
+import {calculateTotalWithPerItemDiscount} from 'utils/calculate-total';
 import {fixRounding, isNumber} from 'utils/utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
@@ -279,7 +276,12 @@ export const PartialPaymentsSection = ({
     maximumFractionDigits: 2,
   });
 
-  const percentageVats =
+  const percentageVats = getAggregatedPartialPaymentsVats(
+    watchedItems,
+    totalAmountExclVat,
+  );
+
+  const currentPercentageVats =
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
 
   const totalAmountInclVats =
@@ -692,6 +694,7 @@ export const PartialPaymentsSection = ({
               )}
             </Fragment>
           ))}
+
         {!isEditing && (
           <>
             <Grid item xs={12}>
@@ -970,12 +973,12 @@ export const PartialPaymentsSection = ({
                 {amountFormatted}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {percentageVats?.map((v, idx) => (
+                {currentPercentageVats?.map((v, idx) => (
                   <p key={idx}>{v.percentageVat}%</p>
                 ))}
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
-                {percentageVats?.map((v, idx) => {
+                {currentPercentageVats?.map((v, idx) => {
                   const vatAmountFormatted = formatCurrency(
                     centsToMoney(currentCurrency?.code!, v.vat),
                     {
@@ -992,7 +995,7 @@ export const PartialPaymentsSection = ({
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {formatCurrency(
                   amount +
-                    percentageVats
+                    currentPercentageVats
                       ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
                       ?.reduce((a, b) => a + b, 0),
                   {

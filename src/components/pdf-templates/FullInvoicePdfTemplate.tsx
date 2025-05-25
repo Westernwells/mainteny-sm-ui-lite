@@ -301,6 +301,7 @@ const FullInvoicePdfTemplate = ({
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
+              serviceCompany={serviceCompany}
             />
           </TopSectionContainer>
 

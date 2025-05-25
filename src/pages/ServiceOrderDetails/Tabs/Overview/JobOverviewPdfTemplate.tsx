@@ -34,17 +34,28 @@ import ArticleTableHeader from 'components/pdf-templates/ArticleSection/ArticleT
 import {ArticleSectionBody} from 'components/pdf-templates/ArticleSection/ArticleSectionBody';
 import ArticleSectionFooter from 'components/pdf-templates/ArticleSection/ArticleSectionFooter';
 import {allItemsHaveZeroDiscount} from 'utils/discount';
+import {isSwissAddress} from 'utils/address';
+
+type StyleProps = {
+  isSwissOffset?: boolean;
+} & PdfConfigurationStyles;
 
 const getStyles = ({
   boldFontStyle,
   primaryColor,
   secondaryColor,
-}: PdfConfigurationStyles) =>
+  isSwissOffset = false,
+}: StyleProps) =>
   StyleSheet.create({
     rightAddress: {
       flex: '0 0 42%',
       display: 'flex',
       flexDirection: 'column',
+      paddingTop: '20px',
+      ...(isSwissOffset && {
+        paddingTop: '50px', // make offset be about 55mm
+        paddingLeft: '6px', // make offset be about 22mm
+      }),
     },
     rightAddressContent: {
       display: 'flex',
@@ -220,6 +231,7 @@ const JobOverviewPdfTemplate = React.memo(
       primaryColor,
       secondaryColor,
       boldFontStyle: fontStyles.bold,
+      isSwissOffset: isSwissAddress(serviceCompany?.businessAddress),
     });
 
     const customerVATId =

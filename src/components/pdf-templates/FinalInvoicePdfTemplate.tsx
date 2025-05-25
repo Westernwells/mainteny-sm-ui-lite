@@ -195,6 +195,7 @@ const FinalInvoicePdfTemplate = ({
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
+              serviceCompany={serviceCompany}
             />
           </TopSectionContainer>
 
@@ -238,6 +239,7 @@ const FinalInvoicePdfTemplate = ({
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
+              invoiceItems={invoiceItems}
             />
 
             {invoice?.additionalInfo?.moreInfo &&

@@ -311,6 +311,7 @@ const PdfPartialUpfrontPreview = ({
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
+              serviceCompany={serviceCompany}
             />
           </TopSectionContainer>
 
@@ -355,6 +356,7 @@ const PdfPartialUpfrontPreview = ({
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
+                invoiceItems={invoiceItems}
               />
             )}
 
@@ -369,6 +371,7 @@ const PdfPartialUpfrontPreview = ({
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
+                invoiceItems={invoiceItems}
               />
             )}
 
