@@ -88,6 +88,7 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
 import ConfirmRemoveSubItemsDialog from 'components/MixedPositions/ConfirmRemoveSubItemsDialog';
+import {PropertyOwnerView} from 'models/propertyManager';
 import {
   fetchArticleSubAssociations,
   useCreateArticle,
@@ -140,6 +141,7 @@ interface MainPositionProps<
   setExpandedRows?: React.Dispatch<React.SetStateAction<number[]>>;
   disableInlineEditing?: boolean;
   propertyOwnerId?: string;
+  customerData?: PropertyOwnerView;
 }
 
 const useMainPosition = <
@@ -176,6 +178,7 @@ const useMainPosition = <
   setExpandedRows,
   disableInlineEditing,
   propertyOwnerId,
+  customerData,
 }: MainPositionProps<TForm>) => {
   const theme = useTheme();
   const {t} = useTranslation();
@@ -406,20 +409,68 @@ const useMainPosition = <
             }
           : undefined;
 
+      const currency = currentCurrency.code;
+      const customerVat = customerData?.additionalInfo?.vat;
+
+      const resolveVatProps = () => {
+        if (customerVat) {
+          return {
+            vatId: customerVat.id,
+            vatName: customerVat.name,
+            percentageVat: customerVat.percentage,
+            currency,
+          };
+        }
+        if (articleObj.unitPurchaseAmount?.vatId) {
+          return {
+            vatId: articleObj.unitPurchaseAmount.vatId,
+            vatName: articleObj.unitPurchaseAmount.vatName,
+            percentageVat: articleObj.unitPurchaseAmount.percentageVat,
+            currency: articleObj.unitPurchaseAmount.currency || currency,
+          };
+        }
+        return defaultVat
+          ? {
+              vatId: defaultVat.id,
+              vatName: defaultVat.name,
+              percentageVat: defaultVat.percentage,
+              currency,
+            }
+          : {};
+      };
+
+      const vatProps = resolveVatProps();
+
+      const finalPurchaseAmount = {
+        ...articleObj.unitPurchaseAmount,
+        ...vatProps,
+      };
+
+      const finalSellingAmount = {
+        ...sellingAmountObj,
+        ...vatProps,
+      };
+
+      const finalSellingAmountForArticle = {
+        ...articleObj.unitSellingAmount,
+        ...vatProps,
+      };
+
       setValue(
         `items.${index}.article` as Path<TForm>,
-        {...articleObj, costPackage: defaultCostPackage} as PathValue<
-          TForm,
-          Path<TForm>
-        >,
+        {
+          ...articleObj,
+          costPackage: defaultCostPackage,
+          unitSellingAmount: finalSellingAmountForArticle,
+        } as PathValue<TForm, Path<TForm>>,
       );
       setValue(
         `items.${index}.unitPurchaseAmount` as Path<TForm>,
-        articleObj.unitPurchaseAmount as PathValue<TForm, Path<TForm>>,
+        finalPurchaseAmount as PathValue<TForm, Path<TForm>>,
       );
       setValue(
         `items.${index}.unitAmount` as Path<TForm>,
-        sellingAmountObj as PathValue<TForm, Path<TForm>>,
+        finalSellingAmount as PathValue<TForm, Path<TForm>>,
       );
       setValue(
         `items.${index}.description` as Path<TForm>,

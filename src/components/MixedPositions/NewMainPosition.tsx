@@ -10,6 +10,7 @@ import {
   EditableServiceOrderItem,
   ServiceOrderAmountDetail,
 } from 'models/service-order';
+import {PropertyOwnerView} from 'models/propertyManager';
 
 type AnyItem =
   | EditableInvoiceItem
@@ -43,6 +44,7 @@ interface Props<TForm extends {items: AnyItem[]} & FieldValues> {
     | ServiceOrderAmountDetail;
   disableInlineEditing?: boolean;
   propertyOwnerId?: string;
+  customerData?: PropertyOwnerView;
 }
 
 const NewMainPositionRow = <
@@ -73,6 +75,7 @@ const NewMainPositionRow = <
   amountDetail,
   disableInlineEditing = false,
   propertyOwnerId,
+  customerData,
 }: Props<TForm>) => {
   const [openDeleteConfirm, setOpenDeleteConfirm] = useState(false);
 
@@ -130,6 +133,7 @@ const NewMainPositionRow = <
     setExpandedRows,
     disableInlineEditing,
     propertyOwnerId,
+    customerData,
   });
 
   return (

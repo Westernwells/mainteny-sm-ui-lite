@@ -44,6 +44,7 @@ import NewSubPositionRow from 'components/MixedPositions/NewSubPositionRow';
 import NewMainPositionRow from 'components/MixedPositions/NewMainPosition';
 import DiscountPanel from 'components/MixedPositions/DiscountPanel';
 import {dialogPaperStyles} from 'components/MixedPositions/MixedPositions.styles';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 
 export interface EditableRowType {
   index: number;
@@ -122,6 +123,8 @@ const InvoicePositionTable = ({
     control: descriptionControl,
     name: 'description',
   });
+
+  const {data: customerData} = useGetCustomer(watch('propertyOwnerId'));
 
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
@@ -260,12 +263,22 @@ const InvoicePositionTable = ({
   };
 
   const handleAddNewPosition = () => {
+    const customerVatProps = customerData?.additionalInfo?.vat
+      ? {
+          percentageVat: customerData.additionalInfo.vat.percentage,
+          vatId: customerData.additionalInfo.vat.id,
+          vatName: customerData.additionalInfo.vat.name,
+        }
+      : {
+          percentageVat: defaultVat?.percentage,
+          vatId: defaultVat?.id,
+          vatName: defaultVat?.name,
+        };
+
     const defaultProps = {
       netAmount: 0,
       currency: currentCurrency.code,
-      percentageVat: defaultVat?.percentage,
-      vatId: defaultVat?.id,
-      vatName: defaultVat?.name,
+      ...customerVatProps,
     };
 
     const newItem: EditableInvoiceItem = {
@@ -307,12 +320,23 @@ const InvoicePositionTable = ({
     const subIndex = parentItem.subItems.length;
     const defaultSubSeq = `${parentSeq}.${subIndex + 1}`;
 
+    // Use customer vat if present, else use fall back vat
+    const customerVatProps = customerData?.additionalInfo?.vat
+      ? {
+          percentageVat: customerData.additionalInfo.vat.percentage,
+          vatId: customerData.additionalInfo.vat.id,
+          vatName: customerData.additionalInfo.vat.name,
+        }
+      : {
+          percentageVat: defaultVat?.percentage,
+          vatId: defaultVat?.id,
+          vatName: defaultVat?.name,
+        };
+
     const defaultProps = {
       netAmount: 0,
       currency: currentCurrency.code,
-      percentageVat: defaultVat?.percentage,
-      vatId: defaultVat?.id,
-      vatName: defaultVat?.name,
+      ...customerVatProps,
     };
 
     const newSub: EditableInvoiceSubItemRecord = {
@@ -525,6 +549,78 @@ const InvoicePositionTable = ({
     watchedItems.length,
   ]);
 
+  // Use Effect to update the new position when it does not have a name yet and customer is changed.
+  useEffect(() => {
+    if (!customerData?.additionalInfo?.vat) return;
+
+    const customerVat = customerData.additionalInfo.vat;
+    const currencyCode = currentCurrency?.code ?? 'EUR';
+
+    const customerVatProps = {
+      percentageVat: customerVat.percentage,
+      vatId: customerVat.id,
+      vatName: customerVat.name,
+      currency: currencyCode,
+    };
+
+    const updatedItems = watchedItems.map((item) => {
+      const isItemEmpty = !item.name?.trim();
+
+      const updatedSubItems: EditableInvoiceItem[] =
+        item.subItems?.map((subItem) => {
+          const isSubItemEmpty = !subItem.name?.trim();
+          if (!isSubItemEmpty) return subItem;
+
+          return {
+            ...subItem,
+            unitAmount: {
+              ...subItem.unitAmount,
+              ...customerVatProps,
+            },
+            unitPurchaseAmount: {
+              ...subItem.unitPurchaseAmount,
+              ...customerVatProps,
+            },
+          };
+        }) ?? [];
+
+      if (!isItemEmpty) {
+        return {
+          ...item,
+          subItems: updatedSubItems,
+        };
+      }
+
+      return {
+        ...item,
+        unitAmount: {
+          ...item.unitAmount,
+          ...customerVatProps,
+        },
+        unitPurchaseAmount: {
+          ...item.unitPurchaseAmount,
+          ...customerVatProps,
+        },
+        article: {
+          ...item.article,
+          unitSellingAmount: {
+            ...item.article?.unitSellingAmount,
+            ...customerVatProps,
+          },
+          unitPurchaseAmount: {
+            ...item.article?.unitPurchaseAmount,
+            ...customerVatProps,
+          },
+        },
+        subItems: updatedSubItems,
+      };
+    });
+
+    updatedItems.forEach((updatedItem, index) => {
+      update(index, updatedItem);
+    });
+  }, [customerData?.additionalInfo?.vat?.id]);
+
   return (
     <>
       <Box
@@ -571,6 +667,7 @@ const InvoicePositionTable = ({
                     onRecalc={onRecalcInvoice}
                     amountDetail={invoiceAmountDetail}
                     propertyOwnerId={watch('propertyOwnerId')}
+                    customerData={customerData}
                   />
                 </TableRow>
 
