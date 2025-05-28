@@ -41,6 +41,7 @@ import TableBody from 'components/Table/TableBody';
 import TableRow from 'components/Table/TableRow';
 import SubPositionFooter from 'components/MixedPositions/SubPositionFooter';
 import {dialogPaperStyles} from 'components/MixedPositions/MixedPositions.styles';
+import {useGetCustomer} from 'hooks/reactQuery/useCustomers';
 import NewSubPositionRow from '../../../../../components/MixedPositions/NewSubPositionRow';
 import NewMainPositionRow from '../../../../../components/MixedPositions/NewMainPosition';
 
@@ -118,6 +119,10 @@ const ServiceOrderPositionTable = ({
     control: descriptionControl,
     name: 'description',
   });
+
+  const {data: customerData} = useGetCustomer(
+    serviceOrder?.elevator?.propertyOwner?.id,
+  );
 
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
 
@@ -268,12 +273,22 @@ const ServiceOrderPositionTable = ({
   };
 
   const handleAddNewPosition = () => {
+    const customerVatProps = customerData?.additionalInfo?.vat
+      ? {
+          percentageVat: customerData.additionalInfo.vat.percentage,
+          vatId: customerData.additionalInfo.vat.id,
+          vatName: customerData.additionalInfo.vat.name,
+        }
+      : {
+          percentageVat: defaultVat?.percentage,
+          vatId: defaultVat?.id,
+          vatName: defaultVat?.name,
+        };
+
     const defaultProps = {
       netAmount: 0,
       currency: currentCurrency.code,
-      percentageVat: defaultVat?.percentage,
-      vatId: defaultVat?.id,
-      vatName: defaultVat?.name,
+      ...customerVatProps,
     };
 
     const newItem: EditableServiceOrderItem = {
@@ -315,12 +330,22 @@ const ServiceOrderPositionTable = ({
     const subIndex = parentItem.subItems.length;
     const defaultSubSeq = `${parentSeq}.${subIndex + 1}`;
 
+    const customerVatProps = customerData?.additionalInfo?.vat
+      ? {
+          percentageVat: customerData.additionalInfo.vat.percentage,
+          vatId: customerData.additionalInfo.vat.id,
+          vatName: customerData.additionalInfo.vat.name,
+        }
+      : {
+          percentageVat: defaultVat?.percentage,
+          vatId: defaultVat?.id,
+          vatName: defaultVat?.name,
+        };
+
     const defaultProps = {
       netAmount: 0,
       currency: currentCurrency.code,
-      percentageVat: defaultVat?.percentage,
-      vatId: defaultVat?.id,
-      vatName: defaultVat?.name,
+      ...customerVatProps,
     };
 
     const newSub: EditableServiceOrderSubArticleRecord = {
@@ -564,6 +589,7 @@ const ServiceOrderPositionTable = ({
                     amountDetail={serviceOrderAmountDetail}
                     disableInlineEditing={disableInlineEditing}
                     propertyOwnerId={serviceOrder?.elevator?.propertyOwner?.id}
+                    customerData={customerData}
                   />
                 </TableRow>
 

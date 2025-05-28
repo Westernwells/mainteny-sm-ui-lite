@@ -1,11 +1,4 @@
-import {
-  Alert,
-  Box,
-  CircularProgress,
-  Grid2 as Grid,
-  TextField,
-  Typography,
-} from '@mui/material';
+import {Box, CircularProgress, Grid2 as Grid, TextField} from '@mui/material';
 import {t} from 'i18next';
 import React, {
   ChangeEvent,
@@ -16,7 +9,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import AddButton from 'components/AddButton';
 import PageHeaderContainer from 'components/PageHeaderContainer';
 import {useQueryState} from 'hooks/useQueryState';
@@ -323,37 +315,6 @@ const MixedPositions = () => {
 
     return {emptyTable: false, noMatchingData: false};
   }, [isFetched, articleResource]);
-
-  const renderAlert = (isCustom: boolean = false) => (
-    <Alert
-      severity="info"
-      icon={
-        <InfoOutlinedIcon
-          fontSize="small"
-          sx={{color: !isCustom ? '#2196F3' : 'white'}}
-        />
-      }
-      sx={{
-        backgroundColor: !isCustom ? '#EAF4FE' : '#2196F3',
-        color: !isCustom ? '#222B45' : 'white',
-        borderRadius: '4px',
-        padding: '10px 16px',
-      }}>
-      <Box>
-        <Typography variant="subtitle2" fontWeight="bold">
-          {t('New feature available!')}
-        </Typography>
-        <Typography variant="body2" pt={0.5}>
-          {t(
-            'We are expanding our feature set with long awaited and requested Mixed Positions. This feature will help you to streamline accounting and diversify your offering.',
-          )}
-        </Typography>
-        <Typography variant="body2" pt={0.5}>
-          {t('Coming soon to Quotations and Invoices.')}
-        </Typography>
-      </Box>
-    </Alert>
-  );
 
   const handleEditStart = (
     row: MixedPositionRow,
@@ -938,7 +899,6 @@ const MixedPositions = () => {
           right: 0,
           padding: '24px',
         }}>
-        {renderAlert(true)}
         <Box
           sx={{
             display: 'flex',
@@ -1001,8 +961,6 @@ const MixedPositions = () => {
           right: 0,
           padding: '24px',
         }}>
-        {renderAlert()}
-
         <PageHeaderContainer sx={{my: '2em'}}>
           <SearchInput
             refInput={textInput}
