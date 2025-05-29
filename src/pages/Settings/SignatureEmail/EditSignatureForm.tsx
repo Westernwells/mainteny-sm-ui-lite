@@ -46,7 +46,16 @@ const EditSignatureForm = ({
           onChange={handleUploadedFile}
         />
 
-        <Avatar src={logoSrc} sx={{width: 80, height: 80}} alt={logoAltName} />
+        <Avatar
+          src={logoSrc}
+          sx={{width: 80, height: 80}}
+          alt={logoAltName}
+          imgProps={{
+            style: {
+              objectFit: 'contain',
+            },
+          }}
+        />
 
         <IconButton
           onClick={onUpload}

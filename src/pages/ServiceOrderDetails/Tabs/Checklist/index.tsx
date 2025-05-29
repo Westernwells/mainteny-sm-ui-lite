@@ -788,7 +788,7 @@ export const CheckList = ({serviceOrder}: Props) => {
                             alt=""
                             src={signaturePath}
                             style={{
-                              objectFit: 'cover',
+                              objectFit: 'contain',
                               objectPosition: 'top',
                               width: '100%',
                               height: '100%',
