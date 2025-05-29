@@ -60,7 +60,7 @@ export const Signature = ({
               alt=""
               src={url}
               style={{
-                objectFit: 'cover',
+                objectFit: 'contain',
                 objectPosition: 'top',
                 maxWidth: '100%',
                 maxHeight: '300%',
