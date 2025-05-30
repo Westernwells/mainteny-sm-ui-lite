@@ -1,8 +1,10 @@
 import {Html, HtmlStyle, HtmlStyles} from 'react-pdf-html';
 import {HTML_PDF_FONT_SIZE} from 'models/richTextField';
 import {
+  flattenTableHtml,
   generateTextIndent,
   modifyHTMLFontSizeForPDFRendering,
+  normalizePdfInlineStyles,
 } from 'utils/rich-text-field';
 import {ContextProps} from 'context/PdfStylesProvider';
 
@@ -20,11 +22,20 @@ export const HtmlPDF = ({
   fontStyles,
   fontSize: explicitFontSize,
 }: Props) => {
-  const modifiedHtmlString = modifyHTMLFontSizeForPDFRendering(
-    generateTextIndent(html),
-  )
-    // Replace tabs with spaces (4 times &nbsp;) because tabs are rendering as square boxes
-    .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+  // 1) Flatten table html
+  const withoutTables = flattenTableHtml(html);
+
+  // 2) indent
+  const indented = generateTextIndent(withoutTables);
+
+  // 3) normalize only the paddings
+  const normalized = normalizePdfInlineStyles(indented);
+
+  // 4) bump font-sizes
+  const sized = modifyHTMLFontSizeForPDFRendering(normalized);
+
+  // 5) tabs → &nbsp;
+  const modifiedHtmlString = sized.replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
 
   const fontSize = explicitFontSize ?? HTML_PDF_FONT_SIZE;
 
@@ -40,6 +51,7 @@ export const HtmlPDF = ({
       stylesheet={{
         '*': {
           fontSize: DEFAULT_HTML_PDF_FONT_SIZE,
+          fontFamily: fontStyles.regular.fontFamily,
         },
         '*:not(div:empty)': {
           margin: '0px',

@@ -8,7 +8,7 @@ import {
 } from 'models/invoice';
 import {EditableQuotationItem, QuotationAmountDetail} from 'models/quotation';
 import {centsToMoney, formatCurrency} from 'utils/currency';
-import {insertNewlines} from 'utils/pdfTemplates';
+import {formatQuantity, insertNewlines} from 'utils/pdfTemplates';
 import {getDiscountDisplay} from 'utils/quotation';
 import {Currency} from 'models/misc';
 import {
@@ -76,12 +76,12 @@ export const ArticleSectionBody = ({
               <View style={styles.col8Right}>
                 <Text>
                   {insertNewlines(
-                    formatCurrency(Number(mainPosition.quantity), {
-                      currency: currentCurrency?.code,
+                    formatQuantity(mainPosition?.quantity, {
+                      currency: currentCurrency?.code!,
                       excludeCurrencySymbol: true,
-                      currencySymbol: currentCurrency?.symbol,
+                      currencySymbol: currentCurrency?.symbol!,
                       companyLang: selectedLng,
-                    }) || '-',
+                    }),
                     5,
                   )}
                 </Text>
@@ -190,12 +190,12 @@ export const ArticleSectionBody = ({
                       <View style={styles.col8Right}>
                         <Text>
                           {insertNewlines(
-                            formatCurrency(Number(subItem.quantity), {
-                              currency: currentCurrency?.code,
+                            formatQuantity(subItem?.quantity, {
+                              currency: currentCurrency?.code!,
                               excludeCurrencySymbol: true,
-                              currencySymbol: currentCurrency?.symbol,
+                              currencySymbol: currentCurrency?.symbol!,
                               companyLang: selectedLng,
-                            }) || '-',
+                            }),
                             5,
                           )}
                         </Text>

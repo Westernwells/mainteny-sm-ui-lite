@@ -2,6 +2,7 @@
 import {ServiceOrderView} from 'models/service-order';
 import {InvoiceView, InvoicedColumn} from 'models/invoice';
 import {QuotationView} from 'models/quotation';
+import {formatCurrency} from './currency';
 
 export const getAddressComponentFromInvoice = (invoice?: InvoiceView) => {
   if (!invoice) return;
@@ -48,3 +49,30 @@ export const getInvoicedSectionColumns = (
     width: '20%',
   },
 ];
+
+export function formatQuantity(
+  raw: number,
+  options?: Intl.NumberFormatOptions & {
+    roundingMode?: 'floor' | 'ceil' | 'trunc' | undefined;
+    excludeCurrencySymbol?: boolean;
+    currencySymbol?: string;
+    companyLang?: string;
+  },
+): string {
+  const num = Number(raw);
+  const value = Number.isNaN(num) ? 0 : num;
+
+  const rounded = Math.round(value * 100) / 100;
+  const isInteger = rounded === Math.floor(rounded);
+
+  // 3) build format options, injecting integerOnly style only when .00
+  const formatOpts = {
+    currency: options?.currency,
+    excludeCurrencySymbol: options?.excludeCurrencySymbol,
+    currencySymbol: options?.currencySymbol,
+    companyLang: options?.companyLang,
+    ...(isInteger ? {minimumFractionDigits: 0, maximumFractionDigits: 0} : {}),
+  };
+
+  return formatCurrency(rounded, formatOpts) || '-';
+}
