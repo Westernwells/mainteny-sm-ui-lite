@@ -9,6 +9,7 @@ import {
   InvoiceActivityView,
   InvoiceAmountDetail,
   InvoiceFormData,
+  InvoiceItemAmount,
   InvoiceItemPaymentRecord,
   InvoiceItemPaymentType,
   InvoiceItemRecord,
@@ -1139,3 +1140,40 @@ export function hasAlternativeAddress(address?: AddressRecord) {
   const fullName = address.fullName?.trim() || '';
   return Boolean(name || fullName);
 }
+
+export const calculateLaborMaterialTotals = (
+  uiItems: EditableInvoiceItem[] = [],
+  detailItems: InvoiceItemAmount[] = [],
+) =>
+  uiItems.reduce(
+    (totals, uiItem, idx) => {
+      const detailItem = detailItems[idx];
+      if (!detailItem) return totals;
+
+      const isMix = uiItem.article?.type === ArticleType.MIX;
+      const subs = Array.isArray(uiItem.subItems) ? uiItem.subItems : [];
+
+      if (isMix && subs.length) {
+        subs.forEach((uiSub, subIdx) => {
+          const net =
+            detailItem.subItems?.[subIdx]?.amountAfterGlobalDiscount
+              .netAmount ?? 0;
+          if (uiSub.article?.type === ArticleType.LABOR) {
+            totals.laborNet += net;
+          } else if (uiSub.article?.type === ArticleType.MATERIAL) {
+            totals.materialNet += net;
+          }
+        });
+      } else {
+        const net = detailItem.amountAfterGlobalDiscount?.netAmount ?? 0;
+        if (uiItem.article?.type === ArticleType.LABOR) {
+          totals.laborNet += net;
+        } else if (uiItem.article?.type === ArticleType.MATERIAL) {
+          totals.materialNet += net;
+        }
+      }
+
+      return totals;
+    },
+    {laborNet: 0, materialNet: 0},
+  );

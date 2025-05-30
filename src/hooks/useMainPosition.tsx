@@ -89,6 +89,7 @@ import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import HdrAutoOutlinedIcon from '@mui/icons-material/HdrAutoOutlined';
 import ConfirmRemoveSubItemsDialog from 'components/MixedPositions/ConfirmRemoveSubItemsDialog';
 import {PropertyOwnerView} from 'models/propertyManager';
+import {formatQuantity} from 'utils/pdfTemplates';
 import {
   fetchArticleSubAssociations,
   useCreateArticle,
@@ -1623,17 +1624,12 @@ const useMainPosition = <
         ) : (
           <Typography
             sx={{paddingRight: '12px', fontSize: '14px', fontWeight: '600'}}>
-            {formatCurrency(
-              Number.isNaN(Number(watchedItem?.quantity))
-                ? 0
-                : Number(watchedItem?.quantity),
-              {
-                currency: currentCurrency?.code,
-                excludeCurrencySymbol: true,
-                currencySymbol: currentCurrency?.symbol,
-                companyLang: selectedLng,
-              },
-            )}
+            {formatQuantity(watchedItem?.quantity, {
+              currency: currentCurrency?.code!,
+              excludeCurrencySymbol: true,
+              currencySymbol: currentCurrency?.symbol!,
+              companyLang: selectedLng,
+            })}
           </Typography>
         )}
       </TableCell>

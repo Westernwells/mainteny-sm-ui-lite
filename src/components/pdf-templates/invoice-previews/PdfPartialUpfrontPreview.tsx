@@ -1,6 +1,5 @@
 import {Document, StyleSheet, View} from '@react-pdf/renderer';
 import {UserAccount} from 'models/user';
-import {formatCurrency} from 'utils/currency';
 import PdfTemplateHeader from 'components/pdf-templates/PdfTemplateHeader';
 import PdfTemplateFooter from 'components/pdf-templates/PdfTemplateFooter';
 import {Currency, HeaderFooterInfoData} from 'models/misc';
@@ -12,15 +11,7 @@ import {
   InvoiceType,
   InvoiceView,
 } from 'models/invoice';
-import {formatCostText} from 'utils/utils';
-import {getDiscoutObj} from 'pages/QuotationDetails/utils';
-import {ArticleType} from 'models/article';
-import {
-  applyGlobalDiscountOnItems,
-  applyPerItemDiscountOnItems,
-  correctCreditNoteInvoicesPercentages,
-  stripHtmlTags,
-} from 'pages/InvoiceDetails/utils';
+import {correctCreditNoteInvoicesPercentages} from 'pages/InvoiceDetails/utils';
 import useCalculateLaborMaterialCost from 'hooks/useCalculateLaborMaterialCost';
 import {getServiceCompanyInfo} from 'utils/company-utils';
 import {ClientReportForPDFConfig} from 'models/client-storage';
@@ -39,6 +30,7 @@ import SwissPageTemplate from '../SwissPageTemplate';
 import AlternativeAddressTemplate from '../AlternativeAddressTemplate';
 import PdfPreviewUpfrontPaymentSection from './PdfPreviewUpfrontPaymentSection';
 import PdfPreviewPartialPaymentSection from './PdfPreviewPartialPaymentSection';
+import {InvoiceNotesPdf} from '../components/InvoiceNotesPdf';
 
 type Props = {
   serviceCompany?: ServiceCompanyItem;
@@ -203,42 +195,9 @@ const PdfPartialUpfrontPreview = ({
         firstInvoiceType === InvoiceType.UPFRONT &&
         isFinalInvoice));
 
-  const articleItems = invoice?.items.map((item, index) => ({
-    ...item,
-    payment: {
-      ...invoiceAmountDetail?.items[index]?.payment,
-      type: invoiceAmountDetail?.items[index]?.payment.type!,
-      amount: {
-        ...invoiceAmountDetail?.items[index]?.payment.amount,
-        netAmount:
-          invoiceAmountDetail?.items[index]?.payment.amount?.netAmount ?? 0,
-        currency:
-          invoiceAmountDetail?.items[index]?.payment.amount?.currency ||
-          currentCurrency?.code!,
-        vats: invoiceAmountDetail?.items[index]?.payment.amount?.vats || [],
-      },
-    },
-    discount: getDiscoutObj(invoiceAmountDetail?.items[index]?.discount),
-  }))!;
-
-  const discount = getDiscoutObj(invoice?.additionalInfo?.discount);
-
-  const itemsAfterPerItemDiscount = applyPerItemDiscountOnItems(articleItems);
-
-  const itemsAfterGlobalDiscount = applyGlobalDiscountOnItems(
-    itemsAfterPerItemDiscount,
-    discount,
-  );
-
-  const laborCost = useCalculateLaborMaterialCost(
-    itemsAfterGlobalDiscount,
-    ArticleType.LABOR,
-    currentCurrency,
-  );
-
-  const materialCost = useCalculateLaborMaterialCost(
-    itemsAfterGlobalDiscount,
-    ArticleType.MATERIAL,
+  const {labor, material} = useCalculateLaborMaterialCost(
+    invoiceItems,
+    invoiceAmountDetail,
     currentCurrency,
   );
 
@@ -375,31 +334,14 @@ const PdfPartialUpfrontPreview = ({
               />
             )}
 
-            {invoice?.additionalInfo?.moreInfo &&
-              stripHtmlTags(invoice?.additionalInfo?.moreInfo) && (
-                <View style={styles.notesSection}>
-                  <HtmlPDF
-                    html={formatCostText(
-                      invoice?.additionalInfo?.moreInfo,
-                      `${formatCurrency(laborCost, {
-                        currency: currentCurrency?.code,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      })}`,
-                      `${formatCurrency(materialCost, {
-                        currency: currentCurrency?.code,
-                        currencySymbol: currentCurrency?.symbol,
-                        companyLang: selectedLng,
-                      })}`,
-                    )}
-                    rootStyle={{
-                      marginTop: 6,
-                      marginBottom: 16,
-                    }}
-                    fontStyles={fontStyles}
-                  />
-                </View>
-              )}
+            <InvoiceNotesPdf
+              moreInfo={invoice?.additionalInfo?.moreInfo}
+              labor={labor}
+              material={material}
+              currentCurrency={currentCurrency}
+              selectedLng={selectedLng}
+              fontStyles={fontStyles}
+            />
           </View>
         </PdfBodyContainer>
 

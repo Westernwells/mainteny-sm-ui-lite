@@ -77,6 +77,7 @@ import {
   EditableServiceOrderItem,
   EditableServiceOrderSubArticleRecord,
 } from 'models/service-order';
+import {formatQuantity} from 'utils/pdfTemplates';
 
 interface SubPositionProps<
   TForm extends {
@@ -1309,17 +1310,12 @@ const useSubPosition = <
           />
         ) : (
           <Typography sx={{paddingRight: '12px', fontSize: '14px'}}>
-            {formatCurrency(
-              Number.isNaN(Number(subItem?.quantity))
-                ? 0
-                : Number(subItem?.quantity),
-              {
-                currency: currentCurrency?.code,
-                excludeCurrencySymbol: true,
-                currencySymbol: currentCurrency?.symbol,
-                companyLang: selectedLng,
-              },
-            )}
+            {formatQuantity(subItem?.quantity, {
+              currency: currentCurrency?.code!,
+              excludeCurrencySymbol: true,
+              currencySymbol: currentCurrency?.symbol!,
+              companyLang: selectedLng,
+            })}
           </Typography>
         )}
       </TableCell>

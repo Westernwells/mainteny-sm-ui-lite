@@ -636,6 +636,76 @@ export const generateTextIndent = (html: string) => {
   return doc.documentElement.outerHTML;
 };
 
+export const normalizePdfInlineStyles = (html: string): string => {
+  // assume 1em = 12pt
+  const EM_IN_PT = 12;
+
+  return html.replace(
+    /<([a-z]+)([^>]*?)\sstyle="([^"]*?)"([^>]*?)>/gi,
+    (
+      _match: string,
+      tag: string,
+      preAttrs: string,
+      styleAttr: string,
+      postAttrs: string,
+    ): string => {
+      // 1) Break the style string into key/value pairs
+      const styleMap = styleAttr
+        .split(/;\s*/)
+        .map((rule: string) => rule.trim())
+        .filter((rule: string) => rule.length > 0)
+        .reduce<Record<string, string>>((acc, rule) => {
+          const [key, val] = rule.split(/\s*:\s*/);
+          if (key && val) {
+            acc[key.toLowerCase()] = val;
+          }
+          return acc;
+        }, {});
+
+      // 2) **Strip font-family completely** (don’t even consider it)
+      delete styleMap['font-family'];
+
+      // 3) Build out only the props you want to keep
+      const props = (['padding-left', 'padding-right'] as const).reduce<
+        string[]
+      >((acc, cssProp) => {
+        const raw = styleMap[cssProp];
+        if (!raw) return acc;
+
+        const propName =
+          cssProp === 'padding-left' ? 'paddingLeft' : 'paddingRight';
+
+        // em → pt
+        const emMatch = raw.match(/^([\d.]+)em$/);
+        if (emMatch) {
+          acc.push(`${propName}: ${parseFloat(emMatch[1]) * EM_IN_PT}pt`);
+        }
+
+        // px → pt
+        const pxMatch = raw.match(/^([\d.]+)px$/);
+        if (pxMatch) {
+          acc.push(`${propName}: ${parseFloat(pxMatch[1])}pt`);
+        }
+
+        return acc;
+      }, []);
+
+      // 4) If nothing left, drop the entire style attribute
+      const styleString = props.length ? ` style="{${props.join(', ')}}"` : '';
+
+      return `<${tag}${preAttrs}${styleString}${postAttrs}>`;
+    },
+  );
+};
+
+export const flattenTableHtml = (html: string) =>
+  html
+    // 1) remove all table, colgroup, tbody, thead, tfoot, tr, td, th
+    .replace(/<(\/?)(table|colgroup|tbody|thead|tfoot|tr|td|th)[^>]*>/gi, '')
+    // 2) collapse any accidental blank lines
+    .replace(/\n\s*\n+/g, '\n\n')
+    .trim();
+
 export const hasMultipleParagraphs = (value: string) =>
   value.split('<p>').length > 2;
 
