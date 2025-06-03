@@ -11,12 +11,12 @@ import {
   SubPositionRow,
   UpdateArticleRecord,
 } from 'models/article';
-import {QuotationItemRecord} from 'models/quotation';
+import {EditableQuotationItem, QuotationItemRecord} from 'models/quotation';
 import {InvoiceItemRecord} from 'models/invoice';
 import {VatView} from 'models/vat';
 import {MultiVatsAmount} from 'models/misc';
+import {stripHtmlTags} from '../pages/InvoiceDetails/utils';
 import {Currencies, formatCurrency} from './currency';
-import {cleanHtmlContent, replaceTextInHtml, stripHtmlTags} from './text-block';
 import {convertToText} from './utils';
 import {CreateArticleRecord} from '../models/article';
 
@@ -125,49 +125,70 @@ export const syncVatLegalNotesWithNotes = ({
   currentNotes,
   taxRates,
 }: {
-  oldArticles: QuotationItemRecord[];
-  newArticles: QuotationItemRecord[];
+  oldArticles: EditableQuotationItem[];
+  newArticles: EditableQuotationItem[];
   currentNotes: string;
   taxRates?: VatView[];
 }) => {
-  let notes = currentNotes || '';
+  let notes = currentNotes;
 
-  if (!taxRates) {
-    return notes;
-  }
+  newArticles.forEach((newArt) => {
+    const oldArt = oldArticles.find((o) => o.id === newArt.id);
+    const oldVatId = oldArt?.unitAmount?.vatId;
+    const newVatId = newArt.unitAmount?.vatId;
 
-  const getLegalNoteForVatId = (vatId?: string) => {
-    if (!vatId) return '';
-    return taxRates.find((rate) => rate.id === vatId)?.legalNote || '';
-  };
-
-  // Add new legal notes
-  newArticles.forEach((item) => {
-    const {vatId} = item.unitAmount!;
-    const legalNote = getLegalNoteForVatId(vatId);
-    if (!legalNote) {
-      return;
-    }
-    if (stripHtmlTags(notes).includes(legalNote)) {
-      return;
-    }
-    const newValue = cleanHtmlContent(`<p>${legalNote}</p>`);
-    notes += ` ${newValue}`;
-  });
-
-  // Remove obsolete legal notes
-  oldArticles.forEach((item) => {
-    const {vatId} = item.unitAmount!;
-    const legalNote = getLegalNoteForVatId(vatId);
-    if (!legalNote) {
-      return;
-    }
-    if (newArticles.every((newItem) => newItem.unitAmount!.vatId !== vatId)) {
-      notes = replaceTextInHtml(notes, `<p>${legalNote}</p>`, '');
+    // If the VAT‐ID changed (or was undefined → defined), append the new legal note:
+    if (oldVatId !== newVatId) {
+      const vatInfo = taxRates?.find((v) => v.id === newVatId);
+      if (vatInfo?.legalNote && !notes.includes(vatInfo.legalNote)) {
+        // If there's already some non‐blank text, insert a newline + <p>…</p>.
+        if (stripHtmlTags(notes).trim().length > 0) {
+          notes += `\n<p>${vatInfo.legalNote}</p>`;
+        } else {
+          // Otherwise, start with a bare <p>…</p>
+          notes = `<p>${vatInfo.legalNote}</p>`;
+        }
+      }
     }
   });
 
   return notes;
+};
+
+export const removeObsoleteVatNotes = (
+  currentNotes: string,
+  oldArticles: EditableQuotationItem[],
+  newArticles: EditableQuotationItem[],
+  prevTaxRates?: VatView[],
+): string => {
+  let updated = currentNotes;
+  if (!prevTaxRates) return updated;
+
+  // build a Set of vatIds still in use
+  const newVatIds = new Set<string>();
+  newArticles.forEach((art) => {
+    const id = art.unitAmount?.vatId;
+    if (id) newVatIds.add(id);
+  });
+
+  oldArticles.forEach((oldArt) => {
+    const oldVatId = oldArt.unitAmount?.vatId;
+    if (!oldVatId || newVatIds.has(oldVatId)) {
+      return;
+    }
+    const note = prevTaxRates.find((v) => v.id === oldVatId)?.legalNote?.trim();
+    if (!note) return;
+
+    // escape regex chars, then remove "<p>…</p>" or bare note
+    const escaped = note.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const rx = new RegExp(`(?:<p>\\s*${escaped}\\s*</p>|${escaped})`, 'g');
+    updated = updated.replace(rx, '');
+  });
+
+  // strip any leftover empty <p>…</p> tags, collapse blank lines, trim
+  updated = updated.replace(/<p[^>]*>\s*<\/p>/g, '');
+  updated = updated.replace(/\n\s*\n+/g, '\n\n').trim();
+  return updated;
 };
 
 export const calculatePackageMaterialLaborPercentages = (costPackage?: {

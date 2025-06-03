@@ -161,11 +161,12 @@ export const ArticleSectionBody = ({
 
             {mainPosition?.subItemsConfig?.subItemsVisible &&
               mainPosition?.subItems?.map((subItem, subIndex) => {
-                const totalSubItemPriceExclVatAfterDiscount = centsToMoney(
-                  currentCurrency?.code!,
-                  amountDetail?.items?.[index]?.subItems?.[subIndex]
-                    .amountAfterItemDiscount?.netAmount || 0,
-                );
+                const totalSubItemPriceExclVatAfterDiscount =
+                  Number(subItem.quantity) *
+                  centsToMoney(
+                    currentCurrency?.code!,
+                    subItem.unitAmount.netAmount ?? 0,
+                  );
                 return (
                   <>
                     <View

@@ -15,6 +15,7 @@ import {
   InvoicePaymentTermRecord,
   InvoiceStatus,
   InvoiceStatusView,
+  InvoiceSubItemAmount,
   InvoiceSubItemRecord,
   InvoiceTableRow,
   InvoiceType,
@@ -28,7 +29,12 @@ import {
 } from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
-import {PaymentTermArticleType, PaymentTermData} from 'models/contract';
+import {
+  ContractPaymentTermView,
+  ContractTermView,
+  PaymentTermArticleType,
+  PaymentTermData,
+} from 'models/contract';
 import {
   AddressRecord,
   Currency,
@@ -1117,31 +1123,76 @@ export function hasAlternativeAddress(address?: AddressRecord) {
 export const calculateLaborMaterialTotals = (
   uiItems: EditableInvoiceItem[] = [],
   detailItems: InvoiceItemAmount[] = [],
-) =>
-  uiItems.reduce(
+) => {
+  const getNet = (item: InvoiceItemAmount | InvoiceSubItemAmount | undefined) =>
+    item?.payment?.amount?.netAmount ?? 0;
+
+  return uiItems.reduce(
     (totals, uiItem, idx) => {
       const detailItem = detailItems[idx];
       if (!detailItem) return totals;
 
-      const isMix = uiItem.article?.type === ArticleType.MIX;
-      const subs = Array.isArray(uiItem.subItems) ? uiItem.subItems : [];
+      const {article, subItems: uiSubs} = uiItem;
+      const articleType = article?.type;
 
-      if (isMix && subs.length) {
-        subs.forEach((uiSub, subIdx) => {
-          const net =
-            detailItem.subItems?.[subIdx]?.payment?.amount?.netAmount ?? 0;
-          if (uiSub.article?.type === ArticleType.LABOR) {
-            totals.laborNet += net;
-          } else if (uiSub.article?.type === ArticleType.MATERIAL) {
-            totals.materialNet += net;
+      if (
+        articleType === ArticleType.MIX &&
+        Array.isArray(uiSubs) &&
+        uiSubs.length
+      ) {
+        uiSubs.forEach((uiSub, subIdx) => {
+          const subDetail: InvoiceSubItemAmount | undefined =
+            detailItem.subItems?.[subIdx];
+          const subNet = getNet(subDetail);
+
+          switch (uiSub.article?.type) {
+            case ArticleType.LABOR:
+              totals.laborNet += subNet;
+              break;
+            case ArticleType.MATERIAL:
+              totals.materialNet += subNet;
+              break;
+            case ArticleType.PACKAGE:
+              {
+                const pkg = uiSub.article.costPackage;
+                if (pkg) {
+                  totals.laborNet +=
+                    subNet * ((pkg.laborPercentage ?? 0) / 100);
+                  totals.materialNet +=
+                    subNet * ((pkg.materialPercentage ?? 0) / 100);
+                } else {
+                  totals.materialNet += subNet;
+                }
+              }
+              break;
+            default:
+              break;
           }
         });
       } else {
-        const net = detailItem.payment?.amount?.netAmount ?? 0;
-        if (uiItem.article?.type === ArticleType.LABOR) {
-          totals.laborNet += net;
-        } else if (uiItem.article?.type === ArticleType.MATERIAL) {
-          totals.materialNet += net;
+        const mainNet = getNet(detailItem);
+
+        switch (articleType) {
+          case ArticleType.LABOR:
+            totals.laborNet += mainNet;
+            break;
+          case ArticleType.MATERIAL:
+            totals.materialNet += mainNet;
+            break;
+          case ArticleType.PACKAGE:
+            {
+              const pkg = article?.costPackage;
+              if (pkg) {
+                totals.laborNet += mainNet * ((pkg.laborPercentage ?? 0) / 100);
+                totals.materialNet +=
+                  mainNet * ((pkg.materialPercentage ?? 0) / 100);
+              } else {
+                totals.materialNet += mainNet;
+              }
+            }
+            break;
+          default:
+            break;
         }
       }
 
@@ -1149,6 +1200,7 @@ export const calculateLaborMaterialTotals = (
     },
     {laborNet: 0, materialNet: 0},
   );
+};
 
 export const makeFormPayment = (rawPayment?: {
   type: string;
@@ -1237,4 +1289,34 @@ export const aggregateVats = (vats: VatAmount[] = []): VatAmount[] => {
   );
 
   return Object.values(grouped);
+};
+
+export const getFormattedPaymentTerms = (
+  paymentTerm: ContractPaymentTermView | ContractTermView,
+  companyLanguage: string = 'en',
+) => {
+  const discountOptions = paymentTerm.data?.discountOptions
+    ?.map((d) => {
+      const discountDays = d.discountDays || 0;
+      const discountPercentage = d.discountPercent || 0;
+
+      if (discountDays > 0 && discountPercentage > 0) {
+        return t(
+          `If you pay before {DUE_DATE} we grant {{discountPercentage}}% discount ({DISCOUNT_AMOUNT}) based on {INVOICE_AMOUNT}. Payment amount: {PAYMENT_AMOUNT}`,
+          {discountPercentage, lng: companyLanguage},
+        );
+      }
+
+      return '';
+    })
+    .filter((option) => option !== '') // Filter out empty strings
+    .join('\n');
+
+  return {
+    data: paymentTerm?.data,
+    id: paymentTerm.id,
+    term: discountOptions
+      ? `${paymentTerm.term}\n${discountOptions}`
+      : paymentTerm.term,
+  };
 };
