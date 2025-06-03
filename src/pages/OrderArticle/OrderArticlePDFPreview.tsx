@@ -73,6 +73,7 @@ const getStyles = ({
       marginBottom: 10,
       paddingTop: 25,
       maxWidth: '95%',
+      color: primaryColor,
     },
     notesSection: {
       paddingBottom: 6,
@@ -324,7 +325,7 @@ const OrderArticlePDFPreview = React.memo(
                             width: '2%',
                             textAlign: 'left',
                             marginRight: 10,
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {index + 1}
                         </Text>
@@ -332,7 +333,7 @@ const OrderArticlePDFPreview = React.memo(
                           html={articleOrderItem.articleName || '-'}
                           rootStyle={{
                             width: '43%',
-                            color: '#212121',
+                            color: primaryColor,
                           }}
                           fontStyles={fontStyles}
                         />
@@ -340,7 +341,7 @@ const OrderArticlePDFPreview = React.memo(
                           style={{
                             width: '14%',
                             textAlign: 'left',
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {articleOrderItem.supplierArticleNumber || '-'}
                         </Text>
@@ -348,7 +349,7 @@ const OrderArticlePDFPreview = React.memo(
                           style={{
                             width: '8%',
                             textAlign: 'right',
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {articleOrderItem.quantity || '-'}
                         </Text>
@@ -357,7 +358,7 @@ const OrderArticlePDFPreview = React.memo(
                             width: '7%',
                             textAlign: 'center',
                             marginLeft: 10,
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {translate(articleOrderItem.unit) || '-'}
                         </Text>
@@ -365,7 +366,7 @@ const OrderArticlePDFPreview = React.memo(
                           style={{
                             width: '13%',
                             textAlign: 'right',
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {formatCurrency(
                             (articleOrderItem.unitPurchaseAmount?.netAmount ??
@@ -385,7 +386,7 @@ const OrderArticlePDFPreview = React.memo(
                           style={{
                             width: '15%',
                             textAlign: 'right',
-                            color: '#212121',
+                            color: primaryColor,
                           }}>
                           {formatCurrency(
                             ((articleOrderItem.unitPurchaseAmount?.netAmount ??
@@ -420,7 +421,7 @@ const OrderArticlePDFPreview = React.memo(
                     <Text
                       style={{
                         width: '32%',
-                        color: '#616161',
+                        color: primaryColor,
                         fontSize: 10,
                         textAlign: 'right',
                       }}>
@@ -451,7 +452,7 @@ const OrderArticlePDFPreview = React.memo(
                         <Text
                           style={{
                             width: '32%',
-                            color: '#616161',
+                            color: primaryColor,
                             fontSize: 10,
                             textAlign: 'right',
                           }}>
@@ -479,7 +480,7 @@ const OrderArticlePDFPreview = React.memo(
                     <Text
                       style={{
                         width: '32%',
-                        color: '#212121',
+                        color: primaryColor,
                         fontSize: 10,
                         textAlign: 'right',
                         ...fontStyles.bold,
@@ -492,7 +493,7 @@ const OrderArticlePDFPreview = React.memo(
                       style={{
                         width: '24%',
                         textAlign: 'right',
-                        color: '#212121',
+                        color: primaryColor,
                         fontSize: 10,
                         ...fontStyles.bold,
                       }}>

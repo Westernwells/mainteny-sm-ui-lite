@@ -95,6 +95,7 @@ const getStyles = ({
     contentBody: {
       marginTop: 6,
       marginBottom: 16,
+      color: primaryColor,
     },
     paymentTermsSection: {
       marginTop: 5,

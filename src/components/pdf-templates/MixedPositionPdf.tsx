@@ -18,11 +18,7 @@ import PreviewFrameThree from '../../assets/images/PreviewFrame3.jpg';
 import PreviewFrameFour from '../../assets/images/PreviewFrame4.jpg';
 import ArticleTableHeader from './ArticleSection/ArticleTableHeader';
 
-const getStyles = ({
-  regularFontStyle,
-  primaryColor,
-  secondaryColor,
-}: PdfConfigurationStyles) =>
+const getStyles = ({regularFontStyle, primaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     page: {
       ...regularFontStyle,
@@ -109,7 +105,7 @@ const getStyles = ({
       alignItems: 'flex-start',
       fontSize: 10,
       marginVertical: 3,
-      color: secondaryColor,
+      color: primaryColor,
     },
     container: {
       display: 'flex',
@@ -301,7 +297,7 @@ const MixedPositionPdf = ({
                 <Text
                   style={{
                     width: '32%',
-                    color: secondaryColor,
+                    color: primaryColor,
                     fontSize: 10,
                     textAlign: 'right',
                   }}>
@@ -334,7 +330,7 @@ const MixedPositionPdf = ({
                     }}>
                     <Text
                       style={{
-                        color: secondaryColor,
+                        color: primaryColor,
                         fontSize: 10,
                         textAlign: 'right',
                         width: '57%',

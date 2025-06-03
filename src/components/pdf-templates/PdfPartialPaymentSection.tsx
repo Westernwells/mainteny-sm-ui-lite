@@ -2,7 +2,6 @@ import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import BigNumber from 'bignumber.js';
 import {
   AggregatedAmount,
-  EditableInvoiceItem,
   InvoiceAmountDetail,
   InvoiceType,
   InvoiceView,
@@ -17,6 +16,8 @@ import {
 import {fixRounding} from 'utils/utils';
 import {Currency, State} from 'models/misc';
 import {
+  aggregateVats,
+  collectVatsFromInvoices,
   getFormattedPaymentValuesForPartialUpfrontAndFinal,
   replacePaymentTermsPlaceholders,
 } from 'utils/invoice';
@@ -24,7 +25,6 @@ import {HtmlPDF} from 'components/HtmlPDF';
 import {useMemo} from 'react';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
-import {getAggregatedPartialPaymentsVats} from 'pages/InvoiceDetails/utils';
 import PdfInvoicedSection from './PdfInvoicedSection';
 import PdfPaymentHistorySection from './PdfPaymentHistorySection';
 import PdfPerItemSection from './PdfPerItemSection';
@@ -36,7 +36,6 @@ type PartialProps = {
   invoiceAmountDetail?: InvoiceAmountDetail;
   selectedLng?: string;
   previousInvoices: InvoiceView[];
-  invoiceItems: EditableInvoiceItem[];
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
 const getStyles = ({
@@ -92,24 +91,28 @@ export const PdfPartialPaymentSection = ({
   fontStyles,
   primaryColor,
   secondaryColor,
-  invoiceItems,
 }: PartialProps) => {
-  const previousInvoicesTotalExclVat = centsToMoney(
-    currentCurrency?.code!,
-    previousInvoices
-      ?.map((i) => i.totalAmount?.netAmount || 0)
-      .reduce((a, b) => a + b, 0),
+  const isEditing = !!invoice?.id;
+
+  const prevInvoicesExcludingCurrent = previousInvoices.filter(
+    (i) => i.id !== invoice?.id,
   );
 
-  const amount = centsToMoney(
+  const previousInvoicesTotalExclCurrentVat = centsToMoney(
+    currentCurrency?.code!,
+    prevInvoicesExcludingCurrent.reduce(
+      (sum, i) => sum + (i.totalAmount?.netAmount || 0),
+      0,
+    ),
+  );
+
+  const currentInvoiceNet = centsToMoney(
     currentCurrency?.code!,
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
   );
 
   const totalAmountExclVat =
-    amount +
-    previousInvoicesTotalExclVat -
-    centsToMoney(currentCurrency?.code!, invoice?.totalAmount?.netAmount);
+    currentInvoiceNet + previousInvoicesTotalExclCurrentVat;
 
   const totalAmountExclVatFormatted = formatCurrency(
     fixRounding(totalAmountExclVat, 2),
@@ -123,16 +126,17 @@ export const PdfPartialPaymentSection = ({
     },
   );
 
-  const percentageVats = getAggregatedPartialPaymentsVats(
-    invoiceItems,
-    totalAmountExclVat,
-  );
-
   const currentPercentageVats =
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
 
+  const previousVats = collectVatsFromInvoices(prevInvoicesExcludingCurrent);
+
+  const allVats = [...previousVats, ...currentPercentageVats];
+
+  const finalAggregatedVats = aggregateVats(allVats);
+
   const totalAmountInclVats =
-    (percentageVats
+    (finalAggregatedVats
       ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
       ?.reduce((a, b) => a + b, 0) ?? 0) + totalAmountExclVat;
 
@@ -144,8 +148,6 @@ export const PdfPartialPaymentSection = ({
     currencySymbol: currentCurrency?.symbol,
     companyLang: selectedLng,
   });
-
-  const hasPreviousInvoices = previousInvoices.length > 0;
 
   const paidAmountInclVats = previousInvoices
     .map((i) =>
@@ -208,72 +210,104 @@ export const PdfPartialPaymentSection = ({
     selectedLng,
   );
 
+  const showPerItem =
+    invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM;
+
+  const invoicesToRender = isEditing
+    ? previousInvoices.slice(
+        0,
+        previousInvoices.findIndex((i) => i.id === invoice.id),
+      )
+    : previousInvoices;
+
   return (
     <View>
-      {invoice?.additionalInfo.payment?.type === PaymentType.PER_ITEM &&
-        previousInvoices.length && (
-          <PdfPerItemSection
-            translate={translate}
-            selectedLng={selectedLng}
-            currentCurrency={currentCurrency}
-            invoice={invoice}
-            previousInvoices={previousInvoices}
-            primaryColor={primaryColor}
-            secondaryColor={secondaryColor}
-            fontStyles={fontStyles}
-          />
-        )}
+      {showPerItem && (
+        <PdfPerItemSection
+          translate={translate}
+          selectedLng={selectedLng}
+          currentCurrency={currentCurrency}
+          invoice={invoice}
+          previousInvoices={invoicesToRender}
+          primaryColor={primaryColor}
+          secondaryColor={secondaryColor}
+          fontStyles={fontStyles}
+          invoiceAmountDetail={invoiceAmountDetail}
+        />
+      )}
 
-      {invoice?.additionalInfo.payment?.type !== PaymentType.PER_ITEM &&
-        previousInvoices.length && (
-          <View>
-            <View
+      {!showPerItem && previousInvoices.length && (
+        <View wrap={false}>
+          <View
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexDirection: 'row',
+              width: '100%',
+              marginTop: 20,
+            }}>
+            <Text
               style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexDirection: 'row',
-                width: '100%',
-                marginTop: 20,
+                ...styles.tableHeading,
+                textAlign: 'left',
+                width: '60%',
               }}>
-              <Text
-                style={{
-                  ...styles.tableHeading,
-                  textAlign: 'left',
-                  width: '60%',
-                }}>
-                {translate('Partial Invoices')}
-              </Text>
+              {translate('Partial Invoices')}
+            </Text>
 
-              {invoice?.additionalInfo.payment?.type ===
-                PaymentType.PERCENTAGE && (
-                <Text
-                  style={{
-                    ...styles.tableHeading,
-                    textAlign: 'right',
-                    width: '15%',
-                  }}>
-                  {translate('Percentage')}
-                </Text>
-              )}
-
+            {invoice?.additionalInfo.payment?.type ===
+              PaymentType.PERCENTAGE && (
               <Text
                 style={{
                   ...styles.tableHeading,
                   textAlign: 'right',
-                  width:
-                    invoice?.additionalInfo.payment?.type ===
-                    PaymentType.PERCENTAGE
-                      ? '25%'
-                      : '40%',
+                  width: '15%',
                 }}>
-                {translate('Total')}
-                {` (${getCurrencySymbol[currentCurrency?.code!]})`}
+                {translate('Percentage')}
               </Text>
-            </View>
+            )}
 
-            {previousInvoices.map((previousInvoice, index) => (
+            <Text
+              style={{
+                ...styles.tableHeading,
+                textAlign: 'right',
+                width:
+                  invoice?.additionalInfo.payment?.type ===
+                  PaymentType.PERCENTAGE
+                    ? '25%'
+                    : '40%',
+              }}>
+              {translate('Total')}
+              {` (${getCurrencySymbol[currentCurrency?.code!]})`}
+            </Text>
+          </View>
+
+          {previousInvoices?.map((previousInvoice, index) => {
+            const isCurrent = previousInvoice.id === invoice?.id;
+
+            const paymentSource = isCurrent
+              ? invoiceAmountDetail?.payment
+              : previousInvoice.additionalInfo.payment;
+
+            const description =
+              previousInvoice.type === InvoiceType.CREDIT_NOTE
+                ? translate('Credit Note invoice')
+                : paymentSource?.description ?? '-';
+
+            const percentageValue = paymentSource?.percentage ?? 0;
+
+            // Lump-sum total (in cents) → actual number
+            const lumpSumValue = isCurrent
+              ? (invoiceAmountDetail?.payment.amount as AggregatedAmount)
+                  ?.netAmount ?? 0
+              : aggregatedAmountToMoney(
+                  previousInvoice.additionalInfo.payment?.amount,
+                ).value;
+
+            return (
               <View
+                key={previousInvoice.id}
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
@@ -281,54 +315,43 @@ export const PdfPartialPaymentSection = ({
                   width: '100%',
                   flexDirection: 'row',
                   marginVertical: 4,
+                  paddingVertical: 2,
                   borderBottomWidth:
                     index === previousInvoices.length - 1 ? 1 : 0,
                   borderBottomColor: '#212121',
-                }}
-                key={previousInvoice.id}>
+                }}>
                 <Text
                   style={{
                     textAlign: 'left',
-                    color: '#212121',
+                    color: primaryColor,
                     width: '60%',
                   }}>
-                  {previousInvoice.type === InvoiceType.CREDIT_NOTE
-                    ? translate('Credit Note invoice')
-                    : previousInvoice.additionalInfo.payment?.description}
+                  {description}
                 </Text>
+
                 {invoice?.additionalInfo.payment?.type ===
                   PaymentType.PERCENTAGE && (
                   <Text
                     style={{
                       textAlign: 'right',
-                      color: '#212121',
+                      color: primaryColor,
                       width: '15%',
                     }}>
-                    {fixRounding(
-                      previousInvoice.additionalInfo.payment?.percentage ?? 0,
-                      2,
-                    )}
-                    %
+                    {fixRounding(percentageValue, 2)}%
                   </Text>
                 )}
 
                 <Text
                   style={{
                     textAlign: 'right',
-                    color: '#212121',
+                    color: primaryColor,
                     width:
-                      previousInvoice.additionalInfo.payment?.type ===
-                      PaymentType.PERCENTAGE
+                      paymentSource?.type === PaymentType.PERCENTAGE
                         ? '25%'
                         : '40%',
                   }}>
                   {formatCurrency(
-                    centsToMoney(
-                      currentCurrency?.code!,
-                      aggregatedAmountToMoney(
-                        previousInvoice?.additionalInfo.payment?.amount,
-                      ).value ?? 0,
-                    ),
+                    centsToMoney(currentCurrency?.code!, lumpSumValue),
                     {
                       currency: currentCurrency?.code,
                       excludeCurrencySymbol: true,
@@ -338,18 +361,19 @@ export const PdfPartialPaymentSection = ({
                   )}
                 </Text>
               </View>
-            ))}
-          </View>
-        )}
+            );
+          })}
+        </View>
+      )}
 
       {previousInvoices.length && (
-        <View>
+        <View wrap={false}>
           <View style={styles.tableRow}>
             <Text style={{width: '44%'}} />
             <Text
               style={{
                 width: '32%',
-                color: '#616161',
+                color: primaryColor,
                 fontSize: 10,
                 textAlign: 'right',
               }}>
@@ -366,13 +390,13 @@ export const PdfPartialPaymentSection = ({
           </View>
 
           <View>
-            {percentageVats?.map((v, index) => (
+            {finalAggregatedVats?.map((v, index) => (
               <View style={styles.tableRow} key={`${index}-${v.percentageVat}`}>
                 <Text style={{width: '44%'}} />
                 <Text
                   style={{
                     width: '32%',
-                    color: '#616161',
+                    color: primaryColor,
                     fontSize: 10,
                     textAlign: 'right',
                   }}>
@@ -402,7 +426,7 @@ export const PdfPartialPaymentSection = ({
             <Text
               style={{
                 width: '32%',
-                color: '#212121',
+                color: primaryColor,
                 ...fontStyles.bold,
                 textAlign: 'right',
                 fontSize: 10,
@@ -416,7 +440,7 @@ export const PdfPartialPaymentSection = ({
               style={{
                 width: '24%',
                 textAlign: 'right',
-                color: '#212121',
+                color: primaryColor,
                 ...fontStyles.bold,
                 fontSize: 10,
               }}>
@@ -445,14 +469,13 @@ export const PdfPartialPaymentSection = ({
         </View>
       )}
 
-      {hasPreviousInvoices &&
-        previousInvoices.length > 1 &&
+      {invoicesToRender.length > 0 &&
         invoice?.additionalInfo.showInvoicedSection && (
           <PdfInvoicedSection
             translate={translate}
             currentCurrency={currentCurrency}
-            previousInvoices={previousInvoices}
-            amount={amount}
+            previousInvoices={invoicesToRender}
+            amount={currentInvoiceNet}
             fontStyles={fontStyles}
             primaryColor={primaryColor}
             secondaryColor={secondaryColor}

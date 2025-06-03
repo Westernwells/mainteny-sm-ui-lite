@@ -82,7 +82,7 @@ export const PdfPaymentHistorySection = ({
 
   return (
     <View>
-      <View>
+      <View wrap={false}>
         <View
           style={{
             display: 'flex',

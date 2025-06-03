@@ -105,7 +105,6 @@ import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplat
 import PdfPreview from 'pages/OrderArticle/PDFPreview';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
-import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
 import ChecklistPdf from 'pages/ServiceOrderDetails/Tabs/Checklist/ChecklistPdf';
@@ -132,6 +131,7 @@ import {
 } from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import FinalInvoicePdfTemplate from 'components/pdf-templates/invoice-previews/FinalInvoicePdfTemplate';
 import {Notes} from './Notes/EditNotes';
 import {InvoiceActivities} from './InvoiceActivities';
 import {

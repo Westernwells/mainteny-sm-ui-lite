@@ -23,6 +23,7 @@ import {ClientReportForPDFConfig} from 'models/client-storage';
 import {getAddressComponentFromInvoice} from 'utils/pdfTemplates';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {ServiceCompanyItem} from 'models/service-company';
+import {PdfConfigurationStyles} from 'models/pdfs';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import {ArticleSection} from './ArticleSection/ArticleSection';
 import PdfPageContainer from './containers/PdfPageContainer';
@@ -33,7 +34,7 @@ import AlternativeAddressTemplate from './AlternativeAddressTemplate';
 import SwissPageTemplate from './SwissPageTemplate';
 import {InvoiceNotesPdf} from './components/InvoiceNotesPdf';
 
-const getStyles = (boldFontStyle?: {fontFamily: string}) =>
+const getStyles = ({boldFontStyle, primaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     dataBody: {
       borderBottom: '1px solid #212121',
@@ -41,6 +42,7 @@ const getStyles = (boldFontStyle?: {fontFamily: string}) =>
     contentBody: {
       marginTop: 6,
       marginBottom: 16,
+      color: primaryColor,
     },
     paymentTermsSection: {
       marginTop: 5,
@@ -174,7 +176,12 @@ const CreditNotePdfTemplate = ({
     invoice?.additionalInfo?.alternativeServiceCompanyInfo,
   );
 
-  const styles = getStyles(fontStyles.bold);
+  const styles = getStyles({
+    boldFontStyle: fontStyles.bold,
+    regularFontStyle: fontStyles.regular,
+    primaryColor,
+    secondaryColor,
+  });
 
   const customerVATId =
     (pdfConfigClientStorage.includeCustomerVAT &&

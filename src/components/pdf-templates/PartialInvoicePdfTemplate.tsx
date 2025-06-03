@@ -22,7 +22,6 @@ import {hasAlternativeAddress} from 'utils/invoice';
 import PdfTemplateInvoiceDetails from './PdfTemplateInvoiceDetails';
 import {ArticleSection} from './ArticleSection/ArticleSection';
 import PdfPartialPaymentSection from './PdfPartialPaymentSection';
-import PdfUpfrontInvoiceSection from './PdfUpfrontInvoiceSection';
 import PdfBodyContainer from './containers/PdfBodyContainer';
 import PdfPageContainer from './containers/PdfPageContainer';
 import TopSectionContainer from './containers/TopSectionContainer';
@@ -30,6 +29,7 @@ import PdfPageTitleHtml from './containers/PdfPageTitleHtml';
 import AlternativeAddressTemplate from './AlternativeAddressTemplate';
 import SwissPageTemplate from './SwissPageTemplate';
 import {InvoiceNotesPdf} from './components/InvoiceNotesPdf';
+import PdfUpfrontPaymentSection from './invoice-previews/PdfUpfrontPaymentSection';
 
 type Props = {
   serviceCompany?: ServiceCompanyItem;
@@ -88,6 +88,7 @@ const getStyles = ({
     contentBody: {
       marginTop: 6,
       marginBottom: 16,
+      color: primaryColor,
     },
     notesSection: {
       marginTop: 30,
@@ -302,12 +303,11 @@ const PartialInvoicePdfTemplate = ({
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
-                invoiceItems={invoiceItems}
               />
             )}
 
             {isUpfrontInvoice && (
-              <PdfUpfrontInvoiceSection
+              <PdfUpfrontPaymentSection
                 translate={translate}
                 selectedLng={selectedLng}
                 invoice={invoice}
@@ -317,7 +317,6 @@ const PartialInvoicePdfTemplate = ({
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
-                invoiceItems={invoiceItems}
               />
             )}
 

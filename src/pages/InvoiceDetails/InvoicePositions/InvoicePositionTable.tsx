@@ -75,6 +75,7 @@ const InvoicePositionTable = ({
 }: Props) => {
   const {t} = useTranslation();
   const {user} = useUserSession();
+  const didMountRef = useRef(false);
 
   const {data: taxRates} = useVats();
 
@@ -552,6 +553,11 @@ const InvoicePositionTable = ({
   // Use Effect to update the new position when it does not have a name yet and customer is changed.
   useEffect(() => {
     if (!customerData?.additionalInfo?.vat) return;
+
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
 
     const customerVat = customerData.additionalInfo.vat;
     const currencyCode = currentCurrency?.code ?? 'EUR';

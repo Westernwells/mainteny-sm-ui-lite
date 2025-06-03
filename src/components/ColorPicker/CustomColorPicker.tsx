@@ -18,6 +18,7 @@ type Props = {
   labelKey?: string;
   backgroundTheme?: 'light' | 'dark';
   onChange: (value: string) => void;
+  anchor?: React.RefObject<HTMLElement> | null;
 };
 
 const CustomColorPicker = ({
@@ -25,6 +26,7 @@ const CustomColorPicker = ({
   labelKey = 'Custom color',
   backgroundTheme = 'light',
   onChange,
+  anchor,
 }: Props) => {
   const {t} = useTranslation();
   const [isOpen, setOpen] = useState(false);
@@ -34,12 +36,15 @@ const CustomColorPicker = ({
 
   const anchorEl = useRef(null);
 
-  const handleOpen = () => {
+  const handleOpen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     setOpen(true);
   };
 
   const handleSave = () => {
     onChange(internalColor);
+    setOpen(false);
   };
 
   const handleClose = () => {
@@ -85,7 +90,7 @@ const CustomColorPicker = ({
 
       <CustomColorPopover
         open={isOpen}
-        anchorEl={anchorEl}
+        anchorEl={isOpen && anchor ? anchor : anchorEl}
         value={internalColor}
         onChange={setInternalColor}
         onSave={handleSave}

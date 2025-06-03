@@ -635,8 +635,13 @@ export interface InvoiceItemAmount {
   subItems: InvoiceSubItemAmount[];
 }
 
+export interface InvoiceSubItemPayment {
+  type: InvoiceItemPaymentType;
+  amount?: AggregatedAmount;
+  percentage?: number;
+}
 export interface InvoiceSubItemAmount {
-  payment: InvoiceItemPaymentType;
+  payment: InvoiceSubItemPayment;
   discount: Discount;
   percentageVat?: number;
   amountBeforeItemDiscount: Amount;

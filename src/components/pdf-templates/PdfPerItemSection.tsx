@@ -1,13 +1,11 @@
 import {StyleSheet, Text, View} from '@react-pdf/renderer';
 import {
-  AggregatedInvoiceItem,
-  DiscountType,
-  InvoiceType,
+  InvoiceAmountDetail,
+  InvoiceItemPaymentRecord,
   InvoiceView,
 } from 'models/invoice';
 import {centsToMoney, formatCurrency, getCurrencySymbol} from 'utils/currency';
 import {Currency} from 'models/misc';
-import {applyDiscount} from 'pages/InvoiceDetails/utils';
 import {HtmlPDF} from 'components/HtmlPDF';
 import {ContextProps} from 'context/PdfStylesProvider';
 import {PdfConfigurationStyles} from 'models/pdfs';
@@ -18,17 +16,139 @@ type PerItemPaymentProps = {
   selectedLng?: string;
   invoice?: InvoiceView;
   previousInvoices: InvoiceView[];
+  invoiceAmountDetail?: InvoiceAmountDetail;
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-const getStyles = ({secondaryColor}: PdfConfigurationStyles) =>
-  StyleSheet.create({
-    tableHeading: {
-      color: secondaryColor,
-      display: 'flex',
-      fontSize: 6,
-      textTransform: 'uppercase',
+const createStyles = ({secondaryColor}: PdfConfigurationStyles) => {
+  const baseRow = {
+    display: 'flex' as const,
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'flex-start' as const,
+    width: '100%' as const,
+  };
+
+  return StyleSheet.create({
+    container: {width: '100%' as const},
+    headerRow: {
+      ...baseRow,
+      alignItems: 'center' as const,
+      marginTop: 20,
+      paddingBottom: 3,
     },
+    headerCell: {
+      fontSize: 6,
+      textTransform: 'uppercase' as const,
+      color: secondaryColor,
+    },
+    rowContainer: {
+      ...baseRow,
+      marginVertical: 4,
+      paddingBottom: 3,
+    },
+    cellIndex: {width: '4%' as const, textAlign: 'left' as const},
+    cellName: {width: '36%' as const},
+    cellPrice: {width: '18%' as const, textAlign: 'right' as const},
+    cellPortion: {width: '15%' as const, textAlign: 'right' as const},
+    cellAmount: {width: '25%' as const, textAlign: 'right' as const},
+    descriptionContainer: {paddingVertical: 3},
+    subjectDivider: {
+      borderBottomWidth: 1,
+      borderBottomColor: '#212121',
+      marginBottom: 2,
+    },
+    subjectContainer: {paddingVertical: 2},
   });
+};
+
+const TableHeader = ({
+  translate,
+  currency,
+  styles,
+}: {
+  translate: (key: string) => string;
+  currency?: Currency;
+  styles: ReturnType<typeof createStyles>;
+}) => (
+  <View style={styles.headerRow}>
+    <Text style={[styles.headerCell, styles.cellIndex]}>#</Text>
+    <Text style={[styles.headerCell, styles.cellName]}>
+      {translate('Article name')}
+    </Text>
+    <Text style={[styles.headerCell, styles.cellPrice]}>
+      {`${translate('Price')} (${getCurrencySymbol[currency?.code!]})`}
+    </Text>
+    <Text style={[styles.headerCell, styles.cellPortion]}>
+      {translate('Portion')} %
+    </Text>
+    <Text style={[styles.headerCell, styles.cellAmount]}>
+      {`${translate('Amount')} (${getCurrencySymbol[currency?.code!]})`}
+    </Text>
+  </View>
+);
+
+const ItemRow = ({
+  item,
+  paymentDetail,
+  index,
+  currency,
+  selectedLng,
+  primaryColor,
+  fontStyles,
+  styles,
+  isPreviousInvoices,
+}: {
+  item: InvoiceView['items'][0];
+  paymentDetail?: InvoiceItemPaymentRecord;
+  index: number;
+  currency?: Currency;
+  selectedLng?: string;
+  primaryColor: string;
+  fontStyles: ContextProps['fontStyles'];
+  styles: ReturnType<typeof createStyles>;
+  isPreviousInvoices?: boolean;
+}) => {
+  const netAmount = item.unitAmount?.netAmount ?? 0;
+
+  const priceExclVat = formatCurrency(
+    centsToMoney(currency?.code!, netAmount),
+    {
+      currency: currency?.code!,
+      excludeCurrencySymbol: true,
+      currencySymbol: currency?.symbol,
+      companyLang: selectedLng,
+    },
+  );
+
+  const paymentInfo = isPreviousInvoices
+    ? item.additionalInfo?.payment
+    : paymentDetail;
+
+  const portion = paymentInfo?.percentage ?? 0;
+
+  const amountNet = paymentInfo?.amount?.netAmount ?? 0;
+
+  const amount = formatCurrency(centsToMoney(currency?.code!, amountNet), {
+    currency: currency?.code,
+    excludeCurrencySymbol: true,
+    currencySymbol: currency?.symbol,
+    companyLang: selectedLng,
+  });
+
+  return (
+    <View key={item.id} style={styles.rowContainer}>
+      <Text style={styles.cellIndex}>{index + 1}</Text>
+      <View style={styles.cellName}>
+        <HtmlPDF html={item.name || ''} fontStyles={fontStyles} />
+      </View>
+      <Text style={styles.cellPrice}>{priceExclVat}</Text>
+      <Text style={[styles.cellPortion, {color: primaryColor}]}>
+        {portion}%
+      </Text>
+      <Text style={[styles.cellAmount, {color: primaryColor}]}>{amount}</Text>
+    </View>
+  );
+};
 
 const PdfPerItemSection = ({
   translate,
@@ -39,257 +159,70 @@ const PdfPerItemSection = ({
   primaryColor,
   secondaryColor,
   fontStyles,
+  invoiceAmountDetail,
 }: PerItemPaymentProps) => {
-  const styles = getStyles({secondaryColor});
-
-  const hasPreviousInvoices = previousInvoices.length > 0;
+  const styles = createStyles({secondaryColor});
 
   return (
-    <View wrap={false}>
-      <View
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexDirection: 'row',
-          width: '100%',
-          marginTop: 20,
-          paddingBottom: 3,
-        }}>
-        <Text
-          style={{
-            ...styles.tableHeading,
-            textAlign: 'left',
-            width: '4%',
-          }}>
-          #
-        </Text>
-        <Text
-          style={{
-            ...styles.tableHeading,
-            textAlign: 'left',
-            width: '36%',
-          }}>
-          {translate('Article name')}
-        </Text>
-        <Text
-          style={{
-            ...styles.tableHeading,
-            textAlign: 'right',
-            width: '18%',
-          }}>
-          {`${translate('Price')} (${
-            getCurrencySymbol[currentCurrency?.code!]
-          })`}
-        </Text>
-        <Text
-          style={{
-            ...styles.tableHeading,
-            textAlign: 'right',
-            width: '15%',
-          }}>
-          {translate('Portion')} %
-        </Text>
-        <Text
-          style={{
-            ...styles.tableHeading,
-            textAlign: 'right',
-            width: '25%',
-          }}>
-          {`${translate('Amount')} (${
-            getCurrencySymbol[currentCurrency?.code!]
-          })`}
-        </Text>
-      </View>
+    <View wrap={false} style={styles.container}>
+      <TableHeader
+        translate={translate}
+        currency={currentCurrency}
+        styles={styles}
+      />
 
-      <View>
-        <View style={{paddingVertical: 3}}>
-          {hasPreviousInvoices &&
-            previousInvoices?.map((prevInvoice) => (
-              <View key={prevInvoice.id}>
-                <Text>
-                  {prevInvoice.type === InvoiceType.CREDIT_NOTE
-                    ? translate('Credit Note invoice')
-                    : prevInvoice.additionalInfo.payment?.description}
-                </Text>
-              </View>
-            ))}
+      {previousInvoices?.map((inv) => (
+        <View key={inv.id} style={{marginBottom: 8}}>
+          {inv.additionalInfo.payment?.description && (
+            <View style={styles.descriptionContainer}>
+              <HtmlPDF
+                html={inv.additionalInfo.payment.description}
+                fontStyles={fontStyles}
+              />
+            </View>
+          )}
+
+          {inv?.items?.map((item, idx) => (
+            <ItemRow
+              key={`${inv.id}-${item.id}`}
+              item={item}
+              index={idx}
+              currency={currentCurrency}
+              selectedLng={selectedLng}
+              primaryColor={primaryColor}
+              fontStyles={fontStyles}
+              styles={styles}
+              isPreviousInvoices
+            />
+          ))}
         </View>
+      ))}
 
-        {hasPreviousInvoices &&
-          previousInvoices &&
-          (() => {
-            const aggregatedItems = previousInvoices.reduce<
-              Record<string, AggregatedInvoiceItem>
-            >((acc, prevInvoice) => {
-              prevInvoice.items.forEach((item) => {
-                if (
-                  item.additionalInfo?.payment?.percentage &&
-                  item.additionalInfo?.payment?.percentage > 0
-                ) {
-                  const itemId = item.article?.id!;
-                  if (!acc[itemId]) {
-                    acc[itemId] = {
-                      ...item,
-                      totalAmountToBePaid: 0,
-                      totalPercentage: 0,
-                    };
-                  }
+      {invoice?.additionalInfo.payment?.description && (
+        <View style={styles.subjectDivider}>
+          <View style={styles.subjectContainer}>
+            <HtmlPDF
+              html={invoice.additionalInfo.payment.description}
+              fontStyles={fontStyles}
+            />
+          </View>
 
-                  // Calculate base amount from unit price and quantity
-                  const baseAmount =
-                    (item.unitAmount.netAmount ?? 0) * item.quantity;
-
-                  // Get discount parameters based on discount type
-                  const discount = item.additionalInfo?.discount;
-                  const discountParams =
-                    discount?.type === DiscountType.AMOUNT
-                      ? {
-                          amount: discount?.amount?.value ?? 0,
-                        }
-                      : {
-                          percentage: discount?.percentage ?? 0,
-                        };
-
-                  // Apply discount to get total price excluding VAT
-                  const itemTotalPriceExclVat = applyDiscount({
-                    actualValue: baseAmount,
-                    ...discountParams,
-                  });
-
-                  // Calculate amount to be paid based on payment percentage
-                  const paymentPercentage =
-                    item.additionalInfo?.payment?.percentage ?? 0;
-                  const itemAmountToBePaid =
-                    (itemTotalPriceExclVat / 100) * paymentPercentage;
-
-                  // Update accumulated totals
-                  acc[itemId].totalAmountToBePaid += centsToMoney(
-                    item.unitAmount.currency,
-                    itemAmountToBePaid,
-                  );
-                  acc[itemId].totalPercentage += paymentPercentage;
-                }
-              });
-              return acc;
-            }, {});
-
-            const currentInvoiceItems = previousInvoices.flatMap(
-              (prevInvoice) =>
-                prevInvoice.id === invoice?.id
-                  ? prevInvoice.items
-                      .filter(
-                        (item) =>
-                          (item.additionalInfo?.payment?.percentage ?? 0) > 0,
-                      )
-                      .map((item, index) => {
-                        const itemId = item.article?.id!;
-                        const aggregatedItem = aggregatedItems[itemId];
-                        // Calculate base amount from unit price and quantity
-                        const baseAmount =
-                          (item.unitAmount.netAmount ?? 0) * item.quantity;
-
-                        // Get discount parameters based on discount type
-                        const discount = item.additionalInfo?.discount;
-                        const discountParams =
-                          discount?.type === DiscountType.AMOUNT
-                            ? {
-                                amount: discount?.amount?.value ?? 0,
-                              }
-                            : {
-                                percentage: discount?.percentage ?? 0,
-                              };
-
-                        // Apply discount and convert to money
-                        const discountedAmount = applyDiscount({
-                          actualValue: baseAmount,
-                          ...discountParams,
-                        });
-
-                        const amountInMoney = centsToMoney(
-                          currentCurrency?.code!,
-                          discountedAmount,
-                        );
-
-                        // Format amount with currency
-                        const itemTotalPriceExclVat = formatCurrency(
-                          amountInMoney,
-                          {
-                            currency: currentCurrency?.code,
-                            excludeCurrencySymbol: true,
-                            currencySymbol: currentCurrency?.symbol,
-                            companyLang: selectedLng,
-                          },
-                        );
-
-                        return (
-                          <View
-                            key={`${prevInvoice.id}-${item.id}`}
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'flex-start',
-                              width: '100%',
-                              flexDirection: 'row',
-                              marginVertical: 4,
-                              borderBottomWidth:
-                                index === prevInvoice.items.length - 1 ? 1 : 0,
-                              borderBottomColor: '#212121',
-                              paddingBottom: 3,
-                            }}>
-                            <Text
-                              style={{
-                                textAlign: 'left',
-                                width: '4%',
-                              }}>
-                              {index + 1}
-                            </Text>
-                            <View style={{width: '36%', textAlign: 'left'}}>
-                              <HtmlPDF
-                                html={item.name || ''}
-                                fontStyles={fontStyles}
-                              />
-                            </View>
-
-                            <Text
-                              style={{
-                                textAlign: 'right',
-                                width: '18%',
-                              }}>
-                              {itemTotalPriceExclVat}
-                            </Text>
-                            <Text
-                              style={{
-                                textAlign: 'right',
-                                color: primaryColor,
-                                width: '15%',
-                              }}>
-                              {aggregatedItem.totalPercentage}%
-                            </Text>
-                            <Text
-                              style={{
-                                textAlign: 'right',
-                                color: primaryColor,
-                                width: '25%',
-                              }}>
-                              {formatCurrency(
-                                aggregatedItem.totalAmountToBePaid,
-                                {
-                                  currency: currentCurrency?.code,
-                                  excludeCurrencySymbol: true,
-                                  currencySymbol: currentCurrency?.symbol,
-                                  companyLang: selectedLng,
-                                },
-                              )}
-                            </Text>
-                          </View>
-                        );
-                      })
-                  : [],
-            );
-            return <View>{currentInvoiceItems}</View>;
-          })()}
-      </View>
+          {invoice.items?.map((item, idx) => (
+            <ItemRow
+              key={item.id}
+              item={item}
+              paymentDetail={invoiceAmountDetail?.items?.[idx].payment}
+              index={idx}
+              currency={currentCurrency}
+              selectedLng={selectedLng}
+              primaryColor={primaryColor}
+              fontStyles={fontStyles}
+              styles={styles}
+              isPreviousInvoices={false}
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 };

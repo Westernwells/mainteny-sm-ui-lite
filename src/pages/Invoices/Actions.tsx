@@ -64,7 +64,6 @@ import {useUserSession} from 'hooks/reactQuery/useUserSession';
 import {useUploadFiles} from 'hooks/reactQuery/useUploadSignedUrl';
 import {pdf} from '@react-pdf/renderer';
 import CreditNotePdfTemplate from 'components/pdf-templates/CreditNotePdfTemplate';
-import FinalInvoicePdfTemplate from 'components/pdf-templates/FinalInvoicePdfTemplate';
 import FullInvoicePdfTemplate from 'components/pdf-templates/FullInvoicePdfTemplate';
 import PartialInvoicePdfTemplate from 'components/pdf-templates/PartialInvoicePdfTemplate';
 import {FileWithPreview} from 'components/MyDropZone/MyDropzone';
@@ -110,6 +109,7 @@ import printJS from 'print-js';
 import {invoiceItemToInvoiceItemRecord, isXMLNeeded} from 'utils/invoice';
 import {handleSignatureSmartly} from 'utils/rich-field-string';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
+import FinalInvoicePdfTemplate from 'components/pdf-templates/invoice-previews/FinalInvoicePdfTemplate';
 
 interface Props {
   invoice: InvoiceView;

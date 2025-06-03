@@ -27,14 +27,15 @@ import PdfBodyContainer from '../containers/PdfBodyContainer';
 import PdfPageContainer from '../containers/PdfPageContainer';
 import PdfPageTitleHtml from '../containers/PdfPageTitleHtml';
 import TopSectionContainer from '../containers/TopSectionContainer';
-import PdfPreviewPartialPaymentSection from './PdfPreviewPartialPaymentSection';
 import {InvoiceNotesPdf} from '../components/InvoiceNotesPdf';
+import PdfPartialPaymentSection from '../PdfPartialPaymentSection';
 
 const getStyles = ({boldFontStyle, primaryColor}: PdfConfigurationStyles) =>
   StyleSheet.create({
     contentBody: {
       marginTop: 6,
       marginBottom: 16,
+      color: primaryColor,
     },
     notesSection: {
       marginTop: 30,
@@ -69,7 +70,7 @@ type Props = {
   serviceCompany?: ServiceCompanyItem;
 } & Pick<ContextProps, 'fontStyles' | 'primaryColor' | 'secondaryColor'>;
 
-const PdfPreviewFinalInvoiceTemplate = ({
+const FinalInvoicePdfTemplate = ({
   translate,
   userInfo,
   currentCurrency,
@@ -94,9 +95,9 @@ const PdfPreviewFinalInvoiceTemplate = ({
 
   const finalPreviousInvoices = correctCreditNoteInvoicesPercentages(
     isEditing
-      ? previousInvoices?.slice(
+      ? previousInvoices.slice(
           0,
-          previousInvoices.findIndex((i) => i.id === invoice?.id) + 1,
+          previousInvoices.findIndex((i) => i.id === invoice.id) + 1,
         )
       : previousInvoices,
   );
@@ -208,7 +209,7 @@ const PdfPreviewFinalInvoiceTemplate = ({
                 />
               )}
 
-            <PdfPreviewPartialPaymentSection
+            <PdfPartialPaymentSection
               translate={translate}
               selectedLng={selectedLng}
               invoice={invoice}
@@ -218,7 +219,6 @@ const PdfPreviewFinalInvoiceTemplate = ({
               fontStyles={fontStyles}
               primaryColor={primaryColor}
               secondaryColor={secondaryColor}
-              invoiceItems={invoiceItems}
             />
 
             <InvoiceNotesPdf
@@ -253,4 +253,4 @@ const PdfPreviewFinalInvoiceTemplate = ({
   );
 };
 
-export default PdfPreviewFinalInvoiceTemplate;
+export default FinalInvoicePdfTemplate;
