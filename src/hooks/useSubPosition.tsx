@@ -413,36 +413,59 @@ const useSubPosition = <
   };
 
   const updateVatForAllRelatedRows = useCallback(
-    (vatId: string, percentage: number) => {
+    (vatId: string, percentage: number, vatName: string) => {
+      const setVatFields = (basePath: string) => {
+        const fieldNames = [
+          'vatId',
+          'percentageVat',
+          'vatName',
+          'vatInfos',
+          'vats',
+          'vat',
+        ] as const;
+
+        const values: (string | number | readonly unknown[])[] = [
+          vatId,
+          percentage,
+          vatName,
+          [],
+          [],
+          0,
+        ];
+
+        fieldNames.forEach((field, i) => {
+          setValue(
+            `${basePath}.unitAmount.${field}` as Path<TForm>,
+            values[i] as PathValue<TForm, Path<TForm>>,
+          );
+        });
+      };
+
       const parentPath = `items.${parentIndex}`;
       const subItemsPath = `${parentPath}.subItems` as Path<TForm>;
-      setValue(
-        `${parentPath}.unitAmount.vatId` as Path<TForm>,
-        vatId as PathValue<TForm, Path<TForm>>,
-      );
-      setValue(
-        `${parentPath}.unitAmount.percentageVat` as Path<TForm>,
-        percentage as PathValue<TForm, Path<TForm>>,
-      );
+
+      // 2) update the main row:
+      setVatFields(parentPath);
+
+      // 3) update every sub-item under that same row:
       const subItems =
-        (getValues(subItemsPath) as (
-          | EditableInvoiceSubItemRecord
-          | EditableQuotationSubItemRecord
-          | EditableServiceOrderSubArticleRecord
-        )[]) || [];
+        (getValues(subItemsPath) as
+          | readonly {
+              unitAmount: {
+                vatId?: string;
+                percentageVat?: number;
+                vatName?: string;
+              };
+            }[]
+          | undefined) || [];
+
       subItems.forEach((_, idx) => {
-        setValue(
-          `${subItemsPath}.${idx}.unitAmount.vatId` as Path<TForm>,
-          vatId as PathValue<TForm, Path<TForm>>,
-        );
-        setValue(
-          `${subItemsPath}.${idx}.unitAmount.percentageVat` as Path<TForm>,
-          percentage as PathValue<TForm, Path<TForm>>,
-        );
+        setVatFields(`${subItemsPath}.${idx}`);
       });
+
       onRecalc();
     },
-    [getValues, parentIndex, setValue],
+    [getValues, parentIndex, setValue, onRecalc],
   );
 
   const onRemoveSubPosition = (pIndex: number, sIndex: number) => {
@@ -1376,9 +1399,12 @@ const useSubPosition = <
                       (tax) => tax.id === selectedVatId,
                     );
                     const percentage = selectedTaxRate?.percentage || 0;
+                    const vatName = selectedTaxRate?.name || '';
+
                     updateVatForAllRelatedRows(
                       String(selectedVatId),
                       percentage,
+                      vatName,
                     );
                     setEditableSubRow(null);
                   }}

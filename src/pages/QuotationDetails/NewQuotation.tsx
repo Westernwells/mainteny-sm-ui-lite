@@ -1,6 +1,9 @@
 import {useLocation} from 'react-router-dom';
 import queryString from 'query-string';
-import {useQuotationDetails} from 'hooks/reactQuery/useQuotation';
+import {
+  useQuotationDetails,
+  useQuotationSubItems,
+} from 'hooks/reactQuery/useQuotation';
 import {Progress} from 'components/Progress';
 import {ServiceCompanyType} from 'models/service-company';
 import DraftQuotation from './DraftQuotation';
@@ -16,7 +19,12 @@ export const NewQuotation = () => {
         })
       : {data: undefined, isLoading: false};
 
-  if (isLoading) {
+  const {data: quotationSubItems, isLoading: isLoadingSubItems} =
+    typeof id === 'string'
+      ? useQuotationSubItems(id)
+      : {data: undefined, isLoading: false};
+
+  if (isLoading || isLoadingSubItems) {
     return <Progress />;
   }
 
@@ -25,6 +33,7 @@ export const NewQuotation = () => {
       formType="new"
       serviceCompanyType={ServiceCompanyType.PROPERTY_OWNER_PAYMENT_TERM}
       quotation={quotation}
+      quotationSubItems={quotationSubItems}
     />
   );
 };

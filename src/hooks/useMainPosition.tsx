@@ -9,14 +9,9 @@ import {
 import {
   DiscountType,
   EditableInvoiceItem,
-  EditableInvoiceSubItemRecord,
   InvoiceAmountDetail,
 } from 'models/invoice';
-import {
-  EditableQuotationItem,
-  EditableQuotationSubItemRecord,
-  QuotationAmountDetail,
-} from 'models/quotation';
+import {EditableQuotationItem, QuotationAmountDetail} from 'models/quotation';
 import {ServiceCompanyNumberType} from 'models/service-company';
 import React, {useCallback, useContext, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -80,7 +75,6 @@ import MainPositionActions from 'components/MixedPositions/MainPositionActions';
 import {EditableRowType} from 'components/MixedPositions/PositionTable';
 import {
   EditableServiceOrderItem,
-  EditableServiceOrderSubArticleRecord,
   ServiceOrderAmountDetail,
   ServiceOrderArticleOwnerType,
 } from 'models/service-order';
@@ -422,12 +416,12 @@ const useMainPosition = <
             currency,
           };
         }
-        if (articleObj.unitPurchaseAmount?.vatId) {
+        if (articleObj.unitSellingAmount?.vatId) {
           return {
-            vatId: articleObj.unitPurchaseAmount.vatId,
-            vatName: articleObj.unitPurchaseAmount.vatName,
-            percentageVat: articleObj.unitPurchaseAmount.percentageVat,
-            currency: articleObj.unitPurchaseAmount.currency || currency,
+            vatId: articleObj.unitSellingAmount.vatId,
+            vatName: articleObj.unitSellingAmount.vatName,
+            percentageVat: articleObj.unitSellingAmount.percentageVat,
+            currency: articleObj.unitSellingAmount.currency || currency,
           };
         }
         return defaultVat
@@ -809,38 +803,54 @@ const useMainPosition = <
   const handleVatChangeForMainRow = (selectedVatId: string) => {
     const selectedTaxRate = taxRates?.find((tax) => tax.id === selectedVatId);
     const percentage = selectedTaxRate?.percentage || 0;
+    const vatName = selectedTaxRate?.name || '';
+
+    const setVatFields = (basePath: string) => {
+      const fieldNames = [
+        'vatId',
+        'percentageVat',
+        'vatName',
+        'vatInfos',
+        'vats',
+        'vat',
+      ] as const;
+
+      const values: Array<string | number | readonly unknown[]> = [
+        selectedVatId,
+        percentage,
+        vatName,
+        [],
+        [],
+        0,
+      ];
+
+      fieldNames.forEach((field, idx) => {
+        setValue(
+          `${basePath}.unitAmount.${field}` as Path<TForm>,
+          values[idx] as PathValue<TForm, Path<TForm>>,
+        );
+      });
+    };
+
+    // 1) update the main row:
     const parentPath = `items.${index}`;
+    setVatFields(parentPath);
 
-    // Update main position's VAT fields
-    setValue(
-      `${parentPath}.unitAmount.vatId` as Path<TForm>,
-      selectedVatId as PathValue<TForm, Path<TForm>>,
-    );
-    setValue(
-      `${parentPath}.unitAmount.percentageVat` as Path<TForm>,
-      percentage as PathValue<TForm, Path<TForm>>,
-    );
-
-    // Get the current subItems for this main row
+    // 2) update every subItem under that same row:
     const subItemsPath = `${parentPath}.subItems` as Path<TForm>;
-
     const subItems =
-      (getValues(subItemsPath) as (
-        | EditableQuotationSubItemRecord
-        | EditableInvoiceSubItemRecord
-        | EditableServiceOrderSubArticleRecord
-      )[]) || [];
+      (getValues(subItemsPath) as
+        | readonly {
+            unitAmount: {
+              vatId?: string;
+              percentageVat?: number;
+              vatName?: string;
+            };
+          }[]
+        | undefined) || [];
 
-    // Update VAT for each sub item
     subItems.forEach((_, subIdx) => {
-      setValue(
-        `${subItemsPath}.${subIdx}.unitAmount.vatId` as Path<TForm>,
-        selectedVatId as PathValue<TForm, Path<TForm>>,
-      );
-      setValue(
-        `${subItemsPath}.${subIdx}.unitAmount.percentageVat` as Path<TForm>,
-        percentage as PathValue<TForm, Path<TForm>>,
-      );
+      setVatFields(`${subItemsPath}.${subIdx}`);
     });
   };
 
