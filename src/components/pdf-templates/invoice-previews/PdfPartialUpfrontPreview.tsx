@@ -28,9 +28,9 @@ import TopSectionContainer from '../containers/TopSectionContainer';
 import PdfPageTitleHtml from '../containers/PdfPageTitleHtml';
 import SwissPageTemplate from '../SwissPageTemplate';
 import AlternativeAddressTemplate from '../AlternativeAddressTemplate';
-import PdfPreviewUpfrontPaymentSection from './PdfPreviewUpfrontPaymentSection';
-import PdfPreviewPartialPaymentSection from './PdfPreviewPartialPaymentSection';
 import {InvoiceNotesPdf} from '../components/InvoiceNotesPdf';
+import PdfPartialPaymentSection from '../PdfPartialPaymentSection';
+import PdfUpfrontPaymentSection from './PdfUpfrontPaymentSection';
 
 type Props = {
   serviceCompany?: ServiceCompanyItem;
@@ -89,6 +89,7 @@ const getStyles = ({
     contentBody: {
       marginTop: 6,
       marginBottom: 16,
+      color: primaryColor,
     },
     notesSection: {
       marginTop: 30,
@@ -305,7 +306,7 @@ const PdfPartialUpfrontPreview = ({
               )}
 
             {isPartialInvoice && (
-              <PdfPreviewPartialPaymentSection
+              <PdfPartialPaymentSection
                 translate={translate}
                 selectedLng={selectedLng}
                 invoice={invoice}
@@ -315,12 +316,11 @@ const PdfPartialUpfrontPreview = ({
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
-                invoiceItems={invoiceItems}
               />
             )}
 
             {isUpfrontInvoice && (
-              <PdfPreviewUpfrontPaymentSection
+              <PdfUpfrontPaymentSection
                 translate={translate}
                 selectedLng={selectedLng}
                 invoice={invoice}
@@ -330,7 +330,6 @@ const PdfPartialUpfrontPreview = ({
                 fontStyles={fontStyles}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
-                invoiceItems={invoiceItems}
               />
             )}
 

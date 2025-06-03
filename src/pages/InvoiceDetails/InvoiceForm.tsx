@@ -1,4 +1,11 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {theme} from 'theme';
 import {
@@ -44,7 +51,6 @@ import {
 } from 'hooks/reactQuery/useInvoice';
 import {
   CreateInvoice,
-  DiscountType,
   EditableInvoiceItem,
   InvoiceAmountDetail,
   InvoiceFormData,
@@ -122,6 +128,7 @@ import {
   generatePdfInvoice,
   getInvoiceStatusStyles,
   invoiceItemToInvoiceItemRecord,
+  makeFormPayment,
 } from 'utils/invoice';
 import {StatusChip} from 'components/StatusChip';
 import {EditFrom} from './EditFrom';
@@ -170,12 +177,12 @@ import {
 import {SwissQRBill} from 'swissqrbill/svg';
 import {calculateArticlesAmount} from 'utils/calculate-total';
 import PdfPartialUpfrontPreview from 'components/pdf-templates/invoice-previews/PdfPartialUpfrontPreview';
-import PdfPreviewFinalInvoiceTemplate from 'components/pdf-templates/invoice-previews/PdfPreviewFinalInvoiceTemplate';
 import {PdfStylesContext} from 'context/PdfStylesProvider';
 import {Controller, useForm, useWatch} from 'react-hook-form';
 import InvoicePositionTable from './InvoicePositions/InvoicePositionTable';
 import * as Sentry from '@sentry/react';
 import InvoiceShowOnPDFSwitch from 'components/Switch/InvoiceShowOnPDFSwitch';
+import FinalInvoicePdfTemplate from 'components/pdf-templates/invoice-previews/FinalInvoicePdfTemplate';
 
 interface Props {
   invoice?: InvoiceView;
@@ -585,6 +592,9 @@ export const InvoiceForm = ({
       discount: !isNewInvoice
         ? getDiscoutObj(invoice?.additionalInfo?.discount)
         : undefined,
+      payment: !isNewInvoice
+        ? makeFormPayment(invoice?.additionalInfo.payment)
+        : undefined,
     }),
     [invoice, invoiceType, isNewInvoice, elevatorExternalIdParam],
   );
@@ -604,6 +614,11 @@ export const InvoiceForm = ({
     reset,
     formState: {errors},
   } = formMethods;
+
+  const watchedAllItems = useWatch({control, name: 'items'});
+
+  const prevServiceOrderIdRef = useRef<string | null>(null);
+  const hasHydratedRef = useRef(false);
 
   const watchedItems = watch('items');
   const watchedItemsHookValue = useWatch({control, name: 'items'});
@@ -1440,7 +1455,7 @@ export const InvoiceForm = ({
     ) {
       PdfTemplate = PdfPartialUpfrontPreview;
     } else {
-      PdfTemplate = PdfPreviewFinalInvoiceTemplate;
+      PdfTemplate = FinalInvoicePdfTemplate;
     }
 
     const shouldIncludePreviousInvoices = !(
@@ -1523,7 +1538,6 @@ export const InvoiceForm = ({
       customer,
       invoice,
     );
-
     await checkValidQrCode(pdfInvoice);
 
     await generateBlobUrl({
@@ -1823,10 +1837,50 @@ export const InvoiceForm = ({
   }, [serviceOrder]);
 
   useEffect(() => {
-    if (!serviceOrder || invoiceType === InvoiceType.CREDIT_NOTE || isDuplicate)
+    if (
+      !serviceOrder ||
+      invoiceType === InvoiceType.CREDIT_NOTE ||
+      isDuplicate
+    ) {
       return;
+    }
 
-    if (!watchedItems.length) {
+    if (isNewInvoice) {
+      if (serviceOrder.articles?.length) {
+        const rows = serviceOrder.articles.map((article) =>
+          serviceOrderItemToServiceOrderItemRecord(
+            article,
+            serviceOrderSubItemsMap,
+          ),
+        );
+
+        setValue('items', rows);
+
+        const updatedNotes = syncVatLegalNotesWithNotes({
+          oldArticles: watch('items'),
+          newArticles: rows,
+          currentNotes: watch('moreInfo') || '',
+          taxRates,
+        });
+        setValue('moreInfo', updatedNotes);
+      }
+      return;
+    }
+
+    // 2) EDIT-INVOICE CASE: only replace items if the user explicitly picked a DIFFERENT serviceOrder
+    if (!hasHydratedRef.current) {
+      hasHydratedRef.current = true;
+      prevServiceOrderIdRef.current = serviceOrder.id;
+      return;
+    }
+
+    const newOrderId = serviceOrder.id;
+    if (prevServiceOrderIdRef.current !== newOrderId) {
+      if (!serviceOrder.articles?.length) {
+        prevServiceOrderIdRef.current = newOrderId;
+        return;
+      }
+
       const rows = serviceOrder.articles.map((article) =>
         serviceOrderItemToServiceOrderItemRecord(
           article,
@@ -1843,14 +1897,16 @@ export const InvoiceForm = ({
         taxRates,
       });
       setValue('moreInfo', updatedNotes);
+
+      prevServiceOrderIdRef.current = newOrderId;
     }
   }, [
     serviceOrder,
     serviceOrderSubItemsMap,
-    watch,
     taxRates,
     invoiceType,
     isDuplicate,
+    isNewInvoice,
   ]);
 
   useEffect(() => {
@@ -2059,7 +2115,15 @@ export const InvoiceForm = ({
         Sentry.captureException(error);
       }
     }, 300),
-    [calculateInvoiceAmount, currentCurrency, getValues, setValue, pageState],
+    [
+      calculateInvoiceAmount,
+      currentCurrency,
+      getValues,
+      setValue,
+      pageState,
+      invoiceType,
+      isDuplicate,
+    ],
   );
 
   useEffect(() => {

@@ -42,7 +42,6 @@ import {
   getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
-import {calculateTotalWithPerItemDiscount} from 'utils/calculate-total';
 import {fixRounding, isNumber} from 'utils/utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {ReactComponent as PartialInvoiceIcon} from 'assets/icons/PartialInvoiceIcon.svg';
@@ -57,6 +56,7 @@ import {State} from 'models/misc';
 import InvoiceShowOnPDFSwitch from 'components/Switch/InvoiceShowOnPDFSwitch';
 import {stripHtmlTags} from 'utils/text-block';
 import {UseFormReturn} from 'react-hook-form';
+import {aggregateVats, collectVatsFromInvoices} from 'utils/invoice';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -159,7 +159,6 @@ export const PartialPaymentsSection = ({
 
   const watchedPayment = watch('payment');
   const watchedItems = watch('items');
-  const watchedDiscount = watch('discount');
   const watchedInvoiceType = watch('type');
   const watchedShowInvoicedSection = watch('showInvoicedSection');
   const watchedShowPaymentSection = watch('showPaymentSection');
@@ -172,14 +171,11 @@ export const PartialPaymentsSection = ({
         )
       : allPreviousInvoices,
   );
-  const subtotalExclVatAfterPerItemDiscount =
-    calculateTotalWithPerItemDiscount(watchedItems);
-  const subtotalExclVat = applyDiscount({
-    actualValue: subtotalExclVatAfterPerItemDiscount,
-    ...(watchedDiscount?.type === DiscountType.AMOUNT
-      ? {amount: watchedDiscount?.amount?.value ?? 0}
-      : {percentage: watchedDiscount?.percentage ?? 0}),
-  });
+
+  const subtotalExclVat = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount?.netAmount ?? 0,
+  );
 
   const handlePartialPaymentChange = (values: NumberFormatValues) => {
     const {floatValue} = values;
@@ -203,11 +199,16 @@ export const PartialPaymentsSection = ({
     onRecalcInvoice();
   };
 
-  const previousInvoicesTotalExclVat = centsToMoney(
-    currentCurrency?.code!,
-    previousInvoices
-      ?.map((i) => i.totalAmount?.netAmount || 0)
-      .reduce((a, b) => a + b, 0),
+  const prevInvoicesExcludingCurrent = previousInvoices.filter(
+    (i) => i.id !== invoice?.id,
+  );
+
+  const previousInvoicesTotalExclCurrentVat = centsToMoney(
+    currentCurrency.code,
+    prevInvoicesExcludingCurrent.reduce(
+      (sum, i) => sum + (i.totalAmount?.netAmount || 0),
+      0,
+    ),
   );
 
   const isAllowedAmountField = (values: NumberFormatValues) => {
@@ -221,7 +222,7 @@ export const PartialPaymentsSection = ({
 
     const maxAmount =
       subtotalExclVat -
-      previousInvoicesTotalExclVat +
+      previousInvoicesTotalExclCurrentVat +
       (isEditing
         ? (invoice?.totalAmount?.netAmount ?? 0) /
           10 ** (invoice?.totalAmount?.fractionDigits ?? 2)
@@ -253,22 +254,21 @@ export const PartialPaymentsSection = ({
     return floatValue <= maxPercentage;
   };
 
-  const amount = centsToMoney(
+  const paymentValue = watch('payment.amount.value') ?? 0;
+
+  const currentInvoiceNet = centsToMoney(
     currentCurrency.code,
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
   );
 
-  const amountFormatted = formatCurrency(amount, {
+  const amountFormatted = formatCurrency(currentInvoiceNet, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
-  const totalAmountExclVat = isEditing
-    ? amount +
-      previousInvoicesTotalExclVat -
-      centsToMoney(currentCurrency?.code!, invoice?.totalAmount?.netAmount)
-    : amount + previousInvoicesTotalExclVat;
+  const totalAmountExclVat =
+    currentInvoiceNet + previousInvoicesTotalExclCurrentVat;
 
   const totalAmountExclVatFormatted = formatCurrency(totalAmountExclVat, {
     currency: currentCurrency.code,
@@ -276,16 +276,17 @@ export const PartialPaymentsSection = ({
     maximumFractionDigits: 2,
   });
 
-  const percentageVats = getAggregatedPartialPaymentsVats(
-    watchedItems,
-    totalAmountExclVat,
-  );
-
   const currentPercentageVats =
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
 
+  const previousVats = collectVatsFromInvoices(prevInvoicesExcludingCurrent);
+
+  const allVats = [...previousVats, ...currentPercentageVats];
+
+  const finalAggregatedVats = aggregateVats(allVats);
+
   const totalAmountInclVats =
-    (percentageVats
+    (finalAggregatedVats
       ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
       ?.reduce((a, b) => a + b, 0) ?? 0) + totalAmountExclVat;
 
@@ -338,11 +339,6 @@ export const PartialPaymentsSection = ({
         ? lastInvoiceIndex + 1
         : 1
       : previousInvoices.length + 1;
-    const articlesAreSame =
-      ((firstInvoicePayment?.amount?.netAmount || 0) /
-        (subtotalExclVat * 100)) *
-        100 ===
-      firstInvoicePayment?.percentage;
 
     if (isEditing) {
       // do nothing if editing
@@ -352,8 +348,7 @@ export const PartialPaymentsSection = ({
       if (watchedPayment?.description !== description) {
         setValue('payment', {
           ...getValues('payment'),
-          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE &&
-          articlesAreSame
+          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
             ? {
                 type: PaymentType.PERCENTAGE,
                 description,
@@ -371,7 +366,7 @@ export const PartialPaymentsSection = ({
                   ...watchedPayment?.amount,
                   currency:
                     watchedPayment?.amount?.currency || currentCurrency.code,
-                  value: subtotalExclVat - previousInvoicesTotalExclVat,
+                  value: subtotalExclVat,
                 },
               }),
         });
@@ -382,8 +377,7 @@ export const PartialPaymentsSection = ({
         let newPayment = {
           ...getValues('payment'),
           type:
-            firstInvoicePaymentType === PaymentType.PERCENTAGE &&
-            articlesAreSame
+            firstInvoicePaymentType === PaymentType.PERCENTAGE
               ? PaymentType.PERCENTAGE
               : firstInvoicePaymentType === PaymentType.PER_ITEM
               ? PaymentType.PER_ITEM
@@ -426,23 +420,6 @@ export const PartialPaymentsSection = ({
   const onPaymentSectionToggle = (newState: boolean) => {
     setValue('showPaymentSection', newState);
   };
-
-  useEffect(() => {
-    if (!invoice) return;
-
-    // initialize payment object if it's not set
-    if (invoice?.additionalInfo.payment && !watchedPayment) {
-      const amountMoney = aggregatedAmountToMoney(
-        invoice?.additionalInfo?.payment?.amount,
-      );
-      amountMoney.value =
-        (amountMoney?.value ?? 0) / 10 ** (amountMoney?.fractionDigits ?? 2);
-      setValue('payment', {
-        ...invoice?.additionalInfo?.payment,
-        amount: amountMoney,
-      });
-    }
-  }, [invoice]);
 
   const paymentDescriptionError: string | undefined = formState.touchedFields
     ?.payment?.description
@@ -545,11 +522,12 @@ export const PartialPaymentsSection = ({
                         })
                         ?.map((item, index) => {
                           const itemIndex = prevInvoice.items.findIndex(
-                            (i) => i.article?.id === item.article?.id,
+                            (i) => i.id === item.id,
                           );
                           const isEditingCurrentItem =
                             prevInvoice.id === invoice?.id;
-                          const currentItem = watchedItems[itemIndex];
+                          const currentItem = watchedItems?.[itemIndex];
+
                           const currentDiscount = currentItem?.discount;
                           const itemDiscount = item?.additionalInfo?.discount;
 
@@ -557,7 +535,7 @@ export const PartialPaymentsSection = ({
                           const baseAmount = isEditingCurrentItem
                             ? centsToMoney(
                                 item.unitAmount.currency,
-                                (currentItem.unitAmount.netAmount ?? 0) *
+                                (currentItem?.unitAmount?.netAmount ?? 0) *
                                   item.quantity,
                               )
                             : (item.unitAmount.netAmount ?? 0) * item.quantity;
@@ -587,15 +565,18 @@ export const PartialPaymentsSection = ({
 
                           const itemCurrencySymbol =
                             getCurrencySymbol[item.unitAmount.currency];
+
+                          const paymentPercentage = isEditingCurrentItem
+                            ? watchedItems[itemIndex]?.payment?.percentage ??
+                              item.additionalInfo?.payment?.percentage ??
+                              0
+                            : item.additionalInfo?.payment?.percentage ?? 0;
+
                           const itemAmountToBePaid =
-                            (itemTotalPriceExclVat / 100) *
-                            (isEditingCurrentItem
-                              ? watchedItems[itemIndex]?.payment?.percentage ??
-                                0
-                              : item.additionalInfo?.payment?.percentage ?? 0);
+                            (itemTotalPriceExclVat / 100) * paymentPercentage;
 
                           return (
-                            <TableRow key={index}>
+                            <TableRow key={item.id}>
                               <TableCell>{index + 1}</TableCell>
                               <TableCell sx={{width: '45%'}}>
                                 <FormInput
@@ -630,7 +611,7 @@ export const PartialPaymentsSection = ({
                                   onValueChange={({value}) => {
                                     setValue(`items.${itemIndex}.payment`, {
                                       type: InvoiceItemPaymentType.PERCENTAGE,
-                                      percentage: value,
+                                      percentage: value || 0,
                                     });
                                     onRecalcInvoice();
                                   }}
@@ -746,6 +727,7 @@ export const PartialPaymentsSection = ({
 
                         const itemCurrencySymbol =
                           getCurrencySymbol[item.unitAmount.currency];
+
                         const itemAmountToBePaid =
                           (itemTotalPriceExclVat / 100) *
                           (item.payment?.percentage ?? 0);
@@ -787,7 +769,7 @@ export const PartialPaymentsSection = ({
                                   const itemIndex = watchedItems.indexOf(item);
                                   setValue(`items.${itemIndex}.payment`, {
                                     type: InvoiceItemPaymentType.PERCENTAGE,
-                                    percentage: value,
+                                    percentage: value || 0,
                                   });
                                   onRecalcInvoice();
                                 }}
@@ -892,22 +874,30 @@ export const PartialPaymentsSection = ({
                 return null;
               }
               const invoiceTotalAmount = i.totalAmount;
+              const sortedVats = (invoiceTotalAmount.vats || [])
+                .slice()
+                .sort((a, b) => a.percentageVat - b.percentageVat);
               const description =
                 i.type === InvoiceType.CREDIT_NOTE
                   ? t('Credit Note invoice')
                   : i.additionalInfo?.payment?.description || '';
               const fractionDigits = invoiceTotalAmount?.fractionDigits ?? 2;
               const amountExclVat = Math.abs(
-                (invoiceTotalAmount?.netAmount ?? 0) / 10 ** fractionDigits,
+                centsToMoney(
+                  currentCurrency.code,
+                  invoiceTotalAmount?.netAmount ?? 0,
+                ),
               );
               const amountExclVatFormatted = formatCurrency(amountExclVat, {
                 currency: currentCurrency.code,
                 minimumFractionDigits: fractionDigits,
                 maximumFractionDigits: fractionDigits,
-                roundingMode: 'floor',
               });
               const totalAmountInclVat = Math.abs(
-                (invoiceTotalAmount?.grossAmount ?? 0) / 10 ** fractionDigits,
+                centsToMoney(
+                  currentCurrency.code,
+                  invoiceTotalAmount?.grossAmount ?? 0,
+                ),
               );
               const totalAmountInclVatFormatted = formatCurrency(
                 totalAmountInclVat,
@@ -915,7 +905,6 @@ export const PartialPaymentsSection = ({
                   currency: currentCurrency.code,
                   minimumFractionDigits: fractionDigits,
                   maximumFractionDigits: fractionDigits,
-                  roundingMode: 'floor',
                 },
               );
               const signBeforeNumber =
@@ -933,14 +922,14 @@ export const PartialPaymentsSection = ({
                     {amountExclVatFormatted}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount?.vats?.map((v, idx) => (
+                    {sortedVats?.map((v, idx) => (
                       <p key={idx}>{v.percentageVat}%</p>
                     ))}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount?.vats?.map((v, idx) => {
+                    {sortedVats?.map((v, idx) => {
                       const vatAmount = Math.abs(
-                        (v?.vat ?? 0) / 10 ** fractionDigits,
+                        centsToMoney(currentCurrency.code, v?.vat ?? 0),
                       );
                       const vatAmountFormatted = formatCurrency(vatAmount, {
                         currency: currentCurrency.code,
@@ -994,7 +983,7 @@ export const PartialPaymentsSection = ({
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {formatCurrency(
-                  amount +
+                  currentInvoiceNet +
                     currentPercentageVats
                       ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
                       ?.reduce((a, b) => a + b, 0),
@@ -1031,8 +1020,7 @@ export const PartialPaymentsSection = ({
         ?.filter((payment) => payment.meta.state === State.ACTIVE)
         .reduce(
           (acc, p) =>
-            acc +
-            (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
+            acc + centsToMoney(currentCurrency.code, p.amount?.value ?? 0),
           0,
         ),
     )
@@ -1044,7 +1032,6 @@ export const PartialPaymentsSection = ({
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-    roundingMode: 'floor',
   });
 
   const renderPaymentHistorySection = () => (
@@ -1097,11 +1084,11 @@ export const PartialPaymentsSection = ({
               const paidAmountExclVat = Math.abs(
                 i.payments
                   ?.filter((payment) => payment.meta.state === State.ACTIVE)
-                  ?.map(
-                    (p) =>
-                      (p.additionalInfo.paymentDetails?.netAmount ?? 0) /
-                      10 **
-                        (p.additionalInfo.paymentDetails?.fractionDigits ?? 2),
+                  ?.map((p) =>
+                    centsToMoney(
+                      currentCurrency?.code,
+                      p.additionalInfo.paymentDetails?.netAmount ?? 0,
+                    ),
                   )
                   ?.reduce((a, b) => a + b, 0),
               );
@@ -1126,10 +1113,8 @@ export const PartialPaymentsSection = ({
               const totalPriceInclVat = Math.abs(
                 i.payments
                   ?.filter((payment) => payment.meta.state === State.ACTIVE)
-                  ?.map(
-                    (p) =>
-                      (p.amount?.value ?? 0) /
-                      10 ** (p.amount?.fractionDigits ?? 2),
+                  ?.map((p) =>
+                    centsToMoney(currentCurrency?.code, p.amount?.value ?? 0),
                   )
                   .reduce((a, b) => a + b, 0),
               );
@@ -1140,7 +1125,6 @@ export const PartialPaymentsSection = ({
                   currency: currentCurrency.code,
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  roundingMode: 'floor',
                 },
               );
               const signBeforeNumber =
@@ -1166,12 +1150,16 @@ export const PartialPaymentsSection = ({
                     {percentageVats?.map((pV, idx) => (
                       <p key={`${pV?.percentageVat}-${idx}`}>
                         {signBeforeNumber}
-                        {formatCurrency(Math.abs((pV?.vat ?? 0) / 10 ** 2), {
-                          currency: currentCurrency.code,
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                          roundingMode: 'floor',
-                        })}
+                        {formatCurrency(
+                          Math.abs(
+                            centsToMoney(currentCurrency?.code, pV?.vat ?? 0),
+                          ),
+                          {
+                            currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          },
+                        )}
                       </p>
                     ))}
                   </TableCell>
@@ -1278,7 +1266,7 @@ export const PartialPaymentsSection = ({
                     <NumericFormat
                       {...(prevInvoice.id === invoice?.id
                         ? {
-                            value: amount,
+                            value: currentInvoiceNet,
                             isAllowed: isAllowedAmountField,
                             ...(watchedPayment?.type === PaymentType.LUMP_SUM
                               ? {
@@ -1289,10 +1277,10 @@ export const PartialPaymentsSection = ({
                               watchedPayment?.type === PaymentType.PERCENTAGE,
                           }
                         : {
-                            value:
-                              (prevInvoice.totalAmount?.netAmount ?? 0) /
-                              10 **
-                                (prevInvoice.totalAmount?.fractionDigits ?? 2),
+                            value: centsToMoney(
+                              currentCurrency?.code,
+                              prevInvoice.totalAmount?.netAmount ?? 0,
+                            ),
                             disabled: true,
                           })}
                       customInput={TextField}
@@ -1337,6 +1325,7 @@ export const PartialPaymentsSection = ({
                   gap={2}>
                   {watchedPayment?.type === PaymentType.PERCENTAGE && (
                     <NumericFormat
+                      name="payment.percentage"
                       value={watchedPayment?.percentage}
                       isAllowed={isAllowedPercentageField}
                       customInput={TextField}
@@ -1355,7 +1344,12 @@ export const PartialPaymentsSection = ({
                     />
                   )}
                   <NumericFormat
-                    value={amount}
+                    name="payment.amount.value"
+                    value={
+                      watchedPayment?.type === PaymentType.PERCENTAGE
+                        ? currentInvoiceNet
+                        : paymentValue
+                    }
                     disabled={watchedPayment?.type === PaymentType.PERCENTAGE}
                     isAllowed={isAllowedAmountField}
                     customInput={TextField}
@@ -1407,7 +1401,7 @@ export const PartialPaymentsSection = ({
             {totalAmountExclVatFormatted}
           </Typography>
 
-          {percentageVats?.map((v) => (
+          {finalAggregatedVats?.map((v) => (
             <Fragment key={v.percentageVat}>
               <Typography variant="body1" color="primary.dark">
                 {T('VAT')} {v.percentageVat}%

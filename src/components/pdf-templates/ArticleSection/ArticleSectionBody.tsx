@@ -264,7 +264,7 @@ export const ArticleSectionBody = ({
                                     {
                                       currency: currentCurrency!.code,
                                       excludeCurrencySymbol: true,
-                                      currencySymbol: currentCurrency!.symbol,
+                                      currencySymbol: currentCurrency?.symbol,
                                       companyLang: selectedLng,
                                     },
                                   ),

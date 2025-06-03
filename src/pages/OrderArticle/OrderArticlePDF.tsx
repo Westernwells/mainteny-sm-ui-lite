@@ -75,6 +75,7 @@ const getStyles = ({
       marginBottom: 10,
       paddingTop: 25,
       maxWidth: '95%',
+      color: primaryColor,
     },
     notesSection: {
       paddingBottom: 6,
@@ -424,7 +425,7 @@ const OrderArticlePDF = React.memo(
                     <Text
                       style={{
                         width: '32%',
-                        color: '#616161',
+                        color: primaryColor,
                         fontSize: 10,
                         textAlign: 'right',
                       }}>
@@ -455,7 +456,7 @@ const OrderArticlePDF = React.memo(
                         <Text
                           style={{
                             width: '32%',
-                            color: '#616161',
+                            color: primaryColor,
                             fontSize: 10,
                             textAlign: 'right',
                           }}>
@@ -483,7 +484,7 @@ const OrderArticlePDF = React.memo(
                     <Text
                       style={{
                         width: '32%',
-                        color: '#212121',
+                        color: primaryColor,
                         ...fontStyles.bold,
                         textAlign: 'right',
                         fontSize: 10,
@@ -496,7 +497,7 @@ const OrderArticlePDF = React.memo(
                       style={{
                         width: '24%',
                         textAlign: 'right',
-                        color: '#212121',
+                        color: primaryColor,
                         ...fontStyles.bold,
                         fontSize: 10,
                       }}>

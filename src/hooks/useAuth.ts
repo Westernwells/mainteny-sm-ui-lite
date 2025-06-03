@@ -7,13 +7,14 @@ import {clearStoredAdmin, getStoredAdmin} from 'userStorage';
 import {useSnackbar} from 'hooks/useSnackbar';
 import {useUserSession} from './reactQuery/useUserSession';
 import {UserSession} from '../models/session';
-import {Role} from '../models/user';
+import {Role, UserAccount} from '../models/user';
 
 interface UseAuth {
   signin: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   signout: () => void;
   loading: boolean;
+  user: UserAccount | null;
 }
 
 interface Location {
@@ -26,7 +27,7 @@ interface Location {
 
 export const useAuth = (): UseAuth => {
   const {t} = useTranslation();
-  const {clearUser, updateUser} = useUserSession();
+  const {clearUser, updateUser, user} = useUserSession();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location: Location = useLocation();
@@ -43,16 +44,16 @@ export const useAuth = (): UseAuth => {
   ): Promise<void> => {
     try {
       setLoading(true);
-      const {data: user} = await axiosClient.post<UserSession>(urlEndpoint, {
+      const {data: session} = await axiosClient.post<UserSession>(urlEndpoint, {
         username: email,
         password,
       });
 
-      if (user?.token) {
+      if (session?.token) {
         if (
           !(
-            user.userAccount.roles.includes(Role.SERVICE_MANAGER) ||
-            user.userAccount.roles.includes(Role.ADMIN)
+            session.userAccount.roles.includes(Role.SERVICE_MANAGER) ||
+            session.userAccount.roles.includes(Role.ADMIN)
           )
         ) {
           enqueueSnackbar(
@@ -66,18 +67,19 @@ export const useAuth = (): UseAuth => {
           setLoading(false);
           return;
         }
-        axiosClient.defaults.headers.common.Authorization = `Bearer ${user.token}`;
-        // update stored user data
-        updateUser(user);
+
+        axiosClient.defaults.headers.common.Authorization = `Bearer ${session.token}`;
+        updateUser(session);
+
         if (location.state?.from) {
           navigate(
             `${location.state.from.pathname}${
-              location.state.from.search ? location.state.from.search : ''
+              location.state.from.search || ''
             }`,
             {replace: true},
           );
         } else {
-          if (user.userAccount.roles.includes(Role.ADMIN)) {
+          if (session.userAccount.roles.includes(Role.ADMIN)) {
             navigate('/admin/companies', {replace: true});
             return;
           }
@@ -93,6 +95,7 @@ export const useAuth = (): UseAuth => {
   const signin = async (email: string, password: string): Promise<void> => {
     authRequest('/api/sessions/login', email, password);
   };
+
   const signup = async (email: string, password: string): Promise<void> => {
     authRequest('/user', email, password);
   };
@@ -113,18 +116,18 @@ export const useAuth = (): UseAuth => {
           navigate('/admin/companies', {replace: true});
           return;
         }
-        navigate('/login', {replace: true}); // This resets the location state
+        navigate('/login', {replace: true});
       }
     } catch (err) {
       showError(err);
     }
   };
 
-  // Return the user object and auth methods
   return {
     signin,
     signup,
     signout,
     loading,
+    user: user?.userAccount ?? null,
   };
 };

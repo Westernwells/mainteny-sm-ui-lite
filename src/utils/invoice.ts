@@ -10,8 +10,6 @@ import {
   InvoiceAmountDetail,
   InvoiceFormData,
   InvoiceItemAmount,
-  InvoiceItemPaymentRecord,
-  InvoiceItemPaymentType,
   InvoiceItemRecord,
   InvoiceItemView,
   InvoicePaymentTermRecord,
@@ -26,6 +24,7 @@ import {
   Payment,
   PaymentType,
   SearchParameters,
+  VatAmount,
 } from 'models/invoice';
 import {QuotationItemRecord} from 'models/quotation';
 import {addDays} from 'date-fns';
@@ -52,6 +51,7 @@ import {ServiceCompanyItem} from 'models/service-company';
 import {VatView} from 'models/vat';
 import {getDiscoutObj} from 'pages/QuotationDetails/utils';
 import {
+  aggregatedAmountToMoney,
   centsToMoney,
   convertNumberToAmountNumber,
   Currencies,
@@ -878,10 +878,7 @@ export const buildInvoicePayload = (
       userSeqNumber: sub.userSeqNumber,
     })),
     userSeqNumber: item.userSeqNumber,
-    payment: item.payment ?? {
-      type: InvoiceItemPaymentType.PERCENTAGE,
-      percentage: 0,
-    },
+    payment: item.payment ?? undefined,
   })),
   globalDiscount:
     discount?.type === DiscountType.AMOUNT
@@ -1109,30 +1106,6 @@ export const articleViewToItem = (
   return record;
 };
 
-export function buildInvoicePayment(
-  invoiceDetail: InvoiceAmountDetail | undefined,
-  index: number,
-  currentCurrency?: Currency,
-): InvoiceItemPaymentRecord | undefined {
-  const paymentData: InvoiceItemPaymentRecord | undefined =
-    invoiceDetail?.items[index]?.payment;
-
-  if (!paymentData) {
-    return undefined;
-  }
-
-  return {
-    ...paymentData,
-    type: paymentData.type!,
-    amount: {
-      ...paymentData.amount,
-      netAmount: paymentData.amount?.netAmount,
-      currency: paymentData.amount?.currency || currentCurrency?.code!,
-      vats: paymentData.amount?.vats || [],
-    },
-  };
-}
-
 export function hasAlternativeAddress(address?: AddressRecord) {
   if (!address || Object.keys(address).length === 0) return false;
 
@@ -1156,8 +1129,7 @@ export const calculateLaborMaterialTotals = (
       if (isMix && subs.length) {
         subs.forEach((uiSub, subIdx) => {
           const net =
-            detailItem.subItems?.[subIdx]?.amountAfterGlobalDiscount
-              .netAmount ?? 0;
+            detailItem.subItems?.[subIdx]?.payment?.amount?.netAmount ?? 0;
           if (uiSub.article?.type === ArticleType.LABOR) {
             totals.laborNet += net;
           } else if (uiSub.article?.type === ArticleType.MATERIAL) {
@@ -1165,7 +1137,7 @@ export const calculateLaborMaterialTotals = (
           }
         });
       } else {
-        const net = detailItem.amountAfterGlobalDiscount?.netAmount ?? 0;
+        const net = detailItem.payment?.amount?.netAmount ?? 0;
         if (uiItem.article?.type === ArticleType.LABOR) {
           totals.laborNet += net;
         } else if (uiItem.article?.type === ArticleType.MATERIAL) {
@@ -1177,3 +1149,92 @@ export const calculateLaborMaterialTotals = (
     },
     {laborNet: 0, materialNet: 0},
   );
+
+export const makeFormPayment = (rawPayment?: {
+  type: string;
+  description?: string;
+  percentage?: number;
+  amount?: AggregatedAmount;
+}):
+  | {
+      type: PaymentType;
+      description: string;
+      percentage?: number;
+      amount?: {
+        value: number;
+        currency: string;
+        fractionDigits: number;
+      };
+    }
+  | undefined => {
+  if (!rawPayment) return undefined;
+
+  const type = rawPayment.type as PaymentType;
+  const description = rawPayment.description || '';
+
+  switch (type) {
+    case PaymentType.LUMP_SUM: {
+      if (!rawPayment.amount) {
+        // If there's no amount object, just default to zero
+        return {
+          type,
+          description,
+          amount: {value: 0, currency: 'EUR', fractionDigits: 2},
+        };
+      }
+      // Convert the AggregatedAmount (in cents) → Money
+      const amountMoney = aggregatedAmountToMoney(rawPayment.amount);
+      amountMoney.value =
+        (amountMoney.value ?? 0) / 10 ** (amountMoney.fractionDigits ?? 2);
+
+      return {
+        type,
+        description,
+        amount: {
+          value: amountMoney.value!,
+          currency: amountMoney.currency,
+          fractionDigits: amountMoney.fractionDigits!,
+        },
+      };
+    }
+
+    case PaymentType.PERCENTAGE: {
+      return {
+        type,
+        description,
+        percentage: rawPayment.percentage ?? 0,
+      };
+    }
+
+    case PaymentType.PER_ITEM: {
+      return {
+        type,
+        description,
+        // For per‐item, we only carry over the percentage
+        percentage: rawPayment.percentage ?? 0,
+      };
+    }
+
+    default:
+      return undefined;
+  }
+};
+
+export const collectVatsFromInvoices = (
+  invoices?: InvoiceView[],
+): VatAmount[] => invoices?.flatMap((inv) => inv.totalAmount?.vats || []) ?? [];
+
+export const aggregateVats = (vats: VatAmount[] = []): VatAmount[] => {
+  const grouped = vats.reduce<Record<number, VatAmount>>(
+    (acc, {percentageVat, vat}) => {
+      if (!acc[percentageVat]) {
+        acc[percentageVat] = {percentageVat, vat: 0};
+      }
+      acc[percentageVat].vat += vat;
+      return acc;
+    },
+    {},
+  );
+
+  return Object.values(grouped);
+};

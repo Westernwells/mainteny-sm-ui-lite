@@ -4,7 +4,7 @@ import {EmployeesSimpleView} from 'models/employee';
 import {StatusColor} from 'models/status';
 import {getAddressString} from 'utils/address';
 import {ArticleType} from 'models/article';
-import {Discount, DiscountType} from 'models/invoice';
+import {Discount, DiscountType, InvoiceItemPaymentType} from 'models/invoice';
 import {AmountRecord, Currency} from 'models/misc';
 import {
   AUTO_GENERATED_TO_PAYMENT_STATUS,
@@ -608,6 +608,7 @@ export const serviceOrderItemToServiceOrderItemRecord = (
     userSeqNumber: serviceOrderItem?.additionalInfo?.userSeqNumber || undefined,
     ownerName: serviceOrderItem.additionalInfo?.owner?.name || '',
     ownerType: serviceOrderItem.ownerType!,
+    payment: {type: InvoiceItemPaymentType.PERCENTAGE, percentage: 0},
   };
 
   // If the article's type is PACKAGE, add a default costPackage if it doesn't exist.

@@ -24,6 +24,7 @@ import {FileResource, FileResourceRecord} from './media';
 import {
   AggregatedAmount,
   Discount,
+  InvoiceItemPaymentRecord,
   InvoiceSubItemsConfig,
   InvoiceUnitAmountSource,
 } from './invoice';
@@ -849,6 +850,7 @@ export interface NewServiceOrderItemRecord {
   ownerName?: string;
   serviceOrderId?: string;
   subItems?: EditableServiceOrderSubArticleRecord[];
+  payment?: InvoiceItemPaymentRecord;
 }
 
 export type EditableServiceOrderItem = NewServiceOrderItemRecord & {

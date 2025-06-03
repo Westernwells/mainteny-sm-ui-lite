@@ -17,13 +17,13 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  TextField,
 } from '@mui/material';
 import BigNumber from 'bignumber.js';
-import {NumberFormatValues} from 'react-number-format';
+import {NumberFormatValues, NumericFormat} from 'react-number-format';
 import {FormInput} from 'components/form/FormInput';
 import {
   AggregatedAmount,
-  DiscountType,
   InvoiceAmountDetail,
   InvoiceFormData,
   InvoiceType,
@@ -34,21 +34,20 @@ import {
   aggregatedAmountToMoney,
   centsToMoney,
   formatCurrency,
+  getCurrencySymbol,
+  getDecimalSeparator,
+  getThousandsSeparator,
   useCurrentCurrency,
 } from 'utils/currency';
-import {calculateTotalWithPerItemDiscount} from 'utils/calculate-total';
 import {ReactComponent as UpfrontInvoiceIcon} from 'assets/icons/UpfrontInvoiceIcon.svg';
-import {
-  applyDiscount,
-  correctCreditNoteInvoicesPercentages,
-  getAggregatedPartialPaymentsVats,
-} from './utils';
+import {correctCreditNoteInvoicesPercentages} from './utils';
 import {SectionTitle} from './SectionTitle';
 import {T} from 'utils/i18n-utils';
 import {formatDate, toDate} from 'utils/datetime';
 import {State} from 'models/misc';
 import {UseFormReturn} from 'react-hook-form';
 import {LanguageContext} from 'context/LanguageProvider';
+import {collectVatsFromInvoices, aggregateVats} from 'utils/invoice';
 
 interface TableProps extends React.ComponentProps<typeof MuiTable> {
   children: React.ReactNode;
@@ -116,8 +115,6 @@ export const UpfrontPaymentsSection = ({
   const {setValue, watch, getValues, formState} = formMethods;
 
   const watchedPayment = watch('payment');
-  const watchedItems = watch('items');
-  const watchedDiscount = watch('discount');
   const watchedInvoiceType = watch('type');
 
   const previousInvoices = correctCreditNoteInvoicesPercentages(
@@ -129,46 +126,44 @@ export const UpfrontPaymentsSection = ({
       : allPreviousInvoices,
   );
 
-  const subtotalExclVatAfterPerItemDiscount =
-    calculateTotalWithPerItemDiscount(watchedItems);
+  const subtotalExclVat = centsToMoney(
+    currentCurrency?.code!,
+    invoiceAmountDetail?.amountAfterGlobalDiscount?.netAmount ?? 0,
+  );
 
-  const subtotalExclVat = applyDiscount({
-    actualValue: subtotalExclVatAfterPerItemDiscount,
-    ...(watchedDiscount?.type === DiscountType.AMOUNT
-      ? {amount: watchedDiscount?.amount?.value ?? 0}
-      : {percentage: watchedDiscount?.percentage ?? 0}),
-  });
-
-  const handleUpfrontPaymentChange = (values: {
-    name?: string;
-    value?: number;
-  }) => {
-    const {value} = values;
+  const handleUpfrontPaymentChange = (values: NumberFormatValues) => {
+    const {floatValue} = values;
     if (watchedPayment?.type === PaymentType.LUMP_SUM) {
       setValue('payment', {
-        ...watchedPayment,
+        ...getValues('payment'),
+        type: getValues('payment')?.type!,
         amount: {
-          value: value || 0,
+          value: floatValue || 0,
           currency: currentCurrency.code,
           fractionDigits: currentCurrency.fractionDigits,
         },
       });
     } else if (watchedPayment?.type === PaymentType.PERCENTAGE) {
       setValue('payment', {
-        ...watchedPayment,
-        percentage: value || 0,
+        ...getValues('payment'),
+        type: getValues('payment')?.type!,
+        percentage: floatValue || 0,
       });
     }
     onRecalcInvoice();
   };
 
-  const previousInvoicesTotalExclVat = previousInvoices
-    ?.map(
-      (i) =>
-        (i.totalAmount?.netAmount ?? 0) /
-        10 ** (i.totalAmount?.fractionDigits ?? 2),
-    )
-    ?.reduce((a, b) => a + b, 0);
+  const prevInvoicesExcludingCurrent = previousInvoices.filter(
+    (i) => i.id !== invoice?.id,
+  );
+
+  const previousInvoicesTotalExclCurrentVat = centsToMoney(
+    currentCurrency.code,
+    prevInvoicesExcludingCurrent.reduce(
+      (sum, i) => sum + (i.totalAmount?.netAmount || 0),
+      0,
+    ),
+  );
 
   const isAllowedAmountField = (values: NumberFormatValues) => {
     const {floatValue} = values;
@@ -182,7 +177,7 @@ export const UpfrontPaymentsSection = ({
 
     const maxAmount =
       subtotalExclVat -
-      previousInvoicesTotalExclVat +
+      previousInvoicesTotalExclCurrentVat +
       (isEditing
         ? (invoice.totalAmount?.netAmount ?? 0) /
           10 ** (invoice.totalAmount?.fractionDigits ?? 2)
@@ -214,23 +209,21 @@ export const UpfrontPaymentsSection = ({
     return floatValue <= maxPercentage;
   };
 
-  const amount = centsToMoney(
+  const paymentValue = watch('payment.amount.value') ?? 0;
+
+  const currentInvoiceNet = centsToMoney(
     currentCurrency.code,
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.netAmount ?? 0,
   );
 
-  const amountFormatted = formatCurrency(amount, {
+  const amountFormatted = formatCurrency(currentInvoiceNet, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
-  const totalAmountExclVat = isEditing
-    ? amount +
-      previousInvoicesTotalExclVat -
-      (invoice.totalAmount?.netAmount ?? 0) /
-        10 ** (invoice.totalAmount?.fractionDigits ?? 2)
-    : amount + previousInvoicesTotalExclVat;
+  const totalAmountExclVat =
+    currentInvoiceNet + previousInvoicesTotalExclCurrentVat;
 
   const totalAmountExclVatFormatted = formatCurrency(totalAmountExclVat, {
     currency: currentCurrency.code,
@@ -238,16 +231,17 @@ export const UpfrontPaymentsSection = ({
     maximumFractionDigits: 2,
   });
 
-  const percentageVats = getAggregatedPartialPaymentsVats(
-    watchedItems,
-    totalAmountExclVat,
-  );
-
   const currentPercentageVats =
     (invoiceAmountDetail?.payment?.amount as AggregatedAmount)?.vats ?? [];
 
+  const previousVats = collectVatsFromInvoices(prevInvoicesExcludingCurrent);
+
+  const allVats = [...previousVats, ...currentPercentageVats];
+
+  const finalAggregatedVats = aggregateVats(allVats);
+
   const totalAmountInclVats =
-    (percentageVats
+    (finalAggregatedVats
       ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
       ?.reduce((a, b) => a + b, 0) ?? 0) + totalAmountExclVat;
 
@@ -269,11 +263,6 @@ export const UpfrontPaymentsSection = ({
     const isFinalAfterPreviousInvoices =
       hasPreviousInvoices && watchedInvoiceType === InvoiceType.FINAL;
     const invoiceIndex = previousInvoices?.length + 1;
-    const articlesAreSame =
-      ((firstInvoicePayment?.amount?.netAmount || 0) /
-        (subtotalExclVat * 100)) *
-        100 ===
-      firstInvoicePayment?.percentage;
 
     if (isEditing) {
       // do nothing if editing
@@ -283,8 +272,7 @@ export const UpfrontPaymentsSection = ({
       if (watchedPayment?.description !== description) {
         setValue('payment', {
           ...watchedPayment,
-          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE &&
-          articlesAreSame
+          ...(firstInvoicePaymentType === PaymentType.PERCENTAGE
             ? {
                 type: PaymentType.PERCENTAGE,
                 description,
@@ -295,7 +283,7 @@ export const UpfrontPaymentsSection = ({
                 description,
                 amount: {
                   ...watchedPayment?.amount,
-                  value: subtotalExclVat - previousInvoicesTotalExclVat,
+                  value: subtotalExclVat,
                   currency:
                     watchedPayment?.amount?.currency || currentCurrency.code,
                 },
@@ -306,23 +294,37 @@ export const UpfrontPaymentsSection = ({
       // change payment type according to first invoice
       const description = `${invoiceIndex}. ${t('Upfront invoice')}`;
       if (watchedPayment?.description !== description) {
-        setValue('payment', {
-          ...watchedPayment,
+        let newPayment = {
+          ...getValues('payment'),
           type:
-            firstInvoicePaymentType === PaymentType.PERCENTAGE &&
-            articlesAreSame
+            firstInvoicePaymentType === PaymentType.PERCENTAGE
               ? PaymentType.PERCENTAGE
               : PaymentType.LUMP_SUM,
           description,
-        });
+        };
+
+        if (newPayment.type === PaymentType.LUMP_SUM) {
+          newPayment.amount = {
+            value: 0,
+            currency: currentCurrency.code,
+            fractionDigits: currentCurrency.fractionDigits,
+          };
+        }
+
+        if (newPayment.type === PaymentType.PERCENTAGE) {
+          newPayment.percentage = 0;
+        }
+
+        setValue('payment', newPayment);
       }
     }
-  }, [previousInvoices]);
+  }, [previousInvoices, formMethods]);
 
   useEffect(() => {
     if (!invoice) return;
     // initialize payment object if it's not set
-    if (invoice?.additionalInfo?.payment && !watchedPayment) {
+
+    if (invoice?.additionalInfo?.payment) {
       const amountMoney = aggregatedAmountToMoney(
         invoice.additionalInfo.payment.amount,
       );
@@ -376,22 +378,30 @@ export const UpfrontPaymentsSection = ({
                 return null;
               }
               const invoiceTotalAmount = i.totalAmount;
+              const sortedVats = (invoiceTotalAmount.vats || [])
+                .slice()
+                .sort((a, b) => a.percentageVat - b.percentageVat);
               const description =
                 i.type === InvoiceType.CREDIT_NOTE
                   ? t('Credit Note invoice')
                   : i.additionalInfo?.payment?.description || '';
               const fractionDigits = invoiceTotalAmount?.fractionDigits ?? 2;
               const amountExclVat = Math.abs(
-                (invoiceTotalAmount?.netAmount ?? 0) / 10 ** fractionDigits,
+                centsToMoney(
+                  currentCurrency.code,
+                  invoiceTotalAmount?.netAmount ?? 0,
+                ),
               );
               const amountExclVatFormatted = formatCurrency(amountExclVat, {
                 currency: currentCurrency.code,
                 minimumFractionDigits: fractionDigits,
                 maximumFractionDigits: fractionDigits,
-                roundingMode: 'floor',
               });
               const totalAmountInclVat = Math.abs(
-                (invoiceTotalAmount?.grossAmount ?? 0) / 10 ** fractionDigits,
+                centsToMoney(
+                  currentCurrency.code,
+                  invoiceTotalAmount?.grossAmount ?? 0,
+                ),
               );
               const totalAmountInclVatFormatted = formatCurrency(
                 totalAmountInclVat,
@@ -399,7 +409,6 @@ export const UpfrontPaymentsSection = ({
                   currency: currentCurrency.code,
                   minimumFractionDigits: fractionDigits,
                   maximumFractionDigits: fractionDigits,
-                  roundingMode: 'floor',
                 },
               );
               const signBeforeNumber =
@@ -417,20 +426,19 @@ export const UpfrontPaymentsSection = ({
                     {amountExclVatFormatted}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount?.vats?.map((v, idx) => (
+                    {sortedVats?.map((v, idx) => (
                       <p key={idx}>{v.percentageVat}%</p>
                     ))}
                   </TableCell>
                   <TableCell align="right">
-                    {invoiceTotalAmount?.vats?.map((v, idx) => {
+                    {sortedVats?.map((v, idx) => {
                       const vatAmount = Math.abs(
-                        (v?.vat ?? 0) / 10 ** fractionDigits,
+                        centsToMoney(currentCurrency.code, v?.vat ?? 0),
                       );
                       const vatAmountFormatted = formatCurrency(vatAmount, {
                         currency: currentCurrency.code,
                         minimumFractionDigits: fractionDigits,
                         maximumFractionDigits: fractionDigits,
-                        roundingMode: 'floor',
                       });
                       return <p key={idx}>{vatAmountFormatted}</p>;
                     })}
@@ -478,7 +486,7 @@ export const UpfrontPaymentsSection = ({
               </TableCell>
               <TableCell align="right" sx={{typography: 'h6', fontWeight: 600}}>
                 {formatCurrency(
-                  amount +
+                  currentInvoiceNet +
                     currentPercentageVats
                       ?.map((v) => centsToMoney(currentCurrency?.code!, v.vat))
                       ?.reduce((a, b) => a + b, 0),
@@ -515,20 +523,20 @@ export const UpfrontPaymentsSection = ({
         ?.filter((payment) => payment.meta.state === State.ACTIVE)
         .reduce(
           (acc, p) =>
-            acc +
-            (p.amount?.value ?? 0) / 10 ** (p.amount?.fractionDigits ?? 2),
+            acc + centsToMoney(currentCurrency.code, p.amount?.value ?? 0),
           0,
         ),
     )
     ?.reduce((acc, a) => acc + a, 0);
+
   const outstandingPayments = BigNumber(totalAmountInclVats)
     .minus(paidAmountInclVats)
     .toNumber();
+
   const outstandingAmountFormatted = formatCurrency(outstandingPayments, {
     currency: currentCurrency.code,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-    roundingMode: 'floor',
   });
 
   const renderPaymentHistorySection = () => (
@@ -572,11 +580,11 @@ export const UpfrontPaymentsSection = ({
               const paidAmountExclVat = Math.abs(
                 i.payments
                   ?.filter((payment) => payment.meta.state === State.ACTIVE)
-                  ?.map(
-                    (p) =>
-                      (p.additionalInfo.paymentDetails?.netAmount ?? 0) /
-                      10 **
-                        (p.additionalInfo.paymentDetails?.fractionDigits ?? 2),
+                  ?.map((p) =>
+                    centsToMoney(
+                      currentCurrency?.code,
+                      p.additionalInfo.paymentDetails?.netAmount ?? 0,
+                    ),
                   )
                   ?.reduce((a, b) => a + b, 0),
               );
@@ -587,7 +595,6 @@ export const UpfrontPaymentsSection = ({
                   currency: currentCurrency.code,
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  roundingMode: 'floor',
                 },
               );
 
@@ -601,10 +608,8 @@ export const UpfrontPaymentsSection = ({
               const totalPriceInclVat = Math.abs(
                 i.payments
                   ?.filter((payment) => payment.meta.state === State.ACTIVE)
-                  ?.map(
-                    (p) =>
-                      (p.amount?.value ?? 0) /
-                      10 ** (p.amount?.fractionDigits ?? 2),
+                  ?.map((p) =>
+                    centsToMoney(currentCurrency?.code, p.amount?.value ?? 0),
                   )
                   .reduce((a, b) => a + b, 0),
               );
@@ -615,7 +620,6 @@ export const UpfrontPaymentsSection = ({
                   currency: currentCurrency.code,
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                  roundingMode: 'floor',
                 },
               );
               const signBeforeNumber =
@@ -641,12 +645,16 @@ export const UpfrontPaymentsSection = ({
                     {percentageVats?.map((pV, idx) => (
                       <p key={`${pV?.percentageVat}-${idx}`}>
                         {signBeforeNumber}
-                        {formatCurrency(Math.abs((pV?.vat ?? 0) / 10 ** 2), {
-                          currency: currentCurrency.code,
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                          roundingMode: 'floor',
-                        })}
+                        {formatCurrency(
+                          Math.abs(
+                            centsToMoney(currentCurrency?.code, pV?.vat ?? 0),
+                          ),
+                          {
+                            currency: currentCurrency.code,
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          },
+                        )}
                       </p>
                     ))}
                   </TableCell>
@@ -738,74 +746,81 @@ export const UpfrontPaymentsSection = ({
                   justifyContent="flex-end"
                   gap={2}>
                   {watchedPayment?.type === PaymentType.PERCENTAGE && (
-                    <FormInput
-                      inputType="currency"
-                      {...(prevInvoice.id === invoice?.id && {
-                        onValueChange: handleUpfrontPaymentChange,
-                      })}
-                      fieldProps={{
-                        value:
-                          prevInvoice.id === invoice?.id
-                            ? watchedPayment?.percentage
-                            : prevInvoice.additionalInfo.payment?.percentage ??
+                    <NumericFormat
+                      name="payment.percentage"
+                      {...(prevInvoice.id === invoice?.id
+                        ? {
+                            value: watchedPayment?.percentage,
+                            isAllowed: isAllowedPercentageField,
+                            onValueChange: handleUpfrontPaymentChange,
+                          }
+                        : {
+                            value:
+                              prevInvoice.additionalInfo.payment?.percentage ??
                               0,
-                        size: 'small',
-                        label: 'Percentage',
-                        InputProps: {
-                          endAdornment: (
-                            <InputAdornment position="end">%</InputAdornment>
-                          ),
-                          inputProps: {
-                            style: {textAlign: 'right'},
-                          },
-                        },
-                      }}
-                      numericFormatProps={{
-                        disabled: prevInvoice.id !== invoice?.id,
-                        allowLeadingZeros: false,
-                        decimalScale: 0,
-                        isAllowed: isAllowedPercentageField,
-                      }}
-                    />
-                  )}
-                  <FormInput
-                    inputType="currency"
-                    {...(watchedPayment?.type === PaymentType.LUMP_SUM
-                      ? {
-                          onValueChange: handleUpfrontPaymentChange,
-                        }
-                      : {})}
-                    fieldProps={{
-                      value:
-                        prevInvoice.id === invoice?.id
-                          ? totalAmountExclVat
-                          : (prevInvoice.totalAmount?.netAmount ?? 0) /
-                            10 **
-                              (prevInvoice.totalAmount?.fractionDigits ?? 2),
-                      label: 'Amount (excl. VAT)',
-                      InputProps: {
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            {currentCurrency.symbol}
-                          </InputAdornment>
+                            disabled: true,
+                          })}
+                      customInput={TextField}
+                      label={t('Percentage')}
+                      fullWidth
+                      decimalScale={0}
+                      allowLeadingZeros={false}
+                      decimalSeparator={getDecimalSeparator(selectedLng)}
+                      thousandSeparator={getThousandsSeparator(selectedLng)}
+                      size="small"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">%</InputAdornment>
                         ),
                         inputProps: {
                           style: {textAlign: 'right'},
                         },
+                      }}
+                    />
+                  )}
+                  <NumericFormat
+                    {...(prevInvoice.id === invoice?.id
+                      ? {
+                          value: currentInvoiceNet,
+                          isAllowed: isAllowedAmountField,
+                          ...(watchedPayment?.type === PaymentType.LUMP_SUM
+                            ? {
+                                onValueChange: handleUpfrontPaymentChange,
+                              }
+                            : {}),
+                          disabled:
+                            watchedPayment?.type === PaymentType.PERCENTAGE,
+                        }
+                      : {
+                          value: centsToMoney(
+                            currentCurrency?.code,
+                            prevInvoice.totalAmount?.netAmount ?? 0,
+                          ),
+                          disabled: true,
+                        })}
+                    customInput={TextField}
+                    label={t('Amount (excl. VAT)')}
+                    fullWidth
+                    allowLeadingZeros={false}
+                    decimalScale={2}
+                    decimalSeparator={getDecimalSeparator(selectedLng)}
+                    thousandSeparator={getThousandsSeparator(selectedLng)}
+                    size="small"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          {
+                            getCurrencySymbol[
+                              prevInvoice.totalAmount?.currency ?? 'EUR'
+                            ]
+                          }
+                        </InputAdornment>
+                      ),
+                      inputProps: {
+                        style: {textAlign: 'right'},
                       },
                     }}
-                    numericFormatProps={{
-                      ...(prevInvoice.id === invoice?.id
-                        ? {
-                            disabled:
-                              watchedPayment?.type === PaymentType.PERCENTAGE,
-                          }
-                        : {
-                            disabled: true,
-                          }),
-                      isAllowed: isAllowedAmountField,
-                      allowLeadingZeros: false,
-                    }}
+                    id="upfront-amount"
                   />
                 </Grid>
               </Fragment>
@@ -838,54 +853,63 @@ export const UpfrontPaymentsSection = ({
                 justifyContent="flex-end"
                 gap={2}>
                 {watchedPayment?.type === PaymentType.PERCENTAGE && (
-                  <FormInput
-                    inputType="currency"
-                    onValueChange={handleUpfrontPaymentChange}
-                    fieldProps={{
-                      value: watchedPayment?.percentage,
-                      label: 'Percentage',
-                      InputProps: {
-                        endAdornment: (
-                          <InputAdornment position="end">%</InputAdornment>
-                        ),
-                        inputProps: {
-                          style: {textAlign: 'right'},
-                        },
+                  <NumericFormat
+                    name="payment.percentage"
+                    value={watchedPayment?.percentage}
+                    isAllowed={isAllowedPercentageField}
+                    customInput={TextField}
+                    label={t('Percentage')}
+                    fullWidth
+                    decimalScale={0}
+                    allowLeadingZeros={false}
+                    decimalSeparator={getDecimalSeparator(selectedLng)}
+                    thousandSeparator={getThousandsSeparator(selectedLng)}
+                    size="small"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">%</InputAdornment>
+                      ),
+                      inputProps: {
+                        style: {textAlign: 'right'},
                       },
                     }}
-                    numericFormatProps={{
-                      allowLeadingZeros: false,
-                      decimalScale: 0,
-                      isAllowed: isAllowedPercentageField,
-                    }}
+                    onValueChange={handleUpfrontPaymentChange}
                   />
                 )}
-                <FormInput
-                  inputType="currency"
+
+                <NumericFormat
+                  name="payment.amount.value"
+                  value={
+                    watchedPayment?.type === PaymentType.PERCENTAGE
+                      ? currentInvoiceNet
+                      : paymentValue
+                  }
+                  disabled={watchedPayment?.type === PaymentType.PERCENTAGE}
+                  isAllowed={isAllowedAmountField}
+                  customInput={TextField}
+                  label={t('Amount (excl. VAT)')}
+                  fullWidth
+                  allowLeadingZeros={false}
+                  decimalScale={2}
+                  decimalSeparator={getDecimalSeparator(selectedLng)}
+                  thousandSeparator={getThousandsSeparator(selectedLng)}
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {currentCurrency.symbol}
+                      </InputAdornment>
+                    ),
+                    inputProps: {
+                      style: {textAlign: 'right'},
+                    },
+                  }}
                   {...(watchedPayment?.type === PaymentType.LUMP_SUM
                     ? {
                         onValueChange: handleUpfrontPaymentChange,
                       }
                     : {})}
-                  fieldProps={{
-                    value: amount,
-                    label: 'Amount (excl. VAT)',
-                    InputProps: {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          {currentCurrency.symbol}
-                        </InputAdornment>
-                      ),
-                      inputProps: {
-                        style: {textAlign: 'right'},
-                      },
-                    },
-                  }}
-                  numericFormatProps={{
-                    disabled: watchedPayment?.type === PaymentType.PERCENTAGE,
-                    isAllowed: isAllowedAmountField,
-                    allowLeadingZeros: false,
-                  }}
+                  id="upfront-amount"
                 />
               </Grid>
             </>
@@ -911,7 +935,7 @@ export const UpfrontPaymentsSection = ({
             {totalAmountExclVatFormatted}
           </Typography>
 
-          {percentageVats?.map((v) => (
+          {finalAggregatedVats?.map((v) => (
             <Fragment key={v.percentageVat}>
               <Typography variant="body1" color="primary.dark">
                 {T('VAT')} {v.percentageVat}%

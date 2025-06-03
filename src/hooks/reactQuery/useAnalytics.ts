@@ -99,22 +99,16 @@ export const useEmployeeWorkingHoursXLSX = (params: QueryWorkingHours) => {
 
 export const fetchInvoicesDatev = async (
   serviceCompanyId: string,
-  params: QueryFinancials,
-) => {
-  const response = await axiosClient.get(
-    `/api/reports/${serviceCompanyId}/datev/invoices.csv`,
-    {
-      headers: {
-        accept: 'text/csv',
-      },
-      responseType: 'blob',
-      params,
-      paramsSerializer,
+  params: QueryDatevFinancials,
+): Promise<AxiosResponse<Blob>> =>
+  axiosClient.get<Blob>(`/api/reports/${serviceCompanyId}/datev/invoices.csv`, {
+    headers: {
+      accept: 'text/csv',
     },
-  );
-
-  return response.data;
-};
+    responseType: 'blob',
+    params,
+    paramsSerializer,
+  });
 
 export const useInvoicesDatev = (
   serviceCompanyId: string,
@@ -125,8 +119,25 @@ export const useInvoicesDatev = (
     [FormatType.DATEV, serviceCompanyId, params],
     () => fetchInvoicesDatev(serviceCompanyId, params),
     {
-      onSuccess: (data) => {
-        download(data, ReportType.FINANCIALS);
+      onSuccess: (response) => {
+        // parse filename from Content-Disposition header (RFC 5987 compliant)
+        const disposition = response.headers['content-disposition'] || '';
+        const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/.exec(disposition);
+        const filename = match
+          ? decodeURIComponent(match[1])
+          : `EXTF_Buchungsstapel_${toRestDateTime(new Date())}.csv`;
+
+        // trigger download with exact header filename
+        const blob = response.data;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
         enqueueSnackbar('Report downloaded successfully!', {
           variant: 'success',
         });
