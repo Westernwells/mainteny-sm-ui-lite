@@ -326,10 +326,6 @@ const ServiceOrderPositionTable = ({
       parentItem.subItems = [];
     }
 
-    const parentSeq = parentItem.userSeqNumber || (parentIndex + 1).toString();
-    const subIndex = parentItem.subItems.length;
-    const defaultSubSeq = `${parentSeq}.${subIndex + 1}`;
-
     const customerVatProps = customerData?.additionalInfo?.vat
       ? {
           percentageVat: customerData.additionalInfo.vat.percentage,
@@ -350,7 +346,6 @@ const ServiceOrderPositionTable = ({
 
     const newSub: EditableServiceOrderSubArticleRecord = {
       id: getUniqueId(),
-      userSeqNumber: defaultSubSeq,
       name: '',
       quantity: 1,
       unitAmount: defaultProps,
@@ -516,12 +511,6 @@ const ServiceOrderPositionTable = ({
                   subItems.splice(subIndex, 0, movedItem);
                   itemsCopy[index].subItems = subItems;
                   update(index, itemsCopy[index]);
-                  itemsCopy[index].subItems?.forEach((_, j) => {
-                    setValue(
-                      `items.${index}.subItems.${j}.userSeqNumber`,
-                      `${index + 1}.${j + 1}` as any,
-                    );
-                  });
                 }
               },
             }),

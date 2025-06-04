@@ -317,10 +317,6 @@ const InvoicePositionTable = ({
       parentItem.subItems = [];
     }
 
-    const parentSeq = parentItem.userSeqNumber || (parentIndex + 1).toString();
-    const subIndex = parentItem.subItems.length;
-    const defaultSubSeq = `${parentSeq}.${subIndex + 1}`;
-
     // Use customer vat if present, else use fall back vat
     const customerVatProps = customerData?.additionalInfo?.vat
       ? {
@@ -342,7 +338,6 @@ const InvoicePositionTable = ({
 
     const newSub: EditableInvoiceSubItemRecord = {
       id: getUniqueId(),
-      userSeqNumber: defaultSubSeq,
       name: '',
       quantity: 1,
       unitAmount: defaultProps,
@@ -514,12 +509,6 @@ const InvoicePositionTable = ({
                   subItems.splice(subIndex, 0, movedItem);
                   itemsCopy[index].subItems = subItems;
                   update(index, itemsCopy[index]);
-                  itemsCopy[index].subItems?.forEach((_, j) => {
-                    setValue(
-                      `items.${index}.subItems.${j}.userSeqNumber`,
-                      `${index + 1}.${j + 1}` as any,
-                    );
-                  });
                   removeDropIndicator(subRow);
                 }
               },

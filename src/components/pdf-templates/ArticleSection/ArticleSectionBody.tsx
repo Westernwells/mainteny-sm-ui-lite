@@ -175,8 +175,13 @@ export const ArticleSectionBody = ({
                       wrap={false}>
                       <View style={styles.col6Left}>
                         <Text>
-                          {insertNewlines(subItem.userSeqNumber || '') ||
-                            insertNewlines(`${index + 1}.${subIndex + 1}`)}
+                          {subItem.userSeqNumber
+                            ? insertNewlines(subItem.userSeqNumber)
+                            : mainPosition.userSeqNumber
+                            ? insertNewlines(
+                                `${mainPosition.userSeqNumber}.${subIndex + 1}`,
+                              )
+                            : insertNewlines(`${index + 1}.${subIndex + 1}`)}
                         </Text>
                       </View>
 

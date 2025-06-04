@@ -663,8 +663,18 @@ const useSubPosition = <
     [hoveredSubRowIndex, setHoveredSubRowIndex, subIndex],
   );
 
-  const renderUserSeqNumberCell = useCallback(
-    () => (
+  const renderUserSeqNumberCell = useCallback(() => {
+    const mainSeqOverride = watch(
+      `items.${parentIndex}.userSeqNumber` as Path<TForm>,
+    );
+
+    const computedPrefix = mainSeqOverride
+      ? `${mainSeqOverride}.${subIndex + 1}`
+      : `${parentIndex + 1}.${subIndex + 1}`;
+
+    const subOverride = subItem.userSeqNumber;
+
+    return (
       <TableCell
         align="left"
         noPadding
@@ -737,22 +747,21 @@ const useSubPosition = <
                 textOverflow: 'ellipsis',
                 overflow: 'auto',
               }}>
-              {subItem?.userSeqNumber || `${parentIndex + 1}.${subIndex + 1}`}
+              {subOverride || computedPrefix}
             </Typography>
           </Tooltip>
         )}
       </TableCell>
-    ),
-    [
-      editableSubRow,
-      parentIndex,
-      setEditableSubRow,
-      setValue,
-      pathBase,
-      subIndex,
-      subItem,
-    ],
-  );
+    );
+  }, [
+    editableSubRow,
+    parentIndex,
+    setEditableSubRow,
+    setValue,
+    pathBase,
+    subIndex,
+    subItem,
+  ]);
 
   const renderNameCell = useCallback(
     () => (

@@ -267,7 +267,7 @@ export const formatQuotationRecord = (
             unitAmount: formattedSubUnitAmount,
             unitPurchaseAmount: formattedSubPurchaseAmount,
             description: sub.description,
-            userSeqNumber: sub.userSeqNumber || undefined,
+            userSeqNumber: undefined,
             article: sub.article
               ? {
                   ...(sub.article.id && sub.article.id.length > 8
