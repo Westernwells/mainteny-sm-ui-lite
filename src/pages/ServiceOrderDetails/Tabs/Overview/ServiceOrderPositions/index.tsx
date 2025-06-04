@@ -327,6 +327,17 @@ const ServiceOrderPositions = ({serviceOrder}: Props) => {
         dialogProps={{
           maxWidth: 'xl',
           open: isOpen || false,
+          disableEscapeKeyDown: true,
+          disableRestoreFocus: true,
+          keepMounted: true,
+          onClose: (event, reason) => {
+            if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
+              return;
+            }
+            setIsOpen(false);
+            setOpenMode(null);
+            reset();
+          },
         }}
         saveButtonText="Save"
         saveButtonContainerStyles={{

@@ -714,7 +714,7 @@ export const buildServiceOrderPayload = (
       unitAmount: sub.unitAmount,
       quantity: Number.isNaN(Number(sub.quantity)) ? 0 : Number(sub.quantity),
       description: sub.description,
-      userSeqNumber: sub.userSeqNumber || undefined,
+      userSeqNumber: undefined,
     })),
     userSeqNumber: item.userSeqNumber || undefined,
   })),
@@ -832,7 +832,7 @@ export function formatServiceOrderArticles(
             unitPurchaseAmount:
               sub.unitPurchaseAmount && makeAmount(sub.unitPurchaseAmount),
             unitAmount: makeAmount(sub.unitAmount),
-            userSeqNumber: sub.userSeqNumber || undefined,
+            userSeqNumber: undefined,
           } as ServiceOrderSubArticleRecord),
       );
     }
